@@ -68,8 +68,8 @@ public:
     /**
      * Calculates the spectrogram (tf-representation) of a given signal
      *
-     * @param[in] signal         input-signal to calculate spectrogram of
-     * @param[in] windowSize     size of the window which is used (resolution in time an frequency is depending on it)
+     * @param\[in\] signal         input-signal to calculate spectrogram of
+     * @param\[in\] windowSize     size of the window which is used (resolution in time an frequency is depending on it)
      *
      * @return spectrogram-matrix (tf-representation of the input signal)
      */
@@ -81,9 +81,9 @@ private:
     /**
      * Calculates a gaussean window function
      *
-     * @param[in] sample_count   number of samples
-     * @param[in] scale          window width
-     * @param[in] translation    translation of the window among a signal
+     * @param\[in\] sample_count   number of samples
+     * @param\[in\] scale          window width
+     * @param\[in\] translation    translation of the window among a signal
      *
      * @return samples of window-vector
      */
@@ -95,7 +95,7 @@ private:
     /**
      * Calculates the spectogram matrix for a given input data matrix.
      *
-     * @param[in] data       The input data.
+     * @param\[in\] data       The input data.
      *
      * @return               The spectogram matrix.
      */
@@ -106,7 +106,7 @@ private:
      * Sums up (reduces) the in parallel processed spectogram matrix.
      *
      * @param[out] resultData    The result data.
-     * @param[in]  data          The incoming, temporary result data.
+     * @param\[in\] data          The incoming, temporary result data.
      */
     static void reduce(Eigen::MatrixXd &resultData,
                        const Eigen::MatrixXd &data);

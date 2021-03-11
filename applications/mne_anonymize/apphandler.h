@@ -99,8 +99,8 @@ public:
      * @see QT Documentation
      * @see https://doc.qt.io/qt-5/qapplication.html#details
      *
-     * @param [in] argc (argument count) number of arguments on the command line.
-     * @param [in] argv (argument vector) an array of pointers to arrays of characters.
+     * @param\[in\] argc (argument count) number of arguments on the command line.
+     * @param\[in\] argv (argument vector) an array of pointers to arrays of characters.
      *
      * @return Pointer to a QCoreApplication.
      */
@@ -117,8 +117,8 @@ public:
      * @see MNE-CPP Documentation
      * @see https://mne-cpp.github.io/
      *
-     * @param [in] argc (argument count) number of arguments on the command line.
-     * @param [in] argv (argument vector) an array of pointers to arrays of characters.
+     * @param\[in\] argc (argument count) number of arguments on the command line.
+     * @param\[in\] argv (argument vector) an array of pointers to arrays of characters.
      *
      * @return Pointer to a SettingsControllerCl object.
      */

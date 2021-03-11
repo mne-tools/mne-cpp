@@ -92,7 +92,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_MNEBemSurface    BEM surface which should be copied
+     * @param\[in\] p_MNEBemSurface    BEM surface which should be copied
      */
     MNEBemSurface(const MNEBemSurface& p_MNEBemSurface);
 
@@ -140,7 +140,7 @@ public:
     /**
      * Writes the bem surface to a FIFF stream
      *
-     * @param[in] p_pStream  The stream to write to.
+     * @param\[in\] p_pStream  The stream to write to.
      */
     void writeToStream(FIFFLIB::FiffStream* p_pStream);
 
@@ -148,7 +148,7 @@ public:
     /**
      * Map bem id integers to human-readable names
      *
-     * @param[in] frame  The bem id integer
+     * @param\[in\] frame  The bem id integer
      *
      * @return Human readable form of the bem id.
      */

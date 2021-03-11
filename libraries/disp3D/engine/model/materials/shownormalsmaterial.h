@@ -94,7 +94,7 @@ public:
     /**
      * Default constructor.
      *
-     * @param[in] parent         The parent of this class.
+     * @param\[in\] parent         The parent of this class.
      */
     explicit ShowNormalsMaterial(Qt3DCore::QNode *parent = 0);
 

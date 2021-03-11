@@ -154,7 +154,7 @@ public:
     /**
      * Constructs an inverse operator, by reading from a IO device.
      *
-     * @param[in] p_IODevice     IO device to read from the evoked data set.
+     * @param\[in\] p_IODevice     IO device to read from the evoked data set.
      */
     MNEInverseOperator(QIODevice& p_IODevice);
 
@@ -162,13 +162,13 @@ public:
     /**
      * Constructs an inverse operator by making one.
      *
-     * @param[in] info               The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
-     * @param[in] forward            Forward operator.
-     * @param[in] p_noise_cov        The noise covariance matrix.
-     * @param[in] loose              float in [0, 1]. Value that weights the source variances of the dipole components defining the tangent space of the cortical surfaces.
-     * @param[in] depth              float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed.
-     * @param[in] fixed              Use fixed source orientations normal to the cortical mantle. If True, the loose parameter is ignored.
-     * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels.
+     * @param\[in\] info               The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
+     * @param\[in\] forward            Forward operator.
+     * @param\[in\] p_noise_cov        The noise covariance matrix.
+     * @param\[in\] loose              float in [0, 1]. Value that weights the source variances of the dipole components defining the tangent space of the cortical surfaces.
+     * @param\[in\] depth              float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed.
+     * @param\[in\] fixed              Use fixed source orientations normal to the cortical mantle. If True, the loose parameter is ignored.
+     * @param\[in\] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels.
      */
     MNEInverseOperator(const FIFFLIB::FiffInfo &info,
                        const MNEForwardSolution& forward,
@@ -182,7 +182,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_MNEInverseOperator   MNE forward solution
+     * @param\[in\] p_MNEInverseOperator   MNE forward solution
      */
     MNEInverseOperator(const MNEInverseOperator &p_MNEInverseOperator);
 
@@ -200,9 +200,9 @@ public:
      * This does all the data transformations to compute the weights for the
      * eigenleads
      *
-     * @param[in] label          labels.
-     * @param[in] method         The applied normals. ("MNE" | "dSPM" | "sLORETA")
-     * @param[in] pick_normal    Pick normals.
+     * @param\[in\] label          labels.
+     * @param\[in\] method         The applied normals. ("MNE" | "dSPM" | "sLORETA")
+     * @param\[in\] pick_normal    Pick normals.
      * @param[out] K             Kernel.
      * @param[out] noise_norm    Noise normals.
      * @param[out] vertno        Vertices of the hemispheres.
@@ -220,7 +220,7 @@ public:
     /**
      * Check that channels in inverse operator are measurements.
      *
-     * @param[in] info   The measurement info
+     * @param\[in\] info   The measurement info
      *
      * @return true when successful, false otherwise
      */
@@ -230,10 +230,10 @@ public:
     /**
      * Clusters the current kernel
      *
-     * @param[in]    p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere
-     * @param[in]    p_iClusterSize      Maximal cluster size per roi
+     * @param\[in\]   p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere
+     * @param\[in\]   p_iClusterSize      Maximal cluster size per roi
      * @param[out]   p_D                 The cluster operator
-     * @param[in]    p_sMethod           "cityblock" or "sqeuclidean"
+     * @param\[in\]   p_sMethod           "cityblock" or "sqeuclidean"
      *
      * @return the clustered kernel
      */
@@ -270,13 +270,13 @@ public:
     /**
      * Assembles the inverse operator.
      *
-     * @param[in] info               The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
-     * @param[in] forward            Forward operator.
-     * @param[in] p_noise_cov        The noise covariance matrix.
-     * @param[in] loose              float in [0, 1]. Value that weights the source variances of the dipole components defining the tangent space of the cortical surfaces.
-     * @param[in] depth              float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed.
-     * @param[in] fixed              Use fixed source orientations normal to the cortical mantle. If True, the loose parameter is ignored.
-     * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels.
+     * @param\[in\] info               The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
+     * @param\[in\] forward            Forward operator.
+     * @param\[in\] p_noise_cov        The noise covariance matrix.
+     * @param\[in\] loose              float in [0, 1]. Value that weights the source variances of the dipole components defining the tangent space of the cortical surfaces.
+     * @param\[in\] depth              float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed.
+     * @param\[in\] fixed              Use fixed source orientations normal to the cortical mantle. If True, the loose parameter is ignored.
+     * @param\[in\] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels.
      *
      * @return the assembled inverse operator
      */
@@ -296,10 +296,10 @@ public:
      *
      * Prepare for actually computing the inverse
      *
-     * @param[in] nave      Number of averages (scales the noise covariance)
-     * @param[in] lambda2   The regularization factor
-     * @param[in] dSPM      Compute the noise-normalization factors for dSPM?
-     * @param[in] sLORETA   Compute the noise-normalization factors for sLORETA?
+     * @param\[in\] nave      Number of averages (scales the noise covariance)
+     * @param\[in\] lambda2   The regularization factor
+     * @param\[in\] dSPM      Compute the noise-normalization factors for dSPM?
+     * @param\[in\] sLORETA   Compute the noise-normalization factors for sLORETA?
      *
      * @return the prepared inverse operator
      */
@@ -316,8 +316,8 @@ public:
      *
      * Reads the inverse operator decomposition from a fif file
      *
-     * @param [in] p_IODevice   A fiff IO device like a fiff QFile or QTCPSocket
-     * @param [out] inv          The read inverse operator
+     * @param\[in\] p_IODevice   A fiff IO device like a fiff QFile or QTCPSocket
+     * @param+[\[]out] inv          The read inverse operator
      *
      * @return true if succeeded, false otherwise
      */
@@ -329,7 +329,7 @@ public:
      *
      * Writes an inverse operator to a fif file
      *
-     * @param [in] p_IODevice   IO device to write the inverse operator to.
+     * @param\[in\] p_IODevice   IO device to write the inverse operator to.
      */
     void write(QIODevice &p_IODevice);
 
@@ -337,7 +337,7 @@ public:
     /**
      * Writes the inverse operator to a FIFF stream
      *
-     * @param[in] p_pStream  The stream to write to.
+     * @param\[in\] p_pStream  The stream to write to.
      */
     void writeToStream(FIFFLIB::FiffStream* p_pStream);
 
@@ -345,8 +345,8 @@ public:
     /**
      * overloading the stream out operator<<
      *
-     * @param[in] out                    The stream to which the fiff covariance should be assigned to.
-     * @param[in] p_MNEInverseOperator   MNEInverseOperator which should be assigned to the stream.
+     * @param\[in\] out                    The stream to which the fiff covariance should be assigned to.
+     * @param\[in\] p_MNEInverseOperator   MNEInverseOperator which should be assigned to the stream.
      *
      * @return the stream with the attached fiff covariance matrix
      */

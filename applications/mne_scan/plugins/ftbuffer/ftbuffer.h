@@ -195,7 +195,7 @@ private:
     /**
      * Receives new data from producer, publishes to plugin output rtmsa
      *
-     * @param[in] matData   New data from FtBuffProducer
+     * @param\[in\] matData   New data from FtBuffProducer
      */
     void onNewDataAvailable(const Eigen::MatrixXd &matData);
 
@@ -209,7 +209,7 @@ private:
     /**
      * Sets up Fiff info from passed FiffInfo and uses it to initialize m_pRTMSA_BufferOutput
      *
-     * @param[in] FiffInfo  FiffInfo used to set up buffer output
+     * @param\[in\] FiffInfo  FiffInfo used to set up buffer output
      */
     bool setupRTMSA(FIFFLIB::FiffInfo FiffInfo);
 

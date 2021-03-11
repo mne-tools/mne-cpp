@@ -115,7 +115,7 @@ public:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param mode     The new mode (Clinical=0, Research=1).
+     * @param\[in\] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -123,7 +123,7 @@ public:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param mode     The new mode (RealTime=0, Offline=1).
+     * @param\[in\] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 
@@ -138,7 +138,7 @@ public:
     /**
      * Add a new Bem to the drop down menu.
      *
-     * @param sBemName     The name of the bem.
+     * @param\[in\] sBemName     The name of the bem.
      */
     void addSelectionBem(const QString& sBemName);
 
@@ -162,7 +162,7 @@ public:
     /**
      * Set the position of the fiducials.
      *
-     * @param[in] vecAxialPosition     The vector containig x-,y- and x- Position for LPA, Nasion and RPA.
+     * @param\[in\] vecAxialPosition     The vector containig x-,y- and x- Position for LPA, Nasion and RPA.
      */
     void setFiducials(const QVector3D vecAxialPosition);
 
@@ -202,7 +202,7 @@ public:
     /**
      * Set the the number of omitted points.
      *
-     * @param[in] iN  The number of omitted digitizer points.
+     * @param\[in\] iN  The number of omitted digitizer points.
      */
     void setOmittedPoints(const int iN);
 
@@ -210,7 +210,7 @@ public:
     /**
      * Set the the Root-Mean-Square-Error (Digitizer-Surface) after icp.
      *
-     * @param[in] fRMSE     The RMSE in m.
+     * @param\[in\] fRMSE     The RMSE in m.
      */
     void setRMSE(const float fRMSE);
 
@@ -252,9 +252,9 @@ public:
     /**
      * Set the transformation received from the ICP  algorithm.
      *
-     * @param[in] vecRot        The rotation angle vector in rad (x,y,z).
-     * @param[in] vecTrans      The traslation vector (x,y,z).
-     * @param[in] vecScale      The vector with the scaling parameters (due to euler transformation: z,y,x).
+     * @param\[in\] vecRot        The rotation angle vector in rad (x,y,z).
+     * @param\[in\] vecTrans      The traslation vector (x,y,z).
+     * @param\[in\] vecScale      The vector with the scaling parameters (due to euler transformation: z,y,x).
      *
      */
     void setTransParams(const Eigen::Vector3f& vecTrans,
@@ -346,7 +346,7 @@ signals:
     /**
      * Emit this signal whenever new fiducials were loaded.
      *
-     * @param[in] sFilePath    The file path to the fiduical file.
+     * @param\[in\] sFilePath    The file path to the fiduical file.
      */
     void fidFileChanged(const QString& sFilePath);
 
@@ -354,7 +354,7 @@ signals:
     /**
      * Emit this signal whenever the picked fiducial changed.
      *
-     * @param[in] iFiducial    The picked fiducial.
+     * @param\[in\] iFiducial    The picked fiducial.
      */
     void fiducialChanged(const int iFiducial);
 
@@ -362,7 +362,7 @@ signals:
     /**
      * Emit this signal whenever the file to store the fiducials changed.
      *
-     * @param[in] sFilePath    The file path to the stored fiducials.
+     * @param\[in\] sFilePath    The file path to the stored fiducials.
      */
     void fidStoreFileChanged(const QString& sFilePath);
 
@@ -370,7 +370,7 @@ signals:
     /**
      * Emit this signal whenever new digitizers were loaded.
      *
-     * @param[in] sFilePath    The file path to the digitizers.
+     * @param\[in\] sFilePath    The file path to the digitizers.
      */
     void digFileChanged(const QString& sFilePath);
 
@@ -390,7 +390,7 @@ signals:
     /**
      * Emit this signal whenever the transformation should be stored.
      *
-     * @param[in] sFilePath    The file path to store the transformation.
+     * @param\[in\] sFilePath    The file path to store the transformation.
      */
     void storeTrans(const QString& sFilePath);
 
@@ -398,7 +398,7 @@ signals:
     /**
      * Emit this signal whenever the transformation should be loaded.
      *
-     * @param[in] sFilePath    The file path to load the transformation.
+     * @param\[in\] sFilePath    The file path to load the transformation.
      */
     void loadTrans(const QString& sFilePath);
 
@@ -406,7 +406,7 @@ signals:
     /**
      * Emit this signal whenever the selected Bem changed.
      *
-     * @param[in] sText    The file name of the currently selected Bem.
+     * @param\[in\] sText    The file name of the currently selected Bem.
      */
     void changeSelectedBem(const QString &sText);
 

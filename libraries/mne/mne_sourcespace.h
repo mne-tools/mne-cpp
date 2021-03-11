@@ -105,7 +105,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_MNESourceSpace   MNE forward solution
+     * @param\[in\] p_MNESourceSpace   MNE forward solution
      */
     MNESourceSpace(const MNESourceSpace &p_MNESourceSpace);
 
@@ -135,7 +135,7 @@ public:
      *
      * Returns the hemisphere id ( FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.
      *
-     * @param[in] p_Hemisphere the hemisphere to investigate
+     * @param\[in\] p_Hemisphere the hemisphere to investigate
      *
      * @return the deduced hemisphere id
      */
@@ -153,7 +153,7 @@ public:
     /**
      * Find vertex numbers and indices from label
      *
-     * @param[in] label      Source space label
+     * @param\[in\] label      Source space label
      * @param[out] src_sel   array of int (idx.size() = vertno[0].size() + vertno[1].size())
      *                       Indices of the selected vertices in sourse space
      *
@@ -168,17 +168,17 @@ public:
      * Generate the patch information from the 'nearest' vector in a source space. For vertex in the source
      * space it provides the list of neighboring vertices in the high resolution triangulation.
      *
-     * @param [in,out] p_Hemisphere  The source space.
+     * @param[in, out] p_Hemisphere  The source space.
      *
      * @return true if succeeded, false otherwise
      */
-    static bool patch_info(MNEHemisphere &p_Hemisphere);//VectorXi& nearest, QList<VectorXi>& pinfo);@param [in] nearest   The nearest vector of the source space.@param [out] pinfo    The requested patch information.
+    static bool patch_info(MNEHemisphere &p_Hemisphere);//VectorXi& nearest, QList<VectorXi>& pinfo);@param\[in\] nearest   The nearest vector of the source space.@param+[\[]out] pinfo    The requested patch information.
 
     //=========================================================================================================
     /**
      * Reduces a source space to selected regions
      *
-     * @param[in] p_qListLabels  ROIs
+     * @param\[in\] p_qListLabels  ROIs
      *
      * @return the reduced source space
      */
@@ -190,9 +190,9 @@ public:
      *
      * Reads source spaces from a fif file
      *
-     * @param [in,out] p_pStream         The opened fif file
-     * @param [in] add_geom          Add geometry information to the source spaces
-     * @param [out] p_SourceSpace    The read source spaces
+     * @param[in, out] p_pStream         The opened fif file
+     * @param\[in\] add_geom          Add geometry information to the source spaces
+     * @param+[\[]out] p_SourceSpace    The read source spaces
      *
      * @return true if succeeded, false otherwise
      */
@@ -218,8 +218,8 @@ public:
      *
      * Transforms source space data to the desired coordinate system
      *
-     * @param [in] dest destination check code
-     * @param [in] trans transformation information
+     * @param\[in\] dest destination check code
+     * @param\[in\] trans transformation information
      *
      * @return true if succeeded, false otherwise
      */
@@ -232,7 +232,7 @@ public:
      *
      * Write the source spaces to a FIF stream
      *
-     * @param[in] p_pStream  The stream to write to.
+     * @param\[in\] p_pStream  The stream to write to.
      */
     void writeToStream(FIFFLIB::FiffStream* p_pStream);
 
@@ -240,7 +240,7 @@ public:
     /**
      * Subscript operator [] to access parameter values by index
      *
-     * @param[in] idx    the hemisphere index (0 or 1).
+     * @param\[in\] idx    the hemisphere index (0 or 1).
      *
      * @return Hemisphere related to the parameter index.
      */
@@ -250,7 +250,7 @@ public:
     /**
      * Subscript operator [] to access parameter values by index
      *
-     * @param[in] idx    the hemisphere index (0 or 1).
+     * @param\[in\] idx    the hemisphere index (0 or 1).
      *
      * @return Hemisphere related to the parameter index.
      */
@@ -260,7 +260,7 @@ public:
     /**
      * Subscript operator [] to access parameter values by index
      *
-     * @param[in] idt    the hemisphere identifier ("lh" or "rh").
+     * @param\[in\] idt    the hemisphere identifier ("lh" or "rh").
      *
      * @return Hemisphere related to the parameter identifier.
      */
@@ -270,7 +270,7 @@ public:
     /**
      * Subscript operator [] to access parameter values by index
      *
-     * @param[in] idt    the hemisphere identifier ("lh" or "rh").
+     * @param\[in\] idt    the hemisphere identifier ("lh" or "rh").
      *
      * @return Hemisphere related to the parameter identifier.
      */
@@ -279,7 +279,7 @@ public:
     /**
      * Overloaded == operator to compare an object to this instance.
      *
-     * @param[in] object    The object which should be compared to.
+     * @param\[in\] object    The object which should be compared to.
      *
      * @return true if equal, false otherwise
      */
@@ -293,7 +293,7 @@ private:
      *
      * Completes triangulation info
      *
-     * @param [in, out] p_pHemisphere   Hemisphere to be completed
+     * @param+[\[]in, out] p_pHemisphere   Hemisphere to be completed
      *
      * @return true if succeeded, false otherwise
      */
@@ -305,9 +305,9 @@ private:
      *
      * Reads a single source space (hemisphere)
      *
-     * @param [in] p_pStream         The opened fif file
-     * @param [in] p_Tree            Search for the source space here
-     * @param [out] p_pHemisphere    The read source space (hemisphere)
+     * @param\[in\] p_pStream         The opened fif file
+     * @param\[in\] p_Tree            Search for the source space here
+     * @param+[\[]out] p_pHemisphere    The read source space (hemisphere)
      *
      * @return true if succeeded, false otherwise
      */

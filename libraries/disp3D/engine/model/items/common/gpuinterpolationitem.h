@@ -98,9 +98,9 @@ public:
     /**
      * Default constructor.
      *
-     * @param[in] p3DEntityParent    The parent 3D entity.
-     * @param[in] iType              The type of the item. See types.h for declaration and definition.
-     * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
+     * @param\[in\] p3DEntityParent    The parent 3D entity.
+     * @param\[in\] iType              The type of the item. See types.h for declaration and definition.
+     * @param\[in\] text               The text of this item. This is also by default the displayed name of the item in a view.
      */
     explicit GpuInterpolationItem(Qt3DCore::QEntity* p3DEntityParent = Q_NULLPTR,
                                   int iType = Data3DTreeModelItemTypes::GpuInterpolationItem,
@@ -116,9 +116,9 @@ public:
     /**
      * Initialize interpolation data of this item.
      *
-     * @param[in] matVertices       The surface vertices.
-     * @param[in] matNormals        The surface normals.
-     * @param[in] matTriangles      The surface triangles.
+     * @param\[in\] matVertices       The surface vertices.
+     * @param\[in\] matNormals        The surface normals.
+     * @param\[in\] matTriangles      The surface triangles.
      */
     virtual void initData(const Eigen::MatrixX3f &matVertices,
                           const Eigen::MatrixX3f &matNormals,
@@ -128,7 +128,7 @@ public:
     /**
      * Set the new Interpolation matrix for the interpolation.
      *
-     * @param[in] pMatInterpolationMatrix  The new Interpolation matrix for interpolation on the bem surface.
+     * @param\[in\] pMatInterpolationMatrix  The new Interpolation matrix for interpolation on the bem surface.
      */
     virtual void setInterpolationMatrix(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
 
@@ -136,7 +136,7 @@ public:
     /**
      * Add a new vector with signal data form the sensors.
      *
-     * @param[in] tSignalVec              Vector with one float value for each sensor.
+     * @param\[in\] tSignalVec              Vector with one float value for each sensor.
      */
     virtual void addNewRtData(const Eigen::VectorXf &tSignalVec);
 
@@ -144,7 +144,7 @@ public:
     /**
      * This function set the normalization value.
      *
-     * @param[in] vecThresholds       The new threshold values used for normalizing the data.
+     * @param\[in\] vecThresholds       The new threshold values used for normalizing the data.
      */
     virtual void setThresholds(const QVector3D& tVecThresholds);
 
@@ -152,7 +152,7 @@ public:
     /**
      * This function sets the colormap type
      *
-     * @param[in] tColormapType           The new colormap name.
+     * @param\[in\] tColormapType           The new colormap name.
      */
     virtual void setColormapType(const QString& tColormapType);
 
@@ -161,7 +161,7 @@ protected:
     /**
      * Build the content of the Interpolation matrix buffer.
      *
-     * @param[in] pMatInterpolationMatrix    The Interpolation matrix.
+     * @param\[in\] pMatInterpolationMatrix    The Interpolation matrix.
      *
      * @return                          Interpolation matrix is byte array form.
      */
@@ -171,7 +171,7 @@ protected:
     /**
      * Build buffer filled with 0.0f.
      *
-     * @param[in] tSize         Number of zeros.
+     * @param\[in\] tSize         Number of zeros.
      *
      * @return              Buffer content.
      */

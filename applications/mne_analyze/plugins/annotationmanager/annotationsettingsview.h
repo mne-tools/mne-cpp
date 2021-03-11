@@ -102,7 +102,7 @@ public:
     /**
      * Updates the GUI combo box with a new item type, given by the input parameter.
      *
-     * @param [in] currentAnnotationType    New annotation type to be added to the combo box
+     * @param\[in\] currentAnnotationType    New annotation type to be added to the combo box
      */
     void updateComboBox(const QString &currentAnnotationType);
 
@@ -110,7 +110,7 @@ public:
     /**
      * Passes a shared pointer to the annotation model triggers all the relevant init functions
      *
-     * @param [in] pAnnModel    Pointer to the annotation model of the current loaded file
+     * @param\[in\] pAnnModel    Pointer to the annotation model of the current loaded file
      */
     void setModel(QSharedPointer<ANSHAREDLIB::AnnotationModel> pAnnModel);
 
@@ -131,7 +131,7 @@ public slots:
     /**
      * Adds input parameter to annotation model as a new annotation.
      *
-     * @param [in] iSample   Sample number to be added to annotation model
+     * @param\[in\] iSample   Sample number to be added to annotation model
      */
     void addAnnotationToModel(int iSamplePos);
 
@@ -139,7 +139,7 @@ public slots:
     /**
      * Update pointer to currently loaded FiffRawViewModel
      *
-     * @param[in] pFiffRawModel     saves pointer to ucurrently loaded FiffRawViewModel
+     * @param\[in\] pFiffRawModel     saves pointer to ucurrently loaded FiffRawViewModel
      */
     void onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel);
 
@@ -148,7 +148,7 @@ signals:
     /**
      * Emits state of the Activate Annotations checkbox
      *
-     * @param [in] iCheckBoxState   0 for unchecked, 1 for checked
+     * @param\[in\] iCheckBoxState   0 for unchecked, 1 for checked
      */
     void activeEventsChecked(const int& iCheckBoxState);
 
@@ -174,7 +174,7 @@ signals:
     /**
      * ends event to trigger progress bar to appear
      *
-     * @param [in] sMessage     message to appear
+     * @param\[in\] sMessage     message to appear
      */
     void loadingStart(QString sMessage = "Loading Events...");
 
@@ -202,7 +202,7 @@ protected slots:
     /**
      * Transmits the checkbox state of the 'Show events in Signal Viewer' checkbox
      *
-     * @param [in] iCheckBoxState    0 for unchecked, 2 for checked
+     * @param\[in\] iCheckBoxState    0 for unchecked, 2 for checked
      */
     void onActiveEventsChecked(int iCheckBoxState);
 
@@ -210,7 +210,7 @@ protected slots:
     /**
      * Transmits the checkbox state of the 'Show selected events only' checkbox
      *
-     * @param [in] iCheckBoxState    0 for unchecked, 2 for checked
+     * @param\[in\] iCheckBoxState    0 for unchecked, 2 for checked
      */
     void onSelectedEventsChecked(int iCheckBoxState);
 
@@ -218,7 +218,7 @@ protected slots:
     /**
      * Transmits the checkbox state ofthe 'Show events from all groups' checkbox
      *
-     * @param [in] iCheckBoxState    0 for unchecked, 2 for checked
+     * @param\[in\] iCheckBoxState    0 for unchecked, 2 for checked
      */
     void onShowAllChecked(int iCheckBoxState);
 
@@ -232,7 +232,7 @@ protected slots:
     /**
      * Used to handle key presses to interact with events.
      *
-     * @param [in] event    a key press event
+     * @param\[in\] event    a key press event
      */
     void keyReleaseEvent(QKeyEvent* event);
 
@@ -253,7 +253,7 @@ private slots:
     /**
      * Update selected annotation with new sample value iValue
      *
-     * @param [in] iValue   new sample value for selected annotation
+     * @param\[in\] iValue   new sample value for selected annotation
      */
     void realTimeDataSample(int iValue);
 
@@ -261,7 +261,7 @@ private slots:
     /**
      * Update selected annotation with new time value dValue
      *
-     * @param [in] dValue   new time value for selected annotation
+     * @param\[in\] dValue   new time value for selected annotation
      */
     void realTimeDataTime(double dValue);
 
@@ -269,7 +269,7 @@ private slots:
     /**
      * Populates the trigger detect view with the correct channel info
      *
-     * @param[in] info  data for the trigger view to get a list of the stim channels
+     * @param\[in\] info  data for the trigger view to get a list of the stim channels
      */
     void initTriggerDetect(const QSharedPointer<FIFFLIB::FiffInfo> info);
 
@@ -296,8 +296,8 @@ private:
     /**
      * Creates a new user-made group of events
      *
-     * @param[in] sName     group name
-     * @param[in] iType     group default type
+     * @param\[in\] sName     group name
+     * @param\[in\] iType     group default type
      */
     bool newUserGroup(const QString& sName,
                       int iType = 0,
@@ -307,9 +307,9 @@ private:
     /**
      * Creates a new group based on Stim channel triggers
      *
-     * @param[in] sName         group name
-     * @param[in] iType         group default type
-     * @param[in] groupColor    group color
+     * @param\[in\] sName         group name
+     * @param\[in\] iType         group default type
+     * @param\[in\] groupColor    group color
      *
      * @return      returns whether group creation was succesful
      */
@@ -357,7 +357,7 @@ private:
     /**
      * Brings up a menu for interacting with events
      *
-     * @param[in] pos   Position on screen where the menu will show up
+     * @param\[in\] pos   Position on screen where the menu will show up
      */
     void customEventContextMenuRequested(const QPoint &pos);
 
@@ -365,7 +365,7 @@ private:
     /**
      * Brings up a menu for interacting with event groups
      *
-     * @param[in] pos   Position on screen where the menu will show up
+     * @param\[in\] pos   Position on screen where the menu will show up
      */
     void customGroupContextMenuRequested(const QPoint &pos);
 
@@ -379,9 +379,9 @@ private:
     /**
      * Used to pass parameters of the currently loaded fif file to the annotation model.
      *
-     * @param [in] iFirst   Sample number of the first sample in the file
-     * @param [in] iLast    Sample number of the last sample in the file
-     * @param [in] fFreq    Sample frequency for the data in the file
+     * @param\[in\] iFirst   Sample number of the first sample in the file
+     * @param\[in\] iLast    Sample number of the last sample in the file
+     * @param\[in\] fFreq    Sample frequency for the data in the file
      */
     void passFiffParams(int iFirst,
                         int iLast,
@@ -391,8 +391,8 @@ private:
     /**
      * Starts trigger detection in separate thread
      *
-     * @param [in] sChannelName      name of stim channel from which we will be reading
-     * @param [in] dThreshold        threshold for a spike to count as a trigger
+     * @param\[in\] sChannelName      name of stim channel from which we will be reading
+     * @param\[in\] dThreshold        threshold for a spike to count as a trigger
      */
     void onDetectTriggers(const QString& sChannelName,
                           double dThreshold);
@@ -401,8 +401,8 @@ private:
     /**
      * Perfroms trigger detection and sorts events into map of events by group based on detection threshold
      *
-     * @param[in] sChannelName      name of stim channel from which we will be reading
-     * @param[in] dThreshold        threshold for a spike to count as a trigger
+     * @param\[in\] sChannelName      name of stim channel from which we will be reading
+     * @param\[in\] dThreshold        threshold for a spike to count as a trigger
      *
      * @return      returns map of events sorted by groups based on threshold
      */

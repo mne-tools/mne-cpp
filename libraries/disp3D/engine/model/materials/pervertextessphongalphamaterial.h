@@ -91,8 +91,8 @@ public:
     /**
      * Default constructor.
      *
-     * @param[in] bUseSortPolicy     Whether to use the sort policy in the framegraph.
-     * @param[in] parent             The parent of this class.
+     * @param\[in\] bUseSortPolicy     Whether to use the sort policy in the framegraph.
+     * @param\[in\] parent             The parent of this class.
      */
     explicit PerVertexTessPhongAlphaMaterial(bool bUseSortPolicy = false, Qt3DCore::QNode *parent = nullptr);
 

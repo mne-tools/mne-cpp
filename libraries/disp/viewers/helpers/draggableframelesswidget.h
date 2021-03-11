@@ -84,11 +84,11 @@ public:
     /**
      * Constructs a DraggableFramelessWidget which is a child of parent.
      *
-     * @param [in] parent        The parent of the widget.
-     * @param [in] flags         The window flags.
-     * @param [in] bRoundEdges   Flag specifying whether to round the edges.
-     * @param [in] bDraggable    Flag specifying whether this widget is draggable.
-     * @param [in] bFrameless    Flag specifying whether this widget is frameless.
+     * @param\[in\] parent        The parent of the widget.
+     * @param\[in\] flags         The window flags.
+     * @param\[in\] bRoundEdges   Flag specifying whether to round the edges.
+     * @param\[in\] bDraggable    Flag specifying whether this widget is draggable.
+     * @param\[in\] bFrameless    Flag specifying whether this widget is frameless.
      */
     DraggableFramelessWidget(QWidget *parent = 0,
                              Qt::WindowFlags flags = 0,
@@ -106,7 +106,7 @@ public:
     /**
      * Set the draggable flag of this widget.
      *
-     * @param [in] bFlag  the flag to set.
+     * @param\[in\] bFlag  the flag to set.
      */
     void setDraggable(bool bFlag);
 
@@ -139,8 +139,8 @@ protected:
     /**
      * Calculates a rect with rounded edged.
      *
-     * @param [in] rect the rect which is supposed to be rounded.
-     * @param [in] r the radius of round edges.
+     * @param\[in\] rect the rect which is supposed to be rounded.
+     * @param\[in\] r the radius of round edges.
      * @return the rounded rect in form of a QRegion
      */
     QRegion roundedRect(const QRect& rect, int r);

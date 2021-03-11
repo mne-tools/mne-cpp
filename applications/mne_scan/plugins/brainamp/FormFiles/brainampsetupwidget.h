@@ -77,8 +77,8 @@ public:
     /**
      * Constructs a BrainAMPSetupWidget which is a child of parent.
      *
-     * @param [in] parent pointer to parent widget; If parent is 0, the new BrainAMPSetupWidget becomes a window. If parent is another widget, BrainAMPSetupWidget becomes a child window inside parent. BrainAMPSetupWidget is deleted when its parent is deleted.
-     * @param [in] pBrainAMP a pointer to the corresponding ECGSimulator.
+     * @param\[in\] parent pointer to parent widget; If parent is 0, the new BrainAMPSetupWidget becomes a window. If parent is another widget, BrainAMPSetupWidget becomes a child window inside parent. BrainAMPSetupWidget is deleted when its parent is deleted.
+     * @param\[in\] pBrainAMP a pointer to the corresponding ECGSimulator.
      */
     BrainAMPSetupWidget(BrainAMP* pBrainAMP, QWidget *parent = 0);
 

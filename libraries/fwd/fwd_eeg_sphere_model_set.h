@@ -94,7 +94,7 @@ public:
 //    /**
 //    * Copy constructor.
 //    *
-//    * @param[in] p_FwdEegSphereModelSet     Forward EEG Sphere Model Set which should be copied
+//    * @param\[in\] p_FwdEegSphereModelSet     Forward EEG Sphere Model Set which should be copied
 //    */
 //    FwdEegSphereModelSet(const FwdEegSphereModelSet &p_FwdEegSphereModelSet);
 
@@ -123,7 +123,7 @@ public:
      * Choose and setup the default EEG sphere model
      * Refactored from: fwd_eeg_sphere_models.c
      *
-     * @param[in] s            The model set to which loaded models are added.
+     * @param\[in\] s            The model set to which loaded models are added.
      *
      * @return The model set with the default model (s + default models)
      */
@@ -134,8 +134,8 @@ public:
      * Load all models available in the specified file
      * Refactored from: fwd_eeg_sphere_models.c
      *
-     * @param[in] p_sFileName    file name to load models from
-     * @param[in] now            The model set to which loaded models are added.
+     * @param\[in\] p_sFileName    file name to load models from
+     * @param\[in\] now            The model set to which loaded models are added.
      *
      * @return The loaded model set (now + loaded models)
      */
@@ -146,7 +146,7 @@ public:
      * Find a model with a given name and return a duplicate
      * Refactored from: fwd_eeg_sphere_models.c
      *
-     * @param[in] p_sName    Name of the model to find
+     * @param\[in\] p_sName    Name of the model to find
      *
      * @return A duplicat of the found model
      */
@@ -157,7 +157,7 @@ public:
      * List the properties of available models
      * Refactored from: dipole_fit_setup.c
      *
-     * @param[in] f      std output stream
+     * @param\[in\] f      std output stream
      */
     void fwd_list_eeg_sphere_models(FILE *f);
 
@@ -179,7 +179,7 @@ public:
 //    /**
 //    * Subscript operator [] to access FwdEegSphereModel by index
 //    *
-//    * @param[in] idx    the FwdEegSphereModel index.
+//    * @param\[in\] idx    the FwdEegSphereModel index.
 //    *
 //    * @return FwdEegSphereModel related to the parameter index.
 //    */
@@ -189,7 +189,7 @@ public:
 //    /**
 //    * Subscript operator [] to access FwdEegSphereModel by index
 //    *
-//    * @param[in] idx    the FwdEegSphereModel index.
+//    * @param\[in\] idx    the FwdEegSphereModel index.
 //    *
 //    * @return FwdEegSphereModel related to the parameter index.
 //    */
@@ -199,7 +199,7 @@ public:
 //    /**
 //    * Subscript operator << to add a new FwdEegSphereModel
 //    *
-//    * @param[in] p_FwdEegSphereModel      FwdEegSphereModel to be added
+//    * @param\[in\] p_FwdEegSphereModel      FwdEegSphereModel to be added
 //    *
 //    * @return FwdEegSphereModelSet
 //    */

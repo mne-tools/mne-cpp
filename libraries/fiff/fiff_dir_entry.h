@@ -80,7 +80,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffDirEntry   Dir Entry which should be copied
+     * @param\[in\] p_FiffDirEntry   Dir Entry which should be copied
      */
     FiffDirEntry(const FiffDirEntry& p_FiffDirEntry);
 

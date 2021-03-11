@@ -103,7 +103,7 @@ public:
      * Copy constructor.
      * Refactored: fwd_dup_coil (fwd_coil_def.c)
      *
-     * @param[in] p_FwdCoil      FwdCoil which should be copied
+     * @param\[in\] p_FwdCoil      FwdCoil which should be copied
      */
     FwdCoil(const FwdCoil& p_FwdCoil);
 
@@ -119,8 +119,8 @@ public:
      * Create an electrode definition. Transform coordinate frame if so desired.
      * Refactored: fwd_create_eeg_el (fwd_coil_def.c)
      *
-     * @param[in] ch     Channel information to use
-     * @param[in] t      Transform the points using this
+     * @param\[in\] ch     Channel information to use
+     * @param\[in\] t      Transform the points using this
      *
      * @return   The created coil.
      */

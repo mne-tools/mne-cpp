@@ -88,7 +88,7 @@ public:
     /**
      * Sets the unit of the numeric data.
      *
-     * @param [in] unit of the data.
+     * @param\[in\] unit of the data.
      */
     inline void setUnit(const QString& unit);
 
@@ -105,7 +105,7 @@ public:
      * Sets a value and notify() all attached observers.
      * This method is inherited by Measurement.
      *
-     * @param [in] v the value which is set to the Numeric measurement.
+     * @param\[in\] v the value which is set to the Numeric measurement.
      */
     virtual void setValue(double v);
 

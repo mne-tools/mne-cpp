@@ -103,7 +103,7 @@ public:
     /**
      * Constructs a FiffRawView which is a child of parent.
      *
-     * @param [in] parent    The parent of widget.
+     * @param[in] parent    The parent of widget.
      */
     FiffRawView(QWidget *parent = nullptr);
 
@@ -123,7 +123,7 @@ public:
     /**
      * Setups the delegate of this view.
      *
-     * @param [in] pDelegate    The new delegate.
+     * @param[in] pDelegate    The new delegate.
      */
     void setDelegate(const QSharedPointer<FiffRawViewDelegate>& pDelegate);
 
@@ -137,7 +137,7 @@ public:
     /**
      * Setups the model of this view.
      *
-     * @param [in] pModel    The new model.
+     * @param[in] pModel    The new model.
      */
     void setModel(const QSharedPointer<ANSHAREDLIB::FiffRawViewModel>& pModel);
 
@@ -145,7 +145,7 @@ public:
     /**
      * Broadcast channel scaling
      *
-     * @param [in] scaleMap QMap with scaling values which is to be broadcasted to the model.
+     * @param[in] scaleMap QMap with scaling values which is to be broadcasted to the model.
      */
     void setScalingMap(const QMap<qint32, float>& scaleMap);
 
@@ -153,7 +153,7 @@ public:
     /**
      * Set the signal color.
      *
-     * @param [in] signalColor  The new signal color.
+     * @param[in] signalColor  The new signal color.
      */
     void setSignalColor(const QColor& signalColor);
 
@@ -161,7 +161,7 @@ public:
     /**
      * Broadcast the background color changes made in the QuickControl widget
      *
-     * @param [in] backgroundColor  The new background color.
+     * @param[in] backgroundColor  The new background color.
      */
     void setBackgroundColor(const QColor& backgroundColor);
 
@@ -169,7 +169,7 @@ public:
     /**
      * Sets new zoom factor
      *
-     * @param [in] dZoomFac  time window size;
+     * @param[in] dZoomFac  time window size;
      */
     void setZoom(double dZoomFac);
 
@@ -177,7 +177,7 @@ public:
     /**
      * Sets new time window size
      *
-     * @param [in] iT  time window size;
+     * @param[in] iT  time window size;
      */
     void setWindowSize(int iT);
 
@@ -185,7 +185,7 @@ public:
     /**
      * distanceTimeSpacerChanged changes the distance of the time spacers
      *
-     * @param[in] iValue the new distance for the time spacers
+     * @param[in] iValue The new distance for the time spacers
      */
     void setDistanceTimeSpacer(int iValue);
 
@@ -272,7 +272,7 @@ public:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param mode     The new mode (Clinical=0, Research=1).
+     * @param[in] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -280,7 +280,7 @@ public:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param mode     The new mode (RealTime=0, Offline=1).
+     * @param[in] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 
@@ -288,7 +288,7 @@ public:
     /**
      * Shows channels based on input selectedChannelsIndexes
      *
-     * @param [in] selectedChannelsIndexes      list of channels to be shown
+     * @param[in] selectedChannelsIndexes      list of channels to be shown
      */
     void showSelectedChannelsOnly(const QList<int> selectedChannelsIndexes);
 
@@ -309,7 +309,7 @@ signals:
     /**
      * Emits sample number to be added aan annotation
      *
-     * @param [in] iSample      sample number to be added
+     * @param[in] iSample      sample number to be added
      */
     void sendSamplePos(int iSample);
 
@@ -324,8 +324,8 @@ private:
     /**
      * Catches events to performa specific action handling
      *
-     * @param [in, out] object      pointer to object the event pertains to
-     * @param [in] event            type of object with associated data
+     * @param[in, out] object      Pointer to object the event pertains to
+     * @param[in] event            Type of object with associated data
      *
      * @return                      true if handled by custom event handling, false if not
      */

@@ -362,7 +362,7 @@ public:
     /**
      * distanceTimeSpacerChanged changes the distance of the time spacers
      *
-     * @param value the new distance for the time spacers
+     * @param[in] iNewValue Value the new distance for the time spacers
      */
     void distanceTimeSpacerChanged(int iNewValue);
 
@@ -516,7 +516,7 @@ public:
     /**
      * Sets the associated AnnotationModel to pModel
      *
-     * @param [in] pModel   associated annotation model
+     * @param[in] pModel   associated annotation model
      */
     void setAnnotationModel(QSharedPointer<ANSHAREDLIB::AnnotationModel> pModel);
 
@@ -525,9 +525,9 @@ private:
     /**
      * Calculates the filtered version of one single datablock
      *
-     * @param [in]   matData         The data block to be filtered.
-     * @param [in]   bFilterEnd      Whether to perform the overlap add in the beginning or end of the data.
-     * @param [in]   bKeepOverhead   Whether to keep the overhead.
+     * @param[in]   matData         The data block to be filtered.
+     * @param[in]   bFilterEnd      Whether to perform the overlap add in the beginning or end of the data.
+     * @param[in]   bKeepOverhead   Whether to keep the overhead.
      *
      * @return Returns true if filtering was performed, otherwise returns false
      */

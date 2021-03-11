@@ -77,8 +77,8 @@ public:
     /**
      * Constructs a RtcMneSetupWidget which is a child of parent.
      *
-     * @param [in] toolbox a pointer to the corresponding MNEToolbox.
-     * @param [in] parent pointer to parent widget; If parent is 0, the new RtcMneSetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+     * @param\[in\] toolbox a pointer to the corresponding MNEToolbox.
+     * @param\[in\] parent pointer to parent widget; If parent is 0, the new RtcMneSetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
      */
     RtcMneSetupWidget(RtcMne* toolbox, QWidget *parent = 0);
 

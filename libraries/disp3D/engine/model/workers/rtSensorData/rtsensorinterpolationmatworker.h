@@ -92,7 +92,7 @@ public:
      * This function sets the function that is used in the interpolation process.
      * Warning: Using this function can take some seconds because recalculation are required.
      *
-     * @param[in] sInterpolationFunction     Function that computes interpolation coefficients using the distance values.
+     * @param\[in\] sInterpolationFunction     Function that computes interpolation coefficients using the distance values.
      */
     void setInterpolationFunction(const QString &sInterpolationFunction);
 
@@ -102,7 +102,7 @@ public:
      * Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
      * Warning: Using this function can take some seconds because recalculation are required.
      *
-     * @param[in] dCancelDist           The new cancel distance value in meters.
+     * @param\[in\] dCancelDist           The new cancel distance value in meters.
      */
     void setCancelDistance(double dCancelDist);
 
@@ -111,11 +111,11 @@ public:
      * Sets the information needed creating the interpolation matrix.
      * Warning: Using this function can take some seconds because recalculation are required.
      *
-     * @param[in] matVertices               The mesh information in form of vertices.
-     * @param[in] vecNeighborVertices       The neighbor vertex information.
-     * @param[in] vecSensorPos              The QVector that holds the sensor positons in x, y and z coordinates.
-     * @param[in] fiffEvoked                Holds all information about the sensors.
-     * @param[in] iSensorType               Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH.
+     * @param\[in\] matVertices               The mesh information in form of vertices.
+     * @param\[in\] vecNeighborVertices       The neighbor vertex information.
+     * @param\[in\] vecSensorPos              The QVector that holds the sensor positons in x, y and z coordinates.
+     * @param\[in\] fiffEvoked                Holds all information about the sensors.
+     * @param\[in\] iSensorType               Type of the sensor: FIFFV_EEG_CH or FIFFV_MEG_CH.
      *
      * @return Returns the created interpolation matrix.
      */
@@ -129,7 +129,7 @@ public:
     /**
      * Sets bad channels and recalculate interpolation matrix.
      *
-     * @param[in] info                 The fiff info including the new bad channels.
+     * @param\[in\] info                 The fiff info including the new bad channels.
      */
     void setBadChannels(const FIFFLIB::FiffInfo& info);
 
@@ -173,7 +173,7 @@ signals:
     /**
      * Emit this signal whenever a new interpolation matrix was calcualted.
      *
-     * @param[in] pMatInterpolationMatrix     The new interpolation matrix.
+     * @param\[in\] pMatInterpolationMatrix     The new interpolation matrix.
      */
     void newInterpolationMatrixCalculated(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
 };

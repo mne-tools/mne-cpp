@@ -117,7 +117,7 @@ private:
     /**
      * Sets the type of channel which are to be filtered
      *
-     * @param[in] sType    The channel type which is to be filtered (EEG, MEG, All)
+     * @param\[in\] sType    The channel type which is to be filtered (EEG, MEG, All)
      */
     void setFilterChannelType(const QString& sType);
 
@@ -125,7 +125,7 @@ private:
     /**
      * Filter parameters changed
      *
-     * @param[in] filterData    The currently active filter
+     * @param\[in\] filterData    The currently active filter
      */
     void setFilter(const RTPROCESSINGLIB::FilterKernel& filterData);
 
@@ -133,7 +133,7 @@ private:
     /**
      * Filter avtivated
      *
-     * @param[in] state    The filter on/off flag
+     * @param\[in\] state    The filter on/off flag
      */
     void setFilterActive(bool state);
 

@@ -87,7 +87,7 @@ public:
     /**
      * Constructs a ConnectivitySettingsView which is a child of parent.
      *
-     * @param [in] parent        parent of widget.
+     * @param\[in\] parent        parent of widget.
      */
     ConnectivitySettingsView(const QString& sSettingsPath = "",
                              QWidget *parent = 0,
@@ -103,7 +103,7 @@ public:
     /**
      * Destroys the ConnectivitySettingsView.
      *
-     * @param [in] lTriggerTypes        The new trigger types.
+     * @param\[in\] lTriggerTypes        The new trigger types.
      */
     void setTriggerTypes(const QStringList& lTriggerTypes);
 
@@ -111,7 +111,7 @@ public:
     /**
      * Sets the new number of trials.
      *
-     * @param [in] iNumberTrials        The new number of trials.
+     * @param\[in\] iNumberTrials        The new number of trials.
      */
     void setNumberTrials(int iNumberTrials);
 
@@ -186,7 +186,7 @@ protected:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param mode     The new mode (Clinical=0, Research=1).
+     * @param\[in\] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -194,7 +194,7 @@ protected:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param mode     The new mode (RealTime=0, Offline=1).
+     * @param\[in\] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 
@@ -202,7 +202,7 @@ protected:
     /**
      * Slot called when the metric changed.
      *
-     * @param [in] sMetric        The new metric.
+     * @param\[in\] sMetric        The new metric.
      */
     void onMetricChanged(const QString& sMetric);
 
@@ -210,7 +210,7 @@ protected:
     /**
      * Slot called when the window type changed.
      *
-     * @param [in] sWindowType        The new window type.
+     * @param\[in\] sWindowType        The new window type.
      */
     void onWindowTypeChanged(const QString& sWindowType);
 
@@ -224,7 +224,7 @@ protected:
     /**
      * Slot called when the trigger type changed.
      *
-     * @param [in] sTriggerType        The new trigger type.
+     * @param\[in\] sTriggerType        The new trigger type.
      */
     void onTriggerTypeChanged(const QString& sTriggerType);
 
@@ -244,7 +244,7 @@ signals:
     /**
      * Emit signal whenever the connectivity metric changed.
      *
-     * @param [in] sMetric        The new metric.
+     * @param\[in\] sMetric        The new metric.
      */
     void connectivityMetricChanged(const QString& sMetric);
 
@@ -252,7 +252,7 @@ signals:
     /**
      * Emit signal whenever the window type changed.
      *
-     * @param [in] windowType        The new window type.
+     * @param\[in\] windowType        The new window type.
      */
     void windowTypeChanged(const QString& windowType);
 
@@ -260,7 +260,7 @@ signals:
     /**
      * Emit signal whenever the number of trials changed.
      *
-     * @param [in] iNumberTrials        The new number of trials.
+     * @param\[in\] iNumberTrials        The new number of trials.
      */
     void numberTrialsChanged(int iNumberTrials);
 
@@ -268,7 +268,7 @@ signals:
     /**
      * Emit signal whenever the trigger type changed.
      *
-     * @param [in] sTriggerType        The new trigger type.
+     * @param\[in\] sTriggerType        The new trigger type.
      */
     void triggerTypeChanged(const QString& sTriggerType);
 
@@ -276,8 +276,8 @@ signals:
     /**
      * Emit signal whenever the frequency band changed.
      *
-     * @param [in] fFreqLow        The new lower frequency band.
-     * @param [in] fFreqHigh       The new higher frequency band.
+     * @param\[in\] fFreqLow        The new lower frequency band.
+     * @param\[in\] fFreqHigh       The new higher frequency band.
      */
     void freqBandChanged(float fFreqLow, float fFreqHigh);
 };

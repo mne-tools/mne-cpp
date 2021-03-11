@@ -81,7 +81,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffRawDir   Raw directory entry which should be copied
+     * @param\[in\] p_FiffRawDir   Raw directory entry which should be copied
      */
     FiffRawDir(const FiffRawDir &p_FiffRawDir);
 

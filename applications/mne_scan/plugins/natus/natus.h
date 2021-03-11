@@ -156,7 +156,7 @@ protected:
     /**
      * Call this function whenenver you received new data.
      *
-     * @param [in] matData The new data.
+     * @param\[in\] matData The new data.
      */
     void onNewDataAvailable(const Eigen::MatrixXd &matData);
 

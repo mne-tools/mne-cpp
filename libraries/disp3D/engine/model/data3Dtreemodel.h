@@ -135,7 +135,7 @@ public:
     /**
      * Default constructor.
      *
-     * @param[in] parent         The parent of this class.
+     * @param\[in\] parent         The parent of this class.
      */
     explicit Data3DTreeModel(QObject *parent = 0);
 
@@ -152,10 +152,10 @@ public:
     /**
      * Adds FreeSurfer brain data SETS.
      *
-     * @param[in] sSubject           The name of the subject.
-     * @param[in] sMriSetName        The name of the MRI set to which the data is to be added. If it does not exist yet, it will be created.
-     * @param[in] surfaceSet         FreeSurfer surface set.
-     * @param[in] annotationSet      FreeSurfer annotation set.
+     * @param\[in\] sSubject           The name of the subject.
+     * @param\[in\] sMriSetName        The name of the MRI set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param\[in\] surfaceSet         FreeSurfer surface set.
+     * @param\[in\] annotationSet      FreeSurfer annotation set.
      *
      * @return                       Returns a QList with the added surface tree items. The ordering
      *                               of the list hereby corresponds to the ordering of the input surface set.
@@ -170,10 +170,10 @@ public:
     /**
      * Adds FreeSurfer brain data.
      *
-     * @param[in] sSubject           The name of the subject.
-     * @param[in] sMriSetName        The name of the MRI set to which the data is to be added. If it does not exist yet, it will be created.
-     * @param[in] surface            FreeSurfer surface.
-     * @param[in] annotation         FreeSurfer annotation.
+     * @param\[in\] sSubject           The name of the subject.
+     * @param\[in\] sMriSetName        The name of the MRI set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param\[in\] surface            FreeSurfer surface.
+     * @param\[in\] annotation         FreeSurfer annotation.
      *
      * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
      */
@@ -186,9 +186,9 @@ public:
     /**
      * Adds source space brain data.
      *
-     * @param[in] sSubject               The name of the subject.
-     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-     * @param[in] sourceSpace            The source space information.
+     * @param\[in\] sSubject               The name of the subject.
+     * @param\[in\] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param\[in\] sourceSpace            The source space information.
      *
      * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
      */
@@ -200,9 +200,9 @@ public:
     /**
      * Adds a forward solution data to the brain tree model. Convenient function to addBrainData(const QString& text, const MNESourceSpace& tSourceSpace).
      *
-     * @param[in] sSubject               The name of the subject.
-     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-     * @param[in] forwardSolution        The forward solution information.
+     * @param\[in\] sSubject               The name of the subject.
+     * @param\[in\] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param\[in\] forwardSolution        The forward solution information.
      *
      * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
      */
@@ -214,12 +214,12 @@ public:
     /**
      * Adds source estimated activation data (MNE or RTC-MUSIC).
      *
-     * @param[in] sSubject               The name of the subject.
-     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-     * @param[in] tSourceEstimate        The MNESourceEstimate.
-     * @param[in] tForwardSolution       The MNEForwardSolution.
-     * @param[in] tSurfSet               The surface set holding the left and right hemisphere surfaces.
-     * @param[in] tAnnotSet              The annotation set holding the left and right hemisphere annotations.
+     * @param\[in\] sSubject               The name of the subject.
+     * @param\[in\] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param\[in\] tSourceEstimate        The MNESourceEstimate.
+     * @param\[in\] tForwardSolution       The MNEForwardSolution.
+     * @param\[in\] tSurfSet               The surface set holding the left and right hemisphere surfaces.
+     * @param\[in\] tAnnotSet              The annotation set holding the left and right hemisphere annotations.
      *
      * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
      */
@@ -234,9 +234,9 @@ public:
     /**
      * Adds source estimated activation data (dipole fit).
      *
-     * @param[in] sSubject               The name of the subject.
-     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-     * @param[in] ecdSet                 The ECDSet dipole data.
+     * @param\[in\] sSubject               The name of the subject.
+     * @param\[in\] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param\[in\] ecdSet                 The ECDSet dipole data.
      *
      * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
      */
@@ -248,9 +248,9 @@ public:
     /**
      * Adds a list of connectivity estimation data.
      *
-     * @param[in] sSubject               The name of the subject.
-     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-     * @param[in] networkData            The list of connectivity data.
+     * @param\[in\] sSubject               The name of the subject.
+     * @param\[in\] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param\[in\] networkData            The list of connectivity data.
      *
      * @return                           Returns a lsit with pointers to the added tree items.
      */
@@ -262,9 +262,9 @@ public:
     /**
      * Adds connectivity estimation data.
      *
-     * @param[in] sSubject               The name of the subject.
-     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-     * @param[in] networkData            The connectivity data.
+     * @param\[in\] sSubject               The name of the subject.
+     * @param\[in\] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param\[in\] networkData            The connectivity data.
      *
      * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
      */
@@ -276,9 +276,9 @@ public:
     /**
      * Adds BEM data.
      *
-     * @param[in] sSubject           The name of the subject.
-     * @param[in] sBemSetName        The name of the BEM set to which the data is to be added. If it does not exist yet, it will be created.
-     * @param[in] bem                The Bem information.
+     * @param\[in\] sSubject           The name of the subject.
+     * @param\[in\] sBemSetName        The name of the BEM set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param\[in\] bem                The Bem information.
      *
      * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
      */
@@ -290,11 +290,11 @@ public:
     /**
      * Adds MEG sensor info.
      *
-     * @param[in] sSubject           The name of the subject.
-     * @param[in] sSensorSetName     The name of the sensor set to which the data is to be added. If it does not exist yet, it will be created.
-     * @param[in] sensor             The sensor surface information in form of a BEM model. Sensor surfaces are internally represented as MNEBem models.
-     * @param[in] lChInfo            The channel information used to plot the MEG channels.
-     * @param[in] bads               The bad channel list.
+     * @param\[in\] sSubject           The name of the subject.
+     * @param\[in\] sSensorSetName     The name of the sensor set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param\[in\] sensor             The sensor surface information in form of a BEM model. Sensor surfaces are internally represented as MNEBem models.
+     * @param\[in\] lChInfo            The channel information used to plot the MEG channels.
+     * @param\[in\] bads               The bad channel list.
      *
      * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
      */
@@ -308,10 +308,10 @@ public:
     /**
      * Adds EEG sensor info.
      *
-     * @param[in] sSubject           The name of the subject.
-     * @param[in] sSensorSetName     The name of the sensor set to which the data is to be added. If it does not exist yet, it will be created.
-     * @param[in] lChInfo            The channel information used to plot the EEG channels.
-     * @param[in] bads               The bad channel list.
+     * @param\[in\] sSubject           The name of the subject.
+     * @param\[in\] sSensorSetName     The name of the sensor set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param\[in\] lChInfo            The channel information used to plot the EEG channels.
+     * @param\[in\] bads               The bad channel list.
      *
      * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
      */
@@ -324,9 +324,9 @@ public:
     /**
      * Adds digitizer data.
      *
-     * @param[in] sSubject               The name of the subject.
-     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-     * @param[in] digitizer              The digitizer information.
+     * @param\[in\] sSubject               The name of the subject.
+     * @param\[in\] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param\[in\] digitizer              The digitizer information.
      *
      * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
      */
@@ -338,12 +338,12 @@ public:
     /**
      * Adds live sensor data.
      *
-     * @param[in] sSubject               The name of the subject.
-     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-     * @param[in] matSensorData          The Sensor Data.
-     * @param[in] tBemSurface            The Bem Surface data.
-     * @param[in] fiffInfo               The FiffInfo that holds all information about the sensors.
-     * @param[in] sDataType              The data type ("MEG" or "EEG").
+     * @param\[in\] sSubject               The name of the subject.
+     * @param\[in\] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param\[in\] matSensorData          The Sensor Data.
+     * @param\[in\] tBemSurface            The Bem Surface data.
+     * @param\[in\] fiffInfo               The FiffInfo that holds all information about the sensors.
+     * @param\[in\] sDataType              The data type ("MEG" or "EEG").
      *
      * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
      */
@@ -367,7 +367,7 @@ protected:
     /**
      * Create a subject tree item if the item was not found. This is a convenience function.
      *
-     * @param[in] sSubject           The name of the subject.
+     * @param\[in\] sSubject           The name of the subject.
      *
      * @return                       Returns a pointer to the first found or created subject tree item. Default is a NULL pointer if no item was found.
      */
@@ -377,14 +377,14 @@ protected:
     /**
      * Adds live sensor data for interpolation with the cpu.
      *
-     * @param[in] sSubject               The name of the subject.
-     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-     * @param[in] matSensorData          The Sensor Data.
-     * @param[in] tBemSurface            The Bem Surface data.
-     * @param[in] fiffInfo             The FiffInfo that holds all information about the sensors.
-     * @param[in] sDataType              The data type ("MEG" or "EEG").
-     * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation
-     * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values
+     * @param\[in\] sSubject               The name of the subject.
+     * @param\[in\] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param\[in\] matSensorData          The Sensor Data.
+     * @param\[in\] tBemSurface            The Bem Surface data.
+     * @param\[in\] fiffInfo             The FiffInfo that holds all information about the sensors.
+     * @param\[in\] sDataType              The data type ("MEG" or "EEG").
+     * @param\[in\] dCancelDist            Distances higher than this are ignored for the interpolation
+     * @param\[in\] sInterpolationFunction Function that computes interpolation coefficients using the distance values
      *
      * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
      */
@@ -401,14 +401,14 @@ protected:
     /**
      * Adds live sensor data for interpolation with a compute shader.
      *
-     * @param[in] sSubject               The name of the subject.
-     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-     * @param[in] matSensorData          The Sensor Data.
-     * @param[in] tBemSurface            The Bem Surface data.
-     * @param[in] fiffInfo               The FiffInfo that holds all information about the sensors.
-     * @param[in] sDataType              The data type ("MEG" or "EEG").
-     * @param[in] dCancelDist            Distances higher than this are ignored for the interpolation
-     * @param[in] sInterpolationFunction Function that computes interpolation coefficients using the distance values
+     * @param\[in\] sSubject               The name of the subject.
+     * @param\[in\] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param\[in\] matSensorData          The Sensor Data.
+     * @param\[in\] tBemSurface            The Bem Surface data.
+     * @param\[in\] fiffInfo               The FiffInfo that holds all information about the sensors.
+     * @param\[in\] sDataType              The data type ("MEG" or "EEG").
+     * @param\[in\] dCancelDist            Distances higher than this are ignored for the interpolation
+     * @param\[in\] sInterpolationFunction Function that computes interpolation coefficients using the distance values
      *
      * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
      */

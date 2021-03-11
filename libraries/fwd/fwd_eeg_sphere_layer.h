@@ -85,7 +85,7 @@ public:
 //    /**
 //    * Copy constructor.
 //    *
-//    * @param[in] p_FwdEegSphereLayer      FwdEegSphereLayer which should be copied
+//    * @param\[in\] p_FwdEegSphereLayer      FwdEegSphereLayer which should be copied
 //    */
 //    FwdEegSphereLayer(const FwdEegSphereLayer& p_FwdEegSphereLayer);
 

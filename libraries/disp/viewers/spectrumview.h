@@ -96,7 +96,7 @@ public:
     /**
      * Constructs a SpectrumView which is a child of parent.
      *
-     * @param [in] parent    parent of widget
+     * @param\[in\] parent    parent of widget
      */
     SpectrumView(const QString& sSettingsPath = "",
                  QWidget* parent = 0,
@@ -112,8 +112,8 @@ public:
     /**
      * Initializes the view based on the FiffInfo and scale type.
      *
-     * @param [in] info          The FiffInfo.
-     * @param [in] iScaleType    The scale type.
+     * @param\[in\] info          The FiffInfo.
+     * @param\[in\] iScaleType    The scale type.
      */
     void init(QSharedPointer<FIFFLIB::FiffInfo> &info,
               int iScaleType);
@@ -122,7 +122,7 @@ public:
     /**
      * Adds data to the underlying model.
      *
-     * @param [in] data          The new data.
+     * @param\[in\] data          The new data.
      */
     void addData(const Eigen::MatrixXd &data);
 
@@ -130,8 +130,8 @@ public:
     /**
      * Sets the boundaries.
      *
-     * @param [in] iLower    The lower boundary.
-     * @param [in] iUpper    The upper boundary.
+     * @param\[in\] iLower    The lower boundary.
+     * @param\[in\] iUpper    The upper boundary.
      */
     void setBoundaries(int iLower,
                        int iUpper);
@@ -140,8 +140,8 @@ public:
     /**
      * The event filter
      *
-     * @param [in] watched
-     * @param [in] event
+     * @param\[in\] watched
+     * @param\[in\] event
      */
     virtual bool eventFilter(QObject* watched,
                              QEvent* event);
@@ -169,7 +169,7 @@ protected:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param mode     The new mode (Clinical=0, Research=1).
+     * @param\[in\] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -177,7 +177,7 @@ protected:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param mode     The new mode (RealTime=0, Offline=1).
+     * @param\[in\] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 

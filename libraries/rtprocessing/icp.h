@@ -81,14 +81,14 @@ const Eigen::VectorXf vecDefaultWeigths;
 /**
  * The ICP algorithm to register a point cloud with a surface.
  *
- * @param [in]  mneSurfacePoints    The MNEProjectToSurface object that contains the surface triangles etc. (To).
- * @param [in]  matPointCloud       The point cloud to be registrated (From).
- * @param [out] transFromTo         The forward transformation matrix. It can contain an initial transformatin (e.g. from fiducial alignment).
- * @param [out] fRMSE               The resulting Root-Mean-Square-Error in m.
- * @param [in]  bScale              Wether to apply scaling or not. Should be false for matching data sets, defaults to false.
- * @param [in]  iMaxIter            The maximum number of iterations for the icp algorithms, defaults to 20.
- * @param [in]  fTol                The destination point set to be reistrated, defaults to 0.001.
- * @param [in]  vecWeitgths         The weitghts to apply, defaults to zeros.
+ * @param\[in\] mneSurfacePoints    The MNEProjectToSurface object that contains the surface triangles etc. (To).
+ * @param\[in\] matPointCloud       The point cloud to be registrated (From).
+ * @param+[\[]out] transFromTo         The forward transformation matrix. It can contain an initial transformatin (e.g. from fiducial alignment).
+ * @param+[\[]out] fRMSE               The resulting Root-Mean-Square-Error in m.
+ * @param\[in\] bScale              Wether to apply scaling or not. Should be false for matching data sets, defaults to false.
+ * @param\[in\] iMaxIter            The maximum number of iterations for the icp algorithms, defaults to 20.
+ * @param\[in\] fTol                The destination point set to be reistrated, defaults to 0.001.
+ * @param\[in\] vecWeitgths         The weitghts to apply, defaults to zeros.
  *
  * @return Wether the registration was succesfull.
  */
@@ -107,12 +107,12 @@ RTPROCESINGSHARED_EXPORT bool performIcp(const QSharedPointer<MNELIB::MNEProject
 /**
  * Corresponding point set registration using quaternions.
  *
- * @param [in]  matSrcPoint         The source point set.
- * @param [in]  matDstPoint         The destination point set.
- * @param [out] matTrans            The forward transformation matrix.
- * @param [out] fScale              The scaling parameter, defaults to 1.0.
- * @param [in]  bScale              Wether to apply scaling or not. Should be false for matching data sets, defaults to false.
- * @param [in]  vecWeitgths         The weitghts to apply , defaults to zeros.
+ * @param\[in\] matSrcPoint         The source point set.
+ * @param\[in\] matDstPoint         The destination point set.
+ * @param+[\[]out] matTrans            The forward transformation matrix.
+ * @param+[\[]out] fScale              The scaling parameter, defaults to 1.0.
+ * @param\[in\] bScale              Wether to apply scaling or not. Should be false for matching data sets, defaults to false.
+ * @param\[in\] vecWeitgths         The weitghts to apply , defaults to zeros.
  *
  * @return Wether the matching was succesfull.
  */
@@ -129,12 +129,12 @@ RTPROCESINGSHARED_EXPORT bool fitMatchedPoints(const Eigen::MatrixXf& matSrcPoin
 /**
  * Discard outliers compared to a given 3D surface
  *
- * @param [in]  mneSurfacePoints    The MNEProjectToSurface object that contains the surface triangles etc. (To).
- * @param [in]  matPointCloud       The destination point set to be registrated (From).
- * @param [out] transFromTo         The forward transformation matrix.
- * @param [in]  vecTake             The index of taken digitizers.
- * @param [in]  matTakePoint        The the digitizer points to take.
- * @param [in]  fMaxDist            The maximum distance to the surface in mm, defaults to 0 mm.
+ * @param\[in\] mneSurfacePoints    The MNEProjectToSurface object that contains the surface triangles etc. (To).
+ * @param\[in\] matPointCloud       The destination point set to be registrated (From).
+ * @param+[\[]out] transFromTo         The forward transformation matrix.
+ * @param\[in\] vecTake             The index of taken digitizers.
+ * @param\[in\] matTakePoint        The the digitizer points to take.
+ * @param\[in\] fMaxDist            The maximum distance to the surface in mm, defaults to 0 mm.
  *
  * @return Wether the discarding was succesfull.
  */

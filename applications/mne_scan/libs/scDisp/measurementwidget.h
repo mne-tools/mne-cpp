@@ -98,7 +98,7 @@ public:
     /**
      * Constructs a MeasurementWidget which is a child of parent.
      *
-     * @param [in] parent pointer to parent widget; If parent is 0, the new MeasurementWidget becomes a window. If parent is another widget, MeasurementWidget becomes a child window inside parent. MeasurementWidget is deleted when its parent is deleted.
+     * @param\[in\] parent pointer to parent widget; If parent is 0, the new MeasurementWidget becomes a window. If parent is another widget, MeasurementWidget becomes a child window inside parent. MeasurementWidget is deleted when its parent is deleted.
      */
     MeasurementWidget(QWidget* parent = 0);
 
@@ -113,7 +113,7 @@ public:
      * Is called when new data are available.
      * Pure virtual method inherited by IObserver.
      *
-     * @param [in] pSubject  pointer to Subject -> not used because its direct attached to the measurement.
+     * @param\[in\] pSubject  pointer to Subject -> not used because its direct attached to the measurement.
      */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement) = 0;
 
@@ -137,9 +137,9 @@ signals:
     /**
      * Signal to notify that new display control widgets are available.
      *
-     * @param [in] lControlWidgets      A QList with pointers to the control widgets. Note that the signal sender
+     * @param\[in\] lControlWidgets      A QList with pointers to the control widgets. Note that the signal sender
      *                                  does not have ownership of these pointers.
-     * @param [in] sDisplayName         The display emmiting the signal.
+     * @param\[in\] sDisplayName         The display emmiting the signal.
      */
     void displayControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
                                       const QString& sDisplayName);
@@ -149,7 +149,7 @@ protected:
     /**
      * Adds a display action to the current measurement widget.
      *
-     * @param [in] pAction  pointer to the action to be added to the measurement widget
+     * @param\[in\] pAction  pointer to the action to be added to the measurement widget
      */
     inline void addDisplayAction(QAction* pAction);
 

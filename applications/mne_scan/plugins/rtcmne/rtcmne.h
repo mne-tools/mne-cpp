@@ -178,7 +178,7 @@ public:
     /**
      * Slot to update the fiff evoked
      *
-     * @param[in] pMeasurement   The evoked to be appended
+     * @param\[in\] pMeasurement   The evoked to be appended
      */
     void updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement);
 
@@ -186,7 +186,7 @@ public:
     /**
      * Slot to update the inverse operator
      *
-     * @param[in] invOp    The inverse operator to update
+     * @param\[in\] invOp    The inverse operator to update
      */
     void updateInvOp(const MNELIB::MNEInverseOperator& invOp);
 
@@ -201,7 +201,7 @@ protected:
     /**
      * Slot called when the method changed.
      *
-     * @param [in] method        The new method.
+     * @param\[in\] method        The new method.
      */
     void onMethodChanged(const QString &method);
 
@@ -209,7 +209,7 @@ protected:
     /**
      * Slot called when the trigger type changed.
      *
-     * @param [in] triggerType        The new trigger type.
+     * @param\[in\] triggerType        The new trigger type.
      */
     void onTriggerTypeChanged(const QString& triggerType);
 
@@ -217,7 +217,7 @@ protected:
     /**
      * Slot called when the time point changes.
      *
-     * @param [in] iTimePointMs        The new time point in ms.
+     * @param\[in\] iTimePointMs        The new time point in ms.
      */
     void onTimePointValueChanged(int iTimePointMs);
 

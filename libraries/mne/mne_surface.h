@@ -106,7 +106,7 @@ public:
     /**
      * Reads a bem surface from a fif IO device
      *
-     * @param[in] p_IODevice     A fiff IO device like a fiff QFile or QTCPSocket
+     * @param\[in\] p_IODevice     A fiff IO device like a fiff QFile or QTCPSocket
      * @param[out] surfaces      List to fill with found surfaces
      *
      * @return true if succeeded, false otherwise
@@ -119,11 +119,11 @@ public:
      *
      * Reads a BEM surface from a fif stream
      *
-     * @param [in] p_pStream     The open fiff file
-     * @param [in] add_geom      Add geometry information to the source spaces
-     * @param [in] p_Tree        Search for the surfaces here
+     * @param\[in\] p_pStream     The open fiff file
+     * @param\[in\] add_geom      Add geometry information to the source spaces
+     * @param\[in\] p_Tree        Search for the surfaces here
      *
-     * @param [out] p_Surfaces    The read bem surfaces
+     * @param+[\[]out] p_Surfaces    The read bem surfaces
      *
      * @return true if succeeded, false otherwise
      */
@@ -144,11 +144,11 @@ private:
     /**
      * Reads and creates a surface from a given block.
      *
-     * @param [in] fiffStream    The open fiff file
-     * @param [in] dir           Search for the surface here
-     * @param [in] def_coord_frame Default coordinate frame
+     * @param\[in\] fiffStream    The open fiff file
+     * @param\[in\] dir           Search for the surface here
+     * @param\[in\] def_coord_frame Default coordinate frame
      *
-     * @param [out] surf         The read bem surface
+     * @param+[\[]out] surf         The read bem surface
      *
      * @return true if succeeded and surf was filled, false otherwise
      */

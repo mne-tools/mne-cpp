@@ -76,9 +76,9 @@ public:
     /**
      * Constructs a PluginInputConnector with the given parent.
      *
-     * @param[in] parent     pointer to parent plugin
-     * @param[in] name       connection name
-     * @param[in] descr      connection description
+     * @param\[in\] parent     pointer to parent plugin
+     * @param\[in\] name       connection name
+     * @param\[in\] descr      connection description
      */
     PluginInputConnector(AbstractPlugin *parent,
                          const QString &name,

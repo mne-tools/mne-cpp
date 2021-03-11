@@ -95,7 +95,7 @@ public:
     /**
      * Constructs a FilterDesignView dialog which is a child of parent.
      *
-     * @param [in] parent pointer to parent widget; If parent is 0, the new FilterDesignView becomes a window.
+     * @param\[in\] parent pointer to parent widget; If parent is 0, the new FilterDesignView becomes a window.
      *             If parent is another widget, FilterDesignView becomes a child window inside parent. FilterDesignView
      *             is deleted when its parent is deleted.
      */
@@ -114,7 +114,7 @@ public:
     /**
      * Sets the max number of allowed filter taps.
      *
-     * @param[in] iMaxNumberFilterTaps  number of max allowed filter taps
+     * @param\[in\] iMaxNumberFilterTaps  number of max allowed filter taps
      */
     void setMaxAllowedFilterTaps(int iMaxNumberFilterTaps);
 
@@ -130,7 +130,7 @@ public:
     /**
      * Sets the new samplingRate.
      *
-     * @param[in] dSamplingRate the new sampling rate
+     * @param\[in\] dSamplingRate the new sampling rate
      */
     void setSamplingRate(double dSamplingRate);
 
@@ -138,7 +138,7 @@ public:
     /**
      * Sets filter 'From' value
      *
-     * @param [in] dFrom    set filter 'From' value
+     * @param\[in\] dFrom    set filter 'From' value
      */
     void setFrom(double dFrom);
 
@@ -146,7 +146,7 @@ public:
     /**
      * Sets filter 'To' value
      *
-     * @param [in] dTo      set filter 'To' value
+     * @param\[in\] dTo      set filter 'To' value
      */
     void setTo(double dTo);
 
@@ -186,7 +186,7 @@ public:
     /**
      * Sets the current channel type which is to be filtered.
      *
-     * @param[in] sType               The new channel type to be filtered.
+     * @param\[in\] sType               The new channel type to be filtered.
      */
     void setChannelType(const QString& sType);
 
@@ -225,7 +225,7 @@ protected:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param mode     The new mode (Clinical=0, Research=1).
+     * @param\[in\] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -233,7 +233,7 @@ protected:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param mode     The new mode (RealTime=0, Offline=1).
+     * @param\[in\] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 
@@ -278,7 +278,7 @@ protected:
     /**
      * This function gets called whenever the combo box is altered by the user via the gui.
      *
-     * @param currentIndex holds the current index of the combo box
+     * @param\[in\] currentIndex holds the current index of the combo box
      */
     void changeStateSpinBoxes(int currentIndex);
 
@@ -292,7 +292,7 @@ protected:
     /**
      * This function applies the user defined filter to all channels.
      *
-     * @param channelType holds the current text of the connected spin box
+     * @param\[in\] channelType holds the current text of the connected spin box
      */
     void onSpinBoxFilterChannelType(const QString &channelType);
 
@@ -318,7 +318,7 @@ protected:
     /**
      * Update Gui and filter based on an input filter parameters
      *
-     * @param [in] filter   filter which parameters will be used to update gui and stored filter
+     * @param\[in\] filter   filter which parameters will be used to update gui and stored filter
      */
     void updateGuiFromFilter(const RTPROCESSINGLIB::FilterKernel& filter);
 
@@ -338,7 +338,7 @@ signals:
     /**
      * Emitted when the filter changes.
      *
-     * @param activeFilter  The currently active filters.
+     * @param\[in\] activeFilter  The currently active filters.
      */
     void filterChanged(const RTPROCESSINGLIB::FilterKernel& activeFilter);
 
@@ -346,7 +346,7 @@ signals:
     /**
      * Emitted when the filter channel type changed.
      *
-     * @param channelType  The channel type on which the filter should be performed on.
+     * @param\[in\] channelType  The channel type on which the filter should be performed on.
      */
     void filterChannelTypeChanged(const QString& channelType);
 
@@ -354,7 +354,7 @@ signals:
     /**
      * Update to simple filter control 'From'
      *
-     * @param dFrom     change in filter 'From' value
+     * @param\[in\] dFrom     change in filter 'From' value
      */
     void updateFilterFrom(double dFrom);
 
@@ -362,7 +362,7 @@ signals:
     /**
      * Update to simple filter control 'To'
      *
-     * @param dTo       change in filter 'To' value
+     * @param\[in\] dTo       change in filter 'To' value
      */
     void updateFilterTo(double dTo);
 };

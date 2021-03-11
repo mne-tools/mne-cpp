@@ -86,7 +86,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffDigitizerData   Digitization point descriptor which should be copied
+     * @param\[in\] p_FiffDigitizerData   Digitization point descriptor which should be copied
      */
     FiffDigitizerData(const FiffDigitizerData& p_FiffDigitizerData);
 
@@ -94,7 +94,7 @@ public:
     /**
      * Default constructor
      *
-     * @param[in] p_IODevice   Input device to read data from.
+     * @param\[in\] p_IODevice   Input device to read data from.
      */
     FiffDigitizerData(QIODevice &p_IODevice);
 

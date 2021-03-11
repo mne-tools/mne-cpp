@@ -109,7 +109,7 @@ public:
     /**
      * Sets the activation status of the CommandManager.
      *
-     * @param [in] status the new activation status of the CommandManager.
+     * @param[in] status the new activation status of the CommandManager.
      */
     inline void setStatus(bool status);
 

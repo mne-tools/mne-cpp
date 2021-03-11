@@ -90,9 +90,9 @@ public:
     /**
      * Default constructor.
      *
-     * @param[in] parent      The parent of the QObject.
-     * @param [in] slFlags    The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: "Data", "View", "Light".
-     * @param [in] type
+     * @param\[in\] parent      The parent of the QObject.
+     * @param\[in\] slFlags    The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: "Data", "View", "Light".
+     * @param\[in\] type
      */
     explicit Control3DView(const QString& sSettingsPath = "",
                            QWidget* parent = 0,
@@ -109,7 +109,7 @@ public:
     /**
      * Set the flags specifying which part of the GUI should be shown.
      *
-     * @param[in] slFlags   flags.
+     * @param\[in\] slFlags   flags.
      */
     void setFlags(const QStringList& slFlags);
 
@@ -117,7 +117,7 @@ public:
     /**
      * Set the delegate for the tree view.
      *
-     * @param[in] pItemDelegate   The delegate.
+     * @param\[in\] pItemDelegate   The delegate.
      */
     void setDelegate(QStyledItemDelegate* pItemDelegate);
 
@@ -125,8 +125,8 @@ public:
     /**
      * Init the control widget based on the 3D view and data model.
      *
-     * @param[in] pData3DTreeModel   The 3D data tree model.
-     * @param[in] pView3D            The view3D to bec connected to this widget.
+     * @param\[in\] pData3DTreeModel   The 3D data tree model.
+     * @param\[in\] pView3D            The view3D to bec connected to this widget.
      */
     void setModel(QStandardItemModel* pDataTreeModel);
 
@@ -165,7 +165,7 @@ protected:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param mode     The new mode (Clinical=0, Research=1).
+     * @param\[in\] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -173,7 +173,7 @@ protected:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param mode     The new mode (RealTime=0, Offline=1).
+     * @param\[in\] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 
@@ -181,7 +181,7 @@ protected:
     /**
      * Slot called when opacity slider was changed.
      *
-     * @param [in] value         opacity value.
+     * @param\[in\] value         opacity value.
      */
     void onOpacityChange(qint32 value);
 
@@ -195,7 +195,7 @@ protected:
     /**
      * @brief customContextMenuRequested
      *
-     * @param[in] pos    The position, where the right-click occurred
+     * @param\[in\] pos    The position, where the right-click occurred
      */
     void onCustomContextMenuRequested(QPoint pos);
 
@@ -203,7 +203,7 @@ protected:
     /**
      * Slot called when the user wants to change the always on top window flag.
      *
-     * @param[in] state      The newly picked on top state.
+     * @param\[in\] state      The newly picked on top state.
      */
     void onAlwaysOnTop(bool state);
 
@@ -211,7 +211,7 @@ protected:
     /**
      * Slot called when the user wants change the color of the scene.
      *
-     * @param[in] color      The newly picked scene color.
+     * @param\[in\] color      The newly picked scene color.
      *
      */
     void onSceneColorChanged(const QColor& color);
@@ -220,7 +220,7 @@ protected:
     /**
      * Slot called when the user wants to show the view in full screen.
      *
-     * @param[in] checked      The newly picked full screen state.
+     * @param\[in\] checked      The newly picked full screen state.
      */
     void onShowFullScreen(bool checked);
 
@@ -228,7 +228,7 @@ protected:
     /**
      * Slot called when the user wants to rotate the models.
      *
-     * @param[in] checked      The newly picked rotation state.
+     * @param\[in\] checked      The newly picked rotation state.
      */
     void onRotationClicked(bool checked);
 
@@ -248,7 +248,7 @@ protected:
     /**
      * Slot called when the user wants change the color of the lights.
      *
-     * @param[in] color      The newly picked light color.
+     * @param\[in\] color      The newly picked light color.
      */
     void onLightColorChanged(const QColor& color);
 
@@ -256,7 +256,7 @@ protected:
     /**
      * Slot called when the user wants to change the light intensity.
      *
-     * @param[in] value      The newly picked light intensity value.
+     * @param\[in\] value      The newly picked light intensity value.
      */
     void onLightIntensityChanged(double value);
 
@@ -276,7 +276,7 @@ signals:
     /**
      * Use this signal whenever the scene color was changed by the user.
      *
-     * @param[in] color      The newly picked color.
+     * @param\[in\] color      The newly picked color.
      */
     void sceneColorChanged(const QColor& color);
 
@@ -284,7 +284,7 @@ signals:
     /**
      * Use this signal whenever the user wants to use full screen mode.
      *
-     * @param[in] bShowFullScreen      The full screen flag.
+     * @param\[in\] bShowFullScreen      The full screen flag.
      */
     void showFullScreen(bool bShowFullScreen);
 
@@ -292,7 +292,7 @@ signals:
     /**
      * Use this signal whenever the user wants to rotate the 3D model.
      *
-     * @param[in] bRotationChanged      The rotation flag.
+     * @param\[in\] bRotationChanged      The rotation flag.
      */
     void rotationChanged(bool bRotationChanged);
 
@@ -300,7 +300,7 @@ signals:
     /**
      * Use this signal whenever the user wants to show the coordinate axis.
      *
-     * @param[in] bShowCoordAxis      The coordinate axis flag.
+     * @param\[in\] bShowCoordAxis      The coordinate axis flag.
      */
     void showCoordAxis(bool bShowCoordAxis);
 
@@ -308,7 +308,7 @@ signals:
     /**
      * Use this signal whenever the light color was changed by the user.
      *
-     * @param[in] color      The newly picked color.
+     * @param\[in\] color      The newly picked color.
      */
     void lightColorChanged(const QColor& color);
 
@@ -316,7 +316,7 @@ signals:
     /**
      * Use this signal whenever the light intensity was changed by the user.
      *
-     * @param[in] value      The newly picked intensity.
+     * @param\[in\] value      The newly picked intensity.
      */
     void lightIntensityChanged(double value);
 

@@ -91,7 +91,7 @@ public:
     /**
      * Constructs a CompensatorView which is a child of parent.
      *
-     * @param [in] parent        parent of widget
+     * @param\[in\] parent        parent of widget
      */
     CompensatorView(const QString& sSettingsPath = "",
                     QWidget *parent = 0,
@@ -123,7 +123,7 @@ public:
     /**
      * Set the current compensators
      *
-     * @param [in] comps    The new compensators.
+     * @param\[in\] comps    The new compensators.
      */
     void setCompensators(const QList<FIFFLIB::FiffCtfComp>& comps);
 
@@ -143,7 +143,7 @@ public:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param mode     The new mode (Clinical=0, Research=1).
+     * @param\[in\] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -151,7 +151,7 @@ public:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param mode     The new mode (RealTime=0, Offline=1).
+     * @param\[in\] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 

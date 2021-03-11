@@ -113,7 +113,7 @@ public:
     /**
      * Constructs a fiff stream that uses the I/O device p_pIODevice.
      *
-     * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
+     * @param\[in\] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
      */
     explicit FiffStream(QIODevice *p_pIODevice);
 
@@ -121,8 +121,8 @@ public:
     /**
      * Constructs a fiff stream that operates on a byte array, a. The mode describes how the device is to be used.
      *
-     * @param[in] a      The byte array
-     * @param[in] mode   The open mode
+     * @param\[in\] a      The byte array
+     * @param\[in\] mode   The open mode
      */
     explicit FiffStream(QByteArray * a, QIODevice::OpenMode mode);
 
@@ -183,8 +183,8 @@ public:
      *
      * Writes a FIFF_BLOCK_END tag
      *
-     * @param[in] kind   The block kind to end
-     * @param[in] next   Position of the next tag (default = FIFFV_NEXT_SEQ)
+     * @param\[in\] kind   The block kind to end
+     * @param\[in\] next   Position of the next tag (default = FIFFV_NEXT_SEQ)
      *
      * @return the position where the end block struct was written to
      */
@@ -210,7 +210,7 @@ public:
     /**
      * Helper to get all evoked entries
      *
-     * @param[in] evoked_node    evoked tree nodes
+     * @param\[in\] evoked_node    evoked tree nodes
      * @param[out] comments      found comments
      * @param[out] aspect_kinds  found aspect_kinds
      * @param[out] t             text formatted found information
@@ -232,7 +232,7 @@ public:
      * Opens a fif file and provides the directory of tags
      * Refactored: open_file (fiff_open.c)
      *
-     * @param [in] mode      The open mode (Default = ReadOnly)
+     * @param\[in\] mode      The open mode (Default = ReadOnly)
      *
      * @return true if succeeded, false otherwise
      */
@@ -253,7 +253,7 @@ public:
      * Create the directory tree structure
      * Refactored: make_subtree (fiff_dir_tree.c), fiff_make_dir_tree (MATLAB)
      *
-     * @param[in] dentry     The dir entries of which the tree should be constructed
+     * @param\[in\] dentry     The dir entries of which the tree should be constructed
      *
      * @return The created dir tree
      */
@@ -269,7 +269,7 @@ public:
      * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirNode
      *       class, that's why a tree object doesn't need to be handed to the function.
      *
-     * @param[in] p_Node The node of interest
+     * @param\[in\] p_Node The node of interest
      *
      * @return the bad channel list
      */
@@ -283,9 +283,9 @@ public:
      *
      * Reads a covariance matrix from a fiff file
      *
-     * @param [in] p_Node          look for the matrix in here
-     * @param [in] cov_kind      what kind of a covariance matrix do we want?
-     * @param [out] p_covData    the read covariance matrix
+     * @param\[in\] p_Node          look for the matrix in here
+     * @param\[in\] cov_kind      what kind of a covariance matrix do we want?
+     * @param+[\[]out] p_covData    the read covariance matrix
      *
      * @return true if succeeded, false otherwise
      */
@@ -299,8 +299,8 @@ public:
      *
      * Read the CTF software compensation data from the given node
      *
-     * @param[in] p_Node The node of interest
-     * @param[in] p_Chs  channels with the calibration info
+     * @param\[in\] p_Node The node of interest
+     * @param\[in\] p_Chs  channels with the calibration info
      *
      * @return the CTF software compensation data
      */
@@ -314,7 +314,7 @@ public:
      *
      * Read the digitizer data from the given node.
      *
-     * @param[in] p_Node     The node of interest
+     * @param\[in\] p_Node     The node of interest
      * @param[out] p_digData  The read digitizer data
      *
      * @return rue if succeeded, false otherwise
@@ -330,7 +330,7 @@ public:
      * Read the measurement info
      * Source is assumed to be an open fiff file.
      *
-     * @param[in] p_Node       The node of interest
+     * @param\[in\] p_Node       The node of interest
      * @param[out] p_Info      The read measurement info
      * @param[out] p_NodeInfo  The to measurement corresponding fiff_dir_node.
      *
@@ -344,7 +344,7 @@ public:
      *
      * Read light measurement info from forward operator -> ToDo base class of FiffInfo
      *
-     * @param[in] p_Node         The node of interest
+     * @param\[in\] p_Node         The node of interest
      * @param[out] p_InfoForward The read light measurement info
      *
      * @return true when successful.
@@ -359,8 +359,8 @@ public:
      *
      * Reads a named matrix.
      *
-     * @param[in] p_Node     The node of interest
-     * @param[in] matkind    The matrix kind to look for
+     * @param\[in\] p_Node     The node of interest
+     * @param\[in\] matkind    The matrix kind to look for
      * @param[out] mat       The named matrix
      *
      * @return true if succeeded, false otherwise
@@ -372,7 +372,7 @@ public:
      * Read the SSP data under a given directory node
      * Refactored: fiff_read_proj (MNE-MATLAB)
      *
-     * @param[in] p_Node    The node of interest
+     * @param\[in\] p_Node    The node of interest
      *
      * @return a list of SSP projectors
      */
@@ -385,7 +385,7 @@ public:
      * Refactored: fiff_read_tag (MNE-MATLAB)
      *
      * @param[out] p_pTag the read tag
-     * @param[in] pos position of the tag inside the fif file
+     * @param\[in\] pos position of the tag inside the fif file
      *
      * @return true if succeeded, false otherwise
      */
@@ -398,7 +398,7 @@ public:
      * Refactored: fiff_read_tag_info (MNE-MATLAB)
      *
      * @param[out] p_pTag the read tag info
-     * @param[in] p_bDoSkip if true it skips the data of the tag (optional, default = true)
+     * @param\[in\] p_bDoSkip if true it skips the data of the tag (optional, default = true)
      *
      * @return the position where the tag info was read from
      */
@@ -422,7 +422,7 @@ public:
      * Refactored: fiff_read_tag (MNE-MATLAB)
      *
      * @param[out] p_pTag the read tag
-     * @param[in] pos position of the tag inside the fif file
+     * @param\[in\] pos position of the tag inside the fif file
      *
      * @return true if succeeded, false otherwise
      */
@@ -437,9 +437,9 @@ public:
      *
      * Read information about raw data file
      *
-     * @param[in] p_IODevice        An fiff IO device like a fiff QFile or QTCPSocket
+     * @param\[in\] p_IODevice        An fiff IO device like a fiff QFile or QTCPSocket
      * @param[out] data              The raw data information - contains the opened fiff file
-     * @param[in] allow_maxshield    Accept unprocessed MaxShield data
+     * @param\[in\] allow_maxshield    Accept unprocessed MaxShield data
      *
      * @return true if succeeded, false otherwise
      */
@@ -456,7 +456,7 @@ public:
      *
      * Splits a string by looking for seperator ":"
      *
-     * @param[in] p_sNameList    string to split
+     * @param\[in\] p_sNameList    string to split
      *
      * @return the splitted string list
      */
@@ -467,7 +467,7 @@ public:
      * Writes a FIFF_BLOCK_START tag
      * Refactored: fiff_start_block (MNE-C); fiff_start_block (MNE-MATLAB)
      *
-     * @param[in] kind       The block kind to start
+     * @param\[in\] kind       The block kind to start
      *
      * @return the position where the start block struct was written to
      */
@@ -478,7 +478,7 @@ public:
      * Opens a fiff file for writing and writes the compulsory header tags
      * Refactored: fiff_start_files (MNE-C); fiff_start_file (MNE-MATLAB)
      *
-     * @param[in] p_IODevice    The IODevice (like QFile or QTCPSocket) to open. It is recommended that the name ends with .fif
+     * @param\[in\] p_IODevice    The IODevice (like QFile or QTCPSocket) to open. It is recommended that the name ends with .fif
      *
      * @return The opened file.
      */
@@ -489,7 +489,7 @@ public:
      * Open fiff file for update
      * Refactored: fiff_open_update (MNE-C)
      *
-     * @param[in] p_IODevice    The IODevice (like QFile or QTCPSocket) to open. It is recommended that the name ends with .fif
+     * @param\[in\] p_IODevice    The IODevice (like QFile or QTCPSocket) to open. It is recommended that the name ends with .fif
      *
      * @return The opened file stream.
      */
@@ -503,11 +503,11 @@ public:
      *
      * function [fid,cals] = fiff_start_writing_raw(name,info,sel)
      *
-     * @param[in] p_IODevice     A fiff IO device like a fiff QFile or QTCPSocket
-     * @param[in] info           The measurement info block of the source file
+     * @param\[in\] p_IODevice     A fiff IO device like a fiff QFile or QTCPSocket
+     * @param\[in\] info           The measurement info block of the source file
      * @param[out] cals          A copy of the calibration values
-     * @param[in] sel            Which channels will be included in the output file (optional)
-     * @param[in] bResetRange    Flag whether to reset the channel range to 1.0. Default is true.
+     * @param\[in\] sel            Which channels will be included in the output file (optional)
+     * @param\[in\] bResetRange    Flag whether to reset the channel range to 1.0. Default is true.
      *
      * @return the started fiff file
      */
@@ -523,8 +523,8 @@ public:
      * Data is not written if it is NULL
      * Refactored: fiff_write_tag, fiff_write_this_tag (MNE-C)
      *
-     * @param[in] p_pTag     Tag to write;
-     * @param[in] pos        the position where the entires should be written to (default -1, i.e. end of the file)
+     * @param\[in\] p_pTag     Tag to write;
+     * @param\[in\] pos        the position where the entires should be written to (default -1, i.e. end of the file)
      *
      * @return the position where the tag struct was written to
      */
@@ -537,7 +537,7 @@ public:
      * of the MNE manual
      * Refactored: fiff_write_ch_info (MNE-C); fiff_write_ch_info (MNE-MATLAB)
      *
-     * @param[in] ch     The channel information structure to write
+     * @param\[in\] ch     The channel information structure to write
      *
      * @return the position where the channel info struct was written to
      */
@@ -547,7 +547,7 @@ public:
     /**
      * Writes a channel position to a fif file
      *
-     * @param[in] chpos      Channel position structure to write
+     * @param\[in\] chpos      Channel position structure to write
      *
      * @return the position where the channel position struct was written to
      */
@@ -558,7 +558,7 @@ public:
      * Writes a coordinate transformation structure
      * Refactored: fiff_write_coord_trans (MNE-C); fiff_write_coord_trans (MNE-MATLAB)
      *
-     * @param[in] trans  The coordinate transfomation structure
+     * @param\[in\] trans  The coordinate transfomation structure
      *
      * @return the position where the coordinate transformation struct was written to
      */
@@ -570,7 +570,7 @@ public:
      *
      * ### MNE toolbox root function ###
      *
-     * @param[in] p_FiffCov      The noise covariance matrix to write
+     * @param\[in\] p_FiffCov      The noise covariance matrix to write
      *
      * @return the position where the covaraince was written to
      */
@@ -584,7 +584,7 @@ public:
      *
      * Writes the CTF compensation data into a fif file
      *
-     * @param[in] comps  The compensation data to write
+     * @param\[in\] comps  The compensation data to write
      *
      * @return the position where the ctf compensators struct was written to
      */
@@ -598,7 +598,7 @@ public:
      *
      * Writes a digitizer data point into a fif file
      *
-     * @param[in] dig        The point to write
+     * @param\[in\] dig        The point to write
      *
      * @return the position where the digitizer points struct was written to
      */
@@ -609,9 +609,9 @@ public:
      * Writes directory position pointer FIFF_DIR_POINTER
      * Returns the postion where the structure was written to.
      *
-     * @param[in] dirpos     The directory position pointer
-     * @param[in] pos        the position where the directory pointer should be written to (default -1, i.e. end of the file)
-     * @param[in] next       Position of the next tag (default = FIFFV_NEXT_SEQ)
+     * @param\[in\] dirpos     The directory position pointer
+     * @param\[in\] pos        the position where the directory pointer should be written to (default -1, i.e. end of the file)
+     * @param\[in\] next       Position of the next tag (default = FIFFV_NEXT_SEQ)
      *
      * @return the position where the directory position pointer was written to
      */
@@ -622,8 +622,8 @@ public:
      * Writes a list of dir entries to a fif file, as a FIFFT_DIR_ENTRY_STRUCT
      * Returns the postion where the structure was written to.
      *
-     * @param[in] dir        The dir entries to write
-     * @param[in] pos        the position where the entires should be written to (default -1, i.e. end of the file)
+     * @param\[in\] dir        The dir entries to write
+     * @param\[in\] pos        the position where the entires should be written to (default -1, i.e. end of the file)
      *
      * @return the position where the directory entries struct was written to
      */
@@ -634,9 +634,9 @@ public:
      * Writes a double-precision floating point tag to a fif file
      * Refactored: fiff_write_double (MNE-MATLAB)
      *
-     * @param[in] kind       Tag kind
-     * @param[in] data       The float data pointer
-     * @param[in] nel        Number of doubles to write (default = 1)
+     * @param\[in\] kind       Tag kind
+     * @param\[in\] data       The float data pointer
+     * @param\[in\] nel        Number of doubles to write (default = 1)
      *
      * @return the position where the double struct was written to
      */
@@ -648,8 +648,8 @@ public:
      * If the id argument is missing it will be generated here
      * Refactored: fiff_write_this_id (MNE-C); fiff_write_id (MNE-MATLAB)
      *
-     * @param[in] kind       The tag kind
-     * @param[in] id         The id to write
+     * @param\[in\] kind       The tag kind
+     * @param\[in\] id         The id to write
      *
      * @return the position where the file id struct was written to
      */
@@ -659,7 +659,7 @@ public:
     /**
      * Write measurement info stored in forward solution
      *
-     * @param[in] p_FiffInfoBase     The measurement info.
+     * @param\[in\] p_FiffInfoBase     The measurement info.
      *
      * @return the position where the info base struct was written to
      */
@@ -670,10 +670,10 @@ public:
      * Writes a 32-bit integer tag to a fif file
      * Refactored: fiff_write_int_tag (MNE-C); fiff_write_int (MNE-MATLAB)
      *
-     * @param[in] kind       Tag kind
-     * @param[in] data       The integer data pointer
-     * @param[in] nel        Number of integers to write (default = 1)
-     * @param[in] next       Position of the next tag (default = FIFFV_NEXT_SEQ)
+     * @param\[in\] kind       Tag kind
+     * @param\[in\] data       The integer data pointer
+     * @param\[in\] nel        Number of integers to write (default = 1)
+     * @param\[in\] next       Position of the next tag (default = FIFFV_NEXT_SEQ)
      *
      * @return the position where the int was written to
      */
@@ -687,8 +687,8 @@ public:
      *
      * Writes a integer matrix tag
      *
-     * @param[in] kind       The tag kind
-     * @param[in] mat        The data matrix
+     * @param\[in\] kind       The tag kind
+     * @param\[in\] mat        The data matrix
      *
      * @return the position where the write_int_matrix was written to
      */
@@ -699,9 +699,9 @@ public:
      * Writes a single-precision floating point tag to a fif file
      * Refactored: fiff_write_float_tag (MNE-C); fiff_write_float (MNE-MATLAB)
      *
-     * @param[in] kind       Tag kind
-     * @param[in] data       The float data pointer
-     * @param[in] nel        Number of floats to write (default = 1)
+     * @param\[in\] kind       Tag kind
+     * @param\[in\] data       The float data pointer
+     * @param\[in\] nel        Number of floats to write (default = 1)
      *
      * @return the position where the float struct was written to
      */
@@ -712,8 +712,8 @@ public:
      * Writes a single-precision floating-point matrix tag
      * Refactored: fiff_write_float_matrix (MNE-C); fiff_write_float_matrix (MNE-MATLAB)
      *
-     * @param[in] kind       The tag kind
-     * @param[in] mat        The data matrix
+     * @param\[in\] kind       The tag kind
+     * @param\[in\] mat        The data matrix
      *
      * @return the position where the float matrix struct was written to
      */
@@ -727,8 +727,8 @@ public:
      *
      * Writes a single-precision sparse (ccs) floating-point matrix tag
      *
-     * @param[in] kind       The tag kind
-     * @param[in] mat        The data matrix
+     * @param\[in\] kind       The tag kind
+     * @param\[in\] mat        The data matrix
      *
      * @return the position where the float sparse ccs matrix struct was written to
      */
@@ -742,8 +742,8 @@ public:
      *
      * Writes a single-precision sparse (RCS) floating-point matrix tag
      *
-     * @param[in] kind       The tag kind
-     * @param[in] mat        The data matrix
+     * @param\[in\] kind       The tag kind
+     * @param\[in\] mat        The data matrix
      *
      * @return the position where the float sparse rcs matrix struct was written to
      */
@@ -757,8 +757,8 @@ public:
      *
      * Writes a colon-separated list of names
      *
-     * @param[in] kind       The tag kind
-     * @param[in] data       An array of names to create the list from
+     * @param\[in\] kind       The tag kind
+     * @param\[in\] data       An array of names to create the list from
      *
      * @return the position where the name list struct was written to
      */
@@ -772,8 +772,8 @@ public:
      *
      * Writes a named single-precision floating-point matrix
      *
-     * @param[in] kind       The tag kind to use for the data
-     * @param[in] mat        The data matrix
+     * @param\[in\] kind       The tag kind to use for the data
+     * @param\[in\] mat        The data matrix
      *
      * @return the position where the named matrix struct was written to
      */
@@ -787,7 +787,7 @@ public:
      *
      * Writes the projection data into a fif stream (file)
      *
-     * @param[in] projs      The compensation data to write
+     * @param\[in\] projs      The compensation data to write
      *
      * @return the position where the projector struct was written to
      */
@@ -801,8 +801,8 @@ public:
      *
      * Writes a raw buffer.
      *
-     * @param[in] buf        the buffer to write
-     * @param[in] cals       calibration factors
+     * @param\[in\] buf        the buffer to write
+     * @param\[in\] cals       calibration factors
      *
      * @return true if succeeded, false otherwise
      */
@@ -816,8 +816,8 @@ public:
      *
      * Writes a raw buffer.
      *
-     * @param[in] buf        the buffer to write
-     * @param[in] mult       the used multiplication matrix consisting out of projection,calibration and compensation
+     * @param\[in\] buf        the buffer to write
+     * @param\[in\] mult       the used multiplication matrix consisting out of projection,calibration and compensation
      *
      * @return true if succeeded, false otherwise
      */
@@ -830,7 +830,7 @@ public:
      *
      * Writes a raw buffer without calibrations.
      *
-     * @param[in] buf        the buffer to write
+     * @param\[in\] buf        the buffer to write
      *
      * @return true if succeeded, false otherwise
      */
@@ -841,8 +841,8 @@ public:
      * Writes a string tag
      * Refactored: fiff_write_string_tag (MNE-C); fiff_write_string (MNE-MATLAB)
      *
-     * @param[in] kind       The tag kind
-     * @param[in] data       The string data to write
+     * @param\[in\] kind       The tag kind
+     * @param\[in\] data       The string data to write
      *
      * @return the position where the string struct was written to
      */
@@ -852,8 +852,8 @@ public:
     /**
      * Writes a real-time command
      *
-     * @param[in] command    The real time command
-     * @param[in] data       The string data to write
+     * @param\[in\] command    The real time command
+     * @param\[in\] data       The string data to write
      */
     void write_rt_command(fiff_int_t command, const QString& data);
 

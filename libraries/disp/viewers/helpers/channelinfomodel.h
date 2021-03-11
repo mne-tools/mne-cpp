@@ -125,7 +125,7 @@ public:
     /**
      * Updates the fiff info
      *
-     * @param fiffInfo fiff info variabel.
+     * @param\[in\] fiffInfo fiff info variabel.
      */
     void setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo>& pFiffInfo);
 
@@ -133,7 +133,7 @@ public:
     /**
      * Updates the fiff info
      *
-     * @param assignedOperators the filter operators which are currently active.
+     * @param\[in\] assignedOperators the filter operators which are currently active.
      */
     void assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators);
 
@@ -141,7 +141,7 @@ public:
     /**
      * Updates the layout map
      *
-     * @param layoutMap the layout map with the 2D positions.
+     * @param\[in\] layoutMap the layout map with the 2D positions.
      */
     void layoutChanged(const QMap<QString,QPointF> &layoutMap);
 
@@ -157,7 +157,7 @@ public:
     /**
      * Returns the model index for the given input channel fro mthe original channel list
      *
-     * @param chName the channel name for which the model index is needed.
+     * @param\[in\] chName the channel name for which the model index is needed.
      * @return the index number. if channel was not found in the data this functions returns -1
      */
     int getIndexFromOrigChName(QString chName);
@@ -166,7 +166,7 @@ public:
     /**
      * Returns the model index for the given input channel fro mthe mapped channel list
      *
-     * @param chName the channel name for which the model index is needed.
+     * @param\[in\] chName the channel name for which the model index is needed.
      * @return the index number. if channel was not found in the data this functions returns -1
      */
     int getIndexFromMappedChName(QString chName);

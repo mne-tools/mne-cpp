@@ -88,7 +88,7 @@ public:
     /**
      * Checks if a command is managed;
      *
-     * @param p_sCommand     COmmand to check.
+     * @param p_sCommand     Command to check.
      *
      * @return true if part of command manager, false otherwise
      */

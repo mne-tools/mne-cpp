@@ -102,7 +102,7 @@ public:
      * Set the new upper item index color. This is used to only plot the background for the upper, visible item in the QTableView.
      * This is a rather ugly hack in order to cope with QOpenGLWidget's/QtableView's problem when setting a background color.
      *
-     * @param [in] iUpperItem  The new upper item index color.
+     * @param[in] iUpperItem  The new upper item index color.
      */
     void setUpperItemIndex(int iUpperItemIndex);
 
@@ -134,7 +134,7 @@ public:
     /**
      * Set the signal color.
      *
-     * @param [in] signalColor  The new signal color.
+     * @param[in] signalColor  The new signal color.
      */
     void setSignalColor(const QColor& signalColor);
 

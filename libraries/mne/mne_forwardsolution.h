@@ -183,12 +183,12 @@ public:
     /**
      * Constructs a forward operator, by reading from a IO device.
      *
-     * @param[in] p_IODevice     IO device to read from the forward operator.
-     * @param[in] force_fixed   Force fixed source orientation mode? (optional)
-     * @param[in] surf_ori      Use surface based source coordinate system? (optional)
-     * @param[in] include       Include these channels (optional)
-     * @param[in] exclude       Exclude these channels (optional)
-     * @param[in] bExcludeBads  If true bads are also read; default = false (optional)
+     * @param\[in\] p_IODevice     IO device to read from the forward operator.
+     * @param\[in\] force_fixed   Force fixed source orientation mode? (optional)
+     * @param\[in\] surf_ori      Use surface based source coordinate system? (optional)
+     * @param\[in\] include       Include these channels (optional)
+     * @param\[in\] exclude       Exclude these channels (optional)
+     * @param\[in\] bExcludeBads  If true bads are also read; default = false (optional)
      *
      */
     MNEForwardSolution(QIODevice &p_IODevice,
@@ -202,7 +202,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_MNEForwardSolution   MNE forward solution
+     * @param\[in\] p_MNEForwardSolution   MNE forward solution
      */
     MNEForwardSolution(const MNEForwardSolution &p_MNEForwardSolution);
 
@@ -223,12 +223,12 @@ public:
      * Cluster the forward solution and stores the result to p_fwdOut.
      * The clustering is done by using the provided annotations
      *
-     * @param[in]    p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere
-     * @param[in]    p_iClusterSize      Maximal cluster size per roi
+     * @param\[in\]   p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere
+     * @param\[in\]   p_iClusterSize      Maximal cluster size per roi
      * @param[out]   p_D                 The cluster operator
-     * @param[in]    p_pNoise_cov
-     * @param[in]    p_pInfo
-     * @param[in]    p_sMethod           "cityblock" or "sqeuclidean"
+     * @param\[in\]   p_pNoise_cov
+     * @param\[in\]   p_pInfo
+     * @param\[in\]   p_sMethod           "cityblock" or "sqeuclidean"
      *
      * @return clustered MNE forward solution
      */
@@ -243,7 +243,7 @@ public:
     /**
      * Compute orientation prior
      *
-     * @param[in] loose      The loose orientation parameter.
+     * @param\[in\] loose      The loose orientation parameter.
      *
      * @return Orientation priors.
      */
@@ -253,13 +253,13 @@ public:
     /**
      * Compute weighting for depth prior. ToDo move this to FiffCov
      *
-     * @param[in] Gain               gain matrix
-     * @param[in] gain_info          The measurement info to specify the channels to include.
-     * @param[in] is_fixed_ori       Fixed orientation?
-     * @param[in] exp                float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed. (optional; default = 0.8)
-     * @param[in] limit              (optional; default = 10.0)
-     * @param[in] patch_areas        (optional)
-     * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels. (optional)
+     * @param\[in\] Gain               gain matrix
+     * @param\[in\] gain_info          The measurement info to specify the channels to include.
+     * @param\[in\] is_fixed_ori       Fixed orientation?
+     * @param\[in\] exp                float in [0, 1]. Depth weighting coefficients. If None, no depth weighting is performed. (optional; default = 0.8)
+     * @param\[in\] limit              (optional; default = 10.0)
+     * @param\[in\] patch_areas        (optional)
+     * @param\[in\] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels. (optional)
      *
      * @return the depth prior
      */
@@ -301,8 +301,8 @@ public:
      *
      * Pick channels from forward operator
      *
-     * @param[in] include    List of channels to include. (if None, include all available).
-     * @param[in] exclude    Channels to exclude (if None, do not exclude any).
+     * @param\[in\] include    List of channels to include. (if None, include all available).
+     * @param\[in\] exclude    Channels to exclude (if None, do not exclude any).
      *
      * @return Forward solution restricted to selected channel types.
      */
@@ -313,7 +313,7 @@ public:
     /**
      * Reduces a forward solution to selected regions
      *
-     * @param[in] p_qListLabels  ROIs
+     * @param\[in\] p_qListLabels  ROIs
      *
      * @return the reduced forward solution
      */
@@ -325,10 +325,10 @@ public:
      *
      * Pick by channel type and names from a forward operator
      *
-     * @param[in] meg        Include MEG channels
-     * @param[in] eeg        Include EEG channels
-     * @param[in] include    Additional channels to include (if empty, do not add any)
-     * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
+     * @param\[in\] meg        Include MEG channels
+     * @param\[in\] eeg        Include EEG channels
+     * @param\[in\] include    Additional channels to include (if empty, do not add any)
+     * @param\[in\] exclude    Channels to exclude (if empty, do not exclude any)
      *
      * @return Forward solution restricted to selected channel types.
      */
@@ -341,9 +341,9 @@ public:
     /**
      * Prepare forward for assembling the inverse operator
      *
-     * @param[in] p_info             The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
-     * @param[in] p_noise_cov        The noise covariance matrix.
-     * @param[in] p_pca              Calculate pca or not.
+     * @param\[in\] p_info             The measurement info to specify the channels to include. Bad channels in info['bads'] are not used.
+     * @param\[in\] p_noise_cov        The noise covariance matrix.
+     * @param\[in\] p_pca              Calculate pca or not.
      * @param[out] ch_names          Selected channel names
      * @param[out] gain              Gain matrix
      * @param[out] p_outNoiseCov     noise covariance matrix
@@ -363,7 +363,7 @@ public:
 //    /**
 //    * Prepares a forward solution, Bad channels, after clustering etc ToDo...
 //    *
-//    * @param [in] p_FiffInfo   Fif measurement info
+//    * @param\[in\] p_FiffInfo   Fif measurement info
 //    *
 //    */
 //    void prepare_forward(const FiffInfo& p_FiffInfo)
@@ -421,13 +421,13 @@ public:
      *
      * Reads a forward solution from a fif file
      *
-     * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+     * @param\[in\] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
      * @param[out] fwd          A forward solution from a fif file
-     * @param[in] force_fixed   Force fixed source orientation mode? (optional)
-     * @param[in] surf_ori      Use surface based source coordinate system? (optional)
-     * @param[in] include       Include these channels (optional)
-     * @param[in] exclude       Exclude these channels (optional)
-     * @param[in] bExcludeBads  If true bads are also read; default = false (optional)
+     * @param\[in\] force_fixed   Force fixed source orientation mode? (optional)
+     * @param\[in\] surf_ori      Use surface based source coordinate system? (optional)
+     * @param\[in\] include       Include these channels (optional)
+     * @param\[in\] exclude       Exclude these channels (optional)
+     * @param\[in\] bExcludeBads  If true bads are also read; default = false (optional)
      *
      * @return true if succeeded, false otherwise
      */
@@ -445,7 +445,7 @@ public:
     /**
      * reduces the forward solution and stores the result to p_fwdOut.
      *
-     * @param[in]    p_iNumDipoles   Desired number of dipoles
+     * @param\[in\]   p_iNumDipoles   Desired number of dipoles
      * @param[out]   p_D             The reduction operator
      *
      * @return reduced MNE forward solution
@@ -457,7 +457,7 @@ public:
      * Restrict gain matrix entries for optimal depth weighting
      *
      * @param[in, out] G     Gain matrix to be restricted; result is stored in place.
-     * @param[in] info       Fiff information
+     * @param\[in\] info       Fiff information
      */
     static void restrict_gain_matrix(Eigen::MatrixXd &G, const FIFFLIB::FiffInfo &info);
 
@@ -471,8 +471,8 @@ public:
     /**
      * overloading the stream out operator<<
      *
-     * @param[in] out                    The stream to which the MNE forward solution should be assigned to.
-     * @param[in] p_MNEForwardSolution   MNE forward solution which should be assigned to the stream.
+     * @param\[in\] out                    The stream to which the MNE forward solution should be assigned to.
+     * @param\[in\] p_MNEForwardSolution   MNE forward solution which should be assigned to the stream.
      *
      * @return the stream with the attached fiff projector
      */
@@ -481,7 +481,7 @@ public:
     /**
      * Overloaded == operator to compare an object to this instance.
      *
-     * @param[in] object    The object which should be compared to.
+     * @param\[in\] object    The object which should be compared to.
      *
      * @return true if equal, false otherwise
      */
@@ -491,8 +491,8 @@ public:
     /**
      * Returns the positions of the specified sources based on their beloning labels
      *
-     * @param[in] lPickedLabels                    The stream to which the MNE forward solution should be assigned to.
-     * @param[in] tSurfSetInflated                 The surface used to pick the source from, based on their index specified bzy this forward solution.
+     * @param\[in\] lPickedLabels                    The stream to which the MNE forward solution should be assigned to.
+     * @param\[in\] tSurfSetInflated                 The surface used to pick the source from, based on their index specified bzy this forward solution.
      *
      * @return the source position in 3D space
      */
@@ -506,8 +506,8 @@ private:
      *
      * Reads all interesting stuff for one forward solution
      *
-     * @param[in] p_pStream  The opened fif file to read from
-     * @param[in] p_Node     The forward solution node
+     * @param\[in\] p_pStream  The opened fif file to read from
+     * @param\[in\] p_Node     The forward solution node
      * @param[out] one       The read forward solution
      *
      * @return True if succeeded, false otherwise

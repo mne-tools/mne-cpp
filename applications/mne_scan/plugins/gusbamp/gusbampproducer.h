@@ -80,7 +80,7 @@ public:
     /**
      * Constructs a GUSBAmpProducer.
      *
-     * @param [in] pGUSBAmp a pointer to the corresponding GUSBAmp class.
+     * @param\[in\] pGUSBAmp a pointer to the corresponding GUSBAmp class.
      */
     GUSBAmpProducer(GUSBAmp* pGUSBAmp);
 
@@ -94,10 +94,10 @@ public:
     /**
      * Starts the GUSBAmpProducer by starting the producer's thread and initialising the device.
      *
-     * @param [in] serials       string array of all Serial names
-     * @param [in] channels      int field of calling number of the channels to be acquired
-     * @param [in] sampleRate    sample Rate as an integer
-     * @param [in] filePath      string of the filepath where data will be stored
+     * @param\[in\] serials       string array of all Serial names
+     * @param\[in\] channels      int field of calling number of the channels to be acquired
+     * @param\[in\] sampleRate    sample Rate as an integer
+     * @param\[in\] filePath      string of the filepath where data will be stored
      *
      */
     virtual void start(std::vector<QString> &serials, std::vector<int> channels, int sampleRate);

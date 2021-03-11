@@ -92,9 +92,9 @@ public:
     /**
      * Default constructor.
      *
-     * @param[in] p3DEntityParent    The parent 3D entity.
-     * @param[in] iType              The type of the item. See types.h for declaration and definition.
-     * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
+     * @param\[in\] p3DEntityParent    The parent 3D entity.
+     * @param\[in\] iType              The type of the item. See types.h for declaration and definition.
+     * @param\[in\] text               The text of this item. This is also by default the displayed name of the item in a view.
      */
     explicit FsSurfaceTreeItem(Qt3DCore::QEntity* p3DEntityParent = 0,
                                int iType = Data3DTreeModelItemTypes::SurfaceItem,
@@ -104,7 +104,7 @@ public:
     /**
      * Adds FreeSurfer data based on surface and annotation data to this item.
      *
-     * @param[in] tSurface           FreeSurfer surface.
+     * @param\[in\] tSurface           FreeSurfer surface.
      */
     void addData(const FSLIB::Surface& tSurface);
 
@@ -112,7 +112,7 @@ public:
     /**
      * Call this function whenever visibilty of teh annoation has changed.
      *
-     * @param[in] isVisible     The visibility flag.
+     * @param\[in\] isVisible     The visibility flag.
      */
     void onAnnotationVisibilityChanged(bool isVisible);
 
@@ -120,9 +120,9 @@ public:
     /**
      * Creates a QByteArray of colors for given curvature and color data.
      *
-     * @param[in] curvature      The curvature information.
-     * @param[in] colSulci       The sulci color information.
-     * @param[in] colGyri        The gyri color information.
+     * @param\[in\] curvature      The curvature information.
+     * @param\[in\] colSulci       The sulci color information.
+     * @param\[in\] colGyri        The gyri color information.
      *
      * @return The final colors per vertex (RGB).
      */

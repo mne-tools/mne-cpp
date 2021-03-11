@@ -87,9 +87,9 @@ public:
     /**
      * Creates the real-time covariance estimation object.
      *
-     * @param[in] p_iMaxSamples      Number of samples to use for each data chunk
-     * @param[in] p_pFiffInfo        Associated Fiff Information
-     * @param[in] parent     Parent QObject (optional)
+     * @param\[in\] p_iMaxSamples      Number of samples to use for each data chunk
+     * @param\[in\] p_pFiffInfo        Associated Fiff Information
+     * @param\[in\] parent     Parent QObject (optional)
      */
     explicit RtNoise(qint32 p_iMaxSamples,
                      FIFFLIB::FiffInfo::SPtr p_pFiffInfo,
@@ -106,7 +106,7 @@ public:
     /**
      * Slot to receive incoming data.
      *
-     * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer
+     * @param\[in\] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer
      */
     void append(const Eigen::MatrixXd &p_DataSegment);
 

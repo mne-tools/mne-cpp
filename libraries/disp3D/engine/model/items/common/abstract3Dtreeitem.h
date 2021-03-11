@@ -86,9 +86,9 @@ public :
     /**
      * Default constructor.
      *
-     * @param[in] p3DEntityParent    The parent 3D entity.
-     * @param[in] iType      The type of the item. See types.h for declaration and definition.
-     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+     * @param\[in\] p3DEntityParent    The parent 3D entity.
+     * @param\[in\] iType      The type of the item. See types.h for declaration and definition.
+     * @param\[in\] text       The text of this item. This is also by default the displayed name of the item in a view.
      */
     Abstract3DTreeItem(QEntity* p3DEntityParent = 0,
                        int iType = Data3DTreeModelItemTypes::UnknownItem,
@@ -105,7 +105,7 @@ public :
     /**
      * Returns all children of this item based on their type.
      *
-     * @param[in] type    The type of the child items which should be looked for.
+     * @param\[in\] type    The type of the child items which should be looked for.
      *
      * @return           List with all found items.
      */
@@ -115,7 +115,7 @@ public :
     /**
      * Returns all children of this item based on their text.
      *
-     * @param[in] text    The text of the child items which should be looked for.
+     * @param\[in\] text    The text of the child items which should be looked for.
      *
      * @return           List with all found items.
      */
@@ -125,7 +125,7 @@ public :
     /**
      * Overloaded stream operator to add a child to this item based on a pointer.
      *
-     * @param[in] newItem    The new item as a pointer.
+     * @param\[in\] newItem    The new item as a pointer.
      */
     Abstract3DTreeItem &operator<<(Abstract3DTreeItem* newItem);
 
@@ -133,7 +133,7 @@ public :
     /**
      * Overloaded stream operator to add a child to this item based on a reference.
      *
-     * @param[in] newItem    The new item as a reference.
+     * @param\[in\] newItem    The new item as a reference.
      */
     Abstract3DTreeItem &operator<<(Abstract3DTreeItem& newItem);
 
@@ -141,8 +141,8 @@ public :
     /**
      * Creates colors for given color for a number of input vertices.
      *
-     * @param[in] numVert        The number of vertices.
-     * @param[in] color          The vertex color information.
+     * @param\[in\] numVert        The number of vertices.
+     * @param\[in\] color          The vertex color information.
      *
      * @return The colors per vertex
      */
@@ -152,7 +152,7 @@ public :
     /**
      * Set the alpha value.
      *
-     * @param[in] fAlpha    The new alpha value.
+     * @param\[in\] fAlpha    The new alpha value.
      */
     void setAlpha(float fAlpha);
 
@@ -167,7 +167,7 @@ protected:
     /**
      * Call this function whenever the check box of this item was checked.
      *
-     * @param[in] checkState        The current checkstate.
+     * @param\[in\] checkState        The current checkstate.
      */
     virtual void onCheckStateChanged(const Qt::CheckState& checkState);
 
@@ -175,7 +175,7 @@ protected:
     /**
      * Call this function whenever the the translation x of this item changed.
      *
-     * @param[in] fTransX        The current x translation.
+     * @param\[in\] fTransX        The current x translation.
      */
     virtual void onTranslationXChanged(const QVariant& fTransX);
 
@@ -183,7 +183,7 @@ protected:
     /**
      * Call this function whenever the the translation y of this item changed.
      *
-     * @param[in] fTransY        The current y translation.
+     * @param\[in\] fTransY        The current y translation.
      */
     virtual void onTranslationYChanged(const QVariant& fTransY);
 
@@ -191,7 +191,7 @@ protected:
     /**
      * Call this function whenever the the translation z of this item changed.
      *
-     * @param[in] fTransZ        The current z translation.
+     * @param\[in\] fTransZ        The current z translation.
      */
     virtual void onTranslationZChanged(const QVariant& fTransZ);
 
@@ -199,7 +199,7 @@ protected:
     /**
      * Call this function whenever the the scaling of this item changed.
      *
-     * @param[in] fScale        The current scale value for all axis.
+     * @param\[in\] fScale        The current scale value for all axis.
      */
     virtual void onScaleChanged(const QVariant& fScale);
 
@@ -207,7 +207,7 @@ protected:
     /**
      * Call this function whenever the color was changed.
      *
-     * @param[in] color        The new surface color.
+     * @param\[in\] color        The new surface color.
      */
     virtual void onColorChanged(const QVariant& color);
 
@@ -215,7 +215,7 @@ protected:
     /**
      * Call this function whenever the alpha value changed.
      *
-     * @param[in] fAlpha     The new alpha value.
+     * @param\[in\] fAlpha     The new alpha value.
      */
     virtual void onAlphaChanged(const QVariant& fAlpha);
 
@@ -229,7 +229,7 @@ signals:
     /**
      * Emit this signal whenever this item's check state changed.
      *
-     * @param[in] checkState     The current check state.
+     * @param\[in\] checkState     The current check state.
      */
     void checkStateChanged(const Qt::CheckState& checkState);
 };

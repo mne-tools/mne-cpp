@@ -124,7 +124,7 @@ public:
     /**
      * Constructs a MainWindow which is a child of parent.
      *
-     * @param [in] parent pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window. If parent is another widget, MainWindow becomes a child window inside parent. MainWindow is deleted when its parent is deleted.
+     * @param\[in\] parent pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window. If parent is another widget, MainWindow becomes a child window inside parent. MainWindow is deleted when its parent is deleted.
      */
     MainWindow(QWidget *parent = Q_NULLPTR);
 
@@ -139,7 +139,7 @@ public:
     /**
      * This event handler is called when Qt receives a window close request from the window system.
      *
-     * @param [in] event     close event
+     * @param\[in\] event     close event
      */
     void closeEvent(QCloseEvent *event);
 
@@ -147,7 +147,7 @@ public:
     /**
      * Starts or restarts the main application timer with a timeout interval of msec milliseconds.
      *
-     * @param [in] msec timeout interval in milliseconds
+     * @param\[in\] msec timeout interval in milliseconds
      */
     void startTimer(int msec);
 
@@ -161,9 +161,9 @@ public:
     /**
      * Writes to MainWindow log.
      *
-     * @param [in] logMsg message
-     * @param [in] lgknd message kind; Message is formated depending on its kind.
-     * @param [in] lglvl message level; Message is displayed depending on its level.
+     * @param\[in\] logMsg message
+     * @param\[in\] lgknd message kind; Message is formated depending on its kind.
+     * @param\[in\] lglvl message level; Message is displayed depending on its level.
      */
     void writeToLog(const QString& logMsg, LogKind lgknd = _LogKndMessage, LogLevel lglvl = _LogLvNormal);
 
@@ -171,8 +171,8 @@ public:
     /**
      * Set the splash screen.
      *
-     * @param [in] pSplashScreen        The pointer to the splash screen.
-     * @param [in] bShowSplashScreen    Whether to show the splash screen until this widget is shown. Default is true.
+     * @param\[in\] pSplashScreen        The pointer to the splash screen.
+     * @param\[in\] bShowSplashScreen    Whether to show the splash screen until this widget is shown. Default is true.
      */
     void setSplashScreen(MainSplashScreen::SPtr& pSplashScreen,
                          bool bShowSplashScreen = true);
@@ -206,7 +206,7 @@ private:
     /**
      * Changes the current layout style of the application.
      *
-     * @param [in] sStyle   The new qss style.
+     * @param\[in\] sStyle   The new qss style.
      */
     void onStyleChanged(const QString& sStyle);
 
@@ -220,7 +220,7 @@ private:
     /**
      * Setup the user interface for running mode.
      *
-     * @param [in] state whether program is running.
+     * @param\[in\] state whether program is running.
      */
     void uiSetupRunningState(bool state);
 
@@ -434,7 +434,7 @@ signals:
     /**
      * Signal emmited whenever the gui modes changed
      *
-     * @param [in] mode       the new gui mode
+     * @param\[in\] mode       the new gui mode
      */
     void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
 

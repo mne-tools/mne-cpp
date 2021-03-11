@@ -100,8 +100,8 @@ public:
     /**
      * Constructs a BemDataModel object.
      *
-     * @param[in] sFilePath             The file path of the model. This is usually also the file path.
-     * @param[in] pParent               The parent model. Default is set to NULL.
+     * @param\[in\] sFilePath             The file path of the model. This is usually also the file path.
+     * @param\[in\] pParent               The parent model. Default is set to NULL.
      */
     BemDataModel(const QString &sFilePath,
                  const QByteArray& byteLoadedData = QByteArray(),
@@ -167,7 +167,7 @@ signals:
     /**
      * Emits new Bem Model
      *
-     * @param [in] pBem    The new Bem model
+     * @param\[in\] pBem    The new Bem model
      */
     void newBemAvailable(const MNELIB::MNEBem::SPtr pBem);
 };

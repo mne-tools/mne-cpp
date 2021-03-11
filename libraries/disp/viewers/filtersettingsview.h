@@ -93,7 +93,7 @@ public:
     /**
      * Constructs a FilterSettingsView which is a child of parent.
      *
-     * @param [in] parent        parent of widget
+     * @param\[in\] parent        parent of widget
      */
     FilterSettingsView(const QString& sSettingsPath = "",
                        QWidget *parent = 0,
@@ -121,7 +121,7 @@ public:
     /**
      * Sets the sampling frequency and setups this view accrodingly.
      *
-     * @param[in] dSFreq the new sampling frequency
+     * @param\[in\] dSFreq the new sampling frequency
      */
     void setSamplingRate(double dSFreq);
 
@@ -155,7 +155,7 @@ protected:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param mode     The new mode (Clinical=0, Research=1).
+     * @param\[in\] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -163,7 +163,7 @@ protected:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param mode     The new mode (RealTime=0, Offline=1).
+     * @param\[in\] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 
@@ -195,7 +195,7 @@ protected:
     /**
      * This function is called whenever the channel type changed
      *
-     * @param[in] sType        the channel type
+     * @param\[in\] sType        the channel type
      */
     void onFilterChannelTypeChanged(const QString& sType);
 

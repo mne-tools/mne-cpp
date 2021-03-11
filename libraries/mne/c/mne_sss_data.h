@@ -96,7 +96,7 @@ public:
      * Copy constructor.
      * Refactored: mne_dup_sss_data (mne_sss_data.c)
      *
-     * @param[in] p_MneSssData   MNE SSS Data which should be copied
+     * @param\[in\] p_MneSssData   MNE SSS Data which should be copied
      */
     MneSssData(const MneSssData& p_MneSssData);
 
@@ -111,7 +111,7 @@ public:
      * Read SSS data from anywhere in a file
      * Refactored: mne_read_sss_data (mne_sss_data.c)
      *
-     * @param[in] name       Name of the file to read the SSS data from
+     * @param\[in\] name       Name of the file to read the SSS data from
      *
      * @return   The read SSS data.
      */
@@ -122,8 +122,8 @@ public:
      * Read the SSS data from the given node of an open fiff stream
      * Refactored: mne_read_sss_data_from_node (mne_sss_data.c)
      *
-     * @param[in] stream     The open fiff stream
-     * @param[in] start      The node/tree to read the SSS data from
+     * @param\[in\] stream     The open fiff stream
+     * @param\[in\] start      The node/tree to read the SSS data from
      *
      * @return   The read SSS data.
      */
@@ -134,7 +134,7 @@ public:
      * Output the SSS information for debugging purposes
      * Refactored: mne_print_sss_data (mne_sss_data.c)
      *
-     * @param[in] f      the file stream to print to;
+     * @param\[in\] f      the file stream to print to;
      */
     void print(FILE *f) const;
 
