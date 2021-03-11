@@ -81,7 +81,7 @@ public:
     /**
      * Constructs a ScaleControl object who's Qlabel element will be set.
      *
-     *@param[in] label    Text for the Qlabel
+     * @param[in] label    Text for the Qlabel
      */
      explicit ScaleControl(const char* label);
 
@@ -90,26 +90,30 @@ public:
      * Constructs a ScaleControl object who's Qlabel element will be set, and sets the parent of the underlying
      * QWidget.
      *
-     *@param[in] label    Text for the Qlabel
-     *@param[in] parent   Parent of widget
+     * @param[in] label    Text for the Qlabel
+     * @param[in] parent   Parent of widget
      */
-    explicit ScaleControl(const char* label, QWidget* parent);
+    explicit ScaleControl(const char* label,
+                          QWidget* parent);
 
     //=========================================================================================================
     /**
      * Constructs a ScaleControl object who's Qlabel element will be set, and sets the parent of the underlying
      * QWidget. The min and max values for the control will also be initialized.
      *
-     *@param[in] label    Text for the Qlabel
-     *@param[in] parent   Parent of widget
-     *@param[in] min      Min value of the control.
-     *@param[in] max      Max value of the control.
+     * @param[in] label    Text for the Qlabel
+     * @param[in] parent   Parent of widget
+     * @param[in] min      Min value of the control.
+     * @param[in] max      Max value of the control.
      */
-     explicit ScaleControl(const char* label, QWidget* parent, double min, double max);
+     explicit ScaleControl(const char* label,
+                           QWidget* parent,
+                           double min,
+                           double max);
 
     //=========================================================================================================
      /**
-     * getUI Retunr a pointer to the GUI of the ScaleControl.
+     * getUI Return a pointer to the GUI of the ScaleControl.
      * @return Pointer to the ScaleControlWidget.
      */
     Ui::ScaleControlWidget* getUI();
@@ -124,28 +128,33 @@ public:
     //=========================================================================================================
     /**
      * Set the value of the maximum sensitivity point for the non-linear sensitivity curve of the sensor.
-     *@param[in] s Maximum sensitivity value
+     *
+     * @param[in] s Maximum sensitivity value.
      */
     void setMaxSensitivityPoint(double s);
 
     //=========================================================================================================
     /**
      * Set the sensitivity value of the non-linear mapping between the control slider and the control value.
-     *@param[in] s Sensitivity, between [0, 1]
+     *
+     * @param[in] s Sensitivity, between [0, 1]
      */
     void setSensitivity(double s);
 
     //=========================================================================================================
     /**
-     * @brief setRange
-     * @param min
-     * @param max
+     * Set the range of the Scalecontrol object. Tha it the maximum and minimum values allowed.
+     *
+     * @param[in] min Minimum value to be allowed for the Scalecontrol.
+     * @param[in] max Maximum value to be allowed for the Scalecontrol.
      */
-    void setRange(double min, double max);
+    void setRange(double min,
+                  double max);
 
     //=========================================================================================================
     /**
      * Set the number of decimals to show in the spinbox of the control.
+     *
      * @param[in] d Number of decimals to show in the spinbox.
      */
     void setDecimals(int d);
@@ -154,7 +163,7 @@ public:
     /**
      * Invert the effect of sliding the control slider to the right. Slider right decreases the control value.
      *
-     * @param[in] inverted [True = Invert the slider effect].
+     * @param[in] inverted (True = Invert the slider effect).
      */
     void invertSlider(bool inverted);
 
@@ -163,7 +172,8 @@ public slots:
     //=========================================================================================================
     /**
      * Set the value of the control.
-     *@param[in] dScale Value to set the control to.
+     *
+     * @param[in] dScale Value to set the control to.
      */
     void setValue(double dScale);
 
@@ -172,7 +182,7 @@ signals:
     /**
      * Signal emitted when the value of the control changes.
      *
-     * @param dScale The new value of the control.
+     * @param[in] dScale The new value of the control.
      */
     void valueChanged(double dScale);
 
@@ -181,7 +191,8 @@ private:
     //=========================================================================================================
     /**
      * Set the text label of the Control.
-     *@param[in] label New label text.
+     *
+     * @param[in] label New label text.
      */
     void initLabel(const char* charTextLabel);
 
@@ -223,7 +234,8 @@ private:
      *@param[in] iMin Minimum value for the slider.
      *@param[in] iMax Maximum value for the slider.
      */
-    void setSliderRange(int min, int max);
+    void setSliderRange(int min,
+                        int max);
 
     //=========================================================================================================
     /**
@@ -256,7 +268,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Memberfunction to addapt the sensitivity value to different range levels.
+     * Member function to addapt the sensitivity value to different range levels.
      *
      * @param[in] fSensitivity Sensitivity value
      * @return Weighted sensitivity value
