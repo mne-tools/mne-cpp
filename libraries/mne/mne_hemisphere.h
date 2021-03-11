@@ -107,7 +107,7 @@ public:
     /**
      * Add vertex normals and neighbourhood information
      *
-     * @param+[\[]in, out] p_pHemisphere   Hemisphere to be completed
+     * @param[in, out] p_pHemisphere   Hemisphere to be completed
      *
      * @return true if succeeded, false otherwise
      */
