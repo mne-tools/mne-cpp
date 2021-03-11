@@ -2,7 +2,7 @@
 /**
  * @file     scalecontrol.cpp
  * @author   Juan Garcia-Prieto <jgarciaprieto@mgh.harvard.edu>
- * @since    0.1.0
+ * @since    0.1.9
  * @date     Feb, 2021
  *
  * @section  LICENSE
