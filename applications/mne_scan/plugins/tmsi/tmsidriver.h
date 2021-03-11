@@ -273,7 +273,7 @@ public:
     /**
      * Get sample from the device in form of a mtrix.
      * @param[in] MatrixXf the block sample values in form of a matrix.
-     * @param+[\[]out] bool returns true if sample was successfully written to the input variable, false otherwise.
+     * @param[in, out] bool returns true if sample was successfully written to the input variable, false otherwise.
      */
     bool getSampleMatrixValue(MatrixXf& sampleMatrix);
 
@@ -287,7 +287,7 @@ public:
      * @param[in] bUseUnitGain Flag for using the channels unit gain. Defined by the user via the GUI.
      * @param[in] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
      * @param[in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
-     * @param+[\[]out] bool returns true if device was successfully initialised, false otherwise.
+     * @param[in, out] bool returns true if device was successfully initialised, false otherwise.
      * @param[in] bUseCommonAverage Flag for using common average when recording EEG data. Defined by the user via the GUI.
      * @param[in] bMeasureImpedance Flag for measuring impedances.
      */
@@ -304,7 +304,7 @@ public:
     //=========================================================================================================
     /**
      * Uninitialise device.
-     * @param+[\[]out] bool returns true if device was successfully uninitialised, false otherwise.
+     * @param[in, out] bool returns true if device was successfully uninitialised, false otherwise.
      */
     bool uninitDevice();
 

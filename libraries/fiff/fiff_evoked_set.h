@@ -139,7 +139,7 @@ public:
      * Apply compensation to the data as desired
      *
      * @param[in] to                 desired compensation in the output
-     * @param[in,out] p_FiffEvoked   Evoked set to compensate
+     * @param[in, out] p_FiffEvoked   Evoked set to compensate
      *
      * @return true if succeeded, false otherwise
      */

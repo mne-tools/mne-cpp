@@ -168,7 +168,7 @@ private:
      *
      * @param[in] index      Used to locate data in a data model.
      * @param[in] option     Describes the parameters used to draw an item in a view widget
-     * @param[in,out] path   The QPointerPath to create for the data plot.
+     * @param[in, out] path   The QPointerPath to create for the data plot.
      * @param[in] ellipsePos Position of the ellipse which is plotted at the current channel signal value.
      * @param[in] amplitude  String which is to be plotted.
      * @param[in] data       Current data for the given row.
@@ -186,7 +186,7 @@ private:
      *
      * @param[in] index      Used to locate data in a data model.
      * @param[in] option     Describes the parameters used to draw an item in a view widget
-     * @param[in,out] path   The QPointerPath to create for the data plot.
+     * @param[in, out] path   The QPointerPath to create for the data plot.
      */
     void createCurrentPositionMarkerPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path) const;
 
@@ -196,7 +196,7 @@ private:
      *
      * @param[in] index      Used to locate data in a data model.
      * @param[in] option     Describes the parameters used to draw an item in a view widget
-     * @param[in,out] path   The QPointerPath to create for the data plot.
+     * @param[in, out] path   The QPointerPath to create for the data plot.
      * @param[in] data       Data for the given row.
      */
     void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const;
@@ -207,7 +207,7 @@ private:
      *
      * @param[in] index      Used to locate data in a data model.
      * @param[in] option     Describes the parameters used to draw an item in a view widget
-     * @param[in,out] path   The QPointerPath to create for the data plot.
+     * @param[in, out] path   The QPointerPath to create for the data plot.
      * @param[in] data       Data for the given row.
      */
     void createTimeSpacersPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const;
@@ -219,7 +219,7 @@ private:
      * @param[in] painter    Low-level painting on widgets and other paint devices
      * @param[in] index      Used to locate data in a data model.
      * @param[in] option     Describes the parameters used to draw an item in a view widget
-     * @param[in,out] path   The QPointerPath to create for the data plot.
+     * @param[in, out] path   The QPointerPath to create for the data plot.
      * @param[in] data       Data for the given row.
      */
     void createTriggerPath(QPainter *painter, const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorPair &data) const;
@@ -230,7 +230,7 @@ private:
      *
      * @param[in] index      Used to locate data in a data model.
      * @param[in] option     Describes the parameters used to draw an item in a view widget
-     * @param[in,out] path   The QPointerPath to create for the data plot.
+     * @param[in, out] path   The QPointerPath to create for the data plot.
      * @param[in] data       Data for the given row.
      * @param[in] textPosition Position of the text.
      */
@@ -241,7 +241,7 @@ private:
      * createMarkerPath Creates the QPointer path for the marker plot.
      *
      * @param[in] option     Describes the parameters used to draw an item in a view widget.
-     * @param[in,out] path   The QPointerPath to create for the data plot.
+     * @param[in, out] path   The QPointerPath to create for the data plot.
      */
     void createMarkerPath(const QStyleOptionViewItem &option, QPainterPath& path) const;
 

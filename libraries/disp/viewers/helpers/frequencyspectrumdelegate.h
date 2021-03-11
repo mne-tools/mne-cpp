@@ -145,7 +145,7 @@ private:
      * CapturePoint capture one QPointer .
      *
      * @param[in]       index   QModelIndex for accessing associated data and model object.
-     * @param[in,out]    path    The QPointerPath to create for the data plot.
+     * @param[in, out]    path    The QPointerPath to create for the data plot.
      */
     void capturePoint(const QModelIndex &index,
                       const QStyleOptionViewItem &option,
@@ -158,7 +158,7 @@ private:
      * createPlotPath creates the QPointer path for the data plot.
      *
      * @param[in]       index   QModelIndex for accessing associated data and model object.
-     * @param[in,out]    path    The QPointerPath to create for the data plot.
+     * @param[in, out]    path    The QPointerPath to create for the data plot.
      */
     void createPlotPath(const QModelIndex &index,
                         const QStyleOptionViewItem &option,
@@ -169,7 +169,7 @@ private:
     /**
      * createGridPath Creates the QPointer path for the grid plot.
      *
-     * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
+     * @param[in, out] path The row vector of the data matrix <1 x nsamples>.
      * @param[in] data The row vector of the data matrix <1 x nsamples>.
      */
     void createGridPath(const QModelIndex &index,

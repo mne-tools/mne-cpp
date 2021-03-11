@@ -190,14 +190,14 @@ private:
     /**
      * Read channelinformation and split into lists for meg/eeg/comp + read m_meg_head_t
      * @param[in] pFiffInfo            The FiffInfo to read from
-     * @param+[\[]out] listMegCh           The MEG channel list
-     * @param+[\[]out] iNMeg               The number of MEG channels
-     * @param+[\[]out] listMegComp         The compensator channel list
-     * @param+[\[]out] iNMegCmp            The number of compensator channels
-     * @param+[\[]out] listEegCh           The EEG channel list
-     * @param+[\[]out] iNEeg               The number of EEG channels
-     * @param+[\[]out] transDevHeadOld     The meg <-> head transformation
-     * @param+[\[]out] id                  The FiffID
+     * @param[in, out] listMegCh           The MEG channel list
+     * @param[in, out] iNMeg               The number of MEG channels
+     * @param[in, out] listMegComp         The compensator channel list
+     * @param[in, out] iNMegCmp            The number of compensator channels
+     * @param[in, out] listEegCh           The EEG channel list
+     * @param[in, out] iNEeg               The number of EEG channels
+     * @param[in, out] transDevHeadOld     The meg <-> head transformation
+     * @param[in, out] id                  The FiffID
      *
      */
     int mne_read_meg_comp_eeg_ch_info_41(FIFFLIB::FiffInfoBase::SPtr pFiffInfoBase,
