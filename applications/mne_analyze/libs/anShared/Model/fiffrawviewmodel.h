@@ -60,6 +60,7 @@
 #include <QBuffer>
 #include <QFile>
 #include <QColor>
+#include <QFileSystemWatcher>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -588,6 +589,9 @@ private:
      */
     void reloadAllData();
 
+    //=========================================================================================================
+    void updateFromRealtime(const QString &path);
+
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lData;             /**< Data. */
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lNewData;          /**< Data that is to be appended or prepended. */
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lFilteredData;     /**< Filtered data. */
@@ -636,6 +640,9 @@ private:
 
     int                                         m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms. */
     int                                         m_iScroller;
+    int                                         m_iRealtimeFileIndex;
+
+    QFileSystemWatcher                          m_fileWatcher;
 
     qint32                                      m_iScrollPos;                               /**< Position of the scrollbar. */
 
