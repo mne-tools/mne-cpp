@@ -79,31 +79,31 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs a ScaleControl object who's Qlabel elemennt will be set.
+     * Constructs a ScaleControl object who's Qlabel element will be set.
      *
-     * @param [in] label    text for the Qlabel
+     *@param[in] label    Text for the Qlabel
      */
      explicit ScaleControl(const char* label);
 
     //=========================================================================================================
     /**
-     * Constructs a ScaleControl object who's Qlabel elemennt will be set, and sets the parent of the underlyning
+     * Constructs a ScaleControl object who's Qlabel element will be set, and sets the parent of the underlying
      * QWidget.
      *
-     * @param [in] label    text for the Qlabel
-     * @param [in] parent   parent of widget
+     *@param[in] label    Text for the Qlabel
+     *@param[in] parent   Parent of widget
      */
     explicit ScaleControl(const char* label, QWidget* parent);
 
     //=========================================================================================================
     /**
-     * Constructs a ScaleControl object who's Qlabel elemennt will be set, and sets the parent of the underlyning
+     * Constructs a ScaleControl object who's Qlabel element will be set, and sets the parent of the underlying
      * QWidget. The min and max values for the control will also be initialized.
      *
-     * @param [in] label    text for the Qlabel
-     * @param [in] parent   parent of widget
-     * @param [in] min      min value of the control.
-     * @param [in] max      max value of the control.
+     *@param[in] label    Text for the Qlabel
+     *@param[in] parent   Parent of widget
+     *@param[in] min      Min value of the control.
+     *@param[in] max      Max value of the control.
      */
      explicit ScaleControl(const char* label, QWidget* parent, double min, double max);
 
@@ -124,14 +124,14 @@ public:
     //=========================================================================================================
     /**
      * Set the value of the maximum sensitivity point for the non-linear sensitivity curve of the sensor.
-     * @param [in] s Maximum sensitivity value
+     *@param[in] s Maximum sensitivity value
      */
     void setMaxSensitivityPoint(double s);
 
     //=========================================================================================================
     /**
      * Set the sensitivity value of the non-linear mapping between the control slider and the control value.
-     * @param [in] s Sensitivity, between [0, 1]
+     *@param[in] s Sensitivity, between [0, 1]
      */
     void setSensitivity(double s);
 
@@ -146,14 +146,15 @@ public:
     //=========================================================================================================
     /**
      * Set the number of decimals to show in the spinbox of the control.
-     * @param d
+     * @param[in] d Number of decimals to show in the spinbox.
      */
     void setDecimals(int d);
 
     //=========================================================================================================
     /**
      * Invert the effect of sliding the control slider to the right. Slider right decreases the control value.
-     * @param [in] inverted [True = Invert the slider effect].
+     *
+     * @param[in] inverted [True = Invert the slider effect].
      */
     void invertSlider(bool inverted);
 
@@ -162,15 +163,16 @@ public slots:
     //=========================================================================================================
     /**
      * Set the value of the control.
-     * @param [in] dScale value to set the control to.
+     *@param[in] dScale Value to set the control to.
      */
     void setValue(double dScale);
 
 signals:
     //=========================================================================================================
     /**
-     * Signal emited when the value of the control changes.
-     * @param dScale
+     * Signal emitted when the value of the control changes.
+     *
+     * @param dScale The new value of the control.
      */
     void valueChanged(double dScale);
 
@@ -179,7 +181,7 @@ private:
     //=========================================================================================================
     /**
      * Set the text label of the Control.
-     * @param [in] label New label text.
+     *@param[in] label New label text.
      */
     void initLabel(const char* charTextLabel);
 
@@ -198,14 +200,16 @@ private:
     //=========================================================================================================
     /**
      * Callback executed whenever the value of the spinbox has changed.
-     * @param dScale
+     *
+     * @param[in] dScale
      */
     void spinBoxChanged(double dScale);
 
     //=========================================================================================================
     /**
      * Callback executed whenever the position of the slider has changed.
-     * @param dScale
+     *
+     * @param[in] dScale New value of the slider.
      */
     void sliderChanged(int dScale);
 
@@ -213,10 +217,11 @@ private:
     /**
      * Member method to set the range of the slider. Normally this is set to [1,1000] and there should be no reason
      * to change it since the non-linear mapping function between the slider and the spinbox should take care of
-     * addapting the actual value of the control (the spinbox) with the values of the slider. Not even if there is
+     * adapting the actual value of the control (the spinbox) with the values of the slider. Not even if there is
      * a need to invert the behavior of the slider since the invertSlider should take care of that.
-     * @param [in] iMin Minimum value for the slider.
-     * @param [in] iMax Maximum value for the slider.
+     *
+     *@param[in] iMin Minimum value for the slider.
+     *@param[in] iMax Maximum value for the slider.
      */
     void setSliderRange(int min, int max);
 
@@ -224,8 +229,9 @@ private:
     /**
      * Member function to map the value of the spinbox to a position in the slider bar consistent with the maximum
      * and minimum levels of the control.
-     * @param [in] dIn Value of the spinbox or the control.
-     * @return [out] int value to set the slider to, consistent with the range of the slider.
+     *
+     * @param[in] dIn Value of the spinbox or the control.
+     * @return Value to set the slider to, consistent with the range of the slider.
      */
     inline int mapSpinBoxToSlider(double dIn);
 
@@ -233,8 +239,8 @@ private:
     /**
      * Member function to map the value of a slider poisition with a value for the control or the spinbox. This
      * functions adapts the ranges of the control/spinbox to the ranges of the slider for consistency between ranges.
-     * @param [in] iIn Integer value representing the position fo the slider.
-     * @return [out] dOut Double value to set the spinbox to.
+     * @param[in] iIn Integer value representing the position of the slider.
+     * @return Double value to set the spinbox to.
      */
     inline double mapSliderToSpinBox(int iIn);
 
@@ -249,8 +255,8 @@ private:
     //=========================================================================================================
     /**
      * Memberfunction to addapt the sensitivity value to different range levels.
-     * @param [in] fSensitivity Sensitivity value
-     * @return [out] weighted sensitivity value
+     * @param[in] fSensitivity Sensitivity value
+     * @return Weighted sensitivity value
      */
     inline float weightedSensitivity(float fSensitivity);
 
