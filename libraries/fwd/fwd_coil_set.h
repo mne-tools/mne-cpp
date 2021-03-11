@@ -89,7 +89,7 @@ public:
 //    /**
 //    * Copy constructor.
 //    *
-//    * @param\[in\] p_FwdCoilSet      FwdCoilSet which should be copied
+//    * @param[in] p_FwdCoilSet      FwdCoilSet which should be copied
 //    */
 //    FwdCoilSet(const FwdCoilSet& p_FwdCoilSet);
 
@@ -113,9 +113,9 @@ public:
      * Change the coordinate frame if so desired
      * Refactored: fwd_create_meg_coil (fwd_coil_def.c)
      *
-     * @param\[in\] ch     Channel information to use
-     * @param\[in\] acc    Required accuracy
-     * @param\[in\] t      Transform the points using this
+     * @param[in] ch     Channel information to use
+     * @param[in] acc    Required accuracy
+     * @param[in] t      Transform the points using this
      *
      * @return   The created meg coil.
      */
@@ -127,10 +127,10 @@ public:
      * Change the coordinate frame if so desired
      * Refactored: fwd_create_meg_coils (fwd_coil_def.c)
      *
-     * @param\[in\] ch     Channel information to use
-     * @param\[in\] nch    Number of channels
-     * @param\[in\] acc    Required accuracy
-     * @param\[in\] t      Transform the points using this
+     * @param[in] ch     Channel information to use
+     * @param[in] nch    Number of channels
+     * @param[in] acc    Required accuracy
+     * @param[in] t      Transform the points using this
      *
      * @return   The created meg coil set.
      */
@@ -145,9 +145,9 @@ public:
      * Change the coordinate frame if so desired
      * Refactored: fwd_create_eeg_els (fwd_coil_def.c)
      *
-     * @param\[in\] ch     Channel information to use
-     * @param\[in\] nch    Number of channels
-     * @param\[in\] t      Transform the points using this
+     * @param[in] ch     Channel information to use
+     * @param[in] nch    Number of channels
+     * @param[in] t      Transform the points using this
      *
      * @return   The created meg coil set.
      */
@@ -160,7 +160,7 @@ public:
      * Read a coil definitions from file
      * Refactored: fwd_read_coil_defs (fwd_coil_def.c)
      *
-     * @param\[in\] name   File name to read from
+     * @param[in] name   File name to read from
      *
      * @return   The read meg coil set.
      */
@@ -171,7 +171,7 @@ public:
      * Make a coil set duplicate
      * Refactored: fwd_dup_coil_set (fwd_coil_def.c)
      *
-     * @param\[in\] t      Transformation which should be applied to the duplicate
+     * @param[in] t      Transformation which should be applied to the duplicate
      *
      * @return   The duplicated coil set.
      */
@@ -182,7 +182,7 @@ public:
      * Checks if a set of templates contains a planar coil of a specified type.
      * Refactored: fwd_is_planar_coil_type (fwd_coil_def.c)
      *
-     * @param\[in\] type   This is the coil type we are interested in
+     * @param[in] type   This is the coil type we are interested in
      *
      * @return   True if set contains a planar coil of specified type, false otherwise
      */
@@ -193,7 +193,7 @@ public:
      * Checks if a set of templates contains an axial coil of a specified type.
      * Refactored: fwd_is_axial_coil_type (fwd_coil_def.c)
      *
-     * @param\[in\] type   This is the coil type we are interested in
+     * @param[in] type   This is the coil type we are interested in
      *
      * @return   True if set contains an axial coil of specified type, false otherwise
      */
@@ -204,7 +204,7 @@ public:
      * Checks if a set of templates contains a magnetometer of a specified type.
      * Refactored: fwd_is_magnetometer_coil_type (fwd_coil_def.c)
      *
-     * @param\[in\] type   This is the coil type we are interested in
+     * @param[in] type   This is the coil type we are interested in
      *
      * @return   True if set contains a magnetometer of specified type, false otherwise
      */
@@ -215,7 +215,7 @@ public:
      * Checks if a set of templates contains an EEG electrode of a specified type.
      * Refactored: fwd_is_eeg_electrode_type (fwd_coil_def.c)
      *
-     * @param\[in\] type   This is the coil type we are interested in
+     * @param[in] type   This is the coil type we are interested in
      *
      * @return   True if set contains an EEG electrode of specified type, false otherwise
      */

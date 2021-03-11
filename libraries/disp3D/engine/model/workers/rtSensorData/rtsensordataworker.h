@@ -97,7 +97,7 @@ public:
     /**
      * Add data which is to be streamed.
      *
-     * @param\[in\] data         The new data.
+     * @param[in] data         The new data.
      */
     void addData(const Eigen::MatrixXd& data);
 
@@ -111,7 +111,7 @@ public:
     /**
      * Set number of vertices.
      *
-     * @param\[in\] iNumberVerts      The number of vertices.
+     * @param[in] iNumberVerts      The number of vertices.
      */
     void setNumberVertices(int iNumberVerts);
 
@@ -119,7 +119,7 @@ public:
     /**
      * Set the number of average to take after emitting the data to the listening threads.
      *
-     * @param\[in\] iNumAvr                The new number of averages.
+     * @param[in] iNumAvr                The new number of averages.
      */
     void setNumberAverages(int iNumAvr);
 
@@ -127,7 +127,7 @@ public:
     /**
      * Sets the state whether to stream smoothed or raw data
      *
-     * @param\[in\] bStreamSmoothedData                 The new state.
+     * @param[in] bStreamSmoothedData                 The new state.
      */
     void setStreamSmoothedData(bool bStreamSmoothedData);
 
@@ -135,7 +135,7 @@ public:
     /**
      * Set the type of the colormap.
      *
-     * @param\[in\] sColormapType          The new colormap type.
+     * @param[in] sColormapType          The new colormap type.
      */
     void setColormapType(const QString& sColormapType);
 
@@ -143,7 +143,7 @@ public:
     /**
      * Set the normalization value.
      *
-     * @param\[in\] vecThresholds          The new threshold values used for normalizing the data.
+     * @param[in] vecThresholds          The new threshold values used for normalizing the data.
      */
     void setThresholds(const QVector3D &vecThresholds);
     
@@ -151,7 +151,7 @@ public:
     /**
      * Set the loop functionality on or off.
      *
-     * @param\[in\] bLoopState                The new looping state.
+     * @param[in] bLoopState                The new looping state.
      */
     void setLoopState(bool bLoopState);
 
@@ -159,7 +159,7 @@ public:
     /**
      * Set the sampling frequency.
      *
-     * @param\[in\] dSFreq                 The new sampling frequency.
+     * @param[in] dSFreq                 The new sampling frequency.
      */
     void setSFreq(const double dSFreq);
 
@@ -167,7 +167,7 @@ public:
     /**
      * Set the interpolation matrix.
      *
-     * @param\[in\] pMatInterpolationMatrix                 The new interpolation matrix.
+     * @param[in] pMatInterpolationMatrix                 The new interpolation matrix.
      */
     void setInterpolationMatrix(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
 
@@ -182,12 +182,12 @@ protected:
     /**
      * @brief normalizeAndTransformToColor  This method normalizes final values for all vertices of the mesh and converts them to rgb using the specified color converter
      *
-     * @param\[in\] vecData                       The final values for each vertex of the surface
+     * @param[in] vecData                       The final values for each vertex of the surface
      * @param[in,out] matFinalVertColor         The color matrix which the results are to be written to
-     * @param\[in\] dThresholdX                   Lower threshold for normalizing
-     * @param\[in\] dThreholdZ                    Upper threshold for normalizing
-     * @param\[in\] functionHandlerColorMap       The pointer to the function which converts scalar values to rgb
-     * @param\[in\] sColorMap                     The color map to us
+     * @param[in] dThresholdX                   Lower threshold for normalizing
+     * @param[in] dThreholdZ                    Upper threshold for normalizing
+     * @param[in] functionHandlerColorMap       The pointer to the function which converts scalar values to rgb
+     * @param[in] sColorMap                     The color map to us
      *
      */
     void normalizeAndTransformToColor(const Eigen::VectorXf& vecData,
@@ -201,7 +201,7 @@ protected:
     /**
      * @brief generateColorsFromSensorValues        Produces the final color matrix that is to be emitted
      *
-     * @param\[in\] vecSensorValues                   A vector of sensor signals
+     * @param[in] vecSensorValues                   A vector of sensor signals
      *
      * @return The final color values for the underlying mesh surface
      */
@@ -241,7 +241,7 @@ signals:
     /**
      * Emit this signal whenever this item should stream new raw data to its listeners.
      *
-     * @param\[in\] vecDataVector     The raw data.
+     * @param[in] vecDataVector     The raw data.
      */
     void newRtRawData(Eigen::VectorXd vecDataVector);
 
@@ -249,7 +249,7 @@ signals:
     /**
      * Emit this signal whenever this item should stream interpolated raw data to its listeners.
      *
-     * @param\[in\] matColorMatrix     The interpolated raw data in form of rgb colors for each vertex.
+     * @param[in] matColorMatrix     The interpolated raw data in form of rgb colors for each vertex.
      */
     void newRtSmoothedData(const Eigen::MatrixX4f &matColorMatrix);
 };

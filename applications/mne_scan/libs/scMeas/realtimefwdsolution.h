@@ -104,7 +104,7 @@ public:
     /**
      * Set the fiff info
      *
-     * @param\[in\] pFiffInfo     The new fiff info.
+     * @param[in] pFiffInfo     The new fiff info.
      */
     void setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
@@ -120,7 +120,7 @@ public:
     /**
      * New forward solution to distribute
      *
-     * @param\[in\] fwdSolution     The forward solution which should be distributed.
+     * @param[in] fwdSolution     The forward solution which should be distributed.
      */
     virtual void setValue(const MNELIB::MNEForwardSolution::SPtr pFwdSolution);
 
@@ -137,7 +137,7 @@ public:
     /**
      * New Lead Field to distribute
      *
-     * @param\[in\] pNamedMatSol     The solution matrix (Lead Field) which should be distributed.
+     * @param[in] pNamedMatSol     The solution matrix (Lead Field) which should be distributed.
      */
     virtual void setSol(const FIFFLIB::FiffNamedMatrix::SDPtr& pNamedMatSol);
 
@@ -153,7 +153,7 @@ public:
     /**
      * New gradient lead field to ditstribute
      *
-     * @param\[in\] pNamedMatSolGrad     The gradient solution matrix (Lead Field) which should be distributed.
+     * @param[in] pNamedMatSolGrad     The gradient solution matrix (Lead Field) which should be distributed.
      */
     virtual void setSolGrad(const FIFFLIB::FiffNamedMatrix::SDPtr& pNamedMatSolGrad);
 

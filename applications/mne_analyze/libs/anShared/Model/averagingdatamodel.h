@@ -87,8 +87,8 @@ public:
     /**
      * Constructs a AveragingDataModel object
      *
-     * @param\[in\] pEvokedSet   sets saved evoked set to pEvokedSet. NULL if left empty
-     * @param\[in\] parent       sets parent of the object. NULL if left empty
+     * @param[in] pEvokedSet   sets saved evoked set to pEvokedSet. NULL if left empty
+     * @param[in] parent       sets parent of the object. NULL if left empty
      */
     AveragingDataModel(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet = Q_NULLPTR,
                        QObject* parent = Q_NULLPTR);
@@ -108,8 +108,8 @@ public:
     /**
      * Returns the FiffEvokedSet stored in the model
      *
-     * @param\[in\] index    index of stored data (all indeces retrun the same data)
-     * @param\[in\] role     role of stored data (Unused)
+     * @param[in] index    index of stored data (all indeces retrun the same data)
+     * @param[in] role     role of stored data (Unused)
      *
      * @return      returns saved FiffEvokedModel with averaging data
      */
@@ -120,7 +120,7 @@ public:
     /**
      * Returns the item flags for the given index.
      *
-     * @param\[in\] index   The index that referres to the requested item.
+     * @param[in] index   The index that referres to the requested item.
      */
     Qt::ItemFlags flags(const QModelIndex &index) const override;
 
@@ -128,7 +128,7 @@ public:
     /**
      * Returns the number of rows in the model
      *
-     * @param\[in\] parent     The parent index.
+     * @param[in] parent     The parent index.
      */
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
@@ -136,7 +136,7 @@ public:
     /**
      * Returns the number of columns in the model
      *
-     * @param\[in\] parent     The parent index.
+     * @param[in] parent     The parent index.
      */
     int columnCount(const QModelIndex &parent = QModelIndex()) const override;
 
@@ -144,7 +144,7 @@ public:
     /**
      * Set the saved evoked set to pEvokedSet
      *
-     * @param\[in\] pEvokedSet   new evoked set to be saved
+     * @param[in] pEvokedSet   new evoked set to be saved
      */
     void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
 
@@ -170,9 +170,9 @@ public:
      * Currently only Qt::DisplayRole is supported.
      * Index rows reflect channels, first column is channel names, second is raw data.
      *
-     * @param\[in\] row      The specified row.
-     * @param\[in\] column   The specified column.
-     * @param\[in\] parent   The parent index.
+     * @param[in] row      The specified row.
+     * @param[in] column   The specified column.
+     * @param[in] parent   The parent index.
      */
     inline QModelIndex index(int row,
                              int column,
@@ -183,7 +183,7 @@ public:
      * Returns the parent index of the given index.
      * In this Model the parent index in always QModelIndex().
      *
-     * @param\[in\] index   The index that referres to the child.
+     * @param[in] index   The index that referres to the child.
      */
     inline QModelIndex parent(const QModelIndex &index) const override;
 

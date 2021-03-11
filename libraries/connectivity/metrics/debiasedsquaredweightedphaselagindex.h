@@ -100,7 +100,7 @@ public:
     /**
      * Calculates the debiased squared weighted phase lag index between the rows of the data matrix.
      *
-     * @param\[in\] connectivitySettings   The input data and parameters.
+     * @param[in] connectivitySettings   The input data and parameters.
      *
      * @return                   The connectivity information in form of a network structure.
      */
@@ -111,15 +111,15 @@ protected:
     /**
      * Computes the DSWPLI values. This function gets called in parallel.
      *
-     * @param\[in\] inputData              The input data.
+     * @param[in] inputData              The input data.
      * @param[out]vecPairCsdSum          The sum of all CSD matrices for each trial.
      * @param[out]vecPairCsdImagAbsSum   The sum of all imag abs CSD matrices for each trial.
      * @param[out]vecPairCsdImagSqrdSum  The sum of all imag aqrd CSD matrices for each trial.
-     * @param\[in\] mutex                  The mutex used to safely access vecPairCsdSum.
-     * @param\[in\] iNRows                 The number of rows.
-     * @param\[in\] iNFreqs                The number of frequenciy bins.
-     * @param\[in\] iNfft                  The FFT length.
-     * @param\[in\] tapers                 The taper information.
+     * @param[in] mutex                  The mutex used to safely access vecPairCsdSum.
+     * @param[in] iNRows                 The number of rows.
+     * @param[in] iNFreqs                The number of frequenciy bins.
+     * @param[in] iNfft                  The FFT length.
+     * @param[in] tapers                 The taper information.
      */
     static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         QVector<QPair<int,Eigen::MatrixXcd> >& vecPairCsdSum,
@@ -136,7 +136,7 @@ protected:
      * Reduces the DSWPLI computation to a final result.
      *
      * @param[out] connectivitySettings   The input data.
-     * @param\[in\] finalNetwork           The final network.
+     * @param[in] finalNetwork           The final network.
      */
     static void computeDSWPLI(ConnectivitySettings &connectivitySettings,
                               Network& finalNetwork);

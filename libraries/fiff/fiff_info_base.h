@@ -88,7 +88,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param\[in\] p_FiffInfoBase  light FIFF measurement information which should be copied
+     * @param[in] p_FiffInfoBase  light FIFF measurement information which should be copied
      */
     FiffInfoBase(const FiffInfoBase& p_FiffInfoBase);
 
@@ -108,7 +108,7 @@ public:
     /**
      * Get channel type.
      *
-     * @param\[in\] idx    Index of channel
+     * @param[in] idx    Index of channel
      *
      * @return Type of channel ('grad', 'mag', 'eeg', 'stim', 'eog', 'emg', 'ecg')
      */
@@ -130,9 +130,9 @@ public:
      *
      * Make a selector to pick desired channels from data
      *
-     * @param\[in\] ch_names  - The channel name list to consult
-     * @param\[in\] include   - Channels to include (if empty, include all available)
-     * @param\[in\] exclude   - Channels to exclude (if empty, do not exclude any)
+     * @param[in] ch_names  - The channel name list to consult
+     * @param[in] include   - Channels to include (if empty, include all available)
+     * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
      *
      * @return the selector matrix (row Vector)
      */
@@ -148,7 +148,7 @@ public:
      *
      * Pick desired channels from measurement info
      *
-     * @param\[in\] sel    List of channels to select
+     * @param[in] sel    List of channels to select
      *
      * @return Info modified according to sel
      */
@@ -162,11 +162,11 @@ public:
      *
      * Create a selector to pick desired channel types from data
      *
-     * @param\[in\] meg        It can be "all", to select all or it can be "mag" or "grad" to select only gradiometers or magnetometers.
-     * @param\[in\] eeg        Include EEG channels
-     * @param\[in\] stim       Include stimulus channels
-     * @param\[in\] include    Additional channels to include (if empty, do not add any)
-     * @param\[in\] exclude    Channels to exclude (if empty, do not exclude any)
+     * @param[in] meg        It can be "all", to select all or it can be "mag" or "grad" to select only gradiometers or magnetometers.
+     * @param[in] eeg        Include EEG channels
+     * @param[in] stim       Include stimulus channels
+     * @param[in] include    Additional channels to include (if empty, do not add any)
+     * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
      *
      * @return the selector matrix (row vector)
      */
@@ -185,11 +185,11 @@ public:
      * Create a selector to pick desired channel types from data
      * Use overloaded pick_types method to specify meg (grad, mag, ref_meg)type
      *
-     * @param\[in\] meg        Include MEG channels
-     * @param\[in\] eeg        Include EEG channels
-     * @param\[in\] stim       Include stimulus channels
-     * @param\[in\] include    Additional channels to include (if empty, do not add any)
-     * @param\[in\] exclude    Channels to exclude (if empty, do not exclude any)
+     * @param[in] meg        Include MEG channels
+     * @param[in] eeg        Include EEG channels
+     * @param[in] stim       Include stimulus channels
+     * @param[in] include    Additional channels to include (if empty, do not add any)
+     * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
      *
      * @return the selector matrix (row vector)
      */
@@ -202,7 +202,7 @@ public:
     /**
      * Overloaded == operator to compare an object to this instance.
      *
-     * @param\[in\] object    The object which should be compared to.
+     * @param[in] object    The object which should be compared to.
      *
      * @return true if equal, false otherwise
      */

@@ -83,7 +83,7 @@ public:
     /**
      * Constructs a FiffSimulatorProducer.
      *
-     * @param\[in\] p_pMneRtClient   a pointer to the corresponding MneRtClient.
+     * @param[in] p_pMneRtClient   a pointer to the corresponding MneRtClient.
      */
     FiffSimulatorProducer(FiffSimulator* p_pFiffSimulator);
 
@@ -97,7 +97,7 @@ public:
     /**
      * Connects the data client.
      *
-     * @param\[in\] p_sRtSeverIP   real-time server ip
+     * @param[in] p_sRtSeverIP   real-time server ip
      */
     void connectDataClient(QString p_sRtSeverIP);
 
@@ -118,7 +118,7 @@ signals:
     /**
      * Emitted when data clients connection status changed
      *
-     * @param\[in\] p_bStatus  connection status
+     * @param[in] p_bStatus  connection status
      */
     void dataConnectionChanged(bool p_bStatus);
 

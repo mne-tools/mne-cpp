@@ -108,7 +108,7 @@ public:
      * Updates the clustering status
      * (0 Initializing, 1 Computing, 2 Recomputing, 3 Clustering, 4 Not Computed, 5 Finished).
      *
-     * @param\[in\] iStatus            status of recomputation.
+     * @param[in] iStatus            status of recomputation.
      */
     void setRecomputationStatus(int iStatus);
 
@@ -130,11 +130,11 @@ public:
     /**
      * Updates forward solution information
      *
-     * @param\[in\] iSourceOri    Source orientation: fixed or free.
-     * @param\[in\] iCoordFrame   Coil coordinate system definition.
-     * @param\[in\] iNSource      Number of source dipoles.
-     * @param\[in\] iNChan        Number of channels.
-     * @param\[in\] iNSpaces      Number of source spaces.
+     * @param[in] iSourceOri    Source orientation: fixed or free.
+     * @param[in] iCoordFrame   Coil coordinate system definition.
+     * @param[in] iNSource      Number of source dipoles.
+     * @param[in] iNChan        Number of channels.
+     * @param[in] iNSpaces      Number of source spaces.
      */
 
     void setSolutionInformation(FIFFLIB::fiff_int_t iSourceOri,
@@ -147,7 +147,7 @@ public:
     /**
      * Updates clustered forward solution information
      *
-     * @param\[in\] iNSource      Number of clustered source dipoles.
+     * @param[in] iNSource      Number of clustered source dipoles.
      */
 
     void setClusteredInformation(int iNSource);
@@ -156,7 +156,7 @@ public:
     /**
      * Updates clustered forward solution information
      *
-     * @param\[in\] bChecked      Whether the clustering check box is checked..
+     * @param[in] bChecked      Whether the clustering check box is checked..
      */
 
     void onClusteringStatusChanged(bool bChecked);
@@ -184,7 +184,7 @@ protected:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param\[in\] mode     The new mode (Clinical=0, Research=1).
+     * @param[in] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -192,7 +192,7 @@ protected:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param\[in\] mode     The new mode (RealTime=0, Offline=1).
+     * @param[in] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 
@@ -207,7 +207,7 @@ signals:
     /**
      * Emit this signal whenever recomputation checkbox changed.
      *
-     * @param\[in\] bChecked    Whether the recomputation check box is checked.
+     * @param[in] bChecked    Whether the recomputation check box is checked.
      */
     void recompStatusChanged(bool bChecked);
 
@@ -215,7 +215,7 @@ signals:
     /**
      * Emit this signal whenever clustering checkbox changed.
      *
-     * @param\[in\] bChecked    Whether the clustering check box is checked.
+     * @param[in] bChecked    Whether the clustering check box is checked.
      */
     void clusteringStatusChanged(bool bChecked);
 
@@ -223,8 +223,8 @@ signals:
     /**
      * Emit this signal whenever the atlas directory is set.
      *
-     * @param\[in\] sDirPath              The path to the atlas.
-     * @param\[in\] pAnnotationSet        The Annotation set.
+     * @param[in] sDirPath              The path to the atlas.
+     * @param[in] pAnnotationSet        The Annotation set.
      */
     void atlasDirChanged(const QString& sDirPath,
                          const FSLIB::AnnotationSet::SPtr pAnnotationSet);

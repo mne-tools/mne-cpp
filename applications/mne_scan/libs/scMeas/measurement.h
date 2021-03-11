@@ -70,8 +70,8 @@ public:
     /**
      * Constructs a Measurement.
      *
-     * @param\[in\] type       the QMetaType id of the Measurement.
-     * @param\[in\] parent     the parent object
+     * @param[in] type       the QMetaType id of the Measurement.
+     * @param[in] parent     the parent object
      */
     explicit Measurement(int type = QMetaType::UnknownType,
                          QObject *parent = 0);
@@ -94,7 +94,7 @@ public:
     /**
      * Sets the name of the Measurement.
      *
-     * @param\[in\] name which should be set.
+     * @param[in] name which should be set.
      */
     inline void setName(const QString& name);
 
@@ -110,7 +110,7 @@ public:
     /**
      * Sets the visibility of the Measurement, whether Measurement is visible at the display or just data are send invisible.
      *
-     * @param\[in\] visibility of the Measurement.
+     * @param[in] visibility of the Measurement.
      */
     inline void setVisibility(bool visibility);
 
@@ -130,7 +130,7 @@ protected:
     /**
      * Sets the type of the Measurement. Use QMetaType::type("the type") to generate the type.
      *
-     * @param\[in\] type   the QMetaType id of the Measurement.
+     * @param[in] type   the QMetaType id of the Measurement.
      */
     inline void setType(int type);
 

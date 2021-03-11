@@ -76,7 +76,7 @@ public:
     /**
      * Default constructor.
      *
-     * @param\[in\] parent             Parent QObject (optional)
+     * @param[in] parent             Parent QObject (optional)
      */
     explicit RawCommand(QObject *parent = 0);
 
@@ -84,9 +84,9 @@ public:
     /**
      * Constructor which parses a command stored in a json object
      *
-     * @param\[in\] p_sCommand         Command
-     * @param\[in\] p_bIsJson          If is received/should be send as JSON (optional, default true)
-     * @param\[in\] parent             Parent QObject (optional)
+     * @param[in] p_sCommand         Command
+     * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
+     * @param[in] parent             Parent QObject (optional)
      */
     explicit RawCommand(const QString &p_sCommand, bool p_bIsJson = true, QObject *parent = 0);
 
@@ -94,7 +94,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param\[in\] p_rawCommand   RawCommand which should be copied.
+     * @param[in] p_rawCommand   RawCommand which should be copied.
      */
     explicit RawCommand(const RawCommand &p_rawCommand);
 
@@ -136,7 +136,7 @@ public:
     /**
      * Assignment Operator
      *
-     * @param\[in\] rhs    RawCommand which should be assigned.
+     * @param[in] rhs    RawCommand which should be assigned.
      */
     RawCommand& operator= (const RawCommand &rhs);
 
@@ -145,7 +145,7 @@ signals:
     /**
      * Signal which is emitted when command patterns execute method is processed.
      *
-     * @param\[in\] p_qListParameters    Parameter List.
+     * @param[in] p_qListParameters    Parameter List.
      */
     void executed(QList<QString> p_qListParameters);
 

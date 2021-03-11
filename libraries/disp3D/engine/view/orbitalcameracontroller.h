@@ -111,7 +111,7 @@ public:
     /**
      * Turns inverse rotation of the camera on and off.
      *
-     * @param\[in\] newStatusFlag      The new status of the inversion
+     * @param[in] newStatusFlag      The new status of the inversion
      */
     void invertCameraRotation(bool newStatusFlag);
 
@@ -119,7 +119,7 @@ public:
     /**
      * Sets the angle of the camera for rotating around
      *
-     * @param\[in\] count      The counter for how long the rotation has been happening
+     * @param[in] count      The counter for how long the rotation has been happening
      */
     void setRotating(int count);
 
@@ -151,8 +151,8 @@ private:
     /**
      * Calcultes the distance between 2 points.
      *
-     * @param\[in\] firstPoint     The first point.
-     * @param\[in\] secondPoint    The second point.
+     * @param[in] firstPoint     The first point.
+     * @param[in] secondPoint    The second point.
      *
      * @returns the distance between the 2 points.
      */

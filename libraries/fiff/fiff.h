@@ -111,10 +111,10 @@ public:
      *
      * Copies directory subtrees from fidin to fidout
      *
-     * @param\[in\] p_pStreamIn    fiff file to copy from
-     * @param\[in\] in_id          file id description
+     * @param[in] p_pStreamIn    fiff file to copy from
+     * @param[in] in_id          file id description
      * @param[out] p_Nodes       subtree directories to be copied
-     * @param\[in\] p_pStreamOut   fiff file to write to
+     * @param[in] p_pStreamOut   fiff file to write to
      *
      * @return true if succeeded, false otherwise
      */
@@ -133,8 +133,8 @@ public:
      *
      * Writes a FIFF_BLOCK_END tag
      *
-     * @param\[in\] p_pStream the opened fiff file
-     * @param\[in\] kind The block kind to end
+     * @param[in] p_pStream the opened fiff file
+     * @param[in] kind The block kind to end
      */
     inline static void end_block(FiffStream* p_pStream, fiff_int_t kind)
     {
@@ -151,7 +151,7 @@ public:
      *
      * Writes the closing tags to a fif file and closes the file
      *
-     * @param\[in\] p_pStream the opened fiff file
+     * @param[in] p_pStream the opened fiff file
      */
     inline static void end_file(FiffStream* p_pStream)
     {
@@ -168,7 +168,7 @@ public:
      *
      * Finishes a raw file by writing all necessary end tags.
      *
-     * @param\[in\] p_pStream the opened fiff file
+     * @param[in] p_pStream the opened fiff file
      */
     inline static void finish_writing_raw(FiffStream* p_pStream)
     {
@@ -185,8 +185,8 @@ public:
      *
      * Find nodes of the given kind from a directory tree structure
      *
-     * @param\[in\] p_Node     The directory tree structure
-     * @param\[in\] p_kind     The given kind
+     * @param[in] p_Node     The directory tree structure
+     * @param[in] p_kind     The given kind
      *
      * @return the found nodes
      */
@@ -205,7 +205,7 @@ public:
      *
      * Invert a coordinate transformation
      *
-     * @param\[in\] p_Transform    The transformation which should be inverted
+     * @param[in] p_Transform    The transformation which should be inverted
      *
      * @return true if succeeded, false otherwise
      */
@@ -224,7 +224,7 @@ public:
      *
      * Opens a fif file and provides the directory of tags
      *
-     * @param\[in\] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+     * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
      * @param[out] p_pStream    file which is openened
      *
      * @return true if succeeded, false otherwise
@@ -246,9 +246,9 @@ public:
      *
      * Make a selector to pick desired channels from data
      *
-     * @param\[in\] ch_names  - The channel name list to consult
-     * @param\[in\] include   - Channels to include (if empty, include all available)
-     * @param\[in\] exclude   - Channels to exclude (if empty, do not exclude any)
+     * @param[in] ch_names  - The channel name list to consult
+     * @param[in] include   - Channels to include (if empty, include all available)
+     * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
      * @return the selector matrix (row Vector)
      */
     inline static Eigen::RowVectorXi pick_channels(QStringList& ch_names,
@@ -268,9 +268,9 @@ public:
      *
      * Pick desired channels from evoked-response data
      *
-     * @param\[in\] orig       The original data
-     * @param\[in\] include   - Channels to include (if empty, include all available)
-     * @param\[in\] exclude   - Channels to exclude (if empty, do not exclude any)
+     * @param[in] orig       The original data
+     * @param[in] include   - Channels to include (if empty, include all available)
+     * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
      *
      * @return the desired fiff evoked data set
      */
@@ -310,8 +310,8 @@ public:
      *
      * Pick desired channels from measurement info
      *
-     * @param\[in\] info   The original data
-     * @param\[in\] sel    List of channels to select
+     * @param[in] info   The original data
+     * @param[in] sel    List of channels to select
      *
      * @return Info modified according to sel
      */
@@ -331,12 +331,12 @@ public:
      *
      * Create a selector to pick desired channel types from data
      *
-     * @param\[in\] info       The measurement info
-     * @param\[in\] meg        Include MEG channels
-     * @param\[in\] eeg        Include EEG channels
-     * @param\[in\] stim       Include stimulus channels
-     * @param\[in\] include    Additional channels to include (if empty, do not add any)
-     * @param\[in\] exclude    Channels to exclude (if empty, do not exclude any)
+     * @param[in] info       The measurement info
+     * @param[in] meg        Include MEG channels
+     * @param[in] eeg        Include EEG channels
+     * @param[in] stim       Include stimulus channels
+     * @param[in] include    Additional channels to include (if empty, do not add any)
+     * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
      *
      * @return the selector matrix (row vector)
      */
@@ -360,8 +360,8 @@ public:
      *
      * Reads the bad channel list from a node if it exists
      *
-     * @param\[in\] p_pStream  The opened fif file to read from
-     * @param\[in\] p_Node    The node of interest
+     * @param[in] p_pStream  The opened fif file to read from
+     * @param[in] p_Node    The node of interest
      *
      * @return the bad channel list
      */
@@ -381,9 +381,9 @@ public:
      *
      * Read the CTF software compensation data from the given node
      *
-     * @param\[in\] p_pStream    The opened fif file to read from
-     * @param\[in\] p_Node    The node of interest
-     * @param\[in\] p_Chs        channels with the calibration info
+     * @param[in] p_pStream    The opened fif file to read from
+     * @param[in] p_Node    The node of interest
+     * @param[in] p_Chs        channels with the calibration info
      *
      * @return the CTF software compensation data
      */
@@ -404,15 +404,15 @@ public:
      *
      * Read one evoked data set
      *
-     * @param\[in\] p_IODevice     A fiff IO device like a fiff QFile or QTCPSocket
+     * @param[in] p_IODevice     A fiff IO device like a fiff QFile or QTCPSocket
      * @param[out] data          The read evoked data
-     * @param\[in\] setno          the set to pick
-     * @param\[in\] baseline       The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b)
+     * @param[in] setno          the set to pick
+     * @param[in] baseline       The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b)
      *                           the interval is between "a (s)" and "b (s)". If a is None the beginning of the data is used and if b is
      *                           None then b is set to the end of the interval. If baseline is equal ot (None, None) all the time interval is used.
      *                           If None, no correction is applied.
-     * @param\[in\] proj           Apply SSP projection vectors (optional, default = true)
-     * @param\[in\] p_aspect_kind  Either "FIFFV_ASPECT_AVERAGE" or "FIFFV_ASPECT_STD_ERR". The type of data to read. Only used if "setno" is a str.
+     * @param[in] proj           Apply SSP projection vectors (optional, default = true)
+     * @param[in] p_aspect_kind  Either "FIFFV_ASPECT_AVERAGE" or "FIFFV_ASPECT_STD_ERR". The type of data to read. Only used if "setno" is a str.
      *
      * @return true if successful, false otherwise
      */
@@ -430,7 +430,7 @@ public:
     /**
      * Read all evoked data from one file
      *
-     * @param\[in\] p_IODevice     A fiff IO device like a fiff QFile or QTCPSocket
+     * @param[in] p_IODevice     A fiff IO device like a fiff QFile or QTCPSocket
      * @param[out] data          The read evoked data
      *
      * @return true if successful, false otherwise
@@ -451,8 +451,8 @@ public:
      * Read the measurement info
      * Source is assumed to be an open fiff stream.
      *
-     * @param\[in\] p_pStream      The opened fiff stream to read from
-     * @param\[in\] p_Node         The node of interest
+     * @param[in] p_pStream      The opened fiff stream to read from
+     * @param[in] p_Node         The node of interest
      * @param[out] p_Info        The read measurement info
      * @param[out] p_NodeInfo    The to measurement corresponding fiff_dir_tree.
      *
@@ -473,9 +473,9 @@ public:
      *
      * Reads a named matrix.
      *
-     * @param\[in\] p_pStream      The opened fif file to read from
-     * @param\[in\] p_Node         The node of interest
-     * @param\[in\] matkind        The matrix kind to look for
+     * @param[in] p_pStream      The opened fif file to read from
+     * @param[in] p_Node         The node of interest
+     * @param[in] matkind        The matrix kind to look for
      * @param[out] mat           The named matrix
      *
      * @return true if succeeded, false otherwise
@@ -495,8 +495,8 @@ public:
      *
      * Wrapper for the FiffStream read_proj member function
      *
-     * @param\[in\] p_pStream    The opened fif file to read from
-     * @param\[in\] p_Node       The node of interest
+     * @param[in] p_pStream    The opened fif file to read from
+     * @param[in] p_Node       The node of interest
      *
      * @return a list of SSP projectors
      */
@@ -515,12 +515,12 @@ public:
      *
      * Read a specific raw data segment
      *
-     * @param\[in\] raw        structure returned by fiff_setup_read_raw
+     * @param[in] raw        structure returned by fiff_setup_read_raw
      * @param[out] data      returns the data matrix (channels x samples)
      * @param[out] times     returns the time values corresponding to the samples
-     * @param\[in\] from       first sample to include. If omitted, defaults to the first sample in data (optional)
-     * @param\[in\] to         last sample to include. If omitted, defaults to the last sample in data (optional)
-     * @param\[in\] sel        channel selection vector (optional)
+     * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional)
+     * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional)
+     * @param[in] sel        channel selection vector (optional)
      *
      * @return true if succeeded, false otherwise
      */
@@ -543,13 +543,13 @@ public:
      *
      * Read a specific raw data segment
      *
-     * @param\[in\] raw        structure returned by fiff_setup_read_raw
+     * @param[in] raw        structure returned by fiff_setup_read_raw
      * @param[out] data      returns the data matrix (channels x samples)
      * @param[out] times     returns the time values corresponding to the samples
      * @param[out] mult      matrix to store used multiplication matrix (compensator,projection,calibration)
-     * @param\[in\] from       first sample to include. If omitted, defaults to the first sample in data (optional)
-     * @param\[in\] to         last sample to include. If omitted, defaults to the last sample in data (optional)
-     * @param\[in\] sel        channel selection vector (optional)
+     * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional)
+     * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional)
+     * @param[in] sel        channel selection vector (optional)
      *
      * @return true if succeeded, false otherwise
      */
@@ -575,9 +575,9 @@ public:
      * Read one tag from a fif file.
      * if pos is not provided, reading starts from the current file position
      *
-     * @param\[in\] p_pStream opened fif file
+     * @param[in] p_pStream opened fif file
      * @param[out] p_pTag the read tag
-     * @param\[in\] pos position of the tag inside the fif file
+     * @param[in] pos position of the tag inside the fif file
      *
      * @return true if succeeded, false otherwise
      */
@@ -597,7 +597,7 @@ public:
      * Read tag information of one tag from a fif file.
      * if pos is not provided, reading starts from the current file position
      *
-     * @param\[in\] p_pStream opened fif file
+     * @param[in] p_pStream opened fif file
      * @param[out] p_pTag the read tag info
      *
      * @return true if succeeded, false otherwise
@@ -617,9 +617,9 @@ public:
      *
      * Read information about raw data file
      *
-     * @param\[in\] p_IODevice         A fiff IO device like a fiff QFile or QTCPSocket
+     * @param[in] p_IODevice         A fiff IO device like a fiff QFile or QTCPSocket
      * @param[out] data              The raw data information - contains the opened fiff file
-     * @param\[in\] allow_maxshield    Accept unprocessed MaxShield data
+     * @param[in] allow_maxshield    Accept unprocessed MaxShield data
      *
      * @return true if succeeded, false otherwise
      */
@@ -638,7 +638,7 @@ public:
      *
      * Splits a string by looking for seperator ":"
      *
-     * @param\[in\] p_sNameList    string to split
+     * @param[in] p_sNameList    string to split
      *
      * @return the splitted string list
      */
@@ -657,8 +657,8 @@ public:
      *
      * Writes a FIFF_BLOCK_START tag
      *
-     * @param\[in\] p_pStream  An open fif file to write to
-     * @param\[in\] kind       The block kind to start
+     * @param[in] p_pStream  An open fif file to write to
+     * @param[in] kind       The block kind to start
      */
     inline static void start_block(FiffStream* p_pStream, fiff_int_t kind)
     {
@@ -675,7 +675,7 @@ public:
      *
      * Opens a fiff file for writing and writes the compulsory header tags
      *
-     * @param\[in\] p_IODevice   A fiff IO device like a fiff QFile or QTCPSocket
+     * @param[in] p_IODevice   A fiff IO device like a fiff QFile or QTCPSocket
      *
      * @return The opened file.
      */
@@ -694,10 +694,10 @@ public:
      *
      * function [fid,cals] = fiff_start_writing_raw(name,info,sel)
      *
-     * @param\[in\] p_IODevice     A fiff IO device like a fiff QFile or QTCPSocket
-     * @param\[in\] info           The measurement info block of the source file
+     * @param[in] p_IODevice     A fiff IO device like a fiff QFile or QTCPSocket
+     * @param[in] info           The measurement info block of the source file
      * @param[out] cals          Thecalibration matrix
-     * @param\[in\] sel            Which channels will be included in the output file (optional)
+     * @param[in] sel            Which channels will be included in the output file (optional)
      *
      * @return the started fiff file
      */
@@ -721,8 +721,8 @@ public:
      * The type, cal, unit, and pos members are explained in Table 9.5
      * of the MNE manual
      *
-     * @param\[in\] p_pStream  An open fif file
-     * @param\[in\] ch         The channel information structure to write
+     * @param[in] p_pStream  An open fif file
+     * @param[in] ch         The channel information structure to write
      */
     inline static void write_ch_info(FiffStream* p_pStream, const FiffChInfo& ch)
     {
@@ -739,8 +739,8 @@ public:
      *
      * Writes a coordinate transformation structure
      *
-     * @param\[in\] p_pStream  An open fif file
-     * @param\[in\] trans      The coordinate transfomation structure
+     * @param[in] p_pStream  An open fif file
+     * @param[in] trans      The coordinate transfomation structure
      */
     inline static void write_coord_trans(FiffStream* p_pStream, FiffCoordTrans& trans)
     {
@@ -757,8 +757,8 @@ public:
      *
      * Writes the CTF compensation data into a fif file
      *
-     * @param\[in\] p_pStream  An open fif file
-     * @param\[in\] comps      The compensation data to write
+     * @param[in] p_pStream  An open fif file
+     * @param[in] comps      The compensation data to write
      */
     inline static void write_ctf_comp(FiffStream* p_pStream, QList<FiffCtfComp>& comps)
     {
@@ -775,8 +775,8 @@ public:
      *
      * Writes a digitizer data point into a fif file
      *
-     * @param\[in\] p_pStream  An open fif file
-     * @param\[in\] dig        The point to write
+     * @param[in] p_pStream  An open fif file
+     * @param[in] dig        The point to write
      */
     inline static void write_dig_point(FiffStream* p_pStream, FiffDigPoint& dig)
     {
@@ -794,9 +794,9 @@ public:
      * Writes fiff id
      * If the id argument is missing it will be generated here
      *
-     * @param\[in\] p_pStream  An open fif file
-     * @param\[in\] kind       The tag kind
-     * @param\[in\] id         The id to write
+     * @param[in] p_pStream  An open fif file
+     * @param[in] kind       The tag kind
+     * @param[in] id         The id to write
      */
     inline static void write_id(FiffStream* p_pStream, fiff_int_t kind, FiffId& id = defaultFiffId)
     {
@@ -813,10 +813,10 @@ public:
      *
      * Writes a 32-bit integer tag to a fif file
      *
-     * @param\[in\] p_pStream  An open fif file
-     * @param\[in\] kind       Tag kind
-     * @param\[in\] data       The integer data pointer
-     * @param\[in\] nel        Number of integers to write (default = 1)
+     * @param[in] p_pStream  An open fif file
+     * @param[in] kind       Tag kind
+     * @param[in] data       The integer data pointer
+     * @param[in] nel        Number of integers to write (default = 1)
      */
     inline static void write_int(FiffStream* p_pStream, fiff_int_t kind, const fiff_int_t* data, fiff_int_t nel = 1)
     {
@@ -833,10 +833,10 @@ public:
      *
      * Writes a single-precision floating point tag to a fif file
      *
-     * @param\[in\] p_pStream  An open fif file
-     * @param\[in\] kind       Tag kind
-     * @param\[in\] data       The float data pointer
-     * @param\[in\] nel        Number of floats to write (default = 1)
+     * @param[in] p_pStream  An open fif file
+     * @param[in] kind       Tag kind
+     * @param[in] data       The float data pointer
+     * @param[in] nel        Number of floats to write (default = 1)
      */
     inline static void write_float(FiffStream* p_pStream, fiff_int_t kind, float* data, fiff_int_t nel = 1)
     {
@@ -853,9 +853,9 @@ public:
      *
      * Writes a single-precision floating-point matrix tag
      *
-     * @param\[in\] p_pStream    An open fif file
-     * @param\[in\] kind       The tag kind
-     * @param\[in\] mat        The data matrix
+     * @param[in] p_pStream    An open fif file
+     * @param[in] kind       The tag kind
+     * @param[in] mat        The data matrix
      */
     inline static void write_float_matrix(FiffStream* p_pStream, fiff_int_t kind, Eigen::MatrixXf& mat)
     {
@@ -872,9 +872,9 @@ public:
      *
      * Writes a colon-separated list of names
      *
-     * @param\[in\] p_pStream    An open fif file
-     * @param\[in\] kind       The tag kind
-     * @param\[in\] data       An array of names to create the list from
+     * @param[in] p_pStream    An open fif file
+     * @param[in] kind       The tag kind
+     * @param[in] data       An array of names to create the list from
      */
     inline static void write_name_list(FiffStream* p_pStream, fiff_int_t kind, QStringList& data)
     {
@@ -891,9 +891,9 @@ public:
      *
      * Writes a named single-precision floating-point matrix
      *
-     * @param\[in\] p_pStream  An open fif file
-     * @param\[in\] kind       The tag kind to use for the data
-     * @param\[in\] mat        The data matrix
+     * @param[in] p_pStream  An open fif file
+     * @param[in] kind       The tag kind to use for the data
+     * @param[in] mat        The data matrix
      */
     inline static void write_named_matrix(FiffStream* p_pStream, fiff_int_t kind,FiffNamedMatrix& mat)
     {
@@ -910,8 +910,8 @@ public:
      *
      * Writes the projection data into a fif file
      *
-     * @param\[in\] p_pStream    An open fif file
-     * @param\[in\] projs      The compensation data to write
+     * @param[in] p_pStream    An open fif file
+     * @param[in] projs      The compensation data to write
      */
     inline static void write_proj(FiffStream* p_pStream, QList<FiffProj>& projs)
     {
@@ -928,9 +928,9 @@ public:
      *
      * Writes a raw buffer.
      *
-     * @param\[in\] p_pStream    An open fif file
-     * @param\[in\] buf        the buffer to write
-     * @param\[in\] cals       calibration factors
+     * @param[in] p_pStream    An open fif file
+     * @param[in] buf        the buffer to write
+     * @param[in] cals       calibration factors
      *
      * @return true if succeeded, false otherwise
      */
@@ -949,9 +949,9 @@ public:
      *
      * Writes a string tag
      *
-     * @param\[in\] p_pStream    An open fif file
-     * @param\[in\] kind       The tag kind
-     * @param\[in\] data       The string data to write
+     * @param[in] p_pStream    An open fif file
+     * @param[in] kind       The tag kind
+     * @param[in] data       The string data to write
      */
     inline static void write_string(FiffStream* p_pStream, fiff_int_t kind, QString& data)
     {

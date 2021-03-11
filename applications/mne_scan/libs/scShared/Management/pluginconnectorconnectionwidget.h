@@ -77,8 +77,8 @@ public:
     /**
      * Constructs a PluginConnectorConnectionWidget which is a child of parent.
      *
-     * @param\[in\] parent pointer to parent widget; If parent is 0, the new PluginConnectorConnectionWidget becomes a window. If parent is another widget, PluginConnectorConnectionWidget becomes a child window inside parent. PluginConnectorConnectionWidget is deleted when its parent is deleted.
-     * @param\[in\] pPluginConnectorConnection a pointer to the corresponding Connector Connection.
+     * @param[in] parent pointer to parent widget; If parent is 0, the new PluginConnectorConnectionWidget becomes a window. If parent is another widget, PluginConnectorConnectionWidget becomes a child window inside parent. PluginConnectorConnectionWidget is deleted when its parent is deleted.
+     * @param[in] pPluginConnectorConnection a pointer to the corresponding Connector Connection.
      */
     PluginConnectorConnectionWidget(PluginConnectorConnection* pPluginConnectorConnection, QWidget *parent = 0);
 
@@ -93,7 +93,7 @@ public:
     /**
      * New selection in one of the combo box
      *
-     * @param\[in\] p_sCurrentReceiver   the receivers name
+     * @param[in] p_sCurrentReceiver   the receivers name
      */
     void updateReceiver(const QString &p_sCurrentReceiver);
 

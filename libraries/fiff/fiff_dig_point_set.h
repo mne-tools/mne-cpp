@@ -97,7 +97,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param\[in\] p_FiffDigPointSet
+     * @param[in] p_FiffDigPointSet
      */
     FiffDigPointSet(const FiffDigPointSet &p_FiffDigPointSet);
 
@@ -149,14 +149,14 @@ public:
     //=========================================================================================================
     /**
      * @brief write
-     * @param\[in\] p_IODevice
+     * @param[in] p_IODevice
      */
     void write(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
      * @brief writeToStream
-     * @param\[in\] p_pStream
+     * @param[in] p_pStream
      */
     void writeToStream(FiffStream* p_pStream);
 
@@ -164,7 +164,7 @@ public:
     /**
      * Subscript operator [] to access FiffDigPoint by index
      *
-     * @param\[in\] idx    the FiffDigPoint index.
+     * @param[in] idx    the FiffDigPoint index.
      *
      * @return FiffDigPoint related to the parameter index.
      */
@@ -174,7 +174,7 @@ public:
     /**
      * Subscript operator [] to access FiffDigPoint by index
      *
-     * @param\[in\] idx    the FiffDigPoint index.
+     * @param[in] idx    the FiffDigPoint index.
      *
      * @return FiffDigPoint related to the parameter index.
      */
@@ -184,7 +184,7 @@ public:
     /**
      * Pick the wanted types from this set and returns them
      *
-     * @param\[in\] includeTypes    The include types (FIFFV_POINT_HPI, FIFFV_POINT_CARDINAL, FIFFV_POINT_EEG, FIFFV_POINT_ECG, FIFFV_POINT_EXTRA, FIFFV_POINT_LPA, FIFFV_POINT_NASION, FIFFV_POINT_RPA).
+     * @param[in] includeTypes    The include types (FIFFV_POINT_HPI, FIFFV_POINT_CARDINAL, FIFFV_POINT_EEG, FIFFV_POINT_ECG, FIFFV_POINT_EXTRA, FIFFV_POINT_LPA, FIFFV_POINT_NASION, FIFFV_POINT_RPA).
      *
      * @return FiffDigPointSet
      */
@@ -194,7 +194,7 @@ public:
     /**
      * Subscript operator << to add a new FiffDigPoint
      *
-     * @param\[in\] dig    FiffDigPoint to be added
+     * @param[in] dig    FiffDigPoint to be added
      *
      * @return FiffDigPointSet
      */
@@ -204,7 +204,7 @@ public:
     /**
      * Subscript operator << to add a new FiffDigPoint
      *
-     * @param\[in\] dig    FiffDigPoint to be added
+     * @param[in] dig    FiffDigPoint to be added
      *
      * @return FiffDigPointSet
      */
@@ -214,8 +214,8 @@ public:
     /**
      * Apply a transforamtion matrix on the 3D position of the digitzed points.
      *
-     * @param\[in\] coordTrans    FiffCoordTrans which is to be applied
-     * @param\[in\] bApplyInverse Whether to apply the inverse. False by default.
+     * @param[in] coordTrans    FiffCoordTrans which is to be applied
+     * @param[in] bApplyInverse Whether to apply the inverse. False by default.
      */
     void applyTransform(const FiffCoordTrans& coordTrans, bool bApplyInverse = false);
 
@@ -224,7 +224,7 @@ public:
 //    /**
 //    * Write the FiffDigPointSet to a FIF file
 //    *
-//    * @param\[in\] p_IODevice   IO device to write the FiffDigPointSet to.
+//    * @param[in] p_IODevice   IO device to write the FiffDigPointSet to.
 //    */
 //    void write(QIODevice &p_IODevice);
 

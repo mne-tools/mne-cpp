@@ -83,7 +83,7 @@ public:
     /**
      * Constructs a PluginManager with the given parent.
      *
-     * @param\[in\] parent pointer to parent Object. (It's normally the default value.)
+     * @param[in] parent pointer to parent Object. (It's normally the default value.)
      */
     PluginManager(QObject* parent = nullptr);
 
@@ -97,7 +97,7 @@ public:
     /**
      * Loads plugins from given directory.
      *
-     * @param\[in\] dir    the plugin directory.
+     * @param[in] dir    the plugin directory.
      */
     void loadPluginsFromDirectory(const QString& dir);
 
@@ -105,7 +105,7 @@ public:
     /**
      * Initializes the plugins.
      *
-     * @param\[in\] data          the global mne analyze data
+     * @param[in] data          the global mne analyze data
      */
     void initPlugins(QSharedPointer<AnalyzeData> data);
 
@@ -113,7 +113,7 @@ public:
     /**
      * Finds index of plugin by name.
      *
-     * @param\[in\] name  the plugin name.
+     * @param[in] name  the plugin name.
      *
      * @return index of plugin.
      */

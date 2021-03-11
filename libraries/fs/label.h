@@ -93,12 +93,12 @@ public:
     /**
      * Constructs a label
      *
-     * @param\[in\] p_vertices     Vertices
-     * @param\[in\] p_pos          Positions
-     * @param\[in\] p_values       Values
-     * @param\[in\] p_hemi         Hemisphere (lh = 0; rh = 1)
-     * @param\[in\] p_name         label names
-     * @param\[in\] p_id           label id (optional, default = -1)
+     * @param[in] p_vertices     Vertices
+     * @param[in] p_pos          Positions
+     * @param[in] p_values       Values
+     * @param[in] p_hemi         Hemisphere (lh = 0; rh = 1)
+     * @param[in] p_name         label names
+     * @param[in] p_id           label id (optional, default = -1)
      */
     Label(const Eigen::VectorXi &p_vertices,
           const Eigen::MatrixX3f &p_pos,
@@ -130,7 +130,7 @@ public:
     /**
      * Select tris for this label from a given surface file.
      *
-     * @param\[in\] p_Surface      to generate the label tris from
+     * @param[in] p_Surface      to generate the label tris from
      *
      * @return the generated tris.
      */
@@ -140,7 +140,7 @@ public:
     /**
      * Select tris for this label from a given tri matrix.
      *
-     * @param\[in\] p_matTris      tris from which the selection should be made
+     * @param[in] p_matTris      tris from which the selection should be made
      *
      * @return the generated tris.
      */
@@ -154,8 +154,8 @@ public:
      * This is based on the FreeSurfer read_label routine
      * SUBJECTS_DIR environment variable is not consulted for the standard location
      *
-     * @param\[in\] p_sFileName    label file name
-     * @param\[in\] p_Label        read label
+     * @param[in] p_sFileName    label file name
+     * @param[in] p_Label        read label
      *
      * @return true if successful, false otherwise
      */

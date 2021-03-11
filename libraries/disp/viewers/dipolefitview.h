@@ -93,7 +93,7 @@ public:
     /**
      * Updates GUI to show selected BEM file
      *
-     * @param\[in\] sFileName
+     * @param[in] sFileName
      */
     void addBem(const QString& sFileName);
 
@@ -101,7 +101,7 @@ public:
     /**
      * Updates GUI to show selected MRI file
      *
-     * @param\[in\] sFileName
+     * @param[in] sFileName
      */
     void addMri(const QString& sFileName);
 
@@ -109,7 +109,7 @@ public:
     /**
      * Updates GUI to show selecte Noise file
      *
-     * @param\[in\] sFileName
+     * @param[in] sFileName
      */
     void addNoise(const QString& sFileName);
 
@@ -117,7 +117,7 @@ public:
     /**
      * Updates GUI to show selected measurement file
      *
-     * @param\[in\] sFileName
+     * @param[in] sFileName
      */
     void addMeas(const QString& sFileName);
 
@@ -125,8 +125,8 @@ public:
     /**
      * Removes model from view
      *
-     * @param\[in\] sModelName   name of model to be removed
-     * @param\[in\] iType        type of model (1-measurement, 2-BEM, 3-MRI, 4-Cov)
+     * @param[in] sModelName   name of model to be removed
+     * @param[in] iType        type of model (1-measurement, 2-BEM, 3-MRI, 4-Cov)
      */
     void removeModel(const QString& sModelName, int iType);
 
@@ -147,7 +147,7 @@ protected:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param\[in\] mode     The new mode (Clinical=0, Research=1).
+     * @param[in] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -155,7 +155,7 @@ protected:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param\[in\] mode     The new mode (RealTime=0, Offline=1).
+     * @param[in] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 
@@ -181,8 +181,8 @@ signals:
     /**
      * Send new modality selection
      *
-     * @param\[in\] bEEG     whether to use EEG (true = yes, false = no)
-     * @param\[in\] bMEG     whether to use MEG (true = yes, false = no)
+     * @param[in] bEEG     whether to use EEG (true = yes, false = no)
+     * @param[in] bMEG     whether to use MEG (true = yes, false = no)
      */
     void modalityChanged(bool bEEG,
                          bool bMEG);
@@ -191,10 +191,10 @@ signals:
     /**
      * Send new time values
      *
-     * @param\[in\] iMin     new minimum in milliseconds
-     * @param\[in\] iMax     new maximum in milliseconds
-     * @param\[in\] iStep    new step value in milliseconds
-     * @param\[in\] iInt     new integration value in milliseconds
+     * @param[in] iMin     new minimum in milliseconds
+     * @param[in] iMax     new maximum in milliseconds
+     * @param[in] iStep    new step value in milliseconds
+     * @param[in] iInt     new integration value in milliseconds
      */
     void timeChanged(int iMin,
                      int iMax,
@@ -205,8 +205,8 @@ signals:
     /**
      * Send new fitting values
      *
-     * @param\[in\] iMinDistance     distance to inner skull in millimeters
-     * @param\[in\] iSize        radisu size guess in millimeters
+     * @param[in] iMinDistance     distance to inner skull in millimeters
+     * @param[in] iSize        radisu size guess in millimeters
      */
     void fittingChanged(int iMinDistance,
                         int iSize);
@@ -215,8 +215,8 @@ signals:
     /**
      * Send new basline values
      *
-     * @param\[in\] iBMin    new minimum in milliseconds
-     * @param\[in\] iBMax    new maximum in milliseconds
+     * @param[in] iBMin    new minimum in milliseconds
+     * @param[in] iBMax    new maximum in milliseconds
      */
     void baselineChanged(int iBMin,
                          int iBMax);
@@ -225,9 +225,9 @@ signals:
     /**
      * Set new manual noise parameters
      *
-     * @param\[in\] dGrad    gradiometer value
-     * @param\[in\] dMag     magnetometer value
-     * @param\[in\] dEeg     eeg value
+     * @param[in] dGrad    gradiometer value
+     * @param[in] dMag     magnetometer value
+     * @param[in] dEeg     eeg value
      */
     void noiseChanged(double dGrad,
                       double dMag,
@@ -237,10 +237,10 @@ signals:
     /**
      * Set new regularization parameters
      *
-     * @param\[in\] iReg         overall regularization parameter
-     * @param\[in\] iRegGrad     gradiatometer regularizaation parameter
-     * @param\[in\] iRegMag      magnetometer regularization parameter
-     * @param\[in\] iRegEeg      eeg regularization parameter
+     * @param[in] iReg         overall regularization parameter
+     * @param[in] iRegGrad     gradiatometer regularizaation parameter
+     * @param[in] iRegMag      magnetometer regularization parameter
+     * @param[in] iRegEeg      eeg regularization parameter
      */
     void regChanged(double dRegGrad,
                     double dRegMag,
@@ -250,7 +250,7 @@ signals:
     /**
      * Select set from measurement to use
      *
-     * @param\[in\] iSet
+     * @param[in] iSet
      */
     void setChanged(int iSet);
 
@@ -258,10 +258,10 @@ signals:
     /**
      * Set new spherer model parameters
      *
-     * @param\[in\] dX           x position in millimeters
-     * @param\[in\] dY           y position in millimeters
-     * @param\[in\] dZ           z position in millimeters
-     * @param\[in\] dRadius      radius in millimeters
+     * @param[in] dX           x position in millimeters
+     * @param[in] dY           y position in millimeters
+     * @param[in] dZ           z position in millimeters
+     * @param[in] dRadius      radius in millimeters
      */
     void sphereChanged(double dX,
                        double dY,
@@ -272,7 +272,7 @@ signals:
     /**
      * Set new Bem model
      *
-     * @param\[in\] sName    file name
+     * @param[in] sName    file name
      */
     void selectedBem(const QString& sName);
 
@@ -280,7 +280,7 @@ signals:
     /**
      * Set new Mri model
      *
-     * @param\[in\] sName    file name
+     * @param[in] sName    file name
      */
     void selectedMri(const QString& sName);
 
@@ -288,7 +288,7 @@ signals:
     /**
      * Set new Noise model
      *
-     * @param\[in\] sName    file name
+     * @param[in] sName    file name
      */
     void selectedNoise(const QString& sName);
 
@@ -296,7 +296,7 @@ signals:
     /**
      * Set new measurement model
      *
-     * @param\[in\] sName    file name
+     * @param[in] sName    file name
      */
     void selectedMeas(const QString& sName);
 

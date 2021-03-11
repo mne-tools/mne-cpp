@@ -65,9 +65,9 @@ public:
     /**
      * Constructs a PluginInputData with the given parent.
      *
-     * @param\[in\] parent     pointer to parent plugin
-     * @param\[in\] name       connection name
-     * @param\[in\] descr      connection description
+     * @param[in] parent     pointer to parent plugin
+     * @param[in] name       connection name
+     * @param[in] descr      connection description
      */
     PluginInputData(AbstractPlugin *parent, const QString &name, const QString &descr);
 
@@ -81,9 +81,9 @@ public:
     /**
      * Creates PluginInputData with the given parent.
      *
-     * @param\[in\] parent     pointer to parent plugin
-     * @param\[in\] name       connection name
-     * @param\[in\] descr      connection description
+     * @param[in] parent     pointer to parent plugin
+     * @param[in] name       connection name
+     * @param[in] descr      connection description
      *
      * @return the created PluginInputData
      */
@@ -94,7 +94,7 @@ public:
      * Convinience function - this can be used to register a function which should be called when new data are available.
      * The signal void notify(SCMEASLIB::Measurement::SPtr) can be used instead of registering a function.
      *
-     * @param\[in\] pFunc  callback function to register
+     * @param[in] pFunc  callback function to register
      */
     void setCallbackMethod(callback_function pFunc);
 
@@ -103,7 +103,7 @@ protected:
     /**
      * SLOT to notify the registered calback fucntion.
      *
-     * @param\[in\] pMeasurement   the measurement data to downcast.
+     * @param[in] pMeasurement   the measurement data to downcast.
      */
     void notifyCallbackFunction(SCMEASLIB::Measurement::SPtr pMeasurement);
 

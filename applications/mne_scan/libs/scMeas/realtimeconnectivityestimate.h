@@ -95,7 +95,7 @@ public:
     /**
      * Constructs a RealTimeConnectivityEstimate.
      *
-     * @param\[in\] parent     the QObject parent of this measurement
+     * @param[in] parent     the QObject parent of this measurement
      */
     RealTimeConnectivityEstimate(QObject *parent = 0);
 
@@ -109,7 +109,7 @@ public:
     /**
      * Sets the annotation set.
      *
-     * @param\[in\] annotSet   the annotation set to set
+     * @param[in] annotSet   the annotation set to set
      */
     inline void setAnnotSet(const QSharedPointer<FSLIB::AnnotationSet>& annotSet);
 
@@ -125,7 +125,7 @@ public:
     /**
      * Sets the sensor surface.
      *
-     * @param\[in\] sensorSurface   the sensor surface
+     * @param[in] sensorSurface   the sensor surface
      */
     inline void setSensorSurface(const QSharedPointer<MNELIB::MNEBem>& sensorSurface);
 
@@ -141,7 +141,7 @@ public:
     /**
      * Sets the sensor surface.
      *
-     * @param\[in\] surfSet   the surface set to set
+     * @param[in] surfSet   the surface set to set
      */
     inline void setSurfSet(const QSharedPointer<FSLIB::SurfaceSet>& surfSet);
 
@@ -157,7 +157,7 @@ public:
     /**
      * Sets the forward solution.
      *
-     * @param\[in\] fwdSolution   the forward solution to set
+     * @param[in] fwdSolution   the forward solution to set
      */
     inline void setFwdSolution(const QSharedPointer<MNELIB::MNEForwardSolution>& fwdSolution);
 
@@ -174,7 +174,7 @@ public:
      * Attaches a value to the sample array vector.
      * This method is inherited by Measurement.
      *
-     * @param\[in\] v the value which is attached to the sample array vector.
+     * @param[in] v the value which is attached to the sample array vector.
      */
     virtual void setValue(const CONNECTIVITYLIB::Network &v);
 
@@ -199,7 +199,7 @@ public:
     /**
      * Sets the current FiffInfo.
      *
-     * @param\[in\] p_fiffInfo the new FiffInfo..
+     * @param[in] p_fiffInfo the new FiffInfo..
      */
     void setFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo>& p_fiffInfo);
 

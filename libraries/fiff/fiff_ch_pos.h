@@ -79,7 +79,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param\[in\] p_FiffChPos  Coil position descriptor which should be copied
+     * @param[in] p_FiffChPos  Coil position descriptor which should be copied
      */
     FiffChPos(const FiffChPos &p_FiffChPos);
 
@@ -101,7 +101,7 @@ public:
     /**
      * Overloaded == operator to compare an object to this instance.
      *
-     * @param\[in\] object    The object which should be compared to.
+     * @param[in] object    The object which should be compared to.
      *
      * @return true if equal, false otherwise
      */

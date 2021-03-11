@@ -167,8 +167,8 @@ protected:
     /**
      * Installed event filter.
      *
-     * @param\[in\] obj the qt object for which the event was intercpeted
-     * @param\[in\] event the current event
+     * @param[in] obj the qt object for which the event was intercpeted
+     * @param[in] event the current event
      */
     bool eventFilter(QObject *object, QEvent *event);
 

@@ -98,7 +98,7 @@ public:
     /**
      * extract information from string with separate char ":"
      *
-     * @param\[in\] cmdstr     QByteArray contains the header information.
+     * @param[in] cmdstr     QByteArray contains the header information.
      *
      * @return QStringList   returned information.
      */
@@ -108,7 +108,7 @@ public:
     /**
      * extract information from string with separate char ":"
      *
-     * @param\[in\] cmdstr         QByteArray contains the header information.
+     * @param[in] cmdstr         QByteArray contains the header information.
      *
      * @return QByteArray        returned information.
      */
@@ -117,28 +117,28 @@ public:
     /**
      * extract channel information from string with separate char ":","|",";"
      *
-     * @param\[in\] cmdstr     QByteArray contains the channel information.
+     * @param[in] cmdstr     QByteArray contains the channel information.
      */
     void MGH_LM_Get_Channel_Info(QByteArray cmdstr);
     //=========================================================================================================
     /**
      * Parse the information about header information
      *
-     * @param\[in\] cmdstr     QByteArray contains the header information.
+     * @param[in] cmdstr     QByteArray contains the header information.
      */
     void MGH_LM_Parse_Para(QByteArray cmdstr);
     //=========================================================================================================
     /**
      * Send data package
      *
-     * @param\[in\] DATA       QByteArray contains MEG data.
+     * @param[in] DATA       QByteArray contains MEG data.
      */
     void MGH_LM_Send_DataPackage(QByteArray DATA);
     //=========================================================================================================
     /**
      * Send command reply package
      *
-     * @param\[in\] DATA       QByteArray contains MEG data.
+     * @param[in] DATA       QByteArray contains MEG data.
      */
     void MGH_LM_Send_CMDPackage(QByteArray DATA);
 
@@ -146,14 +146,14 @@ public:
     /**
      * Parse the information about header information
      *
-     * @param\[in\] cmdstr     QByteArray contains the header information.
+     * @param[in] cmdstr     QByteArray contains the header information.
      */
     void MGH_LM_Parse_Para_Infg(QByteArray cmdstr);
     //=========================================================================================================
     /**
      * extract channel information from string with separate char ":","|",";"
      *
-     * @param\[in\] cmdstr     QByteArray contains the channel information.
+     * @param[in] cmdstr     QByteArray contains the channel information.
      */
     void MGH_LM_Get_Channel_Infg(QByteArray cmdstr);
 

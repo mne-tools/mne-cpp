@@ -78,9 +78,9 @@ QPointer<MainWindow> m_pMainWindow;          /**< The main window. */
 /**
  * Custom Qt message handler.
  *
- * @param\[in\] type      enum to identify the various message types
- * @param\[in\] context   additional information about a log message
- * @param\[in\] msg       the message to log
+ * @param[in] type      enum to identify the various message types
+ * @param[in] context   additional information about a log message
+ * @param[in] msg       the message to log
  */
 void customMessageHandler(QtMsgType type, const
                           QMessageLogContext &context,

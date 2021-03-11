@@ -86,7 +86,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param\[in\] p_FiffCtfComp   CTF software compensation data which should be copied
+     * @param[in] p_FiffCtfComp   CTF software compensation data which should be copied
      */
     FiffCtfComp(const FiffCtfComp &p_FiffCtfComp);
 

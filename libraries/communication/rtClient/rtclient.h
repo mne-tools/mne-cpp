@@ -89,9 +89,9 @@ public:
     /**
      * Creates the real-time client.
      *
-     * @param\[in\] p_sRtServerHostname    The IP address of the mne_rt_server
-     * @param\[in\] p_sClientAlias         The client alias of the data client.
-     * @param\[in\] parent                 Parent QObject (optional)
+     * @param[in] p_sRtServerHostname    The IP address of the mne_rt_server
+     * @param[in] p_sClientAlias         The client alias of the data client.
+     * @param[in] parent                 Parent QObject (optional)
      */
     explicit RtClient(QString p_sRtServerHostname, QString p_sClientAlias = "rtclient", QObject *parent = 0);
     
@@ -146,7 +146,7 @@ signals:
     /**
      * Emits a received raw buffer - ToDo change the emits to fiff raw data.
      *
-     * @param\[in\] p_rawBuffer    the received raw buffer
+     * @param[in] p_rawBuffer    the received raw buffer
      */
     void rawBufferReceived(Eigen::MatrixXf p_rawBuffer);
 
@@ -154,7 +154,7 @@ signals:
     /**
      * Emitted when connection status changed
      *
-     * @param\[in\] p_bStatus  connection status
+     * @param[in] p_bStatus  connection status
      */
     void connectionChanged(bool p_bStatus);
 };

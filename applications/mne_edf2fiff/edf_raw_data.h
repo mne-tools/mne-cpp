@@ -94,9 +94,9 @@ public:
     //=========================================================================================================
     /**
     * @brief EDFRawData Constructor for EDFRawData
-    * @param pDev Pointer to a QIODevice
-    * @param fScaleFactor Raw value scaling factor
-    * @param parent Parent object
+    * @param[in] pDev Pointer to a QIODevice
+    * @param[in] fScaleFactor Raw value scaling factor
+    * @param[in] parent Parent object
     */
     EDFRawData(QIODevice* pDev, float fScaleFactor = 1e6, QObject *parent = nullptr);
 
@@ -111,8 +111,8 @@ public:
     //=========================================================================================================
     /**
     * @brief read_raw_segment Reads a timeslice of data.
-    * @param startSampleIdx First sample index of timeslice.
-    * @param endSampleIdx Last sample index of timeslice (exclusive).
+    * @param[in] startSampleIdx First sample index of timeslice.
+    * @param[in] endSampleIdx Last sample index of timeslice (exclusive).
     *
     * @return An Eigen matrix that holds the timeslice.
     */
@@ -122,8 +122,8 @@ public:
     /**
     * @brief read_raw_segment Reads a timeslice of data. This function simply converts the passed timepoints
     *        into sample indices by multiplying them with the sampling frequency.
-    * @param startTimePoint Start of timeslice in seconds
-    * @param endTimePoint End of timeslice in seconds.
+    * @param[in] startTimePoint Start of timeslice in seconds
+    * @param[in] endTimePoint End of timeslice in seconds.
     *
     * @return An Eigen matrix that holds the timeslice.
     */

@@ -81,7 +81,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param\[in\] p_FiffId   Universially unique identifier which should be copied
+     * @param[in] p_FiffId   Universially unique identifier which should be copied
      */
     FiffId(const FiffId& p_FiffId);
 

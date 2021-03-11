@@ -99,7 +99,7 @@ public:
     /**
      * Calculates the imaginary coherence between the rows of the data matrix.
      *
-     * @param\[in\] connectivitySettings   The input data and parameters.
+     * @param[in] connectivitySettings   The input data and parameters.
      *
      * @return                   The connectivity information in form of a network structure.
      */

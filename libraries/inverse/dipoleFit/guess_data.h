@@ -92,7 +92,7 @@ public:
 //    /**
 //    * Copy constructor.
 //    *
-//    * @param\[in\] p_GuessData    GuessData which should be copied
+//    * @param[in] p_GuessData    GuessData which should be copied
 //    */
 //    GuessData(const GuessData& p_GuessData);
 
@@ -101,7 +101,7 @@ public:
      * Constructs the Guess Data from given Data
      * Refactored: make_guess_data (setup.c)
      *
-     * @param\[in\] guessname
+     * @param[in] guessname
      *
      */
     GuessData( const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, DipoleFitData* f);
@@ -111,7 +111,7 @@ public:
      * Constructs the Guess Data from given Data
      * Refactored: make_guess_data (dipole_fit_setup.c)
      *
-     * @param\[in\] guessname
+     * @param[in] guessname
      *
      */
     GuessData( const QString& guessname, const QString& guess_surfname, float mindist, float exclude, float grid, DipoleFitData* f, char *guess_save_name);
@@ -128,7 +128,7 @@ public:
      * Once the guess locations have been set up we can compute the fields
      * Refactored: compute_guess_fields (dipole_fit_setup.c)
      *
-     * @param\[in\] f      Dipole Fit Data to the Compute Guess Fields
+     * @param[in] f      Dipole Fit Data to the Compute Guess Fields
      *
      * @return true when successful
      */

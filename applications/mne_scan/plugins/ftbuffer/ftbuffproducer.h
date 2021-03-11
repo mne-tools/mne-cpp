@@ -116,8 +116,8 @@ public slots:
     /**
      * Connects to the buffer at a given address. Tries to setup buffer output
      *
-     * @param\[in\] addr  IP address where the buffer is hosted
-     * @param\[in\] port  Port where the buffer is hosted
+     * @param[in] addr  IP address where the buffer is hosted
+     * @param[in] port  Port where the buffer is hosted
      */
     void connectToBuffer(QString addr,
                          int port);
@@ -134,7 +134,7 @@ signals:
     /**
      * Sends new buffer data formatted as an Eigen Matrix
      *
-     * @param\[in\] matData   Formated data from buffer
+     * @param[in] matData   Formated data from buffer
      */
     void newDataAvailable(const Eigen::MatrixXd &matData);
 
@@ -142,7 +142,7 @@ signals:
     /**
      * Sends whether connection parameters have been set.
      *
-     * @param\[in\] connection    Wheterher connection parameters have been set
+     * @param[in] connection    Wheterher connection parameters have been set
      */
     void connecStatus(bool connection);
 

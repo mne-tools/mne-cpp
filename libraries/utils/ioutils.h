@@ -93,7 +93,7 @@ public:
      *
      * Reads a 3-byte integer out of a stream
      *
-     * @param\[in\] p_qStream  Stream to read from
+     * @param[in] p_qStream  Stream to read from
      *
      * @return the read 3-byte integer
      */
@@ -105,8 +105,8 @@ public:
      *
      * Reads a 3-byte integer out of a stream
      *
-     * @param\[in\] p_qStream  Stream to read from
-     * @param\[in\] count      Number of elements to read
+     * @param[in] p_qStream  Stream to read from
+     * @param[in] count      Number of elements to read
      *
      * @return the read 3-byte integer
      */
@@ -116,7 +116,7 @@ public:
     /**
      * swap short
      *
-     * @param\[in\] source     short to swap
+     * @param[in] source     short to swap
      *
      * @return swapped short
      */
@@ -126,7 +126,7 @@ public:
     /**
      * swap integer
      *
-     * @param\[in\] source     integer to swap
+     * @param[in] source     integer to swap
      *
      * @return swapped integer
      */
@@ -144,7 +144,7 @@ public:
     /**
      * swap long
      *
-     * @param\[in\] source     long to swap
+     * @param[in] source     long to swap
      *
      * @return swapped long
      */
@@ -162,7 +162,7 @@ public:
     /**
      * swap float
      *
-     * @param\[in\] source     float to swap
+     * @param[in] source     float to swap
      *
      * @return swapped float
      */
@@ -188,8 +188,8 @@ public:
     /**
      * Write Eigen Matrix to file
      *
-     * @param\[in\] in         input eigen value which is to be written to file
-     * @param\[in\] path       path and file name to write to
+     * @param[in] in         input eigen value which is to be written to file
+     * @param[in] path       path and file name to write to
      */
     template<typename T>
     static bool write_eigen_matrix(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& in, const QString& sPath, const QString& sDescription = QString());
@@ -203,7 +203,7 @@ public:
      * Read Eigen Matrix from file
      *
      * @param[out] out       output eigen value
-     * @param\[in\] path       path and file name to read from
+     * @param[in] path       path and file name to read from
      */
     template<typename T>
     static bool read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& out, const QString& path);
@@ -216,7 +216,7 @@ public:
     /**
      * Returns the new channel naming conventions (whitespcae between channel type and number) for the input list.
      *
-     * @param\[in\] chNames    The channel names.
+     * @param[in] chNames    The channel names.
      *
      * @return The new channel names.
      */
@@ -226,7 +226,7 @@ public:
     /**
      * Returns the old channel naming conventions (whitespcae between channel type and number) for the input list.
      *
-     * @param\[in\] chNames    The channel names.
+     * @param[in] chNames    The channel names.
      *
      * @return The new channel names.
      */
@@ -236,9 +236,9 @@ public:
     /**
      * Checks if all names from chNamesA are in chNamesB. If wanted each name in chNamesA is transformed to the old and new naming convention and checked if in chNamesB.
      *
-     * @param\[in\] chNamesA    The channel names.
-     * @param\[in\] chNamesB    The channel names which is to be compared to.
-     * @param\[in\] bCheckForNewNamingConvention    Whether to use old and new naming conventions while checking.
+     * @param[in] chNamesA    The channel names.
+     * @param[in] chNamesB    The channel names which is to be compared to.
+     * @param[in] bCheckForNewNamingConvention    Whether to use old and new naming conventions while checking.
      *
      * @return True if all names in chNamesA are present in chNamesB, false otherwise.
      */

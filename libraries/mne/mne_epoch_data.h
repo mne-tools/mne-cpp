@@ -87,7 +87,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param\[in\] p_MNEEpochData     MNE epoch data
+     * @param[in] p_MNEEpochData     MNE epoch data
      */
     MNEEpochData(const MNEEpochData &p_MNEEpochData);
 
@@ -101,7 +101,7 @@ public:
     /**
      * Applies baseline (mode=mean) correction to the evoked data.
      *
-     * @param\[in\] baseline     time definition of the baseline in seconds [from, to]
+     * @param[in] baseline     time definition of the baseline in seconds [from, to]
      */
     void applyBaselineCorrection(const QPair<float,float>& baseline);
 
@@ -109,7 +109,7 @@ public:
     /**
      * Reduces the data to the selected rows.
      *
-     * @param\[in\] sel     The selected rows to keep.
+     * @param[in] sel     The selected rows to keep.
      */
     void pick_channels(const Eigen::RowVectorXi& sel);
 
@@ -117,7 +117,7 @@ public:
     /**
      * Comparison of two Epoch data
      *
-     * @param\[in\] b     Epoch data to compare with
+     * @param[in] b     Epoch data to compare with
      *
      * @return true if equal; false otherwise
      */

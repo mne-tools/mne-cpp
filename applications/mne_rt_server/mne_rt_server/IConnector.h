@@ -172,7 +172,7 @@ public:
     /**
      * Sets itsmeta data of the plugin after it was laoded by the pluginmanager.
      *
-     * @param\[in\] status the new activation status of the plugin.
+     * @param[in] status the new activation status of the plugin.
      */
     inline void setMetaData(QJsonObject& p_MetaData);
 
@@ -180,7 +180,7 @@ public:
     /**
      * Sets the activation status of the plugin.
      *
-     * @param\[in\] status    the new activation status of the plugin.
+     * @param[in] status    the new activation status of the plugin.
      */
     inline void setStatus(bool status);
 
@@ -188,7 +188,7 @@ public:
     /**
      * Request FiffInfo to be released.
      *
-     * @param\[in\] ID    ID of the data client to send to. ToDo Remove this - do this processing somewhere else
+     * @param[in] ID    ID of the data client to send to. ToDo Remove this - do this processing somewhere else
      */
     virtual void info(qint32 ID) = 0;
 

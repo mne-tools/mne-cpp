@@ -116,7 +116,7 @@ public:
     /**
      * Set the evoked set model.
      *
-     * @param\[in\] model     The new evoked set model.
+     * @param[in] model     The new evoked set model.
      */
     void setEvokedSetModel(QSharedPointer<EvokedSetModel> model);
 
@@ -146,7 +146,7 @@ public:
     /**
      * Set the modality checkboxes.
      *
-     * @param\[in\] modalityMap    The modality map.
+     * @param[in] modalityMap    The modality map.
      */
     void setModalityMap(const QMap<QString, bool>& modalityMap);
 
@@ -154,7 +154,7 @@ public:
     /**
      * Sets the scale map to scaleMap.
      *
-     * @param\[in\] scaleMap map with all channel types and their current scaling value.
+     * @param[in] scaleMap map with all channel types and their current scaling value.
      */
     void setScaleMap(const QMap<qint32, float> &scaleMap);
 
@@ -162,7 +162,7 @@ public:
     /**
      * Set the selected channels.
      *
-     * @param\[in\] selectedChannels     The new selected channels.
+     * @param[in] selectedChannels     The new selected channels.
      */
     void setSelectedChannels(const QList<int> &selectedChannels);
 
@@ -176,7 +176,7 @@ public:
     /**
      * Set the background color.
      *
-     * @param\[in\] backgroundColor     The new background color.
+     * @param[in] backgroundColor     The new background color.
      */
     void setBackgroundColor(const QColor& backgroundColor);
 
@@ -192,7 +192,7 @@ public:
     /**
      * Renders a screenshot of the view and saves it to the passed path. SVG and PNG supported.
      *
-     * @param\[in\] fileName     The file name and path where to store the screenshot.
+     * @param[in] fileName     The file name and path where to store the screenshot.
      */
     void takeScreenshot(const QString& fileName);
 
@@ -216,7 +216,7 @@ public:
     /**
      * Set the average colors
      *
-     * @param\[in\] qMapAverageColor      Pointer to the new average colors
+     * @param[in] qMapAverageColor      Pointer to the new average colors
      */
     void setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
@@ -224,7 +224,7 @@ public:
     /**
      * Sets the color used to draw the average to avgColor
      *
-     * @param\[in\] avgColor     Color of averaged signal
+     * @param[in] avgColor     Color of averaged signal
      */
     void setSingleAverageColor(const QColor& avgColor);
 
@@ -232,7 +232,7 @@ public:
     /**
      * Set the average activations
      *
-     * @param\[in\] qMapAverageActivation      Pointer to the new average activations
+     * @param[in] qMapAverageActivation      Pointer to the new average activations
      */
     void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 
@@ -240,7 +240,7 @@ public:
     /**
      * Set the channel info model.
      *
-     * @param\[in\] pChannelInfoModel     The new channel info model.
+     * @param[in] pChannelInfoModel     The new channel info model.
      */
     void setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel);
 
@@ -248,7 +248,7 @@ public:
     /**
      * Only shows the channels defined in the QStringList selectedChannels
      *
-     * @param\[in\] selectedChannels list of all channel names which are currently selected in the selection manager.
+     * @param[in] selectedChannels list of all channel names which are currently selected in the selection manager.
      */
     void showSelectedChannelsOnly(const QStringList& selectedChannels);
 
@@ -256,7 +256,7 @@ public:
     /**
      * Shows selected channels based on a list of selected channel indices
      *
-     * @param\[in\] selectedChannelsIndexes  list of indices of channels channels to be displayed
+     * @param[in] selectedChannelsIndexes  list of indices of channels channels to be displayed
      */
     void showSelectedChannels(const QList<int> selectedChannelsIndexes);
 
@@ -290,7 +290,7 @@ protected:
      * Is called to paint the incoming real-time data block.
      * Function is painting the real-time butterfly plot
      *
-     * @param\[in\] event pointer to PaintEvent -> not used.
+     * @param[in] event pointer to PaintEvent -> not used.
      */
     #if !defined(NO_QOPENGLWIDGET)
     virtual void paintGL();
@@ -302,7 +302,7 @@ protected:
     /**
      * createPlotPath creates the QPointer path for the data plot.
      *
-     * @param\[in\] index QModelIndex for accessing associated data and model object.
+     * @param[in] index QModelIndex for accessing associated data and model object.
      */
     void createPlotPath(qint32 row, QPainter& painter) const;
 

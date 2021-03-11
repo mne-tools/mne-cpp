@@ -129,7 +129,7 @@ public:
      * Sets the transformation matrix for each instance of the geometry.
      * It can be used to translate, scale and rotate each instance individually.
      *
-     * @param tInstanceTansform         Transformation matrix.
+     * @param[in] tInstanceTansform         Transformation matrix.
      */
     void setTransforms(const QVector<QMatrix4x4> &tInstanceTansform);
 
@@ -137,7 +137,7 @@ public:
     /**
      * Sets the color for each instance of the geometry.
      *
-     * @param tInstanceColors           Color of the geometry;
+     * @param[in] tInstanceColors           Color of the geometry;
      */
     void setColors(const QVector<QColor> &tInstanceColors);
 
@@ -152,7 +152,7 @@ private:
     /**
      * Builds the transform matrix buffer content.
      *
-     * @param tInstanceTransform        Transformation matrix for each instance.
+     * @param[in] tInstanceTransform        Transformation matrix for each instance.
      * @return                          buffer content.
      */
     QByteArray buildTransformBuffer(const QVector<QMatrix4x4> &tInstanceTransform);
@@ -161,7 +161,7 @@ private:
     /**
      * Builds color buffer content.
      *
-     * @param tInstanceColor            Color for each instance.
+     * @param[in] tInstanceColor            Color for each instance.
      * @return                          buffer content.
      */
     QByteArray buildColorBuffer(const QVector<QColor> &tInstanceColor);

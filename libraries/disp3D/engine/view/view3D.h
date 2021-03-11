@@ -109,7 +109,7 @@ public:
     /**
      * Return the tree model which holds the subject information.
      *
-     * @param\[in\] pModel     The tree model holding the 3d models.
+     * @param[in] pModel     The tree model holding the 3d models.
      */
     void setModel(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel);
 
@@ -117,7 +117,7 @@ public:
     /**
      * Set the background color of the scene.
      *
-     * @param\[in\] colSceneColor          The new background color of the view.
+     * @param[in] colSceneColor          The new background color of the view.
      */
     void setSceneColor(const QColor& colSceneColor);
 
@@ -131,7 +131,7 @@ public:
     /**
      * Rotate camera arround given angle.
      *
-     * @param\[in\] iAngle          The to rotate the camera.
+     * @param[in] iAngle          The to rotate the camera.
      *
      */
     void setCameraRotation(float fAngle);
@@ -173,7 +173,7 @@ public:
     /**
      * Renders a screenshot of the view and saves it to the passed path. SVG and PNG supported.
      *
-     * @param\[in\] fileName     The file name and path where to store the screenshot.
+     * @param[in] fileName     The file name and path where to store the screenshot.
      */
     void takeScreenshot();
 
@@ -182,7 +182,7 @@ public:
     /**
      * Initilize the object picking.
      *
-     * @param\[in\] bActivatePicker     Wheater to activate the object picker.
+     * @param[in] bActivatePicker     Wheater to activate the object picker.
      */
     void activatePicker(const bool bActivatePicker);
 
@@ -212,7 +212,7 @@ protected:
     /**
      * Creates a coordiante system (x/Green, y/Red, z/Blue).
      *
-     * @param\[in\] parent         The parent identity which will "hold" the coordinate system.
+     * @param[in] parent         The parent identity which will "hold" the coordinate system.
      */
     void createCoordSystem(Qt3DCore::QEntity* parent);
 
@@ -220,7 +220,7 @@ protected:
     /**
      * Handle Picking events.
      *
-     * @param\[in\] qPickEvent         The picking event that occured.
+     * @param[in] qPickEvent         The picking event that occured.
      */
     void handlePickerPress(Qt3DRender::QPickEvent *qPickEvent);
 

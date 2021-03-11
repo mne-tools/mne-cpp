@@ -69,9 +69,9 @@ public:
     /**
      * Customized logWriter to colorize type of the message in the terminal
      *
-     * @param\[in\] type      Enum to identify the various message types (qDebug, qInfo, qCritical, qWarning and qFatal)
-     * @param\[in\] context   Context provides information about the source code location
-     * @param\[in\] msg       The message to print in the terminal
+     * @param[in] type      Enum to identify the various message types (qDebug, qInfo, qCritical, qWarning and qFatal)
+     * @param[in] context   Context provides information about the source code location
+     * @param[in] msg       The message to print in the terminal
      */
     static void customLogWriter(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 

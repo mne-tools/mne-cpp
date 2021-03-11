@@ -93,7 +93,7 @@ public:
     /**
      * Constructs a TriggerDetectionView which is a child of parent.
      *
-     * @param\[in\] parent        parent of widget
+     * @param[in] parent        parent of widget
      */
     TriggerDetectionView(const QString& sSettingsPath = "",
                          QWidget *parent = 0,
@@ -115,8 +115,8 @@ public:
     /**
      * Set total number of detected triggers and trigger types.
      *
-     * @param\[in\] totalNumberDetections     The numger of detected triggers
-     * @param\[in\] mapDetectedTriggers       The currently detected triggers
+     * @param[in] totalNumberDetections     The numger of detected triggers
+     * @param[in] mapDetectedTriggers       The currently detected triggers
      */
     void setNumberDetectedTriggersAndTypes(int totalNumberDetections,
                                            const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
@@ -152,7 +152,7 @@ protected:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param\[in\] mode     The new mode (Clinical=0, Research=1).
+     * @param[in] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -160,7 +160,7 @@ protected:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param\[in\] mode     The new mode (RealTime=0, Offline=1).
+     * @param[in] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 

@@ -71,9 +71,9 @@ namespace MNEANONYMIZE {
  * The function main marks the entry point of the program.
  * By default, main has the storage class extern.
  *
- * @param\[in\] argc (argument count) is an integer that indicates how many arguments were entered on the
+ * @param[in] argc (argument count) is an integer that indicates how many arguments were entered on the
  * command line when the program was started.
- * @param\[in\] argv (argument vector) is an array of pointers to arrays of character objects. The array objects
+ * @param[in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects
  * are null-terminated strings, representing the arguments that were entered on the command line when the
  * program was started.
  *

@@ -111,7 +111,7 @@ private:
     /**
      * Handles the event when the currently selected model was changed.
      *
-     * @param\[in\] data  The data from the currently selected QStandardItem
+     * @param[in] data  The data from the currently selected QStandardItem
      */
     void onCurrentlySelectedModelChanged(const QVariant& data);
 
@@ -119,7 +119,7 @@ private:
     /**
      * Triggers update to saved items in AnalyzeData
      *
-     * @param\[in\] pIndex   index of newly selected item to be stored in AnalyzeData
+     * @param[in] pIndex   index of newly selected item to be stored in AnalyzeData
      */
     void onCurrentItemChanged(const QModelIndex& pIndex);
 
@@ -127,7 +127,7 @@ private:
     /**
      * Triggers removeal of item at index
      *
-     * @param\[in\] index    model index of item to be removed
+     * @param[in] index    model index of item to be removed
      */
     void onRemoveItem(const QModelIndex &index);
 

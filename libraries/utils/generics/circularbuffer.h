@@ -80,7 +80,7 @@ public:
     /**
      * Constructs a CircularBuffer.
      *
-     * @param\[in\] uiMaxNumElements length of buffer.
+     * @param[in] uiMaxNumElements length of buffer.
      */
     explicit CircularBuffer(unsigned int uiMaxNumElements);
 
@@ -94,8 +94,8 @@ public:
     /**
      * Adds a whole array at the end buffer.
      *
-     * @param\[in\] pArray pointer to an Array which should be apend to the end.
-     * @param\[in\] size number of elements containing the array.
+     * @param[in] pArray pointer to an Array which should be apend to the end.
+     * @param[in] size number of elements containing the array.
      */
     inline bool push(const _Tp* pArray, unsigned int size);
 
@@ -103,7 +103,7 @@ public:
     /**
      * Adds an element at the end of the buffer.
      *
-     * @param\[in\] newElement pointer to an Array which should be apend to the end.
+     * @param[in] newElement pointer to an Array which should be apend to the end.
      */
     inline bool push(const _Tp& newElement);
 
@@ -144,7 +144,7 @@ private:
     /**
      * Returns the current circular index to the corresponding given index.
      *
-     * @param\[in\] index which should be mapped.
+     * @param[in] index which should be mapped.
      * @return the mapped index.
      */
     inline unsigned int mapIndex(int& index);

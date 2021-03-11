@@ -128,7 +128,7 @@ public:
     /**
     * Constructs an EDFInfo by parsing the passed IO device pDev.
     *
-    * @param pDev The device to read the EDF file from.
+    * @param[in] pDev The device to read the EDF file from.
     */
     EDFInfo(QIODevice* pDev);
 

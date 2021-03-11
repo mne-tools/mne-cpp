@@ -97,9 +97,9 @@ public:
     /**
      * Sets new data to the bar chart using QtCharts
      *
-     * @param\[in\] matClassLimitData      vector input filled with class limits
-     * @param\[in\] matClassFrequencyData  vector input filled with class frequency to the corresponding class
-     * @param\[in\] iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram
+     * @param[in] matClassLimitData      vector input filled with class limits
+     * @param[in] matClassFrequencyData  vector input filled with class frequency to the corresponding class
+     * @param[in] iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram
      */
     template<typename T>
     void setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData,
@@ -114,9 +114,9 @@ public:
     /**
      * Updates the bar plot with the new data
      *
-     * @param\[in\] matClassLimitData      vector input filled with class limits
-     * @param\[in\] matClassFrequencyData  vector input filled with class frequency to the corresponding class
-     * @param\[in\] iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram
+     * @param[in] matClassLimitData      vector input filled with class limits
+     * @param[in] matClassFrequencyData  vector input filled with class frequency to the corresponding class
+     * @param[in] iPrecisionValue        user input to determine the amount of digits of coefficient shown in the histogram
      */
     template<typename T>
     void updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
@@ -127,8 +127,8 @@ public:
     /**
      * splitCoefficientAndExponent takes in QVector value of coefficient and exponent (example: 1.2e-10) and finds the coefficient (1.2) and the appropriate exponent (-12), normalize the exponents to either the lowest or highest exponent in the list then places the values in two separate QVectors
      *
-     * @param\[in\] matClassLimitData      vector input filled with values of class limits (in coefficient and exponent form)
-     * @param\[in\] iClassCount            user input to determine the amount of classes in the histogram
+     * @param[in] matClassLimitData      vector input filled with values of class limits (in coefficient and exponent form)
+     * @param[in] iClassCount            user input to determine the amount of classes in the histogram
      * @param[out] vecCoefficientResults  vector filled with values of coefficient only
      * @param[out] vecExponentResults     vector filled with values of exponent only
      */

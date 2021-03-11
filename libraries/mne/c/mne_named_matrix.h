@@ -98,7 +98,7 @@ public:
      * Copy constructor.
      * Refactored: mne_dup_named_matrix (mne_named_matrix.c)
      *
-     * @param\[in\] p_MneNamedMatrix   MNE Named Matrix which should be copied
+     * @param[in] p_MneNamedMatrix   MNE Named Matrix which should be copied
      */
     MneNamedMatrix(const MneNamedMatrix& p_MneNamedMatrix);
 
@@ -114,11 +114,11 @@ public:
      * Build a named matrix from the ingredients
      * Refactored: mne_build_named_matrix (mne_named_matrix.c)
      *
-     * @param\[in\] nrow       Number of rows
-     * @param\[in\] ncol       Number of columns
-     * @param\[in\] rowlist    List of row (channel) names
-     * @param\[in\] collist    List of column (channel) names
-     * @param\[in\] data       Data to store
+     * @param[in] nrow       Number of rows
+     * @param[in] ncol       Number of columns
+     * @param[in] rowlist    List of row (channel) names
+     * @param[in] collist    List of column (channel) names
+     * @param[in] data       Data to store
      *
      * @return   The new named matrix.
      */
@@ -129,9 +129,9 @@ public:
      * Read a named matrix from the specified node
      * Refactored: mne_read_named_matrix (mne_named_matrix.c)
      *
-     * @param\[in\] stream     Stream to read from
-     * @param\[in\] node       Node to read from
-     * @param\[in\] kind       Block kind which should be read
+     * @param[in] stream     Stream to read from
+     * @param[in] node       Node to read from
+     * @param[in] kind       Block kind which should be read
      *
      * @return   The read named matrix.
      */
@@ -142,10 +142,10 @@ public:
      * Pick appropriate rows and columns and build a new matrix
      * Refactored: mne_pick_from_named_matrix (mne_named_matrix.c)
      *
-     * @param\[in\] pickrowlist    List of row names to pick
-     * @param\[in\] picknrow       Number of rows
-     * @param\[in\] pickcollist    List of column names to pick
-     * @param\[in\] pickncol       Number of columns
+     * @param[in] pickrowlist    List of row names to pick
+     * @param[in] picknrow       Number of rows
+     * @param[in] pickcollist    List of column names to pick
+     * @param[in] pickncol       Number of columns
      *
      * @return   The read named matrix.
      */

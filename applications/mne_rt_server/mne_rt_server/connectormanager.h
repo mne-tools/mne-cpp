@@ -109,7 +109,7 @@ public:
     /**
      * Loads plugins from given directory.
      *
-     * @param dir the plugin directory.
+     * @param[in] dir the plugin directory.
      */
     void loadConnectors(const QString& dir);
 

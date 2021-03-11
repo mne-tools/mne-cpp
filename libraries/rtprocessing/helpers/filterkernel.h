@@ -93,7 +93,7 @@ public:
     /**
      * Creates a filter parameter with name sName
      *
-     * @param\[in\] sName    input name
+     * @param[in] sName    input name
      */
     explicit FilterParameter(QString sName);
 
@@ -101,8 +101,8 @@ public:
     /**
      * Creates a filter parameter with name sName and description sDescription
      *
-     * @param\[in\] sName            input name
-     * @param\[in\] sDescription     input desxription
+     * @param[in] sName            input name
+     * @param[in] sDescription     input desxription
      */
     explicit FilterParameter(QString sName, QString sDescription);
 
@@ -143,14 +143,14 @@ public:
     /**
      * Constructs a FilterKernel object
      *
-     * @param\[in\] sFilterName      Defines the name of the generated filter
-     * @param\[in\] type             Tyep of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
-     * @param\[in\] iOrder           Represents the order of the filter, the higher the higher is the stopband attenuation
-     * @param\[in\] dCenterfreq      Determines the center of the frequency - normed to sFreq/2 (nyquist)
-     * @param\[in\] dBandwidth       Ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband - normed to sFreq/2 (nyquist)
-     * @param\[in\] dParkswidth      Determines the width of the filter slopes (steepness) - normed to sFreq/2 (nyquist)
-     * @param\[in\] dSFreq           The sampling frequency
-     * @param\[in\] designMethod     Specifies the design method to use. Choose between Cosind and Tschebyscheff
+     * @param[in] sFilterName      Defines the name of the generated filter
+     * @param[in] type             Tyep of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
+     * @param[in] iOrder           Represents the order of the filter, the higher the higher is the stopband attenuation
+     * @param[in] dCenterfreq      Determines the center of the frequency - normed to sFreq/2 (nyquist)
+     * @param[in] dBandwidth       Ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband - normed to sFreq/2 (nyquist)
+     * @param[in] dParkswidth      Determines the width of the filter slopes (steepness) - normed to sFreq/2 (nyquist)
+     * @param[in] dSFreq           The sampling frequency
+     * @param[in] designMethod     Specifies the design method to use. Choose between Cosind and Tschebyscheff
      **/
     FilterKernel(const QString &sFilterName,
                  int  iFilterType,
@@ -169,7 +169,7 @@ public:
      * one does not always know the data length of the data blocks to be filtered when
      * designing the filter.
      *
-     * @param\[in\] iDataSize           The data size to setup the filters to
+     * @param[in] iDataSize           The data size to setup the filters to
      */
     void prepareFilter(int iDataSize);
 
@@ -177,8 +177,8 @@ public:
     /**
      * Applies the current filter to the input data using convolution in time domain.
      *
-     * @param\[in\] vecData          Holds the data to be filtered
-     * @param\[in\] bKeepOverhead    Whether the result should still include the overhead information in front and back of the data.
+     * @param[in] vecData          Holds the data to be filtered
+     * @param[in] bKeepOverhead    Whether the result should still include the overhead information in front and back of the data.
      *                              Default is set to false.
      *
      * @return the filtered data in form of a RowVectorXd
@@ -191,7 +191,7 @@ public:
      * Applies the current filter to the input data using multiplication in frequency domain.
      *
      * @param+[\[]in/out] vecData              Holds the data to be filtered. Gets overwritten with its filtered result.
-     * @param\[in\] bKeepOverhead            Whether the result should still include the overhead information in front and back of the data.
+     * @param[in] bKeepOverhead            Whether the result should still include the overhead information in front and back of the data.
      *                                      Default is set to false.
      *
      * @return the filtered data in form of a RowVectorXd
@@ -245,7 +245,7 @@ private:
     /**
      * Transforms the calculated filter coefficients to frequency-domain
      *
-     * @param\[in\] iFftLength                  The FFT length to use
+     * @param[in] iFftLength                  The FFT length to use
      */
     bool fftTransformCoeffs(int iFftLength);
 

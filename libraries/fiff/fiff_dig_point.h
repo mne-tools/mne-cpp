@@ -80,7 +80,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param\[in\] p_FiffDigPoint   Digitization point descriptor which should be copied
+     * @param[in] p_FiffDigPoint   Digitization point descriptor which should be copied
      */
     FiffDigPoint(const FiffDigPoint& p_FiffDigPoint);
 

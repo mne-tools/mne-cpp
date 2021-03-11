@@ -84,7 +84,7 @@ public:
     /**
      * Updates the IObserver.
      *
-     * @param\[in\] pSubject pointer to the subject where observer is attached to.
+     * @param[in] pSubject pointer to the subject where observer is attached to.
      */
     virtual void update(Subject* pSubject) = 0;
 };
@@ -113,7 +113,7 @@ public:
     /**
      * Attaches an observer to the subject.
      *
-     * @param\[in\] pObserver pointer to the observer which should be attached to the subject.
+     * @param[in] pObserver pointer to the observer which should be attached to the subject.
      */
     void attach(IObserver* pObserver);
 
@@ -121,7 +121,7 @@ public:
     /**
      * Detaches an observer of the subject.
      *
-     * @param\[in\] pObserver pointer to the observer which should be detached of the subject.
+     * @param[in] pObserver pointer to the observer which should be detached of the subject.
      */
     void detach(IObserver* pObserver);
 

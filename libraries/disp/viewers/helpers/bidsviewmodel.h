@@ -126,8 +126,8 @@ public slots:
     /**
      * Adds data to the item model.
      *
-     * @param\[in\] sSubjectName          The subject name to store the data under.
-     * @param\[in\] pItem                 The item to be added.
+     * @param[in] sSubjectName          The subject name to store the data under.
+     * @param[in] pItem                 The item to be added.
      */
     void addData(QModelIndex selectedItem,
                  QStandardItem *pNewItem,
@@ -137,8 +137,8 @@ public slots:
     /**
      * Adds a sub-item to a data item (ex. an average)
      *
-     * @param\[in\] pNewItem     item to be added
-     * @param\[in\] parentIndex  index of where the nitem should be added
+     * @param[in] pNewItem     item to be added
+     * @param[in] parentIndex  index of where the nitem should be added
      */
     void addToData(QStandardItem *pNewItem,
                    const QModelIndex &parentIndex,
@@ -148,7 +148,7 @@ public slots:
     /**
      * Adds subject with given input name
      *
-     * @param\[in\] sSubjectName     name of subject name
+     * @param[in] sSubjectName     name of subject name
      *
      * @return  index of newly added item
      */
@@ -158,8 +158,8 @@ public slots:
     /**
      * Adds session named after sSessionName to subjects names sSubjectName
      *
-     * @param\[in\] sSubjectName     Name of subject to which session will be added
-     * @param\[in\] sSessionName     Name of session to add
+     * @param[in] sSubjectName     Name of subject to which session will be added
+     * @param[in] sSessionName     Name of session to add
      *
      * @return  index of newly added item
      */
@@ -170,8 +170,8 @@ public slots:
     /**
      * Adds session named after sSessionName to subject at subjectIndex
      *
-     * @param\[in\] subjectIndex     Index of subject to which session will be added
-     * @param\[in\] sSessionName     Name of session to add
+     * @param[in] subjectIndex     Index of subject to which session will be added
+     * @param[in] sSessionName     Name of session to add
      *
      * @return  index of newly added item
      */
@@ -182,8 +182,8 @@ public slots:
     /**
      * Adds data item pNewItem to session at sessionIndex
      *
-     * @param\[in\] sessionIndex     Index of session to which data will be added
-     * @param\[in\] pNewItem         New item to be added.
+     * @param[in] sessionIndex     Index of session to which data will be added
+     * @param[in] pNewItem         New item to be added.
      *
      * @return index of newly added item
      */
@@ -194,8 +194,8 @@ public slots:
     //=========================================================================================================
     /**
      * Moves a session to a new subject
-     * @param\[in\] subjectIndex     Target subject
-     * @param\[in\] sessionIndex     Session to be moved
+     * @param[in] subjectIndex     Target subject
+     * @param[in] sessionIndex     Session to be moved
      *
      * @return
      */
@@ -206,8 +206,8 @@ public slots:
     /**
      * Moves data at dataIndex to session at sessionIndex
      *
-     * @param\[in\] sessionIndex     Target session
-     * @param\[in\] dataIndex        Data to be moved
+     * @param[in] sessionIndex     Target session
+     * @param[in] dataIndex        Data to be moved
      *
      * @return
      */
@@ -218,7 +218,7 @@ public slots:
     /**
      * Removes item at index itemIndex
      *
-     * @param\[in\] itemIndex    index of item to be removed
+     * @param[in] itemIndex    index of item to be removed
      *
      * @return true if succefully removed, false if not
      */
@@ -230,7 +230,7 @@ signals:
     /**
      * Emit index of newly added items to be selected
      *
-     * @param\[in\] itemIndex    index of new item
+     * @param[in] itemIndex    index of new item
      */
     void newItemIndex(QModelIndex itemIndex);
 

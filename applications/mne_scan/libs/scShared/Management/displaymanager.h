@@ -102,8 +102,8 @@ public:
     /**
      * Shows a widget containing all current measurement widgets.
      *
-     * @param\[in\] outputConnectorList   output connector list
-     * @param\[in\] pT                    global timer
+     * @param[in] outputConnectorList   output connector list
+     * @param[in] pT                    global timer
      * @param+[\[]out] qListActions         a list of actions containing all measurent widget actions
      *
      * @return a pointer to the widget containing all measurement widgets.
