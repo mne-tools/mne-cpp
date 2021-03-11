@@ -185,7 +185,7 @@ public:
     /**
      * distanceTimeSpacerChanged changes the distance of the time spacers
      *
-     * @param iValue the new distance for the time spacers
+     * @param[in] iValue the new distance for the time spacers
      */
     void setDistanceTimeSpacer(int iValue);
 
@@ -341,7 +341,7 @@ private:
     /**
      * Triggers the update of the update label based on the data viewer horizontal positon (not on iValue)
      *
-     * @param [in] iValue   Horizontal scroll bar position (unused)
+     * @param[in] iValue   Horizontal scroll bar position (unused)
      */
     void updateTimeLabels(int iValue);
 
@@ -367,7 +367,7 @@ private:
     /**
      * This tells the model where the view currently is vertically.
      *
-     * @param newScrollPosition Absolute sample number.
+     * @param[in] newScrollPosition Absolute sample number.
      */
     void updateVerticalScrollPosition(qint32 newScrollPosition);
 

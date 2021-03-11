@@ -500,7 +500,7 @@ public:
     /**
      * This tells the model where the view currently is horizontally.
      *
-     * @param newScrollPosition Absolute sample number.
+     * @param[in] newScrollPosition Absolute sample number.
      */
     void updateHorizontalScrollPosition(qint32 newScrollPosition);
 

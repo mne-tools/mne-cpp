@@ -78,8 +78,8 @@ class ScaleControl;
 /**
  * Get the default scaling values by channel type
  *
- * @param [in] iChannelKind     The channel kind to return the default scaling value for.
- * @param [in] iChannelUnit     The channel unit to return the default scaling value for.
+ * @param[in] iChannelKind     The channel kind to return the default scaling value for.
+ * @param[in] iChannelUnit     The channel unit to return the default scaling value for.
  *                              The unit is only important when dealing with MEG channels in order to
  *                              distinguish between magnetometers and gradiometers.
  *
@@ -93,9 +93,9 @@ DISPSHARED_EXPORT float getDefaultScalingValue(int iChannelKind,
  * Get the scaling value from suplied scale map, and check if there is a float asigned to the scale.
  * Otherwise returns default scaling values for the channel type.
  *
- * @param [in] qMapChScaling    The map containing the scaling values for different channel types and units.
- * @param [in] iChannelKind     The channel kind to return the default scaling value for.
- * @param [in] iChannelUnit     The channel unit to return the default scaling value for.
+ * @param[in] qMapChScaling    The map containing the scaling values for different channel types and units.
+ * @param[in] iChannelKind     The channel kind to return the default scaling value for.
+ * @param[in] iChannelUnit     The channel unit to return the default scaling value for.
  *                              The unit is only important when dealing with MEG channels in order to
  *                              distinguish between magnetometers and gradiometers.
  *
@@ -124,7 +124,7 @@ public:
     /**
      * Constructs a ScalingView which is a child of parent.
      *
-     * @param [in] parent Parent of widget.
+     * @param[in] parent Parent of widget.
      */
     ScalingView(const QString& sSettingsPath = "",
                 QWidget *parent = 0,
@@ -173,7 +173,7 @@ public:
     /**
      * Link the Magnetometers to the Gradiometers scale.
      *
-     * @param [in] l Set the link between MAGs and GRADs active or inactive.
+     * @param[in] l Set the link between MAGs and GRADs active or inactive.
      */
     void setMagGradLink(int l);
 
@@ -182,7 +182,7 @@ signals:
     /**
      * Emit this signal whenever the scaling sliders or spin boxes changed.
      *
-     * @param [in] scalingMap this is a list of scaling values ordered by integer keys. These keys are resolved with
+     * @param[in] scalingMap this is a list of scaling values ordered by integer keys. These keys are resolved with
      * the use of defined macros with names of channel-types, vendors, etc.
      */
     void scalingChanged(const QMap<qint32, float>& scalingMap);
@@ -204,7 +204,8 @@ private:
     //=============================================================================================================
     /**
      * Callback to process a change in the MAGs scale spinbox.
-     * @param [in] dScale
+     *
+     * @param[in] dScale
      */
     void updateMAGScale(double dScale);
 
@@ -212,7 +213,7 @@ private:
     /**
      * Callback to process a change in the gradiometers scale spinbox.
      *
-     * @param [in] dScale The new Scale.
+     * @param[in] dScale The new Scale.
      */
     void updateGRADScale(double dScale);
 
@@ -220,7 +221,7 @@ private:
     /**
      * Link Magnetometers and Gradiometers through this ratio. Just for viewing purposes.
      *
-     * @param [in] dScale The new Scale.
+     * @param[in] dScale The new Scale.
      */
     void updateMAGtoGRADlink(double dScale);
 
@@ -228,7 +229,7 @@ private:
     /**
      * Callback to process a change in the EEG scale spinbox.
      *
-     * @param [in] dScale The new Scale.
+     * @param[in] dScale The new Scale.
      */
     void updateEEGScale(double dScale);
 
@@ -236,7 +237,7 @@ private:
     /**
      * Callback to process a change in the EOG scale spinbox.
      *
-     * @param [in] dScale The new Scale.
+     * @param[in] dScale The new Scale.
      */
     void updateEOGScale(double dScale);
 
@@ -244,14 +245,15 @@ private:
     /**
      * Callback to process a change in the EMG scale spinbox.
      *
-     * @param [in] dScale The new Scale.
+     * @param[in] dScale The new Scale.
      */
     void updateEMGScale(double dScale);
 
     //=========================================================================================================
     /**
      * Callback to process a change in the ECG scale spinbox.
-     * @param [in] dScale The new Scale.
+     *
+     * @param[in] dScale The new Scale.
      */
     void updateECGScale(double dScale);
 
@@ -259,7 +261,7 @@ private:
     /**
      * Callback to process a change in the MISC scale spinbox.
      *
-     * @param [in] dScale The new Scale.
+     * @param[in] dScale The new Scale.
      */
     void updateMISCScale(double dScale);
 
@@ -267,7 +269,7 @@ private:
     /**
      * Callback to process a change in the STIM scale spinbox.
      *
-     * @param [in] dScale The new Scale.
+     * @param[in] dScale The new Scale.
      */
     void updateSTIMScale(double dScale);
 
@@ -275,7 +277,7 @@ private:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param [in] mode The new mode (Clinical=0, Research=1).
+     * @param[in] mode The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode) override;
 
@@ -283,7 +285,7 @@ private:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param [in] mode The new mode (RealTime=0, Offline=1).
+     * @param[in] mode The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode) override;
 
@@ -321,7 +323,7 @@ private:
     /**
      * Slot for processing the use of shortcut keypresses.
      *
-     * @param [in] event An keyboard-release event to be processed.
+     * @param[in] event An keyboard-release event to be processed.
      */
     void keyReleaseEvent(QKeyEvent* event) override;
 
@@ -329,7 +331,7 @@ private:
     /**
      * Slot for processing the use of shortcut releases.
      *
-     * @param [in] event An keyboard-press event to be processed.
+     * @param[in] event An keyboard-press event to be processed.
      */
     void keyPressEvent(QKeyEvent* event) override;
 
