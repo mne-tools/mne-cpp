@@ -86,7 +86,7 @@ public:
     /**
      * Sets the channel name
      *
-     * @param[in] p_qStringChName    channel name
+     * @param\[in\] p_qStringChName    channel name
      */
     inline void setChannelName(QString p_qStringChName);
 
@@ -102,7 +102,7 @@ public:
     /**
      * Sets the channel kind
      *
-     * @param[in] p_iKind    channel kind
+     * @param\[in\] p_iKind    channel kind
      */
     inline void setKind(qint32 p_iKind);
 
@@ -118,7 +118,7 @@ public:
     /**
      * Sets the minimal value. If current value to set is smaller, current value is set to minimal value.
      *
-     * @param[in] minValue minimal value.
+     * @param\[in\] minValue minimal value.
      */
     inline void setMinValue(double minValue);
 
@@ -134,7 +134,7 @@ public:
     /**
      * Sets the maximal value. If value to set is bigger, current value is set to maximal value.
      *
-     * @param [in] maxValue maximal value.
+     * @param\[in\] maxValue maximal value.
      */
     inline void setMaxValue(double maxValue);
 
@@ -150,7 +150,7 @@ public:
     /**
      * Sets the unit of the RealTimeSampleArray data.
      *
-     * @param [in] unit of the data.
+     * @param\[in\] unit of the data.
      */
     inline void setUnit(FIFFLIB::fiff_int_t unit);
 
@@ -166,7 +166,7 @@ public:
     /**
      * Sets the coil of the RealTimeSampleArray sensor.
      *
-     * @param [in] coil description of the sensor.
+     * @param\[in\] coil description of the sensor.
      */
     inline void setCoil(FIFFLIB::fiff_int_t coil);
 

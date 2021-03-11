@@ -103,7 +103,7 @@ public:
     /**
      * Constructs a RtFiffRawView which is a child of parent.
      *
-     * @param [in] parent    The parent of widget.
+     * @param\[in\] parent    The parent of widget.
      */
     RtFiffRawView(const QString& sSettingsPath = "",
                   QWidget* parent = 0,
@@ -127,7 +127,7 @@ public:
      * Set the path where to store the settings of this widget via QSettings. Note that this will also trigger
      * a reload of the stored settings.
      *
-     * @param [in] sSettingsPath    The new settings path.
+     * @param\[in\] sSettingsPath    The new settings path.
      */
     void setSettingsPath(const QString& sSettingsPath);
 
@@ -135,7 +135,7 @@ public:
     /**
      * Initilaizes the RtFiffRawView based on a FiffInfo.
      *
-     * @param [in] info    The FiffInfo.
+     * @param\[in\] info    The FiffInfo.
      */
     void init(QSharedPointer<FIFFLIB::FiffInfo> &info);
 
@@ -143,7 +143,7 @@ public:
     /**
      * Add data to the view.
      *
-     * @param [in] data    The new data.
+     * @param\[in\] data    The new data.
      */
     void addData(const QList<Eigen::MatrixXd>& data);
 
@@ -160,8 +160,8 @@ public:
      * Is called when mouse wheel is used.
      * Function is selecting the tool (freezing/annotation);
      *
-     * @param object
-     * @param event
+     * @param\[in\] object
+     * @param\[in\] event
      *
      * @return
      */
@@ -171,7 +171,7 @@ public:
     /**
      * Broadcast the background color changes made in the QuickControl widget
      *
-     * @param [in] backgroundColor  The new background color.
+     * @param\[in\] backgroundColor  The new background color.
      */
     void setBackgroundColor(const QColor& backgroundColor);
 
@@ -195,7 +195,7 @@ public:
     /**
      * Broadcast channel scaling
      *
-     * @param [in] scaleMap QMap with scaling values which is to be broadcasted to the model.
+     * @param\[in\] scaleMap QMap with scaling values which is to be broadcasted to the model.
      */
     void setScalingMap(const QMap<qint32, float>& scaleMap);
 
@@ -203,7 +203,7 @@ public:
     /**
      * Set the signal color.
      *
-     * @param [in] signalColor  The new signal color.
+     * @param\[in\] signalColor  The new signal color.
      */
     void setSignalColor(const QColor& signalColor);
 
@@ -233,7 +233,7 @@ public:
     /**
      * Only shows the channels defined in the QStringList selectedChannels
      *
-     * @param [in] selectedChannels list of all channel names which are currently selected in the selection manager.
+     * @param\[in\] selectedChannels list of all channel names which are currently selected in the selection manager.
      */
     void showSelectedChannelsOnly(const QStringList& selectedChannels);
 
@@ -241,7 +241,7 @@ public:
     /**
      * Sets new zoom factor
      *
-     * @param [in] zoomFac  time window size;
+     * @param\[in\] zoomFac  time window size;
      */
     void setZoom(double zoomFac);
 
@@ -257,7 +257,7 @@ public:
     /**
      * Sets new time window size
      *
-     * @param [in] T  time window size;
+     * @param\[in\] T  time window size;
      */
     void setWindowSize(int T);
 
@@ -273,7 +273,7 @@ public:
     /**
      * Renders a screenshot of the view and saves it to the passed path. SVG and PNG supported.
      *
-     * @param [in] fileName     The file name and path where to store the screenshot.
+     * @param\[in\] fileName     The file name and path where to store the screenshot.
      */
     void takeScreenshot(const QString& fileName);
 
@@ -281,7 +281,7 @@ public:
     /**
      * Update the SSP projection
      *
-     * @param [in] projs    The new projectors.
+     * @param\[in\] projs    The new projectors.
      */
     void updateProjection(const QList<FIFFLIB::FiffProj>& projs);
 
@@ -289,7 +289,7 @@ public:
     /**
      * Update the compensator
      *
-     * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
+     * @param\[in\] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
      */
     void updateCompensator(int to);
 
@@ -297,7 +297,7 @@ public:
     /**
      * Update the SPHARA operator
      *
-     * @param[in] state            The current state of teh SPHARA tool
+     * @param\[in\] state            The current state of teh SPHARA tool
      */
     void updateSpharaActivation(bool state);
 
@@ -305,9 +305,9 @@ public:
     /**
      * Update the SPHARA operator
      *
-     * @param[in] sSystemType            The current acquisition system type (VectorView, BabyMEG, EEG)
-     * @param[in] nBaseFctsFirst         The new number of basis function to use for the first SPHARA operator
-     * @param[in] nBaseFctsSecond        The new number of basis function to use for the second SPHARA operator
+     * @param\[in\] sSystemType            The current acquisition system type (VectorView, BabyMEG, EEG)
+     * @param\[in\] nBaseFctsFirst         The new number of basis function to use for the first SPHARA operator
+     * @param\[in\] nBaseFctsSecond        The new number of basis function to use for the second SPHARA operator
      */
     void updateSpharaOptions(const QString& sSytemType,
                              int nBaseFctsFirst,
@@ -317,7 +317,7 @@ public:
     /**
      * Filter parameters changed
      *
-     * @param[in] filterData   the currently active filter
+     * @param\[in\] filterData   the currently active filter
      */
     void setFilter(const RTPROCESSINGLIB::FilterKernel &filterData);
 
@@ -325,7 +325,7 @@ public:
     /**
      * Filter avtivated
      *
-     * @param[in] state    filter on/off flag
+     * @param\[in\] state    filter on/off flag
      */
     void setFilterActive(bool state);
 
@@ -333,7 +333,7 @@ public:
     /**
      * Sets the type of channel which are to be filtered
      *
-     * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
+     * @param\[in\] channelType    the channel type which is to be filtered (EEG, MEG, All)
      */
     void setFilterChannelType(const QString& channelType);
 
@@ -341,10 +341,10 @@ public:
     /**
      * markChBad marks the selected channels as bad/good in m_chInfolist
      *
-     * @param colorMap       color for each trigger channel
-     * @param activ          real time trigger detection active
-     * @param triggerCh      current trigger channel to scan
-     * @param threshold      threshold for the detection process
+     * @param\[in\] colorMap       color for each trigger channel
+     * @param\[in\] activ          real time trigger detection active
+     * @param\[in\] triggerCh      current trigger channel to scan
+     * @param\[in\] threshold      threshold for the detection process
      */
     void triggerInfoChanged(const QMap<double, QColor>& colorMap,
                             bool active,
@@ -355,7 +355,7 @@ public:
     /**
      * distanceTimeSpacerChanged changes the distance of the time spacers
      *
-     * @param value the new distance for the time spacers
+     * @param\[in\] value the new distance for the time spacers
      */
     void setDistanceTimeSpacer(int value);
 
@@ -396,7 +396,7 @@ protected:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param mode     The new mode (Clinical=0, Research=1).
+     * @param\[in\] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -404,7 +404,7 @@ protected:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param mode     The new mode (RealTime=0, Offline=1).
+     * @param\[in\] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 
@@ -412,7 +412,7 @@ protected:
     /**
      * Show channel context menu
      *
-     * @param [in] pos   Position to popup the conext menu.
+     * @param\[in\] pos   Position to popup the conext menu.
      */
     void channelContextMenu(QPoint pos);
 
@@ -470,8 +470,8 @@ signals:
     /**
      * position is emitted whenever user moves the mouse inside of the table view viewport
      *
-     * @param position   the current mouse position
-     * @param activeRow  the current row which the mouse is moved over
+     * @param\[in\] position   the current mouse position
+     * @param\[in\] activeRow  the current row which the mouse is moved over
      */
     void markerMoved(QPoint position,
                      int activeRow);

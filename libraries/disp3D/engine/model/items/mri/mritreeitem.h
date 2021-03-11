@@ -101,8 +101,8 @@ public:
     /**
      * Default constructor.
      *
-     * @param[in] iType      The type of the item. See types.h for declaration and definition.
-     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+     * @param\[in\] iType      The type of the item. See types.h for declaration and definition.
+     * @param\[in\] text       The text of this item. This is also by default the displayed name of the item in a view.
      */
     explicit MriTreeItem(int iType = Data3DTreeModelItemTypes::MriItem,
                          const QString& text = "MRI");
@@ -111,9 +111,9 @@ public:
     /**
      * Adds FreeSurfer data based on surfaces and annotation SETS to this item.
      *
-     * @param[in] tSurfaceSet        FreeSurfer surface set.
-     * @param[in] tAnnotationSet     FreeSurfer annotation set.
-     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+     * @param\[in\] tSurfaceSet        FreeSurfer surface set.
+     * @param\[in\] tAnnotationSet     FreeSurfer annotation set.
+     * @param\[in\] p3DEntityParent    The Qt3D entity parent of the new item.
      *
      * @return                       Returns a QList with the added surface tree items. The ordering
      *                               of the list hereby corresponds to the ordering of the input surface set.
@@ -127,9 +127,9 @@ public:
     /**
      * Adds FreeSurfer data based on surfaces and annotation data to this item.
      *
-     * @param[in] tSurface           FreeSurfer surface.
-     * @param[in] tAnnotation        FreeSurfer annotation.
-     * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
+     * @param\[in\] tSurface           FreeSurfer surface.
+     * @param\[in\] tAnnotation        FreeSurfer annotation.
+     * @param\[in\] p3DEntityParent    The Qt3D entity parent of the new item.
      *
      * @return                       Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
      */

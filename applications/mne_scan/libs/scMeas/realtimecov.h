@@ -94,7 +94,7 @@ public:
     /**
      * Set the fiff info
      *
-     * @param [in] pFiffInfo     the new fiff info.
+     * @param\[in\] pFiffInfo     the new fiff info.
      */
     void setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
@@ -110,7 +110,7 @@ public:
     /**
      * New covariance to distribute
      *
-     * @param [in] v     the covariance which should be distributed.
+     * @param\[in\] v     the covariance which should be distributed.
      */
     virtual void setValue(const FIFFLIB::FiffCov& v);
 

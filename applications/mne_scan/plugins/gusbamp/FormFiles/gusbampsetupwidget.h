@@ -73,8 +73,8 @@ public:
     /**
      * Constructs a GUSBAmpSetupWidget which is a child of parent.
      *
-     * @param [in] parent pointer to parent widget; If parent is 0, the new GUSBAmpSetupWidget becomes a window. If parent is another widget, GUSBAmpSetupWidget becomes a child window inside parent. GUSBAmpSetupWidget is deleted when its parent is deleted.
-     * @param [in] pGUSBAmp a pointer to the corresponding ECGSimulator.
+     * @param\[in\] parent pointer to parent widget; If parent is 0, the new GUSBAmpSetupWidget becomes a window. If parent is another widget, GUSBAmpSetupWidget becomes a child window inside parent. GUSBAmpSetupWidget is deleted when its parent is deleted.
+     * @param\[in\] pGUSBAmp a pointer to the corresponding ECGSimulator.
      */
     GUSBAmpSetupWidget(GUSBAmp* pGUSBAmp, QWidget *parent = 0);
 

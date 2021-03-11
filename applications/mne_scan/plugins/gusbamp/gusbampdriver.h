@@ -120,7 +120,7 @@ public:
     /**
      * Constructs a GUSBAmpDriver.
      *
-     * @param [in]   pGUSBAmpProducer a pointer to the corresponding GUSBAmp Producer class.
+     * @param\[in\]  pGUSBAmpProducer a pointer to the corresponding GUSBAmp Producer class.
      */
     GUSBAmpDriver(GUSBAmpProducer* pGUSBAmpProducer);
 
@@ -133,7 +133,7 @@ public:
     //=========================================================================================================
     /**
      * Get sample from the device in form of a mtrix.
-     * @param [in]   MatrixXf    the block sample values in form of a matrix.
+     * @param\[in\]  MatrixXf    the block sample values in form of a matrix.
      *
      * @return                   returns true if sample was successfully written to the input variable, false otherwise.
      */
@@ -160,7 +160,7 @@ public:
     /**
      * Setting the adresses of the master amplifer and the slaves. The selections of the slaves are optional.
      *
-     * @param[in]    list        list of serial numbers of the devices. Master is first serialnumber in the list
+     * @param\[in\]   list        list of serial numbers of the devices. Master is first serialnumber in the list
      *
      * @return                   true if executed successfully, false otherwise
      *
@@ -171,7 +171,7 @@ public:
     /**
      * Setting the sampling rate of the amplifier and defining the Number of Scans
      *
-     * @param[in]    samplingRate    sampling rate of the amplifier in [Hz] possible settings for the sample rate are:
+     * @param\[in\]   samplingRate    sampling rate of the amplifier in [Hz] possible settings for the sample rate are:
      *                               32, 64, 128, 256, 512, 600, 1200, 2400, 4800, 9600, 19200 and 38400
      *
      * @return                       true if executed successfully, false otherwise
@@ -183,7 +183,7 @@ public:
     /**
      * Setting the channels and the Number of channels
      *
-     * @param[in]    channels        Vector which behold the values of Channels as integer. The values have to be
+     * @param\[in\]   channels        Vector which behold the values of Channels as integer. The values have to be
      *                               ascending and in number must not exceed 16
      *
      * @return                       true if executed successfully, false otherwise
@@ -195,7 +195,7 @@ public:
     /**
      * Setting Flag for Filewriting
      *
-     * @param[in]    doFileWriting   Boolian, which indicates whether Filewriting should be done or not
+     * @param\[in\]   doFileWriting   Boolian, which indicates whether Filewriting should be done or not
      *
      * @return                       true if executed successfully, false otherwise
      *
@@ -206,7 +206,7 @@ public:
     /**
      * Setting the path of the file
      *
-     * @param[in]    QString         QString which beholds the the path of the File in which data will be stored
+     * @param\[in\]   QString         QString which beholds the the path of the File in which data will be stored
      *
      * @return                       true if executed successfully, false otherwise
      *

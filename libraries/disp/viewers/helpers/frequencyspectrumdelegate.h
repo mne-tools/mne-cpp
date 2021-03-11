@@ -87,7 +87,7 @@ public:
     /**
      * Creates a new abstract item delegate with the given parent.
      *
-     * @param[in] parent     Parent of the delegate
+     * @param\[in\] parent     Parent of the delegate
      */
     FrequencySpectrumDelegate(QTableView* m_pTableView,
                               QObject *parent = 0);
@@ -96,7 +96,7 @@ public:
     /**
      * Set scale type.
      *
-     * @param [in] ScaleType.
+     * @param\[in\] ScaleType.
      */
     void setScaleType(qint8 ScaleType);
 
@@ -106,9 +106,9 @@ public:
      *
      * (sizeHint() must be implemented also)
      *
-     * @param[in] painter    Low-level painting on widgets and other paint devices
-     * @param[in] option     Describes the parameters used to draw an item in a view widget
-     * @param[in] index      Used to locate data in a data model.
+     * @param\[in\] painter    Low-level painting on widgets and other paint devices
+     * @param\[in\] option     Describes the parameters used to draw an item in a view widget
+     * @param\[in\] index      Used to locate data in a data model.
      */
     virtual void paint(QPainter *painter,
                        const QStyleOptionViewItem &option,
@@ -118,8 +118,8 @@ public:
     /**
      * Item size
      *
-     * @param[in] option     Describes the parameters used to draw an item in a view widget
-     * @param[in] index      Used to locate data in a data model.
+     * @param\[in\] option     Describes the parameters used to draw an item in a view widget
+     * @param\[in\] index      Used to locate data in a data model.
      */
     virtual QSize sizeHint(const QStyleOptionViewItem &option,
                            const QModelIndex &index) const;
@@ -128,10 +128,10 @@ public:
     /**
      * Receive Mouse location
      *
-     * @param[in] row    The select row of tableview
-     * @param[in] x      mouse x pos.
-     * @param[in] y      mouse y pos.
-     * @param[in] visRect      visual rect of row_tableview.
+     * @param\[in\] row    The select row of tableview
+     * @param\[in\] x      mouse x pos.
+     * @param\[in\] y      mouse y pos.
+     * @param\[in\] visRect      visual rect of row_tableview.
      *
      */
     void rcvMouseLoc(int row,
@@ -144,7 +144,7 @@ private:
     /**
      * CapturePoint capture one QPointer .
      *
-     * @param[in]        index   QModelIndex for accessing associated data and model object.
+     * @param\[in\]       index   QModelIndex for accessing associated data and model object.
      * @param[in,out]    path    The QPointerPath to create for the data plot.
      */
     void capturePoint(const QModelIndex &index,
@@ -157,7 +157,7 @@ private:
     /**
      * createPlotPath creates the QPointer path for the data plot.
      *
-     * @param[in]        index   QModelIndex for accessing associated data and model object.
+     * @param\[in\]       index   QModelIndex for accessing associated data and model object.
      * @param[in,out]    path    The QPointerPath to create for the data plot.
      */
     void createPlotPath(const QModelIndex &index,
@@ -170,7 +170,7 @@ private:
      * createGridPath Creates the QPointer path for the grid plot.
      *
      * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
-     * @param[in] data The row vector of the data matrix <1 x nsamples>.
+     * @param\[in\] data The row vector of the data matrix <1 x nsamples>.
      */
     void createGridPath(const QModelIndex &index,
                         const QStyleOptionViewItem &option,

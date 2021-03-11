@@ -114,8 +114,8 @@ public:
      * Change the baseline setting in the current data set
      * Refactored: mne_adjust_baselines (mne_apply_baselines.c)
      *
-     * @param[in] bmin   Baseline start timepoint
-     * @param[in] bmax   Baseline end timepoint
+     * @param\[in\] bmin   Baseline start timepoint
+     * @param\[in\] bmax   Baseline end timepoint
      */
     void adjust_baselines(float bmin, float bmax);
 

@@ -141,7 +141,7 @@ private:
     /**
      * Loads new Fiff model whan current loaded model is changed
      *
-     * @param [in,out] pNewModel    pointer to currently loaded FiffRawView Model
+     * @param[in, out] pNewModel    pointer to currently loaded FiffRawView Model
      */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
@@ -149,7 +149,7 @@ private:
     /**
      * Handles clearing view if currently used model is being removed
      *
-     * @param [in] pRemovedModel    Pointer to model being removed
+     * @param[in] pRemovedModel    Pointer to model being removed
      */
     void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
 
@@ -220,7 +220,7 @@ private:
     /**
      * Gets called when compute button on GUI is clicked
      *
-     * @param [in] bChecked     UNUSED - state of the button
+     * @param[in] bChecked     UNUSED - state of the button
      */
     void onComputeButtonClicked(bool bChecked);
 
@@ -271,7 +271,7 @@ private:
     /**
      * Sets channel selection for butterfly and 2D layout view based on QVariant with a SelectionItem object
      *
-     * @param [in] data     QVariant with a SelectionItem object with channel selection information
+     * @param[in] data     QVariant with a SelectionItem object with channel selection information
      */
     void setChannelSelection(const QVariant &data);
 
@@ -279,7 +279,7 @@ private:
     /**
      * Sets scaling map for averaging views
      *
-     * @param [in] data     QVariant with a ScalingParameters object with relevant scaling data
+     * @param[in] data     QVariant with a ScalingParameters object with relevant scaling data
      */
     void setScalingMap(const QVariant &data);
 
@@ -309,7 +309,7 @@ private:
     /**
      * Sends event to trigger loading bar to appear and sMessage to show
      *
-     * @param [in] sMessage     loading bar message
+     * @param[in] sMessage     loading bar message
      */
     void triggerLoadingStart(QString sMessage);
 

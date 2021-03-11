@@ -118,7 +118,7 @@ public:
     /**
      * Sets the file name of the xml layout.
      *
-     * @param[in] layout which should be set.
+     * @param\[in\] layout which should be set.
      */
     inline void setXMLLayoutFile(const QString& layout);
 
@@ -142,7 +142,7 @@ public:
     /**
      * Set the number of pre-stimulus samples
      *
-     * @param[in] samples the number of pre-stimulus samples
+     * @param\[in\] samples the number of pre-stimulus samples
      */
     inline void setNumPreStimSamples(qint32 samples);
 
@@ -174,9 +174,9 @@ public:
     /**
      * New devoked to distribute
      *
-     * @param [in] v                         the evoked set which should be distributed.
-     * @param [in] p_fiffinfo                the evoked fiff info as shared pointer.
-     * @param [in] lResponsibleTriggerTypes  List of all trigger types which lead to the recent emit of a new evoked set.
+     * @param\[in\] v                         the evoked set which should be distributed.
+     * @param\[in\] p_fiffinfo                the evoked fiff info as shared pointer.
+     * @param\[in\] lResponsibleTriggerTypes  List of all trigger types which lead to the recent emit of a new evoked set.
      */
     virtual void setValue(const FIFFLIB::FiffEvokedSet &v,
                           const QSharedPointer<FIFFLIB::FiffInfo>& p_fiffinfo,
@@ -211,7 +211,7 @@ public:
     /**
      * Set baseline information
      *
-     * @param [in] info             the min max information of the baseline
+     * @param\[in\] info             the min max information of the baseline
      */
     inline void setBaselineInfo(QPair<qint32,qint32> info);
 
@@ -228,7 +228,7 @@ private:
     /**
      * Init channel infos using fiff info
      *
-     * @param[in] p_fiffInfo     Info to init from
+     * @param\[in\] p_fiffInfo     Info to init from
      */
     void init(QSharedPointer<FIFFLIB::FiffInfo> p_fiffInfo);
 

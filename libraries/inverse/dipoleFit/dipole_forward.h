@@ -86,7 +86,7 @@ public:
 //    /**
 //    * Copy constructor.
 //    *
-//    * @param[in] p_DipoleForward    DipoleForward which should be copied
+//    * @param\[in\] p_DipoleForward    DipoleForward which should be copied
 //    */
 //    DipoleForward(const DipoleForward& p_DipoleForward);
 

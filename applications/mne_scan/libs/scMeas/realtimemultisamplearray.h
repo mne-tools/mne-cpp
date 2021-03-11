@@ -99,7 +99,7 @@ public:
     /**
      * Inits RealTimeMultiSampleArray and adds uiNumChannels empty channel information
      *
-     * @param [in] uiNumChannels     the number of channels to init.
+     * @param\[in\] uiNumChannels     the number of channels to init.
      */
     void init(QList<RealTimeSampleArrayChInfo> &chInfo);
 
@@ -107,7 +107,7 @@ public:
     /**
      * Init channel infos using fiff info
      *
-     * @param[in] pFiffInfo     Info to init from
+     * @param\[in\] pFiffInfo     Info to init from
      */
     void initFromFiffInfo(FIFFLIB::FiffInfo::SPtr pFiffInfo);
 
@@ -131,7 +131,7 @@ public:
     /**
      * Sets the file name of the xml layout.
      *
-     * @param[in] layout which should be set.
+     * @param\[in\] layout which should be set.
      */
     inline void setXMLLayoutFile(const QString& layout);
 
@@ -139,7 +139,7 @@ public:
     /**
      * Sets the sampling rate of the RealTimeMultiSampleArray Measurement.
      *
-     * @param[in] fSamplingRate the sampling rate of the RealTimeMultiSampleArray.
+     * @param\[in\] fSamplingRate the sampling rate of the RealTimeMultiSampleArray.
      */
     inline void setSamplingRate(float fSamplingRate);
 
@@ -179,7 +179,7 @@ public:
     /**
      * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
      *
-     * @param [in] iMultiArraySize the number of values.
+     * @param\[in\] iMultiArraySize the number of values.
      */
     inline void setMultiArraySize(qint32 iMultiArraySize);
 
@@ -203,7 +203,7 @@ public:
     /**
      * Attaches a value to the sample array list.
      *
-     * @param [in] mat   the value which is attached to the sample array list.
+     * @param\[in\] mat   the value which is attached to the sample array list.
      */
     virtual void setValue(const Eigen::MatrixXd& mat);
 

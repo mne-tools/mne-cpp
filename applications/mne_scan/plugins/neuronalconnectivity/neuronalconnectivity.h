@@ -149,7 +149,7 @@ public:
     /**
      * Udates the pugin with new (incoming) data.
      *
-     * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
+     * @param\[in\] pMeasurement    The incoming data in form of a generalized Measurement.
      */
     void updateSource(SCMEASLIB::Measurement::SPtr pMeasurement);
 
@@ -157,7 +157,7 @@ public:
     /**
      * Updates the real time multi sample array data
      *
-     * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
+     * @param\[in\] pMeasurement    The incoming data in form of a generalized Measurement.
      */
     void updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement);
 
@@ -165,7 +165,7 @@ public:
     /**
      * Slot to update the fiff evoked
      *
-     * @param[in] pMeasurement   The evoked to be appended
+     * @param\[in\] pMeasurement   The evoked to be appended
      */
     void updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement);
 
@@ -189,7 +189,7 @@ protected:
     /**
      * Slot called when a new real-time connectivity estimate is available.
      *
-     * @param [in] connectivityResult        The new connectivity estimate
+     * @param\[in\] connectivityResult        The new connectivity estimate
      */
     void onNewConnectivityResultAvailable(const QList<CONNECTIVITYLIB::Network>& connectivityResults,
                                           const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
@@ -198,7 +198,7 @@ protected:
     /**
      * Slot called when the metric changed.
      *
-     * @param [in] sMetric        The new metric
+     * @param\[in\] sMetric        The new metric
      */
     void onMetricChanged(const QString &sMetric);
 
@@ -206,7 +206,7 @@ protected:
     /**
      * Slot called when the number of trials changed.
      *
-     * @param [in] iNumberTrials        The new number of trials.
+     * @param\[in\] iNumberTrials        The new number of trials.
      */
     void onNumberTrialsChanged(int iNumberTrials);
 
@@ -214,7 +214,7 @@ protected:
     /**
      * Slot called when the window type changed.
      *
-     * @param [in] windowType        The new window type
+     * @param\[in\] windowType        The new window type
      */
     void onWindowTypeChanged(const QString& windowType);
 
@@ -222,7 +222,7 @@ protected:
     /**
      * Slot called when the trigger type changed.
      *
-     * @param [in] triggerType        The new trigger type.
+     * @param\[in\] triggerType        The new trigger type.
      */
     void onTriggerTypeChanged(const QString& triggerType);
 
@@ -230,8 +230,8 @@ protected:
     /**
      * Slot called when the frequency band changed.
      *
-     * @param [in] fFreqLow        The new lower frequency band.
-     * @param [in] fFreqHigh       The new higher frequency band.
+     * @param\[in\] fFreqLow        The new lower frequency band.
+     * @param\[in\] fFreqHigh       The new higher frequency band.
      */
     void onFrequencyBandChanged(float fFreqLow, float fFreqHigh);
 

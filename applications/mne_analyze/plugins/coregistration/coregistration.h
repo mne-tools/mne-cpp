@@ -132,7 +132,7 @@ private:
     /**
      * Removes BEM model from stored list and GUI drop down list
      *
-     * @param [in] pRemovedModel    model being removed
+     * @param\[in\] pRemovedModel    model being removed
      *
      * @return  whether model is removed (true if removed, false if not removed)
      */
@@ -148,7 +148,7 @@ private:
     /**
      * Connected to GUI dropdown to select bem based on bem name input.
      *
-     * @param[in] text  name of bem selected in the GUI.
+     * @param\[in\] text  name of bem selected in the GUI.
      */
     void onChangeSelectedBem(const QString &sText);
 
@@ -174,7 +174,7 @@ private:
     /**
      * Call this funciton whenever new digitzers were loaded.
      *
-     * @param[in] sFilePath     The file path to the new digitzers.
+     * @param\[in\] sFilePath     The file path to the new digitzers.
      */
     void onDigitizersChanged(const QString& sFilePath);
 
@@ -182,7 +182,7 @@ private:
     /**
      * Call this funciton whenever new fiducials were loaded.
      *
-     * @param[in] sFilePath     The file path to the new digitzers.
+     * @param\[in\] sFilePath     The file path to the new digitzers.
      */
     void onFiducialsChanged(const QString& sFilePath);
 
@@ -190,7 +190,7 @@ private:
     /**
      * Load existing transformation from file.
      *
-     * @param[in] sFilePath     The file path to the transformation.
+     * @param\[in\] sFilePath     The file path to the transformation.
      */
     void onLoadTrans(const QString& sFilePath);
 
@@ -198,7 +198,7 @@ private:
     /**
      * Store the transformation to the given file path.
      *
-     * @param[in] sFilePath     The file path to store the transformation.
+     * @param\[in\] sFilePath     The file path to store the transformation.
      */
     void onStoreTrans(const QString& sFilePath);
 
@@ -212,9 +212,9 @@ private:
     /**
      * Perform the actual Coregistration with the ICP algorithm.
      *
-     * @param[in] transInit     The finitial coordinate transformation matrix.
-     * @param[in] digSetHSP     The digitizer set containing the Head Shap Points, HPI coils, etc..
-     * @param[in] bemHead       The head surface.
+     * @param\[in\] transInit     The finitial coordinate transformation matrix.
+     * @param\[in\] digSetHSP     The digitizer set containing the Head Shap Points, HPI coils, etc..
+     * @param\[in\] bemHead       The head surface.
      *
      * @return The resulting coordinate transformation from head to mri space.
      */
@@ -246,7 +246,7 @@ private:
      *
      * Following https://math.stackexchange.com/a/1463487
      *
-     * @param[in] matTrans      The transformation matrix to obtain the parametrs from.
+     * @param\[in\] matTrans      The transformation matrix to obtain the parametrs from.
      * @param[out] vecTrans     The translation vector (x,y,z).
      * @param[out] vecRot       The rotation angle vector in rad (due to euler transformation: z,y,x) .
      * @param[out] vecScale     The vector with the scaling parameters (x,y,z).
@@ -261,9 +261,9 @@ private:
      * Get the transformation matrix from the parameters (rotation euler angle, translation, scale)
      *
      * @param[out] matTrans    The transformation matrix to store the parameters in.
-     * @param[in] vecTrans     The translation vector (x,y,z).
-     * @param[in] vecRot       The rotation angle vector in rad (due to euler transformation: z,y,x).
-     * @param[in] vecScale     The vector with the scaling parameters (x,y,z).
+     * @param\[in\] vecTrans     The translation vector (x,y,z).
+     * @param\[in\] vecRot       The rotation angle vector in rad (due to euler transformation: z,y,x).
+     * @param\[in\] vecScale     The vector with the scaling parameters (x,y,z).
      */
     void getTransFromParam(Matrix4f& matTrans,
                            const Vector3f& vecRot,
@@ -274,7 +274,7 @@ private:
     /**
      * Store the fiducials to the given file path
      *
-     * @param[in] sFilePath     The file path to store the fiducials
+     * @param\[in\] sFilePath     The file path to store the fiducials
      */
     void onStoreFiducials(const QString& sFilePath);
 
@@ -288,7 +288,7 @@ private:
     /**
      * Sends event to trigger loading bar to appear and sMessage to show
      *
-     * @param [in] sMessage     loading bar message
+     * @param\[in\] sMessage     loading bar message
      */
     void triggerLoadingStart(QString sMessage);
 
@@ -302,7 +302,7 @@ private:
     /**
      * Loads new  model when current loaded model is changed
      *
-     * @param [in,out] pNewModel    pointer to currently loaded FiffRawView Model
+     * @param[in, out] pNewModel    pointer to currently loaded FiffRawView Model
      */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
@@ -310,7 +310,7 @@ private:
     /**
      * Handles clearing view if currently used model is being removed
      *
-     * @param [in] pRemovedModel    Pointer to model being removed
+     * @param\[in\] pRemovedModel    Pointer to model being removed
      */
     void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
 

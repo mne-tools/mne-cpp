@@ -85,9 +85,9 @@ public:
     /**
      * Constructs a NatusProducer which is a child of parent.
      *
-     * @param [in] iBlockSize The block size to init the data matrix with.
-     * @param [in] iChannelSize The channel size to init the data matrix with.
-     * @param [in] parent pointer to parent widget.
+     * @param\[in\] iBlockSize The block size to init the data matrix with.
+     * @param\[in\] iChannelSize The channel size to init the data matrix with.
+     * @param\[in\] parent pointer to parent widget.
      */
     explicit NatusProducer(int iBlockSize,
                            int iChannelSize,
@@ -104,7 +104,7 @@ protected:
     /**
      * Parsed the received datagram.
      *
-     * @param [in] datagram The received datagram.
+     * @param\[in\] datagram The received datagram.
      */
     void processDatagram(const QNetworkDatagram &datagram);
 
@@ -120,7 +120,7 @@ signals:
     /**
      * Emit this signal whenever a new data matrix is available.
      *
-     * @param [in] matData The newly parsed data.
+     * @param\[in\] matData The newly parsed data.
      */
     void newDataAvailable(const Eigen::MatrixXd &matData);
 };

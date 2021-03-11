@@ -100,7 +100,7 @@ public:
     /**
      * Constructs a SettingsControllerCl object.
      *
-     * @param [in] arguments    String list containing the input arguments in form of a QStringList.
+     * @param\[in\] arguments    String list containing the input arguments in form of a QStringList.
      */
     SettingsControllerCl(const QStringList& arguments);
 
@@ -130,7 +130,7 @@ protected:
      * Processes the input parser and configures the state of the FiffAnonymizer instance according to
      * the options selected. Including input and output files treatment, execution modes and anonymizing options.
      *
-     * @param[in] arguments The arguments to parse.
+     * @param\[in\] arguments The arguments to parse.
      *
      * @return Returns true if parsing was successful, false otherwise.
      */
@@ -160,7 +160,7 @@ private:
      * Processes the input parser and configures the state of the FiffAnonymizer instance according to
      * the options selected. Including input and output files treatment, execution modes and anonymizing options.
      *
-     * @param[in] arguments The arguments to parse.
+     * @param\[in\] arguments The arguments to parse.
      *
      * @return Returns true if parsing was successful, false otherwise.
      */
@@ -224,7 +224,7 @@ private:
      * @details Many memeber functions require some text to be printed in the console. This member method allows to abstract from that call
      * the state of the object (Verbose Mode On/Off, Silent Mode On/Off) making it more easily readable.
      *
-     * @param [in] str String to print.
+     * @param\[in\] str String to print.
      *
      */
     void printIfVerbose(const QString& str) const;

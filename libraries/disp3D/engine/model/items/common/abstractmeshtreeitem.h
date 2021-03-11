@@ -99,9 +99,9 @@ public:
     /**
      * Default constructor.
      *
-     * @param[in] p3DEntityParent    The parent 3D entity.
-     * @param[in] iType              The type of the item. See types.h for declaration and definition.
-     * @param[in] text               The text of this item. This is also by default the displayed name of the item in a view.
+     * @param\[in\] p3DEntityParent    The parent 3D entity.
+     * @param\[in\] iType              The type of the item. See types.h for declaration and definition.
+     * @param\[in\] text               The text of this item. This is also by default the displayed name of the item in a view.
      */
     explicit AbstractMeshTreeItem(Qt3DCore::QEntity* p3DEntityParent = Q_NULLPTR,
                                   int iType = Data3DTreeModelItemTypes::AbstractMeshItem,
@@ -119,11 +119,11 @@ public:
     /**
      * Set the needed information to create the mesh and then creates a new mesh.
      *
-     * @param[in] tMatVert       Vertices in form of a matrix.
-     * @param[in] tMatNorm       Normals in form of a matrix.
-     * @param[in] tMatTris       Tris/Faces in form of a matrix.
-     * @param[in] tMatColors     The color info of all the vertices.
-     * @param[in] primitiveType  The primitive type of the mesh lines, triangles, etc.
+     * @param\[in\] tMatVert       Vertices in form of a matrix.
+     * @param\[in\] tMatNorm       Normals in form of a matrix.
+     * @param\[in\] tMatTris       Tris/Faces in form of a matrix.
+     * @param\[in\] tMatColors     The color info of all the vertices.
+     * @param\[in\] primitiveType  The primitive type of the mesh lines, triangles, etc.
      */
     void setMeshData(const Eigen::MatrixX3f& tMatVert,
                      const Eigen::MatrixX3f& tMatNorm,
@@ -143,7 +143,7 @@ public:
     /**
      * Set new vertices colors to the mesh.
      *
-     * @param[in] vertColor  New color matrix Eigen::MatrixX3f.
+     * @param\[in\] vertColor  New color matrix Eigen::MatrixX3f.
      *
      * @return The costum mesh.
      */
@@ -160,7 +160,7 @@ protected:
     /**
      * Call this function whenever the inner tesselation value changed.
      *
-     * @param[in] fTessInner     The new inner tesselation value.
+     * @param\[in\] fTessInner     The new inner tesselation value.
      */
     virtual void onSurfaceTessInnerChanged(const QVariant& fTessInner);
 
@@ -168,7 +168,7 @@ protected:
     /**
      * Call this function whenever the outer tesselation value changed.
      *
-     * @param[in] fTessOuter     The new outer tesselation value.
+     * @param\[in\] fTessOuter     The new outer tesselation value.
      */
     virtual void onSurfaceTessOuterChanged(const QVariant& fTessOuter);
 
@@ -176,7 +176,7 @@ protected:
     /**
      * Call this function whenever the triangle scale value changed.
      *
-     * @param[in] fTriangleScale     The triangle scale value.
+     * @param\[in\] fTriangleScale     The triangle scale value.
      */
     virtual void onSurfaceTriangleScaleChanged(const QVariant& fTriangleScale);
 
@@ -184,7 +184,7 @@ protected:
     /**
      * Call this function whenever the surface color was changed.
      *
-     * @param[in] color        The new surface color.
+     * @param\[in\] color        The new surface color.
      */
     virtual void onColorChanged(const QVariant& color);
 
@@ -192,7 +192,7 @@ protected:
     /**
      * Call this function whenever the surface material was changed.
      *
-     * @param[in] material        The new surface material.
+     * @param\[in\] material        The new surface material.
      */
     virtual void onSurfaceMaterialChanged(const QVariant& sMaterial);
 

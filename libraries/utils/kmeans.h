@@ -82,12 +82,12 @@ public:
     /**
      * Constructs a KMeans algorithm object.
      *
-     * @param[in] distance   (optional) K-Means distance measure: "sqeuclidean" (default), "cityblock" , "cosine", "correlation", "hamming"
-     * @param[in] start      (optional) Cluster initialization: "sample" (default), "uniform", "cluster"
-     * @param[in] replicates (optional) Number of K-Means replicates, which are generated. Best is returned.
-     * @param[in] emptyact   (optional) What happens if a cluster wents empty: "error" (default), "drop", "singleton"
-     * @param[in] online     (optional) If centroids should be updated during iterations: true (default), false
-     * @param[in] maxit      (optional) maximal number of iterations per replicate; 100 by default
+     * @param\[in\] distance   (optional) K-Means distance measure: "sqeuclidean" (default), "cityblock" , "cosine", "correlation", "hamming"
+     * @param\[in\] start      (optional) Cluster initialization: "sample" (default), "uniform", "cluster"
+     * @param\[in\] replicates (optional) Number of K-Means replicates, which are generated. Best is returned.
+     * @param\[in\] emptyact   (optional) What happens if a cluster wents empty: "error" (default), "drop", "singleton"
+     * @param\[in\] online     (optional) If centroids should be updated during iterations: true (default), false
+     * @param\[in\] maxit      (optional) maximal number of iterations per replicate; 100 by default
      */
     explicit KMeans(QString distance = QString("sqeuclidean") ,
                     QString start = QString("sample"),
@@ -100,8 +100,8 @@ public:
     /**
      * Clusters input data X
      *
-     * @param[in] X          Input data (rows = points; cols = p dimensional space)
-     * @param[in] kClusters  Number of k clusters
+     * @param\[in\] X          Input data (rows = points; cols = p dimensional space)
+     * @param\[in\] kClusters  Number of k clusters
      * @param[out] idx       The cluster indeces to which cluster the input points belong to
      * @param[out] C         Cluster centroids k x p
      * @param[out] sumD      Summation of the distances to the centroid within one cluster
@@ -119,8 +119,8 @@ private:
     /**
      * Calculate point to cluster centroid distances.
      *
-     * @param[in] X  Input data (rows = points; cols = p dimensional space)
-     * @param[in] C  Cluster centroids
+     * @param\[in\] X  Input data (rows = points; cols = p dimensional space)
+     * @param\[in\] C  Cluster centroids
      *
      * @return Cluster centroid distances
      */
@@ -131,7 +131,7 @@ private:
     /**
      * Updates clusters when points moved
      *
-     * @param[in] X          Input data
+     * @param\[in\] X          Input data
      * @param[in, out] C     Cluster centroids
      * @param[in, out] idx   The cluster indeces to which cluster the input points belong to
      *
@@ -145,9 +145,9 @@ private:
     /**
      * Centroids and counts stratified by group.
      *
-     * @param[in] X          Input data
-     * @param[in] index      The cluster indeces to which cluster the input points belong to
-     * @param[in] clusts     Cluster indeces
+     * @param\[in\] X          Input data
+     * @param\[in\] index      The cluster indeces to which cluster the input points belong to
+     * @param\[in\] clusts     Cluster indeces
      * @param[out] centroids The new centroids
      * @param[out] counts    Number of points belonging to the new centroids
      */
@@ -161,7 +161,7 @@ private:
     /**
      * Centroids and counts stratified by group.
      *
-     * @param[in] X          Input data
+     * @param\[in\] X          Input data
      * @param[out] C         The new centroids
      * @param[out] idx       The new indeces
      *
@@ -175,8 +175,8 @@ private:
     /**
      * Uniform random generator in the intervall [a, b]
      *
-     * @param[in] a      lower boundary
-     * @param[in] b      upper boundary
+     * @param\[in\] a      lower boundary
+     * @param\[in\] b      upper boundary
      *
      * @return random number
      */

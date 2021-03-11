@@ -99,7 +99,7 @@ public:
     /**
      * Perform actual covariance estimation.
      *
-     * @param[in] inputData  Data to estimate the covariance from.
+     * @param\[in\] inputData  Data to estimate the covariance from.
      */
     FIFFLIB::FiffCov estimateCovariance(const Eigen::MatrixXd& matData,
                                         int iNewMaxSamples);
@@ -109,7 +109,7 @@ protected:
     /**
      * Computer multiplication with transposed.
      *
-     * @param[in] matData  Data to self multiply with.
+     * @param\[in\] matData  Data to self multiply with.
      *
      * @return   The multiplication result.
      */
@@ -120,7 +120,7 @@ protected:
      * Computer multiplication with transposed.
      *
      * @param[out]   finalResult     The final covariance estimation.
-     * @param[in]    tempResult      The intermediate result from the compute function
+     * @param\[in\]   tempResult      The intermediate result from the compute function
      */
     static void reduce(RtCovComputeResult& finalResult, const RtCovComputeResult &tempResult);
 

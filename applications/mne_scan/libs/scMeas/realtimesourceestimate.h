@@ -87,7 +87,7 @@ public:
     /**
      * Constructs a RealTimeSourceEstimate.
      *
-     * @param[in] parent     the QObject parent of this measurement
+     * @param\[in\] parent     the QObject parent of this measurement
      */
     RealTimeSourceEstimate(QObject *parent = 0);
 
@@ -101,7 +101,7 @@ public:
     /**
      * Sets the annotation set.
      *
-     * @param[in] annotSet   the annotation set to set
+     * @param\[in\] annotSet   the annotation set to set
      */
     inline void setAnnotSet(FSLIB::AnnotationSet::SPtr& annotSet);
 
@@ -117,7 +117,7 @@ public:
     /**
      * Sets the surface set.
      *
-     * @param[in] surfSet   the surface set to set
+     * @param\[in\] surfSet   the surface set to set
      */
     inline void setSurfSet(FSLIB::SurfaceSet::SPtr& surfSet);
 
@@ -133,7 +133,7 @@ public:
     /**
      * Sets the mri head transformation.
      *
-     * @param[in] mriHeadTrans   The transformation to set
+     * @param\[in\] mriHeadTrans   The transformation to set
      */
     inline void setMriHeadTrans(FIFFLIB::FiffCoordTrans& mriHeadTrans);
 
@@ -149,7 +149,7 @@ public:
     /**
      * Sets the forward solution.
      *
-     * @param[in] fwdSolution   the forward solution to set
+     * @param\[in\] fwdSolution   the forward solution to set
      */
     inline void setFwdSolution(MNELIB::MNEForwardSolution::SPtr& fwdSolution);
 
@@ -166,7 +166,7 @@ public:
      * Attaches a value to the sample array vector.
      * This method is inherited by Measurement.
      *
-     * @param [in] v the value which is attached to the sample array vector.
+     * @param\[in\] v the value which is attached to the sample array vector.
      */
     virtual void setValue(MNELIB::MNESourceEstimate &v);
 
@@ -191,7 +191,7 @@ public:
     /**
      * Sets the current FiffInfo.
      *
-     * @param [in] p_fiffInfo the new FiffInfo..
+     * @param\[in\] p_fiffInfo the new FiffInfo..
      */
     void setFiffInfo(FIFFLIB::FiffInfo::SPtr p_fiffInfo);
 
@@ -207,7 +207,7 @@ public:
     /**
      * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
      *
-     * @param [in] iSourceEstimateSize the number of values.
+     * @param\[in\] iSourceEstimateSize the number of values.
      */
     inline void setSourceEstimateSize(qint32 iSourceEstimateSize);
 

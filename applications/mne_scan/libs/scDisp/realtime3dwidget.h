@@ -113,7 +113,7 @@ public:
     /**
      * Constructs a RealTime3DWidget which is a child of parent.
      *
-     * @param [in] parent    pointer to parent widget; If parent is 0, the new NumericWidget becomes a window.
+     * @param\[in\] parent    pointer to parent widget; If parent is 0, the new NumericWidget becomes a window.
      */
     RealTime3DWidget(QWidget* parent = 0);
 
@@ -133,7 +133,7 @@ public:
     /**
      * Is called when new data are available.
      *
-     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
+     * @param\[in\] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
      */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
@@ -141,7 +141,7 @@ public:
     /**
      * Call this function whenever the digitizer changed and you want to align fiducials.
      *
-     * @param[in] sFilePath    The file path to the new digitzers.
+     * @param\[in\] sFilePath    The file path to the new digitzers.
      */
     void alignFiducials(const QString& sFilePath);
 

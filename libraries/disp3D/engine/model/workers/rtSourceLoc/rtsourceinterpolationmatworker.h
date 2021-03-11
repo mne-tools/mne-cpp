@@ -101,7 +101,7 @@ public:
      * This function sets the function that is used in the interpolation process.
      * Warning: Using this function can take some seconds because recalculation are required.
      *
-     * @param[in] sInterpolationFunction     Function that computes interpolation coefficients using the distance values.
+     * @param\[in\] sInterpolationFunction     Function that computes interpolation coefficients using the distance values.
      */
     void setInterpolationFunction(const QString &sInterpolationFunction);
 
@@ -109,7 +109,7 @@ public:
     /**
      * Set the visualization type.
      *
-     * @param[in] iVisType               The new visualization type.
+     * @param\[in\] iVisType               The new visualization type.
      */
     void setVisualizationType(int iVisType);
 
@@ -119,7 +119,7 @@ public:
      * Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
      * Warning: Using this function can take some seconds because recalculation are required.
      *
-     * @param[in] dCancelDist           The new cancel distance value in meters.
+     * @param\[in\] dCancelDist           The new cancel distance value in meters.
      */
     void setCancelDistance(double dCancelDist);
 
@@ -128,9 +128,9 @@ public:
      * Sets the information needed creating the interpolation matrix.
      * Warning: Using this function can take some seconds because recalculation are required.
      *
-     * @param[in] matVertices               The mesh information in form of vertices.
-     * @param[in] vecNeighborVertices       The neighbor vertex information.
-     * @param[in] vecMappedSubset           Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to.
+     * @param\[in\] matVertices               The mesh information in form of vertices.
+     * @param\[in\] vecNeighborVertices       The neighbor vertex information.
+     * @param\[in\] vecMappedSubset           Vector index position represents the id of the sensor and the qint in each cell is the vertex it is mapped to.
      *
      * @return Returns the created interpolation matrix.
      */
@@ -142,9 +142,9 @@ public:
     /**
      * Set annotation data.
      *
-     * @param[in] vecLabelIds       The labels ids for each of the right hemipshere surface vertex idx.
-     * @param[in] lLabels           The label information for the right hemipshere.
-     * @param[in] vecVertNo         The vertNos for the right hemisphere.
+     * @param\[in\] vecLabelIds       The labels ids for each of the right hemipshere surface vertex idx.
+     * @param\[in\] lLabels           The label information for the right hemipshere.
+     * @param\[in\] vecVertNo         The vertNos for the right hemisphere.
      */
     void setAnnotationInfo(const Eigen::VectorXi &vecLabelIds,
                            const QList<FSLIB::Label> &lLabels,
@@ -202,7 +202,7 @@ signals:
     /**
      * Emit this signal whenever a new interpolation matrix was calcualted.
      *
-     * @param[in] pMatInterpolationMatrix     The new interpolation matrix.
+     * @param\[in\] pMatInterpolationMatrix     The new interpolation matrix.
      */
     void newInterpolationMatrixCalculated(QSharedPointer<Eigen::SparseMatrix<float> > pMatInterpolationMatrix);
 };

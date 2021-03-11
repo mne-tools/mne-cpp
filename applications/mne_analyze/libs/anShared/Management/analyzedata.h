@@ -174,7 +174,7 @@ public:
     /**
      * Add subject with name sSubjectName to BidsViewModel singleton
      *
-     * @param [in] sSubjectName     Name of the new subject item
+     * @param[in] sSubjectName     Name of the new subject item
      *
      * @return returns pointer to new subject item
      */
@@ -184,7 +184,7 @@ public:
     /**
      * Updates stored indexes of currently selected data and item
      *
-     * @param [in] index    index of the new selected item
+     * @param[in] index    index of the new selected item
      */
     void newSelection(const QModelIndex &index);
 
@@ -295,7 +295,7 @@ private:
     /**
      * Returns a list of all items (including child items) in the BidsViewModel;
      *
-     * @param [in] parent   index of parent to search under. QModelIndex() by default
+     * @param[in] parent   index of parent to search under. QModelIndex() by default
      *
      * @return list of all items in BidsViewModel
      */

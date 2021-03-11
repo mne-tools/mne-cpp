@@ -101,7 +101,7 @@ public:
     /**
      * Constructs a EEGoSportsDriver.
      *
-     * @param [in] pEEGoSportsProducer a pointer to the corresponding EEGoSportsProducer class.
+     * @param\[in\] pEEGoSportsProducer a pointer to the corresponding EEGoSportsProducer class.
      */
     EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer);
 
@@ -115,8 +115,8 @@ public:
     /**
      * Get sample from the device in form of a mtrix.
      *
-     * @param [in] MatrixXf the block sample values in form of a matrix.
-     * @param [out] bool returns true if sample was successfully written to the input variable, false otherwise.
+     * @param\[in\] MatrixXf the block sample values in form of a matrix.
+     * @param+[\[]out] bool returns true if sample was successfully written to the input variable, false otherwise.
      */
     bool getSampleMatrixValue(Eigen::MatrixXd& sampleMatrix);
 
@@ -124,11 +124,11 @@ public:
     /**
      *  Initialise device.
      *
-     *  @param [in] iNumberOfChannels number of channels specified by the user.
-     *  @param [in] iSamplesPerBlock samples per block specified by the user.
-     *  @param [in] iSamplingFrequency sampling frequency specified by the user.
-     *  @param [in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
-     *  @param [in] bMeasureImpedance Flag for measuring impedances.
+     *  @param\[in\] iNumberOfChannels number of channels specified by the user.
+     *  @param\[in\] iSamplesPerBlock samples per block specified by the user.
+     *  @param\[in\] iSamplingFrequency sampling frequency specified by the user.
+     *  @param\[in\] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
+     *  @param\[in\] bMeasureImpedance Flag for measuring impedances.
      */
     bool initDevice(bool bWriteDriverDebugToFile,
                     bool bMeasureImpedance);
@@ -137,9 +137,9 @@ public:
     /**
      *  Start recording.
      *
-     *  @param [in] iSamplesPerBlock samples per block specified by the user.
-     *  @param [in] iSamplingFrequency sampling frequency specified by the user.
-     *  @param [in] bMeasureImpedance Flag for measuring impedances.
+     *  @param\[in\] iSamplesPerBlock samples per block specified by the user.
+     *  @param\[in\] iSamplingFrequency sampling frequency specified by the user.
+     *  @param\[in\] bMeasureImpedance Flag for measuring impedances.
      */
     bool startRecording(int iSamplesPerBlock,
                         int iSamplingFrequency,
@@ -149,7 +149,7 @@ public:
     /**
      *  Uninitialise device.
      *
-     *  @param [out] bool returns true if device was successfully uninitialised, false otherwise.
+     *  @param+[\[]out] bool returns true if device was successfully uninitialised, false otherwise.
      */
     bool uninitDevice();
 

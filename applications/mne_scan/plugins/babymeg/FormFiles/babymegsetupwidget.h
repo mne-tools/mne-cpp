@@ -86,8 +86,8 @@ public:
     /**
      * Constructs a BabyMEGSetupWidget which is a child of parent.
      *
-     * @param [in] p_pBabyMEG   a pointer to the corresponding BabyMEG.
-     * @param [in] parent        pointer to parent widget; If parent is 0, the new BabyMEGSetupWidget becomes a window. If parent is another widget, BabyMEGSetupWidget becomes a child window inside parent. BabyMEGSetupWidget is deleted when its parent is deleted.
+     * @param\[in\] p_pBabyMEG   a pointer to the corresponding BabyMEG.
+     * @param\[in\] parent        pointer to parent widget; If parent is 0, the new BabyMEGSetupWidget becomes a window. If parent is another widget, BabyMEGSetupWidget becomes a child window inside parent. BabyMEGSetupWidget is deleted when its parent is deleted.
      */
     BabyMEGSetupWidget(BabyMEG* p_pBabyMEG, QWidget *parent = 0);
 
@@ -102,7 +102,7 @@ public:
     /**
      * Set command connection status
      *
-     * @param[in] bConnectionStatus    the connection status
+     * @param\[in\] bConnectionStatus    the connection status
      */
     void setConnectionStatus(bool bConnectionStatus);
 

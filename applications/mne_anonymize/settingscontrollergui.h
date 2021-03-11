@@ -97,7 +97,7 @@ public slots:
      *
      * @brief Manages the event of the input file path (through the QLineEdit or throught he fileMenu) has been updated.
      *
-     * @param [in] str String containing the path of the input file.
+     * @param\[in\] str String containing the path of the input file.
      *
      */
     void fileInChanged(const QString& strInFile);
@@ -107,7 +107,7 @@ public slots:
      *
      * @brief Manages the event of the input file path (through the QLineEdit or throught he fileMenu) has been updated.
      *
-     * @param [in] str String containing the path of the input file.
+     * @param\[in\] str String containing the path of the input file.
      *
      */
     void fileOutChanged(const QString& strOutFile);

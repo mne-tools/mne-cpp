@@ -101,7 +101,7 @@ public:
      * Calculates the absolute value of coherency of the rows of the data matrix.
      *
      * @param[out]   finalNetwork          The resulting network.
-     * @param[in]    connectivitySettings  The input data and parameters.
+     * @param\[in\]   connectivitySettings  The input data and parameters.
      */
     static void calculateAbs(Network& finalNetwork,
                              ConnectivitySettings &connectivitySettings);
@@ -111,7 +111,7 @@ public:
      * Calculates the imaginary part of coherency of the rows of the data matrix.
      *
      * @param[out]   finalNetwork          The resulting network.
-     * @param[in]    connectivitySettings  The input data and parameters.
+     * @param\[in\]   connectivitySettings  The input data and parameters.
      */
     static void calculateImag(Network& finalNetwork,
                               ConnectivitySettings &connectivitySettings);
@@ -121,14 +121,14 @@ private:
     /**
      * Computes the coherency values. This function gets called in parallel.
      *
-     * @param[in]    inputData           The input data.
+     * @param\[in\]   inputData           The input data.
      * @param[out]   matPsdSum           The sum of all PSD matrices for each trial.
      * @param[out]   vecPairCsdSum       The sum of all CSD matrices for each trial.
-     * @param[in]    mutex               The mutex used to safely access matPsdSum and vecPairCsdSum.
-     * @param[in]    iNRows              The number of rows.
-     * @param[in]    iNFreqs             The number of frequenciy bins.
-     * @param[in]    iNfft               The FFT length.
-     * @param[in]    tapers              The taper information.
+     * @param\[in\]   mutex               The mutex used to safely access matPsdSum and vecPairCsdSum.
+     * @param\[in\]   iNRows              The number of rows.
+     * @param\[in\]   iNFreqs             The number of frequenciy bins.
+     * @param\[in\]   iNfft               The FFT length.
+     * @param\[in\]   tapers              The taper information.
      */
     static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         Eigen::MatrixXd& matPsdSum,

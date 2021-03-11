@@ -122,7 +122,7 @@ private slots:
     /**
      * Receives a list of graphic itemms, stores aparmeters locally and sends them to event manager
      *
-     * @param [in] selectedChannelItems     List of parameters of graphics items
+     * @param\[in\] selectedChannelItems     List of parameters of graphics items
      */
     void onSelectionChanged(const QList<QGraphicsItem*>& selectedChannelItems);
 
@@ -131,7 +131,7 @@ private:
     /**
      * Receives new model and updates stored FiffInfo
      *
-     * @param [in] pNewModel    new loaded model
+     * @param\[in\] pNewModel    new loaded model
      */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
@@ -139,7 +139,7 @@ private:
     /**
      * Handles clearing view if currently used model is being removed
      *
-     * @param [in] pRemovedModel    Pointer to model being removed
+     * @param\[in\] pRemovedModel    Pointer to model being removed
      */
     void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
 
@@ -147,7 +147,7 @@ private:
     /**
      * Sets up channel info model and Channel selection view / subsequently updates with new fiff info
      *
-     * @param [in] pFiffInfo    FiffInfo for currently loaded file
+     * @param\[in\] pFiffInfo    FiffInfo for currently loaded file
      */
     void setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 

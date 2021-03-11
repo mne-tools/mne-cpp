@@ -90,7 +90,7 @@ public:
     /**
      * Sets the scale map to scaleMap.
      *
-     * @param [in] scaleMap map with all channel types and their current scaling value.
+     * @param\[in\] scaleMap map with all channel types and their current scaling value.
      */
     void setScaleMap(const QMap<qint32, float> &scaleMap);
 
@@ -98,7 +98,7 @@ public:
     /**
      * Repaints all items from the layout data in the scene.
      *
-     *  @param [in] selectedChannelItems    items which are to painted to the average scene
+     *  @param\[in\] selectedChannelItems    items which are to painted to the average scene
      */
     void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
 
@@ -106,7 +106,7 @@ public:
     /**
      * Repaints all items from the layout data in the scene from a SelectionItem object
      *
-     * @param [in] selectedChannelItems     data about items which are to be painted
+     * @param\[in\] selectedChannelItems     data about items which are to be painted
      */
     void repaintSelectionItems(const DISPLIB::SelectionItem &selectedChannelItems);
 
@@ -120,7 +120,7 @@ public:
     /**
      * Set the activation per average map information
      *
-     * @param [in] qMapActivationPerAverage     The average activation information.
+     * @param\[in\] qMapActivationPerAverage     The average activation information.
      */
     void setActivationPerAverage(const QSharedPointer<QMap<QString, bool> > qMapActivationPerAverage);
 
@@ -128,7 +128,7 @@ public:
     /**
      * Set the color per average map information
      *
-     * @param [in] qMapAverageColor     The average color information.
+     * @param\[in\] qMapAverageColor     The average color information.
      */
     void setColorPerAverage(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
@@ -144,7 +144,7 @@ public:
     /**
      * Sets the signal color for the items the scene holds
      *
-     * @param signalColor
+     * @param\[in\] signalColor
      */
     void setSignalItemColor(const QColor &signalColor);
 

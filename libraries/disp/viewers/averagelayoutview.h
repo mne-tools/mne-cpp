@@ -94,7 +94,7 @@ public:
     /**
      * Constructs a AverageLayoutView which is a child of parent.
      *
-     * @param [in] parent    parent of widget
+     * @param[in] parent    parent of widget
      */
     AverageLayoutView(const QString& sSettingsPath = "",
                       QWidget *parent = 0,
@@ -117,7 +117,7 @@ public:
     /**
      * Sets the channel info model.
      *
-     * @param [in] pChannelInfoModel     The new channel info model.
+     * @param[in] pChannelInfoModel     The new channel info model.
      */
     void setChannelInfoModel(QSharedPointer<ChannelInfoModel> &pChannelInfoModel);
 
@@ -125,7 +125,7 @@ public:
     /**
      * Sets the evoked set model.
      *
-     * @param [in] pEvokedSetModel     The new evoked set model.
+     * @param[in] pEvokedSetModel     The new evoked set model.
      */
     void setEvokedSetModel(QSharedPointer<EvokedSetModel> pEvokedSetModel);
 
@@ -141,7 +141,7 @@ public:
     /**
      * Sets the background color of the scene.
      *
-     * @param [in] backgroundColor     The new background color.
+     * @param[in] backgroundColor     The new background color.
      */
     void setBackgroundColor(const QColor& backgroundColor);
 
@@ -157,7 +157,7 @@ public:
     /**
      * Renders a screenshot of the scene and saves it to the passed path. SVG and PNG supported.
      *
-     * @param [in] fileName     The file name and path where to store the screenshot.
+     * @param[in] fileName     The file name and path where to store the screenshot.
      */
     void takeScreenshot(const QString& fileName);
 
@@ -165,7 +165,7 @@ public:
     /**
      * Sets the scale map to scaleMap.
      *
-     * @param [in] scaleMap map with all channel types and their current scaling value.
+     * @param[in] scaleMap map with all channel types and their current scaling value.
      */
     void setScaleMap(const QMap<qint32, float> &scaleMap);
 
@@ -189,7 +189,7 @@ public:
     /**
      * Set the average colors
      *
-     * @param [in] qMapAverageColor      Pointer to the new average colors
+     * @param[in] qMapAverageColor      Pointer to the new average colors
      */
     void setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
@@ -197,7 +197,7 @@ public:
     /**
      * Sets the color used to draw the average to avgColor
      *
-     * @param [in] avgColor     Color of averaged signal
+     * @param[in] avgColor     Color of averaged signal
      */
     void setSingleAverageColor(const QColor& avgColor);
 
@@ -205,7 +205,7 @@ public:
     /**
      * Set the average activations
      *
-     * @param [in] qMapAverageActivation      Pointer to the new average activations
+     * @param[in] qMapAverageActivation      Pointer to the new average activations
      */
     void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 
@@ -213,7 +213,7 @@ public:
     /**
      * Stores FiffInfo to local variable to be used for getting channel info
      *
-     * @param [in] pFiffInfo    shared pointer to Fiff Info of currently loaded data
+     * @param[in] pFiffInfo    shared pointer to Fiff Info of currently loaded data
      */
     void setFiffInfo(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
@@ -221,7 +221,7 @@ public:
     /**
      * call this whenever the external channel selection manager changes
      *
-     * * @param [in] selectedChannelItems list of selected graphic items
+     * * @param[in] selectedChannelItems list of selected graphic items
      */
     void channelSelectionManagerChanged(const QList<QGraphicsItem *> &selectedChannelItems);
 
@@ -229,7 +229,7 @@ public:
     /**
      * Sets the currently viewable channels using the corrent name and location parameters
      *
-     * @param [in] data     QVariant containing a SelectionItem object with selected channel information
+     * @param[in] data     QVariant containing a SelectionItem object with selected channel information
      */
     void channelSelectionChanged(const QVariant &data);
 

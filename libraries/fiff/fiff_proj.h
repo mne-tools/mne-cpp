@@ -88,7 +88,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffProj  SSP projector data which should be copied
+     * @param\[in\] p_FiffProj  SSP projector data which should be copied
      */
     FiffProj(const FiffProj& p_FiffProj);
 
@@ -125,10 +125,10 @@ public:
      *
      * Make an SSP operator
      *
-     * @param[in] projs      A set of projection vectors
-     * @param[in] ch_names   A cell array of channel names
+     * @param\[in\] projs      A set of projection vectors
+     * @param\[in\] ch_names   A cell array of channel names
      * @param[out] proj      The projection operator to apply to the data
-     * @param[in] bads       Bad channels to exclude
+     * @param\[in\] bads       Bad channels to exclude
      * @param[out] U         The orthogonal basis of the projection vectors (optional)
      *
      * @return nproj - How many items in the projector
@@ -143,8 +143,8 @@ public:
     /**
      * overloading the stream out operator<<
      *
-     * @param[in] out           The stream to which the fiff projector should be assigned to.
-     * @param[in] p_FiffProj    Fiff projector which should be assigned to the stream.
+     * @param\[in\] out           The stream to which the fiff projector should be assigned to.
+     * @param\[in\] p_FiffProj    Fiff projector which should be assigned to the stream.
      *
      * @return the stream with the attached fiff projector
      */
