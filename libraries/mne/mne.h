@@ -325,7 +325,7 @@ public:
      * Read an event list from a fif file
      *
      * @param[in] p_IODevice   The I/O device to read from
-     * @param+[\[]out] eventlist    The read eventlist m x 3; with m events; colum: 1 - position in samples, 3 - eventcode
+     * @param[in, out] eventlist    The read eventlist m x 3; with m events; colum: 1 - position in samples, 3 - eventcode
      *
      * @return true if succeeded, false otherwise
      */
@@ -339,7 +339,7 @@ public:
      * Read a list of events from an eve file
      *
      * @param[in] p_IODevice   The I/O device to read from
-     * @param+[\[]out] eventList   List of events
+     * @param[in, out] eventList   List of events
      *
      * @return true if succeeded, false otherwise
      */
@@ -363,7 +363,7 @@ public:
      * @param[in] p_pStream     an open fiff file
      * @param[in] p_Node        look for the matrix in here
      * @param[in] cov_kind      what kind of a covariance matrix do we want?
-     * @param+[\[]out] p_covData    the read covariance matrix
+     * @param[in, out] p_covData    the read covariance matrix
      *
      * @return true if succeeded, false otherwise
      */
@@ -388,7 +388,7 @@ public:
      * Reads the inverse operator decomposition from a fif file
      *
      * @param[in] p_pIODevice   A fiff IO device like a fiff QFile or QTCPSocket
-     * @param+[\[]out] inv          The read inverse operator
+     * @param[in, out] inv          The read inverse operator
      *
      * @return true if succeeded, false otherwise
      */
@@ -410,7 +410,7 @@ public:
      * Reads a forward solution from a fif file
      *
      * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
-     * @param+[\[]out] fwd A forward solution from a fif file
+     * @param[in, out] fwd A forward solution from a fif file
      * @param[in] force_fixed   Force fixed source orientation mode? (optional)
      * @param[in] surf_ori      Use surface based source coordinate system? (optional)
      * @param[in] include       Include these channels (optional)
@@ -446,7 +446,7 @@ public:
      * @param[in] p_pStream         The open fiff file
      * @param[in] add_geom          Add geometry information to the source spaces
      *
-     * @param+[\[]out] p_SourceSpace    The read source spaces
+     * @param[in, out] p_SourceSpace    The read source spaces
      *
      * @return true if succeeded, false otherwise
      */
@@ -473,7 +473,7 @@ public:
      * @param[in] add_geom          Add geometry information to the source spaces
      * @param[in] p_Tree            Search for the source spaces here
      *
-     * @param+[\[]out] p_Surfaces       The read bem surfaces
+     * @param[in, out] p_Surfaces       The read bem surfaces
      *
      * @return true if succeeded, false otherwise
      */

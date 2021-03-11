@@ -93,7 +93,7 @@ public:
     /**
      * Reads the specified ANT elc-layout file.
      * @param[in] inputPoints       The input points in 3D space.
-     * @param+[\[]out] outputPoints     The output layout points in 2D space.
+     * @param[in, out] outputPoints     The output layout points in 2D space.
      * @param[in] names             The channel names.
      * @param[in] outFile           The outout file.
      * @param[in] do_fit            The flag whether to do a sphere fitting.

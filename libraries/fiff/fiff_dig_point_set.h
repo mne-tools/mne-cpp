@@ -118,7 +118,7 @@ public:
      * Reads FiffDigPointSet from a fif file
      *
      * @param+[\[]in, out] p_Stream     The opened fif file
-     * @param+[\[]out] p_Dig            The read digitizer point set
+     * @param[in, out] p_Dig            The read digitizer point set
      *
      * @return true if succeeded, false otherwise
      */

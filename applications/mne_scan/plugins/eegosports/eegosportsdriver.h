@@ -116,7 +116,7 @@ public:
      * Get sample from the device in form of a mtrix.
      *
      * @param[in] MatrixXf the block sample values in form of a matrix.
-     * @param+[\[]out] bool returns true if sample was successfully written to the input variable, false otherwise.
+     * @param[in, out] bool returns true if sample was successfully written to the input variable, false otherwise.
      */
     bool getSampleMatrixValue(Eigen::MatrixXd& sampleMatrix);
 
@@ -149,7 +149,7 @@ public:
     /**
      *  Uninitialise device.
      *
-     *  @param+[\[]out] bool returns true if device was successfully uninitialised, false otherwise.
+     *  @param[in, out] bool returns true if device was successfully uninitialised, false otherwise.
      */
     bool uninitDevice();
 

@@ -317,7 +317,7 @@ public:
      * Reads the inverse operator decomposition from a fif file
      *
      * @param[in] p_IODevice   A fiff IO device like a fiff QFile or QTCPSocket
-     * @param+[\[]out] inv          The read inverse operator
+     * @param[in, out] inv          The read inverse operator
      *
      * @return true if succeeded, false otherwise
      */

@@ -580,7 +580,7 @@ public:
     /**
      * Returns the input file which will be anonymized. .
      *
-     * @param+[\[]out] Returns a string containing the input file name including its path.
+     * @param[in, out] Returns a string containing the input file name including its path.
      */
     QString getFileNameIn() const;
 
@@ -588,7 +588,7 @@ public:
     /**
      * Returns the output file where anonymized data will be saved.
      *
-     * @param+[\[]out] Returns a string containing the output file name including its path.
+     * @param[in, out] Returns a string containing the output file name including its path.
      */
     QString getFileNameOut() const;
 
@@ -596,7 +596,7 @@ public:
     /**
      * Retrieves the state of the FiffAnonyzer object's desired verbose mode.
      *
-     * @param+[\[]out] Bool value with the actual verbose mode.
+     * @param[in, out] Bool value with the actual verbose mode.
      *
      */
     bool getVerboseMode() const;
