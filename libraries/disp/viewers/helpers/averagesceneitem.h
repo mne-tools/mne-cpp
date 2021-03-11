@@ -105,7 +105,7 @@ public:
     /**
      * Sets the item color to the input parameter viewColor
      *
-     * @param [in] viewColor    desired item color
+     * @param\[in\] viewColor    desired item color
      */
     void setDefaultColor(const QColor& viewColor);
 
@@ -138,7 +138,7 @@ protected:
     /**
      * Create a plot path and paint the average data
      *
-     * @param [in] painter The painter used to plot in this item.
+     * @param\[in\] painter The painter used to plot in this item.
      */
     void paintAveragePath(QPainter *painter);
 
@@ -146,7 +146,7 @@ protected:
     /**
      * Create a plot path and paint the average data
      *
-     * @param [in] painter The painter used to plot in this item.
+     * @param\[in\] painter The painter used to plot in this item.
      */
     void paintStimLine(QPainter *painter);
 

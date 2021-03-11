@@ -87,7 +87,7 @@ public:
     /**
      * ctor
      *
-     * @param p_sDataPath the path to the directory which contains the data folder.
+     * @param\[in\] p_sDataPath the path to the directory which contains the data folder.
      */
     /*  Dipole();*/
 

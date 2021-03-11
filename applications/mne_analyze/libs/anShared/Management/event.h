@@ -84,9 +84,9 @@ public:
     /**
      * Constructs an Event object.
      *
-     * @param[in] type       The type of the event
-     * @param[in] sender     The sender of the message
-     * @param[in] data       Data that may be attached to the event
+     * @param\[in\] type       The type of the event
+     * @param\[in\] sender     The sender of the message
+     * @param\[in\] data       Data that may be attached to the event
      */
     Event(const EVENT_TYPE type, const Communicator* sender, const QVariant& data);
 

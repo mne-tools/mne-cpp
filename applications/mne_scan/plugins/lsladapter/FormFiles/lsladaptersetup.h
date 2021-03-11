@@ -76,7 +76,7 @@ public:
     /**
      * Constructs a LSLAdapterSetup which is a child of parent.
      *
-     * @param [in] parent pointer to potential parent widget
+     * @param\[in\] parent pointer to potential parent widget
      */
     LSLAdapterSetup(int initialBlockSize, QWidget *parent = Q_NULLPTR);
 
@@ -91,8 +91,8 @@ public slots:
     /**
      * This is called by the LSL Adapter, when it has finished scanning and filtering available LSL streams.
      *
-     * @param [in] vStreamInfos A vector of available LSL streams
-     * @param [in] currentStream The current LSL stream.
+     * @param\[in\] vStreamInfos A vector of available LSL streams
+     * @param\[in\] currentStream The current LSL stream.
      */
     void onLSLScanResults(const QVector<lsl::stream_info>& vStreamInfos, const lsl::stream_info& currentStream);
 
@@ -127,7 +127,7 @@ signals:
     /**
      * This tells the LSL Adapter that the user has changed the stream selection.
      *
-     * @param [in] stream The newly selected LSL stream, represented by stream_info object.
+     * @param\[in\] stream The newly selected LSL stream, represented by stream_info object.
      */
     void streamSelectionChanged(const lsl::stream_info& stream);
 

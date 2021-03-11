@@ -148,7 +148,7 @@ public:
     /**
      * Udates the plugin with new (incoming) data.
      *
-     * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
+     * @param\[in\] pMeasurement    The incoming data in form of a generalized Measurement.
      */
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
@@ -178,7 +178,7 @@ private:
     /**
      * Call this function whenever the recompution status changed.
      *
-     * @param[in] bDoRecomputation    If recomputation is activated.
+     * @param\[in\] bDoRecomputation    If recomputation is activated.
      */
     void onRecompStatusChanged(bool bDoRecomputation);
 
@@ -186,7 +186,7 @@ private:
     /**
      * Call this function whenever the clustering status changed.
      *
-     * @param[in] bDoClustering   If clustering is activated.
+     * @param\[in\] bDoClustering   If clustering is activated.
      */
     void onClusteringStatusChanged(bool bDoRecomputation);
 
@@ -194,8 +194,8 @@ private:
     /**
      * Call this function whenever the atlas directory is set.
      *
-     * @param[in] sDirPath              The path to the atlas directory.
-     * @param[in] pAnnotationSet        The Annotation set.
+     * @param\[in\] sDirPath              The path to the atlas directory.
+     * @param\[in\] pAnnotationSet        The Annotation set.
      */
     void onAtlasDirChanged(const QString& sDirPath,
                            const QSharedPointer<FSLIB::AnnotationSet> pAnnotationSet);
@@ -246,7 +246,7 @@ signals:
      * Emit this signal whenever the clustering status changed
      * (0 Initializing, 1 Computing, 2 Recomputing, 3 Clustering, 4 Not Computed, 5 Finished).
      *
-     * @param[in] iStatus            status of recomputation.
+     * @param\[in\] iStatus            status of recomputation.
      */
     void statusInformationChanged(int iStatus);
 

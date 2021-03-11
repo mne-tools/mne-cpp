@@ -96,7 +96,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffInfo  FIFF measurement information which should be copied
+     * @param\[in\] p_FiffInfo  FIFF measurement information which should be copied
      */
     FiffInfo(const FiffInfo& p_FiffInfo);
 
@@ -120,10 +120,10 @@ public:
      *
      * Create a compensation matrix to bring the data from one compensation state to another
      *
-     * @param[in] from               compensation in the input data
-     * @param[in] to                 desired compensation in the output
+     * @param\[in\] from               compensation in the input data
+     * @param\[in\] to                 desired compensation in the output
      * @param[out] ctf_comp          Compensation Matrix
-     * @param[in] exclude_comp_chs   exclude compensation channels from the output (optional)
+     * @param\[in\] exclude_comp_chs   exclude compensation channels from the output (optional)
      *
      * @return true if succeeded, false otherwise
      */
@@ -164,7 +164,7 @@ public:
      * Make a SSP operator using the meas info
      *
      * @param[out] proj      The projection operator to apply to the data
-     * @param[in] p_chNames   List of channels to include in the projection matrix
+     * @param\[in\] p_chNames   List of channels to include in the projection matrix
      *
      * @return nproj - How many items in the projector
      */
@@ -178,7 +178,7 @@ public:
      *
      * Pick desired channels from measurement info
      *
-     * @param[in] sel    List of channels to select
+     * @param\[in\] sel    List of channels to select
      *
      * @return Info modified according to sel
      */
@@ -188,7 +188,7 @@ public:
     /**
      * Set the current compensation value in the channel info structures
      *
-     * @param[in] value  compensation value
+     * @param\[in\] value  compensation value
      */
     inline void set_current_comp(fiff_int_t value);
 
@@ -203,8 +203,8 @@ public:
      *
      * Set the current compensation value in the channel info structures
      *
-     * @param[in] chs    fiff channel info list
-     * @param[in] value  compensation value
+     * @param\[in\] chs    fiff channel info list
+     * @param\[in\] value  compensation value
      *
      * @return the current compensation
      */
@@ -215,7 +215,7 @@ public:
 //    /**
 //    * Writes the fiff information to an I/O Device, e.g. fiff file
 //    *
-//    * @param [in] p_IODevice   IO device to write the fiff info to.
+//    * @param\[in\] p_IODevice   IO device to write the fiff info to.
 //    */
 //    void write(QIODevice &p_IODevice);
 
@@ -223,7 +223,7 @@ public:
     /**
      * Writes the fiff information to a FIF stream
      *
-     * @param[in] p_pStream  The stream to write to.
+     * @param\[in\] p_pStream  The stream to write to.
      */
     void writeToStream(FiffStream* p_pStream) const;
 
@@ -234,7 +234,7 @@ private:
      *
      * Create a compensation matrix to bring the data from one compensation state to another
      *
-     * @param[in] kind               Compensation in the input data
+     * @param\[in\] kind               Compensation in the input data
      * @param[out] comp              Compensation Matrix
      *
      * @return true if succeeded, false otherwise

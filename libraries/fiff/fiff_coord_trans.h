@@ -87,7 +87,7 @@ public:
     /**
      * Constructs a coordinate transformation, by reading from a IO device.
      *
-     * @param[in] p_IODevice     IO device to read from the coordinate transform.
+     * @param\[in\] p_IODevice     IO device to read from the coordinate transform.
      */
     FiffCoordTrans(QIODevice &p_IODevice);
 
@@ -95,7 +95,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffCoordTrans   Coordinate transformation description which should be copied
+     * @param\[in\] p_FiffCoordTrans   Coordinate transformation description which should be copied
      */
     FiffCoordTrans(const FiffCoordTrans &p_FiffCoordTrans);
 
@@ -139,7 +139,7 @@ public:
      *
      * Reads a coordinate transform from a fif file
      *
-     * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+     * @param\[in\] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
      * @param[out] p_Trans      A coordinate transform from a fif file
      *
      * @return true if succeeded, false otherwise
@@ -154,8 +154,8 @@ public:
      *
      * Applies the coordinate transform to given coordinates and returns the transformed coordinates
      *
-     * @param[in] rr         The coordinates
-     * @param[in] do_move    Perform translation next to rotation yes/no
+     * @param\[in\] rr         The coordinates
+     * @param\[in\] do_move    Perform translation next to rotation yes/no
      *
      * @return Transformed coordinates
      */
@@ -165,8 +165,8 @@ public:
     /**
      * Applies the inverse coordinate transform to given coordinates and returns the transformed coordinates
      *
-     * @param[in] rr         The coordinates
-     * @param[in] do_move    Perform translation next to rotation yes/no
+     * @param\[in\] rr         The coordinates
+     * @param\[in\] do_move    Perform translation next to rotation yes/no
      *
      * @return Transformed coordinates
      */
@@ -178,7 +178,7 @@ public:
      *
      * Map coordinate frame integers to human-readable names
      *
-     * @param[in] frame  The coordinate frame integer
+     * @param\[in\] frame  The coordinate frame integer
      *
      * @return Human readable form of the coordinate frame.
      */
@@ -191,10 +191,10 @@ public:
      * Compose the coordinate transformation structure
      * from a known forward transform
      *
-     * @param[in] from   Source coordinate system
-     * @param[in] to     Destination coordinate system
-     * @param[in] rot    The forward transform (rotation part)
-     * @param[in] move   The forward transform (translation part)
+     * @param\[in\] from   Source coordinate system
+     * @param\[in\] to     Destination coordinate system
+     * @param\[in\] rot    The forward transform (rotation part)
+     * @param\[in\] move   The forward transform (translation part)
      *
      * @return the composed transform
      */
@@ -205,9 +205,9 @@ public:
      * Compose the coordinate transformation structure
      * from a known forward transform
      *
-     * @param[in] from      Source coordinate system
-     * @param[in] to        Destination coordinate system
-     * @param[in] matTrans  The forward transform
+     * @param\[in\] from      Source coordinate system
+     * @param\[in\] to        Destination coordinate system
+     * @param\[in\] matTrans  The forward transform
      *
      * @return the composed transform
      */
@@ -217,7 +217,7 @@ public:
     /**
      * ### MNE C root function ###: Definition of the add_inverse function
      *
-     * @param[in] t      Fiff coordinate transform to which the inverse should be added
+     * @param\[in\] t      Fiff coordinate transform to which the inverse should be added
      *
      * @return True when successful
      */
@@ -234,7 +234,7 @@ public:
     /**
      * @brief Writes the transformation to file
      *
-     * @param p_IODevice
+     * @param\[in\] p_IODevice
      */
     void write(QIODevice &p_IODevice);
 
@@ -242,7 +242,7 @@ public:
     /**
      * @brief Writes the transformation to stream
      *
-     * @param p_pStream
+     * @param\[in\] p_pStream
      */
     void writeToStream(FiffStream* p_pStream);
 
@@ -258,7 +258,7 @@ public:
     /**
      * Overloaded == operator to compare an object to this instance.
      *
-     * @param[in] object    The object which should be compared to.
+     * @param\[in\] object    The object which should be compared to.
      *
      * @return true if equal, false otherwise
      */
@@ -268,7 +268,7 @@ public:
     /**
      * Calculate rotation as angle between two rotation matrices
      *
-     * @param[in]   mTransDest  The destination transformation matrix.
+     * @param\[in\]  mTransDest  The destination transformation matrix.
      * @return      fAgle       The of rotation between two rotation matrices in degree.
      */
     float angleTo(Eigen::MatrixX4f mTransDest);
@@ -277,7 +277,7 @@ public:
     /**
      * Calculate translation between two rotation matrices in meter
      *
-     * @param[in]   mTransTarget  The destination transformation matrix.
+     * @param\[in\]  mTransTarget  The destination transformation matrix.
      * @return      fMove         The translation between two rotation matrices in m.
      */
     float translationTo(Eigen::MatrixX4f mTransDest);

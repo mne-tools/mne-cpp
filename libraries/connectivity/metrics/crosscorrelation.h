@@ -96,7 +96,7 @@ public:
     /**
      * Calculates the cross correlation between the rows of the data matrix.
      *
-     * @param[in] connectivitySettings   The input data and parameters.
+     * @param\[in\] connectivitySettings   The input data and parameters.
      *
      * @return                   The connectivity information in form of a network structure.
      */
@@ -107,11 +107,11 @@ protected:
     /**
      * Calculates the connectivity matrix for a given input data matrix based on the cross correlation coefficient.
      *
-     * @param[in]    inputData           The input data.
+     * @param\[in\]   inputData           The input data.
      * @param[out]   matDist             The sum of all edge weights.
-     * @param[in]    mutex               The mutex used to safely access matDist.
-     * @param[in]    iNfft               The FFT length.
-     * @param[in]    tapers              The taper information.
+     * @param\[in\]   mutex               The mutex used to safely access matDist.
+     * @param\[in\]   iNfft               The FFT length.
+     * @param\[in\]   tapers              The taper information.
      */
     static void compute(ConnectivitySettings::IntermediateTrialData& inputData,
                         Eigen::MatrixXd& matDist,

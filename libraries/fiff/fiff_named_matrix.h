@@ -90,11 +90,11 @@ public:
     /**
      * Constructs named matrix with given parameters. (No plausibility check is performed)
      *
-     * @param[in] p_nrow         Number of rows
-     * @param[in] p_ncol         Number of cols
-     * @param[in] p_row_names    Row names
-     * @param[in] p_col_names    Column names
-     * @param[in] p_data         Data of the named matrix
+     * @param\[in\] p_nrow         Number of rows
+     * @param\[in\] p_ncol         Number of cols
+     * @param\[in\] p_row_names    Row names
+     * @param\[in\] p_col_names    Column names
+     * @param\[in\] p_data         Data of the named matrix
      */
     explicit FiffNamedMatrix(fiff_int_t p_nrow,
                              fiff_int_t p_ncol,
@@ -106,7 +106,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffNamedMatrix  Named matrix which should be copied
+     * @param\[in\] p_FiffNamedMatrix  Named matrix which should be copied
      */
     FiffNamedMatrix(const FiffNamedMatrix& p_FiffNamedMatrix);
 
@@ -151,8 +151,8 @@ public:
     /**
      * overloading the stream out operator<<
      *
-     * @param[in] out                The stream to which the fiff projector should be assigned to.
-     * @param[in] p_FiffNamedMatrix  Fiff named matrix which should be assigned to the stream.
+     * @param\[in\] out                The stream to which the fiff projector should be assigned to.
+     * @param\[in\] p_FiffNamedMatrix  Fiff named matrix which should be assigned to the stream.
      *
      * @return the stream with the attached fiff named matrix
      */
@@ -161,7 +161,7 @@ public:
     /**
      * Overloaded == operator to compare an object to this instance.
      *
-     * @param[in] object    The object which should be compared to.
+     * @param\[in\] object    The object which should be compared to.
      *
      * @return true if equal, false otherwise
      */

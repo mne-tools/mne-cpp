@@ -119,7 +119,7 @@ private:
     /**
      * Receives scaling map scalingMap and sends an event to update views.
      *
-     * @param [in] scalingMap   new scaling map to be sent out in an event
+     * @param\[in\] scalingMap   new scaling map to be sent out in an event
      */
     void onScalingChanged(const QMap<qint32, float>& scalingMap);
 
@@ -127,7 +127,7 @@ private:
     /**
      * Sends new signal color via the event manager
      *
-     * @param [in] signalColor   new signal color
+     * @param\[in\] signalColor   new signal color
      */
     void onSignalColorChanged(const QColor& signalColor);
 
@@ -135,7 +135,7 @@ private:
     /**
      * Sends new backgroundColor via the event manager
      *
-     * @param [in] backgroundColor  new background color
+     * @param\[in\] backgroundColor  new background color
      */
     void onBackgroundColorChanged(const QColor& backgroundColor);
 
@@ -143,7 +143,7 @@ private:
     /**
      * Sends new channel zoom value (number channels shown) via the event manager
      *
-     * @param [in] value    new zoom value
+     * @param\[in\] value    new zoom value
      */
     void onZoomChanged(double dZoomValue);
 
@@ -151,7 +151,7 @@ private:
     /**
      * Sends new time window value (number of seconds of data shown) via the event manager
      *
-     * @param [in] value    new time window value
+     * @param\[in\] value    new time window value
      */
     void onTimeWindowChanged(int iTimeWindow);
 
@@ -159,7 +159,7 @@ private:
     /**
      * Sends new spacer distance parameters via the event manager
      *
-     * @param [in] value    new time spacer distance value
+     * @param\[in\] value    new time spacer distance value
      */
     void onDistanceTimeSpacerChanged(int iSpacerDistance);
 
@@ -167,7 +167,7 @@ private:
     /**
      * Sends the parameters to take screenshot via event manager
      *
-     * @param [in] imageType    screenshot image type
+     * @param\[in\] imageType    screenshot image type
      */
     void onMakeScreenshot(const QString& imageType);
 
@@ -176,7 +176,7 @@ private:
     /**
      * Sets 3D model for the 3D controls
      *
-     * @param [in] pModel   new 3D Model
+     * @param\[in\] pModel   new 3D Model
      */
     void init3DGui(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel);
     #endif
@@ -185,7 +185,7 @@ private:
     /**
      * Sends scene color via the event manager
      *
-     * @param [in] color    new scene color
+     * @param\[in\] color    new scene color
      */
     void onSceneColorChange(const QColor& color);
 
@@ -193,7 +193,7 @@ private:
     /**
      * Send rotation toggle via event manager
      *
-     * @param [in] bRotationChanged     rotation toggle
+     * @param\[in\] bRotationChanged     rotation toggle
      */
     void onRotationChanged(bool bRotationChanged);
 
@@ -201,7 +201,7 @@ private:
     /**
      * Send coordinate axis toggle via event manager
      *
-     * @param [in] bShowCoordAxis   toggle coord axis
+     * @param\[in\] bShowCoordAxis   toggle coord axis
      */
     void onShowCoordAxis(bool bShowCoordAxis);
 
@@ -209,7 +209,7 @@ private:
     /**
      * Send fullscreen toggle via event manager
      *
-     * @param [in] bShowFullScreen      toggle fullscreen
+     * @param\[in\] bShowFullScreen      toggle fullscreen
      */
     void onShowFullScreen(bool bShowFullScreen);
 
@@ -217,7 +217,7 @@ private:
     /**
      * Send light color via the event manager
      *
-     * @param [in] color    new light color
+     * @param\[in\] color    new light color
      */
     void onLightColorChanged(const QColor& color);
 
@@ -225,7 +225,7 @@ private:
     /**
      * Send light intensity via the event manager
      *
-     * @param [in] value    new light intensity
+     * @param\[in\] value    new light intensity
      */
     void onLightIntensityChanged(double value);
 

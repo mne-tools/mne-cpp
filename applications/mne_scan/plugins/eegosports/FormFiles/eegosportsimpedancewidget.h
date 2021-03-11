@@ -105,7 +105,7 @@ public:
     //=========================================================================================================
     /**
     * Updates the values of the electrodes placed in the QGraphicsScene.
-    * @param [in] matValue Matrix of electrode positions.
+    * @param\[in\] matValue Matrix of electrode positions.
     */
     void updateGraphicScene(const VectorXd& matValue);
 
@@ -119,8 +119,8 @@ private:
     //=========================================================================================================
     /**
     * Adds an electrode item to the QGraphicScene.
-    * @param [in] electrodeName Name of added electrode.
-    * @param [in] position of added electrode (2D)
+    * @param\[in\] electrodeName Name of added electrode.
+    * @param\[in\] position of added electrode (2D)
     */
     void addElectrodeItem(const QString& electrodeName, const QVector2D& position);
 
@@ -157,8 +157,8 @@ private:
     //=========================================================================================================
     /**
     * Indicates whether index of Electrode a is larger than index of Electrode b.
-    * @param [in] a first electrode
-    * @param [in] b second electrode
+    * @param\[in\] a first electrode
+    * @param\[in\] b second electrode
     */
     static bool compareChannelIndex(EEGoSportsElectrodeItem* a, EEGoSportsElectrodeItem* b);
 

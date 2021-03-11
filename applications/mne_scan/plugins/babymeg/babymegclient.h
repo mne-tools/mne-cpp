@@ -99,7 +99,7 @@ public:
     /**
      * Convert an integer (4 bytes) to a 4-byte array
      *
-     * @param[in] a -- <int>.
+     * @param\[in\] a -- <int>.
      * @param[out] Byte array
      */
     QByteArray MGH_LM_Int2Byte(int a);
@@ -108,7 +108,7 @@ public:
     /**
      * Convert a 4-byte array to an integer
      *
-     * @param[in] InByte -- Byte array
+     * @param\[in\] InByte -- Byte array
      * @param[out] <int>.
      */
     int MGH_LM_Byte2Int(QByteArray InByte);
@@ -117,7 +117,7 @@ public:
     /**
      * Convert one 8-byte array to a double
      *
-     * @param[in] InByte -- Byte array
+     * @param\[in\] InByte -- Byte array
      * @param[out] <double>.
      */
     double MGH_LM_Byte2Double(QByteArray InByte);
@@ -126,7 +126,7 @@ public:
     /**
      * Hex display
      *
-     * @param[in] a -- double number
+     * @param\[in\] a -- double number
      */
     void HescDisplay(double a);
 
@@ -134,7 +134,7 @@ public:
     /**
      * Set Head Info
      *
-     * @param[in] pInfo -- struct of header information
+     * @param\[in\] pInfo -- struct of header information
      */
     void SetInfo(QSharedPointer<BabyMEGInfo> pInfo);
 
@@ -142,7 +142,7 @@ public:
     /**
      * Dispatch the data package
      *
-     * @param[in] tmp -- block size
+     * @param\[in\] tmp -- block size
      */
     void DispatchDataPackage(int tmp);
 
@@ -150,7 +150,7 @@ public:
     /**
      * Read next data block
      *
-     * @param[in] tmp -- block size
+     * @param\[in\] tmp -- block size
      */
     void ReadNextBlock(int tmp);
 
@@ -158,7 +158,7 @@ public:
     /**
      * Send command with command format as string
      *
-     * @param[in] s -- string
+     * @param\[in\] s -- string
      */
     void SendCommand(QString s);
 
@@ -166,7 +166,7 @@ public:
     /**
      * Handle the data buffer connecting to the TCP socket
      *
-     * @param[in] void
+     * @param\[in\] void
      */
     void handleBuffer();
 
@@ -174,7 +174,7 @@ public:
     /**
      * Connect to BabyMEG server
      *
-     * @param[in] void.
+     * @param\[in\] void.
      */
     void ConnectToBabyMEG();
 
@@ -182,7 +182,7 @@ public:
     /**
      * DisConnect to BabyMEG server
      *
-     * @param[in] void.
+     * @param\[in\] void.
      */
     void DisconnectBabyMEG();
 
@@ -190,7 +190,7 @@ public:
     /**
      * Send Command to BabyMEG server
      *
-     * @param[in] void.
+     * @param\[in\] void.
      */
     void SendCommandToBabyMEG();
 
@@ -198,7 +198,7 @@ public:
     /**
      * Read data from socket to a buffer
      *
-     * @param[in] void.
+     * @param\[in\] void.
      */
     void ReadToBuffer();
 
@@ -206,7 +206,7 @@ public:
     /**
      * Send Command to BabyMEG command server with short sync connection
      *
-     * @param[in] String s - the string will be sent to server.
+     * @param\[in\] String s - the string will be sent to server.
      */
     void SendCommandToBabyMEGShortConnection(QByteArray s);
 

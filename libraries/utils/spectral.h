@@ -92,9 +92,9 @@ public:
     /**
      * Calculates the full tapered spectra of a given input row data
      *
-     * @param[in] vecData         input roww data (time domain), for which the spectrum is computed
-     * @param[in] matTaper        tapers used to compute the spectra
-     * @param[in] iNfft           FFT length
+     * @param\[in\] vecData         input roww data (time domain), for which the spectrum is computed
+     * @param\[in\] matTaper        tapers used to compute the spectra
+     * @param\[in\] iNfft           FFT length
      *
      * @return tapered spectra of the input data
      */
@@ -106,10 +106,10 @@ public:
     /**
      * Calculates the full tapered spectra of a given input matrix data. This function calculates each row in parallel.
      *
-     * @param[in] matData         input matrix data (time domain), for which the spectrum is computed.
-     * @param[in] matTaper        tapers used to compute the spectra.
-     * @param[in] iNfft           FFT length.
-     * @param[in] bUseThreads Whether to use multiple threads.
+     * @param\[in\] matData         input matrix data (time domain), for which the spectrum is computed.
+     * @param\[in\] matTaper        tapers used to compute the spectra.
+     * @param\[in\] iNfft           FFT length.
+     * @param\[in\] bUseThreads Whether to use multiple threads.
      *
      * @return tapered spectra of the input data
      */
@@ -122,7 +122,7 @@ public:
     /**
      * Computes the tapered spectra for a row vector. This function gets called in parallel.
      *
-     * @param[in] inputData    The input data.
+     * @param\[in\] inputData    The input data.
      *
      * @return                 The tapered spectra for one data row.
      */
@@ -133,7 +133,7 @@ public:
      * Reduces the taperedSpectra results to a final result. This function gets called in parallel.
      *
      * @param[out] finalData    The final data data.
-     * @param[in]  resultData   The resulting data from the computation step.
+     * @param\[in\] resultData   The resulting data from the computation step.
      */
     static void reduce(QVector<Eigen::MatrixXcd>& finalData,
                        const Eigen::MatrixXcd& resultData);
@@ -142,10 +142,10 @@ public:
     /**
      * Calculates the power spectral density of given tapered spectrum
      *
-     * @param[in] vecTapSpectrum    tapered spectrum, for which the PSD is calculated
-     * @param[in] vecTapWeights     taper weights
-     * @param[in] iNfft             FFT length
-     * @param[in] dSampFreq         sampling frequency of the input data
+     * @param\[in\] vecTapSpectrum    tapered spectrum, for which the PSD is calculated
+     * @param\[in\] vecTapWeights     taper weights
+     * @param\[in\] iNfft             FFT length
+     * @param\[in\] dSampFreq         sampling frequency of the input data
      *
      * @return power spectral density of a given tapered spectrum
      */
@@ -158,12 +158,12 @@ public:
     /**
      * Calculates the cross-spectral density of the tapered spectra of seed and target
      *
-     * @param[in] vecTapSpectrumSeed      tapered spectrum of the seed
-     * @param[in] vecTapSpectrumTarget    tapered spectrum of the target
-     * @param[in] vecTapWeightsSeed       taper weights of the seed
-     * @param[in] vecTapWeightsTarget     taper weights of the target
-     * @param[in] iNfft                   FFT length
-     * @param[in] dSampFreq               sampling frequency of the input data
+     * @param\[in\] vecTapSpectrumSeed      tapered spectrum of the seed
+     * @param\[in\] vecTapSpectrumTarget    tapered spectrum of the target
+     * @param\[in\] vecTapWeightsSeed       taper weights of the seed
+     * @param\[in\] vecTapWeightsTarget     taper weights of the target
+     * @param\[in\] iNfft                   FFT length
+     * @param\[in\] dSampFreq               sampling frequency of the input data
      *
      * @return cross-spectral density of the tapered spectra of seed and target
      */
@@ -178,8 +178,8 @@ public:
     /**
      * Calculates the FFT frequencies
      *
-     * @param[in] iNfft            FFT length
-     * @param[in] dSampFreq        sampling frequency of the input data
+     * @param\[in\] iNfft            FFT length
+     * @param\[in\] dSampFreq        sampling frequency of the input data
      *
      * @return FFT frequencies
      */
@@ -189,8 +189,8 @@ public:
     /**
      * Calculates a hanning window of given length
      *
-     * @param[in] iSignalLength    length of the hanning window
-     * @param[in] sWindowType      type of the window function used to compute tapered spectra
+     * @param\[in\] iSignalLength    length of the hanning window
+     * @param\[in\] sWindowType      type of the window function used to compute tapered spectra
      *
      * @return Qpair of tapers and taper weights
      */
@@ -202,7 +202,7 @@ private:
     /**
      * Calculates a hanning window of given length
      *
-     * @param[in] iSignalLength     length of the hanning window
+     * @param\[in\] iSignalLength     length of the hanning window
      *
      * @return hanning window
      */

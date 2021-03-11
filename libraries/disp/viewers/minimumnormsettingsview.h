@@ -87,7 +87,7 @@ public:
     /**
      * Constructs a MinimumNormSettingsView which is a child of parent.
      *
-     * @param [in] parent        parent of widget.
+     * @param\[in\] parent        parent of widget.
      */
     MinimumNormSettingsView(const QString& sSettingsPath = "",
                             QWidget *parent = 0,
@@ -103,7 +103,7 @@ public:
     /**
      * Destroys the MinimumNormSettingsView.
      *
-     * @param [in] lTriggerTypes        The new trigger types.
+     * @param\[in\] lTriggerTypes        The new trigger types.
      */
     void setTriggerTypes(const QStringList& lTriggerTypes);
 
@@ -130,7 +130,7 @@ protected:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param mode     The new mode (Clinical=0, Research=1).
+     * @param\[in\] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -138,7 +138,7 @@ protected:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param mode     The new mode (RealTime=0, Offline=1).
+     * @param\[in\] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 
@@ -146,7 +146,7 @@ protected:
     /**
      * Slot called when the method changed.
      *
-     * @param [in] method        The new method.
+     * @param\[in\] method        The new method.
      */
     void onMethodChanged(const QString& method);
 
@@ -154,7 +154,7 @@ protected:
     /**
      * Slot called when the trigger type changed.
      *
-     * @param [in] sTriggerType        The new trigger type.
+     * @param\[in\] sTriggerType        The new trigger type.
      */
     void onTriggerTypeChanged(const QString& sTriggerType);
 
@@ -171,7 +171,7 @@ signals:
     /**
      * Emit signal whenever the method changed.
      *
-     * @param [in] method        The new method.
+     * @param\[in\] method        The new method.
      */
     void methodChanged(const QString& method);
 
@@ -179,7 +179,7 @@ signals:
     /**
      * Emit signal whenever the trigger type changed.
      *
-     * @param [in] triggerType        The new trigger type.
+     * @param\[in\] triggerType        The new trigger type.
      */
     void triggerTypeChanged(const QString& triggerType);
 
@@ -187,7 +187,7 @@ signals:
     /**
      * Emit signal whenever the time point changed.
      *
-     * @param [in] iTimePoint        The new time point.
+     * @param\[in\] iTimePoint        The new time point.
      */
     void timePointChanged(int iTimePoint);
 };

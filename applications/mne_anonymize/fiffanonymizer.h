@@ -105,7 +105,7 @@ public:
     /**
      * Copy constructor for FiffAnonymizer object.
      *
-     * @param [in] A FiffAnonyzer object.
+     * @param\[in\] A FiffAnonyzer object.
      */
     FiffAnonymizer(const FiffAnonymizer& obj);
 
@@ -113,7 +113,7 @@ public:
     /**
      * Assignment operator for FiffAnonymizer object.
      *
-     * @param [in] A FiffAnonyzer object.
+     * @param\[in\] A FiffAnonyzer object.
      */
     FiffAnonymizer& operator = (const FiffAnonymizer &t)
     {
@@ -125,7 +125,7 @@ public:
     /**
      * Move contructor
      *
-     * @param [in] a FiffAnonymizer object.
+     * @param\[in\] a FiffAnonymizer object.
      */
     FiffAnonymizer(FiffAnonymizer &&obj);
 
@@ -149,7 +149,7 @@ signals:
      * <readTag>"()"). Inside, the ID tag, the version of the FIFF standard used to encode the current file is stored
      * as a floating point number.
      *
-     * @param [in] v Version of the FIFF standard used to encode the current file being censored.
+     * @param\[in\] v Version of the FIFF standard used to encode the current file being censored.
      *
      */
     void readingIdFileVersion(double v);
@@ -161,7 +161,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and an ID tag is in <m_pTag> (generally through
      * <readTag>"()"). Inside, the ID tag, the measurement date is stored.
      *
-     * @param [in] d Measurement date of the file being censored.
+     * @param\[in\] d Measurement date of the file being censored.
      *
      */
     void readingIdMeasurementDate(QDateTime d);
@@ -173,7 +173,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and an ID tag is in <m_pTag> (generally through
      * <readTag>"()"). Inside, the MAC address of the network card of the computer used to register the measurement is stored.
      *
-     * @param [in] mac MAC address of the file being censored.
+     * @param\[in\] mac MAC address of the file being censored.
      *
      */
     void readingIdMac(QString mac);
@@ -185,7 +185,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "measurement date" tag is in <m_pTag> (generally through
      * <readTag>"()").
      *
-     * @param [in] d Measurement date of the file being censored.
+     * @param\[in\] d Measurement date of the file being censored.
      *
      */
     void readingFileMeasurementDate(QDateTime d);
@@ -197,7 +197,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "file comment" tag is in <m_pTag> (generally through
      * <readTag>"()"). The file comment tag stores the actual comment as a string, which is sent through this signal.
      *
-     * @param [in] s Comment in the current "file comment" tag being censored.
+     * @param\[in\] s Comment in the current "file comment" tag being censored.
      *
      */
     void readingFileComment(QString s);
@@ -209,7 +209,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "file comment" tag is in <m_pTag> (generally through
      * <readTag>"()"). The file experimenter tag stores the actual experimenter as a string, which is sent through this signal.
      *
-     * @param [in] e Experimenter in the current "file experimenter" tag being censored.
+     * @param\[in\] e Experimenter in the current "file experimenter" tag being censored.
      *
      */
     void readingFileExperimenter(QString e);
@@ -221,7 +221,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "subject id" tag is in <m_pTag> (generally through
      * <readTag>"()"). The subject id tag stores the actual id as an integer value, which is sent through this signal.
      *
-     * @param [in] i Subject id, in the current file.
+     * @param\[in\] i Subject id, in the current file.
      *
      */
     void readingSubjectId(int i);
@@ -233,7 +233,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "subject first name" tag is in <m_pTag> (generally through
      * <readTag>"()"). The subject first name tag stores the actual first name as a string value, which is sent through this signal.
      *
-     * @param [in] fn Subject first name, in the current file.
+     * @param\[in\] fn Subject first name, in the current file.
      *
      */
     void readingSubjectFirstName(QString fn);
@@ -245,7 +245,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "subject middle name" tag is in <m_pTag> (generally through
      * <readTag>"()"). The subject middle name tag stores the actual middle name as a string value, which is sent through this signal.
      *
-     * @param [in] mn Subject middle name, in the current file.
+     * @param\[in\] mn Subject middle name, in the current file.
      *
      */
     void readingSubjectMiddleName(QString mn);
@@ -257,7 +257,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "subject last name" tag is in <m_pTag> (generally through
      * <readTag>"()"). The subject last name tag stores the actual last name as a string value, which is sent through this signal.
      *
-     * @param [in] ln Subject last name, in the current file.
+     * @param\[in\] ln Subject last name, in the current file.
      *
      */
     void readingSubjectLastName(QString ln);
@@ -270,7 +270,7 @@ signals:
      * <readTag>"()"). The subject birthday tag stores the actual birthday as a julian date value, which is transformed into a QDateTime
      * object and sent through this signal.
      *
-     * @param [in] b Subject birthday, in the current file.
+     * @param\[in\] b Subject birthday, in the current file.
      *
      */
     void readingSubjectBirthday(QDate b);
@@ -283,7 +283,7 @@ signals:
      * <readTag>"()"). The subject sex tag stores the actual sex as a codified integer value: [0 = unknown, 1 = male, 2 = female]. This value can
      * be transformed to a meaningful string with the method <subjectSexToString>"()".
      *
-     * @param [in] s Subject sex, in the current file.
+     * @param\[in\] s Subject sex, in the current file.
      *
      */
     void readingSubjectSex(int s);
@@ -296,7 +296,7 @@ signals:
      * <readTag>"()"). The subject hand tag stores the actual handedness as a codified integer value: [0 = unknown, 1 = right, 2 = left]. This value can
      * be transformed to a meaningful string with the method <subjectHandToString>"()".
      *
-     * @param [in] h Subject hand, in the current file.
+     * @param\[in\] h Subject hand, in the current file.
      *
      */
     void readingSubjectHand(int h);
@@ -308,7 +308,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "subject weight" tag is in <m_pTag> (generally through
      * <readTag>"()"). The subject weight tag stores the actual weight of the subject as a floating point value. This value is sent through this signal.
      *
-     * @param [in] w Subject weight, in the current file.
+     * @param\[in\] w Subject weight, in the current file.
      *
      */
     void readingSubjectWeight(float w);
@@ -320,7 +320,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "subject height" tag is in <m_pTag> (generally through
      * <readTag>"()"). The subject height tag stores the actual height of the subject as a floating point value. This value is sent through this signal.
      *
-     * @param [in] h Subject height, in the current file.
+     * @param\[in\] h Subject height, in the current file.
      *
      */
     void readingSubjectHeight(float h);
@@ -331,7 +331,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "subject comment" tag is in <m_pTag> (generally through
      * <readTag>"()"). The subject comment tag stores the actual comment of the subject as a string value. This value is sent through this signal.
      *
-     * @param [in] c Subject comment, in the current file.
+     * @param\[in\] c Subject comment, in the current file.
      *
      */
     void readingSubjectComment(QString c);
@@ -343,7 +343,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "subject his id" tag is in <m_pTag> (generally through
      * <readTag>"()"). The subject his id tag stores the actual his id of the subject as a string value. This value is sent through this signal.
      *
-     * @param [in] hisId Subject his id, in the current file.
+     * @param\[in\] hisId Subject his id, in the current file.
      *
      */
     void readingSubjectHisId(QString hisId);
@@ -355,7 +355,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "project id" tag is in <m_pTag> (generally through
      * <readTag>"()"). The project id tag stores the actual his id of the subject as an integer value. This value is sent through this signal.
      *
-     * @param [in] pId Project id, in the current file.
+     * @param\[in\] pId Project id, in the current file.
      *
      */
     void readingProjectId(int pId);
@@ -367,7 +367,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "project name" tag is in <m_pTag> (generally through
      * <readTag>"()"). The project name tag stores the actual name of the project as a string value. This value is sent through this signal.
      *
-     * @param [in] pName Project name in the current file.
+     * @param\[in\] pName Project name in the current file.
      *
      */
     void readingProjectName(QString pName);
@@ -379,7 +379,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "project name" tag is in <m_pTag> (generally through
      * <readTag>"()"). The project name tag stores the actual name of the project as a string value. This value is sent through this signal.
      *
-     * @param [in] pName Project name in the current file.
+     * @param\[in\] pName Project name in the current file.
      *
      */
     void readingProjectAim(QString pAim);
@@ -391,7 +391,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "project aim" tag is in <m_pTag> (generally through
      * <readTag>"()"). The project aim tag stores the actual aim of the project as a string value. This value is sent through this signal.
      *
-     * @param [in] pAim Project aim in the current file.
+     * @param\[in\] pAim Project aim in the current file.
      *
      */
     void readingProjectPersons(QString pPersons);
@@ -403,7 +403,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "project comment" tag is in <m_pTag> (generally through
      * <readTag>"()"). The project comment tag stores the actual comment of the project as a string value. This value is sent through this signal.
      *
-     * @param [in] pComment Project comment in the current file.
+     * @param\[in\] pComment Project comment in the current file.
      *
      */
     void readingProjectComment(QString pComment);
@@ -415,7 +415,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a mri data is in <m_pTag> (generally through
      * <readTag>"()"). MRI data can be used to reconstruct the subjects face and thus could be considered protected information.
      *
-     * @param [in] f MRi information present in the current file.
+     * @param\[in\] f MRi information present in the current file.
      *
      */
     void mriDataFoundInFile(bool f);
@@ -427,7 +427,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "MNE Working Directory" tag is in <m_pTag> (generally through
      * <readTag>"()"). The working directory tag stores the actual directorys of the project as a string value. This value is sent through this signal.
      *
-     * @param [in] wdir MNE working directory in the current file.
+     * @param\[in\] wdir MNE working directory in the current file.
      *
      */
     void readingMNEWorkingDir(QString wdir);
@@ -439,7 +439,7 @@ signals:
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "MNE Command Line" tag is in <m_pTag> (generally through
      * <readTag>"()"). The command line tag stores the actual MNE toolbox command used to modify the file, as a string value. This value is sent through this signal.
      *
-     * @param [in] cl MNE working directory in the current file.
+     * @param\[in\] cl MNE working directory in the current file.
      *
      */
     void readingMNECommandLine(QString cl);
@@ -456,7 +456,7 @@ public slots:
     /**
      * Configure the input file to anonymize.
      *
-     * @param [in] sFilePathIn  String containing the input file name including its path. Can be a relative or
+     * @param\[in\] sFilePathIn  String containing the input file name including its path. Can be a relative or
      * an absolute path.
      */
     int setInFile(const QString &sFilePathIn);
@@ -465,7 +465,7 @@ public slots:
     /**
      * Configure the output file to anonymize.
      *
-     * @param [in] sFilePathOut String containing the output file name. Can be a relative or
+     * @param\[in\] sFilePathOut String containing the output file name. Can be a relative or
      * an absolute path.
      */
     int setOutFile(const QString &sFilePathOut);
@@ -476,7 +476,7 @@ public slots:
      * default information additional information will also be anonymized, like Subject's weight, height, sex or
      * handedness and the project's information too.
      *
-     * @param [in] bFlag    Bool argument whether to use the brute mode.
+     * @param\[in\] bFlag    Bool argument whether to use the brute mode.
      *
      */
     void setBruteMode(bool bFlag);
@@ -486,7 +486,7 @@ public slots:
      * If found in the fiff file, the measurement date information will be overwritten with the date specified
      * with this function.
      *
-     * @param [in] d     QDateTime object containing the desired measurement day.
+     * @param\[in\] d     QDateTime object containing the desired measurement day.
      */
     void setMeasurementDate(const QDateTime& d);
 
@@ -495,7 +495,7 @@ public slots:
      * If found in the fiff file, the measurement date information will be overwritten with the date specified
      * with this function.
      *
-     * @param [in] d     QDate object containing the desired measurement day.
+     * @param\[in\] d     QDate object containing the desired measurement day.
      */
     void setMeasurementDate(const QString& s);
 
@@ -503,7 +503,7 @@ public slots:
     /**
      * If found in the fiff file, the specified number of days will be subtracted from the measurement date information contained in each fif file.
      *
-     * @param [in] iMeasDayOffset   Integer with the number of dates to subtract from the measurement date.
+     * @param\[in\] iMeasDayOffset   Integer with the number of dates to subtract from the measurement date.
      */
     void setMeasurementDateOffset(int iMeasDateDaysOffset);
 
@@ -511,7 +511,7 @@ public slots:
     /**
      * If found in the fiff file, the specified number of days will be subtracted from the measurement date information contained in each fif file.
      *
-     * @param [in] b   Integer with the number of dates to subtract from the measurement date.
+     * @param\[in\] b   Integer with the number of dates to subtract from the measurement date.
      */
     void setUseMeasurementDateOffset(bool b);
 
@@ -519,7 +519,7 @@ public slots:
     /**
      * If found in the fiff file, subject's birthday information will be overwritten in the file in order to match the date specified with this function.
      *
-     * @param [in] sSubjBirthday String containing the desired subject birthday date.
+     * @param\[in\] sSubjBirthday String containing the desired subject birthday date.
      */
     void setSubjectBirthday(const QString& sSubjBirthday);
 
@@ -527,7 +527,7 @@ public slots:
     /**
      * If found in the fiff file, subject's birthday information will be overwritten in the file in order to match the date specified with this function.
      *
-     * @param [in] sSubjBirtday String containing the desired subject birthday date.
+     * @param\[in\] sSubjBirtday String containing the desired subject birthday date.
      */
     void setSubjectBirthday(const QDate& sSubjBirthday);
 
@@ -535,7 +535,7 @@ public slots:
     /**
      * If found in the fiff file, the specified number of days will be subtracted from the subject's birthday date information contained in each fif file.
      *
-     * @param [in] iSubjBirthdayOffset  Integer with the number of dates to subtract from the subject's birthday date.
+     * @param\[in\] iSubjBirthdayOffset  Integer with the number of dates to subtract from the subject's birthday date.
      */
     void setSubjectBirthdayOffset(int iSubjBirthdayOffset);
 
@@ -543,7 +543,7 @@ public slots:
     /**
      * If found in the fiff file, the specified number of days will be subtracted from the subject's birthday date information contained in each fif file.
      *
-     * @param [in] b  Flag whether to use a birthday offset.
+     * @param\[in\] b  Flag whether to use a birthday offset.
      */
     void setUseSubjectBirthdayOffset(bool b);
 
@@ -552,7 +552,7 @@ public slots:
      * Specifies the subject's id text information you want the output file to have. If a hisID tag is found in the fiff file,
      * then, the subject's hisID information will be changed to match the one specified with this method.
      *
-     * @param [in] sSubjectHisId   String with the subject's id.
+     * @param\[in\] sSubjectHisId   String with the subject's id.
      */
     void setSubjectHisId(const QString& sSubjectHisId);
 
@@ -562,7 +562,7 @@ public slots:
      * printed on screen during the anonymizing process. If set to false only a single line confirmation message will be
      * printed on each execution.
      *
-     * @param [in] bFlag    Bool argument whether to use the verbose mode.
+     * @param\[in\] bFlag    Bool argument whether to use the verbose mode.
      */
     void setVerboseMode(bool bFlag);
 
@@ -571,7 +571,7 @@ public slots:
      * Sets the FiffAnonymizer object's mode to anonymize information related to MNE toolbox like the
      * Working Directory or the command line used to process the data.
      *
-     * @param [in] bFlag    Bool argument whether to anonymize MNE related information.
+     * @param\[in\] bFlag    Bool argument whether to anonymize MNE related information.
      */
     void setMNEEnvironmentMode(bool bFlag);
 
@@ -580,7 +580,7 @@ public:
     /**
      * Returns the input file which will be anonymized. .
      *
-     * @param [out] Returns a string containing the input file name including its path.
+     * @param+[\[]out] Returns a string containing the input file name including its path.
      */
     QString getFileNameIn() const;
 
@@ -588,7 +588,7 @@ public:
     /**
      * Returns the output file where anonymized data will be saved.
      *
-     * @param [out] Returns a string containing the output file name including its path.
+     * @param+[\[]out] Returns a string containing the output file name including its path.
      */
     QString getFileNameOut() const;
 
@@ -596,7 +596,7 @@ public:
     /**
      * Retrieves the state of the FiffAnonyzer object's desired verbose mode.
      *
-     * @param [out] Bool value with the actual verbose mode.
+     * @param+[\[]out] Bool value with the actual verbose mode.
      *
      */
     bool getVerboseMode() const;
@@ -680,7 +680,7 @@ private:
      * FIFF_COMMENT.
      * This is a refactoring method, designed to make anonymizeFile() more readable.
      *
-     * @param [in] pTag Pointer to the tag being read. Normally the input Tag.
+     * @param\[in\] pTag Pointer to the tag being read. Normally the input Tag.
      */
     void updateBlockTypeList();
 
@@ -690,7 +690,7 @@ private:
      * anonymizer class has been developed according to a specific fiff version of this standard. If in the future,
      * this standard were to change, it should be noted through this method.
      *
-     * @param [in] pTag Pointer to the tag being read. Normally, the input Tag.
+     * @param\[in\] pTag Pointer to the tag being read. Normally, the input Tag.
      */
     bool checkValidFiffFormatVersion();
 
@@ -710,7 +710,7 @@ private:
      * @details Fiff standard codes the sex of the subject as an integer value. This helper method allows to easily transform it into a
      * more user friendly format.
      *
-     * @param [in] sexCode the code with the sex of the subject.
+     * @param\[in\] sexCode the code with the sex of the subject.
      *
      */
     inline QString subjectSexToString(int sexCode) const;
@@ -724,7 +724,7 @@ private:
      * @details Fiff standard codes the handness (or handedness) of the subject as an integer value. This helper method allows to easily transform it into a
      * more user friendly format.
      *
-     * @param [in] handCode the code with the handedness of the subject.
+     * @param\[in\] handCode the code with the handedness of the subject.
      *
      */
     inline QString subjectHandToString(int handCode) const;
@@ -739,7 +739,7 @@ private:
      * can be printed in the same line as previous one. Note that to achieve this, messages will be "retained" one
      * call, in order to check if next call requests to print in the same line.
      *
-     * @param [in] str String to print.
+     * @param\[in\] str String to print.
      *
      */
     inline void printIfVerbose(const QString &str) const;

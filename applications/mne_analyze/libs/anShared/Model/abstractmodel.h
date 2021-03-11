@@ -165,7 +165,7 @@ public:
     /**
      * Saves model to the current model path if possible.
      *
-     * @param[in] sPath   The path where the file should be saved to.
+     * @param\[in\] sPath   The path where the file should be saved to.
      *
      * @returns      True if saving was successful
      */

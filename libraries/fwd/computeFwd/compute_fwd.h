@@ -106,7 +106,7 @@ public:
     //=========================================================================================================
     /**
      * Default Constructor
-     * @param [in]  p_settings        The pointer that contains the setting information
+     * @param\[in\] p_settings        The pointer that contains the setting information
      */
     explicit ComputeFwd(ComputeFwdSettings::SPtr pSettings);
 
@@ -125,7 +125,7 @@ public:
     //=========================================================================================================
     /**
      * Update the heaposition with meg_head_t and recalculate the forward solution for meg
-     * @param [in] transDevHeadOld        The meg <-> head transformation to use for updating head position
+     * @param\[in\] transDevHeadOld        The meg <-> head transformation to use for updating head position
      */
     void updateHeadPos(FIFFLIB::FiffCoordTransOld* transDevHeadOld);
 
@@ -133,7 +133,7 @@ public:
     /**
      * Store Forward solution with given name. It defaults the name specified in
      * ComputeFwdSettings::settings->solname.
-     * @param [in] sSolName        The file name to store the currnt forward solution
+     * @param\[in\] sSolName        The file name to store the currnt forward solution
      *
      */
     void storeFwd(const QString& sSolName = "default");
@@ -189,15 +189,15 @@ private:
     //=========================================================================================================
     /**
      * Read channelinformation and split into lists for meg/eeg/comp + read m_meg_head_t
-     * @param [in]  pFiffInfo            The FiffInfo to read from
-     * @param [out] listMegCh           The MEG channel list
-     * @param [out] iNMeg               The number of MEG channels
-     * @param [out] listMegComp         The compensator channel list
-     * @param [out] iNMegCmp            The number of compensator channels
-     * @param [out] listEegCh           The EEG channel list
-     * @param [out] iNEeg               The number of EEG channels
-     * @param [out] transDevHeadOld     The meg <-> head transformation
-     * @param [out] id                  The FiffID
+     * @param\[in\] pFiffInfo            The FiffInfo to read from
+     * @param+[\[]out] listMegCh           The MEG channel list
+     * @param+[\[]out] iNMeg               The number of MEG channels
+     * @param+[\[]out] listMegComp         The compensator channel list
+     * @param+[\[]out] iNMegCmp            The number of compensator channels
+     * @param+[\[]out] listEegCh           The EEG channel list
+     * @param+[\[]out] iNEeg               The number of EEG channels
+     * @param+[\[]out] transDevHeadOld     The meg <-> head transformation
+     * @param+[\[]out] id                  The FiffID
      *
      */
     int mne_read_meg_comp_eeg_ch_info_41(FIFFLIB::FiffInfoBase::SPtr pFiffInfoBase,

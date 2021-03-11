@@ -130,7 +130,7 @@ public:
     /**
      * Udates the pugin with new (incoming) data.
      *
-     * @param[in] pMeasurement    The incoming data in form of a generalized Measurement.
+     * @param\[in\] pMeasurement    The incoming data in form of a generalized Measurement.
      */
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
@@ -144,7 +144,7 @@ public:
     /**
      * Set the active flag for SPHARA processing.
      *
-     * @param[in] state    The new activity flag.
+     * @param\[in\] state    The new activity flag.
      */
     void setSpharaActive(bool state);
 
@@ -152,9 +152,9 @@ public:
     /**
      * Set the number of base functions and acquisition system for SPHARA processing.
      *
-     * @param[in] sSytemType         The acquisition system.
-     * @param[in] nBaseFctsGrad      The number of grad/mag base functions to keep.
-     * @param[in] nBaseFctsMag       The number of grad/mag base functions to keep.
+     * @param\[in\] sSytemType         The acquisition system.
+     * @param\[in\] nBaseFctsGrad      The number of grad/mag base functions to keep.
+     * @param\[in\] nBaseFctsMag       The number of grad/mag base functions to keep.
      */
     void setSpharaOptions(const QString& sSytemType,
                           int nBaseFctsFirst,
@@ -177,7 +177,7 @@ protected:
     /**
      * Update the compensator
      *
-     * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
+     * @param\[in\] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
      */
     void updateCompensator(int to);
 
@@ -185,7 +185,7 @@ protected:
     /**
      * Sets the type of channel which are to be filtered
      *
-     * @param[in] sType    the channel type which is to be filtered (EEG, MEG, All)
+     * @param\[in\] sType    the channel type which is to be filtered (EEG, MEG, All)
      */
     void setFilterChannelType(QString sType);
 
@@ -193,7 +193,7 @@ protected:
     /**
      * Filter parameters changed
      *
-     * @param[in] filterData    currently active filter
+     * @param\[in\] filterData    currently active filter
      */
     void setFilter(const RTPROCESSINGLIB::FilterKernel& filterData);
 
@@ -201,7 +201,7 @@ protected:
     /**
      * Filter avtivated
      *
-     * @param[in] state    filter on/off flag
+     * @param\[in\] state    filter on/off flag
      */
     void setFilterActive(bool state);
 

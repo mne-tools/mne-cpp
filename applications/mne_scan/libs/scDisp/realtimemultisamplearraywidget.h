@@ -102,8 +102,8 @@ public:
     /**
      * Constructs a RealTimeMultiSampleArrayWidget which is a child of parent.
      *
-     * @param [in] pTime         pointer to application time.
-     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
+     * @param\[in\] pTime         pointer to application time.
+     * @param\[in\] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
      */
     RealTimeMultiSampleArrayWidget(QSharedPointer<QTime> &pTime,
                                    QWidget* parent = 0);
@@ -124,7 +124,7 @@ public:
     /**
      * Is called when new data are available.
      *
-     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
+     * @param\[in\] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
      */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
@@ -152,7 +152,7 @@ private:
     /**
      * Call this slot whenever you want to make a screenshot current view.
      *
-     * @param[in] imageType  The current iamge type: png, svg.
+     * @param\[in\] imageType  The current iamge type: png, svg.
      */
     void onMakeScreenshot(const QString& imageType);
 

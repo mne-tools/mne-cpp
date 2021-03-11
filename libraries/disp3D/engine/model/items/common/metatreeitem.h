@@ -83,8 +83,8 @@ public:
     /**
      * Default constructor.
      *
-     * @param[in] iType      The type of the item. See types.h for declaration and definition.
-     * @param[in] text       The text of this item. This is also by default the displayed name of the item in a view.
+     * @param\[in\] iType      The type of the item. See types.h for declaration and definition.
+     * @param\[in\] text       The text of this item. This is also by default the displayed name of the item in a view.
      */
     explicit MetaTreeItem(int iType = MetaTreeItemTypes::UnknownItem, const QString& text = "");
 

@@ -91,7 +91,7 @@ public:
     /**
      * Constructs a ProjectorsView which is a child of parent.
      *
-     * @param [in] parent        parent of widget
+     * @param\[in\] parent        parent of widget
      */
     ProjectorsView(const QString& sSettingsPath = "",
                    QWidget *parent = 0,
@@ -115,7 +115,7 @@ public:
     /**
      * Set the current projectors
      *
-     * @param [in] projs    The new projectors.
+     * @param\[in\] projs    The new projectors.
      */
     void setProjectors(const QList<FIFFLIB::FiffProj>& projs);
 
@@ -148,7 +148,7 @@ protected:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param mode     The new mode (Clinical=0, Research=1).
+     * @param\[in\] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -156,7 +156,7 @@ protected:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param mode     The new mode (RealTime=0, Offline=1).
+     * @param\[in\] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 

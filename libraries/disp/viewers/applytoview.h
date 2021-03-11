@@ -74,9 +74,9 @@ public:
     /**
      * @brief ApplyToView
      *
-     * @param [in] sSettingsPath    path for saving view settings
-     * @param [in] parent           parent of widget
-     * @param [in] f                flag to denote window porperties of the widget
+     * @param[in] sSettingsPath    path for saving view settings
+     * @param[in] parent           parent of widget
+     * @param[in] f                flag to denote window porperties of the widget
      */
     ApplyToView(const QString& sSettingsPath = "",
                 QWidget *parent = 0,

@@ -191,9 +191,9 @@ signals:
     /**
      * Signal to notify that new plugin control widgets are available.
      *
-     * @param [in] lControlWidgets      A QList with pointers to the control widgets. Note that the signal sender
+     * @param\[in\] lControlWidgets      A QList with pointers to the control widgets. Note that the signal sender
      *                                  does not have ownership of these pointers.
-     * @param [in] sPluginName          The plugin name emmiting the signal.
+     * @param\[in\] sPluginName          The plugin name emmiting the signal.
      */
     void pluginControlWidgetsChanged(QList<QWidget*>& lControlWidgets,
                                      const QString& sPluginName);
@@ -202,7 +202,7 @@ signals:
     /**
      * Signal emmited whenever the gui modes changed
      *
-     * @param [in] mode       the new gui mode
+     * @param\[in\] mode       the new gui mode
      */
     void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
 
@@ -219,7 +219,7 @@ protected:
     /**
      * Adds a plugin action to the current plugin.
      *
-     * @param [in] pAction  pointer to the action to be added to the plugin
+     * @param\[in\] pAction  pointer to the action to be added to the plugin
      */
     inline void addPluginAction(QAction* pAction);
 

@@ -77,8 +77,8 @@ public:
     /**
      * Constructs a HpiSetupWidget which is a child of parent.
      *
-     * @param [in] toolbox a pointer to the corresponding Hpi.
-     * @param [in] parent pointer to parent widget; If parent is 0, the new HpiSetupWidget becomes a window. If parent is another widget, HpiSetupWidget becomes a child window inside parent. HpiSetupWidget is deleted when its parent is deleted.
+     * @param\[in\] toolbox a pointer to the corresponding Hpi.
+     * @param\[in\] parent pointer to parent widget; If parent is 0, the new HpiSetupWidget becomes a window. If parent is another widget, HpiSetupWidget becomes a child window inside parent. HpiSetupWidget is deleted when its parent is deleted.
      */
     HpiSetupWidget(Hpi* toolbox, QWidget *parent = 0);
 

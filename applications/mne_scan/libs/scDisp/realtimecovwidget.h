@@ -103,8 +103,8 @@ public:
     /**
      * Constructs a RealTimeCovWidget which is a child of parent.
      *
-     * @param [in] pTime         pointer to application time.
-     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
+     * @param\[in\] pTime         pointer to application time.
+     * @param\[in\] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
      */
     RealTimeCovWidget(QSharedPointer<QTime> &pTime,
                       QWidget* parent = 0);
@@ -125,7 +125,7 @@ public:
     /**
      * Is called when new data are available.
      *
-     * @param [in] pMeasurement  pointer to measurement
+     * @param\[in\] pMeasurement  pointer to measurement
      */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 

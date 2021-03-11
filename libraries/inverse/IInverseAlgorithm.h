@@ -88,8 +88,8 @@ public:
     /**
      * Applies the inverse algorithm to input data and returns a source estimate.
      *
-     * @param[in] p_fiffEvoked   Evoked data.
-     * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
+     * @param\[in\] p_fiffEvoked   Evoked data.
+     * @param\[in\] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
      *                           radial component is kept. This is only applied when working with loose orientations.
      *
      * @return the calculated source estimation
@@ -100,10 +100,10 @@ public:
     /**
      * Applies the inverse algorithm to input data and returns a source estimate.
      *
-     * @param[in] p_fiffEvoked   Evoked data.
-     * @param[in] tmin           Minimal time point
-     * @param[in] tmin           Time between two samples
-     * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
+     * @param\[in\] p_fiffEvoked   Evoked data.
+     * @param\[in\] tmin           Minimal time point
+     * @param\[in\] tmin           Time between two samples
+     * @param\[in\] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
      *                           radial component is kept. This is only applied when working with loose orientations.
      *
      * @return the calculated source estimation

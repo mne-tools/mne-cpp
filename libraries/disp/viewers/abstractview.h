@@ -100,7 +100,7 @@ public:
     /**
      * Constructs a AbstractView which is a child of parent.
      *
-     * @param [in] parent        parent of widget
+     * @param[in] parent        parent of widget
      */
     AbstractView(QWidget *parent = 0,
                  Qt::WindowFlags f = Qt::Widget);

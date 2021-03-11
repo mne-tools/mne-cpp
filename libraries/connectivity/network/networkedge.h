@@ -87,12 +87,12 @@ public:
     /**
      * Constructs a NetworkEdge object.
      *
-     * @param[in]  iStartNodeID      The start node id of the edge.
-     * @param[in]  iEndNodeID        The end node id of the edge.
-     * @param[in]  matWeight         The edge weight.
-     * @param[in]  bIsActive         The active flag of this edge. Default is true.
-     * @param[in]  iStartWeightBin   The bin index to start avergaing from. Default is -1 which means an average over all weights.
-     * @param[in]  iEndWeightBin     The bin index to end avergaing to. Default is -1 which means an average over all weights.
+     * @param\[in\] iStartNodeID      The start node id of the edge.
+     * @param\[in\] iEndNodeID        The end node id of the edge.
+     * @param\[in\] matWeight         The edge weight.
+     * @param\[in\] bIsActive         The active flag of this edge. Default is true.
+     * @param\[in\] iStartWeightBin   The bin index to start avergaing from. Default is -1 which means an average over all weights.
+     * @param\[in\] iEndWeightBin     The bin index to end avergaing to. Default is -1 which means an average over all weights.
      */
     explicit NetworkEdge(int iStartNodeID,
                          int iEndNodeID,
@@ -121,7 +121,7 @@ public:
     /**
      * Sets the activity flag of this edge.
      *
-     * @param[in]  bActiveFlag        The new activity flag of this edge.
+     * @param\[in\] bActiveFlag        The new activity flag of this edge.
      */
     void setActive(bool bActiveFlag);
 
@@ -153,7 +153,7 @@ public:
     /**
      * Set the averaged edge weight.
      *
-     * @param[in] dAveragedWeight        The new weight.
+     * @param\[in\] dAveragedWeight        The new weight.
      */
     void setWeight(double dAveragedWeight);
 
@@ -167,7 +167,7 @@ public:
     /**
      * Sets the frequency bins to average from/to.
      *
-     * @param[in] minMaxFreqBins        The new lower/upper bin to average from/to.
+     * @param\[in\] minMaxFreqBins        The new lower/upper bin to average from/to.
      */
     void setFrequencyBins(const QPair<int, int> &minMaxFreqBins);
 

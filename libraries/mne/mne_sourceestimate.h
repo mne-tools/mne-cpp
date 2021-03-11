@@ -97,10 +97,10 @@ public:
     /**
      * Constructs a source estimation from given data
      *
-     * @param[in] p_sol
-     * @param[in] p_vertices
-     * @param[in] p_tmin
-     * @param[in] p_tstep
+     * @param\[in\] p_sol
+     * @param\[in\] p_vertices
+     * @param\[in\] p_tmin
+     * @param\[in\] p_tstep
      */
     MNESourceEstimate(const Eigen::MatrixXd &p_sol, const Eigen::VectorXi &p_vertices, float p_tmin, float p_tstep);
 
@@ -108,7 +108,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_SourceEstimate    Source estimate data which should be copied
+     * @param\[in\] p_SourceEstimate    Source estimate data which should be copied
      */
     MNESourceEstimate(const MNESourceEstimate& p_SourceEstimate);
 
@@ -116,7 +116,7 @@ public:
     /**
      * Constructs a source estimation, by reading from a IO device.
      *
-     * @param[in] p_IODevice     IO device to read from the source estimation.
+     * @param\[in\] p_IODevice     IO device to read from the source estimation.
      *
      */
     MNESourceEstimate(QIODevice &p_IODevice);
@@ -131,8 +131,8 @@ public:
     /**
      * Reduces the source estimate to selected samples.
      *
-     * @param[in] start  The start index to cut the estimate from.
-     * @param[in] n      Number of samples to cut from start index.
+     * @param\[in\] start  The start index to cut the estimate from.
+     * @param\[in\] n      Number of samples to cut from start index.
      */
     MNESourceEstimate reduce(qint32 start, qint32 n);
 
@@ -142,8 +142,8 @@ public:
      *
      * Reads a source estimate from a given file
      *
-     * @param [in] p_IODevice    IO device to red the stc from.
-     * @param [out] p_stc        the read stc
+     * @param\[in\] p_IODevice    IO device to red the stc from.
+     * @param+[\[]out] p_stc        the read stc
      *
      * @return true if successful, false otherwise
      */
@@ -155,7 +155,7 @@ public:
      *
      * Writes a stc file
      *
-     * @param [in] p_IODevice   IO device to write the stc to.
+     * @param\[in\] p_IODevice   IO device to write the stc to.
      */
     bool write(QIODevice &p_IODevice);
 
@@ -171,7 +171,7 @@ public:
     /**
      * Assignment Operator
      *
-     * @param[in] rhs     SourceEstimate which should be assigned.
+     * @param\[in\] rhs     SourceEstimate which should be assigned.
      *
      * @return the copied source estimate
      */
@@ -189,8 +189,8 @@ public:
     /**
      * Returns the indices of sources in the data matrix based on their beloning label.
      *
-     * @param[in] lPickedLabels      The labels base the selection on.
-     * @param[in] bIsClustered       Whether the source space was clustered.
+     * @param\[in\] lPickedLabels      The labels base the selection on.
+     * @param\[in\] bIsClustered       Whether the source space was clustered.
      *
      * @return the indices
      */

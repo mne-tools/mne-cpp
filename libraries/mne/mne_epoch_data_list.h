@@ -98,13 +98,13 @@ public:
     /**
      * Read the epochs from a raw file based on provided events.
      *
-     * @param[in] raw            The raw data.
-     * @param[in] events         The events provided in samples and event kind.
-     * @param[in] tmin           The start time relative to the event in seconds.
-     * @param[in] tmax           The end time relative to the event in seconds.
-     * @param[in] event          The event kind.
-     * @param[in] lExcludeChs    List of channel names to exclude.
-     * @param[in] picks          Which channels to pick.
+     * @param\[in\] raw            The raw data.
+     * @param\[in\] events         The events provided in samples and event kind.
+     * @param\[in\] tmin           The start time relative to the event in seconds.
+     * @param\[in\] tmax           The end time relative to the event in seconds.
+     * @param\[in\] event          The event kind.
+     * @param\[in\] lExcludeChs    List of channel names to exclude.
+     * @param\[in\] picks          Which channels to pick.
      */
     static MNEEpochDataList readEpochs(const FIFFLIB::FiffRawData& raw,
                                        const Eigen::MatrixXi& events,
@@ -119,11 +119,11 @@ public:
     /**
      * Averages epoch list. Note that no baseline correction performed.
      *
-     * @param[in] info     measurement info
-     * @param[in] first    First time sample
-     * @param[in] last     Last time sample
-     * @param[in] sel      Which epochs should be averaged (optional)
-     * @param[in] proj     Apply SSP projection vectors (optional, default = false)
+     * @param\[in\] info     measurement info
+     * @param\[in\] first    First time sample
+     * @param\[in\] last     Last time sample
+     * @param\[in\] sel      Which epochs should be averaged (optional)
+     * @param\[in\] proj     Apply SSP projection vectors (optional, default = false)
      */
     FIFFLIB::FiffEvoked average(const FIFFLIB::FiffInfo &p_info,
                                 FIFFLIB::fiff_int_t first,
@@ -135,7 +135,7 @@ public:
     /**
      * Applies baseline correction to the evoked data.
      *
-     * @param[in] baseline     time definition of the baseline in seconds [from, to]
+     * @param\[in\] baseline     time definition of the baseline in seconds [from, to]
      */
     void applyBaselineCorrection(const QPair<float, float> &baseline);
 
@@ -149,7 +149,7 @@ public:
     /**
      * Reduces alld epochs to the selected rows.
      *
-     * @param[in] sel     The selected rows to keep.
+     * @param\[in\] sel     The selected rows to keep.
      */
     void pick_channels(const Eigen::RowVectorXi& sel);
 
@@ -157,10 +157,10 @@ public:
     /**
      * Checks the givven matrix for artifacts beyond a threshold value.
      *
-     * @param[in] data           The data matrix.
-     * @param[in] pFiffInfo      The fiff info.
-     * @param[in] mapReject      The channel data types to scan for. EEG, MEG or EOG.
-     * @param[in] lExcludeChs    List of channel names to exclude.
+     * @param\[in\] data           The data matrix.
+     * @param\[in\] pFiffInfo      The fiff info.
+     * @param\[in\] mapReject      The channel data types to scan for. EEG, MEG or EOG.
+     * @param\[in\] lExcludeChs    List of channel names to exclude.
      *
      * @return   Whether a threshold artifact was detected.
      */

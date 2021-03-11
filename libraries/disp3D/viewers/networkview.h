@@ -105,9 +105,9 @@ public:
     /**
      * Adds a list of connectivity estimation data.
      *
-     * @param[in] sSubject               The name of the subject.
-     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-     * @param[in] networkData            The list of connectivity data.
+     * @param\[in\] sSubject               The name of the subject.
+     * @param\[in\] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param\[in\] networkData            The list of connectivity data.
      *
      * @return                           Returns a lsit with pointers to the added tree items.
      */
@@ -119,9 +119,9 @@ public:
     /**
      * Adds connectivity estimation data.
      *
-     * @param[in] sSubject               The name of the subject.
-     * @param[in] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
-     * @param[in] networkData            The connectivity data.
+     * @param\[in\] sSubject               The name of the subject.
+     * @param\[in\] sMeasurementSetName    The name of the measurement set to which the data is to be added. If it does not exist yet, it will be created.
+     * @param\[in\] networkData            The connectivity data.
      *
      * @return                           Returns a pointer to the added tree item. Default is a NULL pointer if no item was added.
      */

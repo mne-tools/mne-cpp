@@ -86,7 +86,7 @@ public:
     /**
      * Creates the plot.
      *
-     * @param[in] parent     Parent QObject (optional)
+     * @param\[in\] parent     Parent QObject (optional)
      */
     explicit Plot(QWidget *parent = Q_NULLPTR);
 
@@ -94,8 +94,8 @@ public:
     /**
      * Creates the plot using a given double vector.
      *
-     * @param[in] p_dVec     The double data vector
-     * @param[in] parent     Parent QObject (optional)
+     * @param\[in\] p_dVec     The double data vector
+     * @param\[in\] parent     Parent QObject (optional)
      */
     explicit Plot(Eigen::VectorXd &p_dVec,
                   QWidget *parent = 0);
@@ -116,7 +116,7 @@ public:
     /**
      * Updates the plot using a given double vector without given X data.
      *
-     * @param[in] p_dVec     The double data vector
+     * @param\[in\] p_dVec     The double data vector
      */
     void updateData(Eigen::VectorXd &p_dVec);
 
@@ -125,7 +125,7 @@ protected:
     /**
      * The reimplemented paintEvent
      *
-     * @param[in] event    The event.
+     * @param\[in\] event    The event.
      */
     void paintEvent(QPaintEvent* event);
 

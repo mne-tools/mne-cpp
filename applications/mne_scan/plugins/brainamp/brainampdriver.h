@@ -104,7 +104,7 @@ public:
     /**
      * Constructs a BrainAMPDriver.
      *
-     * @param [in] pEEGoSportsProducer a pointer to the corresponding EEGoSports Producer class.
+     * @param\[in\] pEEGoSportsProducer a pointer to the corresponding EEGoSports Producer class.
      */
     BrainAMPDriver(BrainAMPProducer* pBrainAmpProducer);
 
@@ -117,7 +117,7 @@ public:
     //=========================================================================================================
     /**
      * Get sample from the device in form of a mtrix.
-     * @param [in] MatrixXf the block sample values in form of a matrix.
+     * @param\[in\] MatrixXf the block sample values in form of a matrix.
      *
      * @return Returns true if sample was successfully written to the input variable, false otherwise.
      */
@@ -126,8 +126,8 @@ public:
     //=========================================================================================================
     /**
      * Initialise device.
-     * @param [in] iSamplesPerBlock samples per block specified by the user.
-     * @param [in] iSamplingFrequency sampling frequency specified by the user.
+     * @param\[in\] iSamplesPerBlock samples per block specified by the user.
+     * @param\[in\] iSamplingFrequency sampling frequency specified by the user.
      */
     bool initDevice(int iSamplesPerBlock,
                     int iSamplingFrequency);

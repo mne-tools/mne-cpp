@@ -77,8 +77,8 @@ public:
     /**
      * Constructs a EEGoSportsSetupWidget which is a child of parent.
      *
-     * @param [in] parent pointer to parent widget; If parent is 0, the new EEGoSportsSetupWidget becomes a window. If parent is another widget, EEGoSportsSetupWidget becomes a child window inside parent. EEGoSportsSetupWidget is deleted when its parent is deleted.
-     * @param [in] pEEGoSports a pointer to the corresponding ECGSimulator.
+     * @param\[in\] parent pointer to parent widget; If parent is 0, the new EEGoSportsSetupWidget becomes a window. If parent is another widget, EEGoSportsSetupWidget becomes a child window inside parent. EEGoSportsSetupWidget is deleted when its parent is deleted.
+     * @param\[in\] pEEGoSports a pointer to the corresponding ECGSimulator.
      */
     EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget *parent = 0);
 

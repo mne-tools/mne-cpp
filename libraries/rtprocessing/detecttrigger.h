@@ -70,7 +70,7 @@ namespace RTPROCESSINGLIB
  *
  * @param[in]       mapTriggers  The QMap to be transformed
  *
- * @param return    A list of transformed Eigen matrices.
+ * @param[in] return    A list of transformed Eigen matrices.
  */
 RTPROCESINGSHARED_EXPORT QList<Eigen::MatrixXi> toEventMatrix(QMap<int,QList<QPair<int,double> > > mapTriggers);
 
@@ -154,7 +154,7 @@ RTPROCESINGSHARED_EXPORT QMap<int,QList<QPair<int,double> > > detectTriggerFlank
  */
 RTPROCESINGSHARED_EXPORT QList<QPair<int,double> > detectTriggerFlanksGrad(const Eigen::MatrixXd &data,
                                                                            int iTriggerChannelIdx,
-                                                                           int iOffsetIndex,
+                                                                            int iOffsetIndex,
                                                                            double dThreshold,
                                                                            bool bRemoveOffset,
                                                                            const QString& type,

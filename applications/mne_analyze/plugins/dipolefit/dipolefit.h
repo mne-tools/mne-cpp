@@ -123,8 +123,8 @@ private:
     /**
      * Updates modalities in dipole settings
      *
-     * @param [in] bEEG     whether to use EEG (true = yes, false = no)
-     * @param [in] bMEG     whether to use MEG (true = yes, false = no)
+     * @param\[in\] bEEG     whether to use EEG (true = yes, false = no)
+     * @param\[in\] bMEG     whether to use MEG (true = yes, false = no)
      */
     void onModalityChanged(bool bEEG, bool bMEG);
 
@@ -132,10 +132,10 @@ private:
     /**
      * Set new time parameters in dipole settings
      *
-     * @param [in] iMin     new minimum in milliseconds
-     * @param [in] iMax     new maximum in milliseconds
-     * @param [in] iStep    new step value in milliseconds
-     * @param [in] iInt     new integration value in milliseconds
+     * @param\[in\] iMin     new minimum in milliseconds
+     * @param\[in\] iMax     new maximum in milliseconds
+     * @param\[in\] iStep    new step value in milliseconds
+     * @param\[in\] iInt     new integration value in milliseconds
      */
     void onTimeChanged(int iMin, int iMax, int iStep, int iInt);
 
@@ -143,8 +143,8 @@ private:
     /**
      * Set new fitting values in dipole settings
      *
-     * @param [in] iMinDistance     distance to inner skull in millimeters
-     * @param [in] iSize        radius guess in millimeters
+     * @param\[in\] iMinDistance     distance to inner skull in millimeters
+     * @param\[in\] iSize        radius guess in millimeters
      */
     void onFittingChanged(float fMinDistance, float fSize);
 
@@ -152,7 +152,7 @@ private:
     /**
      * Loads new model whan current model is changed
      *
-     * @param [in,out] pNewModel    pointer to newly selected model
+     * @param[in, out] pNewModel    pointer to newly selected model
      */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
@@ -160,7 +160,7 @@ private:
     /**
      * Handles clearing view if currently used model is being removed
      *
-     * @param [in] pRemovedModel    Pointer to model being removed
+     * @param\[in\] pRemovedModel    Pointer to model being removed
      */
     void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
 
@@ -168,8 +168,8 @@ private:
     /**
      * Set new baseline parameters
      *
-     * @param [in] iBMin    baseline start time in milliseconds
-     * @param [in] iBMax    baseline end time in milliseconds
+     * @param\[in\] iBMin    baseline start time in milliseconds
+     * @param\[in\] iBMax    baseline end time in milliseconds
      */
     void onBaselineChanged(int iBMin,
                            int iBMax);
@@ -178,9 +178,9 @@ private:
     /**
      * Set new manual noise parameters
      *
-     * @param [in] dGrad    gradiometer value
-     * @param [in] dMag     magnetometer value
-     * @param [in] dEeg     eeg value
+     * @param\[in\] dGrad    gradiometer value
+     * @param\[in\] dMag     magnetometer value
+     * @param\[in\] dEeg     eeg value
      */
     void onNoiseChanged(double dGrad,
                         double dMag,
@@ -190,10 +190,10 @@ private:
     /**
      * Set new regularization parameters
      *
-     * @param [in] iReg         overall regularization parameter
-     * @param [in] iRegGrad     gradiatometer regularizaation parameter
-     * @param [in] iRegMag      magnetometer regularization parameter
-     * @param [in] iRegEeg      eeg regularization parameter
+     * @param\[in\] iReg         overall regularization parameter
+     * @param\[in\] iRegGrad     gradiatometer regularizaation parameter
+     * @param\[in\] iRegMag      magnetometer regularization parameter
+     * @param\[in\] iRegEeg      eeg regularization parameter
      */
     void onRegChanged(double dRegGrad,
                       double dRegMag,
@@ -203,7 +203,7 @@ private:
     /**
      * Select set from measurement to use
      *
-     * @param [in] iSet
+     * @param\[in\] iSet
      */
     void onSetChanged(int iSet);
 
@@ -211,10 +211,10 @@ private:
     /**
      * Set new spherer model parameters
      *
-     * @param [in] dX           x position in millimeters
-     * @param [in] dY           y position in millimeters
-     * @param [in] dZ           z position in millimeters
-     * @param [in] dRadius      radius in millimeters
+     * @param\[in\] dX           x position in millimeters
+     * @param\[in\] dY           y position in millimeters
+     * @param\[in\] dZ           z position in millimeters
+     * @param\[in\] dRadius      radius in millimeters
      */
     void onSphereChanged(double dX,
                          double dY,
@@ -225,7 +225,7 @@ private:
     /**
      * Sends new edc set to be added to 3dView
      *
-     * @param [in] set      new EDCSet to be sent
+     * @param\[in\] set      new EDCSet to be sent
      */
     void newDipoleFit(INVERSELIB::ECDSet set, const QString& sFitName);
 
@@ -233,7 +233,7 @@ private:
     /**
      * Set new Bem model
      *
-     * @param [in] sName    file name
+     * @param\[in\] sName    file name
      */
     void onNewBemSelected(const QString& sName);
 
@@ -241,7 +241,7 @@ private:
     /**
      * Set new Mri model
      *
-     * @param [in] sName    file name
+     * @param\[in\] sName    file name
      */
     void onNewMriSelected(const QString& sName);
 
@@ -249,7 +249,7 @@ private:
     /**
      * Set new Noise model
      *
-     * @param [in] sName    file name
+     * @param\[in\] sName    file name
      */
     void onNewNoiseSelected(const QString& sName);
 
@@ -257,7 +257,7 @@ private:
     /**
      * Set new measurement model
      *
-     * @param [in] sName    file name
+     * @param\[in\] sName    file name
      */
     void onNewMeasSelected(const QString& sName);
 
@@ -279,7 +279,7 @@ private:
     /**
      * Sends event to trigger loading bar to appear and sMessage to show
      *
-     * @param [in] sMessage     loading bar message
+     * @param\[in\] sMessage     loading bar message
      */
     void triggerLoadingStart(QString sMessage);
 
@@ -307,7 +307,7 @@ signals:
     /**
      * New BEM file available (add to gui)
      *
-     * @param [in] sModelName
+     * @param\[in\] sModelName
      */
     void newBemModel(const QString& sModelName);
 
@@ -315,7 +315,7 @@ signals:
     /**
      * New noise file available (add to gui)
      *
-     * @param [in] sModelName
+     * @param\[in\] sModelName
      */
     void newCovarianceModel(const QString& sModelName);
 
@@ -323,7 +323,7 @@ signals:
     /**
      * New MRI file available (add to gui)
      *
-     * @param [in] sModelName
+     * @param\[in\] sModelName
      */
     void newMriModel(const QString& sModelName);
 
@@ -331,7 +331,7 @@ signals:
     /**
      * New measurement file available (add to gui)
      *
-     * @param [in] sModelName
+     * @param\[in\] sModelName
      */
     void newMeasurment(const QString& sModelName);
 
@@ -339,8 +339,8 @@ signals:
     /**
      * Removes model from view
      *
-     * @param [in] sModelName   name of model to be removed
-     * @param [in] iType        type of model (1-measurement, 2-BEM, 3-MRI, 4-Cov)
+     * @param\[in\] sModelName   name of model to be removed
+     * @param\[in\] iType        type of model (1-measurement, 2-BEM, 3-MRI, 4-Cov)
      */
     void removeModel(const QString& sModelName, int iType);
 

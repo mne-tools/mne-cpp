@@ -94,7 +94,7 @@ public:
     /**
      * Constructs an real-time multi sample array table model for the given parent.
      *
-     * @param[in] parent     parent of the table model
+     * @param\[in\] parent     parent of the table model
      */
     FrequencySpectrumModel(QObject *parent = 0);
 
@@ -102,7 +102,7 @@ public:
     /**
      * Returns the number of rows under the given parent. When the parent is valid it means that rowCount is returning the number of children of parent.
      *
-     * @param[in] parent     not used
+     * @param\[in\] parent     not used
      *
      * @return number of rows
      */
@@ -112,7 +112,7 @@ public:
     /**
      * Returns the number of columns for the children of the given parent.
      *
-     * @param[in] parent     not used
+     * @param\[in\] parent     not used
      *
      * @return number of columns
      */
@@ -122,8 +122,8 @@ public:
     /**
      * Returns the data stored under the given role for the item referred to by the index.
      *
-     * @param[in] index      determines item location
-     * @param[in] role       role to return
+     * @param\[in\] index      determines item location
+     * @param\[in\] role       role to return
      *
      * @return accessed data
      */
@@ -134,9 +134,9 @@ public:
     /**
      * Returns the data for the given role and section in the header with the specified orientation.
      *
-     * @param[in] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
-     * @param[in] orientation    Qt::Horizontal or Qt::Vertical
-     * @param[in] role           role to show
+     * @param\[in\] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
+     * @param\[in\] orientation    Qt::Horizontal or Qt::Vertical
+     * @param\[in\] role           role to show
      *
      * @return accessed eader data
      */
@@ -147,7 +147,7 @@ public:
     /**
      * Sets corresponding fiff info
      *
-     * @param [in] inf       The corresponding fiff information object
+     * @param\[in\] inf       The corresponding fiff information object
      */
     void setInfo(QSharedPointer<FIFFLIB::FiffInfo> &info);
 
@@ -155,7 +155,7 @@ public:
     /**
      * Sets Scale type
      *
-     * @param [in] ScaleType       The corresponding scale type
+     * @param\[in\] ScaleType       The corresponding scale type
      */
     void setScaleType(qint8 ScaleType);
 
@@ -163,7 +163,7 @@ public:
     /**
      * Adds the frequency estimation
      *
-     * @param[in] data   the frequency estimation
+     * @param\[in\] data   the frequency estimation
      */
     void addData(const Eigen::MatrixXd &data);
 
@@ -211,7 +211,7 @@ public:
     /**
      * Selects the given list of channel indeces and unselect all other channels
      *
-     * @param[in] selection      channel index list to select
+     * @param\[in\] selection      channel index list to select
      */
     void selectRows(const QList<qint32> &selection);
 
@@ -225,7 +225,7 @@ public:
     /**
      * Toggle freeze for all channels when a channel is double clicked
      *
-     * @param [in] index     of the channel which has been double clicked
+     * @param\[in\] index     of the channel which has been double clicked
      */
     void toggleFreeze(const QModelIndex &index);
 
@@ -241,8 +241,8 @@ public:
     /**
      * Set plotting boundaries
      *
-     * @param[in] fLowerFrqBound     Lower frequency boudnary
-     * @param[in] fUpperFrqBound     Upper frequency boudnary
+     * @param\[in\] fLowerFrqBound     Lower frequency boudnary
+     * @param\[in\] fUpperFrqBound     Upper frequency boudnary
      */
     void setBoundaries(float fLowerFrqBound, float fUpperFrqBound);
 
@@ -267,7 +267,7 @@ signals:
     /**
      * Emmited when new selcetion was made
      *
-     * @param [in] selection     list of all selected channels
+     * @param\[in\] selection     list of all selected channels
      */
     void newSelection(QList<qint32> selection);
 

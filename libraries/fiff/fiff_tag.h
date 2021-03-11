@@ -463,8 +463,8 @@ public:
      * The last choice means that the native byte order value will be substituted here before proceeding
      *
      * @param[in, out] tag       matrix data to convert
-     * @param[in] from_endian    from endian encoding
-     * @param[in] to_endian      to endian encoding
+     * @param\[in\] from_endian    from endian encoding
+     * @param\[in\] to_endian      to endian encoding
      */
     static void convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian);
 

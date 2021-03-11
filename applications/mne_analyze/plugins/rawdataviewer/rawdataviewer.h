@@ -122,7 +122,7 @@ private:
     /**
      * Handles if a new model is present. Only works on FiffRawViewModels
      *
-     * @param [in] pNewModel    The new model.
+     * @param\[in\] pNewModel    The new model.
      */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
@@ -130,7 +130,7 @@ private:
     /**
      * Handles clearing view if currently used model is being removed
      *
-     * @param [in] pRemovedModel    Pointer to model being removed
+     * @param\[in\] pRemovedModel    Pointer to model being removed
      */
     void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
 
@@ -138,7 +138,7 @@ private:
     /**
      * Handles if a new sample position should be dispatched
      *
-     * @param [in] iSample    The sample to be send.
+     * @param\[in\] iSample    The sample to be send.
      */
     void onSendSamplePos(int iSample);
 
@@ -146,7 +146,7 @@ private:
     /**
      * Updates the signal view parameters based on incoming pViewParameters object
      *
-     * @param [in] pViewParameters  container for singal viewer display settings with new desired settings
+     * @param\[in\] pViewParameters  container for singal viewer display settings with new desired settings
      */
     void updateViewParameters(ANSHAREDLIB::ViewParameters viewParameters);
 

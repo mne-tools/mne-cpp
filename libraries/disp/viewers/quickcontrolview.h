@@ -91,10 +91,10 @@ public:
     /**
      * Constructs a QuickControlView which is a child of parent.
      *
-     * @param [in] name          The name to be displayed on the minimize button.
-     * @param [in] flags         The window flags.
-     * @param [in] parent        The parent of widget.
-     * @param [in] bDraggable    Flag specifying whether this widget is draggable.
+     * @param\[in\] name          The name to be displayed on the minimize button.
+     * @param\[in\] flags         The window flags.
+     * @param\[in\] parent        The parent of widget.
+     * @param\[in\] bDraggable    Flag specifying whether this widget is draggable.
      */
     QuickControlView(const QString& sSettingsPath = "",
                      const QString& name = "",
@@ -122,10 +122,10 @@ public:
      * This convenience function adds control widgets to the QuickControlView based on their set objects names.
      * Takes ownership of the QWidgets.
      *
-     * @param [in] lWidgets     The widget which are supposed to be added. The widgets will be categorized based on their
+     * @param\[in\] lWidgets     The widget which are supposed to be added. The widgets will be categorized based on their
      *                          object names: "widget_", "group_", "group_tab_".
-     * @param [in] sTabName     The tab to which the widgets are supposed to be added to.
-     * @param [in] bAddToEnd    Whether to add the new widgets to the end of the layout.
+     * @param\[in\] sTabName     The tab to which the widgets are supposed to be added to.
+     * @param\[in\] bAddToEnd    Whether to add the new widgets to the end of the layout.
      *                          If true, the widgets will inserted in the beginning of the layout.
      */
     void addWidgets(const QList<QWidget*>& lWidgets,
@@ -136,9 +136,9 @@ public:
     /**
      * Add a new group box to this Widget. Takes ownership of the passed widget. Takes ownership of the QWidget.
      *
-     * @param [in] pWidget           The widget which is supposed to be added.
-     * @param [in] sTabName          The tab to which the widget is supposed to be added to.
-     * @param [in] bAddToEnd         Whether to add the new widgets to the end of the layout.
+     * @param\[in\] pWidget           The widget which is supposed to be added.
+     * @param\[in\] sTabName          The tab to which the widget is supposed to be added to.
+     * @param\[in\] bAddToEnd         Whether to add the new widgets to the end of the layout.
      *                               If true, the widgets will inserted in the beginning of the layout.
      */
     void addWidget(QWidget* pWidget,
@@ -149,10 +149,10 @@ public:
     /**
      * Add a new group box to this Widget. Takes ownership of the passed widget. Takes ownership of the QWidget.
      *
-     * @param [in] pWidget           The widgets which will be put into the new group box.
-     * @param [in] sGroupBoxName     The name of the new group box.
-     * @param [in] sTabName          The tab to which the group box is supposed to be added to.
-     * @param [in] bAddToEnd         Whether to add the new widgets to the end of the layout.
+     * @param\[in\] pWidget           The widgets which will be put into the new group box.
+     * @param\[in\] sGroupBoxName     The name of the new group box.
+     * @param\[in\] sTabName          The tab to which the group box is supposed to be added to.
+     * @param\[in\] bAddToEnd         Whether to add the new widgets to the end of the layout.
      *                               If true, the widgets will inserted in the beginning of the layout.
      */
     void addGroupBox(QWidget* pWidget,
@@ -165,11 +165,11 @@ public:
      * Add a new group box with tabs to this Widget. If the group box already exists, a new tab will be added to its QTabWidget.
      *  Takes ownership of the QWidget.
      *
-     * @param [in] pWidget           The widgets which will be put into the new group box.
-     * @param [in] sGroupBoxName     The name of the new group box.
-     * @param [in] sTabNameGroupBox  The tab name inside the tab widget of the group box.
-     * @param [in] sTabName          The tab to which the group box with the tab widget is supposed to be added to.
-     * @param [in] bAddToEnd         Whether to add the new widgets to the end of the layout.
+     * @param\[in\] pWidget           The widgets which will be put into the new group box.
+     * @param\[in\] sGroupBoxName     The name of the new group box.
+     * @param\[in\] sTabNameGroupBox  The tab name inside the tab widget of the group box.
+     * @param\[in\] sTabName          The tab to which the group box with the tab widget is supposed to be added to.
+     * @param\[in\] bAddToEnd         Whether to add the new widgets to the end of the layout.
      *                               If true, the widgets will inserted in the beginning of the layout.
      */
     void addGroupBoxWithTabs(QWidget* pWidget,
@@ -182,7 +182,7 @@ public:
     /**
      * Sets the values of the opacity slider. Choose value between 0.0 and 1.0.
      *
-     * @param [in] opactiy       the new opacity value
+     * @param\[in\] opactiy       the new opacity value
      */
     void setOpacityValue(int opactiy);
 
@@ -198,7 +198,7 @@ public:
     /**
      * Sets the visibility of the hide/show and close button
      *
-     * @param [in] bVisibility       the new visiblity state.
+     * @param\[in\] bVisibility       the new visiblity state.
      */
     void setVisiblityHideOpacityClose(bool bVisibility);
 
@@ -219,7 +219,7 @@ protected:
     /**
      * Slot called when opacity slider was changed
      *
-     * @param [in] value opacity value.
+     * @param\[in\] value opacity value.
      */
     void onOpacityChange(qint32 value);
 
