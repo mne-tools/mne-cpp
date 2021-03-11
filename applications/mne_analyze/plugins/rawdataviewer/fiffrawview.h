@@ -371,6 +371,9 @@ private:
      */
     void updateVerticalScrollPosition(qint32 newScrollPosition);
 
+    //=========================================================================================================
+    void onNewRealtimeData();
+
 
     QPointer<QTableView>                                m_pTableView;                   /**< Pointer to table view ui element. */
 

@@ -226,6 +226,9 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
     connect(m_pTableView.data(), &QWidget::customContextMenuRequested,
             this, &FiffRawView::customContextMenuRequested, Qt::UniqueConnection);
 
+    connect(m_pModel.data(), &FiffRawViewModel::newRealtimeData,
+            this, &FiffRawView::onNewRealtimeData, Qt::UniqueConnection);
+
 //    //Gestures
 //    m_pTableView->grabGesture(Qt::PinchGesture);
 //    m_pTableView->grabGesture(Qt::TapAndHoldGesture);
@@ -616,6 +619,9 @@ void FiffRawView::disconnectModel()
     // Disconnect resizing of the table view to the MVC
     disconnect(this, &FiffRawView::tableViewDataWidthChanged,
             m_pModel.data(), &FiffRawViewModel::setDataColumnWidth);
+
+    disconnect(m_pModel.data(), &FiffRawViewModel::newRealtimeData,
+               this, &FiffRawView::onNewRealtimeData);
 }
 
 //=============================================================================================================
@@ -749,4 +755,15 @@ void FiffRawView::updateFilterLabel()
     }
     label += "  -  " + m_pModel->getFilter().getShortDescription() + "  |";
     m_pFilterLabel->setText(label);
+}
+
+//=============================================================================================================
+
+void FiffRawView::onNewRealtimeData()
+{
+    m_pTableView->update();
+
+    updateTimeLabels(0);
+    updateFileLabel();
+    updateFilterLabel();
 }
