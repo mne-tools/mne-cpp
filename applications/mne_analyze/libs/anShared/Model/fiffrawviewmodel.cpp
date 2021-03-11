@@ -111,7 +111,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_bPerformFiltering(false)
 , m_iDistanceTimerSpacer(1000)
 , m_iScroller(0)
-, m_iRealtimeFileIndex(0)
+, m_iRealtimeFileIndex(1)
 , m_iScrollPos(0)
 , m_bDispAnnotation(true)
 , m_bRealtime(false)
@@ -144,14 +144,14 @@ FiffRawViewModel::~FiffRawViewModel()
 
 //=============================================================================================================
 
-void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
+bool FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
 {
     // build FiffIO
     m_pFiffIO = QSharedPointer<FiffIO>::create(p_IODevice);
 
     if(m_pFiffIO->m_qlistRaw.empty()) {
         qWarning() << "[FiffRawViewModel::loadFiffData] File does not contain any Fiff data";
-        return;
+        return false;
     }
 
     m_ChannelInfoList.clear();
@@ -178,6 +178,8 @@ void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
     p_IODevice.close();
 
     m_bIsInit = true;
+
+    return true;
 }
 
 //=============================================================================================================
@@ -1044,10 +1046,12 @@ void FiffRawViewModel::setRealtime(bool bRealtime)
     if (m_bRealtime) {
         m_fileWatcher.addPath(QDir::currentPath());
         connect(&m_fileWatcher, &QFileSystemWatcher::directoryChanged,
-                this, &FiffRawViewModel::updateFromRealtime, Qt::UniqueConnection);
+                this, &FiffRawViewModel::watchFile, Qt::UniqueConnection);
+        connect(&m_fileWatcher, &QFileSystemWatcher::fileChanged,
+                this, &FiffRawViewModel::readFromRealtimeFile, Qt::UniqueConnection);
     } else {
         disconnect(&m_fileWatcher, &QFileSystemWatcher::directoryChanged,
-                   this, &FiffRawViewModel::updateFromRealtime);
+                   this, &FiffRawViewModel::watchFile);
     }
 }
 
@@ -1060,8 +1064,29 @@ bool FiffRawViewModel::isRealtime()
 
 //=============================================================================================================
 
-void FiffRawViewModel::updateFromRealtime(const QString &path)
+void FiffRawViewModel::watchFile(const QString &path)
 {
-    m_file.setFileName(path + "/mnescanfile" + QString::number(++m_iRealtimeFileIndex) + "_raw.fif");
-    initFiffData(m_file);
+    //m_file.setFileName(path + "/mnescanfile" + QString::number(++m_iRealtimeFileIndex) + "_raw.fif");
+
+    m_fileWatcher.addPath(path + "/mnescanfile" + QString::number(m_iRealtimeFileIndex) + "_raw.fif");
+//    initFiffData(m_file);
+//    updateEndStartFlags();
+
+//    emit dataChanged(createIndex(0, 0),
+//                     createIndex(rowCount(), columnCount()));
+}
+
+//=============================================================================================================
+
+void FiffRawViewModel::readFromRealtimeFile(const QString &path)
+{
+    m_file.setFileName(path);
+    if (initFiffData(m_file)){
+        updateEndStartFlags();
+
+        emit newRealtimeData();
+
+        m_iRealtimeFileIndex++;
+    }
+    m_fileWatcher.removePath(path);
 }
