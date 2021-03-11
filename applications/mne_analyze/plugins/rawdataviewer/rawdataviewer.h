@@ -150,6 +150,9 @@ private:
      */
     void updateViewParameters(ANSHAREDLIB::ViewParameters viewParameters);
 
+    //=========================================================================================================
+    void onNewRealtimeData();
+
     // Control
     QPointer<ANSHAREDLIB::Communicator>             m_pCommu;                   /**< The communicator object to communicate with other plugins. */
 

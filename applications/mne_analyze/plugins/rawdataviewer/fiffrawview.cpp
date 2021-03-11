@@ -761,7 +761,7 @@ void FiffRawView::updateFilterLabel()
 
 void FiffRawView::onNewRealtimeData()
 {
-    m_pTableView->update();
+    updateView();
 
     updateTimeLabels(0);
     updateFileLabel();
