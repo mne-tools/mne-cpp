@@ -111,6 +111,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_bPerformFiltering(false)
 , m_iDistanceTimerSpacer(1000)
 , m_iScroller(0)
+, m_iRealtimeFileIndex(0)
 , m_iScrollPos(0)
 , m_bDispAnnotation(true)
 , m_bRealtime(false)
@@ -152,6 +153,8 @@ void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
         qWarning() << "[FiffRawViewModel::loadFiffData] File does not contain any Fiff data";
         return;
     }
+
+    m_ChannelInfoList.clear();
 
     // load channel infos
     for(qint32 i=0; i < m_pFiffIO->m_qlistRaw[0]->info.nchan; ++i) {
@@ -1038,6 +1041,14 @@ int FiffRawViewModel::getScrollerPosition() const
 void FiffRawViewModel::setRealtime(bool bRealtime)
 {
     m_bRealtime = bRealtime;
+    if (m_bRealtime) {
+        m_fileWatcher.addPath(QDir::currentPath());
+        connect(&m_fileWatcher, &QFileSystemWatcher::directoryChanged,
+                this, &FiffRawViewModel::updateFromRealtime, Qt::UniqueConnection);
+    } else {
+        disconnect(&m_fileWatcher, &QFileSystemWatcher::directoryChanged,
+                   this, &FiffRawViewModel::updateFromRealtime);
+    }
 }
 
 //=============================================================================================================
@@ -1045,4 +1056,12 @@ void FiffRawViewModel::setRealtime(bool bRealtime)
 bool FiffRawViewModel::isRealtime()
 {
     return m_bRealtime;
+}
+
+//=============================================================================================================
+
+void FiffRawViewModel::updateFromRealtime(const QString &path)
+{
+    m_file.setFileName(path + "/mnescanfile" + QString::number(++m_iRealtimeFileIndex) + "_raw.fif");
+    initFiffData(m_file);
 }

@@ -329,9 +329,6 @@ void EventView::disconnectFromModel()
             this, &EventView::onDetectTriggers);
     disconnect(m_pAnnModel.data(), &ANSHAREDLIB::EventModel::eventGroupsUpdated,
             this, &EventView::redrawGroups);
-
-
-    saveGroupSettings();
 }
 
 //=============================================================================================================
