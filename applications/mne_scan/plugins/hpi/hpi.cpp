@@ -287,11 +287,13 @@ void Hpi::updateProjections()
            || m_matCompProjectors.rows() == 0
            || m_matCompProjectors.cols() == 0) {
             m_iNumberBadChannels = m_pFiffInfo->bads.size();
-        } else {
+        } /*else {
             m_mutex.unlock();
             return;
-        }
+        }*/
         m_mutex.unlock();
+
+        qDebug() << "updating projectors";
 
         Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
         Eigen::MatrixXd matComp = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
@@ -324,6 +326,7 @@ void Hpi::updateProjections()
         }
 
         m_mutex.lock();
+        m_matProjectors = matProjectors;
         m_matCompProjectors = matProjectors * matComp;
         m_mutex.unlock();
     }
@@ -493,6 +496,7 @@ void Hpi::run()
     m_mutex.unlock();
 
     MatrixXd matDataMerged(m_pFiffInfo->chs.size(), int(m_pFiffInfo->sfreq/iNumberOfFitsPerSecond));
+    MatrixXd matDataProj(m_pFiffInfo->chs.size(), int(m_pFiffInfo->sfreq/iNumberOfFitsPerSecond));
 
     while(!isInterruptionRequested()) {
         m_mutex.lock();
@@ -522,8 +526,9 @@ void Hpi::run()
                 m_mutex.lock();
                 if(m_bDoFreqOrder) {
                     // find correct frequencie order if requested
-                    HPI.findOrder(matDataMerged,
-                                  m_matCompProjectors,
+                    matDataProj = m_matCompProjectors * matDataMerged;
+                    HPI.findOrder(matDataProj,
+                                  m_matProjectors,
                                   fitResult.devHeadTrans,
                                   m_vCoilFreqs,
                                   fitResult.errorDistances,
@@ -536,8 +541,9 @@ void Hpi::run()
 
                 // Perform actual fitting
                 m_mutex.lock();
-                HPI.fitHPI(matDataMerged,
-                           m_matCompProjectors,
+                matDataProj = m_matCompProjectors * matDataMerged;
+                HPI.fitHPI(matDataProj,
+                           m_matProjectors,
                            fitResult.devHeadTrans,
                            m_vCoilFreqs,
                            fitResult.errorDistances,
