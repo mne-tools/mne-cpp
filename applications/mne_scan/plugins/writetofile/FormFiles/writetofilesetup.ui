@@ -106,7 +106,7 @@ p, li { white-space: pre-wrap; }
         <item>
          <widget class="QCheckBox" name="checkBox">
           <property name="text">
-           <string>Online-Offline Mode</string>
+           <string>Link with MNE Analyze</string>
           </property>
          </widget>
         </item>

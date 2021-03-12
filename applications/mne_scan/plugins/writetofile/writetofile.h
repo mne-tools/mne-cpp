@@ -138,7 +138,7 @@ public:
      */
     void initPluginControlWidgets();
 
-    void setContinuous(bool bState);
+    void setContinuous(int iState);
 
 private:
     //=========================================================================================================
