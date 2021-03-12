@@ -1046,7 +1046,11 @@ void FiffRawViewModel::setRealtime(bool bRealtime)
 {
     m_bRealtime = bRealtime;
     if (m_bRealtime) {
-        m_fileWatcher.addPath(QDir::currentPath());
+        QDir sharedDirectory(QDir::currentPath() + "/realtime_scan_files");
+        if(!sharedDirectory.exists()){
+            sharedDirectory.mkpath(".");
+        }
+        m_fileWatcher.addPath(sharedDirectory.path());
         connect(&m_fileWatcher, &QFileSystemWatcher::directoryChanged,
                 this, &FiffRawViewModel::watchFile, Qt::UniqueConnection);
         connect(&m_fileWatcher, &QFileSystemWatcher::fileChanged,
