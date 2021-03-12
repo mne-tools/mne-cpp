@@ -197,6 +197,12 @@ void WriteToFile::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             initPluginControlWidgets();
         }
 
+        if(m_bContinuous && !m_bWriteToFile){
+            QMutexLocker locker(&m_copymutex);
+            toggleRecordingFile();
+            m_bContinuous = false;
+        }
+
         // Check if data is present
         if(pRTMSA->getMultiSampleArray().size() > 0) {
             for(unsigned char i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
@@ -483,7 +489,7 @@ void WriteToFile::clipRecording(bool bChecked)
     QMutexLocker locker1(&m_copymutex);
     QMutexLocker locker2(&m_mutex);
 
-    auto fileParams = m_qFileOut.openMode();
+    //auto fileParams = m_qFileOut.openMode();
 
     m_qFileOut.close();
 
@@ -516,9 +522,9 @@ bool WriteToFile::copyRecordingFile(const QString& newFilePath)
 
 //=============================================================================================================
 
-void WriteToFile::setContinuous(bool bState)
+void WriteToFile::setContinuous(int iState)
 {
-    m_bContinuous = bState;
+    m_bContinuous = iState;
 }
 
 

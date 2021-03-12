@@ -174,6 +174,8 @@ bool FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
 
     qInfo() << "[FiffRawViewModel::initFiffData] Loaded" << m_lData.size() << "blocks with size"<<data.rows()<<"x"<<m_iSamplesPerBlock;
 
+    qDebug() << "FIRST SAMPLE OFFSET IN ANALYZE:" << m_pFiffIO->m_qlistRaw[0]->first_samp;
+
     // need to close the file manually
     p_IODevice.close();
 

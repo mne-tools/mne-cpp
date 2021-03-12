@@ -736,5 +736,7 @@ void RtFiffRawView::onAddEvent(bool checked)
         iAbsoluteSample -= m_pModel->getMaxSamples();
     }
 
+    qDebug() << "EVENT SAMPLE:" << iAbsoluteSample;
+
     emit addSampleAsEvent(iAbsoluteSample);
 }
