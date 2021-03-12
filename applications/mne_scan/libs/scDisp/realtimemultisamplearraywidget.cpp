@@ -119,7 +119,8 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr pMeasur
             if(!m_bDisplayWidgetsInitialized) {
                 initDisplayControllWidgets();
             }
-        } else if (!m_pRTMSA->getMultiSampleArray().isEmpty()) {
+        }
+        if (!m_pRTMSA->getMultiSampleArray().isEmpty()) {
             //Add data to table view
             m_pChannelDataView->addData(m_pRTMSA->getMultiSampleArray());
         }
