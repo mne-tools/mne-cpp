@@ -397,6 +397,8 @@ private:
     QLabel*                                             m_pFilterLabel;                 /**< Short filter description to be shown under the time-series. */
 signals:
     void tableViewDataWidthChanged(int iWidth);
+
+    void realtimeDataUpdated();
 };
 
 //=============================================================================================================

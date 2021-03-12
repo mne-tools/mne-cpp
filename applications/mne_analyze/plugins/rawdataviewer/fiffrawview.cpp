@@ -766,4 +766,6 @@ void FiffRawView::onNewRealtimeData()
     updateTimeLabels(0);
     updateFileLabel();
     updateFilterLabel();
+
+    emit realtimeDataUpdated();
 }
