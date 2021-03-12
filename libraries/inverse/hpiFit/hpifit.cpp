@@ -256,7 +256,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     for (int j = 0; j < iNumCoils; j++) {
         int iChIdx = 0;
         VectorXd::Index indMax;
-        matAmp.col(j).maxCoeff(&indMax);
+        matAmp.col(j).cwiseAbs().maxCoeff(&indMax);
         if(indMax < m_vecInnerind.size()) {
             iChIdx = m_vecInnerind.at(indMax);
         }
