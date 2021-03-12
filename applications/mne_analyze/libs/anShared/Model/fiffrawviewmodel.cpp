@@ -139,7 +139,9 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 
 FiffRawViewModel::~FiffRawViewModel()
 {
-
+    if(m_bRealtime){
+        m_file.remove();
+    }
 }
 
 //=============================================================================================================
@@ -1086,6 +1088,7 @@ void FiffRawViewModel::watchFile(const QString &path)
 
 void FiffRawViewModel::readFromRealtimeFile(const QString &path)
 {
+    m_file.remove();
     m_file.setFileName(path);
     if (initFiffData(m_file)){
         updateEndStartFlags();
