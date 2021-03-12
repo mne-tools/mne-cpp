@@ -108,6 +108,9 @@ void RawDataViewer::init()
 
     connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
             this, &RawDataViewer::onSendSamplePos, Qt::UniqueConnection);
+
+    connect(m_pFiffRawView.data(), &FiffRawView::realtimeDataUpdated,
+            this, &RawDataViewer::onNewRealtimeData, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
@@ -319,6 +322,5 @@ void RawDataViewer::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pR
 
 void RawDataViewer::onNewRealtimeData()
 {
-    m_pCommu->publishEvent(EVENT_TYPE::SELECTED_MODEL_CHANGED, QVariant::fromValue(m_pFiffRawView->getModel()));
-}
+    m_pCommu->publishEvent(EVENT_TYPE::SELECTED_MODEL_CHANGED, QVariant::fromValue(qSharedPointerCast<AbstractModel>(m_pFiffRawView->getModel())));
 }
