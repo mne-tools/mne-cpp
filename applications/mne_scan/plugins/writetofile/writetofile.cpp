@@ -493,8 +493,15 @@ void WriteToFile::clipRecording(bool bChecked)
 
     m_qFileOut.close();
 
-    QString newPath = QDir::currentPath() + "/mnescanfile" + QString::number(++m_isClipCounter) + "_raw.fif";
-    copyRecordingFile(newPath);
+    QDir sharedDirectory(QDir::currentPath() + "/realtime_scan_files");
+    if(!sharedDirectory.exists()){
+        sharedDirectory.mkpath(".");
+    }
+
+    if(sharedDirectory.exists()){
+        QString newPath = sharedDirectory.path() + "/mnescanfile" + QString::number(++m_isClipCounter) + "_raw.fif";
+        copyRecordingFile(newPath);
+    }
 
     m_qFileOut.open(QIODevice::ReadWrite);
     m_pOutfid->skipRawData(m_qFileOut.bytesAvailable());
