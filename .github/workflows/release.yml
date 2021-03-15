@@ -327,8 +327,8 @@ jobs:
         mkdir applications/mne_scan/plugins/brainflowboard/brainflow/build
         cd applications/mne_scan/plugins/brainflowboard/brainflow/build
         cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
-        make -j
-        make install -j
+        make
+        make install
     - name: Compile LSL submodule
       run: |
         cd applications/mne_scan/plugins/lsladapter/liblsl
