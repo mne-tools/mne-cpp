@@ -114,6 +114,7 @@ public:
     //=========================================================================================================
      /**
      * getUI Return a pointer to the GUI of the ScaleControl.
+     *
      * @return Pointer to the ScaleControlWidget.
      */
     Ui::ScaleControlWidget* getUI();
@@ -121,6 +122,7 @@ public:
     //=========================================================================================================
     /**
      * Return the value of the control
+     *
      * @return value of the control.
      */
     double value() const;
@@ -204,7 +206,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Initialize the slider settings
+     * Initialize the slider settings.
      */
     void initSlider();
 
@@ -212,7 +214,7 @@ private:
     /**
      * Callback executed whenever the value of the spinbox has changed.
      *
-     * @param[in] dScale
+     * @param[in] dScale The new value of the spinbox.
      */
     void spinBoxChanged(double dScale);
 
