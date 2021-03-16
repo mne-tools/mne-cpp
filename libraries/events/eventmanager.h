@@ -78,7 +78,7 @@ private:
     void insertEvent(const EVENTSINTERNAL::EventINT& e);
     bool eraseEvent(idNum eventId);
 
-    std::multimap<const int, EVENTSINTERNAL::EventINT>::const_iterator findEventINT(idNum id) const;
+    std::multimap<int, EVENTSINTERNAL::EventINT>::const_iterator findEventINT(idNum id) const;
     void createDefaultGroupIfNeeded();
 
     std::multimap<int, EVENTSINTERNAL::EventINT>    m_EventsListBySample;

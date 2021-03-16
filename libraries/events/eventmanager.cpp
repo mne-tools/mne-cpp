@@ -33,7 +33,7 @@ Event EventManager::getEvent(idNum eventId) const
 
 //=============================================================================================================
 
-std::multimap<const int, EVENTSINTERNAL::EventINT>::const_iterator EventManager::findEventINT(idNum eventId) const
+std::multimap<int, EVENTSINTERNAL::EventINT>::const_iterator EventManager::findEventINT(idNum eventId) const
 {
     int sample = m_MapIdToSample.at(eventId);
     auto eventsRange = m_EventsListBySample.equal_range(sample);
