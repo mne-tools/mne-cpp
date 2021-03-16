@@ -65,6 +65,7 @@ SUBDIRS += \
 utils.depends =
 fs.depends = utils
 fiff.depends = utils
+events.depends = utils
 mne.depends = utils fs fiff
 fwd.depends = utils fs fiff mne
 inverse.depends = utils fs fiff mne fwd
