@@ -47,6 +47,7 @@
 #include "abstractmodel.h"
 
 #include <fiff/fiff_io.h>
+#include <fiff/fifffilesharer.h>
 
 #include <rtprocessing/helpers/filterkernel.h>
 
@@ -590,9 +591,6 @@ private:
     void reloadAllData();
 
     //=========================================================================================================
-    void watchFile(const QString &path);
-
-    //=========================================================================================================
     void readFromRealtimeFile(const QString &path);
 
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lData;             /**< Data. */
@@ -645,7 +643,7 @@ private:
     int                                         m_iScroller;
     int                                         m_iRealtimeFileIndex;
 
-    QFileSystemWatcher                          m_fileWatcher;
+    FIFFLIB::FiffFileSharer                     m_FileSharer;
 
     qint32                                      m_iScrollPos;                               /**< Position of the scrollbar. */
 

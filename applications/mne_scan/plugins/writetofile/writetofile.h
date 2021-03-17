@@ -43,6 +43,7 @@
 
 #include <utils/generics/circularbuffer.h>
 #include <scShared/Plugins/abstractalgorithm.h>
+#include <fiff/fifffilesharer.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -192,9 +193,6 @@ private:
     //=========================================================================================================
     void clipRecording(bool bChecked);
 
-    //=========================================================================================================
-    bool copyRecordingFile(const QString& newFilePath);
-
     bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
     bool                                    m_bContinuous;
@@ -226,7 +224,7 @@ private:
 
     Eigen::RowVectorXd                      m_mCals;                        /**< Row vector with channel calibration values. */
 
-    static int                              m_isClipCounter;
+    FIFFLIB::FiffFileSharer                 m_FileSharer;
 };
 } // NAMESPACE
 

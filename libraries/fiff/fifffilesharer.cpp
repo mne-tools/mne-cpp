@@ -59,7 +59,7 @@ const static char m_sDefaultFileName[]("realtime_file");
 //=============================================================================================================
 
 FiffFileSharer::FiffFileSharer()
-: FiffFileSharer(QDir::currentPath())
+: FiffFileSharer(m_sDefaultDirectory)
 {
 }
 
@@ -76,17 +76,17 @@ FiffFileSharer::FiffFileSharer(const QString& sDirName)
 void FiffFileSharer::copyRealtimeFile(const QString &sSourcePath)
 {
     if(initSharedDirectory()){
-        QString sFilePath(m_sDirectory + "/" + m_sDefaultFileName + QString::number(m_iFileIndex) + "_raw.fif");
+        QString sFilePath(m_sDirectory + "/" + m_sDefaultFileName + QString::number(++m_iFileIndex) + "_raw.fif");
 
         if(QFile::copy(sSourcePath, sFilePath)){
             QFile newFile(sFilePath);
-            newFile.open(QIODevice::ReadWrite);
+            if(newFile.open(QIODevice::ReadWrite)){
+                FIFFLIB::FiffStream stream(&newFile);
+                stream.skipRawData(newFile.bytesAvailable());
+                stream.finish_writing_raw();
 
-            FIFFLIB::FiffStream stream(&newFile);
-            stream.skipRawData(newFile.bytesAvailable());
-            stream.finish_writing_raw();
-
-            newFile.close();
+                newFile.close();
+            }
         }
     }
 }
