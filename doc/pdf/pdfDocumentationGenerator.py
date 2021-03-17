@@ -94,10 +94,6 @@ class Page:
     def __repr__(self):
         return str(self)      
 
-def parse(s,key):
-    if s.lstrip().startswith(key):
-        return s.split(":")[1].lstrip()
-
 def parseFile(file, verboseMode = False):
     with open(file, 'r', encoding="utf8") as fileOpened:
         insideHeader = False
@@ -168,7 +164,7 @@ def recursiveProcess(folderPath, func):
 # svg2png(svgFile)
 # jpg2png("gh-pages/images/1280px-EEGoSportsGUI.jpg")
 
-myPath = path.join(currentPath(),"gh-pages")
+myPath = path.join(currentPath(),"../gh-pages")
 # print(myPath)
 documents = scanFolder(myPath)
 
@@ -193,6 +189,20 @@ print(web)
 
 # then python3 pdfDocumentationGenerator.py
 
+# for w in web:
 
-outFile = open("example.tex","w")
-outFile.write("")
+# def parseMarkDownFile(filepath):
+#     if filepath == "": 
+#         return
+#     else:
+
+
+
+
+def parseWeb(web):
+    parseMarkDownFile(web.doc)
+    for p in web.children:
+        print(p.doc.fullPath)
+        parseWeb(p)
+
+parseWeb(web)
