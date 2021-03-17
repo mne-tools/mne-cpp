@@ -77,7 +77,7 @@ mne-cpp.pro.user*
 /doc/pdf/*.out
 /doc/pdf/*.toc
 /doc/pdf/*.gz
-
+/doc/pdf/*.pdf
 
 
 
