@@ -67,7 +67,6 @@ class Document:
 
     def __repr__(self):
         return str(self)
-
 class Page:
     def __init__(self,doc):
         self.doc = doc
@@ -183,3 +182,17 @@ while documents:
 
 print("Printing Web Structure:")
 print(web)
+
+
+
+# instructions on how to install svglib correctly on ubuntu
+# sudo apt-get install update
+# sudo apt-get install python3
+# sudo apt-get install python3-pip
+# python3 -m pip install svglib
+
+# then python3 pdfDocumentationGenerator.py
+
+
+outFile = open("example.tex","w")
+outFile.write("")
