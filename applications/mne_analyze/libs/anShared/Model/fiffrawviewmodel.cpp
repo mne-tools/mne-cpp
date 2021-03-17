@@ -1047,20 +1047,12 @@ int FiffRawViewModel::getScrollerPosition() const
 void FiffRawViewModel::setRealtime(bool bRealtime)
 {
     m_bRealtime = bRealtime;
-    if (m_bRealtime) {
-        QDir sharedDirectory(QDir::currentPath() + "/realtime_scan_files");
-        if(!sharedDirectory.exists()){
-            sharedDirectory.mkpath(".");
-        }
-        m_fileWatcher.addPath(sharedDirectory.path());
-        connect(&m_fileWatcher, &QFileSystemWatcher::directoryChanged,
-                this, &FiffRawViewModel::watchFile, Qt::UniqueConnection);
-        connect(&m_fileWatcher, &QFileSystemWatcher::fileChanged,
-                this, &FiffRawViewModel::readFromRealtimeFile, Qt::UniqueConnection);
-    } else {
-        disconnect(&m_fileWatcher, &QFileSystemWatcher::directoryChanged,
-                   this, &FiffRawViewModel::watchFile);
+    if (m_bRealtime){
+        m_FileSharer.initWatcher();
+        connect(&m_FileSharer, &FIFFLIB::FiffFileSharer::newFileAtPath,
+                this, &FiffRawViewModel::readFromRealtimeFile);
     }
+
 }
 
 //=============================================================================================================
@@ -1068,20 +1060,6 @@ void FiffRawViewModel::setRealtime(bool bRealtime)
 bool FiffRawViewModel::isRealtime()
 {
     return m_bRealtime;
-}
-
-//=============================================================================================================
-
-void FiffRawViewModel::watchFile(const QString &path)
-{
-    //m_file.setFileName(path + "/mnescanfile" + QString::number(++m_iRealtimeFileIndex) + "_raw.fif");
-
-    m_fileWatcher.addPath(path + "/mnescanfile" + QString::number(m_iRealtimeFileIndex) + "_raw.fif");
-//    initFiffData(m_file);
-//    updateEndStartFlags();
-
-//    emit dataChanged(createIndex(0, 0),
-//                     createIndex(rowCount(), columnCount()));
 }
 
 //=============================================================================================================
@@ -1097,5 +1075,4 @@ void FiffRawViewModel::readFromRealtimeFile(const QString &path)
 
         m_iRealtimeFileIndex++;
     }
-    m_fileWatcher.removePath(path);
 }

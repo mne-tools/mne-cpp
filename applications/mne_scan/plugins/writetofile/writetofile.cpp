@@ -68,12 +68,10 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-int WriteToFile::m_isClipCounter = 0;
-
 WriteToFile::WriteToFile()
 : m_bWriteToFile(false)
 , m_bUseRecordTimer(false)
-, m_bContinuous(true) //CHANGE TO USER TOGGLE ASAP
+, m_bContinuous(false) //CHANGE TO USER TOGGLE ASAP
 , m_iBlinkStatus(0)
 , m_iSplitCount(0)
 , m_iRecordingMSeconds(5*60*1000)
@@ -198,7 +196,6 @@ void WriteToFile::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         }
 
         if(m_bContinuous && !m_bWriteToFile){
-            QMutexLocker locker(&m_copymutex);
             toggleRecordingFile();
             m_bContinuous = false;
         }
@@ -292,7 +289,7 @@ void WriteToFile::run()
     while(!isInterruptionRequested()) {
         if(m_pCircularBuffer) {
             //pop matrix
-            m_copymutex.lock();
+
             if(m_pCircularBuffer->pop(matData)) {
                 //Write raw data to fif file
                 m_mutex.lock();
@@ -312,7 +309,6 @@ void WriteToFile::run()
                 }
                 m_mutex.unlock();
             }
-            m_copymutex.unlock();
         }
     }
 
@@ -486,45 +482,13 @@ void WriteToFile::clipRecording(bool bChecked)
 {
     Q_UNUSED(bChecked);
 
-    QMutexLocker locker1(&m_copymutex);
     QMutexLocker locker2(&m_mutex);
 
-    //auto fileParams = m_qFileOut.openMode();
-
     m_qFileOut.close();
-
-    QDir sharedDirectory(QDir::currentPath() + "/realtime_scan_files");
-    if(!sharedDirectory.exists()){
-        sharedDirectory.mkpath(".");
-    }
-
-    if(sharedDirectory.exists()){
-        QString newPath = sharedDirectory.path() + "/mnescanfile" + QString::number(++m_isClipCounter) + "_raw.fif";
-        copyRecordingFile(newPath);
-    }
-
+    m_FileSharer.copyRealtimeFile(m_qFileOut.fileName());
     m_qFileOut.open(QIODevice::ReadWrite);
+
     m_pOutfid->skipRawData(m_qFileOut.bytesAvailable());
-}
-
-//=============================================================================================================
-
-bool WriteToFile::copyRecordingFile(const QString& newFilePath)
-{
-    bool copySuccessful;
-
-    copySuccessful = QFile::copy(m_qFileOut.fileName(), newFilePath);
-
-    QFile newFile(newFilePath);
-    copySuccessful = newFile.open(QIODevice::ReadWrite);
-
-    FIFFLIB::FiffStream stream(&newFile);
-    stream.skipRawData(newFile.bytesAvailable());
-    stream.finish_writing_raw();
-
-    newFile.close();
-
-    return copySuccessful;
 }
 
 //=============================================================================================================
