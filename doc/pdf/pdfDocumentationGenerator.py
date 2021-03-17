@@ -190,61 +190,65 @@ print(web)
 # then python3 pdfDocumentationGenerator.py
 
 # for w in web:
-shutil.copy(src_dir,dst_dir)
+
+# shutil.copy(src_dir,dst_dir)
 docFileName = "mnecpp_doc.tex"
 
 # outFile = open(path.join(currentPath(),docFileName),"a+")
 
-def markDownToLatex(file, verboseMode)
+def markDownToLatex(file, verboseMode = False):
     with open(file, 'r', encoding="utf8") as fileOpened:
         insideHeader = False
         insideHtml = False
         if verboseMode:
             print("Parsing file: " + file)
         for line in fileOpened:
-            if line.startswith("---") and not insideHeader:
+
+            if not insideHeader and line.startswith("---"):
                 insideHeader = True
                 continue
-            if line.startswith("---") and insideHeader:
-                insideHeader = False
-                break
+            if insideHeader:
+                if line.startswith("---"):
+                    insideHeader = False
+                continue
+
             if line.count("<html>") > line.count("</html>"):
                 insideHtml = True
             if line.count("</html>") >= line.count("<html>"):
                 insideHtml = False
             if not insideHeader and not insideHtml:
                 if line.startswith("#"):
-                    line.split(":")
+                    line.split("#")
 
 
 
 
-            if not codeText and (line.startswith("```") or line.count("```")%2 != 0):
-                codeText = True
-                continue
-            if codeText and (line.startswith("```") or line.count("```")%2 != 0):
-                codeText = False
-                continue
-            if insideHeader and not codeText:
-                if line.lstrip().startswith("title"):
-                    doc.setTitle(line.split(":")[1].lstrip().rstrip())
-                    validContentFile = True
-                    continue
-                if line.lstrip().startswith("parent"):
-                    doc.setParent(line.split(":")[1].lstrip().rstrip())
-                    continue
-                if line.lstrip().startswith("nav_order"):
-                    doc.setNavOrder(int(line.split(":")[1].lstrip().rstrip()))
-                    continue
-                if line.lstrip().startswith("has_children"):
-                    doc.setHasChildren(bool(line.split(":")[1].lstrip().rstrip()))
-                    continue
-                if line.lstrip().startswith("nav_exclude"):
-                    doc.setNavExclude(bool(line.split(":")[1].lstrip().rstrip()))
-                    continue
-        if validContentFile and verboseMode:
-            print(doc)
-    return doc, validContentFile
+    #         if not codeText and (line.startswith("```") or line.count("```")%2 != 0):
+    #             codeText = True
+    #             continue
+    #         if codeText and (line.startswith("```") or line.count("```")%2 != 0):
+    #             codeText = False
+    #             continue
+    #         if insideHeader and not codeText:
+    #             if line.lstrip().startswith("title"):
+    #                 doc.setTitle(line.split(":")[1].lstrip().rstrip())
+    #                 validContentFile = True
+    #                 continue
+    #             if line.lstrip().startswith("parent"):
+    #                 doc.setParent(line.split(":")[1].lstrip().rstrip())
+    #                 continue
+    #             if line.lstrip().startswith("nav_order"):
+    #                 doc.setNavOrder(int(line.split(":")[1].lstrip().rstrip()))
+    #                 continue
+    #             if line.lstrip().startswith("has_children"):
+    #                 doc.setHasChildren(bool(line.split(":")[1].lstrip().rstrip()))
+    #                 continue
+    #             if line.lstrip().startswith("nav_exclude"):
+    #                 doc.setNavExclude(bool(line.split(":")[1].lstrip().rstrip()))
+    #                 continue
+    #     if validContentFile and verboseMode:
+    #         print(doc)
+    # return doc, validContentFile
 
 
 
@@ -254,15 +258,16 @@ def parseMarkDownFile(doc, sectionLevel):
         return
     else:
         inFile = open(doc.fullPath,"r")
+        markDownToLatex(doc.fullPath)
 
 
         
 
 
 def parseWeb(web, sectionLevel = 0):
+    print("Parsing file: " + web.doc.fullPath)
     parseMarkDownFile(web.doc, sectionLevel)
     for p in web.children:
-        print("Parsing file: " + p.doc.fullPath)
         parseWeb(p,sectionLevel+1)
 
 parseWeb(web)
