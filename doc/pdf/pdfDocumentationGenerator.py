@@ -6,6 +6,8 @@ from svglib.svglib import svg2rlg
 from reportlab.graphics import renderPM
 from PIL import Image
 
+import re
+
 def currentPath():
     return path.abspath(path.dirname(sys.argv[0]))
 
@@ -196,33 +198,97 @@ docFileName = "mnecpp_doc.tex"
 
 # outFile = open(path.join(currentPath(),docFileName),"a+")
 
-def markDownToLatex(file, verboseMode = False):
-    with open(file, 'r', encoding="utf8") as fileOpened:
-        insideHeader = False
-        insideHtml = False
-        if verboseMode:
-            print("Parsing file: " + file)
-        for line in fileOpened:
+def parseMarkDownFile(doc, texFile, sectionLevel, verboseMode = False):
+    if doc.fullPath == "": 
+        return
+    else:
+        with open(doc.fullPath, 'r', encoding="utf8") as markDownFile, \
+             open(texFile,"a+") as texFile:
+            insideHeader = False
+            insideHtml = False
+            if verboseMode:
+                print("Parsing file: " + doc.fullPath)
+            for line in markDownFile:
+                if not insideHeader and line.startswith("---"):
+                    insideHeader = True
+                    continue
+                if insideHeader:
+                    if line.startswith("---"):
+                        insideHeader = False
+                    continue
+                if line.count("<html>") > line.count("</html>"):
+                    insideHtml = True
+                if line.count("</html>") >= line.count("<html>"):
+                    insideHtml = False
+                if not insideHeader and not insideHtml:
+                    if parseHeader(texFile,line,"# ","part","sec") or \ 
+                       parseHeader(texFile,line,"## ","section","sec") or \
+                       parseHeader(texFile,lile,"### ","subsection","ssec") or \
+                       parseHeader(texFile,lile,"#### ","subsubsection","ssec") or \
+                       parseImage(texFile,line):
+                        continue
+                    else:
+                        lineOut = parseBoldMd(line)
+                        lineOut = parseItalicMd(lineOut)
 
-            if not insideHeader and line.startswith("---"):
-                insideHeader = True
-                continue
-            if insideHeader:
-                if line.startswith("---"):
-                    insideHeader = False
-                continue
-
-            if line.count("<html>") > line.count("</html>"):
-                insideHtml = True
-            if line.count("</html>") >= line.count("<html>"):
-                insideHtml = False
-            if not insideHeader and not insideHtml:
-                if line.startswith("#"):
-                    line.split("#")
+                        continue
 
 
 
+def parseHeader(texFile,str,markdown_key,latex_Key,label_latex):
+    if str.startswith(markdown_key):
+        newHeader = line.split(markdown_key)[1].ltrip().rstrip()
+        texFile.write("\n\\" + latex_key + "{" + newHeader.strip() + "}" + " \n\\label{" + label_latex_key + ":" + newHeader.strip().replace(" ","_") + "}")
+        return True
+    else:
+        return False
 
+def parseImage(texFile,str):
+    if str.startswith("!"):
+        captionText = str.split("[")[1].split("]")[0]
+        imageFile = str.split("(")[1].split(")")[0]
+        texFile.write("\n\\begin{figure}[h]")
+        texFile.write("\n\\centering \\includegraphics[width=0.5\\linewidth]{" + imageFile + "}")
+        texFile.write("\n\\caption{" + captionText + ".}")      
+        texFile.write("\n\\label:{fig:" + captionText.replace(" ","_") + "}")      
+        texFile.write("\n\\end{figure}")
+        return True
+    else:
+        return False
+
+
+def parseBoldMd(str):
+    if str.count("**") == 2:
+        strSplitted = str.split("**")
+        strOut = strSplitted[0] + "\\textbf{" + strSplitted[1].split("**")[0] + "}" + strSplitted[1].split("**")[1]
+    else:
+        strOut = str
+    return strOut
+
+def parseItalicMd(str):
+    if str.count("*") == 2:
+        strSplitted = str.split("*")
+        strOut = strSplitted[0] + "\\textit{" + strSplitted[1].split("*")[0] + "}" + strSplitted[1].split("*")[1]
+    else:
+        strOut = str
+    return strOut
+
+def parseLinks(str):
+    link 
+    if str.count
+
+def parseEmbededPdf(str):
+
+def parseTableMd(str)
+
+
+
+#                        \begin{figure}[h] 
+# 	\centering 	\includegraphics[width=0.5\linewidth]{Chrysanthemum.jpg}
+# 	\caption{This is the caption text.}
+# 	\label{fig:Chrysanthemum}
+# \end{figure}
+                        
     #         if not codeText and (line.startswith("```") or line.count("```")%2 != 0):
     #             codeText = True
     #             continue
@@ -250,23 +316,9 @@ def markDownToLatex(file, verboseMode = False):
     #         print(doc)
     # return doc, validContentFile
 
-
-
-
-def parseMarkDownFile(doc, sectionLevel):
-    if doc.fullPath == "": 
-        return
-    else:
-        inFile = open(doc.fullPath,"r")
-        markDownToLatex(doc.fullPath)
-
-
-        
-
-
 def parseWeb(web, sectionLevel = 0):
     print("Parsing file: " + web.doc.fullPath)
-    parseMarkDownFile(web.doc, sectionLevel)
+    parseMarkDownFile(web.doc, "teseta.tex", sectionLevel)
     for p in web.children:
         parseWeb(p,sectionLevel+1)
 
