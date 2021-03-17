@@ -49,7 +49,7 @@
 
 namespace FIFFLIB
 {
-class FiffFileSharer : public QObject
+class FIFFSHARED_EXPORT FiffFileSharer : public QObject
 {
     Q_OBJECT
 public:
