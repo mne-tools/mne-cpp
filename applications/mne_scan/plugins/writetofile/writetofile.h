@@ -191,6 +191,11 @@ private:
     void changeRecordingButton();
 
     //=========================================================================================================
+    /**
+     * Copies recording and sends it to shared file direcotry without stopping reccording
+     *
+     * @param[in] bChecked      Unused. Whether action that triggered this function was checked or unchecked
+     */
     void clipRecording(bool bChecked);
 
     bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
@@ -224,7 +229,7 @@ private:
 
     Eigen::RowVectorXd                      m_mCals;                        /**< Row vector with channel calibration values. */
 
-    FIFFLIB::FiffFileSharer                 m_FileSharer;
+    FIFFLIB::FiffFileSharer                 m_FileSharer;                   /**< Handles copying recording file and saving copy to shared directory. */
 };
 } // NAMESPACE
 

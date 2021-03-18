@@ -591,6 +591,11 @@ private:
     void reloadAllData();
 
     //=========================================================================================================
+    /**
+     * Sets model to read from new fiff file set by input parameter
+     *
+     * @param[in] path      Path to new fiff file to read from
+     */
     void readFromRealtimeFile(const QString &path);
 
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lData;             /**< Data. */
@@ -641,9 +646,8 @@ private:
 
     int                                         m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms. */
     int                                         m_iScroller;
-    int                                         m_iRealtimeFileIndex;
 
-    FIFFLIB::FiffFileSharer                     m_FileSharer;
+    FIFFLIB::FiffFileSharer                     m_FileSharer;                               /**<  Handles receiving files from shared directory for receving from realtime recording. */
 
     qint32                                      m_iScrollPos;                               /**< Position of the scrollbar. */
 
