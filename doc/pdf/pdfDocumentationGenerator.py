@@ -166,9 +166,9 @@ def recursiveProcess(folderPath, func):
 # svg2png(svgFile)
 # jpg2png("gh-pages/images/1280px-EEGoSportsGUI.jpg")
 
-myPath = path.join(currentPath(),"../gh-pages")
-# print(myPath)
-documents = scanFolder(myPath)
+webPath = path.join(currentPath(),"../gh-pages")
+# print(webPath)
+documents = scanFolder(webPath)
 
 print(documents)
 
@@ -206,6 +206,9 @@ def parseMarkDownFile(doc, texFile, sectionLevel, verboseMode = False):
              open(texFile,"a+") as texFile:
             insideHeader = False
             insideHtml = False
+            insideUnorderedList = False
+            insideOrderedList = False
+            insideTable = False
             if verboseMode:
                 print("Parsing file: " + doc.fullPath)
             for line in markDownFile:
@@ -221,30 +224,30 @@ def parseMarkDownFile(doc, texFile, sectionLevel, verboseMode = False):
                 if line.count("</html>") >= line.count("<html>"):
                     insideHtml = False
                 if not insideHeader and not insideHtml:
-                    if parseHeader(texFile,line,"# ","part","sec") or \ 
-                       parseHeader(texFile,line,"## ","section","sec") or \
-                       parseHeader(texFile,lile,"### ","subsection","ssec") or \
-                       parseHeader(texFile,lile,"#### ","subsubsection","ssec") or \
-                       parseImage(texFile,line):
+                    if   parseHeader(texFile,line,"# ","part","sec"):
+                        continue
+                    elif parseHeader(texFile,line,"## ","section","sec"):
+                        continue
+                    elif parseHeader(texFile,line,"### ","subsection","ssec"):
+                        continue
+                    elif parseHeader(texFile,line,"#### ","subsubsection","ssec"):
+                        continue
+                    elif parseImageFigure(texFile,line):
                         continue
                     else:
                         lineOut = parseBoldMd(line)
                         lineOut = parseItalicMd(lineOut)
 
-                        continue
-
-
-
-def parseHeader(texFile,str,markdown_key,latex_Key,label_latex):
-    if str.startswith(markdown_key):
-        newHeader = line.split(markdown_key)[1].ltrip().rstrip()
-        texFile.write("\n\\" + latex_key + "{" + newHeader.strip() + "}" + " \n\\label{" + label_latex_key + ":" + newHeader.strip().replace(" ","_") + "}")
+def parseHeader(texFile,str,markdownKey,latexKey,labelLatexKey):
+    if str.startswith(markdownKey):
+        newHeader = line.split(markdownKey)[1].ltrip().rstrip()
+        texFile.write("\n\\" + latexKey + "{" + newHeader.strip() + "}" + " \n\\label{" + labelLatexKey + ":" + newHeader.strip().replace(" ","_") + "}")
         return True
     else:
         return False
 
-def parseImage(texFile,str):
-    if str.startswith("!"):
+def parseImageFigure(texFile,str):
+    if str.startswith("!["):
         captionText = str.split("[")[1].split("]")[0]
         imageFile = str.split("(")[1].split(")")[0]
         texFile.write("\n\\begin{figure}[h]")
@@ -256,11 +259,13 @@ def parseImage(texFile,str):
     else:
         return False
 
-
 def parseBoldMd(str):
     if str.count("**") == 2:
         strSplitted = str.split("**")
         strOut = strSplitted[0] + "\\textbf{" + strSplitted[1].split("**")[0] + "}" + strSplitted[1].split("**")[1]
+    elif str.count("__") == 2:
+        strSplitted = str.split("__")
+        strOut = strSplitted[0] + "\\textbf{" + strSplitted[1].split("__")[0] + "}" + strSplitted[1].split("__")[1]        
     else:
         strOut = str
     return strOut
@@ -269,52 +274,16 @@ def parseItalicMd(str):
     if str.count("*") == 2:
         strSplitted = str.split("*")
         strOut = strSplitted[0] + "\\textit{" + strSplitted[1].split("*")[0] + "}" + strSplitted[1].split("*")[1]
+    elif str.count("_") == 2:
+        strSplitted = str.split("_")
+        strOut = strSplitted[0] + "\\textit{" + strSplitted[1].split("_")[0] + "}" + strSplitted[1].split("_")[1]
     else:
         strOut = str
     return strOut
 
-def parseLinks(str):
-    link 
-    if str.count
+# def parseEmbededPdf(str):
 
-def parseEmbededPdf(str):
-
-def parseTableMd(str)
-
-
-
-#                        \begin{figure}[h] 
-# 	\centering 	\includegraphics[width=0.5\linewidth]{Chrysanthemum.jpg}
-# 	\caption{This is the caption text.}
-# 	\label{fig:Chrysanthemum}
-# \end{figure}
-                        
-    #         if not codeText and (line.startswith("```") or line.count("```")%2 != 0):
-    #             codeText = True
-    #             continue
-    #         if codeText and (line.startswith("```") or line.count("```")%2 != 0):
-    #             codeText = False
-    #             continue
-    #         if insideHeader and not codeText:
-    #             if line.lstrip().startswith("title"):
-    #                 doc.setTitle(line.split(":")[1].lstrip().rstrip())
-    #                 validContentFile = True
-    #                 continue
-    #             if line.lstrip().startswith("parent"):
-    #                 doc.setParent(line.split(":")[1].lstrip().rstrip())
-    #                 continue
-    #             if line.lstrip().startswith("nav_order"):
-    #                 doc.setNavOrder(int(line.split(":")[1].lstrip().rstrip()))
-    #                 continue
-    #             if line.lstrip().startswith("has_children"):
-    #                 doc.setHasChildren(bool(line.split(":")[1].lstrip().rstrip()))
-    #                 continue
-    #             if line.lstrip().startswith("nav_exclude"):
-    #                 doc.setNavExclude(bool(line.split(":")[1].lstrip().rstrip()))
-    #                 continue
-    #     if validContentFile and verboseMode:
-    #         print(doc)
-    # return doc, validContentFile
+# def parseTableMd(str)
 
 def parseWeb(web, sectionLevel = 0):
     print("Parsing file: " + web.doc.fullPath)
@@ -322,4 +291,57 @@ def parseWeb(web, sectionLevel = 0):
     for p in web.children:
         parseWeb(p,sectionLevel+1)
 
-parseWeb(web)
+# parseWeb(web)
+
+def parseLinks(str):
+    str = str.replace("{:target=\"_blank\" rel=\"noopener\"}","")
+    nameRe = "[^]]+"
+    urlRe = "http[s]?://[^)]+"
+    markupRegex = '\[({0})]\(\s*({1})\s*\)'.format(nameRe, urlRe)
+    linkList = re.findall(markupRegex, str)
+    if linkList:
+        link = linkList[0]
+        strPre  = str.split("[" + link[0] + "]")[0]
+        strPost = str.split("(" + link[1] + ")")[1]
+        strLink = "\\href{" + link[1] + "}{" + link[0] + "}\\footnote{" + link[1] + "}"
+        strOut = strPre + strLink + strPost
+        parseLinks(strOut)
+    else:
+        return str
+
+def parseImagesInline(str):
+    textRe = "[^]]*"
+    imgRe = "\/.*?\.[\w:]+"
+    markupRegex = '!\[({0})]\(\s*({1})\s*\)'.format(textRe, imgRe)
+    imgList = re.findall(markupRegex, str)
+    if imgList:
+        img = imgList[0]
+        strPre  = str.split("![" + img[0] + "]")[0]
+        strPost = str.split("(" + img[1] + ")")[1]
+        strImg = "\\begin{minipage}{.3\\textwidth}\n\\includegraphics[width=\linewidth,height=60mm]{" + img[1] + "}\n\\end{minipage}"
+        strOut = strPre + strImg + strPost
+        parseImagesInline(strOut)
+    else:
+        return str
+
+# !\[[^\]]*\]
+# \href{https://mne-cpp.github.io}{MNE-CPP Project documentation web page}\footnote{https://mne-cpp.github.io}
+
+filePath = path.join(currentPath(),"../gh-pages/pages/development/wasm_buildguide.md")
+
+with open(filePath, 'r', encoding="utf8") as mdFile:
+    for line in mdFile:
+        newLine = parseLinks(line)
+        print(newLine)
+
+
+    # \begin{minipage}{.3\textwidth}
+    #   \includegraphics[width=\linewidth, height=60mm]{tiger}
+    # \end{minipage}
+
+
+still missing: 
+table parsing
+unordered lists parsing
+ordered lists parsing
+inbound links vs outbound links
