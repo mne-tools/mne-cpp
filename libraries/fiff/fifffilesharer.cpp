@@ -110,7 +110,8 @@ void FiffFileSharer::initWatcher()
 
 void FiffFileSharer::onDirectoryChanged(const QString &sPath)
 {
-    m_fileWatcher.addPath(sPath + "/" + m_sDefaultFileName + QString::number(m_iFileIndex) + "_raw.fif");
+    QString filePath(sPath + "/" + m_sDefaultFileName + QString::number(m_iFileIndex) + "_raw.fif");
+    m_fileWatcher.addPath(filePath);
 }
 
 //=============================================================================================================

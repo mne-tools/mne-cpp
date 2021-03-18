@@ -1050,7 +1050,7 @@ void FiffRawViewModel::setRealtime(bool bRealtime)
     if (m_bRealtime){
         m_FileSharer.initWatcher();
         connect(&m_FileSharer, &FIFFLIB::FiffFileSharer::newFileAtPath,
-                this, &FiffRawViewModel::readFromRealtimeFile);
+                this, &FiffRawViewModel::readFromRealtimeFile, Qt::UniqueConnection);
     }
 
 }
