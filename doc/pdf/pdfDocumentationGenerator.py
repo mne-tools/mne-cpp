@@ -59,8 +59,8 @@ class Document:
     def __str__(self):
         s = ""
         # s += "--- Class: " + type(self).__name__ + " ---\n"
-        # s += "path: " + self.fullPath + "\n"
         s += "title: " + self.title + "\n"
+        s += "path: " + self.fullPath + "\n"
         # s += "parent: " + self.parent + "\n"
         # s += "nav_order: " + str(self.nav_order) + "\n"
         # s += "has_children: " + str(self.has_children) + "\n"
@@ -85,7 +85,7 @@ class Page:
                     return True
             return False
     def print(self, spaces = 0):
-        s = " " * spaces + self.doc.title + "\n"
+        s = " " * spaces + " - " + self.doc.title + " (" + self.doc.fullPath + ")\n"
         for p in self.children:
             s += "  " * spaces + p.print(spaces+2)
         return s
@@ -327,12 +327,12 @@ def parseImagesInline(str):
 # !\[[^\]]*\]
 # \href{https://mne-cpp.github.io}{MNE-CPP Project documentation web page}\footnote{https://mne-cpp.github.io}
 
-filePath = path.join(currentPath(),"../gh-pages/pages/development/wasm_buildguide.md")
+# filePath = path.join(currentPath(),"../gh-pages/pages/development/wasm_buildguide.md")
 
-with open(filePath, 'r', encoding="utf8") as mdFile:
-    for line in mdFile:
-        newLine = parseLinks(line)
-        print(newLine)
+# with open(filePath, 'r', encoding="utf8") as mdFile:
+#     for line in mdFile:
+#         newLine = parseLinks(line)
+#         print(newLine)
 
 
     # \begin{minipage}{.3\textwidth}
@@ -340,8 +340,8 @@ with open(filePath, 'r', encoding="utf8") as mdFile:
     # \end{minipage}
 
 
-still missing: 
-table parsing
-unordered lists parsing
-ordered lists parsing
-inbound links vs outbound links
+# still missing: 
+# table parsing
+# unordered lists parsing
+# ordered lists parsing
+# inbound links vs outbound links
