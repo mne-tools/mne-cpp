@@ -482,7 +482,7 @@ void WriteToFile::clipRecording(bool bChecked)
 {
     Q_UNUSED(bChecked);
 
-    QMutexLocker locker2(&m_mutex);
+    QMutexLocker locker(&m_mutex);
 
     m_qFileOut.close();
     m_FileSharer.copyRealtimeFile(m_qFileOut.fileName());

@@ -76,7 +76,7 @@ FiffFileSharer::FiffFileSharer(const QString& sDirName)
 void FiffFileSharer::copyRealtimeFile(const QString &sSourcePath)
 {
     if(initSharedDirectory()){
-        QString sFilePath(m_sDirectory + "/" + m_sDefaultFileName + QString::number(++m_iFileIndex) + "_raw.fif");
+        QString sFilePath(m_sDirectory + "/" + m_sDefaultFileName + QString::number(m_iFileIndex++) + "_raw.fif");
 
         if(QFile::copy(sSourcePath, sFilePath)){
             QFile newFile(sFilePath);
@@ -110,7 +110,7 @@ void FiffFileSharer::initWatcher()
 
 void FiffFileSharer::onDirectoryChanged(const QString &sPath)
 {
-    m_fileWatcher.addPath(sPath + "/mnescanfile" + QString::number(m_iFileIndex) + "_raw.fif");
+    m_fileWatcher.addPath(sPath + "/" + m_sDefaultFileName + QString::number(m_iFileIndex) + "_raw.fif");
 }
 
 //=============================================================================================================
@@ -119,6 +119,8 @@ void FiffFileSharer::onFileChanged(const QString &sPath)
 {
     emit newFileAtPath(sPath);
     m_fileWatcher.removePath(sPath);
+
+    m_iFileIndex++;
 }
 
 //=============================================================================================================
