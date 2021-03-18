@@ -83,7 +83,7 @@ WriteToFile::WriteToFile()
             this, &WriteToFile::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
 
-    m_pActionClipRecording = new QAction(QIcon(":/images/record.png"), tr("Clip Recording"),this);
+    m_pActionClipRecording = new QAction(QIcon(":/images/analyze.png"), tr("Send to MNE Analyze"),this);
     m_pActionClipRecording->setStatusTip(tr("Clip Recording"));
     connect(m_pActionClipRecording.data(), &QAction::triggered,
             this, &WriteToFile::clipRecording);
@@ -496,6 +496,7 @@ void WriteToFile::clipRecording(bool bChecked)
 void WriteToFile::setContinuous(int iState)
 {
     m_bContinuous = iState;
+    m_pActionClipRecording->setVisible(m_bContinuous);
 }
 
 
