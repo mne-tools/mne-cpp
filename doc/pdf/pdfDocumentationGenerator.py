@@ -33,6 +33,7 @@ class Document:
     def __init__(self, path):
         self.title = ""
         self.parent = ""
+        self.grand_parent = ""
         self.nav_order = 0
         self.has_children = False
         self.nav_exclude = False
@@ -43,6 +44,9 @@ class Document:
 
     def setParent(self, parent):
         self.parent = parent
+    
+    def setGrandParent(self, grandParent):
+        self.grand_parent = grandParent
 
     def setNavOrder(self, nav_order):
         self.nav_order = nav_order
@@ -74,7 +78,8 @@ class Page:
         self.doc = doc
         self.children = []
     def insert(self,d2):
-        if d2.parent == self.doc.title:
+        if d2.parent == self.doc.title and \
+           d2.grand_parent == self.doc.parent :
             self.children.append(Page(d2))
             self.children.sort(key=lambda p:p.doc.nav_order)
             return True
@@ -132,6 +137,9 @@ def parseFile(file, verboseMode = False):
                     continue
                 if line.lstrip().startswith("nav_exclude"):
                     doc.setNavExclude(bool(line.split(":")[1].lstrip().rstrip()))
+                    continue
+                if line.lstrip().startswith("grand_parent"):
+                    doc.setGrandParent(line.split(":")[1].lstrip().rstrip())
                     continue
         if validContentFile and verboseMode:
             print(doc)
@@ -291,8 +299,6 @@ def parseWeb(web, sectionLevel = 0):
     for p in web.children:
         parseWeb(p,sectionLevel+1)
 
-# parseWeb(web)
-
 def parseLinks(str):
     str = str.replace("{:target=\"_blank\" rel=\"noopener\"}","")
     nameRe = "[^]]+"
@@ -324,7 +330,12 @@ def parseImagesInline(str):
     else:
         return str
 
+# parseWeb(web)
+
+
+
 # !\[[^\]]*\]
+# '(startText)(.+)((?:\n.+)+)(endText)'
 # \href{https://mne-cpp.github.io}{MNE-CPP Project documentation web page}\footnote{https://mne-cpp.github.io}
 
 # filePath = path.join(currentPath(),"../gh-pages/pages/development/wasm_buildguide.md")
@@ -345,3 +356,4 @@ def parseImagesInline(str):
 # unordered lists parsing
 # ordered lists parsing
 # inbound links vs outbound links
+# parse html image inline tags
