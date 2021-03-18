@@ -61,7 +61,8 @@ WriteToFileSetupWidget::WriteToFileSetupWidget(WriteToFile* toolbox, QWidget *pa
     ui.setupUi(this);
 
     connect(ui.checkBox, &QCheckBox::stateChanged,
-            toolbox, &WriteToFile::setContinuous);
+            m_pWriteToFile, &WriteToFile::setContinuous);
+    m_pWriteToFile->setContinuous(ui.checkBox->checkState());
 }
 
 //=============================================================================================================
