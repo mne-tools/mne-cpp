@@ -243,10 +243,10 @@ private:
     float               m_fFreqBandHigh;        /**< The higher frequency band to average the connectivity weights to. */
     qint32              m_iBlockSize;           /**< The block size of teh last received data block. In frequency bins. */
 
-    QString             m_sAvrType;             /**< The average type */
-    QStringList         m_sConnectivityMethods; /**< The connectivity metric to use */
+    QString             m_sAvrType;             /**< The average type. */
+    QStringList         m_sConnectivityMethods; /**< The connectivity metric to use. */
 
-    QMutex              m_mutex;                /**< The mutex to guarantee thread safety */
+    QMutex              m_mutex;                /**< The mutex to guarantee thread safety. */
 
     QElapsedTimer       m_timer;                /**< The timer to evaluate performance. */
 
@@ -268,7 +268,7 @@ private:
     Eigen::MatrixX3f            m_matNodeVertLeft;              /**< Holds the left hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
     Eigen::MatrixX3f            m_matNodeVertRight;             /**< Holds the right hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/
     Eigen::MatrixX3f            m_matNodeVertComb;              /**< Holds both hemi vertex postions of the network nodes. Corresponding to the neuronal sources.*/ 
-    Eigen::RowVectorXi          m_vecPicks;                     /**< The picked data channels */
+    Eigen::RowVectorXi          m_vecPicks;                     /**< The picked data channels. */
 
     CONNECTIVITYLIB::Network    m_currentConnectivityResult;    /**< The current connectivity result.*/
 };

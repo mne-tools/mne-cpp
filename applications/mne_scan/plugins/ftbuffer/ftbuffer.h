@@ -213,15 +213,15 @@ private:
      */
     bool setupRTMSA(FIFFLIB::FiffInfo FiffInfo);
 
-    bool                                                                                m_bIsConfigured;                /**< Whether the buffer output has been configured */
+    bool                                                                                m_bIsConfigured;                /**< Whether the buffer output has been configured. */
 
-    QMutex                                                                              m_mutex;                        /**< Guards shared data from being accessed at the same time */
+    QMutex                                                                              m_mutex;                        /**< Guards shared data from being accessed at the same time. */
 
-    QThread                                                                             m_pProducerThread;              /**< Producer thread for the FtBuffProducer object */
+    QThread                                                                             m_pProducerThread;              /**< Producer thread for the FtBuffProducer object. */
 
     QSharedPointer<FtBuffProducer>                                                      m_pFtBuffProducer;              /**< Pointer to producer object that handles data from FtConnector*/
     QSharedPointer<FIFFLIB::FiffInfo>                                                   m_pFiffInfo;                    /**< Fiff measurement info.*/
-    QSharedPointer<FIFFLIB::FiffRawData>                                                m_pNeuromagHeadChunkData;       /**< Fiff into parser for header data collected from Neuromag extended header */
+    QSharedPointer<FIFFLIB::FiffRawData>                                                m_pNeuromagHeadChunkData;       /**< Fiff into parser for header data collected from Neuromag extended header. */
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA_BufferOutput;          /**< The RealTimeSampleArray to provide the plugin output data.*/
     QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>                              m_pCircularBuffer;              /**< Holds incoming raw data. */
 };

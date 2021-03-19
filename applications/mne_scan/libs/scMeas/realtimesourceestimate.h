@@ -220,7 +220,7 @@ public:
     inline qint32 getSourceEstimateSize() const;
 
 private:
-    mutable QMutex                          m_qMutex;               /**< Mutex to ensure thread safety */
+    mutable QMutex                          m_qMutex;               /**< Mutex to ensure thread safety. */
 
     FIFFLIB::FiffInfo::SPtr                 m_pFiffInfo;            /**< The Fiff info. */
     FIFFLIB::FiffCoordTrans                 m_mriHeadTrans;         /**< Mri to head transformation. */
@@ -232,7 +232,7 @@ private:
     qint32                                  m_iSourceEstimateSize;  /**< Sample size of the multi sample array.*/
 
     QList<MNELIB::MNESourceEstimate::SPtr>  m_pMNEStc;              /**< The source estimates. */
-    bool                                    m_bInitialized;         /**< Is initialized */
+    bool                                    m_bInitialized;         /**< Is initialized. */
 };
 
 //=============================================================================================================

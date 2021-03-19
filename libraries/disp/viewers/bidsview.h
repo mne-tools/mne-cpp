@@ -192,7 +192,7 @@ private:
      */
     void keyPressEvent(QKeyEvent *event);
 
-    Ui::BidsViewWidget *m_pUi;   /**< The user interface */
+    Ui::BidsViewWidget *m_pUi;   /**< The user interface. */
 
 signals:
     //=========================================================================================================

@@ -232,17 +232,17 @@ private:
      */
     void init(QSharedPointer<FIFFLIB::FiffInfo> p_fiffInfo);
 
-    mutable QMutex                          m_qMutex;           /**< Mutex to ensure thread safety */
+    mutable QMutex                          m_qMutex;           /**< Mutex to ensure thread safety. */
 
     QSharedPointer<FIFFLIB::FiffEvokedSet>  m_pFiffEvokedSet;   /**< Evoked data set*/
 
     QStringList                             m_lResponsibleTriggerTypes; /**< List of all trigger types which lead to the recent emit of a new evoked set. */
 
-    QSharedPointer<FIFFLIB::FiffInfo>       m_pFiffInfo;        /**< Fiff info */
+    QSharedPointer<FIFFLIB::FiffInfo>       m_pFiffInfo;        /**< Fiff info. */
 
     QString                                 m_sXMLLayoutFile;   /**< Layout file name. */
 
-    qint32                                  m_iPreStimSamples;  /**< Number of pre-stimulus samples */
+    qint32                                  m_iPreStimSamples;  /**< Number of pre-stimulus samples. */
 
     QList<QColor>                           m_qListChColors;    /**< Channel color for butterfly plot.*/
 

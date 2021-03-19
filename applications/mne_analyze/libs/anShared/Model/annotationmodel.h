@@ -695,38 +695,38 @@ private:
     int                                 m_iType;                        /** <Type of the currently selected event group */
     int                                 m_iIndexCount;
 
-    QVector<int>                        m_dataSamples;                  /**< Vector of samples of events of the currently loded event group */
-    QVector<int>                        m_dataTypes;                    /**< Types of the events of the currently loaded event group */
-    QVector<int>                        m_dataIsUserEvent;              /**< Whether the events in the currently loaded event group are user-made */
+    QVector<int>                        m_dataSamples;                  /**< Vector of samples of events of the currently loded event group. */
+    QVector<int>                        m_dataTypes;                    /**< Types of the events of the currently loaded event group. */
+    QVector<int>                        m_dataIsUserEvent;              /**< Whether the events in the currently loaded event group are user-made. */
     QVector<int>                        m_dataGroup;
 
-    QVector<int>                        m_dataSamplesFiltered;         /**< Vector of samples of events to be displayed of the currently loded event group */
-    QVector<int>                        m_dataTypesFiltered;           /**< Types of the events to be displayed of the currently loaded event group */
-    QVector<int>                        m_dataIsUserEventFiltered;     /**< Whether the events to be displayed in the currently loaded event group are user-made */
+    QVector<int>                        m_dataSamplesFiltered;         /**< Vector of samples of events to be displayed of the currently loded event group. */
+    QVector<int>                        m_dataTypesFiltered;           /**< Types of the events to be displayed of the currently loaded event group. */
+    QVector<int>                        m_dataIsUserEventFiltered;     /**< Whether the events to be displayed in the currently loaded event group are user-made. */
     QVector<int>                        m_dataGroupFiltered;
 
-    bool                                m_bIsUserMade;                  /**< Whether the current loaded group is user made */
+    bool                                m_bIsUserMade;                  /**< Whether the current loaded group is user made. */
 
-    int                                 m_iSamplePos;                   /**< Sample of event to be added */
-    int                                 m_iFirstSample;                 /**< First sample of file */
-    int                                 m_iLastSample;                  /**< Last sample of file */
+    int                                 m_iSamplePos;                   /**< Sample of event to be added. */
+    int                                 m_iFirstSample;                 /**< First sample of file. */
+    int                                 m_iLastSample;                  /**< Last sample of file. */
 
-    int                                 m_iSelectedCheckState;          /**< State of checkbox of whether to show only selected events */
-    int                                 m_iSelectedAnn;                 /**< Index of selected events */
+    int                                 m_iSelectedCheckState;          /**< State of checkbox of whether to show only selected events. */
+    int                                 m_iSelectedAnn;                 /**< Index of selected events. */
 
-    QList<int>                          m_dataSelectedRows;             /**< List of selected rows for multiple evnt selection */
+    QList<int>                          m_dataSelectedRows;             /**< List of selected rows for multiple evnt selection. */
 
-    int                                 m_iLastTypeAdded;               /**< Stores last created type */
+    int                                 m_iLastTypeAdded;               /**< Stores last created type. */
 
-    float                               m_fFreq;                        /**< Frequency of data file */
+    float                               m_fFreq;                        /**< Frequency of data file. */
 
-    QString                             m_sFilterEventType;             /**< String for diplaying event types */
-    QMap<int, QColor>                   m_eventTypeColor;               /**< Stores colors to display for each event type */
-    QMap<int, QColor>                   m_eventGroupColor;              /**< Stores colors to display for each event group */
+    QString                             m_sFilterEventType;             /**< String for diplaying event types. */
+    QMap<int, QColor>                   m_eventTypeColor;               /**< Stores colors to display for each event type. */
+    QMap<int, QColor>                   m_eventGroupColor;              /**< Stores colors to display for each event group. */
 
-    QStack<QListWidgetItem*>            m_dataStoredGroups;             /**< Stores the groups for switching between files */
+    QStack<QListWidgetItem*>            m_dataStoredGroups;             /**< Stores the groups for switching between files. */
 
-    QSharedPointer<FiffRawViewModel>    m_pFiffModel;                   /**< Pointer to FiffRawViewModel associated with the events stored in this model */
+    QSharedPointer<FiffRawViewModel>    m_pFiffModel;                   /**< Pointer to FiffRawViewModel associated with the events stored in this model. */
 };
 
 //=============================================================================================================

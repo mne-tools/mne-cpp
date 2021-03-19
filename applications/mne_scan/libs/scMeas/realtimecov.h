@@ -132,9 +132,9 @@ public:
     inline bool isInitialized() const;
 
 private:
-    mutable QMutex          m_qMutex;       /**< Mutex to ensure thread safety */
+    mutable QMutex          m_qMutex;       /**< Mutex to ensure thread safety. */
 
-    FIFFLIB::FiffCov::SPtr  m_pFiffCov;     /**< Covariance data set */
+    FIFFLIB::FiffCov::SPtr  m_pFiffCov;     /**< Covariance data set. */
     FIFFLIB::FiffInfo::SPtr m_pFiffInfo;    /**< The Fiff Info. */
 
     bool                    m_bInitialized; /**< If values are stored.*/

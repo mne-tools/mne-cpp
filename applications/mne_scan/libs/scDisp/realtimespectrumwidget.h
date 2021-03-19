@@ -152,14 +152,14 @@ private:
      */
     void showSpectrumSettingsView();
 
-    QPointer<QAction>                                           m_pActionFrequencySettings;         /**< Frequency spectrum settings action */
-    QPointer<DISPLIB::SpectrumView>                             m_pSpectrumView;                    /**< Frequency spectrum view */
+    QPointer<QAction>                                           m_pActionFrequencySettings;         /**< Frequency spectrum settings action. */
+    QPointer<DISPLIB::SpectrumView>                             m_pSpectrumView;                    /**< Frequency spectrum view. */
 
     QSharedPointer<DISPLIB::SpectrumSettingsView>               m_pSpectrumSettingsView;            /**< Frequency spectrum settings modality widget. */
     QSharedPointer<SCMEASLIB::RealTimeSpectrum>                 m_pFS;                              /**< The frequency spectrum measurement. */
 
-    float m_fLowerFrqBound;         /**< Lower frequency bound */
-    float m_fUpperFrqBound;         /**< Upper frequency bound */
+    float m_fLowerFrqBound;         /**< Lower frequency bound. */
+    float m_fUpperFrqBound;         /**< Upper frequency bound. */
 };
 } // NAMESPACE
 

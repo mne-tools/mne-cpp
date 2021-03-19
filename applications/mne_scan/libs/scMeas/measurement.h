@@ -135,10 +135,10 @@ protected:
     inline void setType(int type);
 
 private:
-    mutable QMutex                      m_qMutex;           /**< Mutex to ensure thread safety */
-    int                                 m_iMetaTypeId;      /**< QMetaType id of the Measurement */
-    QString                             m_qString_Name;     /**< Name of the Measurement */
-    bool                                m_bVisibility;      /**< Visibility status */
+    mutable QMutex                      m_qMutex;           /**< Mutex to ensure thread safety. */
+    int                                 m_iMetaTypeId;      /**< QMetaType id of the Measurement. */
+    QString                             m_qString_Name;     /**< Name of the Measurement. */
+    bool                                m_bVisibility;      /**< Visibility status. */
 };
 
 //=============================================================================================================

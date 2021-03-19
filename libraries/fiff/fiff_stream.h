@@ -882,28 +882,28 @@ private:
 
 private:
 
-//    char         *file_name;    /**< Name of the file */ -> Use streamName() instead
-//    FILE         *fd;           /**< The normal file descriptor */ -> file descitpion is part of the stream: stream->device()
-    FiffId                      m_id;   /**< The file identifier */
+//    char         *file_name;    /**< Name of the file. */ -> Use streamName() instead
+//    FILE         *fd;           /**< The normal file descriptor. */ -> file descitpion is part of the stream: stream->device()
+    FiffId                      m_id;   /**< The file identifier. */
     QList<FiffDirEntry::SPtr>   m_dir;  /**< This is the directory. If no directory exists, open automatically scans the file to create one. */
-//    int         nent;           /**< How many entries? */ -> Use nent() instead
-    FiffDirNode::SPtr           m_dirtree; /**< Directory compiled into a tree */
-//    char        *ext_file_name; /**< Name of the file holding the external data */
-//    FILE        *ext_fd;        /**< The file descriptor of the above file if open  */
+//    int         nent;           /**< How many entries?. */ -> Use nent() instead
+    FiffDirNode::SPtr           m_dirtree; /**< Directory compiled into a tree. */
+//    char        *ext_file_name; /**< Name of the file holding the external data. */
+//    FILE        *ext_fd;        /**< The file descriptor of the above file if open . */
 
 // ### OLD STRUCT ###
 // /** FIFF file handle returned by fiff_open(). */
 //typedef struct _fiffFileRec {
-//    char         *file_name;    /**< Name of the file */ -> part of the Parent class of the QIODevice, wrapped by streamName function
-//    FILE         *fd;           /**< The normal file descriptor */
-//    fiffId       id;            /**< The file identifier */
+//    char         *file_name;    /**< Name of the file. */ -> part of the Parent class of the QIODevice, wrapped by streamName function
+//    FILE         *fd;           /**< The normal file descriptor. */
+//    fiffId       id;            /**< The file identifier. */
 //    fiffDirEntry dir;           /**< This is the directory.
 //                                   * If no directory exists, fiff_open
 //                                   * automatically scans the file to create one. */
-//    int         nent;           /**< How many entries? */
-//    fiffDirNode dirtree;        /**< Directory compiled into a tree */
-//    char        *ext_file_name; /**< Name of the file holding the external data */
-//    FILE        *ext_fd;        /**< The file descriptor of the above file if open  */
+//    int         nent;           /**< How many entries?. */
+//    fiffDirNode dirtree;        /**< Directory compiled into a tree. */
+//    char        *ext_file_name; /**< Name of the file holding the external data. */
+//    FILE        *ext_fd;        /**< The file descriptor of the above file if open . */
 //} *fiffFile,fiffFileRec;        /**< FIFF file handle. fiff_open() returns this. */
 };
 } // NAMESPACE

@@ -124,16 +124,16 @@ protected:
      */
     void plotFilterFrequencyResponse();
 
-    RTPROCESSINGLIB::FilterKernel    m_pCurrentFilter;       /**< Pointer to the filter operator */
+    RTPROCESSINGLIB::FilterKernel    m_pCurrentFilter;       /**< Pointer to the filter operator. */
 
-    QGraphicsPathItem*      m_pGraphicsItemPath;    /**< Pointer to the graphics path item in the filterplotscene */
+    QGraphicsPathItem*      m_pGraphicsItemPath;    /**< Pointer to the graphics path item in the filterplotscene. */
 
     int             m_iMaxMagnitude;                /**< the maximum magnitude shown in the diagram. */
     int             m_iScalingFactor;               /**< Scales the db filter magnitudes by the specified factor in order to provide better plotting. */
     int             m_iNumberHorizontalLines;       /**< number of plotted horizontal ()lines. */
     int             m_iNumberVerticalLines;         /**< number of plotted vertical lines. */
     int             m_iAxisTextSize;                /**< point size of the plotted text. */
-    int             m_iDiagramMarginsHoriz;         /**< horizontal space between the filter and diagram plot.  */
+    int             m_iDiagramMarginsHoriz;         /**< horizontal space between the filter and diagram plot. . */
     int             m_iDiagramMarginsVert;          /**< vertical space between the filter and diagram plot. */
     int             m_iCutOffLow;                   /**< cut off frequqency lowpass or lower cut off when filter is a bandpass. */
     int             m_iCutOffHigh;                  /**< cut off frequqency highpass or higher cut off when filter is a bandpass. */

@@ -392,23 +392,23 @@ private:
 
     QList<Eigen::MatrixXd>                  m_matData;                      /**< List that holds the data*/
     QList<Eigen::MatrixXd>                  m_matDataFreeze;                /**< List that holds the data when freezed*/
-    QStringList                             m_lAvrTypes;                    /**< The average types */
+    QStringList                             m_lAvrTypes;                    /**< The average types. */
 
-    Eigen::MatrixXd                         m_matProj;                      /**< SSP projector */
-    Eigen::MatrixXd                         m_matComp;                      /**< Compensator */
+    Eigen::MatrixXd                         m_matProj;                      /**< SSP projector. */
+    Eigen::MatrixXd                         m_matComp;                      /**< Compensator. */
     Eigen::SparseMatrix<double>             m_matSparseProjCompMult;        /**< The final sparse projection + compensator operator.*/
-    Eigen::SparseMatrix<double>             m_matSparseProjMult;            /**< The final sparse SSP projector */
-    Eigen::SparseMatrix<double>             m_matSparseCompMult;            /**< The final sparse compensator matrix */
+    Eigen::SparseMatrix<double>             m_matSparseProjMult;            /**< The final sparse SSP projector. */
+    Eigen::SparseMatrix<double>             m_matSparseCompMult;            /**< The final sparse compensator matrix. */
 
-    Eigen::RowVectorXi                      m_vecBadIdcs;                   /**< Idcs of bad channels */
+    Eigen::RowVectorXi                      m_vecBadIdcs;                   /**< Idcs of bad channels. */
 
-    QPair<QVariant,QVariant>                m_pairBaseline;                 /**< Baseline information */
+    QPair<QVariant,QVariant>                m_pairBaseline;                 /**< Baseline information. */
 
-    bool                                    m_bIsInit;                      /**< Init flag */
-    bool                                    m_bIsFreezed;                   /**< Display is freezed */
-    bool                                    m_bProjActivated;               /**< Doo projections flag */
-    bool                                    m_bCompActivated;               /**< Compensator activated */
-    float                                   m_fSps;                         /**< Sampling rate */
+    bool                                    m_bIsInit;                      /**< Init flag. */
+    bool                                    m_bIsFreezed;                   /**< Display is freezed. */
+    bool                                    m_bProjActivated;               /**< Doo projections flag. */
+    bool                                    m_bCompActivated;               /**< Compensator activated. */
+    float                                   m_fSps;                         /**< Sampling rate. */
 
 signals:
     //=========================================================================================================

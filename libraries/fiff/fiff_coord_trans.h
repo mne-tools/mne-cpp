@@ -293,8 +293,8 @@ public:
 public:
     fiff_int_t  from;   /**< Source coordinate system. */
     fiff_int_t  to;     /**< Destination coordinate system. */
-    Eigen::Matrix<float, 4,4, Eigen::DontAlign>   trans;      /**< The forward transform */
-    Eigen::Matrix<float, 4,4, Eigen::DontAlign>   invtrans;   /**< The inverse transform */
+    Eigen::Matrix<float, 4,4, Eigen::DontAlign>   trans;      /**< The forward transform. */
+    Eigen::Matrix<float, 4,4, Eigen::DontAlign>   invtrans;   /**< The inverse transform. */
 
 // ### OLD STRUCT ###
 // Coordinate transformation descriptor

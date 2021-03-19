@@ -226,8 +226,8 @@ private:
 
     QMutex                              m_qMutex;                           /**< Holds the threads mutex.*/
 
-    QAction*                            m_pActionSetupProject;              /**< shows setup project dialog */
-    QAction*                            m_pActionSetupStimulus;             /**< starts stimulus feature */
+    QAction*                            m_pActionSetupProject;              /**< shows setup project dialog. */
+    QAction*                            m_pActionSetupStimulus;             /**< starts stimulus feature. */
 
     QMutex                              m_mutex;
 };

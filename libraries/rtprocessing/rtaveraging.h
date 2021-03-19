@@ -233,7 +233,7 @@ protected:
      */
     inline bool controlValuesChanged();
 
-    qint32                                          m_iNumAverages;             /**< Number of averages */
+    qint32                                          m_iNumAverages;             /**< Number of averages. */
 
     qint32                                          m_iPreStimSamples;          /**< Amount of samples averaged before the stimulus. */
     qint32                                          m_iNewPreStimSamples;       /**< New amount of samples averaged before the stimulus. */
@@ -241,10 +241,10 @@ protected:
     qint32                                          m_iPostStimSamples;         /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
     qint32                                          m_iNewPostStimSamples;      /**< New amount of samples averaged after the stimulus, including the stimulus sample.*/
 
-    qint32                                          m_iTriggerChIndex;          /**< Current row index of the data matrix which is to be scanned for triggers */
-    qint32                                          m_iNewTriggerIndex;         /**< Old row index of the data matrix which is to be scanned for triggers */
+    qint32                                          m_iTriggerChIndex;          /**< Current row index of the data matrix which is to be scanned for triggers. */
+    qint32                                          m_iNewTriggerIndex;         /**< Old row index of the data matrix which is to be scanned for triggers. */
 
-    float                                           m_fTriggerThreshold;        /**< Threshold to detect trigger */
+    float                                           m_fTriggerThreshold;        /**< Threshold to detect trigger. */
 
     bool                                            m_bActivateThreshold;       /**< Whether to do threshold artifact reduction or not. */
 
@@ -257,10 +257,10 @@ protected:
     FIFFLIB::FiffEvokedSet                          m_stimEvokedSet;            /**< Holds the evoked information. */
 
     QMap<QString,double>                            m_mapThresholds;            /**< Holds the current thresholds for artifact rejection. */
-    QMap<double,QList<Eigen::MatrixXd> >            m_mapStimAve;               /**< the current stimulus average buffer. Holds m_iNumAverages vectors */
+    QMap<double,QList<Eigen::MatrixXd> >            m_mapStimAve;               /**< the current stimulus average buffer. Holds m_iNumAverages vectors. */
     QMap<double,Eigen::MatrixXd>                    m_mapDataPre;               /**< The matrix holding pre stim data. */
     QMap<double,Eigen::MatrixXd>                    m_mapDataPost;              /**< The matrix holding post stim data. */
-    QMap<double,qint32>                             m_mapMatDataPostIdx;        /**< Current index inside of the matrix m_matDataPost */
+    QMap<double,qint32>                             m_mapMatDataPostIdx;        /**< Current index inside of the matrix m_matDataPost. */
     QMap<double,bool>                               m_mapFillingBackBuffer;     /**< Whether the back buffer is currently getting filled. */
 
 signals:

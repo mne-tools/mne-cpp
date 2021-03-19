@@ -168,11 +168,11 @@ public:
     friend bool operator== (const FiffNamedMatrix &a, const FiffNamedMatrix &b);
 
 public:
-    fiff_int_t nrow;        /**< Number of rows */
-    fiff_int_t  ncol;       /**< Number of columns */
-    QStringList row_names;  /**< Row names */
-    QStringList col_names;  /**< Column names */
-    Eigen::MatrixXd data;   /**< Matrix data */
+    fiff_int_t nrow;        /**< Number of rows. */
+    fiff_int_t  ncol;       /**< Number of columns. */
+    QStringList row_names;  /**< Row names. */
+    QStringList col_names;  /**< Column names. */
+    Eigen::MatrixXd data;   /**< Matrix data. */
 
 // ### OLD STRUCT ###
 //typedef struct {            /* Matrix specification with a channel list */
@@ -217,7 +217,7 @@ inline std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffNamedMatri
     out << "\tnrow: " << p_FiffNamedMatrix.nrow << std::endl;
     out << "\tncol: " << p_FiffNamedMatrix.ncol << std::endl;
 
-    Eigen::MatrixXd data;          /**< Matrix data */
+    Eigen::MatrixXd data;          /**< Matrix data. */
 
     out << "\trow_names " << p_FiffNamedMatrix.row_names.size() << ":\n\t";
     if(t_bIsShort)

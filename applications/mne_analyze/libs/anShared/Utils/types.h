@@ -130,8 +130,8 @@ namespace ANSHAREDLIB
      * Public struct for sending scaling parameters through the event manager
      */
     struct ScalingParameters{
-        QList<QString>      m_sViewsToApply;        /**< Which views should apply changes */
-        QMap<qint32, float> m_mScalingMap;          /**< Scaling map */
+        QList<QString>      m_sViewsToApply;        /**< Which views should apply changes. */
+        QMap<qint32, float> m_mScalingMap;          /**< Scaling map. */
     };
 
     //=========================================================================================================
@@ -189,7 +189,7 @@ namespace ANSHAREDLIB
      * Public struct for sending channel selection parameters through the event manager
      */
 //    struct SelectionParameters{
-//        QList<QString>     m_sViewsToApply;         /**< Which views should apply changes */
+//        QList<QString>     m_sViewsToApply;         /**< Which views should apply changes. */
 //        QList<QString>     m_sChannelName;          /**< The channel's name.*/
 //        QList<int>         m_iChannelNumber;        /**< The channel number.*/
 //        QList<int>         m_iChannelKind;          /**< The channel kind.*/

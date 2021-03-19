@@ -127,10 +127,10 @@ private:
     GUSBAmp*                        m_pGUSBAmp;            /**< A pointer to the corresponding GUSBAmp class.*/
     QSharedPointer<GUSBAmpDriver>   m_pGUSBAmpDriver;      /**< A pointer to the corresponding GUSBAmp driver class.*/
 
-    int                 m_iSampRate;            /**< sample rate of the device */
-    QString             m_sFilePath;            /**< path of the file of written data */
+    int                 m_iSampRate;            /**< sample rate of the device. */
+    QString             m_sFilePath;            /**< path of the file of written data. */
     std::vector<QString>     m_vSerials;             /**< vector with the serial numbers of the devices*/
-    std::vector<int>         m_viSizeOfSampleMatrix; /**< size of the sample matrix [rows columns] */
+    std::vector<int>         m_viSizeOfSampleMatrix; /**< size of the sample matrix [rows columns]. */
 };
 } // NAMESPACE
 

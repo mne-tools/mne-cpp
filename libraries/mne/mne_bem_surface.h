@@ -155,19 +155,19 @@ public:
     static QString id_name(int id);
 
 public:
-    FIFFLIB::fiff_int_t id;            /**< Id information */
+    FIFFLIB::fiff_int_t id;            /**< Id information. */
     FIFFLIB::fiff_int_t np;            /**< Number of vertices of the whole/original surface used to create the source locations. */
-    FIFFLIB::fiff_int_t ntri;          /**< Number of available triangles */
-    FIFFLIB::fiff_int_t coord_frame;   /**< Coil coordinate system definition */
-    FIFFLIB::fiff_float_t sigma;       /**< Conductivity of a compartment */
+    FIFFLIB::fiff_int_t ntri;          /**< Number of available triangles. */
+    FIFFLIB::fiff_int_t coord_frame;   /**< Coil coordinate system definition. */
+    FIFFLIB::fiff_float_t sigma;       /**< Conductivity of a compartment. */
     Eigen::MatrixX3f rr;               /**< Source locations of available dipoles. */
     Eigen::MatrixX3f nn;               /**< Source normals of available dipoles. */
-    Eigen::MatrixX3i tris;             /**< Triangles */
-    Eigen::MatrixX3d tri_cent;         /**< Triangle centers */
-    Eigen::MatrixX3d tri_nn;           /**< Triangle normals */
-    Eigen::VectorXd tri_area;          /**< Triangle areas */
-    QVector<QVector<int> > neighbor_tri;           /**< Vector of neighboring triangles for each vertex */
-    QVector<QVector<int> > neighbor_vert;          /**< Vector of neighboring vertices for each vertex */
+    Eigen::MatrixX3i tris;             /**< Triangles. */
+    Eigen::MatrixX3d tri_cent;         /**< Triangle centers. */
+    Eigen::MatrixX3d tri_nn;           /**< Triangle normals. */
+    Eigen::VectorXd tri_area;          /**< Triangle areas. */
+    QVector<QVector<int> > neighbor_tri;           /**< Vector of neighboring triangles for each vertex. */
+    QVector<QVector<int> > neighbor_vert;          /**< Vector of neighboring vertices for each vertex. */
 };
 
 //=============================================================================================================

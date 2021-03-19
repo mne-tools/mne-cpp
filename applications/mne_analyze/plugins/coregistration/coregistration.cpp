@@ -284,7 +284,7 @@ void CoRegistration::onPickFiducials(const bool bActivatePicking)
 void CoRegistration::onSetFiducial(const QVector3D vecResult)
 {
     // Connect to 3DView and activate ObjectPicking
-    fiff_float_t    r[3];           /**< Point location */
+    fiff_float_t    r[3];           /**< Point location. */
     for(int i = 0; i < 3; i++) {
         r[i] = vecResult[i];
     }

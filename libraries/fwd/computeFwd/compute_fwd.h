@@ -139,14 +139,14 @@ public:
     void storeFwd(const QString& sSolName = "default");
 
     // ToDo: make MNEForwardSolution the main output for the solution
-    // QSharedPointer<MNELIB::MNEForwardSolution> fwdSolution;  /**< MNE Forward solution that contains all results */
+    // QSharedPointer<MNELIB::MNEForwardSolution> fwdSolution;  /**< MNE Forward solution that contains all results. */
 
-    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> sol;           /**< Forward solution (will be part of fwdSolution once rafactored) */
-    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> sol_grad;      /**< Forward solution (Grad) (will be part of fwdSolution once rafactored) */
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> sol;           /**< Forward solution (will be part of fwdSolution once rafactored). */
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> sol_grad;      /**< Forward solution (Grad) (will be part of fwdSolution once rafactored). */
 
-    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_meg_forward;            /**< The MEG forward calculation */
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_meg_forward;            /**< The MEG forward calculation. */
     QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_meg_forward_grad;       /**< The MEG gradient forward calculation*/
-    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_eeg_forward;            /**< The EEG forward calculation */
+    QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_eeg_forward;            /**< The EEG forward calculation. */
     QSharedDataPointer<FIFFLIB::FiffNamedMatrix> m_eeg_forward_grad;       /**< The EEG gradient forward calculation*/
 
     QString qPath;
@@ -159,32 +159,32 @@ private:
      */
     void initFwd();
 
-    MNELIB::MneSourceSpaceOld **m_spaces;           /**< Source spaces */
-    int m_iNSpace;                                  /**< The number of source spaces */
-    int m_iNSource;                                 /**< Number of source space points */
-    FwdCoilSet* m_templates;                        /**< The template coil set */
-    FwdCoilSet* m_megcoils;                         /**< The MEG coil set */
-    FwdCoilSet* m_compcoils;                        /**< The compensator coil set */
-    FwdCoilSet* m_eegels;                           /**< The EEG eceltrode set */
-    MNELIB::MneCTFCompDataSet *m_compData;          /**< The compensator data */
-    FwdEegSphereModelSet* m_eegModels;              /**< The EEG model set */
-    FwdEegSphereModel* m_eegModel;                  /**< The EEG model */
-    FwdBemModel *m_bemModel;                        /**< BEM model definition */
-    Eigen::Vector3f *m_r0;                          /**< The Sphere model origin */
+    MNELIB::MneSourceSpaceOld **m_spaces;           /**< Source spaces. */
+    int m_iNSpace;                                  /**< The number of source spaces. */
+    int m_iNSource;                                 /**< Number of source space points. */
+    FwdCoilSet* m_templates;                        /**< The template coil set. */
+    FwdCoilSet* m_megcoils;                         /**< The MEG coil set. */
+    FwdCoilSet* m_compcoils;                        /**< The compensator coil set. */
+    FwdCoilSet* m_eegels;                           /**< The EEG eceltrode set. */
+    MNELIB::MneCTFCompDataSet *m_compData;          /**< The compensator data. */
+    FwdEegSphereModelSet* m_eegModels;              /**< The EEG model set. */
+    FwdEegSphereModel* m_eegModel;                  /**< The EEG model. */
+    FwdBemModel *m_bemModel;                        /**< BEM model definition. */
+    Eigen::Vector3f *m_r0;                          /**< The Sphere model origin. */
 
-    QList<FIFFLIB::FiffChInfo> m_listMegChs;        /**< The MEG channel information */
-    QList<FIFFLIB::FiffChInfo> m_listEegChs;        /**< The EEG channel information */
-    QList<FIFFLIB::FiffChInfo> m_listCompChs;       /**< The Compensator Channel List */
-    int m_iNChan;                                   /**< The number of channels */
+    QList<FIFFLIB::FiffChInfo> m_listMegChs;        /**< The MEG channel information. */
+    QList<FIFFLIB::FiffChInfo> m_listEegChs;        /**< The EEG channel information. */
+    QList<FIFFLIB::FiffChInfo> m_listCompChs;       /**< The Compensator Channel List. */
+    int m_iNChan;                                   /**< The number of channels. */
 
-    FIFFLIB::fiffId m_mri_id;                       /**< The MRI ID */
-    FIFFLIB::FiffId m_meas_id;                      /**< The Measurement ID */
-    FIFFLIB::FiffCoordTransOld* m_mri_head_t;       /**< The MRI->head coordinate transformation */
-    FIFFLIB::FiffCoordTransOld* m_meg_head_t;       /**< The MEG->head coordinate transformation */
+    FIFFLIB::fiffId m_mri_id;                       /**< The MRI ID. */
+    FIFFLIB::FiffId m_meas_id;                      /**< The Measurement ID. */
+    FIFFLIB::FiffCoordTransOld* m_mri_head_t;       /**< The MRI->head coordinate transformation. */
+    FIFFLIB::FiffCoordTransOld* m_meg_head_t;       /**< The MEG->head coordinate transformation. */
 
     QSharedPointer<FIFFLIB::FiffInfoBase> m_pInfoBase;
 
-    ComputeFwdSettings::SPtr m_pSettings;                /**< The settings for the forward calculation */
+    ComputeFwdSettings::SPtr m_pSettings;                /**< The settings for the forward calculation. */
 
     //=========================================================================================================
     /**

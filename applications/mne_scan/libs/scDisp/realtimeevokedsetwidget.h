@@ -167,22 +167,22 @@ private:
      */
     bool virtual eventFilter(QObject *object, QEvent *event);
 
-    QSharedPointer<DISPLIB::EvokedSetModel>             m_pEvokedSetModel;          /**< RTE data model */
+    QSharedPointer<DISPLIB::EvokedSetModel>             m_pEvokedSetModel;          /**< RTE data model. */
     QSharedPointer<SCMEASLIB::RealTimeEvokedSet>        m_pRTESet;                  /**< The real-time evoked measurement. */
     QSharedPointer<DISPLIB::ChannelSelectionView>       m_pChannelSelectionView;    /**< ChannelSelectionView. */
     QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;        /**< Channel info model. */
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< FiffInfo, which is used instead of ListChInfo*/
     QPointer<DISPLIB::AverageLayoutView>                m_pAverageLayoutView;       /**< 2D layout view for plotting averages*/
-    QPointer<DISPLIB::ButterflyView>                    m_pButterflyView;           /**< Butterfly plot */
+    QPointer<DISPLIB::ButterflyView>                    m_pButterflyView;           /**< Butterfly plot. */
 
-    QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda  */
+    QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda . */
 
     bool                                m_bHideBadChannels;         /**< hide bad channels flag. */
     qint32                              m_iMaxFilterTapSize;        /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
 
-    QPointer<QVBoxLayout>               m_pRTESetLayout;            /**< RTE Widget layout */
-    QPointer<QLabel>                    m_pLabelInit;               /**< Initialization Label */
-    QPointer<QToolBox>                  m_pToolBox;                 /**< The toolbox which holds the butterfly and 2D layout plot */
+    QPointer<QVBoxLayout>               m_pRTESetLayout;            /**< RTE Widget layout. */
+    QPointer<QLabel>                    m_pLabelInit;               /**< Initialization Label. */
+    QPointer<QToolBox>                  m_pToolBox;                 /**< The toolbox which holds the butterfly and 2D layout plot. */
 
 signals:
     void windowSizeChanged(int iWindowSize);

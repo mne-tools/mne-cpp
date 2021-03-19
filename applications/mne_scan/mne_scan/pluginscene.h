@@ -121,13 +121,13 @@ protected:
 private:
 //    bool isItemChange(int type);
 
-    PluginGui*  m_pPluginGui;   /**< Corresponding plugin gui */
+    PluginGui*  m_pPluginGui;   /**< Corresponding plugin gui. */
 
     //Current info
     Mode            m_mode;
-    QAction*        m_pActionPluginItem;    /**< Selected plugin */
+    QAction*        m_pActionPluginItem;    /**< Selected plugin. */
 
-    QMenu *m_pMenuPluginItem;         /**< Plugin context menu */
+    QMenu *m_pMenuPluginItem;         /**< Plugin context menu. */
 
     bool leftButtonDown;
     QPointF startPoint;

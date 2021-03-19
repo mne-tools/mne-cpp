@@ -3873,7 +3873,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
                                                     int diagnoise,
                                                     const QList<QString> &projnames,
                                                     int include_meg,
-                                                    int include_eeg)              /**< Include EEG in the fitting? */
+                                                    int include_eeg)              /**< Include EEG in the fitting?. */
 /*
           * Background work for modelling
           */

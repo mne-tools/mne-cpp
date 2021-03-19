@@ -185,7 +185,7 @@ signals:
 
 private:
     CommandManager  m_commandManager;   /**< The command manager. */
-    QMutex          m_qMutex;           /**< Access serialization between threads */
+    QMutex          m_qMutex;           /**< Access serialization between threads. */
     QString         m_sAvailableData;   /**< The last received response. */
 };
 

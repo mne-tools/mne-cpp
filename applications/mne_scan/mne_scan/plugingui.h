@@ -146,8 +146,8 @@ private:
     SCSHAREDLIB::AbstractPlugin::SPtr                   m_pCurrentPlugin;
     SCSHAREDLIB::PluginConnectorConnection::SPtr m_pCurrentConnection;
 
-    PluginScene*    m_pPluginScene;         /**< Plugin graph */
-    QGraphicsView*  m_pGraphicsView;        /**< View to show graph */
+    PluginScene*    m_pPluginScene;         /**< Plugin graph. */
+    QGraphicsView*  m_pGraphicsView;        /**< View to show graph. */
 
     QToolButton*    m_pSensorToolButton;
     QToolButton*    m_pAlgorithmToolButton;

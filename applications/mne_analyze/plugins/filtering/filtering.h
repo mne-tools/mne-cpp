@@ -137,7 +137,7 @@ private:
      */
     void setFilterActive(bool state);
 
-    QPointer<ANSHAREDLIB::Communicator>         m_pCommu;               /**< To broadcst signals */
+    QPointer<ANSHAREDLIB::Communicator>         m_pCommu;               /**< To broadcst signals. */
     QPointer<DISPLIB::FilterSettingsView>       m_pFilterSettingsView;
 
 };

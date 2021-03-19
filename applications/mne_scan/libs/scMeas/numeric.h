@@ -119,7 +119,7 @@ public:
     virtual double getValue() const;
 
 private:
-    mutable QMutex  m_qMutex;   /**< Mutex to ensure thread safety */
+    mutable QMutex  m_qMutex;   /**< Mutex to ensure thread safety. */
 
     QString m_qString_Unit;     /**< Holds unit of the data of the measurement.*/
     double  m_dValue;           /**< Holds current set value.*/

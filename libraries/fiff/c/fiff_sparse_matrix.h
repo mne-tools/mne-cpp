@@ -122,24 +122,24 @@ public:
     FIFFLIB::FiffSparseMatrix* mne_add_upper_triangle_rcs();
 
 public:
-    FIFFLIB::fiff_int_t   coding;    /**< coding (storage) type of the sparse matrix */
-    FIFFLIB::fiff_int_t   m;         /**< m rows */
-    FIFFLIB::fiff_int_t   n;         /**< n columns */
-    FIFFLIB::fiff_int_t   nz;        /**< nz nonzeros */
-    FIFFLIB::fiff_float_t *data;     /**< owns the data */
-    FIFFLIB::fiff_int_t   *inds;     /**< index list, points into data, no dealloc! */
-    FIFFLIB::fiff_int_t   *ptrs;     /**< pointer list, points into data, no dealloc! */
+    FIFFLIB::fiff_int_t   coding;    /**< coding (storage) type of the sparse matrix. */
+    FIFFLIB::fiff_int_t   m;         /**< m rows. */
+    FIFFLIB::fiff_int_t   n;         /**< n columns. */
+    FIFFLIB::fiff_int_t   nz;        /**< nz nonzeros. */
+    FIFFLIB::fiff_float_t *data;     /**< owns the data. */
+    FIFFLIB::fiff_int_t   *inds;     /**< index list, points into data, no dealloc!. */
+    FIFFLIB::fiff_int_t   *ptrs;     /**< pointer list, points into data, no dealloc!. */
 
 // ### OLD STRUCT ###
 ///** Structure for sparse matrices */
 //typedef struct _fiff_sparse_matrix {
-//    fiff_int_t   coding;    /**< coding (storage) type of the sparse matrix */
-//    fiff_int_t   m;         /**< m rows */
-//    fiff_int_t   n;         /**< n columns */
-//    fiff_int_t   nz;        /**< nz nonzeros */
-//    fiff_float_t *data;     /**< owns the data */
-//    fiff_int_t   *inds;     /**< index list, points into data, no dealloc! */
-//    fiff_int_t   *ptrs;     /**< pointer list, points into data, no dealloc! */
+//    fiff_int_t   coding;    /**< coding (storage) type of the sparse matrix. */
+//    fiff_int_t   m;         /**< m rows. */
+//    fiff_int_t   n;         /**< n columns. */
+//    fiff_int_t   nz;        /**< nz nonzeros. */
+//    fiff_float_t *data;     /**< owns the data. */
+//    fiff_int_t   *inds;     /**< index list, points into data, no dealloc!. */
+//    fiff_int_t   *ptrs;     /**< pointer list, points into data, no dealloc!. */
 //} *fiffSparseMatrix, fiffSparseMatrixRec;
 };
 

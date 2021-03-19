@@ -231,7 +231,7 @@ namespace FIFFLIB
 #define FIFFT_INT                   3
 #define FIFFT_FLOAT                 4
 #define FIFFT_DOUBLE                5
-#define FIFFT_JULIAN                6   /**< Julian day */
+#define FIFFT_JULIAN                6   /**< Julian day. */
 #define FIFFT_USHORT                7
 #define FIFFT_UINT                  8
 #define FIFFT_ULONG                 9
@@ -298,11 +298,11 @@ namespace FIFFLIB
 #define FIFF_ECHO               12
 #define FIFF_RESUME_READING     13
 #define FIFF_DACQ_SYSTEM_TYPE   14
-#define FIFF_SELECT_RAW_CH      15  /**< Instruct rawdisp to select this channel */
-#define FIFF_PLAYBACK_MODE      16  /**< Tell that we are playing data back from the hard disks in the data acquisition front end */
+#define FIFF_SELECT_RAW_CH      15  /**< Instruct rawdisp to select this channel. */
+#define FIFF_PLAYBACK_MODE      16  /**< Tell that we are playing data back from the hard disks in the data acquisition front end. */
 #define FIFF_CONTINUE_FILE      17  /**< Used to inform that data is saved into a continuation file. */
-#define FIFF_JITTER_MAX         18  /**< Used to tell the jitter in the timing of data packets */
-#define FIFF_STREAM_SEGMENT     19  /**< A segment of data stream */
+#define FIFF_JITTER_MAX         18  /**< Used to tell the jitter in the timing of data packets. */
+#define FIFF_STREAM_SEGMENT     19  /**< A segment of data stream. */
 /*
 define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere? 
  */
@@ -313,7 +313,7 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFV_DACQ_SYSTEM_ORION   3 
 
 #ifdef _DATA_SERVER
-#define FIFF_MEM_DATA_BUFFER 10300  /**< This is only used by cm_sender to indicate a data buffer which is not logged into the file */
+#define FIFF_MEM_DATA_BUFFER 10300  /**< This is only used by cm_sender to indicate a data buffer which is not logged into the file. */
 #endif
 
 /*
@@ -333,8 +333,8 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFF_PARENT_BLOCK_ID 110
 #define FIFF_BLOCK_NAME      111
 #define FIFF_BLOCK_VERSION   112
-#define FIFF_CREATOR         113   /**< Program that created the file (string)  */
-#define FIFF_MODIFIER        114   /**< Program that modified the file (string) */
+#define FIFF_CREATOR         113   /**< Program that created the file (string) . */
+#define FIFF_MODIFIER        114   /**< Program that modified the file (string). */
 
 #define FIFF_REF_ROLE        115
 #define FIFF_REF_FILE_ID     116
@@ -377,42 +377,42 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFB_EVENTS          115
 #define FIFFB_INDEX           116
 #define FIFFB_DACQ_PARS       117
-#define FIFFB_REF             118         /**< Fiff referencing mechanism */
+#define FIFFB_REF             118         /**< Fiff referencing mechanism. */
 
-#define FIFFB_SMSH_RAW_DATA   119         /**< SmartShield raw data */
-#define FIFFB_SMSH_ASPECT     120         /**< SmartShield averaged data */
-#define FIFFB_HPI_SUBSYSTEM   121         /**< HPI subsystem */
+#define FIFFB_SMSH_RAW_DATA   119         /**< SmartShield raw data. */
+#define FIFFB_SMSH_ASPECT     120         /**< SmartShield averaged data. */
+#define FIFFB_HPI_SUBSYSTEM   121         /**< HPI subsystem. */
 
 /*
  * MRI
  */
 
 #define FIFFB_MRI             200         /**< MRI/CT data. */
-#define FIFFB_MRI_SET         201         /**< MRI/CT volume */
-#define FIFFB_MRI_SLICE       202         /**< MRI/CT slice (image) */
-#define FIFFB_MRI_SCENERY     203         /**< These are for writing unrelated 'slices' */
+#define FIFFB_MRI_SET         201         /**< MRI/CT volume. */
+#define FIFFB_MRI_SLICE       202         /**< MRI/CT slice (image). */
+#define FIFFB_MRI_SCENERY     203         /**< These are for writing unrelated 'slices'. */
 #define FIFFB_MRI_SCENE       204         /**< Which are actually 3D scenes... */
-#define FIFFB_MRI_SEG         205         /**< MRI segmentation data */
-#define FIFFB_MRI_SEG_REGION  206         /**< One MRI segmentation region */
+#define FIFFB_MRI_SEG         205         /**< MRI segmentation data. */
+#define FIFFB_MRI_SEG_REGION  206         /**< One MRI segmentation region. */
 
 /*
  * Forward and inverse modelling
  */
 
-#define FIFFB_SPHERE          300   /**< Concentric sphere model related */
-#define FIFFB_BEM             310   /**< Boundary-element method */
-#define FIFFB_BEM_SURF        311   /**< Boundary-element method surfaces */
-#define FIFFB_CONDUCTOR_MODEL 312   /**< One conductor model definition */
-#define FIFFB_XFIT_PROJ       313   /**< xfit saves the linear projection information here */
-#define FIFFB_XFIT_PROJ_ITEM  314   /**< Each projection item goes here */
-#define FIFFB_XFIT_AUX        315   /**< xfit saves its auxliary data into this block */
+#define FIFFB_SPHERE          300   /**< Concentric sphere model related. */
+#define FIFFB_BEM             310   /**< Boundary-element method. */
+#define FIFFB_BEM_SURF        311   /**< Boundary-element method surfaces. */
+#define FIFFB_CONDUCTOR_MODEL 312   /**< One conductor model definition. */
+#define FIFFB_XFIT_PROJ       313   /**< xfit saves the linear projection information here. */
+#define FIFFB_XFIT_PROJ_ITEM  314   /**< Each projection item goes here. */
+#define FIFFB_XFIT_AUX        315   /**< xfit saves its auxliary data into this block. */
 #define FIFFB_PROJ            FIFFB_XFIT_PROJ
 #define FIFFB_PROJ_ITEM       FIFFB_XFIT_PROJ_ITEM
 /*                            350...
  *                            370          Reserved for MNE estimates (MHa) 
  */
 
-#define FIFFB_BAD_CHANNELS    359         /**< Alias of FIFFB_MNE_BAD_CHANNELS */
+#define FIFFB_BAD_CHANNELS    359         /**< Alias of FIFFB_MNE_BAD_CHANNELS. */
 
 /*
  * Volume info
@@ -422,161 +422,161 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 /*
  * Sparse matrix, cross-talk correction, and SSS blocks
  */
-#define FIFFB_DATA_CORRECTION     500     /**< Correction to data */
-#define FIFFB_CHANNEL_DECOUPLER   501     /**< Cross-talk correction  */
-#define FIFFB_SSS_INFO            502     /**< SSS processing info */
-#define FIFFB_SSS_CAL_ADJUST      503     /**< Fine-calibration adjustment data */
-#define FIFFB_SSS_ST_INFO         504     /**< TSSS info */
-#define FIFFB_SSS_BASES           505     /**< SSS bases */
+#define FIFFB_DATA_CORRECTION     500     /**< Correction to data. */
+#define FIFFB_CHANNEL_DECOUPLER   501     /**< Cross-talk correction . */
+#define FIFFB_SSS_INFO            502     /**< SSS processing info. */
+#define FIFFB_SSS_CAL_ADJUST      503     /**< Fine-calibration adjustment data. */
+#define FIFFB_SSS_ST_INFO         504     /**< TSSS info. */
+#define FIFFB_SSS_BASES           505     /**< SSS bases. */
 
-#define FIFFB_SMARTSHIELD         510     /**< SmartShield data */
+#define FIFFB_SMARTSHIELD         510     /**< SmartShield data. */
 
 /*
  * Different aspects of data
  */
 
-#define FIFFV_ASPECT_AVERAGE       100  /**< Normal average of epochs */
-#define FIFFV_ASPECT_STD_ERR       101  /**< Std. error of mean */
-#define FIFFV_ASPECT_SINGLE        102  /**< Single epoch cut out from the continuous data */
+#define FIFFV_ASPECT_AVERAGE       100  /**< Normal average of epochs. */
+#define FIFFV_ASPECT_STD_ERR       101  /**< Std. error of mean. */
+#define FIFFV_ASPECT_SINGLE        102  /**< Single epoch cut out from the continuous data. */
 #define FIFFV_ASPECT_SUBAVERAGE    103
-#define FIFFV_ASPECT_ALTAVERAGE    104  /**< Alternating subaverage */
-#define FIFFV_ASPECT_SAMPLE        105  /**< A sample cut out by graph */
-#define FIFFV_ASPECT_POWER_DENSITY 106  /**< Power density spectrum */
-#define FIFFV_ASPECT_DIPOLE_WAVE   200  /**< Dipole amplitude curve */
+#define FIFFV_ASPECT_ALTAVERAGE    104  /**< Alternating subaverage. */
+#define FIFFV_ASPECT_SAMPLE        105  /**< A sample cut out by graph. */
+#define FIFFV_ASPECT_POWER_DENSITY 106  /**< Power density spectrum. */
+#define FIFFV_ASPECT_DIPOLE_WAVE   200  /**< Dipole amplitude curve. */
 
 /*
  * Tags used in data files
  */
 
-#define FIFF_UTC_OFFSET      159        /**< UTC offset of related meas_date (sHH:MM) */
+#define FIFF_UTC_OFFSET      159        /**< UTC offset of related meas_date (sHH:MM). */
 
-#define FIFF_NCHAN           200        /**< Number of channels */
-#define FIFF_SFREQ           201        /**< Sampling frequency (Hz) */
-#define FIFF_DATA_PACK       202        /**< How the raw data is packed */
-#define FIFF_CH_INFO         203        /**< Channel descriptor */
-#define FIFF_MEAS_DATE       204        /**< Measurement date */
-#define FIFF_SUBJECT         205        /**< This might be deleted later */
+#define FIFF_NCHAN           200        /**< Number of channels. */
+#define FIFF_SFREQ           201        /**< Sampling frequency (Hz). */
+#define FIFF_DATA_PACK       202        /**< How the raw data is packed. */
+#define FIFF_CH_INFO         203        /**< Channel descriptor. */
+#define FIFF_MEAS_DATE       204        /**< Measurement date. */
+#define FIFF_SUBJECT         205        /**< This might be deleted later. */
 #define FIFF_COMMENT         206        /**< This is used in a questionable way... */
-#define FIFF_NAVE            207        /**< Number of averages */
-#define FIFF_FIRST_SAMPLE    208        /**< The first sample of an epoch */
-#define FIFF_LAST_SAMPLE     209        /**< The last sample of an epoch */
-#define FIFF_ASPECT_KIND     210        /**< Aspect label */
-#define FIFF_REF_EVENT       211        /**< Reference event */
-#define FIFF_EXPERIMENTER    212        /**< Experimenter name */
-#define FIFF_DIG_POINT       213        /**< Digitization point */
-#define FIFF_CH_POS_VEC      214        /**< Channel positions */
-#define FIFF_HPI_SLOPES      215        /**< HPI data */
-#define FIFF_HPI_NCOIL       216        /**< Number of HPI coils */
-#define FIFF_REQ_EVENT       217        /**< Required event */
-#define FIFF_REQ_LIMIT       218        /**< Window for required event */
-#define FIFF_LOWPASS         219        /**< Analog lowpass */
-#define FIFF_BAD_CHS         220        /**< List of bad channels */
-#define FIFF_ARTEF_REMOVAL   221        /**< Artifact removal */
-#define FIFF_COORD_TRANS     222        /**< Coordinate transformation */
-#define FIFF_HIGHPASS        223        /**< Analog highpass */
-#define FIFF_CH_CALS_VEC     224        /**< This will not occur in new files */
-#define FIFF_HPI_BAD_CHS     225        /**< List of channels considered to be bad in hpi */
-#define FIFF_HPI_CORR_COEFF  226        /**< Hpi curve fit correlations */
-#define FIFF_EVENT_COMMENT   227        /**< Comment about the events used in averaging */
-#define FIFF_NO_SAMPLES      228        /**< Number of samples in an epoch */
-#define FIFF_FIRST_TIME      229        /**< Time scale minimum */
-#define FIFF_SUBAVE_SIZE     230        /**< Size of a subaverage */
-#define FIFF_SUBAVE_FIRST    231        /**< The first epoch # contained in the subaverage */
+#define FIFF_NAVE            207        /**< Number of averages. */
+#define FIFF_FIRST_SAMPLE    208        /**< The first sample of an epoch. */
+#define FIFF_LAST_SAMPLE     209        /**< The last sample of an epoch. */
+#define FIFF_ASPECT_KIND     210        /**< Aspect label. */
+#define FIFF_REF_EVENT       211        /**< Reference event. */
+#define FIFF_EXPERIMENTER    212        /**< Experimenter name. */
+#define FIFF_DIG_POINT       213        /**< Digitization point. */
+#define FIFF_CH_POS_VEC      214        /**< Channel positions. */
+#define FIFF_HPI_SLOPES      215        /**< HPI data. */
+#define FIFF_HPI_NCOIL       216        /**< Number of HPI coils. */
+#define FIFF_REQ_EVENT       217        /**< Required event. */
+#define FIFF_REQ_LIMIT       218        /**< Window for required event. */
+#define FIFF_LOWPASS         219        /**< Analog lowpass. */
+#define FIFF_BAD_CHS         220        /**< List of bad channels. */
+#define FIFF_ARTEF_REMOVAL   221        /**< Artifact removal. */
+#define FIFF_COORD_TRANS     222        /**< Coordinate transformation. */
+#define FIFF_HIGHPASS        223        /**< Analog highpass. */
+#define FIFF_CH_CALS_VEC     224        /**< This will not occur in new files. */
+#define FIFF_HPI_BAD_CHS     225        /**< List of channels considered to be bad in hpi. */
+#define FIFF_HPI_CORR_COEFF  226        /**< Hpi curve fit correlations. */
+#define FIFF_EVENT_COMMENT   227        /**< Comment about the events used in averaging. */
+#define FIFF_NO_SAMPLES      228        /**< Number of samples in an epoch. */
+#define FIFF_FIRST_TIME      229        /**< Time scale minimum. */
+#define FIFF_SUBAVE_SIZE     230        /**< Size of a subaverage. */
+#define FIFF_SUBAVE_FIRST    231        /**< The first epoch # contained in the subaverage. */
 #define FIFF_NAME            233          /**< Intended to be a short name. */
-#define FIFF_DESCRIPTION     FIFF_COMMENT /**< (Textual) Description of an object */
-#define FIFF_DIG_STRING      234          /**< String of digitized points */
+#define FIFF_DESCRIPTION     FIFF_COMMENT /**< (Textual) Description of an object. */
+#define FIFF_DIG_STRING      234          /**< String of digitized points. */
 
-#define FIFF_LINE_FREQ       235          /**< Line interference frequency */
-#define FIFF_HPI_COIL_FREQ   236          /**< HPI coil excitation frequency */
-#define FIFF_SIGNAL_CHANNEL  237          /**< Signal channel name */
+#define FIFF_LINE_FREQ       235          /**< Line interference frequency. */
+#define FIFF_HPI_COIL_FREQ   236          /**< HPI coil excitation frequency. */
+#define FIFF_SIGNAL_CHANNEL  237          /**< Signal channel name. */
 
-#define FIFFC_HPI_MAX_NCOIL 1000          /**< Max value for FIFF_HPI_NCOIL */
+#define FIFFC_HPI_MAX_NCOIL 1000          /**< Max value for FIFF_HPI_NCOIL. */
 
 /*
  *
  * HPI fitting program tags
  *
  */
-#define FIFF_HPI_COIL_MOMENTS       240	  /**< Estimated moment vectors for the HPI coil magnetic dipoles */
-#define FIFF_HPI_FIT_GOODNESS       241	  /**< Three floats indicating the goodness of fit */
-#define FIFF_HPI_FIT_ACCEPT         242	  /**< Bitmask indicating acceptance (see below) */
-#define FIFF_HPI_FIT_GOOD_LIMIT     243	  /**< Limit for the goodness-of-fit */
-#define FIFF_HPI_FIT_DIST_LIMIT     244	  /**< Limit for the coil distance difference */
-#define FIFF_HPI_COIL_NO            245	  /**< Coil number listed by HPI measurement */
+#define FIFF_HPI_COIL_MOMENTS       240	  /**< Estimated moment vectors for the HPI coil magnetic dipoles. */
+#define FIFF_HPI_FIT_GOODNESS       241	  /**< Three floats indicating the goodness of fit. */
+#define FIFF_HPI_FIT_ACCEPT         242	  /**< Bitmask indicating acceptance (see below). */
+#define FIFF_HPI_FIT_GOOD_LIMIT     243	  /**< Limit for the goodness-of-fit. */
+#define FIFF_HPI_FIT_DIST_LIMIT     244	  /**< Limit for the coil distance difference. */
+#define FIFF_HPI_COIL_NO            245	  /**< Coil number listed by HPI measurement. */
 #define FIFF_HPI_COILS_USED         246	  /**< List of coils finally used when the transformation
 					   * was computed */
 #define FIFF_HPI_DIGITIZATION_ORDER 247	  /**< Which Isotrak digitization point corresponds to
 					   * each of the coils energized */
 
-#define FIFFV_HPI_ACCEPT_PROGRAM (1<<0)   /**< The fit was accepted by the software */
-#define FIFFV_HPI_ACCEPT_USER    (1<<1)	  /**< The fit was accepted by user action */
+#define FIFFV_HPI_ACCEPT_PROGRAM (1<<0)   /**< The fit was accepted by the software. */
+#define FIFFV_HPI_ACCEPT_USER    (1<<1)	  /**< The fit was accepted by user action. */
 #define FIFFV_HPI_ACCEPT_NONE    0
 
 /**< Following corresponsds to fields in channel info record. */
 
-#define FIFF_CH_SCAN_NO	           250    /**< int32 "Channel scan number. Corresponds to fiffChInfoRec.scanNo field" */
-#define FIFF_CH_LOGICAL_NO         251	  /**< int32 "Channel logical number. Corresponds to fiffChInfoRec.logNo field" */
-#define FIFF_CH_KIND 	           252    /**< enum(ch_kind)  "Channel type. Corresponds to fiffChInfoRec.kind field" */
-#define FIFF_CH_RANGE              253    /**< float          "Conversion from recorded number to (possibly virtual) voltage at the output" */
-#define FIFF_CH_CAL                254    /**< float          "Calibration coefficients from output voltage to some real units" */
-#define FIFF_CH_POS                255    /**< ch_pos_rec     "Channel position" */
-#define FIFF_CH_UNIT               256    /**< enum(unit)     "Unit of the data" */
+#define FIFF_CH_SCAN_NO	           250    /**< int32 "Channel scan number. Corresponds to fiffChInfoRec.scanNo field". */
+#define FIFF_CH_LOGICAL_NO         251	  /**< int32 "Channel logical number. Corresponds to fiffChInfoRec.logNo field". */
+#define FIFF_CH_KIND 	           252    /**< enum(ch_kind)  "Channel type. Corresponds to fiffChInfoRec.kind field". */
+#define FIFF_CH_RANGE              253    /**< float          "Conversion from recorded number to (possibly virtual) voltage at the output". */
+#define FIFF_CH_CAL                254    /**< float          "Calibration coefficients from output voltage to some real units". */
+#define FIFF_CH_POS                255    /**< ch_pos_rec     "Channel position". */
+#define FIFF_CH_UNIT               256    /**< enum(unit)     "Unit of the data". */
 #define FIFF_CH_UNIT_MUL           257	  /**< int            "Unit multiplier exponent. */
-#define FIFF_CH_DACQ_NAME          258	  /**< string "Name of the channel in the data acquisition system. Same as fiffChInfoRec.name." */
+#define FIFF_CH_DACQ_NAME          258	  /**< string "Name of the channel in the data acquisition system. Same as fiffChInfoRec.name.". */
 
-#define FIFF_SSS_FRAME             263    /**< SSS coordinate frame */
-#define FIFF_SSS_JOB               264    /**< SSS job */
-#define FIFF_SSS_ORIGIN            265    /**< Origin of the SSS inside expansion */
-#define FIFF_SSS_ORD_IN            266    /**< Order of the SSS inside expansion */
-#define FIFF_SSS_ORD_OUT           267    /**< Order of the SSS outside expansion */
-#define FIFF_SSS_NMAG              268    /**< Number of MEG channels */
-#define FIFF_SSS_COMPONENTS        269    /**< Number of SSS moments */
-#define FIFF_SSS_CAL_CHANS         270    /**< INT matrix (nmag x 2) for fine-calibrated channel numbers and types */
-#define FIFF_SSS_CAL_CORRS         271    /**< FLOAT matrix (nmag x 14) for fine-calibration coefficients */
-#define FIFF_SSS_ST_CORR           272    /**< TSSS subspace correlation */
+#define FIFF_SSS_FRAME             263    /**< SSS coordinate frame. */
+#define FIFF_SSS_JOB               264    /**< SSS job. */
+#define FIFF_SSS_ORIGIN            265    /**< Origin of the SSS inside expansion. */
+#define FIFF_SSS_ORD_IN            266    /**< Order of the SSS inside expansion. */
+#define FIFF_SSS_ORD_OUT           267    /**< Order of the SSS outside expansion. */
+#define FIFF_SSS_NMAG              268    /**< Number of MEG channels. */
+#define FIFF_SSS_COMPONENTS        269    /**< Number of SSS moments. */
+#define FIFF_SSS_CAL_CHANS         270    /**< INT matrix (nmag x 2) for fine-calibrated channel numbers and types. */
+#define FIFF_SSS_CAL_CORRS         271    /**< FLOAT matrix (nmag x 14) for fine-calibration coefficients. */
+#define FIFF_SSS_ST_CORR           272    /**< TSSS subspace correlation. */
 
-#define FIFFV_SSS_JOB_NOTHING   0         /**< Just copy input to output */
-#define FIFFV_SSS_JOB_CTC       1         /**< Only cross-talk correction */
-#define FIFFV_SSS_JOB_FILTER    2         /**< Spatial filtering (default) */
-#define FIFFV_SSS_JOB_VIRT      3         /**< Reconstruct virtual data */
-#define FIFFV_SSS_JOB_HEAD_POS  4         /**< Estimate head positions, no movecomp */
-#define FIFFV_SSS_JOB_MOVEC_FIT 5         /**< Estimate head positions, do movecomp */
-#define FIFFV_SSS_JOB_MOVEC_QUA 6         /**< Do movecomp from prev estimated positions */
-#define FIFFV_SSS_JOB_REC_ALL   7         /**< Reconstruct fields from inside and outside moments */
-#define FIFFV_SSS_JOB_REC_IN    8         /**< Reconstruct fields from inside moments */
-#define FIFFV_SSS_JOB_REC_OUT   9         /**< Reconstruct fields from outside moments */
-#define FIFFV_SSS_JOB_ST       10         /**< TSSS */
+#define FIFFV_SSS_JOB_NOTHING   0         /**< Just copy input to output. */
+#define FIFFV_SSS_JOB_CTC       1         /**< Only cross-talk correction. */
+#define FIFFV_SSS_JOB_FILTER    2         /**< Spatial filtering (default). */
+#define FIFFV_SSS_JOB_VIRT      3         /**< Reconstruct virtual data. */
+#define FIFFV_SSS_JOB_HEAD_POS  4         /**< Estimate head positions, no movecomp. */
+#define FIFFV_SSS_JOB_MOVEC_FIT 5         /**< Estimate head positions, do movecomp. */
+#define FIFFV_SSS_JOB_MOVEC_QUA 6         /**< Do movecomp from prev estimated positions. */
+#define FIFFV_SSS_JOB_REC_ALL   7         /**< Reconstruct fields from inside and outside moments. */
+#define FIFFV_SSS_JOB_REC_IN    8         /**< Reconstruct fields from inside moments. */
+#define FIFFV_SSS_JOB_REC_OUT   9         /**< Reconstruct fields from outside moments. */
+#define FIFFV_SSS_JOB_ST       10         /**< TSSS. */
 
-#define FIFF_SSS_BASE_IN       273        /**< DOUBLE matrix for SSS inside basis */
-#define FIFF_SSS_BASE_OUT      274        /**< DOUBLE matrix for SSS outside basis */
-#define FIFF_SSS_BASE_VIRT     275        /**< DOUBLE matrix for SSS virtual basis */
-#define FIFF_SSS_NORM          276        /**< Froebius norm of the inside basis */
-#define FIFF_SSS_ITERATE       277        /**< Nr of iterations in iterative SSS pseudo-inverse */
-#define FIFF_GANTRY_ANGLE      282        /**< Tilt angle of the dewar in degrees */
-#define FIFF_DATA_BUFFER       300        /**< Buffer containing measurement data */
-#define FIFF_DATA_SKIP         301        /**< Data skip in buffers */
-#define FIFF_EPOCH             302        /**< Buffer containing one epoch and channel */
-#define FIFF_DATA_SKIP_SAMP    303        /**< Data skip in samples */
-#define FIFF_DATA_BUFFER2      304        /**< Int_32 data buffer in dacq outgen */
-#define FIFF_TIME_STAMP        305        /**< Int_32[3] meas time stamp (sec,usec,sampleno) */
+#define FIFF_SSS_BASE_IN       273        /**< DOUBLE matrix for SSS inside basis. */
+#define FIFF_SSS_BASE_OUT      274        /**< DOUBLE matrix for SSS outside basis. */
+#define FIFF_SSS_BASE_VIRT     275        /**< DOUBLE matrix for SSS virtual basis. */
+#define FIFF_SSS_NORM          276        /**< Froebius norm of the inside basis. */
+#define FIFF_SSS_ITERATE       277        /**< Nr of iterations in iterative SSS pseudo-inverse. */
+#define FIFF_GANTRY_ANGLE      282        /**< Tilt angle of the dewar in degrees. */
+#define FIFF_DATA_BUFFER       300        /**< Buffer containing measurement data. */
+#define FIFF_DATA_SKIP         301        /**< Data skip in buffers. */
+#define FIFF_EPOCH             302        /**< Buffer containing one epoch and channel. */
+#define FIFF_DATA_SKIP_SAMP    303        /**< Data skip in samples. */
+#define FIFF_DATA_BUFFER2      304        /**< Int_32 data buffer in dacq outgen. */
+#define FIFF_TIME_STAMP        305        /**< Int_32[3] meas time stamp (sec,usec,sampleno). */
 
-#define FIFF_SUBJ_ID           400        /**< Subject ID */
-#define FIFF_SUBJ_FIRST_NAME   401        /**< First name of the subject */
-#define FIFF_SUBJ_MIDDLE_NAME  402        /**< Middle name of the subject */
-#define FIFF_SUBJ_LAST_NAME    403        /**< Last name of the subject */
-#define FIFF_SUBJ_BIRTH_DAY    404        /**< Birthday of the subject */
-#define FIFF_SUBJ_SEX          405        /**< Sex of the subject */
-#define FIFF_SUBJ_HAND         406        /**< Handedness of the subject */
-#define FIFF_SUBJ_WEIGHT       407        /**< Weight of the subject */
-#define FIFF_SUBJ_HEIGHT       408        /**< Height of the subject */
-#define FIFF_SUBJ_COMMENT      409        /**< Comment about the subject */
-#define FIFF_SUBJ_HIS_ID       410        /**< ID used in the Hospital Information System */
+#define FIFF_SUBJ_ID           400        /**< Subject ID. */
+#define FIFF_SUBJ_FIRST_NAME   401        /**< First name of the subject. */
+#define FIFF_SUBJ_MIDDLE_NAME  402        /**< Middle name of the subject. */
+#define FIFF_SUBJ_LAST_NAME    403        /**< Last name of the subject. */
+#define FIFF_SUBJ_BIRTH_DAY    404        /**< Birthday of the subject. */
+#define FIFF_SUBJ_SEX          405        /**< Sex of the subject. */
+#define FIFF_SUBJ_HAND         406        /**< Handedness of the subject. */
+#define FIFF_SUBJ_WEIGHT       407        /**< Weight of the subject. */
+#define FIFF_SUBJ_HEIGHT       408        /**< Height of the subject. */
+#define FIFF_SUBJ_COMMENT      409        /**< Comment about the subject. */
+#define FIFF_SUBJ_HIS_ID       410        /**< ID used in the Hospital Information System. */
 
-#define FIFF_PROJ_ID           500        /**< Project ID */
-#define FIFF_PROJ_NAME         501        /**< Project name */
-#define FIFF_PROJ_AIM          502        /**< Projct description */
-#define FIFF_PROJ_PERSONS      503        /**< Persons participating in the project */
-#define FIFF_PROJ_COMMENT      504        /**< Comment about the project */
+#define FIFF_PROJ_ID           500        /**< Project ID. */
+#define FIFF_PROJ_NAME         501        /**< Project name. */
+#define FIFF_PROJ_AIM          502        /**< Projct description. */
+#define FIFF_PROJ_PERSONS      503        /**< Persons participating in the project. */
+#define FIFF_PROJ_COMMENT      504        /**< Comment about the project. */
 
 /**< Special values used in the project tags. */
 
@@ -591,14 +591,14 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 /*
  * Event list saving...
  */
-#define FIFF_EVENT_CHANNELS    600	/**< Event channel numbers */
+#define FIFF_EVENT_CHANNELS    600	/**< Event channel numbers. */
 #define FIFF_EVENT_LIST        601      /**< List of events (integers:
 					 * <sample before after> */
 /*
  * Event spec tags
  */
-#define FIFF_EVENT_CHANNEL     602	/**< Event channel name */
-#define FIFF_EVENT_BITS        603      /**< Event bits array */
+#define FIFF_EVENT_CHANNEL     602	/**< Event channel name. */
+#define FIFF_EVENT_BITS        603      /**< Event bits array. */
 
 /*
  * Event bitmask constants
@@ -624,8 +624,8 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 /*
  * Processing history tags
  */
-#define FIFFB_PROCESSING_HISTORY 900     /**< Processing history block */
-#define FIFFB_PROCESSING_RECORD  901     /**<  .. can contain several processing records */
+#define FIFFB_PROCESSING_HISTORY 900     /**< Processing history block. */
+#define FIFFB_PROCESSING_RECORD  901     /**<  .. can contain several processing records. */
 
 /**<
  * Aspect values used to save characteristic curves of SQUIDs.
@@ -713,35 +713,35 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 /*
  * Sphere model     (3000...)
  */
-#define FIFF_CONDUCTOR_MODEL_KIND 3000      /**< What kind of conductor model */
+#define FIFF_CONDUCTOR_MODEL_KIND 3000      /**< What kind of conductor model. */
 /*
  * These are the models we support
  */
-#define FIFFV_COND_MODEL_UNKNOWN     0      /**< Not known */
-#define FIFFV_COND_MODEL_SPHERE      1      /**< Spherically symmetric */
-#define FIFFV_COND_MODEL_BEM_HOMOG   2      /**< Homogeneous BEM model */
-#define FIFFV_COND_MODEL_BEM         3      /**< Multilayer BEM model */
+#define FIFFV_COND_MODEL_UNKNOWN     0      /**< Not known. */
+#define FIFFV_COND_MODEL_SPHERE      1      /**< Spherically symmetric. */
+#define FIFFV_COND_MODEL_BEM_HOMOG   2      /**< Homogeneous BEM model. */
+#define FIFFV_COND_MODEL_BEM         3      /**< Multilayer BEM model. */
 
 #define FIFF_SPHERE_ORIGIN          3001
-#define FIFF_SPHERE_COORD_FRAME     3002    /**< Which coordinate frame are we using? */
-#define FIFF_SPHERE_LAYERS          3003    /**< Array of layer structures */
+#define FIFF_SPHERE_COORD_FRAME     3002    /**< Which coordinate frame are we using?. */
+#define FIFF_SPHERE_LAYERS          3003    /**< Array of layer structures. */
 /*
  * Surfaces for BEM (3100...)
  */
-#define FIFF_BEM_SURF_ID            3101    /**< int    surface number */
-#define FIFF_BEM_SURF_NAME          3102    /**< string surface name */
-#define FIFF_BEM_SURF_NNODE         3103    /**< int    # of nodes on a surface */
-#define FIFF_BEM_SURF_NTRI          3104    /**< int    # number of triangles on a surface */
-#define FIFF_BEM_SURF_NODES         3105    /**< float  surface nodes (nnode,3) */
-#define FIFF_BEM_SURF_TRIANGLES     3106    /**< int    surface triangles (ntri,3) */
-#define FIFF_BEM_SURF_NORMALS       3107    /**< float  surface node normal unit vectors (nnode,3) */
-#define FIFF_BEM_SURF_CURVS         3108    /**< float  surface node first principal curvature unit vectors (nnode,3) */
-#define FIFF_BEM_SURF_CURV_VALUES   3109    /**< float  the two curvature values (nnode,2) */
+#define FIFF_BEM_SURF_ID            3101    /**< int    surface number. */
+#define FIFF_BEM_SURF_NAME          3102    /**< string surface name. */
+#define FIFF_BEM_SURF_NNODE         3103    /**< int    # of nodes on a surface. */
+#define FIFF_BEM_SURF_NTRI          3104    /**< int    # number of triangles on a surface. */
+#define FIFF_BEM_SURF_NODES         3105    /**< float  surface nodes (nnode,3). */
+#define FIFF_BEM_SURF_TRIANGLES     3106    /**< int    surface triangles (ntri,3). */
+#define FIFF_BEM_SURF_NORMALS       3107    /**< float  surface node normal unit vectors (nnode,3). */
+#define FIFF_BEM_SURF_CURVS         3108    /**< float  surface node first principal curvature unit vectors (nnode,3). */
+#define FIFF_BEM_SURF_CURV_VALUES   3109    /**< float  the two curvature values (nnode,2). */
 
-#define FIFF_BEM_POT_SOLUTION       3110    /**< float ** The solution matrix */
-#define FIFF_BEM_APPROX             3111    /**< int    approximation method, see below */
-#define FIFF_BEM_COORD_FRAME        3112    /**< The coordinate frame of the model */
-#define FIFF_BEM_SIGMA              3113    /**< Conductivity of a compartment */
+#define FIFF_BEM_POT_SOLUTION       3110    /**< float ** The solution matrix. */
+#define FIFF_BEM_APPROX             3111    /**< int    approximation method, see below. */
+#define FIFF_BEM_COORD_FRAME        3112    /**< The coordinate frame of the model. */
+#define FIFF_BEM_SIGMA              3113    /**< Conductivity of a compartment. */
 /*
  * FIFF_BEM_SURF_ID can be one of the following
  */
@@ -775,8 +775,8 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 /*				                               
  * FIFF_BEM_APPROX		     
  */				     
-#define FIFFV_BEM_APPROX_CONST        1     /**< The constant potential approach */
-#define FIFFV_BEM_APPROX_LINEAR       2     /**< The linear potential approach */
+#define FIFFV_BEM_APPROX_CONST        1     /**< The constant potential approach. */
+#define FIFFV_BEM_APPROX_LINEAR       2     /**< The linear potential approach. */
 /*
  * Source descriptions (3200...)
  * The dipole is six floats (position and dipole moment)
@@ -792,7 +792,7 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFF_XFIT_INTEGRATION_RADIUS          3405
 #define FIFF_XFIT_CONDUCTOR_MODEL_NAME        3406
 #define FIFF_XFIT_CONDUCTOR_MODEL_TRANS_NAME  3407
-#define FIFF_XFIT_CONT_SURF_TYPE              3408   /**< Xfit contour surface type */
+#define FIFF_XFIT_CONT_SURF_TYPE              3408   /**< Xfit contour surface type. */
 
 /*
  * These relate to linear projection
@@ -834,32 +834,32 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFV_XFIT_PROJ_ITEM_HOMOG_GRAD  FIFFV_PROJ_ITEM_HOMOG_GRAD
 #define FIFFV_XFIT_PROJ_ITEM_HOMOG_FIELD FIFFV_PROJ_ITEM_HOMOG_FIELD
 
-#define FIFF_XPLOTTER_LAYOUT          3501     /**< xplotter layout tag */
+#define FIFF_XPLOTTER_LAYOUT          3501     /**< xplotter layout tag. */
 
 /*  FIFF_MNE_xxxx                     3502
  *                                     ...
  *  Reserved for MNE data             3799 
  */
-#define FIFF_CH_NAME_LIST             3507     /**< Alias of FIFF_MNE_CH_NAME_LIST */
+#define FIFF_CH_NAME_LIST             3507     /**< Alias of FIFF_MNE_CH_NAME_LIST. */
 
 /*
  * These occur in the volume info files
  */
 #define FIFF_VOL_ID                  4001
 #define FIFF_VOL_NAME                4002
-#define FIFF_VOL_OWNER_ID            4003   /**< User id of the owner */
-#define FIFF_VOL_OWNER_NAME          4004   /**< User name of the owner */
-#define FIFF_VOL_OWNER_REAL_NAME     4005   /**< User name of the owner */
+#define FIFF_VOL_OWNER_ID            4003   /**< User id of the owner. */
+#define FIFF_VOL_OWNER_NAME          4004   /**< User name of the owner. */
+#define FIFF_VOL_OWNER_REAL_NAME     4005   /**< User name of the owner. */
 #define FIFF_VOL_TYPE                4006   /**< See below... */
-#define FIFF_VOL_HOST                4007   /**< Where does the volume reside */
-#define FIFF_VOL_REAL_ROOT           4008   /**< The root of the volume in in the machine where the file system is mounted */
-#define FIFF_VOL_SYMBOLIC_ROOT       4009   /**< Symbolic link to the root of the volume (if any) system is mounted */
-#define FIFF_VOL_MOUNT_POINT         4010   /**< Last mount point of the volume */
-#define FIFF_VOL_BLOCKS              4011   /**< Total # of blocks */
-#define FIFF_VOL_FREE_BLOCKS         4012   /**< # of free blocks */
-#define FIFF_VOL_AVAIL_BLOCKS        4013   /**< # of free blocks available to non-superuser */
-#define FIFF_VOL_BLOCK_SIZE          4014   /**< Block size in bytes */
-#define FIFF_VOL_DIRECTORY           4015   /**< Contents of the volume in a special format the data type will be FIFF_VOID */
+#define FIFF_VOL_HOST                4007   /**< Where does the volume reside. */
+#define FIFF_VOL_REAL_ROOT           4008   /**< The root of the volume in in the machine where the file system is mounted. */
+#define FIFF_VOL_SYMBOLIC_ROOT       4009   /**< Symbolic link to the root of the volume (if any) system is mounted. */
+#define FIFF_VOL_MOUNT_POINT         4010   /**< Last mount point of the volume. */
+#define FIFF_VOL_BLOCKS              4011   /**< Total # of blocks. */
+#define FIFF_VOL_FREE_BLOCKS         4012   /**< # of free blocks. */
+#define FIFF_VOL_AVAIL_BLOCKS        4013   /**< # of free blocks available to non-superuser. */
+#define FIFF_VOL_BLOCK_SIZE          4014   /**< Block size in bytes. */
+#define FIFF_VOL_DIRECTORY           4015   /**< Contents of the volume in a special format the data type will be FIFF_VOID. */
 /*
  * Index
  */
@@ -888,15 +888,15 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
  * Volume types used in FIFF_VOL_TYPE
  */
 
-#define FIFFV_VOL_TYPE_HD            1      /**< Hard disk */
-#define FIFFV_VOL_TYPE_MOD           2      /**< Magneto-optical disk */
+#define FIFFV_VOL_TYPE_HD            1      /**< Hard disk. */
+#define FIFFV_VOL_TYPE_MOD           2      /**< Magneto-optical disk. */
 
 /*
  * Byte order
  */
-#define FIFFV_NATIVE_ENDIAN     0        /**< This refers to the byte order in the current system */
-#define FIFFV_LITTLE_ENDIAN     1        /**< The little-endian (Intel) byte order */
-#define FIFFV_BIG_ENDIAN        2        /**< The big-endian (Motorola) byte order */
+#define FIFFV_NATIVE_ENDIAN     0        /**< This refers to the byte order in the current system. */
+#define FIFFV_LITTLE_ENDIAN     1        /**< The little-endian (Intel) byte order. */
+#define FIFFV_BIG_ENDIAN        2        /**< The big-endian (Motorola) byte order. */
 } // NAMESPACE
 
 #endif // FIFF_FILE_H

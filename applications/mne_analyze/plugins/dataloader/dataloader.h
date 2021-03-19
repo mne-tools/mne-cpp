@@ -204,11 +204,11 @@ private:
      */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
-    QPointer<ANSHAREDLIB::Communicator>             m_pCommu;                   /**< Used for sending events */
-    QPointer<DISPLIB::ProgressView>                 m_pProgressView;            /**< Holds loading bar and loading message */
-    QPointer<QWidget>                               m_pProgressViewWidget;      /**< Window for ProgressView */
+    QPointer<ANSHAREDLIB::Communicator>             m_pCommu;                   /**< Used for sending events. */
+    QPointer<DISPLIB::ProgressView>                 m_pProgressView;            /**< Holds loading bar and loading message. */
+    QPointer<QWidget>                               m_pProgressViewWidget;      /**< Window for ProgressView. */
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pSelectedModel;           /**< Pointer to currently selected Fiff model */
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pSelectedModel;           /**< Pointer to currently selected Fiff model. */
     QString                                         m_sSettingsPath;            /**< Variable that stores the key where to store settings for this plugin.*/
     QString                                         m_sLastDir;                 /**< Variable to store the last directory from where data were loaded.*/
 };

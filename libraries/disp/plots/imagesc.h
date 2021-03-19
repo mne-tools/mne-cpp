@@ -178,25 +178,25 @@ protected:
      */
     void paintEvent(QPaintEvent* event);
 
-    QPixmap*            m_pPixmapData;              /**< data pixmap */
-    QPixmap*            m_pPixmapColorbar;          /**< colorbar pixmap */
+    QPixmap*            m_pPixmapData;              /**< data pixmap. */
+    QPixmap*            m_pPixmapColorbar;          /**< colorbar pixmap. */
 
-    QString             m_sColorMap;                /**< The colorbar */
+    QString             m_sColorMap;                /**< The colorbar. */
 
-    Eigen::MatrixXd     m_matCentNormData;          /**< centralized and normalized data */
+    Eigen::MatrixXd     m_matCentNormData;          /**< centralized and normalized data. */
 
-    double              m_dMinValue;                /**< Minimal data value */
-    double              m_dMaxValue;                /**< Maximal data value */
+    double              m_dMinValue;                /**< Minimal data value. */
+    double              m_dMaxValue;                /**< Maximal data value. */
 
-    bool                m_bColorbar;                /**< If colorbar is visible */
-    QVector<double>     m_qVecScaleValues;          /**< Scale values */
-    qint32              m_iColorbarWidth;           /**< Colorbar width */
-    qint32              m_iColorbarSteps;           /**< Number of colorbar vaues to display */
-    qint32              m_iColorbarGradSteps;       /**< Gradient steps of the colorbar */
-    QFont               m_qFontColorbar;            /**< Colorbar font */
-    QPen                m_qPenColorbar;             /**< Colorbar pen */
+    bool                m_bColorbar;                /**< If colorbar is visible. */
+    QVector<double>     m_qVecScaleValues;          /**< Scale values. */
+    qint32              m_iColorbarWidth;           /**< Colorbar width. */
+    qint32              m_iColorbarSteps;           /**< Number of colorbar vaues to display. */
+    qint32              m_iColorbarGradSteps;       /**< Gradient steps of the colorbar. */
+    QFont               m_qFontColorbar;            /**< Colorbar font. */
+    QPen                m_qPenColorbar;             /**< Colorbar pen. */
 
-    QRgb                (*pColorMapper)(double, const QString&);    /**< Function pointer to current colormap */
+    QRgb                (*pColorMapper)(double, const QString&);    /**< Function pointer to current colormap. */
 };
 
 //=============================================================================================================

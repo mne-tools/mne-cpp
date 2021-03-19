@@ -135,15 +135,15 @@ public:
     bool compute_guess_fields(DipoleFitData* f);
 
 public:
-    float          **rr;            /**< These are the guess dipole locations */
-    DipoleForward** guess_fwd;      /**< Forward solutions for the guesses */
-    int            nguess;          /**< How many sources */
+    float          **rr;            /**< These are the guess dipole locations. */
+    DipoleForward** guess_fwd;      /**< Forward solutions for the guesses. */
+    int            nguess;          /**< How many sources. */
 
 // ### OLD STRUCT ###
 //    typedef struct {
-//        float          **rr;                    /**< These are the guess dipole locations */
-//        DipoleForward** guess_fwd;              /**< Forward solutions for the guesses */
-//        int            nguess;                  /**< How many sources */
+//        float          **rr;                    /**< These are the guess dipole locations. */
+//        DipoleForward** guess_fwd;              /**< Forward solutions for the guesses. */
+//        int            nguess;                  /**< How many sources. */
 //    } *guessData,guessDataRec;
 };
 

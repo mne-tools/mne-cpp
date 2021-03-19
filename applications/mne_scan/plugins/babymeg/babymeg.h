@@ -305,17 +305,17 @@ protected:
 
     qint32                                  m_iBufferSize;                  /**< The raw data buffer size.*/
 
-    QString                                 m_sFiffProjections;             /**< Fiff projection information */
-    QString                                 m_sFiffCompensators;            /**< Fiff compensator information */
-    QString                                 m_sBadChannels;                 /**< Filename which contains a list of bad channels */
+    QString                                 m_sFiffProjections;             /**< Fiff projection information. */
+    QString                                 m_sFiffCompensators;            /**< Fiff compensator information. */
+    QString                                 m_sBadChannels;                 /**< Filename which contains a list of bad channels. */
 
     QMutex                                  m_mutex;                        /**< Mutex to guarantee thread safety.*/
 
     Eigen::RowVectorXd                      m_cals;                         /**< Calibration vector.*/
     Eigen::SparseMatrix<double>             m_sparseMatCals;                /**< Sparse calibration matrix.*/
 
-    QPointer<QAction>                       m_pActionSqdCtrl;               /**< show squid control */
-    QPointer<QAction>                       m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
+    QPointer<QAction>                       m_pActionSqdCtrl;               /**< show squid control. */
+    QPointer<QAction>                       m_pActionUpdateFiffInfo;        /**< Update Fiff Info action. */
 
 signals:
     //=========================================================================================================

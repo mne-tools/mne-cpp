@@ -135,8 +135,8 @@ public:
     static bool fit_sphere_to_points(float **rr, int np, float simplex_size, float *r0, float *R);
 
 private:
-    Eigen::Vector3f m_center;   /**< Sphere's center */
-    float m_r;                  /**< Sphere's radius */
+    Eigen::Vector3f m_center;   /**< Sphere's center. */
+    float m_r;                  /**< Sphere's radius. */
 
     //=========================================================================================================
     /**

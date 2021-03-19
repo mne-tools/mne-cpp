@@ -173,7 +173,7 @@ public:
     ECDSet& operator<< (const ECD& p_ecd);
 
 public:
-    QString dataname;   /**< The associated data file */
+    QString dataname;   /**< The associated data file. */
 
 private:
     QList<ECD> m_qListDips;     /**< List of Electric Current Dipoles. */

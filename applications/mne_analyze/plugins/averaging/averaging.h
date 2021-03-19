@@ -319,40 +319,40 @@ private:
      */
     void triggerLoadingEnd(QString sMessage);
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
-    QSharedPointer<QList<QPair<int,double>>>                m_pTriggerList;             /**< Pointer to list of stim triggers */
-    QSharedPointer<DISPLIB::EvokedSetModel>                 m_pEvokedModel;             /**< Pointer to model used to display averaging data from m_pFiffEvokedSet and m_pFiffEvoked */
-    QSharedPointer<DISPLIB::ChannelInfoModel>               m_pChannelInfoModel;        /**< Pointer to model that holds channel info data */
-    QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                /**< Pointer to info about loaded fiff data */
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model. */
+    QSharedPointer<QList<QPair<int,double>>>                m_pTriggerList;             /**< Pointer to list of stim triggers. */
+    QSharedPointer<DISPLIB::EvokedSetModel>                 m_pEvokedModel;             /**< Pointer to model used to display averaging data from m_pFiffEvokedSet and m_pFiffEvoked. */
+    QSharedPointer<DISPLIB::ChannelInfoModel>               m_pChannelInfoModel;        /**< Pointer to model that holds channel info data. */
+    QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                /**< Pointer to info about loaded fiff data. */
 
-    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
+    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals. */
     QPointer<DISPLIB::ButterflyView>                        m_pButterflyView;           /**< The butterfly plot view. */
-    QPointer<DISPLIB::AverageLayoutView>                    m_pAverageLayoutView;       /**< The average layout plot view */
+    QPointer<DISPLIB::AverageLayoutView>                    m_pAverageLayoutView;       /**< The average layout plot view. */
 
-    DISPLIB::AveragingSettingsView*                         m_pAveragingSettingsView;   /**< Pointer to averaging settings GUI */
+    DISPLIB::AveragingSettingsView*                         m_pAveragingSettingsView;   /**< Pointer to averaging settings GUI. */
 
     float                                                   m_fBaselineFromS;            /**< Baseline start - in seconds relative to stim(0) - can be negative*/
     float                                                   m_fBaselineToS;              /**< Baseline end - in seconds relative to stim(0) - can be negative*/
-    float                                                   m_fPreStim;                 /**< Time before stim - in seconds - stored as positive number (>0) */
-    float                                                   m_fPostStim;                /**< Time after stim - in seconds - stored as positive number (>0) */
-    float                                                   m_fTriggerThreshold;        /**< Threshold to count stim channel events */
+    float                                                   m_fPreStim;                 /**< Time before stim - in seconds - stored as positive number (>0). */
+    float                                                   m_fPostStim;                /**< Time after stim - in seconds - stored as positive number (>0). */
+    float                                                   m_fTriggerThreshold;        /**< Threshold to count stim channel events. */
 
-    QVBoxLayout*                                            m_pLayout;                  /**< Pointer to layout that holds parameter GUI tab elements */
-    QTabWidget*                                             m_pTabView;                 /**< Pointer to object that stores multiple tabs of GUI items */
+    QVBoxLayout*                                            m_pLayout;                  /**< Pointer to layout that holds parameter GUI tab elements. */
+    QTabWidget*                                             m_pTabView;                 /**< Pointer to object that stores multiple tabs of GUI items. */
 
-    bool                                                    m_bBasline;                 /**< Whether to apply baseline correction */
-    bool                                                    m_bRejection;               /**< Whether to drop data points marked fro rejection when calculating average */
-    bool                                                    m_bLoaded;                  /**< Whether the full GUI has already been laoaded */
+    bool                                                    m_bBasline;                 /**< Whether to apply baseline correction. */
+    bool                                                    m_bRejection;               /**< Whether to drop data points marked fro rejection when calculating average. */
+    bool                                                    m_bLoaded;                  /**< Whether the full GUI has already been laoaded. */
     bool                                                    m_bPerformFiltering;        /**< Flag whether to activate/deactivate filtering. */
 
     RTPROCESSINGLIB::FilterKernel                           m_filterKernel;             /**< List of currently active filters. */
 
-    int                                                     m_iCurrentGroup;            /**< Event group from which to compute average. 9999 for current selection */
+    int                                                     m_iCurrentGroup;            /**< Event group from which to compute average. 9999 for current selection. */
 
-    QFutureWatcher<QSharedPointer<FIFFLIB::FiffEvokedSet>>  m_FutureWatcher;            /**< Future watcher for notifing of completed average calculations */
-    QFuture<QSharedPointer<FIFFLIB::FiffEvokedSet>>         m_Future;                   /**< Future for performing average calculations of separate thread */
+    QFutureWatcher<QSharedPointer<FIFFLIB::FiffEvokedSet>>  m_FutureWatcher;            /**< Future watcher for notifing of completed average calculations. */
+    QFuture<QSharedPointer<FIFFLIB::FiffEvokedSet>>         m_Future;                   /**< Future for performing average calculations of separate thread. */
 
-    QMutex                                                  m_ParameterMutex;           /**< Mutex for thread-safing */
+    QMutex                                                  m_ParameterMutex;           /**< Mutex for thread-safing. */
 
 };
 

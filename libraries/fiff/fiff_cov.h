@@ -187,12 +187,12 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov &p_FiffCov);
 
 public:
-    fiff_int_t  kind;       /**< Covariance kind -> fiff_constants.h */
+    fiff_int_t  kind;       /**< Covariance kind -> fiff_constants.h. */
     Eigen::VectorXi chClass;
     bool diag;              /**< If the covariance is stored in a diagonal order. */
     fiff_int_t dim;         /**< Dimension of the covariance (dim x dim). */
     QStringList names;      /**< Channel names. */
-    Eigen::MatrixXd data;   /**< Covariance data */
+    Eigen::MatrixXd data;   /**< Covariance data. */
     QList<FiffProj> projs;  /**< List of available ssp projectors. */
     QStringList bads;       /**< List of bad channels. */
     fiff_int_t nfree;       /**< Number of degrees of freedom. */

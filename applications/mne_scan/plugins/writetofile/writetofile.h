@@ -191,7 +191,7 @@ private:
     bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
 
     qint16                                  m_iBlinkStatus;                 /**< The blink status of the recording button.*/
-    qint32                                  m_iSplitCount;                  /**< File split count */
+    qint32                                  m_iSplitCount;                  /**< File split count. */
     int                                     m_iRecordingMSeconds;           /**< Recording length in mseconds.*/
 
     QMutex                                  m_mutex;                        /**< The threads mutex.*/
@@ -207,7 +207,7 @@ private:
     QString                                 m_sRecordFileName;              /**< Current record file. */
     QTime                                   m_recordingStartedTime;         /**< The time when the recording started.*/
 
-    QPointer<QAction>                       m_pActionRecordFile;            /**< start recording action */
+    QPointer<QAction>                       m_pActionRecordFile;            /**< start recording action. */
 
     QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>                      m_pCircularBuffer;      /**< Holds incoming raw data. */
 

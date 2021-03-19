@@ -73,7 +73,7 @@ public:
     typedef QSharedPointer<const PluginSceneManager> ConstSPtr; /**< Const shared pointer type for PluginSceneManager. */
 
     typedef QList< AbstractPlugin::SPtr > PluginList;                                      /**< type for a list of plugins. */
-    typedef QList<PluginConnectorConnection::SPtr> PluginConnectorConnectionList;   /**< Shared pointer type for PluginConnectorConnection::SPtr list */
+    typedef QList<PluginConnectorConnection::SPtr> PluginConnectorConnectionList;   /**< Shared pointer type for PluginConnectorConnection::SPtr list. */
 
     //=========================================================================================================
     /**

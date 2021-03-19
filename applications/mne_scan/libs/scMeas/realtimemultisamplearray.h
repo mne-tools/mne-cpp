@@ -208,7 +208,7 @@ public:
     virtual void setValue(const Eigen::MatrixXd& mat);
 
 private:
-    mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety */
+    mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety. */
 
     FIFFLIB::FiffInfo::SPtr     m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
 

@@ -357,23 +357,23 @@ private:
      */
     int totalBuffSamples();
 
-    int                                     m_iNumSamples;                          /**< Number of samples we've read from the buffer */
-    int                                     m_iNumNewSamples;                       /**< Number of total samples (read and unread) in the buffer */
-    int                                     m_iMsgSamples;                          /**< Number of samples in the latest buffer transmission receied */
-    int                                     m_iNumChannels;                         /**< Number of channels in the buffer data */
-    int                                     m_iDataType;                            /**< Type of data in the buffer */
-    int                                     m_iNeuromagHeader;                      /**< Size of neuromag header chunk */
-    quint16                                 m_iPort;                                /**< Port where the ft bufferis found */
+    int                                     m_iNumSamples;                          /**< Number of samples we've read from the buffer. */
+    int                                     m_iNumNewSamples;                       /**< Number of total samples (read and unread) in the buffer. */
+    int                                     m_iMsgSamples;                          /**< Number of samples in the latest buffer transmission receied. */
+    int                                     m_iNumChannels;                         /**< Number of channels in the buffer data. */
+    int                                     m_iDataType;                            /**< Type of data in the buffer. */
+    int                                     m_iNeuromagHeader;                      /**< Size of neuromag header chunk. */
+    quint16                                 m_iPort;                                /**< Port where the ft bufferis found. */
 
-    bool                                    m_bNewData;                             /**< Indicate whether we've received new data */
+    bool                                    m_bNewData;                             /**< Indicate whether we've received new data. */
 
-    float                                   m_fSampleFreq;                          /**< Sampling frequency of data in the buffer */
+    float                                   m_fSampleFreq;                          /**< Sampling frequency of data in the buffer. */
 
-    QString                                 m_sAddress;                             /**< Address where the ft buffer is found */
+    QString                                 m_sAddress;                             /**< Address where the ft buffer is found. */
 
-    QTcpSocket*                             m_pSocket;                              /**< Socket that manages the connection to the ft buffer */
+    QTcpSocket*                             m_pSocket;                              /**< Socket that manages the connection to the ft buffer. */
 
-    Eigen::MatrixXd*                        m_pMatEmit;                             /**< Container to format data to tansmit to FtBuffProducer */
+    Eigen::MatrixXd*                        m_pMatEmit;                             /**< Container to format data to tansmit to FtBuffProducer. */
 };
 
 }//namespace end bracket

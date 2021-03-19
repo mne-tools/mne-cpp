@@ -107,9 +107,9 @@ public:
     }
 
 public:
-    float rad;          /**< The actual rads */
-    float rel_rad;      /**< Relative rads */
-    float sigma;        /**< Conductivity */
+    float rad;          /**< The actual rads. */
+    float rel_rad;      /**< Relative rads. */
+    float sigma;        /**< Conductivity. */
 
 // ### OLD STRUCT ###
 //    typedef struct {

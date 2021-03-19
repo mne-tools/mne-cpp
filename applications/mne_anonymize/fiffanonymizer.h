@@ -800,9 +800,9 @@ private:
     bool m_bMNEEnvironmentMode;         /**< User's request to anonymize info related to the MNE toolbox.*/
     const double m_dMaxValidFiffVerion; /**< Maximum version of the Fiff file standard compatible with this application.*/
 
-    QString m_sDefaultString;           /**< String to be used as substitution of other strings in a fiff file */
-    QString m_sDefaultShortString;      /**< Short string to be used as substitution of protected short strings in a fiff file */
-    QDateTime m_dDefaultDate;           /**< Date to be used as substitution of dates found in a fiff file */
+    QString m_sDefaultString;           /**< String to be used as substitution of other strings in a fiff file. */
+    QString m_sDefaultShortString;      /**< Short string to be used as substitution of protected short strings in a fiff file. */
+    QDateTime m_dDefaultDate;           /**< Date to be used as substitution of dates found in a fiff file. */
 
     QDateTime m_dMeasurementDate;       /**< Date to substitute the measuremnt date appearing in the file.*/
     int  m_iMeasurementDateOffset;      /**< Number of days to subtract from the measurement date.*/

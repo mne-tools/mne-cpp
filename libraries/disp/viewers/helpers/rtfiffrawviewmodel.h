@@ -532,41 +532,41 @@ private:
      */
     void clearModel();
 
-    bool                                m_bProjActivated;                           /**< Projections activated */
-    bool                                m_bCompActivated;                           /**< Compensator activated */
-    bool                                m_bSpharaActivated;                         /**< Sphara activated */
-    bool                                m_bIsFreezed;                               /**< Display is freezed */
+    bool                                m_bProjActivated;                           /**< Projections activated. */
+    bool                                m_bCompActivated;                           /**< Compensator activated. */
+    bool                                m_bSpharaActivated;                         /**< Sphara activated. */
+    bool                                m_bIsFreezed;                               /**< Display is freezed. */
     bool                                m_bDrawFilterFront;                         /**< Flag whether to plot/write the delayed frontal part of the filtered signal. This flag is necessary to get rid of nasty signal jumps when changing the filter parameters. */
     bool                                m_bPerformFiltering;                        /**< Flag whether to activate/deactivate filtering. */
-    bool                                m_bTriggerDetectionActive;                  /**< Trigger detection activation state */
-    float                               m_fSps;                                     /**< Sampling rate */
-    double                              m_dTriggerThreshold;                        /**< Trigger detection threshold */
-    qint32                              m_iT;                                       /**< Time window */
-    qint32                              m_iDownsampling;                            /**< Down sampling factor */
-    qint32                              m_iMaxSamples;                              /**< Max samples per window */
-    qint32                              m_iCurrentSample;                           /**< Current sample which holds the current position in the data matrix */
-    qint32                              m_iCurrentSampleFreeze;                     /**< Current sample which holds the current position in the data matrix when freezing tool is active */
-    qint32                              m_iMaxFilterLength;                         /**< Max order of the current filters */
-    qint32                              m_iCurrentBlockSize;                        /**< Current block size */
-    qint32                              m_iResidual;                                /**< Current amount of samples which were to size */
-    int                                 m_iCurrentTriggerChIndex;                   /**< The index of the current trigger channel */
-    int                                 m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms */
-    int                                 m_iDetectedTriggers;                        /**< Detected triggers since the last reset */
+    bool                                m_bTriggerDetectionActive;                  /**< Trigger detection activation state. */
+    float                               m_fSps;                                     /**< Sampling rate. */
+    double                              m_dTriggerThreshold;                        /**< Trigger detection threshold. */
+    qint32                              m_iT;                                       /**< Time window. */
+    qint32                              m_iDownsampling;                            /**< Down sampling factor. */
+    qint32                              m_iMaxSamples;                              /**< Max samples per window. */
+    qint32                              m_iCurrentSample;                           /**< Current sample which holds the current position in the data matrix. */
+    qint32                              m_iCurrentSampleFreeze;                     /**< Current sample which holds the current position in the data matrix when freezing tool is active. */
+    qint32                              m_iMaxFilterLength;                         /**< Max order of the current filters. */
+    qint32                              m_iCurrentBlockSize;                        /**< Current block size. */
+    qint32                              m_iResidual;                                /**< Current amount of samples which were to size. */
+    int                                 m_iCurrentTriggerChIndex;                   /**< The index of the current trigger channel. */
+    int                                 m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms. */
+    int                                 m_iDetectedTriggers;                        /**< Detected triggers since the last reset. */
 
-    QString                             m_sCurrentTriggerCh;                        /**< Current trigger channel which is beeing scanned */
-    QString                             m_sFilterChannelType;                       /**< Kind of channel which is to be filtered */
+    QString                             m_sCurrentTriggerCh;                        /**< Current trigger channel which is beeing scanned. */
+    QString                             m_sFilterChannelType;                       /**< Kind of channel which is to be filtered. */
 
-    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                                /**< Fiff info */
+    QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;                                /**< Fiff info. */
 
-    Eigen::RowVectorXi                  m_vecBadIdcs;                               /**< Idcs of bad channels */
-    Eigen::VectorXd                     m_vecLastBlockFirstValuesFiltered;          /**< The first value of the last complete filtered data display block */
-    Eigen::VectorXd                     m_vecLastBlockFirstValuesRaw;               /**< The first value of the last complete raw data display block */
+    Eigen::RowVectorXi                  m_vecBadIdcs;                               /**< Idcs of bad channels. */
+    Eigen::VectorXd                     m_vecLastBlockFirstValuesFiltered;          /**< The first value of the last complete filtered data display block. */
+    Eigen::VectorXd                     m_vecLastBlockFirstValuesRaw;               /**< The first value of the last complete raw data display block. */
 
-    MatrixXdR                           m_matDataRaw;                               /**< The raw data */
-    MatrixXdR                           m_matDataFiltered;                          /**< The filtered data */
-    MatrixXdR                           m_matDataRawFreeze;                         /**< The raw data in freeze mode */
-    MatrixXdR                           m_matDataFilteredFreeze;                    /**< The raw filtered data in freeze mode */
-    Eigen::MatrixXd                     m_matOverlap;                               /**< Last overlap block for the back */
+    MatrixXdR                           m_matDataRaw;                               /**< The raw data. */
+    MatrixXdR                           m_matDataFiltered;                          /**< The filtered data. */
+    MatrixXdR                           m_matDataRawFreeze;                         /**< The raw data in freeze mode. */
+    MatrixXdR                           m_matDataFilteredFreeze;                    /**< The raw filtered data in freeze mode. */
+    Eigen::MatrixXd                     m_matOverlap;                               /**< Last overlap block for the back. */
 
     Eigen::VectorXi                     m_vecIndicesFirstVV;                        /**< The indices of the channels to pick for the first SPHARA operator in case of a VectorView system.*/
     Eigen::VectorXi                     m_vecIndicesSecondVV;                       /**< The indices of the channels to pick for the second SPHARA operator in case of a VectorView system.*/
@@ -576,11 +576,11 @@ private:
 
     Eigen::SparseMatrix<double>         m_matSparseSpharaMult;                      /**< The final sparse SPHARA operator .*/
     Eigen::SparseMatrix<double>         m_matSparseProjCompMult;                    /**< The final sparse projection + compensator operator.*/
-    Eigen::SparseMatrix<double>         m_matSparseProjMult;                        /**< The final sparse SSP projector */
-    Eigen::SparseMatrix<double>         m_matSparseCompMult;                        /**< The final sparse compensator matrix */
+    Eigen::SparseMatrix<double>         m_matSparseProjMult;                        /**< The final sparse SSP projector. */
+    Eigen::SparseMatrix<double>         m_matSparseCompMult;                        /**< The final sparse compensator matrix. */
 
-    Eigen::MatrixXd                     m_matProj;                                  /**< SSP projector */
-    Eigen::MatrixXd                     m_matComp;                                  /**< Compensator */
+    Eigen::MatrixXd                     m_matProj;                                  /**< SSP projector. */
+    Eigen::MatrixXd                     m_matComp;                                  /**< Compensator. */
 
     Eigen::MatrixXd                     m_matSpharaVVGradLoaded;                    /**< The loaded VectorView gradiometer basis functions.*/
     Eigen::MatrixXd                     m_matSpharaVVMagLoaded;                     /**< The loaded VectorView magnetometer basis functions.*/

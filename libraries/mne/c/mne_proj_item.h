@@ -97,14 +97,14 @@ public:
     static int mne_proj_item_affect(MneProjItem* it, const QStringList& list, int nlist);
 
 public:
-    MneNamedMatrix* vecs;           /**< The original projection vectors */
-    int             nvec;           /**< Number of vectors = vecs->nrow */
-    QString         desc;           /**< Projection item description */
-    int             kind;           /**< Projection item kind */
-    int             active;         /**< Is this item active now? */
-    int             active_file;    /**< Was this item active when loaded from file? */
-    int             has_meg;        /**< Does it have MEG channels? */
-    int             has_eeg;        /**< Does it have EEG channels? */
+    MneNamedMatrix* vecs;           /**< The original projection vectors. */
+    int             nvec;           /**< Number of vectors = vecs->nrow. */
+    QString         desc;           /**< Projection item description. */
+    int             kind;           /**< Projection item kind. */
+    int             active;         /**< Is this item active now?. */
+    int             active_file;    /**< Was this item active when loaded from file?. */
+    int             has_meg;        /**< Does it have MEG channels?. */
+    int             has_eeg;        /**< Does it have EEG channels?. */
 
 // ### OLD STRUCT ###
 //typedef struct {    /* One linear projection item */

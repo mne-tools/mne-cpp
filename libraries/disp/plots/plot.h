@@ -129,13 +129,13 @@ protected:
      */
     void paintEvent(QPaintEvent* event);
 
-    QList<QVector<QPointF> > m_qListVecPointFPaths;     /**< List of point series */
+    QList<QVector<QPointF> > m_qListVecPointFPaths;     /**< List of point series. */
 
-    bool    m_bHoldOn;          /**< If multiple plots */
-    double  m_dMinX;            /**< Minimal X value */
-    double  m_dMaxX;            /**< Maximal X value */
-    double  m_dMinY;            /**< Minimal Y value */
-    double  m_dMaxY;            /**< Maximal Y value */
+    bool    m_bHoldOn;          /**< If multiple plots. */
+    double  m_dMinX;            /**< Minimal X value. */
+    double  m_dMaxX;            /**< Maximal X value. */
+    double  m_dMinY;            /**< Minimal Y value. */
+    double  m_dMaxY;            /**< Maximal Y value. */
 };
 
 //=============================================================================================================

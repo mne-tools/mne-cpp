@@ -85,12 +85,12 @@ namespace MNELIB
  */
 struct RegionDataOut
 {
-    Eigen::VectorXi roiIdx;         /**< Region cluster indices */
-    Eigen::MatrixXd ctrs;           /**< Cluster centers */
-    Eigen::VectorXd sumd;           /**< Sums of the distances to the centroid */
-    Eigen::MatrixXd D;              /**< Distances to the centroid */
+    Eigen::VectorXi roiIdx;         /**< Region cluster indices. */
+    Eigen::MatrixXd ctrs;           /**< Cluster centers. */
+    Eigen::VectorXd sumd;           /**< Sums of the distances to the centroid. */
+    Eigen::MatrixXd D;              /**< Distances to the centroid. */
 
-    qint32 iLabelIdxOut;            /**< Label ID */
+    qint32 iLabelIdxOut;            /**< Label ID. */
 };
 
 //=========================================================================================================
@@ -101,16 +101,16 @@ struct RegionData
 {
     Eigen::MatrixXd matRoiG;            /**< Reshaped region gain matrix sources x sensors(x,y,z)*/
     Eigen::MatrixXd matRoiGWhitened;    /**< Reshaped whitened region gain matrix sources x sensors(x,y,z)*/
-    bool bUseWhitened;                  /**< Wheather indeces of whitened gain matrix should be used to calculate centroids */
+    bool bUseWhitened;                  /**< Wheather indeces of whitened gain matrix should be used to calculate centroids. */
 
     Eigen::MatrixXd matRoiGOrig;        /**< Region gain matrix sensors x sources(x,y,z)*/
 //    Eigen::MatrixXd    matRoiGOrigWhitened;    /**< Whitened region gain matrix sensors x sources(x,y,z)*/
 
-    qint32 nClusters;      /**< Number of clusters within this region */
+    qint32 nClusters;      /**< Number of clusters within this region. */
 
-    Eigen::VectorXi idcs;           /**< Get source space indeces */
-    qint32 iLabelIdxIn;    /**< Label ID */
-    QString sDistMeasure;   /**< "cityblock" or "sqeuclidean" */
+    Eigen::VectorXi idcs;           /**< Get source space indeces. */
+    qint32 iLabelIdxIn;    /**< Label ID. */
+    QString sDistMeasure;   /**< "cityblock" or "sqeuclidean". */
 
     RegionDataOut cluster() const
     {
@@ -517,18 +517,18 @@ private:
                          MNEForwardSolution& one);
 
 public:
-    FIFFLIB::FiffInfoBase info;                 /**< light weighted measurement info */
-    FIFFLIB::fiff_int_t source_ori;             /**< Source orientation: fixed or free */
-    bool surf_ori;                              /**< If surface oriented */
-    FIFFLIB::fiff_int_t coord_frame;            /**< Coil coordinate system definition */
-    FIFFLIB::fiff_int_t nsource;                /**< Number of source dipoles */
-    FIFFLIB::fiff_int_t nchan;                  /**< Number of channels */
-    FIFFLIB::FiffNamedMatrix::SDPtr sol;        /**< Forward solution */
+    FIFFLIB::FiffInfoBase info;                 /**< light weighted measurement info. */
+    FIFFLIB::fiff_int_t source_ori;             /**< Source orientation: fixed or free. */
+    bool surf_ori;                              /**< If surface oriented. */
+    FIFFLIB::fiff_int_t coord_frame;            /**< Coil coordinate system definition. */
+    FIFFLIB::fiff_int_t nsource;                /**< Number of source dipoles. */
+    FIFFLIB::fiff_int_t nchan;                  /**< Number of channels. */
+    FIFFLIB::FiffNamedMatrix::SDPtr sol;        /**< Forward solution. */
     FIFFLIB::FiffNamedMatrix::SDPtr sol_grad;   /**< ToDo... */
-    FIFFLIB::FiffCoordTrans mri_head_t;         /**< MRI head coordinate transformation */
-    MNESourceSpace src;                         /**< Geometric description of the source spaces (hemispheres) */
-    Eigen::MatrixX3f source_rr;                 /**< Source locations */
-    Eigen::MatrixX3f source_nn;                 /**< Source normals (number depends on fixed or free orientation) */
+    FIFFLIB::FiffCoordTrans mri_head_t;         /**< MRI head coordinate transformation. */
+    MNESourceSpace src;                         /**< Geometric description of the source spaces (hemispheres). */
+    Eigen::MatrixX3f source_rr;                 /**< Source locations. */
+    Eigen::MatrixX3f source_nn;                 /**< Source normals (number depends on fixed or free orientation). */
 };
 
 //=============================================================================================================

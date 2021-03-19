@@ -485,8 +485,8 @@ typedef struct {            /* Vector specification with a channel list */
 //				 * taken from the meas date
 //				 * or the meas block id
 //				 * whence it may be inaccurate. */
-//  int           buf_size;                       /**< Buffer size in samples */
-//  int           maxshield_data;                 /**< Are these unprocessed MaxShield data */
+//  int           buf_size;                       /**< Buffer size in samples. */
+//  int           maxshield_data;                 /**< Are these unprocessed MaxShield data. */
 //  QList<FIFFLIB::FiffDirEntry::SPtr> rawDir;    /**< Directory of raw data tags
 //				 * These may be of type
 //				 *       FIFF_DATA_BUFFER

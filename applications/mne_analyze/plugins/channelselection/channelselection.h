@@ -151,20 +151,20 @@ private:
      */
     void setFiffSettings(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
-    QPointer<ANSHAREDLIB::Communicator>                 m_pCommu;                   /**< To broadcast signals */
+    QPointer<ANSHAREDLIB::Communicator>                 m_pCommu;                   /**< To broadcast signals. */
 
-    DISPLIB::SelectionItem*                             m_pSelectionItem;           /**< Stores parameters from list of QGraphicsItems received by channelselectionview */
+    DISPLIB::SelectionItem*                             m_pSelectionItem;           /**< Stores parameters from list of QGraphicsItems received by channelselectionview. */
 
-    DISPLIB::ChannelSelectionView*                      m_pChannelSelectionView;    /**< View for selecting channels to be displayed */
-    QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;        /**< Hold channel info - needed to initialize channelselectionview */
-    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< Hold Information baout currently loaded file */
+    DISPLIB::ChannelSelectionView*                      m_pChannelSelectionView;    /**< View for selecting channels to be displayed. */
+    QSharedPointer<DISPLIB::ChannelInfoModel>           m_pChannelInfoModel;        /**< Hold channel info - needed to initialize channelselectionview. */
+    QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                /**< Hold Information baout currently loaded file. */
 
     DISPLIB::ApplyToView*                               m_pApplyToView;
 
-    QHBoxLayout*                                        m_pViewLayout;              /**< Holds the view portion of the channel selection to be displayed */
-    QVBoxLayout*                                        m_pControlLayout;           /**< Holds the control portion of the channel selection to be displayed */
+    QHBoxLayout*                                        m_pViewLayout;              /**< Holds the view portion of the channel selection to be displayed. */
+    QVBoxLayout*                                        m_pControlLayout;           /**< Holds the control portion of the channel selection to be displayed. */
 
-    bool                                                m_bIsInit;                  /**< Whether channelselectionview and channelinfomodel have been initialized */
+    bool                                                m_bIsInit;                  /**< Whether channelselectionview and channelinfomodel have been initialized. */
 };
 
 //=============================================================================================================

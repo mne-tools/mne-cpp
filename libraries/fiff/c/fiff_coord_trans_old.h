@@ -194,20 +194,20 @@ public:
 public:
     FIFFLIB::fiff_int_t from;       /**< Source coordinate system. */
     FIFFLIB::fiff_int_t to;         /**< Destination coordinate system. */
-    Eigen::Matrix3f     rot;        /**< The forward transform (rotation part) */
-    Eigen::Vector3f     move;       /**< The forward transform (translation part) */
-    Eigen::Matrix3f     invrot;     /**< The inverse transform (rotation part) */
-    Eigen::Vector3f     invmove; /**< The inverse transform (translation part) */
+    Eigen::Matrix3f     rot;        /**< The forward transform (rotation part). */
+    Eigen::Vector3f     move;       /**< The forward transform (translation part). */
+    Eigen::Matrix3f     invrot;     /**< The inverse transform (rotation part). */
+    Eigen::Vector3f     invmove; /**< The inverse transform (translation part). */
 
     // ### OLD STRUCT ###
     //typedef struct _fiffCoordTransRec {
     //    fiff_int_t   from;                  /**< Source coordinate system. */
     //    fiff_int_t   to;                    /**< Destination coordinate system. */
-    //    fiff_float_t rot[3][3];             /**< The forward transform (rotation part) */
-    //    fiff_float_t move[3];               /**< The forward transform (translation part) */
-    //    fiff_float_t invrot[3][3];          /**< The inverse transform (rotation part) */
-    //    fiff_float_t invmove[3];            /**< The inverse transform (translation part) */
-    //} *fiffCoordTrans, fiffCoordTransRec;   /**< Coordinate transformation descriptor */
+    //    fiff_float_t rot[3][3];             /**< The forward transform (rotation part). */
+    //    fiff_float_t move[3];               /**< The forward transform (translation part). */
+    //    fiff_float_t invrot[3][3];          /**< The inverse transform (rotation part). */
+    //    fiff_float_t invmove[3];            /**< The inverse transform (translation part). */
+    //} *fiffCoordTrans, fiffCoordTransRec;   /**< Coordinate transformation descriptor. */
 };
 
 //=============================================================================================================

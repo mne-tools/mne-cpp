@@ -255,7 +255,7 @@ protected:
 
     QString                         m_sAtlasDir;                /**< File to Atlas. */
     QString                         m_sSurfaceDir;              /**< File to Surface. */
-    QString                         m_sAvrType;                 /**< The average type */
+    QString                         m_sAvrType;                 /**< The average type. */
     QString                         m_sMethod;                  /**< The method: "MNE" | "dSPM" | "sLORETA". */
     QFile                           m_fMriHeadTrans;            /**< The Head - Mri transformation. */
 

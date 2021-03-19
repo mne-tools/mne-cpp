@@ -212,7 +212,7 @@ public:
     QSharedPointer<FIFFLIB::FiffInfo> getFiffInfo();
 
 private:
-    mutable QMutex                              m_qMutex;           /**< Mutex to ensure thread safety */
+    mutable QMutex                              m_qMutex;           /**< Mutex to ensure thread safety. */
 
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The Fiff info. */
 
@@ -222,7 +222,7 @@ private:
     QSharedPointer<MNELIB::MNEBem>              m_pSensorSurface;   /**< The sensor surface. Needed for visualization. */
 
     QSharedPointer<CONNECTIVITYLIB::Network>    m_pNetwork;         /**< The network/connectivity estimate. */
-    bool                                        m_bInitialized;     /**< Is initialized */
+    bool                                        m_bInitialized;     /**< Is initialized. */
 };
 
 //=============================================================================================================

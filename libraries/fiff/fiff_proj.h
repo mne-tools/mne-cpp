@@ -151,11 +151,11 @@ public:
     friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffProj &p_FiffProj);
 
 public:
-    fiff_int_t kind;                /**< Fiff kind */
-    bool active;                    /**< If fiff projector active */
-    QString desc;                   /**< Projector description */
+    fiff_int_t kind;                /**< Fiff kind. */
+    bool active;                    /**< If fiff projector active. */
+    QString desc;                   /**< Projector description. */
 
-    FiffNamedMatrix::SDPtr data;    /**< Projector data, rows are equal to the length of channels */
+    FiffNamedMatrix::SDPtr data;    /**< Projector data, rows are equal to the length of channels. */
 };
 
 //=============================================================================================================

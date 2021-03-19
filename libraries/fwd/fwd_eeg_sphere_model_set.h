@@ -213,7 +213,7 @@ public:
 public:
 //    QList<FwdEegSphereModel> m_qListModels;    /**< Set of EEG sphere model definitions. */
 
-    QList<FwdEegSphereModel*> models;     /**< Set of EEG sphere model definitions */
+    QList<FwdEegSphereModel*> models;     /**< Set of EEG sphere model definitions. */
 
 // ### OLD STRUCT ###
 //    typedef struct {

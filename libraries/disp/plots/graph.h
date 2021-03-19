@@ -143,19 +143,19 @@ protected:
     void drawLabels(qint32 p_iContentWidth,
                     qint32 p_iContentHeight);
 
-    QSize       m_qSizeWidget;          /**< current widget size */
+    QSize       m_qSizeWidget;          /**< current widget size. */
 
-    QString     m_sTitle;               /**< Title */
-    QFont       m_qFontTitle;           /**< Title font */
-    QPen        m_qPenTitle;            /**< Title pen */
+    QString     m_sTitle;               /**< Title. */
+    QFont       m_qFontTitle;           /**< Title font. */
+    QPen        m_qPenTitle;            /**< Title pen. */
 
-    qint32      m_iBorderTopBottom;     /**< distance to top and bottom */
-    qint32      m_iBorderLeftRight;     /**< distance to left and right */
+    qint32      m_iBorderTopBottom;     /**< distance to top and bottom. */
+    qint32      m_iBorderLeftRight;     /**< distance to left and right. */
 
-    QString     m_sXLabel;              /**< X axes label */
-    QString     m_sYLabel;              /**< Y axes label */
-    QFont       m_qFontAxes;            /**< Axes font */
-    QPen        m_qPenAxes;             /**< Axes pen */
+    QString     m_sXLabel;              /**< X axes label. */
+    QString     m_sYLabel;              /**< Y axes label. */
+    QFont       m_qFontAxes;            /**< Axes font. */
+    QPen        m_qPenAxes;             /**< Axes pen. */
 };
 
 //=============================================================================================================

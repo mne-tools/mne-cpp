@@ -277,8 +277,8 @@ public:
     void reset();
 
 private:
-    Eigen::MatrixXd                 m_matOverlapBack;                   /**< Overlap block for the end of the data block */
-    Eigen::MatrixXd                 m_matOverlapFront;                  /**< Overlap block for the beginning of the data block */
+    Eigen::MatrixXd                 m_matOverlapBack;                   /**< Overlap block for the end of the data block. */
+    Eigen::MatrixXd                 m_matOverlapFront;                  /**< Overlap block for the beginning of the data block. */
 };
 
 //=============================================================================================================

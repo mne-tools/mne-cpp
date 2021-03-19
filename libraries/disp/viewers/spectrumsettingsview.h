@@ -167,8 +167,8 @@ protected:
      */
     void updateProcessingMode(ProcessingMode mode);
 
-    QPointer<QSlider>   m_pSliderLowerBound;    /**< Lower bound frequency */
-    QPointer<QSlider>   m_pSliderUpperBound;    /**< Upper bound frequency */
+    QPointer<QSlider>   m_pSliderLowerBound;    /**< Lower bound frequency. */
+    QPointer<QSlider>   m_pSliderUpperBound;    /**< Upper bound frequency. */
 
 signals:
     //=========================================================================================================

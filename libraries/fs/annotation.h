@@ -270,14 +270,14 @@ public:
     inline QString fileName() const;
 
 private:
-    QString m_sFileName;        /**< Annotation file name */
-    QString m_sFilePath;        /**< Annotation file path */
+    QString m_sFileName;        /**< Annotation file name. */
+    QString m_sFilePath;        /**< Annotation file path. */
 
-    qint32 m_iHemi;             /**< Hemisphere (lh = 0; rh = 1) */
-    Eigen::VectorXi m_Vertices;        /**< Vertice indeces */
-    Eigen::VectorXi m_LabelIds;        /**< Vertice label ids */
+    qint32 m_iHemi;             /**< Hemisphere (lh = 0; rh = 1). */
+    Eigen::VectorXi m_Vertices;        /**< Vertice indeces. */
+    Eigen::VectorXi m_LabelIds;        /**< Vertice label ids. */
 
-    Colortable m_Colortable;    /**< Lookup table label colors & ids */
+    Colortable m_Colortable;    /**< Lookup table label colors & ids. */
 };
 
 //=============================================================================================================

@@ -86,34 +86,34 @@ private:
     void refreshSizeOutputMatrix(void);
 
     //device parameters
-    std::vector<QString>    m_vsSerials;                /**< vector of serial number as String vector (first one is master) */
-    std::vector<QByteArray> m_vbSerials;                /**< vector of serial number as ByteArray vector (first one is master) */
-    std::vector<LPSTR>      m_vpSerials;                /**< pointer to the serial numbers  */
-    int                     m_numDevices;               /**< number of connected devices (master and slaves) */
-    std::deque<LPSTR>       m_callSequenceSerials;      /**< list of the call sequence (master must be the last device in the call sequence) */
-    std::deque<HANDLE>      m_openedDevicesHandles;     /**< list of handles in the order of the opened devices */
-    std::deque<HANDLE>      m_callSequenceHandles;      /**< list of handles in the order of the opened devices */
+    std::vector<QString>    m_vsSerials;                /**< vector of serial number as String vector (first one is master). */
+    std::vector<QByteArray> m_vbSerials;                /**< vector of serial number as ByteArray vector (first one is master). */
+    std::vector<LPSTR>      m_vpSerials;                /**< pointer to the serial numbers . */
+    int                     m_numDevices;               /**< number of connected devices (master and slaves). */
+    std::deque<LPSTR>       m_callSequenceSerials;      /**< list of the call sequence (master must be the last device in the call sequence). */
+    std::deque<HANDLE>      m_openedDevicesHandles;     /**< list of handles in the order of the opened devices. */
+    std::deque<HANDLE>      m_callSequenceHandles;      /**< list of handles in the order of the opened devices. */
 
-    int                 m_iSlaveSerialsSize;        /**< the number of slave serials specified in slaveSerials */
-    int                 m_iSampleRateHz;            /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!) */
-    int                 m_iNumberOfScans;           /**< the number of scans that should be received simultaneously (depending on the _sampleRate; see C-API documentation for this value!) */
-    UCHAR               m_chNumberOfChannels;       /**< the number of channels per device that should be acquired (must equal the size of the _channelsToAcquire array) */
-    UCHAR*              m_channelsToAcquire;        /**< the channels that should be acquired from each device */
-    const BOOL          m_bTrigger;                 /**< TRUE to acquire the trigger line in an additional channel */
-    UCHAR               m_mode;                     /**< use normal acquisition mode */
-    CHANNEL             m_bipolarSettings;          /**< don't use bipolar derivation (all values will be initialized to zero) */
-    REF                 m_commonReference;          /**< don't connect groups to common reference */
-    GND                 m_commonGround;             /**< don't connect groups to common ground */
-    const int           m_QUEUE_SIZE;               /**< the number of GT_GetData calls that will be queued during acquisition to avoid loss of data */
-    bool                m_isRunning;                /**< flag for data acquisition */
+    int                 m_iSlaveSerialsSize;        /**< the number of slave serials specified in slaveSerials. */
+    int                 m_iSampleRateHz;            /**< the sample rate in Hz (see documentation of the g.USBamp API for details on this value and the NUMBER_OF_SCANS!). */
+    int                 m_iNumberOfScans;           /**< the number of scans that should be received simultaneously (depending on the _sampleRate; see C-API documentation for this value!). */
+    UCHAR               m_chNumberOfChannels;       /**< the number of channels per device that should be acquired (must equal the size of the _channelsToAcquire array). */
+    UCHAR*              m_channelsToAcquire;        /**< the channels that should be acquired from each device. */
+    const BOOL          m_bTrigger;                 /**< TRUE to acquire the trigger line in an additional channel. */
+    UCHAR               m_mode;                     /**< use normal acquisition mode. */
+    CHANNEL             m_bipolarSettings;          /**< don't use bipolar derivation (all values will be initialized to zero). */
+    REF                 m_commonReference;          /**< don't connect groups to common reference. */
+    GND                 m_commonGround;             /**< don't connect groups to common ground. */
+    const int           m_QUEUE_SIZE;               /**< the number of GT_GetData calls that will be queued during acquisition to avoid loss of data. */
+    bool                m_isRunning;                /**< flag for data acquisition. */
 
     //buffer
-    int                 m_nPoints;                  /**< number of points which are received from one channel simultaneously */
-    DWORD               m_bufferSizeBytes;          /**< Size of buffer in Bytes */
-    DWORD               m_numBytesReceived;         /**< num of Bytes whicht are received during one measuring procedure */
-    BYTE***             m_buffers;                  /**< pointer to the buffer */
-    OVERLAPPED**        m_overlapped;               /**< storage in case of overlapping */
-    std::vector<int>    m_sizeOfMatrix;             /**< number of rows and column of output matrix [rows columns] */
+    int                 m_nPoints;                  /**< number of points which are received from one channel simultaneously. */
+    DWORD               m_bufferSizeBytes;          /**< Size of buffer in Bytes. */
+    DWORD               m_numBytesReceived;         /**< num of Bytes whicht are received during one measuring procedure. */
+    BYTE***             m_buffers;                  /**< pointer to the buffer. */
+    OVERLAPPED**        m_overlapped;               /**< storage in case of overlapping. */
+    std::vector<int>    m_sizeOfMatrix;             /**< number of rows and column of output matrix [rows columns]. */
 
 public:
     //=========================================================================================================

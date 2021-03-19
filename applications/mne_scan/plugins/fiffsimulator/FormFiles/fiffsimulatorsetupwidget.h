@@ -108,7 +108,7 @@ public:
 
     void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
 
-    void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
+    void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server. */
 
 private:
     //=========================================================================================================
@@ -123,7 +123,7 @@ private:
 
     Ui::FiffSimulatorSetupWidgetClass ui;   /**< the user interface for the MneRtClientSetupWidget.*/
 
-    bool m_bIsInit;                         /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
+    bool m_bIsInit;                         /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized. */
 };
 } // NAMESPACE
 

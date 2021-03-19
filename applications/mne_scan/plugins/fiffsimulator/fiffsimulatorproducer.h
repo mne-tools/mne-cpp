@@ -139,9 +139,9 @@ private:
     FiffSimulator*          m_pFiffSimulator;                       /**< Holds a pointer to corresponding MneRtClient.*/
 
     bool                    m_bDataClientIsConnected;               /**< If the data client is connected.*/
-    bool                    m_bFlagInfoRequest;                     /**< Read Fiff Info flag */
+    bool                    m_bFlagInfoRequest;                     /**< Read Fiff Info flag. */
 
-    qint32                  m_iDataClientId;                        /**< The client id */
+    qint32                  m_iDataClientId;                        /**< The client id. */
     quint16                 m_iDefaultPortDataClient;               /**< The default port for the rt data client. */
 };
 } // NAMESPACE
