@@ -70,7 +70,7 @@ namespace RTPROCESSINGLIB
  *
  * @param[in]       mapTriggers  The QMap to be transformed.
  *
- * @param[in] return    A list of transformed Eigen matrices.
+ * @param[in]       A list of transformed Eigen matrices.
  */
 RTPROCESINGSHARED_EXPORT QList<Eigen::MatrixXi> toEventMatrix(QMap<int,QList<QPair<int,double> > > mapTriggers);
 
@@ -86,7 +86,7 @@ RTPROCESINGSHARED_EXPORT QList<Eigen::MatrixXi> toEventMatrix(QMap<int,QList<QPa
  * @param[in]        bRemoveOffset  remove the first sample as offset.
  * @param[in]        iBurstLengthMs  The length in samples which is skipped after a trigger was found.
  *
- * @param return     This map holds the indices of the channels which are to be read from data. For each
+ * @return     This map holds the indices of the channels which are to be read from data. For each
  *                   index/channel the found triggersand corresponding signal values are written to the value of the map.
  */
 RTPROCESINGSHARED_EXPORT QMap<int, QList<QPair<int, double> > > detectTriggerFlanksMax(const Eigen::MatrixXd &data,
@@ -107,7 +107,7 @@ RTPROCESINGSHARED_EXPORT QMap<int, QList<QPair<int, double> > > detectTriggerFla
  * @param[in]        bRemoveOffset  remove the first sample as offset.
  * @param[in]        iBurstLengthMs  The length in samples which is skipped after a trigger was found.
  *
- * @param return     This list holds the found trigger indices and corresponding signal values.
+ * @return     This list holds the found trigger indices and corresponding signal values.
  */
 RTPROCESINGSHARED_EXPORT QList<QPair<int,double> > detectTriggerFlanksMax(const Eigen::MatrixXd &data,
                                                                           int iTriggerChannelIdx,
@@ -128,7 +128,7 @@ RTPROCESINGSHARED_EXPORT QList<QPair<int,double> > detectTriggerFlanksMax(const 
  * @param[in]    type  detect rising or falling flank. Use "Rising" or "Falling" as input.
  * @param[in]    iBurstLengthMs  The length in samples which is skipped after a trigger was found.
  *
- * @param return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers and corresponding signal values are written to the value of the map.
+ * @return     This map holds the indices of the channels which are to be read from data. For each index/channel the found triggers and corresponding signal values are written to the value of the map.
  */
 RTPROCESINGSHARED_EXPORT QMap<int,QList<QPair<int,double> > > detectTriggerFlanksGrad(const Eigen::MatrixXd &data,
                                                                                       const QList<int>& lTriggerChannels,
@@ -150,7 +150,7 @@ RTPROCESINGSHARED_EXPORT QMap<int,QList<QPair<int,double> > > detectTriggerFlank
  * @param[in]    type  detect rising or falling flank. Use "Rising" or "Falling" as input.
  * @param[in]    iBurstLengthMs  The length in samples which is skipped after a trigger was found.
  *
- * @param return     This list holds the found trigger indices and corresponding signal values.
+ * @return     This list holds the found trigger indices and corresponding signal values.
  */
 RTPROCESINGSHARED_EXPORT QList<QPair<int,double> > detectTriggerFlanksGrad(const Eigen::MatrixXd &data,
                                                                            int iTriggerChannelIdx,
