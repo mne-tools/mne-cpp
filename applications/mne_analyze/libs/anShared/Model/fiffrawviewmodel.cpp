@@ -111,7 +111,6 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_bPerformFiltering(false)
 , m_iDistanceTimerSpacer(1000)
 , m_iScroller(0)
-, m_iRealtimeFileIndex(1)
 , m_iScrollPos(0)
 , m_bDispAnnotation(true)
 , m_bRealtime(false)
@@ -1070,9 +1069,6 @@ void FiffRawViewModel::readFromRealtimeFile(const QString &path)
     m_file.setFileName(path);
     if (initFiffData(m_file)){
         updateEndStartFlags();
-
         emit newRealtimeData();
-
-        m_iRealtimeFileIndex++;
     }
 }
