@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     annotationmanager.h
+ * @file     events.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.0
@@ -29,20 +29,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the annotationmanager class.
+ * @brief    Contains the declaration of the events class.
  *
  */
 
-#ifndef ANNOTATIONMANAGER_H
-#define ANNOTATIONMANAGER_H
+#ifndef ANALYZE_EVENTS_H
+#define ANALYZE_EVENTS_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "annotationmanager_global.h"
-#include "annotationdelegate.h"
-#include "annotationsettingsview.h"
+#include "events_global.h"
+#include "eventdelegate.h"
+#include "eventview.h"
 
 #include <anShared/Plugins/abstractplugin.h>
 
@@ -63,41 +63,41 @@ namespace ANSHAREDLIB {
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE annotationmanagerPLUGIN
+// DEFINE NAMESPACE eventsPLUGIN
 //=============================================================================================================
 
-namespace ANNOTATIONMANAGERPLUGIN
+namespace EVENTSPLUGIN
 {
 
 //=============================================================================================================
-// ANNOTATIONMANAGERPLUGIN FORWARD DECLARATIONS
+// EVENTSPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
 /**
- * annotationmanager Plugin
+ * events Plugin
  *
- * @brief The annotationmanager class provides input and output capabilities for the fiff file format.
+ * @brief The events class provides input and output capabilities for the fiff file format.
  */
-class ANNOTATIONMANAGERSHARED_EXPORT AnnotationManager : public ANSHAREDLIB::AbstractPlugin
+class EVENTSSHARED_EXPORT Events : public ANSHAREDLIB::AbstractPlugin
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "annotationmanager.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "events.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
 
 public:
     //=========================================================================================================
     /**
-     * Constructs an AnnotationManager.
+     * Constructs an Events.
      */
-    AnnotationManager();
+    Events();
 
     //=========================================================================================================
     /**
-     * Destroys the AnnotationManager.
+     * Destroys the Events.
      */
-    ~AnnotationManager() override;
+    ~Events() override;
 
     // AbstractPlugin functions
     virtual QSharedPointer<AbstractPlugin> clone() const override;
@@ -181,4 +181,4 @@ signals:
 
 } // NAMESPACE
 
-#endif // ANNOTATIONMANAGER_H
+#endif // ANALYZE_EVENTS_H

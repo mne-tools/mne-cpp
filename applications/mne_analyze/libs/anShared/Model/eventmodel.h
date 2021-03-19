@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     annotationmodel.h
+ * @file     eventmodel.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.0

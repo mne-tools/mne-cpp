@@ -43,7 +43,7 @@
 #include "fiffrawviewdelegate.h"
 
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <anShared/Model/annotationmodel.h>
+#include <anShared/Model/eventmodel.h>
 
 #include <rtprocessing/helpers/filterkernel.h>
 

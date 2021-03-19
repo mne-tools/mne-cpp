@@ -37,7 +37,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "annotationmodel.h"
+#include "eventmodel.h"
 #include "fiffrawviewmodel.h"
 #include <mne/mne.h>
 #include <iomanip>
@@ -517,7 +517,7 @@ bool EventModel::saveToFile(const QString& sPath)
 
     return true;
     #else
-    qInfo() << "AnnotationSettingsView::saveToFile";
+    qInfo() << "EventView::saveToFile";
 
     QFile file(sPath);
     if (!file.open(QIODevice::WriteOnly)) {

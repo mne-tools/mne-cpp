@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     annotationsettingsview.cpp
+ * @file     eventview.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.0
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the AnnotationSettingsView Class.
+ * @brief    Definition of the EventView Class.
  *
  */
 
@@ -37,8 +37,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "annotationsettingsview.h"
-#include "ui_annotationsettingsview.h"
+#include "eventview.h"
+#include "ui_eventview.h"
 
 #include <fiff/fiff.h>
 #include <rtprocessing/detecttrigger.h>
@@ -534,7 +534,7 @@ void EventView::onDetectTriggers(const QString &sChannelName,
                                               double dThreshold)
 {
     if (!m_pFiffRawModel)
-        qWarning() << "[AnnotationSettingsView::onDetectTriggers] No Fiff Raw Model selected for trigger detection.";
+        qWarning() << "[EventView::onDetectTriggers] No Fiff Raw Model selected for trigger detection.";
 
     if(m_FutureWatcher.isRunning()){
         return;
@@ -569,7 +569,7 @@ QMap<double,QList<int>> EventView::detectTriggerCalculations(const QString& sCha
     }
 
     if(iCurrentTriggerChIndex == 9999){
-        qWarning() << "[AnnotationSettingsView::onDetectTriggers] Channel Index not valid";\
+        qWarning() << "[EventView::onDetectTriggers] Channel Index not valid";\
         QMap<double,QList<int>> map;
         return map;
     }

@@ -1,6 +1,6 @@
 #==============================================================================================================
 #
-# @file     annotationmanager.pro
+# @file     events.pro
 # @author   Lorenz Esch <lesch@mgh.harvard.edu>;
 #           Gabriel Motta <gbmotta@mgh.harvard.edu>
 # @since    0.1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the annotationmanager plugin.
+# @brief    This project file generates the makefile for the events plugin.
 #
 #==============================================================================================================
 
@@ -41,7 +41,7 @@ QT += gui widgets
 
 CONFIG += skip_target_version_ext plugin
 
-DEFINES += ANNOTATIONMANAGER_PLUGIN
+DEFINES += EVENTS_PLUGIN
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_plugins
 
@@ -49,7 +49,7 @@ contains(MNECPP_CONFIG, wasm) {
     DEFINES += WASMBUILD
 }
 
-TARGET = annotationmanager
+TARGET = events
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -89,20 +89,20 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    annotationmanager.cpp \
-    annotationdelegate.cpp \
-    annotationsettingsview.cpp \
+    events.cpp \
+    eventdelegate.cpp \
+    eventview.cpp \
 
 HEADERS += \
-    annotationmanager_global.h \
-    annotationmanager.h \
-    annotationdelegate.h \
-    annotationsettingsview.h \
+    events_global.h \
+    events.h \
+    eventdelegate.h \
+    eventview.h \
 
 FORMS += \
-    annotationsettingsview.ui \
+    eventview.ui \
 
-OTHER_FILES += annotationmanager.json
+OTHER_FILES += events.json
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

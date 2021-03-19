@@ -94,7 +94,7 @@ SOURCES += \
     Model/bemdatamodel.cpp \
     Model/dipolefitmodel.cpp \
     Model/fiffrawviewmodel.cpp \
-    Model/annotationmodel.cpp \
+    Model/eventmodel.cpp \
     Model/averagingdatamodel.cpp \
     Model/mricoordmodel.cpp \
     Model/covariancemodel.cpp
@@ -116,7 +116,7 @@ HEADERS += \
     Utils/types.h \
     Model/bemdatamodel.h \
     Model/fiffrawviewmodel.h \
-    Model/annotationmodel.h \
+    Model/eventmodel.h \
     Model/averagingdatamodel.h \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

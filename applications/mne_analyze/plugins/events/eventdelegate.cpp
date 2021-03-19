@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     annotationdelegate.h
+ * @file     eventdelegate.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Gabriel Motta <gbmotta@mgh.harvard.edu
  * @since    0.1.0
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the definition of the annotationdelegate class.
+ * @brief    Contains the definition of the eventdelegate class.
  *
  */
 
@@ -37,7 +37,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "annotationdelegate.h"
+#include "eventdelegate.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -185,7 +185,7 @@ void EventDelegate::updateEditorGeometry(QWidget *editor,
 
 //=============================================================================================================
 
-//bool AnnotationDelegate::eventFilter(QObject *object, QEvent *event)
+//bool EventDelegate::eventFilter(QObject *object, QEvent *event)
 //{
 //    qDebug() << event->type();
 //    return true;
