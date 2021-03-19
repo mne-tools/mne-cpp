@@ -41,7 +41,7 @@ SUBDIRS += \
     dataloader \
     datamanager \
     rawdataviewer \
-    annotationmanager \
+    events \
     filtering \
     averaging \
     channelselection \

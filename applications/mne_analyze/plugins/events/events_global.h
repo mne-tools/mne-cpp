@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     annotationmanager_global.h
+ * @file     events_global.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
@@ -33,8 +33,8 @@
  *
  */
 
-#ifndef ANNOTATIONMANAGER_GLOBAL_H
-#define ANNOTATIONMANAGER_GLOBAL_H
+#ifndef ANALYZE_EVENTS_GLOBAL_H
+#define ANALYZE_EVENTS_GLOBAL_H
 
 //=============================================================================================================
 // QT INCLUDES
@@ -46,10 +46,10 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(ANNOTATIONMANAGER_PLUGIN)
-#  define ANNOTATIONMANAGERSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(EVENTS_PLUGIN)
+#  define EVENTSSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define ANNOTATIONMANAGERSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define EVENTSSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // ANNOTATIONMANAGER_GLOBAL_H
+#endif // ANALYZE_EVENTS_GLOBAL_H

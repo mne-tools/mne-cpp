@@ -43,7 +43,7 @@
 
 #include "../Utils/metatypes.h"
 
-#include "annotationmodel.h"
+#include "eventmodel.h"
 
 #include <fiff/fiff.h>
 

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     annotationmanager.cpp
+ * @file     events.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.0
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the AnnotationManager class.
+ * @brief    Definition of the Events class.
  *
  */
 
@@ -37,7 +37,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "annotationmanager.h"
+#include "events.h"
 
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Management/communicator.h>
@@ -53,36 +53,36 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ANNOTATIONMANAGERPLUGIN;
+using namespace EVENTSPLUGIN;
 using namespace ANSHAREDLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AnnotationManager::AnnotationManager()
+Events::Events()
 {
 
 }
 
 //=============================================================================================================
 
-AnnotationManager::~AnnotationManager()
+Events::~Events()
 {
 
 }
 
 //=============================================================================================================
 
-QSharedPointer<AbstractPlugin> AnnotationManager::clone() const
+QSharedPointer<AbstractPlugin> Events::clone() const
 {
-    QSharedPointer<AnnotationManager> pAnnotationManagerClone(new AnnotationManager);
-    return pAnnotationManagerClone;
+    QSharedPointer<Events> pEventsClone(new Events);
+    return pEventsClone;
 }
 
 //=============================================================================================================
 
-void AnnotationManager::init()
+void Events::init()
 {
     m_pCommu = QSharedPointer<ANSHAREDLIB::Communicator>(new ANSHAREDLIB::Communicator(this));
     m_bAlreadyLoaded = false;
@@ -90,69 +90,69 @@ void AnnotationManager::init()
 
 //=============================================================================================================
 
-void AnnotationManager::unload()
+void Events::unload()
 {
 
 }
 
 //=============================================================================================================
 
-QString AnnotationManager::getName() const
+QString Events::getName() const
 {
     return "Events";
 }
 
 //=============================================================================================================
 
-QMenu *AnnotationManager::getMenu()
+QMenu *Events::getMenu()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-QDockWidget *AnnotationManager::getControl()
+QDockWidget *Events::getControl()
 {
-    EventView* pAnnotationSettingsView = new EventView();
-    pAnnotationSettingsView->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
+    EventView* pEventView = new EventView();
+    pEventView->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
                                                        QSizePolicy::Preferred));
 
-    connect(pAnnotationSettingsView, &EventView::triggerRedraw,
-            this, &AnnotationManager::onTriggerRedraw, Qt::UniqueConnection);
+    connect(pEventView, &EventView::triggerRedraw,
+            this, &Events::onTriggerRedraw, Qt::UniqueConnection);
 
-    connect(pAnnotationSettingsView, &EventView::groupsUpdated,
-            this, &AnnotationManager::onGroupsUpdated, Qt::UniqueConnection);
+    connect(pEventView, &EventView::groupsUpdated,
+            this, &Events::onGroupsUpdated, Qt::UniqueConnection);
 
-    connect(pAnnotationSettingsView, &EventView::activeEventsChecked,
-            this, &AnnotationManager::toggleDisplayEvent, Qt::UniqueConnection);
+    connect(pEventView, &EventView::activeEventsChecked,
+            this, &Events::toggleDisplayEvent, Qt::UniqueConnection);
 
-    connect(pAnnotationSettingsView, &EventView::jumpToSelected,
-            this, &AnnotationManager::onJumpToSelected, Qt::UniqueConnection);
+    connect(pEventView, &EventView::jumpToSelected,
+            this, &Events::onJumpToSelected, Qt::UniqueConnection);
 
-    connect(this, &AnnotationManager::newAnnotationAvailable,
-            pAnnotationSettingsView, &EventView::addAnnotationToModel, Qt::UniqueConnection);
+    connect(this, &Events::newAnnotationAvailable,
+            pEventView, &EventView::addAnnotationToModel, Qt::UniqueConnection);
 
-    connect(this, &AnnotationManager::disconnectFromModel,
-            pAnnotationSettingsView, &EventView::disconnectFromModel, Qt::UniqueConnection);
+    connect(this, &Events::disconnectFromModel,
+            pEventView, &EventView::disconnectFromModel, Qt::UniqueConnection);
 
-    connect(this, &AnnotationManager::newAnnotationModelAvailable,
-            pAnnotationSettingsView, &EventView::setModel, Qt::UniqueConnection);
+    connect(this, &Events::newAnnotationModelAvailable,
+            pEventView, &EventView::setModel, Qt::UniqueConnection);
 
-    connect(this, &AnnotationManager::newFiffRawViewModel,
-            pAnnotationSettingsView, &EventView::onNewFiffRawViewModel, Qt::UniqueConnection);
+    connect(this, &Events::newFiffRawViewModel,
+            pEventView, &EventView::onNewFiffRawViewModel, Qt::UniqueConnection);
 
-    connect(pAnnotationSettingsView, &EventView::loadingStart,
-            this, &AnnotationManager::triggerLoadingStart, Qt::DirectConnection);
+    connect(pEventView, &EventView::loadingStart,
+            this, &Events::triggerLoadingStart, Qt::DirectConnection);
 
-    connect(pAnnotationSettingsView, &EventView::loadingEnd,
-            this, &AnnotationManager::triggerLoadingEnd, Qt::DirectConnection);
+    connect(pEventView, &EventView::loadingEnd,
+            this, &Events::triggerLoadingEnd, Qt::DirectConnection);
 
-    connect(this, &AnnotationManager::clearView,
-            pAnnotationSettingsView, &EventView::clearView, Qt::UniqueConnection);
+    connect(this, &Events::clearView,
+            pEventView, &EventView::clearView, Qt::UniqueConnection);
 
     QDockWidget* pControl = new QDockWidget(getName());
     pControl->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea);
-    pControl->setWidget(pAnnotationSettingsView);
+    pControl->setWidget(pEventView);
     pControl->setObjectName(getName());
     pControl->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,
                                         QSizePolicy::Preferred));
@@ -162,14 +162,14 @@ QDockWidget *AnnotationManager::getControl()
 
 //=============================================================================================================
 
-QWidget *AnnotationManager::getView()
+QWidget *Events::getView()
 {
     return Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-void AnnotationManager::handleEvent(QSharedPointer<Event> e)
+void Events::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
     case EVENT_TYPE::NEW_ANNOTATION_ADDED:
@@ -183,13 +183,13 @@ void AnnotationManager::handleEvent(QSharedPointer<Event> e)
         onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
         break;
     default:
-        qWarning() << "[AnnotationManager::handleEvent] Received an Event that is not handled by switch cases.";
+        qWarning() << "[Events::handleEvent] Received an Event that is not handled by switch cases.";
     }
 }
 
 //=============================================================================================================
 
-QVector<EVENT_TYPE> AnnotationManager::getEventSubscriptions(void) const
+QVector<EVENT_TYPE> Events::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
     temp.push_back(NEW_ANNOTATION_ADDED);
@@ -201,7 +201,7 @@ QVector<EVENT_TYPE> AnnotationManager::getEventSubscriptions(void) const
 
 //=============================================================================================================
 
-void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+void Events::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
     if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         emit disconnectFromModel();
@@ -228,7 +228,7 @@ void AnnotationManager::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel
 
 //=============================================================================================================
 
-void AnnotationManager::toggleDisplayEvent(const int& iToggle)
+void Events::toggleDisplayEvent(const int& iToggle)
 {
     QVariant data;
     data.setValue(iToggle);
@@ -237,42 +237,42 @@ void AnnotationManager::toggleDisplayEvent(const int& iToggle)
 
 //=============================================================================================================
 
-void AnnotationManager::onTriggerRedraw()
+void Events::onTriggerRedraw()
 {
     m_pCommu->publishEvent(TRIGGER_REDRAW);
 }
 
 //=============================================================================================================
 
-void AnnotationManager::onJumpToSelected()
+void Events::onJumpToSelected()
 {
     m_pCommu->publishEvent(TRIGGER_VIEWER_MOVE);
 }
 
 //=============================================================================================================
 
-void AnnotationManager::onGroupsUpdated()
+void Events::onGroupsUpdated()
 {
     m_pCommu->publishEvent(EVENT_GROUPS_UPDATED);
 }
 
 //=============================================================================================================
 
-void AnnotationManager::triggerLoadingStart(const QString& sMessage)
+void Events::triggerLoadingStart(const QString& sMessage)
 {
     m_pCommu->publishEvent(LOADING_START, QVariant::fromValue(sMessage));
 }
 
 //=============================================================================================================
 
-void AnnotationManager::triggerLoadingEnd(const QString& sMessage)
+void Events::triggerLoadingEnd(const QString& sMessage)
 {
     m_pCommu->publishEvent(LOADING_END, QVariant::fromValue(sMessage));
 }
 
 //=============================================================================================================
 
-void AnnotationManager::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+void Events::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
     if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_ANNOTATION_MODEL || pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         emit clearView(pRemovedModel);
