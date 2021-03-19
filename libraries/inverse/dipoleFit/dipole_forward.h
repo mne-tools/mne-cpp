@@ -98,14 +98,14 @@ public:
     ~DipoleForward();
 
 public:
-    float **rd;         /**< Dipole locations */
-    int   ndip;         /**< How many dipoles */
-    float **fwd;        /**< The forward solution (projected and whitened) */
-    float *scales;      /**< Scales applied to the columns of fwd */
-    float **uu;         /**< The left singular vectors of the forward matrix */
-    float **vv;         /**< The right singular vectors of the forward matrix */
-    float *sing;        /**< The singular values */
-    int   nch;          /**< Number of channels */
+    float **rd;         /**< Dipole locations. */
+    int   ndip;         /**< How many dipoles. */
+    float **fwd;        /**< The forward solution (projected and whitened). */
+    float *scales;      /**< Scales applied to the columns of fwd. */
+    float **uu;         /**< The left singular vectors of the forward matrix. */
+    float **vv;         /**< The right singular vectors of the forward matrix. */
+    float *sing;        /**< The singular values. */
+    int   nch;          /**< Number of channels. */
 
 // ### OLD STRUCT ###
 //    typedef struct {

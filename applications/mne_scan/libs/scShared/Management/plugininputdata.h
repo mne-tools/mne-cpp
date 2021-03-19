@@ -108,7 +108,7 @@ protected:
     void notifyCallbackFunction(SCMEASLIB::Measurement::SPtr pMeasurement);
 
 private:
-    callback_function m_pFunc;  /**< registered callback function */
+    callback_function m_pFunc;  /**< registered callback function. */
 };
 
 //=============================================================================================================

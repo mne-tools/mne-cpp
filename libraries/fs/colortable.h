@@ -107,10 +107,10 @@ public:
     inline Eigen::MatrixX4i getRGBAs() const;
 
 public:
-    QString orig_tab;           /**< Colortable raw data */
-    qint32 numEntries;          /**< Number of entries */
-    QStringList struct_names;   /**< Anatomical ROI description */
-    Eigen::MatrixXi table;      /**< labels and corresponing colorcode */
+    QString orig_tab;           /**< Colortable raw data. */
+    qint32 numEntries;          /**< Number of entries. */
+    QStringList struct_names;   /**< Anatomical ROI description. */
+    Eigen::MatrixXi table;      /**< labels and corresponing colorcode. */
 };
 
 //=============================================================================================================

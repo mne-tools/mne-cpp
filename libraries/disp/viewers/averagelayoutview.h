@@ -275,12 +275,12 @@ protected:
     void updateProcessingMode(ProcessingMode mode);
 
     QSharedPointer<AverageScene>                                m_pAverageScene;            /**< The pointer to the average scene. */
-    QSharedPointer<DISPLIB::EvokedSetModel>                     m_pEvokedSetModel;          /**< The data model */
+    QSharedPointer<DISPLIB::EvokedSetModel>                     m_pEvokedSetModel;          /**< The data model. */
     QSharedPointer<DISPLIB::ChannelInfoModel>                   m_pChannelInfoModel;        /**< Channel info model. */
 
-    QSharedPointer<FIFFLIB::FiffInfo>                           m_pFiffInfo;                /**< FiffInfo for currently loaded file */
+    QSharedPointer<FIFFLIB::FiffInfo>                           m_pFiffInfo;                /**< FiffInfo for currently loaded file. */
 
-    QPointer<QGraphicsView>                                     m_pAverageLayoutView;       /**< View for 2D average layout scene */
+    QPointer<QGraphicsView>                                     m_pAverageLayoutView;       /**< View for 2D average layout scene. */
 
     QSharedPointer<QMap<QString, QColor> >                      m_qMapAverageColor;         /**< Average colors. */
     QSharedPointer<QMap<QString, bool> >                        m_qMapAverageActivation;    /**< Average activation status. */

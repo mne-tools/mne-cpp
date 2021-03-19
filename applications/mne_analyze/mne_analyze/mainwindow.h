@@ -210,24 +210,24 @@ private:
     void createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);          /**< Creates all menus for user interface of MainWindow class. */
     void createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);    /**< Creates all dock windows for user interface of MainWindow class. */
     void createPluginViews(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);      /**< Creates all Windows within the MultiView for user interface of MainWindow class. */
-    void tabifyDockWindows();                                                                   /**< Tabify all dock windows */
+    void tabifyDockWindows();                                                                   /**< Tabify all dock windows. */
     void about();                                                                               /**< Implements about action.*/
 
     QPointer<DISPLIB::MultiView>        m_pMultiView;               /**< The central View.*/
 
-    QPointer<QGridLayout>               m_pGridLayout;              /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow */
+    QPointer<QGridLayout>               m_pGridLayout;              /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow. */
 
     // MainWindow actions
-    QPointer<QAction>                   m_pActionExit;              /**< exit application action */
-    QPointer<QAction>                   m_pActionAbout;             /**< show about dialog action */
-    QPointer<QAction>                   m_pActionResearchMode;      /**< toggle research mode action */
-    QPointer<QAction>                   m_pActionClinicalMode;      /**< toggle clinical mode action */
-    QPointer<QAction>                   m_pActionDarkMode;          /**< toggle dark mode */
+    QPointer<QAction>                   m_pActionExit;              /**< exit application action. */
+    QPointer<QAction>                   m_pActionAbout;             /**< show about dialog action. */
+    QPointer<QAction>                   m_pActionResearchMode;      /**< toggle research mode action. */
+    QPointer<QAction>                   m_pActionClinicalMode;      /**< toggle clinical mode action. */
+    QPointer<QAction>                   m_pActionDarkMode;          /**< toggle dark mode. */
 
     // MainWindow menus
     QPointer<QMenu>                     m_pMenuFile;                /**< Holds the file menu.*/
     QPointer<QMenu>                     m_pMenuView;                /**< Holds the view menu.*/
-    QPointer<QMenu>                     m_pMenuControl;             /**< Holds the control menu */
+    QPointer<QMenu>                     m_pMenuControl;             /**< Holds the control menu. */
     QPointer<QMenu>                     m_pMenuAppearance;          /**< Holds the appearance menu.*/
     QPointer<QMenu>                     m_pMenuHelp;                /**< Holds the help menu.*/
 

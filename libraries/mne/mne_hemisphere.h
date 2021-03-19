@@ -178,33 +178,33 @@ public:
 
 public:
     FIFFLIB::fiff_int_t type;           /**< Type of the source space: 1 = "surf" or 2 = "vol". ToDo not used yet. */
-    FIFFLIB::fiff_int_t id;             /**< Id information */
+    FIFFLIB::fiff_int_t id;             /**< Id information. */
     FIFFLIB::fiff_int_t np;             /**< Number of vertices of the whole/original surface used to create the source locations. */
-    FIFFLIB::fiff_int_t ntri;           /**< Number of available triangles */
-    FIFFLIB::fiff_int_t coord_frame;    /**< Coil coordinate system definition */
+    FIFFLIB::fiff_int_t ntri;           /**< Number of available triangles. */
+    FIFFLIB::fiff_int_t coord_frame;    /**< Coil coordinate system definition. */
     Eigen::MatrixX3f rr;                /**< Vertices of the source space mesh/surface. */
     Eigen::MatrixX3f nn;                /**< Normals of the source space mesh/surface. */
     Eigen::MatrixX3i tris;              /**< Triangles of the source space mesh/surface. */
     FIFFLIB::fiff_int_t nuse;           /**< Number of used dipoles. */
-    Eigen::VectorXi inuse;              /**< Used source points indicated by 1, 0 otherwise */
+    Eigen::VectorXi inuse;              /**< Used source points indicated by 1, 0 otherwise. */
     Eigen::VectorXi vertno;             /**< Zero based (different to MATLAB) indices of the used vertices/If label based clustered gain matrix vertno contains label IDs*/
     qint32 nuse_tri;                    /**< Number of used triangles. */
     Eigen::MatrixX3i use_tris;          /**< Triangle information of the used triangles. */
-    Eigen::VectorXi nearest;            /**< All indeces mapped to the indeces of the used vertices (using option -cps during mne_setup_source_space) */
+    Eigen::VectorXi nearest;            /**< All indeces mapped to the indeces of the used vertices (using option -cps during mne_setup_source_space). */
     Eigen::VectorXd nearest_dist;       /**< Distance to the nearest vertices (using option -cps during mne_setup_source_space). */
-    QList<Eigen::VectorXi> pinfo;       /**< Patch information (using option -cps during mne_setup_source_space) */
+    QList<Eigen::VectorXi> pinfo;       /**< Patch information (using option -cps during mne_setup_source_space). */
     Eigen::VectorXi patch_inds;         /**< List of neighboring vertices in the high resolution triangulation. */
-    float dist_limit;                   /**< ToDo... (using option -cps during mne_setup_source_space) */
-    Eigen::SparseMatrix<double> dist;   /**< ToDo... (using option -cps during mne_setup_source_space) */
-    Eigen::MatrixX3d tri_cent;          /**< Triangle centers */
-    Eigen::MatrixX3d tri_nn;            /**< Triangle normals */
-    Eigen::VectorXd tri_area;           /**< Triangle areas */
-    Eigen::MatrixX3d use_tri_cent;      /**< Triangle centers of used triangles */
-    Eigen::MatrixX3d use_tri_nn;        /**< Triangle normals of used triangles */
-    Eigen::VectorXd use_tri_area;       /**< Triangle areas of used triangles */
+    float dist_limit;                   /**< ToDo... (using option -cps during mne_setup_source_space). */
+    Eigen::SparseMatrix<double> dist;   /**< ToDo... (using option -cps during mne_setup_source_space). */
+    Eigen::MatrixX3d tri_cent;          /**< Triangle centers. */
+    Eigen::MatrixX3d tri_nn;            /**< Triangle normals. */
+    Eigen::VectorXd tri_area;           /**< Triangle areas. */
+    Eigen::MatrixX3d use_tri_cent;      /**< Triangle centers of used triangles. */
+    Eigen::MatrixX3d use_tri_nn;        /**< Triangle normals of used triangles. */
+    Eigen::VectorXd use_tri_area;       /**< Triangle areas of used triangles. */
 
-    QVector<QVector<int> > neighbor_tri;           /**< Vector of neighboring triangles for each vertex */
-    QVector<QVector<int> > neighbor_vert;          /**< Vector of neighboring vertices for each vertex */
+    QVector<QVector<int> > neighbor_tri;           /**< Vector of neighboring triangles for each vertex. */
+    QVector<QVector<int> > neighbor_vert;          /**< Vector of neighboring vertices for each vertex. */
 
     MNEClusterInfo cluster_info; /**< Holds the cluster information. */
 private:

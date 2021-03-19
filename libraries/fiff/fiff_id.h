@@ -143,9 +143,9 @@ public:
     friend bool operator== (const FiffId &f1, const FiffId &f2);
 
 public:
-    fiff_int_t version;     /**< File version */
-    fiff_int_t machid[2];   /**< Unique machine ID */
-    fiffTimeRec time;       /**< Time of the ID creation */
+    fiff_int_t version;     /**< File version. */
+    fiff_int_t machid[2];   /**< Unique machine ID. */
+    fiffTimeRec time;       /**< Time of the ID creation. */
 
 // ### OLD STRUCT ###
 ///**
@@ -155,10 +155,10 @@ public:
 //* used to identify blocks within fthe files.
 //*/
 //typedef struct _fiffIdRec {
-//    fiff_int_t version;     /**< File version */
-//    fiff_int_t machid[2];   /**< Unique machine ID */
-//    fiffTimeRec time;       /**< Time of the ID creation */
-//} fiffIdRec,*fiffId;        /**< This is the file identifier */
+//    fiff_int_t version;     /**< File version. */
+//    fiff_int_t machid[2];   /**< Unique machine ID. */
+//    fiffTimeRec time;       /**< Time of the ID creation. */
+//} fiffIdRec,*fiffId;        /**< This is the file identifier. */
 //typedef fiffIdRec fiff_id_t;
 };
 

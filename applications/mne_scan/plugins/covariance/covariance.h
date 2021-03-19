@@ -155,7 +155,7 @@ private:
     QMutex      m_mutex;
     qint32      m_iEstimationSamples;
 
-    UTILSLIB::CircularBuffer_Matrix_double::SPtr        m_pCircularBuffer;              /**< Matrix data circular buffer */
+    UTILSLIB::CircularBuffer_Matrix_double::SPtr        m_pCircularBuffer;              /**< Matrix data circular buffer. */
 
     QSharedPointer<FIFFLIB::FiffInfo>                   m_pFiffInfo;                    /**< Fiff measurement info.*/
 

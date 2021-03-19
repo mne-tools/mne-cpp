@@ -182,8 +182,8 @@ public:
     void setColorMap (const QString &colorMap);
 
     Eigen::VectorXi m_vecResultExponentValues; /**< Common exponent values for the entire histogram*/
-    double          m_dMinAxisX;               /**< Display value of the smallest point of the series in x-axis */
-    double          m_dMaxAxisX;               /**< Display value of the largest point on the series in x-axis */
+    double          m_dMinAxisX;               /**< Display value of the smallest point of the series in x-axis. */
+    double          m_dMaxAxisX;               /**< Display value of the largest point on the series in x-axis. */
 
 protected:
     //=========================================================================================================
@@ -195,12 +195,12 @@ protected:
      */
     void updateThreshold (QtCharts::QLineSeries *lineSeries);
 
-    QtCharts::QChart*        m_pChart;            /**< Qchart object that will be shown in the widget */
+    QtCharts::QChart*        m_pChart;            /**< Qchart object that will be shown in the widget. */
     QtCharts::QSplineSeries* m_pSeries;           /**< Spline data series that will contain the histogram data*/
-    QtCharts::QLineSeries*   m_pLeftThreshold;    /**< Vertical line series for the left threshold */
-    QtCharts::QLineSeries*   m_pMiddleThreshold;  /**< Vertical line series for the middle threshold */
-    QtCharts::QLineSeries*   m_pRightThreshold;   /**< Vertical line series for the right threshold */
-    int                      m_iMaximumFrequency; /**< Highest value of frequency (y-axis) */
+    QtCharts::QLineSeries*   m_pLeftThreshold;    /**< Vertical line series for the left threshold. */
+    QtCharts::QLineSeries*   m_pMiddleThreshold;  /**< Vertical line series for the middle threshold. */
+    QtCharts::QLineSeries*   m_pRightThreshold;   /**< Vertical line series for the right threshold. */
+    int                      m_iMaximumFrequency; /**< Highest value of frequency (y-axis). */
     QList<QVector3D>         m_pReturnList;       /**< QList consisting of 2 QVector3D used in getThreshold function*/
     QString                  m_colorMap;          /**< QString that will be used to set the color mapping on the histogram*/
     QVector3D                m_vecReturnVector;   /**< QVector3D after correction with correctionDisplayTrueValue function*/

@@ -234,7 +234,7 @@ protected:
     QPointer<Qt3DRender::QRenderCaptureReply>   m_pScreenCaptureReply;          /**< The capture reply object to save screenshots. */
     QPointer<Qt3DRender::QObjectPicker>         m_pPicker;                      /**< The Picker entity. */
 
-    QPointer<OrbitalCameraController>           m_pCamController;               /**< The controller for camera position */
+    QPointer<OrbitalCameraController>           m_pCamController;               /**< The controller for camera position. */
     QPointer<QPropertyAnimation>                m_pCameraAnimation;             /**< The animations to rotate the camera. */
 
     QList<QPointer<Qt3DRender::QPointLight> >   m_lLightSources;                /**< The light sources. */

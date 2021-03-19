@@ -123,10 +123,10 @@ public:
 public:
     QList<QString>              clusterLabelNames;  /**< Label name of the cluster. Entries can be non unique, since some Label consist of more than one cluster.*/
     QList<qint32>               clusterLabelIds;    /**< Id (Label/ROI id) of the cluster. Entries can be non unique, since some Label/ROI consist of more than one cluster.*/
-    QList<qint32>               centroidVertno;     /**< Id (Label/ROI id) of the centroid */
-    QList<Eigen::Vector3f>     centroidSource_rr;   /**< Centroid location */
+    QList<qint32>               centroidVertno;     /**< Id (Label/ROI id) of the centroid. */
+    QList<Eigen::Vector3f>     centroidSource_rr;   /**< Centroid location. */
     QList<Eigen::VectorXi>     clusterVertnos;      /**< Vertnos which belong to corresponding cluster. */
-    QList<Eigen::MatrixX3f>    clusterSource_rr;    /**< Cluster source locations */
+    QList<Eigen::MatrixX3f>    clusterSource_rr;    /**< Cluster source locations. */
     QList<Eigen::VectorXd>     clusterDistances;    /**< Distances to clusters centroid. */
 };
 

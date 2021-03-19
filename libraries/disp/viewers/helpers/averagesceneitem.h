@@ -131,7 +131,7 @@ public:
 
     QRectF                                          m_rectBoundingRect;         /**< The bounding rect. */
 
-    QColor                                          m_colorDefault;             /**< The color for the avergaed signal */
+    QColor                                          m_colorDefault;             /**< The color for the avergaed signal. */
 
 protected:
     //=========================================================================================================

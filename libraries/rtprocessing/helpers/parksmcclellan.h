@@ -182,7 +182,7 @@ public:
      */
     void CalcCoefficients();
 
-    Eigen::RowVectorXd FirCoeff; /**< containt the generated filter coefficients */
+    Eigen::RowVectorXd FirCoeff; /**< containt the generated filter coefficients. */
 
 private:
     int HalfTapCount;

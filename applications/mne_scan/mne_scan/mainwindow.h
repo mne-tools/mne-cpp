@@ -366,30 +366,30 @@ private:
 
     int                                 m_iTimeoutMSec;                 /**< Holds milliseconds after which timer timeouts.*/
 
-    QPointer<QActionGroup>              m_pActionGroupLgLv;             /**< group log level */
-    QPointer<QActionGroup>              m_pActionStyleGroup;            /**< group for styles */
-    QPointer<QActionGroup>              m_pActionModeGroup;             /**< group for gui modes */
+    QPointer<QActionGroup>              m_pActionGroupLgLv;             /**< group log level. */
+    QPointer<QActionGroup>              m_pActionStyleGroup;            /**< group for styles. */
+    QPointer<QActionGroup>              m_pActionModeGroup;             /**< group for gui modes. */
 
-    QPointer<QAction>                   m_pActionNewConfig;             /**< new configuration */
-    QPointer<QAction>                   m_pActionOpenConfig;            /**< open configuration */
-    QPointer<QAction>                   m_pActionSaveConfig;            /**< save configuration */
-    QPointer<QAction>                   m_pActionExit;                  /**< exit application */
-    QPointer<QAction>                   m_pActionMinLgLv;               /**< set minimal log level */
-    QPointer<QAction>                   m_pActionNormLgLv;              /**< set normal log level */
-    QPointer<QAction>                   m_pActionMaxLgLv;               /**< set maximal log level */
-    QPointer<QAction>                   m_pActionDarkMode;              /**< toggle dark mode */
-    QPointer<QAction>                   m_pActionHelpContents;          /**< open help contents */
-    QPointer<QAction>                   m_pActionAbout;                 /**< show about dialog */
+    QPointer<QAction>                   m_pActionNewConfig;             /**< new configuration. */
+    QPointer<QAction>                   m_pActionOpenConfig;            /**< open configuration. */
+    QPointer<QAction>                   m_pActionSaveConfig;            /**< save configuration. */
+    QPointer<QAction>                   m_pActionExit;                  /**< exit application. */
+    QPointer<QAction>                   m_pActionMinLgLv;               /**< set minimal log level. */
+    QPointer<QAction>                   m_pActionNormLgLv;              /**< set normal log level. */
+    QPointer<QAction>                   m_pActionMaxLgLv;               /**< set maximal log level. */
+    QPointer<QAction>                   m_pActionDarkMode;              /**< toggle dark mode. */
+    QPointer<QAction>                   m_pActionHelpContents;          /**< open help contents. */
+    QPointer<QAction>                   m_pActionAbout;                 /**< show about dialog. */
     QPointer<QAction>                   m_pActionQuickControl;          /**< Show quick control widget. */
-    QPointer<QAction>                   m_pActionRun;                   /**< run application */
-    QPointer<QAction>                   m_pActionStop;                  /**< stop application */
-    QPointer<QAction>                   m_pActionDefaultMode;           /**< stop application */
-    QPointer<QAction>                   m_pActionResearchMode;        /**< activate research gui mode */
-    QPointer<QAction>                   m_pActionClinicalMode;          /**< activate clinical gui mode */
+    QPointer<QAction>                   m_pActionRun;                   /**< run application. */
+    QPointer<QAction>                   m_pActionStop;                  /**< stop application. */
+    QPointer<QAction>                   m_pActionDefaultMode;           /**< stop application. */
+    QPointer<QAction>                   m_pActionResearchMode;        /**< activate research gui mode. */
+    QPointer<QAction>                   m_pActionClinicalMode;          /**< activate clinical gui mode. */
 
-    QList<QAction*>                     m_qListDynamicPluginActions;    /**< dynamic plugin actions */
-    QList<QAction*>                     m_qListDynamicDisplayActions;   /**< dynamic display actions */
-    QList<QAction*>                     m_qListDynamicDisplayMenuActions;/**< dynamic display actions for the menu */
+    QList<QAction*>                     m_qListDynamicPluginActions;    /**< dynamic plugin actions. */
+    QList<QAction*>                     m_qListDynamicDisplayActions;   /**< dynamic display actions. */
+    QList<QAction*>                     m_qListDynamicDisplayMenuActions;/**< dynamic display actions for the menu. */
 
     QPointer<QMenu>                     m_pMenuFile;                    /**< Holds the file menu.*/
     QPointer<QMenu>                     m_pMenuView;                    /**< Holds the view menu.*/
@@ -422,9 +422,9 @@ private:
     QSharedPointer<QTimer>                              m_pTimer;               /**< timer of the main application*/
     QSharedPointer<QTime>                               m_pTime;                /**< Holds current time output, updated with timeout of timer.*/
     QSharedPointer<SCSHAREDLIB::PluginManager>          m_pPluginManager;       /**< Holds log dock widget.*/
-    QSharedPointer<SCSHAREDLIB::PluginSceneManager>     m_pPluginSceneManager;  /**< Plugin scene manager which manages the plugin graph */
+    QSharedPointer<SCSHAREDLIB::PluginSceneManager>     m_pPluginSceneManager;  /**< Plugin scene manager which manages the plugin graph. */
     QSharedPointer<QWidget>                             m_pAboutWindow;         /**< Holds the widget containing the about information.*/
-    QSharedPointer<SCSHAREDLIB::DisplayManager>         m_pDisplayManager;      /**< display manager */
+    QSharedPointer<SCSHAREDLIB::DisplayManager>         m_pDisplayManager;      /**< display manager. */
 
     QString                             m_sSettingsPath;                    /**< The settings path to store the GUI settings to. */
     QString                             m_sCurrentStyle;                    /**< The currently selected style (dark mode, default mode). */

@@ -66,16 +66,16 @@ namespace FIFFLIB
 /*
  * Quaternion channels for head position monitoring
  */
-#define FIFFV_QUAT_0   700  /**< Quaternion parameter q0; obsolete for unit quaternion */
-#define FIFFV_QUAT_1   701  /**< Quaternion parameter q1; rotation */
-#define FIFFV_QUAT_2   702  /**< Quaternion parameter q2; rotation */
-#define FIFFV_QUAT_3   703  /**< Quaternion parameter q3; rotation */
-#define FIFFV_QUAT_4   704  /**< Quaternion parameter q4; translation */
-#define FIFFV_QUAT_5   705  /**< Quaternion parameter q5; translation */
-#define FIFFV_QUAT_6   706  /**< Quaternion parameter q6; translation */
-#define FIFFV_HPI_G    707  /**< Goodness-of-fit in continuous hpi */
-#define FIFFV_HPI_ERR  708  /**< Estimation error in continuous hpi */
-#define FIFFV_HPI_MOV  709  /**< Estimated head movement speed in continuous hpi */
+#define FIFFV_QUAT_0   700  /**< Quaternion parameter q0; obsolete for unit quaternion. */
+#define FIFFV_QUAT_1   701  /**< Quaternion parameter q1; rotation. */
+#define FIFFV_QUAT_2   702  /**< Quaternion parameter q2; rotation. */
+#define FIFFV_QUAT_3   703  /**< Quaternion parameter q3; rotation. */
+#define FIFFV_QUAT_4   704  /**< Quaternion parameter q4; translation. */
+#define FIFFV_QUAT_5   705  /**< Quaternion parameter q5; translation. */
+#define FIFFV_QUAT_6   706  /**< Quaternion parameter q6; translation. */
+#define FIFFV_HPI_G    707  /**< Goodness-of-fit in continuous hpi. */
+#define FIFFV_HPI_ERR  708  /**< Estimation error in continuous hpi. */
+#define FIFFV_HPI_MOV  709  /**< Estimated head movement speed in continuous hpi. */
 
 #define FIFFM_QUAT_CH(X) ((X >= FIFFV_QUAT_0) && (X <= FIFFV_HPI_MOV))   /* Check for a quaternion channel */
 
@@ -161,43 +161,43 @@ namespace FIFFLIB
 /*
  * Coil types
  */
-#define FIFFV_COIL_NONE                         0       /**< The location info contains no data */
-#define FIFFV_COIL_EEG                          1       /**< EEG electrode position in r0 */
-#define FIFFV_COIL_NM_122                       2       /**< Neuromag 122 coils */
-#define FIFFV_COIL_NM_24                        3       /**< Old 24 channel system in HUT */
-#define FIFFV_COIL_NM_MCG_AXIAL                 4       /**< The axial devices in the HUCS MCG system */
-#define FIFFV_COIL_EEG_BIPOLAR                  5       /**< Bipolar EEG lead */
-#define FIFFV_COIL_DIPOLE                       200     /**< Time-varying dipole definition The coil info contains dipole location (r0) and direction (ex) */
-#define FIFFV_COIL_MCG_42                       1000    /**< For testing the MCG software */
-#define FIFFV_COIL_POINT_MAGNETOMETER           2000    /**< Simple point magnetometer */
-#define FIFFV_COIL_AXIAL_GRAD_5CM               2001    /**< Generic axial gradiometer */
-#define FIFFV_COIL_VV_PLANAR_W                  3011    /**< VV prototype wirewound planar sensor */
-#define FIFFV_COIL_VV_PLANAR_T1                 3012    /**< Vectorview SQ20483N planar gradiometer */
-#define FIFFV_COIL_VV_PLANAR_T2                 3013    /**< Vectorview SQ20483N-A planar gradiometer */
-#define FIFFV_COIL_VV_PLANAR_T3                 3014    /**< Vectorview SQ20950N planar gradiometer */
-#define FIFFV_COIL_VV_MAG_W                     3021    /**< VV prototype wirewound magnetometer */
-#define FIFFV_COIL_VV_MAG_T1                    3022    /**< Vectorview SQ20483N magnetometer */
-#define FIFFV_COIL_VV_MAG_T2                    3023    /**< Vectorview SQ20483-A magnetometer */
-#define FIFFV_COIL_VV_MAG_T3                    3024    /**< Vectorview SQ20950N magnetometer */
-#define FIFFV_COIL_MAGNES_MAG                   4001    /**< Magnes WH magnetometer */
-#define FIFFV_COIL_MAGNES_GRAD                  4002    /**< Magnes WH gradiometer  */
-#define FIFFV_COIL_CTF_GRAD                     5001    /**< CTF axial gradiometer */
-#define FIFFV_COIL_CTF_REF_MAG                  5002    /**< CTF reference magnetometer */
-#define FIFFV_COIL_CTF_REF_GRAD                 5003    /**< CTF reference gradiometer */
-#define FIFFV_COIL_CTF_REF_GOFF                 5004    /**< CTF offdiagonal reference gradiometer */
-#define FIFFV_COIL_KIT_GRAD                     6001    /**< KIT MIT gradiometer */
-#define FIFFV_COIL_KIT_REF_GRAD                 6002    /**< KIT MIT reference magnetometer */
-#define FIFFV_COIL_BABY_GRAD                    7001    /**< BabySQUID gradiometers */
-#define FIFFV_COIL_BABY_MAG                     7002    /**< BabyMEG inner layer magnetometers */
-#define FIFFV_COIL_BABY_REF_MAG                 7003    /**< BabyMEG outer layer magnetometers */
-#define FIFFV_COIL_BABY_REF_MAG2                7004    /**< BabyMEG reference magnetometer */
-#define FIFFV_COIL_ARTEMIS123_GRAD              7501    /**< Artemis123 gradiometer */
-#define FIFFV_COIL_ARTEMIS123_REF_MAG           7502    /**< Artemis123 reference magnetometer */
-#define FIFFV_COIL_ARTEMIS123_REF_GRAD          7503    /**< Artemis123 reference gradiometer */
-#define FIFFV_COIL_QUSPIN_ZFOPM_MAG             8001    /**< QuSpin ZFOPM magnetometer */
-#define FIFFV_COIL_KRISS_GRAD                   9001    /**< KRISS gradiometer */
-#define FIFFV_COIL_COMPUMEDICS_ADULT_GRAD       9101    /**< Compumedics adult gradiometer */
-#define FIFFV_COIL_COMPUMEDICS_PEDIATRIC_GRAD   9102    /**< Compumedics pediatric gradiometer */
+#define FIFFV_COIL_NONE                         0       /**< The location info contains no data. */
+#define FIFFV_COIL_EEG                          1       /**< EEG electrode position in r0. */
+#define FIFFV_COIL_NM_122                       2       /**< Neuromag 122 coils. */
+#define FIFFV_COIL_NM_24                        3       /**< Old 24 channel system in HUT. */
+#define FIFFV_COIL_NM_MCG_AXIAL                 4       /**< The axial devices in the HUCS MCG system. */
+#define FIFFV_COIL_EEG_BIPOLAR                  5       /**< Bipolar EEG lead. */
+#define FIFFV_COIL_DIPOLE                       200     /**< Time-varying dipole definition The coil info contains dipole location (r0) and direction (ex). */
+#define FIFFV_COIL_MCG_42                       1000    /**< For testing the MCG software. */
+#define FIFFV_COIL_POINT_MAGNETOMETER           2000    /**< Simple point magnetometer. */
+#define FIFFV_COIL_AXIAL_GRAD_5CM               2001    /**< Generic axial gradiometer. */
+#define FIFFV_COIL_VV_PLANAR_W                  3011    /**< VV prototype wirewound planar sensor. */
+#define FIFFV_COIL_VV_PLANAR_T1                 3012    /**< Vectorview SQ20483N planar gradiometer. */
+#define FIFFV_COIL_VV_PLANAR_T2                 3013    /**< Vectorview SQ20483N-A planar gradiometer. */
+#define FIFFV_COIL_VV_PLANAR_T3                 3014    /**< Vectorview SQ20950N planar gradiometer. */
+#define FIFFV_COIL_VV_MAG_W                     3021    /**< VV prototype wirewound magnetometer. */
+#define FIFFV_COIL_VV_MAG_T1                    3022    /**< Vectorview SQ20483N magnetometer. */
+#define FIFFV_COIL_VV_MAG_T2                    3023    /**< Vectorview SQ20483-A magnetometer. */
+#define FIFFV_COIL_VV_MAG_T3                    3024    /**< Vectorview SQ20950N magnetometer. */
+#define FIFFV_COIL_MAGNES_MAG                   4001    /**< Magnes WH magnetometer. */
+#define FIFFV_COIL_MAGNES_GRAD                  4002    /**< Magnes WH gradiometer . */
+#define FIFFV_COIL_CTF_GRAD                     5001    /**< CTF axial gradiometer. */
+#define FIFFV_COIL_CTF_REF_MAG                  5002    /**< CTF reference magnetometer. */
+#define FIFFV_COIL_CTF_REF_GRAD                 5003    /**< CTF reference gradiometer. */
+#define FIFFV_COIL_CTF_REF_GOFF                 5004    /**< CTF offdiagonal reference gradiometer. */
+#define FIFFV_COIL_KIT_GRAD                     6001    /**< KIT MIT gradiometer. */
+#define FIFFV_COIL_KIT_REF_GRAD                 6002    /**< KIT MIT reference magnetometer. */
+#define FIFFV_COIL_BABY_GRAD                    7001    /**< BabySQUID gradiometers. */
+#define FIFFV_COIL_BABY_MAG                     7002    /**< BabyMEG inner layer magnetometers. */
+#define FIFFV_COIL_BABY_REF_MAG                 7003    /**< BabyMEG outer layer magnetometers. */
+#define FIFFV_COIL_BABY_REF_MAG2                7004    /**< BabyMEG reference magnetometer. */
+#define FIFFV_COIL_ARTEMIS123_GRAD              7501    /**< Artemis123 gradiometer. */
+#define FIFFV_COIL_ARTEMIS123_REF_MAG           7502    /**< Artemis123 reference magnetometer. */
+#define FIFFV_COIL_ARTEMIS123_REF_GRAD          7503    /**< Artemis123 reference gradiometer. */
+#define FIFFV_COIL_QUSPIN_ZFOPM_MAG             8001    /**< QuSpin ZFOPM magnetometer. */
+#define FIFFV_COIL_KRISS_GRAD                   9001    /**< KRISS gradiometer. */
+#define FIFFV_COIL_COMPUMEDICS_ADULT_GRAD       9101    /**< Compumedics adult gradiometer. */
+#define FIFFV_COIL_COMPUMEDICS_PEDIATRIC_GRAD   9102    /**< Compumedics pediatric gradiometer. */
 
 #define FIFFM_IS_VV_COIL(c) ((c)/1000 == 3)
 
@@ -250,9 +250,9 @@ namespace FIFFLIB
 #define FIFFV_LAYER_SKULL   3
 #define FIFFV_LAYER_HEAD    4
 
-#define FIFFV_XFIT_MAP_SURF_SENSORS 0  /**< Xfit contours on the sensor array */
-#define FIFFV_XFIT_MAP_SURF_HEAD    1  /**< Xfit contours on a head surface */
-#define FIFFV_XFIT_MAP_SURF_SPHERE  2  /**< Xfit contours on a spherical surface */
+#define FIFFV_XFIT_MAP_SURF_SENSORS 0  /**< Xfit contours on the sensor array. */
+#define FIFFV_XFIT_MAP_SURF_HEAD    1  /**< Xfit contours on a head surface. */
+#define FIFFV_XFIT_MAP_SURF_SPHERE  2  /**< Xfit contours on a spherical surface. */
 
 /*
  * Pointers
@@ -267,7 +267,7 @@ namespace FIFFLIB
 #define FIFFV_EL_CH      2
 #define FIFFV_MEG_CH     FIFFV_MAGN_CH
 #define FIFFV_MCG_CH     201
-#define FIFFV_REF_MEG_CH 301    /**< CTF coil and channel type */
+#define FIFFV_REF_MEG_CH 301    /**< CTF coil and channel type. */
 #define FIFFV_EEG_CH     FIFFV_EL_CH
 #define FIFFV_STIM_CH      3
 
@@ -425,13 +425,13 @@ namespace FIFFLIB
 /*
  * 3700... Real-Time Communication
  */
-#define FIFF_MNE_RT_COMMAND         3700              /**< Fiff Real-Time Command */
-#define FIFF_MNE_RT_CLIENT_ID       3701              /**< Fiff Real-Time mne_t_server client id */
+#define FIFF_MNE_RT_COMMAND         3700              /**< Fiff Real-Time Command. */
+#define FIFF_MNE_RT_CLIENT_ID       3701              /**< Fiff Real-Time mne_t_server client id. */
 
 /*
  * 3710... Real-Time Blocks
  */
-#define FIFFB_MNE_RT_MEAS_INFO      3710              /**< Fiff Real-Time Measurement Info */
+#define FIFFB_MNE_RT_MEAS_INFO      3710              /**< Fiff Real-Time Measurement Info. */
 
 /*
  * Fiff values associated with MNE computations

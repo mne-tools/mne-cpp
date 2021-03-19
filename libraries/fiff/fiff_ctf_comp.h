@@ -104,7 +104,7 @@ public:
 
 public:
     fiff_int_t ctfkind;             /**< CTF kind. */
-    fiff_int_t kind;                /**< Fiff kind -> fiff_constants.h */
+    fiff_int_t kind;                /**< Fiff kind -> fiff_constants.h. */
     bool save_calibrated;           /**< If data should be safed calibrated. */
     Eigen::MatrixXd rowcals;        /**< Row calibrations. */
     Eigen::MatrixXd colcals;        /**< Colum calibrations. */

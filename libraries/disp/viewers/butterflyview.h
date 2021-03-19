@@ -306,24 +306,24 @@ protected:
      */
     void createPlotPath(qint32 row, QPainter& painter) const;
 
-    bool        m_bShowMAG;                     /**< Show Magnetometers channels */
-    bool        m_bShowGRAD;                    /**< Show Gradiometers channels */
-    bool        m_bShowEEG;                     /**< Show EEG channels */
-    bool        m_bShowEOG;                     /**< Show EEG channels */
-    bool        m_bShowMISC;                    /**< Show Miscellaneous channels */
-    bool        m_bIsInit;                      /**< Whether this class has been initialized */
+    bool        m_bShowMAG;                     /**< Show Magnetometers channels. */
+    bool        m_bShowGRAD;                    /**< Show Gradiometers channels. */
+    bool        m_bShowEEG;                     /**< Show EEG channels. */
+    bool        m_bShowEOG;                     /**< Show EEG channels. */
+    bool        m_bShowMISC;                    /**< Show Miscellaneous channels. */
+    bool        m_bIsInit;                      /**< Whether this class has been initialized. */
 
     QString     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
-    QColor      m_colCurrentBackgroundColor;    /**< The current background color */
+    QColor      m_colCurrentBackgroundColor;    /**< The current background color. */
 
-    QList<int>  m_lSelectedChannels;            /**< The currently selected channels */
+    QList<int>  m_lSelectedChannels;            /**< The currently selected channels. */
 
     QMap<QString, bool>                     m_modalityMap;                  /**< Map of different modalities. */
     QMap<qint32,float>                      m_scaleMap;                     /**< Map with all channel types and their current scaling value.*/
 
-    QSharedPointer<EvokedSetModel>          m_pEvokedSetModel;              /**< The evoked model */
-    QSharedPointer<ChannelInfoModel>        m_pChannelInfoModel;            /**< The channel info model */
+    QSharedPointer<EvokedSetModel>          m_pEvokedSetModel;              /**< The evoked model. */
+    QSharedPointer<ChannelInfoModel>        m_pChannelInfoModel;            /**< The channel info model. */
 
     QSharedPointer<QMap<QString, bool> >    m_qMapAverageActivation;        /**< Average activation status. */
     QSharedPointer<QMap<QString, QColor> >  m_qMapAverageColor;             /**< Average colors. */

@@ -127,17 +127,17 @@ class FiffDirNode;
 //
 //   The magic hexadecimal values
 //
-#define IS_MATRIX               0xFFFF0000          /**< Is Matrix encoding. ffff0000 */
-#define MATRIX_CODING_DENSE     0x00004000          /**< MATRIX_CODING_DENSE encoding. 4000 */
-#define MATRIX_CODING_CCS       0x00004010          /**< MATRIX_CODING_CCS encoding. 4010 */
-#define MATRIX_CODING_RCS       0x00004020          /**< MATRIX_CODING_RCS encoding. 4020 */
-#define DATA_TYPE               0x0000FFFF          /**< DATA_TYPE encoding 0000ffff */
+#define IS_MATRIX               0xFFFF0000          /**< Is Matrix encoding. ffff0000. */
+#define MATRIX_CODING_DENSE     0x00004000          /**< MATRIX_CODING_DENSE encoding. 4000. */
+#define MATRIX_CODING_CCS       0x00004010          /**< MATRIX_CODING_CCS encoding. 4010. */
+#define MATRIX_CODING_RCS       0x00004020          /**< MATRIX_CODING_RCS encoding. 4020. */
+#define DATA_TYPE               0x0000FFFF          /**< DATA_TYPE encoding 0000ffff. */
 
-//const fiff_int_t IS_MATRIX           = 4294901760; /**< Is Matrix encoding. ffff0000 */
-//const fiff_int_t MATRIX_CODING_DENSE = 16384;       /**< MATRIX_CODING_DENSE encoding. 4000 */
-//const fiff_int_t MATRIX_CODING_CCS   = 16400;       /**< MATRIX_CODING_CCS encoding. 4010 */
-//const fiff_int_t MATRIX_CODING_RCS   = 16416;       /**< MATRIX_CODING_RCS encoding. 4020 */
-//const fiff_int_t DATA_TYPE           = 65535;       /**< DATA_TYPE encoding. ffff */
+//const fiff_int_t IS_MATRIX           = 4294901760; /**< Is Matrix encoding. ffff0000. */
+//const fiff_int_t MATRIX_CODING_DENSE = 16384;       /**< MATRIX_CODING_DENSE encoding. 4000. */
+//const fiff_int_t MATRIX_CODING_CCS   = 16400;       /**< MATRIX_CODING_CCS encoding. 4010. */
+//const fiff_int_t MATRIX_CODING_RCS   = 16416;       /**< MATRIX_CODING_RCS encoding. 4020. */
+//const fiff_int_t DATA_TYPE           = 65535;       /**< DATA_TYPE encoding. ffff. */
 
 //=============================================================================================================
 /**
@@ -529,7 +529,7 @@ private:
 //                 *   Negative at the end of file */
 //    fiff_data_t *data;		/**< Pointer to the data.
 //                 *   This point to the data read or to be written. */
-//} *fiffTag,fiffTagRec;   /**< FIFF data tag */
+//} *fiffTag,fiffTagRec;   /**< FIFF data tag. */
 };
 
 //=============================================================================================================

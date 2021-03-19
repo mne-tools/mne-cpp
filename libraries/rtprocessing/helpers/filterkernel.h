@@ -119,8 +119,8 @@ public:
         return (in1.getName() == in2.getName());
     }
 protected:
-    QString m_sName;            /**< Item name */
-    QString m_sDescription;     /**< Item description */
+    QString m_sName;            /**< Item name. */
+    QString m_sDescription;     /**< Item description. */
 };
 
 //=============================================================================================================
@@ -237,8 +237,8 @@ public:
 
     QString getShortDescription() const;
 
-    static QVector<FilterParameter> m_designMethods;  /**< Vector of possible filter design methods */
-    static QVector<FilterParameter> m_filterTypes;    /**< Vector of possible filter design types */
+    static QVector<FilterParameter> m_designMethods;  /**< Vector of possible filter design methods. */
+    static QVector<FilterParameter> m_filterTypes;    /**< Vector of possible filter design types. */
 
 private:
     //=========================================================================================================

@@ -186,8 +186,8 @@ public:
                      bool proj = true);
 
 public:
-    FiffInfo             info;   /**< FIFF measurement information */
-    QList<FiffEvoked>    evoked; /**< List of Fiff Evoked Data */
+    FiffInfo             info;   /**< FIFF measurement information. */
+    QList<FiffEvoked>    evoked; /**< List of Fiff Evoked Data. */
 };
 } // NAMESPACE
 

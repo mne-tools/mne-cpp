@@ -182,7 +182,7 @@ public:
     inline bool isInitialized() const;
 
 private:
-    mutable QMutex          m_qMutex;                                       /**< Mutex to ensure thread safety */
+    mutable QMutex          m_qMutex;                                       /**< Mutex to ensure thread safety. */
     bool                    m_bInitialized;                                 /**< If values are stored.*/
     bool                    m_bClustered;                                   /**< If fwd is clustered.*/
 

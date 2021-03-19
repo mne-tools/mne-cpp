@@ -131,14 +131,14 @@ public:
 
     //=========================================================================================================
 
-    FIFFLIB::fiff_int_t id; /**< Surface number */
-    FIFFLIB::fiff_float_t sigma; /**< Conductivity of a compartment */
-    FIFFLIB::fiff_int_t np; /**< Number of nodes */
-    FIFFLIB::fiff_int_t ntri; /**< Number of triangles */
-    FIFFLIB::fiff_int_t coord_frame; /**< The coordinate frame of the mode */
-    PointsT rr; /**< Points for each node */
-    NormalsT nn; /**< Normals for each node */
-    TrianglesT tris; /**< Triangulation information */
+    FIFFLIB::fiff_int_t id; /**< Surface number. */
+    FIFFLIB::fiff_float_t sigma; /**< Conductivity of a compartment. */
+    FIFFLIB::fiff_int_t np; /**< Number of nodes. */
+    FIFFLIB::fiff_int_t ntri; /**< Number of triangles. */
+    FIFFLIB::fiff_int_t coord_frame; /**< The coordinate frame of the mode. */
+    PointsT rr; /**< Points for each node. */
+    NormalsT nn; /**< Normals for each node. */
+    TrianglesT tris; /**< Triangulation information. */
 
 private:
     /**

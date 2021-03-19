@@ -169,7 +169,7 @@ private:
      */
     void triggerLoadingEnd(const QString& sMessage);
 
-    QSharedPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
+    QSharedPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals. */
 
 signals:
     void newAnnotationAvailable(int iAnnotation);

@@ -248,9 +248,9 @@ public: //Public because it's a mne struct
     float linefreq;                 /**< Power line frequency. */
     float highpass;                 /**< Highpass frequency. */
     float lowpass;                  /**< Lowpass frequency. */
-    int proj_id;                    /**< Project ID */
-    QString proj_name;              /**< Project name */
-    QString xplotter_layout;        /**< xplotter layout tag */
+    int proj_id;                    /**< Project ID. */
+    QString proj_name;              /**< Project name. */
+    QString xplotter_layout;        /**< xplotter layout tag. */
     QString experimenter;           /**< Experimenter name. */
     QString description;            /**< (Textual) Description of an object.*/
     QString utc_offset;             /**< UTC offset of related meas_date (sHH:MM).*/

@@ -176,12 +176,12 @@ private:
     void update();
 
 private:
-    QString                 m_sTitle;           /**< Title */
-    QString                 m_sXLabel;          /**< X axes label */
-    QString                 m_sYLabel;          /**< Y axes label */
+    QString                 m_sTitle;           /**< Title. */
+    QString                 m_sXLabel;          /**< X axes label. */
+    QString                 m_sYLabel;          /**< Y axes label. */
 
-    QtCharts::QLineSeries*  m_pLineSeries;      /**< Line series */
-    QtCharts::QChart*       m_pChart;           /**< The chart */
+    QtCharts::QLineSeries*  m_pLineSeries;      /**< Line series. */
+    QtCharts::QChart*       m_pChart;           /**< The chart. */
 };
 
 //=============================================================================================================

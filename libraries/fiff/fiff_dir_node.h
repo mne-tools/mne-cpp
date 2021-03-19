@@ -243,17 +243,17 @@ public:
     fiff_int_t nchild() const;
 
 public:
-    fiff_int_t                  type;       /**< Block type for this directory */
-    FiffId                      id;         /**< Id of this block if any */
-    QList<FiffDirEntry::SPtr>   dir;        /**< Directory of tags in this node */
-//    fiff_int_t                  nent;       /**< Number of entries in this node */
+    fiff_int_t                  type;       /**< Block type for this directory. */
+    FiffId                      id;         /**< Id of this block if any. */
+    QList<FiffDirEntry::SPtr>   dir;        /**< Directory of tags in this node. */
+//    fiff_int_t                  nent;       /**< Number of entries in this node. */
     QList<FiffDirEntry::SPtr>   dir_tree;   /**< Directory of tags within this node subtrees
                                                  as well as FIFF_BLOCK_START and FIFF_BLOCK_END */
-    fiff_int_t                  nent_tree;  /**< Number of entries in the directory tree node */
-    FiffDirNode::SPtr           parent;     /**< Parent node */
-    FiffId                      parent_id;  /**< Newly added to stay consistent with MATLAB implementation */
-    QList<FiffDirNode::SPtr>    children;   /**< Child nodes */
-//    fiff_int_t                  nchild;     /**< Number of child nodes */ -> use nchild() instead
+    fiff_int_t                  nent_tree;  /**< Number of entries in the directory tree node. */
+    FiffDirNode::SPtr           parent;     /**< Parent node. */
+    FiffId                      parent_id;  /**< Newly added to stay consistent with MATLAB implementation. */
+    QList<FiffDirNode::SPtr>    children;   /**< Child nodes. */
+//    fiff_int_t                  nchild;     /**< Number of child nodes. */ -> use nchild() instead
 
     // typedef struct _fiffDirNode {
     //  int                 type;    /**< Block type for this directory *

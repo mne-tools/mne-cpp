@@ -289,16 +289,16 @@ private:
      */
     void triggerLoadingEnd(QString sMessage);
 
-    QList<QSharedPointer<ANSHAREDLIB::AbstractModel>>       m_ModelList;            /**< List of models used in dipole fitting. Usded for storing for later selection */
-    INVERSELIB::DipoleFitSettings                           m_DipoleSettings;       /**< Settings for dipole fit */
-    QString                                                 m_sFitName;             /**< Fit name for dipole fit */
+    QList<QSharedPointer<ANSHAREDLIB::AbstractModel>>       m_ModelList;            /**< List of models used in dipole fitting. Usded for storing for later selection. */
+    INVERSELIB::DipoleFitSettings                           m_DipoleSettings;       /**< Settings for dipole fit. */
+    QString                                                 m_sFitName;             /**< Fit name for dipole fit. */
 
-    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;               /**< Communicator for sending events */
+    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;               /**< Communicator for sending events. */
 
-    QMutex                                                  m_FitMutex;             /**< Mutex for thread-safing */
+    QMutex                                                  m_FitMutex;             /**< Mutex for thread-safing. */
 
-    QFutureWatcher<INVERSELIB::ECDSet>                      m_FutureWatcher;        /**< Future watcher for notifing of completed fit calculations */
-    QFuture<INVERSELIB::ECDSet>                             m_Future;               /**< Future for performing fit calculations of separate thread */
+    QFutureWatcher<INVERSELIB::ECDSet>                      m_FutureWatcher;        /**< Future watcher for notifing of completed fit calculations. */
+    QFuture<INVERSELIB::ECDSet>                             m_Future;               /**< Future for performing fit calculations of separate thread. */
 
 
 signals:

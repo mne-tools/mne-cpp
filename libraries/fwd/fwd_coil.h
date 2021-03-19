@@ -164,22 +164,22 @@ public:
     bool is_eeg_electrode() const;
 
 public:
-    QString chname;         /**< Name of this channel */
-    int     coord_frame;    /**< Which coordinate frame are we in? */
-    QString desc;           /**< Description for this type of a coil */
-    int     coil_class;     /**< Coil class */
-    int     type;           /**< Coil type */
-    int     accuracy;       /**< Accuracy */
-    float   size;           /**< Coil size */
-    float   base;           /**< Baseline */
-    float   r0[3];          /**< Coil coordinate system origin */
-    float   ex[3];          /**< Coil coordinate system unit vectors */
-    float   ey[3];          /**< This stupid construction needs to be replaced with */
-    float   ez[3];          /**< a coordinate transformation */
-    int     np;             /**< Number of integration points */
-    float   **rmag;         /**< The field point locations */
-    float   **cosmag;       /**< The corresponding direction cosines */
-    float   *w;             /**< The weighting coefficients */
+    QString chname;         /**< Name of this channel. */
+    int     coord_frame;    /**< Which coordinate frame are we in?. */
+    QString desc;           /**< Description for this type of a coil. */
+    int     coil_class;     /**< Coil class. */
+    int     type;           /**< Coil type. */
+    int     accuracy;       /**< Accuracy. */
+    float   size;           /**< Coil size. */
+    float   base;           /**< Baseline. */
+    float   r0[3];          /**< Coil coordinate system origin. */
+    float   ex[3];          /**< Coil coordinate system unit vectors. */
+    float   ey[3];          /**< This stupid construction needs to be replaced with. */
+    float   ez[3];          /**< a coordinate transformation. */
+    int     np;             /**< Number of integration points. */
+    float   **rmag;         /**< The field point locations. */
+    float   **cosmag;       /**< The corresponding direction cosines. */
+    float   *w;             /**< The weighting coefficients. */
 
 // ### OLD STRUCT ###
 //    typedef struct {

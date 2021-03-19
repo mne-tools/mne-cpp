@@ -139,7 +139,7 @@ public:
                                      Eigen::VectorXi& vecExponentValues);
 
 private:
-    QPointer<QtCharts::QChart>             m_pChart;    /**< QChart object that will be shown in the widget */
+    QPointer<QtCharts::QChart>             m_pChart;    /**< QChart object that will be shown in the widget. */
     QPointer<QtCharts::QBarCategoryAxis>   m_pAxis;     /**< Customized axis for bar histogram*/
 };
 

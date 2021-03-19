@@ -139,16 +139,16 @@ public:
     void print(FILE *f) const;
 
 public:
-    int   job;          /**< Value of FIFF_SSS_JOB tag */
-    int   coord_frame;  /**< Coordinate frame */
-    float origin[3];    /**< The expansion origin */
-    int   nchan;        /**< How many channels */
-    int   out_order;    /**< Order of the outside expansion */
-    int   in_order;     /**< Order of the inside expansion */
-    int*  comp_info;     /**< Which components are included */
-    int   ncomp;        /**< How many entries in the above */
-    int   in_nuse;      /**< How many components included in the inside expansion */
-    int   out_nuse;     /**< How many components included in the outside expansion */
+    int   job;          /**< Value of FIFF_SSS_JOB tag. */
+    int   coord_frame;  /**< Coordinate frame. */
+    float origin[3];    /**< The expansion origin. */
+    int   nchan;        /**< How many channels. */
+    int   out_order;    /**< Order of the outside expansion. */
+    int   in_order;     /**< Order of the inside expansion. */
+    int*  comp_info;     /**< Which components are included. */
+    int   ncomp;        /**< How many entries in the above. */
+    int   in_nuse;      /**< How many components included in the inside expansion. */
+    int   out_nuse;     /**< How many components included in the outside expansion. */
 
 // ### OLD STRUCT ###
 //typedef struct {

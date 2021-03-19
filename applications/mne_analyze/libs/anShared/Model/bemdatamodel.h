@@ -156,11 +156,11 @@ private:
      */
     void initBemData(QIODevice& p_IODevice);
 
-    QFile                   m_file;                 /**< The IO file */
+    QFile                   m_file;                 /**< The IO file. */
     QByteArray              m_byteLoadedData;
     QBuffer                 m_buffer;
 
-    MNELIB::MNEBem::SPtr    m_pBem;                 /**< Data */
+    MNELIB::MNEBem::SPtr    m_pBem;                 /**< Data. */
 
 signals:
     //=========================================================================================================
