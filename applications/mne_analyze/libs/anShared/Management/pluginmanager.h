@@ -83,7 +83,7 @@ public:
     /**
      * Constructs a PluginManager with the given parent.
      *
-     * @param[in] parent pointer to parent Object. (It's normally the default value.)
+     * @param[in] parent pointer to parent Object. (It's normally the default value.).
      */
     PluginManager(QObject* parent = nullptr);
 
@@ -105,7 +105,7 @@ public:
     /**
      * Initializes the plugins.
      *
-     * @param[in] data          the global mne analyze data
+     * @param[in] data          the global mne analyze data.
      */
     void initPlugins(QSharedPointer<AnalyzeData> data);
 

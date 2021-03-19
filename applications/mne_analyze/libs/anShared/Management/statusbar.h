@@ -107,7 +107,7 @@ public:
     /**
      * Sets a new timeout for messages in milliseconds.
      *
-     * @param[in] iTimeout       New timeout
+     * @param[in] iTimeout       New timeout.
      */
     void setMsgTimeout(int iTimeout);
 
@@ -124,7 +124,7 @@ private:
     /**
      * Receives event when status bar is hovered over, shows hover widget if there are background processes
      *
-     * @param[in] event    event of type QHoverEvent that holds mouse position
+     * @param[in] event    event of type QHoverEvent that holds mouse position.
      */
     void enterEvent(QEvent* event);
 
@@ -132,7 +132,7 @@ private:
     /**
      * Receives event when status bar is no longer hovered over, hides hover widget
      *
-     * @param[in] event    event of type QHoverEvent that holds mouse position
+     * @param[in] event    event of type QHoverEvent that holds mouse position.
      */
     void leaveEvent(QEvent* event);
 

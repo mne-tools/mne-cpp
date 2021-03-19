@@ -178,7 +178,7 @@ public:
     /**
      * Slot to update the fiff evoked
      *
-     * @param[in] pMeasurement   The evoked to be appended
+     * @param[in] pMeasurement   The evoked to be appended.
      */
     void updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement);
 
@@ -186,7 +186,7 @@ public:
     /**
      * Slot to update the inverse operator
      *
-     * @param[in] invOp    The inverse operator to update
+     * @param[in] invOp    The inverse operator to update.
      */
     void updateInvOp(const MNELIB::MNEInverseOperator& invOp);
 

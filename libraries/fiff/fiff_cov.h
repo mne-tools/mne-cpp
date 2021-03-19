@@ -99,7 +99,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffCov   Covariance data matrix which should be copied
+     * @param[in] p_FiffCov   Covariance data matrix which should be copied.
      */
     FiffCov(const FiffCov &p_FiffCov);
 
@@ -119,7 +119,7 @@ public:
     /**
      * True if FIFF covariance is empty.
      *
-     * @return true if FIFF covariance is empty
+     * @return true if FIFF covariance is empty.
      */
     inline bool isEmpty() const;
 
@@ -129,8 +129,8 @@ public:
      *
      * Pick channels from covariance matrix
      *
-     * @param[in] p_include  List of channels to include (if empty, include all available). (optional)
-     * @param[in] p_exclude  Channels to exclude (if empty, do not exclude any). (optional)
+     * @param[in] p_include  List of channels to include (if empty, include all available). (optional).
+     * @param[in] p_exclude  Channels to exclude (if empty, do not exclude any). (optional).
      *
      * @return Covariance solution restricted to selected channels.
      */
@@ -140,10 +140,10 @@ public:
     /**
      * Prepare noise covariance matrix. Before creating inverse operator.
      *
-     * @param[in] p_info     measurement info
-     * @param[in] p_chNames  Channels which should be taken into account
+     * @param[in] p_info     measurement info.
+     * @param[in] p_chNames  Channels which should be taken into account.
      *
-     * @return the prepared noise covariance matrix
+     * @return the prepared noise covariance matrix.
      */
     FiffCov prepare_noise_cov(const FiffInfo& p_info, const QStringList& p_chNames) const;
 
@@ -161,7 +161,7 @@ public:
      * @param[in] p_bProj     Apply or not projections to keep rank of data.
      * @param[in] p_exclude  List of channels to mark as bad. If None, bads channels are extracted from both info['bads'] and cov['bads'].
      *
-     * @return the regularized covariance matrix
+     * @return the regularized covariance matrix.
      */
     FiffCov regularize(const FiffInfo& p_info, double p_fMag = 0.1, double p_fGrad = 0.1, double p_fEeg = 0.1, bool p_bProj = true, QStringList p_exclude = defaultQStringList) const;
 
@@ -171,7 +171,7 @@ public:
      *
      * @param[in] rhs     FiffCov which should be assigned.
      *
-     * @return the copied covariance matrix
+     * @return the copied covariance matrix.
      */
     FiffCov& operator= (const FiffCov &rhs);
 
@@ -182,7 +182,7 @@ public:
      * @param[in] out           The stream to which the fiff covariance should be assigned to.
      * @param[in] p_FiffCov     FiffCov which should be assigned to the stream.
      *
-     * @return the stream with the attached fiff covariance matrix
+     * @return the stream with the attached fiff covariance matrix.
      */
     friend std::ostream& operator<<(std::ostream& out, const FIFFLIB::FiffCov &p_FiffCov);
 

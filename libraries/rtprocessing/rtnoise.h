@@ -87,9 +87,9 @@ public:
     /**
      * Creates the real-time covariance estimation object.
      *
-     * @param[in] p_iMaxSamples      Number of samples to use for each data chunk
-     * @param[in] p_pFiffInfo        Associated Fiff Information
-     * @param[in] parent     Parent QObject (optional)
+     * @param[in] p_iMaxSamples      Number of samples to use for each data chunk.
+     * @param[in] p_pFiffInfo        Associated Fiff Information.
+     * @param[in] parent     Parent QObject (optional).
      */
     explicit RtNoise(qint32 p_iMaxSamples,
                      FIFFLIB::FiffInfo::SPtr p_pFiffInfo,
@@ -106,7 +106,7 @@ public:
     /**
      * Slot to receive incoming data.
      *
-     * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer
+     * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer.
      */
     void append(const Eigen::MatrixXd &p_DataSegment);
 
@@ -114,7 +114,7 @@ public:
     /**
      * Returns true if is running, otherwise false.
      *
-     * @return true if is running, false otherwise
+     * @return true if is running, false otherwise.
      */
     inline bool isRunning();
 
@@ -122,7 +122,7 @@ public:
     /**
      * Starts the RtNoise by starting the producer's thread.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     virtual bool start();
 
@@ -130,7 +130,7 @@ public:
     /**
      * Stops the RtNoise by stopping the producer's thread.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     virtual bool stop();
 
@@ -178,7 +178,7 @@ signals:
     /**
      * Signal which is emitted when a new data Matrix is estimated.
      *
-     * @param[out]
+     * @param[out].
      */
     void SpecCalculated(Eigen::MatrixXd);
 };

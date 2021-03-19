@@ -182,7 +182,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_MNEInverseOperator   MNE forward solution
+     * @param[in] p_MNEInverseOperator   MNE forward solution.
      */
     MNEInverseOperator(const MNEInverseOperator &p_MNEInverseOperator);
 
@@ -201,13 +201,13 @@ public:
      * eigenleads
      *
      * @param[in] label          labels.
-     * @param[in] method         The applied normals. ("MNE" | "dSPM" | "sLORETA")
+     * @param[in] method         The applied normals. ("MNE" | "dSPM" | "sLORETA").
      * @param[in] pick_normal    Pick normals.
      * @param[out] K             Kernel.
      * @param[out] noise_norm    Noise normals.
      * @param[out] vertno        Vertices of the hemispheres.
      *
-     * @return the assembled kernel
+     * @return the assembled kernel.
      */
     bool assemble_kernel(const FSLIB::Label &label,
                          QString method,
@@ -220,9 +220,9 @@ public:
     /**
      * Check that channels in inverse operator are measurements.
      *
-     * @param[in] info   The measurement info
+     * @param[in] info   The measurement info.
      *
-     * @return true when successful, false otherwise
+     * @return true when successful, false otherwise.
      */
     bool check_ch_names(const FIFFLIB::FiffInfo &info) const;
 
@@ -230,12 +230,12 @@ public:
     /**
      * Clusters the current kernel
      *
-     * @param[in]   p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere
-     * @param[in]   p_iClusterSize      Maximal cluster size per roi
-     * @param[out]   p_D                 The cluster operator
-     * @param[in]   p_sMethod           "cityblock" or "sqeuclidean"
+     * @param[in]   p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere.
+     * @param[in]   p_iClusterSize      Maximal cluster size per roi.
+     * @param[out]   p_D                 The cluster operator.
+     * @param[in]   p_sMethod           "cityblock" or "sqeuclidean".
      *
-     * @return the clustered kernel
+     * @return the clustered kernel.
      */
     Eigen::MatrixXd cluster_kernel(const FSLIB::AnnotationSet &p_AnnotationSet,
                                    qint32 p_iClusterSize,
@@ -246,7 +246,7 @@ public:
     /**
      * Returns the current kernel
      *
-     * @return the current kernel
+     * @return the current kernel.
      */
     inline Eigen::MatrixXd& getKernel();
 
@@ -254,7 +254,7 @@ public:
     /**
      * Returns the current kernel
      *
-     * @return the current kernel
+     * @return the current kernel.
      */
     inline Eigen::MatrixXd getKernel() const;
 
@@ -262,7 +262,7 @@ public:
     /**
      * Has inverse operator fixed orientation?
      *
-     * @return true if inverse operator has fixed orientation, false otherwise
+     * @return true if inverse operator has fixed orientation, false otherwise.
      */
     inline bool isFixedOrient() const;
 
@@ -278,7 +278,7 @@ public:
      * @param[in] fixed              Use fixed source orientations normal to the cortical mantle. If True, the loose parameter is ignored.
      * @param[in] limit_depth_chs    If True, use only grad channels in depth weighting (equivalent to MNE C code). If grad chanels aren't present, only mag channels will be used (if no mag, then eeg). If False, use all channels.
      *
-     * @return the assembled inverse operator
+     * @return the assembled inverse operator.
      */
     static MNEInverseOperator make_inverse_operator(const FIFFLIB::FiffInfo &info,
                                                     MNEForwardSolution forward,
@@ -296,12 +296,12 @@ public:
      *
      * Prepare for actually computing the inverse
      *
-     * @param[in] nave      Number of averages (scales the noise covariance)
-     * @param[in] lambda2   The regularization factor
-     * @param[in] dSPM      Compute the noise-normalization factors for dSPM?
-     * @param[in] sLORETA   Compute the noise-normalization factors for sLORETA?
+     * @param[in] nave      Number of averages (scales the noise covariance).
+     * @param[in] lambda2   The regularization factor.
+     * @param[in] dSPM      Compute the noise-normalization factors for dSPM?.
+     * @param[in] sLORETA   Compute the noise-normalization factors for sLORETA?.
      *
-     * @return the prepared inverse operator
+     * @return the prepared inverse operator.
      */
     MNEInverseOperator prepare_inverse_operator(qint32 nave,
                                                 float lambda2,
@@ -316,10 +316,10 @@ public:
      *
      * Reads the inverse operator decomposition from a fif file
      *
-     * @param[in] p_IODevice   A fiff IO device like a fiff QFile or QTCPSocket
-     * @param[in, out] inv          The read inverse operator
+     * @param[in] p_IODevice   A fiff IO device like a fiff QFile or QTCPSocket.
+     * @param[in, out] inv          The read inverse operator.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static bool read_inverse_operator(QIODevice &p_IODevice, MNEInverseOperator& inv);
 
@@ -348,7 +348,7 @@ public:
      * @param[in] out                    The stream to which the fiff covariance should be assigned to.
      * @param[in] p_MNEInverseOperator   MNEInverseOperator which should be assigned to the stream.
      *
-     * @return the stream with the attached fiff covariance matrix
+     * @return the stream with the attached fiff covariance matrix.
      */
     friend std::ostream& operator<<(std::ostream& out, const MNELIB::MNEInverseOperator &p_MNEInverseOperator);
 

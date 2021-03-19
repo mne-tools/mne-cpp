@@ -357,10 +357,10 @@ public:
      * Returns a Jet RGB to a given double value [0,1] and a colormap specified by sMap.
      * If no matching colormap was found return Jet.
      *
-     * @param[in] v      the double which has to be part of the intervall [0,1]
-     * @param[in] sMap   the colormap to choose
+     * @param[in] v      the double which has to be part of the intervall [0,1].
+     * @param[in] sMap   the colormap to choose.
      *
-     * @return the corresponding RGB value
+     * @return the corresponding RGB value.
      */
     static inline QRgb valueToColor(double v, const QString& sMap);
 
@@ -368,9 +368,9 @@ public:
     /**
      * Returns a Jet RGB to a given double value [0,1]
      *
-     * @param[in] v      the double which has to be part of the intervall [0,1]
+     * @param[in] v      the double which has to be part of the intervall [0,1].
      *
-     * @return the corresponding Jet RGB
+     * @return the corresponding Jet RGB.
      */
     static inline QRgb valueToJet(double v);
 
@@ -378,9 +378,9 @@ public:
     /**
      * Returns a Hot RGB to a given double value [0,1]
      *
-     * @param[in] v      the double which has to be part of the intervall [0,1]
+     * @param[in] v      the double which has to be part of the intervall [0,1].
      *
-     * @return the corresponding Hot RGB
+     * @return the corresponding Hot RGB.
      */
     static inline QRgb valueToHot(double v);
 
@@ -388,9 +388,9 @@ public:
     /**
      * Returns a negative skewed hot RGB to a given double value [0,1]
      *
-     * @param[in] v      the double which has to be part of the intervall [0,1]
+     * @param[in] v      the double which has to be part of the intervall [0,1].
      *
-     * @return the corresponding negative skewed Hot RGB
+     * @return the corresponding negative skewed Hot RGB.
      */
     static inline QRgb valueToHotNegative1(double v);
 
@@ -398,9 +398,9 @@ public:
     /**
      * Returns a negative skewed hot RGB to a given double value [0,1]
      *
-     * @param[in] v      the double which has to be part of the intervall [0,1]
+     * @param[in] v      the double which has to be part of the intervall [0,1].
      *
-     * @return the corresponding negative skewed Hot RGB
+     * @return the corresponding negative skewed Hot RGB.
      */
     static inline QRgb valueToHotNegative2(double v);
 
@@ -408,9 +408,9 @@ public:
     /**
      * Returns a Bone RGB to a given double value [0,1]
      *
-     * @param[in] v      the double which has to be part of the intervall [0,1]
+     * @param[in] v      the double which has to be part of the intervall [0,1].
      *
-     * @return the corresponding Bone RGB
+     * @return the corresponding Bone RGB.
      */
     static inline QRgb valueToBone(double v);
 
@@ -418,9 +418,9 @@ public:
     /**
      * Returns a RedBlue RGB to a given double value [-1,1]
      *
-     * @param[in] v      the double which has to be part of the intervall [-1,1]
+     * @param[in] v      the double which has to be part of the intervall [-1,1].
      *
-     * @return the corresponding Bone RGB
+     * @return the corresponding Bone RGB.
      */
     static inline QRgb valueToRedBlue(double v);
 
@@ -428,9 +428,9 @@ public:
     /**
      * Returns a Cool RGB to a given double value [-1,1]
      *
-     * @param[in] v      the double which has to be part of the intervall [-1,1]
+     * @param[in] v      the double which has to be part of the intervall [-1,1].
      *
-     * @return the corresponding Cool RGB
+     * @return the corresponding Cool RGB.
      */
     static inline QRgb valueToCool(double v);
 
@@ -438,9 +438,9 @@ public:
     /**
      * Returns a Viridis RGB to a given double value [-1,1]
      *
-     * @param[in] v      the double which has to be part of the intervall [-1,1]
+     * @param[in] v      the double which has to be part of the intervall [-1,1].
      *
-     * @return the corresponding Cool RGB
+     * @return the corresponding Cool RGB.
      */
     static QRgb valueToViridis(double v);
 
@@ -448,9 +448,9 @@ public:
     /**
      * Returns a negated Viridis RGB to a given double value [-1,1]
      *
-     * @param[in] v      the double which has to be part of the intervall [-1,1]
+     * @param[in] v      the double which has to be part of the intervall [-1,1].
      *
-     * @return the corresponding Cool RGB
+     * @return the corresponding Cool RGB.
      */
     static QRgb valueToViridisNegated(double v);
 
@@ -459,11 +459,11 @@ protected:
     /**
      * Describes a linear function (y = mx + n) and returns the output value y
      *
-     * @param[in] x  input value
-     * @param[in] m  slope
-     * @param[in] n  offset
+     * @param[in] x  input value.
+     * @param[in] m  slope.
+     * @param[in] n  offset.
      *
-     * @return the output value
+     * @return the output value.
      */
     static double linearSlope(double x, double m, double n);
 
@@ -471,9 +471,9 @@ protected:
     /**
      * Describes the red Jet fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int jetR(double v);
 
@@ -481,9 +481,9 @@ protected:
     /**
      * Describes the green Jet fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int jetG(double v);
 
@@ -491,9 +491,9 @@ protected:
     /**
      * Describes the blue Jet fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int jetB(double v);
 
@@ -501,9 +501,9 @@ protected:
     /**
      * Describes the red Hot fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int hotR(double v);
 
@@ -511,9 +511,9 @@ protected:
     /**
      * Describes the green Hot fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int hotG(double v);
 
@@ -521,9 +521,9 @@ protected:
     /**
      * Describes the blue Hot fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int hotB(double v);
 
@@ -531,9 +531,9 @@ protected:
     /**
      * Describes the red Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int hotRNeg1(double v);
 
@@ -541,9 +541,9 @@ protected:
     /**
      * Describes the green Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int hotGNeg1(double v);
 
@@ -551,9 +551,9 @@ protected:
     /**
      * Describes the blue Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int hotBNeg1(double v);
 
@@ -561,9 +561,9 @@ protected:
     /**
      * Describes the red Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int hotRNeg2(double v);
 
@@ -571,9 +571,9 @@ protected:
     /**
      * Describes the green Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int hotGNeg2(double v);
 
@@ -581,9 +581,9 @@ protected:
     /**
      * Describes the blue Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int hotBNeg2(double v);
 
@@ -591,9 +591,9 @@ protected:
     /**
      * Describes the red Bone fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int boneR(double v);
 
@@ -601,9 +601,9 @@ protected:
     /**
      * Describes the green Bone fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int boneG(double v);
 
@@ -611,9 +611,9 @@ protected:
     /**
      * Describes the blue Bone fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int boneB(double v);
 
@@ -621,9 +621,9 @@ protected:
     /**
      * Describes the red RedBlue fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int rbR(double v);
 
@@ -631,9 +631,9 @@ protected:
     /**
      * Describes the green RedBlue fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int rbG(double v);
 
@@ -641,9 +641,9 @@ protected:
     /**
      * Describes the blue RedBlue fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int rbB(double v);
 
@@ -651,9 +651,9 @@ protected:
     /**
      * Describes the red Cool fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int coolR(double v);
 
@@ -661,9 +661,9 @@ protected:
     /**
      * Describes the green Cool fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int coolG(double v);
 
@@ -671,9 +671,9 @@ protected:
     /**
      * Describes the blue Cool fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
      *
-     * @param[in] v  input value [0,1]
+     * @param[in] v  input value [0,1].
      *
-     * @return the output color value [0.255]
+     * @return the output color value [0.255].
      */
     static int coolB(double v);
 

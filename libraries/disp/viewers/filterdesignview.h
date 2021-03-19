@@ -114,7 +114,7 @@ public:
     /**
      * Sets the max number of allowed filter taps.
      *
-     * @param[in] iMaxNumberFilterTaps  number of max allowed filter taps
+     * @param[in] iMaxNumberFilterTaps  number of max allowed filter taps.
      */
     void setMaxAllowedFilterTaps(int iMaxNumberFilterTaps);
 
@@ -130,7 +130,7 @@ public:
     /**
      * Sets the new samplingRate.
      *
-     * @param[in] dSamplingRate the new sampling rate
+     * @param[in] dSamplingRate the new sampling rate.
      */
     void setSamplingRate(double dSamplingRate);
 
@@ -138,7 +138,7 @@ public:
     /**
      * Sets filter 'From' value
      *
-     * @param[in] dFrom    set filter 'From' value
+     * @param[in] dFrom    set filter 'From' value.
      */
     void setFrom(double dFrom);
 
@@ -146,7 +146,7 @@ public:
     /**
      * Sets filter 'To' value
      *
-     * @param[in] dTo      set filter 'To' value
+     * @param[in] dTo      set filter 'To' value.
      */
     void setTo(double dTo);
 
@@ -154,7 +154,7 @@ public:
     /**
      * Get filter 'From' value
      *
-     * @return filter 'From' value
+     * @return filter 'From' value.
      */
     double getFrom();
 
@@ -162,7 +162,7 @@ public:
     /**
      * Get filter 'To' value
      *
-     * @return filter 'To' value
+     * @return filter 'To' value.
      */
     double getTo();
 
@@ -170,7 +170,7 @@ public:
     /**
      * Returns the current filter.
      *
-     * @return returns the current filter
+     * @return returns the current filter.
      */
     RTPROCESSINGLIB::FilterKernel getCurrentFilter();
 
@@ -278,7 +278,7 @@ protected:
     /**
      * This function gets called whenever the combo box is altered by the user via the gui.
      *
-     * @param[in] currentIndex holds the current index of the combo box
+     * @param[in] currentIndex holds the current index of the combo box.
      */
     void changeStateSpinBoxes(int currentIndex);
 
@@ -292,7 +292,7 @@ protected:
     /**
      * This function applies the user defined filter to all channels.
      *
-     * @param[in] channelType holds the current text of the connected spin box
+     * @param[in] channelType holds the current text of the connected spin box.
      */
     void onSpinBoxFilterChannelType(const QString &channelType);
 
@@ -318,7 +318,7 @@ protected:
     /**
      * Update Gui and filter based on an input filter parameters
      *
-     * @param[in] filter   filter which parameters will be used to update gui and stored filter
+     * @param[in] filter   filter which parameters will be used to update gui and stored filter.
      */
     void updateGuiFromFilter(const RTPROCESSINGLIB::FilterKernel& filter);
 
@@ -354,7 +354,7 @@ signals:
     /**
      * Update to simple filter control 'From'
      *
-     * @param[in] dFrom     change in filter 'From' value
+     * @param[in] dFrom     change in filter 'From' value.
      */
     void updateFilterFrom(double dFrom);
 
@@ -362,7 +362,7 @@ signals:
     /**
      * Update to simple filter control 'To'
      *
-     * @param[in] dTo       change in filter 'To' value
+     * @param[in] dTo       change in filter 'To' value.
      */
     void updateFilterTo(double dTo);
 };

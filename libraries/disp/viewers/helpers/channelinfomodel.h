@@ -149,7 +149,7 @@ public:
     /**
      * Updates the layout map
      *
-     * @return the current mapped channel list
+     * @return the current mapped channel list.
      */
     const QStringList & getMappedChannelsList();
 
@@ -158,7 +158,7 @@ public:
      * Returns the model index for the given input channel fro mthe original channel list
      *
      * @param[in] chName the channel name for which the model index is needed.
-     * @return the index number. if channel was not found in the data this functions returns -1
+     * @return the index number. if channel was not found in the data this functions returns -1.
      */
     int getIndexFromOrigChName(QString chName);
 
@@ -167,7 +167,7 @@ public:
      * Returns the model index for the given input channel fro mthe mapped channel list
      *
      * @param[in] chName the channel name for which the model index is needed.
-     * @return the index number. if channel was not found in the data this functions returns -1
+     * @return the index number. if channel was not found in the data this functions returns -1.
      */
     int getIndexFromMappedChName(QString chName);
 

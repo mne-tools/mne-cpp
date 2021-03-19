@@ -88,7 +88,7 @@ public:
      * Copies a FiffSparseMatrix
      * Refactored: mne_dup_sparse_matrix (mne_sparse_matop.c)
      *
-     * @param[in] mat     The Sparse Matrix which should be copied
+     * @param[in] mat     The Sparse Matrix which should be copied.
      */
     FiffSparseMatrix(const FiffSparseMatrix& mat);
 

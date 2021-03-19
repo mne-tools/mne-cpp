@@ -92,11 +92,11 @@ public:
      *
      * @param[in] p_IODevice     IO device to read from the evoked data set.
      * @param[in] setno          The set to pick. Dataset ID number (int) or comment/name (str). Optional if there isonly one data set in file.
-     * @param[in] t_baseline     The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b)
+     * @param[in] t_baseline     The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b).
      *                           the interval is between "a (s)" and "b (s)". If a is None the beginning of the data is used and if b is
      *                           None then b is set to the end of the interval. If baseline is equal ot (None, None) all the time interval is used.
      *                           If None, no correction is applied.
-     * @param[in] proj           Apply SSP projection vectors (optional, default = true)
+     * @param[in] proj           Apply SSP projection vectors (optional, default = true).
      * @param[in] p_aspect_kind  Either "FIFFV_ASPECT_AVERAGE" or "FIFFV_ASPECT_STD_ERR". The type of data to read. Only used if "setno" is a str.
      */
     FiffEvoked(QIODevice& p_IODevice,
@@ -109,7 +109,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffEvoked    Fiff evoked data which should be copied
+     * @param[in] p_FiffEvoked    Fiff evoked data which should be copied.
      */
     FiffEvoked(const FiffEvoked& p_FiffEvoked);
 
@@ -136,7 +136,7 @@ public:
      * Provides the python Evoked string formatted aspect_kind, which is stored in kind:
      * "average" <-> FIFFV_ASPECT_AVERAGE, "standard_error" <-> FIFFV_ASPECT_STD_ERR or "unknown"
      *
-     * @return string formatted aspect_kind
+     * @return string formatted aspect_kind.
      */
     inline QString aspectKindToString() const;
 
@@ -144,7 +144,7 @@ public:
     /**
      * Returns whether FiffEvoked is empty.
      *
-     * @return true if is empty, false otherwise
+     * @return true if is empty, false otherwise.
      */
     inline bool isEmpty();
 
@@ -156,10 +156,10 @@ public:
      *
      * Pick desired channels from evoked-response data
      *
-     * @param[in] include   - Channels to include (if empty, include all available)
-     * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
+     * @param[in] include   - Channels to include (if empty, include all available).
+     * @param[in] exclude   - Channels to exclude (if empty, do not exclude any).
      *
-     * @return the desired fiff evoked data
+     * @return the desired fiff evoked data.
      */
     FiffEvoked pick_channels(const QStringList& include = defaultQStringList,
                              const QStringList& exclude = defaultQStringList) const;
@@ -174,17 +174,17 @@ public:
      *
      * Read one evoked data set
      *
-     * @param[in] p_IODevice     An fiff IO device like a fiff QFile or QTCPSocket
-     * @param[out] p_FiffEvoked  The read evoked data
+     * @param[in] p_IODevice     An fiff IO device like a fiff QFile or QTCPSocket.
+     * @param[out] p_FiffEvoked  The read evoked data.
      * @param[in] setno          the set to pick. Dataset ID number (int) or comment/name (str). Optional if there isonly one data set in file.
-     * @param[in] t_baseline       The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b)
+     * @param[in] t_baseline       The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b).
      *                           the interval is between "a (s)" and "b (s)". If a is None the beginning of the data is used and if b is
      *                           None then b is set to the end of the interval. If baseline is equal ot (None, None) all the time interval is used.
      *                           If None, no correction is applied.
-     * @param[in] proj           Apply SSP projection vectors (optional, default = true)
+     * @param[in] proj           Apply SSP projection vectors (optional, default = true).
      * @param[in] p_aspect_kind  Either "FIFFV_ASPECT_AVERAGE" or "FIFFV_ASPECT_STD_ERR". The type of data to read. Only used if "setno" is a str.
      *
-     * @return true if successful, false otherwise
+     * @return true if successful, false otherwise.
      */
     static bool read(QIODevice& p_IODevice,
                      FiffEvoked& p_FiffEvoked,
@@ -196,8 +196,8 @@ public:
     /**
      * Set a new fiff measurement info
      *
-     * @param[in] p_info     Info to set
-     * @param[in] proj       Apply SSP projection vectors (optional, default = true)
+     * @param[in] p_info     Info to set.
+     * @param[in] proj       Apply SSP projection vectors (optional, default = true).
      */
     void setInfo(const FiffInfo &p_info,
                  bool proj = true);
@@ -206,9 +206,9 @@ public:
     /**
      * Inputs a new data set and recalculates the average. This function also iterates the nave parameter by one.
      *
-     * @param[in] newData     the new data set which is to be added to the current average
+     * @param[in] newData     the new data set which is to be added to the current average.
      *
-     * @return the updated FiffEvoked
+     * @return the updated FiffEvoked.
      */
     FiffEvoked & operator+=(const Eigen::MatrixXd &newData);
 
@@ -216,7 +216,7 @@ public:
     /**
      * Applies baseline correction to the evoked data.
      *
-     * @param[in] p_baseline     time definition of the baseline in seconds [from, to]
+     * @param[in] p_baseline     time definition of the baseline in seconds [from, to].
      */
     void applyBaselineCorrection(QPair<float,float>& p_baseline);
 

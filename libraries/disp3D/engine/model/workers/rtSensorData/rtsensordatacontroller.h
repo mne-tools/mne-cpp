@@ -316,7 +316,7 @@ signals:
     /**
      * Emit this signal whenever the surface color changed.
      *
-     * @param[in] matSurfaceVertColor      The vertex colors on which the streamed data should be plotted
+     * @param[in] matSurfaceVertColor      The vertex colors on which the streamed data should be plotted.
      */
     void surfaceColorChanged(const Eigen::MatrixX3f& matSurfaceVertColor);
 

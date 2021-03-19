@@ -96,7 +96,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffInfo  FIFF measurement information which should be copied
+     * @param[in] p_FiffInfo  FIFF measurement information which should be copied.
      */
     FiffInfo(const FiffInfo& p_FiffInfo);
 
@@ -120,12 +120,12 @@ public:
      *
      * Create a compensation matrix to bring the data from one compensation state to another
      *
-     * @param[in] from               compensation in the input data
-     * @param[in] to                 desired compensation in the output
-     * @param[out] ctf_comp          Compensation Matrix
-     * @param[in] exclude_comp_chs   exclude compensation channels from the output (optional)
+     * @param[in] from               compensation in the input data.
+     * @param[in] to                 desired compensation in the output.
+     * @param[out] ctf_comp          Compensation Matrix.
+     * @param[in] exclude_comp_chs   exclude compensation channels from the output (optional).
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     bool make_compensator(fiff_int_t from, fiff_int_t to, FiffCtfComp& ctf_comp, bool exclude_comp_chs = false) const;
 
@@ -137,7 +137,7 @@ public:
      *
      * Get the current compensation in effect in the data
      *
-     * @return the current compensation
+     * @return the current compensation.
      */
     qint32 get_current_comp();
 
@@ -149,9 +149,9 @@ public:
      *
      * Make a SSP operator using the meas info
      *
-     * @param[out] proj      The projection operator to apply to the data
+     * @param[out] proj      The projection operator to apply to the data.
      *
-     * @return nproj - How many items in the projector
+     * @return nproj - How many items in the projector.
      */
     inline qint32 make_projector(Eigen::MatrixXd& proj) const;
 
@@ -163,10 +163,10 @@ public:
      *
      * Make a SSP operator using the meas info
      *
-     * @param[out] proj      The projection operator to apply to the data
-     * @param[in] p_chNames   List of channels to include in the projection matrix
+     * @param[out] proj      The projection operator to apply to the data.
+     * @param[in] p_chNames   List of channels to include in the projection matrix.
      *
-     * @return nproj - How many items in the projector
+     * @return nproj - How many items in the projector.
      */
     inline qint32 make_projector(Eigen::MatrixXd& proj, const QStringList& p_chNames) const;
 
@@ -178,9 +178,9 @@ public:
      *
      * Pick desired channels from measurement info
      *
-     * @param[in] sel    List of channels to select
+     * @param[in] sel    List of channels to select.
      *
-     * @return Info modified according to sel
+     * @return Info modified according to sel.
      */
     FiffInfo pick_info(const Eigen::RowVectorXi &sel = defaultVectorXi) const;
 
@@ -188,7 +188,7 @@ public:
     /**
      * Set the current compensation value in the channel info structures
      *
-     * @param[in] value  compensation value
+     * @param[in] value  compensation value.
      */
     inline void set_current_comp(fiff_int_t value);
 
@@ -203,10 +203,10 @@ public:
      *
      * Set the current compensation value in the channel info structures
      *
-     * @param[in] chs    fiff channel info list
-     * @param[in] value  compensation value
+     * @param[in] chs    fiff channel info list.
+     * @param[in] value  compensation value.
      *
-     * @return the current compensation
+     * @return the current compensation.
      */
     static QList<FiffChInfo> set_current_comp(QList<FiffChInfo>& listFiffChInfo, fiff_int_t value);
 
@@ -234,10 +234,10 @@ private:
      *
      * Create a compensation matrix to bring the data from one compensation state to another
      *
-     * @param[in] kind               Compensation in the input data
-     * @param[out] comp              Compensation Matrix
+     * @param[in] kind               Compensation in the input data.
+     * @param[out] comp              Compensation Matrix.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     bool make_compensator(fiff_int_t kind, Eigen::MatrixXd& this_comp) const;
 

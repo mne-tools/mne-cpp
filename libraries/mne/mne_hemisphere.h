@@ -93,7 +93,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_MNEHemisphere    Hemisphere source space which should be copied
+     * @param[in] p_MNEHemisphere    Hemisphere source space which should be copied.
      */
     MNEHemisphere(const MNEHemisphere& p_MNEHemisphere);
 
@@ -107,9 +107,9 @@ public:
     /**
      * Add vertex normals and neighbourhood information
      *
-     * @param[in, out] p_pHemisphere   Hemisphere to be completed
+     * @param[in, out] p_pHemisphere   Hemisphere to be completed.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     bool add_geometry_info();
 
@@ -125,7 +125,7 @@ public:
      *
      * @param[in] p_fScaling  Scale factor of the returned geometry tri model.
      *
-     * @return the geometry model
+     * @return the geometry model.
      */
     Eigen::MatrixXf& getTriCoords(float p_fScaling = 1.0f);
 
@@ -146,10 +146,10 @@ public:
      * Definition of the mne_transform_source_space_to for a single hemisphere function
      * Transform source space data to the desired coordinate system.
      *
-     * @param[in] dest       The id of the destination coordinate system (FIFFV_COORD_...)
-     * @param[in] p_Trans    The coordinate transformation structure to use
+     * @param[in] dest       The id of the destination coordinate system (FIFFV_COORD_...).
+     * @param[in] p_Trans    The coordinate transformation structure to use.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     bool transform_hemisphere_to(FIFFLIB::fiff_int_t dest, const FIFFLIB::FiffCoordTrans &p_Trans);
 
@@ -172,7 +172,7 @@ public:
      *
      * @param[in] object    The object which should be compared to.
      *
-     * @return true if equal, false otherwise
+     * @return true if equal, false otherwise.
      */
     friend bool operator== (const MNEHemisphere &a, const MNEHemisphere &b);
 

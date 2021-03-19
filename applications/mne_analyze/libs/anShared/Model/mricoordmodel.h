@@ -108,7 +108,7 @@ public:
     /**
      * The type of this model (MriCoordModel)
      *
-     * @return The type of this model (MriCoordModel)
+     * @return The type of this model (MriCoordModel).
      */
     inline MODEL_TYPE getType() const override;
 

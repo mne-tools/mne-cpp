@@ -88,7 +88,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffInfoBase  light FIFF measurement information which should be copied
+     * @param[in] p_FiffInfoBase  light FIFF measurement information which should be copied.
      */
     FiffInfoBase(const FiffInfoBase& p_FiffInfoBase);
 
@@ -108,9 +108,9 @@ public:
     /**
      * Get channel type.
      *
-     * @param[in] idx    Index of channel
+     * @param[in] idx    Index of channel.
      *
-     * @return Type of channel ('grad', 'mag', 'eeg', 'stim', 'eog', 'emg', 'ecg')
+     * @return Type of channel ('grad', 'mag', 'eeg', 'stim', 'eog', 'emg', 'ecg').
      */
     QString channel_type(qint32 idx) const;
 
@@ -118,7 +118,7 @@ public:
     /**
      * True if FIFF measurement file information is empty.
      *
-     * @return true if FIFF measurement file information is empty
+     * @return true if FIFF measurement file information is empty.
      */
     inline bool isEmpty() const;
 
@@ -130,11 +130,11 @@ public:
      *
      * Make a selector to pick desired channels from data
      *
-     * @param[in] ch_names  - The channel name list to consult
-     * @param[in] include   - Channels to include (if empty, include all available)
-     * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
+     * @param[in] ch_names  - The channel name list to consult.
+     * @param[in] include   - Channels to include (if empty, include all available).
+     * @param[in] exclude   - Channels to exclude (if empty, do not exclude any).
      *
-     * @return the selector matrix (row Vector)
+     * @return the selector matrix (row Vector).
      */
     static Eigen::RowVectorXi pick_channels(const QStringList& ch_names,
                                             const QStringList& include = defaultQStringList,
@@ -148,9 +148,9 @@ public:
      *
      * Pick desired channels from measurement info
      *
-     * @param[in] sel    List of channels to select
+     * @param[in] sel    List of channels to select.
      *
-     * @return Info modified according to sel
+     * @return Info modified according to sel.
      */
     FiffInfoBase pick_info(const Eigen::RowVectorXi* sel = Q_NULLPTR) const;
 
@@ -163,12 +163,12 @@ public:
      * Create a selector to pick desired channel types from data
      *
      * @param[in] meg        It can be "all", to select all or it can be "mag" or "grad" to select only gradiometers or magnetometers.
-     * @param[in] eeg        Include EEG channels
-     * @param[in] stim       Include stimulus channels
-     * @param[in] include    Additional channels to include (if empty, do not add any)
-     * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
+     * @param[in] eeg        Include EEG channels.
+     * @param[in] stim       Include stimulus channels.
+     * @param[in] include    Additional channels to include (if empty, do not add any).
+     * @param[in] exclude    Channels to exclude (if empty, do not exclude any).
      *
-     * @return the selector matrix (row vector)
+     * @return the selector matrix (row vector).
      */
     Eigen::RowVectorXi pick_types(const QString meg,
                                   bool eeg = false,
@@ -185,13 +185,13 @@ public:
      * Create a selector to pick desired channel types from data
      * Use overloaded pick_types method to specify meg (grad, mag, ref_meg)type
      *
-     * @param[in] meg        Include MEG channels
-     * @param[in] eeg        Include EEG channels
-     * @param[in] stim       Include stimulus channels
-     * @param[in] include    Additional channels to include (if empty, do not add any)
-     * @param[in] exclude    Channels to exclude (if empty, do not exclude any)
+     * @param[in] meg        Include MEG channels.
+     * @param[in] eeg        Include EEG channels.
+     * @param[in] stim       Include stimulus channels.
+     * @param[in] include    Additional channels to include (if empty, do not add any).
+     * @param[in] exclude    Channels to exclude (if empty, do not exclude any).
      *
-     * @return the selector matrix (row vector)
+     * @return the selector matrix (row vector).
      */
     Eigen::RowVectorXi pick_types(bool meg,
                                   bool eeg = false,
@@ -204,14 +204,14 @@ public:
      *
      * @param[in] object    The object which should be compared to.
      *
-     * @return true if equal, false otherwise
+     * @return true if equal, false otherwise.
      */
     friend bool operator== (const FiffInfoBase &a, const FiffInfoBase &b);
 
     /**
      * Parses the channel info information and returns a string list of channel types.
      *
-     * @return The channel types present in this fiff info (grad,mag,eeg,ecg,emg,misc,stim)
+     * @return The channel types present in this fiff info (grad,mag,eeg,ecg,emg,misc,stim).
      */
     QStringList get_channel_types();
 

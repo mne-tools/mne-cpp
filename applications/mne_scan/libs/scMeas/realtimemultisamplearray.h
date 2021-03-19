@@ -107,7 +107,7 @@ public:
     /**
      * Init channel infos using fiff info
      *
-     * @param[in] pFiffInfo     Info to init from
+     * @param[in] pFiffInfo     Info to init from.
      */
     void initFromFiffInfo(FIFFLIB::FiffInfo::SPtr pFiffInfo);
 

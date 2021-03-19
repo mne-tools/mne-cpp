@@ -92,7 +92,7 @@ public:
     /**
      * Set current samples to gather until a new covariance is calculated.
      *
-     * @param[in] iSamples     new number samples
+     * @param[in] iSamples     new number samples.
      */
     void setCurrentSamples(int iSamples);
 
@@ -100,7 +100,7 @@ public:
     /**
      * Set minimum number of samples to gather until a new covariance is calculated.
      *
-     * @param[in] iSamples     new minimum number of samples
+     * @param[in] iSamples     new minimum number of samples.
      */
     void setMinSamples(int iSamples);
 

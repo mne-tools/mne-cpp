@@ -89,7 +89,7 @@ public:
     /**
      * Constructs a ConnectorManager with the given parent.
      *
-     * @param[in] parent pointer to parent Object. (It's normally the default value.)
+     * @param[in] parent pointer to parent Object. (It's normally the default value.).
      */
     ConnectorManager(FiffStreamServer* p_pFiffStreamServer, QObject* parent = 0);
 
@@ -139,7 +139,7 @@ public:
     /**
      * Prints a list of all connectors and their status
      *
-     * @param[in] p_bFlagJSON    if true, function return JSON formatted (default = false)
+     * @param[in] p_bFlagJSON    if true, function return JSON formatted (default = false).
      */
     QByteArray getConnectorList(bool p_bFlagJSON = false) const;
 

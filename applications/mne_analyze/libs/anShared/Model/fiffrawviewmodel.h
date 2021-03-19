@@ -155,7 +155,7 @@ public:
      *
      * @param[in] sPath   The path where the file should be saved to.
      *
-     * @returns      True if saving was successful
+     * @returns      True if saving was successful.
      */
     virtual bool saveToFile(const QString& sPath) override;
 
@@ -164,10 +164,10 @@ public:
      * Returns the data for the given role and section in the header with the specified orientation.
      *
      * @param[in] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
-     * @param[in] orientation    Qt::Horizontal or Qt::Vertical
-     * @param[in] role           role to show
+     * @param[in] orientation    Qt::Horizontal or Qt::Vertical.
+     * @param[in] role           role to show.
      *
-     * @return accessed eader data
+     * @return accessed eader data.
      */
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
@@ -228,7 +228,7 @@ public:
     /**
      * The type of this model (FiffRawViewModel)
      *
-     * @return The type of this model (FiffRawViewModel)
+     * @return The type of this model (FiffRawViewModel).
      */
     inline MODEL_TYPE getType() const override;
 
@@ -236,7 +236,7 @@ public:
     /**
      * Return the first sample of the currently loaded blocks
      *
-     * @return The first sample of the currently loaded blocks
+     * @return The first sample of the currently loaded blocks.
      */
     inline qint32 currentFirstSample() const;
 
@@ -244,7 +244,7 @@ public:
     /**
      * Return the first sample of the loaded Fiff file
      *
-     * @return The first sample of the loaded Fiff file
+     * @return The first sample of the loaded Fiff file.
      */
     inline qint32 absoluteFirstSample() const;
 
@@ -252,7 +252,7 @@ public:
     /**
      * Return the last sample of the currently loaded blocks (inclusive)
      *
-     * @return The last sample of the currently loaded blocks (inclusive)
+     * @return The last sample of the currently loaded blocks (inclusive).
      */
     inline qint32 currentLastSample() const;
 
@@ -260,7 +260,7 @@ public:
     /**
      * Returns the last sample of the loaded Fiff file
      *
-     * @return The last sample of the loaded Fiff file
+     * @return The last sample of the loaded Fiff file.
      */
     inline qint32 absoluteLastSample() const;
 
@@ -268,14 +268,14 @@ public:
     /**
      * Returns the the number of samples that can be loaded in the window.
      *
-     * @return The the number of samples that can be loaded in the window
+     * @return The the number of samples that can be loaded in the window.
      */
     inline qint32 sampleWindowSize() const;
 
     //=========================================================================================================
     /**
      * Updates m_dDx based on new size parameters
-     * @param[in] iWidth    the width of the data column of the table view
+     * @param[in] iWidth    the width of the data column of the table view.
      */
     inline void setDataColumnWidth(int iWidth);
 
@@ -290,7 +290,7 @@ public:
     /**
      * Returns current scaling
      *
-     * @return the current scaling
+     * @return the current scaling.
      */
     inline const QMap< qint32,float >& getScaling() const;
 
@@ -298,7 +298,7 @@ public:
     /**
      * Returns the smapling frequency of the associated fiff file
      *
-     * @return sampling frequency
+     * @return sampling frequency.
      */
     inline float getSamplingFrequency() const;
 
@@ -306,7 +306,7 @@ public:
     /**
      * @brief getFiffInfo
      *
-     * @return Shared Pointer pointing to m_pFiffInfo
+     * @return Shared Pointer pointing to m_pFiffInfo.
      */
     QSharedPointer<FIFFLIB::FiffInfo> getFiffInfo() const;
 
@@ -314,9 +314,9 @@ public:
     /**
      * Returns the kind of channel at the given row index
      *
-     * @param[in] index     index of the row we are requesting the kind
+     * @param[in] index     index of the row we are requesting the kind.
      *
-     * @return the kind of channel the index row is
+     * @return the kind of channel the index row is.
      */
     qint32 getKind(qint32 index) const;
 
@@ -324,9 +324,9 @@ public:
     /**
      * Returns the unit of the channel at the given row index
      *
-     * @param[in] index     index of the row we are requesting the unit
+     * @param[in] index     index of the row we are requesting the unit.
      *
-     * @return the unit of the channel the index row is
+     * @return the unit of the channel the index row is.
      */
     qint32 getUnit(qint32 index) const;
 
@@ -334,7 +334,7 @@ public:
     /**
      * Set scaling channel scaling
      *
-     * @param[in] p_qMapChScaling    Map of scaling factors
+     * @param[in] p_qMapChScaling    Map of scaling factors.
      */
     void setScaling(const QMap< qint32,float >& p_qMapChScaling);
 
@@ -342,7 +342,7 @@ public:
     /**
      * Set the background color
      *
-     * @param[in] color    The background color
+     * @param[in] color    The background color.
      */
     void setBackgroundColor(const QColor& color);
 
@@ -350,9 +350,9 @@ public:
     /**
      * Adjusts size of viewable window and data withing it
      *
-     * @param[in] iNumSeconds   How many seconds of data to be displayed
-     * @param[in] iColWidth         How wide the data column should be
-     * @param[in] iScrollPos        Where in the data scrollable area should go to after resizing
+     * @param[in] iNumSeconds   How many seconds of data to be displayed.
+     * @param[in] iColWidth         How wide the data column should be.
+     * @param[in] iScrollPos        Where in the data scrollable area should go to after resizing.
      */
     void setWindowSize(int iNumSeconds,
                        int iColWidth,
@@ -362,7 +362,7 @@ public:
     /**
      * distanceTimeSpacerChanged changes the distance of the time spacers
      *
-     * @param[in] iNewValue Value the new distance for the time spacers
+     * @param[in] iNewValue Value the new distance for the time spacers.
      */
     void distanceTimeSpacerChanged(int iNewValue);
 
@@ -370,7 +370,7 @@ public:
     /**
      * Returns the number of time spacers per second based on the current time spacer spacing
      *
-     * @return the current number of time spacers per second
+     * @return the current number of time spacers per second.
      */
     float getNumberOfTimeSpacers() const;
 
@@ -378,7 +378,7 @@ public:
     /**
      * Returns the number of vertical lines (one per second)
      *
-     * @return number of vertical lines
+     * @return number of vertical lines.
      */
     inline qint32 numVLines() const;
 
@@ -386,7 +386,7 @@ public:
     /**
      * Returns whether there is currently data stored in the model
      *
-     * @return Returns false if model is empty
+     * @return Returns false if model is empty.
      */
     inline bool isEmpty() const;
 
@@ -394,9 +394,9 @@ public:
     /**
      * Get sample annotation at iIndex
      *
-     * @param[in] index     Index of sample data we want to retreive
+     * @param[in] index     Index of sample data we want to retreive.
      *
-     * @return sample number at iIndex
+     * @return sample number at iIndex.
      */
     int getTimeMarks(int iIndex) const;
 
@@ -404,7 +404,7 @@ public:
     /**
      * Get how many annotations we have
      *
-     * @return number of saved annotations
+     * @return number of saved annotations.
      */
     int getTimeListSize() const;
 
@@ -412,7 +412,7 @@ public:
     /**
      * Get where in the viewer we are scrolling
      *
-     * @return position of scrolling inthe viewer
+     * @return position of scrolling inthe viewer.
      */
     int getSampleScrollPos() const;
 
@@ -420,7 +420,7 @@ public:
     /**
      * Get how many blocks total we have (preloaded and visible)
      *
-     * @return number of blocks
+     * @return number of blocks.
      */
     int getTotalBlockCount() const;
 
@@ -428,7 +428,7 @@ public:
     /**
      * Toggle whether to dipslay annotations
      *
-     * @param[in] iToggleDisp   0 for no, 1+ for yes
+     * @param[in] iToggleDisp   0 for no, 1+ for yes.
      */
     void toggleDispAnnotation(int iToggleDisp);
 
@@ -436,7 +436,7 @@ public:
     /**
      * Returns wheter annotations hould be displayed
      *
-     * @return m_bDispAnn
+     * @return m_bDispAnn.
      */
     bool shouldDisplayAnnotation() const;
 
@@ -444,7 +444,7 @@ public:
     /**
      * Returns shared pointer to associated Annotation model for the FiffRawView model
      *
-     * @return shared pointer to the annotation model
+     * @return shared pointer to the annotation model.
      */
     QSharedPointer<AnnotationModel> getAnnotationModel() const;
 
@@ -452,7 +452,7 @@ public:
     /**
      * Set new filter parameters
      *
-     * @param[in] filterData    list of the new filter
+     * @param[in] filterData    list of the new filter.
      */
     void setFilter(const RTPROCESSINGLIB::FilterKernel& filterData);
 
@@ -468,7 +468,7 @@ public:
     /**
      * Set filter activation
      *
-     * @param[in] bState    filter on/off flag
+     * @param[in] bState    filter on/off flag.
      */
     void setFilterActive(bool bState);
 
@@ -476,7 +476,7 @@ public:
     /**
      * Sets the type of channel which are to be filtered
      *
-     * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
+     * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All).
      */
     void setFilterChannelType(const QString &channelType);
 
@@ -492,7 +492,7 @@ public:
     /**
      * Returns the member FiffIO, containing a list of FiffRawData and FiffEvoked
      *
-     * @return m_pFiffIO, member varaible saving the FiffRawData and FiffEvoked parameters
+     * @return m_pFiffIO, member varaible saving the FiffRawData and FiffEvoked parameters.
      */
     QSharedPointer<FIFFLIB::FiffIO> getFiffIO() const;
 
@@ -508,7 +508,7 @@ public:
     /**
      * Returns whether the model has an associated AnnotationModel
      *
-     * @return true if there is an AnnotationModel, false if not
+     * @return true if there is an AnnotationModel, false if not.
      */
     bool hasSavedEvents();
 
@@ -516,7 +516,7 @@ public:
     /**
      * Sets the associated AnnotationModel to pModel
      *
-     * @param[in] pModel   associated annotation model
+     * @param[in] pModel   associated annotation model.
      */
     void setAnnotationModel(QSharedPointer<ANSHAREDLIB::AnnotationModel> pModel);
 
@@ -529,7 +529,7 @@ private:
      * @param[in]   bFilterEnd      Whether to perform the overlap add in the beginning or end of the data.
      * @param[in]   bKeepOverhead   Whether to keep the overhead.
      *
-     * @return Returns true if filtering was performed, otherwise returns false
+     * @return Returns true if filtering was performed, otherwise returns false.
      */
     bool filterDataBlock(MatrixXd& matData,
                          bool bFilterEnd,
@@ -554,7 +554,7 @@ private:
     /**
      * This is run concurrently
      *
-     * @param[in] iCursorRequested Cursor that points to the requested sample
+     * @param[in] iCursorRequested Cursor that points to the requested sample.
      */
     int loadEarlierBlocks(qint32 numBlocks);
 
@@ -562,7 +562,7 @@ private:
     /**
      * This is run concurrently
      *
-     * @param[in] iCursorRequested Cursor that points to the requested sample
+     * @param[in] iCursorRequested Cursor that points to the requested sample.
      */
     int loadLaterBlocks(qint32 numBlocks);
 
@@ -570,7 +570,7 @@ private:
     /**
      * This is run by the FutureWatcher when its finished
      *
-     * @param[in] result Code value for the result
+     * @param[in] result Code value for the result.
      */
     void postBlockLoad(int result);
 

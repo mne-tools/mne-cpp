@@ -128,9 +128,9 @@ public:
     /**
      * Creates the real-time inverse operator estimation object
      *
-     * @param[in] p_pFiffInfo    Fiff measurement info
-     * @param[in] p_pFwd         Forward solution
-     * @param[in] parent         Parent QObject (optional)
+     * @param[in] p_pFiffInfo    Fiff measurement info.
+     * @param[in] p_pFwd         Forward solution.
+     * @param[in] parent         Parent QObject (optional).
      */
     explicit RtInvOp(QSharedPointer<FIFFLIB::FiffInfo> &p_pFiffInfo,
                      QSharedPointer<MNELIB::MNEForwardSolution> &p_pFwd,
@@ -146,7 +146,7 @@ public:
     /**
      * Slot to receive incoming noise covariance estimations.
      *
-     * @param[in] noiseCov     Noise covariance estimation
+     * @param[in] noiseCov     Noise covariance estimation.
      */
     void append(const FIFFLIB::FiffCov &noiseCov);
 
@@ -154,7 +154,7 @@ public:
     /**
      * Slot to receive incoming forward solution.
      *
-     * @param[in] pFwd     Forward solution
+     * @param[in] pFwd     Forward solution.
      */
     void setFwdSolution(QSharedPointer<MNELIB::MNEForwardSolution> pFwd);
 
@@ -187,7 +187,7 @@ signals:
     /**
      * Signal which is emitted when a inverse operator is calculated.
      *
-     * @param[out] invOp  The inverse operator
+     * @param[out] invOp  The inverse operator.
      */
     void invOperatorCalculated(const MNELIB::MNEInverseOperator& invOp);
 

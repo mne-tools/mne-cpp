@@ -165,7 +165,7 @@ public:
     /**
      * Slot to update the fiff evoked
      *
-     * @param[in] pMeasurement   The evoked to be appended
+     * @param[in] pMeasurement   The evoked to be appended.
      */
     void updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement);
 
@@ -189,7 +189,7 @@ protected:
     /**
      * Slot called when a new real-time connectivity estimate is available.
      *
-     * @param[in] connectivityResult        The new connectivity estimate
+     * @param[in] connectivityResult        The new connectivity estimate.
      */
     void onNewConnectivityResultAvailable(const QList<CONNECTIVITYLIB::Network>& connectivityResults,
                                           const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
@@ -198,7 +198,7 @@ protected:
     /**
      * Slot called when the metric changed.
      *
-     * @param[in] sMetric        The new metric
+     * @param[in] sMetric        The new metric.
      */
     void onMetricChanged(const QString &sMetric);
 
@@ -214,7 +214,7 @@ protected:
     /**
      * Slot called when the window type changed.
      *
-     * @param[in] windowType        The new window type
+     * @param[in] windowType        The new window type.
      */
     void onWindowTypeChanged(const QString& windowType);
 

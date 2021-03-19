@@ -92,7 +92,7 @@ public:
      *
      * @param[in] parent      The parent of the QObject.
      * @param[in] slFlags    The flags indicating which tools to display. Scaling is displayed as default. Possible flags are: "Data", "View", "Light".
-     * @param[in] type
+     * @param[in] type.
      */
     explicit Control3DView(const QString& sSettingsPath = "",
                            QWidget* parent = 0,
@@ -195,7 +195,7 @@ protected:
     /**
      * @brief customContextMenuRequested
      *
-     * @param[in] pos    The position, where the right-click occurred
+     * @param[in] pos    The position, where the right-click occurred.
      */
     void onCustomContextMenuRequested(QPoint pos);
 

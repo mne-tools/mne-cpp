@@ -93,7 +93,7 @@ public:
     /**
      * Creates the real-time HPI worker object.
      *
-     * @param[in] pFiffInfo        Associated Fiff Information
+     * @param[in] pFiffInfo        Associated Fiff Information.
      */
     explicit RtHpiWorker(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
@@ -101,7 +101,7 @@ public:
     /**
      * Perform one single HPI fit.
      *
-     * @param[in] matData            Data to estimate the HPI positions from
+     * @param[in] matData            Data to estimate the HPI positions from.
      * @param[in] matProjectors      The projectors to apply. Bad channels are still included.
      * @param[in] vFreqs             The frequencies for each coil.
      * @param[in] pFiffInfo          Associated Fiff Information.
@@ -137,8 +137,8 @@ public:
     /**
      * Creates the real-time HPIS estimation object.
      *
-     * @param[in] p_pFiffInfo        Associated Fiff Information
-     * @param[in] parent     Parent QObject (optional)
+     * @param[in] p_pFiffInfo        Associated Fiff Information.
+     * @param[in] parent     Parent QObject (optional).
      */
     explicit RtHpi(QSharedPointer<FIFFLIB::FiffInfo> p_pFiffInfo,
                    QObject *parent = 0);
@@ -153,7 +153,7 @@ public:
     /**
      * Slot to receive incoming data.
      *
-     * @param[in] data  Data to estimate the HPI positions from
+     * @param[in] data  Data to estimate the HPI positions from.
      */
     void append(const Eigen::MatrixXd &data);
 

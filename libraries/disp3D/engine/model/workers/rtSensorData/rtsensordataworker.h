@@ -182,12 +182,12 @@ protected:
     /**
      * @brief normalizeAndTransformToColor  This method normalizes final values for all vertices of the mesh and converts them to rgb using the specified color converter
      *
-     * @param[in] vecData                       The final values for each vertex of the surface
-     * @param[in, out] matFinalVertColor         The color matrix which the results are to be written to
-     * @param[in] dThresholdX                   Lower threshold for normalizing
-     * @param[in] dThreholdZ                    Upper threshold for normalizing
-     * @param[in] functionHandlerColorMap       The pointer to the function which converts scalar values to rgb
-     * @param[in] sColorMap                     The color map to us
+     * @param[in] vecData                       The final values for each vertex of the surface.
+     * @param[in, out] matFinalVertColor         The color matrix which the results are to be written to.
+     * @param[in] dThresholdX                   Lower threshold for normalizing.
+     * @param[in] dThreholdZ                    Upper threshold for normalizing.
+     * @param[in] functionHandlerColorMap       The pointer to the function which converts scalar values to rgb.
+     * @param[in] sColorMap                     The color map to us.
      *
      */
     void normalizeAndTransformToColor(const Eigen::VectorXf& vecData,
@@ -201,9 +201,9 @@ protected:
     /**
      * @brief generateColorsFromSensorValues        Produces the final color matrix that is to be emitted
      *
-     * @param[in] vecSensorValues                   A vector of sensor signals
+     * @param[in] vecSensorValues                   A vector of sensor signals.
      *
-     * @return The final color values for the underlying mesh surface
+     * @return The final color values for the underlying mesh surface.
      */
     Eigen::MatrixX4f generateColorsFromSensorValues(const Eigen::VectorXd& vecSensorValues);
 

@@ -137,7 +137,7 @@ public:
     /**
      * Sets the color for each instance of the geometry.
      *
-     * @param[in] tInstanceColors           Color of the geometry;
+     * @param[in] tInstanceColors           Color of the geometry;.
      */
     void setColors(const QVector<QColor> &tInstanceColors);
 

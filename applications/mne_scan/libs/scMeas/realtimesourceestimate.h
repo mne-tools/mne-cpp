@@ -87,7 +87,7 @@ public:
     /**
      * Constructs a RealTimeSourceEstimate.
      *
-     * @param[in] parent     the QObject parent of this measurement
+     * @param[in] parent     the QObject parent of this measurement.
      */
     RealTimeSourceEstimate(QObject *parent = 0);
 
@@ -101,7 +101,7 @@ public:
     /**
      * Sets the annotation set.
      *
-     * @param[in] annotSet   the annotation set to set
+     * @param[in] annotSet   the annotation set to set.
      */
     inline void setAnnotSet(FSLIB::AnnotationSet::SPtr& annotSet);
 
@@ -109,7 +109,7 @@ public:
     /**
      * Returns the annotation set.
      *
-     * @return the annotation set
+     * @return the annotation set.
      */
     inline FSLIB::AnnotationSet::SPtr& getAnnotSet();
 
@@ -117,7 +117,7 @@ public:
     /**
      * Sets the surface set.
      *
-     * @param[in] surfSet   the surface set to set
+     * @param[in] surfSet   the surface set to set.
      */
     inline void setSurfSet(FSLIB::SurfaceSet::SPtr& surfSet);
 
@@ -125,7 +125,7 @@ public:
     /**
      * Returns the surface set.
      *
-     * @return the surface set
+     * @return the surface set.
      */
     inline FSLIB::SurfaceSet::SPtr& getSurfSet();
 
@@ -133,7 +133,7 @@ public:
     /**
      * Sets the mri head transformation.
      *
-     * @param[in] mriHeadTrans   The transformation to set
+     * @param[in] mriHeadTrans   The transformation to set.
      */
     inline void setMriHeadTrans(FIFFLIB::FiffCoordTrans& mriHeadTrans);
 
@@ -141,7 +141,7 @@ public:
     /**
      * Returns the mri head transformation.
      *
-     * @return the mri head transformation
+     * @return the mri head transformation.
      */
     inline FIFFLIB::FiffCoordTrans& getMriHeadTrans();
 
@@ -149,7 +149,7 @@ public:
     /**
      * Sets the forward solution.
      *
-     * @param[in] fwdSolution   the forward solution to set
+     * @param[in] fwdSolution   the forward solution to set.
      */
     inline void setFwdSolution(MNELIB::MNEForwardSolution::SPtr& fwdSolution);
 
@@ -157,7 +157,7 @@ public:
     /**
      * Returns the forward solution.
      *
-     * @return the forward solution
+     * @return the forward solution.
      */
     inline MNELIB::MNEForwardSolution::SPtr& getFwdSolution();
 

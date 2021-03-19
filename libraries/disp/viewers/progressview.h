@@ -65,8 +65,8 @@ public:
     /**
      * Creates an instance of a ProgressView object
      *
-     * @param[in] bHorizontalMessage   Whether message id beside(true) or under(false) the loading bar
-     * @param[in] sStyleSheet          Set the stylesheet of the QLabels that display the loading message
+     * @param[in] bHorizontalMessage   Whether message id beside(true) or under(false) the loading bar.
+     * @param[in] sStyleSheet          Set the stylesheet of the QLabels that display the loading message.
      */
     ProgressView(bool bHorizontalMessage = false,
                  const QString& sStyleSheet = "");
@@ -121,7 +121,7 @@ public:
     /**
      * Sets stylesheet parameters for the QLabels that display loading message
      *
-     * @param[in] styleSheet   string with parameters for the QLabels
+     * @param[in] styleSheet   string with parameters for the QLabels.
      */
     void setTextStyleSheet(const QString& styleSheet);
 
@@ -136,7 +136,7 @@ public slots:
     /**
      * Dsiplays a new message below/beside the loading bar
      *
-     * @param[in] sMessage     message to be displayed
+     * @param[in] sMessage     message to be displayed.
      */
     void setMessage(const QString& sMessage);
 
@@ -144,8 +144,8 @@ public slots:
     /**
      * Sets new completion percentage and updates message
      *
-     * @param[in] iPercentage      percentage to show on the loading bar
-     * @param[in] sMessage         message to be displayed
+     * @param[in] iPercentage      percentage to show on the loading bar.
+     * @param[in] sMessage         message to be displayed.
      */
     void updateProgress(int iPercentage,
                         const QString& sMessage = "");
@@ -154,7 +154,7 @@ public slots:
     /**
      * Sets whether loading bar is visible
      *
-     * @param[in] bVisible     whether the bar visible - True = visible, False = hidden
+     * @param[in] bVisible     whether the bar visible - True = visible, False = hidden.
      */
     void setLoadingBarVisible(bool bVisible);
 

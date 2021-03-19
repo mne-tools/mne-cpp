@@ -137,7 +137,7 @@ public:
     /**
      * Getter for the model type
      *
-     * @return The type of the respective subclasses
+     * @return The type of the respective subclasses.
      */
     virtual MODEL_TYPE getType() const = 0;
 
@@ -167,7 +167,7 @@ public:
      *
      * @param[in] sPath   The path where the file should be saved to.
      *
-     * @returns      True if saving was successful
+     * @returns      True if saving was successful.
      */
     virtual inline bool saveToFile(const QString& sPath);
 

@@ -91,7 +91,7 @@ public:
     /**
      * Constructs a ProjectorsView which is a child of parent.
      *
-     * @param[in] parent        parent of widget
+     * @param[in] parent        parent of widget.
      */
     ProjectorsView(const QString& sSettingsPath = "",
                    QWidget *parent = 0,

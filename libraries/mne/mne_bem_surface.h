@@ -92,7 +92,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_MNEBemSurface    BEM surface which should be copied
+     * @param[in] p_MNEBemSurface    BEM surface which should be copied.
      */
     MNEBemSurface(const MNEBemSurface& p_MNEBemSurface);
 
@@ -114,7 +114,7 @@ public:
      *
      * Completes triangulation info
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     bool addTriangleData();
 
@@ -122,7 +122,7 @@ public:
     /**
      * Add vertex normals and neighbourhood information
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     bool add_geometry_info();
 
@@ -132,7 +132,7 @@ public:
      *
      * Completes triangulation info
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     bool addVertexNormals();
 
@@ -148,7 +148,7 @@ public:
     /**
      * Map bem id integers to human-readable names
      *
-     * @param[in] frame  The bem id integer
+     * @param[in] frame  The bem id integer.
      *
      * @return Human readable form of the bem id.
      */

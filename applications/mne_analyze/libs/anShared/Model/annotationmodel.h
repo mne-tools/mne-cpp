@@ -106,7 +106,7 @@ public:
     /**
      * Constructs an annotation model
      *
-     * @param[in] parent   QObject parent of the model
+     * @param[in] parent   QObject parent of the model.
      */
     AnnotationModel(QObject* parent = Q_NULLPTR);
 
@@ -133,11 +133,11 @@ public:
     /**
      * Inserts span rows at position
      *
-     * @param[in] position     where to insert rows
-     * @param[in] span         how many rows to insert
-     * @param[in] parent       parent of inserted rows (unused)
+     * @param[in] position     where to insert rows.
+     * @param[in] span         how many rows to insert.
+     * @param[in] parent       parent of inserted rows (unused).
      *
-     * @return  returns true if successful
+     * @return  returns true if successful.
      */
     bool insertRows(int position,
                     int span,
@@ -147,11 +147,11 @@ public:
     /**
      * Removes span rows at position
      *
-     * @param[in] position     where to remove rows
-     * @param[in] span         how many rows to remove
-     * @param[in] parent       parent of inserted rows (unused)
+     * @param[in] position     where to remove rows.
+     * @param[in] span         how many rows to remove.
+     * @param[in] parent       parent of inserted rows (unused).
      *
-     * @return  returns true if successful
+     * @return  returns true if successful.
      */
     bool removeRows(int position,
                     int span,
@@ -188,10 +188,10 @@ public:
      * Returns the data for the given role and section in the header with the specified orientation.
      *
      * @param[in] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
-     * @param[in] orientation    Qt::Horizontal or Qt::Vertical
-     * @param[in] role           role to show
+     * @param[in] orientation    Qt::Horizontal or Qt::Vertical.
+     * @param[in] role           role to show.
      *
-     * @return accessed eader data
+     * @return accessed eader data.
      */
     QVariant headerData(int section,
                         Qt::Orientation orientation,
@@ -201,11 +201,11 @@ public:
     /**
      * Sets index to value based on role
      *
-     * @param[in] index    model index to which the data will be set
-     * @param[in] value    data to be set
-     * @param[in] role     Qt role
+     * @param[in] index    model index to which the data will be set.
+     * @param[in] value    data to be set.
+     * @param[in] role     Qt role.
      *
-     * @return returns true if successful
+     * @return returns true if successful.
      */
     bool setData(const QModelIndex & index,
                  const QVariant & value,
@@ -223,7 +223,7 @@ public:
     /**
      * Gets a list of event types currently held by the model
      *
-     * @return Returns a list of event types
+     * @return Returns a list of event types.
      */
     QStringList getEventTypeList() const;
 
@@ -231,7 +231,7 @@ public:
     /**
      * Sets saved sample, used to prepare sample to be added to model.
      *
-     * @param[in] iSamplePos   sample number to be set
+     * @param[in] iSamplePos   sample number to be set.
      */
     void setSamplePos(int iSamplePos);
 
@@ -239,7 +239,7 @@ public:
     /**
      * Sets current filter setting sto only display selected annotation type
      *
-     * @param[in] eventType    Type of annotation that is to be displayed when filterd
+     * @param[in] eventType    Type of annotation that is to be displayed when filterd.
      */
     void setEventFilterType(const QString eventType);
 
@@ -247,8 +247,8 @@ public:
     /**
      * Used to pass first and last sample parameters to the model
      *
-     * @param[in] firstSample  sample number of the first sample in the currently loaded fiff file
-     * @param[in] lastSample   sample number of the last sample in the currently loaded fiff file
+     * @param[in] firstSample  sample number of the first sample in the currently loaded fiff file.
+     * @param[in] lastSample   sample number of the last sample in the currently loaded fiff file.
      */
     void setFirstLastSample(int firstSample,
                             int lastSample);
@@ -257,7 +257,7 @@ public:
     /**
      * returns the first and last sample parameters currently stored in the model
      *
-     * @return Returns first and last sample parameters
+     * @return Returns first and last sample parameters.
      */
     QPair<int, int> getFirstLastSample() const;
 
@@ -265,7 +265,7 @@ public:
     /**
      * Returns frequency parameter stored in the model
      *
-     * @return frequency of the samples
+     * @return frequency of the samples.
      */
     float getSampleFreq() const;
 
@@ -273,7 +273,7 @@ public:
     /**
      * Sets the stored frequerncy parameter to the function input
      *
-     * @param[in] fFreq    frequency of the currently loaded fiff file
+     * @param[in] fFreq    frequency of the currently loaded fiff file.
      */
     void setSampleFreq(float fFreq);
 
@@ -281,7 +281,7 @@ public:
     /**
      * Return number of annotations to be displayed, based on current filter parameters
      *
-     * @return number on annotations to display
+     * @return number on annotations to display.
      */
     int getNumberOfAnnotations() const;
 
@@ -289,9 +289,9 @@ public:
     /**
      * Return annotation stored at index given by input parameter
      *
-     * @param[in] iIndex   Index of the annotation to be retreived
+     * @param[in] iIndex   Index of the annotation to be retreived.
      *
-     * @return Returns annotation at index given by input parameter
+     * @return Returns annotation at index given by input parameter.
      */
     int getAnnotation(int iIndex) const;
 
@@ -299,7 +299,7 @@ public:
     /**
      * Returns map of the colors assigned to each of the annotation types
      *
-     * @return Map of annotation colors
+     * @return Map of annotation colors.
      */
     QMap<int, QColor>& getTypeColors();
 
@@ -307,7 +307,7 @@ public:
     /**
      * Returns map of the colors assigned to each of the annotation groups
      *
-     * @return Map of annotation colors
+     * @return Map of annotation colors.
      */
     QMap<int, QColor>& getGroupColors();
 
@@ -315,8 +315,8 @@ public:
     /**
      * Adds a new annotation type with the input parameters as configuration parameters
      *
-     * @param[in] eventType    type number (0-99)
-     * @param[in] typeColor    color to be used for drawing
+     * @param[in] eventType    type number (0-99).
+     * @param[in] typeColor    color to be used for drawing.
      */
     void addNewAnnotationType(const QString &eventType,
                               const QColor &typeColor);
@@ -325,7 +325,7 @@ public:
     /**
      * Pass which annotations are currenlty selected in the view GUI
      *
-     * @param[in] iSelected    currently selected annotation
+     * @param[in] iSelected    currently selected annotation.
      */
     void setSelectedAnn(int iSelected);
 
@@ -333,7 +333,7 @@ public:
     /**
      * Returns currently selected annotation stored locally in the model
      *
-     * @return Returns stored selected annotation
+     * @return Returns stored selected annotation.
      */
     int getSelectedAnn();
 
@@ -341,7 +341,7 @@ public:
     /**
      * Sets whether only to show selected annotations
      *
-     * @param[in] iSelectedState   whether to show only selected. 0 - no, 2 - yes
+     * @param[in] iSelectedState   whether to show only selected. 0 - no, 2 - yes.
      */
     void setShowSelected(int iSelectedState);
 
@@ -349,7 +349,7 @@ public:
     /**
      * Returns whther to only show selected annotations
      *
-     * @return whther to show selected annotations
+     * @return whther to show selected annotations.
      */
     int getShowSelected();
 
@@ -357,7 +357,7 @@ public:
     /**
      * Returns sample freqency
      *
-     * @return sample frequency
+     * @return sample frequency.
      */
     float getFreq();
 
@@ -367,7 +367,7 @@ public:
      *
      * @param[in] sPath   The path where the file should be saved to.
      *
-     * @returns      True if saving was successful
+     * @returns      True if saving was successful.
      */
     virtual bool saveToFile(const QString& sPath) override;
 
@@ -375,7 +375,7 @@ public:
     /**
      * Saves last added type or last type to be filterd to
      *
-     * @param[in] iType    type to be saved
+     * @param[in] iType    type to be saved.
      */
     void setLastType(int iType);
 
@@ -383,8 +383,8 @@ public:
     /**
      * Updates the value of a sample for real time annotation scrolling
      *
-     * @param[in] iIndex   Index of sample to be changed
-     * @param[in] iSample  Sample value to be changed to
+     * @param[in] iIndex   Index of sample to be changed.
+     * @param[in] iSample  Sample value to be changed to.
      */
     void updateFilteredSample(int iIndex,
                               int iSample);
@@ -393,7 +393,7 @@ public:
     /**
      * Updates the value of the currently selected sample for real time annotation scrolling
      *
-     * @param[in] iSample  Sample value to be changed to
+     * @param[in] iSample  Sample value to be changed to.
      */
     void updateFilteredSample(int iSample);
 
@@ -407,7 +407,7 @@ public:
     /**
      * Adds new row to list of selected rows
      *
-     * @param[in] iSelectedIndex   row index to be added
+     * @param[in] iSelectedIndex   row index to be added.
      */
     void appendSelected(int iSelectedIndex);
 
@@ -415,7 +415,7 @@ public:
     /**
      * Returns formatted matrix with annotation data based on current display and type settings
      *
-     * @return Returns a matrix of formatted annotation data
+     * @return Returns a matrix of formatted annotation data.
      */
     MatrixXi getAnnotationMatrix(int iGroup = 9999);
 
@@ -423,11 +423,11 @@ public:
     /**
      * Creates a new event group with the passed parameters
      *
-     * @param[in] sGroupName        name of the group
-     * @param[in] bIsUserMade       whether the group is user made
-     * @param[in] iType             default group type when adding events
+     * @param[in] sGroupName        name of the group.
+     * @param[in] bIsUserMade       whether the group is user made.
+     * @param[in] iType             default group type when adding events.
      *
-     * @return the index of the newly added group
+     * @return the index of the newly added group.
      */
     int createGroup(const QString& sGroupName,
                     bool bIsUserMade = false,
@@ -438,7 +438,7 @@ public:
     /**
      * Switches to a group based on the index (map key), triggers view to update
      *
-     * @param[in] iGroupIndex   index(map key) of desired group
+     * @param[in] iGroupIndex   index(map key) of desired group.
      */
     void switchGroup(int iGroupIndex);
 
@@ -446,7 +446,7 @@ public:
     /**
      * Removes a group based on the index (map key), triggers view to update
      *
-     * @param[in] iGroupIndex   index(map key) of the group to be deleted
+     * @param[in] iGroupIndex   index(map key) of the group to be deleted.
      */
     void removeGroup(int iGroupIndex);
 
@@ -454,7 +454,7 @@ public:
     /**
      * Returns how many groups are stored in m_mAnnotationHub
      *
-     * @return the amount of groups stored
+     * @return the amount of groups stored.
      */
     int getHubSize();
 
@@ -462,9 +462,9 @@ public:
     /**
      * Returns whether the group at a certain index is user made
      *
-     * @param[in] iIndex    index of the stored group
+     * @param[in] iIndex    index of the stored group.
      *
-     * @return whether the group is user made
+     * @return whether the group is user made.
      */
     bool getHubUserMade(int iIndex);
 
@@ -472,7 +472,7 @@ public:
     /**
      * Retruns whether current slected group is made by the user
      *
-     * @return whether current group is use made
+     * @return whether current group is use made.
      */
     bool isUserMade();
 
@@ -480,7 +480,7 @@ public:
     /**
      * Displays all events from all groups and triggers view updates
      *
-     * @param[in] bSet      whether the checkbox is checked or not
+     * @param[in] bSet      whether the checkbox is checked or not.
      */
     void showAll(bool bSet);
 
@@ -500,7 +500,7 @@ public:
     /**
      * Returns counting index that gives each group a unique number
      *
-     * @return m_iIndexCount
+     * @return m_iIndexCount.
      */
     int getIndexCount();
 
@@ -508,9 +508,9 @@ public:
     /**
      * Returns index of group with name sGroupName. Returns 9999 if no group present with that name
      *
-     * @param[in] sGroupName     name of group of which we want the index
+     * @param[in] sGroupName     name of group of which we want the index.
      *
-     * @return index of group with name sGroupName
+     * @return index of group with name sGroupName.
      */
     int getIndexFromName(const QString& sGroupName);
 
@@ -518,9 +518,9 @@ public:
     /**
      * Returns the group of the event pointed to by parameter iIndex
      *
-     * @param[in] iIndex    Index for which we want to get the group
+     * @param[in] iIndex    Index for which we want to get the group.
      *
-     * @return the group event at iIndex belongs to
+     * @return the group event at iIndex belongs to.
      */
     int currentGroup(int iIndex);
 
@@ -528,7 +528,7 @@ public:
     /**
      * Push widget item into member stack - used for storing groups when file is unloaded
      *
-     * @param[in] item      stores item in the member stack
+     * @param[in] item      stores item in the member stack.
      */
     void pushGroup(QListWidgetItem* item);
 
@@ -536,7 +536,7 @@ public:
     /**
      * Pops widget item from member stack - used for restroing groups when file is loaded
      *
-     * @return retruns widget item on top of the member stack
+     * @return retruns widget item on top of the member stack.
      */
     QListWidgetItem* popGroup();
 
@@ -544,7 +544,7 @@ public:
     /**
      * Returns how many item are currently stored in the member stack
      *
-     * @return size of member stack m_dataStoredGroups
+     * @return size of member stack m_dataStoredGroups.
      */
     int getGroupStackSize();
 
@@ -552,8 +552,8 @@ public:
     /**
      * Sets the color of group iGroupIndex to color groupColor
      *
-     * @param[in] iGroupIndex   Index of the goup to be changed
-     * @param[in] groupColor    Color the group should be changed to
+     * @param[in] iGroupIndex   Index of the goup to be changed.
+     * @param[in] groupColor    Color the group should be changed to.
      */
     void setGroupColor(int iGroupIndex,
                        const QColor& groupColor);
@@ -562,8 +562,8 @@ public:
     /**
      * Sets the name of group at index iGroup index to sGroupName
      *
-     * @param[in] iGroupIndex   index of which group to change
-     * @param[in] sGroupName     new name for group
+     * @param[in] iGroupIndex   index of which group to change.
+     * @param[in] sGroupName     new name for group.
      */
     void setGroupName(int iGroupIndex,
                       const QString& sGroupName);
@@ -578,9 +578,9 @@ public:
     /**
      * Returns group name of the group with map key iMapKey
      *
-     * @param[in] iMapKey       map key(group index) of the group from which we are getting the name
+     * @param[in] iMapKey       map key(group index) of the group from which we are getting the name.
      *
-     * @return name of group at from m_mAnnotationHub at iMapKey
+     * @return name of group at from m_mAnnotationHub at iMapKey.
      */
     QString getGroupName(int iMapKey);
 
@@ -588,9 +588,9 @@ public:
     /**
      * Returns the name of the event at index iListIndex as if the map of groups were an array. Does not use Group Index.
      *
-     * @param[in] iListIndex    index of the group from which we are getting the name
+     * @param[in] iListIndex    index of the group from which we are getting the name.
      *
-     * @return name of the iListIndex-th event group for m_mAnnotationHub
+     * @return name of the iListIndex-th event group for m_mAnnotationHub.
      */
     QString getGroupNameFromList(int iListIndex);
 
@@ -598,7 +598,7 @@ public:
     /**
      * The type of this model (AnnotationModel)
      *
-     * @return The type of this model (AnnotationModel)
+     * @return The type of this model (AnnotationModel).
      */
     inline MODEL_TYPE getType() const override;
 
@@ -629,7 +629,7 @@ public:
     /**
      * Sets the FiffViewModel to whitch this event model cooresponds
      *
-     * @param[in] pModel   pointer to FiffRawViewModel
+     * @param[in] pModel   pointer to FiffRawViewModel.
      */
     void setFiffModel(QSharedPointer<FiffRawViewModel> pModel);
 
@@ -637,7 +637,7 @@ public:
     /**
      * Shift saved smaples based on offset iFirstSampleOffset
      *
-     * @param[in] iFirstSampleOffset   offset due to sample index of first sample
+     * @param[in] iFirstSampleOffset   offset due to sample index of first sample.
      */
     void applyOffset(int iFirstSampleOffset);
 
@@ -645,7 +645,7 @@ public:
     /**
      * Returns FiffRawViewModel associated with this annotation model
      *
-     * @return pointer to cooresponding FiffRawViewModel
+     * @return pointer to cooresponding FiffRawViewModel.
      */
     QSharedPointer<FiffRawViewModel> getFiffModel();
 
@@ -655,7 +655,7 @@ signals:
     /**
      * Emits updated new type to be added to GUI
      *
-     * @param[in] currentFilterType    Type to be updated in GUI
+     * @param[in] currentFilterType    Type to be updated in GUI.
      */
     void updateEventTypes(const QString& currentFilterType);
 
@@ -683,7 +683,7 @@ private:
     /**
      * Instantiates model from data in file pointed to by sFilePath
      *
-     * @param[in] sFilePath    path to file with event data
+     * @param[in] sFilePath    path to file with event data.
      */
     void initFromFile(const QString& sFilePath);
 

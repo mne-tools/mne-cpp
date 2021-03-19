@@ -103,7 +103,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_MNEBem   MNE BEM
+     * @param[in] p_MNEBem   MNE BEM.
      */
     MNEBem(const MNEBem &p_MNEBem);
 
@@ -129,7 +129,7 @@ public:
     /**
      * True if MNE Bem is empty.
      *
-     * @return true if MNE Bem is empty
+     * @return true if MNE Bem is empty.
      */
     inline bool isEmpty() const;
 
@@ -139,10 +139,10 @@ public:
      *
      * Reads Bem surface from a fif file
      *
-     * @param[in, out] p_pStream     The opened fif file
-     * @param[in] add_geom          Add geometry information to the Bem Surface
+     * @param[in, out] p_pStream     The opened fif file.
+     * @param[in] add_geom          Add geometry information to the Bem Surface.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static bool readFromStream(FIFFLIB::FiffStream::SPtr& p_pStream, bool add_geom, MNEBem &p_Bem);
 
@@ -150,7 +150,7 @@ public:
     /**
      * Returns the number of stored bem surfaces
      *
-     * @return number of stored bem surfaces
+     * @return number of stored bem surfaces.
      */
     inline qint32 size() const;
 
@@ -198,9 +198,9 @@ public:
     /**
      * Subscript operator << to add a new bem_surface
      *
-     * @param[in] surf   BemSurface to be added
+     * @param[in] surf   BemSurface to be added.
      *
-     * @return MNEBem
+     * @return MNEBem.
      */
     MNEBem& operator<< (const MNEBemSurface& surf);
 
@@ -208,9 +208,9 @@ public:
     /**
      * Subscript operator << to add a new bem_surface
      *
-     * @param[in] surf   BemSurface to be added
+     * @param[in] surf   BemSurface to be added.
      *
-     * @return MNEBem
+     * @return MNEBem.
      */
     MNEBem& operator<< (const MNEBemSurface* surf);
 
@@ -218,8 +218,8 @@ public:
     /**
      * Warp the Bem
      *
-     * @param[in] sLm       3D Landmarks of the source geometry
-     * @param[in] dLm       3D Landmarks of the destination geometry
+     * @param[in] sLm       3D Landmarks of the source geometry.
+     * @param[in] dLm       3D Landmarks of the destination geometry.
      */
     void warp(const Eigen::MatrixXf &sLm, const Eigen::MatrixXf &dLm);
 
@@ -227,7 +227,7 @@ public:
     /**
      * Transform the Bem
      *
-     * @param[in] trans     The Transformation Matrix
+     * @param[in] trans     The Transformation Matrix.
      */
     void transform(const FIFFLIB::FiffCoordTrans& trans);
 
@@ -235,7 +235,7 @@ public:
     /**
      * Transform the Bem using the inverse
      *
-     * @param[in] trans     The Transformation Matrix
+     * @param[in] trans     The Transformation Matrix.
      */
     void invtransform(const FIFFLIB::FiffCoordTrans& trans);
 
@@ -245,11 +245,11 @@ protected:
      * Definition of the read_bem_surface function in e.g. mne_read_bem_surface.m
      * Reads a single bem surface
      *
-     * @param[in] p_pStream         The opened fif file
-     * @param[in] p_Tree            Search for the bem surface here
-     * @param[in, out] p_BemSurface     The read BemSurface
+     * @param[in] p_pStream         The opened fif file.
+     * @param[in] p_Tree            Search for the bem surface here.
+     * @param[in, out] p_BemSurface     The read BemSurface.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static bool readBemSurface(FIFFLIB::FiffStream::SPtr& p_pStream, const FIFFLIB::FiffDirNode::SPtr& p_Tree, MNEBemSurface& p_BemSurface);
 

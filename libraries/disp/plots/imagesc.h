@@ -86,7 +86,7 @@ public:
     /**
      * Creates the scaled image view.
      *
-     * @param[in] parent     Parent QObject (optional)
+     * @param[in] parent     Parent QObject (optional).
      */
     explicit ImageSc(QWidget *parent = 0);
 
@@ -94,8 +94,8 @@ public:
     /**
      * Creates the scaled image view with a given double matrix.
      *
-     * @param[in] p_dMat     The double data matrix
-     * @param[in] parent     Parent QObject (optional)
+     * @param[in] p_dMat     The double data matrix.
+     * @param[in] parent     Parent QObject (optional).
      */
     explicit ImageSc(Eigen::MatrixXd &p_dMat,
                      QWidget *parent = 0);
@@ -104,8 +104,8 @@ public:
     /**
      * Creates the scaled image view with a given float matrix.
      *
-     * @param[in] p_fMat     The float data matrix
-     * @param[in] parent     Parent QObject (optional)
+     * @param[in] p_fMat     The float data matrix.
+     * @param[in] parent     Parent QObject (optional).
      */
     explicit ImageSc(Eigen::MatrixXf &p_fMat,
                      QWidget *parent = 0);
@@ -114,8 +114,8 @@ public:
     /**
      * Creates the scaled image view with a given integer matrix.
      *
-     * @param[in] p_iMat     The integer data matrix
-     * @param[in] parent     Parent QObject (optional)
+     * @param[in] p_iMat     The integer data matrix.
+     * @param[in] parent     Parent QObject (optional).
      */
     explicit ImageSc(Eigen::MatrixXi &p_iMat,
                      QWidget *parent = 0);
@@ -136,7 +136,7 @@ public:
     /**
      * Updates the scaled image view with a given double matrix.
      *
-     * @param[in] p_dMat     The double data matrix
+     * @param[in] p_dMat     The double data matrix.
      */
     void updateData(Eigen::MatrixXd &p_dMat);
 
@@ -144,14 +144,14 @@ public:
     /**
      * Updates the scaled image view with a given float matrix.
      *
-     * @param[in] p_fMat     The float data matrix
+     * @param[in] p_fMat     The float data matrix.
      */
     void updateData(Eigen::MatrixXf &p_fMat);
     //=========================================================================================================
     /**
      * Updates the scaled image view with a given integer matrix.
      *
-     * @param[in] p_dMat     The integer data matrix
+     * @param[in] p_dMat     The integer data matrix.
      */
     void updateData(Eigen::MatrixXi &p_iMat);
 
@@ -159,7 +159,7 @@ public:
     /**
      * Sets the color map to use, e.g. "Jet", "Hot", "Bone"
      *
-     * @param[in] p_sColorMap    The colormap to use
+     * @param[in] p_sColorMap    The colormap to use.
      */
     void setColorMap(const QString &p_sColorMap);
 

@@ -115,7 +115,7 @@ private:
     /**
      * Set command connection status
      *
-     * @param[in] p_bConnectionStatus    the connection status
+     * @param[in] p_bConnectionStatus    the connection status.
      */
     void cmdConnectionChanged(bool p_bConnectionStatus);
 

@@ -115,7 +115,7 @@ public:
      * @param[in] tAnnotationSet     FreeSurfer annotation set.
      * @param[in] p3DEntityParent    The Qt3D entity parent of the new item.
      *
-     * @return                       Returns a QList with the added surface tree items. The ordering
+     * @return                       Returns a QList with the added surface tree items. The ordering.
      *                               of the list hereby corresponds to the ordering of the input surface set.
      *                               The list is empty if no item was added.
      */

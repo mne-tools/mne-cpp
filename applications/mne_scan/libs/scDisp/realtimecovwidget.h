@@ -125,7 +125,7 @@ public:
     /**
      * Is called when new data are available.
      *
-     * @param[in] pMeasurement  pointer to measurement
+     * @param[in] pMeasurement  pointer to measurement.
      */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 

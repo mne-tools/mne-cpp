@@ -103,7 +103,7 @@ public:
      * Copy constructor.
      * Refactored: fwd_dup_coil (fwd_coil_def.c)
      *
-     * @param[in] p_FwdCoil      FwdCoil which should be copied
+     * @param[in] p_FwdCoil      FwdCoil which should be copied.
      */
     FwdCoil(const FwdCoil& p_FwdCoil);
 
@@ -119,8 +119,8 @@ public:
      * Create an electrode definition. Transform coordinate frame if so desired.
      * Refactored: fwd_create_eeg_el (fwd_coil_def.c)
      *
-     * @param[in] ch     Channel information to use
-     * @param[in] t      Transform the points using this
+     * @param[in] ch     Channel information to use.
+     * @param[in] t      Transform the points using this.
      *
      * @return   The created coil.
      */
@@ -132,7 +132,7 @@ public:
      * Checks if this is an axial coil.
      * Refactored: fwd_is_axial_coil (fwd_coil_def.c)
      *
-     * @return   True if axial coil, false otherwise
+     * @return   True if axial coil, false otherwise.
      */
     bool is_axial_coil() const;
 
@@ -141,7 +141,7 @@ public:
      * Checks if this is an magnetometer.
      * Refactored: fwd_is_magnetometer_coil (fwd_coil_def.c)
      *
-     * @return   True if magnetometer, false otherwise
+     * @return   True if magnetometer, false otherwise.
      */
     bool is_magnetometer_coil() const;
 
@@ -150,7 +150,7 @@ public:
      * Checks if this is an planar coil.
      * Refactored: fwd_is_planar_coil (fwd_coil_def.c)
      *
-     * @return   True if planar coil, false otherwise
+     * @return   True if planar coil, false otherwise.
      */
     bool is_planar_coil() const;
 
@@ -159,7 +159,7 @@ public:
      * Checks if this is an EEG electrode.
      * Refactored: fwd_is_eeg_electrode (fwd_coil_def.c)
      *
-     * @return   True if EEG electrode, false otherwise
+     * @return   True if EEG electrode, false otherwise.
      */
     bool is_eeg_electrode() const;
 

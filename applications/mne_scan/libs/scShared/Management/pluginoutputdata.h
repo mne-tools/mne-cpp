@@ -72,9 +72,9 @@ public:
     /**
      * Constructs PluginOutputData with the given parent.
      *
-     * @param[in] parent     pointer to parent plugin
-     * @param[in] name       connection name
-     * @param[in] descr      connection description
+     * @param[in] parent     pointer to parent plugin.
+     * @param[in] name       connection name.
+     * @param[in] descr      connection description.
      */
     PluginOutputData(AbstractPlugin *parent,
                      const QString &name,
@@ -90,11 +90,11 @@ public:
     /**
      * Creates PluginOutputData with the given parent.
      *
-     * @param[in] parent     pointer to parent plugin
-     * @param[in] name       connection name
-     * @param[in] descr      connection description
+     * @param[in] parent     pointer to parent plugin.
+     * @param[in] name       connection name.
+     * @param[in] descr      connection description.
      *
-     * @return the created PluginOutputData
+     * @return the created PluginOutputData.
      */
     static inline QSharedPointer< PluginOutputData<T> > create(AbstractPlugin *parent,
                                                                const QString &name,
@@ -104,7 +104,7 @@ public:
     /**
      * Returns the measurement
      *
-     * @return the measurement
+     * @return the measurement.
      */
     inline QSharedPointer<T> measurementData();
 

@@ -91,7 +91,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffRawData  FIFF raw measurement which should be copied
+     * @param[in] p_FiffRawData  FIFF raw measurement which should be copied.
      */
     FiffRawData(const FiffRawData &p_FiffRawData);
 
@@ -121,7 +121,7 @@ public:
     /**
      * True if fiff raw data are empty.
      *
-     * @return true if fiff raw data are empty
+     * @return true if fiff raw data are empty.
      */
     inline bool isEmpty() const
     {
@@ -134,13 +134,13 @@ public:
      *
      * Read a specific raw data segment
      *
-     * @param[out] data      returns the data matrix (channels x samples)
-     * @param[out] times     returns the time values corresponding to the samples
-     * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional)
-     * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional)
-     * @param[in] sel        channel selection vector (optional)
+     * @param[out] data      returns the data matrix (channels x samples).
+     * @param[out] times     returns the time values corresponding to the samples.
+     * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional).
+     * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional).
+     * @param[in] sel        channel selection vector (optional).
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     bool read_raw_segment(Eigen::MatrixXd& data,
                           Eigen::MatrixXd& times,
@@ -155,14 +155,14 @@ public:
      *
      * Read a specific raw data segment
      *
-     * @param[out] data      returns the data matrix (channels x samples)
-     * @param[out] times     returns the time values corresponding to the samples
-     * @param[out] multSegment used multiplication matrix (compensator,projection,calibration)
-     * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional)
-     * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional)
-     * @param[in] sel        channel selection vector (optional)
+     * @param[out] data      returns the data matrix (channels x samples).
+     * @param[out] times     returns the time values corresponding to the samples.
+     * @param[out] multSegment used multiplication matrix (compensator,projection,calibration).
+     * @param[in] from       first sample to include. If omitted, defaults to the first sample in data (optional).
+     * @param[in] to         last sample to include. If omitted, defaults to the last sample in data (optional).
+     * @param[in] sel        channel selection vector (optional).
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     bool read_raw_segment(Eigen::MatrixXd& data,
                           Eigen::MatrixXd& times,
@@ -178,13 +178,13 @@ public:
      *
      * Read a specific raw data segment
      *
-     * @param[out] data      returns the data matrix (channels x samples)
-     * @param[out] times     returns the time values corresponding to the samples
-     * @param[in] from       starting time of the segment in seconds
-     * @param[in] to         end time of the segment in seconds
-     * @param[in] sel        optional channel selection vector
+     * @param[out] data      returns the data matrix (channels x samples).
+     * @param[out] times     returns the time values corresponding to the samples.
+     * @param[in] from       starting time of the segment in seconds.
+     * @param[in] to         end time of the segment in seconds.
+     * @param[in] sel        optional channel selection vector.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     bool read_raw_segment_times(Eigen::MatrixXd& data,
                                 Eigen::MatrixXd& times,

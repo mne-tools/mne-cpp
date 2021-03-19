@@ -134,7 +134,7 @@ public:
     /**
      * Returns the number of pre-stimulus samples
      *
-     * @return the number of pre-stimulus samples
+     * @return the number of pre-stimulus samples.
      */
     inline qint32 getNumPreStimSamples() const;
 
@@ -142,7 +142,7 @@ public:
     /**
      * Set the number of pre-stimulus samples
      *
-     * @param[in] samples the number of pre-stimulus samples
+     * @param[in] samples the number of pre-stimulus samples.
      */
     inline void setNumPreStimSamples(qint32 samples);
 
@@ -211,7 +211,7 @@ public:
     /**
      * Set baseline information
      *
-     * @param[in] info             the min max information of the baseline
+     * @param[in] info             the min max information of the baseline.
      */
     inline void setBaselineInfo(QPair<qint32,qint32> info);
 
@@ -219,7 +219,7 @@ public:
     /**
      * Get baseline information
      *
-     * @return the min max information of the baseline as a QPair
+     * @return the min max information of the baseline as a QPair.
      */
     inline QPair<qint32,qint32> getBaselineInfo();
 
@@ -228,7 +228,7 @@ private:
     /**
      * Init channel infos using fiff info
      *
-     * @param[in] p_fiffInfo     Info to init from
+     * @param[in] p_fiffInfo     Info to init from.
      */
     void init(QSharedPointer<FIFFLIB::FiffInfo> p_fiffInfo);
 

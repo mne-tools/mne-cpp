@@ -95,7 +95,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffCoordTrans   Coordinate transformation description which should be copied
+     * @param[in] p_FiffCoordTrans   Coordinate transformation description which should be copied.
      */
     FiffCoordTrans(const FiffCoordTrans &p_FiffCoordTrans);
 
@@ -118,7 +118,7 @@ public:
      * Invert a coordinate transformation
      * (actual obsolete - cause trans and inverse are both stored)
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     bool invert_transform();
 
@@ -139,10 +139,10 @@ public:
      *
      * Reads a coordinate transform from a fif file
      *
-     * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
-     * @param[out] p_Trans      A coordinate transform from a fif file
+     * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket.
+     * @param[out] p_Trans      A coordinate transform from a fif file.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static bool read(QIODevice& p_IODevice, FiffCoordTrans& p_Trans);
 
@@ -154,10 +154,10 @@ public:
      *
      * Applies the coordinate transform to given coordinates and returns the transformed coordinates
      *
-     * @param[in] rr         The coordinates
-     * @param[in] do_move    Perform translation next to rotation yes/no
+     * @param[in] rr         The coordinates.
+     * @param[in] do_move    Perform translation next to rotation yes/no.
      *
-     * @return Transformed coordinates
+     * @return Transformed coordinates.
      */
     Eigen::MatrixX3f apply_trans(const Eigen::MatrixX3f& rr, bool do_move = true) const;
 
@@ -165,10 +165,10 @@ public:
     /**
      * Applies the inverse coordinate transform to given coordinates and returns the transformed coordinates
      *
-     * @param[in] rr         The coordinates
-     * @param[in] do_move    Perform translation next to rotation yes/no
+     * @param[in] rr         The coordinates.
+     * @param[in] do_move    Perform translation next to rotation yes/no.
      *
-     * @return Transformed coordinates
+     * @return Transformed coordinates.
      */
     Eigen::MatrixX3f apply_inverse_trans(const Eigen::MatrixX3f& rr, bool do_move = true) const;
 
@@ -178,7 +178,7 @@ public:
      *
      * Map coordinate frame integers to human-readable names
      *
-     * @param[in] frame  The coordinate frame integer
+     * @param[in] frame  The coordinate frame integer.
      *
      * @return Human readable form of the coordinate frame.
      */
@@ -191,12 +191,12 @@ public:
      * Compose the coordinate transformation structure
      * from a known forward transform
      *
-     * @param[in] from   Source coordinate system
-     * @param[in] to     Destination coordinate system
-     * @param[in] rot    The forward transform (rotation part)
-     * @param[in] move   The forward transform (translation part)
+     * @param[in] from   Source coordinate system.
+     * @param[in] to     Destination coordinate system.
+     * @param[in] rot    The forward transform (rotation part).
+     * @param[in] move   The forward transform (translation part).
      *
-     * @return the composed transform
+     * @return the composed transform.
      */
     static FiffCoordTrans make(int from, int to, const Eigen::Matrix3f& rot, const Eigen::VectorXf& move);
 
@@ -205,11 +205,11 @@ public:
      * Compose the coordinate transformation structure
      * from a known forward transform
      *
-     * @param[in] from      Source coordinate system
-     * @param[in] to        Destination coordinate system
-     * @param[in] matTrans  The forward transform
+     * @param[in] from      Source coordinate system.
+     * @param[in] to        Destination coordinate system.
+     * @param[in] matTrans  The forward transform.
      *
-     * @return the composed transform
+     * @return the composed transform.
      */
     static FiffCoordTrans make(int from, int to, const Eigen::Matrix4f& matTrans);
 
@@ -217,9 +217,9 @@ public:
     /**
      * ### MNE C root function ###: Definition of the add_inverse function
      *
-     * @param[in] t      Fiff coordinate transform to which the inverse should be added
+     * @param[in] t      Fiff coordinate transform to which the inverse should be added.
      *
-     * @return True when successful
+     * @return True when successful.
      */
     static bool addInverse(FiffCoordTrans& t);
 
@@ -234,7 +234,7 @@ public:
     /**
      * @brief Writes the transformation to file
      *
-     * @param[in] p_IODevice
+     * @param[in] p_IODevice.
      */
     void write(QIODevice &p_IODevice);
 
@@ -242,7 +242,7 @@ public:
     /**
      * @brief Writes the transformation to stream
      *
-     * @param[in] p_pStream
+     * @param[in] p_pStream.
      */
     void writeToStream(FiffStream* p_pStream);
 
@@ -260,7 +260,7 @@ public:
      *
      * @param[in] object    The object which should be compared to.
      *
-     * @return true if equal, false otherwise
+     * @return true if equal, false otherwise.
      */
     friend bool operator== (const FiffCoordTrans &a, const FiffCoordTrans &b);
 
@@ -286,7 +286,7 @@ public:
     /**
      * Transform FiffCoordTrans to FiffCoordTransOld
      *
-     * @return  The old FiffCoordTrans structure
+     * @return  The old FiffCoordTrans structure.
      */
     FiffCoordTransOld toOld();
 

@@ -144,8 +144,8 @@ public:
     /**
      * Default constructor.
      *
-     * @param[in] pFiffInfo        Associated Fiff Information
-     * @param[in] bDoFastFit       Do the fast fit by fitting to the more basic Model
+     * @param[in] pFiffInfo        Associated Fiff Information.
+     * @param[in] bDoFastFit       Do the fast fit by fitting to the more basic Model.
      */
     explicit HPIFit(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                     bool bDoFastFit = false);
@@ -154,12 +154,12 @@ public:
     /**
      * Perform one single HPI fit.
      *
-     * @param[in]   t_mat                      Data to estimate the HPI positions from
+     * @param[in]   t_mat                      Data to estimate the HPI positions from.
      * @param[in]   t_matProjectors            The projectors to apply. Bad channels are still included.
-     * @param[out]   transDevHead               The final dev head transformation matrix
+     * @param[out]   transDevHead               The final dev head transformation matrix.
      * @param[in]   vecFreqs                   The frequencies for each coil.
      * @param[out]   vecError                   The HPI estimation Error in mm for each fitted HPI coil.
-     * @param[out]   vecGoF                     The goodness of fit for each fitted HPI coil
+     * @param[out]   vecGoF                     The goodness of fit for each fitted HPI coil.
      * @param[out]   fittedPointSet             The final fitted positions in form of a digitizer set.
      * @param[in]   pFiffInfo                  Associated Fiff Information.
      * @param[in]   bDoDebug                   Print debug info to cmd line and write debug info to file.
@@ -184,13 +184,13 @@ public:
     /**
      * assign frequencies to correct position
      *
-     * @param[in]   t_mat              Data to estimate the HPI positions from
+     * @param[in]   t_mat              Data to estimate the HPI positions from.
      * @param[in]   t_matProjectors    The projectors to apply. Bad channels are still included.
-     * @param[in]   transDevHead       The final dev head transformation matrix
+     * @param[in]   transDevHead       The final dev head transformation matrix.
      * @param[in]   vecFreqs           The frequencies for each coil in unknown order.
      * @param[out]   vecFreqs           The frequencies for each coil in correct order.
      * @param[in]   vecError           The HPI estimation Error in mm for each fitted HPI coil.
-     * @param[in]   vecGoF             The goodness of fit for each fitted HPI coil
+     * @param[in]   vecGoF             The goodness of fit for each fitted HPI coil.
      * @param[in]   fittedPointSet     The final fitted positions in form of a digitizer set.
      * @param[in]   pFiffInfo          Associated Fiff Information.
      */
@@ -298,11 +298,11 @@ private:
      * Update the model of sinoids for the hpi data
      *
      * @param[in] iSamF             The sample frequency.
-     * @param[in] iSamLoc           The minimum samples required to localize numLoc times in a second
+     * @param[in] iSamLoc           The minimum samples required to localize numLoc times in a second.
      * @param[in] iLineF            The line frequency.
      * @param[in] vecFreqs          The frequencies for each coil in unknown order.
      *
-     * @return The updated model
+     * @return The updated model.
      */
     void updateModel(const int iSamF,
                      const int iSamLoc,

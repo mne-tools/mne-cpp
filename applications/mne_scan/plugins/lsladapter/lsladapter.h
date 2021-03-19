@@ -216,8 +216,8 @@ signals:
     /**
      * This is emitted in order to tell the UI that the list of available LSL streams has been updated.
      *
-     * @param[in] vStreamInfos Vector of available LSL streams
-     * @param[in] currentStream The LSL stream that the Adapter would currently connect to (upon start)
+     * @param[in] vStreamInfos Vector of available LSL streams.
+     * @param[in] currentStream The LSL stream that the Adapter would currently connect to (upon start).
      */
     void updatedAvailableLSLStreams(const QVector<lsl::stream_info>& vStreamInfos, const lsl::stream_info& currentStream);
 };

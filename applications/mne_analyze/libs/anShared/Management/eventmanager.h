@@ -97,7 +97,7 @@ public:
     /**
      * Adds a Communicator, respectively its subscriptions to the routing table
      *
-     * @param[in] commu          The Communicator to add
+     * @param[in] commu          The Communicator to add.
      */
     void addCommunicator(Communicator* commu);
 
@@ -106,7 +106,7 @@ public:
      * Communicate an event to all entities that have registered for the respective event type.
      * The Event will get buffered in a queue and processed during the next processing cycle.
      *
-     * @param[in] e              The event to publish
+     * @param[in] e              The event to publish.
      */
     void issueEvent(QSharedPointer<Event> e);
 
@@ -114,8 +114,8 @@ public:
     /**
      * Expands a Communicator's subscriptions by the specified list
      *
-     * @param[in] commu          The Communicator to add the events for
-     * @param[in] newsubs        List of new (additional) subscriptions
+     * @param[in] commu          The Communicator to add the events for.
+     * @param[in] newsubs        List of new (additional) subscriptions.
      */
     void addSubscriptions(Communicator* commu, QVector<EVENT_TYPE> newsubs);
 
@@ -123,8 +123,8 @@ public:
     /**
      * Replaces a Communicators subscriptions with the specified list.
      *
-     * @param[in] commu          The respective Communicator
-     * @param[in] subs           New list of subscriptions
+     * @param[in] commu          The respective Communicator.
+     * @param[in] subs           New list of subscriptions.
      */
     void updateSubscriptions(Communicator* commu, const QVector<EVENT_TYPE> &subs);
 
@@ -142,7 +142,7 @@ public:
      * specified frequency of dealing with buffered events (frequency in Hz)
      *
      * @param[in] frequency          The frequency in Hz to start working through all buffered events.
-     * @return                   Whether starting was successfull
+     * @return                   Whether starting was successfull.
      */
     bool startEventHandling(float frequency = 25.0f);
 
@@ -151,7 +151,7 @@ public:
      * Stops the EventThread. Depending on the specified event-processing frequency, this might take some time
      * (up to one waiting period, to be precise. Example: EventManager running on 20 Hz -> up to 50 ms shutdown).
      *
-     * @return                   Whether stopping was successfull
+     * @return                   Whether stopping was successfull.
      */
     bool stopEventHandling();
 
@@ -167,7 +167,7 @@ public:
     /**
      * Static method for singleton implementation (returns reference to local static object)
      *
-     * @return A reference to the EventManager singleton
+     * @return A reference to the EventManager singleton.
      */
     static EventManager& getEventManager();
 

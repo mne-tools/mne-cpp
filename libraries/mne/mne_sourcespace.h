@@ -105,7 +105,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_MNESourceSpace   MNE forward solution
+     * @param[in] p_MNESourceSpace   MNE forward solution.
      */
     MNESourceSpace(const MNESourceSpace &p_MNESourceSpace);
 
@@ -125,7 +125,7 @@ public:
     /**
      * True if MNE Source Space is empty.
      *
-     * @return true if MNE Source Space is empty
+     * @return true if MNE Source Space is empty.
      */
     inline bool isEmpty() const;
 
@@ -135,9 +135,9 @@ public:
      *
      * Returns the hemisphere id ( FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.
      *
-     * @param[in] p_Hemisphere the hemisphere to investigate
+     * @param[in] p_Hemisphere the hemisphere to investigate.
      *
-     * @return the deduced hemisphere id
+     * @return the deduced hemisphere id.
      */
     static qint32 find_source_space_hemi(MNEHemisphere& p_Hemisphere);
 
@@ -145,7 +145,7 @@ public:
     /**
      * Returns the Zero based (different to MATLAB) indices of the used vertices of both hemispheres
      *
-     * @return the hemisphere vertices
+     * @return the hemisphere vertices.
      */
     QList<Eigen::VectorXi> get_vertno() const;
 
@@ -153,11 +153,11 @@ public:
     /**
      * Find vertex numbers and indices from label
      *
-     * @param[in] label      Source space label
-     * @param[out] src_sel   array of int (idx.size() = vertno[0].size() + vertno[1].size())
+     * @param[in] label      Source space label.
+     * @param[out] src_sel   array of int (idx.size() = vertno[0].size() + vertno[1].size()).
      *                       Indices of the selected vertices in sourse space
      *
-     * @return vertno list of length 2 Vertex numbers for lh and rh
+     * @return vertno list of length 2 Vertex numbers for lh and rh.
      */
     QList<Eigen::VectorXi> label_src_vertno_sel(const FSLIB::Label &p_label, Eigen::VectorXi &src_sel) const;
 
@@ -170,7 +170,7 @@ public:
      *
      * @param[in, out] p_Hemisphere  The source space.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static bool patch_info(MNEHemisphere &p_Hemisphere);//VectorXi& nearest, QList<VectorXi>& pinfo);@param[in] nearest   The nearest vector of the source space.@param[in, out] pinfo    The requested patch information.
 
@@ -178,9 +178,9 @@ public:
     /**
      * Reduces a source space to selected regions
      *
-     * @param[in] p_qListLabels  ROIs
+     * @param[in] p_qListLabels  ROIs.
      *
-     * @return the reduced source space
+     * @return the reduced source space.
      */
     MNESourceSpace pick_regions(const QList<FSLIB::Label> &p_qListLabels) const;
 
@@ -190,11 +190,11 @@ public:
      *
      * Reads source spaces from a fif file
      *
-     * @param[in, out] p_pStream         The opened fif file
-     * @param[in] add_geom          Add geometry information to the source spaces
-     * @param[in, out] p_SourceSpace    The read source spaces
+     * @param[in, out] p_pStream         The opened fif file.
+     * @param[in] add_geom          Add geometry information to the source spaces.
+     * @param[in, out] p_SourceSpace    The read source spaces.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static bool readFromStream(FIFFLIB::FiffStream::SPtr& p_pStream,
                                bool add_geom,
@@ -204,7 +204,7 @@ public:
     /**
      * Returns the number of stored hemispheres 0, 1 or 2
      *
-     * @return number of stored hemispheres
+     * @return number of stored hemispheres.
      */
     inline qint32 size() const;
 
@@ -218,10 +218,10 @@ public:
      *
      * Transforms source space data to the desired coordinate system
      *
-     * @param[in] dest destination check code
-     * @param[in] trans transformation information
+     * @param[in] dest destination check code.
+     * @param[in] trans transformation information.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     bool transform_source_space_to(FIFFLIB::fiff_int_t dest,
                                    FIFFLIB::FiffCoordTrans& trans);
@@ -281,7 +281,7 @@ public:
      *
      * @param[in] object    The object which should be compared to.
      *
-     * @return true if equal, false otherwise
+     * @return true if equal, false otherwise.
      */
     friend bool operator== (const MNESourceSpace &a, const MNESourceSpace &b);
 
@@ -293,9 +293,9 @@ private:
      *
      * Completes triangulation info
      *
-     * @param[in, out] p_pHemisphere   Hemisphere to be completed
+     * @param[in, out] p_pHemisphere   Hemisphere to be completed.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static bool complete_source_space_info(MNEHemisphere& p_Hemisphere);
 
@@ -305,11 +305,11 @@ private:
      *
      * Reads a single source space (hemisphere)
      *
-     * @param[in] p_pStream         The opened fif file
-     * @param[in] p_Tree            Search for the source space here
-     * @param[in, out] p_pHemisphere    The read source space (hemisphere)
+     * @param[in] p_pStream         The opened fif file.
+     * @param[in] p_Tree            Search for the source space here.
+     * @param[in, out] p_pHemisphere    The read source space (hemisphere).
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static bool read_source_space(FIFFLIB::FiffStream::SPtr& p_pStream,
                                   const FIFFLIB::FiffDirNode::SPtr& p_Tree,

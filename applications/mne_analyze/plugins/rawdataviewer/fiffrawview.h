@@ -169,7 +169,7 @@ public:
     /**
      * Sets new zoom factor
      *
-     * @param[in] dZoomFac  time window size;
+     * @param[in] dZoomFac  time window size;.
      */
     void setZoom(double dZoomFac);
 
@@ -177,7 +177,7 @@ public:
     /**
      * Sets new time window size
      *
-     * @param[in] iT  time window size;
+     * @param[in] iT  time window size;.
      */
     void setWindowSize(int iT);
 
@@ -185,7 +185,7 @@ public:
     /**
      * distanceTimeSpacerChanged changes the distance of the time spacers
      *
-     * @param[in] iValue The new distance for the time spacers
+     * @param[in] iValue The new distance for the time spacers.
      */
     void setDistanceTimeSpacer(int iValue);
 
@@ -200,7 +200,7 @@ public:
     //=========================================================================================================
     /**
      * Brings up a menu for interacting with data annotations
-     * @param[in] pos   Position on screen where the menu will show up
+     * @param[in] pos   Position on screen where the menu will show up.
      */
     void customContextMenuRequested(const QPoint &pos);
 
@@ -208,7 +208,7 @@ public:
     /**
      * Create a new annotation
      *
-     * @param[in] con   Whether a new annotaton should be created;
+     * @param[in] con   Whether a new annotaton should be created;.
      */
     void addTimeMark(bool con);
 
@@ -216,7 +216,7 @@ public:
     /**
      * Controls toggling of annotation data
      *
-     * @param[in] iToggle   Sets toggle: 0 - don't show, 1+ - show
+     * @param[in] iToggle   Sets toggle: 0 - don't show, 1+ - show.
      */
     void toggleDisplayEvent(const int& iToggle);
 
@@ -236,7 +236,7 @@ public:
     /**
      * Filter parameters changed
      *
-     * @param[in] filterData   the currently active filter
+     * @param[in] filterData   the currently active filter.
      */
     void setFilter(const RTPROCESSINGLIB::FilterKernel &filterData);
 
@@ -244,7 +244,7 @@ public:
     /**
      * Filter avtivated
      *
-     * @param[in] state    filter on/off flag
+     * @param[in] state    filter on/off flag.
      */
     void setFilterActive(bool state);
 
@@ -252,7 +252,7 @@ public:
     /**
      * Sets the type of channel which are to be filtered
      *
-     * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All)
+     * @param[in] channelType    the channel type which is to be filtered (EEG, MEG, All).
      */
     void setFilterChannelType(const QString& channelType);
 
@@ -288,7 +288,7 @@ public:
     /**
      * Shows channels based on input selectedChannelsIndexes
      *
-     * @param[in] selectedChannelsIndexes      list of channels to be shown
+     * @param[in] selectedChannelsIndexes      list of channels to be shown.
      */
     void showSelectedChannelsOnly(const QList<int> selectedChannelsIndexes);
 
@@ -309,7 +309,7 @@ signals:
     /**
      * Emits sample number to be added aan annotation
      *
-     * @param[in] iSample      sample number to be added
+     * @param[in] iSample      sample number to be added.
      */
     void sendSamplePos(int iSample);
 
@@ -324,10 +324,10 @@ private:
     /**
      * Catches events to performa specific action handling
      *
-     * @param[in, out] object      Pointer to object the event pertains to
-     * @param[in] event            Type of object with associated data
+     * @param[in, out] object      Pointer to object the event pertains to.
+     * @param[in] event            Type of object with associated data.
      *
-     * @return                      true if handled by custom event handling, false if not
+     * @return                      true if handled by custom event handling, false if not.
      */
     bool eventFilter(QObject *object, QEvent *event);
 
@@ -341,7 +341,7 @@ private:
     /**
      * Triggers the update of the update label based on the data viewer horizontal positon (not on iValue)
      *
-     * @param[in] iValue   Horizontal scroll bar position (unused)
+     * @param[in] iValue   Horizontal scroll bar position (unused).
      */
     void updateTimeLabels(int iValue);
 

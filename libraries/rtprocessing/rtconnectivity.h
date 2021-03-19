@@ -117,7 +117,7 @@ public:
     /**
      * Creates the real-time connectivity estimation object.
      *
-     * @param[in] parent     Parent QObject (optional)
+     * @param[in] parent     Parent QObject (optional).
      */
     explicit RtConnectivity(QObject *parent = 0);
 
@@ -131,7 +131,7 @@ public:
     /**
      * Slot to receive incoming data.
      *
-     * @param[in] data  Data to estimate the connectivity from
+     * @param[in] data  Data to estimate the connectivity from.
      */
     void append(const CONNECTIVITYLIB::ConnectivitySettings& connectivitySettings);
 

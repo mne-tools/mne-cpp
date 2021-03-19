@@ -78,8 +78,8 @@ public:
     /**
      * Constructs the Sphere
      *
-     * @param[in] center     The sphere's center
-     * @param[in] radius     The sphere's radius
+     * @param[in] center     The sphere's center.
+     * @param[in] radius     The sphere's radius.
      */
     Sphere(const Eigen::Vector3f& center, float radius);
 
@@ -98,7 +98,7 @@ public:
      * Fits a sphere to a point cloud.
      *
      * @param[in] points         n x 3 matrix of cartesian data to fit the sphere to.
-     * @param[in] simplex_size   The simplex size
+     * @param[in] simplex_size   The simplex size.
      *
      * @return the fitted sphere.
      */
@@ -125,9 +125,9 @@ public:
      * Fits a sphere to a point cloud.
      *
      * @param[in] rr             n x 3 matrix of cartesian data to fit the sphere to.
-     * @param[in] simplex_size   The simplex size
+     * @param[in] simplex_size   The simplex size.
      * @param[out] r0            center (1 x 3 matrix) of the sphere.
-     * @param[out] R             Radius
+     * @param[out] R             Radius.
      *
      * @return true if successful.
      */
@@ -143,7 +143,7 @@ private:
      * Calculates the average
      *
      * @param[in] rr     n x 3 matrix of cartesian data to fit the sphere to.
-     * @param[out] cm    The average center of the caretsian data (1 x 3 matrix)
+     * @param[out] cm    The average center of the caretsian data (1 x 3 matrix).
      * @param[out] avep  The average distance to the average center.
      */
     static void calculate_cm_ave_dist(const Eigen::MatrixXf &rr, Eigen::VectorXf &cm, float &avep);
@@ -153,7 +153,7 @@ private:
      * Creates the initial simplex.
      *
      * @param[in] pars   The simplex center (1 x 3 matrix).
-     * @param[in] size   The simplex size
+     * @param[in] size   The simplex size.
      *
      * @return the inital simplex.
      */
@@ -164,7 +164,7 @@ private:
      * The simplex cost function
      *
      * @param[in] fitpar     A simplex vertex to evaluate.
-     * @param[in] user_data  The user data containing the n x 3 matrix of cartesian data
+     * @param[in] user_data  The user data containing the n x 3 matrix of cartesian data.
      *
      * @return the distance (cost) of the given vertex (sphere center).
      */
@@ -174,9 +174,9 @@ private:
     /**
      * The report function, called to rpeort the optimization status
      *
-     * @param[in] loop       The current iteration loop
+     * @param[in] loop       The current iteration loop.
      * @param[in] fitpar     The currently best fitting simplex vertex.
-     * @param[in] fval       The optimization value
+     * @param[in] fval       The optimization value.
      *
      * @return true if reporting was successful.
      */
@@ -186,10 +186,10 @@ private:
     /**
      * Calculates the optimal radius based on a given center.
      *
-     * @param[in] r0      The center
-     * @param[in] user    The user data containing the n x 3 matrix of cartesian data
+     * @param[in] r0      The center.
+     * @param[in] user    The user data containing the n x 3 matrix of cartesian data.
      *
-     * @return the optimal radius
+     * @return the optimal radius.
      */
     static float opt_rad(const Eigen::VectorXf &r0, const fitUserNew user);
 };

@@ -86,8 +86,8 @@ public:
     /**
      * Constructs a Command
      *
-     * @param[in] p_bIsJson      If is received/should be send as JSON (optional, default true)
-     * @param[in] parent         Parent QObject (optional)
+     * @param[in] p_bIsJson      If is received/should be send as JSON (optional, default true).
+     * @param[in] parent         Parent QObject (optional).
      */
     explicit Command(bool p_bIsJson = true, QObject *parent = 0);
 
@@ -95,10 +95,10 @@ public:
     /**
      * Constructor which parses a command stored in a json object
      *
-     * @param[in] p_sCommand         Command
-     * @param[in] p_qCommandContent  Content encapsulated in a JsonObject
-     * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
-     * @param[in] parent             Parent QObject (optional)
+     * @param[in] p_sCommand         Command.
+     * @param[in] p_qCommandContent  Content encapsulated in a JsonObject.
+     * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true).
+     * @param[in] parent             Parent QObject (optional).
      */
     explicit Command(const QString &p_sCommand, const QJsonObject &p_qCommandContent, bool p_bIsJson = true, QObject *parent = 0);
 
@@ -106,10 +106,10 @@ public:
     /**
      * Constructs a command without parameters
      *
-     * @param[in] p_sCommand         Command
-     * @param[in] p_sDescription     Command description
-     * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
-     * @param[in] parent             Parent QObject (optional)
+     * @param[in] p_sCommand         Command.
+     * @param[in] p_sDescription     Command description.
+     * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true).
+     * @param[in] parent             Parent QObject (optional).
      */
     explicit Command(const QString &p_sCommand, const QString &p_sDescription, bool p_bIsJson = true, QObject *parent = 0);
 
@@ -117,12 +117,12 @@ public:
     /**
      * Constructor which assembles a command from single parts
      *
-     * @param[in] p_sCommand         Command
-     * @param[in] p_sDescription     Command description
-     * @param[in] p_qListParamNames  Parameter names
+     * @param[in] p_sCommand         Command.
+     * @param[in] p_sDescription     Command description.
+     * @param[in] p_qListParamNames  Parameter names.
      * @param[in] p_qListParamValues Parameter values/types.
-     * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
-     * @param[in] parent             Parent QObject (optional)
+     * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true).
+     * @param[in] parent             Parent QObject (optional).
      */
     explicit Command(const QString &p_sCommand, const QString &p_sDescription,
                      const QStringList &p_qListParamNames, const QList<QVariant> &p_qListParamValues, bool p_bIsJson = true, QObject *parent = 0);
@@ -131,11 +131,11 @@ public:
     /**
      * Constructor which assembles a command from single parts
      *
-     * @param[in] p_sCommand                 Command
-     * @param[in] p_sDescription             Command description
-     * @param[in] p_qListParamNames          Parameter names
+     * @param[in] p_sCommand                 Command.
+     * @param[in] p_sDescription             Command description.
+     * @param[in] p_qListParamNames          Parameter names.
      * @param[in] p_qListParamValues         Parameter values/types.
-     * @param[in] p_vecParameterDescriptions Parameter descriptions;
+     * @param[in] p_vecParameterDescriptions Parameter descriptions;.
      */
     explicit Command(const QString &p_sCommand, const QString &p_sDescription,
                      const QStringList &p_qListParamNames, const QList<QVariant> &p_qListParamValues, const QStringList &p_vecParameterDescriptions, bool p_bIsJson = true, QObject *parent = 0);
@@ -144,7 +144,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_Command      Command to be copied
+     * @param[in] p_Command      Command to be copied.
      */
     Command(const Command &p_Command);
 
@@ -182,7 +182,7 @@ public:
     /**
      * Inherited by ICommand
      *
-     * @return  emits received
+     * @return  emits received.
      */
     virtual void execute();
 
@@ -198,7 +198,7 @@ public:
     /**
      * Get parameter descriptions
      *
-     * @return parameter descriptions
+     * @return parameter descriptions.
      */
     inline QList<QString> pDescriptions() const;
 
@@ -206,7 +206,7 @@ public:
     /**
      * Get parameter names
      *
-     * @return parameter names
+     * @return parameter names.
      */
     inline QList<QString> pNames() const;
 
@@ -214,7 +214,7 @@ public:
     /**
      * Returns parameter values
      *
-     * @return parameter values
+     * @return parameter values.
      */
     inline QList<QVariant>& pValues();
 
@@ -222,7 +222,7 @@ public:
     /**
      * Inherited command reply channel.
      *
-     * @param[in] p_sReply   command reply
+     * @param[in] p_sReply   command reply.
      */
     void reply(const QString &p_sReply);
 

@@ -94,7 +94,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_ECDSet       Electric Current Dipole Set which should be copied
+     * @param[in] p_ECDSet       Electric Current Dipole Set which should be copied.
      */
     ECDSet(const ECDSet &p_ECDSet);
 
@@ -138,7 +138,7 @@ public:
     /**
      * Returns the number of stored ECDs
      *
-     * @return number of stored ECDs
+     * @return number of stored ECDs.
      */
     inline qint32 size() const;
 
@@ -166,9 +166,9 @@ public:
     /**
      * Subscript operator << to add a new ECD
      *
-     * @param[in] p_ecd      ECD to be added
+     * @param[in] p_ecd      ECD to be added.
      *
-     * @return ECDSet
+     * @return ECDSet.
      */
     ECDSet& operator<< (const ECD& p_ecd);
 

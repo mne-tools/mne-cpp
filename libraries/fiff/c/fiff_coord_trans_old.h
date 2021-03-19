@@ -94,7 +94,7 @@ public:
      * Copy constructor.
      * Refactored: fiff_dup_transform (fiff_trans.c)
      *
-     * @param[in] p_FiffCoordTransOld    FiffCoordTransOld which should be copied
+     * @param[in] p_FiffCoordTransOld    FiffCoordTransOld which should be copied.
      */
     FiffCoordTransOld(const FiffCoordTransOld& p_FiffCoordTransOld);
 
@@ -187,7 +187,7 @@ public:
      *
      * @param[in] object    The object which should be compared to.
      *
-     * @return true if equal, false otherwise
+     * @return true if equal, false otherwise.
      */
     friend bool operator== (const FiffCoordTransOld &a, const FiffCoordTransOld &b);
 

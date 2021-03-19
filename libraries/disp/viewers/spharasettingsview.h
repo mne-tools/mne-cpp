@@ -87,7 +87,7 @@ public:
     /**
      * Constructs a SpharaSettingsView which is a child of parent.
      *
-     * @param[in] parent        parent of widget
+     * @param[in] parent        parent of widget.
      */
     SpharaSettingsView(const QString& sSettingsPath = "",
                        QWidget *parent = 0,

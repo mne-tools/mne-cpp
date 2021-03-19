@@ -93,8 +93,8 @@ public:
     //=========================================================================================================
     /**
      * The constructor for Spline
-     * @param[in] title     string to specify the title displayed on the histogram, defaults to "Spline Histogram"
-     * @param[in] parent    sets the behaviour of Spline as an object, defaults to no parent QWidget
+     * @param[in] title     string to specify the title displayed on the histogram, defaults to "Spline Histogram".
+     * @param[in] parent    sets the behaviour of Spline as an object, defaults to no parent QWidget.
      */
     Spline(QWidget* parent = 0, const QString& title = "Spline Histogram");
 
@@ -102,8 +102,8 @@ public:
     /**
      * creates a qspline chart histogram from 2 vectors: class limits and class frequency
      *
-     * @param[in] matClassLimitData      vector input filled with class limits
-     * @param[in] matClassFrequencyData  vector input filled with class frequency to the corresponding class
+     * @param[in] matClassLimitData      vector input filled with class limits.
+     * @param[in] matClassFrequencyData  vector input filled with class frequency to the corresponding class.
      */
     template<typename T>
     void setData(const Eigen::Matrix<T, Eigen::Dynamic, 1>& matClassLimitData,
@@ -116,8 +116,8 @@ public:
     /**
      * Updates the spline with new data
      *
-     * @param[in] matClassLimitData      vector input filled with class limits
-     * @param[in] matClassFrequencyData  vector input filled with class frequency to the corresponding class
+     * @param[in] matClassLimitData      vector input filled with class limits.
+     * @param[in] matClassFrequencyData  vector input filled with class frequency to the corresponding class.
      */
     template<typename T>
     void updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
@@ -127,7 +127,7 @@ public:
     /**
      * constructor for mouse press event behaviour to create threshold lines and signal emit
      *
-     * @param[in] event      mouse press input
+     * @param[in] event      mouse press input.
      */
     void mousePressEvent(QMouseEvent *event);
 
@@ -135,10 +135,10 @@ public:
     /**
      * splitCoefficientAndExponent takes in QVector value of coefficient and exponent (example: 1.2e-10) and finds the coefficient (1.2) and the appropriate exponent (-12), normalize the exponents to either the lowest or highest exponent in the list then places the values in two separate QVectors
      *
-     * @param[in] matClassLimitData      vector input filled with values of class limits (in coefficient and exponent form)
-     * @param[in] iClassCount            user input to determine the amount of classes in the histogram
-     * @param[out] vecCoefficientResults  vector filled with values of coefficient only
-     * @param[out] vecExponentResults     vector filled with values of exponent only
+     * @param[in] matClassLimitData      vector input filled with values of class limits (in coefficient and exponent form).
+     * @param[in] iClassCount            user input to determine the amount of classes in the histogram.
+     * @param[out] vecCoefficientResults  vector filled with values of coefficient only.
+     * @param[out] vecExponentResults     vector filled with values of exponent only.
      */
     template<typename T>
     void splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
@@ -150,7 +150,7 @@ public:
     /**
      * setThreshold takes in QVector value from outside sources and create the corresponding lines in the histogram
      *
-     * @param[in] vecThresholdValues      QVector3D consisting of 3 values corresponding to the x-axis value of the threshold lines
+     * @param[in] vecThresholdValues      QVector3D consisting of 3 values corresponding to the x-axis value of the threshold lines.
      */
     void setThreshold(const QVector3D& vecThresholdValues);
 
@@ -158,7 +158,7 @@ public:
     /**
      * getThreshold takes in QVector value from outside sources and create the corresponding lines in the histogram
      *
-     * @return      returns QList consisting of QVector3D corresponding to the x-axis value of the threshold lines
+     * @return      returns QList consisting of QVector3D corresponding to the x-axis value of the threshold lines.
      */
     const QVector3D& getThreshold();
 
@@ -166,9 +166,9 @@ public:
     /**
      * correctionDisplayTrueValue takes in QVector value from outside sources and create the necessary adjustment of exponential multiplication with base 10
      *
-     * @param[in] vecOriginalValues     QVector3D consisting of 3 original values
-     * @param[in] functionName          Choice between getThreshold or setThreshold
-     * @return     returns QVector3D after necessary adjustment
+     * @param[in] vecOriginalValues     QVector3D consisting of 3 original values.
+     * @param[in] functionName          Choice between getThreshold or setThreshold.
+     * @return     returns QVector3D after necessary adjustment.
      */
     QVector3D correctionDisplayTrueValue(QVector3D vecOriginalValues,
                                          QString functionName);
@@ -177,7 +177,7 @@ public:
     /**
      * updateColorMap takes in string name of color map and the three threshold lines and creates the color gradient
      *
-     * @param[in] colorMap  qstring of the color gradient from user input
+     * @param[in] colorMap  qstring of the color gradient from user input.
      */
     void setColorMap (const QString &colorMap);
 
@@ -190,8 +190,8 @@ protected:
     /**
      * updateThreshold takes in string name of threshold and its corresponding Qlineseries and creates the line in the QChart
      *
-     * @param[in] cThresholdName    name of the Line
-     * @param[in] lineSeries        qlineseries of the corresponding threshold line
+     * @param[in] cThresholdName    name of the Line.
+     * @param[in] lineSeries        qlineseries of the corresponding threshold line.
      */
     void updateThreshold (QtCharts::QLineSeries *lineSeries);
 
@@ -210,9 +210,9 @@ signals:
     /**
      * emit signal consisting of three threshold lines x-axis value if any one of them is changed
      *
-     * @param[out]  leftThreshold      value of the left threshold line (initialized as minAxisX)
-     * @param[out]  middleThreshold    value of the middle threshold line (initialized as maxAxisX)
-     * @param[out]  rightThreshold     value of the right threshold line (initialized as maxAxisX)
+     * @param[out]  leftThreshold      value of the left threshold line (initialized as minAxisX).
+     * @param[out]  middleThreshold    value of the middle threshold line (initialized as maxAxisX).
+     * @param[out]  rightThreshold     value of the right threshold line (initialized as maxAxisX).
      */
     void borderChanged(double leftThreshold, double middleThreshold, double rightThreshold);
 };

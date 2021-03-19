@@ -95,7 +95,7 @@ public:
     /**
      * Constructs a PluginManager with the given parent.
      *
-     * @param[in] parent    pointer to parent Object. (It's normally the default value.)
+     * @param[in] parent    pointer to parent Object. (It's normally the default value.).
      */
     PluginManager(QObject* parent = Q_NULLPTR);
 
@@ -143,7 +143,7 @@ public:
     /**
      * Returns vector containing AbstractAlgorithm plugins
      *
-     * @return reference to vector containing IRTAlgorithm plugins
+     * @return reference to vector containing IRTAlgorithm plugins.
      */
     inline const QVector<AbstractAlgorithm*>& getAlgorithmPlugins();
 
@@ -151,7 +151,7 @@ public:
     /**
      * Returns vector containing IIO plugins
      *
-     * @return reference to vector containing IRTVisulaiztaion plugins
+     * @return reference to vector containing IRTVisulaiztaion plugins.
      */
     inline const QVector<IIO*>& getIOPlugins();
 

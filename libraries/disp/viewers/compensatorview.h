@@ -91,7 +91,7 @@ public:
     /**
      * Constructs a CompensatorView which is a child of parent.
      *
-     * @param[in] parent        parent of widget
+     * @param[in] parent        parent of widget.
      */
     CompensatorView(const QString& sSettingsPath = "",
                     QWidget *parent = 0,

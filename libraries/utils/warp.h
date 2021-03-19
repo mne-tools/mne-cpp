@@ -80,11 +80,11 @@ public:
     /**
      * Calculates the TPS Warp of given setup
      *
-     * @param[in] sLm      3D Landmarks of the source geometry
-     * @param[in] dLm      3D Landmarks of the destination geometry
-     * @param[in] sVert    Vertices of the source geometry
+     * @param[in] sLm      3D Landmarks of the source geometry.
+     * @param[in] dLm      3D Landmarks of the destination geometry.
+     * @param[in] sVert    Vertices of the source geometry.
      *
-     * @return wVert   Vertices of the warped destination geometry
+     * @return wVert   Vertices of the warped destination geometry.
      */
     Eigen::MatrixXf calculate(const Eigen::MatrixXf & sLm,
                               const Eigen::MatrixXf &dLm,
@@ -94,9 +94,9 @@ public:
     /**
      * Calculates the TPS Warp of a given setup for a List of vertices
      *
-     * @param[in] sLm       3D Landmarks of the source geometry
-     * @param[in] dLm       3D Landmarks of the destination geometry
-     * @param[in/out] vertList  List of Vertices of the source geometry that are warped to the destination
+     * @param[in] sLm       3D Landmarks of the source geometry.
+     * @param[in] dLm       3D Landmarks of the destination geometry.
+     * @param[in/out] vertList  List of Vertices of the source geometry that are warped to the destination.
      */
     void calculate(const Eigen::MatrixXf & sLm,
                    const Eigen::MatrixXf &dLm,
@@ -106,9 +106,9 @@ public:
     /**
      * Read electrode positions from MRI Database
      *
-     * @param[in] electrodeFileName    .txt file of electrodes
+     * @param[in] electrodeFileName    .txt file of electrodes.
      *
-     * @return electrodes   Matrix with electrode positions
+     * @return electrodes   Matrix with electrode positions.
      */
     Eigen::MatrixXf readsLm(const QString &electrodeFileName);
 
@@ -118,10 +118,10 @@ private:
     /**
      * Calculate the weighting parameters.
      *
-     * @param[in] sLm      3D Landmarks of the source geometry
-     * @param[in] dLm      3D Landmarks of the destination geometry
-     * @param[out] warpWeight Weighting parameters of the tps warp
-     * @param[out] polWeight  Weighting papameters of the polynomial warp
+     * @param[in] sLm      3D Landmarks of the source geometry.
+     * @param[in] dLm      3D Landmarks of the destination geometry.
+     * @param[out] warpWeight Weighting parameters of the tps warp.
+     * @param[out] polWeight  Weighting papameters of the polynomial warp.
      */
     bool calcWeighting(const Eigen::MatrixXf& sLm,
                        const Eigen::MatrixXf &dLm,
@@ -132,12 +132,12 @@ private:
     /**
      * Warp the Vertices of the source geometry
      *
-     * @param[in] sVert    Vertices of the source geometry
-     * @param[in] sLm      3D Landmarks of the source geometry
-     * @param[in] warpWeight Weighting parameters of the tps warp
-     * @param[in] polWeight  Weighting papameters of the polynomial warp
+     * @param[in] sVert    Vertices of the source geometry.
+     * @param[in] sLm      3D Landmarks of the source geometry.
+     * @param[in] warpWeight Weighting parameters of the tps warp.
+     * @param[in] polWeight  Weighting papameters of the polynomial warp.
      *
-     * @return Warped Vertices
+     * @return Warped Vertices.
      */
     Eigen::MatrixXf warpVertices(const Eigen::MatrixXf & sVert,
                                  const Eigen::MatrixXf & sLm,

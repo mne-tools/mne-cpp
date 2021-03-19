@@ -98,7 +98,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffEvokedSet    Fiff evoked data set which should be copied
+     * @param[in] p_FiffEvokedSet    Fiff evoked data set which should be copied.
      */
     FiffEvokedSet(const FiffEvokedSet& p_FiffEvokedSet);
 
@@ -122,10 +122,10 @@ public:
      *
      * Pick desired channels from evoked-response data
      *
-     * @param[in] include   - Channels to include (if empty, include all available)
-     * @param[in] exclude   - Channels to exclude (if empty, do not exclude any)
+     * @param[in] include   - Channels to include (if empty, include all available).
+     * @param[in] exclude   - Channels to exclude (if empty, do not exclude any).
      *
-     * @return the desired fiff evoked data set
+     * @return the desired fiff evoked data set.
      */
     FiffEvokedSet pick_channels(const QStringList& include = defaultQStringList,
                                 const QStringList& exclude = defaultQStringList) const;
@@ -138,10 +138,10 @@ public:
      *
      * Apply compensation to the data as desired
      *
-     * @param[in] to                 desired compensation in the output
-     * @param[in, out] p_FiffEvoked   Evoked set to compensate
+     * @param[in] to                 desired compensation in the output.
+     * @param[in, out] p_FiffEvoked   Evoked set to compensate.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     bool compensate_to(FiffEvokedSet &p_FiffEvokedSet,
                        fiff_int_t to) const;
@@ -154,9 +154,9 @@ public:
      *
      * Find evoked data sets
      *
-     * @param[out] p_FiffEvokedSet   The read evoked data set
+     * @param[out] p_FiffEvokedSet   The read evoked data set.
      *
-     * @return true when any set was found, false otherwise
+     * @return true when any set was found, false otherwise.
      */
     bool find_evoked(const FiffEvokedSet& p_FiffEvokedSet) const;
 
@@ -170,15 +170,15 @@ public:
      *
      * Read one evoked data set
      *
-     * @param[in] p_IODevice         An fiff IO device like a fiff QFile or QTCPSocket
-     * @param[out] p_FiffEvokedSet   The read evoked data set
-     * @param[in] baseline           The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b)
+     * @param[in] p_IODevice         An fiff IO device like a fiff QFile or QTCPSocket.
+     * @param[out] p_FiffEvokedSet   The read evoked data set.
+     * @param[in] baseline           The time interval to apply rescaling / baseline correction. If None do not apply it. If baseline is (a, b).
      *                               the interval is between "a (s)" and "b (s)". If a is None the beginning of the data is used and if b is
      *                               None then b is set to the end of the interval. If baseline is equal ot (None, None) all the time interval is used.
      *                               If None, no correction is applied.
-     * @param[in] proj               Apply SSP projection vectors (optional, default = true)
+     * @param[in] proj               Apply SSP projection vectors (optional, default = true).
      *
-     * @return true when successful, false otherwise
+     * @return true when successful, false otherwise.
      */
     static bool read(QIODevice& p_IODevice,
                      FiffEvokedSet& p_FiffEvokedSet,

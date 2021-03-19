@@ -76,9 +76,9 @@ public:
     /**
      * Constructs a PluginInputConnector with the given parent.
      *
-     * @param[in] parent     pointer to parent plugin
-     * @param[in] name       connection name
-     * @param[in] descr      connection description
+     * @param[in] parent     pointer to parent plugin.
+     * @param[in] name       connection name.
+     * @param[in] descr      connection description.
      */
     PluginInputConnector(AbstractPlugin *parent,
                          const QString &name,
@@ -94,7 +94,7 @@ public:
     /**
      * Returns true.
      *
-     * @return true
+     * @return true.
      */
     virtual bool isInputConnector() const;
 
@@ -102,7 +102,7 @@ public:
     /**
      * Returns false.
      *
-     * @return false
+     * @return false.
      */
     virtual bool isOutputConnector() const;
 

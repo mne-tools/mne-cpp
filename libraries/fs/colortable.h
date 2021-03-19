@@ -86,7 +86,7 @@ public:
     /**
      * Ids encoded in the colortable
      *
-     * @return ids
+     * @return ids.
      */
     inline Eigen::VectorXi getLabelIds() const;
 
@@ -94,7 +94,7 @@ public:
     /**
      * Names encoded in the colortable
      *
-     * @return ids
+     * @return ids.
      */
     inline QStringList getNames() const;
 
@@ -102,7 +102,7 @@ public:
     /**
      * RGBAs encoded in the colortable
      *
-     * @return RGBAs
+     * @return RGBAs.
      */
     inline Eigen::MatrixX4i getRGBAs() const;
 

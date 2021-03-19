@@ -78,7 +78,7 @@ public:
     /**
      * Constructs a CommandServer
      *
-     * @param[in] parent         Parent QObject (optional)
+     * @param[in] parent         Parent QObject (optional).
      */
     CommandServer(QObject *parent = 0);
 
@@ -100,7 +100,7 @@ public:
     /**
      * Slot which is called when a new command is available.
      *
-     * @param[in] p_sCommand     Raw command
+     * @param[in] p_sCommand     Raw command.
      * @param[in] p_iThreadID    ID of the thread which received the command.
      */
     void incommingCommand(QString p_sCommand, qint32 p_iThreadID);
@@ -117,8 +117,8 @@ public:
     /**
      * Is called to prepare the reply
      *
-     * @param[in] p_sReply   The reply which should be send back
-     * @param[in] p_command  Comman which evoked the reply
+     * @param[in] p_sReply   The reply which should be send back.
+     * @param[in] p_command  Comman which evoked the reply.
      */
     void prepareReply(QString p_sReply, COMMUNICATIONLIB::Command p_command);
 
@@ -127,7 +127,7 @@ signals:
     /**
      * Reply to a command
      *
-     * @param[in] p_blockReply   The reply data
+     * @param[in] p_blockReply   The reply data.
      * @param[in] p_iID          ID of the client thread to identify the target.
      */
     void replyCommand(QString p_blockReply, qint32 p_iID);

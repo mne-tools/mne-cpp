@@ -89,13 +89,13 @@ public:
     /**
      * Creates the real-time averaging object.
      *
-     * @param[in] numAverages          Number of evkos to average
-     * @param[in] iPreStimSamples      Number of samples averaged before the stimulus
-     * @param[in] iPostStimSamples     Number of samples averaged after the stimulus (including the stimulus)
-     * @param[in] iBaselineFromMSecs   Start of baseline area which was/is used for correction in msecs
-     * @param[in] iBaselineToMSecs     End of baseline area which was/is used for correction in msecs
-     * @param[in] iTriggerIndex        Row in dex of channel which is to be scanned for triggers
-     * @param[in] pFiffInfo            Associated Fiff Information
+     * @param[in] numAverages          Number of evkos to average.
+     * @param[in] iPreStimSamples      Number of samples averaged before the stimulus.
+     * @param[in] iPostStimSamples     Number of samples averaged after the stimulus (including the stimulus).
+     * @param[in] iBaselineFromMSecs   Start of baseline area which was/is used for correction in msecs.
+     * @param[in] iBaselineToMSecs     End of baseline area which was/is used for correction in msecs.
+     * @param[in] iTriggerIndex        Row in dex of channel which is to be scanned for triggers.
+     * @param[in] pFiffInfo            Associated Fiff Information.
      */
     RtAveragingWorker(quint32 numAverages,
                       quint32 iPreStimSamples,
@@ -109,7 +109,7 @@ public:
     /**
      * Perform one single HPI fit.
      *
-     * @param[in] t_mat           Data to estimate the HPI positions from
+     * @param[in] t_mat           Data to estimate the HPI positions from.
      */
     void doWork(const Eigen::MatrixXd& matData);
 
@@ -117,7 +117,7 @@ public:
     /**
      * Sets the number of averages
      *
-     * @param[in] numAve     new number of averages
+     * @param[in] numAve     new number of averages.
      */
     void setAverageNumber(qint32 numAve);
 
@@ -125,8 +125,8 @@ public:
     /**
      * Sets the number of pre stimulus samples
      *
-     * @param[in] samples    new number of pre stimulus samples
-     * @param[in] secs    new number of pre stimulus seconds
+     * @param[in] samples    new number of pre stimulus samples.
+     * @param[in] secs    new number of pre stimulus seconds.
      */
     void setPreStim(qint32 samples,
                     qint32 secs);
@@ -135,8 +135,8 @@ public:
     /**
      * Sets the number of post stimulus samples
      *
-     * @param[in] samples    new number of post stimulus samples
-     * @param[in] secs    new number of pre stimulus seconds
+     * @param[in] samples    new number of post stimulus samples.
+     * @param[in] secs    new number of pre stimulus seconds.
      */
     void setPostStim(qint32 samples,
                      qint32 secs);
@@ -145,7 +145,7 @@ public:
     /**
      * Sets the index of the trigger channel which is to be scanned fo triggers
      *
-     * @param[in] idx    trigger channel index
+     * @param[in] idx    trigger channel index.
      */
     void setTriggerChIndx(qint32 idx);
 
@@ -153,7 +153,7 @@ public:
     /**
      * Sets the artifact reduction
      *
-     * @param[in] mapThresholds       The new map including the current thresholds for the channels
+     * @param[in] mapThresholds       The new map including the current thresholds for the channels.
      */
     void setArtifactReduction(const QMap<QString, double> &mapThresholds);
 
@@ -161,7 +161,7 @@ public:
     /**
      * Sets the baseline correction on or off
      *
-     * @param[in] activate    activate baseline correction
+     * @param[in] activate    activate baseline correction.
      */
     void setBaselineActive(bool activate);
 
@@ -169,8 +169,8 @@ public:
     /**
      * Sets the from mSeconds of the baseline area
      *
-     * @param[in] fromSamp    from of baseline area in samples
-     * @param[in] fromMSec    from of baseline area in mSeconds
+     * @param[in] fromSamp    from of baseline area in samples.
+     * @param[in] fromMSec    from of baseline area in mSeconds.
      */
     void setBaselineFrom(int fromSamp,
                          int fromMSec);
@@ -179,8 +179,8 @@ public:
     /**
      * Sets the to mSeconds of the baseline area
      *
-     * @param[in] toSamp    to of baseline area in samples
-     * @param[in] toMSec    to of baseline area in mSeconds
+     * @param[in] toSamp    to of baseline area in samples.
+     * @param[in] toMSec    to of baseline area in mSeconds.
      */
     void setBaselineTo(int toSamp,
                        int toMSec);
@@ -293,14 +293,14 @@ public:
     /**
      * Creates the real-time averaging object.
      *
-     * @param[in] numAverages            Number of evkos to average
-     * @param[in] iPreStimSamples      Number of samples averaged before the stimulus
-     * @param[in] iPostStimSamples     Number of samples averaged after the stimulus (including the stimulus)
-     * @param[in] iBaselineFromSecs    Start of baseline area which was/is used for correction in msecs
-     * @param[in] iBaselineToSSecs     End of baseline area which was/is used for correction in msecs
-     * @param[in] iTriggerIndex        Row in dex of channel which is to be scanned for triggers
-     * @param[in] pFiffInfo            Associated Fiff Information
-     * @param[in] parent     Parent QObject (optional)
+     * @param[in] numAverages            Number of evkos to average.
+     * @param[in] iPreStimSamples      Number of samples averaged before the stimulus.
+     * @param[in] iPostStimSamples     Number of samples averaged after the stimulus (including the stimulus).
+     * @param[in] iBaselineFromSecs    Start of baseline area which was/is used for correction in msecs.
+     * @param[in] iBaselineToSSecs     End of baseline area which was/is used for correction in msecs.
+     * @param[in] iTriggerIndex        Row in dex of channel which is to be scanned for triggers.
+     * @param[in] pFiffInfo            Associated Fiff Information.
+     * @param[in] parent     Parent QObject (optional).
      */
     explicit RtAveraging(quint32 numAverages,
                          quint32 iPreStimSamples,
@@ -321,7 +321,7 @@ public:
     /**
      * Slot to receive incoming data.
      *
-     * @param[in] data  Data to calculate the average from
+     * @param[in] data  Data to calculate the average from.
      */
     void append(const Eigen::MatrixXd &data);
 
@@ -329,13 +329,13 @@ public:
     /**
      * Restarts the thread by interrupting its computation queue, quitting, waiting and then starting it again.
      *
-     * @param[in] numAverages            Number of evkos to average
-     * @param[in] iPreStimSamples      Number of samples averaged before the stimulus
-     * @param[in] iPostStimSamples     Number of samples averaged after the stimulus (including the stimulus)
-     * @param[in] iBaselineFromSecs    Start of baseline area which was/is used for correction in msecs
-     * @param[in] iBaselineToSSecs     End of baseline area which was/is used for correction in msecs
-     * @param[in] iTriggerIndex        Row in dex of channel which is to be scanned for triggers
-     * @param[in] pFiffInfo            Associated Fiff Information
+     * @param[in] numAverages            Number of evkos to average.
+     * @param[in] iPreStimSamples      Number of samples averaged before the stimulus.
+     * @param[in] iPostStimSamples     Number of samples averaged after the stimulus (including the stimulus).
+     * @param[in] iBaselineFromSecs    Start of baseline area which was/is used for correction in msecs.
+     * @param[in] iBaselineToSSecs     End of baseline area which was/is used for correction in msecs.
+     * @param[in] iTriggerIndex        Row in dex of channel which is to be scanned for triggers.
+     * @param[in] pFiffInfo            Associated Fiff Information.
      */
     void restart(quint32 numAverages,
                  quint32 iPreStimSamples,
@@ -355,7 +355,7 @@ public:
     /**
      * Sets the number of averages
      *
-     * @param[in] numAve     new number of averages
+     * @param[in] numAve     new number of averages.
      */
     void setAverageNumber(qint32 numAve);
 
@@ -363,8 +363,8 @@ public:
     /**
      * Sets the number of pre stimulus samples
      *
-     * @param[in] samples    new number of pre stimulus samples
-     * @param[in] secs    new number of pre stimulus seconds
+     * @param[in] samples    new number of pre stimulus samples.
+     * @param[in] secs    new number of pre stimulus seconds.
      */
     void setPreStim(qint32 samples,
                     qint32 secs);
@@ -373,8 +373,8 @@ public:
     /**
      * Sets the number of post stimulus samples
      *
-     * @param[in] samples    new number of post stimulus samples
-     * @param[in] secs    new number of pre stimulus seconds
+     * @param[in] samples    new number of post stimulus samples.
+     * @param[in] secs    new number of pre stimulus seconds.
      */
     void setPostStim(qint32 samples,
                      qint32 secs);
@@ -383,7 +383,7 @@ public:
     /**
      * Sets the index of the trigger channel which is to be scanned fo triggers
      *
-     * @param[in] idx    trigger channel index
+     * @param[in] idx    trigger channel index.
      */
     void setTriggerChIndx(qint32 idx);
 
@@ -391,7 +391,7 @@ public:
     /**
      * Sets the artifact reduction
      *
-     * @param[in] mapThresholds       The new map including the current thresholds for the channels
+     * @param[in] mapThresholds       The new map including the current thresholds for the channels.
      */
     void setArtifactReduction(const QMap<QString, double> &mapThresholds);
 
@@ -399,7 +399,7 @@ public:
     /**
      * Sets the baseline correction on or off
      *
-     * @param[in] activate    activate baseline correction
+     * @param[in] activate    activate baseline correction.
      */
     void setBaselineActive(bool activate);
 
@@ -407,8 +407,8 @@ public:
     /**
      * Sets the from mSeconds of the baseline area
      *
-     * @param[in] fromSamp    from of baseline area in samples
-     * @param[in] fromMSec    from of baseline area in mSeconds
+     * @param[in] fromSamp    from of baseline area in samples.
+     * @param[in] fromMSec    from of baseline area in mSeconds.
      */
     void setBaselineFrom(int fromSamp,
                          int fromMSec);
@@ -417,8 +417,8 @@ public:
     /**
      * Sets the to mSeconds of the baseline area
      *
-     * @param[in] toSamp    to of baseline area in samples
-     * @param[in] toMSec    to of baseline area in mSeconds
+     * @param[in] toSamp    to of baseline area in samples.
+     * @param[in] toMSec    to of baseline area in mSeconds.
      */
     void setBaselineTo(int toSamp,
                        int toMSec);

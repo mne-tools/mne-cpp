@@ -166,7 +166,7 @@ public:
     /**
      * Connects to buffer at address m_sAddress and port m_iPort
      *
-     * @return true if successful, false if unsuccessful
+     * @return true if successful, false if unsuccessful.
      */
     bool connect();
 
@@ -174,7 +174,7 @@ public:
     /**
      * Disconnects m_pSocket
      *
-     * @return true if successful, false if unsuccessful
+     * @return true if successful, false if unsuccessful.
      */
     bool disconnect();
 
@@ -182,7 +182,7 @@ public:
     /**
      * Requests and receives header data from buffer, saves relevant parameters internally.
      *
-     * @return true if successful, false if unsuccessful
+     * @return true if successful, false if unsuccessful.
      */
     bool getHeader();
 
@@ -190,7 +190,7 @@ public:
     /**
      * equests and receives data from buffer, parses it, and stores it in m_pMatEmit
      *
-     * @return true if successful, false if unsuccessful
+     * @return true if successful, false if unsuccessful.
      */
     bool getData();
 
@@ -198,7 +198,7 @@ public:
     /**
      * Gets address currently stored in private member m_sAddress
      *
-     * @return returns m_sAddress
+     * @return returns m_sAddress.
      */
     QString getAddr();
 
@@ -206,9 +206,9 @@ public:
     /**
      * Sets private member m_sAddress to a new address
      *
-     * @param[in] sNewAddress   A QString with an address (not checked to se if valid)
+     * @param[in] sNewAddress   A QString with an address (not checked to se if valid).
      *
-     * @return true if successful, false if unsuccessful
+     * @return true if successful, false if unsuccessful.
      */
     bool setAddr(const QString &sNewAddress);
 
@@ -216,7 +216,7 @@ public:
     /**
      * Gets port numbr currently stored in private member m_iPort
      *
-     * @return returns m_iPort
+     * @return returns m_iPort.
      */
     int getPort();
 
@@ -224,9 +224,9 @@ public:
     /**
      * Sets private member m_iPort to a new port number
      *
-     * @param[in] iPort     An int with a new desired port number
+     * @param[in] iPort     An int with a new desired port number.
      *
-     * @return true if successful, false if unsuccessful
+     * @return true if successful, false if unsuccessful.
      */
     bool setPort(const int& iPort);
 
@@ -240,7 +240,7 @@ public:
     /**
      * Returns member m_pMatEmit, newest buffer data formatted as an Eigen MatrixXd
      *
-     * @return returns m_pMatEmit
+     * @return returns m_pMatEmit.
      */
     Eigen::MatrixXd getMatrix();
 
@@ -248,7 +248,7 @@ public:
     /**
      * Returns whether or not new data has been read from buffer
      *
-     * @return returns m_bNewData, flag of whether there is new data
+     * @return returns m_bNewData, flag of whether there is new data.
      */
     bool newData();
 
@@ -262,7 +262,7 @@ public:
     /**
      * Parses the extended header chunk with neuromag data and gets the relevant fiff info
      *
-     * @return returns the FiffInfo from the parsed fif file from the neuromag header chunk
+     * @return returns the FiffInfo from the parsed fif file from the neuromag header chunk.
      */
     FIFFLIB::FiffInfo parseNeuromagHeader();
 
@@ -285,7 +285,7 @@ private:
     /**
      * Sends a formated datasel message, for defining the first and last sample we are requesting from the buffer
      *
-     * @param[in] datasel   Formattd first and last sample index we are requesting from the buffer
+     * @param[in] datasel   Formattd first and last sample index we are requesting from the buffer.
      */
     void sendDataSel(datasel_t &datasel);
 
@@ -293,7 +293,7 @@ private:
     /**
      * Sends a formated sampleevents message, used for receving updated sample an event numbers from buffer
      *
-     * @param[in] threshold     Buffer will respond once sample/event numbers reach the thresholds
+     * @param[in] threshold     Buffer will respond once sample/event numbers reach the thresholds.
      */
     void sendSampleEvents(samples_events_t &threshold);
 
@@ -301,9 +301,9 @@ private:
     /**
      * Parses headerdef message and saves parameters(channels, frequency, datatype, newsamples)
      *
-     * @param[in] readBuffer    QBuffer with return headerdef_t data from buffer
+     * @param[in] readBuffer    QBuffer with return headerdef_t data from buffer.
      *
-     * @return true if successful, false if unsuccessful
+     * @return true if successful, false if unsuccessful.
      */
     bool parseHeaderDef(QBuffer &readBuffer);
 
@@ -311,9 +311,9 @@ private:
     /**
      * Parses messadef and returns bufsize
      *
-     * @param[in] readBuffer    QBuffer with return messagedef_t data from buffer
+     * @param[in] readBuffer    QBuffer with return messagedef_t data from buffer.
      *
-     * @return returns messagedef_t.bufsize
+     * @return returns messagedef_t.bufsize.
      */
     int parseMessageDef(QBuffer &readBuffer);
 
@@ -321,9 +321,9 @@ private:
     /**
      * Parses datadef and returns bufsize
      *
-     * @param[in] dataBuffer    QBuffer with return datadef_t data from buffer
+     * @param[in] dataBuffer    QBuffer with return datadef_t data from buffer.
      *
-     * @return returns datadef_t.bufsize
+     * @return returns datadef_t.bufsize.
      */
     int parseDataDef(QBuffer &dataBuffer);
 
@@ -331,10 +331,10 @@ private:
     /**
      * Parses sample data received from buffer, formates it and saves it to m_pMatEmit;
      *
-     * @param[in] datasampBuffer    QBuffer with return data from buffer
-     * @param[in] bufsize           Buffer size of sample data
+     * @param[in] datasampBuffer    QBuffer with return data from buffer.
+     * @param[in] bufsize           Buffer size of sample data.
      *
-     * @return true if successful, false if unsuccessful
+     * @return true if successful, false if unsuccessful.
      */
     bool parseData(QBuffer &datasampBuffer,
                    int bufsize);
@@ -343,8 +343,8 @@ private:
     /**
      * @brief Opens Buffer, reads numBytes from socket and sets index to zero
      *
-     * @param[out] buffer       QBuffer to which daa will be written
-     * @param[in] numBytes      How many bytes to read from socket
+     * @param[out] buffer       QBuffer to which daa will be written.
+     * @param[in] numBytes      How many bytes to read from socket.
      */
     void prepBuffer(QBuffer &buffer,
                     int numBytes);
@@ -353,7 +353,7 @@ private:
     /**
      * Returns total amount of samples written to buffer
      *
-     * @return returns total amount of samples written to buffer
+     * @return returns total amount of samples written to buffer.
      */
     int totalBuffSamples();
 

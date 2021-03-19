@@ -174,7 +174,7 @@ public:
     /**
      * Provides information about matrix coding
      *
-     * @return Matrix coding.
+     * @return Matrix coding
      */
     fiff_int_t getMatrixCoding() const;
 
@@ -182,7 +182,7 @@ public:
     /**
      * Provides information if tag contains a matrix
      *
-     * @return true if tag contains a matrix.
+     * @return true if tag contains a matrix
      */
     bool isMatrix() const;
 
@@ -191,10 +191,10 @@ public:
      * Returns matrix dimensions
      * Refactors: fiff_get_matrix_dims (fiff_matrix.c)
      *
-     * @param[out] p_ndim    number of dimensions.
-     * @param[out] p_Dims    vector containing the size of each dimension.
+     * @param[out] p_ndim    number of dimensions
+     * @param[out] p_Dims    vector containing the size of each dimension
      *
-     * @return true if dimensions are available.
+     * @return true if dimensions are available
      */
     bool getMatrixDimensions(qint32& p_ndim, QVector<qint32>& p_Dims) const;
 
@@ -202,7 +202,7 @@ public:
     /**
      * Provides the tag type information
      *
-     * @return the tag type.
+     * @return the tag type
      */
     fiff_int_t getType() const;
 
@@ -210,7 +210,7 @@ public:
     /**
      * Type information as a string
      *
-     * @return the tag type information.
+     * @return the tag type information
      */
     QString getInfo() const;
 
@@ -222,7 +222,7 @@ public:
      * to Byte
      * Fast access; Data are deleted if tag gets deleted, and wise versa
      *
-     * @return type cast of the tag data pointer.
+     * @return type cast of the tag data pointer
      */
     inline quint8* toByte() const;
 
@@ -231,7 +231,7 @@ public:
      * to unsigned Short
      * Fast access; Data are deleted if tag gets deleted, and wise versa
      *
-     * @return type cast of the tag data pointer.
+     * @return type cast of the tag data pointer
      */
     inline quint16* toUnsignedShort() const;
 
@@ -240,7 +240,7 @@ public:
      * to Short
      * Fast access; Data are deleted if tag gets deleted, and wise versa
      *
-     * @return type cast of the tag data pointer.
+     * @return type cast of the tag data pointer
      */
     inline qint16* toShort() const;
 
@@ -249,7 +249,7 @@ public:
      * to Int
      * Fast access; Data are deleted if tag gets deleted, and wise versa
      *
-     * @return type cast of the tag data pointer.
+     * @return type cast of the tag data pointer
      */
     inline quint32* toUnsignedInt() const;
 
@@ -258,7 +258,7 @@ public:
      * to Int
      * Fast access; Data are deleted if tag gets deleted, and wise versa
      *
-     * @return type cast of the tag data pointer.
+     * @return type cast of the tag data pointer
      */
     inline qint32* toInt() const;
 
@@ -267,7 +267,7 @@ public:
     * to Julian
     * Fast access; Data are deleted if tag gets deleted, and wise versa
     *
-    * @return type cast of the tag data pointer.
+    * @return type cast of the tag data pointer
     */
     inline qint32* toJulian() const;
 
@@ -276,7 +276,7 @@ public:
     * to Float
     * Fast access; Data are deleted if tag gets deleted, and wise versa
     *
-    * @return type cast of the tag data pointer.
+    * @return type cast of the tag data pointer
     */
     inline float* toFloat() const;
 
@@ -285,7 +285,7 @@ public:
      * to Double
      * Fast access; Data are deleted if tag gets deleted, and wise versa
      *
-     * @return type cast of the tag data pointer.
+     * @return type cast of the tag data pointer
      */
     inline double* toDouble() const;
 
@@ -293,7 +293,7 @@ public:
     /**
      * to String
      *
-     * @return converts data to a string.
+     * @return converts data to a string
      */
     inline QString toString() const;
 
@@ -302,7 +302,7 @@ public:
      * to DauPack16
      * Fast access; Data are deleted if tag gets deleted, and wise versa
      *
-     * @return type cast of the tag data pointer.
+     * @return type cast of the tag data pointer
      */
     inline qint16* toDauPack16() const;
 
@@ -311,7 +311,7 @@ public:
      * to complex float
      * Allocates new memory - pointer has to be deleted ater use
      *
-     * @return complex float array.
+     * @return complex float array
      */
 //    inline std::complex<float>* toComplexFloat();
 
@@ -320,7 +320,7 @@ public:
      * to complex double
      * Allocates new memory - pointer has to be deleted ater use
      *
-     * @return complex double array.
+     * @return complex double array
      */
 //    inline std::complex<double>* toComplexDouble();
 
@@ -331,7 +331,7 @@ public:
     /**
      * to fiff ID
      *
-     * @return Fiff universially unique identifier.
+     * @return Fiff universially unique identifier
      */
     inline FiffId toFiffID() const;
 
@@ -339,7 +339,7 @@ public:
     /**
      * to fiff DIG POINT
      *
-     * @return Fiff point descriptor.
+     * @return Fiff point descriptor
      */
     inline FiffDigPoint toDigPoint() const;
 
@@ -347,7 +347,7 @@ public:
     /**
      * to fiff COORD TRANS
      *
-     * @return Fiff coordinate transformation descriptor.
+     * @return Fiff coordinate transformation descriptor
      */
     inline FiffCoordTrans toCoordTrans() const;
 
@@ -369,7 +369,7 @@ public:
     /**
      * to fiff DIR ENTRY
      *
-     * @return List of directory entry descriptors.
+     * @return List of directory entry descriptors
      */
     inline QList< QSharedPointer<FiffDirEntry> > toDirEntry() const;
 
@@ -380,7 +380,7 @@ public:
     /**
      * to fiff FIFFT INT MATRIX
      *
-     * @return Integer matrix.
+     * @return Integer matrix
      */
     inline Eigen::MatrixXi toIntMatrix() const;
 
@@ -390,7 +390,7 @@ public:
      *
      * parses a fiff float matrix
      *
-     * @return the parsed float matrix.
+     * @return the parsed float matrix
      */
     inline Eigen::MatrixXf toFloatMatrix() const;
 
@@ -400,7 +400,7 @@ public:
      *
      * parses a sparse fiff float matrix and returns a double sparse matrix to make sure only double is used
      *
-     * @return a sparse double matrix wich is newly created from the parsed float.
+     * @return a sparse double matrix wich is newly created from the parsed float
      */
     inline Eigen::SparseMatrix<double> toSparseFloatMatrix() const;
 
@@ -412,7 +412,7 @@ public:
     /**
      * Convert coil position descriptor
      *
-     * @param[in, out] pos    coil position descriptor to convert.
+     * @param[in, out] pos    coil position descriptor to convert
      */
     static void convert_ch_pos(FiffChPos* pos);
 
@@ -437,7 +437,7 @@ public:
     /**
      * Convert matrix data read from a file inside a fiff tag
      *
-     * @param[in, out] tag    matrix data to convert.
+     * @param[in, out] tag    matrix data to convert
      */
     static void convert_matrix_from_file_data(FiffTag::SPtr tag);
 
@@ -445,7 +445,7 @@ public:
     /**
      * Convert matrix data before writing to a file inside a fiff tag
      *
-     * @param[in, out] tag    matrix data to convert.
+     * @param[in, out] tag    matrix data to convert
      */
     static void convert_matrix_to_file_data(FiffTag::SPtr tag);
 
@@ -462,9 +462,9 @@ public:
      * Either of these may be specified as FIFFV_LITTLE_ENDIAN, FIFFV_BIG_ENDIAN, or FIFFV_NATIVE_ENDIAN.
      * The last choice means that the native byte order value will be substituted here before proceeding
      *
-     * @param[in, out] tag       matrix data to convert.
-     * @param[in] from_endian    from endian encoding.
-     * @param[in] to_endian      to endian encoding.
+     * @param[in, out] tag       matrix data to convert
+     * @param[in] from_endian    from endian encoding
+     * @param[in] to_endian      to endian encoding
      */
     static void convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian);
 
@@ -475,7 +475,7 @@ public:
     /**
      * These return information about a fiff type.
      *
-     * @return fiff type.
+     * @return fiff type
      */
     static fiff_int_t fiff_type_fundamental(fiff_int_t type);
 
@@ -483,7 +483,7 @@ public:
     /**
      * These return information about fiff type base.
      *
-     * @return fiff type.
+     * @return fiff type
      */
     static fiff_int_t fiff_type_base(fiff_int_t type);
 
@@ -491,7 +491,7 @@ public:
     /**
      * These return information about the matrix coding.
      *
-     * @return matrix coding.
+     * @return matrix coding
      */
     static fiff_int_t fiff_type_matrix_coding(fiff_int_t type);
 

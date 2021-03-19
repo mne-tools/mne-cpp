@@ -84,10 +84,10 @@ public:
     /**
      * Construts the surface set by reading it of the given files.
      *
-     * @param[in] subject_id         Name of subject
-     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
-     * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
-     * @param[in] subjects_dir       Subjects directory
+     * @param[in] subject_id         Name of subject.
+     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}.
+     * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
+     * @param[in] subjects_dir       Subjects directory.
      */
     explicit SurfaceSet(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
 
@@ -95,9 +95,9 @@ public:
     /**
      * Construts the surface set by reading it of the given files.
      *
-     * @param[in] path               path to surface directory
-     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
-     * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+     * @param[in] path               path to surface directory.
+     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}.
+     * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
      */
     explicit SurfaceSet(const QString &path, qint32 hemi, const QString &surf);
 
@@ -105,8 +105,8 @@ public:
     /**
      * Constructs a surface set by assembling given surfaces
      *
-     * @param[in] p_LHSurface    Left hemisphere surface
-     * @param[in] p_RHSurface    Right hemisphere surface
+     * @param[in] p_LHSurface    Left hemisphere surface.
+     * @param[in] p_RHSurface    Right hemisphere surface.
      */
     explicit SurfaceSet(const Surface& p_LHSurface, const Surface& p_RHSurface);
 
@@ -114,8 +114,8 @@ public:
     /**
      * Constructs an annotation set by reading from annotation files
      *
-     * @param[in] p_sLHFileName  Left hemisphere annotation file
-     * @param[in] p_sRHFileName  Right hemisphere annotation file
+     * @param[in] p_sLHFileName  Left hemisphere annotation file.
+     * @param[in] p_sRHFileName  Right hemisphere annotation file.
      */
     explicit SurfaceSet(const QString& p_sLHFileName, const QString& p_sRHFileName);
 
@@ -135,7 +135,7 @@ public:
     /**
      * Returns The surface set map
      *
-     * @return the surface set map
+     * @return the surface set map.
      */
     inline QMap<qint32, Surface>& data();
 
@@ -143,7 +143,7 @@ public:
     /**
      * True if SurfaceSet is empty.
      *
-     * @return true if SurfaceSet is empty
+     * @return true if SurfaceSet is empty.
      */
     inline bool isEmpty() const;
 
@@ -151,7 +151,7 @@ public:
     /**
      * Insert a surface
      *
-     * @param[in] p_Surface  Surface to insert
+     * @param[in] p_Surface  Surface to insert.
      */
     void insert(const Surface& p_Surface);
 
@@ -159,11 +159,11 @@ public:
     /**
      * Reads different surface files and assembles them to a SurfaceSet
      *
-     * @param[in] p_sLHFileName      Left hemisphere surface file
-     * @param[in] p_sRHFileName      Right hemisphere surface file
-     * @param[out] p_SurfaceSet      The read surface set
+     * @param[in] p_sLHFileName      Left hemisphere surface file.
+     * @param[in] p_sRHFileName      Right hemisphere surface file.
+     * @param[out] p_SurfaceSet      The read surface set.
      *
-     * @return true if succesfull, false otherwise
+     * @return true if succesfull, false otherwise.
      */
     static bool read(const QString& p_sLHFileName, const QString& p_sRHFileName, SurfaceSet &p_SurfaceSet);
 
@@ -171,7 +171,7 @@ public:
     /**
      * The kind of Surfaces which are held by the SurfaceSet (eg. inflated, orig ...)
      *
-     * @return the loaded surfaces (eg. inflated, orig ...)
+     * @return the loaded surfaces (eg. inflated, orig ...).
      */
     inline QString surf() const;
 
@@ -219,7 +219,7 @@ public:
     /**
      * Returns number of loaded hemispheres
      *
-     * @return number of loaded hemispheres
+     * @return number of loaded hemispheres.
      */
     inline qint32 size() const;
 
