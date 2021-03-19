@@ -51,6 +51,7 @@ namespace EVENTSLIB {
 
 /**
  * A holder for the color of an event group.
+ *
  * This class interacts well with QtColor, since it has constructors dependant on rgb type data.
  */
 struct EVENTS_EXPORT RgbColor
