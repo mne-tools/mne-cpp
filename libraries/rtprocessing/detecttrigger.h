@@ -86,7 +86,7 @@ RTPROCESINGSHARED_EXPORT QList<Eigen::MatrixXi> toEventMatrix(QMap<int,QList<QPa
  * @param[in]        bRemoveOffset  remove the first sample as offset.
  * @param[in]        iBurstLengthMs  The length in samples which is skipped after a trigger was found.
  *
- * @param return     This map holds the indices of the channels which are to be read from data. For each.
+ * @param return     This map holds the indices of the channels which are to be read from data. For each
  *                   index/channel the found triggersand corresponding signal values are written to the value of the map.
  */
 RTPROCESINGSHARED_EXPORT QMap<int, QList<QPair<int, double> > > detectTriggerFlanksMax(const Eigen::MatrixXd &data,
