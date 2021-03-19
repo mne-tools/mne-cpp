@@ -187,10 +187,10 @@ private:
     int         m_iUpperItemIndex;          /**< The current upper item index visible in the QTableView. */
 
     QPen        m_penGrid;                  /**< Pen for drawing the data grid. */
-    QPen        m_penNormal;                /**< Pen for drawing the data when data is plotted normally without freeze on. . */
-    QPen        m_penNormalSelected;        /**< Pen for drawing the data when data is plotted normally without freeze on and channel is selected. . */
-    QPen        m_penNormalBad;             /**< Pen for drawing the data when bad data is plotted normally without freeze on. . */
-    QPen        m_penNormalSelectedBad;     /**< Pen for drawing the data when bad data is plotted normally without freeze on and channel is selected. . */
+    QPen        m_penNormal;                /**< Pen for drawing the data when data is plotted normally without freeze on. */
+    QPen        m_penNormalSelected;        /**< Pen for drawing the data when data is plotted normally without freeze on and channel is selected. */
+    QPen        m_penNormalBad;             /**< Pen for drawing the data when bad data is plotted normally without freeze on. */
+    QPen        m_penNormalSelectedBad;     /**< Pen for drawing the data when bad data is plotted normally without freeze on and channel is selected. */
 
 };
 

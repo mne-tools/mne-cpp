@@ -161,7 +161,7 @@ private:
     bool m_bIsInit;             /**< If channel info is initialized.*/
     bool m_bContainsValues;     /**< If values are stored.*/
 
-    qint8 m_xScaleType;         /**< The scale type of x axis: 0-normal; 1-log. . */
+    qint8 m_xScaleType;         /**< The scale type of x axis: 0-normal; 1-log. */
 };
 
 //=============================================================================================================
