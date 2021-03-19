@@ -20,9 +20,9 @@ Make sure you have one of the following compilers installed:
 
 Qt is the only dependency you will need to install. Go to the Qt download section and download the [Qt installer](https://www.qt.io/download-qt-installer?hsCtaTracking=9f6a2170-a938-42df-a8e2-a9f0b1d6cdce%7C6cb0de4f-9bb5-4778-ab02-bfb62735f3e5){:target="_blank" rel="noopener"}.
 
-### Install Qt
+### Install Qt 5
 
-Please note that Qt 5.10.0 or higher is needed in order to have full Qt3D support. Install the Qt version with the minimum of the following features (uncheck all other boxes) to a path without white spaces:
+Please note that Qt 5.10.0 or higher is needed in order to have full Qt3D support. Qt 6 is not yet supported. Install the Qt version with the minimum of the following features (uncheck all other boxes) to a path without white spaces:
 
 - Qt/5.15.1/MSVC 2019 64-bit (Make sure to select the correct version based on your compiler)
 - Qt/5.15.1/QtCharts
@@ -64,6 +64,8 @@ git rebase upstream/master
 4. In the Qt Creator's Projects window, right mouse click on the top level MNE-CPP tree item and select Run qmake. Wait until progress bar in lower right corner turns green (this step may take some time).
 5. Right mouse click again and then hit Build (this step may take some time). Wait until progress bar in lower right corner turns green.
 6. After the build process is finished, go to the `mne-cpp/bin` folder. All applications and libraries should have been created throughout the build process.
+
+For building on CentOS and other linux distros with older gcc versions, check if RHEL Developer Toolsets are available with newer versions. In Qt Creator, under `Tools > Options > Kits > Compilers`, you can add a new compiler, and then add it to your build kit in `Tools > Options > Kits > Kits`.
 
 ### Via Command Line
 
