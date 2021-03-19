@@ -11,34 +11,36 @@ class EventINT;
 
 namespace EVENTSLIB {
 /**
- * @brief This is a public Class to organize events and make it easy to manipulate
+ * This is a public Class to organize events and make it easy to manipulate
  * for the end-user of the library.
  */
 struct EVENTS_EXPORT Event
 {
     /**
-     * @brief Event
+     * EventINT constructor.
      */
     Event();
     //=========================================================================================================
     /**
-     * @brief Event
-     * @param idRHS
-     * @param sampleRHS
-     * @param groupIdRHS
+     * Event class constructor
+     *
+     * @param[in] id Id of the event to be created.
+     * @param[in] sample Sample number of the event to be created.
+     * @param[in] groupId GroupId of the EventGroupINT to which the event will belong to.
      */
-    Event(const idNum idRHS,const  int sampleRHS, const idNum groupIdRHS);
+    Event(const idNum id,const  int sample, const idNum groupId);
 
     //=========================================================================================================
     /**
-     * @brief Event
-     * @param e
+     * Event constructor based on an internal event object of class EventINT.
+     *
+     * @param[in] e An event object.
      */
     Event(const EVENTSINTERNAL::EventINT& e);
 
-    idNum  id;
-    idNum  groupId;
-    int  sample;
+    idNum  id;      /**< Event id. */
+    int  sample;    /**< Sample number of the event. */
+    idNum  groupId; /**< GroupId of this event. */
 };
 
 }
@@ -54,36 +56,68 @@ class EventGroupINT;
 // recording, single file... for about 300 million years. That's that...
 // at some point we can substitute int and idNum with std::int64_t. That will take that limitation away.
 // I don't see how I should ever think of this again.
-
+/**
+ * The EventINT class
+ *
+ * The events are objects of this class internally in the library.
+ */
 class EventINT
 {
 public:
     //=========================================================================================================
     /**
-     * Create an event at sample iSample
+     * EventINT constructor.
      *
-     * @param iSample
-     * @param group
+     * @param[in] Id of the new event.
      */
     EventINT(idNum id);
+    //=========================================================================================================
+    /**
+     * EventINT constructor.
+     *
+     * @param[in] id Id of the new event.
+     * @param[in] iSample Sample of the new created event.
+     * @param[in] groupId GroupId to which the created event will belong.
+     */
     EventINT(idNum id, int iSample, idNum groupId);
+
+    //=========================================================================================================
+    /**
+     * Copy constructor for the EventINT class.
+     *
+     * @param rhs Rhs EventINT object.
+     */
     EventINT(const EventINT& rhs);
+
+    //=========================================================================================================
+    /**
+     * Move constructor
+     *
+     * @param other Object to be moved.
+     */
     EventINT(EventINT&& other);
 
+    //=========================================================================================================
+    /**
+     * Create an event at sample iSample
+     *
+     * @param[in] iSample
+     */
     static inline EventINT fromSample(int iSample);
 
     //=========================================================================================================
     /**
-     * Returns event sample
+     * Returns event sample.
      *
-     * @return event sample
+     * @return Event sample.
      */
     int getSample() const;
 
     //=========================================================================================================
     /**
-     * @brief setSample
-     * @param iSample
+     * setSample Set the value of the event sample.
+     *
+     * @param iSample sample.
      */
     void setSample(int iSample);
 
@@ -91,61 +125,78 @@ public:
     /**
      * Returns event group
      *
-     * @return event group
+     * @return Event group.
      */
     idNum getGroupId() const;
 
     //=========================================================================================================
     /**
-     * @brief setGroupId
-     * @param iGroup
+     * Set the value of the group of this event.
+     *
+     * @param iGroup Group id.
      */
     void setGroupId(idNum iGroup);
 
     //=========================================================================================================
     /**
-     * @brief getId
-     * @return
+     * Retrieve this event's id.
+     *
+     * @return Id Event Id.
      */
     idNum getId() const;
 
     //=========================================================================================================
-    //**
-    //**     * @brief getDescription
-    //**     * @return
-    //**     */
+    /**
+     * Retrieve this event's description.
+     *
+     * @return Event Description.
+     */
     std::string getDescription() const;
 
     //=========================================================================================================
     /**
-     * @brief setDescription
-     * @param description
+     * Set this event's description.
+     *
+     * @param[in] description The new description text.
      */
     void setDescription(const std::string& description);
 
     //=========================================================================================================
     /**
-     * @brief setDescription
-     * @param description
+     * Set this event's description from a rvalue string.
+     *
+     * @param[in] description The new description.
      */
     void setDescription(std::string&& description);
 
     //=========================================================================================================
     /**
-     * @brief operator <
-     * @param rhs
-     * @return
+     * Overriden < operator. This operator helps the organization of events in standard library containers.
+     *
+     * @param[in] rhs EventINT to compare to.
+     *
+     * @return Bool value with the result of the comparison.
      */
     bool operator<(const EventINT& rhs) const;
 
     //=========================================================================================================
     /**
-     * @brief operator ==
-     * @param rhs
-     * @return
+     * Overriden == operator. This operator helps the organization of events in standard library containers.
+     *
+     * @param[in] rhs EventINT to compare to.
+     *
+     * @return Bool value with the result of the comparison.
      */
     bool operator==(const EventINT& rhs) const;
 
+    //=========================================================================================================
+    /**
+     * Overriden = operator in case of need to copy assing an event.
+     *
+     * @param rhs EventINT to copy assign to.
+     *
+     * @return a new EventINT created.
+     */
     EventINT operator=(const EventINT& rhs);
 
 private:
@@ -157,9 +208,11 @@ private:
 
 //=========================================================================================================
 /**
- * @brief EventINT::fromSample
- * @param sample
- * @return
+ * Create an EventINT event from a specific sample.
+ *
+ * @param[in] sample Sample of the new event.
+ *
+ * @return new event created.
  */
 inline EventINT EventINT::fromSample(int sample)
 {
@@ -169,8 +222,9 @@ inline EventINT EventINT::fromSample(int sample)
 }//namespace EVENTSINTERNAL
 
 //=========================================================================================================
+
 /**
- *
+ * Template specialization for the EventINT class. Helpful when dealing with std library containers.
  */
 namespace std {
 template<>

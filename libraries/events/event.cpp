@@ -32,10 +32,10 @@ EVENTSLIB::Event::Event()
 
 //=============================================================================================================
 
-EVENTSLIB::Event::Event(const idNum idRHS,const  int sampleRHS, const idNum groupIdRHS)
-: id(idRHS)
-, groupId(groupIdRHS)
-, sample(sampleRHS)
+EVENTSLIB::Event::Event(const idNum id,const  int sample, const idNum groupId)
+: id(id)
+, sample(sample)
+, groupId(groupId)
 { }
 
 //=============================================================================================================
