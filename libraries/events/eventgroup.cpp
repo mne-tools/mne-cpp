@@ -61,8 +61,8 @@ using namespace EVENTSINTERNAL;
 // INIT STATIC MEMBERS
 //=============================================================================================================
 
-constexpr static const unsigned char defaultGroupColor[] = { 0xC0, 0xFF, 0xEE };
-constexpr static const unsigned char defaultGroupTransparency = 0xFF;
+constexpr static const unsigned char defaultGroupColor[] = { 0xC0, 0xFF, 0xEE };    /**< Default GroupColor. */
+constexpr static const unsigned char defaultGroupTransparency = 0xFF;               /**< Default GroupTransparency value. */
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
