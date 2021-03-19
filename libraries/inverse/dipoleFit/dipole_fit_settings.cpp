@@ -78,7 +78,7 @@ void DipoleFitSettings::initMembers()
     filter.eog_lowpass = 40.0;
     filter.eog_lowpass_width = 5.0;
 
-    accurate    = false;         /**< Use accurate coil definitions? */
+    accurate    = false;         /**< Use accurate coil definitions?. */
 
     guess_rad     = 0.080f;       
     guess_mindist = 0.010f;       

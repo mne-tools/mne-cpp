@@ -182,18 +182,18 @@ public:
     inline Eigen::MatrixXd& getKernel();
 
 private:
-    MNELIB::MNEInverseOperator m_inverseOperator;   /**< The inverse operator */
-    float m_fLambda;                                /**< Regularization parameter */
-    QString m_sMethod;                              /**< Selected method */
-    bool m_bsLORETA;                                /**< Do sLORETA method */
-    bool m_bdSPM;                                   /**< Do dSPM method */
+    MNELIB::MNEInverseOperator m_inverseOperator;   /**< The inverse operator. */
+    float m_fLambda;                                /**< Regularization parameter. */
+    QString m_sMethod;                              /**< Selected method. */
+    bool m_bsLORETA;                                /**< Do sLORETA method. */
+    bool m_bdSPM;                                   /**< Do dSPM method. */
 
-    bool inverseSetup;                              /**< Inverse Setup Calcluated */
-    MNELIB::MNEInverseOperator inv;                 /**< The setup inverse operator */
-    Eigen::SparseMatrix<double> noise_norm;         /**< The noise normalization */
-    QList<Eigen::VectorXi> vertno;                  /**< The vertices numbers */
-    FSLIB::Label label;                             /**< The corresponding labels */
-    Eigen::MatrixXd K;                              /**< Imaging kernel */
+    bool inverseSetup;                              /**< Inverse Setup Calcluated. */
+    MNELIB::MNEInverseOperator inv;                 /**< The setup inverse operator. */
+    Eigen::SparseMatrix<double> noise_norm;         /**< The noise normalization. */
+    QList<Eigen::VectorXi> vertno;                  /**< The vertices numbers. */
+    FSLIB::Label label;                             /**< The corresponding labels. */
+    Eigen::MatrixXd K;                              /**< Imaging kernel. */
 };
 
 //=============================================================================================================

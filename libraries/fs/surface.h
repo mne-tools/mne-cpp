@@ -284,14 +284,14 @@ public:
 private:
     QString m_sFilePath;    /**< Path to surf directory. */
     QString m_sFileName;    /**< Surface file name. */
-    qint32 m_iHemi;         /**< Hemisphere (lh = 0; rh = 1) */
-    QString m_sSurf;        /**< Loaded surface (eg. inflated, orig ...) */
-    Eigen::MatrixX3f m_matRR;      /**< alias verts. Vertex coordinates in meters */
-    Eigen::MatrixX3i m_matTris;    /**< alias faces. The triangle descriptions */
-    Eigen::MatrixX3f m_matNN;      /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us */
-    Eigen::VectorXf m_vecCurv;     /**< FreeSurfer curvature data */
+    qint32 m_iHemi;         /**< Hemisphere (lh = 0; rh = 1). */
+    QString m_sSurf;        /**< Loaded surface (eg. inflated, orig ...). */
+    Eigen::MatrixX3f m_matRR;      /**< alias verts. Vertex coordinates in meters. */
+    Eigen::MatrixX3i m_matTris;    /**< alias faces. The triangle descriptions. */
+    Eigen::MatrixX3f m_matNN;      /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us. */
+    Eigen::VectorXf m_vecCurv;     /**< FreeSurfer curvature data. */
 
-    Eigen::Vector3f m_vecOffset; /**< Surface offset */
+    Eigen::Vector3f m_vecOffset; /**< Surface offset. */
 };
 
 //=============================================================================================================

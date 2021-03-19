@@ -250,8 +250,8 @@ private:
 
     QMutex                              m_qMutex;                           /**< Holds the threads mutex.*/
 
-    QAction*                            m_pActionImpedance;                 /**< shows impedance widget */
-    QAction*                            m_pActionSetupProject;              /**< shows setup project dialog */
+    QAction*                            m_pActionImpedance;                 /**< shows impedance widget. */
+    QAction*                            m_pActionSetupProject;              /**< shows setup project dialog. */
 };
 } // NAMESPACE
 

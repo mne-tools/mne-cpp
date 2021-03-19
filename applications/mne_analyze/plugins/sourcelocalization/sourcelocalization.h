@@ -109,7 +109,7 @@ public:
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
 private:    
-    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals */
+    QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals. */
 };
 
 } // NAMESPACE

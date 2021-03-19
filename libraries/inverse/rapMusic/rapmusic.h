@@ -70,8 +70,8 @@ namespace INVERSELIB
 // SOME DEFINES
 //=============================================================================================================
 
-#define NOT_TRANSPOSED   0  /**< Defines NOT_TRANSPOSED */
-#define IS_TRANSPOSED   1   /**< Defines IS_TRANSPOSED */
+#define NOT_TRANSPOSED   0  /**< Defines NOT_TRANSPOSED. */
+#define IS_TRANSPOSED   1   /**< Defines IS_TRANSPOSED. */
 
 //=============================================================================================================
 /**
@@ -303,7 +303,7 @@ protected:
                                  calculation is stopped. */
 
     int m_iNumGridPoints;               /**< Number of Grid points. */
-    int m_iNumChannels;                 /**< Number of channels */
+    int m_iNumChannels;                 /**< Number of channels. */
     int m_iNumLeadFieldCombinations;    /**< Number of Lead Filed combinations (grid points + 1 over 2)*/
 
     Pair** m_ppPairIdxCombinations; /**< Index combination vector with grid pair indices. */
@@ -313,8 +313,8 @@ protected:
     bool m_bIsInit; /**< Whether the algorithm is initialized. */
 
     //Stc stuff
-    int m_iSamplesStcWindow;    /**< Number of samples per localization window */
-    float m_fStcOverlap;        /**< Percentage of localization window overlap */
+    int m_iSamplesStcWindow;    /**< Number of samples per localization window. */
+    float m_fStcOverlap;        /**< Percentage of localization window overlap. */
 
     //=========================================================================================================
     /**

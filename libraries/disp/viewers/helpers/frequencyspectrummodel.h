@@ -276,18 +276,18 @@ private:
 
     QMap<qint32,qint32>     m_qMapIdxRowSelection;  /**< Selection mapping.*/
 
-    Eigen::RowVectorXd      m_vecFreqScale;         /**< Frequency scale */
-    Eigen::RowVectorXd      m_vecFreqScaleBound;    /**< Frequency scaled to boundaries */
+    Eigen::RowVectorXd      m_vecFreqScale;         /**< Frequency scale. */
+    Eigen::RowVectorXd      m_vecFreqScaleBound;    /**< Frequency scaled to boundaries. */
     Eigen::MatrixXd         m_dataCurrent;          /**< List that holds the current data*/
     Eigen::MatrixXd         m_dataCurrentFreeze;    /**< List that holds the current data when freezed*/
 
-    float       m_fSps;                 /**< Sampling rate */
-    qint32      m_iT;                   /**< Time window */
-    qint32      m_iLowerFrqIdx;         /**< Upper frequency plotting boundary */
-    qint32      m_iUpperFrqIdx;         /**< Lower frequency plotting boundary */
-    qint8       m_iScaleType;           /**< The display scale type */
-    bool        m_bIsFreezed;           /**< Display is freezed */
-    bool        m_bInitialized;         /**< If it's initailized */
+    float       m_fSps;                 /**< Sampling rate. */
+    qint32      m_iT;                   /**< Time window. */
+    qint32      m_iLowerFrqIdx;         /**< Upper frequency plotting boundary. */
+    qint32      m_iUpperFrqIdx;         /**< Lower frequency plotting boundary. */
+    qint8       m_iScaleType;           /**< The display scale type. */
+    bool        m_bIsFreezed;           /**< Display is freezed. */
+    bool        m_bInitialized;         /**< If it's initailized. */
 };
 
 //=============================================================================================================

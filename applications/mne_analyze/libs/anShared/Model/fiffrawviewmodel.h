@@ -580,29 +580,29 @@ private:
      */
     void reloadAllData();
 
-    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lData;             /**< Data */
-    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lNewData;          /**< Data that is to be appended or prepended */
-    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lFilteredData;     /**< Filtered data */
-    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lFilteredNewData;  /**< Filtered data that is to be appended or prepended */
+    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lData;             /**< Data. */
+    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lNewData;          /**< Data that is to be appended or prepended. */
+    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lFilteredData;     /**< Filtered data. */
+    std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lFilteredNewData;  /**< Filtered data that is to be appended or prepended. */
 
     // Display stuff
     double      m_dDx;              /**< pixel difference to the next sample. */
 
     // model config
-    qint32 m_iSamplesPerBlock;      /**< Number of samples per block */
-    qint32 m_iVisibleWindowSize;    /**< Number of blocks per visible window */
-    qint32 m_iPreloadBufferSize;    /**< Number of blocks that are preloaded left and right */
-    qint32 m_iTotalBlockCount;      /**< Total block count ( =  m_iVisibleWindowSize + 2 * m_iPreloadBufferSize) */
+    qint32 m_iSamplesPerBlock;      /**< Number of samples per block. */
+    qint32 m_iVisibleWindowSize;    /**< Number of blocks per visible window. */
+    qint32 m_iPreloadBufferSize;    /**< Number of blocks that are preloaded left and right. */
+    qint32 m_iTotalBlockCount;      /**< Total block count ( =  m_iVisibleWindowSize + 2 * m_iPreloadBufferSize). */
 
     // management
-    qint32 m_iFiffCursorBegin;      /**< This always points to the very first sample that is currently held (in the earliest block) */
-    bool m_bStartOfFileReached;     /**< Flag for having reached the start of the file */
-    bool m_bEndOfFileReached;       /**< Flag for having reached the end of the file */
+    qint32 m_iFiffCursorBegin;      /**< This always points to the very first sample that is currently held (in the earliest block). */
+    bool m_bStartOfFileReached;     /**< Flag for having reached the start of the file. */
+    bool m_bEndOfFileReached;       /**< Flag for having reached the end of the file. */
 
     // concurrent reloading
     QFutureWatcher<int> m_blockLoadFutureWatcher;   /**< QFutureWatcher for watching process of reloading fiff data. */
     bool m_bCurrentlyLoading;                       /**< Flag to indicate whether or not a background operation is going on. */
-    mutable QMutex m_dataMutex;                     /**< Using mutable is not a pretty solution */
+    mutable QMutex m_dataMutex;                     /**< Using mutable is not a pretty solution. */
 
     // data stuff
     QFile m_file;
@@ -610,29 +610,29 @@ private:
     QBuffer m_buffer;
 
     // Filter stuff
-    qint32                                      m_iMaxFilterLength;                         /**< Max order of the current filters */
-    QString                                     m_sFilterChannelType;                       /**< Kind of channel which is to be filtered */
+    qint32                                      m_iMaxFilterLength;                         /**< Max order of the current filters. */
+    QString                                     m_sFilterChannelType;                       /**< Kind of channel which is to be filtered. */
     QSharedPointer<RTPROCESSINGLIB::FilterOverlapAdd>     m_pRtFilter;                                /**< The filter object. */
     Eigen::RowVectorXi                          m_lFilterChannelList;                       /**< The indices of the channels to be filtered.*/
     bool                                        m_bPerformFiltering;                        /**< Flag whether to activate/deactivate filtering. */
     RTPROCESSINGLIB::FilterKernel               m_filterKernel;                             /**< List of currently active filters. */
 
     // fiff stuff
-    QSharedPointer<FIFFLIB::FiffIO>             m_pFiffIO;                                  /**< Fiff IO */
-    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                                /**< Fiff info of whole fiff file */
-    QList<FIFFLIB::FiffChInfo>                  m_ChannelInfoList;                          /**< List of FiffChInfo objects that holds the corresponding channels information */
+    QSharedPointer<FIFFLIB::FiffIO>             m_pFiffIO;                                  /**< Fiff IO. */
+    QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                                /**< Fiff info of whole fiff file. */
+    QList<FIFFLIB::FiffChInfo>                  m_ChannelInfoList;                          /**< List of FiffChInfo objects that holds the corresponding channels information. */
 
     QMap<qint32,float>                          m_qMapChScaling;                            /**< Channel scaling map. */
 
     QColor                                      m_colBackground;                            /**< The background color.*/
 
-    int                                         m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms */
+    int                                         m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms. */
 
-    qint32                                      m_iScrollPos;                               /**< Position of the scrollbar */
+    qint32                                      m_iScrollPos;                               /**< Position of the scrollbar. */
 
-    bool                                        m_bDispAnnotation;                          /**< Whether annotations wil be shown */
+    bool                                        m_bDispAnnotation;                          /**< Whether annotations wil be shown. */
 
-    QSharedPointer<AnnotationModel>             m_pAnnotationModel;                         /**< Model to stored annotations to be displayed */
+    QSharedPointer<AnnotationModel>             m_pAnnotationModel;                         /**< Model to stored annotations to be displayed. */
 
 signals:
     //=========================================================================================================
@@ -760,14 +760,14 @@ public:
     {
 
     public:
-        const ChannelData* cd;  /**< Pointer to the associated ChannelData container */
+        const ChannelData* cd;  /**< Pointer to the associated ChannelData container. */
         // Remember at which point we are currently (this is NOT the absolute sample number,
         // but the index relative to all stored samples in the associated ChannelData container):
         qint32 currentIndex;
 
         // Remember which block we are currently in
         std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > >::const_iterator currentBlockToAccess;
-        qint32 currentRelativeIndex; /**< Remember the relative sample in the current block */
+        qint32 currentRelativeIndex; /**< Remember the relative sample in the current block. */
 
     public:
         ChannelIterator(const ChannelData* cd, qint32 index)

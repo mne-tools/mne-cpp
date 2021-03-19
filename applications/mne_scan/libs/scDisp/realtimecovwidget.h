@@ -144,16 +144,16 @@ protected:
 
     QSharedPointer<SCMEASLIB::RealTimeCov>  m_pRTC;                                 /**< The real-time covariance measurement. */
 
-    QPointer<QVBoxLayout>                   m_pRtcLayout;                           /**< Widget layout */
-    QPointer<QLabel>                        m_pLabelInit;                           /**< Initialization label */
+    QPointer<QVBoxLayout>                   m_pRtcLayout;                           /**< Widget layout. */
+    QPointer<QLabel>                        m_pLabelInit;                           /**< Initialization label. */
 
     QSharedPointer<FIFFLIB::FiffInfo>       m_pFiffInfo;                            /**< The Fiff Info. */
 
     QMap<QString, bool>                     m_modalityMap;                          /**< Map of different modalities. */
 
-    QPointer<DISPLIB::ImageSc>              m_pImageSc;                             /**< The covariance colormap */
+    QPointer<DISPLIB::ImageSc>              m_pImageSc;                             /**< The covariance colormap. */
 
-    QList<qint32>                           m_qListSelChannel;                      /**< The channel list generated from the selected modalities */
+    QList<qint32>                           m_qListSelChannel;                      /**< The channel list generated from the selected modalities. */
 };
 } // NAMESPACE
 

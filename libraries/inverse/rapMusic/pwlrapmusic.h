@@ -70,8 +70,8 @@ namespace INVERSELIB
 // SOME DEFINES
 //=============================================================================================================
 
-#define NOT_TRANSPOSED   0  /**< Defines NOT_TRANSPOSED */
-#define IS_TRANSPOSED   1   /**< Defines IS_TRANSPOSED */
+#define NOT_TRANSPOSED   0  /**< Defines NOT_TRANSPOSED. */
+#define IS_TRANSPOSED   1   /**< Defines IS_TRANSPOSED. */
 
 //=============================================================================================================
 /**

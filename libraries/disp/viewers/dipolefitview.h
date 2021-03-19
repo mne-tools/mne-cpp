@@ -168,7 +168,7 @@ private:
     void initGui();
 
 
-    Ui::DipoleFitViewWidget*        m_pUi;              /**< Holds GUI for view */
+    Ui::DipoleFitViewWidget*        m_pUi;              /**< Holds GUI for view. */
 
 signals:
     //=========================================================================================================

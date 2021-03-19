@@ -220,18 +220,18 @@ protected:
 private:
     QMutex                          m_mutex;                                    /**< The threads mutex.*/
 
-    bool                            m_bCompActivated;                           /**< Compensator activated */
+    bool                            m_bCompActivated;                           /**< Compensator activated. */
     bool                            m_bSpharaActive;                            /**< Flag whether thread is running.*/
-    bool                            m_bProjActivated;                           /**< Projections activated */
-    bool                            m_bFilterActivated;                         /**< Projections activated */
+    bool                            m_bProjActivated;                           /**< Projections activated. */
+    bool                            m_bFilterActivated;                         /**< Projections activated. */
 
     int                             m_iNBaseFctsFirst;                          /**< The number of grad/inner base functions to use for calculating the sphara opreator.*/
     int                             m_iNBaseFctsSecond;                         /**< The number of grad/outer base functions to use for calculating the sphara opreator.*/
-    int                             m_iMaxFilterLength;                         /**< Max order of the current filters */
+    int                             m_iMaxFilterLength;                         /**< Max order of the current filters. */
     int                             m_iMaxFilterTapSize;                        /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
 
     QString                         m_sCurrentSystem;                           /**< The current acquisition system (EEG, babyMEG, VectorView).*/
-    QString                         m_sFilterChannelType;                       /**< Kind of channel which is to be filtered */
+    QString                         m_sFilterChannelType;                       /**< Kind of channel which is to be filtered. */
 
     RTPROCESSINGLIB::FilterKernel     m_filterKernel;                             /**< The currently active filter. */
 
@@ -243,9 +243,9 @@ private:
 
     Eigen::SparseMatrix<double>     m_matSparseSpharaMult;                      /**< The final sparse SPHARA operator .*/
     Eigen::SparseMatrix<double>     m_matSparseProjCompMult;                    /**< The final sparse projection + compensator operator.*/
-    Eigen::SparseMatrix<double>     m_matSparseProjMult;                        /**< The final sparse SSP projector */
-    Eigen::SparseMatrix<double>     m_matSparseCompMult;                        /**< The final sparse compensator matrix */
-    Eigen::SparseMatrix<double>     m_matSparseFull;                            /**< The final sparse full multiplication matrix  */
+    Eigen::SparseMatrix<double>     m_matSparseProjMult;                        /**< The final sparse SSP projector. */
+    Eigen::SparseMatrix<double>     m_matSparseCompMult;                        /**< The final sparse compensator matrix. */
+    Eigen::SparseMatrix<double>     m_matSparseFull;                            /**< The final sparse full multiplication matrix . */
 
     Eigen::MatrixXd                 m_matSpharaVVGradLoaded;                    /**< The loaded VectorView gradiometer basis functions.*/
     Eigen::MatrixXd                 m_matSpharaVVMagLoaded;                     /**< The loaded VectorView magnetometer basis functions.*/

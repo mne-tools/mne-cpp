@@ -150,10 +150,10 @@ fiffId get_file_id(const QString& name)
     }
     else {
         id = MALLOC_41(1,fiffIdRec);
-        id->version = stream->id().version;       /**< File version */
-        id->machid[0] = stream->id().machid[0];   /**< Unique machine ID */
+        id->version = stream->id().version;       /**< File version. */
+        id->machid[0] = stream->id().machid[0];   /**< Unique machine ID. */
         id->machid[1] = stream->id().machid[1];
-        id->time = stream->id().time;             /**< Time of the ID creation */
+        id->time = stream->id().time;             /**< Time of the ID creation. */
 
         stream->close();
         return id;
@@ -1898,7 +1898,7 @@ void ComputeFwd::initFwd()
     m_mri_id                = Q_NULLPTR;
     m_meas_id.clear();
 
-    FILE* out               = Q_NULLPTR;     /**< Output filtered points here */
+    FILE* out               = Q_NULLPTR;     /**< Output filtered points here. */
 
     m_eegModel              = Q_NULLPTR;
     m_bemModel              = Q_NULLPTR;

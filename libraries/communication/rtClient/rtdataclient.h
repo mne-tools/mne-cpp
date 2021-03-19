@@ -129,7 +129,7 @@ public:
     void setClientAlias(const QString &p_sAlias);
 
 private:
-    qint32 m_clientID;  /**< Corresponding client id of the data client at mne_rt_server */
+    qint32 m_clientID;  /**< Corresponding client id of the data client at mne_rt_server. */
     
 };
 } // NAMESPACE

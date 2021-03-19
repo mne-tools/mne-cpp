@@ -187,16 +187,16 @@ private:
                         const QStyleOptionViewItem &option,
                         QPainter *painter) const;
 
-    QPointer<QTableView>    m_tableview; /**< Pointer to the TableView */
+    QPointer<QTableView>    m_tableview; /**< Pointer to the TableView. */
 
     int         m_tableview_row;    /**< the selected row of the tableview*/
-    int         m_mousex;           /**< the mouse x pos */
-    int         m_mousey;           /**< the mouse y pos */
-    QRect       m_visRect;          /**< visual rect of row of tableview */
-    float       m_x_rate;           /**< the rate of the cursor position in the raw visual rect */
-    float       m_fMaxValue;        /**< Maximum value of the data to plot  */
-    float       m_fScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
-    qint8       m_iScaleType;       /**< scale type */
+    int         m_mousex;           /**< the mouse x pos. */
+    int         m_mousey;           /**< the mouse y pos. */
+    QRect       m_visRect;          /**< visual rect of row of tableview. */
+    float       m_x_rate;           /**< the rate of the cursor position in the raw visual rect. */
+    float       m_fMaxValue;        /**< Maximum value of the data to plot . */
+    float       m_fScaleY;          /**< Maximum amplitude of plot (max is m_dPlotHeight/2). */
+    qint8       m_iScaleType;       /**< scale type. */
 };
 } // NAMESPACE
 

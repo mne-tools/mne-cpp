@@ -316,24 +316,24 @@ public:
                                 int   nfit,	               /* Number of equivalent dipoles to fit */
                                 float &rv);
 
-/**< Number of layers */
+/**< Number of layers. */
     int   nlayer() const
     {
         return layers.size();
     }
 
 public:
-    QString                     name;   /**< Textual identifier */
-    QList<FwdEegSphereLayer>    layers; /**< An array of layers */
-    Eigen::Vector3f             r0;     /**< The origin */
+    QString                     name;   /**< Textual identifier. */
+    QList<FwdEegSphereLayer>    layers; /**< An array of layers. */
+    Eigen::Vector3f             r0;     /**< The origin. */
 
-    Eigen::VectorXd fn;                 /**< Coefficients saved to speed up the computations */
-    int             nterms;             /**< How many? */
+    Eigen::VectorXd fn;                 /**< Coefficients saved to speed up the computations. */
+    int             nterms;             /**< How many?. */
 
-    Eigen::VectorXf mu;             /**< The Berg-Scherg equivalence parameters */
+    Eigen::VectorXf mu;             /**< The Berg-Scherg equivalence parameters. */
     Eigen::VectorXf lambda;
-    int             nfit;           /**< How many? */
-    int             scale_pos;      /**< Scale the positions to the surface of the sphere? */
+    int             nfit;           /**< How many?. */
+    int             scale_pos;      /**< Scale the positions to the surface of the sphere?. */
 
 // ### OLD STRUCT ###
 //    typedef struct {

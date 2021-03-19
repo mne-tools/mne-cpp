@@ -185,26 +185,26 @@ private:
     QString m_sDistance;    /**< Distance measurement to use: "sqeuclidean" (default), "cityblock" , "cosine", "correlation", "hamming". */
     QString m_sStart;       /**< Initialization to use: "sample" (default), "uniform", "cluster". */
     qint32 m_iReps;         /**< Number of K-Means replicates, which should be generated. */
-    QString m_sEmptyact;    /**< What should be done if a cluster wents empty: "error" (default), "drop", "singleton" */
-    qint32 m_iMaxit;        /**< Maximal number of iterations per replicate */
-    bool m_bOnline;         /**< If online update should be performed */
+    QString m_sEmptyact;    /**< What should be done if a cluster wents empty: "error" (default), "drop", "singleton". */
+    qint32 m_iMaxit;        /**< Maximal number of iterations per replicate. */
+    bool m_bOnline;         /**< If online update should be performed. */
 
-    qint32 emptyErrCnt;     /**< Counts the occurence of empty errors */
+    qint32 emptyErrCnt;     /**< Counts the occurence of empty errors. */
 
-    qint32 iter;            /**< Current iteration */
-    qint32 k;               /**< Number of clusters */
-    qint32 n;               /**< Number of points to be clustered */
-    qint32 p;               /**< dimension of space in which the clustering is performed */
+    qint32 iter;            /**< Current iteration. */
+    qint32 k;               /**< Number of clusters. */
+    qint32 n;               /**< Number of points to be clustered. */
+    qint32 p;               /**< dimension of space in which the clustering is performed. */
 
-    Eigen::MatrixXd Del;    /**< reassignment criterion */
-    Eigen::VectorXd d;      /**< Minimal distances of each point to its centroid */
-    Eigen::VectorXi m;      /**< m number of points belonging to the cluster */
+    Eigen::MatrixXd Del;    /**< reassignment criterion. */
+    Eigen::VectorXd d;      /**< Minimal distances of each point to its centroid. */
+    Eigen::VectorXi m;      /**< m number of points belonging to the cluster. */
 
-    double totsumD;         /**< Total sum of centroid distances */
+    double totsumD;         /**< Total sum of centroid distances. */
 
-    double prevtotsumD;     /**< Sum of centroid distances of the previous iteration */
+    double prevtotsumD;     /**< Sum of centroid distances of the previous iteration. */
 
-    Eigen::VectorXi previdx;/**< Previous point cluster indeces */
+    Eigen::VectorXi previdx;/**< Previous point cluster indeces. */
 };
 } // NAMESPACE
 

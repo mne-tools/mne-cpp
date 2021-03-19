@@ -120,15 +120,15 @@ public:
 signals:
 
 protected:
-    AbstractPlugin* m_pPlugin;  /**< Plugin to which connector belongs to */
+    AbstractPlugin* m_pPlugin;  /**< Plugin to which connector belongs to. */
 
     //actual obeserver pattern - think of an other implementation --> currently similiar to OpenWalnut
     //figure out how to Qt signal/slot
     QSet<PluginConnector::SPtr> m_setConnections; /**< Set of connectors connected to this connector. */
 
 private:
-    QString m_sName;        /**< Connection name */
-    QString m_sDescription; /**< Connection description */
+    QString m_sName;        /**< Connection name. */
+    QString m_sDescription; /**< Connection description. */
 };
 
 //=============================================================================================================

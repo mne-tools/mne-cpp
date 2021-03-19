@@ -175,14 +175,14 @@ private:
      */
     bool project_to_triangle(Eigen::Vector3f &rTri, const float p, const float q, const int tri);
 
-    Eigen::MatrixX3f r1;         /**< Cartesian Vector to the first triangel corner */
-    Eigen::MatrixX3f r12;        /**< Cartesian Vector from the first to the second triangel corner */
-    Eigen::MatrixX3f r13;        /**< Cartesian Vector from the first to the third triangel corner */
-    Eigen::MatrixX3f nn;         /**< Cartesian Vector of the triangle plane normal */
-    Eigen::VectorXf a;           /**< r12*r12 */
-    Eigen::VectorXf b;           /**< r13*r13 */
-    Eigen::VectorXf c;           /**< r12*r13 */
-    Eigen::VectorXf det;         /**< Determinant of the Matrix [a c, c b] */
+    Eigen::MatrixX3f r1;         /**< Cartesian Vector to the first triangel corner. */
+    Eigen::MatrixX3f r12;        /**< Cartesian Vector from the first to the second triangel corner. */
+    Eigen::MatrixX3f r13;        /**< Cartesian Vector from the first to the third triangel corner. */
+    Eigen::MatrixX3f nn;         /**< Cartesian Vector of the triangle plane normal. */
+    Eigen::VectorXf a;           /**< r12*r12. */
+    Eigen::VectorXf b;           /**< r13*r13. */
+    Eigen::VectorXf c;           /**< r12*r13. */
+    Eigen::VectorXf det;         /**< Determinant of the Matrix [a c, c b]. */
 };
 
 //=============================================================================================================

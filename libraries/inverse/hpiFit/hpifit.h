@@ -269,7 +269,7 @@ protected:
     void createSensorSet(SensorSet& sensors,
                          FWDLIB::FwdCoilSet* coils);
 
-    SensorSet                m_sensors;            /**< sensor struct that contains information about all sensors */
+    SensorSet                m_sensors;            /**< sensor struct that contains information about all sensors. */
 
 private:
     //=========================================================================================================
@@ -289,9 +289,9 @@ private:
      */
     void updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
-    QList<FIFFLIB::FiffChInfo>   m_lChannels;             /**< Channellist with bads excluded */
-    QVector<int>                 m_vecInnerind;           /**< index of inner channels  */
-    QList<QString>               m_lBads;                 /**< contains bad channels  */
+    QList<FIFFLIB::FiffChInfo>   m_lChannels;             /**< Channellist with bads excluded. */
+    QVector<int>                 m_vecInnerind;           /**< index of inner channels . */
+    QList<QString>               m_lBads;                 /**< contains bad channels . */
 
     //=========================================================================================================
     /**
@@ -310,7 +310,7 @@ private:
                      const QVector<int>& vecFreqs);
 
     Eigen::MatrixXd     m_matModel;         /**< The model that contains the sines/cosines for the hpi fit*/
-    bool                m_bDoFastFit;       /**< Do fast fit */
+    bool                m_bDoFastFit;       /**< Do fast fit. */
 
     QVector<int>        m_vecFreqs;         /**< The frequencies for each coil in unknown order. */
 

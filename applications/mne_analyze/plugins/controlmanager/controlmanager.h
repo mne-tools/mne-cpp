@@ -235,16 +235,16 @@ private:
      */
     void onTakeScreenshotChanged();
 
-    QPointer<ANSHAREDLIB::Communicator>         m_pCommu;                   /**< Communicator to send events trhoug hevent manager */
+    QPointer<ANSHAREDLIB::Communicator>         m_pCommu;                   /**< Communicator to send events trhoug hevent manager. */
 
     #ifndef WASMBUILD
-    DISPLIB::Control3DView*                     m_pControl3DView;           /**< Controls for 3d View */
+    DISPLIB::Control3DView*                     m_pControl3DView;           /**< Controls for 3d View. */
     #endif
 
-    DISPLIB::ApplyToView*                       m_pApplyToView;             /**< Controls for selecting views to apply settings */
-    ANSHAREDLIB::ScalingParameters              m_ScalingParameters;        /**< Controls for scaling */
-    ANSHAREDLIB::ViewParameters                 m_ViewParameters;           /**< Struct for 2D view settings */
-    ANSHAREDLIB::View3DParameters               m_View3DParameters;         /**< Struct for 3D view settings */
+    DISPLIB::ApplyToView*                       m_pApplyToView;             /**< Controls for selecting views to apply settings. */
+    ANSHAREDLIB::ScalingParameters              m_ScalingParameters;        /**< Controls for scaling. */
+    ANSHAREDLIB::ViewParameters                 m_ViewParameters;           /**< Struct for 2D view settings. */
+    ANSHAREDLIB::View3DParameters               m_View3DParameters;         /**< Struct for 3D view settings. */
 };
 
 //=============================================================================================================

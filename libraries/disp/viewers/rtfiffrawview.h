@@ -446,18 +446,18 @@ protected:
      */
     void markChBad();
 
-    QPointer<QTableView>                        m_pTableView;                   /**< The QTableView being part of the model/view framework of Qt */
-    QPointer<DISPLIB::RtFiffRawViewDelegate>    m_pDelegate;                    /**< The channel data delegate */
-    QPointer<DISPLIB::RtFiffRawViewModel>       m_pModel;                       /**< The channel data model */
+    QPointer<QTableView>                        m_pTableView;                   /**< The QTableView being part of the model/view framework of Qt. */
+    QPointer<DISPLIB::RtFiffRawViewDelegate>    m_pDelegate;                    /**< The channel data delegate. */
+    QPointer<DISPLIB::RtFiffRawViewModel>       m_pModel;                       /**< The channel data model. */
 
     QMap<qint32,float>                          m_qMapChScaling;                /**< Channel scaling values. */
 
-    qint32                                      m_iT;                           /**< Display window size in seconds */
+    qint32                                      m_iT;                           /**< Display window size in seconds. */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;                    /**< FiffInfo, which is used insteadd of ListChInfo*/
-    float                                       m_fSamplingRate;                /**< Sampling rate */
-    float                                       m_fZoomFactor;                  /**< Zoom factor */
-    QList<qint32>                               m_qListBadChannels;             /**< Current list of bad channels  */
-    QList<qint32>                               m_qListCurrentSelection;        /**< Current selection list -> hack around C++11 lambda  */
+    float                                       m_fSamplingRate;                /**< Sampling rate. */
+    float                                       m_fZoomFactor;                  /**< Zoom factor. */
+    QList<qint32>                               m_qListBadChannels;             /**< Current list of bad channels . */
+    QList<qint32>                               m_qListCurrentSelection;        /**< Current selection list -> hack around C++11 lambda . */
     bool                                        m_bHideBadChannels;             /**< hide bad channels flag. */
     QStringList                                 m_slSelectedChannels;           /**< the currently selected channels from the selection manager window. */
     QColor                                      m_backgroundColor;              /**< Current background color. */

@@ -193,11 +193,11 @@ public:
                                 const Eigen::RowVectorXi& sel = defaultRowVectorXi) const;
 
 public:
-    FiffStream::SPtr file;      /**< replaces fid */
-    FiffInfo info;              /**< Fiff measurement information */
+    FiffStream::SPtr file;      /**< replaces fid. */
+    FiffInfo info;              /**< Fiff measurement information. */
     fiff_int_t first_samp;      /**< Do we have a skip ToDo... */
     fiff_int_t last_samp;       /**< Do we have a skip ToDo... */
-    Eigen::RowVectorXd cals;    /**< Calibration values. ToDo: Check if RowVectorXd is enough */
+    Eigen::RowVectorXd cals;    /**< Calibration values. ToDo: Check if RowVectorXd is enough. */
     QList<FiffRawDir> rawdir;   /**< Special fiff diretory entry for raw data. */
     Eigen::MatrixXd proj;       /**< SSP operator to apply to the data. */
     FiffCtfComp comp;           /**< Compensator. */

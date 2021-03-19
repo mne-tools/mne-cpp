@@ -104,14 +104,14 @@ public:
     void print(FILE *f) const;
 
 public:
-    bool            valid;  /**< Is this dipole valid */
-    float           time;   /**< Time point */
-    Eigen::Vector3f rd;     /**< Dipole location */
-    Eigen::Vector3f Q;      /**< Dipole moment */
-    float           good;   /**< Goodness of fit */
-    float           khi2;   /**< khi^2 value */
-    int             nfree;  /**< Degrees of freedom for the above */
-    int             neval;  /**< Number of function evaluations required for this fit */
+    bool            valid;  /**< Is this dipole valid. */
+    float           time;   /**< Time point. */
+    Eigen::Vector3f rd;     /**< Dipole location. */
+    Eigen::Vector3f Q;      /**< Dipole moment. */
+    float           good;   /**< Goodness of fit. */
+    float           khi2;   /**< khi^2 value. */
+    int             nfree;  /**< Degrees of freedom for the above. */
+    int             neval;  /**< Number of function evaluations required for this fit. */
 
 // ### OLD STRUCT ###
 //    typedef struct {

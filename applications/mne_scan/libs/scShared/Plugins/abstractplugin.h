@@ -229,7 +229,7 @@ protected:
     bool m_bPluginControlWidgetsInit = false;   /**< Flag to indicate if the plugin control widgets were initialized already. */
 
 private:
-    QList< QAction* >   m_qListPluginActions;  /**< List of plugin actions */
+    QList< QAction* >   m_qListPluginActions;  /**< List of plugin actions. */
 };
 
 //=============================================================================================================
