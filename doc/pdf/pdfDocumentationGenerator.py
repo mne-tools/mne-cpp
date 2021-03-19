@@ -213,6 +213,7 @@ def parseMarkDownFile(doc, texFile, sectionLevel, verboseMode = False):
         with open(doc.fullPath, 'r', encoding="utf8") as markDownFile, \
              open(texFile,"a+") as texFile:
             insideHeader = False
+            headerBehind = False
             insideHtml = False
             insideUnorderedList = False
             insideOrderedList = False
@@ -220,31 +221,33 @@ def parseMarkDownFile(doc, texFile, sectionLevel, verboseMode = False):
             if verboseMode:
                 print("Parsing file: " + doc.fullPath)
             for line in markDownFile:
-                if not insideHeader and line.startswith("---"):
-                    insideHeader = True
+                if not headerBehind:
+                    if not insideHeader and line.startswith("---"):
+                        insideHeader = True
                     continue
-                if insideHeader:
                     if line.startswith("---"):
                         insideHeader = False
+                        headerBehind = True
                     continue
-                if line.count("<html>") > line.count("</html>"):
-                    insideHtml = True
-                if line.count("</html>") >= line.count("<html>"):
-                    insideHtml = False
-                if not insideHeader and not insideHtml:
-                    if   parseHeader(texFile,line,"# ","part","sec"):
-                        continue
-                    elif parseHeader(texFile,line,"## ","section","sec"):
-                        continue
-                    elif parseHeader(texFile,line,"### ","subsection","ssec"):
-                        continue
-                    elif parseHeader(texFile,line,"#### ","subsubsection","ssec"):
-                        continue
-                    elif parseImageFigure(texFile,line):
-                        continue
-                    else:
-                        lineOut = parseBoldMd(line)
-                        lineOut = parseItalicMd(lineOut)
+                else:
+                    if line.count("<html>") > line.count("</html>"):
+                        insideHtml = True
+                    if line.count("</html>") >= line.count("<html>"):
+                        insideHtml = False
+                    if not insideHeader and not insideHtml:
+                        if   parseHeader(texFile,line,"# ","part","sec"):
+                            continue
+                        elif parseHeader(texFile,line,"## ","section","sec"):
+                            continue
+                        elif parseHeader(texFile,line,"### ","subsection","ssec"):
+                            continue
+                        elif parseHeader(texFile,line,"#### ","subsubsection","ssec"):
+                            continue
+                        elif parseImageFigure(texFile,line):
+                            continue
+                        else:
+                            lineOut = parseBoldMd(line)
+                            lineOut = parseItalicMd(lineOut)
 
 def parseHeader(texFile,str,markdownKey,latexKey,labelLatexKey):
     if str.startswith(markdownKey):
