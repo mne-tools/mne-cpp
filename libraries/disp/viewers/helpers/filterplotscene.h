@@ -133,7 +133,7 @@ protected:
     int             m_iNumberHorizontalLines;       /**< number of plotted horizontal ()lines. */
     int             m_iNumberVerticalLines;         /**< number of plotted vertical lines. */
     int             m_iAxisTextSize;                /**< point size of the plotted text. */
-    int             m_iDiagramMarginsHoriz;         /**< horizontal space between the filter and diagram plot. . */
+    int             m_iDiagramMarginsHoriz;         /**< horizontal space between the filter and diagram plot. */
     int             m_iDiagramMarginsVert;          /**< vertical space between the filter and diagram plot. */
     int             m_iCutOffLow;                   /**< cut off frequqency lowpass or lower cut off when filter is a bandpass. */
     int             m_iCutOffHigh;                  /**< cut off frequqency highpass or higher cut off when filter is a bandpass. */
