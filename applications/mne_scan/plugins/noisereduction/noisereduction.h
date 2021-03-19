@@ -177,7 +177,7 @@ protected:
     /**
      * Update the compensator
      *
-     * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
+     * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind).
      */
     void updateCompensator(int to);
 
@@ -185,7 +185,7 @@ protected:
     /**
      * Sets the type of channel which are to be filtered
      *
-     * @param[in] sType    the channel type which is to be filtered (EEG, MEG, All)
+     * @param[in] sType    the channel type which is to be filtered (EEG, MEG, All).
      */
     void setFilterChannelType(QString sType);
 
@@ -193,7 +193,7 @@ protected:
     /**
      * Filter parameters changed
      *
-     * @param[in] filterData    currently active filter
+     * @param[in] filterData    currently active filter.
      */
     void setFilter(const RTPROCESSINGLIB::FilterKernel& filterData);
 
@@ -201,7 +201,7 @@ protected:
     /**
      * Filter avtivated
      *
-     * @param[in] state    filter on/off flag
+     * @param[in] state    filter on/off flag.
      */
     void setFilterActive(bool state);
 

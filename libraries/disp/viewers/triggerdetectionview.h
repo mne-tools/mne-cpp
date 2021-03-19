@@ -93,7 +93,7 @@ public:
     /**
      * Constructs a TriggerDetectionView which is a child of parent.
      *
-     * @param[in] parent        parent of widget
+     * @param[in] parent        parent of widget.
      */
     TriggerDetectionView(const QString& sSettingsPath = "",
                          QWidget *parent = 0,
@@ -115,8 +115,8 @@ public:
     /**
      * Set total number of detected triggers and trigger types.
      *
-     * @param[in] totalNumberDetections     The numger of detected triggers
-     * @param[in] mapDetectedTriggers       The currently detected triggers
+     * @param[in] totalNumberDetections     The numger of detected triggers.
+     * @param[in] mapDetectedTriggers       The currently detected triggers.
      */
     void setNumberDetectedTriggersAndTypes(int totalNumberDetections,
                                            const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
@@ -125,7 +125,7 @@ public:
     /**
      * Gets currently selected STIM channel in GUI
      *
-     * @return currently selected STIM channel
+     * @return currently selected STIM channel.
      */
     QString getSelectedStimChannel();
 

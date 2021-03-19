@@ -97,10 +97,10 @@ public:
     /**
      * Constructs a source estimation from given data
      *
-     * @param[in] p_sol
-     * @param[in] p_vertices
-     * @param[in] p_tmin
-     * @param[in] p_tstep
+     * @param[in] p_sol.
+     * @param[in] p_vertices.
+     * @param[in] p_tmin.
+     * @param[in] p_tstep.
      */
     MNESourceEstimate(const Eigen::MatrixXd &p_sol, const Eigen::VectorXi &p_vertices, float p_tmin, float p_tstep);
 
@@ -108,7 +108,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_SourceEstimate    Source estimate data which should be copied
+     * @param[in] p_SourceEstimate    Source estimate data which should be copied.
      */
     MNESourceEstimate(const MNESourceEstimate& p_SourceEstimate);
 
@@ -143,9 +143,9 @@ public:
      * Reads a source estimate from a given file
      *
      * @param[in] p_IODevice    IO device to red the stc from.
-     * @param[in, out] p_stc        the read stc
+     * @param[in, out] p_stc        the read stc.
      *
-     * @return true if successful, false otherwise
+     * @return true if successful, false otherwise.
      */
     static bool read(QIODevice &p_IODevice, MNESourceEstimate& p_stc);
 
@@ -163,7 +163,7 @@ public:
     /**
      * Returns whether SourceEstimate is empty.
      *
-     * @return true if is empty, false otherwise
+     * @return true if is empty, false otherwise.
      */
     inline bool isEmpty() const;
 
@@ -173,7 +173,7 @@ public:
      *
      * @param[in] rhs     SourceEstimate which should be assigned.
      *
-     * @return the copied source estimate
+     * @return the copied source estimate.
      */
     MNESourceEstimate& operator= (const MNESourceEstimate &rhs);
 
@@ -181,7 +181,7 @@ public:
     /**
      * Returns the number of samples.
      *
-     * @return the number of samples
+     * @return the number of samples.
      */
     int samples() const;
 
@@ -192,7 +192,7 @@ public:
      * @param[in] lPickedLabels      The labels base the selection on.
      * @param[in] bIsClustered       Whether the source space was clustered.
      *
-     * @return the indices
+     * @return the indices.
      */
     Eigen::VectorXi getIndicesByLabel(const QList<FSLIB::Label> &lPickedLabels, bool bIsClustered) const;
 

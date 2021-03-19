@@ -105,7 +105,7 @@ public:
     /**
      * Returns the full connectivity matrix for this network structure.
      *
-     * @param[in] bGetMirroredVersion    Flag whether to return the mirrored version of the connectivity matrix, if the network
+     * @param[in] bGetMirroredVersion    Flag whether to return the mirrored version of the connectivity matrix, if the network.
      *                                   is a non-directional one. Otherwise returns zeros for the lower part of the matrix.
      *                                   Default is set to true.
      *
@@ -117,7 +117,7 @@ public:
     /**
      * Returns the thresholded connectivity matrix for this network structure.
      *
-     * @param[in] bGetMirroredVersion    Flag whether to return the mirrored version of the connectivity matrix, if the network
+     * @param[in] bGetMirroredVersion    Flag whether to return the mirrored version of the connectivity matrix, if the network.
      *                                   is a non-directional one. Otherwise returns zeros for the lower part of the matrix.
      *                                   Default is set to true.
      *

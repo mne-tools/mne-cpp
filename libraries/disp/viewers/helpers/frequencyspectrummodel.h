@@ -94,7 +94,7 @@ public:
     /**
      * Constructs an real-time multi sample array table model for the given parent.
      *
-     * @param[in] parent     parent of the table model
+     * @param[in] parent     parent of the table model.
      */
     FrequencySpectrumModel(QObject *parent = 0);
 
@@ -102,9 +102,9 @@ public:
     /**
      * Returns the number of rows under the given parent. When the parent is valid it means that rowCount is returning the number of children of parent.
      *
-     * @param[in] parent     not used
+     * @param[in] parent     not used.
      *
-     * @return number of rows
+     * @return number of rows.
      */
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
 
@@ -112,9 +112,9 @@ public:
     /**
      * Returns the number of columns for the children of the given parent.
      *
-     * @param[in] parent     not used
+     * @param[in] parent     not used.
      *
-     * @return number of columns
+     * @return number of columns.
      */
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
@@ -122,10 +122,10 @@ public:
     /**
      * Returns the data stored under the given role for the item referred to by the index.
      *
-     * @param[in] index      determines item location
-     * @param[in] role       role to return
+     * @param[in] index      determines item location.
+     * @param[in] role       role to return.
      *
-     * @return accessed data
+     * @return accessed data.
      */
     virtual QVariant data(const QModelIndex &index,
                           int role = Qt::DisplayRole) const;
@@ -135,10 +135,10 @@ public:
      * Returns the data for the given role and section in the header with the specified orientation.
      *
      * @param[in] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
-     * @param[in] orientation    Qt::Horizontal or Qt::Vertical
-     * @param[in] role           role to show
+     * @param[in] orientation    Qt::Horizontal or Qt::Vertical.
+     * @param[in] role           role to show.
      *
-     * @return accessed eader data
+     * @return accessed eader data.
      */
     virtual QVariant headerData(int section, Qt::Orientation orientation,
                                 int role = Qt::DisplayRole) const;
@@ -147,7 +147,7 @@ public:
     /**
      * Sets corresponding fiff info
      *
-     * @param[in] inf       The corresponding fiff information object
+     * @param[in] inf       The corresponding fiff information object.
      */
     void setInfo(QSharedPointer<FIFFLIB::FiffInfo> &info);
 
@@ -155,7 +155,7 @@ public:
     /**
      * Sets Scale type
      *
-     * @param[in] ScaleType       The corresponding scale type
+     * @param[in] ScaleType       The corresponding scale type.
      */
     void setScaleType(qint8 ScaleType);
 
@@ -163,7 +163,7 @@ public:
     /**
      * Adds the frequency estimation
      *
-     * @param[in] data   the frequency estimation
+     * @param[in] data   the frequency estimation.
      */
     void addData(const Eigen::MatrixXd &data);
 
@@ -171,7 +171,7 @@ public:
     /**
      * Returns the fiff info
      *
-     * @return the fiff info
+     * @return the fiff info.
      */
     inline QSharedPointer<FIFFLIB::FiffInfo> getInfo() const;
 
@@ -179,7 +179,7 @@ public:
     /**
      * Returns the frequency scale of the x axis
      *
-     * @return the frequency scale of the x axis
+     * @return the frequency scale of the x axis.
      */
     inline Eigen::RowVectorXd getFreqScale() const;
 
@@ -187,7 +187,7 @@ public:
     /**
      * Returns the frequency scale scaled to boundaries of the x axis
      *
-     * @return the frequency scale of the x axis
+     * @return the frequency scale of the x axis.
      */
     inline Eigen::RowVectorXd getFreqScaleBound() const;
 
@@ -195,7 +195,7 @@ public:
     /**
      * Returns the number of stems
      *
-     * @return the number of stems
+     * @return the number of stems.
      */
     inline qint32 getNumStems() const;
 
@@ -203,7 +203,7 @@ public:
     /**
      * Returns a map which conatins the channel idx and its corresponding selection status
      *
-     * @return the channel idx to selection status
+     * @return the channel idx to selection status.
      */
     inline const QMap<qint32,qint32>& getIdxSelMap() const;
 
@@ -211,7 +211,7 @@ public:
     /**
      * Selects the given list of channel indeces and unselect all other channels
      *
-     * @param[in] selection      channel index list to select
+     * @param[in] selection      channel index list to select.
      */
     void selectRows(const QList<qint32> &selection);
 
@@ -225,7 +225,7 @@ public:
     /**
      * Toggle freeze for all channels when a channel is double clicked
      *
-     * @param[in] index     of the channel which has been double clicked
+     * @param[in] index     of the channel which has been double clicked.
      */
     void toggleFreeze(const QModelIndex &index);
 
@@ -233,7 +233,7 @@ public:
     /**
      * Returns current freezing status
      *
-     * @return the current freezing status
+     * @return the current freezing status.
      */
     inline bool isFreezed() const;
 
@@ -241,8 +241,8 @@ public:
     /**
      * Set plotting boundaries
      *
-     * @param[in] fLowerFrqBound     Lower frequency boudnary
-     * @param[in] fUpperFrqBound     Upper frequency boudnary
+     * @param[in] fLowerFrqBound     Lower frequency boudnary.
+     * @param[in] fUpperFrqBound     Upper frequency boudnary.
      */
     void setBoundaries(float fLowerFrqBound, float fUpperFrqBound);
 
@@ -250,7 +250,7 @@ public:
     /**
      * Returns the lower frequency boundary
      *
-     * @return the lower frequency boundary
+     * @return the lower frequency boundary.
      */
     inline qint32 getLowerFrqBound() const;
 
@@ -258,7 +258,7 @@ public:
     /**
      * Returns the upper frequency boundary
      *
-     * @return the upper frequency boundary
+     * @return the upper frequency boundary.
      */
     inline qint32 getUpperFrqBound() const;
 
@@ -267,7 +267,7 @@ signals:
     /**
      * Emmited when new selcetion was made
      *
-     * @param[in] selection     list of all selected channels
+     * @param[in] selection     list of all selected channels.
      */
     void newSelection(QList<qint32> selection);
 

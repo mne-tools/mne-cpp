@@ -88,7 +88,7 @@ public:
     /**
      * Construts the surface by reading it of the given file.
      *
-     * @param[in] p_sFile    Surface file name with path
+     * @param[in] p_sFile    Surface file name with path.
      */
     explicit Surface(const QString& p_sFile);
 
@@ -96,10 +96,10 @@ public:
     /**
      * Construts the surface by reading it of the given file.
      *
-     * @param[in] subject_id         Name of subject
-     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
-     * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
-     * @param[in] subjects_dir       Subjects directory
+     * @param[in] subject_id         Name of subject.
+     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}.
+     * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
+     * @param[in] subjects_dir       Subjects directory.
      */
     explicit Surface(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
 
@@ -107,11 +107,11 @@ public:
     /**
      * Construts the surface by reading it of the given file.
      *
-     * @param[in] path               path to surface directory
-     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
-     * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+     * @param[in] path               path to surface directory.
+     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}.
+     * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
      *
-     * @return true if read sucessful, false otherwise
+     * @return true if read sucessful, false otherwise.
      */
     explicit Surface(const QString &path, qint32 hemi, const QString &surf);
 
@@ -131,7 +131,7 @@ public:
     /**
      * Returns the hemisphere id (0 = lh; 1 = rh)
      *
-     * @return hemisphere id
+     * @return hemisphere id.
      */
     inline qint32 hemi() const;
 
@@ -139,7 +139,7 @@ public:
     /**
      * Returns whether Surface is empty.
      *
-     * @return true if is empty, false otherwise
+     * @return true if is empty, false otherwise.
      */
     inline bool isEmpty() const;
 
@@ -147,7 +147,7 @@ public:
     /**
      * Loaded surface (eg. inflated, orig ...)
      *
-     * @return the surface
+     * @return the surface.
      */
     inline QString surf() const;
 
@@ -157,14 +157,14 @@ public:
      *
      * Reads a FreeSurfer surface file
      *
-     * @param[in] subject_id         Name of subject
-     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
-     * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
-     * @param[in] subjects_dir       Subjects directory
-     * @param[out] p_Surface         The read surface
-     * @param[in] p_bLoadCurvature   True if the curvature should be read (optional, default = true)
+     * @param[in] subject_id         Name of subject.
+     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}.
+     * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
+     * @param[in] subjects_dir       Subjects directory.
+     * @param[out] p_Surface         The read surface.
+     * @param[in] p_bLoadCurvature   True if the curvature should be read (optional, default = true).
      *
-     * @return true if read sucessful, false otherwise
+     * @return true if read sucessful, false otherwise.
      */
     static bool read(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, Surface &p_Surface, bool p_bLoadCurvature = true);
 
@@ -174,13 +174,13 @@ public:
      *
      * Reads a FreeSurfer surface file
      *
-     * @param[in] path               path to surface directory
-     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
-     * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
-     * @param[out] p_Surface         The read surface
-     * @param[in] p_bLoadCurvature   True if the curvature should be read (optional, default = true)
+     * @param[in] path               path to surface directory.
+     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}.
+     * @param[in] surf               Name of the surface to load (eg. inflated, orig ...).
+     * @param[out] p_Surface         The read surface.
+     * @param[in] p_bLoadCurvature   True if the curvature should be read (optional, default = true).
      *
-     * @return true if read sucessful, false otherwise
+     * @return true if read sucessful, false otherwise.
      */
     static bool read(const QString &path, qint32 hemi, const QString &surf, Surface &p_Surface, bool p_bLoadCurvature = true);
 
@@ -190,11 +190,11 @@ public:
      *
      * Reads a FreeSurfer surface file
      *
-     * @param[in] p_sFileName        The file to read
-     * @param[out] p_Surface         The read surface
-     * @param[in] p_bLoadCurvature   True if the curvature should be read (optional, default = true)
+     * @param[in] p_sFileName        The file to read.
+     * @param[out] p_Surface         The read surface.
+     * @param[in] p_bLoadCurvature   True if the curvature should be read (optional, default = true).
      *
-     * @return true if read sucessful, false otherwise
+     * @return true if read sucessful, false otherwise.
      */
     static bool read(const QString &p_sFileName, Surface &p_Surface, bool p_bLoadCurvature = true);
 
@@ -202,7 +202,7 @@ public:
     /**
      * reads a binary curvature file into a vector
      *
-     * @return the read curvature
+     * @return the read curvature.
      */
     static Eigen::VectorXf read_curv(const QString &p_sFileName);
 
@@ -210,10 +210,10 @@ public:
     /**
      * Efficiently compute vertex normals for triangulated surface
      *
-     * @param[in] rr     Vertex coordinates in meters
-     * @param[out] tris  The triangle descriptions
+     * @param[in] rr     Vertex coordinates in meters.
+     * @param[out] tris  The triangle descriptions.
      *
-     * @return The computed normals
+     * @return The computed normals.
      */
     static Eigen::MatrixX3f compute_normals(const Eigen::MatrixX3f& rr, const Eigen::MatrixX3i& tris);
 
@@ -221,7 +221,7 @@ public:
     /**
      * Coordinates of vertices (rr)
      *
-     * @return coordinates of vertices
+     * @return coordinates of vertices.
      */
     inline const Eigen::MatrixX3f& rr() const;
 
@@ -229,7 +229,7 @@ public:
     /**
      * The triangle descriptions
      *
-     * @return triangle descriptions
+     * @return triangle descriptions.
      */
     inline const Eigen::MatrixX3i& tris() const;
 
@@ -237,7 +237,7 @@ public:
     /**
      * Normalized surface normals for each vertex
      *
-     * @return surface normals
+     * @return surface normals.
      */
     inline const Eigen::MatrixX3f& nn() const;
 
@@ -245,7 +245,7 @@ public:
     /**
      * FreeSurfer curvature
      *
-     * @return the FreeSurfer curvature data
+     * @return the FreeSurfer curvature data.
      */
     inline const Eigen::VectorXf& curv() const;
 
@@ -253,7 +253,7 @@ public:
     /**
      * Vector offset
      *
-     * @return the offset vector
+     * @return the offset vector.
      */
     inline const Eigen::Vector3f& offset() const;
 
@@ -261,7 +261,7 @@ public:
     /**
      * Vector offset
      *
-     * @return the offset vector
+     * @return the offset vector.
      */
     inline Eigen::Vector3f& offset();
 
@@ -269,7 +269,7 @@ public:
     /**
      * path to surf directuryt
      *
-     * @return the path to surf directory
+     * @return the path to surf directory.
      */
     inline QString filePath() const;
 
@@ -277,7 +277,7 @@ public:
     /**
      * surf file name
      *
-     * @return the surf file name
+     * @return the surf file name.
      */
     inline QString fileName() const;
 

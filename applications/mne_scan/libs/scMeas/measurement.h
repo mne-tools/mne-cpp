@@ -71,7 +71,7 @@ public:
      * Constructs a Measurement.
      *
      * @param[in] type       the QMetaType id of the Measurement.
-     * @param[in] parent     the parent object
+     * @param[in] parent     the parent object.
      */
     explicit Measurement(int type = QMetaType::UnknownType,
                          QObject *parent = 0);

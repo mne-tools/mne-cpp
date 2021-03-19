@@ -93,7 +93,7 @@ public:
     /**
      * Creates a new abstract item delegate with the given parent.
      *
-     * @param[in] parent     Parent of the delegate
+     * @param[in] parent     Parent of the delegate.
      */
     FiffRawViewDelegate(QObject *parent = 0);
 
@@ -112,8 +112,8 @@ public:
      *
      * (sizeHint() must be implemented also)
      *
-     * @param[in] painter    Low-level painting on widgets and other paint devices
-     * @param[in] option     Describes the parameters used to draw an item in a view widget
+     * @param[in] painter    Low-level painting on widgets and other paint devices.
+     * @param[in] option     Describes the parameters used to draw an item in a view widget.
      * @param[in] index      Used to locate data in a data model.
      */
     virtual void paint(QPainter *painter,
@@ -124,7 +124,7 @@ public:
     /**
      * Item size
      *
-     * @param[in] option     Describes the parameters used to draw an item in a view widget
+     * @param[in] option     Describes the parameters used to draw an item in a view widget.
      * @param[in] index      Used to locate data in a data model.
      */
     virtual QSize sizeHint(const QStyleOptionViewItem &option,
@@ -143,7 +143,7 @@ private:
     /**
      * createPlotPath creates the QPointer path for the data plot.
      *
-     * @param[in] option     Describes the parameters used to draw an item in a view widget
+     * @param[in] option     Describes the parameters used to draw an item in a view widget.
      * @param[in, out] path   The QPointerPath to create for the data plot.
      * @param[in] data       Current data for the given row.
      * @param[in] dDx        pixel difference to the next sample in pixels.
@@ -159,7 +159,7 @@ private:
      * createTimeSpacersPath Creates the QPointer path for the vertical time spacers.
      *
      * @param[in] index      Used to locate data in a data model.
-     * @param[in] option     Describes the parameters used to draw an item in a view widget
+     * @param[in] option     Describes the parameters used to draw an item in a view widget.
      * @param[in, out] path   The QPointerPath to create for the data plot.
      * @param[in] data       Data for the given row.
      */

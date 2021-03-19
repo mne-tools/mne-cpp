@@ -87,8 +87,8 @@ public:
     /**
      * Constructs a AveragingDataModel object
      *
-     * @param[in] pEvokedSet   sets saved evoked set to pEvokedSet. NULL if left empty
-     * @param[in] parent       sets parent of the object. NULL if left empty
+     * @param[in] pEvokedSet   sets saved evoked set to pEvokedSet. NULL if left empty.
+     * @param[in] parent       sets parent of the object. NULL if left empty.
      */
     AveragingDataModel(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet = Q_NULLPTR,
                        QObject* parent = Q_NULLPTR);
@@ -108,10 +108,10 @@ public:
     /**
      * Returns the FiffEvokedSet stored in the model
      *
-     * @param[in] index    index of stored data (all indeces retrun the same data)
-     * @param[in] role     role of stored data (Unused)
+     * @param[in] index    index of stored data (all indeces retrun the same data).
+     * @param[in] role     role of stored data (Unused).
      *
-     * @return      returns saved FiffEvokedModel with averaging data
+     * @return      returns saved FiffEvokedModel with averaging data.
      */
     QVariant data(const QModelIndex &index,
                   int role = Qt::DisplayRole) const override;
@@ -144,7 +144,7 @@ public:
     /**
      * Set the saved evoked set to pEvokedSet
      *
-     * @param[in] pEvokedSet   new evoked set to be saved
+     * @param[in] pEvokedSet   new evoked set to be saved.
      */
     void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
 
@@ -152,7 +152,7 @@ public:
     /**
      * Returns the stored FiffEvokedSet
      *
-     * @return the stored FiffEvokedSet
+     * @return the stored FiffEvokedSet.
      */
     QSharedPointer<FIFFLIB::FiffEvokedSet> getEvokedSet();
 
@@ -160,7 +160,7 @@ public:
     /**
      * The type of this model (MriCoordModel)
      *
-     * @return The type of this model (MriCoordModel)
+     * @return The type of this model (MriCoordModel).
      */
     inline MODEL_TYPE getType() const override;
 
@@ -199,7 +199,7 @@ public:
     /**
      * Gets FiffInfo of the evoked model. To be used if loading avg from file without raw file present
      *
-     * @return  Shared pointer to FiffInfo of m_pFiffEvokedSet
+     * @return  Shared pointer to FiffInfo of m_pFiffEvokedSet.
      */
     QSharedPointer<FIFFLIB::FiffInfo> getFiffInfo();
 

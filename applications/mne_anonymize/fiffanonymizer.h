@@ -456,7 +456,7 @@ public slots:
     /**
      * Configure the input file to anonymize.
      *
-     * @param[in] sFilePathIn  String containing the input file name including its path. Can be a relative or
+     * @param[in] sFilePathIn  String containing the input file name including its path. Can be a relative or.
      * an absolute path.
      */
     int setInFile(const QString &sFilePathIn);
@@ -465,7 +465,7 @@ public slots:
     /**
      * Configure the output file to anonymize.
      *
-     * @param[in] sFilePathOut String containing the output file name. Can be a relative or
+     * @param[in] sFilePathOut String containing the output file name. Can be a relative or.
      * an absolute path.
      */
     int setOutFile(const QString &sFilePathOut);

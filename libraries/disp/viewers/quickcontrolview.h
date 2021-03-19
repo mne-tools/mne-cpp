@@ -122,7 +122,7 @@ public:
      * This convenience function adds control widgets to the QuickControlView based on their set objects names.
      * Takes ownership of the QWidgets.
      *
-     * @param[in] lWidgets     The widget which are supposed to be added. The widgets will be categorized based on their
+     * @param[in] lWidgets     The widget which are supposed to be added. The widgets will be categorized based on their.
      *                          object names: "widget_", "group_", "group_tab_".
      * @param[in] sTabName     The tab to which the widgets are supposed to be added to.
      * @param[in] bAddToEnd    Whether to add the new widgets to the end of the layout.
@@ -182,7 +182,7 @@ public:
     /**
      * Sets the values of the opacity slider. Choose value between 0.0 and 1.0.
      *
-     * @param[in] opactiy       the new opacity value
+     * @param[in] opactiy       the new opacity value.
      */
     void setOpacityValue(int opactiy);
 

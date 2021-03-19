@@ -125,7 +125,7 @@ public:
     /**
      * Initializes the plugin based on cmd line inputs given by the user.
      *
-     * @param[in] sArguments  the cmd line arguments
+     * @param[in] sArguments  the cmd line arguments.
      */
     virtual void cmdLineStartup(const QStringList& sArguments) override;
 
@@ -148,7 +148,7 @@ private:
     /**
      * This functions is called when the save to file button is pressed.
      *
-     * @param[in] type     type of file being saved
+     * @param[in] type     type of file being saved.
      */
     void onSaveFilePressed(FileType type = DATA_FILE);
 
@@ -168,7 +168,7 @@ private:
     /**
      * Shows loading bar with sMessage, dims therest of the window
      *
-     * @param[in] sMessage     message to be shown alongside loading bar
+     * @param[in] sMessage     message to be shown alongside loading bar.
      */
     void startProgress(QString sMessage);
 
@@ -200,7 +200,7 @@ private:
     /**
      * Loads new Fiff model whan current loaded model is changed
      *
-     * @param[in, out] pNewModel    pointer to currently loaded FiffRawView Model
+     * @param[in, out] pNewModel    pointer to currently loaded FiffRawView Model.
      */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 

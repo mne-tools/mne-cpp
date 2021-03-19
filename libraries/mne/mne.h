@@ -104,9 +104,9 @@ public:
      *
      * Compute the three Cartesian components of a vector together
      *
-     * @param[in] vec    Input row vector [ x1 y1 z1 ... x_n y_n z_n ]
+     * @param[in] vec    Input row vector [ x1 y1 z1 ... x_n y_n z_n ].
      *
-     * @return Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ]
+     * @return Output vector [x1^2+y1^2+z1^2 ... x_n^2+y_n^2+z_n^2 ].
      */
     inline static Eigen::VectorXd* combine_xyz(const Eigen::VectorXd& vec)
     {
@@ -133,9 +133,9 @@ public:
      *
      * Returns the hemisphere id (FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.
      *
-     * @param[in] p_Hemisphere   The hemisphere to investigate
+     * @param[in] p_Hemisphere   The hemisphere to investigate.
      *
-     * @return the deduced hemisphere id
+     * @return the deduced hemisphere id.
      */
     inline static qint32 find_source_space_hemi(MNEHemisphere& p_Hemisphere)
     {
@@ -152,9 +152,9 @@ public:
      *
      * Get the current compensation in effect in the data
      *
-     * @param[in] info   Fiff measurement info
+     * @param[in] info   Fiff measurement info.
      *
-     * @return the current compensation
+     * @return the current compensation.
      */
     static inline qint32 get_current_comp(FIFFLIB::FiffInfo* info)
     {
@@ -176,8 +176,8 @@ public:
      * bdn=(na/"n") blocks of submatrices. Each submatrix is ma x "n", and these submatrices are placed down
      * the diagonal of the matrix.
      *
-     * @param[in, out] A Matrix which should be diagonlized
-     * @param[in, out] n Columns of the submatrices
+     * @param[in, out] A Matrix which should be diagonlized.
+     * @param[in, out] n Columns of the submatrices.
      *
      * @return A sparse block diagonal, diagonalized from the elements in "A".
      */
@@ -196,13 +196,13 @@ public:
      *
      * Create a compensation matrix to bring the data from one compensation state to another
      *
-     * @param[in] info               measurement info as returned by the fif reading routines
-     * @param[in] from               compensation in the input data
-     * @param[in] to                 desired compensation in the output
-     * @param[out] ctf_comp          Compensation Matrix
-     * @param[in] exclude_comp_chs   exclude compensation channels from the output (optional)
+     * @param[in] info               measurement info as returned by the fif reading routines.
+     * @param[in] from               compensation in the input data.
+     * @param[in] to                 desired compensation in the output.
+     * @param[out] ctf_comp          Compensation Matrix.
+     * @param[in] exclude_comp_chs   exclude compensation channels from the output (optional).
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     inline static bool make_compensator(const FIFFLIB::FiffInfo& info,
                                         FIFFLIB::fiff_int_t from,
@@ -225,13 +225,13 @@ public:
      *
      * Make an SSP operator
      *
-     * @param[in] projs      A set of projection vectors
-     * @param[in] ch_names   A cell array of channel names
-     * @param[out] proj      The projection operator to apply to the data
-     * @param[in] bads       Bad channels to exclude
-     * @param[out] U         The orthogonal basis of the projection vectors (optional)
+     * @param[in] projs      A set of projection vectors.
+     * @param[in] ch_names   A cell array of channel names.
+     * @param[out] proj      The projection operator to apply to the data.
+     * @param[in] bads       Bad channels to exclude.
+     * @param[out] U         The orthogonal basis of the projection vectors (optional).
      *
-     * @return nproj - How many items in the projector
+     * @return nproj - How many items in the projector.
      */
     inline static FIFFLIB::fiff_int_t make_projector(const QList<FIFFLIB::FiffProj>& projs,
                                                      const QStringList& ch_names,
@@ -256,10 +256,10 @@ public:
      *
      * Make a SSP operator using the meas info
      *
-     * @param[in] info       Fiff measurement info
-     * @param[out] proj      The projection operator to apply to the data
+     * @param[in] info       Fiff measurement info.
+     * @param[out] proj      The projection operator to apply to the data.
      *
-     * @return nproj - How many items in the projector
+     * @return nproj - How many items in the projector.
      */
     static inline qint32 make_projector(FIFFLIB::FiffInfo& info,
                                         Eigen::MatrixXd& proj)
@@ -277,7 +277,7 @@ public:
      *
      * @param[in, out] p_Hemisphere  The source space.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static bool patch_info(MNEHemisphere &p_Hemisphere)
     {
@@ -294,13 +294,13 @@ public:
      *
      * Prepare for actually computing the inverse
      *
-     * @param[in] orig      The inverse operator structure read from a file
-     * @param[in] nave      Number of averages (scales the noise covariance)
-     * @param[in] lambda2   The regularization factor
-     * @param[in] dSPM      Compute the noise-normalization factors for dSPM?
-     * @param[in] sLORETA   Compute the noise-normalization factors for sLORETA?
+     * @param[in] orig      The inverse operator structure read from a file.
+     * @param[in] nave      Number of averages (scales the noise covariance).
+     * @param[in] lambda2   The regularization factor.
+     * @param[in] dSPM      Compute the noise-normalization factors for dSPM?.
+     * @param[in] sLORETA   Compute the noise-normalization factors for sLORETA?.
      *
-     * @return the prepared inverse operator
+     * @return the prepared inverse operator.
      */
     inline static MNEInverseOperator prepare_inverse_operator(MNEInverseOperator& orig,
                                                               qint32 nave,
@@ -324,10 +324,10 @@ public:
      *
      * Read an event list from a fif file
      *
-     * @param[in] p_IODevice   The I/O device to read from
-     * @param[in, out] eventlist    The read eventlist m x 3; with m events; colum: 1 - position in samples, 3 - eventcode
+     * @param[in] p_IODevice   The I/O device to read from.
+     * @param[in, out] eventlist    The read eventlist m x 3; with m events; colum: 1 - position in samples, 3 - eventcode.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static bool read_events_from_fif(QIODevice &p_IODevice,
                                      Eigen::MatrixXi& eventlist);
@@ -338,10 +338,10 @@ public:
      *
      * Read a list of events from an eve file
      *
-     * @param[in] p_IODevice   The I/O device to read from
-     * @param[in, out] eventList   List of events
+     * @param[in] p_IODevice   The I/O device to read from.
+     * @param[in, out] eventList   List of events.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static bool read_events_from_ascii(QIODevice &p_IODevice,
                                        Eigen::MatrixXi& eventlist);
@@ -360,12 +360,12 @@ public:
      *
      * Reads a covariance matrix from a fiff file
      *
-     * @param[in] p_pStream     an open fiff file
-     * @param[in] p_Node        look for the matrix in here
-     * @param[in] cov_kind      what kind of a covariance matrix do we want?
-     * @param[in, out] p_covData    the read covariance matrix
+     * @param[in] p_pStream     an open fiff file.
+     * @param[in] p_Node        look for the matrix in here.
+     * @param[in] cov_kind      what kind of a covariance matrix do we want?.
+     * @param[in, out] p_covData    the read covariance matrix.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     inline static bool read_cov(FIFFLIB::FiffStream::SPtr& p_pStream,
                                 const FIFFLIB::FiffDirNode::SPtr& p_Node,
@@ -387,10 +387,10 @@ public:
      *
      * Reads the inverse operator decomposition from a fif file
      *
-     * @param[in] p_pIODevice   A fiff IO device like a fiff QFile or QTCPSocket
-     * @param[in, out] inv          The read inverse operator
+     * @param[in] p_pIODevice   A fiff IO device like a fiff QFile or QTCPSocket.
+     * @param[in, out] inv          The read inverse operator.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static bool read_inverse_operator(QIODevice& p_pIODevice,
                                       MNEInverseOperator& inv)
@@ -409,14 +409,14 @@ public:
      *
      * Reads a forward solution from a fif file
      *
-     * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
-     * @param[in, out] fwd A forward solution from a fif file
-     * @param[in] force_fixed   Force fixed source orientation mode? (optional)
-     * @param[in] surf_ori      Use surface based source coordinate system? (optional)
-     * @param[in] include       Include these channels (optional)
-     * @param[in] exclude       Exclude these channels (optional)
+     * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket.
+     * @param[in, out] fwd A forward solution from a fif file.
+     * @param[in] force_fixed   Force fixed source orientation mode? (optional).
+     * @param[in] surf_ori      Use surface based source coordinate system? (optional).
+     * @param[in] include       Include these channels (optional).
+     * @param[in] exclude       Exclude these channels (optional).
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static inline bool read_forward_solution(QIODevice& p_IODevice,
                                              MNEForwardSolution& fwd,
@@ -443,12 +443,12 @@ public:
      *
      * Reads source spaces from a fif file
      *
-     * @param[in] p_pStream         The open fiff file
-     * @param[in] add_geom          Add geometry information to the source spaces
+     * @param[in] p_pStream         The open fiff file.
+     * @param[in] add_geom          Add geometry information to the source spaces.
      *
-     * @param[in, out] p_SourceSpace    The read source spaces
+     * @param[in, out] p_SourceSpace    The read source spaces.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static bool read_source_spaces(FIFFLIB::FiffStream::SPtr& p_pStream,
                                    bool add_geom,
@@ -469,13 +469,13 @@ public:
      *
      * Reads a BEM surface from a fif stream
      *
-     * @param[in] p_pStream         The open fiff file
-     * @param[in] add_geom          Add geometry information to the source spaces
-     * @param[in] p_Tree            Search for the source spaces here
+     * @param[in] p_pStream         The open fiff file.
+     * @param[in] add_geom          Add geometry information to the source spaces.
+     * @param[in] p_Tree            Search for the source spaces here.
      *
-     * @param[in, out] p_Surfaces       The read bem surfaces
+     * @param[in, out] p_Surfaces       The read bem surfaces.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static bool read_bem_surface(FIFFLIB::FiffStream::SPtr& p_pStream,
                                  bool add_geom,
@@ -501,10 +501,10 @@ public:
      *
      * Set the current compensation value in the channel info structures
      *
-     * @param[in] chs    fiff channel info list
-     * @param[in] value  compensation value
+     * @param[in] chs    fiff channel info list.
+     * @param[in] value  compensation value.
      *
-     * @return the current compensation
+     * @return the current compensation.
      */
     static QList<FIFFLIB::FiffChInfo> set_current_comp(QList<FIFFLIB::FiffChInfo>& chs,
                                               FIFFLIB::fiff_int_t value)
@@ -523,11 +523,11 @@ public:
      *
      * Transforms source space data to the desired coordinate system
      *
-     * @param[in, out] p_pMNESourceSpace the source space which is should be transformed
-     * @param[in] dest destination check code
-     * @param[in] trans transformation information
+     * @param[in, out] p_pMNESourceSpace the source space which is should be transformed.
+     * @param[in] dest destination check code.
+     * @param[in] trans transformation information.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static inline bool transform_source_space_to(MNESourceSpace& p_pMNESourceSpace,
                                                  FIFFLIB::fiff_int_t dest,

@@ -89,7 +89,7 @@ public:
     /**
      * Constructs a FiffRawViewSettings which is a child of parent.
      *
-     * @param[in] parent        parent of widget
+     * @param[in] parent        parent of widget.
      */
     FiffRawViewSettings(const QString& sSettingsPath = "",
                         QWidget *parent = 0,
@@ -105,7 +105,7 @@ public:
     /**
      * Init the view.
      *
-     * @param[in] lVisibleWidgets       The widgets to be visible: numberChannels, windowSize, distanceSpacers,
+     * @param[in] lVisibleWidgets       The widgets to be visible: numberChannels, windowSize, distanceSpacers,.
      *                                   backgroundcolor, signalColor, screenshot
      */
     void setWidgetList(const QStringList &lVisibleWidgets = QStringList());
@@ -114,7 +114,7 @@ public:
     /**
      * Sets the values of the windowSize spin box
      *
-     * @param[in] windowSize    new window size value
+     * @param[in] windowSize    new window size value.
      */
     void setWindowSize(int windowSize);
 
@@ -122,7 +122,7 @@ public:
     /**
      * Sets the values of the zoomFactor spin box
      *
-     * @param[in] zoomFactor    new zoomFactor value
+     * @param[in] zoomFactor    new zoomFactor value.
      */
     void setZoom(double zoomFactor);
 
@@ -138,7 +138,7 @@ public:
     /**
      * Set current distance time spacer combo box.
      *
-     * @param[in] value     the new value of the combo box
+     * @param[in] value     the new value of the combo box.
      */
     void setDistanceTimeSpacer(int value);
 

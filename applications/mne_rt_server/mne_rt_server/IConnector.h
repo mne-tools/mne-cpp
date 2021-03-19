@@ -155,7 +155,7 @@ public:
      * Starts the IConnector.
      * Pure virtual method.
      *
-     * @return true if successful, false otherwise
+     * @return true if successful, false otherwise.
      */
     virtual bool start() = 0;// = 0 call is not longer possible - it has to be reimplemented in child;
 
@@ -164,7 +164,7 @@ public:
      * Stops the AbstractPlugin.
      * Pure virtual method.
      *
-     * @return true if success, false otherwise
+     * @return true if success, false otherwise.
      */
     virtual bool stop() = 0;
 
@@ -188,7 +188,7 @@ public:
     /**
      * Request FiffInfo to be released.
      *
-     * @param[in] ID    ID of the data client to send to. ToDo Remove this - do this processing somewhere else
+     * @param[in] ID    ID of the data client to send to. ToDo Remove this - do this processing somewhere else.
      */
     virtual void info(qint32 ID) = 0;
 

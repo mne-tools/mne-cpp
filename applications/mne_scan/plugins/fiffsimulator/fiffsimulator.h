@@ -166,7 +166,7 @@ protected:
     /**
      * Change connector
      *
-     * @param[in] p_iNewConnectorId      new connector ID
+     * @param[in] p_iNewConnectorId      new connector ID.
      */
     void changeConnector(qint32 p_iNewConnectorId);
 
@@ -214,7 +214,7 @@ signals:
     /**
      * Emitted when command clients connection status changed
      *
-     * @param[in] p_bStatus  connection status
+     * @param[in] p_bStatus  connection status.
      */
     void cmdConnectionChanged(bool p_bStatus);
 

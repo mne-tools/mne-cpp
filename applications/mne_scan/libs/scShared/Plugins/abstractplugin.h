@@ -127,7 +127,7 @@ public:
      * Starts the AbstractPlugin.
      * Pure virtual method.
      *
-     * @return true if success, false otherwise
+     * @return true if success, false otherwise.
      */
     virtual bool start() = 0;
 
@@ -136,7 +136,7 @@ public:
      * Stops the AbstractPlugin.
      * Pure virtual method.
      *
-     * @return true if success, false otherwise
+     * @return true if success, false otherwise.
      */
     virtual bool stop() = 0;
 
@@ -144,7 +144,7 @@ public:
     /**
      * A list of actions for the current plugin.
      *
-     * @return a list of plugin actions
+     * @return a list of plugin actions.
      */
     inline QList< QAction* > getPluginActions();
 
@@ -153,7 +153,7 @@ public:
      * Returns the plugin type.
      * Pure virtual method.
      *
-     * @return type of the AbstractPlugin
+     * @return type of the AbstractPlugin.
      */
     virtual PluginType getType() const = 0;
 
@@ -191,7 +191,7 @@ signals:
     /**
      * Signal to notify that new plugin control widgets are available.
      *
-     * @param[in] lControlWidgets      A QList with pointers to the control widgets. Note that the signal sender
+     * @param[in] lControlWidgets      A QList with pointers to the control widgets. Note that the signal sender.
      *                                  does not have ownership of these pointers.
      * @param[in] sPluginName          The plugin name emmiting the signal.
      */
@@ -202,7 +202,7 @@ signals:
     /**
      * Signal emmited whenever the gui modes changed
      *
-     * @param[in] mode       the new gui mode
+     * @param[in] mode       the new gui mode.
      */
     void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
 
@@ -219,7 +219,7 @@ protected:
     /**
      * Adds a plugin action to the current plugin.
      *
-     * @param[in] pAction  pointer to the action to be added to the plugin
+     * @param[in] pAction  pointer to the action to be added to the plugin.
      */
     inline void addPluginAction(QAction* pAction);
 

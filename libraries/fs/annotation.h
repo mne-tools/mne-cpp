@@ -94,7 +94,7 @@ public:
     /**
      * Construts the annotation by reading it of the given file.
      *
-     * @param[in] p_sFileName    Annotation file
+     * @param[in] p_sFileName    Annotation file.
      */
     explicit Annotation(const QString& p_sFileName);
 
@@ -102,10 +102,10 @@ public:
     /**
      * Construts the annotation by reading it of the given file.
      *
-     * @param[in] subject_id         Name of subject
-     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
-     * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
-     * @param[in] subjects_dir       Subjects directory
+     * @param[in] subject_id         Name of subject.
+     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}.
+     * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
+     * @param[in] subjects_dir       Subjects directory.
      */
     explicit Annotation(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
 
@@ -113,11 +113,11 @@ public:
     /**
      * Construts the annotation by reading it of the given file.
      *
-     * @param[in] path               path to surface directory
-     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
-     * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
+     * @param[in] path               path to surface directory.
+     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}.
+     * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
      *
-     * @return true if read sucessful, false otherwise
+     * @return true if read sucessful, false otherwise.
      */
     explicit Annotation(const QString &path, qint32 hemi, const QString &surf);
 
@@ -137,7 +137,7 @@ public:
     /**
      * Returns whether Annotation is empty.
      *
-     * @return true if is empty, false otherwise
+     * @return true if is empty, false otherwise.
      */
     inline bool isEmpty() const;
 
@@ -145,7 +145,7 @@ public:
     /**
      * Returns the hemisphere id (0 = lh; 1 = rh)
      *
-     * @return hemisphere id
+     * @return hemisphere id.
      */
     inline qint32 hemi() const;
 
@@ -153,7 +153,7 @@ public:
     /**
      * Returns the vertix indeces
      *
-     * @return vertix indeces
+     * @return vertix indeces.
      */
     inline Eigen::VectorXi& getVertices();
 
@@ -161,7 +161,7 @@ public:
     /**
      * Returns the vertix indeces
      *
-     * @return vertix indeces
+     * @return vertix indeces.
      */
     inline const Eigen::VectorXi getVertices() const;
 
@@ -169,7 +169,7 @@ public:
     /**
      * Returns the vertix labels
      *
-     * @return vertix labels
+     * @return vertix labels.
      */
     inline Eigen::VectorXi& getLabelIds();
 
@@ -177,7 +177,7 @@ public:
     /**
      * Returns the vertix labels
      *
-     * @return vertix labels
+     * @return vertix labels.
      */
     inline const Eigen::VectorXi getLabelIds() const;
 
@@ -185,7 +185,7 @@ public:
     /**
      * Returns the coloratable containing the label based nomenclature
      *
-     * @return colortable
+     * @return colortable.
      */
     inline Colortable& getColortable();
 
@@ -193,7 +193,7 @@ public:
     /**
      * Returns the coloratable containing the label based nomenclature
      *
-     * @return colortable
+     * @return colortable.
      */
     inline const Colortable getColortable() const;
 
@@ -201,13 +201,13 @@ public:
     /**
      * Reads a FreeSurfer annotation file
      *
-     * @param[in] subject_id         Name of subject
-     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
-     * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
-     * @param[in] subjects_dir       Subjects directory
-     * @param[out] p_Annotation      The read annotation
+     * @param[in] subject_id         Name of subject.
+     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}.
+     * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
+     * @param[in] subjects_dir       Subjects directory.
+     * @param[out] p_Annotation      The read annotation.
      *
-     * @return true if read sucessful, false otherwise
+     * @return true if read sucessful, false otherwise.
      */
     static bool read(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir, Annotation &p_Annotation);
 
@@ -215,12 +215,12 @@ public:
     /**
      * Reads a FreeSurfer annotation file
      *
-     * @param[in] path               path to label directory
-     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
-     * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
-     * @param[out] p_Annotation      The read annotation
+     * @param[in] path               path to label directory.
+     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}.
+     * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...).
+     * @param[out] p_Annotation      The read annotation.
      *
-     * @return true if read sucessful, false otherwise
+     * @return true if read sucessful, false otherwise.
      */
     static bool read(const QString &path, qint32 hemi, const QString &atlas, Annotation &p_Annotation);
 
@@ -228,10 +228,10 @@ public:
     /**
      * Reads an annotation of a file
      *
-     * @param[in] p_sFileName    Annotation file
-     * @param[out] p_Annotation  the read annotation
+     * @param[in] p_sFileName    Annotation file.
+     * @param[out] p_Annotation  the read annotation.
      *
-     * @return true if successful, false otherwise
+     * @return true if successful, false otherwise.
      */
     static bool read(const QString &p_sFileName, Annotation &p_Annotation);
 
@@ -241,12 +241,12 @@ public:
      *
      * Converts annotation to a label list and colortable
      *
-     * @param[in] p_surf                 the surface to read the vertex positions from
+     * @param[in] p_surf                 the surface to read the vertex positions from.
      * @param[out] p_qListLabels         the converted labels are appended to a given list. Stored data are not affected.
      * @param[out] p_qListLabelRGBAs     the converted label RGBAs are appended to a given list. Stored data are not affected.
      * @param[out] lLabelPicks           the label names which should be picked.
      *
-     * @return true if successful, false otherwise
+     * @return true if successful, false otherwise.
      */
     bool toLabels(const Surface &p_surf,
                   QList<Label> &p_qListLabels,
@@ -257,7 +257,7 @@ public:
     /**
      * annotation file path
      *
-     * @return the surf file path
+     * @return the surf file path.
      */
     inline QString filePath() const;
 
@@ -265,7 +265,7 @@ public:
     /**
      * annotation file name
      *
-     * @return the surf file name
+     * @return the surf file name.
      */
     inline QString fileName() const;
 

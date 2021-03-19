@@ -110,7 +110,7 @@ public:
     /**
      * Constructs an real-time multi sample array table model for the given parent.
      *
-     * @param[in] parent     parent of the table model
+     * @param[in] parent     parent of the table model.
      */
     EvokedSetModel(QObject *parent = 0);
 
@@ -136,9 +136,9 @@ public:
     /**
      * Returns the number of rows under the given parent. When the parent is valid it means that rowCount is returning the number of children of parent.
      *
-     * @param[in] parent     not used
+     * @param[in] parent     not used.
      *
-     * @return number of rows
+     * @return number of rows.
      */
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
 
@@ -146,9 +146,9 @@ public:
     /**
      * Returns the number of columns for the children of the given parent.
      *
-     * @param[in] parent     not used
+     * @param[in] parent     not used.
      *
-     * @return number of columns
+     * @return number of columns.
      */
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
@@ -156,11 +156,11 @@ public:
     /**
      * Data for the row and column and given display role
      *
-     * @param[in] row       index row
-     * @param[in] column    index column
-     * @param[in] role      display role to access
+     * @param[in] row       index row.
+     * @param[in] column    index column.
+     * @param[in] role      display role to access.
      *
-     * @return the accessed data
+     * @return the accessed data.
      */
     QVariant data(int row,
                   int column,
@@ -170,10 +170,10 @@ public:
     /**
      * Returns the data stored under the given role for the item referred to by the index.
      *
-     * @param[in] index      determines item location
-     * @param[in] role       role to return
+     * @param[in] index      determines item location.
+     * @param[in] role       role to return.
      *
-     * @return accessed data
+     * @return accessed data.
      */
     virtual QVariant data(const QModelIndex &index,
                           int role = Qt::DisplayRole) const;
@@ -183,10 +183,10 @@ public:
      * Returns the data for the given role and section in the header with the specified orientation.
      *
      * @param[in] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
-     * @param[in] orientation    Qt::Horizontal or Qt::Vertical
-     * @param[in] role           role to show
+     * @param[in] orientation    Qt::Horizontal or Qt::Vertical.
+     * @param[in] role           role to show.
      *
-     * @return accessed eader data
+     * @return accessed eader data.
      */
     virtual QVariant headerData(int section,
                                 Qt::Orientation orientation,
@@ -198,7 +198,7 @@ public:
     /**
      * Sets corresponding evoked set
      *
-     * @param[in] pEvokedSet      The evoked set
+     * @param[in] pEvokedSet      The evoked set.
      */
     void setEvokedSet(QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet);
 
@@ -231,7 +231,7 @@ public:
     /**
      * Set the average colors
      *
-     * @param[in] qMapAverageColor      Pointer to the new average colors
+     * @param[in] qMapAverageColor      Pointer to the new average colors.
      */
     void setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
@@ -239,7 +239,7 @@ public:
     /**
      * Set the average activations
      *
-     * @param[in] qMapAverageActivation      Pointer to the new average activations
+     * @param[in] qMapAverageActivation      Pointer to the new average activations.
      */
     void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 
@@ -247,9 +247,9 @@ public:
     /**
      * Returns the kind of a given channel number
      *
-     * @param[in] row    row number which correspodns to a given channel
+     * @param[in] row    row number which correspodns to a given channel.
      *
-     * @return kind of given channel number
+     * @return kind of given channel number.
      */
     FIFFLIB::fiff_int_t getKind(qint32 row) const;
 
@@ -257,9 +257,9 @@ public:
     /**
      * Returns true or fals whether the provided channel is bad.
      *
-     * @param[in] row    row number which correspodns to a given channel
+     * @param[in] row    row number which correspodns to a given channel.
      *
-     * @return Returns true or fals whether the provided channel is bad
+     * @return Returns true or fals whether the provided channel is bad.
      */
     bool getIsChannelBad(qint32 row) const;
 
@@ -267,9 +267,9 @@ public:
     /**
      * Returns the unit of a given channel number
      *
-     * @param[in] row    row number which correspodns to a given channel
+     * @param[in] row    row number which correspodns to a given channel.
      *
-     * @return unit of given channel number
+     * @return unit of given channel number.
      */
     FIFFLIB::fiff_int_t getUnit(qint32 row) const;
 
@@ -277,9 +277,9 @@ public:
     /**
      * Returns the coil type of a given channel number
      *
-     * @param[in] row    row number which correspodns to a given channel
+     * @param[in] row    row number which correspodns to a given channel.
      *
-     * @return coil type of given channel number
+     * @return coil type of given channel number.
      */
     FIFFLIB::fiff_int_t getCoil(qint32 row) const;
 
@@ -287,7 +287,7 @@ public:
     /**
      * Returns a map which conatins the channel idx and its corresponding selection status
      *
-     * @return the channel idx to selection status
+     * @return the channel idx to selection status.
      */
     const QMap<qint32,qint32>& getIdxSelMap() const;
 
@@ -295,7 +295,7 @@ public:
     /**
      * Returns the current number for the time spacers
      *
-     * @return the current number for the time spacers
+     * @return the current number for the time spacers.
      */
     int getNumberOfTimeSpacers() const;
 
@@ -303,7 +303,7 @@ public:
     /**
      * Returns the current baseline information
      *
-     * @return the current baseline information as a from to QPair
+     * @return the current baseline information as a from to QPair.
      */
     QPair<QVariant,QVariant> getBaselineInfo() const;
 
@@ -311,7 +311,7 @@ public:
     /**
      * Returns the current number of stored averages
      *
-     * @return the current number of stored averages
+     * @return the current number of stored averages.
      */
     int getNumAverages() const;
 
@@ -319,7 +319,7 @@ public:
     /**
      * Returns the number of pre-stimulus samples
      *
-     * @return the number of pre-stimulus samples
+     * @return the number of pre-stimulus samples.
      */
     qint32 getNumPreStimSamples() const;
 
@@ -327,7 +327,7 @@ public:
     /**
      * Returns the current sampling frequency
      *
-     * @return the current sampling frequency
+     * @return the current sampling frequency.
      */
     float getSamplingFrequency() const;
 
@@ -335,7 +335,7 @@ public:
     /**
      * Selects the given list of channel indeces and unselect all other channels
      *
-     * @param[in] selection      channel index list to select
+     * @param[in] selection      channel index list to select.
      */
     void selectRows(const QList<qint32> &selection);
 
@@ -349,7 +349,7 @@ public:
     /**
      * Returns the number of vertical lines (one per second)
      *
-     * @return number of vertical lines
+     * @return number of vertical lines.
      */
     qint32 numVLines() const;
 
@@ -357,7 +357,7 @@ public:
     /**
      * Returns current freezing status
      *
-     * @return the current freezing status
+     * @return the current freezing status.
      */
     bool isFreezed() const;
 
@@ -371,7 +371,7 @@ public:
     /**
      * Update the compensator
      *
-     * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind)
+     * @param[in] to    Compensator to use in fiff constant format FiffCtfComp.kind (NOT FiffCtfComp.ctfkind).
      */
     void updateCompensator(int to);
 
@@ -415,7 +415,7 @@ signals:
     /**
      * Emmited when new selcetion was made
      *
-     * @param[in] selection     list of all selected channels
+     * @param[in] selection     list of all selected channels.
      */
     void newSelection(QList<qint32> selection);
 
@@ -423,7 +423,7 @@ signals:
     /**
      * Emmited when new average color is available
      *
-     * @param[in] qMapAverageColor     the average color map
+     * @param[in] qMapAverageColor     the average color map.
      */
     void newAverageColorMap(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
@@ -431,7 +431,7 @@ signals:
     /**
      * Emmited when new average activation is available
      *
-     * @param[in] qMapAverageActivation     the average activation map
+     * @param[in] qMapAverageActivation     the average activation map.
      */
     void newAverageActivationMap(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 };

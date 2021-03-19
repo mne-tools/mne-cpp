@@ -91,8 +91,8 @@ public:
     /**
      * Adds a plugin to the stage.
      *
-     * @param[in] pPlugin        plugin to be cloned and added
-     * @param[out] pAddedPlugin  if plugin is successful added, this contains a pointer to the added instance
+     * @param[in] pPlugin        plugin to be cloned and added.
+     * @param[out] pAddedPlugin  if plugin is successful added, this contains a pointer to the added instance.
      *
      *@return true if plugin is added successful.
      */
@@ -104,7 +104,7 @@ public:
     /**
      * Removes a plugin from the stage.
      *
-     * @param[in] pPlugin    plugin to be removed
+     * @param[in] pPlugin    plugin to be removed.
      *
      *@return true if plugin is removed successful.
      */

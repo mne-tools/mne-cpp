@@ -117,7 +117,7 @@ private:
     /**
      * Loads new Fiff model whan current loaded model is changed
      *
-     * @param[in, out] pNewModel    pointer to currently loaded FiffRawView Model
+     * @param[in, out] pNewModel    pointer to currently loaded FiffRawView Model.
      */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
@@ -125,7 +125,7 @@ private:
     /**
      * Handles clearing view if currently used model is being removed
      *
-     * @param[in] pRemovedModel    Pointer to model being removed
+     * @param[in] pRemovedModel    Pointer to model being removed.
      */
     void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
 
@@ -133,7 +133,7 @@ private:
     /**
      * Toggles whether to show annotations
      *
-     * @param[in] iToggle  0 for not shown, 2 for shown
+     * @param[in] iToggle  0 for not shown, 2 for shown.
      */
     void toggleDisplayEvent(const int& iToggle);
 
@@ -159,7 +159,7 @@ private:
     /**
      * Sends event to trigger loading bar to appear and sMessage to show
      *
-     * @param[in] sMessage     loading bar message
+     * @param[in] sMessage     loading bar message.
      */
     void triggerLoadingStart(const QString& sMessage);
 

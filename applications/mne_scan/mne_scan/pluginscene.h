@@ -92,7 +92,7 @@ public:
     /**
      * Inserts an item depending on the selected action
      *
-     * @param[in] pos   Position where to insert the plugin
+     * @param[in] pos   Position where to insert the plugin.
      */
     void insertItem(const QPointF& pos);
 
@@ -100,10 +100,10 @@ public:
     /**
      * Inserts the m_pActionPluginItem selected plugin into PluginSceneManager
      *
-     * @param[in] pActionPluginItem     Current selected action item
-     * @param[in, out] pAddedPlugin         The added plugin
+     * @param[in] pActionPluginItem     Current selected action item.
+     * @param[in, out] pAddedPlugin         The added plugin.
      *
-     * @return true if successfull
+     * @return true if successfull.
      */
     bool insertPlugin(QAction* pActionPluginItem, SCSHAREDLIB::AbstractPlugin::SPtr &pAddedPlugin);
 

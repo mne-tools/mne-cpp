@@ -87,7 +87,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffChInfo   Channel Info descriptor which should be copied
+     * @param[in] p_FiffChInfo   Channel Info descriptor which should be copied.
      */
     FiffChInfo(const FiffChInfo &p_FiffChInfo);
 
@@ -111,7 +111,7 @@ public:
      *
      * @param[in] object    The object which should be compared to.
      *
-     * @return true if equal, false otherwise
+     * @return true if equal, false otherwise.
      */
     friend bool operator== (const FiffChInfo &a, const FiffChInfo &b);
 

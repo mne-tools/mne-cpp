@@ -124,7 +124,7 @@ public:
     /**
      * The connector connection setup widget
      *
-     * @return the setup widget
+     * @return the setup widget.
      */
     QWidget* setupWidget();
 

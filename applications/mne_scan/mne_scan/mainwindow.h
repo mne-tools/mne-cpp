@@ -139,7 +139,7 @@ public:
     /**
      * This event handler is called when Qt receives a window close request from the window system.
      *
-     * @param[in] event     close event
+     * @param[in] event     close event.
      */
     void closeEvent(QCloseEvent *event);
 
@@ -147,7 +147,7 @@ public:
     /**
      * Starts or restarts the main application timer with a timeout interval of msec milliseconds.
      *
-     * @param[in] msec timeout interval in milliseconds
+     * @param[in] msec timeout interval in milliseconds.
      */
     void startTimer(int msec);
 
@@ -161,7 +161,7 @@ public:
     /**
      * Writes to MainWindow log.
      *
-     * @param[in] logMsg message
+     * @param[in] logMsg message.
      * @param[in] lgknd message kind; Message is formated depending on its kind.
      * @param[in] lglvl message level; Message is displayed depending on its level.
      */
@@ -434,7 +434,7 @@ signals:
     /**
      * Signal emmited whenever the gui modes changed
      *
-     * @param[in] mode       the new gui mode
+     * @param[in] mode       the new gui mode.
      */
     void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
 

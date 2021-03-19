@@ -172,7 +172,7 @@ public:
      * @param[in] p3DEntityParent        Pointer to the QEntity parent.
      * @param[in] bUseGPU                Whether to use GPU support for visualizing real-time data.
      *
-     * @return                           Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.)
+     * @return                           Returns a pointer to the added tree item. (Default would be a NULL pointer if no item was added.).
      */
     SensorDataTreeItem *addData(const Eigen::MatrixXd& tSensorData,
                                 const MNELIB::MNEBemSurface &bemSurface,

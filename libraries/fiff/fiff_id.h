@@ -81,7 +81,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffId   Universially unique identifier which should be copied
+     * @param[in] p_FiffId   Universially unique identifier which should be copied.
      */
     FiffId(const FiffId& p_FiffId);
 
@@ -122,7 +122,7 @@ public:
     /**
      * True if FIFF id is empty.
      *
-     * @return true if FIFF id is empty
+     * @return true if FIFF id is empty.
      */
     inline bool isEmpty() const;
 

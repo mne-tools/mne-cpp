@@ -85,7 +85,7 @@ public:
     /**
      * Constructs a AverageSelectionView which is a child of parent.
      *
-     * @param[in] parent        parent of widget
+     * @param[in] parent        parent of widget.
      */
     AverageSelectionView(const QString &sSettingsPath="",
                          QWidget *parent = 0,
@@ -117,7 +117,7 @@ public:
     /**
      * Set the average colors
      *
-     * @param[in] qMapAverageColor      Pointer to the new average colors
+     * @param[in] qMapAverageColor      Pointer to the new average colors.
      */
     void setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
@@ -125,7 +125,7 @@ public:
     /**
      * Set the average activations
      *
-     * @param[in] qMapAverageActivation      Pointer to the new average activations
+     * @param[in] qMapAverageActivation      Pointer to the new average activations.
      */
     void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 
@@ -186,7 +186,7 @@ signals:
     /**
      * Emmited when new average color is available
      *
-     * @param[in] qMapAverageColor     the average color map
+     * @param[in] qMapAverageColor     the average color map.
      */
     void newAverageColorMap(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
@@ -194,7 +194,7 @@ signals:
     /**
      * Emmited when new average activation is available
      *
-     * @param[in] qMapAverageActivation     the average activation map
+     * @param[in] qMapAverageActivation     the average activation map.
      */
     void newAverageActivationMap(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 };

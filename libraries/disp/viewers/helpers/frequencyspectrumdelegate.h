@@ -87,7 +87,7 @@ public:
     /**
      * Creates a new abstract item delegate with the given parent.
      *
-     * @param[in] parent     Parent of the delegate
+     * @param[in] parent     Parent of the delegate.
      */
     FrequencySpectrumDelegate(QTableView* m_pTableView,
                               QObject *parent = 0);
@@ -106,8 +106,8 @@ public:
      *
      * (sizeHint() must be implemented also)
      *
-     * @param[in] painter    Low-level painting on widgets and other paint devices
-     * @param[in] option     Describes the parameters used to draw an item in a view widget
+     * @param[in] painter    Low-level painting on widgets and other paint devices.
+     * @param[in] option     Describes the parameters used to draw an item in a view widget.
      * @param[in] index      Used to locate data in a data model.
      */
     virtual void paint(QPainter *painter,
@@ -118,7 +118,7 @@ public:
     /**
      * Item size
      *
-     * @param[in] option     Describes the parameters used to draw an item in a view widget
+     * @param[in] option     Describes the parameters used to draw an item in a view widget.
      * @param[in] index      Used to locate data in a data model.
      */
     virtual QSize sizeHint(const QStyleOptionViewItem &option,
@@ -128,7 +128,7 @@ public:
     /**
      * Receive Mouse location
      *
-     * @param[in] row    The select row of tableview
+     * @param[in] row    The select row of tableview.
      * @param[in] x      mouse x pos.
      * @param[in] y      mouse y pos.
      * @param[in] visRect      visual rect of row_tableview.

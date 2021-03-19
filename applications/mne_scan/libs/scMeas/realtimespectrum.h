@@ -92,7 +92,7 @@ public:
     /**
      * Init channel infos using fiff info
      *
-     * @param[in] p_pFiffInfo     Info to init from
+     * @param[in] p_pFiffInfo     Info to init from.
      */
     void initFromFiffInfo(FIFFLIB::FiffInfo::SPtr &p_pFiffInfo);
 
@@ -100,7 +100,7 @@ public:
     /**
      * Init Scale Type
      *
-     * @param[in] ScaleType     Scale type to init from
+     * @param[in] ScaleType     Scale type to init from.
      */
     void initScaleType(qint8 ScaleType);
 

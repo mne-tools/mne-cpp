@@ -97,9 +97,9 @@ public:
      * @param[in] names             The channel names.
      * @param[in] outFile           The outout file.
      * @param[in] do_fit            The flag whether to do a sphere fitting.
-     * @param[in] prad
-     * @param[in] w
-     * @param[in] h
+     * @param[in] prad.
+     * @param[in] w.
+     * @param[in] h.
      * @param[in] writeFile         The flag whether to write to file.
      * @param[in] mirrorXAxis       Mirror points at x axis.
      * @param[in] mirrorYAxis       Mirror points at y axis.

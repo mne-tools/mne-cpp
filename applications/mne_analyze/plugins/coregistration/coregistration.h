@@ -132,9 +132,9 @@ private:
     /**
      * Removes BEM model from stored list and GUI drop down list
      *
-     * @param[in] pRemovedModel    model being removed
+     * @param[in] pRemovedModel    model being removed.
      *
-     * @return  whether model is removed (true if removed, false if not removed)
+     * @return  whether model is removed (true if removed, false if not removed).
      */
     bool removeFromBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
 
@@ -274,7 +274,7 @@ private:
     /**
      * Store the fiducials to the given file path
      *
-     * @param[in] sFilePath     The file path to store the fiducials
+     * @param[in] sFilePath     The file path to store the fiducials.
      */
     void onStoreFiducials(const QString& sFilePath);
 
@@ -288,7 +288,7 @@ private:
     /**
      * Sends event to trigger loading bar to appear and sMessage to show
      *
-     * @param[in] sMessage     loading bar message
+     * @param[in] sMessage     loading bar message.
      */
     void triggerLoadingStart(QString sMessage);
 
@@ -302,7 +302,7 @@ private:
     /**
      * Loads new  model when current loaded model is changed
      *
-     * @param[in, out] pNewModel    pointer to currently loaded FiffRawView Model
+     * @param[in, out] pNewModel    pointer to currently loaded FiffRawView Model.
      */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
@@ -310,7 +310,7 @@ private:
     /**
      * Handles clearing view if currently used model is being removed
      *
-     * @param[in] pRemovedModel    Pointer to model being removed
+     * @param[in] pRemovedModel    Pointer to model being removed.
      */
     void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
 

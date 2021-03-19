@@ -87,7 +87,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffDirTree  Directory tree structure which should be copied
+     * @param[in] p_FiffDirTree  Directory tree structure which should be copied.
      */
     FiffDirNode(const FiffDirNode* p_FiffDirTree);
 
@@ -103,12 +103,12 @@ public:
      *
      * Copies directory subtrees from fidin to fidout
      *
-     * @param[in] p_pStreamIn    fiff file to copy from
-     * @param[in] in_id          file id description
-     * @param[in] p_Nodes        subtree directories to be copied
-     * @param[out] p_pStreamOut   fiff file to write to
+     * @param[in] p_pStreamIn    fiff file to copy from.
+     * @param[in] in_id          file id description.
+     * @param[in] p_Nodes        subtree directories to be copied.
+     * @param[out] p_pStreamOut   fiff file to write to.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static bool copy_tree(QSharedPointer<FiffStream>& p_pStreamIn, const FiffId& in_id, const QList< QSharedPointer<FiffDirNode> >& p_Nodes, QSharedPointer<FiffStream>& p_pStreamOut);
 
@@ -130,9 +130,9 @@ public:
      *
      * Find nodes of the given kind from a directory tree structure
      *
-     * @param[in] p_kind the given kind
+     * @param[in] p_kind the given kind.
      *
-     * @return list of the found nodes
+     * @return list of the found nodes.
      */
     QList<FiffDirNode::SPtr> dir_tree_find(fiff_int_t p_kind) const;
 
@@ -145,11 +145,11 @@ public:
      * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirNode
      *       class, that's why a tree object doesn't need to be handed to the function.
      *
-     * @param[in] p_pStream the opened fif file
-     * @param[in] findkind the kind which should be found
-     * @param[out] p_pTag the found tag
+     * @param[in] p_pStream the opened fif file.
+     * @param[in] findkind the kind which should be found.
+     * @param[out] p_pTag the found tag.
      *
-     * @return true if found, false otherwise
+     * @return true if found, false otherwise.
      */
     inline bool find_tag(QSharedPointer<FiffStream>& p_pStream, fiff_int_t findkind, QSharedPointer<FiffTag>& p_pTag) const;
 
@@ -162,11 +162,11 @@ public:
      * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirNode
      *       class, that's why a tree object doesn't need to be handed to the function.
      *
-     * @param[in] p_pStream the opened fif file
-     * @param[in] findkind the kind which should be found
-     * @param[out] p_pTag the found tag
+     * @param[in] p_pStream the opened fif file.
+     * @param[in] findkind the kind which should be found.
+     * @param[out] p_pTag the found tag.
      *
-     * @return true if found, false otherwise
+     * @return true if found, false otherwise.
      */
     bool find_tag(FiffStream* p_pStream, fiff_int_t findkind, QSharedPointer<FiffTag>& p_pTag) const;
 
@@ -174,9 +174,9 @@ public:
     /**
      * Definition of the has_tag function in fiff_read_named_matrix.m
      *
-     * @param[in] findkind kind to find
+     * @param[in] findkind kind to find.
      *
-     * @return true when fiff_dir_node contains kind
+     * @return true when fiff_dir_node contains kind.
      */
     bool has_tag(fiff_int_t findkind);
 
@@ -184,9 +184,9 @@ public:
     /**
      * Checks whether a FiffDirNode has a specific kind
      *
-     * @param[in] findkind kind to find
+     * @param[in] findkind kind to find.
      *
-     * @return true when fiff_dir_node contains kind
+     * @return true when fiff_dir_node contains kind.
      */
     bool has_kind(fiff_int_t p_kind) const;
 
@@ -195,7 +195,7 @@ public:
      * Prints elements of a tree.
      * Refactored: print_tree (fiff_dir_tree.c)
      *
-     * @param[in] indent     number of intendations
+     * @param[in] indent     number of intendations.
      */
     void print(int indent) const;
 
@@ -204,7 +204,7 @@ public:
      * Try to explain a block...
      * Refactored: fiff_explain_block (fiff_explain.c)
      *
-     * @param[in] kind   Block kind
+     * @param[in] kind   Block kind.
      */
     static void explain_block(int kind);
 
@@ -213,7 +213,7 @@ public:
      * Try to explain...
      * Refactored: fiff_explain (fiff_explain.c)
      *
-     * @param[in] kind   directory kind
+     * @param[in] kind   directory kind.
      */
     static void explain (int kind);
 
@@ -222,7 +222,7 @@ public:
      * Get textual explanation of a tag
      * Refactored: fiff_get_tag_explanation (fiff_explain.c)
      *
-     * @param[in] kind   directory kind
+     * @param[in] kind   directory kind.
      */
     static const char *get_tag_explanation (int kind);
 
@@ -230,7 +230,7 @@ public:
     /**
      * Returns the number of entries in this node
      *
-     * @return Number of entries in this node
+     * @return Number of entries in this node.
      */
     fiff_int_t nent() const;
 
@@ -238,7 +238,7 @@ public:
     /**
      * Returns the number of child nodes
      *
-     * @return Number of child nodes
+     * @return Number of child nodes.
      */
     fiff_int_t nchild() const;
 

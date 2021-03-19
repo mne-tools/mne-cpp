@@ -95,7 +95,7 @@ public:
     /**
      * Constructs a RealTimeConnectivityEstimate.
      *
-     * @param[in] parent     the QObject parent of this measurement
+     * @param[in] parent     the QObject parent of this measurement.
      */
     RealTimeConnectivityEstimate(QObject *parent = 0);
 
@@ -109,7 +109,7 @@ public:
     /**
      * Sets the annotation set.
      *
-     * @param[in] annotSet   the annotation set to set
+     * @param[in] annotSet   the annotation set to set.
      */
     inline void setAnnotSet(const QSharedPointer<FSLIB::AnnotationSet>& annotSet);
 
@@ -117,7 +117,7 @@ public:
     /**
      * Returns the annotation set.
      *
-     * @return the annotation set
+     * @return the annotation set.
      */
     inline QSharedPointer<FSLIB::AnnotationSet>& getAnnotSet();
 
@@ -125,7 +125,7 @@ public:
     /**
      * Sets the sensor surface.
      *
-     * @param[in] sensorSurface   the sensor surface
+     * @param[in] sensorSurface   the sensor surface.
      */
     inline void setSensorSurface(const QSharedPointer<MNELIB::MNEBem>& sensorSurface);
 
@@ -133,7 +133,7 @@ public:
     /**
      * Returns the sensor surface.
      *
-     * @return the sensor surfac
+     * @return the sensor surfac.
      */
     inline QSharedPointer<MNELIB::MNEBem>& getSensorSurface();
 
@@ -141,7 +141,7 @@ public:
     /**
      * Sets the sensor surface.
      *
-     * @param[in] surfSet   the surface set to set
+     * @param[in] surfSet   the surface set to set.
      */
     inline void setSurfSet(const QSharedPointer<FSLIB::SurfaceSet>& surfSet);
 
@@ -149,7 +149,7 @@ public:
     /**
      * Returns the surface set.
      *
-     * @return the surface set
+     * @return the surface set.
      */
     inline QSharedPointer<FSLIB::SurfaceSet> &getSurfSet();
 
@@ -157,7 +157,7 @@ public:
     /**
      * Sets the forward solution.
      *
-     * @param[in] fwdSolution   the forward solution to set
+     * @param[in] fwdSolution   the forward solution to set.
      */
     inline void setFwdSolution(const QSharedPointer<MNELIB::MNEForwardSolution>& fwdSolution);
 
@@ -165,7 +165,7 @@ public:
     /**
      * Returns the forward solution.
      *
-     * @return the forward solution
+     * @return the forward solution.
      */
     inline QSharedPointer<MNELIB::MNEForwardSolution>& getFwdSolution();
 

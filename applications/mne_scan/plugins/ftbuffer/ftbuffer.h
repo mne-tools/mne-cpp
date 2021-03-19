@@ -137,7 +137,7 @@ public:
      * Starts the AbstractSensor.
      * Pure virtual method inherited by IModule.
      *
-     * @return true if success, false otherwise
+     * @return true if success, false otherwise.
      */
     virtual bool start();
 
@@ -146,7 +146,7 @@ public:
      * Stops the AbstractSensor.
      * Pure virtual method inherited by IModule.
      *
-     * @return true if success, false otherwise
+     * @return true if success, false otherwise.
      */
     virtual bool stop();
 
@@ -155,7 +155,7 @@ public:
      * Returns the plugin type.
      * Pure virtual method inherited by IModule.
      *
-     * @return type of the AbstractSensor
+     * @return type of the AbstractSensor.
      */
     virtual PluginType getType() const;
 
@@ -195,7 +195,7 @@ private:
     /**
      * Receives new data from producer, publishes to plugin output rtmsa
      *
-     * @param[in] matData   New data from FtBuffProducer
+     * @param[in] matData   New data from FtBuffProducer.
      */
     void onNewDataAvailable(const Eigen::MatrixXd &matData);
 
@@ -209,7 +209,7 @@ private:
     /**
      * Sets up Fiff info from passed FiffInfo and uses it to initialize m_pRTMSA_BufferOutput
      *
-     * @param[in] FiffInfo  FiffInfo used to set up buffer output
+     * @param[in] FiffInfo  FiffInfo used to set up buffer output.
      */
     bool setupRTMSA(FIFFLIB::FiffInfo FiffInfo);
 

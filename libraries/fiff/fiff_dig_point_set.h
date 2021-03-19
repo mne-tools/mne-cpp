@@ -97,7 +97,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffDigPointSet
+     * @param[in] p_FiffDigPointSet.
      */
     FiffDigPointSet(const FiffDigPointSet &p_FiffDigPointSet);
 
@@ -117,10 +117,10 @@ public:
     /**
      * Reads FiffDigPointSet from a fif file
      *
-     * @param+[\[]in, out] p_Stream     The opened fif file
-     * @param[in, out] p_Dig            The read digitizer point set
+     * @param+[\[]in, out] p_Stream     The opened fif file.
+     * @param[in, out] p_Dig            The read digitizer point set.
      *
-     * @return true if succeeded, false otherwise
+     * @return true if succeeded, false otherwise.
      */
     static bool readFromStream(FiffStream::SPtr& p_Stream, FiffDigPointSet& p_Dig);
 
@@ -134,7 +134,7 @@ public:
     /**
      * True if FiffDigPointSet is empty.
      *
-     * @return true if MNE Bem is empty
+     * @return true if MNE Bem is empty.
      */
     inline bool isEmpty() const;
 
@@ -142,21 +142,21 @@ public:
     /**
      * Returns the number of stored FiffDigPoints
      *
-     * @return number of stored FiffDigPoints
+     * @return number of stored FiffDigPoints.
      */
     inline qint32 size() const;
 
     //=========================================================================================================
     /**
      * @brief write
-     * @param[in] p_IODevice
+     * @param[in] p_IODevice.
      */
     void write(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
      * @brief writeToStream
-     * @param[in] p_pStream
+     * @param[in] p_pStream.
      */
     void writeToStream(FiffStream* p_pStream);
 
@@ -186,7 +186,7 @@ public:
      *
      * @param[in] includeTypes    The include types (FIFFV_POINT_HPI, FIFFV_POINT_CARDINAL, FIFFV_POINT_EEG, FIFFV_POINT_ECG, FIFFV_POINT_EXTRA, FIFFV_POINT_LPA, FIFFV_POINT_NASION, FIFFV_POINT_RPA).
      *
-     * @return FiffDigPointSet
+     * @return FiffDigPointSet.
      */
     FiffDigPointSet pickTypes(QList<int> includeTypes) const;
 
@@ -194,9 +194,9 @@ public:
     /**
      * Subscript operator << to add a new FiffDigPoint
      *
-     * @param[in] dig    FiffDigPoint to be added
+     * @param[in] dig    FiffDigPoint to be added.
      *
-     * @return FiffDigPointSet
+     * @return FiffDigPointSet.
      */
     FiffDigPointSet& operator<< (const FiffDigPoint& dig);
 
@@ -204,9 +204,9 @@ public:
     /**
      * Subscript operator << to add a new FiffDigPoint
      *
-     * @param[in] dig    FiffDigPoint to be added
+     * @param[in] dig    FiffDigPoint to be added.
      *
-     * @return FiffDigPointSet
+     * @return FiffDigPointSet.
      */
     FiffDigPointSet& operator<< (const FiffDigPoint* dig);
 
@@ -214,7 +214,7 @@ public:
     /**
      * Apply a transforamtion matrix on the 3D position of the digitzed points.
      *
-     * @param[in] coordTrans    FiffCoordTrans which is to be applied
+     * @param[in] coordTrans    FiffCoordTrans which is to be applied.
      * @param[in] bApplyInverse Whether to apply the inverse. False by default.
      */
     void applyTransform(const FiffCoordTrans& coordTrans, bool bApplyInverse = false);
