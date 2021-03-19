@@ -102,7 +102,7 @@ public:
     /**
      * Set command connection status
      *
-     * @param[in] bConnectionStatus    the connection status
+     * @param[in] bConnectionStatus    the connection status.
      */
     void setConnectionStatus(bool bConnectionStatus);
 

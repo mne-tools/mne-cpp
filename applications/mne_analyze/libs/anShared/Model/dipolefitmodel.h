@@ -117,7 +117,7 @@ public:
     /**
      * The type of this model (CovarianceModel)
      *
-     * @return The type of this model (CovarianceModel)
+     * @return The type of this model (CovarianceModel).
      */
     inline MODEL_TYPE getType() const override;
 

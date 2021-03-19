@@ -80,7 +80,7 @@ public:
     /**
      * Creates the real-time command client.
      *
-     * @param[in] parent     Parent QObject (optional)
+     * @param[in] parent     Parent QObject (optional).
      */
     explicit RtCmdClient(QObject *parent = Q_NULLPTR);
 
@@ -90,7 +90,7 @@ public:
      *
      * @param p_sCommand     Command to check.
      *
-     * @return true if part of command manager, false otherwise
+     * @return true if part of command manager, false otherwise.
      */
     inline bool hasCommand(const QString &p_sCommand) const;
 
@@ -98,9 +98,9 @@ public:
     /**
      * Sends a command line formatted command to a connected mne_rt_server
      *
-     * @param[in] p_sCommand    The command to send
+     * @param[in] p_sCommand    The command to send.
      *
-     * @return mne_rt_server reply
+     * @return mne_rt_server reply.
      */
     QString sendCLICommand(const QString &p_sCommand);
 
@@ -108,9 +108,9 @@ public:
     /**
      * Sends a command to a connected mne_rt_server
      *
-     * @param[in] p_command    The command to send
+     * @param[in] p_command    The command to send.
      *
-     * @return mne_rt_server reply
+     * @return mne_rt_server reply.
      */
     void sendCommandJSON(const Command &p_command);
 
@@ -138,7 +138,7 @@ public:
     /**
      * Request available connectors from mne_rt_server
      *
-     * @param[in] p_qMapConnectors   list of connectors
+     * @param[in] p_qMapConnectors   list of connectors.
      *
      * @return the active connector.
      */
@@ -179,7 +179,7 @@ signals:
     /**
      * Emits the received response.
      *
-     * @param[in] p_sResponse    the received response
+     * @param[in] p_sResponse    the received response.
      */
     void response(QString p_sResponse);
 

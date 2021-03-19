@@ -110,8 +110,8 @@ public:
     /**
      * Sends an Event of type etype into the event system
      *
-     * @param[in] etype          Type of the event to be published
-     * @param[in] data           Potential data to be attached to the event
+     * @param[in] etype          Type of the event to be published.
+     * @param[in] data           Potential data to be attached to the event.
      */
     void publishEvent(EVENT_TYPE etype, const QVariant& data = QVariant()) const;
 
@@ -120,7 +120,7 @@ public:
      * Overwrites the Communicators subscriptions. Attention: old subscriptions will be deleted!
      * See addSubscriptions.
      *
-     * @param[in] subs           The new list of Event types to be notified about
+     * @param[in] subs           The new list of Event types to be notified about.
      */
     void updateSubscriptions(const QVector<EVENT_TYPE>& subs);
 
@@ -136,7 +136,7 @@ public:
     /**
      * Convenience overload, see addSubscriptions
      *
-     * @param[in] newsub         New subscription to be added
+     * @param[in] newsub         New subscription to be added.
      */
     void addSubscriptions(EVENT_TYPE newsub);
 
@@ -150,7 +150,7 @@ public:
     /**
      * Getter for list of subscriptions
      *
-     * @return List of subscriptions
+     * @return List of subscriptions.
      */
     inline QVector<EVENT_TYPE> getSubscriptions(void) const;
 
@@ -158,7 +158,7 @@ public:
     /**
      * Getter for internal ID
      *
-     * @return Internal ID
+     * @return Internal ID.
      */
     inline CommunicatorID getID(void) const;
 
@@ -167,7 +167,7 @@ signals:
      * Called by EventManager whenever an event needs to be handled. This must be connected to some other
      * function for actual usage.
      *
-     * @param[in] e              The event that was received
+     * @param[in] e              The event that was received.
      */
     void receivedEvent(const QSharedPointer<Event> e);
 

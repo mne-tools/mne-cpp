@@ -107,13 +107,13 @@ public:
      *    -# if the vertex belongs to a sensor: The value at the position of the sensor is 1 and all other values in this row are set to 0
      *    -# if not: the values are calculated to give a total of 1 (a lot of values will stay 0, because they are too far away to influence) by using the above mentioned formula
      *
-     * @param[in] vecProjectedSensors           Vector of IDs of sensor vertices
-     * @param[in] matDistanceTable              Matrix that contains all needed distances
-     * @param[in] interpolationFunction         Function that computes interpolation coefficients using the distance values
-     * @param[in] dCancelDist                   Distances higher than this are ignored, i.e. the respective coefficients are set to zero
-     * @param[in] vecExcludeIndex               The indices to be excluded from vecProjectedSensors, e.g., bad channels (empty by default)
+     * @param[in] vecProjectedSensors           Vector of IDs of sensor vertices.
+     * @param[in] matDistanceTable              Matrix that contains all needed distances.
+     * @param[in] interpolationFunction         Function that computes interpolation coefficients using the distance values.
+     * @param[in] dCancelDist                   Distances higher than this are ignored, i.e. the respective coefficients are set to zero.
+     * @param[in] vecExcludeIndex               The indices to be excluded from vecProjectedSensors, e.g., bad channels (empty by default).
      *
-     * @return                                  The distance matrix created
+     * @return                                  The distance matrix created.
      */
     static QSharedPointer<Eigen::SparseMatrix<float> > createInterpolationMat(const QVector<int> &vecProjectedSensors,
                                                                               const QSharedPointer<Eigen::MatrixXd> matDistanceTable,
@@ -128,10 +128,10 @@ public:
      * The result is a vector that contains interpolated values for all vertices of the mesh that was used to create the weight matrix,
      * i.e. in first instance the distance table that the weight matrix is based on.
      *
-     * @param[in] matInterpolationMatrix    The weight matrix which should be used for multiplying
-     * @param[in] vecMeasurementData        A vector with measured sensor data
+     * @param[in] matInterpolationMatrix    The weight matrix which should be used for multiplying.
+     * @param[in] vecMeasurementData        A vector with measured sensor data.
      *
-     * @return                              Interpolated values for all vertices of the mesh
+     * @return                              Interpolated values for all vertices of the mesh.
      */
     static Eigen::VectorXf interpolateSignal(const QSharedPointer<Eigen::SparseMatrix<float> > matInterpolationMatrix,
                                              const QSharedPointer<Eigen::VectorXf> &vecMeasurementData);
@@ -143,10 +143,10 @@ public:
      * The result is a vector that contains interpolated values for all vertices of the mesh that was used to create the weight matrix,
      * i.e. in first instance the distance table that the weight matrix is based on.
      *
-     * @param[in] matInterpolationMatrix    The weight matrix which should be used for multiplying
-     * @param[in] vecMeasurementData        A vector with measured sensor data
+     * @param[in] matInterpolationMatrix    The weight matrix which should be used for multiplying.
+     * @param[in] vecMeasurementData        A vector with measured sensor data.
      *
-     * @return                              Interpolated values for all vertices of the mesh
+     * @return                              Interpolated values for all vertices of the mesh.
      */
     static Eigen::VectorXf interpolateSignal(const Eigen::SparseMatrix<float> &matInterpolationMatrix,
                                              const Eigen::VectorXf &vecMeasurementData);
@@ -155,9 +155,9 @@ public:
     /**
      * Serves as a placeholder for other functions and is needed in case a linear interpolation is wanted when calling <i>createInterplationMat</i>.Returns input argument unchanged.
      *
-     * @param[in] dIn                       Distance value
+     * @param[in] dIn                       Distance value.
      *
-     * @return                              Same value interpreted as a interpolation weight
+     * @return                              Same value interpreted as a interpolation weight.
      */
     static double linear(const double dIn);
 
@@ -165,9 +165,9 @@ public:
     /**
      * Calculates interpolation weights based on distance values. Returns interpolation weight that corresponds to gauss curve with sigma set to 1.
      *
-     * @param[in] dIn                       Distance value
+     * @param[in] dIn                       Distance value.
      *
-     * @return                              The function value of the gauss curve at d
+     * @return                              The function value of the gauss curve at d.
      */
     static double gaussian(const double dIn);
 
@@ -175,9 +175,9 @@ public:
     /**
      * Calculates interpolation weights based on distance values. Returns interpolation weight that corresponds to negative parabel with an y-offset of 1.
      *
-     * @param[in] dIn                       Distance value
+     * @param[in] dIn                       Distance value.
      *
-     * @return                              The function value of the negative parabel at d
+     * @return                              The function value of the negative parabel at d.
      */
     static double square(const double dIn);
 
@@ -185,9 +185,9 @@ public:
     /**
      * Calculates interpolation weights based on distance values. Returns interpolation weight that corresponds to cubic hyperbel.
      *
-     * @param[in] dIn                           Distance value
+     * @param[in] dIn                           Distance value.
      *
-     * @return                              The function value of the cubic hyperbel at d
+     * @return                              The function value of the cubic hyperbel at d.
      */
     static double cubic(const double dIn);
 

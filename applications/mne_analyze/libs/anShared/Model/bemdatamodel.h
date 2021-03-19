@@ -117,7 +117,7 @@ public:
     /**
      * The type of this model (BemDataModel)
      *
-     * @return The type of this model (BemDataModel)
+     * @return The type of this model (BemDataModel).
      */
     inline MODEL_TYPE getType() const override;
 
@@ -125,7 +125,7 @@ public:
     /**
      * Get the Bem model (BemDataModel)
      *
-     * @return The MNEBem object
+     * @return The MNEBem object.
      */
     inline MNELIB::MNEBem::SPtr getBem();
 
@@ -133,7 +133,7 @@ public:
     /**
      * Returns whether there is currently data stored in the model
      *
-     * @return Returns false if model is empty
+     * @return Returns false if model is empty.
      */
     inline bool isEmpty() const;
 
@@ -167,7 +167,7 @@ signals:
     /**
      * Emits new Bem Model
      *
-     * @param[in] pBem    The new Bem model
+     * @param[in] pBem    The new Bem model.
      */
     void newBemAvailable(const MNELIB::MNEBem::SPtr pBem);
 };

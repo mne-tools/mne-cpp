@@ -76,7 +76,7 @@ public:
     /**
      * Default constructor.
      *
-     * @param[in] parent             Parent QObject (optional)
+     * @param[in] parent             Parent QObject (optional).
      */
     explicit RawCommand(QObject *parent = 0);
 
@@ -84,9 +84,9 @@ public:
     /**
      * Constructor which parses a command stored in a json object
      *
-     * @param[in] p_sCommand         Command
-     * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true)
-     * @param[in] parent             Parent QObject (optional)
+     * @param[in] p_sCommand         Command.
+     * @param[in] p_bIsJson          If is received/should be send as JSON (optional, default true).
+     * @param[in] parent             Parent QObject (optional).
      */
     explicit RawCommand(const QString &p_sCommand, bool p_bIsJson = true, QObject *parent = 0);
 
@@ -128,7 +128,7 @@ public:
     /**
      * Returns parameter values
      *
-     * @return parameter values
+     * @return parameter values.
      */
     inline QList<QString>& pValues();
 

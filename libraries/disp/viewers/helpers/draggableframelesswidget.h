@@ -141,7 +141,7 @@ protected:
      *
      * @param[in] rect the rect which is supposed to be rounded.
      * @param[in] r the radius of round edges.
-     * @return the rounded rect in form of a QRegion
+     * @return the rounded rect in form of a QRegion.
      */
     QRegion roundedRect(const QRect& rect, int r);
 

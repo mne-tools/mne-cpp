@@ -90,7 +90,7 @@ public:
     /**
      * Constructs a ModalitySelectionView which is a child of parent.
      *
-     * @param[in] parent        parent of widget
+     * @param[in] parent        parent of widget.
      */
     ModalitySelectionView(const QList<FIFFLIB::FiffChInfo> &lChannelList,
                           const QString& sSettingsPath = "",

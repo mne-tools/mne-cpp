@@ -103,7 +103,7 @@ public:
     /**
      * Sets the scaled image view title.
      *
-     * @param[in] p_sTitle   The title
+     * @param[in] p_sTitle   The title.
      */
     void setTitle(const QString &p_sTitle);
 
@@ -111,7 +111,7 @@ public:
     /**
      * Sets the label of the y axes
      *
-     * @param[in] p_sXLabel   The x axes label
+     * @param[in] p_sXLabel   The x axes label.
      */
     void setXLabel(const QString &p_sXLabel);
 
@@ -119,7 +119,7 @@ public:
     /**
      * Sets the label of the y axes
      *
-     * @param[in] p_sXLabel   The y axes label
+     * @param[in] p_sXLabel   The y axes label.
      */
     void setYLabel(const QString &p_sYLabel);
 

@@ -121,7 +121,7 @@ public:
     /**
      * This is called when the user presses the "close" button. It notifies the AnalyzeCore via a QtConnect.
      *
-     * @param[in] event The event that has happened
+     * @param[in] event The event that has happened.
      */
     void closeEvent(QCloseEvent *event) override;
 
@@ -129,9 +129,9 @@ public:
     /**
      * Custom Qt message handler.
      *
-     * @param[in] type      enum to identify the various message types
-     * @param[in] context   additional information about a log message
-     * @param[in] msg       the message to log
+     * @param[in] type      enum to identify the various message types.
+     * @param[in] context   additional information about a log message.
+     * @param[in] msg       the message to log.
      */
     void writeToLog(QtMsgType type,
                     const QMessageLogContext &context,
@@ -160,7 +160,7 @@ signals:
     /**
      * Signal emmited whenever the gui modes changes
      *
-     * @param[in] mode       the new gui mode
+     * @param[in] mode       the new gui mode.
      */
     void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
 
@@ -168,7 +168,7 @@ signals:
     /**
      * Signal emmited whenever the gui style changes
      *
-     * @param[in] style       the new gui style
+     * @param[in] style       the new gui style.
      */
     void guiStyleChanged(DISPLIB::AbstractView::StyleMode style);
 

@@ -68,10 +68,10 @@ public:
     /**
      * Calculates the spectrogram (tf-representation) of a given signal
      *
-     * @param[in] signal         input-signal to calculate spectrogram of
-     * @param[in] windowSize     size of the window which is used (resolution in time an frequency is depending on it)
+     * @param[in] signal         input-signal to calculate spectrogram of.
+     * @param[in] windowSize     size of the window which is used (resolution in time an frequency is depending on it).
      *
-     * @return spectrogram-matrix (tf-representation of the input signal)
+     * @return spectrogram-matrix (tf-representation of the input signal).
      */
     static Eigen::MatrixXd makeSpectrogram(Eigen::VectorXd signal,
                                            qint32 windowSize);
@@ -81,11 +81,11 @@ private:
     /**
      * Calculates a gaussean window function
      *
-     * @param[in] sample_count   number of samples
-     * @param[in] scale          window width
-     * @param[in] translation    translation of the window among a signal
+     * @param[in] sample_count   number of samples.
+     * @param[in] scale          window width.
+     * @param[in] translation    translation of the window among a signal.
      *
-     * @return samples of window-vector
+     * @return samples of window-vector.
      */
     static Eigen::VectorXd gaussWindow (qint32 sample_count,
                                         qreal scale,

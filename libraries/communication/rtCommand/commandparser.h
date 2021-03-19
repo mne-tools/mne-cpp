@@ -72,7 +72,7 @@ public:
     /**
      * Default constructor
      *
-     * @param[in] parent     Parent QObject (optional)
+     * @param[in] parent     Parent QObject (optional).
      */
     explicit CommandParser(QObject *parent = 0);
 
@@ -99,7 +99,7 @@ public:
     /**
      * Returns the stored RawCommand
      *
-     * @return the stored RawCommand
+     * @return the stored RawCommand.
      */
     inline RawCommand& getRawCommand();
 

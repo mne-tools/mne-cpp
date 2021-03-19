@@ -107,7 +107,7 @@ public:
     /**
      * Writes the cluster info to a file
      *
-     * @param[in] p_sFileName    FileName to write to
+     * @param[in] p_sFileName    FileName to write to.
      */
     void write(QString p_sFileName) const;
 
@@ -116,7 +116,7 @@ public:
      *
      * @param[in] object    The object which should be compared to.
      *
-     * @return true if equal, false otherwise
+     * @return true if equal, false otherwise.
      */
     friend bool operator== (const MNEClusterInfo &a, const MNEClusterInfo &b);
 

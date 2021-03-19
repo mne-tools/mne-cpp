@@ -111,7 +111,7 @@ public:
     /**
      * Turns inverse rotation of the camera on and off.
      *
-     * @param[in] newStatusFlag      The new status of the inversion
+     * @param[in] newStatusFlag      The new status of the inversion.
      */
     void invertCameraRotation(bool newStatusFlag);
 
@@ -119,7 +119,7 @@ public:
     /**
      * Sets the angle of the camera for rotating around
      *
-     * @param[in] count      The counter for how long the rotation has been happening
+     * @param[in] count      The counter for how long the rotation has been happening.
      */
     void setRotating(int count);
 
@@ -127,7 +127,7 @@ public:
     /**
      * Queries the camera rotating counter
      *
-     * @return The rotation counter
+     * @return The rotation counter.
      */
     int rotating() const;
 

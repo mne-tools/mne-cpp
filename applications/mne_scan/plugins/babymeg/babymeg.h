@@ -169,7 +169,7 @@ public:
     /**
      * Get plugin type.
      *
-     * @return the plugin type in form of a AbstractPlugin::PluginType
+     * @return the plugin type in form of a AbstractPlugin::PluginType.
      */
     virtual SCSHAREDLIB::AbstractPlugin::PluginType getType() const;
 
@@ -177,7 +177,7 @@ public:
     /**
      * Get plugin name.
      *
-     * @return the plugin name as a QString
+     * @return the plugin name as a QString.
      */
     virtual QString getName() const;
 
@@ -185,7 +185,7 @@ public:
     /**
      * Setups this widgets and returns a pointer to it.
      *
-     * @return a QWidget pointer to the set up QWidget
+     * @return a QWidget pointer to the set up QWidget.
      */
     virtual QWidget* setupWidget();
 
@@ -254,7 +254,7 @@ protected:
     /**
      * Combines all analog trigger signals to one single digital trigger line.
      *
-     * @param[out] data  the data matrix
+     * @param[out] data  the data matrix.
      */
     void createDigTrig(Eigen::MatrixXf& data);
 
@@ -262,7 +262,7 @@ protected:
     /**
      * Calibrate matrix.
      *
-     * @param[out] data  the data matrix
+     * @param[out] data  the data matrix.
      */
     Eigen::MatrixXd calibrate(const Eigen::MatrixXf& data);
 
@@ -270,7 +270,7 @@ protected:
     /**
      * Read projections from fiff file.
      *
-     * @return true if successful, false otherwise
+     * @return true if successful, false otherwise.
      */
     bool readProjectors();
 
@@ -278,7 +278,7 @@ protected:
     /**
      * Read compensators from fiff file.
      *
-     * @return true if successful, false otherwise
+     * @return true if successful, false otherwise.
      */
     bool readCompensators();
 
@@ -286,7 +286,7 @@ protected:
     /**
      * Read bad channels from fiff file.
      *
-     * @return true if successful, false otherwise
+     * @return true if successful, false otherwise.
      */
     bool readBadChannels();
 
@@ -322,7 +322,7 @@ signals:
     /**
      * Emitted when command clients connection status changed.
      *
-     * @param[in] p_bStatus  connection status
+     * @param[in] p_bStatus  connection status.
      */
     void cmdConnectionChanged(bool p_bStatus);
 
@@ -336,7 +336,7 @@ signals:
     /**
      * Emitted when data is ready.
      *
-     * @param[in] tmp    data to squid control
+     * @param[in] tmp    data to squid control.
      */
     void dataToSquidCtrlGUI(Eigen::MatrixXf tmp);
 
@@ -344,7 +344,7 @@ signals:
     /**
      * Emitted when data received from tcp/ip socket.
      *
-     * @param[in] DATA    data to squid control
+     * @param[in] DATA    data to squid control.
      */
     void sendCMDDataToSQUIDControl(QByteArray DATA);
 };

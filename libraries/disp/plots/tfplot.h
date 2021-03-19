@@ -96,11 +96,11 @@ public:
     /**
      * Constructs TFplot class
      *
-     * @param[in] tf_matrix         given spectrogram
-     * @param[in] sample_rate       given sample rate of signal related to th spectrogram
-     * @param[in] lower_frq         lower bound frequency, that should be plotted
-     * @param[in] upper_frq         upper bound frequency, that should be plotted
-     * @param[in] cmap              colormap used to plot the spectrogram
+     * @param[in] tf_matrix         given spectrogram.
+     * @param[in] sample_rate       given sample rate of signal related to th spectrogram.
+     * @param[in] lower_frq         lower bound frequency, that should be plotted.
+     * @param[in] upper_frq         upper bound frequency, that should be plotted.
+     * @param[in] cmap              colormap used to plot the spectrogram.
      *
      */
     TFplot(Eigen::MatrixXd tf_matrix,
@@ -113,9 +113,9 @@ public:
     /**
      * Constructs TFplot class
      *
-     * @param[in] tf_matrix         given spectrogram
-     * @param[in] sample_rate       given sample rate of signal related to th spectrogram
-     * @param[in] cmap              colormap used to plot the spectrogram
+     * @param[in] tf_matrix         given spectrogram.
+     * @param[in] sample_rate       given sample rate of signal related to th spectrogram.
+     * @param[in] cmap              colormap used to plot the spectrogram.
      *
      */
     TFplot(Eigen::MatrixXd tf_matrix,
@@ -127,11 +127,11 @@ protected:
     /**
      * Calculates a image to plot the tf_matrix
      *
-     * @param[in] tf_matrix         given spectrogram
-     * @param[in] sample_rate       given sample rate of signal related to th spectrogram
-     * @param[in] cmap              colormap used to plot the spectrogram
-     * @param[in] lower_frq         lower bound frequency, that should be plotted
-     * @param[in] upper_frq         upper bound frequency, that should be plotted
+     * @param[in] tf_matrix         given spectrogram.
+     * @param[in] sample_rate       given sample rate of signal related to th spectrogram.
+     * @param[in] cmap              colormap used to plot the spectrogram.
+     * @param[in] lower_frq         lower bound frequency, that should be plotted.
+     * @param[in] upper_frq         upper bound frequency, that should be plotted.
      *
      */
     void calc_plot(Eigen::MatrixXd tf_matrix,

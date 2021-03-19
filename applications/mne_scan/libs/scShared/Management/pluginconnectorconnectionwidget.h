@@ -93,7 +93,7 @@ public:
     /**
      * New selection in one of the combo box
      *
-     * @param[in] p_sCurrentReceiver   the receivers name
+     * @param[in] p_sCurrentReceiver   the receivers name.
      */
     void updateReceiver(const QString &p_sCurrentReceiver);
 

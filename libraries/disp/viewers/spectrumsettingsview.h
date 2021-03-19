@@ -84,7 +84,7 @@ public:
     /**
      * Constructs a SpectrumSettingsView which is a child of parent.
      *
-     * @param[in] parent    parent of widget
+     * @param[in] parent    parent of widget.
      */
     SpectrumSettingsView(const QString& sSettingsPath = "",
                          QWidget *parent = Q_NULLPTR,
@@ -100,7 +100,7 @@ public:
     /**
      * Update slider value
      *
-     * @param[in] value    slider value
+     * @param[in] value    slider value.
      */
     void updateValue(qint32 value);
 
@@ -120,9 +120,9 @@ public:
     /**
      * Sets the sampling frequency as well as boundaries and configure the GUI elements accordingly
      *
-     * @param[in] fSFreq           The sampling frequency
-     * @param[in] fLowerBound      The lower bound of the spectrum
-     * @param[in] fUpperBound      The upper bound of the spectrum
+     * @param[in] fSFreq           The sampling frequency.
+     * @param[in] fLowerBound      The lower bound of the spectrum.
+     * @param[in] fUpperBound      The upper bound of the spectrum.
      */
     void setBoundaries(float fSFreq,
                        float fLowerBound,
@@ -132,7 +132,7 @@ public:
     /**
      * Returns the lower bound
      *
-     * @return Returns the lower bound as a float
+     * @return Returns the lower bound as a float.
      */
     float getLowerBound();
 
@@ -140,7 +140,7 @@ public:
     /**
      * Returns the upper bound
      *
-     * @return Returns the upper bound as a float
+     * @return Returns the upper bound as a float.
      */
     float getUpperBound();
 

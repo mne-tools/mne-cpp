@@ -122,7 +122,7 @@ public:
     /**
      * Updates window depending on whether connection was successful
      *
-     * @param[in] stat  Whether connection and retrieval of fiff data was successful
+     * @param[in] stat  Whether connection and retrieval of fiff data was successful.
      */
     void isConnected(bool stat);
 
@@ -130,8 +130,8 @@ signals:
     /**
      * Sends a singal with the cooresponding port and address information
      *
-     * @param[in] Addr  An IP address where a buffer is hosted
-     * @param[in] port  The port where the buffer is hosted
+     * @param[in] Addr  An IP address where a buffer is hosted.
+     * @param[in] port  The port where the buffer is hosted.
      */
     void connectAtAddr(QString Addr,
                        int port);

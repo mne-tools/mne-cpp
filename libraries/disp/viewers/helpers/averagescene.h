@@ -106,7 +106,7 @@ public:
     /**
      * Repaints all items from the layout data in the scene from a SelectionItem object
      *
-     * @param[in] selectedChannelItems     data about items which are to be painted
+     * @param[in] selectedChannelItems     data about items which are to be painted.
      */
     void repaintSelectionItems(const DISPLIB::SelectionItem &selectedChannelItems);
 
@@ -144,7 +144,7 @@ public:
     /**
      * Sets the signal color for the items the scene holds
      *
-     * @param[in] signalColor
+     * @param[in] signalColor.
      */
     void setSignalItemColor(const QColor &signalColor);
 

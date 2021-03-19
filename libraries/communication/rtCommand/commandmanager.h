@@ -56,7 +56,7 @@ public:
     /**
      * Returns the lookup table of all available commands.
      *
-     * @return the command lookup table
+     * @return the command lookup table.
      */
     inline QMap<QString, Command>& commandMap();
 
@@ -66,7 +66,7 @@ public:
      *
      * @param p_sCommand     COmmand to check.
      *
-     * @return true if part of command manager, false otherwise
+     * @return true if part of command manager, false otherwise.
      */
     inline bool hasCommand(const QString &p_sCommand) const;
 
@@ -93,7 +93,7 @@ public:
      * Inserts a new command and emmits dataChanged signal.
      *
      * @param p_sKey     Command key word.
-     * @param p_command  Command content. Attention CommandManager takes ownership of that command by reseting commad's parent;
+     * @param p_command  Command content. Attention CommandManager takes ownership of that command by reseting commad's parent;.
      */
     void insert(const QString &p_sKey, const Command &p_command);
 
@@ -163,7 +163,7 @@ signals:
     /**
      * Is emitted when a command is ready to send
      *
-     * @param p_command  Command which should be send
+     * @param p_command  Command which should be send.
      */
     void triggered(Command p_command);
 
@@ -171,7 +171,7 @@ signals:
     /**
      * Is triggered when a reply is available. Commands are the emmiters of this signal -> access trough parent.
      *
-     * @param p_sReply   the plain or JSON formatted reply
+     * @param p_sReply   the plain or JSON formatted reply.
      *@param p_command   Command which send the response
      */
     void response(QString p_sReply, Command p_command);

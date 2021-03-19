@@ -87,7 +87,7 @@ public:
      * Starts the AbstractSensor.
      * Pure virtual method inherited by IModule.
      *
-     * @return true if success, false otherwise
+     * @return true if success, false otherwise.
      */
     virtual bool start() = 0;
 
@@ -96,7 +96,7 @@ public:
      * Stops the AbstractSensor.
      * Pure virtual method inherited by IModule.
      *
-     * @return true if success, false otherwise
+     * @return true if success, false otherwise.
      */
     virtual bool stop() = 0;
 
@@ -105,7 +105,7 @@ public:
      * Returns the plugin type.
      * Pure virtual method inherited by IModule.
      *
-     * @return type of the AbstractSensor
+     * @return type of the AbstractSensor.
      */
     virtual PluginType getType() const = 0;
 

@@ -120,7 +120,7 @@ protected:
      * Computer multiplication with transposed.
      *
      * @param[out]   finalResult     The final covariance estimation.
-     * @param[in]   tempResult      The intermediate result from the compute function
+     * @param[in]   tempResult      The intermediate result from the compute function.
      */
     static void reduce(RtCovComputeResult& finalResult, const RtCovComputeResult &tempResult);
 

@@ -128,7 +128,7 @@ public:
     /**
      * A list of display actions for the current measurement widget.
      *
-     * @return a list of display actions
+     * @return a list of display actions.
      */
     inline QList<QAction*> getDisplayActions();
 
@@ -137,7 +137,7 @@ signals:
     /**
      * Signal to notify that new display control widgets are available.
      *
-     * @param[in] lControlWidgets      A QList with pointers to the control widgets. Note that the signal sender
+     * @param[in] lControlWidgets      A QList with pointers to the control widgets. Note that the signal sender.
      *                                  does not have ownership of these pointers.
      * @param[in] sDisplayName         The display emmiting the signal.
      */
@@ -149,7 +149,7 @@ protected:
     /**
      * Adds a display action to the current measurement widget.
      *
-     * @param[in] pAction  pointer to the action to be added to the measurement widget
+     * @param[in] pAction  pointer to the action to be added to the measurement widget.
      */
     inline void addDisplayAction(QAction* pAction);
 

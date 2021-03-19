@@ -141,7 +141,7 @@ private:
     /**
      * Loads new Fiff model whan current loaded model is changed
      *
-     * @param[in, out] pNewModel    pointer to currently loaded FiffRawView Model
+     * @param[in, out] pNewModel    pointer to currently loaded FiffRawView Model.
      */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
@@ -149,14 +149,14 @@ private:
     /**
      * Handles clearing view if currently used model is being removed
      *
-     * @param[in] pRemovedModel    Pointer to model being removed
+     * @param[in] pRemovedModel    Pointer to model being removed.
      */
     void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
 
     //=========================================================================================================
     /**
      * @brief onNewAveragingModel
-     * @param pAveragingModel
+     * @param pAveragingModel.
      */
     void onNewAveragingModel(QSharedPointer<ANSHAREDLIB::AveragingDataModel> pAveragingModel);
 
@@ -164,7 +164,7 @@ private:
     /**
      * Change the number of averages
      *
-     * @param[in] numAve     new number of averages
+     * @param[in] numAve     new number of averages.
      */
     void onChangeNumAverages(qint32 numAve);
 
@@ -172,7 +172,7 @@ private:
     /**
      * Change the baseline from value
      *
-     * @param[in] fromMS     the new baseline from value in milliseconds
+     * @param[in] fromMS     the new baseline from value in milliseconds.
      */
     void onChangeBaselineFrom(qint32 fromMS);
 
@@ -180,7 +180,7 @@ private:
     /**
      * Change the baseline to value
      *
-     * @param[in] fromMS     the new baseline to value in milliseconds
+     * @param[in] fromMS     the new baseline to value in milliseconds.
      */
     void onChangeBaselineTo(qint32 toMS);
 
@@ -188,7 +188,7 @@ private:
     /**
      * Change the pre stim stim
      *
-     * @param[in] mseconds     the new pres stim in milliseconds
+     * @param[in] mseconds     the new pres stim in milliseconds.
      */
     void onChangePreStim(qint32 mseconds);
 
@@ -196,7 +196,7 @@ private:
     /**
      * Change the post stim stim
      *
-     * @param[in] mseconds     the new post stim in milliseconds
+     * @param[in] mseconds     the new post stim in milliseconds.
      */
     void onChangePostStim(qint32 mseconds);
 
@@ -204,7 +204,7 @@ private:
     /**
      * Change the baseline active state
      *
-     * @param[in] state     the new state
+     * @param[in] state     the new state.
      */
     void onChangeBaselineActive(bool state);
 
@@ -212,7 +212,7 @@ private:
     /**
      * Reset the averaging plugin and delete all currently stored data
      *
-     * @param[in] state     the new state
+     * @param[in] state     the new state.
      */
     void onResetAverage(bool state);
 
@@ -220,7 +220,7 @@ private:
     /**
      * Gets called when compute button on GUI is clicked
      *
-     * @param[in] bChecked     UNUSED - state of the button
+     * @param[in] bChecked     UNUSED - state of the button.
      */
     void onComputeButtonClicked(bool bChecked);
 
@@ -234,7 +234,7 @@ private:
     /**
      * Calculates average and returns FiffEvoked Set. (Run in separate thread with QFuture)
      *
-     * @return Retruns FiffEvoked setwith averaged data
+     * @return Retruns FiffEvoked setwith averaged data.
      */
     QSharedPointer<FIFFLIB::FiffEvokedSet> averageCalculation(FIFFLIB::FiffRawData pFiffRaw,
                                                               MatrixXi matEvents,
@@ -257,7 +257,7 @@ private:
     /**
      * Connected to GUI dropdown to select group based on group name input.
      *
-     * @param[in] text  name of group selected in the GUI
+     * @param[in] text  name of group selected in the GUI.
      */
     void onChangeGroupSelect(const QString &text);
 
@@ -271,7 +271,7 @@ private:
     /**
      * Sets channel selection for butterfly and 2D layout view based on QVariant with a SelectionItem object
      *
-     * @param[in] data     QVariant with a SelectionItem object with channel selection information
+     * @param[in] data     QVariant with a SelectionItem object with channel selection information.
      */
     void setChannelSelection(const QVariant &data);
 
@@ -279,7 +279,7 @@ private:
     /**
      * Sets scaling map for averaging views
      *
-     * @param[in] data     QVariant with a ScalingParameters object with relevant scaling data
+     * @param[in] data     QVariant with a ScalingParameters object with relevant scaling data.
      */
     void setScalingMap(const QVariant &data);
 
@@ -287,7 +287,7 @@ private:
     /**
      * Sets the view settings for the averaging views
      *
-     * @param pViewParams
+     * @param pViewParams.
      */
     void setViewSettings(ANSHAREDLIB::ViewParameters viewParams);
 
@@ -309,7 +309,7 @@ private:
     /**
      * Sends event to trigger loading bar to appear and sMessage to show
      *
-     * @param[in] sMessage     loading bar message
+     * @param[in] sMessage     loading bar message.
      */
     void triggerLoadingStart(QString sMessage);
 

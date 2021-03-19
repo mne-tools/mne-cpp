@@ -86,7 +86,7 @@ public:
     /**
      * Sets the channel name
      *
-     * @param[in] p_qStringChName    channel name
+     * @param[in] p_qStringChName    channel name.
      */
     inline void setChannelName(QString p_qStringChName);
 
@@ -102,7 +102,7 @@ public:
     /**
      * Sets the channel kind
      *
-     * @param[in] p_iKind    channel kind
+     * @param[in] p_iKind    channel kind.
      */
     inline void setKind(qint32 p_iKind);
 

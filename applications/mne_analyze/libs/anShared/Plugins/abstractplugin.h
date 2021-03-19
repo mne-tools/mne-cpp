@@ -121,7 +121,7 @@ public:
     /**
      * Provides the menu, in case no menu is provided it returns a Q_NULLPTR
      *
-     * @return the menu
+     * @return the menu.
      */
     virtual QMenu* getMenu() = 0;
 
@@ -129,7 +129,7 @@ public:
     /**
      * Provides the control, in case no control is provided it returns a Q_NULLPTR
      *
-     * @return the control
+     * @return the control.
      */
     virtual QDockWidget* getControl() = 0;
 
@@ -137,7 +137,7 @@ public:
     /**
      * Provides the view, in case no view is provided it returns a Q_NULLPTR
      *
-     * @return the view
+     * @return the view.
      */
     virtual QWidget* getView() = 0;
 
@@ -146,7 +146,7 @@ public:
      * Informs the EventManager about all Events that the Plugin wants to know about. Can return an empty
      * vector in case no Events need to be seen by the Plugin.
      *
-     * @return The vector of relevant Events
+     * @return The vector of relevant Events.
      */
     virtual QVector<EVENT_TYPE> getEventSubscriptions(void) const = 0;
 
@@ -154,7 +154,7 @@ public:
     /**
      * Initializes the plugin based on cmd line inputs given by the user.
      *
-     * @param[in] sArguments  the cmd line arguments
+     * @param[in] sArguments  the cmd line arguments.
      */
     virtual inline void cmdLineStartup(const QStringList& sArguments);
 
@@ -162,7 +162,7 @@ public:
     /**
      * Sets the global data, which provides the central database.
      *
-     * @param[in] globalData  the global data
+     * @param[in] globalData  the global data.
      */
     virtual inline void setGlobalData(QSharedPointer<AnalyzeData> globalData);
 
@@ -170,7 +170,7 @@ public:
     /**
      * Called by the EventManager in case a subscribed-for Event has happened.
      *
-     * @param e The Event that has taken place
+     * @param e The Event that has taken place.
      */
     virtual void handleEvent(QSharedPointer<Event> e) = 0;
 
@@ -179,7 +179,7 @@ signals:
     /**
      * Signal emmited whenever the gui modes changes
      *
-     * @param[in] mode       the new gui mode
+     * @param[in] mode       the new gui mode.
      */
     void guiModeChanged(DISPLIB::AbstractView::GuiMode mode);
 
@@ -187,7 +187,7 @@ signals:
     /**
      * Signal emmited whenever the gui styles changes
      *
-     * @param[in] style       the new gui style
+     * @param[in] style       the new gui style.
      */
     void guiStyleChanged(DISPLIB::AbstractView::StyleMode style);
 

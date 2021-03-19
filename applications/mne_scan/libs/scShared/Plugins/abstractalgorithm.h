@@ -95,7 +95,7 @@ public:
      * Starts the AbstractAlgorithm.
      * Pure virtual method inherited by AbstractPlugin.
      *
-     * @return true if success, false otherwise
+     * @return true if success, false otherwise.
      */
     virtual bool start() = 0;
 
@@ -104,7 +104,7 @@ public:
      * Stops the AbstractAlgorithm.
      * Pure virtual method inherited by AbstractPlugin.
      *
-     * @return true if success, false otherwise
+     * @return true if success, false otherwise.
      */
     virtual bool stop() = 0;
 
@@ -113,7 +113,7 @@ public:
      * Returns the plugin type.
      * Pure virtual method inherited by AbstractPlugin.
      *
-     * @return type of the AbstractAlgorithm
+     * @return type of the AbstractAlgorithm.
      */
     virtual PluginType getType() const = 0;
 

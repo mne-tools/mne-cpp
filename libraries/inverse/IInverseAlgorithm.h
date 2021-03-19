@@ -89,10 +89,10 @@ public:
      * Applies the inverse algorithm to input data and returns a source estimate.
      *
      * @param[in] p_fiffEvoked   Evoked data.
-     * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
+     * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the.
      *                           radial component is kept. This is only applied when working with loose orientations.
      *
-     * @return the calculated source estimation
+     * @return the calculated source estimation.
      */
     virtual MNELIB::MNESourceEstimate calculateInverse(const FIFFLIB::FiffEvoked &p_fiffEvoked, bool pick_normal = false) = 0;
 
@@ -101,12 +101,12 @@ public:
      * Applies the inverse algorithm to input data and returns a source estimate.
      *
      * @param[in] p_fiffEvoked   Evoked data.
-     * @param[in] tmin           Minimal time point
-     * @param[in] tmin           Time between two samples
-     * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the
+     * @param[in] tmin           Minimal time point.
+     * @param[in] tmin           Time between two samples.
+     * @param[in] pick_normal    If True, rather than pooling the orientations by taking the norm, only the.
      *                           radial component is kept. This is only applied when working with loose orientations.
      *
-     * @return the calculated source estimation
+     * @return the calculated source estimation.
      */
     virtual MNELIB::MNESourceEstimate calculateInverse(const Eigen::MatrixXd &data, float tmin, float tstep, bool pick_normal = false) const = 0;
 
@@ -114,7 +114,7 @@ public:
     /**
      * Returns the algorithm name
      *
-     * @return the algorithm name
+     * @return the algorithm name.
      */
     virtual const char* getName() const = 0;
 
@@ -123,7 +123,7 @@ public:
      * Returns the current mne source space on which the inverse algorithm is performing on.
      * Either from inverse operator (minimum norm estimate), or from forward solution (beamformers)
      *
-     * @return the mne source space information
+     * @return the mne source space information.
      */
     virtual const MNELIB::MNESourceSpace& getSourceSpace() const = 0;
 };

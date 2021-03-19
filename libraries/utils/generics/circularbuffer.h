@@ -111,7 +111,7 @@ public:
     /**
      * Returns the first element (first in first out).
      *
-     * @return the first element
+     * @return the first element.
      */
     inline bool pop(_Tp& element);
 

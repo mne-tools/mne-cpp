@@ -120,7 +120,7 @@ public:
     /**
      * Sets the currently mapped fiff channels. used to create the group All.
      *
-     * @param[in] mappedLayoutChNames the currently to layout mapped channels
+     * @param[in] mappedLayoutChNames the currently to layout mapped channels.
      */
     void setCurrentlyMappedFiffChannels(const QStringList &mappedLayoutChNames);
 
@@ -129,7 +129,7 @@ public:
      * Highlight channels
      * This function highlights channels which were selected outside this selection manager (i.e in the DataWindow's Table View)
      *
-     * @param[in] channelList channels which are be to set as selected
+     * @param[in] channelList channels which are be to set as selected.
      */
     void highlightChannels(QModelIndexList channelIndexList);
 
@@ -138,7 +138,7 @@ public:
      * Select channels
      * This function selects channels which were selected outside this selection manager (i.e in the DataWindow's Table View)
      *
-     * @param[in] channelList channels which are be to set as selected
+     * @param[in] channelList channels which are be to set as selected.
      */
     void selectChannels(QStringList channelList);
 
@@ -153,8 +153,8 @@ public:
     /**
      * gets the item corresponding to text in listWidget
      *
-     * @param[in] listWidget QListWidget which inhibits the needed item
-     * @param[in] channelName the corresponding channel name
+     * @param[in] listWidget QListWidget which inhibits the needed item.
+     * @param[in] channelName the corresponding channel name.
      */
     QListWidgetItem* getItemForChName(QListWidget *listWidget,
                                       const QString& channelName);
@@ -175,7 +175,7 @@ public:
     /**
      * Returns the currently selected layout file.
      *
-     * @return the currently selected layout file
+     * @return the currently selected layout file.
      */
     QString getCurrentLayoutFile();
 
@@ -183,7 +183,7 @@ public:
     /**
      * Returns the currently loaded group file
      *
-     * @return currently loaded selection group file
+     * @return currently loaded selection group file.
      */
     QString getCurrentGroupFile();
 
@@ -191,7 +191,7 @@ public:
     /**
      * Sets the current layout file.
      *
-     * @param[in] currentLayoutFile the current layout file
+     * @param[in] currentLayoutFile the current layout file.
      */
     void setCurrentLayoutFile(QString currentLayoutFile);
 
@@ -240,7 +240,7 @@ public:
     /**
      * Returns pointer to the portion of the channel view with the graphics view
      *
-     * @return pointer to the channelselectionview view
+     * @return pointer to the channelselectionview view.
      */
     QWidget* getViewWidget();
 
@@ -248,7 +248,7 @@ public:
     /**
      * Returns pointer to the portion of the channel view with the controls
      *
-     * @return pointer to the channelselectionview controls
+     * @return pointer to the channelselectionview controls.
      */
     QWidget* getControlWidget();
 
@@ -256,7 +256,7 @@ public:
     /**
      * Returns whether there is a user selection
      *
-     * @return true if there is a user selection, false if not
+     * @return true if there is a user selection, false if not.
      */
     bool isSelectionEmpty();
 
@@ -306,7 +306,7 @@ private:
     /**
      * Loads a new layout from given file path.
      *
-     * @param[in] path holds file pathloll
+     * @param[in] path holds file pathloll.
      */
     bool loadLayout(QString path);
 
@@ -314,7 +314,7 @@ private:
     /**
      * Loads a new selection from given file path.
      *
-     * @param[in] path holds file path
+     * @param[in] path holds file path.
      */
     bool loadSelectionGroups(QString path);
 
@@ -329,8 +329,8 @@ private:
     /**
      * Updates selection group widget in this window.
      *
-     * @param[in] current the current selection group list item
-     * @param[in] previous the previous selection group list item
+     * @param[in] current the current selection group list item.
+     * @param[in] previous the previous selection group list item.
      */
     void updateSelectionGroupsList(QListWidgetItem* current,
                                    QListWidgetItem* previous);
@@ -410,7 +410,7 @@ signals:
     /**
      * emit this signal whenever the user or group selection has changed
      *
-     * @param[in] selectedChannels currently user selected channels or items which are in the visible list widget
+     * @param[in] selectedChannels currently user selected channels or items which are in the visible list widget.
      */
     void showSelectedChannelsOnly(QStringList selectedChannels);
 
@@ -418,7 +418,7 @@ signals:
     /**
      * emit this signal whenever the selection in the scene has changed
      *
-     * @param[in] selectedChannelItems currently user selected channels
+     * @param[in] selectedChannelItems currently user selected channels.
      */
     void selectionChanged(const QList<QGraphicsItem*> &selectedChannelItems);
 
@@ -426,7 +426,7 @@ signals:
     /**
      * emit this signal whenever a new layout was loaded
      *
-     * @param[in] layoutMap currently loaded layout
+     * @param[in] layoutMap currently loaded layout.
      */
     void loadedLayoutMap(const QMap<QString,QPointF> &layoutMap);
 };

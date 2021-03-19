@@ -124,7 +124,7 @@ public:
     /**
      * Returns the currently set EvokedSetModel
      *
-     * @return the currently set EvokedSetModel
+     * @return the currently set EvokedSetModel.
      */
     QSharedPointer<EvokedSetModel> getEvokedSetModel();
 
@@ -216,7 +216,7 @@ public:
     /**
      * Set the average colors
      *
-     * @param[in] qMapAverageColor      Pointer to the new average colors
+     * @param[in] qMapAverageColor      Pointer to the new average colors.
      */
     void setAverageColor(const QSharedPointer<QMap<QString, QColor> > qMapAverageColor);
 
@@ -224,7 +224,7 @@ public:
     /**
      * Sets the color used to draw the average to avgColor
      *
-     * @param[in] avgColor     Color of averaged signal
+     * @param[in] avgColor     Color of averaged signal.
      */
     void setSingleAverageColor(const QColor& avgColor);
 
@@ -232,7 +232,7 @@ public:
     /**
      * Set the average activations
      *
-     * @param[in] qMapAverageActivation      Pointer to the new average activations
+     * @param[in] qMapAverageActivation      Pointer to the new average activations.
      */
     void setAverageActivation(const QSharedPointer<QMap<QString, bool> > qMapAverageActivation);
 
@@ -256,7 +256,7 @@ public:
     /**
      * Shows selected channels based on a list of selected channel indices
      *
-     * @param[in] selectedChannelsIndexes  list of indices of channels channels to be displayed
+     * @param[in] selectedChannelsIndexes  list of indices of channels channels to be displayed.
      */
     void showSelectedChannels(const QList<int> selectedChannelsIndexes);
 

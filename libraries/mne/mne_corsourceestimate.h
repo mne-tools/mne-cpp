@@ -88,10 +88,10 @@ public:
     /**
      * Constructs a source estimation from given data
      *
-     * @param[in] p_sol
-     * @param[in] p_vertices
-     * @param[in] p_tmin
-     * @param[in] p_tstep
+     * @param[in] p_sol.
+     * @param[in] p_vertices.
+     * @param[in] p_tmin.
+     * @param[in] p_tstep.
      */
     MNECorSourceEstimate(const Eigen::MatrixXd &p_sol, const Eigen::VectorXi &p_vertices, float p_tmin, float p_tstep);
 
@@ -99,7 +99,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_SourceEstimate    Source estimate data which should be copied
+     * @param[in] p_SourceEstimate    Source estimate data which should be copied.
      */
     MNECorSourceEstimate(const MNECorSourceEstimate& p_SourceEstimate);
 
@@ -125,9 +125,9 @@ public:
      * Reads a source estimate from a given file
      *
      * @param[in] p_IODevice    IO device to red the stc from.
-     * @param[in, out] p_stc        the read stc
+     * @param[in, out] p_stc        the read stc.
      *
-     * @return true if successful, false otherwise
+     * @return true if successful, false otherwise.
      */
     static bool read(QIODevice &p_IODevice, MNECorSourceEstimate& p_stc);
 
@@ -147,7 +147,7 @@ public:
      *
      * @param[in] rhs     SourceEstimate which should be assigned.
      *
-     * @return the copied source estimate
+     * @return the copied source estimate.
      */
     MNECorSourceEstimate& operator= (const MNECorSourceEstimate &rhs);
 

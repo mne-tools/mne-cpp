@@ -97,10 +97,10 @@ public:
     /**
      * Updates the current filter.
      *
-     * @param[in] operatorFilter pointer to the current filter operator which is to be plotted
-     * @param[in] samplingFreq holds the current sampling frequency
-     * @param[in] cutOffLow cut off frequqency lowpass or lower cut off when filter is a bandpass
-     * @param[in] cutOffHigh cut off frequqency highpass or higher cut off when filter is a bandpass
+     * @param[in] operatorFilter pointer to the current filter operator which is to be plotted.
+     * @param[in] samplingFreq holds the current sampling frequency.
+     * @param[in] cutOffLow cut off frequqency lowpass or lower cut off when filter is a bandpass.
+     * @param[in] cutOffHigh cut off frequqency highpass or higher cut off when filter is a bandpass.
      */
     void updateFilter(const RTPROCESSINGLIB::FilterKernel &operatorFilter,
                       int samplingFreq,
@@ -112,7 +112,7 @@ protected:
     /**
      * Draws the diagram to plot the magnitude.
      *
-     * @param[in] holds the current sampling frequency
+     * @param[in] holds the current sampling frequency.
      * @param[in] holds the current name of the filter. Default is an empty QString.
      */
     void plotMagnitudeDiagram(int samplingFreq,

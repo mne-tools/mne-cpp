@@ -105,7 +105,7 @@ public:
     /**
      * Sets the item color to the input parameter viewColor
      *
-     * @param[in] viewColor    desired item color
+     * @param[in] viewColor    desired item color.
      */
     void setDefaultColor(const QColor& viewColor);
 

@@ -119,11 +119,11 @@ public:
     /**
      * Averages epoch list. Note that no baseline correction performed.
      *
-     * @param[in] info     measurement info
-     * @param[in] first    First time sample
-     * @param[in] last     Last time sample
-     * @param[in] sel      Which epochs should be averaged (optional)
-     * @param[in] proj     Apply SSP projection vectors (optional, default = false)
+     * @param[in] info     measurement info.
+     * @param[in] first    First time sample.
+     * @param[in] last     Last time sample.
+     * @param[in] sel      Which epochs should be averaged (optional).
+     * @param[in] proj     Apply SSP projection vectors (optional, default = false).
      */
     FIFFLIB::FiffEvoked average(const FIFFLIB::FiffInfo &p_info,
                                 FIFFLIB::fiff_int_t first,
@@ -135,7 +135,7 @@ public:
     /**
      * Applies baseline correction to the evoked data.
      *
-     * @param[in] baseline     time definition of the baseline in seconds [from, to]
+     * @param[in] baseline     time definition of the baseline in seconds [from, to].
      */
     void applyBaselineCorrection(const QPair<float, float> &baseline);
 
