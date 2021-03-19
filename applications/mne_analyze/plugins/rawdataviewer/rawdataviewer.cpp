@@ -46,7 +46,7 @@
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Utils/metatypes.h>
 #include <anShared/Management/communicator.h>
-#include <anShared/Model/annotationmodel.h>
+#include <anShared/Model/eventmodel.h>
 
 #include <disp/viewers/fiffrawviewsettings.h>
 #include <disp/viewers/scalingview.h>

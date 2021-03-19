@@ -29,20 +29,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Declaration of the AnnotationSettingsView Class.
+ * @brief    Declaration of the EventView Class.
  *
  */
 
-#ifndef ANNOTATIONSETTINGSVIEW_H
-#define ANNOTATIONSETTINGSVIEW_H
+#ifndef EVENTVIEW_H
+#define EVENTVIEW_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include <fiff/fiff_ch_info.h>
-#include <anShared/Model/annotationmodel.h>
-#include "annotationdelegate.h"
+#include <anShared/Model/eventmodel.h>
+#include "eventdelegate.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -77,9 +77,9 @@ namespace FIFFLIB {
 
 //=============================================================================================================
 /**
- * AnnotationSettingsView
+ * EventView
  *
- * @brief The AnnotationSettingsView class provides the GUI for adding and removing annotation.
+ * @brief The EventView class provides the GUI for adding and removing annotation.
  */
 class EventView : public QWidget
 {
@@ -398,4 +398,4 @@ private:
 
 };
 
-#endif // ANNOTATIONSETTINGSVIEW_H
+#endif // EVENTVIEW_H

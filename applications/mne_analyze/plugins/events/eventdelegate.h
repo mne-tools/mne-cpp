@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     annotationdelegate.h
+ * @file     eventdelegate.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Gabriel Motta <gbmotta@mgh.harvard.edu
  * @since    0.1.0
@@ -29,18 +29,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the annotationdelegate class.
+ * @brief    Contains the declaration of the eventdelegate class.
  *
  */
 
-#ifndef ANNOTATIONDELEGATE_H
-#define ANNOTATIONDELEGATE_H
+#ifndef EVENTDELEGATE_H
+#define EVENTDELEGATE_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <anShared/Model/annotationmodel.h>
+#include <anShared/Model/eventmodel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -76,4 +76,4 @@ private slots:
 //    void timeValueChanged(double dValue);
 };
 
-#endif // ANNOTATIONDELEGATE_H
+#endif // EVENTDELEGATE_H

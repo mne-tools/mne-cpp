@@ -81,7 +81,7 @@ contains(MNECPP_CONFIG, static) {
     LIBS += -ldataloader \
             -ldatamanager \
             -lrawdataviewer \
-            -lannotationmanager \
+            -levents \
             -lfiltering \
             -laveraging \
             -lsourcelocalization \

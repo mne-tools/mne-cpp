@@ -42,7 +42,7 @@
 #include <anShared/Management/analyzedata.h>
 
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <anShared/Model/annotationmodel.h>
+#include <anShared/Model/eventmodel.h>
 #include <anShared/Model/averagingdatamodel.h>
 
 #include <disp/viewers/helpers/channelinfomodel.h>
