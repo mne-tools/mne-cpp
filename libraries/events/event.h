@@ -172,6 +172,7 @@ inline EventINT EventINT::fromSample(int sample)
 /**
  *
  */
+namespace std {
 template<>
 struct std::hash<EVENTSINTERNAL::EventINT>
 {
@@ -180,7 +181,7 @@ struct std::hash<EVENTSINTERNAL::EventINT>
         return std::hash<int>()(rhs.getId());
     }
 };
-
+}
 
 #endif // EVENT_H
 
