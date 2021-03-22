@@ -178,7 +178,7 @@ private:
      * @param[in] data              Data for the given row.
      * @param[in, out] painter      Used for drawing the annotations.
      */
-    void createMarksPath(const QModelIndex &index,
+    void createEventsPath(const QModelIndex &index,
                                const QStyleOptionViewItem &option,
                                QPainterPath& path,
                                ANSHAREDLIB::ChannelData &data,
@@ -189,6 +189,7 @@ private:
                         const QStyleOptionViewItem &option,
                         QPainterPath& path,
                         QPainter* painter) const;
+
 
     int         m_iUpperItemIndex;          /**< The current upper item index visible in the QTableView. */
 

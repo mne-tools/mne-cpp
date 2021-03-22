@@ -188,7 +188,7 @@ void FiffRawViewDelegate::paint(QPainter *painter,
                     painter->setPen(QPen(m_penNormal.color().darker(250), 1, Qt::SolidLine));
 
                     //Plot time marks
-                    createMarksPath(index,
+                    createEventsPath(index,
                                     option,
                                     path,
                                     data,
@@ -244,11 +244,6 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
 
     QPointF qSamplePosition;
 
-    //Deactivate downsampling for now due to aliasing effects
-//    int iPaintStep = (int)(1.0/dDx) - 1;
-//    if (iPaintStep < 2){
-//        iPaintStep = 1;
-//    }
     int iPaintStep = 1;
 
     for(unsigned int j = 0; j < data.size(); j = j + iPaintStep) {
@@ -267,16 +262,6 @@ void FiffRawViewDelegate::createPlotPath(const QStyleOptionViewItem &option,
 
         path.lineTo(qSamplePosition);
     }
-//    for(int j = iPaintStep; j < data.size(); j = j + iPaintStep) {
-//        dValue = data[j] * dScaleY;
-//        diff = dValue - (data[j - iPaintStep] * dScaleY);
-
-//        //Reverse direction -> plot the right way
-
-//        qSamplePosition.setY((path.currentPosition().y() - diff));
-//        qSamplePosition.setX(path.currentPosition().x() + (dDx * (float)iPaintStep));
-//        path.lineTo(qSamplePosition);
-//    }
 }
 
 //=============================================================================================================
@@ -317,7 +302,7 @@ void FiffRawViewDelegate::createTimeSpacersPath(const QModelIndex &index,
 
 //=============================================================================================================
 
-void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
+void FiffRawViewDelegate::createEventsPath(const QModelIndex &index,
                                           const QStyleOptionViewItem &option,
                                           QPainterPath &path,
                                           ANSHAREDLIB::ChannelData &data,
@@ -349,12 +334,14 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
         // Paint selected events
         auto selection = t_pAnnModel->getEventSelection();
         for(auto item : selection){
-            painter->setPen(QPen(t_pAnnModel->getGroupColor(events->at(item).groupId), 1, Qt::SolidLine));
-            int eventSample = events->at(item).sample;
-            painter->drawLine(fInitX + static_cast<float>(eventSample - iStart) * dDx,
-                              fTop,
-                              fInitX + static_cast<float>(eventSample - iStart) * dDx,
-                              fBottom);
+            if (item < selection.size()){
+                painter->setPen(QPen(t_pAnnModel->getGroupColor(events->at(item).groupId), 1, Qt::SolidLine));
+                int eventSample = events->at(item).sample;
+                painter->drawLine(fInitX + static_cast<float>(eventSample - iStart) * dDx,
+                                  fTop,
+                                  fInitX + static_cast<float>(eventSample - iStart) * dDx,
+                                  fBottom);
+                }
         }
     }
 }
