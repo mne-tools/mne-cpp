@@ -73,27 +73,6 @@ class FiffRawViewModel;
 
 //=============================================================================================================
 /**
- * Data struture that stores a group of events and the parameters of the group and the events within
- */
-struct EventGroup{
-    int                 groupNumber;
-    int                 groupType;
-
-    QString             groupName;
-
-    bool                isUserMade;
-
-    QVector<int>        dataSamples;
-    QVector<int>        dataTypes;
-    QVector<int>        dataIsUserEvent;
-
-    QVector<int>        dataSamples_Filtered;
-    QVector<int>        dataTypes_Filtered;
-    QVector<int>        dataIsUserEvent_Filtered;
-};
-
-//=============================================================================================================
-/**
  * Model that holds the event information associated with a fiff file.
  */
 class ANSHAREDSHARED_EXPORT EventModel : public AbstractModel
@@ -377,7 +356,7 @@ public:
     /**
      * Clears list of currently sleected rows
      */
-    void clearSelected();
+    void clearEventSelection();
 
     //=========================================================================================================
     /**
@@ -473,7 +452,7 @@ public:
 
     QColor getGroupColor(int iGroupId) const;
 
-    void clearSelectedGroups();
+    void clearGroupSelection();
 
     void addToSelectedGroups(int iGroupId);
 
@@ -482,6 +461,8 @@ public:
     void deleteSelectedGroups();
 
     void setSharedMemory(bool bState);
+
+    std::list<int> getEventSelection() const;
 
 signals:
 
@@ -524,7 +505,7 @@ private:
     int                                 m_iSelectedCheckState;          /**< State of checkbox of whether to show only selected events. */
     int                                 m_iSelectedAnn;                 /**< Index of selected events. */
 
-    QList<int>                          m_dataSelectedRows;             /**< List of selected rows for multiple evnt selection. */
+    std::list<int>                      m_listEventSelection;           /**< List of selected events. */
 
     int                                 m_iLastTypeAdded;               /**< Stores last created type. */
 
