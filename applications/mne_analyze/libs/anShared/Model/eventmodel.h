@@ -346,14 +346,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Saves last added type or last type to be filterd to
-     *
-     * @param[in] iType    type to be saved.
-     */
-    void setLastType(int iType);
-
-    //=========================================================================================================
-    /**
      * Clears list of currently sleected rows
      */
     void clearEventSelection();
@@ -442,26 +434,37 @@ public:
      */
     QSharedPointer<FiffRawViewModel> getFiffModel();
 
+    //=========================================================================================================
     void addEvent(int iSample);
 
+    //=========================================================================================================
     void addGroup(QString sName, QColor color);
 
+    //=========================================================================================================
     std::unique_ptr<std::vector<EVENTSLIB::Event> > getEventsToDraw(int iBegin, int iEnd) const;
 
+    //=========================================================================================================
     std::unique_ptr<std::vector<EVENTSLIB::EventGroup> > getGroupsToDraw() const;
 
+    //=========================================================================================================
     QColor getGroupColor(int iGroupId) const;
 
+    //=========================================================================================================
     void clearGroupSelection();
 
+    //=========================================================================================================
     void addToSelectedGroups(int iGroupId);
 
+    //=========================================================================================================
     const std::vector<idNum> getSelectedGroups() const;
 
+    //=========================================================================================================
     void deleteSelectedGroups();
 
+    //=========================================================================================================
     void setSharedMemory(bool bState);
 
+    //=========================================================================================================
     std::list<uint> getEventSelection() const;
 
 signals:
@@ -493,6 +496,9 @@ private:
     void initFromFile(const QString& sFilePath);
 
     //=========================================================================================================
+    /**
+     * Emit signals to trigger update of relevant views
+     */
     void eventsUpdated();
 
 
@@ -506,6 +512,7 @@ private:
     int                                 m_iSelectedAnn;                 /**< Index of selected events. */
 
     std::list<uint>                     m_listEventSelection;           /**< List of selected events. */
+    std::vector<idNum>                  m_selectedEventGroups;          /**< Vector of selected groups. */
 
     int                                 m_iLastTypeAdded;               /**< Stores last created type. */
 
@@ -517,8 +524,7 @@ private:
 
     QSharedPointer<FiffRawViewModel>    m_pFiffModel;                   /**< Pointer to FiffRawViewModel associated with the events stored in this model/ */
 
-    EVENTSLIB::EventManager             m_EventManager;
-    std::vector<idNum>                  m_selectedEventGroups;
+    EVENTSLIB::EventManager             m_EventManager;                 /**< Database of of events */
 };
 
 //=============================================================================================================
