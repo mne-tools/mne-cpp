@@ -34,6 +34,7 @@
 
 #include "scalecontrol.h"
 #include "ui_scalecontrol.h"
+#include <math.h>
 
 using namespace DISPLIB;
 
