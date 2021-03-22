@@ -545,16 +545,16 @@ void EventModel::setLastType(int iType)
 
 //=============================================================================================================
 
-void EventModel::clearSelected()
+void EventModel::clearEventSelection()
 {
-    m_dataSelectedRows.clear();
+    m_listEventSelection.clear();
 }
 
 //=============================================================================================================
 
 void EventModel::appendSelected(int iSelectedIndex)
 {
-    m_dataSelectedRows.append(iSelectedIndex);
+    m_listEventSelection.push_back(iSelectedIndex);
 }
 
 //=============================================================================================================
@@ -718,7 +718,7 @@ std::unique_ptr<std::vector<EVENTSLIB::EventGroup> > EventModel::getGroupsToDraw
 
 //=============================================================================================================
 
-void EventModel::clearSelectedGroups()
+void EventModel::clearGroupSelection()
 {
     m_selectedEventGroups.clear();
     eventsUpdated();
@@ -773,4 +773,11 @@ void EventModel::setSharedMemory(bool bState)
     } else {
         m_EventManager.stopSharedMemory();
     }
+}
+
+//=============================================================================================================
+
+std::list<int> EventModel::getEventSelection() const
+{
+    return m_listEventSelection;
 }

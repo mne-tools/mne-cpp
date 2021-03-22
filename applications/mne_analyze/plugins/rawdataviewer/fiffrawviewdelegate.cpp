@@ -334,30 +334,28 @@ void FiffRawViewDelegate::createMarksPath(const QModelIndex &index,
     float fBottom = option.rect.bottomRight().y();
     float fInitX = path.currentPosition().x();
 
-    //QMap<int, QColor> typeColor = t_pAnnModel->getTypeColors();
-//    QMap<int, QColor> groupColor = t_pAnnModel->getGroupColors();
-
     auto events = t_pAnnModel->getEventsToDraw(iStart, iStart + data.size());
-
-    for(int i = 0; i < events->size(); i++) {
-//        unsigned int uiTime = t_pModel->getTimeMarks(i);
-//        if ((t_pModel->getTimeMarks(i) > iStart) && (uiTime < (iStart + data.size()))) {
-////            int type = t_pAnnModel->data(t_pAnnModel->index(i,2)).toInt();
-////            painter->setPen(QPen(typeColor.value(type), Qt::black));
-//            int group = t_pAnnModel->currentGroup(i);
-//            painter->setPen(QPen(groupColor.value(group), 1, Qt::SolidLine));
-//            painter->drawLine(fInitX + static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx,
-//                              fTop,
-//                              fInitX + static_cast<float>(t_pModel->getTimeMarks(i) - iStart) * dDx,
-//                              fBottom);
-//        }
-
-        painter->setPen(QPen(t_pAnnModel->getGroupColor(events->at(i).groupId), 1, Qt::SolidLine));
-        int eventSample = events->at(i).sample;
-        painter->drawLine(fInitX + static_cast<float>(eventSample - iStart) * dDx,
-                          fTop,
-                          fInitX + static_cast<float>(eventSample - iStart) * dDx,
-                          fBottom);
+    if (!t_pAnnModel->getShowSelected()){
+        // Paint all events
+        for(auto event : *events){
+            painter->setPen(QPen(t_pAnnModel->getGroupColor(event.groupId), 1, Qt::SolidLine));
+            int eventSample = event.sample;
+            painter->drawLine(fInitX + static_cast<float>(eventSample - iStart) * dDx,
+                              fTop,
+                              fInitX + static_cast<float>(eventSample - iStart) * dDx,
+                              fBottom);
+        }
+    } else {
+        // Paint selected events
+        auto selection = t_pAnnModel->getEventSelection();
+        for(auto item : selection){
+            painter->setPen(QPen(t_pAnnModel->getGroupColor(events->at(item).groupId), 1, Qt::SolidLine));
+            int eventSample = events->at(item).sample;
+            painter->drawLine(fInitX + static_cast<float>(eventSample - iStart) * dDx,
+                              fTop,
+                              fInitX + static_cast<float>(eventSample - iStart) * dDx,
+                              fBottom);
+        }
     }
 }
 

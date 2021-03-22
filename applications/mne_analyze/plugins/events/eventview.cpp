@@ -335,8 +335,7 @@ void EventView::disconnectFromModel()
 
 void EventView::onCurrentSelectedChanged()
 {
-    m_pAnnModel->clearSelected();
-    m_pAnnModel->setSelectedAnn(m_pUi->m_tableView_eventTableView->selectionModel()->currentIndex().row());
+    m_pAnnModel->clearEventSelection();
 
     for (int i = 0;  i < m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows().size(); i++) {
         m_pAnnModel->appendSelected(m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows().at(i).row());
@@ -418,7 +417,7 @@ bool EventView::newUserGroup(const QString& sName,
 
 void EventView::groupChanged()
 {
-    m_pAnnModel->clearSelectedGroups();
+    m_pAnnModel->clearGroupSelection();
 
     auto selection = m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows();
 
