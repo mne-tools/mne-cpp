@@ -103,7 +103,7 @@ EventModel::EventModel(QSharedPointer<FiffRawViewModel> pFiffModel,
 , m_iSelectedCheckState(0)
 , m_iSelectedAnn(0)
 , m_iLastTypeAdded(0)
-, m_fFreq(600)
+, m_fFreq(pFiffModel->getSamplingFrequency())
 , m_sFilterEventType("All")
 , m_pFiffModel(pFiffModel)
 {
@@ -534,13 +534,6 @@ bool EventModel::saveToFile(const QString& sPath)
 
     return true;
     #endif
-}
-
-//=============================================================================================================
-
-void EventModel::setLastType(int iType)
-{
-    m_iLastTypeAdded = iType;
 }
 
 //=============================================================================================================

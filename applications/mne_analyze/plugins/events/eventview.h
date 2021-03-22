@@ -377,7 +377,13 @@ private:
                                                       FIFFLIB::FiffInfo fiffInfo,
                                                       FIFFLIB::FiffRawData fiffRaw);
 
-    void itemChanged(QListWidgetItem *item);
+    //=========================================================================================================
+    /**
+     * Triggered when group item in Group ListWidget has its name changed. Triggers an update to the name in the back end.
+     *
+     * @param[in] item      Item whose name was changed
+     */
+    void onGroupItemNameChanged(QListWidgetItem *item);
 
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
 

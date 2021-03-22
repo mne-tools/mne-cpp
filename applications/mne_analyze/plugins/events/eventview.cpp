@@ -176,7 +176,7 @@ void EventView::initGUIFunctionality()
 //            this, &EventView::renameGroup, Qt::UniqueConnection);
 
     connect(m_pUi->m_listWidget_groupListWidget, &QListWidget::itemChanged,
-                this, &EventView::itemChanged, Qt::UniqueConnection);
+                this, &EventView::onGroupItemNameChanged, Qt::UniqueConnection);
 
     connect(m_pUi->m_pushButtonStim, &QPushButton::clicked,
             this, &EventView::onStimButtonClicked, Qt::UniqueConnection);
@@ -186,6 +186,8 @@ void EventView::initGUIFunctionality()
 
     connect(&m_FutureWatcher, &QFutureWatcher<QMap<double,QList<int>>>::finished,
             this, &EventView::createGroupsFromTriggers, Qt::UniqueConnection);
+
+    m_pAnnModel->setShowSelected(m_pUi->m_checkBox_showSelectedEventsOnly->isChecked());
 }
 
 //=============================================================================================================
@@ -206,7 +208,7 @@ void EventView::updateComboBox(const QString &currentAnnotationType)
 //    if(m_pAnnModel->getEventTypeList().contains(currentAnnotationType))
 //        m_pUi->m_comboBox_filterTypes->setCurrentText(currentAnnotationType);
 
-    m_pAnnModel->setLastType(currentAnnotationType.toInt());
+//    m_pAnnModel->setLastType(currentAnnotationType.toInt());
     emit triggerRedraw();
 }
 
@@ -696,10 +698,8 @@ void EventView::redrawGroups()
 
 //=============================================================================================================
 
-void EventView::itemChanged(QListWidgetItem *item)
+void EventView::onGroupItemNameChanged(QListWidgetItem *item)
 {
-    qDebug() << "Item -" << item;
-
     int iGroupId = item->data(Qt::UserRole).toInt();
 
     if(m_pAnnModel){
