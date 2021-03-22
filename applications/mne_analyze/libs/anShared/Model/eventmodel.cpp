@@ -777,7 +777,7 @@ void EventModel::setSharedMemory(bool bState)
 
 //=============================================================================================================
 
-std::list<int> EventModel::getEventSelection() const
+std::list<uint> EventModel::getEventSelection() const
 {
     return m_listEventSelection;
 }

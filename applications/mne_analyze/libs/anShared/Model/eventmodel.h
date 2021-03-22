@@ -462,7 +462,7 @@ public:
 
     void setSharedMemory(bool bState);
 
-    std::list<int> getEventSelection() const;
+    std::list<uint> getEventSelection() const;
 
 signals:
 
@@ -505,7 +505,7 @@ private:
     int                                 m_iSelectedCheckState;          /**< State of checkbox of whether to show only selected events. */
     int                                 m_iSelectedAnn;                 /**< Index of selected events. */
 
-    std::list<int>                      m_listEventSelection;           /**< List of selected events. */
+    std::list<uint>                     m_listEventSelection;           /**< List of selected events. */
 
     int                                 m_iLastTypeAdded;               /**< Stores last created type. */
 
