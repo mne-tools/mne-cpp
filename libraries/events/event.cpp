@@ -65,7 +65,7 @@ EVENTSINTERNAL::EventINT::EventINT(const EventINT& rhs)
 : m_iId(rhs.getId())
 , m_iSample(rhs.getSample())
 , m_iGroup(rhs.getGroupId())
-, m_sDescription(getDescription())
+, m_sDescription(rhs.getDescription())
 { }
 
 //=============================================================================================================
@@ -74,7 +74,7 @@ EVENTSINTERNAL::EventINT::EventINT(EventINT&& other)
 : m_iId(other.getId())
 , m_iSample(other.getSample())
 , m_iGroup(other.getGroupId())
-, m_sDescription(getDescription())
+, m_sDescription(other.getDescription())
 { }
 
 //=============================================================================================================
