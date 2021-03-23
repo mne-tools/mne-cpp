@@ -36,19 +36,36 @@
 #ifndef EVENTGROUP_EVENTS_H
 #define EVENTGROUP_EVENTS_H
 
-#include "events_global.h"
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include <string>
 #include <cstdint>
+#include "events_global.h"
 
-using idNum = unsigned int; //We want to eventually modify the idNum to be a hash string or a user-defined class. For now, just an int.
-using uchar = unsigned char;
+//=============================================================================================================
+// EVENTSINTERNAL FORWARD DECLARATIONS
+//=============================================================================================================
 
 namespace EVENTSINTERNAL {
 class EventGroupINT;
 }
 
+//=============================================================================================================
+// LOCAL DEFINITIONS
+//=============================================================================================================
+
+using idNum = unsigned int; //We want to eventually modify the idNum to be a hash string or a user-defined class. For now, just an int.
+using uchar = unsigned char;
+
+//=============================================================================================================
+// NAMESPACE EVENTSLIB
+//=============================================================================================================
+
 namespace EVENTSLIB {
 
+//=============================================================================================================
 /**
  * A holder for the color of an event group.
  *
