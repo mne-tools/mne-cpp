@@ -1,11 +1,58 @@
+//=============================================================================================================
+/**
+ * @file     eventsharedmemmanager.h
+ * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>;
+ *           Juan Garcia-Prieto <juangpc@gmail.com>
+ * @since    0.1.8
+ * @date     March, 2021
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2021, Gabriel Motta, Juan Garcia-Prieto. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief     EventSharedMemManager definition.
+ *
+ */
+
+//=============================================================================================================
+// STD INCLUDES
+//=============================================================================================================
+
 #include "eventsharedmemmanager.h"
 #include "eventmanager.h"
+
+//=============================================================================================================
+// STD INCLUDES
+//=============================================================================================================
 
 #include <QDebug>
 #include <QString>
 #include <utility>
 
 using namespace EVENTSINTERNAL;
+
+//=============================================================================================================
+// STD INCLUDES
+//=============================================================================================================
 
 static const std::string defaultSharedMemoryBufferKey("MNE_EVENTS_SHAREDMEMORY_BUFFER");
 static const std::string defaultGroupName("external");
@@ -19,9 +66,13 @@ int EventSharedMemManager::m_iLastUpdateIndex(0);
 constexpr static int bufferLength(5);
 static long long defatult_timerBufferWatch(200);
 
+//=============================================================================================================
+
 EventUpdate::EventUpdate()
 :EventUpdate(0,0,type::NULL_EVENT)
 { }
+
+//=============================================================================================================
 
 EventUpdate::EventUpdate(int sample, int creator,type t)
 : m_EventSample(sample)
@@ -31,35 +82,49 @@ EventUpdate::EventUpdate(int sample, int creator,type t)
     m_CreationTime = EventSharedMemManager::getTimeNow();
 }
 
+//=============================================================================================================
+
 long long EventUpdate::getCreationTime() const
 {
     return m_CreationTime;
 }
+
+//=============================================================================================================
 
 int EventUpdate::getSample() const
 {
     return m_EventSample;
 }
 
+//=============================================================================================================
+
 int EventUpdate::getCreatorId() const
 {
     return m_CreatorId;
 }
+
+//=============================================================================================================
 
 EventUpdate::type EventUpdate::getType() const
 {
     return m_TypeOfUpdate;
 }
 
+//=============================================================================================================
+
 void EventUpdate::setType(type t)
 {
     m_TypeOfUpdate = t;
 }
 
+//=============================================================================================================
+
 std::string EventUpdate::eventTypeToText()
 {
     return typeString[m_TypeOfUpdate];
 }
+
+//=============================================================================================================
 
 EventSharedMemManager::EventSharedMemManager(EVENTSLIB::EventManager* parent)
 : m_pEventManager(parent)
@@ -81,11 +146,16 @@ EventSharedMemManager::EventSharedMemManager(EVENTSLIB::EventManager* parent)
 
 }
 
+//=============================================================================================================
+
 EventSharedMemManager::~EventSharedMemManager()
 {
     detachFromSharedMemory();
     delete[] m_LocalBuffer;
 }
+
+//=============================================================================================================
+
 void EventSharedMemManager::init(EVENTSLIB::SharedMemoryMode mode)
 {
 //    qDebug() << " ========================================================";
@@ -112,6 +182,8 @@ void EventSharedMemManager::init(EVENTSLIB::SharedMemoryMode mode)
     }
 }
 
+//=============================================================================================================
+
 void EventSharedMemManager::attachToOrCreateSharedSegment(QSharedMemory::AccessMode mode)
 {
     attachToSharedSegment(mode);
@@ -121,6 +193,8 @@ void EventSharedMemManager::attachToOrCreateSharedSegment(QSharedMemory::AccessM
     }
 }
 
+//=============================================================================================================
+
 void EventSharedMemManager::attachToSharedSegment(QSharedMemory::AccessMode mode)
 {
     m_IsInit = m_SharedMemory.attach(mode);
@@ -129,6 +203,8 @@ void EventSharedMemManager::attachToSharedSegment(QSharedMemory::AccessMode mode
         m_SharedBuffer = static_cast<EventUpdate*>(m_SharedMemory.data());
     }
 }
+
+//=============================================================================================================
 
 bool EventSharedMemManager::createSharedSegment(int bufferSize, QSharedMemory::AccessMode mode)
 {
@@ -141,10 +217,14 @@ bool EventSharedMemManager::createSharedSegment(int bufferSize, QSharedMemory::A
     return output;
 }
 
+//=============================================================================================================
+
 void EventSharedMemManager::launchSharedMemoryWatcherThread()
 {
     m_BufferWatcherThread = std::thread(&EventSharedMemManager::bufferWatcher, this);
 }
+
+//=============================================================================================================
 
 void EventSharedMemManager::detachFromSharedMemory()
 {
@@ -158,6 +238,8 @@ void EventSharedMemManager::detachFromSharedMemory()
     }
 }
 
+//=============================================================================================================
+
 void EventSharedMemManager::stopSharedMemoryWatcherThread()
 {
     if(m_BufferWatcherThreadRunning)
@@ -167,16 +249,22 @@ void EventSharedMemManager::stopSharedMemoryWatcherThread()
     }
 }
 
+//=============================================================================================================
+
 void EventSharedMemManager::stop()
 {
     detachFromSharedMemory();
     m_IsInit = false;
 }
 
+//=============================================================================================================
+
 bool EventSharedMemManager::isInit() const
 {
     return m_IsInit;
 }
+
+//=============================================================================================================
 
 void EventSharedMemManager::addEvent(int sample)
 {
@@ -189,6 +277,8 @@ void EventSharedMemManager::addEvent(int sample)
     }
 }
 
+//=============================================================================================================
+
 void EventSharedMemManager::deleteEvent(int sample)
 {
     if(m_IsInit &&
@@ -199,6 +289,8 @@ void EventSharedMemManager::deleteEvent(int sample)
         copyNewUpdateToSharedMemory(newUpdate);
     }
 }
+
+//=============================================================================================================
 
 void EventSharedMemManager::initializeSharedMemory()
 {
@@ -217,6 +309,8 @@ void EventSharedMemManager::initializeSharedMemory()
     }
     m_WritingToSharedMemory = false;
 }
+
+//=============================================================================================================
 
 void EventSharedMemManager::copyNewUpdateToSharedMemory(EventUpdate& newUpdate)
 {
@@ -237,6 +331,8 @@ void EventSharedMemManager::copyNewUpdateToSharedMemory(EventUpdate& newUpdate)
     m_WritingToSharedMemory = false;
 }
 
+//=============================================================================================================
+
 void EventSharedMemManager::copySharedMemoryToLocalBuffer()
 {
     void* localBuffer = static_cast<void*>(m_LocalBuffer);
@@ -250,6 +346,8 @@ void EventSharedMemManager::copySharedMemoryToLocalBuffer()
 //    qDebug() << "Receiving Buffer ========  id: " << m_Id;
 //    printLocalBuffer();
 }
+
+//=============================================================================================================
 
 void EventSharedMemManager::bufferWatcher()
 {
@@ -267,6 +365,7 @@ void EventSharedMemManager::bufferWatcher()
     m_BufferWatcherThreadRunning = false;
 }
 
+//=============================================================================================================
 
 void EventSharedMemManager::processLocalBuffer()
 {
@@ -281,6 +380,8 @@ void EventSharedMemManager::processLocalBuffer()
         }
     }
 }
+
+//=============================================================================================================
 
 void EventSharedMemManager::processEvent(const EventUpdate& ne)
 {
@@ -302,12 +403,16 @@ void EventSharedMemManager::processEvent(const EventUpdate& ne)
     }
 }
 
+//=============================================================================================================
+
 void EventSharedMemManager::processNewEvent(const EventUpdate& ne)
 {
     EVENTSINTERNAL::EventINT newEvent(
                 m_pEventManager->generateNewEventId(), ne.getSample(), m_GroupId);
     m_pEventManager->insertEvent(newEvent);
 }
+
+//=============================================================================================================
 
 void EventSharedMemManager::processDeleteEvent(const EventUpdate& ne)
 {
@@ -322,12 +427,16 @@ void EventSharedMemManager::processDeleteEvent(const EventUpdate& ne)
     }
 }
 
+//=============================================================================================================
+
 long long EventSharedMemManager::getTimeNow()
 {
     const auto tNow = std::chrono::system_clock::now();
     return std::chrono::duration_cast<std::chrono::milliseconds>(
                 tNow.time_since_epoch()).count();
 }
+
+//=============================================================================================================
 
 void EventSharedMemManager::createGroupIfNeeded()
 {
@@ -338,6 +447,8 @@ void EventSharedMemManager::createGroupIfNeeded()
         m_bGroupCreated = true;
     }
 }
+
+//=============================================================================================================
 
 void EventSharedMemManager::printLocalBuffer()
 {
@@ -350,5 +461,4 @@ void EventSharedMemManager::printLocalBuffer()
     }
 }
 
-
-
+//=============================================================================================================

@@ -4,7 +4,7 @@
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>;
  *           Juan Garcia-Prieto <juangpc@gmail.com>
  * @since    0.1.8
- * @date     February, 2021
+ * @date     March, 2021
  *
  * @section  LICENSE
  *
