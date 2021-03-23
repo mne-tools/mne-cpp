@@ -65,6 +65,7 @@ CONFIG(debug, debug|release) {
     LIBS += -lanSharedd \
             -lmnecppDisp3Dd \
             -lmnecppDispd \
+            -lmnecppEventsd \
             -lmnecppConnectivityd \
             -lmnecppRtProcessingd \
             -lmnecppInversed \
@@ -77,6 +78,7 @@ CONFIG(debug, debug|release) {
     LIBS += -lanShared \
             -lmnecppDisp3D \
             -lmnecppDisp \
+            -lmnecppEvents \
             -lmnecppConnectivity \
             -lmnecppRtProcessing \
             -lmnecppInverse \

@@ -79,6 +79,7 @@ CONFIG(debug, debug|release) {
             -lscDispd \
             -lscMeasd \
             -lmnecppDispd \
+            -lmnecppEventsd \
             -lmnecppFiffd \
             -lmnecppUtilsd \
 } else {
@@ -86,6 +87,7 @@ CONFIG(debug, debug|release) {
             -lscDisp \
             -lscMeas \
             -lmnecppDisp \
+            -lmnecppEvents \
             -lmnecppFiff \
             -lmnecppUtils \
 }

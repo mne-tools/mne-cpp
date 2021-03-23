@@ -62,6 +62,7 @@ CONFIG(debug, debug|release) {
             -lscDispd \
             -lscMeasd \
             -lmnecppDispd \
+            -lmnecppEventsd \
             -lmnecppFwdd \
             -lmnecppMned \
             -lmnecppFiffd \
@@ -72,6 +73,7 @@ CONFIG(debug, debug|release) {
             -lscDisp \
             -lscMeas \
             -lmnecppDisp \
+            -lmnecppEvents \
             -lmnecppFwd \
             -lmnecppMne \
             -lmnecppFiff \

@@ -63,6 +63,7 @@ CONFIG(debug, debug|release) {
             -lscMeasd \
             -lmnecppDisp3Dd \
             -lmnecppDispd \
+            -lmnecppEventsd \
             -lmnecppRtProcessingd \
             -lmnecppConnectivityd \
             -lmnecppInversed \
@@ -77,6 +78,7 @@ CONFIG(debug, debug|release) {
             -lscMeas \
             -lmnecppDisp3D \
             -lmnecppDisp \
+            -lmnecppEvents \
             -lmnecppRtProcessing \
             -lmnecppConnectivity \
             -lmnecppInverse \
