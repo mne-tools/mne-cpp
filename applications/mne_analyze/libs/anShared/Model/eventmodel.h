@@ -257,7 +257,15 @@ public:
      *
      * @return number on events to display.
      */
-    int getNumberOfEvents() const;
+    int getNumberOfEventsToDisplay() const;
+
+    //=========================================================================================================
+    /**
+     * Returns number of groups
+     *
+     * @return Number of groups.
+     */
+    int getNumberOfGroups() const;
 
     //=========================================================================================================
     /**
@@ -386,7 +394,13 @@ public:
     void setGroupName(int iGroupIndex,
                       const QString& sGroupName);
 
-    void setSelectedGroupName(const QString &currentText);
+    //=========================================================================================================
+    /**
+     * Sets the name of selected group (or first selected if multiple) to currentText
+     *
+     * @param[in] currentText
+     */
+    void setSelectedGroupName(const QString &sGroupName);
 
     //=========================================================================================================
     /**
@@ -440,36 +454,93 @@ public:
     QSharedPointer<FiffRawViewModel> getFiffModel();
 
     //=========================================================================================================
+    /**
+     * Adds event with given paramters.
+     *
+     * @param[in] iSample   Sample of new event.
+     */
     void addEvent(int iSample);
 
     //=========================================================================================================
+    /**
+     * Adds event group with given parameters.
+     *
+     * @param[in] sName     Group name.
+     * @param[in] color     Group color.
+     */
     void addGroup(QString sName, QColor color);
 
     //=========================================================================================================
-    std::unique_ptr<std::vector<EVENTSLIB::Event> > getEventsToDraw(int iBegin, int iEnd) const;
+    /**
+     * Returns events between two samples
+     *
+     * @param[in] iBegin    Lower bound for sample (inclusive).
+     * @param[in] iEnd      Upper bound for sample (exclusive).
+     *
+     * @return  Pointer to a vector of events.
+     */
+    std::unique_ptr<std::vector<EVENTSLIB::Event> > getEventsToDisplay(int iBegin, int iEnd) const;
 
     //=========================================================================================================
-    std::unique_ptr<std::vector<EVENTSLIB::EventGroup> > getGroupsToDraw() const;
+    /**
+     * Returns all groups
+     *
+     * @return Pointer to a vector of groups
+     */
+    std::unique_ptr<std::vector<EVENTSLIB::EventGroup> > getGroupsToDisplay() const;
 
     //=========================================================================================================
+    /**
+     * Returns color of the group with given input parameters.
+     *
+     * @param[in] iGroupId      Group Id number.
+     *
+     * @return QColor of the group's color.
+     */
     QColor getGroupColor(int iGroupId) const;
 
     //=========================================================================================================
+    /**
+     * Clears tracking of group selection.
+     */
     void clearGroupSelection();
 
     //=========================================================================================================
+    /**
+     * Adds to tracking of selected groups.
+     *
+     * @param[in] iGroupId      Id of group to be added.
+     */
     void addToSelectedGroups(int iGroupId);
 
     //=========================================================================================================
+    /**
+     * Returns which groups are selected
+     *
+     * @return  vector of group Ids of selected groups
+     */
     const std::vector<idNum> getSelectedGroups() const;
 
     //=========================================================================================================
+    /**
+     * Deletes selected group and events within
+     */
     void deleteSelectedGroups();
 
     //=========================================================================================================
+    /**
+     * Turns shared memory on/off based on input parameters
+     *
+     * @param[in] bState    True - on  /  False - off.
+     */
     void setSharedMemory(bool bState);
 
     //=========================================================================================================
+    /**
+     * Returns which events are selected
+     *
+     * @return vector of indices of selected groups
+     */
     std::list<uint> getEventSelection() const;
 
 signals:
@@ -482,6 +553,10 @@ signals:
      */
     void updateEventTypes(const QString& currentFilterType);
 
+    //=========================================================================================================
+    /**
+     * Emits to notify that there have been changes to the event groups
+     */
     void eventGroupsUpdated();
 
 private:

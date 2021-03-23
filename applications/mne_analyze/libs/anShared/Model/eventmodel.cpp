@@ -421,9 +421,16 @@ void EventModel::setSampleFreq(float fFreq)
 
 //=============================================================================================================
 
-int EventModel::getNumberOfEvents() const
+int EventModel::getNumberOfEventsToDisplay() const
 {
     return rowCount();
+}
+
+//=============================================================================================================
+
+int EventModel::getNumberOfGroups() const
+{
+    return m_EventManager.getNumGroups();
 }
 
 //=============================================================================================================
@@ -607,9 +614,9 @@ void EventModel::setGroupName(int iGroupIndex,
 
 //=============================================================================================================
 
-void EventModel::setSelectedGroupName(const QString &currentText)
+void EventModel::setSelectedGroupName(const QString &sGroupName)
 {
-    m_EventManager.renameGroup(m_selectedEventGroups.front(), currentText.toStdString());
+    m_EventManager.renameGroup(m_selectedEventGroups.front(), sGroupName.toStdString());
 }
 
 //=============================================================================================================
@@ -690,7 +697,7 @@ void EventModel::addGroup(QString sName, QColor color)
 
 //=============================================================================================================
 
-std::unique_ptr<std::vector<EVENTSLIB::Event> > EventModel::getEventsToDraw(int iBegin, int iEnd) const
+std::unique_ptr<std::vector<EVENTSLIB::Event> > EventModel::getEventsToDisplay(int iBegin, int iEnd) const
 {
     return m_EventManager.getEventsBetween(iBegin, iEnd, m_selectedEventGroups);
 }
@@ -705,7 +712,7 @@ void EventModel::eventsUpdated()
 
 //=============================================================================================================
 
-std::unique_ptr<std::vector<EVENTSLIB::EventGroup> > EventModel::getGroupsToDraw() const
+std::unique_ptr<std::vector<EVENTSLIB::EventGroup> > EventModel::getGroupsToDisplay() const
 {
     return m_EventManager.getAllGroups();
 }
@@ -753,8 +760,8 @@ void EventModel::deleteSelectedGroups()
             m_EventManager.deleteGroup(groupId);
         }
 
+        eventsUpdated();
         emit eventGroupsUpdated();
-        emit eventsUpdated();
     }
 }
 
