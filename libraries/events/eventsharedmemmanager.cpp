@@ -37,21 +37,30 @@
 // STD INCLUDES
 //=============================================================================================================
 
-#include "eventsharedmemmanager.h"
-#include "eventmanager.h"
+#include <utility>
 
 //=============================================================================================================
-// STD INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
 #include <QString>
-#include <utility>
+
+//=============================================================================================================
+// MNECPP INCLUDES
+//=============================================================================================================
+
+#include "eventsharedmemmanager.h"
+#include "eventmanager.h"
+
+//=============================================================================================================
+// NAMESPACE SPEC
+//=============================================================================================================
 
 using namespace EVENTSINTERNAL;
 
 //=============================================================================================================
-// STD INCLUDES
+// LOCAL DEFINITIONS
 //=============================================================================================================
 
 static const std::string defaultSharedMemoryBufferKey("MNE_EVENTS_SHAREDMEMORY_BUFFER");
@@ -69,12 +78,12 @@ static long long defatult_timerBufferWatch(200);
 //=============================================================================================================
 
 EventUpdate::EventUpdate()
-:EventUpdate(0,0,type::NULL_EVENT)
+:EventUpdate(0,0,EventUpdateType::NULL_EVENT)
 { }
 
 //=============================================================================================================
 
-EventUpdate::EventUpdate(int sample, int creator,type t)
+EventUpdate::EventUpdate(int sample, int creator,EventUpdateType t)
 : m_EventSample(sample)
 , m_CreatorId(creator)
 , m_TypeOfUpdate(t)
@@ -105,14 +114,14 @@ int EventUpdate::getCreatorId() const
 
 //=============================================================================================================
 
-EventUpdate::type EventUpdate::getType() const
+EventUpdateType EventUpdate::getType() const
 {
     return m_TypeOfUpdate;
 }
 
 //=============================================================================================================
 
-void EventUpdate::setType(type t)
+void EventUpdate::setType(EventUpdateType t)
 {
     m_TypeOfUpdate = t;
 }
@@ -121,7 +130,7 @@ void EventUpdate::setType(type t)
 
 std::string EventUpdate::eventTypeToText()
 {
-    return typeString[m_TypeOfUpdate];
+    return EVENTSINTERNAL::EventUpdateTypeString[m_TypeOfUpdate];
 }
 
 //=============================================================================================================
@@ -272,7 +281,7 @@ void EventSharedMemManager::addEvent(int sample)
       (m_Mode == EVENTSLIB::SharedMemoryMode::WRITE  ||
        m_Mode == EVENTSLIB::SharedMemoryMode::READWRITE  )  )
     {
-        EventUpdate newUpdate(sample, m_Id, EventUpdate::type::NEW_EVENT);
+        EventUpdate newUpdate(sample, m_Id, EventUpdateType::NEW_EVENT);
         copyNewUpdateToSharedMemory(newUpdate);
     }
 }
@@ -285,7 +294,7 @@ void EventSharedMemManager::deleteEvent(int sample)
           (m_Mode == EVENTSLIB::SharedMemoryMode::WRITE  ||
            m_Mode == EVENTSLIB::SharedMemoryMode::READWRITE  )  )
     {
-        EventUpdate newUpdate(sample, m_Id, EventUpdate::type::DELETE_EVENT);
+        EventUpdate newUpdate(sample, m_Id, EventUpdateType::DELETE_EVENT);
         copyNewUpdateToSharedMemory(newUpdate);
     }
 }
@@ -388,12 +397,12 @@ void EventSharedMemManager::processEvent(const EventUpdate& ne)
 //    qDebug() << "process new update";
     switch (ne.getType())
     {
-        case EventUpdate::type::NEW_EVENT :
+        case EventUpdateType::NEW_EVENT :
         {
             processNewEvent(ne);
             break;
         }
-        case EventUpdate::type::DELETE_EVENT :
+        case EventUpdateType::DELETE_EVENT :
         {
             processDeleteEvent(ne);
             break;
