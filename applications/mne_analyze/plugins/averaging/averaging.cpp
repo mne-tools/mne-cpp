@@ -616,7 +616,7 @@ void Averaging::updateGroups()
     }
 
     if (m_pFiffRawModel->hasSavedEvents()){
-        auto groups = m_pFiffRawModel->getEventModel()->getGroupsToDraw();
+        auto groups = m_pFiffRawModel->getEventModel()->getGroupsToDisplay();
         for (auto group : *groups){
             m_pAveragingSettingsView->addSelectionGroup((group.name).c_str(), group.id);
         }
