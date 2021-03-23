@@ -66,33 +66,23 @@ QWidget* EventDelegate::createEditor(QWidget *parent,
      const QStyleOptionViewItem &/* option */,
      const QModelIndex & index) const
 {
-    const ANSHAREDLIB::EventModel* pAnnotationModel = static_cast<const ANSHAREDLIB::EventModel*>(index.model());
+    const ANSHAREDLIB::EventModel* pEventModel = static_cast<const ANSHAREDLIB::EventModel*>(index.model());
 
     switch(index.column()) {
         case 0: {
             QSpinBox *editor = new QSpinBox(parent);
             editor->setMinimum(0);
-            editor->setMaximum(pAnnotationModel->getFirstLastSample().second);
-//            connect(editor, QOverload<int>::of(&QSpinBox::valueChanged),
-//                    this, &EventDelegate::onSampleValueChanged);
+            editor->setMaximum(pEventModel->getFirstLastSample().second);
             return editor;
         }
 
         case 1: {
             QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
             editor->setMinimum(0.00);
-            editor->setMaximum(pAnnotationModel->getFirstLastSample().second / pAnnotationModel->getSampleFreq());
+            editor->setMaximum(pEventModel->getFirstLastSample().second / pEventModel->getSampleFreq());
             editor->setSingleStep(0.100);
-//            connect(editor, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
-//                    this, &EventDelegate::onTimeValueChanged);
             return editor;
         }
-
-//        case 2: {
-//            QComboBox *editor = new QComboBox(parent);
-//            editor->addItems(pAnnotationModel->getEventTypeList());
-//            return editor;
-//        }
     }
 
     QWidget *returnWidget = new QWidget();
@@ -117,13 +107,6 @@ void EventDelegate::setEditorData(QWidget *editor, const QModelIndex &index) con
             spinBox->setValue(value);
             break;
         }
-
-//        case 2: {
-//            int value = index.model()->data(index, Qt::DisplayRole).toInt();
-//            QComboBox *spinBox = static_cast<QComboBox*>(editor);
-//            spinBox->setCurrentText(QString().number(value));
-//            break;
-//        }
     }
 }
 
@@ -150,14 +133,6 @@ void EventDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
             model->setData(index, value, Qt::EditRole);
             break;
         }
-
-//        case 2: {
-//            QComboBox *spinBox = static_cast<QComboBox*>(editor);
-//            QString value = spinBox->currentText();
-
-//            model->setData(index, value.toInt(), Qt::EditRole);
-//            break;
-//        }
     }
 }
 
@@ -168,25 +143,3 @@ void EventDelegate::updateEditorGeometry(QWidget *editor,
 {
     editor->setGeometry(option.rect);
 }
-
-//=============================================================================================================
-
-//void EventDelegate::onSampleValueChanged(int iValue)
-//{
-//    emit sampleValueChanged(iValue);
-//}
-
-////=============================================================================================================
-
-//void EventDelegate::onTimeValueChanged(double dValue)
-//{
-//    emit timeValueChanged(dValue);
-//}
-
-//=============================================================================================================
-
-//bool EventDelegate::eventFilter(QObject *object, QEvent *event)
-//{
-//    qDebug() << event->type();
-//    return true;
-//}

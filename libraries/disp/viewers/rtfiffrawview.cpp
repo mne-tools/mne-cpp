@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
  * @file     rtfiffrawview.cpp
- * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>;
+ *           Juan Garcia-Prieto <juangpc@gmail.com>
  * @since    0.1.0
  * @date     July, 2018
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Gabriel B Motta, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2018, Lorenz Esch, Gabriel B Motta, Juan Garcia-Prieto. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:

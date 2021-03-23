@@ -91,7 +91,7 @@ void BidsViewModel::addData(QModelIndex selectedItem,
         }
         break;
     }
-    case BIDS_ANNOTATION:
+    case BIDS_EVENT:
     case BIDS_AVERAGE: {
         if(!selectedItem.isValid()) {
             QStandardItem* pItem = new QStandardItem("Unknown");
@@ -400,7 +400,7 @@ bool BidsViewModel::removeItem(QModelIndex itemIndex)
             }
             return true;
         case BIDS_AVERAGE:
-        case BIDS_ANNOTATION:
+        case BIDS_EVENT:
         case BIDS_DIPOLE:
             if(removeRows(itemIndex.row(), 1, itemIndex.parent())){
                 endResetModel();

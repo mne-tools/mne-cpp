@@ -170,7 +170,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Draws annotations from the FiffRawView model's member Annotation Model
+     * Draws events from the FiffRawView model's member Event Model
      *
      * @param[in] index             Used to locate data in the model.
      * @param[in] option            Describes the parameters used to draw an item in a view widget.

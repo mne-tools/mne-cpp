@@ -182,7 +182,7 @@ void FiffRawViewDelegate::paint(QPainter *painter,
                 painter->drawPath(path);
                 painter->restore();
 
-                if(pFiffRawModel->shouldDisplayAnnotation()) {
+                if(pFiffRawModel->shouldDisplayEvent()) {
                     path = QPainterPath(QPointF(option.rect.x()+pos, option.rect.y()));
 
                     painter->setPen(QPen(m_penNormal.color().darker(250), 1, Qt::SolidLine));
@@ -309,7 +309,7 @@ void FiffRawViewDelegate::createEventsPath(const QModelIndex &index,
                                           QPainter* painter) const
 {
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
-    QSharedPointer<EventModel> t_pAnnModel = t_pModel->getAnnotationModel();
+    QSharedPointer<EventModel> t_pAnnModel = t_pModel->getEventModel();
 
     double dDx = t_pModel->pixelDifference();
 
