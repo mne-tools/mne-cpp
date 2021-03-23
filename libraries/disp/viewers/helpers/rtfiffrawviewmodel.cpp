@@ -3,12 +3,14 @@
  * @file     rtfiffrawviewmodel.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>;
+ *           Juan Garcia-Prieto <juangpc@gmail.com>
  * @since    0.1.0
  * @date     May, 2014
  *
  * @section  LICENSE
  *
- * Copyright (C) 2014, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Gabriel Motta, Juan Garcia-Prieto. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -1401,7 +1403,7 @@ void RtFiffRawViewModel::addEvent(int iSample)
 
 //=============================================================================================================
 
-std::unique_ptr<std::vector<EVENTSLIB::Event> > RtFiffRawViewModel::getEventsToDraw(int iBegin, int iEnd) const
+std::unique_ptr<std::vector<EVENTSLIB::Event> > RtFiffRawViewModel::getEventsToDisplay(int iBegin, int iEnd) const
 {
     return m_EventManager.getEventsBetween(iBegin, iEnd);
 }

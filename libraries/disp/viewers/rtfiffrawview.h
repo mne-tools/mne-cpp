@@ -455,7 +455,13 @@ protected:
      */
     void markChBad();
 
-    void onAddEvent(bool);
+    //=========================================================================================================
+    /**
+     * Adds event based on last clicked position.
+     *
+     * @param[in] bChecked      State of action that triggered this function (unused)
+     */
+    void onAddEvent(bool bChecked);
 
     QPointer<QTableView>                        m_pTableView;                   /**< The QTableView being part of the model/view framework of Qt. */
     QPointer<DISPLIB::RtFiffRawViewDelegate>    m_pDelegate;                    /**< The channel data delegate. */

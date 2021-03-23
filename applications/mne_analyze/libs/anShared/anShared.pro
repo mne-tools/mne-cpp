@@ -72,7 +72,6 @@ CONFIG(debug, debug|release) {
             -lmnecppFiffd \
             -lmnecppFsd \
             -lmnecppUtilsd \
-            -lmnecppEventsd \
 } else {
     LIBS += -lmnecppDisp \
             -lmnecppEvents \
@@ -83,7 +82,6 @@ CONFIG(debug, debug|release) {
             -lmnecppFiff \
             -lmnecppFs \
             -lmnecppUtils \
-            -lmnecppEvents \
 }
 
 SOURCES += \

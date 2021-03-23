@@ -3,12 +3,14 @@
  * @file     rtfiffrawviewmodel.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>;
+ *           Juan Garcia-Prieto <juangpc@gmail.com>
  * @since    0.1.0
  * @date     May, 2014
  *
  * @section  LICENSE
  *
- * Copyright (C) 2014, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Gabriel Motta, Juan Garcia-Prieto. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -529,10 +531,23 @@ public:
     double getMaxValueFromRawViewModel(int row) const;
 
     //=========================================================================================================
+    /**
+     * Adds event based on input parameters
+     *
+     * @param[in]iSample    Sample of the new event.
+     */
     void addEvent(int iSample);
 
     //=========================================================================================================
-    std::unique_ptr<std::vector<EVENTSLIB::Event> > getEventsToDraw(int iBegin, int iEnd) const;
+    /**
+     * Returns events between two samples
+     *
+     * @param[in] iBegin    Lower bound for sample (inclusive).
+     * @param[in] iEnd      Upper bound for sample (exclusive).
+     *
+     * @return  Pointer to a vector of events.
+     */
+    std::unique_ptr<std::vector<EVENTSLIB::Event> > getEventsToDisplay(int iBegin, int iEnd) const;
 
 private:
     //=========================================================================================================
@@ -635,7 +650,7 @@ private:
 
     QColor                              m_colBackground;                            /**< The background color.*/
 
-    static EVENTSLIB::EventManager      m_EventManager;
+    static EVENTSLIB::EventManager      m_EventManager;                             /**< Database for storing events and using shared memory. Shared between all instances */
 
 signals:
     //=========================================================================================================
