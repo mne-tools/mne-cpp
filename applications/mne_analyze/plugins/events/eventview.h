@@ -256,6 +256,10 @@ private slots:
      */
     void createGroupsFromTriggers();
 
+    //=========================================================================================================
+    /**
+     * Redraws groups based on EventModel
+     */
     void redrawGroups();
 
 private:

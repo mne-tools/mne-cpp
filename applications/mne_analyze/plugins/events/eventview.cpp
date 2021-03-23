@@ -137,7 +137,7 @@ void EventView::initGUIFunctionality()
 
     //'Activate events' checkbox
     connect(m_pUi->m_checkBox_activateEvents, &QCheckBox::stateChanged,
-            this, &EventView::onActiveEventsChecked, Qt::UniqueConnection);
+            this, &EventView::activeEventsChecked, Qt::UniqueConnection);
 
     //'Show selected event' checkbox
     connect(m_pUi->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged,
@@ -220,6 +220,10 @@ void EventView::addEventToModel(int iSamplePos)
         return;
     }
 
+    if(!m_pAnnModel->getNumberOfGroups()){
+        addEventGroup();
+    }
+
     m_pAnnModel->addEvent(iSamplePos);
 
     emit triggerRedraw();
@@ -288,8 +292,6 @@ void EventView::removeEvent()
 
 void EventView::addEventGroup()
 {
-    qDebug() << "EventView::addNewEventType";
-
     newUserGroup(m_pUi->lineEdit->text(), m_pUi->m_spinBox_addEventType->value());
 }
 
@@ -310,7 +312,7 @@ void EventView::disconnectFromModel()
     disconnect(m_pAnnModel.data(),&ANSHAREDLIB::EventModel::dataChanged,
             this, &EventView::onDataChanged);
     disconnect(m_pUi->m_checkBox_activateEvents, &QCheckBox::stateChanged,
-            this, &EventView::onActiveEventsChecked);
+            this, &EventView::activeEventsChecked);
     disconnect(m_pUi->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged,
             this, &EventView::onSelectedEventsChecked);
     disconnect(m_pAnnModel.data(), &ANSHAREDLIB::EventModel::updateEventTypes,
@@ -390,18 +392,14 @@ bool EventView::newUserGroup(const QString& sName,
                                           bool bDefaultColor)
 {
     if(!m_pAnnModel){
-        qDebug() << "returning false 1";
         return false;
     }
-
-    qDebug() << "EventView::newUserGroup";
 
     QColor groupColor;
 
     if (!bDefaultColor) {
         groupColor = m_pColordialog->getColor(Qt::black, this);
         if(!groupColor.isValid()){
-            qDebug() << "returning false 2";
             return false;
         }
     } else {
@@ -410,7 +408,7 @@ bool EventView::newUserGroup(const QString& sName,
 
     m_pAnnModel->addGroup(sName, groupColor);
 
-    m_pUi->lineEdit->setText("New Group "/* + QString::number(iCat + 1)*/);
+    m_pUi->lineEdit->setText("New Group"/* + QString::number(iCat + 1)*/);
 
     return true;
 }
@@ -671,7 +669,7 @@ void EventView::redrawGroups()
     if(!m_pAnnModel){
         return;
     }
-    auto groups = m_pAnnModel->getGroupsToDraw();
+    auto groups = m_pAnnModel->getGroupsToDisplay();
     auto selection = m_pAnnModel->getSelectedGroups();
 
     m_pUi->m_listWidget_groupListWidget->clear();
