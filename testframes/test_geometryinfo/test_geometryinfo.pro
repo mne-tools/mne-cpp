@@ -65,6 +65,7 @@ LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lmnecppDisp3Dd \
             -lmnecppDispd \
+            -lmnecppEventsd \
             -lmnecppRtProcessingd \
             -lmnecppConnectivityd \
             -lmnecppInversed \
@@ -76,6 +77,7 @@ CONFIG(debug, debug|release) {
 } else {
     LIBS += -lmnecppDisp3D \
             -lmnecppDisp \
+            -lmnecppEvents \
             -lmnecppRtProcessing \
             -lmnecppConnectivity \
             -lmnecppInverse \

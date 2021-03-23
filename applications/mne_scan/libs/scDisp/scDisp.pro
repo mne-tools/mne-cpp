@@ -66,6 +66,7 @@ CONFIG(debug, debug|release) {
     LIBS += -lscMeasd \
             -lmnecppDisp3Dd \
             -lmnecppDispd \
+            -lmnecppEventsd \
             -lmnecppRtProcessingd \
             -lmnecppConnectivityd \
             -lmnecppInversed \
@@ -74,11 +75,11 @@ CONFIG(debug, debug|release) {
             -lmnecppFiffd \
             -lmnecppFsd \
             -lmnecppUtilsd \
-            -lmnecppEventsd \
 } else {
     LIBS += -lscMeas \
             -lmnecppDisp3D \
             -lmnecppDisp \
+            -lmnecppEvents \
             -lmnecppRtProcessing \
             -lmnecppConnectivity \
             -lmnecppInverse \
@@ -87,7 +88,6 @@ CONFIG(debug, debug|release) {
             -lmnecppFiff \
             -lmnecppFs \
             -lmnecppUtils \
-            -lmnecppEvents \
 }
 
 SOURCES += \
