@@ -50,7 +50,7 @@
 
 //=============================================================================================================
 /**
- * Delegate for the annotations and annotation manager
+ * Delegate for the events and event manager
  */
 class EventDelegate : public QItemDelegate
 {
@@ -62,18 +62,6 @@ public:
     void setEditorData(QWidget *editor, const QModelIndex &index) const;
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-
-//    bool eventFilter(QObject *object, QEvent *event);
-private slots:
-
-//    void onSampleValueChanged(int iValue);
-
-//    void onTimeValueChanged(double dValue);
-
-//signals:
-
-//    void sampleValueChanged(int iValue);
-//    void timeValueChanged(double dValue);
 };
 
 #endif // EVENTDELEGATE_H

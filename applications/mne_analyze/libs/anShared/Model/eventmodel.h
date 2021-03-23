@@ -2,13 +2,14 @@
 /**
  * @file     eventmodel.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Gabriel Motta <gbmotta@mgh.harvard.edu>
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>;
+ *           Juan Garcia-Prieto <juangpc@gmail.com>
  * @since    0.1.0
  * @date     March, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2020, Christoph Dinh, Lorenz Esch, Gabriel Motta. All rights reserved.
+ * Copyright (C) 2020, Christoph Dinh, Lorenz Esch, Gabriel Motta, Juan Garcia-Prieto. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Declaration of the AnnotationModel Class.
+ * @brief    Declaration of the EventModel Class.
  *
  */
 
-#ifndef ANSHAREDLIB_ANNOTATIONMODEL_H
-#define ANSHAREDLIB_ANNOTATIONMODEL_H
+#ifndef ANSHAREDLIB_EVENTMODEL_H
+#define ANSHAREDLIB_EVENTMODEL_H
 
 //=============================================================================================================
 // INCLUDES
@@ -80,12 +81,12 @@ class ANSHAREDSHARED_EXPORT EventModel : public AbstractModel
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<EventModel> SPtr;              /**< Shared pointer type for AnnotationModel. */
-    typedef QSharedPointer<const EventModel> ConstSPtr;   /**< Const shared pointer type for AnnotationModel. */
+    typedef QSharedPointer<EventModel> SPtr;              /**< Shared pointer type for EventModel. */
+    typedef QSharedPointer<const EventModel> ConstSPtr;   /**< Const shared pointer type for EventModel. */
 
     //=========================================================================================================
     /**
-     * Constructs an annotation model
+     * Constructs an event model
      *
      * @param[in] parent   QObject parent of the model.
      */
@@ -106,7 +107,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Destructs an annotation model.
+     * Destructs an event model.
      */
     ~EventModel();
 
@@ -252,67 +253,67 @@ public:
 
     //=========================================================================================================
     /**
-     * Return number of annotations to be displayed, based on current filter parameters
+     * Return number of events to be displayed, based on current filter parameters
      *
-     * @return number on annotations to display.
+     * @return number on events to display.
      */
     int getNumberOfEvents() const;
 
     //=========================================================================================================
     /**
-     * Return annotation stored at index given by input parameter
+     * Return event stored at index given by input parameter
      *
-     * @param[in] iIndex   Index of the annotation to be retreived.
+     * @param [in] iIndex   Index of the event to be retreived.
      *
-     * @return Returns annotation at index given by input parameter.
+     * @return Returns event at index given by input parameter.
      */
     int getEvent(int iIndex) const;
 
     //=========================================================================================================
     /**
-     * Returns map of the colors assigned to each of the annotation types
+     * Returns map of the colors assigned to each of the event types
      *
-     * @return Map of annotation colors.
+     * @return Map of event colors.
      */
     QMap<int, QColor>& getTypeColors();
 
     //=========================================================================================================
     /**
-     * Returns map of the colors assigned to each of the annotation groups
+     * Returns map of the colors assigned to each of the event groups
      *
-     * @return Map of annotation colors.
+     * @return Map of event colors.
      */
     QMap<int, QColor>& getGroupColors();
 
     //=========================================================================================================
     /**
-     * Adds a new annotation type with the input parameters as configuration parameters
+     * Adds a new event type with the input parameters as configuration parameters
      *
      * @param[in] eventType    type number (0-99).
      * @param[in] typeColor    color to be used for drawing.
      */
-    void addNewAnnotationType(const QString &eventType,
+    void addNewEventType(const QString &eventType,
                               const QColor &typeColor);
 
     //=========================================================================================================
     /**
-     * Pass which annotations are currenlty selected in the view GUI
+     * Pass which events are currenlty selected in the view GUI
      *
-     * @param[in] iSelected    currently selected annotation.
+     * @param[in] iSelected    currently selected event/
      */
     void setSelectedAnn(int iSelected);
 
     //=========================================================================================================
     /**
-     * Returns currently selected annotation stored locally in the model
+     * Returns currently selected event stored locally in the model
      *
-     * @return Returns stored selected annotation.
+     * @return Returns stored selected event
      */
     int getSelectedAnn();
 
     //=========================================================================================================
     /**
-     * Sets whether only to show selected annotations
+     * Sets whether only to show selected events
      *
      * @param[in] iSelectedState   whether to show only selected. 0 - no, 2 - yes.
      */
@@ -320,15 +321,15 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns whther to only show selected annotations
+     * Returns whther to only show selected events
      *
-     * @return whther to show selected annotations.
+     * @return whther to show selected events.
      */
     int getShowSelected();
 
     //=========================================================================================================
     /**
-     * Returns sample freqency
+     * Returns sample freqency.
      *
      * @return sample frequency.
      */
@@ -360,11 +361,11 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns formatted matrix with annotation data based on current display and type settings
+     * Returns formatted matrix with event data based on current display and type settings
      *
-     * @return Returns a matrix of formatted annotation data.
+     * @return Returns a matrix of formatted event data.
      */
-    MatrixXi getAnnotationMatrix(int iGroup = 9999);
+    MatrixXi getEventMatrix(int iGroup = 9999);
 
     //=========================================================================================================
     /**
@@ -389,9 +390,13 @@ public:
 
     //=========================================================================================================
     /**
-     * The type of this model (AnnotationModel)
+     * The type of this model (EventModel)
      *
+<<<<<<< HEAD
      * @return The type of this model (AnnotationModel).
+=======
+     * @return The type of this model (EventModel)
+>>>>>>> MAINT: renaming and cleaning up
      */
     inline MODEL_TYPE getType() const override;
 
@@ -428,7 +433,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns FiffRawViewModel associated with this annotation model
+     * Returns FiffRawViewModel associated with this event model
      *
      * @return pointer to cooresponding FiffRawViewModel.
      */
@@ -533,7 +538,7 @@ private:
 
 inline MODEL_TYPE EventModel::getType() const
 {
-    return MODEL_TYPE::ANSHAREDLIB_ANNOTATION_MODEL;
+    return MODEL_TYPE::ANSHAREDLIB_EVENT_MODEL;
 }
 
 //=============================================================================================================
@@ -553,4 +558,4 @@ QModelIndex EventModel::index(int row, int column, const QModelIndex &parent) co
 }
 
 }
-#endif // ANSHAREDLIB_ANNOTATIONMODEL_H
+#endif // ANSHAREDLIB_EVENTMODEL_H

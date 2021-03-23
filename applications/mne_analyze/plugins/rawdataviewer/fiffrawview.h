@@ -199,14 +199,14 @@ public:
 
     //=========================================================================================================
     /**
-     * Brings up a menu for interacting with data annotations
+     * Brings up a menu for interacting with data events.
      * @param[in] pos   Position on screen where the menu will show up.
      */
     void customContextMenuRequested(const QPoint &pos);
 
     //=========================================================================================================
     /**
-     * Create a new annotation
+     * Create a new event
      *
      * @param[in] con   Whether a new annotaton should be created;.
      */
@@ -214,7 +214,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Controls toggling of annotation data
+     * Controls toggling of event data
      *
      * @param[in] iToggle   Sets toggle: 0 - don't show, 1+ - show.
      */
@@ -228,9 +228,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Moves data viewer to a position where the selected annotation is in the middle of the viewer.
+     * Moves data viewer to a position where the selected event is in the middle of the viewer.
      */
-    void updateScrollPositionToAnnotation();
+    void updateScrollPositionToEvent();
 
     //=========================================================================================================
     /**
@@ -307,7 +307,7 @@ public:
 signals:
     //=========================================================================================================
     /**
-     * Emits sample number to be added aan annotation
+     * Emits sample number to be added aan event
      *
      * @param[in] iSample      sample number to be added.
      */

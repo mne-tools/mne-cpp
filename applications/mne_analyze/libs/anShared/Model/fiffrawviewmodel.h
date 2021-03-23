@@ -394,7 +394,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Get sample annotation at iIndex
+     * Get sample event at iIndex
      *
      * @param[in] index     Index of sample data we want to retreive.
      *
@@ -404,9 +404,13 @@ public:
 
     //=========================================================================================================
     /**
-     * Get how many annotations we have
+     * Get how many events we have
      *
+<<<<<<< HEAD
      * @return number of saved annotations.
+=======
+     * @return number of saved events
+>>>>>>> MAINT: renaming and cleaning up
      */
     int getTimeListSize() const;
 
@@ -428,27 +432,31 @@ public:
 
     //=========================================================================================================
     /**
-     * Toggle whether to dipslay annotations
+     * Toggle whether to dipslay events
      *
      * @param[in] iToggleDisp   0 for no, 1+ for yes.
      */
-    void toggleDispAnnotation(int iToggleDisp);
+    void toggleDispEvent(int iToggleDisp);
 
     //=========================================================================================================
     /**
-     * Returns wheter annotations hould be displayed
+     * Returns wheter events hould be displayed
      *
      * @return m_bDispAnn.
      */
-    bool shouldDisplayAnnotation() const;
+    bool shouldDisplayEvent() const;
 
     //=========================================================================================================
     /**
-     * Returns shared pointer to associated Annotation model for the FiffRawView model
+     * Returns shared pointer to associated Event model for the FiffRawView model
      *
+<<<<<<< HEAD
      * @return shared pointer to the annotation model.
+=======
+     * @return shared pointer to the event model
+>>>>>>> MAINT: renaming and cleaning up
      */
-    QSharedPointer<EventModel> getAnnotationModel() const;
+    QSharedPointer<EventModel> getEventModel() const;
 
     //=========================================================================================================
     /**
@@ -508,19 +516,27 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns whether the model has an associated AnnotationModel
+     * Returns whether the model has an associated EventModel
      *
+<<<<<<< HEAD
      * @return true if there is an AnnotationModel, false if not.
+=======
+     * @return true if there is an EventModel, false if not
+>>>>>>> MAINT: renaming and cleaning up
      */
     bool hasSavedEvents();
 
     //=========================================================================================================
     /**
-     * Sets the associated AnnotationModel to pModel
+     * Sets the associated EventModel to pModel
      *
+<<<<<<< HEAD
      * @param[in] pModel   associated annotation model.
+=======
+     * @param [in] pModel   associated event model
+>>>>>>> MAINT: renaming and cleaning up
      */
-    void setAnnotationModel(QSharedPointer<ANSHAREDLIB::EventModel> pModel);
+    void setEventModel(QSharedPointer<ANSHAREDLIB::EventModel> pModel);
 
     void setScrollerSample(int iScrollerPos);
 
@@ -650,11 +666,11 @@ private:
     FIFFLIB::FiffFileSharer                     m_FileSharer;                               /**<  Handles receiving files from shared directory for receving from realtime recording. */
 
     qint32                                      m_iScrollPos;                               /**< Position of the scrollbar. */
-
-    bool                                        m_bDispAnnotation;                          /**< Whether annotations wil be shown. */
+                      /**< Model to stored annotations to be displayed. */
+    bool                                        m_bDispEvent;                          /**< Whether events wil be shown. */
     bool                                        m_bRealtime;
 
-    QSharedPointer<EventModel>             m_pAnnotationModel;                         /**< Model to stored annotations to be displayed. */
+    QSharedPointer<EventModel>             m_pEventModel;                         /**< Model to stored events to be displayed. */
 
 signals:
     //=========================================================================================================
@@ -957,21 +973,6 @@ private:
     quint32 m_iRowNumber;
     qint64 m_iNumSamples;
 };
-
-class AnnotationData {
-
-public:
-    inline bool comparator(AnnotationData& A, AnnotationData& B) {
-        return (A.m_iSample > B.m_iSample);
-    }
-private:
-
-    int m_iSample;
-    int m_iEventType;
-
-
-};
-
 
 } // namespace ANSHAREDLIB
 

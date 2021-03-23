@@ -424,7 +424,7 @@ void FiffRawView::toggleDisplayEvent(const int& iToggle)
 
     int m_iToggle = iToggle;
 
-    m_pModel->toggleDispAnnotation(m_iToggle);
+    m_pModel->toggleDispEvent(m_iToggle);
     m_pTableView->viewport()->repaint();
 }
 
@@ -491,13 +491,13 @@ bool FiffRawView::eventFilter(QObject *object, QEvent *event)
 
 //=============================================================================================================
 
-void FiffRawView::updateScrollPositionToAnnotation()
+void FiffRawView::updateScrollPositionToEvent()
 {
     if(!m_pModel) {
         return;
     }
 
-    int iSample = m_pModel->getAnnotationModel()->getEvent(m_pModel->getAnnotationModel()->getSelectedAnn()) - m_pModel->absoluteFirstSample();
+    int iSample = m_pModel->getEventModel()->getEvent(m_pModel->getEventModel()->getSelectedAnn()) - m_pModel->absoluteFirstSample();
     double dDx = m_pModel->pixelDifference();
 
     //qDebug() << "Div:" << iSample * dDx;
