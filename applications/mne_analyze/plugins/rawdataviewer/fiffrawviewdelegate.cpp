@@ -319,7 +319,7 @@ void FiffRawViewDelegate::createEventsPath(const QModelIndex &index,
     float fBottom = option.rect.bottomRight().y();
     float fInitX = path.currentPosition().x();
 
-    auto events = t_pAnnModel->getEventsToDraw(iStart, iStart + data.size());
+    auto events = t_pAnnModel->getEventsToDisplay(iStart, iStart + data.size());
     if (!t_pAnnModel->getShowSelected()){
         // Paint all events
         for(auto event : *events){
