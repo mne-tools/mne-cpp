@@ -71,7 +71,7 @@ int EventSharedMemManager::m_iLastUpdateIndex(0);
 // The limiting factor in the bandwitdh of the shared memory capabilities of this library
 // is measured in terms of buffer length divided by the time interval between checks for updates.
 // So, in order to say: The library is capable of correctly handle a
-// maximum of "sharedMemBufferLength"/"m_fTimerCheckBuffer" events per second.
+// maximum of "sharedMemBufferLength"/"m_fTimerCheckBuffer" events per milisecond.
 constexpr static int bufferLength(5);
 static long long defatult_timerBufferWatch(200);
 

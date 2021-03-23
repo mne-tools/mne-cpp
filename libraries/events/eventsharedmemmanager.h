@@ -80,26 +80,25 @@ namespace EVENTSINTERNAL {
 enum EventUpdateType{ NULL_EVENT, NEW_EVENT, DELETE_EVENT};
 
 /**
- * typeString Allows for a coherent
+ * Allows for a text description of each option in enum EventUpdateType.
  */
 const std::string EventUpdateTypeString[3] = {"Null Event", "New Event", "Delete Event"};
 
 /**
  * The EventUpdate class serves as a minimal class definition to store updates in the shared memory buffer.
- * The updates are events that happened and need to be followed by a shared memory reader object to process them
- * further.
+ * The updates are events that happened and need to be processed by a shared memory reader object.
  */
 struct EventUpdate
 {
 public:
 
     /**
-     * EventUpdate
+     * Constructor.
      */
     EventUpdate();
 
     /**
-     * EventUpdate
+     * Constructor with members defined.
      * @param[in] sample
      * @param[in] creator
      * @param[in] t
@@ -107,46 +106,46 @@ public:
     EventUpdate(int sample, int creator, enum EventUpdateType t);
 
     /**
-     * getCreationTime
-     * @return
+     * Retrieve the creation time.
+     * @return A long integer with the creation time.
      */
     long long getCreationTime() const;
 
     /**
-     * getSample
-     * @return
+     * Retrieve the sample number.
+     * @return Sample.
      */
     int getSample() const;
 
     /**
-     * getCreatorId
-     * @return
+     * retrieve the creator's id.
+     * @return Creator's id.
      */
     int getCreatorId() const;
 
     /**
-     * getType
-     * @return
+     * Retrieve the type.
+     * @return Type.
      */
     enum EventUpdateType getType() const;
 
     /**
-     * setType
+     * set the type of the event update.
      * @param[in] t
      */
     void setType(enum EventUpdateType t);
 
     /**
-     * eventTypeToText
+     * Retrieve a text descriptive tag for each option in the type of update variable.
      * @return
      */
     std::string eventTypeToText();
 
 protected:
-    int                     m_EventSample;  /**< */
-    int                     m_CreatorId;    /**< */
-    long long               m_CreationTime; /**< */
-    enum EventUpdateType    m_TypeOfUpdate; /**< */
+    int                     m_EventSample;  /**< Sample for the event. */
+    int                     m_CreatorId;    /**< Id of the creator. */
+    long long               m_CreationTime; /**< Creation time point. */
+    enum EventUpdateType    m_TypeOfUpdate; /**< Type of update. */
 };
 
 /**
@@ -157,7 +156,7 @@ class EventSharedMemManager
 public:
     /**
      * EventSharedMemManager
-     * @param[in] parent
+     * @param[in] Pointer to Parent
      */
     explicit EventSharedMemManager(EVENTSLIB::EventManager* parent = nullptr);
 
@@ -183,10 +182,11 @@ public:
     void stop();
 
     /**
-     * addEvent
+     * Add an event.
      * @param[in] sample
      */
     void addEvent(int sample);
+
     /**
      * deleteEvent
      * @param[in] sample
@@ -255,7 +255,7 @@ private:
 
     /**
      * processDeleteEvent
-     * @param[in] n
+     * @param[in] EventUpdate.
      */
     void processDeleteEvent(const EventUpdate& n);
 
@@ -295,7 +295,7 @@ private:
      */
     void createGroupIfNeeded();
 
-    static int                          m_iLastUpdateIndex;             /**<  */
+    static int                          m_iLastUpdateIndex;             /**<  The last position in the buffer to be updated.*/
     EVENTSLIB::EventManager*            m_pEventManager;                /**<  */
     QSharedMemory                       m_SharedMemory;                 /**<  */
     std::atomic_bool                    m_IsInit;                       /**<  */
