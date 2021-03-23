@@ -310,8 +310,8 @@ private:
     long long                           m_lastCheckTime;                /**<  */
     EventUpdate*                        m_LocalBuffer;                  /**<  */
     EventUpdate*                        m_SharedBuffer;                 /**<  */
-    int                                 m_Id;                           /**<  */
-    enum EVENTSLIB::SharedMemoryMode    m_Mode;                         /**<  */
+    int                                 m_Id;                           /**<  Stores the creator Id.*/
+    enum EVENTSLIB::SharedMemoryMode    m_Mode;                         /**<  Shared memory working mode.*/
 };
 
 /**
