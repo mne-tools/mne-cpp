@@ -64,6 +64,7 @@ contains(MNECPP_CONFIG, static) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lmnecppDispd \
+            -lmnecppEventsd \
             -lmnecppRtProcessingd \
             -lmnecppInversed \
             -lmnecppFwdd \
@@ -74,6 +75,7 @@ CONFIG(debug, debug|release) {
             -lmnecppEventsd \
 } else {
     LIBS += -lmnecppDisp \
+            -lmnecppEvents \
             -lmnecppRtProcessing \
             -lmnecppInverse \
             -lmnecppFwd \

@@ -65,11 +65,13 @@ LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lanSharedd \
             -lmnecppDispd \
+            -lmnecppEventsd \
             -lmnecppFiffd \
             -lmnecppUtilsd \
 } else {
     LIBS += -lanShared \
             -lmnecppDisp \
+            -lmnecppEvents \
             -lmnecppFiff \
             -lmnecppUtils \
 }

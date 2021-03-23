@@ -60,6 +60,7 @@ LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lanSharedd \
             -lmnecppDispd \
+            -lmnecppEventsd \
             -lmnecppConnectivityd \
             -lmnecppRtProcessingd \
             -lmnecppInversed \
@@ -71,6 +72,7 @@ CONFIG(debug, debug|release) {
 } else {
     LIBS += -lanShared \
             -lmnecppDisp \
+            -lmnecppEvents \
             -lmnecppConnectivity \
             -lmnecppRtProcessing \
             -lmnecppInverse \

@@ -60,6 +60,7 @@ contains(MNECPP_CONFIG, static) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lmnecppDispd \
+            -lmnecppEventsd \
             -lmnecppFiffd \
             -lmnecppUtilsd \
             -lscMeasd \
@@ -67,6 +68,7 @@ CONFIG(debug, debug|release) {
             -lscShared
 } else {
     LIBS += -lmnecppDisp \
+            -lmnecppEvents \
             -lmnecppFiff \
             -lmnecppUtils \
             -lscMeas \
