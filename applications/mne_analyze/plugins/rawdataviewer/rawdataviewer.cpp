@@ -158,10 +158,10 @@ void RawDataViewer::handleEvent(QSharedPointer<Event> e)
         }
         break;
     case EVENT_TYPE::TRIGGER_VIEWER_MOVE:
-        m_pFiffRawView->updateScrollPositionToAnnotation();
+        m_pFiffRawView->updateScrollPositionToEvent();
         break;
     case EVENT_TYPE::TRIGGER_ACTIVE_CHANGED:
-        m_pFiffRawView->getModel()->toggleDispAnnotation(e->getData().toInt());
+        m_pFiffRawView->getModel()->toggleDispEvent(e->getData().toInt());
         m_pFiffRawView->updateView();
         break;
     case EVENT_TYPE::SELECTED_MODEL_CHANGED:
@@ -247,9 +247,9 @@ void RawDataViewer::onModelChanged(QSharedPointer<AbstractModel> pNewModel)
         }
 
         m_pFiffRawView->setModel(qSharedPointerCast<FiffRawViewModel>(pNewModel));
-    } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_ANNOTATION_MODEL) {
+    } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_EVENT_MODEL) {
         if (qSharedPointerCast<EventModel>(pNewModel)->getFiffModel() == m_pFiffRawView->getModel()){
-            m_pFiffRawView->getModel()->setAnnotationModel(qSharedPointerCast<EventModel>(pNewModel));
+            m_pFiffRawView->getModel()->setEventModel(qSharedPointerCast<EventModel>(pNewModel));
         }
     }
 }
@@ -261,7 +261,7 @@ void RawDataViewer::onSendSamplePos(int iSample)
     QVariant data;
     data.setValue(iSample);
 
-    m_pCommu->publishEvent(EVENT_TYPE::NEW_ANNOTATION_ADDED, data);
+    m_pCommu->publishEvent(EVENT_TYPE::NEW_EVENT_ADDED, data);
 }
 
 //=============================================================================================================

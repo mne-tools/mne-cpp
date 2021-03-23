@@ -135,11 +135,11 @@ void EventView::initMVCSettings()
 void EventView::initGUIFunctionality()
 {
 
-    //'Activate annotations' checkbox
+    //'Activate events' checkbox
     connect(m_pUi->m_checkBox_activateEvents, &QCheckBox::stateChanged,
             this, &EventView::onActiveEventsChecked, Qt::UniqueConnection);
 
-    //'Show selected annotation' checkbox
+    //'Show selected event' checkbox
     connect(m_pUi->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged,
             this, &EventView::onSelectedEventsChecked, Qt::UniqueConnection);
     connect(m_pUi->m_tableView_eventTableView->selectionModel(), &QItemSelectionModel::selectionChanged,
@@ -149,7 +149,7 @@ void EventView::initGUIFunctionality()
 //    connect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
 //            this, &EventView::onShowAllChecked, Qt::UniqueConnection);
 
-    //Annotation types combo box
+    //Event types combo box
     connect(m_pAnnModel.data(), &ANSHAREDLIB::EventModel::updateEventTypes,
             this, &EventView::updateComboBox, Qt::UniqueConnection);
 
@@ -200,21 +200,21 @@ void EventView::onActiveEventsChecked(int iCheckBoxState)
 
 //=============================================================================================================
 
-void EventView::updateComboBox(const QString &currentAnnotationType)
+void EventView::updateComboBox(const QString &currentEventType)
 {
     m_pUi->m_comboBox_filterTypes->clear();
     m_pUi->m_comboBox_filterTypes->addItem("All");
     m_pUi->m_comboBox_filterTypes->addItems(m_pAnnModel->getEventTypeList());
-//    if(m_pAnnModel->getEventTypeList().contains(currentAnnotationType))
-//        m_pUi->m_comboBox_filterTypes->setCurrentText(currentAnnotationType);
+//    if(m_pAnnModel->getEventTypeList().contains(currentEventType))
+//        m_pUi->m_comboBox_filterTypes->setCurrentText(currentEventType);
 
-//    m_pAnnModel->setLastType(currentAnnotationType.toInt());
+//    m_pAnnModel->setLastType(currentEventType.toInt());
     emit triggerRedraw();
 }
 
 //=============================================================================================================
 
-void EventView::addAnnotationToModel(int iSamplePos)
+void EventView::addEventToModel(int iSamplePos)
 {
     if(!m_pAnnModel){
         return;
@@ -288,7 +288,7 @@ void EventView::removeEvent()
 
 void EventView::addEventGroup()
 {
-    qDebug() << "EventView::addNewAnnotationType";
+    qDebug() << "EventView::addNewEventType";
 
     newUserGroup(m_pUi->lineEdit->text(), m_pUi->m_spinBox_addEventType->value());
 }
@@ -354,7 +354,7 @@ void EventView::onSaveButton()
     m_pAnnModel->saveToFile("");
     #else
     QString fileName = QFileDialog::getSaveFileName(Q_NULLPTR,
-                                                    tr("Save Annotations"), "",
+                                                    tr("Save Events"), "",
                                                     tr("Event file (*.eve);;All Files (*)"));
 
     if (fileName.isEmpty()) {

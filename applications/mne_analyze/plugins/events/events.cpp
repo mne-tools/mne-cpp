@@ -129,13 +129,13 @@ QDockWidget *Events::getControl()
     connect(pEventView, &EventView::jumpToSelected,
             this, &Events::onJumpToSelected, Qt::UniqueConnection);
 
-    connect(this, &Events::newAnnotationAvailable,
-            pEventView, &EventView::addAnnotationToModel, Qt::UniqueConnection);
+    connect(this, &Events::newEventAvailable,
+            pEventView, &EventView::addEventToModel, Qt::UniqueConnection);
 
     connect(this, &Events::disconnectFromModel,
             pEventView, &EventView::disconnectFromModel, Qt::UniqueConnection);
 
-    connect(this, &Events::newAnnotationModelAvailable,
+    connect(this, &Events::newEventModelAvailable,
             pEventView, &EventView::setModel, Qt::UniqueConnection);
 
     connect(this, &Events::newFiffRawViewModel,
@@ -172,8 +172,8 @@ QWidget *Events::getView()
 void Events::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    case EVENT_TYPE::NEW_ANNOTATION_ADDED:
-        emit newAnnotationAvailable(e->getData().toInt());
+    case EVENT_TYPE::NEW_EVENT_ADDED:
+        emit newEventAvailable(e->getData().toInt());
         onTriggerRedraw();
         break;
     case EVENT_TYPE::SELECTED_MODEL_CHANGED:
@@ -192,7 +192,7 @@ void Events::handleEvent(QSharedPointer<Event> e)
 QVector<EVENT_TYPE> Events::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
-    temp.push_back(NEW_ANNOTATION_ADDED);
+    temp.push_back(NEW_EVENT_ADDED);
     temp.push_back(SELECTED_MODEL_CHANGED);
     temp.push_back(MODEL_REMOVED);
 
@@ -208,21 +208,21 @@ void Events::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel
         FiffRawViewModel::SPtr pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
 
         if(pFiffRawModel->hasSavedEvents()){
-            emit newAnnotationModelAvailable(pFiffRawModel->getAnnotationModel());
+            emit newEventModelAvailable(pFiffRawModel->getEventModel());
         } else {
             QSharedPointer<EventModel> pAnnModel = QSharedPointer<EventModel>::create(pFiffRawModel);
             if (pFiffRawModel->isRealtime()){
                 pAnnModel->setSharedMemory(true);
             }
-            emit newAnnotationModelAvailable(pAnnModel);
+            emit newEventModelAvailable(pAnnModel);
             m_pAnalyzeData->addModel<ANSHAREDLIB::EventModel>(pAnnModel,
                                                                    "Events");
         }
         emit newFiffRawViewModel(pFiffRawModel);
-    } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_ANNOTATION_MODEL) {
+    } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_EVENT_MODEL) {
         emit disconnectFromModel();
         EventModel::SPtr pAnnModel = qSharedPointerCast<EventModel>(pNewModel);
-        emit newAnnotationModelAvailable(pAnnModel);
+        emit newEventModelAvailable(pAnnModel);
     }
 }
 
@@ -274,7 +274,7 @@ void Events::triggerLoadingEnd(const QString& sMessage)
 
 void Events::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
-    if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_ANNOTATION_MODEL || pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+    if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_EVENT_MODEL || pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
         emit clearView(pRemovedModel);
     }
 }

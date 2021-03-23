@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
- * @file     annotationmodel.cpp
+ * @file     event.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Gabriel Motta <gbmotta@mgh.harvard.edu>
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>;
+ *           Juan Garcia-Prieto <juangpc@gmail.com>
  * @since    0.1.0
  * @date     March, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2020, Christoph Dinh, Lorenz Esch, Gabriel Motta. All rights reserved.
+ * Copyright (C) 2020, Christoph Dinh, Lorenz Esch, Gabriel Motta, Juan Garcia-Prieto. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the AnnotationModel Class.
+ * @brief    Definition of the EventModel Class.
  *
  */
 
@@ -87,7 +88,7 @@ EventModel::EventModel(QObject* parent)
 , m_fFreq(600)
 , m_sFilterEventType("All")
 {
-    qInfo() << "[AnnotationModel::AnnotationModel] CONSTRUCTOR";
+    qInfo() << "[EventModel::EventModel] CONSTRUCTOR";
     initModel();
 
 }
@@ -434,7 +435,7 @@ int EventModel::getEvent(int iIndex) const
 
 //=============================================================================================================
 
-void EventModel::addNewAnnotationType(const QString &eventType,
+void EventModel::addNewEventType(const QString &eventType,
                                            const QColor &typeColor)
 {
     m_eventTypeColor[eventType.toInt()] = typeColor;
@@ -521,7 +522,7 @@ bool EventModel::saveToFile(const QString& sPath)
 
     QFile file(sPath);
     if (!file.open(QIODevice::WriteOnly)) {
-        qWarning() << "[AnnotationModel::saveToFile] Unable to access file.";
+        qWarning() << "[EventModel::saveToFile] Unable to access file.";
         return false;
     }
 
@@ -552,7 +553,7 @@ void EventModel::appendSelected(int iSelectedIndex)
 
 //=============================================================================================================
 
-MatrixXi EventModel::getAnnotationMatrix(int iGroup)
+MatrixXi EventModel::getEventMatrix(int iGroup)
 {
     MatrixXi matEventDataMatrix;
 

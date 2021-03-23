@@ -152,7 +152,7 @@ QMenu *DataLoader::getMenu()
     QAction* pActionSaveAnn = new QAction(tr("Save events"));
     pActionLoadFile->setStatusTip(tr("Save the selected data file"));
     connect(pActionSaveAnn, &QAction::triggered,[=] {
-                onSaveFilePressed(ANNOTATION_FILE);
+                onSaveFilePressed(EVENT_FILE);
             });
 
     QMenu* pBIDSMenu = new QMenu(tr("Load BIDS Folder"));
@@ -339,8 +339,8 @@ void DataLoader::onSaveFilePressed(FileType type)
             m_pSelectedModel->saveToFile("");
             break;
         }
-        case ANNOTATION_FILE: {
-            m_pSelectedModel->getAnnotationModel()->saveToFile("");
+        case EVENT_FILE: {
+            m_pSelectedModel->getEventModel()->saveToFile("");
 
             break;
         }
@@ -363,7 +363,7 @@ void DataLoader::onSaveFilePressed(FileType type)
             sDir = "/MNE-sample-data";
             break;
         }
-        case ANNOTATION_FILE: {
+        case EVENT_FILE: {
             sFile = tr("Save Events");
             sFileType = tr("Event file(*.eve)");
             sDir = "/MNE-sample-data";
@@ -397,8 +397,8 @@ void DataLoader::onSaveFilePressed(FileType type)
             m_pSelectedModel->saveToFile(sFilePath);
             break;
         }
-        case ANNOTATION_FILE: {
-            m_pSelectedModel->getAnnotationModel()->saveToFile(sFilePath);
+        case EVENT_FILE: {
+            m_pSelectedModel->getEventModel()->saveToFile(sFilePath);
             break;
         }
         case AVERAGE_FILE: {

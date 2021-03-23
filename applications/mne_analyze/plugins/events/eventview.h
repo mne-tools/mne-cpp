@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     annotationview.h
+ * @file     eventview.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.0
@@ -79,7 +79,7 @@ namespace FIFFLIB {
 /**
  * EventView
  *
- * @brief The EventView class provides the GUI for adding and removing annotation.
+ * @brief The EventView class provides the GUI for adding and removing event.
  */
 class EventView : public QWidget
 {
@@ -102,15 +102,16 @@ public:
     /**
      * Updates the GUI combo box with a new item type, given by the input parameter.
      *
-     * @param[in] currentAnnotationType    New annotation type to be added to the combo box.
+     * @param[in] currentEventType    New event type to be added to the combo box.
      */
-    void updateComboBox(const QString &currentAnnotationType);
+    void updateComboBox(const QString &currentEventType);
 
     //=========================================================================================================
     /**
-     * Passes a shared pointer to the annotation model triggers all the relevant init functions
+     * Passes a shared pointer to the event model triggers all the relevant init functions
      *
-     * @param[in] pAnnModel    Pointer to the annotation model of the current loaded file.
+
+     * @param[in] pAnnModel    Pointer to the event model of the current loaded file.
      */
     void setModel(QSharedPointer<ANSHAREDLIB::EventModel> pAnnModel);
 
@@ -129,11 +130,11 @@ public:
 public slots:
     //=========================================================================================================
     /**
-     * Adds input parameter to annotation model as a new annotation.
+     * Adds input parameter to event model as a new event.
      *
-     * @param[in] iSample   Sample number to be added to annotation model.
+     * @param[in] iSample   Sample number to be added to event model.
      */
-    void addAnnotationToModel(int iSamplePos);
+    void addEventToModel(int iSamplePos);
 
     //=========================================================================================================
     /**
@@ -146,7 +147,7 @@ public slots:
 signals:
     //=========================================================================================================
     /**
-     * Emits state of the Activate Annotations checkbox
+     * Emits state of the Activate Events checkbox
      *
      * @param[in] iCheckBoxState   0 for unchecked, 1 for checked.
      */
@@ -188,13 +189,13 @@ protected slots:
 
     //=========================================================================================================
     /**
-     * Removes currently selected annotation from model.
+     * Removes currently selected event from model.
      */
     void removeEvent();
 
     //=========================================================================================================
     /**
-     * Creates new annotation of the type currently on the Spin Box widget.
+     * Creates new event of the type currently on the Spin Box widget.
      */
     void addEventGroup();
 
@@ -216,7 +217,7 @@ protected slots:
 
     //=========================================================================================================
     /**
-     * Sets the current selected annotation in the gui and passes it to the model
+     * Sets the current selected event in the gui and passes it to the model
      */
     void onCurrentSelectedChanged();
 
@@ -237,7 +238,7 @@ private slots:
 
     //=========================================================================================================
     /**
-     * Triggers the save file dialog. Calls the save file function in the Annotation Model
+     * Triggers the save file dialog. Calls the save file function in the Event Model
      */
     void onSaveButton();
 
@@ -343,7 +344,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Used to pass parameters of the currently loaded fif file to the annotation model.
+     * Used to pass parameters of the currently loaded fif file to the event model.
      *
      * @param[in] iFirst   Sample number of the first sample in the file.
      * @param[in] iLast    Sample number of the last sample in the file.
@@ -387,7 +388,7 @@ private:
 
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
 
-    int                                             m_iCheckState;                  /** < State of show annotations checkbox (0 unchecked, 2 checked) */
+    int                                             m_iCheckState;                  /** < State of show events checkbox (0 unchecked, 2 checked) */
     int                                             m_iCheckSelectedState;          /** < State of the show selected checkbox (0 unchecked, 2 checked) */
     int                                             m_iLastSampClicked;             /** < Number of the last sample clicked */
 
@@ -397,7 +398,7 @@ private:
 
     QSharedPointer<DISPLIB::TriggerDetectionView>   m_pTriggerDetectView;           /** < Pointer to viewer to control GUI for detecting triggers */
 
-    QColorDialog*                                   m_pColordialog;                 /** < Used for Prompting users for annotation type colors */
+    QColorDialog*                                   m_pColordialog;                 /** < Used for Prompting users for event type colors */
 
     QFutureWatcher <QMap<double,QList<int>>>        m_FutureWatcher;                /** < Watches m_Future and signals when calculations are done */
     QFuture<QMap<double,QList<int>>>                m_Future;                       /** < Used to perfom trigger detection on a separate thread */

@@ -94,7 +94,7 @@ class DATALOADERSHARED_EXPORT DataLoader : public ANSHAREDLIB::AbstractPlugin
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
 
-    enum FileType {DATA_FILE, AVERAGE_FILE, ANNOTATION_FILE};
+    enum FileType {DATA_FILE, AVERAGE_FILE, EVENT_FILE};
 public:
     //=========================================================================================================
     /**

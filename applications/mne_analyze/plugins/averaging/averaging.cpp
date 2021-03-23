@@ -398,7 +398,7 @@ void Averaging::computeAverage()
     m_Future = QtConcurrent::run(this,
                                  &Averaging::averageCalculation,
                                  *this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data(),
-                                 m_pFiffRawModel->getAnnotationModel()->getAnnotationMatrix(m_iCurrentGroup),
+                                 m_pFiffRawModel->getEventModel()->getEventMatrix(m_iCurrentGroup),
                                  m_filterKernel,
                                  *m_pFiffRawModel->getFiffInfo());
     m_FutureWatcher.setFuture(m_Future);
@@ -616,13 +616,13 @@ void Averaging::updateGroups()
     }
 
     if (m_pFiffRawModel->hasSavedEvents()){
-        auto groups = m_pFiffRawModel->getAnnotationModel()->getGroupsToDraw();
+        auto groups = m_pFiffRawModel->getEventModel()->getGroupsToDraw();
         for (auto group : *groups){
             m_pAveragingSettingsView->addSelectionGroup((group.name).c_str(), group.id);
         }
     }
-//    for(int i = 0; i < m_pFiffRawModel->getAnnotationModel()->getHubSize(); i++){
-//        m_pAveragingSettingsView->addSelectionGroup(m_pFiffRawModel->getAnnotationModel()->getGroupNameFromList(i));
+//    for(int i = 0; i < m_pFiffRawModel->getEventModel()->getHubSize(); i++){
+//        m_pAveragingSettingsView->addSelectionGroup(m_pFiffRawModel->getEventModel()->getGroupNameFromList(i));
 //    }
 }
 

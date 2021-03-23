@@ -131,7 +131,7 @@ private:
 
     //=========================================================================================================
     /**
-     * Toggles whether to show annotations
+     * Toggles whether to show events
      *
      * @param[in] iToggle  0 for not shown, 2 for shown.
      */
@@ -172,9 +172,9 @@ private:
     QSharedPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals. */
 
 signals:
-    void newAnnotationAvailable(int iAnnotation);
+    void newEventAvailable(int iEvent);
     void disconnectFromModel();
-    void newAnnotationModelAvailable(QSharedPointer<ANSHAREDLIB::EventModel> pAnnotModel);
+    void newEventModelAvailable(QSharedPointer<ANSHAREDLIB::EventModel> pAnnotModel);
     void newFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel);
     void clearView(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
 };

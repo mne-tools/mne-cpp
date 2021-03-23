@@ -224,8 +224,8 @@ public:
             index = m_SelectedItem;
             break;
         }
-        case ANSHAREDLIB_ANNOTATION_MODEL: {
-            iType = BIDS_ANNOTATION;
+        case ANSHAREDLIB_EVENT_MODEL: {
+            iType = BIDS_EVENT;
             index = m_SelectedFunctionalData;
             break;
         }
@@ -276,11 +276,11 @@ public:
                                BIDS_AVERAGE);
             break;
         }
-        case ANSHAREDLIB_ANNOTATION_MODEL: {
+        case ANSHAREDLIB_EVENT_MODEL: {
             pItem->setData(data);
             m_pData->addToData(pItem,
                                m_SelectedFunctionalData,
-                               BIDS_ANNOTATION);
+                               BIDS_EVENT);
             break;
         }
         case ANSHAREDLIB_DIPOLEFIT_MODEL:{

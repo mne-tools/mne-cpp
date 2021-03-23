@@ -112,9 +112,9 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_iDistanceTimerSpacer(1000)
 , m_iScroller(0)
 , m_iScrollPos(0)
-, m_bDispAnnotation(true)
+, m_bDispEvent(true)
 , m_bRealtime(false)
-//, m_pAnnotationModel(QSharedPointer<AnnotationModel>::create())
+//, m_pEventModel(QSharedPointer<EventModel>::create())
 {
     // connect data reloading: this will be run concurrently
     connect(&m_blockLoadFutureWatcher, &QFutureWatcher<int>::finished,
@@ -437,8 +437,8 @@ float FiffRawViewModel::getNumberOfTimeSpacers() const
 
 int FiffRawViewModel::getTimeMarks(int iIndex) const
 {
-    if (m_pAnnotationModel){
-        return m_pAnnotationModel->getEvent(iIndex);
+    if (m_pEventModel){
+        return m_pEventModel->getEvent(iIndex);
     } else {
         return 0;
     }
@@ -448,8 +448,8 @@ int FiffRawViewModel::getTimeMarks(int iIndex) const
 
 int FiffRawViewModel::getTimeListSize() const
 {
-    if(m_pAnnotationModel){
-        return m_pAnnotationModel->getNumberOfEvents();
+    if(m_pEventModel){
+        return m_pEventModel->getNumberOfEvents();
     } else {
         return 0;
     }
@@ -471,24 +471,24 @@ int FiffRawViewModel::getTotalBlockCount() const
 
 //=============================================================================================================
 
-void FiffRawViewModel::toggleDispAnnotation(int iToggleDisp)
+void FiffRawViewModel::toggleDispEvent(int iToggleDisp)
 {
-    m_bDispAnnotation = (iToggleDisp ? true : false);
+    m_bDispEvent = (iToggleDisp ? true : false);
 }
 
 //=============================================================================================================
 
-bool FiffRawViewModel::shouldDisplayAnnotation() const
+bool FiffRawViewModel::shouldDisplayEvent() const
 {
-    return (m_bDispAnnotation && getTimeListSize());
+    return (m_bDispEvent && getTimeListSize());
 }
 
 //=============================================================================================================
 
-QSharedPointer<EventModel> FiffRawViewModel::getAnnotationModel() const
+QSharedPointer<EventModel> FiffRawViewModel::getEventModel() const
 {
-    if(m_pAnnotationModel){
-        return m_pAnnotationModel;
+    if(m_pEventModel){
+        return m_pEventModel;
     } else {
         return QSharedPointer<EventModel>::create();
     }
@@ -1018,14 +1018,14 @@ void FiffRawViewModel::reloadAllData()
 
 bool FiffRawViewModel::hasSavedEvents()
 {
-    return m_pAnnotationModel;
+    return m_pEventModel;
 }
 
 //=============================================================================================================
 
-void FiffRawViewModel::setAnnotationModel(QSharedPointer<ANSHAREDLIB::EventModel> pModel)
+void FiffRawViewModel::setEventModel(QSharedPointer<ANSHAREDLIB::EventModel> pModel)
 {
-    m_pAnnotationModel = pModel;
+    m_pEventModel = pModel;
 }
 
 //=============================================================================================================
