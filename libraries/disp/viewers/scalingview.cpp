@@ -185,13 +185,9 @@ ScalingView::~ScalingView()
 
     delete m_pUi;
 
-    while(m_qMapScaleControls.size() > 0)
+    for(auto control : m_qMapScaleControls)
     {
-        if(m_qMapScaleControls.begin().value())
-        {
-            delete m_qMapScaleControls.begin().value();
-            m_qMapScaleControls.remove(m_qMapScaleControls.begin().key());
-        }
+        delete control;
     }
 }
 
