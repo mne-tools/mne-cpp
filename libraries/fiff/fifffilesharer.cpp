@@ -51,6 +51,10 @@
 
 using namespace FIFFLIB;
 
+//=============================================================================================================
+// DEFINE STATIC MEMBERS
+//=============================================================================================================
+
 const static char m_sDefaultDirectory[]("realtime_shared_files");
 const static char m_sDefaultFileName[]("realtime_file");
 
@@ -96,6 +100,7 @@ void FiffFileSharer::copyRealtimeFile(const QString &sSourcePath)
 void FiffFileSharer::initWatcher()
 {
     if(initSharedDirectory()){
+        clearSharedDirectory();
         m_fileWatcher.addPath(m_sDirectory);
         connect(&m_fileWatcher, &QFileSystemWatcher::directoryChanged,
                 this, &FiffFileSharer::onDirectoryChanged, Qt::UniqueConnection);
@@ -103,6 +108,18 @@ void FiffFileSharer::initWatcher()
                 this, &FiffFileSharer::onFileChanged, Qt::UniqueConnection);
     } else {
         qWarning() << "[FiffFileSharer::initWatcher] Unable to initilaize shared directory";
+    }
+}
+
+//=============================================================================================================
+
+void FiffFileSharer::clearSharedDirectory()
+{
+    QDir directory(m_sDirectory);
+    directory.setNameFilters(QStringList("*.*"));
+    directory.setFilter(QDir::Files);
+    for(auto& file : directory.entryList()){
+        directory.remove(file);
     }
 }
 

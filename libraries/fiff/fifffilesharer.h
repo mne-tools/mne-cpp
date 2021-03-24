@@ -103,6 +103,12 @@ private:
 
     //=========================================================================================================
     /**
+     * Clears shared directory of old shared files.
+     */
+    void clearSharedDirectory();
+
+    //=========================================================================================================
+    /**
      * Called when directory QFileSystemWatcher m_fileWatcher is watching gets updated/changed.
      * Adds next realtime file to be watched to m_fileWatcher
      *
