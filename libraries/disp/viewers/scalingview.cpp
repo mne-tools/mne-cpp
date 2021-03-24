@@ -190,6 +190,7 @@ ScalingView::~ScalingView()
         if(m_qMapScaleControls.begin().value())
         {
             delete m_qMapScaleControls.begin().value();
+            m_qMapScaleControls.remove(m_qMapScaleControls.begin().key());
         }
     }
 }
