@@ -101,20 +101,11 @@ public:
 
     //=========================================================================================================
     /**
-     * Updates the GUI combo box with a new item type, given by the input parameter.
-     *
-     * @param[in] currentEventType    New event type to be added to the combo box.
-     */
-    void updateComboBox(const QString &currentEventType);
-
-    //=========================================================================================================
-    /**
      * Passes a shared pointer to the event model triggers all the relevant init functions
      *
-
-     * @param[in] pAnnModel    Pointer to the event model of the current loaded file.
+     * @param[in] pEventModel    Pointer to the event model of the current loaded file.
      */
-    void setModel(QSharedPointer<ANSHAREDLIB::EventModel> pAnnModel);
+    void setModel(QSharedPointer<ANSHAREDLIB::EventModel> pEventModel);
 
     //=========================================================================================================
     /**
@@ -398,7 +389,7 @@ private:
     int                                             m_iLastSampClicked;             /** < Number of the last sample clicked */
 
     QSharedPointer<EventDelegate>                   m_pAnnDelegate;                 /** < Pointer to associated delegate */
-    QSharedPointer<ANSHAREDLIB::EventModel>         m_pAnnModel;                    /** < Pointer to associated model. Points to currently loaded. */
+    QSharedPointer<ANSHAREDLIB::EventModel>         m_pEventModel;                  /** < Pointer to associated model. Points to currently loaded. */
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pFiffRawModel;                /** < Pointer to currently loaded FIffRawViewModel */
 
     QSharedPointer<DISPLIB::TriggerDetectionView>   m_pTriggerDetectView;           /** < Pointer to viewer to control GUI for detecting triggers */

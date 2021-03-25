@@ -497,7 +497,9 @@ void FiffRawView::updateScrollPositionToEvent()
         return;
     }
 
-    int iSample = m_pModel->getEventModel()->getEvent(m_pModel->getEventModel()->getSelectedAnn()) - m_pModel->absoluteFirstSample();
+    auto events = m_pModel->getEventModel()->getEventsToDisplay(0, m_pModel->absoluteLastSample());
+    //int iSample = events->at(m_pModel->getEventModel()->getEventSelection())
+    int iSample = 0;
     double dDx = m_pModel->pixelDifference();
 
     //qDebug() << "Div:" << iSample * dDx;
