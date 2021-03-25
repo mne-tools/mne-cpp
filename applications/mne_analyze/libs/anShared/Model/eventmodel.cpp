@@ -83,14 +83,10 @@ EventModel::EventModel(QObject* parent)
 , m_iFirstSample(0)
 , m_iLastSample(0)
 , m_iSelectedCheckState(0)
-, m_iSelectedAnn(0)
-, m_iLastTypeAdded(0)
 , m_fFreq(600)
-, m_sFilterEventType("All")
 {
     qInfo() << "[EventModel::EventModel] CONSTRUCTOR";
     initModel();
-
 }
 
 //=============================================================================================================
@@ -102,10 +98,7 @@ EventModel::EventModel(QSharedPointer<FiffRawViewModel> pFiffModel,
 , m_iFirstSample(0)
 , m_iLastSample(0)
 , m_iSelectedCheckState(0)
-, m_iSelectedAnn(0)
-, m_iLastTypeAdded(0)
 , m_fFreq(pFiffModel->getSamplingFrequency())
-, m_sFilterEventType("All")
 , m_pFiffModel(pFiffModel)
 {
     initModel();
@@ -123,11 +116,7 @@ EventModel::EventModel(const QString &sFilePath,
 , m_iFirstSample(0)
 , m_iLastSample(0)
 , m_iSelectedCheckState(0)
-, m_iSelectedAnn(0)
-, m_iLastTypeAdded(0)
 , m_fFreq(600)
-, m_sFilterEventType("All")
-
 {
     Q_UNUSED(byteLoadedData)
     Q_UNUSED(fSampFreq)
@@ -141,13 +130,6 @@ EventModel::EventModel(const QString &sFilePath,
 
 EventModel::~EventModel()
 {
-}
-
-//=============================================================================================================
-
-QStringList EventModel::getEventTypeList() const
-{
-    return m_eventTypeList;
 }
 
 //=============================================================================================================
@@ -442,42 +424,6 @@ int EventModel::getEvent(int iIndex) const
 
 //=============================================================================================================
 
-void EventModel::addNewEventType(const QString &eventType,
-                                           const QColor &typeColor)
-{
-    m_eventTypeColor[eventType.toInt()] = typeColor;
-
-    if(!m_eventTypeList.contains(eventType))
-        m_eventTypeList<<eventType;
-
-    m_iLastTypeAdded = eventType.toInt();
-
-    emit updateEventTypes(eventType);
-}
-
-//=============================================================================================================
-
-QMap<int, QColor>& EventModel::getTypeColors()
-{
-    return m_eventTypeColor;
-}
-
-//=============================================================================================================
-
-QMap<int, QColor>& EventModel::getGroupColors()
-{
-    return m_eventGroupColor;
-}
-
-//=============================================================================================================
-
-void EventModel::setSelectedAnn(int iSelected)
-{
-    m_iSelectedAnn = iSelected;
-}
-
-//=============================================================================================================
-
 void EventModel::setShowSelected(int iSelectedState)
 {
     m_iSelectedCheckState = iSelectedState;
@@ -488,13 +434,6 @@ void EventModel::setShowSelected(int iSelectedState)
 int EventModel::getShowSelected()
 {
     return m_iSelectedCheckState;
-}
-
-//=============================================================================================================
-
-int EventModel::getSelectedAnn()
-{
-    return m_iSelectedAnn;
 }
 
 //=============================================================================================================
@@ -778,7 +717,7 @@ void EventModel::setSharedMemory(bool bState)
 
 //=============================================================================================================
 
-std::list<uint> EventModel::getEventSelection() const
+std::vector<uint> EventModel::getEventSelection() const
 {
     return m_listEventSelection;
 }

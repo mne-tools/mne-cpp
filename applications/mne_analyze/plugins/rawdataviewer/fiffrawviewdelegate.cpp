@@ -309,7 +309,7 @@ void FiffRawViewDelegate::createEventsPath(const QModelIndex &index,
                                           QPainter* painter) const
 {
     const FiffRawViewModel* t_pModel = static_cast<const FiffRawViewModel*>(index.model());
-    QSharedPointer<EventModel> t_pAnnModel = t_pModel->getEventModel();
+    QSharedPointer<EventModel> t_pEventModel = t_pModel->getEventModel();
 
     double dDx = t_pModel->pixelDifference();
 
@@ -319,11 +319,11 @@ void FiffRawViewDelegate::createEventsPath(const QModelIndex &index,
     float fBottom = option.rect.bottomRight().y();
     float fInitX = path.currentPosition().x();
 
-    auto events = t_pAnnModel->getEventsToDisplay(iStart, iStart + data.size());
-    if (!t_pAnnModel->getShowSelected()){
+    auto events = t_pEventModel->getEventsToDisplay(iStart, iStart + data.size());
+    if (!t_pEventModel->getShowSelected()){
         // Paint all events
         for(auto event : *events){
-            painter->setPen(QPen(t_pAnnModel->getGroupColor(event.groupId), 1, Qt::SolidLine));
+            painter->setPen(QPen(t_pEventModel->getGroupColor(event.groupId), 1, Qt::SolidLine));
             int eventSample = event.sample;
             painter->drawLine(fInitX + static_cast<float>(eventSample - iStart) * dDx,
                               fTop,
@@ -332,10 +332,10 @@ void FiffRawViewDelegate::createEventsPath(const QModelIndex &index,
         }
     } else {
         // Paint selected events
-        auto selection = t_pAnnModel->getEventSelection();
+        auto selection = t_pEventModel->getEventSelection();
         for(auto item : selection){
             if (item < selection.size()){
-                painter->setPen(QPen(t_pAnnModel->getGroupColor(events->at(item).groupId), 1, Qt::SolidLine));
+                painter->setPen(QPen(t_pEventModel->getGroupColor(events->at(item).groupId), 1, Qt::SolidLine));
                 int eventSample = events->at(item).sample;
                 painter->drawLine(fInitX + static_cast<float>(eventSample - iStart) * dDx,
                                   fTop,
