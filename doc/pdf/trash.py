@@ -12,14 +12,19 @@ import re
 # p = re.compile('<html>(.*\n)*</html>')
 # text2 = p.sub('',text)
 
+juangpc@gmail.com
+
+param\[\w+,?\w*\]\s+(\w+)\s+
+<\s*img\s+src="([A-Za-z0-9/]*)" (?=width)
+
 # print(fp)
 
 # textRe = "[^]]*"
 # imgRe = "\/.*?\.[\w:]+"
 # markupRegex = '!\[({0})]\(\s*({1})\s*\)'.format(textRe, imgRe)
 # imgList = re.findall(markupRegex, str)
-aab
-
+aabbb
+aaaaaa
 # #####################################################
 
 text_to_search = '''
