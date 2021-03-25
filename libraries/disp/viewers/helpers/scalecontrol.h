@@ -81,7 +81,7 @@ public:
     /**
      * Constructs a ScaleControl object who's Qlabel element will be set.
      *
-     * @param[in] label    Text for the Qlabel
+     * @param[in] label    Text for the Qlabel.
      */
      explicit ScaleControl(const char* label);
 
@@ -90,8 +90,8 @@ public:
      * Constructs a ScaleControl object who's Qlabel element will be set, and sets the parent of the underlying
      * QWidget.
      *
-     * @param[in] label    Text for the Qlabel
-     * @param[in] parent   Parent of widget
+     * @param[in] label    Text for the Qlabel.
+     * @param[in] parent   Parent of widget.
      */
     explicit ScaleControl(const char* label,
                           QWidget* parent);
@@ -101,8 +101,8 @@ public:
      * Constructs a ScaleControl object who's Qlabel element will be set, and sets the parent of the underlying
      * QWidget. The min and max values for the control will also be initialized.
      *
-     * @param[in] label    Text for the Qlabel
-     * @param[in] parent   Parent of widget
+     * @param[in] label    Text for the Qlabel.
+     * @param[in] parent   Parent of widget.
      * @param[in] min      Min value of the control.
      * @param[in] max      Max value of the control.
      */
@@ -139,7 +139,7 @@ public:
     /**
      * Set the sensitivity value of the non-linear mapping between the control slider and the control value.
      *
-     * @param[in] s Sensitivity, between [0, 1]
+     * @param[in] s Sensitivity, between [0, 1].
      */
     void setSensitivity(double s);
 
@@ -272,7 +272,7 @@ private:
     /**
      * Member function to addapt the sensitivity value to different range levels.
      *
-     * @param[in] fSensitivity Sensitivity value
+     * @param[in] fSensitivity Sensitivity value.
      * @return Weighted sensitivity value
      */
     inline float weightedSensitivity(float fSensitivity);
