@@ -333,9 +333,47 @@ def parseImagesInline(str):
     else:
         return str
 
+def parseImageFigure2(texFile,str):
+    if str.startswith("!["):
+        captionText = str.split("[")[1].split("]")[0]
+        imageFile = str.split("(")[1].split(")")[0]
+        texFile.write("\n\\begin{figure}[h]")
+        texFile.write("\n\\centering \\includegraphics[width=0.5\\linewidth]{" + imageFile + "}")
+        texFile.write("\n\\caption{" + captionText + ".}")      
+        texFile.write("\n\\label:{fig:" + captionText.replace(" ","_") + "}")      
+        texFile.write("\n\\end{figure}")
+        return True
+    else:
+        return False
+
+# def parseInlineCode(str):
+#     <\s*img\s+src="(?P<imgFile>[a-zA-Z0-9/._^"/_]+)".*width="(?P<imgWidth>[0-9]+).*
+
+def parseHtmlInlineImg(file):
+    fileStr=''
+    pattern = re.compile(r'<\s*img\s+src="(?P<imgFile>[a-zA-Z0-9/._^"/_]+)".*width="(?P<imgWidth>[0-9]+).*')
+    with open(file, 'r', encoding='utf8') as markDownFile:
+        fileStr = markDownFile.read()
+        matches = pattern.finditer(fileStr)
+        for match in matches:
+            captionText = 'Missing caption text'
+            textImg  = '\\begin{figure}[h]\n\\centering \\includegraphics[width=0.5\\linewidth]{' + match.group('imgFile') + '}'
+            textImg += '\n\\caption{' + captionText + '.}'
+            textImg += '\n\\label:{fig:' + captionText.replace(" ","_") + '}'
+            textImg += '\n\\end{figure}'
+            fileStrSplitted = fileStr.split(match[0])
+            fileStr = fileStrSplitted[0] + textImg + fileStrSplitted[1]
+    return fileStr
+
+
+out = parseHtmlInlineImg('C:/projects/mne-cpp/doc/gh-pages/pages/documentation/analyze_coregistration.md')
+
+f = open('C:/projects/mne-cpp/doc/gh-pages/pages/documentation/analyze_coregistration2.md','w+',encoding='utf8')
+
+f.write(out)
+f.close()
+
 # parseWeb(web)
-
-
 
 # !\[[^\]]*\]
 # '(startText)(.+)((?:\n.+)+)(endText)'
@@ -360,3 +398,4 @@ def parseImagesInline(str):
 # ordered lists parsing
 # inbound links vs outbound links
 # parse html image inline tags
+
