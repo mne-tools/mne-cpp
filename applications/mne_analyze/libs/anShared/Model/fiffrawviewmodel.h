@@ -406,11 +406,7 @@ public:
     /**
      * Get how many events we have
      *
-<<<<<<< HEAD
-     * @return number of saved annotations.
-=======
      * @return number of saved events
->>>>>>> MAINT: renaming and cleaning up
      */
     int getTimeListSize() const;
 
@@ -450,11 +446,7 @@ public:
     /**
      * Returns shared pointer to associated Event model for the FiffRawView model
      *
-<<<<<<< HEAD
-     * @return shared pointer to the annotation model.
-=======
-     * @return shared pointer to the event model
->>>>>>> MAINT: renaming and cleaning up
+     * @return shared pointer to the event model.
      */
     QSharedPointer<EventModel> getEventModel() const;
 
@@ -665,12 +657,12 @@ private:
 
     FIFFLIB::FiffFileSharer                     m_FileSharer;                               /**<  Handles receiving files from shared directory for receving from realtime recording. */
 
-    qint32                                      m_iScrollPos;                               /**< Position of the scrollbar. */
-                      /**< Model to stored annotations to be displayed. */
-    bool                                        m_bDispEvent;                          /**< Whether events wil be shown. */
-    bool                                        m_bRealtime;
+    qint32                                      m_iScrollPos;                               /**< Position of the scrollbar */
 
-    QSharedPointer<EventModel>             m_pEventModel;                         /**< Model to stored events to be displayed. */
+    bool                                        m_bDispEvent;                               /**< Whether events wil be shown */
+    bool                                        m_bRealtime;                                /**< Whether this model cooreponds to a realtime mnescan session (fiff file can change) */
+
+    QSharedPointer<EventModel>                  m_pEventModel;                              /**< Model to store events to be displayed. */
 
 signals:
     //=========================================================================================================

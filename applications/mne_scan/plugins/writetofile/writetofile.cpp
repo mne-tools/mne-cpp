@@ -499,7 +499,6 @@ void WriteToFile::setContinuous(int iState)
     m_pActionClipRecording->setVisible(m_bContinuous);
 }
 
-
 //=============================================================================================================
 // This needs to be connected to Hpi fitting plugin
 //void WriteToFile::doContinousHPI(MatrixXf& matData)

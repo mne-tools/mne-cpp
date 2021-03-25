@@ -76,7 +76,7 @@ EventView::EventView()
 : m_pUi(new Ui::EventWindowDockWidget)
 , m_iCheckState(0)
 , m_iLastSampClicked(0)
-, m_pAnnModel(Q_NULLPTR)
+, m_pEventModel(Q_NULLPTR)
 , m_pFiffRawModel(Q_NULLPTR)
 , m_pColordialog(new QColorDialog(this))
 {
@@ -116,8 +116,8 @@ void EventView::reset()
 void EventView::initMVCSettings()
 {
     //Model
-    m_pUi->m_tableView_eventTableView->setModel(m_pAnnModel.data());
-    connect(m_pAnnModel.data(),&ANSHAREDLIB::EventModel::dataChanged,
+    m_pUi->m_tableView_eventTableView->setModel(m_pEventModel.data());
+    connect(m_pEventModel.data(),&ANSHAREDLIB::EventModel::dataChanged,
             this, &EventView::onDataChanged, Qt::UniqueConnection);
 
     //Delegate
@@ -127,7 +127,7 @@ void EventView::initMVCSettings()
     m_pUi->m_tableView_eventTableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     m_pUi->m_tableView_eventTableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
-    connect(m_pAnnModel.data(), &ANSHAREDLIB::EventModel::eventGroupsUpdated,
+    connect(m_pEventModel.data(), &ANSHAREDLIB::EventModel::eventGroupsUpdated,
             this, &EventView::redrawGroups, Qt::UniqueConnection);
 }
 
@@ -149,10 +149,6 @@ void EventView::initGUIFunctionality()
     //'Show all' checkbox
 //    connect(m_pUi->m_checkBox_showAll, &QCheckBox::stateChanged,
 //            this, &EventView::onShowAllChecked, Qt::UniqueConnection);
-
-    //Event types combo box
-    connect(m_pAnnModel.data(), &ANSHAREDLIB::EventModel::updateEventTypes,
-            this, &EventView::updateComboBox, Qt::UniqueConnection);
 
     //Add type button
     connect(m_pUi->m_pushButton_addEventType, &QPushButton::clicked,
@@ -188,7 +184,7 @@ void EventView::initGUIFunctionality()
     connect(&m_FutureWatcher, &QFutureWatcher<QMap<double,QList<int>>>::finished,
             this, &EventView::createGroupsFromTriggers, Qt::UniqueConnection);
 
-    m_pAnnModel->setShowSelected(m_pUi->m_checkBox_showSelectedEventsOnly->isChecked());
+    m_pEventModel->setShowSelected(m_pUi->m_checkBox_showSelectedEventsOnly->isChecked());
 }
 
 //=============================================================================================================
@@ -201,40 +197,26 @@ void EventView::onActiveEventsChecked(int iCheckBoxState)
 
 //=============================================================================================================
 
-void EventView::updateComboBox(const QString &currentEventType)
-{
-    m_pUi->m_comboBox_filterTypes->clear();
-    m_pUi->m_comboBox_filterTypes->addItem("All");
-    m_pUi->m_comboBox_filterTypes->addItems(m_pAnnModel->getEventTypeList());
-//    if(m_pAnnModel->getEventTypeList().contains(currentEventType))
-//        m_pUi->m_comboBox_filterTypes->setCurrentText(currentEventType);
-
-//    m_pAnnModel->setLastType(currentEventType.toInt());
-    emit triggerRedraw();
-}
-
-//=============================================================================================================
-
 void EventView::addEventToModel(int iSamplePos)
 {
-    if(!m_pAnnModel){
+    if(!m_pEventModel){
         return;
     }
 
-    if(!m_pAnnModel->getNumberOfGroups()){
+    if(!m_pEventModel->getNumberOfGroups()){
         addEventGroup();
     }
 
-    m_pAnnModel->addEvent(iSamplePos);
+    m_pEventModel->addEvent(iSamplePos);
 
     emit triggerRedraw();
 }
 
 //=============================================================================================================
 
-void EventView::setModel(QSharedPointer<ANSHAREDLIB::EventModel> pAnnModel)
+void EventView::setModel(QSharedPointer<ANSHAREDLIB::EventModel> pEventModel)
 {
-    m_pAnnModel = pAnnModel;
+    m_pEventModel = pEventModel;
 
     initMVCSettings();
     initGUIFunctionality();
@@ -242,7 +224,7 @@ void EventView::setModel(QSharedPointer<ANSHAREDLIB::EventModel> pAnnModel)
 //    loadGroupSettings();
 
     if(m_pFiffRawModel){
-        m_pAnnModel->setSharedMemory(m_pFiffRawModel->isRealtime());
+        m_pEventModel->setSharedMemory(m_pFiffRawModel->isRealtime());
     }
 
     onDataChanged();
@@ -265,8 +247,8 @@ void EventView::passFiffParams(int iFirst,
                                int iLast,
                                float fFreq)
 {
-    m_pAnnModel->setFirstLastSample(iFirst, iLast);
-    m_pAnnModel->setSampleFreq(fFreq);
+    m_pEventModel->setFirstLastSample(iFirst, iLast);
+    m_pEventModel->setSampleFreq(fFreq);
 }
 
 //=============================================================================================================
@@ -282,7 +264,7 @@ void EventView::removeEvent()
     }
 
     for (auto it = set.crbegin(); it != set.crend(); ++it){
-        m_pAnnModel->removeRow(*it);
+        m_pEventModel->removeRow(*it);
     }
 
 
@@ -301,7 +283,7 @@ void EventView::addEventGroup()
 void EventView::onSelectedEventsChecked(int iCheckBoxState)
 {
     m_iCheckSelectedState = iCheckBoxState;
-    m_pAnnModel->setShowSelected(m_iCheckSelectedState);
+    m_pEventModel->setShowSelected(m_iCheckSelectedState);
 
     emit triggerRedraw();
 }
@@ -310,14 +292,12 @@ void EventView::onSelectedEventsChecked(int iCheckBoxState)
 
 void EventView::disconnectFromModel()
 {
-    disconnect(m_pAnnModel.data(),&ANSHAREDLIB::EventModel::dataChanged,
+    disconnect(m_pEventModel.data(),&ANSHAREDLIB::EventModel::dataChanged,
             this, &EventView::onDataChanged);
     disconnect(m_pUi->m_checkBox_activateEvents, &QCheckBox::stateChanged,
             this, &EventView::activeEventsChecked);
     disconnect(m_pUi->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged,
             this, &EventView::onSelectedEventsChecked);
-    disconnect(m_pAnnModel.data(), &ANSHAREDLIB::EventModel::updateEventTypes,
-            this, &EventView::updateComboBox);
     disconnect(m_pUi->m_pushButton_addEventType, &QPushButton::clicked,
             this, &EventView::addEventGroup);
     disconnect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,
@@ -332,7 +312,7 @@ void EventView::disconnectFromModel()
             this, &EventView::onStimButtonClicked);
     disconnect(m_pTriggerDetectView.data(), &DISPLIB::TriggerDetectionView::detectTriggers,
             this, &EventView::onDetectTriggers);
-    disconnect(m_pAnnModel.data(), &ANSHAREDLIB::EventModel::eventGroupsUpdated,
+    disconnect(m_pEventModel.data(), &ANSHAREDLIB::EventModel::eventGroupsUpdated,
             this, &EventView::redrawGroups);
 }
 
@@ -340,10 +320,10 @@ void EventView::disconnectFromModel()
 
 void EventView::onCurrentSelectedChanged()
 {
-    m_pAnnModel->clearEventSelection();
+    m_pEventModel->clearEventSelection();
 
     for (int i = 0;  i < m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows().size(); i++) {
-        m_pAnnModel->appendSelected(m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows().at(i).row());
+        m_pEventModel->appendSelected(m_pUi->m_tableView_eventTableView->selectionModel()->selectedRows().at(i).row());
     }
 
     onDataChanged();
@@ -354,7 +334,7 @@ void EventView::onCurrentSelectedChanged()
 void EventView::onSaveButton()
 {
     #ifdef WASMBUILD
-    m_pAnnModel->saveToFile("");
+    m_pEventModel->saveToFile("");
     #else
     QString fileName = QFileDialog::getSaveFileName(Q_NULLPTR,
                                                     tr("Save Events"), "",
@@ -364,7 +344,7 @@ void EventView::onSaveButton()
         return;
     }
 
-    m_pAnnModel->saveToFile(fileName);
+    m_pEventModel->saveToFile(fileName);
     #endif
 }
 
@@ -392,7 +372,7 @@ bool EventView::newUserGroup(const QString& sName,
                                           int iType,
                                           bool bDefaultColor)
 {
-    if(!m_pAnnModel){
+    if(!m_pEventModel){
         return false;
     }
 
@@ -407,7 +387,7 @@ bool EventView::newUserGroup(const QString& sName,
         groupColor = QColor(Qt::blue);
     }
 
-    m_pAnnModel->addGroup(sName, groupColor);
+    m_pEventModel->addGroup(sName, groupColor);
 
     m_pUi->lineEdit->setText("New Group"/* + QString::number(iCat + 1)*/);
 
@@ -418,7 +398,7 @@ bool EventView::newUserGroup(const QString& sName,
 
 void EventView::groupChanged()
 {
-    m_pAnnModel->clearGroupSelection();
+    m_pEventModel->clearGroupSelection();
 
     auto selection = m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows();
 
@@ -427,7 +407,7 @@ void EventView::groupChanged()
     }
 
     for(auto row : selection){
-        m_pAnnModel->addToSelectedGroups(row.data(Qt::UserRole).toInt());
+        m_pEventModel->addToSelectedGroups(row.data(Qt::UserRole).toInt());
     }
 
     m_pUi->m_listWidget_groupListWidget->repaint();
@@ -477,11 +457,11 @@ void EventView::deleteGroup()
 {
 //    int iSelected = m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows().first().row();
 //    QListWidgetItem* itemToDelete = m_pUi->m_listWidget_groupListWidget->takeItem(iSelected);
-//    m_pAnnModel->removeGroup(itemToDelete->data(Qt::UserRole).toInt());
+//    m_pEventModel->removeGroup(itemToDelete->data(Qt::UserRole).toInt());
 //    m_pUi->m_listWidget_groupListWidget->selectionModel()->clearSelection();
 //    delete itemToDelete;
 
-    m_pAnnModel->deleteSelectedGroups();
+    m_pEventModel->deleteSelectedGroups();
     onDataChanged();
     emit groupsUpdated();
 }
@@ -490,8 +470,8 @@ void EventView::deleteGroup()
 
 void EventView::renameGroup(const QString &currentText)
 {
-    if(m_pAnnModel){
-        m_pAnnModel->setSelectedGroupName(currentText);
+    if(m_pEventModel){
+        m_pEventModel->setSelectedGroupName(currentText);
     }
 }
 
@@ -505,7 +485,7 @@ void EventView::changeGroupColor()
         return;
     }
 
-    m_pAnnModel->setGroupColor(groupColor);
+    m_pEventModel->setGroupColor(groupColor);
 
     onDataChanged();
 }
@@ -616,7 +596,7 @@ bool EventView::newStimGroup(const QString &sName,
                                           int iType,
                                           const QColor &groupColor)
 {
-    m_pAnnModel->addGroup(sName + "_" + QString::number(iType), groupColor);
+    m_pEventModel->addGroup(sName + "_" + QString::number(iType), groupColor);
 
     return true;
 }
@@ -641,7 +621,7 @@ void EventView::createGroupsFromTriggers()
                          static_cast<int>(keyList[i]),
                          colors[i % 10]);
             for (int j : mEventGroupMap[keyList[i]]){
-                m_pAnnModel->addEvent(j + iFirstSample);
+                m_pEventModel->addEvent(j + iFirstSample);
             }
         }
     }
@@ -655,7 +635,7 @@ void EventView::createGroupsFromTriggers()
 
 void EventView::clearView(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
-    if (qSharedPointerCast<ANSHAREDLIB::AbstractModel>(m_pAnnModel) == pRemovedModel){
+    if (qSharedPointerCast<ANSHAREDLIB::AbstractModel>(m_pEventModel) == pRemovedModel){
         disconnectFromModel();
         reset();
     } else if (qSharedPointerCast<ANSHAREDLIB::AbstractModel>(m_pFiffRawModel) == pRemovedModel){
@@ -667,11 +647,11 @@ void EventView::clearView(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedMod
 
 void EventView::redrawGroups()
 {
-    if(!m_pAnnModel){
+    if(!m_pEventModel){
         return;
     }
-    auto groups = m_pAnnModel->getGroupsToDisplay();
-    auto selection = m_pAnnModel->getSelectedGroups();
+    auto groups = m_pEventModel->getGroupsToDisplay();
+    auto selection = m_pEventModel->getSelectedGroups();
 
     m_pUi->m_listWidget_groupListWidget->clear();
 
@@ -690,7 +670,7 @@ void EventView::redrawGroups()
     }
 
     qDebug() << "EventView::redrawGroups";
-    //m_pAnnModel.get
+    //m_pEventModel.get
     emit groupsUpdated();
     emit triggerRedraw();
 }
@@ -701,7 +681,7 @@ void EventView::onGroupItemNameChanged(QListWidgetItem *item)
 {
     int iGroupId = item->data(Qt::UserRole).toInt();
 
-    if(m_pAnnModel){
-        m_pAnnModel->setGroupName(iGroupId, item->text());
+    if(m_pEventModel){
+        m_pEventModel->setGroupName(iGroupId, item->text());
     }
 }

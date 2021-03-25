@@ -100,7 +100,7 @@ namespace ANSHAREDLIB
         PLUGIN_INIT_FINISHED,       ///< [NO DATA] Send when all plugins finished initializing
         STATUS_BAR_MSG,             ///< [QString] Send a message to the status bar (part of gui)
         SELECTED_MODEL_CHANGED,     ///< [QSharedPointer<ANSHAREDLIB::AbstractModel>>] Send whenever the selection changes in the datamanager plugin
-        NEW_EVENT_ADDED,       ///< [int] event send whenever the user adds a new event in the rawdataviewer plugin
+        NEW_EVENT_ADDED,            ///< [int] event send whenever the user adds a new event in the rawdataviewer plugin
         EVENT_GROUPS_UPDATED,       ///< [NO DATA] send when plugins dependent on event groups need to be updated
         TRIGGER_REDRAW,             ///< [NO DATA] send when viewer needs to be updated
         TRIGGER_ACTIVE_CHANGED,     ///< [int] send when the trigger active state was toggled

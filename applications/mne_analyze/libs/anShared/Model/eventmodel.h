@@ -203,14 +203,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Gets a list of event types currently held by the model
-     *
-     * @return Returns a list of event types.
-     */
-    QStringList getEventTypeList() const;
-
-    //=========================================================================================================
-    /**
      * Sets saved sample, used to prepare sample to be added to model.
      *
      * @param[in] iSamplePos   sample number to be set.
@@ -276,48 +268,6 @@ public:
      * @return Returns event at index given by input parameter.
      */
     int getEvent(int iIndex) const;
-
-    //=========================================================================================================
-    /**
-     * Returns map of the colors assigned to each of the event types
-     *
-     * @return Map of event colors.
-     */
-    QMap<int, QColor>& getTypeColors();
-
-    //=========================================================================================================
-    /**
-     * Returns map of the colors assigned to each of the event groups
-     *
-     * @return Map of event colors.
-     */
-    QMap<int, QColor>& getGroupColors();
-
-    //=========================================================================================================
-    /**
-     * Adds a new event type with the input parameters as configuration parameters
-     *
-     * @param[in] eventType    type number (0-99).
-     * @param[in] typeColor    color to be used for drawing.
-     */
-    void addNewEventType(const QString &eventType,
-                              const QColor &typeColor);
-
-    //=========================================================================================================
-    /**
-     * Pass which events are currenlty selected in the view GUI
-     *
-     * @param[in] iSelected    currently selected event/
-     */
-    void setSelectedAnn(int iSelected);
-
-    //=========================================================================================================
-    /**
-     * Returns currently selected event stored locally in the model
-     *
-     * @return Returns stored selected event
-     */
-    int getSelectedAnn();
 
     //=========================================================================================================
     /**
@@ -406,11 +356,7 @@ public:
     /**
      * The type of this model (EventModel)
      *
-<<<<<<< HEAD
-     * @return The type of this model (AnnotationModel).
-=======
-     * @return The type of this model (EventModel)
->>>>>>> MAINT: renaming and cleaning up
+     * @return The type of this model (EventModel).
      */
     inline MODEL_TYPE getType() const override;
 
@@ -541,7 +487,7 @@ public:
      *
      * @return vector of indices of selected groups
      */
-    std::list<uint> getEventSelection() const;
+    std::vector<uint> getEventSelection() const;
 
 signals:
 
@@ -581,30 +527,20 @@ private:
      */
     void eventsUpdated();
 
-
-    QStringList                         m_eventTypeList;                /** <List of the possible event types */
-
     int                                 m_iSamplePos;                   /**< Sample of event to be added */
     int                                 m_iFirstSample;                 /**< First sample of file */
     int                                 m_iLastSample;                  /**< Last sample of file */
 
     int                                 m_iSelectedCheckState;          /**< State of checkbox of whether to show only selected events. */
-    int                                 m_iSelectedAnn;                 /**< Index of selected events. */
 
-    std::list<uint>                     m_listEventSelection;           /**< List of selected events. */
+    std::vector<uint>                   m_listEventSelection;           /**< List of selected events. */
     std::vector<idNum>                  m_selectedEventGroups;          /**< Vector of selected groups. */
-
-    int                                 m_iLastTypeAdded;               /**< Stores last created type. */
 
     float                               m_fFreq;                        /**< Frequency of data file. */
 
-    QString                             m_sFilterEventType;             /**< String for diplaying event types. */
-    QMap<int, QColor>                   m_eventTypeColor;               /**< Stores colors to display for each event type. */
-    QMap<int, QColor>                   m_eventGroupColor;              /**< Stores colors to display for each event group. */
+    QSharedPointer<FiffRawViewModel>    m_pFiffModel;                   /**< Pointer to FiffRawViewModel associated with the events stored in this model. */
 
-    QSharedPointer<FiffRawViewModel>    m_pFiffModel;                   /**< Pointer to FiffRawViewModel associated with the events stored in this model/ */
-
-    EVENTSLIB::EventManager             m_EventManager;                 /**< Database of of events */
+    EVENTSLIB::EventManager             m_EventManager;                 /**< Database of of events. */
 };
 
 //=============================================================================================================

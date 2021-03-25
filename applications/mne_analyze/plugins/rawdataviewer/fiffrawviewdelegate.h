@@ -176,7 +176,7 @@ private:
      * @param[in] option            Describes the parameters used to draw an item in a view widget.
      * @param[in] path              The QPointerPath to create the plot.
      * @param[in] data              Data for the given row.
-     * @param[in, out] painter      Used for drawing the annotations.
+     * @param[in, out] painter      Used for drawing the events.
      */
     void createEventsPath(const QModelIndex &index,
                                const QStyleOptionViewItem &option,

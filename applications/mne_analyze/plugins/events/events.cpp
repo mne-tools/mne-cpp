@@ -211,19 +211,19 @@ void Events::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel
         if(pFiffRawModel->hasSavedEvents()){
             emit newEventModelAvailable(pFiffRawModel->getEventModel());
         } else {
-            QSharedPointer<EventModel> pAnnModel = QSharedPointer<EventModel>::create(pFiffRawModel);
+            QSharedPointer<EventModel> pEventModel = QSharedPointer<EventModel>::create(pFiffRawModel);
             if (pFiffRawModel->isRealtime()){
-                pAnnModel->setSharedMemory(true);
+                pEventModel->setSharedMemory(true);
             }
-            emit newEventModelAvailable(pAnnModel);
-            m_pAnalyzeData->addModel<ANSHAREDLIB::EventModel>(pAnnModel,
+            emit newEventModelAvailable(pEventModel);
+            m_pAnalyzeData->addModel<ANSHAREDLIB::EventModel>(pEventModel,
                                                                    "Events");
         }
         emit newFiffRawViewModel(pFiffRawModel);
     } else if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_EVENT_MODEL) {
         emit disconnectFromModel();
-        EventModel::SPtr pAnnModel = qSharedPointerCast<EventModel>(pNewModel);
-        emit newEventModelAvailable(pAnnModel);
+        EventModel::SPtr pEventModel = qSharedPointerCast<EventModel>(pNewModel);
+        emit newEventModelAvailable(pEventModel);
     }
 }
 
