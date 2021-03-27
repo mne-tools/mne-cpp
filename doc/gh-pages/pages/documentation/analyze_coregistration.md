@@ -11,7 +11,7 @@ This plugin lets you co-register your subject's BEM-files with a digitizer set o
 
 The following sections will show you how to use the plugin and introduce good practice. 
 
-![](../../images/analyze/mne_an_coreg.png)
+![MNE Analyze Coregistration plugin.](../../images/analyze/mne_an_coreg.png)
 
 ## Prerequisites
 
