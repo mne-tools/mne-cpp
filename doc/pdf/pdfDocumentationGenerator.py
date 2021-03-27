@@ -6,17 +6,9 @@ from svglib.svglib import svg2rlg
 from reportlab.graphics import renderPM
 from PIL import Image
 
-import re
 
-def currentPath():
-    return path.abspath(path.dirname(sys.argv[0]))
 
-def extractFilePathNameExt(file):
-    basePath = path.split(file)
-    filePath = basePath[0]
-    fileName = basePath[1].split(".")[0]
-    fileExtension = basePath[1].split(".")[1]
-    return filePath, fileName, fileExtension
+
 
 def svg2png(file):
     drawing = svg2rlg(file)
@@ -29,50 +21,6 @@ def jpg2png(file):
     im1 = Image.open(file)
     fPath, fName, _ = extractFilePathNameExt(file)
     im1.save(path.join(fPath, fName + ".png"))
-class Document:
-    def __init__(self, path):
-        self.title = ""
-        self.parent = ""
-        self.grand_parent = ""
-        self.nav_order = 0
-        self.has_children = False
-        self.nav_exclude = False
-        self.fullPath = path
-    
-    def setTitle(self, title):
-        self.title = title
-
-    def setParent(self, parent):
-        self.parent = parent
-    
-    def setGrandParent(self, grandParent):
-        self.grand_parent = grandParent
-
-    def setNavOrder(self, nav_order):
-        self.nav_order = nav_order
-    
-    def setHasChildren(self, hasChildren):
-        self.has_children = hasChildren
-    
-    def setNavExclude(self, navExclude):
-        self.nav_exclude = navExclude
-    
-    def setFullPath(self, path):
-        self.fullPath = path
-
-    def __str__(self):
-        s = ""
-        # s += "--- Class: " + type(self).__name__ + " ---\n"
-        s += "title: " + self.title + "\n"
-        s += "path: " + self.fullPath + "\n"
-        # s += "parent: " + self.parent + "\n"
-        # s += "nav_order: " + str(self.nav_order) + "\n"
-        # s += "has_children: " + str(self.has_children) + "\n"
-        # s += "nav_exclude: " + str(self.nav_exclude) + "\n"
-        return s
-
-    def __repr__(self):
-        return str(self)
 class Page:
     def __init__(self,doc):
         self.doc = doc
@@ -145,17 +93,6 @@ def parseFile(file, verboseMode = False):
             print(doc)
     return doc, validContentFile
 
-def scanFolder(folderPath, documents = []):
-    for file in scandir(folderPath):
-        if file.is_file() and file.name.endswith("md"):
-            # print("parsing file: " + file.path)
-            doc, valid = parseFile(file)
-            if valid:
-                documents.append(doc)
-        if file.is_dir():
-            scanFolder(file, documents)
-    return documents
-
 def processImage(imageFile):
     _, _, iExt = extractFilePathNameExt(imageFile)
     if iExt == "jpg" or iExt == "jpeg":
@@ -174,23 +111,6 @@ def recursiveProcess(folderPath, func):
 # svg2png(svgFile)
 # jpg2png("gh-pages/images/1280px-EEGoSportsGUI.jpg")
 
-webPath = path.join(currentPath(),"../gh-pages")
-# print(webPath)
-documents = scanFolder(webPath)
-
-print(documents)
-
-web = Page(Document(""))
-while documents:
-    for d in documents:
-        if web.insert(d):
-            documents.remove(d)
-
-print("Printing Web Structure:")
-print(web)
-
-
-
 # instructions on how to install svglib correctly on ubuntu
 # sudo apt-get install update
 # sudo apt-get install python3
@@ -202,7 +122,6 @@ print(web)
 # for w in web:
 
 # shutil.copy(src_dir,dst_dir)
-docFileName = "mnecpp_doc.tex"
 
 # outFile = open(path.join(currentPath(),docFileName),"a+")
 
@@ -364,7 +283,7 @@ def parseHtmlInlineImg(file):
             fileStrSplitted = fileStr.split(match[0])
             fileStr = fileStrSplitted[0] + textImg + fileStrSplitted[1]
     return fileStr
-
+\(/[A-Za-z0-9_- ])*\/[A-Za-z0-9_]+\.[A-Za-z]*
 
 out = parseHtmlInlineImg('C:/projects/mne-cpp/doc/gh-pages/pages/documentation/analyze_coregistration.md')
 

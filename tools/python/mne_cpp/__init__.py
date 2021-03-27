@@ -1,7 +1,6 @@
-# MNE-CPP Project Python main module
 #=============================================================================================================
 #
-# @file     mne_cpp.py
+# @file     __init__.py in mne_cpp module
 # @author   jgarciaprieto@mgh.harvard.edu
 # @since    0.1.9
 # @date     March, 2021
@@ -29,6 +28,6 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Contain the main Python functions definitions for the MNE-CPP Project 
-#
+# MNE-CPP Project Python main module init file.
+import mne_cpp.core
 
