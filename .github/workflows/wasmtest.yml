@@ -5,6 +5,9 @@ on:
     branches:
     # Change this to the branch name you make changes to the documentation on
     - wasm
+  workflow_dispatch:
+    branches:
+    - wasm
 
 jobs:
   WasmTest:

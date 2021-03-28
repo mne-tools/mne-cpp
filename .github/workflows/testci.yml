@@ -4,6 +4,9 @@ on:
   push:
     branches:
     - testci
+  workflow_dispatch:
+    branches:
+    - testci
 
 jobs:
   MinQtDynamic:

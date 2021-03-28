@@ -5,6 +5,9 @@ on:
     branches:
     # Change this to the branch name which you are developing on to trigger the workflow
     - generateqt
+  workflow_dispatch:
+    branches:
+    - generateqt
 
 jobs:
   GenerateLinuxStaticBinaries:
