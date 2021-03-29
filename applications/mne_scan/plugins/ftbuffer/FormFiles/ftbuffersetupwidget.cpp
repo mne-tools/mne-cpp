@@ -61,7 +61,7 @@ FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox,
 : QWidget(parent)
 , m_pFtBuffer(toolbox)
 , m_sSettingsPath(sSettingsPath)
-, m_pUi(new Ui::FtBufferSetupWidgetClass)
+, m_pUi(new Ui::FtBufferSetupUi)
 {
     m_pUi->setupUi(this);
 
@@ -70,8 +70,8 @@ FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox,
     loadSettings();
 
     //Always connect GUI elemts after m_pUi->setpUi has been called
-    connect(m_pUi->m_qPushButton_Connect, SIGNAL(released()),
-            this, SLOT(pressedConnect())); // Connect/Disconnect button
+    connect(m_pUi->m_qPushButton_Connect, &QPushButton::released,
+            this, &FtBufferSetupWidget::pressedConnect); // Connect/Disconnect button
 
     connect(this, &FtBufferSetupWidget::connectAtAddr,
             m_pFtBuffer->m_pFtBuffProducer.data(), &FtBuffProducer::connectToBuffer);
@@ -118,6 +118,7 @@ void FtBufferSetupWidget::loadSettings()
 
 void FtBufferSetupWidget::pressedConnect()
 {
+    qDebug() << "GET HERE";
     emit connectAtAddr(m_pUi->m_lineEditIP->text(),
                        m_pUi->m_spinBoxPort->value());
 }
