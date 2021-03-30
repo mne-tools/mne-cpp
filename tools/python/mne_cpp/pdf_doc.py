@@ -33,8 +33,10 @@
 import sys
 from pathlib import Path
 from os import scandir, path 
+import re
+import mne_cpp.core
 
-def parse_file(file, verboseMode = False):
+def parseFile(file, verboseMode = False):
     with open(file, 'r', encoding='utf8') as fileOpened:
         insideHeader = False
         codeText = False
@@ -78,15 +80,15 @@ def parse_file(file, verboseMode = False):
             print(doc)
     return doc, validContentFile
 
-def scan_folder(folderPath, documents = []):
+def scanFolder(folderPath, documents = []):
     for file in scandir(folderPath):
         if file.is_file() and file.name.endswith('md'):
             # print('parsing file: ' + file.path)
-            doc, valid = parse_file(file)
+            doc, valid = parseFile(file)
             if valid:
                 documents.append(doc)
         if file.is_dir():
-            scan_folder(file, documents)
+            scanFolder(file, documents)
     return documents
 
 class Document:
@@ -151,9 +153,9 @@ class Page:
                     return True
             return False
     def print(self, spaces = 0):
-        s = " " * spaces + " - " + self.doc.title + " (" + self.doc.fullPath + ")\n"
+        s = ' ' * spaces + ' - ' + self.doc.title + ' (' + self.doc.fullPath + ')\n'
         for p in self.children:
-            s += "  " * spaces + p.print(spaces+2)
+            s += ' ' * spaces + p.print(spaces+2)
         return s
 
     def __str__(self):
@@ -162,7 +164,7 @@ class Page:
     def __repr__(self):
         return str(self)      
 
-def build_web_structure(documents):
+def buildWebStructure(documents):
     web = Page(Document(''))
     while documents:
         for d in documents:
@@ -170,3 +172,25 @@ def build_web_structure(documents):
                 documents.remove(d)
     return web
 
+def parseWeb(web, sectionLevel = 0):
+    print("Parsing file: " + web.doc.fullPath)
+    parseMarkDownFile(web.doc, latexFile = "teseta.tex", sectionLevel = 0, verboseMode = True)
+    for p in web.children:
+        parseWeb(p,sectionLevel = sectionLevel+1, verboseMode = True)
+
+def parseMarkDownFile(file, **inputArgs):
+    opts = (('latexFile', 'mne_pdf_manual.tex'),
+            ('verboseMode', False), 
+            ('sectionLevel', 0))
+    (texFile, verboseMode, sectionLevel) = mne_cpp.core.parseInputArgs(inputArgs, opts = opts)
+    if file.fullPath == "": 
+        return
+    else:
+        with open(file.fullPath, 'r', encoding="utf8") as markDownFile, \
+             open(texFile,"a+") as texFile:
+            inText = markDownFile.read()
+            inText = deleteJustTheDocsHeader(inText)
+
+
+def deleteJustTheDocsHeader(text):
+    return re.sub(r'\n*\s*---\s*\n(.*\n)*---\n','',text)

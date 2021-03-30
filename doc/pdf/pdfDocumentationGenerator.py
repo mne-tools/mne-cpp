@@ -6,10 +6,6 @@ from svglib.svglib import svg2rlg
 from reportlab.graphics import renderPM
 from PIL import Image
 
-
-
-
-
 def svg2png(file):
     drawing = svg2rlg(file)
     fPath, fName, _ = extractFilePathNameExt(file)
@@ -100,12 +96,7 @@ def processImage(imageFile):
     if iExt == "svg2":
         svg2png(imageFile)
 
-def recursiveProcess(folderPath, func):
-    for file in scandir(folderPath):
-        if file.is_dir():
-            recursiveProcess(file, func)
-        if file.is_file():
-            func(file)
+
 
 # imagesFolder = path.join("gh-pages", "images")
 # svg2png(svgFile)
@@ -125,48 +116,7 @@ def recursiveProcess(folderPath, func):
 
 # outFile = open(path.join(currentPath(),docFileName),"a+")
 
-def parseMarkDownFile(doc, texFile, sectionLevel, verboseMode = False):
-    if doc.fullPath == "": 
-        return
-    else:
-        with open(doc.fullPath, 'r', encoding="utf8") as markDownFile, \
-             open(texFile,"a+") as texFile:
-            insideHeader = False
-            headerBehind = False
-            insideHtml = False
-            insideUnorderedList = False
-            insideOrderedList = False
-            insideTable = False
-            if verboseMode:
-                print("Parsing file: " + doc.fullPath)
-            for line in markDownFile:
-                if not headerBehind:
-                    if not insideHeader and line.startswith("---"):
-                        insideHeader = True
-                    continue
-                    if line.startswith("---"):
-                        insideHeader = False
-                        headerBehind = True
-                    continue
-                else:
-                    if line.count("<html>") > line.count("</html>"):
-                        insideHtml = True
-                    if line.count("</html>") >= line.count("<html>"):
-                        insideHtml = False
-                    if not insideHeader and not insideHtml:
-                        if   parseHeader(texFile,line,"# ","part","sec"):
-                            continue
-                        elif parseHeader(texFile,line,"## ","section","sec"):
-                            continue
-                        elif parseHeader(texFile,line,"### ","subsection","ssec"):
-                            continue
-                        elif parseHeader(texFile,line,"#### ","subsubsection","ssec"):
-                            continue
-                        elif parseImageFigure(texFile,line):
-                            continue
-                        else:
-                            lineOut = parseBoldMd(line)
-                            lineOut = parseItalicMd(lineOut)
+
 
 def parseHeader(texFile,str,markdownKey,latexKey,labelLatexKey):
     if str.startswith(markdownKey):
@@ -214,12 +164,6 @@ def parseItalicMd(str):
 # def parseEmbededPdf(str):
 
 # def parseTableMd(str)
-
-def parseWeb(web, sectionLevel = 0):
-    print("Parsing file: " + web.doc.fullPath)
-    parseMarkDownFile(web.doc, "teseta.tex", sectionLevel)
-    for p in web.children:
-        parseWeb(p,sectionLevel+1)
 
 def parseLinks(str):
     str = str.replace("{:target=\"_blank\" rel=\"noopener\"}","")
@@ -269,8 +213,11 @@ def parseImageFigure2(texFile,str):
 #     <\s*img\s+src="(?P<imgFile>[a-zA-Z0-9/._^"/_]+)".*width="(?P<imgWidth>[0-9]+).*
 
 def parseHtmlInlineImg(file):
-    fileStr=''
-    pattern = re.compile(r'<\s*img\s+src="(?P<imgFile>[a-zA-Z0-9/._^"/_]+)".*width="(?P<imgWidth>[0-9]+).*')
+    fileStr = ''
+    pattern = re.compile(r"""
+                         <\s*img\s+src=\"(?P<imgFile>[a-zA-Z0-9/._^"/_]+)\"
+                         .*width="(?P<imgWidth>[0-9]+).*
+                         """, re.X)
     with open(file, 'r', encoding='utf8') as markDownFile:
         fileStr = markDownFile.read()
         matches = pattern.finditer(fileStr)
@@ -283,17 +230,9 @@ def parseHtmlInlineImg(file):
             fileStrSplitted = fileStr.split(match[0])
             fileStr = fileStrSplitted[0] + textImg + fileStrSplitted[1]
     return fileStr
-\(/[A-Za-z0-9_- ])*\/[A-Za-z0-9_]+\.[A-Za-z]*
 
-out = parseHtmlInlineImg('C:/projects/mne-cpp/doc/gh-pages/pages/documentation/analyze_coregistration.md')
 
-f = open('C:/projects/mne-cpp/doc/gh-pages/pages/documentation/analyze_coregistration2.md','w+',encoding='utf8')
-
-f.write(out)
-f.close()
-
-# parseWeb(web)
-
+# \(/[A-Za-z0-9_- ])*\/[A-Za-z0-9_]+\.[A-Za-z]*
 # !\[[^\]]*\]
 # '(startText)(.+)((?:\n.+)+)(endText)'
 # \href{https://mne-cpp.github.io}{MNE-CPP Project documentation web page}\footnote{https://mne-cpp.github.io}
