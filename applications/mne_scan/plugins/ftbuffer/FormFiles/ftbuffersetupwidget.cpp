@@ -118,7 +118,6 @@ void FtBufferSetupWidget::loadSettings()
 
 void FtBufferSetupWidget::pressedConnect()
 {
-    qDebug() << "GET HERE";
     emit connectAtAddr(m_pUi->m_lineEditIP->text(),
                        m_pUi->m_spinBoxPort->value());
 }
