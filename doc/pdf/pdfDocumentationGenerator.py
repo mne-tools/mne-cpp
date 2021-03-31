@@ -150,17 +150,6 @@ def parseBoldMd(str):
         strOut = str
     return strOut
 
-def parseItalicMd(str):
-    if str.count("*") == 2:
-        strSplitted = str.split("*")
-        strOut = strSplitted[0] + "\\textit{" + strSplitted[1].split("*")[0] + "}" + strSplitted[1].split("*")[1]
-    elif str.count("_") == 2:
-        strSplitted = str.split("_")
-        strOut = strSplitted[0] + "\\textit{" + strSplitted[1].split("_")[0] + "}" + strSplitted[1].split("_")[1]
-    else:
-        strOut = str
-    return strOut
-
 # def parseEmbededPdf(str):
 
 # def parseTableMd(str)
