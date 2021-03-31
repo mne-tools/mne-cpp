@@ -173,8 +173,8 @@ def buildWebStructure(documents):
     return web
 
 def parseWeb(web, sectionLevel = 0):
-    print("Parsing file: " + web.doc.fullPath)
-    parseMarkDownFile(web.doc, latexFile = "teseta.tex", sectionLevel = 0, verboseMode = True)
+    print('Parsing file: ' + web.doc.fullPath)
+    parseMarkDownFile(web.doc, latexFile = 'teseta.tex', sectionLevel = 0, verboseMode = True)
     for p in web.children:
         parseWeb(p,sectionLevel = sectionLevel+1, verboseMode = True)
 
@@ -183,15 +183,21 @@ def parseMarkDownFile(file, **inputArgs):
             ('verboseMode', False), 
             ('sectionLevel', 0))
     (texFile, verboseMode, sectionLevel) = mne_cpp.core.parseInputArgs(inputArgs, opts = opts)
-    if file.fullPath == "": 
+    if file.fullPath == '': 
         return
     else:
-        with open(file.fullPath, 'r', encoding="utf8") as markDownFile, \
-             open(texFile,"a+") as texFile:
+        with open(file.fullPath, 'r', encoding='utf8') as markDownFile, \
+             open(texFile,'a+') as texFile:
             inText = markDownFile.read()
             inText = deleteJustTheDocsHeader(inText)
             inText = parseInlineItalicText(inText)
             inText = parseInlineBoldText(inText)
+            inText = parseUnorderedList(inText)
+            inText = parseInlineImages(inText)
+            # inText = parseInlineHTMLImages(inText)
+            # inText = parseTables(inText)
+            # inText = parseFigureImages(inText)
+            # inText = parseHeaders(inText)
 
 
 
@@ -204,18 +210,46 @@ def parseInlineItalicText(text):
 def parseInlineBoldText(text):
     return re.sub(r'(?<=\W)((?P<dstar>\*\*)|__)(?P<btext>[\w ]+)((?(dstar)\*\*)|__)(?=\W)',r'\\textbf{\g<btext>}', text)
 
-def parseUnorderedList(text):
-    pattern = re.compile(r"""
-                            (\n\s?\*\s?(?P<firstItem>.+))(\n\s?\*\s?(?P<otherItem>.+))*
-                            """, re.X)
-    matches = pattern.finditer(text)
-    for match in matches:
-        print(match)
-        # substitute the begining with opening list
-        # go through all the match and substitute \n\s\*\s por \item y el texto.
-        # close the list
-#     \begin{itemize}
-#     \item One
-#     \item Two
-#     \item Three
-# \end{itemize}
+def parseUnorderedList(inText):
+    match = re.search(r'(\n\s?\*\s?.+)(\n\s?\*\s?(.+))*', inText)
+    if match:
+        outList = '\n\\begin{itemize}\n'
+        pattern2 = re.compile(r'\n*\s*\*\s*(?P<item>.+)(?=\n)?')
+        itemList = pattern2.finditer(match.group(0))
+        for item in itemList:
+            outList += '\t\\item ' + item.group('item') + '\n'
+        outList += '\\end{itemize}'
+        outText = inText[:match.start(0)] + outList + inText[match.end(0):]
+        return parseUnorderedList(outText)
+    else:
+        return inText
+
+def parseInlineImages(inText):
+    match = re.search(r'!\[(?P<alt_text>[^]]+)\]\((?P<imgFilePath>[^)]+)\)', inText)
+    # if match:
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# if   parseHeader(texFile,line,"# ","part","sec"):
+#     continue
+# elif parseHeader(texFile,line,"## ","section","sec"):
+#     continue
+# elif parseHeader(texFile,line,"### ","subsection","ssec"):
+#     continue
+# elif parseHeader(texFile,line,"#### ","subsubsection","ssec"):
+#     continue

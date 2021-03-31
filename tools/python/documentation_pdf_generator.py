@@ -18,7 +18,7 @@ inFile = open(fullPath, mode = 'r', encoding = 'utf8')
 inText = inFile.read()
 inFile.close()
 
-outText = mne_cpp.pdf_doc.parseInlineBoldText(inText)
+outText = mne_cpp.pdf_doc.parseUnorderedList(inText)
 outFile = open(pathLabel + filePath + fileName + '_PROCESSED' + '.' + fileExt, mode = 'w', encoding = 'utf8')
 outFile.write(outText)
 outFile.close()
