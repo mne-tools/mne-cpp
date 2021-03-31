@@ -130,7 +130,7 @@ def parseFilePathNameExt(inText):
         lastFolder = __ifNoneEmptyStr(match.group('lastFolder'))
         fileName = __ifNoneEmptyStr(match.group('fileName'))
         fileExt = __ifNoneEmptyStr(match.group('fileExt'))
-    return (deviceLabel, filePath, lastFolder, fileName, fileExt )
+    return (deviceLabel, filePath, lastFolder, fileName, fileExt)
 
 
 # class File:
