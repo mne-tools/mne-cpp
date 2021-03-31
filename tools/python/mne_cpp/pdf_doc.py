@@ -192,5 +192,9 @@ def parseMarkDownFile(file, **inputArgs):
             inText = deleteJustTheDocsHeader(inText)
 
 
+
 def deleteJustTheDocsHeader(text):
     return re.sub(r'\n*\s*---\s*\n(.*\n)*---\n','',text)
+
+def parseInlineItalicText(text):
+    return re.sub(r'(?<=\W)((?P<star>\*)|_)(?P<itext>\w+)(?(star)\*|_)(?=\W)',r'\\textit{\g<itext>}', text)

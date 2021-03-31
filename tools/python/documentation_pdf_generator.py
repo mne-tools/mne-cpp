@@ -19,7 +19,7 @@ inFile = open(fullPath, mode = 'r', encoding = 'utf8')
 inText = inFile.read()
 inFile.close()
 
-outText = mne_cpp.pdf_doc.deleteJustTheDocsHeader(inText)
+outText = mne_cpp.pdf_doc.parseInlineItalicText(inText)
 outFile = open(pathLabel + filePath + fileName + '_PROCESSED' + '.' + fileExt, mode = 'w', encoding = 'utf8')
 outFile.write(outText)
 outFile.close()

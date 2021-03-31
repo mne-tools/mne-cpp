@@ -1,3 +1,10 @@
+---
+title: MNE Anonymize
+has_children: false
+parent: Documentation
+nav_order: 3
+has_toc: false
+---
 # MNE Anonymize
 
 This page describes the application MNE Anonymize, i.e. `mne_anonymize`. This application substitutes different **Personal Health Information** (PHI) and **Personal Identifiable Information** (PII) fields from a [FIFF (Functional Imaging File Format)](https://bids-specification.readthedocs.io/en/stable/99-appendices/06-meg-file-formats.html) file (*.fif*), with other values.
@@ -25,20 +32,20 @@ MNE Anonymize can also be executed in command line mode. This is intended for us
 |`--no-gui`| Command line version of the application.|
 |`--version`| Show the version of this appliation.|
 |`-i --in <infile>`| File to anonymize.|
-|`-o --out <outfile>` *optional*| Output file `<outfile>`. As default '_anonymized.fif' is attached to the file name.|
-|`--verbose` *optional*| Prints out all the information about each specific anonymized field. Default: false |
-|`-s --silent` *optional*| Prints no output to the terminal, other than interaction with the user or execution errors. |
-|`-d --delete_input_file_after` *optional*| Delete input fiff file after anonymization. A confirmation message will be prompted to the user. Default: false |
-|`-f --avoid_delete_confirmation` *optional*| Avoid confirming the deletion of the input fiff file. Default: false|
-|`-b --brute` *optional*| Also anonymize subject’s weight, height, sex and handedness, and project’s ID, name, aim and comment. Default: false |
-|`--md --measurement_date <value>` *optional*| Specify the measurement date. Only when anonymizing a single file. Format: DDMMYYYY Default: 01012000. |
-|`--mdo --measurement_date_offset <value>` *optional*| Specify number of days to subtract to the measurement <date>. Only allowed when anonymizing a single file. Default: 0 |
-|`--sb --subject_birthday <value>` *optional*| Specify the subject's birthday <date>. Only allowed when anonymizing a single file. Format: DDMMYYYY. Default: 01012000 |
-|`--sbo --subject_birthday_offset <value>` *optional*| Specify number of <days> to subtract to the subject's birthday. Only allowed when anonymizing a single file. Default: 0 |
-|`--his <value>` *optional*| Specify a Subject's ID within the Hospital system. Only allowed when anonymizing a single file. Default: 'mne_anonymize' |
-|`--mne_environment` *optional*| Also anonymize information added to the fif file through MNE Toolbox, like Working Directory or Command used. Default: false |
+|`-o --out <outfile>` \textit{optional}| Output file `<outfile>`. As default '_anonymized.fif' is attached to the file name.|
+|`--verbose` \textit{optional}| Prints out all the information about each specific anonymized field. Default: false |
+|`-s --silent` \textit{optional}| Prints no output to the terminal, other than interaction with the user or execution errors. |
+|`-d --delete_input_file_after` \textit{optional}| Delete input fiff file after anonymization. A confirmation message will be prompted to the user. Default: false |
+|`-f --avoid_delete_confirmation` \textit{optional}| Avoid confirming the deletion of the input fiff file. Default: false|
+|`-b --brute` \textit{optional}| Also anonymize subject’s weight, height, sex and handedness, and project’s ID, name, aim and comment. Default: false |
+|`--md --measurement_date <value>` \textit{optional}| Specify the measurement date. Only when anonymizing a single file. Format: DDMMYYYY Default: 01012000. |
+|`--mdo --measurement_date_offset <value>` \textit{optional}| Specify number of days to subtract to the measurement <date>. Only allowed when anonymizing a single file. Default: 0 |
+|`--sb --subject_birthday <value>` \textit{optional}| Specify the subject's birthday <date>. Only allowed when anonymizing a single file. Format: DDMMYYYY. Default: 01012000 |
+|`--sbo --subject_birthday_offset <value>` \textit{optional}| Specify number of <days> to subtract to the subject's birthday. Only allowed when anonymizing a single file. Default: 0 |
+|`--his <value>` \textit{optional}| Specify a Subject's ID within the Hospital system. Only allowed when anonymizing a single file. Default: 'mne_anonymize' |
+|`--mne_environment` \textit{optional}| Also anonymize information added to the fif file through MNE Toolbox, like Working Directory or Command used. Default: false |
 
-## Modified FIFF *tags*
+## Modified FIFF \textit{tags}
 
 It is important to remark that tags will not be deleted. The information in the tag will be substituted by other information, either specified by the user or defined in the application by default. This utility modifies the following `tags` from the fiff file:
 
@@ -103,7 +110,7 @@ If you specify the input and the output files with the same name, by default the
 mne_anonymize --no-gui --in ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --out ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file --avoid_delete_confirmation
 ```
 
-In order to **substract** 35 days from all measurement dates, both in the ID and `FIFF_MEAS_DATE` tags, use:
+In order to *\textit{substract}* 35 days from all measurement dates, both in the ID and `FIFF_MEAS_DATE` tags, use:
 
 ```
 mne_anonymize --in ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --measurement_date_offset 35
@@ -144,9 +151,9 @@ Depending on the settings during acquisition the FIFF files may contain few or m
 
 ## How is the File Modified
 
-An initial approach to deal with sensible information in a file would be to just delete it or maybe alter it "in-place", like other applications do. However, we think this is not a good idea. Firstly, some of these fields, like `Subject Name` or `Measuremenet date`, are needed and expected by other software packages, to simply delete them might cause some trouble later. Moreover, it doesn't seem to be a neat job to alter the actual information by *masking* it with a default character set, e.g., substituing the name `Peter` `C` `Smith` with `xxxxx` `x` `xxxxx`. Some of the fields of data in a FIFF file are quite long, and an individual subject might have a particularly long name. Therefore, a subject might not be properly de-identified or anonymized if we were to follow this route. But most importantly, we consider that the best way to modify the information in a FIFF file is to recompute completely the actual information and the structure it is stored in.
+An initial approach to deal with sensible information in a file would be to just delete it or maybe alter it "in-place", like other applications do. However, we think this is not a good idea. Firstly, some of these fields, like `Subject Name` or `Measuremenet date`, are needed and expected by other software packages, to simply delete them might cause some trouble later. Moreover, it doesn't seem to be a neat job to alter the actual information by \textit{masking} it with a default character set, e.g., substituing the name `Peter` `C` `Smith` with `xxxxx` `x` `xxxxx`. Some of the fields of data in a FIFF file are quite long, and an individual subject might have a particularly long name. Therefore, a subject might not be properly de-identified or anonymized if we were to follow this route. But most importantly, we consider that the best way to modify the information in a FIFF file is to recompute completely the actual information and the structure it is stored in.
 
-Since the FIFF format implies a linked list of `tags` with information in them, MNE Anonymize will follow this list of tags from the begining until the end, while creating a new `tag` with *anonymized* or *de-identified* information wherever needed. This way, "hidden tags" or *unlinked* tags in the input file will not be copied to the output. The so-called `free list` of tags, will not be copied to the output anonymized file either. The tag directory will not be copied to the output file either. This implies that the actual final size of the output file will slightly differ from the input file. 
+Since the FIFF format implies a linked list of `tags` with information in them, MNE Anonymize will follow this list of tags from the begining until the end, while creating a new `tag` with \textit{anonymized} or *de-identified* information wherever needed. This way, "hidden tags" or \textit{unlinked} tags in the input file will not be copied to the output. The so-called `free list` of tags, will not be copied to the output anonymized file either. The tag directory will not be copied to the output file either. This implies that the actual final size of the output file will slightly differ from the input file. 
 
 If a specific `tag` with PHI or PII infomation is not present in the FIFF file, `mne_anonymize` will not create it.
 
