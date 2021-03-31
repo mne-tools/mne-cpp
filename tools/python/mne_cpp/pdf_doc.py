@@ -190,6 +190,8 @@ def parseMarkDownFile(file, **inputArgs):
              open(texFile,"a+") as texFile:
             inText = markDownFile.read()
             inText = deleteJustTheDocsHeader(inText)
+            inText = parseInlineItalicText(inText)
+            inText = parseInlineBoldText(inText)
 
 
 
@@ -200,4 +202,20 @@ def parseInlineItalicText(text):
     return re.sub(r'(?<=\W)((?P<star>\*)|_)(?P<itext>\w+)(?(star)\*|_)(?=\W)',r'\\textit{\g<itext>}', text)
 
 def parseInlineBoldText(text):
-    return re.sub(r'(?<=\W)((?P<dstar>\*\*)|__)(?P<btext>\w+)((?(dstar)\*\*)|__)(?=\W)',r'\\textbf{\g<btext>}', text)    
+    return re.sub(r'(?<=\W)((?P<dstar>\*\*)|__)(?P<btext>[\w ]+)((?(dstar)\*\*)|__)(?=\W)',r'\\textbf{\g<btext>}', text)
+
+def parseUnorderedList(text):
+    pattern = re.compile(r"""
+                            (\n\s?\*\s?(?P<firstItem>.+))(\n\s?\*\s?(?P<otherItem>.+))*
+                            """, re.X)
+    matches = pattern.finditer(text)
+    for match in matches:
+        print(match)
+        # substitute the begining with opening list
+        # go through all the match and substitute \n\s\*\s por \item y el texto.
+        # close the list
+#     \begin{itemize}
+#     \item One
+#     \item Two
+#     \item Three
+# \end{itemize}

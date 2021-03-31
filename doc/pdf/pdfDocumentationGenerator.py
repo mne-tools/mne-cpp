@@ -139,17 +139,6 @@ def parseImageFigure(texFile,str):
     else:
         return False
 
-def parseBoldMd(str):
-    if str.count("**") == 2:
-        strSplitted = str.split("**")
-        strOut = strSplitted[0] + "\\textbf{" + strSplitted[1].split("**")[0] + "}" + strSplitted[1].split("**")[1]
-    elif str.count("__") == 2:
-        strSplitted = str.split("__")
-        strOut = strSplitted[0] + "\\textbf{" + strSplitted[1].split("__")[0] + "}" + strSplitted[1].split("__")[1]        
-    else:
-        strOut = str
-    return strOut
-
 # def parseEmbededPdf(str):
 
 # def parseTableMd(str)
