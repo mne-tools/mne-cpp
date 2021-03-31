@@ -198,3 +198,6 @@ def deleteJustTheDocsHeader(text):
 
 def parseInlineItalicText(text):
     return re.sub(r'(?<=\W)((?P<star>\*)|_)(?P<itext>\w+)(?(star)\*|_)(?=\W)',r'\\textit{\g<itext>}', text)
+
+def parseInlineBoldText(text):
+    return re.sub(r'(?<=\W)((?P<dstar>\*\*)|__)(?P<btext>\w+)((?(dstar)\*\*)|__)(?=\W)',r'\\textbf{\g<btext>}', text)    
