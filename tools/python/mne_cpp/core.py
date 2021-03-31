@@ -63,7 +63,7 @@ def extractFilePaths(text: str, **inputArgs):
                                 (?P<deviceLabel>[A-Za-z]:)?     # Device Label. c:  D: etc... for windows.
                                 (?P<filePath>([/\\]?)           # filePath: absolute or relative path. /folder/file.txt vs folder/file.txt
                                                                 #                                      ^                   ^         
-                                 (?P<lastFolder>(\.{1,2}|[^\n.<>:"|?*/\\]+)[/\\])+  # An undefined number of nested folders '.' and '..' admitted. 
+                                 (?P<lastFolder>(\.{1,2}|[^\n.<>:"|?*/\\,()\[\]]+)[/\\])+  # An undefined number of nested folders '.' and '..' admitted. 
                                                                                     # The forbidden char set is mostly due to windows = [^\n.<>:"|?*/\\] but 
                                                                                     # using them in linux is kind of asking for trouble. So out!
                                 )                                                                                    
@@ -75,8 +75,8 @@ def extractFilePaths(text: str, **inputArgs):
         expression = re.compile(r"""
                                 (?P<deviceLabel>[A-Za-z]:)?     # Device Label. c:  D: etc... for windows.
                                 (?P<filePath>([/\\]?)           # filePath: absolute or relative path. /folder/file.txt vs folder/file.txt
-                                                                #                                      ^                   ^         
-                                 (?P<lastFolder>(\.{1,2}|[^\n.<>:"|?*/\\]+)[/\\])+  # An undefined number of nested folders '.' and '..' admitted. 
+                                                                #                             ^                   ^         
+                                 (?P<lastFolder>(\.{1,2}|[^\n.<>:"|?*/\\,()\[\]]+)[/\\])+  # An undefined number of nested folders '.' and '..' admitted. 
                                                                                     # The forbidden char set is mostly due to windows = [^\n.<>:"|?*/\\] but 
                                                                                     # using them in linux is kind of asking for trouble. So out!
                                 )                                                                                    
@@ -108,6 +108,30 @@ def __ifNoneEmptyStr(s):
     if s is None:
         return ''
     return s
+
+def parseFilePathNameExt(inText):
+    pattern = re.compile(r"""
+        ^(?P<filePath>                                  # filePath group starts at the beginning of the text
+            (?P<deviceLabel>([A-Za-z]:[/\\])|[/\\])?    # deviceLabel is for windows plat. i.e. C:\ (optional)
+            (?P<lastFolder>[\w.-]+[/\\])*               # lastFolder is the immediately parent folder to the file. (optional)
+        )?                                              # filePath group ends here. (optional)
+        (?P<fileName>[\w\-.]+?)                         # fileName can contain dots, dash or any character A-Za-z0-9_. min size of 1. Not greedy
+        (\.(?P<fileExt>\w+))?                           # fileExt starts *after* the *last* dot within the fileName. (optional)
+        $""", re.X)        
+    match = re.seach(pattern, inText)
+    deviceLabel = ''
+    filePath = ''
+    lastFolder = ''
+    fileName = ''
+    fileExt = ''
+    if match:
+        deviceLabel = __ifNoneEmptyStr(match.group('deviceLabel'))
+        filePath = __ifNoneEmptyStr(match.group('filePath'))
+        lastFolder = __ifNoneEmptyStr(match.group('lastFolder'))
+        fileName = __ifNoneEmptyStr(match.group('fileName'))
+        fileExt = __ifNoneEmptyStr(match.group('fileExt'))
+    return (deviceLabel, filePath, lastFolder, fileName, fileExt )
+
 
 # class File:
 #     def __init__(self, name, path):
