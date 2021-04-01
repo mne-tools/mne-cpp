@@ -132,31 +132,6 @@ def parseFilePathNameExt(inText):
         fileExt = __ifNoneEmptyStr(match.group('fileExt'))
     return (deviceLabel, filePath, lastFolder, fileName, fileExt)
 
-
-# class File:
-#     def __init__(self, name, path):
-#         self.name = name
-#         self.path = path
-#         self.is_dir = False
-#         self.children = []
-#     def insert(self, f):
-#         self.children.append(f)
-    
-#     def print(self, spaces = 0):
-#         s = ' ' * spaces + ' - ' + self.name + ' (' + self.path + ')\n'
-#         for p in self.children:
-#             s += ' ' * spaces + p.print(spaces+2)
-#         return s
-        
-#     def __str__(self):
-#         return self.print()
-
-#     def __repr__(self):
-#         return str(self)
-
-# def recursiveFileSearch(text: path):
-#     folder = Folder(path)
-
 def parseInputArguments(argsToParse, **opts):
     caseSensitive = True
     relaxedMode = False
