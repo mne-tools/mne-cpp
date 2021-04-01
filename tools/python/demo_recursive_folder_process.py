@@ -16,4 +16,3 @@ listOfFiles.sort(reverse=True, key=lambda f:f[1])
 for f in listOfFiles:
     print('File: ' + f[0].path + ' - (' + mne_cpp.core.size_human_readable(f[1]) + ')')
 
-    
