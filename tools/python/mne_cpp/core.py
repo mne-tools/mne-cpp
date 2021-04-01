@@ -34,6 +34,7 @@ import sys
 from os import path, scandir
 from enum import Enum
 import re
+from math import log2
 
 # This file should be kept inside the following folder: mne_mneBaseFolder/tools/python/mne_cpp
 
@@ -97,10 +98,10 @@ def extractFilePaths(text: str, **inputArgs):
         print(absFilePath)
     return (deviceLabel, filePath, fileName, fileExt, absFilePath)
 
-def __recursiveFolderProcess(folderPath, func):
+def recursiveFolderProcess(folderPath, func):
     for file in scandir(folderPath):
         if file.is_dir():
-            __recursiveFolderProcess(file, func)
+            recursiveFolderProcess(file, func)
         if file.is_file():
             func(file)
 
@@ -162,16 +163,17 @@ def parseInputArguments(argsToParse, **opts):
             options[arg_adapted] = argsToParse[arg]
     return (v for k, v in options.items())
 
+_suffixes = ['bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
+def size_human_readable(size):
+    # determine binary order in steps of size 10 
+    # (coerce to int, // still returns a float)
+    order = int(log2(size) / 10) if size else 0
+    # format file size
+    # (.4g results in rounded numbers for exact matches and max 3 decimals, 
+    # should never resort to exponent values)
+    return '{:.4g} {}'.format(size / (1 << (order * 10)), _suffixes[order])
 
-# The following is an example on how to use parseInput function
-# def importantFcn(a,**inputArgs):
-#     opts = (('optionA', 33), 
-#             ('optionB', 'lalala'),
-#             ('optionC', [range(5)]))
-#     (optionA, optionB, optionC) = parseInputArguments(inputArgs, opts = opts, admit_unknown_options = True, case_sensitive = True)
-#     print(a)
-#     print('OptionA : ' + str(optionA))
-#     print('OptionB : ' + optionB)
-#     print('OptionC : ' + str(optionC))
-
-# importantFcn('5134',optionC = 'obladiriolaride', tetetetet = '321', opTIona = 37)
+def get_list_of_files(folder):
+    listOfFiles = []
+    recursiveFolderProcess(folder,lambda f:listOfFiles.append(f))
+    return listOfFiles

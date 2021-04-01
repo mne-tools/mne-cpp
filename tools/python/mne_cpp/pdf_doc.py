@@ -358,3 +358,6 @@ def jpg2png(file):
 
 # outFile = open(path.join(currentPath(),docFileName),"a+")
 
+# add wrapfigure to latex preamble
+
+
