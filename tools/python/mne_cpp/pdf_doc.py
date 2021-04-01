@@ -228,8 +228,8 @@ def parseUnorderedList(inText):
 def parseInlineImages(inText):
     match = re.search(r'!\[(?P<alt_text>[^]]+)\]\((?P<imgFilePath>[^)]+)\)', inText)
     if match:
-        imgPath = mne_cpp.core.__ifNoneEmptyStr(match.group('imgFilePath'))
-        imgAltText = mne_cpp.core.__ifNoneEmptyStr(match.group('alt_text'))
+        imgPath = mne_cpp.core.none_if_empty(match.group('imgFilePath'))
+        imgAltText = mne_cpp.core.none_if_empty(match.group('alt_text'))
         figText  = '\n\\begin{wrapfigure}{r}{0.5\\textwidth}'
         figText += '\n\t\\begin{center}'
         figText += '\n\t\t\\includegraphics[width=0.4\\textwidth]{ ' + imgPath + '}'
@@ -244,7 +244,7 @@ def parseInlineImages(inText):
 def parseInlineHTMLImages(inText):
     match = re.search(r'<\s*img\s*src\s*=\s*"(?P<imgPath>[^"]+)".*>', inText)
     if match:
-        imgPath = mne_cpp.core.__ifNoneEmptyStr(match.group('imgFilePath'))
+        imgPath = mne_cpp.core.none_if_empty(match.group('imgFilePath'))
         figText  = '\n\\begin{wrapfigure}{r}{0.5\\textwidth}'
         figText += '\n\t\\begin{center}'
         figText += '\n\t\t\\includegraphics[width=0.4\\textwidth]{ ' + imgPath + '}'
@@ -319,6 +319,8 @@ def parseHeader(texFile,str,markdownKey,latexKey,labelLatexKey):
 #     continue
 # elif parseHeader(texFile,line,"#### ","subsubsection","ssec"):
 #     continue
+
+
 
 def processImage(imageFile):
         _, _, _, _, fileExt = mne_cpp.core.parseFilePathNameExt(imageFile)
