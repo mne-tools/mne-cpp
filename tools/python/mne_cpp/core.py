@@ -172,6 +172,14 @@ def size_human_readable(size):
     return '{:.4g} {}'.format(size / (1 << (order * 10)), _suffixes[order])
 
 def get_list_of_files(folder):
+    """Retrieve a list of files inside (recursive) a folder.
+
+    Args:
+        folder Str: Path of the folder.
+
+    Returns:
+        List: Files found.
+    """
     listOfFiles = []
     recursiveFolderProcess(folder,lambda f:listOfFiles.append(f))
     return listOfFiles

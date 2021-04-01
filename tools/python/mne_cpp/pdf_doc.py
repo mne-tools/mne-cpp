@@ -198,9 +198,10 @@ def parseMarkDownFile(file, **inputArgs):
             inText = parseInlineImages(inText)
             inText = parseInlineHTMLImages(inText)
             inText = parseTableMd(inText)
+            inText = parseFigureImages(inText)
+            inText = parseHeaders(inText)
             inText = parseLinks(inText)
-            # inText = parseFigureImages(inText)
-            # inText = parseHeaders(inText)
+
 
 def deleteJustTheDocsHeader(text):
     return re.sub(r'\n*\s*---\s*\n(.*\n)*---\n','',text)
@@ -291,10 +292,10 @@ def parseLinks(inText):
         inTextPre  = inText.split('[' + link[0] + ']')[0]
         inTextPost = inText.split('(' + link[1] + ')')[1]
         latexLink = '\\href{' + link[1] + '}{' + link[0] + '}\\footnote{' + link[1] + '}'
-        strOut = inTextPre + latexLink + inTextPost
-        parseLinks(strOut)
+        outText = inTextPre + latexLink + inTextPost
+        parseLinks(outText)
     else:
-        return str
+        return inText
 
 def parseHeaders(inText):
     latexSectionKey = {
@@ -312,30 +313,37 @@ def parseHeaders(inText):
     else:
         return inText
 
+# parse horizontal line 
+# \n\* \* \*
+
+mne_cpp.core.get_list_of_files
+
+# parse all lists with (\n((\s*[-*]\s*)|(\s*\d+\.\s*)).+)+
+# see https://regex101.com/r/2uKqPB/1/
+
+# after this parse 
+# ordered lists of level 4
+# unordered lists of level 4
+# ordered lists of level 3
+# unordered lists of level 3
+# ordered lists of level 2
+# unordered lists of level 2
+# ordered lists of level 1
+# unordered lists of level 1
+
+# parse task lists
+# https://tex.stackexchange.com/questions/247681/how-to-create-checkbox-todo-list
+
+
+
 
 # still missing: 
 # ordered lists parsing
 # inbound links vs outbound links
 # parse inline code
 # preamble and ending file
-
-def parseHeader(texFile,str,markdownKey,latexKey,labelLatexKey):
-    if str.startswith(markdownKey):
-        newHeader = line.split(markdownKey)[1].ltrip().rstrip()
-        texFile.write("\n\\" + latexKey + "{" + newHeader.strip() + "}" + " \n\\label{" + labelLatexKey + ":" + newHeader.strip().replace(" ","_") + "}")
-        return True
-    else:
-        return False
-
-# if   parseHeader(texFile,line,"# ","part","sec"):
-#     continue
-# elif parseHeader(texFile,line,"## ","section","sec"):
-#     continue
-# elif parseHeader(texFile,line,"### ","subsection","ssec"):
-#     continue
-# elif parseHeader(texFile,line,"#### ","subsubsection","ssec"):
-#     continue
-
+# parse horizontal lines
+# parse multiple terms description/definition
 
 
 def processImage(imageFile):
@@ -369,10 +377,6 @@ def jpg2png(file):
 # python3 -m pip install svglib
 
 # then python3 pdfDocumentationGenerator.py
-
-# for w in web:
-
-# shutil.copy(src_dir,dst_dir)
 
 # outFile = open(path.join(currentPath(),docFileName),"a+")
 
