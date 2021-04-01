@@ -296,11 +296,27 @@ def parseLinks(inText):
     else:
         return str
 
+def parseHeaders(inText):
+    latexSectionKey = {
+        '#'     : ('part','sec'),
+        '##'    : ('section', 'sec'),
+        '###'   : ('subsection', 'ssec'),
+        '####'  : ('subsubsection', 'ssec')
+    }
+    match = re.search(r'(?<=\n)[ \t]*(?P<pounds>#+)[ \t]*(?P<headerText>.*)', inText)
+    if match:
+        outHeader  = '\n\\' + latexSectionKey.get(match.group('pounds'),('subsection','ssec'))[0] + '{' + match.group('headerText') + '}' 
+        outHeader += ' \n\\label{' + latexsectionKey.get(match.group('pounds'),('subsection','ssec'))[1] + ':' + match.group('headerText').replace(' ','_') + '}'
+        outText = inText[:match.start(0)] + outHeader + inText[match.end(0):]
+        return parseHeaders(outText)
+    else:
+        return inText
+
+
 # still missing: 
 # ordered lists parsing
 # inbound links vs outbound links
 # parse inline code
-# parse headers
 # preamble and ending file
 
 def parseHeader(texFile,str,markdownKey,latexKey,labelLatexKey):
