@@ -46,7 +46,6 @@ def parseFile(file, verboseMode = False):
         validContentFile = False
         doc = Document(file.path)
         for line in fileOpened:
-            # print(line)
             if not codeText and (line.startswith('```') or line.count('```')%2 != 0):
                 codeText = True
                 continue
