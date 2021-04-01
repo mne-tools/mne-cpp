@@ -90,10 +90,10 @@ def extractFilePaths(text: str, **inputArgs):
     pattern = re.compile(expression)
     fileMatches = pattern.finditer(text)
     for f in fileMatches:
-        deviceLabel = __ifNoneEmptyStr(f.group('deviceLabel'))    #f.string[f.start('deviceLabel'):f.end('deviceLabel')]
-        filePath = __ifNoneEmptyStr(f.group('filePath'))          #f.string[f.start('filePath'):f.end('filePath')-1]
-        fileName = __ifNoneEmptyStr(f.group('fileName'))          #f.string[f.start('fileName'):f.end('fileName')]
-        fileExt = __ifNoneEmptyStr(f.group('fileExtension'))      #f.string[f.start('fileExtension'):f.end('fileExtension')]
+        deviceLabel = none_if_empty(f.group('deviceLabel'))    #f.string[f.start('deviceLabel'):f.end('deviceLabel')]
+        filePath = none_if_empty(f.group('filePath'))          #f.string[f.start('filePath'):f.end('filePath')-1]
+        fileName = none_if_empty(f.group('fileName'))          #f.string[f.start('fileName'):f.end('fileName')]
+        fileExt = none_if_empty(f.group('fileExtension'))      #f.string[f.start('fileExtension'):f.end('fileExtension')]
         absFilePath = deviceLabel + filePath + fileName + '.' + fileExt
         print(absFilePath)
     return (deviceLabel, filePath, fileName, fileExt, absFilePath)
@@ -105,10 +105,8 @@ def recursiveFolderProcess(folderPath, func):
         if file.is_file():
             func(file)
 
-def __ifNoneEmptyStr(s):
-    if s is None:
-        return ''
-    return s
+def none_if_empty(s):
+    return '' if s is None else s
 
 def parseFilePathNameExt(inText):
     pattern = re.compile(r"""
@@ -126,11 +124,11 @@ def parseFilePathNameExt(inText):
     fileName = ''
     fileExt = ''
     if match:
-        deviceLabel = __ifNoneEmptyStr(match.group('deviceLabel'))
-        filePath = __ifNoneEmptyStr(match.group('filePath'))
-        lastFolder = __ifNoneEmptyStr(match.group('lastFolder'))
-        fileName = __ifNoneEmptyStr(match.group('fileName'))
-        fileExt = __ifNoneEmptyStr(match.group('fileExt'))
+        deviceLabel = none_if_empty(match.group('deviceLabel'))
+        filePath = none_if_empty(match.group('filePath'))
+        lastFolder = none_if_empty(match.group('lastFolder'))
+        fileName = none_if_empty(match.group('fileName'))
+        fileExt = none_if_empty(match.group('fileExt'))
     return (deviceLabel, filePath, lastFolder, fileName, fileExt)
 
 def parseInputArguments(argsToParse, **opts):
