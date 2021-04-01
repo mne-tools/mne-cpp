@@ -12,14 +12,14 @@ webBaseFolder = projectFolder + 'doc/gh-pages'
 # print(web)
 
 # (pathLabel, filePath, fileName, fileExt, fullPath) = mne_cpp.core.extractFilePaths('../../doc/gh-pages/pages/documentation/anonymize.md')
-(pathLabel, filePath, fileName, fileExt, fullPath) = mne_cpp.core.extractFilePaths('../../doc/gh-pages/pages/download/changelog.md')
+(pathLabel, filePath, fileName, fileExt, fullPath) = mne_cpp.core.extractFilePaths('../../doc/gh-pages/pages/contact.md')
 
 inFile = open(fullPath, mode = 'r', encoding = 'utf8')
 inText = inFile.read()
 inFile.close()
 
 outText = mne_cpp.pdf_doc.parseUnorderedList(inText)
-outFile = open(pathLabel + filePath + fileName + '_PROCESSED' + '.' + fileExt, mode = 'w', encoding = 'utf8')
+outFile = open(pathLabel + filePath + fileName + '.PROCESSED' + '.' + fileExt, mode = 'w', encoding = 'utf8')
 outFile.write(outText)
 outFile.close()
 

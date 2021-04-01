@@ -35,6 +35,9 @@ from pathlib import Path
 from os import scandir, path 
 import re
 import mne_cpp.core
+from svglib.svglib import svg2rlg
+from reportlab.graphics import renderPM
+from PIL import Image
 
 def parseFile(file, verboseMode = False):
     with open(file, 'r', encoding='utf8') as fileOpened:
@@ -195,11 +198,10 @@ def parseMarkDownFile(file, **inputArgs):
             inText = parseUnorderedList(inText)
             inText = parseInlineImages(inText)
             inText = parseInlineHTMLImages(inText)
-            # inText = parseTables(inText)
+            inText = parseTableMd(inText)
+            inText = parseLinks(inText)
             # inText = parseFigureImages(inText)
             # inText = parseHeaders(inText)
-
-
 
 def deleteJustTheDocsHeader(text):
     return re.sub(r'\n*\s*---\s*\n(.*\n)*---\n','',text)
@@ -279,6 +281,37 @@ def parseTableMd(inText)
     else:
         return inText
 
+def parseLinks(inText):
+    inText = inText.replace('{:target=\"_blank\" rel=\"noopener\"}','')
+    nameRe = '[^]]+'
+    urlRe = 'http[s]?://[^)]+'
+    markupRegex = '\[({0})]\(\s*({1})\s*\)'.format(nameRe, urlRe)
+    linkList = re.findall(markupRegex, inText)
+    if linkList:
+        link = linkList[0]
+        inTextPre  = inText.split('[' + link[0] + ']')[0]
+        inTextPost = inText.split('(' + link[1] + ')')[1]
+        latexLink = '\\href{' + link[1] + '}{' + link[0] + '}\\footnote{' + link[1] + '}'
+        strOut = inTextPre + latexLink + inTextPost
+        parseLinks(strOut)
+    else:
+        return str
+
+# still missing: 
+# ordered lists parsing
+# inbound links vs outbound links
+# parse inline code
+# parse headers
+# preamble and ending file
+
+def parseHeader(texFile,str,markdownKey,latexKey,labelLatexKey):
+    if str.startswith(markdownKey):
+        newHeader = line.split(markdownKey)[1].ltrip().rstrip()
+        texFile.write("\n\\" + latexKey + "{" + newHeader.strip() + "}" + " \n\\label{" + labelLatexKey + ":" + newHeader.strip().replace(" ","_") + "}")
+        return True
+    else:
+        return False
+
 # if   parseHeader(texFile,line,"# ","part","sec"):
 #     continue
 # elif parseHeader(texFile,line,"## ","section","sec"):
@@ -287,3 +320,42 @@ def parseTableMd(inText)
 #     continue
 # elif parseHeader(texFile,line,"#### ","subsubsection","ssec"):
 #     continue
+
+def processImage(imageFile):
+        _, _, _, _, fileExt = mne_cpp.core.parseFilePathNameExt(imageFile)
+    if fileExt == "jpg" or fileExt == "jpeg":
+        jpg2png(imageFile)
+    if fileExt == "svg2":
+        svg2png(imageFile)
+
+def svg2png(file):
+    drawing = svg2rlg(file)
+    fPath, fName, _ = extractFilePathNameExt(file)
+    pngFile = path.join(fPath, fName + ".png")
+    renderPM.drawToFile(drawing, pngFile, fmt="PNG")
+
+def jpg2png(file):
+    print(file)
+    im1 = Image.open(file)
+    fPath, fName, _ = extractFilePathNameExt(file)
+    im1.save(path.join(fPath, fName + ".png"))
+
+
+# imagesFolder = path.join("gh-pages", "images")
+# svg2png(svgFile)
+# jpg2png("gh-pages/images/1280px-EEGoSportsGUI.jpg")
+
+# instructions on how to install svglib correctly on ubuntu
+# sudo apt-get install update
+# sudo apt-get install python3
+# sudo apt-get install python3-pip
+# python3 -m pip install svglib
+
+# then python3 pdfDocumentationGenerator.py
+
+# for w in web:
+
+# shutil.copy(src_dir,dst_dir)
+
+# outFile = open(path.join(currentPath(),docFileName),"a+")
+
