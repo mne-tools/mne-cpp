@@ -194,7 +194,7 @@ def parseMarkDownFile(file, **inputArgs):
             inText = parseInlineBoldText(inText)
             inText = parseUnorderedList(inText)
             inText = parseInlineImages(inText)
-            # inText = parseInlineHTMLImages(inText)
+            inText = parseInlineHTMLImages(inText)
             # inText = parseTables(inText)
             # inText = parseFigureImages(inText)
             # inText = parseHeaders(inText)
@@ -233,24 +233,27 @@ def parseInlineImages(inText):
         figText += '\n\t\\begin{center}'
         figText += '\n\t\t\\includegraphics[width=0.4\\textwidth]{ ' + imgPath + '}'
         figText += '\n\t\\end{center}'
-        figText += '\n\t\\caption{' + imgAltText + '}'
+        figText += '\n\t\\caption{' + imgAltText.replace(' ','_') + '}'
         figText += '\n\\end{wrapfigure}'
         outText = inText[:match.start(0)] + figText + inText[match.end(0):]
         return parseInlineImages(outText)
     else:
         return inText
 
-
-
-
-
-
-
-
-
-
-
-
+def parseInlineHTMLImages(inText):
+    match = re.search(r'<\s*img\s*src\s*=\s*"(?P<imgPath>[^"]+)".*>', inText)
+    if match:
+        imgPath = mne_cpp.core.__ifNoneEmptyStr(match.group('imgFilePath'))
+        figText  = '\n\\begin{wrapfigure}{r}{0.5\\textwidth}'
+        figText += '\n\t\\begin{center}'
+        figText += '\n\t\t\\includegraphics[width=0.4\\textwidth]{ ' + imgPath + '}'
+        figText += '\n\t\\end{center}'
+        figText += '\n\t\\caption{' + imgAltText.replace(' ','_') + '}'
+        figText += '\n\\end{wrapfigure}'
+        outText = inText[:match.start(0)] + figText + inText[match.end(0):]
+        return parseInlineImages(outText)
+    else:
+        return inText
 
 
 

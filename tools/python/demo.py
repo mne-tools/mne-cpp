@@ -73,3 +73,6 @@ a = 3
 #     print('OptionC : ' + str(optionC))
 
 # importantFcn('5134',optionC = 'obladiriolaride', tetetetet = '321', opTIona = 37)
+
+# add wrapfigure to latex preamble
+
