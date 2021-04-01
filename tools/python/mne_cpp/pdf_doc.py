@@ -255,9 +255,29 @@ def parseInlineHTMLImages(inText):
     else:
         return inText
 
-
-
-
+def parseTableMd(inText)
+    match = re.search(r'(?<=\n)\|([^|\n]+\|)+', inText)
+    if match:
+        tableText = inText[match.start(0):match.end(0)]
+        firstRow = re.sub(r'^.*',r'\g<0>', tableText) 
+        numCols = firstRow.count('|') - 1
+        latexTableText  = '\\begin{table}[h!]\n'
+        latexTableText += '\\centering\n'
+        latexTableText += '\\begin{tabular}{||' + 'c' * numCols + '||}\n'
+        latexTableText += '&'.join(firstRow.split('|')[1:-1]) + '\\\\[0.5ex]\n'
+        otherRows = re.findall(r'(?<=\n)\|.*', tableText)
+        for row in otherRows:
+            hColumnMatch = re.search('(?<=\n)\|[:\-|]+',row)
+            if hColumnMatch:
+                latexTableText += ' \\hline\n'
+            latexTableText += ' ' + '&'.join(row.split('|')[1:-1]) + '\\\\\n'
+        latexTableText += ' \\hline\n'
+        latexTableText += '\\end{tabular}\n'
+        latexTableText += '\\end{table}\n'
+        outText = inText[:match.start(0)] + latexTableText + inText[match.end(0):]
+        return parseInlineImages(outText)
+    else:
+        return inText
 
 # if   parseHeader(texFile,line,"# ","part","sec"):
 #     continue
