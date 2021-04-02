@@ -14,5 +14,5 @@ mne_cpp.core.recursiveFolderProcess(projectFolder + 'doc/gh-pages', lambda f:   
                                                                         else None )
 listOfFiles.sort(reverse=True, key=lambda f:f[1])
 for f in listOfFiles:
-    print('File: ' + f[0].path + ' - (' + mne_cpp.core.size_human_readable(f[1]) + ')')
+    print('File: ' + f[0].path + ' - (' + mne_cpp.core.sizeHumanReadable(f[1]) + ')')
 

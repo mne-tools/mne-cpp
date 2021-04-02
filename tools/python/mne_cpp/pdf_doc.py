@@ -202,15 +202,14 @@ def parseMarkDownFile(file, **inputArgs):
             inText = parseHeaders(inText)
             inText = parseLinks(inText)
 
+def deleteJustTheDocsHeader(inText):
+    return re.sub(r'\n*\s*---\s*\n(.*\n)*---\n','',inText)
 
-def deleteJustTheDocsHeader(text):
-    return re.sub(r'\n*\s*---\s*\n(.*\n)*---\n','',text)
+def parseInlineItalicText(inText):
+    return re.sub(r'(?<=\W)((?P<star>\*)|_)(?P<itext>\w+)(?(star)\*|_)(?=\W)',r'\\textit{\g<itext>}', inText)
 
-def parseInlineItalicText(text):
-    return re.sub(r'(?<=\W)((?P<star>\*)|_)(?P<itext>\w+)(?(star)\*|_)(?=\W)',r'\\textit{\g<itext>}', text)
-
-def parseInlineBoldText(text):
-    return re.sub(r'(?<=\W)((?P<dstar>\*\*)|__)(?P<btext>[\w ]+)((?(dstar)\*\*)|__)(?=\W)',r'\\textbf{\g<btext>}', text)
+def parseInlineBoldText(inText):
+    return re.sub(r'(?<=\W)((?P<dstar>\*\*)|__)(?P<btext>[\w ]+)((?(dstar)\*\*)|__)(?=\W)',r'\\textbf{\g<btext>}', inText)
 
 def parseUnorderedList(inText):
     match = re.search(r'(\n\s?\*\s?.+)(\n\s?\*\s?(.+))*', inText)
@@ -313,10 +312,11 @@ def parseHeaders(inText):
     else:
         return inText
 
+def parseHorizontalLine(inText):
+    return re.sub(r'(?<=\n)\*\s\*\s\*(?=\n)','\\noindent\\rule{15cm}{0.5pt}', inText)
+
 # parse horizontal line 
 # \n\* \* \*
-
-mne_cpp.core.get_list_of_files
 
 # parse all lists with (\n((\s*[-*]\s*)|(\s*\d+\.\s*)).+)+
 # see https://regex101.com/r/2uKqPB/1/
@@ -338,11 +338,10 @@ mne_cpp.core.get_list_of_files
 
 
 # still missing: 
-# ordered lists parsing
+# ordered and unordered lists parsing
 # inbound links vs outbound links
 # parse inline code
 # preamble and ending file
-# parse horizontal lines
 # parse multiple terms description/definition
 
 
