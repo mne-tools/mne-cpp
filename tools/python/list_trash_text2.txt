@@ -1,0 +1,26 @@
+\begin{itemize}
+	\item level 1 item
+	\begin{itemize}
+		\item level 2 item
+		\item level 2 item
+		\begin{itemize}
+			\item level 3 item
+			\item level 3 item
+		\end{itemize}
+	\end{itemize}
+	\item level 1 item
+	\begin{itemize}
+		\item level 2 item
+		\item level 2 item
+		\item level 2 item
+	\end{itemize}
+	\item level 1 item
+	\begin{itemize}
+		\item level 2 item
+		\item level 2 item
+	\end{itemize}
+	\item level 1 item
+\end{itemize}
+ 
+ 
+ 

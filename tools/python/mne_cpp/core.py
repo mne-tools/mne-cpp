@@ -158,8 +158,8 @@ def parseInputArguments(argsToParse, **opts):
             options[arg_adapted] = argsToParse[arg]
     return (v for k, v in options.items())
 
-_suffixes = ['bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
 def sizeHumanReadable(size):
+    _suffixes = ['bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
     # determine binary order in steps of size 10 
     # (coerce to int, // still returns a float)
     order = int(log2(size) / 10) if size else 0
