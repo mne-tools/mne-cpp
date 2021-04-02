@@ -190,8 +190,14 @@ def parseMarkDownFile(file, **inputArgs):
     else:
         with open(file.fullPath, 'r', encoding='utf8') as markDownFile, \
              open(texFile,'a+') as texFile:
+            # The order here is relevant. Some of the regex depend on not having conflicting patterns. 
+            # i.e. empty lines can sometimes interfere with some lists patterns
+            # i.e.2 horizontal lines (\n* * *) pattern can sometimes be understood as a list. 
+            # I've tried to minimize these conflicts but I'm not 100% sure. So any change should be tested...
             inText = markDownFile.read()
+            inText = stripEmptyLines(inText)
             inText = deleteJustTheDocsHeader(inText)
+            inText = parseHorizontalLines(inText)
             inText = parseInlineItalicText(inText)
             inText = parseInlineBoldText(inText)
             inText = parseUnorderedList(inText)
@@ -211,25 +217,11 @@ def parseInlineItalicText(inText):
 def parseInlineBoldText(inText):
     return re.sub(r'(?<=\W)((?P<dstar>\*\*)|__)(?P<btext>[\w ]+)((?(dstar)\*\*)|__)(?=\W)',r'\\textbf{\g<btext>}', inText)
 
-def parseUnorderedList(inText):
-    match = re.search(r'(\n\s?\*\s?.+)(\n\s?\*\s?(.+))*', inText)
-    if match:
-        outList = '\n\\begin{itemize}\n'
-        pattern2 = re.compile(r'\n*\s*\*\s*(?P<item>.+)(?=\n)?')
-        itemList = pattern2.finditer(match.group(0))
-        for item in itemList:
-            outList += '\t\\item ' + item.group('item') + '\n'
-        outList += '\\end{itemize}'
-        outText = inText[:match.start(0)] + outList + inText[match.end(0):]
-        return parseUnorderedList(outText)
-    else:
-        return inText
-
 def parseInlineImages(inText):
     match = re.search(r'!\[(?P<alt_text>[^]]+)\]\((?P<imgFilePath>[^)]+)\)', inText)
     if match:
-        imgPath = mne_cpp.core.none_if_empty(match.group('imgFilePath'))
-        imgAltText = mne_cpp.core.none_if_empty(match.group('alt_text'))
+        imgPath = mne_cpp.core.noneIfEmpty(match.group('imgFilePath'))
+        imgAltText = mne_cpp.core.noneIfEmpty(match.group('alt_text'))
         figText  = '\n\\begin{wrapfigure}{r}{0.5\\textwidth}'
         figText += '\n\t\\begin{center}'
         figText += '\n\t\t\\includegraphics[width=0.4\\textwidth]{ ' + imgPath + '}'
@@ -244,7 +236,7 @@ def parseInlineImages(inText):
 def parseInlineHTMLImages(inText):
     match = re.search(r'<\s*img\s*src\s*=\s*"(?P<imgPath>[^"]+)".*>', inText)
     if match:
-        imgPath = mne_cpp.core.none_if_empty(match.group('imgFilePath'))
+        imgPath = mne_cpp.core.noneIfEmpty(match.group('imgFilePath'))
         figText  = '\n\\begin{wrapfigure}{r}{0.5\\textwidth}'
         figText += '\n\t\\begin{center}'
         figText += '\n\t\t\\includegraphics[width=0.4\\textwidth]{ ' + imgPath + '}'
@@ -256,7 +248,7 @@ def parseInlineHTMLImages(inText):
     else:
         return inText
 
-def parseTableMd(inText)
+def parseTableMd(inText):
     match = re.search(r'(?<=\n)\|([^|\n]+\|)+', inText)
     if match:
         tableText = inText[match.start(0):match.end(0)]
@@ -312,14 +304,67 @@ def parseHeaders(inText):
     else:
         return inText
 
-def parseHorizontalLine(inText):
+def parseHorizontalLines(inText):
     return re.sub(r'(?<=\n)\*\s\*\s\*(?=\n)','\\noindent\\rule{15cm}{0.5pt}', inText)
 
-# parse horizontal line 
-# \n\* \* \*
+def stripHorizontalLines(inText):
+    return re.sub(r'(?<=\n)\*\s\*\s\*(?=\n)','', inText)
+
+def stripEmptyLines(inText):
+    return re.sub(r'((?<=\n)\n)','',inText)
+
+# def parseUnorderedList(inText):
+#     match = re.search(r'(\n\s?\*\s?.+)(\n\s?\*\s?(.+))*', inText)
+#     if match:
+#         outList = '\n\\begin{itemize}\n'
+#         pattern2 = re.compile(r'\n*\s*\*\s*(?P<item>.+)(?=\n)?')
+#         itemList = pattern2.finditer(match.group(0))
+#         for item in itemList:
+#             outList += '\t\\item ' + item.group('item') + '\n'
+#         outList += '\\end{itemize}'
+#         outText = inText[:match.start(0)] + outList + inText[match.end(0):]
+#         return parseUnorderedList(outText)
+#     else:
+#         return inText
+def parseUnorderedList(inText, i):
+    pattern = r'\n(( {0}[-*] *)(?P<itemText>.*))'
+    lastMatch = len(re.findall(pattern, inListText))
+    matches = re.finditer(pattern, inListText)
+    parsedText = ''
+    for numMatch, match in enumerate(matches, start = 1):
+        itemText = '\n\\begin{itemize}' if numMatch is 1 else ''
+        itemText += '\\item ' + match.group('itemText')
+        itemText += '\\end{itemize}' if numMatch is lastMatch
+        parsedText += inListText[:match.start()] + itemText + inListText[match.end():]
+
+
+def parseOneList(inList):
+    outList = parseUnorderedList(inList)
+
+
+
+def parseLists(inText):
+    match = re.search(r'(\n(( *[-*] *)|( *\d+\. *))[^\-*\n ].+)+', inText)
+    if match:
+        parsedList = parseOneList(match.group())
+        outText = inText[:match.start()] + parsedList + inText[match.end():]
+        return parseLists
+    else: 
+        return inText            
+
+
+    # for spaces in range(2:2:6):
+    #     pattern = 
+
+#         matches4ord = re.finditer(r'(\n( {2}(\d+\.) *)([^-\n ].*))+', text[match.start(0):match.end(0)])
+#         for match4ord in matches4ord:
+#             outText = '\n\\begin{enumerate}\n'
+
+# ((\n {2}\d+\. *)(?P<item>.*))
 
 # parse all lists with (\n((\s*[-*]\s*)|(\s*\d+\.\s*)).+)+
-# see https://regex101.com/r/2uKqPB/1/
+# https://regex101.com/r/idzIo5/1/
+# https://regex101.com/r/Iu3hKt/1
 
 # after this parse 
 # ordered lists of level 4
@@ -335,18 +380,16 @@ def parseHorizontalLine(inText):
 # https://tex.stackexchange.com/questions/247681/how-to-create-checkbox-todo-list
 
 
-
-
 # still missing: 
 # ordered and unordered lists parsing
 # inbound links vs outbound links
 # parse inline code
 # preamble and ending file
 # parse multiple terms description/definition
-
+# header tags up to 6 #s
 
 def processImage(imageFile):
-        _, _, _, _, fileExt = mne_cpp.core.parseFilePathNameExt(imageFile)
+    _, _, _, _, fileExt = mne_cpp.core.parseFilePathNameExt(imageFile)
     if fileExt == "jpg" or fileExt == "jpeg":
         jpg2png(imageFile)
     if fileExt == "svg2":
