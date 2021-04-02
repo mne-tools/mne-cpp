@@ -42,18 +42,15 @@ def version():
     print('MNE-CPP Project python module. - Version: 0.1.9')
     print('Copyright (C) 2021, Juan Garcia-Prieto. All rights reserved.')
 
-def __currentPath():
+def __pathToThisFile():
     return path.abspath(path.dirname(sys.argv[0]))
 
 def baseFolder():
-    this_script_path = __currentPath().split(path.sep)
+    this_script_path = __pathToThisFile().split(path.sep)
     project_path = ''
     for f in this_script_path[:-2]:
         project_path += f + '/'
     return project_path
-class File_ext_separator(Enum):
-    FIRST = 1
-    LAST = 2
 
 def extractFilePaths(text: str, **inputArgs):
     
@@ -90,10 +87,10 @@ def extractFilePaths(text: str, **inputArgs):
     pattern = re.compile(expression)
     fileMatches = pattern.finditer(text)
     for f in fileMatches:
-        deviceLabel = none_if_empty(f.group('deviceLabel'))    #f.string[f.start('deviceLabel'):f.end('deviceLabel')]
-        filePath = none_if_empty(f.group('filePath'))          #f.string[f.start('filePath'):f.end('filePath')-1]
-        fileName = none_if_empty(f.group('fileName'))          #f.string[f.start('fileName'):f.end('fileName')]
-        fileExt = none_if_empty(f.group('fileExtension'))      #f.string[f.start('fileExtension'):f.end('fileExtension')]
+        deviceLabel = noneIfEmpty(f.group('deviceLabel'))    #f.string[f.start('deviceLabel'):f.end('deviceLabel')]
+        filePath = noneIfEmpty(f.group('filePath'))          #f.string[f.start('filePath'):f.end('filePath')-1]
+        fileName = noneIfEmpty(f.group('fileName'))          #f.string[f.start('fileName'):f.end('fileName')]
+        fileExt = noneIfEmpty(f.group('fileExtension'))      #f.string[f.start('fileExtension'):f.end('fileExtension')]
         absFilePath = deviceLabel + filePath + fileName + '.' + fileExt
         print(absFilePath)
     return (deviceLabel, filePath, fileName, fileExt, absFilePath)
@@ -105,7 +102,7 @@ def recursiveFolderProcess(folderPath, func):
         if file.is_file():
             func(file)
 
-def none_if_empty(s):
+def noneIfEmpty(s):
     return '' if s is None else s
 
 def parseFilePathNameExt(inText):
@@ -124,11 +121,11 @@ def parseFilePathNameExt(inText):
     fileName = ''
     fileExt = ''
     if match:
-        deviceLabel = none_if_empty(match.group('deviceLabel'))
-        filePath = none_if_empty(match.group('filePath'))
-        lastFolder = none_if_empty(match.group('lastFolder'))
-        fileName = none_if_empty(match.group('fileName'))
-        fileExt = none_if_empty(match.group('fileExt'))
+        deviceLabel = noneIfEmpty(match.group('deviceLabel'))
+        filePath = noneIfEmpty(match.group('filePath'))
+        lastFolder = noneIfEmpty(match.group('lastFolder'))
+        fileName = noneIfEmpty(match.group('fileName'))
+        fileExt = noneIfEmpty(match.group('fileExt'))
     return (deviceLabel, filePath, lastFolder, fileName, fileExt)
 
 def parseInputArguments(argsToParse, **opts):
@@ -162,7 +159,7 @@ def parseInputArguments(argsToParse, **opts):
     return (v for k, v in options.items())
 
 _suffixes = ['bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
-def size_human_readable(size):
+def sizeHumanReadable(size):
     # determine binary order in steps of size 10 
     # (coerce to int, // still returns a float)
     order = int(log2(size) / 10) if size else 0
@@ -171,7 +168,7 @@ def size_human_readable(size):
     # should never resort to exponent values)
     return '{:.4g} {}'.format(size / (1 << (order * 10)), _suffixes[order])
 
-def get_list_of_files(folder):
+def getListOfFiles(folder):
     """Retrieve a list of files inside (recursive) a folder.
 
     Args:
