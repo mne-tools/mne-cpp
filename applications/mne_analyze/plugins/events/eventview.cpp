@@ -655,7 +655,7 @@ void EventView::redrawGroups()
 
     m_pUi->m_listWidget_groupListWidget->clear();
 
-    for (auto eventGroup : *groups){
+    for (auto& eventGroup : *groups){
         QListWidgetItem* newItem = new QListWidgetItem(QString::fromStdString(eventGroup.name));
         newItem->setData(Qt::UserRole, QVariant(eventGroup.id));
         newItem->setData(Qt::DecorationRole, QColor(eventGroup.color.r, eventGroup.color.g, eventGroup.color.b));
@@ -670,7 +670,6 @@ void EventView::redrawGroups()
     }
 
     qDebug() << "EventView::redrawGroups";
-    //m_pEventModel.get
     emit groupsUpdated();
     emit triggerRedraw();
 }

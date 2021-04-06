@@ -229,7 +229,7 @@ void Events::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel
 
 //=============================================================================================================
 
-void Events::toggleDisplayEvent(const int& iToggle)
+void Events::toggleDisplayEvent(int iToggle)
 {
     QVariant data;
     data.setValue(iToggle);
