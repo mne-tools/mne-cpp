@@ -111,6 +111,8 @@ RtFiffRawViewModel::RtFiffRawViewModel(QObject *parent)
     m_EventManager.initSharedMemory(EVENTSLIB::SharedMemoryMode::READWRITE);
 }
 
+//=============================================================================================================
+
 RtFiffRawViewModel::~RtFiffRawViewModel()
 {
     m_EventManager.stopSharedMemory();

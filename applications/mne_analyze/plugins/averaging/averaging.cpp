@@ -621,9 +621,6 @@ void Averaging::updateGroups()
             m_pAveragingSettingsView->addSelectionGroup((group.name).c_str(), group.id);
         }
     }
-//    for(int i = 0; i < m_pFiffRawModel->getEventModel()->getHubSize(); i++){
-//        m_pAveragingSettingsView->addSelectionGroup(m_pFiffRawModel->getEventModel()->getGroupNameFromList(i));
-//    }
 }
 
 //=============================================================================================================

@@ -100,10 +100,10 @@ public:
     //=========================================================================================================
 
     EventModel(const QString &sFilePath,
-                    const QByteArray& byteLoadedData = QByteArray(),
-                    float fSampFreq = 600,
-                    int iFirstSampOffst = 0,
-                    QObject* parent = Q_NULLPTR);
+               const QByteArray& byteLoadedData = QByteArray(),
+               float fSampFreq = 600,
+               int iFirstSampOffst = 0,
+               QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -414,7 +414,8 @@ public:
      * @param[in] sName     Group name.
      * @param[in] color     Group color.
      */
-    void addGroup(QString sName, QColor color);
+    void addGroup(QString sName,
+                  QColor color);
 
     //=========================================================================================================
     /**
@@ -425,7 +426,8 @@ public:
      *
      * @return  Pointer to a vector of events.
      */
-    std::unique_ptr<std::vector<EVENTSLIB::Event> > getEventsToDisplay(int iBegin, int iEnd) const;
+    std::unique_ptr<std::vector<EVENTSLIB::Event> > getEventsToDisplay(int iBegin,
+                                                                       int iEnd) const;
 
     //=========================================================================================================
     /**
@@ -465,7 +467,7 @@ public:
      *
      * @return  vector of group Ids of selected groups
      */
-    const std::vector<idNum> getSelectedGroups() const;
+    std::vector<idNum> getSelectedGroups() const;
 
     //=========================================================================================================
     /**

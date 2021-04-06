@@ -92,7 +92,7 @@ EventModel::EventModel(QObject* parent)
 //=============================================================================================================
 
 EventModel::EventModel(QSharedPointer<FiffRawViewModel> pFiffModel,
-                QObject* parent)
+                       QObject* parent)
 : AbstractModel(parent)
 , m_iSamplePos(0)
 , m_iFirstSample(0)
@@ -107,10 +107,10 @@ EventModel::EventModel(QSharedPointer<FiffRawViewModel> pFiffModel,
 //=============================================================================================================
 
 EventModel::EventModel(const QString &sFilePath,
-                                 const QByteArray& byteLoadedData,
-                                 float fSampFreq,
-                                 int iFirstSampOffst,
-                                 QObject* parent)
+                       const QByteArray& byteLoadedData,
+                       float fSampFreq,
+                       int iFirstSampOffst,
+                       QObject* parent)
 : AbstractModel(parent)
 , m_iSamplePos(0)
 , m_iFirstSample(0)
@@ -135,8 +135,8 @@ EventModel::~EventModel()
 //=============================================================================================================
 
 bool EventModel::insertRows(int position,
-                                 int span,
-                                 const QModelIndex & parent)
+                            int span,
+                            const QModelIndex & parent)
 {
     Q_UNUSED(parent);
 
@@ -185,7 +185,7 @@ int EventModel::columnCount(const QModelIndex &parent) const
 //=============================================================================================================
 
 QVariant EventModel::data(const QModelIndex &index,
-                               int role) const
+                          int role) const
 {
     if(role == Qt::TextAlignmentRole)
         return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
@@ -279,8 +279,8 @@ QVariant EventModel::data(const QModelIndex &index,
 //=============================================================================================================
 
 bool EventModel::setData(const QModelIndex &index,
-                              const QVariant &value,
-                              int role)
+                         const QVariant &value,
+                         int role)
 {
     if(index.row() >= rowCount() || index.column() >= columnCount())
         return false;
@@ -291,18 +291,11 @@ bool EventModel::setData(const QModelIndex &index,
         switch(column) {
             case 0: //sample values
                 m_EventManager.moveEvent(events->at(index.row()).id, value.toInt() + m_iFirstSample);
-                //m_dataSamples[index.row()] = value.toInt() + m_iFirstSample;
                 break;
 
             case 1: //time values
                 m_EventManager.moveEvent(events->at(index.row()).id, value.toDouble() * m_fFreq + m_iFirstSample);
-                //m_dataSamples[index.row()] = value.toDouble() * m_fFreq + m_iFirstSample;
                 break;
-
-//            case 2: //type
-//                QString string = value.toString();
-//                m_dataTypes[index.row()] = string.toInt();
-//                break;
         }
     }
 
@@ -322,8 +315,8 @@ Qt::ItemFlags EventModel::flags(const QModelIndex &index) const
 //=============================================================================================================
 
 QVariant EventModel::headerData(int section,
-                                     Qt::Orientation orientation,
-                                     int role) const
+                                Qt::Orientation orientation,
+                                int role) const
 {
     if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
         return QVariant();
@@ -337,8 +330,6 @@ QVariant EventModel::headerData(int section,
                 return QVariant("Sample");
             case 1: //time value column
                 return QVariant("Time (s)");
-//            case 2: //event type column
-//                return QVariant("Group");
             }
     }
     else if(orientation == Qt::Vertical) {
@@ -351,8 +342,8 @@ QVariant EventModel::headerData(int section,
 //=============================================================================================================
 
 bool EventModel::removeRows(int position,
-                                 int span,
-                                 const QModelIndex &parent)
+                            int span,
+                            const QModelIndex &parent)
 {
     Q_UNUSED(parent);
 
@@ -373,7 +364,7 @@ bool EventModel::removeRows(int position,
 //=============================================================================================================
 
 void EventModel::setFirstLastSample(int firstSample,
-                                         int lastSample)
+                                    int lastSample)
 {
     m_iFirstSample = firstSample;
     m_iLastSample = lastSample;
@@ -503,7 +494,6 @@ MatrixXi EventModel::getEventMatrix(int iGroup)
 {
     MatrixXi matEventDataMatrix;
 
-
     if(iGroup == 9999){
         //Current selecting in Event Plugin
 
@@ -545,7 +535,7 @@ void EventModel::setGroupColor(const QColor& groupColor)
 //=============================================================================================================
 
 void EventModel::setGroupName(int iGroupIndex,
-                                   const QString &sGroupName)
+                              const QString &sGroupName)
 {
     m_EventManager.renameGroup(iGroupIndex, sGroupName.toStdString());
     emit eventGroupsUpdated();
@@ -618,10 +608,9 @@ void EventModel::addEvent(int iSample)
 
 //=============================================================================================================
 
-void EventModel::addGroup(QString sName, QColor color)
+void EventModel::addGroup(QString sName,
+                          QColor color)
 {
-    qDebug() << "EventModel::addGroup";
-
     int red, green, blue;
     color.getRgb(&red, &green, &blue);
 
@@ -636,7 +625,8 @@ void EventModel::addGroup(QString sName, QColor color)
 
 //=============================================================================================================
 
-std::unique_ptr<std::vector<EVENTSLIB::Event> > EventModel::getEventsToDisplay(int iBegin, int iEnd) const
+std::unique_ptr<std::vector<EVENTSLIB::Event> > EventModel::getEventsToDisplay(int iBegin,
+                                                                               int iEnd) const
 {
     return m_EventManager.getEventsBetween(iBegin, iEnd, m_selectedEventGroups);
 }
@@ -684,7 +674,7 @@ QColor EventModel::getGroupColor(int iGroupId) const
 
 //=============================================================================================================
 
-const std::vector<idNum> EventModel::getSelectedGroups() const
+std::vector<idNum> EventModel::getSelectedGroups() const
 {
     return m_selectedEventGroups;
 }

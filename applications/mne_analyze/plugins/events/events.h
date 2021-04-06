@@ -136,7 +136,7 @@ private:
      *
      * @param[in] iToggle  0 for not shown, 2 for shown.
      */
-    void toggleDisplayEvent(const int& iToggle);
+    void toggleDisplayEvent(int iToggle);
 
     //=========================================================================================================
     /**
