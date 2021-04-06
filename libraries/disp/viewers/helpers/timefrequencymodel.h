@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * @file     timefrequencymodel.h
- * @author   Gabriel Motta <lesch@mgh.harvard.edu>
+ * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.9
  * @date     April, 2021
  *

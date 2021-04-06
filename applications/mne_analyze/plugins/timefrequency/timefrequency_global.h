@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     timefrequencyview.h
+ * @file     timefrequency_global.h
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.9
  * @date     April, 2021
@@ -28,18 +28,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Declaration of the TimeFrequencyView Class.
+ * @brief    Contains the FiffIO library export/import macros.
  *
  */
 
-#ifndef TIMEFREQUENCYVIEW_H
-#define TIMEFREQUENCYVIEW_H
+#ifndef TIMEFREQUENCY_GLOBAL_H
+#define TIMEFREQUENCY_GLOBAL_H
 
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
-class TimeFrequencyView
-{
-public:
-    TimeFrequencyView();
-};
+#include <QtCore/qglobal.h>
 
-#endif // TIMEFREQUENCYVIEW_H
+//=============================================================================================================
+// PREPROCESSOR DEFINES
+//=============================================================================================================
+
+#if defined(TIMEFREQUENCY_PLUGIN)
+#  define TIMEFREQUENCYSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#  define TIMEFREQUENCYSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
+
+#endif // TIMEFREQUENCY_GLOBAL_H
