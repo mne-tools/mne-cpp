@@ -550,7 +550,7 @@ void RtFiffRawView::channelContextMenu(QPoint pos)
     connect(addEventMarker, &QAction::triggered,
             this, &RtFiffRawView::onAddEvent);
 
-    //**************** Marking ****************
+    //Marking
 
     menu->addSection("Channel Marking");
 
