@@ -107,6 +107,8 @@ SOURCES += \
     viewers/fwdsettingsview.cpp \
     viewers/helpers/scalecontrol.cpp \
     viewers/helpers/timefrequencymodel.cpp \
+    viewers/helpers/timefrequencyscene.cpp \
+    viewers/helpers/timefrequencysceneitem.cpp \
     viewers/progressview.cpp \
     viewers/spectrumview.cpp \
     viewers/modalityselectionview.cpp \
@@ -168,6 +170,8 @@ HEADERS += \
     viewers/fwdsettingsview.h \
     viewers/helpers/scalecontrol.h \
     viewers/helpers/timefrequencymodel.h \
+    viewers/helpers/timefrequencyscene.h \
+    viewers/helpers/timefrequencysceneitem.h \
     viewers/progressview.h \
     viewers/spectrumview.h \
     viewers/modalityselectionview.h \
