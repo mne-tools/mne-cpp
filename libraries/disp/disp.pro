@@ -106,6 +106,7 @@ SOURCES += \
     viewers/averagelayoutview.cpp \
     viewers/fwdsettingsview.cpp \
     viewers/helpers/scalecontrol.cpp \
+    viewers/helpers/timefrequencymodel.cpp \
     viewers/progressview.cpp \
     viewers/spectrumview.cpp \
     viewers/modalityselectionview.cpp \
@@ -119,6 +120,7 @@ SOURCES += \
     viewers/spharasettingsview.cpp \
     viewers/fiffrawviewsettings.cpp \
     viewers/averageselectionview.cpp \
+    viewers/timefrequencyview.cpp \
     viewers/triggerdetectionview.cpp \
     viewers/quickcontrolview.cpp \
     viewers/connectivitysettingsview.cpp \
@@ -165,6 +167,7 @@ HEADERS += \
     viewers/averagelayoutview.h \
     viewers/fwdsettingsview.h \
     viewers/helpers/scalecontrol.h \
+    viewers/helpers/timefrequencymodel.h \
     viewers/progressview.h \
     viewers/spectrumview.h \
     viewers/modalityselectionview.h \
@@ -178,6 +181,7 @@ HEADERS += \
     viewers/spharasettingsview.h \
     viewers/fiffrawviewsettings.h \
     viewers/averageselectionview.h \
+    viewers/timefrequencyview.h \
     viewers/triggerdetectionview.h \
     viewers/quickcontrolview.h \
     viewers/connectivitysettingsview.h \
