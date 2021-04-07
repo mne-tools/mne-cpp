@@ -76,7 +76,7 @@ Communicator::Communicator(AbstractPlugin* plugin)
 
 Communicator::~Communicator()
 {
-    EventManager::getEventManager().removeCommunicator(this);
+    EventManager::removeCommunicator(this);
 }
 
 //=============================================================================================================
@@ -121,7 +121,7 @@ void Communicator::addSubscriptions(EVENT_TYPE newsub)
 void Communicator::manualDisconnect(void)
 {
     // simply delegate to EventManager
-    EventManager::getEventManager().removeCommunicator(this);
+    EventManager::removeCommunicator(this);
 }
 
 //=============================================================================================================
