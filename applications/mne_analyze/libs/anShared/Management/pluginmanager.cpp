@@ -130,11 +130,14 @@ void PluginManager::initPlugins(QSharedPointer<AnalyzeData> data)
 
 int PluginManager::findByName(const QString& name)
 {
-    QVector<AbstractPlugin*>::const_iterator it = m_qVecPlugins.begin();
-    for(int i = 0; it != m_qVecPlugins.end(); ++i, ++it)
+    QVector<AbstractPlugin*>::const_iterator it = m_qVecPlugins.cbegin();
+    for(int i = 0; it != m_qVecPlugins.cend(); ++i, ++it)
+    {
         if((*it)->getName() == name)
+        {
             return i;
-
+        }
+    }
     return -1;
 }
 
