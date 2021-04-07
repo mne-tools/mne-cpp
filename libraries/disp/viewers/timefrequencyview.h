@@ -101,6 +101,10 @@ public:
      * Clears the view
      */
     void clearView();
+
+protected:
+
+    virtual void paintEvent(QPaintEvent *event);
 };
 
 } //namespace

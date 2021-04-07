@@ -94,3 +94,18 @@ void TimeFrequencyView::loadSettings()
 {
 
 }
+
+
+//=============================================================================================================
+
+void TimeFrequencyView::clearView()
+{
+
+}
+
+//=============================================================================================================
+
+void TimeFrequencyView::paintEvent(QPaintEvent *event)
+{
+    return AbstractView::paintEvent(event);
+}

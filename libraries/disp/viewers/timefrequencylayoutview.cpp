@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     timefrequencyscene.cpp
+ * @file     timefrequencylaoutview.cpp
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.9
  * @date     April, 2021
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the TimeFrequencyScene Class.
+ * @brief    Declaration of the TimeFrequencyLayoutView Class.
  *
  */
 
@@ -36,7 +36,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "timefrequencyscene.h"
+#include "timefrequencylayoutview.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -52,7 +52,53 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TimeFrequencyScene::TimeFrequencyScene()
+TimeFrequencyLayoutView::TimeFrequencyLayoutView()
+{
+
+}
+
+//=============================================================================================================
+
+void TimeFrequencyLayoutView::updateGuiMode(GuiMode mode)
+{
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is research mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
+void TimeFrequencyLayoutView::updateProcessingMode(ProcessingMode mode)
+{
+    switch(mode) {
+        case ProcessingMode::Offline:
+            break;
+        default: // default is realtime mode
+            break;
+    }
+}
+
+//=============================================================================================================
+
+void TimeFrequencyLayoutView::saveSettings()
+{
+
+}
+
+//=============================================================================================================
+
+void TimeFrequencyLayoutView::loadSettings()
+{
+
+}
+
+
+//=============================================================================================================
+
+void TimeFrequencyLayoutView::clearView()
 {
 
 }

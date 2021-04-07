@@ -40,6 +40,10 @@ class TimeFrequencyModel
 {
 public:
     TimeFrequencyModel();
+
+
+private:
+//    QSharedPointer<DISPLIB::ChannelInfoModel>                   m_pChannelInfoModel;
 };
 
 #endif // TIMEFREQUENCYMODEL_H

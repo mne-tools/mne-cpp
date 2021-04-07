@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     timefrequencyscene.cpp
+ * @file     timefrequencylayoutview.h
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.9
  * @date     April, 2021
@@ -28,31 +28,89 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the TimeFrequencyScene Class.
+ * @brief    Declaration of the TimeFrequencyLayoutView Class.
  *
  */
+
+#ifndef TIMEFREQUENCYLAYOUTVIEW_H
+#define TIMEFREQUENCYLAYOUTVIEW_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "timefrequencyscene.h"
+#include "../disp_global.h"
+#include "abstractview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace DISPLIB;
+#include <QPointer>
+#include <QGraphicsView>
 
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// EIGEN INCLUDES
 //=============================================================================================================
 
-TimeFrequencyScene::TimeFrequencyScene()
+
+//=============================================================================================================
+// DEFINE NAMESPACE DISPLIB
+//=============================================================================================================
+
+namespace DISPLIB
 {
 
-}
+//=============================================================================================================
+// DISPLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+class TimeFrequencyScene;
+
+//=============================================================================================================
+class TimeFrequencyLayoutView : public AbstractView
+{
+public:
+    TimeFrequencyLayoutView();
+
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
+     *
+     * @param mode     The new mode (Clinical=0, Research=1).
+     */
+    void updateGuiMode(GuiMode mode);
+
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
+     *
+     * @param mode     The new mode (RealTime=0, Offline=1).
+     */
+    void updateProcessingMode(ProcessingMode mode);
+
+    //=========================================================================================================
+    /**
+     * Saves all important settings of this view via QSettings.
+     */
+    void saveSettings();
+
+    //=========================================================================================================
+    /**
+     * Loads and inits all important settings of this view via QSettings.
+     */
+    void loadSettings();
+
+    //=========================================================================================================
+    /**
+     * Clears the view
+     */
+    void clearView();
+
+protected:
+    QScopedPointer<TimeFrequencyScene>            m_pAverageScene;
+    QScopedPointer<QGraphicsView>                 m_pTimeFrequencyLayoutView;
+};
+}//namespace
+
+#endif // TIMEFREQUENCYLAYOUTVIEW_H
