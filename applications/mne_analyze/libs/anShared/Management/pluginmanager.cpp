@@ -70,7 +70,7 @@ PluginManager::PluginManager(QObject *parent)
 
 PluginManager::~PluginManager()
 {
-    for(AbstractPlugin* plugin : m_qVecPlugins)
+    for(AbstractPlugin*& plugin : m_qVecPlugins)
     {
         delete plugin;
     }
@@ -115,7 +115,7 @@ void PluginManager::loadPluginsFromDirectory(const QString& dir)
 
 void PluginManager::initPlugins(QSharedPointer<AnalyzeData> data)
 {
-    for(AbstractPlugin* plugin : m_qVecPlugins)
+    for(AbstractPlugin*& plugin : m_qVecPlugins)
     {
         plugin->setGlobalData(data);
         plugin->init();
@@ -145,7 +145,7 @@ int PluginManager::findByName(const QString& name)
 
 void PluginManager::shutdown()
 {
-    for(AbstractPlugin* plugin : m_qVecPlugins)
+    for(AbstractPlugin*& plugin : m_qVecPlugins)
     {
         plugin->unload();
     }
