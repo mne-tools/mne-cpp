@@ -93,6 +93,13 @@ void EventManager::addCommunicatorInt(Communicator* commu)
 
 void EventManager::issueEvent(QSharedPointer<Event> e)
 {
+    getEventManager().issueEventInt(e);
+}
+
+//=============================================================================================================
+
+void EventManager::issueEventInt(QSharedPointer<Event> e)
+{
     QMutexLocker temp(&m_eventQMutex);
     m_eventQ.enqueue(e);
     m_eventSemaphore.release();
