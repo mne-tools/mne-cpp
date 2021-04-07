@@ -222,6 +222,13 @@ bool EventManager::stopEventHandlingInt()
 
 bool EventManager::hasBufferedEvents()
 {
+    return getEventManager().hasBufferedEventsInt();
+}
+
+//=============================================================================================================
+
+bool EventManager::hasBufferedEventsInt()
+{
     QMutexLocker temp(&m_eventQMutex);
     return (m_eventQ.isEmpty() == false);
 }
