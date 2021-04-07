@@ -155,6 +155,14 @@ public:
      */
     static bool stopEventHandling();
 
+    //=========================================================================================================
+    /**
+     * Indicates whether or not the EventManager currently holds any unprocessed events.
+     *
+     * @return Whether or not the EventManager has unprocessed events.
+     */
+    bool hasBufferedEvents();
+
 private:
     //=========================================================================================================
     /**
@@ -217,22 +225,24 @@ private:
 
     //=========================================================================================================
     /**
-     * Stops the EventThread. Depending on the specified event-processing frequency, this might take some time
-     * (up to one waiting period, to be precise. Example: EventManager running on 20 Hz -> up to 50 ms shutdown).
+     * Internal fcn to be called by stopEventHandling. Stops the EventThread. Depending on the specified
+     * event-processing frequency, this might take some time (up to one waiting period, to be precise.
+     * Example: EventManager running on 20 Hz -> up to 50 ms shutdown).
      *
      * @return                   Whether stopping was successfull.
      */
     bool stopEventHandlingInt();
-public:
 
     //=========================================================================================================
     /**
-     * Indicates whether or not the EventManager currently holds any unprocessed events.
+     * Internal fcn to be called by hasBufferedEvents. Indicates whether or not the EventManager currently
+     * holds any unprocessed events.
      *
      * @return Whether or not the EventManager has unprocessed events.
      */
-    bool hasBufferedEvents();
+    bool hasBufferedEventsInt();
 
+public:
     //=========================================================================================================
     /**
      * Static method for singleton implementation (returns reference to local static object)
