@@ -105,7 +105,7 @@ void Communicator::addSubscriptions(const QVector<EVENT_TYPE> &newsubs)
 {
     m_EventSubscriptions.append(newsubs);
     // add new subscriptions to routing table of event manager
-    EventManager::getEventManager().addSubscriptions(this, newsubs);
+    EventManager::addSubscriptions(this, newsubs);
 }
 
 //=============================================================================================================
