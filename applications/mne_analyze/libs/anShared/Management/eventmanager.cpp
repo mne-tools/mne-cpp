@@ -171,6 +171,13 @@ void EventManager::removeCommunicatorInt(Communicator* commu)
 
 bool EventManager::startEventHandling(float frequency)
 {
+    return getEventManager().startEventHandlingInt(frequency);
+}
+
+//=============================================================================================================
+
+bool EventManager::startEventHandlingInt(float frequency)
+{
     if (m_running)
     {
         qDebug() << "[EventManager::startEventHandling] WARNING ! somebody tried to call startEventHandling when already running...";
@@ -189,6 +196,13 @@ bool EventManager::startEventHandling(float frequency)
 //=============================================================================================================
 
 bool EventManager::stopEventHandling()
+{
+    return getEventManager().stopEventHandlingInt();
+}
+
+//=============================================================================================================
+
+bool EventManager::stopEventHandlingInt()
 {
     if (m_running)
     {
