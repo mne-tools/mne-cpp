@@ -161,7 +161,13 @@ public:
      *
      * @return Whether or not the EventManager has unprocessed events.
      */
-    bool hasBufferedEvents();
+    static bool hasBufferedEvents();
+
+    //=========================================================================================================
+    /**
+     * This is called when the user presses the "close" button
+     */
+    static void shutdown();
 
 private:
     //=========================================================================================================
@@ -242,22 +248,19 @@ private:
      */
     bool hasBufferedEventsInt();
 
-public:
+    //=========================================================================================================
+    /**
+     * Internal fcn to be called by shutdown(). This is called when the user presses the "close" button
+     */
+    void shutdownInt();
+
     //=========================================================================================================
     /**
      * Static method for singleton implementation (returns reference to local static object)
      *
-     * @return A reference to the EventManager singleton.
+     * @return A reference to the EventManager singleton
      */
     static EventManager& getEventManager();
-
-    //=========================================================================================================
-    /**
-     * This is called when the user presses the "close" button
-     */
-    void shutdown();
-
-private:
 
     //=========================================================================================================
     /**

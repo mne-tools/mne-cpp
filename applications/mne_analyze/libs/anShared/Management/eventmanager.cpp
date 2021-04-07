@@ -296,5 +296,12 @@ void EventManager::run()
 
 void EventManager::shutdown()
 {
-    stopEventHandling();
+    getEventManager().shutdownInt();
+}
+
+//=============================================================================================================
+
+void EventManager::shutdownInt()
+{
+    stopEventHandlingInt();
 }
