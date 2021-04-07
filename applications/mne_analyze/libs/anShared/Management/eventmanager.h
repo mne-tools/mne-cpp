@@ -110,6 +110,24 @@ public:
      */
     static void issueEvent(QSharedPointer<Event> e);
 
+    //=========================================================================================================
+    /**
+     * Expands a Communicator's subscriptions by the specified list
+     *
+     * @param[in] commu          The Communicator to add the events for
+     * @param[in] newsubs        List of new (additional) subscriptions
+     */
+    static void addSubscriptions(Communicator* commu, QVector<EVENT_TYPE> newsubs);
+
+    //=========================================================================================================
+    /**
+     * Replaces a Communicators subscriptions with the specified list.
+     *
+     * @param[in] commu          The respective Communicator
+     * @param[in] subs           New list of subscriptions
+     */
+    static void updateSubscriptions(Communicator* commu, const QVector<EVENT_TYPE> &subs);
+
 private:
     //=========================================================================================================
     /**
@@ -122,32 +140,35 @@ private:
 
     //=========================================================================================================
     /**
-     * Internal function to be called by issueEvent static function. Communicate an event to all entities that have registered for the respective event type.
-     * The Event will get buffered in a queue and processed during the next processing cycle.
+     * Internal function to be called by issueEvent static function. Communicate an event to all entities that
+     * have registered for the respective event type. The Event will get buffered in a queue and processed
+     * during the next processing cycle.
      *
      * @param[in] e              The event to publish.
      */
     void issueEventInt(QSharedPointer<Event> e);
 
-public:
     //=========================================================================================================
     /**
-     * Expands a Communicator's subscriptions by the specified list
+     * Internal function to be called by addSubscriptions. Expands a Communicator's subscriptions by the
+     * specified list
      *
      * @param[in] commu          The Communicator to add the events for.
      * @param[in] newsubs        List of new (additional) subscriptions.
      */
-    void addSubscriptions(Communicator* commu, QVector<EVENT_TYPE> newsubs);
+    void addSubscriptionsInt(Communicator* commu, QVector<EVENT_TYPE> newsubs);
 
     //=========================================================================================================
     /**
-     * Replaces a Communicators subscriptions with the specified list.
+     * Internal function to be called by updateSubscription. Replaces a Communicators subscriptions with the
+     * specified list.
      *
      * @param[in] commu          The respective Communicator.
      * @param[in] subs           New list of subscriptions.
      */
-    void updateSubscriptions(Communicator* commu, const QVector<EVENT_TYPE> &subs);
+    void updateSubscriptionsInt(Communicator* commu, const QVector<EVENT_TYPE> &subs);
 
+public:
     //=========================================================================================================
     /**
      * Removes (and thus disconnects) a Communicator and all its subscriptions from the routing table

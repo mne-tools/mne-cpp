@@ -107,8 +107,15 @@ void EventManager::issueEventInt(QSharedPointer<Event> e)
 
 //=============================================================================================================
 
-void EventManager::addSubscriptions(Communicator* commu,
+void EventManager::addSubscriptions(Communicator *commu,
                                     QVector<EVENT_TYPE> newsubs)
+{
+    getEventManager().addSubscriptionsInt(commu, newsubs);
+}
+//=============================================================================================================
+
+void EventManager::addSubscriptionsInt(Communicator* commu,
+                                       QVector<EVENT_TYPE> newsubs)
 {
     QMutexLocker temp(&m_routingTableMutex);
     for(const EVENT_TYPE& etype : newsubs)
