@@ -65,6 +65,7 @@ namespace ANSHAREDLIB {
 
 namespace DISPLIB {
     class ProgressView;
+    class TimeFrequencyView;
 }
 
 //=============================================================================================================
@@ -133,6 +134,9 @@ private:
 
     QPointer<ANSHAREDLIB::Communicator>             m_pCommu;                   /**< Used for sending events */
     QString                                         m_sSettingsPath;            /**< Variable that stores the key where to store settings for this plugin.*/
+
+    QPointer<DISPLIB::TimeFrequencyView>            m_pTimeFreqView;
+
 };
 
 //=============================================================================================================

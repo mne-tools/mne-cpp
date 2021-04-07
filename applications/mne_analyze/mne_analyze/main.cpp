@@ -78,6 +78,7 @@ Q_IMPORT_PLUGIN(SourceLocalization)
 Q_IMPORT_PLUGIN(ControlManager)
 Q_IMPORT_PLUGIN(ChannelSelection)
 Q_IMPORT_PLUGIN(CoRegistration)
+Q_IMPORT_PLUGIN(TimeFrequency)
 #ifndef WASMBUILD
     Q_IMPORT_PLUGIN(View3D)
 #endif

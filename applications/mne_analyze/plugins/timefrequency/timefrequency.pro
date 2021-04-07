@@ -64,12 +64,24 @@ LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lanSharedd \
             -lmnecppDispd \
+            -lmnecppConnectivityd \
+            -lmnecppRtProcessingd \
+            -lmnecppInversed \
+            -lmnecppFwdd \
+            -lmnecppMned \
             -lmnecppFiffd \
+            -lmnecppFsd \
             -lmnecppUtilsd \
 } else {
     LIBS += -lanShared \
             -lmnecppDisp \
+            -lmnecppConnectivity \
+            -lmnecppRtProcessing \
+            -lmnecppInverse \
+            -lmnecppFwd \
+            -lmnecppMne \
             -lmnecppFiff \
+            -lmnecppFs \
             -lmnecppUtils \
 }
 

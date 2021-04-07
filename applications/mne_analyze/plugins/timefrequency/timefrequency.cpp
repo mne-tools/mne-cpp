@@ -45,6 +45,7 @@
 #include <anShared/Model/averagingdatamodel.h>
 
 #include <disp/viewers/progressview.h>
+#include <disp/viewers/timefrequencyview.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -96,7 +97,7 @@ void TimeFrequency::unload()
 
 QString TimeFrequency::getName() const
 {
-    return "Data Loader";
+    return "Time-Frequency";
 }
 
 //=============================================================================================================
@@ -117,7 +118,8 @@ QDockWidget *TimeFrequency::getControl()
 
 QWidget *TimeFrequency::getView()
 {
-    return Q_NULLPTR;
+    m_pTimeFreqView = new DISPLIB::TimeFrequencyView();
+    return m_pTimeFreqView;
 }
 
 //=============================================================================================================
