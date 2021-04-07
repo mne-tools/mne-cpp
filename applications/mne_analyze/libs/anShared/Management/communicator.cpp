@@ -92,7 +92,7 @@ void Communicator::publishEvent(EVENT_TYPE etype, const QVariant &data) const
 void Communicator::updateSubscriptions(const QVector<EVENT_TYPE> &subs)
 {
     // update routing table of event manager
-    EventManager::getEventManager().updateSubscriptions(this, subs);
+    EventManager::updateSubscriptions(this, subs);
     // update own subscription list: This HAS to be done AFTER the EventManager::updateSubscriptions,
     // since the latter uses the communicators old list in order to keep execution time low
     m_EventSubscriptions.clear();
