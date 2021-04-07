@@ -128,6 +128,14 @@ public:
      */
     static void updateSubscriptions(Communicator* commu, const QVector<EVENT_TYPE> &subs);
 
+    //=========================================================================================================
+    /**
+     * Removes (and thus disconnects) a Communicator and all its subscriptions from the routing table
+     *
+     * @param[in] commu          The communicator to remove.
+     */
+    static void removeCommunicator(Communicator* commu);
+
 private:
     //=========================================================================================================
     /**
@@ -168,15 +176,15 @@ private:
      */
     void updateSubscriptionsInt(Communicator* commu, const QVector<EVENT_TYPE> &subs);
 
-public:
     //=========================================================================================================
     /**
-     * Removes (and thus disconnects) a Communicator and all its subscriptions from the routing table
+     * Internal function to be called by removeCommunicator. Removes (and thus disconnects) a Communicator and all its subscriptions from the routing table
      *
      * @param[in] commu          The communicator to remove.
      */
-    void removeCommunicator(Communicator* commu);
+    void removeCommunicatorInt(Communicator * commu);
 
+public:
     //=========================================================================================================
     /**
      * Starts the EventManagers thread that processes buffered events. The EventManager will try to maintain the

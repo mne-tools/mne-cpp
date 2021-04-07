@@ -129,6 +129,14 @@ void EventManager::addSubscriptionsInt(Communicator* commu,
 void EventManager::updateSubscriptions(Communicator* commu,
                                        const QVector<EVENT_TYPE> &subs)
 {
+    getEventManager().updateSubscriptionsInt(commu, subs);
+}
+
+//=============================================================================================================
+
+void EventManager::updateSubscriptionsInt(Communicator* commu,
+                                       const QVector<EVENT_TYPE> &subs)
+{
     // remove all old subscriptions from EventManager routing table
     removeCommunicator(commu);
     // add new key-value-pairs into map
@@ -138,6 +146,13 @@ void EventManager::updateSubscriptions(Communicator* commu,
 //=============================================================================================================
 
 void EventManager::removeCommunicator(Communicator* commu)
+{
+    getEventManager().removeCommunicatorInt(commu);
+}
+
+//=============================================================================================================
+
+void EventManager::removeCommunicatorInt(Communicator* commu)
 {
     QMutexLocker temp(&m_routingTableMutex);
     for(const EVENT_TYPE& etype : commu->getSubscriptions())
