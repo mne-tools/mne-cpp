@@ -101,25 +101,35 @@ public:
      */
     static void addCommunicator(Communicator* commu);
 
-private:
-    //=========================================================================================================
-    /**
-     * Adds a Communicator, respectively its subscriptions to the routing table
-     *
-     * @param[in] commu          The Communicator to add
-     */
-    void addCommunicatorInt(Communicator* commu);
-
-public:
     //=========================================================================================================
     /**
      * Communicate an event to all entities that have registered for the respective event type.
      * The Event will get buffered in a queue and processed during the next processing cycle.
      *
+     * @param[in] e              The event to publish
+     */
+    static void issueEvent(QSharedPointer<Event> e);
+
+private:
+    //=========================================================================================================
+    /**
+     * Internal function to be called by addCommunicator. It adds a Communicator, respectively its subscriptions
+     * to the routing table
+     *
+     * @param[in] commu          The Communicator to add
+     */
+    void addCommunicatorInt(Communicator* commu);
+
+    //=========================================================================================================
+    /**
+     * Internal function to be called by issueEvent static function. Communicate an event to all entities that have registered for the respective event type.
+     * The Event will get buffered in a queue and processed during the next processing cycle.
+     *
      * @param[in] e              The event to publish.
      */
-    void issueEvent(QSharedPointer<Event> e);
+    void issueEventInt(QSharedPointer<Event> e);
 
+public:
     //=========================================================================================================
     /**
      * Expands a Communicator's subscriptions by the specified list
