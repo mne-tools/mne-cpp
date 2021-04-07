@@ -99,8 +99,18 @@ public:
      *
      * @param[in] commu          The Communicator to add.
      */
-    void addCommunicator(Communicator* commu);
+    static void addCommunicator(Communicator* commu);
 
+private:
+    //=========================================================================================================
+    /**
+     * Adds a Communicator, respectively its subscriptions to the routing table
+     *
+     * @param[in] commu          The Communicator to add
+     */
+    void addCommunicatorInt(Communicator* commu);
+
+public:
     //=========================================================================================================
     /**
      * Communicate an event to all entities that have registered for the respective event type.
