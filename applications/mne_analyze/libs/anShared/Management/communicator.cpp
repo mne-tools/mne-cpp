@@ -60,7 +60,7 @@ Communicator::Communicator(const QVector<EVENT_TYPE> &subs)
 : m_ID(nextID())
 , m_EventSubscriptions(subs)
 {
-    EventManager::getEventManager().addCommunicator(this);
+    EventManager::addCommunicator(this);
 }
 
 //=============================================================================================================

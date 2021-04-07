@@ -72,7 +72,14 @@ EventManager::EventManager()
 
 //=============================================================================================================
 
-void EventManager::addCommunicator(Communicator* commu)
+void EventManager::addCommunicator(Communicator *commu)
+{
+    getEventManager().addCommunicatorInt(commu);
+}
+
+//=============================================================================================================
+
+void EventManager::addCommunicatorInt(Communicator* commu)
 {
     QMutexLocker temp(&m_routingTableMutex);
     const QVector<EVENT_TYPE>& subscriptions = commu->getSubscriptions();
