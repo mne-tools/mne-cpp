@@ -179,7 +179,7 @@ void AnalyzeCore::initGlobalData()
 
 void AnalyzeCore::initEventSystem()
 {
-    EventManager::getEventManager().startEventHandling();
+    EventManager::startEventHandling();
 }
 
 //=============================================================================================================
