@@ -92,7 +92,7 @@ void PluginManager::loadPluginsFromDirectory(const QString& dir)
     }
 #else
     QDir pluginsDir(dir);
-    pluginsDir.setNameFilters((QStringList()<<"*.exp"<<"*.lib"));// Exclude .exp and .lib files (only relevant for windows builds)
+    pluginsDir.setNameFilters((QStringList()<<"*.exp"<<"*.lib"));
     foreach(const QString &file, pluginsDir.entryList(QDir::NoDotAndDotDot | QDir::Files)) {
         loadPlugin(pluginsDir.absoluteFilePath(file));
     }
@@ -103,18 +103,21 @@ void PluginManager::loadPluginsFromDirectory(const QString& dir)
 
 void PluginManager::loadPlugin(const QString& file)
 {
-    this->setFileName(file);
-    AbstractPlugin *pPlugin = qobject_cast<AbstractPlugin*>(this->instance());
-    if(pPlugin) {
-        if(findByName(pPlugin->getName())==-1)
-        {
-            qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " succeeded.";
-            m_qVecPlugins.push_back(qobject_cast<AbstractPlugin*>(pPlugin));
+    if(!file.contains(".exp") && !file.contains(".lib"))
+    {
+        this->setFileName(file);
+        AbstractPlugin* pPlugin = qobject_cast<AbstractPlugin*>(this->instance());
+        if(pPlugin) {
+            if(findByName(pPlugin->getName())==-1)
+            {
+                qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " succeeded.";
+                m_qVecPlugins.push_back(pPlugin);
+            } else {
+                qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << ". Plugin already loaded.";
+            }
         } else {
-            qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << ". Plugin already loaded.";
+            qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " failed.";
         }
-    } else {
-        qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " failed.";
     }
 }
 
