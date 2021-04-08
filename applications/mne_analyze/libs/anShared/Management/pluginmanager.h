@@ -103,9 +103,17 @@ public:
 
     //=========================================================================================================
     /**
+     * Loads a single from given absolute file path string.
+     *
+     * @param [in] dir    The plugin file path.
+     */
+
+    void loadPlugin(const QString& file);
+    //=========================================================================================================
+    /**
      * Initializes the plugins.
      *
-     * @param[in] data          the global mne analyze data.
+     * @param [in] data    The global mne analyze data.
      */
     void initPlugins(QSharedPointer<AnalyzeData> data);
 
