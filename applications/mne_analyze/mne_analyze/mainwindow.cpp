@@ -345,13 +345,16 @@ void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pP
     delete m_pMenuHelp;
 
     // File menu
+    m_pMenuFile.clear();
     m_pMenuFile = menuBar()->addMenu(tr("File"));
     m_pMenuFile->addAction(m_pActionExit);
 
     // View menu
+    m_pMenuControl.clear();
     m_pMenuView = menuBar()->addMenu(tr("View"));
 
     // Control menu
+    m_pMenuControl.clear();
     m_pMenuControl = menuBar()->addMenu(tr("Control"));
 
     //Appearance QMenu
