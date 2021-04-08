@@ -49,6 +49,7 @@
 
 #include <QStack>
 #include <QFileInfo>
+#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -320,7 +321,7 @@ void FiffAnonymizer::censorTag()
     {
         QString inStr(m_pTag->data());
         emit readingFileComment(inStr);
-
+        qDebug() << "\nIn block: " << QString::number(m_pBlockTypeList->top()) << " - Comment Tag: " << inStr;
         if(m_pBlockTypeList->top() == FIFFB_MEAS_INFO)
         {
             QString outStr(m_sDefaultString);

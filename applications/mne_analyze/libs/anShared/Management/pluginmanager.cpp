@@ -93,7 +93,7 @@ void PluginManager::loadPluginsFromDirectory(const QString& dir)
 #else
     QDir pluginsDir(dir);
     pluginsDir.setNameFilters((QStringList()<<"*.exp"<<"*.lib"));// Exclude .exp and .lib files (only relevant for windows builds)
-    foreach(const QString &file, pluginsDir.entryList(QDir::Files)) {
+    foreach(const QString &file, pluginsDir.entryList(QDir::NoDotAndDotDot | QDir::Files)) {
         loadPlugin(pluginsDir.absoluteFilePath(file));
     }
 #endif
