@@ -58,10 +58,12 @@
 namespace DISPLIB
 {
 
-class TimeFrequencyScene : public LayoutScene
+class DISPSHARED_EXPORT TimeFrequencyScene : public LayoutScene
 {
+    Q_OBJECT
 public:
-    TimeFrequencyScene();
+    TimeFrequencyScene(QGraphicsView* view,
+                       QObject *parent = 0);
 };
 }//namespace
 #endif // TIMEFREQUENCYSCENE_H

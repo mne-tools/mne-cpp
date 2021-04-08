@@ -46,6 +46,7 @@
 
 #include <disp/viewers/progressview.h>
 #include <disp/viewers/timefrequencyview.h>
+#include <disp/viewers/timefrequencylayoutview.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -118,7 +119,15 @@ QDockWidget *TimeFrequency::getControl()
 
 QWidget *TimeFrequency::getView()
 {
+    QWidget* pTimeFreqViewWidget = new QWidget();
+    QTabWidget* pTabView = new QTabWidget(pTimeFreqViewWidget);
+
     m_pTimeFreqView = new DISPLIB::TimeFrequencyView();
+    m_pTimeFreqLayoutView = new DISPLIB::TimeFrequencyLayoutView();
+
+    pTabView->addTab(m_pTimeFreqView, "Average View");
+    pTabView->addTab(m_pTimeFreqLayoutView, "Layout View");
+
     return m_pTimeFreqView;
 }
 

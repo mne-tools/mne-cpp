@@ -52,7 +52,9 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TimeFrequencyScene::TimeFrequencyScene()
+TimeFrequencyScene::TimeFrequencyScene(QGraphicsView* view,
+                                       QObject* parent)
+: LayoutScene(view, parent)
 {
 
 }

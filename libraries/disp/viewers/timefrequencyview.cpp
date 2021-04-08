@@ -53,8 +53,19 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 TimeFrequencyView::TimeFrequencyView()
+: TimeFrequencyView("", Q_NULLPTR)
 {
 
+}
+
+//=============================================================================================================
+
+TimeFrequencyView::TimeFrequencyView(const QString& sSettingsPath,
+                                     QWidget *parent,
+                                     Qt::WindowFlags f)
+: AbstractView(parent, f)
+{
+    m_sSettingsPath = sSettingsPath;
 }
 
 //=============================================================================================================

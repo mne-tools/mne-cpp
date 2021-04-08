@@ -37,10 +37,17 @@
 //=============================================================================================================
 
 #include "timefrequencylayoutview.h"
+#include "helpers/timefrequencyscene.h"
+#include "helpers/timefrequencysceneitem.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
+#include <QVBoxLayout>
+#if !defined(NO_QOPENGLWIDGET)
+    #include <QOpenGLWidget>
+#endif
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -53,8 +60,40 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 TimeFrequencyLayoutView::TimeFrequencyLayoutView()
+: TimeFrequencyLayoutView("", Q_NULLPTR)
 {
 
+}
+
+//=============================================================================================================
+
+
+TimeFrequencyLayoutView::TimeFrequencyLayoutView(const QString& sSettingsPath,
+                                                 QWidget *parent,
+                                                 Qt::WindowFlags f)
+: AbstractView(parent, f)
+{
+    m_sSettingsPath = sSettingsPath;
+    this->setWindowTitle("Time-Frequency Layout");
+
+    m_pTimeFreqGraphicsView = new QGraphicsView();
+
+#if !defined(NO_QOPENGLWIDGET)
+    m_pTimeFreqGraphicsView->setViewport(new QOpenGLWidget);
+#endif
+
+    m_pTimeFreqGraphicsView->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    m_pTimeFreqGraphicsView->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    m_pTimeFreqScene = new TimeFrequencyScene(m_pTimeFreqGraphicsView, this);
+    m_pTimeFreqScene->setBackgroundBrush(QBrush(Qt::white));
+
+    m_pTimeFreqGraphicsView->setScene(m_pTimeFreqScene);
+
+    QVBoxLayout *neLayout = new QVBoxLayout(this);
+    neLayout->setContentsMargins(0,0,0,0);
+    neLayout->addWidget(m_pTimeFreqGraphicsView);
+    this->setLayout(neLayout);
 }
 
 //=============================================================================================================

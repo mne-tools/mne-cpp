@@ -68,10 +68,15 @@ namespace DISPLIB
 class TimeFrequencyScene;
 
 //=============================================================================================================
-class TimeFrequencyLayoutView : public AbstractView
+class DISPSHARED_EXPORT TimeFrequencyLayoutView : public AbstractView
 {
+    Q_OBJECT
 public:
     TimeFrequencyLayoutView();
+
+    TimeFrequencyLayoutView(const QString& sSettingsPath,
+                             QWidget* parent,
+                             Qt::WindowFlags f = Qt::Widget);
 
     //=========================================================================================================
     /**
@@ -108,8 +113,8 @@ public:
     void clearView();
 
 protected:
-    QScopedPointer<TimeFrequencyScene>            m_pAverageScene;
-    QScopedPointer<QGraphicsView>                 m_pTimeFrequencyLayoutView;
+    QPointer<TimeFrequencyScene>                m_pTimeFreqScene;
+    QPointer<QGraphicsView>                     m_pTimeFreqGraphicsView;
 };
 }//namespace
 
