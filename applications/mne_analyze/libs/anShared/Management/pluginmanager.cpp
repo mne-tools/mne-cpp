@@ -92,23 +92,30 @@ void PluginManager::loadPluginsFromDirectory(const QString& dir)
     }
 #else
     QDir pluginsDir(dir);
-
+    pluginsDir.setNameFilters((QStringList()<<"*.exp"<<"*.lib"));// Exclude .exp and .lib files (only relevant for windows builds)
     foreach(const QString &file, pluginsDir.entryList(QDir::Files)) {
-        // Exclude .exp and .lib files (only relevant for windows builds)
-        if(!file.contains(".exp") && !file.contains(".lib")) {
-            this->setFileName(pluginsDir.absoluteFilePath(file));
-            QObject *pPlugin = this->instance();
-
-            // AbstractPlugin
-            if(pPlugin) {
-                qDebug() << "[PluginManager::loadPlugin] Loading Plugin" << file.toUtf8().constData() << "succeeded.";
-                m_qVecPlugins.push_back(qobject_cast<AbstractPlugin*>(pPlugin));
-            } else {
-                qDebug() << "[PluginManager::loadPlugin] Loading Plugin" << file.toUtf8().constData() << "failed.";
-            }
-        }
+        loadPlugin(pluginsDir.absoluteFilePath(file));
     }
 #endif
+}
+
+//=============================================================================================================
+
+void PluginManager::loadPlugin(const QString& file)
+{
+    this->setFileName(file);
+    AbstractPlugin *pPlugin = qobject_cast<AbstractPlugin*>(this->instance());
+    if(pPlugin) {
+        if(findByName(pPlugin->getName())==-1)
+        {
+            qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " succeeded.";
+            m_qVecPlugins.push_back(qobject_cast<AbstractPlugin*>(pPlugin));
+        } else {
+            qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << ". Plugin already loaded.";
+        }
+    } else {
+        qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " failed.";
+    }
 }
 
 //=============================================================================================================
