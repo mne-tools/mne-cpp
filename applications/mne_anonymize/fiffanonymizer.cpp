@@ -396,7 +396,7 @@ void FiffAnonymizer::censorTag()
         FIFFLIB::fiff_int_t outData[1];
         outData[0] = static_cast<int32_t> (outBirthday.toJulianDay());
         memcpy(m_pTag->data(),reinterpret_cast<char*>(outData),sizeof(FIFFLIB::fiff_int_t));
-        printIfVerbose("Subject birthday date changed: " + inBirthday.toString("dd.MM.yyyy hh:mm:ss.zzz t") + " -> " + outBirthday.toString("dd.MM.yyyy hh:mm:ss.zzz t"));
+        printIfVerbose("Subject birthday date changed: " + inBirthday.toString("dd.MM.yyyy") + " -> " + outBirthday.toString("dd.MM.yyyy"));
         break;
     }
     case FIFF_SUBJ_SEX:
