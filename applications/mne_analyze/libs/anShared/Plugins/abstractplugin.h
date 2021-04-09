@@ -193,6 +193,7 @@ signals:
 
 protected:
     QSharedPointer<AnalyzeData>     m_pAnalyzeData;         /**< Pointer to the global data base */
+    bool                            m_bAlreadyLoaded;
 };
 
 //=============================================================================================================
