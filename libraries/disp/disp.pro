@@ -44,6 +44,11 @@ QT += core widgets svg concurrent opengl
 qtHaveModule(printsupport): QT += printsupport
 qtHaveModule(charts): QT += charts
 
+qtHaveModule(datavisualization){
+QT += qml quick datavisualization quickwidgets
+}
+
+
 DEFINES += DISP_LIBRARY
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -254,6 +259,16 @@ FORMS += \
     viewers/formfiles/filtersettingsview.ui \
     viewers/formfiles/applytoview.ui \
     viewers/formfiles/bidsview.ui \
+
+qtHaveModule(datavisualization) {
+
+DEFINES += QML_VIEWS_ON
+
+DISTFILES += \
+    viewers/qml/tfview.qml \
+    viewers/qml/Data.qml \
+    viewers/qml/NewButton.qml \
+}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

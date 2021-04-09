@@ -42,6 +42,10 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QQuickItem>
+#include <QQuickWidget>
+#include <QBoxLayout>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -66,6 +70,7 @@ TimeFrequencyView::TimeFrequencyView(const QString& sSettingsPath,
 : AbstractView(parent, f)
 {
     m_sSettingsPath = sSettingsPath;
+    initQMLView();
 }
 
 //=============================================================================================================
@@ -112,6 +117,21 @@ void TimeFrequencyView::loadSettings()
 void TimeFrequencyView::clearView()
 {
 
+}
+
+//=============================================================================================================
+
+void TimeFrequencyView::initQMLView()
+{
+    QUrl source("qml/tfview.qml");
+    QQuickWidget* widget = new QQuickWidget();
+    widget->setSource(source);
+
+    QVBoxLayout* layout = new QVBoxLayout();
+    layout->addWidget(widget);
+
+
+    this->setLayout(layout);
 }
 
 //=============================================================================================================

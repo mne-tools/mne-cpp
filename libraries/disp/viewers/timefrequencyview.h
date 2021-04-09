@@ -108,6 +108,7 @@ public:
     void clearView();
 
 protected:
+    void initQMLView();
 
     virtual void paintEvent(QPaintEvent *event);
 };
