@@ -120,6 +120,19 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 
 MainWindow::~MainWindow()
 {
+    menuBar()->clear();
+
+    delete m_pActionExit;
+    delete m_pActionAbout;
+    delete m_pActionResearchMode;
+    delete m_pActionClinicalMode;
+    delete m_pActionDarkMode;
+
+    delete m_pMenuFile;
+    delete m_pMenuView;
+    delete m_pMenuControl;
+    delete m_pMenuAppearance;
+    delete m_pMenuHelp;
 }
 
 //=============================================================================================================
@@ -316,6 +329,21 @@ void MainWindow::createLogDockWindow()
 
 void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager)
 {
+    //(re)initialize all the menus
+    menuBar()->clear();
+
+    delete m_pActionExit;
+    delete m_pActionAbout;
+    delete m_pActionResearchMode;
+    delete m_pActionClinicalMode;
+    delete m_pActionDarkMode;
+
+    delete m_pMenuFile;
+    delete m_pMenuView;
+    delete m_pMenuControl;
+    delete m_pMenuAppearance;
+    delete m_pMenuHelp;
+
     // File menu
     m_pMenuFile = menuBar()->addMenu(tr("File"));
     m_pMenuFile->addAction(m_pActionExit);
