@@ -121,6 +121,7 @@ QWidget *TimeFrequency::getView()
 {
     QWidget* pTimeFreqViewWidget = new QWidget();
     QTabWidget* pTabView = new QTabWidget(pTimeFreqViewWidget);
+    QVBoxLayout* pViewLayout = new QVBoxLayout();
 
     m_pTimeFreqView = new DISPLIB::TimeFrequencyView();
     m_pTimeFreqLayoutView = new DISPLIB::TimeFrequencyLayoutView();
@@ -128,14 +129,24 @@ QWidget *TimeFrequency::getView()
     pTabView->addTab(m_pTimeFreqView, "Average View");
     pTabView->addTab(m_pTimeFreqLayoutView, "Layout View");
 
-    return m_pTimeFreqView;
+    pViewLayout->addWidget(pTabView);
+    pTimeFreqViewWidget->setLayout(pViewLayout);
+
+    return pTimeFreqViewWidget;
 }
 
 //=============================================================================================================
 
 void TimeFrequency::handleEvent(QSharedPointer<Event> e)
 {
-
+    switch (e->getType()) {
+    case EVENT_TYPE::SELECTED_MODEL_CHANGED:{
+        onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
+        break;
+    }
+    default:
+        qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
+    }
 }
 
 //=============================================================================================================
@@ -161,4 +172,19 @@ void TimeFrequency::loadSettings()
 {
     QSettings settings("MNECPP");
     settings.beginGroup(m_sSettingsPath);
+}
+
+//=============================================================================================================
+
+void TimeFrequency::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+{
+    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+        if(m_pFiffRawModel) {
+            if(m_pFiffRawModel == pNewModel) {
+                qInfo() << "[Averaging::onModelChanged] New model is the same as old model";
+                return;
+            }
+        }
+        m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
+    }
 }
