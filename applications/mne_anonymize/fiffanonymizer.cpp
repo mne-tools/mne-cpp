@@ -454,7 +454,7 @@ void FiffAnonymizer::censorTag()
         QString outStr(m_sSubjectComment);
         m_pTag->resize(outStr.size());
         memcpy(m_pTag->data(),outStr.toUtf8(),static_cast<size_t>(outStr.size()));
-        printIfVerbose("Subject comment changed: " + QString(m_pTag->data()) + " -> " + outStr);
+        printIfVerbose("Subject comment changed: " + inStr + " -> " + outStr);
         break;
     }
     case FIFF_SUBJ_HIS_ID:
