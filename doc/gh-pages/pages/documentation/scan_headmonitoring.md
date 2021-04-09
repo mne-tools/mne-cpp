@@ -25,13 +25,13 @@ Real-time head monitoring works in combination with sensor plugins, such as the 
 
 2. Add the HPI Fitting plugin to the plugin scene and connect your sensor plugin from step one to the HPI Plugin.
 
-   ![](../../images/hpi/mne_scan_hpi_plugin.png)
+![](../../images/hpi/mne_scan_hpi_plugin.png)
 
 3. Start the measurement via the Play button in the top left corner
 
 4. You can open and control the settings for the HPI fitting via the Quick Control View. Open it by pressing the `QUICK CTRL` button and follow the steps described in the next section.
 
-    ![](../../images/hpi/mne_scan_open_quick.png)
+![](../../images/hpi/mne_scan_open_quick.png)
 
 MNE Scan should now look like following picture. You have the plugin scene on the left, the 3D View in the upper part and the data stream in the lower part. The 3D View shows an average head model that is aligned and scaled to digitized landmarks like LPA, RPA, Nasion and HPI coils. The head moddel shows up after the first succesfull HPI fit. 
 

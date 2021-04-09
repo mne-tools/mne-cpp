@@ -47,6 +47,7 @@
 //=============================================================================================================
 
 #include <QMap>
+#include <QPointer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -56,9 +57,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QDoubleSpinBox;
-class QSlider;
-
+class QCheckBox;
 namespace Ui {
     class ScalingViewWidget;
 }
@@ -73,26 +72,14 @@ namespace DISPLIB
 //=============================================================================================================
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
-
-//=========================================================================================================
-/**
- * Default scales for each channel by type.
- */
-const float m_fScaleMAG = 1e-12f;      /**< Default scale for channel kind and unit of MAG */
-const float m_fScaleGRAD = 1e-15f;     /**< Default scale for channel kind and unit of GRAD */
-const float m_fScaleEEG = 1e-5f;       /**< Default scale for channel kind and unit of EEG */
-const float m_fScaleEOG = 1e-6f;       /**< Default scale for channel kind and unit of EOG */
-const float m_fScaleECG = 1e-2f;       /**< Default scale for channel kind and unit of ECG */
-const float m_fScaleSTIM = 1e-3f;      /**< Default scale for channel kind and unit of STIM */
-const float m_fScaleMISC = 1e-3f;      /**< Default scale for channel kind and unit of MISC */
-const float m_fScaleEMG = 1e-3f;       /**< Default scale for channel kind and unit of EMG */
+class ScaleControl;
 
 //=========================================================================================================
 /**
  * Get the default scaling values by channel type
  *
- * @param [in] iChannelKind     The channel kind to return the default scaling value for.
- * @param [in] iChannelUnit     The channel unit to return the default scaling value for.
+ * @param[in] iChannelKind     The channel kind to return the default scaling value for.
+ * @param[in] iChannelUnit     The channel unit to return the default scaling value for.
  *                              The unit is only important when dealing with MEG channels in order to
  *                              distinguish between magnetometers and gradiometers.
  *
@@ -106,9 +93,9 @@ DISPSHARED_EXPORT float getDefaultScalingValue(int iChannelKind,
  * Get the scaling value from suplied scale map, and check if there is a float asigned to the scale.
  * Otherwise returns default scaling values for the channel type.
  *
- * @param [in] qMapChScaling    The map containing the scaling values for different channel types and units.
- * @param [in] iChannelKind     The channel kind to return the default scaling value for.
- * @param [in] iChannelUnit     The channel unit to return the default scaling value for.
+ * @param[in] qMapChScaling    The map containing the scaling values for different channel types and units.
+ * @param[in] iChannelKind     The channel kind to return the default scaling value for.
+ * @param[in] iChannelUnit     The channel unit to return the default scaling value for.
  *                              The unit is only important when dealing with MEG channels in order to
  *                              distinguish between magnetometers and gradiometers.
  *
@@ -117,6 +104,7 @@ DISPSHARED_EXPORT float getDefaultScalingValue(int iChannelKind,
 DISPSHARED_EXPORT float getScalingValue(const QMap<qint32, float>& qMapChScaling,
                                         int iChannelKind,
                                         int iChannelUnit);
+
 
 //=============================================================================================================
 /**
@@ -128,7 +116,7 @@ class DISPSHARED_EXPORT ScalingView : public AbstractView
 {
     Q_OBJECT
 
-public:    
+public:
     typedef QSharedPointer<ScalingView> SPtr;              /**< Shared pointer type for ScalingView. */
     typedef QSharedPointer<const ScalingView> ConstSPtr;   /**< Const shared pointer type for ScalingView. */
 
@@ -136,7 +124,7 @@ public:
     /**
      * Constructs a ScalingView which is a child of parent.
      *
-     * @param [in] parent        parent of widget
+     * @param[in] parent Parent of widget.
      */
     ScalingView(const QString& sSettingsPath = "",
                 QWidget *parent = 0,
@@ -167,72 +155,202 @@ public:
     /**
      * Saves all important settings of this view via QSettings.
      */
-    void saveSettings();
+    void saveSettings() override;
 
     //=========================================================================================================
     /**
      * Loads and inits all important settings of this view via QSettings.
      */
-    void loadSettings();
+    void loadSettings() override;
 
     //=========================================================================================================
     /**
      * Clears the view
      */
-    void clearView();
+    void clearView() override;
 
-protected:
     //=========================================================================================================
     /**
-     * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
+     * Link the Magnetometers to the Gradiometers scale.
      *
-     * @param mode     The new mode (Clinical=0, Research=1).
+     * @param[in] l Set the link between MAGs and GRADs active or inactive.
      */
-    void updateGuiMode(GuiMode mode);
-
-    //=========================================================================================================
-    /**
-     * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
-     *
-     * @param mode     The new mode (RealTime=0, Offline=1).
-     */
-    void updateProcessingMode(ProcessingMode mode);
-
-    //=========================================================================================================
-    /**
-     * Redraw the GUI.
-     */
-    void redrawGUI();
-
-    //=========================================================================================================
-    /**
-     * Slot called when scaling spin boxes change
-     */
-    void onUpdateSpinBoxScaling(double value);
-
-    //=========================================================================================================
-    /**
-     * Slot called when slider scaling change
-     */
-    void onUpdateSliderScaling(int value);
-
-    QMap<qint32, float>                 m_qMapChScaling;                /**< Channel scaling values. */
-    QMap<qint32, QDoubleSpinBox*>       m_qMapScalingDoubleSpinBox;     /**< Map of types and channel scaling line edits. */
-    QMap<qint32, QSlider*>              m_qMapScalingSlider;            /**< Map of types and channel scaling line edits. */
-
-    QString                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
-
-    QStringList                         m_lChannelTypesToShow;          /**< The channel types as strings to show the sliders for. */
-
-    Ui::ScalingViewWidget*              m_pUi;
+    void setMagGradLink(int l);
 
 signals:
     //=========================================================================================================
     /**
      * Emit this signal whenever the scaling sliders or spin boxes changed.
+     *
+     * @param[in] scalingMap this is a list of scaling values ordered by integer keys. These keys are resolved with
+     * the use of defined macros with names of channel-types, vendors, etc.
      */
     void scalingChanged(const QMap<qint32, float>& scalingMap);
+
+private:
+
+    //=============================================================================================================
+    /**
+     * Emit signal to save scale status and update views.
+     */
+    void processScalingChange();
+
+    //=============================================================================================================
+    /**
+     * Renders visible the control object that sets the link between Magnetometers and Gradiometers used in the controlView.
+     */
+    void showLinkControl();
+
+    //=============================================================================================================
+    /**
+     * Callback to process a change in the MAGs scale spinbox.
+     *
+     * @param[in] dScale
+     */
+    void updateMAGScale(double dScale);
+
+    //=========================================================================================================
+    /**
+     * Callback to process a change in the gradiometers scale spinbox.
+     *
+     * @param[in] dScale The new Scale.
+     */
+    void updateGRADScale(double dScale);
+
+    //=========================================================================================================
+    /**
+     * Link Magnetometers and Gradiometers through this ratio. Just for viewing purposes.
+     *
+     * @param[in] dScale The new Scale.
+     */
+    void updateMAGtoGRADlink(double dScale);
+
+    //=========================================================================================================
+    /**
+     * Callback to process a change in the EEG scale spinbox.
+     *
+     * @param[in] dScale The new Scale.
+     */
+    void updateEEGScale(double dScale);
+
+    //=========================================================================================================
+    /**
+     * Callback to process a change in the EOG scale spinbox.
+     *
+     * @param[in] dScale The new Scale.
+     */
+    void updateEOGScale(double dScale);
+
+    //=========================================================================================================
+    /**
+     * Callback to process a change in the EMG scale spinbox.
+     *
+     * @param[in] dScale The new Scale.
+     */
+    void updateEMGScale(double dScale);
+
+    //=========================================================================================================
+    /**
+     * Callback to process a change in the ECG scale spinbox.
+     *
+     * @param[in] dScale The new Scale.
+     */
+    void updateECGScale(double dScale);
+
+    //=========================================================================================================
+    /**
+     * Callback to process a change in the MISC scale spinbox.
+     *
+     * @param[in] dScale The new Scale.
+     */
+    void updateMISCScale(double dScale);
+
+    //=========================================================================================================
+    /**
+     * Callback to process a change in the STIM scale spinbox.
+     *
+     * @param[in] dScale The new Scale.
+     */
+    void updateSTIMScale(double dScale);
+
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
+     *
+     * @param[in] mode The new mode (Clinical=0, Research=1).
+     */
+    void updateGuiMode(GuiMode mode) override;
+
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
+     *
+     * @param[in] mode The new mode (RealTime=0, Offline=1).
+     */
+    void updateProcessingMode(ProcessingMode mode) override;
+
+    //=========================================================================================================
+    /**
+     * Create the controls.
+     */
+    void createScaleControls();
+
+    //=========================================================================================================
+    /**
+     * Create the controls.
+     */
+    void drawScalingGUI();
+
+    //=========================================================================================================
+    /**
+     * Link Gradiometers scale with magnetometers.
+     */
+    void linkMagToGrad();
+
+    //=========================================================================================================
+    /**
+     * Link Gradiometers scale with magnetometers.
+     */
+    void linkGradToMag();
+
+    //=========================================================================================================
+    /**
+     * Create the checkbox for enabling or disabling the link between Magnetometers and Gradiometers.
+     */
+    void createLinkMagGradCheckBox();
+
+    //=========================================================================================================
+    /**
+     * Slot for processing the use of shortcut keypresses.
+     *
+     * @param[in] event An keyboard-release event to be processed.
+     */
+    void keyReleaseEvent(QKeyEvent* event) override;
+
+    //=========================================================================================================
+    /**
+     * Slot for processing the use of shortcut releases.
+     *
+     * @param[in] event A keyboard-press event to be processed.
+     */
+    void keyPressEvent(QKeyEvent* event) override;
+
+    QMap<qint32, float>                     m_qMapChScaling;                /**< Channel scaling values. */
+    QMap<qint32, QPointer<ScaleControl> >   m_qMapScaleControls;            /**< Map of channel scaling controls. */
+
+    QString                                 m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+
+    QStringList                             m_lChannelTypesToShow;          /**< The channel types as strings to show the sliders for. */
+
+    Ui::ScalingViewWidget*                  m_pUi;                          /**< Pointer to the user interface object. */
+    bool                                    m_bLinkMAGtoGRAD;               /**< If this member is set, we link MAGs and GRad scales. */
+    bool                                    m_bIsShiftKeyPressed;           /**< Bool member value to store the use of the shiftkey. */
+    bool                                    m_bManagingSpinBoxChange;       /**< Bool member mutex the state of the spinbox. */
+    bool                                    m_bManagingSliderChange;        /**< Bool member mutex the state of the slider. */
+    bool                                    m_bManagingLinkMagToGrad;       /**< Bool member mutex the link between MAGs and GRADs. */
+    QPointer<QCheckBox>                     m_pCheckBox;                    /**< Stores the conversion ratio between MAGs and GRADs. */
 };
+
 } // NAMESPACE
 
 #endif // SCALINGVIEW_H

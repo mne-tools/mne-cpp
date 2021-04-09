@@ -37,21 +37,18 @@
 //=============================================================================================================
 
 #include "scalingview.h"
-
 #include "ui_scalingview.h"
-
 #include <fiff/fiff_constants.h>
+#include "helpers/scalecontrol.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDoubleSpinBox>
-#include <QLabel>
-#include <QGridLayout>
-#include <QSlider>
-#include <QDebug>
 #include <QSettings>
+#include <QKeyEvent>
+#include <QCheckBox>
+#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -67,6 +64,19 @@ using namespace FIFFLIB;
 //=============================================================================================================
 // DEFINE GLOBAL DISPLIB METHODS
 //=============================================================================================================
+
+/**
+ * Default scales for each channel by type.
+ */
+const static float m_fScaleMAG = 1e-12f;            /**< Default scale for channel kind and unit of MAG */
+const static float m_fScaleGRAD = 1e-15f;           /**< Default scale for channel kind and unit of GRAD */
+const static float m_fScaleEEG = 1e-5f;             /**< Default scale for channel kind and unit of EEG */
+const static float m_fScaleEOG = 1e-6f;             /**< Default scale for channel kind and unit of EOG */
+const static float m_fScaleECG = 1e-2f;             /**< Default scale for channel kind and unit of ECG */
+const static float m_fScaleSTIM = 1e-3f;            /**< Default scale for channel kind and unit of STIM */
+const static float m_fScaleMISC = 1e-3f;            /**< Default scale for channel kind and unit of MISC */
+const static float m_fScaleEMG = 1e-3f;             /**< Default scale for channel kind and unit of EMG */
+const static int MAG_TO_GRAD_LINK = 31337;
 
 float DISPLIB::getDefaultScalingValue(int iChannelKind,
                                       int iChannelUnit)
@@ -148,18 +158,23 @@ ScalingView::ScalingView(const QString& sSettingsPath,
                          Qt::WindowFlags f,
                          const QStringList& lChannelsToShow)
 : AbstractView(parent, f)
-, m_pUi(new Ui::ScalingViewWidget)
 , m_lChannelTypesToShow(lChannelsToShow)
+, m_pUi(new Ui::ScalingViewWidget)
+, m_bLinkMAGtoGRAD(false)
+, m_bIsShiftKeyPressed(false)
+, m_bManagingSpinBoxChange(false)
+, m_bManagingSliderChange(false)
+, m_bManagingLinkMagToGrad(false)
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
 
     this->setWindowTitle("Scaling");
-    this->setMinimumWidth(330);
-    //this->setMaximumWidth(330);
+    this->setMinimumWidth(230);
 
     loadSettings();
-    redrawGUI();
+    createScaleControls();
+    drawScalingGUI();
 }
 
 //=============================================================================================================
@@ -167,7 +182,35 @@ ScalingView::ScalingView(const QString& sSettingsPath,
 ScalingView::~ScalingView()
 {
     saveSettings();
+
     delete m_pUi;
+
+    for(auto control : m_qMapScaleControls)
+    {
+        delete control;
+    }
+}
+
+//=============================================================================================================
+
+void ScalingView::keyReleaseEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Shift)
+    {
+        m_bIsShiftKeyPressed = false;
+    }
+    QWidget::keyReleaseEvent(event);
+}
+
+//=============================================================================================================
+
+void ScalingView::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Shift)
+    {
+        m_bIsShiftKeyPressed = true;
+    }
+    QWidget::keyPressEvent(event);
 }
 
 //=============================================================================================================
@@ -183,7 +226,7 @@ void ScalingView::setScaleMap(const QMap<qint32,float>& qMapChScaling)
 {
     m_qMapChScaling = qMapChScaling;
 
-    redrawGUI();
+    createScaleControls();
 }
 
 //=============================================================================================================
@@ -283,392 +326,268 @@ void ScalingView::updateProcessingMode(ProcessingMode mode)
 
 //=============================================================================================================
 
-void ScalingView::redrawGUI()
+void ScalingView::processScalingChange()
 {
-    qint32 i = 0;
+    emit scalingChanged(m_qMapChScaling);
+    saveSettings();
+}
 
+//=============================================================================================================
+
+void ScalingView::updateMAGScale(double dScale)
+{
+    m_qMapChScaling.insert(FIFF_UNIT_T, dScale * m_fScaleMAG);
+    linkMagToGrad();
+    processScalingChange();
+}
+
+//=============================================================================================================
+
+void ScalingView::linkMagToGrad()
+{
+    if(m_bLinkMAGtoGRAD && !m_bManagingLinkMagToGrad)
+    {
+        m_bManagingLinkMagToGrad = true;
+        m_qMapScaleControls[FIFF_UNIT_T_M]->setValue(m_qMapScaleControls[FIFF_UNIT_T]->value() / (m_qMapScaleControls[MAG_TO_GRAD_LINK]->value() / 100.f));
+        m_bManagingLinkMagToGrad = false;
+    }
+}
+
+//=============================================================================================================
+
+void ScalingView::linkGradToMag()
+{
+    if(m_bLinkMAGtoGRAD && !m_bManagingLinkMagToGrad)
+    {
+        m_bManagingLinkMagToGrad = true;
+        m_qMapScaleControls[FIFF_UNIT_T]->setValue(m_qMapScaleControls[FIFF_UNIT_T_M]->value() * (m_qMapScaleControls[MAG_TO_GRAD_LINK]->value() / 100.0f));
+        m_bManagingLinkMagToGrad = false;
+    }
+}
+
+//=============================================================================================================
+
+void ScalingView::updateGRADScale(double dScale)
+{
+    m_qMapChScaling.insert(FIFF_UNIT_T_M, dScale * m_fScaleGRAD * 100.0);//*100 because we have data in fT/cm and we want it in ft/m.
+    linkGradToMag();
+    processScalingChange();
+}
+
+//=============================================================================================================
+
+void ScalingView::updateEEGScale(double dScale)
+{
+    m_qMapChScaling.insert(FIFFV_EEG_CH, dScale * m_fScaleEEG);
+    processScalingChange();
+}
+
+//=============================================================================================================
+
+void ScalingView::updateEOGScale(double dScale)
+{
+    m_qMapChScaling.insert(FIFFV_EOG_CH, dScale * m_fScaleEOG);
+    processScalingChange();
+}
+
+//=============================================================================================================
+
+void ScalingView::updateEMGScale(double dScale)
+{
+    m_qMapChScaling.insert(FIFFV_EMG_CH, dScale * m_fScaleEMG);
+    processScalingChange();
+}
+
+//=============================================================================================================
+
+void ScalingView::updateECGScale(double dScale)
+{
+    m_qMapChScaling.insert(FIFFV_ECG_CH, dScale * m_fScaleECG);
+    processScalingChange();
+}
+
+//=============================================================================================================
+
+void ScalingView::updateMISCScale(double dScale)
+{
+    m_qMapChScaling.insert(FIFFV_MISC_CH, dScale * m_fScaleMISC);
+    processScalingChange();
+}
+
+//=============================================================================================================
+
+void ScalingView::updateSTIMScale(double scale)
+{
+    m_qMapChScaling.insert(FIFFV_STIM_CH, scale * m_fScaleSTIM);
+    processScalingChange();
+}
+
+//=============================================================================================================
+
+void ScalingView::updateMAGtoGRADlink(double dScale)
+{
+    Q_UNUSED(dScale)
+
+    linkMagToGrad();
+}
+
+//=============================================================================================================
+
+void ScalingView::drawScalingGUI()
+{
+    int i(0);
+    int controls[] = {FIFF_UNIT_T,
+                      MAG_TO_GRAD_LINK,
+                      FIFF_UNIT_T_M,
+                      FIFFV_EEG_CH,
+                      FIFFV_EOG_CH,
+                      FIFFV_ECG_CH,
+                      FIFFV_STIM_CH,
+                      FIFFV_MISC_CH };
+    for(int c: controls)
+    {
+        if(m_qMapScaleControls.contains(c))
+        {
+            m_pUi->verticalLayout->insertWidget(i++, m_qMapScaleControls[c].data());
+        }
+    }
+    createLinkMagGradCheckBox();
+}
+
+//=============================================================================================================
+
+void ScalingView::setMagGradLink(int l)
+{
+    if(m_qMapScaleControls.contains(MAG_TO_GRAD_LINK))
+    {
+        m_bLinkMAGtoGRAD = (l == 2)? true: false;
+    } else {
+        m_bLinkMAGtoGRAD = false;
+    }
+    if(m_bLinkMAGtoGRAD)
+    {
+        m_qMapScaleControls[MAG_TO_GRAD_LINK]->setValue(100 * m_qMapScaleControls[FIFF_UNIT_T]->value() / m_qMapScaleControls[FIFF_UNIT_T_M]->value());
+    }
+    showLinkControl();
+}
+
+//=============================================================================================================
+
+void ScalingView::showLinkControl()
+{
+    if(m_qMapScaleControls.contains(MAG_TO_GRAD_LINK))
+    {
+        m_qMapScaleControls[MAG_TO_GRAD_LINK]->setVisible(m_bLinkMAGtoGRAD);
+    }
+}
+
+//=============================================================================================================
+
+void ScalingView::createScaleControls()
+{
     //MAG
     if(m_qMapChScaling.contains(FIFF_UNIT_T) && (m_lChannelTypesToShow.contains("mag") || m_lChannelTypesToShow.contains("all")))
     {
-        QLabel* t_pLabelModality = new QLabel("MAG (pT)");
-        m_pUi->m_formLayout_Scaling->addWidget(t_pLabelModality,i,0,1,1);
-
-        QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
-        t_pDoubleSpinBoxScale->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-        t_pDoubleSpinBoxScale->setMinimum(0.001);
-        t_pDoubleSpinBoxScale->setMaximum(50000);
-        t_pDoubleSpinBoxScale->setMaximumWidth(100);
-        t_pDoubleSpinBoxScale->setSingleStep(0.01);
-        t_pDoubleSpinBoxScale->setDecimals(3);
-        t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFF_UNIT_T)/(m_fScaleMAG));
-        m_qMapScalingDoubleSpinBox.insert(FIFF_UNIT_T,t_pDoubleSpinBoxScale);
-        connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&ScalingView::onUpdateSpinBoxScaling);
-        m_pUi->m_formLayout_Scaling->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
-
-        QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
-        t_pHorizontalSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-        t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(500);
-        t_pHorizontalSlider->setSingleStep(1);
-        t_pHorizontalSlider->setPageStep(1);
-        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFF_UNIT_T)/(m_fScaleMAG)*10);
-        m_qMapScalingSlider.insert(FIFF_UNIT_T,t_pHorizontalSlider);
-        connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-                this,&ScalingView::onUpdateSliderScaling);
-        m_pUi->m_formLayout_Scaling->addWidget(t_pHorizontalSlider,i+1,1,1,1);
-
-        i+=2;
+        QPointer<ScaleControl> pControlMAG = QPointer<ScaleControl>(new ScaleControl("MAG [pT])"));
+        pControlMAG->setRange(0.2f, 20.0f);
+        pControlMAG->setMaxSensitivityPoint(1.5);
+        pControlMAG->setValue(1.5f);
+        pControlMAG->setSensitivity(0.7f);
+        pControlMAG->invertSlider(true);
+        connect(pControlMAG, &ScaleControl::valueChanged, this, &ScalingView::updateMAGScale);
+        m_qMapScaleControls.insert(FIFF_UNIT_T, pControlMAG);
     }
 
     //GRAD
     if(m_qMapChScaling.contains(FIFF_UNIT_T_M) && (m_lChannelTypesToShow.contains("grad") || m_lChannelTypesToShow.contains("all")))
     {
-        QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText("GRAD (fT/cm)");
-        m_pUi->m_formLayout_Scaling->addWidget(t_pLabelModality,i,0,1,1);
+        QPointer<ScaleControl> pControlGRAD = QPointer<ScaleControl>(new ScaleControl("GRAD [fT/cm]"));
+        pControlGRAD->setRange(30.0f, 5000.0f);
+        pControlGRAD->setMaxSensitivityPoint(100.0f);
+        pControlGRAD->setValue(240.0f);
+        pControlGRAD->setSensitivity(0.7f);
+        pControlGRAD->invertSlider(true);
+        connect(pControlGRAD, &ScaleControl::valueChanged, this, &ScalingView::updateGRADScale);
+        m_qMapScaleControls.insert(FIFF_UNIT_T_M, pControlGRAD);
+    }
 
-        QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
-        t_pDoubleSpinBoxScale->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-        t_pDoubleSpinBoxScale->setMinimum(1);
-        t_pDoubleSpinBoxScale->setMaximum(500000);
-        t_pDoubleSpinBoxScale->setMaximumWidth(100);
-        t_pDoubleSpinBoxScale->setSingleStep(1);
-        t_pDoubleSpinBoxScale->setDecimals(1);
-        t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFF_UNIT_T_M)/(m_fScaleGRAD * 100));
-        m_qMapScalingDoubleSpinBox.insert(FIFF_UNIT_T_M,t_pDoubleSpinBoxScale);
-        connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&ScalingView::onUpdateSpinBoxScaling);
-        m_pUi->m_formLayout_Scaling->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
-
-        QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
-        t_pHorizontalSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-        t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(2000);
-        t_pHorizontalSlider->setSingleStep(1);
-        t_pHorizontalSlider->setPageStep(1);
-        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFF_UNIT_T_M)/(m_fScaleGRAD * 100));
-        m_qMapScalingSlider.insert(FIFF_UNIT_T_M,t_pHorizontalSlider);
-        connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-                this,&ScalingView::onUpdateSliderScaling);
-        m_pUi->m_formLayout_Scaling->addWidget(t_pHorizontalSlider,i+1,1,1,1);
-
-        i+=2;
+    //MAGtoGRADlink only if we have Mags and Grads to link
+    if(m_qMapScaleControls.contains(FIFF_UNIT_T) && m_qMapScaleControls.contains(FIFF_UNIT_T_M))
+    {
+        QPointer<ScaleControl> pControlMAGtoGRADlink = QPointer<ScaleControl>(new ScaleControl("MAG-GRAD link [cm]"));
+        pControlMAGtoGRADlink->setRange(0.10f, 8.0f);
+        pControlMAGtoGRADlink->setMaxSensitivityPoint(2.0f);
+        pControlMAGtoGRADlink->setValue(2.0f);
+        pControlMAGtoGRADlink->setSensitivity(0.7f);
+        connect(pControlMAGtoGRADlink, &ScaleControl::valueChanged, this, &ScalingView::updateMAGtoGRADlink);
+        pControlMAGtoGRADlink->setVisible(m_bLinkMAGtoGRAD);
+        m_qMapScaleControls.insert(MAG_TO_GRAD_LINK,pControlMAGtoGRADlink);
     }
 
     //EEG
     if(m_qMapChScaling.contains(FIFFV_EEG_CH) && (m_lChannelTypesToShow.contains("eeg") || m_lChannelTypesToShow.contains("all")))
     {
-        QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText("EEG (uV)");
-        m_pUi->m_formLayout_Scaling->addWidget(t_pLabelModality,i,0,1,1);
-
-        QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
-        t_pDoubleSpinBoxScale->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-        t_pDoubleSpinBoxScale->setMinimum(0.1);
-        t_pDoubleSpinBoxScale->setMaximum(25000);
-        t_pDoubleSpinBoxScale->setMaximumWidth(100);
-        t_pDoubleSpinBoxScale->setSingleStep(0.1);
-        t_pDoubleSpinBoxScale->setDecimals(1);
-        t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_EEG_CH)/(m_fScaleEEG));
-        m_qMapScalingDoubleSpinBox.insert(FIFFV_EEG_CH,t_pDoubleSpinBoxScale);
-        connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&ScalingView::onUpdateSpinBoxScaling);
-        m_pUi->m_formLayout_Scaling->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
-
-        QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
-        t_pHorizontalSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-        t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(1000);
-        t_pHorizontalSlider->setSingleStep(1);
-        t_pHorizontalSlider->setPageStep(1);
-        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_EEG_CH)/(m_fScaleEEG)*10);
-        m_qMapScalingSlider.insert(FIFFV_EEG_CH,t_pHorizontalSlider);
-        connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-                this,&ScalingView::onUpdateSliderScaling);
-        m_pUi->m_formLayout_Scaling->addWidget(t_pHorizontalSlider,i+1,1,1,1);
-
-        i+=2;
+        QPointer<ScaleControl> pControlEEG = QPointer<ScaleControl>(new ScaleControl("EEG [uV]"));
+        pControlEEG->setRange(3.0f, 100.0f);
+        pControlEEG->setMaxSensitivityPoint(14.0f);
+        pControlEEG->setValue(14.0f);
+        pControlEEG->setSensitivity(0.4f);
+        pControlEEG->invertSlider(true);
+        connect(pControlEEG, &ScaleControl::valueChanged, this, &ScalingView::updateEEGScale);
+        m_qMapScaleControls.insert(FIFFV_EEG_CH, pControlEEG);
     }
 
     //EOG
     if(m_qMapChScaling.contains(FIFFV_EOG_CH) && (m_lChannelTypesToShow.contains("eog") || m_lChannelTypesToShow.contains("all")))
     {
-        QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText("EOG (uV)");
-        m_pUi->m_formLayout_Scaling->addWidget(t_pLabelModality,i,0,1,1);
-
-        QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
-        t_pDoubleSpinBoxScale->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-        t_pDoubleSpinBoxScale->setMinimum(0.1);
-        t_pDoubleSpinBoxScale->setMaximum(102500e14);
-        t_pDoubleSpinBoxScale->setMaximumWidth(100);
-        t_pDoubleSpinBoxScale->setSingleStep(0.1);
-        t_pDoubleSpinBoxScale->setDecimals(1);
-        t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_EOG_CH)/(m_fScaleEOG));
-        m_qMapScalingDoubleSpinBox.insert(FIFFV_EOG_CH,t_pDoubleSpinBoxScale);
-        connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&ScalingView::onUpdateSpinBoxScaling);
-        m_pUi->m_formLayout_Scaling->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
-
-        QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
-        t_pHorizontalSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-        t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(1000);
-        t_pHorizontalSlider->setSingleStep(1);
-        t_pHorizontalSlider->setPageStep(1);
-        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_EOG_CH)/(m_fScaleEOG)*10);
-        m_qMapScalingSlider.insert(FIFFV_EOG_CH,t_pHorizontalSlider);
-        connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-                this,&ScalingView::onUpdateSliderScaling);
-        m_pUi->m_formLayout_Scaling->addWidget(t_pHorizontalSlider,i+1,1,1,1);
-
-        i+=2;
+        QPointer<ScaleControl> pControlEOG = QPointer<ScaleControl>(new ScaleControl("EOG [uV]"));
+        pControlEOG->setRange(3.0f, 100.0f);
+        pControlEOG->setMaxSensitivityPoint(14.0f);
+        pControlEOG->setValue(14.0f);
+        pControlEOG->setSensitivity(0.4f);
+        pControlEOG->invertSlider(true);
+        connect(pControlEOG, &ScaleControl::valueChanged, this, &ScalingView::updateEOGScale);
+        m_qMapScaleControls.insert(FIFFV_EOG_CH, pControlEOG);
     }
 
     //ECG
     if(m_qMapChScaling.contains(FIFFV_ECG_CH) && (m_lChannelTypesToShow.contains("ecg") || m_lChannelTypesToShow.contains("all")))
     {
-        QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText("ECG (uV)");
-        m_pUi->m_formLayout_Scaling->addWidget(t_pLabelModality,i,0,1,1);
-
-        QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
-        t_pDoubleSpinBoxScale->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-        t_pDoubleSpinBoxScale->setMinimum(0.1);
-        t_pDoubleSpinBoxScale->setMaximum(102500e14);
-        t_pDoubleSpinBoxScale->setMaximumWidth(100);
-        t_pDoubleSpinBoxScale->setSingleStep(0.1);
-        t_pDoubleSpinBoxScale->setDecimals(1);
-        t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_ECG_CH)/(m_fScaleECG));
-        m_qMapScalingDoubleSpinBox.insert(FIFFV_ECG_CH,t_pDoubleSpinBoxScale);
-        connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&ScalingView::onUpdateSpinBoxScaling);
-        m_pUi->m_formLayout_Scaling->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
-
-        QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
-        t_pHorizontalSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-        t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(1000);
-        t_pHorizontalSlider->setSingleStep(1);
-        t_pHorizontalSlider->setPageStep(1);
-        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_ECG_CH)/(m_fScaleECG)*10);
-        m_qMapScalingSlider.insert(FIFFV_ECG_CH,t_pHorizontalSlider);
-        connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-                this,&ScalingView::onUpdateSliderScaling);
-        m_pUi->m_formLayout_Scaling->addWidget(t_pHorizontalSlider,i+1,1,1,1);
-
-        i+=2;
+        QPointer<ScaleControl> pControlECG = QPointer<ScaleControl>(new ScaleControl("ECG [uV]"));
+        pControlECG->setRange(3.0f, 100.0f);
+        pControlECG->setMaxSensitivityPoint(14.0f);
+        pControlECG->setValue(14.0f);
+        pControlECG->setSensitivity(0.4f);
+        pControlECG->invertSlider(true);
+        connect(pControlECG, &ScaleControl::valueChanged, this, &ScalingView::updateECGScale);
+        m_qMapScaleControls.insert(FIFFV_ECG_CH, pControlECG);
     }
 
     //STIM
     if(m_qMapChScaling.contains(FIFFV_STIM_CH) && (m_lChannelTypesToShow.contains("stim") || m_lChannelTypesToShow.contains("all")))
     {
-        QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText("STIM");
-        m_pUi->m_formLayout_Scaling->addWidget(t_pLabelModality,i,0,1,1);
-
-        QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
-        t_pDoubleSpinBoxScale->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-        t_pDoubleSpinBoxScale->setMinimum(0.001);
-        t_pDoubleSpinBoxScale->setMaximum(1000);
-        t_pDoubleSpinBoxScale->setMaximumWidth(100);
-        t_pDoubleSpinBoxScale->setSingleStep(0.001);
-        t_pDoubleSpinBoxScale->setDecimals(3);
-        t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_STIM_CH));
-        m_qMapScalingDoubleSpinBox.insert(FIFFV_STIM_CH,t_pDoubleSpinBoxScale);
-        connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&ScalingView::onUpdateSpinBoxScaling);
-        m_pUi->m_formLayout_Scaling->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
-
-        QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
-        t_pHorizontalSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-        t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(1000);
-        t_pHorizontalSlider->setSingleStep(1);
-        t_pHorizontalSlider->setPageStep(1);
-        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_STIM_CH)*10);
-        m_qMapScalingSlider.insert(FIFFV_STIM_CH,t_pHorizontalSlider);
-        connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-                this,&ScalingView::onUpdateSliderScaling);
-        m_pUi->m_formLayout_Scaling->addWidget(t_pHorizontalSlider,i+1,1,1,1);
-
-        i+=2;
+        QPointer<ScaleControl> pControlSTIM = QPointer<ScaleControl>(new ScaleControl("STIM"));
+        pControlSTIM->setRange(1.0f, 99999.0f);
+        pControlSTIM->setMaxSensitivityPoint(5000.0f);
+        pControlSTIM->setValue(5000.0f);
+        pControlSTIM->setSensitivity(0.8f);
+        pControlSTIM->invertSlider(true);
+        connect(pControlSTIM, &ScaleControl::valueChanged, this, &ScalingView::updateSTIMScale);
+        m_qMapScaleControls.insert(FIFFV_STIM_CH, pControlSTIM);
     }
 
     //MISC
     if(m_qMapChScaling.contains(FIFFV_MISC_CH) && (m_lChannelTypesToShow.contains("misc") || m_lChannelTypesToShow.contains("all")))
     {
-        QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText("MISC");
-        m_pUi->m_formLayout_Scaling->addWidget(t_pLabelModality,i,0,1,1);
-
-        QDoubleSpinBox* t_pDoubleSpinBoxScale = new QDoubleSpinBox;
-        t_pDoubleSpinBoxScale->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-        t_pDoubleSpinBoxScale->setMinimum(0.1);
-        t_pDoubleSpinBoxScale->setMaximum(10000);
-        t_pDoubleSpinBoxScale->setMaximumWidth(100);
-        t_pDoubleSpinBoxScale->setSingleStep(0.1);
-        t_pDoubleSpinBoxScale->setDecimals(1);
-        t_pDoubleSpinBoxScale->setPrefix("+/- ");
-        t_pDoubleSpinBoxScale->setValue(m_qMapChScaling.value(FIFFV_MISC_CH));
-        m_qMapScalingDoubleSpinBox.insert(FIFFV_MISC_CH,t_pDoubleSpinBoxScale);
-        connect(t_pDoubleSpinBoxScale,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-                this,&ScalingView::onUpdateSpinBoxScaling);
-        m_pUi->m_formLayout_Scaling->addWidget(t_pDoubleSpinBoxScale,i+1,0,1,1);
-
-        QSlider* t_pHorizontalSlider = new QSlider(Qt::Horizontal);
-        t_pHorizontalSlider->setSizePolicy(QSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred));
-        t_pHorizontalSlider->setMinimum(1);
-        t_pHorizontalSlider->setMaximum(10000);
-        t_pHorizontalSlider->setSingleStep(1);
-        t_pHorizontalSlider->setPageStep(1);
-        t_pHorizontalSlider->setValue(m_qMapChScaling.value(FIFFV_MISC_CH)/10);
-        m_qMapScalingSlider.insert(FIFFV_MISC_CH,t_pHorizontalSlider);
-        connect(t_pHorizontalSlider,static_cast<void (QSlider::*)(int)>(&QSlider::valueChanged),
-                this,&ScalingView::onUpdateSliderScaling);
-        m_pUi->m_formLayout_Scaling->addWidget(t_pHorizontalSlider,i+1,1,1,1);
-
-        i+=2;
+        QPointer<ScaleControl> pControlMISC = QPointer<ScaleControl>(new ScaleControl("MISC"));
+        pControlMISC->setRange(3.0f, 100.0f);
+        pControlMISC->setMaxSensitivityPoint(14.0f);
+        pControlMISC->setValue(14.0f);
+        pControlMISC->setSensitivity(0.4f);
+        pControlMISC->invertSlider(true);
+        connect(pControlMISC, &ScaleControl::valueChanged, this, &ScalingView::updateMISCScale);
+        m_qMapScaleControls.insert(FIFFV_MISC_CH, pControlMISC);
     }
-}
-
-//=============================================================================================================
-
-void ScalingView::onUpdateSpinBoxScaling(double value)
-{
-    Q_UNUSED(value)
-
-    QMap<qint32, QDoubleSpinBox*>::iterator it;
-    for (it = m_qMapScalingDoubleSpinBox.begin(); it != m_qMapScalingDoubleSpinBox.end(); ++it)
-    {
-        double scaleValue = 0;
-
-        switch(it.key())
-        {
-            case FIFF_UNIT_T:
-                //MAG
-                scaleValue = m_fScaleMAG;
-                m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
-                break;
-            case FIFF_UNIT_T_M:
-                //GRAD
-                scaleValue = m_fScaleGRAD * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
-                m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*1);
-                break;
-            case FIFFV_EEG_CH:
-                //EEG
-                scaleValue = m_fScaleEEG;
-                m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
-                break;
-            case FIFFV_EOG_CH:
-                //EOG
-                scaleValue = m_fScaleEOG;
-                m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
-                break;
-            case FIFFV_EMG_CH:
-                //EMG
-                scaleValue = m_fScaleEMG;
-                m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
-                break;
-            case FIFFV_ECG_CH:
-                //ECG
-                scaleValue = m_fScaleECG;
-                m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
-                break;
-            case FIFFV_MISC_CH:
-                //MISC
-                scaleValue = m_fScaleMISC;
-                m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
-                break;
-            case FIFFV_STIM_CH:
-                //STIM
-                scaleValue = m_fScaleSTIM;
-                m_qMapScalingSlider[it.key()]->setValue(it.value()->value()*10);
-                break;
-            default:
-                scaleValue = 1.0;
-        }
-
-        //if(m_qMapScalingSlider[it.key()]->maximum()<it.value()->value()*10)
-            m_qMapChScaling.insert(it.key(), it.value()->value() * scaleValue);
-//        qDebug()<<"m_pRTMSAW->m_qMapChScaling[it.key()]" << m_pRTMSAW->m_qMapChScaling[it.key()];
-    }
-
-    emit scalingChanged(m_qMapChScaling);
-
-    saveSettings();
-}
-
-//=============================================================================================================
-
-void ScalingView::onUpdateSliderScaling(int value)
-{
-    Q_UNUSED(value)
-
-    QMap<qint32, QDoubleSpinBox*>::iterator it;
-    for (it = m_qMapScalingDoubleSpinBox.begin(); it != m_qMapScalingDoubleSpinBox.end(); ++it)
-    {
-        double scaleValue = 0;
-
-        switch(it.key())
-        {
-            case FIFF_UNIT_T:
-                //MAG
-                scaleValue = m_fScaleMAG;
-                it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
-                break;
-            case FIFF_UNIT_T_M:
-                //GRAD
-                scaleValue = m_fScaleGRAD * 100; //*100 because data in fiff files is stored as fT/m not fT/cm
-                it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/1);
-                break;
-            case FIFFV_EEG_CH:
-                //EEG
-                scaleValue = m_fScaleEEG;
-                it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
-                break;
-            case FIFFV_EOG_CH:
-                //EOG
-                scaleValue = m_fScaleEOG;
-                it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
-                break;
-            case FIFFV_EMG_CH:
-                //EMG
-                scaleValue = m_fScaleEMG;
-                it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
-                break;
-            case FIFFV_ECG_CH:
-                //ECG
-                scaleValue = m_fScaleECG;
-                it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
-                break;
-            case FIFFV_MISC_CH:
-                //MISC
-                scaleValue = m_fScaleMISC;
-                it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
-                break;
-            case FIFFV_STIM_CH:
-                //STIM
-                scaleValue = m_fScaleMISC;
-                it.value()->setValue((double)m_qMapScalingSlider[it.key()]->value()/10);
-                break;
-            default:
-                scaleValue = 1.0;
-        }
-
-//        qDebug()<<"m_pRTMSAW->m_qMapChScaling[it.key()]" << m_pRTMSAW->m_qMapChScaling[it.key()];
-    }
-
-    emit scalingChanged(m_qMapChScaling);
-
-    saveSettings();
 }
 
 //=============================================================================================================
@@ -676,4 +595,14 @@ void ScalingView::onUpdateSliderScaling(int value)
 void ScalingView::clearView()
 {
 
+}
+
+//=============================================================================================================
+
+void ScalingView::createLinkMagGradCheckBox()
+{
+    m_pCheckBox = QPointer<QCheckBox>(new QCheckBox("Link MAGs -> GRADs"));
+    m_pCheckBox->setChecked(m_bLinkMAGtoGRAD);
+    connect(m_pCheckBox, &QCheckBox::stateChanged, this, &ScalingView::setMagGradLink);
+    m_pUi->verticalLayout->addWidget(m_pCheckBox);
 }

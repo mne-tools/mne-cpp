@@ -318,6 +318,7 @@ int ColorMap::coolG(double x)
 
 int ColorMap::coolB(double x)
 {
+    Q_UNUSED(x)
     //Describe the blue fuzzy set
     return (int)floor(1.0*255);
 }
