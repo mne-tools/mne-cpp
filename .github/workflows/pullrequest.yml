@@ -154,7 +154,7 @@ jobs:
         mkdir build
         cd build
         cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
-        make -j
+        make
         make install
     - name: Compile LSL submodule (Windows)
       if: matrix.os == 'windows-2019'
