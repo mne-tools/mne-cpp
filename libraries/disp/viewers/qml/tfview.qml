@@ -4,13 +4,11 @@ import QtQuick.Window 2.1
 import QtDataVisualization 1.2
 import "."
 
-Window {
+Item {
     id: mainview
-    title: "Qt Quick 2 Spectrogram Example"
     visible: true
-    width: 1024
-    height: 768
-    color: surfaceGraph.theme.windowColor
+    width: parent.width
+    height: parent.height
 
     Data {
         id: surfaceData
@@ -25,18 +23,17 @@ Window {
 
         ColorGradient {
             id: surfaceGradient
-            ColorGradientStop { position: 0.0; color: "black" }
-            ColorGradientStop { position: 0.2; color: "red" }
-            ColorGradientStop { position: 0.5; color: "blue" }
-            ColorGradientStop { position: 0.8; color: "yellow" }
-            ColorGradientStop { position: 1.0; color: "white" }
+            ColorGradientStop { position: 0.0; color: "red" }
+            ColorGradientStop { position: 0.3; color: "yellow" }
+            ColorGradientStop { position: 0.7; color: "cyan" }
+            ColorGradientStop { position: 1.0; color: "blue" }
         }
 
         ValueAxis3D {
             id: xAxis
             segmentCount: 8
             labelFormat: "%i\u00B0"
-            title: "Angle"
+            title: "Time"
             titleVisible: true
             titleFixed: false
         }
@@ -55,7 +52,7 @@ Window {
             id: zAxis
             segmentCount: 5
             labelFormat: "%i nm"
-            title: "Radius"
+            title: "Frequency"
             titleVisible: true
             titleFixed: false
         }
@@ -244,11 +241,10 @@ Window {
         width: 50
         rotation: 180
         gradient: Gradient {
-            GradientStop { position: 0.0; color: "black" }
-            GradientStop { position: 0.2; color: "red" }
-            GradientStop { position: 0.5; color: "blue" }
-            GradientStop { position: 0.8; color: "yellow" }
-            GradientStop { position: 1.0; color: "white" }
+            GradientStop { position: 0.0; color: "red" }
+            GradientStop { position: 0.3; color: "yellow" }
+            GradientStop { position: 0.7; color: "cyan" }
+            GradientStop { position: 1.0; color: "blue" }
         }
     }
 

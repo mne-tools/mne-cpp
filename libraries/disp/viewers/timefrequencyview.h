@@ -110,7 +110,7 @@ public:
 protected:
     void initQMLView();
 
-    virtual void paintEvent(QPaintEvent *event);
+//    virtual void paintEvent(QPaintEvent *event);
 };
 
 } //namespace

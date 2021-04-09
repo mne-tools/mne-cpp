@@ -123,9 +123,10 @@ void TimeFrequencyView::clearView()
 
 void TimeFrequencyView::initQMLView()
 {
-    QUrl source("qml/tfview.qml");
+    QUrl source = QUrl::fromLocalFile("../libraries/disp/viewers/qml/tfview.qml");
     QQuickWidget* widget = new QQuickWidget();
     widget->setSource(source);
+    widget->setResizeMode(QQuickWidget::SizeRootObjectToView);
 
     QVBoxLayout* layout = new QVBoxLayout();
     layout->addWidget(widget);
@@ -134,9 +135,9 @@ void TimeFrequencyView::initQMLView()
     this->setLayout(layout);
 }
 
-//=============================================================================================================
+////=============================================================================================================
 
-void TimeFrequencyView::paintEvent(QPaintEvent *event)
-{
-    return AbstractView::paintEvent(event);
-}
+//void TimeFrequencyView::paintEvent(QPaintEvent *event)
+//{
+//    return AbstractView::paintEvent(event);
+//}
