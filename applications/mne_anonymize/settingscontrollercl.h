@@ -207,14 +207,14 @@ private:
      * Prints a header message if the Verbose option has been set, a header will be printed during execution, right before the
      * file anonymizationFile signal is sent.
      */
-    void printHeaderIfVerbose();
+    inline void printHeaderIfVerbose();
 
     //=========================================================================================================
     /**
      * Prints a footer line or message if the Verbose option has been set, a header will be printed during execution, right before the
      * file anonymizationFile signal is sent.
      */
-    void printFooterIfVerbose();
+    inline void printFooterIfVerbose();
 
     //=========================================================================================================
     /**
@@ -239,6 +239,7 @@ protected:
     FiffAnonymizer::SPtr m_pAnonymizer;     /**< Local pointer to a Fiffanonyzer object to configure and use.*/
     QString m_sAppName;                     /**< Application name.*/
     QString m_sAppVer;                      /**< Application version number.*/
+    QString m_sBuildDate;                   /**< Application build date.*/
 
     QCommandLineParser m_parser;            /**< Parser object to work with member ptr to QCoreApp and parse input command line options.*/
 
