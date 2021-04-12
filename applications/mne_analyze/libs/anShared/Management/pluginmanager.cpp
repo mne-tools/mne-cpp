@@ -92,7 +92,7 @@ void PluginManager::loadPluginsFromDirectory(const QString& dir)
     }
 #else
     QDir pluginsDir(dir);
-    pluginsDir.setNameFilters((QStringList()<<"*.exp"<<"*.lib"));
+    pluginsDir.setNameFilters(QStringList()<<"*.exp"<<"*.lib");
     foreach(const QString &file, pluginsDir.entryList(QDir::NoDotAndDotDot | QDir::Files)) {
         loadPlugin(pluginsDir.absoluteFilePath(file));
     }
