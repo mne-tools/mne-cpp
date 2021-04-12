@@ -178,13 +178,7 @@ void TimeFrequency::loadSettings()
 
 void TimeFrequency::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
-    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
-        if(m_pFiffRawModel) {
-            if(m_pFiffRawModel == pNewModel) {
-                qInfo() << "[Averaging::onModelChanged] New model is the same as old model";
-                return;
-            }
-        }
-        m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
+    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL) {
+        m_pAvgModel = qSharedPointerCast<AveragingDataModel>(pNewModel);
     }
 }

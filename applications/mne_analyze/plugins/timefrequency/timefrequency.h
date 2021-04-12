@@ -61,6 +61,7 @@
 namespace ANSHAREDLIB {
     class Communicator;
     class AbstractModel;
+    class AveragingDataModel;
 }
 
 namespace DISPLIB {
@@ -142,7 +143,7 @@ private:
     QPointer<DISPLIB::TimeFrequencyView>            m_pTimeFreqView;
     QPointer<DISPLIB::TimeFrequencyLayoutView>      m_pTimeFreqLayoutView;
 
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>   m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model */
+    QSharedPointer<ANSHAREDLIB::AveragingDataModel> m_pAvgModel;                /**< Pointer to currently loaded FiffRawView Model */
 
 };
 

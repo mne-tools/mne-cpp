@@ -62,8 +62,24 @@ class DISPSHARED_EXPORT TimeFrequencyScene : public LayoutScene
 {
     Q_OBJECT
 public:
+    //=========================================================================================================
     TimeFrequencyScene(QGraphicsView* view,
                        QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+     * Repaints all items from the layout data in the scene.
+     *
+     *  @param [in] selectedChannelItems    items which are to painted to the average scene
+     */
+    void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
+
+    //=========================================================================================================
+    /**
+     * Updates and repaints the scene
+     */
+    void updateScene();
+
 };
 }//namespace
 #endif // TIMEFREQUENCYSCENE_H

@@ -63,7 +63,12 @@ class DISPSHARED_EXPORT TimeFrequencySceneItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    TimeFrequencySceneItem();
+    TimeFrequencySceneItem(const QPointF& channelPosition);
+
+private:
+
+    QPointF                     m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
+
 };
 }//namespace
 #endif // TIMEFREQUENCYSCENEITEM_H

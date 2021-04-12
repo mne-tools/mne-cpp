@@ -38,6 +38,9 @@
 
 #include "timefrequencyscene.h"
 
+#include "timefrequencysceneitem.h"
+#include "selectionsceneitem.h"
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -58,3 +61,27 @@ TimeFrequencyScene::TimeFrequencyScene(QGraphicsView* view,
 {
 
 }
+
+//=============================================================================================================
+
+void TimeFrequencyScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
+{
+//    this->clear();
+
+//    QListIterator<QGraphicsItem*> i(selectedChannelItems);
+
+//    while (i.hasNext()) {
+//        SelectionSceneItem* selectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
+//        TimeFrequencySceneItem* averageSceneItemTemp = new TimeFrequencySceneItem();
+
+//        this->addItem(averageSceneItemTemp);
+//    }
+}
+
+//=============================================================================================================
+
+void TimeFrequencyScene::updateScene()
+{
+    this->update();
+}
+

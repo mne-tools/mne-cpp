@@ -56,7 +56,7 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TimeFrequencySceneItem::TimeFrequencySceneItem()
+TimeFrequencySceneItem::TimeFrequencySceneItem(const QPointF& channelPosition)
 {
 
 }

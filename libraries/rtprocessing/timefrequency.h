@@ -26,7 +26,15 @@
 
 namespace FIFFLIB {
     class FiffRawData;
+    class FiffEvokedSet;
 }
+
+//=============================================================================================================
+// DEFINE NAMESPACE RTPROCESSINGLIB
+//=============================================================================================================
+
+namespace RTPROCESSINGLIB
+{
 
 class TimeFrequency
 {
@@ -34,4 +42,7 @@ public:
     TimeFrequency();
 };
 
+RTPROCESINGSHARED_EXPORT void computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet);
+
+}//namespace
 #endif // TIMEFREQUENCY_RTPROCESSING_H

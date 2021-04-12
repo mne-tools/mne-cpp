@@ -67,8 +67,10 @@ class DISPSHARED_EXPORT TimeFrequencyView : public AbstractView
 {
     Q_OBJECT
 public:
-    TimeFrequencyView();
+    //=========================================================================================================
+    TimeFrequencyView();    
 
+    //=========================================================================================================
     TimeFrequencyView(const QString& sSettingsPath,
                       QWidget* parent,
                       Qt::WindowFlags f = Qt::Widget);
