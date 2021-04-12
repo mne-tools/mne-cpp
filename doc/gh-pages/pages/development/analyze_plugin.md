@@ -30,7 +30,7 @@ Returns an instance of the plugin. This is not a copy. Most of the existing plug
 
 ### init()
 
-Initializes the plugin. This gets called after all the plugins get loaded into the Plugin Manager. Any startup actions that need to be done before the user begins interacting with the plugin, such as allocating memory or initializing parameters, can be done here
+Initializes the plugin. This gets called after all the plugins get loaded into the Plugin Manager. Any startup actions that need to be done before the user begins interacting with the plugin, such as allocating memory or initializing parameters, can be done here.
 
 ### unload()
 
