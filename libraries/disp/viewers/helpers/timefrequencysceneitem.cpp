@@ -42,6 +42,10 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QQuickItem>
+#include <QQuickWidget>
+#include <QBoxLayout>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -56,7 +60,27 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TimeFrequencySceneItem::TimeFrequencySceneItem(const QPointF& channelPosition)
+TimeFrequencySceneItem::TimeFrequencySceneItem(const QString& channelName,
+                                               int channelNumber,
+                                               const QPointF& channelPosition,
+                                               int channelKind,
+                                               int channelUnit)
 {
 
+}
+
+//=============================================================================================================
+
+void TimeFrequencySceneItem::initQMLView()
+{
+    QUrl source = QUrl::fromLocalFile("../libraries/disp/viewers/qml/tfview.qml");
+    QQuickWidget* widget = new QQuickWidget();
+    widget->setSource(source);
+    widget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+
+    QVBoxLayout* layout = new QVBoxLayout();
+    layout->addWidget(widget);
+
+
+    this->setLayout(layout);
 }

@@ -39,12 +39,14 @@
 #include "timefrequencylayoutview.h"
 #include "helpers/timefrequencyscene.h"
 #include "helpers/timefrequencysceneitem.h"
+#include "helpers/selectionsceneitem.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QVBoxLayout>
+#include <QDebug>
 #if !defined(NO_QOPENGLWIDGET)
     #include <QOpenGLWidget>
 #endif
@@ -138,6 +140,27 @@ void TimeFrequencyLayoutView::loadSettings()
 //=============================================================================================================
 
 void TimeFrequencyLayoutView::clearView()
+{
+
+}
+
+//=============================================================================================================
+
+void TimeFrequencyLayoutView::channelSelectionChanged(const QVariant &data)
+{
+    if(!m_pTimeFreqScene) {
+        qDebug() << "AverageLayoutView::channelSelectionManagerChanged - m_pAverageScene is NULL. Returning. ";
+        return;
+    }
+
+    SelectionItem* pSelectionItem = data.value<DISPLIB::SelectionItem*>();
+
+    //Repaint the average items in the average scene based on the input parameter selectedChannelItems and update them with current data
+    m_pTimeFreqScene->repaintSelectionItems(*pSelectionItem);
+}
+//=============================================================================================================
+
+void TimeFrequencyLayoutView::updateData()
 {
 
 }

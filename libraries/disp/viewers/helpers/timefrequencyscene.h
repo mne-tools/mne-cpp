@@ -58,6 +58,13 @@
 namespace DISPLIB
 {
 
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class SelectionSceneItem;
+class SelectionItem;
+
 class DISPSHARED_EXPORT TimeFrequencyScene : public LayoutScene
 {
     Q_OBJECT
@@ -73,6 +80,14 @@ public:
      *  @param [in] selectedChannelItems    items which are to painted to the average scene
      */
     void repaintItems(const QList<QGraphicsItem*> &selectedChannelItems);
+
+    //=========================================================================================================
+    /**
+     * Repaints all items from the layout data in the scene from a SelectionItem object
+     *
+     * @param [in] selectedChannelItems     data about items which are to be painted
+     */
+    void repaintSelectionItems(const DISPLIB::SelectionItem &selectedChannelItems);
 
     //=========================================================================================================
     /**

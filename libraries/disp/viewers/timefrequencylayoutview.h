@@ -96,6 +96,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Sets the currently viewable channels using the corrent name and location parameters
+     *
+     * @param [in] data     QVariant containing a SelectionItem object with selected channel information
+     */
+    void channelSelectionChanged(const QVariant &data);
+
+    //=========================================================================================================
+    /**
      * Saves all important settings of this view via QSettings.
      */
     void saveSettings();
@@ -111,6 +119,12 @@ public:
      * Clears the view
      */
     void clearView();
+
+    //=========================================================================================================
+    /**
+     * call this function whenever the items' data needs to be updated
+     */
+    void updateData();
 
 protected:
     QPointer<TimeFrequencyScene>                m_pTimeFreqScene;

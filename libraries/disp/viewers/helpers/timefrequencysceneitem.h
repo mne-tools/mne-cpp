@@ -45,7 +45,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsObject>
+#include <QWidget>
+#include <QGraphicsWidget>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -59,13 +60,31 @@ namespace DISPLIB
 {
 
 //=============================================================================================================
-class DISPSHARED_EXPORT TimeFrequencySceneItem : public QGraphicsObject
+class DISPSHARED_EXPORT TimeFrequencySceneItem : public QWidget
 {
     Q_OBJECT
 public:
-    TimeFrequencySceneItem(const QPointF& channelPosition);
+    TimeFrequencySceneItem(const QString& channelName,
+                           int channelNumber,
+                           const QPointF& channelPosition,
+                           int channelKind,
+                           int channelUnit);
+
+protected:
+    void initQMLView();
 
 private:
+
+    QString                     m_sChannelName;             /**< The channel name.*/
+    int                         m_iChannelNumber;           /**< The channel number.*/
+    int                         m_iChannelKind;             /**< The channel kind.*/
+    int                         m_iChannelUnit;             /**< The channel unit.*/
+    int                         m_iTotalNumberChannels;     /**< The total number of channels loaded in the curent evoked data set.*/
+    int                         m_iFontTextSize;            /**< The font text size of the electrode names.*/
+    int                         m_iMaxWidth;                /**< The max width. */
+    int                         m_iMaxHeigth;               /**< The max heigth. */
+
+    bool                        m_bIsBad;                   /**< Whether this channel is bad. */
 
     QPointF                     m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
 

@@ -45,6 +45,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QGraphicsProxyWidget>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -76,6 +78,25 @@ void TimeFrequencyScene::repaintItems(const QList<QGraphicsItem *> &selectedChan
 
 //        this->addItem(averageSceneItemTemp);
 //    }
+}
+
+//=============================================================================================================
+
+void TimeFrequencyScene::repaintSelectionItems(const DISPLIB::SelectionItem &selectedChannelItems)
+{
+    this->clear();
+
+    for (int i = 0; i < selectedChannelItems.m_iChannelKind.size(); i++){
+        TimeFrequencySceneItem* averageSceneItemTemp = new TimeFrequencySceneItem(selectedChannelItems.m_sChannelName[i],
+                                                                                  selectedChannelItems.m_iChannelNumber[i],
+                                                                                  selectedChannelItems.m_qpChannelPosition[i],
+                                                                                  selectedChannelItems.m_iChannelKind[i],
+                                                                                  selectedChannelItems.m_iChannelUnit[i]);
+
+        QGraphicsProxyWidget* pWidget = this->addWidget(averageSceneItemTemp);
+
+        pWidget->setPos(selectedChannelItems.m_qpChannelPosition[i]);
+    }
 }
 
 //=============================================================================================================
