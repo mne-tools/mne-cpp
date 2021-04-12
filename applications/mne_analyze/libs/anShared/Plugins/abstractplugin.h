@@ -174,6 +174,24 @@ public:
      */
     virtual void handleEvent(QSharedPointer<Event> e) = 0;
 
+    //=========================================================================================================
+    /**
+     * Set whether this plugin has been loaded or not.
+     *
+     * @param b The loading status.
+     */
+    virtual inline void setLoadState(bool b);
+
+    //=========================================================================================================
+    virtual inline bool hasBeenLoaded() const;
+
+    //=========================================================================================================
+
+    virtual inline void setInitState(bool b);
+    //=========================================================================================================
+
+    virtual inline bool hasBeenInitialized() const;
+
 signals:
     //=========================================================================================================
     /**
@@ -193,7 +211,9 @@ signals:
 
 protected:
     QSharedPointer<AnalyzeData>     m_pAnalyzeData;         /**< Pointer to the global data base */
-    bool                            m_bAlreadyLoaded;
+    bool m_bLoaded;                                         /**< Store whether this plugin has been loaded in the PluginManager. */
+    bool m_bInitialized;                                    /**< Store the initialization state of the plugin. */
+
 };
 
 //=============================================================================================================
@@ -210,6 +230,34 @@ void AbstractPlugin::cmdLineStartup(const QStringList& sArguments)
 void AbstractPlugin::setGlobalData(QSharedPointer<AnalyzeData> globalData)
 {
     m_pAnalyzeData = globalData;
+}
+
+//=============================================================================================================
+
+void AbstractPlugin::setLoadState(bool b)
+{
+    m_bLoaded = b;
+}
+
+//=============================================================================================================
+
+bool AbstractPlugin::hasBeenLoaded() const
+{
+    return m_bLoaded;
+}
+
+//=============================================================================================================
+
+void AbstractPlugin::setInitState(bool b)
+{
+    m_bInitialized = b;
+}
+
+//=============================================================================================================
+
+bool AbstractPlugin::hasBeenInitialized() const
+{
+    return m_bInitialized;
 }
 
 } //Namespace
