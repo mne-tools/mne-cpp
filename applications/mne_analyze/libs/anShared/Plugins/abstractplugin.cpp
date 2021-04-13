@@ -52,7 +52,8 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 AbstractPlugin::AbstractPlugin()
-:m_bInitialized(false)
+: m_bInitialized(false),
+m_iOrder(0)
 {
 }
 
@@ -96,5 +97,5 @@ void AbstractPlugin::setGlobalData(QSharedPointer<AnalyzeData> globalData)
 
 int AbstractPlugin::getOrder() const
 {
-    return 1;
+    return m_iOrder;
 }
