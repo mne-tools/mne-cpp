@@ -43,6 +43,7 @@ Copyright (C) 2017, Christoph Dinh, Lars Debor, Simon Heinke and Matti Hamalaine
 #include "../Plugins/abstractplugin.h"
 #include "communicator.h"
 #include <algorithm>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -92,7 +93,6 @@ void PluginManager::loadPluginsFromDirectory(const QString& dir)
     }
 #else
     QDir pluginsDir(dir);
-    pluginsDir.setNameFilters(QStringList()<<"*.exp"<<"*.lib");
     foreach(const QString &file, pluginsDir.entryList(QDir::NoDotAndDotDot | QDir::Files)) {
         loadPlugin(pluginsDir.absoluteFilePath(file));
     }
@@ -134,7 +134,7 @@ void PluginManager::insertPlugin(AbstractPlugin* pPlugin)
 
 void PluginManager::initPlugins(QSharedPointer<AnalyzeData> data)
 {
-    for(AbstractPlugin*& plugin : m_qVecPlugins)
+    for(AbstractPlugin* plugin : m_qVecPlugins)
     {
         if(plugin->hasBeenInitialized() == false)
         {

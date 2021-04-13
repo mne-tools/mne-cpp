@@ -184,7 +184,7 @@ public:
      *
      * @param e The Event that has taken place.
      */
-    void setGlobalData(QSharedPointer<AnalyzeData> globalData);
+    virtual void setGlobalData(QSharedPointer<AnalyzeData> globalData);
 
     //=========================================================================================================
     /**
