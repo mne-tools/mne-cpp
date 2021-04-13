@@ -108,11 +108,10 @@ void PluginManager::loadPlugin(const QString& file)
         this->setFileName(file);
         AbstractPlugin* pPlugin = qobject_cast<AbstractPlugin*>(this->instance());
         if(pPlugin) {
-            if(pPlugin->hasBeenLoaded() == false)
+            if(findByName(pPlugin->getName()) == -1)
             {
                 qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " succeeded.";
                 m_qVecPlugins.push_back(pPlugin);
-//                pPlugin->setLoadState(true);
             } else {
                 qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << ". Plugin already loaded.";
             }
@@ -163,6 +162,5 @@ void PluginManager::shutdown()
     for(AbstractPlugin*& plugin : m_qVecPlugins)
     {
         plugin->unload();
-        plugin->setLoadState(false);
     }
 }
