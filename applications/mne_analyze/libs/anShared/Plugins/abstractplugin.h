@@ -175,6 +175,10 @@ public:
     virtual void cmdLineStartup(const QStringList& sArguments);
 
     //=========================================================================================================
+
+    virtual int getOrder() const;
+
+    //=========================================================================================================
     /**
      * Sets the global data, which provides the central database.
      *
