@@ -226,6 +226,7 @@ signals:
 protected:
     QSharedPointer<AnalyzeData>     m_pAnalyzeData;         /**< Pointer to the global data base */
     bool m_bInitialized;                                    /**< Store the initialization state of the plugin. */
+    int m_iOrder;                                          /**< Hint to order the control in the list of controls. */
 
 };
 
