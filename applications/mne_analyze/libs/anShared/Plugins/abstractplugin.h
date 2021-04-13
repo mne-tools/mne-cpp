@@ -88,7 +88,7 @@ public:
     /**
      * Destroys the plugin.
      */
-    virtual ~AbstractPlugin() {}
+    virtual ~AbstractPlugin();
 
     //=========================================================================================================
     /**
@@ -156,7 +156,7 @@ public:
      *
      * @param[in] sArguments  the cmd line arguments.
      */
-    virtual inline void cmdLineStartup(const QStringList& sArguments);
+    virtual void cmdLineStartup(const QStringList& sArguments) final;
 
     //=========================================================================================================
     /**
@@ -164,7 +164,7 @@ public:
      *
      * @param[in] globalData  the global data.
      */
-    virtual inline void setGlobalData(QSharedPointer<AnalyzeData> globalData);
+    virtual void setGlobalData(QSharedPointer<AnalyzeData> globalData) final;
 
     //=========================================================================================================
     /**
