@@ -152,29 +152,36 @@ public:
 
     //=========================================================================================================
     /**
+     * Called by the EventManager in case a subscribed-for Event has happened.
+     *
+<<<<<<< HEAD
+     * @param[in] sArguments  the cmd line arguments.
+=======
+     * @param e The Event that has taken place
+>>>>>>> 0ecfd5a34 (define qabstractplugin methods as non virtual when there is no need for that)
+     */
+    virtual void handleEvent(QSharedPointer<Event> e) = 0;
+
+    //=========================================================================================================
+    /**
      * Initializes the plugin based on cmd line inputs given by the user.
      *
-     * @param[in] sArguments  the cmd line arguments.
+<<<<<<< HEAD
+     * @param[in] globalData  the global data.
+=======
+     * @param[in] sArguments  the cmd line arguments
+>>>>>>> 0ecfd5a34 (define qabstractplugin methods as non virtual when there is no need for that)
      */
-    virtual void cmdLineStartup(const QStringList& sArguments) final;
+    void cmdLineStartup(const QStringList& sArguments);
 
     //=========================================================================================================
     /**
      * Sets the global data, which provides the central database.
      *
-     * @param[in] globalData  the global data.
-     */
-    virtual void setGlobalData(QSharedPointer<AnalyzeData> globalData) final;
-
-    //=========================================================================================================
-    /**
-     * Called by the EventManager in case a subscribed-for Event has happened.
-     *
      * @param e The Event that has taken place.
      */
-    virtual void handleEvent(QSharedPointer<Event> e) = 0;
+    void setGlobalData(QSharedPointer<AnalyzeData> globalData);
 
-    //=========================================================================================================
     //=========================================================================================================
     /**
      * Set whether this plugin has been initialised or not.
