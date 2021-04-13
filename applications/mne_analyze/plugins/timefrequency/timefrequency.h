@@ -137,6 +137,14 @@ private:
     //=========================================================================================================
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
+    //=========================================================================================================
+    /**
+     * Sets channel selection for views based on QVariant with a SelectionItem object
+     *
+     * @param [in] data     QVariant with a SelectionItem object with channel selection information
+     */
+    void setChannelSelection(const QVariant &data);
+
     QPointer<ANSHAREDLIB::Communicator>             m_pCommu;                   /**< Used for sending events */
     QString                                         m_sSettingsPath;            /**< Variable that stores the key where to store settings for this plugin.*/
 

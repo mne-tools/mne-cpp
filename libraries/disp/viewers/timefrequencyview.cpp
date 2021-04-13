@@ -38,6 +38,8 @@
 
 #include "timefrequencyview.h"
 
+#include "helpers/evokedsetmodel.h"
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -45,6 +47,8 @@
 #include <QQuickItem>
 #include <QQuickWidget>
 #include <QBoxLayout>
+#include <QPainter>
+#include <QPainterPath>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -70,7 +74,7 @@ TimeFrequencyView::TimeFrequencyView(const QString& sSettingsPath,
 : AbstractView(parent, f)
 {
     m_sSettingsPath = sSettingsPath;
-    initQMLView();
+    //initQMLView();
 }
 
 //=============================================================================================================
@@ -135,9 +139,16 @@ void TimeFrequencyView::initQMLView()
     this->setLayout(layout);
 }
 
-////=============================================================================================================
+//=============================================================================================================
 
-//void TimeFrequencyView::paintEvent(QPaintEvent *event)
-//{
-//    return AbstractView::paintEvent(event);
-//}
+void TimeFrequencyView::paintEvent(QPaintEvent *event)
+{
+    QPainter painter(this);
+
+    painter.save();
+    painter.setBrush(QBrush());
+    painter.drawRect(QRect(-1,-1,this->width()+2,this->height()+2));
+    painter.restore();
+
+    return AbstractView::paintEvent(event);
+}

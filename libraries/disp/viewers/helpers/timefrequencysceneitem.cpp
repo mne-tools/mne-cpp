@@ -45,6 +45,7 @@
 #include <QQuickItem>
 #include <QQuickWidget>
 #include <QBoxLayout>
+#include <QLabel>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -66,17 +67,19 @@ TimeFrequencySceneItem::TimeFrequencySceneItem(const QString& channelName,
                                                int channelKind,
                                                int channelUnit)
 {
-
+    initQMLView();
 }
 
 //=============================================================================================================
 
 void TimeFrequencySceneItem::initQMLView()
 {
-    QUrl source = QUrl::fromLocalFile("../libraries/disp/viewers/qml/tfview.qml");
-    QQuickWidget* widget = new QQuickWidget();
-    widget->setSource(source);
-    widget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+//    QUrl source = QUrl::fromLocalFile("../libraries/disp/viewers/qml/tfview.qml");
+//    QQuickWidget* widget = new QQuickWidget();
+//    widget->setSource(source);
+//    widget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+
+    QLabel* widget = new QLabel("Test");
 
     QVBoxLayout* layout = new QVBoxLayout();
     layout->addWidget(widget);

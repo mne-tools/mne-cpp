@@ -40,13 +40,12 @@
 
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>
-#include <anShared/Model/fiffrawviewmodel.h>
-#include <anShared/Model/annotationmodel.h>
 #include <anShared/Model/averagingdatamodel.h>
 
 #include <disp/viewers/progressview.h>
 #include <disp/viewers/timefrequencyview.h>
 #include <disp/viewers/timefrequencylayoutview.h>
+#include <disp/viewers/helpers/selectionsceneitem.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -144,6 +143,9 @@ void TimeFrequency::handleEvent(QSharedPointer<Event> e)
         onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
         break;
     }
+    case EVENT_TYPE::CHANNEL_SELECTION_ITEMS:{
+        setChannelSelection(e->getData());
+    }
     default:
         qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -153,7 +155,9 @@ void TimeFrequency::handleEvent(QSharedPointer<Event> e)
 
 QVector<EVENT_TYPE> TimeFrequency::getEventSubscriptions(void) const
 {
-    QVector<EVENT_TYPE> temp = {SELECTED_MODEL_CHANGED};
+    QVector<EVENT_TYPE> temp;
+    temp.push_back(SELECTED_MODEL_CHANGED);
+    temp.push_back(CHANNEL_SELECTION_ITEMS);
 
     return temp;
 }
@@ -180,5 +184,23 @@ void TimeFrequency::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pN
 {
     if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL) {
         m_pAvgModel = qSharedPointerCast<AveragingDataModel>(pNewModel);
+    }
+}
+
+//=============================================================================================================
+
+void TimeFrequency::setChannelSelection(const QVariant &data)
+{
+    if(data.value<DISPLIB::SelectionItem*>()->m_sViewsToApply.contains("layoutview")){
+        if(m_pTimeFreqLayoutView){
+            m_pTimeFreqLayoutView->channelSelectionChanged(data);
+        }
+    }
+    if(data.value<DISPLIB::SelectionItem*>()->m_sViewsToApply.contains("butterflyview")){
+//        if(data.value<DISPLIB::SelectionItem*>()->m_bShowAll){
+//            emit showAllChannels();
+//        } else {
+//            emit showSelectedChannels(data.value<DISPLIB::SelectionItem*>()->m_iChannelNumber);
+//        }
     }
 }

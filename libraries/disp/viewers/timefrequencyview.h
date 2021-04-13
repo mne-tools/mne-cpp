@@ -60,6 +60,12 @@ namespace DISPLIB
 {
 
 //=============================================================================================================
+// DISPLIB FORWARD DECLARATIONS
+//=============================================================================================================
+
+class EvokedSetModel;
+
+//=============================================================================================================
 /**
  * @brief The TimeFrequencyView class
  */
@@ -112,7 +118,10 @@ public:
 protected:
     void initQMLView();
 
-//    virtual void paintEvent(QPaintEvent *event);
+    virtual void paintEvent(QPaintEvent *event);
+
+    QSharedPointer<EvokedSetModel>              m_pEvokedSetModel;              /**< The evoked model */
+
 };
 
 } //namespace

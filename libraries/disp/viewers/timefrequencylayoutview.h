@@ -65,6 +65,7 @@ namespace DISPLIB
 // DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
+class EvokedSetModel;
 class TimeFrequencyScene;
 
 //=============================================================================================================
@@ -129,6 +130,9 @@ public:
 protected:
     QPointer<TimeFrequencyScene>                m_pTimeFreqScene;
     QPointer<QGraphicsView>                     m_pTimeFreqGraphicsView;
+
+    QSharedPointer<EvokedSetModel>              m_pEvokedSetModel;              /**< The evoked model */
+
 };
 }//namespace
 
