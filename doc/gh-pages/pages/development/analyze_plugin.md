@@ -92,6 +92,8 @@ pLayout->addWidget(pSecondButton);
 
 A lot of control widgets are already implemented in the disp library, they can be used here.
 
+Many different plugins will be loaded to MNE_Analyze, to influence how high or low the controls of a particular plugin will appear in the drop-down menu "Control" tab, you can modify the variable ```m_iOrder```. By default it is set to 0, the higher you set that value to, the higher your control will appear. To force the controls to appear lower you can also use negative values.
+
 ### getView()
 
 Returns a QWidget* with the view GUI element of the plugin. If the plugin does not need a view, return a `Q_NULLPTR` (null pointer) instead.
