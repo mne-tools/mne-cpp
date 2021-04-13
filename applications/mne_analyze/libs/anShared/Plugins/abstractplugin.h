@@ -208,7 +208,6 @@ signals:
 
 protected:
     QSharedPointer<AnalyzeData>     m_pAnalyzeData;         /**< Pointer to the global data base */
-    bool m_bLoaded;                                         /**< Store whether this plugin has been loaded in the PluginManager. */
     bool m_bInitialized;                                    /**< Store the initialization state of the plugin. */
 
 };
