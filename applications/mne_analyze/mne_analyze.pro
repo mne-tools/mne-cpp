@@ -45,4 +45,11 @@ SUBDIRS += \
 
 libs.depends =
 plugins.depends = libs
-mne_analyze.depends = libs plugins
+
+contains(MNECPP_CONFIG, noMneAnalyzePlugins) {
+    message("Building MNE Analyze without plugins")
+    SUBDIRS -= plugins \
+    mne_analyze.depends = libs
+} else {
+    mne_analyze.depends = libs plugins
+}

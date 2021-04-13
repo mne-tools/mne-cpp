@@ -44,4 +44,12 @@ SUBDIRS += \
     mne_rt_server \
 
 plugins.depends = 
-mne_rt_server.depends = plugins
+
+contains(MNECPP_CONFIG, noMneRtServerPlugins) {
+    message("Building MNE Rt Server without plugins")
+    SUBDIRS -= plugins \
+    mne_rt_server.depends =
+} else {
+    mne_rt_server.depends = plugins
+}
+
