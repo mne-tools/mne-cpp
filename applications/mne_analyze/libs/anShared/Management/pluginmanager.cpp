@@ -112,7 +112,7 @@ void PluginManager::loadPlugin(const QString& file)
             {
                 qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " succeeded.";
                 m_qVecPlugins.push_back(pPlugin);
-                pPlugin->setLoadState(true);
+//                pPlugin->setLoadState(true);
             } else {
                 qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << ". Plugin already loaded.";
             }

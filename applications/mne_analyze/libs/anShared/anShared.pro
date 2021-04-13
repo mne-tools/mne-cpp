@@ -97,7 +97,8 @@ SOURCES += \
     Model/eventmodel.cpp \
     Model/averagingdatamodel.cpp \
     Model/mricoordmodel.cpp \
-    Model/covariancemodel.cpp
+    Model/covariancemodel.cpp \
+    Plugins/abstractplugin.cpp
 
 HEADERS += \
     Model/dipolefitmodel.h \
