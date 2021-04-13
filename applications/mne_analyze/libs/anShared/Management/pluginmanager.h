@@ -133,7 +133,7 @@ public:
      *
      * @return reference to vector containing all plugins.
      */
-    inline const QVector<AbstractPlugin*>& getPlugins();
+    inline const QVector<AbstractPlugin*> getPlugins();
 
     //=========================================================================================================
     /**
@@ -157,7 +157,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline const QVector<AbstractPlugin*>& PluginManager::getPlugins()
+inline const QVector<AbstractPlugin*> PluginManager::getPlugins()
 {
     return m_qVecPlugins;
 }
