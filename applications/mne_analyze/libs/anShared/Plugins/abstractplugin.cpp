@@ -67,3 +67,17 @@ bool AbstractPlugin::hasBeenInitialized() const
 
 
 //=============================================================================================================
+
+void AbstractPlugin::cmdLineStartup(const QStringList& sArguments)
+{
+    Q_UNUSED(sArguments)
+}
+
+//=============================================================================================================
+
+void AbstractPlugin::setGlobalData(QSharedPointer<AnalyzeData> globalData)
+{
+    m_pAnalyzeData = globalData;
+}
+
+//=============================================================================================================
