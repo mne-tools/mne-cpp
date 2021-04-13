@@ -115,6 +115,14 @@ public:
      */
     void clearView();
 
+    //=========================================================================================================
+    /**
+     * Set the evoked set model.
+     *
+     * @param [in] model     The new evoked set model.
+     */
+    void setEvokedSetModel(QSharedPointer<EvokedSetModel> model);
+
 protected:
     void initQMLView();
 

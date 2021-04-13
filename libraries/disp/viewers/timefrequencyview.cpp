@@ -143,6 +143,8 @@ void TimeFrequencyView::initQMLView()
 
 void TimeFrequencyView::paintEvent(QPaintEvent *event)
 {
+    if (m_pEvokedSetModel){
+
     QPainter painter(this);
 
     painter.save();
@@ -150,5 +152,43 @@ void TimeFrequencyView::paintEvent(QPaintEvent *event)
     painter.drawRect(QRect(-1,-1,this->width()+2,this->height()+2));
     painter.restore();
 
-    return AbstractView::paintEvent(event);
+
+
+
+    //paint chart
+
+
+
+
+    //paint axis labels
+
+
+    //test
+    if(m_pEvokedSetModel->getNumSamples() > 0) {
+        painter.save();
+        painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
+
+        float fDx = (float)(this->width()) / ((float)m_pEvokedSetModel->getNumSamples());
+        float posX = fDx * ((float)m_pEvokedSetModel->getNumPreStimSamples());
+        painter.drawLine(posX, 1, posX, this->height());
+
+        painter.drawText(QPointF(posX+5,this->rect().bottomRight().y()-5), QString("0ms / Stimulus"));
+
+
+        painter.restore();
+    }
+
+    }
+
+    return QWidget::paintEvent(event);
+}
+
+//=============================================================================================================
+
+void TimeFrequencyView::setEvokedSetModel(QSharedPointer<EvokedSetModel> model)
+{
+    m_pEvokedSetModel = model;
+
+//    connect(m_pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
+//            this, &ButterflyView::dataUpdate, Qt::UniqueConnection);
 }

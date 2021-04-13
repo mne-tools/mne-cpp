@@ -46,6 +46,10 @@
 #include <disp/viewers/timefrequencyview.h>
 #include <disp/viewers/timefrequencylayoutview.h>
 #include <disp/viewers/helpers/selectionsceneitem.h>
+#include <disp/viewers/helpers/evokedsetmodel.h>
+
+#include <fiff/fiff_evoked_set.h>
+#include <fiff/fiff_evoked.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -61,6 +65,7 @@ using namespace ANSHAREDLIB;
 TimeFrequency::TimeFrequency()
 : m_sSettingsPath("MNEANALYZE/TimeFrequency")
 {
+    m_pEvokedModel = QSharedPointer<DISPLIB::EvokedSetModel>(new DISPLIB::EvokedSetModel());
     loadSettings();
 }
 
@@ -184,6 +189,8 @@ void TimeFrequency::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pN
 {
     if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_AVERAGING_MODEL) {
         m_pAvgModel = qSharedPointerCast<AveragingDataModel>(pNewModel);
+        m_pEvokedModel->setEvokedSet(m_pAvgModel->data(QModelIndex()).value<QSharedPointer<FIFFLIB::FiffEvokedSet>>());
+        m_pTimeFreqView->setEvokedSetModel(m_pEvokedModel);
     }
 }
 

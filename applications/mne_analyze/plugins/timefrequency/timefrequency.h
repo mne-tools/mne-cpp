@@ -68,6 +68,7 @@ namespace DISPLIB {
     class ProgressView;
     class TimeFrequencyView;
     class TimeFrequencyLayoutView;
+    class EvokedSetModel;
 }
 
 //=============================================================================================================
@@ -151,6 +152,7 @@ private:
     QPointer<DISPLIB::TimeFrequencyView>            m_pTimeFreqView;
     QPointer<DISPLIB::TimeFrequencyLayoutView>      m_pTimeFreqLayoutView;
 
+    QSharedPointer<DISPLIB::EvokedSetModel>         m_pEvokedModel;             /**< Pointer to model used to display averaging data from m_pFiffEvokedSet and m_pFiffEvoked */
     QSharedPointer<ANSHAREDLIB::AveragingDataModel> m_pAvgModel;                /**< Pointer to currently loaded FiffRawView Model */
 
 };
