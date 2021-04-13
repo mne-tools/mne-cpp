@@ -42,7 +42,7 @@ Copyright (C) 2017, Christoph Dinh, Lars Debor, Simon Heinke and Matti Hamalaine
 #include "pluginmanager.h"
 #include "../Plugins/abstractplugin.h"
 #include "communicator.h"
-
+#include <algorithm>
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -111,7 +111,7 @@ void PluginManager::loadPlugin(const QString& file)
             if(findByName(pPlugin->getName()) == -1)
             {
                 qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " succeeded.";
-                m_qVecPlugins.push_back(pPlugin);
+                insertPlugin(pPlugin);
             } else {
                 qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << ". Plugin already loaded.";
             }
@@ -119,6 +119,15 @@ void PluginManager::loadPlugin(const QString& file)
             qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " failed.";
         }
     }
+}
+
+//=============================================================================================================
+
+void PluginManager::insertPlugin(AbstractPlugin* pPlugin)
+{
+    m_qVecPlugins.push_back(pPlugin);
+    std::sort(m_qVecPlugins.begin(),m_qVecPlugins.end(),
+              [](AbstractPlugin* a,AbstractPlugin* b) { return a->getOrder() > b->getOrder(); });
 }
 
 //=============================================================================================================
