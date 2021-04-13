@@ -45,4 +45,11 @@ SUBDIRS += \
 
 libs.depends =
 plugins.depends = libs
-mne_scan.depends = libs plugins
+
+contains(MNECPP_CONFIG, noMneScanPlugins) {
+    message("Building MNE Scan without plugins")
+    SUBDIRS -= plugins \
+    mne_scan.depends = libs
+} else {
+    mne_scan.depends = libs plugins
+}
