@@ -51,6 +51,13 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
+AbstractPlugin::AbstractPlugin()
+:m_bInitialized(false)
+{
+}
+
+//=============================================================================================================
+
 AbstractPlugin::~AbstractPlugin()
 {
 
