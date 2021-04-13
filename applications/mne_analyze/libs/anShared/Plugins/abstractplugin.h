@@ -172,7 +172,7 @@ public:
      * @param[in] sArguments  the cmd line arguments
 >>>>>>> 0ecfd5a34 (define qabstractplugin methods as non virtual when there is no need for that)
      */
-    void cmdLineStartup(const QStringList& sArguments);
+    virtual void cmdLineStartup(const QStringList& sArguments);
 
     //=========================================================================================================
     /**
