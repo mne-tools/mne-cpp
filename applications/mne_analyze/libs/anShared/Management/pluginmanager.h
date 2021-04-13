@@ -107,8 +107,8 @@ public:
      *
      * @param [in] dir    The plugin file path.
      */
-
     void loadPlugin(const QString& file);
+
     //=========================================================================================================
     /**
      * Initializes the plugins.
@@ -143,6 +143,13 @@ public:
     void shutdown();
 
 private:
+    //=========================================================================================================
+    /**
+     * Insert a plugin into the vector of plugins inserted.
+     */
+    void insertPlugin(AbstractPlugin*  plugin);
+
+
     QVector<AbstractPlugin*>    m_qVecPlugins;       /**< Vector containing all plugins. */
 };
 

@@ -86,3 +86,8 @@ void AbstractPlugin::setGlobalData(QSharedPointer<AnalyzeData> globalData)
 }
 
 //=============================================================================================================
+
+int AbstractPlugin::getOrder() const
+{
+    return 1;
+}
