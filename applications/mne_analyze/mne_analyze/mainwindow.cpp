@@ -81,6 +81,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
                        QWidget *parent)
 : QMainWindow(parent)
 , m_pMultiView(Q_NULLPTR)
+, m_pPluginManager(pPluginManager)
 , m_pGridLayout(Q_NULLPTR)
 , m_sSettingsPath("MNEANALYZE/MainWindow")
 , m_sCurrentStyle("default")
@@ -92,7 +93,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 
     if(!pPluginManager.isNull()) {
         // The order we call these functions is important!
-        createActions();
+        initMenuBar();
         createPluginMenus(pPluginManager);
         createLogDockWindow();
         createPluginControls(pPluginManager);
@@ -248,17 +249,81 @@ void MainWindow::setCurrentStyle(const QString& sStyle)
 
 //=============================================================================================================
 
-void MainWindow::createActions()
+void MainWindow::initMenuBar()
 {
+
     m_pActionExit = new QAction(tr("Exit"), this);
     m_pActionExit->setShortcuts(QKeySequence::Quit);
-    m_pActionExit->setStatusTip(tr("Exit the application"));
+    m_pActionExit->setStatusTip(tr("Exit MNE Analyze"));
     connect(m_pActionExit.data(), &QAction::triggered, this, &MainWindow::close);
 
-    //Help QMenu
+    // File menu
+    m_pMenuFile = menuBar()->addMenu(tr("File"));
+    m_pMenuFile->addAction(m_pActionExit);
+
+    // View menu
+    m_pMenuView = menuBar()->addMenu(tr("View"));
+
+    // Control menu
+    m_pMenuControl = menuBar()->addMenu(tr("Control"));
+
+    //Appearance QMenu
+    // Styles
+    QActionGroup* pActionStyleGroup = new QActionGroup(this);
+
+    QAction* pActionDefaultStyle = new QAction("Default");
+    pActionDefaultStyle->setStatusTip(tr("Activate default style"));
+    pActionDefaultStyle->setCheckable(true);
+    pActionDefaultStyle->setChecked(true);
+    pActionStyleGroup->addAction(pActionDefaultStyle);
+    connect(pActionDefaultStyle, &QAction::triggered,
+        [=]() {
+        setCurrentStyle("default");
+    });
+
+    m_pActionDarkMode = new QAction("Dark");
+    m_pActionDarkMode->setStatusTip(tr("Activate dark style"));
+    m_pActionDarkMode->setCheckable(true);
+    m_pActionDarkMode->setChecked(false);
+    pActionStyleGroup->addAction(m_pActionDarkMode);
+    connect(m_pActionDarkMode.data(), &QAction::triggered,
+        [=]() {
+        setCurrentStyle("dark");
+    });
+
+    // Modes
+    QActionGroup* pActionModeGroup = new QActionGroup(this);
+
+    m_pActionResearchMode = new QAction("Research");
+    m_pActionResearchMode->setStatusTip(tr("Activate the research GUI mode"));
+    m_pActionResearchMode->setCheckable(true);
+    m_pActionResearchMode->setChecked(true);
+    pActionModeGroup->addAction(m_pActionResearchMode);
+    connect(m_pActionResearchMode.data(), &QAction::triggered,
+            this, &MainWindow::onGuiModeChanged);
+
+    m_pActionClinicalMode = new QAction("Clinical");
+    m_pActionClinicalMode->setStatusTip(tr("Activate the clinical GUI mode"));
+    m_pActionClinicalMode->setCheckable(true);
+    m_pActionClinicalMode->setChecked(false);
+    pActionModeGroup->addAction(m_pActionClinicalMode);
+    connect(m_pActionClinicalMode.data(), &QAction::triggered,
+            this, &MainWindow::onGuiModeChanged);
+
+    if(!m_pMenuAppearance) {
+        m_pMenuAppearance = menuBar()->addMenu(tr("&Appearance"));
+        m_pMenuAppearance->addMenu("Styles")->addActions(pActionStyleGroup->actions());
+        m_pMenuAppearance->addMenu("Modes")->addActions(pActionModeGroup->actions());
+    }
+
+   //Help QMenu
     m_pActionAbout = new QAction(tr("About"), this);
     m_pActionAbout->setStatusTip(tr("Show the application's About box"));
     connect(m_pActionAbout.data(), &QAction::triggered, this, &MainWindow::about);
+
+    m_pMenuHelp = menuBar()->addMenu(tr("Help"));
+    m_pMenuHelp->addAction(m_pActionAbout);
+
 }
 
 //=============================================================================================================
@@ -329,84 +394,6 @@ void MainWindow::createLogDockWindow()
 
 void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager)
 {
-    //(re)initialize all the menus
-    menuBar()->clear();
-
-    delete m_pActionExit;
-    delete m_pActionAbout;
-    delete m_pActionResearchMode;
-    delete m_pActionClinicalMode;
-    delete m_pActionDarkMode;
-
-    delete m_pMenuFile;
-    delete m_pMenuView;
-    delete m_pMenuControl;
-    delete m_pMenuAppearance;
-    delete m_pMenuHelp;
-
-    // File menu
-    m_pMenuFile = menuBar()->addMenu(tr("File"));
-    m_pMenuFile->addAction(m_pActionExit);
-
-    // View menu
-    m_pMenuView = menuBar()->addMenu(tr("View"));
-
-    // Control menu
-    m_pMenuControl = menuBar()->addMenu(tr("Control"));
-
-    //Appearance QMenu
-    // Styles
-    QActionGroup* pActionStyleGroup = new QActionGroup(this);
-
-    QAction* pActionDefaultStyle = new QAction("Default");
-    pActionDefaultStyle->setStatusTip(tr("Activate default style"));
-    pActionDefaultStyle->setCheckable(true);
-    pActionDefaultStyle->setChecked(true);
-    pActionStyleGroup->addAction(pActionDefaultStyle);
-    connect(pActionDefaultStyle, &QAction::triggered,
-        [=]() {
-        setCurrentStyle("default");
-    });
-
-    m_pActionDarkMode = new QAction("Dark");
-    m_pActionDarkMode->setStatusTip(tr("Activate dark style"));
-    m_pActionDarkMode->setCheckable(true);
-    m_pActionDarkMode->setChecked(false);
-    pActionStyleGroup->addAction(m_pActionDarkMode);
-    connect(m_pActionDarkMode.data(), &QAction::triggered,
-        [=]() {
-        setCurrentStyle("dark");
-    });
-
-    // Modes
-    QActionGroup* pActionModeGroup = new QActionGroup(this);
-
-    m_pActionResearchMode = new QAction("Research");
-    m_pActionResearchMode->setStatusTip(tr("Activate the research GUI mode"));
-    m_pActionResearchMode->setCheckable(true);
-    m_pActionResearchMode->setChecked(true);
-    pActionModeGroup->addAction(m_pActionResearchMode);
-    connect(m_pActionResearchMode.data(), &QAction::triggered,
-            this, &MainWindow::onGuiModeChanged);
-
-    m_pActionClinicalMode = new QAction("Clinical");
-    m_pActionClinicalMode->setStatusTip(tr("Activate the clinical GUI mode"));
-    m_pActionClinicalMode->setCheckable(true);
-    m_pActionClinicalMode->setChecked(false);
-    pActionModeGroup->addAction(m_pActionClinicalMode);
-    connect(m_pActionClinicalMode.data(), &QAction::triggered,
-            this, &MainWindow::onGuiModeChanged);
-
-    if(!m_pMenuAppearance) {
-        m_pMenuAppearance = menuBar()->addMenu(tr("&Appearance"));
-        m_pMenuAppearance->addMenu("Styles")->addActions(pActionStyleGroup->actions());
-        m_pMenuAppearance->addMenu("Modes")->addActions(pActionModeGroup->actions());
-    }
-
-    // Help menu
-    m_pMenuHelp = menuBar()->addMenu(tr("Help"));
-    m_pMenuHelp->addAction(m_pActionAbout);
-
     // add plugins menus
     for(AbstractPlugin* pPlugin : pPluginManager->getPlugins()) {
         pPlugin->setObjectName(pPlugin->getName());
