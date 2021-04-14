@@ -102,8 +102,6 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 {
     initWindow();
 
-    checkPluginManager();
-
     initMenusAndPluginControls();
     initStatusBar();
 
@@ -127,7 +125,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::deleteMenus()
 {
-    menuBar()->clear();
+    for(auto& action: menuBar()->actions())
+    {
+        menuBar()->removeAction(action);
+    }
     delete m_pMenuFile;
     delete m_pMenuView;
     delete m_pMenuControl;
@@ -260,12 +261,13 @@ void MainWindow::setCurrentStyle(const QString& sStyle)
 
 void MainWindow::initMenusAndPluginControls()
 {
+    checkPluginManager();
+
     if(m_bPluginManagerConfiguredOK)
     {
-        deleteMenus();
         initMenuBar();
-        createPluginMenus();
         createLogDockWindow();
+        createPluginMenus();
         createPluginControls();
         createPluginViews();
     }
@@ -291,7 +293,6 @@ void MainWindow::loadSavedSettingsAndState()
 
 void MainWindow::initMenuBar()
 {
-
     m_pActionExit = new QAction(tr("Exit"), this);
     m_pActionExit->setShortcuts(QKeySequence::Quit);
     m_pActionExit->setStatusTip(tr("Exit MNE Analyze"));
@@ -299,7 +300,7 @@ void MainWindow::initMenuBar()
 
     m_pActionReloadPlugins = new QAction(tr("Reload Plugins"),this);
     m_pActionReloadPlugins->setStatusTip(tr("Reload all the plugins in MNE Analyze's plugin folder."));
-    connect(m_pActionReloadPlugins.data(), &QAction::triggered, this, &MainWindow::initMenusAndPluginControls);
+    connect(m_pActionReloadPlugins.data(), &QAction::triggered, this, &MainWindow::reloadPlugins);
 
     // File menu
     m_pMenuFile = menuBar()->addMenu(tr("File"));
@@ -356,7 +357,7 @@ void MainWindow::initMenuBar()
             this, &MainWindow::manageGuiModeChanged);
 
     if(!m_pMenuAppearance) {
-        m_pMenuAppearance = menuBar()->addMenu(tr("&Appearance"));
+        m_pMenuAppearance = menuBar()->addMenu(tr("Appearance"));
         m_pMenuAppearance->addMenu("Styles")->addActions(pActionStyleGroup->actions());
         m_pMenuAppearance->addMenu("Modes")->addActions(pActionModeGroup->actions());
     }
@@ -483,9 +484,14 @@ void MainWindow::createPluginMenus()
 
 void MainWindow::createPluginControls()
 {
-    setTabPosition(Qt::LeftDockWidgetArea,QTabWidget::West);
-    setTabPosition(Qt::RightDockWidgetArea,QTabWidget::East);
-    setDockOptions(QMainWindow::ForceTabbedDocks);
+    static bool creatingControlsForFirstTime(true);
+    if(creatingControlsForFirstTime)
+    {
+        setTabPosition(Qt::LeftDockWidgetArea,QTabWidget::West);
+        setTabPosition(Qt::RightDockWidgetArea,QTabWidget::East);
+        setDockOptions(QMainWindow::ForceTabbedDocks);
+        creatingControlsForFirstTime = false;
+    }
 
     //Add Plugin controls to the MainWindow
     for(AbstractPlugin* pPlugin : m_pPluginManager->getPlugins()) {
@@ -533,21 +539,12 @@ void MainWindow::createPluginViews()
         creatingViewsForFirstTime = false;
     }
 
-    QString sCurPluginName;
-
     //Add Plugin views to the MultiView, which is the central widget
     for(AbstractPlugin* pPlugin : m_pPluginManager->getPlugins()) {
         QWidget* pView = pPlugin->getView();
         if(pView && pPlugin->viewAlreadyLoaded() == false) {
-            sCurPluginName = pPlugin->getName();
             MultiViewWindow* pWindow = Q_NULLPTR;
-
-            if(sCurPluginName == "RawDataViewer") {
-                pWindow = m_pMultiView->addWidgetBottom(pView, sCurPluginName);
-            } else {
-                pWindow = m_pMultiView->addWidgetTop(pView, sCurPluginName);
-            }
-
+            pWindow = m_pMultiView->addWidgetTop(pView, pPlugin->getName());
             QAction* pAction = pWindow->toggleViewAction();
             pAction->setText(pPlugin->getName());
             m_pMenuView->addAction(pAction);
@@ -567,7 +564,10 @@ void MainWindow::tabifyDockWindows()
     QList<QDockWidget*> docks = findChildren<QDockWidget*>();
 
     // first, un-float all the tabs
-    for (QDockWidget* pDockWidget : docks) pDockWidget->setFloating(false);
+    for (QDockWidget* pDockWidget : docks)
+    {
+        pDockWidget->setFloating(false);
+    }
 
     // sort them into dockWidget areas
     QVector<QDockWidget*> topArea, leftArea, rightArea, bottomArea;
@@ -686,4 +686,28 @@ void MainWindow::about()
     }
 
     m_pAboutWindow->show();
+}
+
+
+void MainWindow::reloadPlugins()
+{
+    qInfo() << "[MainWin] Reload Plugins";
+//    for (auto& action : menuBar()->actions())
+//    {
+//        qInfo() << action->text();
+//    }
+//    qInfo() << "[MainWin] File";
+    for (auto& menu : menuBar()->findChildren<QMenu*>())
+    {
+        qInfo() << "***** " << menu->title();
+        for(auto action : menu->actions())
+        {
+            qInfo() << action->text();
+        }
+    }
+    qInfo() << "*********************************************";
+    for(auto dock: findChildren<QDockWidget*>())
+    {
+        qInfo() << dock->objectName();
+    }
 }

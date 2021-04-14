@@ -340,7 +340,7 @@ private:
     QVBoxLayout*                                            m_pLayout;                  /**< Pointer to layout that holds parameter GUI tab elements. */
     QTabWidget*                                             m_pTabView;                 /**< Pointer to object that stores multiple tabs of GUI items. */
 
-    bool                                                    m_bBasline;                 /**< Whether to apply baseline correction. */
+    bool                                                    m_bBaseline;                /**< Whether to apply baseline correction. */
     bool                                                    m_bRejection;               /**< Whether to drop data points marked fro rejection when calculating average. */
     bool                                                    m_bLoaded;                  /**< Whether the full GUI has already been laoaded. */
     bool                                                    m_bPerformFiltering;        /**< Flag whether to activate/deactivate filtering. */
