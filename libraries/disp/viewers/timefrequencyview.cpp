@@ -145,38 +145,87 @@ void TimeFrequencyView::paintEvent(QPaintEvent *event)
 {
     if (m_pEvokedSetModel){
 
-    QPainter painter(this);
+        int chartBorders = 30;
 
-    painter.save();
-    painter.setBrush(QBrush());
-    painter.drawRect(QRect(-1,-1,this->width()+2,this->height()+2));
-    painter.restore();
+        QPainter painter(this);
 
-
-
-
-    //paint chart
-
-
-
-
-    //paint axis labels
-
-
-    //test
-    if(m_pEvokedSetModel->getNumSamples() > 0) {
         painter.save();
-        painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
+        painter.setBrush(QBrush());
+        painter.drawRect(QRect(-1,-1,this->width()+2,this->height()+2));
+        painter.restore();
 
-        float fDx = (float)(this->width()) / ((float)m_pEvokedSetModel->getNumSamples());
-        float posX = fDx * ((float)m_pEvokedSetModel->getNumPreStimSamples());
-        painter.drawLine(posX, 1, posX, this->height());
 
-        painter.drawText(QPointF(posX+5,this->rect().bottomRight().y()-5), QString("0ms / Stimulus"));
 
+
+        //paint chart
+        painter.save();
+        painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+        QRect chartBound(chartBorders,chartBorders,this->width()-chartBorders * 4 ,this->height()- chartBorders * 2);
+        painter.drawRect(chartBound);
+        painter.restore();
+
+        //paint gradient bar
+
+        painter.save();
+
+        QLinearGradient linGrad(this->width() - chartBorders * 1.5f, chartBound.topRight().y(), this->width() - chartBorders * 1.5f, chartBound.bottomRight().y());
+        painter.save();
+        painter.setBrush(linGrad);
+        painter.drawRect(chartBound.topRight().x() + chartBorders, chartBound.topRight().y(), chartBorders, chartBound.height());
 
         painter.restore();
-    }
+
+
+        //paint axis labels
+        //test
+        if(m_pEvokedSetModel->getNumSamples() > 0) {
+            painter.save();
+            painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
+
+            float fDx = (float)(chartBound.width()) / ((float)m_pEvokedSetModel->getNumSamples());
+            float posX = fDx * ((float)m_pEvokedSetModel->getNumPreStimSamples());
+            painter.drawLine(chartBound.bottomLeft().x()+posX, chartBound.bottomRight().y(), chartBound.bottomLeft().x() + posX, chartBound.topRight().y());
+
+            painter.drawText(QPointF(posX+chartBound.bottomLeft().x(),chartBound.bottomRight().y()-5), QString("0ms / Stimulus"));
+
+            painter.restore();
+
+            painter.save();
+            QColor colorTimeSpacer = Qt::black;
+            colorTimeSpacer.setAlphaF(0.5);
+            painter.setPen(QPen(colorTimeSpacer, 1, Qt::DashLine));
+
+            float yStart = chartBound.topLeft().y();
+            float yEnd = chartBound.bottomRight().y();
+
+            float sampleCounter = m_pEvokedSetModel->getNumPreStimSamples();
+            int counter = 1;
+            float timeDistanceMSec = 50.0;
+            float timeDistanceSamples = (timeDistanceMSec/1000.0)*m_pEvokedSetModel->getSamplingFrequency(); //time distance corresponding to sampling frequency
+
+            //spacers before stim
+            while(sampleCounter-timeDistanceSamples>0) {
+                sampleCounter-=timeDistanceSamples;
+                float x = fDx*sampleCounter;
+                painter.drawLine(x, yStart, x, yEnd);
+                painter.drawText(QPointF(x+5,yEnd-5), QString("-%1ms").arg(timeDistanceMSec*counter));
+                counter++;
+            }
+
+            //spacers after stim
+            counter = 1;
+            sampleCounter = m_pEvokedSetModel->getNumPreStimSamples();
+            while(sampleCounter+timeDistanceSamples<m_pEvokedSetModel->getNumSamples()) {
+                sampleCounter+=timeDistanceSamples;
+                float x = fDx*sampleCounter;
+                painter.drawLine(x, yStart, x, yEnd);
+                painter.drawText(QPointF(x+5,yEnd-5), QString("%1ms").arg(timeDistanceMSec*counter));
+                counter++;
+            }
+
+            painter.restore();
+
+        }
 
     }
 
