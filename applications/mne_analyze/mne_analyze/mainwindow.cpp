@@ -333,8 +333,12 @@ void MainWindow::checkPluginManager()
 {
     if(m_pPluginManager.isNull())
     {
-       qWarning() << "[MainWindow::MainWindow] Plugin manager is nullptr!";
+        qWarning() << "[MainWindow::MainWindow] Plugin manager is nullptr!";
+        m_bPluginManagerConfiguredOK = false;
+    } else {
+        m_bPluginManagerConfiguredOK = true;
     }
+
 }
 
 //=============================================================================================================
