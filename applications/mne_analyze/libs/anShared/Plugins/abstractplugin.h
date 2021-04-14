@@ -172,17 +172,23 @@ public:
     /**
      * Initializes the plugin based on cmd line inputs given by the user.
      *
-<<<<<<< HEAD
-     * @param[in] globalData  the global data.
-=======
-     * @param[in] sArguments  the cmd line arguments
->>>>>>> 0ecfd5a34 (define qabstractplugin methods as non virtual when there is no need for that)
+     * @param[in] sArguments  The cmd line arguments.
      */
     virtual void cmdLineStartup(const QStringList& sArguments);
 
     //=========================================================================================================
-
+    /**
+     * Set the order hint for the GUI of MNE Analyze to decide in which order the menu for this plugin will appear.
+     * @return
+     */
     virtual int getOrder() const;
+
+    //=========================================================================================================
+    /**
+     * Set the order hint for the GUI of MNE Analyze to decide in which order the menu for this plugin will appear.
+     * @param order
+     */
+    virtual void setOrder(int order);
 
     //=========================================================================================================
     /**

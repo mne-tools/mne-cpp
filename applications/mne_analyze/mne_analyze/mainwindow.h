@@ -241,10 +241,11 @@ private:
      */
     void checkPluginManager();
 
-    void initMenuAndStatusBar();
+    void initMenusAndPluginControls();
     void initWindow();
     void loadSavedSettingsAndState();
     void deleteMenus();
+    void initStatusBar();
 
     QPointer<DISPLIB::MultiView>        m_pMultiView;               /**< The central View.*/
     QPointer<QGridLayout>               m_pGridLayout;              /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow. */
