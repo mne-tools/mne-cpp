@@ -52,8 +52,10 @@ using namespace ANSHAREDLIB;
 //=============================================================================================================
 
 AbstractPlugin::AbstractPlugin()
-: m_bInitialized(false),
-m_iOrder(0)
+: m_bInitialized(false)
+, m_bViewAlreadyLoaded(false)
+, m_bControlAlreadyLoaded(false)
+, m_iOrder(0)
 {
 }
 
@@ -100,7 +102,23 @@ int AbstractPlugin::getOrder() const
     return m_iOrder;
 }
 
+//=============================================================================================================
+
 void AbstractPlugin::setOrder(int order)
 {
     m_iOrder = order;
+}
+
+//=============================================================================================================
+
+void AbstractPlugin::set_viewLoadingState(bool b)
+{
+    m_bViewAlreadyLoaded = b;
+}
+
+//=============================================================================================================
+
+void AbstractPlugin::set_controlLoadingState(bool b)
+{
+    m_bControlAlreadyLoaded = b;
 }

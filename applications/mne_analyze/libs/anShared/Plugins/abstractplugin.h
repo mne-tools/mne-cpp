@@ -179,14 +179,15 @@ public:
     //=========================================================================================================
     /**
      * Set the order hint for the GUI of MNE Analyze to decide in which order the menu for this plugin will appear.
-     * @return
+     * @return order hint for the menu position.
      */
     virtual int getOrder() const;
 
     //=========================================================================================================
     /**
      * Set the order hint for the GUI of MNE Analyze to decide in which order the menu for this plugin will appear.
-     * @param order
+     *
+     * @param order hint for the menu position.
      */
     virtual void setOrder(int order);
 
@@ -212,6 +213,34 @@ public:
      */
     bool hasBeenInitialized() const;
 
+    //=========================================================================================================
+    /**
+     * Retrieve if the plugin view has already been loaded.
+     * @return state of the view loading.
+     */
+    bool viewAlreadyLoaded() const;
+
+    //=========================================================================================================
+    /**
+     * Retrieve if the plugin control has already been loaded.
+     * @return state of the control loading.
+     */
+    bool controlAlreadyLoaded() const;
+
+    //=========================================================================================================
+    /**
+     * Set the loading state of the view menus for thisplugins.
+     * @param b new loading state.
+     */
+    void set_viewLoadingState(bool b);
+
+    //=========================================================================================================
+    /**
+     * Set the loading state of the control menus for this plugin.
+     * @param b new loading state.
+     */
+    void set_controlLoadingState(bool b);
+
 signals:
     //=========================================================================================================
     /**
@@ -232,7 +261,9 @@ signals:
 protected:
     QSharedPointer<AnalyzeData>     m_pAnalyzeData;         /**< Pointer to the global data base */
     bool m_bInitialized;                                    /**< Store the initialization state of the plugin. */
-    int m_iOrder;                                          /**< Hint to order the control in the list of controls. */
+    bool m_bViewAlreadyLoaded;                              /**< Store if the plugin view has already been docked into the GUI. */
+    bool m_bControlAlreadyLoaded;                           /**< Store if the plugin control has already been docked into the GUI. */
+    int m_iOrder;                                           /**< Hint to order the control in the list of controls. */
 
 };
 
