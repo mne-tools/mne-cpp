@@ -316,7 +316,7 @@ void MainWindow::initMenuBar()
     m_pActionResearchMode->setChecked(true);
     pActionModeGroup->addAction(m_pActionResearchMode);
     connect(m_pActionResearchMode.data(), &QAction::triggered,
-            this, &MainWindow::guiModeChanged);
+            this, &MainWindow::manageGuiModeChanged);
 
     m_pActionClinicalMode = new QAction("Clinical");
     m_pActionClinicalMode->setStatusTip(tr("Activate the clinical GUI mode"));
@@ -324,7 +324,7 @@ void MainWindow::initMenuBar()
     m_pActionClinicalMode->setChecked(false);
     pActionModeGroup->addAction(m_pActionClinicalMode);
     connect(m_pActionClinicalMode.data(), &QAction::triggered,
-            this, &MainWindow::guiModeChanged);
+            this, &MainWindow::manageGuiModeChanged);
 
     if(!m_pMenuAppearance) {
         m_pMenuAppearance = menuBar()->addMenu(tr("&Appearance"));
@@ -386,7 +386,7 @@ void MainWindow::changeStyle()
 
 //=============================================================================================================
 
-void MainWindow::guiModeChanged()
+void MainWindow::manageGuiModeChanged()
 {
     if(m_pActionResearchMode->isChecked()) {
         emit guiModeChanged(DISPLIB::AbstractView::GuiMode::Research);
