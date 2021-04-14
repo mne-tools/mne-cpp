@@ -241,6 +241,13 @@ private:
      */
     void about();
 
+    //=========================================================================================================
+    /**
+     * Check the correct configuration of the plugin manager.
+     */
+    void checkPluginManager() const;
+
+
     QPointer<DISPLIB::MultiView>        m_pMultiView;               /**< The central View.*/
     QPointer<QGridLayout>               m_pGridLayout;              /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow. */
 
@@ -264,6 +271,7 @@ private:
 
     QString                             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
     QString                             m_sCurrentStyle;            /**< The currently selected style (dark mode, default mode). */
+    bool                                m_bPluginManagerConfiguredOK; /**< Store the state of configuration of the pluginManager. */
 };
 
 }// NAMESPACE
