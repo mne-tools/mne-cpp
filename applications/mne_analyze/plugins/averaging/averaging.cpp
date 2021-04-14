@@ -98,7 +98,7 @@ Averaging::Averaging()
 , m_fPreStim(0)
 , m_fPostStim(0)
 , m_fTriggerThreshold(0.5)
-, m_bBasline(0)
+, m_bBaseline(0)
 , m_bRejection(0)
 , m_bLoaded(0)
 , m_bPerformFiltering(false)
@@ -361,7 +361,7 @@ void Averaging::onChangePostStim(qint32 mseconds)
 void Averaging::onChangeBaselineActive(bool state)
 {
     QMutexLocker lock(&m_ParameterMutex);
-    m_bBasline = state;
+    m_bBaseline = state;
 }
 
 //=============================================================================================================
@@ -430,7 +430,7 @@ QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalculation(FIFFLIB::Fi
                                                                m_fPreStim,
                                                                m_fPostStim,
                                                                iType,
-                                                               m_bBasline,
+                                                               m_bBaseline,
                                                                m_fBaselineFromS,
                                                                m_fBaselineToS,
                                                                mapReject,
@@ -442,7 +442,7 @@ QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalculation(FIFFLIB::Fi
                                                        m_fPreStim,
                                                        m_fPostStim,
                                                        iType,
-                                                       m_bBasline,
+                                                       m_bBaseline,
                                                        m_fBaselineFromS,
                                                        m_fBaselineToS,
                                                        mapReject);
@@ -455,7 +455,7 @@ QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalculation(FIFFLIB::Fi
 
     QMutexLocker lock(&m_ParameterMutex);
 
-    if(m_bBasline){
+    if(m_bBaseline){
         pFiffEvokedSet->evoked[0].baseline.first = m_fBaselineFromS;
         pFiffEvokedSet->evoked[0].baseline.second = m_fBaselineToS;
     }
