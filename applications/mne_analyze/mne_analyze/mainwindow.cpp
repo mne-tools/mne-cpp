@@ -486,7 +486,9 @@ void MainWindow::createPluginControls()
 
     //Add Plugin controls to the MainWindow
     for(AbstractPlugin* pPlugin : m_pPluginManager->getPlugins()) {
-        if(QDockWidget* pControl = pPlugin->getControl()) {
+        QDockWidget* pControl = pPlugin->getControl();
+        if(pControl && pPlugin->controlAlreadyLoaded() == false)
+        {
             addDockWidget(Qt::LeftDockWidgetArea, pControl);
             qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
             QAction* pAction = pControl->toggleViewAction();
@@ -505,6 +507,7 @@ void MainWindow::createPluginControls()
             #ifdef WASMBUILD
             pControl->setFeatures(QDockWidget::DockWidgetClosable);
             #endif
+            pPlugin->setControlLoadingState(true);
         }
     }
 
@@ -515,19 +518,24 @@ void MainWindow::createPluginControls()
 
 void MainWindow::createPluginViews()
 {
-    m_pGridLayout = new QGridLayout(this);
-    m_pMultiView = new MultiView(m_sSettingsPath);
-    m_pGridLayout->addWidget(m_pMultiView);
-    m_pMultiView->show();
-    m_pMultiView->setObjectName("multiview");
-    setCentralWidget(m_pMultiView);
+    static bool creatingViewsForFirstTime(true);
+    if(creatingViewsForFirstTime)
+    {
+        m_pGridLayout = new QGridLayout(this);
+        m_pMultiView = new MultiView(m_sSettingsPath);
+        m_pGridLayout->addWidget(m_pMultiView);
+        m_pMultiView->show();
+        m_pMultiView->setObjectName("multiview");
+        setCentralWidget(m_pMultiView);
+        creatingViewsForFirstTime = false;
+    }
 
     QString sCurPluginName;
 
     //Add Plugin views to the MultiView, which is the central widget
     for(AbstractPlugin* pPlugin : m_pPluginManager->getPlugins()) {
         QWidget* pView = pPlugin->getView();
-        if(pView) {
+        if(pView && pPlugin->viewAlreadyLoaded() == false) {
             sCurPluginName = pPlugin->getName();
             MultiViewWindow* pWindow = Q_NULLPTR;
 
@@ -542,6 +550,7 @@ void MainWindow::createPluginViews()
             m_pMenuView->addAction(pAction);
 
             qInfo() << "[MainWindow::createPluginViews] Found and added subwindow for " << pPlugin->getName();
+            pPlugin->setViewLoadingState(true);
         }
     }
     //m_pMultiView->loadSettings();
