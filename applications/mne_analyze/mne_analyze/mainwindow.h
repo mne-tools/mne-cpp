@@ -209,19 +209,19 @@ private:
     /**
     * Creates all actions for user interface of MainWindow class.
     */
-    void createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);
+    void createPluginMenus();
 
     //=========================================================================================================
     /**
      * Creates all dock windows for user interface of MainWindow class.
      */
-    void createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);
+    void createPluginControls();
 
     //=========================================================================================================
     /**
      *  Creates all Windows within the MultiView for user interface of MainWindow class.
      */
-    void createPluginViews(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);
+    void createPluginViews();
 
     //=========================================================================================================
     /**
@@ -241,6 +241,7 @@ private:
      */
     void checkPluginManager();
 
+    void initMenuAndStatusBar();
 
     QPointer<DISPLIB::MultiView>        m_pMultiView;               /**< The central View.*/
     QPointer<QGridLayout>               m_pGridLayout;              /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow. */

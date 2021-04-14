@@ -91,21 +91,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
     setMinimumSize(1280, 720);
     setWindowTitle(CInfo::AppNameShort());
 
-
-    if(!pPluginManager.isNull()) {
-        // The order we call these functions is important!
-        initMenuBar();
-        createPluginMenus(pPluginManager);
-        createLogDockWindow();
-        createPluginControls(pPluginManager);
-        createPluginViews(pPluginManager);
-    } else {
-
-    }
-
-    StatusBar* statusBar = new StatusBar(this);
-
-    this->setStatusBar(statusBar);
+    initMenuAndStatusBar();
 
     //Load application icon for linux builds only, mac and win executables have built in icons from .pro file
 #ifdef __linux__
@@ -246,6 +232,23 @@ void MainWindow::setCurrentStyle(const QString& sStyle)
     m_sCurrentStyle = sStyle;
 
     onStyleChanged();
+}
+
+//=============================================================================================================
+
+void MainWindow::initMenuAndStatusBar()
+{
+    if(m_bPluginManagerConfiguredOK)
+    {
+        initMenuBar();
+        createPluginMenus();
+        createLogDockWindow();
+        createPluginControls();
+        createPluginViews();
+    }
+
+    StatusBar* statusBar = new StatusBar(this);
+    this->setStatusBar(statusBar);
 }
 
 //=============================================================================================================
@@ -407,10 +410,10 @@ void MainWindow::createLogDockWindow()
 
 //=============================================================================================================
 
-void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager)
+void MainWindow::createPluginMenus()
 {
     // add plugins menus
-    for(AbstractPlugin* pPlugin : pPluginManager->getPlugins()) {
+    for(AbstractPlugin* pPlugin : m_pPluginManager->getPlugins()) {
         pPlugin->setObjectName(pPlugin->getName());
         if(pPlugin) {
             if (QMenu* pMenu = pPlugin->getMenu()) {
@@ -437,14 +440,14 @@ void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pP
 
 //=============================================================================================================
 
-void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager)
+void MainWindow::createPluginControls()
 {
     setTabPosition(Qt::LeftDockWidgetArea,QTabWidget::West);
     setTabPosition(Qt::RightDockWidgetArea,QTabWidget::East);
     setDockOptions(QMainWindow::ForceTabbedDocks);
 
     //Add Plugin controls to the MainWindow
-    for(AbstractPlugin* pPlugin : pPluginManager->getPlugins()) {
+    for(AbstractPlugin* pPlugin : m_pPluginManager->getPlugins()) {
         if(QDockWidget* pControl = pPlugin->getControl()) {
             addDockWidget(Qt::LeftDockWidgetArea, pControl);
             qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
@@ -472,7 +475,7 @@ void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager>
 
 //=============================================================================================================
 
-void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
+void MainWindow::createPluginViews()
 {
     m_pGridLayout = new QGridLayout(this);
     m_pMultiView = new MultiView(m_sSettingsPath);
@@ -484,7 +487,7 @@ void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
     QString sCurPluginName;
 
     //Add Plugin views to the MultiView, which is the central widget
-    for(AbstractPlugin* pPlugin : pPluginManager->getPlugins()) {
+    for(AbstractPlugin* pPlugin : m_pPluginManager->getPlugins()) {
         QWidget* pView = pPlugin->getView();
         if(pView) {
             sCurPluginName = pPlugin->getName();
