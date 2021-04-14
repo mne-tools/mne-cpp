@@ -83,10 +83,25 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 , m_pMultiView(Q_NULLPTR)
 , m_pPluginManager(pPluginManager)
 , m_pGridLayout(Q_NULLPTR)
+, m_pActionExit(Q_NULLPTR)
+, m_pActionAbout(Q_NULLPTR)
+, m_pActionResearchMode(Q_NULLPTR)
+, m_pActionClinicalMode(Q_NULLPTR)
+, m_pActionDarkMode(Q_NULLPTR)
+, m_pMenuFile(Q_NULLPTR)
+, m_pMenuView(Q_NULLPTR)
+, m_pMenuControl(Q_NULLPTR)
+, m_pMenuAppearance(Q_NULLPTR)
+, m_pMenuHelp(Q_NULLPTR)
+, m_pTextBrowser_Log(Q_NULLPTR)
+, m_pAboutWindow(Q_NULLPTR)
 , m_sSettingsPath("MNEANALYZE/MainWindow")
 , m_sCurrentStyle("default")
+, m_bPluginManagerConfiguredOK(false)
 {
     initWindow();
+
+    checkPluginManager();
 
     initMenuAndStatusBar();
 
@@ -103,14 +118,13 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 
 MainWindow::~MainWindow()
 {
-    menuBar()->clear();
+    deleteMenus();
+}
 
-    delete m_pActionExit;
-    delete m_pActionAbout;
-    delete m_pActionResearchMode;
-    delete m_pActionClinicalMode;
-    delete m_pActionDarkMode;
+//=============================================================================================================
 
+void MainWindow::deleteMenus()
+{
     delete m_pMenuFile;
     delete m_pMenuView;
     delete m_pMenuControl;
@@ -268,6 +282,7 @@ void MainWindow::loadSavedSettingsAndState()
 
 void MainWindow::initMenuBar()
 {
+
     m_pActionExit = new QAction(tr("Exit"), this);
     m_pActionExit->setShortcuts(QKeySequence::Quit);
     m_pActionExit->setStatusTip(tr("Exit MNE Analyze"));
