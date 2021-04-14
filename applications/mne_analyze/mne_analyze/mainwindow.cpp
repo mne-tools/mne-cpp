@@ -91,6 +91,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
     setMinimumSize(1280, 720);
     setWindowTitle(CInfo::AppNameShort());
 
+
     if(!pPluginManager.isNull()) {
         // The order we call these functions is important!
         initMenuBar();
@@ -99,7 +100,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
         createPluginControls(pPluginManager);
         createPluginViews(pPluginManager);
     } else {
-        qWarning() << "[MainWindow::MainWindow] Plugin manager is nullptr!";
+
     }
 
     StatusBar* statusBar = new StatusBar(this);
@@ -324,6 +325,16 @@ void MainWindow::initMenuBar()
     m_pMenuHelp = menuBar()->addMenu(tr("Help"));
     m_pMenuHelp->addAction(m_pActionAbout);
 
+}
+
+//=============================================================================================================
+
+void MainWindow::checkPluginManager()
+{
+    if(m_pPluginManager.isNull())
+    {
+       qWarning() << "[MainWindow::MainWindow] Plugin manager is nullptr!";
+    }
 }
 
 //=============================================================================================================

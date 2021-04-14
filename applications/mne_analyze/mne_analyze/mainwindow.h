@@ -206,12 +206,40 @@ private:
     void setCurrentStyle(const QString& style);
 
     //=========================================================================================================
-    /**< Creates all actions for user interface of MainWindow class. */
-    void createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);          /**< Creates all menus for user interface of MainWindow class. */
-    void createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);    /**< Creates all dock windows for user interface of MainWindow class. */
-    void createPluginViews(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);      /**< Creates all Windows within the MultiView for user interface of MainWindow class. */
-    void tabifyDockWindows();                                                                   /**< Tabify all dock windows. */
-    void about();                                                                               /**< Implements about action.*/
+    /**
+     * Checks the correct configuration of the pluginmanager.
+     */
+    void checkPluginManager() const;
+
+    //=========================================================================================================
+    /**
+    * Creates all actions for user interface of MainWindow class.
+    */
+    void createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);
+
+    //=========================================================================================================
+    /**
+     * Creates all dock windows for user interface of MainWindow class.
+     */
+    void createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);
+
+    //=========================================================================================================
+    /**
+     *  Creates all Windows within the MultiView for user interface of MainWindow class.
+     */
+    void createPluginViews(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);
+
+    //=========================================================================================================
+    /**
+     * Tabify all dock windows.
+     */
+    void tabifyDockWindows();
+
+    //=========================================================================================================
+    /**
+     * Implements about action.
+     */
+    void about();
 
     QPointer<DISPLIB::MultiView>        m_pMultiView;               /**< The central View.*/
     QPointer<QGridLayout>               m_pGridLayout;              /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow. */
