@@ -155,6 +155,16 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 //=============================================================================================================
 
+void MainWindow::initWindow()
+{
+    this->setObjectName("mainwindow");
+    setWindowState(Qt::WindowMaximized);
+    setMinimumSize(1280, 720);
+    setWindowTitle(CInfo::AppNameShort());
+}
+
+//=============================================================================================================
+
 void MainWindow::writeToLog(QtMsgType type,
                             const QMessageLogContext &context,
                             const QString &msg)
@@ -261,19 +271,12 @@ void MainWindow::initMenusAndPluginControls()
     }
 }
 
+//=============================================================================================================
+
 void MainWindow::initStatusBar()
 {
     StatusBar* statusBar = new StatusBar(this);
     setStatusBar(statusBar);
-}
-//=============================================================================================================
-
-void MainWindow::initWindow()
-{
-    this->setObjectName("mainwindow");
-    setWindowState(Qt::WindowMaximized);
-    setMinimumSize(1280, 720);
-    setWindowTitle(CInfo::AppNameShort());
 }
 
 //=============================================================================================================
