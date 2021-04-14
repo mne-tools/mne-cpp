@@ -111,14 +111,28 @@ void AbstractPlugin::setOrder(int order)
 
 //=============================================================================================================
 
-void AbstractPlugin::set_viewLoadingState(bool b)
+void AbstractPlugin::setViewLoadingState(bool b)
 {
     m_bViewAlreadyLoaded = b;
 }
 
 //=============================================================================================================
 
-void AbstractPlugin::set_controlLoadingState(bool b)
+void AbstractPlugin::setControlLoadingState(bool b)
 {
     m_bControlAlreadyLoaded = b;
+}
+
+//=============================================================================================================
+
+bool AbstractPlugin::controlAlreadyLoaded() const
+{
+    return m_bControlAlreadyLoaded;
+}
+
+//=============================================================================================================
+
+bool AbstractPlugin::viewAlreadyLoaded() const
+{
+    return m_bViewAlreadyLoaded;
 }

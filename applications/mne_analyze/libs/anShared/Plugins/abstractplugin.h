@@ -232,14 +232,14 @@ public:
      * Set the loading state of the view menus for thisplugins.
      * @param b new loading state.
      */
-    void set_viewLoadingState(bool b);
+    void setViewLoadingState(bool b);
 
     //=========================================================================================================
     /**
      * Set the loading state of the control menus for this plugin.
      * @param b new loading state.
      */
-    void set_controlLoadingState(bool b);
+    void setControlLoadingState(bool b);
 
 signals:
     //=========================================================================================================
