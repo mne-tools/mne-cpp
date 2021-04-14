@@ -207,12 +207,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Checks the correct configuration of the pluginmanager.
-     */
-    void checkPluginManager() const;
-
-    //=========================================================================================================
-    /**
     * Creates all actions for user interface of MainWindow class.
     */
     void createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);
@@ -245,7 +239,7 @@ private:
     /**
      * Check the correct configuration of the plugin manager.
      */
-    void checkPluginManager() const;
+    void checkPluginManager();
 
 
     QPointer<DISPLIB::MultiView>        m_pMultiView;               /**< The central View.*/
