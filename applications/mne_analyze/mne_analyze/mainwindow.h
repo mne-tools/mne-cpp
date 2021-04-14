@@ -185,13 +185,13 @@ private:
      *
      * @param[in] sStyle   The new qss style.
      */
-    void onStyleChanged();
+    void changeStyle();
 
     //=========================================================================================================
     /**
      * Handles changes made to the application's GUI mode.
      */
-    void onGuiModeChanged();
+    void manageGuiModeChanged();
 
     //=========================================================================================================
     /**
