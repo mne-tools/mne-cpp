@@ -91,10 +91,10 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
     initMenuAndStatusBar();
 
     //Load application icon for linux builds only, mac and win executables have built in icons from .pro file
-#ifdef __linux__
+    #ifdef __linux__
     qInfo() << "Loading icon...";
     QMainWindow::setWindowIcon(QIcon(":/images/resources/images/appIcons/icon_mne-analyze_256x256.png"));
-#endif
+    #endif
 
     loadSavedSettingsAndState();
 }
@@ -226,7 +226,7 @@ void MainWindow::setCurrentStyle(const QString& sStyle)
 {
     m_sCurrentStyle = sStyle;
 
-    onStyleChanged();
+    changeStyle();
 }
 
 //=============================================================================================================
@@ -268,7 +268,6 @@ void MainWindow::loadSavedSettingsAndState()
 
 void MainWindow::initMenuBar()
 {
-
     m_pActionExit = new QAction(tr("Exit"), this);
     m_pActionExit->setShortcuts(QKeySequence::Quit);
     m_pActionExit->setStatusTip(tr("Exit MNE Analyze"));
@@ -359,7 +358,7 @@ void MainWindow::checkPluginManager()
 
 //=============================================================================================================
 
-void MainWindow::onStyleChanged()
+void MainWindow::changeStyle()
 {
     if(m_sCurrentStyle == "dark") {
         m_pActionDarkMode->setChecked(true);
