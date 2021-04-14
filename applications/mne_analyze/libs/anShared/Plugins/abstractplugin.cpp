@@ -99,3 +99,8 @@ int AbstractPlugin::getOrder() const
 {
     return m_iOrder;
 }
+
+void AbstractPlugin::setOrder(int order)
+{
+    m_iOrder = order;
+}

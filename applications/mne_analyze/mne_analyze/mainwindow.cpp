@@ -84,6 +84,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 , m_pPluginManager(pPluginManager)
 , m_pGridLayout(Q_NULLPTR)
 , m_pActionExit(Q_NULLPTR)
+, m_pActionReloadPlugins(Q_NULLPTR)
 , m_pActionAbout(Q_NULLPTR)
 , m_pActionResearchMode(Q_NULLPTR)
 , m_pActionClinicalMode(Q_NULLPTR)
@@ -103,7 +104,8 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 
     checkPluginManager();
 
-    initMenuAndStatusBar();
+    initMenusAndPluginControls();
+    initStatusBar();
 
     //Load application icon for linux builds only, mac and win executables have built in icons from .pro file
     #ifdef __linux__
@@ -125,6 +127,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::deleteMenus()
 {
+    menuBar()->clear();
     delete m_pMenuFile;
     delete m_pMenuView;
     delete m_pMenuControl;
@@ -245,21 +248,24 @@ void MainWindow::setCurrentStyle(const QString& sStyle)
 
 //=============================================================================================================
 
-void MainWindow::initMenuAndStatusBar()
+void MainWindow::initMenusAndPluginControls()
 {
     if(m_bPluginManagerConfiguredOK)
     {
+        deleteMenus();
         initMenuBar();
         createPluginMenus();
         createLogDockWindow();
         createPluginControls();
         createPluginViews();
     }
-
-    StatusBar* statusBar = new StatusBar(this);
-    this->setStatusBar(statusBar);
 }
 
+void MainWindow::initStatusBar()
+{
+    StatusBar* statusBar = new StatusBar(this);
+    setStatusBar(statusBar);
+}
 //=============================================================================================================
 
 void MainWindow::initWindow()
@@ -288,8 +294,13 @@ void MainWindow::initMenuBar()
     m_pActionExit->setStatusTip(tr("Exit MNE Analyze"));
     connect(m_pActionExit.data(), &QAction::triggered, this, &MainWindow::close);
 
+    m_pActionReloadPlugins = new QAction(tr("Reload Plugins"),this);
+    m_pActionReloadPlugins->setStatusTip(tr("Reload all the plugins in MNE Analyze's plugin folder."));
+    connect(m_pActionReloadPlugins.data(), &QAction::triggered, this, &MainWindow::initMenusAndPluginControls);
+
     // File menu
     m_pMenuFile = menuBar()->addMenu(tr("File"));
+    m_pMenuFile->addAction(m_pActionReloadPlugins);
     m_pMenuFile->addAction(m_pActionExit);
 
     // View menu
@@ -447,7 +458,7 @@ void MainWindow::createPluginMenus()
                 // Check if the menu already exists. If it does add the actions to the exisiting menu.
                 if(pMenu->title() == "File") {
                     for(QAction* pAction : pMenu->actions()) {
-                        m_pMenuFile->insertAction(m_pActionExit, pAction);
+                        m_pMenuFile->insertAction(m_pActionReloadPlugins, pAction);
                     }
                 } else if(pMenu->title() == "View") {
                     for(QAction* pAction : pMenu->actions()) {
