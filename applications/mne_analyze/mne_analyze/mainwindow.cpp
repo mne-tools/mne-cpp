@@ -86,10 +86,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
 , m_sSettingsPath("MNEANALYZE/MainWindow")
 , m_sCurrentStyle("default")
 {
-    this->setObjectName("mainwindow");
-    setWindowState(Qt::WindowMaximized);
-    setMinimumSize(1280, 720);
-    setWindowTitle(CInfo::AppNameShort());
+    initWindow();
 
     initMenuAndStatusBar();
 
@@ -99,9 +96,7 @@ MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager
     QMainWindow::setWindowIcon(QIcon(":/images/resources/images/appIcons/icon_mne-analyze_256x256.png"));
 #endif
 
-    //Load saved GUI geometry and state
-    loadSettings();
-    m_pMultiView->loadSettings();
+    loadSavedSettingsAndState();
 }
 
 //=============================================================================================================
@@ -249,6 +244,24 @@ void MainWindow::initMenuAndStatusBar()
 
     StatusBar* statusBar = new StatusBar(this);
     this->setStatusBar(statusBar);
+}
+
+//=============================================================================================================
+
+void MainWindow::initWindow()
+{
+    this->setObjectName("mainwindow");
+    setWindowState(Qt::WindowMaximized);
+    setMinimumSize(1280, 720);
+    setWindowTitle(CInfo::AppNameShort());
+}
+
+//=============================================================================================================
+
+void MainWindow::loadSavedSettingsAndState()
+{
+    loadSettings();
+    m_pMultiView->loadSettings();
 }
 
 //=============================================================================================================
