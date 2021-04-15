@@ -128,6 +128,12 @@ protected:
 
     virtual void paintEvent(QPaintEvent *event);
 
+    void paintChart(QPainter& painter,
+                    const QRect chartRect);
+
+    void paintAxes(QPainter& painter,
+                   const QRect chartRect);
+
     QSharedPointer<EvokedSetModel>              m_pEvokedSetModel;              /**< The evoked model */
 
 };

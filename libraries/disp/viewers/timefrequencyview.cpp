@@ -206,9 +206,9 @@ void TimeFrequencyView::paintEvent(QPaintEvent *event)
             //spacers before stim
             while(sampleCounter-timeDistanceSamples>0) {
                 sampleCounter-=timeDistanceSamples;
-                float x = fDx*sampleCounter;
+                float x = chartBound.bottomLeft().x() + fDx*sampleCounter;
                 painter.drawLine(x, yStart, x, yEnd);
-                painter.drawText(QPointF(x+5,yEnd-5), QString("-%1ms").arg(timeDistanceMSec*counter));
+                painter.drawText(QPointF(x - chartBorders/3, yEnd + chartBorders/2), QString("-%1ms").arg(timeDistanceMSec*counter));
                 counter++;
             }
 
@@ -217,9 +217,9 @@ void TimeFrequencyView::paintEvent(QPaintEvent *event)
             sampleCounter = m_pEvokedSetModel->getNumPreStimSamples();
             while(sampleCounter+timeDistanceSamples<m_pEvokedSetModel->getNumSamples()) {
                 sampleCounter+=timeDistanceSamples;
-                float x = fDx*sampleCounter;
+                float x = chartBound.bottomLeft().x() + fDx*sampleCounter;
                 painter.drawLine(x, yStart, x, yEnd);
-                painter.drawText(QPointF(x+5,yEnd-5), QString("%1ms").arg(timeDistanceMSec*counter));
+                painter.drawText(QPointF(x - chartBorders/3, yEnd + chartBorders/2), QString("%1ms").arg(timeDistanceMSec*counter));
                 counter++;
             }
 
@@ -240,4 +240,20 @@ void TimeFrequencyView::setEvokedSetModel(QSharedPointer<EvokedSetModel> model)
 
 //    connect(m_pEvokedSetModel.data(), &EvokedSetModel::dataChanged,
 //            this, &ButterflyView::dataUpdate, Qt::UniqueConnection);
+}
+
+//=============================================================================================================
+
+void TimeFrequencyView::paintChart(QPainter& painter,
+                                   const QRect chartRect)
+{
+
+}
+
+//=============================================================================================================
+
+void TimeFrequencyView::paintAxes(QPainter& painter,
+                                  const QRect chartRect)
+{
+
 }
