@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include <disp/viewers/abstractview.h>
-
+#include "analyzecore.h"
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
@@ -66,9 +66,9 @@ class QDockWidget;
 class QGridLayout;
 QT_END_NAMESPACE
 
-namespace ANSHAREDLIB {
-    class PluginManager;
-}
+//namespace ANSHAREDLIB {
+//    class PluginManager;
+//}
 
 namespace DISPLIB {
     class MultiView;
@@ -108,7 +108,7 @@ public:
      *                    If parent is another widget, MainWindow becomes a child window inside parent.
      *                    MainWindow is deleted when its parent is deleted.
      */
-    MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager, QWidget *parent = Q_NULLPTR);
+    MainWindow(AnalyzeCore& core, QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -249,7 +249,9 @@ private:
     void reloadPlugins();
 
     QPointer<DISPLIB::MultiView>        m_pMultiView;               /**< The central View.*/
-    QPointer<QGridLayout>               m_pGridLayout;              /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow. */
+//    QSharedPointer<ANSHAREDLIB::PluginManager> m_pPluginManager;    /**< Pointer to the application PluginManager Obj.*/
+    AnalyzeCore& m_CoreApp; /**< Pointer to the application controller Obj.*/
+    QPointer<QGridLayout>               m_pGridLayout;              /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow */
 
     // MainWindow actions
     QPointer<QAction>                   m_pActionExit;              /**< exit application action. */

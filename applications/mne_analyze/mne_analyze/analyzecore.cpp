@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "analyzecore.h"
-#include "mainwindow.h"
+//#include "mainwindow.h"
 #include "../libs/anShared/Plugins/abstractplugin.h"
 #include "../libs/anShared/Management/analyzedata.h"
 #include "../libs/anShared/Management/pluginmanager.h"
@@ -187,17 +187,28 @@ void AnalyzeCore::initEventSystem()
 void AnalyzeCore::initPluginManager()
 {
     m_pPluginManager = QSharedPointer<PluginManager>::create();
+    loadandInitPlugins();
+}
+
+//=============================================================================================================
+
+void AnalyzeCore::loadandInitPlugins()
+{
     m_pPluginManager->loadPluginsFromDirectory(qApp->applicationDirPath() + pluginsDir);
     m_pPluginManager->initPlugins(m_analyzeData);
 }
+
+void getLoadedPlugins();
+
+bool pluginsInitialized();
 
 //=============================================================================================================
 
 void AnalyzeCore::initMainWindow()
 {
-    m_pMainWindow = new MainWindow(m_pPluginManager);
+    m_pMainWindow = new MainWindow(*this);
     QObject::connect(m_pMainWindow.data(), &MainWindow::mainWindowClosed,
-                     this, &AnalyzeCore::onMainWindowClosed);
+                     this, &AnalyzeCore::shutdown);
 }
 
 //=============================================================================================================
@@ -209,10 +220,15 @@ void AnalyzeCore::registerMetaTypes()
 
 //=============================================================================================================
 
-void AnalyzeCore::onMainWindowClosed()
+void AnalyzeCore::shutdown()
 {
     EventManager::shutdown();
 
     // shutdown every plugin, empty analzye data etc.
     m_pPluginManager->shutdown();
+}
+
+AnalyzeCore& AnalyzeCore::self()
+{
+    return *this;
 }
