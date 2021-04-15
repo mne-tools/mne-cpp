@@ -41,8 +41,8 @@
 #include "info.h"
 #include "mainwindow.h"
 
-#include <anShared/Plugins/abstractplugin.h>
-#include <anShared/Management/pluginmanager.h>
+//#include <anShared/Plugins/abstractplugin.h>
+//#include <anShared/Management/pluginmanager.h>
 #include <anShared/Management/statusbar.h>
 
 #include <disp/viewers/multiview.h>
@@ -77,11 +77,10 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager,
-                       QWidget *parent)
+MainWindow::MainWindow(AnalyzeCore& core, QWidget *parent)
 : QMainWindow(parent)
 , m_pMultiView(Q_NULLPTR)
-, m_pPluginManager(pPluginManager)
+, m_CoreApp(core)
 , m_pGridLayout(Q_NULLPTR)
 , m_pActionExit(Q_NULLPTR)
 , m_pActionReloadPlugins(Q_NULLPTR)
@@ -490,7 +489,6 @@ void MainWindow::createPluginControls()
         setTabPosition(Qt::LeftDockWidgetArea,QTabWidget::West);
         setTabPosition(Qt::RightDockWidgetArea,QTabWidget::East);
         setDockOptions(QMainWindow::ForceTabbedDocks);
-        creatingControlsForFirstTime = false;
     }
 
     //Add Plugin controls to the MainWindow
@@ -520,7 +518,11 @@ void MainWindow::createPluginControls()
         }
     }
 
-    tabifyDockWindows();
+    if(creatingControlsForFirstTime)
+    {
+        tabifyDockWindows();
+        creatingControlsForFirstTime = false;
+    }
 }
 
 //=============================================================================================================
@@ -553,7 +555,6 @@ void MainWindow::createPluginViews()
             pPlugin->setViewLoadingState(true);
         }
     }
-    //m_pMultiView->loadSettings();
 }
 
 //=============================================================================================================
@@ -705,9 +706,17 @@ void MainWindow::reloadPlugins()
             qInfo() << action->text();
         }
     }
-    qInfo() << "*********************************************";
-    for(auto dock: findChildren<QDockWidget*>())
-    {
-        qInfo() << dock->objectName();
-    }
+
+//    initMenuBar();
+
+    createPluginMenus();
+    createPluginControls();
+    createPluginViews();
+
+
+//    qInfo() << "*********************************************";
+//    for(auto dock: findChildren<QDockWidget*>())
+//    {
+//        qInfo() << dock->objectName();
+//    }
 }
