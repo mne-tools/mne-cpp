@@ -3,12 +3,12 @@
  * @file     eventdelegate.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Gabriel Motta <gbmotta@mgh.harvard.edu
- * @since    0.1.0
- * @date     April, 2020
+ * @since    0.1.9
+ * @date     March, 2021
  *
  * @section  LICENSE
  *
- * Copyright (C) 2020, Lorenz Esch, Gabriel Motta. All rights reserved.
+ * Copyright (C) 2021, Lorenz Esch, Gabriel Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:

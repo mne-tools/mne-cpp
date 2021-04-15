@@ -107,7 +107,6 @@ RtFiffRawViewModel::RtFiffRawViewModel(QObject *parent)
 , m_pFiffInfo(FiffInfo::SPtr::create())
 , m_colBackground(Qt::white)
 {
-
     m_EventManager.initSharedMemory(EVENTSLIB::SharedMemoryMode::READWRITE);
 }
 
@@ -127,11 +126,6 @@ int RtFiffRawViewModel::rowCount(const QModelIndex & /*parent*/) const
     } else {
         return 0;
     }
-
-//    if(!m_qMapIdxRowSelection.empty())
-//        return m_qMapIdxRowSelection.size();
-//    else
-//        return 0;
 }
 
 //=============================================================================================================
