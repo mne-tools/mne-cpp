@@ -120,6 +120,18 @@ public:
      */
     void initGlobalData();
 
+    //=========================================================================================================
+    /**
+     * Load plugins from plugin directory and then initializes their data.
+     */
+    void loadandInitPlugins();
+
+    void getLoadedPlugins();
+
+    bool pluginsInitialized();
+
+    AnalyzeCore& self();
+
 private:
     //=========================================================================================================
     /**
@@ -137,7 +149,7 @@ private:
     /**
      * This is executed when the user presses "close" button (via QConnection from MainWindow)
      */
-    void onMainWindowClosed();
+    void shutdown();
 
     //=========================================================================================================
     /**
@@ -150,6 +162,7 @@ private:
      * This initializes the PluginManager.
      */
     void initPluginManager();
+
 
     //=========================================================================================================
     /**
