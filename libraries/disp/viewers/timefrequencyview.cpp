@@ -44,8 +44,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QQuickItem>
-#include <QQuickWidget>
 #include <QBoxLayout>
 #include <QPainter>
 #include <QPainterPath>
@@ -72,6 +70,7 @@ TimeFrequencyView::TimeFrequencyView(const QString& sSettingsPath,
                                      QWidget *parent,
                                      Qt::WindowFlags f)
 : AbstractView(parent, f)
+, m_iChartBorderSpacing(30)
 {
     m_sSettingsPath = sSettingsPath;
     //initQMLView();
@@ -127,16 +126,16 @@ void TimeFrequencyView::clearView()
 
 void TimeFrequencyView::initQMLView()
 {
-    QUrl source = QUrl::fromLocalFile("../libraries/disp/viewers/qml/tfview.qml");
-    QQuickWidget* widget = new QQuickWidget();
-    widget->setSource(source);
-    widget->setResizeMode(QQuickWidget::SizeRootObjectToView);
+//    QUrl source = QUrl::fromLocalFile("../libraries/disp/viewers/qml/tfview.qml");
+//    QQuickWidget* widget = new QQuickWidget();
+//    widget->setSource(source);
+//    widget->setResizeMode(QQuickWidget::SizeRootObjectToView);
 
-    QVBoxLayout* layout = new QVBoxLayout();
-    layout->addWidget(widget);
+//    QVBoxLayout* layout = new QVBoxLayout();
+//    layout->addWidget(widget);
 
 
-    this->setLayout(layout);
+//    this->setLayout(layout);
 }
 
 //=============================================================================================================
@@ -144,9 +143,6 @@ void TimeFrequencyView::initQMLView()
 void TimeFrequencyView::paintEvent(QPaintEvent *event)
 {
     if (m_pEvokedSetModel){
-
-        int chartBorders = 30;
-
         QPainter painter(this);
 
         painter.save();
@@ -160,7 +156,7 @@ void TimeFrequencyView::paintEvent(QPaintEvent *event)
         //paint chart
         painter.save();
         painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
-        QRect chartBound(chartBorders,chartBorders,this->width()-chartBorders * 4 ,this->height()- chartBorders * 2);
+        QRect chartBound(m_iChartBorderSpacing,m_iChartBorderSpacing,this->width()-m_iChartBorderSpacing * 4 ,this->height()- m_iChartBorderSpacing * 2);
         painter.drawRect(chartBound);
         painter.restore();
 
@@ -168,10 +164,10 @@ void TimeFrequencyView::paintEvent(QPaintEvent *event)
 
         painter.save();
 
-        QLinearGradient linGrad(this->width() - chartBorders * 1.5f, chartBound.topRight().y(), this->width() - chartBorders * 1.5f, chartBound.bottomRight().y());
+        QLinearGradient linGrad(this->width() - m_iChartBorderSpacing * 1.5f, chartBound.topRight().y(), this->width() - m_iChartBorderSpacing * 1.5f, chartBound.bottomRight().y());
         painter.save();
         painter.setBrush(linGrad);
-        painter.drawRect(chartBound.topRight().x() + chartBorders, chartBound.topRight().y(), chartBorders, chartBound.height());
+        painter.drawRect(chartBound.topRight().x() + m_iChartBorderSpacing, chartBound.topRight().y(), m_iChartBorderSpacing, chartBound.height());
 
         painter.restore();
 
@@ -208,7 +204,7 @@ void TimeFrequencyView::paintEvent(QPaintEvent *event)
                 sampleCounter-=timeDistanceSamples;
                 float x = chartBound.bottomLeft().x() + fDx*sampleCounter;
                 painter.drawLine(x, yStart, x, yEnd);
-                painter.drawText(QPointF(x - chartBorders/3, yEnd + chartBorders/2), QString("-%1ms").arg(timeDistanceMSec*counter));
+                painter.drawText(QPointF(x - m_iChartBorderSpacing/3, yEnd + m_iChartBorderSpacing/2), QString("-%1ms").arg(timeDistanceMSec*counter));
                 counter++;
             }
 
@@ -219,7 +215,7 @@ void TimeFrequencyView::paintEvent(QPaintEvent *event)
                 sampleCounter+=timeDistanceSamples;
                 float x = chartBound.bottomLeft().x() + fDx*sampleCounter;
                 painter.drawLine(x, yStart, x, yEnd);
-                painter.drawText(QPointF(x - chartBorders/3, yEnd + chartBorders/2), QString("%1ms").arg(timeDistanceMSec*counter));
+                painter.drawText(QPointF(x - m_iChartBorderSpacing/3, yEnd + m_iChartBorderSpacing/2), QString("%1ms").arg(timeDistanceMSec*counter));
                 counter++;
             }
 
@@ -245,7 +241,7 @@ void TimeFrequencyView::setEvokedSetModel(QSharedPointer<EvokedSetModel> model)
 //=============================================================================================================
 
 void TimeFrequencyView::paintChart(QPainter& painter,
-                                   const QRect chartRect)
+                                   const QRect chartBound)
 {
 
 }
@@ -253,7 +249,7 @@ void TimeFrequencyView::paintChart(QPainter& painter,
 //=============================================================================================================
 
 void TimeFrequencyView::paintAxes(QPainter& painter,
-                                  const QRect chartRect)
+                                  const QRect chartBound)
 {
 
 }

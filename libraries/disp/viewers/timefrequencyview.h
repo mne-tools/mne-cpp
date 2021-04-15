@@ -85,7 +85,7 @@ public:
     /**
      * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
      *
-     * @param mode     The new mode (Clinical=0, Research=1).
+     * @param[in] mode     The new mode (Clinical=0, Research=1).
      */
     void updateGuiMode(GuiMode mode);
 
@@ -93,7 +93,7 @@ public:
     /**
      * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
      *
-     * @param mode     The new mode (RealTime=0, Offline=1).
+     * @param[in] mode     The new mode (RealTime=0, Offline=1).
      */
     void updateProcessingMode(ProcessingMode mode);
 
@@ -119,9 +119,17 @@ public:
     /**
      * Set the evoked set model.
      *
-     * @param [in] model     The new evoked set model.
+     * @param[in] model     The new evoked set model.
      */
     void setEvokedSetModel(QSharedPointer<EvokedSetModel> model);
+
+    //=========================================================================================================
+    /**
+     * Sets spacing for time frequency chart
+     *
+     * @param[in] iSpacing      Spacing value in pixels
+     */
+    void setChartBorderSpacing(int iSpacing);
 
 protected:
     void initQMLView();
@@ -129,12 +137,13 @@ protected:
     virtual void paintEvent(QPaintEvent *event);
 
     void paintChart(QPainter& painter,
-                    const QRect chartRect);
+                    const QRect chartBound);
 
     void paintAxes(QPainter& painter,
-                   const QRect chartRect);
+                   const QRect chartBound);
 
     QSharedPointer<EvokedSetModel>              m_pEvokedSetModel;              /**< The evoked model */
+    int                                         m_iChartBorderSpacing;
 
 };
 
