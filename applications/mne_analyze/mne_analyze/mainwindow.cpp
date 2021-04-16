@@ -695,6 +695,7 @@ void MainWindow::reloadPlugins()
 
 //    initMenuBar();
 
+    m_pCoreApp->loadandInitPlugins();
     createPluginMenus();
     createPluginControls();
     createPluginViews();
