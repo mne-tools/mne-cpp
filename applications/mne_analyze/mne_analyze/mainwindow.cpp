@@ -291,19 +291,21 @@ void MainWindow::loadSavedSettingsAndState()
 
 void MainWindow::initMenuBar()
 {
+    // File menu
+    m_pMenuFile = menuBar()->addMenu(tr("File"));
+
     m_pActionExit = new QAction(tr("Exit"), this);
     m_pActionExit->setShortcuts(QKeySequence::Quit);
     m_pActionExit->setStatusTip(tr("Exit MNE Analyze"));
     connect(m_pActionExit.data(), &QAction::triggered, this, &MainWindow::close);
+    m_pMenuFile->addAction(m_pActionExit);
 
+#ifndef WASMBUILD
     m_pActionReloadPlugins = new QAction(tr("Reload Plugins"),this);
     m_pActionReloadPlugins->setStatusTip(tr("Reload all the plugins in MNE Analyze's plugin folder."));
     connect(m_pActionReloadPlugins.data(), &QAction::triggered, this, &MainWindow::reloadPlugins);
-
-    // File menu
-    m_pMenuFile = menuBar()->addMenu(tr("File"));
     m_pMenuFile->addAction(m_pActionReloadPlugins);
-    m_pMenuFile->addAction(m_pActionExit);
+#endif
 
     // Control menu
     m_pMenuControl = menuBar()->addMenu(tr("Control"));
@@ -446,7 +448,11 @@ void MainWindow::createPluginMenus()
                 // Check if the menu already exists. If it does add the actions to the exisiting menu.
                 if(pMenu->title() == "File") {
                     for(QAction* pAction : pMenu->actions()) {
+#ifdef WASMBUILD
+                        m_pMenuFile->insertAction(m_pActionExit, pAction);
+#else
                         m_pMenuFile->insertAction(m_pActionReloadPlugins, pAction);
+#endif
                     }
                 } else if(pMenu->title() == "View") {
                     for(QAction* pAction : pMenu->actions()) {
@@ -677,7 +683,7 @@ void MainWindow::about()
 
 //=============================================================================================================
 
-void MainWindow::refreshPluginsMenus()
+void MainWindow::refreshPluginMenus()
 {
     createPluginMenus();
     createPluginControls();
