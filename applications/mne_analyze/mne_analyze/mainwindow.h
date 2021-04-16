@@ -159,7 +159,7 @@ public:
     /**
      * Redraw all the menus and actions created by the plugins.
      */
-    void refreshPluginsMenus();
+    void refreshPluginMenus();
 
 signals:    
     //=========================================================================================================
@@ -185,7 +185,9 @@ signals:
     void guiStyleChanged(DISPLIB::AbstractView::StyleMode style);
 
     //=========================================================================================================
-
+    /**
+     * Signal emmited whenever the gui menu option: Reload Plugins is clicked.
+     */
     void reloadPlugins();
 
 private:

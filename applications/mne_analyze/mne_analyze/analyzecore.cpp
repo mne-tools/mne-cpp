@@ -251,5 +251,5 @@ void AnalyzeCore::shutdown()
 void AnalyzeCore::reloadPlugins()
 {
     loadandInitPlugins();
-    m_pMainWindow->refreshPluginsMenus();
+    m_pMainWindow->refreshPluginMenus();
 }
