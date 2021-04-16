@@ -41,7 +41,7 @@
 #include "info.h"
 #include "mainwindow.h"
 
-//#include <anShared/Plugins/abstractplugin.h>
+#include <anShared/Plugins/abstractplugin.h>
 //#include <anShared/Management/pluginmanager.h>
 #include <anShared/Management/statusbar.h>
 
@@ -77,10 +77,10 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MainWindow::MainWindow(AnalyzeCore& core, QWidget *parent)
+MainWindow::MainWindow(AnalyzeCore* pAnalyzeCore, QWidget *parent)
 : QMainWindow(parent)
 , m_pMultiView(Q_NULLPTR)
-, m_CoreApp(core)
+, m_pCoreApp(pAnalyzeCore)
 , m_pGridLayout(Q_NULLPTR)
 , m_pActionExit(Q_NULLPTR)
 , m_pActionReloadPlugins(Q_NULLPTR)
@@ -97,7 +97,6 @@ MainWindow::MainWindow(AnalyzeCore& core, QWidget *parent)
 , m_pAboutWindow(Q_NULLPTR)
 , m_sSettingsPath("MNEANALYZE/MainWindow")
 , m_sCurrentStyle("default")
-, m_bPluginManagerConfiguredOK(false)
 {
     initWindow();
 
@@ -260,15 +259,15 @@ void MainWindow::setCurrentStyle(const QString& sStyle)
 
 void MainWindow::initMenusAndPluginControls()
 {
-    checkPluginManager();
-
-    if(m_bPluginManagerConfiguredOK)
+    if(m_pCoreApp->pluginsInitialized())
     {
         initMenuBar();
         createLogDockWindow();
         createPluginMenus();
         createPluginControls();
         createPluginViews();
+    } else {
+        qWarning() << "[MainWindow::MainWindow] Plugin manager is nullptr!";
     }
 }
 
@@ -373,20 +372,6 @@ void MainWindow::initMenuBar()
 
 //=============================================================================================================
 
-void MainWindow::checkPluginManager()
-{
-    if(m_pPluginManager.isNull())
-    {
-        qWarning() << "[MainWindow::MainWindow] Plugin manager is nullptr!";
-        m_bPluginManagerConfiguredOK = false;
-    } else {
-        m_bPluginManagerConfiguredOK = true;
-    }
-
-}
-
-//=============================================================================================================
-
 void MainWindow::changeStyle()
 {
     if(m_sCurrentStyle == "dark") {
@@ -454,7 +439,7 @@ void MainWindow::createLogDockWindow()
 void MainWindow::createPluginMenus()
 {
     // add plugins menus
-    for(AbstractPlugin* pPlugin : m_pPluginManager->getPlugins()) {
+    for(auto pPlugin : m_pCoreApp->getLoadedPlugins()) {
         pPlugin->setObjectName(pPlugin->getName());
         if(pPlugin) {
             if (QMenu* pMenu = pPlugin->getMenu()) {
@@ -492,7 +477,7 @@ void MainWindow::createPluginControls()
     }
 
     //Add Plugin controls to the MainWindow
-    for(AbstractPlugin* pPlugin : m_pPluginManager->getPlugins()) {
+    for(AbstractPlugin* pPlugin :m_pCoreApp->getLoadedPlugins()) {
         QDockWidget* pControl = pPlugin->getControl();
         if(pControl && pPlugin->controlAlreadyLoaded() == false)
         {
@@ -542,7 +527,7 @@ void MainWindow::createPluginViews()
     }
 
     //Add Plugin views to the MultiView, which is the central widget
-    for(AbstractPlugin* pPlugin : m_pPluginManager->getPlugins()) {
+    for(AbstractPlugin* pPlugin :m_pCoreApp->getLoadedPlugins()) {
         QWidget* pView = pPlugin->getView();
         if(pView && pPlugin->viewAlreadyLoaded() == false) {
             MultiViewWindow* pWindow = Q_NULLPTR;
@@ -689,6 +674,7 @@ void MainWindow::about()
     m_pAboutWindow->show();
 }
 
+//=============================================================================================================
 
 void MainWindow::reloadPlugins()
 {
