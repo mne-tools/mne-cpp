@@ -298,14 +298,13 @@ void MainWindow::initMenuBar()
     m_pActionExit->setShortcuts(QKeySequence::Quit);
     m_pActionExit->setStatusTip(tr("Exit MNE Analyze"));
     connect(m_pActionExit.data(), &QAction::triggered, this, &MainWindow::close);
-    m_pMenuFile->addAction(m_pActionExit);
-
 #ifndef WASMBUILD
     m_pActionReloadPlugins = new QAction(tr("Reload Plugins"),this);
     m_pActionReloadPlugins->setStatusTip(tr("Reload all the plugins in MNE Analyze's plugin folder."));
     connect(m_pActionReloadPlugins.data(), &QAction::triggered, this, &MainWindow::reloadPlugins);
     m_pMenuFile->addAction(m_pActionReloadPlugins);
 #endif
+    m_pMenuFile->addAction(m_pActionExit);
 
     // Control menu
     m_pMenuControl = menuBar()->addMenu(tr("Control"));
