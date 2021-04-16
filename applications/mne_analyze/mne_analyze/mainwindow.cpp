@@ -679,31 +679,7 @@ void MainWindow::about()
 
 void MainWindow::refreshPluginsMenus()
 {
-    qInfo() << "[MainWin] Reload Plugins";
-//    for (auto& action : menuBar()->actions())
-//    {
-//        qInfo() << action->text();
-//    }
-//    qInfo() << "[MainWin] File";
-    for (auto& menu : menuBar()->findChildren<QMenu*>())
-    {
-        qInfo() << "***** " << menu->title();
-        for(auto action : menu->actions())
-        {
-            qInfo() << action->text();
-        }
-    }
-
-//    initMenuBar();
-
     createPluginMenus();
     createPluginControls();
     createPluginViews();
-
-
-//    qInfo() << "*********************************************";
-//    for(auto dock: findChildren<QDockWidget*>())
-//    {
-//        qInfo() << dock->objectName();
-//    }
 }
