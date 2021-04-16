@@ -441,7 +441,7 @@ void MainWindow::createPluginMenus()
     // add plugins menus
     for(auto pPlugin : m_pCoreApp->getLoadedPlugins()) {
         pPlugin->setObjectName(pPlugin->getName());
-        if(pPlugin) {
+        if(pPlugin && pPlugin->controlAlreadyLoaded() == false) {
             if (QMenu* pMenu = pPlugin->getMenu()) {
                 // Check if the menu already exists. If it does add the actions to the exisiting menu.
                 if(pMenu->title() == "File") {
@@ -527,7 +527,7 @@ void MainWindow::createPluginViews()
     }
 
     //Add Plugin views to the MultiView, which is the central widget
-    for(AbstractPlugin* pPlugin :m_pCoreApp->getLoadedPlugins()) {
+    for(AbstractPlugin* pPlugin : m_pCoreApp->getLoadedPlugins()) {
         QWidget* pView = pPlugin->getView();
         if(pView && pPlugin->viewAlreadyLoaded() == false) {
             MultiViewWindow* pWindow = Q_NULLPTR;
