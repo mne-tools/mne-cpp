@@ -262,16 +262,6 @@ FORMS += \
     viewers/formfiles/applytoview.ui \
     viewers/formfiles/bidsview.ui \
 
-qtHaveModule(datavisualization) {
-
-DEFINES += QML_VIEWS_ON
-
-DISTFILES += \
-    viewers/qml/tfview.qml \
-    viewers/qml/Data.qml \
-    viewers/qml/NewButton.qml \
-}
-
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
