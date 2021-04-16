@@ -305,11 +305,11 @@ void MainWindow::initMenuBar()
     m_pMenuFile->addAction(m_pActionReloadPlugins);
     m_pMenuFile->addAction(m_pActionExit);
 
-    // View menu
-    m_pMenuView = menuBar()->addMenu(tr("View"));
-
     // Control menu
     m_pMenuControl = menuBar()->addMenu(tr("Control"));
+
+    // View menu
+    m_pMenuView = menuBar()->addMenu(tr("View"));
 
     //Appearance QMenu
     // Styles
