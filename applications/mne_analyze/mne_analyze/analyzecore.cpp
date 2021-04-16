@@ -73,7 +73,7 @@ const char* pluginsDir = "/mne_analyze_plugins";        /**< Holds path to the p
 // GLOBAL DEFINES
 //=============================================================================================================
 
-QPointer<MainWindow> appMainWindow;          /**< The main window. */
+QPointer<MainWindow> appMainWindowHandler(Q_NULLPTR);          /**< The main window. */
 
 //=============================================================================================================
 /**
@@ -87,7 +87,7 @@ void customMessageHandler(QtMsgType type, const
                           QMessageLogContext &context,
                           const QString &msg)
 {
-    appMainWindow->writeToLog(type, context, msg);
+    appMainWindowHandler->writeToLog(type, context, msg);
 }
 
 
@@ -120,7 +120,7 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
     splash.hide();
 
     // Setup log window
-    appMainWindow = m_pMainWindow;
+    appMainWindowHandler = m_pMainWindow;
     qInstallMessageHandler(customMessageHandler);
 
     // Initialize cmd line inputs if provided by the user
