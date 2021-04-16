@@ -41,8 +41,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mainwindow.h"
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -72,6 +70,8 @@ namespace MNEANALYZE {
 //=============================================================================================================
 // MNEANALYZE FORWARD DECLARATIONS
 //=============================================================================================================
+
+class MainWindow;
 
 //=============================================================================================================
 /**
@@ -126,11 +126,11 @@ public:
      */
     void loadandInitPlugins();
 
-    void getLoadedPlugins();
+    QVector<ANSHAREDLIB::AbstractPlugin*> getLoadedPlugins();
 
-    bool pluginsInitialized();
+    bool pluginsInitialized() const;
 
-    AnalyzeCore& self();
+    QPointer<MainWindow> getMainWindow();
 
 private:
     //=========================================================================================================
@@ -176,9 +176,15 @@ private:
      */
     void registerMetaTypes();
 
-    QSharedPointer<ANSHAREDLIB::PluginManager>      m_pPluginManager;       /**< Holds plugin manager. */
-    QSharedPointer<ANSHAREDLIB::AnalyzeData>        m_analyzeData;          /**< The global data base. */
+    //=============================================================================================================
 
+//    void customMessageHandler(QtMsgType type, const
+//                              QMessageLogContext &context,
+//                              const QString &msg);
+
+    QSharedPointer<ANSHAREDLIB::PluginManager>      m_pPluginManager;       /**< Holds plugin manager. */
+    QSharedPointer<ANSHAREDLIB::AnalyzeData>        m_pAnalyzeData;         /**< The global data base. */
+    QPointer<MainWindow>                            m_pMainWindow;          /**< The main window. */
     QCommandLineParser                              m_cmdLineParser;        /**< The command line parser. */
 };
 
