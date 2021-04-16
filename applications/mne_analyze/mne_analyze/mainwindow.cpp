@@ -441,7 +441,7 @@ void MainWindow::createPluginMenus()
     // add plugins menus
     for(auto pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
         pPlugin->setObjectName(pPlugin->getName());
-        if(pPlugin && pPlugin->controlAlreadyLoaded() == false) {
+        if(pPlugin && pPlugin->menuAlreadyLoaded() == false) {
             if (QMenu* pMenu = pPlugin->getMenu()) {
                 // Check if the menu already exists. If it does add the actions to the exisiting menu.
                 if(pMenu->title() == "File") {
@@ -460,6 +460,7 @@ void MainWindow::createPluginMenus()
                     menuBar()->addMenu(pMenu);
                 }
             }
+            pPlugin->setMenuLoadingState(true);
         }
     }
 }
