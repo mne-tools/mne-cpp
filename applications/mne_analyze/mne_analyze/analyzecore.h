@@ -106,13 +106,12 @@ public:
      */
     void showMainWindow();
 
-//    //=========================================================================================================
-//    /**
-//     * Returns a pointer to the main window.
-//     *
-//     * @return A pointer to the main window.
-//     */
-//    inline QPointer<MainWindow> getMainWindow() const;
+    //=========================================================================================================
+    /**
+     * Make pluginManager to reload and reinitialize all the necessary plugins, and make the MainWindow to
+     * show the results.
+     */
+    void reloadPlugins();
 
     //=========================================================================================================
     /**
@@ -122,15 +121,16 @@ public:
 
     //=========================================================================================================
     /**
-     * Load plugins from plugin directory and then initializes their data.
+     * Retrieve all the loaded plugins from the Application.
      */
-    void loadandInitPlugins();
-
     QVector<ANSHAREDLIB::AbstractPlugin*> getLoadedPlugins();
 
+    //=========================================================================================================
+    /**
+     * Check for the initialization state of the plugins in the application.
+     * @return Initialization state.
+     */
     bool pluginsInitialized() const;
-
-    QPointer<MainWindow> getMainWindow();
 
 private:
     //=========================================================================================================
@@ -176,11 +176,12 @@ private:
      */
     void registerMetaTypes();
 
-    //=============================================================================================================
+    //=========================================================================================================
+    /**
+     * Load plugins from plugin directory and then initializes their data.
+     */
+    void loadandInitPlugins();
 
-//    void customMessageHandler(QtMsgType type, const
-//                              QMessageLogContext &context,
-//                              const QString &msg);
 
     QSharedPointer<ANSHAREDLIB::PluginManager>      m_pPluginManager;       /**< Holds plugin manager. */
     QSharedPointer<ANSHAREDLIB::AnalyzeData>        m_pAnalyzeData;         /**< The global data base. */
@@ -191,10 +192,6 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
-//QPointer<MainWindow> AnalyzeCore::getMainWindow() const {
-//    return m_pMainWindow;
-//}
 
 } // namespace MNEANALYZE
 

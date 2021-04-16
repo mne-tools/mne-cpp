@@ -155,6 +155,12 @@ public:
      */
     void loadSettings();
 
+    //=========================================================================================================
+    /**
+     * Redraw all the menus and actions created by the plugins.
+     */
+    void refreshPluginsMenus();
+
 signals:    
     //=========================================================================================================
     /**
@@ -178,13 +184,11 @@ signals:
      */
     void guiStyleChanged(DISPLIB::AbstractView::StyleMode style);
 
-private:
     //=========================================================================================================
-    /**
-     * Creates the menu actions.
-     */
-    void initMenuBar();
 
+    void reloadPlugins();
+
+private:
     //=========================================================================================================
     /**
      * Changes the current layout style of the application.
@@ -241,15 +245,41 @@ private:
      */
     void about();
 
+    //=========================================================================================================
+    /**
+     * Check the initialization state of the plugins and if correct, initialize all the menus, actions created
+     * by all the plugins.
+     */
     void initMenusAndPluginControls();
+
+    //=========================================================================================================
+    /**
+     * Creates the menu actions.
+     */
+    void initMenuBar();
+\
+    //=========================================================================================================
+    /**
+     * Initialize this window's name size and some properties.
+     */
     void initWindow();
+
+    //=========================================================================================================
+    /**
+     * Load previously saved configuration settings for windows, tab order, and style.
+     */
     void loadSavedSettingsAndState();
-    void deleteMenus();
+
+    //=========================================================================================================
+    /**
+     * Initialize statusbar for this window.
+     */
     void initStatusBar();
-    void reloadPlugins();
+
+    void deleteMenus();
 
     QPointer<DISPLIB::MultiView>        m_pMultiView;               /**< The central View.*/
-    QPointer<AnalyzeCore>               m_pCoreApp;                 /**< Pointer to the application controller Obj.*/
+    QPointer<AnalyzeCore>               m_pAnalyzeCoreController;    /**< Pointer to the application controller Obj.*/
     QPointer<QGridLayout>               m_pGridLayout;              /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow */
 
     // MainWindow actions

@@ -80,7 +80,7 @@ using namespace DISPLIB;
 MainWindow::MainWindow(AnalyzeCore* pAnalyzeCore, QWidget *parent)
 : QMainWindow(parent)
 , m_pMultiView(Q_NULLPTR)
-, m_pCoreApp(pAnalyzeCore)
+, m_pAnalyzeCoreController(pAnalyzeCore)
 , m_pGridLayout(Q_NULLPTR)
 , m_pActionExit(Q_NULLPTR)
 , m_pActionReloadPlugins(Q_NULLPTR)
@@ -259,7 +259,7 @@ void MainWindow::setCurrentStyle(const QString& sStyle)
 
 void MainWindow::initMenusAndPluginControls()
 {
-    if(m_pCoreApp->pluginsInitialized())
+    if(m_pAnalyzeCoreController->pluginsInitialized())
     {
         initMenuBar();
         createLogDockWindow();
@@ -439,7 +439,7 @@ void MainWindow::createLogDockWindow()
 void MainWindow::createPluginMenus()
 {
     // add plugins menus
-    for(auto pPlugin : m_pCoreApp->getLoadedPlugins()) {
+    for(auto pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
         pPlugin->setObjectName(pPlugin->getName());
         if(pPlugin && pPlugin->controlAlreadyLoaded() == false) {
             if (QMenu* pMenu = pPlugin->getMenu()) {
@@ -477,7 +477,7 @@ void MainWindow::createPluginControls()
     }
 
     //Add Plugin controls to the MainWindow
-    for(AbstractPlugin* pPlugin :m_pCoreApp->getLoadedPlugins()) {
+    for(AbstractPlugin* pPlugin :m_pAnalyzeCoreController->getLoadedPlugins()) {
         QDockWidget* pControl = pPlugin->getControl();
         if(pControl && pPlugin->controlAlreadyLoaded() == false)
         {
@@ -527,7 +527,7 @@ void MainWindow::createPluginViews()
     }
 
     //Add Plugin views to the MultiView, which is the central widget
-    for(AbstractPlugin* pPlugin : m_pCoreApp->getLoadedPlugins()) {
+    for(AbstractPlugin* pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
         QWidget* pView = pPlugin->getView();
         if(pView && pPlugin->viewAlreadyLoaded() == false) {
             MultiViewWindow* pWindow = Q_NULLPTR;
@@ -676,7 +676,7 @@ void MainWindow::about()
 
 //=============================================================================================================
 
-void MainWindow::reloadPlugins()
+void MainWindow::refreshPluginsMenus()
 {
     qInfo() << "[MainWin] Reload Plugins";
 //    for (auto& action : menuBar()->actions())
@@ -695,7 +695,6 @@ void MainWindow::reloadPlugins()
 
 //    initMenuBar();
 
-    m_pCoreApp->loadandInitPlugins();
     createPluginMenus();
     createPluginControls();
     createPluginViews();

@@ -222,10 +222,11 @@ bool AnalyzeCore::pluginsInitialized() const
 
 void AnalyzeCore::initMainWindow()
 {
-
     m_pMainWindow = new MainWindow(this);
     QObject::connect(m_pMainWindow.data(), &MainWindow::mainWindowClosed,
                      this, &AnalyzeCore::shutdown);
+    QObject::connect(m_pMainWindow.data(), &MainWindow::reloadPlugins,
+                     this, &AnalyzeCore::reloadPlugins);
 }
 
 //=============================================================================================================
@@ -247,11 +248,8 @@ void AnalyzeCore::shutdown()
 
 //=============================================================================================================
 
-QPointer<MainWindow> AnalyzeCore::getMainWindow()
+void AnalyzeCore::reloadPlugins()
 {
-    return m_pMainWindow;
+    loadandInitPlugins();
+    m_pMainWindow->reloadPluginsMenus();
 }
-
-//=============================================================================================================
-
-
