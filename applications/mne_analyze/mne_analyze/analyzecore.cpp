@@ -38,8 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <functional>
 #include "analyzecore.h"
-//#include "mainwindow.h"
+#include "mainwindow.h"
 #include "../libs/anShared/Plugins/abstractplugin.h"
 #include "../libs/anShared/Management/analyzedata.h"
 #include "../libs/anShared/Management/pluginmanager.h"
@@ -66,13 +67,13 @@ using namespace ANSHAREDLIB;
 // CONST
 //=============================================================================================================
 
-const char* pluginsDir = "/mne_analyze_plugins";        /**< holds path to the plugins.*/
+const char* pluginsDir = "/mne_analyze_plugins";        /**< Holds path to the plugins.*/
 
 //=============================================================================================================
 // GLOBAL DEFINES
 //=============================================================================================================
 
-QPointer<MainWindow> m_pMainWindow;          /**< The main window. */
+QPointer<MainWindow> appMainWindow;          /**< The main window. */
 
 //=============================================================================================================
 /**
@@ -86,8 +87,9 @@ void customMessageHandler(QtMsgType type, const
                           QMessageLogContext &context,
                           const QString &msg)
 {
-    m_pMainWindow->writeToLog(type, context, msg);
+    appMainWindow->writeToLog(type, context, msg);
 }
+
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -95,6 +97,9 @@ void customMessageHandler(QtMsgType type, const
 
 AnalyzeCore::AnalyzeCore(QObject* parent)
 : QObject(parent)
+, m_pPluginManager(Q_NULLPTR)
+, m_pAnalyzeData(Q_NULLPTR)
+, m_pMainWindow(Q_NULLPTR)
 {    
     // Initialize cmd line parser
     initCmdLineParser();
@@ -115,6 +120,7 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
     splash.hide();
 
     // Setup log window
+    appMainWindow = m_pMainWindow;
     qInstallMessageHandler(customMessageHandler);
 
     // Initialize cmd line inputs if provided by the user
@@ -172,7 +178,7 @@ void AnalyzeCore::showMainWindow()
 
 void AnalyzeCore::initGlobalData()
 {
-    m_analyzeData = AnalyzeData::SPtr::create();
+    m_pAnalyzeData = AnalyzeData::SPtr::create();
 }
 
 //=============================================================================================================
@@ -195,18 +201,29 @@ void AnalyzeCore::initPluginManager()
 void AnalyzeCore::loadandInitPlugins()
 {
     m_pPluginManager->loadPluginsFromDirectory(qApp->applicationDirPath() + pluginsDir);
-    m_pPluginManager->initPlugins(m_analyzeData);
+    m_pPluginManager->initPlugins(m_pAnalyzeData);
 }
 
-void getLoadedPlugins();
+//=============================================================================================================
 
-bool pluginsInitialized();
+QVector<ANSHAREDLIB::AbstractPlugin*> AnalyzeCore::getLoadedPlugins()
+{
+    return m_pPluginManager->getPlugins();
+}
+
+//=============================================================================================================
+
+bool AnalyzeCore::pluginsInitialized() const
+{
+    return !m_pPluginManager.isNull();
+}
 
 //=============================================================================================================
 
 void AnalyzeCore::initMainWindow()
 {
-    m_pMainWindow = new MainWindow(*this);
+
+    m_pMainWindow = new MainWindow(this);
     QObject::connect(m_pMainWindow.data(), &MainWindow::mainWindowClosed,
                      this, &AnalyzeCore::shutdown);
 }
@@ -228,7 +245,13 @@ void AnalyzeCore::shutdown()
     m_pPluginManager->shutdown();
 }
 
-AnalyzeCore& AnalyzeCore::self()
+//=============================================================================================================
+
+QPointer<MainWindow> AnalyzeCore::getMainWindow()
 {
-    return *this;
+    return m_pMainWindow;
 }
+
+//=============================================================================================================
+
+

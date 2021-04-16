@@ -44,6 +44,7 @@
 
 #include <disp/viewers/abstractview.h>
 #include "analyzecore.h"
+
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
@@ -103,12 +104,17 @@ public:
     /**
      * Constructs a MainWindow which is a child of parent.
      *
+<<<<<<< HEAD
      * @param[in] pPluginManager Pointer to the plugin manager. It is needed to display subwindows froms plugins.
      * @param[in] parent Pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window.
+=======
+     * @param [in] pAnalyzeCore Pointer to the application controller class. It is needed to display subwindows froms plugins.
+     * @param [in] parent Pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window.
+>>>>>>> d7cfc0499 (rename log structure mainwindow stores analyze core not pluginmanager)
      *                    If parent is another widget, MainWindow becomes a child window inside parent.
      *                    MainWindow is deleted when its parent is deleted.
      */
-    MainWindow(AnalyzeCore& core, QWidget *parent = Q_NULLPTR);
+    MainWindow(AnalyzeCore* pAnalyzeCore, QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -235,12 +241,6 @@ private:
      */
     void about();
 
-    //=========================================================================================================
-    /**
-     * Check the correct configuration of the plugin manager.
-     */
-    void checkPluginManager();
-
     void initMenusAndPluginControls();
     void initWindow();
     void loadSavedSettingsAndState();
@@ -249,8 +249,7 @@ private:
     void reloadPlugins();
 
     QPointer<DISPLIB::MultiView>        m_pMultiView;               /**< The central View.*/
-//    QSharedPointer<ANSHAREDLIB::PluginManager> m_pPluginManager;    /**< Pointer to the application PluginManager Obj.*/
-    AnalyzeCore& m_CoreApp; /**< Pointer to the application controller Obj.*/
+    QPointer<AnalyzeCore>               m_pCoreApp;                 /**< Pointer to the application controller Obj.*/
     QPointer<QGridLayout>               m_pGridLayout;              /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow */
 
     // MainWindow actions
@@ -273,7 +272,6 @@ private:
 
     QString                             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
     QString                             m_sCurrentStyle;            /**< The currently selected style (dark mode, default mode). */
-    bool                                m_bPluginManagerConfiguredOK; /**< Store the state of configuration of the pluginManager. */
 };
 
 }// NAMESPACE
