@@ -53,6 +53,7 @@ using namespace ANSHAREDLIB;
 
 AbstractPlugin::AbstractPlugin()
 : m_bInitialized(false)
+, m_bMenuAlreadyLoaded(false)
 , m_bViewAlreadyLoaded(false)
 , m_bControlAlreadyLoaded(false)
 , m_iOrder(0)
@@ -135,4 +136,18 @@ bool AbstractPlugin::controlAlreadyLoaded() const
 bool AbstractPlugin::viewAlreadyLoaded() const
 {
     return m_bViewAlreadyLoaded;
+}
+
+//=============================================================================================================
+
+bool AbstractPlugin::menuAlreadyLoaded() const
+{
+    return m_bMenuAlreadyLoaded;
+}
+
+//=============================================================================================================
+
+void AbstractPlugin::setMenuLoadingState(bool b)
+{
+    m_bControlAlreadyLoaded = b;
 }

@@ -215,14 +215,21 @@ public:
 
     //=========================================================================================================
     /**
-     * Retrieve if the plugin view has already been loaded.
+     * Retrieve if the plugin Menu has already been loaded.
+     * @return state of the menu loading.
+     */
+    bool menuAlreadyLoaded() const;
+
+    //=========================================================================================================
+    /**
+     * Retrieve if the plugin View has already been loaded.
      * @return state of the view loading.
      */
     bool viewAlreadyLoaded() const;
 
     //=========================================================================================================
     /**
-     * Retrieve if the plugin control has already been loaded.
+     * Retrieve if the plugin Control has already been loaded.
      * @return state of the control loading.
      */
     bool controlAlreadyLoaded() const;
@@ -240,6 +247,13 @@ public:
      * @param b new loading state.
      */
     void setControlLoadingState(bool b);
+
+    //=========================================================================================================
+    /**
+     * Set the loading state of the menus for this plugin.
+     * @param b new loading state.
+     */
+    void setMenuLoadingState(bool b);
 
 signals:
     //=========================================================================================================
@@ -261,6 +275,7 @@ signals:
 protected:
     QSharedPointer<AnalyzeData>     m_pAnalyzeData;         /**< Pointer to the global data base */
     bool m_bInitialized;                                    /**< Store the initialization state of the plugin. */
+    bool m_bMenuAlreadyLoaded;                              /**< Store if the plugin view has already been docked into the GUI. */
     bool m_bViewAlreadyLoaded;                              /**< Store if the plugin view has already been docked into the GUI. */
     bool m_bControlAlreadyLoaded;                           /**< Store if the plugin control has already been docked into the GUI. */
     int m_iOrder;                                           /**< Hint to order the control in the list of controls. */
