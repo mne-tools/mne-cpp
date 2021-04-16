@@ -86,7 +86,6 @@ QSharedPointer<AbstractPlugin> Events::clone() const
 void Events::init()
 {
     m_pCommu = QSharedPointer<ANSHAREDLIB::Communicator>(new ANSHAREDLIB::Communicator(this));
-    m_bAlreadyLoaded = false;
 }
 
 //=============================================================================================================
