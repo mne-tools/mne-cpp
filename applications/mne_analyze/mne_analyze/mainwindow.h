@@ -281,15 +281,16 @@ private:
     void deleteMenus();
 
     QPointer<DISPLIB::MultiView>        m_pMultiView;               /**< The central View.*/
-    QPointer<AnalyzeCore>               m_pAnalyzeCoreController;    /**< Pointer to the application controller Obj.*/
+    QPointer<AnalyzeCore>               m_pAnalyzeCoreController;   /**< Pointer to the application controller Obj.*/
     QPointer<QGridLayout>               m_pGridLayout;              /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow */
 
     // MainWindow actions
-    QPointer<QAction>                   m_pActionExit;              /**< exit application action. */
-    QPointer<QAction>                   m_pActionAbout;             /**< show about dialog action. */
-    QPointer<QAction>                   m_pActionResearchMode;      /**< toggle research mode action. */
-    QPointer<QAction>                   m_pActionClinicalMode;      /**< toggle clinical mode action. */
-    QPointer<QAction>                   m_pActionDarkMode;          /**< toggle dark mode. */
+    QPointer<QAction>                   m_pActionExit;              /**< Exit application action. */
+    QPointer<QAction>                   m_pActionReloadPlugins;     /**< Reload plugins action. */
+    QPointer<QAction>                   m_pActionAbout;             /**< Show about dialog action. */
+    QPointer<QAction>                   m_pActionResearchMode;      /**< Toggle research mode action. */
+    QPointer<QAction>                   m_pActionClinicalMode;      /**< Toggle clinical mode action. */
+    QPointer<QAction>                   m_pActionDarkMode;          /**< Toggle dark mode. */
 
     // MainWindow menus
     QPointer<QMenu>                     m_pMenuFile;                /**< Holds the file menu.*/
