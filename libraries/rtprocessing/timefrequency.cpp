@@ -49,13 +49,6 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace RTPROCESSINGLIB;
-
-
 //TimeFrequency::TimeFrequency()
 //{
 
@@ -65,7 +58,7 @@ using namespace RTPROCESSINGLIB;
 // DEFINE GLOBAL RTPROCESSINGLIB METHODS
 //=============================================================================================================
 
-void computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet)
+void RTPROCESSINGLIB::computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet)
 {
     auto evokedList = evokedSet.evoked;
     qDebug() << "[RTPROCESSINGLIB::computeTimeFreqency]";
