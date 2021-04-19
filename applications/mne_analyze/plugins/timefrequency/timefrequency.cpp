@@ -51,6 +51,8 @@
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_evoked.h>
 
+#include <rtprocessing/timefrequency.h>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -116,7 +118,20 @@ QMenu *TimeFrequency::getMenu()
 
 QDockWidget *TimeFrequency::getControl()
 {
-    return Q_NULLPTR;
+    QDockWidget* pDock = new QDockWidget(getName());
+
+    QWidget* pWidget = new QWidget(pDock);
+    QVBoxLayout* pLayout = new QVBoxLayout(pDock);
+    QPushButton* pButton = new QPushButton("Press me.", pWidget);
+
+    pLayout->addWidget(pButton);
+    pWidget->setLayout(pLayout);
+    pDock->setWidget(pWidget);
+
+    connect(pButton, &QPushButton::pressed,
+            this, &TimeFrequency::computeTimeFreqency);
+
+    return pDock;
 }
 
 //=============================================================================================================
@@ -210,4 +225,13 @@ void TimeFrequency::setChannelSelection(const QVariant &data)
 //            emit showSelectedChannels(data.value<DISPLIB::SelectionItem*>()->m_iChannelNumber);
 //        }
     }
+}
+
+//=============================================================================================================
+
+void TimeFrequency::computeTimeFreqency()
+{
+    qDebug() << "[TimeFrequency::computeTimeFreqency]";
+
+    RTPROCESSINGLIB::computeTimeFrequency(*m_pAvgModel->getEvokedSet());
 }

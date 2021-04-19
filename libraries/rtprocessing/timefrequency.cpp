@@ -67,6 +67,7 @@ using namespace RTPROCESSINGLIB;
 
 void computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet)
 {
-
+    auto evokedList = evokedSet.evoked;
+    qDebug() << "[RTPROCESSINGLIB::computeTimeFreqency]";
 }
 

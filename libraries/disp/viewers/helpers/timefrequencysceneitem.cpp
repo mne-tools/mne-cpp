@@ -42,8 +42,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QQuickItem>
-#include <QQuickWidget>
 #include <QBoxLayout>
 #include <QLabel>
 

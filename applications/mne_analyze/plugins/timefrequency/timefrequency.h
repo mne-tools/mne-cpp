@@ -139,6 +139,9 @@ private:
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
     //=========================================================================================================
+    void computeTimeFreqency();
+
+    //=========================================================================================================
     /**
      * Sets channel selection for views based on QVariant with a SelectionItem object
      *
