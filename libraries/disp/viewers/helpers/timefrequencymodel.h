@@ -51,6 +51,7 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
 
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
@@ -64,11 +65,17 @@ class TimeFrequencyModel
 public:
     TimeFrequencyModel();
 
+    TimeFrequencyModel(std::vector<Eigen::MatrixXd>& spectr);
+
+    void setSpectr(std::vector<Eigen::MatrixXd>& spectr);
+
 
 private:
 //    QSharedPointer<DISPLIB::ChannelInfoModel>                   m_pChannelInfoModel;
 
-    QLinearGradient         m_Gradient;
+//    QLinearGradient         m_Gradient;
+
+    std::vector<Eigen::MatrixXd> vecSpectr;
 
 };
 }//namespace

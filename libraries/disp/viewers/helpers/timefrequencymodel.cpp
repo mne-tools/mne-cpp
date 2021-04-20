@@ -57,3 +57,19 @@ TimeFrequencyModel::TimeFrequencyModel()
 {
 
 }
+
+//=============================================================================================================
+
+TimeFrequencyModel::TimeFrequencyModel(std::vector<Eigen::MatrixXd>& spectr)
+: vecSpectr(std::move(spectr))
+{
+
+}
+
+//=============================================================================================================
+
+void TimeFrequencyModel::setSpectr(std::vector<Eigen::MatrixXd>& spectr)
+{
+    vecSpectr.clear();
+    vecSpectr = std::move(spectr);
+}

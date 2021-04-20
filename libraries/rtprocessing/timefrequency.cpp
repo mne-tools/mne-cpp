@@ -60,15 +60,21 @@
 // DEFINE GLOBAL RTPROCESSINGLIB METHODS
 //=============================================================================================================
 
-Eigen::MatrixXd RTPROCESSINGLIB::computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet)
+std::vector<Eigen::MatrixXd> RTPROCESSINGLIB::computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet)
 {
-    auto evokedList = evokedSet.evoked;
-
-    Eigen::VectorXd dataCol = evokedList.first().data.row(0).transpose();
-    Eigen::MatrixXd dataSpectrum = UTILSLIB::Spectrogram::makeSpectrogram(dataCol, evokedList.first().info.sfreq * 0.2);
-
-    return dataSpectrum;
-
     qDebug() << "[RTPROCESSINGLIB::computeTimeFreqency]";
+
+    auto& evoked = evokedSet.evoked.first();
+    float fSampFreq = evoked.info.sfreq;
+
+    std::vector<Eigen::MatrixXd> tfvector;
+
+    for (int i = 0; i < evoked.data.rows(); i++){
+        Eigen::VectorXd dataCol = evoked.data.row(0).transpose();
+        Eigen::MatrixXd Spectrum = UTILSLIB::Spectrogram::makeSpectrogram(dataCol, fSampFreq * 0.2);
+        tfvector.push_back(Spectrum);
+    }
+
+    return tfvector;
 }
 
