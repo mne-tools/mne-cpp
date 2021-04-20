@@ -47,6 +47,7 @@
 #include <disp/viewers/timefrequencylayoutview.h>
 #include <disp/viewers/helpers/selectionsceneitem.h>
 #include <disp/viewers/helpers/evokedsetmodel.h>
+#include <disp/plots/tfplot.h>
 
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_evoked.h>
@@ -233,5 +234,9 @@ void TimeFrequency::computeTimeFreqency()
 {
     qDebug() << "[TimeFrequency::computeTimeFreqency]";
 
-    RTPROCESSINGLIB::computeTimeFrequency(*m_pAvgModel->getEvokedSet());
+    Eigen::MatrixXd spectr = RTPROCESSINGLIB::computeTimeFrequency(*m_pAvgModel->getEvokedSet());
+
+    DISPLIB::TFplot* tfplot = new DISPLIB::TFplot(spectr, m_pAvgModel->getEvokedSet()->evoked.first().info.sfreq, 0, 100, DISPLIB::ColorMaps::Jet);
+
+    tfplot->show();
 }

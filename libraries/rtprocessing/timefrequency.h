@@ -76,7 +76,7 @@ namespace RTPROCESSINGLIB
 //    TimeFrequency();
 //};
 
-RTPROCESINGSHARED_EXPORT void computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet);
+RTPROCESINGSHARED_EXPORT Eigen::MatrixXd computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet);
 
 }//namespace
 #endif // TIMEFREQUENCY_RTPROCESSING_H

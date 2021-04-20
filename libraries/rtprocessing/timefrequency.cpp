@@ -41,6 +41,8 @@
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_evoked.h>
 
+#include <utils/spectrogram.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -58,9 +60,15 @@
 // DEFINE GLOBAL RTPROCESSINGLIB METHODS
 //=============================================================================================================
 
-void RTPROCESSINGLIB::computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet)
+Eigen::MatrixXd RTPROCESSINGLIB::computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet)
 {
     auto evokedList = evokedSet.evoked;
+
+    Eigen::VectorXd dataCol = evokedList.first().data.row(0).transpose();
+    Eigen::MatrixXd dataSpectrum = UTILSLIB::Spectrogram::makeSpectrogram(dataCol, evokedList.first().info.sfreq * 0.2);
+
+    return dataSpectrum;
+
     qDebug() << "[RTPROCESSINGLIB::computeTimeFreqency]";
 }
 

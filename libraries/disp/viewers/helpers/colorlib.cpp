@@ -20,19 +20,19 @@ using namespace DISPLIB;
 // DEFINE STATIC METHODS
 //=============================================================================================================
 
-ColorMap ColorMap::fromGradient(const ColorGradient &gradient,
-                                int resolution)
-{
-    ColorMap map;
-    map.m_iResolution = resolution;
+//ColorMap ColorMap::fromGradient(const ColorGradient &gradient,
+//                                int resolution)
+//{
+//    ColorMap map;
+//    map.m_iResolution = resolution;
 
-    for (int i = 0 ; i < resolution; i++){
-        float value = static_cast<float>(i) / static_cast<float>(resolution);
-        map.m_vColors.push_back(gradient.getColor(value));
-    }
+//    for (int i = 0 ; i < resolution; i++){
+//        float value = static_cast<float>(i) / static_cast<float>(resolution);
+//        map.m_vColors.push_back(gradient.getColor(value));
+//    }
 
-    return map;
-}
+//    return map;
+//}
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

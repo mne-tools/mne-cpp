@@ -83,21 +83,21 @@ struct ColorPoint
 /**
  * Holds a colormap
  */
-class ColorMap
-{
-public:
-    uint size() const {return m_vColors.size();}
+//class ColorMap
+//{
+//public:
+//    uint size() const {return m_vColors.size();}
 
-    int resolution() const {return m_iResolution;}
+//    int resolution() const {return m_iResolution;}
 
-    static ColorMap fromGradient(const ColorGradient& gradient,
-                                 int resolution = 256);
-private:
-    ColorMap();
+//    static ColorMap fromGradient(const ColorGradient& gradient,
+//                                 int resolution = 256);
+//private:
+//    ColorMap();
 
-    int m_iResolution;
-    std::vector<Color> m_vColors;
-};
+//    int m_iResolution;
+//    std::vector<Color> m_vColors;
+//};
 
 //=============================================================================================================
 /**
@@ -114,7 +114,7 @@ public:
 #ifdef QT_CORE_LIB
     QLinearGradient getQGradient(QPoint from, QPoint to) const;
 #endif
-    ColorMap getColorMap();
+//    ColorMap getColorMap();
 
 private:
 
