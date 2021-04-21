@@ -22,7 +22,8 @@ jobs:
       - name: Coverity scripts
         run: |
           COVERITY_SCAN_PROJECT_NAME="mne-tools/mne-cpp"
-          COVERITY_SCAN_NOTIFICATION_EMAIL="lorenzesch@hotmail.com,gbmotta@mgh.harvard.edu"
+          COVERITY_SCAN_NOTIFICATION_EMAIL1="lorenzesch@hotmail.com"
+          COVERITY_SCAN_NOTIFICATION_EMAIL2="gbmotta@mgh.harvard.edu"
           COVERITY_SCAN_BRANCH_PATTERN="master"
           COVERITY_SCAN_BUILD_COMMAND_PREPEND="qmake -r MNECPP_CONFIG+=noTests"
           COVERITY_SCAN_BUILD_COMMAND="make -j4"
@@ -53,7 +54,8 @@ jobs:
           response=$(curl \
             --silent --write-out "\n%{http_code}\n" \
             --form token=$COVERITY_SCAN_TOKEN \
-            --form email=$COVERITY_SCAN_NOTIFICATION_EMAIL \
+            --form email=$COVERITY_SCAN_NOTIFICATION_EMAIL1 \
+            --form email=$COVERITY_SCAN_NOTIFICATION_EMAIL2 \
             --form file=@$RESULTS_ARCHIVE \
             --form version=$SHA \
             --form description="Github Actions build" \
