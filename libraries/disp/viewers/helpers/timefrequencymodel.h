@@ -46,6 +46,7 @@
 //=============================================================================================================
 
 #include <QLinearGradient>
+#include <QAbstractTableModel>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -60,7 +61,7 @@
 namespace DISPLIB
 {
 
-class TimeFrequencyModel
+class TimeFrequencyModel : public QAbstractTableModel
 {
 public:
     TimeFrequencyModel();
@@ -69,14 +70,66 @@ public:
 
     void setSpectr(std::vector<Eigen::MatrixXd>& spectr);
 
+    //=========================================================================================================
+    /**
+     * Returns the number of rows under the given parent. When the parent is valid it means that rowCount is returning the number of children of parent.
+     *
+     * @param[in] parent     not used
+     *
+     * @return number of rows
+     */
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
+
+    //=========================================================================================================
+    /**
+     * Returns the number of columns for the children of the given parent.
+     *
+     * @param[in] parent     not used
+     *
+     * @return number of columns
+     */
+    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+
+    //=========================================================================================================
+    /**
+     * Returns the data stored under the given role for the item referred to by the index.
+     *
+     * @param[in] index      determines item location
+     * @param[in] role       role to return
+     *
+     * @return accessed data
+     */
+    virtual QVariant data(const QModelIndex &index,
+                          int role = Qt::DisplayRole) const;
+
+    //=========================================================================================================
+    /**
+     * Returns the data for the given role and section in the header with the specified orientation.
+     *
+     * @param[in] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
+     * @param[in] orientation    Qt::Horizontal or Qt::Vertical
+     * @param[in] role           role to show
+     *
+     * @return accessed eader data
+     */
+    virtual QVariant headerData(int section,
+                                Qt::Orientation orientation,
+                                int role = Qt::DisplayRole) const;
+
 
 private:
 //    QSharedPointer<DISPLIB::ChannelInfoModel>                   m_pChannelInfoModel;
 
 //    QLinearGradient         m_Gradient;
 
-    std::vector<Eigen::MatrixXd> vecSpectr;
+    std::vector<Eigen::MatrixXd> m_vSpectr;
 
 };
 }//namespace
+
+#ifndef metatype_matrixXd
+#define metatype_matrixXd
+Q_DECLARE_METATYPE(Eigen::MatrixXd);
+#endif
+
 #endif // TIMEFREQUENCYMODEL_H

@@ -61,7 +61,7 @@ TimeFrequencyModel::TimeFrequencyModel()
 //=============================================================================================================
 
 TimeFrequencyModel::TimeFrequencyModel(std::vector<Eigen::MatrixXd>& spectr)
-: vecSpectr(std::move(spectr))
+: m_vSpectr(std::move(spectr))
 {
 
 }
@@ -70,6 +70,76 @@ TimeFrequencyModel::TimeFrequencyModel(std::vector<Eigen::MatrixXd>& spectr)
 
 void TimeFrequencyModel::setSpectr(std::vector<Eigen::MatrixXd>& spectr)
 {
-    vecSpectr.clear();
-    vecSpectr = std::move(spectr);
+    m_vSpectr.clear();
+    m_vSpectr = std::move(spectr);
+}
+
+//=============================================================================================================
+
+int TimeFrequencyModel::rowCount(const QModelIndex & /*parent*/) const
+{
+    return m_vSpectr.size();
+}
+
+//=============================================================================================================
+
+int TimeFrequencyModel::columnCount(const QModelIndex & /*parent*/) const
+{
+    return 3;
+}
+
+//=============================================================================================================
+
+QVariant TimeFrequencyModel::data(const QModelIndex &index,
+                                  int role) const
+{
+    if(role != Qt::DisplayRole && role != Qt::BackgroundRole) {
+        return QVariant();
+    }
+
+    if(!index.isValid()) {
+        return QVariant();
+    }
+
+    int row = index.row();
+
+    if(index.column() == 0 && role == Qt::DisplayRole) {
+        //            return QVariant(m_pEvokedSet->info.ch_names);
+
+    }
+
+    if(index.column() == 1) { //timefrequencyview
+        switch(role){
+        case Qt::BackgroundRole:{
+            return QVariant();
+        }
+        case Qt::DisplayRole:{
+            QVariant variant;
+            variant.setValue(m_vSpectr[0]);
+            return variant;
+        }
+        }
+    }
+    if(index.column() == 2) { //timefrequencyview
+        switch(role){
+        case Qt::BackgroundRole:{
+            return QVariant();
+        }
+        case Qt::DisplayRole:{
+            QVariant variant;
+            variant.setValue(m_vSpectr[row]);
+            return variant;
+        }
+        }
+    }
+
+}
+
+//=============================================================================================================
+
+QVariant TimeFrequencyModel::headerData(int section,
+                                        Qt::Orientation orientation,
+                                        int role) const
+{
+    return QVariant();
 }
