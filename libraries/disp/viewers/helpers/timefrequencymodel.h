@@ -41,6 +41,8 @@
 
 #include "../../disp_global.h"
 
+#include <fiff/fiff_info.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -61,14 +63,19 @@
 namespace DISPLIB
 {
 
-class TimeFrequencyModel : public QAbstractTableModel
+class DISPSHARED_EXPORT TimeFrequencyModel : public QAbstractTableModel
 {
+    Q_OBJECT
 public:
     TimeFrequencyModel();
 
     TimeFrequencyModel(std::vector<Eigen::MatrixXd>& spectr);
 
     void setSpectr(std::vector<Eigen::MatrixXd>& spectr);
+
+    void setFiffInfo(const FIFFLIB::FiffInfo& info);
+
+    float getSamplingFrequency();
 
     //=========================================================================================================
     /**
@@ -104,6 +111,20 @@ public:
 
     //=========================================================================================================
     /**
+     * Data for the row and column and given display role
+     *
+     * @param [in] row       index row
+     * @param [in] column    index column
+     * @param [in] role      display role to access
+     *
+     * @return the accessed data
+     */
+    QVariant data(int row,
+                  int column,
+                  int role = Qt::DisplayRole) const;
+
+    //=========================================================================================================
+    /**
      * Returns the data for the given role and section in the header with the specified orientation.
      *
      * @param[in] section        For horizontal headers, the section number corresponds to the column number. Similarly, for vertical headers, the section number corresponds to the row number.
@@ -123,6 +144,8 @@ private:
 //    QLinearGradient         m_Gradient;
 
     std::vector<Eigen::MatrixXd> m_vSpectr;
+
+    FIFFLIB::FiffInfo                    m_Info;
 
 };
 }//namespace

@@ -45,6 +45,7 @@
 #include <disp/viewers/progressview.h>
 #include <disp/viewers/timefrequencyview.h>
 #include <disp/viewers/timefrequencylayoutview.h>
+#include <disp/viewers/helpers/timefrequencymodel.h>
 #include <disp/viewers/helpers/selectionsceneitem.h>
 #include <disp/viewers/helpers/evokedsetmodel.h>
 #include <disp/plots/tfplot.h>
@@ -92,6 +93,8 @@ QSharedPointer<AbstractPlugin> TimeFrequency::clone() const
 void TimeFrequency::init()
 {
     m_pCommu = new Communicator(this);
+
+    m_pTFModel = QSharedPointer<DISPLIB::TimeFrequencyModel>(new DISPLIB::TimeFrequencyModel());
 }
 
 //=============================================================================================================
@@ -236,7 +239,12 @@ void TimeFrequency::computeTimeFreqency()
 
     auto spectr = RTPROCESSINGLIB::computeTimeFrequency(*m_pAvgModel->getEvokedSet());
 
-    DISPLIB::TFplot* tfplot = new DISPLIB::TFplot(spectr.front(), m_pAvgModel->getEvokedSet()->evoked.first().info.sfreq, 0, 100, DISPLIB::ColorMaps::Jet);
+//    DISPLIB::TFplot* tfplot = new DISPLIB::TFplot(spectr.front(), m_pAvgModel->getEvokedSet()->evoked.first().info.sfreq, 0, 100, DISPLIB::ColorMaps::Jet);
 
-    tfplot->show();
+//    tfplot->show();
+
+    m_pTFModel->setSpectr(spectr);
+    m_pTFModel->setFiffInfo(m_pAvgModel->getEvokedSet()->evoked.first().info);
+
+    m_pTimeFreqView->setTimeFrequencyModel(m_pTFModel);
 }

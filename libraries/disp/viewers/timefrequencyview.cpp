@@ -39,6 +39,10 @@
 #include "timefrequencyview.h"
 
 #include "helpers/evokedsetmodel.h"
+#include "helpers/timefrequencymodel.h"
+#include "helpers/timefrequencymodel.h"
+
+#include <disp/plots/tfplot.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -252,4 +256,17 @@ void TimeFrequencyView::paintAxes(QPainter& painter,
                                   const QRect chartBound)
 {
 
+}
+
+//=============================================================================================================
+
+void TimeFrequencyView::setTimeFrequencyModel(QSharedPointer<DISPLIB::TimeFrequencyModel> pModel)
+{
+    qDebug() << "[TimeFrequencyView::setTimeFrequencyModel]";
+
+    m_pTFModel = pModel;
+
+    DISPLIB::TFplot* tfplot = new DISPLIB::TFplot(m_pTFModel->data(1,1).value<Eigen::MatrixXd>(), m_pTFModel->getSamplingFrequency(), 0, 100, DISPLIB::ColorMaps::Jet);
+
+    tfplot->show();
 }

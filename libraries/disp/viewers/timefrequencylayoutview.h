@@ -67,6 +67,7 @@ namespace DISPLIB
 
 class EvokedSetModel;
 class TimeFrequencyScene;
+class TimeFrequencyModel;
 
 //=============================================================================================================
 class DISPSHARED_EXPORT TimeFrequencyLayoutView : public AbstractView
@@ -127,11 +128,14 @@ public:
      */
     void updateData();
 
+    void setTimeFrequencyModel(QSharedPointer<DISPLIB::TimeFrequencyModel> pModel);
+
 protected:
     QPointer<TimeFrequencyScene>                m_pTimeFreqScene;
     QPointer<QGraphicsView>                     m_pTimeFreqGraphicsView;
 
     QSharedPointer<EvokedSetModel>              m_pEvokedSetModel;              /**< The evoked model */
+    QSharedPointer<TimeFrequencyModel>          m_pTFModel;
 
 };
 }//namespace

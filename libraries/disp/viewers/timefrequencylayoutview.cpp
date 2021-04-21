@@ -37,9 +37,11 @@
 //=============================================================================================================
 
 #include "timefrequencylayoutview.h"
+
 #include "helpers/timefrequencyscene.h"
 #include "helpers/timefrequencysceneitem.h"
 #include "helpers/selectionsceneitem.h"
+#include "helpers/timefrequencymodel.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -163,4 +165,11 @@ void TimeFrequencyLayoutView::channelSelectionChanged(const QVariant &data)
 void TimeFrequencyLayoutView::updateData()
 {
 
+}
+
+//=============================================================================================================
+
+void TimeFrequencyLayoutView::setTimeFrequencyModel(QSharedPointer<DISPLIB::TimeFrequencyModel> pModel)
+{
+    m_pTFModel = pModel;
 }

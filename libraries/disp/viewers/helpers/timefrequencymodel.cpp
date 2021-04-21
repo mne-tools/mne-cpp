@@ -97,11 +97,11 @@ QVariant TimeFrequencyModel::data(const QModelIndex &index,
         return QVariant();
     }
 
-    if(!index.isValid()) {
+    int row = index.row();
+
+    if(!index.isValid() && row >= m_vSpectr.size()) {
         return QVariant();
     }
-
-    int row = index.row();
 
     if(index.column() == 0 && role == Qt::DisplayRole) {
         //            return QVariant(m_pEvokedSet->info.ch_names);
@@ -137,9 +137,30 @@ QVariant TimeFrequencyModel::data(const QModelIndex &index,
 
 //=============================================================================================================
 
+QVariant TimeFrequencyModel::data(int row, int column, int role) const
+{
+    return data(index(row, column), role);
+}
+
+//=============================================================================================================
+
 QVariant TimeFrequencyModel::headerData(int section,
                                         Qt::Orientation orientation,
                                         int role) const
 {
     return QVariant();
+}
+
+//=============================================================================================================
+
+void TimeFrequencyModel::setFiffInfo(const FIFFLIB::FiffInfo &info)
+{
+    m_Info = info;
+}
+
+//=============================================================================================================
+
+float TimeFrequencyModel::getSamplingFrequency()
+{
+    return m_Info.sfreq;
 }

@@ -64,6 +64,7 @@ namespace DISPLIB
 //=============================================================================================================
 
 class EvokedSetModel;
+class TimeFrequencyModel;
 
 //=============================================================================================================
 /**
@@ -131,6 +132,8 @@ public:
      */
     void setChartBorderSpacing(int iSpacing);
 
+    void setTimeFrequencyModel(QSharedPointer<DISPLIB::TimeFrequencyModel> pModel);
+
 protected:
     void initQMLView();
 
@@ -144,6 +147,7 @@ protected:
 
     QSharedPointer<EvokedSetModel>              m_pEvokedSetModel;              /**< The evoked model */
     int                                         m_iChartBorderSpacing;
+    QSharedPointer<TimeFrequencyModel>          m_pTFModel;
 
 };
 
