@@ -266,7 +266,7 @@ void TimeFrequencyView::setTimeFrequencyModel(QSharedPointer<DISPLIB::TimeFreque
 
     m_pTFModel = pModel;
 
-    DISPLIB::TFplot* tfplot = new DISPLIB::TFplot(m_pTFModel->data(1,1).value<Eigen::MatrixXd>(), m_pTFModel->getSamplingFrequency(), 0, 100, DISPLIB::ColorMaps::Jet);
+//    DISPLIB::TFplot* tfplot = new DISPLIB::TFplot(m_pTFModel->data(1,1).value<Eigen::MatrixXd>(), m_pTFModel->getSamplingFrequency(), 0, 100, DISPLIB::ColorMaps::Jet);
 
-    tfplot->show();
+//    tfplot->show();
 }

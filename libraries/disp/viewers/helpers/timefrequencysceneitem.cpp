@@ -42,8 +42,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QBoxLayout>
 #include <QLabel>
+#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -64,8 +64,26 @@ TimeFrequencySceneItem::TimeFrequencySceneItem(const QString& channelName,
                                                const QPointF& channelPosition,
                                                int channelKind,
                                                int channelUnit)
+: m_sChannelName(channelName)
+, m_iChannelNumber(channelNumber)
+, m_iChannelKind(channelKind)
+, m_iChannelUnit(channelUnit)
+, m_iTotalNumberChannels(0)
+, m_iFontTextSize(15)
+, m_iMaxWidth(1500)
+, m_iMaxHeigth(150)
+, m_bIsBad(false)
+, m_qpChannelPosition(channelPosition)
+, m_pPlot(Q_NULLPTR)
 {
-    initQMLView();
+    //initQMLView();
+
+//    m_rectBoundingRect = QRectF(-m_iMaxWidth/2, -m_iMaxHeigth/2, m_iMaxWidth, m_iMaxHeigth);
+//    QLabel* widget = new QLabel("Test");
+
+    m_pLayout = new QVBoxLayout();
+//    m_pLayout->addWidget(widget);
+    this->setLayout(m_pLayout);
 }
 
 //=============================================================================================================
@@ -77,11 +95,46 @@ void TimeFrequencySceneItem::initQMLView()
 //    widget->setSource(source);
 //    widget->setResizeMode(QQuickWidget::SizeRootObjectToView);
 
-    QLabel* widget = new QLabel("Test");
+//    QLabel* widget = new QLabel("Test");
 
-    QVBoxLayout* layout = new QVBoxLayout();
-    layout->addWidget(widget);
+//    QVBoxLayout* layout = new QVBoxLayout();
+//    layout->addWidget(widget);
 
 
-    this->setLayout(layout);
+//    this->setLayout(layout);
+}
+
+//=============================================================================================================
+
+int TimeFrequencySceneItem::getChannelNumber() const
+{
+    return m_iChannelNumber;
+}
+
+//=============================================================================================================
+
+void TimeFrequencySceneItem::setData(const Eigen::MatrixXd &data)
+{
+    m_data = data;
+
+    if(!m_pLayout->isEmpty()){
+        m_pLayout->removeWidget(m_pPlot);
+        m_pPlot->deleteLater();
+    }
+
+    m_pPlot = new TFplot(m_data, m_fSampleRate, 0, 100, DISPLIB::ColorMaps::Jet);
+    m_pPlot->show();
+
+//    m_pLayout->addWidget(m_pPlot);
+
+//    m_pLayout->addWidget(m_pPlot);
+//    this->setLayout(m_pLayout);
+}
+
+//=============================================================================================================
+
+void TimeFrequencySceneItem::setSampleRate(float fFreq)
+{
+    m_fSampleRate = fFreq;
+    qDebug() << "freq:" << fFreq;
 }

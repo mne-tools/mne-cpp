@@ -64,6 +64,7 @@ namespace DISPLIB
 
 class SelectionSceneItem;
 class SelectionItem;
+class TimeFrequencySceneItem;
 
 class DISPSHARED_EXPORT TimeFrequencyScene : public LayoutScene
 {
@@ -95,6 +96,10 @@ public:
      */
     void updateScene();
 
+    std::vector<TimeFrequencySceneItem*> getItems() const;
+
+private:
+    std::vector<TimeFrequencySceneItem*>    m_vItems;
 };
 }//namespace
 #endif // TIMEFREQUENCYSCENE_H

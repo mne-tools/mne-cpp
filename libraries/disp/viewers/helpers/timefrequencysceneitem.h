@@ -41,16 +41,22 @@
 
 #include "../../disp_global.h"
 
+#include <disp/plots/tfplot.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QWidget>
 #include <QGraphicsWidget>
+#include <QBoxLayout>
+#include <QPointer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
+
+#include <Eigen/Core>
 
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
@@ -70,6 +76,13 @@ public:
                            int channelKind,
                            int channelUnit);
 
+    void setData(const Eigen::MatrixXd& data);
+
+    void setSampleRate(float fFreq);
+
+    int getChannelNumber() const;
+
+
 protected:
     void initQMLView();
 
@@ -87,6 +100,14 @@ private:
     bool                        m_bIsBad;                   /**< Whether this channel is bad. */
 
     QPointF                     m_qpChannelPosition;        /**< The channels 2D position in the scene.*/
+
+    Eigen::MatrixXd             m_data;
+    float                       m_fSampleRate;
+//    QRectF                      m_rectBoundingRect;         /**< The bounding rect. */
+
+    QPointer<QVBoxLayout>       m_pLayout;
+
+    QPointer<TFplot>            m_pPlot;
 
 };
 }//namespace

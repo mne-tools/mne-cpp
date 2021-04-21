@@ -85,6 +85,7 @@ void TimeFrequencyScene::repaintItems(const QList<QGraphicsItem *> &selectedChan
 void TimeFrequencyScene::repaintSelectionItems(const DISPLIB::SelectionItem &selectedChannelItems)
 {
     this->clear();
+    m_vItems.clear();
 
     for (int i = 0; i < selectedChannelItems.m_iChannelKind.size(); i++){
         TimeFrequencySceneItem* averageSceneItemTemp = new TimeFrequencySceneItem(selectedChannelItems.m_sChannelName[i],
@@ -95,7 +96,10 @@ void TimeFrequencyScene::repaintSelectionItems(const DISPLIB::SelectionItem &sel
 
         QGraphicsProxyWidget* pWidget = this->addWidget(averageSceneItemTemp);
 
-        pWidget->setPos(selectedChannelItems.m_qpChannelPosition[i]);
+        m_vItems.push_back(averageSceneItemTemp);
+
+        pWidget->setPos(75*selectedChannelItems.m_qpChannelPosition[i].x(), -75*selectedChannelItems.m_qpChannelPosition[i].y());
+//        pWidget->resize(200,150);
     }
 }
 
@@ -105,4 +109,12 @@ void TimeFrequencyScene::updateScene()
 {
     this->update();
 }
+
+//=============================================================================================================
+
+std::vector<TimeFrequencySceneItem*> TimeFrequencyScene::getItems() const
+{
+    return m_vItems;
+}
+
 

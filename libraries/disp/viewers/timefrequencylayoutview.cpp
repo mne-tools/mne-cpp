@@ -159,17 +159,35 @@ void TimeFrequencyLayoutView::channelSelectionChanged(const QVariant &data)
 
     //Repaint the average items in the average scene based on the input parameter selectedChannelItems and update them with current data
     m_pTimeFreqScene->repaintSelectionItems(*pSelectionItem);
+//    updateData();
 }
 //=============================================================================================================
 
 void TimeFrequencyLayoutView::updateData()
 {
+    if(m_pTFModel){
+        auto sceneItems = m_pTimeFreqScene->getItems();
 
+        for (auto item : sceneItems){
+            item->setSampleRate(m_pTFModel->getSamplingFrequency());
+//            item->setData(m_pTFModel->data(item->getChannelNumber(), 2).value<Eigen::MatrixXd>());
+//            qDebug() << "ch num:" << item->getChannelNumber();
+        }
+        qDebug() << "vec size:" << sceneItems.size();
+        sceneItems.front()->setData(m_pTFModel->data(sceneItems.front()->getChannelNumber(), 2).value<Eigen::MatrixXd>());
+
+//        DISPLIB::TFplot* tfplot = new DISPLIB::TFplot(m_pTFModel->data(1,2).value<Eigen::MatrixXd>(), m_pTFModel->getSamplingFrequency(), 0, 100, DISPLIB::ColorMaps::Jet);
+//        tfplot->show();
+    }
 }
 
 //=============================================================================================================
 
 void TimeFrequencyLayoutView::setTimeFrequencyModel(QSharedPointer<DISPLIB::TimeFrequencyModel> pModel)
 {
-    m_pTFModel = pModel;
+    if(pModel){
+        m_pTFModel = pModel;
+        connect(m_pTFModel.data(), &TimeFrequencyModel::dataChanged,
+                this, &TimeFrequencyLayoutView::updateData, Qt::UniqueConnection);
+    }
 }

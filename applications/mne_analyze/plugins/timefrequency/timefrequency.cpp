@@ -149,6 +149,9 @@ QWidget *TimeFrequency::getView()
     m_pTimeFreqView = new DISPLIB::TimeFrequencyView();
     m_pTimeFreqLayoutView = new DISPLIB::TimeFrequencyLayoutView();
 
+    m_pTimeFreqView->setTimeFrequencyModel(m_pTFModel);
+    m_pTimeFreqLayoutView->setTimeFrequencyModel(m_pTFModel);
+
     pTabView->addTab(m_pTimeFreqView, "Average View");
     pTabView->addTab(m_pTimeFreqLayoutView, "Layout View");
 
@@ -243,8 +246,6 @@ void TimeFrequency::computeTimeFreqency()
 
 //    tfplot->show();
 
-    m_pTFModel->setSpectr(spectr);
     m_pTFModel->setFiffInfo(m_pAvgModel->getEvokedSet()->evoked.first().info);
-
-    m_pTimeFreqView->setTimeFrequencyModel(m_pTFModel);
+    m_pTFModel->setSpectr(spectr);
 }

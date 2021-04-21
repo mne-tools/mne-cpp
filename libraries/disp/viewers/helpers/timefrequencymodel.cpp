@@ -72,6 +72,8 @@ void TimeFrequencyModel::setSpectr(std::vector<Eigen::MatrixXd>& spectr)
 {
     m_vSpectr.clear();
     m_vSpectr = std::move(spectr);
+
+    emit dataChanged(index(0,0), index(rowCount() - 1, columnCount() - 1));
 }
 
 //=============================================================================================================
