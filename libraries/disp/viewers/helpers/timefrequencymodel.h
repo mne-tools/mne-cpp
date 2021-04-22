@@ -137,6 +137,12 @@ public:
                                 Qt::Orientation orientation,
                                 int role = Qt::DisplayRole) const;
 
+    void setMinFreq(int iFreq);
+
+    void setMaxFreq(int iFreq);
+
+    std::pair<int,int> getFreqRange() const;
+
 
 private:
 //    QSharedPointer<DISPLIB::ChannelInfoModel>                   m_pChannelInfoModel;
@@ -146,6 +152,9 @@ private:
     std::vector<Eigen::MatrixXd> m_vSpectr;
 
     FIFFLIB::FiffInfo                    m_Info;
+
+    int m_iMinFreq;
+    int m_iMaxFreq;
 
 };
 }//namespace

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     timefrequencysceneitem.cpp
+ * @file     timefrequencysettingsview.cpp
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.9
  * @date     April, 2021
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the TimeFrequencySceneItem Class.
+ * @brief    Definition of the TimeFrequencySettingsWidget Class.
  *
  */
 
@@ -36,18 +36,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "timefrequencysceneitem.h"
-#include <iostream>
+#include "timefrequencysettingsview.h"
+
+#include "ui_timefrequencysettingsview.h"
 
 //=============================================================================================================
 // QT INCLUDES
-//=============================================================================================================
-
-#include <QLabel>
-#include <QDebug>
-
-//=============================================================================================================
-// EIGEN INCLUDES
 //=============================================================================================================
 
 //=============================================================================================================
@@ -60,117 +54,90 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TimeFrequencySceneItem::TimeFrequencySceneItem(const QString& channelName,
-                                               int channelNumber,
-                                               const QPointF& channelPosition,
-                                               int channelKind,
-                                               int channelUnit)
-: m_sChannelName(channelName)
-, m_iChannelNumber(channelNumber)
-, m_iChannelKind(channelKind)
-, m_iChannelUnit(channelUnit)
-, m_iTotalNumberChannels(0)
-, m_iFontTextSize(15)
-, m_iMaxWidth(1500)
-, m_iMaxHeigth(150)
-, m_bIsBad(false)
-, m_qpChannelPosition(channelPosition)
-, m_pPlot(Q_NULLPTR)
+TimeFrequencySettingsView::TimeFrequencySettingsView(const QString& sSettingsPath,
+                                                     QWidget *parent)
+: AbstractView(parent)
+, m_pUi(new Ui::TimeFrequencySettingsWidget)
 {
-    //initQMLView();
 
-//    m_rectBoundingRect = QRectF(-m_iMaxWidth/2, -m_iMaxHeigth/2, m_iMaxWidth, m_iMaxHeigth);
-//    QLabel* widget = new QLabel("Test");
+    m_sSettingsPath = sSettingsPath;
+    m_pUi->setupUi(this);
 
-//    m_pLayout = new QVBoxLayout();
-////    m_pLayout->addWidget(widget);
-//    this->setLayout(m_pLayout);
+    this->setWindowTitle("Time-Frequency Settings");
+    this->setMinimumWidth(330);
 
-    m_rectBoundingRect = QRectF(-m_iMaxWidth/2, -m_iMaxHeigth/2, m_iMaxWidth, m_iMaxHeigth);
-
-    this->setPos(75*m_qpChannelPosition.x(), -75*m_qpChannelPosition.y());
+    initGUI();
 }
 
 //=============================================================================================================
 
-void TimeFrequencySceneItem::initQMLView()
+void TimeFrequencySettingsView::updateGuiMode(GuiMode mode)
 {
-//    QUrl source = QUrl::fromLocalFile("../libraries/disp/viewers/qml/tfview.qml");
-//    QQuickWidget* widget = new QQuickWidget();
-//    widget->setSource(source);
-//    widget->setResizeMode(QQuickWidget::SizeRootObjectToView);
-
-//    QLabel* widget = new QLabel("Test");
-
-//    QVBoxLayout* layout = new QVBoxLayout();
-//    layout->addWidget(widget);
-
-
-//    this->setLayout(layout);
+    switch(mode) {
+        case GuiMode::Clinical:
+            break;
+        default: // default is research mode
+            break;
+    }
 }
 
 //=============================================================================================================
 
-int TimeFrequencySceneItem::getChannelNumber() const
+void TimeFrequencySettingsView::updateProcessingMode(ProcessingMode mode)
 {
-    return m_iChannelNumber;
+    switch(mode) {
+        case ProcessingMode::Offline:
+
+            break;
+        default: // default is realtime mode
+
+            break;
+    }
 }
 
 //=============================================================================================================
 
-void TimeFrequencySceneItem::setData(const Eigen::MatrixXd &data)
+void TimeFrequencySettingsView::saveSettings()
 {
-    m_data = data;
-
-//    if(!m_pLayout->isEmpty()){
-//        m_pLayout->removeWidget(m_pPlot);
-//        m_pPlot->deleteLater();
-//    }
-
-    //std::cout << data;
-
-//    m_pPlot = new TFplot(m_data, m_fSampleRate, 0, 100, DISPLIB::ColorMaps::Jet);
-//    m_pPlot->show();
-
-    paintPlot();
-
-//    m_pLayout->addWidget(m_pPlot);
-
-//    m_pLayout->addWidget(m_pPlot);
-//    this->setLayout(m_pLayout);
-
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
 
 }
 
 //=============================================================================================================
 
-void TimeFrequencySceneItem::setSampleRate(float fFreq)
+void TimeFrequencySettingsView::loadSettings()
 {
-    m_fSampleRate = fFreq;
-    qDebug() << "freq:" << fFreq;
+    if(m_sSettingsPath.isEmpty()) {
+        return;
+    }
 }
 
 //=============================================================================================================
 
-QRectF TimeFrequencySceneItem::boundingRect() const
+void TimeFrequencySettingsView::clearView()
 {
-    return m_rectBoundingRect;
-}
 
-void TimeFrequencySceneItem::paint(QPainter *painter,
-                                   const QStyleOptionGraphicsItem *option,
-                                   QWidget *widget)
-{
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-    Q_UNUSED(painter);
 }
 
 //=============================================================================================================
 
-void TimeFrequencySceneItem::paintPlot()
+void TimeFrequencySettingsView::initGUI()
 {
-    QGraphicsSimpleTextItem* item = new QGraphicsSimpleTextItem("TEST", this);
-    item->setPos(0,0);
-    item->show();
+    //Freq
+    connect(m_pUi->spinBox_minFreq, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &TimeFrequencySettingsView::minFreqChanged, Qt::UniqueConnection);
+    connect(m_pUi->spinBox_maxFreq, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &TimeFrequencySettingsView::maxFreqChanged, Qt::UniqueConnection);
+
+    //Color map
+
+    connect(m_pUi->comboBox_colorMap, &QComboBox::currentTextChanged,
+            this, &TimeFrequencySettingsView::colorMapChanged, Qt::UniqueConnection);
+
+    //Compute
+
+    connect(m_pUi->pushButton_ciompute, &QPushButton::released,
+            this, &TimeFrequencySettingsView::computePushed, Qt::UniqueConnection);
 }

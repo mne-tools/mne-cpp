@@ -45,6 +45,7 @@
 #include <disp/viewers/progressview.h>
 #include <disp/viewers/timefrequencyview.h>
 #include <disp/viewers/timefrequencylayoutview.h>
+#include <disp/viewers/timefrequencysettingsview.h>
 #include <disp/viewers/helpers/timefrequencymodel.h>
 #include <disp/viewers/helpers/selectionsceneitem.h>
 #include <disp/viewers/helpers/evokedsetmodel.h>
@@ -125,16 +126,30 @@ QDockWidget *TimeFrequency::getControl()
 {
     QDockWidget* pDock = new QDockWidget(getName());
 
-    QWidget* pWidget = new QWidget(pDock);
-    QVBoxLayout* pLayout = new QVBoxLayout(pDock);
-    QPushButton* pButton = new QPushButton("Press me.", pWidget);
+//    QWidget* pWidget = new QWidget(pDock);
+//    QVBoxLayout* pLayout = new QVBoxLayout(pDock);
+//    QPushButton* pButton = new QPushButton("Press me.", pWidget);
 
-    pLayout->addWidget(pButton);
-    pWidget->setLayout(pLayout);
-    pDock->setWidget(pWidget);
+//    pLayout->addWidget(pButton);
+//    pWidget->setLayout(pLayout);
+//    pDock->setWidget(pWidget);
 
-    connect(pButton, &QPushButton::pressed,
-            this, &TimeFrequency::computeTimeFreqency);
+//    connect(pButton, &QPushButton::pressed,
+//            this, &TimeFrequency::computeTimeFreqency);
+
+    DISPLIB::TimeFrequencySettingsView* pSettings = new DISPLIB::TimeFrequencySettingsView();
+
+    connect(pSettings, &DISPLIB::TimeFrequencySettingsView::computePushed,
+            this, &TimeFrequency::computeTimeFreqency, Qt::UniqueConnection);
+
+    connect(pSettings, &DISPLIB::TimeFrequencySettingsView::minFreqChanged,
+            m_pTFModel.data(), &DISPLIB::TimeFrequencyModel::setMinFreq, Qt::UniqueConnection);
+
+    connect(pSettings, &DISPLIB::TimeFrequencySettingsView::maxFreqChanged,
+            m_pTFModel.data(), &DISPLIB::TimeFrequencyModel::setMaxFreq, Qt::UniqueConnection);
+
+    pDock->setWidget(pSettings);
+
 
     return pDock;
 }

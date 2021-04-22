@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     timefrequencyscene.cpp
+ * @file     timefrequencysettingsview.h
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.9
  * @date     April, 2021
@@ -28,93 +28,97 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the TimeFrequencyScene Class.
+ * @brief    Declaration of the TimeFrequencySettingsWidget Class.
  *
  */
+
+#ifndef TIMEFREQUENCYSETTINGSVIEW_H
+#define TIMEFREQUENCYSETTINGSVIEW_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "timefrequencyscene.h"
-
-#include "timefrequencysceneitem.h"
-#include "selectionsceneitem.h"
+#include "../disp_global.h"
+#include "abstractview.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsProxyWidget>
 
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace DISPLIB;
-
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-TimeFrequencyScene::TimeFrequencyScene(QGraphicsView* view,
-                                       QObject* parent)
-: LayoutScene(view, parent)
-{
-
+namespace Ui {
+    class TimeFrequencySettingsWidget;
 }
 
 //=============================================================================================================
-
-void TimeFrequencyScene::repaintItems(const QList<QGraphicsItem *> &selectedChannelItems)
-{
-//    this->clear();
-
-//    QListIterator<QGraphicsItem*> i(selectedChannelItems);
-
-//    while (i.hasNext()) {
-//        SelectionSceneItem* selectionSceneItemTemp = static_cast<SelectionSceneItem*>(i.next());
-//        TimeFrequencySceneItem* averageSceneItemTemp = new TimeFrequencySceneItem();
-
-//        this->addItem(averageSceneItemTemp);
-//    }
-}
-
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
-void TimeFrequencyScene::repaintSelectionItems(const DISPLIB::SelectionItem &selectedChannelItems)
+namespace DISPLIB
 {
-    this->clear();
-    m_vItems.clear();
 
-    for (int i = 0; i < selectedChannelItems.m_iChannelKind.size(); i++){
-        TimeFrequencySceneItem* averageSceneItemTemp = new TimeFrequencySceneItem(selectedChannelItems.m_sChannelName[i],
-                                                                                  selectedChannelItems.m_iChannelNumber[i],
-                                                                                  selectedChannelItems.m_qpChannelPosition[i],
-                                                                                  selectedChannelItems.m_iChannelKind[i],
-                                                                                  selectedChannelItems.m_iChannelUnit[i]);
-
-        /*QGraphicsProxyWidget* pWidget = */this->addItem(averageSceneItemTemp);
-
-        m_vItems.push_back(averageSceneItemTemp);
-
-//        pWidget->setPos(75*selectedChannelItems.m_qpChannelPosition[i].x(), -75*selectedChannelItems.m_qpChannelPosition[i].y());
-//        pWidget->resize(200,150);
-    }
-}
-
-//=============================================================================================================
-
-void TimeFrequencyScene::updateScene()
+class DISPSHARED_EXPORT TimeFrequencySettingsView : public AbstractView
 {
-    this->update();
-}
+    Q_OBJECT
+public:
+    TimeFrequencySettingsView(const QString& sSettingsPath = "",
+                              QWidget *parent = Q_NULLPTR);
 
-//=============================================================================================================
+    //=========================================================================================================
+    /**
+     * Saves all important settings of this view via QSettings.
+     */
+    void saveSettings();
 
-std::vector<TimeFrequencySceneItem*> TimeFrequencyScene::getItems() const
-{
-    return m_vItems;
-}
+    //=========================================================================================================
+    /**
+     * Loads and inits all important settings of this view via QSettings.
+     */
+    void loadSettings();
+
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set GuiMode (Clinical=0, Research=1).
+     *
+     * @param mode     The new mode (Clinical=0, Research=1).
+     */
+    void updateGuiMode(GuiMode mode);
+
+    //=========================================================================================================
+    /**
+     * Update the views GUI based on the set ProcessingMode (RealTime=0, Offline=1).
+     *
+     * @param mode     The new mode (RealTime=0, Offline=1).
+     */
+    void updateProcessingMode(ProcessingMode mode);
+
+    //=========================================================================================================
+    /**
+     * Clears the view
+     */
+    void clearView();
+
+signals:
+    void minFreqChanged(int iMinFreq);
+
+    void maxFreqChanged(int iMaxFreq);
+
+    void computePushed();
+
+    void colorMapChanged(const QString &colormap);
+
+protected:
+
+    void initGUI();
+
+    Ui::TimeFrequencySettingsWidget* m_pUi;              /**< Holds the user interface for the AverageSettingsViewWidget.*/
 
 
+};
+}//namespace
+#endif // TIMEFREQUENCYSETTINGSVIEW_H

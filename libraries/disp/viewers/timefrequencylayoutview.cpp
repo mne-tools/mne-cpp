@@ -178,6 +178,7 @@ void TimeFrequencyLayoutView::updateData()
 
 //        DISPLIB::TFplot* tfplot = new DISPLIB::TFplot(m_pTFModel->data(1,2).value<Eigen::MatrixXd>(), m_pTFModel->getSamplingFrequency(), 0, 100, DISPLIB::ColorMaps::Jet);
 //        tfplot->show();
+        m_pTimeFreqScene->updateScene();
     }
 }
 

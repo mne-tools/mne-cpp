@@ -54,6 +54,8 @@ using namespace DISPLIB;
 
 
 TimeFrequencyModel::TimeFrequencyModel()
+: m_iMinFreq(0)
+, m_iMaxFreq(100)
 {
 
 }
@@ -62,6 +64,8 @@ TimeFrequencyModel::TimeFrequencyModel()
 
 TimeFrequencyModel::TimeFrequencyModel(std::vector<Eigen::MatrixXd>& spectr)
 : m_vSpectr(std::move(spectr))
+, m_iMinFreq(0)
+, m_iMaxFreq(100)
 {
 
 }
@@ -165,4 +169,25 @@ void TimeFrequencyModel::setFiffInfo(const FIFFLIB::FiffInfo &info)
 float TimeFrequencyModel::getSamplingFrequency()
 {
     return m_Info.sfreq;
+}
+
+//=============================================================================================================
+
+void TimeFrequencyModel::setMinFreq(int iFreq)
+{
+    m_iMinFreq = iFreq;
+}
+
+//=============================================================================================================
+
+void TimeFrequencyModel::setMaxFreq(int iFreq)
+{
+    m_iMaxFreq = iFreq;
+}
+
+//=============================================================================================================
+
+std::pair<int,int> TimeFrequencyModel::getFreqRange() const
+{
+    return std::pair<int,int>(m_iMinFreq,m_iMaxFreq);
 }

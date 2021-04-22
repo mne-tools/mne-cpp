@@ -282,11 +282,17 @@ void TimeFrequencyView::setTimeFrequencyModel(QSharedPointer<DISPLIB::TimeFreque
 
 void TimeFrequencyView::updateData()
 {
+    if(!m_pTFModel){
+        return;
+    }
+
     if(!m_pLayout->isEmpty()){
         m_pLayout->removeWidget(m_pPlot);
         m_pPlot->deleteLater();
     }
 
-    m_pPlot = new TFplot(m_pTFModel->data(1,1).value<Eigen::MatrixXd>(),  m_pTFModel->getSamplingFrequency(), 0, 100, DISPLIB::ColorMaps::Jet);
+    auto freqRange = m_pTFModel->getFreqRange();
+
+    m_pPlot = new TFplot(m_pTFModel->data(1,1).value<Eigen::MatrixXd>(),  m_pTFModel->getSamplingFrequency(), freqRange.first, freqRange.second, DISPLIB::ColorMaps::Jet);
     m_pLayout->addWidget(m_pPlot);
 }

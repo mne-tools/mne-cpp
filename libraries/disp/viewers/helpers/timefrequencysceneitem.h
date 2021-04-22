@@ -66,7 +66,7 @@ namespace DISPLIB
 {
 
 //=============================================================================================================
-class DISPSHARED_EXPORT TimeFrequencySceneItem : public QWidget
+class DISPSHARED_EXPORT TimeFrequencySceneItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
@@ -82,9 +82,13 @@ public:
 
     int getChannelNumber() const;
 
+    QRectF boundingRect() const;
+    virtual void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 protected:
     void initQMLView();
+
+    void paintPlot();
 
 private:
 
@@ -103,7 +107,7 @@ private:
 
     Eigen::MatrixXd             m_data;
     float                       m_fSampleRate;
-//    QRectF                      m_rectBoundingRect;         /**< The bounding rect. */
+    QRectF                      m_rectBoundingRect;         /**< The bounding rect. */
 
     QPointer<QVBoxLayout>       m_pLayout;
 
