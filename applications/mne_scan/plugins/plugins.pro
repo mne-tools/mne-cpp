@@ -77,3 +77,4 @@ SUBDIRS += \
     writetofile \
     hpi \
     rtfwd \
+    timefrequency \
