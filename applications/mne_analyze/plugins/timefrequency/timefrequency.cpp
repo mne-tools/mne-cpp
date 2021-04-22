@@ -68,6 +68,7 @@ using namespace ANSHAREDLIB;
 
 TimeFrequency::TimeFrequency()
 : m_sSettingsPath("MNEANALYZE/TimeFrequency")
+, m_pAvgModel(Q_NULLPTR)
 {
     m_pEvokedModel = QSharedPointer<DISPLIB::EvokedSetModel>(new DISPLIB::EvokedSetModel());
     loadSettings();
@@ -239,6 +240,9 @@ void TimeFrequency::setChannelSelection(const QVariant &data)
 void TimeFrequency::computeTimeFreqency()
 {
     qDebug() << "[TimeFrequency::computeTimeFreqency]";
+    if (!m_pAvgModel){
+        return;
+    }
 
     auto spectr = RTPROCESSINGLIB::computeTimeFrequency(*m_pAvgModel->getEvokedSet());
 

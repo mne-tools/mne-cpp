@@ -122,15 +122,16 @@ public:
      */
     void clearView();
 
+    void setTimeFrequencyModel(QSharedPointer<DISPLIB::TimeFrequencyModel> pModel);
+
+protected:
+
     //=========================================================================================================
     /**
      * call this function whenever the items' data needs to be updated
      */
     void updateData();
 
-    void setTimeFrequencyModel(QSharedPointer<DISPLIB::TimeFrequencyModel> pModel);
-
-protected:
     QPointer<TimeFrequencyScene>                m_pTimeFreqScene;
     QPointer<QGraphicsView>                     m_pTimeFreqGraphicsView;
 

@@ -65,7 +65,8 @@ using namespace DISPLIB;
 TimeFrequencyView::TimeFrequencyView()
 : TimeFrequencyView("", Q_NULLPTR)
 {
-
+    m_pLayout = new QVBoxLayout();
+    this->setLayout(m_pLayout);
 }
 
 //=============================================================================================================
@@ -142,95 +143,95 @@ void TimeFrequencyView::initQMLView()
 //    this->setLayout(layout);
 }
 
-//=============================================================================================================
+////=============================================================================================================
 
-void TimeFrequencyView::paintEvent(QPaintEvent *event)
-{
-    if (m_pEvokedSetModel){
-        QPainter painter(this);
+//void TimeFrequencyView::paintEvent(QPaintEvent *event)
+//{
+//    if (m_pEvokedSetModel){
+//        QPainter painter(this);
 
-        painter.save();
-        painter.setBrush(QBrush());
-        painter.drawRect(QRect(-1,-1,this->width()+2,this->height()+2));
-        painter.restore();
-
-
+//        painter.save();
+//        painter.setBrush(QBrush());
+//        painter.drawRect(QRect(-1,-1,this->width()+2,this->height()+2));
+//        painter.restore();
 
 
-        //paint chart
-        painter.save();
-        painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
-        QRect chartBound(m_iChartBorderSpacing,m_iChartBorderSpacing,this->width()-m_iChartBorderSpacing * 4 ,this->height()- m_iChartBorderSpacing * 2);
-        painter.drawRect(chartBound);
-        painter.restore();
-
-        //paint gradient bar
-
-        painter.save();
-
-        QLinearGradient linGrad(this->width() - m_iChartBorderSpacing * 1.5f, chartBound.topRight().y(), this->width() - m_iChartBorderSpacing * 1.5f, chartBound.bottomRight().y());
-        painter.save();
-        painter.setBrush(linGrad);
-        painter.drawRect(chartBound.topRight().x() + m_iChartBorderSpacing, chartBound.topRight().y(), m_iChartBorderSpacing, chartBound.height());
-
-        painter.restore();
 
 
-        //paint axis labels
-        //test
-        if(m_pEvokedSetModel->getNumSamples() > 0) {
-            painter.save();
-            painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
+//        //paint chart
+//        painter.save();
+//        painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+//        QRect chartBound(m_iChartBorderSpacing,m_iChartBorderSpacing,this->width()-m_iChartBorderSpacing * 4 ,this->height()- m_iChartBorderSpacing * 2);
+//        painter.drawRect(chartBound);
+//        painter.restore();
 
-            float fDx = (float)(chartBound.width()) / ((float)m_pEvokedSetModel->getNumSamples());
-            float posX = fDx * ((float)m_pEvokedSetModel->getNumPreStimSamples());
-            painter.drawLine(chartBound.bottomLeft().x()+posX, chartBound.bottomRight().y(), chartBound.bottomLeft().x() + posX, chartBound.topRight().y());
+//        //paint gradient bar
 
-            painter.drawText(QPointF(posX+chartBound.bottomLeft().x(),chartBound.bottomRight().y()-5), QString("0ms / Stimulus"));
+//        painter.save();
 
-            painter.restore();
+//        QLinearGradient linGrad(this->width() - m_iChartBorderSpacing * 1.5f, chartBound.topRight().y(), this->width() - m_iChartBorderSpacing * 1.5f, chartBound.bottomRight().y());
+//        painter.save();
+//        painter.setBrush(linGrad);
+//        painter.drawRect(chartBound.topRight().x() + m_iChartBorderSpacing, chartBound.topRight().y(), m_iChartBorderSpacing, chartBound.height());
 
-            painter.save();
-            QColor colorTimeSpacer = Qt::black;
-            colorTimeSpacer.setAlphaF(0.5);
-            painter.setPen(QPen(colorTimeSpacer, 1, Qt::DashLine));
+//        painter.restore();
 
-            float yStart = chartBound.topLeft().y();
-            float yEnd = chartBound.bottomRight().y();
 
-            float sampleCounter = m_pEvokedSetModel->getNumPreStimSamples();
-            int counter = 1;
-            float timeDistanceMSec = 50.0;
-            float timeDistanceSamples = (timeDistanceMSec/1000.0)*m_pEvokedSetModel->getSamplingFrequency(); //time distance corresponding to sampling frequency
+//        //paint axis labels
+//        //test
+//        if(m_pEvokedSetModel->getNumSamples() > 0) {
+//            painter.save();
+//            painter.setPen(QPen(Qt::red, 1, Qt::DashLine));
 
-            //spacers before stim
-            while(sampleCounter-timeDistanceSamples>0) {
-                sampleCounter-=timeDistanceSamples;
-                float x = chartBound.bottomLeft().x() + fDx*sampleCounter;
-                painter.drawLine(x, yStart, x, yEnd);
-                painter.drawText(QPointF(x - m_iChartBorderSpacing/3, yEnd + m_iChartBorderSpacing/2), QString("-%1ms").arg(timeDistanceMSec*counter));
-                counter++;
-            }
+//            float fDx = (float)(chartBound.width()) / ((float)m_pEvokedSetModel->getNumSamples());
+//            float posX = fDx * ((float)m_pEvokedSetModel->getNumPreStimSamples());
+//            painter.drawLine(chartBound.bottomLeft().x()+posX, chartBound.bottomRight().y(), chartBound.bottomLeft().x() + posX, chartBound.topRight().y());
 
-            //spacers after stim
-            counter = 1;
-            sampleCounter = m_pEvokedSetModel->getNumPreStimSamples();
-            while(sampleCounter+timeDistanceSamples<m_pEvokedSetModel->getNumSamples()) {
-                sampleCounter+=timeDistanceSamples;
-                float x = chartBound.bottomLeft().x() + fDx*sampleCounter;
-                painter.drawLine(x, yStart, x, yEnd);
-                painter.drawText(QPointF(x - m_iChartBorderSpacing/3, yEnd + m_iChartBorderSpacing/2), QString("%1ms").arg(timeDistanceMSec*counter));
-                counter++;
-            }
+//            painter.drawText(QPointF(posX+chartBound.bottomLeft().x(),chartBound.bottomRight().y()-5), QString("0ms / Stimulus"));
 
-            painter.restore();
+//            painter.restore();
 
-        }
+//            painter.save();
+//            QColor colorTimeSpacer = Qt::black;
+//            colorTimeSpacer.setAlphaF(0.5);
+//            painter.setPen(QPen(colorTimeSpacer, 1, Qt::DashLine));
 
-    }
+//            float yStart = chartBound.topLeft().y();
+//            float yEnd = chartBound.bottomRight().y();
 
-    return QWidget::paintEvent(event);
-}
+//            float sampleCounter = m_pEvokedSetModel->getNumPreStimSamples();
+//            int counter = 1;
+//            float timeDistanceMSec = 50.0;
+//            float timeDistanceSamples = (timeDistanceMSec/1000.0)*m_pEvokedSetModel->getSamplingFrequency(); //time distance corresponding to sampling frequency
+
+//            //spacers before stim
+//            while(sampleCounter-timeDistanceSamples>0) {
+//                sampleCounter-=timeDistanceSamples;
+//                float x = chartBound.bottomLeft().x() + fDx*sampleCounter;
+//                painter.drawLine(x, yStart, x, yEnd);
+//                painter.drawText(QPointF(x - m_iChartBorderSpacing/3, yEnd + m_iChartBorderSpacing/2), QString("-%1ms").arg(timeDistanceMSec*counter));
+//                counter++;
+//            }
+
+//            //spacers after stim
+//            counter = 1;
+//            sampleCounter = m_pEvokedSetModel->getNumPreStimSamples();
+//            while(sampleCounter+timeDistanceSamples<m_pEvokedSetModel->getNumSamples()) {
+//                sampleCounter+=timeDistanceSamples;
+//                float x = chartBound.bottomLeft().x() + fDx*sampleCounter;
+//                painter.drawLine(x, yStart, x, yEnd);
+//                painter.drawText(QPointF(x - m_iChartBorderSpacing/3, yEnd + m_iChartBorderSpacing/2), QString("%1ms").arg(timeDistanceMSec*counter));
+//                counter++;
+//            }
+
+//            painter.restore();
+
+//        }
+
+//    }
+
+//    return QWidget::paintEvent(event);
+//}
 
 //=============================================================================================================
 
@@ -244,19 +245,19 @@ void TimeFrequencyView::setEvokedSetModel(QSharedPointer<EvokedSetModel> model)
 
 //=============================================================================================================
 
-void TimeFrequencyView::paintChart(QPainter& painter,
-                                   const QRect chartBound)
-{
+//void TimeFrequencyView::paintChart(QPainter& painter,
+//                                   const QRect chartBound)
+//{
 
-}
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-void TimeFrequencyView::paintAxes(QPainter& painter,
-                                  const QRect chartBound)
-{
+//void TimeFrequencyView::paintAxes(QPainter& painter,
+//                                  const QRect chartBound)
+//{
 
-}
+//}
 
 //=============================================================================================================
 
@@ -266,7 +267,26 @@ void TimeFrequencyView::setTimeFrequencyModel(QSharedPointer<DISPLIB::TimeFreque
 
     m_pTFModel = pModel;
 
+    if(pModel){
+        m_pTFModel = pModel;
+        connect(m_pTFModel.data(), &TimeFrequencyModel::dataChanged,
+                this, &TimeFrequencyView::updateData, Qt::UniqueConnection);
+    }
+
 //    DISPLIB::TFplot* tfplot = new DISPLIB::TFplot(m_pTFModel->data(1,1).value<Eigen::MatrixXd>(), m_pTFModel->getSamplingFrequency(), 0, 100, DISPLIB::ColorMaps::Jet);
 
 //    tfplot->show();
+}
+
+//=============================================================================================================
+
+void TimeFrequencyView::updateData()
+{
+    if(!m_pLayout->isEmpty()){
+        m_pLayout->removeWidget(m_pPlot);
+        m_pPlot->deleteLater();
+    }
+
+    m_pPlot = new TFplot(m_pTFModel->data(1,1).value<Eigen::MatrixXd>(),  m_pTFModel->getSamplingFrequency(), 0, 100, DISPLIB::ColorMaps::Jet);
+    m_pLayout->addWidget(m_pPlot);
 }

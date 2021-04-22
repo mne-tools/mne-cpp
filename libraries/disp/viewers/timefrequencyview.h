@@ -41,11 +41,14 @@
 
 #include "../disp_global.h"
 #include "abstractview.h"
+#include <disp/plots/tfplot.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QLayout>
+#include <QPointer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -134,20 +137,30 @@ public:
 
     void setTimeFrequencyModel(QSharedPointer<DISPLIB::TimeFrequencyModel> pModel);
 
+
 protected:
     void initQMLView();
 
-    virtual void paintEvent(QPaintEvent *event);
+//    virtual void paintEvent(QPaintEvent *event);
 
-    void paintChart(QPainter& painter,
-                    const QRect chartBound);
+//    void paintChart(QPainter& painter,
+//                    const QRect chartBound);
 
-    void paintAxes(QPainter& painter,
-                   const QRect chartBound);
+//    void paintAxes(QPainter& painter,
+//                   const QRect chartBound);
+
+    //=========================================================================================================
+    /**
+     * call this function whenever the items' data needs to be updated
+     */
+    void updateData();
 
     QSharedPointer<EvokedSetModel>              m_pEvokedSetModel;              /**< The evoked model */
     int                                         m_iChartBorderSpacing;
     QSharedPointer<TimeFrequencyModel>          m_pTFModel;
+
+    QPointer<QVBoxLayout>                       m_pLayout;
+    QPointer<TFplot>                            m_pPlot;
 
 };
 
