@@ -76,6 +76,18 @@ public:
     static Eigen::MatrixXd makeSpectrogram(Eigen::VectorXd signal,
                                            qint32 windowSize);
 
+    //=========================================================================================================
+    /**
+     * Calculates the spectrogram (tf-representation) of a given signal
+     *
+     * @param[in] signal         input-signal to calculate spectrogram of
+     * @param[in] windowSize     size of the window which is used (resolution in time an frequency is depending on it)
+     *
+     * @return spectrogram-matrix (tf-representation of the input signal)
+     */
+    static Eigen::MatrixXcd makeComplexSpectrogram(Eigen::VectorXd signal,
+                                                   qint32 windowSize);
+
 private:
     //=========================================================================================================
     /**
@@ -103,6 +115,16 @@ private:
 
     //=========================================================================================================
     /**
+     * Calculates the spectogram matrix for a given input data matrix.
+     *
+     * @param[in] data       The input data.
+     *
+     * @return               The spectogram matrix.
+     */
+    static Eigen::MatrixXcd computeComplex(const SpectogramInputData& data);
+
+    //=========================================================================================================
+    /**
      * Sums up (reduces) the in parallel processed spectogram matrix.
      *
      * @param[out] resultData    The result data.
@@ -110,6 +132,16 @@ private:
      */
     static void reduce(Eigen::MatrixXd &resultData,
                        const Eigen::MatrixXd &data);
+
+    //=========================================================================================================
+    /**
+     * Sums up (reduces) the in parallel processed spectogram matrix.
+     *
+     * @param[out] resultData    The result data.
+     * @param[in]  data          The incoming, temporary result data.
+     */
+    static void reduceComplex(Eigen::MatrixXcd &resultData,
+                              const Eigen::MatrixXcd &data);
 };
 }//namespace
 

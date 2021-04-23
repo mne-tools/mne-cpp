@@ -138,6 +138,8 @@ protected:
     QSharedPointer<EvokedSetModel>              m_pEvokedSetModel;              /**< The evoked model */
     QSharedPointer<TimeFrequencyModel>          m_pTFModel;
 
+    std::list<QGraphicsProxyWidget*>            m_listWidgets();
+
 };
 }//namespace
 

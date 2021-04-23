@@ -155,6 +155,10 @@ void TimeFrequencyLayoutView::channelSelectionChanged(const QVariant &data)
         return;
     }
 
+    if (m_listWidgets.empty()){
+
+    }
+
     SelectionItem* pSelectionItem = data.value<DISPLIB::SelectionItem*>();
 
     //Repaint the average items in the average scene based on the input parameter selectedChannelItems and update them with current data
