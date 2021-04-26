@@ -259,7 +259,7 @@ void TimeFrequency::computeTimeFreqency()
         return;
     }
 
-    auto spectr = RTPROCESSINGLIB::computeTimeFrequency(*m_pAvgModel->getEvokedSet());
+    auto spectr = RTPROCESSINGLIB::computeComplexTimeFrequency(*m_pAvgModel->getEvokedSet());
 
 //    DISPLIB::TFplot* tfplot = new DISPLIB::TFplot(spectr.front(), m_pAvgModel->getEvokedSet()->evoked.first().info.sfreq, 0, 100, DISPLIB::ColorMaps::Jet);
 

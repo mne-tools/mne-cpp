@@ -62,7 +62,7 @@ TimeFrequencyModel::TimeFrequencyModel()
 
 //=============================================================================================================
 
-TimeFrequencyModel::TimeFrequencyModel(std::vector<Eigen::MatrixXd>& spectr)
+TimeFrequencyModel::TimeFrequencyModel(std::vector<Eigen::MatrixXcd>& spectr)
 : m_vSpectr(std::move(spectr))
 , m_iMinFreq(0)
 , m_iMaxFreq(100)
@@ -72,7 +72,7 @@ TimeFrequencyModel::TimeFrequencyModel(std::vector<Eigen::MatrixXd>& spectr)
 
 //=============================================================================================================
 
-void TimeFrequencyModel::setSpectr(std::vector<Eigen::MatrixXd>& spectr)
+void TimeFrequencyModel::setSpectr(std::vector<Eigen::MatrixXcd>& spectr)
 {
     m_vSpectr.clear();
     m_vSpectr = std::move(spectr);
@@ -121,23 +121,27 @@ QVariant TimeFrequencyModel::data(const QModelIndex &index,
         }
         case Qt::DisplayRole:{
             QVariant variant;
-            variant.setValue(m_vSpectr[0]);
+//            Eigen::MatrixXd mat = Eigen::MatrixXd::Zero(m_vSpectr[0].rows(), m_vSpectr[0].cols());
+//            auto matr = m_vSpectr[0].real();
+            auto tempMat = m_vSpectr[0];
+            Eigen::MatrixXd mat = tempMat.cwiseAbs2();
+            variant.setValue(mat);
             return variant;
         }
         }
     }
-    if(index.column() == 2) { //timefrequencyview
-        switch(role){
-        case Qt::BackgroundRole:{
-            return QVariant();
-        }
-        case Qt::DisplayRole:{
-            QVariant variant;
-            variant.setValue(m_vSpectr[row]);
-            return variant;
-        }
-        }
-    }
+//    if(index.column() == 2) { //timefrequencyview
+//        switch(role){
+//        case Qt::BackgroundRole:{
+//            return QVariant();
+//        }
+//        case Qt::DisplayRole:{
+//            QVariant variant;
+//            variant.setValue(m_vSpectr[row]);
+//            return variant;
+//        }
+//        }
+//    }
 
 }
 
@@ -190,4 +194,11 @@ void TimeFrequencyModel::setMaxFreq(int iFreq)
 std::pair<int,int> TimeFrequencyModel::getFreqRange() const
 {
     return std::pair<int,int>(m_iMinFreq,m_iMaxFreq);
+}
+
+//=============================================================================================================
+
+void TimeFrequencyModel::computeAverage()
+{
+
 }

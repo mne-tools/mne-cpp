@@ -155,9 +155,9 @@ void TimeFrequencyLayoutView::channelSelectionChanged(const QVariant &data)
         return;
     }
 
-    if (m_listWidgets.empty()){
+//    if (m_listWidgets.empty()){
 
-    }
+//    }
 
     SelectionItem* pSelectionItem = data.value<DISPLIB::SelectionItem*>();
 

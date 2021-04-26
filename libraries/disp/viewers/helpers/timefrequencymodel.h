@@ -69,13 +69,15 @@ class DISPSHARED_EXPORT TimeFrequencyModel : public QAbstractTableModel
 public:
     TimeFrequencyModel();
 
-    TimeFrequencyModel(std::vector<Eigen::MatrixXd>& spectr);
+    TimeFrequencyModel(std::vector<Eigen::MatrixXcd>& spectr);
 
-    void setSpectr(std::vector<Eigen::MatrixXd>& spectr);
+    void setSpectr(std::vector<Eigen::MatrixXcd>& spectr);
 
     void setFiffInfo(const FIFFLIB::FiffInfo& info);
 
     float getSamplingFrequency();
+
+    void computeAverage();
 
     //=========================================================================================================
     /**
@@ -149,9 +151,11 @@ private:
 
 //    QLinearGradient         m_Gradient;
 
-    std::vector<Eigen::MatrixXd> m_vSpectr;
+    std::vector<Eigen::MatrixXcd>       m_vSpectr;
 
-    FIFFLIB::FiffInfo                    m_Info;
+    Eigen::MatrixXd                     m_Average;
+
+    FIFFLIB::FiffInfo                   m_Info;
 
     int m_iMinFreq;
     int m_iMaxFreq;
@@ -163,5 +167,10 @@ private:
 #define metatype_matrixXd
 Q_DECLARE_METATYPE(Eigen::MatrixXd);
 #endif
+
+//#ifndef metatype_matrixXcd
+//#define metatype_matrixXcd
+//Q_DECLARE_METATYPE(Eigen::MatrixXcd);
+//#endif
 
 #endif // TIMEFREQUENCYMODEL_H

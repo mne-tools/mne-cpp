@@ -78,5 +78,8 @@ namespace RTPROCESSINGLIB
 
 RTPROCESINGSHARED_EXPORT std::vector<Eigen::MatrixXd> computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet);
 
+RTPROCESINGSHARED_EXPORT std::vector<Eigen::MatrixXcd> computeComplexTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet);
+
+
 }//namespace
 #endif // TIMEFREQUENCY_RTPROCESSING_H
