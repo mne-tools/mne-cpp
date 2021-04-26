@@ -227,6 +227,7 @@ void MainWindow::saveSettings()
 void MainWindow::loadSettings()
 {
     if(m_sSettingsPath.isEmpty()) {
+
         return;
     }
 
@@ -265,13 +266,21 @@ void MainWindow::initMenusAndPluginControls()
         initMenuBar();
         createLogDockWindow();
         createPluginMenus();
+        initPluginControls();
         createPluginControls();
+        tabifyDockWindows();
         createPluginViews();
     } else {
         qWarning() << "[MainWindow::MainWindow] Plugin manager is nullptr!";
     }
 }
 
+void MainWindow::initPluginControls()
+{
+        setTabPosition(Qt::LeftDockWidgetArea,QTabWidget::West);
+        setTabPosition(Qt::RightDockWidgetArea,QTabWidget::East);
+        setDockOptions(QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
+}
 //=============================================================================================================
 
 void MainWindow::initStatusBar()
@@ -475,14 +484,6 @@ void MainWindow::createPluginMenus()
 
 void MainWindow::createPluginControls()
 {
-    static bool creatingControlsForFirstTime(true);
-    if(creatingControlsForFirstTime)
-    {
-        setTabPosition(Qt::LeftDockWidgetArea,QTabWidget::West);
-        setTabPosition(Qt::RightDockWidgetArea,QTabWidget::East);
-        setDockOptions(QMainWindow::ForceTabbedDocks);
-    }
-
     //Add Plugin controls to the MainWindow
     for(AbstractPlugin* pPlugin :m_pAnalyzeCoreController->getLoadedPlugins()) {
         QDockWidget* pControl = pPlugin->getControl();
@@ -508,12 +509,6 @@ void MainWindow::createPluginControls()
             #endif
             pPlugin->setControlLoadingState(true);
         }
-    }
-
-    if(creatingControlsForFirstTime)
-    {
-        tabifyDockWindows();
-        creatingControlsForFirstTime = false;
     }
 }
 

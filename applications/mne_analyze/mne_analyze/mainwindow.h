@@ -279,6 +279,16 @@ private:
      */
     void initStatusBar();
 
+    //=========================================================================================================
+    /**
+     * Set the properties of the control views, regarding how and where they can be tabbed.
+     */
+    void initPluginControls();
+
+    //=========================================================================================================
+    /**
+     * Delete the menus created in initMenuBar.
+     */
     void deleteMenus();
 
     QPointer<DISPLIB::MultiView>        m_pMultiView;               /**< The central View.*/
