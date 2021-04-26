@@ -77,6 +77,8 @@ public:
 
     float getSamplingFrequency();
 
+    void setChannelSelection(QList<int> selectionList);
+
     void computeAverage();
 
     //=========================================================================================================
@@ -152,6 +154,7 @@ private:
 //    QLinearGradient         m_Gradient;
 
     std::vector<Eigen::MatrixXcd>       m_vSpectr;
+    QList<int>                          m_listSelection;
 
     Eigen::MatrixXd                     m_Average;
 

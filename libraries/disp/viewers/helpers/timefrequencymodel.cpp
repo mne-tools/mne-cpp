@@ -52,7 +52,6 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
 TimeFrequencyModel::TimeFrequencyModel()
 : m_iMinFreq(0)
 , m_iMaxFreq(100)
@@ -123,9 +122,30 @@ QVariant TimeFrequencyModel::data(const QModelIndex &index,
             QVariant variant;
 //            Eigen::MatrixXd mat = Eigen::MatrixXd::Zero(m_vSpectr[0].rows(), m_vSpectr[0].cols());
 //            auto matr = m_vSpectr[0].real();
-            auto tempMat = m_vSpectr[0];
+            Eigen::MatrixXcd matrix = Eigen::MatrixXcd::Zero(m_vSpectr[0].rows(), m_vSpectr[0].cols());
+
+//            for (auto& channel : m_vSpectr){
+//                matrix += channel;
+//            }
+
+            for (int iChIndex : m_listSelection){
+                if (iChIndex < m_vSpectr.size()){
+                    matrix += m_vSpectr[iChIndex];
+                    qDebug() << "Adding channel" << iChIndex;
+                }
+            }
+
+            matrix /= m_vSpectr.size();
+
+            auto tempMat = matrix;
             Eigen::MatrixXd mat = tempMat.cwiseAbs2();
             variant.setValue(mat);
+
+            qDebug() << "Hi there";
+
+//            auto tempMat = m_vSpectr[0];
+//            Eigen::MatrixXd mat = tempMat.cwiseAbs2();
+//            variant.setValue(mat);
             return variant;
         }
         }
@@ -201,4 +221,16 @@ std::pair<int,int> TimeFrequencyModel::getFreqRange() const
 void TimeFrequencyModel::computeAverage()
 {
 
+}
+
+//=============================================================================================================
+#include <iostream>
+void TimeFrequencyModel::setChannelSelection(QList<int> selectionList)
+{
+    for (int i = 0; i< selectionList.size(); i++){
+        m_listSelection.append(selectionList.value(i));
+        std::cout << selectionList.value(i);
+    }
+
+    emit dataChanged(index(0,0), index(rowCount() - 1, columnCount() - 1));
 }

@@ -51,16 +51,17 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
-//TimeFrequency::TimeFrequency()
-//{
-
-//}
-
 //=============================================================================================================
-// DEFINE GLOBAL RTPROCESSINGLIB METHODS
+// USED NAMESPACES
 //=============================================================================================================
 
-std::vector<Eigen::MatrixXd> RTPROCESSINGLIB::computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet)
+using namespace RTPROCESSINGLIB;
+
+//=============================================================================================================
+// DEFINE STATIC RTPROCESSINGLIB METHODS
+//=============================================================================================================
+
+std::vector<Eigen::MatrixXd> TimeFrequencyData::computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet)
 {
     qDebug() << "[RTPROCESSINGLIB::computeTimeFreqency]";
 
@@ -78,7 +79,7 @@ std::vector<Eigen::MatrixXd> RTPROCESSINGLIB::computeTimeFrequency(const FIFFLIB
     return tfvector;
 }
 
-std::vector<Eigen::MatrixXcd> RTPROCESSINGLIB::computeComplexTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet)
+std::vector<Eigen::MatrixXcd> TimeFrequencyData::computeComplexTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet)
 {
     qDebug() << "[RTPROCESSINGLIB::computeTimeFreqency]";
 
@@ -94,5 +95,14 @@ std::vector<Eigen::MatrixXcd> RTPROCESSINGLIB::computeComplexTimeFrequency(const
     }
 
     return tfvector;
+}
+
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+TimeFrequencyData::TimeFrequencyData()
+{
+
 }
 

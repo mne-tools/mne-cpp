@@ -70,15 +70,17 @@ namespace FIFFLIB {
 namespace RTPROCESSINGLIB
 {
 
-//class TimeFrequency
-//{
-//public:
-//    TimeFrequency();
-//};
+class RTPROCESINGSHARED_EXPORT TimeFrequencyData
+{
+public:
+    TimeFrequencyData();
 
-RTPROCESINGSHARED_EXPORT std::vector<Eigen::MatrixXd> computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet);
+    static std::vector<Eigen::MatrixXd> computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet);
 
-RTPROCESINGSHARED_EXPORT std::vector<Eigen::MatrixXcd> computeComplexTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet);
+    static std::vector<Eigen::MatrixXcd> computeComplexTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet);
+
+private:
+};
 
 
 }//namespace

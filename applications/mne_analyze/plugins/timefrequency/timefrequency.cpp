@@ -247,6 +247,13 @@ void TimeFrequency::setChannelSelection(const QVariant &data)
 //        } else {
 //            emit showSelectedChannels(data.value<DISPLIB::SelectionItem*>()->m_iChannelNumber);
 //        }
+
+    }
+
+    if(m_pTFModel){
+        if(data.value<DISPLIB::SelectionItem*>()->m_sViewsToApply.contains("butterflyview")){
+            m_pTFModel->setChannelSelection(data.value<DISPLIB::SelectionItem*>()->m_iChannelNumber);
+        }
     }
 }
 
@@ -259,7 +266,7 @@ void TimeFrequency::computeTimeFreqency()
         return;
     }
 
-    auto spectr = RTPROCESSINGLIB::computeComplexTimeFrequency(*m_pAvgModel->getEvokedSet());
+    auto spectr = RTPROCESSINGLIB::TimeFrequencyData::computeComplexTimeFrequency(*m_pAvgModel->getEvokedSet());
 
 //    DISPLIB::TFplot* tfplot = new DISPLIB::TFplot(spectr.front(), m_pAvgModel->getEvokedSet()->evoked.first().info.sfreq, 0, 100, DISPLIB::ColorMaps::Jet);
 

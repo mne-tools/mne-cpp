@@ -137,6 +137,8 @@ public:
 
     void setTimeFrequencyModel(QSharedPointer<DISPLIB::TimeFrequencyModel> pModel);
 
+    void setSelectedChannels(QList<int> selectionList);
+
 
 protected:
     void initQMLView();
