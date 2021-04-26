@@ -514,20 +514,20 @@ void MainWindow::createPluginControls()
 
 //=============================================================================================================
 
+void MainWindow::initPluginViews()
+{
+    m_pGridLayout = new QGridLayout(this);
+    m_pMultiView = new MultiView(m_sSettingsPath);
+    m_pGridLayout->addWidget(m_pMultiView);
+    m_pMultiView->show();
+    m_pMultiView->setObjectName("multiview");
+    setCentralWidget(m_pMultiView);
+}
+
+//=============================================================================================================
+
 void MainWindow::createPluginViews()
 {
-    static bool creatingViewsForFirstTime(true);
-    if(creatingViewsForFirstTime)
-    {
-        m_pGridLayout = new QGridLayout(this);
-        m_pMultiView = new MultiView(m_sSettingsPath);
-        m_pGridLayout->addWidget(m_pMultiView);
-        m_pMultiView->show();
-        m_pMultiView->setObjectName("multiview");
-        setCentralWidget(m_pMultiView);
-        creatingViewsForFirstTime = false;
-    }
-
     //Add Plugin views to the MultiView, which is the central widget
     for(AbstractPlugin* pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
         QWidget* pView = pPlugin->getView();

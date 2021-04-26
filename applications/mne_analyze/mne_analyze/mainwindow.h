@@ -287,6 +287,12 @@ private:
 
     //=========================================================================================================
     /**
+     * Initialize the multiview widget that holds the views for each plugin.
+     */
+    void initPluginViews();
+
+    //=========================================================================================================
+    /**
      * Delete the menus created in initMenuBar.
      */
     void deleteMenus();
