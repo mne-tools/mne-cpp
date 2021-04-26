@@ -74,11 +74,13 @@ class EventManager;
 
 namespace EVENTSINTERNAL {
 
+//=========================================================================================================
 /**
  * The type enum specifies what kind of event happened.
  */
 enum EventUpdateType{ NULL_EVENT, NEW_EVENT, DELETE_EVENT};
 
+//=========================================================================================================
 /**
  * Allows for a text description of each option in enum EventUpdateType.
  */
@@ -91,12 +93,13 @@ const std::string EventUpdateTypeString[3] = {"Null Event", "New Event", "Delete
 struct EventUpdate
 {
 public:
-
+    //=========================================================================================================
     /**
      * Constructor.
      */
     EventUpdate();
 
+    //=========================================================================================================
     /**
      * Constructor with members defined.
      * @param[in] sample
@@ -105,36 +108,42 @@ public:
      */
     EventUpdate(int sample, int creator, enum EventUpdateType t);
 
+    //=========================================================================================================
     /**
      * Retrieve the creation time.
      * @return A long integer with the creation time.
      */
     long long getCreationTime() const;
 
+    //=========================================================================================================
     /**
      * Retrieve the sample number.
      * @return Sample.
      */
     int getSample() const;
 
+    //=========================================================================================================
     /**
      * retrieve the creator's id.
      * @return Creator's id.
      */
     int getCreatorId() const;
 
+    //=========================================================================================================
     /**
      * Retrieve the type.
      * @return Type.
      */
     enum EventUpdateType getType() const;
 
+    //=========================================================================================================
     /**
      * set the type of the event update.
      * @param[in] t
      */
     void setType(enum EventUpdateType t);
 
+    //=========================================================================================================
     /**
      * Retrieve a text descriptive tag for each option in the type of update variable.
      * @return
@@ -154,51 +163,61 @@ protected:
 class EventSharedMemManager
 {
 public:
+    //=========================================================================================================
     /**
      * EventSharedMemManager
      * @param[in] Pointer to Parent
      */
     explicit EventSharedMemManager(EVENTSLIB::EventManager* parent = nullptr);
 
+    //=========================================================================================================
     /**
      *
      */
     ~EventSharedMemManager();
+
+    //=========================================================================================================
     /**
      * init
      * @param[in] mode
      */
     void init(EVENTSLIB::SharedMemoryMode mode);
 
+    //=========================================================================================================
     /**
      * isInit
      * @return
      */
     bool isInit() const;
 
+    //=========================================================================================================
     /**
      * stop
      */
     void stop();
 
+    //=========================================================================================================
     /**
      * Add an event.
      * @param[in] sample
      */
     void addEvent(int sample);
 
+    //=========================================================================================================
     /**
      * deleteEvent
      * @param[in] sample
      */
     void deleteEvent(int sample);
 
+    //=========================================================================================================
     /**
      * getTimeNow
      * @return
      */
     static long long getTimeNow();
 
+    //=========================================================================================================
     /**
      * processEvent
      * @param[in] ne
@@ -206,12 +225,14 @@ public:
     void processEvent(const EventUpdate& ne);
 
 private:
+    //=========================================================================================================
     /**
      * attachToSharedSegment
      * @param[in] mode
      */
     void attachToSharedSegment(QSharedMemory::AccessMode mode);
 
+    //=========================================================================================================
     /**
      * createSharedSegment
      * @param[in] bufferSize
@@ -220,100 +241,115 @@ private:
      */
     bool createSharedSegment(int bufferSize, QSharedMemory::AccessMode mode);
 
+    //=========================================================================================================
     /**
      * launchSharedMemoryWatcherThread
      */
     void launchSharedMemoryWatcherThread();
 
+    //=========================================================================================================
     /**
      * attachToOrCreateSharedSegment
      * @param[in] mode
      */
     void attachToOrCreateSharedSegment(QSharedMemory::AccessMode mode);
 
+    //=========================================================================================================
     /**
      * stopSharedMemoryWatcherThread
      */
     void stopSharedMemoryWatcherThread();
 
+    //=========================================================================================================
     /**
      * detachFromSharedMemory
      */
     void detachFromSharedMemory();
 
+    //=========================================================================================================
     /**
      * generateId
      * @return
      */
     inline static int generateId();
 
+    //=========================================================================================================
     /**
      * processNewEvent
      * @param[in] n
      */
     void processNewEvent(const EventUpdate& n);
 
+    //=========================================================================================================
     /**
      * processDeleteEvent
      * @param[in] EventUpdate.
      */
     void processDeleteEvent(const EventUpdate& n);
 
+    //=========================================================================================================
     /**
      * printLocalBuffer
      */
     void printLocalBuffer();
 
+    //=========================================================================================================
     /**
      * copyNewUpdateToSharedMemory
      * @param[in] newUpdate
      */
     void copyNewUpdateToSharedMemory(EventUpdate& newUpdate);
 
+    //=========================================================================================================
     /**
      * initializeSharedMemory
      */
     void initializeSharedMemory();
 
+    //=========================================================================================================
     /**
      * copySharedMemoryToLocalBuffer
      */
     void copySharedMemoryToLocalBuffer();
 
+    //=========================================================================================================
     /**
      * processLocalBuffer
      */
     void processLocalBuffer();
 
+    //=========================================================================================================
     /**
      * bufferWatcher
      */
     void bufferWatcher();
 
+    //=========================================================================================================
     /**
      * createGroupIfNeeded
      */
     void createGroupIfNeeded();
 
     static int                          m_iLastUpdateIndex;             /**<  The last position in the buffer to be updated.*/
-    EVENTSLIB::EventManager*            m_pEventManager;                /**<  */
-    QSharedMemory                       m_SharedMemory;                 /**<  */
-    std::atomic_bool                    m_IsInit;                       /**<  */
-    std::string                         m_sGroupName;                   /**<  */
-    bool                                m_bGroupCreated;                /**<  */
-    idNum                               m_GroupId;                      /**<  */
-    int                                 m_SharedMemorySize;             /**<  */
-    int                                 m_fTimerCheckBuffer;            /**<  */
-    std::thread                         m_BufferWatcherThread;          /**<  */
-    std::atomic_bool                    m_BufferWatcherThreadRunning;   /**<  */
-    std::atomic_bool                    m_WritingToSharedMemory;        /**<  */
-    long long                           m_lastCheckTime;                /**<  */
-    EventUpdate*                        m_LocalBuffer;                  /**<  */
-    EventUpdate*                        m_SharedBuffer;                 /**<  */
+    EVENTSLIB::EventManager*            m_pEventManager;                /**<  Pointer to the parent EventManager object.*/
+    QSharedMemory                       m_SharedMemory;                 /**<  Multiplatform Qt shared memory object.*/
+    std::atomic_bool                    m_IsInit;                       /**<  Flag if the shared memory has not been initialized.*/
+    std::string                         m_sGroupName;                   /**<  Group name to use when creating events in the shared memory segment.*/
+    bool                                m_bGroupCreated;                /**<  Check if the group has already been created.*/
+    idNum                               m_GroupId;                      /**<  Store the group ID of the event group to which events will be assigned.*/
+    int                                 m_SharedMemorySize;             /**<  Size of the shared memory segment.*/
+    int                                 m_fTimerCheckBuffer;            /**<  Time period between checks of the shared buffer.*/
+    std::thread                         m_BufferWatcherThread;          /**<  Offloaded thread to check for new events.*/
+    std::atomic_bool                    m_BufferWatcherThreadRunning;   /**<  Flag if the BufferWatcher thread has been created.*/
+    std::atomic_bool                    m_WritingToSharedMemory;        /**<  Mutex to control writing new events to the shared memory buffer.*/
+    long long                           m_lastCheckTime;                /**<  Place holder for the time when the buffer was last checked.*/
+    EventUpdate*                        m_LocalBuffer;                  /**<  Buffer in the local memory of this application, mirroring the shared memory buffer.*/
+    EventUpdate*                        m_SharedBuffer;                 /**<  Buffer in shared memory segment.*/
     int                                 m_Id;                           /**<  Stores the creator Id.*/
     enum EVENTSLIB::SharedMemoryMode    m_Mode;                         /**<  Shared memory working mode.*/
 };
 
+//=========================================================================================================
 /**
  * EventSharedMemManager::generateId
  * @return
