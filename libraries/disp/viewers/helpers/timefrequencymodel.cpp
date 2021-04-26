@@ -128,10 +128,16 @@ QVariant TimeFrequencyModel::data(const QModelIndex &index,
 //                matrix += channel;
 //            }
 
-            for (int iChIndex : m_listSelection){
-                if (iChIndex < m_vSpectr.size()){
-                    matrix += m_vSpectr[iChIndex];
-                    qDebug() << "Adding channel" << iChIndex;
+            if(m_listSelection.size() > 0){
+                for (int iChIndex : m_listSelection){
+                    if (iChIndex < m_vSpectr.size()){
+                        matrix += m_vSpectr[iChIndex];
+                        qDebug() << "Adding channel" << iChIndex;
+                    }
+                }
+            }else{
+                for (auto& channel : m_vSpectr){
+                    matrix += channel;
                 }
             }
 
@@ -227,10 +233,13 @@ void TimeFrequencyModel::computeAverage()
 #include <iostream>
 void TimeFrequencyModel::setChannelSelection(QList<int> selectionList)
 {
+    m_listSelection.clear();
     for (int i = 0; i< selectionList.size(); i++){
         m_listSelection.append(selectionList.value(i));
-        std::cout << selectionList.value(i);
+        std::cout << selectionList.value(i) << std::endl;
     }
 
-    emit dataChanged(index(0,0), index(rowCount() - 1, columnCount() - 1));
+    if(m_vSpectr.size() > 0){
+        emit dataChanged(index(0,0), index(rowCount() - 1, columnCount() - 1));
+    }
 }
