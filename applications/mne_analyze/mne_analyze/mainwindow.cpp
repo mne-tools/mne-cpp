@@ -269,11 +269,14 @@ void MainWindow::initMenusAndPluginControls()
         initPluginControls();
         createPluginControls();
         tabifyDockWindows();
+        initPluginViews();
         createPluginViews();
     } else {
         qWarning() << "[MainWindow::MainWindow] Plugin manager is nullptr!";
     }
 }
+
+//=============================================================================================================
 
 void MainWindow::initPluginControls()
 {
@@ -281,6 +284,7 @@ void MainWindow::initPluginControls()
         setTabPosition(Qt::RightDockWidgetArea,QTabWidget::East);
         setDockOptions(QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
 }
+
 //=============================================================================================================
 
 void MainWindow::initStatusBar()
