@@ -68,7 +68,7 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 TimeFrequency::TimeFrequency()
-: m_pCircularBuffer(CircularBuffer<FIFFLIB::FiffEvokedSet>::SPtr::create(40))
+: m_pCircularEvokedBuffer(CircularBuffer<FIFFLIB::FiffEvoked>::SPtr::create(40))
 {
 }
 
@@ -141,7 +141,17 @@ QWidget* TimeFrequency::setupWidget()
 
 void TimeFrequency::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
+    if(QSharedPointer<RealTimeEvokedSet> pRTES = pMeasurement.dynamicCast<RealTimeEvokedSet>()) {
+        FIFFLIB::FiffEvokedSet::SPtr pFiffEvokedSet = pRTES->getValue();
 
+        if(this->isRunning()) {
+            for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
+                while(!m_pCircularEvokedBuffer->push(pFiffEvokedSet->evoked.at(i))) {
+                    //Do nothing until the circular buffer is ready to accept new data again
+                }
+            }
+        }
+    }
 }
 
 //=============================================================================================================
@@ -173,11 +183,11 @@ void TimeFrequency::initPluginControlWidgets()
 
 void TimeFrequency::run()
 {
-    FIFFLIB::FiffEvokedSet evokedSet;
+    FIFFLIB::FiffEvoked evoked;
     QStringList lResponsibleTriggerTypes;
 
     while(!isInterruptionRequested()){
-//        if(m_pCircularBuffer->pop(evokedSet)) {
+        if(m_pCircularEvokedBuffer->pop(evoked)) {
 //            m_qMutex.lock();
 //            lResponsibleTriggerTypes = m_lResponsibleTriggerTypes;
 //            m_qMutex.unlock();
@@ -185,6 +195,6 @@ void TimeFrequency::run()
 //            m_pTimeFrequencyOutput->measurementData()->setValue(evokedSet,
 //                                                 m_pFiffInfo,
 //                                                 lResponsibleTriggerTypes);
-//        }
+        }
     }
 }

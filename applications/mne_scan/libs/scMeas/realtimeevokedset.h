@@ -44,6 +44,7 @@
 #include "realtimesamplearraychinfo.h"
 
 #include <fiff/fiff_evoked_set.h>
+#include <fiff/fiff_evoked.h>
 
 //=============================================================================================================
 // QT INCLUDES

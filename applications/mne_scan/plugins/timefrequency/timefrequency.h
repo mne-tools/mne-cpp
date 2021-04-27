@@ -126,10 +126,10 @@ public:
 private:
     virtual void run();
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeEvokedSet>::SPtr        m_pTimeFrequencyInput;      /**< The RealTimeSampleArray of the TimeFrequency input.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeTimeFrequency>::SPtr   m_pTimeFrequencyOutput;     /**< The RealTimeEvoked of the TimeFrequency output.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeEvokedSet>::SPtr            m_pTimeFrequencyInput;      /**< The RealTimeSampleArray of the TimeFrequency input.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeTimeFrequency>::SPtr       m_pTimeFrequencyOutput;     /**< The RealTimeEvoked of the TimeFrequency output.*/
 
-    UTILSLIB::CircularBuffer<FIFFLIB::FiffEvokedSet>::SPtr                      m_pCircularBuffer;      /**< Holds incoming fiff evoked sets. */
+    QSharedPointer<UTILSLIB::CircularBuffer<FIFFLIB::FiffEvoked>>               m_pCircularEvokedBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
 
     QMutex                                          m_qMutex;                           /**< Provides access serialization between threads. */
 
