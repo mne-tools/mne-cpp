@@ -455,31 +455,33 @@ void MainWindow::createPluginMenus()
 {
     // add plugins menus
     for(auto pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
-        pPlugin->setObjectName(pPlugin->getName());
-        if(pPlugin && pPlugin->menuAlreadyLoaded() == false) {
-            if (QMenu* pMenu = pPlugin->getMenu()) {
-                // Check if the menu already exists. If it does add the actions to the exisiting menu.
-                if(pMenu->title() == "File") {
-                    for(QAction* pAction : pMenu->actions()) {
-                        #ifdef WASMBUILD
-                        m_pMenuFile->insertAction(m_pActionExit, pAction);
-                        #else
-                        m_pMenuFile->insertAction(m_pActionReloadPlugins, pAction);
-                        #endif
+        if(pPlugin) {
+            if(pPlugin->menuAlreadyLoaded() == false) {
+                pPlugin->setMenuLoadingState(true);
+                pPlugin->setObjectName(pPlugin->getName());
+                if (QMenu* pMenu = pPlugin->getMenu()) {
+                    // Check if the menu already exists. If it does add the actions to the exisiting menu.
+                    if(pMenu->title() == "File") {
+                        for(QAction* pAction : pMenu->actions()) {
+                            #ifdef WASMBUILD
+                            m_pMenuFile->insertAction(m_pActionExit, pAction);
+                            #else
+                            m_pMenuFile->insertAction(m_pActionReloadPlugins, pAction);
+                            #endif
+                        }
+                    } else if(pMenu->title() == "View") {
+                        for(QAction* pAction : pMenu->actions()) {
+                            m_pMenuView->addAction(pAction);
+                        }
+                    } else if(pMenu->title() == "Help") {
+                        for(QAction* pAction : pMenu->actions()) {
+                            m_pMenuHelp->insertAction(m_pActionAbout, pAction);
+                        }
+                    } else {
+                        menuBar()->addMenu(pMenu);
                     }
-                } else if(pMenu->title() == "View") {
-                    for(QAction* pAction : pMenu->actions()) {
-                        m_pMenuView->addAction(pAction);
-                    }
-                } else if(pMenu->title() == "Help") {
-                    for(QAction* pAction : pMenu->actions()) {
-                        m_pMenuHelp->insertAction(m_pActionAbout, pAction);
-                    }
-                } else {
-                    menuBar()->addMenu(pMenu);
                 }
             }
-            pPlugin->setMenuLoadingState(true);
         }
     }
 }
@@ -490,28 +492,30 @@ void MainWindow::createPluginControls()
 {
     //Add Plugin controls to the MainWindow
     for(AbstractPlugin* pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
-        QDockWidget* pControl = pPlugin->getControl();
-        if(pControl && pPlugin->controlAlreadyLoaded() == false)
-        {
-            addDockWidget(Qt::LeftDockWidgetArea, pControl);
-            qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
-            QAction* pAction = pControl->toggleViewAction();
-            pAction->setText(pPlugin->getName());
-            m_pMenuControl->addAction(pAction);
-            qInfo() << "[MainWindow::createPluginControls] Added" << pPlugin->getName() << "controls to View menu";
-
-            // Connect plugin controls to GUI mode toggling
-            connect(this, &MainWindow::guiModeChanged,
-                    pPlugin, &AbstractPlugin::guiModeChanged);
-
-            connect(this, &MainWindow::guiStyleChanged,
-                    pPlugin, &AbstractPlugin::guiStyleChanged);
-
-            // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
-            #ifdef WASMBUILD
-            pControl->setFeatures(QDockWidget::DockWidgetClosable);
-            #endif
+        if(pPlugin->controlAlreadyLoaded() == false) {
             pPlugin->setControlLoadingState(true);
+            QDockWidget* pControl = pPlugin->getControl();
+            if(pControl)
+            {
+                addDockWidget(Qt::LeftDockWidgetArea, pControl);
+                qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
+                QAction* pAction = pControl->toggleViewAction();
+                pAction->setText(pPlugin->getName());
+                m_pMenuControl->addAction(pAction);
+                qInfo() << "[MainWindow::createPluginControls] Added" << pPlugin->getName() << "controls to View menu";
+
+                // Connect plugin controls to GUI mode toggling
+                connect(this, &MainWindow::guiModeChanged,
+                        pPlugin, &AbstractPlugin::guiModeChanged);
+
+                connect(this, &MainWindow::guiStyleChanged,
+                        pPlugin, &AbstractPlugin::guiStyleChanged);
+
+                // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
+                #ifdef WASMBUILD
+                pControl->setFeatures(QDockWidget::DockWidgetClosable);
+                #endif
+            }
         }
     }
 }
@@ -535,6 +539,7 @@ void MainWindow::createPluginViews()
     //Add Plugin views to the MultiView, which is the central widget
     for(AbstractPlugin* pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
         if(pPlugin->viewAlreadyLoaded() == false) {
+            pPlugin->setViewLoadingState(true);
             QWidget* pView = pPlugin->getView();
             if(pView) {
                 MultiViewWindow* pWindow = Q_NULLPTR;
@@ -544,7 +549,6 @@ void MainWindow::createPluginViews()
                 m_pMenuView->addAction(pAction);
 
                 qInfo() << "[MainWindow::createPluginViews] Found and added subwindow for " << pPlugin->getName();
-                pPlugin->setViewLoadingState(true);
             }
         }
     }
