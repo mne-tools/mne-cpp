@@ -161,11 +161,7 @@ public:
     /**
      * Called by the EventManager in case a subscribed-for Event has happened.
      *
-<<<<<<< HEAD
-     * @param[in] sArguments  the cmd line arguments.
-=======
      * @param e The Event that has taken place
->>>>>>> 0ecfd5a34 (define qabstractplugin methods as non virtual when there is no need for that)
      */
     virtual void handleEvent(QSharedPointer<Event> e) = 0;
 
