@@ -688,7 +688,7 @@ void MainWindow::about()
 
 //=============================================================================================================
 
-void MainWindow::refreshPluginMenus()
+void MainWindow::updatePluginsUI()
 {
     createPluginMenus();
     createPluginControls();
