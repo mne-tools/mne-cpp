@@ -457,11 +457,11 @@ void MainWindow::createPluginMenus()
                 // Check if the menu already exists. If it does add the actions to the exisiting menu.
                 if(pMenu->title() == "File") {
                     for(QAction* pAction : pMenu->actions()) {
-#ifdef WASMBUILD
+                        #ifdef WASMBUILD
                         m_pMenuFile->insertAction(m_pActionExit, pAction);
-#else
+                        #else
                         m_pMenuFile->insertAction(m_pActionReloadPlugins, pAction);
-#endif
+                        #endif
                     }
                 } else if(pMenu->title() == "View") {
                     for(QAction* pAction : pMenu->actions()) {
