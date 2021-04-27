@@ -466,7 +466,7 @@ bool EventModel::saveToFile(const QString& sPath)
     QTextStream out(&file);
     auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
     for (auto event : *events){
-        out << "  " << event.sample << "   " << QString::number(static_cast<float>(event.sample - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          0         1" << endl;
+        out << "  " << event.sample << "   " << QString::number(static_cast<float>(event.sample - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          0         1" << "\n";
 //        out << "  " << iEvent << "   " << QString::number(static_cast<float>(iEvent - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          1         0" << endl;
     }
 
