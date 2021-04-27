@@ -52,6 +52,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace EVENTSLIB;
+
 //=============================================================================================================
 // INIT STATIC MEMBERS
 //=============================================================================================================
@@ -60,13 +62,13 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EVENTSLIB::Event::Event()
-:EVENTSLIB::Event(0,0,0)
+Event::Event()
+:Event(0,0,0)
 { }
 
 //=============================================================================================================
 
-EVENTSLIB::Event::Event(const idNum id,const  int sample, const idNum groupId)
+Event::Event(const idNum id,const  int sample, const idNum groupId)
 : id(id)
 , sample(sample)
 , groupId(groupId)
@@ -74,7 +76,7 @@ EVENTSLIB::Event::Event(const idNum id,const  int sample, const idNum groupId)
 
 //=============================================================================================================
 
-EVENTSLIB::Event::Event(const EVENTSINTERNAL::EventINT& e)
+Event::Event(const EVENTSINTERNAL::EventINT& e)
 : Event(e.getId(), e.getSample(), e.getGroupId())
 { }
 

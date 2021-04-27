@@ -45,11 +45,16 @@
 
 #include <QDebug>
 
+
 //=============================================================================================================
-// local and static declarations
+// USED NAMESPACES
 //=============================================================================================================
 
 using namespace EVENTSLIB;
+
+//=============================================================================================================
+// local and static declarations
+//=============================================================================================================
 
 constexpr static int invalidID(0);              /**< A variable storing an id value which will never be used, by design.*/
 static std::string defaultGroupName("Default"); /**< A name to be used as the name of the default group of events. */

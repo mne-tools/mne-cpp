@@ -36,15 +36,34 @@
 #ifndef EVENT_EVENTSINTERNAL_H
 #define EVENT_EVENTSINTERNAL_H
 
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "events_global.h"
 #include "eventgroup.h"
+
+//=============================================================================================================
+// STD INCLUDES
+//=============================================================================================================
+
 #include <string>
 
-namespace EVENTSINTERNAL {
-class EventINT;
-}
+//=============================================================================================================
+// NAMESPACE EVENTSLIB
+//=============================================================================================================
 
 namespace EVENTSLIB {
+
+//=============================================================================================================
+// EVENTSINTERNAL FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace EVENTSINTERNAL {
+    class EventINT;
+}
+
+//=============================================================================================================
 /**
  * This is a public Class to organize events and make it easy to manipulate
  * for the end-user of the library.
@@ -80,12 +99,7 @@ struct EVENTS_EXPORT Event
     idNum  groupId; /**< GroupId of this event. */
 };
 
-}
-
 namespace EVENTSINTERNAL {
-
-class EventGroupINT;
-
 // The fact that we go with int for sample is a fundamental limitation of this
 // whole architecture. With a Fs = 1kHz, we could have a maximum of aprox. 25 days.
 // Yes not a big limitation... if we keep using 1kHz...
@@ -258,6 +272,7 @@ inline EventINT EventINT::fromSample(int sample)
 }
 
 }//namespace EVENTSINTERNAL
+}//namespace EVENTSLIB
 
 //=========================================================================================================
 
@@ -266,13 +281,14 @@ inline EventINT EventINT::fromSample(int sample)
  */
 namespace std {
 template<>
-struct hash<EVENTSINTERNAL::EventINT>
+struct hash<EVENTSLIB::EVENTSINTERNAL::EventINT>
 {
-    size_t operator()(const EVENTSINTERNAL::EventINT& rhs) const
+    size_t operator()(const EVENTSLIB::EVENTSINTERNAL::EventINT& rhs) const
     {
         return hash<int>()(rhs.getId());
     }
 };
+
 }
 
 #endif // EVENT_H

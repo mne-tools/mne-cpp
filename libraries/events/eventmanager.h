@@ -454,5 +454,5 @@ inline std::unique_ptr<std::vector<T> > allocateOutputContainer(size_t size) noe
     return v;
 };
 
-}//namespace
+}//namespace EVENTSLIB
 #endif // EVENTS_H

@@ -69,8 +69,6 @@ namespace EVENTSLIB {
 
 enum SharedMemoryMode { READ, WRITE, READWRITE };
 class EventManager;
-}
-
 
 namespace EVENTSINTERNAL {
 
@@ -360,6 +358,7 @@ inline int EventSharedMemManager::generateId()
     return abs(t);
 }
 
-} //namespace
+} //namespace EVENTSINTERNAL
+}//namespace EVENTSLIB
 #endif // EVENTSHAREDMEMMANAGER_EVENTS_H
 
