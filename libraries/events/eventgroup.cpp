@@ -55,7 +55,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace EVENTSINTERNAL;
+using namespace EVENTSLIB;
 
 //=============================================================================================================
 // INIT STATIC MEMBERS
@@ -68,19 +68,19 @@ constexpr static const unsigned char defaultGroupTransparency = 0xFF;           
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EVENTSLIB::RgbColor::RgbColor()
+RgbColor::RgbColor()
 : RgbColor(defaultGroupColor[0], defaultGroupColor[1], defaultGroupColor[2])
 { };
 
 //=============================================================================================================
 
-EVENTSLIB::RgbColor::RgbColor(const uchar rRhs, const uchar gRhs, const uchar bRhs)
+RgbColor::RgbColor(const uchar rRhs, const uchar gRhs, const uchar bRhs)
 : RgbColor(rRhs, gRhs, bRhs, defaultGroupTransparency)
 { };
 
 //=============================================================================================================
 
-EVENTSLIB::RgbColor::RgbColor(const uchar rRhs, const uchar gRhs,
+RgbColor::RgbColor(const uchar rRhs, const uchar gRhs,
                               const uchar bRhs, const uchar aRhs)
 : r(rRhs)
 , g(gRhs)
@@ -90,7 +90,7 @@ EVENTSLIB::RgbColor::RgbColor(const uchar rRhs, const uchar gRhs,
 
 //=============================================================================================================
 
-EVENTSLIB::EventGroup::EventGroup(const EVENTSLIB::EventGroup& g)
+EventGroup::EventGroup(const EventGroup& g)
 : id(g.id)
 , name(g.name)
 , color(g.color)
@@ -101,7 +101,7 @@ EVENTSLIB::EventGroup::EventGroup(const EVENTSLIB::EventGroup& g)
 
 //=============================================================================================================
 
-EVENTSLIB::EventGroup::EventGroup(const EVENTSINTERNAL::EventGroupINT& g)
+EventGroup::EventGroup(const EVENTSINTERNAL::EventGroupINT& g)
 : id(g.getId())
 , name(g.getName())
 , color(g.getColor())
@@ -112,7 +112,7 @@ EVENTSLIB::EventGroup::EventGroup(const EVENTSINTERNAL::EventGroupINT& g)
 
 //=============================================================================================================
 
-EventGroupINT::EventGroupINT(const char* name)
+EVENTSINTERNAL::EventGroupINT::EventGroupINT(const char* name)
 : EventGroupINT(std::string(name))
 {
 
@@ -120,7 +120,7 @@ EventGroupINT::EventGroupINT(const char* name)
 
 //=============================================================================================================
 
-EventGroupINT::EventGroupINT(std::string&& name)
+EVENTSINTERNAL::EventGroupINT::EventGroupINT(std::string&& name)
 : m_sName(std::move(name))
 , m_Id(0)
 , m_order(0)
@@ -132,7 +132,7 @@ EventGroupINT::EventGroupINT(std::string&& name)
 
 //=============================================================================================================
 
-EventGroupINT::EventGroupINT(idNum id, const std::string& name)
+EVENTSINTERNAL::EventGroupINT::EventGroupINT(idNum id, const std::string& name)
 : m_sName(name)
 , m_Id(id)
 , m_order(0)
@@ -144,8 +144,8 @@ EventGroupINT::EventGroupINT(idNum id, const std::string& name)
 
 //=============================================================================================================
 
-EventGroupINT::EventGroupINT(idNum id, const std::string& name,
-                       const EVENTSLIB::RgbColor& color)
+EVENTSINTERNAL::EventGroupINT::EventGroupINT(idNum id, const std::string& name,
+                       const RgbColor& color)
 : m_sName(name)
 , m_Id(id)
 , m_order(0)
@@ -157,21 +157,21 @@ EventGroupINT::EventGroupINT(idNum id, const std::string& name,
 
 //=============================================================================================================
 
-void EventGroupINT::setColor(const EVENTSLIB::RgbColor& color)
+void EVENTSINTERNAL::EventGroupINT::setColor(const RgbColor& color)
 {
     m_Color = color;
 }
 
 //=============================================================================================================
 
-EVENTSLIB::RgbColor EventGroupINT::getColor() const
+RgbColor EVENTSINTERNAL::EventGroupINT::getColor() const
 {
     return m_Color;
 }
 
 //=============================================================================================================
 
-void EventGroupINT::setRandomColor()
+void EVENTSINTERNAL::EventGroupINT::setRandomColor()
 {
     m_Color.r = rand() % 256;
     m_Color.g = rand() % 256;
@@ -180,49 +180,49 @@ void EventGroupINT::setRandomColor()
 
 //=============================================================================================================
 
-const std::string& EventGroupINT::getName() const
+const std::string& EVENTSINTERNAL::EventGroupINT::getName() const
 {
     return m_sName;
 }
 
 //=============================================================================================================
 
-void EventGroupINT::setName(const std::string &sName)
+void EVENTSINTERNAL::EventGroupINT::setName(const std::string &sName)
 {
     m_sName = sName;
 }
 
 //=============================================================================================================
 
-idNum EventGroupINT::getId() const
+idNum EVENTSINTERNAL::EventGroupINT::getId() const
 {
     return m_Id;
 }
 
 //=============================================================================================================
 
-std::string EventGroupINT::getDescription() const
+std::string EVENTSINTERNAL::EventGroupINT::getDescription() const
 {
     return m_sDescription;
 }
 
 //=============================================================================================================
 
-int EventGroupINT::getOrder() const
+int EVENTSINTERNAL::EventGroupINT::getOrder() const
 {
     return m_order;
 }
 
 //=============================================================================================================
 
-void EventGroupINT::setOrder(int order)
+void EVENTSINTERNAL::EventGroupINT::setOrder(int order)
 {
     m_order = order;
 }
 
 //=============================================================================================================
 
-bool EventGroupINT::operator<(const EventGroupINT &groupRHS) const
+bool EVENTSINTERNAL::EventGroupINT::operator<(const EventGroupINT &groupRHS) const
 {
     return m_Id < groupRHS.getId();
 }
