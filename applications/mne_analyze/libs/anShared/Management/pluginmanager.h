@@ -150,7 +150,6 @@ private:
      */
     void insertPlugin(AbstractPlugin*  plugin);
 
-
     QVector<AbstractPlugin*>    m_qVecPlugins;       /**< Vector containing all plugins. */
 };
 
