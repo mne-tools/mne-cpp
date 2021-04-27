@@ -534,16 +534,18 @@ void MainWindow::createPluginViews()
 {
     //Add Plugin views to the MultiView, which is the central widget
     for(AbstractPlugin* pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
-        QWidget* pView = pPlugin->getView();
-        if(pView && pPlugin->viewAlreadyLoaded() == false) {
-            MultiViewWindow* pWindow = Q_NULLPTR;
-            pWindow = m_pMultiView->addWidgetTop(pView, pPlugin->getName());
-            QAction* pAction = pWindow->toggleViewAction();
-            pAction->setText(pPlugin->getName());
-            m_pMenuView->addAction(pAction);
+        if(pPlugin->viewAlreadyLoaded() == false) {
+            QWidget* pView = pPlugin->getView();
+            if(pView) {
+                MultiViewWindow* pWindow = Q_NULLPTR;
+                pWindow = m_pMultiView->addWidgetTop(pView, pPlugin->getName());
+                QAction* pAction = pWindow->toggleViewAction();
+                pAction->setText(pPlugin->getName());
+                m_pMenuView->addAction(pAction);
 
-            qInfo() << "[MainWindow::createPluginViews] Found and added subwindow for " << pPlugin->getName();
-            pPlugin->setViewLoadingState(true);
+                qInfo() << "[MainWindow::createPluginViews] Found and added subwindow for " << pPlugin->getName();
+                pPlugin->setViewLoadingState(true);
+            }
         }
     }
 }
