@@ -153,7 +153,7 @@ QVariant TimeFrequencyModel::data(const QModelIndex &index,
             matrix /= m_vSpectr.size();
 
             auto tempMat = matrix;
-            Eigen::MatrixXd mat = tempMat.cwiseAbs2();
+            Eigen::MatrixXd mat = tempMat.cwiseAbs2().real();
             variant.setValue(mat);
 
             qDebug() << "Hi there";

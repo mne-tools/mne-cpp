@@ -122,6 +122,8 @@ public:
            qreal sample_rate,
            ColorMaps cmap);
 
+    void adjustViewSize();
+
 protected:
     //=========================================================================================================
     /**

@@ -100,7 +100,7 @@ std::vector<Eigen::MatrixXcd> TimeFrequencyData::computeComplexTimeFrequency(con
 
     for (int i = 0; i < evoked.data.rows(); i++){
         Eigen::VectorXd dataCol = evoked.data.row(i).transpose();
-        Eigen::MatrixXcd Spectrum = UTILSLIB::Spectrogram::makeSpectrogram(dataCol, fSampFreq * 0.2);
+        Eigen::MatrixXcd Spectrum = UTILSLIB::Spectrogram::makeComplexSpectrogram(dataCol, fSampFreq * 0.2);
         tfvector.push_back(Spectrum);
     }
 
