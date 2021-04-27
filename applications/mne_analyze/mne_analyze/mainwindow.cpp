@@ -485,7 +485,7 @@ void MainWindow::createPluginMenus()
 void MainWindow::createPluginControls()
 {
     //Add Plugin controls to the MainWindow
-    for(AbstractPlugin* pPlugin :m_pAnalyzeCoreController->getLoadedPlugins()) {
+    for(AbstractPlugin* pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
         QDockWidget* pControl = pPlugin->getControl();
         if(pControl && pPlugin->controlAlreadyLoaded() == false)
         {
