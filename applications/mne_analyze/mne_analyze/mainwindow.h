@@ -68,10 +68,6 @@ class QDockWidget;
 class QGridLayout;
 QT_END_NAMESPACE
 
-//namespace ANSHAREDLIB {
-//    class PluginManager;
-//}
-
 namespace DISPLIB {
     class MultiView;
 }
@@ -103,19 +99,15 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs a MainWindow which is a child of parent.
+     * Constructs a MainWindow which is a child of parent.If parent is another widget, MainWindow becomes a
+     * child window inside parent. MainWindow is deleted when its parent is deleted.
      *
-<<<<<<< HEAD
-     * @param[in] pPluginManager Pointer to the plugin manager. It is needed to display subwindows froms plugins.
-     * @param[in] parent Pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window.
-=======
      * @param [in] pAnalyzeCore Pointer to the application controller class. It is needed to display subwindows froms plugins.
      * @param [in] parent Pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window.
->>>>>>> d7cfc0499 (rename log structure mainwindow stores analyze core not pluginmanager)
-     *                    If parent is another widget, MainWindow becomes a child window inside parent.
-     *                    MainWindow is deleted when its parent is deleted.
+     *
      */
-    MainWindow(AnalyzeCore* pAnalyzeCore, QWidget *parent = Q_NULLPTR);
+    MainWindow(AnalyzeCore* pAnalyzeCore,
+               QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
