@@ -288,7 +288,7 @@ void TimeFrequencyView::updateData()
 
     if(!m_pLayout->isEmpty()){
         m_pLayout->removeWidget(m_pPlot);
-        m_pPlot->deleteLater();
+        delete m_pPlot;
     }
 
     auto freqRange = m_pTFModel->getFreqRange();

@@ -120,6 +120,14 @@ QVariant TimeFrequencyModel::data(const QModelIndex &index,
         }
         case Qt::DisplayRole:{
             QVariant variant;
+//            Eigen::MatrixXcd returnMat = m_vSpectr.front();
+//            Eigen::MatrixXd realmat = returnMat.cwiseAbs2();
+
+//            variant.setValue(realmat);
+
+//            return variant;
+
+
 //            Eigen::MatrixXd mat = Eigen::MatrixXd::Zero(m_vSpectr[0].rows(), m_vSpectr[0].cols());
 //            auto matr = m_vSpectr[0].real();
             Eigen::MatrixXcd matrix = Eigen::MatrixXcd::Zero(m_vSpectr[0].rows(), m_vSpectr[0].cols());
@@ -127,12 +135,13 @@ QVariant TimeFrequencyModel::data(const QModelIndex &index,
 //            for (auto& channel : m_vSpectr){
 //                matrix += channel;
 //            }
-
+            int a = 0;
             if(m_listSelection.size() > 0){
                 for (int iChIndex : m_listSelection){
                     if (iChIndex < m_vSpectr.size()){
                         matrix += m_vSpectr[iChIndex];
-                        qDebug() << "Adding channel" << iChIndex;
+                        qDebug() << a << "Adding channel" << iChIndex;
+                        a++;
                     }
                 }
             }else{
@@ -156,18 +165,22 @@ QVariant TimeFrequencyModel::data(const QModelIndex &index,
         }
         }
     }
-//    if(index.column() == 2) { //timefrequencyview
-//        switch(role){
-//        case Qt::BackgroundRole:{
-//            return QVariant();
-//        }
-//        case Qt::DisplayRole:{
-//            QVariant variant;
-//            variant.setValue(m_vSpectr[row]);
-//            return variant;
-//        }
-//        }
-//    }
+    if(index.column() == 2) { //timefrequencyview
+        switch(role){
+        case Qt::BackgroundRole:{
+            return QVariant();
+        }
+        case Qt::DisplayRole:{
+            QVariant variant;
+
+            auto tempMat = m_vSpectr[0];
+            Eigen::MatrixXd mat = tempMat.cwiseAbs2();
+            variant.setValue(mat);
+
+            return variant;
+        }
+        }
+    }
 
 }
 

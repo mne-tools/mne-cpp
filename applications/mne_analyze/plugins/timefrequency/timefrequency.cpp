@@ -269,8 +269,19 @@ void TimeFrequency::computeTimeFreqency()
     auto spectr = RTPROCESSINGLIB::TimeFrequencyData::computeComplexTimeFrequency(*m_pAvgModel->getEvokedSet());
 
 //    DISPLIB::TFplot* tfplot = new DISPLIB::TFplot(spectr.front(), m_pAvgModel->getEvokedSet()->evoked.first().info.sfreq, 0, 100, DISPLIB::ColorMaps::Jet);
-
 //    tfplot->show();
+
+    auto spectr2 = RTPROCESSINGLIB::TimeFrequencyData::computeTimeFrequency(*m_pAvgModel->getEvokedSet());
+
+    DISPLIB::TFplot* tfplot2 = new DISPLIB::TFplot(spectr2.front(), m_pAvgModel->getEvokedSet()->evoked.first().info.sfreq, 0, 100, DISPLIB::ColorMaps::Jet);
+    tfplot2->show();
+
+    DISPLIB::TFplot* tfplot3 = new DISPLIB::TFplot(spectr2.at(20), m_pAvgModel->getEvokedSet()->evoked.first().info.sfreq, 0, 100, DISPLIB::ColorMaps::Jet);
+    tfplot3->show();
+
+    DISPLIB::TFplot* tfplot4 = new DISPLIB::TFplot(spectr2.at(80), m_pAvgModel->getEvokedSet()->evoked.first().info.sfreq, 0, 100, DISPLIB::ColorMaps::Jet);
+    tfplot4->show();
+
 
     m_pTFModel->setFiffInfo(m_pAvgModel->getEvokedSet()->evoked.first().info);
     m_pTFModel->setSpectr(spectr);

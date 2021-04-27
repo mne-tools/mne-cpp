@@ -38,6 +38,8 @@
 
 #include "timefrequency.h"
 
+#include <iostream>
+
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_evoked.h>
 
@@ -65,13 +67,21 @@ std::vector<Eigen::MatrixXd> TimeFrequencyData::computeTimeFrequency(const FIFFL
 {
     qDebug() << "[RTPROCESSINGLIB::computeTimeFreqency]";
 
+    int a = 0;
+    qDebug() << a;
+
+    std::cout << "SIZE:" << evokedSet.evoked.size();
+
     auto& evoked = evokedSet.evoked.first();
     float fSampFreq = evoked.info.sfreq;
+
+    std::cout << "ROWS: " << evoked.data.rows();
 
     std::vector<Eigen::MatrixXd> tfvector;
 
     for (int i = 0; i < evoked.data.rows(); i++){
-        Eigen::VectorXd dataCol = evoked.data.row(0).transpose();
+        Eigen::VectorXd dataCol = evoked.data.row(i).transpose();
+        //std::cout << "First data sample from evoked: " << dataCol(0);
         Eigen::MatrixXd Spectrum = UTILSLIB::Spectrogram::makeSpectrogram(dataCol, fSampFreq * 0.2);
         tfvector.push_back(Spectrum);
     }
@@ -89,7 +99,7 @@ std::vector<Eigen::MatrixXcd> TimeFrequencyData::computeComplexTimeFrequency(con
     std::vector<Eigen::MatrixXcd> tfvector;
 
     for (int i = 0; i < evoked.data.rows(); i++){
-        Eigen::VectorXd dataCol = evoked.data.row(0).transpose();
+        Eigen::VectorXd dataCol = evoked.data.row(i).transpose();
         Eigen::MatrixXcd Spectrum = UTILSLIB::Spectrogram::makeSpectrogram(dataCol, fSampFreq * 0.2);
         tfvector.push_back(Spectrum);
     }

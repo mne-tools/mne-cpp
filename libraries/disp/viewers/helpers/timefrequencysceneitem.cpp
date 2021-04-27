@@ -147,7 +147,7 @@ void TimeFrequencySceneItem::setData(const Eigen::MatrixXd &data)
 void TimeFrequencySceneItem::setSampleRate(float fFreq)
 {
     m_fSampleRate = fFreq;
-    qDebug() << "freq:" << fFreq;
+    //qDebug() << "freq:" << fFreq;
 }
 
 //=============================================================================================================
