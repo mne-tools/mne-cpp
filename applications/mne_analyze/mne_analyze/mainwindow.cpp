@@ -43,7 +43,6 @@
 #include "mainwindow.h"
 
 #include <anShared/Plugins/abstractplugin.h>
-//#include <anShared/Management/pluginmanager.h>
 #include <anShared/Management/statusbar.h>
 
 #include <disp/viewers/multiview.h>
@@ -78,7 +77,8 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MainWindow::MainWindow(AnalyzeCore* pAnalyzeCore, QWidget *parent)
+MainWindow::MainWindow(AnalyzeCore* pAnalyzeCore,
+                       QWidget *parent)
 : QMainWindow(parent)
 , m_pMultiView(Q_NULLPTR)
 , m_pAnalyzeCoreController(pAnalyzeCore)
