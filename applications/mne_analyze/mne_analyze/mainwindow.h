@@ -152,7 +152,7 @@ public:
     /**
      * Redraw all the menus and actions created by the plugins.
      */
-    void refreshPluginMenus();
+    void updatePluginsUI();
 
 signals:    
     //=========================================================================================================
