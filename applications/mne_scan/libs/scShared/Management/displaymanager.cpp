@@ -44,6 +44,7 @@
 #include <scDisp/realtimeevokedsetwidget.h>
 #include <scDisp/realtimecovwidget.h>
 #include <scDisp/realtimespectrumwidget.h>
+#include <scDisp/realtimetimefrequencywidget.h>
 
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimesourceestimate.h>
@@ -52,6 +53,7 @@
 #include <scMeas/realtimecov.h>
 #include <scMeas/realtimespectrum.h>
 #include <scMeas/realtimehpiresult.h>
+#include <scMeas/realtimetimefrequency.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -182,6 +184,9 @@ QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList &outputConnect
 
             vboxLayout->addWidget(fsWidget);
             fsWidget->init();
+        } else if (pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeTimeFrequency> >()) {
+            RealTimeTimeFrequencyWidget* tfWidget = new RealTimeTimeFrequencyWidget(pRealTimeFrequency, pT, newDisp);
+
         }
     }
 
