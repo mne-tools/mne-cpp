@@ -43,6 +43,9 @@
 
 #include <scMeas/realtimeevokedset.h>
 #include <scMeas/realtimetimefrequency.h>
+#include <scMeas/realtimemultisamplearray.h>
+
+#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -69,6 +72,7 @@ using namespace UTILSLIB;
 
 TimeFrequency::TimeFrequency()
 : m_pCircularEvokedBuffer(CircularBuffer<FIFFLIB::FiffEvoked>::SPtr::create(40))
+, m_iDataQueueBlockSize(25)
 {
 }
 
@@ -142,6 +146,10 @@ QWidget* TimeFrequency::setupWidget()
 void TimeFrequency::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     if(QSharedPointer<RealTimeEvokedSet> pRTES = pMeasurement.dynamicCast<RealTimeEvokedSet>()) {
+        if(!m_pFiffInfo) {
+            m_pFiffInfo = pRTES->info();
+        }
+
         FIFFLIB::FiffEvokedSet::SPtr pFiffEvokedSet = pRTES->getValue();
 
         if(this->isRunning()) {
@@ -152,6 +160,28 @@ void TimeFrequency::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             }
         }
     }
+    if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
+         //Fiff information
+        if(!m_pFiffInfo) {
+            m_pFiffInfo = pRTMSA->info();
+        }
+
+//        if (!m_pRTTF){
+//        }
+
+        if (m_pFiffInfo){
+            QMutexLocker locker(&m_qMutex);
+            for(unsigned char i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
+                // Please note that we do not need a copy here since this function will block until
+                // the buffer accepts new data again. Hence, the data is not deleted in the actual
+                // Measurement function after it emitted the notify signal.
+                m_DataQueue.push_back(pRTMSA->getMultiSampleArray()[i]);
+//                while(!m_pCircularTimeSeriesBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
+//                    //Do nothing until the circular buffer is ready to accept new data again
+//                }
+            }
+        }
+    }
 }
 
 //=============================================================================================================
@@ -159,10 +189,15 @@ void TimeFrequency::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 void TimeFrequency::init()
 {
     // Input
-    m_pTimeFrequencyInput = PluginInputData<RealTimeEvokedSet>::create(this, "TfIn", "Time frequency input data");
-
-    connect(m_pTimeFrequencyInput.data(), &PluginInputConnector::notify,
+    m_pTimeFrequencyEvokedInput = PluginInputData<RealTimeEvokedSet>::create(this, "TfEvokedIn", "Time frequency input data");
+    connect(m_pTimeFrequencyEvokedInput.data(), &PluginInputConnector::notify,
             this, &TimeFrequency::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pTimeFrequencyEvokedInput);
+
+    m_pTimeFrequencyTimeSeriesInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "TfTimeSeiresIn", "Time frequency input data");
+    connect(m_pTimeFrequencyTimeSeriesInput.data(), &PluginInputConnector::notify,
+            this, &TimeFrequency::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pTimeFrequencyTimeSeriesInput);
 
     //Output
     m_pTimeFrequencyOutput = PluginOutputData<RealTimeTimeFrequency>::create(this, "TfOut", "Time frequency output data");
@@ -187,7 +222,16 @@ void TimeFrequency::run()
     QStringList lResponsibleTriggerTypes;
 
     while(!isInterruptionRequested()){
-        if(m_pCircularEvokedBuffer->pop(evoked)) {
+        if(m_DataQueue.size() > m_iDataQueueBlockSize){
+            QMutexLocker locker(&m_qMutex);
+
+            computeTimeFrequency();
+
+            while(m_DataQueue.size() > m_iDataQueueBlockSize){
+                m_DataQueue.pop_front();
+            }
+        }
+//        if(m_pCircularEvokedBuffer->pop(evoked)) {
 //            m_qMutex.lock();
 //            lResponsibleTriggerTypes = m_lResponsibleTriggerTypes;
 //            m_qMutex.unlock();
@@ -195,6 +239,29 @@ void TimeFrequency::run()
 //            m_pTimeFrequencyOutput->measurementData()->setValue(evokedSet,
 //                                                 m_pFiffInfo,
 //                                                 lResponsibleTriggerTypes);
-        }
+//        }
     }
+}
+
+//=============================================================================================================
+
+void TimeFrequency::computeTimeFrequency()
+{
+    int iCols = 0;
+
+    std::cout<< "First matrix r:" << m_DataQueue.front().rows() << " | c: " << m_DataQueue.front().cols() << std::endl;
+
+    for (auto mat : m_DataQueue){
+        iCols += mat.cols();
+    }
+
+    std::cout << "COLS: " << iCols << std::endl;
+
+    Eigen::MatrixXd dataMat(m_DataQueue.front().rows(), iCols);
+
+    for (auto mat : m_DataQueue){
+        dataMat << mat;
+    }
+
+    std::cout << "New Matrix - r: " << dataMat.rows() << " | c: " << dataMat.cols() << std::endl;
 }

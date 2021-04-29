@@ -185,8 +185,15 @@ QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList &outputConnect
             vboxLayout->addWidget(fsWidget);
             fsWidget->init();
         } else if (pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeTimeFrequency> >()) {
-            RealTimeTimeFrequencyWidget* tfWidget = new RealTimeTimeFrequencyWidget(pRealTimeFrequency, pT, newDisp);
+            RealTimeTimeFrequencyWidget* tfWidget = new RealTimeTimeFrequencyWidget(pT, newDisp);
 
+            qListActions.append(tfWidget->getDisplayActions());
+
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+                    tfWidget, &RealTimeTimeFrequencyWidget::update, Qt::BlockingQueuedConnection);
+
+            vboxLayout->addWidget(tfWidget);
+            tfWidget->init();
         }
     }
 

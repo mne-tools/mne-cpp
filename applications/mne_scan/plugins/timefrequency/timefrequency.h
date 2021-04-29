@@ -46,9 +46,20 @@
 
 #include <fiff/fiff_evoked_set.h>
 
+#include <deque>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
+#include <QFuture>
+#include <QFutureWatcher>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -57,6 +68,11 @@
 namespace SCMEASLIB{
     class RealTimeEvokedSet;
     class RealTimeTimeFrequency;
+    class RealTimeMultiSampleArray;
+}
+
+namespace RTPROCESSINGLIB{
+    class RtTimeFrequency;
 }
 
 //=============================================================================================================
@@ -126,17 +142,29 @@ public:
 private:
     virtual void run();
 
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeEvokedSet>::SPtr            m_pTimeFrequencyInput;      /**< The RealTimeSampleArray of the TimeFrequency input.*/
-    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeTimeFrequency>::SPtr       m_pTimeFrequencyOutput;     /**< The RealTimeEvoked of the TimeFrequency output.*/
+    void computeTimeFrequency();
 
-    QSharedPointer<UTILSLIB::CircularBuffer<FIFFLIB::FiffEvoked>>               m_pCircularEvokedBuffer;    /**< Holds incoming RealTimeMultiSampleArray data.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pTimeFrequencyTimeSeriesInput;        /**< The RealTimeMultiSampleArray of the NoiseReduction input.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeEvokedSet>::SPtr            m_pTimeFrequencyEvokedInput;            /**< The RealTimeSampleArray of the TimeFrequency input.*/
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeTimeFrequency>::SPtr       m_pTimeFrequencyOutput;                 /**< The RealTimeEvoked of the TimeFrequency output.*/
 
-    QMutex                                          m_qMutex;                           /**< Provides access serialization between threads. */
+    QSharedPointer<UTILSLIB::CircularBuffer<FIFFLIB::FiffEvoked>>               m_pCircularEvokedBuffer;                /**< Holds incoming RealTimeMultiSampleArray data.*/
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>                      m_pCircularTimeSeriesBuffer;      /**< Holds incoming raw data. */
 
-    FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                        /**< Fiff measurement info.*/
+    QSharedPointer<RTPROCESSINGLIB::RtTimeFrequency>                            m_pRTTF;
 
-    QMap<QString,int>                               m_mapStimChsIndexNames;             /**< The currently available stim channels and their corresponding index in the data. */
+    QMutex                                                                      m_qMutex;                               /**< Provides access serialization between threads. */
 
+    FIFFLIB::FiffInfo::SPtr                                                     m_pFiffInfo;                            /**< Fiff measurement info.*/
+
+    std::deque<Eigen::MatrixXd>                                                 m_DataQueue;
+
+    QMap<QString,int>                                                           m_mapStimChsIndexNames;                 /**< The currently available stim channels and their corresponding index in the data. */
+
+    QFuture<Eigen::MatrixXcd>                                                   m_Future;
+    QFutureWatcher<Eigen::MatrixXcd>                                            m_FutureWatcher;
+
+    int                                                                         m_iDataQueueBlockSize;
 signals:
 
 };

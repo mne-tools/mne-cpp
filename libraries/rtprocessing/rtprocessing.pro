@@ -88,6 +88,7 @@ SOURCES += \
     rthpis.cpp \
     filter.cpp \
     rtconnectivity.cpp \
+    rttimefrequency.cpp \
     sphara.cpp \
     detecttrigger.cpp \
     helpers/cosinefilter.cpp \
@@ -107,6 +108,7 @@ HEADERS +=  \
     rthpis.h \
     filter.h \
     detecttrigger.h \
+    rttimefrequency.h \
     sphara.h \
     rtconnectivity.h \
     helpers/cosinefilter.h \

@@ -50,8 +50,18 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FIFFLIB {
+    class FiffInfo;
+}
+
+//=============================================================================================================
+// DEFINE NAMESPACE SCMEASLIB
 //=============================================================================================================
 
 namespace SCMEASLIB
@@ -62,6 +72,11 @@ class SCMEASSHARED_EXPORT RealTimeTimeFrequency : public Measurement
     Q_OBJECT
 public:
     RealTimeTimeFrequency();
+
+    Eigen::MatrixXcd                        m_matData;
+    QSharedPointer<FIFFLIB::FiffInfo>       m_pFiffInfo;        /**< Fiff info */
+
+
 };
 }//namespace
 #endif // REALTIMETIMEFREQUENCY_H
