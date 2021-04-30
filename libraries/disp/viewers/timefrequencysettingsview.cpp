@@ -140,4 +140,8 @@ void TimeFrequencySettingsView::initGUI()
 
     connect(m_pUi->pushButton_ciompute, &QPushButton::released,
             this, &TimeFrequencySettingsView::computePushed, Qt::UniqueConnection);
+
+
+    connect(m_pUi->radioButton_avg, &QRadioButton::toggled,
+            this, &TimeFrequencySettingsView::computeWithAvg, Qt::UniqueConnection);
 }

@@ -112,6 +112,8 @@ signals:
 
     void colorMapChanged(const QString &colormap);
 
+    void computeWithAvg(bool checked);
+
 protected:
 
     void initGUI();

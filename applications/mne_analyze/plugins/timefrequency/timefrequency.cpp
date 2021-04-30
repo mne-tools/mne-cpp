@@ -148,6 +148,8 @@ QDockWidget *TimeFrequency::getControl()
     connect(pSettings, &DISPLIB::TimeFrequencySettingsView::maxFreqChanged,
             m_pTFModel.data(), &DISPLIB::TimeFrequencyModel::setMaxFreq, Qt::UniqueConnection);
 
+
+
     pDock->setWidget(pSettings);
 
 
@@ -230,6 +232,9 @@ void TimeFrequency::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pN
         m_pEvokedModel->setEvokedSet(m_pAvgModel->data(QModelIndex()).value<QSharedPointer<FIFFLIB::FiffEvokedSet>>());
         m_pTimeFreqView->setEvokedSetModel(m_pEvokedModel);
     }
+    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
+        m_pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
+    }
 }
 
 //=============================================================================================================
@@ -271,16 +276,16 @@ void TimeFrequency::computeTimeFreqency()
 //    DISPLIB::TFplot* tfplot = new DISPLIB::TFplot(spectr.front(), m_pAvgModel->getEvokedSet()->evoked.first().info.sfreq, 0, 100, DISPLIB::ColorMaps::Jet);
 //    tfplot->show();
 
-    auto spectr2 = RTPROCESSINGLIB::TimeFrequencyData::computeTimeFrequency(*m_pAvgModel->getEvokedSet());
+//    auto spectr2 = RTPROCESSINGLIB::TimeFrequencyData::computeTimeFrequency(*m_pAvgModel->getEvokedSet());
 
-    DISPLIB::TFplot* tfplot2 = new DISPLIB::TFplot(spectr2.front(), m_pAvgModel->getEvokedSet()->evoked.first().info.sfreq, 0, 100, DISPLIB::ColorMaps::Jet);
-    tfplot2->show();
+//    DISPLIB::TFplot* tfplot2 = new DISPLIB::TFplot(spectr2.front(), m_pAvgModel->getEvokedSet()->evoked.first().info.sfreq, 0, 100, DISPLIB::ColorMaps::Jet);
+//    tfplot2->show();
 
-    DISPLIB::TFplot* tfplot3 = new DISPLIB::TFplot(spectr2.at(20), m_pAvgModel->getEvokedSet()->evoked.first().info.sfreq, 0, 100, DISPLIB::ColorMaps::Jet);
-    tfplot3->show();
+//    DISPLIB::TFplot* tfplot3 = new DISPLIB::TFplot(spectr2.at(20), m_pAvgModel->getEvokedSet()->evoked.first().info.sfreq, 0, 100, DISPLIB::ColorMaps::Jet);
+//    tfplot3->show();
 
-    DISPLIB::TFplot* tfplot4 = new DISPLIB::TFplot(spectr2.at(80), m_pAvgModel->getEvokedSet()->evoked.first().info.sfreq, 0, 100, DISPLIB::ColorMaps::Jet);
-    tfplot4->show();
+//    DISPLIB::TFplot* tfplot4 = new DISPLIB::TFplot(spectr2.at(80), m_pAvgModel->getEvokedSet()->evoked.first().info.sfreq, 0, 100, DISPLIB::ColorMaps::Jet);
+//    tfplot4->show();
 
 
     m_pTFModel->setFiffInfo(m_pAvgModel->getEvokedSet()->evoked.first().info);

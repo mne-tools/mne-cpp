@@ -219,6 +219,8 @@ float TimeFrequencyModel::getSamplingFrequency()
 void TimeFrequencyModel::setMinFreq(int iFreq)
 {
     m_iMinFreq = iFreq;
+
+    emit dataChanged(index(0,0), index(rowCount() - 1, columnCount() - 1));
 }
 
 //=============================================================================================================
@@ -226,6 +228,8 @@ void TimeFrequencyModel::setMinFreq(int iFreq)
 void TimeFrequencyModel::setMaxFreq(int iFreq)
 {
     m_iMaxFreq = iFreq;
+
+    emit dataChanged(index(0,0), index(rowCount() - 1, columnCount() - 1));
 }
 
 //=============================================================================================================

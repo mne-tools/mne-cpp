@@ -80,6 +80,9 @@ public:
     static std::vector<Eigen::MatrixXcd> computeComplexTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet);
 
 private:
+
+    Eigen::MatrixXcd        m_TFData;
+
 };
 
 

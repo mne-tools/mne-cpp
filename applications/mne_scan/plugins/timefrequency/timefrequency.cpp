@@ -45,6 +45,8 @@
 #include <scMeas/realtimetimefrequency.h>
 #include <scMeas/realtimemultisamplearray.h>
 
+#include <utils/spectrogram.h>
+
 #include <iostream>
 
 //=============================================================================================================
@@ -72,7 +74,7 @@ using namespace UTILSLIB;
 
 TimeFrequency::TimeFrequency()
 : m_pCircularEvokedBuffer(CircularBuffer<FIFFLIB::FiffEvoked>::SPtr::create(40))
-, m_iDataQueueBlockSize(25)
+, m_iDataQueueBlockSize(15)
 {
 }
 
@@ -172,13 +174,14 @@ void TimeFrequency::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         if (m_pFiffInfo){
             QMutexLocker locker(&m_qMutex);
             for(unsigned char i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
+                std::cout << "pRTMSA->getMultiSampleArray().size() " << pRTMSA->getMultiSampleArray().size();
                 // Please note that we do not need a copy here since this function will block until
                 // the buffer accepts new data again. Hence, the data is not deleted in the actual
                 // Measurement function after it emitted the notify signal.
-                m_DataQueue.push_back(pRTMSA->getMultiSampleArray()[i]);
-//                while(!m_pCircularTimeSeriesBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
-//                    //Do nothing until the circular buffer is ready to accept new data again
-//                }
+//                m_DataQueue.push_back(pRTMSA->getMultiSampleArray()[i]);
+                while(!m_pCircularTimeSeriesBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
+                    //Do nothing until the circular buffer is ready to accept new data again
+                }
             }
         }
     }
@@ -215,21 +218,50 @@ void TimeFrequency::initPluginControlWidgets()
 }
 
 //=============================================================================================================
-
+#include <disp/plots/tfplot.h>
 void TimeFrequency::run()
 {
     FIFFLIB::FiffEvoked evoked;
     QStringList lResponsibleTriggerTypes;
+    Eigen::MatrixXd matData;
+
 
     while(!isInterruptionRequested()){
-        if(m_DataQueue.size() > m_iDataQueueBlockSize){
-            QMutexLocker locker(&m_qMutex);
+        if(m_pCircularTimeSeriesBuffer->pop(matData)){
 
-            computeTimeFrequency();
+//            int iCols = 0;
 
-            while(m_DataQueue.size() > m_iDataQueueBlockSize){
-                m_DataQueue.pop_front();
-            }
+//            std::cout<< "First matrix r:" << m_DataQueue.front().rows() << " | c: " << m_DataQueue.front().cols() << std::endl;
+
+//            for (auto mat : m_DataQueue){
+//                iCols += mat.cols();
+//            }
+
+//            std::cout << "COLS: " << iCols << std::endl;
+
+//            Eigen::MatrixXd dataMat(m_DataQueue.front().rows(), iCols);
+
+//            for (auto mat : m_DataQueue){
+//                Eigen::MatrixXd temp = mat;
+//                dataMat << temp;
+//            }
+
+//            std::cout << "New Matrix - r: " << dataMat.rows() << " | c: " << dataMat.cols() << std::endl;
+
+//            if((testing_counter % 20) == 0){
+//            Eigen::VectorXd dataCol = dataMat.row(1).transpose();
+
+//            Eigen::MatrixXd Spectrum = UTILSLIB::Spectrogram::makeSpectrogram(dataCol,  m_pFiffInfo->sfreq * 0.2);
+
+////            DISPLIB::TFplot* tfplot2 = new DISPLIB::TFplot(Spectrum, m_pFiffInfo->sfreq, 0, 50, DISPLIB::ColorMaps::Jet);
+
+////            tfplot2->show();
+//            }
+
+//            while(m_DataQueue.size() > m_iDataQueueBlockSize){
+//                m_DataQueue.pop_front();
+//            }
+//            testing_counter++;
         }
 //        if(m_pCircularEvokedBuffer->pop(evoked)) {
 //            m_qMutex.lock();
@@ -251,17 +283,25 @@ void TimeFrequency::computeTimeFrequency()
 
     std::cout<< "First matrix r:" << m_DataQueue.front().rows() << " | c: " << m_DataQueue.front().cols() << std::endl;
 
+    Eigen::MatrixXd dataMat(m_DataQueue.front().rows(), iCols);
+
+    {
+    QMutexLocker locker(&m_qMutex);
     for (auto mat : m_DataQueue){
         iCols += mat.cols();
     }
 
     std::cout << "COLS: " << iCols << std::endl;
-
-    Eigen::MatrixXd dataMat(m_DataQueue.front().rows(), iCols);
-
     for (auto mat : m_DataQueue){
         dataMat << mat;
     }
-
+    }
     std::cout << "New Matrix - r: " << dataMat.rows() << " | c: " << dataMat.cols() << std::endl;
+
+//    for(int i = 0; i < dataMat.rows(); i++){
+//        Eigen::VectorXd dataCol = dataMat.row(i).transpose();
+
+//        Eigen::MatrixXd Spectrum = UTILSLIB::Spectrogram::makeSpectrogram(dataCol,  m_pFiffInfo->sfreq * 0.2);
+//    }
+
 }
