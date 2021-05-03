@@ -40,7 +40,7 @@ Release binaries for Windows, Mac and Linux are available [here](https://mne-cpp
 Get involved
 ------------
 
-If you want to contribute to MNE-CPP you can find all necessary information [here]https://mne-cpp.github.io/pages/development/contribute.html).
+If you want to contribute to MNE-CPP you can find all necessary information [here](https://mne-cpp.github.io/pages/development/contribute.html).
 
 Contact
 -------
