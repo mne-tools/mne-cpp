@@ -102,7 +102,6 @@ Averaging::Averaging()
 , m_bRejection(0)
 , m_bLoaded(0)
 , m_bPerformFiltering(false)
-, m_iCurrentGroup(9999)
 {
     m_pEvokedModel = QSharedPointer<DISPLIB::EvokedSetModel>(new DISPLIB::EvokedSetModel());
 }
@@ -259,7 +258,6 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
             m_filterKernel = e->getData().value<FilterKernel>();
             break;
         case EVENT_TYPE::EVENT_GROUPS_UPDATED:
-            updateGroups();
             break;
         case EVENT_TYPE::CHANNEL_SELECTION_ITEMS:
             setChannelSelection(e->getData());
@@ -398,7 +396,7 @@ void Averaging::computeAverage()
     m_Future = QtConcurrent::run(this,
                                  &Averaging::averageCalculation,
                                  *this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data(),
-                                 m_pFiffRawModel->getEventModel()->getEventMatrix(m_iCurrentGroup),
+                                 m_pFiffRawModel->getEventModel()->getEventMatrix(),
                                  m_filterKernel,
                                  *m_pFiffRawModel->getFiffInfo());
     m_FutureWatcher.setFuture(m_Future);
@@ -473,7 +471,7 @@ void Averaging::createNewAverage()
         QSharedPointer<ANSHAREDLIB::AveragingDataModel> pNewAvgModel = QSharedPointer<ANSHAREDLIB::AveragingDataModel>(new ANSHAREDLIB::AveragingDataModel(pEvokedSet));
 
         m_pAnalyzeData->addModel<ANSHAREDLIB::AveragingDataModel>(pNewAvgModel,
-                                                                  "Average - " + m_pAveragingSettingsView->getCurrentSelectGroup() + " - " + QDateTime::currentDateTime().toString());
+                                                                  "Average - " + QDateTime::currentDateTime().toString());
 
         qInfo() << "[Averaging::createNewAverage] Average computed.";
     } else {
@@ -558,9 +556,6 @@ void Averaging::loadFullGui(QSharedPointer<FIFFLIB::FiffInfo> pInfo)
     connect(pChannelDataSettingsView, &DISPLIB::FiffRawViewSettings::makeScreenshot,
             this, &Averaging::onMakeScreenshot, Qt::UniqueConnection);
 
-    connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::changeGroupSelect,
-            this, &Averaging::onChangeGroupSelect, Qt::UniqueConnection);
-
     m_pAverageLayoutView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
     m_pButterflyView->setBackgroundColor(pChannelDataSettingsView->getBackgroundColor());
 
@@ -604,31 +599,6 @@ void Averaging::onMakeScreenshot(const QString& imageType)
     }
 
     m_pButterflyView->takeScreenshot(fileName);
-}
-
-//=============================================================================================================
-
-void Averaging::updateGroups()
-{
-    m_pAveragingSettingsView->clearSelectionGroup();
-    if(!m_pFiffRawModel){
-        return;
-    }
-
-    if (m_pFiffRawModel->hasSavedEvents()){
-        auto groups = m_pFiffRawModel->getEventModel()->getGroupsToDisplay();
-        for (auto group : *groups){
-            m_pAveragingSettingsView->addSelectionGroup((group.name).c_str(), group.id);
-        }
-    }
-}
-
-//=============================================================================================================
-
-void Averaging::onChangeGroupSelect(int iId)
-{
-    QMutexLocker lock(&m_ParameterMutex);
-    m_iCurrentGroup = iId;
 }
 
 //=============================================================================================================
