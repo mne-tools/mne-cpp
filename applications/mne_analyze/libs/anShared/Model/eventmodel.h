@@ -323,7 +323,7 @@ public:
      *
      * @return Returns a matrix of formatted event data.
      */
-    MatrixXi getEventMatrix(int iGroup = 9999);
+    MatrixXi getEventMatrix();
 
     //=========================================================================================================
     /**

@@ -293,12 +293,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Updates the dropdown display for selecting from which group to average
-     */
-    void updateGroups();
-
-    //=========================================================================================================
-    /**
      * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
      *
      * @param[out] imageType     The current iamge type: png, svg.
@@ -346,8 +340,6 @@ private:
     bool                                                    m_bPerformFiltering;        /**< Flag whether to activate/deactivate filtering. */
 
     RTPROCESSINGLIB::FilterKernel                           m_filterKernel;             /**< List of currently active filters. */
-
-    int                                                     m_iCurrentGroup;            /**< Event group from which to compute average. 9999 for current selection. */
 
     QFutureWatcher<QSharedPointer<FIFFLIB::FiffEvokedSet>>  m_FutureWatcher;            /**< Future watcher for notifing of completed average calculations. */
     QFuture<QSharedPointer<FIFFLIB::FiffEvokedSet>>         m_Future;                   /**< Future for performing average calculations of separate thread. */

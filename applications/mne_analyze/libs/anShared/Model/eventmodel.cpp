@@ -490,30 +490,17 @@ void EventModel::appendSelected(int iSelectedIndex)
 
 //=============================================================================================================
 
-MatrixXi EventModel::getEventMatrix(int iGroup)
+MatrixXi EventModel::getEventMatrix()
 {
     MatrixXi matEventDataMatrix;
 
-    if(iGroup == 9999){
-        //Current selecting in Event Plugin
+    auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
 
-        auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
-
-        matEventDataMatrix.resize(events->size(), 3);
-        for (int i = 0; i < events->size(); i++){
-            matEventDataMatrix(i,0) = events->at(i).sample;
-            matEventDataMatrix(i,1) = 0;
-            matEventDataMatrix(i,2) = 1;
-        }
-    } else {
-        auto events = m_EventManager.getEventsInGroup(iGroup);
-
-        matEventDataMatrix.resize(events->size(), 3);
-        for (int i = 0; i < events->size(); i++){
-            matEventDataMatrix(i,0) = events->at(i).sample;
-            matEventDataMatrix(i,1) = 0;
-            matEventDataMatrix(i,2) = 1;
-        }
+    matEventDataMatrix.resize(events->size(), 3);
+    for (int i = 0; i < events->size(); i++){
+        matEventDataMatrix(i,0) = events->at(i).sample;
+        matEventDataMatrix(i,1) = 0;
+        matEventDataMatrix(i,2) = 1;
     }
 
     return matEventDataMatrix;

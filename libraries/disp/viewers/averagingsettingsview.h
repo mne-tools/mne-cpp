@@ -200,7 +200,6 @@ signals:
     void changeAverageMode(qint32 index);
     void calculateAverage(bool state);
     void changeDropActive(bool state);
-    void changeGroupSelect(int iId);
 };
 } // NAMESPACE
 
