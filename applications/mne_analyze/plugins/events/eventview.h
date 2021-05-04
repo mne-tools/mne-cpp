@@ -155,7 +155,7 @@ signals:
     /**
      * Notifies that the number/names of groups have changed
      */
-    void groupsUpdated();
+    void eventsUpdated();
 
     //=========================================================================================================
     /**
