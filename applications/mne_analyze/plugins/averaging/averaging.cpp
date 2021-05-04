@@ -102,6 +102,7 @@ Averaging::Averaging()
 , m_bRejection(0)
 , m_bLoaded(0)
 , m_bPerformFiltering(false)
+, m_bAutoRecompute(false)
 {
     m_pEvokedModel = QSharedPointer<DISPLIB::EvokedSetModel>(new DISPLIB::EvokedSetModel());
 }
@@ -219,6 +220,8 @@ QDockWidget* Averaging::getControl()
             this, &Averaging::onRejectionChecked, Qt::UniqueConnection);
     connect(&m_FutureWatcher, &QFutureWatcher<QMap<double,QList<int>>>::finished,
             this, &Averaging::createNewAverage, Qt::UniqueConnection);
+    connect(m_pAveragingSettingsView, &DISPLIB::AveragingSettingsView::setAutoCompute,
+            this, &Averaging::setAutoCompute, Qt::UniqueConnection);
 
     m_pAveragingSettingsView->setProcessingMode(DISPLIB::AbstractView::ProcessingMode::Offline);
     m_pAveragingSettingsView->setSizePolicy(QSizePolicy::Expanding,
@@ -568,6 +571,8 @@ void Averaging::loadFullGui(QSharedPointer<FIFFLIB::FiffInfo> pInfo)
     m_fPreStim = -(static_cast<float>(m_pAveragingSettingsView->getPreStimMSeconds())/1000.f);
     m_fPostStim = static_cast<float>(m_pAveragingSettingsView->getPostStimMSeconds())/1000.f;
 
+    m_bAutoRecompute = m_pAveragingSettingsView->getAutoComputeStatus();
+
     m_bLoaded = true;
 }
 
@@ -699,4 +704,11 @@ void Averaging::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemov
             m_pAverageLayoutView->clearView();
         }
     }
+}
+
+//=============================================================================================================
+
+void Averaging::setAutoCompute(bool bShouldAutoCompute)
+{
+    m_bAutoRecompute = bShouldAutoCompute;
 }
