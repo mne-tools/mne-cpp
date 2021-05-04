@@ -103,6 +103,8 @@ Averaging::Averaging()
 , m_bLoaded(0)
 , m_bPerformFiltering(false)
 , m_bAutoRecompute(false)
+, m_bSavingAverage(false)
+, m_pAutoComputeEvokedModel(DISPLIB::EvokedSetModel::create())
 {
     m_pEvokedModel = QSharedPointer<DISPLIB::EvokedSetModel>(new DISPLIB::EvokedSetModel());
 }
@@ -391,7 +393,7 @@ void Averaging::computeAverage()
 
     if (m_FutureWatcher.isRunning()){
         qWarning() << "Averaging computation already taking place.";
-        return;
+        m_FutureWatcher.waitForFinished();
     }
 
     triggerLoadingStart("Calculating average...");
@@ -471,12 +473,16 @@ void Averaging::createNewAverage()
     QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet = m_Future.result();
 
     if(pEvokedSet){
+        if(m_bAutoRecompute){
+            m_pEvokedModel->setEvokedSet(pEvokedSet);
+            updateEvokedSetModel();
+        } else {
+
         QSharedPointer<ANSHAREDLIB::AveragingDataModel> pNewAvgModel = QSharedPointer<ANSHAREDLIB::AveragingDataModel>(new ANSHAREDLIB::AveragingDataModel(pEvokedSet));
 
         m_pAnalyzeData->addModel<ANSHAREDLIB::AveragingDataModel>(pNewAvgModel,
                                                                   "Average - " + QDateTime::currentDateTime().toString());
-
-        qInfo() << "[Averaging::createNewAverage] Average computed.";
+        }
     } else {
         qInfo() << "[Averaging::createNewAverage] Unable to compute average.";
     }
@@ -668,13 +674,7 @@ void Averaging::onNewAveragingModel(QSharedPointer<ANSHAREDLIB::AveragingDataMod
 {
     m_pEvokedModel->setEvokedSet(pAveragingModel->data(QModelIndex()).value<QSharedPointer<FIFFLIB::FiffEvokedSet>>());
 
-    m_pButterflyView->setEvokedSetModel(m_pEvokedModel);
-    m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
-
-    m_pButterflyView->showAllChannels();
-    m_pButterflyView->dataUpdate();
-    m_pButterflyView->updateView();
-    m_pAverageLayoutView->updateData();
+    updateEvokedSetModel();
 }
 
 //=============================================================================================================
@@ -711,4 +711,17 @@ void Averaging::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemov
 void Averaging::setAutoCompute(bool bShouldAutoCompute)
 {
     m_bAutoRecompute = bShouldAutoCompute;
+}
+
+//=============================================================================================================
+
+void Averaging::updateEvokedSetModel()
+{
+    m_pButterflyView->setEvokedSetModel(m_pEvokedModel);
+    m_pAverageLayoutView->setEvokedSetModel(m_pEvokedModel);
+
+    m_pButterflyView->showAllChannels();
+    m_pButterflyView->dataUpdate();
+    m_pButterflyView->updateView();
+    m_pAverageLayoutView->updateData();
 }
