@@ -33,7 +33,7 @@ For a MSVC 2017 build you need to use `Visual Studio 15 2017 Win64` instead.
 
 ## Compilation of the BrainFlowBoard Plugin in MNE Scan
 
-* After the steps above make sure that you use the `MNECPP_CONFIG` flag `withBrainFlow`. You can also set the flag manually in the [mne-cpp.pri file](https://github.com/mne-tools/mne-cpp/blob/master/mne-cpp.pri#L135){:target="_blank" rel="noopener"}.
+* After the steps above make sure that you use the `MNECPP_CONFIG` flag `withBrainFlow`. You can also set the flag manually in the [mne-cpp.pri file](https://github.com/mne-tools/mne-cpp/blob/main/mne-cpp.pri#L135){:target="_blank" rel="noopener"}.
 * Build MNE Scan.
 * BrainFlow has several dynamic libraries and a JSON file which must be in your search path before you run MNE Scan. You need to copypaste all dynamic libraries and the brainflow_boards.json file to your executable folder `mne-cpp\bin` from `mne-cpp\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib`.
 

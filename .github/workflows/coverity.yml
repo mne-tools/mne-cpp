@@ -24,7 +24,7 @@ jobs:
           COVERITY_SCAN_PROJECT_NAME="mne-tools/mne-cpp"
           COVERITY_SCAN_NOTIFICATION_EMAIL1="lorenzesch@hotmail.com"
           COVERITY_SCAN_NOTIFICATION_EMAIL2="gbmotta@mgh.harvard.edu"
-          COVERITY_SCAN_BRANCH_PATTERN="master"
+          COVERITY_SCAN_BRANCH_PATTERN="main"
           COVERITY_SCAN_BUILD_COMMAND_PREPEND="qmake -r MNECPP_CONFIG+=noTests"
           COVERITY_SCAN_BUILD_COMMAND="make -j4"
           COVERITY_SCAN_TOKEN=$COVTOKEN

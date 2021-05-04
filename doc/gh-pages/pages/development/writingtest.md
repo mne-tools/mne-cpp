@@ -21,7 +21,7 @@ After this, a new window should open and allow you to choose from a variety of t
 
 ## Structuring the Test
 
-Always keep our [Coding Conventions](contr_style.md) in mind. Consider taking a look at already available tests to get started. First, you create a class named after your test: `TestName`. The following code snippet shows an example for a test. The `slots` are defining the functions to execute your function `initTestCase()` and compare the output to reference values, e.g. `compareValue()`. Further, you can declare threshold values as private variables that indicate the difference which should not be exceeded when comapring. An example for a test can be found [here](https://github.com/mne-tools/mne-cpp/blob/master/testframes/test_fiff_rwr/test_fiff_rwr.cpp){:target="_blank" rel="noopener"}.
+Always keep our [Coding Conventions](contr_style.md) in mind. Consider taking a look at already available tests to get started. First, you create a class named after your test: `TestName`. The following code snippet shows an example for a test. The `slots` are defining the functions to execute your function `initTestCase()` and compare the output to reference values, e.g. `compareValue()`. Further, you can declare threshold values as private variables that indicate the difference which should not be exceeded when comapring. An example for a test can be found [here](https://github.com/mne-tools/mne-cpp/blob/main/testframes/test_fiff_rwr/test_fiff_rwr.cpp){:target="_blank" rel="noopener"}.
 
 ```cpp
 class TestFiffRWR: public QObject
