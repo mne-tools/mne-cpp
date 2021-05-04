@@ -213,19 +213,22 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Drop Rejected</string>
+      <string>Drop rejected.</string>
      </property>
     </widget>
-   </item>
-   <item>
-    <widget class="QLineEdit" name="lineEdit"/>
    </item>
    <item>
     <widget class="QCheckBox" name="checkBox_autoCompute">
      <property name="text">
       <string>Live average based on events.</string>
      </property>
+     <property name="checked">
+      <bool>true</bool>
+     </property>
     </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="lineEdit"/>
    </item>
    <item>
     <widget class="QPushButton" name="m_pushButton_compute">
