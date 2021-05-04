@@ -120,8 +120,8 @@ QDockWidget *Events::getControl()
     connect(pEventView, &EventView::triggerRedraw,
             this, &Events::onTriggerRedraw, Qt::UniqueConnection);
 
-    connect(pEventView, &EventView::groupsUpdated,
-            this, &Events::onGroupsUpdated, Qt::UniqueConnection);
+    connect(pEventView, &EventView::eventsUpdated,
+            this, &Events::onEventsUpdated, Qt::UniqueConnection);
 
     connect(pEventView, &EventView::activeEventsChecked,
             this, &Events::toggleDisplayEvent, Qt::UniqueConnection);
@@ -251,9 +251,9 @@ void Events::onJumpToSelected()
 
 //=============================================================================================================
 
-void Events::onGroupsUpdated()
+void Events::onEventsUpdated()
 {
-    m_pCommu->publishEvent(EVENT_GROUPS_UPDATED);
+    m_pCommu->publishEvent(EVENTS_UPDATED);
 }
 
 //=============================================================================================================
