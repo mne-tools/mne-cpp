@@ -221,6 +221,13 @@
     <widget class="QLineEdit" name="lineEdit"/>
    </item>
    <item>
+    <widget class="QCheckBox" name="checkBox_autoCompute">
+     <property name="text">
+      <string>Live average based on events.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QPushButton" name="m_pushButton_compute">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
