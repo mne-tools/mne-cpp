@@ -224,6 +224,9 @@ void AveragingSettingsView::redrawGUI()
     connect(m_pUi->m_checkBox_reject, &QCheckBox::clicked,
             this, &AveragingSettingsView::changeDropActive);
 
+    connect(m_pUi->checkBox_autoCompute, &QCheckBox::clicked,
+            this, &AveragingSettingsView::setAutoCompute);
+
     m_pUi->m_pushButton_compute->hide();
     m_pUi->m_checkBox_reject->hide();
 
@@ -440,4 +443,11 @@ void AveragingSettingsView::onChangeStimChannel()
 void AveragingSettingsView::clearView()
 {
 
+}
+
+//=============================================================================================================
+
+bool AveragingSettingsView::getAutoComputeStatus()
+{
+    return m_pUi->checkBox_autoCompute->isChecked();
 }
