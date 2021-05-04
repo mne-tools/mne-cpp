@@ -315,6 +315,8 @@ private:
 
     void setAutoCompute(bool bShouldAutoCompute);
 
+    void updateEvokedSetModel();
+
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model. */
     QSharedPointer<QList<QPair<int,double>>>                m_pTriggerList;             /**< Pointer to list of stim triggers. */
     QSharedPointer<DISPLIB::EvokedSetModel>                 m_pEvokedModel;             /**< Pointer to model used to display averaging data from m_pFiffEvokedSet and m_pFiffEvoked. */
@@ -341,6 +343,7 @@ private:
     bool                                                    m_bLoaded;                  /**< Whether the full GUI has already been laoaded. */
     bool                                                    m_bPerformFiltering;        /**< Flag whether to activate/deactivate filtering. */
     bool                                                    m_bAutoRecompute;
+    bool                                                    m_bSavingAverage;
 
     RTPROCESSINGLIB::FilterKernel                           m_filterKernel;             /**< List of currently active filters. */
 
