@@ -104,7 +104,6 @@ Averaging::Averaging()
 , m_bPerformFiltering(false)
 , m_bAutoRecompute(false)
 , m_bSavingAverage(false)
-, m_pAutoComputeEvokedModel(DISPLIB::EvokedSetModel::create())
 {
     m_pEvokedModel = QSharedPointer<DISPLIB::EvokedSetModel>(new DISPLIB::EvokedSetModel());
 }
@@ -262,7 +261,10 @@ void Averaging::handleEvent(QSharedPointer<Event> e)
         case EVENT_TYPE::FILTER_DESIGN_CHANGED:
             m_filterKernel = e->getData().value<FilterKernel>();
             break;
-        case EVENT_TYPE::EVENT_GROUPS_UPDATED:
+        case EVENT_TYPE::EVENTS_UPDATED:
+            if(m_bAutoRecompute){
+                computeAverage();
+            }
             break;
         case EVENT_TYPE::CHANNEL_SELECTION_ITEMS:
             setChannelSelection(e->getData());
@@ -289,7 +291,7 @@ QVector<EVENT_TYPE> Averaging::getEventSubscriptions(void) const
     temp.push_back(SELECTED_MODEL_CHANGED);
     temp.push_back(FILTER_ACTIVE_CHANGED);
     temp.push_back(FILTER_DESIGN_CHANGED);
-    temp.push_back(EVENT_GROUPS_UPDATED);
+    temp.push_back(EVENTS_UPDATED);
     temp.push_back(CHANNEL_SELECTION_ITEMS);
     temp.push_back(SCALING_MAP_CHANGED);
     temp.push_back(VIEW_SETTINGS_CHANGED);
@@ -379,6 +381,7 @@ void Averaging::onResetAverage(bool state)
 void Averaging::onComputeButtonClicked(bool bChecked)
 {
     Q_UNUSED(bChecked);
+    m_bSavingAverage = true;
     computeAverage();
 }
 
@@ -386,14 +389,15 @@ void Averaging::onComputeButtonClicked(bool bChecked)
 
 void Averaging::computeAverage()
 {
-    if(!m_pFiffRawModel){
+    if(!m_pFiffRawModel || (m_pFiffRawModel->getEventModel()->rowCount() < 2)){
         qWarning() << "No model loaded. Cannot calculate average.";
         return;
     }
 
     if (m_FutureWatcher.isRunning()){
         qWarning() << "Averaging computation already taking place.";
-        m_FutureWatcher.waitForFinished();
+        return;
+        //m_FutureWatcher.waitForFinished();
     }
 
     triggerLoadingStart("Calculating average...");
@@ -473,20 +477,20 @@ void Averaging::createNewAverage()
     QSharedPointer<FIFFLIB::FiffEvokedSet> pEvokedSet = m_Future.result();
 
     if(pEvokedSet){
-        if(m_bAutoRecompute){
+        if(m_bSavingAverage){
+            QSharedPointer<ANSHAREDLIB::AveragingDataModel> pNewAvgModel = QSharedPointer<ANSHAREDLIB::AveragingDataModel>(new ANSHAREDLIB::AveragingDataModel(pEvokedSet));
+
+            m_pAnalyzeData->addModel<ANSHAREDLIB::AveragingDataModel>(pNewAvgModel,
+                                                                      "Average - " + QDateTime::currentDateTime().toString());
+        } else if(m_bAutoRecompute){
             m_pEvokedModel->setEvokedSet(pEvokedSet);
             updateEvokedSetModel();
-        } else {
-
-        QSharedPointer<ANSHAREDLIB::AveragingDataModel> pNewAvgModel = QSharedPointer<ANSHAREDLIB::AveragingDataModel>(new ANSHAREDLIB::AveragingDataModel(pEvokedSet));
-
-        m_pAnalyzeData->addModel<ANSHAREDLIB::AveragingDataModel>(pNewAvgModel,
-                                                                  "Average - " + QDateTime::currentDateTime().toString());
         }
     } else {
         qInfo() << "[Averaging::createNewAverage] Unable to compute average.";
     }
 
+    m_bSavingAverage = false;
     triggerLoadingEnd("Calculating average...");
 }
 

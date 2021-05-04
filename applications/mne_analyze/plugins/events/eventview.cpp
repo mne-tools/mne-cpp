@@ -239,6 +239,7 @@ void EventView::onDataChanged()
     m_pUi->m_tableView_eventTableView->viewport()->update();
     m_pUi->m_tableView_eventTableView->viewport()->repaint();
     emit triggerRedraw();
+    emit eventsUpdated();
 }
 
 //=============================================================================================================
@@ -266,7 +267,6 @@ void EventView::removeEvent()
     for (auto it = set.crbegin(); it != set.crend(); ++it){
         m_pEventModel->removeRow(*it);
     }
-
 
     emit triggerRedraw();
 }
@@ -463,7 +463,6 @@ void EventView::deleteGroup()
 
     m_pEventModel->deleteSelectedGroups();
     onDataChanged();
-    emit groupsUpdated();
 }
 
 //=============================================================================================================
@@ -627,7 +626,6 @@ void EventView::createGroupsFromTriggers()
     }
 
     emit triggerRedraw();
-    emit groupsUpdated();
     emit loadingEnd("Detecting triggers...");
 }
 
@@ -670,7 +668,6 @@ void EventView::redrawGroups()
     }
 
     qDebug() << "EventView::redrawGroups";
-    emit groupsUpdated();
     emit triggerRedraw();
 }
 

@@ -148,7 +148,7 @@ private:
     /**
      * Publishes event to notify that event groups have been changed
      */
-    void onGroupsUpdated();
+    void onEventsUpdated();
 
     //=========================================================================================================
     /**
