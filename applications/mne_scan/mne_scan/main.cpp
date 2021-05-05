@@ -171,8 +171,6 @@ int main(int argc, char *argv[])
     fmt.setSamples(10);
     QSurfaceFormat::setDefaultFormat(fmt);
 
-    mainWin.hideSplashScreen();
-
     int returnValue(app.exec());
 
     return returnValue;
