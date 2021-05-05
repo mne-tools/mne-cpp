@@ -57,7 +57,7 @@ using namespace MNESCAN;
 PluginItem::PluginItem(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin, QMenu *contextMenu, QGraphicsItem *parent)
 : QGraphicsPolygonItem(parent)
 , m_pPlugin(pPlugin)
-, m_iWidth(60)
+, m_iWidth(90)
 , m_iHeight(40)
 , m_contextMenu(contextMenu)
 {
@@ -123,9 +123,9 @@ void PluginItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * opti
 //            break;
 //    }
 
-    painter->drawText(-m_iWidth/2+4,-m_iHeight/2+14,m_pPlugin->getName().mid(0,8));
+    painter->drawText(-m_iWidth/2+7,7,m_pPlugin->getName().mid(0,10));
 
-    painter->drawText(-m_iWidth/2+4,-m_iHeight/2+28,m_pPlugin->getName().mid(8,8));
+//    painter->drawText(-m_iWidth/2+4,-m_iHeight/2+28,m_pPlugin->getName().mid(8,8));
 }
 
 //=============================================================================================================
