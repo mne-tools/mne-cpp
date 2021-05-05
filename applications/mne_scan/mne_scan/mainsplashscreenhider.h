@@ -46,6 +46,12 @@
 #include <QThread>
 
 //=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include "mainsplashscreen.h"
+
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -61,7 +67,7 @@ namespace MNESCAN
 // MNESCAN FORWARD DECLARATIONS
 //=============================================================================================================
 
-//=============================================================================================================
+
 /**
  * Provides a class for QThread to work on a separate thread, just to hide the splash screen window whenever
  * found convenient.
@@ -70,12 +76,14 @@ class MainSplashScreenHider : public QThread
 {
     Q_OBJECT
 public:
-    MainSplashScreenHider();
+    MainSplashScreenHider(QSharedPointer<MainSplashScreen> splashScreen);
+    MainSplashScreenHider(QSharedPointer<MainSplashScreen> splashScreen, unsigned long sleepTime);
 
 protected:
     void run();
 
-
+    QSharedPointer<MNESCAN::MainSplashScreen> m_pSlashScreenToHide;     /**< Pointer to the slpash screen to hide.*/
+    unsigned long   m_iSecondsToSleep;                                  /**< Time to wait before hiding the splash window.*/
 };
 
 } // namespace MNESCAN
