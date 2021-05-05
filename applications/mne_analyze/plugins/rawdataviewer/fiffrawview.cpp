@@ -39,6 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <math.h>
 #include "fiffrawview.h"
 #include "fiffrawviewdelegate.h"
 
@@ -396,8 +397,8 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
     }
 
     int iFirstSampleOffset = m_pModel->absoluteFirstSample();
-    int iScrollBarOffset = m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference();
-    int iMouseOffset = pos.x() / m_pModel->pixelDifference();
+    int iScrollBarOffset = static_cast<int>(std::round(m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()));
+    int iMouseOffset = static_cast<int>(std::round(pos.x() / m_pModel->pixelDifference()));
 
     m_iLastClickedSample = iFirstSampleOffset + iScrollBarOffset + iMouseOffset;
 
