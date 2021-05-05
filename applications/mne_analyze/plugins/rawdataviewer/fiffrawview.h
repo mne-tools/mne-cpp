@@ -4,13 +4,14 @@
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
- *           Gabriel Motta <gbmotta@mgh.harvard.edu>
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>;
+ *           Juan GPC   <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     July, 2018
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke, Gabriel Motta. All rights reserved.
+ * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke, Gabriel Motta, Juan GPC. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
