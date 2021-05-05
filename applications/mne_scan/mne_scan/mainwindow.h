@@ -173,7 +173,7 @@ public:
      *
      * @param[in] bShowSplashScreen    Whether to show the splash screen until this widget is shown. Default is true.
      */
-    void setSplashScreen(bool bShowSplashScreen = true);
+    void initSplashScreen(bool bShowSplashScreen = true);
 
     //=========================================================================================================
     /**

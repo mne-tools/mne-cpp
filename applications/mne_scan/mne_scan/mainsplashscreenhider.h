@@ -76,10 +76,17 @@ class MainSplashScreenHider : public QThread
 {
     Q_OBJECT
 public:
+    //=========================================================================================================
     MainSplashScreenHider(QSharedPointer<MainSplashScreen> splashScreen);
+
+    //=========================================================================================================
     MainSplashScreenHider(QSharedPointer<MainSplashScreen> splashScreen, unsigned long sleepTime);
 
 protected:
+    //=========================================================================================================
+    /**
+     * Method to be run from another thread.
+     */
     void run();
 
     QSharedPointer<MNESCAN::MainSplashScreen> m_pSlashScreenToHide;     /**< Pointer to the slpash screen to hide.*/

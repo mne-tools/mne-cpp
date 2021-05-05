@@ -55,6 +55,20 @@ using namespace MNESCAN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
+MainSplashScreen::MainSplashScreen ()
+: MainSplashScreen(QPixmap())
+{
+}
+
+//=============================================================================================================
+
+MainSplashScreen::MainSplashScreen (const QPixmap & pixmap)
+: MainSplashScreen(pixmap, 0)
+{
+}
+
+//=============================================================================================================
+
 MainSplashScreen::MainSplashScreen (const QPixmap & pixmap, Qt::WindowFlags f)
 : QSplashScreen(pixmap, f)
 {
