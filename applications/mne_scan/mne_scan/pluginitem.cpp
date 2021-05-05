@@ -105,27 +105,8 @@ PluginItem::~PluginItem()
 void PluginItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
     QGraphicsPolygonItem::paint(painter, option, widget);
-
     painter->setPen(QPen(m_qColorContour, 1));
-
-//    QString sKind("");
-//    switch (m_diagramType) {
-//        case StartEnd:
-//            break;
-//        case Algorithm:
-//            sKind = QString("Tool");
-//            break;
-//        case Sensor:
-//            sKind = QString("Sensor");
-//            break;
-//        default:
-//            sKind = QString("IO");
-//            break;
-//    }
-
     painter->drawText(-m_iWidth/2+7,7,m_pPlugin->getName().mid(0,10));
-
-//    painter->drawText(-m_iWidth/2+4,-m_iHeight/2+28,m_pPlugin->getName().mid(8,8));
 }
 
 //=============================================================================================================
@@ -194,18 +175,4 @@ QVariant PluginItem::itemChange(GraphicsItemChange change, const QVariant &value
     }
 
     return value;
-
-//    if (change == ItemPositionChange && scene()) {
-//        // value is the new position.
-//        QPointF newPos = value.toPointF();
-//        QRectF rect = scene()->sceneRect();
-//        if (!rect.contains(newPos)) {
-//            // Keep the item inside the scene rect.
-//            newPos.setX(qMin(rect.right(), qMax(newPos.x(), rect.left())));
-//            newPos.setY(qMin(rect.bottom(), qMax(newPos.y(), rect.top())));
-//            return newPos;
-//        }
-//    }
-
-//    return QGraphicsItem::itemChange(change, value);
 }
