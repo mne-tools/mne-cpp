@@ -77,6 +77,8 @@ class MainSplashScreenHider : public QThread
 {
     Q_OBJECT
 public:
+    typedef QSharedPointer<MainSplashScreenHider> SPtr;               /**< Shared pointer type for MainSplashScreenHider. */
+    typedef QSharedPointer<const MainSplashScreenHider> ConstSPtr;    /**< Const shared pointer type for MainSplashScreenHider. */
     //=========================================================================================================
     MainSplashScreenHider(MainSplashScreen& splashScreen);
 
