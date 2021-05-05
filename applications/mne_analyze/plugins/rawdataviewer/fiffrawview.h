@@ -375,6 +375,7 @@ private:
     //=========================================================================================================
     void onNewRealtimeData();
 
+    void initRightClickMenu();
 
     QPointer<QTableView>                                m_pTableView;                   /**< Pointer to table view ui element. */
 
@@ -396,6 +397,8 @@ private:
     QLabel*                                             m_pEndTimeLabel;                /**< Right 'Sample | Seconds' display label. */
     QLabel*                                             m_pFileLabel;                   /**< File name and path, Fs and duration. */
     QLabel*                                             m_pFilterLabel;                 /**< Short filter description to be shown under the time-series. */
+    QMenu*                                              m_pRightClickContextMenu;       /**< Hold the menu that appears when a right-click event occurs. */
+    QAction*                                            m_pAddEventAction;              /**< Hold the action for directing callback for adding a new event. */
 signals:
     void tableViewDataWidthChanged(int iWidth);
 
