@@ -379,7 +379,7 @@ bool EventView::newUserGroup(const QString& sName,
     QColor groupColor;
 
     if (!bDefaultColor) {
-        groupColor = m_pColordialog->getColor(Qt::black, this);
+        groupColor = QColor(rand()%255, rand()%255, rand()%255);
         if(!groupColor.isValid()){
             return false;
         }
