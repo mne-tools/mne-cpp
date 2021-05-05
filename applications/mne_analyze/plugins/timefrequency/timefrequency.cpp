@@ -41,6 +41,7 @@
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Model/averagingdatamodel.h>
+#include <anShared/Model/eventmodel.h>
 
 #include <disp/viewers/progressview.h>
 #include <disp/viewers/timefrequencyview.h>
@@ -267,11 +268,11 @@ void TimeFrequency::setChannelSelection(const QVariant &data)
 void TimeFrequency::computeTimeFreqency()
 {
     qDebug() << "[TimeFrequency::computeTimeFreqency]";
-    if (!m_pAvgModel){
+    if (!m_pFiffRawModel){
         return;
     }
 
-    auto spectr = RTPROCESSINGLIB::TimeFrequencyData::computeComplexTimeFrequency(*m_pAvgModel->getEvokedSet());
+//    auto spectr = RTPROCESSINGLIB::TimeFrequencyData::computeComplexTimeFrequency(*m_pAvgModel->getEvokedSet());
 
 //    DISPLIB::TFplot* tfplot = new DISPLIB::TFplot(spectr.front(), m_pAvgModel->getEvokedSet()->evoked.first().info.sfreq, 0, 100, DISPLIB::ColorMaps::Jet);
 //    tfplot->show();
@@ -288,6 +289,11 @@ void TimeFrequency::computeTimeFreqency()
 //    tfplot4->show();
 
 
-    m_pTFModel->setFiffInfo(m_pAvgModel->getEvokedSet()->evoked.first().info);
-    m_pTFModel->setSpectr(spectr);
+    auto tfData = RTPROCESSINGLIB::TimeFrequencyData::computeTimeFrequency(*m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data(),
+                                                                           m_pFiffRawModel->getEventModel()->getEventMatrix(9999),
+                                                                           -100,
+                                                                           300);
+
+//    m_pTFModel->setFiffInfo(m_pAvgModel->getEvokedSet()->evoked.first().info);
+//    m_pTFModel->setSpectr(spectr);
 }

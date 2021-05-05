@@ -79,10 +79,17 @@ public:
 
     static std::vector<Eigen::MatrixXcd> computeComplexTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet);
 
+    static std::vector<TimeFrequencyData> computeTimeFrequency(const FIFFLIB::FiffRawData& raw,
+                                                               const Eigen::MatrixXi& matEvents,
+                                                               float fTMinS,
+                                                               float fTMaxS);
+
+    Eigen::MatrixXcd getData();
 private:
 
-    Eigen::MatrixXcd        m_TFData;
+    void setTFData(Eigen::MatrixXcd matData);
 
+    Eigen::MatrixXcd        m_TFData;
 };
 
 

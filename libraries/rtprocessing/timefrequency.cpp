@@ -45,6 +45,8 @@
 
 #include <utils/spectrogram.h>
 
+#include <mne/mne_epoch_data_list.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -89,6 +91,8 @@ std::vector<Eigen::MatrixXd> TimeFrequencyData::computeTimeFrequency(const FIFFL
     return tfvector;
 }
 
+//=============================================================================================================
+
 std::vector<Eigen::MatrixXcd> TimeFrequencyData::computeComplexTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet)
 {
     qDebug() << "[RTPROCESSINGLIB::computeTimeFreqency]";
@@ -108,6 +112,27 @@ std::vector<Eigen::MatrixXcd> TimeFrequencyData::computeComplexTimeFrequency(con
 }
 
 //=============================================================================================================
+
+std::vector<TimeFrequencyData> TimeFrequencyData::computeTimeFrequency(const FIFFLIB::FiffRawData &raw,
+                                                                       const Eigen::MatrixXi &matEvents,
+                                                                       float fTMinS,
+                                                                       float fTMaxS)
+{
+
+    QMap<QString,double> mapReject;
+    mapReject.insert("eog", 300e-06);
+    int iType = 1;
+
+    MNELIB::MNEEpochDataList lstEpochDataList = MNELIB::MNEEpochDataList::readEpochs(raw,
+                                                                                     matEvents,
+                                                                                     fTMinS,
+                                                                                     fTMaxS,
+                                                                                     iType,
+                                                                                     mapReject);
+
+}
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -116,3 +141,4 @@ TimeFrequencyData::TimeFrequencyData()
 
 }
 
+//=============================================================================================================
