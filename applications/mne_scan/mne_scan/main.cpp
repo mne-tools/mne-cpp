@@ -166,7 +166,6 @@ int main(int argc, char *argv[])
     SCMEASLIB::MeasurementTypes::registerTypes();
 
     MainWindow mainWin;
-    mainWin.show();
 
     QSurfaceFormat fmt;
     fmt.setSamples(10);
