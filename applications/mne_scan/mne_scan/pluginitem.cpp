@@ -107,7 +107,7 @@ void PluginItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * opti
 {
     QGraphicsPolygonItem::paint(painter, option, widget);
     painter->setPen(QPen(m_qColorContour, 1));
-    painter->drawText(-m_iWidth/2+7,7,m_pPlugin->getName().mid(0,10));
+    painter->drawText(-m_iWidth/2+6,6,m_pPlugin->getName().mid(0,10));
 }
 
 //=============================================================================================================
