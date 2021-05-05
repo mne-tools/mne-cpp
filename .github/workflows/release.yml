@@ -41,11 +41,11 @@ jobs:
       run: |
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name $GITHUB_USER
-        # Delete current dev_build release remotley. 
+        # Delete current dev_build release remotely. 
         # Must be done before deleting the remote tag associated with the dev_build release. 
-        # This prevents a draft release to be left over after we delete the tag remotley. 
+        # This prevents a draft release to be left over after we delete the tag remotely. 
         hub release delete dev_build
-        # Delete current tag remotley
+        # Delete current tag remotely
         git push origin :refs/tags/dev_build
         # Change dev_build tag to point to newest commit
         git tag dev_build -f -a -m "Development Builds"
