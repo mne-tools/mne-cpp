@@ -44,6 +44,7 @@
 //=============================================================================================================
 
 #include <QThread>
+#include <QWeakPointer>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -77,10 +78,10 @@ class MainSplashScreenHider : public QThread
     Q_OBJECT
 public:
     //=========================================================================================================
-    MainSplashScreenHider(QSharedPointer<MainSplashScreen> splashScreen);
+    MainSplashScreenHider(MainSplashScreen& splashScreen);
 
     //=========================================================================================================
-    MainSplashScreenHider(QSharedPointer<MainSplashScreen> splashScreen, unsigned long sleepTime);
+    MainSplashScreenHider(MainSplashScreen& splashScreen, unsigned long sleepTime);
 
 protected:
     //=========================================================================================================
@@ -89,7 +90,7 @@ protected:
      */
     void run();
 
-    QSharedPointer<MNESCAN::MainSplashScreen> m_pSlashScreenToHide;     /**< Pointer to the slpash screen to hide.*/
+    MainSplashScreen& m_pSlashScreenToHide;       /**< Pointer to the slpash screen to hide.*/
     unsigned long   m_iSecondsToSleep;                                  /**< Time to wait before hiding the splash window.*/
 };
 

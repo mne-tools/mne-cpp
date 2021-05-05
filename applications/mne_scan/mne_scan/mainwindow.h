@@ -169,11 +169,18 @@ public:
 
     //=========================================================================================================
     /**
-     * Set the splash screen.
+     * Initialize the splash screen. By default, the slpash screen will be shown to the user.
+     *
+     */
+    void initSplashScreen();
+
+    //=========================================================================================================
+    /**
+     * Initialize the splash screen.
      *
      * @param[in] bShowSplashScreen    Whether to show the splash screen until this widget is shown. Default is true.
      */
-    void initSplashScreen(bool bShowSplashScreen = true);
+    void initSplashScreen(bool bShowSplashScreen);
 
     //=========================================================================================================
     /**

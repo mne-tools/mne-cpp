@@ -62,13 +62,13 @@ constexpr unsigned long defaultTimeToWait(3);
 
 //=============================================================================================================
 
-MainSplashScreenHider::MainSplashScreenHider(QSharedPointer<MainSplashScreen> splashScreen)
+MainSplashScreenHider::MainSplashScreenHider(MainSplashScreen& splashScreen)
 : MainSplashScreenHider(splashScreen, defaultTimeToWait)
 { }
 
 //=============================================================================================================
 
-MainSplashScreenHider::MainSplashScreenHider(QSharedPointer<MainSplashScreen> splashScreen, unsigned long sleepTime)
+MainSplashScreenHider::MainSplashScreenHider(MainSplashScreen& splashScreen, unsigned long sleepTime)
 : m_pSlashScreenToHide(splashScreen)
 , m_iSecondsToSleep(sleepTime)
 { }
@@ -78,7 +78,7 @@ MainSplashScreenHider::MainSplashScreenHider(QSharedPointer<MainSplashScreen> sp
 void MainSplashScreenHider::run()
 {
     sleep(m_iSecondsToSleep);
-    m_pSlashScreenToHide->hide();
+    m_pSlashScreenToHide.hide();
 }
 
 //=============================================================================================================
