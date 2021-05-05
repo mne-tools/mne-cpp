@@ -128,6 +128,7 @@ MainWindow::MainWindow(QWidget *parent)
     qInfo() << "Loading icon...";
     QMainWindow::setWindowIcon(QIcon(":/images/images/appIcons/icon_mne_scan_256x256.png"));
 #endif
+
 }
 
 //=============================================================================================================
