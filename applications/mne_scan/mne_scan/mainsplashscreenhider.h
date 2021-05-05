@@ -85,6 +85,8 @@ public:
     //=========================================================================================================
     MainSplashScreenHider(MainSplashScreen& splashScreen, unsigned long sleepTime);
 
+    ~MainSplashScreenHider();
+
 protected:
     //=========================================================================================================
     /**
