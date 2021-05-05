@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * @file     pluginitem.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>,
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
- * @date     August, 2013
+ * @date     May, 2021
  *
  * @section  LICENSE
  *
- * Copyright (C) 2013, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2021, Christoph Dinh, Juan GPC. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
