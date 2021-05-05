@@ -118,7 +118,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setUnifiedTitleAndToolBarOnMac(false);
 
-    initSplashScreen(true);
+    initSplashScreen();
 
     setupPlugins();
     setupUI();
@@ -132,6 +132,7 @@ MainWindow::MainWindow(QWidget *parent)
 #endif
 
     hideSplashScreen();
+    show();
 }
 
 //=============================================================================================================
@@ -253,6 +254,14 @@ void MainWindow::onGuiModeChanged()
 
 //=============================================================================================================
 
+void MainWindow::initSplashScreen()
+{
+    bool showSplashScreen(true);
+    initSplashScreen(showSplashScreen);
+}
+
+//=============================================================================================================
+
 void MainWindow::initSplashScreen(bool bShowSplashScreen)
 {
     QPixmap splashPixMap(":/images/splashscreen.png");
@@ -273,9 +282,10 @@ void MainWindow::initSplashScreen(bool bShowSplashScreen)
 
 void MainWindow::hideSplashScreen()
 {
-    MainSplashScreenHider splashScreenHider(m_pSplashScreen,
-                                            waitUntilHidingSplashScreen);
-//    splashScreenHider.start();
+    auto splashScreenHider = new MainSplashScreenHider(*m_pSplashScreen.get(),
+                                                       waitUntilHidingSplashScreen);
+    m_pSplashScreen->clearMessage();
+    splashScreenHider->start();
 }
 
 //=============================================================================================================
