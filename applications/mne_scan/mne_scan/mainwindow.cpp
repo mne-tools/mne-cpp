@@ -87,7 +87,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 const QString pluginDir = "/mne_scan_plugins";          /**< holds path to plugins.*/
-constexpr unsigned long waitUntilHidingSplashScreen(2);     /**< Seconds to wait after the application setup has finished, before hiding the splash screen.*/
+constexpr unsigned long waitUntilHidingSplashScreen(1);     /**< Seconds to wait after the application setup has finished, before hiding the splash screen.*/
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -118,7 +118,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setUnifiedTitleAndToolBarOnMac(false);
 
-    setSplashScreen();
+    initSplashScreen(true);
 
     setupPlugins();
     setupUI();
@@ -253,17 +253,11 @@ void MainWindow::onGuiModeChanged()
 
 //=============================================================================================================
 
-void MainWindow::hideSplashScreen()
-{
-    MainSplashScreenHider splashScreenHider(m_pSplashScreen,
-                                            waitUntilHidingSplashScreen);
-}
-
-void MainWindow::setSplashScreen(bool bShowSplashScreen)
+void MainWindow::initSplashScreen(bool bShowSplashScreen)
 {
     QPixmap splashPixMap(":/images/splashscreen.png");
-    m_pSplashScreen = MainSplashScreen::SPtr::create(splashPixMap);
-
+    m_pSplashScreen = MainSplashScreen::SPtr::create(splashPixMap,
+                                                    Qt::WindowFlags() | Qt::WindowStaysOnTopHint );
     if(m_pSplashScreen && m_pPluginManager) {
         QObject::connect(m_pPluginManager.data(), &PluginManager::pluginLoaded,
                          m_pSplashScreen.data(), &MainSplashScreen::showMessage);
@@ -273,6 +267,15 @@ void MainWindow::setSplashScreen(bool bShowSplashScreen)
         m_pSplashScreen->finish(this);
         m_pSplashScreen->show();
     }
+}
+
+//=============================================================================================================
+
+void MainWindow::hideSplashScreen()
+{
+    MainSplashScreenHider splashScreenHider(m_pSplashScreen,
+                                            waitUntilHidingSplashScreen);
+//    splashScreenHider.start();
 }
 
 //=============================================================================================================
