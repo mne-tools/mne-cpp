@@ -375,6 +375,17 @@ void FiffRawView::onMakeScreenshot(const QString& imageType)
 
 //=============================================================================================================
 
+void FiffRawView::initRightClickContextMenu()
+{
+    m_pRightClickContextMenu = new QMenu(this);
+
+    m_pAddEventAction = m_pRightClickContextMenu->addAction(tr("Add Event"));
+    connect(m_pAddEventAction, &QAction::triggered,
+            this, &FiffRawView::addTimeMark, Qt::UniqueConnection);
+}
+
+//=============================================================================================================
+
 void FiffRawView::customContextMenuRequested(const QPoint &pos)
 {
     if(!m_pModel || m_pModel->isEmpty()) {
@@ -386,12 +397,6 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
     int iMouseOffset = pos.x() / m_pModel->pixelDifference();
 
     m_iLastClickedSample = iFirstSampleOffset + iScrollBarOffset + iMouseOffset;
-
-    QMenu* menu = new QMenu(this);
-
-    QAction* markTime = menu->addAction(tr("Add Event"));
-    connect(markTime, &QAction::triggered,
-            this, &FiffRawView::addTimeMark, Qt::UniqueConnection);
 
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
 }
