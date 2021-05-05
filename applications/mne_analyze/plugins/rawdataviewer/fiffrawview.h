@@ -375,7 +375,7 @@ private:
     //=========================================================================================================
     void onNewRealtimeData();
 
-    void initRightClickMenu();
+    void initRightClickContextMenu();
 
     QPointer<QTableView>                                m_pTableView;                   /**< Pointer to table view ui element. */
 

@@ -97,6 +97,9 @@ FiffRawView::FiffRawView(QWidget *parent)
     //Create position labels
     createBottomLabels();
 
+    //Create Right-click Context menu
+    initRightClickContextMenu();
+
     m_pTableView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     //m_pTableView->horizontalScrollBar()->setRange(0, m_pTableView->horizontalScrollBar()->maximum() / 1000000);
     //m_pTableView->setShowGrid(true);
@@ -398,7 +401,7 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
 
     m_iLastClickedSample = iFirstSampleOffset + iScrollBarOffset + iMouseOffset;
 
-    menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
+    m_pRightClickContextMenu->popup(m_pTableView->viewport()->mapToGlobal(pos));
 }
 
 //=============================================================================================================
