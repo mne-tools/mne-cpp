@@ -129,6 +129,7 @@ MainWindow::MainWindow(QWidget *parent)
     QMainWindow::setWindowIcon(QIcon(":/images/images/appIcons/icon_mne_scan_256x256.png"));
 #endif
 
+    hideSplashScreen();
 }
 
 //=============================================================================================================
