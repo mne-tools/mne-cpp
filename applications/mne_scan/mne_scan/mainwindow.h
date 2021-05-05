@@ -392,7 +392,7 @@ private:
     QPointer<QAction>                   m_pActionRun;                   /**< run application. */
     QPointer<QAction>                   m_pActionStop;                  /**< stop application. */
     QPointer<QAction>                   m_pActionDefaultMode;           /**< stop application. */
-    QPointer<QAction>                   m_pActionResearchMode;        /**< activate research gui mode. */
+    QPointer<QAction>                   m_pActionResearchMode;          /**< activate research gui mode. */
     QPointer<QAction>                   m_pActionClinicalMode;          /**< activate clinical gui mode. */
 
     QList<QAction*>                     m_qListDynamicPluginActions;    /**< dynamic plugin actions. */

@@ -37,6 +37,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <iostream>
+
 #include <scShared/Management/pluginmanager.h>
 #include <scShared/Management/pluginscenemanager.h>
 #include <scShared/Management/displaymanager.h>
@@ -56,6 +58,7 @@
 #include "startupwidget.h"
 #include "plugingui.h"
 #include "info.h"
+#include "mainsplashscreenhider.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -70,8 +73,6 @@
 #include <QFileInfo>
 #include <QStandardPaths>
 
-#include <iostream>
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -85,7 +86,8 @@ using namespace DISPLIB;
 // CONST
 //=============================================================================================================
 
-const QString pluginDir = "/mne_scan_plugins";        /**< holds path to plugins.*/
+const QString pluginDir = "/mne_scan_plugins";          /**< holds path to plugins.*/
+constexpr unsigned long waitUntilHidingSplashScreen(2);     /**< Seconds to wait after the application setup has finished, before hiding the splash screen.*/
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -253,7 +255,8 @@ void MainWindow::onGuiModeChanged()
 
 void MainWindow::hideSplashScreen()
 {
-    m_pSplashScreen->hide();
+    MainSplashScreenHider splashScreenHider(m_pSplashScreen,
+                                            waitUntilHidingSplashScreen);
 }
 
 void MainWindow::setSplashScreen(bool bShowSplashScreen)
