@@ -56,6 +56,7 @@
 #include <QPointer>
 #include <QTextBrowser>
 #include <QSettings>
+#include <QMutex>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -314,6 +315,8 @@ private:
 
     QString                             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
     QString                             m_sCurrentStyle;            /**< The currently selected style (dark mode, default mode). */
+
+    QMutex                              m_Mutex;
 };
 
 }// NAMESPACE

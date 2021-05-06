@@ -96,6 +96,7 @@ EventView::EventView()
     m_pUi->label_2->hide();
 
     onDataChanged();
+    createContextMenu();
 
     m_pTriggerDetectView = QSharedPointer<DISPLIB::TriggerDetectionView>(new DISPLIB::TriggerDetectionView("MNEANALYZE/EVENTS",
                                                                                                            Q_NULLPTR,
@@ -166,8 +167,6 @@ void EventView::initGUIFunctionality()
             this, &EventView::groupChanged, Qt::UniqueConnection);
 
     //Init custom context menus
-    createContextMenu();
-
     m_pUi->m_tableView_eventTableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pUi->m_tableView_eventTableView, &QWidget::customContextMenuRequested,
             this, &EventView::customEventContextMenuRequested, Qt::UniqueConnection);
