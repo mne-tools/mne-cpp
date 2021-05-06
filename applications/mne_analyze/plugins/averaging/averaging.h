@@ -342,8 +342,8 @@ private:
     bool                                                    m_bRejection;               /**< Whether to drop data points marked fro rejection when calculating average. */
     bool                                                    m_bLoaded;                  /**< Whether the full GUI has already been laoaded. */
     bool                                                    m_bPerformFiltering;        /**< Flag whether to activate/deactivate filtering. */
-    bool                                                    m_bAutoRecompute;
-    bool                                                    m_bSavingAverage;
+    bool                                                    m_bAutoRecompute;           /**< Whether to auto recompute averages */
+    bool                                                    m_bSavingAverage;           /**< Whether to save average */
 
     RTPROCESSINGLIB::FilterKernel                           m_filterKernel;             /**< List of currently active filters. */
 
