@@ -93,6 +93,8 @@ public:
      */
     EventView();
 
+    ~EventView();
+
     //=========================================================================================================
     /**
      * Resets the view to its default settings.
@@ -382,6 +384,8 @@ private:
      */
     void onGroupItemNameChanged(QListWidgetItem *item);
 
+    void createContextMenu();
+
     Ui::EventWindowDockWidget*                      m_pUi;                          /** < Pointer to GUI elements */
 
     int                                             m_iCheckState;                  /** < State of show events checkbox (0 unchecked, 2 checked) */
@@ -399,6 +403,8 @@ private:
     QFutureWatcher <QMap<double,QList<int>>>        m_FutureWatcher;                /** < Watches m_Future and signals when calculations are done */
     QFuture<QMap<double,QList<int>>>                m_Future;                       /** < Used to perfom trigger detection on a separate thread */
 
+    QPointer<QMenu>                                 m_pEventContexMenu;
+    QPointer<QMenu>                                 m_pGroupContexMenu;
 };
 
 #endif // EVENTVIEW_H

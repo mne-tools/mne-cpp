@@ -491,6 +491,8 @@ public:
      */
     std::vector<uint> getEventSelection() const;
 
+    void updateSelectedGroups(const QList<QModelIndex>& indexList);
+
 signals:
 
     //=========================================================================================================
