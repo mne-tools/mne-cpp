@@ -491,6 +491,12 @@ public:
      */
     std::vector<uint> getEventSelection() const;
 
+    //=========================================================================================================
+    /**
+     * Updates selection based on input list
+     *
+     * @param[in] indexList     List of selected indeces.
+     */
     void updateSelectedGroups(const QList<QModelIndex>& indexList);
 
 signals:
