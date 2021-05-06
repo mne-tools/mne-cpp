@@ -316,7 +316,7 @@ private:
     QString                             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
     QString                             m_sCurrentStyle;            /**< The currently selected style (dark mode, default mode). */
 
-    QMutex                              m_Mutex;
+    QMutex                              m_Mutex;                    /**< Thread-safing for printing messages. */
 };
 
 }// NAMESPACE

@@ -414,15 +414,6 @@ void EventView::groupChanged()
     }
 
     m_pEventModel->updateSelectedGroups(selection);
-//    for(auto row : selection){
-//        m_pEventModel->addToSelectedGroups(row.data(Qt::UserRole).toInt());
-//    }
-
-//    m_pUi->m_listWidget_groupListWidget->repaint();
-//    m_pUi->m_tableView_eventTableView->repaint();
-//    m_pUi->m_tableView_eventTableView->reset();
-
-//    this->onDataChanged();
 }
 
 //=============================================================================================================
@@ -447,14 +438,7 @@ void EventView::customGroupContextMenuRequested(const QPoint &pos)
 
 void EventView::deleteGroup()
 {
-//    int iSelected = m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows().first().row();
-//    QListWidgetItem* itemToDelete = m_pUi->m_listWidget_groupListWidget->takeItem(iSelected);
-//    m_pEventModel->removeGroup(itemToDelete->data(Qt::UserRole).toInt());
-//    m_pUi->m_listWidget_groupListWidget->selectionModel()->clearSelection();
-//    delete itemToDelete;
-
     m_pEventModel->deleteSelectedGroups();
-//    onDataChanged();
 }
 
 //=============================================================================================================
@@ -477,8 +461,6 @@ void EventView::changeGroupColor()
     }
 
     m_pEventModel->setGroupColor(groupColor);
-
-//    onDataChanged();
 }
 
 //=============================================================================================================
