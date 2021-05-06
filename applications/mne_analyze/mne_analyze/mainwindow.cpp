@@ -64,6 +64,7 @@
 #include <QGridLayout>
 #include <QtWidgets/QGridLayout>
 #include <QStandardPaths>
+#include <QMutexLocker>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -170,6 +171,7 @@ void MainWindow::writeToLog(QtMsgType type,
                             const QString &msg)
 {
     Q_UNUSED(context);
+    QMutexLocker locker(&m_Mutex);
 
     switch (type)
     {

@@ -390,12 +390,12 @@ void Averaging::onComputeButtonClicked(bool bChecked)
 void Averaging::computeAverage()
 {
     if(!m_pFiffRawModel || (m_pFiffRawModel->getEventModel()->rowCount() < 2)){
-        qWarning() << "No model loaded. Cannot calculate average.";
+        //qWarning() << "No model loaded. Cannot calculate average.";
         return;
     }
 
     if (m_FutureWatcher.isRunning()){
-        qWarning() << "Averaging computation already taking place.";
+       // qWarning() << "Averaging computation already taking place.";
         return;
         //m_FutureWatcher.waitForFinished();
     }
@@ -424,7 +424,7 @@ QSharedPointer<FIFFLIB::FiffEvokedSet> Averaging::averageCalculation(FIFFLIB::Fi
     mapReject.insert("eog", 300e-06);
 
     if(matEvents.size() < 6){
-        qWarning() << "[Averaging::averageCalacualtion] Not enough data points to calculate average.";
+        //qWarning() << "[Averaging::averageCalacualtion] Not enough data points to calculate average.";
         return Q_NULLPTR;
     }
 
