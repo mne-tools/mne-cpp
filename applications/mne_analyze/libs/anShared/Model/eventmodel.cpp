@@ -638,7 +638,7 @@ std::unique_ptr<std::vector<EVENTSLIB::EventGroup> > EventModel::getGroupsToDisp
 void EventModel::clearGroupSelection()
 {
     m_selectedEventGroups.clear();
-    eventsUpdated();
+    //eventsUpdated();
 }
 
 //=============================================================================================================
@@ -646,7 +646,7 @@ void EventModel::clearGroupSelection()
 void EventModel::addToSelectedGroups(int iGroupId)
 {
     m_selectedEventGroups.push_back(iGroupId);
-    eventsUpdated();
+    //eventsUpdated();
 }
 
 //=============================================================================================================
@@ -697,4 +697,17 @@ void EventModel::setSharedMemory(bool bState)
 std::vector<uint> EventModel::getEventSelection() const
 {
     return m_listEventSelection;
+}
+
+//=============================================================================================================
+
+void EventModel::updateSelectedGroups(const QList<QModelIndex> &indexList)
+{
+    clearGroupSelection();
+
+    for(auto row : indexList){
+        addToSelectedGroups(row.data(Qt::UserRole).toInt());
+    }
+
+    eventsUpdated();
 }
