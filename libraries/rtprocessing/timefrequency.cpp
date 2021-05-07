@@ -113,7 +113,7 @@ std::vector<Eigen::MatrixXcd> TimeFrequencyData::computeComplexTimeFrequency(con
 
 //=============================================================================================================
 
-std::vector<TimeFrequencyData> TimeFrequencyData::computeTimeFrequency(const FIFFLIB::FiffRawData &raw,
+std::vector<Eigen::MatrixXcd> TimeFrequencyData::computeTimeFrequency(const FIFFLIB::FiffRawData &raw,
                                                                        const Eigen::MatrixXi &matEvents,
                                                                        float fTMinS,
                                                                        float fTMaxS)
@@ -130,26 +130,38 @@ std::vector<TimeFrequencyData> TimeFrequencyData::computeTimeFrequency(const FIF
                                                                                      iType,
                                                                                      mapReject);
 
-    std::vector<TimeFrequencyData> data;
+    std::vector<Eigen::MatrixXcd> data;
 
-    for (int i = 0 ; i < lstEpochDataList.size() ; i++){
-        Eigen::MatrixXcd matrix = Eigen::MatrixXcd::Zero(lstEpochDataList[0]->epoch.rows(), lstEpochDataList[0]->epoch.cols());
-        TimeFrequencyData tfData;
-        tfData = matrix;
-        data.push_back(tfData);
-    }
+    if(!lstEpochDataList.isEmpty()){
 
-    for (auto& epoch : lstEpochDataList){
-        for(int i = 0; i < epoch->epoch.rows(); i++){
-            Eigen::VectorXd dataCol = epoch->epoch.row(i).transpose();
-            Eigen::MatrixXcd Spectrum = UTILSLIB::Spectrogram::makeComplexSpectrogram(dataCol, raw.info.sfreq * 0.2);
-            data[i] += Spectrum;
+        Eigen::VectorXd col = lstEpochDataList.front()->epoch.row(0).transpose();
+        Eigen::MatrixXcd spctr = UTILSLIB::Spectrogram::makeComplexSpectrogram(col, raw.info.sfreq * 0.2);
+
+        int iCols = spctr.cols();
+        int iRows = spctr.rows();
+
+        qDebug() << "Rows:" << iRows << " | Cols:" << iCols;
+
+        for(int i = 0; i < lstEpochDataList.front()->epoch.rows(); i++){
+            Eigen::MatrixXcd matrix = Eigen::MatrixXcd::Zero(iRows, iCols);
+            data.push_back(matrix);
+        }
+
+        //Do subsequent epochs
+        for (auto& epoch : lstEpochDataList){
+            for(int i = 0; i < epoch->epoch.rows(); i++){
+                Eigen::VectorXd dataCol = epoch->epoch.row(i).transpose();
+                Eigen::MatrixXcd Spectrum = UTILSLIB::Spectrogram::makeComplexSpectrogram(dataCol, raw.info.sfreq * 0.2);
+                data[i] += Spectrum;
+            }
+        }
+
+        for (auto tfData : data) {
+            tfData /= lstEpochDataList.size();
         }
     }
 
-    for (auto tfData : data) {
-        tfData /= lstEpochDataList.size();
-    }
+    qDebug() << "Vector size:" << data.size();
 
     return data;
 }
@@ -164,3 +176,8 @@ TimeFrequencyData::TimeFrequencyData()
 }
 
 //=============================================================================================================
+
+TimeFrequencyData::TimeFrequencyData(Eigen::MatrixXcd mat)
+{
+    this->m_TFData = mat;
+}

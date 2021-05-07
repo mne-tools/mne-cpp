@@ -75,11 +75,13 @@ class RTPROCESINGSHARED_EXPORT TimeFrequencyData
 public:
     TimeFrequencyData();
 
+    TimeFrequencyData(Eigen::MatrixXcd mat);
+
     static std::vector<Eigen::MatrixXd> computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet);
 
     static std::vector<Eigen::MatrixXcd> computeComplexTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet);
 
-    static std::vector<TimeFrequencyData> computeTimeFrequency(const FIFFLIB::FiffRawData& raw,
+    static std::vector<Eigen::MatrixXcd> computeTimeFrequency(const FIFFLIB::FiffRawData& raw,
                                                                const Eigen::MatrixXi& matEvents,
                                                                float fTMinS,
                                                                float fTMaxS);
