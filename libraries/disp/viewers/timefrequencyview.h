@@ -143,13 +143,16 @@ public:
 protected:
     void initQMLView();
 
-//    virtual void paintEvent(QPaintEvent *event);
+    virtual void paintEvent(QPaintEvent *event);
 
 //    void paintChart(QPainter& painter,
 //                    const QRect chartBound);
 
 //    void paintAxes(QPainter& painter,
 //                   const QRect chartBound);
+
+    void generatePixmap(Eigen::MatrixXd tf_matrix,
+                        ColorMaps cmap);
 
     //=========================================================================================================
     /**
@@ -163,6 +166,8 @@ protected:
 
     QPointer<QVBoxLayout>                       m_pLayout;
     QPointer<TFplot>                            m_pPlot;
+
+    QPixmap                                     m_Pixmap;
 
 };
 

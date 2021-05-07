@@ -82,7 +82,7 @@
            <string> Hz</string>
           </property>
           <property name="minimum">
-           <number>0</number>
+           <number>20</number>
           </property>
           <property name="maximum">
            <number>999</number>
