@@ -85,6 +85,25 @@ public:
                                                                float fTMaxS);
 
     Eigen::MatrixXcd getData();
+
+    TimeFrequencyData& operator=(const Eigen::MatrixXcd& mat)
+    {
+        this->m_TFData = mat;
+        return *this;
+    }
+
+    TimeFrequencyData& operator+=(const Eigen::MatrixXcd& mat)
+    {
+        this->m_TFData += mat;
+        return *this;
+    }
+
+    TimeFrequencyData& operator/=(int i)
+    {
+        this->m_TFData /= i;
+        return *this;
+    }
+
 private:
 
     void setTFData(Eigen::MatrixXcd matData);

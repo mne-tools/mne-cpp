@@ -130,6 +130,28 @@ std::vector<TimeFrequencyData> TimeFrequencyData::computeTimeFrequency(const FIF
                                                                                      iType,
                                                                                      mapReject);
 
+    std::vector<TimeFrequencyData> data;
+
+    for (int i = 0 ; i < lstEpochDataList.size() ; i++){
+        Eigen::MatrixXcd matrix = Eigen::MatrixXcd::Zero(lstEpochDataList[0]->epoch.rows(), lstEpochDataList[0]->epoch.cols());
+        TimeFrequencyData tfData;
+        tfData = matrix;
+        data.push_back(tfData);
+    }
+
+    for (auto& epoch : lstEpochDataList){
+        for(int i = 0; i < epoch->epoch.rows(); i++){
+            Eigen::VectorXd dataCol = epoch->epoch.row(i).transpose();
+            Eigen::MatrixXcd Spectrum = UTILSLIB::Spectrogram::makeComplexSpectrogram(dataCol, raw.info.sfreq * 0.2);
+            data[i] += Spectrum;
+        }
+    }
+
+    for (auto tfData : data) {
+        tfData /= lstEpochDataList.size();
+    }
+
+    return data;
 }
 
 //=============================================================================================================

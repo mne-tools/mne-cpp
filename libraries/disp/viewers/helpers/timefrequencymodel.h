@@ -43,6 +43,8 @@
 
 #include <fiff/fiff_info.h>
 
+#include <rtprocessing/timefrequency.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -154,6 +156,8 @@ private:
 //    QLinearGradient         m_Gradient;
 
     std::vector<Eigen::MatrixXcd>       m_vSpectr;
+    std::vector<RTPROCESSINGLIB::TimeFrequencyData> m_vTfData;
+
     QList<int>                          m_listSelection;
 
     Eigen::MatrixXd                     m_Average;
