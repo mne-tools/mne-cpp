@@ -32,8 +32,8 @@
  *
  */
 
-#ifndef TIMEFREQUENCY_H
-#define TIMEFREQUENCY_H
+#ifndef TIMEFREQUENCY_AN_PLUGIN_H
+#define TIMEFREQUENCY_AN_PLUGIN_H
 
 //=============================================================================================================
 // INCLUDES
