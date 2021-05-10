@@ -288,16 +288,16 @@ void TimeFrequency::computeTimeFreqency()
 //    tfplot4->show();
 
 
-//    auto tfData = RTPROCESSINGLIB::TimeFrequencyData::computeTimeFrequency(*m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data(),
-//                                                                           m_pFiffRawModel->getEventModel()->getEventMatrix(9999),
-//                                                                           -0.100f,
-//                                                                           0.300f);
+    auto tfData = RTPROCESSINGLIB::TimeFrequencyData::computeTimeFrequency(*m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data(),
+                                                                           m_pFiffRawModel->getEventModel()->getEventMatrix(9999),
+                                                                           -0.100f,
+                                                                           0.300f);
 
-//    m_pTFModel->setFiffInfo(m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data()->info);
-//    m_pTFModel->setSpectr(tfData);
+    m_pTFModel->setFiffInfo(m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data()->info);
+    m_pTFModel->setSpectr(tfData);
 
-    auto spectr = RTPROCESSINGLIB::TimeFrequencyData::computeComplexTimeFrequency(*m_pAvgModel->getEvokedSet());
+//    auto spectr = RTPROCESSINGLIB::TimeFrequencyData::computeTimeFrequency(*m_pAvgModel->getEvokedSet());
 
-    m_pTFModel->setFiffInfo(m_pAvgModel->getEvokedSet()->evoked.first().info);
-    m_pTFModel->setSpectr(spectr);
+//    m_pTFModel->setFiffInfo(m_pAvgModel->getEvokedSet()->evoked.first().info);
+//    m_pTFModel->setSpectr(spectr);
 }

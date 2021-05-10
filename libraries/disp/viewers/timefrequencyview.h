@@ -167,7 +167,9 @@ protected:
     QPointer<QVBoxLayout>                       m_pLayout;
     QPointer<TFplot>                            m_pPlot;
 
-    QPixmap                                     m_Pixmap;
+    QPixmap                                     m_PlotPixmap;
+
+    QPixmap                                     m_CoefficientPixmap;
 
 };
 

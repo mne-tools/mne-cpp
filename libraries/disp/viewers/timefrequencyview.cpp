@@ -156,9 +156,6 @@ void TimeFrequencyView::paintEvent(QPaintEvent *event)
         painter.drawRect(QRect(-1,-1,this->width()+2,this->height()+2));
         painter.restore();
 
-
-
-
         //paint chart
         painter.save();
         painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
@@ -167,22 +164,21 @@ void TimeFrequencyView::paintEvent(QPaintEvent *event)
         painter.restore();
 
         painter.save();
-        painter.drawPixmap(chartBound, m_Pixmap);
+        painter.drawPixmap(chartBound, m_PlotPixmap);
 
         painter.restore();
-
 
         //paint gradient bar
 
         painter.save();
-
-        QLinearGradient linGrad(this->width() - m_iChartBorderSpacing * 1.5f, chartBound.topRight().y(), this->width() - m_iChartBorderSpacing * 1.5f, chartBound.bottomRight().y());
-        painter.save();
-        painter.setBrush(linGrad);
-        painter.drawRect(chartBound.topRight().x() + m_iChartBorderSpacing, chartBound.topRight().y(), m_iChartBorderSpacing, chartBound.height());
-
+        painter.setPen(QPen(Qt::black, 1, Qt::SolidLine));
+        QRect gradientBar(chartBound.topRight().x() + m_iChartBorderSpacing, chartBound.topRight().y(), m_iChartBorderSpacing, chartBound.height());
+        painter.drawRect(gradientBar);
         painter.restore();
 
+        painter.save();
+        painter.drawPixmap(gradientBar, m_CoefficientPixmap);
+        painter.restore();
 
         //paint axis labels
         //test
@@ -387,5 +383,38 @@ void TimeFrequencyView::generatePixmap(Eigen::MatrixXd tf_matrix,
      *image_to_tf_plot = image_to_tf_plot->scaled(tf_matrix.cols(), tf_matrix.cols()/2, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
      *image_to_tf_plot = image_to_tf_plot->scaledToWidth(/*0.9 **/ 1026, Qt::SmoothTransformation);
 
-    m_Pixmap = QPixmap::fromImage(*image_to_tf_plot);
+    m_PlotPixmap = QPixmap::fromImage(*image_to_tf_plot);
+
+    QImage * coeffs_image = new QImage(10, tf_matrix.rows(), QImage::Format_RGB32);
+    qreal norm = tf_matrix.maxCoeff();
+    for(qint32 it = 0; it < tf_matrix.rows(); it++) {
+        for ( qint32 x = 0; x < 10; x++ ) {
+            switch  (cmap) {
+                case Jet:
+                    color.setRgb(ColorMap::valueToJet(it*norm/tf_matrix.rows()));
+                    break;
+                case Hot:
+                    color.setRgb(ColorMap::valueToHot(it*norm/tf_matrix.rows()));
+                    break;
+                case HotNeg1:
+                    color.setRgb(ColorMap::valueToHotNegative1(it*norm/tf_matrix.rows()));
+                    break;
+                case HotNeg2:
+                    color.setRgb(ColorMap::valueToHotNegative2(it*norm/tf_matrix.rows()));
+                    break;
+                case Bone:
+                    color.setRgb(ColorMap::valueToBone(it*norm/tf_matrix.rows()));
+                    break;
+                case RedBlue:
+                    color.setRgb(ColorMap::valueToRedBlue(it*norm/tf_matrix.rows()));
+                    break;
+              }
+              coeffs_image->setPixel(x, tf_matrix.rows() - 1 -  it,  color.rgb());
+        }
+    }
+
+     *coeffs_image = coeffs_image->scaled(10, tf_matrix.cols()/2, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+     *coeffs_image = coeffs_image->scaledToHeight(image_to_tf_plot->height(), Qt::SmoothTransformation);
+
+    m_CoefficientPixmap = QPixmap::fromImage(*coeffs_image);
 }

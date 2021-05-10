@@ -176,13 +176,6 @@
     </spacer>
    </item>
    <item>
-    <widget class="QCheckBox" name="checkBox_auto">
-     <property name="text">
-      <string>Auto recompute for new averages.</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <widget class="QPushButton" name="pushButton_ciompute">
      <property name="text">
       <string>Compute</string>
