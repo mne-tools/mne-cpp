@@ -288,13 +288,16 @@ void TimeFrequency::computeTimeFreqency()
 //    tfplot4->show();
 
 
-    auto tfData = RTPROCESSINGLIB::TimeFrequencyData::computeTimeFrequency(*m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data(),
+    auto tfData = RTPROCESSINGLIB::TimeFrequencyData::computeEpochListTimeFrequency(*m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data(),
                                                                            m_pFiffRawModel->getEventModel()->getEventMatrix(9999),
                                                                            -0.100f,
                                                                            0.300f);
 
+    auto averagedData = RTPROCESSINGLIB::TimeFrequencyData::averageEpochListTimeFrequency(tfData);
+
     m_pTFModel->setFiffInfo(m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data()->info);
-    m_pTFModel->setSpectr(tfData);
+
+    m_pTFModel->setSpectr(averagedData);
 
 //    auto spectr = RTPROCESSINGLIB::TimeFrequencyData::computeTimeFrequency(*m_pAvgModel->getEvokedSet());
 

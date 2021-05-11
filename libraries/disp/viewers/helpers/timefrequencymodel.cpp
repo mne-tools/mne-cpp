@@ -120,21 +120,9 @@ QVariant TimeFrequencyModel::data(const QModelIndex &index,
         }
         case Qt::DisplayRole:{
             QVariant variant;
-//            Eigen::MatrixXcd returnMat = m_vSpectr.front();
-//            Eigen::MatrixXd realmat = returnMat.cwiseAbs2();
 
-//            variant.setValue(realmat);
-
-//            return variant;
-
-
-//            Eigen::MatrixXd mat = Eigen::MatrixXd::Zero(m_vSpectr[0].rows(), m_vSpectr[0].cols());
-//            auto matr = m_vSpectr[0].real();
             Eigen::MatrixXcd matrix = Eigen::MatrixXcd::Zero(m_vSpectr[0].rows(), m_vSpectr[0].cols());
 
-//            for (auto& channel : m_vSpectr){
-//                matrix += channel;
-//            }
             int a = 0;
             if(m_listSelection.size() > 0){
                 for (int iChIndex : m_listSelection){

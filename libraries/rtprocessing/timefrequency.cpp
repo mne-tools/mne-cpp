@@ -65,7 +65,7 @@ using namespace RTPROCESSINGLIB;
 // DEFINE STATIC RTPROCESSINGLIB METHODS
 //=============================================================================================================
 
-std::vector<Eigen::MatrixXd> TimeFrequencyData::computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet)
+std::vector<Eigen::MatrixXd> TimeFrequencyData::computeEpochListTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet)
 {
     qDebug() << "[RTPROCESSINGLIB::computeTimeFreqency]";
 
@@ -113,57 +113,104 @@ std::vector<Eigen::MatrixXcd> TimeFrequencyData::computeComplexTimeFrequency(con
 
 //=============================================================================================================
 
-std::vector<Eigen::MatrixXcd> TimeFrequencyData::computeTimeFrequency(const FIFFLIB::FiffRawData &raw,
-                                                                       const Eigen::MatrixXi &matEvents,
-                                                                       float fTMinS,
-                                                                       float fTMaxS)
+std::vector<std::vector<Eigen::MatrixXcd>> TimeFrequencyData::computeEpochListTimeFrequency(const FIFFLIB::FiffRawData &raw,
+                                                                               const Eigen::MatrixXi &matEvents,
+                                                                               float fTMinS,
+                                                                               float fTMaxS)
 {
 
     QMap<QString,double> mapReject;
     mapReject.insert("eog", 300e-06);
     int iType = 1;
 
-    MNELIB::MNEEpochDataList lstEpochDataList = MNELIB::MNEEpochDataList::readEpochs(raw,
+    std::vector<std::vector<Eigen::MatrixXcd> > epochTimeFrequencyList; //list of epochs x channels x tf
+
+    MNELIB::MNEEpochDataList epochDataList = MNELIB::MNEEpochDataList::readEpochs(raw,
                                                                                      matEvents,
                                                                                      fTMinS,
                                                                                      fTMaxS,
                                                                                      iType,
                                                                                      mapReject);
 
-    std::vector<Eigen::MatrixXcd> data;
+    for(QSharedPointer<MNELIB::MNEEpochData>& epoch : epochDataList){
+        epochTimeFrequencyList.emplace_back(computeEpochTimeFrequency(epoch,
+                                                    raw.info.sfreq));
+    }
 
-    if(!lstEpochDataList.isEmpty()){
+    return epochTimeFrequencyList;
+}
 
-        Eigen::VectorXd col = lstEpochDataList.front()->epoch.row(0).transpose();
-        Eigen::MatrixXcd spctr = UTILSLIB::Spectrogram::makeComplexSpectrogram(col, raw.info.sfreq * 0.2);
+//=============================================================================================================
 
-        int iCols = spctr.cols();
-        int iRows = spctr.rows();
 
-        qDebug() << "Rows:" << iRows << " | Cols:" << iCols;
+std::vector<Eigen::MatrixXcd> TimeFrequencyData::computeEpochTimeFrequency(const QSharedPointer<MNELIB::MNEEpochData>& epoch,
+                                                              float sampleFrequency)
+{
+        int numChannels(epoch->epoch.rows());
 
-        for(int i = 0; i < lstEpochDataList.front()->epoch.rows(); i++){
-            Eigen::MatrixXcd matrix = Eigen::MatrixXcd::Zero(iRows, iCols);
-            data.push_back(matrix);
+        std::vector<Eigen::MatrixXcd> channelTimeFrequencyList;
+
+        for(int channeli = 0; channeli < numChannels; channeli++){
+            channelTimeFrequencyList.emplace_back(UTILSLIB::Spectrogram::makeComplexSpectrogram(epoch->epoch.row(channeli).transpose(), 200));
         }
 
-        //Do subsequent epochs
-        for (auto& epoch : lstEpochDataList){
-            for(int i = 0; i < epoch->epoch.rows(); i++){
-                Eigen::VectorXd dataCol = epoch->epoch.row(i).transpose();
-                Eigen::MatrixXcd Spectrum = UTILSLIB::Spectrogram::makeComplexSpectrogram(dataCol, raw.info.sfreq * 0.2);
-                data[i] += Spectrum;
-            }
-        }
+        return channelTimeFrequencyList;
+}
 
-        for (auto tfData : data) {
-            tfData /= lstEpochDataList.size();
+
+
+//=============================================================================================================
+
+Eigen::MatrixXcd TimeFrequencyData::averageEpochTimeFrequency(const std::vector<Eigen::MatrixXcd>& epochTimeFrequency)
+{
+    if (epochTimeFrequency.empty()){
+        return Eigen::MatrixXcd();
+    }
+
+    Eigen::MatrixXcd averageTimeFrequency(epochTimeFrequency.front().rows(), epochTimeFrequency.front().cols());
+
+    for(auto channelTimeFreq : epochTimeFrequency){
+        averageTimeFrequency += channelTimeFreq;
+    }
+
+    return averageTimeFrequency / epochTimeFrequency.size();
+}
+
+//=============================================================================================================
+
+std::vector<Eigen::MatrixXcd> TimeFrequencyData::averageEpochListTimeFrequency(const std::vector<std::vector<Eigen::MatrixXcd> >& epochListTimeFrequency)
+{
+    int numFreqs(epochListTimeFrequency.front().front().rows());
+    int numSamples(epochListTimeFrequency.front().front().cols());
+
+    int numEpochs(epochListTimeFrequency.size());
+
+    if (numSamples ==0 || numFreqs == 0 || numEpochs == 0){
+        return std::vector<Eigen::MatrixXcd>();
+    }
+
+    int numChannelsInEpoch(epochListTimeFrequency.front().size());
+
+    for (int epochindex(1) ; epochindex < epochListTimeFrequency.size(); epochindex++){
+        if (static_cast<int>(epochListTimeFrequency[epochindex].size()) != numChannelsInEpoch){
+            qDebug() << "Channel number does not match across epoch" << epochindex;
+            return std::vector<Eigen::MatrixXcd>();
         }
     }
 
-    qDebug() << "Vector size:" << data.size();
+    std::vector<Eigen::MatrixXcd> averagedEpochListTimeFrequency;
+    Eigen::MatrixXcd auxMatrix;
 
-    return data;
+    for (int iChannel = 0; iChannel < numChannelsInEpoch; iChannel++){
+        auxMatrix = Eigen::MatrixXcd::Zero(numFreqs, numSamples);
+        for (auto epoch : epochListTimeFrequency){
+            auxMatrix += epoch[iChannel];
+        }
+        auxMatrix /= numEpochs;
+        averagedEpochListTimeFrequency.push_back(auxMatrix);
+    }
+
+    return averagedEpochListTimeFrequency;
 }
 
 //=============================================================================================================

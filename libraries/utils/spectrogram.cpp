@@ -110,7 +110,7 @@ MatrixXcd Spectrogram::makeComplexSpectrogram(VectorXd signal, qint32 windowSize
 
     signal.array() -= signal.mean();
     QList<SpectogramInputData> lData;
-    int iThreadSize = QThread::idealThreadCount()*2;
+    int iThreadSize = QThread::idealThreadCount();
     int iStepsSize = signal.rows()/iThreadSize;
     int iResidual = signal.rows()%iThreadSize;
 

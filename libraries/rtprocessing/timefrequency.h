@@ -63,6 +63,10 @@ namespace FIFFLIB {
     class FiffEvokedSet;
 }
 
+namespace MNELIB {
+    class MNEEpochData;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE RTPROCESSINGLIB
 //=============================================================================================================
@@ -77,14 +81,23 @@ public:
 
     TimeFrequencyData(Eigen::MatrixXcd mat);
 
-    static std::vector<Eigen::MatrixXd> computeTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet);
+    static std::vector<Eigen::MatrixXd> computeEpochListTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet);
 
     static std::vector<Eigen::MatrixXcd> computeComplexTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet);
 
-    static std::vector<Eigen::MatrixXcd> computeTimeFrequency(const FIFFLIB::FiffRawData& raw,
+    static std::vector<std::vector<Eigen::MatrixXcd> > computeEpochListTimeFrequency(const FIFFLIB::FiffRawData& raw,
                                                                const Eigen::MatrixXi& matEvents,
                                                                float fTMinS,
                                                                float fTMaxS);
+
+    static std::vector<Eigen::MatrixXcd> computeEpochTimeFrequency(const QSharedPointer<MNELIB::MNEEpochData>& epoch,
+                                                      float sampleFrequency);
+
+    static Eigen::MatrixXcd averageEpochTimeFrequency(const std::vector<Eigen::MatrixXcd>& epochTimeFrequency);
+
+    static std::vector<Eigen::MatrixXcd> averageEpochListTimeFrequency(const std::vector<std::vector<Eigen::MatrixXcd> >& epochListTimeFrequency);
+
+
 
     Eigen::MatrixXcd getData();
 
