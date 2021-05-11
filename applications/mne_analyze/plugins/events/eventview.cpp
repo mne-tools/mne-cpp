@@ -486,8 +486,10 @@ void EventView::initTriggerDetect(const QSharedPointer<FIFFLIB::FiffInfo>info)
 void EventView::onDetectTriggers(const QString &sChannelName,
                                               double dThreshold)
 {
-    if (!m_pFiffRawModel)
+    if (!m_pFiffRawModel) {
         qWarning() << "[EventView::onDetectTriggers] No Fiff Raw Model selected for trigger detection.";
+        return;
+    }
 
     if(m_FutureWatcher.isRunning()){
         return;

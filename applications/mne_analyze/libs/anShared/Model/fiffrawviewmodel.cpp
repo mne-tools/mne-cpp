@@ -114,6 +114,7 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_iScrollPos(0)
 , m_bDispEvent(true)
 , m_bRealtime(false)
+, m_iLastFileEndSample(0)
 //, m_pEventModel(QSharedPointer<EventModel>::create())
 {
     // connect data reloading: this will be run concurrently
@@ -1065,10 +1066,18 @@ bool FiffRawViewModel::isRealtime()
 
 void FiffRawViewModel::readFromRealtimeFile(const QString &path)
 {
+    m_iLastFileEndSample = this->absoluteLastSample();
     m_file.remove();
     m_file.setFileName(path);
     if (initFiffData(m_file)){
         updateEndStartFlags();
         emit newRealtimeData();
     }
+}
+
+//=============================================================================================================
+
+int FiffRawViewModel::getPreviousLastSample()
+{
+    return m_iLastFileEndSample;
 }
