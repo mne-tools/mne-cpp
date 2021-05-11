@@ -538,6 +538,8 @@ public:
 
     bool isRealtime();
 
+    int getPreviousLastSample();
+
 private:
     //=========================================================================================================
     /**
@@ -664,6 +666,7 @@ private:
 
     QSharedPointer<EventModel>                  m_pEventModel;                              /**< Model to store events to be displayed. */
 
+    int                                         m_iLastFileEndSample;
 signals:
     //=========================================================================================================
     /**

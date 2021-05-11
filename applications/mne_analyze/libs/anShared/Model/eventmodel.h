@@ -499,6 +499,8 @@ public:
      */
     void updateSelectedGroups(const QList<QModelIndex>& indexList);
 
+    void getEventsFromNewData();
+
 signals:
 
     //=========================================================================================================
@@ -551,6 +553,8 @@ private:
     QSharedPointer<FiffRawViewModel>    m_pFiffModel;                   /**< Pointer to FiffRawViewModel associated with the events stored in this model. */
 
     EVENTSLIB::EventManager             m_EventManager;                 /**< Database of of events. */
+
+    const static double                 m_dThreshold;
 };
 
 //=============================================================================================================
