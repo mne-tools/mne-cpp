@@ -177,5 +177,7 @@ int main(int argc, char *argv[])
 
     mainWin.hideSplashScreen();
 
-    return app.exec();
+    int return_value(app.exec());
+
+    return return_value;
 }

@@ -36,7 +36,7 @@
 #==============================================================================================================
 
 include(../../../mne-cpp.pri)
-
+DEFINES += TRACE
 TEMPLATE = app
 
 QT += gui widgets network opengl svg concurrent charts

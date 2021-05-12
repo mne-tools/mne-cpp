@@ -56,7 +56,7 @@
 #include <fiff/fiff_evoked.h>
 
 #include <rtprocessing/timefrequency.h>
-
+#include <utils/tracer.h>
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -267,6 +267,7 @@ void TimeFrequency::setChannelSelection(const QVariant &data)
 
 void TimeFrequency::computeTimeFreqency()
 {
+    __TRACE_FUNC();
     qDebug() << "[TimeFrequency::computeTimeFreqency]";
     if (!m_pFiffRawModel){
         return;

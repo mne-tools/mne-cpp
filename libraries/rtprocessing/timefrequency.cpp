@@ -46,6 +46,7 @@
 #include <utils/spectrogram.h>
 
 #include <mne/mne_epoch_data_list.h>
+#include <utils/tracer.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -67,6 +68,7 @@ using namespace RTPROCESSINGLIB;
 
 std::vector<Eigen::MatrixXd> TimeFrequencyData::computeEpochListTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet)
 {
+    __TRACE_FUNC();
     qDebug() << "[RTPROCESSINGLIB::computeTimeFreqency]";
 
     int a = 0;
@@ -95,6 +97,7 @@ std::vector<Eigen::MatrixXd> TimeFrequencyData::computeEpochListTimeFrequency(co
 
 std::vector<Eigen::MatrixXcd> TimeFrequencyData::computeComplexTimeFrequency(const FIFFLIB::FiffEvokedSet& evokedSet)
 {
+    __TRACE_FUNC();
     qDebug() << "[RTPROCESSINGLIB::computeTimeFreqency]";
 
     auto& evoked = evokedSet.evoked.first();
@@ -118,7 +121,7 @@ std::vector<std::vector<Eigen::MatrixXcd>> TimeFrequencyData::computeEpochListTi
                                                                                float fTMinS,
                                                                                float fTMaxS)
 {
-
+    __TRACE_FUNC();
     QMap<QString,double> mapReject;
     mapReject.insert("eog", 300e-06);
     int iType = 1;
@@ -143,18 +146,19 @@ std::vector<std::vector<Eigen::MatrixXcd>> TimeFrequencyData::computeEpochListTi
 //=============================================================================================================
 
 
-std::vector<Eigen::MatrixXcd> TimeFrequencyData::computeEpochTimeFrequency(const QSharedPointer<MNELIB::MNEEpochData>& epoch,
+std::vector<Eigen::MatrixXcd> TimeFrequencyData::computeEpochTimeFrequency(QSharedPointer<MNELIB::MNEEpochData>& epoch,
                                                               float sampleFrequency)
 {
-        int numChannels(epoch->epoch.rows());
+    __TRACE_FUNC();
+    int numChannels(epoch->epoch.rows());
 
-        std::vector<Eigen::MatrixXcd> channelTimeFrequencyList;
+    std::vector<Eigen::MatrixXcd> channelTimeFrequencyList;
 
-        for(int channeli = 0; channeli < numChannels; channeli++){
-            channelTimeFrequencyList.emplace_back(UTILSLIB::Spectrogram::makeComplexSpectrogram(epoch->epoch.row(channeli).transpose(), 200));
-        }
+    for(int channeli = 0; channeli < numChannels; channeli++){
+        channelTimeFrequencyList.emplace_back(UTILSLIB::Spectrogram::makeComplexSpectrogram(epoch->epoch.row(channeli).transpose(), 200));
+    }
 
-        return channelTimeFrequencyList;
+    return channelTimeFrequencyList;
 }
 
 
@@ -163,6 +167,7 @@ std::vector<Eigen::MatrixXcd> TimeFrequencyData::computeEpochTimeFrequency(const
 
 Eigen::MatrixXcd TimeFrequencyData::averageEpochTimeFrequency(const std::vector<Eigen::MatrixXcd>& epochTimeFrequency)
 {
+    __TRACE_FUNC();
     if (epochTimeFrequency.empty()){
         return Eigen::MatrixXcd();
     }
@@ -180,6 +185,7 @@ Eigen::MatrixXcd TimeFrequencyData::averageEpochTimeFrequency(const std::vector<
 
 std::vector<Eigen::MatrixXcd> TimeFrequencyData::averageEpochListTimeFrequency(const std::vector<std::vector<Eigen::MatrixXcd> >& epochListTimeFrequency)
 {
+    __TRACE_FUNC();
     int numFreqs(epochListTimeFrequency.front().front().rows());
     int numSamples(epochListTimeFrequency.front().front().cols());
 

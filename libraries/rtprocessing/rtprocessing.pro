@@ -36,7 +36,7 @@
 include(../../mne-cpp.pri)
 
 TEMPLATE = lib
-
+DEFINES += TRACE
 CONFIG += skip_target_version_ext
 
 QT += network concurrent

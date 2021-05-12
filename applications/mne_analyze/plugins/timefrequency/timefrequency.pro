@@ -35,7 +35,7 @@
 include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
-
+DEFINES += TRACE
 QT += gui widgets
 
 CONFIG += skip_target_version_ext plugin
