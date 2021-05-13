@@ -73,7 +73,7 @@ public:
      *
      * @return spectrogram-matrix (tf-representation of the input signal).
      */
-    static Eigen::MatrixXd makeSpectrogram(Eigen::VectorXd signal,
+    static Eigen::MatrixXd makeSpectrogram(const Eigen::VectorXd& signal,
                                            qint32 windowSize);
 
     //=========================================================================================================
@@ -85,7 +85,7 @@ public:
      *
      * @return spectrogram-matrix (tf-representation of the input signal)
      */
-    static Eigen::MatrixXcd makeComplexSpectrogram(Eigen::VectorXd signal,
+    static Eigen::MatrixXcd makeComplexSpectrogram(const Eigen::VectorXd& signal,
                                                    qint32 windowSize);
 
 private:

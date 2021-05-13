@@ -53,6 +53,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/StdVector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -90,7 +91,7 @@ public:
                                                                float fTMinS,
                                                                float fTMaxS);
 
-    static std::vector<Eigen::MatrixXcd> computeEpochTimeFrequency(QSharedPointer<MNELIB::MNEEpochData>& epoch,
+    static std::vector<Eigen::MatrixXcd> computeEpochTimeFrequency(const QSharedPointer<MNELIB::MNEEpochData>& epoch,
                                                       float sampleFrequency);
 
     static Eigen::MatrixXcd averageEpochTimeFrequency(const std::vector<Eigen::MatrixXcd>& epochTimeFrequency);

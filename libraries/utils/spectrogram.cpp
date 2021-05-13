@@ -43,6 +43,7 @@
 
 #include <Eigen/SparseCore>
 #include <unsupported/Eigen/FFT>
+#include <Eigen/StdVector>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -64,12 +65,12 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MatrixXd Spectrogram::makeSpectrogram(VectorXd signal, qint32 windowSize = 0)
+MatrixXd Spectrogram::makeSpectrogram(const VectorXd& signal, qint32 windowSize)
 {
     //QElapsedTimer timer;
     //timer.start();
     __TRACE_FUNC();
-    signal.array() -= signal.mean();
+//    signal.array() -= signal.mean();
     QList<SpectogramInputData> lData;
     int iThreadSize = QThread::idealThreadCount()*2;
     int iStepsSize = signal.rows()/iThreadSize;
@@ -79,7 +80,7 @@ MatrixXd Spectrogram::makeSpectrogram(VectorXd signal, qint32 windowSize = 0)
     dataTemp.vecInputData = signal;
     dataTemp.window_size = windowSize;
     if(dataTemp.window_size == 0) {
-        dataTemp.window_size = signal.rows()/15;
+        dataTemp.window_size = signal.rows()/5;
     }
 
     for (int i = 0; i < iThreadSize; ++i) {
@@ -92,6 +93,8 @@ MatrixXd Spectrogram::makeSpectrogram(VectorXd signal, qint32 windowSize = 0)
     dataTemp.iRangeHigh = iThreadSize*iStepsSize+iResidual;
     lData.append(dataTemp);
 
+//    MatrixXd resultMat = compute(dataTemp);
+
     QFuture<MatrixXd> resultMat = QtConcurrent::mappedReduced(lData,
                                                               compute,
                                                               reduce);
@@ -103,12 +106,12 @@ MatrixXd Spectrogram::makeSpectrogram(VectorXd signal, qint32 windowSize = 0)
 
 //=============================================================================================================
 
-MatrixXcd Spectrogram::makeComplexSpectrogram(VectorXd signal, qint32 windowSize = 0)
+MatrixXcd Spectrogram::makeComplexSpectrogram(const VectorXd& signal, qint32 windowSize)
 {
     //QElapsedTimer timer;
     //timer.start();
     __TRACE_FUNC();
-    signal.array() -= signal.mean();
+//    signal.array() -= signal.mean();
     QList<SpectogramInputData> lData;
     int iThreadSize = QThread::idealThreadCount();
     int iStepsSize = signal.rows()/iThreadSize;
@@ -164,26 +167,27 @@ MatrixXd Spectrogram::compute(const SpectogramInputData& inputData)
         fftw_make_planner_thread_safe();
     #endif
     __TRACE_FUNC();
-    Eigen::FFT<double> fft;
-    MatrixXd tf_matrix = MatrixXd::Zero(inputData.vecInputData.rows()/2, inputData.vecInputData.rows());
-    VectorXd envelope, windowed_sig, real_coeffs;
-    VectorXcd fft_win_sig;
-    qint32 window_size = inputData.window_size;
+    MatrixXd tf_matrix;
+//    Eigen::FFT<double> fft;
+//    MatrixXd tf_matrix = MatrixXd::Zero(inputData.vecInputData.rows()/2, inputData.vecInputData.rows());
+//    VectorXd envelope, windowed_sig, real_coeffs;
+//    VectorXcd fft_win_sig;
+//    qint32 window_size = inputData.window_size;
 
-    for(quint32 translate = inputData.iRangeLow; translate < inputData.iRangeHigh; translate++) {
-        envelope = gaussWindow(inputData.vecInputData.rows(), window_size, translate);
+//    for(quint32 translate = inputData.iRangeLow; translate < inputData.iRangeHigh; translate++) {
+//        envelope = gaussWindow(inputData.vecInputData.rows(), window_size, translate);
 
-        windowed_sig = VectorXd::Zero(inputData.vecInputData.rows());
-        fft_win_sig = VectorXcd::Zero(inputData.vecInputData.rows());
+//        windowed_sig = VectorXd::Zero(inputData.vecInputData.rows());
+//        fft_win_sig = VectorXcd::Zero(inputData.vecInputData.rows());
 
-        windowed_sig = inputData.vecInputData.array() * envelope.array();\
+//        windowed_sig = inputData.vecInputData.array() * envelope.array();\
 
-        fft.fwd(fft_win_sig, windowed_sig);
+//        fft.fwd(fft_win_sig, windowed_sig);
 
-        real_coeffs = fft_win_sig.segment(0,inputData.vecInputData.rows()/2).array().abs2();
+//        real_coeffs = fft_win_sig.segment(0,inputData.vecInputData.rows()/2).array().abs2();
 
-        tf_matrix.col(translate) = real_coeffs;
-    }
+//        tf_matrix.col(translate) = real_coeffs;
+//    }
 
     return tf_matrix;
 }

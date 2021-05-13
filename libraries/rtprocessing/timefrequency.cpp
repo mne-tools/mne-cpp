@@ -146,7 +146,7 @@ std::vector<std::vector<Eigen::MatrixXcd>> TimeFrequencyData::computeEpochListTi
 //=============================================================================================================
 
 
-std::vector<Eigen::MatrixXcd> TimeFrequencyData::computeEpochTimeFrequency(QSharedPointer<MNELIB::MNEEpochData>& epoch,
+std::vector<Eigen::MatrixXcd> TimeFrequencyData::computeEpochTimeFrequency(const QSharedPointer<MNELIB::MNEEpochData>& epoch,
                                                               float sampleFrequency)
 {
     __TRACE_FUNC();
@@ -155,7 +155,9 @@ std::vector<Eigen::MatrixXcd> TimeFrequencyData::computeEpochTimeFrequency(QShar
     std::vector<Eigen::MatrixXcd> channelTimeFrequencyList;
 
     for(int channeli = 0; channeli < numChannels; channeli++){
-        channelTimeFrequencyList.emplace_back(UTILSLIB::Spectrogram::makeComplexSpectrogram(epoch->epoch.row(channeli).transpose(), 200));
+        channelTimeFrequencyList.push_back(Eigen::MatrixXcd::Zero(10,10));
+//        channelTimeFrequencyList.emplace_back(UTILSLIB::Spectrogram::makeComplexSpectrogram(epoch->epoch.row(channeli).transpose(), 200));
+//        channelTimeFrequencyList.emplace_back(UTILSLIB::Spectrogram::makeSpectrogram(epoch->epoch.row(channeli).transpose(),0));
     }
 
     return channelTimeFrequencyList;
