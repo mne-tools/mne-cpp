@@ -3,28 +3,24 @@
 
 #include <memory>
 
+#include "methods/analysismethod.h"
+#include "methods/helpers/analysisIO.h"
+
 namespace TIMEFREQUENCYLIB {
-
-enum Method{
-    Superlets
-};
-
-struct TimeFrequencySettings {
-    Method m_method;
-    TimeFrequencySettings() = default;
-};
 
 class TimeFrequencyAnalyzer
 {
 public:
-    TimeFrequencyAnalyzer(const TimeFrequencySettings& settings);
+    TimeFrequencyAnalyzer();
 
-    void run();
+    TimeFrequencyAnalyzer(AnalysisMethod& method);
+
+    bool run();
+
+    TimeFrequencyResult getResult();
 
 private:
-    bool vaildateSettings();
-
-    TimeFrequencySettings m_pSettings;
+    AnalysisMethod& m_method;
 };
 }//namespace
 

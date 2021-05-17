@@ -23,7 +23,7 @@ struct wavelet_analyzer_settings
 class wavelet_spectrum_analyzer
 {
 	using filter_bank	= std::vector<convolver*>;
-	using superlet		= std::vector<morlet>;
+    using superlet		= std::vector<morlet>;
 
 public:
 	wavelet_spectrum_analyzer(wavelet_analyzer_settings set);

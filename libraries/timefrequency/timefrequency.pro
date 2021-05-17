@@ -35,12 +35,18 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     convolver.cpp \
     interface.cpp \
+    methods/helpers/morlet.cpp \
+    methods/superlets.cpp \
     timefrequencyanalyzer.cpp \
     wavelet_spectrum_analyzer.cpp
 
 
 HEADERS += \
     convolver.h \
+    methods/analysismethod.h \
+    methods/helpers/analysisIO.h \
+    methods/helpers/morlet.h \
+    methods/superlets.h \
     morlet.h \
     timefrequencyanalyzer.h \
     wavelet_spectrum_analyzer.h
