@@ -67,6 +67,7 @@ SOURCES += \
     ioutils.cpp \
     layoutloader.cpp \
     layoutmaker.cpp \
+    mnetracer.cpp \
     selectionio.cpp \
     spectrogram.cpp \
     warp.cpp \
@@ -77,6 +78,7 @@ SOURCES += \
 
 HEADERS += \
     kmeans.h\
+    mnetracer.h \
     utils_global.h \
     mnemath.h \
     ioutils.h \

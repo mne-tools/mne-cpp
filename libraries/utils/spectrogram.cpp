@@ -105,6 +105,7 @@ MatrixXd Spectrogram::makeSpectrogram(VectorXd signal, qint32 windowSize = 0)
 
 VectorXd Spectrogram::gaussWindow(qint32 sample_count, qreal scale, quint32 translation)
 {
+    MNE_TRACE()
     VectorXd gauss = VectorXd::Zero(sample_count);
 
     for(qint32 n = 0; n < sample_count; n++)
