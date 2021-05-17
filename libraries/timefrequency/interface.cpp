@@ -25,111 +25,111 @@ int mxGetSize(mxArray* arr)
 }
 
 
-void validate_params(int nrhs, mxArray** prhs)
-{
-	// check params
-	if (nrhs < 6)
-		mexErrMsgTxt("Parameter count not met! faslt expects at least 6 parameters! See below...\n \
-		1. input_data				- Scalar Matrix		- Input buffers (row major) - each row is a trial\n \
-		2. sampling_rate			- Scalar Number		- The sampling frequency in Hz\n \
-		3. frequency_interval		- Scalar Vector		- tuple (vector of size 2) containing the lowest and highest frequency\n \
-		4. frequency_count			- Scalar Number 	- the number of frequency bins in the interval\n \
-		5. cycle_count				- Scalar Number		- the number of cycles of the shortest wavelets\n \
-		6. superresolution_order	- Scalar Vector		- tuple (vector of size 2) containing the lowest and the highest superresolution orders\n \
-		7. multiplicative			- Scalar Number		- 0 to use additive superresolution, multiplicative otherwise (default: true)\n \
-		8. fractional				- Scalar Number		- 0 to use integral ASLT, uses fractional otherwise (default: true)");
-	if (nrhs > 8)
-		mexErrMsgTxt("Parameter count exceeded! faslt expects at most 8 parameters! See below...\n \
-		1. input_data				- Scalar Matrix		- Input buffers (row major) - each row is a trial\n \
-		2. sampling_rate			- Scalar Number		- The sampling frequency in Hz\n \
-		3. frequency_interval		- Scalar Vector		- tuple (vector of size 2) containing the lowest and highest frequency\n \
-		4. frequency_count			- Scalar Number 	- the number of frequency bins in the interval\n \
-		5. cycle_count				- Scalar Number		- the number of cycles of the shortest wavelets\n \
-		6. superresolution_order	- Scalar Vector		- tuple (vector of size 2) containing the lowest and the highest superresolution orders\n \
-		7. multiplicative			- Scalar Number		- 0 to use additive superresolution, multiplicative otherwise (default: true)\n \
-		8. fractional				- Scalar Number		- 0 to use integral ASLT, uses fractional otherwise (default: true)");
+//void validate_params(int nrhs, mxArray** prhs)
+//{
+//	// check params
+//	if (nrhs < 6)
+//		mexErrMsgTxt("Parameter count not met! faslt expects at least 6 parameters! See below...\n \
+//		1. input_data				- Scalar Matrix		- Input buffers (row major) - each row is a trial\n \
+//		2. sampling_rate			- Scalar Number		- The sampling frequency in Hz\n \
+//		3. frequency_interval		- Scalar Vector		- tuple (vector of size 2) containing the lowest and highest frequency\n \
+//		4. frequency_count			- Scalar Number 	- the number of frequency bins in the interval\n \
+//		5. cycle_count				- Scalar Number		- the number of cycles of the shortest wavelets\n \
+//		6. superresolution_order	- Scalar Vector		- tuple (vector of size 2) containing the lowest and the highest superresolution orders\n \
+//		7. multiplicative			- Scalar Number		- 0 to use additive superresolution, multiplicative otherwise (default: true)\n \
+//		8. fractional				- Scalar Number		- 0 to use integral ASLT, uses fractional otherwise (default: true)");
+//	if (nrhs > 8)
+//		mexErrMsgTxt("Parameter count exceeded! faslt expects at most 8 parameters! See below...\n \
+//		1. input_data				- Scalar Matrix		- Input buffers (row major) - each row is a trial\n \
+//		2. sampling_rate			- Scalar Number		- The sampling frequency in Hz\n \
+//		3. frequency_interval		- Scalar Vector		- tuple (vector of size 2) containing the lowest and highest frequency\n \
+//		4. frequency_count			- Scalar Number 	- the number of frequency bins in the interval\n \
+//		5. cycle_count				- Scalar Number		- the number of cycles of the shortest wavelets\n \
+//		6. superresolution_order	- Scalar Vector		- tuple (vector of size 2) containing the lowest and the highest superresolution orders\n \
+//		7. multiplicative			- Scalar Number		- 0 to use additive superresolution, multiplicative otherwise (default: true)\n \
+//		8. fractional				- Scalar Number		- 0 to use integral ASLT, uses fractional otherwise (default: true)");
 
-	// check data
-	if (!mxIsDouble(prhs[P_INPUT_DATA]))
-		mexErrMsgTxt("input_data needs to be a real-valued (double) matrix");
+//	// check data
+//	if (!mxIsDouble(prhs[P_INPUT_DATA]))
+//		mexErrMsgTxt("input_data needs to be a real-valued (double) matrix");
 
-	// check input size
-	if (!mxGetN(prhs[P_INPUT_DATA]) == 1)
-		mexErrMsgTxt("input_data is a column vector. faslt only accepts row vectors.");
+//	// check input size
+//	if (!mxGetN(prhs[P_INPUT_DATA]) == 1)
+//		mexErrMsgTxt("input_data is a column vector. faslt only accepts row vectors.");
 
-	// check FS
-	if (mxGetScalar(prhs[P_SAMPLING_RATE]) <= 0.0)
-		mexErrMsgTxt("sampling_rate needs to be a positive non-zero scalar representing the sampling frequency of the input in Hz");
+//	// check FS
+//	if (mxGetScalar(prhs[P_SAMPLING_RATE]) <= 0.0)
+//		mexErrMsgTxt("sampling_rate needs to be a positive non-zero scalar representing the sampling frequency of the input in Hz");
 
-	// check freq interval
-	if (!mxIsDouble(prhs[P_FREQ_INTERVAL]) || mxGetSize(prhs[P_FREQ_INTERVAL]) != 2)
-		mexErrMsgTxt("frequency_interval needs to be a tuple containing the lower and upper frequency bounds in Hz");
-	else
-	{
-		double lower	= mxGetPr(prhs[P_FREQ_INTERVAL])[0];
-		double upper	= mxGetPr(prhs[P_FREQ_INTERVAL])[1];
-		double fs		= mxGetScalar(prhs[P_SAMPLING_RATE]);
+//	// check freq interval
+//	if (!mxIsDouble(prhs[P_FREQ_INTERVAL]) || mxGetSize(prhs[P_FREQ_INTERVAL]) != 2)
+//		mexErrMsgTxt("frequency_interval needs to be a tuple containing the lower and upper frequency bounds in Hz");
+//	else
+//	{
+//		double lower	= mxGetPr(prhs[P_FREQ_INTERVAL])[0];
+//		double upper	= mxGetPr(prhs[P_FREQ_INTERVAL])[1];
+//		double fs		= mxGetScalar(prhs[P_SAMPLING_RATE]);
 
-		if (lower <= 0 || lower >= fs / 2 ||
-			upper <= 0 || upper >= fs / 2)
-			mexErrMsgTxt("frequency interval must not include DC (0) and Nyquist (sampling_rate / 2) frequencies");
-	}
+//		if (lower <= 0 || lower >= fs / 2 ||
+//			upper <= 0 || upper >= fs / 2)
+//			mexErrMsgTxt("frequency interval must not include DC (0) and Nyquist (sampling_rate / 2) frequencies");
+//	}
 
-	// check frequency count
-	if (!is_integer(mxGetScalar(prhs[P_FREQ_COUNT])) || mxGetScalar(prhs[P_FREQ_COUNT]) <= 0)
-		mexErrMsgTxt("frequency_count needs to be a positive non-zero integer");
+//	// check frequency count
+//	if (!is_integer(mxGetScalar(prhs[P_FREQ_COUNT])) || mxGetScalar(prhs[P_FREQ_COUNT]) <= 0)
+//		mexErrMsgTxt("frequency_count needs to be a positive non-zero integer");
 
-	// check cycle count
-	if (mxGetScalar(prhs[P_CYCLE_COUNT]) <= 0.0)
-		mexErrMsgTxt("cycle_count needs to be a positive non-zero scalar representing the number of cycles of the shortest wavelets");
+//	// check cycle count
+//	if (mxGetScalar(prhs[P_CYCLE_COUNT]) <= 0.0)
+//		mexErrMsgTxt("cycle_count needs to be a positive non-zero scalar representing the number of cycles of the shortest wavelets");
 
-	// check resolution
-	if (!mxIsDouble(prhs[P_SUPERRESOLUTION]) || mxGetSize(prhs[P_SUPERRESOLUTION]) != 2)
-		mexErrMsgTxt("superresolution needs to be a tuple containing the lower and upper frequency bounds in Hz");
-	else
-	{
-		if (mxGetPr(prhs[P_SUPERRESOLUTION])[0] <= 0 || mxGetPr(prhs[P_SUPERRESOLUTION])[1] <= 0)
-			mexErrMsgTxt("frequency interval must not include DC (0) and Nyquist (sampling_rate / 2) frequencies");
-	}
+//	// check resolution
+//	if (!mxIsDouble(prhs[P_SUPERRESOLUTION]) || mxGetSize(prhs[P_SUPERRESOLUTION]) != 2)
+//		mexErrMsgTxt("superresolution needs to be a tuple containing the lower and upper frequency bounds in Hz");
+//	else
+//	{
+//		if (mxGetPr(prhs[P_SUPERRESOLUTION])[0] <= 0 || mxGetPr(prhs[P_SUPERRESOLUTION])[1] <= 0)
+//			mexErrMsgTxt("frequency interval must not include DC (0) and Nyquist (sampling_rate / 2) frequencies");
+//	}
 
-	// check multiplicative
-	if (nrhs > P_MULTIPLICATIVE && mxGetSize(prhs[P_MULTIPLICATIVE]) != 1)
-		mexErrMsgTxt("multiplicative needs to be a scalar (0 - false, !0 otherwise)");
+//	// check multiplicative
+//	if (nrhs > P_MULTIPLICATIVE && mxGetSize(prhs[P_MULTIPLICATIVE]) != 1)
+//		mexErrMsgTxt("multiplicative needs to be a scalar (0 - false, !0 otherwise)");
 
-	// check fractional
-	if (nrhs > P_FRACTIONAL && mxGetSize(prhs[P_FRACTIONAL]) != 1)
-		mexErrMsgTxt("fractional needs to be a scalar (0 - false, !0 otherwise)");
-}
-
-
-
-void print_settings(wavelet_analyzer_settings& set)
-{
-	mexPrintf("wavelet_analyzer_settings:\n\
-	sampling_rate:		%f\n\
-	freq_low:			%f\n\
-	freq_high:			%f\n\
-	freq_count:			%d\n\
-	input_size:			%d\n\
-	wavelet_cycles:		%f\n\
-	resolution_low:		%f\n\
-	resolution_high:	%f\n\
-	multiplicative:		%s\n\
-	fractional:			%s\n",
-		set.sampling_rate,
-		set.freq_low,
-		set.freq_high,
-		set.freq_count,
-		set.input_size,
-		set.wavelet_cycles,
-		set.resolution_low,
-		set.resolution_high,
-		set.multiplicative	? "true" : "false",
-		set.fractional		? "true" : "false");
-}
+//	// check fractional
+//	if (nrhs > P_FRACTIONAL && mxGetSize(prhs[P_FRACTIONAL]) != 1)
+//		mexErrMsgTxt("fractional needs to be a scalar (0 - false, !0 otherwise)");
+//}
 
 
-void __declspec(dllexport) mexFunction(int nlhs, mxArray** plhs, int nrhs, mxArray** prhs)
+
+//void print_settings(wavelet_analyzer_settings& set)
+//{
+//	mexPrintf("wavelet_analyzer_settings:\n\
+//	sampling_rate:		%f\n\
+//	freq_low:			%f\n\
+//	freq_high:			%f\n\
+//	freq_count:			%d\n\
+//	input_size:			%d\n\
+//	wavelet_cycles:		%f\n\
+//	resolution_low:		%f\n\
+//	resolution_high:	%f\n\
+//	multiplicative:		%s\n\
+//	fractional:			%s\n",
+//		set.sampling_rate,
+//		set.freq_low,
+//		set.freq_high,
+//		set.freq_count,
+//		set.input_size,
+//		set.wavelet_cycles,
+//		set.resolution_low,
+//		set.resolution_high,
+//		set.multiplicative	? "true" : "false",
+//		set.fractional		? "true" : "false");
+//}
+
+
+void mexFunction(int nlhs, mxArray** plhs, int nrhs, mxArray** prhs)
 {
 	//	Parameter Name			- Parameter Type							- Description
 	//

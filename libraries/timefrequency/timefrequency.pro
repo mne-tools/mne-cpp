@@ -35,12 +35,14 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     convolver.cpp \
     interface.cpp \
+    timefrequencyanalyzer.cpp \
     wavelet_spectrum_analyzer.cpp
 
 
 HEADERS += \
     convolver.h \
     morlet.h \
+    timefrequencyanalyzer.h \
     wavelet_spectrum_analyzer.h
 
 
