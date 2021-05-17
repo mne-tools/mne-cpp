@@ -104,6 +104,7 @@ MainWindow::MainWindow(QWidget *parent)
 , m_sSettingsPath("MNESCAN/MainWindow")
 , m_sCurrentStyle("default")
 {
+    MNE_TRACE()
     fprintf(stderr, "%s - Version %s\n",
             CInfo::AppNameShort().toUtf8().constData(),
             CInfo::AppVersion().toUtf8().constData());
@@ -134,6 +135,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    MNE_TRACE()
     saveSettings();
 
     if(m_bIsRunning) {
@@ -161,6 +163,7 @@ void MainWindow::setupPlugins()
 
 void MainWindow::setupUI()
 {
+    MNE_TRACE()
     // Quick control selection
     m_pQuickControlView = new QuickControlView(QString("MNESCAN/MainWindow/QuickControl"),
                                                        "MNE Scan",
@@ -179,6 +182,7 @@ void MainWindow::setupUI()
 
 void MainWindow::saveSettings()
 {
+    MNE_TRACE()
     if(m_sSettingsPath.isEmpty()) {
         return;
     }
@@ -214,6 +218,7 @@ void MainWindow::loadSettings()
 
 void MainWindow::onStyleChanged(const QString& sStyle)
 {
+    MNE_TRACE()
     qInfo() << "MainWindow::onStyleChanged";
     qInfo() << "MainWindow::onStyleChanged sStyle" << sStyle;
     if(QApplication *pApp = qobject_cast<QApplication *>(QApplication::instance())) {
