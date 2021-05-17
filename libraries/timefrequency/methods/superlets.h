@@ -7,10 +7,8 @@
 
 namespace TIMEFREQUENCYLIB {
 
-struct SuperletSettings{
-    AnalysisSettings settings;
+struct SuperletSettings : public AnalysisSettings{
     int		freq_count;
-    int		input_size;
     float	wavelet_cycles;
     float	resolution_low;
     float	resolution_high;

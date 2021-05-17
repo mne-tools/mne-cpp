@@ -51,7 +51,7 @@ HEADERS += \
     timefrequencyanalyzer.h \
     wavelet_spectrum_analyzer.h
 
-
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 header_files.files = $${HEADERS}
