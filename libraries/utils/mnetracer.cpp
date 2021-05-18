@@ -10,18 +10,20 @@ long long MNETracer::ms_iZeroTime(0);
 
 //=============================================================================================================
 
-MNETracer::MNETracer(const std::string &function, const std::string &file, const int num)
-: printToTerminal(false)
-, fileName(file)
-, threadId("0")
-, beginTime(0)
-, endTime(0)
-, durationMicros(0)
-, durationMilis(0.0)
+MNETracer::MNETracer(const std::string &file, const std::string &function, int lineNumber)
+: m_bIsInitialized(false)
+, m_bPrintToTerminal(false)
+, m_sFileName(file)
+, m_sFunctionName(function)
+, m_iLineNumber(lineNumber)
+, m_iThreadId("0")
+, m_iBeginTime(0)
+, m_iEndTime(0)
+, m_dDurationMilis(0.)
 {
-    if (isEnabled)
+    initialize();
+    if (ms_bIsEnabled && m_bIsInitialized)
     {
-        initialize(function, file, num);
         writeBeginEvent();
     }
 }
@@ -30,11 +32,11 @@ MNETracer::MNETracer(const std::string &function, const std::string &file, const
 
 MNETracer::~MNETracer()
 {
-    if (isEnabled)
+    if (ms_bIsEnabled && m_bIsInitialized)
     {
         registerFinalTime();
         writeEndEvent();
-        if (printToTerminal)
+        if (m_bPrintToTerminal)
         {
             calculateDuration();
             printDurationMiliSec();
@@ -46,11 +48,13 @@ MNETracer::~MNETracer()
 
 void MNETracer::enable(const std::string &jsonFileName)
 {
-    outputFileStream.open(jsonFileName);
-    outFileMutex = false;
+    ms_OutputFileStream.open(jsonFileName);
     writeHeader();
     setZeroTime();
-    isEnabled = true;
+    if (ms_OutputFileStream.is_open())
+    {
+        ms_bIsEnabled = true;
+    }
 }
 
 //=============================================================================================================
@@ -64,12 +68,12 @@ void MNETracer::enable()
 
 void MNETracer::disable()
 {
-    if (MNETracer::isEnabled)
+    if (ms_bIsEnabled)
     {
         writeFooter();
-        outputFileStream.close();
-        outFileMutex = false;
-        isEnabled = false;
+        ms_OutputFileStream.flush();
+        ms_OutputFileStream.close();
+        ms_bIsEnabled = false;
     }
 }
 
@@ -98,7 +102,7 @@ void MNETracer::stop()
 
 void MNETracer::traceQuantity(const std::string &name, long val)
 {
-    long long timeNow = getTimeNow() - zeroTime;
+    long long timeNow = getTimeNow() - ms_iZeroTime;
     std::string s;
     s.append("{\"name\":\"").append(name).append("\",\"ph\":\"C\",\"ts\":");
     s.append(std::to_string(timeNow)).append(",\"pid\":1,\"tid\":1");
@@ -108,37 +112,34 @@ void MNETracer::traceQuantity(const std::string &name, long val)
 
 //=============================================================================================================
 
-void MNETracer::initialize(const std::string &function, const std::string &file, const int num)
+void MNETracer::initialize()
 {
-    numTracers++;
-
-    initializeFunctionName(function);
-    initializeFile(file);
-    lineNumber = num;
-
+    formatFileName();
+//    formatFunctionName();
     registerThreadId();
     registerInitialTime();
+    m_bIsInitialized = true;
 }
 
 //=============================================================================================================
 
 void MNETracer::setZeroTime()
 {
-    zeroTime = getTimeNow();
+    ms_iZeroTime = getTimeNow();
 }
 
 //=============================================================================================================
 
 void MNETracer::registerInitialTime()
 {
-    beginTime = getTimeNow() - zeroTime;
+    m_iBeginTime = getTimeNow() - ms_iZeroTime;
 }
 
 //=============================================================================================================
 
 void MNETracer::registerFinalTime()
 {
-    endTime = getTimeNow() - zeroTime;
+    m_iEndTime = getTimeNow() - ms_iZeroTime;
 }
 
 //=============================================================================================================
@@ -154,49 +155,48 @@ long long MNETracer::getTimeNow()
 void MNETracer::registerThreadId()
 {
     auto longId = std::hash<std::thread::id>{}(std::this_thread::get_id());
-    threadId = std::to_string(longId).substr(0, 5);
+    m_iThreadId = std::to_string(longId).substr(0, 5);
 }
 
 //=============================================================================================================
 
-void MNETracer::initializeFunctionName(const std::string &function)
+void MNETracer::formatFunctionName()
 {
-    functionName = function;
-    std::string pattern(" __cdecl");
-    size_t pos = functionName.find("__cdecl");
-    if (pos != std::string::npos)
-        functionName.replace(pos, pattern.length(), "");
-}
-
-//=============================================================================================================
-
-void MNETracer::initializeFile(std::string file)
-{
-    std::string patternIn("\\");
-    std::string patternOut("\\\\");
-    size_t start_pos = 0;
-    while ((start_pos = file.find(patternIn, start_pos)) != std::string::npos)
-    {
-        file.replace(start_pos, 1, patternOut);
-        start_pos += patternOut.length();
+    const char* pattern(" __cdecl");
+    constexpr int patternLenght(8);
+    size_t pos = m_sFunctionName.find(pattern);
+    if (pos != std::string::npos) {
+        m_sFunctionName.replace(pos, patternLenght, "");
     }
+}
 
-    fileName = file;
+//=============================================================================================================
+
+void MNETracer::formatFileName()
+{
+    const char* patternIn("\\");
+    const char* patternOut("\\\\");
+    constexpr int patternOutLength(4);
+    size_t start_pos = 0;
+    while ((start_pos = m_sFileName.find(patternIn, start_pos)) != std::string::npos)
+    {
+        m_sFileName.replace(start_pos, 1, patternOut);
+        start_pos += patternOutLength;
+    }
 }
 
 //=============================================================================================================
 
 void MNETracer::calculateDuration()
 {
-    durationMicros = endTime - beginTime;
-    durationMilis = durationMicros * 0.001;
+    m_dDurationMilis = (m_iEndTime - m_iBeginTime) * 0.001;
 }
 
 //=============================================================================================================
 
 void MNETracer::printDurationMiliSec()
 {
-    std::cout << "Scope: " << fileName << " - " << functionName << " DurationMs: " << durationMilis << "ms.\n";
+    std::cout << "Scope: " << m_sFileName << " - " << m_sFunctionName << " DurationMs: " << m_dDurationMilis << "ms.\n";
 }
 
 //=============================================================================================================
@@ -217,18 +217,11 @@ void MNETracer::writeFooter()
 
 void MNETracer::writeToFile(const std::string &str)
 {
-    if (outFileMutex)
-    {
-        std::this_thread::sleep_for(std::chrono::milliseconds(10));
-        writeToFile(str);
+    ms_outFileMutex.lock();
+    if(ms_OutputFileStream.is_open()) {
+        ms_OutputFileStream << str;
     }
-    else
-    {
-        outFileMutex = true;
-        outputFileStream << str;
-        outputFileStream.flush();
-        outFileMutex = false;
-    }
+    ms_outFileMutex.unlock();
 }
 
 //=============================================================================================================
@@ -236,15 +229,15 @@ void MNETracer::writeToFile(const std::string &str)
 void MNETracer::writeBeginEvent()
 {
     std::string s;
-    if (!isFirstEvent)
+    if (!ms_bIsFirstEvent)
         s.append(",");
 
-    s.append("{\"name\":\"").append(functionName).append("\",\"cat\":\"bst\",");
-    s.append("\"ph\":\"B\",\"ts\":").append(std::to_string(beginTime)).append(",\"pid\":1,\"tid\":");
-    s.append(threadId).append(",\"args\":{\"file path\":\"").append(fileName).append("\",\"line number\":");
-    s.append(std::to_string(lineNumber)).append("}}\n");
+    s.append("{\"name\":\"").append(m_sFunctionName).append("\",\"cat\":\"bst\",");
+    s.append("\"ph\":\"B\",\"ts\":").append(std::to_string(m_iBeginTime)).append(",\"pid\":1,\"tid\":");
+    s.append(m_iThreadId).append(",\"args\":{\"file path\":\"").append(m_sFileName).append("\",\"line number\":");
+    s.append(std::to_string(m_iLineNumber)).append("}}\n");
     writeToFile(s);
-    isFirstEvent = false;
+    ms_bIsFirstEvent = false;
 }
 
 //=============================================================================================================
@@ -252,10 +245,10 @@ void MNETracer::writeBeginEvent()
 void MNETracer::writeEndEvent()
 {
     std::string s;
-    s.append(",{\"name\":\"").append(functionName).append("\",\"cat\":\"bst\",");
-    s.append("\"ph\":\"E\",\"ts\":").append(std::to_string(endTime)).append(",\"pid\":1,\"tid\":");
-    s.append(threadId).append(",\"args\":{\"file path\":\"").append(fileName).append("\",\"line number\":");
-    s.append(std::to_string(lineNumber)).append("}}\n");
+    s.append(",{\"name\":\"").append(m_sFunctionName).append("\",\"cat\":\"bst\",");
+    s.append("\"ph\":\"E\",\"ts\":").append(std::to_string(m_iEndTime)).append(",\"pid\":1,\"tid\":");
+    s.append(m_iThreadId).append(",\"args\":{\"file path\":\"").append(m_sFileName).append("\",\"line number\":");
+    s.append(std::to_string(m_iLineNumber)).append("}}\n");
     writeToFile(s);
 }
 
@@ -263,12 +256,12 @@ void MNETracer::writeEndEvent()
 
 bool MNETracer::printToTerminalIsSet()
 {
-    return printToTerminal;
+    return m_bPrintToTerminal;
 }
 
 //=============================================================================================================
 
 void MNETracer::setPrintToTerminal(bool s)
 {
-    printToTerminal = s;
+    m_bPrintToTerminal = s;
 }
