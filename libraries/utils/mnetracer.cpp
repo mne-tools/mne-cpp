@@ -21,9 +21,9 @@ MNETracer::MNETracer(const std::string &file, const std::string &function, int l
 , m_iEndTime(0)
 , m_dDurationMilis(0.)
 {
-    initialize();
-    if (ms_bIsEnabled && m_bIsInitialized)
+    if (ms_bIsEnabled)
     {
+        initialize();
         writeBeginEvent();
     }
 }
@@ -114,10 +114,10 @@ void MNETracer::traceQuantity(const std::string &name, long val)
 
 void MNETracer::initialize()
 {
+    registerConstructionTime();
+    registerThreadId();
     formatFileName();
 //    formatFunctionName();
-    registerThreadId();
-    registerInitialTime();
     m_bIsInitialized = true;
 }
 
@@ -130,7 +130,7 @@ void MNETracer::setZeroTime()
 
 //=============================================================================================================
 
-void MNETracer::registerInitialTime()
+void MNETracer::registerConstructionTime()
 {
     m_iBeginTime = getTimeNow() - ms_iZeroTime;
 }
