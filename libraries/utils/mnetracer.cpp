@@ -98,7 +98,7 @@ void MNETracer::stop()
 
 //=============================================================================================================
 
-void MNETracer::traceQuantity(std::string &name, long val)
+void MNETracer::traceQuantity(const std::string &name, long val)
 {
     long long timeNow = getTimeNow() - zeroTime;
     std::string s;
