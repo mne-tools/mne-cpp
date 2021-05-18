@@ -2,7 +2,7 @@
 
 using namespace UTILSLIB;
 
-static const std::string defaultTracerFileName("default_MNETracer_file.json");
+static const char defaultTracerFileName[] = "default_MNETracer_file.json";
 int MNETracer::numTracers = 0;
 bool MNETracer::isEnabled = false;
 std::ofstream MNETracer::outputFileStream;
