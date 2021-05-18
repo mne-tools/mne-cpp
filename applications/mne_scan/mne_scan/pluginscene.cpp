@@ -61,7 +61,6 @@ PluginScene::PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui)
 , m_pActionPluginItem(Q_NULLPTR)
 , leftButtonDown(false)
 {
-
     m_pMenuPluginItem = pMenuPluginItem;
     m_mode = MovePluginItem;
 //    m_itemType = PluginItem::Sensor;
@@ -80,7 +79,6 @@ PluginScene::~PluginScene()
 
 void PluginScene::insertItem(const QPointF& pos)
 {
-
     PluginItem *item;
     SCSHAREDLIB::AbstractPlugin::SPtr pPlugin;
     QString name;

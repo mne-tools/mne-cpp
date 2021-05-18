@@ -81,11 +81,11 @@ contains(MNECPP_CONFIG, static) {
     message("The static flag was detected. Building static version of MNE-CPP.")
 }
 
-contains(MNECPP_CONFIG, trace) {
-    message("Building with MNE_Tracer support")
-    DEFINES += TRACE
-    QMAKE_CXXFLAGS += -include $${PWD}/libraries/utils/mnetracer.h
-}
+#contains(MNECPP_CONFIG, trace) {
+#    message("Building with MNE_Tracer support")
+#    DEFINES += TRACE
+#    QMAKE_CXXFLAGS += -include $${PWD}/libraries/utils/mnetracer.h
+#}
 
 ########################################### DIRECTORY DEFINITIONS #############################################
 
