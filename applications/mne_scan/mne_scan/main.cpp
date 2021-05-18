@@ -152,7 +152,7 @@ int main(int argc, char *argv[])
     #endif
     #endif
 
-    MNE_TRACER_ENABLE
+    MNE_TRACER_ENABLE(file_test.json)
 
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     QApplication app(argc, argv);
