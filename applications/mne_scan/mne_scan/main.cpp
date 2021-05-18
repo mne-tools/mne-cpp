@@ -71,8 +71,7 @@
 
 using namespace SCMEASLIB;
 using namespace MNESCAN;
-using namespace Eigen;
-//using namespace UTILSLIB;
+//using namespace Eigen;
 
 //=============================================================================================================
 // GLOBAL DEFINTIONS
@@ -152,8 +151,6 @@ int main(int argc, char *argv[])
     #endif
     #endif
 
-    MNE_TRACER_ENABLE(file_test.json)
-
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     QApplication app(argc, argv);
     //app.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings, true);
@@ -179,8 +176,6 @@ int main(int argc, char *argv[])
     mainWin.hideSplashScreen();
 
     int returnValue(app.exec());
-
-    MNE_TRACER_DISABLE
 
     return returnValue;
 }
