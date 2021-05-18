@@ -33,7 +33,7 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    convolver.cpp \
+    methods/helpers/convolver.cpp \
     interface.cpp \
     methods/helpers/morlet.cpp \
     methods/superlets.cpp \
@@ -42,12 +42,11 @@ SOURCES += \
 
 
 HEADERS += \
-    convolver.h \
+    methods/helpers/convolver.h \
     methods/analysismethod.h \
     methods/helpers/analysisIO.h \
     methods/helpers/morlet.h \
     methods/superlets.h \
-    morlet.h \
     timefrequencyanalyzer.h \
     wavelet_spectrum_analyzer.h
 
