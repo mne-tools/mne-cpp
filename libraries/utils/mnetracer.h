@@ -9,18 +9,9 @@
 #include <chrono>
 #include <thread>
 
-
-#if _WIN32
-#define __PRETTY_FUNCTION__ __FUNCSIG__
-#elif __linux__
-#define __PRETTY_FUNCTION__ __func__
-#elif __APPLE__
-#define __PRETTY_FUNCTION__ __func__
-#endif
-
 #ifdef TRACE
-#define MNE_TRACE() UTILSLIB::MNETracer _mneTracer__LINE__(__PRETTY_FUNCTION__, __FILE__, __LINE__);
-#define MNE_TRACER_ENABLE UTILSLIB::MNETracer::enable("chrome_tracer.json");
+#define MNE_TRACE() UTILSLIB::MNETracer _mneTracer__LINE__(__func__, __FILE__, __LINE__);
+#define MNE_TRACER_ENABLE(FILENAME) UTILSLIB::MNETracer::enable(#FILENAME);
 #define MNE_TRACER_DISABLE UTILSLIB::MNETracer::disable();
 #define MNE_TRACE_VALUE(NAME, VALUE) UTILSLIB::MNETracer::traceQuantity(NAME, VALUE);
 #else
