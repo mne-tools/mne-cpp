@@ -2,13 +2,15 @@
 
 using namespace UTILSLIB;
 
-static const char defaultTracerFileName[] = "default_MNETracer_file.json";
+static const char* defaultTracerFileName = "default_MNETracer_file.json";
 int MNETracer::numTracers = 0;
 bool MNETracer::isEnabled = false;
 std::ofstream MNETracer::outputFileStream;
 bool MNETracer::isFirstEvent = true;
 bool MNETracer::outFileMutex = false;
 long long MNETracer::zeroTime = 0;
+
+//=============================================================================================================
 
 MNETracer::MNETracer(const std::string &function, const std::string &file, const int num)
 : printToTerminal(false)
@@ -26,6 +28,8 @@ MNETracer::MNETracer(const std::string &function, const std::string &file, const
     }
 }
 
+//=============================================================================================================
+
 MNETracer::~MNETracer()
 {
     if (isEnabled)
@@ -40,6 +44,8 @@ MNETracer::~MNETracer()
     }
 }
 
+//=============================================================================================================
+
 void MNETracer::enable(const std::string &jsonFileName)
 {
     outputFileStream.open(jsonFileName);
@@ -49,10 +55,14 @@ void MNETracer::enable(const std::string &jsonFileName)
     isEnabled = true;
 }
 
+//=============================================================================================================
+
 void MNETracer::enable()
 {
     enable(defaultTracerFileName);
 }
+
+//=============================================================================================================
 
 void MNETracer::disable()
 {
@@ -65,20 +75,28 @@ void MNETracer::disable()
     }
 }
 
+//=============================================================================================================
+
 void MNETracer::start(const std::string &jsonFileName)
 {
     enable(jsonFileName);
 }
+
+//=============================================================================================================
 
 void MNETracer::start()
 {
     enable();
 }
 
+//=============================================================================================================
+
 void MNETracer::stop()
 {
     disable();
 }
+
+//=============================================================================================================
 
 void MNETracer::traceQuantity(std::string &name, long val)
 {
@@ -89,6 +107,8 @@ void MNETracer::traceQuantity(std::string &name, long val)
     s.append(",\"args\":{\"").append(name).append("\":").append(std::to_string(val)).append("}}\n");
     writeToFile(s);
 }
+
+//=============================================================================================================
 
 void MNETracer::initialize(const std::string &function, const std::string &file, const int num)
 {
@@ -102,20 +122,28 @@ void MNETracer::initialize(const std::string &function, const std::string &file,
     registerInitialTime();
 }
 
+//=============================================================================================================
+
 void MNETracer::setZeroTime()
 {
     zeroTime = getTimeNow();
 }
+
+//=============================================================================================================
 
 void MNETracer::registerInitialTime()
 {
     beginTime = getTimeNow() - zeroTime;
 }
 
+//=============================================================================================================
+
 void MNETracer::registerFinalTime()
 {
     endTime = getTimeNow() - zeroTime;
 }
+
+//=============================================================================================================
 
 long long MNETracer::getTimeNow()
 {
@@ -123,11 +151,15 @@ long long MNETracer::getTimeNow()
     return std::chrono::time_point_cast<std::chrono::microseconds>(timeNow).time_since_epoch().count();
 }
 
+//=============================================================================================================
+
 void MNETracer::registerThreadId()
 {
     auto longId = std::hash<std::thread::id>{}(std::this_thread::get_id());
     threadId = std::to_string(longId).substr(0, 5);
 }
+
+//=============================================================================================================
 
 void MNETracer::initializeFunctionName(const std::string &function)
 {
@@ -137,6 +169,8 @@ void MNETracer::initializeFunctionName(const std::string &function)
     if (pos != std::string::npos)
         functionName.replace(pos, pattern.length(), "");
 }
+
+//=============================================================================================================
 
 void MNETracer::initializeFile(std::string file)
 {
@@ -152,26 +186,36 @@ void MNETracer::initializeFile(std::string file)
     fileName = file;
 }
 
+//=============================================================================================================
+
 void MNETracer::calculateDuration()
 {
     durationMicros = endTime - beginTime;
     durationMilis = durationMicros * 0.001;
 }
 
+//=============================================================================================================
+
 void MNETracer::printDurationMiliSec()
 {
     std::cout << "Scope: " << fileName << " - " << functionName << " DurationMs: " << durationMilis << "ms.\n";
 }
+
+//=============================================================================================================
 
 void MNETracer::writeHeader()
 {
     writeToFile("{\"displayTimeUnit\": \"ms\",\"traceEvents\":[\n");
 }
 
+//=============================================================================================================
+
 void MNETracer::writeFooter()
 {
     writeToFile("]}");
 }
+
+//=============================================================================================================
 
 void MNETracer::writeToFile(const std::string &str)
 {
@@ -189,6 +233,8 @@ void MNETracer::writeToFile(const std::string &str)
     }
 }
 
+//=============================================================================================================
+
 void MNETracer::writeBeginEvent()
 {
     std::string s;
@@ -203,6 +249,8 @@ void MNETracer::writeBeginEvent()
     isFirstEvent = false;
 }
 
+//=============================================================================================================
+
 void MNETracer::writeEndEvent()
 {
     std::string s;
@@ -213,10 +261,14 @@ void MNETracer::writeEndEvent()
     writeToFile(s);
 }
 
+//=============================================================================================================
+
 bool MNETracer::printToTerminalIsSet()
 {
     return printToTerminal;
 }
+
+//=============================================================================================================
 
 void MNETracer::setPrintToTerminal(bool s)
 {
