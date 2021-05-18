@@ -107,7 +107,8 @@ namespace UTILSLIB
  * variables shared and accessible from all the instances of this class MNETracer. Each instance, in its contructor will
  * record the creation time and write to file that begin-measurement event.
  * Whenever the MNETracer object is destructued (normally by falling out of scope), the destructor of this class MNETracer will
- * be called and it is in the desctructor where the end-measurement event is recorded and written to file.
+ * be called and it is in the desctructor where the end-measurement event is recorded and written to file. So the time-alive (time
+ * between the constructor and the desctructor calls, for objects of this class, will be linked to a specific scope (i.e. function).
  *
  * Since this class is oriented as a development tool, all the events are written to the output file stream directly, so there
  * should be not much difficulty recovering the results even if the application crashed.
@@ -222,18 +223,54 @@ private:
     static long long getTimeNow();
 
     /**
-     * @brief initialize
+     * @brief initialize Formats the fileName, FunctionName and line of code text shown in each event saved to the output file.
+     * It then registers the threadId and the construction time for each instance of the class.
      */
     void initialize();
 
+    /**
+     * Removes extra back-slashes from the filename string.
+     */
     void formatFileName();
+
+    /**
+     * removes  "__cdecl" from the function name.
+     */
     void formatFunctionName();
-    void registerInitialTime();
+
+    /**
+     * Saves the construction time of this object. To later compute the time between construction and destruction of each object.
+     */
+    void registerConstructionTime();
+
+    /**
+     * Saves the destruction time of this object. See registerConstructionTime.
+     */
     void registerFinalTime();
+
+    /**
+     * Stores a string, definiing a specific thread based on a hashing function. The same thread will always have the same stringId.
+     */
     void registerThreadId();
+
+    /**
+     * Calculate duration between construction and destruction of an object.
+     */
     void calculateDuration();
+
+    /**
+     * Print duration in miliseconds.
+     */
     void printDurationMiliSec();
+
+    /**
+     * Write an event of type B (begin) in the output file.
+     */
     void writeBeginEvent();
+
+    /**
+     * Write an event of type E (end) in the ouptut file.
+     */
     void writeEndEvent();
 
     static bool ms_bIsEnabled;                  /**< Bool variable to store if the "class" (ie. the MNETracer) has been enabled. */
