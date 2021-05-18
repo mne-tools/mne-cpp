@@ -45,20 +45,22 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <ostream>
 #include <chrono>
 #include <thread>
+#include <mutex>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #ifdef TRACE
-#define MNE_TRACE() UTILSLIB::MNETracer _mneTracer__LINE__(__func__, __FILE__, __LINE__);
+#define MNE_TRACE() UTILSLIB::MNETracer __mneTracer__LINE__(__func__, __FILE__, __LINE__);
 #define MNE_TRACER_ENABLE(FILENAME) UTILSLIB::MNETracer::enable(#FILENAME);
 #define MNE_TRACER_DISABLE UTILSLIB::MNETracer::disable();
 #define MNE_TRACE_VALUE(NAME, VALUE) UTILSLIB::MNETracer::traceQuantity(NAME, VALUE);
 #else
-#define MNE_TRACE() PEPE
+#define MNE_TRACE()
 #define MNE_TRACER_ENABLE
 #define MNE_TRACER_DISABLE
 #define MNE_TRACE_VALUE()
@@ -107,6 +109,9 @@ namespace UTILSLIB
  * Whenever the MNETracer object is destructued (normally by falling out of scope), the destructor of this class MNETracer will
  * be called and it is in the desctructor where the end-measurement event is recorded and written to file.
  *
+ * Since this class is oriented as a development tool, all the events are written to the output file stream directly, so there
+ * should be not much difficulty recovering the results even if the application crashed.
+ *
  * There are some additional macros defined to make is handy for the user to use this class.
  * MNE_TRACER_ENABLE(filename) and MNE_TRACER_DISABLE macros will set the static variables like the output file initialization and
  * a few other needed variables. This should be called before any MNETracer is created, and after the last MNETracer object is destructed.
@@ -116,16 +121,45 @@ namespace UTILSLIB
 class UTILSSHARED_EXPORT MNETracer
 {
 public:
-    MNETracer(const std::string &function, const std::string &file, const int num);
+    /**
+     * @brief MNETracer constructor will check if the class "is enabled". If it is, it will record the creation time with respect to the
+     * ZeroTime set during the last enable function call. It will also write that time to the output file and if needed, it will also print
+     * it to terminal.
+     * @param function Function name where the MNETracer object is created.
+     * @param file File name where the MNETracer object is created.
+     * @param num Line number where the MNETracer object is created.
+     */
+    MNETracer(const std::string& file, const std::string& function, int lineNumber);
+
+    /**
+     * MNETracer destructor will check if the class "is enabled". If it is, it will record the destruction time with respect to the
+     * ZeroTime set during the last enable function call. It will also write that time to the output file and, if needed, it will also print
+     * it to terminal.
+     */
     ~MNETracer();
-    static void enable(const std::string &jsonFileName);
+
+    /**
+     * The enable function initializes an output file (output file stream ie std::ofstream) to write the events.
+     * @param jsonFileName is the name of the output file to configure as the outuput file (it is in json format).
+     */
+    static void enable(const std::string& jsonFileName);
+
+    /**
+     * Overriden function for enable, but using the default filename.
+     */
     static void enable();
+
+    /**
+     * @brief disable If the class "is enabled" (it's static variabable ms_bIsEnabled is true), the output file has a Footer written to it and the
+     * output file stream is closed. Finally, the static member variable ms_bIsEnabled is set to false.
+     */
     static void disable();
+
     /**
      * @brief Convenience overload of the method enable.
      * @param jsonFileName
      */
-    static void start(const std::string &jsonFileName);
+    static void start(const std::string& jsonFileName);
 
     /**
      * @brief Convenience overload of the method enable.
@@ -138,23 +172,62 @@ public:
     static void stop();
 
     /**
-     * @brief traceQuantity
-     * @param name name of the variable to
-     * @param val
+     * @brief traceQuantity Allows to keep track of a specific variable in the output tracing file.
+     * @param name Name of the variable to keep track of.
+     * @param val Value of the variable to keep track of.
      */
-    static void traceQuantity(const std::string &name, long val);
+    static void traceQuantity(const std::string& name, long val);
+
+    /**
+     * Getter function for the member variable that defines whether the output should be printed to terminal, or only to a file.
+     * @return bool value.
+     */
     bool printToTerminalIsSet();
+
+    /**
+     * Setter function for the member variable that defines whether the output should be printed to terminal, or only to a file.
+     * @param s bool value to set the output to terminal control member variable.
+     */
     void setPrintToTerminal(bool s);
 
 private:
+    /**
+     * @brief writeHeader The outputfile needs a specific header to be compatible with Chrome Tracer app. This ads this header to
+     * the output file.
+     */
     static void writeHeader();
+
+    /**
+     * @brief writeFooter The outputfile needs a specific footer to be compatible with Chrome Tracer app. and close the arrays defined in
+     * the json file.  This ads this footer (closing brackets) to the output file.
+     */
     static void writeFooter();
-    static void writeToFile(const std::string &str);
+
+    /**
+     * @brief writeToFile This function writes a string to the output file.
+     * @param str String to write.
+     */
+    static void writeToFile(const std::string& str);
+
+    /**
+     * @brief setZeroTime Sets the zero time, which is the time that will be considered zero in the tracer result. Typically, this is called
+     * by the enable function.
+     */
     static void setZeroTime();
+
+    /**
+     * @brief getTimeNow Wrapper function over chronos std library functionality to get the tick of this instant (in microseconds).
+     * @return The actual time now in microseconds.
+     */
     static long long getTimeNow();
-    void initialize(const std::string &function, const std::string &file, const int num);
-    void formatFunctionName(const std::string &function);
-    void initializeFile(std::string file);
+
+    /**
+     * @brief initialize
+     */
+    void initialize();
+
+    void formatFileName();
+    void formatFunctionName();
     void registerInitialTime();
     void registerFinalTime();
     void registerThreadId();
@@ -163,22 +236,21 @@ private:
     void writeBeginEvent();
     void writeEndEvent();
 
-    static int numTracers;                  /**< Number of MNETracer objs instantiated. */
-    static bool isEnabled;                  /**< Bool variable to store if the "class" (ie. the MNETracer) has been enabled. */
-    static std::ofstream outputFileStream;  /**< Output file stream to write results. */
-    static bool isFirstEvent;               /**< Bool variable to check if this is the first event to be written to the file. */
-    static bool outFileMutex;               /**< Mutex to guard the writing to file between threads. */
-    static long long zeroTime;              /**< Integer value to store the origin-time (ie the Zero time) from which all other time measurements will depend. */
+    static bool ms_bIsEnabled;                  /**< Bool variable to store if the "class" (ie. the MNETracer) has been enabled. */
+    static std::ofstream ms_OutputFileStream;   /**< Output file stream to write results. */
+    static bool ms_bIsFirstEvent;               /**< Bool variable to check if this is the first event to be written to the file. */
+    static std::mutex ms_outFileMutex;          /**< Mutex to guard the writing to file between threads. */
+    static long long ms_iZeroTime;              /**< Integer value to store the origin-time (ie the Zero time) from which all other time measurements will depend. */
 
-    bool printToTerminal;       /**< Store if it is needed from this MNETracer object. to print to terminal too. */
-    std::string functionName;   /**< String to store the function name. */
-    std::string fileName;       /**< String to store the code file name where the MNETracer obj is instantiated. */
-    int lineNumber;             /**< The line number within the code file where the MNETracer obj is instantiated. */
-    std::string threadId;       /**< A string identifier for the thread id in which the MNETracer obj is instantiated. */
-    long long beginTime;        /**< The time when the tracer MNETracer obj is created. */
-    long long endTime;          /**< The time when the tracer MNETracer obj is destructed. */
-    long long durationMicros;   /**< The time difference between MNETracer object creation and destruction in micro seconds. */
-    double durationMilis;       /**< The time difference between MNETracer object creation and destruction in in milli seconds. */
+    bool m_bIsInitialized;          /**< Store if this object has been initialized properly. */
+    bool m_bPrintToTerminal;        /**< Store if it is needed from this MNETracer object. to print to terminal too. */
+    std::string m_sFileName;        /**< String to store the code file name where the MNETracer obj is instantiated. */
+    std::string m_sFunctionName;    /**< String to store the function name. */
+    int m_iLineNumber;              /**< The line number within the code file where the MNETracer obj is instantiated. */
+    std::string m_iThreadId;        /**< A string identifier for the thread id in which the MNETracer obj is instantiated. */
+    long long m_iBeginTime;         /**< The time when the tracer MNETracer obj is created. */
+    long long m_iEndTime;           /**< The time when the tracer MNETracer obj is destructed. */
+    double m_dDurationMilis;        /**< The time difference between MNETracer object creation and destruction in in milli seconds. */
 }; // MNETracer
 
 } // namespace UTILSLIB

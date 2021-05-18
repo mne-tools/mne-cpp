@@ -56,7 +56,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2020 Authors of MNE-CPP. All rights reser
 
 
 # Default flags
-MNECPP_CONFIG +=trace
+MNECPP_CONFIG += trace
 
 # Define c++ version
 CONFIG += c++14
@@ -84,7 +84,7 @@ contains(MNECPP_CONFIG, static) {
 contains(MNECPP_CONFIG, trace) {
     message("Building with MNE_Tracer support")
     DEFINES += TRACE
-    QMAKE_CXXFLAGS += -include utils/mnetracer.h
+    QMAKE_CXXFLAGS += -include $${PWD}/libraries/utils/mnetracer.h
 }
 
 ########################################### DIRECTORY DEFINITIONS #############################################
