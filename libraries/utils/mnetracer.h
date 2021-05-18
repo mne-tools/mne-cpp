@@ -121,10 +121,28 @@ public:
     static void enable(const std::string &jsonFileName);
     static void enable();
     static void disable();
+    /**
+     * @brief Convenience overload of the method enable.
+     * @param jsonFileName
+     */
     static void start(const std::string &jsonFileName);
+
+    /**
+     * @brief Convenience overload of the method enable.
+     */
     static void start();
+
+    /**
+     * @brief Convenience overload of the method disable.
+     */
     static void stop();
-    static void traceQuantity(std::string &name, long val);
+
+    /**
+     * @brief traceQuantity
+     * @param name name of the variable to
+     * @param val
+     */
+    static void traceQuantity(const std::string &name, long val);
     bool printToTerminalIsSet();
     void setPrintToTerminal(bool s);
 
@@ -135,7 +153,7 @@ private:
     static void setZeroTime();
     static long long getTimeNow();
     void initialize(const std::string &function, const std::string &file, const int num);
-    void initializeFunctionName(const std::string &function);
+    void formatFunctionName(const std::string &function);
     void initializeFile(std::string file);
     void registerInitialTime();
     void registerFinalTime();
