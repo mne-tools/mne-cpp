@@ -11,8 +11,6 @@ namespace TIMEFREQUENCYLIB {
 class TimeFrequencyAnalyzer
 {
 public:
-    TimeFrequencyAnalyzer();
-
     TimeFrequencyAnalyzer(AnalysisMethod& method);
 
     bool run();

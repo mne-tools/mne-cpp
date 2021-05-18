@@ -6,7 +6,6 @@ TimeFrequencyAnalyzer::TimeFrequencyAnalyzer(AnalysisMethod& method)
  : m_method(method)
 {
 
-
 }
 
 bool TimeFrequencyAnalyzer::run()

@@ -15,6 +15,11 @@ struct AnalysisSettings
     int		input_size;
 };
 
+class TimeFrequencyInput
+{
+    TimeFrequencyInput(Eigen::MatrixXd);
+};
+
 class TimeFrequencyResult
 {
     template <typename T>

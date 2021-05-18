@@ -30,6 +30,15 @@ public:
     virtual bool validateSettings();
 
 protected:
+
+    void initFromSettings();
+
+    std::vector<float> linspace(float from, float to, int n);
+
+    float mag_sqr(const std::complex<float>& z);
+
+    float fractional(float x);
+
     SuperletSettings&                   m_settings;
     std::vector<filter_bank>			m_filters;
     std::vector<superlet>				m_superlets;
