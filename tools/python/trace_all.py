@@ -38,7 +38,11 @@ def parseInputArguments(argsToParse, **opts):
                 raise NameError('Unkown option specified.')
         else:
             options[arg_adapted] = argsToParse[arg]
-    return (v for k, v in options.items())
+
+    outputOptions = ()
+    for i in range(len(inputOptions)):
+        outputOptions += (options[inputOptions[i][0]], )
+    return outputOptions
 
 def noneIfEmpty(s):
     return "" if s is None else s
@@ -72,15 +76,9 @@ def delete_tracer_macro(in_text):
         return in_text
 
 if __name__ == "__main__":
+
     opts = (("file", ""),("verboseMode", False),("mode","add"))
-    (file_name, verboseMode, mode ) = parseInputArguments(sys.argv, opts = opts, admit_unknown_options=True, main_mode=True)
-    # file_name = ""
-    # verbose_mode_on = False
-    # for arg in sys.argv:
-    #     if arg.startswith("file="):
-    #         file_name = arg.split("=")[1]
-    #     if arg.startswith("verboseMode="):
-    #         verbose_mode_on = arg.split("=")[1]
+    (file_name, verboseMode, mode) = parseInputArguments(sys.argv, opts = opts, admit_unknown_options=True, main_mode=True)
 
     if file_name == "":
         print("You need to specify an input file")
