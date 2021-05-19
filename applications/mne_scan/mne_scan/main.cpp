@@ -50,6 +50,7 @@
 #include <scShared/Plugins/abstractplugin.h>
 
 #include <utils/generics/applicationlogger.h>
+#include <utils/mnetracer.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
