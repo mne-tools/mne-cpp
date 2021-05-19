@@ -37,20 +37,7 @@
 #define TRACER_H
 
 //=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "utils_global.h"
-
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <chrono>
-#include <thread>
-#include <mutex>
-
-//=============================================================================================================
-// QT INCLUDES
+// MACRO DEFINITIONS
 //=============================================================================================================
 
 #ifdef TRACE
@@ -90,12 +77,24 @@ void operator delete(void *memory, size_t size)
 #define MNE_TRACE_MEMORY_REPORT
 #endif
 
+#ifdef TRACE
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "utils_global.h"
+
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <chrono>
+#include <thread>
+#include <mutex>
+namespace UTILSLIB
+{
 //=============================================================================================================
 // DEFINE NAMESPACE MNESCAN
 //=============================================================================================================
-
-namespace UTILSLIB
-{
 
 /**
  * The MNETracer is defined as a single class helper tool to measure execution times of blocks of code
@@ -290,5 +289,7 @@ private:
 }; // MNETracer
 
 } // namespace UTILSLIB
+
+#endif //if TRACE defined
 
 #endif // TRACER_H
