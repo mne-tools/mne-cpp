@@ -84,8 +84,9 @@ contains(MNECPP_CONFIG, static) {
 contains(MNECPP_CONFIG, trace) {
     message("Building with MNE_Tracer support")
     DEFINES += TRACE
-    QMAKE_CXXFLAGS += -include utils/mnetracer.h
+    QMAKE_CXXFLAGS += -include $$shell_path($${PWD}/libraries/utils/mnetracer.h)
 }
+
 ########################################### DIRECTORY DEFINITIONS #############################################
 
 # Repository directory
