@@ -103,7 +103,7 @@ header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/utils
 INSTALLS += header_files
 
 contains(MNECPP_CONFIG, trace) {
-    message("Building with MNE_Tracer support")
+    message("Building Utils lib with MNE_Tracer support.")
     DEFINES += TRACE
     SOURCES += mnetracer.cpp
     HEADERS += mnetracer.h
