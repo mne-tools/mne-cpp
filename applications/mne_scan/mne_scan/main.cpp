@@ -125,7 +125,7 @@ Q_IMPORT_PLUGIN(BrainFlowBoard)
  */
 int main(int argc, char *argv[])
 {
-    MNE_TRACER_ENABLE
+    MNE_TRACER_ENABLE(testing.json)
     // When building a static version of MNE Scan we have to init all resource (.qrc) files here manually
     #ifdef STATICBUILD
     Q_INIT_RESOURCE(babymeg);
