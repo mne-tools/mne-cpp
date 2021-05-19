@@ -74,6 +74,7 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
 : AbstractView(parent, f)
 , m_pUi(new Ui::HpiSettingsViewWidget)
 {
+    MNE_TRACE()
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
 
@@ -112,6 +113,7 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
 
 HpiSettingsView::~HpiSettingsView()
 {
+    MNE_TRACE()
     saveSettings();
 
     delete m_pUi;
@@ -122,6 +124,7 @@ HpiSettingsView::~HpiSettingsView()
 void HpiSettingsView::setErrorLabels(const QVector<double>& vError,
                                      double dMeanErrorDist)
 {
+    MNE_TRACE()
     //Update eror labels and change from m to mm
     QString sGof("0mm");
 
@@ -149,6 +152,7 @@ void HpiSettingsView::setErrorLabels(const QVector<double>& vError,
 void HpiSettingsView::setMovementResults(double dMovement,
                                          double dRotation)
 {
+    MNE_TRACE()
     m_pUi->m_qLineEdit_moveResult->setText(QString::number(dMovement*1000,'f',2) + QString(" mm"));
     m_pUi->m_qLineEdit_rotResult->setText(QString::number(dRotation,'f',2) + QString(" °"));
 
@@ -165,6 +169,7 @@ void HpiSettingsView::setMovementResults(double dMovement,
 
 bool HpiSettingsView::getSspStatusChanged()
 {
+    MNE_TRACE()
     return m_pUi->m_checkBox_useSSP->isChecked();
 }
 
@@ -172,6 +177,7 @@ bool HpiSettingsView::getSspStatusChanged()
 
 bool HpiSettingsView::getCompStatusChanged()
 {
+    MNE_TRACE()
     return m_pUi->m_checkBox_useComp->isChecked();
 }
 
@@ -179,6 +185,7 @@ bool HpiSettingsView::getCompStatusChanged()
 
 double HpiSettingsView::getAllowedMeanErrorDistChanged()
 {
+    MNE_TRACE()
     return m_pUi->m_doubleSpinBox_maxHPIContinousDist->value();
 }
 
@@ -186,6 +193,7 @@ double HpiSettingsView::getAllowedMeanErrorDistChanged()
 
 double HpiSettingsView::getAllowedMovementChanged()
 {
+    MNE_TRACE()
     return m_pUi->m_doubleSpinBox_moveThreshold->value();
 }
 
@@ -193,6 +201,7 @@ double HpiSettingsView::getAllowedMovementChanged()
 
 double HpiSettingsView::getAllowedRotationChanged()
 {
+    MNE_TRACE()
     return m_pUi->m_doubleSpinBox_rotThreshold->value();
 }
 
@@ -200,6 +209,7 @@ double HpiSettingsView::getAllowedRotationChanged()
 
 void HpiSettingsView::saveSettings()
 {
+    MNE_TRACE()
     if(m_sSettingsPath.isEmpty()) {
         return;
     }
@@ -227,6 +237,7 @@ void HpiSettingsView::saveSettings()
 
 void HpiSettingsView::loadSettings()
 {
+    MNE_TRACE()
     if(m_sSettingsPath.isEmpty()) {
         return;
     }
@@ -248,6 +259,7 @@ void HpiSettingsView::loadSettings()
 
 void HpiSettingsView::updateGuiMode(GuiMode mode)
 {
+    MNE_TRACE()
     switch(mode) {
         case GuiMode::Clinical:
             break;
@@ -260,6 +272,7 @@ void HpiSettingsView::updateGuiMode(GuiMode mode)
 
 void HpiSettingsView::updateProcessingMode(ProcessingMode mode)
 {
+    MNE_TRACE()
     switch(mode) {
         case ProcessingMode::Offline:
             break;
@@ -272,6 +285,7 @@ void HpiSettingsView::updateProcessingMode(ProcessingMode mode)
 
 void HpiSettingsView::onLoadDigitizers()
 {
+    MNE_TRACE()
     //Get file location
     QString fileName_HPI = QFileDialog::getOpenFileName(this,
                                                         tr("Open digitizer file"),
@@ -305,6 +319,7 @@ void HpiSettingsView::onLoadDigitizers()
 void HpiSettingsView::onFrequencyCellChanged(int row,
                                              int col)
 {
+    MNE_TRACE()
     if(col != 1 || row >= m_vCoilFreqs.size()) {
         return;
     }
@@ -324,6 +339,7 @@ void HpiSettingsView::onFrequencyCellChanged(int row,
 
 void HpiSettingsView::onAddCoil()
 {
+    MNE_TRACE()
     if(m_pUi->m_tableWidget_Frequencies->rowCount() + 1 > m_pUi->m_label_numberLoadedCoils->text().toInt()) {
         QMessageBox msgBox;
         msgBox.setText("Cannot add more HPI coils. Not enough digitzed HPI coils loaded.");
@@ -373,6 +389,7 @@ void HpiSettingsView::onAddCoil()
 
 void HpiSettingsView::onRemoveCoil()
 {
+    MNE_TRACE()
     int row = m_pUi->m_tableWidget_Frequencies->currentRow();
 
     if(row >= 0 && row < m_vCoilFreqs.size()) {
@@ -397,6 +414,7 @@ void HpiSettingsView::onRemoveCoil()
 
 QList<FiffDigPoint> HpiSettingsView::readPolhemusDig(const QString& fileName)
 {
+    MNE_TRACE()
     m_pUi->m_tableWidget_Frequencies->clear();
     m_pUi->m_tableWidget_Frequencies->setRowCount(0);
     m_pUi->m_tableWidget_Frequencies->setHorizontalHeaderItem(0, new QTableWidgetItem("#Coil"));
@@ -494,5 +512,6 @@ QList<FiffDigPoint> HpiSettingsView::readPolhemusDig(const QString& fileName)
 
 void HpiSettingsView::clearView()
 {
+    MNE_TRACE()
 
 }

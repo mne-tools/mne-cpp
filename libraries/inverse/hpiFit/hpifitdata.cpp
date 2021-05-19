@@ -71,12 +71,14 @@ using namespace INVERSELIB;
 
 HPIFitData::HPIFitData()
 {
+    MNE_TRACE()
 }
 
 //=============================================================================================================
 
 void HPIFitData::doDipfitConcurrent()
 {
+    MNE_TRACE()
     // Initialize variables
     Eigen::RowVectorXd vecCurrentCoil = this->m_coilPos;
     Eigen::VectorXd vecCurrentData = this->m_sensorData;
@@ -109,6 +111,7 @@ Eigen::MatrixXd HPIFitData::magnetic_dipole(Eigen::MatrixXd matPos,
                                             Eigen::MatrixXd matPnt,
                                             Eigen::MatrixXd matOri)
 {
+    MNE_TRACE()
     double u0 = 1e-7;
     int iNchan;
     Eigen::MatrixXd r, r2, r5, x, y, z, mx, my, mz, Tx, Ty, Tz, lf;
@@ -162,6 +165,7 @@ Eigen::MatrixXd HPIFitData::magnetic_dipole(Eigen::MatrixXd matPos,
 
 Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& matPos, const SensorSet& sensors)
 {
+    MNE_TRACE()
 
     Eigen::MatrixXd matPnt, matOri, matLf;
     matPnt = sensors.rmag; // position of each integrationpoint
@@ -179,6 +183,7 @@ DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& matPos,
                                     const struct SensorSet& sensors,
                                     const Eigen::MatrixXd& matProjectors)
 {
+    MNE_TRACE()
     // Variable Declaration
     struct DipFitError e;
     Eigen::MatrixXd matLfSensor, matDif;
@@ -211,6 +216,7 @@ DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& matPos,
 
 bool HPIFitData::compare(HPISortStruct a, HPISortStruct b)
 {
+    MNE_TRACE()
     return (a.base_arr < b.base_arr);
 }
 
@@ -225,6 +231,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& matPos,
                                        const struct SensorSet& sensors,
                                        int &iSimplexNumitr)
 {
+    MNE_TRACE()
     double tolx, tolf, rho, chi, psi, sigma, func_evals, usual_delta, zero_term_delta, temp1, temp2;
     std::string header, how;
     int n, itercount, prnt;
