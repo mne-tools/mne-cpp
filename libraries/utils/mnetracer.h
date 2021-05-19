@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     mainwindow.h
+ * @file     mnetracer.h
  * @author   Juan GPC <jgarciaprietoh@mgh.harvard.edu>;
  * @since    0.1.9
  * @date     May 18, 2021
@@ -47,7 +47,7 @@
 #define MNE_TRACE_VALUE(NAME, VALUE) UTILSLIB::MNETracer::traceQuantity(NAME, VALUE);
 #else
 #define MNE_TRACE()
-#define MNE_TRACER_ENABLE
+#define MNE_TRACER_ENABLE(FILENAME) PEPE
 #define MNE_TRACER_DISABLE
 #define MNE_TRACE_VALUE()
 #endif
