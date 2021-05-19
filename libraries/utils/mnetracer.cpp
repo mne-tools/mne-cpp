@@ -216,7 +216,7 @@ void MNETracer::writeFooter()
 
 //=============================================================================================================
 
-void MNETracer::writeToFile(const std::string &str)
+void MNETracer::writeToFile(const std::string& str)
 {
     ms_outFileMutex.lock();
     if(ms_OutputFileStream.is_open()) {
