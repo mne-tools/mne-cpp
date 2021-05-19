@@ -6,6 +6,7 @@ static const char* defaultTracerFileName("default_MNETracer_file.json");
 bool MNETracer::ms_bIsEnabled(false);
 std::ofstream MNETracer::ms_OutputFileStream;
 bool MNETracer::ms_bIsFirstEvent(true);
+std::mutex MNETracer::ms_outFileMutex;
 long long MNETracer::ms_iZeroTime(0);
 
 //=============================================================================================================
