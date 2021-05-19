@@ -41,13 +41,13 @@
 //=============================================================================================================
 
 #ifdef TRACE
-#define MNE_TRACE() UTILSLIB::MNETracer _mneTracer__LINE__(__func__, __FILE__, __LINE__);
+#define MNE_TRACE() UTILSLIB::MNETracer _mneTracer__LINE__(__FILE__,__func__,__LINE__);
 #define MNE_TRACER_ENABLE(FILENAME) UTILSLIB::MNETracer::enable(#FILENAME);
 #define MNE_TRACER_DISABLE UTILSLIB::MNETracer::disable();
 #define MNE_TRACE_VALUE(NAME, VALUE) UTILSLIB::MNETracer::traceQuantity(NAME, VALUE);
 #else
 #define MNE_TRACE()
-#define MNE_TRACER_ENABLE(FILENAME) PEPE
+#define MNE_TRACER_ENABLE(FILENAME)
 #define MNE_TRACER_DISABLE
 #define MNE_TRACE_VALUE()
 #endif

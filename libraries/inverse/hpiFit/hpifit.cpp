@@ -85,6 +85,7 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo,
                bool bDoFastFit)
     : m_bDoFastFit(bDoFastFit)
 {
+    MNE_TRACE()
     // init member variables
     m_lChannels = QList<FIFFLIB::FiffChInfo>();
     m_vecInnerind = QVector<int>();
@@ -116,6 +117,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                     int iMaxIterations,
                     float fAbortError)
 {
+    MNE_TRACE()
     //Check if data was passed
     if(t_mat.rows() == 0 || t_mat.cols() == 0 ) {
         std::cout<<std::endl<< "HPIFit::fitHPI - No data passed. Returning.";
@@ -385,6 +387,7 @@ void HPIFit::findOrder(const MatrixXd& t_mat,
                        FiffDigPointSet& fittedPointSet,
                        FiffInfo::SPtr pFiffInfo)
 {
+    MNE_TRACE()
     // create temporary copies that are necessary to reset values that are passed to fitHpi()
     fittedPointSet.clear();
     transDevHead.clear();
@@ -451,6 +454,7 @@ CoilParam HPIFit::dipfit(struct CoilParam coil,
                          int iMaxIterations,
                          float fAbortError)
 {
+    MNE_TRACE()
     //Do this in conncurrent mode
     //Generate QList structure which can be handled by the QConcurrent framework
     QList<HPIFitData> lCoilData;
@@ -496,6 +500,7 @@ CoilParam HPIFit::dipfit(struct CoilParam coil,
 
 Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd matNH, MatrixXd matBT)
 {
+    MNE_TRACE()
     MatrixXd matXdiff, matYdiff, matZdiff, matC, matQ;
     Matrix4d matTransFinal = Matrix4d::Identity(4,4);
     Matrix4d matRot = Matrix4d::Zero(4,4);
@@ -565,6 +570,7 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd matNH, MatrixXd ma
 void HPIFit::createSensorSet(SensorSet& sensors,
                              FwdCoilSet* coils)
 {
+    MNE_TRACE()
     int iNchan = coils->ncoil;
 
     // init sensor struct
@@ -609,6 +615,7 @@ void HPIFit::storeHeadPosition(float fTime,
                                const QVector<double>& vecError)
 
 {
+    MNE_TRACE()
     // Write quaternions and vecTime in position matrix. Format is the same like MaxFilter's .pos files.
     Matrix3f matRot = transDevHead.block(0,0,3,3);
 
@@ -635,6 +642,7 @@ void HPIFit::storeHeadPosition(float fTime,
 
 void HPIFit::updateSensor()
 {
+    MNE_TRACE()
     // Create MEG-Coils and read data
     int iAcc = 2;
     int iNch = m_lChannels.size();
@@ -660,6 +668,7 @@ void HPIFit::updateSensor()
 
 void HPIFit::updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
 {
+    MNE_TRACE()
     // Get the indices of inner layer channels and exclude bad channels and create channellist
     int iNumCh = pFiffInfo->nchan;
 
@@ -686,6 +695,7 @@ void HPIFit::updateModel(const int iSamF,
                          int iLineF,
                          const QVector<int>& vecFreqs)
 {
+    MNE_TRACE()
     int iNumCoils = vecFreqs.size();
     MatrixXd matSimsig;
     VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
