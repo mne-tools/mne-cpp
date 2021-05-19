@@ -118,7 +118,6 @@ void MNETracer::initialize()
     registerConstructionTime();
     registerThreadId();
     formatFileName();
-//    formatFunctionName();
     m_bIsInitialized = true;
 }
 
