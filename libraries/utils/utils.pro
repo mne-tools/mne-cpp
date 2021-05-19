@@ -73,7 +73,8 @@ SOURCES += \
     sphere.cpp \
     generics/observerpattern.cpp \
     generics/applicationlogger.cpp \
-    spectral.cpp
+    spectral.cpp \
+    mnetracer.cpp
 
 HEADERS += \
     kmeans.h\
@@ -91,7 +92,8 @@ HEADERS += \
     generics/commandpattern.h \
     generics/observerpattern.h \
     generics/applicationlogger.h \
-    spectral.h
+    spectral.h \
+    mnetracer.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -102,12 +104,12 @@ header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/utils
 
 INSTALLS += header_files
 
-contains(MNECPP_CONFIG, trace) {
-    message("Building Utils lib with MNE_Tracer support.")
-    DEFINES += TRACE
-    SOURCES += mnetracer.cpp
-    HEADERS += mnetracer.h
-}
+#contains(MNECPP_CONFIG, trace) {
+#    message("Building Utils lib with MNE_Tracer support.")
+#    DEFINES += TRACE
+#    SOURCES += mnetracer.cpp
+#    HEADERS += mnetracer.h
+#}
 
 contains(MNECPP_CONFIG, withCodeCov) {
     QMAKE_CXXFLAGS += --coverage
