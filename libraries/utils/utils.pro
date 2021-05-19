@@ -67,7 +67,6 @@ SOURCES += \
     ioutils.cpp \
     layoutloader.cpp \
     layoutmaker.cpp \
-    mnetracer.cpp \
     selectionio.cpp \
     spectrogram.cpp \
     warp.cpp \
@@ -78,7 +77,6 @@ SOURCES += \
 
 HEADERS += \
     kmeans.h\
-    mnetracer.h \
     utils_global.h \
     mnemath.h \
     ioutils.h \
@@ -103,6 +101,13 @@ header_files.files = $${HEADERS}
 header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/utils
 
 INSTALLS += header_files
+
+contains(MNECPP_CONFIG, trace) {
+    message("Building with MNE_Tracer support")
+    DEFINES += TRACE
+    SOURCES += mnetracer.cpp
+    HEADERS += mnetracer.h
+}
 
 contains(MNECPP_CONFIG, withCodeCov) {
     QMAKE_CXXFLAGS += --coverage
