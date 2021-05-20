@@ -179,6 +179,7 @@ int main(int argc, char *argv[])
     mainWin.hideSplashScreen();
 
     int returnValue(app.exec());
+
     MNE_TRACER_DISABLE
 
     return returnValue;
