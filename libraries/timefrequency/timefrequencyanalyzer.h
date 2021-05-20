@@ -15,7 +15,11 @@ public:
 
     bool run();
 
-    TimeFrequencyResult getResult();
+    TimeFrequencyResult compute(TimeFrequencyInput input);
+
+    bool setInput(const TimeFrequencyInput& data);
+
+    TimeFrequencyResult getResult() const;
 
 private:
     AnalysisMethod& m_method;

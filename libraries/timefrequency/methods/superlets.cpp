@@ -88,6 +88,26 @@ void Superlets::initFromSettings()
 
     m_frequencies = linspace(m_settings.freq_low, m_settings.freq_high, m_settings.freq_count);
     m_orders = linspace(m_settings.resolution_low, m_settings.resolution_high, m_settings.freq_count);
+
+    if (!m_settings.fractional)
+        std::transform(m_orders.begin(), m_orders.end(), m_orders.begin(), std::roundf);
+
+    for (size_t i_freq = 0; i_freq < m_settings.freq_count; ++i_freq)
+    {
+        float center_freq	= m_frequencies[i_freq];
+        int n_wavelets		= int(std::ceil(m_orders[i_freq]));
+
+        for (size_t i_wave = 0; i_wave < n_wavelets; ++i_wave)
+        {
+            float ncyc = m_settings.multiplicative
+                ? (i_wave + 1) * m_settings.wavelet_cycles
+                : m_settings.wavelet_cycles + i_wave;
+
+            m_superlets[i_freq]	.emplace_back(center_freq, ncyc, m_settings.sampling_rate);
+            m_filters[i_freq]	.push_back(new convolver(m_settings.input_size, m_superlets[i_freq].back().size()));
+            m_filters[i_freq]	.back()->assign_kernel(m_superlets[i_freq].back().data(), m_superlets[i_freq].back().size());
+        }
+    }
 }
 
 std::vector<float> Superlets::linspace(float from, float to, int n)

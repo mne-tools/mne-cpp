@@ -6,7 +6,6 @@
 
 namespace TIMEFREQUENCYLIB {
 
-}
 struct AnalysisSettings
 {
     float	sampling_rate;
@@ -15,18 +14,17 @@ struct AnalysisSettings
     int		input_size;
 };
 
-class TimeFrequencyInput
+struct TimeFrequencyInput
 {
     TimeFrequencyInput(Eigen::MatrixXd);
 };
 
-class TimeFrequencyResult
+struct TimeFrequencyResult
 {
     template <typename T>
     std::complex<T> getArray();
 
     Eigen::MatrixXcd getEigenMatrix();
 };
-
-//namespace
+}//namepace
 #endif // ANALYSISSETTINGS_H

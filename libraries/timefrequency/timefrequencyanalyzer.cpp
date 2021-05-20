@@ -20,7 +20,8 @@ bool TimeFrequencyAnalyzer::run()
     return validRun;
 }
 
-TimeFrequencyResult TimeFrequencyAnalyzer::getResult()
+TimeFrequencyResult TimeFrequencyAnalyzer::getResult() const
 {
     return m_method.getResult();
 }
+

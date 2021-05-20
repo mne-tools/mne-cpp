@@ -16,6 +16,9 @@ struct SuperletSettings : public AnalysisSettings{
     float	wavelet_cycles;
     float	resolution_low;
     float	resolution_high;
+
+    bool	multiplicative;
+    bool	fractional;
 };
 
 class Superlets : public AnalysisMethod
