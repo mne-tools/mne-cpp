@@ -541,7 +541,7 @@ jobs:
       run: |
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name LorenzE
-        git clone -b master --single-branch https://github.com/mne-cpp/mne-cpp.github.io.git
+        git clone -b main --single-branch https://github.com/mne-cpp/mne-cpp.github.io.git
         cd mne-cpp.github.io
         # Remove all files first
         git rm * -r
