@@ -10,16 +10,31 @@ nav_order: 5
                 **_It is very hard to improve what you can not measure._**
 ***
 
-During development it is common to have to decide between two (or more) different implementations. In general in MNE-CPP, we strive for improving code maintainability and coherence on top of achieving an efficient-as-possible implementation. But still, it is not uncommon to find situations when two solutions seem valid. In this scenario, to be able to understand the performance implications of a particular implementation can help understand better the code and obtaine a more informed opinion, therefore learnign through out the process. For this situations, we have developed a code tracer functionality. 
+During development it is common to have to decide between two (or more) different but equivalent implementations. We value improving code maintainability and coherence on top of achieving an efficient-as-possible implementation. But still, it is not uncommon to find situations when two solutions seem equally valid. In this scenario, to be able to understand the performance implications of each option can be really useful. It can help understand better each decision and obtain a more informed opinion, thus learnign through out the process. MNE Tracer was designed for this situations. A code tracer is a tool that registers when does each method is being executed.
 
-It is also interesting 
+MNE Tracer does this register using a json file where each function call you specify gets recorded as an event. The format used in this json file is compatible with Google Chrome browser's tracer application and with QtCreator related plugin. To view and study your code you just have to open a chrome browser and go to ```chrome://tracing```. Then load your json file generated with MNE Tracer.
 
-MNE Tracer is a single class (MneTracer) which resides in Utils library.
+![](../../images/mnetracer/tracer_example.png)
 
-How to use it
+## Add MNE Tracer to your code
 
-Python helper function
+In order to use there are basically three steps.
+- The functionality is ready in the Utils library (under ```libraries/utils```), so please make sure that Utils library is correctly added to your project (if you're using our recommended settings, this should be the case by default). But make sure Utils lib is correctly linked to your project. 
+- You will need to define the macro ```TRACE``` in your code. If you are using QtCreator and the project's build engine configuration files, you can add the ```trace``` option to the ```MNECPP_CONFIG``` variable in the ```mne-cpp.pri``` file (see image). You can also do this either through the command-line or through the project configuration options. You can also manually add the line ```#include TRACE``` to your code, however we recommend using the build-engine options. 
 
+![](../../images/mnetracer/trace_option.png)
+
+- Finally, and as usual with any C++ dependency, you have to include MNE Tracer's header file in whatever code you want to be able to use it. You can do that by adding the line ```#include <utils/mnetracer.h>```. Typically, every library, plugin or application has a global_project.h header file, which is in-turn included in every file within a project. If you include the line there, it is a neat way of making sure it will be included everywhere needed.
+
+If the utils library is correctly linked to your project, the ```TRACE``` macro is defined and the header files are included, everything should be ready to instantiate and use.
+## Using MNE Tracer
+
+### Enable and disabling the tracer
+Before recording the time point where your code starts we need to make sure the tracer output file is correctly initialized. We make sure this is the case by adding the macro ```MNE_TRACER_ENABLE(filename.json)``` to your code. The name of the output json file can be specified here so that it describes the particular test you are doing at the moment. And the file will be saved in the same folder your binary application is running. 
+After this line is executed, every function call you specify as "traceable" will be recorded and registered in the tracer file.
+Finally, after using the tracer we need to correctly format and close the output register file. We do this by adding the macro ```MNE_TRACER_DISABLE``` to our project. Execution after that point will not tracer anythin.
+
+For instance, a test of a plugin of an application could be configured correctly if we added this to the main function.
 
 ```c++
 int main(int argc, char *argv[])
@@ -27,6 +42,9 @@ int main(int argc, char *argv[])
     MNE_TRACER_ENABLE(hpi_test1.json)
 
     //... your application starts here
+    //... you can trace specific function calls 
+    //... at this point by adding the
+    //... macro MNE_TRACE() to your code.
 
     int returnValue(app.exec());
     
@@ -36,66 +54,36 @@ int main(int argc, char *argv[])
 }
 ```
 
+### Specifying which function calls should be traced
+In a typical C++ application too many generic function calls happen in order to get a specific portion of our code running. So in order to let the user concentrate on a subset of specific calls to mnonitor, trace and study, you have to add a specific signal in the code to let the tracer know that this function should be traced.
 
-This part is focused on giving a short overview of git commands that should cover the general git workflow in MNE-CPP. For further information you can check out this [Git tutorial video](https://www.youtube.com/watch?v=DtLrWCFaG0A&feature=youtu.be){:target="_blank" rel="noopener"}.
+Add the macro ```MNE_TRACE()``` to the first line after the opening brackets of the function/method you want to trace. 
 
-The first steps to get started, as described in the [build guide](buildguide.md), are:
+```C++
+void ImportantClass::importantMethod(int a)
+{
+    MNE_TRACE()
+    //...the method continues here
+    //...
+}
 ```
-git clone https://github.com/<YourGitUserName>/mne-cpp.git
-git remote add upstream https://github.com/mne-tools/mne-cpp.git
-git fetch --all
-git rebase upstream/master
+### Automatically adding all the methods in a class to the tracer
+If you are interested in tracing every single method in a class, instead of manually adding the macro ```MNE_TRACE()``` to every single method, you can use a Python tool we have developed that includes the macro automatically in your ```.cpp``` file.
+
+The script is ```tools/python``` named ```tracer_macros.py```. To use it just do as follows:
+
+- To add the ```MNE_TRACE()``` macro to every method:
+```python
+python mnetracer_macros.py file=<yourfile.cpp> mode=add
 ```
-
-The general workflow is covered by the following steps:
-
-- Create a new branch from `master`:
-
+` To delete the ```MNE_TRACE()``` at the begining of each method you can use the following mode. Note that if in the file there are other ```MNE_TRACE()``` macros already defined to be able to follow specific sections of your code, those will not be deleted. 
+```python
+python mnetracer_macros.py file=<yourfile.cpp> mode=delete
 ```
-git checkout -b <branchName> master
-```
-
-- Get the latest changes and [rebase](https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase){:target="_blank" rel="noopener"}:
-
-```
-git fetch upstream
-git rebase upstream/master
-```
-
-- Solve [merge conflicts](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line){:target="_blank" rel="noopener"}, if they occure.
-
-- Make your changes and check the status:
-
-```
-git status
+- To delete every single line in which the macro ```MNE_TRACE()``` is included.
+```python
+python mnetracer_macros.py file=<yourfile.cpp> mode=deleteAll
 ```
 
-- Add unstaged changes (colored in red) to prepare next commit:
+_Happy tracing!_
 
-```
-git add <changedFileName>
-   or
-git add --all
-```
-
-- Commit the added files (colored in green in status report) and add a meaningful message about what changed and why (have a look at our [commit policy](contr_style.md)):
-
-```
-git commit -m "Fix: meaningful commit message"
-   or
-git commit --all
-```
-
-- If you make small changes that are related to the previous commit, you can amend your changes to the previous commit with:
-
-```
-git commit -m "Fix: meaningful commit message" --amend
-```
-
-- Push your changes to origin (your MNE-CPP fork on GitHub). Pleaes note that a force push via `-f` might be necessary if you rebased:
-
-```
-git push origin <branchName>
-   or
-git push origin <branchName> -f
-```
