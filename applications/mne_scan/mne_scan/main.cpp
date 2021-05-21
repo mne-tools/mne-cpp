@@ -50,7 +50,6 @@
 #include <scShared/Plugins/abstractplugin.h>
 
 #include <utils/generics/applicationlogger.h>
-#include <utils/mnetracer.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -72,7 +71,6 @@
 
 using namespace SCMEASLIB;
 using namespace MNESCAN;
-//using namespace Eigen;
 
 //=============================================================================================================
 // GLOBAL DEFINTIONS
