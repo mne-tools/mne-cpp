@@ -34,7 +34,6 @@
 
 #include "mnetracer.h"
 
-#ifdef TRACE
 
 using namespace UTILSLIB;
 
@@ -308,5 +307,3 @@ void MNETracer::setPrintToTerminal(bool s)
     m_bPrintToTerminal = s;
 }
 
-
-#endif // if TRACE defined
