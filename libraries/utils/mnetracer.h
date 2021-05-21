@@ -32,7 +32,6 @@
  * of a function or a block of code, and formats the output so that it is compatible with Chrome Tracer application.
  *
  */
-
 #ifndef TRACER_H
 #define TRACER_H
 
@@ -77,7 +76,6 @@ void operator delete(void *memory, size_t size)
 #define MNE_TRACE_MEMORY_REPORT
 #endif
 
-#ifdef TRACE
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
@@ -90,11 +88,13 @@ void operator delete(void *memory, size_t size)
 #include <chrono>
 #include <thread>
 #include <mutex>
-namespace UTILSLIB
-{
+
 //=============================================================================================================
 // DEFINE NAMESPACE MNESCAN
 //=============================================================================================================
+
+namespace UTILSLIB
+{
 
 /**
  * The MNETracer is defined as a single class helper tool to measure execution times of blocks of code
@@ -292,4 +292,3 @@ private:
 
 #endif //if TRACE defined
 
-#endif // TRACER_H
