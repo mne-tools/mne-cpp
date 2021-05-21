@@ -47,7 +47,6 @@
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimehpiresult.h>
 #include <inverse/hpiFit/hpifit.h>
-#include <utils/mnetracer.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -83,7 +82,6 @@ Hpi::Hpi()
 , m_bUseComp(false)
 , m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr::create(40))
 {
-    MNE_TRACE()
     connect(this, &Hpi::devHeadTransAvailable,
             this, &Hpi::onDevHeadTransAvailable, Qt::BlockingQueuedConnection);
 }
@@ -92,7 +90,6 @@ Hpi::Hpi()
 
 Hpi::~Hpi()
 {
-    MNE_TRACE()
     if(this->isRunning()) {
         stop();
     }
@@ -102,7 +99,6 @@ Hpi::~Hpi()
 
 QSharedPointer<AbstractPlugin> Hpi::clone() const
 {
-    MNE_TRACE()
     QSharedPointer<Hpi> pHpiClone(new Hpi);
     return pHpiClone;
 }
@@ -111,7 +107,6 @@ QSharedPointer<AbstractPlugin> Hpi::clone() const
 
 void Hpi::init()
 {
-    MNE_TRACE()
     // Input
     m_pHpiInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "HpiIn", "Hpi input data");
     connect(m_pHpiInput.data(), &PluginInputConnector::notify,
@@ -128,14 +123,12 @@ void Hpi::init()
 
 void Hpi::unload()
 {
-    MNE_TRACE()
 }
 
 //=============================================================================================================
 
 bool Hpi::start()
 {
-    MNE_TRACE()
     QThread::start();
 
     return true;
@@ -145,7 +138,6 @@ bool Hpi::start()
 
 bool Hpi::stop()
 {
-    MNE_TRACE()
     requestInterruption();
     wait(500);
 
@@ -160,7 +152,6 @@ bool Hpi::stop()
 
 AbstractPlugin::PluginType Hpi::getType() const
 {
-    MNE_TRACE()
     return _IAlgorithm;
 }
 
@@ -168,7 +159,6 @@ AbstractPlugin::PluginType Hpi::getType() const
 
 QString Hpi::getName() const
 {
-    MNE_TRACE()
     return "HPI Fitting";
 }
 
@@ -176,7 +166,6 @@ QString Hpi::getName() const
 
 QWidget* Hpi::setupWidget()
 {
-    MNE_TRACE()
     HpiSetupWidget* setupWidget = new HpiSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
 }
@@ -185,7 +174,6 @@ QWidget* Hpi::setupWidget()
 
 void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
-    MNE_TRACE()
     if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Check if the fiff info was inititalized
         if(!m_pFiffInfo) {
@@ -234,7 +222,6 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 void Hpi::initPluginControlWidgets()
 {
-    MNE_TRACE()
     bool bFiffInfo = false;
     m_mutex.lock();
     if(m_pFiffInfo) {
@@ -294,7 +281,6 @@ void Hpi::initPluginControlWidgets()
 
 void Hpi::updateProjections()
 {
-    MNE_TRACE()
     if(m_pFiffInfo) {
         m_mutex.lock();
         if(m_iNumberBadChannels != m_pFiffInfo->bads.size()
@@ -347,7 +333,6 @@ void Hpi::updateProjections()
 
 void Hpi::onAllowedMeanErrorDistChanged(double dAllowedMeanErrorDist)
 {
-    MNE_TRACE()
     m_mutex.lock();
     m_dAllowedMeanErrorDist = dAllowedMeanErrorDist * 0.001;
     m_mutex.unlock();
@@ -357,7 +342,6 @@ void Hpi::onAllowedMeanErrorDistChanged(double dAllowedMeanErrorDist)
 
 void Hpi::onAllowedMovementChanged(double dAllowedMovement)
 {
-    MNE_TRACE()
     m_mutex.lock();
     m_dAllowedMovement = dAllowedMovement;
     m_mutex.unlock();
@@ -367,7 +351,6 @@ void Hpi::onAllowedMovementChanged(double dAllowedMovement)
 
 void Hpi::onAllowedRotationChanged(double dAllowedRotation)
 {
-    MNE_TRACE()
     m_mutex.lock();
     m_dAllowedRotation = dAllowedRotation;
     m_mutex.unlock();
@@ -377,8 +360,7 @@ void Hpi::onAllowedRotationChanged(double dAllowedRotation)
 
 void Hpi::onDigitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers,
                               const QString& sFilePath)
-{
-    MNE_TRACE()    
+{    
     m_mutex.lock();
     if(m_pFiffInfo) {
         m_pFiffInfo->dig = lDigitzers;
@@ -393,7 +375,6 @@ void Hpi::onDigitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers,
 
 void Hpi::onDoSingleHpiFit()
 {
-    MNE_TRACE()
     if(m_vCoilFreqs.size() < 3) {
        QMessageBox msgBox;
        msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
@@ -410,7 +391,6 @@ void Hpi::onDoSingleHpiFit()
 
 void Hpi::onDoFreqOrder()
 {
-    MNE_TRACE()
     if(m_vCoilFreqs.size() < 3) {
        QMessageBox msgBox;
        msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
@@ -427,7 +407,6 @@ void Hpi::onDoFreqOrder()
 
 void Hpi::onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs)
 {
-    MNE_TRACE()
     m_mutex.lock();
     m_vCoilFreqs = vCoilFreqs;
     m_mutex.unlock();
@@ -437,7 +416,6 @@ void Hpi::onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs)
 
 void Hpi::onSspStatusChanged(bool bChecked)
 {
-    MNE_TRACE()
     m_bUseSSP = bChecked;
     updateProjections();
 }
@@ -446,7 +424,6 @@ void Hpi::onSspStatusChanged(bool bChecked)
 
 void Hpi::onCompStatusChanged(bool bChecked)
 {
-    MNE_TRACE()
     m_bUseComp = bChecked;
     updateProjections();
 }
@@ -455,7 +432,6 @@ void Hpi::onCompStatusChanged(bool bChecked)
 
 void Hpi::onContHpiStatusChanged(bool bChecked)
 {
-    MNE_TRACE()
     if(m_vCoilFreqs.size() < 3) {
        QMessageBox msgBox;
        msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
@@ -470,7 +446,6 @@ void Hpi::onContHpiStatusChanged(bool bChecked)
 
 void Hpi::onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans)
 {
-    MNE_TRACE()
     m_pFiffInfo->dev_head_t = devHeadTrans;
 }
 
@@ -478,7 +453,6 @@ void Hpi::onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans)
 
 void Hpi::run()
 {
-    MNE_TRACE()
     // Wait for fiff info
     bool bFiffInfo = false;
 
