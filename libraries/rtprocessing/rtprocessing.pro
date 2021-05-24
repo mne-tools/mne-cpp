@@ -36,7 +36,7 @@
 include(../../mne-cpp.pri)
 
 TEMPLATE = lib
-
+DEFINES += TRACE
 CONFIG += skip_target_version_ext
 
 QT += network concurrent
@@ -88,12 +88,14 @@ SOURCES += \
     rthpis.cpp \
     filter.cpp \
     rtconnectivity.cpp \
+    rttimefrequency.cpp \
     sphara.cpp \
     detecttrigger.cpp \
     helpers/cosinefilter.cpp \
     helpers/parksmcclellan.cpp \
     helpers/filterkernel.cpp \
     helpers/filterio.cpp \
+    timefrequency.cpp
 
 HEADERS +=  \
     icp.h \
@@ -106,12 +108,14 @@ HEADERS +=  \
     rthpis.h \
     filter.h \
     detecttrigger.h \
+    rttimefrequency.h \
     sphara.h \
     rtconnectivity.h \
     helpers/cosinefilter.h \
     helpers/parksmcclellan.h \
     helpers/filterkernel.h \
     helpers/filterio.h \
+    timefrequency.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

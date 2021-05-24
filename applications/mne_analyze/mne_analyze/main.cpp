@@ -42,6 +42,7 @@
 
 #include "info.h"
 #include "analyzecore.h"
+#include "utils/tracer.h"
 
 //=============================================================================================================
 // Qt INCLUDES
@@ -78,6 +79,7 @@ Q_IMPORT_PLUGIN(SourceLocalization)
 Q_IMPORT_PLUGIN(ControlManager)
 Q_IMPORT_PLUGIN(ChannelSelection)
 Q_IMPORT_PLUGIN(CoRegistration)
+Q_IMPORT_PLUGIN(TimeFrequency)
 #ifndef WASMBUILD
     Q_IMPORT_PLUGIN(View3D)
 #endif
@@ -87,6 +89,7 @@ Q_IMPORT_PLUGIN(CoRegistration)
 
 int main(int argc, char *argv[])
 {
+    __TRACER_ENABLE
     // When building a static version of MNE Analyze we have to init all resource (.qrc) files here manually
     #ifdef STATICBUILD
         #ifndef WASMBUILD
@@ -109,5 +112,8 @@ int main(int argc, char *argv[])
     QScopedPointer<AnalyzeCore> pAnalyzeCore (new AnalyzeCore);
     pAnalyzeCore->showMainWindow();
 
-    return app.exec();
+    int main_return_value(app.exec());
+    __TRACER_DISABLE
+
+    return main_return_value;
 }

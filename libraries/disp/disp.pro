@@ -44,6 +44,11 @@ QT += core widgets svg concurrent opengl
 qtHaveModule(printsupport): QT += printsupport
 qtHaveModule(charts): QT += charts
 
+qtHaveModule(datavisualization){
+QT += qml quick datavisualization quickwidgets
+}
+
+
 DEFINES += DISP_LIBRARY
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -105,7 +110,11 @@ SOURCES += \
     viewers/filterdesignview.cpp \
     viewers/averagelayoutview.cpp \
     viewers/fwdsettingsview.cpp \
+    viewers/helpers/colorlib.cpp \
     viewers/helpers/scalecontrol.cpp \
+    viewers/helpers/timefrequencymodel.cpp \
+    viewers/helpers/timefrequencyscene.cpp \
+    viewers/helpers/timefrequencysceneitem.cpp \
     viewers/progressview.cpp \
     viewers/spectrumview.cpp \
     viewers/modalityselectionview.cpp \
@@ -119,6 +128,9 @@ SOURCES += \
     viewers/spharasettingsview.cpp \
     viewers/fiffrawviewsettings.cpp \
     viewers/averageselectionview.cpp \
+    viewers/timefrequencylayoutview.cpp \
+    viewers/timefrequencysettingsview.cpp \
+    viewers/timefrequencyview.cpp \
     viewers/triggerdetectionview.cpp \
     viewers/quickcontrolview.cpp \
     viewers/connectivitysettingsview.cpp \
@@ -164,7 +176,11 @@ HEADERS += \
     viewers/filterdesignview.h \
     viewers/averagelayoutview.h \
     viewers/fwdsettingsview.h \
+    viewers/helpers/colorlib.h \
     viewers/helpers/scalecontrol.h \
+    viewers/helpers/timefrequencymodel.h \
+    viewers/helpers/timefrequencyscene.h \
+    viewers/helpers/timefrequencysceneitem.h \
     viewers/progressview.h \
     viewers/spectrumview.h \
     viewers/modalityselectionview.h \
@@ -178,6 +194,9 @@ HEADERS += \
     viewers/spharasettingsview.h \
     viewers/fiffrawviewsettings.h \
     viewers/averageselectionview.h \
+    viewers/timefrequencylayoutview.h \
+    viewers/timefrequencysettingsview.h \
+    viewers/timefrequencyview.h \
     viewers/triggerdetectionview.h \
     viewers/quickcontrolview.h \
     viewers/connectivitysettingsview.h \
@@ -230,6 +249,7 @@ FORMS += \
     viewers/formfiles/progressview.ui \
     viewers/formfiles/spharasettingsview.ui \
     viewers/formfiles/fiffrawviewsettings.ui \
+    viewers/formfiles/timefrequencysettingsview.ui \
     viewers/formfiles/triggerdetectionview.ui \
     viewers/formfiles/quickcontrolview.ui \
     viewers/formfiles/tfsettingsview.ui \

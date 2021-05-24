@@ -94,6 +94,7 @@ Q_IMPORT_PLUGIN(NeuronalConnectivity)
 Q_IMPORT_PLUGIN(FtBuffer)
 Q_IMPORT_PLUGIN(WriteToFile)
 Q_IMPORT_PLUGIN(Hpi)
+Q_IMPORT_PLUGIN(TimeFrequency)
 //Q_IMPORT_PLUGIN(DummyToolbox)
 #ifdef WITHGUSBAMP
 Q_IMPORT_PLUGIN(GUSBAmp)
@@ -176,5 +177,7 @@ int main(int argc, char *argv[])
 
     mainWin.hideSplashScreen();
 
-    return app.exec();
+    int return_value(app.exec());
+
+    return return_value;
 }
