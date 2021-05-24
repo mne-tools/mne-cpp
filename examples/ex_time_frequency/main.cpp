@@ -19,6 +19,9 @@
 #include <QApplication>
 #include <QCommandLineParser>
 
+#include <timefrequency/timefrequencyanalyzer.h>
+#include <timefrequency/methods/superlets.h>
+
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
@@ -134,6 +137,8 @@ int main(int argc, char *argv[])
         return -1;
     }
 
+
+    TIMEFREQUENCYLIB::TimeFrequencyAnalyzer analyzer(TIMEFREQUENCYLIB::SuperletSettings);
     //data.
 
     return app.exec();

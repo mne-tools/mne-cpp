@@ -29,7 +29,7 @@ public:
     Superlets() = delete;
     Superlets(SuperletSettings& settings);
 
-    virtual bool compute();
+    virtual bool compute(TimeFrequencyInput input, TimeFrequencyResult output);
     virtual bool validateSettings();
 
 protected:

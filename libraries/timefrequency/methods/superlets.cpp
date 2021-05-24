@@ -15,7 +15,7 @@ bool Superlets::validateSettings()
 
 }
 
-bool Superlets::compute()
+bool Superlets::compute(TimeFrequencyInput* input, TimeFrequencyResult* output)
 {
     size_t input_size = m_settings.input_size;
 
@@ -44,7 +44,7 @@ bool Superlets::compute()
 
             // determine if fractional superlet should be used
             if (fractional(m_orders[i_freq]) != 0			&&	// order is fractional
-                m_set.fractional								&&	// we are allowed to use it
+                m_settings.fractional								&&	// we are allowed to use it
                 m_superlets[i_freq].size() == n_wavelets + 1	)	// we really have a wavelet available for it
             {
                 double exponent = fractional(m_orders[i_freq]);

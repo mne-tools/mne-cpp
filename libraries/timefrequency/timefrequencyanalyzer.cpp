@@ -8,20 +8,13 @@ TimeFrequencyAnalyzer::TimeFrequencyAnalyzer(AnalysisMethod& method)
 
 }
 
-bool TimeFrequencyAnalyzer::run()
+TimeFrequencyResult TimeFrequencyAnalyzer::compute(TimeFrequencyInput input)
 {
-    bool validRun = false;
     bool validSettings = m_method.validateSettings();
 
+    TimeFrequencyResult output;
+
     if(validSettings){
-        validRun = m_method.compute();
+        m_method.compute(input, output);
     }
-
-    return validRun;
 }
-
-TimeFrequencyResult TimeFrequencyAnalyzer::getResult() const
-{
-    return m_method.getResult();
-}
-
