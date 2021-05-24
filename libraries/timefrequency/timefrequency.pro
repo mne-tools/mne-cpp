@@ -35,7 +35,6 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     methods/helpers/convolver.cpp \
     interface.cpp \
-    methods/helpers/morlet.cpp \
     methods/superlets.cpp \
     timefrequencyanalyzer.cpp \
     wavelet_spectrum_analyzer.cpp
@@ -71,9 +70,13 @@ macx {
     QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
 }
 
+contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
 win32:CONFIG(release, debug|release): LIBS += -L$$PWD/lib/ -llibfftw3f-3
+
 else:win32:CONFIG(debug, debug|release): LIBS += -L$$PWD/lib/ -llibfftw3f-3d
+
 else:unix: LIBS += -L$$PWD/lib/ -llibfftw3f-3
+}
 
 INCLUDEPATH += $$PWD/include
 DEPENDPATH += $$PWD/include

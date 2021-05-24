@@ -3,6 +3,7 @@
 
 #include <mutex>
 #include <algorithm>
+#include <cstring>
 
 using namespace TIMEFREQUENCYLIB;
 
@@ -22,8 +23,7 @@ int nextpow2(int x)
 	return x + 1;
 }
 
-
-__forceinline std::complex<float> conj(const std::complex<float>& z)
+ std::complex<float> conj(const std::complex<float>& z)
 {
 	return std::complex<float>(z.real(), -z.imag());
 }
@@ -136,7 +136,7 @@ void convolver::alloc_fft_buffers(int fft_size)
 	if (!_signal_buffer || !_fft_fwd || !_fft_rev)
 		exit(-1);
 
-	memset(_signal_buffer, 0, size_t(_fft_size) * 3 * sizeof(std::complex<float>));
+    std::memset(_signal_buffer, 0, size_t(_fft_size) * 3 * sizeof(std::complex<float>));
 }
 
 

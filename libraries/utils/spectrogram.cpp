@@ -36,7 +36,6 @@
 //=============================================================================================================
 
 #include "spectrogram.h"
-#include "utils/tracer.h"
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -69,7 +68,6 @@ MatrixXd Spectrogram::makeSpectrogram(const VectorXd& signal, qint32 windowSize)
 {
     //QElapsedTimer timer;
     //timer.start();
-    __TRACE_FUNC();
 //    signal.array() -= signal.mean();
     QList<SpectogramInputData> lData;
     int iThreadSize = QThread::idealThreadCount()*2;
@@ -110,7 +108,6 @@ MatrixXcd Spectrogram::makeComplexSpectrogram(const VectorXd& signal, qint32 win
 {
     //QElapsedTimer timer;
     //timer.start();
-    __TRACE_FUNC();
 //    signal.array() -= signal.mean();
     QList<SpectogramInputData> lData;
     int iThreadSize = QThread::idealThreadCount();
@@ -147,7 +144,6 @@ MatrixXcd Spectrogram::makeComplexSpectrogram(const VectorXd& signal, qint32 win
 
 VectorXd Spectrogram::gaussWindow(qint32 sample_count, qreal scale, quint32 translation)
 {
-    __TRACE_FUNC();
     VectorXd gauss = VectorXd::Zero(sample_count);
 
     for(qint32 n = 0; n < sample_count; n++)
@@ -166,7 +162,6 @@ MatrixXd Spectrogram::compute(const SpectogramInputData& inputData)
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
     #endif
-    __TRACE_FUNC();
     MatrixXd tf_matrix;
 //    Eigen::FFT<double> fft;
 //    MatrixXd tf_matrix = MatrixXd::Zero(inputData.vecInputData.rows()/2, inputData.vecInputData.rows());
@@ -199,7 +194,6 @@ MatrixXcd Spectrogram::computeComplex(const SpectogramInputData& inputData)
     #ifdef EIGEN_FFTW_DEFAULT
         fftw_make_planner_thread_safe();
     #endif
-    __TRACE_FUNC();
     Eigen::FFT<double> fft;
     MatrixXcd tf_matrix = MatrixXcd::Zero(inputData.vecInputData.rows()/2, inputData.vecInputData.rows());
     VectorXd envelope, windowed_sig;
@@ -229,7 +223,6 @@ MatrixXcd Spectrogram::computeComplex(const SpectogramInputData& inputData)
 void Spectrogram::reduce(MatrixXd &resultData,
                          const MatrixXd &data)
 {
-    __TRACE_FUNC();
     if(resultData.size() == 0) {
         resultData = data;
     } else {
@@ -242,7 +235,6 @@ void Spectrogram::reduce(MatrixXd &resultData,
 void Spectrogram::reduceComplex(MatrixXcd &resultData,
                                 const MatrixXcd &data)
 {
-    __TRACE_FUNC();
     if(resultData.size() == 0) {
         resultData = data;
     } else {

@@ -70,7 +70,6 @@ SOURCES += \
     layoutmaker.cpp \
     selectionio.cpp \
     spectrogram.cpp \
-#    tracer.cpp \
     warp.cpp \
     sphere.cpp \
     generics/observerpattern.cpp \
@@ -79,7 +78,6 @@ SOURCES += \
 
 HEADERS += \
     kmeans.h\
-#    tracer.h \
     utils_global.h \
     mnemath.h \
     ioutils.h \
