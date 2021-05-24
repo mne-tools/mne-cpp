@@ -282,7 +282,7 @@ void MainWindow::initSplashScreen(bool bShowSplashScreen)
 
 void MainWindow::hideSplashScreen()
 {
-    m_pSplashScreenHider = MainSplashScreenHider::SPtr::create(*m_pSplashScreen.get(),
+    m_pSplashScreenHider = MainSplashScreenHider::SPtr::create(*m_pSplashScreen.data(),
                                                        waitUntilHidingSplashScreen);
     m_pSplashScreen->clearMessage();
     m_pSplashScreenHider->start();
