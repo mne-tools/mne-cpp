@@ -7,7 +7,7 @@ nav_order: 5
 # MNE Tracer
 
 ***
-                **_It is very hard to improve what you can not measure._**
+                It is very hard to improve what you can not measure.
 ***
 
 During development it is common to have to decide between two (or more) different but equivalent implementations. We value improving code maintainability and coherence on top of achieving an efficient-as-possible implementation. But still, it is not uncommon to find situations when two solutions seem equally valid. In this scenario, to be able to understand the performance implications of each option can be really useful. It can help understand better each decision and obtain a more informed opinion, thus learnign through out the process. MNE Tracer was designed for this situations. A code tracer is a tool that registers when does each method is being executed.
