@@ -726,11 +726,11 @@ void EventModel::getEventsFromNewData()
 
     int iFirstSample = m_pFiffModel->absoluteFirstSample();
 
-    std::list<int> indexList;
+    std::list<int> stimChannelIndexList;
 
     for(int i = 0; i < info->chs.size(); i++) {
         if(info->chs[i].kind == FIFFV_STIM_CH) {
-            indexList.push_back(i);
+            stimChannelIndexList.push_back(i);
         }
     }
 
@@ -746,7 +746,7 @@ void EventModel::getEventsFromNewData()
                               mSampleTimes);
     }
 
-    for (int iChannelIndex : indexList){
+    for (int iChannelIndex : stimChannelIndexList){
         QList<QPair<int,double>> detectedTriggerSamples = RTPROCESSINGLIB::detectTriggerFlanksMax(mSampleData,
                                                                                                   iChannelIndex,
                                                                                                   0,
@@ -755,8 +755,8 @@ void EventModel::getEventsFromNewData()
 
         QMap<double,QList<int>> mEventsinTypes;
 
-        for(QPair<int,double> pair : detectedTriggerSamples){
-            mEventsinTypes[pair.second].append(pair.first);
+        for(const auto& sample : detectedTriggerSamples){
+            mEventsinTypes[sample.second].append(sample.first);
         }
 
         QList<double> keyList = mEventsinTypes.keys();
