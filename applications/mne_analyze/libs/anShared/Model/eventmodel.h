@@ -499,6 +499,10 @@ public:
      */
     void updateSelectedGroups(const QList<QModelIndex>& indexList);
 
+    //=========================================================================================================
+    /**
+     * Gets new events from trigger channels
+     */
     void getEventsFromNewData();
 
 signals:
