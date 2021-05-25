@@ -39,15 +39,13 @@ For instance, a test of a plugin of an application could be configured correctly
 ```c++
 int main(int argc, char *argv[])
 {
-    MNE_TRACER_ENABLE(hpi_test1.json)
+    MNE_TRACER_ENABLE(filename.json)
 
     //... your application starts here
     //... you can trace specific function calls 
     //... at this point by adding the
     //... macro MNE_TRACE() to your code.
 
-    int returnValue(app.exec());
-    
     MNE_TRACER_DISABLE
 
     return returnValue;
@@ -67,7 +65,7 @@ void ImportantClass::importantMethod(int a)
     //...
 }
 ```
-### Automatically adding all the methods in a class to the tracer
+### Automatically adding all the methods in a class to MNE Tracer
 If you are interested in tracing every single method in a class, instead of manually adding the macro ```MNE_TRACE()``` to every single method, you can use a Python tool we have developed that includes the macro automatically in your ```.cpp``` file.
 
 The script is ```tools/python``` named ```mnetracer.py```. To use it just do as follows:
