@@ -373,8 +373,15 @@ private:
     void updateVerticalScrollPosition(qint32 newScrollPosition);
 
     //=========================================================================================================
+    /**
+     * Reloads the view to show the new real-time data.
+     */
     void onNewRealtimeData();
 
+    //=========================================================================================================
+    /**
+     * Initialize the objects necessary for the righ-click add event menu to appear.
+     */
     void initRightClickContextMenu();
 
     QPointer<QTableView>                                m_pTableView;                   /**< Pointer to table view ui element. */
