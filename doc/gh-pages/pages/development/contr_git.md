@@ -13,22 +13,22 @@ The first steps to get started, as described in the [build guide](buildguide.md)
 git clone https://github.com/<YourGitUserName>/mne-cpp.git
 git remote add upstream https://github.com/mne-tools/mne-cpp.git
 git fetch --all
-git rebase upstream/master
+git rebase upstream/main
 ```
 
 The general workflow is covered by the following steps:
 
-- Create a new branch from `master`:
+- Create a new branch from `main`:
 
 ```
-git checkout -b <branchName> master
+git checkout -b <branchName> main
 ```
 
 - Get the latest changes and [rebase](https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase){:target="_blank" rel="noopener"}:
 
 ```
 git fetch upstream
-git rebase upstream/master
+git rebase upstream/main
 ```
 
 - Solve [merge conflicts](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line){:target="_blank" rel="noopener"}, if they occure.

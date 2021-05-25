@@ -6,7 +6,7 @@
     <img src="https://github.com/mne-tools/mne-cpp/workflows/Linux%7CMacOS%7CWin%7CWASM/badge.svg" alt="Github Actions">
 </a>
 <a href="https://codecov.io/gh/mne-tools/mne-cpp" target="_blank">
-    <img src="https://codecov.io/gh/mne-tools/mne-cpp/branch/master/graph/badge.svg" alt="CodeCov">
+    <img src="https://codecov.io/gh/mne-tools/mne-cpp/branch/main/graph/badge.svg" alt="CodeCov">
 </a>
 <a href="https://scan.coverity.com/projects/mne-tools-mne-cpp" target="_blank">
     <img src="https://scan.coverity.com/projects/8955/badge.svg" alt="Coverity">

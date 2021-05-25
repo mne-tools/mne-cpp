@@ -4,13 +4,14 @@
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
- *           Gabriel Motta <gbmotta@mgh.harvard.edu>
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>;
+ *           Juan GPC   <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     July, 2018
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke, Gabriel Motta. All rights reserved.
+ * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke, Gabriel Motta, Juan GPC. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -372,8 +373,16 @@ private:
     void updateVerticalScrollPosition(qint32 newScrollPosition);
 
     //=========================================================================================================
+    /**
+     * Reloads the view to show the new real-time data.
+     */
     void onNewRealtimeData();
 
+    //=========================================================================================================
+    /**
+     * Initialize the objects necessary for the righ-click add event menu to appear.
+     */
+    void initRightClickContextMenu();
 
     QPointer<QTableView>                                m_pTableView;                   /**< Pointer to table view ui element. */
 
@@ -395,6 +404,8 @@ private:
     QLabel*                                             m_pEndTimeLabel;                /**< Right 'Sample | Seconds' display label. */
     QLabel*                                             m_pFileLabel;                   /**< File name and path, Fs and duration. */
     QLabel*                                             m_pFilterLabel;                 /**< Short filter description to be shown under the time-series. */
+    QMenu*                                              m_pRightClickContextMenu;       /**< Hold the menu that appears when a right-click event occurs. */
+    QAction*                                            m_pAddEventAction;              /**< Hold the action for directing callback for adding a new event. */
 signals:
     void tableViewDataWidthChanged(int iWidth);
 

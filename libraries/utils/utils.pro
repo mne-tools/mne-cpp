@@ -4,13 +4,14 @@
 # @author   Lars Debor <Lars.Debor@tu-ilmenau.de>;
 #           Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
 #           Lorenz Esch <lesch@mgh.harvard.edu>;
-#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Juan GPC <jgarciaprieto@mgh.harvard.edu>
 # @since    0.1.0
 # @date     July, 2012
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Lars Debor, Daniel Strohmeier, Lorenz Esch, Christoph Dinh. All rights reserved.
+# Copyright (C) 2021, Lars Debor, Daniel Strohmeier, Lorenz Esch, Christoph Dinh, Juan GPC. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -73,7 +74,8 @@ SOURCES += \
     sphere.cpp \
     generics/observerpattern.cpp \
     generics/applicationlogger.cpp \
-    spectral.cpp
+    spectral.cpp \
+    mnetracer.cpp
 
 HEADERS += \
     kmeans.h\
@@ -91,7 +93,8 @@ HEADERS += \
     generics/commandpattern.h \
     generics/observerpattern.h \
     generics/applicationlogger.h \
-    spectral.h
+    spectral.h \
+    mnetracer.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

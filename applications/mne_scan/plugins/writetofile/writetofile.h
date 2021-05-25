@@ -139,7 +139,21 @@ public:
      */
     void initPluginControlWidgets();
 
+    //=========================================================================================================
+    /**
+     * Sets whether the plugin is to be in continuous save mode
+     *
+     * @param iState    state of checkbox - gets saved as bool 0 - false (not continuous), 1+ - true (continuous)
+     */
     void setContinuous(int iState);
+
+    //=========================================================================================================
+    /**
+     * Whether the plugin is set to continuous save mode
+     *
+     * @return true if set to continuous, false if not.
+     */
+    bool isContinuous();
 
 private:
     //=========================================================================================================
@@ -200,14 +214,13 @@ private:
 
     bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
-    bool                                    m_bContinuous;
+    bool                                    m_bContinuous;                  /**< Flag for whether to start plugin in continuous save mode */
 
     qint16                                  m_iBlinkStatus;                 /**< The blink status of the recording button.*/
     qint32                                  m_iSplitCount;                  /**< File split count. */
     int                                     m_iRecordingMSeconds;           /**< Recording length in mseconds.*/
 
     QMutex                                  m_mutex;                        /**< The threads mutex.*/
-    QMutex                                  m_copymutex;
 
     QSharedPointer<FIFFLIB::FiffInfo>       m_pFiffInfo;                    /**< Fiff measurement info.*/
     QSharedPointer<FIFFLIB::FiffStream>     m_pOutfid;                      /**< FiffStream to write to.*/

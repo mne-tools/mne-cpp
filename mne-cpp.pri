@@ -46,12 +46,14 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2020 Authors of MNE-CPP. All rights reser
 # To build MNE-CPP with FFTW support in Eigen (make sure to specify FFTW_DIRs below) run: qmake MNECPP_CONFIG+=useFFTW
 # To build MNE-CPP without QOpenGLWidget support run: qmake MNECPP_CONFIG+=noQOpenGLWidget
 # To build MNE-CPP against WebAssembly (Wasm) run: qmake MNECPP_CONFIG+=wasm
+# To build MNE-CPP with MNE_TRACER support run: qmake MNECPP_CONFIG+=trace
 # To build MNE Scan with BrainFlow support run: qmake MNECPP_CONFIG+=withBrainFlow
 # To build MNE Scan with LSL support run: qmake MNECPP_CONFIG+=withLsl
 # To build MNE Scan with BrainAMP support run: qmake MNECPP_CONFIG+=withBrainAmp
 # To build MNE Scan with EegoSports support run: qmake MNECPP_CONFIG+=withEego
 # To build MNE Scan with GUSBAmp support run: qmake MNECPP_CONFIG+=withGUSBAmp
 # To build MNE Scan with TMSI support run: qmake MNECPP_CONFIG+=withTmsi
+
 
 # Default flags
 MNECPP_CONFIG +=
@@ -77,6 +79,10 @@ contains(MNECPP_CONFIG, wasm) {
 
 contains(MNECPP_CONFIG, static) {
     message("The static flag was detected. Building static version of MNE-CPP.")
+}
+
+contains(MNECPP_CONFIG, trace) {
+    DEFINES += TRACE
 }
 
 ########################################### DIRECTORY DEFINITIONS #############################################
@@ -131,3 +137,4 @@ MNE_INSTALL_INCLUDE_DIR = $$MNE_INSTALL_INCLUDE_DIR
 isEmpty( MNE_INSTALL_INCLUDE_DIR ) {
     MNE_INSTALL_INCLUDE_DIR = $$shell_path($${PWD}/include)
 }
+

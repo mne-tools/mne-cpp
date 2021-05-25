@@ -28,7 +28,7 @@ QString sChName = "MEG0000";
 void loadTxtFile(const QString& sPath);
 ```
 
-In general, try to make your code match the one around it, e.g., indentations, use of linebreaks, etc. Please use the DoxyGen style to document your code, as seen [here](https://github.com/mne-tools/mne-cpp/blob/master/libraries/connectivity/network/network.h){:target="_blank" rel="noopener"}. If you introduce a new function, please make sure to use the `@since` tag to specify the current version you are developing for. Always align your function parameters in .h and .cpp files, for example:
+In general, try to make your code match the one around it, e.g., indentations, use of linebreaks, etc. Please use the DoxyGen style to document your code, as seen [here](https://github.com/mne-tools/mne-cpp/blob/main/libraries/connectivity/network/network.h){:target="_blank" rel="noopener"}. If you introduce a new function, please make sure to use the `@since` tag to specify the current version you are developing for. Always align your function parameters in .h and .cpp files, for example:
 
 ```cpp
 //=========================================================================================================

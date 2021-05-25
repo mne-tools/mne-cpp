@@ -37,6 +37,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <iostream>
+
 #include <scShared/Management/pluginmanager.h>
 #include <scShared/Management/pluginscenemanager.h>
 #include <scShared/Management/displaymanager.h>
@@ -56,6 +58,7 @@
 #include "startupwidget.h"
 #include "plugingui.h"
 #include "info.h"
+#include "mainsplashscreenhider.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -70,8 +73,6 @@
 #include <QFileInfo>
 #include <QStandardPaths>
 
-#include <iostream>
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -85,7 +86,8 @@ using namespace DISPLIB;
 // CONST
 //=============================================================================================================
 
-const QString pluginDir = "/mne_scan_plugins";        /**< holds path to plugins.*/
+const QString pluginDir = "/mne_scan_plugins";          /**< holds path to plugins.*/
+constexpr unsigned long waitUntilHidingSplashScreen(1);     /**< Seconds to wait after the application setup has finished, before hiding the splash screen.*/
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -116,7 +118,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setUnifiedTitleAndToolBarOnMac(false);
 
-    setSplashScreen();
+    initSplashScreen();
 
     setupPlugins();
     setupUI();
@@ -128,6 +130,9 @@ MainWindow::MainWindow(QWidget *parent)
     qInfo() << "Loading icon...";
     QMainWindow::setWindowIcon(QIcon(":/images/images/appIcons/icon_mne_scan_256x256.png"));
 #endif
+
+    hideSplashScreen();
+    show();
 }
 
 //=============================================================================================================
@@ -249,16 +254,19 @@ void MainWindow::onGuiModeChanged()
 
 //=============================================================================================================
 
-void MainWindow::hideSplashScreen()
+void MainWindow::initSplashScreen()
 {
-    m_pSplashScreen->hide();
+    bool showSplashScreen(true);
+    initSplashScreen(showSplashScreen);
 }
 
-void MainWindow::setSplashScreen(bool bShowSplashScreen)
+//=============================================================================================================
+
+void MainWindow::initSplashScreen(bool bShowSplashScreen)
 {
     QPixmap splashPixMap(":/images/splashscreen.png");
-    m_pSplashScreen = MainSplashScreen::SPtr::create(splashPixMap);
-
+    m_pSplashScreen = MainSplashScreen::SPtr::create(splashPixMap,
+                                                    Qt::WindowFlags() | Qt::WindowStaysOnTopHint );
     if(m_pSplashScreen && m_pPluginManager) {
         QObject::connect(m_pPluginManager.data(), &PluginManager::pluginLoaded,
                          m_pSplashScreen.data(), &MainSplashScreen::showMessage);
@@ -268,6 +276,16 @@ void MainWindow::setSplashScreen(bool bShowSplashScreen)
         m_pSplashScreen->finish(this);
         m_pSplashScreen->show();
     }
+}
+
+//=============================================================================================================
+
+void MainWindow::hideSplashScreen()
+{
+    m_pSplashScreenHider = MainSplashScreenHider::SPtr::create(*m_pSplashScreen.data(),
+                                                       waitUntilHidingSplashScreen);
+    m_pSplashScreen->clearMessage();
+    m_pSplashScreenHider->start();
 }
 
 //=============================================================================================================

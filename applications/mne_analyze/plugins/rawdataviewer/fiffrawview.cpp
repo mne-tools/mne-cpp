@@ -98,6 +98,9 @@ FiffRawView::FiffRawView(QWidget *parent)
     //Create position labels
     createBottomLabels();
 
+    //Create Right-click Context menu
+    initRightClickContextMenu();
+
     m_pTableView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     //m_pTableView->horizontalScrollBar()->setRange(0, m_pTableView->horizontalScrollBar()->maximum() / 1000000);
     //m_pTableView->setShowGrid(true);
@@ -376,6 +379,17 @@ void FiffRawView::onMakeScreenshot(const QString& imageType)
 
 //=============================================================================================================
 
+void FiffRawView::initRightClickContextMenu()
+{
+    m_pRightClickContextMenu = new QMenu(this);
+
+    m_pAddEventAction = m_pRightClickContextMenu->addAction(tr("Add Event"));
+    connect(m_pAddEventAction, &QAction::triggered,
+            this, &FiffRawView::addTimeMark, Qt::UniqueConnection);
+}
+
+//=============================================================================================================
+
 void FiffRawView::customContextMenuRequested(const QPoint &pos)
 {
     if(!m_pModel || m_pModel->isEmpty()) {
@@ -386,20 +400,9 @@ void FiffRawView::customContextMenuRequested(const QPoint &pos)
     int iScrollBarOffset = static_cast<int>(std::round(m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()));
     int iMouseOffset = static_cast<int>(std::round(pos.x() / m_pModel->pixelDifference()));
 
-//    //double dScrollDiff = static_cast<double>(m_pTableView->horizontalScrollBar()->maximum()) / static_cast<double>(m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample());
-//    m_iLastClickedSample = floor((float)m_pModel->absoluteFirstSample() + //accounting for first sample offset
-//                             (m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()) + //accounting for scroll offset
-//                             ((float)pos.x() / m_pModel->pixelDifference())); //accounting for mouse position offset
-
     m_iLastClickedSample = iFirstSampleOffset + iScrollBarOffset + iMouseOffset;
 
-    QMenu* menu = new QMenu(this);
-
-    QAction* markTime = menu->addAction(tr("Add Event"));
-    connect(markTime, &QAction::triggered,
-            this, &FiffRawView::addTimeMark, Qt::UniqueConnection);
-
-    menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
+    m_pRightClickContextMenu->popup(m_pTableView->viewport()->mapToGlobal(pos));
 }
 
 //=============================================================================================================
