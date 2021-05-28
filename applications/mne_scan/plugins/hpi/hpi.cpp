@@ -70,11 +70,17 @@ using namespace Eigen;
 using namespace INVERSELIB;
 
 //=============================================================================================================
+// DEFINE LOCAL CONSTANTS
+//=============================================================================================================
+
+constexpr const int defaultFittingWindowSize(100);
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 Hpi::Hpi()
-: m_iNumberOfFitsPerSecond(3)
+: m_iNumberOfFitsPerSecond(defaultFittingWindowSize)
 , m_bDoFreqOrder(false)
 , m_bDoSingleHpi(false)
 , m_bDoContinousHpi(false)
