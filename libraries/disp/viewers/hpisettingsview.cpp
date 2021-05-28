@@ -200,6 +200,13 @@ double HpiSettingsView::getAllowedRotationChanged()
 
 //=============================================================================================================
 
+int HpiSettingsView::getNumFitsPerSecond()
+{
+    return m_pUi->m_spinBox_fps->value();
+}
+
+//=============================================================================================================
+
 void HpiSettingsView::saveSettings()
 {
     if(m_sSettingsPath.isEmpty()) {
