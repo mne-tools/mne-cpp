@@ -258,6 +258,8 @@ void Hpi::initPluginControlWidgets()
                 this, &Hpi::onAllowedMovementChanged);
         connect(pHpiSettingsView, &HpiSettingsView::allowedRotationChanged,
                 this, &Hpi::onAllowedRotationChanged);
+        connect(pHpiSettingsView, &HpiSettingsView::fitsPerSecondChanged,
+                this, &Hpi::setNumberofFitsPerSecond);
         connect(this, &Hpi::errorsChanged,
                 pHpiSettingsView, &HpiSettingsView::setErrorLabels, Qt::BlockingQueuedConnection);
         connect(this, &Hpi::movementResultsChanged,
@@ -268,6 +270,7 @@ void Hpi::initPluginControlWidgets()
         onAllowedMeanErrorDistChanged(pHpiSettingsView->getAllowedMeanErrorDistChanged());
         onAllowedMovementChanged(pHpiSettingsView->getAllowedMovementChanged());
         onAllowedRotationChanged(pHpiSettingsView->getAllowedRotationChanged());
+        setNumberofFitsPerSecond(pHpiSettingsView->getNumFitsPerSecond());
 
         plControlWidgets.append(pHpiSettingsView);
 
@@ -440,6 +443,14 @@ void Hpi::onContHpiStatusChanged(bool bChecked)
     }
 
     m_bDoContinousHpi = bChecked;
+}
+
+//=============================================================================================================
+
+void Hpi::setNumberofFitsPerSecond(int iFitsPerSecond)
+{
+    QMutexLocker locker(&m_mutex);
+    m_iNumberOfFitsPerSecond = iFitsPerSecond;
 }
 
 //=============================================================================================================
