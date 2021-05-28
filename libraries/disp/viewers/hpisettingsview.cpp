@@ -95,8 +95,8 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
             this, &HpiSettingsView::compStatusChanged);
     connect(m_pUi->m_checkBox_continousHPI, &QCheckBox::clicked,
             this, &HpiSettingsView::contHpiStatusChanged);
-    connect(m_pUi->m_spinBox_fps, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, &HpiSettingsView::fitsPerSecondChanged);
+    connect(m_pUi->m_spinBox_samplesToFit, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &HpiSettingsView::fittingWindowSizeChanged);
     connect(m_pUi->m_doubleSpinBox_maxHPIContinousDist, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &HpiSettingsView::allowedMeanErrorDistChanged);
     connect(m_pUi->m_doubleSpinBox_moveThreshold, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
@@ -200,9 +200,9 @@ double HpiSettingsView::getAllowedRotationChanged()
 
 //=============================================================================================================
 
-int HpiSettingsView::getNumFitsPerSecond()
+int HpiSettingsView::getFittingWindowSize()
 {
-    return m_pUi->m_spinBox_fps->value();
+    return m_pUi->m_spinBox_samplesToFit->value();
 }
 
 //=============================================================================================================
@@ -230,8 +230,8 @@ void HpiSettingsView::saveSettings()
     settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/maxError"),
                       QVariant::fromValue(m_pUi->m_doubleSpinBox_maxHPIContinousDist->value()));
 
-    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/fitsPerSecond"),
-                      QVariant::fromValue(m_pUi->m_spinBox_fps->value()));
+    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/fittingWindowSize"),
+                      QVariant::fromValue(m_pUi->m_spinBox_samplesToFit->value()));
 }
 
 //=============================================================================================================
@@ -253,7 +253,7 @@ void HpiSettingsView::loadSettings()
     m_pUi->m_checkBox_useComp->setChecked(settings.value(m_sSettingsPath + QString("/HpiSettingsView/useCOMP"), false).toBool());
     m_pUi->m_checkBox_continousHPI->setChecked(settings.value(m_sSettingsPath + QString("/HpiSettingsView/continousHPI"), false).toBool());
     m_pUi->m_doubleSpinBox_maxHPIContinousDist->setValue(settings.value(m_sSettingsPath + QString("/HpiSettingsView/maxError"), 10.0).toDouble());
-    m_pUi->m_spinBox_fps->setValue(settings.value(m_sSettingsPath + QString("/HpiSettingsView/fitsPerSecond"), 3).toInt());
+    m_pUi->m_spinBox_samplesToFit->setValue(settings.value(m_sSettingsPath + QString("/HpiSettingsView/fittingWindowSize"), 1000).toInt());
 }
 
 //=============================================================================================================
