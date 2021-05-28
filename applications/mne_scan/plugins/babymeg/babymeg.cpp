@@ -251,12 +251,6 @@ QWidget* BabyMEG::setupWidget()
         widget->setSamplingFrequency();
     }
 
-    if(m_pMyClient->isConnected()) {
-        widget->setConnectionStatus(true);
-    } else {
-        widget->setConnectionStatus(false);
-    }
-
     return widget;
 }
 
