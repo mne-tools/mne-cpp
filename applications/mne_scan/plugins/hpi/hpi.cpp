@@ -508,6 +508,8 @@ void Hpi::run()
     while(!isInterruptionRequested()) {
         m_mutex.lock();
         if(iNumberOfFitsPerSecond != m_iNumberOfFitsPerSecond) {
+            iNumberOfFitsPerSecond = m_iNumberOfFitsPerSecond;
+            std::cout << "Number of Fits per second:" << iNumberOfFitsPerSecond << "\n";
             matDataMerged.resize(m_pFiffInfo->chs.size(), int(m_pFiffInfo->sfreq/iNumberOfFitsPerSecond));
             iDataIndexCounter = 0;
         }
