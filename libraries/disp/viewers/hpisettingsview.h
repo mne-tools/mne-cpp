@@ -160,7 +160,7 @@ public:
      *
      * @return  Number of fits per second
      */
-    int getNumFitsPerSecond();
+    int getFittingWindowSize();
 
     //=========================================================================================================
     /**
@@ -298,7 +298,7 @@ signals:
      *
      * @param[in] iFitsPerSecond    How many fits per second we should do.
      */
-    void fitsPerSecondChanged(int iFitsPerSecond);
+    void fittingWindowSizeChanged(int iFitsPerSecond);
 
     //=========================================================================================================
     /**

@@ -80,7 +80,7 @@ constexpr const int defaultFittingWindowSize(100);
 //=============================================================================================================
 
 Hpi::Hpi()
-: m_iNumberOfFitsPerSecond(defaultFittingWindowSize)
+: m_iFittingWindowSize(defaultFittingWindowSize)
 , m_bDoFreqOrder(false)
 , m_bDoSingleHpi(false)
 , m_bDoContinousHpi(false)
@@ -264,8 +264,8 @@ void Hpi::initPluginControlWidgets()
                 this, &Hpi::onAllowedMovementChanged);
         connect(pHpiSettingsView, &HpiSettingsView::allowedRotationChanged,
                 this, &Hpi::onAllowedRotationChanged);
-        connect(pHpiSettingsView, &HpiSettingsView::fitsPerSecondChanged,
-                this, &Hpi::setNumberofFitsPerSecond);
+        connect(pHpiSettingsView, &HpiSettingsView::fittingWindowSizeChanged,
+                this, &Hpi::setFittingWindowSize);
         connect(this, &Hpi::errorsChanged,
                 pHpiSettingsView, &HpiSettingsView::setErrorLabels, Qt::BlockingQueuedConnection);
         connect(this, &Hpi::movementResultsChanged,
@@ -276,7 +276,7 @@ void Hpi::initPluginControlWidgets()
         onAllowedMeanErrorDistChanged(pHpiSettingsView->getAllowedMeanErrorDistChanged());
         onAllowedMovementChanged(pHpiSettingsView->getAllowedMovementChanged());
         onAllowedRotationChanged(pHpiSettingsView->getAllowedRotationChanged());
-        setNumberofFitsPerSecond(pHpiSettingsView->getNumFitsPerSecond());
+        setFittingWindowSize(pHpiSettingsView->getFittingWindowSize());
 
         plControlWidgets.append(pHpiSettingsView);
 
@@ -453,10 +453,10 @@ void Hpi::onContHpiStatusChanged(bool bChecked)
 
 //=============================================================================================================
 
-void Hpi::setNumberofFitsPerSecond(int iFitsPerSecond)
+void Hpi::setFittingWindowSize(int winSize)
 {
     QMutexLocker locker(&m_mutex);
-    m_iNumberOfFitsPerSecond = iFitsPerSecond;
+    m_iFittingWindowSize = winSize;
 }
 
 //=============================================================================================================
@@ -506,23 +506,25 @@ void Hpi::run()
     MatrixXd matData;
 
     m_mutex.lock();
-    int iNumberOfFitsPerSecond = m_iNumberOfFitsPerSecond;
+    int fittingWindowSize = m_iFittingWindowSize;
     m_mutex.unlock();
 
-    MatrixXd matDataMerged(m_pFiffInfo->chs.size(), int(m_pFiffInfo->sfreq/iNumberOfFitsPerSecond));
+    MatrixXd matDataMerged(m_pFiffInfo->chs.size(), fittingWindowSize);
 
     while(!isInterruptionRequested()) {
         m_mutex.lock();
-        if(iNumberOfFitsPerSecond != m_iNumberOfFitsPerSecond) {
-            iNumberOfFitsPerSecond = m_iNumberOfFitsPerSecond;
-            std::cout << "Number of Fits per second:" << iNumberOfFitsPerSecond << "\n";
-            matDataMerged.resize(m_pFiffInfo->chs.size(), int(m_pFiffInfo->sfreq/iNumberOfFitsPerSecond));
+        if(fittingWindowSize != m_iFittingWindowSize) {
+            fittingWindowSize = m_iFittingWindowSize;
+            std::cout << "Fitting window size: " << fittingWindowSize << "\n";
+            matDataMerged.resize(m_pFiffInfo->chs.size(), fittingWindowSize);
             iDataIndexCounter = 0;
         }
         m_mutex.unlock();
 
         //pop matrix
         if(m_pCircularBuffer->pop(matData)) {
+            std::cout << matData;
+
             if(iDataIndexCounter + matData.cols() < matDataMerged.cols()) {
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matData.cols()) = matData;
                 iDataIndexCounter += matData.cols();
@@ -535,7 +537,8 @@ void Hpi::run()
                 fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
                 m_mutex.unlock();
 
-                matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols()-iDataIndexCounter) = matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
+                matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols()-iDataIndexCounter) =
+                        matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
 
                 // Perform HPI fit
                 m_mutex.lock();

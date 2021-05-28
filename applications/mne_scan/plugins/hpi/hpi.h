@@ -237,11 +237,11 @@ private:
 
     //=========================================================================================================
     /**
-     * Set nubmer of fits per second when doing continuous hpi.
+     * Set fitting window size when doing continuous hpi.
      *
-     * @param[in] iFitsPerSecond    number of fits per second
+     * @param[in] winSize    window size in samples
      */
-    void setNumberofFitsPerSecond(int iFitsPerSecond);
+    void setFittingWindowSize(int winSize);
 
     //=========================================================================================================
     /**
@@ -262,7 +262,7 @@ private:
     QString                     m_sFilePathDigitzers;       /**< The file path to the current digitzers. */
 
     qint16                      m_iNumberBadChannels;       /**< The number of bad channels.*/
-    qint16                      m_iNumberOfFitsPerSecond;   /**< The number of allowed HPI fits per second. Default is 3.*/
+    qint16                      m_iFittingWindowSize;       /**< The number of samples in each fitting window.*/
 
     double                      m_dAllowedMeanErrorDist;    /**< The allowed error distance in order for the last fit to be counted as a good fit.*/
     double                      m_dAllowedMovement;         /**< The allowed head movement regarding reference head position.*/
