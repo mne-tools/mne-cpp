@@ -237,6 +237,14 @@ private:
 
     //=========================================================================================================
     /**
+     * Set nubmer of fits per second when doing continuous hpi.
+     *
+     * @param[in] iFitsPerSecond    number of fits per second
+     */
+    void setNumberofFitsPerSecond(int iFitsPerSecond);
+
+    //=========================================================================================================
+    /**
      * Read Polhemus data from fif file.
      */
     QList<FIFFLIB::FiffDigPoint> readPolhemusDig(const QString& fileName);
