@@ -100,25 +100,11 @@ public:
 
     //=========================================================================================================
     /**
-     * Set command connection status
-     *
-     * @param[in] bConnectionStatus    the connection status.
-     */
-    void setConnectionStatus(bool bConnectionStatus);
-
-    //=========================================================================================================
-    /**
      * Asks the new sampling frequency from the BabyMEG plugin and updates the text field.
      */
     void setSamplingFrequency();
 
 private:
-    //=========================================================================================================
-    /**
-     * Whenever the connect button was pressed.
-     */
-    void onConnectionPressed();
-
     BabyMEG*                    m_pBabyMEG;         /**< a pointer to corresponding mne rt client.*/
 
     Ui::BabyMEGSetupWidgetClass ui;                 /**< the user interface for the BabyMEGSetupWidget.*/
