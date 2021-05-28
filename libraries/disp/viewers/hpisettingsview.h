@@ -156,6 +156,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Get number of fits per second to do when performing continuous hpi
+     *
+     * @return  Number of fits per second
+     */
+    int getNumFitsPerSecond();
+
+    //=========================================================================================================
+    /**
      * Saves all important settings of this view via QSettings.
      */
     void saveSettings();
@@ -240,14 +248,6 @@ signals:
 
     //=========================================================================================================
     /**
-     * Emit this signal whenever the user toggled the do HPI check box.
-     *
-     * @param[in] state    Whether to do continous HPI.
-     */
-    void continousHPIToggled(bool state);
-
-    //=========================================================================================================
-    /**
      * Emit this signal whenever new digitzers were loaded.
      *
      * @param[in] lDigitzers    The new digitzers.
@@ -291,6 +291,14 @@ signals:
      * @param[in] bChecked    Whether the continous HPI check box is checked.
      */
     void contHpiStatusChanged(bool bChecked);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal when 'fits per second' control gets updated.
+     *
+     * @param[in] iFitsPerSecond    How many fits per second we should do.
+     */
+    void fitsPerSecondChanged(int iFitsPerSecond);
 
     //=========================================================================================================
     /**
