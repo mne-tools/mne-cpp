@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>0</number>
+      <number>1</number>
      </property>
      <widget class="QWidget" name="tab_loadDigitizers">
       <attribute name="title">
@@ -299,23 +299,53 @@
             </property>
            </widget>
           </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame">
+         <property name="minimumSize">
+          <size>
+           <width>61</width>
+           <height>35</height>
+          </size>
+         </property>
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="topMargin">
+           <number>4</number>
+          </property>
+          <property name="bottomMargin">
+           <number>4</number>
+          </property>
           <item>
-           <widget class="QSpinBox" name="m_spinBox_fps">
-            <property name="minimum">
-             <number>1</number>
+           <widget class="QSpinBox" name="m_spinBox_samplesToFit">
+            <property name="maximumSize">
+             <size>
+              <width>70</width>
+              <height>16777215</height>
+             </size>
             </property>
-            <property name="maximum">
+            <property name="minimum">
              <number>10</number>
             </property>
+            <property name="maximum">
+             <number>1000000</number>
+            </property>
             <property name="value">
-             <number>3</number>
+             <number>10</number>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QLabel" name="label_3">
             <property name="text">
-             <string> fits per second</string>
+             <string>Win Size [Samples]</string>
             </property>
            </widget>
           </item>
@@ -610,7 +640,6 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>tabWidget</tabstop>
   <tabstop>m_lineEdit_filePath</tabstop>
   <tabstop>m_pushButton_loadDigitizers</tabstop>
   <tabstop>m_tableWidget_Frequencies</tabstop>
