@@ -275,10 +275,51 @@
         </widget>
        </item>
        <item>
-        <widget class="QCheckBox" name="m_checkBox_continousHPI">
-         <property name="text">
-          <string>Do continous HPI fitting</string>
-         </property>
+        <widget class="QWidget" name="widget" native="true">
+         <layout class="QHBoxLayout" name="horizontalLayout">
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QCheckBox" name="m_checkBox_continousHPI">
+            <property name="text">
+             <string>Do continous HPI fitting at</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QSpinBox" name="m_spinBox_fps">
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>10</number>
+            </property>
+            <property name="value">
+             <number>3</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string> fits per second</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item>
@@ -578,7 +619,6 @@
   <tabstop>m_pushButton_doFreqOrder</tabstop>
   <tabstop>m_checkBox_useSSP</tabstop>
   <tabstop>m_checkBox_useComp</tabstop>
-  <tabstop>m_checkBox_continousHPI</tabstop>
   <tabstop>m_pushButton_doSingleFit</tabstop>
   <tabstop>m_tableWidget_errors</tabstop>
   <tabstop>m_doubleSpinBox_maxHPIContinousDist</tabstop>
