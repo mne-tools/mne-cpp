@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include "../utils_global.h"
+#include <mutex>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -76,6 +77,7 @@ public:
     static void customLogWriter(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
 private:
+    static std::mutex m_mutex;
 };
 }
 #endif // APPLICATIONLOGGER_H
