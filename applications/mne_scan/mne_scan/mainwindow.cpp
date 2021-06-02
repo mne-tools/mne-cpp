@@ -273,7 +273,6 @@ void MainWindow::initSplashScreen(bool bShowSplashScreen)
     }
 
     if(m_pSplashScreen && bShowSplashScreen) {
-        m_pSplashScreen->finish(this);
         m_pSplashScreen->show();
     }
 }
