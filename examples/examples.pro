@@ -53,6 +53,7 @@ SUBDIRS += \
     ex_coreg \
     ex_evoked_grad_amp \
     ex_fiff_io \
+    ex_fiff_sniffer \
     ex_find_evoked \
     ex_inverse_mne \
     ex_make_inverse_operator \
