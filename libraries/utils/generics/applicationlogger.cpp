@@ -84,12 +84,6 @@ using namespace std;
 #endif
 
 //=============================================================================================================
-// GLOBAL VARIABLES
-//=============================================================================================================
-
-QString sDate = QString("] ");
-
-//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
@@ -99,6 +93,7 @@ void ApplicationLogger::customLogWriter(QtMsgType type,
 {
     Q_UNUSED(context)
 
+    QString sDate = QString("] ");
     // Comment in following line if you want to display the date and time of the message
     //sDate = QString(" %1] ").arg(QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss.z"));
 
@@ -108,6 +103,7 @@ void ApplicationLogger::customLogWriter(QtMsgType type,
         HANDLE hOut = GetStdHandle(STD_OUTPUT_HANDLE);
     #endif
 
+    m_mutex.lock();
     switch (type) {
         case QtWarningMsg:
             LOG_WRITE(std::cout, COLOR_WARN, QString("[WARN%1").arg(sDate).toStdString(), msg.toStdString());
@@ -128,4 +124,5 @@ void ApplicationLogger::customLogWriter(QtMsgType type,
             LOG_WRITE(std::cout, COLOR_RESET, "", msg.toStdString());
             break;
     }
+    m_mutex.unlock();
 }
