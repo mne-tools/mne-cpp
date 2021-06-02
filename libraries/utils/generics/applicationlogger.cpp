@@ -83,6 +83,8 @@ using namespace std;
     #define LOG_WRITE(OUTPUT, COLOR, LEVEL, MSG) OUTPUT << COLOR << LEVEL << COLOR_RESET << MSG << "\n"
 #endif
 
+std::mutex ApplicationLogger::m_mutex;
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
