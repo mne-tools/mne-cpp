@@ -73,7 +73,7 @@ using namespace INVERSELIB;
 // DEFINE LOCAL CONSTANTS
 //=============================================================================================================
 
-constexpr const int defaultFittingWindowSize(100);
+constexpr const int defaultFittingWindowSize(300);
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
