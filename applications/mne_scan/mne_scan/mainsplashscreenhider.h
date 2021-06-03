@@ -104,7 +104,7 @@ protected:
      */
     void run();
 
-    MainSplashScreen& m_pSlashScreenToHide;       /**< Pointer to the slpash screen to hide.*/
+    MainSplashScreen& m_pSplashScreenToHide;       /**< Pointer to the slpash screen to hide.*/
     unsigned long   m_iSecondsToSleep;                                  /**< Time to wait before hiding the splash window.*/
 };
 
