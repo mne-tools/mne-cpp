@@ -58,7 +58,7 @@
 #include "startupwidget.h"
 #include "plugingui.h"
 #include "info.h"
-#include "mainsplashscreenhider.h"
+#include "mainsplashscreencloser.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -281,7 +281,7 @@ void MainWindow::initSplashScreen(bool bShowSplashScreen)
 
 void MainWindow::hideSplashScreen()
 {
-    m_pSplashScreenHider = MainSplashScreenHider::SPtr::create(*m_pSplashScreen.data(),
+    m_pSplashScreenHider = MainSplashScreenCloser::SPtr::create(*m_pSplashScreen.data(),
                                                        waitUntilHidingSplashScreen);
     m_pSplashScreen->clearMessage();
     m_pSplashScreenHider->start();

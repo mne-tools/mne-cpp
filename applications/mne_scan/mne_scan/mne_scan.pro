@@ -142,7 +142,7 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     main.cpp \
-    mainsplashscreenhider.cpp \
+    mainsplashscreencloser.cpp \
     startupwidget.cpp \
     mainsplashscreen.cpp \
     pluginscene.cpp \
@@ -153,7 +153,7 @@ SOURCES += \
 
 HEADERS += \
     info.h \
-    mainsplashscreenhider.h \
+    mainsplashscreencloser.h \
     startupwidget.h \
     mainsplashscreen.h \
     pluginscene.h \
