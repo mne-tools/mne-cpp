@@ -523,8 +523,6 @@ void Hpi::run()
 
         //pop matrix
         if(m_pCircularBuffer->pop(matData)) {
-            std::cout << matData;
-
             if(iDataIndexCounter + matData.cols() < matDataMerged.cols()) {
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matData.cols()) = matData;
                 iDataIndexCounter += matData.cols();
