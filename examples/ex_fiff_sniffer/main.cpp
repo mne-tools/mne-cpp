@@ -36,10 +36,10 @@ int main(int argc, char *argv[])
     QFile t_fileRaw(parser.value(inputOption));
 
     std::cout << "\n------------ Fiff Sniffer ------------\n";
-    std::cout << "Input file : " << t_fileRaw.fileName().toStdString() << "\n";
 
     if(!t_fileRaw.exists())
     {
+        std::cout << "Input file : " << t_fileRaw.fileName().toStdString() << "\n";
         std::cout << "File cannot be found.\n";
         std::cout << "\nBye!\n";
 
