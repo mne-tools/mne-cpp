@@ -69,11 +69,11 @@ MainSplashScreenHider::MainSplashScreenHider(MainSplashScreen& splashScreen)
 //=============================================================================================================
 
 MainSplashScreenHider::MainSplashScreenHider(MainSplashScreen& splashScreen, unsigned long sleepTime)
-: m_pSlashScreenToHide(splashScreen)
+: m_pSplashScreenToHide(splashScreen)
 , m_iSecondsToSleep(sleepTime)
 {
     connect(this, &MainSplashScreenHider::closeSplashscreen,
-            &m_pSlashScreenToHide, &QWidget::close);
+            &m_pSplashScreenToHide, &QWidget::close);
 }
 
 //=============================================================================================================
