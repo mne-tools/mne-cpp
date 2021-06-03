@@ -140,15 +140,14 @@ void FtBuffProducer::connectToBuffer(QString addr,
 //    }
 
     //Try to get info from buffer first, then resort to file
-    if(!m_pFtConnector->connect()) {
-        if(!m_pFtBuffer->setupRTMSA()) {
-            emit connecStatus(false);
+    if(m_pFtConnector->connect()) {
+        if (m_pFtBuffer->setupRTMSA(m_pFtConnector->parseNeuromagHeader())) {
+            qInfo() << "[FtBuffProducer::connectToBuffer] Failed to read neuromag header from buffer.";
+            emit connecStatus(true);
+            return;
         }
-    } else if (!m_pFtBuffer->setupRTMSA(m_pFtConnector->parseNeuromagHeader())) {
-        qInfo() << "[FtBuffProducer::connectToBuffer] Failed to read neuromag header from buffer.";
-        emit connecStatus(false);
     }
-    emit connecStatus(true); //this happens if all goes well
+    emit connecStatus(false); //this happens if all goes well
 }
 
 //=============================================================================================================

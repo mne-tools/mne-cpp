@@ -68,6 +68,8 @@ FtBuffer::FtBuffer()
 , m_pFtBuffProducer(QSharedPointer<FtBuffProducer>::create(this))
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
 , m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_double>(new CircularBuffer_Matrix_double(10)))
+, m_sBufferAddress("127.0.0.1")
+, m_iBufferPort(1972)
 {
 }
 
@@ -109,7 +111,11 @@ void FtBuffer::unload()
 bool FtBuffer::start()
 {
     if (!m_bIsConfigured) {
-        return false;
+        m_pFtBuffProducer->connectToBuffer(m_sBufferAddress,
+                                           m_iBufferPort);
+        if (!m_bIsConfigured) {
+            return false;
+        }
     }
 
     qInfo() << "[FtBuffer::start] Starting FtBuffer...";
@@ -262,4 +268,18 @@ bool FtBuffer::setupRTMSA(FIFFLIB::FiffInfo FiffInfo)
 
     qInfo() << "[FtBuffer::setupRTMSA] Successfully acquired fif info from buffer.";
     return m_bIsConfigured = true;
+}
+
+//=============================================================================================================
+
+void FtBuffer::setBufferAddress(const QString &sAddress)
+{
+    m_sBufferAddress = sAddress;
+}
+
+//=============================================================================================================
+
+void FtBuffer::setBufferPort(int iPort)
+{
+    m_iBufferPort = iPort;
 }
