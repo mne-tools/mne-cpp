@@ -80,7 +80,7 @@ FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox,
 
     connect(m_pUi->m_lineEditIP, &QLineEdit::textChanged,
             toolbox, &FtBuffer::setBufferAddress);
-    connect(m_pUi->m_spinBoxPort, qOverload<int>(&QSpinBox::valueChanged),
+    connect(m_pUi->m_spinBoxPort, QOverload<int>::of(&QSpinBox::valueChanged),
             toolbox, &FtBuffer::setBufferPort);
     toolbox->setBufferAddress(m_pUi->m_lineEditIP->text());
     toolbox->setBufferPort(m_pUi->m_spinBoxPort->value());
