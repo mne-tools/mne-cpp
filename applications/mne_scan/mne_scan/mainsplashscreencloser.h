@@ -68,7 +68,6 @@ namespace MNESCAN
 // MNESCAN FORWARD DECLARATIONS
 //=============================================================================================================
 
-
 /**
  * Provides a class for QThread to work on a separate thread, just to hide the splash screen window whenever
  * found convenient.
