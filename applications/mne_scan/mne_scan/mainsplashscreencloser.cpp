@@ -32,81 +32,68 @@
  *
  */
 
-#ifndef MAINSPLASHSCREENHIDER_H
-#define MAINSPLASHSCREENHIDER_H
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "mainsplashscreencloser.h"
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QThread>
-#include <QWeakPointer>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
 #include "mainsplashscreen.h"
 
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
+using namespace MNESCAN;
 
 //=============================================================================================================
-// DEFINE NAMESPACE MNESCAN
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace MNESCAN
+constexpr unsigned long defaultTimeToWait(3);
+
+//=============================================================================================================
+
+MainSplashScreenCloser::MainSplashScreenCloser(MainSplashScreen& splashScreen)
+: MainSplashScreenCloser(splashScreen, defaultTimeToWait)
+{ }
+
+//=============================================================================================================
+
+MainSplashScreenCloser::MainSplashScreenCloser(MainSplashScreen& splashScreen, unsigned long sleepTime)
+: m_pSplashScreenToHide(splashScreen)
+, m_iSecondsToSleep(sleepTime)
 {
+    connect(this, &MainSplashScreenCloser::closeSplashscreen,
+            &m_pSplashScreenToHide, &QWidget::close);
+}
 
 //=============================================================================================================
-// MNESCAN FORWARD DECLARATIONS
-//=============================================================================================================
 
-
-/**
- * Provides a class for QThread to work on a separate thread, just to hide the splash screen window whenever
- * found convenient.
- */
-class MainSplashScreenHider : public QThread
+MainSplashScreenCloser::~MainSplashScreenCloser()
 {
-    Q_OBJECT
-public:
-    typedef QSharedPointer<MainSplashScreenHider> SPtr;               /**< Shared pointer type for MainSplashScreenHider. */
-    typedef QSharedPointer<const MainSplashScreenHider> ConstSPtr;    /**< Const shared pointer type for MainSplashScreenHider. */
-    //=========================================================================================================
-    MainSplashScreenHider(MainSplashScreen& splashScreen);
+  quit();
+  #if QT_VERSION >= QT_VERSION_CHECK(5,2,0)
+  requestInterruption();
+  #endif
+  wait();
+}
 
-    //=========================================================================================================
-    MainSplashScreenHider(MainSplashScreen& splashScreen, unsigned long sleepTime);
+//=============================================================================================================
 
-    //=========================================================================================================
-    ~MainSplashScreenHider();
+void MainSplashScreenCloser::run()
+{
+    sleep(m_iSecondsToSleep);
 
+    emit closeSplashscreen();
+}
 
-signals:
-
-    //=========================================================================================================
-    /**
-     * Notifies that splash window should be closed
-     */
-    void closeSplashscreen();
-
-protected:
-    //=========================================================================================================
-    /**
-     * Method to be run from another thread.
-     */
-    void run();
-
-    MainSplashScreen& m_pSplashScreenToHide;       /**< Pointer to the slpash screen to hide.*/
-    unsigned long   m_iSecondsToSleep;                                  /**< Time to wait before hiding the splash window.*/
-};
-
-} // namespace MNESCAN
-#endif // MAINSPLASHSCREENHIDER_H
+//=============================================================================================================

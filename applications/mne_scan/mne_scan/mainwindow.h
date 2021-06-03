@@ -42,7 +42,7 @@
 
 #include "info.h"
 #include "mainsplashscreen.h"
-#include "mainsplashscreenhider.h"
+#include "mainsplashscreencloser.h"
 
 #include <disp/viewers/abstractview.h>
 
@@ -433,7 +433,7 @@ private:
 
     QPointer<DISPLIB::QuickControlView> m_pQuickControlView;            /**< quick control widget. */
 
-    MainSplashScreenHider::SPtr         m_pSplashScreenHider;           /**< Holds the object responsible of hiding the splashscreen. */
+    MainSplashScreenCloser::SPtr         m_pSplashScreenHider;           /**< Holds the object responsible of hiding the splashscreen. */
     MainSplashScreen::SPtr              m_pSplashScreen;                /**< Holds the splash screen. */
 
     QSharedPointer<QTimer>                              m_pTimer;               /**< timer of the main application*/
