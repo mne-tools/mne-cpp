@@ -69,11 +69,11 @@ MainSplashScreenHider::MainSplashScreenHider(MainSplashScreen& splashScreen)
 //=============================================================================================================
 
 MainSplashScreenHider::MainSplashScreenHider(MainSplashScreen& splashScreen, unsigned long sleepTime)
-: m_pSplashScreenToHide(splashScreen)
+: m_pSlashScreenToHide(splashScreen)
 , m_iSecondsToSleep(sleepTime)
 {
     connect(this,&MainSplashScreenHider::closeSplashScreen,
-            &m_pSplashScreenToHide,&MainSplashScreen::close,
+            &m_pSlashScreenToHide,&MainSplashScreen::close,
             Qt::ConnectionType::QueuedConnection);
 }
 
