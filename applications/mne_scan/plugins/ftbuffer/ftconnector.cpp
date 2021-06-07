@@ -63,6 +63,7 @@ FtConnector::FtConnector()
 :m_iNumSamples(0)
 ,m_iNumNewSamples(0)
 ,m_iNumChannels(0)
+,m_iExtendedHeaderSize(0)
 ,m_iPort(1972)
 ,m_bNewData(false)
 ,m_fSampleFreq(0)
@@ -550,12 +551,15 @@ FIFFLIB::FiffInfo FtConnector::parseExtenedHeaders()
 
     int iRead = 0;
 
+    std::cout << "Parsing extended header\n";
+
     while(iRead < m_iExtendedHeaderSize) {
         qint32 iType;
         char cType[sizeof(qint32)];
         chunkBuffer.read(cType, sizeof(qint32));
         std::memcpy(&iType, cType, sizeof(qint32));
         iRead += sizeof(qint32);
+        std::cout << "Read header of type" << iType << "\n";
 
         if(iType == 8) { // Header we care about, FT_CHUNK_NEUROMAG_HEADER = 8
             qint32 iSize;
@@ -627,6 +631,8 @@ FIFFLIB::FiffInfo FtConnector::parseExtenedHeaders()
         }
     }
 
+    std::cout << "No extended header\n";
+
     return infoFromSimpleHeader();
 }
 
@@ -673,4 +679,6 @@ FIFFLIB::FiffInfo FtConnector::infoFromSimpleHeader()
 
         defaultInfo.chs.append(channel);
     }
+
+    return defaultInfo;
 }
