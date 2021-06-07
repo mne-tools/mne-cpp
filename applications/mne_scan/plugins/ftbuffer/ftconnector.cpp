@@ -204,7 +204,7 @@ bool FtConnector::parseHeaderDef(QBuffer &readBuffer)
     m_fSampleFreq = headerdef.fsample;
     m_iNumNewSamples = headerdef.nsamples;
     m_iDataType = headerdef.data_type;
-    m_iNeuromagHeader = headerdef.bufsize;
+    m_iExtendedHeaderSize = headerdef.bufsize;
 
     qInfo() << "[FtConnector::parseHeaderDef] Got header parameters.";
 
@@ -537,7 +537,7 @@ QString FtConnector::getAddr()
 
 //=============================================================================================================
 
-FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
+FIFFLIB::FiffInfo FtConnector::parseExtenedHeaders()
 {
     qInfo() << "[FtConnector::parseNeuromagHeader] Attempting to get extended header...";
 
@@ -546,41 +546,30 @@ FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
 
     getHeader();
 
-    prepBuffer(chunkBuffer, m_iNeuromagHeader);
+    prepBuffer(chunkBuffer, m_iExtendedHeaderSize);
 
-    bool condition = true;
+    int iRead = 0;
 
-    while(condition) {
+    while(iRead < m_iExtendedHeaderSize) {
         qint32 iType;
         char cType[sizeof(qint32)];
         chunkBuffer.read(cType, sizeof(qint32));
         std::memcpy(&iType, cType, sizeof(qint32));
+        iRead += sizeof(qint32);
 
-        //Headers we don't care about
-        if(iType < 8) {
+        if(iType == 8) { // Header we care about, FT_CHUNK_NEUROMAG_HEADER = 8
             qint32 iSize;
             char cSize[sizeof(qint32)];
 
             //read size of chunk
             chunkBuffer.read(cSize, sizeof(qint32));
             std::memcpy(&iSize, cSize, sizeof(qint32));
-
-            //read rest of chunk (to clear buffer to read next chunk)
-            char* cRest;
-            cRest = new char[sizeof(char) * iSize + 1];
-            chunkBuffer.read(cRest, iSize);
-            delete cRest;
-        } else if(iType == 8) { // Header we care about, FT_CHUNK_NEUROMAG_HEADER = 8
-            qint32 iSize;
-            char cSize[sizeof(qint32)];
-
-            //read size of chunk
-            chunkBuffer.read(cSize, sizeof(qint32));
-            std::memcpy(&iSize, cSize, sizeof(qint32));
+            iRead += sizeof(qint32);
 
             //Read relevant chunk info
             neuromagBuffer.open(QIODevice::ReadWrite);
             neuromagBuffer.write(chunkBuffer.read(iSize));
+            iRead += iSize;
 
             qint32_be iIntToChar;
             char cCharFromInt[sizeof (qint32)];
@@ -624,14 +613,21 @@ FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
 
             return FifInfo; //Returns this if all went well
         } else {
-            qCritical() << "Unable to recongine chunk data. Plugin behavior undefined";
-            FIFFLIB::FiffInfo defaultInfo;
-            return defaultInfo;
+            qint32 iSize;
+            char cSize[sizeof(qint32)];
+
+            //read size of chunk
+            chunkBuffer.read(cSize, sizeof(qint32));
+            std::memcpy(&iSize, cSize, sizeof(qint32));
+            iRead += sizeof(qint32);
+
+            //read rest of chunk (to clear buffer to read next chunk)
+            chunkBuffer.skip(iSize);
+            iRead += iSize;
         }
     }
-    //Should never be reached, but returns default fiffinfo for safety
-    FIFFLIB::FiffInfo defaultInfo;
-    return defaultInfo;
+
+    return infoFromSimpleHeader();
 }
 
 //=============================================================================================================
@@ -639,4 +635,42 @@ FIFFLIB::FiffInfo FtConnector::parseNeuromagHeader()
 void FtConnector::catchUpToBuffer()
 {
     m_iNumSamples = totalBuffSamples();
+}
+
+//=============================================================================================================
+
+BufferInfo FtConnector::getBufferInfo()
+{
+    BufferInfo info;
+    info.iNumSamples    = m_iNumSamples;
+    info.iNumNewSamples = m_iNumNewSamples;
+    info.iMsgSamples    = m_iMsgSamples;
+    info.iNumChannels   = m_iNumChannels;
+    info.iDataType      = m_iDataType;
+
+    return info;
+}
+
+//=============================================================================================================
+
+FIFFLIB::FiffInfo FtConnector::infoFromSimpleHeader()
+{
+    FIFFLIB::FiffInfo defaultInfo;
+
+    defaultInfo.sfreq = m_fSampleFreq;
+    defaultInfo.nchan = m_iNumChannels;
+
+    defaultInfo.chs.clear();
+
+    for (int i = 0; i< m_iNumChannels; i++){
+        FIFFLIB::FiffChInfo channel;
+
+        channel.ch_name = "Ch. " + QString::number(i);
+        channel.kind = FIFFV_MEG_CH;
+        channel.unit = FIFF_UNIT_T;
+        channel.unit_mul = FIFF_UNITM_NONE;
+        channel.chpos.coil_type = FIFFV_COIL_NONE;
+
+        defaultInfo.chs.append(channel);
+    }
 }
