@@ -678,6 +678,8 @@ FIFFLIB::FiffInfo FtConnector::infoFromSimpleHeader()
         channel.chpos.coil_type = FIFFV_COIL_NONE;
 
         defaultInfo.chs.append(channel);
+
+        defaultInfo.ch_names.append("Ch. " + QString::number(i));
     }
 
     return defaultInfo;
