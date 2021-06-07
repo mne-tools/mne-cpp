@@ -139,6 +139,14 @@ typedef struct {
     qint32 nevents;
 } samples_events_t;
 
+struct BufferInfo{
+    int     iNumSamples;                          /**< Number of samples we've read from the buffer. */
+    int     iNumNewSamples;                       /**< Number of total samples (read and unread) in the buffer. */
+    int     iMsgSamples;                          /**< Number of samples in the latest buffer transmission receied. */
+    int     iNumChannels;                         /**< Number of channels in the buffer data. */
+    int     iDataType;                            /**< Type of data in the buffer. */
+};
+
 //=============================================================================================================
 
 class FtConnector : public QObject
@@ -264,13 +272,15 @@ public:
      *
      * @return returns the FiffInfo from the parsed fif file from the neuromag header chunk.
      */
-    FIFFLIB::FiffInfo parseNeuromagHeader();
+    FIFFLIB::FiffInfo parseExtenedHeaders();
 
     //=========================================================================================================
     /**
      * Gets the current number of samples in the buffer and stores it in m_iNumSamples
      */
     void catchUpToBuffer();
+
+    BufferInfo getBufferInfo();
 
 private:
     //=========================================================================================================
@@ -357,12 +367,14 @@ private:
      */
     int totalBuffSamples();
 
+    FIFFLIB::FiffInfo infoFromSimpleHeader();
+
     int                                     m_iNumSamples;                          /**< Number of samples we've read from the buffer. */
     int                                     m_iNumNewSamples;                       /**< Number of total samples (read and unread) in the buffer. */
     int                                     m_iMsgSamples;                          /**< Number of samples in the latest buffer transmission receied. */
     int                                     m_iNumChannels;                         /**< Number of channels in the buffer data. */
     int                                     m_iDataType;                            /**< Type of data in the buffer. */
-    int                                     m_iNeuromagHeader;                      /**< Size of neuromag header chunk. */
+    int                                     m_iExtendedHeaderSize;                          /**< Size of extended header chunks. */
     quint16                                 m_iPort;                                /**< Port where the ft bufferis found. */
 
     bool                                    m_bNewData;                             /**< Indicate whether we've received new data. */
