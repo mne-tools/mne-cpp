@@ -259,7 +259,11 @@ bool FtBuffer::setupRTMSA(FIFFLIB::FiffInfo FiffInfo)
         return false;
     }
 
+    std::cout << "attempting to init info\n";
+
     m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo (FiffInfo));
+
+    std::cout << "init info\n";
 
     //Set the RMTSA parameters
     m_pRTMSA_BufferOutput->measurementData()->initFromFiffInfo(m_pFiffInfo);
