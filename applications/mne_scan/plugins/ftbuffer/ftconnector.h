@@ -367,6 +367,8 @@ private:
      */
     int totalBuffSamples();
 
+    FIFFLIB::FiffInfo infoFromNeuromagHeader(QBuffer& neuromagBuffer);
+
     FIFFLIB::FiffInfo infoFromSimpleHeader();
 
     int                                     m_iNumSamples;                          /**< Number of samples we've read from the buffer. */
