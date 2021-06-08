@@ -542,6 +542,10 @@ FIFFLIB::FiffInfo FtConnector::parseExtenedHeaders()
 {
     qInfo() << "[FtConnector::parseNeuromagHeader] Attempting to get extended header...";
 
+    FIFFLIB::FiffInfo info;
+
+    bool extendedHeaderFound = false;
+
     QBuffer chunkBuffer;
     QBuffer neuromagBuffer;
 
@@ -575,48 +579,13 @@ FIFFLIB::FiffInfo FtConnector::parseExtenedHeaders()
             neuromagBuffer.write(chunkBuffer.read(iSize));
             iRead += iSize;
 
-            qint32_be iIntToChar;
-            char cCharFromInt[sizeof (qint32)];
+            info = infoFromNeuromagHeader(neuromagBuffer);
+            extendedHeaderFound = true;
+        }else if(iType == 9) { // FT_CHUNK_NEUROMAG_ISOTRAK = 9
 
-            //Append read info with -1 to have a Fiff tag with 'next' == -1
-            iIntToChar = -1;
-            memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
-            neuromagBuffer.write(cCharFromInt);
-            iIntToChar = -1;
-            memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
-            neuromagBuffer.write(cCharFromInt);
-            iIntToChar = -1;
-            memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
-            neuromagBuffer.write(cCharFromInt);
-            iIntToChar = -1;
-            memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
-            neuromagBuffer.write(cCharFromInt);
+        }else if(iType == 10) {// FT_CHUNK_NEUROMAG_HPIRESULT = 10
 
-            neuromagBuffer.reset();
-
-            //Format data into Little endian FiffStream so we can read it with the fiff library
-            FIFFLIB::FiffStream::SPtr pStream(new FIFFLIB::FiffStream(&neuromagBuffer));
-            pStream->setByteOrder(QDataStream::LittleEndian);
-
-            //Opens and created a dir tree (this is why we had to append -1)
-            if(!pStream->open()) {
-                qCritical() << "Unable to open neuromag fiff data. Plugin behavior undefined";
-                FIFFLIB::FiffInfo defaultInfo;
-                return defaultInfo;
-            }
-
-            FIFFLIB::FiffInfo FifInfo;
-            FIFFLIB::FiffDirNode::SPtr DirNode;
-
-            //Get Fiff info we care about
-            if(!pStream->read_meas_info(pStream->dirtree(), FifInfo, DirNode)) {
-                qCritical() << "Unable to parse neuromag fiff data. Plugin behavior undefined";
-                FIFFLIB::FiffInfo defaultInfo;
-                return defaultInfo;
-            }
-
-            return FifInfo; //Returns this if all went well
-        } else {
+        }else {
             qint32 iSize;
             char cSize[sizeof(qint32)];
 
@@ -631,9 +600,12 @@ FIFFLIB::FiffInfo FtConnector::parseExtenedHeaders()
         }
     }
 
-    std::cout << "No extended header\n";
+    if (!extendedHeaderFound){
+        std::cout << "No extended header\n";
+        info = infoFromSimpleHeader();
+    }
 
-    return infoFromSimpleHeader();
+    return info;
 }
 
 //=============================================================================================================
@@ -683,4 +655,53 @@ FIFFLIB::FiffInfo FtConnector::infoFromSimpleHeader()
     }
 
     return defaultInfo;
+}
+
+//=============================================================================================================
+
+FIFFLIB::FiffInfo FtConnector::infoFromNeuromagHeader(QBuffer &neuromagBuffer)
+{
+    qint32_be iIntToChar;
+    char cCharFromInt[sizeof (qint32)];
+
+    //Append read info with -1 to have a Fiff tag with 'next' == -1
+    iIntToChar = -1;
+    memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
+    neuromagBuffer.write(cCharFromInt);
+    iIntToChar = -1;
+    memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
+    neuromagBuffer.write(cCharFromInt);
+    iIntToChar = -1;
+    memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
+    neuromagBuffer.write(cCharFromInt);
+    iIntToChar = -1;
+    memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
+    neuromagBuffer.write(cCharFromInt);
+
+    neuromagBuffer.reset();
+
+    //Format data into Little endian FiffStream so we can read it with the fiff library
+    FIFFLIB::FiffStream::SPtr pStream(new FIFFLIB::FiffStream(&neuromagBuffer));
+    pStream->setByteOrder(QDataStream::LittleEndian);
+
+    //Opens and created a dir tree (this is why we had to append -1)
+    if(!pStream->open()) {
+        qCritical() << "Unable to open neuromag fiff data. Plugin behavior undefined";
+        FIFFLIB::FiffInfo defaultInfo;
+        return defaultInfo;
+    }
+
+    FIFFLIB::FiffInfo FifInfo;
+    FIFFLIB::FiffDirNode::SPtr DirNode;
+
+    //Get Fiff info we care about
+    if(!pStream->read_meas_info(pStream->dirtree(), FifInfo, DirNode)) {
+        qCritical() << "Unable to parse neuromag fiff data. Plugin behavior undefined";
+        FIFFLIB::FiffInfo defaultInfo;
+        return defaultInfo;
+    }
+
+    //do we have isotrack and hpi dat in the buffer as well?
+
+    return FifInfo; //Returns this if all went well
 }
