@@ -444,7 +444,7 @@ void ChannelSelectionView::loadSettings()
     setCurrentLayoutFile(settings.value(m_sSettingsPath + QString("/ChannelSelectionView/selectedLayoutFile"), "Vectorview-all.lout").toString());
     loadSelectionGroups(QCoreApplication::applicationDirPath() + settings.value(m_sSettingsPath + QString("/ChannelSelectionView/selectedGroupFile"), "mne_browse_raw_vv.sel").toString().prepend("/resources/general/selectionGroups/"));
 
-    std::cout << "loadSettings: " << getCurrentLayoutFile().toStdString();
+    qDebug() << "loadSettings: " << getCurrentLayoutFile();
 
     QPoint pos = settings.value(m_sSettingsPath + QString("/ChannelSelectionView/channelSelectionViewPos"), QPoint(100,100)).toPoint();
 
