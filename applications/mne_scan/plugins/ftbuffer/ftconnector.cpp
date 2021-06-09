@@ -547,7 +547,6 @@ FIFFLIB::FiffInfo FtConnector::parseExtenedHeaders()
     bool extendedHeaderFound = false;
 
     QBuffer chunkBuffer;
-    QBuffer neuromagBuffer;
 
     getHeader();
 
@@ -574,6 +573,8 @@ FIFFLIB::FiffInfo FtConnector::parseExtenedHeaders()
             std::memcpy(&iSize, cSize, sizeof(qint32));
             iRead += sizeof(qint32);
 
+            QBuffer neuromagBuffer;
+
             //Read relevant chunk info
             neuromagBuffer.open(QIODevice::ReadWrite);
             neuromagBuffer.write(chunkBuffer.read(iSize));
@@ -582,9 +583,23 @@ FIFFLIB::FiffInfo FtConnector::parseExtenedHeaders()
             info = infoFromNeuromagHeader(neuromagBuffer);
             extendedHeaderFound = true;
         }else if(iType == 9) { // FT_CHUNK_NEUROMAG_ISOTRAK = 9
+            qint32 iSize;
+            char cSize[sizeof(qint32)];
+
+            //read size of chunk
+            chunkBuffer.read(cSize, sizeof(qint32));
+            std::memcpy(&iSize, cSize, sizeof(qint32));
+            iRead += sizeof(qint32);
+
+            QBuffer isotrakBuffer;
+
+            //Read relevant chunk info
+            isotrakBuffer.open(QIODevice::ReadWrite);
+            isotrakBuffer.write(chunkBuffer.read(iSize));
+            iRead += iSize;
 
         }else if(iType == 10) {// FT_CHUNK_NEUROMAG_HPIRESULT = 10
-
+            //do nothing for now
         }else {
             qint32 iSize;
             char cSize[sizeof(qint32)];
