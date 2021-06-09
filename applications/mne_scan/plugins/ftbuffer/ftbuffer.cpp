@@ -77,9 +77,6 @@ FtBuffer::FtBuffer()
 
 FtBuffer::~FtBuffer()
 {
-    if(this->isRunning()) {
-        stop();
-    }
 }
 
 //=============================================================================================================
@@ -156,7 +153,7 @@ bool FtBuffer::stop()
     }
 
     requestInterruption();
-    wait(500);
+    wait();
 
     //Reset ftproducer and sample received list
     m_pFtBuffProducer.clear();
