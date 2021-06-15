@@ -565,53 +565,23 @@ FIFFLIB::FiffInfo FtConnector::parseExtenedHeaders()
         std::cout << "Read header of type" << iType << "\n";
 
         if(iType == 8) { // Header we care about, FT_CHUNK_NEUROMAG_HEADER = 8
-            qint32 iSize;
-            char cSize[sizeof(qint32)];
-
-            //read size of chunk
-            chunkBuffer.read(cSize, sizeof(qint32));
-            std::memcpy(&iSize, cSize, sizeof(qint32));
-            iRead += sizeof(qint32);
-
             QBuffer neuromagBuffer;
 
-            //Read relevant chunk info
-            neuromagBuffer.open(QIODevice::ReadWrite);
-            neuromagBuffer.write(chunkBuffer.read(iSize));
-            iRead += iSize;
+            moveBufferData(chunkBuffer, neuromagBuffer, iRead);
 
             info = infoFromNeuromagHeader(neuromagBuffer);
             extendedHeaderFound = true;
         }else if(iType == 9) { // FT_CHUNK_NEUROMAG_ISOTRAK = 9
-            qint32 iSize;
-            char cSize[sizeof(qint32)];
-
-            //read size of chunk
-            chunkBuffer.read(cSize, sizeof(qint32));
-            std::memcpy(&iSize, cSize, sizeof(qint32));
-            iRead += sizeof(qint32);
-
             QBuffer isotrakBuffer;
 
-            //Read relevant chunk info
-            isotrakBuffer.open(QIODevice::ReadWrite);
-            isotrakBuffer.write(chunkBuffer.read(iSize));
-            iRead += iSize;
+            moveBufferData(chunkBuffer, isotrakBuffer, iRead);
+            digDataFromIsotrakHeader(isotrakBuffer);
 
         }else if(iType == 10) {// FT_CHUNK_NEUROMAG_HPIRESULT = 10
             //do nothing for now
+            skipBufferData(chunkBuffer, iRead);
         }else {
-            qint32 iSize;
-            char cSize[sizeof(qint32)];
-
-            //read size of chunk
-            chunkBuffer.read(cSize, sizeof(qint32));
-            std::memcpy(&iSize, cSize, sizeof(qint32));
-            iRead += sizeof(qint32);
-
-            //read rest of chunk (to clear buffer to read next chunk)
-            chunkBuffer.skip(iSize);
-            iRead += iSize;
+            skipBufferData(chunkBuffer, iRead);
         }
     }
 
@@ -719,4 +689,46 @@ FIFFLIB::FiffInfo FtConnector::infoFromNeuromagHeader(QBuffer &neuromagBuffer)
     //do we have isotrack and hpi dat in the buffer as well?
 
     return FifInfo; //Returns this if all went well
+}
+
+//=============================================================================================================
+
+FIFFLIB::FiffDigitizerData FtConnector::digDataFromIsotrakHeader(QBuffer& neuromagBuffer)
+{
+
+}
+
+//=============================================================================================================
+
+void FtConnector::moveBufferData(QBuffer &from, QBuffer &to, qint32& iCount)
+{
+    qint32 iSize;
+    char cSize[sizeof(qint32)];
+
+    //read size of chunk
+    from.read(cSize, sizeof(qint32));
+    std::memcpy(&iSize, cSize, sizeof(qint32));
+    iCount += sizeof(qint32);
+
+    //Read relevant chunk info
+    to.open(QIODevice::ReadWrite);
+    to.write(from.read(iSize));
+    iCount += iSize;
+}
+
+//=============================================================================================================
+
+void FtConnector::skipBufferData(QBuffer &buffer, qint32& iCount)
+{
+    qint32 iSize;
+    char cSize[sizeof(qint32)];
+
+    //read size of chunk
+    buffer.read(cSize, sizeof(qint32));
+    std::memcpy(&iSize, cSize, sizeof(qint32));
+    iCount += sizeof(qint32);
+
+    //read rest of chunk (to clear buffer to read next chunk)
+    buffer.skip(iSize);
+    iCount += iSize;
 }
