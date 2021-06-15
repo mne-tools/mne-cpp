@@ -692,9 +692,17 @@ FIFFLIB::FiffInfo FtConnector::infoFromNeuromagHeader(QBuffer &neuromagBuffer)
 
 //=============================================================================================================
 
-FIFFLIB::FiffDigitizerData FtConnector::digDataFromIsotrakHeader(QBuffer& neuromagBuffer)
+FIFFLIB::FiffDigitizerData FtConnector::digDataFromIsotrakHeader(QBuffer& isotrakBuffer)
 {
+    isotrakBuffer.reset();
 
+    FIFFLIB::FiffStream stream(&isotrakBuffer);
+    FIFFLIB::FiffDigitizerData digData;
+
+    stream.open();
+    stream.read_digitizer_data(stream.dirtree(), digData);
+
+    return digData;
 }
 
 //=============================================================================================================

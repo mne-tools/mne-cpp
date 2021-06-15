@@ -270,6 +270,23 @@ bool FtBuffer::setupRTMSA(FIFFLIB::FiffInfo FiffInfo)
 
 //=============================================================================================================
 
+bool FtBuffer::setupRTMSA(MetaData metadata)
+{
+    if (metadata.info.sfreq < 0) {
+        return false;
+    }
+
+    m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo (metadata.info));
+
+    m_pRTMSA_BufferOutput->measurementData()->initFromFiffInfo(m_pFiffInfo);
+    m_pRTMSA_BufferOutput->measurementData()->setMultiArraySize(1);
+    m_pRTMSA_BufferOutput->measurementData()->setVisibility(true);
+
+    return m_bIsConfigured = true;
+}
+
+//=============================================================================================================
+
 void FtBuffer::setBufferAddress(const QString &sAddress)
 {
     m_sBufferAddress = sAddress;
