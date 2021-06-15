@@ -148,6 +148,19 @@ struct BufferInfo{
     int     iDataType;                            /**< Type of data in the buffer. */
 };
 
+struct MetaData{
+    bool bFiffInfo = false;
+    FIFFLIB::FiffInfo info;
+    bool bFiffDigitizerData = false;
+    FIFFLIB::FiffDigitizerData dig;
+
+    void setFiffinfo(FIFFLIB::FiffInfo newinfo) {info = newinfo;
+                                                 bFiffInfo = true;};
+
+    void setFiffDigitizerData(FIFFLIB::FiffDigitizerData newdig) {dig = newdig;
+                                                                  bFiffDigitizerData = true;};
+};
+
 //=============================================================================================================
 
 class FtConnector : public QObject
@@ -273,7 +286,7 @@ public:
      *
      * @return returns the FiffInfo from the parsed fif file from the neuromag header chunk.
      */
-    FIFFLIB::FiffInfo parseExtenedHeaders();
+    MetaData parseExtenedHeaders();
 
     //=========================================================================================================
     /**
@@ -374,9 +387,11 @@ private:
 
     FIFFLIB::FiffDigitizerData digDataFromIsotrakHeader(QBuffer& neuromagBuffer);
 
-    void moveBufferData(QBuffer& from, QBuffer& to, qint32& iCount);
+    int getExtendedHeaderType(QBuffer& buffer, qint32& iReadCount);
 
-    void skipBufferData(QBuffer& buffer, qint32& iCount);
+    void moveBufferData(QBuffer& from, QBuffer& to, qint32& iReadCount);
+
+    void skipBufferData(QBuffer& buffer, qint32& iReadCount);
 
     int                                     m_iNumSamples;                          /**< Number of samples we've read from the buffer. */
     int                                     m_iNumNewSamples;                       /**< Number of total samples (read and unread) in the buffer. */
