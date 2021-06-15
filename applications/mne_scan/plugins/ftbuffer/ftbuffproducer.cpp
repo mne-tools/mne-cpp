@@ -142,17 +142,21 @@ void FtBuffProducer::connectToBuffer(QString addr,
     //Try to get info from buffer first, then resort to file
     if(m_pFtConnector->connect()) {
         auto metadata = m_pFtConnector->parseExtenedHeaders();
-        if(metadata.bFiffInfo){
-            if (m_pFtBuffer->setupRTMSA(metadata.info)) {
-                emit connecStatus(true);
-                return;
-            }
+        if (m_pFtBuffer->setupRTMSA(metadata)){
+            emit connecStatus(true);
+            return;
         }
-        if(metadata.bFiffDigitizerData){
+//        if(metadata.bFiffInfo){
+//            if (m_pFtBuffer->setupRTMSA(metadata.info)) {
+//                emit connecStatus(true);
+//                return;
+//            }
+//        }
+//        if(metadata.bFiffDigitizerData){
 
-        }
+//        }
     }
-    emit connecStatus(false); //this happens if all goes well
+    emit connecStatus(false); //this happens if all goes wQBuffer& buffer, qint32& iCountell
 }
 
 //=============================================================================================================

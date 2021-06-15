@@ -385,7 +385,7 @@ private:
 
     FIFFLIB::FiffInfo infoFromSimpleHeader();
 
-    FIFFLIB::FiffDigitizerData digDataFromIsotrakHeader(QBuffer& neuromagBuffer);
+    FIFFLIB::FiffDigitizerData digDataFromIsotrakHeader(QBuffer& isotrakBuffer);
 
     int getExtendedHeaderType(QBuffer& buffer, qint32& iReadCount);
 

@@ -229,6 +229,8 @@ private:
      */
     bool setupRTMSA(FIFFLIB::FiffInfo FiffInfo);
 
+    bool setupRTMSA(MetaData metadata);
+
     bool                                                                                m_bIsConfigured;                /**< Whether the buffer output has been configured. */
 
     QMutex                                                                              m_mutex;                        /**< Guards shared data from being accessed at the same time. */
