@@ -45,6 +45,7 @@
 #include "realtimesamplearraychinfo.h"
 
 #include <fiff/fiff_info.h>
+#include <fiff/c/fiff_digitizer_data.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -207,10 +208,13 @@ public:
      */
     virtual void setValue(const Eigen::MatrixXd& mat);
 
+    virtual void setFiffDigitizerData(FIFFLIB::FiffDigitizerData::SPtr digData);
+
 private:
     mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety. */
 
     FIFFLIB::FiffInfo::SPtr     m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
+    FIFFLIB::FiffDigitizerData::SPtr m_pFiffDigitizerData_orig;
 
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
     float                       m_fSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
