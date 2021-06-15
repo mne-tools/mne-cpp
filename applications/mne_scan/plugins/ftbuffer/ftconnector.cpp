@@ -538,59 +538,58 @@ QString FtConnector::getAddr()
 
 //=============================================================================================================
 
-FIFFLIB::FiffInfo FtConnector::parseExtenedHeaders()
+MetaData FtConnector::parseExtenedHeaders()
 {
     qInfo() << "[FtConnector::parseNeuromagHeader] Attempting to get extended header...";
 
-    FIFFLIB::FiffInfo info;
-
-    bool extendedHeaderFound = false;
-
+    MetaData metadata;
     QBuffer chunkBuffer;
 
+    bool extendedHeaderFound = false;
+    int iReadCount = 0;
+
     getHeader();
-
     prepBuffer(chunkBuffer, m_iExtendedHeaderSize);
-
-    int iRead = 0;
 
     std::cout << "Parsing extended header\n";
 
-    while(iRead < m_iExtendedHeaderSize) {
-        qint32 iType;
-        char cType[sizeof(qint32)];
-        chunkBuffer.read(cType, sizeof(qint32));
-        std::memcpy(&iType, cType, sizeof(qint32));
-        iRead += sizeof(qint32);
-        std::cout << "Read header of type" << iType << "\n";
+    while(iReadCount < m_iExtendedHeaderSize) {
+        int iType = getExtendedHeaderType(chunkBuffer, iReadCount);
 
-        if(iType == 8) { // Header we care about, FT_CHUNK_NEUROMAG_HEADER = 8
+        switch(iType){
+        case 8:{ //FT_CHUNK_NEUROMAG_HEADER = 8
             QBuffer neuromagBuffer;
+            moveBufferData(chunkBuffer, neuromagBuffer, iReadCount);
 
-            moveBufferData(chunkBuffer, neuromagBuffer, iRead);
-
-            info = infoFromNeuromagHeader(neuromagBuffer);
+            metadata.setFiffinfo(infoFromNeuromagHeader(neuromagBuffer));
             extendedHeaderFound = true;
-        }else if(iType == 9) { // FT_CHUNK_NEUROMAG_ISOTRAK = 9
+            break;
+        }
+        case 9:{ //FT_CHUNK_NEUROMAG_ISOTRAK = 9
             QBuffer isotrakBuffer;
 
-            moveBufferData(chunkBuffer, isotrakBuffer, iRead);
-            digDataFromIsotrakHeader(isotrakBuffer);
-
-        }else if(iType == 10) {// FT_CHUNK_NEUROMAG_HPIRESULT = 10
+            moveBufferData(chunkBuffer, isotrakBuffer, iReadCount);
+            metadata.setFiffDigitizerData(digDataFromIsotrakHeader(isotrakBuffer));
+            break;
+        }
+        case 10:{ //FT_CHUNK_NEUROMAG_HPIRESULT = 10
             //do nothing for now
-            skipBufferData(chunkBuffer, iRead);
-        }else {
-            skipBufferData(chunkBuffer, iRead);
+            skipBufferData(chunkBuffer, iReadCount);
+            break;
+        }
+        default:{
+            skipBufferData(chunkBuffer, iReadCount);
+            break;
+        }
         }
     }
 
     if (!extendedHeaderFound){
         std::cout << "No extended header\n";
-        info = infoFromSimpleHeader();
+        metadata.setFiffinfo(infoFromSimpleHeader());
     }
 
-    return info;
+    return metadata;
 }
 
 //=============================================================================================================
@@ -700,7 +699,7 @@ FIFFLIB::FiffDigitizerData FtConnector::digDataFromIsotrakHeader(QBuffer& neurom
 
 //=============================================================================================================
 
-void FtConnector::moveBufferData(QBuffer &from, QBuffer &to, qint32& iCount)
+void FtConnector::moveBufferData(QBuffer &from, QBuffer &to, qint32& iReadCount)
 {
     qint32 iSize;
     char cSize[sizeof(qint32)];
@@ -708,17 +707,17 @@ void FtConnector::moveBufferData(QBuffer &from, QBuffer &to, qint32& iCount)
     //read size of chunk
     from.read(cSize, sizeof(qint32));
     std::memcpy(&iSize, cSize, sizeof(qint32));
-    iCount += sizeof(qint32);
+    iReadCount += sizeof(qint32);
 
     //Read relevant chunk info
     to.open(QIODevice::ReadWrite);
     to.write(from.read(iSize));
-    iCount += iSize;
+    iReadCount += iSize;
 }
 
 //=============================================================================================================
 
-void FtConnector::skipBufferData(QBuffer &buffer, qint32& iCount)
+void FtConnector::skipBufferData(QBuffer &buffer, qint32& iReadCount)
 {
     qint32 iSize;
     char cSize[sizeof(qint32)];
@@ -726,9 +725,24 @@ void FtConnector::skipBufferData(QBuffer &buffer, qint32& iCount)
     //read size of chunk
     buffer.read(cSize, sizeof(qint32));
     std::memcpy(&iSize, cSize, sizeof(qint32));
-    iCount += sizeof(qint32);
+    iReadCount += sizeof(qint32);
 
     //read rest of chunk (to clear buffer to read next chunk)
     buffer.skip(iSize);
-    iCount += iSize;
+    iReadCount += iSize;
+}
+
+//=============================================================================================================
+
+int FtConnector::getExtendedHeaderType(QBuffer &buffer, qint32 &iReadCount)
+{
+    qint32 iType;
+    char cType[sizeof(qint32)];
+
+    buffer.read(cType, sizeof(qint32));
+    std::memcpy(&iType, cType, sizeof(qint32));
+    iReadCount += sizeof(qint32);
+
+    std::cout << "Read header of type" << iType << "\n";
+    return iType;
 }

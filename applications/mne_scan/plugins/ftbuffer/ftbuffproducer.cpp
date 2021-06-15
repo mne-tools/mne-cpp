@@ -141,10 +141,15 @@ void FtBuffProducer::connectToBuffer(QString addr,
 
     //Try to get info from buffer first, then resort to file
     if(m_pFtConnector->connect()) {
-        if (m_pFtBuffer->setupRTMSA(m_pFtConnector->parseExtenedHeaders())) {
-            qInfo() << "[FtBuffProducer::connectToBuffer] Failed to read neuromag header from buffer.";
-            emit connecStatus(true);
-            return;
+        auto metadata = m_pFtConnector->parseExtenedHeaders();
+        if(metadata.bFiffInfo){
+            if (m_pFtBuffer->setupRTMSA(metadata.info)) {
+                emit connecStatus(true);
+                return;
+            }
+        }
+        if(metadata.bFiffDigitizerData){
+
         }
     }
     emit connecStatus(false); //this happens if all goes well
