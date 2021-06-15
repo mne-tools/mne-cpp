@@ -45,6 +45,7 @@
 
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_raw_data.h>
+#include <fiff/c/fiff_digitizer_data.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -370,6 +371,12 @@ private:
     FIFFLIB::FiffInfo infoFromNeuromagHeader(QBuffer& neuromagBuffer);
 
     FIFFLIB::FiffInfo infoFromSimpleHeader();
+
+    FIFFLIB::FiffDigitizerData digDataFromIsotrakHeader(QBuffer& neuromagBuffer);
+
+    void moveBufferData(QBuffer& from, QBuffer& to, qint32& iCount);
+
+    void skipBufferData(QBuffer& buffer, qint32& iCount);
 
     int                                     m_iNumSamples;                          /**< Number of samples we've read from the buffer. */
     int                                     m_iNumNewSamples;                       /**< Number of total samples (read and unread) in the buffer. */
