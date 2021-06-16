@@ -54,8 +54,6 @@ TEMPLATE = app
 
 QT += widgets network
 
-CONFIG += console
-
 !contains(MNECPP_CONFIG, withAppBundles) {
     CONFIG -= app_bundle
 }
@@ -64,6 +62,7 @@ DESTDIR = $${MNE_BINARY_DIR}
 
 TARGET = mne_anonymize
 CONFIG(debug, debug|release) {
+    CONFIG += console
     TARGET = $$join(TARGET,,,d)
 }
 
