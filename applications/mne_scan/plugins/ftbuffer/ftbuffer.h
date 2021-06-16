@@ -229,6 +229,12 @@ private:
      */
     bool setupRTMSA(FIFFLIB::FiffInfo FiffInfo);
 
+    //=========================================================================================================
+    /**
+     * Initializes output based on input measuremnt data object
+     *
+     * @param[in] metadata  object with fiffinfo and optionally digitizer data
+     */
     bool setupRTMSA(MetaData metadata);
 
     bool                                                                                m_bIsConfigured;                /**< Whether the buffer output has been configured. */

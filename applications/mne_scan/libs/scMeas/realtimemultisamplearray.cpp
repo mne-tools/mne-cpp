@@ -61,6 +61,8 @@ using namespace Eigen;
 
 RealTimeMultiSampleArray::RealTimeMultiSampleArray(QObject *parent)
 : Measurement(QMetaType::type("RealTimeMultiSampleArray::SPtr"), parent)
+, m_pFiffInfo_orig(nullptr)
+, m_pFiffDigitizerData_orig(nullptr)
 , m_fSamplingRate(0)
 , m_iMultiArraySize(10)
 , m_bChInfoIsInit(false)
@@ -258,3 +260,9 @@ void RealTimeMultiSampleArray::setValue(const MatrixXd& mat)
     }
 }
 
+//=============================================================================================================
+
+void RealTimeMultiSampleArray::setDigitizerData(FIFFLIB::FiffDigitizerData::SPtr digData)
+{
+    m_pFiffDigitizerData_orig = digData;
+}
