@@ -37,16 +37,17 @@
 
 include(../../../mne-cpp.pri)
 
+QMAKE_TARGET_DESCRIPTION = MNE Scan
+
 TEMPLATE = app
 
 QT += network core widgets xml svg charts concurrent opengl 3dextras
-
-CONFIG += console
 
 DESTDIR = $${MNE_BINARY_DIR}
 
 TARGET = mne_scan
 CONFIG(debug, debug|release) {
+    CONFIG += console
     TARGET = $$join(TARGET,,,d)
 }
 
