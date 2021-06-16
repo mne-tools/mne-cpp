@@ -227,6 +227,8 @@ public:
      */
     void writeToStream(FiffStream* p_pStream) const;
 
+    void print();
+
 private:
     //=========================================================================================================
     /**

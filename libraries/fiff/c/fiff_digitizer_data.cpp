@@ -41,6 +41,7 @@
 #include "fiff_digitizer_data.h"
 #include "fiff_coord_trans_old.h"
 #include "../fiff_dig_point.h"
+#include <iostream>
 
 #ifndef TRUE
 #define TRUE 1
@@ -162,3 +163,24 @@ FiffDigitizerData::~FiffDigitizerData()
     FREE_43(mri_fids);
 }
 
+//=============================================================================================================
+
+void FiffDigitizerData::print()
+{
+    std::cout << "Number of digitizer points: " << points.size() << "\n";
+
+    switch(coord_frame){
+    case FIFFV_COORD_MRI:
+        std::cout << "Coord. Frame: FIFFV_COORD_MRI \n";
+         break;
+    case FIFFV_COORD_HEAD:
+        std::cout << "Coord. Frame: FIFFV_COORD_HEAD \n";
+        break;
+    }
+
+    for (auto& point : points){
+        if (point.kind == FIFFV_POINT_HPI){
+            std::cout << "HPI Point " << point.ident << " - " << point.r[0] << ", " << point.r[1] << ", " << point.r[2] << "\n";
+        }
+    }
+}
