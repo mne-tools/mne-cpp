@@ -38,6 +38,8 @@
 
 include(../../mne-cpp.pri)
 
+QMAKE_TARGET_DESCRIPTION = MNE Anonymize
+
 #Application version
 VERSION_MAJOR = 0
 VERSION_MINOR = 99
@@ -54,8 +56,6 @@ TEMPLATE = app
 
 QT += widgets network
 
-CONFIG += console
-
 !contains(MNECPP_CONFIG, withAppBundles) {
     CONFIG -= app_bundle
 }
@@ -64,6 +64,7 @@ DESTDIR = $${MNE_BINARY_DIR}
 
 TARGET = mne_anonymize
 CONFIG(debug, debug|release) {
+    CONFIG += console
     TARGET = $$join(TARGET,,,d)
 }
 
