@@ -38,6 +38,8 @@
 
 include(../../mne-cpp.pri)
 
+QMAKE_TARGET_DESCRIPTION = MNE Anonymize
+
 #Application version
 VERSION_MAJOR = 0
 VERSION_MINOR = 99
