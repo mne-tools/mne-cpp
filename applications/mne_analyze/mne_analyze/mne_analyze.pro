@@ -37,7 +37,7 @@
 
 include(../../../mne-cpp.pri)
 
-QMAKE_TARGET_DESCRIPTION = A Framework for Electrophysiology.
+QMAKE_TARGET_DESCRIPTION = MNE Analyze
 
 TEMPLATE = app
 
