@@ -381,10 +381,32 @@ private:
      */
     int totalBuffSamples();
 
+    //=========================================================================================================
+    /**
+     * Returns FiffInfo object initilized based on fieldtrip neuromag header
+     *
+     * @param[in] neuromagBuffer    buffer with the neuromag header
+     *
+     * @return FiffInfo object based on fieldtrip neuromag header
+     */
     FIFFLIB::FiffInfo infoFromNeuromagHeader(QBuffer& neuromagBuffer);
 
+    //=========================================================================================================
+    /**
+     * Returns FiffInfo object initilized based on base filedtrip header info
+     *
+     * @return FiffInfo object based on filedtrip header
+     */
     FIFFLIB::FiffInfo infoFromSimpleHeader();
 
+    //=========================================================================================================
+    /**
+     * @brief digDataFromIsotrakHeader
+     *
+     * @param isotrakBuffer
+     *
+     * @return
+     */
     FIFFLIB::FiffDigitizerData digDataFromIsotrakHeader(QBuffer& isotrakBuffer);
 
     int getExtendedHeaderType(QBuffer& buffer, qint32& iReadCount);
