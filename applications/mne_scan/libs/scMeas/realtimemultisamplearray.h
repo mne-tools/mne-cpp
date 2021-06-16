@@ -208,7 +208,13 @@ public:
      */
     virtual void setValue(const Eigen::MatrixXd& mat);
 
-    virtual void setFiffDigitizerData(FIFFLIB::FiffDigitizerData::SPtr digData);
+    //=========================================================================================================
+    /**
+     * Sets digitizer data for measurement
+     *
+     * @param[in] digData   digitizer data from measurment
+     */
+    virtual void setDigitizerData(FIFFLIB::FiffDigitizerData::SPtr digData);
 
 private:
     mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety. */
