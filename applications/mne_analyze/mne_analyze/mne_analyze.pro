@@ -44,12 +44,11 @@ TEMPLATE = app
 QT += gui widgets network opengl svg concurrent charts
 qtHaveModule(printsupport): QT += printsupport
 
-CONFIG += console
-
 DESTDIR = $${MNE_BINARY_DIR}
 
 TARGET = mne_analyze
 CONFIG(debug, debug|release) {
+    CONFIG += console
     TARGET = $$join(TARGET,,,d)
 }
 
