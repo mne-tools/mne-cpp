@@ -89,8 +89,6 @@ int main(int argc, char* argv[])
     qtApp->setOrganizationName("MNE-CPP Project");
     qtApp->setApplicationName("MNE Anonymize");
 
-    qDebug() << "date: " << __DATE__;
-
     QScopedPointer<MNEANONYMIZE::SettingsControllerCl> controller(h->createController(qtApp->arguments()));
 
     return qtApp->exec();
