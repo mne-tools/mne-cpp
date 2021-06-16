@@ -37,6 +37,8 @@
 
 include(../../../mne-cpp.pri)
 
+QMAKE_TARGET_DESCRIPTION = MNE Scan
+
 TEMPLATE = app
 
 QT += network core widgets xml svg charts concurrent opengl 3dextras
