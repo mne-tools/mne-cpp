@@ -37,6 +37,8 @@
 
 include(../../../mne-cpp.pri)
 
+QMAKE_TARGET_DESCRIPTION = A Framework for Electrophysiology.
+
 TEMPLATE = app
 
 QT += gui widgets network opengl svg concurrent charts
