@@ -233,7 +233,7 @@ signals:
     /**
      * Signal the main qt core application to stop running and exit.
      */
-    void finished(const int) const;
+    void finished(const int);
 
 protected:
     FiffAnonymizer::SPtr m_pAnonymizer;     /**< Local pointer to a Fiffanonyzer object to configure and use.*/
