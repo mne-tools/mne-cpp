@@ -65,6 +65,7 @@ namespace FIFFLIB {
     class FiffInfo;
     class FiffDigPoint;
     class FiffCoordTrans;
+    class FiffDigitizerData;
 }
 
 namespace INVERSELIB {
@@ -251,9 +252,17 @@ private:
 
     //=========================================================================================================
     /**
+     * @brief isDigitizerDataAvailable
+     *
+     * @return
+     */
+    bool isDigitizerDataAvailable();
+
+    //=========================================================================================================
+    /**
      * AbstractAlgorithm function
      */
-    virtual void run();    
+    virtual void run();
 
     QMutex                      m_mutex;                    /**< The threads mutex.*/
 
@@ -278,6 +287,7 @@ private:
     Eigen::MatrixXd             m_matCompProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
 
     QSharedPointer<FIFFLIB::FiffInfo>                                           m_pFiffInfo;            /**< Fiff measurement info.*/
+    QSharedPointer<FIFFLIB::FiffDigitizerData>                                  m_pFiffDigitizerData;
     QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>                      m_pCircularBuffer;      /**< Holds incoming raw data. */
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pHpiInput;            /**< The RealTimeMultiSampleArray of the Hpi input.*/

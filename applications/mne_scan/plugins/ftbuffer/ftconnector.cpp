@@ -702,6 +702,8 @@ FIFFLIB::FiffDigitizerData FtConnector::digDataFromIsotrakHeader(QBuffer& isotra
     stream.open();
     stream.read_digitizer_data(stream.dirtree(), digData);
 
+    digData.print();
+
     return digData;
 }
 

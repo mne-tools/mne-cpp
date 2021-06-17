@@ -61,6 +61,7 @@
 
 namespace FIFFLIB{
     class FiffInfo;
+    class FiffDigitizerData;
 }
 
 //=============================================================================================================
@@ -137,12 +138,21 @@ public:
      */
     inline bool isInitialized() const;
 
+    //=========================================================================================================
+    /**
+     * Sets digitizer data for measurement
+     *
+     * @param[in] digData   digitizer data from measurment
+     */
+    void setDigitizerData(QSharedPointer<FIFFLIB::FiffDigitizerData> digData);
+
 private:
     mutable QMutex          m_qMutex;                               /**< Mutex to ensure thread safety. */
     bool                    m_bInitialized;                         /**< If values are stored.*/
 
     QSharedPointer<INVERSELIB::HpiFitResult>    m_pHpiFitResult;    /**< The HPI fit result. */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The Fiff Info. */
+    QSharedPointer<FIFFLIB::FiffDigitizerData>  m_pFiffDigData;
 };
 
 //=============================================================================================================

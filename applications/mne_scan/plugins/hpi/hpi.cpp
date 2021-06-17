@@ -47,6 +47,7 @@
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimehpiresult.h>
 #include <inverse/hpiFit/hpifit.h>
+#include <fiff/c/fiff_digitizer_data.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -465,6 +466,8 @@ void Hpi::onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans)
 {
     m_pFiffInfo->dev_head_t = devHeadTrans;
 }
+
+//=============================================================================================================
 
 //=============================================================================================================
 
