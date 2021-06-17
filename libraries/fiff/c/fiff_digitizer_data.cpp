@@ -183,4 +183,10 @@ void FiffDigitizerData::print()
             std::cout << "HPI Point " << point.ident << " - " << point.r[0] << ", " << point.r[1] << ", " << point.r[2] << "\n";
         }
     }
+
+    std::cout << "Number of MRI fiducials: " << nfids << "\n";
+
+    if (head_mri_t){
+
+    }
 }

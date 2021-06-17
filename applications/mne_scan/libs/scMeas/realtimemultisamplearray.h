@@ -214,7 +214,7 @@ public:
      *
      * @param[in] digData   digitizer data from measurment
      */
-    virtual void setDigitizerData(FIFFLIB::FiffDigitizerData::SPtr digData);
+    void setDigitizerData(FIFFLIB::FiffDigitizerData::SPtr digData);
 
 private:
     mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety. */
