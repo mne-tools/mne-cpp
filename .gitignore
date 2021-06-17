@@ -66,3 +66,18 @@ mne-cpp.pro.user*
 
 # FFTW
 /include/3rdParty/fftw
+
+# Documentation
+/doc/pdf/*.aux
+/doc/pdf/*.bbl
+/doc/pdf/*.blg
+/doc/pdf/*.fdb_latexmk
+/doc/pdf/*.fls
+/doc/pdf/*.log
+/doc/pdf/*.out
+/doc/pdf/*.toc
+/doc/pdf/*.gz
+/doc/pdf/*.pdf
+
+
+
