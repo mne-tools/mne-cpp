@@ -44,9 +44,6 @@
 #include "measurement.h"
 #include "realtimesamplearraychinfo.h"
 
-#include <fiff/fiff_info.h>
-#include <fiff/c/fiff_digitizer_data.h>
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -56,6 +53,15 @@
 #include <QList>
 #include <QMutex>
 #include <QMutexLocker>
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FIFFLIB{
+    class FiffInfo;
+    class FiffDigitizerData;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE SCMEASLIB
@@ -110,7 +116,7 @@ public:
      *
      * @param[in] pFiffInfo     Info to init from.
      */
-    void initFromFiffInfo(FIFFLIB::FiffInfo::SPtr pFiffInfo);
+    void initFromFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -174,7 +180,11 @@ public:
      *
      * @return the reference to the orig FiffInfo.
      */
-    inline FIFFLIB::FiffInfo::SPtr info();
+    inline QSharedPointer<FIFFLIB::FiffInfo> info();
+
+    //=========================================================================================================
+
+    inline QSharedPointer<FIFFLIB::FiffDigitizerData> digitizerData();
 
     //=========================================================================================================
     /**
@@ -214,13 +224,13 @@ public:
      *
      * @param[in] digData   digitizer data from measurment
      */
-    void setDigitizerData(FIFFLIB::FiffDigitizerData::SPtr digData);
+    void setDigitizerData(QSharedPointer<FIFFLIB::FiffDigitizerData> digData);
 
 private:
     mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety. */
 
-    FIFFLIB::FiffInfo::SPtr     m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
-    FIFFLIB::FiffDigitizerData::SPtr m_pFiffDigitizerData_orig;
+    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
+    QSharedPointer<FIFFLIB::FiffDigitizerData>      m_pFiffDigitizerData_orig;
 
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
     float                       m_fSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
@@ -299,10 +309,16 @@ inline QList<RealTimeSampleArrayChInfo>& RealTimeMultiSampleArray::chInfo()
 
 //=============================================================================================================
 
-inline FIFFLIB::FiffInfo::SPtr RealTimeMultiSampleArray::info()
+inline QSharedPointer<FIFFLIB::FiffInfo> RealTimeMultiSampleArray::info()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo_orig;
+}
+
+inline QSharedPointer<FIFFLIB::FiffDigitizerData> RealTimeMultiSampleArray::digitizerData()
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_pFiffDigitizerData_orig;
 }
 
 //=============================================================================================================
