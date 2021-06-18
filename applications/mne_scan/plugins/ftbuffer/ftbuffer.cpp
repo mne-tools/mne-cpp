@@ -270,7 +270,7 @@ bool FtBuffer::setupRTMSA(FIFFLIB::FiffInfo FiffInfo)
 
 //=============================================================================================================
 
-bool FtBuffer::setupRTMSA(MetaData metadata)
+bool FtBuffer::setupRTMSA(const MetaData& metadata)
 {
     if (metadata.info.sfreq < 0) {
         return false;
