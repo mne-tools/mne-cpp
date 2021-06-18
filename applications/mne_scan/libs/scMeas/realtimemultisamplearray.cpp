@@ -39,6 +39,9 @@
 
 #include "realtimemultisamplearray.h"
 
+#include <fiff/fiff_info.h>
+#include <fiff/c/fiff_digitizer_data.h>
+
 #include <iostream>
 
 //=============================================================================================================
@@ -96,7 +99,7 @@ void RealTimeMultiSampleArray::init(QList<RealTimeSampleArrayChInfo> &chInfo)
 
 //=============================================================================================================
 
-void RealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr pFiffInfo)
+void RealTimeMultiSampleArray::initFromFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
 {
     QMutexLocker locker(&m_qMutex);
     m_qListChInfo.clear();
@@ -262,7 +265,8 @@ void RealTimeMultiSampleArray::setValue(const MatrixXd& mat)
 
 //=============================================================================================================
 
-void RealTimeMultiSampleArray::setDigitizerData(FIFFLIB::FiffDigitizerData::SPtr digData)
+void RealTimeMultiSampleArray::setDigitizerData(QSharedPointer<FIFFLIB::FiffDigitizerData> digData)
 {
+    QMutexLocker locker(&m_qMutex);
     m_pFiffDigitizerData_orig = digData;
 }
