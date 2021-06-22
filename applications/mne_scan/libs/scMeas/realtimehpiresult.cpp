@@ -109,5 +109,6 @@ void RealTimeHpiResult::setValue(const HpiFitResult& v)
 
 void RealTimeHpiResult::setDigitizerData(QSharedPointer<FIFFLIB::FiffDigitizerData> digData)
 {
-
+    QMutexLocker lock(&m_qMutex);
+    m_pFiffDigData = digData;
 }

@@ -137,6 +137,8 @@ public:
      */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
+protected:
+
     //=========================================================================================================
     /**
      * Call this function whenever the digitizer changed and you want to align fiducials.
@@ -145,7 +147,14 @@ public:
      */
     void alignFiducials(const QString& sFilePath);
 
-protected:
+    //=========================================================================================================
+    /**
+     * @brief alignFiducials
+     *
+     * @param pDigData
+     */
+    void alignFiducials(QSharedPointer<FIFFLIB::FiffDigitizerData> pDigData);
+
     //=========================================================================================================
     /**
      * Initialise the display control widgets to be shown in the QuickControlView.
@@ -159,6 +168,7 @@ protected:
     void createGUI();
 
     QString                                                     m_sFilePathDigitizers;
+    QSharedPointer<FIFFLIB::FiffDigitizerData>                  m_pFiffDigitizerData;
 
     int                                                         m_iNumberBadChannels;   /**< The last received number of bad channels. */
 

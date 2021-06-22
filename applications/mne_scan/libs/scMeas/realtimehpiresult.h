@@ -139,6 +139,10 @@ public:
     inline bool isInitialized() const;
 
     //=========================================================================================================
+
+    inline QSharedPointer<FIFFLIB::FiffDigitizerData> digitizerData();
+
+    //=========================================================================================================
     /**
      * Sets digitizer data for measurement
      *
@@ -163,6 +167,12 @@ inline bool RealTimeHpiResult::isInitialized() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_bInitialized;
+}
+
+inline QSharedPointer<FIFFLIB::FiffDigitizerData> RealTimeHpiResult::digitizerData()
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_pFiffDigData;
 }
 
 } // NAMESPACE
