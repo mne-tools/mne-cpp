@@ -249,6 +249,9 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
                 alignFiducials(pHpiFitResult->sFilePathDigitzers);
             }
+            if (!m_pFiffDigitizerData){
+                alignFiducials(pRTHR->digitizerData());
+            }
 
             //Add and update items to 3D view
             m_pData3DModel->addDigitizerData("Subject",
@@ -350,6 +353,17 @@ void RealTime3DWidget::alignFiducials(const QString& sFilePath)
     }
 
     delete pMneMshDisplaySurfaceSet;
+}
+
+//=============================================================================================================
+
+void RealTime3DWidget::alignFiducials(QSharedPointer<FIFFLIB::FiffDigitizerData> pDigData)
+{
+    m_pFiffDigitizerData = pDigData;
+
+    if (m_pFiffDigitizerData){
+
+    }
 }
 
 //=============================================================================================================

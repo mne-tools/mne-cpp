@@ -47,6 +47,8 @@
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimehpiresult.h>
 #include <inverse/hpiFit/hpifit.h>
+
+#include <fiff/fiff_info.h>
 #include <fiff/c/fiff_digitizer_data.h>
 
 //=============================================================================================================
@@ -189,6 +191,10 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_pHpiOutput->measurementData()->setFiffInfo(m_pFiffInfo);
             m_mutex.unlock();
             updateProjections();
+        }
+        if(!m_pFiffDigitizerData){
+            m_pFiffDigitizerData = pRTMSA->digitizerData();
+            m_pHpiOutput->measurementData()->setDigitizerData(m_pFiffDigitizerData);
         }
 
         if(!m_bPluginControlWidgetsInit) {
