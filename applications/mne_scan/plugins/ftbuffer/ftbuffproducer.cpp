@@ -141,7 +141,7 @@ void FtBuffProducer::connectToBuffer(QString addr,
 
     //Try to get info from buffer first, then resort to file
     if(m_pFtConnector->connect()) {
-        auto metadata = m_pFtConnector->parseExtenedHeaders();
+        auto metadata = m_pFtConnector->parseBufferHeaders();
         if (m_pFtBuffer->setupRTMSA(metadata)){
             emit connecStatus(true);
             return;
