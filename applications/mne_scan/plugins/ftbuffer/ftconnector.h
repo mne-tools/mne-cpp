@@ -286,7 +286,7 @@ public:
      *
      * @return returns the FiffInfo from the parsed fif file from the neuromag header chunk.
      */
-    MetaData parseExtenedHeaders();
+    MetaData parseBufferHeaders();
 
     //=========================================================================================================
     /**
@@ -408,6 +408,8 @@ private:
      * @return
      */
     FIFFLIB::FiffDigitizerData digDataFromIsotrakHeader(QBuffer& isotrakBuffer);
+
+    std::vector<std::string> channelNamesFromHeader(QBuffer& nameBuffer);
 
     int getExtendedHeaderType(QBuffer& buffer, qint32& iReadCount);
 

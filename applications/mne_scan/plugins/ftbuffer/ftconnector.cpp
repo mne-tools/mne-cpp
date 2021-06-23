@@ -538,7 +538,7 @@ QString FtConnector::getAddr()
 
 //=============================================================================================================
 
-MetaData FtConnector::parseExtenedHeaders()
+MetaData FtConnector::parseBufferHeaders()
 {
     qInfo() << "[FtConnector::parseNeuromagHeader] Attempting to get extended header...";
 
@@ -557,6 +557,13 @@ MetaData FtConnector::parseExtenedHeaders()
         int iType = getExtendedHeaderType(chunkBuffer, iReadCount);
 
         switch(iType){
+        case 1:{
+            QBuffer channelNameBuffer;
+            moveBufferData(chunkBuffer, channelNameBuffer, iReadCount);
+
+            channelNamesFromHeader(channelNameBuffer);
+        }
+
         case 8:{ //FT_CHUNK_NEUROMAG_HEADER = 8
             QBuffer neuromagBuffer;
             moveBufferData(chunkBuffer, neuromagBuffer, iReadCount);
@@ -755,4 +762,11 @@ int FtConnector::getExtendedHeaderType(QBuffer &buffer, qint32 &iReadCount)
 
     std::cout << "Read header of type" << iType << "\n";
     return iType;
+}
+
+//=============================================================================================================
+
+std::vector<std::string> FtConnector::channelNamesFromHeader(QBuffer &nameBuffer)
+{
+
 }
