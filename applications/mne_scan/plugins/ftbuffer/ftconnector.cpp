@@ -557,12 +557,12 @@ MetaData FtConnector::parseBufferHeaders()
         int iType = getExtendedHeaderType(chunkBuffer, iReadCount);
 
         switch(iType){
-        case 1:{
-            QBuffer channelNameBuffer;
-            moveBufferData(chunkBuffer, channelNameBuffer, iReadCount);
+//        case 1:{
+//            QBuffer channelNameBuffer;
+//            moveBufferData(chunkBuffer, channelNameBuffer, iReadCount);
 
-            channelNamesFromHeader(channelNameBuffer);
-        }
+//            channelNamesFromHeader(channelNameBuffer);
+//        }
 
         case 8:{ //FT_CHUNK_NEUROMAG_HEADER = 8
             QBuffer neuromagBuffer;
@@ -583,6 +583,9 @@ MetaData FtConnector::parseBufferHeaders()
             //do nothing for now
             skipBufferData(chunkBuffer, iReadCount);
             break;
+        }
+        case 11:{
+
         }
         default:{
             skipBufferData(chunkBuffer, iReadCount);
