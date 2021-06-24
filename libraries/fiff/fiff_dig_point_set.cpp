@@ -85,6 +85,14 @@ FiffDigPointSet::FiffDigPointSet(const FiffDigPointSet &p_FiffDigPointSet)
 
 //=============================================================================================================
 
+FiffDigPointSet::FiffDigPointSet(const QList<FIFFLIB::FiffDigPoint>& pointList)
+: m_qListDigPoint(pointList)
+{
+}
+
+
+//=============================================================================================================
+
 FiffDigPointSet::FiffDigPointSet(QIODevice &p_IODevice)   //const FiffDigPointSet &p_FiffDigPointSet
 {
     //

@@ -101,6 +101,8 @@ public:
      */
     FiffDigPointSet(const FiffDigPointSet &p_FiffDigPointSet);
 
+    FiffDigPointSet(const QList<FIFFLIB::FiffDigPoint>& pointList);
+
     //=========================================================================================================
     /**
      * Default constructor
