@@ -249,8 +249,14 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
                 alignFiducials(pHpiFitResult->sFilePathDigitzers);
             }
-            if (!m_pFiffDigitizerData){
-                alignFiducials(pRTHR->digitizerData());
+            if (!m_pFiffDigitizerData && pRTHR->digitizerData()){
+                m_pFiffDigitizerData = pRTHR->digitizerData();
+                FiffDigPointSet digSet(m_pFiffDigitizerData->points);
+
+                FiffDigPointSet digSetWithoutAdditional = digSet.pickTypes(QList<int>()<<FIFFV_POINT_HPI<<FIFFV_POINT_CARDINAL<<FIFFV_POINT_EEG<<FIFFV_POINT_EXTRA);
+                m_pTrackedDigitizer = m_pData3DModel->addDigitizerData("Subject",
+                                                                       "Tracked Digitizers",
+                                                                       digSetWithoutAdditional);
             }
 
             //Add and update items to 3D view
