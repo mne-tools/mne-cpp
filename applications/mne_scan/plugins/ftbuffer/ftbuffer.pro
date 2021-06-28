@@ -86,6 +86,7 @@ HEADERS += \
     ftbuffer_global.h \
     ftbuffer.h \
     FormFiles/ftbuffersetupwidget.h \
+    ftbuffertypes.h \
     ftbuffproducer.h \
     ftconnector.h \
 

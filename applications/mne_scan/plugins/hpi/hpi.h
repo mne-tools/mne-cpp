@@ -264,6 +264,12 @@ private:
      */
     virtual void run();
 
+    void manageInitialization(QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray> pRTMSA);
+
+    void initFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> info);
+
+    void initFiffDigitizers(QSharedPointer<FIFFLIB::FiffDigitizerData> fiffDig);
+
     QMutex                      m_mutex;                    /**< The threads mutex.*/
 
     QVector<int>                m_vCoilFreqs;               /**< Vector contains the HPI coil frequencies. */

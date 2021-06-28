@@ -585,7 +585,9 @@ MetaData FtConnector::parseBufferHeaders()
             break;
         }
         case 11:{
-
+            //do nothing for now
+            skipBufferData(chunkBuffer, iReadCount);
+            break;
         }
         default:{
             skipBufferData(chunkBuffer, iReadCount);
