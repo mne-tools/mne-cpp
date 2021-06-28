@@ -185,26 +185,8 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Check if the fiff info was inititalized
-        if(!m_pFiffInfo) {
-            m_mutex.lock();
-            m_pFiffInfo = pRTMSA->info();
-            m_pHpiOutput->measurementData()->setFiffInfo(m_pFiffInfo);
-            m_mutex.unlock();
-            updateProjections();
-        }
-        if(!m_pFiffDigitizerData && m_pFiffInfo){
-            m_pFiffDigitizerData = pRTMSA->digitizerData();
-            m_pHpiOutput->measurementData()->setDigitizerData(m_pFiffDigitizerData);
-            m_mutex.lock();
 
-            m_pFiffInfo->dig = m_pFiffDigitizerData->points; //temp solution. refactor fit function so this isn't necessary.
-
-            m_mutex.unlock();
-        }
-
-        if(!m_bPluginControlWidgetsInit) {
-            initPluginControlWidgets();
-        }
+        manageInitialization(pRTMSA);
 
         // Check if data is present
         if(pRTMSA->getMultiSampleArray().size() > 0) {
@@ -234,6 +216,45 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             }
         }
     }
+}
+
+//=============================================================================================================
+
+void Hpi::manageInitialization(QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray> pRTMSA)
+{
+    if(!m_pFiffInfo) {
+        initFiffInfo(pRTMSA->info());
+    }
+    if(!m_pFiffDigitizerData && m_pFiffInfo){
+        initFiffDigitizers(pRTMSA->digitizerData());
+    }
+    if(!m_bPluginControlWidgetsInit) {
+        initPluginControlWidgets();
+    }
+}
+
+//=============================================================================================================
+
+void Hpi::initFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> info)
+{
+    m_mutex.lock();
+    m_pFiffInfo = info;
+    m_pHpiOutput->measurementData()->setFiffInfo(m_pFiffInfo);
+    m_mutex.unlock();
+    updateProjections();
+}
+
+//=============================================================================================================
+
+void Hpi::initFiffDigitizers(QSharedPointer<FIFFLIB::FiffDigitizerData> fiffDig)
+{
+    m_pFiffDigitizerData = fiffDig;
+    m_pHpiOutput->measurementData()->setDigitizerData(m_pFiffDigitizerData);
+    m_mutex.lock();
+
+    m_pFiffInfo->dig = m_pFiffDigitizerData->points; //temp solution. refactor fit function so this isn't necessary.
+
+    m_mutex.unlock();
 }
 
 //=============================================================================================================
