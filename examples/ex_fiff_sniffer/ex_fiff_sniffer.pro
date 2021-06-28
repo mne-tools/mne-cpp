@@ -36,8 +36,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += network
-QT -= gui
+QT += network widgets gui
 
 CONFIG   += console
 !contains(MNECPP_CONFIG, withAppBundles) {
