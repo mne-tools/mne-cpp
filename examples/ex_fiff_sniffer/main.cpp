@@ -12,6 +12,17 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/c/fiff_digitizer_data.h>
 
+////////////////////////
+
+#include <connectivity/network/network.h>
+
+#include <fiff/fiff_ch_info.h>
+#include <fiff/c/fiff_digitizer_data.h>
+
+#include <mne/c/mne_msh_display_surface_set.h>
+#include <mne/c/mne_surface_or_volume.h>
+//////////////////////
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -23,6 +34,10 @@
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
+
+using namespace CONNECTIVITYLIB;
+using namespace MNELIB;
+using namespace FIFFLIB;
 
 int main(int argc, char *argv[])
 {
@@ -106,6 +121,8 @@ int main(int argc, char *argv[])
 
             if(stream.read_digitizer_data(stream.dirtree(), digData)) {
                 std::cout << "GOT DIGITIZER DATA!!!\n";
+
+
                 std::cout << "DIG POINTS:" << digData.points.size() << "\n";
                 for (auto& point : digData.points){
                     if (point.kind == FIFFV_POINT_HPI){
@@ -114,6 +131,39 @@ int main(int argc, char *argv[])
                 }
                 std::cout << "mri_fids: " << digData.mri_fids;
             }
+
+            ///////////////////////////////////////////////////////
+            MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = new MneMshDisplaySurfaceSet();
+
+            MneMshDisplaySurfaceSet::add_bem_surface(pMneMshDisplaySurfaceSet,
+                                                     QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif",
+                                                     FIFFV_BEM_SURF_ID_HEAD,
+                                                     "head",
+                                                     1,
+                                                     1);
+
+            MneMshDisplaySurface* surface = pMneMshDisplaySurfaceSet->surfs[0];
+
+            QFile t_fileDigDataReference(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-fiducials.fif");
+
+            float scales[3];
+            QScopedPointer<FiffDigitizerData> t_digDataReference(new FiffDigitizerData(t_fileDigDataReference));
+            MneSurfaceOrVolume::align_fiducials(&digData,
+                                                t_digDataReference.data(),
+                                                surface,
+                                                10,
+                                                1,
+                                                0,
+                                                scales);
+
+
+            std::cout << "\n";
+
+            std::cout << digData.head_mri_t_adj->invmove(0) << "\n";
+            std::cout << digData.head_mri_t_adj->invmove(1) << "\n";
+            std::cout << digData.head_mri_t_adj->invmove(2) << "\n";
+
+            ///////////////////////////////////////////////////////
         }
 
 //        QBuffer buffer;

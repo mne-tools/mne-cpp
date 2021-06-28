@@ -192,9 +192,14 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_mutex.unlock();
             updateProjections();
         }
-        if(!m_pFiffDigitizerData){
+        if(!m_pFiffDigitizerData && m_pFiffInfo){
             m_pFiffDigitizerData = pRTMSA->digitizerData();
             m_pHpiOutput->measurementData()->setDigitizerData(m_pFiffDigitizerData);
+            m_mutex.lock();
+
+            m_pFiffInfo->dig = m_pFiffDigitizerData->points; //temp solution. refactor fit function so this isn't necessary.
+
+            m_mutex.unlock();
         }
 
         if(!m_bPluginControlWidgetsInit) {
