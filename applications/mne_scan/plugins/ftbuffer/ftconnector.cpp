@@ -773,5 +773,13 @@ int FtConnector::getExtendedHeaderType(QBuffer &buffer, qint32 &iReadCount)
 
 std::vector<std::string> FtConnector::channelNamesFromHeader(QBuffer &nameBuffer)
 {
+    std::vector<std::string> channelNames;
 
+    auto splitList = nameBuffer.buffer().split('\0');
+
+    for (auto item : splitList){
+        channelNames.push_back(item.data());
+    }
+
+    return channelNames;
 }
