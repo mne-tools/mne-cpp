@@ -415,28 +415,36 @@ void HpiSettingsView::onRemoveCoil()
 
 QList<FiffDigPoint> HpiSettingsView::readPolhemusDig(const QString& fileName)
 {
-    m_pUi->m_tableWidget_Frequencies->clear();
-    m_pUi->m_tableWidget_Frequencies->setRowCount(0);
-    m_pUi->m_tableWidget_Frequencies->setHorizontalHeaderItem(0, new QTableWidgetItem("#Coil"));
-    m_pUi->m_tableWidget_Frequencies->setHorizontalHeaderItem(1, new QTableWidgetItem("Frequency (Hz)"));
-
-    m_pUi->m_tableWidget_errors->clear();
-    m_pUi->m_tableWidget_errors->setRowCount(0);
-    m_pUi->m_tableWidget_errors->setHorizontalHeaderItem(0, new QTableWidgetItem("#Coil"));
-    m_pUi->m_tableWidget_errors->setHorizontalHeaderItem(1, new QTableWidgetItem("Error"));
+    resetTables();
 
     QFile t_fileDig(fileName);
     FiffDigPointSet t_digSet(t_fileDig);
+    updateDigitizerInfo(t_digSet);
 
-    QList<FiffDigPoint> lDigPoints;
+    return t_digSet.getList();
+}
 
+//=============================================================================================================
+
+void HpiSettingsView::newDigitizerList(QList<FIFFLIB::FiffDigPoint> pointList)
+{
+    resetTables();
+
+    FiffDigPointSet t_digSet(pointList);
+    updateDigitizerInfo(t_digSet);
+}
+
+//=============================================================================================================
+
+void HpiSettingsView::updateDigitizerInfo(FiffDigPointSet digSet)
+{
     qint16 numHPI = 0;
     qint16 numFiducials = 0;
     qint16 numEEG = 0;
     qint16 numAdditional = 0;
 
-    for(int i = 0; i < t_digSet.size(); ++i) {
-        switch(t_digSet[i].kind) {
+    for(int i = 0; i < digSet.size(); ++i) {
+        switch(digSet[i].kind) {
             case FIFFV_POINT_HPI: {
                 // Add column 0 in freq table widget
                 m_pUi->m_tableWidget_Frequencies->insertRow(m_pUi->m_tableWidget_Frequencies->rowCount());
@@ -472,24 +480,19 @@ QList<FiffDigPoint> HpiSettingsView::readPolhemusDig(const QString& fileName)
                 m_pUi->m_tableWidget_errors->setItem(m_pUi->m_tableWidget_errors->rowCount()-1,
                                                     1,
                                                     pTableItemC);
-
-                lDigPoints.append(t_digSet[i]);
                 numHPI++;
                 break;
             }
 
             case FIFFV_POINT_CARDINAL:
-                lDigPoints.append(t_digSet[i]);
                 numFiducials++;
                 break;
 
             case FIFFV_POINT_EEG:
-                lDigPoints.append(t_digSet[i]);
                 numEEG++;
                 break;
 
             case FIFFV_POINT_EXTRA:
-                lDigPoints.append(t_digSet[i]);
                 numAdditional++;
                 break;
         }
@@ -504,8 +507,22 @@ QList<FiffDigPoint> HpiSettingsView::readPolhemusDig(const QString& fileName)
     // Make sure that the stored coil freqs always match the number of loaded ones
     m_vCoilFreqs.resize(numHPI);
     emit coilFrequenciesChanged(m_vCoilFreqs);
+}
 
-    return lDigPoints;
+//=============================================================================================================
+
+void HpiSettingsView::resetTables()
+{
+    m_pUi->m_tableWidget_Frequencies->clear();
+    m_pUi->m_tableWidget_Frequencies->setRowCount(0);
+    m_pUi->m_tableWidget_Frequencies->setHorizontalHeaderItem(0, new QTableWidgetItem("#Coil"));
+    m_pUi->m_tableWidget_Frequencies->setHorizontalHeaderItem(1, new QTableWidgetItem("Frequency (Hz)"));
+
+    m_pUi->m_tableWidget_errors->clear();
+    m_pUi->m_tableWidget_errors->setRowCount(0);
+    m_pUi->m_tableWidget_errors->setHorizontalHeaderItem(0, new QTableWidgetItem("#Coil"));
+    m_pUi->m_tableWidget_errors->setHorizontalHeaderItem(1, new QTableWidgetItem("Error"));
+
 }
 
 //=============================================================================================================

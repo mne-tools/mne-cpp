@@ -85,7 +85,7 @@ FiffDigPointSet::FiffDigPointSet(const FiffDigPointSet &p_FiffDigPointSet)
 
 //=============================================================================================================
 
-FiffDigPointSet::FiffDigPointSet(const QList<FIFFLIB::FiffDigPoint>& pointList)
+FiffDigPointSet::FiffDigPointSet(QList<FIFFLIB::FiffDigPoint> pointList)
 : m_qListDigPoint(pointList)
 {
 }
@@ -302,4 +302,11 @@ void FiffDigPointSet::applyTransform(const FiffCoordTrans& coordTrans, bool bApp
         m_qListDigPoint[i].r[1] = tempvec(1);
         m_qListDigPoint[i].r[2] = tempvec(2);
     }
+}
+
+//=============================================================================================================
+
+QList<FiffDigPoint> FiffDigPointSet::getList()
+{
+    return m_qListDigPoint;
 }

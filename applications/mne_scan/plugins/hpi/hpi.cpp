@@ -253,8 +253,16 @@ void Hpi::initFiffDigitizers(QSharedPointer<FIFFLIB::FiffDigitizerData> fiffDig)
     m_mutex.lock();
 
     m_pFiffInfo->dig = m_pFiffDigitizerData->points; //temp solution. refactor fit function so this isn't necessary.
+    updateDigitizerInfo();
 
     m_mutex.unlock();
+}
+
+//=============================================================================================================
+
+void Hpi::updateDigitizerInfo()
+{
+    emit newDigitizerList(m_pFiffDigitizerData->points);
 }
 
 //=============================================================================================================
@@ -303,6 +311,9 @@ void Hpi::initPluginControlWidgets()
                 pHpiSettingsView, &HpiSettingsView::setErrorLabels, Qt::BlockingQueuedConnection);
         connect(this, &Hpi::movementResultsChanged,
                 pHpiSettingsView, &HpiSettingsView::setMovementResults, Qt::BlockingQueuedConnection);
+        connect(this, &Hpi::newDigitizerList,
+                pHpiSettingsView, &HpiSettingsView::newDigitizerList);
+
 
         onSspStatusChanged(pHpiSettingsView->getSspStatusChanged());
         onCompStatusChanged(pHpiSettingsView->getCompStatusChanged());
