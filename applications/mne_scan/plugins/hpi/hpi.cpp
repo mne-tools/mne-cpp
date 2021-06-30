@@ -226,6 +226,7 @@ void Hpi::manageInitialization(QSharedPointer<SCMEASLIB::RealTimeMultiSampleArra
         initFiffInfo(pRTMSA->info());
     }
     if(!m_pFiffDigitizerData && m_pFiffInfo){
+        std::cout << "I'm initializing digitizers\n";
         initFiffDigitizers(pRTMSA->digitizerData());
     }
     if(!m_bPluginControlWidgetsInit) {
