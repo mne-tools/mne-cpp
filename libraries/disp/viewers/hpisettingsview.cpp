@@ -342,12 +342,12 @@ void HpiSettingsView::onFrequencyCellChanged(int row,
 
 void HpiSettingsView::onAddCoil()
 {
-    if(m_pUi->m_tableWidget_Frequencies->rowCount() + 1 > m_pUi->m_label_numberLoadedCoils->text().toInt()) {
-        QMessageBox msgBox;
-        msgBox.setText("Cannot add more HPI coils. Not enough digitzed HPI coils loaded.");
-        msgBox.exec();
-        return;
-    }
+//    if(m_pUi->m_tableWidget_Frequencies->rowCount() + 1 > m_pUi->m_label_numberLoadedCoils->text().toInt()) {
+//        QMessageBox msgBox;
+//        msgBox.setText("Cannot add more HPI coils. Not enough digitzed HPI coils loaded.");
+//        msgBox.exec();
+//        return;
+//    }
 
     // Add column 0 in freq table widget
     m_pUi->m_tableWidget_Frequencies->insertRow(m_pUi->m_tableWidget_Frequencies->rowCount());
