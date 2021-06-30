@@ -249,7 +249,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
                 alignFiducials(pHpiFitResult->sFilePathDigitzers);
             }
-            if (!m_pFiffDigitizerData){
+            if (!m_pFiffDigitizerData && m_pBemHeadAvr){
                 alignFiducials(pRTHR->digitizerData());
             }
 
@@ -259,6 +259,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                                              pHpiFitResult->fittedCoils.pickTypes(QList<int>()<<FIFFV_POINT_EEG));
 
             if(m_pTrackedDigitizer && m_pBemHeadAvr) {
+                std::cout << "if(m_pTrackedDigitizer && m_pBemHeadAvr)\n";
                 //Update fast scan / tracked digitizer
                 QList<QStandardItem*> itemList = m_pTrackedDigitizer->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
                 for(int j = 0; j < itemList.size(); ++j) {
@@ -362,6 +363,18 @@ void RealTime3DWidget::alignFiducials(QSharedPointer<FIFFLIB::FiffDigitizerData>
     m_pFiffDigitizerData = pDigData;
 
     if (m_pFiffDigitizerData){
+        std::cout << "We've got data!!!\n\n\n";
+
+        FiffDigPointSet digSet(m_pFiffDigitizerData->points);
+        FiffDigPointSet digSetWithoutAdditional = digSet.pickTypes(QList<int>()<<FIFFV_POINT_HPI<<FIFFV_POINT_CARDINAL<<FIFFV_POINT_EEG<<FIFFV_POINT_EXTRA);
+        m_pTrackedDigitizer = m_pData3DModel->addDigitizerData("Subject",
+                                                               "Tracked Digitizers",
+                                                               digSetWithoutAdditional);
+
+
+
+
+
         MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = new MneMshDisplaySurfaceSet();
         MneMshDisplaySurfaceSet::add_bem_surface(pMneMshDisplaySurfaceSet,
                                                  QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif",
