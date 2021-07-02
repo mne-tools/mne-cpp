@@ -249,9 +249,9 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
                 alignFiducials(pHpiFitResult->sFilePathDigitzers);
             }
-            if (!m_pFiffDigitizerData && m_pBemHeadAvr){
-                alignFiducials(pRTHR->digitizerData());
-            }
+//            if (!m_pFiffDigitizerData && m_pBemHeadAvr){
+//                alignFiducials(pRTHR->digitizerData());
+//            }
 
             //Add and update items to 3D view
             m_pData3DModel->addDigitizerData("Subject",
