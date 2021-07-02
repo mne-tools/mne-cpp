@@ -249,14 +249,17 @@ void Hpi::initFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> info)
 
 void Hpi::initFiffDigitizers(QSharedPointer<FIFFLIB::FiffDigitizerData> fiffDig)
 {
-    m_pFiffDigitizerData = fiffDig;
-    m_pHpiOutput->measurementData()->setDigitizerData(m_pFiffDigitizerData);
-    m_mutex.lock();
+    if(fiffDig){
+        std::cout << "Shouldn't be here";
+        m_pFiffDigitizerData = fiffDig;
+        m_pHpiOutput->measurementData()->setDigitizerData(m_pFiffDigitizerData);
+        m_mutex.lock();
 
-    m_pFiffInfo->dig = m_pFiffDigitizerData->points; //temp solution. refactor fit function so this isn't necessary.
-    updateDigitizerInfo();
+        m_pFiffInfo->dig = m_pFiffDigitizerData->points; //temp solution. refactor fit function so this isn't necessary.
+        updateDigitizerInfo();
 
-    m_mutex.unlock();
+        m_mutex.unlock();
+    }
 }
 
 //=============================================================================================================
