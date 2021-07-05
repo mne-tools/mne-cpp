@@ -237,6 +237,14 @@ private:
 
     //=========================================================================================================
     /**
+     * Set fitting window size when doing continuous hpi.
+     *
+     * @param[in] winSize    window size in samples
+     */
+    void setFittingWindowSize(int winSize);
+
+    //=========================================================================================================
+    /**
      * Read Polhemus data from fif file.
      */
     QList<FIFFLIB::FiffDigPoint> readPolhemusDig(const QString& fileName);
@@ -254,7 +262,7 @@ private:
     QString                     m_sFilePathDigitzers;       /**< The file path to the current digitzers. */
 
     qint16                      m_iNumberBadChannels;       /**< The number of bad channels.*/
-    qint16                      m_iNumberOfFitsPerSecond;   /**< The number of allowed HPI fits per second. Default is 3.*/
+    qint16                      m_iFittingWindowSize;       /**< The number of samples in each fitting window.*/
 
     double                      m_dAllowedMeanErrorDist;    /**< The allowed error distance in order for the last fit to be counted as a good fit.*/
     double                      m_dAllowedMovement;         /**< The allowed head movement regarding reference head position.*/

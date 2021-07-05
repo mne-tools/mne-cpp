@@ -70,11 +70,17 @@ using namespace Eigen;
 using namespace INVERSELIB;
 
 //=============================================================================================================
+// DEFINE LOCAL CONSTANTS
+//=============================================================================================================
+
+constexpr const int defaultFittingWindowSize(300);
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 Hpi::Hpi()
-: m_iNumberOfFitsPerSecond(3)
+: m_iFittingWindowSize(defaultFittingWindowSize)
 , m_bDoFreqOrder(false)
 , m_bDoSingleHpi(false)
 , m_bDoContinousHpi(false)
@@ -258,6 +264,8 @@ void Hpi::initPluginControlWidgets()
                 this, &Hpi::onAllowedMovementChanged);
         connect(pHpiSettingsView, &HpiSettingsView::allowedRotationChanged,
                 this, &Hpi::onAllowedRotationChanged);
+        connect(pHpiSettingsView, &HpiSettingsView::fittingWindowSizeChanged,
+                this, &Hpi::setFittingWindowSize);
         connect(this, &Hpi::errorsChanged,
                 pHpiSettingsView, &HpiSettingsView::setErrorLabels, Qt::BlockingQueuedConnection);
         connect(this, &Hpi::movementResultsChanged,
@@ -268,6 +276,7 @@ void Hpi::initPluginControlWidgets()
         onAllowedMeanErrorDistChanged(pHpiSettingsView->getAllowedMeanErrorDistChanged());
         onAllowedMovementChanged(pHpiSettingsView->getAllowedMovementChanged());
         onAllowedRotationChanged(pHpiSettingsView->getAllowedRotationChanged());
+        setFittingWindowSize(pHpiSettingsView->getFittingWindowSize());
 
         plControlWidgets.append(pHpiSettingsView);
 
@@ -444,6 +453,14 @@ void Hpi::onContHpiStatusChanged(bool bChecked)
 
 //=============================================================================================================
 
+void Hpi::setFittingWindowSize(int winSize)
+{
+    QMutexLocker locker(&m_mutex);
+    m_iFittingWindowSize = winSize;
+}
+
+//=============================================================================================================
+
 void Hpi::onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans)
 {
     m_pFiffInfo->dev_head_t = devHeadTrans;
@@ -489,15 +506,17 @@ void Hpi::run()
     MatrixXd matData;
 
     m_mutex.lock();
-    int iNumberOfFitsPerSecond = m_iNumberOfFitsPerSecond;
+    int fittingWindowSize = m_iFittingWindowSize;
     m_mutex.unlock();
 
-    MatrixXd matDataMerged(m_pFiffInfo->chs.size(), int(m_pFiffInfo->sfreq/iNumberOfFitsPerSecond));
+    MatrixXd matDataMerged(m_pFiffInfo->chs.size(), fittingWindowSize);
 
     while(!isInterruptionRequested()) {
         m_mutex.lock();
-        if(iNumberOfFitsPerSecond != m_iNumberOfFitsPerSecond) {
-            matDataMerged.resize(m_pFiffInfo->chs.size(), int(m_pFiffInfo->sfreq/iNumberOfFitsPerSecond));
+        if(fittingWindowSize != m_iFittingWindowSize) {
+            fittingWindowSize = m_iFittingWindowSize;
+            std::cout << "Fitting window size: " << fittingWindowSize << "\n";
+            matDataMerged.resize(m_pFiffInfo->chs.size(), fittingWindowSize);
             iDataIndexCounter = 0;
         }
         m_mutex.unlock();
@@ -516,7 +535,8 @@ void Hpi::run()
                 fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
                 m_mutex.unlock();
 
-                matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols()-iDataIndexCounter) = matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
+                matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols()-iDataIndexCounter) =
+                        matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
 
                 // Perform HPI fit
                 m_mutex.lock();

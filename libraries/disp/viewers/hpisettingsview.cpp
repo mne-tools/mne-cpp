@@ -95,6 +95,8 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
             this, &HpiSettingsView::compStatusChanged);
     connect(m_pUi->m_checkBox_continousHPI, &QCheckBox::clicked,
             this, &HpiSettingsView::contHpiStatusChanged);
+    connect(m_pUi->m_spinBox_samplesToFit, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &HpiSettingsView::fittingWindowSizeChanged);
     connect(m_pUi->m_doubleSpinBox_maxHPIContinousDist, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &HpiSettingsView::allowedMeanErrorDistChanged);
     connect(m_pUi->m_doubleSpinBox_moveThreshold, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
@@ -198,6 +200,13 @@ double HpiSettingsView::getAllowedRotationChanged()
 
 //=============================================================================================================
 
+int HpiSettingsView::getFittingWindowSize()
+{
+    return m_pUi->m_spinBox_samplesToFit->value();
+}
+
+//=============================================================================================================
+
 void HpiSettingsView::saveSettings()
 {
     if(m_sSettingsPath.isEmpty()) {
@@ -205,22 +214,24 @@ void HpiSettingsView::saveSettings()
     }
 
     QSettings settings("MNECPP");
-    QVariant data;
 
-    data.setValue(m_vCoilFreqs);
-    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/coilFreqs"), data);
+    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/coilFreqs"),
+                      QVariant::fromValue(m_vCoilFreqs));
 
-    data.setValue(m_pUi->m_checkBox_useSSP->isChecked());
-    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/useSSP"), data);
+    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/useSSP"),
+                      QVariant::fromValue(m_pUi->m_checkBox_useSSP->isChecked()));
 
-    data.setValue(m_pUi->m_checkBox_useComp->isChecked());
-    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/useCOMP"), data);
+    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/useCOMP"),
+                      QVariant::fromValue(m_pUi->m_checkBox_useComp->isChecked()));
 
-    data.setValue(m_pUi->m_checkBox_continousHPI->isChecked());
-    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/continousHPI"), data);
+    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/continousHPI"),\
+                      QVariant::fromValue(m_pUi->m_checkBox_continousHPI->isChecked()));
 
-    data.setValue(m_pUi->m_doubleSpinBox_maxHPIContinousDist->value());
-    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/maxError"), data);
+    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/maxError"),
+                      QVariant::fromValue(m_pUi->m_doubleSpinBox_maxHPIContinousDist->value()));
+
+    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/fittingWindowSize"),
+                      QVariant::fromValue(m_pUi->m_spinBox_samplesToFit->value()));
 }
 
 //=============================================================================================================
@@ -242,6 +253,7 @@ void HpiSettingsView::loadSettings()
     m_pUi->m_checkBox_useComp->setChecked(settings.value(m_sSettingsPath + QString("/HpiSettingsView/useCOMP"), false).toBool());
     m_pUi->m_checkBox_continousHPI->setChecked(settings.value(m_sSettingsPath + QString("/HpiSettingsView/continousHPI"), false).toBool());
     m_pUi->m_doubleSpinBox_maxHPIContinousDist->setValue(settings.value(m_sSettingsPath + QString("/HpiSettingsView/maxError"), 10.0).toDouble());
+    m_pUi->m_spinBox_samplesToFit->setValue(settings.value(m_sSettingsPath + QString("/HpiSettingsView/fittingWindowSize"), 300).toInt());
 }
 
 //=============================================================================================================
