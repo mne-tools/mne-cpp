@@ -191,7 +191,13 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         // Check if data is present
         if(pRTMSA->getMultiSampleArray().size() > 0) {
             //If bad channels changed, recalcluate projectors
-            updateProjections();
+            if(m_iNumberBadChannels != m_pFiffInfo->bads.size()
+                || m_matCompProjectors.rows() == 0
+                || m_matCompProjectors.cols() == 0) {
+                updateProjections();
+                m_iNumberBadChannels = m_pFiffInfo->bads.size();
+            }
+
 
             m_mutex.lock();
             bool bDoSingleHpi = m_bDoSingleHpi;
@@ -282,17 +288,6 @@ void Hpi::initPluginControlWidgets()
 void Hpi::updateProjections()
 {
     if(m_pFiffInfo) {
-        m_mutex.lock();
-        if(m_iNumberBadChannels != m_pFiffInfo->bads.size()
-           || m_matCompProjectors.rows() == 0
-           || m_matCompProjectors.cols() == 0) {
-            m_iNumberBadChannels = m_pFiffInfo->bads.size();
-        } else {
-            m_mutex.unlock();
-            return;
-        }
-        m_mutex.unlock();
-
         Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
         Eigen::MatrixXd matComp = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
@@ -324,6 +319,7 @@ void Hpi::updateProjections()
         }
 
         m_mutex.lock();
+        m_matProjectors = matProjectors;
         m_matCompProjectors = matProjectors * matComp;
         m_mutex.unlock();
     }
@@ -360,7 +356,7 @@ void Hpi::onAllowedRotationChanged(double dAllowedRotation)
 
 void Hpi::onDigitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers,
                               const QString& sFilePath)
-{    
+{
     m_mutex.lock();
     if(m_pFiffInfo) {
         m_pFiffInfo->dig = lDigitzers;
@@ -493,6 +489,7 @@ void Hpi::run()
     m_mutex.unlock();
 
     MatrixXd matDataMerged(m_pFiffInfo->chs.size(), int(m_pFiffInfo->sfreq/iNumberOfFitsPerSecond));
+    MatrixXd matDataProj(m_pFiffInfo->chs.size(), int(m_pFiffInfo->sfreq/iNumberOfFitsPerSecond));
 
     while(!isInterruptionRequested()) {
         m_mutex.lock();
@@ -522,8 +519,9 @@ void Hpi::run()
                 m_mutex.lock();
                 if(m_bDoFreqOrder) {
                     // find correct frequencie order if requested
-                    HPI.findOrder(matDataMerged,
-                                  m_matCompProjectors,
+                    matDataProj = m_matCompProjectors * matDataMerged;
+                    HPI.findOrder(matDataProj,
+                                  m_matProjectors,
                                   fitResult.devHeadTrans,
                                   m_vCoilFreqs,
                                   fitResult.errorDistances,
@@ -536,8 +534,9 @@ void Hpi::run()
 
                 // Perform actual fitting
                 m_mutex.lock();
-                HPI.fitHPI(matDataMerged,
-                           m_matCompProjectors,
+                matDataProj = m_matCompProjectors * matDataMerged;
+                HPI.fitHPI(matDataProj,
+                           m_matProjectors,
                            fitResult.devHeadTrans,
                            m_vCoilFreqs,
                            fitResult.errorDistances,

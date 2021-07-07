@@ -268,6 +268,7 @@ private:
 
     Eigen::MatrixXd             m_matData;                  /**< The last data block.*/
     Eigen::MatrixXd             m_matCompProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
+    Eigen::MatrixXd             m_matProjectors;            /**< Holds the matrix with the SSP.*/
 
     QSharedPointer<FIFFLIB::FiffInfo>                                           m_pFiffInfo;            /**< Fiff measurement info.*/
     QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>                      m_pCircularBuffer;      /**< Holds incoming raw data. */
