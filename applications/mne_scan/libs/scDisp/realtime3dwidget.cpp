@@ -249,9 +249,9 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
                 alignFiducials(pHpiFitResult->sFilePathDigitzers);
             }
-//            if (!m_pFiffDigitizerData && m_pBemHeadAvr){
-//                alignFiducials(pRTHR->digitizerData());
-//            }
+            if (!m_pFiffDigitizerData && m_pBemHeadAvr){
+                alignFiducials(pRTHR->digitizerData());
+            }
 
             //Add and update items to 3D view
             m_pData3DModel->addDigitizerData("Subject",
@@ -273,6 +273,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 itemList = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
                 for(int j = 0; j < itemList.size(); ++j) {
                     if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
+                        std::cout << "Appling head transformation";
                         pBemItem->setTransform(m_tAlignment);
                         // apply inverse to get from head to device space
                         pBemItem->applyTransform(pHpiFitResult->devHeadTrans, true);
