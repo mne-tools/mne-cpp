@@ -439,8 +439,13 @@ Metadata RtDataClient::readMetadata()
             {
                 t_fiffStream.read_rt_tag(t_pTag);
 
-                if(t_pTag->kind == FIFF_DIG_POINT)
+                if(t_pTag->kind == FIFF_DIG_POINT){
                     p_pFiffInfo->dig.append(t_pTag->toDigPoint());
+                    p_pDigData->points.append(t_pTag->toDigPoint());
+                }
+                if(t_pTag->kind == FIFF_MNE_COORD_FRAME){
+                    p_pDigData->coord_frame = *t_pTag->toInt();
+                }
             }
         }
         //
@@ -635,6 +640,14 @@ Metadata RtDataClient::readMetadata()
     //
     for (qint32 c = 0; c < p_pFiffInfo->nchan; ++c)
         p_pFiffInfo->ch_names << p_pFiffInfo->chs[c].ch_name;
+
+    p_pDigData->npoint = p_pDigData->points.size();
+
+    for (int k = 0; k < p_pDigData->npoint; k++) {
+        std::cout << "Apending true: " << k << "\n";
+        p_pDigData->active.append(1);
+        p_pDigData->discard.append(0);
+    }
 
     Metadata data;
 
