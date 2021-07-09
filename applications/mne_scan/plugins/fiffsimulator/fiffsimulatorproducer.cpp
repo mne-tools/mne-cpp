@@ -40,6 +40,8 @@
 #include "fiffsimulatorproducer.h"
 #include "fiffsimulator.h"
 
+#include <fiff/c/fiff_digitizer_data.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -167,6 +169,7 @@ void FiffSimulatorProducer::run()
         if(m_bFlagInfoRequest) {
             m_pFiffSimulator->m_qMutex.lock();
             m_pFiffSimulator->m_pFiffInfo = m_pRtDataClient->readInfo();
+            m_pFiffSimulator->m_pFiffDigData = m_pRtDataClient->readDigData();
             m_pFiffSimulator->m_qMutex.unlock();
             emit m_pFiffSimulator->fiffInfoAvailable();
             m_bFlagInfoRequest = false;
