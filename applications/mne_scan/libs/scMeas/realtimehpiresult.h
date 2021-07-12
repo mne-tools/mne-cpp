@@ -139,7 +139,11 @@ public:
     inline bool isInitialized() const;
 
     //=========================================================================================================
-
+    /**
+     * Returns digitizer data for measurement
+     *
+     * @return the current set digitizer data
+     */
     inline QSharedPointer<FIFFLIB::FiffDigitizerData> digitizerData();
 
     //=========================================================================================================
