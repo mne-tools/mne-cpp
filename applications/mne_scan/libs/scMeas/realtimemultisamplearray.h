@@ -183,7 +183,11 @@ public:
     inline QSharedPointer<FIFFLIB::FiffInfo> info();
 
     //=========================================================================================================
-
+    /**
+     * Returns digitizer data for measurement
+     *
+     * @return the current set digitizer data
+     */
     inline QSharedPointer<FIFFLIB::FiffDigitizerData> digitizerData();
 
     //=========================================================================================================

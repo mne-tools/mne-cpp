@@ -862,7 +862,6 @@ bool FiffStream::read_digitizer_data(const FiffDirNode::SPtr& p_Node, FiffDigiti
     p_digData.npoint      = npoint;
 
     for (int k = 0; k < p_digData.npoint; k++) {
-        std::cout << "Apending true: " << k << "\n";
         p_digData.active.append(TRUE);
         p_digData.discard.append(FALSE);
     }

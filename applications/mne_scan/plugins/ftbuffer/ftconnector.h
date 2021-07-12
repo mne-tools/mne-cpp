@@ -300,7 +300,7 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief Opens Buffer, reads numBytes from socket and sets index to zero
+     * Opens Buffer, reads numBytes from socket and sets index to zero
      *
      * @param[out] buffer       QBuffer to which daa will be written.
      * @param[in] numBytes      How many bytes to read from socket.
@@ -336,24 +336,52 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief digDataFromIsotrakHeader
+     * Reads digitizer data from buffer with isotrak header chunk
      *
-     * @param isotrakBuffer
+     * @param[in] isotrakBuffer     buffer with isotrak ft header chunk
      *
-     * @return
+     * @return digitizer data
      */
     FIFFLIB::FiffDigitizerData digDataFromIsotrakHeader(QBuffer& isotrakBuffer);
 
     //=========================================================================================================
+    /**
+     * Reads channel names from buffer with channel names header chunk
+     *
+     * @param[in] nameBuffer        buffer with channel names header chunk
+     *
+     * @return channel names
+     */
     std::vector<std::string> channelNamesFromHeader(QBuffer& nameBuffer);
 
     //=========================================================================================================
+    /**
+     * Reads type of ft header chunk from buffer
+     *
+     * @param[in] buffer            buffer with ft buffer header chunk
+     * @param[in, out] iReadCount   number of bytes read
+     *
+     * @return extended header chunk type
+     */
     int getExtendedHeaderType(QBuffer& buffer, qint32& iReadCount);
 
     //=========================================================================================================
+    /**
+     * Reads a ftbuffer header chunk from one buffer and writes it to another
+     *
+     * @param[in] from              source buffer
+     * @param[in, out] to           destination buffer
+     * @param[in, out] iReadCount   increments with amount of data read
+     */
     void moveBufferData(QBuffer& from, QBuffer& to, qint32& iReadCount);
 
     //=========================================================================================================
+    /**
+     * Skips ahead one chunk header
+     *
+     * @param[in] buffer            input buffer to be skipped
+     * @param[in, out] iReadCount   increments with amount of data read
+     */
     void skipBufferData(QBuffer& buffer, qint32& iReadCount);
 
     int                                     m_iNumSamples;                          /**< Number of samples we've read from the buffer. */
@@ -361,7 +389,7 @@ private:
     int                                     m_iMsgSamples;                          /**< Number of samples in the latest buffer transmission receied. */
     int                                     m_iNumChannels;                         /**< Number of channels in the buffer data. */
     int                                     m_iDataType;                            /**< Type of data in the buffer. */
-    int                                     m_iExtendedHeaderSize;                          /**< Size of extended header chunks. */
+    int                                     m_iExtendedHeaderSize;                  /**< Size of extended header chunks. */
     quint16                                 m_iPort;                                /**< Port where the ft bufferis found. */
 
     bool                                    m_bNewData;                             /**< Indicate whether we've received new data. */
