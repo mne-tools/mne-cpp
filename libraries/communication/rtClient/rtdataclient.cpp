@@ -644,7 +644,6 @@ Metadata RtDataClient::readMetadata()
     p_pDigData->npoint = p_pDigData->points.size();
 
     for (int k = 0; k < p_pDigData->npoint; k++) {
-        std::cout << "Apending true: " << k << "\n";
         p_pDigData->active.append(1);
         p_pDigData->discard.append(0);
     }
