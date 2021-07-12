@@ -101,6 +101,8 @@ public:
      */
     FiffDigPointSet(const FiffDigPointSet &p_FiffDigPointSet);
 
+    FiffDigPointSet(QList<FIFFLIB::FiffDigPoint> pointList);
+
     //=========================================================================================================
     /**
      * Default constructor
@@ -218,6 +220,8 @@ public:
      * @param[in] bApplyInverse Whether to apply the inverse. False by default.
      */
     void applyTransform(const FiffCoordTrans& coordTrans, bool bApplyInverse = false);
+
+    QList<FiffDigPoint> getList();
 
 //    ToDo:
 //    //=========================================================================================================

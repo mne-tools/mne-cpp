@@ -104,6 +104,8 @@ public:
      */
     ~FiffDigitizerData();
 
+    void print();
+
 public:
     QString        filename;                 /* Where did these come from */
     FIFFLIB::FiffCoordTransOld* head_mri_t;            /* This is relevant for us */

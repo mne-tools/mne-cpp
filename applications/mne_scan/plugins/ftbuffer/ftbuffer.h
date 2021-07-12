@@ -229,6 +229,14 @@ private:
      */
     bool setupRTMSA(FIFFLIB::FiffInfo FiffInfo);
 
+    //=========================================================================================================
+    /**
+     * Initializes output based on input measuremnt data object
+     *
+     * @param[in] metadata  object with fiffinfo and optionally digitizer data
+     */
+    bool setupRTMSA(const MetaData& metadata);
+
     bool                                                                                m_bIsConfigured;                /**< Whether the buffer output has been configured. */
 
     QMutex                                                                              m_mutex;                        /**< Guards shared data from being accessed at the same time. */

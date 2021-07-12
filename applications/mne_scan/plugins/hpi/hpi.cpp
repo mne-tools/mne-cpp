@@ -48,6 +48,9 @@
 #include <scMeas/realtimehpiresult.h>
 #include <inverse/hpiFit/hpifit.h>
 
+#include <fiff/fiff_info.h>
+#include <fiff/c/fiff_digitizer_data.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -74,7 +77,7 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 Hpi::Hpi()
-: m_iNumberOfFitsPerSecond(3)
+: m_iNumberOfFitsPerSecond(6)
 , m_bDoFreqOrder(false)
 , m_bDoSingleHpi(false)
 , m_bDoContinousHpi(false)
@@ -176,17 +179,8 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Check if the fiff info was inititalized
-        if(!m_pFiffInfo) {
-            m_mutex.lock();
-            m_pFiffInfo = pRTMSA->info();
-            m_pHpiOutput->measurementData()->setFiffInfo(m_pFiffInfo);
-            m_mutex.unlock();
-            updateProjections();
-        }
 
-        if(!m_bPluginControlWidgetsInit) {
-            initPluginControlWidgets();
-        }
+        manageInitialization(pRTMSA);
 
         // Check if data is present
         if(pRTMSA->getMultiSampleArray().size() > 0) {
@@ -216,6 +210,57 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             }
         }
     }
+}
+
+//=============================================================================================================
+
+void Hpi::manageInitialization(QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray> pRTMSA)
+{
+    if(!m_pFiffInfo) {
+        initFiffInfo(pRTMSA->info());
+    }
+    if(!m_bPluginControlWidgetsInit) {
+        initPluginControlWidgets();
+    }
+    if(!m_pFiffDigitizerData && m_pFiffInfo){
+        std::cout << "Initializing digitizers\n";
+        initFiffDigitizers(pRTMSA->digitizerData());
+    }
+}
+
+//=============================================================================================================
+
+void Hpi::initFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> info)
+{
+    m_mutex.lock();
+    m_pFiffInfo = info;
+    m_pHpiOutput->measurementData()->setFiffInfo(m_pFiffInfo);
+    m_mutex.unlock();
+    updateProjections();
+}
+
+//=============================================================================================================
+
+void Hpi::initFiffDigitizers(QSharedPointer<FIFFLIB::FiffDigitizerData> fiffDig)
+{
+    if(fiffDig){
+        m_mutex.lock();
+        m_pFiffDigitizerData = fiffDig;
+        m_pHpiOutput->measurementData()->setDigitizerData(m_pFiffDigitizerData);
+        m_pFiffInfo->dig = m_pFiffDigitizerData->points; //temp solution. refactor fit function so this isn't necessary.
+        m_mutex.unlock();
+
+        std::cout<<"Calling updateDigitizerInfo\n";
+        updateDigitizerInfo();
+    }
+}
+
+//=============================================================================================================
+
+void Hpi::updateDigitizerInfo()
+{
+    std::cout << "Emitting signal";
+    emit newDigitizerList(m_pFiffDigitizerData->points);
 }
 
 //=============================================================================================================
@@ -262,6 +307,9 @@ void Hpi::initPluginControlWidgets()
                 pHpiSettingsView, &HpiSettingsView::setErrorLabels, Qt::BlockingQueuedConnection);
         connect(this, &Hpi::movementResultsChanged,
                 pHpiSettingsView, &HpiSettingsView::setMovementResults, Qt::BlockingQueuedConnection);
+        connect(this, &Hpi::newDigitizerList,
+                pHpiSettingsView, &HpiSettingsView::newDigitizerList);
+
 
         onSspStatusChanged(pHpiSettingsView->getSspStatusChanged());
         onCompStatusChanged(pHpiSettingsView->getCompStatusChanged());
@@ -377,7 +425,7 @@ void Hpi::onDoSingleHpiFit()
 {
     if(m_vCoilFreqs.size() < 3) {
        QMessageBox msgBox;
-       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
+       msgBox.setText("Please input HPI coil frequencies first.");
        msgBox.exec();
        return;
     }
@@ -393,7 +441,7 @@ void Hpi::onDoFreqOrder()
 {
     if(m_vCoilFreqs.size() < 3) {
        QMessageBox msgBox;
-       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
+       msgBox.setText("Please input HPI coil frequencies first.");
        msgBox.exec();
        return;
     }

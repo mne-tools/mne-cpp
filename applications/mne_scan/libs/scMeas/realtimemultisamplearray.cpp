@@ -39,6 +39,9 @@
 
 #include "realtimemultisamplearray.h"
 
+#include <fiff/fiff_info.h>
+#include <fiff/c/fiff_digitizer_data.h>
+
 #include <iostream>
 
 //=============================================================================================================
@@ -61,6 +64,8 @@ using namespace Eigen;
 
 RealTimeMultiSampleArray::RealTimeMultiSampleArray(QObject *parent)
 : Measurement(QMetaType::type("RealTimeMultiSampleArray::SPtr"), parent)
+, m_pFiffInfo_orig(nullptr)
+, m_pFiffDigitizerData_orig(nullptr)
 , m_fSamplingRate(0)
 , m_iMultiArraySize(10)
 , m_bChInfoIsInit(false)
@@ -94,7 +99,7 @@ void RealTimeMultiSampleArray::init(QList<RealTimeSampleArrayChInfo> &chInfo)
 
 //=============================================================================================================
 
-void RealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr pFiffInfo)
+void RealTimeMultiSampleArray::initFromFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
 {
     QMutexLocker locker(&m_qMutex);
     m_qListChInfo.clear();
@@ -258,3 +263,10 @@ void RealTimeMultiSampleArray::setValue(const MatrixXd& mat)
     }
 }
 
+//=============================================================================================================
+
+void RealTimeMultiSampleArray::setDigitizerData(QSharedPointer<FIFFLIB::FiffDigitizerData> digData)
+{
+    QMutexLocker locker(&m_qMutex);
+    m_pFiffDigitizerData_orig = digData;
+}

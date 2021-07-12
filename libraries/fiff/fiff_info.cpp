@@ -43,6 +43,7 @@
 #include "fiff_file.h"
 
 #include <utils/ioutils.h>
+#include <iostream>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -475,4 +476,18 @@ void FiffInfo::writeToStream(FiffStream* p_pStream) const
     //
     //
     p_pStream->end_block(FIFFB_MEAS_INFO);
+}
+
+//=============================================================================================================
+
+void FiffInfo::print()
+{
+    std::cout << "Sample frequency: " << sfreq << "\n";
+    std::cout << "LineFreq: " << linefreq << " | Highpass: " << highpass << " | Lowpass: " << lowpass << "\n";
+    std::cout << "Number of digitizer points: " << dig.size() << "\n";
+    for (auto& point : dig){
+        if (point.kind == FIFFV_POINT_HPI){
+            std::cout << "HPI Point " << point.ident << " - " << point.r[0] << ", " << point.r[1] << ", " << point.r[2] << "\n";
+        }
+    }
 }

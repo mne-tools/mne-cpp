@@ -61,6 +61,7 @@ namespace Ui {
 
 namespace FIFFLIB {
     class FiffDigPoint;
+    class FiffDigPointSet;
 }
 
 //=============================================================================================================
@@ -156,6 +157,14 @@ public:
 
     //=========================================================================================================
     /**
+     * @brief newDigitizerList
+     *
+     * @param pointList
+     */
+    void newDigitizerList(QList<FIFFLIB::FiffDigPoint> pointList);
+
+    //=========================================================================================================
+    /**
      * Saves all important settings of this view via QSettings.
      */
     void saveSettings();
@@ -221,7 +230,13 @@ protected:
     /**
      * Read Polhemus data from fif file.
      */
-    QList<FIFFLIB::FiffDigPoint> readPolhemusDig(const QString& fileName);
+    QList<FIFFLIB::FiffDigPoint> readDigitizersFromFile(const QString& fileName);
+
+    void resetTables();
+
+    void updateDigitizerInfo(FIFFLIB::FiffDigPointSet digSet);
+
+
 
     Ui::HpiSettingsViewWidget*                  m_pUi;                  /**< The HPI dialog. */
 
