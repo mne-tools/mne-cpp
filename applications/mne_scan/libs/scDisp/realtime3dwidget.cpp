@@ -357,19 +357,15 @@ void RealTime3DWidget::alignFiducials(FIFFLIB::FiffDigitizerData *pDigData)
                                         0,
                                         scales);
 
-    QMatrix4x4 invMat;
+    QMatrix4x4 invMat = calculateInverseMatrix(pDigData, scales[0]);
 
-    // use inverse transform
-    for(int r = 0; r < 3; ++r) {
-        for(int c = 0; c < 3; ++c) {
-            // also apply scaling factor
-            invMat(r,c) = pDigData->head_mri_t_adj->invrot(r,c) * scales[0];
-        }
-    }
-    invMat(0,3) = pDigData->head_mri_t_adj->invmove(0);
-    invMat(1,3) = pDigData->head_mri_t_adj->invmove(1);
-    invMat(2,3) = pDigData->head_mri_t_adj->invmove(2);
+    applyAlignmentTransform(invMat);
+}
 
+//=============================================================================================================
+
+void RealTime3DWidget::applyAlignmentTransform(QMatrix4x4 invMat)
+{
     Qt3DCore::QTransform identity;
     m_tAlignment.setMatrix(invMat);
 
@@ -380,6 +376,27 @@ void RealTime3DWidget::alignFiducials(FIFFLIB::FiffDigitizerData *pDigData)
             pBemItem->setTransform(m_tAlignment);
         }
     }
+}
+
+//=============================================================================================================
+
+QMatrix4x4 RealTime3DWidget::calculateInverseMatrix(FIFFLIB::FiffDigitizerData *pDigData,
+                                                    float scale)
+{
+    QMatrix4x4 invMat;
+
+    // use inverse transform
+    for(int r = 0; r < 3; ++r) {
+        for(int c = 0; c < 3; ++c) {
+            // also apply scaling factor
+            invMat(r,c) = pDigData->head_mri_t_adj->invrot(r,c) * scale;
+        }
+    }
+    invMat(0,3) = pDigData->head_mri_t_adj->invmove(0);
+    invMat(1,3) = pDigData->head_mri_t_adj->invmove(1);
+    invMat(2,3) = pDigData->head_mri_t_adj->invmove(2);
+
+    return invMat;
 }
 
 //=============================================================================================================

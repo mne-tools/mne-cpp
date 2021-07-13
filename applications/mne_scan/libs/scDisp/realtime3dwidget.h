@@ -176,6 +176,15 @@ protected:
     void addDigSetToView(const FIFFLIB::FiffDigPointSet& digSet);
 
     //=========================================================================================================
+
+    QMatrix4x4 calculateInverseMatrix(FIFFLIB::FiffDigitizerData *pDigData,
+                                      float scale);
+
+    //=========================================================================================================
+
+    void applyAlignmentTransform(QMatrix4x4 invMat);
+
+    //=========================================================================================================
     /**
      * Initialise the display control widgets to be shown in the QuickControlView.
      */
