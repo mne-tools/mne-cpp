@@ -83,6 +83,10 @@ namespace DISPLIB {
     class Control3DView;
 }
 
+namespace FIFFLIB {
+    class FiffDigPointSet;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE SCDISPLIB
 //=============================================================================================================
@@ -149,11 +153,27 @@ protected:
 
     //=========================================================================================================
     /**
-     * @brief alignFiducials
+     * Allign fiducials based on input digitizer data
      *
-     * @param pDigData
+     * @param[in] pDigData      New digitizer data
      */
     void alignFiducials(QSharedPointer<FIFFLIB::FiffDigitizerData> pDigData);
+
+    //=========================================================================================================
+    /**
+     * Allign fiducials based on input digitizer data
+     *
+     * @param[in] pDigData      New digitizer data
+     */
+    void alignFiducials(FIFFLIB::FiffDigitizerData* pDigData);
+
+    //=========================================================================================================
+    /**
+     * Adds digitizer points to view
+     *
+     * @param[in] digSet    set of digitizer points
+     */
+    void addDigSetToView(const FIFFLIB::FiffDigPointSet& digSet);
 
     //=========================================================================================================
     /**
