@@ -53,8 +53,7 @@ jobs:
           response=$(curl \
             --silent --write-out "\n%{http_code}\n" \
             --form token=$COVERITY_SCAN_TOKEN \
-            --form email=$COVERITY_SCAN_NOTIFICATION_EMAIL1 \
-            --form email=$COVERITY_SCAN_NOTIFICATION_EMAIL2 \
+            --form email=$COVERITY_SCAN_NOTIFICATION_EMAIL \
             --form file=@$RESULTS_ARCHIVE \
             --form version=$SHA \
             --form description="Github Actions build" \
