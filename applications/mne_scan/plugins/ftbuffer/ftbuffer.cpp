@@ -152,9 +152,6 @@ bool FtBuffer::stop()
         msleep(10);
     }
 
-    requestInterruption();
-    wait();
-
     //Reset ftproducer and sample received list
     m_pFtBuffProducer.clear();
     m_pFtBuffProducer = QSharedPointer<FtBuffProducer>::create(this);
