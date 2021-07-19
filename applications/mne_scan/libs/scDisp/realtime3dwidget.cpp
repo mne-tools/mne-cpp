@@ -261,7 +261,6 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                                              pHpiFitResult->fittedCoils.pickTypes(QList<int>()<<FIFFV_POINT_EEG));
 
             if(m_pTrackedDigitizer && m_pBemHeadAvr) {
-                std::cout << "if(m_pTrackedDigitizer && m_pBemHeadAvr)\n";
                 //Update fast scan / tracked digitizer
                 QList<QStandardItem*> itemList = m_pTrackedDigitizer->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
                 for(int j = 0; j < itemList.size(); ++j) {
@@ -275,7 +274,6 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 itemList = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
                 for(int j = 0; j < itemList.size(); ++j) {
                     if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-                        std::cout << "Appling head transformation";
                         pBemItem->setTransform(m_tAlignment);
                         // apply inverse to get from head to device space
                         pBemItem->applyTransform(pHpiFitResult->devHeadTrans, true);
