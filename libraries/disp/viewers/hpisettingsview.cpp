@@ -107,6 +107,8 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
             this, &HpiSettingsView::allowedRotationChanged);
     connect(m_pUi->comboBox_coilPreset, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &HpiSettingsView::loadCoilPreset);
+
+    m_pUi->comboBox_coilPreset->hide();
     //Init coil freqs
     m_vCoilFreqs << 155 << 165 << 190 << 200;
     qRegisterMetaTypeStreamOperators<QVector<int> >("QVector<int>");
