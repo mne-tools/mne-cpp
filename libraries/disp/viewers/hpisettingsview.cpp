@@ -77,6 +77,8 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
 
+    setupCoilPresets();
+
     connect(m_pUi->m_pushButton_loadDigitizers, &QPushButton::released,
             this, &HpiSettingsView::onLoadDigitizers);
     connect(m_pUi->m_pushButton_doFreqOrder, &QPushButton::clicked,
@@ -103,6 +105,8 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
             this, &HpiSettingsView::allowedMovementChanged);
     connect(m_pUi->m_doubleSpinBox_rotThreshold, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &HpiSettingsView::allowedRotationChanged);
+    connect(m_pUi->comboBox_coilPreset, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &HpiSettingsView::loadCoilPreset);
     //Init coil freqs
     m_vCoilFreqs << 155 << 165 << 190 << 200;
     qRegisterMetaTypeStreamOperators<QVector<int> >("QVector<int>");
@@ -507,4 +511,27 @@ QList<FiffDigPoint> HpiSettingsView::readPolhemusDig(const QString& fileName)
 void HpiSettingsView::clearView()
 {
 
+}
+
+//=============================================================================================================
+
+void HpiSettingsView::setupCoilPresets()
+{
+    m_pUi->comboBox_coilPreset->addItem("Load preset");
+
+    m_pUi->comboBox_coilPreset->addItem("VV 4coils 1-500Hz", QVariant::fromValue(QVector<int>{154,158,161,166}));
+    m_pUi->comboBox_coilPreset->addItem("VV 4coils 501-2000Hz", QVariant::fromValue(QVector<int>{293,307,314,321}));
+    m_pUi->comboBox_coilPreset->addItem("VV 4coils 2001-3000Hz+", QVariant::fromValue(QVector<int>{586,614,628,642}));
+}
+
+//=============================================================================================================
+
+void HpiSettingsView::loadCoilPreset(int iCoilPresetIndex)
+{
+    if (iCoilPresetIndex < (m_pUi->comboBox_coilPreset->count() - 1)){
+        auto data = m_pUi->comboBox_coilPreset->itemData(iCoilPresetIndex);
+        if (!data.isNull()){
+            //set coil freqs
+        }
+    }
 }
