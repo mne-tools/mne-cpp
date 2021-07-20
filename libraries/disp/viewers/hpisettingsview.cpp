@@ -429,7 +429,6 @@ QList<FiffDigPoint> HpiSettingsView::readDigitizersFromFile(const QString& fileN
 
 void HpiSettingsView::newDigitizerList(QList<FIFFLIB::FiffDigPoint> pointList)
 {
-    std::cout << "Signal received";
     resetTables();
 
     FiffDigPointSet t_digSet(pointList);
@@ -438,7 +437,7 @@ void HpiSettingsView::newDigitizerList(QList<FIFFLIB::FiffDigPoint> pointList)
 
 //=============================================================================================================
 
-void HpiSettingsView::updateDigitizerInfo(FiffDigPointSet digSet)
+void HpiSettingsView::updateDigitizerInfo(const FiffDigPointSet& digSet)
 {
     qint16 numHPI = 0;
     qint16 numFiducials = 0;
@@ -446,7 +445,6 @@ void HpiSettingsView::updateDigitizerInfo(FiffDigPointSet digSet)
     qint16 numAdditional = 0;
 
     for(int i = 0; i < digSet.size(); ++i) {
-        std::cout << "Loop " << i << "\n";
         switch(digSet[i].kind) {
             case FIFFV_POINT_HPI: {
                 // Add column 0 in freq table widget

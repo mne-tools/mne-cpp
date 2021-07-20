@@ -716,6 +716,8 @@ FIFFLIB::FiffDigitizerData FtConnector::digDataFromIsotrakHeader(QBuffer& isotra
 
     digData.print();
 
+    stream.close();
+
     return digData;
 }
 

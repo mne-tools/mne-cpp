@@ -246,7 +246,7 @@ protected:
 
     void resetTables();
 
-    void updateDigitizerInfo(FIFFLIB::FiffDigPointSet digSet);
+    void updateDigitizerInfo(const FIFFLIB::FiffDigPointSet& digSet);
 
 
     Ui::HpiSettingsViewWidget*                  m_pUi;                  /**< The HPI dialog. */

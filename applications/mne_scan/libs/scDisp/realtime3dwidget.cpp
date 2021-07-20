@@ -350,7 +350,7 @@ void RealTime3DWidget::alignFiducials(FIFFLIB::FiffDigitizerData *pDigData)
     MneSurfaceOrVolume::align_fiducials(pDigData,
                                         t_digDataReference.data(),
                                         surface,
-                                        10,
+                                        50,
                                         1,
                                         0,
                                         scales);
