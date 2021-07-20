@@ -857,6 +857,10 @@ bool FiffStream::read_digitizer_data(const FiffDirNode::SPtr& p_Node, FiffDigiti
         return false;
     }
 
+    for (auto& dig : p_digData.points){
+        dig.coord_frame = p_digData.coord_frame;
+    }
+
     //Add other information as default
     p_digData.filename    = this->streamName();
     p_digData.npoint      = npoint;
