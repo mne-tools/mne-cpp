@@ -3177,7 +3177,6 @@ int MneSurfaceOrVolume::iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	
             else
                 w[nactive] = 1.0;
             nactive++;
-            std::cout << "nactive: " << nactive << "\n";
         }
     }
     if (nactive < 3) {
