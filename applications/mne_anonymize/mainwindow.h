@@ -249,7 +249,7 @@ signals:
      * @param[in] s Absolute path of the input file.
      *
      */
-    void fileInChanged(const QString& s) const;
+    void fileInChanged(const QString& s);
 
     //=========================================================================================================
     /**
@@ -258,7 +258,7 @@ signals:
      * @param[in] s Absolute path of the output file.
      *
      */
-    void fileOutChanged(const QString& s) const;
+    void fileOutChanged(const QString& s);
 
     //=========================================================================================================
     /**
@@ -267,7 +267,7 @@ signals:
      * @param[in] s State of the checkbox Brute Mode.
      *
      */
-    void bruteModeChanged(bool b) const;
+    void bruteModeChanged(bool b);
 
     //=========================================================================================================
     /**
@@ -276,7 +276,7 @@ signals:
      * @param[in] t Date specified.
      *
      */
-    void measurementDateChanged(const QDateTime& t) const;
+    void measurementDateChanged(const QDateTime& t);
 
     //=========================================================================================================
     /**
@@ -286,7 +286,7 @@ signals:
      * @param[in] f State of the checkbox.
      *
      */
-    void useMeasurementOffset(bool f) const;
+    void useMeasurementOffset(bool f);
 
     //=========================================================================================================
     /**
@@ -295,7 +295,7 @@ signals:
      * @param[in] o Number of days to offset the measurement.
      *
      */
-    void measurementDateOffsetChanged(int o) const;
+    void measurementDateOffsetChanged(int o);
 
     //=========================================================================================================
     /**
@@ -304,7 +304,7 @@ signals:
      * @param[in] o Number of days to offset the measurement.
      *
      */
-    void birthdayDateChanged(const QDate& d) const;
+    void birthdayDateChanged(const QDate& d);
 
     //=========================================================================================================
     /**
@@ -313,7 +313,7 @@ signals:
      * @param[in] o Number of days to offset the measurement.
      *
      */
-    void useBirthdayOffset(bool f) const;
+    void useBirthdayOffset(bool f);
 
     //=========================================================================================================
     /**
@@ -322,7 +322,7 @@ signals:
      * @param[in] o Number of days to offset the measurement.
      *
      */
-    void birthdayOffsetChanged(int o) const;
+    void birthdayOffsetChanged(int o);
 
     //=========================================================================================================
     /**
@@ -331,7 +331,7 @@ signals:
      * @param[in] text New text to substitute HisId with.
      *
      */
-    void subjectHisIdChanged(const QString& text) const;
+    void subjectHisIdChanged(const QString& text);
 
     //=========================================================================================================
     /**
