@@ -90,7 +90,10 @@ public:
     ~ProjectSettingsView();
 
     void setRecordingElapsedTime(int mSecsElapsed);
+
     QString getCurrentFileName();
+
+    void triggerFileNameUpdate();
 
     //=========================================================================================================
     /**
@@ -128,6 +131,8 @@ protected:
     void updateProcessingMode(ProcessingMode mode);
 
 private:
+    void connectGui();
+
     void addProject();
     void addSubject();
 
@@ -146,6 +151,8 @@ private:
 
     void onTimeChanged();
     void onRecordingTimerStateChanged(bool state);
+
+    void browseDirectories();
 
     Ui::ProjectSettingsViewWidget*   m_pUi;
 
