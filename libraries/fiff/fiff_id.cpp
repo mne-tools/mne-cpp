@@ -204,3 +204,11 @@ QString FiffId::toMachidString() const
 
     return strOut.toUpper();
 }
+
+//=============================================================================================================
+
+FiffId& FiffId::getDefault()
+{
+    static FiffId defaultFiffId;
+    return defaultFiffId;
+}
