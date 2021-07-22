@@ -798,7 +798,7 @@ public:
      * @param[in] kind       The tag kind.
      * @param[in] id         The id to write.
      */
-    inline static void write_id(FiffStream* p_pStream, fiff_int_t kind, FiffId& id = defaultFiffId)
+    inline static void write_id(FiffStream* p_pStream, fiff_int_t kind, FiffId& id = FiffId::getDefault())
     {
         p_pStream->write_id(kind, id);
     }
