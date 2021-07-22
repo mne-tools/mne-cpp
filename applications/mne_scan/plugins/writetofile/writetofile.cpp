@@ -221,14 +221,15 @@ void WriteToFile::initPluginControlWidgets()
     if(m_pFiffInfo) {
         QList<QWidget*> plControlWidgets;
 
+        QSettings settings("MNECPP");
+
         //Mne Scan data Path
-        QString sMneScanDataPath = QDir::homePath() + "/mne_scan";
+        QString sMneScanDataPath = settings.value(QString("MNESCAN/%1/currentDir").arg(getName()), QDir::homePath() + "/mne_scan").toString();
         if(!QDir(sMneScanDataPath).exists()) {
             QDir().mkdir(sMneScanDataPath);
         }
 
         //Test Project
-        QSettings settings("MNECPP");
         QString sCurrentProject = settings.value(QString("MNESCAN/%1/currentProject").arg(getName()), "TestProject").toString();
         if(!QDir(sMneScanDataPath+"/"+sCurrentProject).exists()) {
             QDir().mkdir(sMneScanDataPath+"/"+sCurrentProject);
