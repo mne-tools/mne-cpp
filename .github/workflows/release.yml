@@ -144,7 +144,7 @@ jobs:
     #     make install -j
     - name: Configure and compile MNE-CPP
       run: |
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
+        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static MNECPP_CONFIG+=withAppBundles
         make -j
         make install -j
     - name: Deploy binaries
@@ -339,7 +339,7 @@ jobs:
         make install
     - name: Configure and compile MNE-CPP
       run: |
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
+        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl MNECPP_CONFIG+=withAppBundles
         make -j4
     - name: Deploy binaries (MacOS)
       run: |
