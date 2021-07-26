@@ -111,7 +111,7 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
 
     m_pUi->comboBox_coilPreset->hide();
     //Init coil freqs
-    m_vCoilFreqs << 155 << 165 << 190 << 200;
+    m_vCoilFreqs << 293 << 307 << 314 << 321;
     qRegisterMetaTypeStreamOperators<QVector<int> >("QVector<int>");
 
     loadSettings();
