@@ -254,24 +254,38 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief isDigitizerDataAvailable
-     *
-     * @return
-     */
-    bool isDigitizerDataAvailable();
-
-    //=========================================================================================================
-    /**
      * AbstractAlgorithm function
      */
     virtual void run();
 
+    //=========================================================================================================
+    /**
+     * Manages iitilization of measurement metadata
+     *
+     * @param[in] pRTMSA    input real-time multi-sample arraymeasurement
+     */
     void manageInitialization(QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray> pRTMSA);
 
+    //=========================================================================================================
+    /**
+     * Initializes fiff info based on input info.
+     *
+     * @param[in] info      input fiff info objcts
+     */
     void initFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> info);
 
+    //=========================================================================================================
+    /**
+     * Inititlizaes fiffi digitizer information based on input fiffDig.
+     *
+     * @param[in] fiffDig   input fiff digitizer information
+     */
     void initFiffDigitizers(QSharedPointer<FIFFLIB::FiffDigitizerData> fiffDig);
 
+    //=========================================================================================================
+    /**
+     * Update viewer gui with current fiff digitizer metadata..
+     */
     void updateDigitizerInfo();
 
     QMutex                      m_mutex;                    /**< The threads mutex.*/

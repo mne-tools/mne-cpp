@@ -101,6 +101,12 @@ public:
      */
     FiffDigPointSet(const FiffDigPointSet &p_FiffDigPointSet);
 
+    //=========================================================================================================
+    /**
+     * Construct FiffDigPointSet based on input pointList
+     *
+     * @param[in] pointList     list of digitizer points
+     */
     FiffDigPointSet(QList<FIFFLIB::FiffDigPoint> pointList);
 
     //=========================================================================================================
@@ -221,6 +227,12 @@ public:
      */
     void applyTransform(const FiffCoordTrans& coordTrans, bool bApplyInverse = false);
 
+    //=========================================================================================================
+    /**
+     * Returns list of digitizer point the set contains
+     *
+     * @return list of digitizer points
+     */
     QList<FiffDigPoint> getList();
 
 //    ToDo:

@@ -229,7 +229,6 @@ void Hpi::manageInitialization(QSharedPointer<SCMEASLIB::RealTimeMultiSampleArra
         initPluginControlWidgets();
     }
     if(!m_pFiffDigitizerData && m_pFiffInfo){
-        std::cout << "Initializing digitizers\n";
         initFiffDigitizers(pRTMSA->digitizerData());
     }
 }
@@ -256,7 +255,6 @@ void Hpi::initFiffDigitizers(QSharedPointer<FIFFLIB::FiffDigitizerData> fiffDig)
         m_pFiffInfo->dig = m_pFiffDigitizerData->points; //temp solution. refactor fit function so this isn't necessary.
         m_mutex.unlock();
 
-        std::cout<<"Calling updateDigitizerInfo\n";
         updateDigitizerInfo();
     }
 }
@@ -265,7 +263,6 @@ void Hpi::initFiffDigitizers(QSharedPointer<FIFFLIB::FiffDigitizerData> fiffDig)
 
 void Hpi::updateDigitizerInfo()
 {
-    std::cout << "Emitting signal";
     emit newDigitizerList(m_pFiffDigitizerData->points);
 }
 
