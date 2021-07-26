@@ -107,6 +107,8 @@ FiffDigitizerData::FiffDigitizerData(const FiffDigitizerData& p_FiffDigitizerDat
 , closest(p_FiffDigitizerData.closest)
 , closest_point(p_FiffDigitizerData.closest_point)
 , dist_valid(p_FiffDigitizerData.dist_valid)
+, active(p_FiffDigitizerData.active)
+, discard(p_FiffDigitizerData.discard)
 {
 }
 
