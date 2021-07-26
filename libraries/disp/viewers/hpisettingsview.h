@@ -165,9 +165,9 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief newDigitizerList
+     * Display digitizer metadata bsed on input pointList
      *
-     * @param pointList
+     * @param[in] pointList     list of digitizer points
      */
     void newDigitizerList(QList<FIFFLIB::FiffDigPoint> pointList);
 
@@ -244,8 +244,17 @@ protected:
 
     void loadCoilPreset(int iCoilPresetIndex);
 
+    //=========================================================================================================
+    /**
+     * Resets GUI display tables and empties all rows
+     */
     void resetTables();
 
+    /**
+     * @UpdateGUI information with data from input digitizer set.
+     *
+     * @param[in] digSet    Digigtizer set from which data metadata will be displayed.
+     */
     void updateDigitizerInfo(const FIFFLIB::FiffDigPointSet& digSet);
 
 

@@ -176,12 +176,23 @@ protected:
     void addDigSetToView(const FIFFLIB::FiffDigPointSet& digSet);
 
     //=========================================================================================================
-
+    /**
+     * Calculates matrix based on input digitizer data
+     *
+     * @param[in] pDigData      source digitizer data
+     * @param[in] scale         scaling factor
+     *
+     * @return
+     */
     QMatrix4x4 calculateInverseMatrix(FIFFLIB::FiffDigitizerData *pDigData,
                                       float scale);
 
     //=========================================================================================================
-
+    /**
+     * Alligns 3D head model based on input matrix
+     *
+     * @param[in] invMat    matrix used to alligned 3d head
+     */
     void applyAlignmentTransform(QMatrix4x4 invMat);
 
     //=========================================================================================================
