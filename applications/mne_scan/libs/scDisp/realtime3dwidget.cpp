@@ -229,7 +229,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_pData3DModel->addMegSensorInfo("Device", "BabyMEG", QList<FiffChInfo>(), t_babyMEGsensorSurfaceBEM)->setCheckState(Qt::Unchecked);
 
             // Add sensor surface VectorView
-            QFile t_fileVVSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m.fif");
+            QFile t_fileVVSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
             MNEBem t_sensorVVSurfaceBEM(t_fileVVSensorSurfaceBEM);
             m_pData3DModel->addMegSensorInfo("Device", "VectorView", QList<FiffChInfo>(), t_sensorVVSurfaceBEM);
 
