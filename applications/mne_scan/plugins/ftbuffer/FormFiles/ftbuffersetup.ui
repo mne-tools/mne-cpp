@@ -66,41 +66,7 @@
         <bool>false</bool>
        </property>
        <layout class="QGridLayout" name="m_qGridLayout_Properties">
-        <item row="4" column="0">
-         <widget class="QPushButton" name="m_qPushButton_Connect">
-          <property name="text">
-           <string>Set Address/Port + Load Fif Data</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLineEdit" name="m_lineEditIP"/>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Port:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Address:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QSpinBox" name="m_spinBoxPort">
-          <property name="maximum">
-           <number>9999</number>
-          </property>
-          <property name="value">
-           <number>1972</number>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0">
+        <item row="7" column="0">
          <widget class="QGroupBox" name="m_qGroupBox_Information">
           <property name="title">
            <string>Information</string>
@@ -136,7 +102,65 @@ p, li { white-space: pre-wrap; }
           </layout>
          </widget>
         </item>
-        <item row="6" column="0">
+        <item row="4" column="0">
+         <widget class="QFrame" name="frame">
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <layout class="QGridLayout" name="gridLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item row="0" column="0">
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Address:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLineEdit" name="m_lineEditIP"/>
+           </item>
+           <item row="1" column="1">
+            <widget class="QSpinBox" name="m_spinBoxPort">
+             <property name="maximum">
+              <number>9999</number>
+             </property>
+             <property name="value">
+              <number>1972</number>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Port:</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QPushButton" name="m_qPushButton_Connect">
+          <property name="text">
+           <string>Check Buffer State</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0">
          <spacer name="horizontalSpacer_2">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -151,6 +175,17 @@ p, li { white-space: pre-wrap; }
            </size>
           </property>
          </spacer>
+        </item>
+        <item row="6" column="0">
+         <widget class="QFrame" name="frame_2">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_2"/>
+         </widget>
         </item>
        </layout>
       </widget>
