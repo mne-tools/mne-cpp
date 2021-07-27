@@ -44,6 +44,7 @@
 
 #include <QThread>
 #include <QtEndian>
+#include <QHostInfo>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -85,33 +86,39 @@ FtConnector::~FtConnector()
 
 bool FtConnector::connect()
 {
-    if(m_pSocket != Q_NULLPTR) {
-        delete m_pSocket;
-        m_pSocket = Q_NULLPTR;
-    }
+    auto info = QHostInfo::fromName(m_sAddress);
+    bool bConnected = false;
 
-    m_pSocket = new QTcpSocket();
-    m_pSocket->connectToHost(QHostAddress(m_sAddress), m_iPort);
-    qint8 iTries = 0;
+    if(!info.addresses().isEmpty()){
+        if(m_pSocket != Q_NULLPTR) {
+            delete m_pSocket;
+            m_pSocket = Q_NULLPTR;
+        }
 
-    //wait for connect max 5 tries, also windows safeguard
-    while (m_pSocket->state() != QAbstractSocket::ConnectedState) {
-        m_pSocket->waitForConnected(200);
-        iTries ++;
-        if (iTries > 5) {
-            break;
+        m_pSocket = new QTcpSocket();
+        m_pSocket->connectToHost(info.addresses().first(), m_iPort);
+        qint8 iTries = 0;
+
+        //wait for connect max 5 tries, also windows safeguard
+        while (m_pSocket->state() != QAbstractSocket::ConnectedState) {
+            m_pSocket->waitForConnected(200);
+            iTries ++;
+            if (iTries > 5) {
+                break;
+            }
+        }
+
+        if(m_pSocket->state() == QAbstractSocket::ConnectedState) {
+            qInfo() << "[FtConnector::connect] Connected!";
+            bConnected = true;
+        } else {
+            qWarning() << "[FtConnector::connect] Timed out: Failed to connect.";
+            delete m_pSocket;
+            m_pSocket = Q_NULLPTR;
+            bConnected = false;
         }
     }
-
-    if(m_pSocket->state() == QAbstractSocket::ConnectedState) {
-        qInfo() << "[FtConnector::connect] Connected!";
-        return true;
-    } else {
-        qWarning() << "[FtConnector::connect] Timed out: Failed to connect.";
-        delete m_pSocket;
-        m_pSocket = Q_NULLPTR;
-        return false;
-    }
+    return bConnected;
 }
 
 //=============================================================================================================
