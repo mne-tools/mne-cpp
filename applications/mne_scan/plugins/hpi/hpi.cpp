@@ -538,7 +538,7 @@ void Hpi::run()
 
     FiffCoordTrans transDevHeadRef = m_pFiffInfo->dev_head_t;
 
-    HPIFit HPI = HPIFit(m_pFiffInfo);
+    HPIFit HPI = HPIFit(m_pFiffInfo, true);
 
     double dErrorMax = 0.0;
     double dMeanErrorDist = 0.0;
