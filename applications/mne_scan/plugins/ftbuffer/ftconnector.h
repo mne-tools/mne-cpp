@@ -44,6 +44,7 @@
 #include <cstring>
 
 #include "ftbuffertypes.h"
+#include "ftheaderparser.h"
 
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_raw_data.h>
@@ -81,19 +82,6 @@ struct BufferInfo{
     int     iMsgSamples;                          /**< Number of samples in the latest buffer transmission receied. */
     int     iNumChannels;                         /**< Number of channels in the buffer data. */
     int     iDataType;                            /**< Type of data in the buffer. */
-};
-
-struct MetaData{
-    bool bFiffInfo = false;
-    FIFFLIB::FiffInfo info;
-    bool bFiffDigitizerData = false;
-    FIFFLIB::FiffDigitizerData dig;
-
-    void setFiffinfo(FIFFLIB::FiffInfo newinfo) {info = newinfo;
-                                                 bFiffInfo = true;};
-
-    void setFiffDigitizerData(FIFFLIB::FiffDigitizerData newdig) {dig = newdig;
-                                                                  bFiffDigitizerData = true;};
 };
 
 //=============================================================================================================
@@ -318,31 +306,11 @@ private:
 
     //=========================================================================================================
     /**
-     * Returns FiffInfo object initilized based on fieldtrip neuromag header
-     *
-     * @param[in] neuromagBuffer    buffer with the neuromag header
-     *
-     * @return FiffInfo object based on fieldtrip neuromag header
-     */
-    FIFFLIB::FiffInfo infoFromNeuromagHeader(QBuffer& neuromagBuffer);
-
-    //=========================================================================================================
-    /**
      * Returns FiffInfo object initilized based on base filedtrip header info
      *
      * @return FiffInfo object based on filedtrip header
      */
     FIFFLIB::FiffInfo infoFromSimpleHeader();
-
-    //=========================================================================================================
-    /**
-     * Reads digitizer data from buffer with isotrak header chunk
-     *
-     * @param[in] isotrakBuffer     buffer with isotrak ft header chunk
-     *
-     * @return digitizer data
-     */
-    FIFFLIB::FiffDigitizerData digDataFromIsotrakHeader(QBuffer& isotrakBuffer);
 
     //=========================================================================================================
     /**
@@ -353,36 +321,6 @@ private:
      * @return channel names
      */
     std::vector<std::string> channelNamesFromHeader(QBuffer& nameBuffer);
-
-    //=========================================================================================================
-    /**
-     * Reads type of ft header chunk from buffer
-     *
-     * @param[in] buffer            buffer with ft buffer header chunk
-     * @param[in, out] iReadCount   number of bytes read
-     *
-     * @return extended header chunk type
-     */
-    int getExtendedHeaderType(QBuffer& buffer, qint32& iReadCount);
-
-    //=========================================================================================================
-    /**
-     * Reads a ftbuffer header chunk from one buffer and writes it to another
-     *
-     * @param[in] from              source buffer
-     * @param[in, out] to           destination buffer
-     * @param[in, out] iReadCount   increments with amount of data read
-     */
-    void moveBufferData(QBuffer& from, QBuffer& to, qint32& iReadCount);
-
-    //=========================================================================================================
-    /**
-     * Skips ahead one chunk header
-     *
-     * @param[in] buffer            input buffer to be skipped
-     * @param[in, out] iReadCount   increments with amount of data read
-     */
-    void skipBufferData(QBuffer& buffer, qint32& iReadCount);
 
     int                                     m_iNumSamples;                          /**< Number of samples we've read from the buffer. */
     int                                     m_iNumNewSamples;                       /**< Number of total samples (read and unread) in the buffer. */

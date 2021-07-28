@@ -545,59 +545,15 @@ MetaData FtConnector::parseBufferHeaders()
     MetaData metadata;
     QBuffer chunkBuffer;
 
-    bool extendedHeaderFound = false;
-    int iReadCount = 0;
-
     getHeader();
     prepBuffer(chunkBuffer, m_iExtendedHeaderSize);
 
     std::cout << "Parsing extended header\n";
 
-    while(iReadCount < m_iExtendedHeaderSize) {
-        int iType = getExtendedHeaderType(chunkBuffer, iReadCount);
+    FtHeaderParser parser;
+    metadata = parser.parseHeader(chunkBuffer);
 
-        switch(iType){
-//        case 1:{
-//            QBuffer channelNameBuffer;
-//            moveBufferData(chunkBuffer, channelNameBuffer, iReadCount);
-
-//            channelNamesFromHeader(channelNameBuffer);
-//        }
-
-        case 8:{ //FT_CHUNK_NEUROMAG_HEADER = 8
-            QBuffer neuromagBuffer;
-            moveBufferData(chunkBuffer, neuromagBuffer, iReadCount);
-
-            metadata.setFiffinfo(infoFromNeuromagHeader(neuromagBuffer));
-            extendedHeaderFound = true;
-            break;
-        }
-        case 9:{ //FT_CHUNK_NEUROMAG_ISOTRAK = 9
-            QBuffer isotrakBuffer;
-
-            moveBufferData(chunkBuffer, isotrakBuffer, iReadCount);
-            metadata.setFiffDigitizerData(digDataFromIsotrakHeader(isotrakBuffer));
-            break;
-        }
-        case 10:{ //FT_CHUNK_NEUROMAG_HPIRESULT = 10
-            //do nothing for now
-            skipBufferData(chunkBuffer, iReadCount);
-            break;
-        }
-        case 11:{
-            //do nothing for now
-            skipBufferData(chunkBuffer, iReadCount);
-            break;
-        }
-        default:{
-            skipBufferData(chunkBuffer, iReadCount);
-            break;
-        }
-        }
-    }
-
-    if (!extendedHeaderFound){
-        std::cout << "No extended header\n";
+    if (!metadata.bFiffInfo){
         metadata.setFiffinfo(infoFromSimpleHeader());
     }
 
@@ -651,137 +607,4 @@ FIFFLIB::FiffInfo FtConnector::infoFromSimpleHeader()
     }
 
     return defaultInfo;
-}
-
-//=============================================================================================================
-
-FIFFLIB::FiffInfo FtConnector::infoFromNeuromagHeader(QBuffer &neuromagBuffer)
-{
-    qint32_be iIntToChar;
-    char cCharFromInt[sizeof (qint32)];
-
-    //Append read info with -1 to have a Fiff tag with 'next' == -1
-    iIntToChar = -1;
-    memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
-    neuromagBuffer.write(cCharFromInt);
-    iIntToChar = -1;
-    memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
-    neuromagBuffer.write(cCharFromInt);
-    iIntToChar = -1;
-    memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
-    neuromagBuffer.write(cCharFromInt);
-    iIntToChar = -1;
-    memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
-    neuromagBuffer.write(cCharFromInt);
-
-    neuromagBuffer.reset();
-
-    //Format data into Little endian FiffStream so we can read it with the fiff library
-    FIFFLIB::FiffStream::SPtr pStream(new FIFFLIB::FiffStream(&neuromagBuffer));
-    pStream->setByteOrder(QDataStream::LittleEndian);
-
-    //Opens and created a dir tree (this is why we had to append -1)
-    if(!pStream->open()) {
-        qCritical() << "Unable to open neuromag fiff data. Plugin behavior undefined";
-        FIFFLIB::FiffInfo defaultInfo;
-        return defaultInfo;
-    }
-
-    FIFFLIB::FiffInfo FifInfo;
-    FIFFLIB::FiffDirNode::SPtr DirNode;
-
-    //Get Fiff info we care about
-    if(!pStream->read_meas_info(pStream->dirtree(), FifInfo, DirNode)) {
-        qCritical() << "Unable to parse neuromag fiff data. Plugin behavior undefined";
-        FIFFLIB::FiffInfo defaultInfo;
-        return defaultInfo;
-    }
-
-    //do we have isotrack and hpi dat in the buffer as well?
-
-    return FifInfo; //Returns this if all went well
-}
-
-//=============================================================================================================
-
-FIFFLIB::FiffDigitizerData FtConnector::digDataFromIsotrakHeader(QBuffer& isotrakBuffer)
-{
-    isotrakBuffer.reset();
-
-    FIFFLIB::FiffStream stream(&isotrakBuffer);
-    FIFFLIB::FiffDigitizerData digData;
-
-    stream.open();
-    stream.read_digitizer_data(stream.dirtree(), digData);
-
-    digData.print();
-
-    stream.close();
-
-    return digData;
-}
-
-//=============================================================================================================
-
-void FtConnector::moveBufferData(QBuffer &from, QBuffer &to, qint32& iReadCount)
-{
-    qint32 iSize;
-    char cSize[sizeof(qint32)];
-
-    //read size of chunk
-    from.read(cSize, sizeof(qint32));
-    std::memcpy(&iSize, cSize, sizeof(qint32));
-    iReadCount += sizeof(qint32);
-
-    //Read relevant chunk info
-    to.open(QIODevice::ReadWrite);
-    to.write(from.read(iSize));
-    iReadCount += iSize;
-}
-
-//=============================================================================================================
-
-void FtConnector::skipBufferData(QBuffer &buffer, qint32& iReadCount)
-{
-    qint32 iSize;
-    char cSize[sizeof(qint32)];
-
-    //read size of chunk
-    buffer.read(cSize, sizeof(qint32));
-    std::memcpy(&iSize, cSize, sizeof(qint32));
-    iReadCount += sizeof(qint32);
-
-    //read rest of chunk (to clear buffer to read next chunk)
-    buffer.skip(iSize);
-    iReadCount += iSize;
-}
-
-//=============================================================================================================
-
-int FtConnector::getExtendedHeaderType(QBuffer &buffer, qint32 &iReadCount)
-{
-    qint32 iType;
-    char cType[sizeof(qint32)];
-
-    buffer.read(cType, sizeof(qint32));
-    std::memcpy(&iType, cType, sizeof(qint32));
-    iReadCount += sizeof(qint32);
-
-    std::cout << "Read header of type" << iType << "\n";
-    return iType;
-}
-
-//=============================================================================================================
-
-std::vector<std::string> FtConnector::channelNamesFromHeader(QBuffer &nameBuffer)
-{
-    std::vector<std::string> channelNames;
-
-    auto splitList = nameBuffer.buffer().split('\0');
-
-    for (auto item : splitList){
-        channelNames.push_back(item.data());
-    }
-
-    return channelNames;
 }

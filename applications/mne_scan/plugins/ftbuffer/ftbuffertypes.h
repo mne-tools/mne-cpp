@@ -74,4 +74,10 @@ typedef struct {
     qint32 nevents;
 } samples_events_t;
 
+enum class HeaderChunk: int{
+    FT_CHUNK_NEUROMAG_HEADER = 8,
+    FT_CHUNK_NEUROMAG_ISOTRAK = 9,
+    FT_CHUNK_NEUROMAG_HPIRESULT = 10
+};
+
 #endif // FTBUFFERTYPES_H
