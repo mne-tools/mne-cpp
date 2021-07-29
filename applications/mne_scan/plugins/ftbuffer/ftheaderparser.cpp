@@ -51,12 +51,11 @@
 
 using namespace FTBUFFERPLUGIN;
 
-
 //=============================================================================================================
 // DEFINE FREE FUNCTIONS
 //=============================================================================================================
 
-void parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer)
+void FTBUFFERPLUGIN::parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer)
 {
     qint32_be iIntToChar;
     char cCharFromInt[sizeof (qint32)];
@@ -85,7 +84,7 @@ void parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer)
 
 //=============================================================================================================
 
-void parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer)
+void FTBUFFERPLUGIN::parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer)
 {
     isotrakBuffer.reset();
 
