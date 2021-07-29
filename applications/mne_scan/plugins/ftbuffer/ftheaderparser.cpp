@@ -49,7 +49,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FTBUFFERPLUGIN;
+using FTBUFFERPLUGIN::FtHeaderParser;
+using FTBUFFERPLUGIN::MetaData;
 
 //=============================================================================================================
 // DEFINE FREE FUNCTIONS
