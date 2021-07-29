@@ -124,8 +124,8 @@ MetaData FtHeaderParser::parseHeader(QBuffer &buffer)
 
 void FtHeaderParser::registerMembers()
 {
-    functionMap = {{HeaderChunk::FT_CHUNK_NEUROMAG_HEADER, parseNeuromagHeader},
-                   {HeaderChunk::FT_CHUNK_NEUROMAG_ISOTRAK, parseIsotrakHeader}};
+    functionMap[HeaderChunk::FT_CHUNK_NEUROMAG_HEADER] = parseNeuromagHeader;
+    functionMap[HeaderChunk::FT_CHUNK_NEUROMAG_ISOTRAK] = parseIsotrakHeader;
 }
 
 //=============================================================================================================

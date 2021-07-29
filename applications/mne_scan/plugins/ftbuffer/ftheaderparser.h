@@ -41,6 +41,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "ftbuffer_global.h"
+
 #include "ftbuffertypes.h"
 
 #include <fiff/fiff_tag.h>
@@ -68,7 +70,7 @@ namespace FTBUFFERPLUGIN
 // DEFINE STRUCTS
 //=============================================================================================================
 
-struct MetaData{
+struct FTBUFFER_EXPORT MetaData{
     bool bFiffInfo = false;
     FIFFLIB::FiffInfo info;
     bool bFiffDigitizerData = false;
@@ -92,7 +94,7 @@ struct MetaData{
  * @param[in, out] data         MetaData object that gets updated with measurment info from header
  * @param[in] neuromagBuffer    Buffer containing the data portion of the neuromag header chunk
  */
-void parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer);
+void FTBUFFER_EXPORT parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer);
 
 //=============================================================================================================
 /**
@@ -101,7 +103,7 @@ void parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer);
  * @param[in, out] data         MetaData object that gets updated with measurment info from header
  * @param [in] isotrakBuffer    Buffer containing the data portion of the isotrak header chunk
  */
-void parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer);
+void FTBUFFER_EXPORT parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer);
 
 //=============================================================================================================
 /**
@@ -113,7 +115,7 @@ void parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer);
  * buffer; thse functions expect the 'read head' of the QBuffer to be at the correct location for the component
  * they are trying to read.
  */
-class FtHeaderParser{
+class FTBUFFER_EXPORT FtHeaderParser{
 public:
     //=========================================================================================================
     /**
