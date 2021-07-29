@@ -94,7 +94,7 @@ struct FTBUFFER_EXPORT MetaData{
  * @param[in, out] data         MetaData object that gets updated with measurment info from header
  * @param[in] neuromagBuffer    Buffer containing the data portion of the neuromag header chunk
  */
-void FTBUFFER_EXPORT parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer);
+FTBUFFER_EXPORT void parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer);
 
 //=============================================================================================================
 /**
@@ -103,7 +103,7 @@ void FTBUFFER_EXPORT parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer
  * @param[in, out] data         MetaData object that gets updated with measurment info from header
  * @param [in] isotrakBuffer    Buffer containing the data portion of the isotrak header chunk
  */
-void FTBUFFER_EXPORT parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer);
+FTBUFFER_EXPORT void parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer);
 
 //=============================================================================================================
 /**

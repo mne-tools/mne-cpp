@@ -312,16 +312,6 @@ private:
      */
     FIFFLIB::FiffInfo infoFromSimpleHeader();
 
-    //=========================================================================================================
-    /**
-     * Reads channel names from buffer with channel names header chunk
-     *
-     * @param[in] nameBuffer        buffer with channel names header chunk
-     *
-     * @return channel names
-     */
-    std::vector<std::string> channelNamesFromHeader(QBuffer& nameBuffer);
-
     int                                     m_iNumSamples;                          /**< Number of samples we've read from the buffer. */
     int                                     m_iNumNewSamples;                       /**< Number of total samples (read and unread) in the buffer. */
     int                                     m_iMsgSamples;                          /**< Number of samples in the latest buffer transmission receied. */
