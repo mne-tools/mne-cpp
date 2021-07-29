@@ -51,72 +51,9 @@
 
 using namespace FTBUFFERPLUGIN;
 
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-FtHeaderParser::FtHeaderParser()
-{
-
-}
 
 //=============================================================================================================
-
-MetaData FtHeaderParser::parseHeader(QBuffer &buffer)
-{
-    MetaData data;
-    while(!buffer.atEnd()){
-        processChunk(data, buffer);
-    }
-
-    return data;
-}
-
-//=============================================================================================================
-
-HeaderChunk FtHeaderParser::getChunkType(QBuffer &buffer)
-{
-    qint32 iType;
-    char cType[sizeof(qint32)];
-
-    buffer.read(cType, sizeof(qint32));
-    std::memcpy(&iType, cType, sizeof(qint32));
-
-    std::cout << "Read header of type" << iType << "\n";
-    return static_cast<HeaderChunk>(iType);
-}
-
-//=============================================================================================================
-
-void FtHeaderParser::processChunk(MetaData& data , QBuffer& buffer)
-{
-    auto chunkType = getChunkType(buffer);
-    auto function = functionMap.find(chunkType);
-
-    QBuffer headerChunk;
-    getSingleHeaderChunk(buffer, headerChunk);
-
-    if (function != functionMap.end()){
-        function->second(data, headerChunk);
-    }
-}
-
-//=============================================================================================================
-
-void FtHeaderParser::getSingleHeaderChunk(QBuffer &source, QBuffer &dest)
-{
-    qint32 iSize;
-    char cSize[sizeof(qint32)];
-
-    //read size of chunk
-    source.read(cSize, sizeof(qint32));
-    std::memcpy(&iSize, cSize, sizeof(qint32));
-
-    //Read relevant chunk info
-    dest.open(QIODevice::ReadWrite);
-    dest.write(source.read(iSize));
-}
-
+// DEFINE FREE FUNCTIONS
 //=============================================================================================================
 
 void parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer)
@@ -124,6 +61,7 @@ void parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer)
     qint32_be iIntToChar;
     char cCharFromInt[sizeof (qint32)];
 
+    //Pad buffer because the fiff file we receive is missing an end tag
     iIntToChar = -1;
     memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
     neuromagBuffer.write(cCharFromInt);
@@ -162,9 +100,76 @@ void parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer)
 }
 
 //=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+FtHeaderParser::FtHeaderParser()
+{
+    registerMembers();
+}
+
+//=============================================================================================================
+
+MetaData FtHeaderParser::parseHeader(QBuffer &buffer)
+{
+    MetaData data;
+    while(!buffer.atEnd()){
+        processChunk(data, buffer);
+    }
+
+    return data;
+}
+
+//=============================================================================================================
 
 void FtHeaderParser::registerMembers()
 {
     functionMap = {{HeaderChunk::FT_CHUNK_NEUROMAG_HEADER, parseNeuromagHeader},
                    {HeaderChunk::FT_CHUNK_NEUROMAG_ISOTRAK, parseIsotrakHeader}};
 }
+
+//=============================================================================================================
+
+void FtHeaderParser::processChunk(MetaData& data , QBuffer& buffer)
+{
+    auto chunkType = getChunkType(buffer);
+    auto function = functionMap.find(chunkType);
+
+    QBuffer headerChunk;
+    getSingleHeaderChunk(buffer, headerChunk);
+
+    if (function != functionMap.end()){
+        function->second(data, headerChunk);
+    }
+}
+
+//=============================================================================================================
+
+void FtHeaderParser::getSingleHeaderChunk(QBuffer &source, QBuffer &dest)
+{
+    qint32 iSize;
+    char cSize[sizeof(qint32)];
+
+    //read size of chunk
+    source.read(cSize, sizeof(qint32));
+    std::memcpy(&iSize, cSize, sizeof(qint32));
+
+    //Read relevant chunk info
+    dest.open(QIODevice::ReadWrite);
+    dest.write(source.read(iSize));
+}
+
+//=============================================================================================================
+
+HeaderChunk FtHeaderParser::getChunkType(QBuffer &buffer)
+{
+    qint32 iType;
+    char cType[sizeof(qint32)];
+
+    buffer.read(cType, sizeof(qint32));
+    std::memcpy(&iType, cType, sizeof(qint32));
+
+    std::cout << "Read header of type" << iType << "\n";
+    return static_cast<HeaderChunk>(iType);
+}
+
