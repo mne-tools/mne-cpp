@@ -9,7 +9,7 @@ on:
 
 jobs:
   CreateRelease:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
     
     steps:
     - name: Clone repository
@@ -55,7 +55,7 @@ jobs:
         hub release create -m "Development Builds" dev_build --prerelease
         
   LinuxStatic:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
     needs: CreateRelease
     
     steps:
@@ -239,7 +239,7 @@ jobs:
         overwrite: true
 
   LinuxDynamic:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
     needs: CreateRelease
     
     steps:
@@ -435,7 +435,7 @@ jobs:
   Tests:
     # Only run for dev releases
     if: endsWith(github.ref, 'main') == true
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
     needs: CreateRelease
 
     steps:
@@ -468,7 +468,7 @@ jobs:
         ./tools/testing/test_linux_codecov
         
   Doxygen:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
     needs: CreateRelease
 
     steps:
