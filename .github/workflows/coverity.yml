@@ -17,7 +17,7 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@v2
         with:
-          version: 5.10.1
+          version: 5.12.5
           modules: qtcharts
       - name: Coverity scripts
         run: |
@@ -58,7 +58,7 @@ jobs:
             --form version=$SHA \
             --form description="Github Actions build" \
             $UPLOAD_URL)
-          echo "$response"  
+          echo "$response"
           status_code=$(echo "$response" | sed -n '$p')
         env:
           COVTOKEN: ${{ secrets.COVERITY_TOKEN }}
