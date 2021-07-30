@@ -211,7 +211,7 @@ jobs:
       if: matrix.os == 'ubuntu-18.04'
       run: |
         sudo apt-get update -q
-        sudo apt-get install build-essential libgl1-mesa-dev
+        sudo apt-get install build-essential libgl1-mesa-dev libicu55
     - name: Install Qt (Linux)
       if: matrix.os == 'ubuntu-18.04'
       run: |
