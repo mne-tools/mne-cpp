@@ -96,7 +96,7 @@ jobs:
         jom -j4
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat dynamic pack
+        ./tools/deployment/deploy.sh.bat dynamic pack
 
   MaxQtDynamic:
     runs-on: ${{ matrix.os }}
@@ -188,7 +188,7 @@ jobs:
         jom -j4
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat dynamic pack
+        ./tools/deployment/deploy.sh.bat dynamic pack
 
   QtStatic:
     runs-on: ${{ matrix.os }}
@@ -263,7 +263,7 @@ jobs:
         jom -j4
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat static pack
+        ./tools/deployment/deploy.sh.bat static pack
 
   Tests:
     runs-on: ${{ matrix.os }}
