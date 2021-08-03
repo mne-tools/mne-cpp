@@ -217,20 +217,20 @@ jobs:
       if: matrix.os == 'ubuntu-18.04'
       run: |
         # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
-        wget -O qt5_5152_static_binaries_linux.tar.gz https://www.dropbox.com/s/i4owdnhoz4nsx49/qt5_5152_static_binaries_linux.tar.gz.zip?dl=1
+        wget -O qt5_5152_static_binaries_linux.tar.gz https://www.dropbox.com/s/o0aw8p8kqqnmwcp/qt5_5152_static_binaries_linux.tar.gz?dl=1
         mkdir ../Qt5_binaries
         tar xvzf qt5_5152_static_binaries_linux.tar.gz -C ../ -P
     - name: Install Qt (MacOS)
       if: matrix.os == 'macos-latest'
       run: |
         # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
-        wget -O qt5_5152_static_binaries_macos.tar.gz https://www.dropbox.com/s/9x0rnpjv74qvvdz/qt5_5152_static_binaries_macos.tar.gz.zip?dl=1
+        wget -O qt5_5152_static_binaries_macos.tar.gz https://www.dropbox.com/s/ccigarxk40wlxq0/qt5_5152_static_binaries_macos.tar.gz?dl=1
         tar xvzf qt5_5152_static_binaries_macos.tar.gz -P
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2019'
       run: |
         # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
-        Invoke-WebRequest https://www.dropbox.com/s/xjbvy6xw1cjq7ok/qt5_5152_static_binaries_win.zip.zip?dl=1 -OutFile .\qt5_5152_static_binaries_win.zip
+        Invoke-WebRequest https://www.dropbox.com/s/47s49smjg499gnm/qt5_5152_static_binaries_win.zip?dl=1 -OutFile .\qt5_5152_static_binaries_win.zip
         expand-archive -path "qt5_5152_static_binaries_win.zip" -destinationpath "..\"
     - name: Install jom (Windows)
       if: matrix.os == 'windows-2019'
