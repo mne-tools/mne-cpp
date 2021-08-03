@@ -2,7 +2,7 @@ name: Linux|MacOS|Win|WASM
 
 on:
   push:
-    tags:        
+    tags:
     - v0.*
     branches:
     - main
@@ -10,7 +10,7 @@ on:
 jobs:
   CreateRelease:
     runs-on: ubuntu-18.04
-    
+
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
@@ -41,9 +41,9 @@ jobs:
       run: |
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name $GITHUB_USER
-        # Delete current dev_build release remotely. 
-        # Must be done before deleting the remote tag associated with the dev_build release. 
-        # This prevents a draft release to be left over after we delete the tag remotely. 
+        # Delete current dev_build release remotely.
+        # Must be done before deleting the remote tag associated with the dev_build release.
+        # This prevents a draft release to be left over after we delete the tag remotely.
         hub release delete dev_build
         # Delete current tag remotely
         git push origin :refs/tags/dev_build
@@ -53,11 +53,11 @@ jobs:
         git push -f --tag
         # Create new dev_build release
         hub release create -m "Development Builds" dev_build --prerelease
-        
+
   LinuxStatic:
     runs-on: ubuntu-18.04
     needs: CreateRelease
-    
+
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
@@ -68,7 +68,7 @@ jobs:
     - name: Install Qt
       run: |
         # Download the pre-built static version of Qt, which was created with the buildqtbinaries.yml workflow
-        wget -O qt5_5152_static_binaries_linux.tar.gz https://www.dropbox.com/s/cm50t5fl62rspdl/qt5_5152_static_binaries_linux.tar.gz?dl=1
+        wget -O qt5_5152_static_binaries_linux.tar.gz https://www.dropbox.com/s/i4owdnhoz4nsx49/qt5_5152_static_binaries_linux.tar.gz.zip?dl=1
         mkdir ../Qt5_binaries
         tar xvzf qt5_5152_static_binaries_linux.tar.gz -C ../ -P
     # Uncomment this if you want to build Qt statically in this workflow
@@ -117,14 +117,14 @@ jobs:
   MacOSStatic:
     runs-on: macos-latest
     needs: CreateRelease
-    
+
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
     - name: Install Qt
       run: |
         # Download the pre-built static version of Qt, which was created with the buildqtbinaries.yml workflow
-        wget -O qt5_5152_static_binaries_macos.tar.gz https://www.dropbox.com/s/2s61xfnod6fwn2w/qt5_5152_static_binaries_macos.tar.gz?dl=1
+        wget -O qt5_5152_static_binaries_macos.tar.gz https://www.dropbox.com/s/9x0rnpjv74qvvdz/qt5_5152_static_binaries_macos.tar.gz.zip?dl=1
         tar xzf qt5_5152_static_binaries_macos.tar.gz -P
     # Uncomment this if you want to build Qt statically in this workflow
     # - name: Compile static Qt version
@@ -168,7 +168,7 @@ jobs:
         asset_name: mne-cpp-macos-static-x86_64.tar.gz
         tag: dev_build
         overwrite: true
-        
+
   WinStatic:
     runs-on: windows-2019
     needs: CreateRelease
@@ -185,11 +185,11 @@ jobs:
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/dku543gtw7ik7hr/jom.zip?dl=1 -OutFile .\jom.zip
         expand-archive -path "jom.zip"
-        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append  
+        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Install Qt
       run: |
         # Download the pre-built static version of Qt, which was created with the buildqtbinaries.yml workflow
-        Invoke-WebRequest https://www.dropbox.com/s/8bizfho6mgifgpb/qt5_5152_static_binaries_win.zip?dl=1 -OutFile .\qt5_5152_static_binaries_win.zip
+        Invoke-WebRequest https://www.dropbox.com/s/xjbvy6xw1cjq7ok/qt5_5152_static_binaries_win.zip.zip?dl=1 -OutFile .\qt5_5152_static_binaries_win.zip
         expand-archive -path "qt5_5152_static_binaries_win.zip" -destinationpath "..\"
     # Uncomment this if you want to build Qt statically in this workflow
     # - name: Compile static Qt version
@@ -203,7 +203,7 @@ jobs:
     #     cd ..
     #     mkdir qt5_shadow
     #     cd qt5_shadow
-    #     # Setup the compiler 
+    #     # Setup the compiler
     #     cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
     #     Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
     #     # Configure Qt5
@@ -241,7 +241,7 @@ jobs:
   LinuxDynamic:
     runs-on: ubuntu-18.04
     needs: CreateRelease
-    
+
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
@@ -322,7 +322,7 @@ jobs:
       with:
         version: 5.14.2
         modules: qtcharts
-    - name: Compile BrainFlow submodule 
+    - name: Compile BrainFlow submodule
       run: |
         mkdir applications/mne_scan/plugins/brainflowboard/brainflow/build
         cd applications/mne_scan/plugins/brainflowboard/brainflow/build
@@ -374,7 +374,7 @@ jobs:
       uses: actions/setup-python@v1
       with:
         python-version: '3.7'
-        architecture: 'x64'   
+        architecture: 'x64'
     - name: Install BrainFlow and LSL submodules
       run: |
         git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
@@ -431,7 +431,7 @@ jobs:
         asset_name: mne-cpp-windows-dynamic-x86_64.zip
         tag: dev_build
         overwrite: true
-        
+
   Tests:
     # Only run for dev releases
     if: endsWith(github.ref, 'main') == true
@@ -450,7 +450,7 @@ jobs:
         architecture: 'x64'
     - name: Install Codecov
       run: |
-        sudo pip install codecov 
+        sudo pip install codecov
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
@@ -466,7 +466,7 @@ jobs:
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
         ./tools/testing/test_linux_codecov
-        
+
   Doxygen:
     runs-on: ubuntu-18.04
     needs: CreateRelease
@@ -487,7 +487,7 @@ jobs:
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
-        credentials: ${{secrets.GIT_CREDENTIALS}}    
+        credentials: ${{secrets.GIT_CREDENTIALS}}
     - name: Deploy qch docu data base with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -515,7 +515,7 @@ jobs:
         # Remove all files first
         git rm * -r
         git commit --amend -a -m 'Update docu' --allow-empty
-        touch .nojekyll        
+        touch .nojekyll
         # Copy doxygen files
         cp -r ../html/* .
         # Add all new files, commit and push
@@ -562,7 +562,7 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
-    - name: Setup emscripten compiler 
+    - name: Setup emscripten compiler
       run: |
         cd ..
         # Get the emsdk repo
@@ -571,7 +571,7 @@ jobs:
         cd emsdk
         git pull
         # Download and install the latest SDK tools.
-        ./emsdk install 1.39.7       
+        ./emsdk install 1.39.7
     - name: Compile wasm Qt version
       run: |
         cd ..
@@ -594,7 +594,7 @@ jobs:
         ./emsdk/emsdk activate 1.39.7
         # Activate PATH and other environment variables in the current terminal
         source ./emsdk/emsdk_env.sh
-        # Compile MNE-CPP        
+        # Compile MNE-CPP
         cd mne-cpp
         ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG=wasm
         make -j4
