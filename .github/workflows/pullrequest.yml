@@ -216,31 +216,21 @@ jobs:
     - name: Install Qt (Linux)
       if: matrix.os == 'ubuntu-18.04'
       run: |
-        cd ..
-        git clone https://code.qt.io/qt/qt5.git -b 5.15.2
-        cd qt5
-        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d
-        # Create shadow build folder
-        cd ..
-        mkdir qt5_shadow
-        cd qt5_shadow
-        # Configure Qt5
-        ../qt5/configure -static -release -prefix "../Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -bundled-xcb-xinput -qt-libpng -qt-pcre
-        make module-qtbase module-qtsvg module-qtcharts module-qt3d -j4
-        make install -j4
-        cd ..
-        cd mne-cpp
+        # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
+        wget -O qt5_5152_static_binaries_linux.tar.gz https://www.dropbox.com/s/i4owdnhoz4nsx49/qt5_5152_static_binaries_linux.tar.gz.zip?dl=1
+        mkdir ../Qt5_binaries
+        tar xvzf qt5_5152_static_binaries_linux.tar.gz -C ../ -P
     - name: Install Qt (MacOS)
       if: matrix.os == 'macos-latest'
       run: |
         # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
-        wget -O qt5_5152_static_binaries_macos.tar.gz https://www.dropbox.com/s/2s61xfnod6fwn2w/qt5_5152_static_binaries_macos.tar.gz?dl=1
+        wget -O qt5_5152_static_binaries_macos.tar.gz https://www.dropbox.com/s/9x0rnpjv74qvvdz/qt5_5152_static_binaries_macos.tar.gz.zip?dl=1
         tar xvzf qt5_5152_static_binaries_macos.tar.gz -P
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2019'
       run: |
         # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
-        Invoke-WebRequest https://www.dropbox.com/s/8bizfho6mgifgpb/qt5_5152_static_binaries_win.zip?dl=1 -OutFile .\qt5_5152_static_binaries_win.zip
+        Invoke-WebRequest https://www.dropbox.com/s/xjbvy6xw1cjq7ok/qt5_5152_static_binaries_win.zip.zip?dl=1 -OutFile .\qt5_5152_static_binaries_win.zip
         expand-archive -path "qt5_5152_static_binaries_win.zip" -destinationpath "..\"
     - name: Install jom (Windows)
       if: matrix.os == 'windows-2019'
