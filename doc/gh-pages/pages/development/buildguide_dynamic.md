@@ -81,7 +81,7 @@ make -j8 # On Linux and MacOS
 
 ### Running Applications
 
-Once built, applications can be run from within QtCreator using the run button on the bottom left side. To instead run applications from the command line, first execute the ```deploy.bat``` script in ```tools/deployment```.  For more information about this script, see our [Continuous Integration documentation](ci_deployment.md). Once this is done, applications can be executed normally from the command line.
+Once built, applications can be run from within QtCreator using the run button on the bottom left side. To instead run applications from the command line, first execute the ```deploy.sh.bat``` script in ```tools/deployment```.  For more information about this script, see our [Continuous Integration documentation](ci_deployment.md). Once this is done, applications can be executed normally from the command line.
 
 ## Test the Build
 

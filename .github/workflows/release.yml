@@ -9,7 +9,7 @@ on:
 
 jobs:
   CreateRelease:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
     
     steps:
     - name: Clone repository
@@ -55,7 +55,7 @@ jobs:
         hub release create -m "Development Builds" dev_build --prerelease
         
   LinuxStatic:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
     needs: CreateRelease
     
     steps:
@@ -94,7 +94,7 @@ jobs:
         make install -j4
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat static pack
+        ./tools/deployment/deploy.sh.bat static pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -149,7 +149,7 @@ jobs:
         make install -j
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat static pack
+        ./tools/deployment/deploy.sh.bat static pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -218,7 +218,7 @@ jobs:
         jom -j4
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat static pack
+        ./tools/deployment/deploy.sh.bat static pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -239,7 +239,7 @@ jobs:
         overwrite: true
 
   LinuxDynamic:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
     needs: CreateRelease
     
     steps:
@@ -281,7 +281,7 @@ jobs:
         make -j4
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat dynamic pack
+        ./tools/deployment/deploy.sh.bat dynamic pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -343,7 +343,7 @@ jobs:
         make -j4
     - name: Deploy binaries (MacOS)
       run: |
-        ./tools/deployment/deploy.bat dynamic pack
+        ./tools/deployment/deploy.sh.bat dynamic pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -412,7 +412,7 @@ jobs:
         jom -j4
     - name: Deploy binaries (Windows)
       run: |
-        ./tools/deployment/deploy.bat dynamic pack
+        ./tools/deployment/deploy.sh.bat dynamic pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -435,7 +435,7 @@ jobs:
   Tests:
     # Only run for dev releases
     if: endsWith(github.ref, 'main') == true
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
     needs: CreateRelease
 
     steps:
@@ -468,7 +468,7 @@ jobs:
         ./tools/testing/test_linux_codecov
         
   Doxygen:
-    runs-on: ubuntu-16.04
+    runs-on: ubuntu-18.04
     needs: CreateRelease
 
     steps:
