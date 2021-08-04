@@ -70,6 +70,10 @@ namespace FTBUFFERPLUGIN
 // DEFINE STRUCTS
 //=============================================================================================================
 
+//=============================================================================================================
+/**
+ * Struct that holds metadata for a measurement.
+ */
 struct FTBUFFER_EXPORT MetaData{
     bool bFiffInfo = false;
     FIFFLIB::FiffInfo info;
