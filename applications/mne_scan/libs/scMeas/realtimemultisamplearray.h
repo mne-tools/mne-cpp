@@ -233,8 +233,8 @@ public:
 private:
     mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety. */
 
-    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
-    QSharedPointer<FIFFLIB::FiffDigitizerData>      m_pFiffDigitizerData_orig;
+    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo_orig;           /**< Original Fiff Info if initialized by fiff info. */
+    QSharedPointer<FIFFLIB::FiffDigitizerData>      m_pFiffDigitizerData_orig;  /**< Original Fiff Digitizer Data */
 
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
     float                       m_fSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
