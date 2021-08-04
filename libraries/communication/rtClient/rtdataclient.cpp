@@ -366,7 +366,7 @@ FiffInfo::SPtr RtDataClient::readInfo()
 
 //=============================================================================================================
 
-Metadata RtDataClient::readMetadata()
+MetaData RtDataClient::readMetadata()
 {
     FiffDigitizerData::SPtr p_pDigData(new FiffDigitizerData());
     FiffInfo::SPtr p_pFiffInfo(new FiffInfo());
@@ -648,12 +648,7 @@ Metadata RtDataClient::readMetadata()
         p_pDigData->discard.append(0);
     }
 
-    Metadata data;
-
-    data.info = p_pFiffInfo;
-    data.dig = p_pDigData;
-
-    return data;
+    return MetaData(p_pFiffInfo, p_pDigData);
 }
 
 //=============================================================================================================
