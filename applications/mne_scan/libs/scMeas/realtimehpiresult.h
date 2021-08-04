@@ -160,7 +160,7 @@ private:
 
     QSharedPointer<INVERSELIB::HpiFitResult>    m_pHpiFitResult;    /**< The HPI fit result. */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The Fiff Info. */
-    QSharedPointer<FIFFLIB::FiffDigitizerData>  m_pFiffDigData;
+    QSharedPointer<FIFFLIB::FiffDigitizerData>  m_pFiffDigData;     /**< The Fiff Digigtizer Data */
 };
 
 //=============================================================================================================
