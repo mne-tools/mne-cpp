@@ -65,9 +65,14 @@
 namespace COMMUNICATIONLIB
 {
 
-struct Metadata{
-    FIFFLIB::FiffInfo::SPtr info;
-    FIFFLIB::FiffDigitizerData::SPtr dig;
+struct MetaData{
+    MetaData(FIFFLIB::FiffInfo::SPtr pInfo,
+             FIFFLIB::FiffDigitizerData::SPtr pDigitizerData)
+            :m_pInfo(pInfo)
+            ,m_pDigitizerData(pDigitizerData){};
+
+    FIFFLIB::FiffInfo::SPtr m_pInfo;
+    FIFFLIB::FiffDigitizerData::SPtr m_pDigitizerData;
 };
 
 //=============================================================================================================
@@ -116,7 +121,13 @@ public:
      */
     FIFFLIB::FiffInfo::SPtr readInfo();
 
-    Metadata readMetadata();
+    //=========================================================================================================
+    /**
+     * Reads fiff metaata class from data connection
+     *
+     * @return returns metadata class (FiffInfo and FiffDigitizerData)
+     */
+    MetaData readMetadata();
 
     //=========================================================================================================
     /**
