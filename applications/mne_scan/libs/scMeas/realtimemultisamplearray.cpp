@@ -105,11 +105,6 @@ void RealTimeMultiSampleArray::initFromFiffInfo(QSharedPointer<FIFFLIB::FiffInfo
     m_qListChInfo.clear();
     m_bChInfoIsInit = false;
 
-    bool t_bIsBabyMEG = false;
-
-    if(pFiffInfo->acq_pars == "BabyMEG")
-        t_bIsBabyMEG = true;
-
     for(qint32 i = 0; i < pFiffInfo->nchan; ++i)
     {
         RealTimeSampleArrayChInfo initChInfo;
@@ -125,93 +120,6 @@ void RealTimeMultiSampleArray::initFromFiffInfo(QSharedPointer<FIFFLIB::FiffInfo
             initChInfo.setMinValue(0);
             initChInfo.setMaxValue(1.0e6);
         }
-//        else
-//        {
-////            qDebug() << "kind" << pFiffInfo->chs[i].kind << "unit" << pFiffInfo->chs[i].unit;
-
-//            //Unit
-//            switch(pFiffInfo->chs[i].unit)
-//            {
-//                case 101:
-//                    initChInfo.setUnit("Hz");
-//                    break;
-//                case 102:
-//                    initChInfo.setUnit("N");
-//                    break;
-//                case 103:
-//                    initChInfo.setUnit("Pa");
-//                    break;
-//                case 104:
-//                    initChInfo.setUnit("J");
-//                    break;
-//                case 105:
-//                    initChInfo.setUnit("W");
-//                    break;
-//                case 106:
-//                    initChInfo.setUnit("C");
-//                    break;
-//                case 107:
-//                    initChInfo.setUnit("V");
-////                    initChInfo.setMinValue(0);
-////                    initChInfo.setMaxValue(1.0e-3);
-//                    break;
-//                case 108:
-//                    initChInfo.setUnit("F");
-//                    break;
-//                case 109:
-//                    initChInfo.setUnit("Ohm");
-//                    break;
-//                case 110:
-//                    initChInfo.setUnit("MHO");
-//                    break;
-//                case 111:
-//                    initChInfo.setUnit("Wb");
-//                    break;
-//                case 112:
-//                    initChInfo.setUnit("T");
-//                    if(t_bIsBabyMEG)
-//                    {
-//                        initChInfo.setMinValue(-1.0e-4);
-//                        initChInfo.setMaxValue(1.0e-4);
-//                    }
-//                    else
-//                    {
-//                        initChInfo.setMinValue(-1.0e-10);
-//                        initChInfo.setMaxValue(1.0e-10);
-//                    }
-//                    break;
-//                case 113:
-//                    initChInfo.setUnit("H");
-//                    break;
-//                case 114:
-//                    initChInfo.setUnit("Cel");
-//                    break;
-//                case 115:
-//                    initChInfo.setUnit("Lm");
-//                    break;
-//                case 116:
-//                    initChInfo.setUnit("Lx");
-//                    break;
-//                case 201:
-//                    initChInfo.setUnit("T/m");
-//                    if(t_bIsBabyMEG)
-//                    {
-//                        initChInfo.setMinValue(-1.0e-4);
-//                        initChInfo.setMaxValue(1.0e-4);
-//                    }
-//                    else
-//                    {
-//                        initChInfo.setMinValue(-1.0e-10);
-//                        initChInfo.setMaxValue(1.0e-10);
-//                    }
-//                    break;
-//                case 202:
-//                    initChInfo.setUnit("Am");
-//                    break;
-//                default:
-//                    initChInfo.setUnit("");
-//            }
-//        }
 
         // set channel Kind
         initChInfo.setKind(pFiffInfo->chs[i].kind);
