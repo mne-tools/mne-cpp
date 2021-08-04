@@ -169,10 +169,8 @@ void FiffSimulatorProducer::run()
         if(m_bFlagInfoRequest) {
             m_pFiffSimulator->m_qMutex.lock();
             auto metadata = m_pRtDataClient->readMetadata();
-//            m_pFiffSimulator->m_pFiffInfo = m_pRtDataClient->readInfo();
-//            m_pFiffSimulator->m_pFiffDigData = m_pRtDataClient->readDigData();
-            m_pFiffSimulator->m_pFiffInfo = metadata.info;
-            m_pFiffSimulator->m_pFiffDigData = metadata.dig;
+            m_pFiffSimulator->m_pFiffInfo = metadata.m_pInfo;
+            m_pFiffSimulator->m_pFiffDigData = metadata.m_pDigitizerData;
             m_pFiffSimulator->m_qMutex.unlock();
             emit m_pFiffSimulator->fiffInfoAvailable();
             m_bFlagInfoRequest = false;
