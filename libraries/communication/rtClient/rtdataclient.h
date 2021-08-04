@@ -65,6 +65,10 @@
 namespace COMMUNICATIONLIB
 {
 
+//=============================================================================================================
+/**
+ * Struct that holds metadata for a measurement.
+ */
 struct MetaData{
     MetaData(FIFFLIB::FiffInfo::SPtr pInfo,
              FIFFLIB::FiffDigitizerData::SPtr pDigitizerData)

@@ -144,7 +144,7 @@ public:
      *
      * @return the current set digitizer data
      */
-    inline QSharedPointer<FIFFLIB::FiffDigitizerData> digitizerData();
+    inline QSharedPointer<FIFFLIB::FiffDigitizerData> digitizerData() const;
 
     //=========================================================================================================
     /**
@@ -173,7 +173,7 @@ inline bool RealTimeHpiResult::isInitialized() const
     return m_bInitialized;
 }
 
-inline QSharedPointer<FIFFLIB::FiffDigitizerData> RealTimeHpiResult::digitizerData()
+inline QSharedPointer<FIFFLIB::FiffDigitizerData> RealTimeHpiResult::digitizerData() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFiffDigData;

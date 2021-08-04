@@ -176,8 +176,8 @@ protected:
      *
      * @return
      */
-    QMatrix4x4 calculateInverseMatrix(QSharedPointer<FIFFLIB::FiffDigitizerData> pDigData,
-                                      float scale);
+    QMatrix4x4 calculateInverseMatrix(const QSharedPointer<FIFFLIB::FiffDigitizerData> pDigData,
+                                      float scale) const;
 
     //=========================================================================================================
     /**
@@ -185,7 +185,7 @@ protected:
      *
      * @param[in] invMat    matrix used to alligned 3d head
      */
-    void applyAlignmentTransform(QMatrix4x4 invMat);
+    void applyAlignmentTransform(QMatrix4x4& invMat);
 
     //=========================================================================================================
     /**
@@ -199,8 +199,8 @@ protected:
      */
     void createGUI();
 
-    QString                                                     m_sFilePathDigitizers;
-    QSharedPointer<FIFFLIB::FiffDigitizerData>                  m_pFiffDigitizerData;
+    QString                                                     m_sFilePathDigitizers;  /**< Path to loaded fiff file with digitizer data. */
+    QSharedPointer<FIFFLIB::FiffDigitizerData>                  m_pFiffDigitizerData;   /**< Fiff digitizer data for current measurement. */
 
     int                                                         m_iNumberBadChannels;   /**< The last received number of bad channels. */
 
