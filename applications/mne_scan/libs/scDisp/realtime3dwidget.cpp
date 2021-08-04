@@ -249,6 +249,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             }
             if (!m_pFiffDigitizerData && m_pBemHeadAvr){
                 if (auto pDigData = pRTHR->digitizerData()){
+                    m_pFiffDigitizerData = pDigData;
                     FiffDigPointSet digSet(pDigData->points);
                     addDigSetToView(digSet);
                     alignFiducials(pDigData);
@@ -315,7 +316,7 @@ void RealTime3DWidget::alignFiducials(const QString& sFilePath)
     m_sFilePathDigitizers = sFilePath;
 
     QFile t_fileDigData(sFilePath);
-    FiffDigitizerData* t_digData = new FiffDigitizerData(t_fileDigData);
+    QSharedPointer<FIFFLIB::FiffDigitizerData> t_digData = QSharedPointer<FIFFLIB::FiffDigitizerData>::create(t_fileDigData);
 
     alignFiducials(t_digData);
 }
@@ -323,15 +324,6 @@ void RealTime3DWidget::alignFiducials(const QString& sFilePath)
 //=============================================================================================================
 
 void RealTime3DWidget::alignFiducials(QSharedPointer<FIFFLIB::FiffDigitizerData> pDigData)
-{
-    m_pFiffDigitizerData = pDigData;
-
-    alignFiducials(m_pFiffDigitizerData.data());
-}
-
-//=============================================================================================================
-
-void RealTime3DWidget::alignFiducials(FIFFLIB::FiffDigitizerData *pDigData)
 {
     std::unique_ptr<MneMshDisplaySurfaceSet> pMneMshDisplaySurfaceSet = std::make_unique<MneMshDisplaySurfaceSet>();
     MneMshDisplaySurfaceSet::add_bem_surface(pMneMshDisplaySurfaceSet.get(),
@@ -347,7 +339,7 @@ void RealTime3DWidget::alignFiducials(FIFFLIB::FiffDigitizerData *pDigData)
 
     float scales[3];
     QScopedPointer<FiffDigitizerData> t_digDataReference(new FiffDigitizerData(t_fileDigDataReference));
-    MneSurfaceOrVolume::align_fiducials(pDigData,
+    MneSurfaceOrVolume::align_fiducials(pDigData.data(),
                                         t_digDataReference.data(),
                                         surface,
                                         10,
@@ -378,7 +370,7 @@ void RealTime3DWidget::applyAlignmentTransform(QMatrix4x4 invMat)
 
 //=============================================================================================================
 
-QMatrix4x4 RealTime3DWidget::calculateInverseMatrix(FIFFLIB::FiffDigitizerData *pDigData,
+QMatrix4x4 RealTime3DWidget::calculateInverseMatrix(QSharedPointer<FIFFLIB::FiffDigitizerData> pDigData,
                                                     float scale)
 {
     QMatrix4x4 invMat;
