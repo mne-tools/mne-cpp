@@ -354,7 +354,7 @@ void RealTime3DWidget::alignFiducials(QSharedPointer<FIFFLIB::FiffDigitizerData>
 
 //=============================================================================================================
 
-void RealTime3DWidget::applyAlignmentTransform(QMatrix4x4 invMat)
+void RealTime3DWidget::applyAlignmentTransform(QMatrix4x4& invMat)
 {
     Qt3DCore::QTransform identity;
     m_tAlignment.setMatrix(invMat);
@@ -370,8 +370,8 @@ void RealTime3DWidget::applyAlignmentTransform(QMatrix4x4 invMat)
 
 //=============================================================================================================
 
-QMatrix4x4 RealTime3DWidget::calculateInverseMatrix(QSharedPointer<FIFFLIB::FiffDigitizerData> pDigData,
-                                                    float scale)
+QMatrix4x4 RealTime3DWidget::calculateInverseMatrix(const QSharedPointer<FIFFLIB::FiffDigitizerData> pDigData,
+                                                    float scale) const
 {
     QMatrix4x4 invMat;
 
