@@ -221,13 +221,17 @@ public:
 
     //=========================================================================================================
     /**
-     * Writes the fiff information to a FIF stream
+     * Writes the fiff information to a FIF stream.
      *
      * @param[in] p_pStream  The stream to write to.
      */
     void writeToStream(FiffStream* p_pStream) const;
 
-    void print();
+    //=========================================================================================================
+    /**
+     * Prints class contents.
+     */
+    void print() const;
 
 private:
     //=========================================================================================================
