@@ -161,14 +161,6 @@ protected:
 
     //=========================================================================================================
     /**
-     * Allign fiducials based on input digitizer data
-     *
-     * @param[in] pDigData      New digitizer data
-     */
-    void alignFiducials(FIFFLIB::FiffDigitizerData* pDigData);
-
-    //=========================================================================================================
-    /**
      * Adds digitizer points to view
      *
      * @param[in] digSet    set of digitizer points
@@ -184,7 +176,7 @@ protected:
      *
      * @return
      */
-    QMatrix4x4 calculateInverseMatrix(FIFFLIB::FiffDigitizerData *pDigData,
+    QMatrix4x4 calculateInverseMatrix(QSharedPointer<FIFFLIB::FiffDigitizerData> pDigData,
                                       float scale);
 
     //=========================================================================================================
