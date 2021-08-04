@@ -99,8 +99,8 @@ Hpi::Hpi()
 
 Hpi::~Hpi()
 {
-    if(this->isRunning()) {
-        stop();
+    if(isRunning()) {
+        resetState();
     }
 }
 
@@ -147,14 +147,16 @@ bool Hpi::start()
 
 bool Hpi::stop()
 {
-    requestInterruption();
-    wait(500);
-
-    m_bPluginControlWidgetsInit = false;
-
-    m_pCircularBuffer->clear();
-
+    resetState();
     return true;
+}
+
+//=============================================================================================================
+
+void Hpi::resetState()
+{
+    m_bPluginControlWidgetsInit = false;
+    m_pCircularBuffer->clear();
 }
 
 //=============================================================================================================

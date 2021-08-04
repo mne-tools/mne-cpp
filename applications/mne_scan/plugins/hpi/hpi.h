@@ -288,6 +288,8 @@ private:
      */
     void updateDigitizerInfo();
 
+    void resetState();
+
     QMutex                      m_mutex;                    /**< The threads mutex.*/
 
     QVector<int>                m_vCoilFreqs;               /**< Vector contains the HPI coil frequencies. */

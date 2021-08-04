@@ -175,7 +175,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         } else {
             //qDebug()<<"RealTime3DWidget::getData - Working with m_pRtConnectivityItem";
             QPair<float,float> freqs = pRTCE->getValue()->getFrequencyRange();
-            QString sItemName = QString("%1_%2_%3").arg(pRTCE->getValue()->getConnectivityMethod()).arg(QString::number(freqs.first)).arg(QString::number(freqs.second));
+            QString sItemName = QString("%1_%2_%3").arg(pRTCE->getValue()->getConnectivityMethod(), QString::number(freqs.first), QString::number(freqs.second));
             m_pRtConnectivityItem->setText(sItemName);
             m_pRtConnectivityItem->addData(*(pRTCE->getValue().data()));
 
