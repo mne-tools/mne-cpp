@@ -480,7 +480,7 @@ void FiffInfo::writeToStream(FiffStream* p_pStream) const
 
 //=============================================================================================================
 
-void FiffInfo::print()
+void FiffInfo::print() const
 {
     std::cout << "Sample frequency: " << sfreq << "\n";
     std::cout << "LineFreq: " << linefreq << " | Highpass: " << highpass << " | Lowpass: " << lowpass << "\n";

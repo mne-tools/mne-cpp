@@ -167,7 +167,7 @@ FiffDigitizerData::~FiffDigitizerData()
 
 //=============================================================================================================
 
-void FiffDigitizerData::print()
+void FiffDigitizerData::print() const
 {
     std::cout << "Number of digitizer points: " << points.size() << "\n";
 
