@@ -254,20 +254,26 @@ protected:
 
     void populatePresetGUI(QJsonArray presetData);
 
+    void populateCoilGUI();
+
     void selectCoilPreset(int iCoilPresetIndex);
+
+    void addCoilFreqToGUI(int iCoilFreq);
+
+    void addCoilErrorToGUI();
 
     //=========================================================================================================
     /**
      * Resets GUI display tables and empties all rows
      */
-    void resetTables();
+    void resetCoilGUI();
 
     /**
      * @UpdateGUI information with data from input digitizer set.
      *
      * @param[in] digSet    Digigtizer set from which data metadata will be displayed.
      */
-    void updateDigitizerInfo(const FIFFLIB::FiffDigPointSet& digSet);
+    void updateDigitizerInfoGUI(const FIFFLIB::FiffDigPointSet& digSet);
 
 
     Ui::HpiSettingsViewWidget*                  m_pUi;                  /**< The HPI dialog. */
