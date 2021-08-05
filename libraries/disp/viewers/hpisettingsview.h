@@ -242,6 +242,14 @@ protected:
 
     void setupCoilPresets();
 
+    //=========================================================================================================
+    /**
+     * Load coil presets from json file at the provided path
+     *
+     * @param[in] sFilePath     PAth to json file with coil preset data
+     */
+    void setupCoilPresets(const QString& sFilePath);
+
     void loadCoilPreset(int iCoilPresetIndex);
 
     //=========================================================================================================

@@ -539,9 +539,9 @@ void HpiSettingsView::setupCoilPresets()
 {
     m_pUi->comboBox_coilPreset->addItem("Load preset");
 
-    m_pUi->comboBox_coilPreset->addItem("VV 4coils 1-500Hz", QVariant::fromValue(QVector<int>{154,158,161,166}));
-    m_pUi->comboBox_coilPreset->addItem("VV 4coils 501-2000Hz", QVariant::fromValue(QVector<int>{293,307,314,321}));
-    m_pUi->comboBox_coilPreset->addItem("VV 4coils 2001-3000Hz+", QVariant::fromValue(QVector<int>{586,614,628,642}));
+    m_pUi->comboBox_coilPreset->addItem("VV 4coils 154-166Hz", QVariant::fromValue(QVector<int>{154,158,161,166}));
+    m_pUi->comboBox_coilPreset->addItem("VV 4coils 293-321Hz", QVariant::fromValue(QVector<int>{293,307,314,321}));
+    m_pUi->comboBox_coilPreset->addItem("VV 4coils 586-642Hz", QVariant::fromValue(QVector<int>{586,614,628,642}));
 }
 
 //=============================================================================================================
