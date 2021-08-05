@@ -416,7 +416,7 @@ void HpiSettingsView::onRemoveCoil()
 
 QList<FiffDigPoint> HpiSettingsView::readDigitizersFromFile(const QString& fileName)
 {
-    resetCoilGUI();
+    clearCoilGUI();
 
     QFile t_fileDig(fileName);
     FiffDigPointSet t_digSet(t_fileDig);
@@ -429,7 +429,7 @@ QList<FiffDigPoint> HpiSettingsView::readDigitizersFromFile(const QString& fileN
 
 void HpiSettingsView::newDigitizerList(QList<FIFFLIB::FiffDigPoint> pointList)
 {
-    resetCoilGUI();
+    clearCoilGUI();
 
     FiffDigPointSet t_digSet(pointList);
     updateDigitizerInfoGUI(t_digSet);
@@ -533,7 +533,7 @@ void HpiSettingsView::addCoilErrorToGUI()
 
 //=============================================================================================================
 
-void HpiSettingsView::resetCoilGUI()
+void HpiSettingsView::clearCoilGUI()
 {
     m_pUi->m_tableWidget_Frequencies->clear();
     m_pUi->m_tableWidget_Frequencies->setRowCount(0);
@@ -576,7 +576,7 @@ void HpiSettingsView::setupCoilPresets(int iNumCoils)
 
 //=============================================================================================================
 
-void HpiSettingsView::populatePresetGUI(QJsonArray presetData)
+void HpiSettingsView::populatePresetGUI(const QJsonArray& presetData)
 {
     m_pUi->comboBox_coilPreset->clear();
     m_pUi->comboBox_coilPreset->addItem("Load preset");
@@ -598,11 +598,13 @@ void HpiSettingsView::populatePresetGUI(QJsonArray presetData)
 void HpiSettingsView::selectCoilPreset(int iCoilPresetIndex)
 {
     if (iCoilPresetIndex < (m_pUi->comboBox_coilPreset->count() - 1)){
-        auto data = m_pUi->comboBox_coilPreset->itemData(iCoilPresetIndex);
-        if (!data.isNull() && data.canConvert<QVector<int>>()){
-            m_vCoilFreqs = data.value<QVector<int>>();
-            resetCoilGUI();
+        auto coilFreqData = m_pUi->comboBox_coilPreset->itemData(iCoilPresetIndex);
+        if (!coilFreqData.isNull() && coilFreqData.canConvert<QVector<int>>()){
+            m_vCoilFreqs = coilFreqData.value<QVector<int>>();
+            clearCoilGUI();
             populateCoilGUI();
+
+            emit coilFrequenciesChanged(m_vCoilFreqs);
         }
     }
 }

@@ -250,26 +250,59 @@ protected:
      */
     QList<FIFFLIB::FiffDigPoint> readDigitizersFromFile(const QString& fileName);
 
+    //=========================================================================================================
+    /**
+     * Sets up coil presets for the number of coils specified by the input argument.
+     *
+     * @param[in] iNumCoils     number of hpi coils.
+     */
     void setupCoilPresets(int iNumCoils);
 
-    void populatePresetGUI(QJsonArray presetData);
+    //=========================================================================================================
+    /**
+     * Populates preset dropdown gui with names and coil freqs in the input array.
+     *
+     * @param[in] presetData    json array containing the coil preset name and freqs.
+     */
+    void populatePresetGUI(const QJsonArray& presetData);
 
+    //=========================================================================================================
+    /**
+     * Adds coil freq and coil error entries based on m_vCoilFreqs. Does not clear existing entires.
+     */
     void populateCoilGUI();
 
+    //=========================================================================================================
+    /**
+     * Selects and loads coil preset at index specified by input argument.
+     *
+     * @param[in] iCoilPresetIndex  selected coil preset.
+     */
     void selectCoilPreset(int iCoilPresetIndex);
 
+    //=========================================================================================================
+    /**
+     * Adds coil frequency to gui table based on input argument.
+     *
+     * @param[in] iCoilFreq
+     */
     void addCoilFreqToGUI(int iCoilFreq);
 
+    //=========================================================================================================
+    /**
+     * @brief addCoilErrorToGUI
+     */
     void addCoilErrorToGUI();
 
     //=========================================================================================================
     /**
-     * Resets GUI display tables and empties all rows
+     * Clears GUI display tables for coil error and coil freqs and empties all rows
      */
-    void resetCoilGUI();
+    void clearCoilGUI();
 
+    //=========================================================================================================
     /**
-     * @UpdateGUI information with data from input digitizer set.
+     * UpdateGUI information with data from input digitizer set.
      *
      * @param[in] digSet    Digigtizer set from which data metadata will be displayed.
      */
@@ -282,7 +315,7 @@ protected:
 
     QString                                     m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
 
-    QJsonDocument                               m_CoilPresets;
+    QJsonDocument                               m_CoilPresets;          /**< Loaded coil frequency presets */
 
 signals:
     //=========================================================================================================
