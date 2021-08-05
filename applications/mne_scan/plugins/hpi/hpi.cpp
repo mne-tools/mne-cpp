@@ -55,6 +55,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QDir>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -288,6 +290,9 @@ void Hpi::initPluginControlWidgets()
 
         // Projects Settings
         HpiSettingsView* pHpiSettingsView = new HpiSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
+
+        pHpiSettingsView->loadCoilPresets(QDir::currentPath() + "/mne_scan_plugins/hpi.json");
+
         connect(this, &Hpi::guiModeChanged,
                 pHpiSettingsView, &HpiSettingsView::setGuiMode);
         pHpiSettingsView->setObjectName("widget_");
