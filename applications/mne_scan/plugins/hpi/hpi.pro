@@ -132,3 +132,9 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
                 -lfftw3_threads \
     }
 }
+
+copydata.commands = $(COPY_DIR) $$shell_path($$PWD/hpi.json) $$shell_path($$DESTDIR)
+first.depends = $(first) copydata
+export(first.depends)
+export(copydata.commands)
+QMAKE_EXTRA_TARGETS += first copydata
