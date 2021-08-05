@@ -53,6 +53,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
+#include <QJsonObject>
+#include <QJsonArray>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -77,8 +79,6 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
-
-    setupCoilPresets();
 
     connect(m_pUi->m_pushButton_loadDigitizers, &QPushButton::released,
             this, &HpiSettingsView::onLoadDigitizers);
@@ -107,7 +107,7 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
     connect(m_pUi->m_doubleSpinBox_rotThreshold, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &HpiSettingsView::allowedRotationChanged);
     connect(m_pUi->comboBox_coilPreset, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &HpiSettingsView::loadCoilPreset);
+            this, &HpiSettingsView::selectCoilPreset);
 
     m_pUi->comboBox_coilPreset->hide();
     //Init coil freqs
@@ -535,18 +535,48 @@ void HpiSettingsView::clearView()
 
 //=============================================================================================================
 
-void HpiSettingsView::setupCoilPresets()
+void HpiSettingsView::loadCoilPresets(const QString &sFilePath)
 {
-    m_pUi->comboBox_coilPreset->addItem("Load preset");
-
-    m_pUi->comboBox_coilPreset->addItem("VV 4coils 154-166Hz", QVariant::fromValue(QVector<int>{154,158,161,166}));
-    m_pUi->comboBox_coilPreset->addItem("VV 4coils 293-321Hz", QVariant::fromValue(QVector<int>{293,307,314,321}));
-    m_pUi->comboBox_coilPreset->addItem("VV 4coils 586-642Hz", QVariant::fromValue(QVector<int>{586,614,628,642}));
+    QFile inFile(sFilePath);
+    if (inFile.open(QIODevice::ReadOnly)){
+        QByteArray inArray = inFile.readAll();
+        m_CoilPresets = QJsonDocument::fromJson(inArray);
+    }
 }
 
 //=============================================================================================================
 
-void HpiSettingsView::loadCoilPreset(int iCoilPresetIndex)
+void HpiSettingsView::setupCoilPresets(int iNumCoils)
+{
+    if(!m_CoilPresets.isNull()){
+        QJsonArray presetData = m_CoilPresets.object()[QString::number(iNumCoils)].toArray();
+
+        populatePresetGUI(presetData);
+    }
+}
+
+//=============================================================================================================
+
+void HpiSettingsView::populatePresetGUI(QJsonArray presetData)
+{
+    m_pUi->comboBox_coilPreset->clear();
+    m_pUi->comboBox_coilPreset->addItem("Load preset");
+
+    for(const auto& entry : presetData){
+        QString name = entry.toObject()["name"].toString();
+        QVector<int> data;
+
+        for (const auto& coil : entry.toObject()["coils"].toArray()){
+            data.append(coil.toInt());
+        }
+
+        m_pUi->comboBox_coilPreset->addItem(name, QVariant::fromValue(data));
+    }
+}
+
+//=============================================================================================================
+
+void HpiSettingsView::selectCoilPreset(int iCoilPresetIndex)
 {
     if (iCoilPresetIndex < (m_pUi->comboBox_coilPreset->count() - 1)){
         auto data = m_pUi->comboBox_coilPreset->itemData(iCoilPresetIndex);

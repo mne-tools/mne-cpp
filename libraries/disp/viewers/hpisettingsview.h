@@ -47,6 +47,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QJsonDocument>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -173,6 +175,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Load coil presets from json file at the provided path
+     *
+     * @param[in] sFilePath     PAth to json file with coil preset data
+     */
+    void loadCoilPresets(const QString& sFilePath);
+
+    //=========================================================================================================
+    /**
      * Saves all important settings of this view via QSettings.
      */
     void saveSettings();
@@ -240,17 +250,11 @@ protected:
      */
     QList<FIFFLIB::FiffDigPoint> readDigitizersFromFile(const QString& fileName);
 
-    void setupCoilPresets();
+    void setupCoilPresets(int iNumCoils);
 
-    //=========================================================================================================
-    /**
-     * Load coil presets from json file at the provided path
-     *
-     * @param[in] sFilePath     PAth to json file with coil preset data
-     */
-    void setupCoilPresets(const QString& sFilePath);
+    void populatePresetGUI(QJsonArray presetData);
 
-    void loadCoilPreset(int iCoilPresetIndex);
+    void selectCoilPreset(int iCoilPresetIndex);
 
     //=========================================================================================================
     /**
@@ -271,6 +275,8 @@ protected:
     QVector<int>                                m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
 
     QString                                     m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
+
+    QJsonDocument                               m_CoilPresets;
 
 signals:
     //=========================================================================================================
