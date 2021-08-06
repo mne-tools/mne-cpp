@@ -80,11 +80,11 @@ struct FTBUFFER_EXPORT MetaData{
     bool bFiffDigitizerData = false;
     FIFFLIB::FiffDigitizerData dig;
 
-    void setFiffinfo(FIFFLIB::FiffInfo newinfo) {info = newinfo;
-                                                 bFiffInfo = true;};
+    void setFiffinfo(const FIFFLIB::FiffInfo& newinfo) {info = newinfo;
+                                                        bFiffInfo = true;};
 
-    void setFiffDigitizerData(FIFFLIB::FiffDigitizerData newdig) {dig = newdig;
-                                                                  bFiffDigitizerData = true;};
+    void setFiffDigitizerData(const FIFFLIB::FiffDigitizerData& newdig) {dig = newdig;
+                                                                         bFiffDigitizerData = true;};
 };
 
 //=============================================================================================================
