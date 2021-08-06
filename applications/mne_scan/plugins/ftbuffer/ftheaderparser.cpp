@@ -92,11 +92,12 @@ void FTBUFFERPLUGIN::parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer)
     FIFFLIB::FiffStream stream(&isotrakBuffer);
     FIFFLIB::FiffDigitizerData digData;
 
-    stream.open();
-    stream.read_digitizer_data(stream.dirtree(), digData);
-    stream.close();
+    if(stream.open()){
+        stream.read_digitizer_data(stream.dirtree(), digData);
+        stream.close();
 
-    data.setFiffDigitizerData(digData);
+        data.setFiffDigitizerData(digData);
+    }
 }
 
 //=============================================================================================================
