@@ -116,7 +116,7 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 header_files.files = $${HEADERS}
 header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/connectivity
 
-INSTALLS += header_files
+#INSTALLS += header_files
 
 contains(MNECPP_CONFIG, withCodeCov) {
     QMAKE_CXXFLAGS += --coverage
