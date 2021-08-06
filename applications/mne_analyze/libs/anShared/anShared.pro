@@ -128,7 +128,7 @@ INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 header_files.files = $${HEADERS}
 header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/anShared
 
-INSTALLS += header_files
+#INSTALLS += header_files
 
 win32:!contains(MNECPP_CONFIG, static) {
     QMAKE_POST_LINK += $$QMAKE_COPY $$shell_path($${MNE_LIBRARY_DIR}/$${TARGET}.dll) $${MNE_BINARY_DIR}
