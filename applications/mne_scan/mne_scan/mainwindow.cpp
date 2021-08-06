@@ -230,9 +230,10 @@ void MainWindow::onStyleChanged(const QString& sStyle)
             qInfo() << "MainWindow::onStyleChanged 2";
             m_sCurrentStyle = "dark";
             QFile file(":/dark.qss");
-            file.open(QFile::ReadOnly);
-            QTextStream stream(&file);
-            pApp->setStyleSheet(stream.readAll());
+            if(file.open(QFile::ReadOnly)){
+                QTextStream stream(&file);
+                pApp->setStyleSheet(stream.readAll());
+            }
         }
 
         // Set default font
