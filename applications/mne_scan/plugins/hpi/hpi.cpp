@@ -83,7 +83,11 @@ constexpr const int defaultFittingWindowSize(300);
 //=============================================================================================================
 
 Hpi::Hpi()
-: m_iFittingWindowSize(defaultFittingWindowSize)
+: m_iNumberBadChannels(0)
+, m_iFittingWindowSize(defaultFittingWindowSize)
+, m_dAllowedMeanErrorDist(10)
+, m_dAllowedMovement(3)
+, m_dAllowedRotation(5)
 , m_bDoFreqOrder(false)
 , m_bDoSingleHpi(false)
 , m_bDoContinousHpi(false)
