@@ -227,7 +227,7 @@ private:
      *
      * @param[in] FiffInfo  FiffInfo used to set up buffer output.
      */
-    bool setupRTMSA(FIFFLIB::FiffInfo FiffInfo);
+    bool setupRTMSA(const FIFFLIB::FiffInfo& FiffInfo);
 
     //=========================================================================================================
     /**
