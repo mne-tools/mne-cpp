@@ -109,7 +109,6 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
     connect(m_pUi->comboBox_coilPreset, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &HpiSettingsView::selectCoilPreset);
 
-    m_pUi->comboBox_coilPreset->hide();
     //Init coil freqs
     m_vCoilFreqs << 293 << 307 << 314 << 321;
     qRegisterMetaTypeStreamOperators<QVector<int> >("QVector<int>");
