@@ -279,9 +279,6 @@ private:
      */
     void updateSensor();
 
-    FWDLIB::FwdCoilSet* m_coilTemplate;
-    FWDLIB::FwdCoilSet* m_coilMeg;
-
     //=========================================================================================================
     /**
      * Update the channellist for init and if bads changed
@@ -311,7 +308,8 @@ private:
 
     Eigen::MatrixXd     m_matModel;         /**< The model that contains the sines/cosines for the hpi fit*/
     bool                m_bDoFastFit;       /**< Do fast fit. */
-
+    FWDLIB::FwdCoilSet* m_pCoilTemplate;    /**< */
+    FWDLIB::FwdCoilSet* m_pCoilMeg;         /**< */
     QVector<int>        m_vecFreqs;         /**< The frequencies for each coil in unknown order. */
 
 };
