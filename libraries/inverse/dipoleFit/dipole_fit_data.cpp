@@ -2266,21 +2266,19 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
 
             for (j = 0; j < nchan; j++)
                 chs.append(FiffChInfo());
-                chs[j].scanNo = -1;
+            chs[j].scanNo = -1;
             to_find = nchan;
             break;
 
         case FIFF_PARENT_BLOCK_ID :
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
-//            id = t_pTag->toFiffID();
             *id = *(fiffId)t_pTag->data();
             break;
 
         case FIFF_COORD_TRANS :
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
-//            t = t_pTag->toCoordTrans();
             t = FiffCoordTransOld::read_helper( t_pTag );
             if (t->from != FIFFV_COORD_DEVICE || t->to   != FIFFV_COORD_HEAD)
                 t = NULL;
@@ -2825,7 +2823,8 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
 {
     QList<FiffChInfo> ch;
     FiffChInfo this_ch;
-    int j,k,nchan;
+    int j,k;
+    int nchan = 0;
     int to_find = 0;
     FiffDirNode::SPtr meas;
     FiffDirNode::SPtr meas_info;
