@@ -3679,6 +3679,9 @@ int DipoleFitData::make_projection(const QList<QString> &projnames,
     return OK;
 
 bad :
+    if(all)
+        delete all;
+    all = NULL;
     return FAIL;
 }
 
