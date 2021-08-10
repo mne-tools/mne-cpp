@@ -331,7 +331,7 @@ void CoRegistration::onDigitizersChanged(const QString& sFilePath)
 {
     QFile fileDig(sFilePath);
     m_digSetHead.clear();
-    m_digSetHead = *new FiffDigPointSet(fileDig);
+    m_digSetHead = FiffDigPointSet(fileDig);
 
     // send digitizer to 3DView
     QVariant data = QVariant::fromValue(m_digSetHead);
