@@ -576,6 +576,8 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
         case FIFF_COORD_TRANS :
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
+            if(t)
+                delete t;
             t = FiffCoordTransOld::read_helper( t_pTag );
             /*
             * Require this particular transform!
