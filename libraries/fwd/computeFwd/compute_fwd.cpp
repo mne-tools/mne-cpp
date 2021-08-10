@@ -2247,6 +2247,8 @@ void ComputeFwd::initFwd()
                                                      m_mri_head_t,
                                                      m_spaces,
                                                      m_iNSpace,out,m_pSettings->use_threads) == FAIL) {
+            if(out)
+                fclose(out);
             return;
         }
     }
