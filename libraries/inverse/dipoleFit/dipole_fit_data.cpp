@@ -2280,8 +2280,11 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
             t = FiffCoordTransOld::read_helper( t_pTag );
-            if (t->from != FIFFV_COORD_DEVICE || t->to   != FIFFV_COORD_HEAD)
+            if (t && (t->from != FIFFV_COORD_DEVICE || t->to != FIFFV_COORD_HEAD))
+            {
+                delete t;
                 t = NULL;
+            }
             break;
 
         case FIFF_CH_INFO : /* Information about one channel */
