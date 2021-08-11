@@ -2102,8 +2102,7 @@ void ComputeFwd::initFwd()
         }
 
         char *coilfile = MALLOC_41(strlen(qPath.toUtf8().data())+1,char);
-        strcpy(coilfile,qPath.toUtf8().data());
-
+        strcpy_s(coilfile, strlen(qPath.toUtf8()), qPath.toUtf8().data());
         //#endif
 
         if (!coilfile) {
