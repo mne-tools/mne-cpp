@@ -1859,6 +1859,8 @@ ComputeFwd::~ComputeFwd()
         delete m_megcoils;
     if(m_eegels)
         delete m_eegels;
+    if(m_eegModel)
+        delete m_eegModel;
 }
 
 //=============================================================================================================
