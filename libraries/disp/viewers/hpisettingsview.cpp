@@ -445,25 +445,21 @@ void HpiSettingsView::updateDigitizerInfoGUI(const FiffDigPointSet& digSet)
 
     for(int i = 0; i < digSet.size(); ++i) {
         switch(digSet[i].kind) {
-            case FIFFV_POINT_HPI: {
-                if(m_vCoilFreqs.size() <= numHPI) {
-                    m_vCoilFreqs.append(-1);
-                }
-                numHPI++;
-                break;
+        case FIFFV_POINT_HPI:
+            if(m_vCoilFreqs.size() <= numHPI) {
+                m_vCoilFreqs.append(-1);
             }
-
-            case FIFFV_POINT_CARDINAL:
-                numFiducials++;
-                break;
-
-            case FIFFV_POINT_EEG:
-                numEEG++;
-                break;
-
-            case FIFFV_POINT_EXTRA:
-                numAdditional++;
-                break;
+            numHPI++;
+            break;
+        case FIFFV_POINT_CARDINAL:
+            numFiducials++;
+            break;
+        case FIFFV_POINT_EEG:
+            numEEG++;
+            break;
+        case FIFFV_POINT_EXTRA:
+            numAdditional++;
+            break;
         }
     }
 
