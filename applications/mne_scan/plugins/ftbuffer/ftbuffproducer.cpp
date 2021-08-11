@@ -142,3 +142,10 @@ bool FtBuffProducer::disconnectFromBuffer()
 {
     return this->m_pFtBuffer->disconnect();
 }
+
+//=============================================================================================================
+
+BufferInfo FtBuffProducer::getBufferInfo()
+{
+    return m_pFtConnector->getBufferInfo();
+}

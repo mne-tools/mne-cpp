@@ -141,6 +141,7 @@ void FtHeaderParser::processChunk(MetaData& data , QBuffer& buffer)
 
     if (function != functionMap.end()){
         function->second(data, headerChunk);
+        data.lHeaderList.push_back(chunkType);
     }
 }
 

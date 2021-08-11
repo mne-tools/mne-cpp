@@ -565,6 +565,7 @@ MetaData FtConnector::parseBufferHeaders()
 
     FtHeaderParser parser;
     metadata = parser.parseHeader(chunkBuffer);
+    m_lHeaderChunks = metadata.lHeaderList;
 
     if (!metadata.bFiffInfo){
         metadata.setFiffinfo(infoFromSimpleHeader());
@@ -590,6 +591,8 @@ BufferInfo FtConnector::getBufferInfo()
     info.iMsgSamples    = m_iMsgSamples;
     info.iNumChannels   = m_iNumChannels;
     info.iDataType      = m_iDataType;
+    info.fSampleFreq    = m_fSampleFreq;
+    info.lHeaderChunks  = m_lHeaderChunks;
 
     return info;
 }

@@ -82,6 +82,10 @@ struct BufferInfo{
     int     iMsgSamples;                          /**< Number of samples in the latest buffer transmission receied. */
     int     iNumChannels;                         /**< Number of channels in the buffer data. */
     int     iDataType;                            /**< Type of data in the buffer. */
+
+    float   fSampleFreq;
+
+    std::list<HeaderChunk> lHeaderChunks;
 };
 
 //=============================================================================================================
@@ -217,6 +221,10 @@ public:
      */
     void catchUpToBuffer();
 
+    //=========================================================================================================
+    /**
+     * Returns buffer metadata.
+     */
     BufferInfo getBufferInfo();
 
 private:
@@ -329,6 +337,8 @@ private:
     QTcpSocket*                             m_pSocket;                              /**< Socket that manages the connection to the ft buffer. */
 
     Eigen::MatrixXd*                        m_pMatEmit;                             /**< Container to format data to tansmit to FtBuffProducer. */
+
+    std::list<HeaderChunk>                  m_lHeaderChunks;
 };
 
 }//namespace end bracket

@@ -85,6 +85,8 @@ struct FTBUFFER_EXPORT MetaData{
 
     void setFiffDigitizerData(const FIFFLIB::FiffDigitizerData& newdig) {dig = newdig;
                                                                          bFiffDigitizerData = true;};
+
+    std::list<HeaderChunk> lHeaderList;
 };
 
 //=============================================================================================================
