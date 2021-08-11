@@ -2346,7 +2346,7 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* transDevHeadOld)
 
     int iNComp = 0;
     if(m_compcoils) {
-        iNMeg = m_megcoils->ncoil;
+        iNComp = m_compcoils->ncoil;
     }
 //    // transformation in head space
 //    FiffCoordTransOld* transHeadHeadOld = new FiffCoordTransOld;
