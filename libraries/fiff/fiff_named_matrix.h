@@ -114,7 +114,7 @@ public:
     /**
      * Destroys the named matrix.
      */
-    ~FiffNamedMatrix();
+    ~FiffNamedMatrix() = default;
 
     //=========================================================================================================
     /**
