@@ -60,15 +60,17 @@ using namespace FTBUFFERPLUGIN;
 //=============================================================================================================
 
 FtConnector::FtConnector()
-:m_iNumSamples(0)
-,m_iNumNewSamples(0)
-,m_iNumChannels(0)
-,m_iExtendedHeaderSize(0)
-,m_iPort(1972)
-,m_bNewData(false)
-,m_fSampleFreq(0)
-,m_sAddress("127.0.0.1")
-,m_pSocket(Q_NULLPTR)
+: m_iNumSamples(0)
+, m_iNumNewSamples(0)
+, m_iMsgSamples(0)
+, m_iNumChannels(0)
+, m_iDataType(0)
+, m_iExtendedHeaderSize(0)
+, m_iPort(1972)
+, m_bNewData(false)
+, m_fSampleFreq(0)
+, m_sAddress("127.0.0.1")
+, m_pSocket(Q_NULLPTR)
 {
 }
 
