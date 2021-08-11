@@ -690,8 +690,6 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
     int     type;
     int     datasize,idxsize,ptrsize;
     int     two = 2;
-    int     res;
-    int     val;
 
     datasize = mat->nz * sizeof(fiff_float_t);
     idxsize  = mat->nz * sizeof(fiff_int_t);
@@ -1001,7 +999,6 @@ static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOl
     int *inuse_map = Q_NULLPTR;
     int nneigh,*neigh;
     int k,p;
-    fiffTagRec tag;
     int res = FAIL;
 
     if (ss->type != FIFFV_MNE_SPACE_VOLUME)
@@ -1351,9 +1348,6 @@ int mne_write_named_matrix( FiffStream::SPtr& t_pStream,
     t_pStream->end_block(FIFFB_MNE_NAMED_MATRIX);
 
     return FIFF_OK;
-
-bad :
-    return FIFF_FAIL;
 }
 
 bool fiff_put_dir (FiffStream::SPtr& t_pStream, const QList<FiffDirEntry::SPtr>& dir)
@@ -1472,7 +1466,6 @@ bool write_solution(const QString& name,         /* Destination file */
      */
     {
         QStringList file_bads;
-        int  file_nbad   = 0;
 
         t_pStream->start_block(FIFFB_MNE_PARENT_MEAS_FILE);
 
