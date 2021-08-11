@@ -137,6 +137,15 @@ signals:
                        int port);
 
 private:
+
+    void displayBufferSettings(BufferInfo bufferInfo);
+
+    void displayConnectionFailed();
+
+    void hideSettings();
+
+    void showSettings();
+
     FtBuffer*   m_pFtBuffer;                /**< Holds a pointer to corresponding FtBuffer.*/
 
     QString     m_sSettingsPath;            /**< The settings path to store the GUI settings to. */

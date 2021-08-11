@@ -84,6 +84,8 @@ FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox,
             toolbox, &FtBuffer::setBufferPort);
     toolbox->setBufferAddress(m_pUi->m_lineEditIP->text());
     toolbox->setBufferPort(m_pUi->m_spinBoxPort->value());
+
+    m_pUi->frame_BufferStatus->hide();
 }
 
 //=============================================================================================================
@@ -133,13 +135,22 @@ void FtBufferSetupWidget::pressedConnect()
 
 void FtBufferSetupWidget::isConnected(bool stat)
 {
+    m_pUi->frame_BufferStatus->show();
     if (stat) {
-        m_pUi->m_qPushButton_Connect->setText("Set");
+        displayBufferSettings(m_pFtBuffer->m_pFtBuffProducer->getBufferInfo());
     } else {
-        qWarning() << "[FtBufferSetupWidget::isConnected] Unable to find relevant fiff info.";
-
-        QMessageBox msgBox;
-        msgBox.setText("Unable to find relevant fiff info. Is there header data in the buffer?");
-        msgBox.exec();
+        displayConnectionFailed();
     }
+}
+
+//=============================================================================================================
+
+void FtBufferSetupWidget::displayBufferSettings(BufferInfo bufferInfo)
+{
+}
+
+//=============================================================================================================
+
+void FtBufferSetupWidget::displayConnectionFailed()
+{
 }

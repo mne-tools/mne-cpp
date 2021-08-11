@@ -66,6 +66,67 @@
         <bool>false</bool>
        </property>
        <layout class="QGridLayout" name="m_qGridLayout_Properties">
+        <item row="6" column="0">
+         <widget class="QFrame" name="frame_BufferStatus">
+          <property name="frameShape">
+           <enum>QFrame::StyledPanel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+          <layout class="QGridLayout" name="gridLayout_2">
+           <item row="2" column="1">
+            <widget class="QLabel" name="label_numChannels">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0" colspan="2">
+            <widget class="QLabel" name="label_noData">
+             <property name="text">
+              <string>No buffer found at specified address and port.</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="0">
+            <widget class="QLabel" name="label_numChannelsTitle">
+             <property name="text">
+              <string>Number of Channels :</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLabel" name="label_sampleFreq">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QLabel" name="label_sampleFreqTitle">
+             <property name="text">
+              <string>Sample Frequency:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="0">
+            <widget class="QLabel" name="label_extendedHeaderTitle">
+             <property name="text">
+              <string>Extended Headers Found:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLabel" name="label_extendedHeader">
+             <property name="text">
+              <string>TextLabel</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
         <item row="7" column="0">
          <widget class="QGroupBox" name="m_qGroupBox_Information">
           <property name="title">
@@ -153,13 +214,6 @@ p, li { white-space: pre-wrap; }
           </layout>
          </widget>
         </item>
-        <item row="5" column="0">
-         <widget class="QPushButton" name="m_qPushButton_Connect">
-          <property name="text">
-           <string>Check Buffer State</string>
-          </property>
-         </widget>
-        </item>
         <item row="8" column="0">
          <spacer name="horizontalSpacer_2">
           <property name="orientation">
@@ -176,15 +230,11 @@ p, li { white-space: pre-wrap; }
           </property>
          </spacer>
         </item>
-        <item row="6" column="0">
-         <widget class="QFrame" name="frame_2">
-          <property name="frameShape">
-           <enum>QFrame::StyledPanel</enum>
+        <item row="5" column="0">
+         <widget class="QPushButton" name="m_qPushButton_Connect">
+          <property name="text">
+           <string>Check Buffer State</string>
           </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
-          </property>
-          <layout class="QGridLayout" name="gridLayout_2"/>
          </widget>
         </item>
        </layout>
