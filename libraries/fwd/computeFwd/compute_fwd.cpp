@@ -1669,13 +1669,13 @@ bool mne_attach_env(const QString& name, const QString& command)
     FiffId id;
     int     b,k, insert;
     FiffTag::SPtr t_pTag;
-    QList<FiffTag::SPtr> tags;
+//    QList<FiffTag::SPtr> tags;
     QFile fileInOut(name);
     FiffStream::SPtr t_pStreamInOut;
 
 //    if (fiff_new_file_id(&id) == FIFF_FAIL)
 //        return false;
-    id = FiffId::new_file_id();
+//    id = FiffId::new_file_id();
 
 //#ifdef DEBUG
 //    fprintf(stderr,"\n");
@@ -2107,12 +2107,12 @@ void ComputeFwd::initFwd()
         if (!coilfile) {
             return;
         }
+        FREE_41(coilfile);
 
         m_templates = FwdCoilSet::read_coil_defs(coilfile);
         if (!m_templates) {
             return;
         }
-        FREE_41(coilfile);
 
         // Compensation data
 
