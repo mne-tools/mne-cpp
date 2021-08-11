@@ -2088,11 +2088,6 @@ void ComputeFwd::initFwd()
     // Create coil descriptions with transformation to head or MRI frame
 
     if (m_pSettings->include_meg) {
-        //#ifdef USE_SHARE_PATH
-        //        char *coilfile = mne_compose_mne_name("share/mne","coil_def.dat");
-        //#else
-        //        char *coilfile = mne_compose_mne_name("setup/mne","coil_def.dat");
-
         qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
         file.setFileName(qPath);
         if ( !QCoreApplication::startingUp() ) {
@@ -2102,8 +2097,7 @@ void ComputeFwd::initFwd()
         }
 
         char *coilfile = MALLOC_41(strlen(qPath.toUtf8().data())+1,char);
-        strcpy_s(coilfile, strlen(qPath.toUtf8()), qPath.toUtf8().data());
-        //#endif
+        memcpy(coilfile, qPath.toStdString().c_str(), qPath.size());
 
         if (!coilfile) {
             return;
