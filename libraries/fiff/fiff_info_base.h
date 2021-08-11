@@ -96,7 +96,7 @@ public:
     /**
      * Destroys the light fiff measurement file information.
      */
-    ~FiffInfoBase();
+    virtual ~FiffInfoBase();
 
     //=========================================================================================================
     /**
