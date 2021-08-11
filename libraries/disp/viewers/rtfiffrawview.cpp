@@ -85,6 +85,7 @@ RtFiffRawView::RtFiffRawView(const QString& sSettingsPath,
 , m_fZoomFactor(1.0f)
 , m_bHideBadChannels(false)
 , m_iDistanceTimeSpacer(1)
+, m_iClickPosX(0)
 {
     m_sSettingsPath = sSettingsPath;
     m_pTableView = new QTableView;
