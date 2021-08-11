@@ -147,10 +147,62 @@ void FtBufferSetupWidget::isConnected(bool stat)
 
 void FtBufferSetupWidget::displayBufferSettings(BufferInfo bufferInfo)
 {
+    m_pUi->label_noData->hide();
+    showSettings();
+
+    m_pUi->label_numChannels->setText(QString::number(bufferInfo.iNumChannels));
+    m_pUi->label_sampleFreq->setText(QString::number(bufferInfo.fSampleFreq));
+
+    if(!bufferInfo.lHeaderChunks.empty()){
+        QString extHdText = "| ";
+        for(auto header : bufferInfo.lHeaderChunks){
+            switch (header) {
+            case HeaderChunk::FT_CHUNK_NEUROMAG_HEADER:
+                extHdText += "Neuromag | ";
+                break;
+            case HeaderChunk::FT_CHUNK_NEUROMAG_ISOTRAK:
+                extHdText += "Isotrak | ";
+                break;
+            default:
+                break;
+            }
+        }
+        m_pUi->label_extendedHeader->setText(extHdText);
+    }
 }
 
 //=============================================================================================================
 
 void FtBufferSetupWidget::displayConnectionFailed()
 {
+    m_pUi->label_noData->show();
+    hideSettings();
+}
+
+//=============================================================================================================
+
+void FtBufferSetupWidget::hideSettings()
+{
+    m_pUi->label_extendedHeader->hide();
+    m_pUi->label_extendedHeaderTitle->hide();
+
+    m_pUi->label_numChannels->hide();
+    m_pUi->label_numChannelsTitle->hide();
+
+    m_pUi->label_sampleFreq->hide();
+    m_pUi->label_sampleFreqTitle->hide();
+}
+
+//=============================================================================================================
+
+void FtBufferSetupWidget::showSettings()
+{
+    m_pUi->label_extendedHeader->show();
+    m_pUi->label_extendedHeaderTitle->show();
+
+    m_pUi->label_numChannels->show();
+    m_pUi->label_numChannelsTitle->show();
+
+    m_pUi->label_sampleFreq->show();
+    m_pUi->label_sampleFreqTitle->show();
 }
