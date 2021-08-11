@@ -2108,9 +2108,9 @@ void ComputeFwd::initFwd()
         if (!coilfile) {
             return;
         }
-        FREE_41(coilfile);
 
         m_templates = FwdCoilSet::read_coil_defs(coilfile);
+        FREE_41(coilfile);
         if (!m_templates) {
             return;
         }
