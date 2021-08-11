@@ -86,8 +86,14 @@ FtConnector::~FtConnector()
 
 bool FtConnector::connect()
 {
+    if (m_sAddress == "localhost"){
+        m_sAddress = "127.0.0.1";
+    }
+
     auto info = QHostInfo::fromName(m_sAddress);
     bool bConnected = false;
+
+    std::cout << "Attempting to connect to : " <<m_sAddress.toStdString() << " - " << info.addresses().constFirst().toString().toStdString() << "\n";
 
     if(!info.addresses().isEmpty()){
         if(m_pSocket != Q_NULLPTR) {
@@ -96,7 +102,7 @@ bool FtConnector::connect()
         }
 
         m_pSocket = new QTcpSocket();
-        m_pSocket->connectToHost(info.addresses().first(), m_iPort);
+        m_pSocket->connectToHost(info.addresses().constFirst(), m_iPort);
         qint8 iTries = 0;
 
         //wait for connect max 5 tries, also windows safeguard
