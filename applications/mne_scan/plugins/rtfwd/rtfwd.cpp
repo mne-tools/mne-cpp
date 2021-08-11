@@ -87,11 +87,11 @@ using namespace Eigen;
 //=============================================================================================================
 
 RtFwd::RtFwd()
-: m_bBusy(false)
+: m_pFwdSettings(new ComputeFwdSettings)
+, m_bBusy(false)
 , m_bDoRecomputation(false)
 , m_bDoClustering(true)
 , m_bDoFwdComputation(false)
-, m_pFwdSettings(new ComputeFwdSettings)
 {
     // set init values
     m_pFwdSettings->solname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/your-solution-fwd.fif";
