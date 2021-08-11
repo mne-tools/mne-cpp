@@ -97,6 +97,7 @@ using namespace FIFFLIB;
 RealTimeEvokedSetWidget::RealTimeEvokedSetWidget(QSharedPointer<QTime> &pTime,
                                                  QWidget* parent)
 : MeasurementWidget(parent)
+, m_iMaxFilterTapSize(0)
 {
     Q_UNUSED(pTime)
 
