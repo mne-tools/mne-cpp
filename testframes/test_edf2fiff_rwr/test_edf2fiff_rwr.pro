@@ -76,6 +76,7 @@ HEADERS += \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_GLOBAL_DIR}
 INCLUDEPATH += ../../applications/mne_edf2fiff
 
 contains(MNECPP_CONFIG, withCodeCov) {
