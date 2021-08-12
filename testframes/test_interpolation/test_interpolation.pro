@@ -91,6 +91,7 @@ SOURCES += test_interpolation.cpp
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_GLOBAL_DIR}
 
 contains(MNECPP_CONFIG, withCodeCov) {
     QMAKE_CXXFLAGS += --coverage
