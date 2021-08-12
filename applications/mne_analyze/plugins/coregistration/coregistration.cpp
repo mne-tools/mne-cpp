@@ -331,7 +331,7 @@ void CoRegistration::onDigitizersChanged(const QString& sFilePath)
 {
     QFile fileDig(sFilePath);
     m_digSetHead.clear();
-    m_digSetHead = *new FiffDigPointSet(fileDig);
+    m_digSetHead = FiffDigPointSet(fileDig);
 
     // send digitizer to 3DView
     QVariant data = QVariant::fromValue(m_digSetHead);
@@ -352,7 +352,7 @@ void CoRegistration::onFiducialsChanged(const QString& sFilePath)
 {
     QFile fileDig(sFilePath);
     m_digFidMri.clear();
-    m_digFidMri = *new FiffDigPointSet(fileDig);
+    m_digFidMri = FiffDigPointSet(fileDig);
 
     QVariant data = QVariant::fromValue(m_digFidMri);
     m_pCommu->publishEvent(EVENT_TYPE::NEW_FIDUCIALS_ADDED, data);
@@ -383,7 +383,7 @@ void CoRegistration::onLoadTrans(const QString& sFilePath)
     // check for type of transformation
     if(transTemp.from == FIFFV_COORD_HEAD && transTemp.to == FIFFV_COORD_MRI) {
         m_transHeadMri.clear();
-        m_transHeadMri = *new FiffCoordTrans(transTemp);
+        m_transHeadMri = FiffCoordTrans(transTemp);
 
         // Update Widget
         getParamFromTrans(m_transHeadMri.trans,vecRot,vecTrans,vecScale);
@@ -768,7 +768,7 @@ void CoRegistration::deleteModels()
             m_sCurrentSelectedBem = "";
         } else {
             // update new bem list
-            for(auto pBemDataModel : m_vecBemDataModels) {
+            for(auto& pBemDataModel : m_vecBemDataModels) {
                 m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
             }
         }
@@ -805,7 +805,7 @@ bool CoRegistration::removeFromBemList(QSharedPointer<ANSHAREDLIB::AbstractModel
         }
 
         m_pCoregSettingsView->clearSelectionBem();
-        for(auto pBemDataModel : m_vecBemDataModels) {
+        for(auto& pBemDataModel : m_vecBemDataModels) {
             m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
         }
         return true;
