@@ -37,6 +37,12 @@
 #define NEURONALCONNECTIVITY_GLOBAL_H
 
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <buildtime.h>
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -51,5 +57,13 @@
 #else
 #  define NEURONALCONNECTIVITYSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+//=============================================================================================================
+// BUILD TIMESTAMP
+//=============================================================================================================
+
+namespace NEURONALCONNECTIVITYPLUGIN{
+constexpr auto BUILDTIMESTAMP(){BUILDTIME::get();};
+}
 
 #endif // CONNECTIVITY_GLOBAL_H
