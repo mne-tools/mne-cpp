@@ -63,7 +63,7 @@
 //=============================================================================================================
 
 namespace AVERAGINGPLUGIN{
-constexpr auto BUILDTIMESTAMP(){BUILDTIME::get();};
+constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
 }
 
 #endif // AVERAGING_GLOBAL_H

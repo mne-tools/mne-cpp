@@ -275,3 +275,9 @@ void Covariance::run()
     }
 }
 
+//=============================================================================================================
+
+QString Covariance::getBuildDateTime()
+{
+    return QString(BUILDTIMESTAMP().date()) + " " + QString(BUILDTIMESTAMP().time());
+}

@@ -401,3 +401,10 @@ void BrainAMP::showSetupProjectDialog()
         m_pBrainAMPSetupProjectWidget->raise();
     }
 }
+
+//=============================================================================================================
+
+QString BrainAMP::getBuildDateTime()
+{
+    return QString(BUILDTIMESTAMP().date()) + " " + QString(BUILDTIMESTAMP().time());
+}

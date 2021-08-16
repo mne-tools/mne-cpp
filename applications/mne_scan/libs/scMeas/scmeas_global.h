@@ -32,8 +32,15 @@
  * @brief    Contains the scMeas library export/import macros.
  *
  */
+
 #ifndef SCMEAS_GLOBAL_H
 #define SCMEAS_GLOBAL_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <buildtime.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -52,5 +59,11 @@
 #else
 #  define SCMEASSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+//=============================================================================================================
+// BUILD TIMESTAMP
+//=============================================================================================================
+
+constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
 
 #endif // SCMEAS_GLOBAL_H

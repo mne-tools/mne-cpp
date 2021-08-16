@@ -183,6 +183,14 @@ public:
      */
     virtual QWidget* setupWidget() = 0; //setup()
 
+    //=========================================================================================================
+    /**
+     * Returns string with plugin build date and time.
+     *
+     * @return build date and time
+     */
+    virtual QString getBuildDateTime();
+
     inline InputConnectorList& getInputConnectors(){return m_inputConnectors;}
     inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
 
@@ -253,6 +261,13 @@ inline QList< QAction* > AbstractPlugin::getPluginActions()
 inline void AbstractPlugin::addPluginAction(QAction* pAction)
 {
     m_qListPluginActions.append(pAction);
+}
+
+//=============================================================================================================
+
+inline QString AbstractPlugin::getBuildDateTime()
+{
+    return QString(BUILDTIMESTAMP().date()) + " " + QString(BUILDTIMESTAMP().time());
 }
 
 //=============================================================================================================

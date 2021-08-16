@@ -63,7 +63,7 @@
 //=============================================================================================================
 
 namespace BRAINAMPPLUGIN{
-constexpr auto BUILDTIMESTAMP(){BUILDTIME::get();};
+constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
 }
 
 #endif // BRAINAMP_GLOBAL_H

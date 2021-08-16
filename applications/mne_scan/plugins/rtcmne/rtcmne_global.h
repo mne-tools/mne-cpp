@@ -63,7 +63,7 @@
 //=============================================================================================================
 
 namespace RTCMNEPLUGIN{
-constexpr auto BUILDTIMESTAMP(){BUILDTIME::get();};
+constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
 }
 
 #endif // RTCMNE_GLOBAL_H

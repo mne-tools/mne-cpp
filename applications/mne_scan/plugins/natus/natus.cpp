@@ -309,3 +309,9 @@ void Natus::run()
     }
 }
 
+//=============================================================================================================
+
+QString Natus::getBuildDateTime()
+{
+    return QString(BUILDTIMESTAMP().date()) + " " + QString(BUILDTIMESTAMP().time());
+}

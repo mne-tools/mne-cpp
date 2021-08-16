@@ -62,7 +62,7 @@
 //=============================================================================================================
 
 namespace RTFWDPLUGIN{
-constexpr auto BUILDTIMESTAMP(){BUILDTIME::get();};
+constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
 }
 
 #endif // RTFWD_GLOBAL_H

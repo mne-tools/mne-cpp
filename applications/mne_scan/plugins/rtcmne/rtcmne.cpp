@@ -668,3 +668,10 @@ void RtcMne::run()
         ++skip_count;
     }
 }
+
+//=============================================================================================================
+
+QString RtcMne::getBuildDateTime()
+{
+    return QString(BUILDTIMESTAMP().date()) + " " + QString(BUILDTIMESTAMP().time());
+}

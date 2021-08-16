@@ -63,7 +63,7 @@
 //=============================================================================================================
 
 namespace GUSBAMPPLUGIN{
-constexpr auto BUILDTIMESTAMP(){BUILDTIME::get();};
+constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
 }
 
 #endif // GUSBAMP_GLOBAL_H

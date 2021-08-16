@@ -177,6 +177,8 @@ public:
      */
     virtual QWidget* setupWidget();
 
+    virtual QString getBuildDateTime();
+
     //=========================================================================================================
     /**
      * Sets address used to connect to buffer (if starting plugin without an established connection).

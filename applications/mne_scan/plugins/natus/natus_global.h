@@ -62,7 +62,7 @@
 //=============================================================================================================
 
 namespace NATUSPLUGIN{
-constexpr auto BUILDTIMESTAMP(){BUILDTIME::get();};
+constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
 }
 
 #endif // NATUS_GLOBAL_H

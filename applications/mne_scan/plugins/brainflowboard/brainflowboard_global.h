@@ -62,7 +62,7 @@
 //=============================================================================================================
 
 namespace BRAINFLOWBOARDPLUGIN{
-constexpr auto BUILDTIMESTAMP(){BUILDTIME::get();};
+constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
 }
 
 #endif // BRAINFLOWBOARD_GLOBAL_H
