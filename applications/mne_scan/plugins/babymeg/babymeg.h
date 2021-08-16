@@ -189,6 +189,8 @@ public:
      */
     virtual QWidget* setupWidget();
 
+    virtual QString getBuildDateTime();
+
 protected:
     virtual void run();
 

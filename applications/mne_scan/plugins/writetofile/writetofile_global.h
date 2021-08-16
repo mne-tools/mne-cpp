@@ -62,7 +62,7 @@
 //=============================================================================================================
 
 namespace WRITETOFILEPLUGIN{
-constexpr auto BUILDTIMESTAMP(){BUILDTIME::get();};
+constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
 }
 
 #endif // WRITETOFILE_GLOBAL_H

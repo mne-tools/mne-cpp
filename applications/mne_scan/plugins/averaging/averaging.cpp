@@ -451,3 +451,10 @@ void Averaging::run()
         }
     }
 }
+
+//=============================================================================================================
+
+QString Averaging::getBuildDateTime()
+{
+    return QString(BUILDTIMESTAMP().date()) + " " + QString(BUILDTIMESTAMP().time());
+}

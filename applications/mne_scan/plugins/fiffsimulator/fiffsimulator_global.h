@@ -63,7 +63,7 @@
 //=============================================================================================================
 
 namespace FIFFSIMULATORPLUGIN{
-constexpr auto BUILDTIMESTAMP(){BUILDTIME::get();};
+constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
 }
 
 #endif // FIFFSIMULATOR_GLOBAL_H

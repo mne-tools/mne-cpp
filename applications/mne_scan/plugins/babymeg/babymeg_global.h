@@ -63,7 +63,7 @@
 //=============================================================================================================
 
 namespace BABYMEGPLUGIN {
-constexpr auto BUILDTIMESTAMP(){BUILDTIME::get();};
+constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
 }
 
 #endif // BABYMEG_GLOBAL_H

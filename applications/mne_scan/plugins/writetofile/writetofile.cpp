@@ -507,6 +507,13 @@ bool WriteToFile::isContinuous()
 }
 
 //=============================================================================================================
+
+QString WriteToFile::getBuildDateTime()
+{
+    return QString(BUILDTIMESTAMP().date()) + " " + QString(BUILDTIMESTAMP().time());
+}
+
+//=============================================================================================================
 // This needs to be connected to Hpi fitting plugin
 //void WriteToFile::doContinousHPI(MatrixXf& matData)
 //{

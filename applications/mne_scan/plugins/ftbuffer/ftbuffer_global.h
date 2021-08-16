@@ -64,7 +64,7 @@
 //=============================================================================================================
 
 namespace FTBUFFERPLUGIN{
-constexpr auto BUILDTIMESTAMP(){BUILDTIME::get();};
+constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
 }
 
 #endif // FTBUFFER_GLOBAL_H

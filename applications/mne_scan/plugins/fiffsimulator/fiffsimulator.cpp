@@ -352,3 +352,10 @@ void FiffSimulator::requestInfo()
         qWarning() << "FiffSimulatorProducer is not connected!";
     }
 }
+
+//=============================================================================================================
+
+QString FiffSimulator::getBuildDateTime()
+{
+    return QString(BUILDTIMESTAMP().date()) + " " + QString(BUILDTIMESTAMP().time());
+}

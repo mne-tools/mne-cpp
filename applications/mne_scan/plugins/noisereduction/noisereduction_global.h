@@ -63,7 +63,7 @@
 //=============================================================================================================
 
 namespace NOISEREDUCTIONPLUGIN{
-constexpr auto BUILDTIMESTAMP(){BUILDTIME::get();};
+constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
 }
 
 #endif // NOISEREDUCTION_GLOBAL_H

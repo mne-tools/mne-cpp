@@ -302,3 +302,10 @@ void FtBuffer::setBufferPort(int iPort)
 {
     m_iBufferPort = iPort;
 }
+
+//=============================================================================================================
+
+QString FtBuffer::getBuildDateTime()
+{
+    return QString(BUILDTIMESTAMP().date()) + " " + QString(BUILDTIMESTAMP().time());
+}

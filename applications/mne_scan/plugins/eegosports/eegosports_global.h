@@ -63,7 +63,7 @@
 //=============================================================================================================
 
 namespace EEGOSPORTSPLUGIN{
-constexpr auto BUILDTIMESTAMP(){BUILDTIME::get();};
+constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
 }
 
 #endif // EEGOSPORTS_GLOBAL_H
