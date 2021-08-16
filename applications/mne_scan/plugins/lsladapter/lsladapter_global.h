@@ -65,7 +65,7 @@
 //=============================================================================================================
 
 namespace LSLADAPTERPLUGIN{
-constexpr auto BUILDTIMESTAMP(){BUILDTIME::get();};
+constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
 }
 
 #endif // LSLADAPTER_GLOBAL_H

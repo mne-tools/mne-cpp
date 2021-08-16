@@ -719,3 +719,9 @@ void EEGoSports::run()
     }
 }
 
+//=============================================================================================================
+
+QString EEGoSports::getBuildDateTime()
+{
+    return QString(BUILDTIMESTAMP().date()) + " " + QString(BUILDTIMESTAMP().time());
+}

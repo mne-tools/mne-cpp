@@ -601,3 +601,10 @@ bool BabyMEG::readBadChannels()
 
     return true;
 }
+
+//=============================================================================================================
+
+QString BabyMEG::getBuildDateTime()
+{
+    return QString(BUILDTIMESTAMP().date()) + " " + QString(BUILDTIMESTAMP().time());
+}

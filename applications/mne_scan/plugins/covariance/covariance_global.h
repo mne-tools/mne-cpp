@@ -63,7 +63,7 @@
 //=============================================================================================================
 
 namespace COVARIANCEPLUGIN{
-constexpr auto BUILDTIMESTAMP(){BUILDTIME::get();};
+constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
 }
 
 #endif // COVARIANCE_GLOBAL_H

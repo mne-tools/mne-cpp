@@ -121,6 +121,7 @@ public:
     virtual QString getName() const;
     virtual QWidget* setupWidget();
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+    virtual QString getBuildDateTime();
 
     //=========================================================================================================
     /**

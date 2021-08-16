@@ -63,7 +63,7 @@
 //=============================================================================================================
 
 namespace NEURONALCONNECTIVITYPLUGIN{
-constexpr auto BUILDTIMESTAMP(){BUILDTIME::get();};
+constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
 }
 
 #endif // CONNECTIVITY_GLOBAL_H

@@ -524,3 +524,10 @@ void RtFwd::run()
         }
     }
 }
+
+//=============================================================================================================
+
+QString RtFwd::getBuildDateTime()
+{
+    return QString(BUILDTIMESTAMP().date()) + " " + QString(BUILDTIMESTAMP().time());
+}
