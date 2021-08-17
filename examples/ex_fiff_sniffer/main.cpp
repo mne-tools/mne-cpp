@@ -74,7 +74,11 @@ int main(int argc, char *argv[])
 
     } else { //file found
         QBuffer buffer;
-        buffer.open(QIODevice::ReadWrite);
+        if(!buffer.open(QIODevice::ReadWrite))
+        {
+            std::cout << "Buffer can't be opened.\n";
+            return 1;
+        }
         t_fileRaw.open(QIODevice::ReadOnly);
         buffer.write(t_fileRaw.readAll());
 
