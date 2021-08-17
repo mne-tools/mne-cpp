@@ -718,5 +718,5 @@ void NoiseReduction::createSpharaOperator()
 
 QString NoiseReduction::getBuildDateTime()
 {
-    return QString(BUILDTIMESTAMP().date()) + " " + QString(BUILDTIMESTAMP().time());
+    return QString(BUILDINFO::timestamp());
 }
