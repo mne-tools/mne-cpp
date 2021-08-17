@@ -2230,15 +2230,12 @@ void ComputeFwd::initFwd()
             }
             printf("Omitted source space points will be output to : %s\n",m_pSettings->mindistoutname.toUtf8().constData());
         }
-        if (MneSurfaceOrVolume::filter_source_spaces(m_pSettings->mindist,
-                                                     m_pSettings->bemname.toUtf8().data(),
-                                                     m_mri_head_t,
-                                                     m_spaces,
-                                                     m_iNSpace,out,m_pSettings->use_threads) == FAIL) {
-            if(out)
-                fclose(out);
-            return;
-        }
+        MneSurfaceOrVolume::filter_source_spaces(m_pSettings->mindist,
+                                                 m_pSettings->bemname.toUtf8().data(),
+                                                 m_mri_head_t,
+                                                 m_spaces,
+                                                 m_iNSpace,out,m_pSettings->use_threads);
+        fclose(out);
     }
 }
 
