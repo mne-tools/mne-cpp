@@ -605,7 +605,7 @@ void mne_free_cov_3(MneCovMatrix* c)
     if (c->sss)
         delete c->sss;
     c->bads.clear();
-    delete c;
+    FREE_3(c);
     return;
 }
 
@@ -3336,27 +3336,27 @@ int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix*& c)
 DipoleFitData::DipoleFitData()
 : mri_head_t (NULL)
 , meg_head_t (NULL)
-, meg_coils (NULL)
-, eeg_els (NULL)
 , nmeg (0)
 , neeg (0)
 , ch_names (NULL)
 , pick (NULL)
-, bem_model (NULL)
+, meg_coils (NULL)
+, eeg_els (NULL)
 , eeg_model (NULL)
-, fixed_noise (FALSE)
-, noise (NULL)
-, noise_orig (NULL)
-, nave (1)
-, user (NULL)
-, user_free (NULL)
-, proj (NULL)
+, bem_model (NULL)
 , sphere_funcs (NULL)
 , bem_funcs (NULL)
-, mag_dipole_funcs (NULL)
 , funcs (NULL)
+, mag_dipole_funcs (NULL)
+, fixed_noise (FALSE)
+, noise_orig (NULL)
+, noise (NULL)
+, nave (1)
+, proj (NULL)
 , column_norm (COLUMN_NORM_NONE)
 , fit_mag_dipoles (FALSE)
+, user (NULL)
+, user_free (NULL)
 {
     r0[0] = 0.0f;
     r0[1] = 0.0f;
