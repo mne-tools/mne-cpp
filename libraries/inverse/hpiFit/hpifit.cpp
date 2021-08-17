@@ -93,10 +93,6 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo,
     m_matModel = MatrixXd(0,0);
     m_vecFreqs = QVector<int>();
 
-    // init coils
-    m_coilTemplate = NULL;
-    m_coilMeg = NULL;
-
     updateChannels(pFiffInfo);
     updateSensor();
 }
@@ -563,7 +559,7 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd matNH, MatrixXd ma
 //=============================================================================================================
 
 void HPIFit::createSensorSet(SensorSet& sensors,
-                             FwdCoilSet* coils)
+                             QSharedPointer<FWDLIB::FwdCoilSet> coils)
 {
     int iNchan = coils->ncoil;
 
@@ -645,15 +641,15 @@ void HPIFit::updateSensor()
 
     FiffCoordTransOld* t = NULL;
 
-    if(!m_coilTemplate) {
+    if(m_pCoilTemplate.isNull()) {
         // read coil_def.dat
         QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
-        m_coilTemplate = FwdCoilSet::read_coil_defs(qPath);
+        m_pCoilTemplate = QSharedPointer<FWDLIB::FwdCoilSet>(FwdCoilSet::read_coil_defs(qPath));
     }
 
     // create sensor set
-    m_coilMeg = m_coilTemplate->create_meg_coils(m_lChannels, iNch, iAcc, t);
-    createSensorSet(m_sensors, m_coilMeg);
+    m_pCoilMeg = QSharedPointer<FWDLIB::FwdCoilSet>(m_pCoilTemplate->create_meg_coils(m_lChannels, iNch, iAcc, t));
+    createSensorSet(m_sensors, m_pCoilMeg);
 }
 
 //=============================================================================================================

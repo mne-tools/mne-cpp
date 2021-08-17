@@ -93,8 +93,6 @@ class FiffChPos;
 class FiffCoordTrans;
 class FiffDigitizerData;
 
-static FiffId defaultFiffId;
-
 //=============================================================================================================
 /**
  * FiffStream provides an interface for reading from and writing to fiff files
@@ -653,7 +651,7 @@ public:
      *
      * @return the position where the file id struct was written to.
      */
-    fiff_long_t write_id(fiff_int_t kind, const FiffId& id = defaultFiffId);
+    fiff_long_t write_id(fiff_int_t kind, const FiffId& id = FiffId::getDefault());
 
     //=========================================================================================================
     /**

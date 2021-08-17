@@ -2266,24 +2266,25 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
 
             for (j = 0; j < nchan; j++)
                 chs.append(FiffChInfo());
-                chs[j].scanNo = -1;
+            chs[j].scanNo = -1;
             to_find = nchan;
             break;
 
         case FIFF_PARENT_BLOCK_ID :
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
-//            id = t_pTag->toFiffID();
             *id = *(fiffId)t_pTag->data();
             break;
 
         case FIFF_COORD_TRANS :
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
-//            t = t_pTag->toCoordTrans();
             t = FiffCoordTransOld::read_helper( t_pTag );
-            if (t->from != FIFFV_COORD_DEVICE || t->to   != FIFFV_COORD_HEAD)
+            if (t && (t->from != FIFFV_COORD_DEVICE || t->to != FIFFV_COORD_HEAD))
+            {
+                delete t;
                 t = NULL;
+            }
             break;
 
         case FIFF_CH_INFO : /* Information about one channel */
@@ -2825,7 +2826,8 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
 {
     QList<FiffChInfo> ch;
     FiffChInfo this_ch;
-    int j,k,nchan;
+    int j,k;
+    int nchan = 0;
     int to_find = 0;
     FiffDirNode::SPtr meas;
     FiffDirNode::SPtr meas_info;
@@ -3334,27 +3336,27 @@ int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix*& c)
 DipoleFitData::DipoleFitData()
 : mri_head_t (NULL)
 , meg_head_t (NULL)
-, meg_coils (NULL)
-, eeg_els (NULL)
 , nmeg (0)
 , neeg (0)
 , ch_names (NULL)
 , pick (NULL)
-, bem_model (NULL)
+, meg_coils (NULL)
+, eeg_els (NULL)
 , eeg_model (NULL)
-, fixed_noise (FALSE)
-, noise (NULL)
-, noise_orig (NULL)
-, nave (1)
-, user (NULL)
-, user_free (NULL)
-, proj (NULL)
+, bem_model (NULL)
 , sphere_funcs (NULL)
 , bem_funcs (NULL)
-, mag_dipole_funcs (NULL)
 , funcs (NULL)
+, mag_dipole_funcs (NULL)
+, fixed_noise (FALSE)
+, noise_orig (NULL)
+, noise (NULL)
+, nave (1)
+, proj (NULL)
 , column_norm (COLUMN_NORM_NONE)
 , fit_mag_dipoles (FALSE)
+, user (NULL)
+, user_free (NULL)
 {
     r0[0] = 0.0f;
     r0[1] = 0.0f;
@@ -3679,6 +3681,9 @@ int DipoleFitData::make_projection(const QList<QString> &projnames,
     return OK;
 
 bad :
+    if(all)
+        delete all;
+    all = NULL;
     return FAIL;
 }
 
@@ -3821,10 +3826,12 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
         mne_free_cov_3(f->noise); f->noise = NULL;
         if (nmeg > 0 && nmeg-nomit_meg > 0 && nmeg-nomit_meg < min_nchan) {
             qCritical("Too few MEG channels remaining");
+            FREE_3(w);
             return FAIL;
         }
         if (neeg > 0 && neeg-nomit_eeg > 0 && neeg-nomit_eeg < min_nchan) {
             qCritical("Too few EEG channels remaining");
+            FREE_3(w);
             return FAIL;
         }
         f->noise = MneCovMatrix::mne_dup_cov(f->noise_orig);

@@ -180,7 +180,7 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream,
     //    fiffDirEntry this_ent;
     QList<FiffChInfo> ch;
     FiffChInfo this_ch;
-    FiffCoordTransOld* t;
+    FiffCoordTransOld* t = nullptr;
     int j,k;
     int to_find = 4;
     QList<FiffDirNode::SPtr> hpi;
@@ -309,6 +309,8 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream,
             //            t = (fiffCoordTrans)tag.data;
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
+            if(t)
+                delete t;
             t = FiffCoordTransOld::read_helper( t_pTag );
             /*
                 * Require this particular transform!
