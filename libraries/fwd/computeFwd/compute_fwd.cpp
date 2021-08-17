@@ -1659,7 +1659,7 @@ bool mne_attach_env(const QString& name, const QString& command)
 {
     int  insert_blocks[]  = { FIFFB_MNE , FIFFB_MEAS, FIFFB_MRI, FIFFB_BEM, -1 };
     QString cwd = QDir::currentPath();
-    FiffId id;
+
     int     b,k, insert;
     FiffTag::SPtr t_pTag;
 //    QList<FiffTag::SPtr> tags;
@@ -1668,7 +1668,7 @@ bool mne_attach_env(const QString& name, const QString& command)
 
 //    if (fiff_new_file_id(&id) == FIFF_FAIL)
 //        return false;
-//    id = FiffId::new_file_id();
+    FiffId id(FiffId::new_file_id());
 
 //#ifdef DEBUG
 //    fprintf(stderr,"\n");
