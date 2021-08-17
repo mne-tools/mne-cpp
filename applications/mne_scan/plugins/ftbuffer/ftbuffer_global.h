@@ -59,12 +59,4 @@
 #  define FTBUFFER_EXPORT Q_DECL_IMPORT
 #endif
 
-//=============================================================================================================
-// BUILD TIMESTAMP
-//=============================================================================================================
-
-namespace FTBUFFERPLUGIN{
-constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
-}
-
 #endif // FTBUFFER_GLOBAL_H

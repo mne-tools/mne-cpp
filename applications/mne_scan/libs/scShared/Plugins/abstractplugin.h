@@ -189,7 +189,7 @@ public:
      *
      * @return build date and time
      */
-    virtual QString getBuildDateTime();
+    virtual QString getBuildDateTime() = 0;
 
     inline InputConnectorList& getInputConnectors(){return m_inputConnectors;}
     inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
@@ -261,13 +261,6 @@ inline QList< QAction* > AbstractPlugin::getPluginActions()
 inline void AbstractPlugin::addPluginAction(QAction* pAction)
 {
     m_qListPluginActions.append(pAction);
-}
-
-//=============================================================================================================
-
-inline QString AbstractPlugin::getBuildDateTime()
-{
-    return QString(BUILDTIMESTAMP().date()) + " " + QString(BUILDTIMESTAMP().time());
 }
 
 //=============================================================================================================
