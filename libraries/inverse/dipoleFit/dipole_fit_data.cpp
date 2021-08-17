@@ -3826,16 +3826,12 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
         mne_free_cov_3(f->noise); f->noise = NULL;
         if (nmeg > 0 && nmeg-nomit_meg > 0 && nmeg-nomit_meg < min_nchan) {
             qCritical("Too few MEG channels remaining");
-            if(w)
-                delete w;
-            w = NULL;
+            FREE_3(w);
             return FAIL;
         }
         if (neeg > 0 && neeg-nomit_eeg > 0 && neeg-nomit_eeg < min_nchan) {
             qCritical("Too few EEG channels remaining");
-            if(w)
-                delete w;
-            w = NULL;
+            FREE_3(w);
             return FAIL;
         }
         f->noise = MneCovMatrix::mne_dup_cov(f->noise_orig);
