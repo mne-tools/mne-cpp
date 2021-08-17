@@ -94,7 +94,6 @@ OTHER_FILES += sampleplugin.json
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-INCLUDEPATH += $${MNE_GLOBAL_DIR}
 INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 
 # Install headers to include directory

@@ -86,7 +86,6 @@ SOURCES += main.cpp
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-INCLUDEPATH += $${MNE_GLOBAL_DIR}
 
 unix:!macx {
     # Unix
