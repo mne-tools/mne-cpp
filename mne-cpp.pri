@@ -143,3 +143,4 @@ isEmpty( MNE_INSTALL_INCLUDE_DIR ) {
     MNE_INSTALL_INCLUDE_DIR = $$shell_path($${PWD}/include)
 }
 
+DEFINES += GIT_HASH="\\\"$(shell git -C \""$$_PRO_FILE_PWD_"\" describe)\\\""
