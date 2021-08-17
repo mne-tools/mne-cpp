@@ -113,6 +113,12 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns a default FiffId object to be used as an mutable placeholder for a default instance of the class.
+     */
+    static FiffId& getDefault();
+
+    //=========================================================================================================
+    /**
      * Prints the id
      * Refactored: print_id (fiff_dir_tree.c)
      */

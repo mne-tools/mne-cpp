@@ -53,6 +53,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSettings>
+#include <QJsonObject>
+#include <QJsonArray>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -77,8 +79,6 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
-
-    setupCoilPresets();
 
     connect(m_pUi->m_pushButton_loadDigitizers, &QPushButton::released,
             this, &HpiSettingsView::onLoadDigitizers);
@@ -107,9 +107,8 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
     connect(m_pUi->m_doubleSpinBox_rotThreshold, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &HpiSettingsView::allowedRotationChanged);
     connect(m_pUi->comboBox_coilPreset, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &HpiSettingsView::loadCoilPreset);
+            this, &HpiSettingsView::selectCoilPreset);
 
-    m_pUi->comboBox_coilPreset->hide();
     //Init coil freqs
     m_vCoilFreqs << 293 << 307 << 314 << 321;
     qRegisterMetaTypeStreamOperators<QVector<int> >("QVector<int>");
@@ -416,11 +415,11 @@ void HpiSettingsView::onRemoveCoil()
 
 QList<FiffDigPoint> HpiSettingsView::readDigitizersFromFile(const QString& fileName)
 {
-    resetTables();
+    clearCoilGUI();
 
     QFile t_fileDig(fileName);
     FiffDigPointSet t_digSet(t_fileDig);
-    updateDigitizerInfo(t_digSet);
+    updateDigitizerInfoGUI(t_digSet);
 
     return t_digSet.getList();
 }
@@ -429,15 +428,15 @@ QList<FiffDigPoint> HpiSettingsView::readDigitizersFromFile(const QString& fileN
 
 void HpiSettingsView::newDigitizerList(QList<FIFFLIB::FiffDigPoint> pointList)
 {
-    resetTables();
+    clearCoilGUI();
 
     FiffDigPointSet t_digSet(pointList);
-    updateDigitizerInfo(t_digSet);
+    updateDigitizerInfoGUI(t_digSet);
 }
 
 //=============================================================================================================
 
-void HpiSettingsView::updateDigitizerInfo(const FiffDigPointSet& digSet)
+void HpiSettingsView::updateDigitizerInfoGUI(const FiffDigPointSet& digSet)
 {
     qint16 numHPI = 0;
     qint16 numFiducials = 0;
@@ -446,56 +445,21 @@ void HpiSettingsView::updateDigitizerInfo(const FiffDigPointSet& digSet)
 
     for(int i = 0; i < digSet.size(); ++i) {
         switch(digSet[i].kind) {
-            case FIFFV_POINT_HPI: {
-                // Add column 0 in freq table widget
-                m_pUi->m_tableWidget_Frequencies->insertRow(m_pUi->m_tableWidget_Frequencies->rowCount());
-                QTableWidgetItem* pTableItemA = new QTableWidgetItem(QString::number(m_pUi->m_tableWidget_Frequencies->rowCount()));
-                pTableItemA->setFlags(Qt::ItemIsEnabled);
-                m_pUi->m_tableWidget_Frequencies->setItem(m_pUi->m_tableWidget_Frequencies->rowCount()-1,
-                                                         0,
-                                                         pTableItemA);
-
-                // Add column 1 in freq table widget
-                if(m_vCoilFreqs.size() > numHPI) {
-                    m_pUi->m_tableWidget_Frequencies->setItem(m_pUi->m_tableWidget_Frequencies->rowCount()-1,
-                                                             1,
-                                                             new QTableWidgetItem(QString::number(m_vCoilFreqs.at(numHPI))));
-                } else {
-                    m_pUi->m_tableWidget_Frequencies->setItem(m_pUi->m_tableWidget_Frequencies->rowCount()-1,
-                                                             1,
-                                                             new QTableWidgetItem("none"));
-                    m_vCoilFreqs.append(-1);
-                }
-
-                // Add column 0 in error table widget
-                m_pUi->m_tableWidget_errors->insertRow(m_pUi->m_tableWidget_errors->rowCount());
-                QTableWidgetItem* pTableItemB = new QTableWidgetItem(QString::number(m_pUi->m_tableWidget_Frequencies->rowCount()));
-                pTableItemB->setFlags(Qt::ItemIsEnabled);
-                m_pUi->m_tableWidget_errors->setItem(m_pUi->m_tableWidget_errors->rowCount()-1,
-                                                    0,
-                                                    pTableItemB);
-
-                // Add column 1 in error table widget
-                QTableWidgetItem* pTableItemC = new QTableWidgetItem("0mm");
-                pTableItemC->setFlags(Qt::ItemIsEnabled);
-                m_pUi->m_tableWidget_errors->setItem(m_pUi->m_tableWidget_errors->rowCount()-1,
-                                                    1,
-                                                    pTableItemC);
-                numHPI++;
-                break;
+        case FIFFV_POINT_HPI:
+            if(m_vCoilFreqs.size() <= numHPI) {
+                m_vCoilFreqs.append(-1);
             }
-
-            case FIFFV_POINT_CARDINAL:
-                numFiducials++;
-                break;
-
-            case FIFFV_POINT_EEG:
-                numEEG++;
-                break;
-
-            case FIFFV_POINT_EXTRA:
-                numAdditional++;
-                break;
+            numHPI++;
+            break;
+        case FIFFV_POINT_CARDINAL:
+            numFiducials++;
+            break;
+        case FIFFV_POINT_EEG:
+            numEEG++;
+            break;
+        case FIFFV_POINT_EXTRA:
+            numAdditional++;
+            break;
         }
     }
 
@@ -505,6 +469,10 @@ void HpiSettingsView::updateDigitizerInfo(const FiffDigPointSet& digSet)
     m_pUi->m_label_numberLoadedEEG->setNum(numEEG);
     m_pUi->m_label_numberLoadedAdditional->setNum(numAdditional);
 
+    m_vCoilFreqs.resize(numHPI);
+    populateCoilGUI();
+    setupCoilPresets(numHPI);
+
     // Make sure that the stored coil freqs always match the number of loaded ones
     m_vCoilFreqs.resize(numHPI);
     emit coilFrequenciesChanged(m_vCoilFreqs);
@@ -512,7 +480,55 @@ void HpiSettingsView::updateDigitizerInfo(const FiffDigPointSet& digSet)
 
 //=============================================================================================================
 
-void HpiSettingsView::resetTables()
+void HpiSettingsView::populateCoilGUI()
+{
+    for(int iCoilFreq : m_vCoilFreqs){
+        addCoilFreqToGUI(iCoilFreq);
+        addCoilErrorToGUI();
+    }
+}
+
+//=============================================================================================================
+
+void HpiSettingsView::addCoilFreqToGUI(int iCoilFreq)
+{
+    // Add column 0 in freq table widget
+    m_pUi->m_tableWidget_Frequencies->insertRow(m_pUi->m_tableWidget_Frequencies->rowCount());
+    QTableWidgetItem* pTableItemA = new QTableWidgetItem(QString::number(m_pUi->m_tableWidget_Frequencies->rowCount()));
+    pTableItemA->setFlags(Qt::ItemIsEnabled);
+    m_pUi->m_tableWidget_Frequencies->setItem(m_pUi->m_tableWidget_Frequencies->rowCount()-1,
+                                             0,
+                                             pTableItemA);
+
+    // Add column 1 in freq table widget
+    m_pUi->m_tableWidget_Frequencies->setItem(m_pUi->m_tableWidget_Frequencies->rowCount()-1,
+                                              1,
+                                              new QTableWidgetItem(QString::number(iCoilFreq)));
+}
+
+//=============================================================================================================
+
+void HpiSettingsView::addCoilErrorToGUI()
+{
+    // Add column 0 in error table widget
+    m_pUi->m_tableWidget_errors->insertRow(m_pUi->m_tableWidget_errors->rowCount());
+    QTableWidgetItem* pTableItemB = new QTableWidgetItem(QString::number(m_pUi->m_tableWidget_Frequencies->rowCount()));
+    pTableItemB->setFlags(Qt::ItemIsEnabled);
+    m_pUi->m_tableWidget_errors->setItem(m_pUi->m_tableWidget_errors->rowCount()-1,
+                                        0,
+                                        pTableItemB);
+
+    // Add column 1 in error table widget
+    QTableWidgetItem* pTableItemC = new QTableWidgetItem("0mm");
+    pTableItemC->setFlags(Qt::ItemIsEnabled);
+    m_pUi->m_tableWidget_errors->setItem(m_pUi->m_tableWidget_errors->rowCount()-1,
+                                        1,
+                                        pTableItemC);
+}
+
+//=============================================================================================================
+
+void HpiSettingsView::clearCoilGUI()
 {
     m_pUi->m_tableWidget_Frequencies->clear();
     m_pUi->m_tableWidget_Frequencies->setRowCount(0);
@@ -523,7 +539,6 @@ void HpiSettingsView::resetTables()
     m_pUi->m_tableWidget_errors->setRowCount(0);
     m_pUi->m_tableWidget_errors->setHorizontalHeaderItem(0, new QTableWidgetItem("#Coil"));
     m_pUi->m_tableWidget_errors->setHorizontalHeaderItem(1, new QTableWidgetItem("Error"));
-
 }
 
 //=============================================================================================================
@@ -533,25 +548,58 @@ void HpiSettingsView::clearView()
 
 }
 
-//=============================================================================================================
+//==============================================void populateCoilGUI(int iNumCoils);===============================================================
 
-void HpiSettingsView::setupCoilPresets()
+void HpiSettingsView::loadCoilPresets(const QString &sFilePath)
 {
-    m_pUi->comboBox_coilPreset->addItem("Load preset");
-
-    m_pUi->comboBox_coilPreset->addItem("VV 4coils 1-500Hz", QVariant::fromValue(QVector<int>{154,158,161,166}));
-    m_pUi->comboBox_coilPreset->addItem("VV 4coils 501-2000Hz", QVariant::fromValue(QVector<int>{293,307,314,321}));
-    m_pUi->comboBox_coilPreset->addItem("VV 4coils 2001-3000Hz+", QVariant::fromValue(QVector<int>{586,614,628,642}));
+    QFile inFile(sFilePath);
+    if (inFile.open(QIODevice::ReadOnly)){
+        QByteArray inArray = inFile.readAll();
+        m_CoilPresets = QJsonDocument::fromJson(inArray);
+    }
 }
 
 //=============================================================================================================
 
-void HpiSettingsView::loadCoilPreset(int iCoilPresetIndex)
+void HpiSettingsView::setupCoilPresets(int iNumCoils)
+{
+    if(!m_CoilPresets.isNull()){
+        QJsonArray presetData = m_CoilPresets.object()[QString::number(iNumCoils)].toArray();
+        populatePresetGUI(presetData);
+    }
+}
+
+//=============================================================================================================
+
+void HpiSettingsView::populatePresetGUI(const QJsonArray& presetData)
+{
+    m_pUi->comboBox_coilPreset->clear();
+    m_pUi->comboBox_coilPreset->addItem("Load preset");
+
+    for(const auto& entry : presetData){
+        QString name = entry.toObject()["name"].toString();
+        QVector<int> data;
+
+        for (const auto& coil : entry.toObject()["coils"].toArray()){
+            data.append(coil.toInt());
+        }
+
+        m_pUi->comboBox_coilPreset->addItem(name, QVariant::fromValue(data));
+    }
+}
+
+//=============================================================================================================
+
+void HpiSettingsView::selectCoilPreset(int iCoilPresetIndex)
 {
     if (iCoilPresetIndex < (m_pUi->comboBox_coilPreset->count() - 1)){
-        auto data = m_pUi->comboBox_coilPreset->itemData(iCoilPresetIndex);
-        if (!data.isNull()){
-            //set coil freqs
+        auto coilFreqData = m_pUi->comboBox_coilPreset->itemData(iCoilPresetIndex);
+        if (!coilFreqData.isNull() && coilFreqData.canConvert<QVector<int>>()){
+            m_vCoilFreqs = coilFreqData.value<QVector<int>>();
+            clearCoilGUI();
+            populateCoilGUI();
+
+            emit coilFrequenciesChanged(m_vCoilFreqs);
         }
     }
 }

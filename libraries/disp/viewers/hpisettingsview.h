@@ -47,6 +47,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QJsonDocument>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -173,6 +175,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Load coil presets from json file at the provided path
+     *
+     * @param[in] sFilePath     PAth to json file with coil preset data
+     */
+    void loadCoilPresets(const QString& sFilePath);
+
+    //=========================================================================================================
+    /**
      * Saves all important settings of this view via QSettings.
      */
     void saveSettings();
@@ -240,22 +250,63 @@ protected:
      */
     QList<FIFFLIB::FiffDigPoint> readDigitizersFromFile(const QString& fileName);
 
-    void setupCoilPresets();
-
-    void loadCoilPreset(int iCoilPresetIndex);
+    //=========================================================================================================
+    /**
+     * Sets up coil presets for the number of coils specified by the input argument.
+     *
+     * @param[in] iNumCoils     number of hpi coils.
+     */
+    void setupCoilPresets(int iNumCoils);
 
     //=========================================================================================================
     /**
-     * Resets GUI display tables and empties all rows
+     * Populates preset dropdown gui with names and coil freqs in the input array.
+     *
+     * @param[in] presetData    json array containing the coil preset name and freqs.
      */
-    void resetTables();
+    void populatePresetGUI(const QJsonArray& presetData);
 
+    //=========================================================================================================
     /**
-     * @UpdateGUI information with data from input digitizer set.
+     * Adds coil freq and coil error entries based on m_vCoilFreqs. Does not clear existing entires.
+     */
+    void populateCoilGUI();
+
+    //=========================================================================================================
+    /**
+     * Selects and loads coil preset at index specified by input argument.
+     *
+     * @param[in] iCoilPresetIndex  selected coil preset.
+     */
+    void selectCoilPreset(int iCoilPresetIndex);
+
+    //=========================================================================================================
+    /**
+     * Adds coil frequency to gui table based on input argument.
+     *
+     * @param[in] iCoilFreq
+     */
+    void addCoilFreqToGUI(int iCoilFreq);
+
+    //=========================================================================================================
+    /**
+     * @brief addCoilErrorToGUI
+     */
+    void addCoilErrorToGUI();
+
+    //=========================================================================================================
+    /**
+     * Clears GUI display tables for coil error and coil freqs and empties all rows
+     */
+    void clearCoilGUI();
+
+    //=========================================================================================================
+    /**
+     * UpdateGUI information with data from input digitizer set.
      *
      * @param[in] digSet    Digigtizer set from which data metadata will be displayed.
      */
-    void updateDigitizerInfo(const FIFFLIB::FiffDigPointSet& digSet);
+    void updateDigitizerInfoGUI(const FIFFLIB::FiffDigPointSet& digSet);
 
 
     Ui::HpiSettingsViewWidget*                  m_pUi;                  /**< The HPI dialog. */
@@ -263,6 +314,8 @@ protected:
     QVector<int>                                m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
 
     QString                                     m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
+
+    QJsonDocument                               m_CoilPresets;          /**< Loaded coil frequency presets */
 
 signals:
     //=========================================================================================================

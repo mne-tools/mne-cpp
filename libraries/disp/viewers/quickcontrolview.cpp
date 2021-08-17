@@ -67,8 +67,8 @@ QuickControlView::QuickControlView(const QString &sSettingsPath,
                                    QWidget *parent,
                                    bool bDraggable)
 : DraggableFramelessWidget(parent, flags, false, bDraggable, true)
-, m_pUi(new Ui::QuickControlViewWidget)
 , m_sName(name)
+, m_pUi(new Ui::QuickControlViewWidget)
 {
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
