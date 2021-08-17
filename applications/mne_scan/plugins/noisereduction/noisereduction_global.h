@@ -58,12 +58,4 @@
 #  define NOISEREDUCTIONSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-//=============================================================================================================
-// BUILD TIMESTAMP
-//=============================================================================================================
-
-namespace NOISEREDUCTIONPLUGIN{
-constexpr auto BUILDTIMESTAMP(){return BUILDTIME::get();};
-}
-
 #endif // NOISEREDUCTION_GLOBAL_H
