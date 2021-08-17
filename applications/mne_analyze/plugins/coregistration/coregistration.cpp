@@ -239,7 +239,7 @@ void CoRegistration::updateBemList(QSharedPointer<ANSHAREDLIB::AbstractModel> pN
     if(!m_vecBemDataModels.contains(pNewModel) && pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
         m_pCoregSettingsView->clearSelectionBem();
         m_vecBemDataModels.append(pNewModel);
-        for(auto pBemDataModel : m_vecBemDataModels) {
+        for(auto& pBemDataModel : m_vecBemDataModels) {
             m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
         }
     }
@@ -251,7 +251,7 @@ void CoRegistration::onChangeSelectedBem(const QString &sText)
 {
     QSharedPointer<ANSHAREDLIB::BemDataModel> pBemDataModel;
 
-    for (auto bemDataModel : m_vecBemDataModels) {
+    for (auto& bemDataModel : m_vecBemDataModels) {
         if(bemDataModel->getModelName() == sText && sText != m_sCurrentSelectedBem){
             // update current selected Bem
             pBemDataModel = qSharedPointerCast<BemDataModel>(bemDataModel);
@@ -352,7 +352,7 @@ void CoRegistration::onFiducialsChanged(const QString& sFilePath)
 {
     QFile fileDig(sFilePath);
     m_digFidMri.clear();
-    m_digFidMri = *new FiffDigPointSet(fileDig);
+    m_digFidMri = FiffDigPointSet(fileDig);
 
     QVariant data = QVariant::fromValue(m_digFidMri);
     m_pCommu->publishEvent(EVENT_TYPE::NEW_FIDUCIALS_ADDED, data);
@@ -383,7 +383,7 @@ void CoRegistration::onLoadTrans(const QString& sFilePath)
     // check for type of transformation
     if(transTemp.from == FIFFV_COORD_HEAD && transTemp.to == FIFFV_COORD_MRI) {
         m_transHeadMri.clear();
-        m_transHeadMri = *new FiffCoordTrans(transTemp);
+        m_transHeadMri = FiffCoordTrans(transTemp);
 
         // Update Widget
         getParamFromTrans(m_transHeadMri.trans,vecRot,vecTrans,vecScale);
@@ -717,8 +717,6 @@ void CoRegistration::getParamFromTrans(const Matrix4f& matTrans,
 
     // get translation vector
     vecTrans = m_transHeadMri.trans.block(0,3,3,1);
-
-    return;
 }
 
 //=============================================================================================================
@@ -770,7 +768,7 @@ void CoRegistration::deleteModels()
             m_sCurrentSelectedBem = "";
         } else {
             // update new bem list
-            for(auto pBemDataModel : m_vecBemDataModels) {
+            for(auto& pBemDataModel : m_vecBemDataModels) {
                 m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
             }
         }
@@ -807,7 +805,7 @@ bool CoRegistration::removeFromBemList(QSharedPointer<ANSHAREDLIB::AbstractModel
         }
 
         m_pCoregSettingsView->clearSelectionBem();
-        for(auto pBemDataModel : m_vecBemDataModels) {
+        for(auto& pBemDataModel : m_vecBemDataModels) {
             m_pCoregSettingsView->addSelectionBem(pBemDataModel->getModelName());
         }
         return true;
