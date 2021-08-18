@@ -44,6 +44,8 @@
 #include "rawdataviewer_global.h"
 #include <anShared/Plugins/abstractplugin.h>
 
+#include <utils/buildtime.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -112,6 +114,7 @@ public:
     virtual QMenu* getMenu() override;
     virtual QDockWidget* getControl() override;
     virtual QWidget* getView() override;
+    virtual QString getBuildDateTime() override;
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 

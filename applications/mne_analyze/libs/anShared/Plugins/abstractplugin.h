@@ -167,6 +167,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns string with plugin build date and time.
+     *
+     * @return build date and time
+     */
+    virtual QString getBuildDateTime() = 0;
+
+    //=========================================================================================================
+    /**
      * Initializes the plugin based on cmd line inputs given by the user.
      *
      * @param[in] sArguments  The cmd line arguments.

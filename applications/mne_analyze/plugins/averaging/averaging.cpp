@@ -729,3 +729,11 @@ void Averaging::updateEvokedSetModel()
     m_pButterflyView->updateView();
     m_pAverageLayoutView->updateData();
 }
+
+
+//=============================================================================================================
+
+QString Averaging::getBuildDateTime()
+{
+    return QString(BUILDINFO::timestamp());
+}

@@ -106,7 +106,7 @@ void ChannelSelection::unload()
 {
 }
 
-//=============================================================================================================
+//=========================================virtual QString getBuildDateTime();====================================================================
 
 QString ChannelSelection::getName() const
 {
@@ -277,4 +277,12 @@ void ChannelSelection::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel>
     if(m_pAnalyzeData->getModelsByType(ANSHAREDLIB_FIFFRAW_MODEL).size() == 0 && m_pAnalyzeData->getModelsByType(ANSHAREDLIB_AVERAGING_MODEL).size() == 0){
         m_pChannelSelectionView->clearView();
     }
+}
+
+
+//=============================================================================================================
+
+QString ChannelSelection::getBuildDateTime()
+{
+    return QString(BUILDINFO::timestamp());
 }

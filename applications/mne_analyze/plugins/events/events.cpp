@@ -278,3 +278,10 @@ void Events::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedM
         emit clearView(pRemovedModel);
     }
 }
+
+//=============================================================================================================
+
+QString Events::getBuildDateTime()
+{
+    return QString(BUILDINFO::timestamp());
+}
