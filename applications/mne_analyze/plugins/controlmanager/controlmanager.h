@@ -41,7 +41,6 @@
 
 #include "controlmanager_global.h"
 #include <anShared/Plugins/abstractplugin.h>
-#include <utils/buildtime.h>
 
 //=============================================================================================================
 // QT INCLUDES
