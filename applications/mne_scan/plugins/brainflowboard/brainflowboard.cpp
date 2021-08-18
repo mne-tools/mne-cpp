@@ -451,3 +451,11 @@ void BrainFlowBoard::releaseSession(bool useQmessage)
         msgBox.exec();
     }
 }
+
+
+//=============================================================================================================
+
+QString BrainFlowBoard::getBuildDateTime()
+{
+    return QString(BUILDINFO::timestamp());
+}
