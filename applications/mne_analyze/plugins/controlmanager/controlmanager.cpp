@@ -397,3 +397,10 @@ void ControlManager::onTakeScreenshotChanged()
 
     m_pCommu->publishEvent(EVENT_TYPE::VIEW3D_SETTINGS_CHANGED, QVariant::fromValue(m_View3DParameters));
 }
+
+//=============================================================================================================
+
+QString ControlManager::getBuildDateTime()
+{
+    return QString(BUILDINFO::timestamp());
+}

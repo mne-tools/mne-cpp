@@ -181,3 +181,11 @@ void DataManager::onCurrentItemChanged(const QModelIndex &pIndex)
 {
     m_pAnalyzeData->newSelection(pIndex);
 }
+
+
+//=============================================================================================================
+
+QString DataManager::getBuildDateTime()
+{
+    return QString(BUILDINFO::timestamp());
+}

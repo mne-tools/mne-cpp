@@ -324,3 +324,10 @@ void RawDataViewer::onNewRealtimeData()
 {
     m_pCommu->publishEvent(EVENT_TYPE::SELECTED_MODEL_CHANGED, QVariant::fromValue(qSharedPointerCast<AbstractModel>(m_pFiffRawView->getModel())));
 }
+
+//=============================================================================================================
+
+QString RawDataViewer::getBuildDateTime()
+{
+    return QString(BUILDINFO::timestamp());
+}
