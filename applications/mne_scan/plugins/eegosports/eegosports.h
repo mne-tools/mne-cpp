@@ -51,6 +51,7 @@
 
 #include <scShared/Plugins/abstractsensor.h>
 #include <utils/generics/circularbuffer.h>
+#include <utils/buildtime.h>
 #include <fstream>
 
 //=============================================================================================================

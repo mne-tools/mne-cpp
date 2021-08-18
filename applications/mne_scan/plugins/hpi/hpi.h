@@ -43,6 +43,7 @@
 #include "hpi_global.h"
 
 #include <utils/generics/circularbuffer.h>
+#include <utils/buildtime.h>
 #include <scShared/Plugins/abstractalgorithm.h>
 
 #include <fiff/fiff_dig_point.h>

@@ -44,6 +44,7 @@
 
 #include <scShared/Plugins/abstractalgorithm.h>
 #include <utils/generics/circularbuffer.h>
+#include <utils/buildtime.h>
 
 #include <fiff/fiff_evoked_set.h>
 

@@ -45,6 +45,7 @@
 #include <scShared/Plugins/abstractalgorithm.h>
 
 #include <utils/generics/circularbuffer.h>
+#include <utils/buildtime.h>
 
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>

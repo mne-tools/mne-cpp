@@ -54,6 +54,7 @@
 #include <fiff/fiff_raw_data.h>
 
 #include <utils/generics/circularbuffer.h>
+#include <utils/buildtime.h>
 
 //=============================================================================================================
 // QT INCLUDES

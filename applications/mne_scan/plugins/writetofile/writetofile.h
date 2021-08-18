@@ -42,6 +42,7 @@
 #include "writetofile_global.h"
 
 #include <utils/generics/circularbuffer.h>
+#include <utils/buildtime.h>
 #include <scShared/Plugins/abstractalgorithm.h>
 #include <fiff/fifffilesharer.h>
 
