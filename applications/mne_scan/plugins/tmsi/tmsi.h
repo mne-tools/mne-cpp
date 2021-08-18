@@ -57,6 +57,7 @@
 #include <scMeas/realtimemultisamplearray.h>
 
 #include <utils/layoutloader.h>
+#include <utils/buildtime.h>
 
 #include <fiff/fiff.h>
 

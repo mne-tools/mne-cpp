@@ -45,6 +45,7 @@
 #include <scShared/Plugins/abstractsensor.h>
 #include <communication/rtClient/rtcmdclient.h>
 #include <utils/generics/circularbuffer.h>
+#include <utils/buildtime.h>
 
 //=============================================================================================================
 // QT INCLUDES
