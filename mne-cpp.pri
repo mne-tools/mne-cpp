@@ -117,11 +117,6 @@ isEmpty( MNE_LIBRARY_DIR ) {
     MNE_LIBRARY_DIR = $$shell_path($${PWD}/lib)
 }
 
-MNE_GLOBAL_DIR = $$MNE_GLOBAL_DIR
-isEmpty( MNE_GLOBAL_DIR ) {
-    MNE_GLOBAL_DIR = $$shell_path($${PWD}/include/global)
-}
-
 win32 {
     FFTW_DIR_LIBS = $$shell_path($${PWD}/include/3rdParty/fftw)
     FFTW_DIR_INCLUDE = $$shell_path($${PWD}/include/3rdParty/fftw)
