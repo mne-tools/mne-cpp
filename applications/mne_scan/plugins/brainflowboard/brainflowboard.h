@@ -105,6 +105,7 @@ public:
     virtual bool stop();
     virtual AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
+    virtual QString getBuildDateTime();
     virtual QWidget* setupWidget();
 
     void releaseSession(bool useQmessage = true);
