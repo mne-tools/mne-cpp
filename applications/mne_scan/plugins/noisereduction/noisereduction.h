@@ -43,6 +43,7 @@
 #include "noisereduction_global.h"
 
 #include <utils/generics/circularbuffer.h>
+#include <utils/buildtime.h>
 
 #include <fiff/fiff_proj.h>
 
