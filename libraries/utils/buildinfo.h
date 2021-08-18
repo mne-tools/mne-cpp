@@ -20,14 +20,14 @@ constexpr auto timestamp()
     return __TIMESTAMP__;
 }
 
-constexpr auto githash()
-{
-#ifdef GIT_HASH
-    return GIT_HASH;
-#else
-    return "Git hash not defined.";
-#endif
-}
+//constexpr auto githash()
+//{
+//#ifdef GIT_HASH
+//    return GIT_HASH;
+//#else
+//    return "Git hash not defined.";
+//#endif
+//}
 
 //char* githash_short()
 //{

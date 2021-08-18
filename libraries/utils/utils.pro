@@ -78,6 +78,7 @@ SOURCES += \
     mnetracer.cpp
 
 HEADERS += \
+    buildinfo.h \
     kmeans.h\
     utils_global.h \
     mnemath.h \
@@ -94,8 +95,7 @@ HEADERS += \
     generics/observerpattern.h \
     generics/applicationlogger.h \
     spectral.h \
-    mnetracer.h \
-    buildtime.h
+    mnetracer.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

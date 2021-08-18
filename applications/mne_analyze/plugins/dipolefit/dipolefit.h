@@ -44,7 +44,6 @@
 
 #include <inverse/dipoleFit/dipole_fit_settings.h>
 
-#include <utils/buildtime.h>
 
 //=============================================================================================================
 // QT INCLUDES
