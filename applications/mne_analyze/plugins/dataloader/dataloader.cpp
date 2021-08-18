@@ -494,3 +494,11 @@ void DataLoader::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewM
         m_pSelectedModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
     }
 }
+
+
+//=============================================================================================================
+
+QString DataLoader::getBuildDateTime()
+{
+    return QString(BUILDINFO::timestamp());
+}

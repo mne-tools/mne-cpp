@@ -211,3 +211,10 @@ void Filtering::setFilterActive(bool state)
     data.setValue(state);
     m_pCommu->publishEvent(EVENT_TYPE::FILTER_ACTIVE_CHANGED, data);
 }
+
+//=============================================================================================================
+
+QString Filtering::getBuildDateTime()
+{
+    return QString(BUILDINFO::timestamp());
+}
