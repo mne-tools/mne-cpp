@@ -118,6 +118,12 @@ public:
      */
     QFileInfo getQFiOutFile();
 
+    //=========================================================================================================
+    /**
+     * Signals the FiffAnonymizer method handling both the multi-parallel setup and the single-thread setup.
+     */
+    virtual int run();
+
 protected:
     //=========================================================================================================
     /**
@@ -144,12 +150,6 @@ protected:
      * the output file can then be called as the original input file. This function helps with this process.
      */
     QString generateRandomFileName();
-
-    //=========================================================================================================
-    /**
-     * Signals the FiffAnonymizer method handling both the multi-parallel setup and the single-thread setup.
-     */
-    int execute();
 
     //=========================================================================================================
     /**

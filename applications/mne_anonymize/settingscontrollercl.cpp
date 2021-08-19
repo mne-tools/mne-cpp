@@ -116,13 +116,6 @@ SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
 
     printHeaderIfVerbose();
     printIfVerbose(QString("Executing command: ") + arguments.join(" "));
-
-    if(execute())
-    {
-        qCritical() << "Error during the anonymization of the input file";
-        return;
-    }
-
 }
 
 //=============================================================================================================
@@ -442,6 +435,8 @@ int SettingsControllerCl::run()
     }
 
     printFooterIfVerbose();
+
+    emit finished(0);
 
     return 0;
 }

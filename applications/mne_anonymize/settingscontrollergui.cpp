@@ -315,3 +315,10 @@ void SettingsControllerGui::initializeOptionsState()
         m_pWin->setSubjectHis(m_pAnonymizer->getSubjectHisID());
     }
 }
+
+//=============================================================================================================
+
+int SettingsControllerGui::run()
+{
+    return 0;
+}
