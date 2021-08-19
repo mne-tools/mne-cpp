@@ -54,7 +54,7 @@ VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
 
 TEMPLATE = app
 
-QT += widgets network
+QT += core widgets network
 
 !contains(MNECPP_CONFIG, withAppBundles) {
     CONFIG -= app_bundle
@@ -63,8 +63,11 @@ QT += widgets network
 DESTDIR = $${MNE_BINARY_DIR}
 
 TARGET = mne_anonymize
+
+CONFIG += console
+
 CONFIG(debug, debug|release) {
-    CONFIG += console
+#    CONFIG += console
     TARGET = $$join(TARGET,,,d)
 }
 
