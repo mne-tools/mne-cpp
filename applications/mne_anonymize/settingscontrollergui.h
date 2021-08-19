@@ -72,8 +72,8 @@ namespace MNEANONYMIZE {
 //=============================================================================================================
 /**
  * Controller class for mne_anonymize application when the GUI version of the application is called. This is generally
- * done by adding the '--gui' flag after the application binary executable file. It controls the declaration and
- * management of a fiffanonymizer and a mainwindow object, and controls communication between them.
+ * done by default. It controls the declaration and management of a fiffanonymizer and a mainwindow object, and controls
+ * communication between them.
  *
  * @brief Controller class for the GUI version of mne_anonymize.
  */
@@ -119,6 +119,12 @@ public slots:
      *
      */
     void executeAnonymizer();
+
+    //=========================================================================================================
+    /**
+     * Runs the anonymizer.
+     */
+    int run() override;
 
 private:
     //=========================================================================================================
