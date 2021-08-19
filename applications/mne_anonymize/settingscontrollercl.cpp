@@ -418,7 +418,7 @@ int SettingsControllerCl::parseInOutFiles()
 
 //=============================================================================================================
 
-int SettingsControllerCl::execute()
+int SettingsControllerCl::run()
 {
     if(m_pAnonymizer->anonymizeFile())
     {
