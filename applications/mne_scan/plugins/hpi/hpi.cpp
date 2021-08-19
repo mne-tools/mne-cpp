@@ -291,7 +291,7 @@ void Hpi::initPluginControlWidgets()
         // Projects Settings
         HpiSettingsView* pHpiSettingsView = new HpiSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
 
-        pHpiSettingsView->loadCoilPresets(QDir::currentPath() + "/mne_scan_plugins/hpi.json");
+        pHpiSettingsView->loadCoilPresets(QCoreApplication::applicationFilePath() + "/mne_scan_plugins/hpi.json");
 
         connect(this, &Hpi::guiModeChanged,
                 pHpiSettingsView, &HpiSettingsView::setGuiMode);
