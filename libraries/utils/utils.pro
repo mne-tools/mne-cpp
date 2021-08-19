@@ -70,6 +70,7 @@ SOURCES += \
     layoutmaker.cpp \
     selectionio.cpp \
     spectrogram.cpp \
+    utils_global.cpp \
     warp.cpp \
     sphere.cpp \
     generics/observerpattern.cpp \
@@ -132,3 +133,18 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
                 -lfftw3_threads \
     }
 }
+
+force_update.target = utils_global.h
+force_update.depends = FORCE
+
+win32 {
+force_update.commands += copy /b utils_global.h +,,
+
+}
+unix {
+force_update.commands += touch utils_global.h
+}
+
+PRE_TARGETDEPS += utils_global.h
+
+QMAKE_EXTRA_TARGETS += force_update
