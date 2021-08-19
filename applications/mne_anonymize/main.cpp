@@ -91,5 +91,7 @@ int main(int argc, char* argv[])
 
     QScopedPointer<MNEANONYMIZE::SettingsControllerCl> controller(h->createController(qtApp->arguments()));
 
-    return controller->run();
+    controller->run();
+
+    return qtApp->exec();
 }
