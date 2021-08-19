@@ -36,6 +36,8 @@
 #ifndef UTILS_GLOBAL_H
 #define UTILS_GLOBAL_H
 
+#include "buildinfo.h"
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -53,5 +55,9 @@
 #else
 #  define UTILSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+namespace UTILSLIB{
+    UTILSSHARED_EXPORT const char* BUILD_TIMESTAMP();
+}
 
 #endif // MNEUTILS_GLOBAL_H
