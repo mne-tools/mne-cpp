@@ -96,6 +96,7 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     averaging.cpp \
+    averaging_global.cpp
 
 HEADERS += \
     averaging_global.h \

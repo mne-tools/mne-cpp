@@ -78,6 +78,7 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     dataloader.cpp \
+    dataloader_global.cpp
 
 HEADERS += \
     dataloader_global.h \

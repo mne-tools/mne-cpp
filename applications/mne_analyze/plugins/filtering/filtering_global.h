@@ -57,4 +57,8 @@
 #  define FILTERINGSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
+namespace FILTERINGPLUGIN{
+    FILTERINGSHARED_EXPORT const char* BUILD_TIMESTAMP();
+}
+
 #endif // FILTERING_GLOBAL_H

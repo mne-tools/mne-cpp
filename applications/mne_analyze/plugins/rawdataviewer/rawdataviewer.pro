@@ -92,7 +92,8 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     rawdataviewer.cpp \
     fiffrawview.cpp \
-    fiffrawviewdelegate.cpp
+    fiffrawviewdelegate.cpp \
+    rawdataviewer_global.cpp
 
 HEADERS += \
     rawdataviewer_global.h \

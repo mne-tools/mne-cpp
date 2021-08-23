@@ -89,6 +89,7 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     sourcelocalization.cpp \
+    sourcelocalization_global.cpp
 
 HEADERS += \
     sourcelocalization_global.h \

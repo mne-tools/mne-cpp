@@ -84,7 +84,8 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    channelselection.cpp
+    channelselection.cpp \
+    channelselection_global.cpp
 
 HEADERS += \
     channelselection_global.h \

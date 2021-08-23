@@ -101,7 +101,8 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    controlmanager.cpp
+    controlmanager.cpp \
+    controlmanager_global.cpp
 
 HEADERS += \
     controlmanager_global.h \
