@@ -74,7 +74,8 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    dipolefit.cpp
+    dipolefit.cpp \
+    dipolefit_global.cpp
 
 HEADERS += \
     dipolefit_global.h \

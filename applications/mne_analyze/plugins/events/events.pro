@@ -92,6 +92,7 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     events.cpp \
     eventdelegate.cpp \
+    events_global.cpp \
     eventview.cpp \
 
 HEADERS += \

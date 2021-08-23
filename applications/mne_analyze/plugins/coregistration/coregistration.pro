@@ -84,7 +84,8 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    coregistration.cpp
+    coregistration.cpp \
+    coregistration_global.cpp
 
 HEADERS += \
     coregistration_global.h \

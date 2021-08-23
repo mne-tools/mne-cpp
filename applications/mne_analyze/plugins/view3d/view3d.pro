@@ -91,6 +91,7 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     view3d.cpp \
+    view3d_global.cpp
 
 HEADERS += \
     view3d_global.h \

@@ -85,6 +85,7 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     filtering.cpp \
+    filtering_global.cpp
 
 HEADERS += \
     filtering_global.h \
