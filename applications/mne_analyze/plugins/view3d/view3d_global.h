@@ -57,4 +57,8 @@
 #  define VIEW3DSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
+namespace VIEW3DPLUGIN{
+    VIEW3DSHARED_EXPORT const char* BUILD_TIMESTAMP();
+}
+
 #endif // MNEANALYZE_VIEW3D_GLOBAL_H

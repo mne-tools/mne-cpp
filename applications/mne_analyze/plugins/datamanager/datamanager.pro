@@ -74,7 +74,8 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    datamanager.cpp
+    datamanager.cpp \
+    datamanager_global.cpp
 
 HEADERS += \
     datamanager_global.h \
