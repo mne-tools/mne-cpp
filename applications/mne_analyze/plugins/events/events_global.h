@@ -59,7 +59,8 @@
 #endif
 
 namespace EVENTSPLUGIN{
-    EVENTSSHARED_EXPORT const char* BUILD_TIMESTAMP();
+    EVENTSSHARED_EXPORT const char* BUILD_TIME();
+    EVENTSSHARED_EXPORT const char* BUILD_DATE();
 }
 
 #endif // ANALYZE_EVENTS_GLOBAL_H

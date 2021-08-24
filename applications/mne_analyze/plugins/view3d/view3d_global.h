@@ -58,7 +58,8 @@
 #endif
 
 namespace VIEW3DPLUGIN{
-    VIEW3DSHARED_EXPORT const char* BUILD_TIMESTAMP();
+    VIEW3DSHARED_EXPORT const char* BUILD_TIME();
+    VIEW3DSHARED_EXPORT const char* BUILD_DATE();
 }
 
 #endif // MNEANALYZE_VIEW3D_GLOBAL_H
