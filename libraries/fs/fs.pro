@@ -69,6 +69,7 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     annotation.cpp \
     colortable.cpp \
+    fs_global.cpp \
     label.cpp \
     surface.cpp \
     annotationset.cpp \

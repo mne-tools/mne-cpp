@@ -70,6 +70,7 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
+    communication_global.cpp \
     rtClient/rtclient.cpp \
     rtClient/rtdataclient.cpp \
     rtClient/rtcmdclient.cpp \

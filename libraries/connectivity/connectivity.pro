@@ -73,6 +73,7 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
+    connectivity_global.cpp \
     metrics/abstractmetric.cpp \
     metrics/correlation.cpp \
     metrics/crosscorrelation.cpp \
