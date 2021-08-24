@@ -73,6 +73,7 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     mne.cpp \
+    mne_global.cpp \
     mne_sourcespace.cpp \
     mne_forwardsolution.cpp \
     mne_sourceestimate.cpp \

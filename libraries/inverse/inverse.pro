@@ -76,6 +76,7 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
+    inverse_global.cpp \
     minimumNorm/minimumnorm.cpp \
     rapMusic/rapmusic.cpp \
     rapMusic/pwlrapmusic.cpp \

@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include <QtCore/qglobal.h>
+#include <utils/buildinfo.h>
 
 //=============================================================================================================
 // DEFINES
@@ -54,5 +55,10 @@
 #else
 #  define FIFFSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+namespace FIFFLIB{
+    FIFFSHARED_EXPORT const char* BUILD_TIME();
+    FIFFSHARED_EXPORT const char* BUILD_DATE();
+}
 
 #endif // FIFF_GLOBAL_H

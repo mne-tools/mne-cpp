@@ -72,6 +72,7 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += fiff.cpp \
+    fiff_global.cpp \
     fiff_tag.cpp \
     fiff_coord_trans.cpp \
     fiff_ch_info.cpp \

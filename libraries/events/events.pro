@@ -36,6 +36,7 @@ SOURCES += \
     event.cpp \
     eventgroup.cpp \
     eventmanager.cpp \
+    events_global.cpp \
     eventsharedmemmanager.cpp
 
 HEADERS += \
