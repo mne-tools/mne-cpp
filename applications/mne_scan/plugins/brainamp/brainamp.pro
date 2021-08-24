@@ -78,6 +78,7 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
         brainamp.cpp \
+    brainamp_global.cpp \
         brainampproducer.cpp \
         FormFiles/brainampsetupwidget.cpp \
         brainampdriver.cpp \

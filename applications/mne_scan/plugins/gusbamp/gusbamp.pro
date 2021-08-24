@@ -97,6 +97,7 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
         gusbamp.cpp \
+        gusbamp_global.cpp \
         gusbampproducer.cpp \
         gusbampdriver.cpp \
         FormFiles/gusbampsetupwidget.cpp \

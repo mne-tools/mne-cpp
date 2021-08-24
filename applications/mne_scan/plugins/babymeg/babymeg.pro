@@ -80,6 +80,7 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     babymeg.cpp \
+    babymeg_global.cpp \
     babymegclient.cpp \
     babymeginfo.cpp \
     FormFiles/babymegsetupwidget.cpp \

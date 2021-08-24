@@ -58,4 +58,9 @@
 #  define NEURONALCONNECTIVITYSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
+namespace NEURONALCONNECTIVITYPLUGIN{
+    NEURONALCONNECTIVITYSHARED_EXPORT const char* BUILD_TIME();
+    NEURONALCONNECTIVITYSHARED_EXPORT const char* BUILD_DATE();
+}
+
 #endif // CONNECTIVITY_GLOBAL_H

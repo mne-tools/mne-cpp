@@ -91,6 +91,7 @@ CONFIG(debug, debug|release) {
 SOURCES += \
         hpi.cpp \
         FormFiles/hpisetupwidget.cpp \
+    hpi_global.cpp
 
 HEADERS += \
         hpi.h\

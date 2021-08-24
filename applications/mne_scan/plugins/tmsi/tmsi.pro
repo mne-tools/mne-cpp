@@ -94,6 +94,7 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
         tmsi.cpp \
+        tmsi_global.cpp \
         tmsiproducer.cpp \
         FormFiles/tmsisetupwidget.cpp \
         tmsidriver.cpp \

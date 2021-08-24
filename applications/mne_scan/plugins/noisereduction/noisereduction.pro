@@ -91,6 +91,7 @@ CONFIG(debug, debug|release) {
 SOURCES += \
         noisereduction.cpp \
         FormFiles/noisereductionsetupwidget.cpp \
+    noisereduction_global.cpp
 
 HEADERS += \
         noisereduction.h\

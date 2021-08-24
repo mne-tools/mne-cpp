@@ -58,4 +58,9 @@
 #  define BRAINAMPSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
+namespace BRAINAMPPLUGIN{
+    BRAINAMPSHARED_EXPORT const char* BUILD_TIME();
+    BRAINAMPSHARED_EXPORT const char* BUILD_DATE();
+}
+
 #endif // BRAINAMP_GLOBAL_H

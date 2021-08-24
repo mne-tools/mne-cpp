@@ -90,7 +90,8 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     covariance.cpp \
-    FormFiles/covariancesetupwidget.cpp
+    FormFiles/covariancesetupwidget.cpp \
+    covariance_global.cpp
 
 HEADERS += \
     covariance_global.h \

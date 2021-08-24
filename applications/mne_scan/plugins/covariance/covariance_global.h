@@ -58,4 +58,9 @@
 #  define COVARIANCESHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
+namespace COVARIANCEPLUGIN{
+    COVARIANCESHARED_EXPORT const char* BUILD_TIME();
+    COVARIANCESHARED_EXPORT const char* BUILD_DATE();
+}
+
 #endif // COVARIANCE_GLOBAL_H
