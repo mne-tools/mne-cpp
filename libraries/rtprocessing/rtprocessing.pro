@@ -88,6 +88,7 @@ SOURCES += \
     rthpis.cpp \
     filter.cpp \
     rtconnectivity.cpp \
+    rtprocessing_global.cpp \
     sphara.cpp \
     detecttrigger.cpp \
     helpers/cosinefilter.cpp \

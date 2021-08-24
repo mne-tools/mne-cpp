@@ -57,7 +57,8 @@
 #endif
 
 namespace UTILSLIB{
-    UTILSSHARED_EXPORT const char* BUILD_TIMESTAMP();
+    UTILSSHARED_EXPORT const char* BUILD_TIME();
+    UTILSSHARED_EXPORT const char* BUILD_DATE();
 }
 
 #endif // MNEUTILS_GLOBAL_H

@@ -85,6 +85,7 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
+    disp3D_global.cpp \
     engine/view/view3D.cpp \
     engine/delegate/data3Dtreedelegate.cpp \
     engine/model/data3Dtreemodel.cpp \

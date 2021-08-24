@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include <QtCore/qglobal.h>
+#include <utils/buildinfo.h>
 
 //=============================================================================================================
 // DEFINES
@@ -54,5 +55,10 @@
 #else
 #  define MNESHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+namespace MNELIB{
+    MNESHARED_EXPORT const char* BUILD_TIME();
+    MNESHARED_EXPORT const char* BUILD_DATE();
+}
 
 #endif // MNE_GLOBAL_H

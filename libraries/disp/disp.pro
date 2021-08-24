@@ -93,6 +93,7 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
+    disp_global.cpp \
     plots/imagesc.cpp \
     plots/plot.cpp \
     plots/graph.cpp \

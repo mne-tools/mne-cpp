@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include <QtCore/qglobal.h>
+#include <utils/buildinfo.h>
 
 //=============================================================================================================
 // DEFINES
@@ -53,5 +54,10 @@
 #else
 #  define DISP3DSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+namespace DISP3DLIB{
+    DISP3DLIB_DISP3D_GLOBAL_H const char* BUILD_TIME();
+    DISP3DLIB_DISP3D_GLOBAL_H const char* BUILD_DATE();
+}
 
 #endif // DISP3DLIB_GLOBAL_H

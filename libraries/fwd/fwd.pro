@@ -84,6 +84,7 @@ SOURCES += \
     fwd_eeg_sphere_layer.cpp \
     fwd_eeg_sphere_model.cpp \
     fwd_eeg_sphere_model_set.cpp \
+    fwd_global.cpp \
     fwd_thread_arg.cpp
 
 HEADERS +=\
