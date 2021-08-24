@@ -85,6 +85,7 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
         natus.cpp \
+    natus_global.cpp \
         natusproducer.cpp \
         FormFiles/natussetup.cpp \
 

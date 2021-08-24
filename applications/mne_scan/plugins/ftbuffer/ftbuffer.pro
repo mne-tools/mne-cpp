@@ -79,6 +79,7 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     ftbuffer.cpp \
     FormFiles/ftbuffersetupwidget.cpp \
+    ftbuffer_global.cpp \
     ftbuffproducer.cpp \
     ftconnector.cpp \
     ftheaderparser.cpp

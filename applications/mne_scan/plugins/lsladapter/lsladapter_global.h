@@ -60,4 +60,9 @@
 #  define LSLADAPTERSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
+namespace LSLADAPTERPLUGIN{
+    LSLADAPTERSHARED_EXPORT const char* BUILD_TIME();
+    LSLADAPTERSHARED_EXPORT const char* BUILD_DATE();
+}
+
 #endif // LSLADAPTER_GLOBAL_H

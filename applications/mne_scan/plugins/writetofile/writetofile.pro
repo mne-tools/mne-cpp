@@ -93,6 +93,7 @@ CONFIG(debug, debug|release) {
 SOURCES += \
         writetofile.cpp \
         FormFiles/writetofilesetupwidget.cpp \
+    writetofile_global.cpp
 
 HEADERS += \
         writetofile.h\

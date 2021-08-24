@@ -58,4 +58,9 @@
 #  define EEGOSPORTSSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
+namespace EEGOSPORTSPLUGIN{
+    EEGOSPORTSSHARED_EXPORT const char* BUILD_TIME();
+    EEGOSPORTSSHARED_EXPORT const char* BUILD_DATE();
+}
+
 #endif // EEGOSPORTS_GLOBAL_H

@@ -83,6 +83,7 @@ CONFIG(debug, debug|release) {
 SOURCES += \
         FormFiles/eegosportsimpedancewidget.cpp \
         eegosports.cpp \
+    eegosports_global.cpp \
         eegosportselectrodeitem.cpp \
         eegosportsimpedancescene.cpp \
         eegosportsimpedanceview.cpp \

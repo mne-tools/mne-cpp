@@ -88,6 +88,7 @@ LIBS += -L"$$PWD/liblsl/build/install/lib/" -llsl
 
 SOURCES += \
         lsladapter.cpp \
+    lsladapter_global.cpp \
         lsladapterproducer.cpp \
         FormFiles/lsladaptersetup.cpp \
 

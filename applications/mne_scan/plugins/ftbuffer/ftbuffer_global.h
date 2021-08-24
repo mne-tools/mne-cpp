@@ -59,4 +59,9 @@
 #  define FTBUFFER_EXPORT Q_DECL_IMPORT
 #endif
 
+namespace FTBUFFERPLUGIN{
+    FTBUFFER_EXPORT const char* BUILD_TIME();
+    FTBUFFER_EXPORT const char* BUILD_DATE();
+}
+
 #endif // FTBUFFER_GLOBAL_H

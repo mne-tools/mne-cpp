@@ -77,6 +77,7 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
+    fiffsimulator_global.cpp \
     fiffsimulatorproducer.cpp \
     fiffsimulator.cpp \
     FormFiles/fiffsimulatorsetupwidget.cpp
