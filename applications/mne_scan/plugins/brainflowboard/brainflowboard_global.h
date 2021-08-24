@@ -57,4 +57,9 @@
 #  define BRAINFLOWBOARD_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
+namespace BRAINFLOWBOARDPLUGIN{
+    BRAINFLOWBOARD_EXPORT const char* BUILD_TIME();
+    BRAINFLOWBOARD_EXPORT const char* BUILD_DATE();
+}
+
 #endif // BRAINFLOWBOARD_GLOBAL_H

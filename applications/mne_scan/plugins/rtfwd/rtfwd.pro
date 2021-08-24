@@ -84,6 +84,7 @@ CONFIG(debug, debug|release) {
 SOURCES += \
         rtfwd.cpp \
 	    FormFiles/rtfwdsetupwidget.cpp \
+    rtfwd_global.cpp
 
 HEADERS += \
         rtfwd.h\

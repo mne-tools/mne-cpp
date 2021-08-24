@@ -57,4 +57,9 @@
 #  define HPISHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
+namespace HPIPLUGIN{
+    HPISHARED_EXPORT const char* BUILD_TIME();
+    HPISHARED_EXPORT const char* BUILD_DATE();
+}
+
 #endif // WRITETOFILE_GLOBAL_H

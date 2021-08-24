@@ -90,7 +90,8 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     rtcmne.cpp \
-    FormFiles/rtcmnesetupwidget.cpp
+    FormFiles/rtcmnesetupwidget.cpp \
+    rtcmne_global.cpp
 
 HEADERS += \
     rtcmne.h\

@@ -58,4 +58,9 @@
 #  define GUSBAMPSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
+namespace GUSBAMPPLUGIN{
+    GUSBAMPSHARED_EXPORT const char* BUILD_TIME();
+    GUSBAMPSHARED_EXPORT const char* BUILD_DATE();
+}
+
 #endif // GUSBAMP_GLOBAL_H

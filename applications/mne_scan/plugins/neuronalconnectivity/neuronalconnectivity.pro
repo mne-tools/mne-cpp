@@ -93,6 +93,7 @@ CONFIG(debug, debug|release) {
 SOURCES += \
         neuronalconnectivity.cpp \
         FormFiles/neuronalconnectivitysetupwidget.cpp \
+    neuronalconnectivity_global.cpp
 
 HEADERS += \
         neuronalconnectivity.h\
