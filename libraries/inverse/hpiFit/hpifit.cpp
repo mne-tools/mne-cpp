@@ -286,8 +286,65 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                   iMaxIterations,
                   fAbortError);
 
-    Matrix4d matTrans = computeTransformation(matHeadHPI, coil.pos);
-    transDevHead = FiffCoordTrans::make(1,4,matTrans.cast<float>(),true);
+    // drop coils
+    int iNumUsed = iNumCoils;
+
+    // use at minimum three coils
+    // store Goodness of Fit
+    vecGoF = coil.dpfiterror;
+    for(int i = 0; i < vecGoF.size(); ++i) {
+        vecGoF(i) = 1 - vecGoF(i);
+    }
+
+    Matrix4d matTrans(4,4);
+    MatrixXd matHeadTemp = matHeadHPI;
+    MatrixXd matHeadDrop;
+    MatrixXd matCoilDrop;
+    MatrixXd matCoilTemp = coil.pos;
+    VectorXd vecGofTemp = vecGoF;
+    VectorXd vecGofDrop = vecGoF;
+
+    if(vecGoF.minCoeff() < 0.75) { // hard coded, can potentially be passed as variable
+        std::cout << vecGoF << std::endl;
+
+        while(iNumUsed > 3) {
+            int iR = 0;
+            matCoilDrop.conservativeResize(iNumUsed-1,3);
+            matHeadDrop.conservativeResize(iNumUsed-1,3);
+            vecGofDrop.conservativeResize(iNumUsed-1,1);
+
+            for(int i = 0; i < iNumUsed; i++){
+                if(vecGofTemp[i] != vecGofTemp.minCoeff()) {
+                    matHeadDrop.row(iR) = matHeadTemp.row(i);
+                    matCoilDrop.row(iR) = matCoilTemp.row(i);
+                    vecGofDrop(iR) = vecGofTemp(i);
+                    iR++;
+
+                } else {
+                    qInfo() << "Dropped coil: " << i << " with GoF: "  << vecGofTemp[i];
+                }
+            }
+            matHeadTemp = matHeadDrop;
+            matCoilTemp = matCoilDrop;
+            vecGofTemp = vecGofDrop;
+            matTrans = computeTransformation(matHeadTemp, matCoilTemp);
+            iNumUsed--;
+        }
+    } else {
+        matTrans = computeTransformation(matHeadHPI, coil.pos);
+    }
+
+    //Matrix4d matTrans = computeTransformation(matHeadHPI, coil.pos);
+    //Eigen::Matrix4d matTrans = computeTransformation(coil.pos, matHeadHPI);
+
+    // Store the final result to fiff info
+    // Set final device/head matrix and its inverse to the fiff info
+    transDevHead.from = 1;
+    transDevHead.to = 4;
+    transDevHead.trans = matTrans.cast<float>();
+
+    // Also store the inverse
+    transDevHead.invtrans = transDevHead.trans.inverse();
 
     //Calculate Error
     MatrixXd matTemp = coil.pos;
