@@ -209,6 +209,7 @@ bool FtConnector::parseHeaderDef(QBuffer &readBuffer)
     m_iNumNewSamples = headerdef.nsamples;
     m_iDataType = headerdef.data_type;
     m_iExtendedHeaderSize = headerdef.bufsize;
+    m_iMinSampleRead = static_cast<int>(m_fSampleFreq/2);
 
     qInfo() << "[FtConnector::parseHeaderDef] Got header parameters.";
 
