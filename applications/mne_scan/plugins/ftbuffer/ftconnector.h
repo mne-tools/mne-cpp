@@ -312,6 +312,7 @@ private:
      */
     FIFFLIB::FiffInfo infoFromSimpleHeader();
 
+    int                                     m_iMinSampleRead;                       /**< Number of samples that need to be added t obuffer before we try to read. */
     int                                     m_iNumSamples;                          /**< Number of samples we've read from the buffer. */
     int                                     m_iNumNewSamples;                       /**< Number of total samples (read and unread) in the buffer. */
     int                                     m_iMsgSamples;                          /**< Number of samples in the latest buffer transmission receied. */

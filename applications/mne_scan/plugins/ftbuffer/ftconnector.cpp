@@ -60,7 +60,8 @@ using namespace FTBUFFERPLUGIN;
 //=============================================================================================================
 
 FtConnector::FtConnector()
-: m_iNumSamples(0)
+: m_iMinSampleRead(200)
+, m_iNumSamples(0)
 , m_iNumNewSamples(0)
 , m_iMsgSamples(0)
 , m_iNumChannels(0)
@@ -259,7 +260,7 @@ bool FtConnector::getData()
 {
     m_iNumNewSamples = totalBuffSamples();
 
-    if (m_iNumNewSamples == m_iNumSamples) {
+    if (m_iNumNewSamples <= (m_iNumSamples + m_iMinSampleRead)) {
         // no new unread data in buffer
         return false;
     }
