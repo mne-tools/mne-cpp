@@ -132,6 +132,12 @@ void Control3DView::setFlags(const QStringList& slFlags)
 
         connect(m_pUi->m_pushButton_takeScreenshot, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
                 this, &Control3DView::takeScreenshotChanged);
+
+        connect(m_pUi->m_radioButton_single, &QRadioButton::pressed,
+                this, &Control3DView::toggleSingleView);
+
+        connect(m_pUi->m_radioButton_multi, &QRadioButton::pressed,
+                this, &Control3DView::toggleMutiview);
     } else {
         m_pUi->m_groupBox_viewOptions->hide();
     }

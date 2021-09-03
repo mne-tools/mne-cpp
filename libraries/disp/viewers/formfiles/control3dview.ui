@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>300</width>
-    <height>520</height>
+    <width>302</width>
+    <height>601</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -70,20 +70,6 @@
           <string>View options</string>
          </property>
          <layout class="QFormLayout" name="formLayout">
-          <item row="3" column="0">
-           <widget class="QLabel" name="m_label_sceneColorPicker">
-            <property name="text">
-             <string>Change scene color:</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QPushButton" name="m_pushButton_sceneColorPicker">
-            <property name="text">
-             <string/>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="0" colspan="2">
            <widget class="QCheckBox" name="m_checkBox_showFullScreen">
             <property name="text">
@@ -105,10 +91,44 @@
             </property>
            </widget>
           </item>
-          <item row="4" column="0" colspan="2">
+          <item row="4" column="0">
+           <widget class="QLabel" name="m_label_sceneColorPicker">
+            <property name="text">
+             <string>Change scene color:</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QPushButton" name="m_pushButton_sceneColorPicker">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0" colspan="2">
            <widget class="QPushButton" name="m_pushButton_takeScreenshot">
             <property name="text">
              <string>Take screenshot</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QRadioButton" name="m_radioButton_single">
+            <property name="text">
+             <string>Single View</string>
+            </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QRadioButton" name="m_radioButton_multi">
+            <property name="text">
+             <string>Multiview</string>
+            </property>
+            <property name="checked">
+             <bool>false</bool>
             </property>
            </widget>
           </item>

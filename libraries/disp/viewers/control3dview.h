@@ -325,6 +325,18 @@ signals:
      * Use this signal whenever the take screenshot button was clicked by the user.
      */
     void takeScreenshotChanged();
+
+    //=========================================================================================================
+    /**
+     * Notifies the 'Single View' radio button has been checked.
+     */
+    void toggleSingleView();
+
+    //=========================================================================================================
+    /**
+     * Notifies the 'Multiview' radio button has been checked.
+     */
+    void toggleMutiview();
 };
 } // NAMESPACE DISPLIB
 
