@@ -65,6 +65,8 @@
 #include <Qt3DExtras/QCylinderGeometry>
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DRender/QRenderSettings>
+#include <Qt3DRender/QRenderSurfaceSelector>
+#include <Qt3DRender/QCameraSelector>
 
 #include <QObjectPicker>
 #include <QPickingSettings>
@@ -123,6 +125,24 @@ View3D::View3D()
     // initialize object picking and disable it by default to save resources
     initObjectPicking();
     activatePicker(true);
+
+    this->camera()->setPosition(QVector3D(0, 4.0f, 0));
+    this->camera()->setViewCenter(QVector3D(0, 0, 0));
+
+    auto surfaceSelector = new Qt3DRender::QRenderSurfaceSelector();
+    auto mainViewPort = new Qt3DRender::QViewport(surfaceSelector);
+
+    auto viewPort1 = new Qt3DRender::QViewport(mainViewPort);
+    viewPort1->setNormalizedRect(QRectF(0.0f, 0.0f, 0.5f, 1.0f));
+    auto cameraSelector1 = new Qt3DRender::QCameraSelector(viewPort1);
+    cameraSelector1->setCamera(this->camera());
+
+    auto viewPort2 = new Qt3DRender::QViewport(mainViewPort);
+    viewPort2->setNormalizedRect(QRectF(0.5f, 0.0f, 0.5f, 1.0f));
+    auto cameraSelector2= new Qt3DRender::QCameraSelector(viewPort2);
+    cameraSelector2->setCamera(this->camera());
+
+    this->setActiveFrameGraph(surfaceSelector);
 }
 
 
