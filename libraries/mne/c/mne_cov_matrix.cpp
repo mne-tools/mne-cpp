@@ -45,6 +45,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
+#include <fiff/c/fiff_sparse_matrix.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -273,20 +274,20 @@ MneCovMatrix::MneCovMatrix(int p_kind,
                            FiffSparseMatrix* p_cov_sparse)
 :kind(p_kind)
 ,ncov(p_ncov)
+,nfree(1)
 ,nproj(0)
 ,nzero(0)
 ,names(p_names)
 ,cov(p_cov)
 ,cov_diag(p_cov_diag)
 ,cov_sparse(p_cov_sparse)
-,eigen(NULL)
 ,lambda(NULL)
-,chol(NULL)
 ,inv_lambda(NULL)
-,nfree(1)
-,ch_class(NULL)
+,eigen(NULL)
+,chol(NULL)
 ,proj(NULL)
 ,sss(NULL)
+,ch_class(NULL)
 ,nbad(0)
 {
 }
