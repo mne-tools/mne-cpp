@@ -134,12 +134,18 @@ double **mne_dmatrix_30(int nr, int nc)
     double *whole;
 
     m = MALLOC_30(nr,double *);
-    if (!m) matrix_error_30(1,nr,nc);
+    if (!m)
+        matrix_error_30(1,nr,nc);
+
     whole = MALLOC_30(nr*nc,double);
-    if (!whole) matrix_error_30(2,nr,nc);
+    if (!whole)
+        matrix_error_30(2,nr,nc);
 
     for(i=0;i<nr;i++)
         m[i] = whole + i*nc;
+
+    if(whole)
+        FREE_30(whole);
     return m;
 }
 
