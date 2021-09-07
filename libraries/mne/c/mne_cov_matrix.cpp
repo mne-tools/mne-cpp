@@ -223,6 +223,7 @@ int mne_decompose_eigen (double *mat,
     }
     FREE_30(w);
     FREE_30(z);
+    FREE_30(dmat);
     if (info == 0)
         return 0;
     else
