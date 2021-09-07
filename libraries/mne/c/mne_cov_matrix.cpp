@@ -162,10 +162,10 @@ int mne_decompose_eigen (double *mat,
     double *dmat = MALLOC_30(np,double);
     float  *vecp = vectors[0];
 
-    const char   *uplo  = "U";
-    const char   *compz = "V";
+//    const char   *uplo  = "U";
+//    const char   *compz = "V";
     int    info,k;
-    int    one = 1;
+//    int    one = 1;
     int    maxi;
     double scale;
 
