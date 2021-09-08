@@ -67,6 +67,9 @@
 #include <Qt3DRender/QRenderSettings>
 #include <Qt3DRender/QRenderSurfaceSelector>
 #include <Qt3DRender/QCameraSelector>
+#include <Qt3DRender/QTechniqueFilter>
+#include <Qt3DRender/QClearBuffers>
+#include <Qt3DRender/QNoDraw>
 
 #include <QObjectPicker>
 #include <QPickingSettings>
@@ -93,31 +96,21 @@ View3D::View3D()
 , m_p3DObjectsEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pLightEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pCamera(this->camera())
+, m_pMultiCam1(new Qt3DRender::QCamera())
+, m_pMultiCam2(new Qt3DRender::QCamera())
+, m_pMultiCam3(new Qt3DRender::QCamera())
 , m_pPicker(new Qt3DRender::QObjectPicker(m_pRootEntity))
 , m_pCamController(new OrbitalCameraController(m_pRootEntity))
 {
     //Root entity
     this->setRootEntity(m_pRootEntity);
 
-    //FrameGraph
-    m_pFrameGraph = new CustomFrameGraph();
-    m_pFrameGraph->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 1.0));
-    this->setActiveFrameGraph(m_pFrameGraph);
+    initSingleView();
 
     //Only render new frames when needed
     this->renderSettings()->setRenderPolicy(Qt3DRender::QRenderSettings::OnDemand);
 
     initLight();
-
-    m_pCamera->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
-    m_pCamera->setPosition(QVector3D(0.0f, -0.4f, -0.25f));
-    m_pCamera->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
-    m_pCamera->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
-    m_pCamera->tiltAboutViewCenter(180);
-    m_pCamera->lens()->setPerspectiveProjection(45.0f, this->width()/this->height(), 0.01f, 5000.0f);
-    m_pFrameGraph->setCamera(m_pCamera);
-
-    m_pCamController->setCamera(m_pCamera);
 
     createCoordSystem(m_pRootEntity);
     toggleCoordAxis(false);
@@ -126,23 +119,12 @@ View3D::View3D()
     initObjectPicking();
     activatePicker(true);
 
-    this->camera()->setPosition(QVector3D(0, 4.0f, 0));
-    this->camera()->setViewCenter(QVector3D(0, 0, 0));
+    initMultiView();
 
-    auto surfaceSelector = new Qt3DRender::QRenderSurfaceSelector();
-    auto mainViewPort = new Qt3DRender::QViewport(surfaceSelector);
+    this->setRootEntity(m_pRootEntity);
 
-    auto viewPort1 = new Qt3DRender::QViewport(mainViewPort);
-    viewPort1->setNormalizedRect(QRectF(0.0f, 0.0f, 0.5f, 1.0f));
-    auto cameraSelector1 = new Qt3DRender::QCameraSelector(viewPort1);
-    cameraSelector1->setCamera(this->camera());
-
-    auto viewPort2 = new Qt3DRender::QViewport(mainViewPort);
-    viewPort2->setNormalizedRect(QRectF(0.5f, 0.0f, 0.5f, 1.0f));
-    auto cameraSelector2= new Qt3DRender::QCameraSelector(viewPort2);
-    cameraSelector2->setCamera(this->camera());
-
-    this->setActiveFrameGraph(surfaceSelector);
+//    this->setActiveFrameGraph(m_pFrameGraph);
+    this->setActiveFrameGraph(m_pMultiFrame);
 }
 
 
@@ -414,4 +396,92 @@ void View3D::startStopCameraRotation(bool bChecked)
     else {
         m_pCameraAnimation->stop();
     }
+}
+
+//=============================================================================================================
+
+void View3D::initSingleCam()
+{
+    m_pCamera->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
+    m_pCamera->setPosition(QVector3D(0.0f, -0.4f, -0.25f));
+    m_pCamera->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
+    m_pCamera->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
+    m_pCamera->tiltAboutViewCenter(180);
+    m_pCamera->lens()->setPerspectiveProjection(45.0f, this->width()/this->height(), 0.01f, 5000.0f);
+    m_pFrameGraph->setCamera(m_pCamera);
+
+    m_pCamController->setCamera(m_pCamera);
+}
+
+//=============================================================================================================
+
+void View3D::initMultiCams()
+{
+    m_pMultiCam1->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
+    m_pMultiCam1->setPosition(QVector3D(0.0f, -0.4f, -0.25f));
+    m_pMultiCam1->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
+    m_pMultiCam1->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
+    m_pMultiCam1->tiltAboutViewCenter(180);
+    m_pMultiCam1->lens()->setPerspectiveProjection(45.0f, this->width()/this->height(), 0.01f, 5000.0f);
+
+    m_pMultiCam2->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
+    m_pMultiCam2->setPosition(QVector3D(0.0f, -0.4f, -0.25f));
+    m_pMultiCam2->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
+    m_pMultiCam2->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
+    m_pMultiCam2->tiltAboutViewCenter(180);
+    m_pMultiCam2->lens()->setPerspectiveProjection(45.0f, this->width()/this->height(), 0.01f, 5000.0f);
+
+    m_pMultiCam3->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
+    m_pMultiCam3->setPosition(QVector3D(0.0f, -0.4f, -0.25f));
+    m_pMultiCam3->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
+    m_pMultiCam3->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
+    m_pMultiCam3->tiltAboutViewCenter(180);
+    m_pMultiCam3->lens()->setPerspectiveProjection(45.0f, this->width()/this->height(), 0.01f, 5000.0f);
+
+}
+
+//=============================================================================================================
+
+void View3D::initSingleView()
+{
+    //FrameGraph
+    m_pFrameGraph = new CustomFrameGraph();
+    m_pFrameGraph->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 1.0));
+
+    initSingleCam();
+}
+
+//=============================================================================================================
+
+void View3D::initMultiView()
+{
+    initMultiCams();
+
+    // Framegraph root node
+    auto m_pMultiFrame = new Qt3DRender::QRenderSurfaceSelector();
+    auto mainViewPort = new Qt3DRender::QViewport(m_pMultiFrame);
+
+    // First RenderView: clear buffers
+    auto clearBuffers = new Qt3DRender::QClearBuffers(mainViewPort);
+    clearBuffers->setBuffers(Qt3DRender::QClearBuffers::ColorDepthBuffer);
+    clearBuffers->setClearColor(Qt::white);
+
+    auto viewPort1 = new Qt3DRender::QViewport(mainViewPort);
+    viewPort1->setNormalizedRect(QRectF(0.0f, 0.0f, 0.5f, 1.0f));
+    auto cameraSelector1 = new Qt3DRender::QCameraSelector(viewPort1);
+    cameraSelector1->setCamera(m_pMultiCam1);
+
+    auto viewPort2 = new Qt3DRender::QViewport(mainViewPort);
+    viewPort2->setNormalizedRect(QRectF(0.5f, 0.0f, 0.5f, 1.0f));
+    auto cameraSelector2= new Qt3DRender::QCameraSelector(viewPort2);
+    cameraSelector2->setCamera(m_pMultiCam2);
+
+    auto viewPort3 = new Qt3DRender::QViewport(mainViewPort);
+    viewPort2->setNormalizedRect(QRectF(0.5f, 0.0f, 0.5f, 1.0f));
+    auto cameraSelector3= new Qt3DRender::QCameraSelector(viewPort3);
+    cameraSelector3->setCamera(m_pMultiCam3);
+
+    auto noDraw = new Qt3DRender::QNoDraw(clearBuffers);
+
+    // Add framegraph and scenegraph to viewer
 }
