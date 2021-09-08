@@ -63,6 +63,7 @@ namespace Qt3DRender {
     class QPointLight;
     class QRenderCaptureReply;
     class QPickEvent;
+    class QRenderSurfaceSelector;
 }
 
 //=============================================================================================================
@@ -224,13 +225,32 @@ protected:
      */
     void handlePickerPress(Qt3DRender::QPickEvent *qPickEvent);
 
+    //=========================================================================================================
+    void initSingleCam();
+
+    //=========================================================================================================
+    void initMultiCams();
+
+    //=========================================================================================================
+    void initSingleView();
+
+    //=========================================================================================================
+    void initMultiView();
+
+
     QPointer<Qt3DCore::QEntity>                 m_pRootEntity;                  /**< The root/most top level entity buffer. */
     QPointer<Qt3DCore::QEntity>                 m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */
     QPointer<Qt3DCore::QEntity>                 m_pLightEntity;                 /**< The root/most top level entity buffer. */
     QSharedPointer<Qt3DCore::QEntity>           m_pCoordSysEntity;              /**< The entity representing the x/y/z coord system. */
 
     QPointer<CustomFrameGraph>                  m_pFrameGraph;                  /**< The frameGraph entity. */
+    QPointer<Qt3DRender::QRenderSurfaceSelector>m_pMultiFrame;
+
     QPointer<Qt3DRender::QCamera>               m_pCamera;                      /**< The camera entity. */
+    QPointer<Qt3DRender::QCamera>               m_pMultiCam1;                   /**< The camera entity. */
+    QPointer<Qt3DRender::QCamera>               m_pMultiCam2;                   /**< The camera entity. */
+    QPointer<Qt3DRender::QCamera>               m_pMultiCam3;                   /**< The camera entity. */
+
     QPointer<Qt3DRender::QRenderCaptureReply>   m_pScreenCaptureReply;          /**< The capture reply object to save screenshots. */
     QPointer<Qt3DRender::QObjectPicker>         m_pPicker;                      /**< The Picker entity. */
 
