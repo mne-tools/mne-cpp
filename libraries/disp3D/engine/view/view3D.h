@@ -237,6 +237,12 @@ protected:
     //=========================================================================================================
     void initMultiView();
 
+    //=========================================================================================================
+    void updateMultiViewAspectRatio();
+
+    //=========================================================================================================
+    void resizeEvent(QResizeEvent *) override;
+
 
     QPointer<Qt3DCore::QEntity>                 m_pRootEntity;                  /**< The root/most top level entity buffer. */
     QPointer<Qt3DCore::QEntity>                 m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */
