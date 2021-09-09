@@ -2,14 +2,14 @@
 RepoRootDir="$(dirname "$BASH_SOURCE")/../.."
 echo $RepoRootDir
 
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$(RepoRootDir)/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${RepoRootDir}/lib
 for test in ./bin/test_*;
 do
   # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
   # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.
   echo ">> Starting $test"
   $test
-  find ./libraries -type f -name "*.cpp" -execdir gcov {} \; > /dev/null
+  find ./libraries -type f -name "*.cpp" -exec gcov {} \; &> /dev/null
   # Hide codecov output since it corrupts the log too much
-  codecov > /dev/null
+  codecov &> /dev/null
 done
