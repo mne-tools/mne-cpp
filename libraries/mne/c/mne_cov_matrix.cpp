@@ -127,9 +127,6 @@ float **mne_cmatrix_30(int nr,int nc)
     for(i=0;i<nr;i++)
         m[i] = whole + i*nc;
 
-    if(whole)
-        FREE_30(whole);
-
     return m;
 }
 
@@ -150,9 +147,6 @@ double **mne_dmatrix_30(int nr, int nc)
 
     for(i=0;i<nr;i++)
         m[i] = whole + i*nc;
-
-    if(whole)
-        FREE_30(whole);
 
     return m;
 }
@@ -177,10 +171,7 @@ int mne_decompose_eigen (double *mat,
     double *dmat = MALLOC_30(np,double);
     float  *vecp = vectors[0];
 
-//    const char   *uplo  = "U";
-//    const char   *compz = "V";
     int    info,k;
-//    int    one = 1;
     int    maxi;
     double scale;
 
