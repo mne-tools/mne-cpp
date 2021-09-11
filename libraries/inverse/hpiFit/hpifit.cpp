@@ -291,12 +291,8 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     // Store the final result to fiff info
     // Set final device/head matrix and its inverse to the fiff info
-    transDevHead.from = 1;
-    transDevHead.to = 4;
-    transDevHead.trans = matTrans.cast<float>();
 
-    // Also store the inverse
-    transDevHead.invtrans = transDevHead.trans.inverse();
+    transDevHead.setTransform(1,4,matTrans.cast<float>());
 
     //Calculate Error
     MatrixXd matTemp = coil.pos;
