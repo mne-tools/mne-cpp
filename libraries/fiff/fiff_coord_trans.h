@@ -250,10 +250,14 @@ public:
     /**
      * @brief sets a new transform
      *
+     * @param[in] iFrom      Source coordinate system.
+     * @param[in] iTo        Destination coordinate system.
      * @param[in] matTrans  The forward transform.
      *
      */
-    void setTransform(const Eigen::Matrix4f& matTrans);
+    void setTransform(int iFrom,
+                      int iTo,
+                      const Eigen::Matrix4f& matTrans);
 
     //=========================================================================================================
     /**
