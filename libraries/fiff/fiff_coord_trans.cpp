@@ -279,8 +279,12 @@ void FiffCoordTrans::print() const
 
 //=============================================================================================================
 
-void FiffCoordTrans::setTransform(const Eigen::Matrix4f& matTrans)
+void FiffCoordTrans::setTransform(int iFrom,
+                                  int iTo,
+                                  const Eigen::Matrix4f& matTrans)
 {
+    this->from = iFrom;
+    this->to = iTo;
     this->trans = matTrans;
     this->trans.row(3) = Vector4f(0,0,0,1); // make sure that it is affine
     addInverse(*this);
