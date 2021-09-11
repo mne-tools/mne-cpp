@@ -246,6 +246,7 @@ FiffCoordTrans FiffCoordTrans::make(int from, int to, const Matrix4f& matTrans)
 {
     FiffCoordTrans t;
     t.trans = matTrans;
+    t.trans.row(3) = VectorXf(0,0,0,1); // make sure that it is affine
     t.from = from;
     t.to   = to;
 
@@ -259,6 +260,7 @@ FiffCoordTrans FiffCoordTrans::make(int from, int to, const Matrix4f& matTrans)
 bool FiffCoordTrans::addInverse(FiffCoordTrans &t)
 {
     t.invtrans = t.trans.inverse().eval();
+    t.invtrans.row(3) = VectorXf(0,0,0,1); // make sure that it is affine
     return true;
 }
 
@@ -272,6 +274,15 @@ void FiffCoordTrans::print() const
     for (int p = 0; p < 3; p++)
         printf("\t% 8.6f % 8.6f % 8.6f\t% 7.2f mm\n", trans(p,0),trans(p,1),trans(p,2),1000*trans(p,3));
     printf("\t% 8.6f % 8.6f % 8.6f   % 7.2f\n",trans(3,0),trans(3,1),trans(3,2),trans(3,3));
+}
+
+//=============================================================================================================
+
+void FiffCoordTrans::setTransform(const Eigen::Matrix4f& matTrans)
+{
+    this->trans = matTrans;
+    this->trans.row(3) = VectorXf(0,0,0,1); // make sure that it is affine
+    addInverse(*this);
 }
 
 //=============================================================================================================
