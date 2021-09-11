@@ -287,25 +287,15 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                   fAbortError);
 
     Matrix4d matTrans = computeTransformation(matHeadHPI, coil.pos);
-    //Eigen::Matrix4d matTrans = computeTransformation(coil.pos, matHeadHPI);
-
-    // Store the final result to fiff info
-    // Set final device/head matrix and its inverse to the fiff info
-
     transDevHead.setTransform(1,4,matTrans.cast<float>());
 
     //Calculate Error
     MatrixXd matTemp = coil.pos;
-    matTemp.conservativeResize(coil.pos.rows(),coil.pos.cols()+1);
+    MatrixXd matTestPos = transDevHead.apply_trans(matTemp.cast<float>()).cast<double>();
+    MatrixXd matDiffPos = matTestPos - matHeadHPI;
 
-    matTemp.block(0,3,iNumCoils,1).setOnes();
-    matTemp.transposeInPlace();
-
-    MatrixXd matTestPos = matTrans * matTemp;
-    MatrixXd matDiffPos = matTestPos.block(0,0,3,iNumCoils) - matHeadHPI.transpose();
-
-    for(int i = 0; i < matDiffPos.cols(); ++i) {
-        vecError[i] = matDiffPos.col(i).norm();
+    for(int i = 0; i < matDiffPos.rows(); ++i) {
+        vecError[i] = matDiffPos.row(i).norm();
     }
 
     // store Goodness of Fit
