@@ -64,6 +64,7 @@ namespace Qt3DRender {
     class QRenderCaptureReply;
     class QPickEvent;
     class QRenderSurfaceSelector;
+    class QViewport;
 }
 
 //=============================================================================================================
@@ -241,6 +242,12 @@ protected:
     void updateMultiViewAspectRatio();
 
     //=========================================================================================================
+    void setMultiViewVertical();
+
+    //=========================================================================================================
+    void setMultiViewHorizontal();
+
+    //=========================================================================================================
     void resizeEvent(QResizeEvent *) override;
 
 
@@ -253,9 +260,13 @@ protected:
     QPointer<Qt3DRender::QRenderSurfaceSelector>m_pMultiFrame;
 
     QPointer<Qt3DRender::QCamera>               m_pCamera;                      /**< The camera entity. */
-    QPointer<Qt3DRender::QCamera>               m_pMultiCam1;                   /**< The camera entity. */
-    QPointer<Qt3DRender::QCamera>               m_pMultiCam2;                   /**< The camera entity. */
-    QPointer<Qt3DRender::QCamera>               m_pMultiCam3;                   /**< The camera entity. */
+    QPointer<Qt3DRender::QCamera>               m_pMultiCam1;                   /**< First multiview camera entity. */
+    QPointer<Qt3DRender::QCamera>               m_pMultiCam2;                   /**< Second multiview camera entity. */
+    QPointer<Qt3DRender::QCamera>               m_pMultiCam3;                   /**< Third multiview camera entity. */
+
+    QPointer<Qt3DRender::QViewport>             m_pMultiViewport1;              /**< First multiview viewport. */
+    QPointer<Qt3DRender::QViewport>             m_pMultiViewport2;              /**< Second multiview viewport. */
+    QPointer<Qt3DRender::QViewport>             m_pMultiViewport3;              /**< Third multiview viewport. */
 
     QPointer<Qt3DRender::QRenderCaptureReply>   m_pScreenCaptureReply;          /**< The capture reply object to save screenshots. */
     QPointer<Qt3DRender::QObjectPicker>         m_pPicker;                      /**< The Picker entity. */

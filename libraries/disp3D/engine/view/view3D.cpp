@@ -463,19 +463,19 @@ void View3D::initMultiView()
     clearBuffers->setBuffers(Qt3DRender::QClearBuffers::ColorDepthBuffer);
     clearBuffers->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 1.0));
 
-    auto viewPort1 = new Qt3DRender::QViewport(mainViewPort);
-    viewPort1->setNormalizedRect(QRectF(0.0f, 0.0f, 0.333f, 1.0f));
-    auto cameraSelector1 = new Qt3DRender::QCameraSelector(viewPort1);
+    m_pMultiViewport1 = new Qt3DRender::QViewport(mainViewPort);
+    m_pMultiViewport1->setNormalizedRect(QRectF(0.0f, 0.0f, 0.333f, 1.0f));
+    auto cameraSelector1 = new Qt3DRender::QCameraSelector(m_pMultiViewport1);
     cameraSelector1->setCamera(m_pMultiCam1);
 
-    auto viewPort2 = new Qt3DRender::QViewport(mainViewPort);
-    viewPort2->setNormalizedRect(QRectF(0.333f, 0.0f, 0.333f, 1.0f));
-    auto cameraSelector2= new Qt3DRender::QCameraSelector(viewPort2);
+    m_pMultiViewport2 = new Qt3DRender::QViewport(mainViewPort);
+    m_pMultiViewport2->setNormalizedRect(QRectF(0.333f, 0.0f, 0.333f, 1.0f));
+    auto cameraSelector2= new Qt3DRender::QCameraSelector(m_pMultiViewport2);
     cameraSelector2->setCamera(m_pMultiCam2);
 
-    auto viewPort3 = new Qt3DRender::QViewport(mainViewPort);
-    viewPort3->setNormalizedRect(QRectF(0.666f, 0.0f, 0.333f, 1.0f));
-    auto cameraSelector3= new Qt3DRender::QCameraSelector(viewPort3);
+    m_pMultiViewport3 = new Qt3DRender::QViewport(mainViewPort);
+    m_pMultiViewport3->setNormalizedRect(QRectF(0.666f, 0.0f, 0.333f, 1.0f));
+    auto cameraSelector3= new Qt3DRender::QCameraSelector(m_pMultiViewport3);
     cameraSelector3->setCamera(m_pMultiCam3);
 
     auto noDraw = new Qt3DRender::QNoDraw(clearBuffers);
@@ -498,8 +498,26 @@ void View3D::updateMultiViewAspectRatio()
     std::cout << "Regular aspect -- Width: " << this->width() << " | Height: " << this->height() << " | Ration: " << this->width()/this->height() << "\n";
     std::cout << "Cast aspect    -- Width: " << this->width() << " | Height: " << this->height() << " | Ration: " << static_cast<float>(this->width())/static_cast<float>(this->height()) << "\n";
 
+    float fAspectRatio;
+
     m_pMultiCam1->setAspectRatio(static_cast<float>(this->width())/(3.0f * static_cast<float>(this->height())));
     m_pMultiCam2->setAspectRatio(static_cast<float>(this->width())/(3.0f * static_cast<float>(this->height())));
     m_pMultiCam3->setAspectRatio(static_cast<float>(this->width())/(3.0f * static_cast<float>(this->height())));
+
+
+
+}
+
+//=============================================================================================================
+
+void View3D::setMultiViewVertical()
+{
+
+}
+
+//=============================================================================================================
+
+void View3D::setMultiViewHorizontal()
+{
 
 }
