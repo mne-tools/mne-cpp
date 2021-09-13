@@ -485,7 +485,7 @@ void View3D::initMultiView()
 
 void View3D::resizeEvent(QResizeEvent *event)
 {
-    //updateMultiViewAspectRatio();
+    updateMultiViewAspectRatio();
     //single view updates implicitly due to use of default camera from Qt3DWindow.
 
     Qt3DWindow::resizeEvent(event);
@@ -495,9 +495,11 @@ void View3D::resizeEvent(QResizeEvent *event)
 
 void View3D::updateMultiViewAspectRatio()
 {
-    m_pMultiCam1->setAspectRatio(this->width()/(3 * this->height()));
+    std::cout << "Regular aspect -- Width: " << this->width() << " | Height: " << this->height() << " | Ration: " << this->width()/this->height() << "\n";
+    std::cout << "Cast aspect    -- Width: " << this->width() << " | Height: " << this->height() << " | Ration: " << static_cast<float>(this->width())/static_cast<float>(this->height()) << "\n";
 
-    m_pMultiCam2->setAspectRatio(this->width()/(3 * this->height()));
+    m_pMultiCam1->setAspectRatio(static_cast<float>(this->width())/(3.0f * static_cast<float>(this->height())));
+    m_pMultiCam2->setAspectRatio(static_cast<float>(this->width())/(3.0f * static_cast<float>(this->height())));
+    m_pMultiCam3->setAspectRatio(static_cast<float>(this->width())/(3.0f * static_cast<float>(this->height())));
 
-    m_pMultiCam3->setAspectRatio(this->width()/(3 * this->height()));
 }
