@@ -214,24 +214,65 @@ private:
     void clipRecording(bool bChecked);
 
     //=========================================================================================================
+    /**
+     * Prompts user to rename recent recording file/files.
+     */
     void promptFileName();
 
     //=========================================================================================================
-    bool renameFile(const QString& sFileName);
+    /**
+     * Attempts to rename files from most recent recording with input parameter sFileName.
+     *
+     * @param[in] sFileName     new name for save files.
+     *
+     * @return Returns true if all files were renamed, false if not.
+     */
+    bool renameRecording(const QString& sFileName);
 
     //=========================================================================================================
+    /**
+     * Renames a single file
+     *
+     * @param[in] sCurrentFileName      current file name.
+     * @param[in] sNewFileName          new file name.
+     *
+     * @return Returns true if file was renamed, false if not.
+     */
     bool renameSingleFile(const QString& sCurrentFileName, const QString& sNewFileName);
 
     //=========================================================================================================
+    /**
+     * Renames multiple files using input param as template and adds "-n" to file names to denote order.
+     *
+     * @param[in] sFileName     new template file name
+     *
+     * @return Returns true if all files were renamed, false if not.
+     */
     bool renameMultipleFiles(const QString& sFileName);
 
     //=========================================================================================================
-    void deleteFiles();
+    /**
+     * Deletes latest recording.
+     */
+    void deleteRecording();
 
     //=========================================================================================================
+    /**
+     * Displays pop up message with sText. Blocking.
+     *
+     * @param[in] sText     Text to be displayed.
+     */
     void popUp(const QString& sText);
 
     //=========================================================================================================
+    /**
+     * Displays pop up message with sText and sInfoText. Returns response. Blocking.
+     *
+     * @param sText         Text to be displayed.
+     * @param sInfoText     Text to be displayed.
+     *
+     * @return  Returns response as QMessageBox::No or QMessageBox::Yes.
+     */
     int popUpYesNo(const QString& sText,
                    const QString& sInfoText);
 
@@ -267,7 +308,7 @@ private:
 
     FIFFLIB::FiffFileSharer                 m_FileSharer;                   /**< Handles copying recording file and saving copy to shared directory. */
 
-    QStringList                             m_lFileNames;
+    QStringList                             m_lFileNames;                   /**< List of file names of latest recording */
 };
 } // NAMESPACE
 

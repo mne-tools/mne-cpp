@@ -523,19 +523,21 @@ void WriteToFile::promptFileName()
         QString sFileName = QInputDialog::getText(Q_NULLPTR, tr("Write to File"), tr("Name your save file:"), QLineEdit::Normal, QString(), &ok);
 
         if (ok && !sFileName.isEmpty()){
-            bFileHandled = renameFile(sFileName);
+            bFileHandled = renameRecording(sFileName);
         } else if (ok){
             popUp("Cannot save file with no name.");
         } else {
-            deleteFiles();
+            deleteRecording();
             bFileHandled = true;
         }
     }
+
+    m_lFileNames.clear();
 }
 
 //=============================================================================================================
 
-bool WriteToFile::renameFile(const QString& sFileName)
+bool WriteToFile::renameRecording(const QString& sFileName)
 {
     bool bRenameFile = false;
 
@@ -582,7 +584,7 @@ bool WriteToFile::renameMultipleFiles(const QString& sFileName)
 
 //=============================================================================================================
 
-void WriteToFile::deleteFiles()
+void WriteToFile::deleteRecording()
 {
     for (QString& sFileName : m_lFileNames){
         QFile(QFileInfo(m_qFileOut).dir().absolutePath() + sFileName).remove();
