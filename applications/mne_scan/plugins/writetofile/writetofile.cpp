@@ -535,38 +535,63 @@ void WriteToFile::promptFileName()
 
 //=============================================================================================================
 
-bool WriteToFile::renameFile(QString sFileName)
+bool WriteToFile::renameFile(const QString& sFileName)
 {
-    QFileInfo fileinfo(m_qFileOut);
-
     bool bRenameFile = false;
 
-    for (int i = 0; i < m_lFileNames.size(); i++){
-        QFileInfo existingFile(fileinfo.dir().absolutePath() + sFileName);
+    if(m_lFileNames.size() == 1){
+        bRenameFile = renameSingleFile(m_qFileOut.fileName(), sFileName);
+    } else {
+        bRenameFile = renameMultipleFiles(sFileName);
     }
 
-    if(existingFile1.exists() || existingFile2.exists()){
+    return bRenameFile;
+}
+
+//=============================================================================================================
+
+bool WriteToFile::renameSingleFile(const QString& sCurrentFileName, const QString& sNewFileName)
+{
+    QFileInfo fileinfo(m_qFileOut);
+    QFileInfo existingFile(fileinfo.dir().absolutePath() + sNewFileName);
+
+    if(existingFile.exists()){
         int ret = popUpYesNo("A file with this name already exists.",
                              "Do you want to overwrite this file?");
-        if(ret == QMessageBox::Yes) {
-            renameFile();
+        if(ret == QMessageBox::No) {
+            return false;
         }
-
-    } else {
-
     }
+
+    return QFile(fileinfo.dir().absolutePath() + sCurrentFileName).rename(sNewFileName);
+}
+
+//=============================================================================================================
+
+bool WriteToFile::renameMultipleFiles(const QString& sFileName)
+{
+    for (int i = 0; i < m_lFileNames.size(); i++){
+        bool rename = renameSingleFile(m_lFileNames.at(i), sFileName + QString("-") + QString::number(i + 1));
+        if (!rename){
+            return rename;
+        }
+    }
+
+    return true;
 }
 
 //=============================================================================================================
 
 void WriteToFile::deleteFiles()
 {
-
+    for (QString& sFileName : m_lFileNames){
+        QFile(QFileInfo(m_qFileOut).dir().absolutePath() + sFileName).remove();
+    }
 }
 
 //=============================================================================================================
 
-void WriteToFile::popUp(QString sText)
+void WriteToFile::popUp(const QString& sText)
 {
     QMessageBox msgBox;
     msgBox.setText(sText);
@@ -576,8 +601,8 @@ void WriteToFile::popUp(QString sText)
 
 //=============================================================================================================
 
-int WriteToFile::popUpYesNo(QString sText,
-                            QString sInfoText)
+int WriteToFile::popUpYesNo(const QString& sText,
+                            const QString& sInfoText)
 {
     QMessageBox msgBox;
     msgBox.setText(sText);
