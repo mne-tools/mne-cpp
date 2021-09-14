@@ -138,14 +138,9 @@ isEmpty( MNE_INSTALL_INCLUDE_DIR ) {
     MNE_INSTALL_INCLUDE_DIR = $$shell_path($${PWD}/include)
 }
 
-unix|macx {
-    DEFINES += "GIT_HASH="\\\"$$system(git log -1 --format=%h)\\\"""
-    DEFINES += "GIT_HASH_LONG="\\\"$$system(git log -1 --format=%H)\\\"""
-}
 
-win32 {
-    DEFINES += "GIT_HASH=$$system(git log -1 --format=%h)"
-    DEFINES += "GIT_LONG_HASH=$$system(git log -1 --format=%H)"
-}
+DEFINES += "GIT_HASH=\\\"$$system(git log -1 --format=%h)\\\""
+DEFINES += "GIT_HASH_LONG=\\\"$$system(git log -1 --format=%H)\\\""
+
 
 message(Hello this is a test! - $$DEFINES )
