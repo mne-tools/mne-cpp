@@ -101,6 +101,7 @@ View3D::View3D()
 , m_pMultiCam3(new Qt3DRender::QCamera)
 , m_pPicker(new Qt3DRender::QObjectPicker(m_pRootEntity))
 , m_pCamController(new OrbitalCameraController(m_pRootEntity))
+, m_MultiViewOrientation(View3D::MultiViewOrientation::Horizontal)
 {
     //Root entity
     this->setRootEntity(m_pRootEntity);
@@ -418,19 +419,19 @@ void View3D::initSingleCam()
 void View3D::initMultiCams()
 {
     m_pMultiCam1->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
-    m_pMultiCam1->setPosition(QVector3D(0.0f, 0.4f, 0.0f));
+    m_pMultiCam1->setPosition(QVector3D(0.0f, 0.5f, 0.0f));
     m_pMultiCam1->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
     m_pMultiCam1->setUpVector(QVector3D(0.0f, 0.0f, 1.0f));
 //    m_pMultiCam1->setParent(m_pRootEntity);
 
     m_pMultiCam2->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
-    m_pMultiCam2->setPosition(QVector3D(-0.4f, 0.0f, 0.0f));
+    m_pMultiCam2->setPosition(QVector3D(-0.5f, 0.0f, 0.0f));
     m_pMultiCam2->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
     m_pMultiCam2->setUpVector(QVector3D(0.0f, 0.0f, 1.0f));
 //    m_pMultiCam2->setParent(m_pRootEntity);
 
     m_pMultiCam3->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
-    m_pMultiCam3->setPosition(QVector3D(0.0f, 0.0f, 0.4f));
+    m_pMultiCam3->setPosition(QVector3D(0.0f, 0.0f, 0.5f));
     m_pMultiCam3->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
     m_pMultiCam3->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
 //    m_pMultiCam3->setParent(m_pRootEntity);
@@ -478,6 +479,8 @@ void View3D::initMultiView()
     auto cameraSelector3= new Qt3DRender::QCameraSelector(m_pMultiViewport3);
     cameraSelector3->setCamera(m_pMultiCam3);
 
+    updateMultiViewAspectRatio();
+
     auto noDraw = new Qt3DRender::QNoDraw(clearBuffers);
 }
 
@@ -500,28 +503,43 @@ void View3D::updateMultiViewAspectRatio()
 
     float fAspectRatio = static_cast<float>(this->width())/static_cast<float>(this->height());
 
-    if(fAspectRatio > 1.0f ){
+    if(fAspectRatio > 1.5f ){
         m_pMultiCam1->setAspectRatio(fAspectRatio / 3.0f);
         m_pMultiCam2->setAspectRatio(fAspectRatio / 3.0f);
         m_pMultiCam3->setAspectRatio(fAspectRatio / 3.0f);
+
+        setMultiViewHorizontal();
     } else {
         m_pMultiCam1->setAspectRatio(fAspectRatio * 3.0f);
         m_pMultiCam2->setAspectRatio(fAspectRatio * 3.0f);
         m_pMultiCam3->setAspectRatio(fAspectRatio * 3.0f);
-    }
 
+        setMultiViewVertical();
+    }
 }
 
 //=============================================================================================================
 
 void View3D::setMultiViewVertical()
 {
+    if (m_MultiViewOrientation != View3D::MultiViewOrientation::Veritical){
+        m_pMultiViewport1->setNormalizedRect(QRectF(0.0f, 0.0f, 1.0f, 0.333f));
+        m_pMultiViewport2->setNormalizedRect(QRectF(0.0f, 0.333f, 1.0f, 0.333f));
+        m_pMultiViewport3->setNormalizedRect(QRectF(0.0f, 0.666f, 1.0f, 0.333f));
 
+        m_MultiViewOrientation = View3D::MultiViewOrientation::Veritical;
+    }
 }
 
 //=============================================================================================================
 
 void View3D::setMultiViewHorizontal()
 {
+    if (m_MultiViewOrientation != View3D::MultiViewOrientation::Horizontal){
+        m_pMultiViewport1->setNormalizedRect(QRectF(0.0f, 0.0f, 0.333f, 1.0f));
+        m_pMultiViewport2->setNormalizedRect(QRectF(0.333f, 0.0f, 0.333f, 1.0f));
+        m_pMultiViewport3->setNormalizedRect(QRectF(0.666f, 0.0f, 0.333f, 1.0f));
 
+        m_MultiViewOrientation = View3D::MultiViewOrientation::Horizontal;
+    }
 }

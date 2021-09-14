@@ -250,6 +250,10 @@ protected:
     //=========================================================================================================
     void resizeEvent(QResizeEvent *) override;
 
+    enum MultiViewOrientation{
+        Horizontal,
+        Veritical
+    };
 
     QPointer<Qt3DCore::QEntity>                 m_pRootEntity;                  /**< The root/most top level entity buffer. */
     QPointer<Qt3DCore::QEntity>                 m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */
@@ -275,6 +279,8 @@ protected:
     QPointer<QPropertyAnimation>                m_pCameraAnimation;             /**< The animations to rotate the camera. */
 
     QList<QPointer<Qt3DRender::QPointLight> >   m_lLightSources;                /**< The light sources. */
+
+    MultiViewOrientation                        m_MultiViewOrientation;
 
 signals:
     /*
