@@ -498,13 +498,17 @@ void View3D::updateMultiViewAspectRatio()
     std::cout << "Regular aspect -- Width: " << this->width() << " | Height: " << this->height() << " | Ration: " << this->width()/this->height() << "\n";
     std::cout << "Cast aspect    -- Width: " << this->width() << " | Height: " << this->height() << " | Ration: " << static_cast<float>(this->width())/static_cast<float>(this->height()) << "\n";
 
-    float fAspectRatio;
+    float fAspectRatio = static_cast<float>(this->width())/static_cast<float>(this->height());
 
-    m_pMultiCam1->setAspectRatio(static_cast<float>(this->width())/(3.0f * static_cast<float>(this->height())));
-    m_pMultiCam2->setAspectRatio(static_cast<float>(this->width())/(3.0f * static_cast<float>(this->height())));
-    m_pMultiCam3->setAspectRatio(static_cast<float>(this->width())/(3.0f * static_cast<float>(this->height())));
-
-
+    if(fAspectRatio > 1.0f ){
+        m_pMultiCam1->setAspectRatio(fAspectRatio / 3.0f);
+        m_pMultiCam2->setAspectRatio(fAspectRatio / 3.0f);
+        m_pMultiCam3->setAspectRatio(fAspectRatio / 3.0f);
+    } else {
+        m_pMultiCam1->setAspectRatio(fAspectRatio * 3.0f);
+        m_pMultiCam2->setAspectRatio(fAspectRatio * 3.0f);
+        m_pMultiCam3->setAspectRatio(fAspectRatio * 3.0f);
+    }
 
 }
 
