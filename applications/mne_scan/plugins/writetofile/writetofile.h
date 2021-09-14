@@ -217,23 +217,23 @@ private:
     void promptFileName();
 
     //=========================================================================================================
-    bool renameFile(QString sFileName);
+    bool renameFile(const QString& sFileName);
 
     //=========================================================================================================
-    void renameSingleFile(QString sFileName);
+    bool renameSingleFile(const QString& sCurrentFileName, const QString& sNewFileName);
 
     //=========================================================================================================
-    void renameMultipleFiles(QString sFileName);
+    bool renameMultipleFiles(const QString& sFileName);
 
     //=========================================================================================================
     void deleteFiles();
 
     //=========================================================================================================
-    void popUp(QString sText);
+    void popUp(const QString& sText);
 
     //=========================================================================================================
-    int popUpYesNo(QString sText,
-                   QString sInfoText);
+    int popUpYesNo(const QString& sText,
+                   const QString& sInfoText);
 
     bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
