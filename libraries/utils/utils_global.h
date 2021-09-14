@@ -1,14 +1,16 @@
 //=============================================================================================================
 /**
  * @file     utils_global.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>;
+ *           Juan G Prieto <jgarciaprieto@mgh.harvard.edu>;
+ *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
- * @date     July, 2012
+ * @date     September, 2021
  *
  * @section  LICENSE
  *
- * Copyright (C) 2012, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2021, Lorenz Esch, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -59,6 +61,8 @@
 namespace UTILSLIB{
     UTILSSHARED_EXPORT const char* BUILD_TIME();
     UTILSSHARED_EXPORT const char* BUILD_DATE();
+    UTILSSHARED_EXPORT const char* BUILD_HASH();
+    UTILSSHARED_EXPORT const char* BUILD_HASH_LONG();
 }
 
 #endif // MNEUTILS_GLOBAL_H
