@@ -45,10 +45,14 @@ constexpr auto githash()
 #endif
 }
 
-//char* githash_short()
-//{
-
-//}
+constexpr auto githash_long()
+{
+#ifdef GIT_HASH_LONG
+    return GIT_HASH_LONG;
+#else
+    return "Git hash long not defined.";
+#endif
+}
 
 //char* version()
 //{
