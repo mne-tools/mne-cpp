@@ -44,6 +44,8 @@
 #include <scMeas/realtimemultisamplearray.h>
 #include <fiff/fiff_stream.h>
 
+#include <filesystem>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -364,24 +366,20 @@ void WriteToFile::toggleRecordingFile()
         m_pBlinkingRecordButtonTimer->stop();
         m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
         m_pUpdateTimeInfoTimer->stop();
+
+        promptFileName();
+
     } else {
         m_iSplitCount = 0;
 
         if(!m_pFiffInfo) {
-            QMessageBox msgBox;
-            msgBox.setText("FiffInfo missing!");
-            msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-            msgBox.exec();
+            popUp("FiffInfo missing!");
             return;
         }
 
         if(m_pFiffInfo->dev_head_t.trans.isIdentity()) {
-            QMessageBox msgBox;
-            msgBox.setText("It seems that no HPI fitting was performed. This is your last chance!");
-            msgBox.setInformativeText("Do you want to continue without HPI fitting?");
-            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-            msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-            int ret = msgBox.exec();
+            int ret = popUpYesNo("It seems that no HPI fitting was performed. This is your last chance!",
+                                 "Do you want to continue without HPI fitting?");
             if(ret == QMessageBox::No)
                 return;
         }
@@ -389,12 +387,8 @@ void WriteToFile::toggleRecordingFile()
         //Initiate the stream for writing to the fif file
         m_qFileOut.setFileName(m_sRecordFileName);
         if(m_qFileOut.exists()) {
-            QMessageBox msgBox;
-            msgBox.setText("The file you want to write already exists.");
-            msgBox.setInformativeText("Do you want to overwrite this file?");
-            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-            msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-            int ret = msgBox.exec();
+            int ret = popUpYesNo("The file you want to write already exists.",
+                                 "Do you want to overwrite this file?");
             if(ret == QMessageBox::No) {
                 return;
             }
@@ -425,6 +419,8 @@ void WriteToFile::toggleRecordingFile()
         if(m_bUseRecordTimer) {
             m_pRecordTimer->start(m_iRecordingMSeconds);
         }
+
+        m_lFileNames.append(m_qFileOut.fileName());
     }
 }
 
@@ -462,6 +458,8 @@ void WriteToFile::splitRecordingFile()
 
     fiff_int_t first = 0;
     m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
+
+    m_lFileNames.append(m_qFileOut.fileName());
 }
 
 //=============================================================================================================
@@ -515,6 +513,82 @@ QString WriteToFile::getBuildInfo()
 }
 
 //=============================================================================================================
+
+void WriteToFile::promptFileName()
+{
+    bool bFileHandled = false;
+
+    while(!bFileHandled){
+        bool ok;
+        QString sFileName = QInputDialog::getText(Q_NULLPTR, tr("Write to File"), tr("Name your save file:"), QLineEdit::Normal, QString(), &ok);
+
+        if (ok && !sFileName.isEmpty()){
+            bFileHandled = renameFile(sFileName);
+        } else if (ok){
+            popUp("Cannot save file with no name.");
+        } else {
+            deleteFiles();
+            bFileHandled = true;
+        }
+    }
+}
+
+//=============================================================================================================
+
+bool WriteToFile::renameFile(QString sFileName)
+{
+    QFileInfo fileinfo(m_qFileOut);
+
+    bool bRenameFile = false;
+
+    for (int i = 0; i < m_lFileNames.size(); i++){
+        QFileInfo existingFile(fileinfo.dir().absolutePath() + sFileName);
+    }
+
+    if(existingFile1.exists() || existingFile2.exists()){
+        int ret = popUpYesNo("A file with this name already exists.",
+                             "Do you want to overwrite this file?");
+        if(ret == QMessageBox::Yes) {
+            renameFile();
+        }
+
+    } else {
+
+    }
+}
+
+//=============================================================================================================
+
+void WriteToFile::deleteFiles()
+{
+
+}
+
+//=============================================================================================================
+
+void WriteToFile::popUp(QString sText)
+{
+    QMessageBox msgBox;
+    msgBox.setText(sText);
+    msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+    msgBox.exec();
+}
+
+//=============================================================================================================
+
+int WriteToFile::popUpYesNo(QString sText,
+                            QString sInfoText)
+{
+    QMessageBox msgBox;
+    msgBox.setText(sText);
+    msgBox.setInformativeText(sInfoText);
+    msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+    msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+    return msgBox.exec();
+}
+
+//=============================================================================================================
+
 // This needs to be connected to Hpi fitting plugin
 //void WriteToFile::doContinousHPI(MatrixXf& matData)
 //{

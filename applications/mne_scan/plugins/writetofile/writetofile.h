@@ -213,6 +213,28 @@ private:
      */
     void clipRecording(bool bChecked);
 
+    //=========================================================================================================
+    void promptFileName();
+
+    //=========================================================================================================
+    bool renameFile(QString sFileName);
+
+    //=========================================================================================================
+    void renameSingleFile(QString sFileName);
+
+    //=========================================================================================================
+    void renameMultipleFiles(QString sFileName);
+
+    //=========================================================================================================
+    void deleteFiles();
+
+    //=========================================================================================================
+    void popUp(QString sText);
+
+    //=========================================================================================================
+    int popUpYesNo(QString sText,
+                   QString sInfoText);
+
     bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
     bool                                    m_bContinuous;                  /**< Flag for whether to start plugin in continuous save mode */
@@ -244,6 +266,8 @@ private:
     Eigen::RowVectorXd                      m_mCals;                        /**< Row vector with channel calibration values. */
 
     FIFFLIB::FiffFileSharer                 m_FileSharer;                   /**< Handles copying recording file and saving copy to shared directory. */
+
+    QStringList                             m_lFileNames;
 };
 } // NAMESPACE
 
