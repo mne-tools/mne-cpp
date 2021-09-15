@@ -43,6 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "mne_anonymize.h"
 #include "fiffanonymizer.h"
 #include <iostream>
 

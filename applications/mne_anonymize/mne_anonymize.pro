@@ -114,6 +114,7 @@ HEADERS += \
     apphandler.h \
     fiffanonymizer.h \
     mainwindow.h \
+    mne_anonymize.h \
     settingscontrollercl.h \
     settingscontrollergui.h
 
