@@ -497,9 +497,6 @@ void View3D::resizeEvent(QResizeEvent *event)
 
 void View3D::updateMultiViewAspectRatio()
 {
-    std::cout << "Regular aspect -- Width: " << this->width() << " | Height: " << this->height() << " | Ration: " << this->width()/this->height() << "\n";
-    std::cout << "Cast aspect    -- Width: " << this->width() << " | Height: " << this->height() << " | Ration: " << static_cast<float>(this->width())/static_cast<float>(this->height()) << "\n";
-
     float fAspectRatio = static_cast<float>(this->width())/static_cast<float>(this->height());
 
     if(fAspectRatio > 1.5f ){
