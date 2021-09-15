@@ -43,6 +43,7 @@
 #include "settingscontrollercl.h"
 #include "fiffanonymizer.h"
 #include "utils/buildinfo.h"
+#include "utils/utils_global.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -75,8 +76,8 @@ SettingsControllerCl::SettingsControllerCl()
 : m_pAnonymizer(FiffAnonymizer::SPtr(new FiffAnonymizer))
 , m_sAppName(qApp->applicationName())
 , m_sAppVer(qApp->applicationVersion())
-, m_sBuildDate(QString(BUILDINFO::date()) + " " + QString(BUILDINFO::time()))
-, m_sBuildHash("")
+, m_sBuildDate(QString(BUILDINFO::timestamp()))
+, m_sBuildHash(QString(BUILDINFO::githash()))
 , m_bGuiMode(false)
 , m_bDeleteInputFileAfter(false)
 , m_bDeleteInputFileConfirmation(true)
@@ -95,7 +96,8 @@ SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
 : m_pAnonymizer(FiffAnonymizer::SPtr(new FiffAnonymizer))
 , m_sAppName(qApp->applicationName())
 , m_sAppVer(qApp->applicationVersion())
-, m_sBuildDate(__DATE__)
+, m_sBuildDate(QString(BUILDINFO::timestamp()))
+, m_sBuildHash(QString(BUILDINFO::githash()))
 , m_bGuiMode(false)
 , m_bDeleteInputFileAfter(false)
 , m_bDeleteInputFileConfirmation(true)
@@ -551,6 +553,9 @@ void SettingsControllerCl::printHeaderIfVerbose()
     printIfVerbose(m_sAppName + "  (Version: " + m_sAppVer + ")");
     printIfVerbose("Build Date: " + m_sBuildDate);
     printIfVerbose("Build Hash: " + m_sBuildHash);
+    printIfVerbose(" ");
+    printIfVerbose(QString("Utils Lib Build Date: ") + UTILSLIB::BUILD_DATETIME());
+    printIfVerbose(QString("Utils Lib Build Hash: ") + UTILSLIB::BUILD_HASH());
     printIfVerbose(" ");
 }
 
