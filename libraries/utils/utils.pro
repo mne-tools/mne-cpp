@@ -134,17 +134,18 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
     }
 }
 
-force_update.target = utils_global.h
-force_update.depends = FORCE
+force_update_utils_global.target = ./utils_global.h
+force_update_utils_global.depends = echo_update_utils_global
 
 win32 {
-force_update.commands += copy /b utils_global.h +,,
-
+    force_update_utils_global.commands = copy $$force_update.target +,,
 }
+
 unix {
-force_update.commands += touch utils_global.h
+    force_update_utils_global.commands += touch utils_global.h
+    PRE_TARGETDEPS += utils_global.h
 }
 
-PRE_TARGETDEPS += utils_global.h
+echo_update_utils_global.commands = @echo Updating $$force_update_utils_global.target
 
-QMAKE_EXTRA_TARGETS += force_update
+QMAKE_EXTRA_TARGETS += force_update_utils_global echo_update_utils_global
