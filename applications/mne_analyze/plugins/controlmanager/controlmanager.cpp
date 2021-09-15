@@ -402,5 +402,5 @@ void ControlManager::onTakeScreenshotChanged()
 
 QString ControlManager::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }

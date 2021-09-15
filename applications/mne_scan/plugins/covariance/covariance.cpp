@@ -279,5 +279,5 @@ void Covariance::run()
 
 QString Covariance::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }

@@ -187,5 +187,5 @@ void DataManager::onCurrentItemChanged(const QModelIndex &pIndex)
 
 QString DataManager::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }

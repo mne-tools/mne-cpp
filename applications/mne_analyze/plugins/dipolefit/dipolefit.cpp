@@ -552,5 +552,5 @@ void DipoleFit::triggerLoadingEnd(QString sMessage)
 
 QString DipoleFit::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }

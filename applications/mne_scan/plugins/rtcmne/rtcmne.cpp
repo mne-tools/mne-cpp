@@ -673,5 +673,5 @@ void RtcMne::run()
 
 QString RtcMne::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }

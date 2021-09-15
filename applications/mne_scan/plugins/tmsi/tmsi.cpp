@@ -665,5 +665,5 @@ void TMSI::showSetupProjectDialog()
 
 QString TMSI::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }
