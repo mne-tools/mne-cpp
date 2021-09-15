@@ -457,5 +457,5 @@ void BrainFlowBoard::releaseSession(bool useQmessage)
 
 QString BrainFlowBoard::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }

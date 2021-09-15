@@ -510,7 +510,7 @@ bool WriteToFile::isContinuous()
 
 QString WriteToFile::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }
 
 //=============================================================================================================

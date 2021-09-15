@@ -313,5 +313,5 @@ void Natus::run()
 
 QString Natus::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }

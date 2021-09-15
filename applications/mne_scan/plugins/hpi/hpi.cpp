@@ -668,5 +668,5 @@ void Hpi::run()
 
 QString Hpi::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }

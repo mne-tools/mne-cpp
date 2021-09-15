@@ -284,5 +284,5 @@ void ChannelSelection::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel>
 
 QString ChannelSelection::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }
