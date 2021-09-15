@@ -40,6 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "mne_anonymize.h"
 #include "apphandler.h"
 #include <utils/generics/applicationlogger.h>
 
