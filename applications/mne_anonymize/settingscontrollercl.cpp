@@ -42,6 +42,7 @@
 
 #include "settingscontrollercl.h"
 #include "fiffanonymizer.h"
+#include "utils/buildinfo.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -74,7 +75,8 @@ SettingsControllerCl::SettingsControllerCl()
 : m_pAnonymizer(FiffAnonymizer::SPtr(new FiffAnonymizer))
 , m_sAppName(qApp->applicationName())
 , m_sAppVer(qApp->applicationVersion())
-, m_sBuildDate(__DATE__)
+, m_sBuildDate(QString(BUILDINFO::date()) + " " + QString(BUILDINFO::time()))
+, m_sBuildHash("")
 , m_bGuiMode(false)
 , m_bDeleteInputFileAfter(false)
 , m_bDeleteInputFileConfirmation(true)
@@ -548,6 +550,7 @@ void SettingsControllerCl::printHeaderIfVerbose()
     printIfVerbose(" ");
     printIfVerbose(m_sAppName + "  (Version: " + m_sAppVer + ")");
     printIfVerbose("Build Date: " + m_sBuildDate);
+    printIfVerbose("Build Hash: " + m_sBuildHash);
     printIfVerbose(" ");
 }
 
