@@ -456,6 +456,6 @@ void Averaging::run()
 
 QString Averaging::getBuildDateTime()
 {
-    return QString(UTILSLIB::BUILD_DATE()) + " " + QString(UTILSLIB::BUILD_TIME());
+    return QString(UTILSLIB::BUILD_DATETIME());
 }
 
