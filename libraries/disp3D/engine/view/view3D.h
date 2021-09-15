@@ -189,9 +189,15 @@ public:
     void activatePicker(const bool bActivatePicker);
 
     //=========================================================================================================
+    /**
+     * Toggles view to display single view.
+     */
     void showSingleView();
 
     //=========================================================================================================
+    /**
+     * Toggles view to display multi-view.
+     */
     void showMultiView();
 
 protected:
@@ -233,27 +239,51 @@ protected:
     void handlePickerPress(Qt3DRender::QPickEvent *qPickEvent);
 
     //=========================================================================================================
+    /**
+     * Initilaize single view camera parameters.
+     */
     void initSingleCam();
 
     //=========================================================================================================
+    /**
+     * Initialize multi-view camera parameters.
+     */
     void initMultiCams();
 
     //=========================================================================================================
+    /**
+     * Initialize single view viewport/framegraph.
+     */
     void initSingleView();
 
     //=========================================================================================================
+    /**
+     * Initilize multiview viewports.
+     */
     void initMultiView();
 
     //=========================================================================================================
+    /**
+     * Update multiview camera parameters based on aspect ratio.
+     */
     void updateMultiViewAspectRatio();
 
     //=========================================================================================================
+    /**
+     * Sets multiview views to vertical layout.
+     */
     void setMultiViewVertical();
 
     //=========================================================================================================
+    /**
+     * Sets multiview views to horizontal layout.
+     */
     void setMultiViewHorizontal();
 
     //=========================================================================================================
+    /**
+     * Handles resize event for non-default multiview cameras.
+     */
     void resizeEvent(QResizeEvent *) override;
 
     enum MultiViewOrientation{
@@ -286,7 +316,7 @@ protected:
 
     QList<QPointer<Qt3DRender::QPointLight> >   m_lLightSources;                /**< The light sources. */
 
-    MultiViewOrientation                        m_MultiViewOrientation;
+    MultiViewOrientation                        m_MultiViewOrientation;         /**< The current orientation of the multiview viewports. */
 
 signals:
     /*
