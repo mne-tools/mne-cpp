@@ -25,13 +25,13 @@ constexpr auto date()
 
 //=============================================================================================================
 /**
- * Returns date and time of modification of source file. Must be called in compiled function to return correctly.
+ * Returns build date and time (time preprocessor was run). Must be called in compiled function to return
+ * correctly.
  */
 constexpr auto timestamp()
 {
-    return __TIMESTAMP__;
+    return __TIME__ " " __DATE__;
 }
-
 //=============================================================================================================
 /**
  * @brief githash
@@ -53,11 +53,6 @@ constexpr auto githash_long()
     return "Git hash long not defined.";
 #endif
 }
-
-//char* version()
-//{
-
-//}
 
 }
 
