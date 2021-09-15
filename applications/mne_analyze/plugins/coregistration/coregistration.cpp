@@ -818,5 +818,5 @@ bool CoRegistration::removeFromBemList(QSharedPointer<ANSHAREDLIB::AbstractModel
 
 QString CoRegistration::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }

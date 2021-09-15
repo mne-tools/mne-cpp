@@ -329,5 +329,5 @@ void RawDataViewer::onNewRealtimeData()
 
 QString RawDataViewer::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }

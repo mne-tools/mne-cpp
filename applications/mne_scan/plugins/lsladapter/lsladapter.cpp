@@ -407,5 +407,5 @@ void LSLAdapter::onBlockSizeChanged(const int newBlockSize)
 
 QString LSLAdapter::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }

@@ -529,5 +529,5 @@ void RtFwd::run()
 
 QString RtFwd::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }

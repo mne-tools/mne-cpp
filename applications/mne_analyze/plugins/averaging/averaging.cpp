@@ -735,5 +735,5 @@ void Averaging::updateEvokedSetModel()
 
 QString Averaging::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }

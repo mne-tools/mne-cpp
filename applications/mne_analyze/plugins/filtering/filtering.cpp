@@ -216,5 +216,5 @@ void Filtering::setFilterActive(bool state)
 
 QString Filtering::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }

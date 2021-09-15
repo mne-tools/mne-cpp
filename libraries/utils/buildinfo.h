@@ -28,7 +28,7 @@ constexpr auto date()
  * Returns build date and time (time preprocessor was run). Must be called in compiled function to return
  * correctly.
  */
-constexpr auto timestamp()
+constexpr auto dateTime()
 {
     return __TIME__ " " __DATE__;
 }
@@ -36,7 +36,7 @@ constexpr auto timestamp()
 /**
  * @brief githash
  */
-constexpr auto githash()
+constexpr auto gitHash()
 {
 #ifdef GIT_HASH
     return GIT_HASH;
@@ -45,7 +45,7 @@ constexpr auto githash()
 #endif
 }
 
-constexpr auto githash_long()
+constexpr auto gitHashLong()
 {
 #ifdef GIT_HASH_LONG
     return GIT_HASH_LONG;

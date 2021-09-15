@@ -606,5 +606,5 @@ bool BabyMEG::readBadChannels()
 
 QString BabyMEG::getBuildDateTime()
 {
-    return QString(BUILDINFO::timestamp());
+    return QString(BUILDINFO::dateTime());
 }
