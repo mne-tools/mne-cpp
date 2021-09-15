@@ -188,6 +188,12 @@ public:
      */
     void activatePicker(const bool bActivatePicker);
 
+    //=========================================================================================================
+    void showSingleView();
+
+    //=========================================================================================================
+    void showMultiView();
+
 protected:
 
     void saveScreenshot();

@@ -124,8 +124,7 @@ View3D::View3D()
 
     this->setRootEntity(m_pRootEntity);
 
-//    this->setActiveFrameGraph(m_pFrameGraph);
-    this->setActiveFrameGraph(m_pMultiFrame);
+    showSingleView();
 }
 
 
@@ -542,4 +541,18 @@ void View3D::setMultiViewHorizontal()
 
         m_MultiViewOrientation = View3D::MultiViewOrientation::Horizontal;
     }
+}
+
+//=============================================================================================================
+
+void View3D::showSingleView()
+{
+    this->setActiveFrameGraph(m_pFrameGraph);
+}
+
+//=============================================================================================================
+
+void View3D::showMultiView()
+{
+    this->setActiveFrameGraph(m_pMultiFrame);
 }
