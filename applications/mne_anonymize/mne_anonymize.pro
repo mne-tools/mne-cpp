@@ -62,6 +62,8 @@ QT += core widgets network
 
 DESTDIR = $${MNE_BINARY_DIR}
 
+CONFIG += console
+
 TARGET = mne_anonymize
 
 CONFIG += console
