@@ -74,8 +74,8 @@ using namespace MNEANONYMIZE;
 
 SettingsControllerCl::SettingsControllerCl()
 : m_pAnonymizer(FiffAnonymizer::SPtr(new FiffAnonymizer))
-, m_sAppName(qApp->applicationName())
-, m_sAppVer(qApp->applicationVersion())
+, m_sAppName(APPLICATION_NAME)
+, m_sAppVer(APPLICATION_VERSION)
 , m_sBuildDate(QString(BUILDINFO::timestamp()))
 , m_sBuildHash(QString(BUILDINFO::githash()))
 , m_bGuiMode(false)
@@ -94,8 +94,8 @@ SettingsControllerCl::SettingsControllerCl()
 
 SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
 : m_pAnonymizer(FiffAnonymizer::SPtr(new FiffAnonymizer))
-, m_sAppName(qApp->applicationName())
-, m_sAppVer(qApp->applicationVersion())
+, m_sAppName(APPLICATION_NAME)
+, m_sAppVer(APPLICATION_VERSION)
 , m_sBuildDate(QString(BUILDINFO::timestamp()))
 , m_sBuildHash(QString(BUILDINFO::githash()))
 , m_bGuiMode(false)
@@ -110,6 +110,11 @@ SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
 {
     QObject::connect(this, &MNEANONYMIZE::SettingsControllerCl::finished,
                      qApp, &QCoreApplication::exit, Qt::QueuedConnection);
+
+    for(auto& s : arguments)
+    {
+        qInfo() << s << "\n";
+    }
 
     initParser();
     if(parseInputs(arguments))
@@ -550,7 +555,7 @@ void SettingsControllerCl::printHeaderIfVerbose()
     printIfVerbose(" ");
     printIfVerbose("=============================================================================================");
     printIfVerbose(" ");
-    printIfVerbose(m_sAppName + "  (Version: " + m_sAppVer + ")");
+    printIfVerbose(m_sAppName + "    Version: " + m_sAppVer);
     printIfVerbose("Build Date: " + m_sBuildDate);
     printIfVerbose("Build Hash: " + m_sBuildHash);
     printIfVerbose(" ");
