@@ -140,7 +140,7 @@ win32 {
     force_update_utils_global.commands = copy $$force_update_utils_global.target +,,
 }
 
-unix {
+unix|macx {
     force_update_utils_global.commands += touch utils_global.h
     PRE_TARGETDEPS += utils_global.h
 }
