@@ -141,6 +141,3 @@ isEmpty( MNE_INSTALL_INCLUDE_DIR ) {
 
 DEFINES += "GIT_HASH=\\\"$$system(git log -1 --format=%h)\\\""
 DEFINES += "GIT_HASH_LONG=\\\"$$system(git log -1 --format=%H)\\\""
-
-
-message(Hello this is a test! - $$DEFINES )
