@@ -418,19 +418,19 @@ void View3D::initSingleCam()
 void View3D::initMultiCams()
 {
     m_pMultiCam1->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
-    m_pMultiCam1->setPosition(QVector3D(0.0f, 0.5f, 0.0f));
+    m_pMultiCam1->setPosition(QVector3D(0.0f, 0.65f, 0.0f));
     m_pMultiCam1->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
     m_pMultiCam1->setUpVector(QVector3D(0.0f, 0.0f, 1.0f));
 //    m_pMultiCam1->setParent(m_pRootEntity);
 
     m_pMultiCam2->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
-    m_pMultiCam2->setPosition(QVector3D(-0.5f, 0.0f, 0.0f));
+    m_pMultiCam2->setPosition(QVector3D(-0.65f, 0.0f, 0.0f));
     m_pMultiCam2->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
     m_pMultiCam2->setUpVector(QVector3D(0.0f, 0.0f, 1.0f));
 //    m_pMultiCam2->setParent(m_pRootEntity);
 
     m_pMultiCam3->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
-    m_pMultiCam3->setPosition(QVector3D(0.0f, 0.0f, 0.5f));
+    m_pMultiCam3->setPosition(QVector3D(0.0f, 0.0f, 0.65f));
     m_pMultiCam3->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
     m_pMultiCam3->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
 //    m_pMultiCam3->setParent(m_pRootEntity);
