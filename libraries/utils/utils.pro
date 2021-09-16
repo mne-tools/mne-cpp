@@ -134,15 +134,43 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
     }
 }
 
-force_update_utils_global.target = utils_global.h
+################################################## Phony target ############################################
 
-win32 {
-    force_update_utils_global.commands = copy $$force_update_utils_global.target +,,
+#PhonyUpdater.target = utils_global.cpp
+
+
+#PhonyUpdater.depends += $$ALLFILES
+#PhonyUPdater.commands += message(Updating $$PhonyUpdater.target)
+#win32 {
+#    PhonyUpdater.commands = copy $$PhonyUpdater.target +,,
+#}
+
+#unix|macx {
+#    PhonyUpdater.commands += touch $$PhonyUpdater.target
+#    PRE_TARGETDEPS += $$PhonyUpdater.target
+#}
+
+#QMAKE_EXTRA_TARGETS += PhonyUpdater
+
+
+
+
+#PhonyUpdater.target = Phony1
+#PhonyUpdater.commands = touch $$ROOT_DIR/libraries/utils/utils_global.cpp
+#PRE_TARGETDEPS += Phony1
+#QMAKE_EXTRA_TARGETS += PhonyUpdater
+
+ALLFILES += $$HEADERS
+ALLFILES += $$SOURCES
+ALLFILES -= utils_global.cpp
+PhonyUpdater.target = phony1
+PhonyUpdater.commands = touch $$PWD/utils_global.cpp ; echo bbb > phony1
+PhonyUpdater.depends +=
+for (IFILE, ALLFILES) {
+    PhonyUpdater.depends += $$PWD/$$IFILE
 }
+PRE_TARGETDEPS += phony1
+QMAKE_EXTRA_TARGETS += PhonyUpdater
 
-unix|macx {
-    force_update_utils_global.commands += touch utils_global.h
-    PRE_TARGETDEPS += utils_global.h
-}
 
-QMAKE_EXTRA_TARGETS += force_update_utils_global
+
