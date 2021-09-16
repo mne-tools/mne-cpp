@@ -152,7 +152,7 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
 
 ################################################## BUILD TIMESTAMP/HASH UPDATER ############################################
 
-FILETOUPDATE = rtpreprocessing_global.cpp
+FILETOUPDATE = rtprocessing_global.cpp
 
 ALLFILES += $$HEADERS
 ALLFILES += $$SOURCES
