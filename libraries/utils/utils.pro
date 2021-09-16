@@ -134,43 +134,21 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
     }
 }
 
-################################################## Phony target ############################################
+################################################## BUILD TIMESTAMP/HASH UPDATER ############################################
 
-#PhonyUpdater.target = utils_global.cpp
-
-
-#PhonyUpdater.depends += $$ALLFILES
-#PhonyUPdater.commands += message(Updating $$PhonyUpdater.target)
-#win32 {
-#    PhonyUpdater.commands = copy $$PhonyUpdater.target +,,
-#}
-
-#unix|macx {
-#    PhonyUpdater.commands += touch $$PhonyUpdater.target
-#    PRE_TARGETDEPS += $$PhonyUpdater.target
-#}
-
-#QMAKE_EXTRA_TARGETS += PhonyUpdater
-
-
-
-
-#PhonyUpdater.target = Phony1
-#PhonyUpdater.commands = touch $$ROOT_DIR/libraries/utils/utils_global.cpp
-#PRE_TARGETDEPS += Phony1
-#QMAKE_EXTRA_TARGETS += PhonyUpdater
+FILETOUPDATE = utils_global.cpp
 
 ALLFILES += $$HEADERS
 ALLFILES += $$SOURCES
-ALLFILES -= utils_global.cpp
-PhonyUpdater.target = phony1
-PhonyUpdater.commands = touch $$PWD/utils_global.cpp ; echo bbb > phony1
-PhonyUpdater.depends +=
+ALLFILES -= $$FILETOUPDATE
+FileUpdater.target = phonyFileUpdater
+FileUpdater.commands = touch $$PWD/$$FILETOUPDATE ; echo PASTA > phonyFileUpdater
+FileUpdater.depends +=
 for (IFILE, ALLFILES) {
-    PhonyUpdater.depends += $$PWD/$$IFILE
+    FileUpdater.depends += $$PWD/$$IFILE
 }
-PRE_TARGETDEPS += phony1
-QMAKE_EXTRA_TARGETS += PhonyUpdater
+PRE_TARGETDEPS += phonyFileUpdater
+QMAKE_EXTRA_TARGETS += FileUpdater
 
 
 
