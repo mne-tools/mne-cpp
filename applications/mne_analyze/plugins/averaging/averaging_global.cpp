@@ -1,3 +1,3 @@
 #include "averaging_global.h"
 
-const char* AVERAGINGPLUGIN::BUILD_TIMETIME(){ return BUILDINFO::dateTime();};
+const char* AVERAGINGPLUGIN::BUILD_DATETIME(){ return BUILDINFO::dateTime();};
