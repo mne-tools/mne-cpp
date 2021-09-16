@@ -1,6 +1,8 @@
 #include "mne_global.h"
 
-const char* MNELIB::BUILD_TIME(){ return BUILDINFO::time();};
+const char* MNELIB::BUILD_DATETIME(){ return BUILDINFO::dateTime();};
 
-const char* MNELIB::BUILD_DATE(){ return BUILDINFO::date();};
+const char* MNELIB::BUILD_HASH(){ return BUILDINFO::gitHash();};
+
+const char* MNELIB::BUILD_HASH_LONG(){ return BUILDINFO::gitHashLong();};
 
