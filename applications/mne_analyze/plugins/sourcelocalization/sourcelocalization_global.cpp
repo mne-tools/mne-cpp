@@ -1,5 +1,7 @@
 #include "sourcelocalization_global.h"
 
-const char* SOURCELOCALIZATIONPLUGIN::BUILD_TIME(){ return BUILDINFO::time();};
+const char* SOURCELOCALIZATIONPLUGIN::BUILD_DATETIME(){ return BUILDINFO::dateTime();};
 
-const char* SOURCELOCALIZATIONPLUGIN::BUILD_DATE(){ return BUILDINFO::date();};
+const char* SOURCELOCALIZATIONPLUGIN::BUILD_HASH(){ return BUILDINFO::gitHash();};
+
+const char* SOURCELOCALIZATIONPLUGIN::BUILD_HASH_LONG(){ return BUILDINFO::gitHashLong();};

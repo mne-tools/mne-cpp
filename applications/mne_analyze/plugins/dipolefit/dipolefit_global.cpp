@@ -1,5 +1,7 @@
 #include "dipolefit_global.h"
 
-const char* DIPOLEFITPLUGIN::BUILD_TIME(){ return BUILDINFO::time();};
+const char* DIPOLEFITPLUGIN::BUILD_DATETIME(){ return BUILDINFO::dateTime();};
 
-const char* DIPOLEFITPLUGIN::BUILD_DATE(){ return BUILDINFO::date();};
+const char* DIPOLEFITPLUGIN::BUILD_HASH(){ return BUILDINFO::gitHash();};
+
+const char* DIPOLEFITPLUGIN::BUILD_HASH_LONG(){ return BUILDINFO::gitHashLong();};
