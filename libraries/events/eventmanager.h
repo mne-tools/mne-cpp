@@ -451,6 +451,7 @@ inline std::unique_ptr<std::vector<T> > allocateOutputContainer(size_t size) noe
     {
         v->reserve(size);
     }
+
     return v;
 };
 
