@@ -52,6 +52,8 @@ DEFINES += "VERSION_MAJOR=$$VERSION_MAJOR"\
 #Target version
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
 
+DEFINES += "APPLICATION_VERSION=\\\"$${VERSION}\\\""
+
 TEMPLATE = app
 
 QT += core widgets network
