@@ -418,7 +418,7 @@ void WriteToFile::toggleRecordingFile()
             m_pRecordTimer->start(m_iRecordingMSeconds);
         }
 
-        m_lFileNames.append(m_qFileOut.fileName());
+        m_lFileNames.append(QFileInfo(m_qFileOut).fileName());
     }
 }
 
@@ -457,7 +457,7 @@ void WriteToFile::splitRecordingFile()
     fiff_int_t first = 0;
     m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
 
-    m_lFileNames.append(m_qFileOut.fileName());
+    m_lFileNames.append(QFileInfo(m_qFileOut).fileName());
 }
 
 //=============================================================================================================
@@ -540,7 +540,8 @@ bool WriteToFile::renameRecording(const QString& sFileName)
     bool bRenameFile = false;
 
     if(m_lFileNames.size() == 1){
-        bRenameFile = renameSingleFile(m_qFileOut.fileName(), sFileName);
+
+        bRenameFile = renameSingleFile(QFileInfo(m_qFileOut).fileName(), sFileName);
     } else {
         bRenameFile = renameMultipleFiles(sFileName);
     }
@@ -563,7 +564,15 @@ bool WriteToFile::renameSingleFile(const QString& sCurrentFileName, const QStrin
         }
     }
 
-    return QFile(fileinfo.dir().absolutePath() + sCurrentFileName).rename(sNewFileName);
+    bool success = QFile(fileinfo.dir().absolutePath() + QString("/") + sCurrentFileName).rename(sNewFileName);
+
+    std::cout << "Attempting to rename: " << fileinfo.dir().absolutePath().toStdString() << "/" << sCurrentFileName.toStdString() << "\n";
+
+    std::cout << "to: " << sNewFileName.toStdString() << "\n";
+
+    std::cout << "renamed file? " << success << "\n";
+
+    return success;
 }
 
 //=============================================================================================================
