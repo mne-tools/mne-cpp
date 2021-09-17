@@ -56,9 +56,9 @@
 #endif
 
 namespace RTPROCESSINGLIB{
-    RTPROCESINGSHARED_EXPORT const char* BUILD_DATETIME();
-    RTPROCESINGSHARED_EXPORT const char* BUILD_HASH();
-    RTPROCESINGSHARED_EXPORT const char* BUILD_HASH_LONG();
+    RTPROCESINGSHARED_EXPORT const char* buildDateTime();
+    RTPROCESINGSHARED_EXPORT const char* buildHash();
+    RTPROCESINGSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // RTPROCESSING_GLOBAL_H

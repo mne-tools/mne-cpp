@@ -57,9 +57,9 @@
 #endif
 
 namespace MNELIB{
-    MNESHARED_EXPORT const char* BUILD_DATETIME();
-    MNESHARED_EXPORT const char* BUILD_HASH();
-    MNESHARED_EXPORT const char* BUILD_HASH_LONG();
+    MNESHARED_EXPORT const char* buildDateTime();
+    MNESHARED_EXPORT const char* buildHash();
+    MNESHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // MNE_GLOBAL_H

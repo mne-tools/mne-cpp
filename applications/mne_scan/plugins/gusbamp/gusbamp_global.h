@@ -59,9 +59,9 @@
 #endif
 
 namespace GUSBAMPPLUGIN{
-    GUSBAMPSHARED_EXPORT const char* BUILD_DATETIME();
-    GUSBAMPSHARED_EXPORT const char* BUILD_HASH();
-    GUSBAMPSHARED_EXPORT const char* BUILD_HASH_LONG();
+    GUSBAMPSHARED_EXPORT const char* buildDateTime();
+    GUSBAMPSHARED_EXPORT const char* buildHash();
+    GUSBAMPSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // GUSBAMP_GLOBAL_H

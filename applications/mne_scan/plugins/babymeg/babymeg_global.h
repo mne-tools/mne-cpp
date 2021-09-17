@@ -59,9 +59,9 @@
 #endif
 
 namespace BABYMEGPLUGIN{
-    BABYMEGSHARED_EXPORT const char* BUILD_DATETIME();
-    BABYMEGSHARED_EXPORT const char* BUILD_HASH();
-    BABYMEGSHARED_EXPORT const char* BUILD_HASH_LONG();
+    BABYMEGSHARED_EXPORT const char* buildDateTime();
+    BABYMEGSHARED_EXPORT const char* buildHash();
+    BABYMEGSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // BABYMEG_GLOBAL_H

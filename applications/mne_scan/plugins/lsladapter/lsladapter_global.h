@@ -61,9 +61,9 @@
 #endif
 
 namespace LSLADAPTERPLUGIN{
-    LSLADAPTERSHARED_EXPORT const char* BUILD_DATETIME();
-    LSLADAPTERSHARED_EXPORT const char* BUILD_HASH();
-    LSLADAPTERSHARED_EXPORT const char* BUILD_HASH_LONG();
+    LSLADAPTERSHARED_EXPORT const char* buildDateTime();
+    LSLADAPTERSHARED_EXPORT const char* buildHash();
+    LSLADAPTERSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // LSLADAPTER_GLOBAL_H

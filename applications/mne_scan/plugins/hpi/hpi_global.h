@@ -58,9 +58,9 @@
 #endif
 
 namespace HPIPLUGIN{
-    HPISHARED_EXPORT const char* BUILD_DATETIME();
-    HPISHARED_EXPORT const char* BUILD_HASH();
-    HPISHARED_EXPORT const char* BUILD_HASH_LONG();
+    HPISHARED_EXPORT const char* buildDateTime();
+    HPISHARED_EXPORT const char* buildHash();
+    HPISHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // WRITETOFILE_GLOBAL_H

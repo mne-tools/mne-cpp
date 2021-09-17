@@ -59,9 +59,9 @@
 #endif
 
 namespace UTILSLIB{
-    UTILSSHARED_EXPORT const char* BUILD_DATETIME();
-    UTILSSHARED_EXPORT const char* BUILD_HASH();
-    UTILSSHARED_EXPORT const char* BUILD_HASH_LONG();
+    UTILSSHARED_EXPORT const char* buildDateTime();
+    UTILSSHARED_EXPORT const char* buildHash();
+    UTILSSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // MNEUTILS_GLOBAL_H

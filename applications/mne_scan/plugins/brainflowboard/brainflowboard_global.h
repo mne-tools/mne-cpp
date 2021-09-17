@@ -58,9 +58,9 @@
 #endif
 
 namespace BRAINFLOWBOARDPLUGIN{
-    BRAINFLOWBOARD_EXPORT const char* BUILD_DATETIME();
-    BRAINFLOWBOARD_EXPORT const char* BUILD_HASH();
-    BRAINFLOWBOARD_EXPORT const char* BUILD_HASH_LONG();
+    BRAINFLOWBOARD_EXPORT const char* buildDateTime();
+    BRAINFLOWBOARD_EXPORT const char* buildHash();
+    BRAINFLOWBOARD_EXPORT const char* buildHashLong();
 }
 
 #endif // BRAINFLOWBOARD_GLOBAL_H

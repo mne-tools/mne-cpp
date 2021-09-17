@@ -55,9 +55,9 @@
 #endif
 
 namespace CONNECTIVITYLIB{
-    CONNECTIVITYSHARED_EXPORT const char* BUILD_DATETIME();
-    CONNECTIVITYSHARED_EXPORT const char* BUILD_HASH();
-    CONNECTIVITYSHARED_EXPORT const char* BUILD_HASH_LONG();
+    CONNECTIVITYSHARED_EXPORT const char* buildDateTime();
+    CONNECTIVITYSHARED_EXPORT const char* buildHash();
+    CONNECTIVITYSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // CONNECTIVITY_GLOBAL_H

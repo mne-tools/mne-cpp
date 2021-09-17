@@ -58,9 +58,9 @@
 #endif
 
 namespace FILTERINGPLUGIN{
-    FILTERINGSHARED_EXPORT const char* BUILD_DATETIME();
-    FILTERINGSHARED_EXPORT const char* BUILD_HASH();
-    FILTERINGSHARED_EXPORT const char* BUILD_HASH_LONG();
+    FILTERINGSHARED_EXPORT const char* buildDateTime();
+    FILTERINGSHARED_EXPORT const char* buildHash();
+    FILTERINGSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // FILTERING_GLOBAL_H

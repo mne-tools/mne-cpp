@@ -1,7 +1,7 @@
 #include "controlmanager_global.h"
 
-const char* CONTROLMANAGERPLUGIN::BUILD_DATETIME(){ return BUILDINFO::dateTime();};
+const char* CONTROLMANAGERPLUGIN::buildDateTime(){ return BUILDINFO::dateTime();};
 
-const char* CONTROLMANAGERPLUGIN::BUILD_HASH(){ return BUILDINFO::gitHash();};
+const char* CONTROLMANAGERPLUGIN::buildHash(){ return BUILDINFO::gitHash();};
 
-const char* CONTROLMANAGERPLUGIN::BUILD_HASH_LONG(){ return BUILDINFO::gitHashLong();};
+const char* CONTROLMANAGERPLUGIN::buildHashLong(){ return BUILDINFO::gitHashLong();};

@@ -59,9 +59,9 @@
 #endif
 
 namespace BRAINAMPPLUGIN{
-    BRAINAMPSHARED_EXPORT const char* BUILD_DATETIME();
-    BRAINAMPSHARED_EXPORT const char* BUILD_HASH();
-    BRAINAMPSHARED_EXPORT const char* BUILD_HASH_LONG();
+    BRAINAMPSHARED_EXPORT const char* buildDateTime();
+    BRAINAMPSHARED_EXPORT const char* buildHash();
+    BRAINAMPSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // BRAINAMP_GLOBAL_H

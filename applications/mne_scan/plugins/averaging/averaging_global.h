@@ -59,9 +59,9 @@
 #endif
 
 namespace AVERAGINGPLUGIN{
-    AVERAGINGSHARED_EXPORT const char* BUILD_DATETIME();
-    AVERAGINGSHARED_EXPORT const char* BUILD_HASH();
-    AVERAGINGSHARED_EXPORT const char* BUILD_HASH_LONG();
+    AVERAGINGSHARED_EXPORT const char* buildDateTime();
+    AVERAGINGSHARED_EXPORT const char* buildHash();
+    AVERAGINGSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // AVERAGING_GLOBAL_H

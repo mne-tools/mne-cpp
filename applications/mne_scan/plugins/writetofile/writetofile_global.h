@@ -58,9 +58,9 @@
 #endif
 
 namespace WRITETOFILEPLUGIN{
-    WRITETOFILESHARED_EXPORT const char* BUILD_DATETIME();
-    WRITETOFILESHARED_EXPORT const char* BUILD_HASH();
-    WRITETOFILESHARED_EXPORT const char* BUILD_HASH_LONG();
+    WRITETOFILESHARED_EXPORT const char* buildDateTime();
+    WRITETOFILESHARED_EXPORT const char* buildHash();
+    WRITETOFILESHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // WRITETOFILE_GLOBAL_H

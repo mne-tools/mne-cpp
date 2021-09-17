@@ -1,7 +1,7 @@
 #include "tmsi_global.h"
 
-const char* TMSIPLUGIN::BUILD_DATETIME(){ return BUILDINFO::dateTime();};
+const char* TMSIPLUGIN::buildDateTime(){ return BUILDINFO::dateTime();};
 
-const char* TMSIPLUGIN::BUILD_HASH(){ return BUILDINFO::gitHash();};
+const char* TMSIPLUGIN::buildHash(){ return BUILDINFO::gitHash();};
 
-const char* TMSIPLUGIN::BUILD_HASH_LONG(){ return BUILDINFO::gitHashLong();};
+const char* TMSIPLUGIN::buildHashLong(){ return BUILDINFO::gitHashLong();};

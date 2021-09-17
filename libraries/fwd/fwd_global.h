@@ -58,9 +58,9 @@
 #endif
 
 namespace FWDLIB{
-    FWDSHARED_EXPORT const char* BUILD_DATETIME();
-    FWDSHARED_EXPORT const char* BUILD_HASH();
-    FWDSHARED_EXPORT const char* BUILD_HASH_LONG();
+    FWDSHARED_EXPORT const char* buildDateTime();
+    FWDSHARED_EXPORT const char* buildHash();
+    FWDSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // FWD_GLOBAL_H

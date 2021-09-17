@@ -57,9 +57,9 @@
 #endif
 
 namespace FIFFLIB{
-    FIFFSHARED_EXPORT const char* BUILD_DATETIME();
-    FIFFSHARED_EXPORT const char* BUILD_HASH();
-    FIFFSHARED_EXPORT const char* BUILD_HASH_LONG();
+    FIFFSHARED_EXPORT const char* buildDateTime();
+    FIFFSHARED_EXPORT const char* buildHash();
+    FIFFSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // FIFF_GLOBAL_H

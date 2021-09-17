@@ -1,7 +1,7 @@
 #include "dataloader_global.h"
 
-const char* DATALOADERPLUGIN::BUILD_DATETIME(){ return BUILDINFO::dateTime();};
+const char* DATALOADERPLUGIN::buildDateTime(){ return BUILDINFO::dateTime();};
 
-const char* DATALOADERPLUGIN::BUILD_HASH(){ return BUILDINFO::gitHash();};
+const char* DATALOADERPLUGIN::buildHash(){ return BUILDINFO::gitHash();};
 
-const char* DATALOADERPLUGIN::BUILD_HASH_LONG(){ return BUILDINFO::gitHashLong();};
+const char* DATALOADERPLUGIN::buildHashLong(){ return BUILDINFO::gitHashLong();};

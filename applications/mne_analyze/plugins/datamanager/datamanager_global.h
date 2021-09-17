@@ -60,9 +60,9 @@
 #endif
 
 namespace DATAMANAGERPLUGIN{
-    DATAMANAGERSHARED_EXPORT const char* BUILD_DATETIME();
-    DATAMANAGERSHARED_EXPORT const char* BUILD_HASH();
-    DATAMANAGERSHARED_EXPORT const char* BUILD_HASH_LONG();
+    DATAMANAGERSHARED_EXPORT const char* buildDateTime();
+    DATAMANAGERSHARED_EXPORT const char* buildHash();
+    DATAMANAGERSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // DATAMANAGER_GLOBAL_H

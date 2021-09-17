@@ -59,9 +59,9 @@
 #endif
 
 namespace EEGOSPORTSPLUGIN{
-    EEGOSPORTSSHARED_EXPORT const char* BUILD_DATETIME();
-    EEGOSPORTSSHARED_EXPORT const char* BUILD_HASH();
-    EEGOSPORTSSHARED_EXPORT const char* BUILD_HASH_LONG();
+    EEGOSPORTSSHARED_EXPORT const char* buildDateTime();
+    EEGOSPORTSSHARED_EXPORT const char* buildHash();
+    EEGOSPORTSSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // EEGOSPORTS_GLOBAL_H
