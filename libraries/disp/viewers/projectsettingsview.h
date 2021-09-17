@@ -95,6 +95,11 @@ public:
 
     void triggerFileNameUpdate();
 
+    void hideFileNameUi();
+
+    void showFileNameUi();
+
+
     //=========================================================================================================
     /**
      * Saves all important settings of this view via QSettings.

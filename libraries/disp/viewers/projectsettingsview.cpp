@@ -526,3 +526,21 @@ void ProjectSettingsView::browseDirectories()
         updateFileName(true);
     }
 }
+
+//=============================================================================================================
+
+void ProjectSettingsView::hideFileNameUi()
+{
+    m_pUi->m_qLine->hide();
+    m_pUi->m_qLineEditFileName->hide();
+    m_pUi->m_qLabel->hide();
+}
+
+//=============================================================================================================
+
+void ProjectSettingsView::showFileNameUi()
+{
+    m_pUi->m_qLine->show();
+    m_pUi->m_qLineEditFileName->show();
+    m_pUi->m_qLabel->show();
+}
