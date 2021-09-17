@@ -559,8 +559,8 @@ void SettingsControllerCl::printHeaderIfVerbose()
     printIfVerbose("Build Date: " + m_sBuildDate);
     printIfVerbose("Build Hash: " + m_sBuildHash);
     printIfVerbose(" ");
-    printIfVerbose(QString("Utils Lib Build Date: ") + UTILSLIB::BUILD_DATETIME());
-    printIfVerbose(QString("Utils Lib Build Hash: ") + UTILSLIB::BUILD_HASH());
+    printIfVerbose(QString("Utils Lib Build Date: ") + UTILSLIB::buildDateTime());
+    printIfVerbose(QString("Utils Lib Build Hash: ") + UTILSLIB::buildHash());
     printIfVerbose(" ");
 }
 

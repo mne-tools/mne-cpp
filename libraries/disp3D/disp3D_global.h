@@ -56,9 +56,9 @@
 #endif
 
 namespace DISP3DLIB{
-    DISP3DLIB_DISP3D_GLOBAL_H const char* BUILD_DATETIME();
-    DISP3DLIB_DISP3D_GLOBAL_H const char* BUILD_HASH();
-    DISP3DLIB_DISP3D_GLOBAL_H const char* BUILD_HASH_LONG();
+    DISP3DLIB_DISP3D_GLOBAL_H const char* buildDateTime();
+    DISP3DLIB_DISP3D_GLOBAL_H const char* buildHash();
+    DISP3DLIB_DISP3D_GLOBAL_H const char* buildHashLong();
 }
 
 #endif // DISP3DLIB_GLOBAL_H

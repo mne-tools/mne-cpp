@@ -59,9 +59,9 @@
 #endif
 
 namespace DATALOADERPLUGIN{
-    DATALOADERSHARED_EXPORT const char* BUILD_DATETIME();
-    DATALOADERSHARED_EXPORT const char* BUILD_HASH();
-    DATALOADERSHARED_EXPORT const char* BUILD_HASH_LONG();
+    DATALOADERSHARED_EXPORT const char* buildDateTime();
+    DATALOADERSHARED_EXPORT const char* buildHash();
+    DATALOADERSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // DATALOADER_GLOBAL_H

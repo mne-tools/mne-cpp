@@ -1,7 +1,7 @@
 #include "inverse_global.h"
 
-const char* INVERSELIB::BUILD_DATETIME(){ return BUILDINFO::dateTime();};
+const char* INVERSELIB::buildDateTime(){ return BUILDINFO::dateTime();};
 
-const char* INVERSELIB::BUILD_HASH(){ return BUILDINFO::gitHash();};
+const char* INVERSELIB::buildHash(){ return BUILDINFO::gitHash();};
 
-const char* INVERSELIB::BUILD_HASH_LONG(){ return BUILDINFO::gitHashLong();};
+const char* INVERSELIB::buildHashLong(){ return BUILDINFO::gitHashLong();};

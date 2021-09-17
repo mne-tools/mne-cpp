@@ -1,7 +1,7 @@
 #include "neuronalconnectivity_global.h"
 
-const char* NEURONALCONNECTIVITYPLUGIN::BUILD_DATETIME(){ return BUILDINFO::dateTime();};
+const char* NEURONALCONNECTIVITYPLUGIN::buildDateTime(){ return BUILDINFO::dateTime();};
 
-const char* NEURONALCONNECTIVITYPLUGIN::BUILD_HASH(){ return BUILDINFO::gitHash();};
+const char* NEURONALCONNECTIVITYPLUGIN::buildHash(){ return BUILDINFO::gitHash();};
 
-const char* NEURONALCONNECTIVITYPLUGIN::BUILD_HASH_LONG(){ return BUILDINFO::gitHashLong();};
+const char* NEURONALCONNECTIVITYPLUGIN::buildHashLong(){ return BUILDINFO::gitHashLong();};

@@ -1,7 +1,7 @@
 #include "babymeg_global.h"
 
-const char* BABYMEGPLUGIN::BUILD_DATETIME(){ return BUILDINFO::dateTime();};
+const char* BABYMEGPLUGIN::buildDateTime(){ return BUILDINFO::dateTime();};
 
-const char* BABYMEGPLUGIN::BUILD_HASH(){ return BUILDINFO::gitHash();};
+const char* BABYMEGPLUGIN::buildHash(){ return BUILDINFO::gitHash();};
 
-const char* BABYMEGPLUGIN::BUILD_HASH_LONG(){ return BUILDINFO::gitHashLong();};
+const char* BABYMEGPLUGIN::buildHashLong(){ return BUILDINFO::gitHashLong();};

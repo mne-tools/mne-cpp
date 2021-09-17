@@ -59,9 +59,9 @@
 #endif
 
 namespace RTCMNEPLUGIN{
-    RTCMNESHARED_EXPORT const char* BUILD_DATETIME();
-    RTCMNESHARED_EXPORT const char* BUILD_HASH();
-    RTCMNESHARED_EXPORT const char* BUILD_HASH_LONG();
+    RTCMNESHARED_EXPORT const char* buildDateTime();
+    RTCMNESHARED_EXPORT const char* buildHash();
+    RTCMNESHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // RTCMNE_GLOBAL_H

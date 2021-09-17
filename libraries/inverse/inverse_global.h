@@ -57,9 +57,9 @@
 #endif
 
 namespace INVERSELIB{
-    INVERSESHARED_EXPORT const char* BUILD_DATETIME();
-    INVERSESHARED_EXPORT const char* BUILD_HASH();
-    INVERSESHARED_EXPORT const char* BUILD_HASH_LONG();
+    INVERSESHARED_EXPORT const char* buildDateTime();
+    INVERSESHARED_EXPORT const char* buildHash();
+    INVERSESHARED_EXPORT const char* buildHashLong();
 
 }
 

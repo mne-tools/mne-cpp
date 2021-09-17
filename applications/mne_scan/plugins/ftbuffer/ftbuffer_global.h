@@ -60,9 +60,9 @@
 #endif
 
 namespace FTBUFFERPLUGIN{
-    FTBUFFER_EXPORT const char* BUILD_DATETIME();
-    FTBUFFER_EXPORT const char* BUILD_HASH();
-    FTBUFFER_EXPORT const char* BUILD_HASH_LONG();
+    FTBUFFER_EXPORT const char* buildDateTime();
+    FTBUFFER_EXPORT const char* buildHash();
+    FTBUFFER_EXPORT const char* buildHashLong();
 }
 
 #endif // FTBUFFER_GLOBAL_H

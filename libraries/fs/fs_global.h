@@ -57,9 +57,9 @@
 #endif
 
 namespace FSLIB{
-    FSSHARED_EXPORT const char* BUILD_DATETIME();
-    FSSHARED_EXPORT const char* BUILD_HASH();
-    FSSHARED_EXPORT const char* BUILD_HASH_LONG();
+    FSSHARED_EXPORT const char* buildDateTime();
+    FSSHARED_EXPORT const char* buildHash();
+    FSSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // FS_GLOBAL_H

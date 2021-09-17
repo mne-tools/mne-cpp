@@ -1,7 +1,7 @@
 #include "coregistration_global.h"
 
-const char* COREGISTRATIONPLUGIN::BUILD_DATETIME(){ return BUILDINFO::dateTime();};
+const char* COREGISTRATIONPLUGIN::buildDateTime(){ return BUILDINFO::dateTime();};
 
-const char* COREGISTRATIONPLUGIN::BUILD_HASH(){ return BUILDINFO::gitHash();};
+const char* COREGISTRATIONPLUGIN::buildHash(){ return BUILDINFO::gitHash();};
 
-const char* COREGISTRATIONPLUGIN::BUILD_HASH_LONG(){ return BUILDINFO::gitHashLong();};
+const char* COREGISTRATIONPLUGIN::buildHashLong(){ return BUILDINFO::gitHashLong();};
