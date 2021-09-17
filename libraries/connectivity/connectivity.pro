@@ -145,3 +145,20 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
                 -lfftw3_threads \
     }
 }
+
+################################################## BUILD TIMESTAMP/HASH UPDATER ############################################
+
+FILETOUPDATE = connectivity_global.cpp
+
+ALLFILES += $$HEADERS
+ALLFILES += $$SOURCES
+ALLFILES -= $$FILETOUPDATE
+FileUpdater.target = phonyFileUpdater
+FileUpdater.commands = touch $$PWD/$$FILETOUPDATE ; echo PASTA > phonyFileUpdater
+FileUpdater.depends +=
+for (IFILE, ALLFILES) {
+    FileUpdater.depends += $$PWD/$$IFILE
+}
+PRE_TARGETDEPS += phonyFileUpdater
+QMAKE_EXTRA_TARGETS += FileUpdater
+
