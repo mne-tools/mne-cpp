@@ -158,7 +158,12 @@ ALLFILES += $$HEADERS
 ALLFILES += $$SOURCES
 ALLFILES -= $$FILETOUPDATE
 FileUpdater.target = phonyFileUpdater
-FileUpdater.commands = touch $$PWD/$$FILETOUPDATE ; echo PASTA > phonyFileUpdater
+unix|macx {
+    FileUpdater.commands = touch $$PWD/$$FILETOUPDATE ; echo PASTA > phonyFileUpdater
+}
+win32 {
+    FileUpdater.commands = copy $$PWD/$$FILETOUPDATE +,, & echo PASTA > phonyFileUpdater
+}
 FileUpdater.depends +=
 for (IFILE, ALLFILES) {
     FileUpdater.depends += $$PWD/$$IFILE
