@@ -1,7 +1,8 @@
 //=============================================================================================================
 /**
  * @file     fwd_global.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ * @author   Juan GP <jgarciaprieto@mgh.harvard.edu>;
+ *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
@@ -57,8 +58,9 @@
 #endif
 
 namespace FWDLIB{
-    FWDSHARED_EXPORT const char* BUILD_TIME();
-    FWDSHARED_EXPORT const char* BUILD_DATE();
+    FWDSHARED_EXPORT const char* BUILD_DATETIME();
+    FWDSHARED_EXPORT const char* BUILD_HASH();
+    FWDSHARED_EXPORT const char* BUILD_HASH_LONG();
 }
 
 #endif // FWD_GLOBAL_H
