@@ -553,22 +553,33 @@ bool WriteToFile::renameRecording(const QString& sFileName)
 
 bool WriteToFile::renameSingleFile(const QString& sCurrentFileName, const QString& sNewFileName)
 {
+    QString sFullNewName;
+
+    if(sNewFileName.endsWith(".fif")){
+        sFullNewName = sNewFileName;
+    } else {
+        sFullNewName = sNewFileName + ".fif";
+    }
+
     QFileInfo fileinfo(m_qFileOut);
-    QFileInfo existingFile(fileinfo.dir().absolutePath() + sNewFileName);
+    QFileInfo existingFile(fileinfo.dir().absolutePath() + QString("/") + sFullNewName);
 
     if(existingFile.exists()){
+        std::cout << "should be a pop up\n";
         int ret = popUpYesNo("A file with this name already exists.",
                              "Do you want to overwrite this file?");
         if(ret == QMessageBox::No) {
             return false;
+        } else {
+            QFile(fileinfo.dir().absolutePath() + QString("/") + sFullNewName).remove();
         }
     }
 
-    bool success = QFile(fileinfo.dir().absolutePath() + QString("/") + sCurrentFileName).rename(sNewFileName);
+    bool success = QFile(fileinfo.dir().absolutePath() + QString("/") + sCurrentFileName).rename(fileinfo.dir().absolutePath() + QString("/") + sFullNewName);
 
     std::cout << "Attempting to rename: " << fileinfo.dir().absolutePath().toStdString() << "/" << sCurrentFileName.toStdString() << "\n";
 
-    std::cout << "to: " << sNewFileName.toStdString() << "\n";
+    std::cout << "to: " << sFullNewName.toStdString() << "\n";
 
     std::cout << "renamed file? " << success << "\n";
 
@@ -594,7 +605,7 @@ bool WriteToFile::renameMultipleFiles(const QString& sFileName)
 void WriteToFile::deleteRecording()
 {
     for (QString& sFileName : m_lFileNames){
-        QFile(QFileInfo(m_qFileOut).dir().absolutePath() + sFileName).remove();
+        QFile(QFileInfo(m_qFileOut).dir().absolutePath() + QString("/") + sFileName).remove();
     }
 }
 
@@ -618,7 +629,8 @@ int WriteToFile::popUpYesNo(const QString& sText,
     msgBox.setInformativeText(sInfoText);
     msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
     msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
-    return msgBox.exec();
+    auto ret = msgBox.exec();
+    return ret;
 }
 
 //=============================================================================================================
