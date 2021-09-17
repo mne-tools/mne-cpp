@@ -327,7 +327,7 @@ void RawDataViewer::onNewRealtimeData()
 
 //=============================================================================================================
 
-QString RawDataViewer::getBuildDateTime()
+QString RawDataViewer::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(RAWDATAVIEWERPLUGIN::buildDateTime()) + QString(" - ")  + QString(RAWDATAVIEWERPLUGIN::buildHash());
 }

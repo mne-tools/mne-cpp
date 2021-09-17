@@ -405,7 +405,7 @@ void LSLAdapter::onBlockSizeChanged(const int newBlockSize)
 
 //=============================================================================================================
 
-QString LSLAdapter::getBuildDateTime()
+QString LSLAdapter::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(LSLADAPTERPLUGIN::buildDateTime()) + QString(" - ")  + QString(LSLADAPTERPLUGIN::buildHash());
 }

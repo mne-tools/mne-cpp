@@ -282,7 +282,7 @@ void ChannelSelection::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel>
 
 //=============================================================================================================
 
-QString ChannelSelection::getBuildDateTime()
+QString ChannelSelection::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(CHANNELSELECTIONPLUGIN::buildDateTime()) + QString(" - ")  + QString(CHANNELSELECTIONPLUGIN::buildHash());
 }

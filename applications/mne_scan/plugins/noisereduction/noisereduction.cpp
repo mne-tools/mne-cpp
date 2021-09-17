@@ -716,7 +716,7 @@ void NoiseReduction::createSpharaOperator()
 
 //=============================================================================================================
 
-QString NoiseReduction::getBuildDateTime()
+QString NoiseReduction::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(NOISEREDUCTIONPLUGIN::buildDateTime()) + QString(" - ")  + QString(NOISEREDUCTIONPLUGIN::buildHash());
 }

@@ -663,7 +663,7 @@ void TMSI::showSetupProjectDialog()
 
 //=============================================================================================================
 
-QString TMSI::getBuildDateTime()
+QString TMSI::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(TMSIPLUGIN::buildDateTime()) + QString(" - ")  + QString(TMSIPLUGIN::buildHash());
 }

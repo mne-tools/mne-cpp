@@ -142,7 +142,7 @@ QVector<EVENT_TYPE> SourceLocalization::getEventSubscriptions(void) const
 
 //=============================================================================================================
 
-QString SourceLocalization::getBuildDateTime()
+QString SourceLocalization::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(SOURCELOCALIZATIONPLUGIN::buildDateTime()) + QString(" - ")  + QString(SOURCELOCALIZATIONPLUGIN::buildHash());
 }

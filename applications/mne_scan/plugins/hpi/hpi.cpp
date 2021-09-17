@@ -666,7 +666,7 @@ void Hpi::run()
 
 //=============================================================================================================
 
-QString Hpi::getBuildDateTime()
+QString Hpi::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(HPIPLUGIN::buildDateTime()) + QString(" - ")  + QString(HPIPLUGIN::buildHash());
 }

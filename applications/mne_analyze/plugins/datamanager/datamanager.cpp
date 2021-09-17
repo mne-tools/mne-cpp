@@ -185,7 +185,7 @@ void DataManager::onCurrentItemChanged(const QModelIndex &pIndex)
 
 //=============================================================================================================
 
-QString DataManager::getBuildDateTime()
+QString DataManager::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(DATAMANAGERPLUGIN::buildDateTime()) + QString(" - ")  + QString(DATAMANAGERPLUGIN::buildHash());
 }

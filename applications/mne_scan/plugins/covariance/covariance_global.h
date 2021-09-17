@@ -59,8 +59,9 @@
 #endif
 
 namespace COVARIANCEPLUGIN{
-    COVARIANCESHARED_EXPORT const char* BUILD_TIME();
-    COVARIANCESHARED_EXPORT const char* BUILD_DATE();
+    COVARIANCESHARED_EXPORT const char* buildDateTime();
+    COVARIANCESHARED_EXPORT const char* buildHash();
+    COVARIANCESHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // COVARIANCE_GLOBAL_H

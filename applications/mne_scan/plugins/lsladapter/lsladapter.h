@@ -133,7 +133,7 @@ public:
 
     virtual inline QString getName() const;
 
-    virtual QString getBuildDateTime();
+    virtual QString getBuildInfo();
 
 public slots:
     //=========================================================================================================

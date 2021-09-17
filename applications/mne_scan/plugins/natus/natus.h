@@ -150,7 +150,7 @@ public:
     virtual AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
-    virtual QString getBuildDateTime();
+    virtual QString getBuildInfo();
 
 protected:
     //=========================================================================================================

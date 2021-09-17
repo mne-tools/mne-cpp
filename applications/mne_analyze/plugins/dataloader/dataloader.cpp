@@ -498,7 +498,7 @@ void DataLoader::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewM
 
 //=============================================================================================================
 
-QString DataLoader::getBuildDateTime()
+QString DataLoader::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(DATALOADERPLUGIN::buildDateTime()) + QString(" - ")  + QString(DATALOADERPLUGIN::buildHash());
 }

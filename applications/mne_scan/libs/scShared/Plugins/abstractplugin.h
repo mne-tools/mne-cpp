@@ -189,7 +189,7 @@ public:
      *
      * @return build date and time
      */
-    virtual QString getBuildDateTime() = 0;
+    virtual QString getBuildInfo() = 0;
 
     inline InputConnectorList& getInputConnectors(){return m_inputConnectors;}
     inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
