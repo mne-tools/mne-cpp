@@ -58,8 +58,9 @@
 #endif
 
 namespace RTFWDPLUGIN{
-    RTFWDSHARED_EXPORT const char* BUILD_TIME();
-    RTFWDSHARED_EXPORT const char* BUILD_DATE();
+    RTFWDSHARED_EXPORT const char* BUILD_DATETIME();
+    RTFWDSHARED_EXPORT const char* BUILD_HASH();
+    RTFWDSHARED_EXPORT const char* BUILD_HASH_LONG();
 }
 
 #endif // RTFWD_GLOBAL_H
