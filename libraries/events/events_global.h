@@ -47,8 +47,9 @@
 #endif
 
 namespace EVENTSLIB{
-    EVENTS_EXPORT const char* BUILD_TIME();
-    EVENTS_EXPORT const char* BUILD_DATE();
+    EVENTS_EXPORT const char* BUILD_DATETIME();
+    EVENTS_EXPORT const char* BUILD_HASH();
+    EVENTS_EXPORT const char* BUILD_HASH_LONG();
 }
 
 #endif // EVENTS_GLOBAL_H

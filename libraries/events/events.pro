@@ -60,3 +60,20 @@ win32:!contains(MNECPP_CONFIG, static) {
 macx {
     QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
 }
+
+################################################## BUILD TIMESTAMP/HASH UPDATER ############################################
+
+FILETOUPDATE = events_global.cpp
+
+ALLFILES += $$HEADERS
+ALLFILES += $$SOURCES
+ALLFILES -= $$FILETOUPDATE
+FileUpdater.target = phonyFileUpdater
+FileUpdater.commands = touch $$PWD/$$FILETOUPDATE ; echo PASTA > phonyFileUpdater
+FileUpdater.depends +=
+for (IFILE, ALLFILES) {
+    FileUpdater.depends += $$PWD/$$IFILE
+}
+PRE_TARGETDEPS += phonyFileUpdater
+QMAKE_EXTRA_TARGETS += FileUpdater
+
