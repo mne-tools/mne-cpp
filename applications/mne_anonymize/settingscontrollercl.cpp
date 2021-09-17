@@ -44,6 +44,7 @@
 #include "fiffanonymizer.h"
 #include "utils/buildinfo.h"
 #include "utils/utils_global.h"
+#include "fiff/fiff_global.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -561,6 +562,9 @@ void SettingsControllerCl::printHeaderIfVerbose()
     printIfVerbose(" ");
     printIfVerbose(QString("Utils Lib Build Date: ") + UTILSLIB::buildDateTime());
     printIfVerbose(QString("Utils Lib Build Hash: ") + UTILSLIB::buildHash());
+    printIfVerbose(" ");
+    printIfVerbose(QString("Fiff Lib Build Date: ") + FIFFLIB::buildDateTime());
+    printIfVerbose(QString("Fiff Lib Build Hash: ") + FIFFLIB::buildHash());
     printIfVerbose(" ");
 }
 
