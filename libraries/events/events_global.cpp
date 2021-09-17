@@ -1,5 +1,7 @@
 #include "events_global.h"
 
-const char* EVENTSLIB::BUILD_TIME(){ return BUILDINFO::time();};
+const char* EVENTSLIB::BUILD_DATETIME(){ return BUILDINFO::dateTime();};
 
-const char* EVENTSLIB::BUILD_DATE(){ return BUILDINFO::date();};
+const char* EVENTSLIB::BUILD_HASH(){ return BUILDINFO::gitHash();};
+
+const char* EVENTSLIB::BUILD_HASH_LONG(){ return BUILDINFO::gitHashLong();};
