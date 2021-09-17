@@ -171,7 +171,7 @@ public:
      *
      * @return build date and time
      */
-    virtual QString getBuildDateTime() = 0;
+    virtual QString getBuildInfo() = 0;
 
     //=========================================================================================================
     /**

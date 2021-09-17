@@ -183,7 +183,7 @@ public:
      */
     void splitRecordingFile();
 
-    virtual QString getBuildDateTime();
+    virtual QString getBuildInfo();
 
 protected:
     //=========================================================================================================

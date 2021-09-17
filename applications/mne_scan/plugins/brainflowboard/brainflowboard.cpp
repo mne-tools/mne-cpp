@@ -455,7 +455,7 @@ void BrainFlowBoard::releaseSession(bool useQmessage)
 
 //=============================================================================================================
 
-QString BrainFlowBoard::getBuildDateTime()
+QString BrainFlowBoard::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(BRAINFLOWBOARDPLUGIN::buildDateTime()) + QString(" - ")  + QString(BRAINFLOWBOARDPLUGIN::buildHash());
 }

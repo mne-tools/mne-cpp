@@ -721,7 +721,7 @@ void EEGoSports::run()
 
 //=============================================================================================================
 
-QString EEGoSports::getBuildDateTime()
+QString EEGoSports::getBuildInfo()
 {
-    return QString(BUILDTIMESTAMP().date()) + " " + QString(BUILDTIMESTAMP().time());
+    return QString(EEGOSPORTSPLUGIN::buildDateTime()) + QString(" - ")  + QString(EEGOSPORTSPLUGIN::buildHash());
 }

@@ -618,7 +618,7 @@ void NeuronalConnectivity::onFrequencyBandChanged(float fFreqLow, float fFreqHig
 
 //=============================================================================================================
 
-QString NeuronalConnectivity::getBuildDateTime()
+QString NeuronalConnectivity::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(NEURONALCONNECTIVITYPLUGIN::buildDateTime()) + QString(" - ")  + QString(NEURONALCONNECTIVITYPLUGIN::buildHash());
 }
