@@ -565,7 +565,6 @@ bool WriteToFile::renameSingleFile(const QString& sCurrentFileName, const QStrin
     QFileInfo existingFile(fileinfo.dir().absolutePath() + QString("/") + sFullNewName);
 
     if(existingFile.exists()){
-        std::cout << "should be a pop up\n";
         int ret = popUpYesNo("A file with this name already exists.",
                              "Do you want to overwrite this file?");
         if(ret == QMessageBox::No) {
@@ -576,12 +575,6 @@ bool WriteToFile::renameSingleFile(const QString& sCurrentFileName, const QStrin
     }
 
     bool success = QFile(fileinfo.dir().absolutePath() + QString("/") + sCurrentFileName).rename(fileinfo.dir().absolutePath() + QString("/") + sFullNewName);
-
-    std::cout << "Attempting to rename: " << fileinfo.dir().absolutePath().toStdString() << "/" << sCurrentFileName.toStdString() << "\n";
-
-    std::cout << "to: " << sFullNewName.toStdString() << "\n";
-
-    std::cout << "renamed file? " << success << "\n";
 
     return success;
 }

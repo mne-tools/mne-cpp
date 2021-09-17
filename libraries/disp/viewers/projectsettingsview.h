@@ -89,14 +89,38 @@ public:
                                  QWidget *parent = 0);
     ~ProjectSettingsView();
 
+    //=========================================================================================================
+    /**
+     * Sets elapsed time to input parameter
+     *
+     * @param[in] mSecsElapsed      elapsed tim in milliseconds
+     */
     void setRecordingElapsedTime(int mSecsElapsed);
 
+    //=========================================================================================================
+    /**
+     * Updates and gets current file name based on project and subject.
+     *
+     * @return file name
+     */
     QString getCurrentFileName();
 
+    //=========================================================================================================
+    /**
+     * Updates file name based on current project and subject.
+     */
     void triggerFileNameUpdate();
 
+    //=========================================================================================================
+    /**
+     * Hides file name ui elements.
+     */
     void hideFileNameUi();
 
+    //=========================================================================================================
+    /**
+     * Shows file name ui elements.
+     */
     void showFileNameUi();
 
 
