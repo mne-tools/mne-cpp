@@ -56,8 +56,9 @@
 #endif
 
 namespace DISPLIB{
-    DISPSHARED_EXPORT const char* BUILD_TIME();
-    DISPSHARED_EXPORT const char* BUILD_DATE();
+    DISPSHARED_EXPORT const char* BUILD_DATETIME();
+    DISPSHARED_EXPORT const char* BUILD_HASH();
+    DISPSHARED_EXPORT const char* BUILD_HASH_LONG();
 }
 
 #endif // DISP_GLOBAL_H
