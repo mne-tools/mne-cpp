@@ -58,8 +58,9 @@
 #endif
 
 namespace NATUSPLUGIN{
-    NATUSSHARED_EXPORT const char* BUILD_TIME();
-    NATUSSHARED_EXPORT const char* BUILD_DATE();
+    NATUSSHARED_EXPORT const char* BUILD_DATETIME();
+    NATUSSHARED_EXPORT const char* BUILD_HASH();
+    NATUSSHARED_EXPORT const char* BUILD_HASH_LONG();
 }
 
 #endif // NATUS_GLOBAL_H

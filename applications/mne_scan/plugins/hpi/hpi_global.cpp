@@ -1,6 +1,7 @@
 #include "hpi_global.h"
 
-const char* HPIPLUGIN::BUILD_TIME(){ return BUILDINFO::time();};
+const char* HPIPLUGIN::BUILD_DATETIME(){ return BUILDINFO::dateTime();};
 
-const char* HPIPLUGIN::BUILD_DATE(){ return BUILDINFO::date();};
+const char* HPIPLUGIN::BUILD_HASH(){ return BUILDINFO::gitHash();};
 
+const char* HPIPLUGIN::BUILD_HASH_LONG(){ return BUILDINFO::gitHashLong();};

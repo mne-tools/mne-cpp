@@ -139,3 +139,20 @@ first.depends = $(first) copydata
 export(first.depends)
 export(copydata.commands)
 QMAKE_EXTRA_TARGETS += first copydata
+
+################################################## BUILD TIMESTAMP/HASH UPDATER ############################################
+
+FILETOUPDATE = hpi_global.cpp
+
+ALLFILES += $$HEADERS
+ALLFILES += $$SOURCES
+ALLFILES -= $$FILETOUPDATE
+FileUpdater.target = phonyFileUpdater
+FileUpdater.commands = touch $$PWD/$$FILETOUPDATE ; echo PASTA > phonyFileUpdater
+FileUpdater.depends +=
+for (IFILE, ALLFILES) {
+    FileUpdater.depends += $$PWD/$$IFILE
+}
+PRE_TARGETDEPS += phonyFileUpdater
+QMAKE_EXTRA_TARGETS += FileUpdater
+
