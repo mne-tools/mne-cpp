@@ -319,7 +319,7 @@ bool GUSBAmp::dirExists(const std::string& dirName_in)
 
 //=============================================================================================================
 
-QString GUSBAmp::getBuildDateTime()
+QString GUSBAmp::getBuildInfo()
 {
-    return QString(BUILDTIMESTAMP().date()) + " " + QString(BUILDTIMESTAMP().time());
+    return QString(GUSBAMPPLUGIN::buildDateTime()) + QString(" - ")  + QString(GUSBAMPPLUGIN::buildHash());
 }

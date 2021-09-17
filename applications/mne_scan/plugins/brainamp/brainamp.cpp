@@ -404,7 +404,7 @@ void BrainAMP::showSetupProjectDialog()
 
 //=============================================================================================================
 
-QString BrainAMP::getBuildDateTime()
+QString BrainAMP::getBuildInfo()
 {
-    return QString(BUILDTIMESTAMP().date()) + " " + QString(BUILDTIMESTAMP().time());
+    return QString(BRAINAMPPLUGIN::buildDateTime()) + QString(" - ")  + QString(BRAINAMPPLUGIN::buildHash());
 }

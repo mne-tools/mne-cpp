@@ -527,7 +527,7 @@ void RtFwd::run()
 
 //=============================================================================================================
 
-QString RtFwd::getBuildDateTime()
+QString RtFwd::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(RTFWDPLUGIN::buildDateTime()) + QString(" - ")  + QString(RTFWDPLUGIN::buildHash());
 }

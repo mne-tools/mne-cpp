@@ -733,7 +733,7 @@ void Averaging::updateEvokedSetModel()
 
 //=============================================================================================================
 
-QString Averaging::getBuildDateTime()
+QString Averaging::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(AVERAGINGPLUGIN::buildDateTime()) + QString(" - ")  + QString(AVERAGINGPLUGIN::buildHash());
 }

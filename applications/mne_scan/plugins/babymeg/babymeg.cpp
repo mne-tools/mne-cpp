@@ -604,7 +604,7 @@ bool BabyMEG::readBadChannels()
 
 //=============================================================================================================
 
-QString BabyMEG::getBuildDateTime()
+QString BabyMEG::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(BABYMEGPLUGIN::buildDateTime()) + QString(" - ")  + QString(BABYMEGPLUGIN::buildHash());
 }

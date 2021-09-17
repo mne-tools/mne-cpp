@@ -355,7 +355,7 @@ void FiffSimulator::requestInfo()
 
 //=============================================================================================================
 
-QString FiffSimulator::getBuildDateTime()
+QString FiffSimulator::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(FIFFSIMULATORPLUGIN::buildDateTime()) + QString(" - ")  + QString(FIFFSIMULATORPLUGIN::buildHash());
 }

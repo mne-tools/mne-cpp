@@ -400,7 +400,7 @@ void ControlManager::onTakeScreenshotChanged()
 
 //=============================================================================================================
 
-QString ControlManager::getBuildDateTime()
+QString ControlManager::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(CONTROLMANAGERPLUGIN::buildDateTime()) + QString(" - ")  + QString(CONTROLMANAGERPLUGIN::buildHash());
 }

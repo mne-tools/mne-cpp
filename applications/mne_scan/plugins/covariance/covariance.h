@@ -148,7 +148,7 @@ public:
 
     void changeSamples(qint32 samples);
 
-    virtual QString getBuildDateTime();
+    virtual QString getBuildInfo();
 
 protected:
     virtual void run();

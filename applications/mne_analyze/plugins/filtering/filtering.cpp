@@ -214,7 +214,7 @@ void Filtering::setFilterActive(bool state)
 
 //=============================================================================================================
 
-QString Filtering::getBuildDateTime()
+QString Filtering::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(FILTERINGPLUGIN::buildDateTime()) + QString(" - ")  + QString(FILTERINGPLUGIN::buildHash());
 }

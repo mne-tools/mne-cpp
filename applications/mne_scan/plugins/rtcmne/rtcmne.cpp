@@ -671,7 +671,7 @@ void RtcMne::run()
 
 //=============================================================================================================
 
-QString RtcMne::getBuildDateTime()
+QString RtcMne::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(RTCMNEPLUGIN::buildDateTime()) + QString(" - ")  + QString(RTCMNEPLUGIN::buildHash());
 }

@@ -550,7 +550,7 @@ void DipoleFit::triggerLoadingEnd(QString sMessage)
 
 //=============================================================================================================
 
-QString DipoleFit::getBuildDateTime()
+QString DipoleFit::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(DIPOLEFITPLUGIN::buildDateTime()) + QString(" - ")  + QString(DIPOLEFITPLUGIN::buildHash());
 }

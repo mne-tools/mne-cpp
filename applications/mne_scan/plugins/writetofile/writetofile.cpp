@@ -508,9 +508,9 @@ bool WriteToFile::isContinuous()
 
 //=============================================================================================================
 
-QString WriteToFile::getBuildDateTime()
+QString WriteToFile::getBuildInfo()
 {
-    return QString(BUILDINFO::dateTime());
+    return QString(WRITETOFILEPLUGIN::buildDateTime()) + QString(" - ")  + QString(WRITETOFILEPLUGIN::buildHash());
 }
 
 //=============================================================================================================
