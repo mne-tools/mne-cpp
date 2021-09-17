@@ -59,9 +59,9 @@
 #endif
 
 namespace TMSIPLUGIN{
-    TMSISHARED_EXPORT const char* BUILD_DATETIME();
-    TMSISHARED_EXPORT const char* BUILD_HASH();
-    TMSISHARED_EXPORT const char* BUILD_HASH_LONG();
+    TMSISHARED_EXPORT const char* buildDateTime();
+    TMSISHARED_EXPORT const char* buildHash();
+    TMSISHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // TMSI_GLOBAL_H

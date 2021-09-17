@@ -1,7 +1,7 @@
 #include "lsladapter_global.h"
 
-const char* LSLADAPTERPLUGIN::BUILD_DATETIME(){ return BUILDINFO::dateTime();};
+const char* LSLADAPTERPLUGIN::buildDateTime(){ return BUILDINFO::dateTime();};
 
-const char* LSLADAPTERPLUGIN::BUILD_HASH(){ return BUILDINFO::gitHash();};
+const char* LSLADAPTERPLUGIN::buildHash(){ return BUILDINFO::gitHash();};
 
-const char* LSLADAPTERPLUGIN::BUILD_HASH_LONG(){ return BUILDINFO::gitHashLong();};
+const char* LSLADAPTERPLUGIN::buildHashLong(){ return BUILDINFO::gitHashLong();};

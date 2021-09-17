@@ -58,9 +58,9 @@
 #endif
 
 namespace DIPOLEFITPLUGIN{
-    DIPOLEFITSHARED_EXPORT const char* BUILD_DATETIME();
-    DIPOLEFITSHARED_EXPORT const char* BUILD_HASH();
-    DIPOLEFITSHARED_EXPORT const char* BUILD_HASH_LONG();
+    DIPOLEFITSHARED_EXPORT const char* buildDateTime();
+    DIPOLEFITSHARED_EXPORT const char* buildHash();
+    DIPOLEFITSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // DIPOLEFIT_GLOBAL_H

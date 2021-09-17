@@ -1,9 +1,9 @@
 #include "ftbuffer_global.h"
 
-const char* FTBUFFERPLUGIN::BUILD_DATETIME(){ return BUILDINFO::dateTime();};
+const char* FTBUFFERPLUGIN::buildDateTime(){ return BUILDINFO::dateTime();};
 
-const char* FTBUFFERPLUGIN::BUILD_HASH(){ return BUILDINFO::gitHash();};
+const char* FTBUFFERPLUGIN::buildHash(){ return BUILDINFO::gitHash();};
 
-const char* FTBUFFERPLUGIN::BUILD_HASH_LONG(){ return BUILDINFO::gitHashLong();};
+const char* FTBUFFERPLUGIN::buildHashLong(){ return BUILDINFO::gitHashLong();};
 
 

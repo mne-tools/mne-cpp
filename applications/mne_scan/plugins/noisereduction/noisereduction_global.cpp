@@ -1,7 +1,7 @@
 #include "noisereduction_global.h"
 
-const char* NOISEREDUCTIONPLUGIN::BUILD_DATETIME(){ return BUILDINFO::dateTime();};
+const char* NOISEREDUCTIONPLUGIN::buildDateTime(){ return BUILDINFO::dateTime();};
 
-const char* NOISEREDUCTIONPLUGIN::BUILD_HASH(){ return BUILDINFO::gitHash();};
+const char* NOISEREDUCTIONPLUGIN::buildHash(){ return BUILDINFO::gitHash();};
 
-const char* NOISEREDUCTIONPLUGIN::BUILD_HASH_LONG(){ return BUILDINFO::gitHashLong();};
+const char* NOISEREDUCTIONPLUGIN::buildHashLong(){ return BUILDINFO::gitHashLong();};
