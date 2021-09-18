@@ -307,7 +307,7 @@ unix|macx {
 }
 
 win32 {
-    FileUpdater.commands = copy /y $$shell_path($${PWD})\$${FILE_TO_UPDATE} +,, $$shell_path($${PWD})\$${FILE_TO_UPDATE} & echo PASTA > phonyFileUpdater
+    FileUpdater.commands = copy /y $$shell_path($${PWD})\\$${FILE_TO_UPDATE} +,, $$shell_path($${PWD})\\$${FILE_TO_UPDATE} & echo PASTA > phonyFileUpdater
     OrderForcerTarget.target = $${OBJ_TARJET}
     OrderForcerTarget.depends += phonyFileUpdater
     QMAKE_EXTRA_TARGETS += OrderForcerTarget
