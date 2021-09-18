@@ -130,21 +130,34 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
 
 ################################################## BUILD TIMESTAMP/HASH UPDATER ############################################
 
-FILETOUPDATE = natus_global.cpp
-
-ALLFILES += $$HEADERS
-ALLFILES += $$SOURCES
-ALLFILES -= $$FILETOUPDATE
-FileUpdater.target = phonyFileUpdater
-unix|macx {
-    FileUpdater.commands = touch $$PWD/$$FILETOUPDATE ; echo PASTA > phonyFileUpdater
-}
+FILE_TO_UPDATE = natus_global.cpp
 win32 {
-    FileUpdater.commands = copy $$PWD/$$FILETOUPDATE +,, & echo PASTA > phonyFileUpdater
+    CONFIG(debug, debug|release) {
+        OBJ_TARJET = debug\natus_global.obj
+    } else {
+        OBJ_TARJET = release\natus_global.obj
+    }
 }
-for (IFILE, ALLFILES) {
-    FileUpdater.depends += $$PWD/$$IFILE
-}
-PRE_TARGETDEPS += phonyFileUpdater
-QMAKE_EXTRA_TARGETS += FileUpdater
 
+ALL_FILES += $HEADERS
+ALL_FILES += $SOURCES
+ALL_FILES -= $FILE_TO_UPDATE
+
+FileUpdater.target = phonyFileUpdater
+for (I_FILE, ALL_FILES) {
+    FileUpdater.depends += ${PWD}/${I_FILE}
+}
+
+unix|macx {
+    FileUpdater.commands = touch ${PWD}/${FILE_TO_UPDATE} ; echo PASTA > phonyFileUpdater
+}
+
+win32 {
+    FileUpdater.commands = copy /y $shell_path(${PWD})\${FILE_TO_UPDATE} +,, $shell_path(${PWD})\${FILE_TO_UPDATE} & echo PASTA > phonyFileUpdater
+    OrderForcerTarget.target = ${OBJ_TARJET}
+    OrderForcerTarget.depends += phonyFileUpdater
+    QMAKE_EXTRA_TARGETS += OrderForcerTarget
+}
+
+PRE_TARGETDEPS += phonyFileUpdater
+QMAKE_EXTRA_TARGETS += FileUpdate
