@@ -136,24 +136,32 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
 
 ################################################## BUILD TIMESTAMP/HASH UPDATER ############################################
 
-FILETOUPDATE = utils_global.cpp
+FILE_TO_UPDATE = utils_global.cpp
+CONFIG(debug, debug|release) {
+    OBJ_TARJET = debug\utils_global.obj
+} else {
+    OBJ_TARJET = release\utils_global.obj
+}
 
-ALLFILES += $$HEADERS
-ALLFILES += $$SOURCES
-ALLFILES -= $$FILETOUPDATE
+ALL_FILES += $$HEADERS
+ALL_FILES += $$SOURCES
+ALL_FILES -= $$FILE_TO_UPDATE
+
 FileUpdater.target = phonyFileUpdater
+for (IFILE, ALL_FILES) {
+    FileUpdater.depends += $${PWD}/$${IFILE}
+}
+
 unix|macx {
-    FileUpdater.commands = touch $$PWD/$$FILETOUPDATE ; echo PASTA > phonyFileUpdater
+    FileUpdater.commands = touch $${PWD}/$${FILE_TO_UPDATE} ; echo PASTA > phonyFileUpdater
 }
+
 win32 {
-    FileUpdater.commands = copy $$PWD/$$FILETOUPDATE +,, & echo PASTA > phonyFileUpdater
+    FileUpdater.commands = copy /y $$shell_path($${PWD})\\$${FILE_TO_UPDATE} +,, $$shell_path($${PWD})\\$${FILE_TO_UPDATE} & echo PASTA > phonyFileUpdater
+    ORDERING_TARGET.target = $${OBJ_TARJET}
+    ORDERING_TARGET.depends += phonyFileUpdater
 }
-FileUpdater.depends +=
-for (IFILE, ALLFILES) {
-    FileUpdater.depends += $$PWD/$$IFILE
-}
+
 PRE_TARGETDEPS += phonyFileUpdater
-QMAKE_EXTRA_TARGETS += FileUpdater
-
-
+QMAKE_EXTRA_TARGETS += FileUpdater ORDERING_TARGET
 
