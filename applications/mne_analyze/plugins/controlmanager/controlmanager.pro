@@ -114,7 +114,7 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 
 unix:!macx {
-    QMAKE_RPATHDIR += $ORIGIN/../../lib
+    QMAKE_RPATHDIR += $$ORIGIN/../../lib
 }
 
 # Activate FFTW backend in Eigen

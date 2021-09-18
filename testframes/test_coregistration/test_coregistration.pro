@@ -91,7 +91,7 @@ contains(MNECPP_CONFIG, withCodeCov) {
 }
 
 unix:!macx {
-    QMAKE_RPATHDIR += $ORIGIN/../lib
+    QMAKE_RPATHDIR += $$ORIGIN/../lib
 }
 
 macx {

@@ -100,7 +100,7 @@ INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 OTHER_FILES += rtfwd.json
 
 unix:!macx {
-    QMAKE_RPATHDIR += $ORIGIN/../../lib
+    QMAKE_RPATHDIR += $$ORIGIN/../../lib
 }
 
 # Activate FFTW backend in Eigen for non-static builds only

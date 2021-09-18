@@ -123,7 +123,7 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_FIFF_ANONYMIZER_DIR}
 
 unix:!macx {
-    QMAKE_RPATHDIR += $ORIGIN/../lib
+    QMAKE_RPATHDIR += $$ORIGIN/../lib
 }
 
 macx {

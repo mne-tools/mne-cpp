@@ -92,7 +92,7 @@ INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 unix:!macx {
     # Unix
-    QMAKE_RPATHDIR += $ORIGIN/../lib
+    QMAKE_RPATHDIR += $$ORIGIN/../lib
 }
 
 macx {

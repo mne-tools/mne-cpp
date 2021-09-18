@@ -110,7 +110,7 @@ RESOURCES += \
     noisereduction.qrc
 
 unix:!macx {
-    QMAKE_RPATHDIR += $ORIGIN/../../lib
+    QMAKE_RPATHDIR += $$ORIGIN/../../lib
 }
 
 # Activate FFTW backend in Eigen for non-static builds only

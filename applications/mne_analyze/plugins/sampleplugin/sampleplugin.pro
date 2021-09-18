@@ -101,7 +101,7 @@ header_files.files = $${HEADERS}
 header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/mne_analyze_plugins
 
 unix:!macx {
-    QMAKE_RPATHDIR += $ORIGIN/../../lib
+    QMAKE_RPATHDIR += $$ORIGIN/../../lib
 }
 
 # Activate FFTW backend in Eigen
