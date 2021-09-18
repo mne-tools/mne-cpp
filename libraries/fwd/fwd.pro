@@ -181,4 +181,4 @@ win32 {
 }
 
 PRE_TARGETDEPS += phonyFileUpdater
-QMAKE_EXTRA_TARGETS += FileUpdate
+QMAKE_EXTRA_TARGETS += FileUpdater
