@@ -137,10 +137,12 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
 ################################################## BUILD TIMESTAMP/HASH UPDATER ############################################
 
 FILE_TO_UPDATE = utils_global.cpp
-CONFIG(debug, debug|release) {
-    OBJ_TARJET = debug\utils_global.obj
-} else {
-    OBJ_TARJET = release\utils_global.obj
+win32 {
+    CONFIG(debug, debug|release) {
+        OBJ_TARJET = debug\utils_global.obj
+    } else {
+        OBJ_TARJET = release\utils_global.obj
+    }
 }
 
 ALL_FILES += $$HEADERS
@@ -157,11 +159,12 @@ unix|macx {
 }
 
 win32 {
-    FileUpdater.commands = copy /y $$shell_path($${PWD})\\$${FILE_TO_UPDATE} +,, $$shell_path($${PWD})\\$${FILE_TO_UPDATE} & echo PASTA > phonyFileUpdater
-    ORDERING_TARGET.target = $${OBJ_TARJET}
-    ORDERING_TARGET.depends += phonyFileUpdater
+    FileUpdater.commands = copy /y $shell_path(${PWD})\${FILE_TO_UPDATE} +,, $shell_path(${PWD})\${FILE_TO_UPDATE} & echo PASTA > phonyFileUpdater
+    OrderForcerTarget.target = ${OBJ_TARJET}
+    OrderForcerTarget.depends += phonyFileUpdater
+    QMAKE_EXTRA_TARGETS += OrderForcerTarget
 }
 
 PRE_TARGETDEPS += phonyFileUpdater
-QMAKE_EXTRA_TARGETS += FileUpdater ORDERING_TARGET
+QMAKE_EXTRA_TARGETS += FileUpdater
 
