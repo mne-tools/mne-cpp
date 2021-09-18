@@ -75,7 +75,6 @@ unix|macx {
 win32 {
     FileUpdater.commands = copy $$PWD/$$FILETOUPDATE +,, & echo PASTA > phonyFileUpdater
 }
-FileUpdater.depends +=
 for (IFILE, ALLFILES) {
     FileUpdater.depends += $$PWD/$$IFILE
 }
