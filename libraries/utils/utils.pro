@@ -148,8 +148,8 @@ ALL_FILES += $$SOURCES
 ALL_FILES -= $$FILE_TO_UPDATE
 
 FileUpdater.target = phonyFileUpdater
-for (IFILE, ALL_FILES) {
-    FileUpdater.depends += $${PWD}/$${IFILE}
+for (I_FILE, ALL_FILES) {
+    FileUpdater.depends += $${PWD}/$${I_FILE}
 }
 
 unix|macx {
