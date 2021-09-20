@@ -134,7 +134,7 @@ void PluginManager::loadPlugins(const QString& dir)
                     if(pSensor) {
                         m_qVecSensorPlugins.push_back(pSensor);
                         qInfo() << "[PluginManager::loadPlugins] Loading sensor plugin" << pSensor->getName() << "succeeded.";
-                        qInfo() << "[PluginManager::loadPlugins] Build Timestamp:" << pSensor->getBuildInfo();
+                        qInfo() << "[PluginManager::loadPlugins] Build Info:" << pSensor->getBuildInfo();
 
                     } else {
                         qInfo() << "[PluginManager::loadPlugins] Loading sensor plugin failed.";
