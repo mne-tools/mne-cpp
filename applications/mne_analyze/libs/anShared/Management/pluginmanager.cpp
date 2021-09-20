@@ -112,7 +112,7 @@ void PluginManager::loadPlugin(const QString& file)
             if(findByName(pPlugin->getName()) == -1)
             {
                 qInfo() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " succeeded.";
-                qInfo() << "[PluginManager::loadPlugin] Build Timestamp:" << pPlugin->getBuildInfo();
+                qInfo() << "[PluginManager::loadPlugin] Build Info:" << pPlugin->getBuildInfo();
                 insertPlugin(pPlugin);
             } else {
                 qInfo() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << ". Plugin already loaded.";
