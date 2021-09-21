@@ -91,6 +91,14 @@ struct FTBUFFER_EXPORT MetaData{
 // DEFINE FREE FUNCTIONS
 //=============================================================================================================
 
+/**
+ * Parses header chunk FT_CHUNK_CHANNEL_NAMES = 1
+ *
+ * @param[in, out] data         MetaData object that gets updated with measurment info from header
+ * @param[in] neuromagBuffer    Buffer containing the data portion of the neuromag header chunk
+ */
+FTBUFFER_EXPORT void parseChannelNamesHeader(MetaData& data, QBuffer& neuromagBuffer);
+
 //=============================================================================================================
 /**
  * Parses header chunk FT_CHUNK_NEUROMAG_HEADER = 8
@@ -172,7 +180,7 @@ private:
      */
     HeaderChunk getChunkType(QBuffer& buffer);
 
-    std::unordered_map<HeaderChunk, std::function<void(MetaData&, QBuffer&)>> functionMap;  /**< Map of functions to parse header chunks. */
+    std::unordered_map<HeaderChunk, std::function<void(MetaData&, QBuffer&)>> chunkParsersMap;  /**< Map of functions to parse header chunks. */
 };
 
 }//namespace

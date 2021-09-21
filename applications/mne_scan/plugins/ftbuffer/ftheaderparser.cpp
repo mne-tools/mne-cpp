@@ -56,18 +56,29 @@ using FTBUFFERPLUGIN::MetaData;
 // DEFINE FREE FUNCTIONS
 //=============================================================================================================
 
+void FTBUFFERPLUGIN::parseChannelNamesHeader( MetaData& data, QBuffer& neuromagBuffer)
+{
+    neuromagBuffer.reset();
+    std::cout << "Parsing channel names\n";
+    QDataStream labelNames(&neuromagBuffer);
+    labelNames.setByteOrder(QDataStream::LittleEndian);
+//    labelNames->device()->open(QIODevice::ReadOnly);
+    QString c;
+    labelNames >> c;
+    for(int iii = 0; iii< 100; ++iii)
+    {
+        labelNames >> c;
+    }
+
+}
+
 void FTBUFFERPLUGIN::parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer)
 {
-    qint32_be iIntToChar;
-    char cCharFromInt[sizeof (qint32)];
-
     //Pad buffer because the fiff file we receive is missing an end tag
-    iIntToChar = -1;
+    char cCharFromInt[sizeof (qint32)];
+    qint32_be iIntToChar(-1);
     memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
-    neuromagBuffer.write(cCharFromInt);
-    neuromagBuffer.write(cCharFromInt);
-    neuromagBuffer.write(cCharFromInt);
-    neuromagBuffer.write(cCharFromInt);
+    neuromagBuffer.write(cCharFromInt, sizeof(quint32));
 
     neuromagBuffer.reset();
 
@@ -125,6 +136,7 @@ MetaData FtHeaderParser::parseHeader(QBuffer &buffer)
 
 void FtHeaderParser::registerMembers()
 {
+    chunkParsersMap[HeaderChunk::FT_CHUNK_CHANNEL_NAMES] = parseChannelNamesHeader;
     chunkParsersMap[HeaderChunk::FT_CHUNK_NEUROMAG_HEADER] = parseNeuromagHeader;
     chunkParsersMap[HeaderChunk::FT_CHUNK_NEUROMAG_ISOTRAK] = parseIsotrakHeader;
 }

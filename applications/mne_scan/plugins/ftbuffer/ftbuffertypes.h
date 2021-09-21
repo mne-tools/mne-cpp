@@ -75,6 +75,7 @@ typedef struct {
 } samples_events_t;
 
 enum class HeaderChunk : int{
+    FT_CHUNK_CHANNEL_NAMES = 1,
     FT_CHUNK_NEUROMAG_HEADER = 8,
     FT_CHUNK_NEUROMAG_ISOTRAK = 9,
     FT_CHUNK_NEUROMAG_HPIRESULT = 10
