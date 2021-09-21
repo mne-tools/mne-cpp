@@ -125,8 +125,8 @@ MetaData FtHeaderParser::parseHeader(QBuffer &buffer)
 
 void FtHeaderParser::registerMembers()
 {
-    functionMap[HeaderChunk::FT_CHUNK_NEUROMAG_HEADER] = parseNeuromagHeader;
-    functionMap[HeaderChunk::FT_CHUNK_NEUROMAG_ISOTRAK] = parseIsotrakHeader;
+    chunkParsersMap[HeaderChunk::FT_CHUNK_NEUROMAG_HEADER] = parseNeuromagHeader;
+    chunkParsersMap[HeaderChunk::FT_CHUNK_NEUROMAG_ISOTRAK] = parseIsotrakHeader;
 }
 
 //=============================================================================================================
@@ -134,13 +134,13 @@ void FtHeaderParser::registerMembers()
 void FtHeaderParser::processChunk(MetaData& data , QBuffer& buffer)
 {
     auto chunkType = getChunkType(buffer);
-    auto function = functionMap.find(chunkType);
+    auto chunkParser = chunkParsersMap.find(chunkType);
 
     QBuffer headerChunk;
     getSingleHeaderChunk(buffer, headerChunk);
 
-    if (function != functionMap.end()){
-        function->second(data, headerChunk);
+    if (chunkParser != chunkParsersMap.end()) {
+        chunkParser->second(data, headerChunk);
     }
 }
 
