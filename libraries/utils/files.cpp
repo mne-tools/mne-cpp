@@ -37,9 +37,13 @@
 //=============================================================================================================
 
 #include "files.h"
-
 #include <fstream>
+
+#if __cplusplus >= 201703L
+#include <filesystem>
+#else
 #include <cstdio>
+#endif
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -54,60 +58,63 @@ using namespace UTILSLIB;
 bool exists(const char* filePath)
 {
 #if __cplusplus >= 201703L
-
+    return std::filesystem::exists(filePath);
 #else
     std::ifstream infile(filePath);
     return infile.good();
-
 #endif
 }
 
 //=============================================================================================================
 
-bool Files::copy(const char* sourcePath, const char* destPath)
+void Files::copy(const char* sourcePath, const char* destPath)
 {
 #if __cplusplus >= 201703L
-
+    std::filesystem::copy(sourcePath, destPath);
 #else
+    if (!exists(sourcePath) || exists(destPath)){
+        return;
+    }
+
     std::ifstream source(sourcePath, std::ios::binary);
     std::ofstream destination(destPath, std::ios::binary);
 
-    if(destination << source.rdbuf()){
-        return true;
-    } else {
-        return false;
-    }
+    destination << source.rdbuf();
 #endif
 }
 
 //=============================================================================================================
 
-bool Files::rename(const char* sourcePath, const char* destPath)
+void Files::rename(const char* sourcePath, const char* destPath)
 {
 #if __cplusplus >= 201703L
-
+    std::filesystem::rename(sourcePath, destPath);
 #else
-    if (Files::copy(sourcePath, destPath)){
-        return Files::remove(sourcePath);
+    if (!exists(sourcePath) || exists(destPath)){
+        return;
     }
 
-    return false;
-
+    std::rename(sourcePath, destPath);
 #endif
-
 }
 
 //=============================================================================================================
 
-bool Files::remove(const char* filePath)
+void Files::remove(const char* filePath)
 {
 #if __cplusplus >= 201703L
-
+    std::filesystem::remove(filePath);
 #else
-    if(std::remove(filePath)){
-        return false;
-    } else {
-        return true;
+    if (!exists(filePath)){
+        return;
     }
+    std::remove(filePath);
 #endif
+}
+
+//=============================================================================================================
+
+void Files::create(const char *filePath)
+{
+    std::ofstream {filePath};
 }

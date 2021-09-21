@@ -67,29 +67,45 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief copy
-     * @param sourcePath
-     * @param destPath
+     * Attempts to copy file based on input parameters.
+     *
+     * @param[in] sourcePath
+     * @param[in] destPath
+     *
      * @return
      */
-    static bool copy(const char* sourcePath, const char* destPath);
+    static void copy(const char* sourcePath, const char* destPath);
 
     //=========================================================================================================
     /**
-     * @brief rename
-     * @param sourcePath
-     * @param destPath
-     * @return
+     * Attempts to rename file based on input parameters.
+     *
+     * @param[in] sourcePath
+     * @param[in] destPath
+     *
+     * @return Whether file was renamed successfully
      */
-    static bool rename(const char* sourcePath, const char* destPath);
+    static void rename(const char* sourcePath, const char* destPath);
 
     //=========================================================================================================
     /**
-     * @brief remove
-     * @param filePath
-     * @return
+     * Attempts to remove file at given input param.
+     *
+     * @param[in] filePath  File path to file to be deleted.
+     *
+     * @return Returns whether file exists at the end of execution.
      */
-    static bool remove(const char* filePath);
+    static void remove(const char* filePath);
+
+    //=========================================================================================================
+    /**
+     * Attempts to create a file at given input param. Does not check if file already exists.
+     *
+     * @param[in] filePath  File path to new file to be created.
+     *
+     * @return Returns whether a file with given name exists once execution is complete.
+     */
+    static void create(const char* filePath);
 };
 
 }//namepace
