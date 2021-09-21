@@ -3,11 +3,11 @@
 # @file     ex_fiff_sniff.pro
 # @author   Gabriel Motta <gbmotta@mgh.harvard.edu>;
 # @since    0.1.9
-# @date     June, 2021
+# @date     September, 2021
 #
 # @section  LICENSE
-#d
-# Copyright (C) 2021, . All rights reserved.
+#
+# Copyright (C) 2021, Gabriel Motta . All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -57,15 +57,9 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lmnecppMned \
-            -lmnecppFiffd \
-            -lmnecppFsd \
-            -lmnecppUtilsd \
+    LIBS += -lmnecppUtilsd \
 } else {
-    LIBS += -lmnecppMne \
-            -lmnecppFiff \
-            -lmnecppFs \
-            -lmnecppUtils \
+    LIBS += -lmnecppUtils \
 }
 
 SOURCES += \
@@ -101,4 +95,3 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
                 -lfftw3_threads \
     }
 }
-
