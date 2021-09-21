@@ -63,6 +63,7 @@ contains(MNECPP_CONFIG, static) {
 }
 
 SOURCES += \
+    files.cpp \
     kmeans.cpp \
     mnemath.cpp \
     ioutils.cpp \
@@ -80,6 +81,7 @@ SOURCES += \
 
 HEADERS += \
     buildinfo.h \
+    files.h \
     kmeans.h\
     utils_global.h \
     mnemath.h \
