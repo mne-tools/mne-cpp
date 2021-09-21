@@ -129,7 +129,7 @@ public:
      *
      * @return true if successful, false if unsuccessful.
      */
-    bool getHeader();
+    bool getFixedHeader();
 
     //=========================================================================================================
     /**
@@ -209,7 +209,7 @@ public:
      *
      * @return returns the FiffInfo from the parsed fif file from the neuromag header chunk.
      */
-    MetaData parseBufferHeaders();
+    MetaData parseBufferHeader();
 
     //=========================================================================================================
     /**
@@ -293,7 +293,7 @@ private:
      * @param[out] buffer       QBuffer to which daa will be written.
      * @param[in] numBytes      How many bytes to read from socket.
      */
-    void prepBuffer(QBuffer &buffer,
+    void copyAllChunks(QBuffer &buffer,
                     int numBytes);
 
     //=========================================================================================================

@@ -119,7 +119,7 @@ bool FtConnector::connect()
 
 //=============================================================================================================
 
-bool FtConnector::getHeader()
+bool FtConnector::getFixedHeader()
 {
     qInfo() << "[FtConnector::getHeader] Attempting to get header...";
 
@@ -140,7 +140,7 @@ bool FtConnector::getHeader()
 
     //Parse return message from buffer
     QBuffer msgBuffer;
-    prepBuffer(msgBuffer, sizeof (messagedef_t));
+    copyAllChunks(msgBuffer, sizeof (messagedef_t));
     int bufsize = parseMessageDef(msgBuffer);
 
     if (bufsize == 0) {
@@ -155,7 +155,7 @@ bool FtConnector::getHeader()
 
     //Parse header info from buffer
     QBuffer hdrBuffer;
-    prepBuffer(hdrBuffer, sizeof (headerdef_t)); // if implementing header chunks: change from sizeof (headerdef) to bufsize
+    copyAllChunks(hdrBuffer, sizeof (headerdef_t)); // if implementing header chunks: change from sizeof (headerdef) to bufsize
     parseHeaderDef(hdrBuffer);
 
     return true;
@@ -287,7 +287,7 @@ bool FtConnector::getData()
 
     //Parse return message from buffer
     QBuffer msgBuffer;
-    prepBuffer(msgBuffer, sizeof (messagedef_t));
+    copyAllChunks(msgBuffer, sizeof (messagedef_t));
     int bufsize = parseMessageDef(msgBuffer);
 
     //Waiting for response.
@@ -297,12 +297,12 @@ bool FtConnector::getData()
 
     //Parse return data def from buffer
     QBuffer datadefBuffer;
-    prepBuffer(datadefBuffer, sizeof (datadef_t));
+    copyAllChunks(datadefBuffer, sizeof (datadef_t));
     bufsize = parseDataDef(datadefBuffer);
 
     //Parse actual data from buffer
     QBuffer datasampBuffer;
-    prepBuffer(datasampBuffer, bufsize);
+    copyAllChunks(datasampBuffer, bufsize);
     parseData(datasampBuffer, bufsize);
 
     //update sample tracking
@@ -334,7 +334,7 @@ bool FtConnector::setPort(const int &iPort)
 
 //=============================================================================================================
 
-void FtConnector::prepBuffer(QBuffer &buffer,
+void FtConnector::copyAllChunks(QBuffer &buffer,
                              int numBytes)
 {
     buffer.open(QIODevice::ReadWrite);
@@ -430,7 +430,7 @@ int FtConnector::totalBuffSamples()
 
     //Parse return message from buffer
     QBuffer msgBuffer;
-    prepBuffer(msgBuffer, sizeof (messagedef_t));
+    copyAllChunks(msgBuffer, sizeof (messagedef_t));
     parseMessageDef(msgBuffer);
 
     //Waiting for response.
@@ -441,7 +441,7 @@ int FtConnector::totalBuffSamples()
     qint32 iNumSamp;
 
     QBuffer sampeventsBuffer;
-    prepBuffer(sampeventsBuffer, sizeof(samples_events_t));
+    copyAllChunks(sampeventsBuffer, sizeof(samples_events_t));
 
     char cSamps[sizeof(iNumSamp)];
     sampeventsBuffer.read(cSamps, sizeof(iNumSamp));
@@ -542,20 +542,20 @@ QString FtConnector::getAddr()
 
 //=============================================================================================================
 
-MetaData FtConnector::parseBufferHeaders()
+MetaData FtConnector::parseBufferHeader()
 {
     qInfo() << "[FtConnector::parseNeuromagHeader] Attempting to get extended header...";
 
     MetaData metadata;
-    QBuffer chunkBuffer;
 
-    getHeader();
-    prepBuffer(chunkBuffer, m_iExtendedHeaderSize);
+    getFixedHeader();
 
-    std::cout << "Parsing extended header\n";
+    qInfo() << "[FtConnector::parseNeuromagHeader] Parsing extended header\n";
+    QBuffer allChunksBuffer;
+    copyAllChunks(allChunksBuffer, m_iExtendedHeaderSize);
 
     FtHeaderParser parser;
-    metadata = parser.parseHeader(chunkBuffer);
+    metadata = parser.parseHeader(allChunksBuffer);
 
     if (!metadata.bFiffInfo){
         metadata.setFiffinfo(infoFromSimpleHeader());

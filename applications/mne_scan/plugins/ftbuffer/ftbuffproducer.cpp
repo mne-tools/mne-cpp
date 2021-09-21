@@ -81,7 +81,7 @@ void FtBuffProducer::runMainLoop()
         QThread::usleep(50000);
     }
 
-    while(!m_pFtConnector->getHeader()) {
+    while(!m_pFtConnector->getFixedHeader()) {
         QThread::usleep(50000);
     }
 
@@ -127,7 +127,7 @@ void FtBuffProducer::connectToBuffer(QString addr,
 
     //Try to get info from buffer first, then resort to file
     if(m_pFtConnector->connect()) {
-        auto metadata = m_pFtConnector->parseBufferHeaders();
+        auto metadata = m_pFtConnector->parseBufferHeader();
         if (m_pFtBuffer->setupRTMSA(metadata)){
             emit connecStatus(true);
             return;
