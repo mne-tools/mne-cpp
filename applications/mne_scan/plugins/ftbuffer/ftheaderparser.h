@@ -87,9 +87,7 @@ struct FTBUFFER_EXPORT MetaData{
                                                                          bFiffDigitizerData = true;};
 };
 
-//=============================================================================================================
-// DEFINE FREE FUNCTIONS
-//=============================================================================================================
+namespace Details{
 
 /**
  * Parses header chunk FT_CHUNK_CHANNEL_NAMES = 1
@@ -97,7 +95,7 @@ struct FTBUFFER_EXPORT MetaData{
  * @param[in, out] data         MetaData object that gets updated with measurment info from header
  * @param[in] neuromagBuffer    Buffer containing the data portion of the neuromag header chunk
  */
-FTBUFFER_EXPORT void parseChannelNamesHeader(MetaData& data, QBuffer& neuromagBuffer);
+void parseChannelNamesHeader(MetaData& data, QBuffer& neuromagBuffer);
 
 //=============================================================================================================
 /**
@@ -106,7 +104,7 @@ FTBUFFER_EXPORT void parseChannelNamesHeader(MetaData& data, QBuffer& neuromagBu
  * @param[in, out] data         MetaData object that gets updated with measurment info from header
  * @param[in] neuromagBuffer    Buffer containing the data portion of the neuromag header chunk
  */
-FTBUFFER_EXPORT void parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer);
+void parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer);
 
 //=============================================================================================================
 /**
@@ -115,7 +113,17 @@ FTBUFFER_EXPORT void parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer
  * @param[in, out] data         MetaData object that gets updated with measurment info from header
  * @param [in] isotrakBuffer    Buffer containing the data portion of the isotrak header chunk
  */
-FTBUFFER_EXPORT void parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer);
+void parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer);
+
+//=============================================================================================================
+/**
+ * Return a list of names for each channel from the input buffer.
+ * @param [in] buffer   Buffer from where to extract the channel names spearated by '\0' characters.
+ * @return A list with each channel's label name.
+ */
+QStringList extractChannelNamesFromBuffer(QBuffer& buffer);
+
+} //details
 
 //=============================================================================================================
 /**
@@ -146,6 +154,14 @@ public:
     MetaData parseHeader(QBuffer& buffer);
 
 private:
+    class Chunk
+    {
+        public:
+        HeaderChunkType type;
+        quint32 size;
+        QSharedPointer<QBuffer> data;
+    };
+
     //=========================================================================================================
     /**
      * Initialize the function map with entreis for the chunk headers we care about.
@@ -163,24 +179,15 @@ private:
 
     //=========================================================================================================
     /**
-     * Retreives just the data portion of the extended header chunk and places it in a new buffer.
-     *
-     * @param[in] source        Buffer with all etended header chunks. Buffer needs to be at size of a chunk.
-     * @param[in, out] dest     Destination buffer where chunk will be copied.
-     */
-    void getSingleHeaderChunk(QBuffer& source, QBuffer& dest);
-
-    //=========================================================================================================
-    /**
-     * Returns type of chunk next up in the buffer.
+     * Returns a populated chunk read from the input buffer.
      *
      * @param[in] buffer    Buffer of all extended header chunks. Buffer needs to be at start of a chunk.
      *
      * @return  Returns enum of the cooresponding header chuk type.
      */
-    HeaderChunk getChunkType(QBuffer& buffer);
+    Chunk getChunk(QBuffer& buffer);
 
-    std::unordered_map<HeaderChunk, std::function<void(MetaData&, QBuffer&)>> chunkParsersMap;  /**< Map of functions to parse header chunks. */
+    std::unordered_map<HeaderChunkType, std::function<void(MetaData&, QBuffer&)>> chunkParsersMap;  /**< Map of functions to parse header chunks. */
 };
 
 }//namespace
