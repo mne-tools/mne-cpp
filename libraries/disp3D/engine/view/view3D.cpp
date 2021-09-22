@@ -65,6 +65,11 @@
 #include <Qt3DExtras/QCylinderGeometry>
 #include <Qt3DExtras/QSphereMesh>
 #include <Qt3DRender/QRenderSettings>
+#include <Qt3DRender/QRenderSurfaceSelector>
+#include <Qt3DRender/QCameraSelector>
+#include <Qt3DRender/QTechniqueFilter>
+#include <Qt3DRender/QClearBuffers>
+#include <Qt3DRender/QNoDraw>
 
 #include <QObjectPicker>
 #include <QPickingSettings>
@@ -91,31 +96,22 @@ View3D::View3D()
 , m_p3DObjectsEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pLightEntity(new Qt3DCore::QEntity(m_pRootEntity))
 , m_pCamera(this->camera())
+, m_pMultiCam1(new Qt3DRender::QCamera)
+, m_pMultiCam2(new Qt3DRender::QCamera)
+, m_pMultiCam3(new Qt3DRender::QCamera)
 , m_pPicker(new Qt3DRender::QObjectPicker(m_pRootEntity))
 , m_pCamController(new OrbitalCameraController(m_pRootEntity))
+, m_MultiViewOrientation(View3D::MultiViewOrientation::Horizontal)
 {
     //Root entity
     this->setRootEntity(m_pRootEntity);
 
-    //FrameGraph
-    m_pFrameGraph = new CustomFrameGraph();
-    m_pFrameGraph->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 1.0));
-    this->setActiveFrameGraph(m_pFrameGraph);
+    initSingleView();
 
     //Only render new frames when needed
     this->renderSettings()->setRenderPolicy(Qt3DRender::QRenderSettings::OnDemand);
 
     initLight();
-
-    m_pCamera->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
-    m_pCamera->setPosition(QVector3D(0.0f, -0.4f, -0.25f));
-    m_pCamera->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
-    m_pCamera->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
-    m_pCamera->tiltAboutViewCenter(180);
-    m_pCamera->lens()->setPerspectiveProjection(45.0f, this->width()/this->height(), 0.01f, 5000.0f);
-    m_pFrameGraph->setCamera(m_pCamera);
-
-    m_pCamController->setCamera(m_pCamera);
 
     createCoordSystem(m_pRootEntity);
     toggleCoordAxis(false);
@@ -123,8 +119,28 @@ View3D::View3D()
     // initialize object picking and disable it by default to save resources
     initObjectPicking();
     activatePicker(true);
+
+    initMultiView();
+
+    this->setRootEntity(m_pRootEntity);
+
+    showSingleView();
 }
 
+//=============================================================================================================
+
+View3D::~View3D()
+{
+    delete m_pMultiCam1;
+    delete m_pMultiCam2;
+    delete m_pMultiCam3;
+
+    delete m_pMultiViewport1;
+    delete m_pMultiViewport2;
+    delete m_pMultiViewport3;
+
+    delete m_pMultiFrame;
+}
 
 //=============================================================================================================
 
@@ -394,4 +410,160 @@ void View3D::startStopCameraRotation(bool bChecked)
     else {
         m_pCameraAnimation->stop();
     }
+}
+
+//=============================================================================================================
+
+void View3D::initSingleCam()
+{
+    m_pCamera->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
+    m_pCamera->setPosition(QVector3D(0.0f, -0.4f, -0.25f));
+    m_pCamera->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
+    m_pCamera->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
+    m_pCamera->tiltAboutViewCenter(180);
+    m_pCamera->lens()->setPerspectiveProjection(45.0f, this->width()/this->height(), 0.01f, 5000.0f);
+    m_pFrameGraph->setCamera(m_pCamera);
+
+    m_pCamController->setCamera(m_pCamera);
+}
+
+//=============================================================================================================
+
+void View3D::initMultiCams()
+{
+    m_pMultiCam1->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
+    m_pMultiCam1->setPosition(QVector3D(0.0f, 0.65f, 0.0f));
+    m_pMultiCam1->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
+    m_pMultiCam1->setUpVector(QVector3D(0.0f, 0.0f, 1.0f));
+//    m_pMultiCam1->setParent(m_pRootEntity);
+
+    m_pMultiCam2->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
+    m_pMultiCam2->setPosition(QVector3D(-0.65f, 0.0f, 0.0f));
+    m_pMultiCam2->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
+    m_pMultiCam2->setUpVector(QVector3D(0.0f, 0.0f, 1.0f));
+//    m_pMultiCam2->setParent(m_pRootEntity);
+
+    m_pMultiCam3->lens()->setPerspectiveProjection(45.0f, 16.0f/9.0f, 0.0001f, 100000.0f);
+    m_pMultiCam3->setPosition(QVector3D(0.0f, 0.0f, 0.65f));
+    m_pMultiCam3->setViewCenter(QVector3D(0.0f, 0.0f, 0.0f));
+    m_pMultiCam3->setUpVector(QVector3D(0.0f, 1.0f, 0.0f));
+//    m_pMultiCam3->setParent(m_pRootEntity);
+
+}
+
+//=============================================================================================================
+
+void View3D::initSingleView()
+{
+    //FrameGraph
+    m_pFrameGraph = new CustomFrameGraph();
+    m_pFrameGraph->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 1.0));
+
+    initSingleCam();
+}
+
+//=============================================================================================================
+
+void View3D::initMultiView()
+{
+    initMultiCams();
+
+    // Framegraph root node
+    m_pMultiFrame = new Qt3DRender::QRenderSurfaceSelector();
+    auto mainViewPort = new Qt3DRender::QViewport(m_pMultiFrame);
+
+    // First RenderView: clear buffers
+    auto clearBuffers = new Qt3DRender::QClearBuffers(mainViewPort);
+    clearBuffers->setBuffers(Qt3DRender::QClearBuffers::ColorDepthBuffer);
+    clearBuffers->setClearColor(QColor::fromRgbF(0.0, 0.0, 0.0, 1.0));
+
+    m_pMultiViewport1 = new Qt3DRender::QViewport(mainViewPort);
+    m_pMultiViewport1->setNormalizedRect(QRectF(0.0f, 0.0f, 0.333f, 1.0f));
+    auto cameraSelector1 = new Qt3DRender::QCameraSelector(m_pMultiViewport1);
+    cameraSelector1->setCamera(m_pMultiCam1);
+
+    m_pMultiViewport2 = new Qt3DRender::QViewport(mainViewPort);
+    m_pMultiViewport2->setNormalizedRect(QRectF(0.333f, 0.0f, 0.333f, 1.0f));
+    auto cameraSelector2= new Qt3DRender::QCameraSelector(m_pMultiViewport2);
+    cameraSelector2->setCamera(m_pMultiCam2);
+
+    m_pMultiViewport3 = new Qt3DRender::QViewport(mainViewPort);
+    m_pMultiViewport3->setNormalizedRect(QRectF(0.666f, 0.0f, 0.333f, 1.0f));
+    auto cameraSelector3= new Qt3DRender::QCameraSelector(m_pMultiViewport3);
+    cameraSelector3->setCamera(m_pMultiCam3);
+
+    updateMultiViewAspectRatio();
+
+    auto noDraw = new Qt3DRender::QNoDraw(clearBuffers);
+}
+
+//=============================================================================================================
+
+void View3D::resizeEvent(QResizeEvent *event)
+{
+    updateMultiViewAspectRatio();
+    //single view updates implicitly due to use of default camera from Qt3DWindow.
+
+    Qt3DWindow::resizeEvent(event);
+}
+
+//=============================================================================================================
+
+void View3D::updateMultiViewAspectRatio()
+{
+    float fAspectRatio = static_cast<float>(this->width())/static_cast<float>(this->height());
+
+    if(fAspectRatio > 1.5f ){
+        m_pMultiCam1->setAspectRatio(fAspectRatio / 3.0f);
+        m_pMultiCam2->setAspectRatio(fAspectRatio / 3.0f);
+        m_pMultiCam3->setAspectRatio(fAspectRatio / 3.0f);
+
+        setMultiViewHorizontal();
+    } else {
+        m_pMultiCam1->setAspectRatio(fAspectRatio * 3.0f);
+        m_pMultiCam2->setAspectRatio(fAspectRatio * 3.0f);
+        m_pMultiCam3->setAspectRatio(fAspectRatio * 3.0f);
+
+        setMultiViewVertical();
+    }
+}
+
+//=============================================================================================================
+
+void View3D::setMultiViewVertical()
+{
+    if (m_MultiViewOrientation != View3D::MultiViewOrientation::Veritical){
+        m_pMultiViewport1->setNormalizedRect(QRectF(0.0f, 0.0f, 1.0f, 0.333f));
+        m_pMultiViewport2->setNormalizedRect(QRectF(0.0f, 0.333f, 1.0f, 0.333f));
+        m_pMultiViewport3->setNormalizedRect(QRectF(0.0f, 0.666f, 1.0f, 0.333f));
+
+        m_MultiViewOrientation = View3D::MultiViewOrientation::Veritical;
+    }
+}
+
+//=============================================================================================================
+
+void View3D::setMultiViewHorizontal()
+{
+    if (m_MultiViewOrientation != View3D::MultiViewOrientation::Horizontal){
+        m_pMultiViewport1->setNormalizedRect(QRectF(0.0f, 0.0f, 0.333f, 1.0f));
+        m_pMultiViewport2->setNormalizedRect(QRectF(0.333f, 0.0f, 0.333f, 1.0f));
+        m_pMultiViewport3->setNormalizedRect(QRectF(0.666f, 0.0f, 0.333f, 1.0f));
+
+        m_MultiViewOrientation = View3D::MultiViewOrientation::Horizontal;
+    }
+}
+
+//=============================================================================================================
+
+void View3D::showSingleView()
+{
+    this->setActiveFrameGraph(m_pFrameGraph);
+}
+
+//=============================================================================================================
+
+void View3D::showMultiView()
+{
+    this->setActiveFrameGraph(m_pMultiFrame);
 }
