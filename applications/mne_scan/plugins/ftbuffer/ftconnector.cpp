@@ -44,6 +44,7 @@
 
 #include <QThread>
 #include <QtEndian>
+#include <QDateTime>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -69,7 +70,7 @@ FtConnector::FtConnector()
 , m_iExtendedHeaderSize(0)
 , m_iPort(1972)
 , m_bNewData(false)
-, m_fSampleFreq(0)
+, m_fSamplingFreq(0)
 , m_sAddress("127.0.0.1")
 , m_pSocket(Q_NULLPTR)
 {
@@ -140,7 +141,7 @@ bool FtConnector::getFixedHeader()
 
     //Parse return message from buffer
     QBuffer msgBuffer;
-    copyAllChunks(msgBuffer, sizeof (messagedef_t));
+    copyResponse(msgBuffer, sizeof (messagedef_t));
     int bufsize = parseMessageDef(msgBuffer);
 
     if (bufsize == 0) {
@@ -155,7 +156,7 @@ bool FtConnector::getFixedHeader()
 
     //Parse header info from buffer
     QBuffer hdrBuffer;
-    copyAllChunks(hdrBuffer, sizeof (headerdef_t)); // if implementing header chunks: change from sizeof (headerdef) to bufsize
+    copyResponse(hdrBuffer, sizeof (headerdef_t)); // if implementing header chunks: change from sizeof (headerdef) to bufsize
     parseHeaderDef(hdrBuffer);
 
     return true;
@@ -205,11 +206,11 @@ bool FtConnector::parseHeaderDef(QBuffer &readBuffer)
 
     //Save paramerters
     m_iNumChannels = headerdef.nchans;
-    m_fSampleFreq = headerdef.fsample;
+    m_fSamplingFreq = headerdef.fsample;
     m_iNumNewSamples = headerdef.nsamples;
     m_iDataType = headerdef.data_type;
     m_iExtendedHeaderSize = headerdef.bufsize;
-    m_iMinSampleRead = static_cast<int>(m_fSampleFreq/2);
+    m_iMinSampleRead = static_cast<int>(m_fSamplingFreq/2);
 
     qInfo() << "[FtConnector::parseHeaderDef] Got header parameters.";
 
@@ -287,7 +288,7 @@ bool FtConnector::getData()
 
     //Parse return message from buffer
     QBuffer msgBuffer;
-    copyAllChunks(msgBuffer, sizeof (messagedef_t));
+    copyResponse(msgBuffer, sizeof (messagedef_t));
     int bufsize = parseMessageDef(msgBuffer);
 
     //Waiting for response.
@@ -297,12 +298,12 @@ bool FtConnector::getData()
 
     //Parse return data def from buffer
     QBuffer datadefBuffer;
-    copyAllChunks(datadefBuffer, sizeof (datadef_t));
+    copyResponse(datadefBuffer, sizeof (datadef_t));
     bufsize = parseDataDef(datadefBuffer);
 
     //Parse actual data from buffer
     QBuffer datasampBuffer;
-    copyAllChunks(datasampBuffer, bufsize);
+    copyResponse(datasampBuffer, bufsize);
     parseData(datasampBuffer, bufsize);
 
     //update sample tracking
@@ -334,8 +335,8 @@ bool FtConnector::setPort(const int &iPort)
 
 //=============================================================================================================
 
-void FtConnector::copyAllChunks(QBuffer &buffer,
-                             int numBytes)
+void FtConnector::copyResponse(QBuffer &buffer,
+                                int numBytes)
 {
     buffer.open(QIODevice::ReadWrite);
     buffer.write(m_pSocket->read(numBytes));
@@ -395,7 +396,7 @@ void FtConnector::echoStatus()
     qInfo() << "| Socket:      " << m_pSocket->state();
     qInfo() << "| Address:     " << m_sAddress << ":" << m_iPort;
     qInfo() << "| Channels:    " << m_iNumChannels;
-    qInfo() << "| Frequency:   " << m_fSampleFreq;
+    qInfo() << "| Frequency:   " << m_fSamplingFreq;
     qInfo() << "| Samples read:" << m_iNumSamples;
     qInfo() << "| New samples: " << m_iNumNewSamples;
     qInfo() << "|================================";
@@ -430,7 +431,7 @@ int FtConnector::totalBuffSamples()
 
     //Parse return message from buffer
     QBuffer msgBuffer;
-    copyAllChunks(msgBuffer, sizeof (messagedef_t));
+    copyResponse(msgBuffer, sizeof (messagedef_t));
     parseMessageDef(msgBuffer);
 
     //Waiting for response.
@@ -441,7 +442,7 @@ int FtConnector::totalBuffSamples()
     qint32 iNumSamp;
 
     QBuffer sampeventsBuffer;
-    copyAllChunks(sampeventsBuffer, sizeof(samples_events_t));
+    copyResponse(sampeventsBuffer, sizeof(samples_events_t));
 
     char cSamps[sizeof(iNumSamp)];
     sampeventsBuffer.read(cSamps, sizeof(iNumSamp));
@@ -467,19 +468,6 @@ bool FtConnector::parseData(QBuffer &datasampBuffer,
     //start interpreting data as float instead of char
     QByteArray dataArray = datasampBuffer.readAll();
     float* fdata = reinterpret_cast<float*> (dataArray.data());
-
-//TODO: Implement receiving other types of data
-//    switch (m_iDataType) {
-//        case DATATYPE_FLOAT32:
-//            auto data = reinterpret_cast<float*>(dataArray.data(), bufsize);
-//            qDebug() << "*** Would you look at that, we're all the way here ***";
-//            qDebug() << "Data sample:";
-
-//            for (int i = 0; i < 10 ; i++) {
-//                qDebug() << data[i];
-//            }
-//            break;
-//    }
 
     //format data into eigen matrix to pass up
     Eigen::MatrixXf matData;
@@ -552,14 +540,12 @@ MetaData FtConnector::parseBufferHeader()
 
     qInfo() << "[FtConnector::parseNeuromagHeader] Parsing extended header\n";
     QBuffer allChunksBuffer;
-    copyAllChunks(allChunksBuffer, m_iExtendedHeaderSize);
+    copyResponse(allChunksBuffer, m_iExtendedHeaderSize);
 
     FtHeaderParser parser;
-    metadata = parser.parseHeader(allChunksBuffer);
+    metadata = parser.parseExtendedHeader(allChunksBuffer);
 
-    if (!metadata.bFiffInfo){
-        metadata.setFiffinfo(infoFromSimpleHeader());
-    }
+    checkForMissingMetadataFields(metadata);
 
     return metadata;
 }
