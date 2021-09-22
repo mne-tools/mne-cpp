@@ -573,11 +573,14 @@ BufferInfo FtConnector::getBufferInfo()
 
 //=============================================================================================================
 
-FIFFLIB::FiffInfo FtConnector::infoFromSimpleHeader()
+FIFFLIB::FiffInfo FtConnector::infoFromSimpleHeader() const
 {
     FIFFLIB::FiffInfo defaultInfo;
 
-    defaultInfo.sfreq = m_fSampleFreq;
+    defaultInfo.meas_date[0] = static_cast<int32_t>(QDateTime::currentDateTime().toSecsSinceEpoch());
+    defaultInfo.meas_date[1] = 0;
+
+    defaultInfo.sfreq = m_fSamplingFreq;
     defaultInfo.nchan = m_iNumChannels;
 
     defaultInfo.chs.clear();
@@ -597,4 +600,44 @@ FIFFLIB::FiffInfo FtConnector::infoFromSimpleHeader()
     }
 
     return defaultInfo;
+}
+
+//=============================================================================================================
+
+void FtConnector::checkForMissingMetadataFields(MetaData& data) const
+{
+    if (!data.bFiffInfo){
+        data.setFiffinfo(infoFromSimpleHeader());
+    } else {
+        if ( data.info.meas_date[0] == -1 )
+        {
+            data.info.meas_date[0] = static_cast<int32_t>(QDateTime::currentDateTime().toSecsSinceEpoch());
+            data.info.meas_date[1] = 0;
+        }
+
+        if ( data.info.sfreq <= 0 )
+        {
+            data.info.sfreq = m_fSamplingFreq;
+        }
+        if ( data.info.nchan == -1 )
+        {
+            data.info.nchan = m_iNumChannels;
+            data.info.chs.clear();
+            for (int chani = 0; chani< m_iNumChannels; chani++)
+            {
+                FIFFLIB::FiffChInfo channel;
+
+                channel.ch_name = "Ch. " + QString::number(chani);
+                channel.kind = FIFFV_MEG_CH;
+                channel.unit = FIFF_UNIT_T;
+                channel.unit_mul = FIFF_UNITM_NONE;
+                channel.chpos.coil_type = FIFFV_COIL_NONE;
+
+                data.info.chs.append(channel);
+
+                data.info.ch_names.append("Ch. " + QString::number(chani));
+
+            }
+        }
+    }
 }

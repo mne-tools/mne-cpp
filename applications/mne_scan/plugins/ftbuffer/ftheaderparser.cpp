@@ -38,6 +38,8 @@
 //=============================================================================================================
 
 #include "ftheaderparser.h"
+#include "fiff/fiff_ch_info.h"
+#include "fiff/fiff_constants.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -85,40 +87,23 @@ void parseChannelNamesHeader( MetaData& data, QBuffer& channelNamesBuffer)
 
 //    qInfo() << channelNames;
     FIFFLIB::FiffInfo info;
-    info.clear();
-    info.file_id =
-    info.meas_id =
-    info.meas_date[0] =
-    info.meas_date[1] =
 
-    info.nchan =
-    info.chs =
-    info.ch_names =
+    info.nchan = static_cast<FIFFLIB::fiff_int_t>(channelNames.size());
 
-    info.sfreq =
-    info.linefreq =
+    QList<FIFFLIB::FiffChInfo> chanList;
+    for ( auto& name : channelNames)
+    {
+        FIFFLIB::FiffChInfo chanInfo;
+        chanInfo.ch_name = name;
+        chanInfo.kind = FIFFV_MEG_CH;
+        chanInfo.unit = FIFF_UNIT_T;
+        chanInfo.unit_mul = FIFF_UNITM_NONE;
+        chanList.append(chanInfo);
+    }
+    info.chs = chanList;
+    info.ch_names = channelNames;
 
-    info.highpass =
-    info.lowpass =
-
-    info.dig   = dig;
-    if (!dig_trans.isEmpty())
-        info.dig_trans = dig_trans;
-
-    info.experimenter = experimenter;
-    info.description = description;
-    info.proj_id = proj_id;
-    info.proj_name = proj_name;
-    info.xplotter_layout = xplotter_layout;
-    info.gantry_angle = gantry_angle;
-    info.utc_offset = utc_offset;
-
-    info.bads  = bads;
-    info.projs = projs;
-    info.comps = comps;
-    info.acq_pars = acq_pars;
-    info.acq_stim = acq_stim;
-
+    data.setFiffinfo(info);
 }
 
 //=============================================================================================================
@@ -185,7 +170,7 @@ FtHeaderParser::FtHeaderParser()
 
 //=============================================================================================================
 
-MetaData FtHeaderParser::parseHeader(QBuffer &buffer)
+MetaData FtHeaderParser::parseExtendedHeader(QBuffer &buffer)
 {
     MetaData data;
     while(!buffer.atEnd()){

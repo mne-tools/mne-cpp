@@ -87,18 +87,6 @@ struct FTBUFFER_EXPORT MetaData{
                                                                          bFiffDigitizerData = true;};
 };
 
-//namespace {
-
-//void parseChannelNamesHeader(MetaData& data, const QBuffer& neuromagBuffer);
-
-//void parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer);
-
-//void parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer);
-
-//QStringList extractChannelNamesFromBuffer(QBuffer& buffer);
-
-//} //namespace details
-
 //=============================================================================================================
 /**
  * This class parses the extended header chunks of a fieldtrip buffer and returns measurement metadata.
@@ -125,7 +113,7 @@ public:
      *
      * @return Returns MetaData object containing buffer/measurement metadata.
      */
-    MetaData parseHeader(QBuffer& buffer);
+    MetaData parseExtendedHeader(QBuffer& buffer);
 
 private:
     class Chunk
