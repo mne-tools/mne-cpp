@@ -65,15 +65,44 @@ FiffId::FiffId()
 
 //=============================================================================================================
 
-FiffId::FiffId(const FiffId& p_FiffId)
-: version(p_FiffId.version)
+FiffId::FiffId(const FiffId& other)
+: version(other.version)
 {
-    machid[0] = p_FiffId.machid[0];
-    machid[1] = p_FiffId.machid[1];
-    time.secs = p_FiffId.time.secs;
-    time.usecs = p_FiffId.time.usecs;
+    machid[0] = other.machid[0];
+    machid[1] = other.machid[1];
+    time.secs = other.time.secs;
+    time.usecs = other.time.usecs;
 }
 
+//=============================================================================================================
+
+FiffId& FiffId::operator=(const FiffId& other)
+{
+    if( this != &other)
+    {
+        version = other.version;
+        machid[0] = other.machid[0];
+        machid[1] = other.machid[1];
+        time.secs = other.time.secs;
+        time.usecs = other.time.usecs;
+    }
+    return *this;
+}
+
+//=============================================================================================================
+
+FiffId& FiffId::operator=(FiffId& other)
+{
+    if( this != &other)
+    {
+        version = other.version;
+        machid[0] = other.machid[0];
+        machid[1] = other.machid[1];
+        time.secs = other.time.secs;
+        time.usecs = other.time.usecs;
+    }
+    return *this;
+}
 //=============================================================================================================
 
 FiffId::~FiffId()

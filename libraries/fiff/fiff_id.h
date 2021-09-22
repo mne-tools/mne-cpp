@@ -81,15 +81,27 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffId   Universially unique identifier which should be copied.
+     * @param[in] other  Universially unique identifier which should be copied.
      */
-    FiffId(const FiffId& p_FiffId);
+    FiffId(const FiffId& other);
 
     //=========================================================================================================
     /**
      * Destroys the universially unique identifier.
      */
     ~FiffId();
+
+    //=========================================================================================================
+    /**
+     * Copy assignment operator.
+     */
+    FiffId& operator=(const FiffId& other);
+
+    //=========================================================================================================
+    /**
+     * Copy assignment operator.
+     */
+    FiffId& operator=(FiffId& other);
 
     //=========================================================================================================
     /**
