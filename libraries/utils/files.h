@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include "utils_global.h"
+#include <string>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -77,6 +78,16 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns whether file at given input parameter exists
+     *
+     * @param[in] filePath      file to be checked
+     *
+     * @return Returns whther file exists.
+     */
+    static bool exists(const std::string& filePath);
+
+    //=========================================================================================================
+    /**
      * Copies file based on input parameters.
      * Does nothing if source file does not exists or if destination file already exists.
      *
@@ -86,6 +97,18 @@ public:
      * @return Returns true if copy was performed successfully, false otherwise.
      */
     static bool copy(const char* sourcePath, const char* destPath);
+
+    //=========================================================================================================
+    /**
+     * Copies file based on input parameters.
+     * Does nothing if source file does not exists or if destination file already exists.
+     *
+     * @param[in] sourcePath
+     * @param[in] destPath
+     *
+     * @return Returns true if copy was performed successfully, false otherwise.
+     */
+    static bool copy(const std::string& sourcePath, const std::string& destPath);
 
     //=========================================================================================================
     /**
@@ -101,6 +124,18 @@ public:
 
     //=========================================================================================================
     /**
+     * Attempts to rename file based on input parameters.
+     * Does nothing if source file does not exists or if destination file already exists.
+     *
+     * @param[in] sourcePath
+     * @param[in] destPath
+     *
+     * @return Whether file was renamed successfully, false otherwise.
+     */
+    static bool rename(const std::string& sourcePath, const std::string& destPath);
+
+    //=========================================================================================================
+    /**
      * Attempts to remove file at given input param.
      * Does nothing if file already does not exists.
      *
@@ -112,6 +147,17 @@ public:
 
     //=========================================================================================================
     /**
+     * Attempts to remove file at given input param.
+     * Does nothing if file already does not exists.
+     *
+     * @param[in] filePath  File path to file to be deleted.
+     *
+     * @return Returns whether file was removed, false otherwise.
+     */
+    static bool remove(const std::string& filePath);
+
+    //=========================================================================================================
+    /**
      * Attempts to create a file at filePath.
      * Does nothing if file already exists.
      *
@@ -120,6 +166,17 @@ public:
      * @return Returns whether file was created, false otherwise.
      */
     static bool create(const char* filePath);
+
+    //=========================================================================================================
+    /**
+     * Attempts to create a file at filePath.
+     * Does nothing if file already exists.
+     *
+     * @param[in] filePath  File path of new file to be created.
+     *
+     * @return Returns whether file was created, false otherwise.
+     */
+    static bool create(const std::string& filePath);
 
 #ifdef QT_CORE_LIB // QString oveloads
     //=========================================================================================================
@@ -177,7 +234,6 @@ public:
      * @return Returns whether file was created, false otherwise.
      */
     static bool create(const QString& filePath);
-
 #endif
 };
 
