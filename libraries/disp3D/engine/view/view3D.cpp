@@ -127,6 +127,20 @@ View3D::View3D()
     showSingleView();
 }
 
+//=============================================================================================================
+
+View3D::~View3D()
+{
+    delete m_pMultiCam1;
+    delete m_pMultiCam2;
+    delete m_pMultiCam3;
+
+    delete m_pMultiViewport1;
+    delete m_pMultiViewport2;
+    delete m_pMultiViewport3;
+
+    delete m_pMultiFrame;
+}
 
 //=============================================================================================================
 
