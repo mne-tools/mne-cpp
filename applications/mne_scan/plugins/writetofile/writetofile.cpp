@@ -43,6 +43,7 @@
 #include <disp/viewers/projectsettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <fiff/fiff_stream.h>
+#include <utils/files.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -540,7 +541,6 @@ bool WriteToFile::renameRecording(const QString& sFileName)
     bool bRenameFile = false;
 
     if(m_lFileNames.size() == 1){
-
         bRenameFile = renameSingleFile(QFileInfo(m_qFileOut).fileName(), sFileName);
     } else {
         bRenameFile = renameMultipleFiles(sFileName);
@@ -561,20 +561,19 @@ bool WriteToFile::renameSingleFile(const QString& sCurrentFileName, const QStrin
         sFullNewName = sNewFileName + ".fif";
     }
 
-    QFileInfo fileinfo(m_qFileOut);
-    QFileInfo existingFile(fileinfo.dir().absolutePath() + QString("/") + sFullNewName);
+    QString dir(QFileInfo(m_qFileOut).dir().absolutePath() + QString("/"));
 
-    if(existingFile.exists()){
+    if(Files::exists(QString(dir + sFullNewName))){
         int ret = popUpYesNo("A file with this name already exists.",
                              "Do you want to overwrite this file?");
         if(ret == QMessageBox::No) {
             return false;
         } else {
-            QFile(fileinfo.dir().absolutePath() + QString("/") + sFullNewName).remove();
+            Files::remove(dir + sFullNewName);
         }
     }
 
-    bool success = QFile(fileinfo.dir().absolutePath() + QString("/") + sCurrentFileName).rename(fileinfo.dir().absolutePath() + QString("/") + sFullNewName);
+    bool success = Files::rename(dir + sCurrentFileName, dir + sFullNewName);
 
     return success;
 }
