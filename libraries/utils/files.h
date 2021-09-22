@@ -58,7 +58,7 @@ namespace UTILSLIB
 
 //=============================================================================================================
 /**
- * @brief The Files class
+ * Class contianing static functions for common file operations.
  */
 class UTILSSHARED_EXPORT Files
 {
@@ -67,104 +67,114 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief exists
-     * @param filePath
-     * @return
+     * Returns whether file at given input parameter exists
+     *
+     * @param[in] filePath      file to be checked
+     *
+     * @return Returns whther file exists.
      */
     static bool exists(const char* filePath);
 
     //=========================================================================================================
     /**
      * Copies file based on input parameters.
+     * Does nothing if source file does not exists or if destination file already exists.
      *
      * @param[in] sourcePath
      * @param[in] destPath
      *
-     * @return
+     * @return Returns true if copy was performed successfully, false otherwise.
      */
     static bool copy(const char* sourcePath, const char* destPath);
 
     //=========================================================================================================
     /**
      * Attempts to rename file based on input parameters.
+     * Does nothing if source file does not exists or if destination file already exists.
      *
      * @param[in] sourcePath
      * @param[in] destPath
      *
-     * @return Whether file was renamed successfully.
+     * @return Whether file was renamed successfully, false otherwise.
      */
     static bool rename(const char* sourcePath, const char* destPath);
 
     //=========================================================================================================
     /**
      * Attempts to remove file at given input param.
+     * Does nothing if file already does not exists.
      *
      * @param[in] filePath  File path to file to be deleted.
      *
-     * @return Returns whether file was removed.
+     * @return Returns whether file was removed, false otherwise.
      */
     static bool remove(const char* filePath);
 
     //=========================================================================================================
     /**
      * Attempts to create a file at filePath.
+     * Does nothing if file already exists.
      *
-     * @param[in] filePath  File path to new file to be created.
+     * @param[in] filePath  File path of new file to be created.
      *
-     * @return Returns whether file was created.
+     * @return Returns whether file was created, false otherwise.
      */
     static bool create(const char* filePath);
 
 #ifdef QT_CORE_LIB // QString oveloads
     //=========================================================================================================
     /**
-     * Returns whether file given by input parameter exists.
+     * Returns whether file at given input parameter exists
      *
-     * @param [in] filePath     path to file to be checked
+     * @param[in] filePath      file to be checked
      *
-     * @return Whether file exists
+     * @return Returns whther file exists.
      */
     static bool exists(const QString& filePath);
 
     //=========================================================================================================
     /**
-     * Copies file based on given input parameters.
+     * Copies file based on input parameters.
+     * Does nothing if source file does not exists or if destination file already exists.
      *
-     * @param[in] sourcePath    file to be copied
+     * @param[in] sourcePath
      * @param[in] destPath
      *
-     * @return Returns whether copy was performed.
+     * @return Returns true if copy was performed successfully, false otherwise.
      */
     static bool copy(const QString& sourcePath, const QString& destPath);
 
     //=========================================================================================================
     /**
      * Attempts to rename file based on input parameters.
+     * Does nothing if source file does not exists or if destination file already exists.
      *
      * @param[in] sourcePath
      * @param[in] destPath
      *
-     * @return Whether file was renamed successfully.
+     * @return Whether file was renamed successfully, false otherwise.
      */
     static bool rename(const QString& sourcePath, const QString& destPath);
 
     //=========================================================================================================
     /**
      * Attempts to remove file at given input param.
+     * Does nothing if file already does not exists.
      *
      * @param[in] filePath  File path to file to be deleted.
      *
-     * @return Returns whether file was removed.
+     * @return Returns whether file was removed, false otherwise.
      */
     static bool remove(const QString& filePath);
 
     //=========================================================================================================
     /**
      * Attempts to create a file at filePath.
+     * Does nothing if file already exists.
      *
-     * @param[in] filePath  File path to new file to be created.
+     * @param[in] filePath  File path of new file to be created.
      *
-     * @return Returns whether file was created.
+     * @return Returns whether file was created, false otherwise.
      */
     static bool create(const QString& filePath);
 
