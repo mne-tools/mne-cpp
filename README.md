@@ -53,7 +53,6 @@ License
 MNE-CPP is **BSD-licenced** (3 clause):
 
     Copyright (c) 2011-2021, authors of MNE-CPP. All rights reserved.
-    All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
