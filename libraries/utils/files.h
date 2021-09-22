@@ -42,6 +42,14 @@
 #include "utils_global.h"
 
 //=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#ifdef QT_CORE_LIB
+#include <QString>
+#endif
+
+//=============================================================================================================
 // DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
@@ -67,14 +75,14 @@ public:
 
     //=========================================================================================================
     /**
-     * Attempts to copy file based on input parameters.
+     * Copies file based on input parameters.
      *
      * @param[in] sourcePath
      * @param[in] destPath
      *
      * @return
      */
-    static void copy(const char* sourcePath, const char* destPath);
+    static bool copy(const char* sourcePath, const char* destPath);
 
     //=========================================================================================================
     /**
@@ -83,9 +91,9 @@ public:
      * @param[in] sourcePath
      * @param[in] destPath
      *
-     * @return Whether file was renamed successfully
+     * @return Whether file was renamed successfully.
      */
-    static void rename(const char* sourcePath, const char* destPath);
+    static bool rename(const char* sourcePath, const char* destPath);
 
     //=========================================================================================================
     /**
@@ -93,19 +101,74 @@ public:
      *
      * @param[in] filePath  File path to file to be deleted.
      *
-     * @return Returns whether file exists at the end of execution.
+     * @return Returns whether file was removed.
      */
-    static void remove(const char* filePath);
+    static bool remove(const char* filePath);
 
     //=========================================================================================================
     /**
-     * Attempts to create a file at given input param. Does not check if file already exists.
+     * Attempts to create a file at filePath.
      *
      * @param[in] filePath  File path to new file to be created.
      *
-     * @return Returns whether a file with given name exists once execution is complete.
+     * @return Returns whether file was created.
      */
-    static void create(const char* filePath);
+    static bool create(const char* filePath);
+
+#ifdef QT_CORE_LIB // QString oveloads
+    //=========================================================================================================
+    /**
+     * Returns whether file given by input parameter exists.
+     *
+     * @param [in] filePath     path to file to be checked
+     *
+     * @return Whether file exists
+     */
+    static bool exists(const QString& filePath);
+
+    //=========================================================================================================
+    /**
+     * Copies file based on given input parameters.
+     *
+     * @param[in] sourcePath    file to be copied
+     * @param[in] destPath
+     *
+     * @return Returns whether copy was performed.
+     */
+    static bool copy(const QString& sourcePath, const QString& destPath);
+
+    //=========================================================================================================
+    /**
+     * Attempts to rename file based on input parameters.
+     *
+     * @param[in] sourcePath
+     * @param[in] destPath
+     *
+     * @return Whether file was renamed successfully.
+     */
+    static bool rename(const QString& sourcePath, const QString& destPath);
+
+    //=========================================================================================================
+    /**
+     * Attempts to remove file at given input param.
+     *
+     * @param[in] filePath  File path to file to be deleted.
+     *
+     * @return Returns whether file was removed.
+     */
+    static bool remove(const QString& filePath);
+
+    //=========================================================================================================
+    /**
+     * Attempts to create a file at filePath.
+     *
+     * @param[in] filePath  File path to new file to be created.
+     *
+     * @return Returns whether file was created.
+     */
+    static bool create(const QString& filePath);
+
+#endif
 };
 
 }//namepace
