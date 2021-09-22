@@ -84,15 +84,15 @@ int main(int argc, char *argv[])
 
     bool bStep = (parser.value("step") == "true");
 
-    std::string sDirPath = QDir::currentPath().toStdString();
-    std::string sFilePath = sDirPath + "test.txt";
+    std::string sDirPath = QCoreApplication::applicationDirPath().toStdString();
+    std::string sFilePath = sDirPath + "/test.txt";
 
     std::cout << "=====  Creating File  =====\n";
     if(bStep){
         std::cout << "Press RETURN to execute.\n";
         std::cin.get();
     }
-    Files::create(sFilePath.c_str());
+    Files::create(sFilePath);
 
     std::cout << "=====  Checking File  =====\n";
     if(bStep){
@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
         std::cin.get();
     }
     std::string answer;
-    if (Files::exists(sFilePath.c_str())){
+    if (Files::exists(sFilePath)){
         answer = "Yes.";
     } else {
         answer = "No.";
@@ -113,20 +113,20 @@ int main(int argc, char *argv[])
         std::cin.get();
     }
 
-    std::string sFilePath2 = sDirPath + "test_copy.txt";
-    std::string sFilePath3 = sDirPath + "another_test_copy.txt";
+    std::string sFilePath2 = sDirPath + "/test_copy.txt";
+    std::string sFilePath3 = sDirPath + "/another_test_copy.txt";
 
-    Files::copy(sFilePath.c_str(), sFilePath2.c_str());
-    Files::copy(sFilePath2.c_str(), sFilePath.c_str());
+    Files::copy(sFilePath, sFilePath2);
+    Files::copy(sFilePath2, sFilePath);
 
     std::cout << "=====  Renaming File  =====\n";
     if(bStep){
         std::cout << "Press RETURN to execute.\n";
         std::cin.get();
     }
-    std::string sFilePath4 = sDirPath + "another_test_copy.txt";
+    std::string sFilePath4 = sDirPath + "/another_test_copy.txt";
 
-    Files::rename(sFilePath3.c_str(), sFilePath4.c_str());
+    Files::rename(sFilePath3, sFilePath4);
 
     return a.exec();
 }
