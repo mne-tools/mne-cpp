@@ -49,28 +49,50 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FTBUFFERPLUGIN;
 using FTBUFFERPLUGIN::FtHeaderParser;
 using FTBUFFERPLUGIN::MetaData;
 
 //=============================================================================================================
 // DEFINE FREE FUNCTIONS
 //=============================================================================================================
+namespace {
 
-QStringList FTBUFFERPLUGIN::Details::extractChannelNamesFromBuffer(QBuffer& buffer)
+//=============================================================================================================
+/**
+ * Return a list of names for each channel from the input buffer.
+ * @param [in] buffer   Buffer from where to extract the channel names spearated by '\0' characters.
+ * @return A list with each channel's label name.
+ */
+QStringList extractChannelNamesFromBuffer(QBuffer& buffer)
 {
     QString singleStringAllNames(buffer.buffer().replace('\0','\n'));
     QStringList channelNames(singleStringAllNames.split('\n'));
     return channelNames;
 }
 
-void FTBUFFERPLUGIN::Details::parseChannelNamesHeader( MetaData& data, QBuffer& channelNamesBuffer)
+//=============================================================================================================
+/**
+ * Parses header chunk FT_CHUNK_CHANNEL_NAMES = 1
+ *
+ * @param[in, out] data         MetaData object that gets updated with measurment info from header
+ * @param[in] neuromagBuffer    Buffer containing the data portion of the neuromag header chunk
+ */
+void parseChannelNamesHeader( MetaData& data, QBuffer& channelNamesBuffer)
 {
     QStringList channelNames(extractChannelNamesFromBuffer(channelNamesBuffer));
 
 
 }
 
-void FTBUFFERPLUGIN::Details::parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer)
+//=============================================================================================================
+/**
+ * Parses header chunk FT_CHUNK_NEUROMAG_HEADER = 8
+ *
+ * @param[in, out] data         MetaData object that gets updated with measurment info from header
+ * @param[in] neuromagBuffer    Buffer containing the data portion of the neuromag header chunk
+ */
+void parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer)
 {
     //Pad buffer because the fiff file we receive is missing an end tag
     char cCharFromInt[sizeof (qint32)];
@@ -93,8 +115,13 @@ void FTBUFFERPLUGIN::Details::parseNeuromagHeader(MetaData& data, QBuffer& neuro
 }
 
 //=============================================================================================================
-
-void FTBUFFERPLUGIN::Details::parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer)
+/**
+ * Parses headr chunk FT_CHUNK_NEUROMAG_ISOTRAK = 9
+ *
+ * @param[in, out] data         MetaData object that gets updated with measurment info from header
+ * @param [in] isotrakBuffer    Buffer containing the data portion of the isotrak header chunk
+ */
+void parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer)
 {
     isotrakBuffer.reset();
 
@@ -108,6 +135,8 @@ void FTBUFFERPLUGIN::Details::parseIsotrakHeader(MetaData& data, QBuffer& isotra
         data.setFiffDigitizerData(digData);
     }
 }
+
+} //namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -134,9 +163,9 @@ MetaData FtHeaderParser::parseHeader(QBuffer &buffer)
 
 void FtHeaderParser::registerMembers()
 {
-    chunkParsersMap[HeaderChunkType::FT_CHUNK_CHANNEL_NAMES] = Details::parseChannelNamesHeader;
-    chunkParsersMap[HeaderChunkType::FT_CHUNK_NEUROMAG_HEADER] = Details::parseNeuromagHeader;
-    chunkParsersMap[HeaderChunkType::FT_CHUNK_NEUROMAG_ISOTRAK] = Details::parseIsotrakHeader;
+    chunkParsersMap[HeaderChunkType::FT_CHUNK_CHANNEL_NAMES] = parseChannelNamesHeader;
+    chunkParsersMap[HeaderChunkType::FT_CHUNK_NEUROMAG_HEADER] = parseNeuromagHeader;
+    chunkParsersMap[HeaderChunkType::FT_CHUNK_NEUROMAG_ISOTRAK] = parseIsotrakHeader;
 }
 
 //=============================================================================================================

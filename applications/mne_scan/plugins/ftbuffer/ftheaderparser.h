@@ -87,43 +87,17 @@ struct FTBUFFER_EXPORT MetaData{
                                                                          bFiffDigitizerData = true;};
 };
 
-namespace Details{
+//namespace {
 
-/**
- * Parses header chunk FT_CHUNK_CHANNEL_NAMES = 1
- *
- * @param[in, out] data         MetaData object that gets updated with measurment info from header
- * @param[in] neuromagBuffer    Buffer containing the data portion of the neuromag header chunk
- */
-void parseChannelNamesHeader(MetaData& data, QBuffer& neuromagBuffer);
+//void parseChannelNamesHeader(MetaData& data, const QBuffer& neuromagBuffer);
 
-//=============================================================================================================
-/**
- * Parses header chunk FT_CHUNK_NEUROMAG_HEADER = 8
- *
- * @param[in, out] data         MetaData object that gets updated with measurment info from header
- * @param[in] neuromagBuffer    Buffer containing the data portion of the neuromag header chunk
- */
-void parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer);
+//void parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer);
 
-//=============================================================================================================
-/**
- * Parses headr chunk FT_CHUNK_NEUROMAG_ISOTRAK = 9
- *
- * @param[in, out] data         MetaData object that gets updated with measurment info from header
- * @param [in] isotrakBuffer    Buffer containing the data portion of the isotrak header chunk
- */
-void parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer);
+//void parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer);
 
-//=============================================================================================================
-/**
- * Return a list of names for each channel from the input buffer.
- * @param [in] buffer   Buffer from where to extract the channel names spearated by '\0' characters.
- * @return A list with each channel's label name.
- */
-QStringList extractChannelNamesFromBuffer(QBuffer& buffer);
+//QStringList extractChannelNamesFromBuffer(QBuffer& buffer);
 
-} //details
+//} //namespace details
 
 //=============================================================================================================
 /**
