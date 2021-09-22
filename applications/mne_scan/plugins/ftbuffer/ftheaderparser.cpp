@@ -68,6 +68,7 @@ QStringList extractChannelNamesFromBuffer(QBuffer& buffer)
 {
     QString singleStringAllNames(buffer.buffer().replace('\0','\n'));
     QStringList channelNames(singleStringAllNames.split('\n'));
+    channelNames.removeAll(channelNames[channelNames.size()-1]);
     return channelNames;
 }
 
@@ -82,6 +83,41 @@ void parseChannelNamesHeader( MetaData& data, QBuffer& channelNamesBuffer)
 {
     QStringList channelNames(extractChannelNamesFromBuffer(channelNamesBuffer));
 
+//    qInfo() << channelNames;
+    FIFFLIB::FiffInfo info;
+    info.clear();
+    info.file_id =
+    info.meas_id =
+    info.meas_date[0] =
+    info.meas_date[1] =
+
+    info.nchan =
+    info.chs =
+    info.ch_names =
+
+    info.sfreq =
+    info.linefreq =
+
+    info.highpass =
+    info.lowpass =
+
+    info.dig   = dig;
+    if (!dig_trans.isEmpty())
+        info.dig_trans = dig_trans;
+
+    info.experimenter = experimenter;
+    info.description = description;
+    info.proj_id = proj_id;
+    info.proj_name = proj_name;
+    info.xplotter_layout = xplotter_layout;
+    info.gantry_angle = gantry_angle;
+    info.utc_offset = utc_offset;
+
+    info.bads  = bads;
+    info.projs = projs;
+    info.comps = comps;
+    info.acq_pars = acq_pars;
+    info.acq_stim = acq_stim;
 
 }
 
