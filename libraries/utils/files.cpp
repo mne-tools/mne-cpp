@@ -67,54 +67,102 @@ bool exists(const char* filePath)
 
 //=============================================================================================================
 
-void Files::copy(const char* sourcePath, const char* destPath)
+bool Files::copy(const char* sourcePath, const char* destPath)
 {
 #if __cplusplus >= 201703L
     std::filesystem::copy(sourcePath, destPath);
 #else
     if (!exists(sourcePath) || exists(destPath)){
-        return;
+        return false;
     }
 
     std::ifstream source(sourcePath, std::ios::binary);
     std::ofstream destination(destPath, std::ios::binary);
 
-    destination << source.rdbuf();
+    if(destination << source.rdbuf()){
+        return true;
+    } else {
+        return false;
+    }
+
 #endif
 }
 
 //=============================================================================================================
 
-void Files::rename(const char* sourcePath, const char* destPath)
+bool Files::rename(const char* sourcePath, const char* destPath)
 {
 #if __cplusplus >= 201703L
     std::filesystem::rename(sourcePath, destPath);
 #else
     if (!exists(sourcePath) || exists(destPath)){
-        return;
+        return false;
     }
 
-    std::rename(sourcePath, destPath);
+    return !std::rename(sourcePath, destPath); //std::rename returns 0 upon success
 #endif
 }
 
 //=============================================================================================================
 
-void Files::remove(const char* filePath)
+bool Files::remove(const char* filePath)
 {
 #if __cplusplus >= 201703L
     std::filesystem::remove(filePath);
 #else
     if (!exists(filePath)){
-        return;
+        return false;
     }
-    std::remove(filePath);
+    return !std::remove(filePath); //std::remove returns 0 upon success
 #endif
 }
 
 //=============================================================================================================
 
-void Files::create(const char *filePath)
+bool Files::create(const char *filePath)
 {
+    if (exists(filePath)){
+        return false;
+    }
+
     std::ofstream {filePath};
+
+    return exists(filePath);
 }
+
+//=============================================================================================================
+
+#ifdef QT_CORE_LIB // QString oveloads
+bool exists(const QString& filePath)
+{
+    return exists(filePath.toStdString().c_str());
+}
+
+//=============================================================================================================
+
+bool Files::copy(const QString& sourcePath, const QString& destPath)
+{
+    return copy(sourcePath.toStdString().c_str(), destPath.toStdString().c_str());
+}
+
+//=============================================================================================================
+
+bool Files::rename(const QString& sourcePath, const QString& destPath)
+{
+    return rename(sourcePath.toStdString().c_str(), destPath.toStdString().c_str());
+}
+
+//=============================================================================================================
+
+bool Files::remove(const QString& filePath)
+{
+    return remove(filePath.toStdString().c_str());
+}
+
+//=============================================================================================================
+
+bool Files::create(const QString& filePath)
+{
+    return create(filePath.toStdString().c_str());
+}
+#endif
