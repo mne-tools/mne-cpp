@@ -116,7 +116,7 @@ CosineFilter::CosineFilter(int fftLength,
             mult = 1.0/w;
             add  = 3.0;
 
-            for (k = 0; k < highpasss-w+1; k++)
+            for (k = 0; k < resp_size; k++)
                 filterFreqResp(k) = 0.0;
 
             for (k = -w+1, s = highpasss-w+1; k < w; k++, s++) {
