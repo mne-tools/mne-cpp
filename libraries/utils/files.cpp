@@ -55,7 +55,7 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-bool exists(const char* filePath)
+bool Files::exists(const char* filePath)
 {
 #if __cplusplus >= 201703L
     return std::filesystem::exists(filePath);
@@ -63,6 +63,13 @@ bool exists(const char* filePath)
     std::ifstream infile(filePath);
     return infile.good();
 #endif
+}
+
+//=============================================================================================================
+
+bool Files::exists(const std::string& filePath)
+{
+    return exists(filePath.c_str());
 }
 
 //=============================================================================================================
@@ -90,6 +97,13 @@ bool Files::copy(const char* sourcePath, const char* destPath)
 
 //=============================================================================================================
 
+bool Files::copy(const std::string& sourcePath, const std::string& destPath)
+{
+    return copy(sourcePath.c_str(), destPath.c_str());
+}
+
+//=============================================================================================================
+
 bool Files::rename(const char* sourcePath, const char* destPath)
 {
     if (!exists(sourcePath) || exists(destPath)){
@@ -102,6 +116,13 @@ bool Files::rename(const char* sourcePath, const char* destPath)
 #else
     return !std::rename(sourcePath, destPath); //std::rename returns 0 upon success
 #endif
+}
+
+//=============================================================================================================
+
+bool Files::rename(const std::string& sourcePath, const std::string& destPath)
+{
+    return rename(sourcePath.c_str(), destPath.c_str());
 }
 
 //=============================================================================================================
@@ -122,21 +143,35 @@ bool Files::remove(const char* filePath)
 
 //=============================================================================================================
 
+bool Files::remove(const std::string& filePath)
+{
+    return remove(filePath.c_str());
+}
+
+//=============================================================================================================
+
 bool Files::create(const char *filePath)
 {
     if (exists(filePath)){
         return false;
     }
 
-    std::ofstream {filePath};
+    std::ofstream a(filePath);
 
     return exists(filePath);
 }
 
 //=============================================================================================================
 
+bool Files::create(const std::string& filePath)
+{
+    return create(filePath.c_str());
+}
+
+//=============================================================================================================
+
 #ifdef QT_CORE_LIB // QString oveloads
-bool exists(const QString& filePath)
+bool Files::exists(const QString& filePath)
 {
     return exists(filePath.toStdString().c_str());
 }
