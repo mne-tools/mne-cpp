@@ -69,13 +69,14 @@ bool exists(const char* filePath)
 
 bool Files::copy(const char* sourcePath, const char* destPath)
 {
-#if __cplusplus >= 201703L
-    std::filesystem::copy(sourcePath, destPath);
-#else
     if (!exists(sourcePath) || exists(destPath)){
         return false;
     }
 
+#if __cplusplus >= 201703L
+    std::filesystem::copy(sourcePath, destPath);
+    return exists(destPath);
+#else
     std::ifstream source(sourcePath, std::ios::binary);
     std::ofstream destination(destPath, std::ios::binary);
 
@@ -84,7 +85,6 @@ bool Files::copy(const char* sourcePath, const char* destPath)
     } else {
         return false;
     }
-
 #endif
 }
 
@@ -92,13 +92,14 @@ bool Files::copy(const char* sourcePath, const char* destPath)
 
 bool Files::rename(const char* sourcePath, const char* destPath)
 {
-#if __cplusplus >= 201703L
-    std::filesystem::rename(sourcePath, destPath);
-#else
     if (!exists(sourcePath) || exists(destPath)){
         return false;
     }
 
+#if __cplusplus >= 201703L
+    std::filesystem::rename(sourcePath, destPath);
+    return (!exists(sourcePath) && exists(destPath));
+#else
     return !std::rename(sourcePath, destPath); //std::rename returns 0 upon success
 #endif
 }
@@ -107,12 +108,14 @@ bool Files::rename(const char* sourcePath, const char* destPath)
 
 bool Files::remove(const char* filePath)
 {
-#if __cplusplus >= 201703L
-    std::filesystem::remove(filePath);
-#else
     if (!exists(filePath)){
         return false;
     }
+
+#if __cplusplus >= 201703L
+    std::filesystem::remove(filePath);
+    return !exists(filePath);
+#else
     return !std::remove(filePath); //std::remove returns 0 upon success
 #endif
 }
