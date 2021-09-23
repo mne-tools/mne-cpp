@@ -49,6 +49,8 @@
 #include <disp/viewers/multiviewwindow.h>
 #include <disp/viewers/abstractview.h>
 
+#include <utils/buildinfo.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -661,7 +663,7 @@ void MainWindow::about()
         m_textEdit_aboutText->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse);
 
         QLabel* pLabel = new QLabel();
-        pLabel->setText(QString("Version: ") + CInfo::AppVersion());
+        pLabel->setText(QString("Version: ") + CInfo::AppVersion() + " - " + QString(UTILSLIB::dateTimeNow()) + " - " + QString(UTILSLIB::gitHash()));
 
         gridLayout->addWidget(pLabel, 1, 0, 1, 1);
 
