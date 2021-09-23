@@ -59,9 +59,24 @@
 #endif
 
 namespace BRAINAMPPLUGIN{
-    BRAINAMPSHARED_EXPORT const char* buildDateTime();
-    BRAINAMPSHARED_EXPORT const char* buildHash();
-    BRAINAMPSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+BRAINAMPSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+BRAINAMPSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+BRAINAMPSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // BRAINAMP_GLOBAL_H

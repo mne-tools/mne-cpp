@@ -59,9 +59,24 @@
 #endif
 
 namespace NEURONALCONNECTIVITYPLUGIN{
-    NEURONALCONNECTIVITYSHARED_EXPORT const char* buildDateTime();
-    NEURONALCONNECTIVITYSHARED_EXPORT const char* buildHash();
-    NEURONALCONNECTIVITYSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+NEURONALCONNECTIVITYSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+NEURONALCONNECTIVITYSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+NEURONALCONNECTIVITYSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // CONNECTIVITY_GLOBAL_H

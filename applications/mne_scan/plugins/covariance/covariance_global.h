@@ -59,9 +59,24 @@
 #endif
 
 namespace COVARIANCEPLUGIN{
-    COVARIANCESHARED_EXPORT const char* buildDateTime();
-    COVARIANCESHARED_EXPORT const char* buildHash();
-    COVARIANCESHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+COVARIANCESHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+COVARIANCESHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+COVARIANCESHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // COVARIANCE_GLOBAL_H

@@ -59,9 +59,24 @@
 #endif
 
 namespace AVERAGINGPLUGIN{
-    AVERAGINGSHARED_EXPORT const char* buildDateTime();
-    AVERAGINGSHARED_EXPORT const char* buildHash();
-    AVERAGINGSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+AVERAGINGSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+AVERAGINGSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+AVERAGINGSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // AVERAGING_GLOBAL_H

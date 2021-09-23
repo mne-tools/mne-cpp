@@ -56,9 +56,24 @@
 #endif
 
 namespace DISP3DLIB{
-    DISP3DLIB_DISP3D_GLOBAL_H const char* buildDateTime();
-    DISP3DLIB_DISP3D_GLOBAL_H const char* buildHash();
-    DISP3DLIB_DISP3D_GLOBAL_H const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+DISP3DLIB_DISP3D_GLOBAL_H const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+DISP3DLIB_DISP3D_GLOBAL_H const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+DISP3DLIB_DISP3D_GLOBAL_H const char* buildHashLong();
 }
 
 #endif // DISP3DLIB_GLOBAL_H

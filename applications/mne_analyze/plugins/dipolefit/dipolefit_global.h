@@ -58,9 +58,24 @@
 #endif
 
 namespace DIPOLEFITPLUGIN{
-    DIPOLEFITSHARED_EXPORT const char* buildDateTime();
-    DIPOLEFITSHARED_EXPORT const char* buildHash();
-    DIPOLEFITSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+DIPOLEFITSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+DIPOLEFITSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+DIPOLEFITSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // DIPOLEFIT_GLOBAL_H
