@@ -59,9 +59,24 @@
 #endif
 
 namespace NOISEREDUCTIONPLUGIN{
-    NOISEREDUCTIONSHARED_EXPORT const char* buildDateTime();
-    NOISEREDUCTIONSHARED_EXPORT const char* buildHash();
-    NOISEREDUCTIONSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+NOISEREDUCTIONSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+NOISEREDUCTIONSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+NOISEREDUCTIONSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // NOISEREDUCTION_GLOBAL_H

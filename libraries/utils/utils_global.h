@@ -59,9 +59,24 @@
 #endif
 
 namespace UTILSLIB{
-    UTILSSHARED_EXPORT const char* buildDateTime();
-    UTILSSHARED_EXPORT const char* buildHash();
-    UTILSSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+UTILSSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+UTILSSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+UTILSSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // MNEUTILS_GLOBAL_H

@@ -58,9 +58,24 @@
 #endif
 
 namespace FWDLIB{
-    FWDSHARED_EXPORT const char* buildDateTime();
-    FWDSHARED_EXPORT const char* buildHash();
-    FWDSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+FWDSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+FWDSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+FWDSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // FWD_GLOBAL_H

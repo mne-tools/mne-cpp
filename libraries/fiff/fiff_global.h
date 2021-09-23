@@ -57,9 +57,24 @@
 #endif
 
 namespace FIFFLIB{
-    FIFFSHARED_EXPORT const char* buildDateTime();
-    FIFFSHARED_EXPORT const char* buildHash();
-    FIFFSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+FIFFSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+FIFFSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+FIFFSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // FIFF_GLOBAL_H

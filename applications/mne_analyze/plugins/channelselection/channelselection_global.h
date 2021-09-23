@@ -58,9 +58,24 @@
 #endif
 
 namespace CHANNELSELECTIONPLUGIN{
-    CHANNELSELECTIONSHARED_EXPORT const char* buildDateTime();
-    CHANNELSELECTIONSHARED_EXPORT const char* buildHash();
-    CHANNELSELECTIONSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+CHANNELSELECTIONSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+CHANNELSELECTIONSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+CHANNELSELECTIONSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // DATAMANAGER_GLOBAL_H

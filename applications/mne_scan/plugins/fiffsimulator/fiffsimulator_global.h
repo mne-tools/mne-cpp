@@ -59,9 +59,24 @@
 #endif
 
 namespace FIFFSIMULATORPLUGIN{
-    FIFFSIMULATORSHARED_EXPORT const char* buildDateTime();
-    FIFFSIMULATORSHARED_EXPORT const char* buildHash();
-    FIFFSIMULATORSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+FIFFSIMULATORSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+FIFFSIMULATORSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+FIFFSIMULATORSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // FIFFSIMULATOR_GLOBAL_H

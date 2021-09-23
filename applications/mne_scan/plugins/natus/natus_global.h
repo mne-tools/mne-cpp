@@ -58,9 +58,24 @@
 #endif
 
 namespace NATUSPLUGIN{
-    NATUSSHARED_EXPORT const char* buildDateTime();
-    NATUSSHARED_EXPORT const char* buildHash();
-    NATUSSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+NATUSSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+NATUSSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+NATUSSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // NATUS_GLOBAL_H

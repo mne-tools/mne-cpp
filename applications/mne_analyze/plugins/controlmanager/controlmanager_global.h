@@ -58,9 +58,24 @@
 #endif
 
 namespace CONTROLMANAGERPLUGIN{
-    CONTROLMANAGERSHARED_EXPORT const char* buildDateTime();
-    CONTROLMANAGERSHARED_EXPORT const char* buildHash();
-    CONTROLMANAGERSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+CONTROLMANAGERSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+CONTROLMANAGERSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+CONTROLMANAGERSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // CONTROLMANAGER_GLOBAL_H

@@ -59,9 +59,24 @@
 #endif
 
 namespace TMSIPLUGIN{
-    TMSISHARED_EXPORT const char* buildDateTime();
-    TMSISHARED_EXPORT const char* buildHash();
-    TMSISHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+TMSISHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+TMSISHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+TMSISHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // TMSI_GLOBAL_H

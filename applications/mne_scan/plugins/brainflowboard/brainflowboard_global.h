@@ -58,9 +58,24 @@
 #endif
 
 namespace BRAINFLOWBOARDPLUGIN{
-    BRAINFLOWBOARD_EXPORT const char* buildDateTime();
-    BRAINFLOWBOARD_EXPORT const char* buildHash();
-    BRAINFLOWBOARD_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+BRAINFLOWBOARD_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+BRAINFLOWBOARD_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+BRAINFLOWBOARD_EXPORT const char* buildHashLong();
 }
 
 #endif // BRAINFLOWBOARD_GLOBAL_H
