@@ -47,9 +47,24 @@
 #endif
 
 namespace EVENTSLIB{
-    EVENTS_EXPORT const char* buildDateTime();
-    EVENTS_EXPORT const char* buildHash();
-    EVENTS_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+EVENTS_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+EVENTS_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+EVENTS_EXPORT const char* buildHashLong();
 }
 
 #endif // EVENTS_GLOBAL_H

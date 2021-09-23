@@ -58,9 +58,24 @@
 #endif
 
 namespace COREGISTRATIONPLUGIN{
-    COREGISTRATIONSHARED_EXPORT const char* buildDateTime();
-    COREGISTRATIONSHARED_EXPORT const char* buildHash();
-    COREGISTRATIONSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+COREGISTRATIONSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+COREGISTRATIONSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+COREGISTRATIONSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // COREGISTRATION_GLOBAL_H

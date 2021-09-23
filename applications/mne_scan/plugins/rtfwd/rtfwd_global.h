@@ -58,9 +58,24 @@
 #endif
 
 namespace RTFWDPLUGIN{
-    RTFWDSHARED_EXPORT const char* buildDateTime();
-    RTFWDSHARED_EXPORT const char* buildHash();
-    RTFWDSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+RTFWDSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+RTFWDSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+RTFWDSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // RTFWD_GLOBAL_H

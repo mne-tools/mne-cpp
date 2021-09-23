@@ -61,9 +61,24 @@
 #endif
 
 namespace LSLADAPTERPLUGIN{
-    LSLADAPTERSHARED_EXPORT const char* buildDateTime();
-    LSLADAPTERSHARED_EXPORT const char* buildHash();
-    LSLADAPTERSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+LSLADAPTERSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+LSLADAPTERSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+LSLADAPTERSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // LSLADAPTER_GLOBAL_H

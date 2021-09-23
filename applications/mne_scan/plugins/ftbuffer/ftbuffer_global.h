@@ -60,9 +60,24 @@
 #endif
 
 namespace FTBUFFERPLUGIN{
-    FTBUFFER_EXPORT const char* buildDateTime();
-    FTBUFFER_EXPORT const char* buildHash();
-    FTBUFFER_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+FTBUFFER_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+FTBUFFER_EXPORT const char* buildHash();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+FTBUFFER_EXPORT const char* buildHashLong();
 }
 
 #endif // FTBUFFER_GLOBAL_H

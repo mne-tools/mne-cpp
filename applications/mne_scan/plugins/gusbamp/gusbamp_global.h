@@ -59,9 +59,24 @@
 #endif
 
 namespace GUSBAMPPLUGIN{
-    GUSBAMPSHARED_EXPORT const char* buildDateTime();
-    GUSBAMPSHARED_EXPORT const char* buildHash();
-    GUSBAMPSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+GUSBAMPSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+GUSBAMPSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+GUSBAMPSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // GUSBAMP_GLOBAL_H

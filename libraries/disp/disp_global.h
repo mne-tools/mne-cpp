@@ -56,9 +56,24 @@
 #endif
 
 namespace DISPLIB{
-    DISPSHARED_EXPORT const char* buildDateTime();
-    DISPSHARED_EXPORT const char* buildHash();
-    DISPSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+DISPSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+DISPSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+DISPSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // DISP_GLOBAL_H

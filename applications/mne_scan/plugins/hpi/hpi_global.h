@@ -58,9 +58,24 @@
 #endif
 
 namespace HPIPLUGIN{
-    HPISHARED_EXPORT const char* buildDateTime();
-    HPISHARED_EXPORT const char* buildHash();
-    HPISHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+HPISHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+HPISHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+HPISHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // WRITETOFILE_GLOBAL_H

@@ -57,9 +57,24 @@
 #endif
 
 namespace MNELIB{
-    MNESHARED_EXPORT const char* buildDateTime();
-    MNESHARED_EXPORT const char* buildHash();
-    MNESHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+MNESHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+MNESHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+MNESHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // MNE_GLOBAL_H

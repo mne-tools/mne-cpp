@@ -59,9 +59,24 @@
 #endif
 
 namespace BABYMEGPLUGIN{
-    BABYMEGSHARED_EXPORT const char* buildDateTime();
-    BABYMEGSHARED_EXPORT const char* buildHash();
-    BABYMEGSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+BABYMEGSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+BABYMEGSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+BABYMEGSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // BABYMEG_GLOBAL_H

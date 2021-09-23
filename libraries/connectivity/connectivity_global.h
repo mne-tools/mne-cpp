@@ -55,9 +55,24 @@
 #endif
 
 namespace CONNECTIVITYLIB{
-    CONNECTIVITYSHARED_EXPORT const char* buildDateTime();
-    CONNECTIVITYSHARED_EXPORT const char* buildHash();
-    CONNECTIVITYSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+CONNECTIVITYSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+CONNECTIVITYSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+CONNECTIVITYSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // CONNECTIVITY_GLOBAL_H

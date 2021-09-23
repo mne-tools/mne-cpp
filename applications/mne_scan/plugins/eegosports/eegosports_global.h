@@ -59,9 +59,24 @@
 #endif
 
 namespace EEGOSPORTSPLUGIN{
-    EEGOSPORTSSHARED_EXPORT const char* buildDateTime();
-    EEGOSPORTSSHARED_EXPORT const char* buildHash();
-    EEGOSPORTSSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+EEGOSPORTSSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+EEGOSPORTSSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+EEGOSPORTSSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // EEGOSPORTS_GLOBAL_H

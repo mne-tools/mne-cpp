@@ -57,9 +57,24 @@
 #endif
 
 namespace COMMUNICATIONLIB{
-    COMMUNICATIONSHARED_EXPORT const char* buildDateTime();
-    COMMUNICATIONSHARED_EXPORT const char* buildHash();
-    COMMUNICATIONSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+COMMUNICATIONSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+COMMUNICATIONSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+COMMUNICATIONSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // COMMUNICATION_GLOBAL_H

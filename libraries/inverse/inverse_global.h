@@ -57,9 +57,24 @@
 #endif
 
 namespace INVERSELIB{
-    INVERSESHARED_EXPORT const char* buildDateTime();
-    INVERSESHARED_EXPORT const char* buildHash();
-    INVERSESHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+INVERSESHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+INVERSESHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+INVERSESHARED_EXPORT const char* buildHashLong();
 
 }
 

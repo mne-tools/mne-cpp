@@ -58,9 +58,24 @@
 #endif
 
 namespace SOURCELOCALIZATIONPLUGIN{
-    SOURCELOCALIZATIONSHARED_EXPORT const char* buildDateTime();
-    SOURCELOCALIZATIONSHARED_EXPORT const char* buildHash();
-    SOURCELOCALIZATIONSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+SOURCELOCALIZATIONSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+SOURCELOCALIZATIONSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+SOURCELOCALIZATIONSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // MNEANALYZE_SOURCELOCALIZATION_GLOBAL_H

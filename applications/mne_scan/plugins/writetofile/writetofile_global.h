@@ -58,9 +58,24 @@
 #endif
 
 namespace WRITETOFILEPLUGIN{
-    WRITETOFILESHARED_EXPORT const char* buildDateTime();
-    WRITETOFILESHARED_EXPORT const char* buildHash();
-    WRITETOFILESHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+WRITETOFILESHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+WRITETOFILESHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+WRITETOFILESHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // WRITETOFILE_GLOBAL_H

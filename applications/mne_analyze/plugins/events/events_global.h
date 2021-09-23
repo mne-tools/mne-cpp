@@ -59,9 +59,24 @@
 #endif
 
 namespace EVENTSPLUGIN{
-    EVENTSSHARED_EXPORT const char* buildDateTime();
-    EVENTSSHARED_EXPORT const char* buildHash();
-    EVENTSSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+EVENTSSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+EVENTSSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+EVENTSSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // ANALYZE_EVENTS_GLOBAL_H

@@ -57,9 +57,24 @@
 #endif
 
 namespace FSLIB{
-    FSSHARED_EXPORT const char* buildDateTime();
-    FSSHARED_EXPORT const char* buildHash();
-    FSSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+FSSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+FSSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+FSSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // FS_GLOBAL_H

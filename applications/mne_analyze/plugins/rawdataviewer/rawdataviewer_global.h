@@ -60,9 +60,24 @@
 #endif
 
 namespace RAWDATAVIEWERPLUGIN{
-    RAWDATAVIEWERSHARED_EXPORT const char* buildDateTime();
-    RAWDATAVIEWERSHARED_EXPORT const char* buildHash();
-    RAWDATAVIEWERSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+RAWDATAVIEWERSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+RAWDATAVIEWERSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+RAWDATAVIEWERSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // RAWDATAVIEWER_GLOBAL_H

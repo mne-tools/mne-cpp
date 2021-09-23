@@ -59,9 +59,24 @@
 #endif
 
 namespace RTCMNEPLUGIN{
-    RTCMNESHARED_EXPORT const char* buildDateTime();
-    RTCMNESHARED_EXPORT const char* buildHash();
-    RTCMNESHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+RTCMNESHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+RTCMNESHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+RTCMNESHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // RTCMNE_GLOBAL_H

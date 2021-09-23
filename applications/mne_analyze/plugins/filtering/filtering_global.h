@@ -58,9 +58,24 @@
 #endif
 
 namespace FILTERINGPLUGIN{
-    FILTERINGSHARED_EXPORT const char* buildDateTime();
-    FILTERINGSHARED_EXPORT const char* buildHash();
-    FILTERINGSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+FILTERINGSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+FILTERINGSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+FILTERINGSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // FILTERING_GLOBAL_H

@@ -59,9 +59,24 @@
 #endif
 
 namespace DATALOADERPLUGIN{
-    DATALOADERSHARED_EXPORT const char* buildDateTime();
-    DATALOADERSHARED_EXPORT const char* buildHash();
-    DATALOADERSHARED_EXPORT const char* buildHashLong();
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+DATALOADERSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+DATALOADERSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+DATALOADERSHARED_EXPORT const char* buildHashLong();
 }
 
 #endif // DATALOADER_GLOBAL_H
