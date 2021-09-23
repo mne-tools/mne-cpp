@@ -70,7 +70,7 @@ BRAINAMPSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-BRAINAMPSHARED_EXPORT const char* buildDateTime();
+BRAINAMPSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

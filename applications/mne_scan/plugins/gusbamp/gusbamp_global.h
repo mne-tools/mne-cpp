@@ -70,7 +70,7 @@ GUSBAMPSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-GUSBAMPSHARED_EXPORT const char* buildDateTime();
+GUSBAMPSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

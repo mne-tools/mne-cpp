@@ -70,7 +70,7 @@ TMSISHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-TMSISHARED_EXPORT const char* buildDateTime();
+TMSISHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

@@ -70,7 +70,7 @@ COVARIANCESHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-COVARIANCESHARED_EXPORT const char* buildDateTime();
+COVARIANCESHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

@@ -69,7 +69,7 @@ BRAINFLOWBOARD_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-BRAINFLOWBOARD_EXPORT const char* buildDateTime();
+BRAINFLOWBOARD_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**
