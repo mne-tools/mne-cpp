@@ -1,7 +1,7 @@
 #include "disp_global.h"
 
-const char* DISPLIB::buildDateTime(){ return BUILDINFO::dateTime();};
+const char* DISPLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();};
 
-const char* DISPLIB::buildHash(){ return BUILDINFO::gitHash();};
+const char* DISPLIB::buildHash(){ return UTILSLIB::gitHash();};
 
-const char* DISPLIB::buildHashLong(){ return BUILDINFO::gitHashLong();};
+const char* DISPLIB::buildHashLong(){ return UTILSLIB::gitHashLong();};

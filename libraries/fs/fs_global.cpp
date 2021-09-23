@@ -1,7 +1,7 @@
 #include "fs_global.h"
 
-const char* FSLIB::buildDateTime(){ return BUILDINFO::dateTime();};
+const char* FSLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();};
 
-const char* FSLIB::buildHash(){ return BUILDINFO::gitHash();};
+const char* FSLIB::buildHash(){ return UTILSLIB::gitHash();};
 
-const char* FSLIB::buildHashLong(){ return BUILDINFO::gitHashLong();};
+const char* FSLIB::buildHashLong(){ return UTILSLIB::gitHashLong();};

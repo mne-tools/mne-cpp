@@ -1,7 +1,7 @@
 #include "covariance_global.h"
 
-const char* COVARIANCEPLUGIN::buildDateTime(){ return BUILDINFO::dateTime();};
+const char* COVARIANCEPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();};
 
-const char* COVARIANCEPLUGIN::buildHash(){ return BUILDINFO::gitHash();};
+const char* COVARIANCEPLUGIN::buildHash(){ return UTILSLIB::gitHash();};
 
-const char* COVARIANCEPLUGIN::buildHashLong(){ return BUILDINFO::gitHashLong();};
+const char* COVARIANCEPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();};
