@@ -66,7 +66,7 @@ CONNECTIVITYSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-CONNECTIVITYSHARED_EXPORT const char* buildDateTime();
+CONNECTIVITYSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

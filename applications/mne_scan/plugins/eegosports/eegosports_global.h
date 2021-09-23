@@ -70,7 +70,7 @@ EEGOSPORTSSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-EEGOSPORTSSHARED_EXPORT const char* buildDateTime();
+EEGOSPORTSSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

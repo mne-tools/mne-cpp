@@ -69,7 +69,7 @@ RTFWDSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-RTFWDSHARED_EXPORT const char* buildDateTime();
+RTFWDSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

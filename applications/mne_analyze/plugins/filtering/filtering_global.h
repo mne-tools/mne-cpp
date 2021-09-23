@@ -69,7 +69,7 @@ FILTERINGSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-FILTERINGSHARED_EXPORT const char* buildDateTime();
+FILTERINGSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

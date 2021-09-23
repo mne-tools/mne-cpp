@@ -70,7 +70,7 @@ NOISEREDUCTIONSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-NOISEREDUCTIONSHARED_EXPORT const char* buildDateTime();
+NOISEREDUCTIONSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

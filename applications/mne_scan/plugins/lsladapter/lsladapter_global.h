@@ -72,7 +72,7 @@ LSLADAPTERSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-LSLADAPTERSHARED_EXPORT const char* buildDateTime();
+LSLADAPTERSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

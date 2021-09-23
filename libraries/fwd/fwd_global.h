@@ -69,7 +69,7 @@ FWDSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-FWDSHARED_EXPORT const char* buildDateTime();
+FWDSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

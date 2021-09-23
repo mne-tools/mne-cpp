@@ -69,7 +69,7 @@ HPISHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-HPISHARED_EXPORT const char* buildDateTime();
+HPISHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

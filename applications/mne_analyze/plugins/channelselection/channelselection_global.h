@@ -69,7 +69,7 @@ CHANNELSELECTIONSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-CHANNELSELECTIONSHARED_EXPORT const char* buildDateTime();
+CHANNELSELECTIONSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

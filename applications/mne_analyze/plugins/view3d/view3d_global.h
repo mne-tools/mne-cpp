@@ -69,7 +69,7 @@ VIEW3DSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-VIEW3DSHARED_EXPORT const char* buildDateTime();
+VIEW3DSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

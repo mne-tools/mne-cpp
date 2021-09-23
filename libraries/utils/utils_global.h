@@ -70,7 +70,7 @@ UTILSSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-UTILSSHARED_EXPORT const char* buildDateTime();
+UTILSSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

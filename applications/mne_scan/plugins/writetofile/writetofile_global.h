@@ -69,7 +69,7 @@ WRITETOFILESHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-WRITETOFILESHARED_EXPORT const char* buildDateTime();
+WRITETOFILESHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

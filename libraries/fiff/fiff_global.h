@@ -68,7 +68,7 @@ FIFFSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-FIFFSHARED_EXPORT const char* buildDateTime();
+FIFFSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

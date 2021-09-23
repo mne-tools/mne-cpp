@@ -70,7 +70,7 @@ DATALOADERSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-DATALOADERSHARED_EXPORT const char* buildDateTime();
+DATALOADERSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

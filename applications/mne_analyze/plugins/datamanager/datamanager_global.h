@@ -71,7 +71,7 @@ DATAMANAGERSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-DATAMANAGERSHARED_EXPORT const char* buildDateTime();
+DATAMANAGERSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

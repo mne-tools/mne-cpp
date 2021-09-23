@@ -70,7 +70,7 @@ FIFFSIMULATORSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-FIFFSIMULATORSHARED_EXPORT const char* buildDateTime();
+FIFFSIMULATORSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

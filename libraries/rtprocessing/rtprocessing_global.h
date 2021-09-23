@@ -67,7 +67,7 @@ RTPROCESINGSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-RTPROCESINGSHARED_EXPORT const char* buildDateTime();
+RTPROCESINGSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**
