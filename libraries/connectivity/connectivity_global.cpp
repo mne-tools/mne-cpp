@@ -1,7 +1,7 @@
 #include "connectivity_global.h"
 
-const char* CONNECTIVITYLIB::buildDateTime(){ return BUILDINFO::dateTime();};
+const char* CONNECTIVITYLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();};
 
-const char* CONNECTIVITYLIB::buildHash(){ return BUILDINFO::gitHash();};
+const char* CONNECTIVITYLIB::buildHash(){ return UTILSLIB::gitHash();};
 
-const char* CONNECTIVITYLIB::buildHashLong(){ return BUILDINFO::gitHashLong();};
+const char* CONNECTIVITYLIB::buildHashLong(){ return UTILSLIB::gitHashLong();};

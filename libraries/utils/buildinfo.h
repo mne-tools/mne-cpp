@@ -9,7 +9,7 @@ namespace BUILDINFO{
 /**
  * Returns build time (time preprocessor was run). Must be called in compiled function to return correctly.
  */
-constexpr auto time()
+constexpr auto timeNowNow()
 {
     return __TIME__;
 }
@@ -18,7 +18,7 @@ constexpr auto time()
 /**
  * Returns build date (time preprocessor was run). Must be called in compiled function to return correctly.
  */
-constexpr auto date()
+constexpr auto dateToday()
 {
     return __DATE__;
 }
@@ -28,7 +28,7 @@ constexpr auto date()
  * Returns build date and time (time preprocessor was run). Must be called in compiled function to return
  * correctly.
  */
-constexpr auto dateTime()
+constexpr auto dateTimeNow()
 {
     return __DATE__ " " __TIME__;
 }

@@ -1,7 +1,7 @@
 #include "filtering_global.h"
 
-const char* FILTERINGPLUGIN::buildDateTime(){ return BUILDINFO::dateTime();};
+const char* FILTERINGPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();};
 
-const char* FILTERINGPLUGIN::buildHash(){ return BUILDINFO::gitHash();};
+const char* FILTERINGPLUGIN::buildHash(){ return UTILSLIB::gitHash();};
 
-const char* FILTERINGPLUGIN::buildHashLong(){ return BUILDINFO::gitHashLong();};
+const char* FILTERINGPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();};
