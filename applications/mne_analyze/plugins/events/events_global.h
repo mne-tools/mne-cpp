@@ -70,7 +70,7 @@ EVENTSSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-EVENTSSHARED_EXPORT const char* buildDateTime();
+EVENTSSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

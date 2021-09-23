@@ -70,7 +70,7 @@ NEURONALCONNECTIVITYSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-NEURONALCONNECTIVITYSHARED_EXPORT const char* buildDateTime();
+NEURONALCONNECTIVITYSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

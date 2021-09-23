@@ -69,7 +69,7 @@ COREGISTRATIONSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-COREGISTRATIONSHARED_EXPORT const char* buildDateTime();
+COREGISTRATIONSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

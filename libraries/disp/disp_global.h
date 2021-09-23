@@ -67,7 +67,7 @@ DISPSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-DISPSHARED_EXPORT const char* buildDateTime();
+DISPSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

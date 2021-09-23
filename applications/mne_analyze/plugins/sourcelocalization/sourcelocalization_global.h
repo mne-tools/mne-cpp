@@ -69,7 +69,7 @@ SOURCELOCALIZATIONSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-SOURCELOCALIZATIONSHARED_EXPORT const char* buildDateTime();
+SOURCELOCALIZATIONSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

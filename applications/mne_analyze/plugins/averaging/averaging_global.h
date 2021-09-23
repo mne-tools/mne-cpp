@@ -69,7 +69,7 @@ AVERAGINGSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-AVERAGINGSHARED_EXPORT const char* buildDateTime();
+AVERAGINGSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

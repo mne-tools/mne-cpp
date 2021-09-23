@@ -70,7 +70,7 @@ RTCMNESHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-RTCMNESHARED_EXPORT const char* buildDateTime();
+RTCMNESHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

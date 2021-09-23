@@ -68,7 +68,7 @@ MNESHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-MNESHARED_EXPORT const char* buildDateTime();
+MNESHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

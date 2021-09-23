@@ -71,7 +71,7 @@ RAWDATAVIEWERSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-RAWDATAVIEWERSHARED_EXPORT const char* buildDateTime();
+RAWDATAVIEWERSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

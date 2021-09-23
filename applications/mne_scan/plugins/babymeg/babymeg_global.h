@@ -70,7 +70,7 @@ BABYMEGSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-BABYMEGSHARED_EXPORT const char* buildDateTime();
+BABYMEGSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

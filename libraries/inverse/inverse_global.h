@@ -68,7 +68,7 @@ INVERSESHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-INVERSESHARED_EXPORT const char* buildDateTime();
+INVERSESHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

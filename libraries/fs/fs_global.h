@@ -68,7 +68,7 @@ FSSHARED_EXPORT const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-FSSHARED_EXPORT const char* buildDateTime();
+FSSHARED_EXPORT const char* buildHash();
 
 //=============================================================================================================
 /**

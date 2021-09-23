@@ -67,7 +67,7 @@ DISP3DLIB_DISP3D_GLOBAL_H const char* buildDateTime();
 /**
  * Returns abbreviated build git hash.
  */
-DISP3DLIB_DISP3D_GLOBAL_H const char* buildDateTime();
+DISP3DLIB_DISP3D_GLOBAL_H const char* buildHash();
 
 //=============================================================================================================
 /**
