@@ -1168,7 +1168,7 @@ static void sort_parameters(VectorXd& mu,VectorXd& lambda,int nfit)
     
     qsort (pars, nfit, sizeof(bergSchergParRec), comp_pars);
 
-    for (k = 0; k < nfit; k++) {
+    for (int k = 0; k < nfit; k++) {
         mu[k]     = pars[k].mu;
         lambda[k] = pars[k].lambda;
     }
