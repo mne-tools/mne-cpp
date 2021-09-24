@@ -36,6 +36,7 @@ SOURCES += \
     event.cpp \
     eventgroup.cpp \
     eventmanager.cpp \
+    events_global.cpp \
     eventsharedmemmanager.cpp
 
 HEADERS += \
@@ -59,3 +60,37 @@ win32:!contains(MNECPP_CONFIG, static) {
 macx {
     QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
 }
+
+################################################## BUILD TIMESTAMP/HASH UPDATER ############################################
+
+FILE_TO_UPDATE = events_global.cpp
+win32 {
+    CONFIG(debug, debug|release) {
+        OBJ_TARJET = debug\events_global.obj
+    } else {
+        OBJ_TARJET = release\events_global.obj
+    }
+}
+
+ALL_FILES += $$HEADERS
+ALL_FILES += $$SOURCES
+ALL_FILES -= $$FILE_TO_UPDATE
+
+FileUpdater.target = phonyFileUpdater
+for (I_FILE, ALL_FILES) {
+    FileUpdater.depends += $${PWD}/$${I_FILE}
+}
+
+unix|macx {
+    FileUpdater.commands = touch $${PWD}/$${FILE_TO_UPDATE} ; echo PASTA > phonyFileUpdater
+}
+
+win32 {
+    FileUpdater.commands = copy /y $$shell_path($${PWD})\\$${FILE_TO_UPDATE} +,, $$shell_path($${PWD})\\$${FILE_TO_UPDATE} & echo PASTA > phonyFileUpdater
+    OrderForcerTarget.target = $${OBJ_TARJET}
+    OrderForcerTarget.depends += phonyFileUpdater
+    QMAKE_EXTRA_TARGETS += OrderForcerTarget
+}
+
+PRE_TARGETDEPS += phonyFileUpdater
+QMAKE_EXTRA_TARGETS += FileUpdater

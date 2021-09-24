@@ -1,14 +1,16 @@
 //=============================================================================================================
 /**
  * @file     utils_global.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>;
+ *           Juan G Prieto <jgarciaprieto@mgh.harvard.edu>;
+ *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
- * @date     July, 2012
+ * @date     September, 2021
  *
  * @section  LICENSE
  *
- * Copyright (C) 2012, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2021, Lorenz Esch, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -36,6 +38,8 @@
 #ifndef UTILS_GLOBAL_H
 #define UTILS_GLOBAL_H
 
+#include "buildinfo.h"
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -53,5 +57,26 @@
 #else
 #  define UTILSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+namespace UTILSLIB{
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+UTILSSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+UTILSSHARED_EXPORT const char* buildHash();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+UTILSSHARED_EXPORT const char* buildHashLong();
+}
 
 #endif // MNEUTILS_GLOBAL_H

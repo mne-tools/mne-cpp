@@ -663,3 +663,10 @@ void Hpi::run()
         }
     }
 }
+
+//=============================================================================================================
+
+QString Hpi::getBuildInfo()
+{
+    return QString(HPIPLUGIN::buildDateTime()) + QString(" - ")  + QString(HPIPLUGIN::buildHash());
+}

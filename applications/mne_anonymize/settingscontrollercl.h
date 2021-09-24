@@ -43,6 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "mne_anonymize.h"
 #include "fiffanonymizer.h"
 #include <iostream>
 
@@ -244,6 +245,7 @@ protected:
     QString m_sAppName;                     /**< Application name.*/
     QString m_sAppVer;                      /**< Application version number.*/
     QString m_sBuildDate;                   /**< Application build date.*/
+    QString m_sBuildHash;                   /**< Repository hash whenever the application was built.*/
 
     QCommandLineParser m_parser;            /**< Parser object to work with member ptr to QCoreApp and parse input command line options.*/
 
@@ -262,7 +264,6 @@ private:
     bool m_bInOutFileNamesEqual;            /**< Flags user's request to have both input and output files with the same name.*/
     bool m_bInputFileDeleted;               /**< Flags if the input file has been deleted. */
     bool m_bOutFileRenamed;                 /**< Flags if the output file has been renamed to match the name the input file had. */
-
 };
 
 //=============================================================================================================

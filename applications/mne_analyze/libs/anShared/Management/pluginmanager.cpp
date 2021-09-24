@@ -111,13 +111,14 @@ void PluginManager::loadPlugin(const QString& file)
         if(pPlugin) {
             if(findByName(pPlugin->getName()) == -1)
             {
-                qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " succeeded.";
+                qInfo() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " succeeded.";
+                qInfo() << "[PluginManager::loadPlugin] Build Info:" << pPlugin->getBuildInfo();
                 insertPlugin(pPlugin);
             } else {
-                qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << ". Plugin already loaded.";
+                qInfo() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << ". Plugin already loaded.";
             }
         } else {
-            qDebug() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " failed.";
+            qInfo() << "[PluginManager::loadPlugin] Loading Plugin " << file.toUtf8().constData() << " failed.";
         }
     }
 }

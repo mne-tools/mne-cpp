@@ -524,3 +524,10 @@ void RtFwd::run()
         }
     }
 }
+
+//=============================================================================================================
+
+QString RtFwd::getBuildInfo()
+{
+    return QString(RTFWDPLUGIN::buildDateTime()) + QString(" - ")  + QString(RTFWDPLUGIN::buildHash());
+}

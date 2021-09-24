@@ -316,3 +316,10 @@ bool GUSBAmp::dirExists(const std::string& dirName_in)
     }
     return false;    // this is not a directory!
 }
+
+//=============================================================================================================
+
+QString GUSBAmp::getBuildInfo()
+{
+    return QString(GUSBAMPPLUGIN::buildDateTime()) + QString(" - ")  + QString(GUSBAMPPLUGIN::buildHash());
+}

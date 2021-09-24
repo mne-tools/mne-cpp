@@ -35,12 +35,47 @@
 #ifndef NATUS_GLOBAL_H
 #define NATUS_GLOBAL_H
 
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <utils/buildinfo.h>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QtCore/qglobal.h>
+
+//=============================================================================================================
+// PREPROCESSOR DEFINES
+//=============================================================================================================
 
 #if defined(NATUS_PLUGIN)
 #  define NATUSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
 #  define NATUSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+namespace NATUSPLUGIN{
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+NATUSSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+NATUSSHARED_EXPORT const char* buildHash();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+NATUSSHARED_EXPORT const char* buildHashLong();
+}
 
 #endif // NATUS_GLOBAL_H

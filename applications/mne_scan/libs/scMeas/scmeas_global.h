@@ -32,6 +32,7 @@
  * @brief    Contains the scMeas library export/import macros.
  *
  */
+
 #ifndef SCMEAS_GLOBAL_H
 #define SCMEAS_GLOBAL_H
 

@@ -52,6 +52,8 @@ DEFINES += "VERSION_MAJOR=$$VERSION_MAJOR"\
 #Target version
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
 
+DEFINES += "APPLICATION_VERSION=\\\"$${VERSION}\\\""
+
 TEMPLATE = app
 
 QT += core widgets network
@@ -61,6 +63,8 @@ QT += core widgets network
 }
 
 DESTDIR = $${MNE_BINARY_DIR}
+
+CONFIG += console
 
 TARGET = mne_anonymize
 
@@ -112,6 +116,7 @@ HEADERS += \
     apphandler.h \
     fiffanonymizer.h \
     mainwindow.h \
+    mne_anonymize.h \
     settingscontrollercl.h \
     settingscontrollergui.h
 

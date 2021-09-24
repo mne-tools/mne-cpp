@@ -170,6 +170,8 @@ public:
 
     virtual QWidget* setupWidget();
 
+    virtual QString getBuildInfo();
+
     void setKeyboardTriggerType(int type);
 
     void splitRecordingFile();

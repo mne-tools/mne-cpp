@@ -226,7 +226,7 @@ int FiffAnonymizer::anonymizeFile()
     }
 
     printIfVerbose("Max. Valid Fiff version: " + QString::number(m_dMaxValidFiffVerion));
-    printIfVerbose("Current date: " + QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss.zzz t"));
+    printIfVerbose("Current date and time: " __DATE__ " " __TIME__);
     printIfVerbose(" ");
 
     openInOutStreams();

@@ -8,7 +8,7 @@
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2021, Lorenz Esch, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include <QtCore/qglobal.h>
+#include <utils/buildinfo.h>
 
 //=============================================================================================================
 // DEFINES
@@ -53,5 +54,26 @@
 #else
 #  define DISP3DSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+namespace DISP3DLIB{
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+DISP3DLIB_DISP3D_GLOBAL_H const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+DISP3DLIB_DISP3D_GLOBAL_H const char* buildHash();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+DISP3DLIB_DISP3D_GLOBAL_H const char* buildHashLong();
+}
 
 #endif // DISP3DLIB_GLOBAL_H

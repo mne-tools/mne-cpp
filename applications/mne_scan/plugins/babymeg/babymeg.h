@@ -189,6 +189,8 @@ public:
      */
     virtual QWidget* setupWidget();
 
+    virtual QString getBuildInfo();
+
 protected:
     virtual void run();
 
