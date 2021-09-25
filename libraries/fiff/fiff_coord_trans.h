@@ -208,10 +208,11 @@ public:
      * @param[in] from      Source coordinate system.
      * @param[in] to        Destination coordinate system.
      * @param[in] matTrans  The forward transform.
+     * @param[in] bAffine   Enforce affine transformation yes/no. Defaults to false.
      *
      * @return the composed transform.
      */
-    static FiffCoordTrans make(int from, int to, const Eigen::Matrix4f& matTrans);
+    static FiffCoordTrans make(int from, int to, const Eigen::Matrix4f& matTrans, bool bAffine = false);
 
     //=========================================================================================================
     /**
