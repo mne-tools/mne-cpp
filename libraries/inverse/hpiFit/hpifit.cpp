@@ -287,7 +287,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                   fAbortError);
 
     Matrix4d matTrans = computeTransformation(matHeadHPI, coil.pos);
-    transDevHead.setTransform(1,4,matTrans.cast<float>());
+    transDevHead = FiffCoordTrans::make(1,4,matTrans.cast<float>(),true);
 
     //Calculate Error
     MatrixXd matTemp = coil.pos;
