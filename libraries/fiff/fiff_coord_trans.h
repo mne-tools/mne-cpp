@@ -249,19 +249,6 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief sets a new transform
-     *
-     * @param[in] iFrom      Source coordinate system.
-     * @param[in] iTo        Destination coordinate system.
-     * @param[in] matTrans  The forward transform.
-     *
-     */
-    void setTransform(int iFrom,
-                      int iTo,
-                      const Eigen::Matrix4f& matTrans);
-
-    //=========================================================================================================
-    /**
      * Size of the old struct (fiffCoordTransRec) 26*int = 26*4 = 104
      *
      * @return the size of the old struct fiffCoordTransRec.
