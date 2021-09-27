@@ -427,7 +427,7 @@ int MneMshDisplaySurfaceSet::add_bem_surface(MneMshDisplaySurfaceSet* surfs,
         if (std::fabs(sum - 1.0) > 1e-4) {
             fprintf(stderr, "%s surface is not closed "
                                  "(sum of solid angles = %g * 4*PI).",name,sum);
-            goto bad;
+            return FAIL;
         }
     }
 
@@ -442,21 +442,14 @@ int MneMshDisplaySurfaceSet::add_bem_surface(MneMshDisplaySurfaceSet* surfs,
     newSurf->overlay_color_mode   = SHOW_OVERLAY_HEAT;
 
     decide_surface_extent(newSurf,name);
-    add_replace_display_surface(surfs,newSurf,TRUE,TRUE);
+    add_replace_display_surface(surfs, newSurf, true, true);
     apply_left_eyes(surfs);
     setup_current_surface_lights(surfs);
 
     return OK;
 
 bad : {
-        if(surf)
-        {
-            delete surf;
-        }
-        if(newSurf)
-        {
-            delete newSurf;
-        }
+        delete surf;
         return FAIL;
     }
 }
@@ -465,13 +458,14 @@ bad : {
 
 void MneMshDisplaySurfaceSet::add_replace_display_surface(MneMshDisplaySurfaceSet* surfs,
                                                           MneMshDisplaySurface*    newSurf,
-                                                          int                  replace,
-                                                          int                  drawable)
+                                                          bool                  replace,
+                                                          bool                  drawable)
 {
+    int k;
     MneMshDisplaySurface* surf = new MneMshDisplaySurface();
 
     if (replace) {
-        for (int k = 0; k < surfs->nsurf; k++) {
+        for (k = 0; k < surfs->nsurf; k++) {
             surf = surfs->surfs[k];
             if (surf->s->id == newSurf->s->id) {
                 newSurf->transparent   = surf->transparent;
@@ -500,6 +494,7 @@ void MneMshDisplaySurfaceSet::add_replace_display_surface(MneMshDisplaySurfaceSe
         surfs->patch_rot[surfs->nsurf] = 0.0;
         surfs->nsurf++;
     }
+    return;
 }
 
 //=============================================================================================================

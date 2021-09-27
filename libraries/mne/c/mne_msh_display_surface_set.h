@@ -120,8 +120,8 @@ public:
 
     static void add_replace_display_surface(MneMshDisplaySurfaceSet* surfs,
                                             MneMshDisplaySurface*    newSurf,
-                                            int                  replace,
-                                            int                  drawable);
+                                            bool                  replace,
+                                            bool                  drawable);
 
     //============================= vertex_colors.c =============================
 
