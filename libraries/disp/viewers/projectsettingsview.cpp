@@ -544,3 +544,19 @@ void ProjectSettingsView::showFileNameUi()
     m_pUi->m_qLineEditFileName->show();
     m_pUi->m_qLabel->show();
 }
+
+//=============================================================================================================
+
+void ProjectSettingsView::hideParadigmUi()
+{
+    m_pUi->m_qLabel_Paradigm->hide();
+    m_pUi->m_qLineEditParadigm->hide();
+}
+
+//=============================================================================================================
+
+void ProjectSettingsView::showParadigmUi()
+{
+    m_pUi->m_qLabel_Paradigm->show();
+    m_pUi->m_qLineEditParadigm->show();
+}
