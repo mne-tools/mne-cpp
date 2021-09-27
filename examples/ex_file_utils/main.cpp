@@ -117,16 +117,25 @@ int main(int argc, char *argv[])
     std::string sFilePath3 = sDirPath + "/another_test_copy.txt";
 
     Files::copy(sFilePath, sFilePath2);
-    Files::copy(sFilePath2, sFilePath);
+    Files::copy(sFilePath2, sFilePath3);
 
     std::cout << "=====  Renaming File  =====\n";
     if(bStep){
         std::cout << "Press RETURN to execute.\n";
         std::cin.get();
     }
-    std::string sFilePath4 = sDirPath + "/another_test_copy.txt";
+    std::string sFilePath4 = sDirPath + "/yet_another_test_copy.txt";
 
     Files::rename(sFilePath3, sFilePath4);
+
+    std::cout << "=====  Removing File  =====\n";
+    if(bStep){
+        std::cout << "Press RETURN to execute.\n";
+        std::cin.get();
+    }
+    Files::remove(sFilePath);
+    Files::remove(sFilePath2);
+    Files::remove(sFilePath4);
 
     return a.exec();
 }
