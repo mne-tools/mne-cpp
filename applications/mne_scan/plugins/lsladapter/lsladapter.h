@@ -133,6 +133,8 @@ public:
 
     virtual inline QString getName() const;
 
+    virtual QString getBuildInfo();
+
 public slots:
     //=========================================================================================================
     /**

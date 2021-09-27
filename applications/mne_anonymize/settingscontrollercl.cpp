@@ -42,6 +42,9 @@
 
 #include "settingscontrollercl.h"
 #include "fiffanonymizer.h"
+#include "utils/buildinfo.h"
+#include "utils/utils_global.h"
+#include "fiff/fiff_global.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -72,9 +75,10 @@ using namespace MNEANONYMIZE;
 
 SettingsControllerCl::SettingsControllerCl()
 : m_pAnonymizer(FiffAnonymizer::SPtr(new FiffAnonymizer))
-, m_sAppName(qApp->applicationName())
-, m_sAppVer(qApp->applicationVersion())
-, m_sBuildDate(__DATE__)
+, m_sAppName(APPLICATION_NAME)
+, m_sAppVer(APPLICATION_VERSION)
+, m_sBuildDate(QString(UTILSLIB::dateTimeNow()))
+, m_sBuildHash(QString(UTILSLIB::gitHash()))
 , m_bGuiMode(false)
 , m_bDeleteInputFileAfter(false)
 , m_bDeleteInputFileConfirmation(true)
@@ -91,9 +95,10 @@ SettingsControllerCl::SettingsControllerCl()
 
 SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
 : m_pAnonymizer(FiffAnonymizer::SPtr(new FiffAnonymizer))
-, m_sAppName(qApp->applicationName())
-, m_sAppVer(qApp->applicationVersion())
-, m_sBuildDate(__DATE__)
+, m_sAppName(APPLICATION_NAME)
+, m_sAppVer(APPLICATION_VERSION)
+, m_sBuildDate(QString(UTILSLIB::dateTimeNow()))
+, m_sBuildHash(QString(UTILSLIB::gitHash()))
 , m_bGuiMode(false)
 , m_bDeleteInputFileAfter(false)
 , m_bDeleteInputFileConfirmation(true)
@@ -106,6 +111,11 @@ SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
 {
     QObject::connect(this, &MNEANONYMIZE::SettingsControllerCl::finished,
                      qApp, &QCoreApplication::exit, Qt::QueuedConnection);
+
+    for(auto& s : arguments)
+    {
+        qInfo() << s << "\n";
+    }
 
     initParser();
     if(parseInputs(arguments))
@@ -546,8 +556,15 @@ void SettingsControllerCl::printHeaderIfVerbose()
     printIfVerbose(" ");
     printIfVerbose("=============================================================================================");
     printIfVerbose(" ");
-    printIfVerbose(m_sAppName + "  (Version: " + m_sAppVer + ")");
+    printIfVerbose(m_sAppName + "    Version: " + m_sAppVer);
     printIfVerbose("Build Date: " + m_sBuildDate);
+    printIfVerbose("Build Hash: " + m_sBuildHash);
+    printIfVerbose(" ");
+    printIfVerbose(QString("Utils Lib Build Date: ") + UTILSLIB::buildDateTime());
+    printIfVerbose(QString("Utils Lib Build Hash: ") + UTILSLIB::buildHash());
+    printIfVerbose(" ");
+    printIfVerbose(QString("Fiff Lib Build Date: ") + FIFFLIB::buildDateTime());
+    printIfVerbose(QString("Fiff Lib Build Hash: ") + FIFFLIB::buildHash());
     printIfVerbose(" ");
 }
 

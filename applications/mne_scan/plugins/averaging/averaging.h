@@ -121,6 +121,7 @@ public:
     virtual QString getName() const;
     virtual QWidget* setupWidget();
     void update(SCMEASLIB::Measurement::SPtr pMeasurement);
+    virtual QString getBuildInfo();
 
     //=========================================================================================================
     /**
@@ -230,7 +231,7 @@ private:
 
     FIFFLIB::FiffInfo::SPtr                         m_pFiffInfo;                        /**< Fiff measurement info.*/
 
-    QSharedPointer<RTPROCESSINGLIB::RtAveraging>          m_pRtAve;                           /**< Real-time average object. */
+    QSharedPointer<RTPROCESSINGLIB::RtAveraging>          m_pRtAve;                     /**< Real-time average object. */
 
     QStringList                                     m_lResponsibleTriggerTypes;         /**< List of all trigger types which lead to the recent emit of a new evoked set. */
 

@@ -309,3 +309,9 @@ void Natus::run()
     }
 }
 
+//=============================================================================================================
+
+QString Natus::getBuildInfo()
+{
+    return QString(NATUSPLUGIN::buildDateTime()) + QString(" - ")  + QString(NATUSPLUGIN::buildHash());
+}

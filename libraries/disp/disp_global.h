@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include <QtCore/qglobal.h>
+#include <utils/buildinfo.h>
 
 //=============================================================================================================
 // DEFINES
@@ -53,5 +54,26 @@
 #else
 #  define DISPSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+namespace DISPLIB{
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+DISPSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+DISPSHARED_EXPORT const char* buildHash();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+DISPSHARED_EXPORT const char* buildHashLong();
+}
 
 #endif // DISP_GLOBAL_H

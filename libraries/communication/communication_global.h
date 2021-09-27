@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include <QtCore/qglobal.h>
+#include <utils/buildinfo.h>
 
 //=============================================================================================================
 // DEFINES
@@ -54,5 +55,26 @@
 #else
 #  define COMMUNICATIONSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+namespace COMMUNICATIONLIB{
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+COMMUNICATIONSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+COMMUNICATIONSHARED_EXPORT const char* buildHash();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+COMMUNICATIONSHARED_EXPORT const char* buildHashLong();
+}
 
 #endif // COMMUNICATION_GLOBAL_H

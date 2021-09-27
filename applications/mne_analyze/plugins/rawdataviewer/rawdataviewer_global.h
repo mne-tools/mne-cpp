@@ -38,6 +38,12 @@
 #define RAWDATAVIEWER_GLOBAL_H
 
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <utils/buildinfo.h>
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -52,5 +58,26 @@
 #else
 #  define RAWDATAVIEWERSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+namespace RAWDATAVIEWERPLUGIN{
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+RAWDATAVIEWERSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+RAWDATAVIEWERSHARED_EXPORT const char* buildHash();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+RAWDATAVIEWERSHARED_EXPORT const char* buildHashLong();
+}
 
 #endif // RAWDATAVIEWER_GLOBAL_H

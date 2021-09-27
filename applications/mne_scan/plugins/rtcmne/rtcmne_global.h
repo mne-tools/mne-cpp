@@ -37,6 +37,12 @@
 #define RTCMNE_GLOBAL_H
 
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <utils/buildinfo.h>
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -51,5 +57,26 @@
 #else
 #  define RTCMNESHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+namespace RTCMNEPLUGIN{
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+RTCMNESHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+RTCMNESHARED_EXPORT const char* buildHash();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+RTCMNESHARED_EXPORT const char* buildHashLong();
+}
 
 #endif // RTCMNE_GLOBAL_H
