@@ -119,9 +119,9 @@ public:
                         int                  check);
 
     static void add_replace_display_surface(MneMshDisplaySurfaceSet* surfs,
-                                                MneMshDisplaySurface*    newSurf,
-                                                int                  replace,
-                                                int                  drawable);
+                                            MneMshDisplaySurface*    newSurf,
+                                            int                  replace,
+                                            int                  drawable);
 
     //============================= vertex_colors.c =============================
 
