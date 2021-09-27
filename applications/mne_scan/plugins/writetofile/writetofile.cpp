@@ -89,6 +89,7 @@ WriteToFile::WriteToFile()
     connect(m_pActionClipRecording.data(), &QAction::triggered,
             this, &WriteToFile::clipRecording);
     addPluginAction(m_pActionClipRecording);
+    m_pActionClipRecording->setVisible(false);
 
     //Init timers
     if(!m_pRecordTimer) {
@@ -265,6 +266,9 @@ void WriteToFile::initPluginControlWidgets()
         connect(pProjectSettingsView, &ProjectSettingsView::fileNameChanged, [=]() {
             pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
         });
+
+        pProjectSettingsView->hideFileNameUi();
+        pProjectSettingsView->hideParadigmUi();
 
         plControlWidgets.append(pProjectSettingsView);
 
