@@ -79,3 +79,17 @@ FiffDigPoint::FiffDigPoint(const FiffDigPoint& p_FiffDigPoint)
 FiffDigPoint::~FiffDigPoint()
 {
 }
+
+//=============================================================================================================
+
+FiffDigPoint& FiffDigPoint::operator=(FiffDigPoint& rhs)
+{
+    kind = rhs.kind;
+    ident = rhs.ident;
+    coord_frame = rhs.coord_frame;
+    for(int i = 0; i < 3; ++i )
+    {
+        r[i] = rhs.r[i];
+    }
+    return *this;
+}
