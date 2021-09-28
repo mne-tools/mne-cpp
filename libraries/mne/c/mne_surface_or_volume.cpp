@@ -153,7 +153,7 @@ static void matrix_error_17(int kind, int nr, int nc)
     exit(1);
 }
 
-float **mne_cmatrix_17(int numPoints,int numDim)
+float** mne_cmatrix_17(int numPoints,int numDim)
 {
     float** m;
     float*  whole;
@@ -3050,18 +3050,21 @@ void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerDat
  * Calculate the distances from the scalp surface
  */
 {
-    float             **rr   = ALLOC_CMATRIX_17(dig->npoint,3);
-    int               k,nactive;
-    int               *closest;
-    float             *dist;
-    FiffDigPoint      point;
-    FiffCoordTransOld*    t = dig->head_mri_t_adj ? dig->head_mri_t_adj : dig->head_mri_t;
-    int               nstep = 4;
+    float**             rr = ALLOC_CMATRIX_17(dig->npoint,3);
+    int                 k,nactive;
+    int*                closest;
+    float*              dist;
+    FiffDigPoint        point;
+    FiffCoordTransOld*  t = dig->head_mri_t_adj ? dig->head_mri_t_adj : dig->head_mri_t;
+    int                 nstep = 4;
 
     if (dig->dist_valid)
-        return;
+    {
+        FREE_CMATRIX_17(rr);
+        return ;
+    }
 
-    dig->dist          = REALLOC_17(dig->dist,dig->npoint,float);
+    dig->dist = REALLOC_17(dig->dist,dig->npoint,float);
     if (!dig->closest) {
         /*
         * Ensure that all closest values are initialized correctly
