@@ -3035,19 +3035,21 @@ int MneSurfaceOrVolume::discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerD
 
 //=============================================================================================================
 
-void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerData* dig, MneMshDisplaySurface* head,
-                                                       int do_all, int do_approx)
+void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerData* dig,
+                                                       MneMshDisplaySurface* head,
+                                                       int do_all,
+                                                       int do_approx)
 /*
  * Calculate the distances from the scalp surface
  */
 {
-    float             **rr   = ALLOC_CMATRIX_17(dig->npoint,3);
-    int               k,nactive;
-    int               *closest;
-    float             *dist;
-    FiffDigPoint      point;
-    FiffCoordTransOld*    t = dig->head_mri_t_adj ? dig->head_mri_t_adj : dig->head_mri_t;
-    int               nstep = 4;
+    float**             rr = ALLOC_CMATRIX_17(dig->npoint, 3);
+    int                 k, nactive;
+    int*                closest;
+    float*              dist;
+    FiffDigPoint        point;
+    FiffCoordTransOld*  t = dig->head_mri_t_adj ? dig->head_mri_t_adj : dig->head_mri_t;
+    int                 nstep = 4;
 
     if (dig->dist_valid)
         return;
