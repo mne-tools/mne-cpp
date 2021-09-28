@@ -33,8 +33,8 @@
  *
  */
 
-#ifndef WRITETOFILE_H
-#define WRITETOFILE_H
+#ifndef HPI_H
+#define HPI_H
 
 //=============================================================================================================
 // INCLUDES
@@ -331,4 +331,4 @@ signals:
 };
 } // NAMESPACE
 
-#endif // WRITETOFILE_H
+#endif // HPI_H
