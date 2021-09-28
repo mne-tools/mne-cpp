@@ -461,7 +461,7 @@ void MneMshDisplaySurfaceSet::add_replace_display_surface(MneMshDisplaySurfaceSe
                                                           bool                  replace,
                                                           bool                  drawable)
 {
-    MneMshDisplaySurface* surf = new MneMshDisplaySurface();
+    MneMshDisplaySurface* surf;
 
     if (replace) {
         for (int k = 0; k < surfs->nsurf; k++) {
