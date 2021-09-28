@@ -427,7 +427,7 @@ int MneMshDisplaySurfaceSet::add_bem_surface(MneMshDisplaySurfaceSet* surfs,
         if (std::fabs(sum - 1.0) > 1e-4) {
             fprintf(stderr, "%s surface is not closed "
                                  "(sum of solid angles = %g * 4*PI).",name,sum);
-            return FAIL;
+            goto bad;
         }
     }
 
@@ -448,8 +448,16 @@ int MneMshDisplaySurfaceSet::add_bem_surface(MneMshDisplaySurfaceSet* surfs,
 
     return OK;
 
-bad : {
-        delete surf;
+bad :
+    {
+        if(surf)
+        {
+            delete surf;
+        }
+        if(newSurf)
+        {
+            delete newSurf;
+        }
         return FAIL;
     }
 }
