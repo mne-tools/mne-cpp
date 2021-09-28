@@ -153,19 +153,31 @@ static void matrix_error_17(int kind, int nr, int nc)
     exit(1);
 }
 
+//whole is an array of values with a certain dimension. i.e. positions in a 3d space.
+//thus, whole is float * array. if MALLOC_17 call is correct it will point to a contiguous portion
+//in memory of float x ndims
+//in order to reference each individual
 float **mne_cmatrix_17(int nr,int nc)
 {
-    int i;
     float **m;
     float *whole;
 
     m = MALLOC_17(nr,float *);
-    if (!m) matrix_error_17(1,nr,nc);
-    whole = MALLOC_17(nr*nc,float);
-    if (!whole) matrix_error_17(2,nr,nc);
+    if (!m)
+    {
+        matrix_error_17(1,nr,nc);
+    }
 
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
+    whole = MALLOC_17(nr*nc,float);
+
+    if (!whole)
+    {
+        matrix_error_17(2,nr,nc);
+    }
+
+    for(int i=0; i<nr; ++i)
+        m[i] = &whole[i*nc];
+
     return m;
 }
 
