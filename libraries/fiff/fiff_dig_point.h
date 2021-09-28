@@ -79,17 +79,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Copy constructor.
-     *
-     * @param[in] p_FiffDigPoint   Digitization point descriptor which should be copied.
-     */
-    FiffDigPoint(const FiffDigPoint& p_FiffDigPoint);
-
-    //=========================================================================================================
-    /**
      * Destroys the digitization point description
      */
-    ~FiffDigPoint();
+    ~FiffDigPoint() = default;
 
     //=========================================================================================================
     /**
@@ -98,13 +90,6 @@ public:
      * @return the size of the old struct fiffDigPointRec.
      */
     inline static qint32 storageSize();
-
-    //=========================================================================================================
-    /**
-     * @brief operator Copy assignment.
-     */
-    FiffDigPoint& operator=(FiffDigPoint& );
-    FiffDigPoint& operator=(FiffDigPoint );
 
 public:
     fiff_int_t      kind;           /**< FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA or FIFFV_POINT_EEG. */
@@ -119,7 +104,7 @@ public:
 
 inline qint32 FiffDigPoint::storageSize()
 {
-    return 20;
+    return sizeof(FiffDigPoint);
 }
 } // NAMESPACE
 
