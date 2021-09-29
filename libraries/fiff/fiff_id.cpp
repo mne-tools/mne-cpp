@@ -65,52 +65,6 @@ FiffId::FiffId()
 
 //=============================================================================================================
 
-FiffId::FiffId(const FiffId& other)
-: version(other.version)
-{
-    machid[0] = other.machid[0];
-    machid[1] = other.machid[1];
-    time.secs = other.time.secs;
-    time.usecs = other.time.usecs;
-}
-
-//=============================================================================================================
-
-FiffId& FiffId::operator=(const FiffId& other)
-{
-    if( this != &other)
-    {
-        version = other.version;
-        machid[0] = other.machid[0];
-        machid[1] = other.machid[1];
-        time.secs = other.time.secs;
-        time.usecs = other.time.usecs;
-    }
-    return *this;
-}
-
-//=============================================================================================================
-
-FiffId& FiffId::operator=(FiffId& other)
-{
-    if( this != &other)
-    {
-        version = other.version;
-        machid[0] = other.machid[0];
-        machid[1] = other.machid[1];
-        time.secs = other.time.secs;
-        time.usecs = other.time.usecs;
-    }
-    return *this;
-}
-//=============================================================================================================
-
-FiffId::~FiffId()
-{
-}
-
-//=============================================================================================================
-
 FiffId FiffId::new_file_id()
 {
     FiffId id;
