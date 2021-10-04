@@ -1,7 +1,8 @@
 //=============================================================================================================
 /**
  * @file     fiff_dig_point.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ * @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+ *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
@@ -78,17 +79,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Copy constructor.
-     *
-     * @param[in] p_FiffDigPoint   Digitization point descriptor which should be copied.
-     */
-    FiffDigPoint(const FiffDigPoint& p_FiffDigPoint);
-
-    //=========================================================================================================
-    /**
      * Destroys the digitization point description
      */
-    ~FiffDigPoint();
+    ~FiffDigPoint() = default;
 
     //=========================================================================================================
     /**
@@ -103,15 +96,6 @@ public:
     fiff_int_t      ident;          /**< Number identifying this point. */
     fiff_float_t    r[3];           /**< Point location. */
     fiff_int_t      coord_frame;    /**< Newly added to stay consistent with fiff MATLAB implementation. */
-
-// ### OLD STRUCT ###
-// typedef struct _fiffDigPointRec {
-//  fiff_int_t kind;         /**< FIFFV_POINT_CARDINAL, FIFFV_POINT_HPI, FIFFV_POINT_EXTRA or FIFFV_POINT_EEG *
-//  fiff_int_t ident;        /**< Number identifying this point *
-//  fiff_float_t r[3];       /**< Point location *
-//  fiff_int_t coord_frame;  /**< Newly added to stay consistent with fiff MATLAB implementation *
-// } fiffDigPointRec, *fiffDigPoint; /**< Digitization point description *
-// typedef fiffDigPointRec  fiff_dig_point_t;
 };
 
 //=============================================================================================================
@@ -120,7 +104,7 @@ public:
 
 inline qint32 FiffDigPoint::storageSize()
 {
-    return 20;
+    return sizeof(FiffDigPoint);
 }
 } // NAMESPACE
 
