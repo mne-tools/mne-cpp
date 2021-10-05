@@ -104,7 +104,7 @@ public:
 
 inline qint32 FiffDigPoint::storageSize()
 {
-    return 20;
+    return sizeof(FiffDigPoint);
 }
 } // NAMESPACE
 
