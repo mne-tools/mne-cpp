@@ -121,8 +121,8 @@ void TestCoregistration::initTestCase()
     QFile t_fileTransRefFit(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif");
     QFile t_fileTransRefIcp(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/icp-trans.fif");
 
-    float fTol = 0.01/1000;
-    float fMaxDist = 0.02;
+    float fTol = 0.01f/1000.0f;
+    float fMaxDist = 0.02f;
 
     // read reference Transformation
     transFitMatchedRef = FiffCoordTrans(t_fileTransRefFit);
