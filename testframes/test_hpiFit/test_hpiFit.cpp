@@ -131,6 +131,7 @@ mDataPreparationFinishedCorrectly(false)
 
 void TestHpiFit::initTestCase()
 {
+    QVERIFY(false);
     qInstallMessageHandler(ApplicationLogger::customLogWriter);
     qInfo() << "Error Translation" << dErrorTrans;
     qInfo() << "Error Quaternion" << dErrorQuat;
