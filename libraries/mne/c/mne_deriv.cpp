@@ -52,7 +52,7 @@ void mne_free_name_list_15(char **list, int nlist)
         return;
     for (k = 0; k < nlist; k++) {
 #ifdef FOO
-        fprintf(stderr,"%d %s\n",k,list[k]);
+        printf("%d %s\n",k,list[k]);
 #endif
         FREE_15(list[k]);
     }

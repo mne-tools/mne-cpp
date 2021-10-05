@@ -1615,7 +1615,7 @@ void MneMeasData::adjust_baselines(float bmin, float bmax)
                 data[s][c] = data[s][c] - ave;
         }
         qDebug() << "TODO: Check comments content";
-        fprintf(stderr,"\t%s : using baseline %7.1f ... %7.1f ms\n",
+        printf("\t%s : using baseline %7.1f ... %7.1f ms\n",
                 this->current->comment.toUtf8().constData() ?  this->current->comment.toUtf8().constData() : "unknown",
                 1000*(tmin+b1/sfreq),
                 1000*(tmin+b2/sfreq));
@@ -1717,7 +1717,7 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
 
 #ifdef FOO
     if (add_to) {			/* Should add consistency check here */
-        fprintf(stderr,"\tWarning: data set consistency check is still in the works.\n");
+        printf("\tWarning: data set consistency check is still in the works.\n");
     }
 #endif
     /*
@@ -1769,7 +1769,7 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
        */
     tmin = dtmin;
     tmax = dtmax;
-    fprintf(stderr,"\tData time range: %8.1f ... %8.1f ms\n",1000*tmin,1000*tmax);
+    printf("\tData time range: %8.1f ... %8.1f ms\n",1000*tmin,1000*tmax);
     /*
        * Just put it together
        */
@@ -1798,13 +1798,13 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
         if (t) {
             new_data->meg_head_t    = t;
             t = NULL;
-            fprintf(stderr,"\tUsing MEG <-> head transform from the present data set\n");
+            printf("\tUsing MEG <-> head transform from the present data set\n");
         }
         if (op != NULL && op->mri_head_t != NULL) { /* Copy if available */
             if (!new_data->mri_head_t)
                 new_data->mri_head_t = new FiffCoordTransOld;
             *(new_data->mri_head_t) = *(op->mri_head_t);
-            fprintf(stderr,"\tPicked MRI <-> head transform from the inverse operator\n");
+            printf("\tPicked MRI <-> head transform from the inverse operator\n");
         }
         /*
          * Channel list
@@ -1821,14 +1821,14 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
         else {
             new_data->proj = MneProjOp::mne_read_proj_op(name);
             if (new_data->proj && new_data->proj->nitems > 0) {
-                fprintf(stderr,"\tLoaded projection from %s:\n",name.toUtf8().data());
+                printf("\tLoaded projection from %s:\n",name.toUtf8().data());
                 MneProjOp::mne_proj_op_report(stderr,"\t\t",new_data->proj);
             }
             new_data->comp = MneCTFCompDataSet::mne_read_ctf_comp_data(name);
             if (new_data->comp == NULL)
                 goto out;
             if (new_data->comp->ncomp > 0)
-                fprintf(stderr,"\tRead %d compensation data sets from %s\n",new_data->comp->ncomp,name.toUtf8().data());
+                printf("\tRead %d compensation data sets from %s\n",new_data->comp->ncomp,name.toUtf8().data());
         }
         /*
          * Th bad channel stuff
@@ -1849,11 +1849,11 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
                         }
                     }
                 }
-                fprintf(stderr,"\t%d bad channels read from %s%s",new_data->nbad,name.toUtf8().data(),new_data->nbad > 0 ? ":\n" : "\n");
+                printf("\t%d bad channels read from %s%s",new_data->nbad,name.toUtf8().data(),new_data->nbad > 0 ? ":\n" : "\n");
                 if (new_data->nbad > 0) {
-                    fprintf(stderr,"\t\t");
+                    printf("\t\t");
                     for (k = 0; k < new_data->nbad; k++)
-                        fprintf(stderr,"%s%c",new_data->badlist[k].toUtf8().constData(),k < new_data->nbad-1 ? ' ' : '\n');
+                        printf("%s%c",new_data->badlist[k].toUtf8().constData(),k < new_data->nbad-1 ? ' ' : '\n');
                 }
             }
         }
@@ -1897,7 +1897,7 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
     if (!add_to)
         new_data->current = new_data->sets[0];
     res = new_data;
-    fprintf(stderr,"\t%s dataset %s from %s\n",
+    printf("\t%s dataset %s from %s\n",
             add_to ? "Added" : "Loaded",
             new_data->sets[new_data->nset-1]->comment.toUtf8().constData() ? new_data->sets[new_data->nset-1]->comment.toUtf8().constData() : "unknown",name.toUtf8().data());
 

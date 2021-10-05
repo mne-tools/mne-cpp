@@ -47,7 +47,7 @@ DipoleFitSettings::DipoleFitSettings(int *argc,char **argv)
         return;
 
 //    mne_print_version_info(stderr,argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
-    fprintf(stderr,"%s version %s compiled at %s %s\n",argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+    printf("%s version %s compiled at %s %s\n",argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
 
     checkIntegrity();
 }
@@ -158,9 +158,9 @@ void DipoleFitSettings::checkIntegrity()
         printf("Guesses          : %s\n",guessname.toUtf8().data());
     else {
         if (!guess_surfname.isEmpty())
-            fprintf(stderr,"Guess space bounded by %s\n",guess_surfname.toUtf8().data());
+            printf("Guess space bounded by %s\n",guess_surfname.toUtf8().data());
         else
-            fprintf(stderr,"Spherical guess space, rad = %.1f mm\n",1000*guess_rad);
+            printf("Spherical guess space, rad = %.1f mm\n",1000*guess_rad);
         printf("Guess grid       : %6.1f mm\n",1000*guess_grid);
         if (guess_mindist > 0.0)
             printf("Guess mindist    : %6.1f mm\n",1000*guess_mindist);
