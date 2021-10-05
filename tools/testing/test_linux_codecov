@@ -14,4 +14,3 @@ do
   # Hide codecov output since it corrupts the log too much
   codecov &> /dev/null
 done
-
