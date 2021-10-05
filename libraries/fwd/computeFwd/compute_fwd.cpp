@@ -1671,10 +1671,10 @@ bool mne_attach_env(const QString& name, const QString& command)
     FiffId id(FiffId::new_file_id());
 
 //#ifdef DEBUG
-//    fprintf(stderr,"\n");
-//    fprintf(stderr,"cwd   = %s\n",cwd);
-//    fprintf(stderr,"com   = %s\n",command);
-//    fprintf(stderr,"envid = %s\n",mne_format_file_id(&id));
+//    printf("\n");
+//    printf("cwd   = %s\n",cwd);
+//    printf("com   = %s\n",command);
+//    printf("envid = %s\n",mne_format_file_id(&id));
 //#endif
 
     if (!fileInOut.exists()) {

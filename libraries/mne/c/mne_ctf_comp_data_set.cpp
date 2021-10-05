@@ -705,7 +705,7 @@ MneCTFCompDataSet *MneCTFCompDataSet::mne_read_ctf_comp_data(const QString &name
         }
     }
 #ifdef DEBUG
-    fprintf(stderr,"%d CTF compensation data sets read from %s\n",set->ncomp,name);
+    printf("%d CTF compensation data sets read from %s\n",set->ncomp,name);
 #endif
     goto good;
 
@@ -754,7 +754,7 @@ int MneCTFCompDataSet::mne_make_ctf_comp(MneCTFCompDataSet* set,
         compchs = chs;
         ncomp   = nch;
     }
-    fprintf(stderr,"Setting up compensation data...\n");
+    printf("Setting up compensation data...\n");
     if (nch == 0)
         return OK;
     if (set) {
@@ -782,11 +782,11 @@ int MneCTFCompDataSet::mne_make_ctf_comp(MneCTFCompDataSet* set,
             comps[k] = MNE_CTFV_COMP_NONE;
     }
     if (need_comp == 0) {
-        fprintf(stderr,"\tNo compensation set. Nothing more to do.\n");
+        printf("\tNo compensation set. Nothing more to do.\n");
         FREE_32(comps);
         return OK;
     }
-    fprintf(stderr,"\t%d out of %d channels have the compensation set.\n",need_comp,nch);
+    printf("\t%d out of %d channels have the compensation set.\n",need_comp,nch);
     if (!set) {
         printf("No compensation data available for the required compensation.");
         return FAIL;
@@ -805,7 +805,7 @@ int MneCTFCompDataSet::mne_make_ctf_comp(MneCTFCompDataSet* set,
                mne_explain_ctf_comp(mne_map_ctf_comp_kind(first_comp)));
         goto bad;
     }
-    fprintf(stderr,"\tDesired compensation data (%s) found.\n",mne_explain_ctf_comp(mne_map_ctf_comp_kind(first_comp)));
+    printf("\tDesired compensation data (%s) found.\n",mne_explain_ctf_comp(mne_map_ctf_comp_kind(first_comp)));
     /*
         * Find the compensation channels
         */
@@ -823,7 +823,7 @@ int MneCTFCompDataSet::mne_make_ctf_comp(MneCTFCompDataSet* set,
             goto bad;
         }
     }
-    fprintf(stderr,"\tAll compensation channels found.\n");
+    printf("\tAll compensation channels found.\n");
     /*
         * Create the preselector
         */
@@ -839,7 +839,7 @@ int MneCTFCompDataSet::mne_make_ctf_comp(MneCTFCompDataSet* set,
             goto bad;
         }
         FREE_CMATRIX_32(sel);
-        fprintf(stderr,"\tPreselector created.\n");
+        printf("\tPreselector created.\n");
     }
     /*
      * Pick the desired channels
@@ -851,7 +851,7 @@ int MneCTFCompDataSet::mne_make_ctf_comp(MneCTFCompDataSet* set,
 
     if ((data = this_comp->data->pick_from_named_matrix(names,need_comp,emptyList,0)) == NULL)
         goto bad;
-    fprintf(stderr,"\tCompensation data matrix created.\n");
+    printf("\tCompensation data matrix created.\n");
     /*
         * Create the postselector
         */
@@ -868,7 +868,7 @@ int MneCTFCompDataSet::mne_make_ctf_comp(MneCTFCompDataSet* set,
             goto bad;
         }
         FREE_CMATRIX_32(sel);
-        fprintf(stderr,"\tPostselector created.\n");
+        printf("\tPostselector created.\n");
     }
     set->current           = new MneCTFCompData();
     set->current->kind     = this_comp->kind;
@@ -877,7 +877,7 @@ int MneCTFCompDataSet::mne_make_ctf_comp(MneCTFCompDataSet* set,
     set->current->presel   = presel;
     set->current->postsel  = postsel;
 
-    fprintf(stderr,"\tCompensation set up.\n");
+    printf("\tCompensation set up.\n");
 
     names.clear();
     FREE_32(comps);
@@ -916,7 +916,7 @@ int MneCTFCompDataSet::mne_set_ctf_comp(QList<FIFFLIB::FiffChInfo>& chs,
             nset++;
         }
     }
-    fprintf(stderr,"A new compensation value (%s) was assigned to %d MEG channels.\n",
+    printf("A new compensation value (%s) was assigned to %d MEG channels.\n",
             mne_explain_ctf_comp(mne_map_ctf_comp_kind(comp)),nset);
     return nset;
 }
@@ -1213,7 +1213,7 @@ int MneCTFCompDataSet::mne_ctf_set_compensation(MneCTFCompDataSet *set,
         * Are we there already?
         */
     if (set->current && set->current->mne_kind == compensate_to) {
-        fprintf(stderr,"No further compensation necessary (comp = %s)\n",mne_explain_ctf_comp(set->current->kind));
+        printf("No further compensation necessary (comp = %s)\n",mne_explain_ctf_comp(set->current->kind));
         if(set->current)
             delete set->current;
         set->current = NULL;
@@ -1222,7 +1222,7 @@ int MneCTFCompDataSet::mne_ctf_set_compensation(MneCTFCompDataSet *set,
     set->undo    = set->current;
     set->current = NULL;
     if (compensate_to == MNE_CTFV_NOGRAD) {
-        fprintf(stderr,"No compensation was requested.\n");
+        printf("No compensation was requested.\n");
         mne_set_ctf_comp(chs,nchan,compensate_to);
         return OK;
     }
@@ -1233,7 +1233,7 @@ int MneCTFCompDataSet::mne_ctf_set_compensation(MneCTFCompDataSet *set,
             comp_was = MNE_CTFV_NOGRAD;
         if (mne_make_ctf_comp(set,chs,nchan,comp_chs,ncomp_chan) == FAIL)
             goto bad;
-        fprintf(stderr,"Compensation set up as requested (%s -> %s).\n",
+        printf("Compensation set up as requested (%s -> %s).\n",
                 mne_explain_ctf_comp(mne_map_ctf_comp_kind(comp_was)),
                 mne_explain_ctf_comp(set->current->kind));
     }

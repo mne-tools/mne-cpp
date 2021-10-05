@@ -204,7 +204,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
             FREE_16(sp);
             goto bad;
         }
-        fprintf(stderr,"Read guesses from %s\n",guessname.toUtf8().constData());
+        printf("Read guesses from %s\n",guessname.toUtf8().constData());
         guesses = sp[0]; FREE_16(sp);
     }
     else {
@@ -215,12 +215,12 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         VEC_COPY_16(r0,f->r0);
         FiffCoordTransOld::fiff_coord_trans_inv(r0,f->mri_head_t,TRUE);
         if (f->bem_model) {
-            fprintf(stderr,"Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
+            printf("Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
             if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
                 goto bad;
         }
         else if (!guess_surfname.isEmpty()) {
-            fprintf(stderr,"Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
+            printf("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
             if ((inner_skull = MneSurfaceOrVolume::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
                 goto bad;
             free_inner_skull = TRUE;
@@ -232,7 +232,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
     }
     if (MneSurfaceOrVolume::mne_transform_source_spaces_to(f->coord_frame,f->mri_head_t,&guesses,1) != OK)
         goto bad;
-    fprintf(stderr,"Guess locations are now in %s coordinates.\n",FiffCoordTransOld::mne_coord_frame_name(f->coord_frame));
+    printf("Guess locations are now in %s coordinates.\n",FiffCoordTransOld::mne_coord_frame_name(f->coord_frame));
     this->nguess  = guesses->nuse;
     this->rr      = ALLOC_CMATRIX_16(guesses->nuse,3);
     for (k = 0, p = 0; k < guesses->np; k++)
@@ -242,7 +242,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         }
     delete guesses; guesses = NULL;
 
-    fprintf(stderr,"Go through all guess source locations...");
+    printf("Go through all guess source locations...");
     this->guess_fwd = MALLOC_16(this->nguess,DipoleForward*);
     for (k = 0; k < this->nguess; k++)
         this->guess_fwd[k] = NULL;
@@ -265,7 +265,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
     }
     f->funcs = orig;
 
-    fprintf(stderr,"[done %d sources]\n",p);
+    printf("[done %d sources]\n",p);
 
     return;
 //    return res;

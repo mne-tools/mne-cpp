@@ -1016,16 +1016,16 @@ bool FwdEegSphereModel::fwd_setup_eeg_sphere_model(float rad, bool fit_berg_sche
 
     if (fit_berg_scherg) {
         if (this->fwd_eeg_fit_berg_scherg(nterms,nfit,rv)) {
-            fprintf(stderr,"Equiv. model fitting -> ");
-            fprintf(stderr,"RV = %g %%\n",100*rv);
+            printf("Equiv. model fitting -> ");
+            printf("RV = %g %%\n",100*rv);
             for (int k = 0; k < nfit; k++)
-                fprintf(stderr,"mu%d = %g\tlambda%d = %g\n", k+1,this->mu[k],k+1,this->layers[this->nlayer()-1].sigma*this->lambda[k]);
+                printf("mu%d = %g\tlambda%d = %g\n", k+1,this->mu[k],k+1,this->layers[this->nlayer()-1].sigma*this->lambda[k]);
         }
         else
             return false;
     }
 
-    fprintf(stderr,"Defined EEG sphere model with rad = %7.2f mm\n", 1000.0*rad);
+    printf("Defined EEG sphere model with rad = %7.2f mm\n", 1000.0*rad);
     return true;
 }
 
@@ -1187,8 +1187,8 @@ static bool report_fit(int    loop,
 {
 #ifdef LOG_FIT
     for (int k = 0; k < fitpar.size(); k++)
-        fprintf(stderr,"%g ",mu[k]);
-    fprintf(stderr,"%g\n",Smin);
+        printf("%g ",mu[k]);
+    printf("%g\n",Smin);
 #endif
     return true;
 }
@@ -1412,7 +1412,7 @@ bool FwdEegSphereModel::fwd_eeg_fit_berg_scherg(int   nterms,              /* Nu
 
     sort_parameters(mu,lambda,nfit);
 #ifdef LOG_FIT
-    fprintf(stderr,"RV = %g %%\n",100*rv);
+    printf("RV = %g %%\n",100*rv);
 #endif
     this->mu.resize(nfit);
     this->lambda.resize(nfit);
