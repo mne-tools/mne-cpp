@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
     Matrix3f matDst(digSetDst.size(),3);
     Matrix4f matTrans;
     Vector3f vecWeights(digSetSrc.size()); // LPA, Nasion, RPA
-    float fScale;
+    float fScale = 1.0f;
 
     // get coordinates
     for(int i = 0; i< digSetSrc.size(); ++i) {
