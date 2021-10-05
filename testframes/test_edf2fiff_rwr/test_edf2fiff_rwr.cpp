@@ -44,6 +44,7 @@
 #include <fiff/fiff.h>
 #include "../../applications/mne_edf2fiff/edf_raw_data.h"
 
+#include <utils/generics/applicationlogger.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -51,7 +52,7 @@
 //=============================================================================================================
 
 #include <QtTest>
-
+#include <QProcess>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -114,8 +115,10 @@ TestEDF2FIFFRWR::TestEDF2FIFFRWR()
 
 void TestEDF2FIFFRWR::initTestCase()
 {
-    m_pFileIn = new QFile(QDir::currentPath() + "/mne-cpp-test-data/EEG/test_reduced.edf");
-    m_pFileOut = new QFile(QDir::currentPath() + "/mne-cpp-test-data/EEG/test_reduced_temporary.fif");
+    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
+
+    m_pFileIn = new QFile(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/EEG/test_reduced.edf");
+    m_pFileOut = new QFile(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/EEG/test_reduced_temporary.fif");
 
     // initialize EDF raw data
     m_pEDFRaw = new EDFRawData(m_pFileIn);
@@ -239,5 +242,5 @@ void TestEDF2FIFFRWR::cleanupTestCase()
 // MAIN
 //=============================================================================================================
 
-QTEST_APPLESS_MAIN(TestEDF2FIFFRWR)
+QTEST_GUILESS_MAIN(TestEDF2FIFFRWR)
 #include "test_edf2fiff_rwr.moc"
