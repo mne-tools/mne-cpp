@@ -494,7 +494,7 @@ void View3D::initMultiView()
 
     updateMultiViewAspectRatio();
 
-    auto noDraw = new Qt3DRender::QNoDraw(clearBuffers);
+//    auto noDraw = new Qt3DRender::QNoDraw(clearBuffers);
 }
 
 //=============================================================================================================

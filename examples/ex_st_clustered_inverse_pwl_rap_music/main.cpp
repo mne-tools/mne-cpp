@@ -370,12 +370,12 @@ int main(int argc, char *argv[])
 
     p3DDataModel->addSurfaceSet(parser.value(subjectOption), "HemiLRSet", t_surfSet, t_annotationSet);
 
-    MneDataTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption),
-                                                               "HemiLRSet",
-                                                               sourceEstimate,
-                                                               t_clusteredFwd,
-                                                               t_surfSet,
-                                                               t_annotationSet);
+//    MneDataTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption),
+//                                                               "HemiLRSet",
+//                                                               sourceEstimate,
+//                                                               t_clusteredFwd,
+//                                                               t_surfSet,
+//                                                               t_annotationSet);
 
     p3DAbstractView->show();
 

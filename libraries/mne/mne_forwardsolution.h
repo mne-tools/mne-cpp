@@ -79,6 +79,16 @@
 namespace MNELIB
 {
 
+//=============================================================================================================
+// DEFAULT VARIABLES DEFINITION
+//=============================================================================================================
+
+namespace {
+    const FIFFLIB::FiffCov defaultCov;
+    const FIFFLIB::FiffInfo defaultInfo;
+    Eigen::MatrixXd defaultD;
+}
+
 //=========================================================================================================
 /**
  * Gain matrix output data for one region, used for clustering
@@ -157,9 +167,7 @@ struct RegionData
     }
 };
 
-const static FIFFLIB::FiffCov defaultCov;
-const static FIFFLIB::FiffInfo defaultInfo;
-static Eigen::MatrixXd defaultD;
+
 
 //=============================================================================================================
 /**

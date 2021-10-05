@@ -175,7 +175,7 @@ void EventModel::setSamplePos(int iSamplePos)
 int EventModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
-    return m_EventManager.getEventsInGroups(m_selectedEventGroups)->size();
+    return static_cast<int>(m_EventManager.getEventsInGroups(m_selectedEventGroups)->size());
 }
 
 //=============================================================================================================
@@ -628,7 +628,7 @@ std::unique_ptr<std::vector<EVENTSLIB::Event> > EventModel::getEventsToDisplay(i
 void EventModel::eventsUpdated()
 {
     emit dataChanged(createIndex(0,0), createIndex(rowCount(), columnCount()));
-    emit headerDataChanged(Qt::Vertical, 0, m_EventManager.getAllEvents()->size());
+    emit headerDataChanged(Qt::Vertical, 0, static_cast<int>(m_EventManager.getAllEvents()->size()));
 }
 
 //=============================================================================================================

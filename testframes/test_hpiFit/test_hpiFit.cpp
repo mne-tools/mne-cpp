@@ -177,7 +177,6 @@ void TestHpiFit::initTestCase()
     FiffDigPointSet fittedPointSet;
     Eigen::MatrixXd mProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
-    bool bDoDebug = true;
 
     HPIFit HPI = HPIFit(pFiffInfo, true);
 
@@ -212,6 +211,9 @@ void TestHpiFit::initTestCase()
         }
 
         qInfo()  << "HPI-Fit...";
+
+        bool bDoDebug = false;
+
         HPI.fitHPI(mData,
                    mProjectors,
                    pFiffInfo->dev_head_t,
@@ -220,7 +222,7 @@ void TestHpiFit::initTestCase()
                    vGoF,
                    fittedPointSet,
                    pFiffInfo,
-                   bDoDebug = 0,
+                   bDoDebug,
                    sHPIResourceDir,
                    200,
                    1e-5f);

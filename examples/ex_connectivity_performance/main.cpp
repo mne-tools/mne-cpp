@@ -133,6 +133,9 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
  */
 int main(int argc, char *argv[])
 {
+    Q_UNUSED(argc);
+    Q_UNUSED(argv);
+
     #ifdef STATICBUILD
     Q_INIT_RESOURCE(disp3d);
     #endif

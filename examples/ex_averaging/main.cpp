@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
                                                         fTMin,
                                                         fTMax,
                                                         event,
-                                                        -1.0f,
+                                                        true,
                                                         -1.0f,
                                                         true,
                                                         mapReject,
