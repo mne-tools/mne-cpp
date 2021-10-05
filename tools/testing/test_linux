@@ -1,5 +1,8 @@
 #!/bin/bash
 set -e
+
+CompoundOutput=0
+
 RepoRootDir="$(dirname "$BASH_SOURCE")/../.."
 echo $RepoRootDir
 
@@ -10,4 +13,8 @@ do
   # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.
   echo ">> Starting $test"
   $test
+  if [ $? -eq 0 ];
+  then 
+    $CompoundOutput = $CompoundOutput + 1
+  fi
 done
