@@ -108,7 +108,7 @@ MainWindow::MainWindow(QWidget *parent)
 , m_sSettingsPath("MNESCAN/MainWindow")
 , m_sCurrentStyle("default")
 {
-    fprintf(stderr, "%s - Version %s\n",
+    printf( "%s - Version %s\n",
             CInfo::AppNameShort().toUtf8().constData(),
             CInfo::AppVersion().toUtf8().constData());
 

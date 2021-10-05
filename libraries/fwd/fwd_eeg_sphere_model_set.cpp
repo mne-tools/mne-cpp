@@ -247,7 +247,7 @@ FwdEegSphereModel* FwdEegSphereModelSet::fwd_select_eeg_sphere_model(const QStri
 
     for (k = 0; k < this->nmodel(); k++) {
         if (this->models[k]->name.compare(name) == 0) {
-            fprintf(stderr,"Selected model: %s\n",this->models[k]->name.toUtf8().constData());
+            printf("Selected model: %s\n",this->models[k]->name.toUtf8().constData());
             return new FwdEegSphereModel(*(this->models[k]));
         }
     }

@@ -474,7 +474,7 @@ int MneCovMatrix::condition_cov(MneCovMatrix *c, float rank_threshold, int use_r
         printf("\n\tEstimated covariance matrix rank = %d (%g)\n",nok,lambda[c->ncov-nok]/lambda[c->ncov-1]);
         if (use_rank > 0 && use_rank < nok) {
             nok = use_rank;
-            fprintf(stderr,"\tUser-selected covariance matrix rank = %d (%g)\n",nok,lambda[c->ncov-nok]/lambda[c->ncov-1]);
+            printf("\tUser-selected covariance matrix rank = %d (%g)\n",nok,lambda[c->ncov-nok]/lambda[c->ncov-1]);
         }
         /*
          * Put it back together
@@ -534,7 +534,7 @@ int MneCovMatrix::mne_decompose_eigen_cov_small(MneCovMatrix *c, float p_small, 
     if (c->cov_diag)
         return mne_add_inv_cov(c);
     if (c->lambda && c->eigen) {
-        fprintf(stderr,"\n\tEigenvalue decomposition had been precomputed.\n");
+        printf("\n\tEigenvalue decomposition had been precomputed.\n");
         c->nzero = 0;
         for (k = 0; k < c->ncov; k++, c->nzero++)
             if (c->lambda[k] > 0)

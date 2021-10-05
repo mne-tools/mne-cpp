@@ -150,7 +150,7 @@ bool FiffIO::read(QIODevice& pIODevice)
         //append to corresponding member qlist
         m_qlistRaw.append(p_fiffRawData);
 
-        fprintf(stderr, "Finished reading raw data!\n");
+        printf( "Finished reading raw data!\n");
     }
 
     //evoked data + projections

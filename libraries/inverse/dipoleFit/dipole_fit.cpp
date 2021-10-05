@@ -150,7 +150,7 @@ void mne_free_name_list(char **list, int nlist)
         return;
     for (k = 0; k < nlist; k++) {
 #ifdef FOO
-        fprintf(stderr,"%d %s\n",k,list[k]);
+        printf("%d %s\n",k,list[k]);
 #endif
         FREE(list[k]);
     }
@@ -303,7 +303,7 @@ int mne_ch_selection_assign_chs(mneChSelection sel,
             nch++;
     }
     if (sel->nderiv > 0)
-        fprintf(stderr,"Selection %c%s%c has %d matched derived channels.\n",'"',sel->name.toUtf8().constData(),'"',sel->nderiv);
+        printf("Selection %c%s%c has %d matched derived channels.\n",'"',sel->name.toUtf8().constData(),'"',sel->nderiv);
     return nch;
 }
 
@@ -697,14 +697,14 @@ int DipoleFit::fit_dipoles( const QString& dataname, MneMeasData* data, DipoleFi
 
     set.dataname = dataname;
 
-    fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
+    printf("Fitting...%c",verbose ? '\n' : '\0');
     for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
         /*
      * Pick the data point
      */
         if (mne_get_values_from_data(time,integ,data->current->data,data->current->np,data->nchan,data->current->tmin,
                                      1.0/data->current->tstep,FALSE,one) == FAIL) {
-            fprintf(stderr,"Cannot pick time: %7.1f ms\n",1000*time);
+            printf("Cannot pick time: %7.1f ms\n",1000*time);
             continue;
         }
 
@@ -716,12 +716,12 @@ int DipoleFit::fit_dipoles( const QString& dataname, MneMeasData* data, DipoleFi
                 dip.print(stdout);
             else {
                 if (set.size() % report_interval == 0)
-                    fprintf(stderr,"%d..",set.size());
+                    printf("%d..",set.size());
             }
         }
     }
     if (!verbose)
-        fprintf(stderr,"[done]\n");
+        printf("[done]\n");
     FREE(one);
     p_set = set;
     return OK;
@@ -754,7 +754,7 @@ int DipoleFit::fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSe
     stime = start/sfreq;
     if (MneRawData::mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
         goto bad;
-    fprintf(stderr,"Fitting...%c",verbose ? '\n' : '\0');
+    printf("Fitting...%c",verbose ? '\n' : '\0');
     for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
         picks = time*sfreq - start;
         if (picks > stepo) {		/* Need a new data segment? */
@@ -768,7 +768,7 @@ int DipoleFit::fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSe
      * Get the values
      */
         if (mne_get_values_from_data_ch (time,integ,data,length,sel->nchan,stime,sfreq,FALSE,one) == FAIL) {
-            fprintf(stderr,"Cannot pick time: %8.3f s\n",time);
+            printf("Cannot pick time: %8.3f s\n",time);
             continue;
         }
         /*
@@ -782,12 +782,12 @@ int DipoleFit::fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSe
                 dip.print(stdout);
             else {
                 if (set.size() % report_interval == 0)
-                    fprintf(stderr,"%d..",set.size());
+                    printf("%d..",set.size());
             }
         }
     }
     if (!verbose)
-        fprintf(stderr,"[done]\n");
+        printf("[done]\n");
     FREE_CMATRIX(data);
     FREE(one);
     p_set = set;

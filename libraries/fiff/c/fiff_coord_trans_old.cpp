@@ -974,7 +974,7 @@ FiffCoordTransOld* FiffCoordTransOld::procrustes_align(int   from_frame,  /* The
      * Test the transformation and print the results
      */
     #ifdef DEBUG
-    fprintf(stderr,"Procrustes matching (desired vs. transformed) :\n");
+    printf("Procrustes matching (desired vs. transformed) :\n");
     #endif
     for (p = 0; p < np; p++) {
         for (j = 0; j < 3; j++) {
@@ -984,7 +984,7 @@ FiffCoordTransOld* FiffCoordTransOld::procrustes_align(int   from_frame,  /* The
         }
         VEC_DIFF_20(top[p],rr,diff);
         #ifdef DEBUG
-        fprintf(stderr,"\t%7.2f %7.2f %7.2f mm <-> %7.2f %7.2f %7.2f mm diff = %8.3f mm\n",
+        printf("\t%7.2f %7.2f %7.2f mm <-> %7.2f %7.2f %7.2f mm diff = %8.3f mm\n",
         1000*top[p][0],1000*top[p][1],1000*top[p][2],
         1000*rr[0],1000*rr[1],1000*rr[2],1000*VEC_LEN(diff));
         #endif
@@ -994,7 +994,7 @@ FiffCoordTransOld* FiffCoordTransOld::procrustes_align(int   from_frame,  /* The
         }
     }
     #ifdef DEBUG
-    fprintf(stderr,"\n");
+    printf("\n");
     #endif
 
     FREE_CMATRIX_20(from);

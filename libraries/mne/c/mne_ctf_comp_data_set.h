@@ -182,7 +182,7 @@ public:
     //    * Are we there already?
     //    */
     //    if (set->current && set->current->mne_kind == compensate_to) {
-    //        fprintf(stderr,"The data were already compensated as desired (%s)\n",mne_explain_ctf_comp(set->current->kind));
+    //        printf("The data were already compensated as desired (%s)\n",mne_explain_ctf_comp(set->current->kind));
     //        return OK;
     //    }
     //    /*
@@ -192,13 +192,13 @@ public:
     //        if (mne_apply_ctf_comp(set,FALSE,data[k],nchan,comp_data[k],ncomp_chan) == FAIL)
     //            goto bad;
     //    if (set->current)
-    //        fprintf(stderr,"The previous compensation (%s) is now undone\n",mne_explain_ctf_comp(set->current->kind));
+    //        printf("The previous compensation (%s) is now undone\n",mne_explain_ctf_comp(set->current->kind));
     //    /*
     //    * Set to new gradient compensation
     //    */
     //    if (compensate_to == MNE_CTFV_NOGRAD) {
     //        mne_set_ctf_comp(chs,nchan,compensate_to);
-    //        fprintf(stderr,"No compensation was requested. Original data have been restored.\n");
+    //        printf("No compensation was requested. Original data have been restored.\n");
     //    }
     //    else {
     //        if (mne_set_ctf_comp(chs,nchan,compensate_to) > 0) {
@@ -213,10 +213,10 @@ public:
     //                if (mne_apply_ctf_comp(set,TRUE,data[k],nchan,comp_data[k],ncomp_chan) == FAIL)
     //                    goto bad;
     //            if (set->current)
-    //                fprintf(stderr,"The data are now compensated as requested (%s).\n",mne_explain_ctf_comp(set->current->kind));
+    //                printf("The data are now compensated as requested (%s).\n",mne_explain_ctf_comp(set->current->kind));
     //        }
     //        else
-    //            fprintf(stderr,"No MEG channels to compensate.\n");
+    //            printf("No MEG channels to compensate.\n");
     //    }
     //    return OK;
 

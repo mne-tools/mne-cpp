@@ -109,32 +109,32 @@ void ComputeFwdSettings::initMembers()
 
 void ComputeFwdSettings::usage(char *name)
 {
-    fprintf(stderr,"usage : %s [options]\n",name);
-    fprintf(stderr,"\t--meg             to compute the MEG forward solution\n");
-    fprintf(stderr,"\t--eeg             to compute the EEG forward solution\n");
-    fprintf(stderr,"\t--grad            compute the gradient of the field with respect to the dipole coordinates as well\n");
-    fprintf(stderr,"\t--fixed           to calculate only for the source orientation given by the surface normals\n");
-    fprintf(stderr,"\t--mricoord        do calculations in MRI coordinates instead of head coordinates\n");
-    fprintf(stderr,"\t--accurate        use more accurate coil definitions in MEG forward computation\n");
-    fprintf(stderr,"\t--src name        specify the source space\n");
-    fprintf(stderr,"\t--label name      label file to select the sources (can have multiple of these)\n");
-    fprintf(stderr,"\t--mri name        take head/MRI coordinate transform from here (Neuromag MRI description file)\n");
-    fprintf(stderr,"\t--trans name      take head/MRI coordinate transform from here (text file)\n");
-    fprintf(stderr,"\t--notrans         head and MRI coordinate systems are identical.\n");
-    fprintf(stderr,"\t--meas name       take MEG sensor and EEG electrode locations from here\n");
-    fprintf(stderr,"\t--bem  name       BEM model name\n");
-    fprintf(stderr,"\t--origin x:y:z/mm use a sphere model with this origin (head coordinates/mm)\n");
-    fprintf(stderr,"\t--eegscalp        scale the electrode locations to the surface of the scalp when using a sphere model\n");
-    fprintf(stderr,"\t--eegmodels name  read EEG sphere model specifications from here.\n");
-    fprintf(stderr,"\t--eegmodel  name  name of the EEG sphere model to use (default : Default)\n");
-    fprintf(stderr,"\t--eegrad rad/mm   radius of the scalp surface to use in EEG sphere model (default : %7.1f mm)\n",1000*eeg_sphere_rad);
-    fprintf(stderr,"\t--mindist dist/mm minimum allowable distance of the sources from the inner skull surface.\n");
-    fprintf(stderr,"\t--mindistout name Output the omitted source space points here.\n");
-    fprintf(stderr,"\t--includeall      Omit all source space checks\n");
-    fprintf(stderr,"\t--all             calculate forward solution in all nodes instead the selected ones only.\n");
-    fprintf(stderr,"\t--fwd  name       save the solution here\n");
-    fprintf(stderr,"\t--help            print this info.\n");
-    fprintf(stderr,"\t--version         print version info.\n\n");
+    printf("usage : %s [options]\n",name);
+    printf("\t--meg             to compute the MEG forward solution\n");
+    printf("\t--eeg             to compute the EEG forward solution\n");
+    printf("\t--grad            compute the gradient of the field with respect to the dipole coordinates as well\n");
+    printf("\t--fixed           to calculate only for the source orientation given by the surface normals\n");
+    printf("\t--mricoord        do calculations in MRI coordinates instead of head coordinates\n");
+    printf("\t--accurate        use more accurate coil definitions in MEG forward computation\n");
+    printf("\t--src name        specify the source space\n");
+    printf("\t--label name      label file to select the sources (can have multiple of these)\n");
+    printf("\t--mri name        take head/MRI coordinate transform from here (Neuromag MRI description file)\n");
+    printf("\t--trans name      take head/MRI coordinate transform from here (text file)\n");
+    printf("\t--notrans         head and MRI coordinate systems are identical.\n");
+    printf("\t--meas name       take MEG sensor and EEG electrode locations from here\n");
+    printf("\t--bem  name       BEM model name\n");
+    printf("\t--origin x:y:z/mm use a sphere model with this origin (head coordinates/mm)\n");
+    printf("\t--eegscalp        scale the electrode locations to the surface of the scalp when using a sphere model\n");
+    printf("\t--eegmodels name  read EEG sphere model specifications from here.\n");
+    printf("\t--eegmodel  name  name of the EEG sphere model to use (default : Default)\n");
+    printf("\t--eegrad rad/mm   radius of the scalp surface to use in EEG sphere model (default : %7.1f mm)\n",1000*eeg_sphere_rad);
+    printf("\t--mindist dist/mm minimum allowable distance of the sources from the inner skull surface.\n");
+    printf("\t--mindistout name Output the omitted source space points here.\n");
+    printf("\t--includeall      Omit all source space checks\n");
+    printf("\t--all             calculate forward solution in all nodes instead the selected ones only.\n");
+    printf("\t--fwd  name       save the solution here\n");
+    printf("\t--help            print this info.\n");
+    printf("\t--version         print version info.\n\n");
     exit(1);
 }
 
@@ -158,10 +158,10 @@ bool ComputeFwdSettings::check_unrecognized_args(int argc, char **argv)
     int k;
 
     if (argc > 1) {
-        fprintf(stderr,"Unrecognized arguments : ");
+        printf("Unrecognized arguments : ");
         for (k = 1; k < argc; k++)
-            fprintf(stderr,"%s ",argv[k]);
-        fprintf(stderr,"\n");
+            printf("%s ",argv[k]);
+        printf("\n");
         qCritical("Check the command line.");
         return false;
     }
@@ -183,7 +183,7 @@ bool ComputeFwdSettings::check_args (int *argc,char **argv)
     for (int k = 0; k < *argc; k++) {
         found = 0;
         if (strcmp(argv[k],"--version") == 0) {
-            fprintf(stderr,"%s version %s compiled at %s %s\n", argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
+            printf("%s version %s compiled at %s %s\n", argv[0],PROGRAM_VERSION,__DATE__,__TIME__);
             exit(0);
         }
         else if (strcmp(argv[k],"--help") == 0) {

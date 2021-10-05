@@ -1083,7 +1083,7 @@ float **FwdBemModel::fwd_bem_lin_pot_coeff(const QList<MneSurfaceOld*>& surfs)
             np2   = surf2->np;
             ntri  = surf2->ntri;
 
-            fprintf(stderr,"\t\t%s (%d) -> %s (%d) ... ",
+            printf("\t\t%s (%d) -> %s (%d) ... ",
                     fwd_bem_explain_surface(surf1->id).toUtf8().constData(),np1,
                     fwd_bem_explain_surface(surf2->id).toUtf8().constData(),np2);
 
@@ -1112,7 +1112,7 @@ float **FwdBemModel::fwd_bem_lin_pot_coeff(const QList<MneSurfaceOld*>& surfs)
                     sub_mat[j] = mat[j+joff]+koff;
                 correct_auto_elements (surf1,sub_mat);
             }
-            fprintf(stderr,"[done]\n");
+            printf("[done]\n");
         }
     }
     FREE_40(row);
@@ -1134,7 +1134,7 @@ int FwdBemModel::fwd_bem_linear_collocation_solution(FwdBemModel *m)
     if(m)
         m->fwd_bem_free_solution();
 
-    fprintf(stderr,"\nComputing the linear collocation solution...\n");
+    printf("\nComputing the linear collocation solution...\n");
     fprintf (stderr,"\tMatrix coefficients...\n");
     if ((coeff = fwd_bem_lin_pot_coeff (m->surfs)) == NULL)
         goto bad;
@@ -1172,7 +1172,7 @@ int FwdBemModel::fwd_bem_linear_collocation_solution(FwdBemModel *m)
 
     }
     m->bem_method = FWD_BEM_LINEAR_COLL;
-    fprintf(stderr,"Solution ready.\n");
+    printf("Solution ready.\n");
     return OK;
 
 bad : {
@@ -1258,13 +1258,13 @@ void FwdBemModel::fwd_bem_ip_modify_solution(float **solution, float **ip_soluti
     sub = MALLOC_40(ntot,float *);
     mult = (1.0 + ip_mult)/ip_mult;
 
-    fprintf(stderr,"\t\tCombining...");
+    printf("\t\tCombining...");
 #ifndef OLD
-    fprintf(stderr,"t ");
+    printf("t ");
     mne_transpose_square_40(ip_solution,nlast);
 #endif
     for (s = 0, joff = 0; s < nsurf; s++) {
-        fprintf(stderr,"%d3 ",s+1);
+        printf("%d3 ",s+1);
         /*
         * Pick the correct submatrix
         */
@@ -1292,10 +1292,10 @@ void FwdBemModel::fwd_bem_ip_modify_solution(float **solution, float **ip_soluti
         joff = joff+ntri[s];
     }
 #ifndef OLD
-    fprintf(stderr,"t ");
+    printf("t ");
     mne_transpose_square_40(ip_solution,nlast);
 #endif
-    fprintf(stderr,"33 ");
+    printf("33 ");
     /*
      * The lower right corner is a special case
      */
@@ -1305,9 +1305,9 @@ void FwdBemModel::fwd_bem_ip_modify_solution(float **solution, float **ip_soluti
     /*
      * Final scaling
      */
-    fprintf(stderr,"done.\n\t\tScaling...");
+    printf("done.\n\t\tScaling...");
     mne_scale_vector_40(ip_mult,solution[0],ntot*ntot);
-    fprintf(stderr,"done.\n");
+    printf("done.\n");
     FREE_40(row); FREE_40(sub);
     return;
 }
@@ -1376,7 +1376,7 @@ float **FwdBemModel::fwd_bem_solid_angles(const QList<MneSurfaceOld*>& surfs)
         for (q = 0, koff = 0; q < surfs.size(); q++, koff = koff + ntri2) {
             surf2 = surfs[q];
             ntri2 = surf2->ntri;
-            fprintf(stderr,"\t\t%s (%d) -> %s (%d) ... ",fwd_bem_explain_surface(surf1->id).toUtf8().constData(),ntri1,fwd_bem_explain_surface(surf2->id).toUtf8().constData(),ntri2);
+            printf("\t\t%s (%d) -> %s (%d) ... ",fwd_bem_explain_surface(surf1->id).toUtf8().constData(),ntri1,fwd_bem_explain_surface(surf2->id).toUtf8().constData(),ntri2);
             for (j = 0; j < ntri1; j++)
                 for (k = 0, tri = surf2->tris; k < ntri2; k++, tri++) {
                     if (p == q && j == k)
@@ -1387,7 +1387,7 @@ float **FwdBemModel::fwd_bem_solid_angles(const QList<MneSurfaceOld*>& surfs)
                 }
             for (j = 0; j < ntri1; j++)
                 sub_solids[j] = solids[j+joff]+koff;
-            fprintf(stderr,"[done]\n");
+            printf("[done]\n");
             if (p == q)
                 desired = 1;
             else if (p < q)
@@ -1419,8 +1419,8 @@ int FwdBemModel::fwd_bem_constant_collocation_solution(FwdBemModel *m)
     if(m)
         m->fwd_bem_free_solution();
 
-    fprintf(stderr,"\nComputing the constant collocation solution...\n");
-    fprintf(stderr,"\tSolid angles...\n");
+    printf("\nComputing the constant collocation solution...\n");
+    printf("\tSolid angles...\n");
     if ((solids = fwd_bem_solid_angles(m->surfs)) == NULL)
         goto bad;
 
@@ -1506,14 +1506,14 @@ int FwdBemModel::fwd_bem_load_recompute_solution(const QString& name, int bem_me
             m->fwd_bem_free_solution();
         solres = fwd_bem_load_solution(name,bem_method,m);
         if (solres == TRUE) {
-            fprintf(stderr,"\nLoaded %s BEM solution from %s\n",fwd_bem_explain_method(m->bem_method).toUtf8().constData(),name.toUtf8().constData());
+            printf("\nLoaded %s BEM solution from %s\n",fwd_bem_explain_method(m->bem_method).toUtf8().constData(),name.toUtf8().constData());
             return OK;
         }
         else if (solres == FAIL)
             return FAIL;
 #ifdef DEBUG
         else
-            fprintf(stderr,"Desired BEM  solution not available in %s (%s)\n",name,err_get_error());
+            printf("Desired BEM  solution not available in %s (%s)\n",name,err_get_error());
 #endif
     }
     if (bem_method == FWD_BEM_UNKNOWN)
@@ -3139,7 +3139,7 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
          * It works the same way independent of whether or not the compensation is in effect
          */
 #ifdef TEST
-        fprintf(stderr,"Using differences.\n");
+        printf("Using differences.\n");
         comp = FwdCompData::fwd_make_comp_data(comp_data,
                                                coils,comp_coils,
                                                FwdBemModel::fwd_bem_field,
@@ -3166,13 +3166,13 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
         printf("Composing the field computation matrix...");
         if (fwd_bem_specify_coils(bem_model,coils) == FAIL)
             goto bad;
-        fprintf(stderr,"[done]\n");
+        printf("[done]\n");
 
         if (comp->set && comp->set->current) { /* Test just to specify confusing output */
-            fprintf(stderr,"Composing the field computation matrix (compensation coils)...");
+            printf("Composing the field computation matrix (compensation coils)...");
             if (fwd_bem_specify_coils(bem_model,comp->comp_coils) == FAIL)
                 goto bad;
-            fprintf(stderr,"[done]\n");
+            printf("[done]\n");
         }
         field      = FwdCompData::fwd_comp_field;
         vec_field  = NULL;
@@ -3185,7 +3185,7 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
          * It works the same way independent of whether or not the compensation is in effect
          */
 #ifdef TEST
-        fprintf(stderr,"Using differences.\n");
+        printf("Using differences.\n");
         comp = FwdCompData::fwd_make_comp_data(comp_data,coils,comp_coils,
                                                fwd_sphere_field,
                                                fwd_sphere_field_vec,
@@ -3256,7 +3256,7 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
                 off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
                 args.append(t_arg);
             }
-            fprintf(stderr,"%d processors. I will use one thread for each of the %d source spaces.\n",
+            printf("%d processors. I will use one thread for each of the %d source spaces.\n",
                     nproc,nspace);
         }
         else {
@@ -3270,10 +3270,10 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
                 }
                 off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
             }
-            fprintf(stderr,"%d processors. I will use %d threads : %d source spaces x 3 source components.\n",
+            printf("%d processors. I will use %d threads : %d source spaces x 3 source components.\n",
                     nproc,nthread,nspace);
         }
-        fprintf(stderr,"Computing MEG at %d source locations (%s orientations)...",
+        printf("Computing MEG at %d source locations (%s orientations)...",
                 nsource,fixed_ori ? "fixed" : "free");
         /*
         * Ready to start the threads & Wait for them to complete
@@ -3293,7 +3293,7 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
             goto bad;
     }
     else {
-        fprintf(stderr,"Computing MEG at %d source locations (%s orientations, no threads)...",
+        printf("Computing MEG at %d source locations (%s orientations, no threads)...",
                 nsource,fixed_ori ? "fixed" : "free");
         for (k = 0, off = 0; k < nspace; k++) {
             one_arg->s   = spaces[k];
@@ -3304,7 +3304,7 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
             off = fixed_ori ? off + one_arg->s->nuse : off + 3*one_arg->s->nuse;
         }
     }
-    fprintf(stderr,"done.\n");
+    printf("done.\n");
     {
         QStringList orig_names;
         for (k = 0; k < nmeg; k++)
@@ -3406,7 +3406,7 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces,
         pot      = fwd_bem_pot_els;
         vec_pot  = NULL;
 #ifdef TEST
-        fprintf(stderr,"Using differences.\n");
+        printf("Using differences.\n");
         pot_grad = my_bem_pot_grad;
 #else
         pot_grad = fwd_bem_pot_grad_els;
@@ -3414,13 +3414,13 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces,
     }
     else {
         if (m->nfit == 0) {
-            fprintf(stderr,"Using the standard series expansion for a multilayer sphere model for EEG\n");
+            printf("Using the standard series expansion for a multilayer sphere model for EEG\n");
             pot      = FwdEegSphereModel::fwd_eeg_multi_spherepot_coil1;
             vec_pot  = NULL;
             pot_grad = NULL;
         }
         else {
-            fprintf(stderr,"Using the equivalent source approach in the homogeneous sphere for EEG\n");
+            printf("Using the equivalent source approach in the homogeneous sphere for EEG\n");
             pot      = FwdEegSphereModel::fwd_eeg_spherepot_coil;
             vec_pot  = FwdEegSphereModel::fwd_eeg_spherepot_coil_vec;
             pot_grad = FwdEegSphereModel::fwd_eeg_spherepot_grad_coil;
@@ -3512,7 +3512,7 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces,
             goto bad;
     }
     else {
-        fprintf(stderr,"Computing EEG at %d source locations (%s orientations, no threads)...",
+        printf("Computing EEG at %d source locations (%s orientations, no threads)...",
                 nsource,fixed_ori ? "fixed" : "free");
         for (k = 0, off = 0; k < nspace; k++) {
             one_arg->s   = spaces[k];
@@ -3523,7 +3523,7 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces,
             off = fixed_ori ? off + one_arg->s->nuse : off + 3*one_arg->s->nuse;
         }
     }
-    fprintf(stderr,"done.\n");
+    printf("done.\n");
     {
         QStringList orig_names;
         for (k = 0; k < neeg; k++)
