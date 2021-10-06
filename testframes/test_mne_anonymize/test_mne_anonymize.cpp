@@ -89,11 +89,15 @@ private:
 
     void verifyTags(FIFFLIB::FiffStream::SPtr &outStream,
                     QString testArg="blank");
+    int mDaysToOffsetDates;
+    QDateTime mDefaultMeasDate;
 };
 
 //=============================================================================================================
 
 TestMneAnonymize::TestMneAnonymize()
+    : mDaysToOffsetDates(35),
+      mDefaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0), Qt::LocalTime)
 {
 }
 
@@ -246,7 +250,7 @@ void TestMneAnonymize::compareBirthdayOffsetOption()
     QStringList arguments;
     arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
     arguments << "--in" << sFileIn;
-    arguments << "--subject_birthday_offset" << "35";
+    arguments << "--subject_birthday_offset" << QString::number(mDaysToOffsetDates);
     arguments << "--verbose";
     arguments << "--no-gui";
 
@@ -281,7 +285,7 @@ void TestMneAnonymize::compareMeasureDateOffsetOption()
     QStringList arguments;
     arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
     arguments << "--in" << sFileIn;
-    arguments << "--measurement_date_offset" << "35";
+    arguments << "--measurement_date_offset" << QString::number(mDaysToOffsetDates);
     arguments << "--verbose";
     arguments << "--no-gui";
 
@@ -329,10 +333,9 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
 
             if(testArg != "MeasDateOffset"){
                 QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(inId.time.secs, Qt::LocalTime));
-                QDateTime defaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0), Qt::LocalTime);
 
-                QVERIFY(inMeasDate == defaultMeasDate);
-                QVERIFY(inId.time.secs == static_cast<int32_t>(defaultMeasDate.toSecsSinceEpoch()));
+                QVERIFY(inMeasDate == mDefaultMeasDate);
+                QVERIFY(inId.time.secs == static_cast<int32_t>(mDefaultMeasDate.toSecsSinceEpoch()));
                 QVERIFY(inId.time.usecs == 0);
             }
 
@@ -344,14 +347,17 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
         case FIFF_MEAS_DATE:
         {
             QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*pTag->toInt(), Qt::LocalTime));
-            QDateTime defaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0), Qt::LocalTime);
-            QDateTime actualDate(QDate(2002,12,3), QTime(14, 1, 10), Qt::LocalTime);
-            QDateTime offSetMeasDate(actualDate.addDays(-35));
+            QDateTime originalDateInFile(QDate(2002,12,3), QTime(14, 1, 10), Qt::LocalTime);
+
+            qInfo() << "InMeasDate: " << inMeasDate;
+            qInfo() << "originalDateInFile: " << originalDateInFile;
+            qInfo() << "days in between: " << inMeasDate.daysTo(originalDateInFile);
+            qInfo() << "days used as offset: " << mDaysToOffsetDates;
 
             if(testArg == "MeasDateOffset"){
-                QVERIFY(inMeasDate == offSetMeasDate);
+                QVERIFY(inMeasDate.daysTo(originalDateInFile) == mDaysToOffsetDates);
             } else {
-                QVERIFY(inMeasDate == defaultMeasDate);
+                QVERIFY(inMeasDate == mDefaultMeasDate);
             }
 
             break;
