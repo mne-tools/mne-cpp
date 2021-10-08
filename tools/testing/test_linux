@@ -7,7 +7,6 @@ CompoundOutput=0
 
 ##########
 
-BASH_SOURCE=pwd
 RepoRootDir="$(dirname "$BASH_SOURCE")/../.."
 echo $RepoRootDir
 
