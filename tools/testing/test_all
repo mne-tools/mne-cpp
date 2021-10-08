@@ -73,10 +73,10 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$RepoRootDir/lib
 
 ##########
 CompoundOutput=0
-testColumnWidth=40
+testColumnWidth=50
 printf "%${testColumnWidth}s %s\n" " Test Name " " Result "
 
-for test in ./bin/test_*;
+for test in $RepoRootDir/bin/test_*;
 do
   # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
   # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.
@@ -92,7 +92,7 @@ do
   if [ $lastReturnValue -ne 0 ];
   then 
     CompoundOutput=$((CompoundOutput + 1))
-    printf "%${testColumnWidth}s \e[91m %s \e[0m\n" "${test}" "FAILED!"
+    printf "%${testColumnWidth}s \e[91m\033[1m %s \033[0\e[0m\n" "${test}" "FAILED!"
 
     if [ $ExitOnFirstFail == "true" ];
     then
