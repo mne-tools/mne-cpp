@@ -8,13 +8,11 @@ ExitOnFirstFail="false"
 RunCodeCoverage="false"
 
 doPrintConfiguration() {
-  echo =======================================
-  echo ==   Printing Configuration
-  echo ==   ----------------------
-  echo ==   VerboseMode = $VerboseMode
-  echo ==   ExitOnFirstFail = $ExitOnFirstFail
-  echo ==   RunCodeCoverage = $RunCodeCoverage
-  echo =======================================
+  echo =========================================
+  echo " "  VerboseMode = $VerboseMode
+  echo " "  ExitOnFirstFail = $ExitOnFirstFail
+  echo " "  RunCodeCoverage = $RunCodeCoverage
+  echo =========================================
 }
 
 doPrintHelp() {
@@ -22,12 +20,25 @@ doPrintHelp() {
   echo "MNE-CPP testing script help."
   echo "This script will run all applications in bin folder starting with "test_""
   echo "For help run: ./test_linux help"
-  echo "Normal call has 2 or 3 arguments: ./test_linux (verbose/summary) (exitOnFail/continueOnFail) [coverage]"
+  echo "Normal call has 2 or 3 arguments: ./test_linux (verbose/summary) (exitOnFail/continueOnFail) [coverage/noCoverage]"
   echo " "
 }
 
 if [[ -z "$1" ]]; then
-  echo Running Script with default parameters:
+  echo " "
+  echo "Running Script with default parameters."
+  echo "Press H for Help."
+  echo " "
+  doPrintConfiguration
+  echo " " 
+  read -p "Are you sure you want to continue? (Yy)" -n 1 -r
+  echo " "
+  if [[ $REPLY =~ ^[Hh]$ ]]; then
+    doPrintHelp
+    exit 1
+  elif [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    exit 0
+  fi
 else
   if [[ $1 == verbose ]]; then
     VerboseMode="true"
@@ -46,6 +57,8 @@ else
 
   if [[ $3 == coverage ]]; then
     RunCodeCoverage="true"
+  else 
+    RunCodeCoverage="false"
   fi
 fi
 
@@ -60,6 +73,8 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$RepoRootDir/lib
 
 ##########
 CompoundOutput=0
+testColumnWidth=40
+printf "%${testColumnWidth}s %s\n" " Test Name " " Result "
 
 for test in ./bin/test_*;
 do
@@ -77,14 +92,15 @@ do
   if [ $lastReturnValue -ne 0 ];
   then 
     CompoundOutput=$((CompoundOutput + 1))
-    echo ">> Test $test FAILED!   ******** "
+    printf "%${testColumnWidth}s \e[91m %s \e[0m\n" "${test}" "FAILED!"
 
     if [ $ExitOnFirstFail == "true" ];
     then
       exit $lastReturnValue
     fi
   else
-    echo ">> Test $test is rock solid!"
+    # echo ">> Test $test \t\t\t\t RockSolid!"
+    printf "%${testColumnWidth}s \e[92m %s \e[0m\n" "${test}" "Rock Solid!"
   fi
 
   if [ $RunCodeCoverage == "true" ];
