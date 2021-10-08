@@ -2,6 +2,7 @@
 #
 # @file     test_mne_anonymize.pro
 # @author   Lorenz Esch <lorenzesch@hotmail.com>;
+#           Juan GPC <jgarciaprieto@mgh.harvard.edu>
 # @since    0.1.0
 # @date     September, 2019
 #
