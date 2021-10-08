@@ -18,23 +18,24 @@ doPrintConfiguration() {
 }
 
 doPrintHelp() {
-  echo MNE-CPP testing script 
-  echo This script will run all applications in bin folder starting with "test_"
-  echo For help run: ./test_linux help
-  echo Normal use: ./test_linux (verbose/summary) (exitOnFail/continueOnFail) [coverage]
+  echo " "
+  echo "MNE-CPP testing script help."
+  echo "This script will run all applications in bin folder starting with "test_""
+  echo "For help run: ./test_linux help"
+  echo "Normal call has 2 or 3 arguments: ./test_linux (verbose/summary) (exitOnFail/continueOnFail) [coverage]"
+  echo " "
 }
 
 if [[ -z "$1" ]]; then
   echo Running Script with default parameters:
-  doPrintConfiguration
 else
   if [[ $1 == verbose ]]; then
     VerboseMode="true"
   elif [[ $1 == summary ]]; then
     VerboseMode="false"
   elif [[ $1 == help ]]; then
-    echo Run this script from mne-cpp project main folder 
-    doPrintConfiguration
+    doPrintHelp
+    exit 1
   fi
 
   if [[ $2 == exitOnFail ]]; then
@@ -48,9 +49,7 @@ else
   fi
 fi
 
-echo =======================
 doPrintConfiguration
-exit 0
 
 ##########
 
