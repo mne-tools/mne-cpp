@@ -19,8 +19,8 @@ doPrintHelp() {
   echo " "
   echo "MNE-CPP testing script help."
   echo "This script will run all applications in bin folder starting with "test_""
-  echo "For help run: ./test_linux help"
-  echo "Normal call has 2 or 3 arguments: ./test_linux (verbose/summary) (exitOnFail/continueOnFail) [coverage/noCoverage]"
+  echo "For help run: ./test_all help"
+  echo "Normal call has 2 or 3 arguments: ./test_all (verbose/summary) (exitOnFail/continueOnFail) [coverage/noCoverage]"
   echo " "
 }
 
