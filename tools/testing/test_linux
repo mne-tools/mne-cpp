@@ -17,6 +17,13 @@ doPrintConfiguration() {
   echo =======================================
 }
 
+doPrintHelp() {
+  echo MNE-CPP testing script 
+  echo This script will run all applications in bin folder starting with "test_"
+  echo For help run: ./test_linux help
+  echo Normal use: ./test_linux (verbose/summary) (exitOnFail/continueOnFail) [coverage]
+}
+
 if [[ -z "$1" ]]; then
   echo Running Script with default parameters:
   doPrintConfiguration
@@ -25,6 +32,9 @@ else
     VerboseMode="true"
   elif [[ $1 == summary ]]; then
     VerboseMode="false"
+  elif [[ $1 == help ]]; then
+    echo Run this script from mne-cpp project main folder 
+    doPrintConfiguration
   fi
 
   if [[ $2 == exitOnFail ]]; then
