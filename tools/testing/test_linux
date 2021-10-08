@@ -1,9 +1,46 @@
 #!/bin/bash
-# set -e
+
+
+#####  default parameters
 
 VerboseMode="true"
 ExitOnFirstFail="false"
-CompoundOutput=0
+RunCodeCoverage="false"
+
+doPrintConfiguration() {
+  echo =======================================
+  echo ==   Printing Configuration
+  echo ==   ----------------------
+  echo ==   VerboseMode = $VerboseMode
+  echo ==   ExitOnFirstFail = $ExitOnFirstFail
+  echo ==   RunCodeCoverage = $RunCodeCoverage
+  echo =======================================
+}
+
+if [[ -z "$1" ]]; then
+  echo Running Script with default parameters:
+  doPrintConfiguration
+else
+  if [[ $1 == verbose ]]; then
+    VerboseMode="true"
+  elif [[ $1 == summary ]]; then
+    VerboseMode="false"
+  fi
+
+  if [[ $2 == exitOnFail ]]; then
+    ExitOnFirstFail="true"
+  elif [[ $2 == continueOnFail ]]; then
+    ExitOnFirstFail="false"    
+  fi
+
+  if [[ $3 == coverage ]]; then
+    RunCodeCoverage="true"
+  fi
+fi
+
+echo =======================
+doPrintConfiguration
+exit 0
 
 ##########
 
@@ -11,6 +48,9 @@ RepoRootDir="$(dirname "$BASH_SOURCE")/../.."
 echo $RepoRootDir
 
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$RepoRootDir/lib
+
+##########
+CompoundOutput=0
 
 for test in ./bin/test_*;
 do
@@ -34,10 +74,17 @@ do
     then
       exit $lastReturnValue
     fi
-
   else
     echo ">> Test $test is rock solid!"
   fi
+
+  if [ $RunCodeCoverage == "true" ];
+  then
+    find ./libraries -type f -name "*.cpp" -exec gcov {} \; &> /dev/null
+    # Hide codecov output since it corrupts the log too much
+    codecov &> /dev/null
+  fi
+
 done
 
 exit $CompoundOutput
