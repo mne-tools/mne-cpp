@@ -4,6 +4,7 @@
  * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     December, 2016
  *
@@ -78,7 +79,6 @@ public:
 private slots:
     void initTestCase();
     void computeForward();
-    void compareForward();
     void cleanupTestCase();
 
 private:
@@ -173,12 +173,6 @@ void TestMneForwardSolution::computeForward()
     QVERIFY(m_pFwdMEGEEGRead->source_nn == m_pFwdMEGEEGRef->source_nn);
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compare MEG/EEG Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
-}
-
-//=============================================================================================================
-
-void TestMneForwardSolution::compareForward()
-{
 }
 
 //=============================================================================================================
