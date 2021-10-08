@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 RepoRootDir="$(dirname "$BASH_SOURCE")/../.."
 echo $RepoRootDir
 
