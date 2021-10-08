@@ -3,6 +3,7 @@
 # @file     test_edf2fiff_rwr.pro
 # @author   Simon Heinke <simon.heinke@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+#           Juan GPC <jgarciaprieto@mgh.harvard.edu>
 # @version  1.0
 # @date     August, 2019
 #
@@ -39,16 +40,24 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT += testlib
+QT += testlib concurrent network
 QT -= gui
 
-CONFIG   += console
-CONFIG   -= app_bundle
+CONFIG += console
+!contains(MNECPP_CONFIG, withAppBundles) {
+    CONFIG -= app_bundle
+}
+
+DESTDIR =  $${MNE_BINARY_DIR}
 
 TARGET = test_edf2fiff_rwr
-
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
+}
+
+contains(MNECPP_CONFIG, static) {
+    CONFIG += static
+    DEFINES += STATICBUILD
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
@@ -61,7 +70,6 @@ else {
             -lmnecppUtils \
 }
 
-DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
     test_edf2fiff_rwr.cpp \
@@ -92,6 +100,10 @@ contains(MNECPP_CONFIG, withCodeCov) {
 unix:!macx {
     # === Unix ===
     QMAKE_RPATHDIR += $ORIGIN/../lib
+}
+
+macx {
+    QMAKE_LFLAGS += -Wl,-rpath,@executable_path/../lib
 }
 
 # Activate FFTW backend in Eigen
