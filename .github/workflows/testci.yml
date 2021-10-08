@@ -320,13 +320,13 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        ./tools/testing/test_linux verbose continueOnFail coverage
+        ./tools/testing/test_all verbose continueOnFail coverage
     - name: Run tests (MacOS)
       if: matrix.os == 'macos-latest'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        ./tools/testing/test_macos
+        ./tools/testing/test_all verbose continueOnFail noCoverage
     - name: Run tests (Windows)
       if: matrix.os == 'windows-2019'
       env:
