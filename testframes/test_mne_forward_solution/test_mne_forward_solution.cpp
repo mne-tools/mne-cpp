@@ -143,17 +143,17 @@ void TestMneForwardSolution::computeForward()
     pSettingsMEGEEG->checkIntegrity();
 
     QSharedPointer<ComputeFwd> pFwdMEGEEGComputed = QSharedPointer<ComputeFwd>(new ComputeFwd(pSettingsMEGEEG));
-    pFwdMEGEEGComputed->calculateFwd();
+//    pFwdMEGEEGComputed->calculateFwd();
 
-    // recalculate with same meg_head_t to check that we still get the same result
-    FIFFLIB::FiffCoordTransOld meg_head_t = pFiffInfo->dev_head_t.toOld();
-    pFwdMEGEEGComputed->updateHeadPos(&meg_head_t);
+//    // recalculate with same meg_head_t to check that we still get the same result
+//    FIFFLIB::FiffCoordTransOld meg_head_t = pFiffInfo->dev_head_t.toOld();
+//    pFwdMEGEEGComputed->updateHeadPos(&meg_head_t);
 
-    pFwdMEGEEGComputed->storeFwd();
+//    pFwdMEGEEGComputed->storeFwd();
 
-    // Read newly created fwd
-    QFile fileFwdMEGEEGRead(pSettingsMEGEEG->solname);
-    m_pFwdMEGEEGRead = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(fileFwdMEGEEGRead));
+//    // Read newly created fwd
+//    QFile fileFwdMEGEEGRead(pSettingsMEGEEG->solname);
+//    m_pFwdMEGEEGRead = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(fileFwdMEGEEGRead));
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute/Write/Read MEG/EEG Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
