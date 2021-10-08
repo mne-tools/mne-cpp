@@ -7,4 +7,11 @@ for test in $RepoRootDir/bin/test_*;
 do
   echo ">> Starting $test"
   $test
+  lastReturnValue=$?
+  if [ $lastReturnValue -ne 0 ];
+  then
+    exit $lastReturnValue
+  fi
+
 done
+
