@@ -1,6 +1,6 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "SilentlyContinue"
-$PrintOutput = "False"
+$PrintOutput = "True"
 $StopOnFirstTestFail = "False"
 
 $global:CompoundOutput = 0
