@@ -1,6 +1,6 @@
 Set-StrictMode -Version Latest
-$ErrorActionPreference = "Stop"
-$PrintOutput = "True"
+$ErrorActionPreference = "SilentlyContinue"
+$PrintOutput = "False"
 $StopOnFirstTestFail = "False"
 
 $global:CompoundOutput = 0
@@ -11,28 +11,31 @@ function compoundReturnValue( $e )
   {
     $global:CompoundOutput = $global:CompoundOutput + 1;
   }
-  Write-Output "compound output: $global:CompoundOutput";
+  # Write-Host "compound output: $global:CompoundOutput";
 }
 
 $CURRENT_PATH = pwd
 cd $PSScriptRoot/../..
 
+Write-Host "" ""
+
 Get-ChildItem -Filter bin/test_*.exe | ForEach {
-  Write-Output "" "" "Starting $_" "";
   if ( $PrintOutput -eq "True" ) {
     &$_.FullName;
   } else {
-    $out = &$_.Fullname;
-    # &dir ;
+    Write-Host " $_  => " -NoNewline
+    # ($out = &$_.Fullname) ;
+    ($out = &$_.Fullname) 2>&1 | out-null;
+    # &$_.Fullname 2>&1 | Out-Null;
   }
   compoundReturnValue $lastexitcode;
-  if (($lastexitcode -ne 0) -and $ErrorActionPreference -eq "Stop") { 
-    Write-Output " => IS FAILING" "";
+  if ( $lastexitcode -ne 0 ) { 
+    Write-Host " FAIL!"  -ForegroundColor Red;
     if ($StopOnFirstTestFail -eq "True" ) {
       exit $lastexitcode
     }
   }  else { 
-    Write-Output " => FINISHED OK!" "";
+    Write-Host " RockSolid!" -ForegroundColor Green;
   }
 }
 
