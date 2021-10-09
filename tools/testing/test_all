@@ -69,10 +69,9 @@ doPrintConfiguration
 RepoRootDir="$(dirname "$BASH_SOURCE")/../.."
 echo $RepoRootDir
 
-if [ $(uname) == "Linux"]; then
+if [[ $(uname) == "Linux" ]]; then
   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$RepoRootDir/lib
 fi
-
 
 ##########
 CompoundOutput=0
