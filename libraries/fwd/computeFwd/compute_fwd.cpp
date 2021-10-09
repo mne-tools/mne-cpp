@@ -2005,7 +2005,7 @@ void ComputeFwd::initFwd()
     } else {
         m_mri_head_t = FiffCoordTransOld::mne_identity_transform(FIFFV_COORD_MRI,FIFFV_COORD_HEAD);
     }
-    FiffCoordTransOld::mne_print_coord_transform(stderr,m_mri_head_t);
+    FiffCoordTransOld::mne_print_coord_transform(stdout,m_mri_head_t);
 
     // Read the channel information and the MEG device -> head coordinate transformation
     // replace mne_read_meg_comp_eeg_ch_info_41()
@@ -2067,7 +2067,7 @@ void ComputeFwd::initFwd()
         iNComp = 0;
     }
     else
-        FiffCoordTransOld::mne_print_coord_transform(stderr,m_meg_head_t);
+        FiffCoordTransOld::mne_print_coord_transform(stdout,m_meg_head_t);
     if (!m_pSettings->include_eeg) {
         printf("EEG not requested. EEG channels omitted.\n");
         m_listEegChs.clear();
@@ -2089,15 +2089,7 @@ void ComputeFwd::initFwd()
             qPath = "./resources/general/coilDefinitions/coil_def.dat";
         }
 
-        char *coilfile = MALLOC_41(strlen(qPath.toUtf8().data())+1,char);
-        memcpy(coilfile, qPath.toStdString().c_str(), qPath.size());
-
-        if (!coilfile) {
-            return;
-        }
-
-        m_templates = FwdCoilSet::read_coil_defs(coilfile);
-        FREE_41(coilfile);
+        m_templates = FwdCoilSet::read_coil_defs(qPath);
         if (!m_templates) {
             return;
         }
