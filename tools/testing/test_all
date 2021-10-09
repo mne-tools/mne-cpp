@@ -69,7 +69,10 @@ doPrintConfiguration
 RepoRootDir="$(dirname "$BASH_SOURCE")/../.."
 echo $RepoRootDir
 
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$RepoRootDir/lib
+if [ $(uname) == "Linux"]; then
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$RepoRootDir/lib
+fi
+
 
 ##########
 CompoundOutput=0
@@ -92,8 +95,7 @@ do
   if [ $lastReturnValue -ne 0 ];
   then 
     CompoundOutput=$((CompoundOutput + 1))
-    printf "%${testColumnWidth}s \e[91m\033[1m %s \033[0\e[0m\n" "${test}" "FAILED!"
-
+    printf "%${testColumnWidth}s \e[91m\033[1m %s \033[0m\e[0m\n" "${test}" "FAILED!"
     if [ $ExitOnFirstFail == "true" ];
     then
       exit $lastReturnValue
