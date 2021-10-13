@@ -326,9 +326,10 @@ void TestSpectralConnectivity::spectralConnectivityXCOR()
     // Compute Connectivity
     //*********************************************************************************************************
 
+    QString outputResultFile("ref_spectral_connectivity_xcorr.txt");
     Network network = CrossCorrelation::calculate(m_connectivitySettings);
     m_dConnectivityOutput = network.getFullConnectivityMatrix()(0,1);
-    IOUtils::write_eigen_matrix(network.getFullConnectivityMatrix(),"ref_spectral_connectivity_xcorr.txt");
+    IOUtils::write_eigen_matrix(network.getFullConnectivityMatrix(), outputResultFile);
 
     //*********************************************************************************************************
     // Load Results As Reference
@@ -344,6 +345,15 @@ void TestSpectralConnectivity::spectralConnectivityXCOR()
     //*********************************************************************************************************
 
     compareConnectivity();
+
+    //*********************************************************************************************************
+    // Cleanup
+    //*********************************************************************************************************
+
+    if(QFile::exists(outputResultFile))
+    {
+        QFile::remove(outputResultFile);
+    }
 }
 
 //=============================================================================================================
