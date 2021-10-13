@@ -8,8 +8,8 @@
 :;# 
 
 :<<BATCH
-    :;@echo off
-    :; # ########## WINDOWS SECTION #########################
+:;@echo off
+:; # ########## WINDOWS SECTION #########################
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "SilentlyContinue"
@@ -67,12 +67,12 @@ cd $CURRENT_PATH
 
 exit $CompoundOutput;
 
-    :; # ########## WINDOWS SECTION ENDS ####################
-    :; # ####################################################
+:; # ########## WINDOWS SECTION ENDS ####################
+:; # ####################################################
 BATCH
 
-    # ######################################################
-    # ############## LINUX MAC SECTION STARTS ##############
+# ######################################################
+# ############## LINUX MAC SECTION STARTS ##############
 #!/bin/bash
 
 #####  default parameters
@@ -103,27 +103,8 @@ doPrintHelp() {
 ## input arguments parsing
 
 if [[ -z "$1" ]]; then #IF first argument is missing
-#   if [[  -z $MNE_TESTALL_USE_DEFAULTS ]]; then
-#     echo "Running Script with default parameters."
-#     echo "Press H for Help."
-#     echo " "
-#     doPrintConfiguration
-#     echo " " 
-#     read -p "Are you sure you want to continue? (Yy)" -n 1 -r
-#     echo " "
-#     if [[ $REPLY =~ ^[Hh]$ ]]; then
-#       doPrintHelp
-#       exit 1
-#     elif [[ ! $REPLY =~ ^[Yy]$ ]]; then
-#       exit 0
-#     fi
-#     export MNE_TESTALL_USE_DEFAULTS=true 
-#   else 
-    echo "Running script in default mode."
-    # echo "To disable this mode delete the environment variable MNE_TESTALL_USE_DEFAULTS."
-    # echo "Use: unset MNE_TESTALL_USE_DEFAULTS"
-    echo " "
-#  fi
+  echo "Running script in default mode."
+  echo " "
 else
   if [[ $1 == verbose ]]; then #if first argument is equal to
     VerboseMode="true"
@@ -200,8 +181,8 @@ done
 
 exit $CompoundOutput
 
-    # ############## LINUX MAC SECTION ENDS ################
-    # ######################################################
+# ############## LINUX MAC SECTION ENDS ################
+# ######################################################
 
 
 
