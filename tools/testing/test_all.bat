@@ -8,43 +8,46 @@
 :;# 
 
 :<<BATCH
-:;@echo off
-:; # ########## WINDOWS SECTION #########################
+  :;@echo off
+  :; # ########## WINDOWS SECTION #########################
 
-Set-StrictMode -Version Latest
-$ErrorActionPreference = "SilentlyContinue"
-$PrintOutput = "False"
-$StopOnFirstTestFail = "False"
+  $PrintOutput=False
+  $StopOnFirstTestFail=False
 
-$verboseMode=$args[0]
-$exitMode=$args[1]
+  $verboseMode=%1
+  $exitMode=%2
 
-if ( $verboseMode -eq "verbose" ) {
-  $PrintOutput = "True"
-}
+  IF "%verboseMode%"=="verbose" (
+    SET PrintOutput=True
+  ) 
 
-if ( $exitMode -eq "exitOnFail" ) {
-  $StopOnFirstTestFail = "True"
-}
+  IF "%exitMode%"=="exitOnFail" (
+    SET StopOnFirstTestFail=True
+  )
 
-$global:CompoundOutput = 0
+SET /A compoundOutput=0
 
-function compoundReturnValue( $e )
+:compoundReturnValue
 {
-  if( $e -ne 0)
-  {
-    $global:CompoundOutput = $global:CompoundOutput + 1;
-  }
-  # Write-Host "compound output: $global:CompoundOutput";
+  IF %lastReturnValue% NEQ 0 (
+    %compoundOutput% += 1
+  )
+  @REM echo %compundOutput%
 }
 
-$CURRENT_PATH = pwd
-cd $PSScriptRoot/../..
+echo " "
 
-Write-Host "" ""
-
+dir /s /b bin\test_*.exe 
+for %%f in (bin\test_*.exe) do (
+  echo %%nf
+  start "" "%%f"
+  if errorlevel 1 (
+    compoundReturnValue
+    
+  )
+)
 Get-ChildItem -Filter bin/test_*.exe | ForEach {
-  if ( $PrintOutput -eq "True" ) {
+  IF " ( $PrintOutput -eq "True" ) {
     &$_.FullName;
   } else {
     Write-Host " $_  => " -NoNewline
@@ -53,9 +56,9 @@ Get-ChildItem -Filter bin/test_*.exe | ForEach {
     # &$_.Fullname 2>&1 | Out-Null;
   }
   compoundReturnValue $lastexitcode;
-  if ( $lastexitcode -ne 0 ) { 
+  IF " ( $lastexitcode -ne 0 ) { 
     Write-Host " FAIL!"  -ForegroundColor Red;
-    if ($StopOnFirstTestFail -eq "True" ) {
+    IF " ($StopOnFirstTestFail -eq "True" ) {
       exit $lastexitcode
     }
   }  else { 
@@ -63,12 +66,11 @@ Get-ChildItem -Filter bin/test_*.exe | ForEach {
   }
 }
 
-cd $CURRENT_PATH
+exit %compoundOutput%
 
-exit $CompoundOutput;
-
-:; # ########## WINDOWS SECTION ENDS ####################
-:; # ####################################################
+  :; # ########## WINDOWS SECTION ENDS ####################
+  :; # ####################################################
+  exit /b
 BATCH
 
 # ######################################################
