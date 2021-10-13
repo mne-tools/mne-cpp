@@ -179,6 +179,8 @@ void TestMneForwardSolution::computeForward()
 
 void TestMneForwardSolution::cleanupTestCase()
 {
+    QString fwdMEGEEGFileRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QFile::remove(fwdMEGEEGFileRef);
 }
 
 //=============================================================================================================
