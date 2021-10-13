@@ -161,6 +161,18 @@ void MNEForwardSolution::clear()
 //=============================================================================================================
 
 MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const AnnotationSet &p_AnnotationSet,
+                                                                qint32 p_iClusterSize) const
+{
+    const FIFFLIB::FiffCov p_pNoise_cov;
+    const FIFFLIB::FiffInfo p_pInfo;
+    Eigen::MatrixXd p_D;
+
+    return cluster_forward_solution(p_AnnotationSet, p_iClusterSize, p_D, p_pNoise_cov, p_pInfo, "cityblock");
+}
+
+//=============================================================================================================
+
+MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const AnnotationSet &p_AnnotationSet,
                                                                 qint32 p_iClusterSize,
                                                                 MatrixXd& p_D,
                                                                 const FiffCov &p_pNoise_cov,

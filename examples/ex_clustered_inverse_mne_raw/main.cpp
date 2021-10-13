@@ -493,7 +493,7 @@ int main(int argc, char *argv[])
     // Cluster forward solution;
     //
     MatrixXd D;
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20, D, noise_cov, evoked.info);
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20, D, noise_cov, evoked.info, "citiblock");
 
     //
     // make an inverse operators
