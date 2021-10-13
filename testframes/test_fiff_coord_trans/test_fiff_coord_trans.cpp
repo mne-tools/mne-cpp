@@ -122,6 +122,8 @@ void TestFiffCoordTrans::compareTrans()
 
 void TestFiffCoordTrans::cleanupTestCase()
 {
+    QFile fileTransTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test-trans.fif");
+    fileTransTest.remove();
 }
 
 //=============================================================================================================
