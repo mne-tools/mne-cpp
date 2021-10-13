@@ -465,7 +465,7 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        ./tools/testing/test_all verbose continueOnFail coverage
+        ./tools/testing/test_all.ps1 verbose continueOnFail coverage
 
   Doxygen:
     runs-on: ubuntu-18.04
