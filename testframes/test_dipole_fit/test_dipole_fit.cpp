@@ -296,6 +296,11 @@ void TestDipoleFit::compareFit()
 
 void TestDipoleFit::cleanupTestCase()
 {
+    QString outFile(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/dip-5120-bem_fit.dat");
+    QFile::remove(outFile);
+
+    outFile = QString(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/dip_fit.dat");
+    QFile::remove(outFile);
 }
 
 //=============================================================================================================
