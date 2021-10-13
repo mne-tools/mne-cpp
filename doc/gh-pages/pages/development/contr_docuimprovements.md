@@ -15,9 +15,9 @@ The content of this website is actually stored inside the code repository itself
 
 This solution works with VS Code and Docker installed on your system only. Detailed system requirements can be found [here](https://code.visualstudio.com/docs/remote/containers#_system-requirements){:target="_blank" rel="noopener"}.
 
-1. Open VS Code, click on the green box in the most lower left corner. Select `Reopen in Container`. This might take a bit since the needed docker images will be downloaded and a new container created. 
-2. Inside VS Code navigate to `doc/gh-pages/pages` and make your changes.
-3. Go to your web browser and open [http://localhost:4000/doc/gh-pages/](http://localhost:4000/doc/gh-pages/){:target="_blank" rel="noopener"}.
+1. Open VS Code and click on the lower left corner bar with the ```><``` symbol. This is the ```Remote Window Indicator``` which only shows up if you have the ```Remote Development Extensions``` installed. Select `Reopen in Container`. This might take a while since the needed docker images will be downloaded and a new container created. The first build after Docker installation might fail. If that is the case try closing and reopening VS Code and try again from this step.
+2. Go to your web browser and open [http://localhost:4000/doc/gh-pages/](http://localhost:4000/doc/gh-pages/){:target="_blank" rel="noopener"}. You should be able to navigate through the documentation website.
+3. Inside VS Code navigate to `doc/gh-pages/pages` and make your changes.
 4. Everytime you save your changes in VS Code the website will automatically recompile. Refresh the website in your web browser to see the results.
 
 ## GitHub Actions
