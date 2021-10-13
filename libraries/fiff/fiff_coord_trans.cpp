@@ -242,7 +242,7 @@ FiffCoordTrans FiffCoordTrans::make(int from, int to, const Matrix3f& rot, const
 
 //=============================================================================================================
 
-FiffCoordTrans FiffCoordTrans::make(int from, int to, const Matrix4f& matTrans, bool bAffine)
+FiffCoordTrans FiffCoordTrans::make(int from, int to, const Matrix4f& matTrans, bool bStandard)
 {
     FiffCoordTrans t;
 
@@ -250,8 +250,8 @@ FiffCoordTrans FiffCoordTrans::make(int from, int to, const Matrix4f& matTrans, 
     t.from = from;
     t.to   = to;
 
-    if(bAffine) {
-        // make sure that it is affine if requested
+    if(bStandard) {
+        // make sure that it is a standard transform if requested
         t.trans.row(3) = Vector4f(0,0,0,1);
     }
 
