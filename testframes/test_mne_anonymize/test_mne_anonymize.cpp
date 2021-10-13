@@ -233,6 +233,8 @@ void TestMneAnonymize::testDefaultAnonymizationOfTags()
     }
 
     verifyTags(outStream);
+
+    QFile::remove(sFileOut);
 }
 
 //=============================================================================================================
@@ -268,6 +270,8 @@ void TestMneAnonymize::compareBirthdayOffsetOption()
     }
 
     verifyTags(outStream, "SubjBirthdayOffset");
+
+    QFile::remove(sFileOut);
 }
 
 //=============================================================================================================
@@ -304,6 +308,8 @@ void TestMneAnonymize::compareMeasureDateOffsetOption()
     }
 
     verifyTags(outStream, "MeasDateOffset");
+
+    QFile::remove(sFileOut);
 }
 
 //=============================================================================================================
