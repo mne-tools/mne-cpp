@@ -101,11 +101,11 @@ private slots:
     void cleanupTestCase();
 
 private:
-    double dErrorTrans = 0.0003;
-    double dErrorQuat = 0.002;
-    double dErrorTime = 0.00000001;
-    double dErrorAngle = 0.1;
-    double dErrorDetect = 0.0;
+    double dErrorTrans;
+    double dErrorQuat;
+    double dErrorTime;
+    double dErrorAngle;
+    double dErrorDetect;
     MatrixXd mRefPos;
     MatrixXd mHpiPos;
     MatrixXd mRefResult;
