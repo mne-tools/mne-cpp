@@ -91,7 +91,6 @@ public:
 
 private slots:
     void initTestCase();
-    void testDataPrepatationFinished();
     void compareFrequencies();
     void compareTranslation();
     void compareRotation();
@@ -107,7 +106,6 @@ private:
     double dErrorTime = 0.00000001;
     double dErrorAngle = 0.1;
     double dErrorDetect = 0.0;
-    bool mDataPreparationFinishedCorrectly;
     MatrixXd mRefPos;
     MatrixXd mHpiPos;
     MatrixXd mRefResult;
@@ -122,8 +120,7 @@ TestHpiFit::TestHpiFit()
 dErrorQuat(0.002),
 dErrorTime(0.00000001),
 dErrorAngle(0.1),
-dErrorDetect(0.0),
-mDataPreparationFinishedCorrectly(false)
+dErrorDetect(0.0)
 {
 }
 
@@ -238,17 +235,8 @@ void TestHpiFit::initTestCase()
         mHpiResult(i,1) = devHeadT.angleTo(pFiffInfo->dev_head_t.trans);
 
     }
-
-    mDataPreparationFinishedCorrectly = true;
     // For debug: position file for HPIFit
 //    UTILSLIB::IOUtils::write_eigen_matrix(mHpiPos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/mHpiPos.txt");
-}
-
-//=============================================================================================================
-
-void TestHpiFit::testDataPrepatationFinished()
-{
-    QVERIFY(mDataPreparationFinishedCorrectly);
 }
 
 //=============================================================================================================
