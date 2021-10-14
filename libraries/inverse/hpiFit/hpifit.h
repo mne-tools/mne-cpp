@@ -176,6 +176,7 @@ public:
                 FIFFLIB::FiffDigPointSet& fittedPointSet,
                 QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                 bool bDoDebug = false,
+                bool bDrop = false,
                 const QString& sHPIResourceDir = QString("./HPIFittingDebug"),
                 int iMaxIterations = 500,
                 float fAbortError = 1e-9);
@@ -278,6 +279,25 @@ private:
      *
      */
     void updateSensor();
+
+    //=========================================================================================================
+    /**
+     * Update FwdCoilSet and store into sensors struct.
+     *
+     */
+    Eigen::MatrixXd dropCoils(const Eigen::VectorXd vecGoF,
+                              const Eigen::MatrixXd matCoil,
+                              const Eigen::MatrixXd matHeadCoil,
+                              Eigen::VectorXi& vecInd);
+
+    //=========================================================================================================
+    /**
+     * Update FwdCoilSet and store into sensors struct.
+     *
+     */
+    double objectTrans(const Eigen::MatrixXd matHeadCoil,
+                       const Eigen::MatrixXd matCoil,
+                       const Eigen::MatrixXd matTrans);
 
     //=========================================================================================================
     /**
