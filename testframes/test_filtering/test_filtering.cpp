@@ -221,6 +221,7 @@ void TestFiltering::compareData()
     int iLength = mFirstFiltered.cols()-int(iOrder/2);
     MatrixXd mDataDiff = mFirstFiltered.block(0,int(iOrder/2),mFirstFiltered.rows(),iLength) - mRefFiltered.block(0,int(iOrder/2),mRefFiltered.rows(),iLength);
     QVERIFY( mDataDiff.sum() < dEpsilon );
+    QVERIFY(false);
 }
 
 //=============================================================================================================
