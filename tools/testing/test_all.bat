@@ -23,14 +23,19 @@ set runCodeCoverage=False
 
 @REM parse input argument
 set verboseModeInput=%1
-set stopOnFirstFailInput=%2
+set runCodeCoverageInput=%2
 
 if "%verboseModeInput%"=="verbose" (
   set printOutput=True
-) 
+) else (
+  if "%verboseModeInput%"=="help" (
+    call:doPrintHelp
+    exit /B 0
+  )
+)
 
-if "%stopOnFirstFailInput%"=="exitOnFail" (
-  set stopOnFirstFail=True
+if "%runCodeCoverageInput%"=="withCoverage" (
+  set runCodeCoverage=True
 )
 
 @REM start execution
@@ -41,7 +46,6 @@ set /A "compoundOutput=0"
 
 cd %basePath%\bin
 
-@REM for /f %%f in ('dir test_*.exe /s /b ^| findstr "filtering"') do (
 for /f %%f in ('dir test_*.exe /s /b ^| findstr /v "d.exe"') do (
   if "%printOutput%"=="True" (
     %%f && call:success %%~nxf || call:fail %%~nxf
@@ -54,6 +58,9 @@ cd %scriptPath%
 
 exit /B %compoundOutput%
 
+:; # this part should never get parsed other than the actual
+:; # functions defined herein.
+
 :doPrintConfiguration
   echo.
   echo =========================================
@@ -62,6 +69,16 @@ exit /B %compoundOutput%
   echo runCodeCoverage = %runCodeCoverage%
   echo =========================================
   echo.
+exit /B 0
+
+:doPrintHelp 
+  echo.
+  echo MNE-CPP testing script help.
+  echo This script will run all applications in bin folder starting with test_*
+  echo For help run: ./test_all.bat help
+  echo Normal call has none or 2 arguments: ./test_all.bat [verbose] [withCoverage]
+  echo.
+  @REM call:doPrintConfiguration
 exit /B 0
 
 :success 
@@ -101,9 +118,9 @@ doPrintConfiguration() {
 doPrintHelp() {
   echo " "
   echo "MNE-CPP testing script help."
-  echo "This script will run all applications in bin folder starting with "test_""
-  echo "For help run: ./test_all help"
-  echo "Normal call has 2 or 3 arguments: ./test_all [verbose] [withCoverage]"
+  echo "This script will run all applications in bin folder starting with "test_*"
+  echo "For help run: ./test_all.bat help"
+  echo "Normal call has 2 or 3 arguments: ./test_all.bat [verbose] [withCoverage]"
   echo " "
 }
 
