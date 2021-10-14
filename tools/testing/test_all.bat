@@ -1,3 +1,4 @@
+
 :;# This script performs generates and copies the necesary library dependencies for running qt-projects both for 
 :;# dynamic and for staic builds. 
 :;#
@@ -8,65 +9,69 @@
 :;# 
 
 :<<BATCH
-  :;@echo off
   :; # ########## WINDOWS SECTION #########################
+  @echo off
+  
+@REM Setup default values
+setlocal
+set scriptPath=%~dp0
+set basePath=%scriptPath%..\..
 
-  $PrintOutput=False
-  $StopOnFirstTestFail=False
+set printOutput=False
+set stopOnFirstFail=False
+set runCodeCoverage=False
 
-  $verboseMode=%1
-  $exitMode=%2
+@REM parse input argument
+set verboseModeInput=%1
+set stopOnFirstFailInput=%2
 
-  IF "%verboseMode%"=="verbose" (
-    SET PrintOutput=True
-  ) 
+if "%verboseModeInput%"=="verbose" (
+  set printOutput=True
+) 
 
-  IF "%exitMode%"=="exitOnFail" (
-    SET StopOnFirstTestFail=True
-  )
+if "%stopOnFirstFailInput%"=="exitOnFail" (
+  set stopOnFirstFail=True
+)
 
-SET /A compoundOutput=0
+@REM start execution
 
-:compoundReturnValue
-{
-  IF %lastReturnValue% NEQ 0 (
-    %compoundOutput% += 1
-  )
-  @REM echo %compundOutput%
-}
+call:doPrintConfiguration
 
-echo " "
+set /A "compoundOutput=0"
 
-dir /s /b bin\test_*.exe 
-for %%f in (bin\test_*.exe) do (
-  echo %%nf
-  start "" "%%f"
-  if errorlevel 1 (
-    compoundReturnValue
-    
+cd %basePath%\bin
+
+@REM for /f %%f in ('dir test_*.exe /s /b ^| findstr "filtering"') do (
+for /f %%f in ('dir test_*.exe /s /b ^| findstr /v "d.exe"') do (
+  if "%printOutput%"=="True" (
+    %%f && call:success %%~nxf || call:fail %%~nxf
+  ) else (
+    %%f > null 2>&1 && call:success %%~nxf || call:fail %%~nxf
   )
 )
-Get-ChildItem -Filter bin/test_*.exe | ForEach {
-  IF " ( $PrintOutput -eq "True" ) {
-    &$_.FullName;
-  } else {
-    Write-Host " $_  => " -NoNewline
-    # ($out = &$_.Fullname) ;
-    ($out = &$_.Fullname) 2>&1 | out-null;
-    # &$_.Fullname 2>&1 | Out-Null;
-  }
-  compoundReturnValue $lastexitcode;
-  IF " ( $lastexitcode -ne 0 ) { 
-    Write-Host " FAIL!"  -ForegroundColor Red;
-    IF " ($StopOnFirstTestFail -eq "True" ) {
-      exit $lastexitcode
-    }
-  }  else { 
-    Write-Host " RockSolid!" -ForegroundColor Green;
-  }
-}
 
-exit %compoundOutput%
+cd %scriptPath%
+
+exit /B %compoundOutput%
+
+:doPrintConfiguration
+  echo.
+  echo =========================================
+  echo verbose = %printOutput%
+  echo exitOnFail = %stopOnFirstFail%
+  echo runCodeCoverage = %runCodeCoverage%
+  echo =========================================
+  echo.
+exit /B 0
+
+:success 
+  echo [92m%~1[0m
+exit /B 0
+
+:fail
+  echo [91m%~1[0m
+  set /A "compoundOutput+=1"
+exit /B 0
 
   :; # ########## WINDOWS SECTION ENDS ####################
   :; # ####################################################
@@ -153,11 +158,10 @@ do
   if [ $VerboseMode == "false" ];
   then
     $test &> /dev/null
-    lastReturnValue=$?
   else
     $test 
-    lastReturnValue=$?
   fi
+  lastReturnValue=$?
 
   if [ $lastReturnValue -ne 0 ];
   then 
