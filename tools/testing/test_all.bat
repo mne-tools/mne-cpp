@@ -102,7 +102,7 @@ BATCH
 #####  default parameters
 
 VerboseMode="false"
-ExitOnFirstFail="false" #by default False. this is not changeable with input arguments any more.
+ExitOnFirstFail="false"
 RunCodeCoverage="false"
 
 ##### function definitions
@@ -110,7 +110,6 @@ RunCodeCoverage="false"
 doPrintConfiguration() {
   echo =========================================
   echo " "  VerboseMode = $VerboseMode
-  # echo " "  ExitOnFirstFail = $ExitOnFirstFail
   echo " "  RunCodeCoverage = $RunCodeCoverage
   echo =========================================
 }
@@ -118,7 +117,7 @@ doPrintConfiguration() {
 doPrintHelp() {
   echo " "
   echo "MNE-CPP testing script help."
-  echo "This script will run all applications in bin folder starting with "test_*"
+  echo "This script will run all applications in bin folder starting with test_*"
   echo "For help run: ./test_all.bat help"
   echo "Normal call has 2 or 3 arguments: ./test_all.bat [verbose] [withCoverage]"
   echo " "
@@ -126,13 +125,13 @@ doPrintHelp() {
 
 ## input arguments parsing
 
-if [[ -z "$1" ]]; then #IF first argument is missing
+if [[ -z "$1" ]]; then 
   echo "Running script in default mode."
   echo " "
 else
-  if [[ $1 == verbose ]]; then #if first argument is equal to
+  if [[ $1 == verbose ]]; then 
     VerboseMode="true"
-  elif [[ $1 == help ]]; then #if third argument is equal to
+  elif [[ $1 == help ]]; then 
     doPrintHelp
     exit 1
   fi
@@ -144,7 +143,7 @@ else
   fi
 fi
 
-doPrintConfiguration  # call to this function defined previously
+doPrintConfiguration
 
 ##########
 
@@ -164,16 +163,14 @@ for test in $RepoRootDir/bin/test_*;
 do
   # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
   # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.
-  if [ $VerboseMode == "false" ];
-  then
+  if [ $VerboseMode == "false" ]; then
     $test &> /dev/null
   else
     $test 
   fi
   lastReturnValue=$?
 
-  if [ $lastReturnValue -ne 0 ];
-  then 
+  if [ $lastReturnValue -ne 0 ]; then 
     CompoundOutput=$((CompoundOutput + 1))
     printf "%${testColumnWidth}s \e[91m\033[1m %s \033[0m\e[0m\n" "${test}" "FAILED!"
     if [ $ExitOnFirstFail == "true" ];
@@ -185,8 +182,7 @@ do
     printf "%${testColumnWidth}s \e[92m %s \e[0m\n" "${test}" "Rock Solid!"
   fi
 
-  if [ $RunCodeCoverage == "true" ];
-  then
+  if [ $RunCodeCoverage == "true" ]; then
     find ./libraries -type f -name "*.cpp" -exec gcov {} \; &> /dev/null
     # Hide codecov output since it corrupts the log too much
     codecov &> /dev/null
@@ -194,10 +190,8 @@ do
 
 done
 
-exit $CompoundOutput
-
 # ############## LINUX MAC SECTION ENDS ################
 # ######################################################
 
-
+exit $CompoundOutput
 
