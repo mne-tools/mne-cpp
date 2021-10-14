@@ -298,13 +298,26 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     if((vecGoF.minCoeff() < 0.997) && bDrop) { // hard coded, can potentially be passed as variable
         matTrans = dropCoils(vecGoF,
-                             vecError,
                              coil.pos,
                              matHeadHPI,
                              vecInd);
     } else {
         matTrans = computeTransformation(matHeadHPI, coil.pos);
     }
+
+    int iKeep = vecInd.size();
+    MatrixXd matHeadHPITemp(iKeep,3);
+    MatrixXd matCoilTemp(iKeep,3);
+    VectorXd vecGofTemp(iKeep);
+    for(int i = 0; i < iKeep; i++) {
+        matHeadHPITemp.row(i) = matHeadHPI.row(vecInd(i));
+        matCoilTemp.row(i) = coil.pos.row(vecInd(i));
+        vecGofTemp(i) = vecGoF(vecInd(i));
+    }
+
+    coil.pos = matCoilTemp;
+    matHeadHPI = matHeadHPITemp;
+    vecGoF = vecGofTemp;
 
     //Eigen::Matrix4d matTrans = computeTransformation(coil.pos, matHeadHPI);
 
@@ -322,14 +335,15 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     MatrixXd matTestPos = transDevHead.apply_trans(matTemp.cast<float>()).cast<double>();
     MatrixXd matDiffPos = matTestPos - matHeadHPI;
 
-    for(int i = 0; i < matDiffPos.rows(); ++i) {
-        vecError[i] = matDiffPos.row(i).norm();
-    }
+    matTemp.block(0,3,iKeep,1).setOnes();
+    matTemp.transposeInPlace();
 
-    // store Goodness of Fit
-    vecGoF = coil.dpfiterror;
-    for(int i = 0; i < vecGoF.size(); ++i) {
-        vecGoF(i) = 1 - vecGoF(i);
+    MatrixXd matTestPos = matTrans * matTemp;
+    MatrixXd matDiffPos = matTestPos.block(0,0,3,iKeep) - matHeadHPI.transpose();
+
+    vecError = QVector<double>(iKeep);
+    for(int i = 0; i < matDiffPos.cols(); ++i) {
+        vecError[i] = matDiffPos.col(i).norm();
     }
 
     //Generate final fitted points and store in digitizer set
