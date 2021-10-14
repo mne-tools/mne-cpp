@@ -85,7 +85,7 @@ BATCH
 #####  default parameters
 
 VerboseMode="false"
-ExitOnFirstFail="false"
+ExitOnFirstFail="false" #by default False. this is not changeable with input arguments any more.
 RunCodeCoverage="false"
 
 ##### function definitions
@@ -93,7 +93,7 @@ RunCodeCoverage="false"
 doPrintConfiguration() {
   echo =========================================
   echo " "  VerboseMode = $VerboseMode
-  echo " "  ExitOnFirstFail = $ExitOnFirstFail
+  # echo " "  ExitOnFirstFail = $ExitOnFirstFail
   echo " "  RunCodeCoverage = $RunCodeCoverage
   echo =========================================
 }
@@ -103,7 +103,7 @@ doPrintHelp() {
   echo "MNE-CPP testing script help."
   echo "This script will run all applications in bin folder starting with "test_""
   echo "For help run: ./test_all help"
-  echo "Normal call has 2 or 3 arguments: ./test_all (verbose/summary) (exitOnFail/continueOnFail) [coverage/noCoverage]"
+  echo "Normal call has 2 or 3 arguments: ./test_all [verbose] [withCoverage]"
   echo " "
 }
 
@@ -115,20 +115,12 @@ if [[ -z "$1" ]]; then #IF first argument is missing
 else
   if [[ $1 == verbose ]]; then #if first argument is equal to
     VerboseMode="true"
-  elif [[ $1 == summary ]]; then #if second argument is equal to
-    VerboseMode="false"
   elif [[ $1 == help ]]; then #if third argument is equal to
     doPrintHelp
     exit 1
   fi
 
-  if [[ $2 == exitOnFail ]]; then
-    ExitOnFirstFail="true"
-  elif [[ $2 == continueOnFail ]]; then
-    ExitOnFirstFail="false"    
-  fi
-
-  if [[ $3 == coverage ]]; then
+  if [[ $2 == withCoverage ]]; then
     RunCodeCoverage="true"
   else 
     RunCodeCoverage="false"
