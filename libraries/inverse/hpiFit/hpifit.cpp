@@ -107,6 +107,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                     VectorXd& vecGoF,
                     FiffDigPointSet& fittedPointSet,
                     FiffInfo::SPtr pFiffInfo,
+                    bool bDrop,
                     bool bDoDebug,
                     const QString& sHPIResourceDir,
                     int iMaxIterations,
@@ -287,54 +288,24 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                   fAbortError);
 
     // drop coils
-    int iNumUsed = iNumCoils;
-
-    // use at minimum three coils
-    // store Goodness of Fit
     vecGoF = coil.dpfiterror;
     for(int i = 0; i < vecGoF.size(); ++i) {
         vecGoF(i) = 1 - vecGoF(i);
     }
 
-    Matrix4d matTrans(4,4);
-    MatrixXd matHeadTemp = matHeadHPI;
-    MatrixXd matHeadDrop;
-    MatrixXd matCoilDrop;
-    MatrixXd matCoilTemp = coil.pos;
-    VectorXd vecGofTemp = vecGoF;
-    VectorXd vecGofDrop = vecGoF;
+    MatrixXd matTrans(4,4);
+    VectorXi vecInd = VectorXi::LinSpaced(iNumCoils,0,iNumCoils);
 
-    if(vecGoF.minCoeff() < 0.75) { // hard coded, can potentially be passed as variable
-        std::cout << vecGoF << std::endl;
-
-        while(iNumUsed > 3) {
-            int iR = 0;
-            matCoilDrop.conservativeResize(iNumUsed-1,3);
-            matHeadDrop.conservativeResize(iNumUsed-1,3);
-            vecGofDrop.conservativeResize(iNumUsed-1,1);
-
-            for(int i = 0; i < iNumUsed; i++){
-                if(vecGofTemp[i] != vecGofTemp.minCoeff()) {
-                    matHeadDrop.row(iR) = matHeadTemp.row(i);
-                    matCoilDrop.row(iR) = matCoilTemp.row(i);
-                    vecGofDrop(iR) = vecGofTemp(i);
-                    iR++;
-
-                } else {
-                    qInfo() << "Dropped coil: " << i << " with GoF: "  << vecGofTemp[i];
-                }
-            }
-            matHeadTemp = matHeadDrop;
-            matCoilTemp = matCoilDrop;
-            vecGofTemp = vecGofDrop;
-            matTrans = computeTransformation(matHeadTemp, matCoilTemp);
-            iNumUsed--;
-        }
+    if((vecGoF.minCoeff() < 0.997) && bDrop) { // hard coded, can potentially be passed as variable
+        matTrans = dropCoils(vecGoF,
+                             vecError,
+                             coil.pos,
+                             matHeadHPI,
+                             vecInd);
     } else {
         matTrans = computeTransformation(matHeadHPI, coil.pos);
     }
 
-    //Matrix4d matTrans = computeTransformation(matHeadHPI, coil.pos);
     //Eigen::Matrix4d matTrans = computeTransformation(coil.pos, matHeadHPI);
 
     // Store the final result to fiff info
@@ -761,4 +732,88 @@ void HPIFit::updateModel(const int iSamF,
         matTemp.row(i) = m_matModel.row(vecIndex(i));
     }
     m_matModel = matTemp;
+}
+
+//=============================================================================================================
+
+MatrixXd HPIFit::dropCoils(const VectorXd vecGoF,
+                           const MatrixXd matCoil,
+                           const MatrixXd matHeadCoil,
+                           VectorXi& vecInd)
+{
+    int iNumCoils = matCoil.rows();
+    int iNumUsed = iNumCoils;
+    VectorXi vecIndDrop = vecInd;
+    // initial transformation
+    MatrixXd matTransNew = MatrixXd(4,4);
+    MatrixXd matTrans = computeTransformation(matHeadCoil,matCoil);
+    double dFre = objectTrans(matHeadCoil,matCoil,matTrans); // fiducial registration error
+    double dFreNew = 0.0;
+
+    // resize elements
+    MatrixXd matCoilDrop = matCoil;
+    MatrixXd matHeadDrop = matHeadCoil;
+    VectorXd vecGofDrop = vecGoF;
+    matCoilDrop.conservativeResize(iNumUsed-1,3);
+    matHeadDrop.conservativeResize(iNumUsed-1,3);
+    vecGofDrop.conservativeResize(iNumUsed-1,1);
+    vecIndDrop.conservativeResize(iNumUsed-1,1);
+
+    // Drop Coils recursively
+    if(iNumUsed > 3) {
+        int iR = 0;
+        // do not copy row coresponding to lowest gof -> drop it
+        for(int i = 0; i < iNumUsed; i++){
+            if(vecGoF[i] != vecGoF.minCoeff()) {
+                matHeadDrop.row(iR) = matHeadCoil.row(i);
+                matCoilDrop.row(iR) = matCoil.row(i);
+                vecGofDrop(iR) = vecGoF(i);
+                vecIndDrop(iR) = vecInd(i);
+                iR++;
+            } else {
+                qInfo() << "Dropped coil: " << i << " with GoF: "  << vecGoF[i];
+            }
+        }
+        // iterative update of transformation
+        matTransNew = dropCoils(vecGofDrop, matCoilDrop, matHeadDrop, vecIndDrop);
+
+        // fiducial registration error
+        dFreNew = objectTrans(matHeadDrop,matCoilDrop,matTransNew);
+
+        iNumUsed--;
+
+        // update if dFreNew < dFreOld;
+        if(dFreNew < dFre) {
+            matTrans = matTransNew;
+            vecInd = vecIndDrop;
+        }
+    }
+    return matTrans;
+}
+
+//=============================================================================================================
+
+double HPIFit::objectTrans(const MatrixXd matHeadCoil,
+                           const MatrixXd matCoil,
+                           const MatrixXd matTrans)
+{
+    // Compute the fiducial registration error - the lower, the better.
+
+    int iNumCoils = matHeadCoil.rows();
+    double dFRE = 0.0;
+    MatrixXd matTemp = matCoil;
+
+    // homogeneous coordinates
+    matTemp.conservativeResize(matCoil.rows(),matCoil.cols()+1);
+    matTemp.block(0,3,iNumCoils,1).setOnes();
+    matTemp.transposeInPlace();
+
+    // apply transformation
+    MatrixXd matTestPos = matTrans * matTemp;
+
+    // remove
+    MatrixXd matDiff = matTestPos.block(0,0,3,iNumCoils) - matHeadCoil.transpose();
+    dFRE = std::sqrt(1.0/(2.0*iNumCoils) * (matDiff*matDiff.transpose()).trace());
+    qDebug() << dFRE;
+    return dFRE;
 }
