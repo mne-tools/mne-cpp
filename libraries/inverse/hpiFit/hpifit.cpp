@@ -287,16 +287,18 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                   iMaxIterations,
                   fAbortError);
 
-    // drop coils
+    // get gof
     vecGoF = coil.dpfiterror;
     for(int i = 0; i < vecGoF.size(); ++i) {
         vecGoF(i) = 1 - vecGoF(i);
     }
 
+    // prepare dropping coils
     MatrixXd matTrans(4,4);
     VectorXi vecInd = VectorXi::LinSpaced(iNumCoils,0,iNumCoils);
 
-    if((vecGoF.minCoeff() < 0.997) && bDrop) { // hard coded, can potentially be passed as variable
+    if((vecGoF.minCoeff() < 0.98) && bDrop) {
+        // hard coded, can potentially be passed as variable
         matTrans = dropCoils(vecGoF,
                              coil.pos,
                              matHeadHPI,
@@ -635,7 +637,15 @@ void HPIFit::storeHeadPosition(float fTime,
     // Write quaternions and vecTime in position matrix. Format is the same like MaxFilter's .pos files.
     Matrix3f matRot = transDevHead.block(0,0,3,3);
 
-    double dError = std::accumulate(vecError.begin(), vecError.end(), .0) / vecError.size();     // HPI estimation Error
+    // don't take values below 0 into account (-1 means dropped coil)
+    std::vector<double> vecTargetError;
+    std::copy_if(vecError.begin(), vecError.end(), std::back_inserter(vecTargetError),[](double n ){ return  n >= 0.0;});
+    double dError = std::accumulate(vecTargetError.begin(), vecTargetError.end(), .0) / vecTargetError.size();     // HPI estimation Error
+
+    std::vector<double> vecTargetGof;
+    std::copy_if(vecGoF.data(), vecGoF.data() + vecGoF.size(), std::back_inserter(vecTargetGof),[](double n ){ return  n >= 0.0;});
+    double dGoF = std::accumulate(vecTargetError.begin(), vecTargetError.end(), .0) / vecTargetError.size();     // HPI estimation Error
+
     Eigen::Quaternionf quatHPI(matRot);
 
 //    qDebug() << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z ";
@@ -649,7 +659,7 @@ void HPIFit::storeHeadPosition(float fTime,
     matPosition(matPosition.rows()-1,4) = transDevHead(0,3);
     matPosition(matPosition.rows()-1,5) = transDevHead(1,3);
     matPosition(matPosition.rows()-1,6) = transDevHead(2,3);
-    matPosition(matPosition.rows()-1,7) = vecGoF.mean();
+    matPosition(matPosition.rows()-1,7) = dGoF;
     matPosition(matPosition.rows()-1,8) = dError;
     matPosition(matPosition.rows()-1,9) = 0;
 }
