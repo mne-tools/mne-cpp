@@ -586,14 +586,15 @@ bool WriteToFile::renameSingleFile(const QString& sCurrentFileName, const QStrin
 
 bool WriteToFile::renameMultipleFiles(const QString& sFileName)
 {
+    bool renamingOK(false);
     for (int i = 0; i < m_lFileNames.size(); i++){
-        bool rename = renameSingleFile(m_lFileNames.at(i), sFileName + QString("-") + QString::number(i + 1));
-        if (!rename){
-            return rename;
+        renamingOK = renameSingleFile(m_lFileNames.at(i), sFileName + QString("-") + QString::number(i + 1));
+        if (!renamingOK){
+            break;
         }
     }
 
-    return true;
+    return renamingOK;
 }
 
 //=============================================================================================================
