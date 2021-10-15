@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
     if(fStep <= 0.0) {
         // check for proper step size
         qWarning() << "Step <= 0. Step size was set to 0.1 seconds.";
-        fStep = 0.1;
+        fStep = 0.1f;
     }
     QStringList lFreqs = parser.value(inFreqs).split(",");
     QFile t_fileIn(parser.value(inFile));
@@ -148,8 +148,8 @@ int main(int argc, char *argv[])
 
     // Setup comparison of transformation matrices
     FiffCoordTrans transDevHead = pFiffInfo->dev_head_t;    // transformation that only updates after big head movements
-    float fThreshRot = 5;          // in degree
-    float fThreshTrans = 0.005;    // in m
+    float fThreshRot = 5.0f;          // in degree
+    float fThreshTrans = 0.005f;    // in m
 
     // Set up the reading parameters
     RowVectorXi vecPicks = pFiffInfo->pick_types(true, false, false);
