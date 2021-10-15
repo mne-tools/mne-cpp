@@ -591,7 +591,7 @@ bool WriteToFile::renameMultipleFiles(const QString& sFileName)
     int fileIndex(1);
     for( auto& fileName: m_lFileNames) {
         renamingOK = renameSingleFile(fileName, sFileName + "-" + QString::number(fileIndex));
-        if ( !renamingOk ) {
+        if ( !renamingOK ) {
             break;
         }
     }
