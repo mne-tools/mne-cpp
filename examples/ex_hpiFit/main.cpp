@@ -101,8 +101,8 @@ int main(int argc, char *argv[])
     qInfo() << "Please download the mne-cpp-test-data folder from Github (mne-tools) into mne-cpp/bin.";
 
     QCommandLineOption inFile("fileIn", "The input file.", "in", QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
-    QCommandLineOption inBuffer("buffer", "The buffer size in samples.", "in","200");
-    QCommandLineOption inStep("step", "The step size in seconds.", "in","0.1");
+    QCommandLineOption inWindow("window", "The window size for the HPI fit in ms.", "in","400");
+    QCommandLineOption inStep("step", "The step size in ms.", "in","10");
     QCommandLineOption inFreqs("freqs", "The frequencies used.", "in","154,158,161,166");
     QCommandLineOption inSave("save", "Store the fitting results [0,1].", "in","0");
     QCommandLineOption inVerbose("verbose", "Print to command line [0,1].", "in","0");
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
     QCommandLineOption outName("fileOut", "The output file name for movement data.", "out","position.txt");
 
     parser.addOption(inFile);
-    parser.addOption(inBuffer);
+    parser.addOption(inWindow);
     parser.addOption(inStep);
     parser.addOption(inFreqs);
     parser.addOption(inSave);
@@ -122,13 +122,13 @@ int main(int argc, char *argv[])
 
     parser.process(a);
 
-    int iQuantum = parser.value(inBuffer).toInt();
-    if(iQuantum <= 0) {
+    float fWindow = parser.value(inWindow).toFloat()/1000.0; // convert to seconds
+    if(fWindow <= 0.0) {
         // check for proper buffer size
-        qWarning() << "Buffer <= 0. Buffer was set to 200 samples.";
-        iQuantum = 200;
+        qWarning() << "Window <= 0. Window was set to 200 ms.";
+        fWindow = 0.2f;
     }
-    float fStep = parser.value(inStep).toFloat();
+    float fStep = parser.value(inStep).toFloat()/1000; // convert to seconds
     if(fStep <= 0.0) {
         // check for proper step size
         qWarning() << "Step <= 0. Step size was set to 0.1 seconds.";
@@ -161,6 +161,7 @@ int main(int argc, char *argv[])
     fiff_int_t last = raw.last_samp;
 
     // create time vector that specifies when to fit
+    int iQuantum = floor(fWindow*pFiffInfo->sfreq);     // window size
     int iQuantumT = floor(fStep*pFiffInfo->sfreq);      // samples between fits
     int iN = floor((last-first)/iQuantumT)-floor(iQuantum/iQuantumT);
     RowVectorXf vecTime = RowVectorXf::LinSpaced(iN, 0, iN-1);
