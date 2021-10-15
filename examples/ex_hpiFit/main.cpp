@@ -104,7 +104,9 @@ int main(int argc, char *argv[])
     QCommandLineOption inBuffer("buffer", "The buffer size <in>.", "in","200");
     QCommandLineOption inFreqs("freqs", "The frequencies used <in>.", "in","154,158,161,166");
     QCommandLineOption inSave("save", "Weather to store data <in>.", "in","0");
-    QCommandLineOption inVerbose("verbose", "Command Line output <in>.", "out","0");
+    QCommandLineOption inVerbose("verbose", "Print to Command Line <in>.", "in","0");
+    QCommandLineOption inDebug("debug", "Save debug info in HPI fit <in>.", "in","0");
+    QCommandLineOption inFast("fast", "Do fast fits <in>.", "in","0");
     QCommandLineOption outName("fileOut", "The output file for movement data <out>.", "out","position.txt");
 
     parser.addOption(inFile);
@@ -112,15 +114,25 @@ int main(int argc, char *argv[])
     parser.addOption(inFreqs);
     parser.addOption(inSave);
     parser.addOption(inVerbose);
+    parser.addOption(inDebug);
+    parser.addOption(inFast);
     parser.addOption(outName);
 
     parser.process(a);
 
     int iQuantum = parser.value(inBuffer).toInt();
+    if(iQuantum <= 0) {
+        // check for proper size
+        qWarning() << "Buffer <= 0. Buffer was set to 200.";
+        iQuantum = 200;
+    }
     QStringList lFreqs = parser.value(inFreqs).split(",");
     QFile t_fileIn(parser.value(inFile));
     bool bSave = parser.value(inSave).toInt();
     bool bVerbose = parser.value(inVerbose).toInt();
+    bool bDoDebug = parser.value(inDebug).toInt();
+    bool bFast = parser.value(inFast).toInt();
+
     QString sNameOut(parser.value(outName));
 
     // Init data loading and writing
@@ -142,8 +154,8 @@ int main(int argc, char *argv[])
     fiff_int_t last = raw.last_samp;
 
     // create time vector that specifies when to fit
-    float fTSec = 0.1;                              // time between hpi fits
-    int iQuantumT = floor(fTSec*pFiffInfo->sfreq);   // samples between fits
+    float fTSec = 0.1;                                  // time between hpi fits
+    int iQuantumT = floor(fTSec*pFiffInfo->sfreq);      // samples between fits
     int iN = floor((last-first)/iQuantumT)-floor(iQuantum/iQuantumT);
     RowVectorXf vecTime = RowVectorXf::LinSpaced(iN, 0, iN-1);
 
@@ -182,9 +194,8 @@ int main(int argc, char *argv[])
 
     // if debugging files are necessary set bDoDebug = true;
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
-    bool bDoDebug = false;
 
-    HPIFit HPI = HPIFit(pFiffInfo);
+    HPIFit HPI = HPIFit(pFiffInfo,bFast);
 
     // ordering of frequencies
     from = first + vecTime(0);
@@ -256,5 +267,4 @@ int main(int argc, char *argv[])
     if(bSave) {
         IOUtils::write_eigen_matrix(matPosition, QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + sNameOut);
     }
-    // IOUtils::write_eigen_matrix(matPosition, QCoreApplication::applicationDirPath() + "/MNE-sample-data/position.txt");
 }
