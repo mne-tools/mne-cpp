@@ -100,17 +100,19 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
     qInfo() << "Please download the mne-cpp-test-data folder from Github (mne-tools) into mne-cpp/bin.";
 
-    QCommandLineOption inFile("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
-    QCommandLineOption inBuffer("buffer", "The buffer size <in>.", "in","200");
-    QCommandLineOption inFreqs("freqs", "The frequencies used <in>.", "in","154,158,161,166");
-    QCommandLineOption inSave("save", "Weather to store data <in>.", "in","0");
-    QCommandLineOption inVerbose("verbose", "Print to Command Line <in>.", "in","0");
-    QCommandLineOption inDebug("debug", "Save debug info in HPI fit <in>.", "in","0");
-    QCommandLineOption inFast("fast", "Do fast fits <in>.", "in","0");
-    QCommandLineOption outName("fileOut", "The output file for movement data <out>.", "out","position.txt");
+    QCommandLineOption inFile("fileIn", "The input file.", "in", QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
+    QCommandLineOption inBuffer("buffer", "The buffer size in samples.", "in","200");
+    QCommandLineOption inStep("step", "The step size in seconds.", "in","0.1");
+    QCommandLineOption inFreqs("freqs", "The frequencies used.", "in","154,158,161,166");
+    QCommandLineOption inSave("save", "Store the fitting results [0,1].", "in","0");
+    QCommandLineOption inVerbose("verbose", "Print to command line [0,1].", "in","0");
+    QCommandLineOption inDebug("debug", "Save debug info during HPI fit [0,1].", "in","0");
+    QCommandLineOption inFast("fast", "Do fast fits [0,1].", "in","0");
+    QCommandLineOption outName("fileOut", "The output file name for movement data.", "out","position.txt");
 
     parser.addOption(inFile);
     parser.addOption(inBuffer);
+    parser.addOption(inStep);
     parser.addOption(inFreqs);
     parser.addOption(inSave);
     parser.addOption(inVerbose);
@@ -122,9 +124,15 @@ int main(int argc, char *argv[])
 
     int iQuantum = parser.value(inBuffer).toInt();
     if(iQuantum <= 0) {
-        // check for proper size
-        qWarning() << "Buffer <= 0. Buffer was set to 200.";
+        // check for proper buffer size
+        qWarning() << "Buffer <= 0. Buffer was set to 200 samples.";
         iQuantum = 200;
+    }
+    float fStep = parser.value(inStep).toFloat();
+    if(fStep <= 0.0) {
+        // check for proper step size
+        qWarning() << "Step <= 0. Step size was set to 0.1 seconds.";
+        fStep = 0.1;
     }
     QStringList lFreqs = parser.value(inFreqs).split(",");
     QFile t_fileIn(parser.value(inFile));
@@ -132,7 +140,6 @@ int main(int argc, char *argv[])
     bool bVerbose = parser.value(inVerbose).toInt();
     bool bDoDebug = parser.value(inDebug).toInt();
     bool bFast = parser.value(inFast).toInt();
-
     QString sNameOut(parser.value(outName));
 
     // Init data loading and writing
@@ -154,8 +161,7 @@ int main(int argc, char *argv[])
     fiff_int_t last = raw.last_samp;
 
     // create time vector that specifies when to fit
-    float fTSec = 0.1;                                  // time between hpi fits
-    int iQuantumT = floor(fTSec*pFiffInfo->sfreq);      // samples between fits
+    int iQuantumT = floor(fStep*pFiffInfo->sfreq);      // samples between fits
     int iN = floor((last-first)/iQuantumT)-floor(iQuantum/iQuantumT);
     RowVectorXf vecTime = RowVectorXf::LinSpaced(iN, 0, iN-1);
 
