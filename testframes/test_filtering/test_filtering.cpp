@@ -233,6 +233,8 @@ void TestFiltering::compareTimes()
 
 void TestFiltering::cleanupTestCase()
 {
+    QFile t_fileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/rtfilter_filterdata_out_raw.fif");
+    t_fileOut.remove();
 }
 
 //=============================================================================================================
