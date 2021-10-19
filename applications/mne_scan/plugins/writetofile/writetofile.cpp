@@ -568,17 +568,17 @@ bool WriteToFile::renameSingleFile(const QString& sCurrentFileName, const QStrin
 
     QString dir(QFileInfo(m_qFileOut).dir().absolutePath() + QString("/"));
 
-    if(Files::exists(QString(dir + sFullNewName))){
+    if(File::exists(QString(dir + sFullNewName))){
         int ret = popUpYesNo("A file with this name already exists.",
                              "Do you want to overwrite this file?");
         if(ret == QMessageBox::No) {
             return false;
         } else {
-            Files::remove(dir + sFullNewName);
+            File::remove(dir + sFullNewName);
         }
     }
 
-    bool success = Files::rename(dir + sCurrentFileName, dir + sFullNewName);
+    bool success = File::rename(dir + sCurrentFileName, dir + sFullNewName);
 
     return success;
 }
