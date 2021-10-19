@@ -44,7 +44,7 @@
 #include <disp/viewers/projectsettingsview.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <fiff/fiff_stream.h>
-#include <utils/files.h>
+#include <utils/file.h>
 
 //=============================================================================================================
 // QT INCLUDES
