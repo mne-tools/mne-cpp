@@ -32,8 +32,8 @@
  *
  */
 
-#ifndef FILES_UTILS_H
-#define FILES_UTILS_H
+#ifndef FILE_UTILS_H
+#define FILE_UTILS_H
 
 //=============================================================================================================
 // INCLUDES
@@ -61,10 +61,10 @@ namespace UTILSLIB
 /**
  * Class contianing static functions for common file operations.
  */
-class UTILSSHARED_EXPORT Files
+class UTILSSHARED_EXPORT File
 {
 public:
-    Files() = delete;
+    File() = delete;
 
     //=========================================================================================================
     /**
@@ -238,4 +238,4 @@ public:
 };
 
 }//namepace
-#endif // FILES_UTILS_H
+#endif // FILE_UTILS_H
