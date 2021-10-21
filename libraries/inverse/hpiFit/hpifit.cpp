@@ -94,7 +94,8 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo,
     m_vecFreqs = QVector<int>();
 
     updateChannels(pFiffInfo);
-    updateSensor();
+    int iAcc = 2;
+    updateSensor(iAcc);
 }
 
 //=============================================================================================================
@@ -402,6 +403,31 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
 //=============================================================================================================
 
+void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
+                               const QVector<int>& vecFreqs,
+                               const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                               Eigen::MatrixXd& matAmplitudes,
+                               const int iLineFreq,
+                               const bool bAdvanced)
+{
+
+}
+
+//=============================================================================================================
+
+void HPIFit::computeHeadPos(const Eigen::MatrixXd& matCoilsDev,
+                            const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                            FIFFLIB::FiffCoordTrans& transDevHead,
+                            QVector<double> &vecError,
+                            Eigen::VectorXd& vecGoF,
+                            FIFFLIB::FiffDigPointSet& fittedPointSet,
+                            bool bDrop)
+{
+
+}
+
+//=============================================================================================================
+
 void HPIFit::findOrder(const MatrixXd& t_mat,
                        const MatrixXd& t_matProjectors,
                        FiffCoordTrans& transDevHead,
@@ -666,10 +692,9 @@ void HPIFit::storeHeadPosition(float fTime,
 
 //=============================================================================================================
 
-void HPIFit::updateSensor()
+void HPIFit::updateSensor(const int iAcc)
 {
     // Create MEG-Coils and read data
-    int iAcc = 2;
     int iNch = m_lChannels.size();
 
     if(iNch == 0) {
@@ -822,7 +847,6 @@ double HPIFit::objectTrans(const MatrixXd matHeadCoil,
                            const MatrixXd matTrans)
 {
     // Compute the fiducial registration error - the lower, the better.
-
     int iNumCoils = matHeadCoil.rows();
     double dFRE = 0.0;
     MatrixXd matTemp = matCoil;

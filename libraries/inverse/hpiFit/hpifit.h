@@ -156,11 +156,11 @@ public:
      *
      * @param[in]   t_mat                      Data to estimate the HPI positions from.
      * @param[in]   t_matProjectors            The projectors to apply. Bad channels are still included.
-     * @param[out]   transDevHead               The final dev head transformation matrix.
+     * @param[out]  transDevHead               The final dev head transformation matrix.
      * @param[in]   vecFreqs                   The frequencies for each coil.
-     * @param[out]   vecError                   The HPI estimation Error in mm for each fitted HPI coil.
-     * @param[out]   vecGoF                     The goodness of fit for each fitted HPI coil.
-     * @param[out]   fittedPointSet             The final fitted positions in form of a digitizer set.
+     * @param[out]  vecError                   The HPI estimation Error in mm for each fitted HPI coil.
+     * @param[out]  vecGoF                     The goodness of fit for each fitted HPI coil.
+     * @param[out]  fittedPointSet             The final fitted positions in form of a digitizer set.
      * @param[in]   pFiffInfo                  Associated Fiff Information.
      * @param[in]   bDoDebug                   Print debug info to cmd line and write debug info to file.
      * @param[in]   sHPIResourceDir            The path to the debug file which is to be written.
@@ -189,7 +189,7 @@ public:
      * @param[in]   t_matProjectors    The projectors to apply. Bad channels are still included.
      * @param[in]   transDevHead       The final dev head transformation matrix.
      * @param[in]   vecFreqs           The frequencies for each coil in unknown order.
-     * @param[out]   vecFreqs           The frequencies for each coil in correct order.
+     * @param[out]  vecFreqs           The frequencies for each coil in correct order.
      * @param[in]   vecError           The HPI estimation Error in mm for each fitted HPI coil.
      * @param[in]   vecGoF             The goodness of fit for each fitted HPI coil.
      * @param[in]   fittedPointSet     The final fitted positions in form of a digitizer set.
@@ -206,15 +206,77 @@ public:
 
     //=========================================================================================================
     /**
+     * Fit linear model to data to get amplitudes for the dipole fit
+     *
+     * @param[in]   matData            Data to estimate the HPI positions from.
+     * @param[in]   vecFreqs           The ordered coil frequencies.
+     * @param[in]   pFiffInfo          Associated Fiff Information.
+     * @param[out]  matAmplitudes      The computed amplitudes amplitudes (n_channels x n_coils).
+     * @param[in]   iLineFreq          The line frequency in Hz to use for the advanced model. Defaults to 60 Hz.
+     * @param[in]   bAdvanced          Use the advanced model to compute the coil amplitudes.
+     *
+     */
+    void computeAmplitudes(const Eigen::MatrixXd& matData,
+                           const QVector<int>& vecFreqs,
+                           const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                           Eigen::MatrixXd& matAmplitudes,
+                           const int iLineFreq = 60,
+                           const bool bAdvanced = true);
+
+    //=========================================================================================================
+    /**
+     * Compute the coil locations using dipole fit.
+     *
+     * @param[in]   matAmplitudes      The amplitudes fitted using computeAmplitudes.
+     * @param[in]   t_matProjectors    The projectors to apply. Bad channels are still included.
+     * @param[in]   transDevHead       The dev head transformation matrix for an initial guess.
+     * @param[in]   pFiffInfo          Associated Fiff Information.
+     * @param[out]  matCoilLoc         The computed coil locations.
+     * @param[in]   iMaxIterations     The maximum allowed number of iterations used to fit the dipoles. Default is 500.
+     * @param[in]   fAbortError        The error which will lead to aborting the dipole fitting process. Default is 1e-9.
+     *
+     */
+    void computeCoilLoc(const Eigen::MatrixXd& matAmplitudes,
+                        const Eigen::MatrixXd& matProjectors,
+                        const FIFFLIB::FiffCoordTrans& transDevHead,
+                        const QVector<int>& vecFreqs,
+                        const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                        Eigen::MatrixXd& matCoilLoc,
+                        int iMaxIterations = 500,
+                        float fAbortError = 1e-9);
+
+    //=========================================================================================================
+    /**
+     * Compute the device to head transformation.
+     *
+     * @param[in]   matCoilsDev         The estimated coil positions in device space.
+     * @param[in]   pFiffInfo           Associated Fiff Information.
+     * @param[out]  transDevHead        The dev head transformation matrix for an initial guess.
+     * @param[out]  vecError            The HPI estimation Error in mm for each fitted HPI coil.
+     * @param[out]  vecGof              The goodness of fit for each fitted HPI coil.
+     * @param[out]  fittedPointSet      The final fitted positions in form of a digitizer set.
+     * @param[in]   bDrop               Only use good coils yes/no. Defaults to yes.
+     *
+     */
+    void computeHeadPos(const Eigen::MatrixXd& matCoilsDev,
+                        const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                        FIFFLIB::FiffCoordTrans& transDevHead,
+                        QVector<double> &vecError,
+                        Eigen::VectorXd& vecGoF,
+                        FIFFLIB::FiffDigPointSet& fittedPointSet,
+                        bool bDrop = true);
+
+    //=========================================================================================================
+    /**
      * Store results from dev_Head_t as quaternions in position matrix. The format is the same as you
      * get from Neuromag's MaxFilter.
      *
      *
-     * @param[in]  fTime           The corresponding time in the measurement for the fit.
-     * @param[in]  pFiffInfo       The FiffInfo file from the measurement.
+     * @param[in]   fTime           The corresponding time in the measurement for the fit.
+     * @param[in]   pFiffInfo       The FiffInfo file from the measurement.
      * @param[out]  matPosition     The matrix to store the results.
-     * @param[in]  vecGoF          The goodness of fit for each coil.
-     * @param[in]  vecError        The Hpi estimation Error per coil.
+     * @param[in]   vecGoF          The goodness of fit for each coil.
+     * @param[in]   vecError        The Hpi estimation Error per coil.
      *
      * ToDo: get estimated movement velocity and store it in channel 9
      */
@@ -223,7 +285,7 @@ public:
                                   Eigen::MatrixXd& matPosition,
                                   const Eigen::VectorXd& vecGoF,
                                   const QVector<double>& vecError);
-protected:
+private:
     //=========================================================================================================
     /**
      * Fits dipoles for the given coils and a given data set.
@@ -270,20 +332,25 @@ protected:
     void createSensorSet(SensorSet& sensors,
                          QSharedPointer<FWDLIB::FwdCoilSet> coils);
 
-    SensorSet                m_sensors;            /**< sensor struct that contains information about all sensors. */
-
-private:
     //=========================================================================================================
     /**
      * Update FwdCoilSet and store into sensors struct.
+     *
+     * @param[in] iAcc       The accuracy level to use for the sensor set. Defaults to 2 (highest).
      *
      */
-    void updateSensor();
+    void updateSensor(const int iAcc = 2);
 
     //=========================================================================================================
     /**
-     * Update FwdCoilSet and store into sensors struct.
+     * Drop coils with worst GoF to improve the transformation.
      *
+     * @param[in]   vecGoF        The goodness of fit per coil.
+     * @param[in]   matCoil       The fitted coil positions (device space).
+     * @param[in]   matHeadCoil   The digitized coil positions (head space).
+     * @param[out]  vecInd        The indices of the coils used to trace back which one was dropped.
+     *
+     * @return Returns the transformation matrix.
      */
     Eigen::MatrixXd dropCoils(const Eigen::VectorXd vecGoF,
                               const Eigen::MatrixXd matCoil,
@@ -292,8 +359,13 @@ private:
 
     //=========================================================================================================
     /**
-     * Update FwdCoilSet and store into sensors struct.
+     * The objective function to measure the goodness of the calculated transform.
      *
+     * @param[in] matCoil       The fitted coil positions (device space).
+     * @param[in] matHeadCoil   The digitized coil positions (head space).
+     * @param[in] matHeadCoil   The digitized coil positions (head space).
+     *
+     * @return Returns the fiducial registration error.
      */
     double objectTrans(const Eigen::MatrixXd matHeadCoil,
                        const Eigen::MatrixXd matCoil,
@@ -303,12 +375,10 @@ private:
     /**
      * Update the channellist for init and if bads changed
      *
+     * @param[in] pFiffInfo       The FiffInfo file from the measurement.
+     *
      */
     void updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
-
-    QList<FIFFLIB::FiffChInfo>   m_lChannels;             /**< Channellist with bads excluded. */
-    QVector<int>                 m_vecInnerind;           /**< index of inner channels . */
-    QList<QString>               m_lBads;                 /**< contains bad channels . */
 
     //=========================================================================================================
     /**
@@ -326,11 +396,15 @@ private:
                      const int iLineF,
                      const QVector<int>& vecFreqs);
 
-    Eigen::MatrixXd     m_matModel;         /**< The model that contains the sines/cosines for the hpi fit*/
-    bool                m_bDoFastFit;       /**< Do fast fit. */
+    QList<FIFFLIB::FiffChInfo>          m_lChannels;        /**< Channellist with bads excluded. */
+    QVector<int>                        m_vecInnerind;      /**< index of inner channels . */
+    QList<QString>                      m_lBads;            /**< contains bad channels . */
+    SensorSet                           m_sensors;          /**< sensor struct that contains information about all sensors. */
+    Eigen::MatrixXd                     m_matModel;         /**< The model that contains the sines/cosines for the hpi fit*/
+    bool                                m_bDoFastFit;       /**< Do fast fit. */
     QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilTemplate;    /**< */
     QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilMeg;         /**< */
-    QVector<int>        m_vecFreqs;         /**< The frequencies for each coil in unknown order. */
+    QVector<int>                        m_vecFreqs;         /**< The frequencies for each coil in unknown order. */
 
 };
 
