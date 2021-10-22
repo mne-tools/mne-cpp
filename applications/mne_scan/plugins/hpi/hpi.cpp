@@ -555,7 +555,7 @@ void Hpi::run()
     FiffCoordTrans transDevHeadRef = m_pFiffInfo->dev_head_t;
 
     HPIFit HPI = HPIFit(m_pFiffInfo, true);
-
+    bool bDrop = false;
     double dErrorMax = 0.0;
     double dMeanErrorDist = 0.0;
     double dAllowedMovement = 0.0;
@@ -624,7 +624,8 @@ void Hpi::run()
                            fitResult.errorDistances,
                            fitResult.GoF,
                            fitResult.fittedCoils,
-                           m_pFiffInfo);
+                           m_pFiffInfo,
+                           bDrop);
                 m_mutex.unlock();
 
                 //Check if the error meets distance requirement
