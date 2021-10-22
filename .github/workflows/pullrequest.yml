@@ -321,19 +321,19 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        ./tools/testing/test_linux_codecov
+        ./tools/testing/test_all.bat verbose withCoverage
     - name: Run tests (MacOS)
       if: matrix.os == 'macos-latest'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        ./tools/testing/test_macos
+        ./tools/testing/test_all.bat verbose
     - name: Run tests (Windows)
       if: matrix.os == 'windows-2019'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        ./tools/testing/test_win.ps1
+        ./tools/testing/test_all.bat verbose
 
   Doxygen:
     runs-on: ubuntu-18.04

@@ -1,9 +1,0 @@
-#!/bin/bash
-RepoRootDir="$(dirname "$BASH_SOURCE")/../.."
-echo $RepoRootDir
-
-for test in $RepoRootDir/bin/test_*;
-do
-  echo ">> Starting $test"
-  $test
-done
