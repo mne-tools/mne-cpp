@@ -242,12 +242,18 @@ FiffCoordTrans FiffCoordTrans::make(int from, int to, const Matrix3f& rot, const
 
 //=============================================================================================================
 
-FiffCoordTrans FiffCoordTrans::make(int from, int to, const Matrix4f& matTrans)
+FiffCoordTrans FiffCoordTrans::make(int from, int to, const Matrix4f& matTrans, bool bStandard)
 {
     FiffCoordTrans t;
+
     t.trans = matTrans;
     t.from = from;
     t.to   = to;
+
+    if(bStandard) {
+        // make sure that it is a standard transform if requested
+        t.trans.row(3) = Vector4f(0,0,0,1);
+    }
 
     FiffCoordTrans::addInverse(t);
 
