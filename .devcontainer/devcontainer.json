@@ -1,0 +1,12 @@
+{
+	"name": "Jekyll",
+	"image": "jekyll/jekyll:pages",
+	"containerEnv": { "JEKYLL_ENV": "docker" },
+	"forwardPorts": [ 3000, 4000 ],
+	"extensions": [
+		"davidanson.vscode-markdownlint",
+		"yzhang.markdown-all-in-one",
+		"streetsidesoftware.code-spell-checker"
+	],
+	"postStartCommand": "jekyll serve --config doc/gh-pages/_config.docker.yml --force_polling"
+}

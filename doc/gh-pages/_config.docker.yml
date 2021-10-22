@@ -1,9 +1,13 @@
+baseurl: ""
+repository: ""
+description: ""
+url: "http://localhost:4000"
 remote_theme: pmarsceill/just-the-docs
 aux_links:
   "MNE-CPP on GitHub":
     - "https://github.com/mne-tools/mne-cpp"
 title: "MNE-CPP"
-logo: "images/partners.png"
+logo: "doc/gh-pages/images/partners.png"
 search_enabled: true
 search:
   # Split pages into sections that can be searched individually
@@ -28,5 +32,5 @@ search:
   # Enable or disable the search button that appears in the bottom right corner of every page
   # Supports true or false (default)
   button: true
-heading_anchors: true
+heading_anchors: true  
 exclude: [README.md, include, bin, libraries, applications, examples, testframes, tools, doc/doxygen]
