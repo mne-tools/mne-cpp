@@ -101,11 +101,11 @@ private slots:
     void cleanupTestCase();
 
 private:
-    double dErrorTrans = 0.0003;
-    double dErrorQuat = 0.002;
-    double dErrorTime = 0.00000001;
-    double dErrorAngle = 0.1;
-    double dErrorDetect = 0;
+    double dErrorTrans;
+    double dErrorQuat;
+    double dErrorTime;
+    double dErrorAngle;
+    double dErrorDetect;
     MatrixXd mRefPos;
     MatrixXd mHpiPos;
     MatrixXd mRefResult;
@@ -116,6 +116,11 @@ private:
 //=============================================================================================================
 
 TestHpiFit::TestHpiFit()
+: dErrorTrans(0.0003),
+dErrorQuat(0.002),
+dErrorTime(0.00000001),
+dErrorAngle(0.1),
+dErrorDetect(0.0)
 {
 }
 
@@ -162,8 +167,8 @@ void TestHpiFit::initTestCase()
     mHpiResult = mRefResult;
 
     // define thresholds for big head movement detection
-    float threshRot = 2;
-    float threshTrans = 0.002;
+    float threshRot = 2.0f;
+    float threshTrans = 0.002f;
 
     // Setup informations for HPI fit
     vFreqs = {154,158,161,166};
@@ -218,7 +223,7 @@ void TestHpiFit::initTestCase()
                    bDoDebug = 0,
                    sHPIResourceDir,
                    200,
-                   1e-5);
+                   1e-5f);
         qInfo() << "[done]\n";
 
         if(MNEMath::compareTransformation(devHeadT.trans, pFiffInfo->dev_head_t.trans, threshRot, threshTrans)) {

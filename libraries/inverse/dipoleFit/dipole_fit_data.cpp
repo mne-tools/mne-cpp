@@ -3916,10 +3916,10 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
         res->mri_head_t = new FiffCoordTransOld(FIFFV_COORD_MRI,FIFFV_COORD_HEAD,rot,move);
     }
 
-    FiffCoordTransOld::mne_print_coord_transform(stderr,res->mri_head_t);
+    FiffCoordTransOld::mne_print_coord_transform(stdout,res->mri_head_t);
     if ((res->meg_head_t = FiffCoordTransOld::mne_read_meas_transform(measname)) == NULL)
         goto bad;
-    FiffCoordTransOld::mne_print_coord_transform(stderr,res->meg_head_t);
+    FiffCoordTransOld::mne_print_coord_transform(stdout,res->meg_head_t);
     /*
        * Read the bad channel lists
        */
