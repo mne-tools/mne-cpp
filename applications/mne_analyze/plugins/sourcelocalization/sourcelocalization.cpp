@@ -139,3 +139,10 @@ QVector<EVENT_TYPE> SourceLocalization::getEventSubscriptions(void) const
 
     return temp;
 }
+
+//=============================================================================================================
+
+QString SourceLocalization::getBuildInfo()
+{
+    return QString(SOURCELOCALIZATIONPLUGIN::buildDateTime()) + QString(" - ")  + QString(SOURCELOCALIZATIONPLUGIN::buildHash());
+}

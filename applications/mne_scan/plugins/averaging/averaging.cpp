@@ -451,3 +451,11 @@ void Averaging::run()
         }
     }
 }
+
+//=============================================================================================================
+
+QString Averaging::getBuildInfo()
+{
+    return QString(AVERAGINGPLUGIN::buildDateTime()) + QString(" - ")  + QString(AVERAGINGPLUGIN::buildHash());
+}
+

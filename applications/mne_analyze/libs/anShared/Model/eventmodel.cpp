@@ -755,7 +755,7 @@ void EventModel::getEventsFromNewData()
 
         QMap<double,QList<int>> mEventsinTypes;
 
-        for(const auto& sample : detectedTriggerSamples){
+        for(const auto& sample : qAsConst(detectedTriggerSamples)){
             mEventsinTypes[sample.second].append(sample.first);
         }
 
@@ -763,7 +763,7 @@ void EventModel::getEventsFromNewData()
 
         auto groups = m_EventManager.getAllGroups();
 
-        for (auto key : keyList){
+        for (auto key : qAsConst(keyList)){
             QString name =info->chs[iChannelIndex].ch_name + "_" + QString::number(static_cast<int>(key));
             bool foundMatch = false;
             int groupID = 0;
@@ -780,7 +780,7 @@ void EventModel::getEventsFromNewData()
                 groupID = newGroup.id;
             }
 
-            for (auto event : mEventsinTypes[key]){
+            for (auto event : qAsConst(mEventsinTypes[key])){
                 m_EventManager.addEvent(event + iFirstSample, groupID);
             }
         }

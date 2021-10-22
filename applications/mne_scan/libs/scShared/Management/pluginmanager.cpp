@@ -133,9 +133,11 @@ void PluginManager::loadPlugins(const QString& dir)
 
                     if(pSensor) {
                         m_qVecSensorPlugins.push_back(pSensor);
-                        qDebug() << "[PluginManager::loadExtension] Loading sensor plugin" << pSensor->getName() << "succeeded.";
+                        qInfo() << "[PluginManager::loadPlugins] Loading sensor plugin" << pSensor->getName() << "succeeded.";
+                        qInfo() << "[PluginManager::loadPlugins] Build Info:" << pSensor->getBuildInfo();
+
                     } else {
-                        qDebug() << "[PluginManager::loadExtension] Loading sensor plugin failed.";
+                        qInfo() << "[PluginManager::loadPlugins] Loading sensor plugin failed.";
                     }
                 } else if(pluginType == AbstractPlugin::_IAlgorithm) {
                     // AbstractAlgorithm
@@ -143,9 +145,10 @@ void PluginManager::loadPlugins(const QString& dir)
 
                     if(pAlgorithm) {
                         m_qVecAlgorithmPlugins.push_back(pAlgorithm);
-                        qDebug() << "[PluginManager::loadExtension] Loading algorithm plugin" << pAlgorithm->getName() << "succeeded.";
+                        qInfo() << "[PluginManager::loadPlugins] Loading algorithm plugin" << pAlgorithm->getName() << "succeeded.";
+                        qInfo() << "[PluginManager::loadPlugins] Build Timestamp:" << pAlgorithm->getBuildInfo();
                     } else {
-                        qDebug() << "[PluginManager::loadExtension] Loading algorithm plugin failed.";
+                        qInfo() << "[PluginManager::loadPlugins] Loading algorithm plugin failed.";
                     }
                 }
 

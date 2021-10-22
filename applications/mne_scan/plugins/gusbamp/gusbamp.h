@@ -183,6 +183,8 @@ public:
      */
     void splitRecordingFile();
 
+    virtual QString getBuildInfo();
+
 protected:
     //=========================================================================================================
     /**

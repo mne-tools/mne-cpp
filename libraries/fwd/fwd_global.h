@@ -1,7 +1,8 @@
 //=============================================================================================================
 /**
  * @file     fwd_global.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ * @author   Juan GP <jgarciaprieto@mgh.harvard.edu>;
+ *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
  * @since    0.1.0
@@ -42,6 +43,7 @@
 //=============================================================================================================
 
 #include <QtCore/qglobal.h>
+#include <utils/buildinfo.h>
 
 //=============================================================================================================
 // DEFINES
@@ -54,5 +56,26 @@
 #else
 #  define FWDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+namespace FWDLIB{
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+FWDSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+FWDSHARED_EXPORT const char* buildHash();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+FWDSHARED_EXPORT const char* buildHashLong();
+}
 
 #endif // FWD_GLOBAL_H

@@ -39,8 +39,8 @@
 
 #include <utils/generics/applicationlogger.h>
 
-#include "../applications/mne_anonymize/fiffanonymizer.h"
-#include "../applications/mne_anonymize/settingscontrollercl.h"
+#include "../../applications/mne_anonymize/fiffanonymizer.h"
+#include "../../applications/mne_anonymize/settingscontrollercl.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -89,11 +89,15 @@ private:
 
     void verifyTags(FIFFLIB::FiffStream::SPtr &outStream,
                     QString testArg="blank");
+    int mDaysToOffsetDates;
+    QDateTime mDefaultMeasDate;
 };
 
 //=============================================================================================================
 
 TestMneAnonymize::TestMneAnonymize()
+    : mDaysToOffsetDates(35),
+      mDefaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0), Qt::LocalTime)
 {
 }
 
@@ -118,6 +122,7 @@ void TestMneAnonymize::testDefaultOutput()
     QStringList arguments;
     arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
     arguments << "--in" << sFileIn;
+    arguments << "--no-gui";
 
     qInfo() << "arguments" << arguments;
 
@@ -126,6 +131,7 @@ void TestMneAnonymize::testDefaultOutput()
     }
 
     MNEANONYMIZE::SettingsControllerCl controller(arguments);
+    controller.run();
     QVERIFY(QFile::exists(sFileOut));
 
     QFile::remove(sFileOut);
@@ -152,12 +158,14 @@ void TestMneAnonymize::testDeleteInputFile()
     arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
     arguments << "--in" << sFileInTest;
     arguments << "--out" << sFileOutTest;
+    arguments << "--no-gui";
     arguments << "--delete_input_file_after";
     arguments << "--avoid_delete_confirmation";
 
     qInfo() << "arguments" << arguments;
 
     MNEANONYMIZE::SettingsControllerCl controller(arguments);
+    controller.run();
 
     QVERIFY(!QFile::exists(sFileInTest));
     QVERIFY(QFile::exists(sFileOutTest));
@@ -171,7 +179,7 @@ void TestMneAnonymize::testInPlace()
 {
     // Init testing arguments
     QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QString sFileInTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing1.fif");
+    QString sFileInTest(QCoreApplication::applicationDirPath() +  "/mne-cpp-test-data/MEG/sample/testing1.fif");
     QString sFileOutTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing1.fif");
 
     qInfo() << "\n\n-------------------------testInPlace-------------------------------------";
@@ -184,12 +192,13 @@ void TestMneAnonymize::testInPlace()
     arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
     arguments << "--in" << sFileInTest;
     arguments << "--out" << sFileOutTest;
+    arguments << "--no-gui";
     arguments << "--avoid_delete_confirmation";
 
     qInfo() << "arguments" << arguments;
 
     MNEANONYMIZE::SettingsControllerCl controller(arguments);
-
+    controller.run();
     QVERIFY(QFile::exists(sFileOutTest));
 
     QFile::remove(sFileOutTest);
@@ -208,10 +217,12 @@ void TestMneAnonymize::testDefaultAnonymizationOfTags()
     QStringList arguments;
     arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
     arguments << "--in" << sFileIn;
+    arguments << "--no-gui";
 
     qInfo() << "arguments" << arguments;
 
     MNEANONYMIZE::SettingsControllerCl controller(arguments);
+    controller.run();
 
     QFile fFileOut(sFileOut);
     FiffStream::SPtr outStream(new FiffStream(&fFileOut));
@@ -222,6 +233,8 @@ void TestMneAnonymize::testDefaultAnonymizationOfTags()
     }
 
     verifyTags(outStream);
+
+    QFile::remove(sFileOut);
 }
 
 //=============================================================================================================
@@ -239,12 +252,14 @@ void TestMneAnonymize::compareBirthdayOffsetOption()
     QStringList arguments;
     arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
     arguments << "--in" << sFileIn;
-    arguments << "--subject_birthday_offset" << "35";
+    arguments << "--subject_birthday_offset" << QString::number(mDaysToOffsetDates);
     arguments << "--verbose";
+    arguments << "--no-gui";
 
     qInfo() << "arguments" << arguments;
 
     MNEANONYMIZE::SettingsControllerCl controller(arguments);
+    controller.run();
 
     QFile fFileOut(sFileOut);
     FiffStream::SPtr outStream(new FiffStream(&fFileOut));
@@ -255,6 +270,8 @@ void TestMneAnonymize::compareBirthdayOffsetOption()
     }
 
     verifyTags(outStream, "SubjBirthdayOffset");
+
+    QFile::remove(sFileOut);
 }
 
 //=============================================================================================================
@@ -272,12 +289,14 @@ void TestMneAnonymize::compareMeasureDateOffsetOption()
     QStringList arguments;
     arguments << QCoreApplication::applicationDirPath() + "/mne_anonymize";
     arguments << "--in" << sFileIn;
-    arguments << "--measurement_date_offset" << "35";
+    arguments << "--measurement_date_offset" << QString::number(mDaysToOffsetDates);
     arguments << "--verbose";
+    arguments << "--no-gui";
 
     qInfo() << "arguments" << arguments;
 
     MNEANONYMIZE::SettingsControllerCl controller(arguments);
+    controller.run();
 
     QFile fFileOut(sFileOut);
 
@@ -289,6 +308,8 @@ void TestMneAnonymize::compareMeasureDateOffsetOption()
     }
 
     verifyTags(outStream, "MeasDateOffset");
+
+    QFile::remove(sFileOut);
 }
 
 //=============================================================================================================
@@ -317,11 +338,10 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
             FiffId inId = pTag->toFiffID();
 
             if(testArg != "MeasDateOffset"){
-                QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(inId.time.secs, Qt::UTC));
-                QDateTime defaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC);
+                QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(inId.time.secs, Qt::LocalTime));
 
-                QVERIFY(inMeasDate == defaultMeasDate);
-                QVERIFY(inId.time.secs == static_cast<int32_t>(defaultMeasDate.toSecsSinceEpoch()));
+                QVERIFY(inMeasDate == mDefaultMeasDate);
+                QVERIFY(inId.time.secs == static_cast<int32_t>(mDefaultMeasDate.toSecsSinceEpoch()));
                 QVERIFY(inId.time.usecs == 0);
             }
 
@@ -332,15 +352,18 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
         }
         case FIFF_MEAS_DATE:
         {
-            QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*pTag->toInt(), Qt::UTC));
-            QDateTime defaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC);
-            QDateTime actualDate(QDate(2002,12,3), QTime(19, 1, 10), Qt::UTC);
-            QDateTime offSetMeasDate(actualDate.addDays(-35));
+            QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*pTag->toInt(), Qt::LocalTime));
+            QDateTime originalDateInFile(QDate(2002,12,3), QTime(14, 1, 10), Qt::LocalTime);
+
+            qInfo() << "InMeasDate: " << inMeasDate;
+            qInfo() << "originalDateInFile: " << originalDateInFile;
+            qInfo() << "days in between: " << inMeasDate.daysTo(originalDateInFile);
+            qInfo() << "days used as offset: " << mDaysToOffsetDates;
 
             if(testArg == "MeasDateOffset"){
-                QVERIFY(inMeasDate == offSetMeasDate);
+                QVERIFY(inMeasDate.daysTo(originalDateInFile) == mDaysToOffsetDates);
             } else {
-                QVERIFY(inMeasDate == defaultMeasDate);
+                QVERIFY(inMeasDate == mDefaultMeasDate);
             }
 
             break;
@@ -396,7 +419,7 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
         }
         case FIFF_SUBJ_BIRTH_DAY:
         {
-            QDateTime defaultDate(QDate(2000,1,1), QTime(1, 1, 0), Qt::UTC);
+            QDateTime defaultDate(QDate(2000,1,1), QTime(1, 1, 0), Qt::LocalTime);
             QDateTime inBirthday(QDate::fromJulianDay(*pTag->toJulian()));
             QDateTime offSetBirtday(defaultDate.date().addDays(-35));
 

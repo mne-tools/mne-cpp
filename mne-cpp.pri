@@ -85,6 +85,11 @@ contains(MNECPP_CONFIG, trace) {
     DEFINES += TRACE
 }
 
+########################################### BUILDINFO DEFINITIONS #############################################
+
+DEFINES += "GIT_HASH=\\\"$$system(git log -1 --format=%h)\\\""
+DEFINES += "GIT_HASH_LONG=\\\"$$system(git log -1 --format=%H)\\\""
+
 ########################################### DIRECTORY DEFINITIONS #############################################
 
 # Repository directory

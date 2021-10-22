@@ -82,12 +82,6 @@ FiffNamedMatrix::FiffNamedMatrix(const FiffNamedMatrix& p_FiffNamedMatrix)
 
 //=============================================================================================================
 
-FiffNamedMatrix::~FiffNamedMatrix()
-{
-}
-
-//=============================================================================================================
-
 void FiffNamedMatrix::clear()
 {
     nrow = -1;

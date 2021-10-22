@@ -428,6 +428,12 @@ void RealTime3DWidget::initDisplayControllWidgets()
     connect(pControl3DView, &Control3DView::takeScreenshotChanged,
             m_p3DView.data(), &View3D::takeScreenshot);
 
+    connect(pControl3DView, &Control3DView::toggleSingleView,
+            m_p3DView.data(), &View3D::showSingleView);
+
+    connect(pControl3DView, &Control3DView::toggleMutiview,
+            m_p3DView.data(), &View3D::showMultiView);
+
     emit displayControlWidgetsChanged(lControlWidgets, "3D View");
 
     m_bDisplayWidgetsInitialized = true;

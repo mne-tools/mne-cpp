@@ -4,6 +4,7 @@
  * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     December, 2016
  *
@@ -78,12 +79,9 @@ public:
 private slots:
     void initTestCase();
     void computeForward();
-    void compareForward();
     void cleanupTestCase();
 
 private:
-    double dEpsilon;
-
     QSharedPointer<MNEForwardSolution> m_pFwdMEGEEGRead;
     QSharedPointer<MNEForwardSolution> m_pFwdMEGEEGRef;
 };
@@ -91,7 +89,6 @@ private:
 //=============================================================================================================
 
 TestMneForwardSolution::TestMneForwardSolution()
-: dEpsilon(0.0001)
 {
 }
 
@@ -159,12 +156,6 @@ void TestMneForwardSolution::computeForward()
     m_pFwdMEGEEGRead = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(fileFwdMEGEEGRead));
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute/Write/Read MEG/EEG Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
-}
-
-//=============================================================================================================
-
-void TestMneForwardSolution::compareForward()
-{
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>\n");
     // The following is equal to QVERIFY(*m_pFwdMEGEEGRead == *m_pFwdMEGEEGRef);
     // This just gives more information on what might be wrong if failing
@@ -188,6 +179,8 @@ void TestMneForwardSolution::compareForward()
 
 void TestMneForwardSolution::cleanupTestCase()
 {
+    QString fwdMEGEEGFileRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QFile::remove(fwdMEGEEGFileRef);
 }
 
 //=============================================================================================================

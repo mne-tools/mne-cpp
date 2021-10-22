@@ -222,10 +222,10 @@ public:
     bool is_eeg_electrode_type(int type) const;
 
 public:
-    FwdCoil **coils;                 /* The coil or electrode positions */
-    int     ncoil;
-    int     coord_frame;            /* Common coordinate frame */
-    void    *user_data;             /* We can put whatever in here */
+    FwdCoil **coils;                /*< The coil or electrode positions >*/
+    int     ncoil;                  /*< Number of coils >*/
+    int     coord_frame;            /*< Common coordinate frame >*/
+    void    *user_data;             /*< We can put whatever in here >*/
     fwdUserFreeFunc user_data_free;
 
 // ### OLD STRUCT ###

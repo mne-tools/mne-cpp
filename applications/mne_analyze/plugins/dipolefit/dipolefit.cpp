@@ -547,3 +547,10 @@ void DipoleFit::triggerLoadingEnd(QString sMessage)
 {
     m_pCommu->publishEvent(LOADING_END, QVariant::fromValue(sMessage));
 }
+
+//=============================================================================================================
+
+QString DipoleFit::getBuildInfo()
+{
+    return QString(DIPOLEFITPLUGIN::buildDateTime()) + QString(" - ")  + QString(DIPOLEFITPLUGIN::buildHash());
+}

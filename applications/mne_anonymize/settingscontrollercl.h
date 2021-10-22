@@ -43,6 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "mne_anonymize.h"
 #include "fiffanonymizer.h"
 #include <iostream>
 
@@ -118,6 +119,12 @@ public:
      */
     QFileInfo getQFiOutFile();
 
+    //=========================================================================================================
+    /**
+     * Signals the FiffAnonymizer method handling both the multi-parallel setup and the single-thread setup.
+     */
+    virtual int run();
+
 protected:
     //=========================================================================================================
     /**
@@ -147,10 +154,8 @@ protected:
 
     //=========================================================================================================
     /**
-     * Signals the FiffAnonymizer method handling both the multi-parallel setup and the single-thread setup.
+     * If an output filename is not provided this method generates a default output name.
      */
-    int execute();
-
     QString generateDefaultOutputFileName();
 
 private:
@@ -240,11 +245,12 @@ protected:
     QString m_sAppName;                     /**< Application name.*/
     QString m_sAppVer;                      /**< Application version number.*/
     QString m_sBuildDate;                   /**< Application build date.*/
+    QString m_sBuildHash;                   /**< Repository hash whenever the application was built.*/
 
     QCommandLineParser m_parser;            /**< Parser object to work with member ptr to QCoreApp and parse input command line options.*/
 
-    QFileInfo m_fiInFile;               /**< Input File info obj.*/
-    QFileInfo m_fiOutFile;              /**< Output File info obj.*/
+    QFileInfo m_fiInFile;                   /**< Input File info obj.*/
+    QFileInfo m_fiOutFile;                  /**< Output File info obj.*/
 
 protected:
     bool m_bGuiMode;                        /**< Object running in GUI mode.*/
@@ -258,7 +264,6 @@ private:
     bool m_bInOutFileNamesEqual;            /**< Flags user's request to have both input and output files with the same name.*/
     bool m_bInputFileDeleted;               /**< Flags if the input file has been deleted. */
     bool m_bOutFileRenamed;                 /**< Flags if the output file has been renamed to match the name the input file had. */
-
 };
 
 //=============================================================================================================

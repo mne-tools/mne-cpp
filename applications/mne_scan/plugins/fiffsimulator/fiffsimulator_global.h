@@ -37,6 +37,12 @@
 #define FIFFSIMULATOR_GLOBAL_H
 
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <utils/buildinfo.h>
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -51,5 +57,26 @@
 #else
 #  define FIFFSIMULATORSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+namespace FIFFSIMULATORPLUGIN{
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+FIFFSIMULATORSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+FIFFSIMULATORSHARED_EXPORT const char* buildHash();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+FIFFSIMULATORSHARED_EXPORT const char* buildHashLong();
+}
 
 #endif // FIFFSIMULATOR_GLOBAL_H

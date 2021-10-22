@@ -668,3 +668,10 @@ void RtcMne::run()
         ++skip_count;
     }
 }
+
+//=============================================================================================================
+
+QString RtcMne::getBuildInfo()
+{
+    return QString(RTCMNEPLUGIN::buildDateTime()) + QString(" - ")  + QString(RTCMNEPLUGIN::buildHash());
+}

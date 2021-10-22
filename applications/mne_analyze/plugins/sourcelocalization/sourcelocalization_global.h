@@ -36,6 +36,12 @@
 #define MNEANALYZE_SOURCELOCALIZATION_GLOBAL_H
 
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <utils/buildinfo.h>
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -50,5 +56,26 @@
 #else
 #  define SOURCELOCALIZATIONSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+namespace SOURCELOCALIZATIONPLUGIN{
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+SOURCELOCALIZATIONSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+SOURCELOCALIZATIONSHARED_EXPORT const char* buildHash();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+SOURCELOCALIZATIONSHARED_EXPORT const char* buildHashLong();
+}
 
 #endif // MNEANALYZE_SOURCELOCALIZATION_GLOBAL_H

@@ -36,6 +36,7 @@
 #define EVENTS_GLOBAL_H
 
 #include <QtCore/qglobal.h>
+#include <utils/buildinfo.h>
 
 #if defined(STATICBUILD)
 #  define EVENTS_EXPORT
@@ -44,5 +45,26 @@
 #else
 #  define EVENTS_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+namespace EVENTSLIB{
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+EVENTS_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+EVENTS_EXPORT const char* buildHash();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+EVENTS_EXPORT const char* buildHashLong();
+}
 
 #endif // EVENTS_GLOBAL_H

@@ -66,3 +66,6 @@ mne-cpp.pro.user*
 
 # FFTW
 /include/3rdParty/fftw
+
+# Generated docu Docker files
+/_site

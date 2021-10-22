@@ -33,8 +33,8 @@
  *
  */
 
-#ifndef WRITETOFILE_H
-#define WRITETOFILE_H
+#ifndef HPI_H
+#define HPI_H
 
 //=============================================================================================================
 // INCLUDES
@@ -130,6 +130,7 @@ public:
     virtual AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
+    virtual QString getBuildInfo();
 
     //=========================================================================================================
     /**
@@ -330,4 +331,4 @@ signals:
 };
 } // NAMESPACE
 
-#endif // WRITETOFILE_H
+#endif // HPI_H

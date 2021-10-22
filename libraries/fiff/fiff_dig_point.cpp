@@ -62,20 +62,3 @@ FiffDigPoint::FiffDigPoint()
     for(qint32 i = 0; i < 3; ++i)
         r[i] = -1;
 }
-
-//=============================================================================================================
-
-FiffDigPoint::FiffDigPoint(const FiffDigPoint& p_FiffDigPoint)
-: kind(p_FiffDigPoint.kind)
-, ident(p_FiffDigPoint.ident)
-, coord_frame(p_FiffDigPoint.coord_frame)
-{
-    for(qint32 i = 0; i < 3; ++i)
-        r[i] = p_FiffDigPoint.r[i];
-}
-
-//=============================================================================================================
-
-FiffDigPoint::~FiffDigPoint()
-{
-}
