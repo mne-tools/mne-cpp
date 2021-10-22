@@ -142,7 +142,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     // check if we have to update the model
     if(bUpdateModel || (m_matModel.rows() == 0) || (m_vecFreqs != vecFreqs) || (t_mat.cols() != m_matModel.cols())) {
-        updateModel(pFiffInfo->sfreq, t_mat.cols(), pFiffInfo->linefreq, vecFreqs);
+        updateModel(pFiffInfo->sfreq, t_mat.cols(), pFiffInfo->linefreq, vecFreqs, m_matModel);
         m_vecFreqs = vecFreqs;
         bUpdateModel = false;
     }
@@ -338,12 +338,6 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     MatrixXd matTestPos = transDevHead.apply_trans(matTemp.cast<float>()).cast<double>();
     MatrixXd matDiffPos = matTestPos - matHeadHPI;
 
-    matTemp.block(0,3,iKeep,1).setOnes();
-    matTemp.transposeInPlace();
-
-    MatrixXd matTestPos = matTrans * matTemp;
-    MatrixXd matDiffPos = matTestPos.block(0,0,3,iKeep) - matHeadHPI.transpose();
-
     vecError = QVector<double>(iKeep);
     for(int i = 0; i < matDiffPos.cols(); ++i) {
         vecError[i] = matDiffPos.col(i).norm();
@@ -410,12 +404,71 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
                                const int iLineFreq,
                                const bool bAdvanced)
 {
+    // meta data
+    int iNumCoils = vecFreqs.size();
+
     //Check if data was passed
     if(matData.rows() == 0 || matData.cols() == 0 ) {
         std::cout<<std::endl<< "HPIFit::fitHPI - No data passed. Returning.";
         return;
     }
 
+    // check if number of freuencies matches data
+    if(iNumCoils != matData.cols()) {
+        std::cout<<std::endl<< "HPIFit::fitHPI - Not enough coil frequencies specified. Returning.";
+        return;
+    }
+
+    // check if we need to update the model (bads, frequencies)
+    if(!(m_lBads == pFiffInfo->bads) || m_lChannels.isEmpty() || m_matModel.rows()==0) {
+        m_lBads = pFiffInfo->bads;
+        updateChannels(pFiffInfo);
+        updateSensor();
+        updateModel(pFiffInfo->sfreq, matData.cols(), pFiffInfo->linefreq, vecFreqs, m_matModel);
+    }
+
+    // extract data for channels to use
+    MatrixXd matInnerdata(m_vecInnerind.size(), matData.cols());
+
+    for(int j = 0; j < m_vecInnerind.size(); ++j) {
+        matInnerdata.row(j) << matData.row(m_vecInnerind[j]);
+    }
+
+    // fit linear model
+    MatrixXd matTopo;
+    MatrixXd matAmp(m_vecInnerind.size(), iNumCoils);   // sine part
+    MatrixXd matAmpC(m_vecInnerind.size(), iNumCoils);  // cosine part
+
+    matTopo = m_matModel * matInnerdata.transpose();
+
+    // select sine or cosine part
+
+    if(bAdvanced) {
+        // Select sine or cosine component depending on the relative size
+        matTopo.transposeInPlace();
+        matAmp = matTopo.leftCols(iNumCoils);
+        matAmpC = matTopo.rightCols(iNumCoils);
+        for(int j = 0; j < iNumCoils; ++j) {
+            float fNS = 0.0;
+            float fNC = 0.0;
+            fNS = matAmp.col(j).array().square().sum();
+            fNC = matAmpC.col(j).array().square().sum();
+            if(fNC > fNS) {
+                matAmp.col(j) = matAmpC.col(j);
+            }
+        }
+    } else {
+        // estimate the sinusoid phase
+        for(int i = 0; i < iNumCoils; ++i) {
+            int from = 2*i;
+            MatrixXd m = matTopo.block(from,0,2,matTopo.cols());
+            JacobiSVD<MatrixXd> svd(m, ComputeThinU | ComputeThinV);
+            matAmp.col(i) = svd.singularValues()(0) * svd.matrixV().col(0);
+        }
+    }
+
+    // return data
+    matAmplitudes = matAmp;
 }
 
 //=============================================================================================================
@@ -675,7 +728,7 @@ void HPIFit::storeHeadPosition(float fTime,
 
     std::vector<double> vecTargetGof;
     std::copy_if(vecGoF.data(), vecGoF.data() + vecGoF.size(), std::back_inserter(vecTargetGof),[](double n ){ return  n >= 0.0;});
-    double dGoF = std::accumulate(vecTargetError.begin(), vecTargetError.end(), .0) / vecTargetError.size();     // HPI estimation Error
+    double dGoF = std::accumulate(vecTargetGof.begin(), vecTargetGof.end(), .0) / vecTargetGof.size();     // HPI estimation Error
 
     Eigen::Quaternionf quatHPI(matRot);
 
@@ -746,8 +799,9 @@ void HPIFit::updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
 
 void HPIFit::updateModel(const int iSamF,
                          const int iSamLoc,
-                         int iLineF,
-                         const QVector<int>& vecFreqs)
+                         const int iLineF,
+                         const QVector<int>& vecFreqs,
+                         MatrixXd m_matModel)
 {
     int iNumCoils = vecFreqs.size();
     MatrixXd matSimsig;
