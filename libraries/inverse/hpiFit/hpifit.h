@@ -285,6 +285,33 @@ public:
                                   Eigen::MatrixXd& matPosition,
                                   const Eigen::VectorXd& vecGoF,
                                   const QVector<double>& vecError);
+
+    //=========================================================================================================
+    /**
+     * Update the model of sinoids for the hpi data
+     *
+     * @param[in] iSamF             The sample frequency.
+     * @param[in] iSamLoc           The minimum samples required to localize numLoc times in a second.
+     * @param[in] iLineF            The line frequency.
+     * @param[in] vecFreqs          The frequencies for each coil in unknown order.
+     * @param[out] m_matModel       The model that contains the sines/cosines for the hpi fit
+     */
+    void updateModel(const int iSamF,
+                     const int iSamLoc,
+                     const int iLineF,
+                     const QVector<int>& vecFreqs,
+                     Eigen::MatrixXd m_matModel);
+
+    //=========================================================================================================
+    /**
+     * inline get functions for private member variables.
+     *
+     */
+    inline QList<FIFFLIB::FiffChInfo> getChannels() const;
+    inline QList<QString> getBads() const;
+    inline SensorSet getSensors() const;
+    inline Eigen::MatrixXd getModel() const;
+
 private:
     //=========================================================================================================
     /**
@@ -380,22 +407,6 @@ private:
      */
     void updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
-    //=========================================================================================================
-    /**
-     * Update the model of sinoids for the hpi data
-     *
-     * @param[in] iSamF             The sample frequency.
-     * @param[in] iSamLoc           The minimum samples required to localize numLoc times in a second.
-     * @param[in] iLineF            The line frequency.
-     * @param[in] vecFreqs          The frequencies for each coil in unknown order.
-     *
-     * @return The updated model.
-     */
-    void updateModel(const int iSamF,
-                     const int iSamLoc,
-                     const int iLineF,
-                     const QVector<int>& vecFreqs);
-
     QList<FIFFLIB::FiffChInfo>          m_lChannels;        /**< Channellist with bads excluded. */
     QVector<int>                        m_vecInnerind;      /**< index of inner channels . */
     QList<QString>                      m_lBads;            /**< contains bad channels . */
@@ -411,6 +422,26 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+inline QList<FIFFLIB::FiffChInfo> HPIFit::getChannels() const
+{
+    return m_lChannels;
+}
+
+inline QList<QString> HPIFit::getBads() const
+{
+    return m_lBads;
+}
+
+inline SensorSet HPIFit::getSensors() const
+{
+    return m_sensors;
+}
+
+inline Eigen::MatrixXd HPIFit::getModel() const
+{
+    return m_matModel;
+}
+
 } //NAMESPACE
 
 #ifndef metatype_HpiFitResult
