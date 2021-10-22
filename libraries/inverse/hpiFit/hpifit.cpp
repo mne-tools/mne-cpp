@@ -410,6 +410,11 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
                                const int iLineFreq,
                                const bool bAdvanced)
 {
+    //Check if data was passed
+    if(matData.rows() == 0 || matData.cols() == 0 ) {
+        std::cout<<std::endl<< "HPIFit::fitHPI - No data passed. Returning.";
+        return;
+    }
 
 }
 
