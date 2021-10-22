@@ -177,8 +177,8 @@ void TestHpiFit::initTestCase()
     FiffDigPointSet fittedPointSet;
     Eigen::MatrixXd mProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
-    bool bDoDebug = true;
-
+    bool bDoDebug = false;
+    bool bDrop = false;
     HPIFit HPI = HPIFit(pFiffInfo, true);
 
     // bring frequencies into right order
@@ -220,6 +220,7 @@ void TestHpiFit::initTestCase()
                    vGoF,
                    fittedPointSet,
                    pFiffInfo,
+                   bDrop,
                    bDoDebug = 0,
                    sHPIResourceDir,
                    200,
