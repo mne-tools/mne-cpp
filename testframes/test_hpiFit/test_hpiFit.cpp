@@ -105,16 +105,19 @@ private slots:
     void testUpdateModel_basic_5coils();
     void testUpdateModel_advanced_4coils();
     void testUpdateModel_advanced_5coils();
-    void testComputeAmplitudes_basic();
+    void testComputeAmplitudes_basic_sin();         // test with simulated data, only sines
+    void testComputeAmplitudes_basic_cos();         // test with simulated data, only cosines
+    void testComputeAmplitudes_basic_sincos();      // test with simulated data, both summed
+    void testComputeAmplitudes_advanced_sin();         // test with simulated data, only sines
+    void testComputeAmplitudes_advanced_cos();         // test with simulated data, only cosines
+    void testComputeAmplitudes_advanced_summed();      // test with simulated data, summed sines/cos + line
     void cleanupTestCase();
 
 private:
     FiffRawData m_raw;
     QSharedPointer<FiffInfo>  m_pFiffInfo;
     MatrixXd m_matData;
-    MatrixXd mHpiPos;
-    MatrixXd mRefResult;
-    MatrixXd mHpiResult;
+    double dErrorTol;
     QVector<int> vFreqs;
 };
 
@@ -122,6 +125,7 @@ private:
 
 TestHpiFit::TestHpiFit()
 {
+    dErrorTol = 0.0000001;
 }
 
 //=============================================================================================================
@@ -296,7 +300,6 @@ void TestHpiFit::testConstructor_sensors()
 
     // create vector with expected sizes of sensor struct data
     int iNChan = 204;               // number of channels (204 gradiometers)
-    int iAcc = 2;                   // accuracy to use
     int iNp = 8;                    // 8 integration points for acc 2
     int iNRmag = iNp * iNChan;      // expected number of points for computation, 8 for each sensor -> 8*204
     int iNCosmag = iNp * iNChan;    // same as rmag
@@ -453,15 +456,15 @@ void TestHpiFit::testUpdateModel_advanced_4coils()
 
     matModelExpected = UTILSLIB::MNEMath::pinv(matSimsig);
 
-    // reorder for faster computation
-    MatrixXd matTemp = matModelExpected;
-    RowVectorXi vecIndex(2*iNumCoils);
+//    // reorder for faster computation
+//    MatrixXd matTemp = matModelExpected;
+//    RowVectorXi vecIndex(2*iNumCoils);
 
-    vecIndex << 0,4,1,5,2,6,3,7;
-    for(int i = 0; i < vecIndex.size(); ++i) {
-        matTemp.row(i) = matModelExpected.row(vecIndex(i));
-    }
-    matModelExpected = matTemp;
+//    vecIndex << 0,4,1,5,2,6,3,7;
+//    for(int i = 0; i < vecIndex.size(); ++i) {
+//        matTemp.row(i) = matModelExpected.row(vecIndex(i));
+//    }
+//    matModelExpected = matTemp;
 
     /// Act
     HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
@@ -485,7 +488,7 @@ void TestHpiFit::testUpdateModel_advanced_5coils()
     // init test data
     int iSamF = 1000;
     int iLineF = 60;
-    int iSamLoc = 600;
+    int iSamLoc = 200;
     bool bBasic = false;
     QVector<int> vecFreqs = {154,158,161,166,172};
     int iNumCoils = vecFreqs.size();
@@ -504,19 +507,17 @@ void TestHpiFit::testUpdateModel_advanced_5coils()
     matSimsig.col(iNumCoils*4) = RowVectorXd::LinSpaced(iSamLoc, -0.5, 0.5);
     matSimsig.col(iNumCoils*4+1).fill(1);
 
-    // IOUtils::write_eigen_matrix(matSimsig, QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + "test.txt");
-
     matModelExpected = UTILSLIB::MNEMath::pinv(matSimsig);
 
-    // reorder for faster computation
-    MatrixXd matTemp = matModelExpected;
-    RowVectorXi vecIndex(2*iNumCoils);
+//    // reorder for faster computation
+//    MatrixXd matTemp = matModelExpected;
+//    RowVectorXi vecIndex(2*iNumCoils);
 
-    vecIndex << 0,5,1,6,2,7,3,8,4,9;
-    for(int i = 0; i < vecIndex.size(); ++i) {
-        matTemp.row(i) = matModelExpected.row(vecIndex(i));
-    }
-    matModelExpected = matTemp;
+//    vecIndex << 0,5,1,6,2,7,3,8,4,9;
+//    for(int i = 0; i < vecIndex.size(); ++i) {
+//        matTemp.row(i) = matModelExpected.row(vecIndex(i));
+//    }
+//    matModelExpected = matTemp;
 
     /// Act
     HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
@@ -531,37 +532,422 @@ void TestHpiFit::testUpdateModel_advanced_5coils()
 
 //=============================================================================================================
 
-void TestHpiFit::testComputeAmplitudes_basic()
+void TestHpiFit::testComputeAmplitudes_basic_sin()
 {
     /// Prepare
-    // simulate data
+    // simulate fiff info with only grads
+    int iNumCh = m_pFiffInfo->nchan;
+    QList<FIFFLIB::FiffChInfo> lChannels;
+    QStringList lChannelsNames;
+
+    for (int i = 0; i < iNumCh; ++i) {
+        if(m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
+            // Check if the sensor is bad, if not append to innerind
+            if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
+                lChannels.append(m_pFiffInfo->chs[i]);
+                lChannelsNames.append(m_pFiffInfo->ch_names[i]);
+            }
+        }
+    }
+
+    m_pFiffInfo->chs = lChannels;
+    m_pFiffInfo->ch_names = lChannelsNames;
+    m_pFiffInfo->nchan = lChannels.size();
+
     HPIFit HPI = HPIFit(m_pFiffInfo);
 
     // init test data
     QVector<int> vecFreqs = {154,158,161,166};
     int iNumCoils = vecFreqs.size();
-    int iSamF = 1000;
+    int iSamF = m_pFiffInfo->sfreq;
     int iLineF = 60;
     int iSamLoc = m_matData.cols();
-    bool bBasic = false;
-    double dAmplitude = 0.5;
+    bool bBasic = true;
+    double dAmplitude = 0.5;        // expected amplitudes
 
-    // simulate data
-    MatrixXd matAmpExpected;
-    MatrixXd matSimData(m_matData);
+    // simulate data - zeros and sines with specified freqs and amplitudes in first 4 channels
+    // meaning that computed amplitudes should match in the first 4 cases
+    MatrixXd matSimData = MatrixXd::Zero(m_pFiffInfo->nchan,200);
     MatrixXd matModel;
     matSimData.fill(0);
     VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
 
     for(int i = 0; i < iNumCoils; ++i) {
         matSimData.row(i) = dAmplitude * sin(2*M_PI*vecFreqs[i]*vecTime.array());
-        matSimData.row(i+iNumCoils).fill(0);
     }
+    MatrixXd matAmpExpected = MatrixXd::Zero(204,4);
+
+    // coefficents to model, first index for channel,
+    // second for sine within the model
+    matAmpExpected(0,0) = dAmplitude;
+    matAmpExpected(1,1) = dAmplitude;
+    matAmpExpected(2,2) = dAmplitude;
+    matAmpExpected(3,3) = dAmplitude;
 
     /// Act
     MatrixXd matAmpActual;
     HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
-    HPI.computeAmplitudes(matSimData,vecFreqs,m_pFiffInfo,matAmpActual,m_pFiffInfo->linefreq,bBasic);
+    HPI.computeAmplitudes(matSimData,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
+
+    /// Assert
+    // use summed squared error ssd
+    MatrixXd matDiff = matAmpActual - matAmpExpected;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+    QVERIFY(dSSD < dErrorTol);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testComputeAmplitudes_basic_cos()
+{
+    /// Prepare
+    // simulate fiff info with only grads
+    int iNumCh = m_pFiffInfo->nchan;
+    QList<FIFFLIB::FiffChInfo> lChannels;
+    QStringList lChannelsNames;
+
+    for (int i = 0; i < iNumCh; ++i) {
+        if(m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
+            // Check if the sensor is bad, if not append to innerind
+            if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
+                lChannels.append(m_pFiffInfo->chs[i]);
+                lChannelsNames.append(m_pFiffInfo->ch_names[i]);
+            }
+        }
+    }
+
+    m_pFiffInfo->chs = lChannels;
+    m_pFiffInfo->ch_names = lChannelsNames;
+    m_pFiffInfo->nchan = lChannels.size();
+
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+
+    // init test data
+    QVector<int> vecFreqs = {154,158,161,166};
+    int iNumCoils = vecFreqs.size();
+    int iSamF = m_pFiffInfo->sfreq;
+    int iLineF = 60;
+    int iSamLoc = m_matData.cols();
+    bool bBasic = true;
+    double dAmplitude = 0.5;        // expected amplitudes
+
+    // simulate data - zeros and cosines with specified freqs and amplitudes in first 4 channels
+    // meaning that computed amplitudes should match in the first 4 cases
+    MatrixXd matSimData = MatrixXd::Zero(m_pFiffInfo->nchan,200);
+    MatrixXd matModel;
+    matSimData.fill(0);
+    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
+
+    for(int i = 0; i < iNumCoils; ++i) {
+        matSimData.row(i) = dAmplitude * cos(2*M_PI*vecFreqs[i]*vecTime.array());
+    }
+    MatrixXd matAmpExpected = MatrixXd::Zero(204,4);
+
+    // coefficents to model, first index for channel,
+    // second for sine within the model
+    matAmpExpected(0,0) = dAmplitude;
+    matAmpExpected(1,1) = dAmplitude;
+    matAmpExpected(2,2) = dAmplitude;
+    matAmpExpected(3,3) = dAmplitude;
+
+    /// Act
+    MatrixXd matAmpActual;
+    HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
+    HPI.computeAmplitudes(matSimData,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
+
+    /// Assert
+    // use summed squared error ssd
+    MatrixXd matDiff = matAmpActual - matAmpExpected;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+    QVERIFY(dSSD < dErrorTol);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testComputeAmplitudes_basic_sincos()
+{
+    /// Prepare
+    // simulate fiff info with only grads
+    int iNumCh = m_pFiffInfo->nchan;
+    QList<FIFFLIB::FiffChInfo> lChannels;
+    QStringList lChannelsNames;
+
+    for (int i = 0; i < iNumCh; ++i) {
+        if(m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
+            // Check if the sensor is bad, if not append to innerind
+            if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
+                lChannels.append(m_pFiffInfo->chs[i]);
+                lChannelsNames.append(m_pFiffInfo->ch_names[i]);
+            }
+        }
+    }
+
+    m_pFiffInfo->chs = lChannels;
+    m_pFiffInfo->ch_names = lChannelsNames;
+    m_pFiffInfo->nchan = lChannels.size();
+
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+
+    // init test data
+    QVector<int> vecFreqs = {154,158,161,166};
+    int iNumCoils = vecFreqs.size();
+    int iSamF = m_pFiffInfo->sfreq;
+    int iLineF = 60;
+    int iSamLoc = m_matData.cols();
+    bool bBasic = true;
+    double dAmpSin = 0.5;        // expected amplitudes
+    double dAmpCos = 0.25;        // expected amplitudes
+
+    // simulate data - zeros and summed sines and cosines, but different amplitudes
+    MatrixXd matSimData = MatrixXd::Zero(m_pFiffInfo->nchan,200);
+    MatrixXd matModel;
+    matSimData.fill(0);
+    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
+
+    for(int i = 0; i < iNumCoils; ++i) {
+        matSimData.row(i) = dAmpSin * sin(2*M_PI*vecFreqs[i]*vecTime.array()) + dAmpCos * cos(2*M_PI*vecFreqs[i]*vecTime.array());
+    }
+    MatrixXd matAmpExpected = MatrixXd::Zero(204,4);
+
+    // coefficents of fitted model - first index for channel, second for sine/coseine
+    // we expect amplitude of sine, since it is higher
+    matAmpExpected(0,0) = dAmpSin;
+    matAmpExpected(1,1) = dAmpSin;
+    matAmpExpected(2,2) = dAmpSin;
+    matAmpExpected(3,3) = dAmpSin;
+
+    /// Act
+    MatrixXd matAmpActual;
+    HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
+    HPI.computeAmplitudes(matSimData,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
+
+    /// Assert
+    // use summed squared error ssd
+    MatrixXd matDiff = matAmpActual - matAmpExpected;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+    QVERIFY(dSSD < dErrorTol);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testComputeAmplitudes_advanced_sin()
+{
+    /// Prepare
+    // simulate fiff info with only grads
+    int iNumCh = m_pFiffInfo->nchan;
+    QList<FIFFLIB::FiffChInfo> lChannels;
+    QStringList lChannelsNames;
+
+    for (int i = 0; i < iNumCh; ++i) {
+        if(m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
+            // Check if the sensor is bad, if not append to innerind
+            if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
+                lChannels.append(m_pFiffInfo->chs[i]);
+                lChannelsNames.append(m_pFiffInfo->ch_names[i]);
+            }
+        }
+    }
+
+    m_pFiffInfo->chs = lChannels;
+    m_pFiffInfo->ch_names = lChannelsNames;
+    m_pFiffInfo->nchan = lChannels.size();
+    m_pFiffInfo->sfreq = 1000;
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+
+    // init test data
+    QVector<int> vecFreqs = {154,158,161,166};
+    int iNumCoils = vecFreqs.size();
+    int iSamF = m_pFiffInfo->sfreq;
+    int iLineF = 60;
+    int iSamLoc = m_matData.cols();
+    bool bBasic = false;
+    double dAmplitude = 0.5;        // expected amplitudes
+
+    // simulate data - zeros and sines with specified freqs and amplitudes in first 4 channels
+    // meaning that computed amplitudes should match in the first 4 cases
+    MatrixXd matSimData = MatrixXd::Zero(m_pFiffInfo->nchan,200);
+    matSimData.fill(0);
+    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
+
+    for(int i = 0; i < iNumCoils; ++i) {
+        matSimData.row(i) = dAmplitude * sin(2*M_PI*vecFreqs[i]*vecTime.array());
+    }
+    MatrixXd matAmpExpected = MatrixXd::Zero(204,4);
+
+    // coefficents to model, first index for channel,
+    // second for sine within the model
+    matAmpExpected(0,0) = dAmplitude;
+    matAmpExpected(1,1) = dAmplitude;
+    matAmpExpected(2,2) = dAmplitude;
+    matAmpExpected(3,3) = dAmplitude;
+
+    /// Act
+    MatrixXd matAmpActual;
+    HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
+    HPI.computeAmplitudes(matSimData,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
+
+    /// Assert
+    // use summed squared error ssd
+    MatrixXd matDiff = matAmpActual - matAmpExpected;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+    QVERIFY(dSSD < dErrorTol);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testComputeAmplitudes_advanced_cos()
+{
+    /// Prepare
+    // simulate fiff info with only grads
+    int iNumCh = m_pFiffInfo->nchan;
+    QList<FIFFLIB::FiffChInfo> lChannels;
+    QStringList lChannelsNames;
+
+    for (int i = 0; i < iNumCh; ++i) {
+        if(m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
+            // Check if the sensor is bad, if not append to innerind
+            if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
+                lChannels.append(m_pFiffInfo->chs[i]);
+                lChannelsNames.append(m_pFiffInfo->ch_names[i]);
+            }
+        }
+    }
+
+    m_pFiffInfo->chs = lChannels;
+    m_pFiffInfo->ch_names = lChannelsNames;
+    m_pFiffInfo->nchan = lChannels.size();
+
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+
+    // init test data
+    QVector<int> vecFreqs = {154,158,161,166};
+    int iNumCoils = vecFreqs.size();
+    int iSamF = m_pFiffInfo->sfreq;
+    int iLineF = 60;
+    int iSamLoc = m_matData.cols();
+    bool bBasic = false;
+    double dAmplitude = 0.5;        // expected amplitudes
+
+    // simulate data - zeros and cosines with specified freqs and amplitudes in first 4 channels
+    // meaning that computed amplitudes should match in the first 4 cases
+    MatrixXd matSimData = MatrixXd::Zero(m_pFiffInfo->nchan,200);
+    MatrixXd matModel;
+    matSimData.fill(0);
+    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
+
+    for(int i = 0; i < iNumCoils; ++i) {
+        matSimData.row(i) = dAmplitude * cos(2*M_PI*vecFreqs[i]*vecTime.array());
+    }
+    MatrixXd matAmpExpected = MatrixXd::Zero(204,4);
+
+    // coefficents to model, first index for channel,
+    // second for sine within the model
+    matAmpExpected(0,0) = dAmplitude;
+    matAmpExpected(1,1) = dAmplitude;
+    matAmpExpected(2,2) = dAmplitude;
+    matAmpExpected(3,3) = dAmplitude;
+
+    /// Act
+    MatrixXd matAmpActual;
+    HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
+    HPI.computeAmplitudes(matSimData,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
+
+    /// Assert
+    // use summed squared error ssd
+    MatrixXd matDiff = matAmpActual - matAmpExpected;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+    QVERIFY(dSSD < dErrorTol);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testComputeAmplitudes_advanced_summed()
+{
+    /// Prepare
+    // simulate fiff info with only grads
+    int iNumCh = m_pFiffInfo->nchan;
+    QList<FIFFLIB::FiffChInfo> lChannels;
+    QStringList lChannelsNames;
+
+    for (int i = 0; i < iNumCh; ++i) {
+        if(m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
+            // Check if the sensor is bad, if not append to innerind
+            if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
+                lChannels.append(m_pFiffInfo->chs[i]);
+                lChannelsNames.append(m_pFiffInfo->ch_names[i]);
+            }
+        }
+    }
+
+    m_pFiffInfo->chs = lChannels;
+    m_pFiffInfo->ch_names = lChannelsNames;
+    m_pFiffInfo->nchan = lChannels.size();
+
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+
+    // init test data
+    QVector<int> vecFreqs = {154,158,161,166};
+    int iNumCoils = vecFreqs.size();
+    int iSamF = m_pFiffInfo->sfreq;
+    int iLineF = 60;
+    int iSamLoc = m_matData.cols();
+    bool bBasic = false;
+    double dAmpSin = 0.5;        // expected amplitudes
+    double dAmpCos = 0.25;       // amplitudes of cosine to add
+    double dAmpLine = 0.25;       // amplitudes of line freq.
+
+    // simulate data - zeros and summed sines and cosines, but different amplitudes
+    MatrixXd matSimData = MatrixXd::Zero(m_pFiffInfo->nchan,200);
+    matSimData.fill(0);
+    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
+
+    for(int i = 0; i < iNumCoils; ++i) {
+        matSimData.row(i) = dAmpSin * sin(2*M_PI*vecFreqs[i]*vecTime.array())
+                            + dAmpCos * cos(2*M_PI*vecFreqs[i]*vecTime.array())
+                            + dAmpLine * sin(2*M_PI*60*vecTime.array())
+                            + dAmpLine/2 * sin(2*M_PI*60*2*vecTime.array())
+                            + dAmpLine/3 * sin(2*M_PI*60*3*vecTime.array());
+    }
+    MatrixXd matAmpExpected = MatrixXd::Zero(204,4);
+
+    // coefficents of fitted model - first index for channel, second for sine/coseine
+    // we expect amplitude of sine, since it is higher
+    matAmpExpected(0,0) = dAmpSin;
+    matAmpExpected(1,1) = dAmpSin;
+    matAmpExpected(2,2) = dAmpSin;
+    matAmpExpected(3,3) = dAmpSin;
+
+    /// Act
+    MatrixXd matAmpActual;
+    HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
+    MatrixXd matModel = HPI.getModel();
+    IOUtils::write_eigen_matrix(matSimData, QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + "testData.txt");
+    IOUtils::write_eigen_matrix(matModel, QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + "testModel.txt");
+    HPI.computeAmplitudes(matSimData,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
+
+    /// Assert
+    // use summed squared error ssd
+    MatrixXd matDiff = matAmpActual - matAmpExpected;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+    QVERIFY(dSSD < dErrorTol);
 }
 
 void TestHpiFit::cleanupTestCase()

@@ -218,7 +218,6 @@ public:
      * @param[in]   vecFreqs           The ordered coil frequencies.
      * @param[in]   pFiffInfo          Associated Fiff Information.
      * @param[out]  matAmplitudes      The computed amplitudes amplitudes (n_channels x n_coils).
-     * @param[in]   iLineFreq          The line frequency in Hz to use for the advanced model. Defaults to 60 Hz.
      * @param[in]   bAdvanced          Use the advanced model to compute the coil amplitudes.
      *
      */
@@ -226,7 +225,6 @@ public:
                            const QVector<int>& vecFreqs,
                            const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                            Eigen::MatrixXd& matAmplitudes,
-                           const int iLineFreq = 60,
                            const bool bBasic = false);
 
     //=========================================================================================================

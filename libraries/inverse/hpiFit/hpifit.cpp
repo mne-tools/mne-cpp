@@ -420,7 +420,6 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
                                const QVector<int>& vecFreqs,
                                const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                                Eigen::MatrixXd& matAmplitudes,
-                               const int iLineFreq,
                                const bool bBasic)
 {
     // meta data
@@ -431,12 +430,6 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
         std::cout<<std::endl<< "HPIFit::fitHPI - No data passed. Returning.";
         return;
     }
-
-//    // check if number of freuencies matches data
-//    if(iNumCoils != matData.cols()) {
-//        std::cout<<std::endl<< "HPIFit::fitHPI - Not enough coil frequencies specified. Returning.";
-//        return;
-//    }
 
     // check if we need to update the model (bads, frequencies)
     if(!(m_lBads == pFiffInfo->bads) || m_lChannels.isEmpty() || m_matModel.rows()==0) {
@@ -477,13 +470,26 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
             }
         }
     } else {
-        // estimate the sinusoid phase
-        for(int i = 0; i < iNumCoils; ++i) {
-            int from = 2*i;
-            MatrixXd m = matTopo.block(from,0,2,matTopo.cols());
-            JacobiSVD<MatrixXd> svd(m, ComputeThinU | ComputeThinV);
-            matAmp.col(i) = svd.singularValues()(0) * svd.matrixV().col(0);
+//        // estimate the sinusoid phase
+//        for(int i = 0; i < iNumCoils; ++i) {
+//            int from = 2*i;
+//            MatrixXd m = matTopo.block(from,0,2,matTopo.cols());
+//            JacobiSVD<MatrixXd> svd(m, ComputeThinU | ComputeThinV);
+//            matAmp.col(i) = std::abs(svd.singularValues()(0)) * svd.matrixV().col(0);
+//        }
+        matTopo.transposeInPlace();
+        matAmp = matTopo.leftCols(iNumCoils);
+        matAmpC = matTopo.middleCols(iNumCoils,iNumCoils);
+        for(int j = 0; j < iNumCoils; ++j) {
+            float fNS = 0.0;
+            float fNC = 0.0;
+            fNS = matAmp.col(j).array().square().sum();
+            fNC = matAmpC.col(j).array().square().sum();
+            if(fNC > fNS) {
+                matAmp.col(j) = matAmpC.col(j);
+            }
         }
+
     }
 
     // return data
@@ -838,6 +844,7 @@ void HPIFit::updateModel(const int iSamF,
     }
     m_matModel = UTILSLIB::MNEMath::pinv(matSimsig);
     MatrixXd matTemp = m_matModel;
+    return;
     // reorder so that sin and cos with same freq. are next to each other
     int iC = 0;
     std::vector<int> vec(2*iNumCoils);
