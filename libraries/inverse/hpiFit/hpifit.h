@@ -145,7 +145,6 @@ public:
      * Default constructor.
      *
      * @param[in] pFiffInfo        Associated Fiff Information.
-     * @param[in] bDoFastFit       Do the fast fit by fitting to the more basic Model.
      */
     explicit HPIFit(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
@@ -267,23 +266,12 @@ public:
 
     //=========================================================================================================
     /**
-     * Store results from dev_Head_t as quaternions in position matrix. The format is the same as you
-     * get from Neuromag's MaxFilter.
+     * Update FwdCoilSet and store into sensors struct.
      *
+     * @param[in] iAcc       The accuracy level to use for the sensor set. Defaults to 2 (highest).
      *
-     * @param[in]   fTime           The corresponding time in the measurement for the fit.
-     * @param[in]   pFiffInfo       The FiffInfo file from the measurement.
-     * @param[out]  matPosition     The matrix to store the results.
-     * @param[in]   vecGoF          The goodness of fit for each coil.
-     * @param[in]   vecError        The Hpi estimation Error per coil.
-     *
-     * ToDo: get estimated movement velocity and store it in channel 9
      */
-    static void storeHeadPosition(float fTime,
-                                  const Eigen::MatrixXf& transDevHead,
-                                  Eigen::MatrixXd& matPosition,
-                                  const Eigen::VectorXd& vecGoF,
-                                  const QVector<double>& vecError);
+    void updateSensor(const int iAcc = 2);
 
     //=========================================================================================================
     /**
@@ -310,6 +298,26 @@ public:
     inline QList<QString> getBads() const;
     inline SensorSet getSensors() const;
     inline Eigen::MatrixXd getModel() const;
+
+    //=========================================================================================================
+    /**
+     * Store results from dev_Head_t as quaternions in position matrix. The format is the same as you
+     * get from Neuromag's MaxFilter.
+     *
+     *
+     * @param[in]   fTime           The corresponding time in the measurement for the fit.
+     * @param[in]   pFiffInfo       The FiffInfo file from the measurement.
+     * @param[out]  matPosition     The matrix to store the results.
+     * @param[in]   vecGoF          The goodness of fit for each coil.
+     * @param[in]   vecError        The Hpi estimation Error per coil.
+     *
+     * ToDo: get estimated movement velocity and store it in channel 9
+     */
+    static void storeHeadPosition(float fTime,
+                                  const Eigen::MatrixXf& transDevHead,
+                                  Eigen::MatrixXd& matPosition,
+                                  const Eigen::VectorXd& vecGoF,
+                                  const QVector<double>& vecError);
 
 private:
     //=========================================================================================================
@@ -345,27 +353,6 @@ private:
      */
     Eigen::Matrix4d computeTransformation(Eigen::MatrixXd matNH,
                                           Eigen::MatrixXd matBT);
-
-    //=========================================================================================================
-    /**
-     * Read from FwdCoilSet and store into sensors struct.
-     * Can be deleted as soon as FwdCoilSet is refactored to QList and EigenMatrix.
-     *
-     * @param[in] sensors       The struct to save sensor information.
-     * @param[in] coils         The coilset to read the sensor information from.
-     *
-     */
-    void createSensorSet(SensorSet& sensors,
-                         QSharedPointer<FWDLIB::FwdCoilSet> coils);
-
-    //=========================================================================================================
-    /**
-     * Update FwdCoilSet and store into sensors struct.
-     *
-     * @param[in] iAcc       The accuracy level to use for the sensor set. Defaults to 2 (highest).
-     *
-     */
-    void updateSensor(const int iAcc = 2);
 
     //=========================================================================================================
     /**
