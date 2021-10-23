@@ -274,6 +274,15 @@ public:
 
     //=========================================================================================================
     /**
+     * Update the channellist for init and if bads changed
+     *
+     * @param[in] pFiffInfo       The FiffInfo file from the measurement.
+     *
+     */
+    void updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+
+    //=========================================================================================================
+    /**
      * Update FwdCoilSet and store into sensors struct.
      *
      * @param[in] iAcc       The accuracy level to use for the sensor set. Defaults to 2 (highest).
@@ -391,15 +400,6 @@ private:
     double objectTrans(const Eigen::MatrixXd matHeadCoil,
                        const Eigen::MatrixXd matCoil,
                        const Eigen::MatrixXd matTrans);
-
-    //=========================================================================================================
-    /**
-     * Update the channellist for init and if bads changed
-     *
-     * @param[in] pFiffInfo       The FiffInfo file from the measurement.
-     *
-     */
-    void updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     QList<FIFFLIB::FiffChInfo>          m_lChannels;        /**< Channellist with bads excluded. */
     QVector<int>                        m_vecInnerind;      /**< index of inner channels . */
