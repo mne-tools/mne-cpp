@@ -81,6 +81,24 @@ using namespace FWDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
+HPIFit::HPIFit()
+{
+    // init member variables
+    m_lChannels = QList<FIFFLIB::FiffChInfo>();
+    m_vecInnerind = QVector<int>();
+    m_sensors = SensorSet();
+    m_lBads = QList<QString>();
+    m_matModel = MatrixXd(0,0);
+    m_vecFreqs = QVector<int>();
+
+    // read coil_def.dat
+    QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
+    m_pCoilTemplate = QSharedPointer<FWDLIB::FwdCoilSet>(FwdCoilSet::read_coil_defs(qPath));
+
+}
+
+//=============================================================================================================
+
 HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
 {
     // init member variables
