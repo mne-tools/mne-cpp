@@ -91,6 +91,10 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
     m_matModel = MatrixXd(0,0);
     m_vecFreqs = QVector<int>();
 
+    // read coil_def.dat
+    QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
+    m_pCoilTemplate = QSharedPointer<FWDLIB::FwdCoilSet>(FwdCoilSet::read_coil_defs(qPath));
+
     updateChannels(pFiffInfo);
     int iAcc = 2;
     updateSensor(iAcc);
@@ -669,46 +673,6 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd matNH, MatrixXd ma
 
 //=============================================================================================================
 
-void HPIFit::createSensorSet(SensorSet& sensors,
-                             QSharedPointer<FWDLIB::FwdCoilSet> coils)
-{
-    int iNchan = coils->ncoil;
-
-    // init sensor struct
-    int iNp = coils->coils[0]->np;
-    sensors.w = RowVectorXd(iNchan*iNp);
-    sensors.r0 = MatrixXd(iNchan,3);
-    sensors.cosmag = MatrixXd(iNchan*iNp,3);
-    sensors.rmag = MatrixXd(iNchan*iNp,3);
-    sensors.ncoils = iNchan;
-    sensors.tra = MatrixXd::Identity(iNchan,iNchan);
-    sensors.np = iNp;
-
-    for(int i = 0; i < iNchan; i++){
-        FwdCoil* coil = (coils->coils[i]);
-        MatrixXd matRmag = MatrixXd::Zero(iNp,3);
-        MatrixXd matCosmag = MatrixXd::Zero(iNp,3);
-        RowVectorXd vecW(iNp);
-
-        sensors.r0(i,0) = coil->r0[0];
-        sensors.r0(i,1) = coil->r0[1];
-        sensors.r0(i,2) = coil->r0[2];
-
-        for (int p = 0; p < iNp; p++){
-            sensors.w(i*iNp+p) = coil->w[p];
-            for (int c = 0; c < 3; c++) {
-                matRmag(p,c)   = coil->rmag[p][c];
-                matCosmag(p,c) = coil->cosmag[p][c];
-            }
-        }
-
-        sensors.cosmag.block(i*iNp,0,iNp,3) = matCosmag;
-        sensors.rmag.block(i*iNp,0,iNp,3) = matRmag;
-    }
-}
-
-//=============================================================================================================
-
 void HPIFit::storeHeadPosition(float fTime,
                                const Eigen::MatrixXf& transDevHead,
                                Eigen::MatrixXd& matPosition,
@@ -751,23 +715,49 @@ void HPIFit::storeHeadPosition(float fTime,
 void HPIFit::updateSensor(const int iAcc)
 {
     // Create MEG-Coils and read data
-    int iNch = m_lChannels.size();
+    int iNchan = m_lChannels.size();
 
-    if(iNch == 0) {
+    if(iNchan == 0) {
+        std::cout<<std::endl<< "HPIFit::updateSensor - No channels. Returning.";
         return;
     }
 
     FiffCoordTransOld* t = NULL;
 
-    if(m_pCoilTemplate.isNull()) {
-        // read coil_def.dat
-        QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
-        m_pCoilTemplate = QSharedPointer<FWDLIB::FwdCoilSet>(FwdCoilSet::read_coil_defs(qPath));
-    }
-
     // create sensor set
-    m_pCoilMeg = QSharedPointer<FWDLIB::FwdCoilSet>(m_pCoilTemplate->create_meg_coils(m_lChannels, iNch, iAcc, t));
-    createSensorSet(m_sensors, m_pCoilMeg);
+    QSharedPointer<FWDLIB::FwdCoilSet> pCoilMeg = QSharedPointer<FWDLIB::FwdCoilSet>(m_pCoilTemplate->create_meg_coils(m_lChannels, iNchan, iAcc, t));
+
+    // init sensor struct
+    int iNp = pCoilMeg->coils[0]->np;
+    m_sensors.w = RowVectorXd(iNchan*iNp);
+    m_sensors.r0 = MatrixXd(iNchan,3);
+    m_sensors.cosmag = MatrixXd(iNchan*iNp,3);
+    m_sensors.rmag = MatrixXd(iNchan*iNp,3);
+    m_sensors.ncoils = iNchan;
+    m_sensors.tra = MatrixXd::Identity(iNchan,iNchan);
+    m_sensors.np = iNp;
+
+    for(int i = 0; i < iNchan; i++){
+        FwdCoil* coil = (pCoilMeg->coils[i]);
+        MatrixXd matRmag = MatrixXd::Zero(iNp,3);
+        MatrixXd matCosmag = MatrixXd::Zero(iNp,3);
+        RowVectorXd vecW(iNp);
+
+        m_sensors.r0(i,0) = coil->r0[0];
+        m_sensors.r0(i,1) = coil->r0[1];
+        m_sensors.r0(i,2) = coil->r0[2];
+
+        for (int p = 0; p < iNp; p++){
+            m_sensors.w(i*iNp+p) = coil->w[p];
+            for (int c = 0; c < 3; c++) {
+                matRmag(p,c)   = coil->rmag[p][c];
+                matCosmag(p,c) = coil->cosmag[p][c];
+            }
+        }
+
+        m_sensors.cosmag.block(i*iNp,0,iNp,3) = matCosmag;
+        m_sensors.rmag.block(i*iNp,0,iNp,3) = matRmag;
+    }
 }
 
 //=============================================================================================================
