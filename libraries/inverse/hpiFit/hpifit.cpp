@@ -81,9 +81,7 @@ using namespace FWDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo,
-               bool bDoFastFit)
-    : m_bDoFastFit(bDoFastFit)
+HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
 {
     // init member variables
     m_lChannels = QList<FIFFLIB::FiffChInfo>();
@@ -142,7 +140,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
     // check if we have to update the model
     if(bUpdateModel || (m_matModel.rows() == 0) || (m_vecFreqs != vecFreqs) || (t_mat.cols() != m_matModel.cols())) {
-        updateModel(pFiffInfo->sfreq, t_mat.cols(), pFiffInfo->linefreq, vecFreqs, m_matModel);
+        updateModel(pFiffInfo->sfreq, t_mat.cols(), pFiffInfo->linefreq, vecFreqs, m_bDoFastFit);
         m_vecFreqs = vecFreqs;
         bUpdateModel = false;
     }
@@ -402,7 +400,7 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
                                const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                                Eigen::MatrixXd& matAmplitudes,
                                const int iLineFreq,
-                               const bool bAdvanced)
+                               const bool bBasic)
 {
     // meta data
     int iNumCoils = vecFreqs.size();
@@ -413,18 +411,18 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
         return;
     }
 
-    // check if number of freuencies matches data
-    if(iNumCoils != matData.cols()) {
-        std::cout<<std::endl<< "HPIFit::fitHPI - Not enough coil frequencies specified. Returning.";
-        return;
-    }
+//    // check if number of freuencies matches data
+//    if(iNumCoils != matData.cols()) {
+//        std::cout<<std::endl<< "HPIFit::fitHPI - Not enough coil frequencies specified. Returning.";
+//        return;
+//    }
 
     // check if we need to update the model (bads, frequencies)
     if(!(m_lBads == pFiffInfo->bads) || m_lChannels.isEmpty() || m_matModel.rows()==0) {
         m_lBads = pFiffInfo->bads;
         updateChannels(pFiffInfo);
         updateSensor();
-        updateModel(pFiffInfo->sfreq, matData.cols(), pFiffInfo->linefreq, vecFreqs, m_matModel);
+        updateModel(pFiffInfo->sfreq, matData.cols(), pFiffInfo->linefreq, vecFreqs, bBasic);
     }
 
     // extract data for channels to use
@@ -443,7 +441,7 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
 
     // select sine or cosine part
 
-    if(bAdvanced) {
+    if(bBasic) {
         // Select sine or cosine component depending on the relative size
         matTopo.transposeInPlace();
         matAmp = matTopo.leftCols(iNumCoils);
@@ -801,13 +799,13 @@ void HPIFit::updateModel(const int iSamF,
                          const int iSamLoc,
                          const int iLineF,
                          const QVector<int>& vecFreqs,
-                         MatrixXd m_matModel)
+                         bool bBasic)
 {
     int iNumCoils = vecFreqs.size();
     MatrixXd matSimsig;
     VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
 
-    if(m_bDoFastFit){
+    if(bBasic){
         // Generate simulated data Matrix
         matSimsig.conservativeResize(iSamLoc,iNumCoils*2);
 
@@ -820,25 +818,30 @@ void HPIFit::updateModel(const int iSamF,
 
     } else {
         // add linefreq + harmonics + DC part to model
-        matSimsig.conservativeResize(iSamLoc,iNumCoils*4);
+        matSimsig.conservativeResize(iSamLoc,iNumCoils*4+2);
         for(int i = 0; i < iNumCoils; ++i) {
             matSimsig.col(i) = sin(2*M_PI*vecFreqs[i]*vecTime.array());
             matSimsig.col(i+iNumCoils) = cos(2*M_PI*vecFreqs[i]*vecTime.array());
-            matSimsig.col(i+2*iNumCoils) = sin(2*M_PI*iLineF*i*vecTime.array());
-            matSimsig.col(i+3*iNumCoils) = cos(2*M_PI*iLineF*i*vecTime.array());
+            matSimsig.col(i+2*iNumCoils) = sin(2*M_PI*iLineF*(i+1)*vecTime.array());
+            matSimsig.col(i+3*iNumCoils) = cos(2*M_PI*iLineF*(i+1)*vecTime.array());
         }
-        matSimsig.col(14) = RowVectorXd::LinSpaced(iSamLoc, -0.5, 0.5);
-        matSimsig.col(15).fill(1);
+        matSimsig.col(iNumCoils*4) = RowVectorXd::LinSpaced(iSamLoc, -0.5, 0.5);
+        matSimsig.col(iNumCoils*4+1).fill(1);
     }
     m_matModel = UTILSLIB::MNEMath::pinv(matSimsig);
-
-    // reorder for faster computation
     MatrixXd matTemp = m_matModel;
-    RowVectorXi vecIndex(2*iNumCoils);
-    vecIndex << 0,4,1,5,2,6,3,7;
-    for(int i = 0; i < vecIndex.size(); ++i) {
-        matTemp.row(i) = m_matModel.row(vecIndex(i));
+    // reorder so that sin and cos with same freq. are next to each other
+    int iC = 0;
+    std::vector<int> vec(2*iNumCoils);
+    for(int i = 1; i < 2*iNumCoils; i=i+2) {
+        vec[i-1] = iC;
+        vec[i] = iC+iNumCoils;
+        iC++;
     }
+    for(int i = 0; i < 2*iNumCoils; ++i) {
+        matTemp.row(i) = m_matModel.row(vec[i]);
+    }
+
     m_matModel = matTemp;
 }
 

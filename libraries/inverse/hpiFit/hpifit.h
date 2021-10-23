@@ -147,8 +147,7 @@ public:
      * @param[in] pFiffInfo        Associated Fiff Information.
      * @param[in] bDoFastFit       Do the fast fit by fitting to the more basic Model.
      */
-    explicit HPIFit(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                    bool bDoFastFit = false);
+    explicit HPIFit(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -221,7 +220,7 @@ public:
                            const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                            Eigen::MatrixXd& matAmplitudes,
                            const int iLineFreq = 60,
-                           const bool bAdvanced = true);
+                           const bool bBasic = false);
 
     //=========================================================================================================
     /**
@@ -294,13 +293,13 @@ public:
      * @param[in] iSamLoc           The minimum samples required to localize numLoc times in a second.
      * @param[in] iLineF            The line frequency.
      * @param[in] vecFreqs          The frequencies for each coil in unknown order.
-     * @param[out] m_matModel       The model that contains the sines/cosines for the hpi fit
+     * @param[in] bBasic            Use the basic model yes/no.
      */
     void updateModel(const int iSamF,
                      const int iSamLoc,
                      const int iLineF,
                      const QVector<int>& vecFreqs,
-                     Eigen::MatrixXd m_matModel);
+                     bool bBasic);
 
     //=========================================================================================================
     /**

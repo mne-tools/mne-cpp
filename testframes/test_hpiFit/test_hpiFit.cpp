@@ -91,22 +91,17 @@ public:
 
 private slots:
     void initTestCase();
-    void compareFrequencies();
-    void compareTranslation();
-    void compareRotation();
-    void compareAngle();
-    void compareMove();
-    void compareDetect();
-    void compareTime();
+    void testConstructor();
+    void testUpdateModel_basic_4coils();
+    void testUpdateModel_basic_5coils();
+    void testUpdateModel_advanced_4coils();
+    void testUpdateModel_advanced_5coils();
+    void testComputeAmplitudes_basic();
     void cleanupTestCase();
-
 private:
-    double dErrorTrans;
-    double dErrorQuat;
-    double dErrorTime;
-    double dErrorAngle;
-    double dErrorDetect;
-    MatrixXd mRefPos;
+    FiffRawData m_raw;
+    QSharedPointer<FiffInfo>  m_pFiffInfo;
+    MatrixXd m_matData;
     MatrixXd mHpiPos;
     MatrixXd mRefResult;
     MatrixXd mHpiResult;
@@ -116,216 +111,263 @@ private:
 //=============================================================================================================
 
 TestHpiFit::TestHpiFit()
-: dErrorTrans(0.0003),
-dErrorQuat(0.002),
-dErrorTime(0.00000001),
-dErrorAngle(0.1),
-dErrorDetect(0.0)
 {
 }
+
+//=============================================================================================================
+
+void TestHpiFit::testConstructor()
+{
+    /// prepare
+    //
+
+    /// act
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+
+    /// assert
+}
+
 
 //=============================================================================================================
 
 void TestHpiFit::initTestCase()
 {
     qInstallMessageHandler(ApplicationLogger::customLogWriter);
-    qInfo() << "Error Translation" << dErrorTrans;
-    qInfo() << "Error Quaternion" << dErrorQuat;
+
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
 
     // Make sure test folder exists
     QFileInfo t_fileInInfo(t_fileIn);
     QDir().mkdir(t_fileInInfo.path());
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Read Raw and HPI fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
-
     // Setup for reading the raw data
-    FiffRawData raw;
-    raw = FiffRawData(t_fileIn);
-    QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo(raw.info));
+    FiffRawData m_raw;
+    m_raw = FiffRawData(t_fileIn);
+    m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo(m_raw.info));
 
-    // Only filter MEG channels
-    RowVectorXi picks = raw.info.pick_types(true, false, false);
-    RowVectorXd cals;
-
-    FiffCoordTrans devHeadT = pFiffInfo->dev_head_t;
-
-    // Set up the reading parameters
-    fiff_int_t from;
-    fiff_int_t to;
-    fiff_int_t first = raw.first_samp;
-    fiff_int_t last = raw.last_samp;
-    MatrixXd mData, mTimes;
-
-    float quantum_sec = 0.2f;   //read and write in 200 ms junks
-    fiff_int_t quantum = ceil(quantum_sec*pFiffInfo->sfreq);
-
-    // Read Quaternion File from maxfilter and calculated movements/rotations with python
-    IOUtils::read_eigen_matrix(mRefPos, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
-    IOUtils::read_eigen_matrix(mRefResult, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_angle_move.txt");
-
-    mHpiResult = mRefResult;
-
-    // define thresholds for big head movement detection
-    float threshRot = 2.0f;
-    float threshTrans = 0.002f;
-
-    // Setup informations for HPI fit
-    vFreqs = {154,158,161,166};
-    QVector<double> vError;
-    VectorXd vGoF;
-    FiffDigPointSet fittedPointSet;
-    Eigen::MatrixXd mProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
-    QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
-    bool bDoDebug = false;
-    bool bDrop = false;
-    HPIFit HPI = HPIFit(pFiffInfo, true);
-
-    // bring frequencies into right order
-    from = first + mRefPos(0,0)*pFiffInfo->sfreq;
-    to = from + quantum;
-    if(!raw.read_raw_segment(mData, mTimes, from, to)) {
+    // read data segment (200 samples)
+    int iBuffer = 200;
+    MatrixXd matTimes;
+    if(!m_raw.read_raw_segment(m_matData, matTimes, m_raw.first_samp,  m_raw.first_samp + iBuffer-1)) {
         qCritical("error during read_raw_segment");
     }
-    qInfo() << "[done]";
 
-    qInfo() << "Order Frequecies: ...";
-    HPI.findOrder(mData,
-                  mProjectors,
-                  pFiffInfo->dev_head_t,
-                  vFreqs,
-                  vError,
-                  vGoF,
-                  fittedPointSet,
-                  pFiffInfo);
-    qInfo() << "[done]";
+}
 
-    for(int i = 0; i < mRefPos.rows(); i++) {
-        from = first + mRefPos(i,0)*pFiffInfo->sfreq;
-        to = from + quantum;
-        if (to > last) {
-            to = last;
-        }
-        qInfo()  << "Reading...";
-        if(!raw.read_raw_segment(mData, mTimes, from, to)) {
-            qWarning("error during read_raw_segment\n");
-        }
+//=============================================================================================================
 
-        qInfo()  << "HPI-Fit...";
-        HPI.fitHPI(mData,
-                   mProjectors,
-                   pFiffInfo->dev_head_t,
-                   vFreqs,
-                   vError,
-                   vGoF,
-                   fittedPointSet,
-                   pFiffInfo,
-                   bDrop,
-                   bDoDebug = 0,
-                   sHPIResourceDir,
-                   200,
-                   1e-5f);
-        qInfo() << "[done]\n";
+void TestHpiFit::testUpdateModel_basic_4coils()
+{
+    /// Prepare
+    // Create HPI object
+    HPIFit HPI = HPIFit(m_pFiffInfo);
 
-        if(MNEMath::compareTransformation(devHeadT.trans, pFiffInfo->dev_head_t.trans, threshRot, threshTrans)) {
-            mHpiResult(i,2) = 1;
-        }
+    // init test data
+    int iSamF = 1000;
+    int iLineF = 60;
+    int iSamLoc = 200;
+    bool bBasic = true;
+    QVector<int> vecFreqs = {154,158,161,166};
+    int iNumCoils = vecFreqs.size();
 
-        HPIFit::storeHeadPosition(mRefPos(i,0), pFiffInfo->dev_head_t.trans, mHpiPos, vGoF, vError);
-        mHpiResult(i,0) = devHeadT.translationTo(pFiffInfo->dev_head_t.trans);
-        mHpiResult(i,1) = devHeadT.angleTo(pFiffInfo->dev_head_t.trans);
+    // create basic model
+    MatrixXd matModelExpected;
+    MatrixXd matSimsig(iSamLoc,iNumCoils*2);
+    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
 
+    for(int i = 0; i < iNumCoils; ++i) {
+        matSimsig.col(i) = sin(2*M_PI*vecFreqs[i]*vecTime.array());
+        matSimsig.col(i+iNumCoils) = cos(2*M_PI*vecFreqs[i]*vecTime.array());
     }
-    // For debug: position file for HPIFit
-//    UTILSLIB::IOUtils::write_eigen_matrix(mHpiPos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/mHpiPos.txt");
+    matModelExpected = UTILSLIB::MNEMath::pinv(matSimsig);
+
+    /// Act
+    HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
+    MatrixXd matModelActual = HPI.getModel();
+
+    /// Assert
+    // use Summed Difference as measure
+    MatrixXd matDiff = (matModelActual - matModelExpected);
+    double dSD = matDiff.sum();
+    QVERIFY(dSD == 0);
 }
 
-//=============================================================================================================
-
-void TestHpiFit::compareFrequencies()
+void TestHpiFit::testUpdateModel_basic_5coils()
 {
-    QVector<int> vFreqRef {166, 154, 161, 158};
-    QVERIFY(vFreqRef == vFreqs);
+    /// Prepare
+    // Create HPI object
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+
+    // init test data
+    int iSamF = 1000;
+    int iLineF = 60;
+    int iSamLoc = 200;
+    bool bBasic = true;
+    QVector<int> vecFreqs = {154,158,161,166,172};
+    int iNumCoils = vecFreqs.size();
+
+    // create basic model
+    MatrixXd matModelExpected;
+    MatrixXd matSimsig(iSamLoc,iNumCoils*2);
+    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
+
+    for(int i = 0; i < iNumCoils; ++i) {
+        matSimsig.col(i) = sin(2*M_PI*vecFreqs[i]*vecTime.array());
+        matSimsig.col(i+iNumCoils) = cos(2*M_PI*vecFreqs[i]*vecTime.array());
+    }
+    matModelExpected = UTILSLIB::MNEMath::pinv(matSimsig);
+
+    /// Act
+    HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
+    MatrixXd matModelActual = HPI.getModel();
+
+    /// Assert
+    // use Summed Difference as measure
+    MatrixXd matDiff = (matModelActual - matModelExpected);
+    double dSD = matDiff.sum();
+    QVERIFY(dSD == 0);
 }
 
 //=============================================================================================================
 
-void TestHpiFit::compareTranslation()
+void TestHpiFit::testUpdateModel_advanced_4coils()
 {
-    RowVector3d vDiffTrans;
-    vDiffTrans(0) = (mRefPos.col(4)-mHpiPos.col(4)).mean();
-    vDiffTrans(1) = (mRefPos.col(5)-mHpiPos.col(5)).mean();
-    vDiffTrans(2) = (mRefPos.col(6)-mHpiPos.col(6)).mean();
-    qDebug() << "ErrorTrans x: " << std::abs(vDiffTrans(0));
-    qDebug() << "ErrorTrans y: " << std::abs(vDiffTrans(1));
-    qDebug() << "ErrorTrans z: " << std::abs(vDiffTrans(2));
-    QVERIFY(std::abs(vDiffTrans(0)) < dErrorTrans);
-    QVERIFY(std::abs(vDiffTrans(1)) < dErrorTrans);
-    QVERIFY(std::abs(vDiffTrans(2)) < dErrorTrans);
+    /// Prepare
+    // Create HPI object
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+
+    // init test data
+    int iSamF = 1000;
+    int iLineF = 60;
+    int iSamLoc = 200;
+    bool bBasic = false;
+    QVector<int> vecFreqs = {154,158,161,166};
+    int iNumCoils = vecFreqs.size();
+
+    // create basic model
+    MatrixXd matModelExpected;
+    MatrixXd matSimsig(iSamLoc,iNumCoils*4+2);
+    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
+
+    for(int i = 0; i < iNumCoils; ++i) {
+        matSimsig.col(i) = sin(2*M_PI*vecFreqs[i]*vecTime.array());
+        matSimsig.col(i+iNumCoils) = cos(2*M_PI*vecFreqs[i]*vecTime.array());
+        matSimsig.col(i+2*iNumCoils) = sin(2*M_PI*iLineF*(i+1)*vecTime.array());
+        matSimsig.col(i+3*iNumCoils) = cos(2*M_PI*iLineF*(i+1)*vecTime.array());
+    }
+    matSimsig.col(iNumCoils*4) = RowVectorXd::LinSpaced(iSamLoc, -0.5, 0.5);
+    matSimsig.col(iNumCoils*4+1).fill(1);
+
+    matModelExpected = UTILSLIB::MNEMath::pinv(matSimsig);
+
+    // reorder for faster computation
+    MatrixXd matTemp = matModelExpected;
+    RowVectorXi vecIndex(2*iNumCoils);
+
+    vecIndex << 0,4,1,5,2,6,3,7;
+    for(int i = 0; i < vecIndex.size(); ++i) {
+        matTemp.row(i) = matModelExpected.row(vecIndex(i));
+    }
+    matModelExpected = matTemp;
+
+    /// Act
+    HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
+    MatrixXd matModelActual = HPI.getModel();
+
+    /// Assert
+    // use Summed Difference as measure
+    MatrixXd matDiff = (matModelActual - matModelExpected);
+    double dSD = matDiff.sum();
+    QVERIFY(dSD == 0);
 }
 
-//=============================================================================================================
-
-void TestHpiFit::compareRotation()
+void TestHpiFit::testUpdateModel_advanced_5coils()
 {
-    RowVector3d vDiffQuat;
-    vDiffQuat(0) = (mRefPos.col(1)-mHpiPos.col(1)).mean();
-    vDiffQuat(1) = (mRefPos.col(2)-mHpiPos.col(2)).mean();
-    vDiffQuat(2) = (mRefPos.col(3)-mHpiPos.col(3)).mean();
-    qDebug() << "ErrorQuat q1: " <<std::abs(vDiffQuat(0));
-    qDebug() << "ErrorQuat q2: " <<std::abs(vDiffQuat(1));
-    qDebug() << "ErrorQuat q3: " <<std::abs(vDiffQuat(2));
-    QVERIFY(std::abs(vDiffQuat(0)) < dErrorQuat);
-    QVERIFY(std::abs(vDiffQuat(1)) < dErrorQuat);
-    QVERIFY(std::abs(vDiffQuat(2)) < dErrorQuat);
+    /// Prepare
+    // Create HPI object
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+
+    // init test data
+    int iSamF = 1000;
+    int iLineF = 60;
+    int iSamLoc = 600;
+    bool bBasic = false;
+    QVector<int> vecFreqs = {154,158,161,166,172};
+    int iNumCoils = vecFreqs.size();
+
+    // create basic model
+    MatrixXd matModelExpected;
+    MatrixXd matSimsig(iSamLoc,iNumCoils*4+2);
+    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
+
+    for(int i = 0; i < iNumCoils; ++i) {
+        matSimsig.col(i) = sin(2*M_PI*vecFreqs[i]*vecTime.array());
+        matSimsig.col(i+iNumCoils) = cos(2*M_PI*vecFreqs[i]*vecTime.array());
+        matSimsig.col(i+2*iNumCoils) = sin(2*M_PI*iLineF*(i+1)*vecTime.array());
+        matSimsig.col(i+3*iNumCoils) = cos(2*M_PI*iLineF*(i+1)*vecTime.array());
+    }
+    matSimsig.col(iNumCoils*4) = RowVectorXd::LinSpaced(iSamLoc, -0.5, 0.5);
+    matSimsig.col(iNumCoils*4+1).fill(1);
+
+    // IOUtils::write_eigen_matrix(matSimsig, QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + "test.txt");
+
+    matModelExpected = UTILSLIB::MNEMath::pinv(matSimsig);
+
+    // reorder for faster computation
+    MatrixXd matTemp = matModelExpected;
+    RowVectorXi vecIndex(2*iNumCoils);
+
+    vecIndex << 0,5,1,6,2,7,3,8,4,9;
+    for(int i = 0; i < vecIndex.size(); ++i) {
+        matTemp.row(i) = matModelExpected.row(vecIndex(i));
+    }
+    matModelExpected = matTemp;
+
+    /// Act
+    HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
+    MatrixXd matModelActual = HPI.getModel();
+
+    /// Assert
+    // use Summed Difference as measure
+    MatrixXd matDiff = (matModelActual - matModelExpected);
+    double dSD = matDiff.sum();
+    QVERIFY(dSD == 0);
 }
 
 //=============================================================================================================
 
-void TestHpiFit::compareMove()
+void TestHpiFit::testComputeAmplitudes_basic()
 {
-    float fDiffMove = (mRefResult.col(0)-mHpiResult.col(0)).mean();
-    fDiffMove = std::abs(fDiffMove);
+    /// Prepare
+    // simulate data
+    HPIFit HPI = HPIFit(m_pFiffInfo);
 
-    qDebug() << "DiffMove: [m]" << fDiffMove;
-    QVERIFY(std::abs(fDiffMove) < dErrorTrans);
+    // init test data
+    QVector<int> vecFreqs = {154,158,161,166};
+    int iNumCoils = vecFreqs.size();
+    int iSamF = 1000;
+    int iLineF = 60;
+    int iSamLoc = m_matData.cols();
+    bool bBasic = false;
+    double dAmplitude = 0.5;
+
+    // simulate data
+    MatrixXd matAmpExpected;
+    MatrixXd matSimData(m_matData);
+    MatrixXd matModel;
+    matSimData.fill(0);
+    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
+
+    for(int i = 0; i < iNumCoils; ++i) {
+        matSimData.row(i) = dAmplitude * sin(2*M_PI*vecFreqs[i]*vecTime.array());
+        matSimData.row(i+iNumCoils).fill(0);
+    }
+
+    /// Act
+    MatrixXd matAmpActual;
+    HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
+    HPI.computeAmplitudes(matSimData,vecFreqs,m_pFiffInfo,matAmpActual,m_pFiffInfo->linefreq,bBasic);
 }
-
-//=============================================================================================================
-
-void TestHpiFit::compareAngle()
-{
-    float fDiffAngle = (mRefResult.col(1)-mRefResult.col(1)).mean();
-    fDiffAngle = std::abs(fDiffAngle);
-
-    qDebug() << "DiffAngle: [degree]" << fDiffAngle;
-    QVERIFY(std::abs(fDiffAngle) < dErrorAngle);
-}
-
-//=============================================================================================================
-
-void TestHpiFit::compareDetect()
-{
-    float fDiffCompare = (mRefResult.col(2)-mRefResult.col(2)).mean();
-    fDiffCompare = std::abs(fDiffCompare);
-
-    qDebug() << "DiffCompare: " << fDiffCompare;
-    QVERIFY(std::abs(fDiffCompare) == dErrorDetect);
-}
-
-//=============================================================================================================
-
-void TestHpiFit::compareTime()
-{
-    MatrixXd mDiff = MatrixXd::Zero(mRefPos.rows(),1);
-    mDiff.col(0) = mRefPos.col(0)-mHpiPos.col(0);
-    float fDiffTime = mDiff.col(0).mean();
-
-    qDebug() << "ErrorTime: " << fDiffTime;
-    QVERIFY(std::abs(fDiffTime) < dErrorTime);
-}
-
-//=============================================================================================================
 
 void TestHpiFit::cleanupTestCase()
 {
