@@ -90,8 +90,15 @@ public:
     TestHpiFit();
 
 private slots:
-    void initTestCase();
-    void testConstructor();
+    void initTestCase();                        // run once at the very beginning
+    void init();                                // run before each test
+    void testConstructor_channels();            // compare channel lists (no lists)
+    void testConstructor_bads();                // compare bad channels
+    void testConstructor_channels_bads();       // compare channel list when bads are included
+    void testConstructor_channels_bads_size();  // compare expected size when bads included
+    void testConstructor_sensors();             // check size of sensor struct for sensorset from constructor, acc = 2
+    void testUpdateSensors_acc1();              // check size of updated sensor struct for sensorset, acc = 1
+
     void testUpdateModel_basic_4coils();
     void testUpdateModel_basic_5coils();
     void testUpdateModel_advanced_4coils();
@@ -116,22 +123,9 @@ TestHpiFit::TestHpiFit()
 
 //=============================================================================================================
 
-void TestHpiFit::testConstructor()
-{
-    /// prepare
-    //
-
-    /// act
-    HPIFit HPI = HPIFit(m_pFiffInfo);
-
-    /// assert
-}
-
-
-//=============================================================================================================
-
 void TestHpiFit::initTestCase()
 {
+
     qInstallMessageHandler(ApplicationLogger::customLogWriter);
 
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
@@ -141,9 +135,7 @@ void TestHpiFit::initTestCase()
     QDir().mkdir(t_fileInInfo.path());
 
     // Setup for reading the raw data
-    FiffRawData m_raw;
     m_raw = FiffRawData(t_fileIn);
-    m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FiffInfo(m_raw.info));
 
     // read data segment (200 samples)
     int iBuffer = 200;
@@ -151,7 +143,169 @@ void TestHpiFit::initTestCase()
     if(!m_raw.read_raw_segment(m_matData, matTimes, m_raw.first_samp,  m_raw.first_samp + iBuffer-1)) {
         qCritical("error during read_raw_segment");
     }
+}
 
+//=============================================================================================================
+
+void TestHpiFit::init()
+{
+    m_pFiffInfo =  QSharedPointer<FiffInfo>(new FiffInfo(m_raw.info));
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testConstructor_channels()
+{
+    /// prepare
+    int iNumCh = m_pFiffInfo->nchan;
+    QList<FIFFLIB::FiffChInfo> lChannelsExpected;
+    for (int i = 0; i < iNumCh; ++i) {
+        if(m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
+            // Check if the sensor is bad, if not append to innerind
+            if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
+                lChannelsExpected.append(m_pFiffInfo->chs[i]);
+            }
+        }
+    }
+
+    /// act
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+    QList<FIFFLIB::FiffChInfo> lChannelsActual = HPI.getChannels();
+
+    /// assert
+    QVERIFY(lChannelsExpected == lChannelsActual);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testConstructor_bads()
+{
+    /// prepare
+    // set some  bad channels
+    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
+    QList<QString> lBadsExpected = m_pFiffInfo->bads;
+
+    /// act
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+    QList<QString> lBadsActual = HPI.getBads();
+
+    /// assert
+    QVERIFY(lBadsExpected == lBadsActual);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testConstructor_channels_bads()
+{
+    /// prepare
+    // set some  bad channels
+    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
+    QList<QString> lBadsExpected = m_pFiffInfo->bads;
+
+    /// prepare
+    int iNumCh = m_pFiffInfo->nchan;
+    QList<FIFFLIB::FiffChInfo> lChannelsExpected;
+    for (int i = 0; i < iNumCh; ++i) {
+        if(m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
+            // Check if the sensor is bad, if not append to innerind
+            if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
+                lChannelsExpected.append(m_pFiffInfo->chs[i]);
+            }
+        }
+    }
+
+    /// act
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+    QList<FIFFLIB::FiffChInfo> lChannelsActual = HPI.getChannels();
+
+    /// assert
+    QVERIFY(lChannelsExpected == lChannelsActual);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testConstructor_channels_bads_size()
+{
+    /// prepare
+    // set some  bad channels
+    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
+    QList<QString> lBadsExpected = m_pFiffInfo->bads;
+    int iNChanExpected = 202; // 204 gradiometers - 2 bads
+
+    /// act
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+    QList<FIFFLIB::FiffChInfo> lChannelsActual = HPI.getChannels();
+    int iNChanActual = lChannelsActual.size();
+
+    /// assert
+    QVERIFY(iNChanActual == iNChanExpected);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testConstructor_sensors()
+{
+    /// prepare
+    // use already tested functions to get channels
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+    QList<FIFFLIB::FiffChInfo> lChannels = HPI.getChannels();
+
+    // create vector with expected sizes of sensor struct data
+    int iNChan = lChannels.size();  // number of channels
+    int iAcc = 2;                   // accuracy to use
+    int iNp = 8;                    // 8 integration points for acc 2
+    int iNRmag = iNp * iNChan;      // expected number of points for computation, 8 for each sensor -> 8*204
+    int iNCosmag = iNp * iNChan;    // same as rmag
+    int iNTra = iNChan*iNChan;      // size square matrix 204*204
+    int iNW = iNp * iNChan;         // one weight for each point
+
+    /// act
+    SensorSet sensorsActual = HPI.getSensors();
+
+    /// assert
+    QVERIFY2(iNp == sensorsActual.np,"Number of integration points does not match.");
+    QVERIFY2(iNChan == sensorsActual.ncoils,"Number of channels does not match.");
+    QVERIFY2(iNRmag == sensorsActual.rmag.rows(),"Number of points for computation does not match.");
+    QVERIFY2(iNCosmag == sensorsActual.cosmag.rows(),"Number of points for computation does not match.");
+    QVERIFY2(iNTra == sensorsActual.tra.size(),"Size of square matrix does not match.");
+    QVERIFY2(iNW == sensorsActual.w.size(),"Number of iweights does not match");
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testUpdateSensors_acc1()
+{
+    /// prepare
+    // use already tested functions to get channels
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+    QList<FIFFLIB::FiffChInfo> lChannels = HPI.getChannels();
+
+    // create vector with expected sizes of sensor struct data
+    int iNChan = lChannels.size();  // number of channels
+    int iAcc = 1;                   // accuracy to use
+    int iNp = 4;                    // 4 integration points for acc 1
+    int iNRmag = iNp * iNChan;      // expected number of points for computation, 4 for each sensor -> 4*204
+    int iNCosmag = iNp * iNChan;    // same as rmag
+    int iNTra = iNChan*iNChan;      // size square matrix 204*204
+    int iNW = iNp * iNChan;         // one weight for each point
+
+    /// act
+    HPI.updateSensor(iAcc);
+    SensorSet sensorsActual = HPI.getSensors();
+
+    /// assert
+    QVERIFY2(iNp == sensorsActual.np,"Number of integration points does not match.");
+    QVERIFY2(iNChan == sensorsActual.ncoils,"Number of channels does not match.");
+    QVERIFY2(iNRmag == sensorsActual.rmag.rows(),"Number of points for computation does not match.");
+    QVERIFY2(iNCosmag == sensorsActual.cosmag.rows(),"Number of points for computation does not match.");
+    QVERIFY2(iNTra == sensorsActual.tra.size(),"Size of square matrix does not match.");
+    QVERIFY2(iNW == sensorsActual.w.size(),"Number of iweights does not match");
 }
 
 //=============================================================================================================
@@ -191,6 +345,8 @@ void TestHpiFit::testUpdateModel_basic_4coils()
     double dSD = matDiff.sum();
     QVERIFY(dSD == 0);
 }
+
+//=============================================================================================================
 
 void TestHpiFit::testUpdateModel_basic_5coils()
 {
@@ -280,6 +436,8 @@ void TestHpiFit::testUpdateModel_advanced_4coils()
     double dSD = matDiff.sum();
     QVERIFY(dSD == 0);
 }
+
+//=============================================================================================================
 
 void TestHpiFit::testUpdateModel_advanced_5coils()
 {
