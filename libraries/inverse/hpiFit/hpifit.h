@@ -144,6 +144,14 @@ public:
     /**
      * Default constructor.
      *
+     */
+    explicit HPIFit();
+
+    //=========================================================================================================
+
+    /**
+     * Constructs the HPI object with FiffInfo.
+     *
      * @param[in] pFiffInfo        Associated Fiff Information.
      */
     explicit HPIFit(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
