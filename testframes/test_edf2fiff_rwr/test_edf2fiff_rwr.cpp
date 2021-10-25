@@ -169,6 +169,7 @@ void TestEDF2FIFFRWR::testEDFReadAndFiffWrite()
     outfid->finish_writing_raw();
 
     QVERIFY(iSamplesRead == m_pEDFRaw->getInfo().getSampleCount());
+    QVERIFY(false);
 }
 
 

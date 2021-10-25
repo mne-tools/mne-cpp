@@ -214,6 +214,7 @@ void TestCoregistration::initTestCase()
 
 void TestCoregistration::compareFitMatchedPoints()
 {
+    QVERIFY(false);
     QVERIFY(transFitMatchedRef == transFitMatched);
 }
 
