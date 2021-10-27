@@ -148,13 +148,25 @@ public:
     explicit HPIFit();
 
     //=========================================================================================================
-
     /**
      * Constructs the HPI object with FiffInfo.
      *
      * @param[in] pFiffInfo        Associated Fiff Information.
      */
     explicit HPIFit(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+
+    //=========================================================================================================
+    /**
+     * Initiaze the HPI Fitting.
+     *
+     * @param[in] pFiffInfo        Associated Fiff Information.
+     * @param[in] matProjectors    The projectors to apply. Bad channels are still included.
+     * @param[in] iAcc             The accuracy level to use for the sensor set. Defaults to 2 (highest).
+     */
+    void init(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+              const Eigen::MatrixXd matProjectors,
+              const int iAcc = 2);
+
 
     //=========================================================================================================
     /**
@@ -313,13 +325,14 @@ public:
      * @param[in] matProjectors     The projector matrix.
      *
      */
-    void prepareProj(const Eigen::MatrixXd& matProjectors);
+    void updateProjectors(const Eigen::MatrixXd& matProjectors);
 
     //=========================================================================================================
     /**
      * inline get functions for private member variables.
      *
      */
+    inline bool isInitialized() const;
     inline QList<FIFFLIB::FiffChInfo> getChannels() const;
     inline QList<QString> getBads() const;
     inline SensorSet getSensors() const;
@@ -353,7 +366,7 @@ private:
      * Update the digitized HPI coils.
      * @param[in]   lDig          The digitizer list to extract the hpi coils from.
      */
-    void extractHpiDig(const QList<FIFFLIB::FiffDigPoint>& lDig);
+    void updateHpiDigitizer(const QList<FIFFLIB::FiffDigPoint>& lDig);
 
     //=========================================================================================================
     /**
@@ -429,12 +442,18 @@ private:
     QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilTemplate;    /**< */
     QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilMeg;         /**< */
     QVector<int>                        m_vecFreqs;         /**< The frequencies for each coil in unknown order. */
+    bool                                m_isInitialized;    /**< If the object is initialized. */
     bool m_bDoFastFit;  // delete
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline bool HPIFit::isInitialized() const
+{
+    return m_isInitialized;
+}
 
 inline QList<FIFFLIB::FiffChInfo> HPIFit::getChannels() const
 {
