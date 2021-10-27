@@ -111,17 +111,32 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
     m_vecFreqs = QVector<int>();
     m_matHeadHPI = MatrixXd(0,0);
     m_matProjectors = MatrixXd(0,0);
-
+    m_isInitialized = false;
     // read coil_def.dat
     QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
     m_pCoilTemplate = QSharedPointer<FWDLIB::FwdCoilSet>(FwdCoilSet::read_coil_defs(qPath));
+}
 
+//=============================================================================================================
+
+void HPIFit::init(const FiffInfo::SPtr pFiffInfo,
+                  const MatrixXd matProjectors,
+                  const int iAcc)
+{
     // update channel list
     updateChannels(pFiffInfo);
 
     // update sensors
-    int iAcc = 2;
     updateSensor(iAcc);
+
+    // update HPI digitizer
+    updateHpiDigitizer(pFiffInfo->dig);
+
+    // update projectors
+    updateProjectors(matProjectors);
+
+    // set to initialzed
+    m_isInitialized = true;
 }
 
 //=============================================================================================================
@@ -447,7 +462,7 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
         updateModel(pFiffInfo->sfreq, matData.cols(), pFiffInfo->linefreq, vecFreqs, bBasic);
     }
 
-    prepareProj(matProjectors);
+    updateProjectors(matProjectors);
 
     // extract data for channels to use
     MatrixXd matInnerdata(m_vecInnerind.size(), matData.cols());
@@ -515,11 +530,11 @@ void HPIFit::computeCoilLoc(const Eigen::MatrixXd& matAmplitudes,
 
     // update digitized hpi info
     // ToDo: only do when necessary
-    extractHpiDig(pFiffInfo->dig);
+    updateHpiDigitizer(pFiffInfo->dig);
 
     // set projectors
     // ToDo: only do when necessary
-    prepareProj(matProjectors);
+    updateProjectors(matProjectors);
 
     // init coil parameters
     struct CoilParam coil;
@@ -906,7 +921,7 @@ void HPIFit::updateModel(const int iSamF,
 
 //=============================================================================================================
 
-void HPIFit::extractHpiDig(const QList<FiffDigPoint>& lDig)
+void HPIFit::updateHpiDigitizer(const QList<FiffDigPoint>& lDig)
 {
     // extract hpi coils from digitizer
     QList<FiffDigPoint> lHPIPoints;
@@ -928,18 +943,18 @@ void HPIFit::extractHpiDig(const QList<FiffDigPoint>& lDig)
             m_matHeadHPI(i,2) = lHPIPoints.at(i).r[2];
         }
     } else {
-        std::cout << "HPIFit::extractHpiDig - No HPI coils digitized. Returning." << std::endl;
+        std::cout << "HPIFit::updateHpiDigitizer - No HPI coils digitized. Returning." << std::endl;
         return;
     }
 }
 
 //=============================================================================================================
 
-void HPIFit::prepareProj(const Eigen::MatrixXd& matProjectors)
+void HPIFit::updateProjectors(const Eigen::MatrixXd& matProjectors)
 {
     // check if m_vecInnerInd is alreadz initialized
     if(m_vecInnerind.size() == 0) {
-        std::cout << "HPIFit::prepareProj - No channels. Returning." << std::endl;
+        std::cout << "HPIFit::updateProjectors - No channels. Returning." << std::endl;
         return;
     }
 
