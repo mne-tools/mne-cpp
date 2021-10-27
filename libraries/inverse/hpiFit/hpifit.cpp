@@ -90,6 +90,8 @@ HPIFit::HPIFit()
     m_lBads = QList<QString>();
     m_matModel = MatrixXd(0,0);
     m_vecFreqs = QVector<int>();
+    m_matHeadHPI = MatrixXd(0,0);
+    m_matProjectors = MatrixXd(0,0);
 
     // read coil_def.dat
     QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
@@ -107,12 +109,17 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
     m_lBads = pFiffInfo->bads;
     m_matModel = MatrixXd(0,0);
     m_vecFreqs = QVector<int>();
+    m_matHeadHPI = MatrixXd(0,0);
+    m_matProjectors = MatrixXd(0,0);
 
     // read coil_def.dat
     QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
     m_pCoilTemplate = QSharedPointer<FWDLIB::FwdCoilSet>(FwdCoilSet::read_coil_defs(qPath));
 
+    // update channel list
     updateChannels(pFiffInfo);
+
+    // update sensors
     int iAcc = 2;
     updateSensor(iAcc);
 }
@@ -417,6 +424,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 //=============================================================================================================
 
 void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
+                               const MatrixXd& matProjectors,
                                const QVector<int>& vecFreqs,
                                const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                                Eigen::MatrixXd& matAmplitudes,
@@ -427,7 +435,7 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
 
     //Check if data was passed
     if(matData.rows() == 0 || matData.cols() == 0 ) {
-        std::cout<<std::endl<< "HPIFit::fitHPI - No data passed. Returning.";
+        std::cout<<std::endl<< "HPIFit::computeAmplitudes - No data passed. Returning.";
         return;
     }
 
@@ -439,6 +447,8 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
         updateModel(pFiffInfo->sfreq, matData.cols(), pFiffInfo->linefreq, vecFreqs, bBasic);
     }
 
+    prepareProj(matProjectors);
+
     // extract data for channels to use
     MatrixXd matInnerdata(m_vecInnerind.size(), matData.cols());
 
@@ -446,29 +456,22 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
         matInnerdata.row(j) << matData.row(m_vecInnerind[j]);
     }
 
-    // fit linear model
+    // prepare matrices
     MatrixXd matTopo;
     MatrixXd matAmp(m_vecInnerind.size(), iNumCoils);   // sine part
     MatrixXd matAmpC(m_vecInnerind.size(), iNumCoils);  // cosine part
 
-    matTopo = m_matModel * matInnerdata.transpose();
+    // apply projectors
+    MatrixXd matProjData = m_matProjectors * matInnerdata;
 
-    // select sine or cosine part
+    // fit model
+    matTopo = m_matModel * matProjData.transpose();
+    matTopo.transposeInPlace();
 
+    // split into sine and cosine contributions
     if(bBasic) {
-        // Select sine or cosine component depending on the relative size
-        matTopo.transposeInPlace();
         matAmp = matTopo.leftCols(iNumCoils);
         matAmpC = matTopo.rightCols(iNumCoils);
-        for(int j = 0; j < iNumCoils; ++j) {
-            float fNS = 0.0;
-            float fNC = 0.0;
-            fNS = matAmp.col(j).array().square().sum();
-            fNC = matAmpC.col(j).array().square().sum();
-            if(fNC > fNS) {
-                matAmp.col(j) = matAmpC.col(j);
-            }
-        }
     } else {
 //        // estimate the sinusoid phase
 //        for(int i = 0; i < iNumCoils; ++i) {
@@ -477,23 +480,64 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
 //            JacobiSVD<MatrixXd> svd(m, ComputeThinU | ComputeThinV);
 //            matAmp.col(i) = std::abs(svd.singularValues()(0)) * svd.matrixV().col(0);
 //        }
-        matTopo.transposeInPlace();
         matAmp = matTopo.leftCols(iNumCoils);
         matAmpC = matTopo.middleCols(iNumCoils,iNumCoils);
-        for(int j = 0; j < iNumCoils; ++j) {
-            float fNS = 0.0;
-            float fNC = 0.0;
-            fNS = matAmp.col(j).array().square().sum();
-            fNC = matAmpC.col(j).array().square().sum();
-            if(fNC > fNS) {
-                matAmp.col(j) = matAmpC.col(j);
-            }
-        }
+    }
 
+    // Select sine or cosine component depending on their contributions to the amplitudes
+    for(int j = 0; j < iNumCoils; ++j) {
+        float fNS = 0.0;
+        float fNC = 0.0;
+        fNS = matAmp.col(j).array().square().sum();
+        fNC = matAmpC.col(j).array().square().sum();
+        if(fNC > fNS) {
+            matAmp.col(j) = matAmpC.col(j);
+        }
     }
 
     // return data
     matAmplitudes = matAmp;
+}
+
+//=============================================================================================================
+
+void HPIFit::computeCoilLoc(const Eigen::MatrixXd& matAmplitudes,
+                            const MatrixXd& matProjectors,
+                            const FIFFLIB::FiffCoordTrans& transDevHead,
+                            const QVector<int>& vecFreqs,
+                            const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                            Eigen::MatrixXd& matCoilLoc,
+                            int iMaxIterations,
+                            float fAbortError)
+{
+    // get numer of coils
+    int iNumCoils = vecFreqs.size();
+
+    // update digitized hpi info
+    // ToDo: only do when necessary
+    extractHpiDig(pFiffInfo->dig);
+
+    // set projectors
+    // ToDo: only do when necessary
+    prepareProj(matProjectors);
+
+    // init coil parameters
+    struct CoilParam coil;
+    coil.pos = MatrixXd::Zero(iNumCoils,3);
+    coil.mom = MatrixXd::Zero(iNumCoils,3);
+    coil.dpfiterror = VectorXd::Zero(iNumCoils);
+    coil.dpfitnumitr = VectorXd::Zero(iNumCoils);
+
+    // find seed points
+    // 1. check error, if good last fit, use old trafo
+
+    // 2. if not, find max amplitudes in channels
+
+    // 3. go 3 cm inwards from max channels
+
+    // dipole fit
+
+    // return data
 }
 
 //=============================================================================================================
@@ -858,6 +902,60 @@ void HPIFit::updateModel(const int iSamF,
     }
 
     m_matModel = matTemp;
+}
+
+//=============================================================================================================
+
+void HPIFit::extractHpiDig(const QList<FiffDigPoint>& lDig)
+{
+    // extract hpi coils from digitizer
+    QList<FiffDigPoint> lHPIPoints;
+    int iNumCoils = 0;
+
+    for(int i = 0; i < lDig.size(); ++i) {
+        if(lDig[i].kind == FIFFV_POINT_HPI) {
+            iNumCoils++;
+            lHPIPoints.append(lDig[i]);
+        }
+    }
+
+    // convert to matrix iNumCoils x 3
+    if (lHPIPoints.size() > 0) {
+        m_matHeadHPI(iNumCoils,3);
+        for (int i = 0; i < lHPIPoints.size(); ++i) {
+            m_matHeadHPI(i,0) = lHPIPoints.at(i).r[0];
+            m_matHeadHPI(i,1) = lHPIPoints.at(i).r[1];
+            m_matHeadHPI(i,2) = lHPIPoints.at(i).r[2];
+        }
+    } else {
+        std::cout << "HPIFit::extractHpiDig - No HPI coils digitized. Returning." << std::endl;
+        return;
+    }
+}
+
+//=============================================================================================================
+
+void HPIFit::prepareProj(const Eigen::MatrixXd& matProjectors)
+{
+    // check if m_vecInnerInd is alreadz initialized
+    if(m_vecInnerind.size() == 0) {
+        std::cout << "HPIFit::prepareProj - No channels. Returning." << std::endl;
+        return;
+    }
+
+    //Create new projector based on the excluded channels, first exclude the rows then the columns
+    MatrixXd matProjectorsRows(m_vecInnerind.size(),matProjectors.cols());
+    MatrixXd matProjectorsInnerind(m_vecInnerind.size(),m_vecInnerind.size());
+
+    for (int i = 0; i < matProjectorsRows.rows(); ++i) {
+        matProjectorsRows.row(i) = matProjectors.row(m_vecInnerind.at(i));
+    }
+
+    for (int i = 0; i < matProjectorsInnerind.cols(); ++i) {
+        matProjectorsInnerind.col(i) = matProjectorsRows.col(m_vecInnerind.at(i));
+    }
+    m_matProjectors = matProjectorsInnerind;
+    return;
 }
 
 //=============================================================================================================
