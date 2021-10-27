@@ -215,6 +215,7 @@ public:
      * Fit linear model to data to get amplitudes for the dipole fit
      *
      * @param[in]   matData            Data to estimate the HPI positions from.
+     * @param[in]   matProjectors      The projectors to apply. Bad channels are still included.
      * @param[in]   vecFreqs           The ordered coil frequencies.
      * @param[in]   pFiffInfo          Associated Fiff Information.
      * @param[out]  matAmplitudes      The computed amplitudes amplitudes (n_channels x n_coils).
@@ -222,6 +223,7 @@ public:
      *
      */
     void computeAmplitudes(const Eigen::MatrixXd& matData,
+                           const Eigen::MatrixXd& matProjectors,
                            const QVector<int>& vecFreqs,
                            const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                            Eigen::MatrixXd& matAmplitudes,
@@ -232,7 +234,7 @@ public:
      * Compute the coil locations using dipole fit.
      *
      * @param[in]   matAmplitudes      The amplitudes fitted using computeAmplitudes.
-     * @param[in]   t_matProjectors    The projectors to apply. Bad channels are still included.
+     * @param[in]   matProjectors      The projectors to apply. Bad channels are still included.
      * @param[in]   transDevHead       The dev head transformation matrix for an initial guess.
      * @param[in]   pFiffInfo          Associated Fiff Information.
      * @param[out]  matCoilLoc         The computed coil locations.
@@ -306,6 +308,15 @@ public:
 
     //=========================================================================================================
     /**
+     * Set the projectors to use.
+     *
+     * @param[in] matProjectors     The projector matrix.
+     *
+     */
+    void prepareProj(const Eigen::MatrixXd& matProjectors);
+
+    //=========================================================================================================
+    /**
      * inline get functions for private member variables.
      *
      */
@@ -313,6 +324,8 @@ public:
     inline QList<QString> getBads() const;
     inline SensorSet getSensors() const;
     inline Eigen::MatrixXd getModel() const;
+    inline Eigen::MatrixXd getProjectors() const;
+    inline Eigen::MatrixXd getHpiDig() const;
 
     //=========================================================================================================
     /**
@@ -335,6 +348,13 @@ public:
                                   const QVector<double>& vecError);
 
 private:
+    //=========================================================================================================
+    /**
+     * Update the digitized HPI coils.
+     * @param[in]   lDig          The digitizer list to extract the hpi coils from.
+     */
+    void extractHpiDig(const QList<FIFFLIB::FiffDigPoint>& lDig);
+
     //=========================================================================================================
     /**
      * Fits dipoles for the given coils and a given data set.
@@ -404,16 +424,18 @@ private:
     QList<QString>                      m_lBads;            /**< contains bad channels . */
     SensorSet                           m_sensors;          /**< sensor struct that contains information about all sensors. */
     Eigen::MatrixXd                     m_matModel;         /**< The model that contains the sines/cosines for the hpi fit*/
-    bool                                m_bDoFastFit;       /**< Do fast fit. */
+    Eigen::MatrixXd                     m_matHeadHPI;       /**< The coordinates of the digitized HPI coils in head space*/
+    Eigen::MatrixXd                     m_matProjectors;    /**< projectors . */
     QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilTemplate;    /**< */
     QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilMeg;         /**< */
     QVector<int>                        m_vecFreqs;         /**< The frequencies for each coil in unknown order. */
-
+    bool m_bDoFastFit;  // delete
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
 inline QList<FIFFLIB::FiffChInfo> HPIFit::getChannels() const
 {
     return m_lChannels;
@@ -432,6 +454,16 @@ inline SensorSet HPIFit::getSensors() const
 inline Eigen::MatrixXd HPIFit::getModel() const
 {
     return m_matModel;
+}
+
+inline Eigen::MatrixXd HPIFit::getProjectors() const
+{
+    return m_matProjectors;
+}
+
+inline Eigen::MatrixXd HPIFit::getHpiDig() const
+{
+    return m_matHeadHPI;
 }
 
 } //NAMESPACE
