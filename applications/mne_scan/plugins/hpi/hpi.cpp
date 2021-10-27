@@ -212,7 +212,7 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 }
             }
 
-            if(m_bDoContinousHpi) {
+            if(m_bDoContinousHpi && (m_vCoilFreqs.size() >= 3)) {
                 for(unsigned char i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                     // Please note that we do not need a copy here since this function will block until
                     // the buffer accepts new data again. Hence, the data is not deleted in the actual
@@ -498,12 +498,12 @@ void Hpi::onCompStatusChanged(bool bChecked)
 
 void Hpi::onContHpiStatusChanged(bool bChecked)
 {
-    if(m_vCoilFreqs.size() < 3) {
-       QMessageBox msgBox;
-       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
-       msgBox.exec();
-       return;
-    }
+//    if(m_vCoilFreqs.size() < 3) {
+//       QMessageBox msgBox;
+//       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
+//       msgBox.exec();
+//       return;
+//    }
 
     m_bDoContinousHpi = bChecked;
 }
