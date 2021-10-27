@@ -593,7 +593,6 @@ void HpiSettingsView::populatePresetGUI(const QJsonArray& presetData)
         }
 
         m_pUi->comboBox_coilPreset->addItem(name, QVariant::fromValue(data));
-        qDebug() << "HERE IS THE DATA!!!!" << data;
     }
 }
 
