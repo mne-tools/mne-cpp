@@ -159,6 +159,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns whether continuous fitting is checked.
+     *
+     * @return Whether continuous fitting is checked.
+     */
+    bool continuousHPIChecked();
+
+    //=========================================================================================================
+    /**
      * Get number of fits per second to do when performing continuous hpi
      *
      * @return  Number of fits per second
