@@ -333,6 +333,7 @@ void Hpi::initPluginControlWidgets()
         onAllowedMovementChanged(pHpiSettingsView->getAllowedMovementChanged());
         onAllowedRotationChanged(pHpiSettingsView->getAllowedRotationChanged());
         setFittingWindowSize(pHpiSettingsView->getFittingWindowSize());
+        onContHpiStatusChanged(pHpiSettingsView->continuousHPIChecked());
 
         plControlWidgets.append(pHpiSettingsView);
 

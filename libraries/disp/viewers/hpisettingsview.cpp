@@ -206,6 +206,14 @@ double HpiSettingsView::getAllowedRotationChanged()
 
 //=============================================================================================================
 
+bool HpiSettingsView::continuousHPIChecked()
+{
+    return m_pUi->m_checkBox_continousHPI->isChecked();
+}
+
+
+//=============================================================================================================
+
 int HpiSettingsView::getFittingWindowSize()
 {
     return m_pUi->m_spinBox_samplesToFit->value();
