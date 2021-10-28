@@ -281,8 +281,12 @@ bool FtConnector::getData()
     sendDataSel(datasel);
 
     //Waiting for response.
+    int fail_count = 0;
     while(static_cast<unsigned long>(m_pSocket->bytesAvailable()) < sizeof (messagedef_t)) {
         m_pSocket->waitForReadyRead(10);
+        if (fail_count > 20){
+            return false;
+        }
     }
 
     //Parse return message from buffer
@@ -291,8 +295,12 @@ bool FtConnector::getData()
     int bufsize = parseMessageDef(msgBuffer);
 
     //Waiting for response.
+    fail_count = 0;
     while(m_pSocket->bytesAvailable() < bufsize) {
         m_pSocket->waitForReadyRead(10);
+        if (fail_count > 20){
+            return false;
+        }
     }
 
     //Parse return data def from buffer
