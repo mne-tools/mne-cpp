@@ -112,6 +112,11 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                     int iMaxIterations,
                     float fAbortError)
 {
+    if(bDoDebug)
+    {
+        std::cout << "Debug mode ON\n";
+    }
+
     //Check if data was passed
     if(t_mat.rows() == 0 || t_mat.cols() == 0 ) {
         std::cout<<std::endl<< "HPIFit::fitHPI - No data passed. Returning.";

@@ -161,6 +161,18 @@ void MNEForwardSolution::clear()
 //=============================================================================================================
 
 MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const AnnotationSet &p_AnnotationSet,
+                                                                qint32 p_iClusterSize) const
+{
+    const FIFFLIB::FiffCov p_pNoise_cov;
+    const FIFFLIB::FiffInfo p_pInfo;
+    Eigen::MatrixXd p_D;
+
+    return cluster_forward_solution(p_AnnotationSet, p_iClusterSize, p_D, p_pNoise_cov, p_pInfo, "cityblock");
+}
+
+//=============================================================================================================
+
+MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const AnnotationSet &p_AnnotationSet,
                                                                 qint32 p_iClusterSize,
                                                                 MatrixXd& p_D,
                                                                 const FiffCov &p_pNoise_cov,
@@ -266,7 +278,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
             if (label_ids[i] != 0)
             {
                 QString curr_name = t_CurrentColorTable.struct_names[i];//obj.label2AtlasName(label(i));
-                printf("\tCluster %d / %ld %s...", i+1, label_ids.rows(), curr_name.toUtf8().constData());
+                printf("\tCluster %d / %ld %s...", i+1, static_cast<long int>(label_ids.rows()), curr_name.toUtf8().constData());
 
                 //
                 // Get source space indeces
@@ -875,7 +887,7 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
         }
     }
 
-    printf("\tlimit = %d/%ld = %f", n_limit + 1, d.size(), sqrt(limit / ws[0]));
+    printf("\tlimit = %d/%ld = %f", n_limit + 1, static_cast<long int>(d.size()), sqrt(limit / ws[0]));
     double scale = 1.0 / limit;
     printf("\tscale = %g exp = %g", scale, exp);
 
@@ -1773,7 +1785,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
     // Figure out which ones have been used
     if(info.chs.size() != G.rows())
     {
-        printf("Error G.rows() and length of info.chs do not match: %ld != %i", G.rows(), info.chs.size()); //ToDo throw
+        printf("Error G.rows() and length of info.chs do not match: %ld != %i", static_cast<long int>(G.rows()), info.chs.size()); //ToDo throw
         return;
     }
 
@@ -1783,7 +1795,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
         for(qint32 i = 0; i < sel.size(); ++i)
             G.row(i) = G.row(sel[i]);
         G.conservativeResize(sel.size(), G.cols());
-        printf("\t%ld planar channels", sel.size());
+        printf("\t%ld planar channels", static_cast<long int>(sel.size()));
     }
     else
     {
@@ -1793,7 +1805,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
             for(qint32 i = 0; i < sel.size(); ++i)
                 G.row(i) = G.row(sel[i]);
             G.conservativeResize(sel.size(), G.cols());
-            printf("\t%ld magnetometer or axial gradiometer channels", sel.size());
+            printf("\t%ld magnetometer or axial gradiometer channels", static_cast<long int>(sel.size()));
         }
         else
         {
@@ -1803,7 +1815,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
                 for(qint32 i = 0; i < sel.size(); ++i)
                     G.row(i) = G.row(sel[i]);
                 G.conservativeResize(sel.size(), G.cols());
-                printf("\t%ld EEG channels\n", sel.size());
+                printf("\t%ld EEG channels\n", static_cast<long int>(sel.size()));
             }
             else
                 printf("Could not find MEG or EEG channels\n");

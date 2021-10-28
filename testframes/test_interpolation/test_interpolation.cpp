@@ -119,7 +119,7 @@ void TestInterpolation::initTestCase()
     if(evoked.isEmpty()) {
         return;
     }
-    for( const FiffChInfo &info : evoked.info.chs) {
+    for( const FiffChInfo &info : qAsConst(evoked.info.chs)) {
         if(info.kind == FIFFV_MEG_CH && info.unit == FIFF_UNIT_T) {
             vMegSensors.push_back(info.chpos.r0);
         }

@@ -445,7 +445,7 @@ void CoRegistration::onFitFiducials()
     Matrix3f matMri(digSetFidMRI.size(),3);
     Matrix4f matTrans;
     Vector3f vecWeights; // LPA, Nasion, RPA
-    float fScale = 0.0;
+    float fScale = 1.0f;
 
     // get coordinates
     for(int i = 0; i< digSetFidHead.size(); ++i) {

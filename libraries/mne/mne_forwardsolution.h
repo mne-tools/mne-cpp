@@ -157,9 +157,7 @@ struct RegionData
     }
 };
 
-const static FIFFLIB::FiffCov defaultCov;
-const static FIFFLIB::FiffInfo defaultInfo;
-static Eigen::MatrixXd defaultD;
+
 
 //=============================================================================================================
 /**
@@ -225,19 +223,32 @@ public:
      *
      * @param[in]   p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere.
      * @param[in]   p_iClusterSize      Maximal cluster size per roi.
-     * @param[out]   p_D                 The cluster operator.
-     * @param[in]   p_pNoise_cov.
-     * @param[in]   p_pInfo.
+     * @param[out]  p_D                 The cluster operator.
+     * @param[in]   p_pNoise_cov
+     * @param[in]   p_pInfo
      * @param[in]   p_sMethod           "cityblock" or "sqeuclidean".
      *
      * @return clustered MNE forward solution.
      */
     MNEForwardSolution cluster_forward_solution(const FSLIB::AnnotationSet &p_AnnotationSet,
                                                 qint32 p_iClusterSize,
-                                                Eigen::MatrixXd& p_D = defaultD,
-                                                const FIFFLIB::FiffCov &p_pNoise_cov = defaultCov,
-                                                const FIFFLIB::FiffInfo &p_pInfo = defaultInfo,
-                                                QString p_sMethod = "cityblock") const;
+                                                Eigen::MatrixXd& p_D,
+                                                const FIFFLIB::FiffCov &p_pNoise_cov,
+                                                const FIFFLIB::FiffInfo &p_pInfo,
+                                                QString p_sMethod) const;
+
+    //=========================================================================================================
+    /**
+     * Cluster the forward solution and stores the result to p_fwdOut.
+     * The clustering is done by using the provided annotations
+     *
+     * @param[in]   p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere.
+     * @param[in]   p_iClusterSize      Maximal cluster size per roi.
+     *
+     * @return clustered MNE forward solution.
+     */
+    MNEForwardSolution cluster_forward_solution(const FSLIB::AnnotationSet &p_AnnotationSet,
+                                                qint32 p_iClusterSize) const;
 
     //=========================================================================================================
     /**

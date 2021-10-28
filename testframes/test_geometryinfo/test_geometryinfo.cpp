@@ -153,7 +153,7 @@ void TestGeometryInfo::testBadChannelFiltering() {
         return;
     }
     QVector<Vector3f> vMegSensors;
-    for( const FiffChInfo &info : evoked.info.chs) {
+    for( const FiffChInfo &info : qAsConst(evoked.info.chs)) {
         if(info.kind == FIFFV_MEG_CH) {
             vMegSensors.push_back(info.chpos.r0);
         }
@@ -166,7 +166,7 @@ void TestGeometryInfo::testBadChannelFiltering() {
     // filter for bad MEG channels:
     QVector<int> vErasedColums = GeometryInfo::filterBadChannels(pDistanceMatrix, evoked.info, FIFFV_MEG_CH);
 
-    for (qint32 col : vErasedColums) {
+    for (qint32 col : qAsConst(vErasedColums)) {
         qint64 iNotInfCount = 0;
         for (qint32 row = 0; row < pDistanceMatrix->rows(); ++row) {
             if (pDistanceMatrix->coeff(row, col) != FLOAT_INFINITY) {

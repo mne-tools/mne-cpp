@@ -97,7 +97,6 @@ private slots:
 
 private:
     // declare your thresholds, variables and error values here
-    double dEpsilon;
     FiffCoordTrans transFitMatched;
     FiffCoordTrans transPerformICP;
     FiffCoordTrans transFitMatchedRef;
@@ -107,7 +106,6 @@ private:
 //=============================================================================================================
 
 TestCoregistration::TestCoregistration()
-    : dEpsilon(0.000001)
 {
 }
 
@@ -149,7 +147,7 @@ void TestCoregistration::initTestCase()
     Matrix3f matDst(digSetDst.size(),3);
     Matrix4f matTrans;
     Vector3f vecWeights(digSetSrc.size()); // LPA, Nasion, RPA
-    float fScale;
+    float fScale = 1.0f;
     bool bScale = true;
 
     // get coordinates
@@ -173,7 +171,7 @@ void TestCoregistration::initTestCase()
     fiff_int_t iFrom = digSetSrc[0].coord_frame;
     fiff_int_t iTo = bemSurface.data()->coord_frame;
     transFitMatched = FiffCoordTrans::make(iFrom, iTo, matTrans);
-    transPerformICP = *new FiffCoordTrans(transFitMatched);
+    transPerformICP = FiffCoordTrans(transFitMatched);
 
     // Prepare Icp:
     VectorXf vecWeightsICP(digSetHsp.size()); // Weigths vector

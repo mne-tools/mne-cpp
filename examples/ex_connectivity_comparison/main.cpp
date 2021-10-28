@@ -383,7 +383,7 @@ int main(int argc, char *argv[])
                                                                      lNetworks);
 
     for(int j = 0; j < lNetworkTreeItems.size(); ++j) {
-        lNetworkTreeItems.at(j)->setThresholds(QVector3D(0.9,0.95,1.0));
+        lNetworkTreeItems.at(j)->setThresholds(QVector3D(0.9f, 0.95f, 1.0f));
     }
 
     //Read and show sensor helmets

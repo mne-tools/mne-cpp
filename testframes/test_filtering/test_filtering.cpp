@@ -149,7 +149,7 @@ void TestFiltering::initTestCase()
     fiff_int_t to = rawFirstInRaw.last_samp;
 
     // initialize filter settings
-    QString sFilterName = "example_cosine";
+//    QString sFilterName = "example_cosine";
     int type = FilterKernel::m_filterTypes.indexOf(FilterParameter("BPF"));
     double dSFreq = rawFirstInRaw.info.sfreq;
     double dCenterfreq = 10;

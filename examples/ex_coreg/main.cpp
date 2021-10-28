@@ -163,7 +163,7 @@ int main(int argc, char *argv[])
     Matrix3f matDst(digSetDst.size(),3);
     Matrix4f matTrans;
     Vector3f vecWeights(digSetSrc.size()); // LPA, Nasion, RPA
-    float fScale;
+    float fScale = 1.0f;
 
     // get coordinates
     for(int i = 0; i< digSetSrc.size(); ++i) {
@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
     AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
     Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
     DigitizerSetTreeItem* pDigSrcSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Fiducials Transformed", digSetSrc);
-    DigitizerSetTreeItem* pDigHspSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Digitizer", digSetHsp);
+//    DigitizerSetTreeItem* pDigHspSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Digitizer", digSetHsp);
     pDigSrcSetTreeItem->setTransform(transHeadMri,true);
 
     BemTreeItem* pBemItem = p3DDataModel->addBemData("Sample", "Head", bemHead);

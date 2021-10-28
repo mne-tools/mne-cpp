@@ -92,8 +92,9 @@ bool RTPROCESSINGLIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoint
 
     // Initialization
     int iNP = matPointCloud.rows();             // The number of points
-    float fMSEPrev,fMSE = 0.0;                  // The mean square error
-    float fScale = 1.0;
+    float fMSEPrev = 0.0f;                       // The mean square error of previous iteration.
+    float fMSE = 0.0f;                           // The mean square error
+    float fScale = 1.0f;
     MatrixXf matP0 = matPointCloud;             // Initial Set of points
     MatrixXf matPk = matP0;                     // Transformed Set of points
     MatrixXf matYk(matPk.rows(),matPk.cols());  // Iterative closest points on the surface
@@ -175,7 +176,6 @@ bool RTPROCESSINGLIB::fitMatchedPoints(const MatrixXf& matSrcPoint,
     Matrix3f matRot = Matrix3f::Identity(3,3);
     Vector3f vecTrans;
     float fTrace = 0.0;
-    fScale = 1.0;
 
     // test size of point clouds
     if(matSrcPoint.size() != matDstPoint.size()) {

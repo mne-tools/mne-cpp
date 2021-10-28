@@ -79,15 +79,12 @@ private slots:
     void cleanupTestCase();
 
 private:
-    double dEpsilon;
-
     MneMshDisplaySurfaceSet::SPtr m_pSurfSetBemLoaded;
 };
 
 //=============================================================================================================
 
 TestMneMshDisplaySurfaceSet::TestMneMshDisplaySurfaceSet()
-: dEpsilon(0.000001)
 {
 }
 
