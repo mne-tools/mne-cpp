@@ -115,6 +115,16 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
     // read coil_def.dat
     QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
     m_pCoilTemplate = QSharedPointer<FWDLIB::FwdCoilSet>(FwdCoilSet::read_coil_defs(qPath));
+
+    // update channel list
+    updateChannels(pFiffInfo);
+
+    // update sensors
+    int iAcc = 2;
+    updateSensor(iAcc);
+
+    // update HPI digitizer
+    updateHpiDigitizer(pFiffInfo->dig);
 }
 
 //=============================================================================================================
@@ -384,7 +394,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         vecError[i] = matDiffPos.col(i).norm();
     }
 
-    //Generate final fitted points and store in digitizer set
+    // Generate final fitted points and store in digitizer set
     for(int i = 0; i < coil.pos.rows(); ++i) {
         FiffDigPoint digPoint;
         digPoint.kind = FIFFV_POINT_EEG; //Store as EEG so they have a different color
@@ -519,14 +529,14 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
 void HPIFit::computeCoilLoc(const Eigen::MatrixXd& matAmplitudes,
                             const MatrixXd& matProjectors,
                             const FIFFLIB::FiffCoordTrans& transDevHead,
-                            const QVector<int>& vecFreqs,
                             const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                            const QVector<double>& vecError,
                             Eigen::MatrixXd& matCoilLoc,
-                            int iMaxIterations,
-                            float fAbortError)
+                            const int iMaxIterations,
+                            const float fAbortError)
 {
     // get numer of coils
-    int iNumCoils = vecFreqs.size();
+    int iNumCoils = matAmplitudes.cols();
 
     // update digitized hpi info
     // ToDo: only do when necessary
@@ -544,15 +554,50 @@ void HPIFit::computeCoilLoc(const Eigen::MatrixXd& matAmplitudes,
     coil.dpfitnumitr = VectorXd::Zero(iNumCoils);
 
     // find seed points
-    // 1. check error, if good last fit, use old trafo
+    MatrixXd matCoilPos = MatrixXd::Zero(iNumCoils,3);
 
-    // 2. if not, find max amplitudes in channels
+    // check error,
+    double dError = std::accumulate(vecError.begin(), vecError.end(), .0) / vecError.size();
 
-    // 3. go 3 cm inwards from max channels
+    if(transDevHead.trans != MatrixXd::Identity(4,4).cast<float>() && dError < 0.010) {
+        // if good last fit, use old trafo
+        matCoilPos = transDevHead.apply_inverse_trans(m_matHeadHPI.cast<float>()).cast<double>();
+    } else {
+        // if not, find max amplitudes in channels
+        VectorXi vecChIdcs(iNumCoils);
+
+        for (int j = 0; j < iNumCoils; j++) {
+            int iChIdx = 0;
+            VectorXd::Index indMax;
+            matAmplitudes.col(j).maxCoeff(&indMax);
+            if(indMax < m_vecInnerind.size()) {
+                iChIdx = m_vecInnerind.at(indMax);
+            }
+            vecChIdcs(j) = iChIdx;
+        }
+        // and go 3 cm inwards from max channels
+        for (int j = 0; j < vecChIdcs.rows(); ++j) {
+            if(vecChIdcs(j) < pFiffInfo->chs.size()) {
+                Vector3f r0 = pFiffInfo->chs.at(vecChIdcs(j)).chpos.r0;
+                matCoilPos.row(j) = (-1 * pFiffInfo->chs.at(vecChIdcs(j)).chpos.ez * 0.03 + r0).cast<double>();
+            }
+        }
+    }
+
+    coil.pos = matCoilPos;
 
     // dipole fit
 
+    coil = dipfit(coil,
+                  m_sensors,
+                  matAmplitudes,
+                  iNumCoils,
+                  matProjectors,
+                  iMaxIterations,
+                  fAbortError);
+
     // return data
+    matCoilLoc = coil.pos;
 }
 
 //=============================================================================================================
@@ -849,7 +894,7 @@ void HPIFit::updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
     // Get the indices of inner layer channels and exclude bad channels and create channellist
     int iNumCh = pFiffInfo->nchan;
     m_lChannels.clear();
-
+    m_vecInnerind.clear();
     for (int i = 0; i < iNumCh; ++i) {
         if(pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
            pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
@@ -936,7 +981,7 @@ void HPIFit::updateHpiDigitizer(const QList<FiffDigPoint>& lDig)
 
     // convert to matrix iNumCoils x 3
     if (lHPIPoints.size() > 0) {
-        m_matHeadHPI(iNumCoils,3);
+        m_matHeadHPI = MatrixXd(iNumCoils,3);
         for (int i = 0; i < lHPIPoints.size(); ++i) {
             m_matHeadHPI(i,0) = lHPIPoints.at(i).r[0];
             m_matHeadHPI(i,1) = lHPIPoints.at(i).r[1];
