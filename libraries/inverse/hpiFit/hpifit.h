@@ -251,39 +251,35 @@ public:
      * @param[in]   pFiffInfo          Associated Fiff Information.
      * @param[out]  vecError           The HPI estimation Error in mm for each fitted HPI coil.
      * @param[out]  matCoilLoc         The computed coil locations.
+     * @param[out]  vecGoF             The goodness of fit for each fitted HPI coil.
      * @param[in]   iMaxIterations     The maximum allowed number of iterations used to fit the dipoles. Default is 500.
      * @param[in]   fAbortError        The error which will lead to aborting the dipole fitting process. Default is 1e-9.
      *
      */
-    void ComputeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
-                        const Eigen::MatrixXd& matProjectors,
-                        const FIFFLIB::FiffCoordTrans& transDevHead,
-                        const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                        const QVector<double>& vecError,
-                        Eigen::MatrixXd& matCoilLoc,
-                        const int iMaxIterations = 500,
-                        const float fAbortError = 1e-9);
+    void computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
+                             const Eigen::MatrixXd& matProjectors,
+                             const FIFFLIB::FiffCoordTrans& transDevHead,
+                             const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                             const QVector<double>& vecError,
+                             Eigen::MatrixXd& matCoilLoc,
+                             Eigen::VectorXd& vecGoF,
+                             const int iMaxIterations = 500,
+                             const float fAbortError = 1e-9);
 
     //=========================================================================================================
     /**
      * Compute the device to head transformation.
      *
      * @param[in]   matCoilsDev         The estimated coil positions in device space.
-     * @param[in]   pFiffInfo           Associated Fiff Information.
      * @param[out]  transDevHead        The dev head transformation matrix for an initial guess.
      * @param[out]  vecError            The HPI estimation Error in mm for each fitted HPI coil.
-     * @param[out]  vecGof              The goodness of fit for each fitted HPI coil.
      * @param[out]  fittedPointSet      The final fitted positions in form of a digitizer set.
-     * @param[in]   bDrop               Only use good coils yes/no. Defaults to yes.
      *
      */
-    void computeHeadPos(const Eigen::MatrixXd& matCoilsDev,
-                        const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                        FIFFLIB::FiffCoordTrans& transDevHead,
-                        QVector<double> &vecError,
-                        Eigen::VectorXd& vecGoF,
-                        FIFFLIB::FiffDigPointSet& fittedPointSet,
-                        bool bDrop = true);
+    void computeHeadPosition(const Eigen::MatrixXd& matCoilsDev,
+                             FIFFLIB::FiffCoordTrans& transDevHead,
+                             QVector<double> &vecError,
+                             FIFFLIB::FiffDigPointSet& fittedPointSet);
 
     //=========================================================================================================
     /**

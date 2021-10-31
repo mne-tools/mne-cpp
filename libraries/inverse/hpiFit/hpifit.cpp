@@ -373,8 +373,6 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
     matHeadHPI = matHeadHPITemp;
     vecGoF = vecGofTemp;
 
-    //Eigen::Matrix4d matTrans = computeTransformation(coil.pos, matHeadHPI);
-
     // Store the final result to fiff info
     // Set final device/head matrix and its inverse to the fiff info
     transDevHead.from = 1;
@@ -514,14 +512,15 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
 
 //=============================================================================================================
 
-void HPIFit::ComputeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
-                            const MatrixXd& matProjectors,
-                            const FIFFLIB::FiffCoordTrans& transDevHead,
-                            const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                            const QVector<double>& vecError,
-                            Eigen::MatrixXd& matCoilLoc,
-                            const int iMaxIterations,
-                            const float fAbortError)
+void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
+                                 const MatrixXd& matProjectors,
+                                 const FIFFLIB::FiffCoordTrans& transDevHead,
+                                 const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                                 const QVector<double>& vecError,
+                                 Eigen::MatrixXd& matCoilLoc,
+                                 Eigen::VectorXd& vecGoF,
+                                 const int iMaxIterations,
+                                 const float fAbortError)
 {
     // get numer of coils
     int iNumCoils = matAmplitudes.cols();
@@ -575,7 +574,6 @@ void HPIFit::ComputeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
     coil.pos = matCoilPos;
 
     // dipole fit
-
     coil = dipfit(coil,
                   m_sensors,
                   matAmplitudes,
@@ -585,20 +583,56 @@ void HPIFit::ComputeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
                   fAbortError);
 
     // return data
+    vecGoF = coil.dpfiterror;
+    for(int i = 0; i < vecGoF.size(); ++i) {
+        vecGoF(i) = 1 - vecGoF(i);
+    }
+
     matCoilLoc = coil.pos;
 }
 
 //=============================================================================================================
 
-void HPIFit::computeHeadPos(const Eigen::MatrixXd& matCoilsDev,
-                            const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                            FIFFLIB::FiffCoordTrans& transDevHead,
-                            QVector<double> &vecError,
-                            Eigen::VectorXd& vecGoF,
-                            FIFFLIB::FiffDigPointSet& fittedPointSet,
-                            bool bDrop)
+void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilsDev,
+                                 FIFFLIB::FiffCoordTrans& transDevHead,
+                                 QVector<double> &vecError,
+                                 FIFFLIB::FiffDigPointSet& fittedPointSet)
 {
+    // get number of coils
+    int iNumCoils = matCoilsDev.rows();
 
+    // prepare dropping coils
+    MatrixXd matTrans(4,4);
+    VectorXi vecInd = VectorXi::LinSpaced(iNumCoils,0,iNumCoils);
+
+    matTrans = computeTransformation(m_matHeadHPI, matCoilsDev);
+
+
+    // Store the final result to fiff info
+    // Set final device/head matrix and its inverse to the fiff info
+    transDevHead.from = 1;
+    transDevHead.to = 4;
+    transDevHead.trans = matTrans.cast<float>();
+
+    // Also store the inverse
+    transDevHead.invtrans = transDevHead.trans.inverse();
+
+    //Calculate Error
+    MatrixXd matTemp = matCoilsDev;
+    MatrixXd matTestPos = transDevHead.apply_trans(matTemp.cast<float>()).cast<double>();
+    MatrixXd matDiffPos = matTestPos - m_matHeadHPI;
+
+    // Generate final fitted points and store in digitizer set
+    for(int i = 0; i < m_matHeadHPI.rows(); ++i) {
+        FiffDigPoint digPoint;
+        digPoint.kind = FIFFV_POINT_EEG; //Store as EEG so they have a different color
+        digPoint.ident = i;
+        digPoint.r[0] = m_matHeadHPI(i,0);
+        digPoint.r[1] = m_matHeadHPI(i,1);
+        digPoint.r[2] = m_matHeadHPI(i,2);
+
+        fittedPointSet << digPoint;
+    }
 }
 
 //=============================================================================================================
