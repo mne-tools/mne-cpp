@@ -598,6 +598,9 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilsDev,
                                  QVector<double> &vecError,
                                  FIFFLIB::FiffDigPointSet& fittedPointSet)
 {
+    // sanity
+    fittedPointSet.clear();
+
     // get number of coils
     int iNumCoils = matCoilsDev.rows();
 
@@ -610,26 +613,26 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilsDev,
 
     // Store the final result to fiff info
     // Set final device/head matrix and its inverse to the fiff info
-    transDevHead.from = 1;
-    transDevHead.to = 4;
-    transDevHead.trans = matTrans.cast<float>();
-
-    // Also store the inverse
-    transDevHead.invtrans = transDevHead.trans.inverse();
+    transDevHead = FiffCoordTrans::make(1,4,matTrans.cast<float>(),true);
 
     //Calculate Error
     MatrixXd matTemp = matCoilsDev;
     MatrixXd matTestPos = transDevHead.apply_trans(matTemp.cast<float>()).cast<double>();
     MatrixXd matDiffPos = matTestPos - m_matHeadHPI;
 
+    // compute error
+    for(int i = 0; i < matDiffPos.cols(); ++i) {
+        vecError[i] = matDiffPos.col(i).norm();
+    }
+
     // Generate final fitted points and store in digitizer set
     for(int i = 0; i < m_matHeadHPI.rows(); ++i) {
         FiffDigPoint digPoint;
         digPoint.kind = FIFFV_POINT_EEG; //Store as EEG so they have a different color
         digPoint.ident = i;
-        digPoint.r[0] = m_matHeadHPI(i,0);
-        digPoint.r[1] = m_matHeadHPI(i,1);
-        digPoint.r[2] = m_matHeadHPI(i,2);
+        digPoint.r[0] = matCoilsDev(i,0);
+        digPoint.r[1] = matCoilsDev(i,1);
+        digPoint.r[2] = matCoilsDev(i,2);
 
         fittedPointSet << digPoint;
     }
