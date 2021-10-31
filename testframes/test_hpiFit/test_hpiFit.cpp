@@ -98,9 +98,12 @@ private slots:
     void testConstructor_channels_bads_size();      // compare expected size when bads included
     void testConstructor_sensors();                 // check size of sensor struct for sensorset from constructor, acc = 2
     void testUpdateSensors_acc1();                  // check size of updated sensor struct for sensorset, acc = 1
+    void testUpdateSensors_empty();                 // check size of updated sensor when HPI object not yet initialized
     void testUpdateChannels_channels();             // compare channel list
     void testUpdateChannels_channels_bads();        // compare channel list when bads are included
     void testUpdateChannels_channels_bads_size();   // compare channel list  size when bads are included
+    void testPrepareProj_emptyHPI();                // test function when HPI object not yet initialized
+    void testPrepareProj();                         // test projector preparation
     void testUpdateModel_basic_4coils();
     void testUpdateModel_basic_5coils();
     void testUpdateModel_advanced_4coils();
@@ -108,16 +111,25 @@ private slots:
     void testComputeAmplitudes_basic_sin();         // test with simulated data, only sines
     void testComputeAmplitudes_basic_cos();         // test with simulated data, only cosines
     void testComputeAmplitudes_basic_sincos();      // test with simulated data, both summed
-    void testComputeAmplitudes_advanced_sin();         // test with simulated data, only sines
-    void testComputeAmplitudes_advanced_cos();         // test with simulated data, only cosines
-    void testComputeAmplitudes_advanced_summed();      // test with simulated data, summed sines/cos + line
-    void cleanupTestCase();
+    void testComputeAmplitudes_advanced_sin();      // test with simulated data, only sines
+    void testComputeAmplitudes_advanced_cos();      // test with simulated data, only cosines
+    void testComputeAmplitudes_advanced_summedCosSine();   // test with simulated data, summed sines/cos + line
+    void testComputeCoilLoc_basic_noproj();         // test with basic model, no projectors
+    void testComputeCoilLoc_basic_noproj_trafo();   // test with basic model, no projectors and initial trafo
+    void testComputeCoilLoc_basic_proj();           // test with basic model and projectors
+    void testComputeCoilLoc_advanced_noproj();         // test with advanced model, no projectors
+    void testComputeCoilLoc_advanced_noproj_trafo();   // test with advanced model, no projectors and initial trafo
+    void testComputeCoilLoc_advanced_proj();           // test with advanced model and projectors
+
+    void cleanupTestCase();                         // clean-up at the end
 
 private:
     FiffRawData m_raw;
     QSharedPointer<FiffInfo>  m_pFiffInfo;
     MatrixXd m_matData;
     double dErrorTol;
+    double dErrorEqualTol;
+    MatrixXd m_matProjectors;
     QVector<int> vFreqs;
 };
 
@@ -125,7 +137,8 @@ private:
 
 TestHpiFit::TestHpiFit()
 {
-    dErrorTol = 0.0000001;
+    dErrorEqualTol = 0.0000001;
+    dErrorTol = 0.0001;
 }
 
 //=============================================================================================================
@@ -143,6 +156,7 @@ void TestHpiFit::initTestCase()
 
     // Setup for reading the raw data
     m_raw = FiffRawData(t_fileIn);
+    m_pFiffInfo =  QSharedPointer<FiffInfo>(new FiffInfo(m_raw.info));
 
     // read data segment (200 samples)
     int iBuffer = 200;
@@ -150,12 +164,32 @@ void TestHpiFit::initTestCase()
     if(!m_raw.read_raw_segment(m_matData, matTimes, m_raw.first_samp,  m_raw.first_samp + iBuffer-1)) {
         qCritical("error during read_raw_segment");
     }
+
+    // Use SSP + SGM + calibration
+    m_matProjectors = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
+    //Do a copy here because we are going to change the activity flags of the SSP's
+    FiffInfo infoTemp = *(m_pFiffInfo.data());
+
+    //Turn on all SSP
+    for(int i = 0; i < infoTemp.projs.size(); ++i) {
+        infoTemp.projs[i].active = true;
+    }
+
+    //Create the projector for all SSP's on
+    infoTemp.make_projector(m_matProjectors);
+
+    //set columns of matrix to zero depending on bad channels indexes
+    for(qint32 j = 0; j < infoTemp.bads.size(); ++j) {
+        m_matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
+    }
 }
 
 //=============================================================================================================
 
 void TestHpiFit::init()
 {
+    // run at beginning of each test
     m_pFiffInfo =  QSharedPointer<FiffInfo>(new FiffInfo(m_raw.info));
 }
 
@@ -346,6 +380,72 @@ void TestHpiFit::testUpdateSensors_acc1()
     QVERIFY2(iNCosmag == sensorsActual.cosmag.rows(),"Number of points for computation does not match.");
     QVERIFY2(iNTra == sensorsActual.tra.size(),"Size of square matrix does not match.");
     QVERIFY2(iNW == sensorsActual.w.size(),"Number of iweights does not match");
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testUpdateSensors_empty()
+{
+    /// prepare
+    HPIFit HPI = HPIFit();
+    SensorSet sensorExpected = SensorSet();
+
+    /// act
+    int iAcc = 2;
+    HPI.updateSensor(iAcc);
+    SensorSet sensorsActual = HPI.getSensors();
+
+    /// assert
+    QVERIFY2(sensorsActual.np == sensorsActual.np,"Number of integration points does not match.");
+    QVERIFY2(sensorsActual.ncoils == sensorsActual.ncoils,"Number of channels does not match.");
+    QVERIFY2(sensorsActual.rmag.rows() == sensorsActual.rmag.rows(),"Number of points for computation does not match.");
+    QVERIFY2(sensorsActual.cosmag.rows() == sensorsActual.cosmag.rows(),"Number of points for computation does not match.");
+    QVERIFY2(sensorsActual.tra.size() == sensorsActual.tra.size(),"Size of square matrix does not match.");
+    QVERIFY2(sensorsActual.w.size() == sensorsActual.w.size(),"Number of iweights does not match");
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testPrepareProj_emptyHPI()
+{
+    /// prepare
+    // use already tested functions to get channels
+    HPIFit HPI = HPIFit();
+
+    // create vector with expected sizes of sensor struct data
+    int iSizeExpected = 0;               // 0 expected, not initialized
+
+    MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
+    /// act
+    HPI.updateProjectors(matProj);
+    MatrixXd matProjPrepared = HPI.getProjectors();
+    int iSizeActual = matProjPrepared.cols();
+
+    /// assert
+    QVERIFY(iSizeExpected == iSizeActual);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testPrepareProj()
+{
+    /// prepare
+    // use already tested functions to get channels
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+
+    // create vector with expected sizes of sensor struct data
+    int iSizeExpected = 204;       // number of channels (204 gradiometers)
+
+    MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
+    /// act
+    HPI.updateProjectors(matProj);
+    MatrixXd matProjPrepared = HPI.getProjectors();
+    int iSizeActual = matProjPrepared.cols();
+
+    /// assert
+    QVERIFY(iSizeExpected == iSizeActual);
 }
 
 //=============================================================================================================
@@ -587,16 +687,18 @@ void TestHpiFit::testComputeAmplitudes_basic_sin()
     matAmpExpected(2,2) = dAmplitude;
     matAmpExpected(3,3) = dAmplitude;
 
+    MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
     /// Act
     MatrixXd matAmpActual;
     HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
-    HPI.computeAmplitudes(matSimData,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
+    HPI.computeAmplitudes(matSimData,matProj,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
 
     /// Assert
     // use summed squared error ssd
     MatrixXd matDiff = matAmpActual - matAmpExpected;
     double dSSD = (matDiff*matDiff.transpose()).trace();
-    QVERIFY(dSSD < dErrorTol);
+    QVERIFY(dSSD < dErrorEqualTol);
 }
 
 //=============================================================================================================
@@ -656,16 +758,18 @@ void TestHpiFit::testComputeAmplitudes_basic_cos()
     matAmpExpected(2,2) = dAmplitude;
     matAmpExpected(3,3) = dAmplitude;
 
+    MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
     /// Act
     MatrixXd matAmpActual;
     HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
-    HPI.computeAmplitudes(matSimData,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
+    HPI.computeAmplitudes(matSimData,matProj,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
 
     /// Assert
     // use summed squared error ssd
     MatrixXd matDiff = matAmpActual - matAmpExpected;
     double dSSD = (matDiff*matDiff.transpose()).trace();
-    QVERIFY(dSSD < dErrorTol);
+    QVERIFY(dSSD < dErrorEqualTol);
 }
 
 //=============================================================================================================
@@ -725,16 +829,18 @@ void TestHpiFit::testComputeAmplitudes_basic_sincos()
     matAmpExpected(2,2) = dAmpSin;
     matAmpExpected(3,3) = dAmpSin;
 
+    MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
     /// Act
     MatrixXd matAmpActual;
     HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
-    HPI.computeAmplitudes(matSimData,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
+    HPI.computeAmplitudes(matSimData,matProj,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
 
     /// Assert
     // use summed squared error ssd
     MatrixXd matDiff = matAmpActual - matAmpExpected;
     double dSSD = (matDiff*matDiff.transpose()).trace();
-    QVERIFY(dSSD < dErrorTol);
+    QVERIFY(dSSD < dErrorEqualTol);
 }
 
 //=============================================================================================================
@@ -793,16 +899,18 @@ void TestHpiFit::testComputeAmplitudes_advanced_sin()
     matAmpExpected(2,2) = dAmplitude;
     matAmpExpected(3,3) = dAmplitude;
 
+    MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
     /// Act
     MatrixXd matAmpActual;
     HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
-    HPI.computeAmplitudes(matSimData,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
+    HPI.computeAmplitudes(matSimData,matProj,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
 
     /// Assert
     // use summed squared error ssd
     MatrixXd matDiff = matAmpActual - matAmpExpected;
     double dSSD = (matDiff*matDiff.transpose()).trace();
-    QVERIFY(dSSD < dErrorTol);
+    QVERIFY(dSSD < dErrorEqualTol);
 }
 
 //=============================================================================================================
@@ -846,7 +954,6 @@ void TestHpiFit::testComputeAmplitudes_advanced_cos()
     // simulate data - zeros and cosines with specified freqs and amplitudes in first 4 channels
     // meaning that computed amplitudes should match in the first 4 cases
     MatrixXd matSimData = MatrixXd::Zero(m_pFiffInfo->nchan,200);
-    MatrixXd matModel;
     matSimData.fill(0);
     VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
 
@@ -862,21 +969,26 @@ void TestHpiFit::testComputeAmplitudes_advanced_cos()
     matAmpExpected(2,2) = dAmplitude;
     matAmpExpected(3,3) = dAmplitude;
 
+    MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
     /// Act
     MatrixXd matAmpActual;
     HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
-    HPI.computeAmplitudes(matSimData,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
+    MatrixXd matModel = HPI.getModel();
+    IOUtils::write_eigen_matrix(matSimData, QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + "testData.txt");
+    IOUtils::write_eigen_matrix(matModel, QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + "testModel.txt");
+    HPI.computeAmplitudes(matSimData,matProj,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
 
     /// Assert
     // use summed squared error ssd
     MatrixXd matDiff = matAmpActual - matAmpExpected;
     double dSSD = (matDiff*matDiff.transpose()).trace();
-    QVERIFY(dSSD < dErrorTol);
+    QVERIFY(dSSD < dErrorEqualTol);
 }
 
 //=============================================================================================================
 
-void TestHpiFit::testComputeAmplitudes_advanced_summed()
+void TestHpiFit::testComputeAmplitudes_advanced_summedCosSine()
 {
     /// Prepare
     // simulate fiff info with only grads
@@ -912,7 +1024,7 @@ void TestHpiFit::testComputeAmplitudes_advanced_summed()
     bool bBasic = false;
     double dAmpSin = 0.5;        // expected amplitudes
     double dAmpCos = 0.25;       // amplitudes of cosine to add
-    double dAmpLine = 0.25;       // amplitudes of line freq.
+    double dAmpLine = 0.25;      // amplitudes of line freq.
 
     // simulate data - zeros and summed sines and cosines, but different amplitudes
     MatrixXd matSimData = MatrixXd::Zero(m_pFiffInfo->nchan,200);
@@ -935,27 +1047,256 @@ void TestHpiFit::testComputeAmplitudes_advanced_summed()
     matAmpExpected(2,2) = dAmpSin;
     matAmpExpected(3,3) = dAmpSin;
 
+    MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
     /// Act
     MatrixXd matAmpActual;
     HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
-    MatrixXd matModel = HPI.getModel();
-    IOUtils::write_eigen_matrix(matSimData, QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + "testData.txt");
-    IOUtils::write_eigen_matrix(matModel, QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + "testModel.txt");
-    HPI.computeAmplitudes(matSimData,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
+    HPI.computeAmplitudes(matSimData,
+                          matProj,
+                          vecFreqs,
+                          m_pFiffInfo,
+                          matAmpActual,
+                          bBasic);
 
     /// Assert
     // use summed squared error ssd
     MatrixXd matDiff = matAmpActual - matAmpExpected;
     double dSSD = (matDiff*matDiff.transpose()).trace();
+    QVERIFY(dSSD < dErrorEqualTol);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testComputeCoilLoc_basic_noproj()
+{
+    /// Prepare
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+    MatrixXd matProjectors = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+    QVector<int> vecFreqs = {166, 154, 161, 158};
+    QVector<double> vecError = {1.0, 1.0, 1.0, 1.0};
+    MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
+    MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
+    MatrixXd matAmplitudes;
+    bool bBasic = true;
+    FiffCoordTrans transDevHead;
+
+    HPI.computeAmplitudes(m_matData,
+                          matProjectors,
+                          vecFreqs,
+                          m_pFiffInfo,
+                          matAmplitudes,
+                          bBasic);
+
+    /// Act
+    MatrixXd matCoilLocActual(4,3);
+
+    HPI.computeCoilLoc(matAmplitudes,
+                       matProjectors,
+                       transDevHead,
+                       m_pFiffInfo,
+                       vecError,
+                       matCoilLocActual);
+    /// Assert
+
+    MatrixXd matDiff = matCoilLocExpected - matCoilLocActual;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+    qDebug() << dSSD;
+
     QVERIFY(dSSD < dErrorTol);
 }
+
+//=============================================================================================================
+
+void TestHpiFit::testComputeCoilLoc_basic_noproj_trafo()
+{
+    /// Prepare
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+    MatrixXd matProjectors = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+    QVector<int> vecFreqs = {166, 154, 161, 158};
+    QVector<double> vecError(4);
+    MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
+    MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
+    MatrixXd matAmplitudes;
+    bool bBasic = true;
+    FiffCoordTrans transDevHead;
+
+    HPI.computeAmplitudes(m_matData,
+                          matProjectors,
+                          vecFreqs,
+                          m_pFiffInfo,
+                          matAmplitudes,
+                          bBasic);
+
+    /// Act
+    MatrixXd matCoilLocActual(4,3);
+
+    HPI.computeCoilLoc(matAmplitudes,
+                       matProjectors,
+                       m_pFiffInfo->dev_head_t,
+                       m_pFiffInfo,
+                       vecError,
+                       matCoilLocActual);
+    /// Assert
+
+    MatrixXd matDiff = matCoilLocExpected - matCoilLocActual;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+    qDebug() << dSSD;
+
+    QVERIFY(dSSD < dErrorTol);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testComputeCoilLoc_basic_proj()
+{
+    /// Prepare
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+    QVector<int> vecFreqs = {166, 154, 161, 158};
+    QVector<double> vecError(4);
+    MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
+    MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
+    MatrixXd matAmplitudes;
+    bool bBasic = true;
+    FiffCoordTrans transDevHead;
+
+    HPI.computeAmplitudes(m_matData,
+                          m_matProjectors,
+                          vecFreqs,
+                          m_pFiffInfo,
+                          matAmplitudes,
+                          bBasic);
+
+    /// Act
+    MatrixXd matCoilLocActual(4,3);
+
+    HPI.computeCoilLoc(matAmplitudes,
+                       m_matProjectors,
+                       m_pFiffInfo->dev_head_t,
+                       m_pFiffInfo,
+                       vecError,
+                       matCoilLocActual);
+    /// Assert
+
+    MatrixXd matDiff = matCoilLocExpected - matCoilLocActual;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+    qDebug() << dSSD;
+
+    QVERIFY(dSSD < dErrorTol);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testComputeCoilLoc_advanced_noproj()
+{
+    /// Prepare
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+    MatrixXd matProjectors = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+    QVector<int> vecFreqs = {166, 154, 161, 158};
+    QVector<double> vecError = {1.0, 1.0, 1.0, 1.0};
+    MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
+    MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
+    MatrixXd matAmplitudes;
+    bool bBasic = true;
+    FiffCoordTrans transDevHead;
+
+    HPI.computeAmplitudes(m_matData,matProjectors,vecFreqs,m_pFiffInfo,matAmplitudes,bBasic);
+
+    /// Act
+    MatrixXd matCoilLocActual(4,3);
+
+    HPI.computeCoilLoc(matAmplitudes,
+                       matProjectors,
+                       transDevHead,
+                       m_pFiffInfo,
+                       vecError,
+                       matCoilLocActual);
+    /// Assert
+
+    MatrixXd matDiff = matCoilLocExpected - matCoilLocActual;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+    qDebug() << dSSD;
+
+    QVERIFY(dSSD < dErrorTol);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testComputeCoilLoc_advanced_noproj_trafo()
+{
+    /// Prepare
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+    MatrixXd matProjectors = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+    QVector<int> vecFreqs = {166, 154, 161, 158};
+    QVector<double> vecError(4);
+    MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
+    MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
+    MatrixXd matAmplitudes;
+    bool bBasic = true;
+    FiffCoordTrans transDevHead;
+
+    HPI.computeAmplitudes(m_matData,matProjectors,vecFreqs,m_pFiffInfo,matAmplitudes,bBasic);
+
+    /// Act
+    MatrixXd matCoilLocActual(4,3);
+
+    HPI.computeCoilLoc(matAmplitudes,
+                       matProjectors,
+                       m_pFiffInfo->dev_head_t,
+                       m_pFiffInfo,
+                       vecError,
+                       matCoilLocActual);
+    /// Assert
+
+    MatrixXd matDiff = matCoilLocExpected - matCoilLocActual;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+    qDebug() << dSSD;
+
+    QVERIFY(dSSD < dErrorTol);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testComputeCoilLoc_advanced_proj()
+{
+    /// Prepare
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+    QVector<int> vecFreqs = {166, 154, 161, 158};
+    QVector<double> vecError(4);
+    MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
+    MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
+    MatrixXd matAmplitudes;
+    bool bBasic = true;
+    FiffCoordTrans transDevHead;
+
+    HPI.computeAmplitudes(m_matData,m_matProjectors,vecFreqs,m_pFiffInfo,matAmplitudes,bBasic);
+
+    /// Act
+    MatrixXd matCoilLocActual(4,3);
+
+    HPI.computeCoilLoc(matAmplitudes,
+                       m_matProjectors,
+                       m_pFiffInfo->dev_head_t,
+                       m_pFiffInfo,
+                       vecError,
+                       matCoilLocActual);
+    /// Assert
+
+    MatrixXd matDiff = matCoilLocExpected - matCoilLocActual;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+    qDebug() << dSSD;
+
+    QVERIFY(dSSD < dErrorTol);
+}
+
+//=============================================================================================================
 
 void TestHpiFit::cleanupTestCase()
 {
 }
-
 //=============================================================================================================
 // MAIN
+
 //=============================================================================================================
 
 QTEST_GUILESS_MAIN(TestHpiFit)
