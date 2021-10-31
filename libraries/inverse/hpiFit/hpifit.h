@@ -249,6 +249,7 @@ public:
      * @param[in]   matProjectors      The projectors to apply. Bad channels are still included.
      * @param[in]   transDevHead       The dev head transformation matrix for an initial guess.
      * @param[in]   pFiffInfo          Associated Fiff Information.
+     * @param[out]  vecError           The HPI estimation Error in mm for each fitted HPI coil.
      * @param[out]  matCoilLoc         The computed coil locations.
      * @param[in]   iMaxIterations     The maximum allowed number of iterations used to fit the dipoles. Default is 500.
      * @param[in]   fAbortError        The error which will lead to aborting the dipole fitting process. Default is 1e-9.
@@ -257,11 +258,11 @@ public:
     void computeCoilLoc(const Eigen::MatrixXd& matAmplitudes,
                         const Eigen::MatrixXd& matProjectors,
                         const FIFFLIB::FiffCoordTrans& transDevHead,
-                        const QVector<int>& vecFreqs,
                         const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+                        const QVector<double>& vecError,
                         Eigen::MatrixXd& matCoilLoc,
-                        int iMaxIterations = 500,
-                        float fAbortError = 1e-9);
+                        const int iMaxIterations = 500,
+                        const float fAbortError = 1e-9);
 
     //=========================================================================================================
     /**
