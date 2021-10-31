@@ -255,7 +255,7 @@ public:
      * @param[in]   fAbortError        The error which will lead to aborting the dipole fitting process. Default is 1e-9.
      *
      */
-    void computeCoilLoc(const Eigen::MatrixXd& matAmplitudes,
+    void ComputeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
                         const Eigen::MatrixXd& matProjectors,
                         const FIFFLIB::FiffCoordTrans& transDevHead,
                         const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
@@ -339,7 +339,7 @@ public:
     inline SensorSet getSensors() const;
     inline Eigen::MatrixXd getModel() const;
     inline Eigen::MatrixXd getProjectors() const;
-    inline Eigen::MatrixXd getHpiDig() const;
+    inline Eigen::MatrixXd getHpiDigitizer() const;
 
     //=========================================================================================================
     /**
@@ -481,7 +481,7 @@ inline Eigen::MatrixXd HPIFit::getProjectors() const
     return m_matProjectors;
 }
 
-inline Eigen::MatrixXd HPIFit::getHpiDig() const
+inline Eigen::MatrixXd HPIFit::getHpiDigitizer() const
 {
     return m_matHeadHPI;
 }
