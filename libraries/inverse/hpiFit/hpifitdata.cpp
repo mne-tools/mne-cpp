@@ -87,13 +87,13 @@ void HPIFitData::doDipfitConcurrent()
     int iSimplexNumitr = 0;
 
     this->m_coilPos = fminsearch(vecCurrentCoil,
-                               iMaxiter,
-                               2 * iMaxiter * vecCurrentCoil.cols(),
-                               iDisplay,
-                               vecCurrentData,
-                               this->m_matProjector,
-                               currentSensors,
-                               iSimplexNumitr);
+                                iMaxiter,
+                                2 * iMaxiter * vecCurrentCoil.cols(),
+                                iDisplay,
+                                vecCurrentData,
+                                this->m_matProjector,
+                                currentSensors,
+                                iSimplexNumitr);
 
     this->m_errorInfo = dipfitError(vecCurrentCoil,
                                   vecCurrentData,

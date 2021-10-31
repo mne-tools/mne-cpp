@@ -493,21 +493,9 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
     matTopo = m_matModel * matProjData.transpose();
     matTopo.transposeInPlace();
 
-    // split into sine and cosine contributions
-    if(bBasic) {
-        matAmp = matTopo.leftCols(iNumCoils);
-        matAmpC = matTopo.rightCols(iNumCoils);
-    } else {
-//        // estimate the sinusoid phase
-//        for(int i = 0; i < iNumCoils; ++i) {
-//            int from = 2*i;
-//            MatrixXd m = matTopo.block(from,0,2,matTopo.cols());
-//            JacobiSVD<MatrixXd> svd(m, ComputeThinU | ComputeThinV);
-//            matAmp.col(i) = std::abs(svd.singularValues()(0)) * svd.matrixV().col(0);
-//        }
-        matAmp = matTopo.leftCols(iNumCoils);
-        matAmpC = matTopo.middleCols(iNumCoils,iNumCoils);
-    }
+    // split into sine and cosine amplitudes
+    matAmp = matTopo.leftCols(iNumCoils);
+    matAmpC = matTopo.middleCols(iNumCoils,iNumCoils);
 
     // Select sine or cosine component depending on their contributions to the amplitudes
     for(int j = 0; j < iNumCoils; ++j) {
@@ -526,7 +514,7 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
 
 //=============================================================================================================
 
-void HPIFit::computeCoilLoc(const Eigen::MatrixXd& matAmplitudes,
+void HPIFit::ComputeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
                             const MatrixXd& matProjectors,
                             const FIFFLIB::FiffCoordTrans& transDevHead,
                             const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
@@ -592,7 +580,7 @@ void HPIFit::computeCoilLoc(const Eigen::MatrixXd& matAmplitudes,
                   m_sensors,
                   matAmplitudes,
                   iNumCoils,
-                  matProjectors,
+                  m_matProjectors,
                   iMaxIterations,
                   fAbortError);
 
