@@ -593,7 +593,7 @@ void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
 
 //=============================================================================================================
 
-void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilsDev,
+void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilPos,
                                  FIFFLIB::FiffCoordTrans& transDevHead,
                                  QVector<double> &vecError,
                                  FIFFLIB::FiffDigPointSet& fittedPointSet)
@@ -601,38 +601,32 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilsDev,
     // sanity
     fittedPointSet.clear();
 
-    // get number of coils
-    int iNumCoils = matCoilsDev.rows();
-
     // prepare dropping coils
     MatrixXd matTrans(4,4);
-    VectorXi vecInd = VectorXi::LinSpaced(iNumCoils,0,iNumCoils);
-
-    matTrans = computeTransformation(m_matHeadHPI, matCoilsDev);
-
+    matTrans = computeTransformation(m_matHeadHPI,matCoilPos);
 
     // Store the final result to fiff info
     // Set final device/head matrix and its inverse to the fiff info
     transDevHead = FiffCoordTrans::make(1,4,matTrans.cast<float>(),true);
 
     //Calculate Error
-    MatrixXd matTemp = matCoilsDev;
+    MatrixXd matTemp = matCoilPos;
     MatrixXd matTestPos = transDevHead.apply_trans(matTemp.cast<float>()).cast<double>();
     MatrixXd matDiffPos = matTestPos - m_matHeadHPI;
 
     // compute error
-    for(int i = 0; i < matDiffPos.cols(); ++i) {
-        vecError[i] = matDiffPos.col(i).norm();
+    for(int i = 0; i < matDiffPos.rows(); ++i) {
+        vecError[i] = matDiffPos.row(i).norm();
     }
 
     // Generate final fitted points and store in digitizer set
-    for(int i = 0; i < m_matHeadHPI.rows(); ++i) {
+    for(int i = 0; i < matCoilPos.rows(); ++i) {
         FiffDigPoint digPoint;
         digPoint.kind = FIFFV_POINT_EEG; //Store as EEG so they have a different color
         digPoint.ident = i;
-        digPoint.r[0] = matCoilsDev(i,0);
-        digPoint.r[1] = matCoilsDev(i,1);
-        digPoint.r[2] = matCoilsDev(i,2);
+        digPoint.r[0] = matCoilPos(i,0);
+        digPoint.r[1] = matCoilPos(i,1);
+        digPoint.r[2] = matCoilPos(i,2);
 
         fittedPointSet << digPoint;
     }
