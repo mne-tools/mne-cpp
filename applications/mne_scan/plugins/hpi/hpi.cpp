@@ -163,6 +163,9 @@ void Hpi::resetState()
 {
     m_bPluginControlWidgetsInit = false;
     m_pCircularBuffer->clear();
+
+    m_pFiffInfo.clear();
+    m_pFiffDigitizerData.clear();
 }
 
 //=============================================================================================================
