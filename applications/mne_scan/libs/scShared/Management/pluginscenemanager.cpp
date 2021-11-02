@@ -184,20 +184,20 @@ void PluginSceneManager::stopPlugins()
     QList<AbstractPlugin::SPtr>::iterator it = m_pluginList.begin();
     for( ; it != m_pluginList.end(); ++it)
         if((*it)->getType() == AbstractPlugin::_ISensor){
-            (*it)->requestInterruption();
-            (*it)->wait();
-            if(!(*it)->stop())
+            if(!(*it)->stop()){
                 qWarning() << "Could not stop AbstractPlugin: " << (*it)->getName();
+            }
+            (*it)->requestInterruption();
         }
 
     // Stop all other plugins!
     it = m_pluginList.begin();
     for( ; it != m_pluginList.end(); ++it)
         if((*it)->getType() != AbstractPlugin::_ISensor){
-            (*it)->requestInterruption();
-            (*it)->wait();
-            if(!(*it)->stop())
+            if(!(*it)->stop()){
                 qWarning() << "Could not stop AbstractPlugin: " << (*it)->getName();
+            }
+            (*it)->requestInterruption();
         }
 }
 

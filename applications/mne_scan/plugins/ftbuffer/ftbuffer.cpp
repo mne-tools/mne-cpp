@@ -148,8 +148,13 @@ bool FtBuffer::stop()
 
     //stops separate producer/client thread first
     m_pProducerThread.requestInterruption();
+    int itries = 0;
     while(m_pProducerThread.isRunning()) {
         msleep(10);
+        if(itries > 10){
+            break;
+        }
+        ++itries;
     }
 
     //Reset ftproducer and sample received list
