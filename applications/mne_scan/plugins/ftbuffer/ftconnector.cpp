@@ -287,6 +287,7 @@ bool FtConnector::getData()
         if (fail_count > 20){
             return false;
         }
+        ++fail_count;
     }
 
     //Parse return message from buffer
@@ -301,6 +302,7 @@ bool FtConnector::getData()
         if (fail_count > 20){
             return false;
         }
+        ++fail_count;
     }
 
     //Parse return data def from buffer
