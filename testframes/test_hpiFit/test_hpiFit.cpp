@@ -120,8 +120,10 @@ private slots:
     void testComputeCoilLocation_advanced_noproj();         // test with advanced model, no projectors
     void testComputeCoilLocation_advanced_noproj_trafo();   // test with advanced model, no projectors and initial trafo
     void testComputeCoilLocation_advanced_proj();           // test with advanced model and projectors
-    void testComputeHeadPosition_trafo();           // compare computed trafo to inital transformation
-    void testComputeHeadPosition_headpos();         // compare computed head position to inital position
+    void testComputeCoilLocation_basic_gof();               // test with advanced model and projectors
+    void testComputeCoilLocation_advanced_gof();            // compare gof to specified value
+    void testComputeHeadPosition_error();           // compare error to specified value
+    void testFindOrder();                           // test with different frequency oders
     void cleanupTestCase();                         // clean-up at the end
 
 private:
@@ -130,6 +132,8 @@ private:
     MatrixXd m_matData;
     double dErrorTol;
     double dErrorEqualTol;
+    double dLocalizationErrorTol;
+    double dGofTol;
     MatrixXd m_matProjectors;
     QVector<int> vFreqs;
 };
@@ -140,6 +144,8 @@ TestHpiFit::TestHpiFit()
 {
     dErrorEqualTol = 0.0000001;
     dErrorTol = 0.0001;
+    dLocalizationErrorTol = 1.0;
+    dGofTol = 0.88;
 }
 
 //=============================================================================================================
@@ -1318,7 +1324,83 @@ void TestHpiFit::testComputeCoilLocation_advanced_proj()
 
 //=============================================================================================================
 
-void TestHpiFit::testComputeHeadPosition_trafo()
+void TestHpiFit::testComputeCoilLocation_basic_gof()
+{
+    /// Prepare
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+    QVector<int> vecFreqs = {166, 154, 161, 158};
+    QVector<double> vecError(4);
+    VectorXd vecGoF;
+    MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
+    MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
+    MatrixXd matAmplitudes;
+    bool bBasic = true;
+    FiffCoordTrans transDevHead;
+
+    HPI.computeAmplitudes(m_matData,
+                          m_matProjectors,
+                          vecFreqs,
+                          m_pFiffInfo,
+                          matAmplitudes,
+                          bBasic);
+
+    /// Act
+    MatrixXd matCoilLocActual(4,3);
+
+    HPI.computeCoilLocation(matAmplitudes,
+                            m_matProjectors,
+                            transDevHead,
+                            m_pFiffInfo,
+                            vecError,
+                            matCoilLocActual,
+                            vecGoF);
+
+    /// Assert
+    double meanGoF = vecGoF.mean();
+    QVERIFY(meanGoF > dGofTol);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testComputeCoilLocation_advanced_gof()
+{
+    /// Prepare
+    HPIFit HPI = HPIFit(m_pFiffInfo);
+    QVector<int> vecFreqs = {166, 154, 161, 158};
+    QVector<double> vecError(4);
+    VectorXd vecGoF;
+    MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
+    MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
+    MatrixXd matAmplitudes;
+    bool bBasic = false;
+    FiffCoordTrans transDevHead;
+
+    HPI.computeAmplitudes(m_matData,
+                          m_matProjectors,
+                          vecFreqs,
+                          m_pFiffInfo,
+                          matAmplitudes,
+                          bBasic);
+
+    /// Act
+    MatrixXd matCoilLocActual(4,3);
+
+    HPI.computeCoilLocation(matAmplitudes,
+                            m_matProjectors,
+                            transDevHead,
+                            m_pFiffInfo,
+                            vecError,
+                            matCoilLocActual,
+                            vecGoF);
+
+    /// Assert
+    double meanGoF = vecGoF.mean();
+    QVERIFY(meanGoF > dGofTol);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testComputeHeadPosition_error()
 {
     /// prepare
     HPIFit HPI = HPIFit(m_pFiffInfo);
@@ -1355,65 +1437,22 @@ void TestHpiFit::testComputeHeadPosition_trafo()
                             fittedPointSet);
 
     /// assert
-    MatrixXf matDiff = transDevHeadActual.trans - m_pFiffInfo->dev_head_t.trans;
-    double dSSD = (matDiff*matDiff.transpose()).trace();
-    qDebug() << dSSD;
-
-    QVERIFY(dSSD < dErrorTol);
+    double dLocalizationErrorMean = 100.0f * std::accumulate(vecError.begin(), vecError.end(), .0) / vecError.size();
+    QVERIFY(dLocalizationErrorMean < dLocalizationErrorTol);
 }
 
 //=============================================================================================================
 
-void TestHpiFit::testComputeHeadPosition_headpos()
+void TestHpiFit::testFindOrder()
 {
-    /// prepare
     HPIFit HPI = HPIFit(m_pFiffInfo);
-    QVector<int> vecFreqs = {166, 154, 161, 158};
-    QVector<double> vecError(4);
-    VectorXd vecGoF;
-    MatrixXd matHpiPosExpected = HPI.getHpiDigitizer();
-    MatrixXd matAmplitudes;
-    bool bBasic = true;
-    FiffDigPointSet fittedPointSet;
-    FiffCoordTrans transDevHead;
+    QVector<int> vecFreqsExpected = {166, 154, 161, 158};
 
-    HPI.computeAmplitudes(m_matData,
-                          m_matProjectors,
-                          vecFreqs,
-                          m_pFiffInfo,
-                          matAmplitudes,
-                          bBasic);
+    QVector<int> vecFreqsActual(4);
 
-    MatrixXd matCoilLoc(4,3);
 
-    HPI.computeCoilLocation(matAmplitudes,
-                            m_matProjectors,
-                            m_pFiffInfo->dev_head_t,
-                            m_pFiffInfo,
-                            vecError,
-                            matCoilLoc,
-                            vecGoF);
-
-    /// act
-    HPI.computeHeadPosition(matCoilLoc,
-                            transDevHead,
-                            vecError,
-                            fittedPointSet);
-
-    MatrixXd matHpiPosActual(4,3);
-    for(int i = 0; i < matHpiPosActual.rows(); ++i) {
-        matHpiPosActual(i,0) = fittedPointSet[i].r[0];
-        matHpiPosActual(i,1) = fittedPointSet[i].r[1];
-        matHpiPosActual(i,2) = fittedPointSet[i].r[2];
-    }
-
-    /// assert
-    MatrixXd matDiff = matHpiPosActual - matHpiPosExpected;
-    double dSSD = (matDiff*matDiff.transpose()).trace();
-    qDebug() << dSSD;
-
-    QVERIFY(dSSD < dErrorTol);
 }
+
 //=============================================================================================================
 
 void TestHpiFit::cleanupTestCase()
