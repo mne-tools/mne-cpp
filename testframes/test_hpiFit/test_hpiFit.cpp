@@ -1445,12 +1445,17 @@ void TestHpiFit::testComputeHeadPosition_error()
 
 void TestHpiFit::testFindOrder()
 {
+    /// prepare
     HPIFit HPI = HPIFit(m_pFiffInfo);
     QVector<int> vecFreqsExpected = {166, 154, 161, 158};
 
-    QVector<int> vecFreqsActual(4);
+    QVector<int> vecFreqsActual = {154, 158, 161, 166};
 
+    /// act
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual,m_pFiffInfo);
 
+    /// assert
+    QVERIFY(vecFreqsExpected == vecFreqsActual);
 }
 
 //=============================================================================================================

@@ -634,50 +634,42 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilPos,
 
 //=============================================================================================================
 
-void HPIFit::findOrder(const MatrixXd& t_mat,
-                       const MatrixXd& t_matProjectors,
-                       FiffCoordTrans& transDevHead,
+void HPIFit::findOrder(const MatrixXd& matData,
+                       const MatrixXd& matProjectors,
                        QVector<int>& vecFreqs,
-                       QVector<double>& vecError,
-                       VectorXd& vecGoF,
-                       FiffDigPointSet& fittedPointSet,
-                       FiffInfo::SPtr pFiffInfo)
+                       const FiffInfo::SPtr pFiffInfo)
 {
-    // clear points
-    fittedPointSet.clear();
-    transDevHead.clear();
-    vecError.fill(0);
+    // predefinitions
+    QVector<double> vecError;
+    VectorXd vecGoF;
+    int iNumCoils = vecFreqs.length();
 
-    // casual fit to get fitted coils
-    fitHPI(t_mat, t_matProjectors, transDevHead, vecFreqs, vecError, vecGoF, fittedPointSet, pFiffInfo);
+    // compute amplitudes
+    MatrixXd matAmplitudes;
+    computeAmplitudes(matData,
+                      matProjectors,
+                      vecFreqs,
+                      pFiffInfo,
+                      matAmplitudes,
+                      false);
+
+    // compute coil position
+    MatrixXd matCoil = MatrixXd::Zero(iNumCoils,3);
+    computeCoilLocation(matAmplitudes,
+                        matProjectors,
+                        pFiffInfo->dev_head_t,
+                        pFiffInfo,
+                        vecError,
+                        matCoil,
+                        vecGoF);
 
     // extract digitized and fitted coils
-    int iNumCoils = vecFreqs.length();
     QVector<int> vecToOrder = vecFreqs;
     VectorXd vecOrder(iNumCoils);
     Vector4d vecInit(0,1,2,3);
-    MatrixXd matCoil = MatrixXd::Zero(iNumCoils,3);
-    MatrixXd matDig = MatrixXd::Zero(iNumCoils,3);
+    MatrixXd matDig = m_matHeadHPI;
     VectorXd vecDist = VectorXd::Zero(iNumCoils);
     QList<FiffDigPoint> lHPIPoints;
-
-    for(int i = 0; i < iNumCoils; ++i) {
-        matCoil(i,0) = fittedPointSet[i].r[0];
-        matCoil(i,1) = fittedPointSet[i].r[1];
-        matCoil(i,2) = fittedPointSet[i].r[2];
-    }
-
-    for(int i = 0; i < pFiffInfo->dig.size(); ++i) {
-        if(pFiffInfo->dig[i].kind == FIFFV_POINT_HPI) {
-            lHPIPoints.append(pFiffInfo->dig[i]);
-        }
-    }
-
-    for (int i = 0; i < lHPIPoints.size(); ++i) {
-        matDig(i,0) = lHPIPoints.at(i).r[0];
-        matDig(i,1) = lHPIPoints.at(i).r[1];
-        matDig(i,2) = lHPIPoints.at(i).r[2];
-    }
 
     // Find closest point to each dig and find with that the order
 
