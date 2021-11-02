@@ -78,8 +78,7 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    test_hpiFit_unit.cpp \
-    test_hpiFit_integration.cpp
+    test_hpiFit.cpp
 
 
 clang {
