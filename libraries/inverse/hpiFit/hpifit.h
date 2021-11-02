@@ -205,22 +205,14 @@ public:
      *
      * @param[in]   t_mat              Data to estimate the HPI positions from.
      * @param[in]   t_matProjectors    The projectors to apply. Bad channels are still included.
-     * @param[in]   transDevHead       The final dev head transformation matrix.
      * @param[in]   vecFreqs           The frequencies for each coil in unknown order.
      * @param[out]  vecFreqs           The frequencies for each coil in correct order.
-     * @param[in]   vecError           The HPI estimation Error in mm for each fitted HPI coil.
-     * @param[in]   vecGoF             The goodness of fit for each fitted HPI coil.
-     * @param[in]   fittedPointSet     The final fitted positions in form of a digitizer set.
      * @param[in]   pFiffInfo          Associated Fiff Information.
      */
     void findOrder(const Eigen::MatrixXd& t_mat,
                    const Eigen::MatrixXd& t_matProjectors,
-                   FIFFLIB::FiffCoordTrans &transDevHead,
                    QVector<int>& vecFreqs,
-                   QVector<double> &vecError,
-                   Eigen::VectorXd& vecGoF,
-                   FIFFLIB::FiffDigPointSet& fittedPointSet,
-                   QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+                   const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
