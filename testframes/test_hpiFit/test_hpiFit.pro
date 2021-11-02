@@ -78,7 +78,9 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    test_hpiFit.cpp
+    test_hpiFit_unit.cpp \
+    test_hpiFit_integration.cpp
+
 
 clang {
     QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 

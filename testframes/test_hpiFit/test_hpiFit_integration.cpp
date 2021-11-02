@@ -1452,7 +1452,10 @@ void TestHpiFit::testFindOrder()
     QVector<int> vecFreqsActual = {154, 158, 161, 166};
 
     /// act
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual,m_pFiffInfo);
+    HPI.findOrder(m_matData,
+                  m_matProjectors,
+                  vecFreqsActual,
+                  m_pFiffInfo);
 
     /// assert
     QVERIFY(vecFreqsExpected == vecFreqsActual);
