@@ -646,6 +646,12 @@ void HPIFit::findOrder(const MatrixXd& matData,
 
     // compute amplitudes
     MatrixXd matAmplitudes;
+    updateModel(pFiffInfo->sfreq,
+                matData.cols(),
+                pFiffInfo->linefreq,
+                vecFreqs,
+                false);
+
     computeAmplitudes(matData,
                       matProjectors,
                       vecFreqs,
@@ -664,18 +670,21 @@ void HPIFit::findOrder(const MatrixXd& matData,
                         vecGoF);
 
     // extract digitized and fitted coils
-    QVector<int> vecToOrder = vecFreqs;
+    QVector<int> vecToOrder = {154,158,161,166};
     VectorXd vecOrder(iNumCoils);
     Vector4d vecInit(0,1,2,3);
     MatrixXd matDig = m_matHeadHPI;
     VectorXd vecDist = VectorXd::Zero(iNumCoils);
     QList<FiffDigPoint> lHPIPoints;
 
-    // Find closest point to each dig and find with that the order
+    // center both point sets
+    MatrixXd matDigCentered = matDig.rowwise() - matDig.colwise().mean();
+    MatrixXd matCoilCentered = matCoil.rowwise() - matCoil.colwise().mean();
 
+    // Find closest point to each dig and find with that the order
     for(int i = 0; i < iNumCoils; i++) {
         // distances from of fitted point to all digitized
-        vecDist = (matCoil.rowwise() - matDig.row(i)).rowwise().norm();
+        vecDist = (matCoilCentered.rowwise() - matDigCentered.row(i)).rowwise().norm();
         Eigen::MatrixXf::Index min_index;
         vecDist.minCoeff(&min_index);
         vecOrder(i) = vecInit(min_index);

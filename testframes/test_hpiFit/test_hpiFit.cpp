@@ -123,7 +123,7 @@ private slots:
     void testComputeCoilLocation_basic_gof();               // test with advanced model and projectors
     void testComputeCoilLocation_advanced_gof();            // compare gof to specified value
     void testComputeHeadPosition_error();           // compare error to specified value
-    void testFindOrder();                           // test with different frequency oders
+    void testFindOrder();                           // test with all possible frequency oders
     void cleanupTestCase();                         // clean-up at the end
 
 private:
@@ -982,8 +982,8 @@ void TestHpiFit::testComputeAmplitudes_advanced_cos()
     MatrixXd matAmpActual;
     HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
     MatrixXd matModel = HPI.getModel();
-    IOUtils::write_eigen_matrix(matSimData, QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + "testData.txt");
-    IOUtils::write_eigen_matrix(matModel, QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + "testModel.txt");
+//    IOUtils::write_eigen_matrix(matSimData, QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + "testData.txt");
+//    IOUtils::write_eigen_matrix(matModel, QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + "testModel.txt");
     HPI.computeAmplitudes(matSimData,matProj,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
 
     /// Assert
@@ -1446,21 +1446,91 @@ void TestHpiFit::testComputeHeadPosition_error()
 void TestHpiFit::testFindOrder()
 {
     /// prepare
+    QVector<int> vecFreqsActual01 = {154,158,161,166};
+    QVector<int> vecFreqsActual02 = {158,154,161,166};
+    QVector<int> vecFreqsActual03 = {161,154,158,166};
+    QVector<int> vecFreqsActual04 = {154,161,158,166};
+    QVector<int> vecFreqsActual05 = {158,161,154,166};
+    QVector<int> vecFreqsActual06 = {161,158,154,166};
+    QVector<int> vecFreqsActual07 = {161,158,166,154};
+    QVector<int> vecFreqsActual08 = {158,161,166,154};
+    QVector<int> vecFreqsActual09 = {166,161,158,154};
+    QVector<int> vecFreqsActual10 = {161,166,158,154};
+    QVector<int> vecFreqsActual11 = {158,166,161,154};
+    QVector<int> vecFreqsActual12 = {166,158,161,154};
+    QVector<int> vecFreqsActual13 = {166,154,161,158};
+    QVector<int> vecFreqsActual14 = {154,166,161,158};
+    QVector<int> vecFreqsActual15 = {161,166,154,158};
+    QVector<int> vecFreqsActual16 = {166,161,154,158};
+    QVector<int> vecFreqsActual17 = {154,161,166,158};
+    QVector<int> vecFreqsActual18 = {161,154,166,158};
+    QVector<int> vecFreqsActual19 = {158,154,166,161};
+    QVector<int> vecFreqsActual20 = {154,158,166,161};
+    QVector<int> vecFreqsActual21 = {166,158,154,161};
+    QVector<int> vecFreqsActual22 = {158,166,154,161};
+    QVector<int> vecFreqsActual23 = {154,166,158,161};
+    QVector<int> vecFreqsActual24 = {166,154,158,161};
+
     HPIFit HPI = HPIFit(m_pFiffInfo);
     QVector<int> vecFreqsExpected = {166, 154, 161, 158};
-
-    QVector<int> vecFreqsActual = {154, 158, 161, 166};
+    QVector<bool> vecResultExpected(24);
+    vecResultExpected.fill(true);
 
     /// act
-    HPI.findOrder(m_matData,
-                  m_matProjectors,
-                  vecFreqsActual,
-                  m_pFiffInfo);
+    QVector<bool> vecResultActual;
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual01,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual01);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual02,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual02);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual03,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual03);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual04,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual04);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual05,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual05);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual06,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual06);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual07,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual07);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual08,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual08);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual09,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual09);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual10,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual10);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual11,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual11);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual12,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual12);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual13,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual13);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual14,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual14);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual15,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual15);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual16,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual16);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual17,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual17);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual18,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual18);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual19,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual19);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual20,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual20);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual21,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual21);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual22,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual22);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual23,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual23);
+    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual24,m_pFiffInfo);
+    vecResultActual << (vecFreqsExpected == vecFreqsActual24);
 
     /// assert
-    QVERIFY(vecFreqsExpected == vecFreqsActual);
-}
+    QVERIFY(vecResultExpected == vecResultActual);
 
+}
 //=============================================================================================================
 
 void TestHpiFit::cleanupTestCase()
