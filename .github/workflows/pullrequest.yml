@@ -277,7 +277,9 @@ jobs:
     - name: Install Codecov
       if: matrix.os == 'ubuntu-18.04'
       run: |
-        sudo pip install codecov
+        curl -Os https://uploader.codecov.io/latest/macos/codecov
+        chmod +x codecov
+        echo "${pwd}" >> $GITHUB_PATH
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-18.04') || (matrix.os == 'macos-latest')
       uses: jurplel/install-qt-action@v2
