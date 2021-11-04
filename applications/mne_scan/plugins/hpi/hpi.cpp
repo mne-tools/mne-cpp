@@ -153,6 +153,7 @@ bool Hpi::start()
 
 bool Hpi::stop()
 {
+    requestInterruption();
     resetState();
     return true;
 }
