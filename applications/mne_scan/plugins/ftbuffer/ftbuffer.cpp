@@ -146,6 +146,9 @@ bool FtBuffer::stop()
 
     m_bIsConfigured = false;
 
+    requestInterruption();
+    wait(500);
+
     //stops separate producer/client thread first
     m_pProducerThread.requestInterruption();
     int itries = 0;
