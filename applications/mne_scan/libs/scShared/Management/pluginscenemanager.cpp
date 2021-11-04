@@ -187,7 +187,6 @@ void PluginSceneManager::stopPlugins()
             if(!(*it)->stop()){
                 qWarning() << "Could not stop AbstractPlugin: " << (*it)->getName();
             }
-            (*it)->requestInterruption();
         }
 
     // Stop all other plugins!
@@ -197,7 +196,6 @@ void PluginSceneManager::stopPlugins()
             if(!(*it)->stop()){
                 qWarning() << "Could not stop AbstractPlugin: " << (*it)->getName();
             }
-            (*it)->requestInterruption();
         }
 }
 
