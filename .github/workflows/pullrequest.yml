@@ -277,7 +277,7 @@ jobs:
     - name: Install Codecov
       if: matrix.os == 'ubuntu-18.04'
       run: |
-        curl -Os https://uploader.codecov.io/latest/macos/codecov
+        curl -Os https://uploader.codecov.io/latest/linux/codecov
         chmod +x codecov
         echo "${pwd}" >> $GITHUB_PATH
     - name: Install Qt (Linux|MacOS)
