@@ -345,8 +345,8 @@ void mne_fft_ana(float *data,int np, float **precalcp)
     //      *precalcp = precalc;
     //  }
     //  rfftf(&np,data,precalc);
-    if (!precalcp)
-        FREE_36(precalc);
+//    if (!precalcp)
+//        FREE_36(precalc);
     return;
 }
 
@@ -375,8 +375,8 @@ void mne_fft_syn(float *data,int np, float **precalcp)
     //  mult = 1.0/np;
     //  mne_scale_vector(mult,data,np);
 
-    if (!precalcp)
-        FREE_36(precalc);
+//    if (!precalcp)
+//        FREE_36(precalc);
     return;
 }
 
