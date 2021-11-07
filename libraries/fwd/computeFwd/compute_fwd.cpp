@@ -879,14 +879,9 @@ FiffSparseMatrix* mne_create_sparse_rcs(int nrow,           /* Number of rows */
         qCritical("No nonzero elements specified.");
         return Q_NULLPTR;
     }
-    if (stor_type == FIFFTS_MC_RCS) {
-        size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (nrow+1)*(sizeof(fiff_int_t));
-    }
-    else {
-        qCritical("Illegal sparse matrix storage type: %d",stor_type);
-        return Q_NULLPTR;
-    }
+    size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
+            (nrow+1)*(sizeof(fiff_int_t));
+
     sparse = new FiffSparseMatrix;
     sparse->coding = stor_type;
     sparse->m      = nrow;
