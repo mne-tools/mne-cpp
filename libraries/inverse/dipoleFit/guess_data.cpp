@@ -285,7 +285,6 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
 {
     MneSourceSpaceOld* *sp = NULL;
     int             nsp = 0;
-    GuessData*      res = NULL;
     int             k,p;
     float           guessrad = 0.080f;
     MneSourceSpaceOld*  guesses = NULL;
@@ -349,7 +348,6 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         goto bad;
     printf("Guess locations are now in %s coordinates.\n",FiffCoordTransOld::mne_coord_frame_name(f->coord_frame));
 
-    res = new GuessData();
     this->nguess  = guesses->nuse;
     this->rr      = ALLOC_CMATRIX_16(guesses->nuse,3);
     for (k = 0, p = 0; k < guesses->np; k++)
@@ -371,14 +369,11 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         goto bad;
 
     return;
-//    return res;
 
 bad : {
         if(guesses)
             delete guesses;
-        delete res;
         return;
-//        return NULL;
     }
 }
 
