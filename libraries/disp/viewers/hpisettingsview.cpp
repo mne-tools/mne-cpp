@@ -206,6 +206,14 @@ double HpiSettingsView::getAllowedRotationChanged()
 
 //=============================================================================================================
 
+bool HpiSettingsView::continuousHPIChecked()
+{
+    return m_pUi->m_checkBox_continousHPI->isChecked();
+}
+
+
+//=============================================================================================================
+
 int HpiSettingsView::getFittingWindowSize()
 {
     return m_pUi->m_spinBox_samplesToFit->value();
@@ -592,7 +600,7 @@ void HpiSettingsView::populatePresetGUI(const QJsonArray& presetData)
 
 void HpiSettingsView::selectCoilPreset(int iCoilPresetIndex)
 {
-    if (iCoilPresetIndex < (m_pUi->comboBox_coilPreset->count() - 1)){
+    if (iCoilPresetIndex < (m_pUi->comboBox_coilPreset->count())){
         auto coilFreqData = m_pUi->comboBox_coilPreset->itemData(iCoilPresetIndex);
         if (!coilFreqData.isNull() && coilFreqData.canConvert<QVector<int>>()){
             m_vCoilFreqs = coilFreqData.value<QVector<int>>();
