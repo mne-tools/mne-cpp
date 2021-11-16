@@ -194,7 +194,7 @@ ECDSet ECDSet::read_dipoles_dip(const QString& fileName)
         }
         inputFile.close();
 
-        fprintf(stderr,"Read %d dipoles in dip format from %s\n",set.size(),fileName.toUtf8().data());
+        printf("Read %d dipoles in dip format from %s\n",set.size(),fileName.toUtf8().data());
     }
     else {
         printf("Not able to read from: %s\n", fileName.toUtf8().data());
@@ -249,7 +249,7 @@ bool ECDSet::save_dipoles_bdip(const QString& fileName)
         printf(fileName.toUtf8().data());
         return false;
     }
-    fprintf(stderr,"Save %d dipoles in bdip format to %s\n",nsave,fileName.toUtf8().data());
+    printf("Save %d dipoles in bdip format to %s\n",nsave,fileName.toUtf8().data());
     return true;
 
 bad : {
@@ -294,7 +294,7 @@ bool ECDSet::save_dipoles_dip(const QString& fileName) const
         printf(fileName.toUtf8().data());
         goto bad;
     }
-    fprintf(stderr,"Save %d dipoles in dip format to %s\n",nsave,fileName.toUtf8().data());
+    printf("Save %d dipoles in dip format to %s\n",nsave,fileName.toUtf8().data());
     return true;
 
 bad : {

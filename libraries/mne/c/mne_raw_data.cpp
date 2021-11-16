@@ -194,7 +194,7 @@ void mne_free_name_list_36(char **list, int nlist)
         return;
     for (k = 0; k < nlist; k++) {
 #ifdef FOO
-        fprintf(stderr,"%d %s\n",k,list[k]);
+        printf("%d %s\n",k,list[k]);
 #endif
         FREE_36(list[k]);
     }
@@ -345,8 +345,8 @@ void mne_fft_ana(float *data,int np, float **precalcp)
     //      *precalcp = precalc;
     //  }
     //  rfftf(&np,data,precalc);
-    if (!precalcp)
-        FREE_36(precalc);
+//    if (!precalcp)
+//        FREE_36(precalc);
     return;
 }
 
@@ -375,8 +375,8 @@ void mne_fft_syn(float *data,int np, float **precalcp)
     //  mult = 1.0/np;
     //  mne_scale_vector(mult,data,np);
 
-    if (!precalcp)
-        FREE_36(precalc);
+//    if (!precalcp)
+//        FREE_36(precalc);
     return;
 }
 
@@ -506,7 +506,7 @@ void mne_create_filter_response(mneFilterDef    filter,
             highpass_widths = 3;	   	             /* Minimal */
 
         if (filter->filter_on) {
-            fprintf(stderr,"filter : %7.3f ... %6.1f Hz   bins : %d ... %d of %d hpw : %d lpw : %d\n",
+            printf("filter : %7.3f ... %6.1f Hz   bins : %d ... %d of %d hpw : %d lpw : %d\n",
                     highpass,
                     lowpass,
                     highpasss,
@@ -551,12 +551,12 @@ void mne_create_filter_response(mneFilterDef    filter,
         }
         if (filter->filter_on) {
             if (*highpass_effective)
-                fprintf(stderr,"Highpass filter will work as specified.\n");
+                printf("Highpass filter will work as specified.\n");
             else
-                fprintf(stderr,"NOTE: Highpass filter omitted due to a too low corner frequency.\n");
+                printf("NOTE: Highpass filter omitted due to a too low corner frequency.\n");
         }
         else
-            fprintf(stderr,"NOTE: Filter is presently switched off.\n");
+            printf("NOTE: Filter is presently switched off.\n");
     }
      *filter_datap      = filter_data;
      *filter_data_freep = filter_data_free;
@@ -617,7 +617,7 @@ void *mne_initialize_ring(int nbuf)
     ring->next = 0;
 
 #ifdef DEBUG
-    fprintf(stderr,"Ring buffer structure with %d entries initialized\n",ring->nbuf);
+    printf("Ring buffer structure with %d entries initialized\n",ring->nbuf);
 #endif
 
     return ring;
@@ -637,7 +637,7 @@ void mne_allocate_from_ring(void *ringp, int nrow, int ncol, float ***res)
         ring->next = 0;
 
 #ifdef DEBUG
-    fprintf(stderr,"Allocating buf # %d\n",ring->next);
+    printf("Allocating buf # %d\n",ring->next);
 #endif
 
     buf = ring->bufs[ring->next++];
@@ -1018,7 +1018,7 @@ void MneRawData::setup_filter_bufs(MneRawData *data)
          firstsamp = firstsamp + filter->size)
         nfilt_buf++;
 #ifdef DEBUG
-    fprintf(stderr,"%d filter buffers needed\n",nfilt_buf);
+    printf("%d filter buffers needed\n",nfilt_buf);
 #endif
     bufs = MALLOC_36(nfilt_buf,MneRawBufDef);
     for (k = 0, firstsamp = data->first_samp-filter->taper_size; k < nfilt_buf; k++,
@@ -1066,7 +1066,7 @@ int MneRawData::load_one_buffer(MneRawData *data, MneRawBufDef *buf)
         return OK;
 
 #ifdef DEBUG
-    fprintf(stderr,"Read buffer %d .. %d\n",buf->firsts,buf->lasts);
+    printf("Read buffer %d .. %d\n",buf->firsts,buf->lasts);
 #endif
 
     if (mne_read_raw_buffer_t(data->stream,
@@ -1447,7 +1447,7 @@ int MneRawData::load_one_filt_buf(MneRawData *data, MneRawBufDef *buf)
 
 #ifdef DEBUG
     if (res == OK)
-        fprintf(stderr,"Loaded filtered buffer %d...%d %d %d last = %d\n",
+        printf("Loaded filtered buffer %d...%d %d %d last = %d\n",
                 buf->firsts,buf->lasts,buf->lasts-buf->firsts+1,buf->ns,data->first_samp + data->nsamp);
 #endif
     buf->valid = res == OK;
@@ -1514,7 +1514,7 @@ int MneRawData::mne_raw_pick_data_filt(MneRawData *data, mneChSelection sel, int
     }
     for (; k < data->nfilt_buf && this_buf->firsts <= lasts; k++, this_buf++) {
 #ifdef DEBUG
-        fprintf(stderr,"this_buf (%d): %d..%d\n",k,this_buf->firsts,this_buf->lasts);
+        printf("this_buf (%d): %d..%d\n",k,this_buf->firsts,this_buf->lasts);
 #endif
         /*
          * Load the buffer first and apply projection
@@ -1617,8 +1617,8 @@ int MneRawData::mne_raw_pick_data_filt(MneRawData *data, mneChSelection sel, int
             s2  = ns;
         }
 #ifdef DEBUG
-        fprintf(stderr,"buf  : %d..%d %d\n",bs1,bs2,bs2-bs1);
-        fprintf(stderr,"dest : %d..%d %d\n",s1,s2,s2-s1);
+        printf("buf  : %d..%d %d\n",bs1,bs2,bs2-bs1);
+        printf("dest : %d..%d %d\n",s1,s2,s2-s1);
 #endif
         /*
          * Then pick data from all relevant channels
@@ -1709,7 +1709,7 @@ MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name,
         if (QString::compare(ch.ch_name,MNE_DEFAULT_TRIGGER_CH) == 0) {
             if (std::fabs(1.0 - ch.range) > 1e-5) {
                 ch.range = 1.0;
-                fprintf(stderr,"%s range set to %f\n",MNE_DEFAULT_TRIGGER_CH,ch.range);
+                printf("%s range set to %f\n",MNE_DEFAULT_TRIGGER_CH,ch.range);
             }
         }
         /*
@@ -1717,7 +1717,7 @@ MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name,
          */
         if (ch.unit_mul != 0) {
             ch.cal = pow(10.0,(double)(ch.unit_mul))*ch.cal;
-            fprintf(stderr,"Ch %s unit multiplier %d -> 0\n",ch.ch_name.toLatin1().data(),ch.unit_mul);
+            printf("Ch %s unit multiplier %d -> 0\n",ch.ch_name.toLatin1().data(),ch.unit_mul);
             ch.unit_mul = 0;
         }
     }
@@ -1747,15 +1747,15 @@ MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name,
     data->comp = MneCTFCompDataSet::mne_read_ctf_comp_data(data->filename);
     if (data->comp) {
         if (data->comp->ncomp > 0)
-            fprintf(stderr,"Read %d compensation data sets from %s\n",data->comp->ncomp,data->filename.toUtf8().constData());
+            printf("Read %d compensation data sets from %s\n",data->comp->ncomp,data->filename.toUtf8().constData());
         else
-            fprintf(stderr,"No compensation data in %s\n",data->filename.toUtf8().constData());
+            printf("No compensation data in %s\n",data->filename.toUtf8().constData());
     }
     else
         qWarning() << "err_print_error()";
     if ((data->comp_file = MneCTFCompDataSet::mne_get_ctf_comp(data->info->chInfo,data->info->nchan)) == FAIL)
         goto bad;
-    fprintf(stderr,"Compensation in file : %s\n",MneCTFCompDataSet::mne_explain_ctf_comp(MneCTFCompDataSet::mne_map_ctf_comp_kind(data->comp_file)));
+    printf("Compensation in file : %s\n",MneCTFCompDataSet::mne_explain_ctf_comp(MneCTFCompDataSet::mne_map_ctf_comp_kind(data->comp_file)));
     if (comp_set < 0)
         data->comp_now = data->comp_file;
     else
@@ -1773,11 +1773,11 @@ MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name,
        */
     data->sss = MneSssData::read_sss_data(data->filename);
     if (data->sss && data->sss->job != FIFFV_SSS_JOB_NOTHING && data->sss->ncomp > 0) {
-        fprintf(stderr,"SSS data read from %s :\n",data->filename.toUtf8().constData());
+        printf("SSS data read from %s :\n",data->filename.toUtf8().constData());
         data->sss->print(stderr);
     }
     else {
-        fprintf(stderr,"No SSS data in %s\n",data->filename.toUtf8().constData());
+        printf("No SSS data in %s\n",data->filename.toUtf8().constData());
         if(data->sss)
             delete data->sss;
         data->sss = NULL;
@@ -1806,7 +1806,7 @@ MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name,
         if (!stream->read_tag(t_pTag,dir0[current_dir0]->pos))
             goto bad;
         nsamp_skip = data->info->buf_size*(*t_pTag->toInt());
-        fprintf(stderr,"Data skip of %d samples in the beginning\n",nsamp_skip);
+        printf("Data skip of %d samples in the beginning\n",nsamp_skip);
         current_dir0++;
         ndir--;
         if (dir0[current_dir0]->kind == FIFF_FIRST_SAMPLE) {
@@ -1832,7 +1832,7 @@ MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name,
         data->first_samp = 0;
     }
 #ifdef DEBUG
-    fprintf(stderr,"data->first_samp = %d\n",data->first_samp);
+    printf("data->first_samp = %d\n",data->first_samp);
 #endif
     /*
        * Figure out the buffers
@@ -1909,11 +1909,11 @@ MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name,
                     }
                 }
             }
-            fprintf(stderr,"%d bad channels read from %s%s",data->nbad,name.toUtf8().constData(),data->nbad > 0 ? ":\n" : "\n");
+            printf("%d bad channels read from %s%s",data->nbad,name.toUtf8().constData(),data->nbad > 0 ? ":\n" : "\n");
             if (data->nbad > 0) {
-                fprintf(stderr,"\t");
+                printf("\t");
                 for (k = 0; k < data->nbad; k++)
-                    fprintf(stderr,"%s%c",data->badlist[k].toUtf8().constData(),k < data->nbad-1 ? ' ' : '\n');
+                    printf("%s%c",data->badlist[k].toUtf8().constData(),k < data->nbad-1 ? ' ' : '\n');
             }
         }
     }
@@ -1938,13 +1938,13 @@ MneRawData *MneRawData::mne_raw_open_file_comp(const QString& name,
         for (k = 0; k < data->info->nchan; k++)
             data->first_sample_val[k] = vals[k][0];
         FREE_CMATRIX_36(vals);
-        fprintf(stderr,"Initial dc offsets determined\n");
+        printf("Initial dc offsets determined\n");
     }
-    fprintf(stderr,"Raw data file %s:\n",name.toUtf8().constData());
-    fprintf(stderr,"\tnchan  = %d\n",data->info->nchan);
-    fprintf(stderr,"\tnsamp  = %d\n",data->nsamp);
-    fprintf(stderr,"\tsfreq  = %-8.3f Hz\n",data->info->sfreq);
-    fprintf(stderr,"\tlength = %-8.3f sec\n",data->nsamp/data->info->sfreq);
+    printf("Raw data file %s:\n",name.toUtf8().constData());
+    printf("\tnchan  = %d\n",data->info->nchan);
+    printf("\tnsamp  = %d\n",data->nsamp);
+    printf("\tsfreq  = %-8.3f Hz\n",data->info->sfreq);
+    printf("\tlength = %-8.3f sec\n",data->nsamp/data->info->sfreq);
 
     return data;
 
