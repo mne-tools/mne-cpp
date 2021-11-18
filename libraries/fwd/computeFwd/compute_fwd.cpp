@@ -879,14 +879,9 @@ FiffSparseMatrix* mne_create_sparse_rcs(int nrow,           /* Number of rows */
         qCritical("No nonzero elements specified.");
         return Q_NULLPTR;
     }
-    if (stor_type == FIFFTS_MC_RCS) {
-        size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (nrow+1)*(sizeof(fiff_int_t));
-    }
-    else {
-        qCritical("Illegal sparse matrix storage type: %d",stor_type);
-        return Q_NULLPTR;
-    }
+    size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
+            (nrow+1)*(sizeof(fiff_int_t));
+
     sparse = new FiffSparseMatrix;
     sparse->coding = stor_type;
     sparse->m      = nrow;
@@ -1671,10 +1666,10 @@ bool mne_attach_env(const QString& name, const QString& command)
     FiffId id(FiffId::new_file_id());
 
 //#ifdef DEBUG
-//    fprintf(stderr,"\n");
-//    fprintf(stderr,"cwd   = %s\n",cwd);
-//    fprintf(stderr,"com   = %s\n",command);
-//    fprintf(stderr,"envid = %s\n",mne_format_file_id(&id));
+//    printf("\n");
+//    printf("cwd   = %s\n",cwd);
+//    printf("com   = %s\n",command);
+//    printf("envid = %s\n",mne_format_file_id(&id));
 //#endif
 
     if (!fileInOut.exists()) {

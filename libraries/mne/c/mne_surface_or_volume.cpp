@@ -538,7 +538,7 @@ int MneSurfaceOrVolume::mne_add_patch_stats(MneSourceSpaceOld* s)
     MnePatchInfo* *pinfo = MALLOC_17(s->nuse,MnePatchInfo*);
     int        nave,p,q,k;
 
-    fprintf(stderr,"Computing patch statistics...\n");
+    printf("Computing patch statistics...\n");
     if (!s->neighbor_tri)
         if (mne_source_space_add_geometry_info(s,FALSE) != OK)
             goto bad;
@@ -556,7 +556,7 @@ int MneSurfaceOrVolume::mne_add_patch_stats(MneSourceSpaceOld* s)
     /*
        * Calculate the average normals and the patch areas
        */
-    fprintf(stderr,"\tareas, average normals, and mean deviations...");
+    printf("\tareas, average normals, and mean deviations...");
     mne_sort_nearest_by_nearest(nearest,s->np);
     nave = 1;
     for (p = 1, q = 0; p < s->np; p++) {
@@ -602,7 +602,7 @@ int MneSurfaceOrVolume::mne_add_patch_stats(MneSourceSpaceOld* s)
         MnePatchInfo::calculate_normal_stats(s,pinfo[q]);
         q++;
     }
-    fprintf(stderr," %d/%d [done]\n",q,s->nuse);
+    printf(" %d/%d [done]\n",q,s->nuse);
 
     if (s->patches) {
         for (k = 0; k < s->npatch; k++)
@@ -704,10 +704,10 @@ void *MneSurfaceOrVolume::filter_source_space(void *arg)
         }
     }
     if (omit_outside > 0)
-        fprintf(stderr,"%d source space points omitted because they are outside the inner skull surface.\n",
+        printf("%d source space points omitted because they are outside the inner skull surface.\n",
                 omit_outside);
     if (omit > 0)
-        fprintf(stderr,"%d source space points omitted because of the %6.1f-mm distance limit.\n",
+        printf("%d source space points omitted because of the %6.1f-mm distance limit.\n",
                 omit,1000*a->limit);
     a->stat = OK;
     return NULL;
@@ -735,17 +735,17 @@ int MneSurfaceOrVolume::filter_source_spaces(float limit, char *bemfile, FiffCoo
     /*
      * How close are the source points to the surface?
      */
-    fprintf(stderr,"Source spaces are in ");
+    printf("Source spaces are in ");
     if (spaces[0]->coord_frame == FIFFV_COORD_HEAD)
-        fprintf(stderr,"head coordinates.\n");
+        printf("head coordinates.\n");
     else if (spaces[0]->coord_frame == FIFFV_COORD_MRI)
-        fprintf(stderr,"MRI coordinates.\n");
+        printf("MRI coordinates.\n");
     else
-        fprintf(stderr,"unknown (%d) coordinates.\n",spaces[0]->coord_frame);
-    fprintf(stderr,"Checking that the sources are inside the inner skull ");
+        printf("unknown (%d) coordinates.\n",spaces[0]->coord_frame);
+    printf("Checking that the sources are inside the inner skull ");
     if (limit > 0.0)
-        fprintf(stderr,"and at least %6.1f mm away",1000*limit);
-    fprintf(stderr," (will take a few...)\n");
+        printf("and at least %6.1f mm away",1000*limit);
+    printf(" (will take a few...)\n");
     if (nproc < 2 || nspace == 1 || !use_threads) {
         /*
         * This is the conventional calculation
@@ -1534,7 +1534,7 @@ void MneSurfaceOrVolume::mne_find_closest_on_surface_approx(MneSurfaceOld* s, fl
     int k,was;
     float mydist;
 
-    fprintf(stderr,"%s for %d points %d steps...",nearest[0] < 0 ? "Closest" : "Approx closest",np,nstep);
+    printf("%s for %d points %d steps...",nearest[0] < 0 ? "Closest" : "Approx closest",np,nstep);
 
     for (k = 0; k < np; k++) {
         was = nearest[k];
@@ -1546,7 +1546,7 @@ void MneSurfaceOrVolume::mne_find_closest_on_surface_approx(MneSurfaceOld* s, fl
         }
     }
 
-    fprintf(stderr,"[done]\n");
+    printf("[done]\n");
     delete p;
     return;
 }
@@ -2903,7 +2903,7 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
 
     if (scale_head) {
         get_head_scale(head_dig,mri_fid,head_surf,scales);
-        fprintf(stdout,"xscale = %.3f yscale = %.3f zscale = %.3f\n",scales[0],scales[1],scales[2]);
+        printf("xscale = %.3f yscale = %.3f zscale = %.3f\n",scales[0],scales[1],scales[2]);
 
         for (j = 0; j < 3; j++)
             for (k = 0; k < 3; k++)
@@ -2932,7 +2932,7 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
                 goto bad;
         }
 
-        fprintf(stderr,"%d / %d iterations done. RMS dist = %7.1f mm\n",k,niter,
+        printf("%d / %d iterations done. RMS dist = %7.1f mm\n",k,niter,
                 1000.0*rms_digitizer_distance(head_dig,head_surf));
         FiffCoordTransOld::mne_print_coord_transform_label(stdout,QString("After refinement :").toLatin1().data(),head_dig->head_mri_t_adj);
     }
@@ -2977,7 +2977,7 @@ void MneSurfaceOrVolume::get_head_scale(FIFFLIB::FiffDigitizerData* dig,
         goto out;
     }
 
-    fprintf(stderr,"Polhemus : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[X_17],1000*r0[Y_17],1000*r0[Z_17],1000*Rdig);
+    printf("Polhemus : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[X_17],1000*r0[Y_17],1000*r0[Z_17],1000*Rdig);
 
     // Pick only the points above the fiducial plane
     VEC_DIFF_17(mri_fid[0],mri_fid[2],LR);
@@ -2999,7 +2999,7 @@ void MneSurfaceOrVolume::get_head_scale(FIFFLIB::FiffDigitizerData* dig,
         goto out;
     }
 
-    fprintf(stderr,"Scalp : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[X_17],1000*r0[Y_17],1000*r0[Z_17],1000*Rscalp);
+    printf("Scalp : (%.1f %.1f %.1f) mm R = %.1f mm\n",1000*r0[X_17],1000*r0[Y_17],1000*r0[Z_17],1000*Rscalp);
 
     scales[0] = scales[1] = scales[2] = Rdig/Rscalp;
 
@@ -3037,7 +3037,7 @@ int MneSurfaceOrVolume::discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerD
                 d->discard[k] = TRUE;
             }
         }
-        fprintf(stderr,"%d points discarded (maxdist = %6.1f mm).\n",discarded,1000*maxdist);
+        printf("%d points discarded (maxdist = %6.1f mm).\n",discarded,1000*maxdist);
     }
     return discarded;
 }
@@ -3100,7 +3100,7 @@ void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerDat
      * Project the points on the triangles
      */
     if (!do_approx)
-        fprintf(stderr,"Inside or outside for %d points...",nactive);
+        printf("Inside or outside for %d points...",nactive);
     for (k = 0, nactive = 0; k < dig->npoint; k++) {
         if ((dig->active[k] && !dig->discard[k]) || do_all) {
             dig->dist[k]    = dist[nactive];
@@ -3121,7 +3121,7 @@ void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerDat
     }
 
     if (!do_approx)
-        fprintf(stderr,"[done]\n");
+        printf("[done]\n");
 
     FREE_CMATRIX_17(rr);
     FREE_17(closest);
@@ -3444,7 +3444,7 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
         /*
      * Get the comment
      */
-        fprintf(stderr,"Triangle file : ");
+        printf("Triangle file : ");
         for (c = fgetc(fp); c != '\n'; c = fgetc(fp)) {
             if (c == EOF) {
                 qCritical()<<"Bad triangle file.";
@@ -3460,7 +3460,7 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
             goto bad;
         if (mne_read_int(fp,&ntri) != 0)
             goto bad;
-        fprintf(stderr," nvert = %d ntri = %d\n",nvert,ntri);
+        printf(" nvert = %d ntri = %d\n",nvert,ntri);
         vert = ALLOC_CMATRIX_17(nvert,3);
         tri  = ALLOC_ICMATRIX_17(ntri,3);
         /*
@@ -3498,7 +3498,7 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
             goto bad;
         if (mne_read_int3(fp,&nquad) != 0)
             goto bad;
-        fprintf(stderr,"%s file : nvert = %d nquad = %d\n",
+        printf("%s file : nvert = %d nquad = %d\n",
                 magic == QUAD_FILE_MAGIC_NUMBER ? "Quad" : "New quad",
                 nvert,nquad);
         vert = ALLOC_CMATRIX_17(nvert,3);
@@ -3550,7 +3550,7 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
 #endif
             which = quad[0];
             /*
-    fprintf(stderr,"%f ",sqrt(1.9*quad[0]) + sqrt(3.5*quad[1]));
+    printf("%f ",sqrt(1.9*quad[0]) + sqrt(3.5*quad[1]));
      */
 
             if (EVEN(which)) {
@@ -3640,7 +3640,7 @@ int MneSurfaceOrVolume::mne_read_curvature_file(char  *fname,
         goto bad;
     }
     if (mne_read_int3(fp,&magic) != 0) {
-        fprintf(stderr, "Bad magic in %s",fname);
+        printf( "Bad magic in %s",fname);
         goto bad;
     }
     if (magic == CURVATURE_FILE_MAGIC_NUMBER) {	    /* A new-style curvature file */
@@ -3652,7 +3652,7 @@ int MneSurfaceOrVolume::mne_read_curvature_file(char  *fname,
         if (mne_read_int(fp,&nface) != 0)
             goto bad;
 #ifdef DEBUG
-        fprintf(stderr,"nvert = %d nface = %d\n",ncurv,nface);
+        printf("nvert = %d nface = %d\n",ncurv,nface);
 #endif
         if (mne_read_int(fp,&val_pervert) != 0)
             goto bad;
@@ -3682,7 +3682,7 @@ int MneSurfaceOrVolume::mne_read_curvature_file(char  *fname,
         if (mne_read_int3(fp,&nface) != 0)
             goto bad;
 #ifdef DEBUG
-        fprintf(stderr,"nvert = %d nface = %d\n",ncurv,nface);
+        printf("nvert = %d nface = %d\n",ncurv,nface);
 #endif
         /*
  * Read the curvature values
@@ -3701,7 +3701,7 @@ int MneSurfaceOrVolume::mne_read_curvature_file(char  *fname,
         }
     }
 #ifdef DEBUG
-    fprintf(stderr,"Curvature range: %f...%f\n",curvmin,curvmax);
+    printf("Curvature range: %f...%f\n",curvmin,curvmax);
 #endif
      *ncurvp = ncurv;
      *curvsp = curvs;
@@ -3861,7 +3861,7 @@ int MneSurfaceOrVolume::read_tag_data(FILE *fp, int tag, long long nbytes, unsig
     if (nbytes > 0) {
         dum = MALLOC_17(nbytes+1,unsigned char);
         if (fread(dum,sizeof(unsigned char),nbytes,fp) != snbytes) {
-            fprintf(stderr, "Failed to read %d bytes of tag data",nbytes);
+            printf( "Failed to read %d bytes of tag data",nbytes);
             FREE_17(dum);
             return FAIL;
         }
@@ -3885,7 +3885,7 @@ int MneSurfaceOrVolume::read_tag_data(FILE *fp, int tag, long long nbytes, unsig
             *nbytesp = sizeof(int);
         }
         else {
-            fprintf(stderr,"Encountered an unknown tag with no length specification : %d\n",tag);
+            printf("Encountered an unknown tag with no length specification : %d\n",tag);
             *val     = NULL;
             *nbytesp = 0;
         }
