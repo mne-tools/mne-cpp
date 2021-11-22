@@ -247,7 +247,7 @@ bool ECDSet::save_dipoles_bdip(const QString& fileName)
     if (fclose(out) != 0) {
         out = NULL;
         printf(fileName.toUtf8().data());
-        goto bad;
+        return false;
     }
     printf("Save %d dipoles in bdip format to %s\n",nsave,fileName.toUtf8().data());
     return true;
