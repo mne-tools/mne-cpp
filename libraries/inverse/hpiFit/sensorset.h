@@ -102,8 +102,17 @@ public:
     */
     explicit SensorSet();
 
-    void init(const QList<FIFFLIB::FiffChInfo> channelList,
-              const int iAccuracy);
+    //=========================================================================================================
+    /**
+     * Update FwdCoilSet and store into sensors struct.
+     *
+     * @param[in] channelList   The channel list to create the MEG sensor set from.
+     * @param[in] iAccuracy     The accuracy level to use for the sensor set.
+     *
+     */
+
+    void updateSensorSet(const QList<FIFFLIB::FiffChInfo> channelList,
+                         const int iAccuracy);
 
 protected:
 
@@ -117,10 +126,18 @@ protected:
 
 private:
 
+    //=========================================================================================================
+    /**
+     * convert data from FwdCoilSet to SensorSet.
+     *
+     * @param[in] pCoilMeg   The initialized fwd coilset to get data from.
+     *
+     */
+
     void convertFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> pCoilMeg);
 
-    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilTemplate;
-    QString m_qPath;
+    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilTemplate;    // the coil template
+    QString m_qPath;    // the path to the coil definition file
 
 signals:
 };
