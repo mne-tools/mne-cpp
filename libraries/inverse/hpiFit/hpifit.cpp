@@ -45,6 +45,8 @@
 #include <utils/mnemath.h>
 
 #include <iostream>
+#include <vector>
+#include <numeric>
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <fstream>
@@ -670,32 +672,40 @@ void HPIFit::findOrder(const MatrixXd& matData,
                         vecGoF);
 
     // extract digitized and fitted coils
-    QVector<int> vecToOrder = {154,158,161,166};
-    VectorXd vecOrder(iNumCoils);
-    Vector4d vecInit(0,1,2,3);
-    MatrixXd matDig = m_matHeadHPI;
-    VectorXd vecDist = VectorXd::Zero(iNumCoils);
-    QList<FiffDigPoint> lHPIPoints;
+    QVector<int> vecFreqsOrder = vecFreqs;
+    MatrixXd matDigTemp = m_matHeadHPI;
+    MatrixXd matCoilTemp = matCoil;
 
-    // center both point sets
-    MatrixXd matDigCentered = matDig.rowwise() - matDig.colwise().mean();
-    MatrixXd matCoilCentered = matCoil.rowwise() - matCoil.colwise().mean();
+    std::vector<int> vecOrder(iNumCoils);
+    std::iota(vecOrder.begin(), vecOrder.end(), 0);;
 
-    // Find closest point to each dig and find with that the order
-    for(int i = 0; i < iNumCoils; i++) {
-        // distances from of fitted point to all digitized
-        vecDist = (matCoilCentered.rowwise() - matDigCentered.row(i)).rowwise().norm();
-        Eigen::MatrixXf::Index min_index;
-        vecDist.minCoeff(&min_index);
-        vecOrder(i) = vecInit(min_index);
-        vecToOrder[i] = vecFreqs[min_index];
-    }
+    // maximum 10 mm mean error
+    double dErrorMin = 0.010;
+    double dErrorActual = 0.0;
+    double dErrorBest = dErrorMin;
 
-    // check if still all frequencies are represented and update model
-    if(std::accumulate(vecFreqs.begin(), vecFreqs.end(), .0) ==  std::accumulate(vecToOrder.begin(), vecToOrder.end(), .0)) {
-        vecFreqs = vecToOrder;
-    } else {
-        qWarning() << "HPIFit::findOrder: frequency ordering was not succesfull.";
+    MatrixXd matTrans(4,4);
+    bool bSuccess = false;
+    // permutation
+    do {
+        for(int i = 0; i < iNumCoils; i++) {
+            matCoilTemp.row(i) =  matCoil.row(vecOrder[i]);
+        }
+        matTrans = computeTransformation(m_matHeadHPI,matCoilTemp);
+        dErrorActual = objectTrans(m_matHeadHPI,matCoilTemp,matTrans);
+        if(dErrorActual < dErrorMin && dErrorActual < dErrorBest) {
+            // exit
+            for(int i = 0; i < iNumCoils; i++) {
+                vecFreqs[i] =  vecFreqsOrder[vecOrder[i]];
+            }
+            dErrorBest = dErrorActual;
+            bSuccess = true;
+        }
+    } while (std::next_permutation(vecOrder.begin(), vecOrder.end()) );
+
+    if(bSuccess) {
+        // update model if succesfull
+        updateModel(pFiffInfo->sfreq, matData.cols(), pFiffInfo->linefreq, vecFreqs, false);
     }
 }
 
@@ -746,7 +756,6 @@ CoilParam HPIFit::dipfit(struct CoilParam coil,
             //std::cout<<std::endl<< "HPIFit::dipfit - Itr steps for coil " << i << " =" <<coil.dpfitnumitr(i);
         }
     }
-
     return coil;
 }
 
@@ -830,19 +839,8 @@ void HPIFit::storeHeadPosition(float fTime,
     // Write quaternions and vecTime in position matrix. Format is the same like MaxFilter's .pos files.
     Matrix3f matRot = transDevHead.block(0,0,3,3);
 
-    // don't take values below 0 into account (-1 means dropped coil)
-    std::vector<double> vecTargetError;
-    std::copy_if(vecError.begin(), vecError.end(), std::back_inserter(vecTargetError),[](double n ){ return  n >= 0.0;});
-    double dError = std::accumulate(vecTargetError.begin(), vecTargetError.end(), .0) / vecTargetError.size();     // HPI estimation Error
-
-    std::vector<double> vecTargetGof;
-    std::copy_if(vecGoF.data(), vecGoF.data() + vecGoF.size(), std::back_inserter(vecTargetGof),[](double n ){ return  n >= 0.0;});
-    double dGoF = std::accumulate(vecTargetGof.begin(), vecTargetGof.end(), .0) / vecTargetGof.size();     // HPI estimation Error
-
     Eigen::Quaternionf quatHPI(matRot);
-
-//    qDebug() << "quatHPI.x() " << "quatHPI.y() " << "quatHPI.y() " << "trans x " << "trans y " << "trans z ";
-//    qDebug() << quatHPI.x() << quatHPI.y() << quatHPI.z() << transDevHead(0,3) << transDevHead(1,3) << transDevHead(2,3);
+    double dError = std::accumulate(vecError.begin(), vecError.end(), .0) / vecError.size();     // HPI estimation Error
 
     matPosition.conservativeResize(matPosition.rows()+1, 10);
     matPosition(matPosition.rows()-1,0) = fTime;
@@ -852,7 +850,7 @@ void HPIFit::storeHeadPosition(float fTime,
     matPosition(matPosition.rows()-1,4) = transDevHead(0,3);
     matPosition(matPosition.rows()-1,5) = transDevHead(1,3);
     matPosition(matPosition.rows()-1,6) = transDevHead(2,3);
-    matPosition(matPosition.rows()-1,7) = dGoF;
+    matPosition(matPosition.rows()-1,7) = vecGoF.mean();
     matPosition(matPosition.rows()-1,8) = dError;
     matPosition(matPosition.rows()-1,9) = 0;
 }
@@ -1051,8 +1049,8 @@ MatrixXd HPIFit::dropCoils(const VectorXd vecGoF,
     // initial transformation
     MatrixXd matTransNew = MatrixXd(4,4);
     MatrixXd matTrans = computeTransformation(matHeadCoil,matCoil);
-    double dFre = objectTrans(matHeadCoil,matCoil,matTrans); // fiducial registration error
-    double dFreNew = 0.0;
+    double dErrorActual = objectTrans(matHeadCoil,matCoil,matTrans); // fiducial registration error
+    double dErrorActualNew = 0.0;
 
     // resize elements
     MatrixXd matCoilDrop = matCoil;
@@ -1082,12 +1080,12 @@ MatrixXd HPIFit::dropCoils(const VectorXd vecGoF,
         matTransNew = dropCoils(vecGofDrop, matCoilDrop, matHeadDrop, vecIndDrop);
 
         // fiducial registration error
-        dFreNew = objectTrans(matHeadDrop,matCoilDrop,matTransNew);
+        dErrorActualNew = objectTrans(matHeadDrop,matCoilDrop,matTransNew);
 
         iNumUsed--;
 
-        // update if dFreNew < dFreOld;
-        if(dFreNew < dFre) {
+        // update if dErrorActualNew < dErrorActualOld;
+        if(dErrorActualNew < dErrorActual) {
             matTrans = matTransNew;
             vecInd = vecIndDrop;
         }
@@ -1103,7 +1101,6 @@ double HPIFit::objectTrans(const MatrixXd matHeadCoil,
 {
     // Compute the fiducial registration error - the lower, the better.
     int iNumCoils = matHeadCoil.rows();
-    double dFRE = 0.0;
     MatrixXd matTemp = matCoil;
 
     // homogeneous coordinates
@@ -1116,7 +1113,10 @@ double HPIFit::objectTrans(const MatrixXd matHeadCoil,
 
     // remove
     MatrixXd matDiff = matTestPos.block(0,0,3,iNumCoils) - matHeadCoil.transpose();
-    dFRE = std::sqrt(1.0/(2.0*iNumCoils) * (matDiff*matDiff.transpose()).trace());
-    qDebug() << dFRE;
-    return dFRE;
+    VectorXd vecError = matDiff.colwise().norm();
+    // std::cout << vecError.transpose() << std::endl;
+    // compute error
+    double dError = matDiff.colwise().norm().mean();;
+
+    return dError;
 }
