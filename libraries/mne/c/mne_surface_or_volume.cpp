@@ -3861,7 +3861,7 @@ int MneSurfaceOrVolume::read_tag_data(FILE *fp, int tag, long long nbytes, unsig
     if (nbytes > 0) {
         dum = MALLOC_17(nbytes+1,unsigned char);
         if (fread(dum,sizeof(unsigned char),nbytes,fp) != snbytes) {
-            printf( "Failed to read %d bytes of tag data",nbytes);
+            printf("Failed to read %d bytes of tag data",static_cast<int>(nbytes));
             FREE_17(dum);
             return FAIL;
         }
