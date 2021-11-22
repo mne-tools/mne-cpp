@@ -76,6 +76,7 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
+    hpiFit/sensorset.cpp \
     inverse_global.cpp \
     minimumNorm/minimumnorm.cpp \
     rapMusic/rapmusic.cpp \
@@ -95,6 +96,7 @@ SOURCES += \
     hpiFit/hpifitdata.cpp
 
 HEADERS +=\
+    hpiFit/sensorset.h \
     inverse_global.h \
     IInverseAlgorithm.h \
     minimumNorm/minimumnorm.h \
