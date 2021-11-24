@@ -75,7 +75,11 @@ HEADERS +=  edf_info.h \
             edf_raw_data.h \
             edf_ch_info.h \
 
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+*-clang++ {
+    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
+} else {
+    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
+}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 unix:!macx {

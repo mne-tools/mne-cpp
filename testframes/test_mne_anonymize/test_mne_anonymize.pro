@@ -75,7 +75,11 @@ HEADERS  += \
     ../../applications/mne_anonymize/settingscontrollercl.h \
     ../../applications/mne_anonymize/fiffanonymizer.h \
 
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+*-clang++ {
+    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
+} else {
+    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
+}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 contains(MNECPP_CONFIG, withCodeCov) {

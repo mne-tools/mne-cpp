@@ -82,7 +82,11 @@ HEADERS += \
     ../../applications/mne_edf2fiff/edf_info.h \
     ../../applications/mne_edf2fiff/edf_ch_info.h \
 
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+*-clang++ {
+    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
+} else {
+    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
+}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += ../../applications/mne_edf2fiff
 
