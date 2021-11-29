@@ -203,13 +203,6 @@ void FwdCompData::fwd_free_comp_data(void *d)
     if (!comp)
         return;
 
-    if(comp->comp_coils)
-        delete comp->comp_coils;
-    if(comp->set)
-        delete comp->set;
-    FREE_60(comp->work);
-    FREE_CMATRIX_60(comp->vec_work);
-
     if (comp->client_free && comp->client)
         comp->client_free(comp->client);
 
