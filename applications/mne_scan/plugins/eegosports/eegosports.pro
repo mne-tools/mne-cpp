@@ -109,7 +109,11 @@ FORMS += \
         FormFiles/eegosportssetup.ui \
         FormFiles/eegosportssetupprojectwidget.ui \
 
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+*-clang++ {
+    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
+} else {
+    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
+}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 

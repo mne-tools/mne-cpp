@@ -135,7 +135,11 @@ HEADERS += fiff.h \
     c/fiff_coord_trans_set.h \
     fifffilesharer.h
 
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+*-clang++ {
+    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
+} else {
+    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
+}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 contains(MNECPP_CONFIG, withCodeCov) {
