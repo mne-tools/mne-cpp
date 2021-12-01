@@ -149,6 +149,19 @@ public:
 signals:
 
 private:
+
+    //=========================================================================================================
+    /**
+     * Stops all sensor plugins in m_pluginList.
+     */
+    void stopSensorPlugins();
+
+    //=========================================================================================================
+    /**
+     * Stops all non-sensor plugins in m_pluginList.
+     */
+    void stopNonSensorPlugins();
+
     PluginList m_pluginList;    /**< List of plugins associated with this set. */
 //    PluginConnectorConnectionList m_conConList; /**< List of connector connections. */
 

@@ -180,25 +180,8 @@ bool PluginSceneManager::startAlgorithmPlugins()
 
 void PluginSceneManager::stopPlugins()
 {
-    // Stop AbstractSensor plugins first!
-    QList<AbstractPlugin::SPtr>::iterator it = m_pluginList.begin();
-    for( ; it != m_pluginList.end(); ++it)
-        if((*it)->getType() == AbstractPlugin::_ISensor){
-            (*it)->requestInterruption();
-            (*it)->wait();
-            if(!(*it)->stop())
-                qWarning() << "Could not stop AbstractPlugin: " << (*it)->getName();
-        }
-
-    // Stop all other plugins!
-    it = m_pluginList.begin();
-    for( ; it != m_pluginList.end(); ++it)
-        if((*it)->getType() != AbstractPlugin::_ISensor){
-            (*it)->requestInterruption();
-            (*it)->wait();
-            if(!(*it)->stop())
-                qWarning() << "Could not stop AbstractPlugin: " << (*it)->getName();
-        }
+    stopSensorPlugins();
+    stopNonSensorPlugins();
 }
 
 //=============================================================================================================
@@ -206,4 +189,30 @@ void PluginSceneManager::stopPlugins()
 void PluginSceneManager::clear()
 {
 //    m_pluginList.clear();
+}
+
+//=============================================================================================================
+
+void PluginSceneManager::stopSensorPlugins()
+{
+    for(auto& plugin : m_pluginList){
+        if(plugin->getType() == AbstractPlugin::_ISensor){
+            if(!plugin->stop()){
+                qWarning() << "Could not stop AbstractPlugin: " << plugin->getName();
+            }
+        }
+    }
+}
+
+//=============================================================================================================
+
+void PluginSceneManager::stopNonSensorPlugins()
+{
+    for(auto& plugin : m_pluginList){
+        if(plugin->getType() != AbstractPlugin::_ISensor){
+            if(!plugin->stop()){
+                qWarning() << "Could not stop AbstractPlugin: " << plugin->getName();
+            }
+        }
+    }
 }
