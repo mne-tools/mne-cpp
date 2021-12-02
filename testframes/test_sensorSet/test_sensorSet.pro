@@ -1,14 +1,13 @@
 #==============================================================================================================
 #
-# @file     test_fiff_mne_types_io.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Lorenz Esch <lesch@mgh.harvard.edu>
+# @file     test_sensorSet.pro
+# @author   Ruben Dörfel <doerfelruben@aol.com>
 # @since    0.1.0
-# @date     January, 2017
+# @date     November, 2021
 #
 # @section  LICENSE
 #
-# Copyright (C) 2017, Christoph Dinh, Lorenz Esch. All rights reserved.
+# Copyright (C) 2021, Ruben Dörfel. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -18,7 +17,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,7 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Builds the fiff mne types io unit test
+# @brief    This project file generates the makefile to build the test_sensorSet test.
 #
 #==============================================================================================================
 
@@ -37,7 +36,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += testlib network
+QT += testlib concurrent network
 QT -= gui
 
 CONFIG   += console
@@ -47,7 +46,7 @@ CONFIG   += console
 
 DESTDIR =  $${MNE_BINARY_DIR}
 
-TARGET = test_fiff_mne_types_io
+TARGET = test_sensorSet
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -59,24 +58,30 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lmnecppFiffd \
-            -lmnecppFsd \
-            -lmnecppUtilsd
+    LIBS += -lmnecppRtProcessingd \
+            -lmnecppConnectivityd \
+	    -lmnecppInversed \
+	    -lmnecppFwdd \
+	    -lmnecppMned \
+	    -lmnecppFiffd \
+	    -lmnecppFsd \
+	    -lmnecppUtilsd \
 } else {
-    LIBS += -lmnecppFiff \
-            -lmnecppFs \
-            -lmnecppUtils
+    LIBS += -lmnecppRtProcessing \
+            -lmnecppConnectivity \
+	    -lmnecppInverse \
+	    -lmnecppFwd \
+	    -lmnecppMne \
+	    -lmnecppFiff \
+	    -lmnecppFs \
+	    -lmnecppUtils \
 }
 
 SOURCES += \
-    ../test_hpiFit/test_hpiFit.cpp \
-    test_fiff_mne_types_io.cpp
+    test_sensorSet.cpp
 
-clang {
-    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
-} else {
-    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
-}
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 contains(MNECPP_CONFIG, withCodeCov) {
@@ -92,7 +97,7 @@ macx {
     QMAKE_LFLAGS += -Wl,-rpath,@executable_path/../lib
 }
 
-# Activate FFTW backend in Eigen for non-static builds only
+# Activate FFTW backend in Eigen
 contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
     DEFINES += EIGEN_FFTW_DEFAULT
     INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
@@ -100,17 +105,14 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
 
     win32 {
         # On Windows
-        LIBS += -llibfftw3-3 \
-                -llibfftw3f-3 \
-                -llibfftw3l-3 \
+	LIBS += -llibfftw3-3 \
+	        -llibfftw3f-3 \
+		-llibfftw3l-3 \
     }
 
     unix:!macx {
         # On Linux
-        LIBS += -lfftw3 \
-                -lfftw3_threads \
+	LIBS += -lfftw3 \
+	        -lfftw3_threads \
     }
 }
-
-SUBDIRS += \
-    ../test_hpiFit/test_hpiFit.pro
