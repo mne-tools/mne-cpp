@@ -150,7 +150,7 @@ RESOURCES += \
         $${ROOT_DIR}/bin/resources/general/styles/styles.qrc \
         $${ROOT_DIR}/bin/resources/general/fonts/fonts.qrc
 
-*-clang++ {
+clang {
     QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
 } else {
     INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
