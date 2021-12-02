@@ -75,7 +75,7 @@ HEADERS  += \
     ../../applications/mne_anonymize/settingscontrollercl.h \
     ../../applications/mne_anonymize/fiffanonymizer.h \
 
-*-clang++ {
+clang {
     QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
 } else {
     INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 

@@ -124,7 +124,7 @@ FORMS += \
         FormFiles/tmsiimpedancewidget.ui \
         FormFiles/tmsisetupprojectwidget.ui
 
-*-clang++ {
+clang {
     QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
 } else {
     INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 

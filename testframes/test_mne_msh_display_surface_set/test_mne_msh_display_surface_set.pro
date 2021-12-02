@@ -73,7 +73,7 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     test_mne_msh_display_surface_set.cpp
 
-*-clang++ {
+clang {
     QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
 } else {
     INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 

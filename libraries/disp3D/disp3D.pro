@@ -196,7 +196,7 @@ FORMS += \
 
 RESOURCES += $$PWD/disp3d.qrc \
 
-*-clang++ {
+clang {
     QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
 } else {
     INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 

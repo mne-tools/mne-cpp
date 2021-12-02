@@ -120,7 +120,7 @@ HEADERS += \
     Model/eventmodel.h \
     Model/averagingdatamodel.h \
 
-*-clang++ {
+clang {
     QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
 } else {
     INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 

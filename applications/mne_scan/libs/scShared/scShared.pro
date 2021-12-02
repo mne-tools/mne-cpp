@@ -118,7 +118,7 @@ HEADERS += \
     Management/pluginscenemanager.h \
     Management/displaymanager.h
 
-*-clang++ {
+clang {
     QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
 } else {
     INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 

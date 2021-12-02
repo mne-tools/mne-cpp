@@ -135,7 +135,7 @@ HEADERS += fiff.h \
     c/fiff_coord_trans_set.h \
     fifffilesharer.h
 
-*-clang++ {
+clang {
     QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
 } else {
     INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 

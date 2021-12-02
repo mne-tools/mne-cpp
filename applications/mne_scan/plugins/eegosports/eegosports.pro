@@ -109,7 +109,7 @@ FORMS += \
         FormFiles/eegosportssetup.ui \
         FormFiles/eegosportssetupprojectwidget.ui \
 
-*-clang++ {
+clang {
     QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
 } else {
     INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 

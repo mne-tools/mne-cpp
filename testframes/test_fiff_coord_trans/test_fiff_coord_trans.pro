@@ -70,7 +70,7 @@ CONFIG(debug, debug|release) {
 SOURCES += \
     test_fiff_coord_trans.cpp
 
-*-clang++ {
+clang {
     QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
 } else {
     INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
