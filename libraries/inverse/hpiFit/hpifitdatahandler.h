@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
- * @file     sensorset.h
+ * @file     hpifitdatahandler.h
  * @author   Ruben Dörfel <doerfelruben@aol.com>
  * @since    0.1.0
- * @date     November, 2021
+ * @date     December, 2021
  *
  * @section  LICENSE
  *
@@ -28,45 +28,39 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     SensorSet class declaration.
+ * @brief     HpiFitDataHandler class declaration.
  *
  */
 
-#ifndef SENSORSET_H
-#define SENSORSET_H
+#ifndef HPIFITDATAHANDLER_H
+#define HPIFITDATAHANDLER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "../inverse_global.h"
+#include <fiff/fiff_dig_point_set.h>
+#include <fiff/fiff_dig_point.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QObject>
 #include <QSharedPointer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
-
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FWDLIB{
-    class FwdCoil;
-    class FwdCoilSet;
-}
-
 namespace FIFFLIB{
-    class FiffCoordTransOld;
-    class FiffDigPointSet;
+    class FiffInfo;
     class FiffChInfo;
+    class FiffDigPointSet;
 }
 
 //=============================================================================================================
@@ -86,84 +80,110 @@ namespace INVERSELIB
  *
  * @brief Brief description of this class.
  */
-class INVERSESHARED_EXPORT SensorSet
+class INVERSESHARED_EXPORT HpiFitDataHandler
 {
 
 public:
-    typedef QSharedPointer<SensorSet> SPtr;            /**< Shared pointer type for SensorSet. */
-    typedef QSharedPointer<const SensorSet> ConstSPtr; /**< Const shared pointer type for SensorSet. */
+    typedef QSharedPointer<HpiFitDataHandler> SPtr;            /**< Shared pointer type for HpiFitDataHandler. */
+    typedef QSharedPointer<const HpiFitDataHandler> ConstSPtr; /**< Const shared pointer type for HpiFitDataHandler. */
 
     //=========================================================================================================
     /**
-    * Constructs a MEG SensorSet object.
+    * Constructs a HpiFitDataHandler object.
     */
-    explicit SensorSet();
+    HpiFitDataHandler(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
-     * Update SensorSet from new channel list with new accuracy.
+     * Reduce data to only use good channels.
      *
-     * @param[in] channelList   The channel list to create the MEG sensor set from.
-     * @param[in] iAccuracy     The accuracy level to use for the sensor set.
+     * @param[in] matProjectors     The projector matrix.
      *
      */
+    void prepareData(const Eigen::MatrixXd& matData);
 
-    void updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
-                         const int iAccuracy);
+    //=========================================================================================================
+    /**
+     * Reduce projectors to only use good channels.
+     *
+     * @param[in] matProjectors     The projector matrix.
+     *
+     */
+    void prepareProjectors(const Eigen::MatrixXd& matProjectors);
 
-    Eigen::MatrixXd r0;
-    Eigen::MatrixXd rmag;
-    Eigen::MatrixXd cosmag;
-    Eigen::MatrixXd tra;
-    Eigen::RowVectorXd w;
-    int ncoils;
-    int np;
+    //=========================================================================================================
+    /**
+     * inline get functions for private member variables.
+     *
+     */
+    inline Eigen::MatrixXd getProjectors() const;
+    inline Eigen::MatrixXd getHpiDigitizer() const;
+    inline QList<FIFFLIB::FiffChInfo> getChannels() const;
+    inline QList<QString> getBads() const;
 
 protected:
 
 private:
-
     //=========================================================================================================
     /**
-     * create the Fwd coil set from the channel list with given accuracy
-     * @param[in] channelList   The channel list to create the MEG sensor set from.
-     * @param[in] iAccuracy     The accuracy level to use for the sensor set.
-     */
-    QSharedPointer<FWDLIB::FwdCoilSet> createFwdCoilSet(const QList<FIFFLIB::FiffChInfo>& channelList,
-                                                        const int iAccuracy);
-
-    //=========================================================================================================
-    /**
-     * read coil definitions if necessary
+     * Update the channellist for init and if bads changed
+     *
+     * @param[in] pFiffInfo       The FiffInfo file from the measurement.
      *
      */
-    void readCoilDefinitions();
+    void updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
-     * convert data from FwdCoilSet to SensorSet.
+     * Update the list of bad channels
      *
-     * @param[in] pCoilMeg   The initialized fwd coilset to get data from.
+     * @param[in] pFiffInfo       The FiffInfo file from the measurement.
      *
      */
-    void convertFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> pCoilMeg);
+    void updateBadChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
-     * initialize member matrices for specific size.
-     * @param[in] iNchan   The number of channels.
-     * @param[in] iAcc     The number of integration points.
+     * Update the digitized HPI coils.
+     * @param[in]   lDig          The digitizer list to extract the hpi coils from.
+     *
      */
-    void initMatrices(const int iNchan, const int iNp);
+    void updateHpiDigitizer(const QList<FIFFLIB::FiffDigPoint>& lDig);
 
-    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilDefinitions;    // the coil definitions as template
+    QList<FIFFLIB::FiffChInfo> m_lChannels; /**< Channellist with bads excluded. */
+    QVector<int> m_vecInnerind;             /**< index of inner channels . */
+    QList<QString> m_lBads;                 /**< contains bad channels . */
+    Eigen::MatrixXd m_matHpiDigitizer;      /**< The coordinates of the digitized HPI coils in head space*/
+    Eigen::MatrixXd m_matProjectors;        /**< The projectors ready to use*/
+    Eigen::MatrixXd m_matInnerdata;         /**< The data ready to use*/
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+inline QList<FIFFLIB::FiffChInfo> HpiFitDataHandler::getChannels() const
+{
+    return m_lChannels;
+}
+
+inline QList<QString> HpiFitDataHandler::getBads() const
+{
+    return m_lBads;
+}
+
+
+inline Eigen::MatrixXd HpiFitDataHandler::getProjectors() const
+{
+    return m_matProjectors;
+}
+
+inline Eigen::MatrixXd HpiFitDataHandler::getHpiDigitizer() const
+{
+    return m_matHpiDigitizer;
+}
+
 } // namespace INVERSELIB
 
-#endif // SENSORSET_H
+#endif // HPIFITDATAHANDLER_H
 
