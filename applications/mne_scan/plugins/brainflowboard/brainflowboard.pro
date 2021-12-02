@@ -81,7 +81,7 @@ contains(QT_ARCH, i386) {
 }
 
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-*-clang++ {
+clang {
     QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
 } else {
     INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
