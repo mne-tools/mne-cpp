@@ -69,7 +69,6 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    ../test_hpiFit/test_hpiFit.cpp \
     test_fiff_mne_types_io.cpp
 
 clang {
