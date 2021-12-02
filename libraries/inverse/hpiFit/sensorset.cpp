@@ -72,12 +72,17 @@ using namespace Eigen;
 
 SensorSet::SensorSet()
 {
-    QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
-    m_pCoilTemplate = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath));
-
     this->ncoils = 0;
     this->np = 0;
 
+}
+
+//=============================================================================================================
+
+void SensorSet::initCoilTemplate()
+{
+    QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
+    m_pCoilTemplate = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath));
 }
 
 //=============================================================================================================
@@ -88,6 +93,10 @@ void SensorSet::updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
     if(channelList.size() == 0) {
         std::cout<<std::endl<< "HPIFit::updateSensor - No channels. Returning.";
         return;
+    }
+
+    if(!m_pCoilTemplate) {
+        initCoilTemplate();
     }
 
     FiffCoordTransOld* t = NULL;
