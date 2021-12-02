@@ -110,7 +110,7 @@ HEADERS += \
 RESOURCES += \
     scDisp.qrc
 
-*-clang++ {
+clang {
     QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
 } else {
     INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
