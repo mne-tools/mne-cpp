@@ -79,14 +79,14 @@ public:
 private slots:
     void initTestCase();
     void testConstructor();
+    void testChannelList_empty();
     void testChannelList_acc1();
     void testChannelList_acc2();
     void cleanupTestCase();
 
 private:
     // declare your thresholds, variables and error values here
-    QList<FIFFLIB::FiffChInfo> lChannels;
-
+    QList<FIFFLIB::FiffChInfo> m_lChannels;
 
 };
 
@@ -117,7 +117,7 @@ void TestSensorSet::initTestCase()
             pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
             // Check if the sensor is bad, if not append to innerind
             if(!(pFiffInfo->bads.contains(pFiffInfo->ch_names.at(i)))) {
-                lChannels.append(pFiffInfo->chs[i]);
+                m_lChannels.append(pFiffInfo->chs[i]);
             }
         }
     }
@@ -148,6 +148,34 @@ void TestSensorSet::testConstructor()
 
 //=============================================================================================================
 
+void TestSensorSet::testChannelList_empty()
+{
+    int iNChan = 0;
+    int iNp = 0;
+    int iNRmag = 0;
+    int iNCosmag = 0;
+    int iNTra = 0;
+    int iNW = 0;
+
+    /// act
+    int iAccuracy = 1;
+
+    SensorSet sensorsActual = SensorSet();
+    QList<FIFFLIB::FiffChInfo> lChannels;
+
+    sensorsActual.updateSensorSet(lChannels,iAccuracy);
+
+    /// assert
+    QVERIFY2(iNp == sensorsActual.np,"Number of integration points does not match.");
+    QVERIFY2(iNChan == sensorsActual.ncoils,"Number of channels does not match.");
+    QVERIFY2(iNRmag == sensorsActual.rmag.rows(),"Number of points for computation does not match.");
+    QVERIFY2(iNCosmag == sensorsActual.cosmag.rows(),"Number of points for computation does not match.");
+    QVERIFY2(iNTra == sensorsActual.tra.size(),"Size of square matrix does not match.");
+    QVERIFY2(iNW == sensorsActual.w.size(),"Number of iweights does not match");
+}
+
+//=============================================================================================================
+
 void TestSensorSet::testChannelList_acc1()
 {
     // create vector with expected sizes of sensor struct data
@@ -161,7 +189,7 @@ void TestSensorSet::testChannelList_acc1()
     /// act
     int iAccuracy = 1;
     SensorSet sensorsActual = SensorSet();
-    sensorsActual.updateSensorSet(lChannels,iAccuracy);
+    sensorsActual.updateSensorSet(m_lChannels,iAccuracy);
 
     /// assert
     QVERIFY2(iNp == sensorsActual.np,"Number of integration points does not match.");
@@ -187,7 +215,7 @@ void TestSensorSet::testChannelList_acc2()
     /// act
     int iAccuracy = 2;
     SensorSet sensorsActual = SensorSet();
-    sensorsActual.updateSensorSet(lChannels,iAccuracy);
+    sensorsActual.updateSensorSet(m_lChannels,iAccuracy);
 
     /// assert
     QVERIFY2(iNp == sensorsActual.np,"Number of integration points does not match.");
