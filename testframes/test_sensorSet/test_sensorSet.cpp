@@ -152,7 +152,7 @@ void TestSensorSet::testChannelList_acc1()
 {
     // create vector with expected sizes of sensor struct data
     int iNChan = 204;               // number of channels (204 gradiometers)
-    int iNp = 8;                    // 8 integration points for acc 2
+    int iNp = 4;                    // 8 integration points for acc 2
     int iNRmag = iNp * iNChan;      // expected number of points for computation, 8 for each sensor -> 8*204
     int iNCosmag = iNp * iNChan;    // same as rmag
     int iNTra = iNChan*iNChan;      // size square matrix 204*204
