@@ -79,7 +79,7 @@ SensorSet::SensorSet()
 
 //=============================================================================================================
 
-void SensorSet::initCoilTemplate()
+void SensorSet::readCoilDefinitions()
 {
     QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
     m_pCoilDefinitions = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath));
@@ -96,28 +96,34 @@ void SensorSet::updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
     }
 
     if(!m_pCoilDefinitions) {
-        initCoilTemplate();
+        readCoilDefinitions();
     }
 
-    FiffCoordTransOld* t = NULL;
-
-    FwdCoilSet::SPtr pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(channelList, channelList.size(), iAccuracy, t));
-
-    this->ncoils = pCoilMeg->ncoil;
-    this->np = pCoilMeg->coils[0]->np;
+    FwdCoilSet::SPtr pCoilMeg = createFwdCoilSet(channelList,iAccuracy);
 
     convertFromFwdCoilSet(pCoilMeg);
 }
 
 //=============================================================================================================
 
+FwdCoilSet::SPtr SensorSet::createFwdCoilSet(const QList<FIFFLIB::FiffChInfo>& channelList,
+                                             const int iAccuracy)
+{
+    FiffCoordTransOld* t = NULL;
+    return FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(channelList, channelList.size(), iAccuracy, t));
+}
+
+//=============================================================================================================
+
 void SensorSet::convertFromFwdCoilSet(const FwdCoilSet::SPtr pCoilMeg)
 {
+    int iNchan = pCoilMeg->ncoil;
+    int iNp = pCoilMeg->coils[0]->np;
 
-    initMatrices();
+    this->ncoils = iNchan;
+    this->np = iNp;
 
-    int iNchan = this->ncoils;
-    int iNp = this->np;
+    initMatrices(iNchan,iNp);
 
     // get data froms Fwd Coilset
     for(int i = 0; i < iNchan; i++){
@@ -146,11 +152,8 @@ void SensorSet::convertFromFwdCoilSet(const FwdCoilSet::SPtr pCoilMeg)
 
 //=============================================================================================================
 
-void SensorSet::initMatrices()
+void SensorSet::initMatrices(const int iNchan, const int iNp)
 {
-    int iNchan = this->ncoils;
-    int iNp = this->np;
-
     this->r0 = MatrixXd(iNchan,3);
     this->rmag = MatrixXd(iNchan*iNp,3);
     this->cosmag = MatrixXd(iNchan*iNp,3);

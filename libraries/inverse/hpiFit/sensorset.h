@@ -126,10 +126,19 @@ private:
 
     //=========================================================================================================
     /**
-     * read coil template if necessary
+     * create the Fwd coil set from the channel list with given accuracy
+     * @param[in] channelList   The channel list to create the MEG sensor set from.
+     * @param[in] iAccuracy     The accuracy level to use for the sensor set.
+     */
+    QSharedPointer<FWDLIB::FwdCoilSet> createFwdCoilSet(const QList<FIFFLIB::FiffChInfo>& channelList,
+                                                        const int iAccuracy);
+
+    //=========================================================================================================
+    /**
+     * read coil definitions if necessary
      *
      */
-    void initCoilTemplate();
+    void readCoilDefinitions();
 
     //=========================================================================================================
     /**
@@ -142,10 +151,11 @@ private:
 
     //=========================================================================================================
     /**
-     * initialize member matrices.
-     *
+     * initialize member matrices for specific size.
+     * @param[in] iNchan   The number of channels.
+     * @param[in] iAcc     The number of integration points.
      */
-    void initMatrices();
+    void initMatrices(const int iNchan, const int iNp);
 
     QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilDefinitions;    // the coil definitions as template
 };
