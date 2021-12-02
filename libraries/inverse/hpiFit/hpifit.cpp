@@ -40,6 +40,7 @@
 
 #include "hpifit.h"
 #include "hpifitdata.h"
+#include "sensorset.h"
 
 #include <utils/ioutils.h>
 #include <utils/mnemath.h>
@@ -94,10 +95,6 @@ HPIFit::HPIFit()
     m_vecFreqs = QVector<int>();
     m_matHeadHPI = MatrixXd(0,0);
     m_matProjectors = MatrixXd(0,0);
-
-    // read coil_def.dat
-    QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
-    m_pCoilTemplate = QSharedPointer<FWDLIB::FwdCoilSet>(FwdCoilSet::read_coil_defs(qPath));
 }
 
 //=============================================================================================================
@@ -114,9 +111,6 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
     m_matHeadHPI = MatrixXd(0,0);
     m_matProjectors = MatrixXd(0,0);
     m_isInitialized = false;
-    // read coil_def.dat
-    QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
-    m_pCoilTemplate = QSharedPointer<FWDLIB::FwdCoilSet>(FwdCoilSet::read_coil_defs(qPath));
 
     // update channel list
     updateChannels(pFiffInfo);
@@ -859,50 +853,7 @@ void HPIFit::storeHeadPosition(float fTime,
 
 void HPIFit::updateSensor(const int iAcc)
 {
-    // Create MEG-Coils and read data
-    int iNchan = m_lChannels.size();
-
-    if(iNchan == 0) {
-        std::cout<<std::endl<< "HPIFit::updateSensor - No channels. Returning.";
-        return;
-    }
-
-    FiffCoordTransOld* t = NULL;
-
-    // create sensor set
-    QSharedPointer<FWDLIB::FwdCoilSet> pCoilMeg = QSharedPointer<FWDLIB::FwdCoilSet>(m_pCoilTemplate->create_meg_coils(m_lChannels, iNchan, iAcc, t));
-
-    // init sensor struct
-    int iNp = pCoilMeg->coils[0]->np;
-    m_sensors.w = RowVectorXd(iNchan*iNp);
-    m_sensors.r0 = MatrixXd(iNchan,3);
-    m_sensors.cosmag = MatrixXd(iNchan*iNp,3);
-    m_sensors.rmag = MatrixXd(iNchan*iNp,3);
-    m_sensors.ncoils = iNchan;
-    m_sensors.tra = MatrixXd::Identity(iNchan,iNchan);
-    m_sensors.np = iNp;
-
-    for(int i = 0; i < iNchan; i++){
-        FwdCoil* coil = (pCoilMeg->coils[i]);
-        MatrixXd matRmag = MatrixXd::Zero(iNp,3);
-        MatrixXd matCosmag = MatrixXd::Zero(iNp,3);
-        RowVectorXd vecW(iNp);
-
-        m_sensors.r0(i,0) = coil->r0[0];
-        m_sensors.r0(i,1) = coil->r0[1];
-        m_sensors.r0(i,2) = coil->r0[2];
-
-        for (int p = 0; p < iNp; p++){
-            m_sensors.w(i*iNp+p) = coil->w[p];
-            for (int c = 0; c < 3; c++) {
-                matRmag(p,c)   = coil->rmag[p][c];
-                matCosmag(p,c) = coil->cosmag[p][c];
-            }
-        }
-
-        m_sensors.cosmag.block(i*iNp,0,iNp,3) = matCosmag;
-        m_sensors.rmag.block(i*iNp,0,iNp,3) = matRmag;
-    }
+    m_sensors.updateSensorSet(m_lChannels,iAcc);
 }
 
 //=============================================================================================================

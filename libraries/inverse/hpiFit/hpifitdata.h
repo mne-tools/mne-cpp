@@ -43,6 +43,7 @@
 
 #include "../inverse_global.h"
 #include "hpifit.h"
+#include "sensorset.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -97,6 +98,7 @@ struct HPISortStruct {
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+    class SensorSet;
 
 //=============================================================================================================
 /**
@@ -126,7 +128,7 @@ public:
     Eigen::MatrixXd         m_coilPos;
     Eigen::RowVectorXd      m_sensorData;
     DipFitError             m_errorInfo;
-    struct SensorSet        m_sensors;
+    SensorSet               m_sensors;
     Eigen::MatrixXd         m_matProjector;
 
     int                     m_iMaxIterations;
@@ -152,7 +154,7 @@ protected:
      * same output.
      */
     Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& matPos,
-                                      const struct SensorSet& sensors);
+                                      const SensorSet& sensors);
 
     //=========================================================================================================
     /**
@@ -163,7 +165,7 @@ protected:
      */
     DipFitError dipfitError(const Eigen::MatrixXd& matPos,
                             const Eigen::MatrixXd& matData,
-                            const struct SensorSet& sensors,
+                            const SensorSet& sensors,
                             const Eigen::MatrixXd& matProjectors);
 
     //=========================================================================================================
@@ -184,7 +186,7 @@ protected:
                                int iDisplay,
                                const Eigen::MatrixXd& matData,
                                const Eigen::MatrixXd& matProjectors,
-                               const struct SensorSet& sensors,
+                               const SensorSet& sensors,
                                int &iSimplexNumitr);
 };
 

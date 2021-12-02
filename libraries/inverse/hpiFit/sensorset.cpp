@@ -36,10 +36,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "sensorset.h"
+#include <inverse/hpiFit/sensorset.h>
 #include <iostream>
-#include <Eigen/Dense>
 #include <fwd/fwd_coil_set.h>
+#include <fiff/fiff_ch_info.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -50,6 +50,8 @@
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
+
+#include <Eigen/Dense>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -70,23 +72,18 @@ using namespace Eigen;
 
 SensorSet::SensorSet()
 {
-
     QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
     m_pCoilTemplate = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath));
 
-    this->w = RowVectorXd(0);
-    this->r0 = MatrixXd(0);
-    this->cosmag = MatrixXd(0);
-    this->rmag = MatrixXd(0);
     this->ncoils = 0;
-    this->tra = MatrixXd::Identity(0,0);
     this->np = 0;
 
 }
 
 //=============================================================================================================
 
-void SensorSet::updateSensorSet(const QList<FiffChInfo> channelList, const int iAccuracy)
+void SensorSet::updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
+                                const int iAccuracy)
 {
     if(channelList.size() == 0) {
         std::cout<<std::endl<< "HPIFit::updateSensor - No channels. Returning.";
@@ -97,6 +94,10 @@ void SensorSet::updateSensorSet(const QList<FiffChInfo> channelList, const int i
 
     FwdCoilSet::SPtr pCoilMeg = FwdCoilSet::SPtr(m_pCoilTemplate->create_meg_coils(channelList, channelList.size(), iAccuracy, t));
 
+    this->ncoils = pCoilMeg->ncoil;
+    this->np = pCoilMeg->coils[0]->np;
+
+    initMatrices();
     convertFromFwdCoilSet(pCoilMeg);
 }
 
@@ -104,10 +105,10 @@ void SensorSet::updateSensorSet(const QList<FiffChInfo> channelList, const int i
 
 void SensorSet::convertFromFwdCoilSet(const FwdCoilSet::SPtr pCoilMeg)
 {
-    int iNchan = pCoilMeg->ncoil;
-    int iNp = pCoilMeg->coils[0]->np;
+    int iNchan = this->ncoils;
+    int iNp = this->np;
 
-    // init sensor struct
+    // get data froms Fwd Coilset
     for(int i = 0; i < iNchan; i++){
         FwdCoil* coil = (pCoilMeg->coils[i]);
         MatrixXd matRmag = MatrixXd::Zero(iNp,3);
@@ -129,4 +130,20 @@ void SensorSet::convertFromFwdCoilSet(const FwdCoilSet::SPtr pCoilMeg)
         this->cosmag.block(i*iNp,0,iNp,3) = matCosmag;
         this->rmag.block(i*iNp,0,iNp,3) = matRmag;
     }
+    this->tra = MatrixXd::Identity(iNchan,iNchan);
+}
+
+//=============================================================================================================
+
+void SensorSet::initMatrices()
+{
+    int iNchan = this->ncoils;
+    int iNp = this->np;
+
+    this->r0 = MatrixXd(iNchan,3);
+    this->rmag = MatrixXd(iNchan*iNp,3);
+    this->cosmag = MatrixXd(iNchan*iNp,3);
+    this->cosmag = MatrixXd(iNchan*iNp,3);
+    this->tra = MatrixXd(iNchan,iNchan);
+    this->w = RowVectorXd(iNchan*iNp);
 }

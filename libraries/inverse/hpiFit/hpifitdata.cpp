@@ -40,6 +40,8 @@
 
 #include "hpifitdata.h"
 #include "hpifit.h"
+#include "sensorset.h"
+
 #include <utils/mnemath.h>
 
 #include <iostream>
@@ -176,7 +178,7 @@ Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& matPos, con
 
 DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& matPos,
                                     const Eigen::MatrixXd& matData,
-                                    const struct SensorSet& sensors,
+                                    const SensorSet& sensors,
                                     const Eigen::MatrixXd& matProjectors)
 {
     // Variable Declaration
@@ -222,7 +224,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& matPos,
                                        int iDisplay,
                                        const Eigen::MatrixXd& matData,
                                        const Eigen::MatrixXd& matProjectors,
-                                       const struct SensorSet& sensors,
+                                       const SensorSet& sensors,
                                        int &iSimplexNumitr)
 {
     double tolx, tolf, rho, chi, psi, sigma, func_evals, usual_delta, zero_term_delta, temp1, temp2;

@@ -97,9 +97,6 @@ private slots:
     void testConstructor_channels_size();           // compare size of channel list
     void testConstructor_bads();                    // compare bad channels
     void testConstructor_channels_bads_size();      // compare expected size when bads included
-    void testConstructor_sensors();                 // check size of sensor struct for sensorset from constructor, acc = 2
-    void testUpdateSensors_acc1();                  // check size of updated sensor struct for sensorset, acc = 1
-    void testUpdateSensors_empty();                 // check size of updated sensor when HPI object not yet initialized
     void testUpdateChannels_channels();             // compare channel list
     void testUpdateChannels_channels_bads();        // compare channel list when bads are included
     void testUpdateChannels_channels_bads_size();   // compare channel list  size when bads are included
@@ -329,87 +326,6 @@ void TestHpiFit::testConstructor_channels_bads_size()
 
     /// assert
     QVERIFY(iNChanActual == iNChanExpected);
-}
-
-//=============================================================================================================
-
-void TestHpiFit::testConstructor_sensors()
-{
-    /// prepare
-    // use already tested functions to get channels
-    HPIFit HPI = HPIFit(m_pFiffInfo);
-    QList<FIFFLIB::FiffChInfo> lChannels = HPI.getChannels();
-
-    // create vector with expected sizes of sensor struct data
-    int iNChan = 204;               // number of channels (204 gradiometers)
-    int iNp = 8;                    // 8 integration points for acc 2
-    int iNRmag = iNp * iNChan;      // expected number of points for computation, 8 for each sensor -> 8*204
-    int iNCosmag = iNp * iNChan;    // same as rmag
-    int iNTra = iNChan*iNChan;      // size square matrix 204*204
-    int iNW = iNp * iNChan;         // one weight for each point
-
-    /// act
-    SensorSet sensorsActual = HPI.getSensors();
-
-    /// assert
-    QVERIFY2(iNp == sensorsActual.np,"Number of integration points does not match.");
-    QVERIFY2(iNChan == sensorsActual.ncoils,"Number of channels does not match.");
-    QVERIFY2(iNRmag == sensorsActual.rmag.rows(),"Number of points for computation does not match.");
-    QVERIFY2(iNCosmag == sensorsActual.cosmag.rows(),"Number of points for computation does not match.");
-    QVERIFY2(iNTra == sensorsActual.tra.size(),"Size of square matrix does not match.");
-    QVERIFY2(iNW == sensorsActual.w.size(),"Number of iweights does not match");
-}
-
-//=============================================================================================================
-
-void TestHpiFit::testUpdateSensors_acc1()
-{
-    /// prepare
-    // use already tested functions to get channels
-    HPIFit HPI = HPIFit(m_pFiffInfo);
-
-    // create vector with expected sizes of sensor struct data
-    int iNChan = 204;               // number of channels (204 gradiometers)
-    int iAcc = 1;                   // accuracy to use
-    int iNp = 4;                    // 4 integration points for acc 1
-    int iNRmag = iNp * iNChan;      // expected number of points for computation, 4 for each sensor -> 4*204
-    int iNCosmag = iNp * iNChan;    // same as rmag
-    int iNTra = iNChan*iNChan;      // size square matrix 204*204
-    int iNW = iNp * iNChan;         // one weight for each point
-
-    /// act
-    HPI.updateSensor(iAcc);
-    SensorSet sensorsActual = HPI.getSensors();
-
-    /// assert
-    QVERIFY2(iNp == sensorsActual.np,"Number of integration points does not match.");
-    QVERIFY2(iNChan == sensorsActual.ncoils,"Number of channels does not match.");
-    QVERIFY2(iNRmag == sensorsActual.rmag.rows(),"Number of points for computation does not match.");
-    QVERIFY2(iNCosmag == sensorsActual.cosmag.rows(),"Number of points for computation does not match.");
-    QVERIFY2(iNTra == sensorsActual.tra.size(),"Size of square matrix does not match.");
-    QVERIFY2(iNW == sensorsActual.w.size(),"Number of iweights does not match");
-}
-
-//=============================================================================================================
-
-void TestHpiFit::testUpdateSensors_empty()
-{
-    /// prepare
-    HPIFit HPI = HPIFit();
-    SensorSet sensorExpected = SensorSet();
-
-    /// act
-    int iAcc = 2;
-    HPI.updateSensor(iAcc);
-    SensorSet sensorsActual = HPI.getSensors();
-
-    /// assert
-    QVERIFY2(sensorsActual.np == sensorsActual.np,"Number of integration points does not match.");
-    QVERIFY2(sensorsActual.ncoils == sensorsActual.ncoils,"Number of channels does not match.");
-    QVERIFY2(sensorsActual.rmag.rows() == sensorsActual.rmag.rows(),"Number of points for computation does not match.");
-    QVERIFY2(sensorsActual.cosmag.rows() == sensorsActual.cosmag.rows(),"Number of points for computation does not match.");
-    QVERIFY2(sensorsActual.tra.size() == sensorsActual.tra.size(),"Size of square matrix does not match.");
-    QVERIFY2(sensorsActual.w.size() == sensorsActual.w.size(),"Number of iweights does not match");
 }
 
 //=============================================================================================================
