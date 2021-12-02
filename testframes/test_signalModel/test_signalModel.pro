@@ -1,9 +1,9 @@
 #==============================================================================================================
 #
-# @file     test_sensorSet.pro
+# @file     test_signalModel.pro
 # @author   Ruben Dörfel <doerfelruben@aol.com>
 # @since    0.1.0
-# @date     November, 2021
+# @date     December, 2021
 #
 # @section  LICENSE
 #
@@ -28,7 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the test_sensorSet test.
+# @brief    This project file generates the makefile to build the test_signalModel test.
 #
 #==============================================================================================================
 
@@ -78,7 +78,7 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    test_sensorSet.cpp
+    test_signalModel.cpp
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

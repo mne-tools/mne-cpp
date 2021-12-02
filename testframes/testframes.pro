@@ -53,6 +53,7 @@ SUBDIRS += \
     test_fiff_mne_types_io \
     test_filtering \
     test_hpiFit \
+    test_hpiFitDataHandler \
     test_hpiFit_integration \
     test_mne_forward_solution \
     test_fiff_cov \
@@ -60,7 +61,8 @@ SUBDIRS += \
     test_mne_msh_display_surface_set \
     test_mne_project_to_surface \
     test_utils_circularbuffer \
-    test_sensorSet
+    test_sensorSet \
+    test_signalModel
 
     qtHaveModule(charts) {
         SUBDIRS += \

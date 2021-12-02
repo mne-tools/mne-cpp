@@ -447,6 +447,7 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
     if(!(m_lBads == pFiffInfo->bads) || m_lChannels.isEmpty() || m_matModel.rows()==0) {
         m_lBads = pFiffInfo->bads;
         updateChannels(pFiffInfo);
+        updateSensor();
         updateModel(pFiffInfo->sfreq, matData.cols(), pFiffInfo->linefreq, vecFreqs, bBasic);
     }
 

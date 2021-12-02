@@ -93,7 +93,6 @@ public:
 private slots:
     void initTestCase();                            // run once at the very beginning
     void init();                                    // run before each test
-
     void testConstructor_channels_size();           // compare size of channel list
     void testConstructor_bads();                    // compare bad channels
     void testConstructor_channels_bads_size();      // compare expected size when bads included
@@ -150,7 +149,6 @@ TestHpiFit::TestHpiFit()
 
 void TestHpiFit::initTestCase()
 {
-
     qInstallMessageHandler(ApplicationLogger::customLogWriter);
 
     QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");

@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
- * @file     sensorset.cpp
+ * @file     hpifitdatahandler.cpp
  * @author   Ruben Dörfel <doerfelruben@aol.com>
  * @since    0.1.0
- * @date     November, 2021
+ * @date     December, 2021
  *
  * @section  LICENSE
  *
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    SensorSet class definition.
+ * @brief    HpiFitDataHandler class definition.
  *
  */
 
@@ -36,16 +36,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inverse/hpiFit/sensorset.h>
-#include <iostream>
-#include <fwd/fwd_coil_set.h>
+#include "hpifitdatahandler.h"
 #include <fiff/fiff_ch_info.h>
+#include <fiff/fiff_info.h>
+#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QCoreApplication>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -59,7 +57,6 @@
 
 using namespace INVERSELIB;
 using namespace FIFFLIB;
-using namespace FWDLIB;
 using namespace Eigen;
 
 //=============================================================================================================
@@ -70,93 +67,106 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SensorSet::SensorSet()
+HpiFitDataHandler::HpiFitDataHandler(FiffInfo::SPtr pFiffInfo)
 {
-    this->ncoils = 0;
-    this->np = 0;
+    updateBadChannels(pFiffInfo);
+    updateChannels(pFiffInfo);
+    updateHpiDigitizer(pFiffInfo->dig);
 }
 
 //=============================================================================================================
 
-void SensorSet::readCoilDefinitions()
+void HpiFitDataHandler::updateBadChannels(FiffInfo::SPtr pFiffInfo)
 {
-    QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
-    m_pCoilDefinitions = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath));
+    m_lBads = pFiffInfo->bads;
 }
 
 //=============================================================================================================
 
-void SensorSet::updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
-                                const int iAccuracy)
+void HpiFitDataHandler::updateChannels(FiffInfo::SPtr pFiffInfo)
 {
-    if(channelList.size() == 0) {
-        std::cout<<std::endl<< "HPIFit::updateSensor - No channels. Returning.";
+    // Get the indices of inner layer channels and exclude bad channels and create channellist
+    int iNumCh = pFiffInfo->nchan;
+    m_lChannels.clear();
+    m_vecInnerind.clear();
+    for (int i = 0; i < iNumCh; ++i) {
+        if(pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
+            pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
+            pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
+            pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
+
+            // Check if the sensor is bad, if not append to innerind
+
+            if(!(pFiffInfo->bads.contains(pFiffInfo->ch_names.at(i)))) {
+                m_vecInnerind.append(i);
+                m_lChannels.append(pFiffInfo->chs[i]);
+            }
+        }
+    }
+}
+
+//=============================================================================================================
+
+void HpiFitDataHandler::updateHpiDigitizer(const QList<FiffDigPoint>& lDig)
+{
+    // extract hpi coils from digitizer
+    QList<FiffDigPoint> lHPIPoints;
+    int iNumCoils = 0;
+
+    for(int i = 0; i < lDig.size(); ++i) {
+        if(lDig[i].kind == FIFFV_POINT_HPI) {
+            iNumCoils++;
+            lHPIPoints.append(lDig[i]);
+        }
+    }
+
+    // convert to matrix iNumCoils x 3
+    if (lHPIPoints.size() > 0) {
+        m_matHpiDigitizer = MatrixXd(iNumCoils,3);
+        for (int i = 0; i < lHPIPoints.size(); ++i) {
+            m_matHpiDigitizer(i,0) = lHPIPoints.at(i).r[0];
+            m_matHpiDigitizer(i,1) = lHPIPoints.at(i).r[1];
+            m_matHpiDigitizer(i,2) = lHPIPoints.at(i).r[2];
+        }
+    } else {
+        std::cout << "HPIFit::updateHpiDigitizer - No HPI coils digitized. Returning." << std::endl;
+        return;
+    }
+}
+
+//=============================================================================================================
+
+void HpiFitDataHandler::prepareData(const Eigen::MatrixXd& matData)
+{
+    // extract data for channels to use
+    m_matInnerdata = MatrixXd(m_vecInnerind.size(), matData.cols());
+
+    for(int j = 0; j < m_vecInnerind.size(); ++j) {
+        m_matInnerdata.row(j) << matData.row(m_vecInnerind[j]);
+    }
+}
+
+//=============================================================================================================
+
+void HpiFitDataHandler::prepareProjectors(const Eigen::MatrixXd& matProjectors)
+{
+    // check if m_vecInnerInd is alreadz initialized
+    if(m_vecInnerind.size() == 0) {
+        std::cout << "HPIFit::updateProjectors - No channels. Returning." << std::endl;
         return;
     }
 
-    if(!m_pCoilDefinitions) {
-        readCoilDefinitions();
+    //Create new projector based on the excluded channels, first exclude the rows then the columns
+    MatrixXd matProjectorsRows(m_vecInnerind.size(),matProjectors.cols());
+    MatrixXd matProjectorsInnerind(m_vecInnerind.size(),m_vecInnerind.size());
+
+    for (int i = 0; i < matProjectorsRows.rows(); ++i) {
+        matProjectorsRows.row(i) = matProjectors.row(m_vecInnerind.at(i));
     }
 
-    FwdCoilSet::SPtr pCoilMeg = createFwdCoilSet(channelList,iAccuracy);
-
-    convertFromFwdCoilSet(pCoilMeg);
-}
-
-//=============================================================================================================
-
-FwdCoilSet::SPtr SensorSet::createFwdCoilSet(const QList<FIFFLIB::FiffChInfo>& channelList,
-                                             const int iAccuracy)
-{
-    FiffCoordTransOld* t = NULL;
-    return FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(channelList, channelList.size(), iAccuracy, t));
-}
-
-//=============================================================================================================
-
-void SensorSet::convertFromFwdCoilSet(const FwdCoilSet::SPtr pCoilMeg)
-{
-    int iNchan = pCoilMeg->ncoil;
-    int iNp = pCoilMeg->coils[0]->np;
-
-    this->ncoils = iNchan;
-    this->np = iNp;
-
-    initMatrices(iNchan,iNp);
-
-    // get data froms Fwd Coilset
-    for(int i = 0; i < iNchan; i++){
-        FwdCoil* coil = (pCoilMeg->coils[i]);
-        MatrixXd matRmag = MatrixXd::Zero(iNp,3);
-        MatrixXd matCosmag = MatrixXd::Zero(iNp,3);
-        RowVectorXd vecW(iNp);
-
-        this->r0(i,0) = coil->r0[0];
-        this->r0(i,1) = coil->r0[1];
-        this->r0(i,2) = coil->r0[2];
-
-        for (int p = 0; p < iNp; p++){
-            this->w(i*iNp+p) = coil->w[p];
-            for (int c = 0; c < 3; c++) {
-                matRmag(p,c)   = coil->rmag[p][c];
-                matCosmag(p,c) = coil->cosmag[p][c];
-            }
-        }
-
-        this->cosmag.block(i*iNp,0,iNp,3) = matCosmag;
-        this->rmag.block(i*iNp,0,iNp,3) = matRmag;
+    for (int i = 0; i < matProjectorsInnerind.cols(); ++i) {
+        matProjectorsInnerind.col(i) = matProjectorsRows.col(m_vecInnerind.at(i));
     }
-    this->tra = MatrixXd::Identity(iNchan,iNchan);
-}
-
-//=============================================================================================================
-
-void SensorSet::initMatrices(const int iNchan, const int iNp)
-{
-    this->r0 = MatrixXd(iNchan,3);
-    this->rmag = MatrixXd(iNchan*iNp,3);
-    this->cosmag = MatrixXd(iNchan*iNp,3);
-    this->cosmag = MatrixXd(iNchan*iNp,3);
-    this->tra = MatrixXd(iNchan,iNchan);
-    this->w = RowVectorXd(iNchan*iNp);
+    m_matProjectors = matProjectorsInnerind;
+    return;
 }
