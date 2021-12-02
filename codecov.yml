@@ -4,7 +4,8 @@ codecov:
 coverage:
   precision: 2
   round: down
-  range: "70...100"
+  range: 1..100
+  threshold: 1%
 
   status:
     project: yes
