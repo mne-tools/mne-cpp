@@ -48,6 +48,7 @@
 
 #include <inverse/hpiFit/hpifit.h>
 #include <inverse/hpiFit/hpifitdata.h>
+#include <inverse/hpiFit/sensorset.h>
 
 #include <utils/ioutils.h>
 #include <utils/mnemath.h>

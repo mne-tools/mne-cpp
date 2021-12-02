@@ -59,7 +59,8 @@ SUBDIRS += \
     test_fiff_digitizer \
     test_mne_msh_display_surface_set \
     test_mne_project_to_surface \
-    test_utils_circularbuffer
+    test_utils_circularbuffer \
+    test_sensorSet
 
     qtHaveModule(charts) {
         SUBDIRS += \
