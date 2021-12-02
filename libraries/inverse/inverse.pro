@@ -76,7 +76,6 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    hpiFit/sensorset.cpp \
     inverse_global.cpp \
     minimumNorm/minimumnorm.cpp \
     rapMusic/rapmusic.cpp \
@@ -93,10 +92,10 @@ SOURCES += \
     c/mne_meas_data.cpp \
     c/mne_meas_data_set.cpp \
     hpiFit/hpifit.cpp \
-    hpiFit/hpifitdata.cpp
+    hpiFit/hpifitdata.cpp \
+    hpiFit/sensorset.cpp \
 
 HEADERS +=\
-    hpiFit/sensorset.h \
     inverse_global.h \
     IInverseAlgorithm.h \
     minimumNorm/minimumnorm.h \
@@ -115,7 +114,8 @@ HEADERS +=\
     c/mne_meas_data.h \
     c/mne_meas_data_set.h \
     hpiFit/hpifit.h \
-    hpiFit/hpifitdata.h
+    hpiFit/hpifitdata.h \
+    hpiFit/sensorset.h \
 
 clang {
     QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
