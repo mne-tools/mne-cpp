@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
- * @file     sensorset.h
+ * @file     SignalModel.h
  * @author   Ruben Dörfel <doerfelruben@aol.com>
  * @since    0.1.0
- * @date     November, 2021
+ * @date     December, 2021
  *
  * @section  LICENSE
  *
@@ -28,12 +28,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     SensorSet class declaration.
+ * @brief     SignalModel class declaration.
  *
  */
 
-#ifndef SENSORSET_H
-#define SENSORSET_H
+#ifndef SignalModel_H
+#define SignalModel_H
 
 //=============================================================================================================
 // INCLUDES
@@ -45,7 +45,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QObject>
 #include <QSharedPointer>
 
 //=============================================================================================================
@@ -58,23 +57,13 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FWDLIB{
-    class FwdCoil;
-    class FwdCoilSet;
-}
-
-namespace FIFFLIB{
-    class FiffCoordTransOld;
-    class FiffDigPointSet;
-    class FiffChInfo;
-}
-
 //=============================================================================================================
 // DEFINE NAMESPACE INVERSELIB
 //=============================================================================================================
 
 namespace INVERSELIB
 {
+
 
 //=============================================================================================================
 // INVERSELIB FORWARD DECLARATIONS
@@ -86,77 +75,29 @@ namespace INVERSELIB
  *
  * @brief Brief description of this class.
  */
-class INVERSESHARED_EXPORT SensorSet
+class INVERSESHARED_EXPORT SignalModel
 {
 
 public:
-    typedef QSharedPointer<SensorSet> SPtr;            /**< Shared pointer type for SensorSet. */
-    typedef QSharedPointer<const SensorSet> ConstSPtr; /**< Const shared pointer type for SensorSet. */
+    typedef QSharedPointer<SignalModel> SPtr;            /**< Shared pointer type for SignalModel. */
+    typedef QSharedPointer<const SignalModel> ConstSPtr; /**< Const shared pointer type for SignalModel. */
 
     //=========================================================================================================
     /**
-    * Constructs a MEG SensorSet object.
+    * Constructs a SignalModel object.
     */
-    explicit SensorSet();
+    SignalModel();
 
-    //=========================================================================================================
-    /**
-     * Update SensorSet from new channel list with new accuracy.
-     *
-     * @param[in] channelList   The channel list to create the MEG sensor set from.
-     * @param[in] iAccuracy     The accuracy level to use for the sensor set.
-     *
-     */
+    void setData(const Eigen::MatrixXd& matData);
+    void setFrequencies(const int iSFreq, const int iLineFreq);
 
-    void updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
-                         const int iAccuracy);
-
-    Eigen::MatrixXd r0;
-    Eigen::MatrixXd rmag;
-    Eigen::MatrixXd cosmag;
-    Eigen::MatrixXd tra;
-    Eigen::RowVectorXd w;
-    int ncoils;
-    int np;
+    Eigen::MatrixXd createBasicModel();
+    Eigen::MatrixXd createAdvancedModel();
 
 protected:
 
 private:
-
-    //=========================================================================================================
-    /**
-     * create the Fwd coil set from the channel list with given accuracy
-     * @param[in] channelList   The channel list to create the MEG sensor set from.
-     * @param[in] iAccuracy     The accuracy level to use for the sensor set.
-     */
-    QSharedPointer<FWDLIB::FwdCoilSet> createFwdCoilSet(const QList<FIFFLIB::FiffChInfo>& channelList,
-                                                        const int iAccuracy);
-
-    //=========================================================================================================
-    /**
-     * read coil definitions if necessary
-     *
-     */
-    void readCoilDefinitions();
-
-    //=========================================================================================================
-    /**
-     * convert data from FwdCoilSet to SensorSet.
-     *
-     * @param[in] pCoilMeg   The initialized fwd coilset to get data from.
-     *
-     */
-    void convertFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> pCoilMeg);
-
-    //=========================================================================================================
-    /**
-     * initialize member matrices for specific size.
-     * @param[in] iNchan   The number of channels.
-     * @param[in] iAcc     The number of integration points.
-     */
-    void initMatrices(const int iNchan, const int iNp);
-
-    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilDefinitions;    // the coil definitions as template
+    Eigen::MatrixXd m_matSignalModel;   // the model
 };
 
 //=============================================================================================================
@@ -165,5 +106,5 @@ private:
 
 } // namespace INVERSELIB
 
-#endif // SENSORSET_H
+#endif // SignalModel_H
 

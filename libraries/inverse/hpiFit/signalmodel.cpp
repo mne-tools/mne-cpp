@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
- * @file     sensorset.cpp
+ * @file     signalmodel.cpp
  * @author   Ruben Dörfel <doerfelruben@aol.com>
  * @since    0.1.0
- * @date     November, 2021
+ * @date     December, 2021
  *
  * @section  LICENSE
  *
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    SensorSet class definition.
+ * @brief    signalModel class definition.
  *
  */
 
@@ -36,31 +36,21 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inverse/hpiFit/sensorset.h>
-#include <iostream>
-#include <fwd/fwd_coil_set.h>
-#include <fiff/fiff_ch_info.h>
+#include "signalmodel.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QCoreApplication>
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
-
-#include <Eigen/Dense>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace INVERSELIB;
-using namespace FIFFLIB;
-using namespace FWDLIB;
-using namespace Eigen;
 
 //=============================================================================================================
 // DEFINE GLOBAL METHODS
@@ -70,93 +60,8 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SensorSet::SensorSet()
+SignalModel::SignalModel()
 {
-    this->ncoils = 0;
-    this->np = 0;
 }
 
 //=============================================================================================================
-
-void SensorSet::readCoilDefinitions()
-{
-    QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
-    m_pCoilDefinitions = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath));
-}
-
-//=============================================================================================================
-
-void SensorSet::updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
-                                const int iAccuracy)
-{
-    if(channelList.size() == 0) {
-        std::cout<<std::endl<< "HPIFit::updateSensor - No channels. Returning.";
-        return;
-    }
-
-    if(!m_pCoilDefinitions) {
-        readCoilDefinitions();
-    }
-
-    FwdCoilSet::SPtr pCoilMeg = createFwdCoilSet(channelList,iAccuracy);
-
-    convertFromFwdCoilSet(pCoilMeg);
-}
-
-//=============================================================================================================
-
-FwdCoilSet::SPtr SensorSet::createFwdCoilSet(const QList<FIFFLIB::FiffChInfo>& channelList,
-                                             const int iAccuracy)
-{
-    FiffCoordTransOld* t = NULL;
-    return FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(channelList, channelList.size(), iAccuracy, t));
-}
-
-//=============================================================================================================
-
-void SensorSet::convertFromFwdCoilSet(const FwdCoilSet::SPtr pCoilMeg)
-{
-    int iNchan = pCoilMeg->ncoil;
-    int iNp = pCoilMeg->coils[0]->np;
-
-    this->ncoils = iNchan;
-    this->np = iNp;
-
-    initMatrices(iNchan,iNp);
-
-    // get data froms Fwd Coilset
-    for(int i = 0; i < iNchan; i++){
-        FwdCoil* coil = (pCoilMeg->coils[i]);
-        MatrixXd matRmag = MatrixXd::Zero(iNp,3);
-        MatrixXd matCosmag = MatrixXd::Zero(iNp,3);
-        RowVectorXd vecW(iNp);
-
-        this->r0(i,0) = coil->r0[0];
-        this->r0(i,1) = coil->r0[1];
-        this->r0(i,2) = coil->r0[2];
-
-        for (int p = 0; p < iNp; p++){
-            this->w(i*iNp+p) = coil->w[p];
-            for (int c = 0; c < 3; c++) {
-                matRmag(p,c)   = coil->rmag[p][c];
-                matCosmag(p,c) = coil->cosmag[p][c];
-            }
-        }
-
-        this->cosmag.block(i*iNp,0,iNp,3) = matCosmag;
-        this->rmag.block(i*iNp,0,iNp,3) = matRmag;
-    }
-    this->tra = MatrixXd::Identity(iNchan,iNchan);
-}
-
-//=============================================================================================================
-
-void SensorSet::initMatrices(const int iNchan, const int iNp)
-{
-    this->r0 = MatrixXd(iNchan,3);
-    this->rmag = MatrixXd(iNchan*iNp,3);
-    this->cosmag = MatrixXd(iNchan*iNp,3);
-    this->cosmag = MatrixXd(iNchan*iNp,3);
-    this->tra = MatrixXd(iNchan,iNchan);
-    this->w = RowVectorXd(iNchan*iNp);
-}
