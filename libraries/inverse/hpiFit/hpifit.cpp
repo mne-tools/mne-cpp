@@ -86,15 +86,7 @@ using namespace FWDLIB;
 
 HPIFit::HPIFit()
 {
-    // init member variables
-    m_lChannels = QList<FIFFLIB::FiffChInfo>();
-    m_vecInnerind = QVector<int>();
-    m_sensors = SensorSet();
-    m_lBads = QList<QString>();
-    m_matModel = MatrixXd(0,0);
-    m_vecFreqs = QVector<int>();
-    m_matHeadHPI = MatrixXd(0,0);
-    m_matProjectors = MatrixXd(0,0);
+
 }
 
 //=============================================================================================================
@@ -102,14 +94,7 @@ HPIFit::HPIFit()
 HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
 {
     // init member variables
-    m_lChannels = QList<FIFFLIB::FiffChInfo>();
-    m_vecInnerind = QVector<int>();
-    m_sensors = SensorSet();
     m_lBads = pFiffInfo->bads;
-    m_matModel = MatrixXd(0,0);
-    m_vecFreqs = QVector<int>();
-    m_matHeadHPI = MatrixXd(0,0);
-    m_matProjectors = MatrixXd(0,0);
     m_isInitialized = false;
 
     // update channel list
@@ -462,7 +447,6 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
     if(!(m_lBads == pFiffInfo->bads) || m_lChannels.isEmpty() || m_matModel.rows()==0) {
         m_lBads = pFiffInfo->bads;
         updateChannels(pFiffInfo);
-        updateSensor();
         updateModel(pFiffInfo->sfreq, matData.cols(), pFiffInfo->linefreq, vecFreqs, bBasic);
     }
 

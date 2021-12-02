@@ -126,6 +126,13 @@ private:
 
     //=========================================================================================================
     /**
+     * read coil template if necessary
+     *
+     */
+    void initCoilTemplate();
+
+    //=========================================================================================================
+    /**
      * convert data from FwdCoilSet to SensorSet.
      *
      * @param[in] pCoilMeg   The initialized fwd coilset to get data from.
