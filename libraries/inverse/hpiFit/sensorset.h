@@ -64,8 +64,6 @@ namespace FWDLIB{
 }
 
 namespace FIFFLIB{
-    class FiffInfo;
-    class FiffCoordTrans;
     class FiffCoordTransOld;
     class FiffDigPointSet;
     class FiffChInfo;
@@ -76,8 +74,8 @@ namespace FIFFLIB{
 //=============================================================================================================
 
 
-namespace INVERSELIB {
-
+namespace INVERSELIB
+{
 
 //=============================================================================================================
 // INVERSELIB FORWARD DECLARATIONS
@@ -111,10 +109,8 @@ public:
      *
      */
 
-    void updateSensorSet(const QList<FIFFLIB::FiffChInfo> channelList,
+    void updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
                          const int iAccuracy);
-
-protected:
 
     Eigen::MatrixXd r0;
     Eigen::MatrixXd rmag;
@@ -123,6 +119,8 @@ protected:
     Eigen::RowVectorXd w;
     int ncoils;
     int np;
+
+protected:
 
 private:
 
@@ -133,13 +131,16 @@ private:
      * @param[in] pCoilMeg   The initialized fwd coilset to get data from.
      *
      */
-
     void convertFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> pCoilMeg);
 
-    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilTemplate;    // the coil template
-    QString m_qPath;    // the path to the coil definition file
+    //=========================================================================================================
+    /**
+     * initialize member matrices.
+     *
+     */
+    void initMatrices();
 
-signals:
+    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilTemplate;    // the coil template
 };
 
 //=============================================================================================================
@@ -149,5 +150,6 @@ signals:
 
 } // namespace INVERSELIB
 
-#endif // INVERSELIB_SENSORSET_H
+
+#endif // SENSORSET_H
 

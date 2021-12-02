@@ -43,7 +43,7 @@
 
 #include "../inverse_global.h"
 #include "fiff/fiff_ch_info.h"
-
+#include "sensorset.h"
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_coord_trans.h>
@@ -113,15 +113,15 @@ struct HpiFitResult {
 /**
  * The strucut specifing the sensor parameters.
  */
-struct SensorSet {
-    Eigen::MatrixXd r0;
-    Eigen::MatrixXd rmag;
-    Eigen::MatrixXd cosmag;
-    Eigen::MatrixXd tra;
-    Eigen::RowVectorXd w;
-    int ncoils;
-    int np;
-};
+//struct SensorSet {
+//    Eigen::MatrixXd r0;
+//    Eigen::MatrixXd rmag;
+//    Eigen::MatrixXd cosmag;
+//    Eigen::MatrixXd tra;
+//    Eigen::RowVectorXd w;
+//    int ncoils;
+//    int np;
+//};
 
 //=============================================================================================================
 // INVERSELIB FORWARD DECLARATIONS
@@ -324,7 +324,6 @@ public:
     inline bool isInitialized() const;
     inline QList<FIFFLIB::FiffChInfo> getChannels() const;
     inline QList<QString> getBads() const;
-    inline SensorSet getSensors() const;
     inline Eigen::MatrixXd getModel() const;
     inline Eigen::MatrixXd getProjectors() const;
     inline Eigen::MatrixXd getHpiDigitizer() const;
@@ -452,11 +451,6 @@ inline QList<FIFFLIB::FiffChInfo> HPIFit::getChannels() const
 inline QList<QString> HPIFit::getBads() const
 {
     return m_lBads;
-}
-
-inline SensorSet HPIFit::getSensors() const
-{
-    return m_sensors;
 }
 
 inline Eigen::MatrixXd HPIFit::getModel() const
