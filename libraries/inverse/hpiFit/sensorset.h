@@ -102,7 +102,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Update FwdCoilSet and store into sensors struct.
+     * Update SensorSet from new channel list with new accuracy.
      *
      * @param[in] channelList   The channel list to create the MEG sensor set from.
      * @param[in] iAccuracy     The accuracy level to use for the sensor set.
@@ -147,7 +147,7 @@ private:
      */
     void initMatrices();
 
-    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilTemplate;    // the coil template
+    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilDefinitions;    // the coil definitions as template
 };
 
 //=============================================================================================================

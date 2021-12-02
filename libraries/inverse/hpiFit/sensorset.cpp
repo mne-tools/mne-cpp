@@ -82,7 +82,7 @@ SensorSet::SensorSet()
 void SensorSet::initCoilTemplate()
 {
     QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
-    m_pCoilTemplate = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath));
+    m_pCoilDefinitions = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath));
 }
 
 //=============================================================================================================
@@ -95,18 +95,17 @@ void SensorSet::updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
         return;
     }
 
-    if(!m_pCoilTemplate) {
+    if(!m_pCoilDefinitions) {
         initCoilTemplate();
     }
 
     FiffCoordTransOld* t = NULL;
 
-    FwdCoilSet::SPtr pCoilMeg = FwdCoilSet::SPtr(m_pCoilTemplate->create_meg_coils(channelList, channelList.size(), iAccuracy, t));
+    FwdCoilSet::SPtr pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(channelList, channelList.size(), iAccuracy, t));
 
     this->ncoils = pCoilMeg->ncoil;
     this->np = pCoilMeg->coils[0]->np;
 
-    initMatrices();
     convertFromFwdCoilSet(pCoilMeg);
 }
 
@@ -114,6 +113,9 @@ void SensorSet::updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
 
 void SensorSet::convertFromFwdCoilSet(const FwdCoilSet::SPtr pCoilMeg)
 {
+
+    initMatrices();
+
     int iNchan = this->ncoils;
     int iNp = this->np;
 
