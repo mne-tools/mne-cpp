@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     test_hpiFitDataHandler.cpp
+ * @file     test_hpiDataUpdater.cpp
  * @author   Ruben Dörfel <doerfelruben@aol.com>
  * @since    0.1.0
  * @date     December, 2021
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     Unit test for the HpiFitDataHandler class..
+ * @brief     Unit test for the HpiDataUpdater class..
  *
  */
 
@@ -38,7 +38,7 @@
 
 #include <utils/generics/applicationlogger.h>
 #include <iostream>
-#include <inverse/hpiFit/hpifitdatahandler.h>
+#include <inverse/hpiFit/hpidataupdater.h>
 #include <fiff/fiff.h>
 
 //=============================================================================================================
@@ -65,28 +65,30 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
- * DECLARE CLASS TestHpiFitDataHandler
+ * DECLARE CLASS TestHpiDataUpdater
  *
  * @brief The TestFiffRWR class provides read write read fiff verification tests
  *
  */
-class TestHpiFitDataHandler: public QObject
+class TestHpiDataUpdater: public QObject
 {
     Q_OBJECT
 
 public:
-    TestHpiFitDataHandler();
+    TestHpiDataUpdater();
 
 private slots:
     void initTestCase();
     void init();
     void testConstructor_channels_size();           // compare size of channel list
     void testConstructor_bads();                    // compare bad channels
-    void testConstructor_channels_bads_size();      // compare expected size when bads included
-    void testUpdateChannels_channels();             // compare channel list
-    void testUpdateChannels_channels_bads();        // compare channel list when bads are included
-    void testUpdateChannels_channels_bads_size();   // compare channel list  size when bads are included
-    void testPrepareProj();     // add other compareFunctions here
+    void testConstructor_channels();             // compare channel list
+    void testConstructor_channels_bads();        // compare channel list when bads are included
+    void testPrepareProj_size();     // add other compareFunctions here
+    void testPrepareProjectors();
+    void testPrepareProjectors_bads();
+    void testPrepareData_bads();
+    void testPrepareData();
     void cleanupTestCase();
 
 private:
@@ -95,18 +97,22 @@ private:
     QSharedPointer<FiffInfo>  m_pFiffInfo;
     MatrixXd m_matData;
     MatrixXd m_matProjectors;
+    QList<FIFFLIB::FiffChInfo> m_lChannelsWithoutBads;
+    QList<FIFFLIB::FiffChInfo> m_lChannelsWithBads;
+    QVector<int> m_vecInnerindWithBads;             /**< index of inner channels . */
+    QVector<int> m_vecInnerindWithoutBads;             /**< index of inner channels . */
 
 };
 
 //=============================================================================================================
 
-TestHpiFitDataHandler::TestHpiFitDataHandler()
+TestHpiDataUpdater::TestHpiDataUpdater()
 {
 }
 
 //=============================================================================================================
 
-void TestHpiFitDataHandler::initTestCase()
+void TestHpiDataUpdater::initTestCase()
 {
     qInstallMessageHandler(ApplicationLogger::customLogWriter);
 
@@ -127,29 +133,41 @@ void TestHpiFitDataHandler::initTestCase()
         qCritical("error during read_raw_segment");
     }
 
-    // Use SSP + SGM + calibration
-    m_matProjectors = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
-
-    //Do a copy here because we are going to change the activity flags of the SSP's
-    FiffInfo infoTemp = *(m_pFiffInfo.data());
-
-    //Turn on all SSP
-    for(int i = 0; i < infoTemp.projs.size(); ++i) {
-        infoTemp.projs[i].active = true;
+    // Prepare channel lists without bads
+    int iNumCh = m_pFiffInfo->nchan;
+    for (int i = 0; i < iNumCh; ++i) {
+        if(m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
+            // Check if the sensor is bad, if not append to innerind
+            if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
+                m_lChannelsWithoutBads.append(m_pFiffInfo->chs[i]);
+                m_vecInnerindWithoutBads.append(i);
+            }
+        }
     }
 
-    //Create the projector for all SSP's on
-    infoTemp.make_projector(m_matProjectors);
-
-    //set columns of matrix to zero depending on bad channels indexes
-    for(qint32 j = 0; j < infoTemp.bads.size(); ++j) {
-        m_matProjectors.col(infoTemp.ch_names.indexOf(infoTemp.bads.at(j))).setZero();
+    // Prepare channel lists with bads
+    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
+    for (int i = 0; i < iNumCh; ++i) {
+        if(m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
+            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
+            // Check if the sensor is bad, if not append to innerind
+            if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
+                m_lChannelsWithBads.append(m_pFiffInfo->chs[i]);
+                m_vecInnerindWithBads.append(i);
+            }
+        }
     }
+
 }
 
 //=============================================================================================================
 
-void TestHpiFitDataHandler::init()
+void TestHpiDataUpdater::init()
 {
     // run at beginning of each test
     m_pFiffInfo =  QSharedPointer<FiffInfo>(new FiffInfo(m_raw.info));
@@ -157,163 +175,199 @@ void TestHpiFitDataHandler::init()
 
 //=============================================================================================================
 
-void TestHpiFitDataHandler::testUpdateChannels_channels()
+void TestHpiDataUpdater::testConstructor_channels()
 {
-    /// prepare
-    int iNumCh = m_pFiffInfo->nchan;
-    QList<FIFFLIB::FiffChInfo> lChannelsExpected;
-    for (int i = 0; i < iNumCh; ++i) {
-        if(m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
-            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
-            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
-            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
-            // Check if the sensor is bad, if not append to innerind
-            if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
-                lChannelsExpected.append(m_pFiffInfo->chs[i]);
-            }
-        }
-    }
+    // Prepare
+    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
 
-    /// act
-
-    HpiFitDataHandler hpiData = HpiFitDataHandler(m_pFiffInfo);
+    // act
     QList<FIFFLIB::FiffChInfo> lChannelsActual = hpiData.getChannels();
 
-    /// assert
-    QVERIFY(lChannelsExpected == lChannelsActual);
+    // assert
+    QVERIFY(m_lChannelsWithoutBads == lChannelsActual);
 }
 
 //=============================================================================================================
 
-void TestHpiFitDataHandler::testUpdateChannels_channels_bads()
+void TestHpiDataUpdater::testConstructor_channels_bads()
 {
-    /// prepare
-    // set some  bad channels
+    // Prepare
     m_pFiffInfo->bads << "MEG0113" << "MEG0112";
-    QList<QString> lBadsExpected = m_pFiffInfo->bads;
 
-    /// prepare
-    int iNumCh = m_pFiffInfo->nchan;
-    QList<FIFFLIB::FiffChInfo> lChannelsExpected;
-    for (int i = 0; i < iNumCh; ++i) {
-        if(m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
-            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
-            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
-            m_pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
-            // Check if the sensor is bad, if not append to innerind
-            if(!(m_pFiffInfo->bads.contains(m_pFiffInfo->ch_names.at(i)))) {
-                lChannelsExpected.append(m_pFiffInfo->chs[i]);
-            }
-        }
-    }
-
-    /// act
-    HpiFitDataHandler hpiData = HpiFitDataHandler(m_pFiffInfo);
+    // act
+    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
     QList<FIFFLIB::FiffChInfo> lChannelsActual = hpiData.getChannels();
 
-    /// assert
-    QVERIFY(lChannelsExpected == lChannelsActual);
+    // assert
+    QVERIFY(m_lChannelsWithBads == lChannelsActual);
 }
 
 //=============================================================================================================
 
-void TestHpiFitDataHandler::testUpdateChannels_channels_bads_size()
+void TestHpiDataUpdater::testConstructor_channels_size()
 {
-    /// Prepare
-    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
-    int iNChanExpected = 204 - 2;
-
-    /// Act
-    HpiFitDataHandler hpiData = HpiFitDataHandler(m_pFiffInfo);
-    QList<FIFFLIB::FiffChInfo> lChannelsActual = hpiData.getChannels();
-    int iNChanActual = lChannelsActual.size();
-
-    /// Assert
-    QVERIFY(iNChanActual == iNChanExpected);
-}
-
-//=============================================================================================================
-
-void TestHpiFitDataHandler::testConstructor_channels_size()
-{
-    /// prepare
+    // prepare
     int iNChanExpected = 204; // number of gradiometers
 
-    /// act
-    HpiFitDataHandler hpiData = HpiFitDataHandler(m_pFiffInfo);
+    // act
+    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
     QList<FIFFLIB::FiffChInfo> lChannelsActual = hpiData.getChannels();
     int iNChanActual = lChannelsActual.size();
 
-    /// assert
+    // assert
     QVERIFY(iNChanExpected == iNChanActual);
 }
 
 //=============================================================================================================
 
-void TestHpiFitDataHandler::testConstructor_bads()
+void TestHpiDataUpdater::testConstructor_bads()
 {
-    /// prepare
+    // prepare
     // set some  bad channels
     m_pFiffInfo->bads << "MEG0113" << "MEG0112";
     QList<QString> lBadsExpected = m_pFiffInfo->bads;
 
-    /// act
-    HpiFitDataHandler hpiData = HpiFitDataHandler(m_pFiffInfo);
+    // act
+    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
     QList<QString> lBadsActual = hpiData.getBads();
 
-    /// assert
+    // assert
     QVERIFY(lBadsExpected == lBadsActual);
 }
 
 //=============================================================================================================
 
-void TestHpiFitDataHandler::testConstructor_channels_bads_size()
+void TestHpiDataUpdater::testPrepareProj_size()
 {
-    /// prepare
-    // set some  bad channels
-    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
-    QList<QString> lBadsExpected = m_pFiffInfo->bads;
-    int iNChanExpected = 202; // 204 gradiometers - 2 bads
-
-    /// act
-    HpiFitDataHandler hpiData = HpiFitDataHandler(m_pFiffInfo);
-    QList<FIFFLIB::FiffChInfo> lChannelsActual = hpiData.getChannels();
-    int iNChanActual = lChannelsActual.size();
-
-    /// assert
-    QVERIFY(iNChanActual == iNChanExpected);
-}
-
-//=============================================================================================================
-
-void TestHpiFitDataHandler::testPrepareProj()
-{
-    /// prepare
-    HpiFitDataHandler hpiData = HpiFitDataHandler(m_pFiffInfo);
+    // prepare
+    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
 
     int iSizeExpected = 204;       // number of channels (204 gradiometers)
 
     MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
-    /// act
+    // act
     hpiData.prepareProjectors(matProj);
     MatrixXd matProjPrepared = hpiData.getProjectors();
     int iSizeActual = matProjPrepared.cols();
 
-    /// assert
+    // assert
     QVERIFY(iSizeExpected == iSizeActual);
 }
 
 //=============================================================================================================
 
-void TestHpiFitDataHandler::cleanupTestCase()
+void TestHpiDataUpdater::testPrepareProjectors()
 {
+    // prepare
+    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+    MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
+    //Create new projector based on the excluded channels, first exclude the rows then the columns
+    MatrixXd matProjectorsRows(m_vecInnerindWithoutBads.size(),matProj.cols());
+    MatrixXd matProjectorsExpected(m_vecInnerindWithoutBads.size(),m_vecInnerindWithoutBads.size());
+
+    for (int i = 0; i < matProjectorsRows.rows(); ++i) {
+        matProjectorsRows.row(i) = matProj.row(m_vecInnerindWithoutBads.at(i));
+    }
+
+    for (int i = 0; i < matProjectorsExpected.cols(); ++i) {
+        matProjectorsExpected.col(i) = matProjectorsRows.col(m_vecInnerindWithoutBads.at(i));
+    }
+
+    // act
+    hpiData.prepareProjectors(matProj);
+    MatrixXd matProjPrepared = hpiData.getProjectors();
+
+    // assert
+    QVERIFY(matProjectorsExpected == matProjPrepared);
+}
+
+//=============================================================================================================
+
+void TestHpiDataUpdater::testPrepareProjectors_bads()
+{
+    // prepare
+    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
+
+    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+    MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
+    //Create new projector based on the excluded channels, first exclude the rows then the columns
+    MatrixXd matProjectorsRows(m_vecInnerindWithBads.size(),matProj.cols());
+    MatrixXd matProjectorsExpected(m_vecInnerindWithBads.size(),m_vecInnerindWithBads.size());
+
+    for (int i = 0; i < matProjectorsRows.rows(); ++i) {
+        matProjectorsRows.row(i) = matProj.row(m_vecInnerindWithBads.at(i));
+    }
+
+    for (int i = 0; i < matProjectorsExpected.cols(); ++i) {
+        matProjectorsExpected.col(i) = matProjectorsRows.col(m_vecInnerindWithBads.at(i));
+    }
+
+    // act
+    hpiData.prepareProjectors(matProj);
+    MatrixXd matProjPrepared = hpiData.getProjectors();
+
+    // assert
+    QVERIFY(matProjectorsExpected == matProjPrepared);
+}
+
+//=============================================================================================================
+
+void TestHpiDataUpdater::testPrepareData()
+{
+    // prepare
+    // extract data for channels to use
+    MatrixXd matDataExpected = MatrixXd(m_vecInnerindWithoutBads.size(), m_matData.cols());
+
+    for(int j = 0; j < m_vecInnerindWithoutBads.size(); ++j) {
+        matDataExpected.row(j) << m_matData.row(m_vecInnerindWithoutBads[j]);
+    }
+
+    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+
+    // act
+    hpiData.prepareData(m_matData);
+    MatrixXd matDataPrepared = hpiData.getData();
+
+    // assert
+    QVERIFY(matDataExpected == matDataPrepared);
+}
+
+//=============================================================================================================
+
+void TestHpiDataUpdater::testPrepareData_bads()
+{
+    // extract data for channels to use
+    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
+    MatrixXd matDataExpected = MatrixXd(m_vecInnerindWithBads.size(), m_matData.cols());
+
+    for(int j = 0; j < m_vecInnerindWithBads.size(); ++j) {
+        matDataExpected.row(j) << m_matData.row(m_vecInnerindWithBads[j]);
+    }
+
+    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+
+    /// act
+    hpiData.prepareData(m_matData);
+    MatrixXd matDataPrepared = hpiData.getData();
+
+    /// assert
+    QVERIFY(matDataExpected == matDataPrepared);
+}
+
+//=============================================================================================================
+
+void TestHpiDataUpdater::cleanupTestCase()
+{
+
 }
 
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
 
-QTEST_GUILESS_MAIN(TestHpiFitDataHandler)
-#include "test_hpiFitDataHandler.moc"
+QTEST_GUILESS_MAIN(TestHpiDataUpdater)
+#include "test_hpiDataUpdater.moc"
 
