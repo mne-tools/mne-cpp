@@ -41,6 +41,7 @@
 #include "hpifit.h"
 #include "hpifitdata.h"
 #include "sensorset.h"
+#include "hpidataupdater.h"
 
 #include <utils/ioutils.h>
 #include <utils/mnemath.h>
@@ -94,8 +95,8 @@ HPIFit::HPIFit()
 HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
 {
     // init member variables
+    m_HpiDataUpdater = HpiDataUpdater(pFiffInfo);
     m_lBads = pFiffInfo->bads;
-    m_isInitialized = false;
 
     // update channel list
     updateChannels(pFiffInfo);
@@ -127,7 +128,6 @@ void HPIFit::init(const FiffInfo::SPtr pFiffInfo,
     updateProjectors(matProjectors);
 
     // set to initialzed
-    m_isInitialized = true;
 }
 
 //=============================================================================================================
@@ -445,28 +445,23 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
 
     // check if we need to update the model (bads, frequencies)
     if(!(m_lBads == pFiffInfo->bads) || m_lChannels.isEmpty() || m_matModel.rows()==0) {
-        m_lBads = pFiffInfo->bads;
-        updateChannels(pFiffInfo);
-        updateSensor();
         updateModel(pFiffInfo->sfreq, matData.cols(), pFiffInfo->linefreq, vecFreqs, bBasic);
     }
 
-    updateProjectors(matProjectors);
+    // prepare data
+    m_HpiDataUpdater.prepareData(matData);
+    m_HpiDataUpdater.prepareProjectors(matProjectors);
 
-    // extract data for channels to use
-    MatrixXd matInnerdata(m_vecInnerind.size(), matData.cols());
-
-    for(int j = 0; j < m_vecInnerind.size(); ++j) {
-        matInnerdata.row(j) << matData.row(m_vecInnerind[j]);
-    }
+    MatrixXd matPreparedData = m_HpiDataUpdater.getData();
+    MatrixXd matPreparedProjectors = m_HpiDataUpdater.getProjectors();
 
     // prepare matrices
     MatrixXd matTopo;
-    MatrixXd matAmp(m_vecInnerind.size(), iNumCoils);   // sine part
-    MatrixXd matAmpC(m_vecInnerind.size(), iNumCoils);  // cosine part
+    MatrixXd matAmp(matPreparedData.cols(), iNumCoils);   // sine part
+    MatrixXd matAmpC(matPreparedData.cols(), iNumCoils);  // cosine part
 
     // apply projectors
-    MatrixXd matProjData = m_matProjectors * matInnerdata;
+    MatrixXd matProjData = matPreparedProjectors * matPreparedData;
 
     // fit model
     matTopo = m_matModel * matProjData.transpose();
