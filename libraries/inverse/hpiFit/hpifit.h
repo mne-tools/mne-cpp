@@ -44,6 +44,7 @@
 #include "../inverse_global.h"
 #include "fiff/fiff_ch_info.h"
 #include "sensorset.h"
+#include "hpidataupdater.h"
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_coord_trans.h>
@@ -420,28 +421,23 @@ private:
                        const Eigen::MatrixXd matCoil,
                        const Eigen::MatrixXd matTrans);
 
-    QList<FIFFLIB::FiffChInfo>          m_lChannels;        /**< Channellist with bads excluded. */
-    QVector<int>                        m_vecInnerind;      /**< index of inner channels . */
-    QList<QString>                      m_lBads;            /**< contains bad channels . */
-    SensorSet                           m_sensors;          /**< sensor struct that contains information about all sensors. */
-    Eigen::MatrixXd                     m_matModel;         /**< The model that contains the sines/cosines for the hpi fit*/
-    Eigen::MatrixXd                     m_matHeadHPI;       /**< The coordinates of the digitized HPI coils in head space*/
-    Eigen::MatrixXd                     m_matProjectors;    /**< projectors . */
-    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilTemplate;    /**< */
-    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilMeg;         /**< */
-    QVector<int>                        m_vecFreqs;         /**< The frequencies for each coil in unknown order. */
-    bool                                m_isInitialized;    /**< If the object is initialized. */
+    HpiDataUpdater m_HpiDataUpdater;
+    QList<FIFFLIB::FiffChInfo> m_lChannels;        /**< Channellist with bads excluded. */
+    QVector<int> m_vecInnerind;      /**< index of inner channels . */
+    QList<QString> m_lBads;            /**< contains bad channels . */
+    SensorSet m_sensors;          /**< sensor struct that contains information about all sensors. */
+    Eigen::MatrixXd m_matModel;         /**< The model that contains the sines/cosines for the hpi fit*/
+    Eigen::MatrixXd m_matHeadHPI;       /**< The coordinates of the digitized HPI coils in head space*/
+    Eigen::MatrixXd m_matProjectors;    /**< projectors . */
+    QSharedPointer<FWDLIB::FwdCoilSet> m_pCoilTemplate;    /**< */
+    QSharedPointer<FWDLIB::FwdCoilSet> m_pCoilMeg;         /**< */
+    QVector<int> m_vecFreqs;         /**< The frequencies for each coil in unknown order. */
     bool m_bDoFastFit;  // delete
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
-inline bool HPIFit::isInitialized() const
-{
-    return m_isInitialized;
-}
 
 inline QList<FIFFLIB::FiffChInfo> HPIFit::getChannels() const
 {
