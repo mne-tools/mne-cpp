@@ -53,7 +53,7 @@ SUBDIRS += \
     test_fiff_mne_types_io \
     test_filtering \
     test_hpiFit \
-    test_hpiFitDataHandler \
+    test_hpiDataUpdater \
     test_hpiFit_integration \
     test_mne_forward_solution \
     test_fiff_cov \
