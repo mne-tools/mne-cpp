@@ -80,15 +80,17 @@ public:
 private slots:
     void initTestCase();
     void init();
-    void testConstructor_channels_size();           // compare size of channel list
-    void testConstructor_bads();                    // compare bad channels
-    void testConstructor_channels();             // compare channel list
-    void testConstructor_channels_bads();        // compare channel list when bads are included
-    void testPrepareProj_size();     // add other compareFunctions here
+    void testPrepareProj_size();                 // add other compareFunctions here
     void testPrepareProjectors();
     void testPrepareProjectors_bads();
     void testPrepareData_bads();
     void testPrepareData();
+    void testGetSensors();
+    void testGetSensors_bads();
+    void testCheckForUpdates_sensors();
+    void testCheckForUpdates_data();
+    void testCheckForUpdates_projectors();
+
     void cleanupTestCase();
 
 private:
@@ -171,68 +173,6 @@ void TestHpiDataUpdater::init()
 {
     // run at beginning of each test
     m_pFiffInfo =  QSharedPointer<FiffInfo>(new FiffInfo(m_raw.info));
-}
-
-//=============================================================================================================
-
-void TestHpiDataUpdater::testConstructor_channels()
-{
-    // Prepare
-    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
-
-    // act
-    QList<FIFFLIB::FiffChInfo> lChannelsActual = hpiData.getChannels();
-
-    // assert
-    QVERIFY(m_lChannelsWithoutBads == lChannelsActual);
-}
-
-//=============================================================================================================
-
-void TestHpiDataUpdater::testConstructor_channels_bads()
-{
-    // Prepare
-    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
-
-    // act
-    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
-    QList<FIFFLIB::FiffChInfo> lChannelsActual = hpiData.getChannels();
-
-    // assert
-    QVERIFY(m_lChannelsWithBads == lChannelsActual);
-}
-
-//=============================================================================================================
-
-void TestHpiDataUpdater::testConstructor_channels_size()
-{
-    // prepare
-    int iNChanExpected = 204; // number of gradiometers
-
-    // act
-    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
-    QList<FIFFLIB::FiffChInfo> lChannelsActual = hpiData.getChannels();
-    int iNChanActual = lChannelsActual.size();
-
-    // assert
-    QVERIFY(iNChanExpected == iNChanActual);
-}
-
-//=============================================================================================================
-
-void TestHpiDataUpdater::testConstructor_bads()
-{
-    // prepare
-    // set some  bad channels
-    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
-    QList<QString> lBadsExpected = m_pFiffInfo->bads;
-
-    // act
-    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
-    QList<QString> lBadsActual = hpiData.getBads();
-
-    // assert
-    QVERIFY(lBadsExpected == lBadsActual);
 }
 
 //=============================================================================================================
@@ -355,6 +295,126 @@ void TestHpiDataUpdater::testPrepareData_bads()
 
     /// assert
     QVERIFY(matDataExpected == matDataPrepared);
+}
+
+//=============================================================================================================
+
+void TestHpiDataUpdater::testGetSensors()
+{
+    // extract data for channels to use
+    int iAccuracy = 2;
+    SensorSet sensorsExpected = SensorSet();
+    sensorsExpected.updateSensorSet(m_lChannelsWithoutBads,iAccuracy);
+
+    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+
+    /// act
+    SensorSet sensorsActual = hpiData.getSensors();
+
+    /// assert
+    QVERIFY2(sensorsExpected.np == sensorsActual.np,"Number of integration points does not match.");
+    QVERIFY2(sensorsExpected.ncoils == sensorsActual.ncoils,"Number of channels does not match.");
+    QVERIFY2(sensorsExpected.rmag.rows() == sensorsActual.rmag.rows(),"Number of points for computation does not match.");
+    QVERIFY2(sensorsExpected.cosmag.rows() == sensorsActual.cosmag.rows(),"Number of points for computation does not match.");
+    QVERIFY2(sensorsExpected.tra.size() == sensorsActual.tra.size(),"Size of square matrix does not match.");
+    QVERIFY2(sensorsExpected.w.size() == sensorsActual.w.size(),"Number of iweights does not match");
+}
+
+//=============================================================================================================
+
+void TestHpiDataUpdater::testGetSensors_bads()
+{
+    // extract data for channels to use
+    int iAccuracy = 2;
+    SensorSet sensorsExpected = SensorSet();
+    sensorsExpected.updateSensorSet(m_lChannelsWithBads,iAccuracy);
+
+    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
+    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+
+    /// act
+    SensorSet sensorsActual = hpiData.getSensors();
+
+    /// assert
+    QVERIFY2(sensorsExpected.np == sensorsActual.np,"Number of integration points does not match.");
+    QVERIFY2(sensorsExpected.ncoils == sensorsActual.ncoils,"Number of channels does not match.");
+    QVERIFY2(sensorsExpected.rmag.rows() == sensorsActual.rmag.rows(),"Number of points for computation does not match.");
+    QVERIFY2(sensorsExpected.cosmag.rows() == sensorsActual.cosmag.rows(),"Number of points for computation does not match.");
+    QVERIFY2(sensorsExpected.tra.size() == sensorsActual.tra.size(),"Size of square matrix does not match.");
+    QVERIFY2(sensorsExpected.w.size() == sensorsActual.w.size(),"Number of iweights does not match");
+}
+
+//=============================================================================================================
+
+void TestHpiDataUpdater::testCheckForUpdates_sensors()
+{
+    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
+    int iAccuracy = 2;
+    SensorSet sensorsExpected = SensorSet();
+    sensorsExpected.updateSensorSet(m_lChannelsWithBads,iAccuracy);
+
+    /// act
+    hpiData.checkForUpdate(m_pFiffInfo);
+    SensorSet sensorsActual = hpiData.getSensors();
+
+    /// assert
+    QVERIFY2(sensorsExpected.np == sensorsActual.np,"Number of integration points does not match.");
+    QVERIFY2(sensorsExpected.ncoils == sensorsActual.ncoils,"Number of channels does not match.");
+    QVERIFY2(sensorsExpected.rmag.rows() == sensorsActual.rmag.rows(),"Number of points for computation does not match.");
+    QVERIFY2(sensorsExpected.cosmag.rows() == sensorsActual.cosmag.rows(),"Number of points for computation does not match.");
+    QVERIFY2(sensorsExpected.tra.size() == sensorsActual.tra.size(),"Size of square matrix does not match.");
+    QVERIFY2(sensorsExpected.w.size() == sensorsActual.w.size(),"Number of iweights does not match");
+}
+
+//=============================================================================================================
+
+void TestHpiDataUpdater::testCheckForUpdates_data()
+{
+    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
+    MatrixXd matDataExpected = MatrixXd(m_vecInnerindWithBads.size(), m_matData.cols());
+
+    for(int j = 0; j < m_vecInnerindWithBads.size(); ++j) {
+        matDataExpected.row(j) << m_matData.row(m_vecInnerindWithBads[j]);
+    }
+
+    /// act
+    hpiData.checkForUpdate(m_pFiffInfo);
+    hpiData.prepareData(m_matData);
+    MatrixXd matDataPrepared = hpiData.getData();
+
+    /// assert
+    QVERIFY(matDataExpected == matDataPrepared);
+}
+
+//=============================================================================================================
+
+void TestHpiDataUpdater::testCheckForUpdates_projectors()
+{
+    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
+    MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
+
+    //Create new projector based on the excluded channels, first exclude the rows then the columns
+    MatrixXd matProjectorsRows(m_vecInnerindWithBads.size(),matProj.cols());
+    MatrixXd matProjectorsExpected(m_vecInnerindWithBads.size(),m_vecInnerindWithBads.size());
+
+    for (int i = 0; i < matProjectorsRows.rows(); ++i) {
+        matProjectorsRows.row(i) = matProj.row(m_vecInnerindWithBads.at(i));
+    }
+
+    for (int i = 0; i < matProjectorsExpected.cols(); ++i) {
+        matProjectorsExpected.col(i) = matProjectorsRows.col(m_vecInnerindWithBads.at(i));
+    }
+
+    // act
+    hpiData.checkForUpdate(m_pFiffInfo);
+    hpiData.prepareProjectors(matProj);
+    MatrixXd matProjPrepared = hpiData.getProjectors();
+
+    // assert
+    QVERIFY(matProjectorsExpected == matProjPrepared);
 }
 
 //=============================================================================================================

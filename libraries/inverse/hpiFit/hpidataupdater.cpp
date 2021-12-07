@@ -67,7 +67,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-HpiDataUpdater::HpiDataUpdater(FiffInfo::SPtr pFiffInfo)
+HpiDataUpdater::HpiDataUpdater(const FiffInfo::SPtr pFiffInfo)
 {
     updateBadChannels(pFiffInfo);
     updateChannels(pFiffInfo);
@@ -141,6 +141,31 @@ void HpiDataUpdater::updateHpiDigitizer(const QList<FiffDigPoint>& lDig)
         std::cout << "HPIFit::updateHpiDigitizer - No HPI coils digitized. Returning." << std::endl;
         return;
     }
+}
+
+//=============================================================================================================
+
+void HpiDataUpdater::checkForUpdate(const FiffInfo::SPtr pFiffInfo)
+{
+    bool bUpdate = checkIfChanged(pFiffInfo->bads,pFiffInfo->chs);
+    if(bUpdate)
+    {
+        updateBadChannels(pFiffInfo);
+        updateChannels(pFiffInfo);
+        updateHpiDigitizer(pFiffInfo->dig);
+        updateSensors(m_lChannels);
+    }
+}
+
+//=============================================================================================================
+
+bool HpiDataUpdater::checkIfChanged(const QList<QString> lBads, const QList<FIFFLIB::FiffChInfo> lChannels)
+{
+    bool bUpdate = false;
+    if(!(m_lBads == lBads) || !(m_lChannels == lChannels)) {
+        bUpdate = true;
+    }
+    return bUpdate;
 }
 
 //=============================================================================================================
