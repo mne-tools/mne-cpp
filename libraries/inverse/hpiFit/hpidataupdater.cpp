@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
- * @file     hpifitdatahandler.cpp
- * @author   Ruben Dörfel <doerfelruben@aol.com>
+ * @file     hpidataupdater.cpp
+ * @author   Ruben Doerfel <doerfelruben@aol.com>
  * @since    0.1.0
  * @date     December, 2021
  *
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    HpiFitDataHandler class definition.
+ * @brief    HpiDataUpdater class definition.
  *
  */
 
@@ -36,7 +36,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "hpifitdatahandler.h"
+#include "hpidataupdater.h"
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_info.h>
 #include <iostream>
@@ -67,23 +67,24 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-HpiFitDataHandler::HpiFitDataHandler(FiffInfo::SPtr pFiffInfo)
+HpiDataUpdater::HpiDataUpdater(FiffInfo::SPtr pFiffInfo)
 {
     updateBadChannels(pFiffInfo);
     updateChannels(pFiffInfo);
     updateHpiDigitizer(pFiffInfo->dig);
+    updateSensors(m_lChannels);
 }
 
 //=============================================================================================================
 
-void HpiFitDataHandler::updateBadChannels(FiffInfo::SPtr pFiffInfo)
+void HpiDataUpdater::updateBadChannels(FiffInfo::SPtr pFiffInfo)
 {
     m_lBads = pFiffInfo->bads;
 }
 
 //=============================================================================================================
 
-void HpiFitDataHandler::updateChannels(FiffInfo::SPtr pFiffInfo)
+void HpiDataUpdater::updateChannels(FiffInfo::SPtr pFiffInfo)
 {
     // Get the indices of inner layer channels and exclude bad channels and create channellist
     int iNumCh = pFiffInfo->nchan;
@@ -107,7 +108,15 @@ void HpiFitDataHandler::updateChannels(FiffInfo::SPtr pFiffInfo)
 
 //=============================================================================================================
 
-void HpiFitDataHandler::updateHpiDigitizer(const QList<FiffDigPoint>& lDig)
+void HpiDataUpdater::updateSensors(const QList<FIFFLIB::FiffChInfo> lChannelList)
+{
+    int iAccuracy = 2;
+    m_sensors.updateSensorSet(lChannelList,iAccuracy);
+}
+
+//=============================================================================================================
+
+void HpiDataUpdater::updateHpiDigitizer(const QList<FiffDigPoint>& lDig)
 {
     // extract hpi coils from digitizer
     QList<FiffDigPoint> lHPIPoints;
@@ -136,7 +145,7 @@ void HpiFitDataHandler::updateHpiDigitizer(const QList<FiffDigPoint>& lDig)
 
 //=============================================================================================================
 
-void HpiFitDataHandler::prepareData(const Eigen::MatrixXd& matData)
+void HpiDataUpdater::prepareData(const Eigen::MatrixXd& matData)
 {
     // extract data for channels to use
     m_matInnerdata = MatrixXd(m_vecInnerind.size(), matData.cols());
@@ -148,7 +157,7 @@ void HpiFitDataHandler::prepareData(const Eigen::MatrixXd& matData)
 
 //=============================================================================================================
 
-void HpiFitDataHandler::prepareProjectors(const Eigen::MatrixXd& matProjectors)
+void HpiDataUpdater::prepareProjectors(const Eigen::MatrixXd& matProjectors)
 {
     // check if m_vecInnerInd is alreadz initialized
     if(m_vecInnerind.size() == 0) {

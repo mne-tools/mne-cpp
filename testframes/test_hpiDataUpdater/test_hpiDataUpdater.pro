@@ -1,6 +1,6 @@
 #==============================================================================================================
 #
-# @file     test_hpiFitDataHandler.pro
+# @file     test_hpiDataUpdater.pro
 # @author   Ruben Dörfel <doerfelruben@aol.com>
 # @since    0.1.0
 # @date     December, 2021
@@ -28,7 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the test_hpiFitDataHandler test.
+# @brief    This project file generates the makefile to build the test_hpiDataUpdater test.
 #
 #==============================================================================================================
 
@@ -46,7 +46,7 @@ CONFIG   += console
 
 DESTDIR =  $${MNE_BINARY_DIR}
 
-TARGET = test_hpiFitDataHandler
+TARGET = test_hpiDataUpdater
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -78,7 +78,7 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    test_hpiFitDataHandler.cpp
+    test_hpiDataUpdater.cpp
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -115,3 +115,5 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
 	        -lfftw3_threads \
     }
 }
+
+HEADERS +=
