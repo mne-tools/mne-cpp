@@ -67,6 +67,13 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
+HpiDataUpdater::HpiDataUpdater()
+{
+
+}
+
+//=============================================================================================================
+
 HpiDataUpdater::HpiDataUpdater(const FiffInfo::SPtr pFiffInfo)
 {
     updateBadChannels(pFiffInfo);

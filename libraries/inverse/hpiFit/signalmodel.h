@@ -88,16 +88,80 @@ public:
     */
     SignalModel();
 
+    //=========================================================================================================
+    /**
+     * Set the data matrix to use.
+     *
+     * @param[in] matData     The data matrix.
+     *
+     */
     void setData(const Eigen::MatrixXd& matData);
-    void setFrequencies(const int iSFreq, const int iLineFreq);
 
-    Eigen::MatrixXd createBasicModel();
-    Eigen::MatrixXd createAdvancedModel();
+    //=========================================================================================================
+    /**
+     * Set the model to use. The basic model only contains sines and cosines of the hpi frequencies, the advanced yields the linefrequency and its harmonics as well.
+     *
+     * @param[in] bBasicModel     Compute the basic model yes/no.
+     *
+     */
+    void setModelType(const bool bBasic);
+
+    //=========================================================================================================
+    /**
+     * Set the necessary frequencies.
+     *
+     * @param[in] iSamplingFreq     The sampling frequency.
+     * @param[in] iLineFreq     The line frequency.
+     * @param[in] vecHpiFreqs     The hpi frequencies.
+     *
+     */
+    void setFrequencies(const int iSamplingFreq, const int iLineFreq, const QVector<int>& vecHpiFreqs);
+
+    void createInverseBasicModel();
+    void createInverseAdvancedModel();
 
 protected:
 
 private:
-    Eigen::MatrixXd m_matSignalModel;   // the model
+    //=========================================================================================================
+    /**
+     * Computes the model.
+     *
+     * @param[in] bBasicModel  weather to compute the basic model or the advanced.
+     *
+     */
+    void computeModel(const bool bBasicModel);
+
+    //=========================================================================================================
+    /**
+     * Check if dimensions of input data match the model.
+     *
+     * @param[in] matData     The data matrix.
+     *
+     * @return true if changed
+     *
+     */
+    bool checkDataDimensions(const Eigen::MatrixXd& matData);
+
+    //=========================================================================================================
+    /**
+     * Check if the frequencies changed.
+     *
+     * @param[in] iSamplingFreq     The sampling frequency.
+     * @param[in] iLineFreq     The line frequency.
+     * @param[in] vecHpiFreqs     The hpi frequencies.
+     *
+     * @return true if changed
+     */
+    bool checkFrequencies(const int iSamplingFreq, const int iLineFreq, const QVector<int>& vecHpiFreqs);
+
+    Eigen::MatrixXd m_matData;
+    Eigen::MatrixXd m_matInverseSignalModel;
+    int m_iCurrentModelCols;
+    int m_iSamplingFreq;
+    int m_iLineFreq;
+    QVector<int> m_vecHpiFreqs;
+    bool m_bBasicModel;
 };
 
 //=============================================================================================================

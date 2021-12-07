@@ -92,6 +92,7 @@ public:
     /**
     * Constructs a HpiDataUpdater object.
     */
+    HpiDataUpdater();
     HpiDataUpdater(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
