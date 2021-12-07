@@ -1,13 +1,13 @@
 //=============================================================================================================
 /**
- * @file     hpifitdatahandler.h
- * @author   Ruben Dörfel <doerfelruben@aol.com>
+ * @file     hpidataupdater.h
+ * @author   Ruben Doerfel <doerfelruben@aol.com>
  * @since    0.1.0
  * @date     December, 2021
  *
  * @section  LICENSE
  *
- * Copyright (C) 2021, Ruben Dörfel. All rights reserved.
+ * Copyright (C) 2021, Ruben DÃƒÂ¶rfel. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -28,18 +28,19 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     HpiFitDataHandler class declaration.
+ * @brief     HpiDataUpdater class declaration.
  *
  */
 
-#ifndef HPIFITDATAHANDLER_H
-#define HPIFITDATAHANDLER_H
+#ifndef HPIDATAUPDATER_H
+#define HPIDATAUPDATER_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "../inverse_global.h"
+#include "sensorset.h"
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_dig_point.h>
 
@@ -80,18 +81,18 @@ namespace INVERSELIB
  *
  * @brief Brief description of this class.
  */
-class INVERSESHARED_EXPORT HpiFitDataHandler
+class INVERSESHARED_EXPORT HpiDataUpdater
 {
 
 public:
-    typedef QSharedPointer<HpiFitDataHandler> SPtr;            /**< Shared pointer type for HpiFitDataHandler. */
-    typedef QSharedPointer<const HpiFitDataHandler> ConstSPtr; /**< Const shared pointer type for HpiFitDataHandler. */
+    typedef QSharedPointer<HpiDataUpdater> SPtr;            /**< Shared pointer type for HpiDataUpdater. */
+    typedef QSharedPointer<const HpiDataUpdater> ConstSPtr; /**< Const shared pointer type for HpiDataUpdater. */
 
     //=========================================================================================================
     /**
-    * Constructs a HpiFitDataHandler object.
+    * Constructs a HpiDataUpdater object.
     */
-    HpiFitDataHandler(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+    HpiDataUpdater(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
@@ -120,6 +121,7 @@ public:
     inline Eigen::MatrixXd getHpiDigitizer() const;
     inline QList<FIFFLIB::FiffChInfo> getChannels() const;
     inline QList<QString> getBads() const;
+    inline Eigen::MatrixXd getData() const;
 
 protected:
 
@@ -150,40 +152,55 @@ private:
      */
     void updateHpiDigitizer(const QList<FIFFLIB::FiffDigPoint>& lDig);
 
+    //=========================================================================================================
+    /**
+     * Update FwdCoilSet and store into sensors struct.
+     *
+     * @param[in] iAcc       The accuracy level to use for the sensor set. Defaults to 2 (highest).
+     *
+     */
+    void updateSensors(const QList<FIFFLIB::FiffChInfo>);
+
     QList<FIFFLIB::FiffChInfo> m_lChannels; /**< Channellist with bads excluded. */
     QVector<int> m_vecInnerind;             /**< index of inner channels . */
     QList<QString> m_lBads;                 /**< contains bad channels . */
     Eigen::MatrixXd m_matHpiDigitizer;      /**< The coordinates of the digitized HPI coils in head space*/
     Eigen::MatrixXd m_matProjectors;        /**< The projectors ready to use*/
     Eigen::MatrixXd m_matInnerdata;         /**< The data ready to use*/
+    SensorSet m_sensors;                    /**< The most recent SensorSet*/
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QList<FIFFLIB::FiffChInfo> HpiFitDataHandler::getChannels() const
+inline QList<FIFFLIB::FiffChInfo> HpiDataUpdater::getChannels() const
 {
     return m_lChannels;
 }
 
-inline QList<QString> HpiFitDataHandler::getBads() const
+inline QList<QString> HpiDataUpdater::getBads() const
 {
     return m_lBads;
 }
 
 
-inline Eigen::MatrixXd HpiFitDataHandler::getProjectors() const
+inline Eigen::MatrixXd HpiDataUpdater::getProjectors() const
 {
     return m_matProjectors;
 }
 
-inline Eigen::MatrixXd HpiFitDataHandler::getHpiDigitizer() const
+inline Eigen::MatrixXd HpiDataUpdater::getData() const
+{
+    return m_matInnerdata;
+}
+
+inline Eigen::MatrixXd HpiDataUpdater::getHpiDigitizer() const
 {
     return m_matHpiDigitizer;
 }
 
 } // namespace INVERSELIB
 
-#endif // HPIFITDATAHANDLER_H
+#endif // HPIDATAUPDATER_H
 
