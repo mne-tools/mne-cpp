@@ -88,28 +88,6 @@ struct FTBUFFER_EXPORT MetaData{
 };
 
 //=============================================================================================================
-// DEFINE FREE FUNCTIONS
-//=============================================================================================================
-
-//=============================================================================================================
-/**
- * Parses header chunk FT_CHUNK_NEUROMAG_HEADER = 8
- *
- * @param[in, out] data         MetaData object that gets updated with measurment info from header
- * @param[in] neuromagBuffer    Buffer containing the data portion of the neuromag header chunk
- */
-FTBUFFER_EXPORT void parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer);
-
-//=============================================================================================================
-/**
- * Parses headr chunk FT_CHUNK_NEUROMAG_ISOTRAK = 9
- *
- * @param[in, out] data         MetaData object that gets updated with measurment info from header
- * @param [in] isotrakBuffer    Buffer containing the data portion of the isotrak header chunk
- */
-FTBUFFER_EXPORT void parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer);
-
-//=============================================================================================================
 /**
  * This class parses the extended header chunks of a fieldtrip buffer and returns measurement metadata.
  *
@@ -135,9 +113,17 @@ public:
      *
      * @return Returns MetaData object containing buffer/measurement metadata.
      */
-    MetaData parseHeader(QBuffer& buffer);
+    MetaData parseExtendedHeader(QBuffer& buffer);
 
 private:
+    class Chunk
+    {
+        public:
+        HeaderChunkType type;
+        quint32 size;
+        QSharedPointer<QBuffer> data;
+    };
+
     //=========================================================================================================
     /**
      * Initialize the function map with entreis for the chunk headers we care about.
@@ -155,24 +141,15 @@ private:
 
     //=========================================================================================================
     /**
-     * Retreives just the data portion of the extended header chunk and places it in a new buffer.
-     *
-     * @param[in] source        Buffer with all etended header chunks. Buffer needs to be at size of a chunk.
-     * @param[in, out] dest     Destination buffer where chunk will be copied.
-     */
-    void getSingleHeaderChunk(QBuffer& source, QBuffer& dest);
-
-    //=========================================================================================================
-    /**
-     * Returns type of chunk next up in the buffer.
+     * Returns a populated chunk read from the input buffer.
      *
      * @param[in] buffer    Buffer of all extended header chunks. Buffer needs to be at start of a chunk.
      *
      * @return  Returns enum of the cooresponding header chuk type.
      */
-    HeaderChunk getChunkType(QBuffer& buffer);
+    Chunk getChunk(QBuffer& buffer);
 
-    std::unordered_map<HeaderChunk, std::function<void(MetaData&, QBuffer&)>> functionMap;  /**< Map of functions to parse header chunks. */
+    std::unordered_map<HeaderChunkType, std::function<void(MetaData&, QBuffer&)>> chunkParsersMap;  /**< Map of functions to parse header chunks. */
 };
 
 }//namespace

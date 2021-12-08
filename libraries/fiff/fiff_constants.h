@@ -198,6 +198,7 @@ namespace FIFFLIB
 #define FIFFV_COIL_KRISS_GRAD                   9001    /**< KRISS gradiometer. */
 #define FIFFV_COIL_COMPUMEDICS_ADULT_GRAD       9101    /**< Compumedics adult gradiometer. */
 #define FIFFV_COIL_COMPUMEDICS_PEDIATRIC_GRAD   9102    /**< Compumedics pediatric gradiometer. */
+#define FIFFV_COIL_FIELDLINE_OPM               10001    /**< Fieldliine OPM magnetometer. */
 
 #define FIFFM_IS_VV_COIL(c) ((c)/1000 == 3)
 

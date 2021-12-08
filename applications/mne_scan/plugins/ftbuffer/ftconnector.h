@@ -129,7 +129,7 @@ public:
      *
      * @return true if successful, false if unsuccessful.
      */
-    bool getHeader();
+    bool getFixedHeader();
 
     //=========================================================================================================
     /**
@@ -209,7 +209,7 @@ public:
      *
      * @return returns the FiffInfo from the parsed fif file from the neuromag header chunk.
      */
-    MetaData parseBufferHeaders();
+    MetaData parseBufferHeader();
 
     //=========================================================================================================
     /**
@@ -293,8 +293,8 @@ private:
      * @param[out] buffer       QBuffer to which daa will be written.
      * @param[in] numBytes      How many bytes to read from socket.
      */
-    void prepBuffer(QBuffer &buffer,
-                    int numBytes);
+    void copyResponse(QBuffer &buffer,
+                       int numBytes);
 
     //=========================================================================================================
     /**
@@ -310,7 +310,16 @@ private:
      *
      * @return FiffInfo object based on filedtrip header
      */
-    FIFFLIB::FiffInfo infoFromSimpleHeader();
+    FIFFLIB::FiffInfo infoFromSimpleHeader() const;
+
+    //=========================================================================================================
+    /**
+     * Checks for empty or invalid important fields in the parsed metadata and attempts to fill them.
+     *
+     * @param[in] data FiffInfo structure with information parsed from the FTBuffer headers.
+     *
+     */
+    void checkForMissingMetadataFields(MetaData& data) const;
 
     int                                     m_iMinSampleRead;                       /**< Number of samples that need to be added t obuffer before we try to read. */
     int                                     m_iNumSamples;                          /**< Number of samples we've read from the buffer. */
@@ -323,7 +332,7 @@ private:
 
     bool                                    m_bNewData;                             /**< Indicate whether we've received new data. */
 
-    float                                   m_fSampleFreq;                          /**< Sampling frequency of data in the buffer. */
+    float                                   m_fSamplingFreq;                        /**< Sampling frequency of data in the buffer. */
 
     QString                                 m_sAddress;                             /**< Address where the ft buffer is found. */
 

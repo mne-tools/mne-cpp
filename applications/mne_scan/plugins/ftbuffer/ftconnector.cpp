@@ -44,6 +44,7 @@
 
 #include <QThread>
 #include <QtEndian>
+#include <QDateTime>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -69,7 +70,7 @@ FtConnector::FtConnector()
 , m_iExtendedHeaderSize(0)
 , m_iPort(1972)
 , m_bNewData(false)
-, m_fSampleFreq(0)
+, m_fSamplingFreq(0)
 , m_sAddress("127.0.0.1")
 , m_pSocket(Q_NULLPTR)
 {
@@ -119,7 +120,7 @@ bool FtConnector::connect()
 
 //=============================================================================================================
 
-bool FtConnector::getHeader()
+bool FtConnector::getFixedHeader()
 {
     qInfo() << "[FtConnector::getHeader] Attempting to get header...";
 
@@ -140,7 +141,7 @@ bool FtConnector::getHeader()
 
     //Parse return message from buffer
     QBuffer msgBuffer;
-    prepBuffer(msgBuffer, sizeof (messagedef_t));
+    copyResponse(msgBuffer, sizeof (messagedef_t));
     int bufsize = parseMessageDef(msgBuffer);
 
     if (bufsize == 0) {
@@ -155,7 +156,7 @@ bool FtConnector::getHeader()
 
     //Parse header info from buffer
     QBuffer hdrBuffer;
-    prepBuffer(hdrBuffer, sizeof (headerdef_t)); // if implementing header chunks: change from sizeof (headerdef) to bufsize
+    copyResponse(hdrBuffer, sizeof (headerdef_t)); // if implementing header chunks: change from sizeof (headerdef) to bufsize
     parseHeaderDef(hdrBuffer);
 
     return true;
@@ -205,11 +206,11 @@ bool FtConnector::parseHeaderDef(QBuffer &readBuffer)
 
     //Save paramerters
     m_iNumChannels = headerdef.nchans;
-    m_fSampleFreq = headerdef.fsample;
+    m_fSamplingFreq = headerdef.fsample;
     m_iNumNewSamples = headerdef.nsamples;
     m_iDataType = headerdef.data_type;
     m_iExtendedHeaderSize = headerdef.bufsize;
-    m_iMinSampleRead = static_cast<int>(m_fSampleFreq/2);
+    m_iMinSampleRead = static_cast<int>(m_fSamplingFreq/2);
 
     qInfo() << "[FtConnector::parseHeaderDef] Got header parameters.";
 
@@ -292,7 +293,7 @@ bool FtConnector::getData()
 
     //Parse return message from buffer
     QBuffer msgBuffer;
-    prepBuffer(msgBuffer, sizeof (messagedef_t));
+    copyResponse(msgBuffer, sizeof (messagedef_t));
     int bufsize = parseMessageDef(msgBuffer);
 
     //Waiting for response.
@@ -307,12 +308,12 @@ bool FtConnector::getData()
 
     //Parse return data def from buffer
     QBuffer datadefBuffer;
-    prepBuffer(datadefBuffer, sizeof (datadef_t));
+    copyResponse(datadefBuffer, sizeof (datadef_t));
     bufsize = parseDataDef(datadefBuffer);
 
     //Parse actual data from buffer
     QBuffer datasampBuffer;
-    prepBuffer(datasampBuffer, bufsize);
+    copyResponse(datasampBuffer, bufsize);
     parseData(datasampBuffer, bufsize);
 
     //update sample tracking
@@ -344,8 +345,8 @@ bool FtConnector::setPort(const int &iPort)
 
 //=============================================================================================================
 
-void FtConnector::prepBuffer(QBuffer &buffer,
-                             int numBytes)
+void FtConnector::copyResponse(QBuffer &buffer,
+                                int numBytes)
 {
     buffer.open(QIODevice::ReadWrite);
     buffer.write(m_pSocket->read(numBytes));
@@ -405,7 +406,7 @@ void FtConnector::echoStatus()
     qInfo() << "| Socket:      " << m_pSocket->state();
     qInfo() << "| Address:     " << m_sAddress << ":" << m_iPort;
     qInfo() << "| Channels:    " << m_iNumChannels;
-    qInfo() << "| Frequency:   " << m_fSampleFreq;
+    qInfo() << "| Frequency:   " << m_fSamplingFreq;
     qInfo() << "| Samples read:" << m_iNumSamples;
     qInfo() << "| New samples: " << m_iNumNewSamples;
     qInfo() << "|================================";
@@ -440,7 +441,7 @@ int FtConnector::totalBuffSamples()
 
     //Parse return message from buffer
     QBuffer msgBuffer;
-    prepBuffer(msgBuffer, sizeof (messagedef_t));
+    copyResponse(msgBuffer, sizeof (messagedef_t));
     parseMessageDef(msgBuffer);
 
     //Waiting for response.
@@ -451,7 +452,7 @@ int FtConnector::totalBuffSamples()
     qint32 iNumSamp;
 
     QBuffer sampeventsBuffer;
-    prepBuffer(sampeventsBuffer, sizeof(samples_events_t));
+    copyResponse(sampeventsBuffer, sizeof(samples_events_t));
 
     char cSamps[sizeof(iNumSamp)];
     sampeventsBuffer.read(cSamps, sizeof(iNumSamp));
@@ -477,19 +478,6 @@ bool FtConnector::parseData(QBuffer &datasampBuffer,
     //start interpreting data as float instead of char
     QByteArray dataArray = datasampBuffer.readAll();
     float* fdata = reinterpret_cast<float*> (dataArray.data());
-
-//TODO: Implement receiving other types of data
-//    switch (m_iDataType) {
-//        case DATATYPE_FLOAT32:
-//            auto data = reinterpret_cast<float*>(dataArray.data(), bufsize);
-//            qDebug() << "*** Would you look at that, we're all the way here ***";
-//            qDebug() << "Data sample:";
-
-//            for (int i = 0; i < 10 ; i++) {
-//                qDebug() << data[i];
-//            }
-//            break;
-//    }
 
     //format data into eigen matrix to pass up
     Eigen::MatrixXf matData;
@@ -552,24 +540,22 @@ QString FtConnector::getAddr()
 
 //=============================================================================================================
 
-MetaData FtConnector::parseBufferHeaders()
+MetaData FtConnector::parseBufferHeader()
 {
     qInfo() << "[FtConnector::parseNeuromagHeader] Attempting to get extended header...";
 
     MetaData metadata;
-    QBuffer chunkBuffer;
 
-    getHeader();
-    prepBuffer(chunkBuffer, m_iExtendedHeaderSize);
+    getFixedHeader();
 
-    std::cout << "Parsing extended header\n";
+    qInfo() << "[FtConnector::parseNeuromagHeader] Parsing extended header\n";
+    QBuffer allChunksBuffer;
+    copyResponse(allChunksBuffer, m_iExtendedHeaderSize);
 
     FtHeaderParser parser;
-    metadata = parser.parseHeader(chunkBuffer);
+    metadata = parser.parseExtendedHeader(allChunksBuffer);
 
-    if (!metadata.bFiffInfo){
-        metadata.setFiffinfo(infoFromSimpleHeader());
-    }
+    checkForMissingMetadataFields(metadata);
 
     return metadata;
 }
@@ -597,11 +583,14 @@ BufferInfo FtConnector::getBufferInfo()
 
 //=============================================================================================================
 
-FIFFLIB::FiffInfo FtConnector::infoFromSimpleHeader()
+FIFFLIB::FiffInfo FtConnector::infoFromSimpleHeader() const
 {
     FIFFLIB::FiffInfo defaultInfo;
 
-    defaultInfo.sfreq = m_fSampleFreq;
+    defaultInfo.meas_date[0] = static_cast<int32_t>(QDateTime::currentDateTime().toSecsSinceEpoch());
+    defaultInfo.meas_date[1] = 0;
+
+    defaultInfo.sfreq = m_fSamplingFreq;
     defaultInfo.nchan = m_iNumChannels;
 
     defaultInfo.chs.clear();
@@ -621,4 +610,44 @@ FIFFLIB::FiffInfo FtConnector::infoFromSimpleHeader()
     }
 
     return defaultInfo;
+}
+
+//=============================================================================================================
+
+void FtConnector::checkForMissingMetadataFields(MetaData& data) const
+{
+    if (!data.bFiffInfo){
+        data.setFiffinfo(infoFromSimpleHeader());
+    } else {
+        if ( data.info.meas_date[0] == -1 )
+        {
+            data.info.meas_date[0] = static_cast<int32_t>(QDateTime::currentDateTime().toSecsSinceEpoch());
+            data.info.meas_date[1] = 0;
+        }
+
+        if ( data.info.sfreq <= 0 )
+        {
+            data.info.sfreq = m_fSamplingFreq;
+        }
+        if ( data.info.nchan == -1 )
+        {
+            data.info.nchan = m_iNumChannels;
+            data.info.chs.clear();
+            for (int chani = 0; chani< m_iNumChannels; chani++)
+            {
+                FIFFLIB::FiffChInfo channel;
+
+                channel.ch_name = "Ch. " + QString::number(chani);
+                channel.kind = FIFFV_MEG_CH;
+                channel.unit = FIFF_UNIT_T;
+                channel.unit_mul = FIFF_UNITM_NONE;
+                channel.chpos.coil_type = FIFFV_COIL_NONE;
+
+                data.info.chs.append(channel);
+
+                data.info.ch_names.append("Ch. " + QString::number(chani));
+
+            }
+        }
+    }
 }

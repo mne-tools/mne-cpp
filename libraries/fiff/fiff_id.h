@@ -79,17 +79,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Copy constructor.
-     *
-     * @param[in] p_FiffId   Universially unique identifier which should be copied.
+     * Destructor.
      */
-    FiffId(const FiffId& p_FiffId);
-
-    //=========================================================================================================
-    /**
-     * Destroys the universially unique identifier.
-     */
-    ~FiffId();
+    ~FiffId() = default;
 
     //=========================================================================================================
     /**
@@ -152,20 +144,6 @@ public:
     fiff_int_t version;     /**< File version. */
     fiff_int_t machid[2];   /**< Unique machine ID. */
     fiffTimeRec time;       /**< Time of the ID creation. */
-
-// ### OLD STRUCT ###
-///**
-//* A file ID.
-//*
-//* These universially unique identifiers are also
-//* used to identify blocks within fthe files.
-//*/
-//typedef struct _fiffIdRec {
-//    fiff_int_t version;     /**< File version. */
-//    fiff_int_t machid[2];   /**< Unique machine ID. */
-//    fiffTimeRec time;       /**< Time of the ID creation. */
-//} fiffIdRec,*fiffId;        /**< This is the file identifier. */
-//typedef fiffIdRec fiff_id_t;
 };
 
 //=============================================================================================================

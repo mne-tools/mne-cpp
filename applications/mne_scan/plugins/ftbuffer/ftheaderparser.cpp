@@ -38,6 +38,8 @@
 //=============================================================================================================
 
 #include "ftheaderparser.h"
+#include "fiff/fiff_ch_info.h"
+#include "fiff/fiff_constants.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -49,25 +51,75 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FTBUFFERPLUGIN;
 using FTBUFFERPLUGIN::FtHeaderParser;
 using FTBUFFERPLUGIN::MetaData;
 
 //=============================================================================================================
 // DEFINE FREE FUNCTIONS
 //=============================================================================================================
+namespace {
 
-void FTBUFFERPLUGIN::parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer)
+//=============================================================================================================
+/**
+ * Return a list of names for each channel from the input buffer.
+ * @param [in] buffer   Buffer from where to extract the channel names spearated by '\0' characters.
+ * @return A list with each channel's label name.
+ */
+QStringList extractChannelNamesFromBuffer(QBuffer& buffer)
 {
-    qint32_be iIntToChar;
-    char cCharFromInt[sizeof (qint32)];
+    QString singleStringAllNames(buffer.buffer().replace('\0','\n'));
+    QStringList channelNames(singleStringAllNames.split('\n'));
+    channelNames.removeAll(channelNames[channelNames.size()-1]);
+    return channelNames;
+}
 
+//=============================================================================================================
+/**
+ * Parses header chunk FT_CHUNK_CHANNEL_NAMES = 1
+ *
+ * @param[in, out] data         MetaData object that gets updated with measurment info from header
+ * @param[in] neuromagBuffer    Buffer containing the data portion of the neuromag header chunk
+ */
+void parseChannelNamesHeader( MetaData& data, QBuffer& channelNamesBuffer)
+{
+    QStringList channelNames(extractChannelNamesFromBuffer(channelNamesBuffer));
+
+//    qInfo() << channelNames;
+    FIFFLIB::FiffInfo info;
+
+    info.nchan = static_cast<FIFFLIB::fiff_int_t>(channelNames.size());
+
+    QList<FIFFLIB::FiffChInfo> chanList;
+    for ( auto& name : channelNames)
+    {
+        FIFFLIB::FiffChInfo chanInfo;
+        chanInfo.ch_name = name;
+        chanInfo.kind = FIFFV_MEG_CH;
+        chanInfo.unit = FIFF_UNIT_T;
+        chanInfo.unit_mul = FIFF_UNITM_NONE;
+        chanList.append(chanInfo);
+    }
+    info.chs = chanList;
+    info.ch_names = channelNames;
+
+    data.setFiffinfo(info);
+}
+
+//=============================================================================================================
+/**
+ * Parses header chunk FT_CHUNK_NEUROMAG_HEADER = 8
+ *
+ * @param[in, out] data         MetaData object that gets updated with measurment info from header
+ * @param[in] neuromagBuffer    Buffer containing the data portion of the neuromag header chunk
+ */
+void parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer)
+{
     //Pad buffer because the fiff file we receive is missing an end tag
-    iIntToChar = -1;
+    char cCharFromInt[sizeof (qint32)];
+    qint32_be iIntToChar(-1);
     memcpy(cCharFromInt, &iIntToChar, sizeof(qint32));
-    neuromagBuffer.write(cCharFromInt);
-    neuromagBuffer.write(cCharFromInt);
-    neuromagBuffer.write(cCharFromInt);
-    neuromagBuffer.write(cCharFromInt);
+    neuromagBuffer.write(cCharFromInt, sizeof(quint32));
 
     neuromagBuffer.reset();
 
@@ -84,8 +136,13 @@ void FTBUFFERPLUGIN::parseNeuromagHeader(MetaData& data, QBuffer& neuromagBuffer
 }
 
 //=============================================================================================================
-
-void FTBUFFERPLUGIN::parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer)
+/**
+ * Parses headr chunk FT_CHUNK_NEUROMAG_ISOTRAK = 9
+ *
+ * @param[in, out] data         MetaData object that gets updated with measurment info from header
+ * @param [in] isotrakBuffer    Buffer containing the data portion of the isotrak header chunk
+ */
+void parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer)
 {
     isotrakBuffer.reset();
 
@@ -100,6 +157,8 @@ void FTBUFFERPLUGIN::parseIsotrakHeader(MetaData& data, QBuffer& isotrakBuffer)
     }
 }
 
+} //namespace
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -111,7 +170,7 @@ FtHeaderParser::FtHeaderParser()
 
 //=============================================================================================================
 
-MetaData FtHeaderParser::parseHeader(QBuffer &buffer)
+MetaData FtHeaderParser::parseExtendedHeader(QBuffer &buffer)
 {
     MetaData data;
     while(!buffer.atEnd()){
@@ -125,52 +184,42 @@ MetaData FtHeaderParser::parseHeader(QBuffer &buffer)
 
 void FtHeaderParser::registerMembers()
 {
-    functionMap[HeaderChunk::FT_CHUNK_NEUROMAG_HEADER] = parseNeuromagHeader;
-    functionMap[HeaderChunk::FT_CHUNK_NEUROMAG_ISOTRAK] = parseIsotrakHeader;
+    chunkParsersMap[HeaderChunkType::FT_CHUNK_CHANNEL_NAMES] = parseChannelNamesHeader;
+    chunkParsersMap[HeaderChunkType::FT_CHUNK_NEUROMAG_HEADER] = parseNeuromagHeader;
+    chunkParsersMap[HeaderChunkType::FT_CHUNK_NEUROMAG_ISOTRAK] = parseIsotrakHeader;
 }
 
 //=============================================================================================================
 
 void FtHeaderParser::processChunk(MetaData& data , QBuffer& buffer)
 {
-    auto chunkType = getChunkType(buffer);
-    auto function = functionMap.find(chunkType);
+    FtHeaderParser::Chunk chunk = getChunk(buffer);
 
-    QBuffer headerChunk;
-    getSingleHeaderChunk(buffer, headerChunk);
+    auto chunkParser = chunkParsersMap.find(chunk.type);
 
-    if (function != functionMap.end()){
-        function->second(data, headerChunk);
+    if (chunkParser != chunkParsersMap.end()) {
+        chunkParser->second(data, *chunk.data);
     }
 }
 
 //=============================================================================================================
 
-void FtHeaderParser::getSingleHeaderChunk(QBuffer &source, QBuffer &dest)
+FtHeaderParser::Chunk FtHeaderParser::getChunk(QBuffer &buffer)
 {
-    qint32 iSize;
-    char cSize[sizeof(qint32)];
+    FtHeaderParser::Chunk outChunk;
 
-    //read size of chunk
-    source.read(cSize, sizeof(qint32));
-    std::memcpy(&iSize, cSize, sizeof(qint32));
+    char cType[sizeof(quint32)];
+    buffer.read(cType, sizeof(quint32));
+    std::memcpy(&outChunk.type, cType, sizeof(quint32));
 
-    //Read relevant chunk info
-    dest.open(QIODevice::ReadWrite);
-    dest.write(source.read(iSize));
+    char cSize[sizeof(quint32)];
+    buffer.read(cSize, sizeof(quint32));
+    std::memcpy(&outChunk.size, cSize, sizeof(quint32));
+
+    outChunk.data = QSharedPointer<QBuffer>(new QBuffer);
+
+    outChunk.data->open(QIODevice::ReadWrite);
+    outChunk.data->write(buffer.read(outChunk.size));
+
+    return outChunk;
 }
-
-//=============================================================================================================
-
-HeaderChunk FtHeaderParser::getChunkType(QBuffer &buffer)
-{
-    qint32 iType;
-    char cType[sizeof(qint32)];
-
-    buffer.read(cType, sizeof(qint32));
-    std::memcpy(&iType, cType, sizeof(qint32));
-
-    std::cout << "Read header of type" << iType << "\n";
-    return static_cast<HeaderChunk>(iType);
-}
-
