@@ -261,7 +261,7 @@ void TestHpiFit::testUpdateChannels_channels_bads()
 
 void TestHpiFit::testUpdateChannels_channels_bads_size()
 {
-    /// Prepare
+    // Prepare
     HPIFit HPI = HPIFit(m_pFiffInfo);
     m_pFiffInfo->bads << "MEG0113" << "MEG0112";
     int iNChanExpected = 204 - 2;
@@ -374,7 +374,7 @@ void TestHpiFit::testPrepareProj()
 
 void TestHpiFit::testUpdateModel_basic_4coils()
 {
-    /// Prepare
+    // Prepare
     // Create HPI object
     HPIFit HPI = HPIFit(m_pFiffInfo);
 
@@ -412,7 +412,7 @@ void TestHpiFit::testUpdateModel_basic_4coils()
 
 void TestHpiFit::testUpdateModel_basic_5coils()
 {
-    /// Prepare
+    // Prepare
     // Create HPI object
     HPIFit HPI = HPIFit(m_pFiffInfo);
 
@@ -450,7 +450,7 @@ void TestHpiFit::testUpdateModel_basic_5coils()
 
 void TestHpiFit::testUpdateModel_advanced_4coils()
 {
-    /// Prepare
+    // Prepare
     // Create HPI object
     HPIFit HPI = HPIFit(m_pFiffInfo);
 
@@ -503,7 +503,7 @@ void TestHpiFit::testUpdateModel_advanced_4coils()
 
 void TestHpiFit::testUpdateModel_advanced_5coils()
 {
-    /// Prepare
+    // Prepare
     // Create HPI object
     HPIFit HPI = HPIFit(m_pFiffInfo);
 
@@ -556,7 +556,7 @@ void TestHpiFit::testUpdateModel_advanced_5coils()
 
 void TestHpiFit::testComputeAmplitudes_basic_sin()
 {
-    /// Prepare
+    // Prepare
     // simulate fiff info with only grads
     int iNumCh = m_pFiffInfo->nchan;
     QList<FIFFLIB::FiffChInfo> lChannels;
@@ -627,7 +627,7 @@ void TestHpiFit::testComputeAmplitudes_basic_sin()
 
 void TestHpiFit::testComputeAmplitudes_basic_cos()
 {
-    /// Prepare
+    // Prepare
     // simulate fiff info with only grads
     int iNumCh = m_pFiffInfo->nchan;
     QList<FIFFLIB::FiffChInfo> lChannels;
@@ -698,7 +698,7 @@ void TestHpiFit::testComputeAmplitudes_basic_cos()
 
 void TestHpiFit::testComputeAmplitudes_basic_sincos()
 {
-    /// Prepare
+    // Prepare
     // simulate fiff info with only grads
     int iNumCh = m_pFiffInfo->nchan;
     QList<FIFFLIB::FiffChInfo> lChannels;
@@ -769,7 +769,7 @@ void TestHpiFit::testComputeAmplitudes_basic_sincos()
 
 void TestHpiFit::testComputeAmplitudes_advanced_sin()
 {
-    /// Prepare
+    // Prepare
     // simulate fiff info with only grads
     int iNumCh = m_pFiffInfo->nchan;
     QList<FIFFLIB::FiffChInfo> lChannels;
@@ -839,7 +839,7 @@ void TestHpiFit::testComputeAmplitudes_advanced_sin()
 
 void TestHpiFit::testComputeAmplitudes_advanced_cos()
 {
-    /// Prepare
+    // Prepare
     // simulate fiff info with only grads
     int iNumCh = m_pFiffInfo->nchan;
     QList<FIFFLIB::FiffChInfo> lChannels;
@@ -912,7 +912,7 @@ void TestHpiFit::testComputeAmplitudes_advanced_cos()
 
 void TestHpiFit::testComputeAmplitudes_advanced_summedCosSine()
 {
-    /// Prepare
+    // Prepare
     // simulate fiff info with only grads
     int iNumCh = m_pFiffInfo->nchan;
     QList<FIFFLIB::FiffChInfo> lChannels;
@@ -992,7 +992,7 @@ void TestHpiFit::testComputeAmplitudes_advanced_summedCosSine()
 
 void TestHpiFit::testComputeCoilLocation_basic_noproj()
 {
-    /// Prepare
+    // Prepare
     HPIFit HPI = HPIFit(m_pFiffInfo);
     MatrixXd matProjectors = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
     QVector<int> vecFreqs = {166, 154, 161, 158};
@@ -1034,7 +1034,7 @@ void TestHpiFit::testComputeCoilLocation_basic_noproj()
 
 void TestHpiFit::testComputeCoilLocation_basic_noproj_trafo()
 {
-    /// Prepare
+    // Prepare
     HPIFit HPI = HPIFit(m_pFiffInfo);
     MatrixXd matProjectors = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
     QVector<int> vecFreqs = {166, 154, 161, 158};
@@ -1076,7 +1076,7 @@ void TestHpiFit::testComputeCoilLocation_basic_noproj_trafo()
 
 void TestHpiFit::testComputeCoilLocation_basic_proj()
 {
-    /// Prepare
+    // Prepare
     HPIFit HPI = HPIFit(m_pFiffInfo);
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError(4);
@@ -1117,7 +1117,7 @@ void TestHpiFit::testComputeCoilLocation_basic_proj()
 
 void TestHpiFit::testComputeCoilLocation_advanced_noproj()
 {
-    /// Prepare
+    // Prepare
     HPIFit HPI = HPIFit(m_pFiffInfo);
     MatrixXd matProjectors = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
     QVector<int> vecFreqs = {166, 154, 161, 158};
@@ -1159,7 +1159,7 @@ void TestHpiFit::testComputeCoilLocation_advanced_noproj()
 
 void TestHpiFit::testComputeCoilLocation_advanced_noproj_trafo()
 {
-    /// Prepare
+    // Prepare
     HPIFit HPI = HPIFit(m_pFiffInfo);
     MatrixXd matProjectors = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
     QVector<int> vecFreqs = {166, 154, 161, 158};
@@ -1200,7 +1200,7 @@ void TestHpiFit::testComputeCoilLocation_advanced_noproj_trafo()
 
 void TestHpiFit::testComputeCoilLocation_advanced_proj()
 {
-    /// Prepare
+    // Prepare
     HPIFit HPI = HPIFit(m_pFiffInfo);
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError(4);
@@ -1241,7 +1241,7 @@ void TestHpiFit::testComputeCoilLocation_advanced_proj()
 
 void TestHpiFit::testComputeCoilLocation_basic_gof()
 {
-    /// Prepare
+    // Prepare
     HPIFit HPI = HPIFit(m_pFiffInfo);
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError(4);
@@ -1279,7 +1279,7 @@ void TestHpiFit::testComputeCoilLocation_basic_gof()
 
 void TestHpiFit::testComputeCoilLocation_advanced_gof()
 {
-    /// Prepare
+    // Prepare
     HPIFit HPI = HPIFit(m_pFiffInfo);
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError(4);

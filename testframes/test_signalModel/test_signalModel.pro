@@ -115,3 +115,5 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
 	        -lfftw3_threads \
     }
 }
+
+HEADERS +=
