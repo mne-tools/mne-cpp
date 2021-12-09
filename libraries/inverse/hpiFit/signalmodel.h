@@ -64,6 +64,18 @@
 namespace INVERSELIB
 {
 
+//=============================================================================================================
+// Declare all structures to be used
+//=============================================================================================================
+
+/**
+ * The strucut specifing important frequencies used for hpi fitting.
+ */
+struct Frequencies {
+    int iLineFreq;
+    int iSampleFreq;
+    QVector<int> vecHpiFreqs;
+};
 
 //=============================================================================================================
 // INVERSELIB FORWARD DECLARATIONS
@@ -84,9 +96,12 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a SignalModel object.
-    */
-    SignalModel();
+     * Constructs a SignalModel object.
+     *
+     * @param[in] frequencies     The frequencies.
+     * @param[in] bBasicModel     Compute the basic model yes/no.
+     */
+    SignalModel(const Frequencies frequencies, bool bBasicModel);
 
     //=========================================================================================================
     /**
@@ -108,17 +123,14 @@ public:
 
     //=========================================================================================================
     /**
-     * Set the necessary frequencies.
+     * Update the frequencies used for the signal model
      *
-     * @param[in] iSamplingFreq     The sampling frequency.
-     * @param[in] iLineFreq     The line frequency.
-     * @param[in] vecHpiFreqs     The hpi frequencies.
+     * @param[in] frequencies     The frequencies.
      *
      */
-    void setFrequencies(const int iSamplingFreq, const int iLineFreq, const QVector<int>& vecHpiFreqs);
+    void updateFrequencies(const Frequencies frequencies);
 
-    void createInverseBasicModel();
-    void createInverseAdvancedModel();
+    inline Eigen::MatrixXd getModel() const;
 
 protected:
 
@@ -130,7 +142,15 @@ private:
      * @param[in] bBasicModel  weather to compute the basic model or the advanced.
      *
      */
-    void computeModel(const bool bBasicModel);
+    void selectModelAndCompute(const bool bBasicModel);
+
+    //=========================================================================================================
+    /**
+     * Computes the model.
+     *
+     */
+    void computeInverseBasicModel();
+    void computeInverseAdvancedModel();
 
     //=========================================================================================================
     /**
@@ -153,21 +173,22 @@ private:
      *
      * @return true if changed
      */
-    bool checkFrequencies(const int iSamplingFreq, const int iLineFreq, const QVector<int>& vecHpiFreqs);
+    bool checkFrequencies(const Frequencies frequencies);
 
     Eigen::MatrixXd m_matData;
     Eigen::MatrixXd m_matInverseSignalModel;
     int m_iCurrentModelCols;
-    int m_iSamplingFreq;
-    int m_iLineFreq;
-    QVector<int> m_vecHpiFreqs;
     bool m_bBasicModel;
+    Frequencies m_frequencies;
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
+inline Eigen::MatrixXd SignalModel::getModel() const
+{
+    return m_matInverseSignalModel;
+}
 } // namespace INVERSELIB
 
 #endif // SignalModel_H
