@@ -66,47 +66,46 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SignalModel::SignalModel()
+SignalModel::SignalModel(const Frequencies frequencies, bool bBasicModel)
 {
     m_iCurrentModelCols = 0;
-    m_iSamplingFreq = 0;
-    m_iLineFreq = 0;
-    m_bBasicModel = false;
+    m_frequencies = frequencies;
+    m_bBasicModel = bBasicModel;
 }
 
 //=============================================================================================================
 
-void SignalModel::createInverseBasicModel()
+void SignalModel::computeInverseBasicModel()
 {
-    int iNumCoils = m_vecHpiFreqs.size();
+    int iNumCoils = m_frequencies.vecHpiFreqs.size();
     MatrixXd matSimsig;
-    VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/m_iSamplingFreq;
+    VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/m_frequencies.iSampleFreq;
 
     // Generate simulated data Matrix
     matSimsig.conservativeResize(m_iCurrentModelCols,iNumCoils*2);
 
     for(int i = 0; i < iNumCoils; ++i) {
-        matSimsig.col(i) = sin(2*M_PI*m_vecHpiFreqs[i]*vecTime.array());
-        matSimsig.col(i+iNumCoils) = cos(2*M_PI*m_vecHpiFreqs[i]*vecTime.array());
+        matSimsig.col(i) = sin(2*M_PI*m_frequencies.vecHpiFreqs[i]*vecTime.array());
+        matSimsig.col(i+iNumCoils) = cos(2*M_PI*m_frequencies.vecHpiFreqs[i]*vecTime.array());
     }
     m_matInverseSignalModel = UTILSLIB::MNEMath::pinv(matSimsig);
 }
 
 //=============================================================================================================
 
-void SignalModel::createInverseAdvancedModel()
+void SignalModel::computeInverseAdvancedModel()
 {
-    int iNumCoils = m_vecHpiFreqs.size();
+    int iNumCoils = m_frequencies.vecHpiFreqs.size();
     MatrixXd matSimsig;
-    VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/m_iSamplingFreq;
+    VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/m_frequencies.iSampleFreq;
 
     // add linefreq + harmonics + DC part to model
     matSimsig.conservativeResize(m_iCurrentModelCols,iNumCoils*4+2);
     for(int i = 0; i < iNumCoils; ++i) {
-        matSimsig.col(i) = sin(2*M_PI*m_vecHpiFreqs[i]*vecTime.array());
-        matSimsig.col(i+iNumCoils) = cos(2*M_PI*m_vecHpiFreqs[i]*vecTime.array());
-        matSimsig.col(i+2*iNumCoils) = sin(2*M_PI*m_iLineFreq*(i+1)*vecTime.array());
-        matSimsig.col(i+3*iNumCoils) = cos(2*M_PI*m_iLineFreq*(i+1)*vecTime.array());
+        matSimsig.col(i) = sin(2*M_PI*m_frequencies.vecHpiFreqs[i]*vecTime.array());
+        matSimsig.col(i+iNumCoils) = cos(2*M_PI*m_frequencies.vecHpiFreqs[i]*vecTime.array());
+        matSimsig.col(i+2*iNumCoils) = sin(2*M_PI*m_frequencies.iLineFreq*(i+1)*vecTime.array());
+        matSimsig.col(i+3*iNumCoils) = cos(2*M_PI*m_frequencies.iLineFreq*(i+1)*vecTime.array());
     }
     matSimsig.col(iNumCoils*4) = RowVectorXd::LinSpaced(m_iCurrentModelCols, -0.5, 0.5);
     matSimsig.col(iNumCoils*4+1).fill(1);
@@ -118,10 +117,11 @@ void SignalModel::createInverseAdvancedModel()
 
 void SignalModel::setData(const Eigen::MatrixXd& matData)
 {
-    bool bHasChanged = checkDataDimensions(matData);
+    // avoid copiing!!
+    bool bDimensionsChanged = checkDataDimensions(matData);
     m_matData = matData;
-    if(bHasChanged) {
-        computeModel(m_bBasicModel);
+    if(bDimensionsChanged) {
+        selectModelAndCompute(m_bBasicModel);
     }
 }
 
@@ -130,7 +130,8 @@ void SignalModel::setData(const Eigen::MatrixXd& matData)
 bool SignalModel::checkDataDimensions(const Eigen::MatrixXd& matData)
 {
     bool bHasChanged = false;
-    if(matData.rows() != m_iCurrentModelCols) {
+    if(matData.cols() != m_iCurrentModelCols) {
+        m_iCurrentModelCols = matData.cols();
         bHasChanged = true;
     }
     return bHasChanged;
@@ -148,24 +149,26 @@ void SignalModel::setModelType(const bool bBasic)
 
 //=============================================================================================================
 
-void SignalModel::setFrequencies(const int iSamplingFreq, const int iLineFreq, const QVector<int>& vecHpiFreqs)
+void SignalModel::updateFrequencies(const Frequencies frequencies)
 {
-    bool bHasChanged = checkFrequencies(iSamplingFreq,iLineFreq,vecHpiFreqs);
+    bool bHasChanged = checkFrequencies(frequencies);
     if(bHasChanged)
     {
-        m_iSamplingFreq = iSamplingFreq;
-        m_iLineFreq = iLineFreq;
-        m_vecHpiFreqs = vecHpiFreqs;
-        computeModel(m_bBasicModel);
+        m_frequencies.iSampleFreq = frequencies.iSampleFreq;
+        m_frequencies.iLineFreq = frequencies.iLineFreq;
+        m_frequencies.vecHpiFreqs = frequencies.vecHpiFreqs;
+        selectModelAndCompute(m_bBasicModel);
     }
 }
 
 //=============================================================================================================
 
-bool SignalModel::checkFrequencies(const int iSamplingFreq, const int iLineFreq, const QVector<int>& vecHpiFreqs)
+bool SignalModel::checkFrequencies(const Frequencies frequencies)
 {
     bool bHasChanged = false;
-    if((m_iSamplingFreq != iSamplingFreq) || (m_iLineFreq != iLineFreq) || (m_vecHpiFreqs != vecHpiFreqs)) {
+    if((m_frequencies.iSampleFreq != frequencies.iSampleFreq) ||
+       (m_frequencies.iLineFreq != frequencies.iLineFreq) ||
+       (m_frequencies.vecHpiFreqs != frequencies.vecHpiFreqs)) {
         bHasChanged = true;
     }
     return bHasChanged;
@@ -173,11 +176,11 @@ bool SignalModel::checkFrequencies(const int iSamplingFreq, const int iLineFreq,
 
 //=============================================================================================================
 
-void SignalModel::computeModel(bool bBasicModel)
+void SignalModel::selectModelAndCompute(bool bBasicModel)
 {
     if(bBasicModel) {
-        createInverseBasicModel();
+        computeInverseBasicModel();
     } else {
-        createInverseAdvancedModel();
+        computeInverseAdvancedModel();
     }
 }
