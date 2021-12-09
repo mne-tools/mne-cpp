@@ -39,7 +39,7 @@
 #include <utils/generics/applicationlogger.h>
 #include <inverse/hpiFit/signalmodel.h>
 #include <utils/mnemath.h>
-
+#include <iostream>
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -76,23 +76,24 @@ public:
 
 private slots:
     void initTestCase();
-    void testUpdateModel_basic_4coils();
-    void testUpdateModel_basic_5coils();
-    void testUpdateModel_advanced_4coils();
-    void testUpdateModel_advanced_5coils();
+    void testFitData_basic_4coils();
+    void testFitData_basic_5coils();
+    void testFitData_advanced_4coils();
+    void testFitData_advanced_5coils();
     void cleanupTestCase();
 
 private:
     // declare your thresholds, variables and error values here
     Eigen::MatrixXd mFirstInData;
     Eigen::MatrixXd mSecondInData;
-
+    double dErrorTol;
 };
 
 //=============================================================================================================
 
 TestSignalModel::TestSignalModel()
 {
+    dErrorTol = 0.0001;
 }
 
 //=============================================================================================================
@@ -104,7 +105,7 @@ void TestSignalModel::initTestCase()
 
 //=============================================================================================================
 
-void TestSignalModel::testUpdateModel_basic_4coils()
+void TestSignalModel::testFitData_basic_4coils()
 {
     // Prepare
     Frequencies frequencies;
@@ -117,34 +118,45 @@ void TestSignalModel::testUpdateModel_basic_4coils()
 
     int iNumCoils = frequencies.vecHpiFreqs.size();
     int iSamLoc = 200;
-    MatrixXd matData = MatrixXd::Identity(iSamLoc,iSamLoc);
+    int iNchan = 10;
 
-    // create basic model
-    MatrixXd matModelExpected;
-    MatrixXd matSimsig(iSamLoc,iNumCoils*2);
+    // create test signal
+    MatrixXd matSimData = MatrixXd::Zero(iNchan,iSamLoc);
+    matSimData.fill(0);
+
+    // expected amplitudes
+    double dAmpSine = 0.5;
+    double dAmpCosine = 0.25;
+
     VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/frequencies.iSampleFreq;
 
     for(int i = 0; i < iNumCoils; ++i) {
-        matSimsig.col(i) = sin(2*M_PI*frequencies.vecHpiFreqs[i]*vecTime.array());
-        matSimsig.col(i+iNumCoils) = cos(2*M_PI*frequencies.vecHpiFreqs[i]*vecTime.array());
+        matSimData.row(i) = dAmpSine * sin(2*M_PI*frequencies.vecHpiFreqs[i]*vecTime.array()) + dAmpCosine * cos(2*M_PI*frequencies.vecHpiFreqs[i]*vecTime.array());
     }
-    matModelExpected = UTILSLIB::MNEMath::pinv(matSimsig);
 
+    MatrixXd matAmpExpected = MatrixXd::Zero(2*iNumCoils,iNchan);
+    matAmpExpected(0,0) = dAmpSine;
+    matAmpExpected(1,1) = dAmpSine;
+    matAmpExpected(2,2) = dAmpSine;
+    matAmpExpected(3,3) = dAmpSine;
+    matAmpExpected(4,0) = dAmpCosine;
+    matAmpExpected(5,1) = dAmpCosine;
+    matAmpExpected(6,2) = dAmpCosine;
+    matAmpExpected(7,3) = dAmpCosine;
 
     /// Act
-    signalModel.setData(matData);
-    MatrixXd matModelActual = signalModel.getModel();
+    MatrixXd matAmpActual = signalModel.fitData(matSimData);
 
     /// Assert
-    // use Summed Difference as measure
-    MatrixXd matDiff = (matModelActual - matModelExpected);
-    double dSD = matDiff.sum();
-    QVERIFY(dSD == 0);
+    // use summed squared error ssd
+    MatrixXd matDiff = matAmpActual - matAmpExpected;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+    QVERIFY(dSSD < dErrorTol);
 }
 
 //=============================================================================================================
 
-void TestSignalModel::testUpdateModel_basic_5coils()
+void TestSignalModel::testFitData_basic_5coils()
 {
     // Prepare
     Frequencies frequencies;
@@ -157,35 +169,48 @@ void TestSignalModel::testUpdateModel_basic_5coils()
 
     int iNumCoils = frequencies.vecHpiFreqs.size();
     int iSamLoc = 200;
-    MatrixXd matData = MatrixXd::Identity(iSamLoc,iSamLoc);
+    int iNchan = 10;
 
-    // create basic model
-    MatrixXd matModelExpected;
-    MatrixXd matSimsig(iSamLoc,iNumCoils*2);
+    // create test signal
+    MatrixXd matSimData = MatrixXd::Zero(iNchan,iSamLoc);
+
+    // expected amplitudes
+    double dAmpSine = 0.5;
+    double dAmpCosine = 0.25;
+
     VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/frequencies.iSampleFreq;
 
     for(int i = 0; i < iNumCoils; ++i) {
-        matSimsig.col(i) = sin(2*M_PI*frequencies.vecHpiFreqs[i]*vecTime.array());
-        matSimsig.col(i+iNumCoils) = cos(2*M_PI*frequencies.vecHpiFreqs[i]*vecTime.array());
+        matSimData.row(i) = dAmpSine * sin(2*M_PI*frequencies.vecHpiFreqs[i]*vecTime.array()) + dAmpCosine * cos(2*M_PI*frequencies.vecHpiFreqs[i]*vecTime.array());
     }
-    matModelExpected = UTILSLIB::MNEMath::pinv(matSimsig);
 
+    MatrixXd matAmpExpected = MatrixXd::Zero(2*iNumCoils,iNchan);
+    matAmpExpected(0,0) = dAmpSine;
+    matAmpExpected(1,1) = dAmpSine;
+    matAmpExpected(2,2) = dAmpSine;
+    matAmpExpected(3,3) = dAmpSine;
+    matAmpExpected(4,4) = dAmpSine;
+
+    matAmpExpected(5,0) = dAmpCosine;
+    matAmpExpected(6,1) = dAmpCosine;
+    matAmpExpected(7,2) = dAmpCosine;
+    matAmpExpected(8,3) = dAmpCosine;
+    matAmpExpected(9,4) = dAmpCosine;
 
     /// Act
-    signalModel.setData(matData);
-    MatrixXd matModelActual = signalModel.getModel();
+    MatrixXd matAmpActual = signalModel.fitData(matSimData);
 
     /// Assert
-    // use Summed Difference as measure
-    MatrixXd matDiff = (matModelActual - matModelExpected);
-    double dSD = matDiff.sum();
-    QVERIFY(dSD == 0);
+    // use summed squared error ssd
+    MatrixXd matDiff = matAmpActual - matAmpExpected;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+    QVERIFY(dSSD < dErrorTol);
 }
 
 
 //=============================================================================================================
 
-void TestSignalModel::testUpdateModel_advanced_4coils()
+void TestSignalModel::testFitData_advanced_4coils()
 {
     // Prepare
     Frequencies frequencies;
@@ -193,53 +218,53 @@ void TestSignalModel::testUpdateModel_advanced_4coils()
     frequencies.iLineFreq = 60;
     frequencies.vecHpiFreqs = {154,158,161,166};
 
-    bool bBasic = false;
+    bool bBasic = true;
     SignalModel signalModel = SignalModel(frequencies,bBasic);
 
     int iNumCoils = frequencies.vecHpiFreqs.size();
     int iSamLoc = 200;
-    MatrixXd matData = MatrixXd::Identity(iSamLoc,iSamLoc);
+    int iNchan = 10;
 
-    MatrixXd matModelExpected;
-    MatrixXd matSimsig(iSamLoc,iNumCoils*4+2);
+    // create test signal
+    MatrixXd matSimData = MatrixXd::Zero(iNchan,iSamLoc);
+
+    // expected amplitudes
+    double dAmpSine = 0.75;
+    double dAmpCosine = 0.5;
+    double dAmpLine = 0.3;
     VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/frequencies.iSampleFreq;
 
     for(int i = 0; i < iNumCoils; ++i) {
-        matSimsig.col(i) = sin(2*M_PI*frequencies.vecHpiFreqs[i]*vecTime.array());
-        matSimsig.col(i+iNumCoils) = cos(2*M_PI*frequencies.vecHpiFreqs[i]*vecTime.array());
-        matSimsig.col(i+2*iNumCoils) = sin(2*M_PI*frequencies.iLineFreq*(i+1)*vecTime.array());
-        matSimsig.col(i+3*iNumCoils) = cos(2*M_PI*frequencies.iLineFreq*(i+1)*vecTime.array());
+        matSimData.row(i) = dAmpSine * sin(2*M_PI*frequencies.vecHpiFreqs[i]*vecTime.array())
+                            + dAmpCosine * cos(2*M_PI*frequencies.vecHpiFreqs[i]*vecTime.array())
+                            + dAmpLine * sin(2*M_PI*60*vecTime.array())
+                            + dAmpLine/2 * sin(2*M_PI*60*2*vecTime.array())
+                            + dAmpLine/3 * sin(2*M_PI*60*3*vecTime.array());
     }
-    matSimsig.col(iNumCoils*4) = RowVectorXd::LinSpaced(iSamLoc, -0.5, 0.5);
-    matSimsig.col(iNumCoils*4+1).fill(1);
 
-    matModelExpected = UTILSLIB::MNEMath::pinv(matSimsig);
-
-    //    // reorder for faster computation
-    //    MatrixXd matTemp = matModelExpected;
-    //    RowVectorXi vecIndex(2*iNumCoils);
-
-    //    vecIndex << 0,4,1,5,2,6,3,7;
-    //    for(int i = 0; i < vecIndex.size(); ++i) {
-    //        matTemp.row(i) = matModelExpected.row(vecIndex(i));
-    //    }
-    //    matModelExpected = matTemp;
+    MatrixXd matAmpExpected = MatrixXd::Zero(2*iNumCoils,iNchan);
+    matAmpExpected(0,0) = dAmpSine;
+    matAmpExpected(1,1) = dAmpSine;
+    matAmpExpected(2,2) = dAmpSine;
+    matAmpExpected(3,3) = dAmpSine;
+    matAmpExpected(4,0) = dAmpCosine;
+    matAmpExpected(5,1) = dAmpCosine;
+    matAmpExpected(6,2) = dAmpCosine;
+    matAmpExpected(7,3) = dAmpCosine;
 
     /// Act
-    signalModel.setData(matData);
-    MatrixXd matModelActual = signalModel.getModel();
-
+    MatrixXd matAmpActual = signalModel.fitData(matSimData);
 
     /// Assert
-    // use Summed Difference as measure
-    MatrixXd matDiff = (matModelActual - matModelExpected);
-    double dSD = matDiff.sum();
-    QVERIFY(dSD == 0);
+    // use summed squared error ssd
+    MatrixXd matDiff = matAmpActual - matAmpExpected;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+    QVERIFY(dSSD < dErrorTol);
 }
 
 //=============================================================================================================
 
-void TestSignalModel::testUpdateModel_advanced_5coils()
+void TestSignalModel::testFitData_advanced_5coils()
 {
     // Prepare
     Frequencies frequencies;
@@ -252,43 +277,48 @@ void TestSignalModel::testUpdateModel_advanced_5coils()
 
     int iNumCoils = frequencies.vecHpiFreqs.size();
     int iSamLoc = 200;
-    MatrixXd matData = MatrixXd::Identity(iSamLoc,iSamLoc);
+    int iNchan = 10;
 
-    MatrixXd matModelExpected;
-    MatrixXd matSimsig(iSamLoc,iNumCoils*4+2);
+    // create test signal
+    MatrixXd matSimData = MatrixXd::Zero(iNchan,iSamLoc);
+
+    // expected amplitudes
+    double dAmpSine = 0.75;
+    double dAmpCosine = 0.5;
+    double dAmpLine = 0.3;
     VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/frequencies.iSampleFreq;
 
     for(int i = 0; i < iNumCoils; ++i) {
-        matSimsig.col(i) = sin(2*M_PI*frequencies.vecHpiFreqs[i]*vecTime.array());
-        matSimsig.col(i+iNumCoils) = cos(2*M_PI*frequencies.vecHpiFreqs[i]*vecTime.array());
-        matSimsig.col(i+2*iNumCoils) = sin(2*M_PI*frequencies.iLineFreq*(i+1)*vecTime.array());
-        matSimsig.col(i+3*iNumCoils) = cos(2*M_PI*frequencies.iLineFreq*(i+1)*vecTime.array());
+        matSimData.row(i) = dAmpSine * sin(2*M_PI*frequencies.vecHpiFreqs[i]*vecTime.array())
+                            + dAmpCosine * cos(2*M_PI*frequencies.vecHpiFreqs[i]*vecTime.array())
+                            + dAmpLine * sin(2*M_PI*60*vecTime.array())
+                            + dAmpLine/2 * sin(2*M_PI*60*2*vecTime.array())
+                            + dAmpLine/3 * sin(2*M_PI*60*3*vecTime.array());
     }
-    matSimsig.col(iNumCoils*4) = RowVectorXd::LinSpaced(iSamLoc, -0.5, 0.5);
-    matSimsig.col(iNumCoils*4+1).fill(1);
 
-    matModelExpected = UTILSLIB::MNEMath::pinv(matSimsig);
+    MatrixXd matAmpExpected = MatrixXd::Zero(2*iNumCoils,iNchan);
+    matAmpExpected(0,0) = dAmpSine;
+    matAmpExpected(1,1) = dAmpSine;
+    matAmpExpected(2,2) = dAmpSine;
+    matAmpExpected(3,3) = dAmpSine;
+    matAmpExpected(4,4) = dAmpSine;
 
-    //    // reorder for faster computation
-    //    MatrixXd matTemp = matModelExpected;
-    //    RowVectorXi vecIndex(2*iNumCoils);
-
-    //    vecIndex << 0,4,1,5,2,6,3,7;
-    //    for(int i = 0; i < vecIndex.size(); ++i) {
-    //        matTemp.row(i) = matModelExpected.row(vecIndex(i));
-    //    }
-    //    matModelExpected = matTemp;
+    matAmpExpected(5,0) = dAmpCosine;
+    matAmpExpected(6,1) = dAmpCosine;
+    matAmpExpected(7,2) = dAmpCosine;
+    matAmpExpected(8,3) = dAmpCosine;
+    matAmpExpected(9,4) = dAmpCosine;
 
     /// Act
-    signalModel.setData(matData);
-    MatrixXd matModelActual = signalModel.getModel();
-
+    MatrixXd matAmpActual = signalModel.fitData(matSimData);
 
     /// Assert
-    // use Summed Difference as measure
-    MatrixXd matDiff = (matModelActual - matModelExpected);
-    double dSD = matDiff.sum();
-    QVERIFY(dSD == 0);
+    // use summed squared error ssd
+    MatrixXd matDiff = matAmpActual - matAmpExpected;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+
+    std::cout << dSSD << std::endl;
+    QVERIFY(dSSD < dErrorTol);
 }
 
 //=============================================================================================================
