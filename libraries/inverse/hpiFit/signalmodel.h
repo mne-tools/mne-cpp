@@ -105,12 +105,12 @@ public:
 
     //=========================================================================================================
     /**
-     * Set the data matrix to use.
+     * Fit the data to the model.
      *
      * @param[in] matData     The data matrix.
      *
      */
-    void setData(const Eigen::MatrixXd& matData);
+    Eigen::MatrixXd fitData(const Eigen::MatrixXd& matData);
 
     //=========================================================================================================
     /**
@@ -175,7 +175,6 @@ private:
      */
     bool checkFrequencies(const Frequencies frequencies);
 
-    Eigen::MatrixXd m_matData;
     Eigen::MatrixXd m_matInverseSignalModel;
     int m_iCurrentModelCols;
     bool m_bBasicModel;

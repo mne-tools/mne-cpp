@@ -75,6 +75,29 @@ SignalModel::SignalModel(const Frequencies frequencies, bool bBasicModel)
 
 //=============================================================================================================
 
+MatrixXd SignalModel::fitData(const MatrixXd& matData)
+{
+    bool bDimensionsChanged = checkDataDimensions(matData);
+    if(bDimensionsChanged) {
+        selectModelAndCompute(m_bBasicModel);
+    }
+    MatrixXd matTopo = m_matInverseSignalModel * matData.transpose();
+    return matTopo;
+}
+
+//=============================================================================================================
+
+void SignalModel::selectModelAndCompute(bool bBasicModel)
+{
+    if(bBasicModel) {
+        computeInverseBasicModel();
+    } else {
+        computeInverseAdvancedModel();
+    }
+}
+
+//=============================================================================================================
+
 void SignalModel::computeInverseBasicModel()
 {
     int iNumCoils = m_frequencies.vecHpiFreqs.size();
@@ -97,6 +120,8 @@ void SignalModel::computeInverseAdvancedModel()
 {
     int iNumCoils = m_frequencies.vecHpiFreqs.size();
     MatrixXd matSimsig;
+    MatrixXd matSimsigInvTemp;
+
     VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/m_frequencies.iSampleFreq;
 
     // add linefreq + harmonics + DC part to model
@@ -109,25 +134,13 @@ void SignalModel::computeInverseAdvancedModel()
     }
     matSimsig.col(iNumCoils*4) = RowVectorXd::LinSpaced(m_iCurrentModelCols, -0.5, 0.5);
     matSimsig.col(iNumCoils*4+1).fill(1);
-
-    m_matInverseSignalModel = UTILSLIB::MNEMath::pinv(matSimsig);
+    matSimsigInvTemp = UTILSLIB::MNEMath::pinv(matSimsig);
+    m_matInverseSignalModel = matSimsigInvTemp.block(0,0,iNumCoils*2,m_iCurrentModelCols);
 }
 
 //=============================================================================================================
 
-void SignalModel::setData(const Eigen::MatrixXd& matData)
-{
-    // avoid copiing!!
-    bool bDimensionsChanged = checkDataDimensions(matData);
-    m_matData = matData;
-    if(bDimensionsChanged) {
-        selectModelAndCompute(m_bBasicModel);
-    }
-}
-
-//=============================================================================================================
-
-bool SignalModel::checkDataDimensions(const Eigen::MatrixXd& matData)
+bool SignalModel::checkDataDimensions(const MatrixXd& matData)
 {
     bool bHasChanged = false;
     if(matData.cols() != m_iCurrentModelCols) {
@@ -139,11 +152,12 @@ bool SignalModel::checkDataDimensions(const Eigen::MatrixXd& matData)
 
 //=============================================================================================================
 
-void SignalModel::setModelType(const bool bBasic)
+void SignalModel::setModelType(const bool bBasicModel)
 {
-    if(m_bBasicModel != bBasic)
+    if(m_bBasicModel != bBasicModel)
     {
-        m_bBasicModel = bBasic;
+        m_bBasicModel = bBasicModel;
+        selectModelAndCompute(bBasicModel);
     }
 }
 
@@ -172,15 +186,4 @@ bool SignalModel::checkFrequencies(const Frequencies frequencies)
         bHasChanged = true;
     }
     return bHasChanged;
-}
-
-//=============================================================================================================
-
-void SignalModel::selectModelAndCompute(bool bBasicModel)
-{
-    if(bBasicModel) {
-        computeInverseBasicModel();
-    } else {
-        computeInverseAdvancedModel();
-    }
 }
