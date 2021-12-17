@@ -158,19 +158,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Initiaze the HPI Fitting.
-     *
-     * @param[in] pFiffInfo        Associated Fiff Information.
-     * @param[in] matProjectors    The projectors to apply. Bad channels are still included.
-     * @param[in] iAcc             The accuracy level to use for the sensor set. Defaults to 2 (highest).
-     */
-    void init(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-              const Eigen::MatrixXd matProjectors,
-              const int iAcc = 2);
-
-
-    //=========================================================================================================
-    /**
      * Perform one single HPI fit.
      *
      * @param[in]   t_mat                      Data to estimate the HPI positions from.
