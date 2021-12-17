@@ -69,12 +69,13 @@ namespace INVERSELIB
 //=============================================================================================================
 
 /**
- * The strucut specifing important frequencies used for hpi fitting.
+ * The strucut specifing important ModelParameters used for hpi fitting.
  */
-struct Frequencies {
+struct ModelParameters {
     int iLineFreq;
     int iSampleFreq;
     QVector<int> vecHpiFreqs;
+    bool bBasic;
 };
 
 //=============================================================================================================
@@ -97,38 +98,29 @@ public:
     //=========================================================================================================
     /**
      * Constructs a SignalModel object.
-     *
-     * @param[in] frequencies     The frequencies.
-     * @param[in] bBasicModel     Compute the basic model yes/no.
      */
-    SignalModel(const Frequencies frequencies, bool bBasicModel);
+    SignalModel();
 
     //=========================================================================================================
     /**
-     * Fit the data to the model.
+     * Fit the data to the model constructed from given model parameters.
      *
-     * @param[in] matData     The data matrix.
+     * @param[in] modelParameters   The ModelParameters.
+     * @param[in] matData           The data matrix.
+     *
+     * @return the fitted data
      *
      */
-    Eigen::MatrixXd fitData(const Eigen::MatrixXd& matData);
+    Eigen::MatrixXd fitData(const ModelParameters& modelParameters,const Eigen::MatrixXd& matData);
 
     //=========================================================================================================
     /**
-     * Set the model to use. The basic model only contains sines and cosines of the hpi frequencies, the advanced yields the linefrequency and its harmonics as well.
+     * Update the ModelParameters used for the signal model
      *
-     * @param[in] bBasicModel     Compute the basic model yes/no.
-     *
-     */
-    void setModelType(const bool bBasic);
-
-    //=========================================================================================================
-    /**
-     * Update the frequencies used for the signal model
-     *
-     * @param[in] frequencies     The frequencies.
+     * @param[in] ModelParameters     The ModelParameters.
      *
      */
-    void updateFrequencies(const Frequencies frequencies);
+    void updateModelParameters(const ModelParameters& modelParameters);
 
     inline Eigen::MatrixXd getModel() const;
 
@@ -137,12 +129,10 @@ protected:
 private:
     //=========================================================================================================
     /**
-     * Computes the model.
-     *
-     * @param[in] bBasicModel  weather to compute the basic model or the advanced.
+     * Selects the model to compute and calls coresponding compute function.
      *
      */
-    void selectModelAndCompute(const bool bBasicModel);
+    void selectModelAndCompute();
 
     //=========================================================================================================
     /**
@@ -157,7 +147,6 @@ private:
      * Check if dimensions of input data match the model.
      *
      * @param[in] iCols     The number of Clumns to compare.
-     *
      * @return true if changed
      *
      */
@@ -165,20 +154,16 @@ private:
 
     //=========================================================================================================
     /**
-     * Check if the frequencies changed.
+     * Check if the ModelParameters changed.
      *
-     * @param[in] iSamplingFreq     The sampling frequency.
-     * @param[in] iLineFreq     The line frequency.
-     * @param[in] vecHpiFreqs     The hpi frequencies.
-     *
+     * @param[in] modelParameters     The model parameters.
      * @return true if changed
      */
-    bool checkFrequencies(const Frequencies frequencies);
+    bool checkModelParameters(const ModelParameters& modelParameters);
 
     Eigen::MatrixXd m_matInverseSignalModel;
     int m_iCurrentModelCols;
-    bool m_bBasicModel;
-    Frequencies m_frequencies;
+    ModelParameters m_modelParameters;
 };
 
 //=============================================================================================================

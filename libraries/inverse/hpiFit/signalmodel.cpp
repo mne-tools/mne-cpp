@@ -66,76 +66,25 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SignalModel::SignalModel(const Frequencies frequencies, bool bBasicModel)
+SignalModel::SignalModel()
 {
     m_iCurrentModelCols = 0;
-    m_frequencies = frequencies;
-    m_bBasicModel = bBasicModel;
 }
 
 //=============================================================================================================
 
-MatrixXd SignalModel::fitData(const MatrixXd& matData)
+MatrixXd SignalModel::fitData(const ModelParameters& modelParameters,const MatrixXd& matData)
 {
+
+    bool bParametersChanged = checkModelParameters(modelParameters);
     bool bDimensionsChanged = checkDataDimensions(matData.cols());
-    if(bDimensionsChanged) {
-        selectModelAndCompute(m_bBasicModel);
+
+    if(bDimensionsChanged || bParametersChanged) {
+        selectModelAndCompute();
     }
+
     MatrixXd matTopo = m_matInverseSignalModel * matData.transpose();
     return matTopo;
-}
-
-//=============================================================================================================
-
-void SignalModel::selectModelAndCompute(bool bBasicModel)
-{
-    if(bBasicModel) {
-        computeInverseBasicModel();
-    } else {
-        computeInverseAdvancedModel();
-    }
-}
-
-//=============================================================================================================
-
-void SignalModel::computeInverseBasicModel()
-{
-    int iNumCoils = m_frequencies.vecHpiFreqs.size();
-    MatrixXd matSimsig;
-    VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/m_frequencies.iSampleFreq;
-
-    // Generate simulated data Matrix
-    matSimsig.conservativeResize(m_iCurrentModelCols,iNumCoils*2);
-
-    for(int i = 0; i < iNumCoils; ++i) {
-        matSimsig.col(i) = sin(2*M_PI*m_frequencies.vecHpiFreqs[i]*vecTime.array());
-        matSimsig.col(i+iNumCoils) = cos(2*M_PI*m_frequencies.vecHpiFreqs[i]*vecTime.array());
-    }
-    m_matInverseSignalModel = UTILSLIB::MNEMath::pinv(matSimsig);
-}
-
-//=============================================================================================================
-
-void SignalModel::computeInverseAdvancedModel()
-{
-    int iNumCoils = m_frequencies.vecHpiFreqs.size();
-    MatrixXd matSimsig;
-    MatrixXd matSimsigInvTemp;
-
-    VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/m_frequencies.iSampleFreq;
-
-    // add linefreq + harmonics + DC part to model
-    matSimsig.conservativeResize(m_iCurrentModelCols,iNumCoils*4+2);
-    for(int i = 0; i < iNumCoils; ++i) {
-        matSimsig.col(i) = sin(2*M_PI*m_frequencies.vecHpiFreqs[i]*vecTime.array());
-        matSimsig.col(i+iNumCoils) = cos(2*M_PI*m_frequencies.vecHpiFreqs[i]*vecTime.array());
-        matSimsig.col(i+2*iNumCoils) = sin(2*M_PI*m_frequencies.iLineFreq*(i+1)*vecTime.array());
-        matSimsig.col(i+3*iNumCoils) = cos(2*M_PI*m_frequencies.iLineFreq*(i+1)*vecTime.array());
-    }
-    matSimsig.col(iNumCoils*4) = RowVectorXd::LinSpaced(m_iCurrentModelCols, -0.5, 0.5);
-    matSimsig.col(iNumCoils*4+1).fill(1);
-    matSimsigInvTemp = UTILSLIB::MNEMath::pinv(matSimsig);
-    m_matInverseSignalModel = matSimsigInvTemp.block(0,0,iNumCoils*2,m_iCurrentModelCols);
 }
 
 //=============================================================================================================
@@ -152,38 +101,68 @@ bool SignalModel::checkDataDimensions(const int iCols)
 
 //=============================================================================================================
 
-void SignalModel::setModelType(const bool bBasicModel)
-{
-    if(m_bBasicModel != bBasicModel)
-    {
-        m_bBasicModel = bBasicModel;
-        selectModelAndCompute(bBasicModel);
-    }
-}
-
-//=============================================================================================================
-
-void SignalModel::updateFrequencies(const Frequencies frequencies)
-{
-    bool bHasChanged = checkFrequencies(frequencies);
-    if(bHasChanged)
-    {
-        m_frequencies.iSampleFreq = frequencies.iSampleFreq;
-        m_frequencies.iLineFreq = frequencies.iLineFreq;
-        m_frequencies.vecHpiFreqs = frequencies.vecHpiFreqs;
-        selectModelAndCompute(m_bBasicModel);
-    }
-}
-
-//=============================================================================================================
-
-bool SignalModel::checkFrequencies(const Frequencies frequencies)
+bool SignalModel::checkModelParameters(const ModelParameters& modelParameters)
 {
     bool bHasChanged = false;
-    if((m_frequencies.iSampleFreq != frequencies.iSampleFreq) ||
-       (m_frequencies.iLineFreq != frequencies.iLineFreq) ||
-       (m_frequencies.vecHpiFreqs != frequencies.vecHpiFreqs)) {
+    if((m_modelParameters.iSampleFreq != modelParameters.iSampleFreq) ||
+        (m_modelParameters.iLineFreq != modelParameters.iLineFreq) ||
+        (m_modelParameters.vecHpiFreqs != modelParameters.vecHpiFreqs) ||
+        (m_modelParameters.bBasic != modelParameters.bBasic)) {
         bHasChanged = true;
+        m_modelParameters = modelParameters;
     }
     return bHasChanged;
+}
+
+//=============================================================================================================
+
+void SignalModel::selectModelAndCompute()
+{
+    if(m_modelParameters.bBasic) {
+        computeInverseBasicModel();
+    } else {
+        computeInverseAdvancedModel();
+    }
+}
+
+//=============================================================================================================
+
+void SignalModel::computeInverseBasicModel()
+{
+    int iNumCoils = m_modelParameters.vecHpiFreqs.size();
+    MatrixXd matSimsig;
+    VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/m_modelParameters.iSampleFreq;
+
+    // Generate simulated data Matrix
+    matSimsig.conservativeResize(m_iCurrentModelCols,iNumCoils*2);
+
+    for(int i = 0; i < iNumCoils; ++i) {
+        matSimsig.col(i) = sin(2*M_PI*m_modelParameters.vecHpiFreqs[i]*vecTime.array());
+        matSimsig.col(i+iNumCoils) = cos(2*M_PI*m_modelParameters.vecHpiFreqs[i]*vecTime.array());
+    }
+    m_matInverseSignalModel = UTILSLIB::MNEMath::pinv(matSimsig);
+}
+
+//=============================================================================================================
+
+void SignalModel::computeInverseAdvancedModel()
+{
+    int iNumCoils = m_modelParameters.vecHpiFreqs.size();
+    MatrixXd matSimsig;
+    MatrixXd matSimsigInvTemp;
+
+    VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/m_modelParameters.iSampleFreq;
+
+    // add linefreq + harmonics + DC part to model
+    matSimsig.conservativeResize(m_iCurrentModelCols,iNumCoils*4+2);
+    for(int i = 0; i < iNumCoils; ++i) {
+        matSimsig.col(i) = sin(2*M_PI*m_modelParameters.vecHpiFreqs[i]*vecTime.array());
+        matSimsig.col(i+iNumCoils) = cos(2*M_PI*m_modelParameters.vecHpiFreqs[i]*vecTime.array());
+        matSimsig.col(i+2*iNumCoils) = sin(2*M_PI*m_modelParameters.iLineFreq*(i+1)*vecTime.array());
+        matSimsig.col(i+3*iNumCoils) = cos(2*M_PI*m_modelParameters.iLineFreq*(i+1)*vecTime.array());
+    }
+    matSimsig.col(iNumCoils*4) = RowVectorXd::LinSpaced(m_iCurrentModelCols, -0.5, 0.5);
+    matSimsig.col(iNumCoils*4+1).fill(1);
+    matSimsigInvTemp = UTILSLIB::MNEMath::pinv(matSimsig);
+    m_matInverseSignalModel = matSimsigInvTemp.block(0,0,iNumCoils*2,m_iCurrentModelCols);
 }
