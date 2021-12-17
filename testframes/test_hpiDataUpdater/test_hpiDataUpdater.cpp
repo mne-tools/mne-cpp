@@ -81,8 +81,8 @@ private slots:
     void initTestCase();
     void init();
     void testPrepareProj_size();                 // add other compareFunctions here
-    void testPrepareProjectors();
-    void testPrepareProjectors_bads();
+    void testprepareDataAndProjectors();
+    void testprepareDataAndProjectors_bads();
     void testPrepareData_bads();
     void testPrepareData();
     void testGetSensors();
@@ -164,6 +164,7 @@ void TestHpiDataUpdater::initTestCase()
             }
         }
     }
+    m_matProjectors = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
 }
 
@@ -187,7 +188,7 @@ void TestHpiDataUpdater::testPrepareProj_size()
     MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
     // act
-    hpiData.prepareProjectors(matProj);
+    hpiData.prepareDataAndProjectors(m_matData,matProj);
     MatrixXd matProjPrepared = hpiData.getProjectors();
     int iSizeActual = matProjPrepared.cols();
 
@@ -197,7 +198,7 @@ void TestHpiDataUpdater::testPrepareProj_size()
 
 //=============================================================================================================
 
-void TestHpiDataUpdater::testPrepareProjectors()
+void TestHpiDataUpdater::testprepareDataAndProjectors()
 {
     // prepare
     HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
@@ -216,7 +217,7 @@ void TestHpiDataUpdater::testPrepareProjectors()
     }
 
     // act
-    hpiData.prepareProjectors(matProj);
+    hpiData.prepareDataAndProjectors(m_matData,matProj);
     MatrixXd matProjPrepared = hpiData.getProjectors();
 
     // assert
@@ -225,7 +226,7 @@ void TestHpiDataUpdater::testPrepareProjectors()
 
 //=============================================================================================================
 
-void TestHpiDataUpdater::testPrepareProjectors_bads()
+void TestHpiDataUpdater::testprepareDataAndProjectors_bads()
 {
     // prepare
     m_pFiffInfo->bads << "MEG0113" << "MEG0112";
@@ -246,7 +247,7 @@ void TestHpiDataUpdater::testPrepareProjectors_bads()
     }
 
     // act
-    hpiData.prepareProjectors(matProj);
+    hpiData.prepareDataAndProjectors(m_matData,matProj);
     MatrixXd matProjPrepared = hpiData.getProjectors();
 
     // assert
@@ -268,7 +269,7 @@ void TestHpiDataUpdater::testPrepareData()
     HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
 
     // act
-    hpiData.prepareData(m_matData);
+    hpiData.prepareDataAndProjectors(m_matData,m_matProjectors);
     MatrixXd matDataPrepared = hpiData.getData();
 
     // assert
@@ -290,7 +291,7 @@ void TestHpiDataUpdater::testPrepareData_bads()
     HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
 
     /// act
-    hpiData.prepareData(m_matData);
+    hpiData.prepareDataAndProjectors(m_matData,m_matProjectors);
     MatrixXd matDataPrepared = hpiData.getData();
 
     /// assert
@@ -381,7 +382,7 @@ void TestHpiDataUpdater::testCheckForUpdates_data()
 
     /// act
     hpiData.checkForUpdate(m_pFiffInfo);
-    hpiData.prepareData(m_matData);
+    hpiData.prepareDataAndProjectors(m_matData,m_matProjectors);
     MatrixXd matDataPrepared = hpiData.getData();
 
     /// assert
@@ -410,7 +411,7 @@ void TestHpiDataUpdater::testCheckForUpdates_projectors()
 
     // act
     hpiData.checkForUpdate(m_pFiffInfo);
-    hpiData.prepareProjectors(matProj);
+    hpiData.prepareDataAndProjectors(m_matData,matProj);
     MatrixXd matProjPrepared = hpiData.getProjectors();
 
     // assert
