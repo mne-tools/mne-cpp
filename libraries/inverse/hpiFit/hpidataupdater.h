@@ -115,16 +115,7 @@ public:
      * @param[in] matProjectors     The projector matrix.
      *
      */
-    void prepareData(const Eigen::MatrixXd& matData);
-
-    //=========================================================================================================
-    /**
-     * Reduce projectors to only use good channels.
-     *
-     * @param[in] matProjectors     The projector matrix.
-     *
-     */
-    void prepareProjectors(const Eigen::MatrixXd& matProjectors);
+    void prepareDataAndProjectors(const Eigen::MatrixXd& matData, const Eigen::MatrixXd& matProjectors);
 
     //=========================================================================================================
     /**
@@ -134,6 +125,7 @@ public:
     inline const Eigen::MatrixXd& getProjectors();
     inline const Eigen::MatrixXd& getHpiDigitizer();
     inline const Eigen::MatrixXd& getData();
+    inline const Eigen::MatrixXd& getProjectedData();
     inline const SensorSet& getSensors();
 
 protected:
@@ -185,13 +177,33 @@ private:
      */
     bool checkIfChanged(const QList<QString>& lBads, const QList<FIFFLIB::FiffChInfo>& lChannels);
 
+    //=========================================================================================================
+    /**
+     * Reduce data to only use good channels.
+     *
+     * @param[in] matProjectors     The projector matrix.
+     *
+     */
+    void prepareData(const Eigen::MatrixXd& matData);
+
+    //=========================================================================================================
+    /**
+     * Reduce projectors to only use good channels.
+     *
+     * @param[in] matProjectors     The projector matrix.
+     *
+     */
+    void prepareProjectors(const Eigen::MatrixXd& matProjectors);
+
     QList<FIFFLIB::FiffChInfo> m_lChannels; /**< Channellist with bads excluded. */
     QVector<int> m_vecInnerind;             /**< index of inner channels . */
     QList<QString> m_lBads;                 /**< contains bad channels . */
     Eigen::MatrixXd m_matHpiDigitizer;      /**< The coordinates of the digitized HPI coils in head space*/
     Eigen::MatrixXd m_matProjectors;        /**< The projectors ready to use*/
     Eigen::MatrixXd m_matInnerdata;         /**< The data ready to use*/
+    Eigen::MatrixXd m_matDataProjected;     /**< The data with projectros applied*/
     SensorSet m_sensors;                    /**< The most recent SensorSet*/
+
 };
 
 //=============================================================================================================
@@ -206,6 +218,11 @@ inline const Eigen::MatrixXd& HpiDataUpdater::getProjectors()
 inline const Eigen::MatrixXd& HpiDataUpdater::getData()
 {
     return m_matInnerdata;
+}
+
+inline const Eigen::MatrixXd& HpiDataUpdater::getProjectedData()
+{
+    return m_matDataProjected;
 }
 
 inline const Eigen::MatrixXd& HpiDataUpdater::getHpiDigitizer()

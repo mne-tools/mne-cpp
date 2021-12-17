@@ -177,6 +177,15 @@ bool HpiDataUpdater::checkIfChanged(const QList<QString>& lBads, const QList<FIF
 
 //=============================================================================================================
 
+void HpiDataUpdater::prepareDataAndProjectors(const MatrixXd &matData, const MatrixXd &matProjectors)
+{
+    prepareData(matData);
+    prepareProjectors(matProjectors);
+    m_matDataProjected = m_matProjectors * m_matInnerdata;
+}
+
+//=============================================================================================================
+
 void HpiDataUpdater::prepareData(const Eigen::MatrixXd& matData)
 {
     // extract data for channels to use
