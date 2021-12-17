@@ -436,7 +436,7 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
     modelParameters.iLineFreq = pFiffInfo->linefreq;
     modelParameters.iSampleFreq = pFiffInfo->sfreq;
     modelParameters.vecHpiFreqs = vecFreqs;
-    modelParameters.bBasic = true;
+    modelParameters.bBasic = bBasic;
 
     // matTopo = hpiSignalModel.fit(matProjData);
     MatrixXd matTopo = m_signalModel.fitData(modelParameters,matProjectedData);
