@@ -42,6 +42,7 @@
 #include "hpifitdata.h"
 #include "sensorset.h"
 #include "hpidataupdater.h"
+#include "signalmodel.h"
 
 #include <utils/ioutils.h>
 #include <utils/mnemath.h>
@@ -107,6 +108,10 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
 
     // update HPI digitizer
     updateHpiDigitizer(pFiffInfo->dig);
+
+    // update frequencies for model
+    // updateSignalModel(const int iSamplingFreq, const int iLineFreq, const QVector<int>& vecHpiFreqs);
+
 }
 
 //=============================================================================================================
@@ -452,7 +457,7 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
     m_HpiDataUpdater.prepareData(matData);
     m_HpiDataUpdater.prepareProjectors(matProjectors);
 
-    MatrixXd matPreparedData = m_HpiDataUpdater.getData();
+    const auto& matPreparedData = m_HpiDataUpdater.getData();
     MatrixXd matPreparedProjectors = m_HpiDataUpdater.getProjectors();
 
     // prepare matrices
@@ -464,6 +469,7 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
     MatrixXd matProjData = matPreparedProjectors * matPreparedData;
 
     // fit model
+    // matTopo = hpiSignalModel.fit(matProjData);
     matTopo = m_matModel * matProjData.transpose();
     matTopo.transposeInPlace();
 
@@ -483,7 +489,7 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
     }
 
     // return data
-    matAmplitudes = matAmp;
+    matAmplitudes = std::move(matAmp);
 }
 
 //=============================================================================================================
@@ -574,8 +580,6 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilPos,
                                  QVector<double> &vecError,
                                  FIFFLIB::FiffDigPointSet& fittedPointSet)
 {
-    // sanity
-    fittedPointSet.clear();
 
     // prepare dropping coils
     MatrixXd matTrans(4,4);
@@ -594,6 +598,9 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilPos,
     for(int i = 0; i < matDiffPos.rows(); ++i) {
         vecError[i] = matDiffPos.row(i).norm();
     }
+
+    // sanity
+    fittedPointSet.clear();
 
     // Generate final fitted points and store in digitizer set
     for(int i = 0; i < matCoilPos.rows(); ++i) {
