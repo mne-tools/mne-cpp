@@ -44,6 +44,7 @@
 #include "../inverse_global.h"
 #include "fiff/fiff_ch_info.h"
 #include "sensorset.h"
+#include "signalmodel.h"
 #include "hpidataupdater.h"
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_dig_point.h>
@@ -424,6 +425,7 @@ private:
     QVector<int> m_vecInnerind;      /**< index of inner channels . */
     QList<QString> m_lBads;            /**< contains bad channels . */
     SensorSet m_sensors;          /**< sensor struct that contains information about all sensors. */
+    SignalModel m_signalModel;      /**< The signal model to use for the hpi fitting */
     Eigen::MatrixXd m_matModel;         /**< The model that contains the sines/cosines for the hpi fit*/
     Eigen::MatrixXd m_matHeadHPI;       /**< The coordinates of the digitized HPI coils in head space*/
     Eigen::MatrixXd m_matProjectors;    /**< projectors . */

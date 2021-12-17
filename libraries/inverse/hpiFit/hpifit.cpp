@@ -109,9 +109,8 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
     // update HPI digitizer
     updateHpiDigitizer(pFiffInfo->dig);
 
-    // update frequencies for model
-    // updateSignalModel(const int iSamplingFreq, const int iLineFreq, const QVector<int>& vecHpiFreqs);
-
+    // update ModelParameters for model
+    m_signalModel = SignalModel();
 }
 
 //=============================================================================================================
@@ -180,7 +179,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
         }
     }
 
-    //Set coil frequencies
+    //Set coil ModelParameters
     VectorXd vecCoilfreq(iNumCoils);
 
     if(vecFreqs.size() >= iNumCoils) {
@@ -189,7 +188,7 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
             //std::cout<<std::endl << vecCoilfreq[i] << "Hz";
         }
     } else {
-        std::cout<<std::endl<< "HPIFit::fitHPI - Not enough coil frequencies specified. Returning.";
+        std::cout<<std::endl<< "HPIFit::fitHPI - Not enough coil ModelParameters specified. Returning.";
         return;
     }
 
@@ -432,16 +431,15 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
     const auto& matProjectedData = m_HpiDataUpdater.getProjectedData();
 
     // fit model
-    // check if we need to update the model (bads, frequencies)
-    Frequencies frequencies;
-    frequencies.iLineFreq = pFiffInfo->linefreq;
-    frequencies.iSampleFreq = pFiffInfo->sfreq;
-    frequencies.vecHpiFreqs = vecFreqs;
-
-    SignalModel signalModel(frequencies,bBasic);
+    // check if we need to update the model (bads, ModelParameters)
+    ModelParameters modelParameters;
+    modelParameters.iLineFreq = pFiffInfo->linefreq;
+    modelParameters.iSampleFreq = pFiffInfo->sfreq;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.bBasic = true;
 
     // matTopo = hpiSignalModel.fit(matProjData);
-    MatrixXd matTopo = signalModel.fitData(matProjectedData);
+    MatrixXd matTopo = m_signalModel.fitData(modelParameters,matProjectedData);
     matTopo.transposeInPlace();
 
     // split into sine and cosine amplitudes
