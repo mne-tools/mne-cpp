@@ -116,27 +116,6 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
 
 //=============================================================================================================
 
-void HPIFit::init(const FiffInfo::SPtr pFiffInfo,
-                  const MatrixXd matProjectors,
-                  const int iAcc)
-{
-    // update channel list
-    updateChannels(pFiffInfo);
-
-    // update sensors
-    updateSensor(iAcc);
-
-    // update HPI digitizer
-    updateHpiDigitizer(pFiffInfo->dig);
-
-    // update projectors
-    updateProjectors(matProjectors);
-
-    // set to initialzed
-}
-
-//=============================================================================================================
-
 void HPIFit::fitHPI(const MatrixXd& t_mat,
                     const MatrixXd& t_matProjectors,
                     FiffCoordTrans& transDevHead,
@@ -448,32 +427,27 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
         return;
     }
 
-    // check if we need to update the model (bads, frequencies)
-    if(!(m_lBads == pFiffInfo->bads) || m_lChannels.isEmpty() || m_matModel.rows()==0) {
-        updateModel(pFiffInfo->sfreq, matData.cols(), pFiffInfo->linefreq, vecFreqs, bBasic);
-    }
-
     // prepare data
-    m_HpiDataUpdater.prepareData(matData);
-    m_HpiDataUpdater.prepareProjectors(matProjectors);
-
-    const auto& matPreparedData = m_HpiDataUpdater.getData();
-    MatrixXd matPreparedProjectors = m_HpiDataUpdater.getProjectors();
-
-    // prepare matrices
-    MatrixXd matTopo;
-    MatrixXd matAmp(matPreparedData.cols(), iNumCoils);   // sine part
-    MatrixXd matAmpC(matPreparedData.cols(), iNumCoils);  // cosine part
-
-    // apply projectors
-    MatrixXd matProjData = matPreparedProjectors * matPreparedData;
+    m_HpiDataUpdater.prepareDataAndProjectors(matData,matProjectors);
+    const auto& matProjectedData = m_HpiDataUpdater.getProjectedData();
 
     // fit model
+    // check if we need to update the model (bads, frequencies)
+    Frequencies frequencies;
+    frequencies.iLineFreq = pFiffInfo->linefreq;
+    frequencies.iSampleFreq = pFiffInfo->sfreq;
+    frequencies.vecHpiFreqs = vecFreqs;
+
+    SignalModel signalModel(frequencies,bBasic);
+
     // matTopo = hpiSignalModel.fit(matProjData);
-    matTopo = m_matModel * matProjData.transpose();
+    MatrixXd matTopo = signalModel.fitData(matProjectedData);
     matTopo.transposeInPlace();
 
     // split into sine and cosine amplitudes
+    MatrixXd matAmp(matProjectedData.cols(), iNumCoils);   // sine part
+    MatrixXd matAmpC(matProjectedData.cols(), iNumCoils);  // cosine part
+
     matAmp = matTopo.leftCols(iNumCoils);
     matAmpC = matTopo.middleCols(iNumCoils,iNumCoils);
 
