@@ -156,12 +156,12 @@ private:
     /**
      * Check if dimensions of input data match the model.
      *
-     * @param[in] matData     The data matrix.
+     * @param[in] iCols     The number of Clumns to compare.
      *
      * @return true if changed
      *
      */
-    bool checkDataDimensions(const Eigen::MatrixXd& matData);
+    bool checkDataDimensions(const int iCols);
 
     //=========================================================================================================
     /**
