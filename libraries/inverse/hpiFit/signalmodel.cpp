@@ -77,7 +77,7 @@ SignalModel::SignalModel(const Frequencies frequencies, bool bBasicModel)
 
 MatrixXd SignalModel::fitData(const MatrixXd& matData)
 {
-    bool bDimensionsChanged = checkDataDimensions(matData);
+    bool bDimensionsChanged = checkDataDimensions(matData.cols());
     if(bDimensionsChanged) {
         selectModelAndCompute(m_bBasicModel);
     }
@@ -140,11 +140,11 @@ void SignalModel::computeInverseAdvancedModel()
 
 //=============================================================================================================
 
-bool SignalModel::checkDataDimensions(const MatrixXd& matData)
+bool SignalModel::checkDataDimensions(const int iCols)
 {
     bool bHasChanged = false;
-    if(matData.cols() != m_iCurrentModelCols) {
-        m_iCurrentModelCols = matData.cols();
+    if(iCols != m_iCurrentModelCols) {
+        m_iCurrentModelCols = iCols;
         bHasChanged = true;
     }
     return bHasChanged;
