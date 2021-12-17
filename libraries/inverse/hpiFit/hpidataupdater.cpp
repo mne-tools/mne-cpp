@@ -115,10 +115,10 @@ void HpiDataUpdater::updateChannels(FiffInfo::SPtr pFiffInfo)
 
 //=============================================================================================================
 
-void HpiDataUpdater::updateSensors(const QList<FIFFLIB::FiffChInfo> lChannelList)
+void HpiDataUpdater::updateSensors(const QList<FIFFLIB::FiffChInfo>& lChannels)
 {
     int iAccuracy = 2;
-    m_sensors.updateSensorSet(lChannelList,iAccuracy);
+    m_sensors.updateSensorSet(lChannels,iAccuracy);
 }
 
 //=============================================================================================================
@@ -166,7 +166,7 @@ void HpiDataUpdater::checkForUpdate(const FiffInfo::SPtr pFiffInfo)
 
 //=============================================================================================================
 
-bool HpiDataUpdater::checkIfChanged(const QList<QString> lBads, const QList<FIFFLIB::FiffChInfo> lChannels)
+bool HpiDataUpdater::checkIfChanged(const QList<QString>& lBads, const QList<FIFFLIB::FiffChInfo>& lChannels)
 {
     bool bUpdate = false;
     if(!(m_lBads == lBads) || !(m_lChannels == lChannels)) {

@@ -72,6 +72,10 @@ namespace INVERSELIB
 {
 
 //=============================================================================================================
+// Declare all structures to be used
+//=============================================================================================================
+
+//=============================================================================================================
 // INVERSELIB FORWARD DECLARATIONS
 //=============================================================================================================
 
@@ -127,10 +131,10 @@ public:
      * inline get functions for private member variables.
      *
      */
-    inline Eigen::MatrixXd getProjectors() const;
-    inline Eigen::MatrixXd getHpiDigitizer() const;
-    inline Eigen::MatrixXd getData() const;
-    inline SensorSet getSensors() const;
+    inline const Eigen::MatrixXd& getProjectors();
+    inline const Eigen::MatrixXd& getHpiDigitizer();
+    inline const Eigen::MatrixXd& getData();
+    inline const SensorSet& getSensors();
 
 protected:
 
@@ -163,12 +167,12 @@ private:
 
     //=========================================================================================================
     /**
-     * Update FwdCoilSet and store into sensors struct.
+     * Update sensors struct.
      *
-     * @param[in] iAcc       The accuracy level to use for the sensor set. Defaults to 2 (highest).
+     * @param[in] lChannels       The channel list to update the sensors with.
      *
      */
-    void updateSensors(const QList<FIFFLIB::FiffChInfo>);
+    void updateSensors(const QList<FIFFLIB::FiffChInfo>& lChannels);
 
     //=========================================================================================================
     /**
@@ -179,7 +183,7 @@ private:
      *
      * @return true if changed
      */
-    bool checkIfChanged(const QList<QString> lBads, const QList<FIFFLIB::FiffChInfo> lChannels);
+    bool checkIfChanged(const QList<QString>& lBads, const QList<FIFFLIB::FiffChInfo>& lChannels);
 
     QList<FIFFLIB::FiffChInfo> m_lChannels; /**< Channellist with bads excluded. */
     QVector<int> m_vecInnerind;             /**< index of inner channels . */
@@ -194,22 +198,22 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline Eigen::MatrixXd HpiDataUpdater::getProjectors() const
+inline const Eigen::MatrixXd& HpiDataUpdater::getProjectors()
 {
     return m_matProjectors;
 }
 
-inline Eigen::MatrixXd HpiDataUpdater::getData() const
+inline const Eigen::MatrixXd& HpiDataUpdater::getData()
 {
     return m_matInnerdata;
 }
 
-inline Eigen::MatrixXd HpiDataUpdater::getHpiDigitizer() const
+inline const Eigen::MatrixXd& HpiDataUpdater::getHpiDigitizer()
 {
     return m_matHpiDigitizer;
 }
 
-inline SensorSet HpiDataUpdater::getSensors() const
+inline const SensorSet& HpiDataUpdater::getSensors()
 {
     return m_sensors;
 }
