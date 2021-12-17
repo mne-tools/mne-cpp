@@ -319,6 +319,17 @@ public:
 
     //=========================================================================================================
     /**
+     * Update the necessary frequencies.
+     *
+     * @param[in] iSamplingFreq     The sampling frequency.
+     * @param[in] iLineFreq     The line frequency.
+     * @param[in] vecHpiFreqs     The hpi frequencies.
+     *
+     */
+    void updateFrequenices(const int iSamplingFreq, const int iLineFreq, const QVector<int>& vecHpiFreqs);
+
+    //=========================================================================================================
+    /**
      * inline get functions for private member variables.
      *
      */
@@ -433,6 +444,7 @@ private:
     QSharedPointer<FWDLIB::FwdCoilSet> m_pCoilMeg;         /**< */
     QVector<int> m_vecFreqs;         /**< The frequencies for each coil in unknown order. */
     bool m_bDoFastFit;  // delete
+
 };
 
 //=============================================================================================================
