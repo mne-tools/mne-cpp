@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     Test for the signal model class..
+ * @brief     Test for the signal model class.
  *
  */
 
