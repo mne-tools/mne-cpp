@@ -209,7 +209,7 @@ public:
      *
      * @param[in]   matData            Data to estimate the HPI positions from.
      * @param[in]   matProjectors      The projectors to apply. Bad channels are still included.
-     * @param[in]   vecFreqs           The ordered coil frequencies.
+     * @param[in]   modelParameters    The model parmeters to use for the amplitude fitting (frequencies).
      * @param[in]   pFiffInfo          Associated Fiff Information.
      * @param[out]  matAmplitudes      The computed amplitudes amplitudes (n_channels x n_coils).
      * @param[in]   bAdvanced          Use the advanced model to compute the coil amplitudes.
@@ -217,10 +217,8 @@ public:
      */
     void computeAmplitudes(const Eigen::MatrixXd& matData,
                            const Eigen::MatrixXd& matProjectors,
-                           const QVector<int>& vecFreqs,
-                           const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                           Eigen::MatrixXd& matAmplitudes,
-                           const bool bBasic = false);
+                           const ModelParameters& modelParameters,
+                           Eigen::MatrixXd& matAmplitudes);
 
     //=========================================================================================================
     /**
@@ -315,6 +313,18 @@ public:
      *
      */
     void updateFrequenices(const int iSamplingFreq, const int iLineFreq, const QVector<int>& vecHpiFreqs);
+
+    //=========================================================================================================
+    /**
+     * inline get functions for private member variables.
+     *
+     */
+    inline bool isInitialized() const;
+    inline QList<FIFFLIB::FiffChInfo> getChannels() const;
+    inline QList<QString> getBads() const;
+    inline Eigen::MatrixXd getModel() const;
+    inline Eigen::MatrixXd getProjectors() const;
+    inline Eigen::MatrixXd getHpiDigitizer() const;
 
     //=========================================================================================================
     /**
@@ -427,6 +437,31 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline QList<FIFFLIB::FiffChInfo> HPIFit::getChannels() const
+{
+    return m_lChannels;
+}
+
+inline QList<QString> HPIFit::getBads() const
+{
+    return m_lBads;
+}
+
+inline Eigen::MatrixXd HPIFit::getModel() const
+{
+    return m_matModel;
+}
+
+inline Eigen::MatrixXd HPIFit::getProjectors() const
+{
+    return m_matProjectors;
+}
+
+inline Eigen::MatrixXd HPIFit::getHpiDigitizer() const
+{
+    return m_matHeadHPI;
+}
 
 } //NAMESPACE
 
