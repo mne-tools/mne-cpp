@@ -318,18 +318,6 @@ public:
 
     //=========================================================================================================
     /**
-     * inline get functions for private member variables.
-     *
-     */
-    inline bool isInitialized() const;
-    inline QList<FIFFLIB::FiffChInfo> getChannels() const;
-    inline QList<QString> getBads() const;
-    inline Eigen::MatrixXd getModel() const;
-    inline Eigen::MatrixXd getProjectors() const;
-    inline Eigen::MatrixXd getHpiDigitizer() const;
-
-    //=========================================================================================================
-    /**
      * Store results from dev_Head_t as quaternions in position matrix. The format is the same as you
      * get from Neuromag's MaxFilter.
      *
@@ -439,31 +427,6 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
-inline QList<FIFFLIB::FiffChInfo> HPIFit::getChannels() const
-{
-    return m_lChannels;
-}
-
-inline QList<QString> HPIFit::getBads() const
-{
-    return m_lBads;
-}
-
-inline Eigen::MatrixXd HPIFit::getModel() const
-{
-    return m_matModel;
-}
-
-inline Eigen::MatrixXd HPIFit::getProjectors() const
-{
-    return m_matProjectors;
-}
-
-inline Eigen::MatrixXd HPIFit::getHpiDigitizer() const
-{
-    return m_matHeadHPI;
-}
 
 } //NAMESPACE
 
