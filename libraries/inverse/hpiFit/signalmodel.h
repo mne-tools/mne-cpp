@@ -113,17 +113,6 @@ public:
      */
     Eigen::MatrixXd fitData(const ModelParameters& modelParameters,const Eigen::MatrixXd& matData);
 
-    //=========================================================================================================
-    /**
-     * Update the ModelParameters used for the signal model
-     *
-     * @param[in] ModelParameters     The ModelParameters.
-     *
-     */
-    void updateModelParameters(const ModelParameters& modelParameters);
-
-    inline Eigen::MatrixXd getModel() const;
-
 protected:
 
 private:
@@ -169,10 +158,7 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-inline Eigen::MatrixXd SignalModel::getModel() const
-{
-    return m_matInverseSignalModel;
-}
+
 } // namespace INVERSELIB
 
 #endif // SignalModel_H
