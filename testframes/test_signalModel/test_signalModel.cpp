@@ -40,6 +40,8 @@
 #include <inverse/hpiFit/signalmodel.h>
 #include <utils/mnemath.h>
 #include <iostream>
+#include <utils/ioutils.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -59,6 +61,7 @@
 
 using namespace INVERSELIB;
 using namespace Eigen;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 /**
@@ -93,7 +96,7 @@ private:
 
 TestSignalModel::TestSignalModel()
 {
-    dErrorTol = 0.0001;
+    dErrorTol = 0.00000001;
 }
 
 //=============================================================================================================
@@ -217,7 +220,7 @@ void TestSignalModel::testFitData_advanced_4coils()
     modelParameters.iSampleFreq = 1000;
     modelParameters.iLineFreq = 60;
     modelParameters.vecHpiFreqs = {154,158,161,166};
-    modelParameters.bBasic = true;
+    modelParameters.bBasic = false;
 
     SignalModel signalModel = SignalModel();
 
@@ -233,13 +236,16 @@ void TestSignalModel::testFitData_advanced_4coils()
     double dAmpCosine = 0.5;
     double dAmpLine = 0.3;
     VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/modelParameters.iSampleFreq;
-
+    VectorXd vecTime2 = vecTime;
+    vecTime2.fill(1);
     for(int i = 0; i < iNumCoils; ++i) {
         matSimData.row(i) = dAmpSine * sin(2*M_PI*modelParameters.vecHpiFreqs[i]*vecTime.array())
                             + dAmpCosine * cos(2*M_PI*modelParameters.vecHpiFreqs[i]*vecTime.array())
                             + dAmpLine * sin(2*M_PI*60*vecTime.array())
                             + dAmpLine/2 * sin(2*M_PI*60*2*vecTime.array())
-                            + dAmpLine/3 * sin(2*M_PI*60*3*vecTime.array());
+                            + dAmpLine/3 * sin(2*M_PI*60*3*vecTime.array())
+                            + dAmpLine * VectorXd::LinSpaced(iSamLoc, -0.5, 0.5).array()
+                            + dAmpLine * vecTime2.array();
     }
 
     MatrixXd matAmpExpected = MatrixXd::Zero(2*iNumCoils,iNchan);
@@ -315,8 +321,6 @@ void TestSignalModel::testFitData_advanced_5coils()
     // use summed squared error ssd
     MatrixXd matDiff = matAmpActual - matAmpExpected;
     double dSSD = (matDiff*matDiff.transpose()).trace();
-
-    std::cout << dSSD << std::endl;
     QVERIFY(dSSD < dErrorTol);
 }
 
