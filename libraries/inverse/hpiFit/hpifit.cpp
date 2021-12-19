@@ -412,14 +412,9 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
 void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
                                const MatrixXd& matProjectors,
-                               const QVector<int>& vecFreqs,
-                               const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                               Eigen::MatrixXd& matAmplitudes,
-                               const bool bBasic)
+                               const ModelParameters& modelParameters,
+                               Eigen::MatrixXd& matAmplitudes)
 {
-    // meta data
-    int iNumCoils = vecFreqs.size();
-
     //Check if data was passed
     if(matData.rows() == 0 || matData.cols() == 0 ) {
         std::cout<<std::endl<< "HPIFit::computeAmplitudes - No data passed. Returning.";
@@ -431,18 +426,12 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
     const auto& matProjectedData = m_HpiDataUpdater.getProjectedData();
 
     // fit model
-    // check if we need to update the model (bads, ModelParameters)
-    ModelParameters modelParameters;
-    modelParameters.iLineFreq = pFiffInfo->linefreq;
-    modelParameters.iSampleFreq = pFiffInfo->sfreq;
-    modelParameters.vecHpiFreqs = vecFreqs;
-    modelParameters.bBasic = bBasic;
-
-    // matTopo = hpiSignalModel.fit(matProjData);
     MatrixXd matTopo = m_signalModel.fitData(modelParameters,matProjectedData);
     matTopo.transposeInPlace();
 
     // split into sine and cosine amplitudes
+    int iNumCoils = modelParameters.vecHpiFreqs.size();
+
     MatrixXd matAmp(matProjectedData.cols(), iNumCoils);   // sine part
     MatrixXd matAmpC(matProjectedData.cols(), iNumCoils);  // cosine part
 
@@ -461,7 +450,7 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
     }
 
     // return data
-    matAmplitudes = std::move(matAmp);
+    matAmplitudes = matAmp;
 }
 
 //=============================================================================================================
@@ -601,18 +590,17 @@ void HPIFit::findOrder(const MatrixXd& matData,
 
     // compute amplitudes
     MatrixXd matAmplitudes;
-    updateModel(pFiffInfo->sfreq,
-                matData.cols(),
-                pFiffInfo->linefreq,
-                vecFreqs,
-                false);
+
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.iLineFreq = pFiffInfo->linefreq;
+    modelParameters.iSampleFreq = pFiffInfo->sfreq;
+    modelParameters.bBasic = false;
 
     computeAmplitudes(matData,
                       matProjectors,
-                      vecFreqs,
-                      pFiffInfo,
-                      matAmplitudes,
-                      false);
+                      modelParameters,
+                      matAmplitudes);
 
     // compute coil position
     MatrixXd matCoil = MatrixXd::Zero(iNumCoils,3);

@@ -299,9 +299,17 @@ void TestHpiFit::testComputeAmplitudes_basic_sin()
     MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
     /// Act
-    MatrixXd matAmpActual;
-    HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
-    HPI.computeAmplitudes(matSimData,matProj,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
+    MatrixXd matAmpActual;    
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.iLineFreq = iLineF;
+    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
+    modelParameters.bBasic = bBasic;
+
+    HPI.computeAmplitudes(matSimData,
+                          m_matProjectors,
+                          modelParameters,
+                          matAmpActual);
 
     /// Assert
     // use summed squared error ssd
@@ -371,8 +379,16 @@ void TestHpiFit::testComputeAmplitudes_basic_cos()
 
     /// Act
     MatrixXd matAmpActual;
-    HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
-    HPI.computeAmplitudes(matSimData,matProj,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.iLineFreq = iLineF;
+    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
+    modelParameters.bBasic = bBasic;
+
+    HPI.computeAmplitudes(matSimData,
+                          m_matProjectors,
+                          modelParameters,
+                          matAmpActual);
 
     /// Assert
     // use summed squared error ssd
@@ -414,9 +430,7 @@ void TestHpiFit::testComputeAmplitudes_basic_sincos()
     QVector<int> vecFreqs = {154,158,161,166};
     int iNumCoils = vecFreqs.size();
     int iSamF = m_pFiffInfo->sfreq;
-    int iLineF = 60;
     int iSamLoc = m_matData.cols();
-    bool bBasic = true;
     double dAmpSin = 0.5;        // expected amplitudes
     double dAmpCos = 0.25;        // expected amplitudes
 
@@ -442,8 +456,16 @@ void TestHpiFit::testComputeAmplitudes_basic_sincos()
 
     /// Act
     MatrixXd matAmpActual;
-    HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
-    HPI.computeAmplitudes(matSimData,matProj,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.iLineFreq = m_pFiffInfo->linefreq;
+    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
+    modelParameters.bBasic = true;
+
+    HPI.computeAmplitudes(matSimData,
+                          m_matProjectors,
+                          modelParameters,
+                          matAmpActual);
 
     /// Assert
     // use summed squared error ssd
@@ -512,8 +534,16 @@ void TestHpiFit::testComputeAmplitudes_advanced_sin()
 
     /// Act
     MatrixXd matAmpActual;
-    HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
-    HPI.computeAmplitudes(matSimData,matProj,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.iLineFreq = iLineF;
+    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
+    modelParameters.bBasic = bBasic;
+
+    HPI.computeAmplitudes(matSimData,
+                          m_matProjectors,
+                          modelParameters,
+                          matAmpActual);
 
     /// Assert
     // use summed squared error ssd
@@ -582,11 +612,16 @@ void TestHpiFit::testComputeAmplitudes_advanced_cos()
 
     /// Act
     MatrixXd matAmpActual;
-    HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
-    MatrixXd matModel = HPI.getModel();
-//    IOUtils::write_eigen_matrix(matSimData, QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + "testData.txt");
-//    IOUtils::write_eigen_matrix(matModel, QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + "testModel.txt");
-    HPI.computeAmplitudes(matSimData,matProj,vecFreqs,m_pFiffInfo,matAmpActual,bBasic);
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.iLineFreq = iLineF;
+    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
+    modelParameters.bBasic = bBasic;
+
+    HPI.computeAmplitudes(matSimData,
+                          m_matProjectors,
+                          modelParameters,
+                          matAmpActual);
 
     /// Assert
     // use summed squared error ssd
@@ -660,13 +695,16 @@ void TestHpiFit::testComputeAmplitudes_advanced_summedCosSine()
 
     /// Act
     MatrixXd matAmpActual;
-    HPI.updateModel(iSamF,iSamLoc,iLineF,vecFreqs,bBasic);
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.iLineFreq = iLineF;
+    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
+    modelParameters.bBasic = bBasic;
+
     HPI.computeAmplitudes(matSimData,
-                          matProj,
-                          vecFreqs,
-                          m_pFiffInfo,
-                          matAmpActual,
-                          bBasic);
+                          m_matProjectors,
+                          modelParameters,
+                          matAmpActual);
 
     /// Assert
     // use summed squared error ssd
@@ -684,19 +722,24 @@ void TestHpiFit::testComputeCoilLocation_basic_noproj()
     MatrixXd matProjectors = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError = {1.0, 1.0, 1.0, 1.0};
+    int iLineF = 60;
     VectorXd vecGoF;
     MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
-    MatrixXd matAmplitudes;
     bool bBasic = true;
     FiffCoordTrans transDevHead;
 
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.iLineFreq = iLineF;
+    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
+    modelParameters.bBasic = bBasic;
+
+    MatrixXd matAmplitudes;
     HPI.computeAmplitudes(m_matData,
-                          matProjectors,
-                          vecFreqs,
-                          m_pFiffInfo,
-                          matAmplitudes,
-                          bBasic);
+                          m_matProjectors,
+                          modelParameters,
+                          matAmplitudes);
 
     /// Act
     MatrixXd matCoilLocActual(4,3);
@@ -726,19 +769,24 @@ void TestHpiFit::testComputeCoilLocation_basic_noproj_trafo()
     MatrixXd matProjectors = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError(4);
+    int iLineF = 60;
     VectorXd vecGoF;
     MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
-    MatrixXd matAmplitudes;
     bool bBasic = true;
     FiffCoordTrans transDevHead;
 
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.iLineFreq = iLineF;
+    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
+    modelParameters.bBasic = bBasic;
+
+    MatrixXd matAmplitudes;
     HPI.computeAmplitudes(m_matData,
-                          matProjectors,
-                          vecFreqs,
-                          m_pFiffInfo,
-                          matAmplitudes,
-                          bBasic);
+                          m_matProjectors,
+                          modelParameters,
+                          matAmplitudes);
 
     /// Act
     MatrixXd matCoilLocActual(4,3);
@@ -767,19 +815,24 @@ void TestHpiFit::testComputeCoilLocation_basic_proj()
     HPIFit HPI = HPIFit(m_pFiffInfo);
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError(4);
+    int iLineF = 60;
     VectorXd vecGoF;
     MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
-    MatrixXd matAmplitudes;
     bool bBasic = true;
     FiffCoordTrans transDevHead;
 
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.iLineFreq = iLineF;
+    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
+    modelParameters.bBasic = bBasic;
+
+    MatrixXd matAmplitudes;
     HPI.computeAmplitudes(m_matData,
                           m_matProjectors,
-                          vecFreqs,
-                          m_pFiffInfo,
-                          matAmplitudes,
-                          bBasic);
+                          modelParameters,
+                          matAmplitudes);
 
     /// Act
     MatrixXd matCoilLocActual(4,3);
@@ -812,16 +865,21 @@ void TestHpiFit::testComputeCoilLocation_advanced_noproj()
     VectorXd vecGoF;
     MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
-    MatrixXd matAmplitudes;
     bool bBasic = false;
+    int iLineF = 60;
     FiffCoordTrans transDevHead;
 
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.iLineFreq = iLineF;
+    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
+    modelParameters.bBasic = bBasic;
+
+    MatrixXd matAmplitudes;
     HPI.computeAmplitudes(m_matData,
-                          matProjectors,
-                          vecFreqs,
-                          m_pFiffInfo,
-                          matAmplitudes,
-                          bBasic);
+                          m_matProjectors,
+                          modelParameters,
+                          matAmplitudes);
 
     /// Act
     MatrixXd matCoilLocActual(4,3);
@@ -854,15 +912,20 @@ void TestHpiFit::testComputeCoilLocation_advanced_noproj_trafo()
     VectorXd vecGoF;
     MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
-    MatrixXd matAmplitudes;
     bool bBasic = false;
+    int iLineF = 60;
 
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.iLineFreq = iLineF;
+    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
+    modelParameters.bBasic = bBasic;
+
+    MatrixXd matAmplitudes;
     HPI.computeAmplitudes(m_matData,
-                          matProjectors,
-                          vecFreqs,
-                          m_pFiffInfo,
-                          matAmplitudes,
-                          bBasic);
+                          m_matProjectors,
+                          modelParameters,
+                          matAmplitudes);
 
     /// Act
     MatrixXd matCoilLocActual(4,3);
@@ -894,16 +957,23 @@ void TestHpiFit::testComputeCoilLocation_advanced_proj()
     VectorXd vecGoF;
     MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
-    MatrixXd matAmplitudes;
     bool bBasic = false;
     FiffCoordTrans transDevHead;
 
+    int iLineF = 60;
+
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.iLineFreq = iLineF;
+    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
+    modelParameters.bBasic = bBasic;
+
+
+    MatrixXd matAmplitudes;
     HPI.computeAmplitudes(m_matData,
                           m_matProjectors,
-                          vecFreqs,
-                          m_pFiffInfo,
-                          matAmplitudes,
-                          bBasic);
+                          modelParameters,
+                          matAmplitudes);
 
     /// Act
     MatrixXd matCoilLocActual(4,3);
@@ -935,16 +1005,23 @@ void TestHpiFit::testComputeCoilLocation_basic_gof()
     VectorXd vecGoF;
     MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
-    MatrixXd matAmplitudes;
     bool bBasic = true;
     FiffCoordTrans transDevHead;
 
+    int iLineF = 60;
+
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.iLineFreq = iLineF;
+    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
+    modelParameters.bBasic = bBasic;
+
+
+    MatrixXd matAmplitudes;
     HPI.computeAmplitudes(m_matData,
                           m_matProjectors,
-                          vecFreqs,
-                          m_pFiffInfo,
-                          matAmplitudes,
-                          bBasic);
+                          modelParameters,
+                          matAmplitudes);
 
     /// Act
     MatrixXd matCoilLocActual(4,3);
@@ -973,16 +1050,22 @@ void TestHpiFit::testComputeCoilLocation_advanced_gof()
     VectorXd vecGoF;
     MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
-    MatrixXd matAmplitudes;
     bool bBasic = false;
     FiffCoordTrans transDevHead;
 
+    int iLineF = 60;
+
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.iLineFreq = iLineF;
+    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
+    modelParameters.bBasic = bBasic;
+
+    MatrixXd matAmplitudes;
     HPI.computeAmplitudes(m_matData,
                           m_matProjectors,
-                          vecFreqs,
-                          m_pFiffInfo,
-                          matAmplitudes,
-                          bBasic);
+                          modelParameters,
+                          matAmplitudes);
 
     /// Act
     MatrixXd matCoilLocActual(4,3);
@@ -1010,16 +1093,20 @@ void TestHpiFit::testComputeHeadPosition_error()
     QVector<double> vecError(4);
     VectorXd vecGoF;
     MatrixXd matHpiPosExpected = HPI.getHpiDigitizer();
-    MatrixXd matAmplitudes;
     bool bBasic = true;
     FiffDigPointSet fittedPointSet;
 
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.iLineFreq = m_pFiffInfo->linefreq;
+    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
+    modelParameters.bBasic = bBasic;
+
+    MatrixXd matAmplitudes;
     HPI.computeAmplitudes(m_matData,
                           m_matProjectors,
-                          vecFreqs,
-                          m_pFiffInfo,
-                          matAmplitudes,
-                          bBasic);
+                          modelParameters,
+                          matAmplitudes);
 
     MatrixXd matCoilLoc(4,3);
 

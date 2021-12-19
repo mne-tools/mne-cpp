@@ -194,6 +194,11 @@ void TestHpiFitIntegration::initTestCase()
     qInfo() << "[done]";
     MatrixXd matAmplitudes;
     bool bBasic = true;
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vFreqs;
+    modelParameters.iLineFreq = 60;
+    modelParameters.iSampleFreq = pFiffInfo->sfreq;
+    modelParameters.bBasic = bBasic;
 
     for(int i = 0; i < mRefPos.rows(); i++) {
         from = first + mRefPos(i,0)*pFiffInfo->sfreq;
@@ -208,10 +213,8 @@ void TestHpiFitIntegration::initTestCase()
 
         HPI.computeAmplitudes(mData,
                               mProjectors,
-                              vFreqs,
-                              pFiffInfo,
-                              matAmplitudes,
-                              bBasic);
+                              modelParameters,
+                              matAmplitudes);
 
         MatrixXd matCoilLoc(4,3);
 
