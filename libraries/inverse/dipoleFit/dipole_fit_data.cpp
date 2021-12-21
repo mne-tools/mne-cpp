@@ -605,7 +605,9 @@ void mne_free_cov_3(MneCovMatrix* c)
     if (c->sss)
         delete c->sss;
     c->bads.clear();
-    FREE_3(c);
+    if(c) {
+        delete c;
+    }
     return;
 }
 
