@@ -2330,7 +2330,6 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
         }
     }
 
-//    fiff_close(in);
     stream->close();
 
     megp = meg;
@@ -2356,10 +2355,10 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
     return FIFF_OK;
 
 bad : {
-//        fiff_close(in);
+
         stream->close();
         FREE_3(id);
-//        FREE_3(tag.data);
+
         delete t;
         return FIFF_FAIL;
     }
