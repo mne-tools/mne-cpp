@@ -37,16 +37,17 @@
 
 include(../../../mne-cpp.pri)
 
+QMAKE_TARGET_DESCRIPTION = MNE Scan
+
 TEMPLATE = app
 
 QT += network core widgets xml svg charts concurrent opengl 3dextras
-
-CONFIG += console
 
 DESTDIR = $${MNE_BINARY_DIR}
 
 TARGET = mne_scan
 CONFIG(debug, debug|release) {
+    CONFIG += console
     TARGET = $$join(TARGET,,,d)
 }
 
@@ -112,6 +113,7 @@ CONFIG(debug, debug|release) {
             -lscMeasd \
             -lmnecppDisp3Dd \
             -lmnecppDispd \
+            -lmnecppEventsd \
             -lmnecppRtProcessingd \
             -lmnecppConnectivityd \
             -lmnecppInversed \
@@ -127,6 +129,7 @@ CONFIG(debug, debug|release) {
             -lscMeas \
             -lmnecppDisp3D \
             -lmnecppDisp \
+            -lmnecppEvents \
             -lmnecppRtProcessing \
             -lmnecppConnectivity \
             -lmnecppInverse \
@@ -140,6 +143,7 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     main.cpp \
+    mainsplashscreencloser.cpp \
     startupwidget.cpp \
     mainsplashscreen.cpp \
     pluginscene.cpp \
@@ -150,6 +154,7 @@ SOURCES += \
 
 HEADERS += \
     info.h \
+    mainsplashscreencloser.h \
     startupwidget.h \
     mainsplashscreen.h \
     pluginscene.h \
@@ -158,7 +163,11 @@ HEADERS += \
     arrow.h \
     mainwindow.h
 
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+clang {
+    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
+} else {
+    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
+}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 

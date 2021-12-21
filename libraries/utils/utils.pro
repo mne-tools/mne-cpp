@@ -4,13 +4,14 @@
 # @author   Lars Debor <Lars.Debor@tu-ilmenau.de>;
 #           Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
 #           Lorenz Esch <lesch@mgh.harvard.edu>;
-#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Juan GPC <jgarciaprieto@mgh.harvard.edu>
 # @since    0.1.0
 # @date     July, 2012
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Lars Debor, Daniel Strohmeier, Lorenz Esch, Christoph Dinh. All rights reserved.
+# Copyright (C) 2021, Lars Debor, Daniel Strohmeier, Lorenz Esch, Christoph Dinh, Juan GPC. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -62,6 +63,7 @@ contains(MNECPP_CONFIG, static) {
 }
 
 SOURCES += \
+    file.cpp \
     kmeans.cpp \
     mnemath.cpp \
     ioutils.cpp \
@@ -69,13 +71,17 @@ SOURCES += \
     layoutmaker.cpp \
     selectionio.cpp \
     spectrogram.cpp \
+    utils_global.cpp \
     warp.cpp \
     sphere.cpp \
     generics/observerpattern.cpp \
     generics/applicationlogger.cpp \
-    spectral.cpp
+    spectral.cpp \
+    mnetracer.cpp
 
 HEADERS += \
+    buildinfo.h \
+    file.h \
     kmeans.h\
     utils_global.h \
     mnemath.h \
@@ -91,16 +97,15 @@ HEADERS += \
     generics/commandpattern.h \
     generics/observerpattern.h \
     generics/applicationlogger.h \
-    spectral.h
+    spectral.h \
+    mnetracer.h
 
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+clang {
+    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
+} else {
+    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
+}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-
-# Install headers to include directory
-header_files.files = $${HEADERS}
-header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/utils
-
-INSTALLS += header_files
 
 contains(MNECPP_CONFIG, withCodeCov) {
     QMAKE_CXXFLAGS += --coverage
@@ -134,3 +139,38 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
                 -lfftw3_threads \
     }
 }
+
+################################################## BUILD TIMESTAMP/HASH UPDATER ############################################
+
+FILE_TO_UPDATE = utils_global.cpp
+win32 {
+    CONFIG(debug, debug|release) {
+        OBJ_TARJET = debug\utils_global.obj
+    } else {
+        OBJ_TARJET = release\utils_global.obj
+    }
+}
+
+ALL_FILES += $$HEADERS
+ALL_FILES += $$SOURCES
+ALL_FILES -= $$FILE_TO_UPDATE
+
+FileUpdater.target = phonyFileUpdater
+for (I_FILE, ALL_FILES) {
+    FileUpdater.depends += $${PWD}/$${I_FILE}
+}
+
+unix|macx {
+    FileUpdater.commands = touch $${PWD}/$${FILE_TO_UPDATE} ; echo PASTA > phonyFileUpdater
+}
+
+win32 {
+    FileUpdater.commands = copy /y $$shell_path($${PWD})\\$${FILE_TO_UPDATE} +,, $$shell_path($${PWD})\\$${FILE_TO_UPDATE} & echo PASTA > phonyFileUpdater
+    OrderForcerTarget.target = $${OBJ_TARJET}
+    OrderForcerTarget.depends += phonyFileUpdater
+    QMAKE_EXTRA_TARGETS += OrderForcerTarget
+}
+
+PRE_TARGETDEPS += phonyFileUpdater
+QMAKE_EXTRA_TARGETS += FileUpdater
+

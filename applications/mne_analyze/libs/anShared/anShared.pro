@@ -64,6 +64,7 @@ contains(MNECPP_CONFIG, static) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lmnecppDispd \
+            -lmnecppEventsd \
             -lmnecppRtProcessingd \
             -lmnecppInversed \
             -lmnecppFwdd \
@@ -73,6 +74,7 @@ CONFIG(debug, debug|release) {
             -lmnecppUtilsd \
 } else {
     LIBS += -lmnecppDisp \
+            -lmnecppEvents \
             -lmnecppRtProcessing \
             -lmnecppInverse \
             -lmnecppFwd \
@@ -92,10 +94,11 @@ SOURCES += \
     Model/bemdatamodel.cpp \
     Model/dipolefitmodel.cpp \
     Model/fiffrawviewmodel.cpp \
-    Model/annotationmodel.cpp \
+    Model/eventmodel.cpp \
     Model/averagingdatamodel.cpp \
     Model/mricoordmodel.cpp \
-    Model/covariancemodel.cpp
+    Model/covariancemodel.cpp \
+    Plugins/abstractplugin.cpp
 
 HEADERS += \
     Model/dipolefitmodel.h \
@@ -114,18 +117,16 @@ HEADERS += \
     Utils/types.h \
     Model/bemdatamodel.h \
     Model/fiffrawviewmodel.h \
-    Model/annotationmodel.h \
+    Model/eventmodel.h \
     Model/averagingdatamodel.h \
 
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+clang {
+    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
+} else {
+    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
+}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
-
-# Install headers to include directory
-header_files.files = $${HEADERS}
-header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/anShared
-
-INSTALLS += header_files
 
 win32:!contains(MNECPP_CONFIG, static) {
     QMAKE_POST_LINK += $$QMAKE_COPY $$shell_path($${MNE_LIBRARY_DIR}/$${TARGET}.dll) $${MNE_BINARY_DIR}

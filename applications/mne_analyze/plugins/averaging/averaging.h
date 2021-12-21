@@ -126,6 +126,7 @@ public:
     virtual QMenu* getMenu() override;
     virtual QDockWidget* getControl() override;
     virtual QWidget* getView() override;
+    virtual QString getBuildInfo() override;
 
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
@@ -259,7 +260,7 @@ private:
      *
      * @param[in] text  name of group selected in the GUI.
      */
-    void onChangeGroupSelect(const QString &text);
+    void onChangeGroupSelect(int iId);
 
     //=========================================================================================================
     /**
@@ -293,12 +294,6 @@ private:
 
     //=========================================================================================================
     /**
-     * Updates the dropdown display for selecting from which group to average
-     */
-    void updateGroups();
-
-    //=========================================================================================================
-    /**
      * Call this slot whenever you want to make a screenshot of the butterfly or layout view.
      *
      * @param[out] imageType     The current iamge type: png, svg.
@@ -318,6 +313,10 @@ private:
      * Sends event to hide loading bar
      */
     void triggerLoadingEnd(QString sMessage);
+
+    void setAutoCompute(bool bShouldAutoCompute);
+
+    void updateEvokedSetModel();
 
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pFiffRawModel;            /**< Pointer to currently loaded FiffRawView Model. */
     QSharedPointer<QList<QPair<int,double>>>                m_pTriggerList;             /**< Pointer to list of stim triggers. */
@@ -340,14 +339,14 @@ private:
     QVBoxLayout*                                            m_pLayout;                  /**< Pointer to layout that holds parameter GUI tab elements. */
     QTabWidget*                                             m_pTabView;                 /**< Pointer to object that stores multiple tabs of GUI items. */
 
-    bool                                                    m_bBasline;                 /**< Whether to apply baseline correction. */
+    bool                                                    m_bBaseline;                /**< Whether to apply baseline correction. */
     bool                                                    m_bRejection;               /**< Whether to drop data points marked fro rejection when calculating average. */
     bool                                                    m_bLoaded;                  /**< Whether the full GUI has already been laoaded. */
     bool                                                    m_bPerformFiltering;        /**< Flag whether to activate/deactivate filtering. */
+    bool                                                    m_bAutoRecompute;           /**< Whether to auto recompute averages */
+    bool                                                    m_bSavingAverage;           /**< Whether to save average */
 
     RTPROCESSINGLIB::FilterKernel                           m_filterKernel;             /**< List of currently active filters. */
-
-    int                                                     m_iCurrentGroup;            /**< Event group from which to compute average. 9999 for current selection. */
 
     QFutureWatcher<QSharedPointer<FIFFLIB::FiffEvokedSet>>  m_FutureWatcher;            /**< Future watcher for notifing of completed average calculations. */
     QFuture<QSharedPointer<FIFFLIB::FiffEvokedSet>>         m_Future;                   /**< Future for performing average calculations of separate thread. */

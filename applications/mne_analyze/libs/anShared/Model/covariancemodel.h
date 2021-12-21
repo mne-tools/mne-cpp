@@ -62,8 +62,8 @@ class ANSHAREDSHARED_EXPORT CovarianceModel : public AbstractModel
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<CovarianceModel> SPtr;              /**< Shared pointer type for AnnotationModel. */
-    typedef QSharedPointer<const CovarianceModel> ConstSPtr;   /**< Const shared pointer type for AnnotationModel. */
+    typedef QSharedPointer<CovarianceModel> SPtr;              /**< Shared pointer type for CovarianceModel. */
+    typedef QSharedPointer<const CovarianceModel> ConstSPtr;   /**< Const shared pointer type for CovarianceModel. */
 
     CovarianceModel(const QString &sFilePath,
                const QByteArray& byteLoadedData = QByteArray(),

@@ -267,7 +267,7 @@ protected:
      *
      */
     void createSensorSet(SensorSet& sensors,
-                         FWDLIB::FwdCoilSet* coils);
+                         QSharedPointer<FWDLIB::FwdCoilSet> coils);
 
     SensorSet                m_sensors;            /**< sensor struct that contains information about all sensors. */
 
@@ -278,9 +278,6 @@ private:
      *
      */
     void updateSensor();
-
-    FWDLIB::FwdCoilSet* m_coilTemplate;
-    FWDLIB::FwdCoilSet* m_coilMeg;
 
     //=========================================================================================================
     /**
@@ -311,7 +308,8 @@ private:
 
     Eigen::MatrixXd     m_matModel;         /**< The model that contains the sines/cosines for the hpi fit*/
     bool                m_bDoFastFit;       /**< Do fast fit. */
-
+    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilTemplate;    /**< */
+    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilMeg;         /**< */
     QVector<int>        m_vecFreqs;         /**< The frequencies for each coil in unknown order. */
 
 };

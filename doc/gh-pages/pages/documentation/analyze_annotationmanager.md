@@ -13,11 +13,13 @@ The event manager is used to create, display, and save events. Events in MNE Ana
 
 ### Adding Events Manually
 
-To add an event group, select a name and type for the group and press `Create`. Select a color when prompted.
+To add an event group, select a name and press `Create`. Select a color when prompted.
 
 ![](../../images/analyze/mne_an_annotationmanager_4.png)
 
-To add an event, right click on the data plot in the spot you wish to add, and select the `Mark time` option. The event will be added to the currently selected group.
+To add an event, right click on the data plot in the spot you wish to add, and select the `Add Event` option. The event will be added to the currently selected group.
+
+Alternatively, hit the `E` key to add an event to where the signal viewer cursor is currently located.
 
 ![](../../images/analyze/mne_an_annotationmanager_3.png)
 
@@ -33,10 +35,8 @@ Press `Detect Triggers` to load in events. This may take a few seconds depending
 
 ### Managing and Viewing Events
 
-Event groups will be added to the left side of the event table. The right side will display the events in the currently selected event group. Event groups can be renamed, recolored, or deleted by right clicking them and selecting the corresponding action.
+Event groups will be added to the left side of the event table. The right side will display the events in the currently selected event group. Event groups can be recolored or deleted by right clicking them and selecting the corresponding action. To rename groups, double click them and input a new name.
 
-The display of events can also be narrowed or broadened. Checking `Show selected events only` will make only the currently selected events display in the Signal Viewer. Checking `Show events from all groups` deselects all groups and shows all events at once in the right side of the table and the viewer.
-
-![](../../images/analyze/mne_an_annotationmanager_6.png)
+The display of events can also be narrowed or broadened. Select multiple groups buy holding `Ctrl` when clicking through groups, or use `Shift` to select a range of groups. Checking `Show selected events only` will make only the currently selected events display in the Signal Viewer, use `Ctrl` and `Shift` to select multiple events as well.
 
 To save the events currently showing on the right side of the table to an `.eve` file, press `Save Events`.

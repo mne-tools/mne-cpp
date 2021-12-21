@@ -43,7 +43,7 @@
 
 #include "../Utils/metatypes.h"
 
-#include "annotationmodel.h"
+#include "eventmodel.h"
 
 #include <fiff/fiff.h>
 
@@ -110,9 +110,12 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 , m_pRtFilter(FilterOverlapAdd::SPtr::create())
 , m_bPerformFiltering(false)
 , m_iDistanceTimerSpacer(1000)
+, m_iScroller(0)
 , m_iScrollPos(0)
-, m_bDispAnnotation(true)
-//, m_pAnnotationModel(QSharedPointer<AnnotationModel>::create())
+, m_bDispEvent(true)
+, m_bRealtime(false)
+, m_iLastFileEndSample(0)
+//, m_pEventModel(QSharedPointer<EventModel>::create())
 {
     // connect data reloading: this will be run concurrently
     connect(&m_blockLoadFutureWatcher, &QFutureWatcher<int>::finished,
@@ -136,20 +139,24 @@ FiffRawViewModel::FiffRawViewModel(const QString &sFilePath,
 
 FiffRawViewModel::~FiffRawViewModel()
 {
-
+    if(m_bRealtime){
+        m_file.remove();
+    }
 }
 
 //=============================================================================================================
 
-void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
+bool FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
 {
     // build FiffIO
     m_pFiffIO = QSharedPointer<FiffIO>::create(p_IODevice);
 
     if(m_pFiffIO->m_qlistRaw.empty()) {
         qWarning() << "[FiffRawViewModel::loadFiffData] File does not contain any Fiff data";
-        return;
+        return false;
     }
+
+    m_ChannelInfoList.clear();
 
     // load channel infos
     for(qint32 i=0; i < m_pFiffIO->m_qlistRaw[0]->info.nchan; ++i) {
@@ -169,10 +176,14 @@ void FiffRawViewModel::initFiffData(QIODevice& p_IODevice)
 
     qInfo() << "[FiffRawViewModel::initFiffData] Loaded" << m_lData.size() << "blocks with size"<<data.rows()<<"x"<<m_iSamplesPerBlock;
 
+    qDebug() << "FIRST SAMPLE OFFSET IN ANALYZE:" << m_pFiffIO->m_qlistRaw[0]->first_samp;
+
     // need to close the file manually
     p_IODevice.close();
 
     m_bIsInit = true;
+
+    return true;
 }
 
 //=============================================================================================================
@@ -427,8 +438,8 @@ float FiffRawViewModel::getNumberOfTimeSpacers() const
 
 int FiffRawViewModel::getTimeMarks(int iIndex) const
 {
-    if (m_pAnnotationModel){
-        return m_pAnnotationModel->getAnnotation(iIndex);
+    if (m_pEventModel){
+        return m_pEventModel->getEvent(iIndex);
     } else {
         return 0;
     }
@@ -438,8 +449,8 @@ int FiffRawViewModel::getTimeMarks(int iIndex) const
 
 int FiffRawViewModel::getTimeListSize() const
 {
-    if(m_pAnnotationModel){
-        return m_pAnnotationModel->getNumberOfAnnotations();
+    if(m_pEventModel){
+        return m_pEventModel->getNumberOfEventsToDisplay();
     } else {
         return 0;
     }
@@ -461,26 +472,26 @@ int FiffRawViewModel::getTotalBlockCount() const
 
 //=============================================================================================================
 
-void FiffRawViewModel::toggleDispAnnotation(int iToggleDisp)
+void FiffRawViewModel::toggleDispEvent(int iToggleDisp)
 {
-    m_bDispAnnotation = (iToggleDisp ? true : false);
+    m_bDispEvent = (iToggleDisp ? true : false);
 }
 
 //=============================================================================================================
 
-bool FiffRawViewModel::shouldDisplayAnnotation() const
+bool FiffRawViewModel::shouldDisplayEvent() const
 {
-    return (m_bDispAnnotation && getTimeListSize());
+    return (m_bDispEvent && getTimeListSize());
 }
 
 //=============================================================================================================
 
-QSharedPointer<AnnotationModel> FiffRawViewModel::getAnnotationModel() const
+QSharedPointer<EventModel> FiffRawViewModel::getEventModel() const
 {
-    if(m_pAnnotationModel){
-        return m_pAnnotationModel;
+    if(m_pEventModel){
+        return m_pEventModel;
     } else {
-        return QSharedPointer<AnnotationModel>::create();
+        return QSharedPointer<EventModel>::create();
     }
 
 }
@@ -931,6 +942,10 @@ void FiffRawViewModel::postBlockLoad(int result)
 
 void FiffRawViewModel::reloadAllData()
 {
+    if(!m_pFiffInfo){
+        return;
+    }
+
     m_lData.clear();
     m_lFilteredData.clear();
 
@@ -1004,12 +1019,65 @@ void FiffRawViewModel::reloadAllData()
 
 bool FiffRawViewModel::hasSavedEvents()
 {
-    return m_pAnnotationModel;
+    return m_pEventModel;
 }
 
 //=============================================================================================================
 
-void FiffRawViewModel::setAnnotationModel(QSharedPointer<ANSHAREDLIB::AnnotationModel> pModel)
+void FiffRawViewModel::setEventModel(QSharedPointer<ANSHAREDLIB::EventModel> pModel)
 {
-    m_pAnnotationModel = pModel;
+    m_pEventModel = pModel;
+}
+
+//=============================================================================================================
+
+void FiffRawViewModel::setScrollerSample(int iScrollerPos){
+    m_iScroller = iScrollerPos;
+}
+
+//=============================================================================================================
+
+int FiffRawViewModel::getScrollerPosition() const
+{
+    return m_iScroller;
+}
+
+//=============================================================================================================
+
+void FiffRawViewModel::setRealtime(bool bRealtime)
+{
+    m_bRealtime = bRealtime;
+    if (m_bRealtime){
+        m_FileSharer.initWatcher();
+        connect(&m_FileSharer, &FIFFLIB::FiffFileSharer::newFileAtPath,
+                this, &FiffRawViewModel::readFromRealtimeFile, Qt::UniqueConnection);
+    }
+
+}
+
+//=============================================================================================================
+
+bool FiffRawViewModel::isRealtime()
+{
+    return m_bRealtime;
+}
+
+//=============================================================================================================
+
+void FiffRawViewModel::readFromRealtimeFile(const QString &path)
+{
+    m_iLastFileEndSample = this->absoluteLastSample();
+    m_file.remove();
+    m_file.setFileName(path);
+    if (initFiffData(m_file)){
+        updateEndStartFlags();
+        emit newRealtimeData();
+    }
+}
+
+//=============================================================================================================
+
+int FiffRawViewModel::getPreviousLastSample()
+{
+    return m_iLastFileEndSample;
 }

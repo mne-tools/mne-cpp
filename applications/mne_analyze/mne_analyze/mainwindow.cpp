@@ -4,7 +4,8 @@
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+ *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
+ *           Juan Garcia-Prieto <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     January, 2017
  *
@@ -42,12 +43,13 @@
 #include "mainwindow.h"
 
 #include <anShared/Plugins/abstractplugin.h>
-#include <anShared/Management/pluginmanager.h>
 #include <anShared/Management/statusbar.h>
 
 #include <disp/viewers/multiview.h>
 #include <disp/viewers/multiviewwindow.h>
 #include <disp/viewers/abstractview.h>
+
+#include <utils/buildinfo.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -64,6 +66,7 @@
 #include <QGridLayout>
 #include <QtWidgets/QGridLayout>
 #include <QStandardPaths>
+#include <QMutexLocker>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -77,57 +80,57 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MainWindow::MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager,
+MainWindow::MainWindow(AnalyzeCore* pAnalyzeCore,
                        QWidget *parent)
 : QMainWindow(parent)
 , m_pMultiView(Q_NULLPTR)
+, m_pAnalyzeCoreController(pAnalyzeCore)
 , m_pGridLayout(Q_NULLPTR)
+, m_pActionExit(Q_NULLPTR)
+, m_pActionReloadPlugins(Q_NULLPTR)
+, m_pActionAbout(Q_NULLPTR)
+, m_pActionResearchMode(Q_NULLPTR)
+, m_pActionClinicalMode(Q_NULLPTR)
+, m_pActionDarkMode(Q_NULLPTR)
+, m_pMenuFile(Q_NULLPTR)
+, m_pMenuView(Q_NULLPTR)
+, m_pMenuControl(Q_NULLPTR)
+, m_pMenuAppearance(Q_NULLPTR)
+, m_pMenuHelp(Q_NULLPTR)
+, m_pTextBrowser_Log(Q_NULLPTR)
+, m_pAboutWindow(Q_NULLPTR)
 , m_sSettingsPath("MNEANALYZE/MainWindow")
 , m_sCurrentStyle("default")
 {
-    this->setObjectName("mainwindow");
-    setWindowState(Qt::WindowMaximized);
-    setMinimumSize(1280, 720);
-    setWindowTitle(CInfo::AppNameShort());
+    initWindow();
 
-    if(!pPluginManager.isNull()) {
-        // The order we call these functions is important!
-        createActions();
-        createPluginMenus(pPluginManager);
-        createLogDockWindow();
-        createPluginControls(pPluginManager);
-        createPluginViews(pPluginManager);
-    } else {
-        qWarning() << "[MainWindow::MainWindow] Plugin manager is nullptr!";
-    }
-
-    StatusBar* statusBar = new StatusBar(this);
-
-    this->setStatusBar(statusBar);
+    initMenusAndPluginControls();
+    initStatusBar();
 
     //Load application icon for linux builds only, mac and win executables have built in icons from .pro file
-#ifdef __linux__
+    #ifdef __linux__
     qInfo() << "Loading icon...";
     QMainWindow::setWindowIcon(QIcon(":/images/resources/images/appIcons/icon_mne-analyze_256x256.png"));
-#endif
+    #endif
 
-    //Load saved GUI geometry and state
-    loadSettings();
-    m_pMultiView->loadSettings();
+    loadSavedSettingsAndState();
 }
 
 //=============================================================================================================
 
 MainWindow::~MainWindow()
 {
-    menuBar()->clear();
+    deleteMenus();
+}
 
-    delete m_pActionExit;
-    delete m_pActionAbout;
-    delete m_pActionResearchMode;
-    delete m_pActionClinicalMode;
-    delete m_pActionDarkMode;
+//=============================================================================================================
 
+void MainWindow::deleteMenus()
+{
+    for(auto& action: menuBar()->actions())
+    {
+        menuBar()->removeAction(action);
+    }
     delete m_pMenuFile;
     delete m_pMenuView;
     delete m_pMenuControl;
@@ -155,11 +158,22 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 //=============================================================================================================
 
+void MainWindow::initWindow()
+{
+    this->setObjectName("mainwindow");
+    setWindowState(Qt::WindowMaximized);
+    setMinimumSize(1280, 720);
+    setWindowTitle(CInfo::AppNameShort());
+}
+
+//=============================================================================================================
+
 void MainWindow::writeToLog(QtMsgType type,
                             const QMessageLogContext &context,
                             const QString &msg)
 {
     Q_UNUSED(context);
+    QMutexLocker locker(&m_Mutex);
 
     switch (type)
     {
@@ -217,6 +231,7 @@ void MainWindow::saveSettings()
 void MainWindow::loadSettings()
 {
     if(m_sSettingsPath.isEmpty()) {
+
         return;
     }
 
@@ -243,27 +258,140 @@ void MainWindow::setCurrentStyle(const QString& sStyle)
 {
     m_sCurrentStyle = sStyle;
 
-    onStyleChanged();
+    changeStyle();
 }
 
 //=============================================================================================================
 
-void MainWindow::createActions()
+void MainWindow::initMenusAndPluginControls()
 {
+    if(m_pAnalyzeCoreController->pluginsInitialized())
+    {
+        initMenuBar();
+        createLogDockWindow();
+        createPluginMenus();
+        initPluginControls();
+        createPluginControls();
+        tabifyDockWindows();
+        initPluginViews();
+        createPluginViews();
+    } else {
+        qWarning() << "[MainWindow::MainWindow] Plugin manager is nullptr!";
+    }
+}
+
+//=============================================================================================================
+
+void MainWindow::initPluginControls()
+{
+        setTabPosition(Qt::LeftDockWidgetArea,QTabWidget::West);
+        setTabPosition(Qt::RightDockWidgetArea,QTabWidget::East);
+        setDockOptions(QMainWindow::AllowNestedDocks | QMainWindow::AllowTabbedDocks);
+}
+
+//=============================================================================================================
+
+void MainWindow::initStatusBar()
+{
+    StatusBar* statusBar = new StatusBar(this);
+    setStatusBar(statusBar);
+}
+
+//=============================================================================================================
+
+void MainWindow::loadSavedSettingsAndState()
+{
+    loadSettings();
+    m_pMultiView->loadSettings();
+}
+
+//=============================================================================================================
+
+void MainWindow::initMenuBar()
+{
+    // File menu
+    m_pMenuFile = menuBar()->addMenu(tr("File"));
+
     m_pActionExit = new QAction(tr("Exit"), this);
     m_pActionExit->setShortcuts(QKeySequence::Quit);
-    m_pActionExit->setStatusTip(tr("Exit the application"));
+    m_pActionExit->setStatusTip(tr("Exit MNE Analyze"));
     connect(m_pActionExit.data(), &QAction::triggered, this, &MainWindow::close);
+#ifndef WASMBUILD
+    m_pActionReloadPlugins = new QAction(tr("Reload Plugins"),this);
+    m_pActionReloadPlugins->setStatusTip(tr("Reload all the plugins in MNE Analyze's plugin folder."));
+    connect(m_pActionReloadPlugins.data(), &QAction::triggered, this, &MainWindow::reloadPlugins);
+    m_pMenuFile->addAction(m_pActionReloadPlugins);
+#endif
+    m_pMenuFile->addAction(m_pActionExit);
 
-    //Help QMenu
+    // Control menu
+    m_pMenuControl = menuBar()->addMenu(tr("Control"));
+
+    // View menu
+    m_pMenuView = menuBar()->addMenu(tr("View"));
+
+    //Appearance QMenu
+    // Styles
+    QActionGroup* pActionStyleGroup = new QActionGroup(this);
+
+    QAction* pActionDefaultStyle = new QAction("Default");
+    pActionDefaultStyle->setStatusTip(tr("Activate default style"));
+    pActionDefaultStyle->setCheckable(true);
+    pActionDefaultStyle->setChecked(true);
+    pActionStyleGroup->addAction(pActionDefaultStyle);
+    connect(pActionDefaultStyle, &QAction::triggered,
+        [=]() {
+        setCurrentStyle("default");
+    });
+
+    m_pActionDarkMode = new QAction("Dark");
+    m_pActionDarkMode->setStatusTip(tr("Activate dark style"));
+    m_pActionDarkMode->setCheckable(true);
+    m_pActionDarkMode->setChecked(false);
+    pActionStyleGroup->addAction(m_pActionDarkMode);
+    connect(m_pActionDarkMode.data(), &QAction::triggered,
+        [=]() {
+        setCurrentStyle("dark");
+    });
+
+    // Modes
+    QActionGroup* pActionModeGroup = new QActionGroup(this);
+
+    m_pActionResearchMode = new QAction("Research");
+    m_pActionResearchMode->setStatusTip(tr("Activate the research GUI mode"));
+    m_pActionResearchMode->setCheckable(true);
+    m_pActionResearchMode->setChecked(true);
+    pActionModeGroup->addAction(m_pActionResearchMode);
+    connect(m_pActionResearchMode.data(), &QAction::triggered,
+            this, &MainWindow::manageGuiModeChanged);
+
+    m_pActionClinicalMode = new QAction("Clinical");
+    m_pActionClinicalMode->setStatusTip(tr("Activate the clinical GUI mode"));
+    m_pActionClinicalMode->setCheckable(true);
+    m_pActionClinicalMode->setChecked(false);
+    pActionModeGroup->addAction(m_pActionClinicalMode);
+    connect(m_pActionClinicalMode.data(), &QAction::triggered,
+            this, &MainWindow::manageGuiModeChanged);
+
+    if(!m_pMenuAppearance) {
+        m_pMenuAppearance = menuBar()->addMenu(tr("Appearance"));
+        m_pMenuAppearance->addMenu("Styles")->addActions(pActionStyleGroup->actions());
+        m_pMenuAppearance->addMenu("Modes")->addActions(pActionModeGroup->actions());
+    }
+
+   //Help QMenu
     m_pActionAbout = new QAction(tr("About"), this);
     m_pActionAbout->setStatusTip(tr("Show the application's About box"));
     connect(m_pActionAbout.data(), &QAction::triggered, this, &MainWindow::about);
+
+    m_pMenuHelp = menuBar()->addMenu(tr("Help"));
+    m_pMenuHelp->addAction(m_pActionAbout);
+
 }
 
 //=============================================================================================================
 
-void MainWindow::onStyleChanged()
+void MainWindow::changeStyle()
 {
     if(m_sCurrentStyle == "dark") {
         m_pActionDarkMode->setChecked(true);
@@ -291,7 +419,7 @@ void MainWindow::onStyleChanged()
 
 //=============================================================================================================
 
-void MainWindow::onGuiModeChanged()
+void MainWindow::manageGuiModeChanged()
 {
     if(m_pActionResearchMode->isChecked()) {
         emit guiModeChanged(DISPLIB::AbstractView::GuiMode::Research);
@@ -327,106 +455,35 @@ void MainWindow::createLogDockWindow()
 
 //=============================================================================================================
 
-void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager)
+void MainWindow::createPluginMenus()
 {
-    //(re)initialize all the menus
-    menuBar()->clear();
-
-    delete m_pActionExit;
-    delete m_pActionAbout;
-    delete m_pActionResearchMode;
-    delete m_pActionClinicalMode;
-    delete m_pActionDarkMode;
-
-    delete m_pMenuFile;
-    delete m_pMenuView;
-    delete m_pMenuControl;
-    delete m_pMenuAppearance;
-    delete m_pMenuHelp;
-
-    // File menu
-    m_pMenuFile = menuBar()->addMenu(tr("File"));
-    m_pMenuFile->addAction(m_pActionExit);
-
-    // View menu
-    m_pMenuView = menuBar()->addMenu(tr("View"));
-
-    // Control menu
-    m_pMenuControl = menuBar()->addMenu(tr("Control"));
-
-    //Appearance QMenu
-    // Styles
-    QActionGroup* pActionStyleGroup = new QActionGroup(this);
-
-    QAction* pActionDefaultStyle = new QAction("Default");
-    pActionDefaultStyle->setStatusTip(tr("Activate default style"));
-    pActionDefaultStyle->setCheckable(true);
-    pActionDefaultStyle->setChecked(true);
-    pActionStyleGroup->addAction(pActionDefaultStyle);
-    connect(pActionDefaultStyle, &QAction::triggered,
-        [=]() {
-        setCurrentStyle("default");
-    });
-
-    m_pActionDarkMode = new QAction("Dark");
-    m_pActionDarkMode->setStatusTip(tr("Activate dark style"));
-    m_pActionDarkMode->setCheckable(true);
-    m_pActionDarkMode->setChecked(false);
-    pActionStyleGroup->addAction(m_pActionDarkMode);
-    connect(m_pActionDarkMode.data(), &QAction::triggered,
-        [=]() {
-        setCurrentStyle("dark");
-    });
-
-    // Modes
-    QActionGroup* pActionModeGroup = new QActionGroup(this);
-
-    m_pActionResearchMode = new QAction("Research");
-    m_pActionResearchMode->setStatusTip(tr("Activate the research GUI mode"));
-    m_pActionResearchMode->setCheckable(true);
-    m_pActionResearchMode->setChecked(true);
-    pActionModeGroup->addAction(m_pActionResearchMode);
-    connect(m_pActionResearchMode.data(), &QAction::triggered,
-            this, &MainWindow::onGuiModeChanged);
-
-    m_pActionClinicalMode = new QAction("Clinical");
-    m_pActionClinicalMode->setStatusTip(tr("Activate the clinical GUI mode"));
-    m_pActionClinicalMode->setCheckable(true);
-    m_pActionClinicalMode->setChecked(false);
-    pActionModeGroup->addAction(m_pActionClinicalMode);
-    connect(m_pActionClinicalMode.data(), &QAction::triggered,
-            this, &MainWindow::onGuiModeChanged);
-
-    if(!m_pMenuAppearance) {
-        m_pMenuAppearance = menuBar()->addMenu(tr("&Appearance"));
-        m_pMenuAppearance->addMenu("Styles")->addActions(pActionStyleGroup->actions());
-        m_pMenuAppearance->addMenu("Modes")->addActions(pActionModeGroup->actions());
-    }
-
-    // Help menu
-    m_pMenuHelp = menuBar()->addMenu(tr("Help"));
-    m_pMenuHelp->addAction(m_pActionAbout);
-
     // add plugins menus
-    for(AbstractPlugin* pPlugin : pPluginManager->getPlugins()) {
-        pPlugin->setObjectName(pPlugin->getName());
+    for(auto pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
         if(pPlugin) {
-            if (QMenu* pMenu = pPlugin->getMenu()) {
-                // Check if the menu already exists. If it does add the actions to the exisiting menu.
-                if(pMenu->title() == "File") {
-                    for(QAction* pAction : pMenu->actions()) {
-                        m_pMenuFile->insertAction(m_pActionExit, pAction);
+            if(pPlugin->menuAlreadyLoaded() == false) {
+                pPlugin->setMenuLoadingState(true);
+                pPlugin->setObjectName(pPlugin->getName());
+                if (QMenu* pMenu = pPlugin->getMenu()) {
+                    // Check if the menu already exists. If it does add the actions to the exisiting menu.
+                    if(pMenu->title() == "File") {
+                        for(QAction* pAction : pMenu->actions()) {
+                            #ifdef WASMBUILD
+                            m_pMenuFile->insertAction(m_pActionExit, pAction);
+                            #else
+                            m_pMenuFile->insertAction(m_pActionReloadPlugins, pAction);
+                            #endif
+                        }
+                    } else if(pMenu->title() == "View") {
+                        for(QAction* pAction : pMenu->actions()) {
+                            m_pMenuView->addAction(pAction);
+                        }
+                    } else if(pMenu->title() == "Help") {
+                        for(QAction* pAction : pMenu->actions()) {
+                            m_pMenuHelp->insertAction(m_pActionAbout, pAction);
+                        }
+                    } else {
+                        menuBar()->addMenu(pMenu);
                     }
-                } else if(pMenu->title() == "View") {
-                    for(QAction* pAction : pMenu->actions()) {
-                        m_pMenuView->addAction(pAction);
-                    }
-                } else if(pMenu->title() == "Help") {
-                    for(QAction* pAction : pMenu->actions()) {
-                        m_pMenuHelp->insertAction(m_pActionAbout, pAction);
-                    }
-                } else {
-                    menuBar()->addMenu(pMenu);
                 }
             }
         }
@@ -435,42 +492,41 @@ void MainWindow::createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pP
 
 //=============================================================================================================
 
-void MainWindow::createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager)
+void MainWindow::createPluginControls()
 {
-    setTabPosition(Qt::LeftDockWidgetArea,QTabWidget::West);
-    setTabPosition(Qt::RightDockWidgetArea,QTabWidget::East);
-    setDockOptions(QMainWindow::ForceTabbedDocks);
-
     //Add Plugin controls to the MainWindow
-    for(AbstractPlugin* pPlugin : pPluginManager->getPlugins()) {
-        if(QDockWidget* pControl = pPlugin->getControl()) {
-            addDockWidget(Qt::LeftDockWidgetArea, pControl);
-            qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
-            QAction* pAction = pControl->toggleViewAction();
-            pAction->setText(pPlugin->getName());
-            m_pMenuControl->addAction(pAction);
-            qInfo() << "[MainWindow::createPluginControls] Added" << pPlugin->getName() << "controls to View menu";
+    for(AbstractPlugin* pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
+        if(pPlugin->controlAlreadyLoaded() == false) {
+            pPlugin->setControlLoadingState(true);
+            QDockWidget* pControl = pPlugin->getControl();
+            if(pControl)
+            {
+                addDockWidget(Qt::LeftDockWidgetArea, pControl);
+                qInfo() << "[MainWindow::createPluginControls] Found and added dock widget for " << pPlugin->getName();
+                QAction* pAction = pControl->toggleViewAction();
+                pAction->setText(pPlugin->getName());
+                m_pMenuControl->addAction(pAction);
+                qInfo() << "[MainWindow::createPluginControls] Added" << pPlugin->getName() << "controls to View menu";
 
-            // Connect plugin controls to GUI mode toggling
-            connect(this, &MainWindow::guiModeChanged,
-                    pPlugin, &AbstractPlugin::guiModeChanged);
+                // Connect plugin controls to GUI mode toggling
+                connect(this, &MainWindow::guiModeChanged,
+                        pPlugin, &AbstractPlugin::guiModeChanged);
 
-            connect(this, &MainWindow::guiStyleChanged,
-                    pPlugin, &AbstractPlugin::guiStyleChanged);
+                connect(this, &MainWindow::guiStyleChanged,
+                        pPlugin, &AbstractPlugin::guiStyleChanged);
 
-            // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
-            #ifdef WASMBUILD
-            pControl->setFeatures(QDockWidget::DockWidgetClosable);
-            #endif
+                // Disable floating and editable dock widgets, since the wasm QDockWidget version is buggy
+                #ifdef WASMBUILD
+                pControl->setFeatures(QDockWidget::DockWidgetClosable);
+                #endif
+            }
         }
     }
-
-    tabifyDockWindows();
 }
 
 //=============================================================================================================
 
-void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
+void MainWindow::initPluginViews()
 {
     m_pGridLayout = new QGridLayout(this);
     m_pMultiView = new MultiView(m_sSettingsPath);
@@ -478,30 +534,28 @@ void MainWindow::createPluginViews(QSharedPointer<PluginManager> pPluginManager)
     m_pMultiView->show();
     m_pMultiView->setObjectName("multiview");
     setCentralWidget(m_pMultiView);
+}
 
-    QString sCurPluginName;
+//=============================================================================================================
 
+void MainWindow::createPluginViews()
+{
     //Add Plugin views to the MultiView, which is the central widget
-    for(AbstractPlugin* pPlugin : pPluginManager->getPlugins()) {
-        QWidget* pView = pPlugin->getView();
-        if(pView) {
-            sCurPluginName = pPlugin->getName();
-            MultiViewWindow* pWindow = Q_NULLPTR;
+    for(AbstractPlugin* pPlugin : m_pAnalyzeCoreController->getLoadedPlugins()) {
+        if(pPlugin->viewAlreadyLoaded() == false) {
+            pPlugin->setViewLoadingState(true);
+            QWidget* pView = pPlugin->getView();
+            if(pView) {
+                MultiViewWindow* pWindow = Q_NULLPTR;
+                pWindow = m_pMultiView->addWidgetTop(pView, pPlugin->getName());
+                QAction* pAction = pWindow->toggleViewAction();
+                pAction->setText(pPlugin->getName());
+                m_pMenuView->addAction(pAction);
 
-            if(sCurPluginName == "RawDataViewer") {
-                pWindow = m_pMultiView->addWidgetBottom(pView, sCurPluginName);
-            } else {
-                pWindow = m_pMultiView->addWidgetTop(pView, sCurPluginName);
+                qInfo() << "[MainWindow::createPluginViews] Found and added subwindow for " << pPlugin->getName();
             }
-
-            QAction* pAction = pWindow->toggleViewAction();
-            pAction->setText(pPlugin->getName());
-            m_pMenuView->addAction(pAction);
-
-            qInfo() << "[MainWindow::createPluginViews] Found and added subwindow for " << pPlugin->getName();
         }
     }
-    //m_pMultiView->loadSettings();
 }
 
 //=============================================================================================================
@@ -512,7 +566,10 @@ void MainWindow::tabifyDockWindows()
     QList<QDockWidget*> docks = findChildren<QDockWidget*>();
 
     // first, un-float all the tabs
-    for (QDockWidget* pDockWidget : docks) pDockWidget->setFloating(false);
+    for (QDockWidget* pDockWidget : docks)
+    {
+        pDockWidget->setFloating(false);
+    }
 
     // sort them into dockWidget areas
     QVector<QDockWidget*> topArea, leftArea, rightArea, bottomArea;
@@ -606,7 +663,7 @@ void MainWindow::about()
         m_textEdit_aboutText->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse);
 
         QLabel* pLabel = new QLabel();
-        pLabel->setText(QString("Version: ") + CInfo::AppVersion());
+        pLabel->setText(QString("Version: ") + CInfo::AppVersion() + " - " + QString(UTILSLIB::dateTimeNow()) + " - " + QString(UTILSLIB::gitHash()));
 
         gridLayout->addWidget(pLabel, 1, 0, 1, 1);
 
@@ -631,4 +688,13 @@ void MainWindow::about()
     }
 
     m_pAboutWindow->show();
+}
+
+//=============================================================================================================
+
+void MainWindow::updatePluginsUI()
+{
+    createPluginMenus();
+    createPluginControls();
+    createPluginViews();
 }

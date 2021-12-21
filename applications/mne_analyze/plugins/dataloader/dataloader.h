@@ -94,7 +94,7 @@ class DATALOADERSHARED_EXPORT DataLoader : public ANSHAREDLIB::AbstractPlugin
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
 
-    enum FileType {DATA_FILE, AVERAGE_FILE, ANNOTATION_FILE};
+    enum FileType {DATA_FILE, AVERAGE_FILE, EVENT_FILE};
 public:
     //=========================================================================================================
     /**
@@ -117,6 +117,7 @@ public:
     virtual QMenu* getMenu() override;
     virtual QDockWidget* getControl() override;
     virtual QWidget* getView() override;
+    virtual QString getBuildInfo() override;
 
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
@@ -143,6 +144,10 @@ private:
      * This functions is called when the load from file button is pressed.
      */
     void onLoadFilePressed();
+
+    //=========================================================================================================
+
+    void onLoadScanSessionPressed();
 
     //=========================================================================================================
     /**

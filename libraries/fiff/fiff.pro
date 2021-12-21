@@ -1,7 +1,8 @@
 #==============================================================================================================
 #
 # @file     fiff.pro
-# @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+# @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+#           Lorenz Esch <lesch@mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 # @since    0.1.0
@@ -72,6 +73,7 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += fiff.cpp \
+    fiff_global.cpp \
     fiff_tag.cpp \
     fiff_coord_trans.cpp \
     fiff_ch_info.cpp \
@@ -97,6 +99,7 @@ SOURCES += fiff.cpp \
     c/fiff_sparse_matrix.cpp \
     c/fiff_digitizer_data.cpp \
     c/fiff_coord_trans_set.cpp \
+    fifffilesharer.cpp
 
 HEADERS += fiff.h \
     fiff_global.h \
@@ -130,15 +133,14 @@ HEADERS += fiff.h \
     c/fiff_types_mne-c.h \
     c/fiff_digitizer_data.h \
     c/fiff_coord_trans_set.h \
+    fifffilesharer.h
 
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+clang {
+    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
+} else {
+    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
+}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-
-# Install headers to include directory
-header_files.files = $${HEADERS}
-header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/fiff
-
-INSTALLS += header_files
 
 contains(MNECPP_CONFIG, withCodeCov) {
     QMAKE_CXXFLAGS += --coverage
@@ -173,3 +175,36 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
     }
 }
 
+################################################## BUILD TIMESTAMP/HASH UPDATER ############################################
+
+FILE_TO_UPDATE = fiff_global.cpp
+win32 {
+    CONFIG(debug, debug|release) {
+        OBJ_TARJET = debug\fiff_global.obj
+    } else {
+        OBJ_TARJET = release\fiff_global.obj
+    }
+}
+
+ALL_FILES += $$HEADERS
+ALL_FILES += $$SOURCES
+ALL_FILES -= $$FILE_TO_UPDATE
+
+FileUpdater.target = phonyFileUpdater
+for (I_FILE, ALL_FILES) {
+    FileUpdater.depends += $${PWD}/$${I_FILE}
+}
+
+unix|macx {
+    FileUpdater.commands = touch $${PWD}/$${FILE_TO_UPDATE} ; echo PASTA > phonyFileUpdater
+}
+
+win32 {
+    FileUpdater.commands = copy /y $$shell_path($${PWD})\\$${FILE_TO_UPDATE} +,, $$shell_path($${PWD})\\$${FILE_TO_UPDATE} & echo PASTA > phonyFileUpdater
+    OrderForcerTarget.target = $${OBJ_TARJET}
+    OrderForcerTarget.depends += phonyFileUpdater
+    QMAKE_EXTRA_TARGETS += OrderForcerTarget
+}
+
+PRE_TARGETDEPS += phonyFileUpdater
+QMAKE_EXTRA_TARGETS += FileUpdater

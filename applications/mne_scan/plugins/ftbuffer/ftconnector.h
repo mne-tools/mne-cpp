@@ -43,8 +43,12 @@
 
 #include <cstring>
 
+#include "ftbuffertypes.h"
+#include "ftheaderparser.h"
+
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_raw_data.h>
+#include <fiff/c/fiff_digitizer_data.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -72,72 +76,13 @@
 namespace FTBUFFERPLUGIN
 {
 
-//=============================================================================================================
-// DEFINITION MACROS
-//=============================================================================================================
-
-#define VERSION    static_cast<qint16>(0x0001)
-
-#define PUT_HDR    static_cast<qint16>(0x0101) /* decimal 257 */
-#define PUT_DAT    static_cast<qint16>(0x0102) /* decimal 258 */
-#define PUT_EVT    static_cast<qint16>(0x0103) /* decimal 259 */
-#define PUT_OK     static_cast<qint16>(0x0104) /* decimal 260 */
-#define PUT_ERR    static_cast<qint16>(0x0105) /* decimal 261 */
-
-#define GET_HDR    static_cast<qint16>(0x0201) /* decimal 513 */
-#define GET_DAT    static_cast<qint16>(0x0202) /* decimal 514 */
-#define GET_EVT    static_cast<qint16>(0x0203) /* decimal 515 */
-#define GET_OK     static_cast<qint16>(0x0204) /* decimal 516 */
-#define GET_ERR    static_cast<qint16>(0x0205) /* decimal 517 */
-
-#define WAIT_DAT   static_cast<qint16>(0x0402) /* decimal 1026 */
-#define WAIT_OK    static_cast<qint16>(0x0404) /* decimal 1027 */
-#define WAIT_ERR   static_cast<qint16>(0x0405) /* decimal 1028 */
-
-#define PUT_HDR_NORESPONSE static_cast<qint16>(0x0501) /* decimal 1281 */
-#define PUT_DAT_NORESPONSE static_cast<qint16>(0x0502) /* decimal 1282 */
-#define PUT_EVT_NORESPONSE static_cast<qint16>(0x0503) /* decimal 1283 */
-
-//=============================================================================================================
-// STRUCT DEFINITIONS
-//=============================================================================================================
-
-typedef struct {
-    qint32 nchans;
-    qint32 nsamples;
-    qint32 data_type;
-    qint32 bufsize;     /* size of the buffer in bytes */
-} datadef_t;
-
-typedef struct {
-    qint32  nchans;
-    qint32  nsamples;
-    qint32  nevents;
-    float   fsample;
-    qint32  data_type;
-    qint32  bufsize;     /* size of the buffer in bytes */
-} headerdef_t;
-
-typedef struct {
-    qint16 version;   /* see VERSION */
-    qint16 command;   /* see PUT_xxx, GET_xxx and FLUSH_xxx */
-    qint32 bufsize;   /* size of the buffer in bytes */
-} messagedef_t;
-
-typedef struct {
-    messagedef_t *def;
-    void         *buf;
-} message_t;
-
-typedef struct {
-    qint32 begsample; /* indexing starts with 0, should be >=0 */
-    qint32 endsample; /* indexing starts with 0, should be <header.nsamples */
-} datasel_t;
-
-typedef struct {
-    qint32 nsamples;
-    qint32 nevents;
-} samples_events_t;
+struct BufferInfo{
+    int     iNumSamples;                          /**< Number of samples we've read from the buffer. */
+    int     iNumNewSamples;                       /**< Number of total samples (read and unread) in the buffer. */
+    int     iMsgSamples;                          /**< Number of samples in the latest buffer transmission receied. */
+    int     iNumChannels;                         /**< Number of channels in the buffer data. */
+    int     iDataType;                            /**< Type of data in the buffer. */
+};
 
 //=============================================================================================================
 
@@ -264,13 +209,15 @@ public:
      *
      * @return returns the FiffInfo from the parsed fif file from the neuromag header chunk.
      */
-    FIFFLIB::FiffInfo parseNeuromagHeader();
+    MetaData parseBufferHeaders();
 
     //=========================================================================================================
     /**
      * Gets the current number of samples in the buffer and stores it in m_iNumSamples
      */
     void catchUpToBuffer();
+
+    BufferInfo getBufferInfo();
 
 private:
     //=========================================================================================================
@@ -341,7 +288,7 @@ private:
 
     //=========================================================================================================
     /**
-     * @brief Opens Buffer, reads numBytes from socket and sets index to zero
+     * Opens Buffer, reads numBytes from socket and sets index to zero
      *
      * @param[out] buffer       QBuffer to which daa will be written.
      * @param[in] numBytes      How many bytes to read from socket.
@@ -357,12 +304,21 @@ private:
      */
     int totalBuffSamples();
 
+    //=========================================================================================================
+    /**
+     * Returns FiffInfo object initilized based on base filedtrip header info
+     *
+     * @return FiffInfo object based on filedtrip header
+     */
+    FIFFLIB::FiffInfo infoFromSimpleHeader();
+
+    int                                     m_iMinSampleRead;                       /**< Number of samples that need to be added t obuffer before we try to read. */
     int                                     m_iNumSamples;                          /**< Number of samples we've read from the buffer. */
     int                                     m_iNumNewSamples;                       /**< Number of total samples (read and unread) in the buffer. */
     int                                     m_iMsgSamples;                          /**< Number of samples in the latest buffer transmission receied. */
     int                                     m_iNumChannels;                         /**< Number of channels in the buffer data. */
     int                                     m_iDataType;                            /**< Type of data in the buffer. */
-    int                                     m_iNeuromagHeader;                      /**< Size of neuromag header chunk. */
+    int                                     m_iExtendedHeaderSize;                  /**< Size of extended header chunks. */
     quint16                                 m_iPort;                                /**< Port where the ft bufferis found. */
 
     bool                                    m_bNewData;                             /**< Indicate whether we've received new data. */

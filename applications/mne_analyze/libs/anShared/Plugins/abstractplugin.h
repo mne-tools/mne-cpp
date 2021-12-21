@@ -5,6 +5,7 @@
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+ *           Juan Garcia-Prieto <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.6
  * @date     October, 2020
  *
@@ -86,9 +87,15 @@ public:
 
     //=========================================================================================================
     /**
+     * Contructor of an AbstractPlugin object.
+     */
+    AbstractPlugin();
+
+    //=========================================================================================================
+    /**
      * Destroys the plugin.
      */
-    virtual ~AbstractPlugin() {}
+    virtual ~AbstractPlugin();
 
     //=========================================================================================================
     /**
@@ -152,27 +159,106 @@ public:
 
     //=========================================================================================================
     /**
+     * Called by the EventManager in case a subscribed-for Event has happened.
+     *
+     * @param e The Event that has taken place
+     */
+    virtual void handleEvent(QSharedPointer<Event> e) = 0;
+
+    //=========================================================================================================
+    /**
+     * Returns string with plugin build date and time.
+     *
+     * @return build date and time
+     */
+    virtual QString getBuildInfo() = 0;
+
+    //=========================================================================================================
+    /**
      * Initializes the plugin based on cmd line inputs given by the user.
      *
-     * @param[in] sArguments  the cmd line arguments.
+     * @param[in] sArguments  The cmd line arguments.
      */
-    virtual inline void cmdLineStartup(const QStringList& sArguments);
+    virtual void cmdLineStartup(const QStringList& sArguments);
+
+    //=========================================================================================================
+    /**
+     * Set the order hint for the GUI of MNE Analyze to decide in which order the menu for this plugin will appear.
+     * @return order hint for the menu position.
+     */
+    virtual int getOrder() const;
+
+    //=========================================================================================================
+    /**
+     * Set the order hint for the GUI of MNE Analyze to decide in which order the menu for this plugin will appear.
+     *
+     * @param order hint for the menu position.
+     */
+    virtual void setOrder(int order);
 
     //=========================================================================================================
     /**
      * Sets the global data, which provides the central database.
      *
-     * @param[in] globalData  the global data.
+     * @param e The Event that has taken place.
      */
-    virtual inline void setGlobalData(QSharedPointer<AnalyzeData> globalData);
+    virtual void setGlobalData(QSharedPointer<AnalyzeData> globalData);
 
     //=========================================================================================================
     /**
-     * Called by the EventManager in case a subscribed-for Event has happened.
+     * Set whether this plugin has been initialised or not.
      *
-     * @param e The Event that has taken place.
+     * @param b The initialization status.
      */
-    virtual void handleEvent(QSharedPointer<Event> e) = 0;
+    void setInitState(bool b);
+    //=========================================================================================================
+    /**
+     * Get the initialization state of the plugin.
+     *
+     */
+    bool hasBeenInitialized() const;
+
+    //=========================================================================================================
+    /**
+     * Retrieve if the plugin Menu has already been loaded.
+     * @return state of the menu loading.
+     */
+    bool menuAlreadyLoaded() const;
+
+    //=========================================================================================================
+    /**
+     * Retrieve if the plugin View has already been loaded.
+     * @return state of the view loading.
+     */
+    bool viewAlreadyLoaded() const;
+
+    //=========================================================================================================
+    /**
+     * Retrieve if the plugin Control has already been loaded.
+     * @return state of the control loading.
+     */
+    bool controlAlreadyLoaded() const;
+
+    //=========================================================================================================
+    /**
+     * Set the loading state of the view menus for thisplugins.
+     * @param b new loading state.
+     */
+    void setViewLoadingState(bool b);
+
+    //=========================================================================================================
+    /**
+     * Set the loading state of the control menus for this plugin.
+     * @param b new loading state.
+     */
+    void setControlLoadingState(bool b);
+
+    //=========================================================================================================
+    /**
+     * Set the loading state of the menus for this plugin.
+     * @param b new loading state.
+     */
+    void setMenuLoadingState(bool b);
 
 signals:
     //=========================================================================================================
@@ -193,24 +279,13 @@ signals:
 
 protected:
     QSharedPointer<AnalyzeData>     m_pAnalyzeData;         /**< Pointer to the global data base */
-    bool                            m_bAlreadyLoaded;
+    bool m_bInitialized;                                    /**< Store the initialization state of the plugin. */
+    bool m_bMenuAlreadyLoaded;                              /**< Store if the plugin view has already been docked into the GUI. */
+    bool m_bViewAlreadyLoaded;                              /**< Store if the plugin view has already been docked into the GUI. */
+    bool m_bControlAlreadyLoaded;                           /**< Store if the plugin control has already been docked into the GUI. */
+    int m_iOrder;                                           /**< Hint to order the control in the list of controls. */
+
 };
-
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-void AbstractPlugin::cmdLineStartup(const QStringList& sArguments)
-{
-    Q_UNUSED(sArguments)
-}
-
-//=============================================================================================================
-
-void AbstractPlugin::setGlobalData(QSharedPointer<AnalyzeData> globalData)
-{
-    m_pAnalyzeData = globalData;
-}
 
 } //Namespace
 

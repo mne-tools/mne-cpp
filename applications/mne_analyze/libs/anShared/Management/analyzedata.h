@@ -213,26 +213,31 @@ public:
 
         switch(temp->getType()){
         case ANSHAREDLIB_FIFFRAW_MODEL:
-        case ANSHAREDLIB_NOISE_MODEL:
+        case ANSHAREDLIB_NOISE_MODEL: {
             iType = BIDS_FUNCTIONALDATA;
             index = m_SelectedItem;
             break;
+        }
         case ANSHAREDLIB_BEMDATA_MODEL:
-        case ANSHAREDLIB_MRICOORD_MODEL:
+        case ANSHAREDLIB_MRICOORD_MODEL: {
             iType = BIDS_ANATOMICALDATA;
             index = m_SelectedItem;
             break;
-        case ANSHAREDLIB_ANNOTATION_MODEL:
-            iType = BIDS_ANNOTATION;
+        }
+        case ANSHAREDLIB_EVENT_MODEL: {
+            iType = BIDS_EVENT;
             index = m_SelectedFunctionalData;
             break;
-        case ANSHAREDLIB_AVERAGING_MODEL:
+        }
+        case ANSHAREDLIB_AVERAGING_MODEL: {
             iType = BIDS_AVERAGE;
             index = m_SelectedFunctionalData;
             break;
-        default:
+        }
+        default: {
             iType = BIDS_UNKNOWN;
             index = m_SelectedItem;
+        }
         }
 
         QStandardItem* pItem = new QStandardItem(temp->getModelName());
@@ -264,27 +269,39 @@ public:
         data.setValue(temp);
 
         switch(temp->getType()){
-            case ANSHAREDLIB_AVERAGING_MODEL:
-                pItem->setData(data);
-                m_pData->addToData(pItem,
-                                   m_SelectedFunctionalData,
-                                   BIDS_AVERAGE);
-                break;
-            case ANSHAREDLIB_ANNOTATION_MODEL:
-                pItem->setData(data);
-                m_pData->addToData(pItem,
-                                   m_SelectedFunctionalData,
-                                   BIDS_ANNOTATION);
-                break;
-            case ANSHAREDLIB_DIPOLEFIT_MODEL:
-                pItem->setData(data);
-                m_pData->addToData(pItem,
-                                   m_SelectedFunctionalData,
-                                   BIDS_DIPOLE);
-                break;
-            default:
-                qWarning() << "[AnalyzeData::addModel] Model type not supported";
-                break;
+        case ANSHAREDLIB_AVERAGING_MODEL:{
+            pItem->setData(data);
+            m_pData->addToData(pItem,
+                               m_SelectedFunctionalData,
+                               BIDS_AVERAGE);
+            break;
+        }
+        case ANSHAREDLIB_EVENT_MODEL: {
+            pItem->setData(data);
+            m_pData->addToData(pItem,
+                               m_SelectedFunctionalData,
+                               BIDS_EVENT);
+            break;
+        }
+        case ANSHAREDLIB_DIPOLEFIT_MODEL:{
+            pItem->setData(data);
+            m_pData->addToData(pItem,
+                               m_SelectedFunctionalData,
+                               BIDS_DIPOLE);
+            break;
+        }
+        case ANSHAREDLIB_FIFFRAW_MODEL: {
+            pItem->setData(data);
+            QModelIndex index = m_SelectedItem;
+            m_pData->addData(index,
+                             pItem,
+                             BIDS_FUNCTIONALDATA);
+            break;
+        }
+        default:{
+            qWarning() << "[AnalyzeData::addModel] Model type not supported";
+            break;
+        }
         }
         return pNewModel;
     }

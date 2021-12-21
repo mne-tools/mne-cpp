@@ -64,8 +64,8 @@ class ANSHAREDSHARED_EXPORT DipoleFitModel : public AbstractModel
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<DipoleFitModel> SPtr;              /**< Shared pointer type for AnnotationModel. */
-    typedef QSharedPointer<const DipoleFitModel> ConstSPtr;   /**< Const shared pointer type for AnnotationModel. */
+    typedef QSharedPointer<DipoleFitModel> SPtr;              /**< Shared pointer type for DipoleFitModel. */
+    typedef QSharedPointer<const DipoleFitModel> ConstSPtr;   /**< Const shared pointer type for DipoleFitModel. */
 
 public:
     //=========================================================================================================

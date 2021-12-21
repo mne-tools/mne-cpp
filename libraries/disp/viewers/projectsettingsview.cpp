@@ -51,6 +51,7 @@
 #include <QMessageBox>
 #include <QTime>
 #include <QSettings>
+#include <QFileDialog>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -86,6 +87,34 @@ ProjectSettingsView::ProjectSettingsView(const QString& sSettingsPath,
     scanForProjects();
     scanForSubjects();
 
+    connectGui();
+
+    m_pUi->m_qLineEditFileName->setReadOnly(true);
+
+    m_pUi->m_lineEditDirectory->setReadOnly(true);
+    m_pUi->m_lineEditDirectory->setText(m_sDataPath);
+
+    updateFileName();
+
+    //Hide remaining time
+    m_pUi->m_label_RemainingTime->hide();
+    m_pUi->m_label_timeToGo->hide();
+
+//    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+//                                              tr("User name:"), QLineEdit::Normal,
+//                                              QDir::home().dirName(), &ok);
+
+    //Hide delete buttons
+    m_pUi->m_qPushButtonDeleteProject->hide();
+    m_pUi->m_qPushButtonDeleteSubject->hide();
+
+    loadSettings();
+}
+
+//=============================================================================================================
+
+void ProjectSettingsView::connectGui()
+{
     connect(m_pUi->m_qComboBox_ProjectSelection,static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
                 this,&ProjectSettingsView::selectNewProject);
 
@@ -119,23 +148,8 @@ ProjectSettingsView::ProjectSettingsView(const QString& sSettingsPath,
     connect(m_pUi->m_checkBox_useRecordingTimer,&QCheckBox::toggled,
                 this,&ProjectSettingsView::onRecordingTimerStateChanged);
 
-    m_pUi->m_qLineEditFileName->setReadOnly(true);
-
-    updateFileName();
-
-    //Hide remaining time
-    m_pUi->m_label_RemainingTime->hide();
-    m_pUi->m_label_timeToGo->hide();
-
-//    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
-//                                              tr("User name:"), QLineEdit::Normal,
-//                                              QDir::home().dirName(), &ok);
-
-    //Hide delete buttons
-    m_pUi->m_qPushButtonDeleteProject->hide();
-    m_pUi->m_qPushButtonDeleteSubject->hide();
-
-    loadSettings();
+    connect(m_pUi->m_pushButtonDirectory, &QPushButton::released,
+            this, &ProjectSettingsView::browseDirectories);
 }
 
 //=============================================================================================================
@@ -487,4 +501,62 @@ void ProjectSettingsView::onRecordingTimerStateChanged(bool state)
 void ProjectSettingsView::clearView()
 {
 
+}
+
+//=============================================================================================================
+
+void ProjectSettingsView::triggerFileNameUpdate()
+{
+    updateFileName();
+}
+
+//=============================================================================================================
+
+void ProjectSettingsView::browseDirectories()
+{
+    QString sDir = QFileDialog::getExistingDirectory(this,
+                                                     tr("Select Project Directory"),
+                                                     QDir::homePath(),
+                                                     QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+    if(!sDir.isEmpty() && !sDir.isNull()){
+        m_sDataPath = sDir;
+        m_pUi->m_lineEditDirectory->setText(m_sDataPath);
+        scanForProjects();
+        scanForSubjects();
+        updateFileName(true);
+    }
+}
+
+//=============================================================================================================
+
+void ProjectSettingsView::hideFileNameUi()
+{
+    m_pUi->m_qLine->hide();
+    m_pUi->m_qLineEditFileName->hide();
+    m_pUi->m_qLabel->hide();
+}
+
+//=============================================================================================================
+
+void ProjectSettingsView::showFileNameUi()
+{
+    m_pUi->m_qLine->show();
+    m_pUi->m_qLineEditFileName->show();
+    m_pUi->m_qLabel->show();
+}
+
+//=============================================================================================================
+
+void ProjectSettingsView::hideParadigmUi()
+{
+    m_pUi->m_qLabel_Paradigm->hide();
+    m_pUi->m_qLineEditParadigm->hide();
+}
+
+//=============================================================================================================
+
+void ProjectSettingsView::showParadigmUi()
+{
+    m_pUi->m_qLabel_Paradigm->show();
+    m_pUi->m_qLineEditParadigm->show();
 }

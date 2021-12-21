@@ -79,6 +79,7 @@ CONFIG(debug, debug|release) {
             -lmnecppFiffd \
             -lmnecppFsd \
             -lmnecppUtilsd \
+            -lmnecppEventsd \
 } else {
     LIBS += -lmnecppConnectivity \
             -lmnecppRtProcessing \
@@ -88,9 +89,11 @@ CONFIG(debug, debug|release) {
             -lmnecppFiff \
             -lmnecppFs \
             -lmnecppUtils \
+            -lmnecppEvents \
 }
 
 SOURCES += \
+    disp_global.cpp \
     plots/imagesc.cpp \
     plots/plot.cpp \
     plots/graph.cpp \
@@ -243,14 +246,12 @@ FORMS += \
     viewers/formfiles/applytoview.ui \
     viewers/formfiles/bidsview.ui \
 
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+clang {
+    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
+} else {
+    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
+}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-
-# Install headers to include directory
-header_files.files = $${HEADERS}
-header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/disp
-
-INSTALLS += header_files
 
 contains(MNECPP_CONFIG, withCodeCov) {
     QMAKE_CXXFLAGS += --coverage
@@ -284,3 +285,37 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
                 -lfftw3_threads \
     }
 }
+
+################################################## BUILD TIMESTAMP/HASH UPDATER ############################################
+
+FILE_TO_UPDATE = disp_global.cpp
+win32 {
+    CONFIG(debug, debug|release) {
+        OBJ_TARJET = debug\disp_global.obj
+    } else {
+        OBJ_TARJET = release\disp_global.obj
+    }
+}
+
+ALL_FILES += $$HEADERS
+ALL_FILES += $$SOURCES
+ALL_FILES -= $$FILE_TO_UPDATE
+
+FileUpdater.target = phonyFileUpdater
+for (I_FILE, ALL_FILES) {
+    FileUpdater.depends += $${PWD}/$${I_FILE}
+}
+
+unix|macx {
+    FileUpdater.commands = touch $${PWD}/$${FILE_TO_UPDATE} ; echo PASTA > phonyFileUpdater
+}
+
+win32 {
+    FileUpdater.commands = copy /y $$shell_path($${PWD})\\$${FILE_TO_UPDATE} +,, $$shell_path($${PWD})\\$${FILE_TO_UPDATE} & echo PASTA > phonyFileUpdater
+    OrderForcerTarget.target = $${OBJ_TARJET}
+    OrderForcerTarget.depends += phonyFileUpdater
+    QMAKE_EXTRA_TARGETS += OrderForcerTarget
+}
+
+PRE_TARGETDEPS += phonyFileUpdater
+QMAKE_EXTRA_TARGETS += FileUpdater

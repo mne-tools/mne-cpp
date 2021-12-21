@@ -37,17 +37,18 @@
 
 include(../../../mne-cpp.pri)
 
+QMAKE_TARGET_DESCRIPTION = MNE Analyze
+
 TEMPLATE = app
 
 QT += gui widgets network opengl svg concurrent charts
 qtHaveModule(printsupport): QT += printsupport
 
-CONFIG += console
-
 DESTDIR = $${MNE_BINARY_DIR}
 
 TARGET = mne_analyze
 CONFIG(debug, debug|release) {
+    CONFIG += console
     TARGET = $$join(TARGET,,,d)
 }
 
@@ -81,7 +82,7 @@ contains(MNECPP_CONFIG, static) {
     LIBS += -ldataloader \
             -ldatamanager \
             -lrawdataviewer \
-            -lannotationmanager \
+            -levents \
             -lfiltering \
             -laveraging \
             -lsourcelocalization \
@@ -111,6 +112,7 @@ LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lanSharedd \
             -lmnecppDispd \
+            -lmnecppEventsd \
             -lmnecppConnectivityd \
             -lmnecppRtProcessingd \
             -lmnecppInversed \
@@ -122,6 +124,7 @@ CONFIG(debug, debug|release) {
 } else {
     LIBS += -lanShared \
             -lmnecppDisp \
+            -lmnecppEvents \
             -lmnecppConnectivity \
             -lmnecppRtProcessing \
             -lmnecppInverse \
@@ -147,7 +150,11 @@ RESOURCES += \
         $${ROOT_DIR}/bin/resources/general/styles/styles.qrc \
         $${ROOT_DIR}/bin/resources/general/fonts/fonts.qrc
 
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+clang {
+    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
+} else {
+    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
+}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 

@@ -3,7 +3,8 @@
  * @file     fiff_info.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+ *           Juan GPC <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     July, 2012
  *
@@ -221,11 +222,17 @@ public:
 
     //=========================================================================================================
     /**
-     * Writes the fiff information to a FIF stream
+     * Writes the fiff information to a FIF stream.
      *
      * @param[in] p_pStream  The stream to write to.
      */
     void writeToStream(FiffStream* p_pStream) const;
+
+    //=========================================================================================================
+    /**
+     * Prints class contents.
+     */
+    void print() const;
 
 private:
     //=========================================================================================================

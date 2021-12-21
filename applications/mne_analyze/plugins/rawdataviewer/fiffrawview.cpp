@@ -39,11 +39,12 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <math.h>
 #include "fiffrawview.h"
 #include "fiffrawviewdelegate.h"
 
 #include <anShared/Model/fiffrawviewmodel.h>
-#include <anShared/Model/annotationmodel.h>
+#include <anShared/Model/eventmodel.h>
 
 #include <rtprocessing/helpers/filterkernel.h>
 
@@ -96,6 +97,9 @@ FiffRawView::FiffRawView(QWidget *parent)
 
     //Create position labels
     createBottomLabels();
+
+    //Create Right-click Context menu
+    initRightClickContextMenu();
 
     m_pTableView->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
     //m_pTableView->horizontalScrollBar()->setRange(0, m_pTableView->horizontalScrollBar()->maximum() / 1000000);
@@ -225,6 +229,9 @@ void FiffRawView::setModel(const QSharedPointer<FiffRawViewModel>& pModel)
     m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(m_pTableView.data(), &QWidget::customContextMenuRequested,
             this, &FiffRawView::customContextMenuRequested, Qt::UniqueConnection);
+
+    connect(m_pModel.data(), &FiffRawViewModel::newRealtimeData,
+            this, &FiffRawView::onNewRealtimeData, Qt::UniqueConnection);
 
 //    //Gestures
 //    m_pTableView->grabGesture(Qt::PinchGesture);
@@ -372,24 +379,30 @@ void FiffRawView::onMakeScreenshot(const QString& imageType)
 
 //=============================================================================================================
 
+void FiffRawView::initRightClickContextMenu()
+{
+    m_pRightClickContextMenu = new QMenu(this);
+
+    m_pAddEventAction = m_pRightClickContextMenu->addAction(tr("Add Event"));
+    connect(m_pAddEventAction, &QAction::triggered,
+            this, &FiffRawView::addTimeMark, Qt::UniqueConnection);
+}
+
+//=============================================================================================================
+
 void FiffRawView::customContextMenuRequested(const QPoint &pos)
 {
     if(!m_pModel || m_pModel->isEmpty()) {
         return;
     }
 
-    //double dScrollDiff = static_cast<double>(m_pTableView->horizontalScrollBar()->maximum()) / static_cast<double>(m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample());
-    m_fLastClickedSample = floor((float)m_pModel->absoluteFirstSample() + //accounting for first sample offset
-                             (m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()) + //accounting for scroll offset
-                             ((float)pos.x() / m_pModel->pixelDifference())); //accounting for mouse position offset
+    int iFirstSampleOffset = m_pModel->absoluteFirstSample();
+    int iScrollBarOffset = static_cast<int>(std::round(m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()));
+    int iMouseOffset = static_cast<int>(std::round(pos.x() / m_pModel->pixelDifference()));
 
-    QMenu* menu = new QMenu(this);
+    m_iLastClickedSample = iFirstSampleOffset + iScrollBarOffset + iMouseOffset;
 
-    QAction* markTime = menu->addAction(tr("Add Event"));
-    connect(markTime, &QAction::triggered,
-            this, &FiffRawView::addTimeMark, Qt::UniqueConnection);
-
-    menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
+    m_pRightClickContextMenu->popup(m_pTableView->viewport()->mapToGlobal(pos));
 }
 
 //=============================================================================================================
@@ -402,7 +415,7 @@ void FiffRawView::addTimeMark(bool con)
         return;
     }
 
-    emit sendSamplePos(static_cast<int>(m_fLastClickedSample));
+    emit sendSamplePos(m_iLastClickedSample);
 }
 
 //=============================================================================================================
@@ -415,7 +428,7 @@ void FiffRawView::toggleDisplayEvent(const int& iToggle)
 
     int m_iToggle = iToggle;
 
-    m_pModel->toggleDispAnnotation(m_iToggle);
+    m_pModel->toggleDispEvent(m_iToggle);
     m_pTableView->viewport()->repaint();
 }
 
@@ -436,7 +449,7 @@ bool FiffRawView::eventFilter(QObject *object, QEvent *event)
         && event->type() == QEvent::Enter) {
         QScroller::ungrabGesture(m_pTableView);
         return true;
-    }
+    } else
 
     //Activate grabbing gesture when scrollbars or vertical header are deselected
     if ((object == m_pTableView->horizontalScrollBar() ||
@@ -445,20 +458,51 @@ bool FiffRawView::eventFilter(QObject *object, QEvent *event)
         && event->type() == QEvent::Leave) {
         QScroller::grabGesture(m_pTableView, QScroller::LeftMouseButtonGesture);
         return true;
+    } else
+
+    if(event->type() == QEvent::KeyPress){
+        qDebug() << "Key Press";
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        switch(keyEvent->key()){
+        case Qt::Key_E :{
+            if(m_pModel){
+                m_iLastClickedSample = m_pModel->getScrollerPosition();
+                addTimeMark(true);
+            }
+        }
+        }
     }
 
-    return false;
+    if(event->type() == QEvent::MouseButtonPress){
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+        switch(mouseEvent->button()){
+        case Qt::LeftButton:{
+            if(m_pModel && object == m_pTableView->viewport()){
+            QPoint pos = mouseEvent->pos();
+            m_pModel->setScrollerSample(static_cast<int>(floor((float)m_pModel->absoluteFirstSample() + //accounting for first sample offset
+                                     (m_pTableView->horizontalScrollBar()->value() / m_pModel->pixelDifference()) + //accounting for scroll offset
+                                     ((float)pos.x() / m_pModel->pixelDifference())))); //accounting for mouse position offset
+            m_pTableView->viewport()->repaint();
+            }
+        }
+        }
+
+    }
+
+
+    return QWidget::eventFilter(object, event);
 }
 
 //=============================================================================================================
 
-void FiffRawView::updateScrollPositionToAnnotation()
+void FiffRawView::updateScrollPositionToEvent()
 {
     if(!m_pModel) {
         return;
     }
 
-    int iSample = m_pModel->getAnnotationModel()->getAnnotation(m_pModel->getAnnotationModel()->getSelectedAnn()) - m_pModel->absoluteFirstSample();
+    auto events = m_pModel->getEventModel()->getEventsToDisplay(0, m_pModel->absoluteLastSample());
+    int iSample = events->at(m_pModel->getEventModel()->getEventSelection().front()).sample - m_pModel->absoluteFirstSample();
     double dDx = m_pModel->pixelDifference();
 
     //qDebug() << "Div:" << iSample * dDx;
@@ -580,6 +624,9 @@ void FiffRawView::disconnectModel()
     // Disconnect resizing of the table view to the MVC
     disconnect(this, &FiffRawView::tableViewDataWidthChanged,
             m_pModel.data(), &FiffRawViewModel::setDataColumnWidth);
+
+    disconnect(m_pModel.data(), &FiffRawViewModel::newRealtimeData,
+               this, &FiffRawView::onNewRealtimeData);
 }
 
 //=============================================================================================================
@@ -688,7 +735,11 @@ void FiffRawView::updateFileLabel()
         int iFileLengthInSamples = m_pModel->absoluteLastSample() - m_pModel->absoluteFirstSample();
         float fFileLengthInSeconds = static_cast<float>(iFileLengthInSamples) / fFrequency;
 
-        label += "   |   " + m_pModel->getModelName();
+        if(m_pModel->isRealtime()){
+            label += "   |   MNE Scan Session";
+        } else {
+            label += "   |   " + m_pModel->getModelName();
+        }
         label += "  -  Sampling Freq. " + QString::number(m_pModel->getSamplingFrequency(),'g',5) + "Hz";
         label += "  -  Length: " + QString::number(fFileLengthInSeconds,'g',5) + "s.";
         m_pFileLabel->setText(label);
@@ -709,4 +760,17 @@ void FiffRawView::updateFilterLabel()
     }
     label += "  -  " + m_pModel->getFilter().getShortDescription() + "  |";
     m_pFilterLabel->setText(label);
+}
+
+//=============================================================================================================
+
+void FiffRawView::onNewRealtimeData()
+{
+    updateView();
+
+    updateTimeLabels(0);
+    updateFileLabel();
+    updateFilterLabel();
+
+    emit realtimeDataUpdated();
 }

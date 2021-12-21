@@ -3,7 +3,8 @@
  * @file     analyzecore.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+ *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
+ *           Juan Garcia-Prieto <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     March, 2018
  *
@@ -38,6 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <functional>
 #include "analyzecore.h"
 #include "mainwindow.h"
 #include "../libs/anShared/Plugins/abstractplugin.h"
@@ -66,13 +68,13 @@ using namespace ANSHAREDLIB;
 // CONST
 //=============================================================================================================
 
-const char* pluginsDir = "/mne_analyze_plugins";        /**< holds path to the plugins.*/
+const char* pluginsDir = "/mne_analyze_plugins";        /**< Holds path to the plugins.*/
 
 //=============================================================================================================
 // GLOBAL DEFINES
 //=============================================================================================================
 
-QPointer<MainWindow> m_pMainWindow;          /**< The main window. */
+QPointer<MainWindow> appMainWindowHandler(Q_NULLPTR);          /**< The main window. */
 
 //=============================================================================================================
 /**
@@ -86,8 +88,9 @@ void customMessageHandler(QtMsgType type, const
                           QMessageLogContext &context,
                           const QString &msg)
 {
-    m_pMainWindow->writeToLog(type, context, msg);
+    appMainWindowHandler->writeToLog(type, context, msg);
 }
+
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -95,6 +98,9 @@ void customMessageHandler(QtMsgType type, const
 
 AnalyzeCore::AnalyzeCore(QObject* parent)
 : QObject(parent)
+, m_pPluginManager(Q_NULLPTR)
+, m_pAnalyzeData(Q_NULLPTR)
+, m_pMainWindow(Q_NULLPTR)
 {    
     // Initialize cmd line parser
     initCmdLineParser();
@@ -115,6 +121,7 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
     splash.hide();
 
     // Setup log window
+    appMainWindowHandler = m_pMainWindow;
     qInstallMessageHandler(customMessageHandler);
 
     // Initialize cmd line inputs if provided by the user
@@ -172,14 +179,14 @@ void AnalyzeCore::showMainWindow()
 
 void AnalyzeCore::initGlobalData()
 {
-    m_analyzeData = AnalyzeData::SPtr::create();
+    m_pAnalyzeData = AnalyzeData::SPtr::create();
 }
 
 //=============================================================================================================
 
 void AnalyzeCore::initEventSystem()
 {
-    EventManager::getEventManager().startEventHandling();
+    EventManager::startEventHandling();
 }
 
 //=============================================================================================================
@@ -187,17 +194,40 @@ void AnalyzeCore::initEventSystem()
 void AnalyzeCore::initPluginManager()
 {
     m_pPluginManager = QSharedPointer<PluginManager>::create();
+    loadandInitPlugins();
+}
+
+//=============================================================================================================
+
+void AnalyzeCore::loadandInitPlugins()
+{
     m_pPluginManager->loadPluginsFromDirectory(qApp->applicationDirPath() + pluginsDir);
-    m_pPluginManager->initPlugins(m_analyzeData);
+    m_pPluginManager->initPlugins(m_pAnalyzeData);
+}
+
+//=============================================================================================================
+
+QVector<ANSHAREDLIB::AbstractPlugin*> AnalyzeCore::getLoadedPlugins()
+{
+    return m_pPluginManager->getPlugins();
+}
+
+//=============================================================================================================
+
+bool AnalyzeCore::pluginsInitialized() const
+{
+    return !m_pPluginManager.isNull();
 }
 
 //=============================================================================================================
 
 void AnalyzeCore::initMainWindow()
 {
-    m_pMainWindow = new MainWindow(m_pPluginManager);
+    m_pMainWindow = new MainWindow(this);
     QObject::connect(m_pMainWindow.data(), &MainWindow::mainWindowClosed,
-                     this, &AnalyzeCore::onMainWindowClosed);
+                     this, &AnalyzeCore::shutdown);
+    QObject::connect(m_pMainWindow.data(), &MainWindow::reloadPlugins,
+                     this, &AnalyzeCore::reloadPlugins);
 }
 
 //=============================================================================================================
@@ -209,10 +239,18 @@ void AnalyzeCore::registerMetaTypes()
 
 //=============================================================================================================
 
-void AnalyzeCore::onMainWindowClosed()
+void AnalyzeCore::shutdown()
 {
-    EventManager::getEventManager().shutdown();
+    EventManager::shutdown();
 
     // shutdown every plugin, empty analzye data etc.
     m_pPluginManager->shutdown();
+}
+
+//=============================================================================================================
+
+void AnalyzeCore::reloadPlugins()
+{
+    loadandInitPlugins();
+    m_pMainWindow->updatePluginsUI();
 }

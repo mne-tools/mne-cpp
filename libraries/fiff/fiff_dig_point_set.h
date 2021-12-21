@@ -103,6 +103,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Construct FiffDigPointSet based on input pointList
+     *
+     * @param[in] pointList     list of digitizer points
+     */
+    FiffDigPointSet(QList<FIFFLIB::FiffDigPoint> pointList);
+
+    //=========================================================================================================
+    /**
      * Default constructor
      */
     FiffDigPointSet(QIODevice &p_IODevice);
@@ -218,6 +226,14 @@ public:
      * @param[in] bApplyInverse Whether to apply the inverse. False by default.
      */
     void applyTransform(const FiffCoordTrans& coordTrans, bool bApplyInverse = false);
+
+    //=========================================================================================================
+    /**
+     * Returns list of digitizer point the set contains
+     *
+     * @return list of digitizer points
+     */
+    QList<FiffDigPoint> getList();
 
 //    ToDo:
 //    //=========================================================================================================

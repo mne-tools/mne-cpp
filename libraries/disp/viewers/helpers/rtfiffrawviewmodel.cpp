@@ -3,12 +3,14 @@
  * @file     rtfiffrawviewmodel.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>;
+ *           Juan Garcia-Prieto <juangpc@gmail.com>
  * @since    0.1.0
  * @date     May, 2014
  *
  * @section  LICENSE
  *
- * Copyright (C) 2014, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Gabriel Motta, Juan Garcia-Prieto. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -56,6 +58,7 @@
 #include <QCoreApplication>
 #include <QtConcurrent>
 #include <QFuture>
+#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -75,32 +78,43 @@ using namespace RTPROCESSINGLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
+EVENTSLIB::EventManager RtFiffRawViewModel::m_EventManager;
+
 RtFiffRawViewModel::RtFiffRawViewModel(QObject *parent)
 : QAbstractTableModel(parent)
-, m_bSpharaActivated(false)
 , m_bProjActivated(false)
 , m_bCompActivated(false)
+, m_bSpharaActivated(false)
+, m_bIsFreezed(false)
+, m_bDrawFilterFront(true)
 , m_bPerformFiltering(false)
+, m_bTriggerDetectionActive(false)
 , m_fSps(1024.0f)
+, m_dTriggerThreshold(0.01)
 , m_iT(10)
 , m_iDownsampling(10)
 , m_iMaxSamples(1024)
 , m_iCurrentSample(0)
-, m_bIsFreezed(false)
-, m_sFilterChannelType("MEG")
+, m_iCurrentStartingSample(0)
+, m_iCurrentSampleFreeze(0)
 , m_iMaxFilterLength(128)
 , m_iCurrentBlockSize(1024)
 , m_iResidual(0)
-, m_bDrawFilterFront(true)
-, m_bTriggerDetectionActive(false)
-, m_dTriggerThreshold(0.01)
+, m_iCurrentTriggerChIndex(0)
 , m_iDistanceTimerSpacer(1000)
 , m_iDetectedTriggers(0)
-, m_iCurrentSampleFreeze(0)
-, m_iCurrentTriggerChIndex(0)
+, m_sFilterChannelType("MEG")
 , m_pFiffInfo(FiffInfo::SPtr::create())
 , m_colBackground(Qt::white)
 {
+    m_EventManager.initSharedMemory(EVENTSLIB::SharedMemoryMode::READWRITE);
+}
+
+//=============================================================================================================
+
+RtFiffRawViewModel::~RtFiffRawViewModel()
+{
+    m_EventManager.stopSharedMemory();
 }
 
 //=============================================================================================================
@@ -112,11 +126,6 @@ int RtFiffRawViewModel::rowCount(const QModelIndex & /*parent*/) const
     } else {
         return 0;
     }
-
-//    if(!m_qMapIdxRowSelection.empty())
-//        return m_qMapIdxRowSelection.size();
-//    else
-//        return 0;
 }
 
 //=============================================================================================================
@@ -296,7 +305,7 @@ void RtFiffRawViewModel::setFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> &p_pFiffI
             sel = FiffInfoBase::pick_channels(p_pFiffInfo->ch_names, p_pFiffInfo->bads, emptyExclude);
         }
 
-        m_vecBadIdcs = sel;       
+        m_vecBadIdcs = sel;
 
         m_pFiffInfo = p_pFiffInfo;
 
@@ -369,7 +378,7 @@ void RtFiffRawViewModel::setSamplingInfo(float sps, int T, bool bSetZero)
 
     m_iT = T;
 
-    m_iMaxSamples = (qint32)ceil(sps * T);
+    m_iMaxSamples = (qint32) ceil(sps * T);
 
     //Resize data matrix without touching the stored values
     m_matDataRaw.conservativeResize(m_pFiffInfo->chs.size(), m_iMaxSamples);
@@ -385,6 +394,7 @@ void RtFiffRawViewModel::setSamplingInfo(float sps, int T, bool bSetZero)
     }
 
     if(m_iCurrentSample>m_iMaxSamples) {
+        m_iCurrentStartingSample += m_iCurrentSample;
         m_iCurrentSample = 0;
     }
 
@@ -456,6 +466,9 @@ void RtFiffRawViewModel::addData(const QList<MatrixXd> &data)
                     m_matDataRaw.block(0, m_iCurrentSample, nRow, m_iResidual) = data.at(b).block(0,0,nRow,m_iResidual);
                 }
             }
+
+            m_iCurrentStartingSample += m_iCurrentSample;
+            m_iCurrentStartingSample += m_iResidual;
 
             m_iCurrentSample = 0;
 
@@ -1025,7 +1038,7 @@ void RtFiffRawViewModel::markChBad(QModelIndex ch, bool status)
 void RtFiffRawViewModel::triggerInfoChanged(const QMap<double, QColor>& colorMap, bool active, QString triggerCh, double threshold)
 {
     m_qMapTriggerColor = colorMap;
-    m_bTriggerDetectionActive = active;    
+    m_bTriggerDetectionActive = active;
     m_dTriggerThreshold = threshold;
 
     //Find channel index and initialise detected trigger map if channel name changed
@@ -1301,4 +1314,92 @@ void RtFiffRawViewModel::clearModel()
     m_matOverlap.setZero();
 
     endResetModel();
+}
+
+//=============================================================================================================
+
+double RtFiffRawViewModel::getMaxValueFromRawViewModel(int row) const
+{
+    double dMaxValue;
+    qint32 kind = getKind(row);
+
+    switch(kind) {
+        case FIFFV_MEG_CH: {
+            dMaxValue = 1e-11f;
+            qint32 unit = getUnit(row);
+            if(unit == FIFF_UNIT_T_M) { //gradiometers
+                dMaxValue = 1e-10f;
+                if(getScaling().contains(FIFF_UNIT_T_M))
+                    dMaxValue = getScaling()[FIFF_UNIT_T_M];
+            }
+            else if(unit == FIFF_UNIT_T) //magnetometers
+            {
+                dMaxValue = 1e-11f;
+                if(getScaling().contains(FIFF_UNIT_T))
+                    dMaxValue = getScaling()[FIFF_UNIT_T];
+            }
+            break;
+        }
+
+        case FIFFV_REF_MEG_CH: {
+            dMaxValue = 1e-11f;
+            if( getScaling().contains(FIFF_UNIT_T))
+                dMaxValue = getScaling()[FIFF_UNIT_T];
+            break;
+        }
+        case FIFFV_EEG_CH: {
+            dMaxValue = 1e-4f;
+            if( getScaling().contains(FIFFV_EEG_CH))
+                dMaxValue = getScaling()[FIFFV_EEG_CH];
+            break;
+        }
+        case FIFFV_EOG_CH: {
+            dMaxValue = 1e-3f;
+            if( getScaling().contains(FIFFV_EOG_CH))
+                dMaxValue = getScaling()[FIFFV_EOG_CH];
+            break;
+        }
+        case FIFFV_STIM_CH: {
+            dMaxValue = 5;
+            if( getScaling().contains(FIFFV_STIM_CH))
+                dMaxValue = getScaling()[FIFFV_STIM_CH];
+            break;
+        }
+        case FIFFV_MISC_CH: {
+            dMaxValue = 1e-3f;
+            if( getScaling().contains(FIFFV_MISC_CH))
+                dMaxValue = getScaling()[FIFFV_MISC_CH];
+            break;
+        }
+        default :
+        dMaxValue = 1e-9f;
+        break;
+    }
+
+    return dMaxValue;
+}
+
+//=============================================================================================================
+
+void RtFiffRawViewModel::addEvent(int iSample)
+{
+    auto pGroups = m_EventManager.getAllGroups();
+    for(auto g : *pGroups){
+        qDebug() << "Group: " << g.name.c_str() << "- Id: " << g.id;
+    }
+
+    m_EventManager.addEvent(iSample);
+
+    auto pEvents = m_EventManager.getAllEvents();
+
+    for(auto e : *pEvents){
+        qDebug() << "Event> Sample: " << e.sample << "- Id: " << e.id;
+    }
+}
+
+//=============================================================================================================
+
+std::unique_ptr<std::vector<EVENTSLIB::Event> > RtFiffRawViewModel::getEventsToDisplay(int iBegin, int iEnd) const
+{
+    return m_EventManager.getEventsBetween(iBegin, iEnd);
 }

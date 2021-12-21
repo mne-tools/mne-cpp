@@ -63,8 +63,8 @@ class ANSHAREDSHARED_EXPORT MriCoordModel : public AbstractModel
     Q_OBJECT
 
 public:
-    typedef QSharedPointer<MriCoordModel> SPtr;              /**< Shared pointer type for AnnotationModel. */
-    typedef QSharedPointer<const MriCoordModel> ConstSPtr;   /**< Const shared pointer type for AnnotationModel. */
+    typedef QSharedPointer<MriCoordModel> SPtr;              /**< Shared pointer type for EventModel. */
+    typedef QSharedPointer<const MriCoordModel> ConstSPtr;   /**< Const shared pointer type for EventModel. */
 
     MriCoordModel(const QString &sFilePath,
                   const QByteArray& byteLoadedData = QByteArray(),

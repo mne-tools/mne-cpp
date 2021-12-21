@@ -93,10 +93,6 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo,
     m_matModel = MatrixXd(0,0);
     m_vecFreqs = QVector<int>();
 
-    // init coils
-    m_coilTemplate = NULL;
-    m_coilMeg = NULL;
-
     updateChannels(pFiffInfo);
     updateSensor();
 }
@@ -291,29 +287,15 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
                   fAbortError);
 
     Matrix4d matTrans = computeTransformation(matHeadHPI, coil.pos);
-    //Eigen::Matrix4d matTrans = computeTransformation(coil.pos, matHeadHPI);
-
-    // Store the final result to fiff info
-    // Set final device/head matrix and its inverse to the fiff info
-    transDevHead.from = 1;
-    transDevHead.to = 4;
-    transDevHead.trans = matTrans.cast<float>();
-
-    // Also store the inverse
-    transDevHead.invtrans = transDevHead.trans.inverse();
+    transDevHead = FiffCoordTrans::make(1,4,matTrans.cast<float>(),true);
 
     //Calculate Error
     MatrixXd matTemp = coil.pos;
-    matTemp.conservativeResize(coil.pos.rows(),coil.pos.cols()+1);
+    MatrixXd matTestPos = transDevHead.apply_trans(matTemp.cast<float>()).cast<double>();
+    MatrixXd matDiffPos = matTestPos - matHeadHPI;
 
-    matTemp.block(0,3,iNumCoils,1).setOnes();
-    matTemp.transposeInPlace();
-
-    MatrixXd matTestPos = matTrans * matTemp;
-    MatrixXd matDiffPos = matTestPos.block(0,0,3,iNumCoils) - matHeadHPI.transpose();
-
-    for(int i = 0; i < matDiffPos.cols(); ++i) {
-        vecError[i] = matDiffPos.col(i).norm();
+    for(int i = 0; i < matDiffPos.rows(); ++i) {
+        vecError[i] = matDiffPos.row(i).norm();
     }
 
     // store Goodness of Fit
@@ -385,60 +367,59 @@ void HPIFit::findOrder(const MatrixXd& t_mat,
                        FiffDigPointSet& fittedPointSet,
                        FiffInfo::SPtr pFiffInfo)
 {
-    // create temporary copies that are necessary to reset values that are passed to fitHpi()
+    // clear points
     fittedPointSet.clear();
     transDevHead.clear();
     vecError.fill(0);
 
-    FiffDigPointSet fittedPointSetTemp = fittedPointSet;
-    FiffCoordTrans transDevHeadTemp = transDevHead;
-    FiffInfo::SPtr pFiffInfoTemp = pFiffInfo;
+    // casual fit to get fitted coils
+    fitHPI(t_mat, t_matProjectors, transDevHead, vecFreqs, vecError, vecGoF, fittedPointSet, pFiffInfo);
+
+    // extract digitized and fitted coils
+    int iNumCoils = vecFreqs.length();
     QVector<int> vecToOrder = vecFreqs;
-    QVector<int> vecFreqTemp(vecFreqs.size());
-    QVector<double> vecErrorTemp = vecError;
-    VectorXd vecGoFTemp = vecGoF;
-    bool bIdentity = false;
+    VectorXd vecOrder(iNumCoils);
+    Vector4d vecInit(0,1,2,3);
+    MatrixXd matCoil = MatrixXd::Zero(iNumCoils,3);
+    MatrixXd matDig = MatrixXd::Zero(iNumCoils,3);
+    VectorXd vecDist = VectorXd::Zero(iNumCoils);
+    QList<FiffDigPoint> lHPIPoints;
 
-    MatrixXf matTrans = transDevHead.trans;
-    if(transDevHead.trans == MatrixXf::Identity(4,4).cast<float>()) {
-        // avoid identity since this leads to problems with this method in fitHpi.
-        // the hpi fit is robust enough to handle bad starting points
-        transDevHeadTemp.trans(3,0) = 0.000001;
-        bIdentity = true;
+    for(int i = 0; i < iNumCoils; ++i) {
+        matCoil(i,0) = fittedPointSet[i].r[0];
+        matCoil(i,1) = fittedPointSet[i].r[1];
+        matCoil(i,2) = fittedPointSet[i].r[2];
     }
 
-    // perform vecFreqs.size() hpi fits with same frequencies in each iteration
-    for(int i = 0; i < vecFreqs.size(); i++){
-        vecFreqTemp.fill(vecFreqs[i]);
-
-        // hpi Fit
-        fitHPI(t_mat, t_matProjectors, transDevHeadTemp, vecFreqTemp, vecErrorTemp, vecGoFTemp, fittedPointSetTemp, pFiffInfoTemp);
-
-        // get location of maximum GoF -> correct assignment of coil - frequency
-        VectorXd::Index indMax;
-        vecGoFTemp.maxCoeff(&indMax);
-        vecToOrder[indMax] = vecFreqs[i];
-
-        // std::cout << vecGoFTemp[0] << " " << vecGoFTemp[1] << " " << vecGoFTemp[2] << " " << vecGoFTemp[3] << " " << std::endl;
-
-        // reset values that are edidet by fitHpi()
-        fittedPointSetTemp = fittedPointSet;
-        pFiffInfoTemp = pFiffInfo;
-        transDevHeadTemp = transDevHead;
-
-        if(bIdentity) {
-            transDevHeadTemp.trans(3,0) = 0.000001;
+    for(int i = 0; i < pFiffInfo->dig.size(); ++i) {
+        if(pFiffInfo->dig[i].kind == FIFFV_POINT_HPI) {
+            lHPIPoints.append(pFiffInfo->dig[i]);
         }
-        vecErrorTemp = vecError;
-        vecGoFTemp = vecGoF;
     }
+
+    for (int i = 0; i < lHPIPoints.size(); ++i) {
+        matDig(i,0) = lHPIPoints.at(i).r[0];
+        matDig(i,1) = lHPIPoints.at(i).r[1];
+        matDig(i,2) = lHPIPoints.at(i).r[2];
+    }
+
+    // Find closest point to each dig and find with that the order
+
+    for(int i = 0; i < iNumCoils; i++) {
+        // distances from of fitted point to all digitized
+        vecDist = (matCoil.rowwise() - matDig.row(i)).rowwise().norm();
+        Eigen::MatrixXf::Index min_index;
+        vecDist.minCoeff(&min_index);
+        vecOrder(i) = vecInit(min_index);
+        vecToOrder[i] = vecFreqs[min_index];
+    }
+
     // check if still all frequencies are represented and update model
     if(std::accumulate(vecFreqs.begin(), vecFreqs.end(), .0) ==  std::accumulate(vecToOrder.begin(), vecToOrder.end(), .0)) {
         vecFreqs = vecToOrder;
     } else {
-        qWarning() << "HPIFit::findOrder: frequencie ordering went wrong";
+        qWarning() << "HPIFit::findOrder: frequency ordering was not succesfull.";
     }
-    qInfo() << "HPIFit::findOrder: vecFreqs = " << vecFreqs;
 }
 
 //=============================================================================================================
@@ -563,7 +544,7 @@ Eigen::Matrix4d HPIFit::computeTransformation(Eigen::MatrixXd matNH, MatrixXd ma
 //=============================================================================================================
 
 void HPIFit::createSensorSet(SensorSet& sensors,
-                             FwdCoilSet* coils)
+                             QSharedPointer<FWDLIB::FwdCoilSet> coils)
 {
     int iNchan = coils->ncoil;
 
@@ -645,15 +626,15 @@ void HPIFit::updateSensor()
 
     FiffCoordTransOld* t = NULL;
 
-    if(!m_coilTemplate) {
+    if(m_pCoilTemplate.isNull()) {
         // read coil_def.dat
         QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
-        m_coilTemplate = FwdCoilSet::read_coil_defs(qPath);
+        m_pCoilTemplate = QSharedPointer<FWDLIB::FwdCoilSet>(FwdCoilSet::read_coil_defs(qPath));
     }
 
     // create sensor set
-    m_coilMeg = m_coilTemplate->create_meg_coils(m_lChannels, iNch, iAcc, t);
-    createSensorSet(m_sensors, m_coilMeg);
+    m_pCoilMeg = QSharedPointer<FWDLIB::FwdCoilSet>(m_pCoilTemplate->create_meg_coils(m_lChannels, iNch, iAcc, t));
+    createSensorSet(m_sensors, m_pCoilMeg);
 }
 
 //=============================================================================================================

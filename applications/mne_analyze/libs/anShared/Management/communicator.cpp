@@ -60,7 +60,7 @@ Communicator::Communicator(const QVector<EVENT_TYPE> &subs)
 : m_ID(nextID())
 , m_EventSubscriptions(subs)
 {
-    EventManager::getEventManager().addCommunicator(this);
+    EventManager::addCommunicator(this);
 }
 
 //=============================================================================================================
@@ -76,7 +76,7 @@ Communicator::Communicator(AbstractPlugin* plugin)
 
 Communicator::~Communicator()
 {
-    EventManager::getEventManager().removeCommunicator(this);
+    EventManager::removeCommunicator(this);
 }
 
 //=============================================================================================================
@@ -84,7 +84,7 @@ Communicator::~Communicator()
 void Communicator::publishEvent(EVENT_TYPE etype, const QVariant &data) const
 {
     // simply wrap in smart pointer, fill in the sender pointer, and pass on to EventManager
-    EventManager::getEventManager().issueEvent(QSharedPointer<Event>::create(etype, this, data));
+    EventManager::issueEvent(QSharedPointer<Event>::create(etype, this, data));
 }
 
 //=============================================================================================================
@@ -92,7 +92,7 @@ void Communicator::publishEvent(EVENT_TYPE etype, const QVariant &data) const
 void Communicator::updateSubscriptions(const QVector<EVENT_TYPE> &subs)
 {
     // update routing table of event manager
-    EventManager::getEventManager().updateSubscriptions(this, subs);
+    EventManager::updateSubscriptions(this, subs);
     // update own subscription list: This HAS to be done AFTER the EventManager::updateSubscriptions,
     // since the latter uses the communicators old list in order to keep execution time low
     m_EventSubscriptions.clear();
@@ -105,7 +105,7 @@ void Communicator::addSubscriptions(const QVector<EVENT_TYPE> &newsubs)
 {
     m_EventSubscriptions.append(newsubs);
     // add new subscriptions to routing table of event manager
-    EventManager::getEventManager().addSubscriptions(this, newsubs);
+    EventManager::addSubscriptions(this, newsubs);
 }
 
 //=============================================================================================================
@@ -121,7 +121,7 @@ void Communicator::addSubscriptions(EVENT_TYPE newsub)
 void Communicator::manualDisconnect(void)
 {
     // simply delegate to EventManager
-    EventManager::getEventManager().removeCommunicator(this);
+    EventManager::removeCommunicator(this);
 }
 
 //=============================================================================================================

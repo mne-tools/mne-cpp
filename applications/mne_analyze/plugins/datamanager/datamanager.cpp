@@ -65,6 +65,7 @@ using namespace ANSHAREDLIB;
 
 DataManager::DataManager()
 {
+    m_iOrder = -10;
 }
 
 //=============================================================================================================
@@ -179,4 +180,12 @@ void DataManager::onRemoveItem(const QModelIndex& index)
 void DataManager::onCurrentItemChanged(const QModelIndex &pIndex)
 {
     m_pAnalyzeData->newSelection(pIndex);
+}
+
+
+//=============================================================================================================
+
+QString DataManager::getBuildInfo()
+{
+    return QString(DATAMANAGERPLUGIN::buildDateTime()) + QString(" - ")  + QString(DATAMANAGERPLUGIN::buildHash());
 }

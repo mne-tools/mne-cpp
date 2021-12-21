@@ -6,7 +6,7 @@
     <img src="https://github.com/mne-tools/mne-cpp/workflows/Linux%7CMacOS%7CWin%7CWASM/badge.svg" alt="Github Actions">
 </a>
 <a href="https://codecov.io/gh/mne-tools/mne-cpp" target="_blank">
-    <img src="https://codecov.io/gh/mne-tools/mne-cpp/branch/master/graph/badge.svg" alt="CodeCov">
+    <img src="https://codecov.io/gh/mne-tools/mne-cpp/branch/main/graph/badge.svg" alt="CodeCov">
 </a>
 <a href="https://scan.coverity.com/projects/mne-tools-mne-cpp" target="_blank">
     <img src="https://scan.coverity.com/projects/8955/badge.svg" alt="Coverity">
@@ -23,7 +23,7 @@ MNE-CPP is an open-source software framework which offers a variety of neuroscie
 Build from source
 -----------------
 
-To get the latest source code and compile it please follow the [build guide](https://mne-cpp.github.io/pages/install/buildguide.html). The minimum requirements to build MNE-CPP are:
+To get the latest source code and compile it please follow the [build guide](https://mne-cpp.github.io/pages/development/buildguide.html). The minimum requirements to build MNE-CPP are:
 
   * Compiler
     * Windows - [MSVC 2015](https://visualstudio.microsoft.com/vs/older-downloads/) or later
@@ -35,12 +35,12 @@ To get the latest source code and compile it please follow the [build guide](htt
 Releases
 --------
 
-Release binaries for Windows, Mac and Linux are available [here](https://mne-cpp.github.io/pages/install/binaries.html).
+Release binaries for Windows, Mac and Linux are available [here](https://mne-cpp.github.io/pages/download/download.html).
 
 Get involved
 ------------
 
-If you want to contribute to MNE-CPP you can find all necessary information [here](https://mne-cpp.github.io/pages/contribute/contribute.html).
+If you want to contribute to MNE-CPP you can find all necessary information [here](https://mne-cpp.github.io/pages/development/contribute.html).
 
 Contact
 -------
@@ -52,8 +52,7 @@ License
 
 MNE-CPP is **BSD-licenced** (3 clause):
 
-    Copyright (c) 2011-2020, MNE-CPP
-    All rights reserved.
+    Copyright (c) 2011-2021, authors of MNE-CPP. All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:

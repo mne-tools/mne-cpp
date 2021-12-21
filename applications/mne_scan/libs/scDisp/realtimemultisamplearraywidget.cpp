@@ -56,6 +56,8 @@
 
 #include <rtprocessing/helpers/filterkernel.h>
 
+#include <fiff/fiff_info.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -67,6 +69,7 @@
 #include <QDir>
 #include <QSettings>
 #include <QToolBar>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -118,7 +121,8 @@ void RealTimeMultiSampleArrayWidget::update(SCMEASLIB::Measurement::SPtr pMeasur
             if(!m_bDisplayWidgetsInitialized) {
                 initDisplayControllWidgets();
             }
-        } else if (!m_pRTMSA->getMultiSampleArray().isEmpty()) {
+        }
+        if (!m_pRTMSA->getMultiSampleArray().isEmpty()) {
             //Add data to table view
             m_pChannelDataView->addData(m_pRTMSA->getMultiSampleArray());
         }

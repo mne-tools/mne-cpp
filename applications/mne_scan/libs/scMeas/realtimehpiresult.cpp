@@ -39,6 +39,7 @@
 #include "realtimehpiresult.h"
 
 #include <time.h>
+#include <fiff/c/fiff_digitizer_data.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -104,3 +105,10 @@ void RealTimeHpiResult::setValue(const HpiFitResult& v)
     emit notify();
 }
 
+//=============================================================================================================
+
+void RealTimeHpiResult::setDigitizerData(QSharedPointer<FIFFLIB::FiffDigitizerData> digData)
+{
+    QMutexLocker lock(&m_qMutex);
+    m_pFiffDigData = digData;
+}

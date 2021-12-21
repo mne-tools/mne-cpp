@@ -47,6 +47,7 @@
 #include "abstractmodel.h"
 
 #include <fiff/fiff_io.h>
+#include <fiff/fifffilesharer.h>
 
 #include <rtprocessing/helpers/filterkernel.h>
 
@@ -60,6 +61,7 @@
 #include <QBuffer>
 #include <QFile>
 #include <QColor>
+#include <QFileSystemWatcher>
 
 //=============================================================================================================
 // Eigen INCLUDES
@@ -88,7 +90,7 @@ namespace ANSHAREDLIB {
 // ANSHAREDLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class AnnotationModel;
+class EventModel;
 
 //=============================================================================================================
 /**
@@ -136,7 +138,7 @@ public:
     /**
      * Helper function for initialization
      */
-    void initFiffData(QIODevice& p_IODevice);
+    bool initFiffData(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
@@ -392,7 +394,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Get sample annotation at iIndex
+     * Get sample event at iIndex
      *
      * @param[in] index     Index of sample data we want to retreive.
      *
@@ -402,9 +404,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Get how many annotations we have
+     * Get how many events we have
      *
-     * @return number of saved annotations.
+     * @return number of saved events
      */
     int getTimeListSize() const;
 
@@ -426,27 +428,27 @@ public:
 
     //=========================================================================================================
     /**
-     * Toggle whether to dipslay annotations
+     * Toggle whether to dipslay events
      *
      * @param[in] iToggleDisp   0 for no, 1+ for yes.
      */
-    void toggleDispAnnotation(int iToggleDisp);
+    void toggleDispEvent(int iToggleDisp);
 
     //=========================================================================================================
     /**
-     * Returns wheter annotations hould be displayed
+     * Returns wheter events hould be displayed
      *
      * @return m_bDispAnn.
      */
-    bool shouldDisplayAnnotation() const;
+    bool shouldDisplayEvent() const;
 
     //=========================================================================================================
     /**
-     * Returns shared pointer to associated Annotation model for the FiffRawView model
+     * Returns shared pointer to associated Event model for the FiffRawView model
      *
-     * @return shared pointer to the annotation model.
+     * @return shared pointer to the event model.
      */
-    QSharedPointer<AnnotationModel> getAnnotationModel() const;
+    QSharedPointer<EventModel> getEventModel() const;
 
     //=========================================================================================================
     /**
@@ -506,19 +508,37 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns whether the model has an associated AnnotationModel
+     * Returns whether the model has an associated EventModel
      *
+<<<<<<< HEAD
      * @return true if there is an AnnotationModel, false if not.
+=======
+     * @return true if there is an EventModel, false if not
+>>>>>>> MAINT: renaming and cleaning up
      */
     bool hasSavedEvents();
 
     //=========================================================================================================
     /**
-     * Sets the associated AnnotationModel to pModel
+     * Sets the associated EventModel to pModel
      *
+<<<<<<< HEAD
      * @param[in] pModel   associated annotation model.
+=======
+     * @param [in] pModel   associated event model
+>>>>>>> MAINT: renaming and cleaning up
      */
-    void setAnnotationModel(QSharedPointer<ANSHAREDLIB::AnnotationModel> pModel);
+    void setEventModel(QSharedPointer<ANSHAREDLIB::EventModel> pModel);
+
+    void setScrollerSample(int iScrollerPos);
+
+    int getScrollerPosition() const;
+
+    void setRealtime(bool bRealtime);
+
+    bool isRealtime();
+
+    int getPreviousLastSample();
 
 private:
     //=========================================================================================================
@@ -580,6 +600,14 @@ private:
      */
     void reloadAllData();
 
+    //=========================================================================================================
+    /**
+     * Sets model to read from new fiff file set by input parameter
+     *
+     * @param[in] path      Path to new fiff file to read from
+     */
+    void readFromRealtimeFile(const QString &path);
+
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lData;             /**< Data. */
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lNewData;          /**< Data that is to be appended or prepended. */
     std::list<QSharedPointer<QPair<MatrixXd, MatrixXd> > > m_lFilteredData;     /**< Filtered data. */
@@ -627,19 +655,27 @@ private:
     QColor                                      m_colBackground;                            /**< The background color.*/
 
     int                                         m_iDistanceTimerSpacer;                     /**< The distance for the horizontal time spacers in the view in ms. */
+    int                                         m_iScroller;
 
-    qint32                                      m_iScrollPos;                               /**< Position of the scrollbar. */
+    FIFFLIB::FiffFileSharer                     m_FileSharer;                               /**<  Handles receiving files from shared directory for receving from realtime recording. */
 
-    bool                                        m_bDispAnnotation;                          /**< Whether annotations wil be shown. */
+    qint32                                      m_iScrollPos;                               /**< Position of the scrollbar */
 
-    QSharedPointer<AnnotationModel>             m_pAnnotationModel;                         /**< Model to stored annotations to be displayed. */
+    bool                                        m_bDispEvent;                               /**< Whether events wil be shown */
+    bool                                        m_bRealtime;                                /**< Whether this model cooreponds to a realtime mnescan session (fiff file can change) */
 
+    QSharedPointer<EventModel>                  m_pEventModel;                              /**< Model to store events to be displayed. */
+
+    int                                         m_iLastFileEndSample;
 signals:
     //=========================================================================================================
     /**
      * Emits that new block data is loaded
      */
     void newBlocksLoaded();
+
+    //=========================================================================================================
+    void newRealtimeData();
 };
 
 //=============================================================================================================
@@ -932,21 +968,6 @@ private:
     quint32 m_iRowNumber;
     qint64 m_iNumSamples;
 };
-
-class AnnotationData {
-
-public:
-    inline bool comparator(AnnotationData& A, AnnotationData& B) {
-        return (A.m_iSample > B.m_iSample);
-    }
-private:
-
-    int m_iSample;
-    int m_iEventType;
-
-
-};
-
 
 } // namespace ANSHAREDLIB
 

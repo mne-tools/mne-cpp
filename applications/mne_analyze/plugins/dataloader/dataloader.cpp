@@ -43,7 +43,7 @@
 #include <anShared/Management/analyzedata.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/bemdatamodel.h>
-#include <anShared/Model/annotationmodel.h>
+#include <anShared/Model/eventmodel.h>
 #include <anShared/Model/averagingdatamodel.h>
 #include <anShared/Model/covariancemodel.h>
 #include <anShared/Model/mricoordmodel.h>
@@ -122,6 +122,11 @@ QMenu *DataLoader::getMenu()
     connect(pActionLoadFile, &QAction::triggered,
             this, &DataLoader::onLoadFilePressed);
 
+    QAction* pActionLoadScanSession = new QAction(tr("Open MNE Scan Session"));
+    pActionLoadFile->setStatusTip(tr("Load a data file"));
+    connect(pActionLoadScanSession, &QAction::triggered,
+            this, &DataLoader::onLoadScanSessionPressed);
+
     QAction* pActionLoadSubject = new QAction(tr("Open Subject"));
     pActionLoadSubject->setStatusTip(tr("Load a subject folder"));
     connect(pActionLoadSubject, &QAction::triggered,
@@ -144,10 +149,10 @@ QMenu *DataLoader::getMenu()
                 onSaveFilePressed(AVERAGE_FILE);
             });
 
-    QAction* pActionSaveAnn = new QAction(tr("Save annotation"));
+    QAction* pActionSaveAnn = new QAction(tr("Save events"));
     pActionLoadFile->setStatusTip(tr("Save the selected data file"));
     connect(pActionSaveAnn, &QAction::triggered,[=] {
-                onSaveFilePressed(ANNOTATION_FILE);
+                onSaveFilePressed(EVENT_FILE);
             });
 
     QMenu* pBIDSMenu = new QMenu(tr("Load BIDS Folder"));
@@ -160,6 +165,7 @@ QMenu *DataLoader::getMenu()
     //pSaveMenu->addAction(pActionSaveAvg);
 
     pMenuFile->addAction(pActionLoadFile);
+    pMenuFile->addAction(pActionLoadScanSession);
     //pMenuFile->addMenu(pBIDSMenu);
     pMenuFile->addMenu(pSaveMenu);
     //pMenuFile->addAction(pActionSave);
@@ -221,14 +227,14 @@ void DataLoader::loadFilePath(const QString& sFilePath)
     startProgress("Loading " + fileInfo.fileName());
 
     if(fileInfo.exists() && (fileInfo.completeSuffix() == "eve")){
-        QSharedPointer<ANSHAREDLIB::AnnotationModel> pModel = m_pAnalyzeData->loadModel<ANSHAREDLIB::AnnotationModel>(sFilePath);
+        QSharedPointer<ANSHAREDLIB::EventModel> pModel = m_pAnalyzeData->loadModel<ANSHAREDLIB::EventModel>(sFilePath);
         //pModel->applyOffset(m_pSelectedModel->absoluteFirstSample());
         pModel->setFiffModel(m_pSelectedModel);
         pModel->setFirstLastSample(m_pSelectedModel->absoluteFirstSample(), m_pSelectedModel->absoluteLastSample());
         pModel->setSampleFreq(m_pSelectedModel->getFiffInfo()->sfreq);
     } else if(fileInfo.exists() && (fileInfo.completeSuffix() == "fif")) {
         if(fileInfo.completeBaseName().endsWith("eve")){
-            m_pAnalyzeData->loadModel<ANSHAREDLIB::AnnotationModel>(sFilePath);
+            m_pAnalyzeData->loadModel<ANSHAREDLIB::EventModel>(sFilePath);
         } else if(fileInfo.completeBaseName().endsWith("bem")) {
             m_pAnalyzeData->loadModel<ANSHAREDLIB::BemDataModel>(sFilePath);
         } else if(fileInfo.completeBaseName().endsWith("raw")){
@@ -280,6 +286,15 @@ void DataLoader::onLoadFilePressed()
 
 //=============================================================================================================
 
+void DataLoader::onLoadScanSessionPressed()
+{
+    QSharedPointer<FiffRawViewModel> pModel = QSharedPointer<FiffRawViewModel>::create("");
+    pModel->setRealtime(true);
+    m_pAnalyzeData->addModel<ANSHAREDLIB::FiffRawViewModel>(pModel, "MNE Scan Session");
+}
+
+//=============================================================================================================
+
 void DataLoader::updateLastDir(const QString& lastDir)
 {
     m_sLastDir = lastDir;
@@ -324,8 +339,8 @@ void DataLoader::onSaveFilePressed(FileType type)
             m_pSelectedModel->saveToFile("");
             break;
         }
-        case ANNOTATION_FILE: {
-            m_pSelectedModel->getAnnotationModel()->saveToFile("");
+        case EVENT_FILE: {
+            m_pSelectedModel->getEventModel()->saveToFile("");
 
             break;
         }
@@ -348,7 +363,7 @@ void DataLoader::onSaveFilePressed(FileType type)
             sDir = "/MNE-sample-data";
             break;
         }
-        case ANNOTATION_FILE: {
+        case EVENT_FILE: {
             sFile = tr("Save Events");
             sFileType = tr("Event file(*.eve)");
             sDir = "/MNE-sample-data";
@@ -382,8 +397,8 @@ void DataLoader::onSaveFilePressed(FileType type)
             m_pSelectedModel->saveToFile(sFilePath);
             break;
         }
-        case ANNOTATION_FILE: {
-            m_pSelectedModel->getAnnotationModel()->saveToFile(sFilePath);
+        case EVENT_FILE: {
+            m_pSelectedModel->getEventModel()->saveToFile(sFilePath);
             break;
         }
         case AVERAGE_FILE: {
@@ -478,4 +493,12 @@ void DataLoader::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewM
         }
         m_pSelectedModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
     }
+}
+
+
+//=============================================================================================================
+
+QString DataLoader::getBuildInfo()
+{
+    return QString(DATALOADERPLUGIN::buildDateTime()) + QString(" - ")  + QString(DATALOADERPLUGIN::buildHash());
 }

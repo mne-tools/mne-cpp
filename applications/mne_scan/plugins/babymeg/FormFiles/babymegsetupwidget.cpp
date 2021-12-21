@@ -73,12 +73,6 @@ BabyMEGSetupWidget::BabyMEGSetupWidget(BabyMEG* p_pBabyMEG,
 {
     ui.setupUi(this);
 
-    connect(m_pBabyMEG, &BabyMEG::cmdConnectionChanged,
-            this, &BabyMEGSetupWidget::setConnectionStatus);
-
-    connect(ui.m_pPushButton_Connect, &QPushButton::click,
-            this, &BabyMEGSetupWidget::onConnectionPressed);
-
     //rt server fiffInfo received
     connect(m_pBabyMEG, &BabyMEG::fiffInfoAvailable, this,
             &BabyMEGSetupWidget::setSamplingFrequency);
@@ -92,37 +86,9 @@ BabyMEGSetupWidget::~BabyMEGSetupWidget()
 
 //=============================================================================================================
 
-void BabyMEGSetupWidget::setConnectionStatus(bool bConnectionStatus)
-{
-    if(bConnectionStatus) {
-        ui.m_label_connectionStatus->setText("BabyMEG is connected");
-        ui.m_pPushButton_Connect->setText("Disconnect");
-    } else {
-        ui.m_label_connectionStatus->setText("BabyMEG is disconnected");
-        ui.m_pPushButton_Connect->setText("Connect");
-    }
-
-}
-
-//=============================================================================================================
-
 void BabyMEGSetupWidget::setSamplingFrequency()
 {
     if(m_pBabyMEG->m_pFiffInfo) {
         this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pBabyMEG->m_pFiffInfo->sfreq));
     }
 }
-
-//=============================================================================================================
-
-void BabyMEGSetupWidget::onConnectionPressed()
-{
-    if(m_pBabyMEG) {
-        if(ui.m_pPushButton_Connect->text() == "Connect") {
-            m_pBabyMEG->m_pMyClient->ConnectToBabyMEG();
-        } else if(ui.m_pPushButton_Connect->text() == "Disconnect") {
-            m_pBabyMEG->m_pMyClient->DisconnectBabyMEG();
-        }
-    }
-}
-

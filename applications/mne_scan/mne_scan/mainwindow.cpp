@@ -37,6 +37,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <iostream>
+
 #include <scShared/Management/pluginmanager.h>
 #include <scShared/Management/pluginscenemanager.h>
 #include <scShared/Management/displaymanager.h>
@@ -52,10 +54,13 @@
 
 #include <disp/viewers/quickcontrolview.h>
 
+#include <utils/buildinfo.h>
+
 #include "mainwindow.h"
 #include "startupwidget.h"
 #include "plugingui.h"
 #include "info.h"
+#include "mainsplashscreencloser.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -70,8 +75,6 @@
 #include <QFileInfo>
 #include <QStandardPaths>
 
-#include <iostream>
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -85,7 +88,8 @@ using namespace DISPLIB;
 // CONST
 //=============================================================================================================
 
-const QString pluginDir = "/mne_scan_plugins";        /**< holds path to plugins.*/
+const QString pluginDir = "/mne_scan_plugins";          /**< holds path to plugins.*/
+constexpr unsigned long waitUntilHidingSplashScreen(1);     /**< Seconds to wait after the application setup has finished, before hiding the splash screen.*/
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -104,7 +108,7 @@ MainWindow::MainWindow(QWidget *parent)
 , m_sSettingsPath("MNESCAN/MainWindow")
 , m_sCurrentStyle("default")
 {
-    fprintf(stderr, "%s - Version %s\n",
+    printf( "%s - Version %s\n",
             CInfo::AppNameShort().toUtf8().constData(),
             CInfo::AppVersion().toUtf8().constData());
 
@@ -116,9 +120,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setUnifiedTitleAndToolBarOnMac(false);
 
-    QPixmap splashPixMap(":/images/splashscreen.png");
-    MainSplashScreen::SPtr pSplashScreen = MainSplashScreen::SPtr::create(splashPixMap);
-    setSplashScreen(pSplashScreen, true);
+    initSplashScreen();
 
     setupPlugins();
     setupUI();
@@ -130,6 +132,9 @@ MainWindow::MainWindow(QWidget *parent)
     qInfo() << "Loading icon...";
     QMainWindow::setWindowIcon(QIcon(":/images/images/appIcons/icon_mne_scan_256x256.png"));
 #endif
+
+    hideSplashScreen();
+    show();
 }
 
 //=============================================================================================================
@@ -227,9 +232,10 @@ void MainWindow::onStyleChanged(const QString& sStyle)
             qInfo() << "MainWindow::onStyleChanged 2";
             m_sCurrentStyle = "dark";
             QFile file(":/dark.qss");
-            file.open(QFile::ReadOnly);
-            QTextStream stream(&file);
-            pApp->setStyleSheet(stream.readAll());
+            if(file.open(QFile::ReadOnly)){
+                QTextStream stream(&file);
+                pApp->setStyleSheet(stream.readAll());
+            }
         }
 
         // Set default font
@@ -251,20 +257,37 @@ void MainWindow::onGuiModeChanged()
 
 //=============================================================================================================
 
-void MainWindow::setSplashScreen(MainSplashScreen::SPtr& pSplashScreen,
-                                 bool bShowSplashScreen)
+void MainWindow::initSplashScreen()
 {
-    m_pSplashScreen = pSplashScreen;
+    bool showSplashScreen(true);
+    initSplashScreen(showSplashScreen);
+}
 
+//=============================================================================================================
+
+void MainWindow::initSplashScreen(bool bShowSplashScreen)
+{
+    QPixmap splashPixMap(":/images/splashscreen.png");
+    m_pSplashScreen = MainSplashScreen::SPtr::create(splashPixMap,
+                                                    Qt::WindowFlags() | Qt::WindowStaysOnTopHint );
     if(m_pSplashScreen && m_pPluginManager) {
         QObject::connect(m_pPluginManager.data(), &PluginManager::pluginLoaded,
                          m_pSplashScreen.data(), &MainSplashScreen::showMessage);
     }
 
     if(m_pSplashScreen && bShowSplashScreen) {
-        m_pSplashScreen->finish(this);
         m_pSplashScreen->show();
     }
+}
+
+//=============================================================================================================
+
+void MainWindow::hideSplashScreen()
+{
+    m_pSplashScreenHider = MainSplashScreenCloser::SPtr::create(*m_pSplashScreen.data(),
+                                                       waitUntilHidingSplashScreen);
+    m_pSplashScreen->clearMessage();
+    m_pSplashScreenHider->start();
 }
 
 //=============================================================================================================
@@ -365,7 +388,7 @@ void MainWindow::about()
         m_textEdit_aboutText->setTextInteractionFlags(Qt::LinksAccessibleByKeyboard|Qt::LinksAccessibleByMouse|Qt::TextBrowserInteraction|Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse);
 
         QLabel* pLabel = new QLabel();
-        pLabel->setText(QString("Version: ") + CInfo::AppVersion());
+        pLabel->setText(QString("Version: ") + CInfo::AppVersion() + " - " + QString(UTILSLIB::dateTimeNow()) + " - " + QString(UTILSLIB::gitHash()));
 
         gridLayout->addWidget(pLabel, 1, 0, 1, 1);
         gridLayout->addWidget(m_textEdit_aboutText, 2, 0, 1, 1);

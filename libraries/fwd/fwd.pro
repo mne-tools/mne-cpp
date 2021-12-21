@@ -1,7 +1,8 @@
 #==============================================================================================================
 #
 # @file     fwd.pro
-# @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+# @author   Juan GPC <jgarciaprieto@mgh.harvard.edu>;
+#           Lorenz Esch <lesch@mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 # @since    0.1.0
@@ -84,6 +85,7 @@ SOURCES += \
     fwd_eeg_sphere_layer.cpp \
     fwd_eeg_sphere_model.cpp \
     fwd_eeg_sphere_model_set.cpp \
+    fwd_global.cpp \
     fwd_thread_arg.cpp
 
 HEADERS +=\
@@ -101,14 +103,12 @@ HEADERS +=\
     fwd_thread_arg.h \
     fwd_types.h
 
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+clang {
+    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
+} else {
+    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
+}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-
-# Install headers to include directory
-header_files.files = $${HEADERS}
-header_files.path = $${MNE_INSTALL_INCLUDE_DIR}/fwd
-
-INSTALLS += header_files
 
 contains(MNECPP_CONFIG, withCodeCov) {
     QMAKE_CXXFLAGS += --coverage
@@ -153,3 +153,36 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
     }
 }
 
+################################################## BUILD TIMESTAMP/HASH UPDATER ############################################
+
+FILE_TO_UPDATE = fwd_global.cpp
+win32 {
+    CONFIG(debug, debug|release) {
+        OBJ_TARJET = debug\fwd_global.obj
+    } else {
+        OBJ_TARJET = release\fwd_global.obj
+    }
+}
+
+ALL_FILES += $$HEADERS
+ALL_FILES += $$SOURCES
+ALL_FILES -= $$FILE_TO_UPDATE
+
+FileUpdater.target = phonyFileUpdater
+for (I_FILE, ALL_FILES) {
+    FileUpdater.depends += $${PWD}/$${I_FILE}
+}
+
+unix|macx {
+    FileUpdater.commands = touch $${PWD}/$${FILE_TO_UPDATE} ; echo PASTA > phonyFileUpdater
+}
+
+win32 {
+    FileUpdater.commands = copy /y $$shell_path($${PWD})\\$${FILE_TO_UPDATE} +,, $$shell_path($${PWD})\\$${FILE_TO_UPDATE} & echo PASTA > phonyFileUpdater
+    OrderForcerTarget.target = $${OBJ_TARJET}
+    OrderForcerTarget.depends += phonyFileUpdater
+    QMAKE_EXTRA_TARGETS += OrderForcerTarget
+}
+
+PRE_TARGETDEPS += phonyFileUpdater
+QMAKE_EXTRA_TARGETS += FileUpdater

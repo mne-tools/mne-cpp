@@ -3,7 +3,8 @@
  * @file     analyzecore.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+ *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
+ *           Juan Garcia-Prieto <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     March, 2018
  *
@@ -41,8 +42,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mainwindow.h"
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -72,6 +71,8 @@ namespace MNEANALYZE {
 //=============================================================================================================
 // MNEANALYZE FORWARD DECLARATIONS
 //=============================================================================================================
+
+class MainWindow;
 
 //=============================================================================================================
 /**
@@ -106,19 +107,31 @@ public:
      */
     void showMainWindow();
 
-//    //=========================================================================================================
-//    /**
-//     * Returns a pointer to the main window.
-//     *
-//     * @return A pointer to the main window.
-//     */
-//    inline QPointer<MainWindow> getMainWindow() const;
+    //=========================================================================================================
+    /**
+     * Make pluginManager to reload and reinitialize all the necessary plugins, and make the MainWindow to
+     * show the results.
+     */
+    void reloadPlugins();
 
     //=========================================================================================================
     /**
      * Initializes the global data base
      */
     void initGlobalData();
+
+    //=========================================================================================================
+    /**
+     * Retrieve all the loaded plugins from the Application.
+     */
+    QVector<ANSHAREDLIB::AbstractPlugin*> getLoadedPlugins();
+
+    //=========================================================================================================
+    /**
+     * Check for the initialization state of the plugins in the application.
+     * @return Initialization state.
+     */
+    bool pluginsInitialized() const;
 
 private:
     //=========================================================================================================
@@ -137,7 +150,7 @@ private:
     /**
      * This is executed when the user presses "close" button (via QConnection from MainWindow)
      */
-    void onMainWindowClosed();
+    void shutdown();
 
     //=========================================================================================================
     /**
@@ -151,6 +164,7 @@ private:
      */
     void initPluginManager();
 
+
     //=========================================================================================================
     /**
      * This initializes the MainWindow.
@@ -163,19 +177,22 @@ private:
      */
     void registerMetaTypes();
 
-    QSharedPointer<ANSHAREDLIB::PluginManager>      m_pPluginManager;       /**< Holds plugin manager. */
-    QSharedPointer<ANSHAREDLIB::AnalyzeData>        m_analyzeData;          /**< The global data base. */
+    //=========================================================================================================
+    /**
+     * Load plugins from plugin directory and then initializes their data.
+     */
+    void loadandInitPlugins();
 
+
+    QSharedPointer<ANSHAREDLIB::PluginManager>      m_pPluginManager;       /**< Holds plugin manager. */
+    QSharedPointer<ANSHAREDLIB::AnalyzeData>        m_pAnalyzeData;         /**< The global data base. */
+    QPointer<MainWindow>                            m_pMainWindow;          /**< The main window. */
     QCommandLineParser                              m_cmdLineParser;        /**< The command line parser. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
-//QPointer<MainWindow> AnalyzeCore::getMainWindow() const {
-//    return m_pMainWindow;
-//}
 
 } // namespace MNEANALYZE
 

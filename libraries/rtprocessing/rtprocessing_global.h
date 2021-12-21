@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include <QtCore/qglobal.h>
+#include <utils/buildinfo.h>
 
 //=============================================================================================================
 // DEFINES
@@ -53,5 +54,26 @@
 #else
 #  define RTPROCESINGSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+namespace RTPROCESSINGLIB{
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+RTPROCESINGSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+RTPROCESINGSHARED_EXPORT const char* buildHash();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+RTPROCESINGSHARED_EXPORT const char* buildHashLong();
+}
 
 #endif // RTPROCESSING_GLOBAL_H

@@ -92,7 +92,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Default constructor
+     * Default constructor.
      *
      * @param[in] p_IODevice   Input device to read data from.
      */
@@ -100,9 +100,15 @@ public:
 
     //=========================================================================================================
     /**
-     * Destroys the digitization point description
+     * Destroys the digitization point description.
      */
     ~FiffDigitizerData();
+
+    //=========================================================================================================
+    /**
+     * Prints class contents.
+     */
+    void print() const;
 
 public:
     QString        filename;                 /* Where did these come from */

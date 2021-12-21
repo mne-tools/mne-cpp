@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>295</width>
-    <height>482</height>
+    <width>321</width>
+    <height>516</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -108,22 +108,6 @@
         </property>
        </widget>
       </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_2_EventGroup">
-        <property name="text">
-         <string>Event Group:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="QComboBox" name="comboBox_EventGroup">
-        <item>
-         <property name="text">
-          <string>Current Selection</string>
-         </property>
-        </item>
-       </widget>
-      </item>
      </layout>
      <zorder>label</zorder>
      <zorder>m_pComboBoxChSelection</zorder>
@@ -133,8 +117,6 @@
      <zorder>m_pSpinBoxNumAverages</zorder>
      <zorder>m_pSpinBoxPreStimMSeconds</zorder>
      <zorder>m_pSpinBoxPostStimMSeconds</zorder>
-     <zorder>label_2_EventGroup</zorder>
-     <zorder>comboBox_EventGroup</zorder>
     </widget>
    </item>
    <item>
@@ -231,7 +213,20 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>Drop Rejected</string>
+      <string>Drop rejected.</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="checkBox_autoCompute">
+     <property name="text">
+      <string>Live average based on events.</string>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <property name="checked">
+      <bool>false</bool>
      </property>
     </widget>
    </item>
@@ -247,7 +242,7 @@
       </sizepolicy>
      </property>
      <property name="text">
-      <string>COMPUTE</string>
+      <string>Save</string>
      </property>
     </widget>
    </item>

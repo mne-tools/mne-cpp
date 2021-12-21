@@ -38,9 +38,11 @@
 
 include(../../mne-cpp.pri)
 
+QMAKE_TARGET_DESCRIPTION = MNE Anonymize
+
 #Application version
-VERSION_MAJOR = 0
-VERSION_MINOR = 99
+VERSION_MAJOR = 1
+VERSION_MINOR = 0
 VERSION_BUILD = 0
 
 DEFINES += "VERSION_MAJOR=$$VERSION_MAJOR"\
@@ -50,11 +52,11 @@ DEFINES += "VERSION_MAJOR=$$VERSION_MAJOR"\
 #Target version
 VERSION = $${VERSION_MAJOR}.$${VERSION_MINOR}.$${VERSION_BUILD}
 
+DEFINES += "APPLICATION_VERSION=\\\"$${VERSION}\\\""
+
 TEMPLATE = app
 
-QT += widgets network
-
-CONFIG += console
+QT += core widgets network
 
 !contains(MNECPP_CONFIG, withAppBundles) {
     CONFIG -= app_bundle
@@ -62,8 +64,14 @@ CONFIG += console
 
 DESTDIR = $${MNE_BINARY_DIR}
 
+CONFIG += console
+
 TARGET = mne_anonymize
+
+CONFIG += console
+
 CONFIG(debug, debug|release) {
+#    CONFIG += console
     TARGET = $$join(TARGET,,,d)
 }
 
@@ -108,13 +116,18 @@ HEADERS += \
     apphandler.h \
     fiffanonymizer.h \
     mainwindow.h \
+    mne_anonymize.h \
     settingscontrollercl.h \
     settingscontrollergui.h
 
 FORMS += \
     mainwindow.ui
 
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+clang {
+    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
+} else {
+    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
+}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_FIFF_ANONYMIZER_DIR}
 

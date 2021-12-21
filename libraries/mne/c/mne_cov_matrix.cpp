@@ -45,6 +45,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
+#include <fiff/c/fiff_sparse_matrix.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -116,12 +117,16 @@ float **mne_cmatrix_30(int nr,int nc)
     float *whole;
 
     m = MALLOC_30(nr,float *);
-    if (!m) matrix_error_30(1,nr,nc);
+    if (!m)
+        matrix_error_30(1,nr,nc);
+
     whole = MALLOC_30(nr*nc,float);
-    if (!whole) matrix_error_30(2,nr,nc);
+    if (!whole)
+        matrix_error_30(2,nr,nc);
 
     for(i=0;i<nr;i++)
         m[i] = whole + i*nc;
+
     return m;
 }
 
@@ -133,12 +138,16 @@ double **mne_dmatrix_30(int nr, int nc)
     double *whole;
 
     m = MALLOC_30(nr,double *);
-    if (!m) matrix_error_30(1,nr,nc);
+    if (!m)
+        matrix_error_30(1,nr,nc);
+
     whole = MALLOC_30(nr*nc,double);
-    if (!whole) matrix_error_30(2,nr,nc);
+    if (!whole)
+        matrix_error_30(2,nr,nc);
 
     for(i=0;i<nr;i++)
         m[i] = whole + i*nc;
+
     return m;
 }
 
@@ -162,10 +171,7 @@ int mne_decompose_eigen (double *mat,
     double *dmat = MALLOC_30(np,double);
     float  *vecp = vectors[0];
 
-    const char   *uplo  = "U";
-    const char   *compz = "V";
     int    info,k;
-    int    one = 1;
     int    maxi;
     double scale;
 
@@ -223,6 +229,7 @@ int mne_decompose_eigen (double *mat,
     }
     FREE_30(w);
     FREE_30(z);
+    FREE_30(dmat);
     if (info == 0)
         return 0;
     else
@@ -272,20 +279,20 @@ MneCovMatrix::MneCovMatrix(int p_kind,
                            FiffSparseMatrix* p_cov_sparse)
 :kind(p_kind)
 ,ncov(p_ncov)
+,nfree(1)
 ,nproj(0)
 ,nzero(0)
 ,names(p_names)
 ,cov(p_cov)
 ,cov_diag(p_cov_diag)
 ,cov_sparse(p_cov_sparse)
-,eigen(NULL)
 ,lambda(NULL)
-,chol(NULL)
 ,inv_lambda(NULL)
-,nfree(1)
-,ch_class(NULL)
+,eigen(NULL)
+,chol(NULL)
 ,proj(NULL)
 ,sss(NULL)
+,ch_class(NULL)
 ,nbad(0)
 {
 }
@@ -467,7 +474,7 @@ int MneCovMatrix::condition_cov(MneCovMatrix *c, float rank_threshold, int use_r
         printf("\n\tEstimated covariance matrix rank = %d (%g)\n",nok,lambda[c->ncov-nok]/lambda[c->ncov-1]);
         if (use_rank > 0 && use_rank < nok) {
             nok = use_rank;
-            fprintf(stderr,"\tUser-selected covariance matrix rank = %d (%g)\n",nok,lambda[c->ncov-nok]/lambda[c->ncov-1]);
+            printf("\tUser-selected covariance matrix rank = %d (%g)\n",nok,lambda[c->ncov-nok]/lambda[c->ncov-1]);
         }
         /*
          * Put it back together
@@ -527,7 +534,7 @@ int MneCovMatrix::mne_decompose_eigen_cov_small(MneCovMatrix *c, float p_small, 
     if (c->cov_diag)
         return mne_add_inv_cov(c);
     if (c->lambda && c->eigen) {
-        fprintf(stderr,"\n\tEigenvalue decomposition had been precomputed.\n");
+        printf("\n\tEigenvalue decomposition had been precomputed.\n");
         c->nzero = 0;
         for (k = 0; k < c->ncov; k++, c->nzero++)
             if (c->lambda[k] > 0)

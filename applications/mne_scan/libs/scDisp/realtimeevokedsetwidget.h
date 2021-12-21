@@ -177,8 +177,8 @@ private:
 
     QList<qint32>                       m_qListCurrentSelection;    /**< Current selection list -> hack around C++11 lambda . */
 
-    bool                                m_bHideBadChannels;         /**< hide bad channels flag. */
-    qint32                              m_iMaxFilterTapSize;        /**< maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
+    bool                                m_bHideBadChannels;         /**< Hide bad channels flag. */
+    qint32                              m_iMaxFilterTapSize;        /**< Maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
 
     QPointer<QVBoxLayout>               m_pRTESetLayout;            /**< RTE Widget layout. */
     QPointer<QLabel>                    m_pLabelInit;               /**< Initialization Label. */

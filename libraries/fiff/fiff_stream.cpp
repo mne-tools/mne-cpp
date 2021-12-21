@@ -824,7 +824,7 @@ bool FiffStream::read_digitizer_data(const FiffDirNode::SPtr& p_Node, FiffDigiti
         t_qListDigData = p_Node->dir_tree_find(FIFFB_MRI_SET);
 
         if(t_qListDigData.isEmpty()) {
-            fprintf(stderr, "No Isotrak data found in %s", this->streamName().toLatin1().data());
+            printf( "No Isotrak data found in %s", this->streamName().toLatin1().data());
             return false;
         } else {
             p_digData.coord_frame = FIFFV_COORD_MRI;
@@ -853,8 +853,12 @@ bool FiffStream::read_digitizer_data(const FiffDirNode::SPtr& p_Node, FiffDigiti
     npoint = p_digData.points.size();
 
     if (npoint == 0) {
-        fprintf(stderr, "No digitizer data in %s", this->streamName().toLatin1().data());
+        printf( "No digitizer data in %s", this->streamName().toLatin1().data());
         return false;
+    }
+
+    for (auto& dig : p_digData.points){
+        dig.coord_frame = p_digData.coord_frame;
     }
 
     //Add other information as default

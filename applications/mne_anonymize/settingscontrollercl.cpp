@@ -42,6 +42,9 @@
 
 #include "settingscontrollercl.h"
 #include "fiffanonymizer.h"
+#include "utils/buildinfo.h"
+#include "utils/utils_global.h"
+#include "fiff/fiff_global.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -72,9 +75,10 @@ using namespace MNEANONYMIZE;
 
 SettingsControllerCl::SettingsControllerCl()
 : m_pAnonymizer(FiffAnonymizer::SPtr(new FiffAnonymizer))
-, m_sAppName(qApp->applicationName())
-, m_sAppVer(qApp->applicationVersion())
-, m_sBuildDate(__DATE__)
+, m_sAppName(APPLICATION_NAME)
+, m_sAppVer(APPLICATION_VERSION)
+, m_sBuildDate(QString(UTILSLIB::dateTimeNow()))
+, m_sBuildHash(QString(UTILSLIB::gitHash()))
 , m_bGuiMode(false)
 , m_bDeleteInputFileAfter(false)
 , m_bDeleteInputFileConfirmation(true)
@@ -91,9 +95,10 @@ SettingsControllerCl::SettingsControllerCl()
 
 SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
 : m_pAnonymizer(FiffAnonymizer::SPtr(new FiffAnonymizer))
-, m_sAppName(qApp->applicationName())
-, m_sAppVer(qApp->applicationVersion())
-, m_sBuildDate(__DATE__)
+, m_sAppName(APPLICATION_NAME)
+, m_sAppVer(APPLICATION_VERSION)
+, m_sBuildDate(QString(UTILSLIB::dateTimeNow()))
+, m_sBuildHash(QString(UTILSLIB::gitHash()))
 , m_bGuiMode(false)
 , m_bDeleteInputFileAfter(false)
 , m_bDeleteInputFileConfirmation(true)
@@ -107,25 +112,20 @@ SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
     QObject::connect(this, &MNEANONYMIZE::SettingsControllerCl::finished,
                      qApp, &QCoreApplication::exit, Qt::QueuedConnection);
 
+    for(auto& s : arguments)
+    {
+        qInfo() << s << "\n";
+    }
+
     initParser();
     if(parseInputs(arguments))
     {
         qCritical() << "Something went wrong during the parsing of input options.";
-        emit finished(1);
         return;
     }
 
     printHeaderIfVerbose();
     printIfVerbose(QString("Executing command: ") + arguments.join(" "));
-
-    if(execute())
-    {
-        qCritical() << "Error during the anonymization of the input file";
-        emit finished(1);
-        return;
-    }
-
-    emit finished(0);
 }
 
 //=============================================================================================================
@@ -165,7 +165,7 @@ void SettingsControllerCl::initParser()
            "\n - MNE Toolbox info: Working Directory"
            "\n - MNE Toolbox info: Command line used"
            "\n "
-           "\n - *** Additionally if there is MRI data present in the file a warning message will appear.\n"));
+           "\n - Additionally if there is MRI data present in the file a warning message will appear.\n"));
     m_parser.addHelpOption();
 
     //this breaks encapsulation. damn it. it has to be here in order to show in the help text.
@@ -181,7 +181,7 @@ void SettingsControllerCl::initParser()
     m_parser.addOption(inFileOpt);
 
     QCommandLineOption outFileOpt(QStringList() << "o" << "out",
-                                  QCoreApplication::translate("main","Output file <outfile>. Default ‘_anonymized.fif’ will be attached to the input file name."),
+                                  QCoreApplication::translate("main","Output file <outfile>. Default \"_anonymized.fif\" will be attached to the input file name."),
                                   QCoreApplication::translate("main","outfile"));
     m_parser.addOption(outFileOpt);
 
@@ -203,7 +203,7 @@ void SettingsControllerCl::initParser()
     m_parser.addOption(deleteInFileConfirmOpt);
 
     QCommandLineOption bruteOpt(QStringList() << "b" << "brute",
-                                QCoreApplication::translate("main","Anonymize additional subject’s information like weight, height, sex and handedness, and project’s data,"
+                                QCoreApplication::translate("main","Anonymize additional subject information like weight, height, sex and handedness, and project data,"
                                                             " subject's data. See help above. Default: false"));
     m_parser.addOption(bruteOpt);
 
@@ -218,7 +218,7 @@ void SettingsControllerCl::initParser()
     m_parser.addOption(measDateOffsetOpt);
 
     QCommandLineOption birthdayOpt(QStringList() << "sb" << "subject_birthday",
-                                   QCoreApplication::translate("main","Specify the subject’s birthday. Format: DDMMYYYY. Default: 01012000"),
+                                   QCoreApplication::translate("main","Specify the subject birthday date. Format: DDMMYYYY. Default: 01012000"),
                                    QCoreApplication::translate("main","date"));
     m_parser.addOption(birthdayOpt);
 
@@ -227,7 +227,7 @@ void SettingsControllerCl::initParser()
                                          QCoreApplication::translate("main","days"));
     m_parser.addOption(birthdayOffsetOpt);
 
-    QCommandLineOption subjectIdOpt("his",QCoreApplication::translate("main","Specify the subject’s ID within the Hospital information system. Default: ‘mne_anonymize’"),
+    QCommandLineOption subjectIdOpt("his",QCoreApplication::translate("main","Specify the subject ID within the Hospital information system. Default: \"mne_anonymize\""),
                                           QCoreApplication::translate("main","id#"));
     m_parser.addOption(subjectIdOpt);
 
@@ -421,7 +421,7 @@ int SettingsControllerCl::parseInOutFiles()
 
 //=============================================================================================================
 
-int SettingsControllerCl::execute()
+int SettingsControllerCl::run()
 {
     if(m_pAnonymizer->anonymizeFile())
     {
@@ -445,6 +445,8 @@ int SettingsControllerCl::execute()
     }
 
     printFooterIfVerbose();
+
+    emit finished(0);
 
     return 0;
 }
@@ -554,8 +556,15 @@ void SettingsControllerCl::printHeaderIfVerbose()
     printIfVerbose(" ");
     printIfVerbose("=============================================================================================");
     printIfVerbose(" ");
-    printIfVerbose(m_sAppName + "  (Version: " + m_sAppVer + ")");
+    printIfVerbose(m_sAppName + "    Version: " + m_sAppVer);
     printIfVerbose("Build Date: " + m_sBuildDate);
+    printIfVerbose("Build Hash: " + m_sBuildHash);
+    printIfVerbose(" ");
+    printIfVerbose(QString("Utils Lib Build Date: ") + UTILSLIB::buildDateTime());
+    printIfVerbose(QString("Utils Lib Build Hash: ") + UTILSLIB::buildHash());
+    printIfVerbose(" ");
+    printIfVerbose(QString("Fiff Lib Build Date: ") + FIFFLIB::buildDateTime());
+    printIfVerbose(QString("Fiff Lib Build Hash: ") + FIFFLIB::buildHash());
     printIfVerbose(" ");
 }
 

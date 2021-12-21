@@ -713,3 +713,10 @@ void NoiseReduction::createSpharaOperator()
 
     m_mutex.unlock();
 }
+
+//=============================================================================================================
+
+QString NoiseReduction::getBuildInfo()
+{
+    return QString(NOISEREDUCTIONPLUGIN::buildDateTime()) + QString(" - ")  + QString(NOISEREDUCTIONPLUGIN::buildHash());
+}

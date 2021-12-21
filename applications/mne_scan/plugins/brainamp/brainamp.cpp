@@ -401,3 +401,10 @@ void BrainAMP::showSetupProjectDialog()
         m_pBrainAMPSetupProjectWidget->raise();
     }
 }
+
+//=============================================================================================================
+
+QString BrainAMP::getBuildInfo()
+{
+    return QString(BRAINAMPPLUGIN::buildDateTime()) + QString(" - ")  + QString(BRAINAMPPLUGIN::buildHash());
+}

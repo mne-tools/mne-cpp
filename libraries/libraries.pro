@@ -40,6 +40,7 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
+    events \
     utils \
     fs \
     fiff \
@@ -64,11 +65,12 @@ SUBDIRS += \
 utils.depends =
 fs.depends = utils
 fiff.depends = utils
+events.depends = utils
 mne.depends = utils fs fiff
 fwd.depends = utils fs fiff mne
 inverse.depends = utils fs fiff mne fwd
 communication.depends = utils fiff
 rtprocessing.depends = utils connectivity fiff mne fwd inverse
 connectivity.depends = utils fs fiff mne
-disp.depends = utils fs fiff mne fwd inverse rtprocessing
+disp.depends = utils fs fiff mne fwd inverse rtprocessing events
 disp3D.depends = utils connectivity rtprocessing fs fiff mne fwd inverse disp

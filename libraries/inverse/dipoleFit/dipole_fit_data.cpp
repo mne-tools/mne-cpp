@@ -949,7 +949,7 @@ static int condition_cov_3(MneCovMatrix* c, float rank_threshold, int use_rank)
         printf("\n\tEstimated covariance matrix rank = %d (%g)\n",nok,lambda[c->ncov-nok]/lambda[c->ncov-1]);
         if (use_rank > 0 && use_rank < nok) {
             nok = use_rank;
-            fprintf(stderr,"\tUser-selected covariance matrix rank = %d (%g)\n",nok,lambda[c->ncov-nok]/lambda[c->ncov-1]);
+            printf("\tUser-selected covariance matrix rank = %d (%g)\n",nok,lambda[c->ncov-nok]/lambda[c->ncov-1]);
         }
         /*
      * Put it back together
@@ -1067,7 +1067,7 @@ static int mne_decompose_eigen_cov_small_3(MneCovMatrix* c,float small, int use_
     if (c->cov_diag)
         return mne_add_inv_cov_3(c);
     if (c->lambda && c->eigen) {
-        fprintf(stderr,"\n\tEigenvalue decomposition had been precomputed.\n");
+        printf("\n\tEigenvalue decomposition had been precomputed.\n");
         c->nzero = 0;
         for (k = 0; k < c->ncov; k++, c->nzero++)
             if (c->lambda[k] > 0)
@@ -1285,16 +1285,16 @@ void mne_regularize_cov(MneCovMatrix* c,       /* The matrix to regularize */
             nn[c->ch_class[j]]++;
         }
     }
-    fprintf(stderr,"Average noise-covariance matrix diagonals:\n");
+    printf("Average noise-covariance matrix diagonals:\n");
     for (j = 0; j < nkind; j++) {
         if (nn[j] > 0) {
             sums[j] = sums[j]/nn[j];
             if (j == MNE_COV_CH_MEG_MAG)
-                fprintf(stderr,"\tMagnetometers       : %-7.2f fT    reg = %-6.2f\n",1e15*sqrt(sums[j]),regs[j]);
+                printf("\tMagnetometers       : %-7.2f fT    reg = %-6.2f\n",1e15*sqrt(sums[j]),regs[j]);
             else if (j == MNE_COV_CH_MEG_GRAD)
-                fprintf(stderr,"\tPlanar gradiometers : %-7.2f fT/cm reg = %-6.2f\n",1e13*sqrt(sums[j]),regs[j]);
+                printf("\tPlanar gradiometers : %-7.2f fT/cm reg = %-6.2f\n",1e13*sqrt(sums[j]),regs[j]);
             else
-                fprintf(stderr,"\tEEG                 : %-7.2f uV    reg = %-6.2f\n",1e6*sqrt(sums[j]),regs[j]);
+                printf("\tEEG                 : %-7.2f uV    reg = %-6.2f\n",1e6*sqrt(sums[j]),regs[j]);
             sums[j] = regs[j]*sums[j];
         }
     }
@@ -1305,7 +1305,7 @@ void mne_regularize_cov(MneCovMatrix* c,       /* The matrix to regularize */
         if (c->ch_class[j] >= 0)
             c->cov[mne_lt_packed_index_3(j,j)] += sums[c->ch_class[j]];
 
-    fprintf(stderr,"Noise-covariance regularized as requested.\n");
+    printf("Noise-covariance regularized as requested.\n");
     return;
 }
 
@@ -1491,7 +1491,7 @@ static int report_func(int     loop,
 {
     float *r0 = fitpar;
 
-    fprintf(stderr,"loop %d r0 %7.1f %7.1f %7.1f fval %g\n",
+    printf("loop %d r0 %7.1f %7.1f %7.1f fval %g\n",
             loop,1000*r0[0],1000*r0[1],1000*r0[2],fval);
 
     return OK;
@@ -1520,7 +1520,7 @@ static float fit_sphere_eval(float *fitpar,
     F = sum2 - sum*sum/user->np;
 
     if (user->report)
-        fprintf(stderr,"r0 %7.1f %7.1f %7.1f R %7.1f fval %g\n",
+        printf("r0 %7.1f %7.1f %7.1f R %7.1f fval %g\n",
                 1000*r0[0],1000*r0[1],1000*r0[2],1000*sum/user->np,F);
 
     return F;
@@ -1613,7 +1613,7 @@ int fit_sphere_to_points(float **rr,
     calculate_cm_ave_dist(rr,np,cm,&R0);
 
 #ifdef DEBUG
-    fprintf(stderr,"cm %7.1f %7.1f %7.1f R %7.1f\n",
+    printf("cm %7.1f %7.1f %7.1f R %7.1f\n",
             1000*cm[0],1000*cm[1],1000*cm[2],1000*R0);
 #endif
 
@@ -2072,7 +2072,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
         FREE_CMATRIX_3(mat_eeg); mat_eeg = NULL; nvec_eeg = 0;
     }
     if (nvec_meg + nvec_eeg == 0) {
-        fprintf(stderr,"No projection remains after excluding bad channels. Omitting projection.\n");
+        printf("No projection remains after excluding bad channels. Omitting projection.\n");
         return OK;
     }
     /*
@@ -2119,7 +2119,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
         if (sing_eeg[p]/sing_eeg[0] < USE_LIMIT)
             break;
 #ifdef DEBUG
-    fprintf(stderr,"Number of linearly independent vectors = %d\n",op->nvec);
+    printf("Number of linearly independent vectors = %d\n",op->nvec);
 #endif
     op->proj_data = ALLOC_CMATRIX_3(op->nvec,op->nch);
 #ifdef DEBUG
@@ -2266,24 +2266,25 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
 
             for (j = 0; j < nchan; j++)
                 chs.append(FiffChInfo());
-                chs[j].scanNo = -1;
+            chs[j].scanNo = -1;
             to_find = nchan;
             break;
 
         case FIFF_PARENT_BLOCK_ID :
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
-//            id = t_pTag->toFiffID();
             *id = *(fiffId)t_pTag->data();
             break;
 
         case FIFF_COORD_TRANS :
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
-//            t = t_pTag->toCoordTrans();
             t = FiffCoordTransOld::read_helper( t_pTag );
-            if (t->from != FIFFV_COORD_DEVICE || t->to   != FIFFV_COORD_HEAD)
+            if (t && (t->from != FIFFV_COORD_DEVICE || t->to != FIFFV_COORD_HEAD))
+            {
+                delete t;
                 t = NULL;
+            }
             break;
 
         case FIFF_CH_INFO : /* Information about one channel */
@@ -2825,7 +2826,8 @@ static int get_all_chs (//fiffFile file,	        /* The file we are reading */
 {
     QList<FiffChInfo> ch;
     FiffChInfo this_ch;
-    int j,k,nchan;
+    int j,k;
+    int nchan = 0;
     int to_find = 0;
     FiffDirNode::SPtr meas;
     FiffDirNode::SPtr meas_info;
@@ -3334,27 +3336,28 @@ int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix*& c)
 DipoleFitData::DipoleFitData()
 : mri_head_t (NULL)
 , meg_head_t (NULL)
-, meg_coils (NULL)
-, eeg_els (NULL)
+, coord_frame(FIFFV_COORD_UNKNOWN)
 , nmeg (0)
 , neeg (0)
 , ch_names (NULL)
 , pick (NULL)
-, bem_model (NULL)
+, meg_coils (NULL)
+, eeg_els (NULL)
 , eeg_model (NULL)
-, fixed_noise (FALSE)
-, noise (NULL)
-, noise_orig (NULL)
-, nave (1)
-, user (NULL)
-, user_free (NULL)
-, proj (NULL)
+, bem_model (NULL)
 , sphere_funcs (NULL)
 , bem_funcs (NULL)
-, mag_dipole_funcs (NULL)
 , funcs (NULL)
+, mag_dipole_funcs (NULL)
+, fixed_noise (FALSE)
+, noise_orig (NULL)
+, noise (NULL)
+, nave (1)
+, proj (NULL)
 , column_norm (COLUMN_NORM_NONE)
 , fit_mag_dipoles (FALSE)
+, user (NULL)
+, user_free (NULL)
 {
     r0[0] = 0.0f;
     r0[1] = 0.0f;
@@ -3679,6 +3682,9 @@ int DipoleFitData::make_projection(const QList<QString> &projnames,
     return OK;
 
 bad :
+    if(all)
+        delete all;
+    all = NULL;
     return FAIL;
 }
 
@@ -3693,7 +3699,7 @@ int DipoleFitData::scale_noise_cov(DipoleFitData *f, int nave)
         return OK;
 
     if (f->noise->cov != NULL) {
-        fprintf(stderr,"Decomposing the sensor noise covariance matrix...\n");
+        printf("Decomposing the sensor noise covariance matrix...\n");
         if (mne_decompose_eigen_cov_3(f->noise) == FAIL)
             goto bad;
 
@@ -3710,11 +3716,11 @@ int DipoleFitData::scale_noise_cov(DipoleFitData *f, int nave)
     else {
         for (k = 0; k < f->noise->ncov; k++)
             f->noise->cov_diag[k] = nave_ratio*f->noise->cov_diag[k];
-        fprintf(stderr,"Decomposition not needed for a diagonal noise covariance matrix.\n");
+        printf("Decomposition not needed for a diagonal noise covariance matrix.\n");
         if (mne_add_inv_cov_3(f->noise) == FAIL)
             goto bad;
     }
-    fprintf(stderr,"Effective nave is now %d\n",nave);
+    printf("Effective nave is now %d\n",nave);
     f->nave = nave;
     return OK;
 
@@ -3738,7 +3744,7 @@ int DipoleFitData::scale_dipole_fit_noise_cov(DipoleFitData *f, int nave)
         /*
          * Do the decomposition and check that the matrix is positive definite
          */
-        fprintf(stderr,"Decomposing the noise covariance...");
+        printf("Decomposing the noise covariance...");
         if (f->noise->cov) {
             if (mne_decompose_eigen_cov_3(f->noise) == FAIL)
                 goto bad;
@@ -3760,11 +3766,11 @@ int DipoleFitData::scale_dipole_fit_noise_cov(DipoleFitData *f, int nave)
     else {
         for (k = 0; k < f->noise->ncov; k++)
             f->noise->cov_diag[k] = nave_ratio*f->noise->cov_diag[k];
-        fprintf(stderr,"Decomposition not needed for a diagonal noise covariance matrix.\n");
+        printf("Decomposition not needed for a diagonal noise covariance matrix.\n");
         if (mne_add_inv_cov_3(f->noise) == FAIL)
             goto bad;
     }
-    fprintf(stderr,"Effective nave is now %d\n",nave);
+    printf("Effective nave is now %d\n",nave);
     f->nave = nave;
     return OK;
 
@@ -3821,10 +3827,12 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
         mne_free_cov_3(f->noise); f->noise = NULL;
         if (nmeg > 0 && nmeg-nomit_meg > 0 && nmeg-nomit_meg < min_nchan) {
             qCritical("Too few MEG channels remaining");
+            FREE_3(w);
             return FAIL;
         }
         if (neeg > 0 && neeg-nomit_eeg > 0 && neeg-nomit_eeg < min_nchan) {
             qCritical("Too few EEG channels remaining");
+            FREE_3(w);
             return FAIL;
         }
         f->noise = MneCovMatrix::mne_dup_cov(f->noise_orig);
@@ -3909,10 +3917,10 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
         res->mri_head_t = new FiffCoordTransOld(FIFFV_COORD_MRI,FIFFV_COORD_HEAD,rot,move);
     }
 
-    FiffCoordTransOld::mne_print_coord_transform(stderr,res->mri_head_t);
+    FiffCoordTransOld::mne_print_coord_transform(stdout,res->mri_head_t);
     if ((res->meg_head_t = FiffCoordTransOld::mne_read_meas_transform(measname)) == NULL)
         goto bad;
-    FiffCoordTransOld::mne_print_coord_transform(stderr,res->meg_head_t);
+    FiffCoordTransOld::mne_print_coord_transform(stdout,res->meg_head_t);
     /*
        * Read the bad channel lists
        */
@@ -4063,7 +4071,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
                         &res->proj) == FAIL)
         goto bad;
     if (res->proj && res->proj->nitems > 0) {
-        fprintf(stderr,"Final projection operator is:\n");
+        printf("Final projection operator is:\n");
         mne_proj_op_report_3(stderr,"\t",res->proj);
 
         if (mne_proj_op_chs_3(res->proj,res->ch_names,res->nmeg+res->neeg) == FAIL)
@@ -4114,7 +4122,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
        */
     if (diagnoise) {
         mne_revert_to_diag_cov(res->noise);
-        fprintf(stderr,"Using only the main diagonal of the noise-covariance matrix.\n");
+        printf("Using only the main diagonal of the noise-covariance matrix.\n");
     }
 
     /*
@@ -4154,11 +4162,11 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
     /*
        * Do the decomposition and check that the matrix is positive definite
        */
-    fprintf(stderr,"Decomposing the noise covariance...\n");
+    printf("Decomposing the noise covariance...\n");
     if (res->noise->cov) {
         if (mne_decompose_eigen_cov_3(res->noise) == FAIL)
             goto bad;
-        fprintf(stderr,"Eigenvalue decomposition done.\n");
+        printf("Eigenvalue decomposition done.\n");
         for (k = 0; k < res->noise->ncov; k++) {
             if (res->noise->lambda[k] < 0.0)
                 res->noise->lambda[k] = 0.0;
@@ -4207,7 +4215,7 @@ void print_fields(float       *rd,
 
     if (mne_get_values_from_data_3(time,integ,data->current->data,data->current->np,data->nchan,data->current->tmin,
                                    1.0/data->current->tstep,FALSE,one) == FAIL) {
-        fprintf(stderr,"Cannot pick time: %7.1f ms\n",1000*time);
+        printf("Cannot pick time: %7.1f ms\n",1000*time);
         return;
     }
     for (k = 0; k < data->nchan; k++)
@@ -4354,7 +4362,7 @@ static float fit_eval(float *rd,int npar,void *user)
     fwd = fuser->fwd = DipoleFitData::dipole_forward_one(fit,rd,fuser->fwd);
     ncomp = fwd->sing[2]/fwd->sing[0] > fuser->limit ? 3 : 2;
     if (fuser->report_dim)
-        fprintf(stderr,"ncomp = %d\n",ncomp);
+        printf("ncomp = %d\n",ncomp);
 
     for (c = 0, Bm2 = 0.0; c < ncomp; c++) {
         one = mne_dot_vectors_3(fwd->uu[c],fuser->B,fwd->nch);

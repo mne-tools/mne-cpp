@@ -33,8 +33,8 @@
  *
  */
 
-#ifndef WRITETOFILE_H
-#define WRITETOFILE_H
+#ifndef HPI_H
+#define HPI_H
 
 //=============================================================================================================
 // INCLUDES
@@ -44,6 +44,8 @@
 
 #include <utils/generics/circularbuffer.h>
 #include <scShared/Plugins/abstractalgorithm.h>
+
+#include <fiff/fiff_dig_point.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -65,6 +67,7 @@ namespace FIFFLIB {
     class FiffInfo;
     class FiffDigPoint;
     class FiffCoordTrans;
+    class FiffDigitizerData;
 }
 
 namespace INVERSELIB {
@@ -127,6 +130,7 @@ public:
     virtual AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
+    virtual QString getBuildInfo();
 
     //=========================================================================================================
     /**
@@ -237,6 +241,14 @@ private:
 
     //=========================================================================================================
     /**
+     * Set fitting window size when doing continuous hpi.
+     *
+     * @param[in] winSize    window size in samples
+     */
+    void setFittingWindowSize(int winSize);
+
+    //=========================================================================================================
+    /**
      * Read Polhemus data from fif file.
      */
     QList<FIFFLIB::FiffDigPoint> readPolhemusDig(const QString& fileName);
@@ -245,7 +257,39 @@ private:
     /**
      * AbstractAlgorithm function
      */
-    virtual void run();    
+    virtual void run();
+
+    //=========================================================================================================
+    /**
+     * Manages iitilization of measurement metadata
+     *
+     * @param[in] pRTMSA    input real-time multi-sample arraymeasurement
+     */
+    void manageInitialization(QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray> pRTMSA);
+
+    //=========================================================================================================
+    /**
+     * Initializes fiff info based on input info.
+     *
+     * @param[in] info      input fiff info objcts
+     */
+    void initFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> info);
+
+    //=========================================================================================================
+    /**
+     * Inititlizaes fiffi digitizer information based on input fiffDig.
+     *
+     * @param[in] fiffDig   input fiff digitizer information
+     */
+    void initFiffDigitizers(QSharedPointer<FIFFLIB::FiffDigitizerData> fiffDig);
+
+    //=========================================================================================================
+    /**
+     * Update viewer gui with current fiff digitizer metadata..
+     */
+    void updateDigitizerInfo();
+
+    void resetState();
 
     QMutex                      m_mutex;                    /**< The threads mutex.*/
 
@@ -254,7 +298,7 @@ private:
     QString                     m_sFilePathDigitzers;       /**< The file path to the current digitzers. */
 
     qint16                      m_iNumberBadChannels;       /**< The number of bad channels.*/
-    qint16                      m_iNumberOfFitsPerSecond;   /**< The number of allowed HPI fits per second. Default is 3.*/
+    qint16                      m_iFittingWindowSize;       /**< The number of samples in each fitting window.*/
 
     double                      m_dAllowedMeanErrorDist;    /**< The allowed error distance in order for the last fit to be counted as a good fit.*/
     double                      m_dAllowedMovement;         /**< The allowed head movement regarding reference head position.*/
@@ -270,6 +314,7 @@ private:
     Eigen::MatrixXd             m_matCompProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
 
     QSharedPointer<FIFFLIB::FiffInfo>                                           m_pFiffInfo;            /**< Fiff measurement info.*/
+    QSharedPointer<FIFFLIB::FiffDigitizerData>                                  m_pFiffDigitizerData;
     QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>                      m_pCircularBuffer;      /**< Holds incoming raw data. */
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pHpiInput;            /**< The RealTimeMultiSampleArray of the Hpi input.*/
@@ -281,7 +326,9 @@ signals:
     void movementResultsChanged(double dMovement,
                                 double dRotation);
     void devHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans);
+
+    void newDigitizerList(QList<FIFFLIB::FiffDigPoint> pointList);
 };
 } // NAMESPACE
 
-#endif // WRITETOFILE_H
+#endif // HPI_H

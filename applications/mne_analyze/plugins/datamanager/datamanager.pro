@@ -64,15 +64,18 @@ CONFIG(debug, debug|release) {
             -lmnecppFiffd \
             -lanSharedd \
             -lmnecppDispd \
+            -lmnecppEventsd \
 } else {
     LIBS += -lmnecppUtils \
             -lmnecppFiff \
             -lanShared \
             -lmnecppDisp \
+            -lmnecppEvents \
 }
 
 SOURCES += \
-    datamanager.cpp
+    datamanager.cpp \
+    datamanager_global.cpp
 
 HEADERS += \
     datamanager_global.h \
@@ -80,7 +83,11 @@ HEADERS += \
 
 OTHER_FILES += datamanager.json
 
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+clang {
+    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
+} else {
+    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
+}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 
@@ -107,3 +114,37 @@ contains(MNECPP_CONFIG, useFFTW) {
                 -lfftw3_threads \
     }
 }
+
+################################################## BUILD TIMESTAMP/HASH UPDATER ############################################
+
+FILE_TO_UPDATE = datamanager_global.cpp
+win32 {
+    CONFIG(debug, debug|release) {
+        OBJ_TARJET = debug\datamanager_global.obj
+    } else {
+        OBJ_TARJET = release\datamanager_global.obj
+    }
+}
+
+ALL_FILES += $$HEADERS
+ALL_FILES += $$SOURCES
+ALL_FILES -= $$FILE_TO_UPDATE
+
+FileUpdater.target = phonyFileUpdater
+for (I_FILE, ALL_FILES) {
+    FileUpdater.depends += $${PWD}/$${I_FILE}
+}
+
+unix|macx {
+    FileUpdater.commands = touch $${PWD}/$${FILE_TO_UPDATE} ; echo PASTA > phonyFileUpdater
+}
+
+win32 {
+    FileUpdater.commands = copy /y $$shell_path($${PWD})\\$${FILE_TO_UPDATE} +,, $$shell_path($${PWD})\\$${FILE_TO_UPDATE} & echo PASTA > phonyFileUpdater
+    OrderForcerTarget.target = $${OBJ_TARJET}
+    OrderForcerTarget.depends += phonyFileUpdater
+    QMAKE_EXTRA_TARGETS += OrderForcerTarget
+}
+
+PRE_TARGETDEPS += phonyFileUpdater
+QMAKE_EXTRA_TARGETS += FileUpdater

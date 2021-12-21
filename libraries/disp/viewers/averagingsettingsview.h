@@ -121,7 +121,7 @@ public:
 
     void setDetectedEpochs(const FIFFLIB::FiffEvokedSet& evokedSet);
 
-    void addSelectionGroup(const QString& sGroupName);
+    bool getAutoComputeStatus();
 
     void clearSelectionGroup();
 
@@ -172,6 +172,7 @@ protected:
     void onChangeBaselineTo();
     void onChangeNumAverages();    
     void onChangeStimChannel();
+    void onChangeGroupSelect(int iIndex);
 
     Ui::AverageSettingsViewWidget* m_pUi;              /**< Holds the user interface for the AverageSettingsViewWidget.*/
 
@@ -198,7 +199,7 @@ signals:
     void changeAverageMode(qint32 index);
     void calculateAverage(bool state);
     void changeDropActive(bool state);
-    void changeGroupSelect(const QString &text);
+    void setAutoCompute(bool state);
 };
 } // NAMESPACE
 

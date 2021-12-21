@@ -1,13 +1,15 @@
 //=============================================================================================================
 /**
  * @file     rtfiffrawview.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>;
+ *           Juan Garcia-Prieto <juangpc@gmail.com>
  * @since    0.1.0
  * @date     July, 2018
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2018, Lorenz Esch, Gabriel B Motta, Juan Garcia-Prieto. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -69,6 +71,7 @@ namespace FIFFLIB {
 
 namespace RTPROCESSINGLIB {
     class FilterKernel;
+    class EventList;
 }
 
 //=============================================================================================================
@@ -391,6 +394,12 @@ public:
      */
     void clearView();
 
+    //=========================================================================================================
+    /**
+     * Getter fcn for Sampling Frequency member.
+     */
+    float getSamplingFreq() const;
+
 protected:
     //=========================================================================================================
     /**
@@ -446,6 +455,14 @@ protected:
      */
     void markChBad();
 
+    //=========================================================================================================
+    /**
+     * Adds event based on last clicked position.
+     *
+     * @param[in] bChecked      State of action that triggered this function (unused)
+     */
+    void onAddEvent(bool bChecked);
+
     QPointer<QTableView>                        m_pTableView;                   /**< The QTableView being part of the model/view framework of Qt. */
     QPointer<DISPLIB::RtFiffRawViewDelegate>    m_pDelegate;                    /**< The channel data delegate. */
     QPointer<DISPLIB::RtFiffRawViewModel>       m_pModel;                       /**< The channel data model. */
@@ -462,8 +479,10 @@ protected:
     QStringList                                 m_slSelectedChannels;           /**< the currently selected channels from the selection manager window. */
     QColor                                      m_backgroundColor;              /**< Current background color. */
     int                                         m_iDistanceTimeSpacer;          /**< Current distance between time spacer. */
+    int                                         m_iClickPosX;
 
     QString                                     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
+
 
 signals:    
     //=========================================================================================================
@@ -483,7 +502,14 @@ signals:
     void triggerDetected(int numberDetectedTriggers,
                          const QMap<int,QList<QPair<int,double> > >& mapDetectedTriggers);
 
+    //=========================================================================================================
+    /**
+     * Emmited when marking of bad channels is changed
+     */
     void channelMarkingChanged();
+
+    //=========================================================================================================
+    void addSampleAsEvent(int iSample);
 };
 } // NAMESPACE
 

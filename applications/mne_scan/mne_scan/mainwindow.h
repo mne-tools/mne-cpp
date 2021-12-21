@@ -42,6 +42,7 @@
 
 #include "info.h"
 #include "mainsplashscreen.h"
+#include "mainsplashscreencloser.h"
 
 #include <disp/viewers/abstractview.h>
 
@@ -169,13 +170,24 @@ public:
 
     //=========================================================================================================
     /**
-     * Set the splash screen.
+     * Initialize the splash screen. By default, the slpash screen will be shown to the user.
      *
-     * @param[in] pSplashScreen        The pointer to the splash screen.
+     */
+    void initSplashScreen();
+
+    //=========================================================================================================
+    /**
+     * Initialize the splash screen.
+     *
      * @param[in] bShowSplashScreen    Whether to show the splash screen until this widget is shown. Default is true.
      */
-    void setSplashScreen(MainSplashScreen::SPtr& pSplashScreen,
-                         bool bShowSplashScreen = true);
+    void initSplashScreen(bool bShowSplashScreen);
+
+    //=========================================================================================================
+    /**
+     * Public function to hide Main applications splash screen.
+     */
+    void hideSplashScreen();
 
     //=========================================================================================================
     /**
@@ -273,6 +285,10 @@ private:
      */
     void initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::AbstractPlugin> > lPlugins);
 
+    //=========================================================================================================
+    /**
+     * Process the event of a widget changing its location.
+     */
     void onDockLocationChanged(QWidget* pWidget);
 
     //=========================================================================================================
@@ -384,7 +400,7 @@ private:
     QPointer<QAction>                   m_pActionRun;                   /**< run application. */
     QPointer<QAction>                   m_pActionStop;                  /**< stop application. */
     QPointer<QAction>                   m_pActionDefaultMode;           /**< stop application. */
-    QPointer<QAction>                   m_pActionResearchMode;        /**< activate research gui mode. */
+    QPointer<QAction>                   m_pActionResearchMode;          /**< activate research gui mode. */
     QPointer<QAction>                   m_pActionClinicalMode;          /**< activate clinical gui mode. */
 
     QList<QAction*>                     m_qListDynamicPluginActions;    /**< dynamic plugin actions. */
@@ -417,7 +433,8 @@ private:
 
     QPointer<DISPLIB::QuickControlView> m_pQuickControlView;            /**< quick control widget. */
 
-    MainSplashScreen::SPtr              m_pSplashScreen;                /**< Holds the splash scren. */
+    MainSplashScreenCloser::SPtr         m_pSplashScreenHider;           /**< Holds the object responsible of hiding the splashscreen. */
+    MainSplashScreen::SPtr              m_pSplashScreen;                /**< Holds the splash screen. */
 
     QSharedPointer<QTimer>                              m_pTimer;               /**< timer of the main application*/
     QSharedPointer<QTime>                               m_pTime;                /**< Holds current time output, updated with timeout of timer.*/

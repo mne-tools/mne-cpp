@@ -67,6 +67,8 @@
 #include <mne/c/mne_msh_display_surface_set.h>
 #include <mne/c/mne_surface_or_volume.h>
 
+#include <memory>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -173,7 +175,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
         } else {
             //qDebug()<<"RealTime3DWidget::getData - Working with m_pRtConnectivityItem";
             QPair<float,float> freqs = pRTCE->getValue()->getFrequencyRange();
-            QString sItemName = QString("%1_%2_%3").arg(pRTCE->getValue()->getConnectivityMethod()).arg(QString::number(freqs.first)).arg(QString::number(freqs.second));
+            QString sItemName = QString("%1_%2_%3").arg(pRTCE->getValue()->getConnectivityMethod(), QString::number(freqs.first), QString::number(freqs.second));
             m_pRtConnectivityItem->setText(sItemName);
             m_pRtConnectivityItem->addData(*(pRTCE->getValue().data()));
 
@@ -227,7 +229,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_pData3DModel->addMegSensorInfo("Device", "BabyMEG", QList<FiffChInfo>(), t_babyMEGsensorSurfaceBEM)->setCheckState(Qt::Unchecked);
 
             // Add sensor surface VectorView
-            QFile t_fileVVSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m.fif");
+            QFile t_fileVVSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
             MNEBem t_sensorVVSurfaceBEM(t_fileVVSensorSurfaceBEM);
             m_pData3DModel->addMegSensorInfo("Device", "VectorView", QList<FiffChInfo>(), t_sensorVVSurfaceBEM);
 
@@ -242,12 +244,16 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 //Add all digitizer but additional points to the 3D view
                 QFile fileDig(pHpiFitResult->sFilePathDigitzers);
                 FiffDigPointSet digSet(fileDig);
-                FiffDigPointSet digSetWithoutAdditional = digSet.pickTypes(QList<int>()<<FIFFV_POINT_HPI<<FIFFV_POINT_CARDINAL<<FIFFV_POINT_EEG<<FIFFV_POINT_EXTRA);
-                m_pTrackedDigitizer = m_pData3DModel->addDigitizerData("Subject",
-                                                                       "Tracked Digitizers",
-                                                                       digSetWithoutAdditional);
-
+                addDigSetToView(digSet);
                 alignFiducials(pHpiFitResult->sFilePathDigitzers);
+            }
+            if (!m_pFiffDigitizerData && m_pBemHeadAvr){
+                if (auto pDigData = pRTHR->digitizerData()){
+                    m_pFiffDigitizerData = pDigData;
+                    FiffDigPointSet digSet(pDigData->points);
+                    addDigSetToView(digSet);
+                    alignFiducials(pDigData);
+                }
             }
 
             //Add and update items to 3D view
@@ -295,13 +301,32 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 
 //=============================================================================================================
 
+void RealTime3DWidget::addDigSetToView(const FIFFLIB::FiffDigPointSet& digSet)
+{
+    FiffDigPointSet digSetWithoutAdditional = digSet.pickTypes(QList<int>()<<FIFFV_POINT_HPI<<FIFFV_POINT_CARDINAL<<FIFFV_POINT_EEG<<FIFFV_POINT_EXTRA);
+    m_pTrackedDigitizer = m_pData3DModel->addDigitizerData("Subject",
+                                                           "Tracked Digitizers",
+                                                           digSetWithoutAdditional);
+}
+
+//=============================================================================================================
+
 void RealTime3DWidget::alignFiducials(const QString& sFilePath)
 {
     m_sFilePathDigitizers = sFilePath;
 
-    //Calculate the alignment of the fiducials
-    MneMshDisplaySurfaceSet* pMneMshDisplaySurfaceSet = new MneMshDisplaySurfaceSet();
-    MneMshDisplaySurfaceSet::add_bem_surface(pMneMshDisplaySurfaceSet,
+    QFile t_fileDigData(sFilePath);
+    QSharedPointer<FIFFLIB::FiffDigitizerData> t_digData = QSharedPointer<FIFFLIB::FiffDigitizerData>::create(t_fileDigData);
+
+    alignFiducials(t_digData);
+}
+
+//=============================================================================================================
+
+void RealTime3DWidget::alignFiducials(QSharedPointer<FIFFLIB::FiffDigitizerData> pDigData)
+{
+    std::unique_ptr<MneMshDisplaySurfaceSet> pMneMshDisplaySurfaceSet = std::make_unique<MneMshDisplaySurfaceSet>();
+    MneMshDisplaySurfaceSet::add_bem_surface(pMneMshDisplaySurfaceSet.get(),
                                              QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif",
                                              FIFFV_BEM_SURF_ID_HEAD,
                                              "head",
@@ -310,14 +335,11 @@ void RealTime3DWidget::alignFiducials(const QString& sFilePath)
 
     MneMshDisplaySurface* surface = pMneMshDisplaySurfaceSet->surfs[0];
 
-    QFile t_fileDigData(sFilePath);
-    FiffDigitizerData* t_digData = new FiffDigitizerData(t_fileDigData);
-
     QFile t_fileDigDataReference(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-fiducials.fif");
 
     float scales[3];
     QScopedPointer<FiffDigitizerData> t_digDataReference(new FiffDigitizerData(t_fileDigDataReference));
-    MneSurfaceOrVolume::align_fiducials(t_digData,
+    MneSurfaceOrVolume::align_fiducials(pDigData.data(),
                                         t_digDataReference.data(),
                                         surface,
                                         10,
@@ -325,19 +347,15 @@ void RealTime3DWidget::alignFiducials(const QString& sFilePath)
                                         0,
                                         scales);
 
-    QMatrix4x4 invMat;
+    QMatrix4x4 invMat = calculateInverseMatrix(pDigData, scales[0]);
 
-    // use inverse transform
-    for(int r = 0; r < 3; ++r) {
-        for(int c = 0; c < 3; ++c) {
-            // also apply scaling factor
-            invMat(r,c) = t_digData->head_mri_t_adj->invrot(r,c) * scales[0];
-        }
-    }
-    invMat(0,3) = t_digData->head_mri_t_adj->invmove(0);
-    invMat(1,3) = t_digData->head_mri_t_adj->invmove(1);
-    invMat(2,3) = t_digData->head_mri_t_adj->invmove(2);
+    applyAlignmentTransform(invMat);
+}
 
+//=============================================================================================================
+
+void RealTime3DWidget::applyAlignmentTransform(QMatrix4x4& invMat)
+{
     Qt3DCore::QTransform identity;
     m_tAlignment.setMatrix(invMat);
 
@@ -348,8 +366,27 @@ void RealTime3DWidget::alignFiducials(const QString& sFilePath)
             pBemItem->setTransform(m_tAlignment);
         }
     }
+}
 
-    delete pMneMshDisplaySurfaceSet;
+//=============================================================================================================
+
+QMatrix4x4 RealTime3DWidget::calculateInverseMatrix(const QSharedPointer<FIFFLIB::FiffDigitizerData> pDigData,
+                                                    float scale) const
+{
+    QMatrix4x4 invMat;
+
+    // use inverse transform
+    for(int r = 0; r < 3; ++r) {
+        for(int c = 0; c < 3; ++c) {
+            // also apply scaling factor
+            invMat(r,c) = pDigData->head_mri_t_adj->invrot(r,c) * scale;
+        }
+    }
+    invMat(0,3) = pDigData->head_mri_t_adj->invmove(0);
+    invMat(1,3) = pDigData->head_mri_t_adj->invmove(1);
+    invMat(2,3) = pDigData->head_mri_t_adj->invmove(2);
+
+    return invMat;
 }
 
 //=============================================================================================================
@@ -390,6 +427,12 @@ void RealTime3DWidget::initDisplayControllWidgets()
 
     connect(pControl3DView, &Control3DView::takeScreenshotChanged,
             m_p3DView.data(), &View3D::takeScreenshot);
+
+    connect(pControl3DView, &Control3DView::toggleSingleView,
+            m_p3DView.data(), &View3D::showSingleView);
+
+    connect(pControl3DView, &Control3DView::toggleMutiview,
+            m_p3DView.data(), &View3D::showMultiView);
 
     emit displayControlWidgetsChanged(lControlWidgets, "3D View");
 

@@ -152,7 +152,7 @@ public:
      *
      * @return List of subscriptions.
      */
-    inline QVector<EVENT_TYPE> getSubscriptions(void) const;
+    inline const QVector<EVENT_TYPE> getSubscriptions(void) const;
 
     //=========================================================================================================
     /**
@@ -190,7 +190,7 @@ inline Communicator::CommunicatorID Communicator::nextID()
 
 //=============================================================================================================
 
-inline QVector<EVENT_TYPE> Communicator::getSubscriptions(void) const
+inline const QVector<EVENT_TYPE> Communicator::getSubscriptions(void) const
 {
     return m_EventSubscriptions;
 }

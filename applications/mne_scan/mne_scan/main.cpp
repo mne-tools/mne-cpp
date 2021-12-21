@@ -71,8 +71,6 @@
 
 using namespace SCMEASLIB;
 using namespace MNESCAN;
-using namespace Eigen;
-using namespace UTILSLIB;
 
 //=============================================================================================================
 // GLOBAL DEFINTIONS
@@ -152,7 +150,7 @@ int main(int argc, char *argv[])
     #endif
     #endif
 
-    qInstallMessageHandler(ApplicationLogger::customLogWriter);
+    qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     QApplication app(argc, argv);
     //app.setAttribute(Qt::AA_DontCreateNativeWidgetSiblings, true);
 
@@ -168,11 +166,12 @@ int main(int argc, char *argv[])
     SCMEASLIB::MeasurementTypes::registerTypes();
 
     MainWindow mainWin;
-    mainWin.show();
 
     QSurfaceFormat fmt;
     fmt.setSamples(10);
     QSurfaceFormat::setDefaultFormat(fmt);
 
-    return app.exec();
+    int returnValue(app.exec());
+
+    return returnValue;
 }

@@ -4,7 +4,8 @@
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
- *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+ *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
+ *           Juan Garcia-Prieto <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     January, 2017
  *
@@ -43,6 +44,7 @@
 //=============================================================================================================
 
 #include <disp/viewers/abstractview.h>
+#include "analyzecore.h"
 
 //=============================================================================================================
 // Qt INCLUDES
@@ -54,6 +56,7 @@
 #include <QPointer>
 #include <QTextBrowser>
 #include <QSettings>
+#include <QMutex>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -65,10 +68,6 @@ class QMenu;
 class QDockWidget;
 class QGridLayout;
 QT_END_NAMESPACE
-
-namespace ANSHAREDLIB {
-    class PluginManager;
-}
 
 namespace DISPLIB {
     class MultiView;
@@ -101,14 +100,15 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs a MainWindow which is a child of parent.
+     * Constructs a MainWindow which is a child of parent.If parent is another widget, MainWindow becomes a
+     * child window inside parent. MainWindow is deleted when its parent is deleted.
      *
-     * @param[in] pPluginManager Pointer to the plugin manager. It is needed to display subwindows froms plugins.
-     * @param[in] parent Pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window.
-     *                    If parent is another widget, MainWindow becomes a child window inside parent.
-     *                    MainWindow is deleted when its parent is deleted.
+     * @param [in] pAnalyzeCore Pointer to the application controller class. It is needed to display subwindows froms plugins.
+     * @param [in] parent Pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window.
+     *
      */
-    MainWindow(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager, QWidget *parent = Q_NULLPTR);
+    MainWindow(AnalyzeCore* pAnalyzeCore,
+               QWidget *parent = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -149,6 +149,12 @@ public:
      */
     void loadSettings();
 
+    //=========================================================================================================
+    /**
+     * Redraw all the menus and actions created by the plugins.
+     */
+    void updatePluginsUI();
+
 signals:    
     //=========================================================================================================
     /**
@@ -172,26 +178,26 @@ signals:
      */
     void guiStyleChanged(DISPLIB::AbstractView::StyleMode style);
 
-private:
     //=========================================================================================================
     /**
-     * Creates the menu actions.
+     * Signal emmited whenever the gui menu option: Reload Plugins is clicked.
      */
-    void createActions();
+    void reloadPlugins();
 
+private:
     //=========================================================================================================
     /**
      * Changes the current layout style of the application.
      *
      * @param[in] sStyle   The new qss style.
      */
-    void onStyleChanged();
+    void changeStyle();
 
     //=========================================================================================================
     /**
      * Handles changes made to the application's GUI mode.
      */
-    void onGuiModeChanged();
+    void manageGuiModeChanged();
 
     //=========================================================================================================
     /**
@@ -206,23 +212,95 @@ private:
     void setCurrentStyle(const QString& style);
 
     //=========================================================================================================
-    /**< Creates all actions for user interface of MainWindow class. */
-    void createPluginMenus(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);          /**< Creates all menus for user interface of MainWindow class. */
-    void createPluginControls(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);    /**< Creates all dock windows for user interface of MainWindow class. */
-    void createPluginViews(QSharedPointer<ANSHAREDLIB::PluginManager> pPluginManager);      /**< Creates all Windows within the MultiView for user interface of MainWindow class. */
-    void tabifyDockWindows();                                                                   /**< Tabify all dock windows. */
-    void about();                                                                               /**< Implements about action.*/
+    /**
+    * Creates all actions for user interface of MainWindow class.
+    */
+    void createPluginMenus();
+
+    //=========================================================================================================
+    /**
+     * Creates all dock windows for user interface of MainWindow class.
+     */
+    void createPluginControls();
+
+    //=========================================================================================================
+    /**
+     *  Creates all Windows within the MultiView for user interface of MainWindow class.
+     */
+    void createPluginViews();
+
+    //=========================================================================================================
+    /**
+     * Tabify all dock windows.
+     */
+    void tabifyDockWindows();
+
+    //=========================================================================================================
+    /**
+     * Implements about action.
+     */
+    void about();
+
+    //=========================================================================================================
+    /**
+     * Check the initialization state of the plugins and if correct, initialize all the menus, actions created
+     * by all the plugins.
+     */
+    void initMenusAndPluginControls();
+
+    //=========================================================================================================
+    /**
+     * Creates the menu actions.
+     */
+    void initMenuBar();
+\
+    //=========================================================================================================
+    /**
+     * Initialize this window's name size and some properties.
+     */
+    void initWindow();
+
+    //=========================================================================================================
+    /**
+     * Load previously saved configuration settings for windows, tab order, and style.
+     */
+    void loadSavedSettingsAndState();
+
+    //=========================================================================================================
+    /**
+     * Initialize statusbar for this window.
+     */
+    void initStatusBar();
+
+    //=========================================================================================================
+    /**
+     * Set the properties of the control views, regarding how and where they can be tabbed.
+     */
+    void initPluginControls();
+
+    //=========================================================================================================
+    /**
+     * Initialize the multiview widget that holds the views for each plugin.
+     */
+    void initPluginViews();
+
+    //=========================================================================================================
+    /**
+     * Delete the menus created in initMenuBar.
+     */
+    void deleteMenus();
 
     QPointer<DISPLIB::MultiView>        m_pMultiView;               /**< The central View.*/
-
-    QPointer<QGridLayout>               m_pGridLayout;              /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow. */
+    QPointer<AnalyzeCore>               m_pAnalyzeCoreController;   /**< Pointer to the application controller Obj.*/
+    QPointer<QGridLayout>               m_pGridLayout;              /**< Grid Layout is used for MainWindow, so that the MultiView can always fit the size of MainWindow */
 
     // MainWindow actions
-    QPointer<QAction>                   m_pActionExit;              /**< exit application action. */
-    QPointer<QAction>                   m_pActionAbout;             /**< show about dialog action. */
-    QPointer<QAction>                   m_pActionResearchMode;      /**< toggle research mode action. */
-    QPointer<QAction>                   m_pActionClinicalMode;      /**< toggle clinical mode action. */
-    QPointer<QAction>                   m_pActionDarkMode;          /**< toggle dark mode. */
+    QPointer<QAction>                   m_pActionExit;              /**< Exit application action. */
+    QPointer<QAction>                   m_pActionReloadPlugins;     /**< Reload plugins action. */
+    QPointer<QAction>                   m_pActionAbout;             /**< Show about dialog action. */
+    QPointer<QAction>                   m_pActionResearchMode;      /**< Toggle research mode action. */
+    QPointer<QAction>                   m_pActionClinicalMode;      /**< Toggle clinical mode action. */
+    QPointer<QAction>                   m_pActionDarkMode;          /**< Toggle dark mode. */
 
     // MainWindow menus
     QPointer<QMenu>                     m_pMenuFile;                /**< Holds the file menu.*/
@@ -237,6 +315,8 @@ private:
 
     QString                             m_sSettingsPath;            /**< The settings path to store the GUI settings to. */
     QString                             m_sCurrentStyle;            /**< The currently selected style (dark mode, default mode). */
+
+    QMutex                              m_Mutex;                    /**< Thread-safing for printing messages. */
 };
 
 }// NAMESPACE

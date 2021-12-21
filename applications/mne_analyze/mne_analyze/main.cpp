@@ -71,7 +71,7 @@ using namespace MNEANALYZE;
 Q_IMPORT_PLUGIN(DataLoader)
 Q_IMPORT_PLUGIN(DataManager)
 Q_IMPORT_PLUGIN(RawDataViewer)
-Q_IMPORT_PLUGIN(AnnotationManager)
+Q_IMPORT_PLUGIN(Events)
 Q_IMPORT_PLUGIN(Filtering)
 Q_IMPORT_PLUGIN(Averaging)
 Q_IMPORT_PLUGIN(SourceLocalization)

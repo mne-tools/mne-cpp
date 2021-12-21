@@ -5,6 +5,7 @@
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>
+ *           Juan Garcia-Prieto <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     February, 2017
  *
@@ -103,9 +104,17 @@ public:
 
     //=========================================================================================================
     /**
+     * Loads a single from given absolute file path string.
+     *
+     * @param [in] dir    The plugin file path.
+     */
+    void loadPlugin(const QString& file);
+
+    //=========================================================================================================
+    /**
      * Initializes the plugins.
      *
-     * @param[in] data          the global mne analyze data.
+     * @param [in] data    The global mne analyze data.
      */
     void initPlugins(QSharedPointer<AnalyzeData> data);
 
@@ -125,7 +134,7 @@ public:
      *
      * @return reference to vector containing all plugins.
      */
-    inline const QVector<AbstractPlugin*>& getPlugins();
+    inline const QVector<AbstractPlugin*> getPlugins();
 
     //=========================================================================================================
     /**
@@ -135,6 +144,12 @@ public:
     void shutdown();
 
 private:
+    //=========================================================================================================
+    /**
+     * Insert a plugin into the vector of plugins inserted.
+     */
+    void insertPlugin(AbstractPlugin*  plugin);
+
     QVector<AbstractPlugin*>    m_qVecPlugins;       /**< Vector containing all plugins. */
 };
 
@@ -142,7 +157,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline const QVector<AbstractPlugin*>& PluginManager::getPlugins()
+inline const QVector<AbstractPlugin*> PluginManager::getPlugins()
 {
     return m_qVecPlugins;
 }

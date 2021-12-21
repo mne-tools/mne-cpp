@@ -4,13 +4,14 @@
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
  *           Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
- *           Gabriel Motta <gbmotta@mgh.harvard.edu>
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>;
+ *           Juan GPC   <jgarciaprieto@mgh.harvard.edu>
  * @since    0.1.0
  * @date     July, 2018
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke, Gabriel Motta. All rights reserved.
+ * Copyright (C) 2018, Lorenz Esch, Lars Debor, Simon Heinke, Gabriel Motta, Juan GPC. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -199,14 +200,14 @@ public:
 
     //=========================================================================================================
     /**
-     * Brings up a menu for interacting with data annotations
+     * Brings up a menu for interacting with data events.
      * @param[in] pos   Position on screen where the menu will show up.
      */
     void customContextMenuRequested(const QPoint &pos);
 
     //=========================================================================================================
     /**
-     * Create a new annotation
+     * Create a new event
      *
      * @param[in] con   Whether a new annotaton should be created;.
      */
@@ -214,7 +215,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Controls toggling of annotation data
+     * Controls toggling of event data
      *
      * @param[in] iToggle   Sets toggle: 0 - don't show, 1+ - show.
      */
@@ -228,9 +229,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Moves data viewer to a position where the selected annotation is in the middle of the viewer.
+     * Moves data viewer to a position where the selected event is in the middle of the viewer.
      */
-    void updateScrollPositionToAnnotation();
+    void updateScrollPositionToEvent();
 
     //=========================================================================================================
     /**
@@ -307,7 +308,7 @@ public:
 signals:
     //=========================================================================================================
     /**
-     * Emits sample number to be added aan annotation
+     * Emits sample number to be added aan event
      *
      * @param[in] iSample      sample number to be added.
      */
@@ -371,6 +372,17 @@ private:
      */
     void updateVerticalScrollPosition(qint32 newScrollPosition);
 
+    //=========================================================================================================
+    /**
+     * Reloads the view to show the new real-time data.
+     */
+    void onNewRealtimeData();
+
+    //=========================================================================================================
+    /**
+     * Initialize the objects necessary for the righ-click add event menu to appear.
+     */
+    void initRightClickContextMenu();
 
     QPointer<QTableView>                                m_pTableView;                   /**< Pointer to table view ui element. */
 
@@ -380,9 +392,9 @@ private:
 
     QMap<qint32,float>                                  m_qMapChScaling;                /**< Channel scaling values. */
 
-    float                                               m_fDefaultSectionSize;          /**< Default row height. */
-    float                                               m_fZoomFactor;                  /**< Zoom factor. */
-    float                                               m_fLastClickedSample;           /**< Stores last clicked sample on screen. */
+    float                                               m_fDefaultSectionSize;          /**< Default row height */
+    float                                               m_fZoomFactor;                  /**< Zoom factor */
+    int                                                 m_iLastClickedSample;            /**< Stores last clicked sample on screen */
 
     qint32                                              m_iT;                           /**< Display window size in seconds. */
 
@@ -392,8 +404,12 @@ private:
     QLabel*                                             m_pEndTimeLabel;                /**< Right 'Sample | Seconds' display label. */
     QLabel*                                             m_pFileLabel;                   /**< File name and path, Fs and duration. */
     QLabel*                                             m_pFilterLabel;                 /**< Short filter description to be shown under the time-series. */
+    QMenu*                                              m_pRightClickContextMenu;       /**< Hold the menu that appears when a right-click event occurs. */
+    QAction*                                            m_pAddEventAction;              /**< Hold the action for directing callback for adding a new event. */
 signals:
     void tableViewDataWidthChanged(int iWidth);
+
+    void realtimeDataUpdated();
 };
 
 //=============================================================================================================

@@ -188,7 +188,9 @@ QVector<EVENT_TYPE> ChannelSelection::getEventSubscriptions(void) const
 void ChannelSelection::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
     if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_FIFFRAW_MODEL) {
-        setFiffSettings(qSharedPointerCast<FiffRawViewModel>(pNewModel)->getFiffInfo());
+        if(auto info = qSharedPointerCast<FiffRawViewModel>(pNewModel)->getFiffInfo()){
+            setFiffSettings(info);
+        }
     }
 }
 
@@ -275,4 +277,12 @@ void ChannelSelection::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel>
     if(m_pAnalyzeData->getModelsByType(ANSHAREDLIB_FIFFRAW_MODEL).size() == 0 && m_pAnalyzeData->getModelsByType(ANSHAREDLIB_AVERAGING_MODEL).size() == 0){
         m_pChannelSelectionView->clearView();
     }
+}
+
+
+//=============================================================================================================
+
+QString ChannelSelection::getBuildInfo()
+{
+    return QString(CHANNELSELECTIONPLUGIN::buildDateTime()) + QString(" - ")  + QString(CHANNELSELECTIONPLUGIN::buildHash());
 }

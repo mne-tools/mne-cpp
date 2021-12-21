@@ -99,34 +99,34 @@ public:
      *
      * @param[in] commu          The Communicator to add.
      */
-    void addCommunicator(Communicator* commu);
+    static void addCommunicator(Communicator* commu);
 
     //=========================================================================================================
     /**
      * Communicate an event to all entities that have registered for the respective event type.
      * The Event will get buffered in a queue and processed during the next processing cycle.
      *
-     * @param[in] e              The event to publish.
+     * @param[in] e              The event to publish
      */
-    void issueEvent(QSharedPointer<Event> e);
+    static void issueEvent(QSharedPointer<Event> e);
 
     //=========================================================================================================
     /**
      * Expands a Communicator's subscriptions by the specified list
      *
-     * @param[in] commu          The Communicator to add the events for.
-     * @param[in] newsubs        List of new (additional) subscriptions.
+     * @param[in] commu          The Communicator to add the events for
+     * @param[in] newsubs        List of new (additional) subscriptions
      */
-    void addSubscriptions(Communicator* commu, QVector<EVENT_TYPE> newsubs);
+    static void addSubscriptions(Communicator* commu, QVector<EVENT_TYPE> newsubs);
 
     //=========================================================================================================
     /**
      * Replaces a Communicators subscriptions with the specified list.
      *
-     * @param[in] commu          The respective Communicator.
-     * @param[in] subs           New list of subscriptions.
+     * @param[in] commu          The respective Communicator
+     * @param[in] subs           New list of subscriptions
      */
-    void updateSubscriptions(Communicator* commu, const QVector<EVENT_TYPE> &subs);
+    static void updateSubscriptions(Communicator* commu, const QVector<EVENT_TYPE> &subs);
 
     //=========================================================================================================
     /**
@@ -134,26 +134,26 @@ public:
      *
      * @param[in] commu          The communicator to remove.
      */
-    void removeCommunicator(Communicator* commu);
+    static void removeCommunicator(Communicator* commu);
 
     //=========================================================================================================
     /**
      * Starts the EventManagers thread that processes buffered events. The EventManager will try to maintain the
      * specified frequency of dealing with buffered events (frequency in Hz)
      *
-     * @param[in] frequency          The frequency in Hz to start working through all buffered events.
-     * @return                   Whether starting was successfull.
+     * @param frequency          The frequency in Hz to start working through all buffered events.
+     * @return                   Whether starting was successfull
      */
-    bool startEventHandling(float frequency = 25.0f);
+    static bool startEventHandling(float frequency = 25.0f);
 
     //=========================================================================================================
     /**
      * Stops the EventThread. Depending on the specified event-processing frequency, this might take some time
      * (up to one waiting period, to be precise. Example: EventManager running on 20 Hz -> up to 50 ms shutdown).
      *
-     * @return                   Whether stopping was successfull.
+     * @return                   Whether stopping was successfull
      */
-    bool stopEventHandling();
+    static bool stopEventHandling();
 
     //=========================================================================================================
     /**
@@ -161,23 +161,106 @@ public:
      *
      * @return Whether or not the EventManager has unprocessed events.
      */
-    bool hasBufferedEvents();
-
-    //=========================================================================================================
-    /**
-     * Static method for singleton implementation (returns reference to local static object)
-     *
-     * @return A reference to the EventManager singleton.
-     */
-    static EventManager& getEventManager();
+    static bool hasBufferedEvents();
 
     //=========================================================================================================
     /**
      * This is called when the user presses the "close" button
      */
-    void shutdown();
+    static void shutdown();
 
 private:
+    //=========================================================================================================
+    /**
+     * Internal function to be called by addCommunicator. It adds a Communicator, respectively its subscriptions
+     * to the routing table
+     *
+     * @param[in] commu          The Communicator to add
+     */
+    void addCommunicatorInt(Communicator* commu);
+
+    //=========================================================================================================
+    /**
+     * Internal function to be called by issueEvent static function. Communicate an event to all entities that
+     * have registered for the respective event type. The Event will get buffered in a queue and processed
+     * during the next processing cycle.
+     *
+     * @param[in] e              The event to publish.
+     */
+    void issueEventInt(QSharedPointer<Event> e);
+
+    //=========================================================================================================
+    /**
+     * Internal function to be called by addSubscriptions. Expands a Communicator's subscriptions by the
+     * specified list
+     *
+     * @param[in] commu          The Communicator to add the events for.
+     * @param[in] newsubs        List of new (additional) subscriptions.
+     */
+    void addSubscriptionsInt(Communicator* commu, QVector<EVENT_TYPE> newsubs);
+
+    //=========================================================================================================
+    /**
+     * Internal function to be called by updateSubscription. Replaces a Communicators subscriptions with the
+     * specified list.
+     *
+     * @param[in] commu          The respective Communicator.
+     * @param[in] subs           New list of subscriptions.
+     */
+    void updateSubscriptionsInt(Communicator* commu, const QVector<EVENT_TYPE> &subs);
+
+    //=========================================================================================================
+    /**
+     * Internal function to be called by removeCommunicator. Removes (and thus disconnects) a Communicator
+     * and all its subscriptions from the routing table.
+     *
+     * @param[in] commu          The communicator to remove.
+     */
+    void removeCommunicatorInt(Communicator * commu);
+
+    //=========================================================================================================
+    /**
+     * Internal function to be called by startEventHandling. Starts the EventManagers thread that processes
+     * buffered events. The EventManager will try to maintain the specified frequency of dealing with
+     * buffered events (frequency in Hz).
+     *
+     * @param[in] frequency          The frequency in Hz to start working through all buffered events.
+     * @return                   Whether starting was successfull.
+     */
+    bool startEventHandlingInt(float frequency = 25.0f);
+
+    //=========================================================================================================
+    /**
+     * Internal fcn to be called by stopEventHandling. Stops the EventThread. Depending on the specified
+     * event-processing frequency, this might take some time (up to one waiting period, to be precise.
+     * Example: EventManager running on 20 Hz -> up to 50 ms shutdown).
+     *
+     * @return                   Whether stopping was successfull.
+     */
+    bool stopEventHandlingInt();
+
+    //=========================================================================================================
+    /**
+     * Internal fcn to be called by hasBufferedEvents. Indicates whether or not the EventManager currently
+     * holds any unprocessed events.
+     *
+     * @return Whether or not the EventManager has unprocessed events.
+     */
+    bool hasBufferedEventsInt();
+
+    //=========================================================================================================
+    /**
+     * Internal fcn to be called by shutdown(). This is called when the user presses the "close" button
+     */
+    void shutdownInt();
+
+    //=========================================================================================================
+    /**
+     * Static method for singleton implementation (returns reference to local static object)
+     *
+     * @return A reference to the EventManager singleton
+     */
+    static EventManager& getEventManager();
 
     //=========================================================================================================
     /**

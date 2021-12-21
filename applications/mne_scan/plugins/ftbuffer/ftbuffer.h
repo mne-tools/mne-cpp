@@ -177,6 +177,24 @@ public:
      */
     virtual QWidget* setupWidget();
 
+    virtual QString getBuildInfo();
+
+    //=========================================================================================================
+    /**
+     * Sets address used to connect to buffer (if starting plugin without an established connection).
+     *
+     * @param[in] sAddress      IP address of the FieldTrip buffer
+     */
+    void setBufferAddress(const QString& sAddress);
+
+    //=========================================================================================================
+    /**
+     * Sets port used to connect to buffer (if starting plugin without an established connection).
+     *
+     * @param[in] iPort         Port of the FieldTrip buffer
+     */
+    void setBufferPort(int iPort);
+
 signals:
     //=========================================================================================================
     /**
@@ -211,7 +229,15 @@ private:
      *
      * @param[in] FiffInfo  FiffInfo used to set up buffer output.
      */
-    bool setupRTMSA(FIFFLIB::FiffInfo FiffInfo);
+    bool setupRTMSA(const FIFFLIB::FiffInfo& FiffInfo);
+
+    //=========================================================================================================
+    /**
+     * Initializes output based on input measuremnt data object
+     *
+     * @param[in] metadata  object with fiffinfo and optionally digitizer data
+     */
+    bool setupRTMSA(const MetaData& metadata);
 
     bool                                                                                m_bIsConfigured;                /**< Whether the buffer output has been configured. */
 
@@ -224,6 +250,9 @@ private:
     QSharedPointer<FIFFLIB::FiffRawData>                                                m_pNeuromagHeadChunkData;       /**< Fiff into parser for header data collected from Neuromag extended header. */
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA_BufferOutput;          /**< The RealTimeSampleArray to provide the plugin output data.*/
     QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>                              m_pCircularBuffer;              /**< Holds incoming raw data. */
+
+    QString                                                                             m_sBufferAddress;               /**< The address used to connect to the buffer if starting without being connected */
+    int                                                                                 m_iBufferPort;                  /**< The port used to connect to the buffer if starting without being connected */
 };
 }//namespace end brace
 

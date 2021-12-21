@@ -48,9 +48,14 @@
 #include <scMeas/realtimehpiresult.h>
 #include <inverse/hpiFit/hpifit.h>
 
+#include <fiff/fiff_info.h>
+#include <fiff/c/fiff_digitizer_data.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
+#include <QDir>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -70,11 +75,21 @@ using namespace Eigen;
 using namespace INVERSELIB;
 
 //=============================================================================================================
+// DEFINE LOCAL CONSTANTS
+//=============================================================================================================
+
+constexpr const int defaultFittingWindowSize(300);
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 Hpi::Hpi()
-: m_iNumberOfFitsPerSecond(3)
+: m_iNumberBadChannels(0)
+, m_iFittingWindowSize(defaultFittingWindowSize)
+, m_dAllowedMeanErrorDist(10)
+, m_dAllowedMovement(3)
+, m_dAllowedRotation(5)
 , m_bDoFreqOrder(false)
 , m_bDoSingleHpi(false)
 , m_bDoContinousHpi(false)
@@ -90,8 +105,8 @@ Hpi::Hpi()
 
 Hpi::~Hpi()
 {
-    if(this->isRunning()) {
-        stop();
+    if(isRunning()) {
+        resetState();
     }
 }
 
@@ -139,13 +154,19 @@ bool Hpi::start()
 bool Hpi::stop()
 {
     requestInterruption();
-    wait(500);
+    resetState();
+    return true;
+}
 
+//=============================================================================================================
+
+void Hpi::resetState()
+{
     m_bPluginControlWidgetsInit = false;
-
     m_pCircularBuffer->clear();
 
-    return true;
+    m_pFiffInfo.clear();
+    m_pFiffDigitizerData.clear();
 }
 
 //=============================================================================================================
@@ -176,17 +197,8 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
         //Check if the fiff info was inititalized
-        if(!m_pFiffInfo) {
-            m_mutex.lock();
-            m_pFiffInfo = pRTMSA->info();
-            m_pHpiOutput->measurementData()->setFiffInfo(m_pFiffInfo);
-            m_mutex.unlock();
-            updateProjections();
-        }
 
-        if(!m_bPluginControlWidgetsInit) {
-            initPluginControlWidgets();
-        }
+        manageInitialization(pRTMSA);
 
         // Check if data is present
         if(pRTMSA->getMultiSampleArray().size() > 0) {
@@ -204,7 +216,7 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 }
             }
 
-            if(m_bDoContinousHpi) {
+            if(m_bDoContinousHpi && (m_vCoilFreqs.size() >= 3)) {
                 for(unsigned char i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                     // Please note that we do not need a copy here since this function will block until
                     // the buffer accepts new data again. Hence, the data is not deleted in the actual
@@ -216,6 +228,54 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             }
         }
     }
+}
+
+//=============================================================================================================
+
+void Hpi::manageInitialization(QSharedPointer<SCMEASLIB::RealTimeMultiSampleArray> pRTMSA)
+{
+    if(!m_pFiffInfo) {
+        initFiffInfo(pRTMSA->info());
+    }
+    if(!m_bPluginControlWidgetsInit) {
+        initPluginControlWidgets();
+    }
+    if(!m_pFiffDigitizerData && m_pFiffInfo){
+        initFiffDigitizers(pRTMSA->digitizerData());
+    }
+}
+
+//=============================================================================================================
+
+void Hpi::initFiffInfo(QSharedPointer<FIFFLIB::FiffInfo> info)
+{
+    m_mutex.lock();
+    m_pFiffInfo = info;
+    m_pHpiOutput->measurementData()->setFiffInfo(m_pFiffInfo);
+    m_mutex.unlock();
+    updateProjections();
+}
+
+//=============================================================================================================
+
+void Hpi::initFiffDigitizers(QSharedPointer<FIFFLIB::FiffDigitizerData> fiffDig)
+{
+    if(fiffDig){
+        m_mutex.lock();
+        m_pFiffDigitizerData = fiffDig;
+        m_pHpiOutput->measurementData()->setDigitizerData(m_pFiffDigitizerData);
+        m_pFiffInfo->dig = m_pFiffDigitizerData->points; //temp solution. refactor fit function so this isn't necessary.
+        m_mutex.unlock();
+
+        updateDigitizerInfo();
+    }
+}
+
+//=============================================================================================================
+
+void Hpi::updateDigitizerInfo()
+{
+    emit newDigitizerList(m_pFiffDigitizerData->points);
 }
 
 //=============================================================================================================
@@ -234,6 +294,9 @@ void Hpi::initPluginControlWidgets()
 
         // Projects Settings
         HpiSettingsView* pHpiSettingsView = new HpiSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
+
+        pHpiSettingsView->loadCoilPresets(QCoreApplication::applicationDirPath() + "/mne_scan_plugins/hpi.json");
+
         connect(this, &Hpi::guiModeChanged,
                 pHpiSettingsView, &HpiSettingsView::setGuiMode);
         pHpiSettingsView->setObjectName("widget_");
@@ -258,16 +321,23 @@ void Hpi::initPluginControlWidgets()
                 this, &Hpi::onAllowedMovementChanged);
         connect(pHpiSettingsView, &HpiSettingsView::allowedRotationChanged,
                 this, &Hpi::onAllowedRotationChanged);
+        connect(pHpiSettingsView, &HpiSettingsView::fittingWindowSizeChanged,
+                this, &Hpi::setFittingWindowSize);
         connect(this, &Hpi::errorsChanged,
                 pHpiSettingsView, &HpiSettingsView::setErrorLabels, Qt::BlockingQueuedConnection);
         connect(this, &Hpi::movementResultsChanged,
                 pHpiSettingsView, &HpiSettingsView::setMovementResults, Qt::BlockingQueuedConnection);
+        connect(this, &Hpi::newDigitizerList,
+                pHpiSettingsView, &HpiSettingsView::newDigitizerList);
+
 
         onSspStatusChanged(pHpiSettingsView->getSspStatusChanged());
         onCompStatusChanged(pHpiSettingsView->getCompStatusChanged());
         onAllowedMeanErrorDistChanged(pHpiSettingsView->getAllowedMeanErrorDistChanged());
         onAllowedMovementChanged(pHpiSettingsView->getAllowedMovementChanged());
         onAllowedRotationChanged(pHpiSettingsView->getAllowedRotationChanged());
+        setFittingWindowSize(pHpiSettingsView->getFittingWindowSize());
+        onContHpiStatusChanged(pHpiSettingsView->continuousHPIChecked());
 
         plControlWidgets.append(pHpiSettingsView);
 
@@ -377,7 +447,7 @@ void Hpi::onDoSingleHpiFit()
 {
     if(m_vCoilFreqs.size() < 3) {
        QMessageBox msgBox;
-       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
+       msgBox.setText("Please input HPI coil frequencies first.");
        msgBox.exec();
        return;
     }
@@ -393,7 +463,7 @@ void Hpi::onDoFreqOrder()
 {
     if(m_vCoilFreqs.size() < 3) {
        QMessageBox msgBox;
-       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
+       msgBox.setText("Please input HPI coil frequencies first.");
        msgBox.exec();
        return;
     }
@@ -432,14 +502,22 @@ void Hpi::onCompStatusChanged(bool bChecked)
 
 void Hpi::onContHpiStatusChanged(bool bChecked)
 {
-    if(m_vCoilFreqs.size() < 3) {
-       QMessageBox msgBox;
-       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
-       msgBox.exec();
-       return;
-    }
+//    if(m_vCoilFreqs.size() < 3) {
+//       QMessageBox msgBox;
+//       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
+//       msgBox.exec();
+//       return;
+//    }
 
     m_bDoContinousHpi = bChecked;
+}
+
+//=============================================================================================================
+
+void Hpi::setFittingWindowSize(int winSize)
+{
+    QMutexLocker locker(&m_mutex);
+    m_iFittingWindowSize = winSize;
 }
 
 //=============================================================================================================
@@ -476,7 +554,7 @@ void Hpi::run()
 
     FiffCoordTrans transDevHeadRef = m_pFiffInfo->dev_head_t;
 
-    HPIFit HPI = HPIFit(m_pFiffInfo);
+    HPIFit HPI = HPIFit(m_pFiffInfo, true);
 
     double dErrorMax = 0.0;
     double dMeanErrorDist = 0.0;
@@ -489,15 +567,17 @@ void Hpi::run()
     MatrixXd matData;
 
     m_mutex.lock();
-    int iNumberOfFitsPerSecond = m_iNumberOfFitsPerSecond;
+    int fittingWindowSize = m_iFittingWindowSize;
     m_mutex.unlock();
 
-    MatrixXd matDataMerged(m_pFiffInfo->chs.size(), int(m_pFiffInfo->sfreq/iNumberOfFitsPerSecond));
+    MatrixXd matDataMerged(m_pFiffInfo->chs.size(), fittingWindowSize);
 
     while(!isInterruptionRequested()) {
         m_mutex.lock();
-        if(iNumberOfFitsPerSecond != m_iNumberOfFitsPerSecond) {
-            matDataMerged.resize(m_pFiffInfo->chs.size(), int(m_pFiffInfo->sfreq/iNumberOfFitsPerSecond));
+        if(fittingWindowSize != m_iFittingWindowSize) {
+            fittingWindowSize = m_iFittingWindowSize;
+            std::cout << "Fitting window size: " << fittingWindowSize << "\n";
+            matDataMerged.resize(m_pFiffInfo->chs.size(), fittingWindowSize);
             iDataIndexCounter = 0;
         }
         m_mutex.unlock();
@@ -516,7 +596,8 @@ void Hpi::run()
                 fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
                 m_mutex.unlock();
 
-                matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols()-iDataIndexCounter) = matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
+                matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols()-iDataIndexCounter) =
+                        matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
 
                 // Perform HPI fit
                 m_mutex.lock();
@@ -586,4 +667,11 @@ void Hpi::run()
             }
         }
     }
+}
+
+//=============================================================================================================
+
+QString Hpi::getBuildInfo()
+{
+    return QString(HPIPLUGIN::buildDateTime()) + QString(" - ")  + QString(HPIPLUGIN::buildHash());
 }

@@ -46,6 +46,9 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_tag.h>
+#include <fiff/c/fiff_digitizer_data.h>
+
+#include <utility>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -61,6 +64,20 @@
 
 namespace COMMUNICATIONLIB
 {
+
+//=============================================================================================================
+/**
+ * Struct that holds metadata for a measurement.
+ */
+struct MetaData{
+    MetaData(FIFFLIB::FiffInfo::SPtr pInfo,
+             FIFFLIB::FiffDigitizerData::SPtr pDigitizerData)
+            :m_pInfo(pInfo)
+            ,m_pDigitizerData(pDigitizerData){};
+
+    FIFFLIB::FiffInfo::SPtr m_pInfo;
+    FIFFLIB::FiffDigitizerData::SPtr m_pDigitizerData;
+};
 
 //=============================================================================================================
 /**
@@ -107,6 +124,14 @@ public:
      * @return the read fiff measurement information.
      */
     FIFFLIB::FiffInfo::SPtr readInfo();
+
+    //=========================================================================================================
+    /**
+     * Reads fiff metaata class from data connection
+     *
+     * @return returns metadata class (FiffInfo and FiffDigitizerData)
+     */
+    MetaData readMetadata();
 
     //=========================================================================================================
     /**

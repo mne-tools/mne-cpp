@@ -61,6 +61,7 @@
 
 namespace FIFFLIB{
     class FiffInfo;
+    class FiffDigitizerData;
 }
 
 //=============================================================================================================
@@ -137,12 +138,29 @@ public:
      */
     inline bool isInitialized() const;
 
+    //=========================================================================================================
+    /**
+     * Returns digitizer data for measurement
+     *
+     * @return the current set digitizer data
+     */
+    inline QSharedPointer<FIFFLIB::FiffDigitizerData> digitizerData() const;
+
+    //=========================================================================================================
+    /**
+     * Sets digitizer data for measurement
+     *
+     * @param[in] digData   digitizer data from measurment
+     */
+    void setDigitizerData(QSharedPointer<FIFFLIB::FiffDigitizerData> digData);
+
 private:
     mutable QMutex          m_qMutex;                               /**< Mutex to ensure thread safety. */
     bool                    m_bInitialized;                         /**< If values are stored.*/
 
     QSharedPointer<INVERSELIB::HpiFitResult>    m_pHpiFitResult;    /**< The HPI fit result. */
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;        /**< The Fiff Info. */
+    QSharedPointer<FIFFLIB::FiffDigitizerData>  m_pFiffDigData;     /**< The Fiff Digigtizer Data */
 };
 
 //=============================================================================================================
@@ -153,6 +171,12 @@ inline bool RealTimeHpiResult::isInitialized() const
 {
     QMutexLocker locker(&m_qMutex);
     return m_bInitialized;
+}
+
+inline QSharedPointer<FIFFLIB::FiffDigitizerData> RealTimeHpiResult::digitizerData() const
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_pFiffDigData;
 }
 
 } // NAMESPACE

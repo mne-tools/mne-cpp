@@ -83,6 +83,10 @@ namespace DISPLIB {
     class Control3DView;
 }
 
+namespace FIFFLIB {
+    class FiffDigPointSet;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE SCDISPLIB
 //=============================================================================================================
@@ -137,6 +141,8 @@ public:
      */
     virtual void update(SCMEASLIB::Measurement::SPtr pMeasurement);
 
+protected:
+
     //=========================================================================================================
     /**
      * Call this function whenever the digitizer changed and you want to align fiducials.
@@ -145,7 +151,42 @@ public:
      */
     void alignFiducials(const QString& sFilePath);
 
-protected:
+    //=========================================================================================================
+    /**
+     * Allign fiducials based on input digitizer data
+     *
+     * @param[in] pDigData      New digitizer data
+     */
+    void alignFiducials(QSharedPointer<FIFFLIB::FiffDigitizerData> pDigData);
+
+    //=========================================================================================================
+    /**
+     * Adds digitizer points to view
+     *
+     * @param[in] digSet    set of digitizer points
+     */
+    void addDigSetToView(const FIFFLIB::FiffDigPointSet& digSet);
+
+    //=========================================================================================================
+    /**
+     * Calculates matrix based on input digitizer data
+     *
+     * @param[in] pDigData      source digitizer data
+     * @param[in] scale         scaling factor
+     *
+     * @return
+     */
+    QMatrix4x4 calculateInverseMatrix(const QSharedPointer<FIFFLIB::FiffDigitizerData> pDigData,
+                                      float scale) const;
+
+    //=========================================================================================================
+    /**
+     * Alligns 3D head model based on input matrix
+     *
+     * @param[in] invMat    matrix used to alligned 3d head
+     */
+    void applyAlignmentTransform(QMatrix4x4& invMat);
+
     //=========================================================================================================
     /**
      * Initialise the display control widgets to be shown in the QuickControlView.
@@ -158,7 +199,8 @@ protected:
      */
     void createGUI();
 
-    QString                                                     m_sFilePathDigitizers;
+    QString                                                     m_sFilePathDigitizers;  /**< Path to loaded fiff file with digitizer data. */
+    QSharedPointer<FIFFLIB::FiffDigitizerData>                  m_pFiffDigitizerData;   /**< Fiff digitizer data for current measurement. */
 
     int                                                         m_iNumberBadChannels;   /**< The last received number of bad channels. */
 

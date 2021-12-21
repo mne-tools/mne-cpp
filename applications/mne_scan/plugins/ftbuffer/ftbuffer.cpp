@@ -68,6 +68,8 @@ FtBuffer::FtBuffer()
 , m_pFtBuffProducer(QSharedPointer<FtBuffProducer>::create(this))
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
 , m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_double>(new CircularBuffer_Matrix_double(10)))
+, m_sBufferAddress("127.0.0.1")
+, m_iBufferPort(1972)
 {
 }
 
@@ -75,9 +77,6 @@ FtBuffer::FtBuffer()
 
 FtBuffer::~FtBuffer()
 {
-    if(this->isRunning()) {
-        stop();
-    }
 }
 
 //=============================================================================================================
@@ -109,7 +108,11 @@ void FtBuffer::unload()
 bool FtBuffer::start()
 {
     if (!m_bIsConfigured) {
-        return false;
+        m_pFtBuffProducer->connectToBuffer(m_sBufferAddress,
+                                           m_iBufferPort);
+        if (!m_bIsConfigured) {
+            return false;
+        }
     }
 
     qInfo() << "[FtBuffer::start] Starting FtBuffer...";
@@ -143,14 +146,19 @@ bool FtBuffer::stop()
 
     m_bIsConfigured = false;
 
-    //stops separate producer/client thread first
-    m_pProducerThread.requestInterruption();
-    while(m_pProducerThread.isRunning()) {
-        msleep(10);
-    }
-
     requestInterruption();
     wait(500);
+
+    //stops separate producer/client thread first
+    m_pProducerThread.requestInterruption();
+    int itries = 0;
+    while(m_pProducerThread.isRunning()) {
+        msleep(10);
+        if(itries > 10){
+            break;
+        }
+        ++itries;
+    }
 
     //Reset ftproducer and sample received list
     m_pFtBuffProducer.clear();
@@ -246,14 +254,18 @@ bool FtBuffer::setupRTMSA()
 
 //=============================================================================================================
 
-bool FtBuffer::setupRTMSA(FIFFLIB::FiffInfo FiffInfo)
+bool FtBuffer::setupRTMSA(const FIFFLIB::FiffInfo& FiffInfo)
 {
     //Check for FiffInfo that has not changed its default values and return early
     if (FiffInfo.sfreq < 0) {
         return false;
     }
 
+    std::cout << "attempting to init info\n";
+
     m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo (FiffInfo));
+
+    std::cout << "init info\n";
 
     //Set the RMTSA parameters
     m_pRTMSA_BufferOutput->measurementData()->initFromFiffInfo(m_pFiffInfo);
@@ -262,4 +274,46 @@ bool FtBuffer::setupRTMSA(FIFFLIB::FiffInfo FiffInfo)
 
     qInfo() << "[FtBuffer::setupRTMSA] Successfully acquired fif info from buffer.";
     return m_bIsConfigured = true;
+}
+
+//=============================================================================================================
+
+bool FtBuffer::setupRTMSA(const MetaData& metadata)
+{
+    if (metadata.info.sfreq < 0) {
+        return false;
+    } else {
+        m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo (metadata.info));
+
+        m_pRTMSA_BufferOutput->measurementData()->initFromFiffInfo(m_pFiffInfo);
+        m_pRTMSA_BufferOutput->measurementData()->setMultiArraySize(1);
+        m_pRTMSA_BufferOutput->measurementData()->setVisibility(true);
+        if(metadata.bFiffDigitizerData){
+            m_pRTMSA_BufferOutput->measurementData()->setDigitizerData(QSharedPointer<FIFFLIB::FiffDigitizerData>(new FIFFLIB::FiffDigitizerData (metadata.dig)));
+        }
+        m_bIsConfigured = true;
+    }
+
+    return m_bIsConfigured;
+}
+
+//=============================================================================================================
+
+void FtBuffer::setBufferAddress(const QString &sAddress)
+{
+    m_sBufferAddress = sAddress;
+}
+
+//=============================================================================================================
+
+void FtBuffer::setBufferPort(int iPort)
+{
+    m_iBufferPort = iPort;
+}
+
+//=============================================================================================================
+
+QString FtBuffer::getBuildInfo()
+{
+    return QString(FTBUFFERPLUGIN::buildDateTime()) + QString(" - ")  + QString(FTBUFFERPLUGIN::buildHash());
 }

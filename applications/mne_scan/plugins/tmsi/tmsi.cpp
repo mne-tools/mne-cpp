@@ -660,3 +660,10 @@ void TMSI::showSetupProjectDialog()
         m_pTmsiSetupProjectWidget->raise();
     }
 }
+
+//=============================================================================================================
+
+QString TMSI::getBuildInfo()
+{
+    return QString(TMSIPLUGIN::buildDateTime()) + QString(" - ")  + QString(TMSIPLUGIN::buildHash());
+}

@@ -114,7 +114,7 @@ public:
     /**
      * Destroys the named matrix.
      */
-    ~FiffNamedMatrix();
+    ~FiffNamedMatrix() = default;
 
     //=========================================================================================================
     /**
@@ -165,7 +165,7 @@ public:
      *
      * @return true if equal, false otherwise.
      */
-    friend bool operator== (const FiffNamedMatrix &a, const FiffNamedMatrix &b);
+    friend bool operator==(const FiffNamedMatrix &a, const FiffNamedMatrix &b);
 
 public:
     fiff_int_t nrow;        /**< Number of rows. */

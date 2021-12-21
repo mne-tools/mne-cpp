@@ -41,6 +41,7 @@
 #include "fiff_digitizer_data.h"
 #include "fiff_coord_trans_old.h"
 #include "../fiff_dig_point.h"
+#include <iostream>
 
 #ifndef TRUE
 #define TRUE 1
@@ -106,6 +107,8 @@ FiffDigitizerData::FiffDigitizerData(const FiffDigitizerData& p_FiffDigitizerDat
 , closest(p_FiffDigitizerData.closest)
 , closest_point(p_FiffDigitizerData.closest_point)
 , dist_valid(p_FiffDigitizerData.dist_valid)
+, active(p_FiffDigitizerData.active)
+, discard(p_FiffDigitizerData.discard)
 {
 }
 
@@ -162,3 +165,30 @@ FiffDigitizerData::~FiffDigitizerData()
     FREE_43(mri_fids);
 }
 
+//=============================================================================================================
+
+void FiffDigitizerData::print() const
+{
+    std::cout << "Number of digitizer points: " << points.size() << "\n";
+
+    switch(coord_frame){
+    case FIFFV_COORD_MRI:
+        std::cout << "Coord. Frame: FIFFV_COORD_MRI \n";
+         break;
+    case FIFFV_COORD_HEAD:
+        std::cout << "Coord. Frame: FIFFV_COORD_HEAD \n";
+        break;
+    }
+
+    for (auto& point : points){
+        if (point.kind == FIFFV_POINT_HPI){
+            std::cout << "HPI Point " << point.ident << " - " << point.r[0] << ", " << point.r[1] << ", " << point.r[2] << "\n";
+        }
+    }
+
+    std::cout << "Number of MRI fiducials: " << nfids << "\n";
+
+    if (head_mri_t){
+
+    }
+}

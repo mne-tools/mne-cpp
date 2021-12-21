@@ -47,6 +47,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QJsonDocument>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -61,6 +63,7 @@ namespace Ui {
 
 namespace FIFFLIB {
     class FiffDigPoint;
+    class FiffDigPointSet;
 }
 
 //=============================================================================================================
@@ -156,6 +159,38 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns whether continuous fitting is checked.
+     *
+     * @return Whether continuous fitting is checked.
+     */
+    bool continuousHPIChecked();
+
+    //=========================================================================================================
+    /**
+     * Get number of fits per second to do when performing continuous hpi
+     *
+     * @return  Number of fits per second
+     */
+    int getFittingWindowSize();
+
+    //=========================================================================================================
+    /**
+     * Display digitizer metadata bsed on input pointList
+     *
+     * @param[in] pointList     list of digitizer points
+     */
+    void newDigitizerList(QList<FIFFLIB::FiffDigPoint> pointList);
+
+    //=========================================================================================================
+    /**
+     * Load coil presets from json file at the provided path
+     *
+     * @param[in] sFilePath     PAth to json file with coil preset data
+     */
+    void loadCoilPresets(const QString& sFilePath);
+
+    //=========================================================================================================
+    /**
      * Saves all important settings of this view via QSettings.
      */
     void saveSettings();
@@ -221,13 +256,74 @@ protected:
     /**
      * Read Polhemus data from fif file.
      */
-    QList<FIFFLIB::FiffDigPoint> readPolhemusDig(const QString& fileName);
+    QList<FIFFLIB::FiffDigPoint> readDigitizersFromFile(const QString& fileName);
+
+    //=========================================================================================================
+    /**
+     * Sets up coil presets for the number of coils specified by the input argument.
+     *
+     * @param[in] iNumCoils     number of hpi coils.
+     */
+    void setupCoilPresets(int iNumCoils);
+
+    //=========================================================================================================
+    /**
+     * Populates preset dropdown gui with names and coil freqs in the input array.
+     *
+     * @param[in] presetData    json array containing the coil preset name and freqs.
+     */
+    void populatePresetGUI(const QJsonArray& presetData);
+
+    //=========================================================================================================
+    /**
+     * Adds coil freq and coil error entries based on m_vCoilFreqs. Does not clear existing entires.
+     */
+    void populateCoilGUI();
+
+    //=========================================================================================================
+    /**
+     * Selects and loads coil preset at index specified by input argument.
+     *
+     * @param[in] iCoilPresetIndex  selected coil preset.
+     */
+    void selectCoilPreset(int iCoilPresetIndex);
+
+    //=========================================================================================================
+    /**
+     * Adds coil frequency to gui table based on input argument.
+     *
+     * @param[in] iCoilFreq
+     */
+    void addCoilFreqToGUI(int iCoilFreq);
+
+    //=========================================================================================================
+    /**
+     * @brief addCoilErrorToGUI
+     */
+    void addCoilErrorToGUI();
+
+    //=========================================================================================================
+    /**
+     * Clears GUI display tables for coil error and coil freqs and empties all rows
+     */
+    void clearCoilGUI();
+
+    //=========================================================================================================
+    /**
+     * UpdateGUI information with data from input digitizer set.
+     *
+     * @param[in] digSet    Digigtizer set from which data metadata will be displayed.
+     */
+    void updateDigitizerInfoGUI(const FIFFLIB::FiffDigPointSet& digSet);
+
 
     Ui::HpiSettingsViewWidget*                  m_pUi;                  /**< The HPI dialog. */
 
     QVector<int>                                m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
 
     QString                                     m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
+
+    QJsonDocument                               m_CoilPresets;          /**< Loaded coil frequency presets */
 
 signals:
     //=========================================================================================================
@@ -237,14 +333,6 @@ signals:
      * @param[in] vCoilFreqs    The new coil frequencies.
      */
     void coilFrequenciesChanged(const QVector<int>& vCoilFreqs);
-
-    //=========================================================================================================
-    /**
-     * Emit this signal whenever the user toggled the do HPI check box.
-     *
-     * @param[in] state    Whether to do continous HPI.
-     */
-    void continousHPIToggled(bool state);
 
     //=========================================================================================================
     /**
@@ -291,6 +379,14 @@ signals:
      * @param[in] bChecked    Whether the continous HPI check box is checked.
      */
     void contHpiStatusChanged(bool bChecked);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal when 'fits per second' control gets updated.
+     *
+     * @param[in] iFitsPerSecond    How many fits per second we should do.
+     */
+    void fittingWindowSizeChanged(int iFitsPerSecond);
 
     //=========================================================================================================
     /**

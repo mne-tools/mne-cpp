@@ -49,7 +49,7 @@ Every time you want to update to the newest changes use:
 
 ```
 git fetch --all
-git rebase upstream/master
+git rebase upstream/main
 ```
 
 ## Compile the Cource Code

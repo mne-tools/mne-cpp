@@ -159,10 +159,12 @@ void Filtering::handleEvent(QSharedPointer<Event> e)
             if(QSharedPointer<FiffRawViewModel> pModel = qSharedPointerCast<FiffRawViewModel>(e->getData().value<QSharedPointer<AbstractModel> >())) {
                 if(m_pFilterSettingsView) {
                     setFilterActive(m_pFilterSettingsView->getFilterActive());
-                    m_pFilterSettingsView->getFilterView()->setSamplingRate(pModel->getFiffInfo()->sfreq);
-                    //m_pFilterSettingsView->getFilterView()->setMaxAllowedFilterTaps(pModel->getFiffInfo()->sfreq);
-                    setFilterChannelType(m_pFilterSettingsView->getFilterView()->getChannelType());
-                    setFilter(m_pFilterSettingsView->getFilterView()->getCurrentFilter());
+                    if(auto info = pModel->getFiffInfo()){
+                        m_pFilterSettingsView->getFilterView()->setSamplingRate(info->sfreq);
+                        //m_pFilterSettingsView->getFilterView()->setMaxAllowedFilterTaps(pModel->getFiffInfo()->sfreq);
+                        setFilterChannelType(m_pFilterSettingsView->getFilterView()->getChannelType());
+                        setFilter(m_pFilterSettingsView->getFilterView()->getCurrentFilter());
+                    }
                 }
             }
         }
@@ -208,4 +210,11 @@ void Filtering::setFilterActive(bool state)
     QVariant data;
     data.setValue(state);
     m_pCommu->publishEvent(EVENT_TYPE::FILTER_ACTIVE_CHANGED, data);
+}
+
+//=============================================================================================================
+
+QString Filtering::getBuildInfo()
+{
+    return QString(FILTERINGPLUGIN::buildDateTime()) + QString(" - ")  + QString(FILTERINGPLUGIN::buildHash());
 }

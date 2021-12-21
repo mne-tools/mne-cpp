@@ -63,6 +63,8 @@ namespace Qt3DRender {
     class QPointLight;
     class QRenderCaptureReply;
     class QPickEvent;
+    class QRenderSurfaceSelector;
+    class QViewport;
 }
 
 //=============================================================================================================
@@ -103,7 +105,7 @@ public:
     /**
      * Default destructor
      */
-    ~View3D() = default;
+    ~View3D();
 
     //=========================================================================================================
     /**
@@ -186,6 +188,18 @@ public:
      */
     void activatePicker(const bool bActivatePicker);
 
+    //=========================================================================================================
+    /**
+     * Toggles view to display single view.
+     */
+    void showSingleView();
+
+    //=========================================================================================================
+    /**
+     * Toggles view to display multi-view.
+     */
+    void showMultiView();
+
 protected:
 
     void saveScreenshot();
@@ -224,13 +238,76 @@ protected:
      */
     void handlePickerPress(Qt3DRender::QPickEvent *qPickEvent);
 
+    //=========================================================================================================
+    /**
+     * Initilaize single view camera parameters.
+     */
+    void initSingleCam();
+
+    //=========================================================================================================
+    /**
+     * Initialize multi-view camera parameters.
+     */
+    void initMultiCams();
+
+    //=========================================================================================================
+    /**
+     * Initialize single view viewport/framegraph.
+     */
+    void initSingleView();
+
+    //=========================================================================================================
+    /**
+     * Initilize multiview viewports.
+     */
+    void initMultiView();
+
+    //=========================================================================================================
+    /**
+     * Update multiview camera parameters based on aspect ratio.
+     */
+    void updateMultiViewAspectRatio();
+
+    //=========================================================================================================
+    /**
+     * Sets multiview views to vertical layout.
+     */
+    void setMultiViewVertical();
+
+    //=========================================================================================================
+    /**
+     * Sets multiview views to horizontal layout.
+     */
+    void setMultiViewHorizontal();
+
+    //=========================================================================================================
+    /**
+     * Handles resize event for non-default multiview cameras.
+     */
+    void resizeEvent(QResizeEvent *) override;
+
+    enum MultiViewOrientation{
+        Horizontal,
+        Veritical
+    };
+
     QPointer<Qt3DCore::QEntity>                 m_pRootEntity;                  /**< The root/most top level entity buffer. */
     QPointer<Qt3DCore::QEntity>                 m_p3DObjectsEntity;             /**< The root/most top level entity buffer. */
     QPointer<Qt3DCore::QEntity>                 m_pLightEntity;                 /**< The root/most top level entity buffer. */
     QSharedPointer<Qt3DCore::QEntity>           m_pCoordSysEntity;              /**< The entity representing the x/y/z coord system. */
 
     QPointer<CustomFrameGraph>                  m_pFrameGraph;                  /**< The frameGraph entity. */
+    QPointer<Qt3DRender::QRenderSurfaceSelector>m_pMultiFrame;
+
     QPointer<Qt3DRender::QCamera>               m_pCamera;                      /**< The camera entity. */
+    QPointer<Qt3DRender::QCamera>               m_pMultiCam1;                   /**< First multiview camera entity. */
+    QPointer<Qt3DRender::QCamera>               m_pMultiCam2;                   /**< Second multiview camera entity. */
+    QPointer<Qt3DRender::QCamera>               m_pMultiCam3;                   /**< Third multiview camera entity. */
+
+    QPointer<Qt3DRender::QViewport>             m_pMultiViewport1;              /**< First multiview viewport. */
+    QPointer<Qt3DRender::QViewport>             m_pMultiViewport2;              /**< Second multiview viewport. */
+    QPointer<Qt3DRender::QViewport>             m_pMultiViewport3;              /**< Third multiview viewport. */
+
     QPointer<Qt3DRender::QRenderCaptureReply>   m_pScreenCaptureReply;          /**< The capture reply object to save screenshots. */
     QPointer<Qt3DRender::QObjectPicker>         m_pPicker;                      /**< The Picker entity. */
 
@@ -238,6 +315,8 @@ protected:
     QPointer<QPropertyAnimation>                m_pCameraAnimation;             /**< The animations to rotate the camera. */
 
     QList<QPointer<Qt3DRender::QPointLight> >   m_lLightSources;                /**< The light sources. */
+
+    MultiViewOrientation                        m_MultiViewOrientation;         /**< The current orientation of the multiview viewports. */
 
 signals:
     /*

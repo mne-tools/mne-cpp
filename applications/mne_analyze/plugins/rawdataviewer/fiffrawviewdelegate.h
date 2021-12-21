@@ -170,19 +170,26 @@ private:
 
     //=========================================================================================================
     /**
-     * Draws annotations from the FiffRawView model's member Annotation Model
+     * Draws events from the FiffRawView model's member Event Model
      *
      * @param[in] index             Used to locate data in the model.
      * @param[in] option            Describes the parameters used to draw an item in a view widget.
      * @param[in] path              The QPointerPath to create the plot.
      * @param[in] data              Data for the given row.
-     * @param[in, out] painter      Used for drawing the annotations.
+     * @param[in, out] painter      Used for drawing the events.
      */
-    void createMarksPath(const QModelIndex &index,
+    void createEventsPath(const QModelIndex &index,
                                const QStyleOptionViewItem &option,
                                QPainterPath& path,
                                ANSHAREDLIB::ChannelData &data,
                                QPainter* painter) const;
+
+    //=========================================================================================================
+    void createScroller(const QModelIndex &index,
+                        const QStyleOptionViewItem &option,
+                        QPainterPath& path,
+                        QPainter* painter) const;
+
 
     int         m_iUpperItemIndex;          /**< The current upper item index visible in the QTableView. */
 

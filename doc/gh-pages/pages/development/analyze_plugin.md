@@ -30,7 +30,7 @@ Returns an instance of the plugin. This is not a copy. Most of the existing plug
 
 ### init()
 
-Initializes the plugin. This gets called after all the plugins get loaded into the Plugin Manager. Any startup actions that need to be done before the user begins interacting with the plugin, such as allocating memory or initializing parameters, can be done here
+Initializes the plugin. This gets called after all the plugins get loaded into the Plugin Manager. Any startup actions that need to be done before the user begins interacting with the plugin, such as allocating memory or initializing parameters, can be done here.
 
 ### unload()
 
@@ -91,6 +91,8 @@ pLayout->addWidget(pSecondButton);
 ```
 
 A lot of control widgets are already implemented in the disp library, they can be used here.
+
+Many different plugins will be loaded to MNE_Analyze, to influence how high or low the controls of a particular plugin will appear in the drop-down menu "Control" tab, you can modify the variable ```m_iOrder```. By default it is set to 0, the higher you set that value to, the higher your control will appear. To force the controls to appear lower you can also use negative values.
 
 ### getView()
 

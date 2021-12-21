@@ -43,6 +43,8 @@
 #include "scdisp_global.h"
 #include "measurementwidget.h"
 
+#include <events/eventmanager.h>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -175,7 +177,7 @@ private:
     QPointer<QAction>                                       m_pActionHideBad;               /**< Hide bad channels. */
 
     qint32                                                  m_iMaxFilterTapSize;            /**< Maximum number of allowed filter taps. This number depends on the size of the receiving blocks. */
- };
+};
 } // NAMESPACE SCDISPLIB
 
 #endif // REALTIMEMULTISAMPLEARRAYWIDGET_H

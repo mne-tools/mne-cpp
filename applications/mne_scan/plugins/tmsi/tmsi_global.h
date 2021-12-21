@@ -37,6 +37,12 @@
 #define TMSI_GLOBAL_H
 
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <utils/buildinfo.h>
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -51,5 +57,26 @@
 #else
 #  define TMSISHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+namespace TMSIPLUGIN{
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+TMSISHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+TMSISHARED_EXPORT const char* buildHash();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+TMSISHARED_EXPORT const char* buildHashLong();
+}
 
 #endif // TMSI_GLOBAL_H

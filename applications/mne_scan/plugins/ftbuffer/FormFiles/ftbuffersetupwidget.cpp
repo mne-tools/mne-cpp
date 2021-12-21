@@ -77,6 +77,13 @@ FtBufferSetupWidget::FtBufferSetupWidget(FtBuffer* toolbox,
             m_pFtBuffer->m_pFtBuffProducer.data(), &FtBuffProducer::connectToBuffer);
     connect(m_pFtBuffer->m_pFtBuffProducer.data(), &FtBuffProducer::connecStatus,
             this, &FtBufferSetupWidget::isConnected);
+
+    connect(m_pUi->m_lineEditIP, &QLineEdit::textChanged,
+            toolbox, &FtBuffer::setBufferAddress);
+    connect(m_pUi->m_spinBoxPort, QOverload<int>::of(&QSpinBox::valueChanged),
+            toolbox, &FtBuffer::setBufferPort);
+    toolbox->setBufferAddress(m_pUi->m_lineEditIP->text());
+    toolbox->setBufferPort(m_pUi->m_spinBoxPort->value());
 }
 
 //=============================================================================================================
@@ -132,7 +139,7 @@ void FtBufferSetupWidget::isConnected(bool stat)
         qWarning() << "[FtBufferSetupWidget::isConnected] Unable to find relevant fiff info.";
 
         QMessageBox msgBox;
-        msgBox.setText("Unable to find relevant fiff info. Is there header data in the buffer or a fiff file in your bin folder?");
+        msgBox.setText("Unable to find relevant fiff info. Is there header data in the buffer?");
         msgBox.exec();
     }
 }

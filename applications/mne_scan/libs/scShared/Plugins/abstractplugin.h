@@ -183,6 +183,14 @@ public:
      */
     virtual QWidget* setupWidget() = 0; //setup()
 
+    //=========================================================================================================
+    /**
+     * Returns string with plugin build date and time.
+     *
+     * @return build date and time
+     */
+    virtual QString getBuildInfo() = 0;
+
     inline InputConnectorList& getInputConnectors(){return m_inputConnectors;}
     inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
 

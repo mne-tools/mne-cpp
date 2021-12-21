@@ -60,6 +60,7 @@ LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lanSharedd \
             -lmnecppDispd \
+            -lmnecppEventsd \
             -lmnecppConnectivityd \
             -lmnecppRtProcessingd \
             -lmnecppInversed \
@@ -71,6 +72,7 @@ CONFIG(debug, debug|release) {
 } else {
     LIBS += -lanShared \
             -lmnecppDisp \
+            -lmnecppEvents \
             -lmnecppConnectivity \
             -lmnecppRtProcessing \
             -lmnecppInverse \
@@ -90,7 +92,11 @@ HEADERS += \
 
 OTHER_FILES += sampleplugin.json
 
-INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+*-clang++ {
+    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
+} else {
+    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
+}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_ANALYZE_INCLUDE_DIR}
 

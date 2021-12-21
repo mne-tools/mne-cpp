@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
  * @file     writetofile.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>,
+ *           Gabriel B Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.0
  * @date     February, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2020, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2020, Lorenz Esch, Gabriel B Motta . All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -43,6 +44,7 @@
 
 #include <utils/generics/circularbuffer.h>
 #include <scShared/Plugins/abstractalgorithm.h>
+#include <fiff/fifffilesharer.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -123,6 +125,7 @@ public:
     virtual AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
+    virtual QString getBuildInfo();
 
     //=========================================================================================================
     /**
@@ -137,6 +140,22 @@ public:
      * Inits widgets which are used to control this plugin, then emits them in form of a QList.
      */
     void initPluginControlWidgets();
+
+    //=========================================================================================================
+    /**
+     * Sets whether the plugin is to be in continuous save mode
+     *
+     * @param iState    state of checkbox - gets saved as bool 0 - false (not continuous), 1+ - true (continuous)
+     */
+    void setContinuous(int iState);
+
+    //=========================================================================================================
+    /**
+     * Whether the plugin is set to continuous save mode
+     *
+     * @return true if set to continuous, false if not.
+     */
+    bool isContinuous();
 
 private:
     //=========================================================================================================
@@ -187,8 +206,80 @@ private:
      */
     void changeRecordingButton();
 
+    //=========================================================================================================
+    /**
+     * Copies recording and sends it to shared file direcotry without stopping reccording
+     *
+     * @param[in] bChecked      Unused. Whether action that triggered this function was checked or unchecked
+     */
+    void clipRecording(bool bChecked);
+
+    //=========================================================================================================
+    /**
+     * Prompts user to rename recent recording file/files.
+     */
+    void promptFileName();
+
+    //=========================================================================================================
+    /**
+     * Attempts to rename files from most recent recording with input parameter sFileName.
+     *
+     * @param[in] sFileName     new name for save files.
+     *
+     * @return Returns true if all files were renamed, false if not.
+     */
+    bool renameRecording(const QString& sFileName);
+
+    //=========================================================================================================
+    /**
+     * Renames a single file
+     *
+     * @param[in] sCurrentFileName      current file name.
+     * @param[in] sNewFileName          new file name.
+     *
+     * @return Returns true if file was renamed, false if not.
+     */
+    bool renameSingleFile(const QString& sCurrentFileName, const QString& sNewFileName);
+
+    //=========================================================================================================
+    /**
+     * Renames multiple files using input param as template and adds "-n" to file names to denote order.
+     *
+     * @param[in] sFileName     new template file name
+     *
+     * @return Returns true if all files were renamed, false if not.
+     */
+    bool renameMultipleFiles(const QString& sFileName);
+
+    //=========================================================================================================
+    /**
+     * Deletes latest recording.
+     */
+    void deleteRecording();
+
+    //=========================================================================================================
+    /**
+     * Displays pop up message with sText. Blocking.
+     *
+     * @param[in] sText     Text to be displayed.
+     */
+    void popUp(const QString& sText);
+
+    //=========================================================================================================
+    /**
+     * Displays pop up message with sText and sInfoText. Returns response. Blocking.
+     *
+     * @param sText         Text to be displayed.
+     * @param sInfoText     Text to be displayed.
+     *
+     * @return  Returns response as QMessageBox::No or QMessageBox::Yes.
+     */
+    int popUpYesNo(const QString& sText,
+                   const QString& sInfoText);
+
     bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
+    bool                                    m_bContinuous;                  /**< Flag for whether to start plugin in continuous save mode */
 
     qint16                                  m_iBlinkStatus;                 /**< The blink status of the recording button.*/
     qint32                                  m_iSplitCount;                  /**< File split count. */
@@ -208,12 +299,17 @@ private:
     QTime                                   m_recordingStartedTime;         /**< The time when the recording started.*/
 
     QPointer<QAction>                       m_pActionRecordFile;            /**< start recording action. */
+    QPointer<QAction>                       m_pActionClipRecording;
 
     QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>                      m_pCircularBuffer;      /**< Holds incoming raw data. */
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr      m_pWriteToFileInput;   /**< The RealTimeMultiSampleArray of the WriteToFile input.*/
 
     Eigen::RowVectorXd                      m_mCals;                        /**< Row vector with channel calibration values. */
+
+    FIFFLIB::FiffFileSharer                 m_FileSharer;                   /**< Handles copying recording file and saving copy to shared directory. */
+
+    QStringList                             m_lFileNames;                   /**< List of file names of latest recording */
 };
 } // NAMESPACE
 

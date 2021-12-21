@@ -254,7 +254,7 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(const QString
     ba_curv = pathLhCurv.toLatin1();
     this_curv = ba_curv.data();
 
-    fprintf(stderr,"Loading surface %s ...\n",this_surf);
+    printf("Loading surface %s ...\n",this_surf);
     if ((left = MneSurfaceOrVolume::mne_load_surface(this_surf,this_curv)) == Q_NULLPTR) {
         if ((left = MneSurfaceOrVolume::mne_load_surface(this_surf,Q_NULLPTR)) == Q_NULLPTR)
             goto bad;
@@ -272,7 +272,7 @@ MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load_new_surface(const QString
     ba_curv = pathRhCurv.toLatin1();
     this_curv = ba_curv.data();
 
-    fprintf(stderr,"Loading surface %s ...\n",this_surf);
+    printf("Loading surface %s ...\n",this_surf);
     if ((right = MneSurfaceOrVolume::mne_load_surface(this_surf,this_curv)) == Q_NULLPTR) {
         if ((right = MneSurfaceOrVolume::mne_load_surface(this_surf,Q_NULLPTR)) == Q_NULLPTR)
             goto bad;
@@ -357,10 +357,10 @@ void MneMshDisplaySurfaceSet::decide_surface_extent(MneMshDisplaySurface* surf,
         }
     }
 #ifdef DEBUG
-    fprintf(stderr,"%s:\n",tag);
-    fprintf(stderr,"\tx = %f ... %f mm\n",1000*minv[X],1000*maxv[X]);
-    fprintf(stderr,"\ty = %f ... %f mm\n",1000*minv[Y],1000*maxv[Y]);
-    fprintf(stderr,"\tz = %f ... %f mm\n",1000*minv[Z],1000*maxv[Z]);
+    printf("%s:\n",tag);
+    printf("\tx = %f ... %f mm\n",1000*minv[X],1000*maxv[X]);
+    printf("\ty = %f ... %f mm\n",1000*minv[Y],1000*maxv[Y]);
+    printf("\tz = %f ... %f mm\n",1000*minv[Z],1000*maxv[Z]);
 #endif
 
     surf->fov = 0;
@@ -417,7 +417,7 @@ int MneMshDisplaySurfaceSet::add_bem_surface(MneMshDisplaySurfaceSet* surfs,
         goto bad;
     }
 
-    fprintf(stderr,"Loading BEM surface %s (id = %d) from %s ...\n",name,kind,filename);
+    printf("Loading BEM surface %s (id = %d) from %s ...\n",name,kind,filename);
     if ((surf = MneSurfaceOld::mne_read_bem_surface2(filename,kind,full_geom,Q_NULLPTR)) == Q_NULLPTR)
         goto bad;
     if (check) {
@@ -425,9 +425,9 @@ int MneMshDisplaySurfaceSet::add_bem_surface(MneMshDisplaySurfaceSet* surfs,
         MneSurfaceOld::mne_compute_surface_cm(surf);
         sum = MneSurfaceOld::sum_solids(surf->cm,surf)/(4*M_PI);
         if (std::fabs(sum - 1.0) > 1e-4) {
-            fprintf(stderr, "%s surface is not closed "
+            printf( "%s surface is not closed "
                                  "(sum of solid angles = %g * 4*PI).",name,sum);
-            return FAIL;
+            goto bad;
         }
     }
 
@@ -442,14 +442,22 @@ int MneMshDisplaySurfaceSet::add_bem_surface(MneMshDisplaySurfaceSet* surfs,
     newSurf->overlay_color_mode   = SHOW_OVERLAY_HEAT;
 
     decide_surface_extent(newSurf,name);
-    add_replace_display_surface(surfs,newSurf,TRUE,TRUE);
+    add_replace_display_surface(surfs, newSurf, true, true);
     apply_left_eyes(surfs);
     setup_current_surface_lights(surfs);
 
     return OK;
 
-bad : {
-        delete surf;
+bad :
+    {
+        if(surf)
+        {
+            delete surf;
+        }
+        if(newSurf)
+        {
+            delete newSurf;
+        }
         return FAIL;
     }
 }
@@ -458,14 +466,13 @@ bad : {
 
 void MneMshDisplaySurfaceSet::add_replace_display_surface(MneMshDisplaySurfaceSet* surfs,
                                                           MneMshDisplaySurface*    newSurf,
-                                                          int                  replace,
-                                                          int                  drawable)
+                                                          bool                  replace,
+                                                          bool                  drawable)
 {
-    int k;
-    MneMshDisplaySurface* surf = new MneMshDisplaySurface();
+    MneMshDisplaySurface* surf;
 
     if (replace) {
-        for (k = 0; k < surfs->nsurf; k++) {
+        for (int k = 0; k < surfs->nsurf; k++) {
             surf = surfs->surfs[k];
             if (surf->s->id == newSurf->s->id) {
                 newSurf->transparent   = surf->transparent;
@@ -540,7 +547,7 @@ void MneMshDisplaySurfaceSet::setup_curvature_colors(MneMshDisplaySurface* surf)
         }
     }
 #ifdef DEBUG
-    fprintf(stderr,"Average curvature : %f\n",curv_sum/s->np);
+    printf("Average curvature : %f\n",curv_sum/s->np);
 #endif
     return;
 }

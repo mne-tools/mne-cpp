@@ -719,3 +719,9 @@ void EEGoSports::run()
     }
 }
 
+//=============================================================================================================
+
+QString EEGoSports::getBuildInfo()
+{
+    return QString(EEGOSPORTSPLUGIN::buildDateTime()) + QString(" - ")  + QString(EEGOSPORTSPLUGIN::buildHash());
+}

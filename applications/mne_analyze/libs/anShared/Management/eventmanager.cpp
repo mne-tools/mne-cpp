@@ -72,7 +72,14 @@ EventManager::EventManager()
 
 //=============================================================================================================
 
-void EventManager::addCommunicator(Communicator* commu)
+void EventManager::addCommunicator(Communicator *commu)
+{
+    getEventManager().addCommunicatorInt(commu);
+}
+
+//=============================================================================================================
+
+void EventManager::addCommunicatorInt(Communicator* commu)
 {
     QMutexLocker temp(&m_routingTableMutex);
     const QVector<EVENT_TYPE>& subscriptions = commu->getSubscriptions();
@@ -86,6 +93,13 @@ void EventManager::addCommunicator(Communicator* commu)
 
 void EventManager::issueEvent(QSharedPointer<Event> e)
 {
+    getEventManager().issueEventInt(e);
+}
+
+//=============================================================================================================
+
+void EventManager::issueEventInt(QSharedPointer<Event> e)
+{
     QMutexLocker temp(&m_eventQMutex);
     m_eventQ.enqueue(e);
     m_eventSemaphore.release();
@@ -93,8 +107,15 @@ void EventManager::issueEvent(QSharedPointer<Event> e)
 
 //=============================================================================================================
 
-void EventManager::addSubscriptions(Communicator* commu,
+void EventManager::addSubscriptions(Communicator *commu,
                                     QVector<EVENT_TYPE> newsubs)
+{
+    getEventManager().addSubscriptionsInt(commu, newsubs);
+}
+//=============================================================================================================
+
+void EventManager::addSubscriptionsInt(Communicator* commu,
+                                       QVector<EVENT_TYPE> newsubs)
 {
     QMutexLocker temp(&m_routingTableMutex);
     for(const EVENT_TYPE& etype : newsubs)
@@ -108,6 +129,14 @@ void EventManager::addSubscriptions(Communicator* commu,
 void EventManager::updateSubscriptions(Communicator* commu,
                                        const QVector<EVENT_TYPE> &subs)
 {
+    getEventManager().updateSubscriptionsInt(commu, subs);
+}
+
+//=============================================================================================================
+
+void EventManager::updateSubscriptionsInt(Communicator* commu,
+                                       const QVector<EVENT_TYPE> &subs)
+{
     // remove all old subscriptions from EventManager routing table
     removeCommunicator(commu);
     // add new key-value-pairs into map
@@ -117,6 +146,13 @@ void EventManager::updateSubscriptions(Communicator* commu,
 //=============================================================================================================
 
 void EventManager::removeCommunicator(Communicator* commu)
+{
+    getEventManager().removeCommunicatorInt(commu);
+}
+
+//=============================================================================================================
+
+void EventManager::removeCommunicatorInt(Communicator* commu)
 {
     QMutexLocker temp(&m_routingTableMutex);
     for(const EVENT_TYPE& etype : commu->getSubscriptions())
@@ -134,6 +170,13 @@ void EventManager::removeCommunicator(Communicator* commu)
 //=============================================================================================================
 
 bool EventManager::startEventHandling(float frequency)
+{
+    return getEventManager().startEventHandlingInt(frequency);
+}
+
+//=============================================================================================================
+
+bool EventManager::startEventHandlingInt(float frequency)
 {
     if (m_running)
     {
@@ -154,6 +197,13 @@ bool EventManager::startEventHandling(float frequency)
 
 bool EventManager::stopEventHandling()
 {
+    return getEventManager().stopEventHandlingInt();
+}
+
+//=============================================================================================================
+
+bool EventManager::stopEventHandlingInt()
+{
     if (m_running)
     {
         m_running = false;
@@ -171,6 +221,13 @@ bool EventManager::stopEventHandling()
 //=============================================================================================================
 
 bool EventManager::hasBufferedEvents()
+{
+    return getEventManager().hasBufferedEventsInt();
+}
+
+//=============================================================================================================
+
+bool EventManager::hasBufferedEventsInt()
 {
     QMutexLocker temp(&m_eventQMutex);
     return (m_eventQ.isEmpty() == false);
@@ -239,5 +296,12 @@ void EventManager::run()
 
 void EventManager::shutdown()
 {
-    stopEventHandling();
+    getEventManager().shutdownInt();
+}
+
+//=============================================================================================================
+
+void EventManager::shutdownInt()
+{
+    stopEventHandlingInt();
 }

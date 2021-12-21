@@ -28,7 +28,6 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- *
  * @brief    IOUtils class declaration
  *
  */
@@ -68,6 +67,16 @@ namespace UTILSLIB
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+struct UTILSSHARED_EXPORT aaaa
+{
+    int i = 9;
+};
+
+struct UTILSSHARED_EXPORT b
+{
+    int i = 4;
+};
 
 //=============================================================================================================
 /**

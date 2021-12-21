@@ -89,8 +89,51 @@ public:
                                  QWidget *parent = 0);
     ~ProjectSettingsView();
 
+    //=========================================================================================================
+    /**
+     * Sets elapsed time to input parameter
+     *
+     * @param[in] mSecsElapsed      elapsed tim in milliseconds
+     */
     void setRecordingElapsedTime(int mSecsElapsed);
+
+    //=========================================================================================================
+    /**
+     * Updates and gets current file name based on project and subject.
+     *
+     * @return file name
+     */
     QString getCurrentFileName();
+
+    //=========================================================================================================
+    /**
+     * Updates file name based on current project and subject.
+     */
+    void triggerFileNameUpdate();
+
+    //=========================================================================================================
+    /**
+     * Hides file name ui elements.
+     */
+    void hideFileNameUi();
+
+    //=========================================================================================================
+    /**
+     * Shows file name ui elements.
+     */
+    void showFileNameUi();
+
+    //=========================================================================================================
+    /**
+     * Hides paradigm ui elements.
+     */
+    void hideParadigmUi();
+
+    //=========================================================================================================
+    /**
+     * Shows paradigm ui elements.
+     */
+    void showParadigmUi();
 
     //=========================================================================================================
     /**
@@ -128,6 +171,8 @@ protected:
     void updateProcessingMode(ProcessingMode mode);
 
 private:
+    void connectGui();
+
     void addProject();
     void addSubject();
 
@@ -146,6 +191,8 @@ private:
 
     void onTimeChanged();
     void onRecordingTimerStateChanged(bool state);
+
+    void browseDirectories();
 
     Ui::ProjectSettingsViewWidget*   m_pUi;
 

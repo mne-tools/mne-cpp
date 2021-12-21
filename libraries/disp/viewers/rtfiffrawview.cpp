@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
  * @file     rtfiffrawview.cpp
- * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>;
+ *           Juan Garcia-Prieto <juangpc@gmail.com>
  * @since    0.1.0
  * @date     July, 2018
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Gabriel B Motta, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2018, Lorenz Esch, Gabriel B Motta, Juan Garcia-Prieto. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -84,6 +85,7 @@ RtFiffRawView::RtFiffRawView(const QString& sSettingsPath,
 , m_fZoomFactor(1.0f)
 , m_bHideBadChannels(false)
 , m_iDistanceTimeSpacer(1)
+, m_iClickPosX(0)
 {
     m_sSettingsPath = sSettingsPath;
     m_pTableView = new QTableView;
@@ -144,6 +146,8 @@ void RtFiffRawView::init(QSharedPointer<FIFFLIB::FiffInfo> &info)
     m_pModel->setSamplingInfo(m_fSamplingRate, m_iT, true);
     connect(m_pModel.data(), &RtFiffRawViewModel::triggerDetected,
             this, &RtFiffRawView::triggerDetected);
+    connect(this, &RtFiffRawView::addSampleAsEvent,
+            m_pModel, &RtFiffRawViewModel::addEvent, Qt::UniqueConnection);
 
     //Init bad channel list
     m_qListBadChannels.clear();
@@ -227,11 +231,11 @@ MatrixXd RtFiffRawView::getLastBlock()
 
 bool RtFiffRawView::eventFilter(QObject *object, QEvent *event)
 {
-    if (object == m_pTableView->viewport() && event->type() == QEvent::MouseMove) {
-        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-        emit markerMoved(mouseEvent->pos(), m_pTableView->rowAt(mouseEvent->pos().y()));
-        return true;
-    }
+//    if (object == m_pTableView->viewport() && event->type() == QEvent::MouseMove) {
+//        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+//        emit markerMoved(mouseEvent->pos(), m_pTableView->rowAt(mouseEvent->pos().y()));
+//        return true;
+//    }
 
     return QWidget::eventFilter(object, event);
 }
@@ -308,7 +312,7 @@ void RtFiffRawView::hideBadChannels()
     }
 
     //Update the visible channel list which are to be filtered
-    //visibleRowsChanged();
+    visibleRowsChanged();
 }
 
 //=============================================================================================================
@@ -337,7 +341,7 @@ void RtFiffRawView::showSelectedChannelsOnly(const QStringList &selectedChannels
     }
 
     //Update the visible channel list which are to be filtered
-    //visibleRowsChanged();
+    visibleRowsChanged();
 }
 
 //=============================================================================================================
@@ -374,6 +378,13 @@ int RtFiffRawView::getWindowSize()
 
 //=============================================================================================================
 
+float RtFiffRawView::getSamplingFreq() const
+{
+    return m_fSamplingRate;
+}
+
+//=============================================================================================================
+
 void RtFiffRawView::takeScreenshot(const QString& fileName)
 {
     if(fileName.contains(".svg", Qt::CaseInsensitive)) {
@@ -387,7 +398,7 @@ void RtFiffRawView::takeScreenshot(const QString& fileName)
     }
 
     if(fileName.contains(".png", Qt::CaseInsensitive)) {
-        QPixmap pixMap = QPixmap::grabWidget(m_pTableView);
+        QPixmap pixMap(m_pTableView->grab());
         pixMap.save(fileName);
     }
 }
@@ -523,6 +534,8 @@ void RtFiffRawView::updateProcessingMode(ProcessingMode mode)
 
 void RtFiffRawView::channelContextMenu(QPoint pos)
 {
+    m_iClickPosX = pos.x();
+
     //obtain index where index was clicked
     QModelIndex index = m_pTableView->indexAt(pos);
 
@@ -532,7 +545,16 @@ void RtFiffRawView::channelContextMenu(QPoint pos)
     //create custom context menu and actions
     QMenu *menu = new QMenu(this);
 
-    //**************** Marking ****************
+    menu->addSection("Events");
+
+    QAction* addEventMarker = menu->addAction(tr("Add event"));
+    connect(addEventMarker, &QAction::triggered,
+            this, &RtFiffRawView::onAddEvent);
+
+    //Marking
+
+    menu->addSection("Channel Marking");
+
     if(!m_qListBadChannels.contains(index.row())) {
         QAction* doMarkChBad = menu->addAction(tr("Mark as bad"));
         connect(doMarkChBad, &QAction::triggered,
@@ -549,7 +571,9 @@ void RtFiffRawView::channelContextMenu(QPoint pos)
         if(selected[i].column() == 1)
             m_qListCurrentSelection.append(m_pModel->getIdxSelMap()[selected[i].row()]);
 
-    QAction* doSelection = menu->addAction(tr("Apply selection"));
+    menu->addSection("Selection");
+
+    QAction* doSelection = menu->addAction(tr("Only show selection"));
     connect(doSelection, &QAction::triggered,
             this, &RtFiffRawView::applySelection);
 
@@ -629,8 +653,8 @@ void RtFiffRawView::visibleRowsChanged()
     }
 
     int from = m_pTableView->rowAt(0);
-    if(from != 0)
-        from--;
+//    if(from != 0){
+//        from--;
 
     int to = m_pTableView->rowAt(m_pTableView->height()-1);
     if(to != m_pModel->rowCount()-1)
@@ -648,7 +672,7 @@ void RtFiffRawView::visibleRowsChanged()
 
 //    m_pModel->createFilterChannelList(channelNames);
 
-    m_pDelegate->setUpperItemIndex(from+1);
+    m_pDelegate->setUpperItemIndex(from/*+1*/);
 
     //qDebug() <<"RtFiffRawView::visibleRowsChanged - from "<< from << " to" << to;
 }
@@ -689,4 +713,32 @@ void RtFiffRawView::markChBad()
 void RtFiffRawView::clearView()
 {
 
+}
+
+//=============================================================================================================
+
+void RtFiffRawView::onAddEvent(bool bChecked)
+{
+    Q_UNUSED(bChecked)
+    double dDx = static_cast<double>(m_pTableView->columnWidth(1)) / static_cast<double>(m_pModel->getMaxSamples());
+    double dSample = static_cast<double>(m_iClickPosX) / dDx;
+
+    int iFirstSampleOffset = m_pModel->getFirstSampleOffset();
+
+    // Dont allow adding events to blank space in the beginning
+    if (dSample > m_pModel->getCurrentSampleIndex() && iFirstSampleOffset == 0){
+        return;
+    }
+
+    //Add offset
+    int iAbsoluteSample = static_cast<int>(dSample) + iFirstSampleOffset;
+
+    //Account for whether adding before or after draw point
+    if (dSample > m_pModel->getCurrentSampleIndex()){
+        iAbsoluteSample -= m_pModel->getMaxSamples();
+    }
+
+    qDebug() << "EVENT SAMPLE:" << iAbsoluteSample;
+
+    emit addSampleAsEvent(iAbsoluteSample);
 }

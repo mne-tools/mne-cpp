@@ -3,12 +3,14 @@
  * @file     rtfiffrawviewmodel.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>;
+ *           Juan Garcia-Prieto <juangpc@gmail.com>
  * @since    0.1.0
  * @date     May, 2014
  *
  * @section  LICENSE
  *
- * Copyright (C) 2014, Lorenz Esch, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Gabriel Motta, Juan Garcia-Prieto. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -46,6 +48,8 @@
 #include <fiff/fiff_proj.h>
 
 #include <rtprocessing/helpers/filterkernel.h>
+
+#include <events/eventmanager.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -110,6 +114,13 @@ public:
      */
     RtFiffRawViewModel(QObject *parent = 0);
 
+    //=========================================================================================================
+    /**
+     * Destructs RtFiffRawViewModel and stops the use of Shared Memory within the Event Manager.
+     *
+     */
+
+    ~RtFiffRawViewModel();
     //=========================================================================================================
     /**
      * Returns the number of rows under the given parent. When the parent is valid it means that rowCount is returning the number of children of parent.
@@ -502,6 +513,42 @@ public:
      */
     inline int getCurrentOverlapAddDelay() const;
 
+    //=========================================================================================================
+    /**
+     * Get offset of first drawn sample in the window
+     *
+     * @return sample offset of window
+     */
+    inline int getFirstSampleOffset() const;
+
+    //=========================================================================================================
+    /**
+     * Get maximum range of respective channel type. range value in FiffChInfo does not seem to contain a reasonable value
+     *
+     * @param [in] Row of the model
+     * @return the max value of the y axis for the channel
+     */
+    double getMaxValueFromRawViewModel(int row) const;
+
+    //=========================================================================================================
+    /**
+     * Adds event based on input parameters
+     *
+     * @param[in]iSample    Sample of the new event.
+     */
+    void addEvent(int iSample);
+
+    //=========================================================================================================
+    /**
+     * Returns events between two samples
+     *
+     * @param[in] iBegin    Lower bound for sample (inclusive).
+     * @param[in] iEnd      Upper bound for sample (exclusive).
+     *
+     * @return  Pointer to a vector of events.
+     */
+    std::unique_ptr<std::vector<EVENTSLIB::Event> > getEventsToDisplay(int iBegin, int iEnd) const;
+
 private:
     //=========================================================================================================
     /**
@@ -545,6 +592,7 @@ private:
     qint32                              m_iDownsampling;                            /**< Down sampling factor. */
     qint32                              m_iMaxSamples;                              /**< Max samples per window. */
     qint32                              m_iCurrentSample;                           /**< Current sample which holds the current position in the data matrix. */
+    qint32                              m_iCurrentStartingSample;                   /**< Accumulates cumulative starting sample position when m_iCurrentSample resets to 0 */
     qint32                              m_iCurrentSampleFreeze;                     /**< Current sample which holds the current position in the data matrix when freezing tool is active. */
     qint32                              m_iMaxFilterLength;                         /**< Max order of the current filters. */
     qint32                              m_iCurrentBlockSize;                        /**< Current block size. */
@@ -601,6 +649,8 @@ private:
     QMap<qint32,qint32>                 m_qMapIdxRowSelection;                      /**< Selection mapping.*/
 
     QColor                              m_colBackground;                            /**< The background color.*/
+
+    static EVENTSLIB::EventManager      m_EventManager;                             /**< Database for storing events and using shared memory. Shared between all instances */
 
 signals:
     //=========================================================================================================
@@ -779,6 +829,13 @@ inline int RtFiffRawViewModel::getCurrentOverlapAddDelay() const
         return m_iMaxFilterLength/2;
     else
         return 0;
+}
+
+//=============================================================================================================
+
+inline int RtFiffRawViewModel::getFirstSampleOffset() const
+{
+    return m_iCurrentStartingSample;
 }
 } // NAMESPACE
 
