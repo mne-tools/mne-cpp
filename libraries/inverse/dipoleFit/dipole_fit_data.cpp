@@ -1490,6 +1490,7 @@ static int report_func(int     loop,
       */
 {
     float *r0 = fitpar;
+    (void) npar; // avoid unused variable warning.
 
     printf("loop %d r0 %7.1f %7.1f %7.1f fval %g\n",
             loop,1000*r0[0],1000*r0[1],1000*r0[2],fval);
@@ -1510,6 +1511,7 @@ static float fit_sphere_eval(float *fitpar,
     float diff[3];
     int   k;
     float sum,sum2,one,F;
+    (void) npar; // avoid unused variable warning.
 
     for (k = 0, sum = sum2 = 0.0; k < user->np; k++) {
         VEC_DIFF_3(r0,user->rr[k],diff);
@@ -4458,7 +4460,7 @@ static int report_func(int     loop,
       */
 {
     float *r0 = fitpar;
-
+    (void) npar; // avoid unused variable warning.
     fprintf(stdout,"loop %d rd %7.2f %7.2f %7.2f fval %g %g par diff %g\n",
             loop,1000*r0[0],1000*r0[1],1000*r0[2],fval_lo,fval_hi,1000*par_diff);
 
