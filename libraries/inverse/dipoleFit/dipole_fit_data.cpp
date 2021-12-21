@@ -983,6 +983,7 @@ static int condition_cov_3(MneCovMatrix* c, float rank_threshold, int use_rank)
         res = nok;
     }
     FREE_3(cov);
+    FREE_3(scale);
     FREE_3(lambda);
     FREE_CMATRIX_3(eigen);
     FREE_DCMATRIX_3(data1);
