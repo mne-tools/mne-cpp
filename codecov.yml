@@ -6,17 +6,15 @@ coverage:
   round: down
   range: 0..100
   status:
-    patch: yes
+    patch:
+      default:
+        target: auto
+        threshold: 2%
     changes: no
     project:
       default:
         target: auto
         threshold: 2%
-
-  # status:
-  #   project: yes
-  #   patch: yes
-  #   changes: no
 
 parsers:
   gcov:
