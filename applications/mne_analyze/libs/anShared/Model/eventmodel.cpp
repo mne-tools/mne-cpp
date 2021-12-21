@@ -737,13 +737,21 @@ void EventModel::getEventsFromNewData()
     Eigen::MatrixXd mSampleData, mSampleTimes;
 
     if(previousLastSample > 0){
-        raw->read_raw_segment(mSampleData,
+        if(!raw->read_raw_segment(mSampleData,
                               mSampleTimes,
-                              previousLastSample);
+                                   previousLastSample))
+        {
+            qWarning() << "[EventModel::getEventsFromNewData] Could not read block ";
+            return;
+        }
     }
     else {
-        raw->read_raw_segment(mSampleData,
-                              mSampleTimes);
+        if(!raw->read_raw_segment(mSampleData,
+                                   mSampleTimes))
+        {
+            qWarning() << "[EventModel::getEventsFromNewData] Could not read block ";
+            return;
+        }
     }
 
     for (int iChannelIndex : stimChannelIndexList){
