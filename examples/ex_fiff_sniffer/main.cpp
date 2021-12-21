@@ -79,7 +79,11 @@ int main(int argc, char *argv[])
             std::cout << "Buffer can't be opened.\n";
             return 1;
         }
-        t_fileRaw.open(QIODevice::ReadOnly);
+        if(!t_fileRaw.open(QIODevice::ReadOnly))
+        {
+            std::cout << "Input file can't be opened.\n";
+            return 1;
+        }
         buffer.write(t_fileRaw.readAll());
 
         t_fileRaw.close();
