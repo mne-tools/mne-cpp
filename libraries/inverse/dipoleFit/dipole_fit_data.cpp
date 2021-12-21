@@ -2333,7 +2333,9 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
     stream->close();
 
     megp = meg;
-    *nmegp = nmeg;
+    if(nmegp) {
+        *nmegp = nmeg;
+    }
 
     meg_compp = meg_comp;
     *nmeg_compp = nmeg_comp;
