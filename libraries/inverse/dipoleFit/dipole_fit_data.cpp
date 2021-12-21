@@ -2348,7 +2348,7 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
     else
         *idp   = id;
     if (meg_head_t == NULL) {
-        FREE_3(t);
+        delete t;
     }
     else
         *meg_head_t = t;
@@ -2360,7 +2360,7 @@ bad : {
         stream->close();
         FREE_3(id);
 //        FREE_3(tag.data);
-        FREE_3(t);
+        delete t;
         return FIFF_FAIL;
     }
 }
