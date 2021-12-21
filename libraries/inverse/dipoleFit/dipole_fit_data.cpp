@@ -4359,6 +4359,7 @@ static float fit_eval(float *rd,int npar,void *user)
     fitDipUser       fuser = (fitDipUser)fit->user;
     double        Bm2,one;
     int           ncomp,c;
+    (void)npar; // avoid unused variable warning.
 
     fwd = fuser->fwd = DipoleFitData::dipole_forward_one(fit,rd,fuser->fwd);
     ncomp = fwd->sing[2]/fwd->sing[0] > fuser->limit ? 3 : 2;
