@@ -4,13 +4,17 @@ codecov:
 coverage:
   precision: 2
   round: down
-  range: 1..100
-  threshold: 1%
-
+  range: 0..100
   status:
-    project: yes
-    patch: yes
+    patch:
+      default:
+        target: auto
+        threshold: 2%
     changes: no
+    project:
+      default:
+        target: auto
+        threshold: 2%
 
 parsers:
   gcov:
