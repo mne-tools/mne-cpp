@@ -38,6 +38,7 @@
 
 #include "signalmodel.h"
 #include <utils/mnemath.h>
+#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -76,6 +77,11 @@ SignalModel::SignalModel()
 MatrixXd SignalModel::fitData(const ModelParameters& modelParameters,const MatrixXd& matData)
 {
 
+    if(checkEmpty(modelParameters)) {
+        MatrixXd matTopo;
+        return matTopo;
+    }
+
     bool bParametersChanged = checkModelParameters(modelParameters);
     bool bDimensionsChanged = checkDataDimensions(matData.cols());
 
@@ -112,6 +118,20 @@ bool SignalModel::checkModelParameters(const ModelParameters& modelParameters)
         m_modelParameters = modelParameters;
     }
     return bHasChanged;
+}
+
+//=============================================================================================================
+
+bool SignalModel::checkEmpty(const ModelParameters& modelParameters)
+{
+    if(modelParameters.vecHpiFreqs.empty()) {
+        std::cout << "SignalModel::checkEmpty - no Hpi frequencies set" << std::endl;
+        return true;
+    } else if(modelParameters.iSampleFreq == 0) {
+        std::cout << "SignalModel::checkEmpty - no sampling frequencies set" << std::endl;
+        return true;
+    }
+    return false;
 }
 
 //=============================================================================================================

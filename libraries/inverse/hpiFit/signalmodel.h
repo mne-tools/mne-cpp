@@ -72,10 +72,10 @@ namespace INVERSELIB
  * The strucut specifing important ModelParameters used for hpi fitting.
  */
 struct ModelParameters {
-    int iLineFreq;
-    int iSampleFreq;
+    int iLineFreq = 0;
+    int iSampleFreq = 0;
     QVector<int> vecHpiFreqs;
-    bool bBasic;
+    bool bBasic = true;
 };
 
 //=============================================================================================================
@@ -149,6 +149,15 @@ private:
      * @return true if changed
      */
     bool checkModelParameters(const ModelParameters& modelParameters);
+
+    //=========================================================================================================
+    /**
+     * Check if the ModelParameters are empty. HPI and sampling frequencies need to be set.
+     *
+     * @param[in] modelParameters     The model parameters.
+     * @return true if empty
+     */
+    bool checkEmpty(const ModelParameters& modelParameters);
 
     Eigen::MatrixXd m_matInverseSignalModel;
     int m_iCurrentModelCols;

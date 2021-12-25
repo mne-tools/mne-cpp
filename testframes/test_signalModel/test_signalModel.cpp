@@ -79,6 +79,8 @@ public:
 
 private slots:
     void initTestCase();
+    void testFitData_emptyHpiFres();
+    void testFitData_emptySFreq();
     void testFitData_basic_4coils();
     void testFitData_basic_5coils();
     void testFitData_advanced_4coils();
@@ -104,6 +106,43 @@ TestSignalModel::TestSignalModel()
 void TestSignalModel::initTestCase()
 {
     // test your function here
+}
+
+//=============================================================================================================
+
+void TestSignalModel::testFitData_emptyHpiFres()
+{
+    ModelParameters modelParameters;
+
+    SignalModel signalModel = SignalModel();
+    MatrixXd matSimData = MatrixXd::Identity(10,10);
+
+    MatrixXd matAmpActual = signalModel.fitData(modelParameters,matSimData);
+    MatrixXd matAmpExpected;
+
+    // use summed squared error ssd
+    MatrixXd matDiff = matAmpActual - matAmpExpected;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+    QVERIFY(dSSD < dErrorTol);
+}
+
+//=============================================================================================================
+
+void TestSignalModel::testFitData_emptySFreq()
+{
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = {1,2,3,4};
+
+    SignalModel signalModel = SignalModel();
+    MatrixXd matSimData = MatrixXd::Identity(10,10);
+
+    MatrixXd matAmpActual = signalModel.fitData(modelParameters,matSimData);
+    MatrixXd matAmpExpected;
+
+    // use summed squared error ssd
+    MatrixXd matDiff = matAmpActual - matAmpExpected;
+    double dSSD = (matDiff*matDiff.transpose()).trace();
+    QVERIFY(dSSD < dErrorTol);
 }
 
 //=============================================================================================================
