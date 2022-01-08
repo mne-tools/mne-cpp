@@ -175,40 +175,8 @@ public:
      * @param[in]   iMaxIterations             The maximum allowed number of iterations used to fit the dipoles. Default is 500.
      * @param[in]   fAbortError                The error which will lead to aborting the dipole fitting process. Default is 1e-9.
      */
-    void fitHPI(const Eigen::MatrixXd& t_mat,
-                const Eigen::MatrixXd& t_matProjectors,
-                FIFFLIB::FiffCoordTrans &transDevHead,
-                const QVector<int>& vecFreqs,
-                QVector<double>& vecError,
-                Eigen::VectorXd& vecGoF,
-                FIFFLIB::FiffDigPointSet& fittedPointSet,
-                QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-                bool bDoDebug = false,
-                bool bDrop = false,
-                const QString& sHPIResourceDir = QString("./HPIFittingDebug"),
-                int iMaxIterations = 500,
-                float fAbortError = 1e-9);
-
-    //=========================================================================================================
-    /**
-     * Perform one single HPI fit.
-     *
-     * @param[in]   t_mat                      Data to estimate the HPI positions from.
-     * @param[in]   t_matProjectors            The projectors to apply. Bad channels are still included.
-     * @param[out]  transDevHead               The final dev head transformation matrix.
-     * @param[in]   vecFreqs                   The frequencies for each coil.
-     * @param[out]  vecError                   The HPI estimation Error in mm for each fitted HPI coil.
-     * @param[out]  vecGoF                     The goodness of fit for each fitted HPI coil.
-     * @param[out]  fittedPointSet             The final fitted positions in form of a digitizer set.
-     * @param[in]   pFiffInfo                  Associated Fiff Information.
-     * @param[in]   bDoDebug                   Print debug info to cmd line and write debug info to file.
-     * @param[in]   sHPIResourceDir            The path to the debug file which is to be written.
-     * @param[in]   iMaxIterations             The maximum allowed number of iterations used to fit the dipoles. Default is 500.
-     * @param[in]   fAbortError                The error which will lead to aborting the dipole fitting process. Default is 1e-9.
-     */
     void fit(const Eigen::MatrixXd& matData,
              const Eigen::MatrixXd& matProjectors,
-             const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
              const ModelParameters& modelParameters,
              HpiFitResult& hpiFitResult);
 
@@ -262,7 +230,6 @@ public:
     void computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
                              const Eigen::MatrixXd& matProjectors,
                              const FIFFLIB::FiffCoordTrans& transDevHead,
-                             const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                              const QVector<double>& vecError,
                              Eigen::MatrixXd& matCoilLoc,
                              Eigen::VectorXd& vecGoF,
@@ -286,72 +253,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Update the channellist for init and if bads changed
-     *
-     * @param[in] pFiffInfo       The FiffInfo file from the measurement.
-     *
-     */
-    void updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
-
-    //=========================================================================================================
-    /**
-     * Update FwdCoilSet and store into sensors struct.
-     *
-     * @param[in] iAcc       The accuracy level to use for the sensor set. Defaults to 2 (highest).
-     *
-     */
-    void updateSensor(const int iAcc = 2);
-
-    //=========================================================================================================
-    /**
-     * Update the model of sinoids for the hpi data
-     *
-     * @param[in] iSamF             The sample frequency.
-     * @param[in] iSamLoc           The minimum samples required to localize numLoc times in a second.
-     * @param[in] iLineF            The line frequency.
-     * @param[in] vecFreqs          The frequencies for each coil in unknown order.
-     * @param[in] bBasic            Use the basic model yes/no.
-     */
-    void updateModel(const int iSamF,
-                     const int iSamLoc,
-                     const int iLineF,
-                     const QVector<int>& vecFreqs,
-                     bool bBasic);
-
-    //=========================================================================================================
-    /**
-     * Set the projectors to use.
-     *
-     * @param[in] matProjectors     The projector matrix.
-     *
-     */
-    void updateProjectors(const Eigen::MatrixXd& matProjectors);
-
-    //=========================================================================================================
-    /**
-     * Update the necessary frequencies.
-     *
-     * @param[in] iSamplingFreq     The sampling frequency.
-     * @param[in] iLineFreq     The line frequency.
-     * @param[in] vecHpiFreqs     The hpi frequencies.
-     *
-     */
-    void updateFrequenices(const int iSamplingFreq, const int iLineFreq, const QVector<int>& vecHpiFreqs);
-
-    //=========================================================================================================
-    /**
-     * inline get functions for private member variables.
-     *
-     */
-    inline bool isInitialized() const;
-    inline QList<FIFFLIB::FiffChInfo> getChannels() const;
-    inline QList<QString> getBads() const;
-    inline Eigen::MatrixXd getModel() const;
-    inline Eigen::MatrixXd getProjectors() const;
-    inline Eigen::MatrixXd getHpiDigitizer() const;
-
-    //=========================================================================================================
-    /**
      * Store results from dev_Head_t as quaternions in position matrix. The format is the same as you
      * get from Neuromag's MaxFilter.
      *
@@ -371,13 +272,6 @@ public:
                                   const QVector<double>& vecError);
 
 private:
-    //=========================================================================================================
-    /**
-     * Update the digitized HPI coils.
-     * @param[in]   lDig          The digitizer list to extract the hpi coils from.
-     */
-    void updateHpiDigitizer(const QList<FIFFLIB::FiffDigPoint>& lDig);
-
     //=========================================================================================================
     /**
      * Fits dipoles for the given coils and a given data set.
@@ -461,31 +355,6 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
-inline QList<FIFFLIB::FiffChInfo> HPIFit::getChannels() const
-{
-    return m_lChannels;
-}
-
-inline QList<QString> HPIFit::getBads() const
-{
-    return m_lBads;
-}
-
-inline Eigen::MatrixXd HPIFit::getModel() const
-{
-    return m_matModel;
-}
-
-inline Eigen::MatrixXd HPIFit::getProjectors() const
-{
-    return m_matProjectors;
-}
-
-inline Eigen::MatrixXd HPIFit::getHpiDigitizer() const
-{
-    return m_matHeadHPI;
-}
 
 } //NAMESPACE
 

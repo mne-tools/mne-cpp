@@ -83,14 +83,16 @@ void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
     fitResult.devHeadTrans.from = 1;
     fitResult.devHeadTrans.to = 4;
 
-    m_pHpiFit->fitHPI(matData,
-                      matProjectors,
-                      fitResult.devHeadTrans,
-                      vFreqs,
-                      fitResult.errorDistances,
-                      fitResult.GoF,
-                      fitResult.fittedCoils,
-                      pFiffInfo);
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vFreqs;
+    modelParameters.iLineFreq = pFiffInfo->linefreq;
+    modelParameters.iSampleFreq = pFiffInfo->sfreq;
+    modelParameters.bBasic = false;
+
+    m_pHpiFit->fit(matData,
+                   matProjectors,
+                   modelParameters,
+                   fitResult);
 
     emit resultReady(fitResult);
 }

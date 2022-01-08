@@ -547,14 +547,22 @@ void Hpi::run()
     }
 
     // init hpi fit
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = m_vCoilFreqs;
+    modelParameters.iLineFreq = m_pFiffInfo->linefreq;
+    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
+    modelParameters.bBasic = false;
+
     HpiFitResult fitResult;
+    fitResult.hpiFreqs = m_vCoilFreqs;
+    fitResult.errorDistances = QVector<double>(m_vCoilFreqs.size());
     fitResult.devHeadTrans = m_pFiffInfo->dev_head_t;
     fitResult.devHeadTrans.from = 1;
     fitResult.devHeadTrans.to = 4;
 
     FiffCoordTrans transDevHeadRef = m_pFiffInfo->dev_head_t;
 
-    HPIFit HPI = HPIFit(m_pFiffInfo, true);
+    HPIFit HPI = HPIFit(m_pFiffInfo);
     bool bDrop = false;
     double dErrorMax = 0.0;
     double dMeanErrorDist = 0.0;
@@ -603,29 +611,17 @@ void Hpi::run()
                 m_mutex.lock();
                 if(m_bDoFreqOrder) {
                     // find correct frequencie order if requested
-                    HPI.findOrder(matDataMerged,
-                                  m_matCompProjectors,
-                                  fitResult.devHeadTrans,
-                                  m_vCoilFreqs,
-                                  fitResult.errorDistances,
-                                  fitResult.GoF,
-                                  fitResult.fittedCoils,
-                                  m_pFiffInfo);
+                    HPI.findOrder(matDataMerged,m_matCompProjectors,m_vCoilFreqs,m_pFiffInfo);
                     m_bDoFreqOrder = false;
                 }
                 m_mutex.unlock();
 
                 // Perform actual fitting
                 m_mutex.lock();
-                HPI.fitHPI(matDataMerged,
-                           m_matCompProjectors,
-                           fitResult.devHeadTrans,
-                           m_vCoilFreqs,
-                           fitResult.errorDistances,
-                           fitResult.GoF,
-                           fitResult.fittedCoils,
-                           m_pFiffInfo,
-                           bDrop);
+                HPI.fit(matDataMerged,
+                        m_matCompProjectors,
+                        modelParameters,
+                        fitResult);
                 m_mutex.unlock();
 
                 //Check if the error meets distance requirement
