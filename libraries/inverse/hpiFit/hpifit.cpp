@@ -410,6 +410,41 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
 //=============================================================================================================
 
+void HPIFit::fit(const MatrixXd& matData,
+                 const MatrixXd& matProjectors,
+                 FiffCoordTrans& transDevHead,
+                 const QVector<int>& vecFreqs,
+                 QVector<double>& vecError,
+                 VectorXd& vecGoF,
+                 FiffDigPointSet& fittedPointSet,
+                 FiffInfo::SPtr pFiffInfo,
+                 const ModelParameters& modelParameters)
+{
+
+    MatrixXd matAmplitudes;
+    computeAmplitudes(matData,
+                      matProjectors,
+                      modelParameters,
+                      matAmplitudes);
+
+    int iNumCoils = vecFreqs.size();
+    MatrixXd matCoilPos = MatrixXd::Zero(iNumCoils,3);
+    computeCoilLocation(matAmplitudes,
+                        matProjectors,
+                        transDevHead,
+                        pFiffInfo,
+                        vecError,
+                        matCoilPos,
+                        vecGoF);
+
+    computeHeadPosition(matCoilPos,
+                        transDevHead,
+                        vecError,
+                        fittedPointSet);
+}
+
+//=============================================================================================================
+
 void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
                                const MatrixXd& matProjectors,
                                const ModelParameters& modelParameters,
