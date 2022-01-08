@@ -200,6 +200,13 @@ void TestHpiFitIntegration::initTestCase()
     modelParameters.iSampleFreq = pFiffInfo->sfreq;
     modelParameters.bBasic = bBasic;
 
+    HpiFitResult hpiFitResult;
+    hpiFitResult.hpiFreqs = vFreqs;
+    hpiFitResult.errorDistances = vError;
+    hpiFitResult.GoF = vGoF;
+    hpiFitResult.fittedCoils = fittedPointSet;
+    hpiFitResult.devHeadTrans = devHeadT;
+
     for(int i = 0; i < mRefPos.rows(); i++) {
         from = first + mRefPos(i,0)*pFiffInfo->sfreq;
         to = from + quantum;
@@ -213,21 +220,17 @@ void TestHpiFitIntegration::initTestCase()
 
         HPI.fit(mData,
                 mProjectors,
-                pFiffInfo->dev_head_t,
-                vFreqs,
-                vError,
-                vGoF,
-                fittedPointSet,
                 pFiffInfo,
-                modelParameters);
+                modelParameters,
+                hpiFitResult);
 
         if(MNEMath::compareTransformation(devHeadT.trans, pFiffInfo->dev_head_t.trans, threshRot, threshTrans)) {
             mHpiResult(i,2) = 1;
         }
 
-        HPIFit::storeHeadPosition(mRefPos(i,0), pFiffInfo->dev_head_t.trans, mHpiPos, vGoF, vError);
-        mHpiResult(i,0) = devHeadT.translationTo(pFiffInfo->dev_head_t.trans);
-        mHpiResult(i,1) = devHeadT.angleTo(pFiffInfo->dev_head_t.trans);
+        HPIFit::storeHeadPosition(mRefPos(i,0), hpiFitResult.devHeadTrans.trans, mHpiPos, hpiFitResult.GoF, hpiFitResult.errorDistances);
+        mHpiResult(i,0) = devHeadT.translationTo(hpiFitResult.devHeadTrans.trans);
+        mHpiResult(i,1) = devHeadT.angleTo(hpiFitResult.devHeadTrans.trans);
 
     }
     // For debug: position file for HPIFit
