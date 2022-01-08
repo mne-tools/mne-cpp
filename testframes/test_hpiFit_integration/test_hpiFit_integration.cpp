@@ -206,31 +206,20 @@ void TestHpiFitIntegration::initTestCase()
         if (to > last) {
             to = last;
         }
-        qInfo()  << "Reading...";
+
         if(!raw.read_raw_segment(mData, mTimes, from, to)) {
             qWarning("error during read_raw_segment\n");
         }
 
-        HPI.computeAmplitudes(mData,
-                              mProjectors,
-                              modelParameters,
-                              matAmplitudes);
-
-        MatrixXd matCoilLoc(4,3);
-
-        HPI.computeCoilLocation(matAmplitudes,
-                                mProjectors,
-                                pFiffInfo->dev_head_t,
-                                pFiffInfo,
-                                vError,
-                                matCoilLoc,
-                                vGoF);
-
-        /// act
-        HPI.computeHeadPosition(matCoilLoc,
-                                pFiffInfo->dev_head_t,
-                                vError,
-                                fittedPointSet);
+        HPI.fit(mData,
+                mProjectors,
+                pFiffInfo->dev_head_t,
+                vFreqs,
+                vError,
+                vGoF,
+                fittedPointSet,
+                pFiffInfo,
+                modelParameters);
 
         if(MNEMath::compareTransformation(devHeadT.trans, pFiffInfo->dev_head_t.trans, threshRot, threshTrans)) {
             mHpiResult(i,2) = 1;
