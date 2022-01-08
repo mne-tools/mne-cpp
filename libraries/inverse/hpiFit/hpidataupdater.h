@@ -122,6 +122,7 @@ public:
      * inline get functions for private member variables.
      *
      */
+    inline const QList<FIFFLIB::FiffChInfo>& getChannels();
     inline const Eigen::MatrixXd& getProjectors();
     inline const Eigen::MatrixXd& getHpiDigitizer();
     inline const Eigen::MatrixXd& getData();
@@ -209,6 +210,11 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline const QList<FIFFLIB::FiffChInfo>& HpiDataUpdater::getChannels()
+{
+    return m_lChannels;
+}
 
 inline const Eigen::MatrixXd& HpiDataUpdater::getProjectors()
 {

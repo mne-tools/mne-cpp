@@ -97,17 +97,6 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
 {
     // init member variables
     m_HpiDataUpdater = HpiDataUpdater(pFiffInfo);
-    m_lBads = pFiffInfo->bads;
-
-    // update channel list
-    updateChannels(pFiffInfo);
-
-    // update sensors
-    int iAcc = 2;
-    updateSensor(iAcc);
-
-    // update HPI digitizer
-    updateHpiDigitizer(pFiffInfo->dig);
 
     // update ModelParameters for model
     m_signalModel = SignalModel();
@@ -115,308 +104,12 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
 
 //=============================================================================================================
 
-void HPIFit::fitHPI(const MatrixXd& t_mat,
-                    const MatrixXd& t_matProjectors,
-                    FiffCoordTrans& transDevHead,
-                    const QVector<int>& vecFreqs,
-                    QVector<double>& vecError,
-                    VectorXd& vecGoF,
-                    FiffDigPointSet& fittedPointSet,
-                    FiffInfo::SPtr pFiffInfo,
-                    bool bDrop,
-                    bool bDoDebug,
-                    const QString& sHPIResourceDir,
-                    int iMaxIterations,
-                    float fAbortError)
-{
-    //Check if data was passed
-    if(t_mat.rows() == 0 || t_mat.cols() == 0 ) {
-        std::cout<<std::endl<< "HPIFit::fitHPI - No data passed. Returning.";
-        return;
-    }
-    //Check if projector was passed
-    if(t_matProjectors.rows() == 0 || t_matProjectors.cols() == 0 ) {
-        std::cout<<std::endl<< "HPIFit::fitHPI - No projector passed. Returning.";
-        return;
-    }
-
-    bool bUpdateModel = false;
-
-    // check if bads have changed and update coils/channellist if so
-    if(!(m_lBads == pFiffInfo->bads) || m_lChannels.isEmpty()) {
-        m_lBads = pFiffInfo->bads;
-        updateChannels(pFiffInfo);
-        updateSensor();
-        bUpdateModel = true;
-    }
-
-    if(m_lChannels.isEmpty()) {
-        qWarning() << "HPIFit::fitHPI - Channel list is empty. Returning.";
-        return;
-    }
-
-    // check if we have to update the model
-    if(bUpdateModel || (m_matModel.rows() == 0) || (m_vecFreqs != vecFreqs) || (t_mat.cols() != m_matModel.cols())) {
-        updateModel(pFiffInfo->sfreq, t_mat.cols(), pFiffInfo->linefreq, vecFreqs, m_bDoFastFit);
-        m_vecFreqs = vecFreqs;
-        bUpdateModel = false;
-    }
-
-    // Make sure the fitted digitzers are empty
-    fittedPointSet.clear();
-
-    // init coil parameters
-    struct CoilParam coil;
-
-    //Get HPI coils from digitizers and set number of coils
-    int iNumCoils = 0;
-    QList<FiffDigPoint> lHPIPoints;
-
-    for(int i = 0; i < pFiffInfo->dig.size(); ++i) {
-        if(pFiffInfo->dig[i].kind == FIFFV_POINT_HPI) {
-            iNumCoils++;
-            lHPIPoints.append(pFiffInfo->dig[i]);
-        }
-    }
-
-    //Set coil ModelParameters
-    VectorXd vecCoilfreq(iNumCoils);
-
-    if(vecFreqs.size() >= iNumCoils) {
-        for(int i = 0; i < iNumCoils; ++i) {
-            vecCoilfreq[i] = vecFreqs.at(i);
-            //std::cout<<std::endl << vecCoilfreq[i] << "Hz";
-        }
-    } else {
-        std::cout<<std::endl<< "HPIFit::fitHPI - Not enough coil ModelParameters specified. Returning.";
-        return;
-    }
-
-    // Initialize HPI coils location and moment
-    coil.pos = MatrixXd::Zero(iNumCoils,3);
-    coil.mom = MatrixXd::Zero(iNumCoils,3);
-    coil.dpfiterror = VectorXd::Zero(iNumCoils);
-    coil.dpfitnumitr = VectorXd::Zero(iNumCoils);
-
-    // Create digitized HPI coil position matrix
-    MatrixXd matHeadHPI(iNumCoils,3);
-
-    // check the pFiffInfo->dig information. If dig is empty, set the matHeadHPI is 0;
-    if (lHPIPoints.size() > 0) {
-        for (int i = 0; i < lHPIPoints.size(); ++i) {
-            matHeadHPI(i,0) = lHPIPoints.at(i).r[0];
-            matHeadHPI(i,1) = lHPIPoints.at(i).r[1];
-            matHeadHPI(i,2) = lHPIPoints.at(i).r[2];
-        }
-    } else {
-        matHeadHPI.fill(0);
-    }
-
-    //Create new projector based on the excluded channels, first exclude the rows then the columns
-    MatrixXd matProjectorsRows(m_vecInnerind.size(),t_matProjectors.cols());
-    MatrixXd matProjectorsInnerind(m_vecInnerind.size(),m_vecInnerind.size());
-
-    for (int i = 0; i < matProjectorsRows.rows(); ++i) {
-        matProjectorsRows.row(i) = t_matProjectors.row(m_vecInnerind.at(i));
-    }
-
-    for (int i = 0; i < matProjectorsInnerind.cols(); ++i) {
-        matProjectorsInnerind.col(i) = matProjectorsRows.col(m_vecInnerind.at(i));
-    }
-
-    // Get the data from inner layer channels
-    MatrixXd matInnerdata(m_vecInnerind.size(), t_mat.cols());
-
-    for(int j = 0; j < m_vecInnerind.size(); ++j) {
-        matInnerdata.row(j) << t_mat.row(m_vecInnerind[j]);
-    }
-
-    // Calculate topo
-    MatrixXd matTopo;
-    MatrixXd matAmp(m_vecInnerind.size(), iNumCoils);
-    MatrixXd matAmpC(m_vecInnerind.size(), iNumCoils);
-
-    matTopo = m_matModel * matInnerdata.transpose(); // topo: # of good inner channel x 8
-
-    if(m_bDoFastFit) {
-        // Select sine or cosine component depending on the relative size
-        matTopo.transposeInPlace();
-        matAmp = matTopo.leftCols(iNumCoils);
-        matAmpC = matTopo.rightCols(iNumCoils);
-        for(int j = 0; j < iNumCoils; ++j) {
-           float fNS = 0.0;
-           float fNC = 0.0;
-           fNS = matAmp.col(j).array().square().sum();
-           fNC = matAmpC.col(j).array().square().sum();
-           if(fNC > fNS) {
-               matAmp.col(j) = matAmpC.col(j);
-           }
-        }
-    } else {
-        // estimate the sinusoid phase
-        for(int i = 0; i < iNumCoils; ++i) {
-            int from = 2*i;
-            MatrixXd m = matTopo.block(from,0,2,matTopo.cols());
-            JacobiSVD<MatrixXd> svd(m, ComputeThinU | ComputeThinV);
-            matAmp.col(i) = svd.singularValues()(0) * svd.matrixV().col(0);
-        }
-    }
-
-    //Find good seed point/starting point for the coil position in 3D space
-    //Find biggest amplitude per pickup coil (sensor) and store corresponding sensor channel index
-    VectorXi vecChIdcs(iNumCoils);
-
-    for (int j = 0; j < iNumCoils; j++) {
-        int iChIdx = 0;
-        VectorXd::Index indMax;
-        matAmp.col(j).maxCoeff(&indMax);
-        if(indMax < m_vecInnerind.size()) {
-            iChIdx = m_vecInnerind.at(indMax);
-        }
-        vecChIdcs(j) = iChIdx;
-    }
-
-    vecError.resize(iNumCoils);
-    double dError = std::accumulate(vecError.begin(), vecError.end(), .0) / vecError.size();
-    MatrixXd matCoilPos = MatrixXd::Zero(iNumCoils,3);
-
-    // Generate seed point by projection the found channel position 3cm inwards if previous transDevHead is identity or bad fit
-    if(transDevHead.trans == MatrixXd::Identity(4,4).cast<float>() || dError > 0.010) {
-        for (int j = 0; j < vecChIdcs.rows(); ++j) {
-            if(vecChIdcs(j) < pFiffInfo->chs.size()) {
-                Vector3f r0 = pFiffInfo->chs.at(vecChIdcs(j)).chpos.r0;
-                matCoilPos.row(j) = (-1 * pFiffInfo->chs.at(vecChIdcs(j)).chpos.ez * 0.03 + r0).cast<double>();
-            }
-        }
-    } else {
-        matCoilPos = transDevHead.apply_inverse_trans(matHeadHPI.cast<float>()).cast<double>();
-    }
-
-    coil.pos = matCoilPos;
-
-    // Perform actual localization
-    coil = dipfit(coil,
-                  m_sensors,
-                  matAmp,
-                  iNumCoils,
-                  matProjectorsInnerind,
-                  iMaxIterations,
-                  fAbortError);
-
-    // get gof
-    vecGoF = coil.dpfiterror;
-    for(int i = 0; i < vecGoF.size(); ++i) {
-        vecGoF(i) = 1 - vecGoF(i);
-    }
-
-    // prepare dropping coils
-    MatrixXd matTrans(4,4);
-    VectorXi vecInd = VectorXi::LinSpaced(iNumCoils,0,iNumCoils);
-
-    if((vecGoF.minCoeff() < 0.98) && bDrop) {
-        // hard coded, can potentially be passed as variable
-        matTrans = dropCoils(vecGoF,
-                             coil.pos,
-                             matHeadHPI,
-                             vecInd);
-    } else {
-        matTrans = computeTransformation(matHeadHPI, coil.pos);
-    }
-
-    int iKeep = vecInd.size();
-    MatrixXd matHeadHPITemp(iKeep,3);
-    MatrixXd matCoilTemp(iKeep,3);
-    VectorXd vecGofTemp(iKeep);
-    for(int i = 0; i < iKeep; i++) {
-        matHeadHPITemp.row(i) = matHeadHPI.row(vecInd(i));
-        matCoilTemp.row(i) = coil.pos.row(vecInd(i));
-        vecGofTemp(i) = vecGoF(vecInd(i));
-    }
-
-    coil.pos = matCoilTemp;
-    matHeadHPI = matHeadHPITemp;
-    vecGoF = vecGofTemp;
-
-    // Store the final result to fiff info
-    // Set final device/head matrix and its inverse to the fiff info
-    transDevHead.from = 1;
-    transDevHead.to = 4;
-    transDevHead.trans = matTrans.cast<float>();
-
-    // Also store the inverse
-    transDevHead.invtrans = transDevHead.trans.inverse();
-
-    //Calculate Error
-    MatrixXd matTemp = coil.pos;
-    MatrixXd matTestPos = transDevHead.apply_trans(matTemp.cast<float>()).cast<double>();
-    MatrixXd matDiffPos = matTestPos - matHeadHPI;
-
-    vecError = QVector<double>(iKeep);
-    for(int i = 0; i < matDiffPos.cols(); ++i) {
-        vecError[i] = matDiffPos.col(i).norm();
-    }
-
-    // Generate final fitted points and store in digitizer set
-    for(int i = 0; i < coil.pos.rows(); ++i) {
-        FiffDigPoint digPoint;
-        digPoint.kind = FIFFV_POINT_EEG; //Store as EEG so they have a different color
-        digPoint.ident = i;
-        digPoint.r[0] = coil.pos(i,0);
-        digPoint.r[1] = coil.pos(i,1);
-        digPoint.r[2] = coil.pos(i,2);
-
-        fittedPointSet << digPoint;
-    }
-
-    if(bDoDebug) {
-        // DEBUG HPI fitting and write debug results
-        std::cout << std::endl << std::endl << "HPIFit::fitHPI - dpfiterror" << coil.dpfiterror << std::endl << std::endl;
-        std::cout << std::endl << std::endl << "HPIFit::fitHPI - Initial seed point for HPI coils" << std::endl << matCoilPos << std::endl;
-        std::cout << std::endl << std::endl << "HPIFit::fitHPI - temp" << std::endl << matTemp << std::endl;
-        std::cout << std::endl << std::endl << "HPIFit::fitHPI - testPos" << std::endl << matTestPos << std::endl;
-        std::cout << std::endl << std::endl << "HPIFit::fitHPI - Diff fitted - original" << std::endl << matDiffPos << std::endl;
-        std::cout << std::endl << std::endl << "HPIFit::fitHPI - dev/head trans" << std::endl << matTrans << std::endl;
-
-        QString sTimeStamp = QDateTime::currentDateTime().toString("yyMMdd_hhmmss");
-
-        if(!QDir(sHPIResourceDir).exists()) {
-            QDir().mkdir(sHPIResourceDir);
-        }
-
-        UTILSLIB::IOUtils::write_eigen_matrix(matCoilPos, QString("%1/%2_coilPosSeed_mat").arg(sHPIResourceDir).arg(sTimeStamp));
-
-        UTILSLIB::IOUtils::write_eigen_matrix(vecGoF, QString("%1/%2_gof_mat").arg(sHPIResourceDir).arg(sTimeStamp));
-
-        UTILSLIB::IOUtils::write_eigen_matrix(coil.pos, QString("%1/%2_coilPos_mat").arg(sHPIResourceDir).arg(sTimeStamp));
-
-        UTILSLIB::IOUtils::write_eigen_matrix(matHeadHPI, QString("%1/%2_headHPI_mat").arg(sHPIResourceDir).arg(sTimeStamp));
-
-        MatrixXd testPosCut = matTestPos.transpose();//block(0,0,3,4);
-        UTILSLIB::IOUtils::write_eigen_matrix(testPosCut, QString("%1/%2_testPos_mat").arg(sHPIResourceDir).arg(sTimeStamp));
-
-        MatrixXi matIdx(vecChIdcs.rows(),1);
-        matIdx.col(0) = vecChIdcs;
-        UTILSLIB::IOUtils::write_eigen_matrix(matIdx, QString("%1/%2_idx_mat").arg(sHPIResourceDir).arg(sTimeStamp));
-
-        MatrixXd matCoilFreq(vecCoilfreq.rows(),1);
-        matCoilFreq.col(0) = vecCoilfreq;
-        UTILSLIB::IOUtils::write_eigen_matrix(matCoilFreq, QString("%1/%2_coilFreq_mat").arg(sHPIResourceDir).arg(sTimeStamp));
-
-        UTILSLIB::IOUtils::write_eigen_matrix(matDiffPos, QString("%1/%2_diffPos_mat").arg(sHPIResourceDir).arg(sTimeStamp));
-
-        UTILSLIB::IOUtils::write_eigen_matrix(matAmp, QString("%1/%2_amp_mat").arg(sHPIResourceDir).arg(sTimeStamp));
-    }
-}
-
-//=============================================================================================================
-
 void HPIFit::fit(const MatrixXd& matData,
                  const MatrixXd& matProjectors,
-                 const FiffInfo::SPtr pFiffInfo,
                  const ModelParameters& modelParameters,
                  HpiFitResult& hpiFitResult)
 {
-
+    // TODO: Check for dimensions
     MatrixXd matAmplitudes;
     computeAmplitudes(matData,
                       matProjectors,
@@ -428,7 +121,6 @@ void HPIFit::fit(const MatrixXd& matData,
     computeCoilLocation(matAmplitudes,
                         matProjectors,
                         hpiFitResult.devHeadTrans,
-                        pFiffInfo,
                         hpiFitResult.errorDistances,
                         matCoilPos,
                         hpiFitResult.GoF);
@@ -481,7 +173,7 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
     }
 
     // return data
-    matAmplitudes = matAmp;
+    matAmplitudes = std::move(matAmp);
 }
 
 //=============================================================================================================
@@ -489,40 +181,22 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
 void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
                                  const MatrixXd& matProjectors,
                                  const FIFFLIB::FiffCoordTrans& transDevHead,
-                                 const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
                                  const QVector<double>& vecError,
                                  Eigen::MatrixXd& matCoilLoc,
                                  Eigen::VectorXd& vecGoF,
                                  const int iMaxIterations,
                                  const float fAbortError)
 {
-    // get numer of coils
+    const auto& matHeadHPI = m_HpiDataUpdater.getHpiDigitizer();
+    const auto& lChannels = m_HpiDataUpdater.getChannels();
     int iNumCoils = matAmplitudes.cols();
-
-    // update digitized hpi info
-    // ToDo: only do when necessary
-    updateHpiDigitizer(pFiffInfo->dig);
-
-    // set projectors
-    // ToDo: only do when necessary
-    updateProjectors(matProjectors);
-
-    // init coil parameters
-    struct CoilParam coil;
-    coil.pos = MatrixXd::Zero(iNumCoils,3);
-    coil.mom = MatrixXd::Zero(iNumCoils,3);
-    coil.dpfiterror = VectorXd::Zero(iNumCoils);
-    coil.dpfitnumitr = VectorXd::Zero(iNumCoils);
-
-    // find seed points
     MatrixXd matCoilPos = MatrixXd::Zero(iNumCoils,3);
 
-    // check error,
     double dError = std::accumulate(vecError.begin(), vecError.end(), .0) / vecError.size();
 
     if(transDevHead.trans != MatrixXd::Identity(4,4).cast<float>() && dError < 0.010) {
         // if good last fit, use old trafo
-        matCoilPos = transDevHead.apply_inverse_trans(m_matHeadHPI.cast<float>()).cast<double>();
+        matCoilPos = transDevHead.apply_inverse_trans(matHeadHPI.cast<float>()).cast<double>();
     } else {
         // if not, find max amplitudes in channels
         VectorXi vecChIdcs(iNumCoils);
@@ -531,28 +205,36 @@ void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
             int iChIdx = 0;
             VectorXd::Index indMax;
             matAmplitudes.col(j).maxCoeff(&indMax);
-            if(indMax < m_vecInnerind.size()) {
-                iChIdx = m_vecInnerind.at(indMax);
+            if(indMax < lChannels.size()) {
+                iChIdx = indMax;
             }
             vecChIdcs(j) = iChIdx;
         }
         // and go 3 cm inwards from max channels
         for (int j = 0; j < vecChIdcs.rows(); ++j) {
-            if(vecChIdcs(j) < pFiffInfo->chs.size()) {
-                Vector3f r0 = pFiffInfo->chs.at(vecChIdcs(j)).chpos.r0;
-                matCoilPos.row(j) = (-1 * pFiffInfo->chs.at(vecChIdcs(j)).chpos.ez * 0.03 + r0).cast<double>();
+            if(vecChIdcs(j) < lChannels.size()) {
+                Vector3f r0 = lChannels.at(vecChIdcs(j)).chpos.r0;
+                matCoilPos.row(j) = (-1 * lChannels.at(vecChIdcs(j)).chpos.ez * 0.03 + r0).cast<double>();
             }
         }
     }
 
+    // init coil parameters
+    struct CoilParam coil;
     coil.pos = matCoilPos;
+    coil.mom = MatrixXd::Zero(iNumCoils,3);
+    coil.dpfiterror = VectorXd::Zero(iNumCoils);
+    coil.dpfitnumitr = VectorXd::Zero(iNumCoils);
 
     // dipole fit
+    const auto& matPreparedProjector = m_HpiDataUpdater.getProjectors();
+    const auto& sensors = m_HpiDataUpdater.getSensors();
+
     coil = dipfit(coil,
-                  m_sensors,
+                  sensors,
                   matAmplitudes,
                   iNumCoils,
-                  m_matProjectors,
+                  matPreparedProjector,
                   iMaxIterations,
                   fAbortError);
 
@@ -575,7 +257,8 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilPos,
 
     // prepare dropping coils
     MatrixXd matTrans(4,4);
-    matTrans = computeTransformation(m_matHeadHPI,matCoilPos);
+    MatrixXd matHeadHPI = m_HpiDataUpdater.getHpiDigitizer();
+    matTrans = computeTransformation(matHeadHPI,matCoilPos);
 
     // Store the final result to fiff info
     // Set final device/head matrix and its inverse to the fiff info
@@ -584,7 +267,7 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilPos,
     //Calculate Error
     MatrixXd matTemp = matCoilPos;
     MatrixXd matTestPos = transDevHead.apply_trans(matTemp.cast<float>()).cast<double>();
-    MatrixXd matDiffPos = matTestPos - m_matHeadHPI;
+    MatrixXd matDiffPos = matTestPos - matHeadHPI;
 
     // compute error
     for(int i = 0; i < matDiffPos.rows(); ++i) {
@@ -638,14 +321,14 @@ void HPIFit::findOrder(const MatrixXd& matData,
     computeCoilLocation(matAmplitudes,
                         matProjectors,
                         pFiffInfo->dev_head_t,
-                        pFiffInfo,
                         vecError,
                         matCoil,
                         vecGoF);
 
     // extract digitized and fitted coils
     QVector<int> vecFreqsOrder = vecFreqs;
-    MatrixXd matDigTemp = m_matHeadHPI;
+    MatrixXd matDigTemp = m_HpiDataUpdater.getHpiDigitizer();
+    MatrixXd matHeadHpi = m_HpiDataUpdater.getHpiDigitizer();
     MatrixXd matCoilTemp = matCoil;
 
     std::vector<int> vecOrder(iNumCoils);
@@ -663,8 +346,8 @@ void HPIFit::findOrder(const MatrixXd& matData,
         for(int i = 0; i < iNumCoils; i++) {
             matCoilTemp.row(i) =  matCoil.row(vecOrder[i]);
         }
-        matTrans = computeTransformation(m_matHeadHPI,matCoilTemp);
-        dErrorActual = objectTrans(m_matHeadHPI,matCoilTemp,matTrans);
+        matTrans = computeTransformation(matHeadHpi,matCoilTemp);
+        dErrorActual = objectTrans(matHeadHpi,matCoilTemp,matTrans);
         if(dErrorActual < dErrorMin && dErrorActual < dErrorBest) {
             // exit
             for(int i = 0; i < iNumCoils; i++) {
@@ -674,11 +357,6 @@ void HPIFit::findOrder(const MatrixXd& matData,
             bSuccess = true;
         }
     } while (std::next_permutation(vecOrder.begin(), vecOrder.end()) );
-
-    if(bSuccess) {
-        // update model if succesfull
-        updateModel(pFiffInfo->sfreq, matData.cols(), pFiffInfo->linefreq, vecFreqs, false);
-    }
 }
 
 //=============================================================================================================
@@ -825,144 +503,6 @@ void HPIFit::storeHeadPosition(float fTime,
     matPosition(matPosition.rows()-1,7) = vecGoF.mean();
     matPosition(matPosition.rows()-1,8) = dError;
     matPosition(matPosition.rows()-1,9) = 0;
-}
-
-//=============================================================================================================
-
-void HPIFit::updateSensor(const int iAcc)
-{
-    m_sensors.updateSensorSet(m_lChannels,iAcc);
-}
-
-//=============================================================================================================
-
-void HPIFit::updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
-{
-    // Get the indices of inner layer channels and exclude bad channels and create channellist
-    int iNumCh = pFiffInfo->nchan;
-    m_lChannels.clear();
-    m_vecInnerind.clear();
-    for (int i = 0; i < iNumCh; ++i) {
-        if(pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_BABY_MAG ||
-           pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T1 ||
-           pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T2 ||
-           pFiffInfo->chs[i].chpos.coil_type == FIFFV_COIL_VV_PLANAR_T3) {
-            // Check if the sensor is bad, if not append to innerind
-            if(!(pFiffInfo->bads.contains(pFiffInfo->ch_names.at(i)))) {
-                m_vecInnerind.append(i);
-                m_lChannels.append(pFiffInfo->chs[i]);
-            }
-        }
-    }
-
-    m_lBads = pFiffInfo->bads;
-}
-
-//=============================================================================================================
-
-void HPIFit::updateModel(const int iSamF,
-                         const int iSamLoc,
-                         const int iLineF,
-                         const QVector<int>& vecFreqs,
-                         bool bBasic)
-{
-    int iNumCoils = vecFreqs.size();
-    MatrixXd matSimsig;
-    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/iSamF;
-
-    if(bBasic){
-        // Generate simulated data Matrix
-        matSimsig.conservativeResize(iSamLoc,iNumCoils*2);
-
-        for(int i = 0; i < iNumCoils; ++i) {
-            matSimsig.col(i) = sin(2*M_PI*vecFreqs[i]*vecTime.array());
-            matSimsig.col(i+iNumCoils) = cos(2*M_PI*vecFreqs[i]*vecTime.array());
-        }
-        m_matModel = UTILSLIB::MNEMath::pinv(matSimsig);
-        return;
-
-    } else {
-        // add linefreq + harmonics + DC part to model
-        matSimsig.conservativeResize(iSamLoc,iNumCoils*4+2);
-        for(int i = 0; i < iNumCoils; ++i) {
-            matSimsig.col(i) = sin(2*M_PI*vecFreqs[i]*vecTime.array());
-            matSimsig.col(i+iNumCoils) = cos(2*M_PI*vecFreqs[i]*vecTime.array());
-            matSimsig.col(i+2*iNumCoils) = sin(2*M_PI*iLineF*(i+1)*vecTime.array());
-            matSimsig.col(i+3*iNumCoils) = cos(2*M_PI*iLineF*(i+1)*vecTime.array());
-        }
-        matSimsig.col(iNumCoils*4) = RowVectorXd::LinSpaced(iSamLoc, -0.5, 0.5);
-        matSimsig.col(iNumCoils*4+1).fill(1);
-    }
-    m_matModel = UTILSLIB::MNEMath::pinv(matSimsig);
-    MatrixXd matTemp = m_matModel;
-    return;
-    // reorder so that sin and cos with same freq. are next to each other
-    int iC = 0;
-    std::vector<int> vec(2*iNumCoils);
-    for(int i = 1; i < 2*iNumCoils; i=i+2) {
-        vec[i-1] = iC;
-        vec[i] = iC+iNumCoils;
-        iC++;
-    }
-    for(int i = 0; i < 2*iNumCoils; ++i) {
-        matTemp.row(i) = m_matModel.row(vec[i]);
-    }
-
-    m_matModel = matTemp;
-}
-
-//=============================================================================================================
-
-void HPIFit::updateHpiDigitizer(const QList<FiffDigPoint>& lDig)
-{
-    // extract hpi coils from digitizer
-    QList<FiffDigPoint> lHPIPoints;
-    int iNumCoils = 0;
-
-    for(int i = 0; i < lDig.size(); ++i) {
-        if(lDig[i].kind == FIFFV_POINT_HPI) {
-            iNumCoils++;
-            lHPIPoints.append(lDig[i]);
-        }
-    }
-
-    // convert to matrix iNumCoils x 3
-    if (lHPIPoints.size() > 0) {
-        m_matHeadHPI = MatrixXd(iNumCoils,3);
-        for (int i = 0; i < lHPIPoints.size(); ++i) {
-            m_matHeadHPI(i,0) = lHPIPoints.at(i).r[0];
-            m_matHeadHPI(i,1) = lHPIPoints.at(i).r[1];
-            m_matHeadHPI(i,2) = lHPIPoints.at(i).r[2];
-        }
-    } else {
-        std::cout << "HPIFit::updateHpiDigitizer - No HPI coils digitized. Returning." << std::endl;
-        return;
-    }
-}
-
-//=============================================================================================================
-
-void HPIFit::updateProjectors(const Eigen::MatrixXd& matProjectors)
-{
-    // check if m_vecInnerInd is alreadz initialized
-    if(m_vecInnerind.size() == 0) {
-        std::cout << "HPIFit::updateProjectors - No channels. Returning." << std::endl;
-        return;
-    }
-
-    //Create new projector based on the excluded channels, first exclude the rows then the columns
-    MatrixXd matProjectorsRows(m_vecInnerind.size(),matProjectors.cols());
-    MatrixXd matProjectorsInnerind(m_vecInnerind.size(),m_vecInnerind.size());
-
-    for (int i = 0; i < matProjectorsRows.rows(); ++i) {
-        matProjectorsRows.row(i) = matProjectors.row(m_vecInnerind.at(i));
-    }
-
-    for (int i = 0; i < matProjectorsInnerind.cols(); ++i) {
-        matProjectorsInnerind.col(i) = matProjectorsRows.col(m_vecInnerind.at(i));
-    }
-    m_matProjectors = matProjectorsInnerind;
-    return;
 }
 
 //=============================================================================================================

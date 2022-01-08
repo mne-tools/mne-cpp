@@ -220,11 +220,10 @@ void TestHpiFitIntegration::initTestCase()
 
         HPI.fit(mData,
                 mProjectors,
-                pFiffInfo,
                 modelParameters,
                 hpiFitResult);
 
-        if(MNEMath::compareTransformation(devHeadT.trans, pFiffInfo->dev_head_t.trans, threshRot, threshTrans)) {
+        if(MNEMath::compareTransformation(devHeadT.trans, hpiFitResult.devHeadTrans.trans, threshRot, threshTrans)) {
             mHpiResult(i,2) = 1;
         }
 

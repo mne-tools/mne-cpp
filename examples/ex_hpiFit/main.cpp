@@ -178,7 +178,7 @@ int main(int argc, char *argv[])
         vecFreqs[i] = lFreqs[i].toInt();
     }
 
-    QVector<double> vecError;
+    QVector<double> vecError(lFreqs.size());
     VectorXd vecGoF;
     FiffDigPointSet fittedPointSet;
 
@@ -205,7 +205,10 @@ int main(int argc, char *argv[])
     // if debugging files are necessary set bDoDebug = true;
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
 
-    HPIFit HPI = HPIFit(pFiffInfo,bFast);
+    HPIFit HPI = HPIFit(pFiffInfo);
+    MatrixXd matAmplitudes;
+    MatrixXd matCoilLoc(4,3);
+
     // ordering of frequencies
     from = first + vecTime(0);
     to = from + iQuantum;
@@ -218,14 +221,22 @@ int main(int argc, char *argv[])
     timer.start();
     HPI.findOrder(matData,
                   matProjectors,
-                  pFiffInfo->dev_head_t,
                   vecFreqs,
-                  vecError,
-                  vecGoF,
-                  fittedPointSet,
                   pFiffInfo);
 
     float fTimer = 0.0;
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecFreqs;
+    modelParameters.iLineFreq = pFiffInfo->linefreq;
+    modelParameters.iSampleFreq = pFiffInfo->sfreq;
+    modelParameters.bBasic = bFast;
+
+    HpiFitResult hpiFitResult;
+    hpiFitResult.hpiFreqs = vecFreqs;
+    hpiFitResult.errorDistances = vecError;
+    hpiFitResult.GoF = vecGoF;
+    hpiFitResult.fittedCoils = fittedPointSet;
+    hpiFitResult.devHeadTrans = transDevHead;
 
     // read and fit
     for(int i = 0; i < vecTime.size(); i++) {
@@ -242,24 +253,18 @@ int main(int argc, char *argv[])
         }
 
         timer.start();
-        HPI.fitHPI(matData,
-                   matProjectors,
-                   pFiffInfo->dev_head_t,
-                   vecFreqs,
-                   vecError,
-                   vecGoF,
-                   fittedPointSet,
-                   pFiffInfo,
-                   bDrop,
-                   bDoDebug,
-                   sHPIResourceDir);
+        HPI.fit(matData,
+                matProjectors,
+                modelParameters,
+                hpiFitResult);
+
         fTimer = timer.elapsed();
 
-        HPIFit::storeHeadPosition(vecTime(i), pFiffInfo->dev_head_t.trans, matPosition, vecGoF, vecError);
+        HPIFit::storeHeadPosition(vecTime(i), hpiFitResult.devHeadTrans.trans, matPosition, hpiFitResult.GoF, hpiFitResult.errorDistances);
         matPosition(i,9) = fTimer;
         // if big head displacement occures, update debHeadTrans
-        if(MNEMath::compareTransformation(transDevHead.trans, pFiffInfo->dev_head_t.trans, fThreshRot, fThreshTrans)) {
-            transDevHead = pFiffInfo->dev_head_t;
+        if(MNEMath::compareTransformation(transDevHead.trans, hpiFitResult.devHeadTrans.trans, fThreshRot, fThreshTrans)) {
+            transDevHead = hpiFitResult.devHeadTrans;
             qInfo() << "dev_head_t has been updated.";
         }
         if(bVerbose) {

@@ -93,9 +93,6 @@ public:
 private slots:
     void initTestCase();                            // run once at the very beginning
     void init();                                    // run before each test
-    void testConstructor_channels_size();           // compare size of channel list
-    void testConstructor_bads();                    // compare bad channels
-    void testConstructor_channels_bads_size();      // compare expected size when bads included
     void testComputeAmplitudes_basic_sin();         // test with simulated data, only sines
     void testComputeAmplitudes_basic_cos();         // test with simulated data, only cosines
     void testComputeAmplitudes_basic_sincos();      // test with simulated data, both summed
@@ -185,58 +182,6 @@ void TestHpiFit::init()
 {
     // run at beginning of each test
     m_pFiffInfo =  QSharedPointer<FiffInfo>(new FiffInfo(m_raw.info));
-}
-
-
-//=============================================================================================================
-
-void TestHpiFit::testConstructor_channels_size()
-{
-    /// prepare
-    int iNChanExpected = 204; // number of gradiometers
-
-    /// act
-    HPIFit HPI = HPIFit(m_pFiffInfo);
-    QList<FIFFLIB::FiffChInfo> lChannelsActual = HPI.getChannels();
-    int iNChanActual = lChannelsActual.size();
-    /// assert
-    QVERIFY(iNChanExpected == iNChanActual);
-}
-
-//=============================================================================================================
-
-void TestHpiFit::testConstructor_bads()
-{
-    /// prepare
-    // set some  bad channels
-    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
-    QList<QString> lBadsExpected = m_pFiffInfo->bads;
-
-    /// act
-    HPIFit HPI = HPIFit(m_pFiffInfo);
-    QList<QString> lBadsActual = HPI.getBads();
-
-    /// assert
-    QVERIFY(lBadsExpected == lBadsActual);
-}
-
-//=============================================================================================================
-
-void TestHpiFit::testConstructor_channels_bads_size()
-{
-    /// prepare
-    // set some  bad channels
-    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
-    QList<QString> lBadsExpected = m_pFiffInfo->bads;
-    int iNChanExpected = 202; // 204 gradiometers - 2 bads
-
-    /// act
-    HPIFit HPI = HPIFit(m_pFiffInfo);
-    QList<FIFFLIB::FiffChInfo> lChannelsActual = HPI.getChannels();
-    int iNChanActual = lChannelsActual.size();
-
-    /// assert
-    QVERIFY(iNChanActual == iNChanExpected);
 }
 
 //=============================================================================================================
@@ -724,7 +669,8 @@ void TestHpiFit::testComputeCoilLocation_basic_noproj()
     QVector<double> vecError = {1.0, 1.0, 1.0, 1.0};
     int iLineF = 60;
     VectorXd vecGoF;
-    MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
+    HpiDataUpdater hpiDataUpdater(m_pFiffInfo);
+    MatrixXd matHpiDigitizer = hpiDataUpdater.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
     bool bBasic = true;
     FiffCoordTrans transDevHead;
@@ -747,7 +693,6 @@ void TestHpiFit::testComputeCoilLocation_basic_noproj()
     HPI.computeCoilLocation(matAmplitudes,
                             matProjectors,
                             m_pFiffInfo->dev_head_t,
-                            m_pFiffInfo,
                             vecError,
                             matCoilLocActual,
                             vecGoF);
@@ -771,7 +716,8 @@ void TestHpiFit::testComputeCoilLocation_basic_noproj_trafo()
     QVector<double> vecError(4);
     int iLineF = 60;
     VectorXd vecGoF;
-    MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
+    HpiDataUpdater hpiDataUpdater(m_pFiffInfo);
+    MatrixXd matHpiDigitizer = hpiDataUpdater.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
     bool bBasic = true;
     FiffCoordTrans transDevHead;
@@ -794,7 +740,6 @@ void TestHpiFit::testComputeCoilLocation_basic_noproj_trafo()
     HPI.computeCoilLocation(matAmplitudes,
                             matProjectors,
                             m_pFiffInfo->dev_head_t,
-                            m_pFiffInfo,
                             vecError,
                             matCoilLocActual,
                             vecGoF);
@@ -817,7 +762,8 @@ void TestHpiFit::testComputeCoilLocation_basic_proj()
     QVector<double> vecError(4);
     int iLineF = 60;
     VectorXd vecGoF;
-    MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
+    HpiDataUpdater hpiDataUpdater(m_pFiffInfo);
+    MatrixXd matHpiDigitizer = hpiDataUpdater.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
     bool bBasic = true;
     FiffCoordTrans transDevHead;
@@ -840,7 +786,6 @@ void TestHpiFit::testComputeCoilLocation_basic_proj()
     HPI.computeCoilLocation(matAmplitudes,
                             m_matProjectors,
                             m_pFiffInfo->dev_head_t,
-                            m_pFiffInfo,
                             vecError,
                             matCoilLocActual,
                             vecGoF);
@@ -863,7 +808,8 @@ void TestHpiFit::testComputeCoilLocation_advanced_noproj()
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError = {1.0, 1.0, 1.0, 1.0};
     VectorXd vecGoF;
-    MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
+    HpiDataUpdater hpiDataUpdater(m_pFiffInfo);
+    MatrixXd matHpiDigitizer = hpiDataUpdater.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
     bool bBasic = false;
     int iLineF = 60;
@@ -887,7 +833,6 @@ void TestHpiFit::testComputeCoilLocation_advanced_noproj()
     HPI.computeCoilLocation(matAmplitudes,
                             matProjectors,
                             transDevHead,
-                            m_pFiffInfo,
                             vecError,
                             matCoilLocActual,
                             vecGoF);
@@ -910,7 +855,8 @@ void TestHpiFit::testComputeCoilLocation_advanced_noproj_trafo()
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError(4);
     VectorXd vecGoF;
-    MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
+    HpiDataUpdater hpiDataUpdater(m_pFiffInfo);
+    MatrixXd matHpiDigitizer = hpiDataUpdater.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
     bool bBasic = false;
     int iLineF = 60;
@@ -933,7 +879,6 @@ void TestHpiFit::testComputeCoilLocation_advanced_noproj_trafo()
     HPI.computeCoilLocation(matAmplitudes,
                             matProjectors,
                             m_pFiffInfo->dev_head_t,
-                            m_pFiffInfo,
                             vecError,
                             matCoilLocActual,
                             vecGoF);
@@ -955,7 +900,8 @@ void TestHpiFit::testComputeCoilLocation_advanced_proj()
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError(4);
     VectorXd vecGoF;
-    MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
+    HpiDataUpdater hpiDataUpdater(m_pFiffInfo);
+    MatrixXd matHpiDigitizer = hpiDataUpdater.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
     bool bBasic = false;
     FiffCoordTrans transDevHead;
@@ -981,7 +927,6 @@ void TestHpiFit::testComputeCoilLocation_advanced_proj()
     HPI.computeCoilLocation(matAmplitudes,
                             m_matProjectors,
                             transDevHead,
-                            m_pFiffInfo,
                             vecError,
                             matCoilLocActual,
                             vecGoF);
@@ -1003,7 +948,8 @@ void TestHpiFit::testComputeCoilLocation_basic_gof()
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError(4);
     VectorXd vecGoF;
-    MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
+    HpiDataUpdater hpiDataUpdater(m_pFiffInfo);
+    MatrixXd matHpiDigitizer = hpiDataUpdater.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
     bool bBasic = true;
     FiffCoordTrans transDevHead;
@@ -1029,7 +975,6 @@ void TestHpiFit::testComputeCoilLocation_basic_gof()
     HPI.computeCoilLocation(matAmplitudes,
                             m_matProjectors,
                             transDevHead,
-                            m_pFiffInfo,
                             vecError,
                             matCoilLocActual,
                             vecGoF);
@@ -1048,7 +993,8 @@ void TestHpiFit::testComputeCoilLocation_advanced_gof()
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError(4);
     VectorXd vecGoF;
-    MatrixXd matHpiDigitizer = HPI.getHpiDigitizer();
+    HpiDataUpdater hpiDataUpdater(m_pFiffInfo);
+    MatrixXd matHpiDigitizer = hpiDataUpdater.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
     bool bBasic = false;
     FiffCoordTrans transDevHead;
@@ -1073,7 +1019,6 @@ void TestHpiFit::testComputeCoilLocation_advanced_gof()
     HPI.computeCoilLocation(matAmplitudes,
                             m_matProjectors,
                             transDevHead,
-                            m_pFiffInfo,
                             vecError,
                             matCoilLocActual,
                             vecGoF);
@@ -1092,7 +1037,6 @@ void TestHpiFit::testComputeHeadPosition_error()
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError(4);
     VectorXd vecGoF;
-    MatrixXd matHpiPosExpected = HPI.getHpiDigitizer();
     bool bBasic = true;
     FiffDigPointSet fittedPointSet;
 
@@ -1113,7 +1057,6 @@ void TestHpiFit::testComputeHeadPosition_error()
     HPI.computeCoilLocation(matAmplitudes,
                             m_matProjectors,
                             m_pFiffInfo->dev_head_t,
-                            m_pFiffInfo,
                             vecError,
                             matCoilLoc,
                             vecGoF);
