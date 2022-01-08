@@ -190,6 +190,33 @@ public:
 
     //=========================================================================================================
     /**
+     * Perform one single HPI fit.
+     *
+     * @param[in]   t_mat                      Data to estimate the HPI positions from.
+     * @param[in]   t_matProjectors            The projectors to apply. Bad channels are still included.
+     * @param[out]  transDevHead               The final dev head transformation matrix.
+     * @param[in]   vecFreqs                   The frequencies for each coil.
+     * @param[out]  vecError                   The HPI estimation Error in mm for each fitted HPI coil.
+     * @param[out]  vecGoF                     The goodness of fit for each fitted HPI coil.
+     * @param[out]  fittedPointSet             The final fitted positions in form of a digitizer set.
+     * @param[in]   pFiffInfo                  Associated Fiff Information.
+     * @param[in]   bDoDebug                   Print debug info to cmd line and write debug info to file.
+     * @param[in]   sHPIResourceDir            The path to the debug file which is to be written.
+     * @param[in]   iMaxIterations             The maximum allowed number of iterations used to fit the dipoles. Default is 500.
+     * @param[in]   fAbortError                The error which will lead to aborting the dipole fitting process. Default is 1e-9.
+     */
+    void fit(const Eigen::MatrixXd& matData,
+             const Eigen::MatrixXd& matProjectors,
+             FIFFLIB::FiffCoordTrans& transDevHead,
+             const QVector<int>& vecFreqs,
+             QVector<double>& vecError,
+             Eigen::VectorXd& vecGoF,
+             FIFFLIB::FiffDigPointSet& fittedPointSet,
+             const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
+             const ModelParameters& modelParameters);
+
+    //=========================================================================================================
+    /**
      * assign frequencies to correct position
      *
      * @param[in]   t_mat              Data to estimate the HPI positions from.
