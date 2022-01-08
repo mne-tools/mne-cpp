@@ -102,6 +102,7 @@ struct CoilParam {
  * The struct specifing all data needed to perform coil-wise fitting.
  */
 struct HpiFitResult {
+    QVector<int> hpiFreqs;
     FIFFLIB::FiffDigPointSet    fittedCoils;
     FIFFLIB::FiffCoordTrans     devHeadTrans;
     QVector<double>             errorDistances;
@@ -207,13 +208,9 @@ public:
      */
     void fit(const Eigen::MatrixXd& matData,
              const Eigen::MatrixXd& matProjectors,
-             FIFFLIB::FiffCoordTrans& transDevHead,
-             const QVector<int>& vecFreqs,
-             QVector<double>& vecError,
-             Eigen::VectorXd& vecGoF,
-             FIFFLIB::FiffDigPointSet& fittedPointSet,
              const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo,
-             const ModelParameters& modelParameters);
+             const ModelParameters& modelParameters,
+             HpiFitResult& hpiFitResult);
 
     //=========================================================================================================
     /**

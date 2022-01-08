@@ -412,13 +412,9 @@ void HPIFit::fitHPI(const MatrixXd& t_mat,
 
 void HPIFit::fit(const MatrixXd& matData,
                  const MatrixXd& matProjectors,
-                 FiffCoordTrans& transDevHead,
-                 const QVector<int>& vecFreqs,
-                 QVector<double>& vecError,
-                 VectorXd& vecGoF,
-                 FiffDigPointSet& fittedPointSet,
-                 FiffInfo::SPtr pFiffInfo,
-                 const ModelParameters& modelParameters)
+                 const FiffInfo::SPtr pFiffInfo,
+                 const ModelParameters& modelParameters,
+                 HpiFitResult& hpiFitResult)
 {
 
     MatrixXd matAmplitudes;
@@ -427,20 +423,20 @@ void HPIFit::fit(const MatrixXd& matData,
                       modelParameters,
                       matAmplitudes);
 
-    int iNumCoils = vecFreqs.size();
+    int iNumCoils = hpiFitResult.hpiFreqs.size();
     MatrixXd matCoilPos = MatrixXd::Zero(iNumCoils,3);
     computeCoilLocation(matAmplitudes,
                         matProjectors,
-                        transDevHead,
+                        hpiFitResult.devHeadTrans,
                         pFiffInfo,
-                        vecError,
+                        hpiFitResult.errorDistances,
                         matCoilPos,
-                        vecGoF);
+                        hpiFitResult.GoF);
 
     computeHeadPosition(matCoilPos,
-                        transDevHead,
-                        vecError,
-                        fittedPointSet);
+                        hpiFitResult.devHeadTrans,
+                        hpiFitResult.errorDistances,
+                        hpiFitResult.fittedCoils);
 }
 
 //=============================================================================================================
