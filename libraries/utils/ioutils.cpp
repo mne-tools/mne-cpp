@@ -38,6 +38,8 @@
 //=============================================================================================================
 
 #include "ioutils.h"
+#include <algorithm>
+#include <regex>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -73,12 +75,35 @@ qint32 IOUtils::fread3(QDataStream &p_qStream)
 
 //=============================================================================================================
 
+qint32 IOUtils::fread3(std::iostream& stream)
+{
+    char* bytes = new char[3];
+    stream.read(bytes, 3);
+    qint32 int3 = (((unsigned char) bytes[0]) << 16) + (((unsigned char) bytes[1]) << 8) + ((unsigned char) bytes[2]);
+    delete[] bytes;
+    return int3;
+}
+
+//=============================================================================================================
+
 VectorXi IOUtils::fread3_many(QDataStream &p_qStream, qint32 count)
 {
     VectorXi res(count);
 
     for(qint32 i = 0; i < count; ++i)
         res[i] = IOUtils::fread3(p_qStream);
+
+    return res;
+}
+
+//=============================================================================================================
+
+VectorXi IOUtils::fread3_many(std::iostream& stream, qint32 count)
+{
+    VectorXi res(count);
+
+    for(qint32 i = 0; i < count; ++i)
+        res[i] = IOUtils::fread3(stream);
 
     return res;
 }
@@ -253,6 +278,20 @@ QStringList IOUtils::get_new_chnames_conventions(const QStringList& chNames)
 
 //=============================================================================================================
 
+std::vector<std::string> IOUtils::get_new_chnames_conventions(const std::vector<std::string>& chNames)
+{
+    std::vector<std::string> result;
+
+    for(auto channelName : chNames){
+        std::remove(channelName.begin(), channelName.end(), ' ');
+        result.push_back(std::move(channelName));
+    }
+
+    return result;
+}
+
+//=============================================================================================================
+
 QStringList IOUtils::get_old_chnames_conventions(const QStringList& chNames)
 {
     QStringList result, xList;
@@ -269,6 +308,20 @@ QStringList IOUtils::get_old_chnames_conventions(const QStringList& chNames)
             replaceString.replace(xList.at(k),QString("%1%2").arg(" ").arg(xList.at(k)));
             result.append(replaceString);
         }
+    }
+
+    return result;
+}
+
+//=============================================================================================================
+
+std::vector<std::string> IOUtils::get_old_chnames_conventions(const std::vector<std::string>& chNames)
+{
+    std::vector<std::string> result;
+
+    for(auto channelName : chNames){
+        std::regex_replace(channelName, std::regex("[0-9]{1,100}"), " $&");
+        result.push_back(std::move(channelName));
     }
 
     return result;
@@ -320,5 +373,41 @@ bool IOUtils::check_matching_chnames_conventions(const QStringList& chNamesA, co
         }
     }
 
+    return bMatching;
+}
+
+//=============================================================================================================
+
+bool IOUtils::check_matching_chnames_conventions(const std::vector<std::string>& chNamesA, const std::vector<std::string>& chNamesB, bool bCheckForNewNamingConvention)
+{
+    if(chNamesA.empty()){
+        qWarning("Warning in IOUtils::check_matching_chnames_conventions - chNamesA list is empty. Nothing to compare");
+    }
+    if(chNamesB.empty()){
+        qWarning("Warning in IOUtils::check_matching_chnames_conventions - chNamesB list is empty. Nothing to compare");
+    }
+
+    bool bMatching = false;
+
+    for(int i = 0 ; i < chNamesA.size(); ++i){
+        if (std::find(chNamesB.begin(), chNamesB.end(), chNamesA.at(i)) != chNamesB.end()){
+            bMatching = true;
+        } else if(bCheckForNewNamingConvention){
+            std::string replaceStringNewConv{chNamesA.at(i)};
+            std::remove(replaceStringNewConv.begin(), replaceStringNewConv.end(), ' ');
+
+            if(std::find(chNamesB.begin(), chNamesB.end(), replaceStringNewConv) != chNamesB.end()){
+                bMatching = true;
+            } else {
+                std::string replaceStringOldConv{chNamesA.at(i)};
+                std::regex_replace(replaceStringOldConv, std::regex("[0-9]{1,100}"), " $&");
+                if(std::find(chNamesB.begin(), chNamesB.end(), replaceStringNewConv) != chNamesB.end() || std::find(chNamesB.begin(), chNamesB.end(), replaceStringOldConv) != chNamesB.end()){
+                    bMatching = true;
+                } else {
+                    bMatching = false;
+                }
+            }
+        }
+    }
     return bMatching;
 }
