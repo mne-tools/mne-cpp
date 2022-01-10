@@ -68,6 +68,33 @@ KMeans::KMeans(QString distance,
                QString emptyact,
                bool online,
                qint32 maxit)
+: m_sDistance(distance.toStdString())
+, m_sStart(start.toStdString())
+, m_iReps(replicates)
+, m_sEmptyact(emptyact.toStdString())
+, m_iMaxit(maxit)
+, m_bOnline(online)
+, emptyErrCnt(0)
+, iter(0)
+, k(0)
+, n(0)
+, p(0)
+, totsumD(0)
+, prevtotsumD(0)
+{
+    // Assume one replicate
+    if (m_iReps < 1)
+        m_iReps = 1;
+}
+
+//=============================================================================================================
+
+KMeans::KMeans(std::string distance,
+               std::string start,
+               qint32 replicates,
+               std::string emptyact,
+               bool online,
+               qint32 maxit)
 : m_sDistance(distance)
 , m_sStart(start)
 , m_iReps(replicates)
