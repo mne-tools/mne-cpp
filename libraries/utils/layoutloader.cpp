@@ -38,6 +38,8 @@
 //=============================================================================================================
 
 #include "layoutloader.h"
+#include <algorithm>
+#include <fstream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -56,13 +58,7 @@ using namespace UTILSLIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
-//=============================================================================================================
-
-LayoutLoader::LayoutLoader()
-{
-}
-
-//=============================================================================================================
+//=============================================================================================================s
 
 bool LayoutLoader::readAsaElcFile(const QString& path,
                                   QStringList &channelNames,
@@ -153,6 +149,101 @@ bool LayoutLoader::readAsaElcFile(const QString& path,
 
 //=============================================================================================================
 
+bool LayoutLoader::readAsaElcFile(const std::string &path,
+                                  std::vector<std::string> &channelNames,
+                                  std::vector<std::vector<float> > &location3D,
+                                  std::vector<std::vector<float> > &location2D,
+                                  std::string &unit)
+{
+
+    if(std::find(path.begin(), path.end(), ".elc") == path.end()){
+        return false;
+    }
+
+    std::ifstream inFile(path);
+
+    if(!inFile.is_open()){
+        qDebug()<<"Error opening elc file";
+        return false;
+    }
+
+    //Start reading from file
+    double numberElectrodes;
+    bool read2D = false;
+
+    std::string line;
+
+    while(std::getline(inFile, line)){
+        if(std::find(line.begin(), line.end(), '#') == line.end()){
+            std::vector<std::string> elements;
+            std::stringstream stream{line};
+            std::string element;
+
+            stream >> std::ws;
+            while(stream >> element){
+                elements.push_back(std::move(element));
+                stream >> std::ws;
+            }
+
+            //Read number of electrodes
+            if(std::find(line.begin(), line.end(), "NumberPositions") != line.end())
+                numberElectrodes = std::stod(elements.at(1));
+
+            //Read the unit of the position values
+            if(std::find(line.begin(), line.end(), "UnitPosition") != line.end())
+                unit = elements.at(1);
+
+            //Read actual electrode positions
+            if(std::find(line.begin(), line.end(), "Positions2D") != line.end())
+                read2D = true;
+
+            if(std::find(line.begin(), line.end(), ":") != line.end() && !read2D) //Read 3D positions
+            {
+                channelNames.push_back(elements.at(0));
+                std::vector<float> posTemp;
+
+                posTemp.push_back(std::stod(elements.at(elements.size()-3)));    //x
+                posTemp.push_back(std::stod(elements.at(elements.size()-2)));    //y
+                posTemp.push_back(std::stod(elements.at(elements.size()-1)));    //z
+
+                location3D.push_back(std::move(posTemp));
+            }
+
+            if(std::find(line.begin(), line.end(), ":") != line.end() && read2D) //Read 2D positions
+            {
+                std::vector<float> posTemp;
+                posTemp.push_back(std::stod(elements.at(elements.size()-2)));    //x
+                posTemp.push_back(std::stod(elements.at(elements.size()-1)));    //y
+                location2D.push_back(std::move(posTemp));
+            }
+
+            //Read channel names
+            if(std::find(line.begin(), line.end(), "Labels") != line.end())
+            {
+                std::getline(inFile, line);
+                std::stringstream channels{line};
+                std::vector<std::string> listOfNames;
+
+                std::string channelName;
+
+                channels >> std::ws;
+                while(channels >> channelName){
+                    listOfNames.push_back(std::move(channelName));
+                    channels >> std::ws;
+                }
+
+                channelNames = std::move(listOfNames);
+            }
+        }
+    }
+
+    Q_UNUSED(numberElectrodes);
+
+    return true;
+}
+
+//=============================================================================================================
+
 bool LayoutLoader::readMNELoutFile(const QString &path, QMap<QString, QPointF> &channelData)
 {
     //Open .elc file
@@ -192,6 +283,51 @@ bool LayoutLoader::readMNELoutFile(const QString &path, QMap<QString, QPointF> &
     }
 
     file.close();
+
+    return true;
+}
+
+//=============================================================================================================
+
+bool LayoutLoader::readMNELoutFile(const std::string &path, QMap<std::string, QPointF> &channelData)
+{
+
+    if(std::find(path.begin(), path.end(), ".lout") == path.end()){
+        return false;
+    }
+
+    channelData.clear();
+    std::ifstream inFile(path);
+
+    if(!inFile.is_open()){
+        qDebug()<<"Error opening mne lout file";
+        return false;
+    }
+
+
+    std::string line;
+
+    while(std::getline(inFile, line)){
+        if(std::find(line.begin(), line.end(), '#') == line.end()){
+            std::vector<std::string> elements;
+            std::stringstream stream{line};
+            std::string element;
+
+            stream >> std::ws;
+            while(stream >> element){
+                elements.push_back(std::move(element));
+                stream >> std::ws;
+            }
+
+            QPointF posTemp;
+            posTemp.setX(std::stod(elements.at(1)));      //x
+            posTemp.setY(std::stod(elements.at(2)));      //y
+
+            //Create channel data map entry
+            std::string key{elements.at(elements.size() - 2) + " " + elements.at(elements.size() - 1)};
+            channelData.insert(key, posTemp);
+        }
+    }
 
     return true;
 }
