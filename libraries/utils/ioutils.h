@@ -576,6 +576,7 @@ bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
                 stream >> std::ws;
                 while(stream >> element){
                     elements.push_back(std::stod(element));
+                    stream >> std::ws;
                 }
 
                 Eigen::VectorXd x (elements.size());
