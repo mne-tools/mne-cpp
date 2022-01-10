@@ -40,6 +40,11 @@
 //=============================================================================================================
 
 #include "utils_global.h"
+#include <ios>
+#include <string>
+#include <sstream>
+#include <vector>
+#include <fstream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -110,6 +115,18 @@ public:
 
     //=========================================================================================================
     /**
+     * mne_fread3(fid)
+     *
+     * Reads a 3-byte integer out of a stream
+     *
+     * @param[in] stream  Stream to read from.
+     *
+     * @return the read 3-byte integer.
+     */
+    static qint32 fread3(std::iostream& stream);
+
+    //=========================================================================================================
+    /**
      * fread3_many(fid,count)
      *
      * Reads a 3-byte integer out of a stream
@@ -120,6 +137,19 @@ public:
      * @return the read 3-byte integer.
      */
     static Eigen::VectorXi fread3_many(QDataStream &p_qStream, qint32 count);
+
+    //=========================================================================================================
+    /**
+     * fread3_many(fid,count)
+     *
+     * Reads a 3-byte integer out of a stream
+     *
+     * @param[in] stream     Stream to read from.
+     * @param[in] count      Number of elements to read.
+     *
+     * @return the read 3-byte integer.
+     */
+    static Eigen::VectorXi fread3_many(std::iostream &stream, qint32 count);
 
     //=========================================================================================================
     /**
@@ -209,6 +239,20 @@ public:
 
     //=========================================================================================================
     /**
+     * Write Eigen Matrix to file
+     *
+     * @param[in] in         input eigen value which is to be written to file.
+     * @param[in] path       path and file name to write to.
+     */
+    template<typename T>
+    static bool write_eigen_matrix(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& in, const std::string& sPath, const std::string& sDescription = std::string());
+    template<typename T>
+    static bool write_eigen_matrix(const Eigen::Matrix<T, 1, Eigen::Dynamic>& in, const std::string& sPath, const std::string& sDescription = std::string());
+    template<typename T>
+    static bool write_eigen_matrix(const Eigen::Matrix<T, Eigen::Dynamic, 1>& in, const std::string& sPath, const std::string& sDescription = std::string());
+
+    //=========================================================================================================
+    /**
      * Read Eigen Matrix from file
      *
      * @param[out] out       output eigen value.
@@ -223,6 +267,20 @@ public:
 
     //=========================================================================================================
     /**
+     * Read Eigen Matrix from file
+     *
+     * @param[out] out       output eigen value.
+     * @param[in] path       path and file name to read from.
+     */
+    template<typename T>
+    static bool read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& out, const std::string& path);
+    template<typename T>
+    static bool read_eigen_matrix(Eigen::Matrix<T, 1, Eigen::Dynamic>& out, const std::string& path);
+    template<typename T>
+    static bool read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, 1>& out, const std::string& path);
+
+    //=========================================================================================================
+    /**
      * Returns the new channel naming conventions (whitespcae between channel type and number) for the input list.
      *
      * @param[in] chNames    The channel names.
@@ -230,6 +288,16 @@ public:
      * @return The new channel names.
      */
     static QStringList get_new_chnames_conventions(const QStringList& chNames);
+
+    //=========================================================================================================
+    /**
+     * Returns the new channel naming conventions (whitespcae between channel type and number) for the input list.
+     *
+     * @param[in] chNames    The channel names.
+     *
+     * @return The new channel names.
+     */
+    static std::vector<std::string> get_new_chnames_conventions(const std::vector<std::string>& chNames);
 
     //=========================================================================================================
     /**
@@ -243,6 +311,16 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns the old channel naming conventions (whitespcae between channel type and number) for the input list.
+     *
+     * @param[in] chNames    The channel names.
+     *
+     * @return The new channel names.
+     */
+    static std::vector<std::string> get_old_chnames_conventions(const std::vector<std::string>& chNames);
+
+    //=========================================================================================================
+    /**
      * Checks if all names from chNamesA are in chNamesB. If wanted each name in chNamesA is transformed to the old and new naming convention and checked if in chNamesB.
      *
      * @param[in] chNamesA    The channel names.
@@ -252,6 +330,18 @@ public:
      * @return True if all names in chNamesA are present in chNamesB, false otherwise.
      */
     static bool check_matching_chnames_conventions(const QStringList& chNamesA, const QStringList& chNamesB, bool bCheckForNewNamingConvention = false);
+
+    //=========================================================================================================
+    /**
+     * Checks if all names from chNamesA are in chNamesB. If wanted each name in chNamesA is transformed to the old and new naming convention and checked if in chNamesB.
+     *
+     * @param[in] chNamesA    The channel names.
+     * @param[in] chNamesB    The channel names which is to be compared to.
+     * @param[in] bCheckForNewNamingConvention    Whether to use old and new naming conventions while checking.
+     *
+     * @return True if all names in chNamesA are present in chNamesB, false otherwise.
+     */
+    static bool check_matching_chnames_conventions(const std::vector<std::string>& chNamesA, const std::vector<std::string>& chNamesB, bool bCheckForNewNamingConvention = false);
 };
 
 //=============================================================================================================
@@ -301,6 +391,52 @@ bool IOUtils::write_eigen_matrix(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::D
     }
 
     file.close();
+
+    return true;
+}
+
+//=============================================================================================================
+
+template<typename T>
+bool IOUtils::write_eigen_matrix(const Eigen::Matrix<T, 1, Eigen::Dynamic>& in, const std::string& sPath, const std::string& sDescription)
+{
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1,in.cols());
+    matrixName.row(0)= in;
+    return IOUtils::write_eigen_matrix(matrixName, sPath, sDescription);
+}
+
+//=============================================================================================================
+
+template<typename T>
+bool IOUtils::write_eigen_matrix(const Eigen::Matrix<T, Eigen::Dynamic, 1>& in, const std::string& sPath, const std::string& sDescription)
+{
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(in.rows(),1);
+    matrixName.col(0)= in;
+    return IOUtils::write_eigen_matrix(matrixName, sPath, sDescription);
+}
+
+//=============================================================================================================
+
+template<typename T>
+bool IOUtils::write_eigen_matrix(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& in, const std::string& sPath, const std::string& sDescription)
+{
+    std::ofstream outputFile(sPath);
+    if(outputFile.is_open())
+    {
+        if(!sDescription.empty()) {
+            outputFile<<"# Dimensions (rows x cols): "<<in.rows()<<" x "<<in.cols()<<"\n";
+            outputFile<<"# Description: "<<sDescription<<"\n";
+        }
+
+        for(int row = 0; row<in.rows(); row++) {
+            for(int col = 0; col<in.cols(); col++)
+                outputFile << in(row, col)<<" ";
+            outputFile<<"\n";
+        }
+    } else {
+        qWarning()<<"Could not write Eigen element to file! Path does not exist!";
+        return false;
+    }
 
     return true;
 }
@@ -375,6 +511,89 @@ bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
         out.resize(rows, cols);
 
         for (int i=0; i<help.length(); i++) {
+            out.row(i)=help[i].transpose();
+        }
+    } else {
+        qWarning()<<"IOUtils::read_eigen_matrix - Could not read Eigen element from file! Path does not exist!";
+        return false;
+    }
+
+    return true;
+}
+
+//=============================================================================================================
+
+template<typename T>
+bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, 1, Eigen::Dynamic>& out, const std::string& path)
+{
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName;
+    bool bStatus = IOUtils::read_eigen_matrix(matrixName, path);
+
+    if(matrixName.rows() > 0)
+    {
+        out = matrixName.row(0);
+    }
+
+    return bStatus;
+}
+
+//=============================================================================================================
+
+template<typename T>
+bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, 1>& out, const std::string& path)
+{
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName;
+    bool bStatus = IOUtils::read_eigen_matrix(matrixName, path);
+
+    if(matrixName.cols() > 0)
+    {
+        out = matrixName.col(0);
+    }
+
+    return bStatus;
+}
+
+//=============================================================================================================
+
+template<typename T>
+bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& out, const std::string& path)
+{
+    std::ifstream inputFile(path);
+
+    if(inputFile.is_open()) {
+        //Start reading from file
+        std::vector<Eigen::VectorXd> help;
+
+        std::string line;
+        size_t matSize{0};
+
+        while(std::getline(inputFile, line)){
+            if(std::find(line.begin(), line.end(), '#') != line.end()){
+                std::vector<double> elements;
+                std::stringstream stream{line};
+                std::string element;
+
+                stream >> std::ws;
+                while(stream >> element){
+                    element.push_back(std::stod(element));
+                }
+
+                Eigen::VectorXd x (elements.size());
+
+                for(int i = 0; i < elements.size(); ++i){
+                    x(i) = element.at(i);
+                }
+
+                help.push_back(std::move(x));
+            }
+        }
+
+        int rows = help.size();
+        int cols = rows<=0 ? 0 : help.at(0).rows();
+
+        out.resize(rows, cols);
+
+        for (int i=0; i < help.size(); i++) {
             out.row(i)=help[i].transpose();
         }
     } else {
