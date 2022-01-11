@@ -39,7 +39,7 @@
 
 #define _USE_MATH_DEFINES
 #include <math.h>
-
+#include <iostream>
 #include "mnemath.h"
 
 //=============================================================================================================
@@ -497,7 +497,11 @@ MatrixXd MNEMath::rescale(const MatrixXd& data,
     std::vector<std::string> valid_modes{"logratio", "ratio", "zscore", "mean", "percent"};
     if(std::find(valid_modes.begin(),valid_modes.end(), mode) == valid_modes.end())
     {
-        qWarning().noquote() << "[MNEMath::rescale] Mode" << QString(mode.c_str()) << "is not supported. Supported modes are:" << valid_modes << "Returning input data.";
+        qWarning().noquote() << "[MNEMath::rescale] Mode" << mode.c_str() << "is not supported. Supported modes are:";
+        for(auto& mode : valid_modes){
+            std::cout << mode << " ";
+        }
+        std::cout << "\n" << "Returning input data.\n";
         return data_out;
     }
 
