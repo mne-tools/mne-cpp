@@ -565,10 +565,9 @@ bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
         std::vector<Eigen::VectorXd> help;
 
         std::string line;
-        size_t matSize{0};
 
         while(std::getline(inputFile, line)){
-            if(std::find(line.begin(), line.end(), '#') == line.end()){
+            if(line.find('#') == std::string::npos){
                 std::vector<double> elements;
                 std::stringstream stream{line};
                 std::string element;
