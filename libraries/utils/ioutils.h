@@ -497,8 +497,8 @@ bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
 
                 Eigen::VectorXd x (fields.size());
 
-                for (int j=0; j<fields.size(); j++) {
-                    x(j)=fields.at(j).toDouble();
+                for (int j = 0; j<fields.size(); j++) {
+                    x(j) = fields.at(j).toDouble();
                 }
 
                 help.append(x);
@@ -506,12 +506,12 @@ bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
         }
 
         int rows = help.size();
-        int cols = rows<=0 ? 0 : help.at(0).rows();
+        int cols = rows <= 0 ? 0 : help.at(0).rows();
 
         out.resize(rows, cols);
 
-        for (int i=0; i<help.length(); i++) {
-            out.row(i)=help[i].transpose();
+        for (int i=0; i < help.length(); i++) {
+            out.row(i) = help[i].transpose();
         }
     } else {
         qWarning()<<"IOUtils::read_eigen_matrix - Could not read Eigen element from file! Path does not exist!";
@@ -580,7 +580,7 @@ bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
 
                 Eigen::VectorXd x (elements.size());
 
-                for(int i = 0; i < elements.size(); ++i){
+                for(size_t i = 0; i < elements.size(); ++i){
                     x(i) = elements.at(i);
                 }
 
@@ -589,12 +589,12 @@ bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
         }
 
         int rows = help.size();
-        int cols = rows<=0 ? 0 : help.at(0).rows();
+        int cols = rows <= 0 ? 0 : help.at(0).rows();
 
         out.resize(rows, cols);
 
-        for (int i=0; i < help.size(); i++) {
-            out.row(i)=help[i].transpose();
+        for (size_t i = 0; i < help.size(); i++) {
+            out.row(i) = help[i].transpose();
         }
     } else {
         qWarning()<<"IOUtils::read_eigen_matrix - Could not read Eigen element from file! Path does not exist!";
