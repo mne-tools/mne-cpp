@@ -389,7 +389,7 @@ bool IOUtils::check_matching_chnames_conventions(const std::vector<std::string>&
 
     bool bMatching = false;
 
-    for(int i = 0 ; i < chNamesA.size(); ++i){
+    for(size_t i = 0 ; i < chNamesA.size(); ++i){
         if (std::find(chNamesB.begin(), chNamesB.end(), chNamesA.at(i)) != chNamesB.end()){
             bMatching = true;
         } else if(bCheckForNewNamingConvention){
