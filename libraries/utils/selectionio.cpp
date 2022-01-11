@@ -340,7 +340,7 @@ bool SelectionIO::writeBrainstormMonFiles(const std::string& path, const std::ma
 
     for(auto& mapElement : selectionMap){
         //logic of using parent_path here might not be "correct"
-        std::string newPath = std::filesystem::absolute(std::filesystem::path(path).parent_path()) /= (mapElement.first + ".mon");
+        std::string newPath{path.substr(0, path.find_last_of("/") + 1) + mapElement.first + ".mon"};
         std::ofstream outFile(newPath);
         if(!outFile.is_open()){
             qDebug()<<"Error opening mon file for writing";
