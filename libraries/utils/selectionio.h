@@ -42,6 +42,10 @@
 
 #include "utils_global.h"
 
+#include <vector>
+#include <string>
+#include <map>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -85,11 +89,27 @@ public:
 
     //=========================================================================================================
     /**
+     * Reads the specified MNE sel file.
+     * @param[in] path holds the file path of the .sel file which is to be read.
+     * @param[in] selectionMap holds the map to which the read selection groups are stored.
+     */
+    static bool readMNESelFile(const std::string& path, std::multimap<std::string,std::vector<std::string>>& selectionMap);
+
+    //=========================================================================================================
+    /**
      * Reads the specified Brainstorm montage file.
      * @param[in] path holds the file path of the .mon file which is to be read.
      * @param[in] selectionMap holds the map to which the read selection groups are stored.
      */
     static bool readBrainstormMonFile(QString path, QMap<QString,QStringList> &selectionMap);
+
+    //=========================================================================================================
+    /**
+     * Reads the specified Brainstorm montage file.
+     * @param[in] path holds the file path of the .mon file which is to be read.
+     * @param[in] selectionMap holds the map to which the read selection groups are stored.
+     */
+    static bool readBrainstormMonFile(const std::string& path, std::multimap<std::string,std::vector<std::string>>& selectionMap);
 
     //=========================================================================================================
     /**
@@ -101,11 +121,27 @@ public:
 
     //=========================================================================================================
     /**
+     * Writes the specified selection groups to a single MNE .sel file.
+     * @param[in] path holds the file path of the .sel file which is to be read.
+     * @param[in] selectionMap holds the map to which the read selection groups are stored.
+     */
+    static bool writeMNESelFile(const std::string& path, const std::map<std::string,std::vector<std::string>>& selectionMap);
+
+    //=========================================================================================================
+    /**
      * Writes the specified selection groups to different Brainstorm .mon files. The amount of written files depend on the number of selection groups in selectionMap
      * @param[in] path holds the file path of the .mon file which is to be read.
      * @param[in] selectionMap holds the map to which the read selection groups are stored.
      */
     static bool writeBrainstormMonFiles(QString path, const QMap<QString,QStringList> &selectionMap);
+
+    //=========================================================================================================
+    /**
+     * Writes the specified selection groups to different Brainstorm .mon files. The amount of written files depend on the number of selection groups in selectionMap
+     * @param[in] path holds the file path of the .mon file which is to be read.
+     * @param[in] selectionMap holds the map to which the read selection groups are stored.
+     */
+    static bool writeBrainstormMonFiles(const std::string& path, const std::map<std::string,std::vector<std::string>>& selectionMap);
 };
 } // NAMESPACE
 
