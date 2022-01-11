@@ -158,6 +158,38 @@ void MNEMath::get_whitener(MatrixXd &A,
 
 //=============================================================================================================
 
+void MNEMath::get_whitener(MatrixXd &A,
+                           bool pca,
+                           const std::string& ch_type,
+                           VectorXd &eig,
+                           MatrixXd &eigvec)
+{
+    // whitening operator
+    SelfAdjointEigenSolver<MatrixXd> t_eigenSolver(A);//Can be used because, covariance matrices are self-adjoint matrices.
+
+    eig = t_eigenSolver.eigenvalues();
+    eigvec = t_eigenSolver.eigenvectors().transpose();
+
+    MNEMath::sort<double>(eig, eigvec, false);
+    qint32 rnk = MNEMath::rank(A);
+
+    for(qint32 i = 0; i < eig.size()-rnk; ++i)
+        eig(i) = 0;
+
+    printf("Setting small %s eigenvalues to zero.\n", ch_type.c_str());
+    if (!pca)  // No PCA case.
+        printf("Not doing PCA for %s\n", ch_type.c_str());
+    else
+    {
+        printf("Doing PCA for %s.",ch_type.c_str());
+        // This line will reduce the actual number of variables in data
+        // and leadfield to the true rank.
+        eigvec = eigvec.block(eigvec.rows()-rnk, 0, rnk, eigvec.cols());
+    }
+}
+
+//=============================================================================================================
+
 VectorXi MNEMath::intersect(const VectorXi &v1,
                             const VectorXi &v2,
                             VectorXi &idx_sel)
@@ -290,6 +322,26 @@ MatrixXd MNEMath::legendre(qint32 n,
     return y;
 }
 
+
+//=============================================================================================================
+
+MatrixXd MNEMath::legendre(qint32 n,
+                           const VectorXd &X,
+                           std::string normalize)
+{
+    MatrixXd y;
+
+    Q_UNUSED(y);
+
+    Q_UNUSED(n);
+    Q_UNUSED(X);
+    Q_UNUSED(normalize);
+
+    //ToDo
+
+    return y;
+}
+
 //=============================================================================================================
 
 SparseMatrix<double>* MNEMath::make_block_diag(const MatrixXd &A,
@@ -374,6 +426,82 @@ MatrixXd MNEMath::rescale(const MatrixXd &data,
     }
 
     qInfo().noquote() << QString("[MNEMath::rescale] Applying baseline correction ... (mode: %1)").arg(mode);
+
+    qint32 imin = 0;
+    qint32 imax = times.size();
+
+    if (baseline.second == baseline.first) {
+        imin = 0;
+    } else {
+        float bmin = baseline.first;
+        for(qint32 i = 0; i < times.size(); ++i) {
+            if(times[i] >= bmin) {
+                imin = i;
+                break;
+            }
+        }
+    }
+
+    float bmax = baseline.second;
+
+    if (baseline.second == baseline.first) {
+        bmax = 0;
+    }
+
+    for(qint32 i = times.size()-1; i >= 0; --i) {
+        if(times[i] <= bmax) {
+            imax = i+1;
+            break;
+        }
+    }
+
+    if(imax < imin) {
+        qWarning() << "[MNEMath::rescale] imax < imin. Returning input data.";
+        return data_out;
+    }
+
+    VectorXd mean = data_out.block(0, imin,data_out.rows(),imax-imin).rowwise().mean();
+    if(mode.compare("mean") == 0) {
+        data_out -= mean.rowwise().replicate(data.cols());
+    } else if(mode.compare("logratio") == 0) {
+        for(qint32 i = 0; i < data_out.rows(); ++i)
+            for(qint32 j = 0; j < data_out.cols(); ++j)
+                data_out(i,j) = log10(data_out(i,j)/mean[i]); // a value of 1 means 10 times bigger
+    } else if(mode.compare("ratio") == 0) {
+        data_out = data_out.cwiseQuotient(mean.rowwise().replicate(data_out.cols()));
+    } else if(mode.compare("zscore") == 0) {
+        MatrixXd std_mat = data.block(0, imin, data.rows(), imax-imin) - mean.rowwise().replicate(imax-imin);
+        std_mat = std_mat.cwiseProduct(std_mat);
+        VectorXd std_v = std_mat.rowwise().mean();
+        for(qint32 i = 0; i < std_v.size(); ++i)
+            std_v[i] = sqrt(std_v[i] / (float)(imax-imin));
+
+        data_out -= mean.rowwise().replicate(data_out.cols());
+        data_out = data_out.cwiseQuotient(std_v.rowwise().replicate(data_out.cols()));
+    } else if(mode.compare("percent") == 0) {
+        data_out -= mean.rowwise().replicate(data_out.cols());
+        data_out = data_out.cwiseQuotient(mean.rowwise().replicate(data_out.cols()));
+    }
+
+    return data_out;
+}
+
+//=============================================================================================================
+
+MatrixXd MNEMath::rescale(const MatrixXd& data,
+                          const RowVectorXf& times,
+                          const std::pair<float,float>& baseline,
+                          const std::string& mode)
+{
+    MatrixXd data_out = data;
+    std::vector<std::string> valid_modes{"logratio", "ratio", "zscore", "mean", "percent"};
+    if(std::find(valid_modes.begin(),valid_modes.end(), mode) == valid_modes.end())
+    {
+        qWarning().noquote() << "[MNEMath::rescale] Mode" << QString(mode.c_str()) << "is not supported. Supported modes are:" << valid_modes << "Returning input data.";
+        return data_out;
+    }
+
+    qInfo().noquote() << QString("[MNEMath::rescale] Applying baseline correction ... (mode: %1)").arg(mode.c_str());
 
     qint32 imin = 0;
     qint32 imax = times.size();

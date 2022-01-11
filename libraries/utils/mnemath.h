@@ -44,6 +44,10 @@
 
 #include "utils_global.h"
 
+#include <string>
+#include <utility>
+#include <vector>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -164,6 +168,21 @@ public:
 
     //=========================================================================================================
     /**
+     * Returns the whitener of a given matrix.
+     *
+     * @param[in] A      Matrix to compute the whitener from.
+     * @param[in] pca    perform a pca.
+     *
+     * @return rank of matrix A.
+     */
+    static void get_whitener(Eigen::MatrixXd& A,
+                             bool pca,
+                             const std::string& ch_type,
+                             Eigen::VectorXd& eig,
+                             Eigen::MatrixXd& eigvec);
+
+    //=========================================================================================================
+    /**
      * Find the intersection of two vectors
      *
      * @param[in] v1         Input vector 1.
@@ -201,6 +220,21 @@ public:
     static Eigen::MatrixXd legendre(qint32 n,
                                     const Eigen::VectorXd &X,
                                     QString normalize = QString("unnorm"));
+
+    //=========================================================================================================
+    /**
+     * LEGENDRE Associated Legendre function.
+     *
+     *   P = LEGENDRE(N,X) computes the associated Legendre functions
+     *   of degree N and order M = 0, 1, ..., N, evaluated for each element
+     *   of X.  N must be a scalar integer and X must contain real values
+     *   between -1 <= X <= 1.
+     *
+     * @return associated Legendre functions.
+     */
+    static Eigen::MatrixXd legendre(qint32 n,
+                                    const Eigen::VectorXd &X,
+                                    std::string normalize = "unnorm");
 
     //=========================================================================================================
     /**
@@ -265,6 +299,27 @@ public:
                                    const Eigen::RowVectorXf &times,
                                    const QPair<float, float> &baseline,
                                    QString mode);
+
+    //=========================================================================================================
+    /**
+     * ToDo: Maybe new processing class
+     *
+     * Rescale aka baseline correct data
+     *
+     * @param[in] data           Data Matrix (m x n_time).
+     * @param[in] times          Time instants is seconds.
+     * @param[in] baseline       If baseline is (a, b) the interval is between "a (s)" and "b (s)".
+     *                           If a and b are equal use interval between the beginning of the data and the time point 0 (stimulus onset).
+     * @param[in] mode           Do baseline correction with ratio (power is divided by mean power during baseline) or zscore (power is divided by standard.
+     *                           deviatio of power during baseline after substracting the mean, power = [power - mean(power_baseline)] / std(power_baseline)).
+     *                           ("logratio" | "ratio" | "zscore" | "mean" | "percent")
+     *
+     * @return   rescaled data matrix rescaling.
+     */
+    static Eigen::MatrixXd rescale(const Eigen::MatrixXd& data,
+                                   const Eigen::RowVectorXf& times,
+                                   const std::pair<float, float>& baseline,
+                                   const std::string& mode);
 
     //=========================================================================================================
     /**
