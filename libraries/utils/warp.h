@@ -112,6 +112,16 @@ public:
      */
     Eigen::MatrixXf readsLm(const QString &electrodeFileName);
 
+    //=========================================================================================================
+    /**
+     * Read electrode positions from MRI Database
+     *
+     * @param[in] electrodeFileName    .txt file of electrodes.
+     *
+     * @return electrodes   Matrix with electrode positions.
+     */
+    Eigen::MatrixXf readsLm(const std::string &electrodeFileName);
+
 private:
 
     //=========================================================================================================

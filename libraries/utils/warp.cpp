@@ -38,6 +38,7 @@
 #include "warp.h"
 
 #include <iostream>
+#include <fstream>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -183,5 +184,52 @@ MatrixXf Warp::readsLm(const QString &electrodeFileName)
         }
         i++;
     }
+    return electrodes;
+}
+
+//=============================================================================================================
+
+MatrixXf Warp::readsLm(const std::string &electrodeFileName)
+{
+    MatrixXf electrodes;
+    std::ifstream inFile(electrodeFileName);
+
+    if(!inFile.is_open()) {
+        qDebug()<<"Error opening file";
+        //Why are we not returning?
+//        return false;
+    }
+
+    //Start reading from file
+    double numberElectrodes;
+    int i = 0;
+
+    std::string line;
+    while(std::getline(inFile, line)){
+        std::vector<std::string> fields;
+        std::stringstream stream{line};
+        std::string element;
+
+        stream >> std::ws;
+        while(stream >> element){
+            fields.push_back(std::move(element));
+            stream >> std::ws;
+        }
+
+        //Read number of electrodes
+        if(i == 0){
+            numberElectrodes = std::stod(fields.at(fields.size()-1));
+            electrodes = MatrixXf::Zero(numberElectrodes, 3);
+        }
+
+        //Read actual electrode positions
+        else{
+            Vector3f x;
+            x << std::stof(fields.at(fields.size()-3)), std::stof(fields.at(fields.size()-2)), std::stof(fields.at(fields.size()-1));
+            electrodes.row(i-1)=x.transpose();
+        }
+        i++;
+    }
+
     return electrodes;
 }
