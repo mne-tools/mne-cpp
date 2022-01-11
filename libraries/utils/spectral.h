@@ -45,6 +45,9 @@
 
 #include "utils_global.h"
 
+#include <vector>
+#include <utility>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -118,6 +121,22 @@ public:
                                                                  int iNfft,
                                                                  bool bUseThreads = true);
 
+//    //=========================================================================================================
+//    /**
+//     * Calculates the full tapered spectra of a given input matrix data. This function calculates each row in parallel.
+//     *
+//     * @param[in] matData         input matrix data (time domain), for which the spectrum is computed.
+//     * @param[in] matTaper        tapers used to compute the spectra.
+//     * @param[in] iNfft           FFT length.
+//     * @param[in] bUseThreads Whether to use multiple threads.
+//     *
+//     * @return tapered spectra of the input data.
+//     */
+//    static std::vector<Eigen::MatrixXcd> computeTaperedSpectraMatrix(const Eigen::MatrixXd &matData,
+//                                                                    const Eigen::MatrixXd &matTaper,
+//                                                                    int iNfft,
+//                                                                    bool bUseThreads = true);
+
     //=========================================================================================================
     /**
      * Computes the tapered spectra for a row vector. This function gets called in parallel.
@@ -137,6 +156,16 @@ public:
      */
     static void reduce(QVector<Eigen::MatrixXcd>& finalData,
                        const Eigen::MatrixXcd& resultData);
+
+//    //=========================================================================================================
+//    /**
+//     * Reduces the taperedSpectra results to a final result. This function gets called in parallel.
+//     *
+//     * @param[out] finalData    The final data data.
+//     * @param[in] resultData   The resulting data from the computation step.
+//     */
+//    static void reduce(std::vector<Eigen::MatrixXcd>& finalData,
+//                       const Eigen::MatrixXcd& resultData);
 
     //=========================================================================================================
     /**
@@ -196,6 +225,18 @@ public:
      */
     static QPair<Eigen::MatrixXd, Eigen::VectorXd> generateTapers(int iSignalLength,
                                                                   const QString &sWindowType = "hanning");
+
+    //=========================================================================================================
+    /**
+     * Calculates a hanning window of given length
+     *
+     * @param[in] iSignalLength    length of the hanning window.
+     * @param[in] sWindowType      type of the window function used to compute tapered spectra.
+     *
+     * @return Qpair of tapers and taper weights.
+     */
+    static std::pair<Eigen::MatrixXd, Eigen::VectorXd> generateTapers(int iSignalLength,
+                                                                  const std::string &sWindowType = "hanning");
 
 private:
     //=========================================================================================================
