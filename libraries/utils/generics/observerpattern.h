@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include "../utils_global.h"
+#include <set>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -147,6 +148,14 @@ public:
      */
     inline t_Observers& observers();
 
+//    //=========================================================================================================
+//    /**
+//     * Returns attached observers.
+
+//     * @return attached observers.
+//     */
+//    inline std::set<IObserver*>& observers();
+
     //=========================================================================================================
     /**
      * Returns number of attached observers.
@@ -165,6 +174,7 @@ protected:
 
 private:
     t_Observers                 m_Observers;    /**< Holds the attached observers.*/
+//    std::set<IObserver*>        m_Observers;    /**< Holds the attached observers.*/
 };
 
 //=============================================================================================================
@@ -175,6 +185,11 @@ inline Subject::t_Observers& Subject::observers()
 {
     return m_Observers;
 }
+
+//inline std::set<IObserver*>& Subject::observers()
+//{
+//    return m_Observers;
+//}
 
 } // Namespace
 
