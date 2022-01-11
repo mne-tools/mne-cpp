@@ -71,12 +71,6 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-LayoutMaker::LayoutMaker()
-{
-}
-
-//=============================================================================================================
-
 bool LayoutMaker::makeLayout(const QList<QVector<float> > &inputPoints,
                              QList<QVector<float> > &outputPoints,
                              const QStringList &names,
@@ -106,7 +100,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<float> > &inputPoints,
     VectorXf yy(nchan);
 
     if (nchan <= 0) {
-        std::cout << "No input points to lay out." << std::endl;
+        std::cout << "No input points to lay out.\n";
         return false;
     }
 
@@ -117,11 +111,11 @@ bool LayoutMaker::makeLayout(const QList<QVector<float> > &inputPoints,
         rrs(k,2) = inputPoints.at(k)[2]; //z
     }
 
-    std::cout << "Channels found for layout: " << nchan << std::endl;
+    std::cout << "Channels found for layout: " << nchan << "\n";
 
     //Fit to sphere if wanted by the user
     if (!do_fit) {
-        std::cout << "Using default origin:" << r0[0] << ", " << r0[1] << ", " << r0[2] << std::endl;
+        std::cout << "Using default origin:" << r0[0] << ", " << r0[1] << ", " << r0[2] << "\n";
     }
     else {
         Sphere sphere = Sphere::fit_sphere_simplex(rrs, 0.05);
@@ -129,8 +123,8 @@ bool LayoutMaker::makeLayout(const QList<QVector<float> > &inputPoints,
         r0 = sphere.center();
         rad = sphere.radius();
 
-        std::cout << "best fitting sphere:" << std::endl;
-        std::cout << "torigin: " << r0[0] << ", " << r0[1] << ", " << r0[2] << std::endl << "; tradius: " << rad << std::endl;
+        std::cout << "best fitting sphere:\n";
+        std::cout << "torigin: " << r0[0] << ", " << r0[1] << ", " << r0[2] << std::endl << "; tradius: " << rad << "\n";
     }
 
     /*
@@ -161,7 +155,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<float> > &inputPoints,
     }
 
     if(xmin == xmax || ymin == ymax) {
-        std::cout<<"Cannot make a layout. All positions are identical"<<std::endl;
+        std::cout<<"Cannot make a layout. All positions are identical\n";
         return false;
     }
 
@@ -179,7 +173,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<float> > &inputPoints,
 
     if(writeFile) {
         if (!outFile.open(QIODevice::WriteOnly)) {
-            std::cout << "Could not open output file!" << std::endl;
+            std::cout << "Could not open output file!\n";
             return false;
         }
 
@@ -213,9 +207,151 @@ bool LayoutMaker::makeLayout(const QList<QVector<float> > &inputPoints,
     }
 
     if(writeFile) {
-        std::cout << "Success while wrtiting to output file." << std::endl;
+        std::cout << "Success while wrtiting to output file.\n";
 
         outFile.close();
+    }
+
+    return true;
+}
+
+//=============================================================================================================
+
+bool LayoutMaker::makeLayout(const std::vector<std::vector<float> > &inputPoints,
+                             std::vector<std::vector<float> > &outputPoints,
+                             const std::vector<std::string> &names,
+                             const std::string& outFilePath,
+                             bool do_fit,
+                             float prad,
+                             float w,
+                             float h,
+                             bool writeFile,
+                             bool mirrorXAxis,
+                             bool mirrorYAxis)
+{
+    /*
+     * Automatically make a layout according to the
+     * channel locations in inputPoints
+     */
+    VectorXf    r0(3);
+    VectorXf    rr(3);
+    float       rad,th,phi;
+
+    float       xmin,xmax,ymin,ymax;
+    int         nchan = inputPoints.size();
+
+    MatrixXf rrs(nchan,3);
+    VectorXf xx(nchan);
+    VectorXf yy(nchan);
+
+    if (nchan <= 0) {
+        std::cout << "No input points to lay out.\n";
+        return false;
+    }
+
+    //Fill matrix with 3D points
+    for(int k = 0; k < nchan; k++) {
+        rrs(k,0) = inputPoints.at(k)[0]; //x
+        rrs(k,1) = inputPoints.at(k)[1]; //y
+        rrs(k,2) = inputPoints.at(k)[2]; //z
+    }
+
+    std::cout << "Channels found for layout: " << nchan << "\n";
+
+    //Fit to sphere if wanted by the user
+    if (!do_fit) {
+        std::cout << "Using default origin:" << r0[0] << ", " << r0[1] << ", " << r0[2] << "\n";
+    }
+    else {
+        Sphere sphere = Sphere::fit_sphere_simplex(rrs, 0.05);
+
+        r0 = sphere.center();
+        rad = sphere.radius();
+
+        std::cout << "best fitting sphere:\n";
+        std::cout << "torigin: " << r0[0] << ", " << r0[1] << ", " << r0[2] << std::endl << "; tradius: " << rad << "\n";
+    }
+
+    /*
+     * Do the azimuthal equidistant projection
+     */
+    for (int k = 0; k < nchan; k++) {
+        rr = r0 - static_cast<VectorXf>(rrs.row(k));
+        sphere_coord(rr[0],rr[1],rr[2],&rad,&th,&phi);
+        xx[k] = prad*(2.0*th/M_PI)*cos(phi);
+        yy[k] = prad*(2.0*th/M_PI)*sin(phi);
+    }
+
+    /*
+     * Find suitable range of viewports
+     */
+    xmin = xmax = xx[0];
+    ymin = ymax = yy[0];
+
+    for(int k = 1; k < nchan; k++) {
+        if (xx[k] > xmax)
+            xmax = xx[k];
+        else if (xx[k] < xmin)
+            xmin = xx[k];
+        if (yy[k] > ymax)
+            ymax = yy[k];
+        else if (yy[k] < ymin)
+            ymin = yy[k];
+    }
+
+    if(xmin == xmax || ymin == ymax) {
+        std::cout<<"Cannot make a layout. All positions are identical\n";
+        return false;
+    }
+
+    xmax = xmax + 0.6*w;
+    xmin = xmin - 0.6*w;
+
+    ymax = ymax + 0.6*h;
+    ymin = ymin - 0.6*h;
+
+    /*
+     * Compose the viewports
+     */
+    std::vector<float> point;
+    std::ofstream outFile;
+
+    if(writeFile) {
+        outFile.open(outFilePath);
+        if (outFile.is_open()) {
+            std::cout << "Could not open output file!\n";
+            return false;
+        }
+        outFile << "0.000000 0.000000 0.000000 0.000000" << std::endl;
+    }
+
+
+    for(int k = 0; k < nchan; k++) {
+        point.clear();
+
+        if(mirrorXAxis)
+            point.push_back(-(xx[k]-0.5*w));
+        else
+            point.push_back(xx[k]-0.5*w);
+
+        if(mirrorYAxis)
+            point.push_back(-(yy[k]-0.5*h));
+        else
+            point.push_back(yy[k]-0.5*h);
+
+        outputPoints.push_back(point);
+
+        if(writeFile) {
+            if((k) < names.size()) {
+                outFile << k+1 << " " << point[0] << " " << point[1] << " " << w << " " << h << " " << names.at(k) << std::endl;
+            } else {
+                outFile << k+1 << " " << point[0] << " " << point[1] << " " << w << " " << h << std::endl;
+            }
+        }
+    }
+
+    if(writeFile) {
+        std::cout << "Success while wrtiting to output file.\n";
     }
 
     return true;

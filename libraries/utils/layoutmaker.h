@@ -42,6 +42,10 @@
 
 #include "utils_global.h"
 
+#include <vector>
+#include <string>
+#include <fstream>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -83,11 +87,6 @@ typedef struct {
 class UTILSSHARED_EXPORT LayoutMaker
 {
 public:
-    //=========================================================================================================
-    /**
-     * Constructs a LayoutMaker object.
-     */
-    LayoutMaker();
 
     //=========================================================================================================
     /**
@@ -117,6 +116,36 @@ public:
                            bool writeFile = false,
                            bool mirrorXAxis = false,
                            bool mirrorYAxis = false);
+
+    //=========================================================================================================
+    /**
+     * Reads the specified ANT elc-layout file.
+     * @param[in] inputPoints       The input points in 3D space.
+     * @param[in, out] outputPoints     The output layout points in 2D space.
+     * @param[in] names             The channel names.
+     * @param[in] outFile           The outout file.
+     * @param[in] do_fit            The flag whether to do a sphere fitting.
+     * @param[in] prad.
+     * @param[in] w.
+     * @param[in] h.
+     * @param[in] writeFile         The flag whether to write to file.
+     * @param[in] mirrorXAxis       Mirror points at x axis.
+     * @param[in] mirrorYAxis       Mirror points at y axis.
+     *
+     * @return true if making layout was successful, false otherwise.
+     */
+    static bool makeLayout(const std::vector<std::vector<float> > &inputPoints,
+                           std::vector<std::vector<float> > &outputPoints,
+                           const std::vector<std::string> &names,
+                           const std::string& outFilePath,
+                           bool do_fit,
+                           float prad,
+                           float w,
+                           float h,
+                           bool writeFile = false,
+                           bool mirrorXAxis = false,
+                           bool mirrorYAxis = false);
+
 
 private:
     static void sphere_coord(float x,
