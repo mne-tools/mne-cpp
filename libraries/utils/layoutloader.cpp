@@ -156,7 +156,7 @@ bool LayoutLoader::readAsaElcFile(const std::string &path,
                                   std::string &unit)
 {
 
-    if(std::find(path.begin(), path.end(), ".elc") == path.end()){
+    if(path.find(".elc") == std::string::npos){
         return false;
     }
 
@@ -174,7 +174,7 @@ bool LayoutLoader::readAsaElcFile(const std::string &path,
     std::string line;
 
     while(std::getline(inFile, line)){
-        if(std::find(line.begin(), line.end(), '#') == line.end()){
+        if(line.find('#') == std::string::npos){
             std::vector<std::string> elements;
             std::stringstream stream{line};
             std::string element;
@@ -186,18 +186,18 @@ bool LayoutLoader::readAsaElcFile(const std::string &path,
             }
 
             //Read number of electrodes
-            if(std::find(line.begin(), line.end(), "NumberPositions") != line.end())
+            if(line.find("NumberPositions") != std::string::npos)
                 numberElectrodes = std::stod(elements.at(1));
 
             //Read the unit of the position values
-            if(std::find(line.begin(), line.end(), "UnitPosition") != line.end())
+            if(line.find("UnitPosition") != std::string::npos)
                 unit = elements.at(1);
 
             //Read actual electrode positions
-            if(std::find(line.begin(), line.end(), "Positions2D") != line.end())
+            if(line.find("Positions2D") != std::string::npos)
                 read2D = true;
 
-            if(std::find(line.begin(), line.end(), ":") != line.end() && !read2D) //Read 3D positions
+            if(line.find(':') != std::string::npos && !read2D) //Read 3D positions
             {
                 channelNames.push_back(elements.at(0));
                 std::vector<float> posTemp;
@@ -209,7 +209,7 @@ bool LayoutLoader::readAsaElcFile(const std::string &path,
                 location3D.push_back(std::move(posTemp));
             }
 
-            if(std::find(line.begin(), line.end(), ":") != line.end() && read2D) //Read 2D positions
+            if(line.find(":") != std::string::npos && read2D) //Read 2D positions
             {
                 std::vector<float> posTemp;
                 posTemp.push_back(std::stod(elements.at(elements.size()-2)));    //x
@@ -218,7 +218,7 @@ bool LayoutLoader::readAsaElcFile(const std::string &path,
             }
 
             //Read channel names
-            if(std::find(line.begin(), line.end(), "Labels") != line.end())
+            if(line.find("Labels") != std::string::npos)
             {
                 std::getline(inFile, line);
                 std::stringstream channels{line};
@@ -292,7 +292,7 @@ bool LayoutLoader::readMNELoutFile(const QString &path, QMap<QString, QPointF> &
 bool LayoutLoader::readMNELoutFile(const std::string &path, QMap<std::string, QPointF> &channelData)
 {
 
-    if(std::find(path.begin(), path.end(), ".lout") == path.end()){
+    if(path.find(".lout") == std::string::npos){
         return false;
     }
 
@@ -308,7 +308,7 @@ bool LayoutLoader::readMNELoutFile(const std::string &path, QMap<std::string, QP
     std::string line;
 
     while(std::getline(inFile, line)){
-        if(std::find(line.begin(), line.end(), '#') == line.end()){
+        if(line.find('#') != std::string::npos){
             std::vector<std::string> elements;
             std::stringstream stream{line};
             std::string element;
