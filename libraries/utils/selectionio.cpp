@@ -40,6 +40,9 @@
 #include "selectionio.h"
 
 #include <iostream>
+#include <fstream>
+#include <sstream>
+#include <filesystem>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -112,6 +115,48 @@ bool SelectionIO::readMNESelFile(QString path, QMap<QString,QStringList> &select
 
 //=============================================================================================================
 
+bool SelectionIO::readMNESelFile(const std::string& path, std::multimap<std::string,std::vector<std::string>> &selectionMap)
+{
+    //Open .sel file
+    if(path.find(".sel") != std::string::npos)
+        return false;
+
+    //clear the map first
+    selectionMap.clear();
+
+    std::ifstream inFile(path);
+    if(!inFile.is_open()){
+        qDebug()<<"Error opening selection file";
+        return false;
+    }
+
+    std::string line;
+
+    while(std::getline(inFile, line)){
+        if(line.find('%') == std::string::npos && line.find(':') != std::string::npos){
+            std::stringstream stream{line};
+            std::vector<std::string> firstSplit;
+            for (std::string element; std::getline(stream, line, ':');){
+                firstSplit.push_back(std::move(element));
+            }
+            std::string key = firstSplit.at(0);
+
+            std::vector<std::string> secondSplit;
+            for (std::string element; std::getline(stream, line, '|');){
+                secondSplit.push_back(std::move(element));
+            }
+            if(secondSplit.back() == ""){
+                secondSplit.pop_back();
+            }
+            selectionMap.insert({key, secondSplit});
+        }
+    }
+
+    return true;
+}
+
+//=============================================================================================================
+
 bool SelectionIO::readBrainstormMonFile(QString path, QMap<QString,QStringList> &selectionMap)
 {
     //Open .sel file
@@ -152,6 +197,44 @@ bool SelectionIO::readBrainstormMonFile(QString path, QMap<QString,QStringList> 
 
 //=============================================================================================================
 
+bool SelectionIO::readBrainstormMonFile(const std::string& path, std::multimap<std::string,std::vector<std::string>>& selectionMap)
+{
+    //Open file
+    if(path.find(".mon") != std::string::npos)
+        return false;
+
+    //clear the map first
+    selectionMap.clear();
+
+    std::ifstream inFile(path);
+    if(!inFile.is_open()){
+        qDebug()<<"Error opening montage file";
+        return false;
+    }
+    std::vector<std::string> channels;
+
+    std::string groupName;
+    std::getline(inFile, groupName);
+
+    std::string line;
+    while(std::getline(inFile, line)){
+        if(line.find(':') != std::string::npos){
+            std::stringstream stream{line};
+            std::vector<std::string> split;
+            for (std::string element; std::getline(stream, line, ':');){
+                split.push_back(std::move(element));
+            }
+            channels.push_back(split.at(0));
+        }
+    }
+
+    selectionMap.insert({groupName, channels});
+
+    return true;
+}
+
+//=============================================================================================================
+
 bool SelectionIO::writeMNESelFile(QString path, const QMap<QString,QStringList> &selectionMap)
 {
     //Open .sel file
@@ -180,6 +263,31 @@ bool SelectionIO::writeMNESelFile(QString path, const QMap<QString,QStringList> 
     }
 
     file.close();
+
+    return true;
+}
+
+//=============================================================================================================
+
+bool SelectionIO::writeMNESelFile(const std::string& path, const std::map<std::string,std::vector<std::string>>& selectionMap)
+{
+    //Open .sel file
+    if(path.find(".sel") == std::string::npos)
+        return false;
+
+    std::ofstream outFile(path);
+    if (outFile.is_open()){
+        qDebug()<<"Error opening sel file for writing";
+        return false;
+    }
+
+    for(auto& mapElement : selectionMap){
+        outFile << mapElement.first << ":";
+        for(auto& vectorElement : mapElement.second){
+            outFile << vectorElement << "|";
+        }
+        outFile << "\n" << "\n";
+    }
 
     return true;
 }
@@ -217,6 +325,32 @@ bool SelectionIO::writeBrainstormMonFiles(QString path, const QMap<QString,QStri
             out << i.value().at(u) << " : " << i.value().at(u) << "\n";
 
         file.close();
+    }
+
+    return true;
+}
+
+//=============================================================================================================
+
+bool SelectionIO::writeBrainstormMonFiles(const std::string& path, const std::map<std::string,std::vector<std::string>>& selectionMap)
+{
+    //Open file
+    if(path.find(".mon") == std::string::npos)
+        return false;
+
+    for(auto& mapElement : selectionMap){
+        //logic of using parent_path here might not be "correct"
+        std::string newPath = std::filesystem::absolute(std::filesystem::path(path).parent_path()) /= (mapElement.first + ".mon");
+        std::ofstream outFile(newPath);
+        if(!outFile.is_open()){
+            qDebug()<<"Error opening mon file for writing";
+            return false;
+        }
+
+        outFile << mapElement.first << "\n";
+        for(auto& vectorElement : mapElement.second){
+            outFile << vectorElement << " : " << vectorElement << "\n";
+        }
     }
 
     return true;
