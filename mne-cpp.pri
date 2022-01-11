@@ -59,7 +59,7 @@ QMAKE_TARGET_COPYRIGHT = Copyright (C) 2020 Authors of MNE-CPP. All rights reser
 MNECPP_CONFIG +=
 
 # Define c++ version
-CONFIG += c++17
+CONFIG += c++14
 
 # Suppress untested SDK version checks on MacOS
 macx {
