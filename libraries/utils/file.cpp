@@ -39,11 +39,7 @@
 #include "file.h"
 #include <fstream>
 
-#if __cplusplus >= 201703L
-#include <filesystem>
-#else
 #include <cstdio>
-#endif
 
 //=============================================================================================================
 // USED NAMESPACES
