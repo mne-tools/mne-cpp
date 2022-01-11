@@ -186,6 +186,14 @@ void Spectral::reduce(QVector<MatrixXcd>& finalData,
 
 //=============================================================================================================
 
+//void Spectral::reduce(std::vector<MatrixXcd>& finalData,
+//                      const MatrixXcd& resultData)
+//{
+//    finalData.push_back(resultData);
+//}
+
+//=============================================================================================================
+
 Eigen::RowVectorXd Spectral::psdFromTaperedSpectra(const Eigen::MatrixXcd &matTapSpectrum,
                                                    const Eigen::VectorXd &vecTapWeights,
                                                    int iNfft,
@@ -283,6 +291,24 @@ VectorXd Spectral::calculateFFTFreqs(int iNfft, double dSampFreq)
 QPair<MatrixXd, VectorXd> Spectral::generateTapers(int iSignalLength, const QString &sWindowType)
 {
     QPair<MatrixXd, VectorXd> pairOut;
+    if (sWindowType == "hanning") {
+        pairOut.first = hanningWindow(iSignalLength);
+        pairOut.second = VectorXd::Ones(1);
+    } else if (sWindowType == "ones") {
+        pairOut.first = MatrixXd::Ones(1, iSignalLength) / double(iSignalLength);
+        pairOut.second = VectorXd::Ones(1);
+    } else {
+        pairOut.first = hanningWindow(iSignalLength);
+        pairOut.second = VectorXd::Ones(1);
+    }
+    return pairOut;
+}
+
+//=============================================================================================================
+
+std::pair<MatrixXd, VectorXd> Spectral::generateTapers(int iSignalLength, const std::string &sWindowType)
+{
+    std::pair<MatrixXd, VectorXd> pairOut;
     if (sWindowType == "hanning") {
         pairOut.first = hanningWindow(iSignalLength);
         pairOut.second = VectorXd::Ones(1);
