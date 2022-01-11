@@ -57,12 +57,8 @@ using namespace UTILSLIB;
 
 bool File::exists(const char* filePath)
 {
-#if __cplusplus >= 201703L
-    return std::filesystem::exists(filePath);
-#else
     std::ifstream infile(filePath);
     return infile.good();
-#endif
 }
 
 //=============================================================================================================
@@ -79,11 +75,6 @@ bool File::copy(const char* sourcePath, const char* destPath)
     if (!exists(sourcePath) || exists(destPath)){
         return false;
     }
-
-#if __cplusplus >= 201703L
-    std::filesystem::copy(sourcePath, destPath);
-    return exists(destPath);
-#else
     std::ifstream source(sourcePath, std::ios::binary);
     std::ofstream destination(destPath, std::ios::binary);
 
@@ -92,7 +83,6 @@ bool File::copy(const char* sourcePath, const char* destPath)
     } else {
         return false;
     }
-#endif
 }
 
 //=============================================================================================================
@@ -109,13 +99,7 @@ bool File::rename(const char* sourcePath, const char* destPath)
     if (!exists(sourcePath) || exists(destPath)){
         return false;
     }
-
-#if __cplusplus >= 201703L
-    std::filesystem::rename(sourcePath, destPath);
-    return (!exists(sourcePath) && exists(destPath));
-#else
     return !std::rename(sourcePath, destPath); //std::rename returns 0 upon success
-#endif
 }
 
 //=============================================================================================================
@@ -133,12 +117,7 @@ bool File::remove(const char* filePath)
         return false;
     }
 
-#if __cplusplus >= 201703L
-    std::filesystem::remove(filePath);
-    return !exists(filePath);
-#else
     return !std::remove(filePath); //std::remove returns 0 upon success
-#endif
 }
 
 //=============================================================================================================
