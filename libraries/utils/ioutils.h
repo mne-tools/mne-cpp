@@ -397,49 +397,49 @@ bool IOUtils::write_eigen_matrix(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::D
 
 //=============================================================================================================
 
-template<typename T>
-bool IOUtils::write_eigen_matrix(const Eigen::Matrix<T, 1, Eigen::Dynamic>& in, const std::string& sPath, const std::string& sDescription)
-{
-    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1,in.cols());
-    matrixName.row(0)= in;
-    return IOUtils::write_eigen_matrix(matrixName, sPath, sDescription);
-}
+//template<typename T>
+//bool IOUtils::write_eigen_matrix(const Eigen::Matrix<T, 1, Eigen::Dynamic>& in, const std::string& sPath, const std::string& sDescription)
+//{
+//    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(1,in.cols());
+//    matrixName.row(0)= in;
+//    return IOUtils::write_eigen_matrix(matrixName, sPath, sDescription);
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-template<typename T>
-bool IOUtils::write_eigen_matrix(const Eigen::Matrix<T, Eigen::Dynamic, 1>& in, const std::string& sPath, const std::string& sDescription)
-{
-    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(in.rows(),1);
-    matrixName.col(0)= in;
-    return IOUtils::write_eigen_matrix(matrixName, sPath, sDescription);
-}
+//template<typename T>
+//bool IOUtils::write_eigen_matrix(const Eigen::Matrix<T, Eigen::Dynamic, 1>& in, const std::string& sPath, const std::string& sDescription)
+//{
+//    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName(in.rows(),1);
+//    matrixName.col(0)= in;
+//    return IOUtils::write_eigen_matrix(matrixName, sPath, sDescription);
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-template<typename T>
-bool IOUtils::write_eigen_matrix(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& in, const std::string& sPath, const std::string& sDescription)
-{
-    std::ofstream outputFile(sPath);
-    if(outputFile.is_open())
-    {
-        if(!sDescription.empty()) {
-            outputFile<<"# Dimensions (rows x cols): "<<in.rows()<<" x "<<in.cols()<<"\n";
-            outputFile<<"# Description: "<<sDescription<<"\n";
-        }
+//template<typename T>
+//bool IOUtils::write_eigen_matrix(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& in, const std::string& sPath, const std::string& sDescription)
+//{
+//    std::ofstream outputFile(sPath);
+//    if(outputFile.is_open())
+//    {
+//        if(!sDescription.empty()) {
+//            outputFile<<"# Dimensions (rows x cols): "<<in.rows()<<" x "<<in.cols()<<"\n";
+//            outputFile<<"# Description: "<<sDescription<<"\n";
+//        }
 
-        for(int row = 0; row<in.rows(); row++) {
-            for(int col = 0; col<in.cols(); col++)
-                outputFile << in(row, col)<<" ";
-            outputFile<<"\n";
-        }
-    } else {
-        qWarning()<<"Could not write Eigen element to file! Path does not exist!";
-        return false;
-    }
+//        for(int row = 0; row<in.rows(); row++) {
+//            for(int col = 0; col<in.cols(); col++)
+//                outputFile << in(row, col)<<" ";
+//            outputFile<<"\n";
+//        }
+//    } else {
+//        qWarning()<<"Could not write Eigen element to file! Path does not exist!";
+//        return false;
+//    }
 
-    return true;
-}
+//    return true;
+//}
 
 //=============================================================================================================
 
@@ -523,86 +523,86 @@ bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
 
 //=============================================================================================================
 
-template<typename T>
-bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, 1, Eigen::Dynamic>& out, const std::string& path)
-{
-    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName;
-    bool bStatus = IOUtils::read_eigen_matrix(matrixName, path);
+//template<typename T>
+//bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, 1, Eigen::Dynamic>& out, const std::string& path)
+//{
+//    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName;
+//    bool bStatus = IOUtils::read_eigen_matrix(matrixName, path);
 
-    if(matrixName.rows() > 0)
-    {
-        out = matrixName.row(0);
-    }
+//    if(matrixName.rows() > 0)
+//    {
+//        out = matrixName.row(0);
+//    }
 
-    return bStatus;
-}
+//    return bStatus;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-template<typename T>
-bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, 1>& out, const std::string& path)
-{
-    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName;
-    bool bStatus = IOUtils::read_eigen_matrix(matrixName, path);
+//template<typename T>
+//bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, 1>& out, const std::string& path)
+//{
+//    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrixName;
+//    bool bStatus = IOUtils::read_eigen_matrix(matrixName, path);
 
-    if(matrixName.cols() > 0)
-    {
-        out = matrixName.col(0);
-    }
+//    if(matrixName.cols() > 0)
+//    {
+//        out = matrixName.col(0);
+//    }
 
-    return bStatus;
-}
+//    return bStatus;
+//}
 
-//=============================================================================================================
+////=============================================================================================================
 
-template<typename T>
-bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& out, const std::string& path)
-{
-    std::ifstream inputFile(path);
+//template<typename T>
+//bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& out, const std::string& path)
+//{
+//    std::ifstream inputFile(path);
 
-    if(inputFile.is_open()) {
-        //Start reading from file
-        std::vector<Eigen::VectorXd> help;
+//    if(inputFile.is_open()) {
+//        //Start reading from file
+//        std::vector<Eigen::VectorXd> help;
 
-        std::string line;
+//        std::string line;
 
-        while(std::getline(inputFile, line)){
-            if(line.find('#') == std::string::npos){
-                std::vector<double> elements;
-                std::stringstream stream{line};
-                std::string element;
+//        while(std::getline(inputFile, line)){
+//            if(line.find('#') == std::string::npos){
+//                std::vector<double> elements;
+//                std::stringstream stream{line};
+//                std::string element;
 
-                stream >> std::ws;
-                while(stream >> element){
-                    elements.push_back(std::stod(element));
-                    stream >> std::ws;
-                }
+//                stream >> std::ws;
+//                while(stream >> element){
+//                    elements.push_back(std::stod(element));
+//                    stream >> std::ws;
+//                }
 
-                Eigen::VectorXd x (elements.size());
+//                Eigen::VectorXd x (elements.size());
 
-                for(size_t i = 0; i < elements.size(); ++i){
-                    x(i) = elements.at(i);
-                }
+//                for(size_t i = 0; i < elements.size(); ++i){
+//                    x(i) = elements.at(i);
+//                }
 
-                help.push_back(std::move(x));
-            }
-        }
+//                help.push_back(std::move(x));
+//            }
+//        }
 
-        int rows = help.size();
-        int cols = rows <= 0 ? 0 : help.at(0).rows();
+//        int rows = help.size();
+//        int cols = rows <= 0 ? 0 : help.at(0).rows();
 
-        out.resize(rows, cols);
+//        out.resize(rows, cols);
 
-        for (size_t i = 0; i < help.size(); i++) {
-            out.row(i) = help[i].transpose();
-        }
-    } else {
-        qWarning()<<"IOUtils::read_eigen_matrix - Could not read Eigen element from file! Path does not exist!";
-        return false;
-    }
+//        for (size_t i = 0; i < help.size(); i++) {
+//            out.row(i) = help[i].transpose();
+//        }
+//    } else {
+//        qWarning()<<"IOUtils::read_eigen_matrix - Could not read Eigen element from file! Path does not exist!";
+//        return false;
+//    }
 
-    return true;
-}
+//    return true;
+//}
 } // NAMESPACE
 
 #endif // IOUTILS_H
