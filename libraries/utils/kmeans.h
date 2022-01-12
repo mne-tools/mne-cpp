@@ -96,23 +96,23 @@ public:
                     bool online = true,
                     qint32 maxit = 100);
 
-    //=========================================================================================================
-    /**
-     * Constructs a KMeans algorithm object.
-     *
-     * @param[in] distance   (optional) K-Means distance measure: "sqeuclidean" (default), "cityblock" , "cosine", "correlation", "hamming".
-     * @param[in] start      (optional) Cluster initialization: "sample" (default), "uniform", "cluster".
-     * @param[in] replicates (optional) Number of K-Means replicates, which are generated. Best is returned.
-     * @param[in] emptyact   (optional) What happens if a cluster wents empty: "error" (default), "drop", "singleton".
-     * @param[in] online     (optional) If centroids should be updated during iterations: true (default), false.
-     * @param[in] maxit      (optional) maximal number of iterations per replicate; 100 by default.
-     */
-    explicit KMeans(std::string distance = std::string{"sqeuclidean"} ,
-                    std::string start = std::string{"sample"},
-                    qint32 replicates = 1,
-                    std::string emptyact = std::string{"error"},
-                    bool online = true,
-                    qint32 maxit = 100);
+//    //=========================================================================================================
+//    /**
+//     * Constructs a KMeans algorithm object.
+//     *
+//     * @param[in] distance   (optional) K-Means distance measure: "sqeuclidean" (default), "cityblock" , "cosine", "correlation", "hamming".
+//     * @param[in] start      (optional) Cluster initialization: "sample" (default), "uniform", "cluster".
+//     * @param[in] replicates (optional) Number of K-Means replicates, which are generated. Best is returned.
+//     * @param[in] emptyact   (optional) What happens if a cluster wents empty: "error" (default), "drop", "singleton".
+//     * @param[in] online     (optional) If centroids should be updated during iterations: true (default), false.
+//     * @param[in] maxit      (optional) maximal number of iterations per replicate; 100 by default.
+//     */
+//    explicit KMeans(std::string distance = std::string{"sqeuclidean"} ,
+//                    std::string start = std::string{"sample"},
+//                    qint32 replicates = 1,
+//                    std::string emptyact = std::string{"error"},
+//                    bool online = true,
+//                    qint32 maxit = 100);
 
     //=========================================================================================================
     /**
