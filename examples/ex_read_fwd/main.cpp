@@ -124,7 +124,7 @@ int main(int argc, char *argv[])
     qDebug() << "col_names:";
     qDebug() << t_clusteredFwd.sol->col_names;
     qDebug() << "write fwd data to ./test_fwd.txt ...";
-    IOUtils::write_eigen_matrix(t_clusteredFwd.sol->data,"./test_fwd.txt");
+    IOUtils::write_eigen_matrix(t_clusteredFwd.sol->data, QString("./test_fwd.txt"));
     qDebug() << "[done]";
 
     return app.exec();
