@@ -97,7 +97,7 @@ int main(int argc, char *argv[])
     }
 
     //Generate hanning window
-    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iNSamples, "hanning");
+    QPair<MatrixXd, VectorXd> tapers = Spectral::generateTapers(iNSamples, QString("hanning"));
     MatrixXd matTaps = tapers.first;
     VectorXd vecTapWeights = tapers.second;
 
