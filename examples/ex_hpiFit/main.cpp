@@ -272,6 +272,6 @@ int main(int argc, char *argv[])
             << "Average Duration:" << matPosition.col(9).mean() << "ms";
 
     if(bSave) {
-        IOUtils::write_eigen_matrix(matPosition, QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + sNameOut);
+        IOUtils::write_eigen_matrix(matPosition, QString(QCoreApplication::applicationDirPath() + "/MNE-sample-data/" + sNameOut));
     }
 }
