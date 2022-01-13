@@ -2,13 +2,14 @@
 /**
  * @file     spectral.cpp
  * @author   Daniel Strohmeier <Daniel.Strohmeier@tu-ilmenau.de>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
+ *           Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.0
  * @date     March, 2018
  *
  * @section  LICENSE
  *
- * Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2018, Daniel Strohmeier, Lorenz Esch, Gabriel Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
