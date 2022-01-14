@@ -126,6 +126,10 @@ void SensorSet::convertFromFwdCoilSet(const FwdCoilSet::SPtr pCoilMeg)
         this->r0(i,1) = coil->r0[1];
         this->r0(i,2) = coil->r0[2];
 
+        this->ez(i,0) = coil->ez[0];
+        this->ez(i,1) = coil->ez[1];
+        this->ez(i,2) = coil->ez[2];
+
         for (int p = 0; p < iNp; p++){
             this->w(i*iNp+p) = coil->w[p];
             for (int c = 0; c < 3; c++) {
@@ -144,6 +148,7 @@ void SensorSet::convertFromFwdCoilSet(const FwdCoilSet::SPtr pCoilMeg)
 
 void SensorSet::initMatrices(const int iNchan, const int iNp)
 {
+    this->ez = MatrixXd(iNchan,3);
     this->r0 = MatrixXd(iNchan,3);
     this->rmag = MatrixXd(iNchan*iNp,3);
     this->cosmag = MatrixXd(iNchan*iNp,3);
