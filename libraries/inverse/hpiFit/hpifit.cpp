@@ -97,9 +97,7 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
 {
     // init member variables
     m_HpiDataUpdater = HpiDataUpdater(pFiffInfo);
-    m_lChannels = m_HpiDataUpdater.getChannels();
-    m_sensors = SensorSet();
-    m_sensors.updateSensorSet(m_lChannels,2);
+    m_sensors = m_HpiDataUpdater.getSensors();
     m_signalModel = SignalModel();
 }
 
@@ -146,7 +144,8 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
                                const ModelParameters& modelParameters,
                                Eigen::MatrixXd& matAmplitudes)
 {
-    //Check if data was passed
+    // Check if data was passed
+    // TODO: move outside
     if(matProjectedData.rows() == 0 || matProjectedData.cols() == 0 ) {
         std::cout<<std::endl<< "HPIFit::computeAmplitudes - No data passed. Returning.";
         return;
@@ -218,8 +217,6 @@ void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
             if(vecChIdcs(j) < m_sensors.ncoils) {
                 Vector3d r0 = m_sensors.r0.row(vecChIdcs(j));
                 Vector3d ez = m_sensors.ez.row(vecChIdcs(j));
-                // Vector3f r0 = m_lChannels.at(vecChIdcs(j)).chpos.r0;
-                // matCoilPos.row(j) = (-1 * m_lChannels.at(vecChIdcs(j)).chpos.ez * 0.03 + r0).cast<double>();
                 matCoilPos.row(j) = (-1 * ez * 0.03 + r0);
             }
         }
@@ -247,7 +244,7 @@ void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
         vecGoF(i) = 1 - vecGoF(i);
     }
 
-    matCoilLoc = coil.pos;
+    matCoilLoc = std::move(coil.pos);
 }
 
 //=============================================================================================================
