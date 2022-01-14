@@ -208,16 +208,19 @@ void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
             int iChIdx = 0;
             VectorXd::Index indMax;
             matAmplitudes.col(j).maxCoeff(&indMax);
-            if(indMax < m_lChannels.size()) {
+            if(indMax < m_sensors.ncoils) {
                 iChIdx = indMax;
             }
             vecChIdcs(j) = iChIdx;
         }
         // and go 3 cm inwards from max channels
         for (int j = 0; j < vecChIdcs.rows(); ++j) {
-            if(vecChIdcs(j) < m_lChannels.size()) {
-                Vector3f r0 = m_lChannels.at(vecChIdcs(j)).chpos.r0;
-                matCoilPos.row(j) = (-1 * m_lChannels.at(vecChIdcs(j)).chpos.ez * 0.03 + r0).cast<double>();
+            if(vecChIdcs(j) < m_sensors.ncoils) {
+                Vector3d r0 = m_sensors.r0.row(vecChIdcs(j));
+                Vector3d ez = m_sensors.ez.row(vecChIdcs(j));
+                // Vector3f r0 = m_lChannels.at(vecChIdcs(j)).chpos.r0;
+                // matCoilPos.row(j) = (-1 * m_lChannels.at(vecChIdcs(j)).chpos.ez * 0.03 + r0).cast<double>();
+                matCoilPos.row(j) = (-1 * ez * 0.03 + r0);
             }
         }
     }
