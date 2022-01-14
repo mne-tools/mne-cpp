@@ -111,6 +111,7 @@ public:
     void updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
                          const int iAccuracy);
 
+    Eigen::MatrixXd ez;
     Eigen::MatrixXd r0;
     Eigen::MatrixXd rmag;
     Eigen::MatrixXd cosmag;
