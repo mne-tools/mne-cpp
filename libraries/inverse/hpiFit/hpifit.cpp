@@ -97,8 +97,9 @@ HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
 {
     // init member variables
     m_HpiDataUpdater = HpiDataUpdater(pFiffInfo);
-
-    // update ModelParameters for model
+    m_lChannels = m_HpiDataUpdater.getChannels();
+    m_sensors = SensorSet();
+    m_sensors.updateSensorSet(m_lChannels,2);
     m_signalModel = SignalModel();
 }
 
@@ -116,7 +117,7 @@ void HPIFit::fit(const MatrixXd& matData,
                       modelParameters,
                       matAmplitudes);
 
-    int iNumCoils = hpiFitResult.hpiFreqs.size();
+    int iNumCoils = modelParameters.vecHpiFreqs.size();
     MatrixXd matCoilPos = MatrixXd::Zero(iNumCoils,3);
     computeCoilLocation(matAmplitudes,
                         matProjectors,
@@ -188,7 +189,6 @@ void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
                                  const float fAbortError)
 {
     const auto& matHeadHPI = m_HpiDataUpdater.getHpiDigitizer();
-    const auto& lChannels = m_HpiDataUpdater.getChannels();
     int iNumCoils = matAmplitudes.cols();
     MatrixXd matCoilPos = MatrixXd::Zero(iNumCoils,3);
 
@@ -205,16 +205,16 @@ void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
             int iChIdx = 0;
             VectorXd::Index indMax;
             matAmplitudes.col(j).maxCoeff(&indMax);
-            if(indMax < lChannels.size()) {
+            if(indMax < m_lChannels.size()) {
                 iChIdx = indMax;
             }
             vecChIdcs(j) = iChIdx;
         }
         // and go 3 cm inwards from max channels
         for (int j = 0; j < vecChIdcs.rows(); ++j) {
-            if(vecChIdcs(j) < lChannels.size()) {
-                Vector3f r0 = lChannels.at(vecChIdcs(j)).chpos.r0;
-                matCoilPos.row(j) = (-1 * lChannels.at(vecChIdcs(j)).chpos.ez * 0.03 + r0).cast<double>();
+            if(vecChIdcs(j) < m_lChannels.size()) {
+                Vector3f r0 = m_lChannels.at(vecChIdcs(j)).chpos.r0;
+                matCoilPos.row(j) = (-1 * m_lChannels.at(vecChIdcs(j)).chpos.ez * 0.03 + r0).cast<double>();
             }
         }
     }
@@ -228,10 +228,9 @@ void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
 
     // dipole fit
     const auto& matPreparedProjector = m_HpiDataUpdater.getProjectors();
-    const auto& sensors = m_HpiDataUpdater.getSensors();
 
     coil = dipfit(coil,
-                  sensors,
+                  m_sensors,
                   matAmplitudes,
                   iNumCoils,
                   matPreparedProjector,
@@ -257,7 +256,7 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilPos,
 
     // prepare dropping coils
     MatrixXd matTrans(4,4);
-    MatrixXd matHeadHPI = m_HpiDataUpdater.getHpiDigitizer();
+    MatrixXd matHeadHPI = m_HpiDataUpdater.getHpiDigitizer(); // move outside
     matTrans = computeTransformation(matHeadHPI,matCoilPos);
 
     // Store the final result to fiff info
@@ -270,6 +269,8 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilPos,
     MatrixXd matDiffPos = matTestPos - matHeadHPI;
 
     // compute error
+    int iNumCoils = matCoilPos.rows();
+    vecError = QVector<double>(iNumCoils);
     for(int i = 0; i < matDiffPos.rows(); ++i) {
         vecError[i] = matDiffPos.row(i).norm();
     }
@@ -278,7 +279,7 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilPos,
     fittedPointSet.clear();
 
     // Generate final fitted points and store in digitizer set
-    for(int i = 0; i < matCoilPos.rows(); ++i) {
+    for(int i = 0; i < iNumCoils; ++i) {
         FiffDigPoint digPoint;
         digPoint.kind = FIFFV_POINT_EEG; //Store as EEG so they have a different color
         digPoint.ident = i;
