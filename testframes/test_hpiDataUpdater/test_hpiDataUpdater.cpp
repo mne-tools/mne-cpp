@@ -39,6 +39,8 @@
 #include <utils/generics/applicationlogger.h>
 #include <iostream>
 #include <inverse/hpiFit/hpidataupdater.h>
+#include <inverse/hpiFit/sensorset.h>
+
 #include <fiff/fiff.h>
 
 //=============================================================================================================
@@ -90,7 +92,6 @@ private slots:
     void testCheckForUpdates_sensors();
     void testCheckForUpdates_data();
     void testCheckForUpdates_projectors();
-
     void cleanupTestCase();
 
 private:
@@ -304,8 +305,8 @@ void TestHpiDataUpdater::testGetSensors()
 {
     // extract data for channels to use
     int iAccuracy = 2;
-    SensorSet sensorsExpected = SensorSet();
-    sensorsExpected.updateSensorSet(m_lChannelsWithoutBads,iAccuracy);
+    SensorSetCreator sensorCreator;
+    SensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithoutBads,iAccuracy);
 
     HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
 
@@ -327,8 +328,9 @@ void TestHpiDataUpdater::testGetSensors_bads()
 {
     // extract data for channels to use
     int iAccuracy = 2;
-    SensorSet sensorsExpected = SensorSet();
-    sensorsExpected.updateSensorSet(m_lChannelsWithBads,iAccuracy);
+
+    SensorSetCreator sensorCreator;
+    SensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithBads,iAccuracy);
 
     m_pFiffInfo->bads << "MEG0113" << "MEG0112";
     HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
@@ -352,8 +354,8 @@ void TestHpiDataUpdater::testCheckForUpdates_sensors()
     HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
     m_pFiffInfo->bads << "MEG0113" << "MEG0112";
     int iAccuracy = 2;
-    SensorSet sensorsExpected = SensorSet();
-    sensorsExpected.updateSensorSet(m_lChannelsWithBads,iAccuracy);
+    SensorSetCreator sensorCreator;
+    SensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithBads,iAccuracy);
 
     /// act
     hpiData.checkForUpdate(m_pFiffInfo);
