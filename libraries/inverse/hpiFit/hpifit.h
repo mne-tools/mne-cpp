@@ -207,8 +207,7 @@ public:
      * @param[in]   bAdvanced          Use the advanced model to compute the coil amplitudes.
      *
      */
-    void computeAmplitudes(const Eigen::MatrixXd& matData,
-                           const Eigen::MatrixXd& matProjectors,
+    void computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
                            const ModelParameters& modelParameters,
                            Eigen::MatrixXd& matAmplitudes);
 
@@ -231,6 +230,7 @@ public:
                              const Eigen::MatrixXd& matProjectors,
                              const FIFFLIB::FiffCoordTrans& transDevHead,
                              const QVector<double>& vecError,
+                             const Eigen::MatrixXd& matHeadHPI,
                              Eigen::MatrixXd& matCoilLoc,
                              Eigen::VectorXd& vecGoF,
                              const int iMaxIterations = 500,
@@ -247,6 +247,7 @@ public:
      *
      */
     void computeHeadPosition(const Eigen::MatrixXd& matCoilsDev,
+                             const Eigen::MatrixXd& matCoilsHead,
                              FIFFLIB::FiffCoordTrans& transDevHead,
                              QVector<double> &vecError,
                              FIFFLIB::FiffDigPointSet& fittedPointSet);
