@@ -203,6 +203,7 @@ private:
     Eigen::MatrixXd m_matProjectors;        /**< The projectors ready to use*/
     Eigen::MatrixXd m_matInnerdata;         /**< The data ready to use*/
     Eigen::MatrixXd m_matDataProjected;     /**< The data with projectros applied*/
+    SensorSetCreator m_sensorSetCreator;
     SensorSet m_sensors;                    /**< The most recent SensorSet*/
 
 };

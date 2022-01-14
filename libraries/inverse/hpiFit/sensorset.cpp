@@ -70,20 +70,21 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SensorSet::SensorSet()
+SensorSetCreator::SensorSetCreator()
 {
-    this->ncoils = 0;
-    this->np = 0;
+    m_sensors = SensorSet();
+    m_sensors.ncoils = 0;
+    m_sensors.np = 0;
 }
 
 //=============================================================================================================
 
-void SensorSet::updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
+SensorSet SensorSetCreator::updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
                                 const int iAccuracy)
 {
     if(channelList.size() == 0) {
         std::cout<<std::endl<< "HPIFit::updateSensor - No channels. Returning.";
-        return;
+        return SensorSet();
     }
 
     if(!m_pCoilDefinitions) {
@@ -93,11 +94,12 @@ void SensorSet::updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
     auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(channelList, channelList.size(), iAccuracy, nullptr));
 
     convertFromFwdCoilSet(pCoilMeg);
+    return m_sensors;
 }
 
 //=============================================================================================================
 
-void SensorSet::readCoilDefinitions()
+void SensorSetCreator::readCoilDefinitions()
 {
     QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
     m_pCoilDefinitions = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath));
@@ -105,13 +107,13 @@ void SensorSet::readCoilDefinitions()
 
 //=============================================================================================================
 
-void SensorSet::convertFromFwdCoilSet(const FwdCoilSet::SPtr pCoilMeg)
+void SensorSetCreator::convertFromFwdCoilSet(const FwdCoilSet::SPtr pCoilMeg)
 {
     int iNchan = pCoilMeg->ncoil;
     int iNp = pCoilMeg->coils[0]->np;
 
-    this->ncoils = iNchan;
-    this->np = iNp;
+    m_sensors.ncoils = iNchan;
+    m_sensors.np = iNp;
 
     initMatrices(iNchan,iNp);
 
@@ -122,37 +124,37 @@ void SensorSet::convertFromFwdCoilSet(const FwdCoilSet::SPtr pCoilMeg)
         MatrixXd matCosmag = MatrixXd::Zero(iNp,3);
         RowVectorXd vecW(iNp);
 
-        this->r0(i,0) = coil->r0[0];
-        this->r0(i,1) = coil->r0[1];
-        this->r0(i,2) = coil->r0[2];
+        m_sensors.r0(i,0) = coil->r0[0];
+        m_sensors.r0(i,1) = coil->r0[1];
+        m_sensors.r0(i,2) = coil->r0[2];
 
-        this->ez(i,0) = coil->ez[0];
-        this->ez(i,1) = coil->ez[1];
-        this->ez(i,2) = coil->ez[2];
+        m_sensors.ez(i,0) = coil->ez[0];
+        m_sensors.ez(i,1) = coil->ez[1];
+        m_sensors.ez(i,2) = coil->ez[2];
 
         for (int p = 0; p < iNp; p++){
-            this->w(i*iNp+p) = coil->w[p];
+            m_sensors.w(i*iNp+p) = coil->w[p];
             for (int c = 0; c < 3; c++) {
                 matRmag(p,c)   = coil->rmag[p][c];
                 matCosmag(p,c) = coil->cosmag[p][c];
             }
         }
 
-        this->cosmag.block(i*iNp,0,iNp,3) = matCosmag;
-        this->rmag.block(i*iNp,0,iNp,3) = matRmag;
+        m_sensors.cosmag.block(i*iNp,0,iNp,3) = matCosmag;
+        m_sensors.rmag.block(i*iNp,0,iNp,3) = matRmag;
     }
-    this->tra = MatrixXd::Identity(iNchan,iNchan);
+    m_sensors.tra = MatrixXd::Identity(iNchan,iNchan);
 }
 
 //=============================================================================================================
 
-void SensorSet::initMatrices(const int iNchan, const int iNp)
+void SensorSetCreator::initMatrices(const int iNchan, const int iNp)
 {
-    this->ez = MatrixXd(iNchan,3);
-    this->r0 = MatrixXd(iNchan,3);
-    this->rmag = MatrixXd(iNchan*iNp,3);
-    this->cosmag = MatrixXd(iNchan*iNp,3);
-    this->cosmag = MatrixXd(iNchan*iNp,3);
-    this->tra = MatrixXd(iNchan,iNchan);
-    this->w = RowVectorXd(iNchan*iNp);
+    m_sensors.ez = MatrixXd(iNchan,3);
+    m_sensors.r0 = MatrixXd(iNchan,3);
+    m_sensors.rmag = MatrixXd(iNchan*iNp,3);
+    m_sensors.cosmag = MatrixXd(iNchan*iNp,3);
+    m_sensors.cosmag = MatrixXd(iNchan*iNp,3);
+    m_sensors.tra = MatrixXd(iNchan,iNchan);
+    m_sensors.w = RowVectorXd(iNchan*iNp);
 }
