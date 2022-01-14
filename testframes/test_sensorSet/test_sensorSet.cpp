@@ -160,10 +160,10 @@ void TestSensorSet::testChannelList_empty()
     /// act
     int iAccuracy = 1;
 
-    SensorSet sensorsActual = SensorSet();
+    SensorSetCreator sensorSetCreator;
     QList<FIFFLIB::FiffChInfo> lChannels;
 
-    sensorsActual.updateSensorSet(lChannels,iAccuracy);
+    SensorSet sensorsActual = sensorSetCreator.updateSensorSet(lChannels,iAccuracy);
 
     /// assert
     QVERIFY2(iNp == sensorsActual.np,"Number of integration points does not match.");
@@ -188,8 +188,8 @@ void TestSensorSet::testChannelList_acc1()
 
     /// act
     int iAccuracy = 1;
-    SensorSet sensorsActual = SensorSet();
-    sensorsActual.updateSensorSet(m_lChannels,iAccuracy);
+    SensorSetCreator sensorSetCreator;
+    SensorSet sensorsActual = sensorSetCreator.updateSensorSet(m_lChannels,iAccuracy);
 
     /// assert
     QVERIFY2(iNp == sensorsActual.np,"Number of integration points does not match.");
@@ -214,8 +214,8 @@ void TestSensorSet::testChannelList_acc2()
 
     /// act
     int iAccuracy = 2;
-    SensorSet sensorsActual = SensorSet();
-    sensorsActual.updateSensorSet(m_lChannels,iAccuracy);
+    SensorSetCreator sensorSetCreator;
+    SensorSet sensorsActual = sensorSetCreator.updateSensorSet(m_lChannels,iAccuracy);
 
     /// assert
     QVERIFY2(iNp == sensorsActual.np,"Number of integration points does not match.");

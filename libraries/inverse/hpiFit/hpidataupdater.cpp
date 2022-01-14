@@ -118,7 +118,7 @@ void HpiDataUpdater::updateChannels(FiffInfo::SPtr pFiffInfo)
 void HpiDataUpdater::updateSensors(const QList<FIFFLIB::FiffChInfo>& lChannels)
 {
     int iAccuracy = 2;
-    m_sensors.updateSensorSet(lChannels,iAccuracy);
+    m_sensors = m_sensorSetCreator.updateSensorSet(lChannels,iAccuracy);
 }
 
 //=============================================================================================================

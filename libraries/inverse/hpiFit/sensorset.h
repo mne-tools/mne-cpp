@@ -76,6 +76,20 @@ namespace FIFFLIB{
 namespace INVERSELIB
 {
 
+/**
+ * The strucut specifing the sensor parameters.
+ */
+struct SensorSet {
+    Eigen::MatrixXd ez;
+    Eigen::MatrixXd r0;
+    Eigen::MatrixXd rmag;
+    Eigen::MatrixXd cosmag;
+    Eigen::MatrixXd tra;
+    Eigen::RowVectorXd w;
+    int ncoils;
+    int np;
+};
+
 //=============================================================================================================
 // INVERSELIB FORWARD DECLARATIONS
 //=============================================================================================================
@@ -86,7 +100,7 @@ namespace INVERSELIB
  *
  * @brief Brief description of this class.
  */
-class INVERSESHARED_EXPORT SensorSet
+class INVERSESHARED_EXPORT SensorSetCreator
 {
 
 public:
@@ -97,7 +111,7 @@ public:
     /**
     * Constructs a MEG SensorSet object.
     */
-    explicit SensorSet();
+    explicit SensorSetCreator();
 
     //=========================================================================================================
     /**
@@ -108,7 +122,7 @@ public:
      *
      */
 
-    void updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
+    SensorSet updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
                          const int iAccuracy);
 
     Eigen::MatrixXd ez;
@@ -148,6 +162,7 @@ private:
      */
     void initMatrices(const int iNchan, const int iNp);
 
+    SensorSet m_sensors;
     QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilDefinitions;    // the coil definitions as template
 };
 
