@@ -201,11 +201,6 @@ void TestHpiFitIntegration::initTestCase()
     modelParameters.bBasic = bBasic;
 
     HpiFitResult hpiFitResult;
-    hpiFitResult.hpiFreqs = vFreqs;
-    hpiFitResult.errorDistances = vError;
-    hpiFitResult.GoF = vGoF;
-    hpiFitResult.fittedCoils = fittedPointSet;
-    hpiFitResult.devHeadTrans = devHeadT;
 
     for(int i = 0; i < mRefPos.rows(); i++) {
         from = first + mRefPos(i,0)*pFiffInfo->sfreq;

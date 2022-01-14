@@ -111,22 +111,30 @@ void HPIFit::fit(const MatrixXd& matData,
                  HpiFitResult& hpiFitResult)
 {
     // TODO: Check for dimensions
+
+    // prepare data
+    m_HpiDataUpdater.prepareDataAndProjectors(matData,matProjectors);
+    const auto& matProjectedData = m_HpiDataUpdater.getProjectedData();
+    const auto& matPreparedProjector = m_HpiDataUpdater.getProjectors();
+    const auto& matCoilsHead = m_HpiDataUpdater.getHpiDigitizer();
+
     MatrixXd matAmplitudes;
-    computeAmplitudes(matData,
-                      matProjectors,
+    computeAmplitudes(matProjectedData,
                       modelParameters,
                       matAmplitudes);
 
     int iNumCoils = modelParameters.vecHpiFreqs.size();
     MatrixXd matCoilPos = MatrixXd::Zero(iNumCoils,3);
     computeCoilLocation(matAmplitudes,
-                        matProjectors,
+                        matPreparedProjector,
                         hpiFitResult.devHeadTrans,
                         hpiFitResult.errorDistances,
+                        matCoilsHead,
                         matCoilPos,
                         hpiFitResult.GoF);
 
     computeHeadPosition(matCoilPos,
+                        matCoilsHead,
                         hpiFitResult.devHeadTrans,
                         hpiFitResult.errorDistances,
                         hpiFitResult.fittedCoils);
@@ -134,20 +142,15 @@ void HPIFit::fit(const MatrixXd& matData,
 
 //=============================================================================================================
 
-void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matData,
-                               const MatrixXd& matProjectors,
+void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
                                const ModelParameters& modelParameters,
                                Eigen::MatrixXd& matAmplitudes)
 {
     //Check if data was passed
-    if(matData.rows() == 0 || matData.cols() == 0 ) {
+    if(matProjectedData.rows() == 0 || matProjectedData.cols() == 0 ) {
         std::cout<<std::endl<< "HPIFit::computeAmplitudes - No data passed. Returning.";
         return;
     }
-
-    // prepare data
-    m_HpiDataUpdater.prepareDataAndProjectors(matData,matProjectors);
-    const auto& matProjectedData = m_HpiDataUpdater.getProjectedData();
 
     // fit model
     MatrixXd matTopo = m_signalModel.fitData(modelParameters,matProjectedData);
@@ -183,12 +186,12 @@ void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
                                  const MatrixXd& matProjectors,
                                  const FIFFLIB::FiffCoordTrans& transDevHead,
                                  const QVector<double>& vecError,
+                                 const MatrixXd& matCoilsHead,
                                  Eigen::MatrixXd& matCoilLoc,
                                  Eigen::VectorXd& vecGoF,
                                  const int iMaxIterations,
                                  const float fAbortError)
 {
-    const auto& matHeadHPI = m_HpiDataUpdater.getHpiDigitizer();
     int iNumCoils = matAmplitudes.cols();
     MatrixXd matCoilPos = MatrixXd::Zero(iNumCoils,3);
 
@@ -196,7 +199,7 @@ void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
 
     if(transDevHead.trans != MatrixXd::Identity(4,4).cast<float>() && dError < 0.010) {
         // if good last fit, use old trafo
-        matCoilPos = transDevHead.apply_inverse_trans(matHeadHPI.cast<float>()).cast<double>();
+        matCoilPos = transDevHead.apply_inverse_trans(matCoilsHead.cast<float>()).cast<double>();
     } else {
         // if not, find max amplitudes in channels
         VectorXi vecChIdcs(iNumCoils);
@@ -227,13 +230,11 @@ void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
     coil.dpfitnumitr = VectorXd::Zero(iNumCoils);
 
     // dipole fit
-    const auto& matPreparedProjector = m_HpiDataUpdater.getProjectors();
-
     coil = dipfit(coil,
                   m_sensors,
                   matAmplitudes,
                   iNumCoils,
-                  matPreparedProjector,
+                  matProjectors,
                   iMaxIterations,
                   fAbortError);
 
@@ -249,6 +250,7 @@ void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
 //=============================================================================================================
 
 void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilPos,
+                                 const Eigen::MatrixXd& matCoilsHead,
                                  FIFFLIB::FiffCoordTrans& transDevHead,
                                  QVector<double> &vecError,
                                  FIFFLIB::FiffDigPointSet& fittedPointSet)
@@ -256,8 +258,7 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilPos,
 
     // prepare dropping coils
     MatrixXd matTrans(4,4);
-    MatrixXd matHeadHPI = m_HpiDataUpdater.getHpiDigitizer(); // move outside
-    matTrans = computeTransformation(matHeadHPI,matCoilPos);
+    matTrans = computeTransformation(matCoilsHead,matCoilPos);
 
     // Store the final result to fiff info
     // Set final device/head matrix and its inverse to the fiff info
@@ -266,7 +267,7 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilPos,
     //Calculate Error
     MatrixXd matTemp = matCoilPos;
     MatrixXd matTestPos = transDevHead.apply_trans(matTemp.cast<float>()).cast<double>();
-    MatrixXd matDiffPos = matTestPos - matHeadHPI;
+    MatrixXd matDiffPos = matTestPos - matCoilsHead;
 
     // compute error
     int iNumCoils = matCoilPos.rows();
@@ -312,25 +313,30 @@ void HPIFit::findOrder(const MatrixXd& matData,
     modelParameters.iSampleFreq = pFiffInfo->sfreq;
     modelParameters.bBasic = false;
 
-    computeAmplitudes(matData,
-                      matProjectors,
+    // prepare data
+    m_HpiDataUpdater.prepareDataAndProjectors(matData,matProjectors);
+    const auto& matProjectedData = m_HpiDataUpdater.getProjectedData();
+    const auto& matPreparedProjector = m_HpiDataUpdater.getProjectors();
+    const auto& matCoilsHead = m_HpiDataUpdater.getHpiDigitizer();
+
+    computeAmplitudes(matProjectedData,
                       modelParameters,
                       matAmplitudes);
 
     // compute coil position
-    MatrixXd matCoil = MatrixXd::Zero(iNumCoils,3);
+    MatrixXd matCoilsDev = MatrixXd::Zero(iNumCoils,3);
     computeCoilLocation(matAmplitudes,
-                        matProjectors,
+                        matPreparedProjector,
                         pFiffInfo->dev_head_t,
                         vecError,
-                        matCoil,
+                        matCoilsHead,
+                        matCoilsDev,
                         vecGoF);
 
     // extract digitized and fitted coils
     QVector<int> vecFreqsOrder = vecFreqs;
-    MatrixXd matDigTemp = m_HpiDataUpdater.getHpiDigitizer();
-    MatrixXd matHeadHpi = m_HpiDataUpdater.getHpiDigitizer();
-    MatrixXd matCoilTemp = matCoil;
+    MatrixXd matDigTemp = matCoilsHead;
+    MatrixXd matCoilTemp = matCoilsDev;
 
     std::vector<int> vecOrder(iNumCoils);
     std::iota(vecOrder.begin(), vecOrder.end(), 0);;
@@ -345,10 +351,10 @@ void HPIFit::findOrder(const MatrixXd& matData,
     // permutation
     do {
         for(int i = 0; i < iNumCoils; i++) {
-            matCoilTemp.row(i) =  matCoil.row(vecOrder[i]);
+            matCoilTemp.row(i) =  matCoilsDev.row(vecOrder[i]);
         }
-        matTrans = computeTransformation(matHeadHpi,matCoilTemp);
-        dErrorActual = objectTrans(matHeadHpi,matCoilTemp,matTrans);
+        matTrans = computeTransformation(matCoilsHead,matCoilTemp);
+        dErrorActual = objectTrans(matCoilsHead,matCoilTemp,matTrans);
         if(dErrorActual < dErrorMin && dErrorActual < dErrorBest) {
             // exit
             for(int i = 0; i < iNumCoils; i++) {
