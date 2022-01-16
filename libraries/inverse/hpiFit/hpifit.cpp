@@ -121,7 +121,7 @@ void HPIFit::fit(const MatrixXd& matData,
                       modelParameters,
                       matAmplitudes);
 
-    int iNumCoils = modelParameters.vecHpiFreqs.size();
+    int iNumCoils = modelParameters.iNHpiCoils;
     MatrixXd matCoilPos = MatrixXd::Zero(iNumCoils,3);
     computeCoilLocation(matAmplitudes,
                         matPreparedProjector,
@@ -156,7 +156,7 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
     matTopo.transposeInPlace();
 
     // split into sine and cosine amplitudes
-    int iNumCoils = modelParameters.vecHpiFreqs.size();
+    int iNumCoils = modelParameters.iNHpiCoils;
 
     MatrixXd matAmp(matProjectedData.cols(), iNumCoils);   // sine part
     MatrixXd matAmpC(matProjectedData.cols(), iNumCoils);  // cosine part
@@ -307,11 +307,10 @@ void HPIFit::findOrder(const MatrixXd& matData,
     // compute amplitudes
     MatrixXd matAmplitudes;
 
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = vecFreqs;
-    modelParameters.iLineFreq = pFiffInfo->linefreq;
-    modelParameters.iSampleFreq = pFiffInfo->sfreq;
-    modelParameters.bBasic = false;
+    ModelParameters modelParameters = setModelParameters(vecFreqs,
+                                                         pFiffInfo->sfreq,
+                                                         pFiffInfo->linefreq,
+                                                         false);
 
     // prepare data
     m_HpiDataUpdater.prepareDataAndProjectors(matData,matProjectors);

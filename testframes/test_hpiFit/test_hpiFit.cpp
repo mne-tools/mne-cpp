@@ -245,12 +245,11 @@ void TestHpiFit::testComputeAmplitudes_basic_sin()
     MatrixXd matProj = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
     /// Act
-    MatrixXd matAmpActual;    
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = vecFreqs;
-    modelParameters.iLineFreq = iLineF;
-    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
-    modelParameters.bBasic = bBasic;
+    MatrixXd matAmpActual;
+    ModelParameters modelParameters = setModelParameters(vecFreqs,
+                                                         iSamF,
+                                                         iLineF,
+                                                         bBasic);
 
     HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
     hpiDataUpdater.prepareDataAndProjectors(matSimData,m_matProjectors);
@@ -327,11 +326,10 @@ void TestHpiFit::testComputeAmplitudes_basic_cos()
 
     /// Act
     MatrixXd matAmpActual;
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = vecFreqs;
-    modelParameters.iLineFreq = iLineF;
-    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
-    modelParameters.bBasic = bBasic;
+    ModelParameters modelParameters = setModelParameters(vecFreqs,
+                                                         iSamF,
+                                                         iLineF,
+                                                         bBasic);
 
     HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
     hpiDataUpdater.prepareDataAndProjectors(matSimData,m_matProjectors);
@@ -380,6 +378,8 @@ void TestHpiFit::testComputeAmplitudes_basic_sincos()
     QVector<int> vecFreqs = {154,158,161,166};
     int iNumCoils = vecFreqs.size();
     int iSamF = m_pFiffInfo->sfreq;
+    int iLineF = m_pFiffInfo->linefreq;
+    bool bBasic = true;
     int iSamLoc = m_matData.cols();
     double dAmpSin = 0.5;        // expected amplitudes
     double dAmpCos = 0.25;        // expected amplitudes
@@ -406,11 +406,10 @@ void TestHpiFit::testComputeAmplitudes_basic_sincos()
 
     /// Act
     MatrixXd matAmpActual;
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = vecFreqs;
-    modelParameters.iLineFreq = m_pFiffInfo->linefreq;
-    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
-    modelParameters.bBasic = true;
+    ModelParameters modelParameters = setModelParameters(vecFreqs,
+                                                         iSamF,
+                                                         iLineF,
+                                                         bBasic);
 
     HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
     hpiDataUpdater.prepareDataAndProjectors(matSimData,m_matProjectors);
@@ -486,11 +485,10 @@ void TestHpiFit::testComputeAmplitudes_advanced_sin()
 
     /// Act
     MatrixXd matAmpActual;
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = vecFreqs;
-    modelParameters.iLineFreq = iLineF;
-    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
-    modelParameters.bBasic = bBasic;
+    ModelParameters modelParameters = setModelParameters(vecFreqs,
+                                                         iSamF,
+                                                         iLineF,
+                                                         bBasic);
 
     HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
     hpiDataUpdater.prepareDataAndProjectors(matSimData,m_matProjectors);
@@ -539,7 +537,7 @@ void TestHpiFit::testComputeAmplitudes_advanced_cos()
     QVector<int> vecFreqs = {154,158,161,166};
     int iNumCoils = vecFreqs.size();
     int iSamF = m_pFiffInfo->sfreq;
-    int iLineF = 60;
+    int iLineF = m_pFiffInfo->linefreq;
     int iSamLoc = m_matData.cols();
     bool bBasic = false;
     double dAmplitude = 0.5;        // expected amplitudes
@@ -566,11 +564,10 @@ void TestHpiFit::testComputeAmplitudes_advanced_cos()
 
     /// Act
     MatrixXd matAmpActual;
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = vecFreqs;
-    modelParameters.iLineFreq = iLineF;
-    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
-    modelParameters.bBasic = bBasic;
+    ModelParameters modelParameters = setModelParameters(vecFreqs,
+                                                         iSamF,
+                                                         iLineF,
+                                                         bBasic);
 
     HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
     hpiDataUpdater.prepareDataAndProjectors(matSimData,m_matProjectors);
@@ -651,11 +648,10 @@ void TestHpiFit::testComputeAmplitudes_advanced_summedCosSine()
 
     /// Act
     MatrixXd matAmpActual;
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = vecFreqs;
-    modelParameters.iLineFreq = iLineF;
-    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
-    modelParameters.bBasic = bBasic;
+    ModelParameters modelParameters = setModelParameters(vecFreqs,
+                                                         iSamF,
+                                                         iLineF,
+                                                         bBasic);
 
     HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
     hpiDataUpdater.prepareDataAndProjectors(matSimData,m_matProjectors);
@@ -681,6 +677,7 @@ void TestHpiFit::testComputeCoilLocation_basic_noproj()
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError = {1.0, 1.0, 1.0, 1.0};
     int iLineF = 60;
+    int iSamF = m_pFiffInfo->sfreq;
     VectorXd vecGoF;
     HpiDataUpdater hpiDataUpdater(m_pFiffInfo);
     MatrixXd matHpiDigitizer = hpiDataUpdater.getHpiDigitizer();
@@ -688,11 +685,10 @@ void TestHpiFit::testComputeCoilLocation_basic_noproj()
     bool bBasic = true;
     FiffCoordTrans transDevHead;
 
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = vecFreqs;
-    modelParameters.iLineFreq = iLineF;
-    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
-    modelParameters.bBasic = bBasic;
+    ModelParameters modelParameters = setModelParameters(vecFreqs,
+                                                         iSamF,
+                                                         iLineF,
+                                                         bBasic);
 
     MatrixXd matAmplitudes;
     hpiDataUpdater.prepareDataAndProjectors(m_matData,matProjectors);
@@ -732,6 +728,7 @@ void TestHpiFit::testComputeCoilLocation_basic_noproj_trafo()
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError(4);
     int iLineF = 60;
+    int iSamF = m_pFiffInfo->sfreq;
     VectorXd vecGoF;
     HpiDataUpdater hpiDataUpdater(m_pFiffInfo);
     MatrixXd matHpiDigitizer = hpiDataUpdater.getHpiDigitizer();
@@ -739,11 +736,10 @@ void TestHpiFit::testComputeCoilLocation_basic_noproj_trafo()
     bool bBasic = true;
     FiffCoordTrans transDevHead;
 
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = vecFreqs;
-    modelParameters.iLineFreq = iLineF;
-    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
-    modelParameters.bBasic = bBasic;
+    ModelParameters modelParameters = setModelParameters(vecFreqs,
+                                                         iSamF,
+                                                         iLineF,
+                                                         bBasic);
 
     MatrixXd matAmplitudes;
     hpiDataUpdater.prepareDataAndProjectors(m_matData,matProjectors);
@@ -782,6 +778,7 @@ void TestHpiFit::testComputeCoilLocation_basic_proj()
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError(4);
     int iLineF = 60;
+    int iSamF = m_pFiffInfo->sfreq;
     VectorXd vecGoF;
     HpiDataUpdater hpiDataUpdater(m_pFiffInfo);
     MatrixXd matHpiDigitizer = hpiDataUpdater.getHpiDigitizer();
@@ -789,11 +786,10 @@ void TestHpiFit::testComputeCoilLocation_basic_proj()
     bool bBasic = true;
     FiffCoordTrans transDevHead;
 
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = vecFreqs;
-    modelParameters.iLineFreq = iLineF;
-    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
-    modelParameters.bBasic = bBasic;
+    ModelParameters modelParameters = setModelParameters(vecFreqs,
+                                                         iSamF,
+                                                         iLineF,
+                                                         bBasic);
 
     MatrixXd matAmplitudes;
     hpiDataUpdater.prepareDataAndProjectors(m_matData,m_matProjectors);
@@ -838,13 +834,13 @@ void TestHpiFit::testComputeCoilLocation_advanced_noproj()
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
     bool bBasic = false;
     int iLineF = 60;
+    int iSamF = m_pFiffInfo->sfreq;
     FiffCoordTrans transDevHead;
 
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = vecFreqs;
-    modelParameters.iLineFreq = iLineF;
-    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
-    modelParameters.bBasic = bBasic;
+    ModelParameters modelParameters = setModelParameters(vecFreqs,
+                                                         iSamF,
+                                                         iLineF,
+                                                         bBasic);
 
     MatrixXd matAmplitudes;
     hpiDataUpdater.prepareDataAndProjectors(m_matData,matProjectors);
@@ -889,12 +885,12 @@ void TestHpiFit::testComputeCoilLocation_advanced_noproj_trafo()
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
     bool bBasic = false;
     int iLineF = 60;
+    int iSamF = m_pFiffInfo->sfreq;
 
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = vecFreqs;
-    modelParameters.iLineFreq = iLineF;
-    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
-    modelParameters.bBasic = bBasic;
+    ModelParameters modelParameters = setModelParameters(vecFreqs,
+                                                         iSamF,
+                                                         iLineF,
+                                                         bBasic);
 
     MatrixXd matAmplitudes;
     hpiDataUpdater.prepareDataAndProjectors(m_matData,matProjectors);
@@ -940,13 +936,12 @@ void TestHpiFit::testComputeCoilLocation_advanced_proj()
     FiffCoordTrans transDevHead;
 
     int iLineF = 60;
+    int iSamF = m_pFiffInfo->sfreq;
 
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = vecFreqs;
-    modelParameters.iLineFreq = iLineF;
-    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
-    modelParameters.bBasic = bBasic;
-
+    ModelParameters modelParameters = setModelParameters(vecFreqs,
+                                                         iSamF,
+                                                         iLineF,
+                                                         bBasic);
 
     MatrixXd matAmplitudes;
     hpiDataUpdater.prepareDataAndProjectors(m_matData,m_matProjectors);
@@ -983,11 +978,15 @@ void TestHpiFit::testFit_basic_gof()
     /// prepare
     HPIFit HPI = HPIFit(m_pFiffInfo);
 
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = {166, 154, 161, 158};
-    modelParameters.iLineFreq = m_pFiffInfo->linefreq;
-    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
-    modelParameters.bBasic = true;
+    int iSampleFreq = m_pFiffInfo->sfreq;
+    int iLineFreq = m_pFiffInfo->linefreq;
+    QVector<int> vecHpiFreqs = {166, 154, 161, 158};
+    bool bBasic = true;
+    ModelParameters modelParameters = setModelParameters(vecHpiFreqs,
+                                                         iSampleFreq,
+                                                         iLineFreq,
+                                                         bBasic);
+
     HpiFitResult hpiFitResult;
 
     HPI.fit(m_matData,
@@ -1009,11 +1008,14 @@ void TestHpiFit::testFit_advanced_gof()
     /// prepare
     HPIFit HPI = HPIFit(m_pFiffInfo);
 
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = {166, 154, 161, 158};
-    modelParameters.iLineFreq = m_pFiffInfo->linefreq;
-    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
-    modelParameters.bBasic = false;
+    int iSampleFreq = m_pFiffInfo->sfreq;
+    int iLineFreq = m_pFiffInfo->linefreq;
+    QVector<int> vecHpiFreqs = {166, 154, 161, 158};
+    bool bBasic = false;
+    ModelParameters modelParameters = setModelParameters(vecHpiFreqs,
+                                                         iSampleFreq,
+                                                         iLineFreq,
+                                                         bBasic);
     HpiFitResult hpiFitResult;
 
     HPI.fit(m_matData,
@@ -1035,11 +1037,14 @@ void TestHpiFit::testFit_basic_error()
     /// prepare
     HPIFit HPI = HPIFit(m_pFiffInfo);
 
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = {166, 154, 161, 158};
-    modelParameters.iLineFreq = m_pFiffInfo->linefreq;
-    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
-    modelParameters.bBasic = true;
+    int iSampleFreq = m_pFiffInfo->sfreq;
+    int iLineFreq = m_pFiffInfo->linefreq;
+    QVector<int> vecHpiFreqs = {166, 154, 161, 158};
+    bool bBasic = true;
+    ModelParameters modelParameters = setModelParameters(vecHpiFreqs,
+                                                         iSampleFreq,
+                                                         iLineFreq,
+                                                         bBasic);
     HpiFitResult hpiFitResult;
 
     HPI.fit(m_matData,
@@ -1061,11 +1066,14 @@ void TestHpiFit::testFit_advanced_error()
     /// prepare
     HPIFit HPI = HPIFit(m_pFiffInfo);
 
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = {166, 154, 161, 158};
-    modelParameters.iLineFreq = m_pFiffInfo->linefreq;
-    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
-    modelParameters.bBasic = false;
+    int iSampleFreq = m_pFiffInfo->sfreq;
+    int iLineFreq = m_pFiffInfo->linefreq;
+    QVector<int> vecHpiFreqs = {166, 154, 161, 158};
+    bool bBasic = false;
+    ModelParameters modelParameters = setModelParameters(vecHpiFreqs,
+                                                         iSampleFreq,
+                                                         iLineFreq,
+                                                         bBasic);
     HpiFitResult hpiFitResult;
 
     HPI.fit(m_matData,

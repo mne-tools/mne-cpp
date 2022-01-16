@@ -63,6 +63,20 @@ using namespace Eigen;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
+ModelParameters INVERSELIB::setModelParameters(const QVector<int> vecHpiFreqs,
+                                               const int iSampleFreq,
+                                               const int iLineFreq,
+                                               const bool bBasic)
+{
+    ModelParameters modelParameters;
+    modelParameters.vecHpiFreqs = vecHpiFreqs;
+    modelParameters.iNHpiCoils = vecHpiFreqs.size();
+    modelParameters.iSampleFreq = iSampleFreq;
+    modelParameters.iLineFreq = iLineFreq;
+    modelParameters.bBasic = bBasic;
+    return modelParameters;
+}
+
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -112,6 +126,7 @@ bool SignalModel::checkModelParameters(const ModelParameters& modelParameters)
     bool bHasChanged = false;
     if((m_modelParameters.iSampleFreq != modelParameters.iSampleFreq) ||
         (m_modelParameters.iLineFreq != modelParameters.iLineFreq) ||
+        (m_modelParameters.iNHpiCoils != modelParameters.iNHpiCoils) ||
         (m_modelParameters.vecHpiFreqs != modelParameters.vecHpiFreqs) ||
         (m_modelParameters.bBasic != modelParameters.bBasic)) {
         bHasChanged = true;
@@ -149,7 +164,7 @@ void SignalModel::selectModelAndCompute()
 
 void SignalModel::computeInverseBasicModel()
 {
-    int iNumCoils = m_modelParameters.vecHpiFreqs.size();
+    int iNumCoils = m_modelParameters.iNHpiCoils;
     MatrixXd matSimsig;
     VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/m_modelParameters.iSampleFreq;
 
@@ -167,7 +182,7 @@ void SignalModel::computeInverseBasicModel()
 
 void SignalModel::computeInverseAdvancedModel()
 {
-    int iNumCoils = m_modelParameters.vecHpiFreqs.size();
+    int iNumCoils = m_modelParameters.iNHpiCoils;
     MatrixXd matSimsig;
     MatrixXd matSimsigInvTemp;
 

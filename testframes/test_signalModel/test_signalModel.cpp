@@ -79,6 +79,7 @@ public:
 
 private slots:
     void initTestCase();
+    void testSetModelParameters();
     void testFitData_emptyHpiFres();
     void testFitData_emptySFreq();
     void testFitData_basic_4coils();
@@ -106,6 +107,35 @@ TestSignalModel::TestSignalModel()
 void TestSignalModel::initTestCase()
 {
     // test your function here
+}
+
+//=============================================================================================================
+
+void TestSignalModel::testSetModelParameters()
+{
+    int iSampleFreq = 1;
+    int iLineFreq = 1;
+    QVector<int> vecHpiFreqs = {1,2};
+    int iNHpiCoils = 2;
+    bool bBasic = true;
+
+    ModelParameters modelParametersExpected;
+    modelParametersExpected.vecHpiFreqs = vecHpiFreqs;
+    modelParametersExpected.iNHpiCoils = iNHpiCoils;
+    modelParametersExpected.iSampleFreq = iSampleFreq;
+    modelParametersExpected.iLineFreq = iLineFreq;
+    modelParametersExpected.bBasic = bBasic;
+
+    ModelParameters modelParametersActual = setModelParameters(vecHpiFreqs,
+                                                               iSampleFreq,
+                                                               iLineFreq,
+                                                               bBasic);
+
+    QVERIFY2(modelParametersExpected.vecHpiFreqs == modelParametersActual.vecHpiFreqs,"HPI frequencies do not match.");
+    QVERIFY2(modelParametersExpected.iNHpiCoils == modelParametersActual.iNHpiCoils,"Number of coils does not match.");
+    QVERIFY2(modelParametersExpected.iSampleFreq == modelParametersActual.iSampleFreq,"Sampling frequency does not match.");
+    QVERIFY2(modelParametersExpected.iLineFreq == modelParametersActual.iLineFreq,"Line frequency does not match.");
+    QVERIFY2(modelParametersExpected.bBasic == modelParametersActual.bBasic,"Model selection does not match.");
 }
 
 //=============================================================================================================
@@ -150,12 +180,14 @@ void TestSignalModel::testFitData_emptySFreq()
 void TestSignalModel::testFitData_basic_4coils()
 {
     // Prepare
-    ModelParameters modelParameters;
-    modelParameters.iSampleFreq = 1000;
-    modelParameters.iLineFreq = 60;
-    modelParameters.vecHpiFreqs = {154,158,161,166};
-    modelParameters.bBasic = true;
-
+    int iSampleFreq = 1000;
+    int iLineFreq = 60;
+    QVector<int> vecHpiFreqs = {154,158,161,166};
+    bool bBasic = true;
+    ModelParameters modelParameters = setModelParameters(vecHpiFreqs,
+                                                         iSampleFreq,
+                                                         iLineFreq,
+                                                         bBasic);
     SignalModel signalModel = SignalModel();
 
     int iNumCoils = modelParameters.vecHpiFreqs.size();
@@ -201,12 +233,14 @@ void TestSignalModel::testFitData_basic_4coils()
 void TestSignalModel::testFitData_basic_5coils()
 {
     // Prepare
-    ModelParameters modelParameters;
-    modelParameters.iSampleFreq = 1000;
-    modelParameters.iLineFreq = 60;
-    modelParameters.vecHpiFreqs = {154,158,161,166,172};
-    modelParameters.bBasic = true;
-
+    int iSampleFreq = 1000;
+    int iLineFreq = 60;
+    QVector<int> vecHpiFreqs = {154,158,161,166,172};
+    bool bBasic = true;
+    ModelParameters modelParameters = setModelParameters(vecHpiFreqs,
+                                                         iSampleFreq,
+                                                         iLineFreq,
+                                                         bBasic);
     SignalModel signalModel = SignalModel();
 
     int iNumCoils = modelParameters.vecHpiFreqs.size();
@@ -255,11 +289,14 @@ void TestSignalModel::testFitData_basic_5coils()
 void TestSignalModel::testFitData_advanced_4coils()
 {
     // Prepare
-    ModelParameters modelParameters;
-    modelParameters.iSampleFreq = 1000;
-    modelParameters.iLineFreq = 60;
-    modelParameters.vecHpiFreqs = {154,158,161,166};
-    modelParameters.bBasic = false;
+    int iSampleFreq = 1000;
+    int iLineFreq = 60;
+    QVector<int> vecHpiFreqs = {154,158,161,166};
+    bool bBasic = false;
+    ModelParameters modelParameters = setModelParameters(vecHpiFreqs,
+                                                         iSampleFreq,
+                                                         iLineFreq,
+                                                         bBasic);
 
     SignalModel signalModel = SignalModel();
 
@@ -312,11 +349,14 @@ void TestSignalModel::testFitData_advanced_4coils()
 void TestSignalModel::testFitData_advanced_5coils()
 {
     // Prepare
-    ModelParameters modelParameters;
-    modelParameters.iSampleFreq = 1000;
-    modelParameters.iLineFreq = 60;
-    modelParameters.vecHpiFreqs = {154,158,161,166,172};
-    modelParameters.bBasic = false;
+    int iSampleFreq = 1000;
+    int iLineFreq = 60;
+    QVector<int> vecHpiFreqs = {154,158,161,166,172};
+    bool bBasic = false;
+    ModelParameters modelParameters = setModelParameters(vecHpiFreqs,
+                                                         iSampleFreq,
+                                                         iLineFreq,
+                                                         bBasic);
     SignalModel signalModel = SignalModel();
 
     int iNumCoils = modelParameters.vecHpiFreqs.size();
