@@ -225,12 +225,11 @@ int main(int argc, char *argv[])
                   pFiffInfo);
 
     float fTimer = 0.0;
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = vecFreqs;
-    modelParameters.iLineFreq = pFiffInfo->linefreq;
-    modelParameters.iSampleFreq = pFiffInfo->sfreq;
-    modelParameters.bBasic = bFast;
 
+    ModelParameters modelParameters = setModelParameters(vecFreqs,
+                                                         pFiffInfo->sfreq,
+                                                         pFiffInfo->linefreq,
+                                                         bFast);
     HpiFitResult hpiFitResult;
     hpiFitResult.hpiFreqs = vecFreqs;
     hpiFitResult.errorDistances = vecError;

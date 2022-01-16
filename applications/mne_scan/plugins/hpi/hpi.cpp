@@ -547,12 +547,10 @@ void Hpi::run()
     }
 
     // init hpi fit
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = m_vCoilFreqs;
-    modelParameters.iLineFreq = m_pFiffInfo->linefreq;
-    modelParameters.iSampleFreq = m_pFiffInfo->sfreq;
-    modelParameters.bBasic = false;
-
+    ModelParameters modelParameters = setModelParameters(m_vCoilFreqs,
+                                                         m_pFiffInfo->sfreq,
+                                                         m_pFiffInfo->linefreq,
+                                                         false);
     HpiFitResult fitResult;
     fitResult.hpiFreqs = m_vCoilFreqs;
     fitResult.errorDistances = QVector<double>(m_vCoilFreqs.size());
