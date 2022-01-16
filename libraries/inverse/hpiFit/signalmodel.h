@@ -72,11 +72,28 @@ namespace INVERSELIB
  * The strucut specifing important ModelParameters used for hpi fitting.
  */
 struct ModelParameters {
-    int iLineFreq = 0;
-    int iSampleFreq = 0;
     QVector<int> vecHpiFreqs;
+    int iNHpiCoils = 0;
+    int iSampleFreq = 0;
+    int iLineFreq = 0;
     bool bBasic = true;
 };
+
+    //=========================================================================================================
+    /**
+         * Fit the data to the model constructed from given model parameters.
+         *
+         * @param[in] modelParameters   The ModelParameters.
+         * @param[in] matData           The data matrix.
+         *
+         * @return the fitted data
+         *
+         */
+
+    INVERSESHARED_EXPORT ModelParameters setModelParameters(const QVector<int> vecHpiFreqs,
+                                                            const int iSampleFreq,
+                                                            const int iLineFreq,
+                                                            const bool bBasic);
 
 //=============================================================================================================
 // INVERSELIB FORWARD DECLARATIONS

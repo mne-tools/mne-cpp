@@ -46,7 +46,7 @@ CONFIG   += console
 
 DESTDIR =  $${MNE_BINARY_DIR}
 
-TARGET = test_sensorSet
+TARGET = test_signalModel
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
