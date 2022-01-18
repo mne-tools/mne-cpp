@@ -93,29 +93,22 @@ HPIFit::HPIFit()
 
 //=============================================================================================================
 
-HPIFit::HPIFit(FiffInfo::SPtr pFiffInfo)
+HPIFit::HPIFit(const SensorSet sensorSet)
 {
     // init member variables
-    m_HpiDataUpdater = HpiDataUpdater(pFiffInfo);
-    m_sensors = m_HpiDataUpdater.getSensors();
+    m_sensors = sensorSet;
     m_signalModel = SignalModel();
 }
 
 //=============================================================================================================
 
-void HPIFit::fit(const MatrixXd& matData,
+void HPIFit::fit(const MatrixXd& matProjectedData,
                  const MatrixXd& matProjectors,
                  const ModelParameters& modelParameters,
+                 const MatrixXd& matCoilsHead,
                  HpiFitResult& hpiFitResult)
 {
     // TODO: Check for dimensions
-
-    // prepare data
-    m_HpiDataUpdater.prepareDataAndProjectors(matData,matProjectors);
-    const auto& matProjectedData = m_HpiDataUpdater.getProjectedData();
-    const auto& matPreparedProjector = m_HpiDataUpdater.getProjectors();
-    const auto& matCoilsHead = m_HpiDataUpdater.getHpiDigitizer();
-
     MatrixXd matAmplitudes;
     computeAmplitudes(matProjectedData,
                       modelParameters,
@@ -124,7 +117,7 @@ void HPIFit::fit(const MatrixXd& matData,
     int iNumCoils = modelParameters.iNHpiCoils;
     MatrixXd matCoilPos = MatrixXd::Zero(iNumCoils,3);
     computeCoilLocation(matAmplitudes,
-                        matPreparedProjector,
+                        matProjectors,
                         hpiFitResult.devHeadTrans,
                         hpiFitResult.errorDistances,
                         matCoilsHead,
@@ -296,37 +289,26 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilPos,
 
 void HPIFit::findOrder(const MatrixXd& matData,
                        const MatrixXd& matProjectors,
-                       QVector<int>& vecFreqs,
-                       const FiffInfo::SPtr pFiffInfo)
+                       const ModelParameters& modelParameters,
+                       const MatrixXd& matCoilsHead,
+                       QVector<int>& vecFreqs)
 {
     // predefinitions
     QVector<double> vecError;
     VectorXd vecGoF;
     int iNumCoils = vecFreqs.length();
-
     // compute amplitudes
     MatrixXd matAmplitudes;
-
-    ModelParameters modelParameters = setModelParameters(vecFreqs,
-                                                         pFiffInfo->sfreq,
-                                                         pFiffInfo->linefreq,
-                                                         false);
-
-    // prepare data
-    m_HpiDataUpdater.prepareDataAndProjectors(matData,matProjectors);
-    const auto& matProjectedData = m_HpiDataUpdater.getProjectedData();
-    const auto& matPreparedProjector = m_HpiDataUpdater.getProjectors();
-    const auto& matCoilsHead = m_HpiDataUpdater.getHpiDigitizer();
-
-    computeAmplitudes(matProjectedData,
+    computeAmplitudes(matData,
                       modelParameters,
                       matAmplitudes);
 
     // compute coil position
+    FiffCoordTrans transDevHead;
     MatrixXd matCoilsDev = MatrixXd::Zero(iNumCoils,3);
     computeCoilLocation(matAmplitudes,
-                        matPreparedProjector,
-                        pFiffInfo->dev_head_t,
+                        matProjectors,
+                        transDevHead,
                         vecError,
                         matCoilsHead,
                         matCoilsDev,
@@ -362,7 +344,7 @@ void HPIFit::findOrder(const MatrixXd& matData,
             dErrorBest = dErrorActual;
             bSuccess = true;
         }
-    } while (std::next_permutation(vecOrder.begin(), vecOrder.end()) );
+    } while (std::next_permutation(vecOrder.begin(), vecOrder.end()));
 }
 
 //=============================================================================================================

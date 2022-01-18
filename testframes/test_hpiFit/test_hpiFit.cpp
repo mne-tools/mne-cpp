@@ -47,7 +47,7 @@
 #include <fiff/fiff_dig_point_set.h>
 
 #include <inverse/hpiFit/hpifit.h>
-#include <inverse/hpiFit/hpifitdata.h>
+#include <inverse/hpiFit/hpidataupdater.h>
 #include <inverse/hpiFit/sensorset.h>
 
 #include <utils/ioutils.h>
@@ -212,7 +212,8 @@ void TestHpiFit::testComputeAmplitudes_basic_sin()
     m_pFiffInfo->ch_names = lChannelsNames;
     m_pFiffInfo->nchan = lChannels.size();
 
-    HPIFit HPI = HPIFit(m_pFiffInfo);
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
 
     // init test data
     QVector<int> vecFreqs = {154,158,161,166};
@@ -251,7 +252,6 @@ void TestHpiFit::testComputeAmplitudes_basic_sin()
                                                          iLineF,
                                                          bBasic);
 
-    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
     hpiDataUpdater.prepareDataAndProjectors(matSimData,m_matProjectors);
     const auto& matProjectedData = hpiDataUpdater.getProjectedData();
     HPI.computeAmplitudes(matProjectedData,
@@ -292,7 +292,8 @@ void TestHpiFit::testComputeAmplitudes_basic_cos()
     m_pFiffInfo->ch_names = lChannelsNames;
     m_pFiffInfo->nchan = lChannels.size();
 
-    HPIFit HPI = HPIFit(m_pFiffInfo);
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
 
     // init test data
     QVector<int> vecFreqs = {154,158,161,166};
@@ -331,7 +332,6 @@ void TestHpiFit::testComputeAmplitudes_basic_cos()
                                                          iLineF,
                                                          bBasic);
 
-    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
     hpiDataUpdater.prepareDataAndProjectors(matSimData,m_matProjectors);
     const auto& matProjectedData = hpiDataUpdater.getProjectedData();
     HPI.computeAmplitudes(matProjectedData,
@@ -372,7 +372,8 @@ void TestHpiFit::testComputeAmplitudes_basic_sincos()
     m_pFiffInfo->ch_names = lChannelsNames;
     m_pFiffInfo->nchan = lChannels.size();
 
-    HPIFit HPI = HPIFit(m_pFiffInfo);
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
 
     // init test data
     QVector<int> vecFreqs = {154,158,161,166};
@@ -411,7 +412,6 @@ void TestHpiFit::testComputeAmplitudes_basic_sincos()
                                                          iLineF,
                                                          bBasic);
 
-    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
     hpiDataUpdater.prepareDataAndProjectors(matSimData,m_matProjectors);
     const auto& matProjectedData = hpiDataUpdater.getProjectedData();
     HPI.computeAmplitudes(matProjectedData,
@@ -452,7 +452,9 @@ void TestHpiFit::testComputeAmplitudes_advanced_sin()
     m_pFiffInfo->ch_names = lChannelsNames;
     m_pFiffInfo->nchan = lChannels.size();
     m_pFiffInfo->sfreq = 1000;
-    HPIFit HPI = HPIFit(m_pFiffInfo);
+
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
 
     // init test data
     QVector<int> vecFreqs = {154,158,161,166};
@@ -490,7 +492,6 @@ void TestHpiFit::testComputeAmplitudes_advanced_sin()
                                                          iLineF,
                                                          bBasic);
 
-    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
     hpiDataUpdater.prepareDataAndProjectors(matSimData,m_matProjectors);
     const auto& matProjectedData = hpiDataUpdater.getProjectedData();
     HPI.computeAmplitudes(matProjectedData,
@@ -531,7 +532,8 @@ void TestHpiFit::testComputeAmplitudes_advanced_cos()
     m_pFiffInfo->ch_names = lChannelsNames;
     m_pFiffInfo->nchan = lChannels.size();
 
-    HPIFit HPI = HPIFit(m_pFiffInfo);
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
 
     // init test data
     QVector<int> vecFreqs = {154,158,161,166};
@@ -569,7 +571,6 @@ void TestHpiFit::testComputeAmplitudes_advanced_cos()
                                                          iLineF,
                                                          bBasic);
 
-    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
     hpiDataUpdater.prepareDataAndProjectors(matSimData,m_matProjectors);
     const auto& matProjectedData = hpiDataUpdater.getProjectedData();
     HPI.computeAmplitudes(matProjectedData,
@@ -610,7 +611,8 @@ void TestHpiFit::testComputeAmplitudes_advanced_summedCosSine()
     m_pFiffInfo->ch_names = lChannelsNames;
     m_pFiffInfo->nchan = lChannels.size();
 
-    HPIFit HPI = HPIFit(m_pFiffInfo);
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
 
     // init test data
     QVector<int> vecFreqs = {154,158,161,166};
@@ -653,7 +655,6 @@ void TestHpiFit::testComputeAmplitudes_advanced_summedCosSine()
                                                          iLineF,
                                                          bBasic);
 
-    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
     hpiDataUpdater.prepareDataAndProjectors(matSimData,m_matProjectors);
     const auto& matProjectedData = hpiDataUpdater.getProjectedData();
     HPI.computeAmplitudes(matProjectedData,
@@ -672,14 +673,14 @@ void TestHpiFit::testComputeAmplitudes_advanced_summedCosSine()
 void TestHpiFit::testComputeCoilLocation_basic_noproj()
 {
     // Prepare
-    HPIFit HPI = HPIFit(m_pFiffInfo);
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
     MatrixXd matProjectors = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError = {1.0, 1.0, 1.0, 1.0};
     int iLineF = 60;
     int iSamF = m_pFiffInfo->sfreq;
     VectorXd vecGoF;
-    HpiDataUpdater hpiDataUpdater(m_pFiffInfo);
     MatrixXd matHpiDigitizer = hpiDataUpdater.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
     bool bBasic = true;
@@ -723,14 +724,14 @@ void TestHpiFit::testComputeCoilLocation_basic_noproj()
 void TestHpiFit::testComputeCoilLocation_basic_noproj_trafo()
 {
     // Prepare
-    HPIFit HPI = HPIFit(m_pFiffInfo);
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
     MatrixXd matProjectors = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError(4);
     int iLineF = 60;
     int iSamF = m_pFiffInfo->sfreq;
     VectorXd vecGoF;
-    HpiDataUpdater hpiDataUpdater(m_pFiffInfo);
     MatrixXd matHpiDigitizer = hpiDataUpdater.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
     bool bBasic = true;
@@ -774,13 +775,13 @@ void TestHpiFit::testComputeCoilLocation_basic_noproj_trafo()
 void TestHpiFit::testComputeCoilLocation_basic_proj()
 {
     // Prepare
-    HPIFit HPI = HPIFit(m_pFiffInfo);
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError(4);
     int iLineF = 60;
     int iSamF = m_pFiffInfo->sfreq;
     VectorXd vecGoF;
-    HpiDataUpdater hpiDataUpdater(m_pFiffInfo);
     MatrixXd matHpiDigitizer = hpiDataUpdater.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
     bool bBasic = true;
@@ -824,12 +825,12 @@ void TestHpiFit::testComputeCoilLocation_basic_proj()
 void TestHpiFit::testComputeCoilLocation_advanced_noproj()
 {
     // Prepare
-    HPIFit HPI = HPIFit(m_pFiffInfo);
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
     MatrixXd matProjectors = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError = {1.0, 1.0, 1.0, 1.0};
     VectorXd vecGoF;
-    HpiDataUpdater hpiDataUpdater(m_pFiffInfo);
     MatrixXd matHpiDigitizer = hpiDataUpdater.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
     bool bBasic = false;
@@ -875,12 +876,12 @@ void TestHpiFit::testComputeCoilLocation_advanced_noproj()
 void TestHpiFit::testComputeCoilLocation_advanced_noproj_trafo()
 {
     // Prepare
-    HPIFit HPI = HPIFit(m_pFiffInfo);
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
     MatrixXd matProjectors = MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError(4);
     VectorXd vecGoF;
-    HpiDataUpdater hpiDataUpdater(m_pFiffInfo);
     MatrixXd matHpiDigitizer = hpiDataUpdater.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
     bool bBasic = false;
@@ -925,11 +926,11 @@ void TestHpiFit::testComputeCoilLocation_advanced_noproj_trafo()
 void TestHpiFit::testComputeCoilLocation_advanced_proj()
 {
     // Prepare
-    HPIFit HPI = HPIFit(m_pFiffInfo);
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
     QVector<int> vecFreqs = {166, 154, 161, 158};
     QVector<double> vecError(4);
     VectorXd vecGoF;
-    HpiDataUpdater hpiDataUpdater(m_pFiffInfo);
     MatrixXd matHpiDigitizer = hpiDataUpdater.getHpiDigitizer();
     MatrixXd matCoilLocExpected = m_pFiffInfo->dev_head_t.apply_inverse_trans(matHpiDigitizer.cast<float>()).cast<double>();
     bool bBasic = false;
@@ -975,9 +976,7 @@ void TestHpiFit::testComputeCoilLocation_advanced_proj()
 
 void TestHpiFit::testFit_basic_gof()
 {
-    /// prepare
-    HPIFit HPI = HPIFit(m_pFiffInfo);
-
+    /// prepare    
     int iSampleFreq = m_pFiffInfo->sfreq;
     int iLineFreq = m_pFiffInfo->linefreq;
     QVector<int> vecHpiFreqs = {166, 154, 161, 158};
@@ -987,11 +986,19 @@ void TestHpiFit::testFit_basic_gof()
                                                          iLineFreq,
                                                          bBasic);
 
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
+    hpiDataUpdater.prepareDataAndProjectors(m_matData,m_matProjectors);
+    const auto& matProjectedData = hpiDataUpdater.getProjectedData();
+    const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
+    const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
+
     HpiFitResult hpiFitResult;
 
-    HPI.fit(m_matData,
-            m_matProjectors,
+    HPI.fit(matProjectedData,
+            matPreparedProjectors,
             modelParameters,
+            matCoilsHead,
             hpiFitResult);
 
     VectorXd vecGoF = hpiFitResult.GoF;
@@ -1006,8 +1013,6 @@ void TestHpiFit::testFit_basic_gof()
 void TestHpiFit::testFit_advanced_gof()
 {
     /// prepare
-    HPIFit HPI = HPIFit(m_pFiffInfo);
-
     int iSampleFreq = m_pFiffInfo->sfreq;
     int iLineFreq = m_pFiffInfo->linefreq;
     QVector<int> vecHpiFreqs = {166, 154, 161, 158};
@@ -1016,11 +1021,20 @@ void TestHpiFit::testFit_advanced_gof()
                                                          iSampleFreq,
                                                          iLineFreq,
                                                          bBasic);
+
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
+    hpiDataUpdater.prepareDataAndProjectors(m_matData,m_matProjectors);
+    const auto& matProjectedData = hpiDataUpdater.getProjectedData();
+    const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
+    const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
+
     HpiFitResult hpiFitResult;
 
-    HPI.fit(m_matData,
-            m_matProjectors,
+    HPI.fit(matProjectedData,
+            matPreparedProjectors,
             modelParameters,
+            matCoilsHead,
             hpiFitResult);
 
     VectorXd vecGoF = hpiFitResult.GoF;
@@ -1035,8 +1049,6 @@ void TestHpiFit::testFit_advanced_gof()
 void TestHpiFit::testFit_basic_error()
 {
     /// prepare
-    HPIFit HPI = HPIFit(m_pFiffInfo);
-
     int iSampleFreq = m_pFiffInfo->sfreq;
     int iLineFreq = m_pFiffInfo->linefreq;
     QVector<int> vecHpiFreqs = {166, 154, 161, 158};
@@ -1045,11 +1057,20 @@ void TestHpiFit::testFit_basic_error()
                                                          iSampleFreq,
                                                          iLineFreq,
                                                          bBasic);
+
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
+    hpiDataUpdater.prepareDataAndProjectors(m_matData,m_matProjectors);
+    const auto& matProjectedData = hpiDataUpdater.getProjectedData();
+    const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
+    const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
+
     HpiFitResult hpiFitResult;
 
-    HPI.fit(m_matData,
-            m_matProjectors,
+    HPI.fit(matProjectedData,
+            matPreparedProjectors,
             modelParameters,
+            matCoilsHead,
             hpiFitResult);
 
     QVector<double> vecError = hpiFitResult.errorDistances;
@@ -1064,8 +1085,6 @@ void TestHpiFit::testFit_basic_error()
 void TestHpiFit::testFit_advanced_error()
 {
     /// prepare
-    HPIFit HPI = HPIFit(m_pFiffInfo);
-
     int iSampleFreq = m_pFiffInfo->sfreq;
     int iLineFreq = m_pFiffInfo->linefreq;
     QVector<int> vecHpiFreqs = {166, 154, 161, 158};
@@ -1074,11 +1093,20 @@ void TestHpiFit::testFit_advanced_error()
                                                          iSampleFreq,
                                                          iLineFreq,
                                                          bBasic);
+
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
+    hpiDataUpdater.prepareDataAndProjectors(m_matData,m_matProjectors);
+    const auto& matProjectedData = hpiDataUpdater.getProjectedData();
+    const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
+    const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
+
     HpiFitResult hpiFitResult;
 
-    HPI.fit(m_matData,
-            m_matProjectors,
+    HPI.fit(matProjectedData,
+            matPreparedProjectors,
             modelParameters,
+            matCoilsHead,
             hpiFitResult);
 
     QVector<double> vecError = hpiFitResult.errorDistances;
@@ -1118,60 +1146,77 @@ void TestHpiFit::testFindOrder()
     QVector<int> vecFreqsActual23 = {154,166,158,161};
     QVector<int> vecFreqsActual24 = {166,154,158,161};
 
-    HPIFit HPI = HPIFit(m_pFiffInfo);
     QVector<int> vecFreqsExpected = {166, 154, 161, 158};
     QVector<bool> vecResultExpected(24);
     vecResultExpected.fill(true);
 
     /// act
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
+    hpiDataUpdater.prepareDataAndProjectors(m_matData,m_matProjectors);
+    const auto& matProjectedData = hpiDataUpdater.getProjectedData();
+    const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
+    const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
+
+    HpiFitResult hpiFitResult;
+
+    int iSampleFreq = m_pFiffInfo->sfreq;
+    int iLineFreq = m_pFiffInfo->linefreq;
+    QVector<int> vecHpiFreqs = {166, 154, 161, 158};
+    bool bBasic = false;
+    ModelParameters modelParameters = setModelParameters(vecHpiFreqs,
+                                                         iSampleFreq,
+                                                         iLineFreq,
+                                                         bBasic);
+
     QVector<bool> vecResultActual;
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual01,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual01);
     vecResultActual << (vecFreqsExpected == vecFreqsActual01);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual02,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual02);
     vecResultActual << (vecFreqsExpected == vecFreqsActual02);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual03,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual03);
     vecResultActual << (vecFreqsExpected == vecFreqsActual03);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual04,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual04);
     vecResultActual << (vecFreqsExpected == vecFreqsActual04);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual05,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual05);
     vecResultActual << (vecFreqsExpected == vecFreqsActual05);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual06,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual06);
     vecResultActual << (vecFreqsExpected == vecFreqsActual06);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual07,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual07);
     vecResultActual << (vecFreqsExpected == vecFreqsActual07);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual08,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual08);
     vecResultActual << (vecFreqsExpected == vecFreqsActual08);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual09,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual09);
     vecResultActual << (vecFreqsExpected == vecFreqsActual09);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual10,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual10);
     vecResultActual << (vecFreqsExpected == vecFreqsActual10);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual11,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual11);
     vecResultActual << (vecFreqsExpected == vecFreqsActual11);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual12,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual12);
     vecResultActual << (vecFreqsExpected == vecFreqsActual12);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual13,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual13);
     vecResultActual << (vecFreqsExpected == vecFreqsActual13);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual14,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual14);
     vecResultActual << (vecFreqsExpected == vecFreqsActual14);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual15,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual15);
     vecResultActual << (vecFreqsExpected == vecFreqsActual15);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual16,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual16);
     vecResultActual << (vecFreqsExpected == vecFreqsActual16);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual17,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual17);
     vecResultActual << (vecFreqsExpected == vecFreqsActual17);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual18,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual18);
     vecResultActual << (vecFreqsExpected == vecFreqsActual18);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual19,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual19);
     vecResultActual << (vecFreqsExpected == vecFreqsActual19);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual20,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual20);
     vecResultActual << (vecFreqsExpected == vecFreqsActual20);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual21,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual21);
     vecResultActual << (vecFreqsExpected == vecFreqsActual21);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual22,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual22);
     vecResultActual << (vecFreqsExpected == vecFreqsActual22);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual23,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual23);
     vecResultActual << (vecFreqsExpected == vecFreqsActual23);
-    HPI.findOrder(m_matData,m_matProjectors,vecFreqsActual24,m_pFiffInfo);
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vecFreqsActual24);
     vecResultActual << (vecFreqsExpected == vecFreqsActual24);
 
     /// assert

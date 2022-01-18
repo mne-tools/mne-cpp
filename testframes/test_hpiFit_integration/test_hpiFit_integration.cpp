@@ -47,7 +47,7 @@
 #include <fiff/fiff_dig_point_set.h>
 
 #include <inverse/hpiFit/hpifit.h>
-#include <inverse/hpiFit/hpifitdata.h>
+#include <inverse/hpiFit/hpidataupdater.h>
 
 #include <utils/ioutils.h>
 #include <utils/mnemath.h>
@@ -178,7 +178,15 @@ void TestHpiFitIntegration::initTestCase()
     Eigen::MatrixXd mProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
 
-    HPIFit HPI = HPIFit(pFiffInfo);
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
+
+    int iSampleFreq = pFiffInfo->sfreq;
+    int iLineFreq = pFiffInfo->linefreq;
+    ModelParameters modelParameters = setModelParameters(vFreqs,
+                                                         iSampleFreq,
+                                                         iLineFreq,
+                                                         true);
 
     // bring frequencies into right order
     from = first + mRefPos(0,0)*pFiffInfo->sfreq;
@@ -186,19 +194,17 @@ void TestHpiFitIntegration::initTestCase()
     if(!raw.read_raw_segment(mData, mTimes, from, to)) {
         qCritical("error during read_raw_segment");
     }
-    qInfo() << "[done]";
 
     qInfo() << "Order Frequecies: ...";
-    HPI.findOrder(mData,mProjectors,vFreqs,pFiffInfo);
+    hpiDataUpdater.prepareDataAndProjectors(mData,mProjectors);
+    const auto& matProjectedData = hpiDataUpdater.getProjectedData();
+    const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
+    const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
 
-    qInfo() << "[done]";
-    MatrixXd matAmplitudes;
-    bool bBasic = true;
-    ModelParameters modelParameters;
+    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vFreqs);
     modelParameters.vecHpiFreqs = vFreqs;
-    modelParameters.iLineFreq = 60;
-    modelParameters.iSampleFreq = pFiffInfo->sfreq;
-    modelParameters.bBasic = bBasic;
+    qInfo() << "[done]";
+
 
     HpiFitResult hpiFitResult;
 
@@ -213,9 +219,12 @@ void TestHpiFitIntegration::initTestCase()
             qWarning("error during read_raw_segment\n");
         }
 
-        HPI.fit(mData,
-                mProjectors,
+        const auto& matProjectedData = hpiDataUpdater.getProjectedData();
+        const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
+        HPI.fit(matProjectedData,
+                matPreparedProjectors,
                 modelParameters,
+                matCoilsHead,
                 hpiFitResult);
 
         if(MNEMath::compareTransformation(devHeadT.trans, hpiFitResult.devHeadTrans.trans, threshRot, threshTrans)) {
