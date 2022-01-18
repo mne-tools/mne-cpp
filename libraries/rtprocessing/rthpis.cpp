@@ -39,6 +39,7 @@
 #include "rthpis.h"
 
 #include <inverse/hpiFit/hpifit.h>
+#include <inverse/hpiFit/sensorset.h>
 #include <fiff/fiff_info.h>
 
 //=============================================================================================================
@@ -64,15 +65,15 @@ using namespace INVERSELIB;
 // DEFINE MEMBER METHODS RtHpiWorker
 //=============================================================================================================
 
-RtHpiWorker::RtHpiWorker(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
+RtHpiWorker::RtHpiWorker(const SensorSet sensorSet)
 {
-    m_pHpiFit = QSharedPointer<INVERSELIB::HPIFit>(new HPIFit(pFiffInfo));
+    m_pHpiFit = QSharedPointer<INVERSELIB::HPIFit>(new HPIFit(sensorSet));
 }
 
 void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
                          const Eigen::MatrixXd& matProjectors,
-                         const QVector<int>& vFreqs,
-                         QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo)
+                         const ModelParameters& modelParameters,
+                         const Eigen::MatrixXd& matCoilsHead)
 {
     if(this->thread()->isInterruptionRequested()) {
         return;
@@ -83,15 +84,11 @@ void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
     fitResult.devHeadTrans.from = 1;
     fitResult.devHeadTrans.to = 4;
 
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = vFreqs;
-    modelParameters.iLineFreq = pFiffInfo->linefreq;
-    modelParameters.iSampleFreq = pFiffInfo->sfreq;
-    modelParameters.bBasic = false;
 
     m_pHpiFit->fit(matData,
                    matProjectors,
                    modelParameters,
+                   matCoilsHead,
                    fitResult);
 
     emit resultReady(fitResult);
@@ -101,16 +98,17 @@ void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
 // DEFINE MEMBER METHODS RtHpi
 //=============================================================================================================
 
-RtHpi::RtHpi(FiffInfo::SPtr p_pFiffInfo, QObject *parent)
+RtHpi::RtHpi(const SensorSet sensorSet, QObject *parent)
 : QObject(parent)
-, m_pFiffInfo(p_pFiffInfo)
 {
     qRegisterMetaType<INVERSELIB::HpiFitResult>("INVERSELIB::HpiFitResult");
     qRegisterMetaType<QVector<int> >("QVector<int>");
     qRegisterMetaType<QSharedPointer<FIFFLIB::FiffInfo> >("QSharedPointer<FIFFLIB::FiffInfo>");
     qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
 
-    RtHpiWorker *worker = new RtHpiWorker(m_pFiffInfo);
+    m_sensorSet = sensorSet;
+
+    RtHpiWorker *worker = new RtHpiWorker(m_sensorSet);
     worker->moveToThread(&m_workerThread);
 
     connect(&m_workerThread, &QThread::finished,
@@ -136,11 +134,11 @@ RtHpi::~RtHpi()
 
 void RtHpi::append(const MatrixXd &data)
 {
-    if(m_vCoilFreqs.size() >= 3) {
+    if(m_modelParameters.iNHpiCoils >= 3) {
         emit operate(data,
                      m_matProjectors,
-                     m_vCoilFreqs,
-                     m_pFiffInfo);
+                     m_modelParameters,
+                     m_matCoilsHead);
     } else {
         qWarning() << "[RtHpi::append] Not enough coil frequencies set. At least three frequencies are needed.";
     }
@@ -148,9 +146,9 @@ void RtHpi::append(const MatrixXd &data)
 
 //=============================================================================================================
 
-void RtHpi::setCoilFrequencies(const QVector<int>& vCoilFreqs)
+void RtHpi::setModelParameters(ModelParameters modelParameters)
 {
-    m_vCoilFreqs = vCoilFreqs;
+    m_modelParameters = modelParameters;
 }
 
 //=============================================================================================================
@@ -158,6 +156,13 @@ void RtHpi::setCoilFrequencies(const QVector<int>& vCoilFreqs)
 void RtHpi::setProjectionMatrix(const Eigen::MatrixXd& matProjectors)
 {
     m_matProjectors = matProjectors;
+}
+
+//=============================================================================================================
+
+void RtHpi::setHpiDigitizer(const Eigen::MatrixXd& matCoilsHead)
+{
+    m_matCoilsHead = matCoilsHead;
 }
 
 //=============================================================================================================
@@ -173,7 +178,7 @@ void RtHpi::restart()
 {
     stop();
 
-    RtHpiWorker *worker = new RtHpiWorker(m_pFiffInfo);
+    RtHpiWorker *worker = new RtHpiWorker(m_sensorSet);
     worker->moveToThread(&m_workerThread);
 
     connect(&m_workerThread, &QThread::finished,

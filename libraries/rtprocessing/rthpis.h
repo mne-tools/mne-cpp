@@ -40,7 +40,8 @@
 //=============================================================================================================
 
 #include "rtprocessing_global.h"
-
+#include <inverse/hpiFit/sensorset.h>
+#include <inverse/hpiFit/signalmodel.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -66,8 +67,10 @@ namespace FIFFLIB {
 }
 
 namespace INVERSELIB {
+    struct SensorSet;
     class HPIFit;
     struct HpiFitResult;
+    struct ModelParameters;
 }
 
 //=============================================================================================================
@@ -95,7 +98,7 @@ public:
      *
      * @param[in] pFiffInfo        Associated Fiff Information.
      */
-    explicit RtHpiWorker(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+    explicit RtHpiWorker(const INVERSELIB::SensorSet sensorSet);
 
     //=========================================================================================================
     /**
@@ -108,8 +111,8 @@ public:
      */
     void doWork(const Eigen::MatrixXd& matData,
                 const Eigen::MatrixXd& matProjectors,
-                const QVector<int>& vFreqs,
-                QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+                const INVERSELIB::ModelParameters& modelParameters,
+                const Eigen::MatrixXd& matCoilsHead);
 
 protected:
     //=========================================================================================================
@@ -140,7 +143,7 @@ public:
      * @param[in] p_pFiffInfo        Associated Fiff Information.
      * @param[in] parent     Parent QObject (optional).
      */
-    explicit RtHpi(QSharedPointer<FIFFLIB::FiffInfo> p_pFiffInfo,
+    explicit RtHpi(const INVERSELIB::SensorSet sensorSet,
                    QObject *parent = 0);
 
     //=========================================================================================================
@@ -163,7 +166,7 @@ public:
      *
      * @param[in] vCoilFreqs  The coil frequencies.
      */
-    void setCoilFrequencies(const QVector<int>& vCoilFreqs);
+    void setModelParameters(INVERSELIB::ModelParameters modelParameters);
 
     //=========================================================================================================
     /**
@@ -172,6 +175,14 @@ public:
      * @param[in] matProjectors  The new projection matrix.
      */
     void setProjectionMatrix(const Eigen::MatrixXd& matProjectors);
+
+    //=========================================================================================================
+    /**
+     * Set the new projection matrix.
+     *
+     * @param[in] matProjectors  The new projection matrix.
+     */
+    void setHpiDigitizer(const Eigen::MatrixXd& matCoilsHead);
 
     //=========================================================================================================
     /**
@@ -192,17 +203,18 @@ protected:
      */
     void handleResults(const INVERSELIB::HpiFitResult &fitResult);
 
-    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;           /**< Holds the fiff measurement information. */
-    QThread             m_workerThread;         /**< The worker thread. */
-    QVector<int>        m_vCoilFreqs;           /**< Vector contains the HPI coil frequencies. */
-    Eigen::MatrixXd     m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
+    QThread m_workerThread;         /**< The worker thread. */
+    Eigen::MatrixXd m_matCoilsHead;           /**< Vector contains the HPI coil frequencies. */
+    Eigen::MatrixXd m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
+    INVERSELIB::SensorSet m_sensorSet;
+    INVERSELIB::ModelParameters m_modelParameters;
 
 signals:
     void newHpiFitResultAvailable(const INVERSELIB::HpiFitResult &fitResult);
     void operate(const Eigen::MatrixXd& matData,
                  const Eigen::MatrixXd& matProjectors,
-                 const QVector<int>& vFreqs,
-                 QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+                 const INVERSELIB::ModelParameters& modelParameters,
+                 const Eigen::MatrixXd& matCoilsHead);
 };
 
 //=============================================================================================================
