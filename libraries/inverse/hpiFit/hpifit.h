@@ -45,7 +45,6 @@
 #include "fiff/fiff_ch_info.h"
 #include "sensorset.h"
 #include "signalmodel.h"
-#include "hpidataupdater.h"
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_dig_point.h>
 #include <fiff/fiff_coord_trans.h>
@@ -83,7 +82,8 @@ namespace FIFFLIB{
 
 namespace INVERSELIB
 {
-
+struct SensorSet;
+class SignalModel;
 //=============================================================================================================
 // Declare all structures to be used
 //=============================================================================================================
@@ -156,7 +156,7 @@ public:
      *
      * @param[in] pFiffInfo        Associated Fiff Information.
      */
-    explicit HPIFit(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+    explicit HPIFit(const SensorSet sensorSet);
 
     //=========================================================================================================
     /**
@@ -175,9 +175,10 @@ public:
      * @param[in]   iMaxIterations             The maximum allowed number of iterations used to fit the dipoles. Default is 500.
      * @param[in]   fAbortError                The error which will lead to aborting the dipole fitting process. Default is 1e-9.
      */
-    void fit(const Eigen::MatrixXd& matData,
+    void fit(const Eigen::MatrixXd& matProjectedData,
              const Eigen::MatrixXd& matProjectors,
              const ModelParameters& modelParameters,
+             const Eigen::MatrixXd& matCoilsHead,
              HpiFitResult& hpiFitResult);
 
     //=========================================================================================================
@@ -190,10 +191,11 @@ public:
      * @param[out]  vecFreqs           The frequencies for each coil in correct order.
      * @param[in]   pFiffInfo          Associated Fiff Information.
      */
-    void findOrder(const Eigen::MatrixXd& t_mat,
-                   const Eigen::MatrixXd& t_matProjectors,
-                   QVector<int>& vecFreqs,
-                   const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+    void findOrder(const Eigen::MatrixXd& matProjectedData,
+                   const Eigen::MatrixXd& matProjectors,
+                   const ModelParameters& modelParameters,
+                   const Eigen::MatrixXd& matCoilsHead,
+                   QVector<int>& vecFreqs);
 
     //=========================================================================================================
     /**
@@ -337,8 +339,6 @@ private:
                        const Eigen::MatrixXd matCoil,
                        const Eigen::MatrixXd matTrans);
 
-    HpiDataUpdater m_HpiDataUpdater;
-    QList<FIFFLIB::FiffChInfo> m_lChannels;
     SensorSet m_sensors;          /**< sensor struct that contains information about all sensors. */
     SignalModel m_signalModel;      /**< The signal model to use for the hpi fitting */
 

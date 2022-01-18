@@ -47,6 +47,7 @@
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimehpiresult.h>
 #include <inverse/hpiFit/hpifit.h>
+#include <inverse/hpiFit/hpidataupdater.h>
 
 #include <fiff/fiff_info.h>
 #include <fiff/c/fiff_digitizer_data.h>
@@ -560,7 +561,10 @@ void Hpi::run()
 
     FiffCoordTrans transDevHeadRef = m_pFiffInfo->dev_head_t;
 
-    HPIFit HPI = HPIFit(m_pFiffInfo);
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
+    HpiFitResult hpiFitResult;
+
     bool bDrop = false;
     double dErrorMax = 0.0;
     double dMeanErrorDist = 0.0;
@@ -605,22 +609,32 @@ void Hpi::run()
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols()-iDataIndexCounter) =
                         matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
 
+                m_mutex.lock();
+
+                hpiDataUpdater.prepareDataAndProjectors(matDataMerged,m_matCompProjectors);
+                m_mutex.unlock();
+
+                const auto& matProjectedData = hpiDataUpdater.getProjectedData();
+                const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
+                const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
+
                 // Perform HPI fit
                 m_mutex.lock();
                 if(m_bDoFreqOrder) {
                     // find correct frequencie order if requested
-                    HPI.findOrder(matDataMerged,m_matCompProjectors,m_vCoilFreqs,m_pFiffInfo);
+                    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,m_vCoilFreqs);
                     m_bDoFreqOrder = false;
                 }
                 m_mutex.unlock();
 
                 // Perform actual fitting
-                m_mutex.lock();
-                HPI.fit(matDataMerged,
-                        m_matCompProjectors,
+
+
+                HPI.fit(matProjectedData,
+                        matPreparedProjectors,
                         modelParameters,
-                        fitResult);
-                m_mutex.unlock();
+                        matCoilsHead,
+                        hpiFitResult);
 
                 //Check if the error meets distance requirement
                 if(fitResult.errorDistances.size() > 0) {
