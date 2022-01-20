@@ -85,6 +85,7 @@ public:
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+    void resizeAsRectangle(int width, int height);
 
 private:
     SCSHAREDLIB::AbstractPlugin::SPtr m_pPlugin;
