@@ -104,6 +104,13 @@ PluginItem::~PluginItem()
 
 void PluginItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
+    auto textSize = painter->fontMetrics().size(Qt::TextSingleLine, m_pPlugin->getName());
+    int iHorizontalSpacing = 4;
+    int iVerticalSpacing = 4;
+
+    resizeAsRectangle(textSize.width() + 2 * iHorizontalSpacing,
+                      textSize.height() + 2* iVerticalSpacing);
+
     QGraphicsPolygonItem::paint(painter, option, widget);
 
     painter->setPen(QPen(m_qColorContour, 1));
@@ -123,9 +130,7 @@ void PluginItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * opti
 //            break;
 //    }
 
-    painter->drawText(-m_iWidth/2+4,-m_iHeight/2+14,m_pPlugin->getName().mid(0,8));
-
-    painter->drawText(-m_iWidth/2+4,-m_iHeight/2+28,m_pPlugin->getName().mid(8,8));
+    painter->drawText(-m_iWidth/2+ iHorizontalSpacing, iVerticalSpacing,m_pPlugin->getName());
 }
 
 //=============================================================================================================
@@ -208,4 +213,23 @@ QVariant PluginItem::itemChange(GraphicsItemChange change, const QVariant &value
 //    }
 
 //    return QGraphicsItem::itemChange(change, value);
+}
+
+//=============================================================================================================
+
+void PluginItem::resizeAsRectangle(int width, int height)
+{
+    if(m_iWidth == width && m_iHeight == height){
+        return;
+    }
+
+    m_iWidth = width;
+    m_iHeight = height;
+
+    m_qPolygon = QPolygonF();
+    m_qPolygon << QPointF(-m_iWidth/2, -m_iHeight/2) << QPointF(m_iWidth/2, -m_iHeight/2)
+               << QPointF(m_iWidth/2, m_iHeight/2) << QPointF(-m_iWidth/2, m_iHeight/2)
+               << QPointF(-m_iWidth/2, -m_iHeight/2);
+
+    this->setPolygon(m_qPolygon);
 }
