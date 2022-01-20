@@ -109,7 +109,7 @@ void PluginItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * opti
     int iVerticalSpacing = 4;
 
     resizeAsRectangle(textSize.width() + 2 * iHorizontalSpacing,
-                      textSize.height() + 2* iVerticalSpacing);
+                      textSize.height() + 2 * iVerticalSpacing);
 
     QGraphicsPolygonItem::paint(painter, option, widget);
 
@@ -130,7 +130,7 @@ void PluginItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * opti
 //            break;
 //    }
 
-    painter->drawText(-m_iWidth/2+ iHorizontalSpacing, iVerticalSpacing,m_pPlugin->getName());
+    painter->drawText(-m_iWidth/2 + iHorizontalSpacing, iVerticalSpacing, m_pPlugin->getName());
 }
 
 //=============================================================================================================
@@ -226,10 +226,11 @@ void PluginItem::resizeAsRectangle(int width, int height)
     m_iWidth = width;
     m_iHeight = height;
 
-    m_qPolygon = QPolygonF();
-    m_qPolygon << QPointF(-m_iWidth/2, -m_iHeight/2) << QPointF(m_iWidth/2, -m_iHeight/2)
-               << QPointF(m_iWidth/2, m_iHeight/2) << QPointF(-m_iWidth/2, m_iHeight/2)
-               << QPointF(-m_iWidth/2, -m_iHeight/2);
+    m_qPolygon = QPolygonF({QPointF(-m_iWidth/2, -m_iHeight/2),
+                            QPointF(m_iWidth/2, -m_iHeight/2),
+                            QPointF(m_iWidth/2, m_iHeight/2),
+                            QPointF(-m_iWidth/2, m_iHeight/2),
+                            QPointF(-m_iWidth/2, -m_iHeight/2)});
 
     this->setPolygon(m_qPolygon);
 }
