@@ -108,6 +108,18 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
                  const MatrixXd& matCoilsHead,
                  HpiFitResult& hpiFitResult)
 {
+    fit(matProjectedData,matProjectors,modelParameters,matCoilsHead,false,hpiFitResult);
+}
+
+//=============================================================================================================
+
+void HPIFit::fit(const MatrixXd& matProjectedData,
+                 const MatrixXd& matProjectors,
+                 const ModelParameters& modelParameters,
+                 const MatrixXd& matCoilsHead,
+                 const bool bOrderFrequencies,
+                 HpiFitResult& hpiFitResult)
+{
     // TODO: Check for dimensions
     MatrixXd matAmplitudes;
     computeAmplitudes(matProjectedData,
@@ -115,16 +127,24 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
                       matAmplitudes);
 
     int iNumCoils = modelParameters.iNHpiCoils;
-    MatrixXd matCoilPos = MatrixXd::Zero(iNumCoils,3);
+    MatrixXd matCoilsDev = MatrixXd::Zero(iNumCoils,3);
     computeCoilLocation(matAmplitudes,
                         matProjectors,
                         hpiFitResult.devHeadTrans,
                         hpiFitResult.errorDistances,
                         matCoilsHead,
-                        matCoilPos,
+                        matCoilsDev,
                         hpiFitResult.GoF);
 
-    computeHeadPosition(matCoilPos,
+    if(bOrderFrequencies) {
+        std::vector<int> vecOrder = findCoilOrder(matCoilsDev,
+                                                  matCoilsHead);
+
+        matCoilsDev = order(vecOrder,matCoilsDev);
+        hpiFitResult.hpiFreqs = order(vecOrder,modelParameters.vecHpiFreqs);
+    }
+
+    computeHeadPosition(matCoilsDev,
                         matCoilsHead,
                         hpiFitResult.devHeadTrans,
                         hpiFitResult.errorDistances,
@@ -248,10 +268,8 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilPos,
                                  QVector<double> &vecError,
                                  FIFFLIB::FiffDigPointSet& fittedPointSet)
 {
-
     // prepare dropping coils
-    MatrixXd matTrans(4,4);
-    matTrans = computeTransformation(matCoilsHead,matCoilPos);
+    MatrixXd matTrans = computeTransformation(matCoilsHead,matCoilPos);
 
     // Store the final result to fiff info
     // Set final device/head matrix and its inverse to the fiff info
@@ -287,37 +305,13 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilPos,
 
 //=============================================================================================================
 
-void HPIFit::findOrder(const MatrixXd& matData,
-                       const MatrixXd& matProjectors,
-                       const ModelParameters& modelParameters,
-                       const MatrixXd& matCoilsHead,
-                       QVector<int>& vecFreqs)
+std::vector<int> HPIFit::findCoilOrder(const MatrixXd matCoilsDev,
+                                       const MatrixXd matCoilsHead)
 {
-    // predefinitions
-    QVector<double> vecError;
-    VectorXd vecGoF;
-    int iNumCoils = vecFreqs.length();
-    // compute amplitudes
-    MatrixXd matAmplitudes;
-    computeAmplitudes(matData,
-                      modelParameters,
-                      matAmplitudes);
-
-    // compute coil position
-    FiffCoordTrans transDevHead;
-    MatrixXd matCoilsDev = MatrixXd::Zero(iNumCoils,3);
-    computeCoilLocation(matAmplitudes,
-                        matProjectors,
-                        transDevHead,
-                        vecError,
-                        matCoilsHead,
-                        matCoilsDev,
-                        vecGoF);
-
     // extract digitized and fitted coils
-    QVector<int> vecFreqsOrder = vecFreqs;
     MatrixXd matDigTemp = matCoilsHead;
     MatrixXd matCoilTemp = matCoilsDev;
+    int iNumCoils = matCoilsDev.rows();
 
     std::vector<int> vecOrder(iNumCoils);
     std::iota(vecOrder.begin(), vecOrder.end(), 0);;
@@ -328,6 +322,8 @@ void HPIFit::findOrder(const MatrixXd& matData,
     double dErrorBest = dErrorMin;
 
     MatrixXd matTrans(4,4);
+    std::vector<int> vecOrderBest = vecOrder;
+
     bool bSuccess = false;
     // permutation
     do {
@@ -338,13 +334,40 @@ void HPIFit::findOrder(const MatrixXd& matData,
         dErrorActual = objectTrans(matCoilsHead,matCoilTemp,matTrans);
         if(dErrorActual < dErrorMin && dErrorActual < dErrorBest) {
             // exit
-            for(int i = 0; i < iNumCoils; i++) {
-                vecFreqs[i] =  vecFreqsOrder[vecOrder[i]];
-            }
             dErrorBest = dErrorActual;
+            vecOrderBest = vecOrder;
             bSuccess = true;
         }
     } while (std::next_permutation(vecOrder.begin(), vecOrder.end()));
+    return vecOrderBest;
+}
+
+//=============================================================================================================
+
+Eigen::MatrixXd HPIFit::order(const std::vector<int> vecOrder,
+                              const Eigen::MatrixXd matToOrder)
+{
+    int iNumCoils = vecOrder.size();
+    MatrixXd matToOrderTemp = matToOrder;
+
+    for(int i = 0; i < iNumCoils; i++) {
+        matToOrderTemp.row(i) =  matToOrder.row(vecOrder[i]);
+    }
+    return matToOrderTemp;
+}
+
+//=============================================================================================================
+
+QVector<int> HPIFit::order(const std::vector<int> vecOrder,
+                           const QVector<int> vecToOrder)
+{
+    int iNumCoils = vecOrder.size();
+    QVector<int> vecToOrderTemp = vecToOrder;
+
+    for(int i = 0; i < iNumCoils; i++) {
+        vecToOrderTemp[i] =  vecToOrder[vecOrder[i]];
+    }
+    return vecToOrderTemp;
 }
 
 //=============================================================================================================
