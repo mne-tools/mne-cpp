@@ -102,7 +102,7 @@ struct CoilParam {
  * The struct specifing all data needed to perform coil-wise fitting.
  */
 struct HpiFitResult {
-    QVector<int> hpiFreqs;
+    QVector<int>                hpiFreqs;
     FIFFLIB::FiffDigPointSet    fittedCoils;
     FIFFLIB::FiffCoordTrans     devHeadTrans;
     QVector<double>             errorDistances;
@@ -181,21 +181,12 @@ public:
              const Eigen::MatrixXd& matCoilsHead,
              HpiFitResult& hpiFitResult);
 
-    //=========================================================================================================
-    /**
-     * assign frequencies to correct position
-     *
-     * @param[in]   t_mat              Data to estimate the HPI positions from.
-     * @param[in]   t_matProjectors    The projectors to apply. Bad channels are still included.
-     * @param[in]   vecFreqs           The frequencies for each coil in unknown order.
-     * @param[out]  vecFreqs           The frequencies for each coil in correct order.
-     * @param[in]   pFiffInfo          Associated Fiff Information.
-     */
-    void findOrder(const Eigen::MatrixXd& matProjectedData,
-                   const Eigen::MatrixXd& matProjectors,
-                   const ModelParameters& modelParameters,
-                   const Eigen::MatrixXd& matCoilsHead,
-                   QVector<int>& vecFreqs);
+    void fit(const Eigen::MatrixXd& matProjectedData,
+             const Eigen::MatrixXd& matProjectors,
+             const ModelParameters& modelParameters,
+             const Eigen::MatrixXd& matCoilsHead,
+             const bool bOrderFrequencies,
+             HpiFitResult& hpiFitResult);
 
     //=========================================================================================================
     /**
@@ -308,6 +299,24 @@ private:
      */
     Eigen::Matrix4d computeTransformation(Eigen::MatrixXd matNH,
                                           Eigen::MatrixXd matBT);
+
+    //=========================================================================================================
+    /**
+     * Computes the transformation matrix between two sets of 3D points.
+     *
+     * @param[in] matNH    The first set of input 3D points (row-wise order) - To.
+     * @param[in] matBT    The second set of input 3D points (row-wise order) - From.
+     *
+     * @return Returns the transformation matrix.
+     */
+    std::vector<int> findCoilOrder(const Eigen::MatrixXd matCoilsDev,
+                                   const Eigen::MatrixXd matCoilsHead);
+
+    Eigen::MatrixXd order(const std::vector<int> vecOrder,
+                          const Eigen::MatrixXd matToOrder);
+
+    QVector<int> order(const std::vector<int> vecOrder,
+                       const QVector<int> vecToOrder);
 
     //=========================================================================================================
     /**
