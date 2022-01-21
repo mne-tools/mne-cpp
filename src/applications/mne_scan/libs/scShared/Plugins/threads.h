@@ -90,6 +90,13 @@ public:
      */
     void stop() {m_bTriggerStop = true; m_thread.join(); m_bIsRunning = false;}
 
+    //=========================================================================================================
+    /**
+     * Runs a function as a thread. Thread is deleted once function is finished. Not bound by caller's scope.
+     */
+    template<class Function, class... Args >
+    static void run(Function&& func, Args&&... args){Thread(func, args...).m_thread.detach();}
+
 private:
     std::thread m_thread;                       /**< The actual thread. */
     std::atomic_bool m_bIsRunning;              /**< Whether the thred is runing. */
