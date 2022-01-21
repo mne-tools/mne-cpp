@@ -44,6 +44,7 @@
 #include <fiff/fiff_dig_point_set.h>
 
 #include <inverse/hpiFit/hpifit.h>
+#include <inverse/hpiFit/hpidataupdater.h>
 
 #include <utils/ioutils.h>
 #include <utils/generics/applicationlogger.h>
@@ -105,7 +106,7 @@ int main(int argc, char *argv[])
     QCommandLineOption inStep("step", "The step size in ms.", "in","10");
     QCommandLineOption inFreqs("freqs", "The frequencies used.", "in","154,158,161,166");
     QCommandLineOption inSave("save", "Store the fitting results [0,1].", "in","0");
-    QCommandLineOption inVerbose("verbose", "Print to command line [0,1].", "in","0");
+    QCommandLineOption inVerbose("verbose", "Print to command line [0,1].", "in","1");
     QCommandLineOption inDrop("drop", "Only use tree best coils, yes/no.", "in","0");
     QCommandLineOption inDebug("debug", "Save debug info during HPI fit [0,1].", "in","0");
     QCommandLineOption inFast("fast", "Do fast fits [0,1].", "in","0");
@@ -205,7 +206,9 @@ int main(int argc, char *argv[])
     // if debugging files are necessary set bDoDebug = true;
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
 
-    HPIFit HPI = HPIFit(pFiffInfo);
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
+
     MatrixXd matAmplitudes;
     MatrixXd matCoilLoc(4,3);
 
@@ -219,23 +222,20 @@ int main(int argc, char *argv[])
 
     // order frequencies
     timer.start();
-    HPI.findOrder(matData,
-                  matProjectors,
-                  vecFreqs,
-                  pFiffInfo);
-
-    float fTimer = 0.0;
-
+    hpiDataUpdater.prepareDataAndProjectors(matData,matProjectors);
+    const auto& matProjectedData = hpiDataUpdater.getProjectedData();
+    const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
+    const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
     ModelParameters modelParameters = setModelParameters(vecFreqs,
                                                          pFiffInfo->sfreq,
                                                          pFiffInfo->linefreq,
                                                          bFast);
+
     HpiFitResult hpiFitResult;
-    hpiFitResult.hpiFreqs = vecFreqs;
-    hpiFitResult.errorDistances = vecError;
-    hpiFitResult.GoF = vecGoF;
-    hpiFitResult.fittedCoils = fittedPointSet;
-    hpiFitResult.devHeadTrans = transDevHead;
+    HPI.fit(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,true,hpiFitResult);
+    modelParameters.vecHpiFreqs = hpiFitResult.hpiFreqs;
+
+    float fTimer = 0.0;
 
     // read and fit
     for(int i = 0; i < vecTime.size(); i++) {
@@ -252,11 +252,14 @@ int main(int argc, char *argv[])
         }
 
         timer.start();
-        HPI.fit(matData,
-                matProjectors,
+        hpiDataUpdater.prepareDataAndProjectors(matData,matProjectors);
+        const auto& matProjectedData = hpiDataUpdater.getProjectedData();
+        const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
+        HPI.fit(matProjectedData,
+                matPreparedProjectors,
                 modelParameters,
+                matCoilsHead,
                 hpiFitResult);
-
         fTimer = timer.elapsed();
 
         HPIFit::storeHeadPosition(vecTime(i), hpiFitResult.devHeadTrans.trans, matPosition, hpiFitResult.GoF, hpiFitResult.errorDistances);
@@ -269,8 +272,8 @@ int main(int argc, char *argv[])
         if(bVerbose) {
             qInfo() << "Iteration" << i << "Of" << vecTime.size()
                     << " Duration " << fTimer << "ms"
-                    << " Error" << vecError[0]*1000 << vecError[1]*1000 << vecError[2]*1000 << vecError[3]*1000
-                    << " GoF" << vecGoF[0] << vecGoF[1] << vecGoF[2] << vecGoF[3];
+                    << " Error" << hpiFitResult.errorDistances[0]*1000 << hpiFitResult.errorDistances[1]*1000 << hpiFitResult.errorDistances[2]*1000 << hpiFitResult.errorDistances[3]*1000
+                    << " GoF" << hpiFitResult.GoF[0] << hpiFitResult.GoF[1] << hpiFitResult.GoF[2] << hpiFitResult.GoF[3];
         }
     }
     qInfo() << "Iterations:" << vecTime.size()

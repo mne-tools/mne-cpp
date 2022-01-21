@@ -172,15 +172,11 @@ void TestHpiFitIntegration::initTestCase()
 
     // Setup informations for HPI fit
     vFreqs = {154,158,161,166};
-    QVector<double> vError(4);
-    VectorXd vGoF(4);
-    FiffDigPointSet fittedPointSet;
     Eigen::MatrixXd mProjectors = Eigen::MatrixXd::Identity(pFiffInfo->chs.size(), pFiffInfo->chs.size());
     QString sHPIResourceDir = QCoreApplication::applicationDirPath() + "/HPIFittingDebug";
 
     HpiDataUpdater hpiDataUpdater = HpiDataUpdater(pFiffInfo);
     HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
-
     int iSampleFreq = pFiffInfo->sfreq;
     int iLineFreq = pFiffInfo->linefreq;
     ModelParameters modelParameters = setModelParameters(vFreqs,
@@ -188,7 +184,6 @@ void TestHpiFitIntegration::initTestCase()
                                                          iLineFreq,
                                                          true);
 
-    // bring frequencies into right order
     from = first + mRefPos(0,0)*pFiffInfo->sfreq;
     to = from + quantum;
     if(!raw.read_raw_segment(mData, mTimes, from, to)) {
@@ -201,12 +196,12 @@ void TestHpiFitIntegration::initTestCase()
     const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
     const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
 
-    HPI.findOrder(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,vFreqs);
-    modelParameters.vecHpiFreqs = vFreqs;
-    qInfo() << "[done]";
-
-
     HpiFitResult hpiFitResult;
+    HPI.fit(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,true,hpiFitResult);
+    modelParameters.vecHpiFreqs = hpiFitResult.hpiFreqs;
+    vFreqs = hpiFitResult.hpiFreqs;
+
+    qInfo() << "[done]";
 
     for(int i = 0; i < mRefPos.rows(); i++) {
         from = first + mRefPos(i,0)*pFiffInfo->sfreq;
@@ -219,6 +214,7 @@ void TestHpiFitIntegration::initTestCase()
             qWarning("error during read_raw_segment\n");
         }
 
+        hpiDataUpdater.prepareDataAndProjectors(mData,mProjectors);
         const auto& matProjectedData = hpiDataUpdater.getProjectedData();
         const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
         HPI.fit(matProjectedData,
@@ -295,7 +291,7 @@ void TestHpiFitIntegration::compareMove()
 
 void TestHpiFitIntegration::compareAngle()
 {
-    float fDiffAngle = (mRefResult.col(1)-mRefResult.col(1)).mean();
+    float fDiffAngle = (mRefResult.col(1)-mHpiResult.col(1)).mean();
     fDiffAngle = std::abs(fDiffAngle);
 
     qDebug() << "DiffAngle: [degree]" << fDiffAngle;
@@ -306,7 +302,7 @@ void TestHpiFitIntegration::compareAngle()
 
 void TestHpiFitIntegration::compareDetect()
 {
-    float fDiffCompare = (mRefResult.col(2)-mRefResult.col(2)).mean();
+    float fDiffCompare = (mRefResult.col(2)-mHpiResult.col(2)).mean();
     fDiffCompare = std::abs(fDiffCompare);
 
     qDebug() << "DiffCompare: " << fDiffCompare;
