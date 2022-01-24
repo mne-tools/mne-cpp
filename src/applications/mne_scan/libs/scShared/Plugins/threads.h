@@ -57,7 +57,7 @@ public:
     /**
      * Constructs an "empty" object.
      */
-    Thread(): m_bIsRunning(false), m_bTriggerStop(false) {};
+    Thread(): m_bIsRunning(false) {}
 
 
     template<class Function, class... Args >
@@ -69,26 +69,13 @@ public:
      * @param[in] args  function arguments.
      *                  (Note - member functions need to be passed usually-implicit 'this' pointer)
      */
-    Thread(Function&& func, Args&&... args): m_thread(func, args...), m_bIsRunning(true), m_bTriggerStop(false){}
+    Thread(Function&& func, Args&&... args): m_thread(func, args...), m_bIsRunning(true) {}
 
     //=========================================================================================================
     /**
      * Returns whether the thread is running.
      */
     bool isRunning() const {return m_bIsRunning;}
-
-    //=========================================================================================================
-    /**
-     * Returns whether a stop has been triggered.
-     */
-    bool stopTriggered() const {return m_bTriggerStop;}
-
-    //=========================================================================================================
-    /**
-     * Attempts to join thread. Underlying function needs to finish before this happens.
-     * Recommend using the 'stopTriggered' method to check, similarly to 'interruptionRequested'
-     */
-    void stop() {m_bTriggerStop = true; m_thread.join(); m_bIsRunning = false;}
 
     //=========================================================================================================
     /**
@@ -100,9 +87,7 @@ public:
 private:
     std::thread m_thread;                       /**< The actual thread. */
     std::atomic_bool m_bIsRunning;              /**< Whether the thred is runing. */
-    std::atomic_bool m_bTriggerStop;            /**< Whether a thread interruption has been requested. */
 };
-
 
 }//namespace
 
