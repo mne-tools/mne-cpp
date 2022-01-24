@@ -77,6 +77,7 @@ using namespace Eigen;
 
 Averaging::Averaging()
 : m_pCircularBuffer(CircularBuffer<FIFFLIB::FiffEvokedSet>::SPtr::create(40))
+, m_bProcessOutput(false)
 {
 }
 
@@ -84,7 +85,7 @@ Averaging::Averaging()
 
 Averaging::~Averaging()
 {
-    if(this->isRunning())
+    if(m_OutputProcessingThread.joinable())
         stop();
 }
 
@@ -106,7 +107,8 @@ void Averaging::unload()
 
 bool Averaging::start()
 {
-    QThread::start();
+    m_bProcessOutput = true;
+    m_OutputProcessingThread = std::thread(&Averaging::run, this);
 
     return true;
 }
@@ -115,8 +117,8 @@ bool Averaging::start()
 
 bool Averaging::stop()
 {
-    requestInterruption();
-    wait(500);
+    m_bProcessOutput = false;
+    m_OutputProcessingThread.join();
 
     m_bPluginControlWidgetsInit = false;
 
@@ -406,7 +408,7 @@ void Averaging::onChangeBaselineActive(bool state)
 void Averaging::onNewEvokedSet(const FIFFLIB::FiffEvokedSet& evokedSet,
                                const QStringList& lResponsibleTriggerTypes)
 {
-    if(!this->isRunning()) {
+    if(!m_bProcessOutput) {
         return;
     }
 
@@ -439,7 +441,7 @@ void Averaging::run()
     FIFFLIB::FiffEvokedSet evokedSet;
     QStringList lResponsibleTriggerTypes;
 
-    while(!isInterruptionRequested()){
+    while(m_bProcessOutput){
         if(m_pCircularBuffer->pop(evokedSet)) {
             m_qMutex.lock();
             lResponsibleTriggerTypes = m_lResponsibleTriggerTypes;

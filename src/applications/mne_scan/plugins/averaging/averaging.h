@@ -47,6 +47,8 @@
 
 #include <fiff/fiff_evoked_set.h>
 
+#include <thread>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -236,6 +238,9 @@ private:
     QStringList                                     m_lResponsibleTriggerTypes;         /**< List of all trigger types which lead to the recent emit of a new evoked set. */
 
     QMap<QString,int>                               m_mapStimChsIndexNames;             /**< The currently available stim channels and their corresponding index in the data. */
+
+    std::thread             m_OutputProcessingThread;
+    std::atomic_bool        m_bProcessOutput;
 
 signals:
     void stimChannelsChanged(const QMap<QString,int>& mapStimChsIndexNames);
