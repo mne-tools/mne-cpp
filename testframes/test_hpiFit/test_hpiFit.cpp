@@ -93,18 +93,6 @@ public:
 private slots:
     void initTestCase(); // run once at the very beginning
     void init(); // run before each test
-    void testComputeAmplitudes_basic_sin();  // test with simulated data, only sines
-    void testComputeAmplitudes_basic_cos();  // test with simulated data, only cosines
-    void testComputeAmplitudes_basic_sincos();  // test with simulated data, both summed
-    void testComputeAmplitudes_advanced_sin();  // test with simulated data, only sines
-    void testComputeAmplitudes_advanced_cos();  // test with simulated data, only cosines
-    void testComputeAmplitudes_advanced_summedCosSine();  // test with simulated data, summed sines/cos + line
-    void testComputeCoilLocation_basic_noproj();  // test with basic model, no projectors
-    void testComputeCoilLocation_basic_noproj_trafo();  // test with basic model, no projectors and initial trafo
-    void testComputeCoilLocation_basic_proj();  // test with basic model and projectors
-    void testComputeCoilLocation_advanced_noproj();  // test with advanced model, no projectors
-    void testComputeCoilLocation_advanced_noproj_trafo();  // test with advanced model, no projectors and initial trafo
-    void testComputeCoilLocation_advanced_proj();  // test with advanced model and projectors
     void testFit_basic_gof();  // test with advanced model and projectors
     void testFit_advanced_gof();  // compare gof to specified value
     void testFit_basic_error();  // compare error to specified value

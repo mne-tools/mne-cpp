@@ -190,6 +190,28 @@ public:
 
     //=========================================================================================================
     /**
+     * Store results from dev_Head_t as quaternions in position matrix. The format is the same as you
+     * get from Neuromag's MaxFilter.
+     *
+     *
+     * @param[in]   fTime           The corresponding time in the measurement for the fit.
+     * @param[in]   pFiffInfo       The FiffInfo file from the measurement.
+     * @param[out]  matPosition     The matrix to store the results.
+     * @param[in]   vecGoF          The goodness of fit for each coil.
+     * @param[in]   vecError        The Hpi estimation Error per coil.
+     *
+     * ToDo: get estimated movement velocity and store it in channel 9
+     */
+    static void storeHeadPosition(float fTime,
+                                  const Eigen::MatrixXf& transDevHead,
+                                  Eigen::MatrixXd& matPosition,
+                                  const Eigen::VectorXd& vecGoF,
+                                  const QVector<double>& vecError);
+
+private:
+
+    //=========================================================================================================
+    /**
      * Fit linear model to data to get amplitudes for the dipole fit
      *
      * @param[in]   matData            Data to estimate the HPI positions from.
@@ -245,27 +267,6 @@ public:
                              QVector<double> &vecError,
                              FIFFLIB::FiffDigPointSet& fittedPointSet);
 
-    //=========================================================================================================
-    /**
-     * Store results from dev_Head_t as quaternions in position matrix. The format is the same as you
-     * get from Neuromag's MaxFilter.
-     *
-     *
-     * @param[in]   fTime           The corresponding time in the measurement for the fit.
-     * @param[in]   pFiffInfo       The FiffInfo file from the measurement.
-     * @param[out]  matPosition     The matrix to store the results.
-     * @param[in]   vecGoF          The goodness of fit for each coil.
-     * @param[in]   vecError        The Hpi estimation Error per coil.
-     *
-     * ToDo: get estimated movement velocity and store it in channel 9
-     */
-    static void storeHeadPosition(float fTime,
-                                  const Eigen::MatrixXf& transDevHead,
-                                  Eigen::MatrixXd& matPosition,
-                                  const Eigen::VectorXd& vecGoF,
-                                  const QVector<double>& vecError);
-
-private:
     //=========================================================================================================
     /**
      * Fits dipoles for the given coils and a given data set.
