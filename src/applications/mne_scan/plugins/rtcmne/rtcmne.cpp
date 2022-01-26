@@ -106,6 +106,7 @@ RtcMne::RtcMne()
 , m_sMethod("dSPM")
 , m_fMriHeadTrans(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/all-trans.fif")
 , m_bUpdateMinimumNorm(false)
+, m_bProcessOutput(false)
 {
 }
 

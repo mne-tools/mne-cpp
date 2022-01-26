@@ -46,6 +46,7 @@
 #include <utils/generics/circularbuffer.h>
 
 #include <thread>
+#include <atomic>
 
 //=============================================================================================================
 // EIGEN INCLUDES

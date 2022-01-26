@@ -50,6 +50,7 @@
 #include <fiff/fiff_coord_trans.h>
 
 #include <thread>
+#include <atomic>
 
 //=============================================================================================================
 // QT INCLUDES

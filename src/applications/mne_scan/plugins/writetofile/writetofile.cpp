@@ -78,6 +78,7 @@ WriteToFile::WriteToFile()
 , m_iSplitCount(0)
 , m_iRecordingMSeconds(5*60*1000)
 , m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr(new CircularBuffer_Matrix_double(40)))
+, m_bProcessOutput(false)
 {
     m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
     m_pActionRecordFile->setStatusTip(tr("Start Recording"));

@@ -93,6 +93,7 @@ NoiseReduction::NoiseReduction()
 , m_pCircularBuffer(QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>::create(40))
 , m_pNoiseReductionInput(Q_NULLPTR)
 , m_pNoiseReductionOutput(Q_NULLPTR)
+, m_bProcessOutput(false)
 {
     if(m_sCurrentSystem == "BabyMEG") {
         m_iNBaseFctsFirst = 270;

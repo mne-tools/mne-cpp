@@ -51,6 +51,7 @@
 #include <scShared/Plugins/abstractalgorithm.h>
 
 #include <thread>
+#include <atomic>
 
 //=============================================================================================================
 // QT INCLUDES

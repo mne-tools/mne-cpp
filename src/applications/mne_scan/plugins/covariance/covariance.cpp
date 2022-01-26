@@ -82,6 +82,7 @@ using namespace Eigen;
 Covariance::Covariance()
 : m_iEstimationSamples(2000)
 , m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr::create(40))
+, m_bProcessOutput(false)
 {
 }
 

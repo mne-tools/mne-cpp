@@ -50,6 +50,7 @@
 #include <connectivity/network/network.h>
 
 #include <thread>
+#include <atomic>
 
 //=============================================================================================================
 // QT INCLUDES

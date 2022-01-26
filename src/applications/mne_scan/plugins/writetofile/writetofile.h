@@ -47,6 +47,7 @@
 #include <fiff/fifffilesharer.h>
 
 #include <thread>
+#include <atomic>
 
 //=============================================================================================================
 // QT INCLUDES

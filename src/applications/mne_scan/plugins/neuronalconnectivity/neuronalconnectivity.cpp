@@ -95,6 +95,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_pCircularBuffer(CircularBuffer<CONNECTIVITYLIB::Network>::SPtr::create(40))
 , m_pRtConnectivity(RtConnectivity::SPtr::create())
 , m_pActionShowYourWidget(Q_NULLPTR)
+, m_bProcessOutput(false)
 {
     AbstractMetric::m_bStorageModeIsActive = true;
     AbstractMetric::m_iNumberBinStart = 0;

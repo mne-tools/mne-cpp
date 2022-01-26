@@ -48,6 +48,7 @@
 #include <fiff/fiff_evoked_set.h>
 
 #include <thread>
+#include <atomic>
 
 //=============================================================================================================
 // QT INCLUDES

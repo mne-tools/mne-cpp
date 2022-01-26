@@ -97,6 +97,7 @@ Hpi::Hpi()
 , m_bUseSSP(false)
 , m_bUseComp(false)
 , m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr::create(40))
+, m_bProcessOutput(false)
 {
     connect(this, &Hpi::devHeadTransAvailable,
             this, &Hpi::onDevHeadTransAvailable, Qt::BlockingQueuedConnection);

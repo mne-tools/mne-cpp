@@ -92,6 +92,7 @@ RtFwd::RtFwd()
 , m_bDoRecomputation(false)
 , m_bDoClustering(true)
 , m_bDoFwdComputation(false)
+, m_bProcessOutput(false)
 {
     // set init values
     m_pFwdSettings->solname = QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/your-solution-fwd.fif";

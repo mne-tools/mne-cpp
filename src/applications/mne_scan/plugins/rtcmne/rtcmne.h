@@ -51,6 +51,7 @@
 #include <mne/mne_inverse_operator.h>
 
 #include <thread>
+#include <atomic>
 
 //=============================================================================================================
 // QT INCLUDES

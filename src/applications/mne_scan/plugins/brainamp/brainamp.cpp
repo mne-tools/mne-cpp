@@ -84,6 +84,7 @@ BrainAMP::BrainAMP()
 , m_sRPA("2RD")
 , m_sNasion("0Z")
 , m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_double>(new CircularBuffer_Matrix_double(8)))
+, m_bProcessOutput(false)
 {
     // Create record file option action bar item/button
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup project"), this);
