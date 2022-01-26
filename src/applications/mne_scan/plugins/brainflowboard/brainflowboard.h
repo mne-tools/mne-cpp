@@ -47,6 +47,10 @@
 
 #include <scShared/Plugins/abstractsensor.h>
 
+#include <thread>
+#include <atomic>
+
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -128,6 +132,9 @@ private:
 
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pOutput;
     QSharedPointer<FIFFLIB::FiffInfo>   m_pFiffInfo;        /**< Fiff measurement info.*/
+
+    std::thread             m_OutputProcessingThread;
+    std::atomic_bool        m_bProcessOutput;
 };
 }
 

@@ -44,12 +44,16 @@
 #include <scShared/Plugins/abstractsensor.h>
 #include <utils/generics/circularbuffer.h>
 
+#include <thread>
+#include <atomic>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QObject>
 #include <QDebug>
+#include <QThread>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -181,6 +185,9 @@ protected:
 
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRMTSA_Natus;     /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfo;        /**< Fiff measurement info.*/
+
+    std::thread             m_OutputProcessingThread;
+    std::atomic_bool        m_bProcessOutput;
 };
 } // NAMESPACE
 
