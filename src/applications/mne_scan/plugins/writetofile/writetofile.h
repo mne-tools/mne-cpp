@@ -46,6 +46,8 @@
 #include <scShared/Plugins/abstractalgorithm.h>
 #include <fiff/fifffilesharer.h>
 
+#include <thread>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -310,6 +312,9 @@ private:
     FIFFLIB::FiffFileSharer                 m_FileSharer;                   /**< Handles copying recording file and saving copy to shared directory. */
 
     QStringList                             m_lFileNames;                   /**< List of file names of latest recording */
+
+    std::thread             m_OutputProcessingThread;
+    std::atomic_bool        m_bProcessOutput;
 };
 } // NAMESPACE
 

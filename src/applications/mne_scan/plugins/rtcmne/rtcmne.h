@@ -50,6 +50,8 @@
 
 #include <mne/mne_inverse_operator.h>
 
+#include <thread>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -264,6 +266,9 @@ protected:
     QStringList                     m_qListPickChannels;        /**< Channels to pick. */
 
     MNELIB::MNEInverseOperator      m_invOp;                    /**< The inverse operator. */
+
+    std::thread             m_OutputProcessingThread;
+    std::atomic_bool        m_bProcessOutput;
 
 signals:
     void responsibleTriggerTypesChanged(const QStringList& lResponsibleTriggerTypes);

@@ -115,7 +115,7 @@ RtcMne::~RtcMne()
 {
     m_future.waitForFinished();
 
-    if(this->isRunning()) {
+    if(m_bProcessOutput) {
         stop();
     }
 }
@@ -313,7 +313,8 @@ bool RtcMne::calcFiffInfo()
 
 bool RtcMne::start()
 {
-    QThread::start();
+    m_bProcessOutput = true;
+    m_OutputProcessingThread = std::thread(&RtcMne::run, this);
     return true;
 }
 
@@ -321,8 +322,11 @@ bool RtcMne::start()
 
 bool RtcMne::stop()
 {
-    requestInterruption();
-    wait(500);
+    m_bProcessOutput = false;
+
+    if(m_OutputProcessingThread.joinable()){
+        m_OutputProcessingThread.join();
+    }
 
     m_qListCovChNames.clear();
     m_bEvokedInput = false;
@@ -369,7 +373,7 @@ void RtcMne::updateRTFS(SCMEASLIB::Measurement::SPtr pMeasurement)
             m_qMutex.unlock();
 
             // update inverse operator
-            if(this->isRunning() && m_pRtInvOp) {
+            if(m_bProcessOutput && m_pRtInvOp) {
                 m_pRtInvOp->setFwdSolution(m_pFwd);
                 m_pRtInvOp->append(*m_pNoiseCov);
             }
@@ -386,7 +390,7 @@ void RtcMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
     if(m_pFwd) {
         QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>();
 
-        if(pRTMSA && this->isRunning()) {
+        if(pRTMSA && m_bProcessOutput) {
             //Fiff Information of the RTMSA
             m_qMutex.lock();
             if(!m_pFiffInfoInput) {
@@ -400,7 +404,7 @@ void RtcMne::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement)
                 initPluginControlWidgets();
             }
 
-            if(this->isRunning()) {
+            if(m_bProcessOutput) {
                 // Check for artifacts
                 QMap<QString,double> mapReject;
                 mapReject.insert("eog", 150e-06);
@@ -433,7 +437,7 @@ void RtcMne::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
     if(m_pFwd) {
         QSharedPointer<RealTimeCov> pRTC = pMeasurement.dynamicCast<RealTimeCov>();
 
-        if(pRTC && this->isRunning()) {
+        if(pRTC && m_bProcessOutput) {
             // Init Real-Time inverse estimator
             if(!m_pRtInvOp && m_pFiffInfo && m_pFwd) {
                 m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pFwd));
@@ -446,7 +450,7 @@ void RtcMne::updateRTC(SCMEASLIB::Measurement::SPtr pMeasurement)
                 m_qListCovChNames = pRTC->getValue()->names;
             }
 
-            if(this->isRunning() && m_pRtInvOp){
+            if(m_bProcessOutput && m_pRtInvOp){
                 m_pNoiseCov = pRTC->getValue();
                 m_pRtInvOp->append(*m_pNoiseCov);
             }
@@ -467,7 +471,7 @@ void RtcMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
                 initPluginControlWidgets();
             }
 
-            if(!this->isRunning() || !lResponsibleTriggerTypes.contains(m_sAvrType)) {
+            if(!m_bProcessOutput || !lResponsibleTriggerTypes.contains(m_sAvrType)) {
                 return;
             }
 
@@ -491,7 +495,7 @@ void RtcMne::updateRTE(SCMEASLIB::Measurement::SPtr pMeasurement)
                 initPluginControlWidgets();
             }
 
-            if(this->isRunning()) {
+            if(m_bProcessOutput) {
                 for(int i = 0; i < pFiffEvokedSet->evoked.size(); ++i) {
                     if(pFiffEvokedSet->evoked.at(i).comment == m_sAvrType) {
                         // Store current evoked as member so we can dispatch it if the time pick by the user changed
@@ -551,7 +555,7 @@ void RtcMne::onTimePointValueChanged(int iTimePointMs)
         m_iTimePointSps = m_pFiffInfoInput->sfreq * (float)iTimePointMs * 0.001f;
         m_qMutex.unlock();
 
-        if(this->isRunning()) {
+        if(m_bProcessOutput) {
             while(!m_pCircularEvokedBuffer->push(m_currentEvoked)) {
                 //Do nothing until the circular buffer is ready to accept new data again
             }
@@ -565,7 +569,7 @@ void RtcMne::run()
 {
     // Wait for fiff info to arrive
     while(!calcFiffInfo()) {
-        msleep(200);
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 
     // Init parameters
@@ -588,7 +592,7 @@ void RtcMne::run()
     QStringList lChNamesInvOp;
 
     // Start processing data
-    while(!isInterruptionRequested()) {
+    while(m_bProcessOutput) {
         m_qMutex.lock();
         iTimePointSps = m_iTimePointSps;
         bEvokedInput = m_bEvokedInput;

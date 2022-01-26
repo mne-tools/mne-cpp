@@ -115,7 +115,7 @@ RtFwd::~RtFwd()
 {
     m_future.waitForFinished();
 
-    if(this->isRunning()) {
+    if(m_bProcessOutput) {
         stop();
     }
 }
@@ -222,7 +222,8 @@ bool RtFwd::start()
     stream->close();
 
     //Start thread
-    QThread::start();
+    m_bProcessOutput = true;
+    m_OutputProcessingThread = std::thread(&RtFwd::run, this);
 
     return true;
 }
@@ -231,8 +232,11 @@ bool RtFwd::start()
 
 bool RtFwd::stop()
 {
-    requestInterruption();
-    wait(500);
+    m_bProcessOutput = false;
+
+    if(m_OutputProcessingThread.joinable()){
+        m_OutputProcessingThread.join();
+    }
 
     m_bPluginControlWidgetsInit = false;
 
@@ -400,7 +404,7 @@ void RtFwd::run()
             break;
         }
         m_mutex.unlock();
-        msleep(200);
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
     }
 
     m_mutex.lock();
@@ -429,7 +433,7 @@ void RtFwd::run()
     bool bDoFwdComputation = false;             // compute forward if requested
     bool bIsInit = false;                       // only recompute if initial fwd solulion is calculated
 
-    while(!isInterruptionRequested()) {
+    while(m_bProcessOutput) {
         m_mutex.lock();
         bDoFwdComputation = m_bDoFwdComputation;
         m_mutex.unlock();

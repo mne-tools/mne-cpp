@@ -49,6 +49,8 @@
 
 #include <fiff/fiff_coord_trans.h>
 
+#include <thread>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -223,6 +225,9 @@ private:
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pRTMSAInput;          /**< The incoming data.*/
 
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeFwdSolution>::SPtr         m_pRTFSOutput;          /**< The fwd solution.*/
+
+    std::thread             m_OutputProcessingThread;
+    std::atomic_bool        m_bProcessOutput;
 
 signals:
     //=========================================================================================================

@@ -111,7 +111,7 @@ WriteToFile::WriteToFile()
 
 WriteToFile::~WriteToFile()
 {
-    if(this->isRunning()) {
+    if(m_bProcessOutput) {
         stop();
     }
 }
@@ -145,7 +145,8 @@ void WriteToFile::unload()
 
 bool WriteToFile::start()
 {
-    QThread::start();
+    m_bProcessOutput = true;
+    m_OutputProcessingThread = std::thread(&WriteToFile::run, this);
 
     return true;
 }
@@ -154,8 +155,11 @@ bool WriteToFile::start()
 
 bool WriteToFile::stop()
 {
-    requestInterruption();
-    wait();
+    m_bProcessOutput = false;
+
+    if(m_OutputProcessingThread.joinable()){
+        m_OutputProcessingThread.join();
+    }
 
     m_bPluginControlWidgetsInit = false;
 
@@ -293,7 +297,7 @@ void WriteToFile::run()
     MatrixXd matData;
     qint32 size = 0;
 
-    while(!isInterruptionRequested()) {
+    while(m_bProcessOutput) {
         if(m_pCircularBuffer) {
             //pop matrix
 

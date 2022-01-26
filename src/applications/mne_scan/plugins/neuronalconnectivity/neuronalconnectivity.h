@@ -49,6 +49,8 @@
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
 
+#include <thread>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -272,6 +274,9 @@ private:
     Eigen::RowVectorXi          m_vecPicks;                     /**< The picked data channels. */
 
     CONNECTIVITYLIB::Network    m_currentConnectivityResult;    /**< The current connectivity result.*/
+
+    std::thread             m_OutputProcessingThread;
+    std::atomic_bool        m_bProcessOutput;
 };
 } // NAMESPACE
 
