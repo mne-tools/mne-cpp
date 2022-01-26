@@ -168,8 +168,9 @@ bool Covariance::start()
 
 bool Covariance::stop()
 {
+    m_bProcessOutput = false;
+
     if(m_OutputProcessingThread.joinable()){
-        m_bProcessOutput = false;
         m_OutputProcessingThread.join();
     }
 

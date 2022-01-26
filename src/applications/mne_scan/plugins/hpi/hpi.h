@@ -47,6 +47,8 @@
 
 #include <fiff/fiff_dig_point.h>
 
+#include <thread>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -319,6 +321,9 @@ private:
 
     SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr     m_pHpiInput;            /**< The RealTimeMultiSampleArray of the Hpi input.*/
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeHpiResult>::SPtr           m_pHpiOutput;           /**< The RealTimeHpiResult of the Hpi output.*/
+
+    std::thread             m_OutputProcessingThread;
+    std::atomic_bool        m_bProcessOutput;
 
 signals:
     void errorsChanged(const QVector<double>& vErrors,

@@ -172,9 +172,11 @@ bool FiffSimulator::start()
 bool FiffSimulator::stop()
 {
     // Stop this (consumer) thread first
-    m_StopOutputProcessingThread = true;
-    m_OutputProcessingThread.join();
-    m_OutputProcessingThreadRunning = false;
+    m_bProcessOutput = false;
+
+    if(m_OutputProcessingThread.joinable()){
+        m_OutputProcessingThread.join();
+    }
 
     // Stop producer thread second
     m_pFiffSimulatorProducer->stop();

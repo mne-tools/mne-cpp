@@ -106,8 +106,8 @@ Hpi::Hpi()
 
 Hpi::~Hpi()
 {
-    if(isRunning()) {
-        resetState();
+    if(m_bProcessOutput) {
+        stop();
     }
 }
 
@@ -145,7 +145,9 @@ void Hpi::unload()
 
 bool Hpi::start()
 {
-    QThread::start();
+    m_bProcessOutput = true;
+    m_OutputProcessingThread = std::thread(&Hpi::run, this);
+
 
     return true;
 }
@@ -154,7 +156,11 @@ bool Hpi::start()
 
 bool Hpi::stop()
 {
-    requestInterruption();
+    m_bProcessOutput = false;
+
+    if(m_OutputProcessingThread.joinable()){
+        m_OutputProcessingThread.join();
+    }
     resetState();
     return true;
 }
@@ -545,7 +551,7 @@ void Hpi::run()
         if(bFiffInfo) {
             break;
         }
-        msleep(100);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     // init hpi fit
@@ -583,7 +589,7 @@ void Hpi::run()
     MatrixXd matDataMerged(m_pFiffInfo->chs.size(), fittingWindowSize);
     bool bOrder = false;
 
-    while(!isInterruptionRequested()) {
+    while(m_bProcessOutput) {
         m_mutex.lock();
         if(fittingWindowSize != m_iFittingWindowSize) {
             fittingWindowSize = m_iFittingWindowSize;

@@ -118,7 +118,10 @@ bool Averaging::start()
 bool Averaging::stop()
 {
     m_bProcessOutput = false;
-    m_OutputProcessingThread.join();
+
+    if(m_OutputProcessingThread.joinable()){
+        m_OutputProcessingThread.join();
+    }
 
     m_bPluginControlWidgetsInit = false;
 
