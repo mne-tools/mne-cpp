@@ -85,7 +85,7 @@ Averaging::Averaging()
 
 Averaging::~Averaging()
 {
-    if(m_OutputProcessingThread.joinable())
+    if(m_bProcessOutput)
         stop();
 }
 

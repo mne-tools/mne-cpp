@@ -45,6 +45,8 @@
 #include <scShared/Plugins/abstractalgorithm.h>
 #include <utils/generics/circularbuffer.h>
 
+#include <thread>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -163,6 +165,9 @@ private:
 
     QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray> >  m_pCovarianceInput;     /**< The RealTimeMultiSampleArray of the Covariance input.*/
     QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeCov> >              m_pCovarianceOutput;    /**< The RealTimeCov of the Covariance output.*/
+
+    std::thread             m_OutputProcessingThread;
+    std::atomic_bool        m_bProcessOutput;
 
 signals:
 };
