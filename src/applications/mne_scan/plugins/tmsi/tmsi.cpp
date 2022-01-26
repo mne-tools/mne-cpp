@@ -634,7 +634,7 @@ void TMSI::run()
 void TMSI::showImpedanceDialog()
 {
     // Open Impedance dialog only if no sampling process is active
-    if(!this->isRunning()) {
+    if(!m_bProcessOutput) {
         if(m_pTmsiImpedanceWidget == NULL) {
             m_pTmsiImpedanceWidget = QSharedPointer<TMSIImpedanceWidget>(new TMSIImpedanceWidget(this));
         }
