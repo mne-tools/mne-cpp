@@ -17,12 +17,15 @@ public:
     explicit ScanCore(QObject *parent = nullptr);
 
 private:
-    void loadPlugins();
 
-    void loadGui();
+    void registerMetatypes();
+    void initPluginManager();
+    void initMainWindow();
 
-    std::unique_ptr<MainWindow> p_MainWindow;
-    std::shared_ptr<SCSHAREDLIB::PluginManager> p_PluginManager;
+    std::unique_ptr<MainWindow> m_pMainWindow;
+    std::shared_ptr<SCSHAREDLIB::PluginManager> m_pPluginManager;
+
+    bool m_bIsRunning;
 };
 }//namespace
 #endif // SCANCORE_H

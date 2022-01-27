@@ -39,6 +39,7 @@
 
 #include "mainsplashscreen.h"
 #include "mainwindow.h"
+#include "scancore.h"
 
 #include <scMeas/measurementtypes.h>
 #include <scMeas/realtimemultisamplearray.h>
@@ -166,6 +167,7 @@ int main(int argc, char *argv[])
     SCMEASLIB::MeasurementTypes::registerTypes();
 
     MainWindow mainWin;
+    ScanCore scanCore;
 
     QSurfaceFormat fmt;
     fmt.setSamples(10);
