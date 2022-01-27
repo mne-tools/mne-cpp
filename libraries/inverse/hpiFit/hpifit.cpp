@@ -95,7 +95,6 @@ HPIFit::HPIFit()
 
 HPIFit::HPIFit(const SensorSet sensorSet)
 {
-    // init member variables
     m_sensors = sensorSet;
     m_signalModel = SignalModel();
 }
@@ -157,13 +156,6 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
                                const ModelParameters& modelParameters,
                                Eigen::MatrixXd& matAmplitudes)
 {
-    // Check if data was passed
-    // TODO: move outside
-    if(matProjectedData.rows() == 0 || matProjectedData.cols() == 0 ) {
-        std::cout<<std::endl<< "HPIFit::computeAmplitudes - No data passed. Returning.";
-        return;
-    }
-
     // fit model
     MatrixXd matTopo = m_signalModel.fitData(modelParameters,matProjectedData);
     matTopo.transposeInPlace();
@@ -171,25 +163,24 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
     // split into sine and cosine amplitudes
     int iNumCoils = modelParameters.iNHpiCoils;
 
-    MatrixXd matAmp(matProjectedData.cols(), iNumCoils);   // sine part
-    MatrixXd matAmpC(matProjectedData.cols(), iNumCoils);  // cosine part
+    MatrixXd matAmpSine(matProjectedData.cols(), iNumCoils);
+    MatrixXd matAmpCosine(matProjectedData.cols(), iNumCoils);
 
-    matAmp = matTopo.leftCols(iNumCoils);
-    matAmpC = matTopo.middleCols(iNumCoils,iNumCoils);
+    matAmpSine = matTopo.leftCols(iNumCoils);
+    matAmpCosine = matTopo.middleCols(iNumCoils,iNumCoils);
 
     // Select sine or cosine component depending on their contributions to the amplitudes
     for(int j = 0; j < iNumCoils; ++j) {
         float fNS = 0.0;
         float fNC = 0.0;
-        fNS = matAmp.col(j).array().square().sum();
-        fNC = matAmpC.col(j).array().square().sum();
+        fNS = matAmpSine.col(j).array().square().sum();
+        fNC = matAmpCosine.col(j).array().square().sum();
         if(fNC > fNS) {
-            matAmp.col(j) = matAmpC.col(j);
+            matAmpSine.col(j) = matAmpCosine.col(j);
         }
     }
 
-    // return data
-    matAmplitudes = std::move(matAmp);
+    matAmplitudes = std::move(matAmpSine);
 }
 
 //=============================================================================================================
@@ -205,13 +196,13 @@ void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
                                  const float fAbortError)
 {
     int iNumCoils = matAmplitudes.cols();
-    MatrixXd matCoilPos = MatrixXd::Zero(iNumCoils,3);
+    MatrixXd matCoilsDev = MatrixXd::Zero(iNumCoils,3);
 
     double dError = std::accumulate(vecError.begin(), vecError.end(), .0) / vecError.size();
 
     if(transDevHead.trans != MatrixXd::Identity(4,4).cast<float>() && dError < 0.010) {
         // if good last fit, use old trafo
-        matCoilPos = transDevHead.apply_inverse_trans(matCoilsHead.cast<float>()).cast<double>();
+        matCoilsDev = transDevHead.apply_inverse_trans(matCoilsHead.cast<float>()).cast<double>();
     } else {
         // if not, find max amplitudes in channels
         VectorXi vecChIdcs(iNumCoils);
@@ -230,14 +221,14 @@ void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
             if(vecChIdcs(j) < m_sensors.ncoils) {
                 Vector3d r0 = m_sensors.r0.row(vecChIdcs(j));
                 Vector3d ez = m_sensors.ez.row(vecChIdcs(j));
-                matCoilPos.row(j) = (-1 * ez * 0.03 + r0);
+                matCoilsDev.row(j) = (-1 * ez * 0.03 + r0);
             }
         }
     }
 
     // init coil parameters
     struct CoilParam coil;
-    coil.pos = matCoilPos;
+    coil.pos = matCoilsDev;
     coil.mom = MatrixXd::Zero(iNumCoils,3);
     coil.dpfiterror = VectorXd::Zero(iNumCoils);
     coil.dpfitnumitr = VectorXd::Zero(iNumCoils);
@@ -262,42 +253,35 @@ void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
 
 //=============================================================================================================
 
-void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilPos,
+void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilsDev,
                                  const Eigen::MatrixXd& matCoilsHead,
                                  FIFFLIB::FiffCoordTrans& transDevHead,
                                  QVector<double> &vecError,
                                  FIFFLIB::FiffDigPointSet& fittedPointSet)
 {
-    // prepare dropping coils
-    MatrixXd matTrans = computeTransformation(matCoilsHead,matCoilPos);
-
-    // Store the final result to fiff info
-    // Set final device/head matrix and its inverse to the fiff info
+    MatrixXd matTrans = computeTransformation(matCoilsHead,matCoilsDev);
     transDevHead = FiffCoordTrans::make(1,4,matTrans.cast<float>(),true);
 
     //Calculate Error
-    MatrixXd matTemp = matCoilPos;
+    MatrixXd matTemp = matCoilsDev;
     MatrixXd matTestPos = transDevHead.apply_trans(matTemp.cast<float>()).cast<double>();
     MatrixXd matDiffPos = matTestPos - matCoilsHead;
 
     // compute error
-    int iNumCoils = matCoilPos.rows();
+    int iNumCoils = matCoilsDev.rows();
     vecError = QVector<double>(iNumCoils);
     for(int i = 0; i < matDiffPos.rows(); ++i) {
         vecError[i] = matDiffPos.row(i).norm();
     }
 
-    // sanity
     fittedPointSet.clear();
-
-    // Generate final fitted points and store in digitizer set
     for(int i = 0; i < iNumCoils; ++i) {
         FiffDigPoint digPoint;
         digPoint.kind = FIFFV_POINT_EEG; //Store as EEG so they have a different color
         digPoint.ident = i;
-        digPoint.r[0] = matCoilPos(i,0);
-        digPoint.r[1] = matCoilPos(i,1);
-        digPoint.r[2] = matCoilPos(i,2);
+        digPoint.r[0] = matCoilsDev(i,0);
+        digPoint.r[1] = matCoilsDev(i,1);
+        digPoint.r[2] = matCoilsDev(i,2);
 
         fittedPointSet << digPoint;
     }
@@ -497,7 +481,6 @@ void HPIFit::storeHeadPosition(float fTime,
                                const QVector<double>& vecError)
 
 {
-    // Write quaternions and vecTime in position matrix. Format is the same like MaxFilter's .pos files.
     Matrix3f matRot = transDevHead.block(0,0,3,3);
 
     Eigen::Quaternionf quatHPI(matRot);
@@ -594,7 +577,7 @@ double HPIFit::objectTrans(const MatrixXd matHeadCoil,
     // remove
     MatrixXd matDiff = matTestPos.block(0,0,3,iNumCoils) - matHeadCoil.transpose();
     VectorXd vecError = matDiff.colwise().norm();
-    // std::cout << vecError.transpose() << std::endl;
+
     // compute error
     double dError = matDiff.colwise().norm().mean();;
 
