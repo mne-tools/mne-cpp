@@ -501,63 +501,6 @@ void HPIFit::storeHeadPosition(float fTime,
 
 //=============================================================================================================
 
-MatrixXd HPIFit::dropCoils(const VectorXd vecGoF,
-                           const MatrixXd matCoil,
-                           const MatrixXd matHeadCoil,
-                           VectorXi& vecInd)
-{
-    int iNumCoils = matCoil.rows();
-    int iNumUsed = iNumCoils;
-    VectorXi vecIndDrop = vecInd;
-    // initial transformation
-    MatrixXd matTransNew = MatrixXd(4,4);
-    MatrixXd matTrans = computeTransformation(matHeadCoil,matCoil);
-    double dErrorActual = objectTrans(matHeadCoil,matCoil,matTrans); // fiducial registration error
-    double dErrorActualNew = 0.0;
-
-    // resize elements
-    MatrixXd matCoilDrop = matCoil;
-    MatrixXd matHeadDrop = matHeadCoil;
-    VectorXd vecGofDrop = vecGoF;
-    matCoilDrop.conservativeResize(iNumUsed-1,3);
-    matHeadDrop.conservativeResize(iNumUsed-1,3);
-    vecGofDrop.conservativeResize(iNumUsed-1,1);
-    vecIndDrop.conservativeResize(iNumUsed-1,1);
-
-    // Drop Coils recursively
-    if(iNumUsed > 3) {
-        int iR = 0;
-        // do not copy row coresponding to lowest gof -> drop it
-        for(int i = 0; i < iNumUsed; i++){
-            if(vecGoF[i] != vecGoF.minCoeff()) {
-                matHeadDrop.row(iR) = matHeadCoil.row(i);
-                matCoilDrop.row(iR) = matCoil.row(i);
-                vecGofDrop(iR) = vecGoF(i);
-                vecIndDrop(iR) = vecInd(i);
-                iR++;
-            } else {
-                qInfo() << "Dropped coil: " << i << " with GoF: "  << vecGoF[i];
-            }
-        }
-        // iterative update of transformation
-        matTransNew = dropCoils(vecGofDrop, matCoilDrop, matHeadDrop, vecIndDrop);
-
-        // fiducial registration error
-        dErrorActualNew = objectTrans(matHeadDrop,matCoilDrop,matTransNew);
-
-        iNumUsed--;
-
-        // update if dErrorActualNew < dErrorActualOld;
-        if(dErrorActualNew < dErrorActual) {
-            matTrans = matTransNew;
-            vecInd = vecIndDrop;
-        }
-    }
-    return matTrans;
-}
-
-//=============================================================================================================
-
 double HPIFit::objectTrans(const MatrixXd matHeadCoil,
                            const MatrixXd matCoil,
                            const MatrixXd matTrans)
