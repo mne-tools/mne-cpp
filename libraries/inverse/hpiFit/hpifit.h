@@ -113,19 +113,6 @@ struct HpiFitResult {
     float                       fHeadMovementAngle;
 };
 
-/**
- * The strucut specifing the sensor parameters.
- */
-//struct SensorSet {
-//    Eigen::MatrixXd r0;
-//    Eigen::MatrixXd rmag;
-//    Eigen::MatrixXd cosmag;
-//    Eigen::MatrixXd tra;
-//    Eigen::RowVectorXd w;
-//    int ncoils;
-//    int np;
-//};
-
 //=============================================================================================================
 // INVERSELIB FORWARD DECLARATIONS
 //=============================================================================================================
@@ -318,22 +305,6 @@ private:
 
     QVector<int> order(const std::vector<int> vecOrder,
                        const QVector<int> vecToOrder);
-
-    //=========================================================================================================
-    /**
-     * Drop coils with worst GoF to improve the transformation.
-     *
-     * @param[in]   vecGoF        The goodness of fit per coil.
-     * @param[in]   matCoil       The fitted coil positions (device space).
-     * @param[in]   matHeadCoil   The digitized coil positions (head space).
-     * @param[out]  vecInd        The indices of the coils used to trace back which one was dropped.
-     *
-     * @return Returns the transformation matrix.
-     */
-    Eigen::MatrixXd dropCoils(const Eigen::VectorXd vecGoF,
-                              const Eigen::MatrixXd matCoil,
-                              const Eigen::MatrixXd matHeadCoil,
-                              Eigen::VectorXi& vecInd);
 
     //=========================================================================================================
     /**
