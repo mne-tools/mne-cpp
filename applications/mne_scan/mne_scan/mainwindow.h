@@ -125,7 +125,9 @@ public:
     /**
      * Constructs a MainWindow which is a child of parent.
      *
-     * @param[in] parent pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window. If parent is another widget, MainWindow becomes a child window inside parent. MainWindow is deleted when its parent is deleted.
+     * @param[in] parent    pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes
+     *                      a window. If parent is another widget, MainWindow becomes a child window inside
+     *                      parent. MainWindow is deleted when its parent is deleted.
      */
     MainWindow(QWidget *parent = Q_NULLPTR);
 
@@ -166,7 +168,9 @@ public:
      * @param[in] lgknd message kind; Message is formated depending on its kind.
      * @param[in] lglvl message level; Message is displayed depending on its level.
      */
-    void writeToLog(const QString& logMsg, LogKind lgknd = _LogKndMessage, LogLevel lglvl = _LogLvNormal);
+    void writeToLog(const QString& logMsg,
+                    LogKind lgknd = _LogKndMessage,
+                    LogLevel lglvl = _LogLvNormal);
 
     //=========================================================================================================
     /**
@@ -193,7 +197,8 @@ public:
     /**
      * Init an setup the plugins.
      */
-    void setupPlugins();
+    void setupPlugins(std::shared_ptr<SCSHAREDLIB::PluginManager>,
+                      std::shared_ptr<SCSHAREDLIB::PluginSceneManager>);
 
     //=========================================================================================================
     /**
@@ -438,8 +443,8 @@ private:
 
     QSharedPointer<QTimer>                              m_pTimer;               /**< timer of the main application*/
     QSharedPointer<QTime>                               m_pTime;                /**< Holds current time output, updated with timeout of timer.*/
-    QSharedPointer<SCSHAREDLIB::PluginManager>          m_pPluginManager;       /**< Holds log dock widget.*/
-    QSharedPointer<SCSHAREDLIB::PluginSceneManager>     m_pPluginSceneManager;  /**< Plugin scene manager which manages the plugin graph. */
+    std::shared_ptr<SCSHAREDLIB::PluginManager>         m_pPluginManager;       /**< Holds log dock widget.*/
+    std::shared_ptr<SCSHAREDLIB::PluginSceneManager>    m_pPluginSceneManager;  /**< Plugin scene manager which manages the plugin graph. */
     QSharedPointer<QWidget>                             m_pAboutWindow;         /**< Holds the widget containing the about information.*/
     QSharedPointer<SCSHAREDLIB::DisplayManager>         m_pDisplayManager;      /**< display manager. */
 

@@ -102,8 +102,6 @@ MainWindow::MainWindow(QWidget *parent)
 , m_pStartUpWidget(new StartUpWidget(this))
 , m_eLogLevelCurrent(_LogLvMax)
 , m_pTime(new QTime(0, 0))
-, m_pPluginManager(new SCSHAREDLIB::PluginManager(this))
-, m_pPluginSceneManager(new SCSHAREDLIB::PluginSceneManager(this))
 , m_pDisplayManager(new SCSHAREDLIB::DisplayManager(this))
 , m_sSettingsPath("MNESCAN/MainWindow")
 , m_sCurrentStyle("default")
@@ -159,9 +157,12 @@ MainWindow::~MainWindow()
 
 //=============================================================================================================
 
-void MainWindow::setupPlugins()
+void MainWindow::setupPlugins(std::shared_ptr<SCSHAREDLIB::PluginManager> pPluginManager,
+                              std::shared_ptr<SCSHAREDLIB::PluginSceneManager> pPluginSceneManager)
 {
-    m_pPluginManager->loadPlugins(qApp->applicationDirPath()+pluginDir);
+    m_pPluginManager = pPluginManager;
+    m_pPluginSceneManager = pPluginSceneManager;
+    createPluginDockWindow();
 }
 
 //=============================================================================================================
@@ -176,7 +177,6 @@ void MainWindow::setupUI()
     createActions();
     createMenus();
     createToolBars();
-    createPluginDockWindow();
     createLogDockWindow();
 
     initStatusBar();
