@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
 
     SCMEASLIB::MeasurementTypes::registerTypes();
 
-    MainWindow mainWin;
+    //MainWindow mainWin;
     ScanCore scanCore;
 
     QSurfaceFormat fmt;

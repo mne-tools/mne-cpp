@@ -2,13 +2,14 @@
 /**
  * @file     mainwindow.cpp
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
+ *           Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Gabriel B Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.0
  * @date     February, 2013
  *
  * @section  LICENSE
  *
- * Copyright (C) 2013, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2013, Christoph Dinh, Lorenz Esch, Gabriel B Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -120,7 +121,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     initSplashScreen();
 
-    setupPlugins();
     setupUI();
 
     loadSettings();
@@ -271,7 +271,7 @@ void MainWindow::initSplashScreen(bool bShowSplashScreen)
     m_pSplashScreen = MainSplashScreen::SPtr::create(splashPixMap,
                                                     Qt::WindowFlags() | Qt::WindowStaysOnTopHint );
     if(m_pSplashScreen && m_pPluginManager) {
-        QObject::connect(m_pPluginManager.data(), &PluginManager::pluginLoaded,
+        QObject::connect(m_pPluginManager.get(), &PluginManager::pluginLoaded,
                          m_pSplashScreen.data(), &MainSplashScreen::showMessage);
     }
 
@@ -692,7 +692,7 @@ void MainWindow::createPluginDockWindow()
     m_pPluginGuiDockWidget = new QDockWidget(tr("Plugins"), this);
     m_pPluginGuiDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    m_pPluginGui = new PluginGui(m_pPluginManager.data(), m_pPluginSceneManager.data());
+    m_pPluginGui = new PluginGui(m_pPluginManager.get(), m_pPluginSceneManager.get());
     m_pPluginGui->setParent(m_pPluginGuiDockWidget);
     m_pPluginGuiDockWidget->setWidget(m_pPluginGui);
 
