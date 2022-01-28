@@ -42,6 +42,7 @@
 
 #include <scMeas/measurementtypes.h>
 #include <scMeas/realtimemultisamplearray.h>
+#include <scMeas/realtimeneurofeedbackresult.h>
 #include <scMeas/numeric.h>
 
 #include <scShared/Management/pluginconnectorconnection.h>
@@ -92,6 +93,7 @@ Q_IMPORT_PLUGIN(NeuronalConnectivity)
 Q_IMPORT_PLUGIN(FtBuffer)
 Q_IMPORT_PLUGIN(WriteToFile)
 Q_IMPORT_PLUGIN(Hpi)
+Q_IMPORT_PLUGIN(Neurofeedback)
 //Q_IMPORT_PLUGIN(DummyToolbox)
 #ifdef WITHGUSBAMP
 Q_IMPORT_PLUGIN(GUSBAmp)

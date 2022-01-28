@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
- * @file     measurementtypes.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
+ * @file     neurofeedback_global.h
+ * @author   Simon Marxgut <simon.marxgut@umit-tirol.at>
  * @since    0.1.0
- * @date     August, 2013
+ * @date     November, 2021
  *
  * @section  LICENSE
  *
- * Copyright (C) 2013, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2021, Simon Marxgut. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,54 +28,54 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MeasurementTypes class.
+ * @brief    Contains the Neurofeedback library export/import macros.
  *
  */
+
+#ifndef NEUROFEEDBACK_GLOBAL_H
+#define NEUROFEEDBACK_GLOBAL_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "measurementtypes.h"
-
-#include "measurement.h"
-#include "realtimemultisamplearray.h"
-#include "numeric.h"
-#include "realtimesourceestimate.h"
-#include "realtimeconnectivityestimate.h"
-#include "realtimespectrum.h"
-#include "realtimesamplearraychinfo.h"
-#include "realtimecov.h"
-#include "realtimeevokedset.h"
-#include "realtimeneurofeedbackresult.h"
+#include <utils/buildinfo.h>
 
 //=============================================================================================================
-// USED NAMESPACES
+// QT INCLUDES
 //=============================================================================================================
 
-using namespace SCMEASLIB;
+#include <QtCore/qglobal.h>
 
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// PREPROCESSOR DEFINES
 //=============================================================================================================
 
-MeasurementTypes::MeasurementTypes(QObject *parent)
-: QObject(parent)
-{
+#if defined(NEUROFEEDBACK_PLUGIN)
+#  define NEUROFEEDBACKSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#  define NEUROFEEDBACKSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
+
+namespace NEUROFEEDBACKPLUGIN{
+
+//=============================================================================================================
+/**
+ * Returns build date and time.
+ */
+NEUROFEEDBACKSHARED_EXPORT const char* buildDateTime();
+
+//=============================================================================================================
+/**
+ * Returns abbreviated build git hash.
+ */
+NEUROFEEDBACKSHARED_EXPORT const char* buildHash();
+
+//=============================================================================================================
+/**
+ * Returns full build git hash.
+ */
+NEUROFEEDBACKSHARED_EXPORT const char* buildHashLong();
 }
 
-//=============================================================================================================
-
-void MeasurementTypes::registerTypes()
-{
-    qRegisterMetaType< Measurement::SPtr >("Measurement::SPtr");
-    qRegisterMetaType< RealTimeMultiSampleArray::SPtr >("RealTimeMultiSampleArray::SPtr");
-    qRegisterMetaType< Numeric::SPtr >("Numeric::SPtr");
-    qRegisterMetaType< RealTimeSpectrum::SPtr >("RealTimeSpectrum::SPtr");
-    qRegisterMetaType< RealTimeSourceEstimate::SPtr >("RealTimeSourceEstimate::SPtr");
-    qRegisterMetaType< RealTimeConnectivityEstimate::SPtr >("RealTimeConnectivityEstimate::SPtr");
-    qRegisterMetaType< RealTimeCov::SPtr >("RealTimeCov::SPtr");
-    qRegisterMetaType< RealTimeEvokedSet::SPtr >("RealTimeEvokedSet::SPtr");
-    qRegisterMetaType< RealTimeSampleArrayChInfo::SPtr >("RealTimeSampleArrayChInfo::SPtr");
-    qRegisterMetaType< RealTimeNeurofeedbackResult::SPtr >("RealTimeNeurofeedbackResult::SPtr");
-}
+#endif // NEUROFEEDBACK_GLOBAL_H
