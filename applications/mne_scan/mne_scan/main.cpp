@@ -164,8 +164,6 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName(CInfo::AppNameShort());
     QCoreApplication::setOrganizationDomain("www.mne-cpp.org");
 
-    SCMEASLIB::MeasurementTypes::registerTypes();
-
     //MainWindow mainWin;
     ScanCore scanCore;
 

@@ -61,18 +61,17 @@ ScanCore::ScanCore(QObject *parent)
 : QObject(parent)
 , m_bGuiMode(true)
 {
-    registerMetatypes();
+    registerQtMetaTypes();
 
     initPlugins();
-
     if(m_bGuiMode){
-        initGUI();
+        initGUI(); //plugins must be initialized before GUI
     }
 }
 
 //=============================================================================================================
 
-void ScanCore::registerMetatypes()
+void ScanCore::registerQtMetaTypes()
 {
     SCMEASLIB::MeasurementTypes::registerTypes();
 }

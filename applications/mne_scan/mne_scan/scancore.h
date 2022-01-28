@@ -65,22 +65,49 @@ class ScanCore : public QObject
 {
     Q_OBJECT
 public:
+    //=========================================================================================================
+    /**
+     * Constructs a ScanCore object. Main object that controls MNE Scan.
+     */
     explicit ScanCore(QObject *parent = nullptr);
 
+    //=========================================================================================================
+    /**
+     * Attempts to start current workflow. Returns wheteher successful.
+     */
     bool startMeasurement();
+
+    //=========================================================================================================
+    /**
+     * Attempts to stop current workflow. Returns wheteher successful.
+     */
     bool stopMeasurement();
 
 private:
-    void registerMetatypes();
+    //=========================================================================================================
+    /**
+     * Registers types with Qt for use in QVariant and signals/slots.
+     */
+    void registerQtMetaTypes();
+
+    //=========================================================================================================
+    /**
+     * Inititlaizes plguins management classes and loads plugins.
+     */
     void initPlugins();
+
+    //=========================================================================================================
+    /**
+     * Initializes GUI elements.
+     */
     void initGUI();
 
-    std::unique_ptr<MainWindow> m_pMainWindow;
-    std::shared_ptr<SCSHAREDLIB::PluginManager> m_pPluginManager;
-    std::shared_ptr<SCSHAREDLIB::PluginSceneManager> m_pPluginSceneManager;
+    bool m_bGuiMode;                                /**< Whether to use a GUI. */
+    std::unique_ptr<MainWindow> m_pMainWindow;      /**< GUI main window. */
 
-    bool m_bIsRunning;
-    bool m_bGuiMode;
+    std::shared_ptr<SCSHAREDLIB::PluginManager>         m_pPluginManager;           /**< Loads and holds plugins. */
+    std::shared_ptr<SCSHAREDLIB::PluginSceneManager>    m_pPluginSceneManager;      /**< Stores selected and running plugins */
+
 };
 }//namespace
 #endif // SCANCORE_H
