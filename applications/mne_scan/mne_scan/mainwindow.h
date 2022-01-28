@@ -134,7 +134,7 @@ public:
      *                      a window. If parent is another widget, MainWindow becomes a child window inside
      *                      parent. MainWindow is deleted when its parent is deleted.
      */
-    MainWindow(QWidget *parent = Q_NULLPTR);
+    MainWindow(ScanCore* core);
 
     //=========================================================================================================
     /**

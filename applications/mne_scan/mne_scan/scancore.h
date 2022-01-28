@@ -39,6 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "mainwindow.h"
+
 #include <scShared/Management/pluginmanager.h>
 #include <scShared/Management/pluginscenemanager.h>
 
@@ -58,12 +60,7 @@ namespace MNESCAN
 {
 
 //=============================================================================================================
-// FORWARD DECLARATION
-//=============================================================================================================
 
-class MainWindow;
-
-//=============================================================================================================
 class ScanCore : public QObject
 {
     Q_OBJECT
@@ -75,14 +72,15 @@ public:
 
 private:
     void registerMetatypes();
-    void initPluginManager();
-    void initMainWindow();
+    void initPlugins();
+    void initGUI();
 
     std::unique_ptr<MainWindow> m_pMainWindow;
     std::shared_ptr<SCSHAREDLIB::PluginManager> m_pPluginManager;
     std::shared_ptr<SCSHAREDLIB::PluginSceneManager> m_pPluginSceneManager;
 
     bool m_bIsRunning;
+    bool m_bGuiMode;
 };
 }//namespace
 #endif // SCANCORE_H

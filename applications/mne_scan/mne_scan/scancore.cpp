@@ -59,11 +59,15 @@ const QString pluginDir = "/mne_scan_plugins";          /**< holds path to plugi
 
 ScanCore::ScanCore(QObject *parent)
 : QObject(parent)
+, m_bGuiMode(true)
 {
     registerMetatypes();
 
-    initPluginManager();
-    initMainWindow();
+    initPlugins();
+
+    if(m_bGuiMode){
+        initGUI();
+    }
 }
 
 //=============================================================================================================
@@ -75,18 +79,20 @@ void ScanCore::registerMetatypes()
 
 //=============================================================================================================
 
-void ScanCore::initPluginManager()
+void ScanCore::initPlugins()
 {
     m_pPluginManager = std::make_shared<SCSHAREDLIB::PluginManager>();
     m_pPluginManager->loadPlugins(qApp->applicationDirPath() + pluginDir);
+    m_pPluginSceneManager = std::make_shared<SCSHAREDLIB::PluginSceneManager>();
 }
 
 //=============================================================================================================
 
-void ScanCore::initMainWindow()
+void ScanCore::initGUI()
 {
-    m_pMainWindow = std::make_unique<MainWindow>();
+    m_pMainWindow = std::make_unique<MainWindow>(this);
     m_pMainWindow->setupPlugins(m_pPluginManager, m_pPluginSceneManager);
+    m_pMainWindow->setupUI();
 }
 
 //=============================================================================================================

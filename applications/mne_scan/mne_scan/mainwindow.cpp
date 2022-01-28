@@ -97,8 +97,8 @@ constexpr unsigned long waitUntilHidingSplashScreen(1);     /**< Seconds to wait
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MainWindow::MainWindow(QWidget *parent)
-: QMainWindow(parent)
+MainWindow::MainWindow(ScanCore *core)
+: QMainWindow(nullptr)
 , m_bIsRunning(false)
 , m_iTimeoutMSec(1000)
 , m_pStartUpWidget(new StartUpWidget(this))
@@ -107,6 +107,7 @@ MainWindow::MainWindow(QWidget *parent)
 , m_pDisplayManager(new SCSHAREDLIB::DisplayManager(this))
 , m_sSettingsPath("MNESCAN/MainWindow")
 , m_sCurrentStyle("default")
+, m_pScanCore(core)
 {
     printf( "%s - Version %s\n",
             CInfo::AppNameShort().toUtf8().constData(),
@@ -121,10 +122,6 @@ MainWindow::MainWindow(QWidget *parent)
     setUnifiedTitleAndToolBarOnMac(false);
 
     initSplashScreen();
-
-    setupUI();
-
-    loadSettings();
 
     //Load application icon for linux builds only, mac and win executables have built in icons from .pro file
 #ifdef __linux__
@@ -163,7 +160,6 @@ void MainWindow::setupPlugins(std::shared_ptr<SCSHAREDLIB::PluginManager> pPlugi
 {
     m_pPluginManager = pPluginManager;
     m_pPluginSceneManager = pPluginSceneManager;
-    createPluginDockWindow();
 }
 
 //=============================================================================================================
@@ -178,9 +174,12 @@ void MainWindow::setupUI()
     createActions();
     createMenus();
     createToolBars();
+    createPluginDockWindow();
     createLogDockWindow();
 
     initStatusBar();
+
+    loadSettings();
 }
 
 //=============================================================================================================
@@ -913,6 +912,7 @@ void MainWindow::writeToLog(const QString& logMsg,
 void MainWindow::startMeasurement()
 {
     // Save pipeline before starting just in case a crash occurs
+    std::cout << "Hey!\n";
     m_pPluginGui->saveConfig(QStandardPaths::writableLocation(QStandardPaths::DataLocation),"default.xml");
 
     writeToLog(tr("Starting real-time measurement..."), _LogKndMessage, _LogLvMin);
