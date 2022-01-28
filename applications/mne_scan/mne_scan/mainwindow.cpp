@@ -97,7 +97,7 @@ constexpr unsigned long waitUntilHidingSplashScreen(1);     /**< Seconds to wait
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MainWindow::MainWindow(ScanCore *core)
+MainWindow::MainWindow(ScanCore& core)
 : QMainWindow(nullptr)
 , m_bIsRunning(false)
 , m_iTimeoutMSec(1000)
@@ -917,7 +917,7 @@ void MainWindow::startMeasurement()
 
     writeToLog(tr("Starting real-time measurement..."), _LogKndMessage, _LogLvMin);
 
-    if(!m_pScanCore->startMeasurement()) {
+    if(!m_pScanCore.startMeasurement()) {
         QMessageBox::information(0, tr("MNE Scan - Start"), QString(QObject::tr("Not able to start all plugins!")), QMessageBox::Ok);
         return;
     }
@@ -944,7 +944,7 @@ void MainWindow::stopMeasurement()
     writeToLog(tr("Stopping real-time measurement..."), _LogKndMessage, _LogLvMin);
 
     //Stop all plugins
-    m_pScanCore->stopMeasurement();
+    m_pScanCore.stopMeasurement();
     m_pDisplayManager->clean();
 
     // Hide and clear QuickControlView

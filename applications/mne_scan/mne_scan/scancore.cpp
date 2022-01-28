@@ -90,7 +90,7 @@ void ScanCore::initPlugins()
 
 void ScanCore::initGUI()
 {
-    m_pMainWindow = std::make_unique<MainWindow>(this);
+    m_pMainWindow = std::make_unique<MainWindow>(*this);
     m_pMainWindow->setupPlugins(m_pPluginManager, m_pPluginSceneManager);
     m_pMainWindow->setupUI();
 }

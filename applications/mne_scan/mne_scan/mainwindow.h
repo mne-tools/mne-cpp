@@ -134,7 +134,7 @@ public:
      *                      a window. If parent is another widget, MainWindow becomes a child window inside
      *                      parent. MainWindow is deleted when its parent is deleted.
      */
-    MainWindow(ScanCore* core);
+    MainWindow(ScanCore& core);
 
     //=========================================================================================================
     /**
@@ -456,7 +456,7 @@ private:
     QString                             m_sSettingsPath;                    /**< The settings path to store the GUI settings to. */
     QString                             m_sCurrentStyle;                    /**< The currently selected style (dark mode, default mode). */
 
-    MNESCAN::ScanCore*                  m_pScanCore;                        /**< The core of mnescan */
+    MNESCAN::ScanCore&                  m_pScanCore;                        /**< The core of mnescan */
 
 signals:
     //=========================================================================================================
