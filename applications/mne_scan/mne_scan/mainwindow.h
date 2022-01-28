@@ -92,6 +92,10 @@ namespace DISPLIB
     class QuickControlView;
 }
 
+namespace MNESCAN {
+    class ScanCore;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE MNESCAN
 //=============================================================================================================
@@ -451,6 +455,8 @@ private:
 
     QString                             m_sSettingsPath;                    /**< The settings path to store the GUI settings to. */
     QString                             m_sCurrentStyle;                    /**< The currently selected style (dark mode, default mode). */
+
+    MNESCAN::ScanCore*                  m_pScanCore;                        /**< The core of mnescan */
 
 signals:
     //=========================================================================================================

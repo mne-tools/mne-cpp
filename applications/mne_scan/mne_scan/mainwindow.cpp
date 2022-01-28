@@ -58,6 +58,7 @@
 #include <utils/buildinfo.h>
 
 #include "mainwindow.h"
+#include "scancore.h"
 #include "startupwidget.h"
 #include "plugingui.h"
 #include "info.h"
@@ -916,9 +917,8 @@ void MainWindow::startMeasurement()
 
     writeToLog(tr("Starting real-time measurement..."), _LogKndMessage, _LogLvMin);
 
-    if(!m_pPluginSceneManager->startPlugins()) {
+    if(!m_pScanCore->startMeasurement()) {
         QMessageBox::information(0, tr("MNE Scan - Start"), QString(QObject::tr("Not able to start all plugins!")), QMessageBox::Ok);
-        m_pPluginSceneManager->stopPlugins();
         return;
     }
 
@@ -944,7 +944,7 @@ void MainWindow::stopMeasurement()
     writeToLog(tr("Stopping real-time measurement..."), _LogKndMessage, _LogLvMin);
 
     //Stop all plugins
-    m_pPluginSceneManager->stopPlugins();
+    m_pScanCore->stopMeasurement();
     m_pDisplayManager->clean();
 
     // Hide and clear QuickControlView

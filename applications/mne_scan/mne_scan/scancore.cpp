@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "scancore.h"
+#include "mainwindow.h"
 
 #include <scMeas/measurementtypes.h>
 
@@ -90,16 +91,21 @@ void ScanCore::initMainWindow()
 
 //=============================================================================================================
 
-void ScanCore::startMeasurement()
+bool ScanCore::startMeasurement()
 {
-
+    if(!m_pPluginSceneManager->startPlugins()) {
+        m_pPluginSceneManager->stopPlugins();
+        return false;
+    }
+    return true;
 }
 
 //=============================================================================================================
 
-void ScanCore::stopMeasurement()
+bool ScanCore::stopMeasurement()
 {
-
+    m_pPluginSceneManager->stopPlugins();
+    return true;
 }
 
 } //namespace

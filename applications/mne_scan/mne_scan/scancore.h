@@ -39,8 +39,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mainwindow.h"
-
 #include <scShared/Management/pluginmanager.h>
 #include <scShared/Management/pluginscenemanager.h>
 
@@ -59,15 +57,21 @@
 namespace MNESCAN
 {
 
+//=============================================================================================================
+// FORWARD DECLARATION
+//=============================================================================================================
 
+class MainWindow;
+
+//=============================================================================================================
 class ScanCore : public QObject
 {
     Q_OBJECT
 public:
     explicit ScanCore(QObject *parent = nullptr);
 
-    void startMeasurement();
-    void stopMeasurement();
+    bool startMeasurement();
+    bool stopMeasurement();
 
 private:
     void registerMetatypes();
