@@ -150,6 +150,28 @@ public:
 
     //=========================================================================================================
     /**
+     * A list of menus for the current plugin.
+     *
+     * @return a list of plugin actions.
+     */
+    inline QList< QMenu* > getPluginMenus();
+
+    //=========================================================================================================
+    /**
+     * A list of widgets for the current plugin.
+     *
+     * @return a list of plugin actions.
+     */
+    inline QList< QWidget* > getPluginWidgets();
+
+    //=========================================================================================================
+    /**
+     * Whether the plugin can be added to a scene.
+     */
+    inline bool isScenePlugin() const;
+
+    //=========================================================================================================
+    /**
      * Returns the plugin type.
      * Pure virtual method.
      *
@@ -231,6 +253,22 @@ protected:
      */
     inline void addPluginAction(QAction* pAction);
 
+    //=========================================================================================================
+    /**
+     * Adds a plugin menu to the current plugin.
+     *
+     * @param[in] pMenu  pointer to the menu to be added to the plugin.
+     */
+    inline void addPluginMenu(QMenu* pMenu);
+
+    //=========================================================================================================
+    /**
+     * Adds a plugin widget to the current plugin.
+     *
+     * @param[in] pWidget  pointer to the widget to be added to the plugin.
+     */
+    inline void addPluginWidget(QWidget* pWidget);
+
     InputConnectorList m_inputConnectors;       /**< Set of input connectors associated with this plug-in. */
     OutputConnectorList m_outputConnectors;     /**< Set of output connectors associated with this plug-in. */
 
@@ -238,6 +276,10 @@ protected:
 
 private:
     QList< QAction* >   m_qListPluginActions;  /**< List of plugin actions. */
+    QList< QMenu* >     m_qListPluginMenus;    /**< List of plugin menus. */
+    QList< QWidget* >   m_qListPluginWidgets;  /**< List of plugin widgets. */
+
+    bool                bIsScenePlugin;
 };
 
 //=============================================================================================================
@@ -261,6 +303,34 @@ inline QList< QAction* > AbstractPlugin::getPluginActions()
 inline void AbstractPlugin::addPluginAction(QAction* pAction)
 {
     m_qListPluginActions.append(pAction);
+}
+
+//=============================================================================================================
+
+inline QList< QMenu* > AbstractPlugin::getPluginMenus()
+{
+    return m_qListPluginMenus;
+}
+
+//=============================================================================================================
+
+inline void AbstractPlugin::addPluginMenu(QMenu* pMenu)
+{
+    m_qListPluginMenus.append(pMenu);
+}
+
+//=============================================================================================================
+
+inline QList< QWidget* > AbstractPlugin::getPluginWidgets()
+{
+    return m_qListPluginWidgets;
+}
+
+//=============================================================================================================
+
+inline void AbstractPlugin::addPluginWidget(QWidget* pWidget)
+{
+    m_qListPluginWidgets.append(pWidget);
 }
 
 //=============================================================================================================

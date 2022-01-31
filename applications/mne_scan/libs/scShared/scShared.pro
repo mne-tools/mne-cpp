@@ -103,6 +103,7 @@ SOURCES += \
     Management/displaymanager.cpp
 
 HEADERS += \
+    Plugins/abstractpassive.h \
     scshared_global.h \
     Plugins/abstractplugin.h \
     Plugins/abstractsensor.h \
