@@ -38,7 +38,7 @@
 //=============================================================================================================
 
 #include "pluginscene.h"
-#include "plugingui.h"
+#include "pluginscenegui.h"
 #include "arrow.h"
 
 #include <QTextCursor>
@@ -55,7 +55,7 @@ using namespace MNESCAN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginScene::PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui)
+PluginScene::PluginScene(QMenu *pMenuPluginItem, PluginSceneGui *pPluginGui)
 : QGraphicsScene(pPluginGui)
 , m_pPluginGui(pPluginGui)
 , m_pActionPluginItem(Q_NULLPTR)

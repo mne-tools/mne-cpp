@@ -41,10 +41,14 @@
 
 #include "../scshared_global.h"
 
+#include "plugingui.h"
+
 #include "../Management/pluginoutputdata.h"
 #include "../Management/plugininputdata.h"
 
 #include <disp/viewers/abstractview.h>
+
+#include <memory>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -142,30 +146,6 @@ public:
 
     //=========================================================================================================
     /**
-     * A list of actions for the current plugin.
-     *
-     * @return a list of plugin actions.
-     */
-    inline QList< QAction* > getPluginActions();
-
-    //=========================================================================================================
-    /**
-     * A list of menus for the current plugin.
-     *
-     * @return a list of plugin actions.
-     */
-    inline QList< QMenu* > getPluginMenus();
-
-    //=========================================================================================================
-    /**
-     * A list of widgets for the current plugin.
-     *
-     * @return a list of plugin actions.
-     */
-    inline QList< QWidget* > getPluginWidgets();
-
-    //=========================================================================================================
-    /**
      * Whether the plugin can be added to a scene.
      */
     inline bool isScenePlugin() const;
@@ -195,15 +175,6 @@ public:
      * @return true if multi instantiation of plugin is allowed.
      */
     virtual inline bool multiInstanceAllowed() const = 0;
-
-    //=========================================================================================================
-    /**
-     * Returns the set up widget for configuration of the AbstractPlugin.
-     * Pure virtual method.
-     *
-     * @return the setup widget.
-     */
-    virtual QWidget* setupWidget() = 0; //setup()
 
     //=========================================================================================================
     /**
@@ -245,40 +216,14 @@ protected:
      */
     virtual void run() = 0;
 
-    //=========================================================================================================
-    /**
-     * Adds a plugin action to the current plugin.
-     *
-     * @param[in] pAction  pointer to the action to be added to the plugin.
-     */
-    inline void addPluginAction(QAction* pAction);
-
-    //=========================================================================================================
-    /**
-     * Adds a plugin menu to the current plugin.
-     *
-     * @param[in] pMenu  pointer to the menu to be added to the plugin.
-     */
-    inline void addPluginMenu(QMenu* pMenu);
-
-    //=========================================================================================================
-    /**
-     * Adds a plugin widget to the current plugin.
-     *
-     * @param[in] pWidget  pointer to the widget to be added to the plugin.
-     */
-    inline void addPluginWidget(QWidget* pWidget);
-
     InputConnectorList m_inputConnectors;       /**< Set of input connectors associated with this plug-in. */
     OutputConnectorList m_outputConnectors;     /**< Set of output connectors associated with this plug-in. */
 
     bool m_bPluginControlWidgetsInit = false;   /**< Flag to indicate if the plugin control widgets were initialized already. */
 
 private:
-    QList< QAction* >   m_qListPluginActions;  /**< List of plugin actions. */
-    QList< QMenu* >     m_qListPluginMenus;    /**< List of plugin menus. */
-    QList< QWidget* >   m_qListPluginWidgets;  /**< List of plugin widgets. */
-
+    std::unique_ptr<PluginGUI>  m_pGUI;
+    bool                bHasGUI;
     bool                bIsScenePlugin;
 };
 
@@ -289,48 +234,6 @@ private:
 inline bool AbstractPlugin::multiInstanceAllowed() const
 {
     return true;
-}
-
-//=============================================================================================================
-
-inline QList< QAction* > AbstractPlugin::getPluginActions()
-{
-    return m_qListPluginActions;
-}
-
-//=============================================================================================================
-
-inline void AbstractPlugin::addPluginAction(QAction* pAction)
-{
-    m_qListPluginActions.append(pAction);
-}
-
-//=============================================================================================================
-
-inline QList< QMenu* > AbstractPlugin::getPluginMenus()
-{
-    return m_qListPluginMenus;
-}
-
-//=============================================================================================================
-
-inline void AbstractPlugin::addPluginMenu(QMenu* pMenu)
-{
-    m_qListPluginMenus.append(pMenu);
-}
-
-//=============================================================================================================
-
-inline QList< QWidget* > AbstractPlugin::getPluginWidgets()
-{
-    return m_qListPluginWidgets;
-}
-
-//=============================================================================================================
-
-inline void AbstractPlugin::addPluginWidget(QWidget* pWidget)
-{
-    m_qListPluginWidgets.append(pWidget);
 }
 
 //=============================================================================================================

@@ -58,7 +58,7 @@
 
 #include "mainwindow.h"
 #include "startupwidget.h"
-#include "plugingui.h"
+#include "pluginscenegui.h"
 #include "info.h"
 #include "mainsplashscreencloser.h"
 
@@ -692,20 +692,20 @@ void MainWindow::createPluginDockWindow()
     m_pPluginGuiDockWidget = new QDockWidget(tr("Plugins"), this);
     m_pPluginGuiDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    m_pPluginGui = new PluginGui(m_pPluginManager.data(), m_pPluginSceneManager.data());
+    m_pPluginGui = new PluginSceneGui(m_pPluginManager.data(), m_pPluginSceneManager.data());
     m_pPluginGui->setParent(m_pPluginGuiDockWidget);
     m_pPluginGuiDockWidget->setWidget(m_pPluginGui);
 
     addDockWidget(Qt::LeftDockWidgetArea, m_pPluginGuiDockWidget);
 
-    connect(m_pPluginGui.data(), &PluginGui::selectedPluginChanged,
+    connect(m_pPluginGui.data(), &PluginSceneGui::selectedPluginChanged,
             this, &MainWindow::updatePluginSetupWidget);
 
     if(m_pPluginGui->getCurrentPlugin()) {
         updatePluginSetupWidget(m_pPluginGui->getCurrentPlugin());
     }
 
-    connect(m_pPluginGui.data(), &PluginGui::selectedConnectionChanged,
+    connect(m_pPluginGui.data(), &PluginSceneGui::selectedConnectionChanged,
             this, &MainWindow::updateConnectionWidget);
 
     m_pMenuView->addAction(m_pPluginGuiDockWidget->toggleViewAction());

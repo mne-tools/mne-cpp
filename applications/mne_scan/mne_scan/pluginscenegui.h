@@ -32,8 +32,8 @@
  *
  */
 
-#ifndef PLUGINGUI_H
-#define PLUGINGUI_H
+#ifndef PLUGINSCENEGUI_H
+#define PLUGINSCENEGUI_H
 
 //=============================================================================================================
 // INCLUDES
@@ -74,16 +74,16 @@ class QGraphicsView;
 namespace MNESCAN
 {
 
-class PluginGui : public QMainWindow
+class PluginSceneGui : public QMainWindow
 {
     Q_OBJECT
 
     friend class PluginScene;
 
 public:
-    PluginGui(SCSHAREDLIB::PluginManager *pPluginManager, SCSHAREDLIB::PluginSceneManager *pPluginSceneManager);
+    PluginSceneGui(SCSHAREDLIB::PluginManager *pPluginManager, SCSHAREDLIB::PluginSceneManager *pPluginSceneManager);
 
-    ~PluginGui();
+    ~PluginSceneGui();
 
     //=========================================================================================================
     /**
@@ -170,10 +170,10 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline SCSHAREDLIB::AbstractPlugin::SPtr PluginGui::getCurrentPlugin()
+inline SCSHAREDLIB::AbstractPlugin::SPtr PluginSceneGui::getCurrentPlugin()
 {
     return m_pCurrentPlugin;
 }
 } //NAMESPACE
 
-#endif // PLUGINGUI_H
+#endif // PLUGINSCENEGUI_H
