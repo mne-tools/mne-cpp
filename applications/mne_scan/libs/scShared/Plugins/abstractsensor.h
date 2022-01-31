@@ -128,12 +128,15 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns the set up widget for configuration of AbstractSensor.
-     * Pure virtual method inherited by IModule.
-     *
-     * @return the setup widget.
+     * Returns whether a plugin has a GUI component.
      */
-    virtual QWidget* setupWidget() = 0;
+    virtual inline bool hasGUI() const;
+
+    //=========================================================================================================
+    /**
+     * Whether the plugin can be added to a scene.
+     */
+    virtual bool inline isScenePlugin() const;
 
 protected:
 
@@ -154,6 +157,21 @@ inline bool AbstractSensor::multiInstanceAllowed() const
 {
     return false;
 }
+
+//=============================================================================================================
+
+inline bool AbstractSensor::hasGUI() const
+{
+    return true;
+}
+
+//=============================================================================================================
+
+inline bool AbstractSensor::isScenePlugin() const
+{
+    return true;
+}
+
 } //NAMESPACE
 
 Q_DECLARE_INTERFACE(SCSHAREDLIB::AbstractSensor, "scsharedlib/1.0")

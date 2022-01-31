@@ -148,7 +148,7 @@ public:
     /**
      * Whether the plugin can be added to a scene.
      */
-    inline bool isScenePlugin() const;
+    virtual bool isScenePlugin() const = 0;
 
     //=========================================================================================================
     /**
@@ -174,7 +174,13 @@ public:
      *
      * @return true if multi instantiation of plugin is allowed.
      */
-    virtual inline bool multiInstanceAllowed() const = 0;
+    virtual inline bool multiInstanceAllowed() const;
+
+    //=========================================================================================================
+    /**
+     * Returns whether a plugin has a GUI component.
+     */
+    virtual bool hasGUI() const = 0;
 
     //=========================================================================================================
     /**
@@ -187,6 +193,7 @@ public:
     inline InputConnectorList& getInputConnectors(){return m_inputConnectors;}
     inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
 
+    inline const PluginUI& getPluginUI() const;
 signals:
     //=========================================================================================================
     /**
@@ -221,10 +228,7 @@ protected:
 
     bool m_bPluginControlWidgetsInit = false;   /**< Flag to indicate if the plugin control widgets were initialized already. */
 
-private:
-    std::unique_ptr<PluginGUI>  m_pGUI;
-    bool                bHasGUI;
-    bool                bIsScenePlugin;
+    std::unique_ptr<PluginUI>  m_pGUI;          /**< Plugin GUI. */
 };
 
 //=============================================================================================================

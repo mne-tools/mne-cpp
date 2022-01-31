@@ -9,6 +9,13 @@
 #include <QMenu>
 #include <QWidget>
 
+//=============================================================================================================
+/**
+ * Used as the interface for returning the GUI for a plugin.
+ *
+ * Can be used by either passing in items with the 'add' and 'set' functions,
+ * or subclassed and reimplementing the 'get' functions.
+ */
 class PluginUI
 {
 public:
