@@ -193,7 +193,7 @@ public:
     inline InputConnectorList& getInputConnectors(){return m_inputConnectors;}
     inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
 
-    inline const PluginUI& getPluginUI() const;
+    inline const PluginUI* getPluginUI() const;
 signals:
     //=========================================================================================================
     /**
@@ -238,6 +238,13 @@ protected:
 inline bool AbstractPlugin::multiInstanceAllowed() const
 {
     return true;
+}
+
+//=============================================================================================================
+
+inline const PluginUI* AbstractPlugin::getPluginUI() const
+{
+    return m_pGUI.get();
 }
 
 //=============================================================================================================

@@ -25,7 +25,7 @@ public:
      *
      * @return a list of plugin actions.
      */
-    inline virtual QList< QAction* > getPluginActions();
+    inline virtual QList< QAction* > getPluginActions() const;
 
     //=========================================================================================================
     /**
@@ -33,7 +33,7 @@ public:
      *
      * @return a list of plugin actions.
      */
-    inline virtual QList< QMenu* > getPluginMenus();
+    inline virtual QList< QMenu* > getPluginMenus() const;
 
     //=========================================================================================================
     /**
@@ -41,7 +41,7 @@ public:
      *
      * @return a list of plugin actions.
      */
-    inline virtual QList< QWidget* > getPluginWidgets();
+    inline virtual QList< QWidget* > getPluginWidgets() const;
 
     //=========================================================================================================
     /**
@@ -73,7 +73,7 @@ public:
      *
      * @return the setup widget.
      */
-     inline virtual QWidget* getSetupWidget();
+     inline virtual QWidget* getSetupWidget() const;
 
      //=========================================================================================================
      /**
@@ -95,7 +95,7 @@ private:
 //=============================================================================================================
 
 
-inline QList< QAction* > PluginUI::getPluginActions()
+inline QList< QAction* > PluginUI::getPluginActions() const
 {
     return m_qListPluginActions;
 }
@@ -109,7 +109,7 @@ inline void PluginUI::addPluginAction(QAction* pAction)
 
 //=============================================================================================================
 
-inline QList< QMenu* > PluginUI::getPluginMenus()
+inline QList< QMenu* > PluginUI::getPluginMenus() const
 {
     return m_qListPluginMenus;
 }
@@ -123,7 +123,7 @@ inline void PluginUI::addPluginMenu(QMenu* pMenu)
 
 //=============================================================================================================
 
-inline QList< QWidget* > PluginUI::getPluginWidgets()
+inline QList< QWidget* > PluginUI::getPluginWidgets() const
 {
     return m_qListPluginWidgets;
 }
@@ -137,7 +137,7 @@ inline void PluginUI::addPluginWidget(QWidget* pWidget)
 
 //=============================================================================================================
 
-inline QWidget* PluginUI::getSetupWidget()
+inline QWidget* PluginUI::getSetupWidget() const
 {
     return m_pSetupWidget;
 }
