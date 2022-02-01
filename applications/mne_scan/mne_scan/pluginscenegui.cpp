@@ -37,7 +37,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "plugingui.h"
+#include "pluginscenegui.h"
 
 #include "arrow.h"
 #include "pluginitem.h"
@@ -574,8 +574,11 @@ void PluginSceneGui::createToolbars()
     //Sensors
     m_pSensorToolButton = new QToolButton;
     QMenu *menuSensors = new QMenu;
-    for(qint32 i = 0; i < m_pPluginManager->getSensorPlugins().size(); ++i)
-        createItemAction(m_pPluginManager->getSensorPlugins()[i]->getName(), menuSensors);
+    for(auto& plugin : m_pPluginManager->getSensorPlugins()){
+        if(plugin->hasGUI() && plugin->isScenePlugin()){
+            createItemAction(plugin->getName(), menuSensors);
+        }
+    }
 
     m_pSensorToolButton->setMenu(menuSensors);
     m_pSensorToolButton->setPopupMode(QToolButton::InstantPopup);
@@ -586,8 +589,11 @@ void PluginSceneGui::createToolbars()
     //Algorithms
     m_pAlgorithmToolButton = new QToolButton;
     QMenu *menuAlgorithms = new QMenu;
-    for(qint32 i = 0; i < m_pPluginManager->getAlgorithmPlugins().size(); ++i)
-        createItemAction(m_pPluginManager->getAlgorithmPlugins()[i]->getName(), menuAlgorithms);
+    for(auto& plugin : m_pPluginManager->getAlgorithmPlugins()){
+        if(plugin->hasGUI() && plugin->isScenePlugin()){
+            createItemAction(plugin->getName(), menuAlgorithms);
+        }
+    }
 
     m_pAlgorithmToolButton->setMenu(menuAlgorithms);
     m_pAlgorithmToolButton->setPopupMode(QToolButton::InstantPopup);

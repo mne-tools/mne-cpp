@@ -16,7 +16,7 @@
  * Can be used by either passing in items with the 'add' and 'set' functions,
  * or subclassed and reimplementing the 'get' functions.
  */
-class PluginUI
+class PluginGUI
 {
 public:
     //=========================================================================================================
@@ -95,49 +95,49 @@ private:
 //=============================================================================================================
 
 
-inline QList< QAction* > PluginUI::getPluginActions() const
+inline QList< QAction* > PluginGUI::getPluginActions() const
 {
     return m_qListPluginActions;
 }
 
 //=============================================================================================================
 
-inline void PluginUI::addPluginAction(QAction* pAction)
+inline void PluginGUI::addPluginAction(QAction* pAction)
 {
     m_qListPluginActions.append(pAction);
 }
 
 //=============================================================================================================
 
-inline QList< QMenu* > PluginUI::getPluginMenus() const
+inline QList< QMenu* > PluginGUI::getPluginMenus() const
 {
     return m_qListPluginMenus;
 }
 
 //=============================================================================================================
 
-inline void PluginUI::addPluginMenu(QMenu* pMenu)
+inline void PluginGUI::addPluginMenu(QMenu* pMenu)
 {
     m_qListPluginMenus.append(pMenu);
 }
 
 //=============================================================================================================
 
-inline QList< QWidget* > PluginUI::getPluginWidgets() const
+inline QList< QWidget* > PluginGUI::getPluginWidgets() const
 {
     return m_qListPluginWidgets;
 }
 
 //=============================================================================================================
 
-inline void PluginUI::addPluginWidget(QWidget* pWidget)
+inline void PluginGUI::addPluginWidget(QWidget* pWidget)
 {
     m_qListPluginWidgets.append(pWidget);
 }
 
 //=============================================================================================================
 
-inline QWidget* PluginUI::getSetupWidget() const
+inline QWidget* PluginGUI::getSetupWidget() const
 {
     return m_pSetupWidget;
 }
@@ -146,7 +146,7 @@ inline QWidget* PluginUI::getSetupWidget() const
 /**
  * Sets the setup widget.
  */
-inline void PluginUI::setSetupWidget(QWidget* pWidget)
+inline void PluginGUI::setSetupWidget(QWidget* pWidget)
 {
     m_pSetupWidget = pWidget;
 }

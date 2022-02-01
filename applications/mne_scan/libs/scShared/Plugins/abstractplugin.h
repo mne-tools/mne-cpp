@@ -193,7 +193,7 @@ public:
     inline InputConnectorList& getInputConnectors(){return m_inputConnectors;}
     inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
 
-    inline const PluginUI* getPluginUI() const;
+    inline const PluginGUI* getGUI() const;
 signals:
     //=========================================================================================================
     /**
@@ -228,7 +228,7 @@ protected:
 
     bool m_bPluginControlWidgetsInit = false;   /**< Flag to indicate if the plugin control widgets were initialized already. */
 
-    std::unique_ptr<PluginUI>  m_pGUI;          /**< Plugin GUI. */
+    std::unique_ptr<PluginGUI>  m_pGUI;          /**< Plugin GUI. */
 };
 
 //=============================================================================================================
@@ -242,7 +242,7 @@ inline bool AbstractPlugin::multiInstanceAllowed() const
 
 //=============================================================================================================
 
-inline const PluginUI* AbstractPlugin::getPluginUI() const
+inline const PluginGUI* AbstractPlugin::getGUI() const
 {
     return m_pGUI.get();
 }

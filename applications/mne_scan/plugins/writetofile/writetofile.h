@@ -277,6 +277,12 @@ private:
     int popUpYesNo(const QString& sText,
                    const QString& sInfoText);
 
+    //=========================================================================================================
+    void initGUI();
+
+    //=========================================================================================================
+    void initGUIActions();
+
     bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/
     bool                                    m_bContinuous;                  /**< Flag for whether to start plugin in continuous save mode */

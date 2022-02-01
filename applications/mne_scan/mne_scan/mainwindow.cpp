@@ -736,17 +736,11 @@ void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::AbstractPlugin::SPtr pPlug
 {
     m_qListDynamicPluginActions.clear();
 
-    if(!pPlugin.isNull()) {
+    if(!pPlugin.isNull() && pPlugin->hasGUI()) {
         // Add Dynamic Plugin Actions
-        m_qListDynamicPluginActions.append(pPlugin->getPluginActions());
-
-        if(pPlugin.isNull()) {
-            QWidget* pWidget = new QWidget;
-            setCentralWidget(pWidget);
-        } else {
-            if(!m_bIsRunning) {
-                setCentralWidget(pPlugin->setupWidget());
-            }
+        m_qListDynamicPluginActions.append(pPlugin->getGUI()->getPluginActions());
+        if(!m_bIsRunning) {
+            setCentralWidget(pPlugin->getGUI()->getSetupWidget());
         }
     } else {
         QWidget* pWidget = new QWidget;
@@ -761,7 +755,7 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::AbstractP
     for(int i = 0; i < lPlugins.size(); ++i) {
         if(!lPlugins.at(i).isNull()) {
             // Add Dynamic Plugin Actions
-            m_qListDynamicPluginActions.append(lPlugins.at(i)->getPluginActions());
+            m_qListDynamicPluginActions.append(lPlugins.at(i)->getGUI()->getPluginActions());
 
             QString sCurPluginName = lPlugins.at(i)->getName();
 
@@ -772,8 +766,8 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::AbstractP
                 sCurPluginName = "3D View";
             }
 
-            if(!m_bIsRunning) {
-                setCentralWidget(lPlugins.at(i)->setupWidget());
+            if(!m_bIsRunning && lPlugins.at(i)->hasGUI()) {
+                setCentralWidget(lPlugins.at(i)->getGUI()->getSetupWidget());
             } else {                
                 // Connect plugin controls to GUI mode toggling
                 connect(this, &MainWindow::guiModeChanged,
