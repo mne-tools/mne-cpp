@@ -740,6 +740,7 @@ void MainWindow::updatePluginSetupWidget(SCSHAREDLIB::AbstractPlugin::SPtr pPlug
         // Add Dynamic Plugin Actions
         m_qListDynamicPluginActions.append(pPlugin->getGUI()->getPluginActions());
         if(!m_bIsRunning) {
+            this->centralWidget()->setParent(nullptr);
             setCentralWidget(pPlugin->getGUI()->getSetupWidget());
         }
     } else {
