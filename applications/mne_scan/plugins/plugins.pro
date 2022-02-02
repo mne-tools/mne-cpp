@@ -41,8 +41,8 @@ include(../../../mne-cpp.pri)
 TEMPLATE = subdirs
 
 #Sensors
-#SUBDIRS += \
-#    fiffsimulator \
+SUBDIRS += \
+    fiffsimulator \
 #    ftbuffer \
 #    babymeg \
 #    natus \

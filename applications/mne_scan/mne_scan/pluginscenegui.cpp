@@ -575,7 +575,7 @@ void PluginSceneGui::createToolbars()
     m_pSensorToolButton = new QToolButton;
     QMenu *menuSensors = new QMenu;
     for(auto& plugin : m_pPluginManager->getSensorPlugins()){
-        if(plugin->hasGUI() && plugin->isScenePlugin()){
+        if(plugin->isScenePlugin()){
             createItemAction(plugin->getName(), menuSensors);
         }
     }
@@ -590,7 +590,7 @@ void PluginSceneGui::createToolbars()
     m_pAlgorithmToolButton = new QToolButton;
     QMenu *menuAlgorithms = new QMenu;
     for(auto& plugin : m_pPluginManager->getAlgorithmPlugins()){
-        if(plugin->hasGUI() && plugin->isScenePlugin()){
+        if(plugin->isScenePlugin()){
             createItemAction(plugin->getName(), menuAlgorithms);
         }
     }

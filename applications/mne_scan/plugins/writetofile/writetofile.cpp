@@ -167,14 +167,6 @@ QString WriteToFile::getName() const
 
 //=============================================================================================================
 
-QWidget* WriteToFile::setupWidget()
-{
-    WriteToFileSetupWidget* setupWidget = new WriteToFileSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
-    return setupWidget;
-}
-
-//=============================================================================================================
-
 void WriteToFile::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 {
     if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
