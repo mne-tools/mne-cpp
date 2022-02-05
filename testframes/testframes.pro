@@ -55,6 +55,7 @@ SUBDIRS += \
     test_hpiFit \
     test_hpiDataUpdater \
     test_hpiFit_integration \
+    test_hpiModelParameter \
     test_mne_forward_solution \
     test_fiff_cov \
     test_fiff_digitizer \
