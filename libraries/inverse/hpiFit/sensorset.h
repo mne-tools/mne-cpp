@@ -96,7 +96,7 @@ struct SensorSet {
 
 //=============================================================================================================
 /**
- * Description of what this class is intended to do (in detail).
+ * Create a SensorSet struct from a channel list with specified accuracy.
  *
  * @brief Brief description of this class.
  */
