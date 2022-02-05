@@ -81,7 +81,7 @@ namespace INVERSELIB
 
 //=============================================================================================================
 /**
- * Description of what this class is intended to do (in detail).
+ * This class brings all the data and objects used for HPI fitting into the right format.
  *
  * @brief Brief description of this class.
  */
@@ -136,7 +136,7 @@ private:
     /**
      * Update the channellist for init and if bads changed
      *
-     * @param[in] pFiffInfo       The FiffInfo file from the measurement.
+     * @param[in] pFiffInfo         The FiffInfo file from the measurement.
      *
      */
     void updateChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
@@ -145,7 +145,7 @@ private:
     /**
      * Update the list of bad channels
      *
-     * @param[in] pFiffInfo       The FiffInfo file from the measurement.
+     * @param[in] pFiffInfo         The FiffInfo file from the measurement.
      *
      */
     void updateBadChannels(QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
@@ -153,7 +153,7 @@ private:
     //=========================================================================================================
     /**
      * Update the digitized HPI coils.
-     * @param[in]   lDig          The digitizer list to extract the hpi coils from.
+     * @param[in]   lDig            The digitizer list to extract the hpi coils from.
      *
      */
     void updateHpiDigitizer(const QList<FIFFLIB::FiffDigPoint>& lDig);
@@ -203,7 +203,7 @@ private:
     Eigen::MatrixXd m_matProjectors;        /**< The projectors ready to use*/
     Eigen::MatrixXd m_matInnerdata;         /**< The data ready to use*/
     Eigen::MatrixXd m_matDataProjected;     /**< The data with projectros applied*/
-    SensorSetCreator m_sensorSetCreator;
+    SensorSetCreator m_sensorSetCreator;    /**< ThesensorSetCreator to create a sensorset*/
     SensorSet m_sensors;                    /**< The most recent SensorSet*/
 
 };
