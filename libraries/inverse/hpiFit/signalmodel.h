@@ -69,9 +69,9 @@ namespace INVERSELIB
 //=============================================================================================================
 
 /**
- * The strucut specifing important ModelParameters used for hpi amplaitude fitting.
+ * The strucut specifing important HpiModelParameters used for hpi amplaitude fitting.
  */
-struct ModelParameters {
+struct HpiModelParameters {
     QVector<int> vecHpiFreqs;
     int iNHpiCoils = 0;
     int iSampleFreq = 0;
@@ -83,17 +83,17 @@ struct ModelParameters {
     /**
      * Set the model parameters.
      *
-     * @param[in] modelParameters   The ModelParameters.
+     * @param[in] hpiModelParameters   The HpiModelParameters.
      * @param[in] matData           The data matrix.
      *
      * @return the fitted data
      *
      */
 
-    INVERSESHARED_EXPORT ModelParameters setModelParameters(const QVector<int> vecHpiFreqs,
-                                                            const int iSampleFreq,
-                                                            const int iLineFreq,
-                                                            const bool bBasic);
+    INVERSESHARED_EXPORT HpiModelParameters setModelParameters(const QVector<int> vecHpiFreqs,
+                                                               const int iSampleFreq,
+                                                               const int iLineFreq,
+                                                               const bool bBasic);
 
 //=============================================================================================================
 // INVERSELIB FORWARD DECLARATIONS
@@ -122,13 +122,13 @@ public:
     /**
      * Fit the data to the model constructed from given model parameters.
      *
-     * @param[in] modelParameters   The ModelParameters.
+     * @param[in] hpiModelParameters   The HpiModelParameters.
      * @param[in] matData           The data matrix.
      *
      * @return the fitted data
      *
      */
-    Eigen::MatrixXd fitData(const ModelParameters& modelParameters,const Eigen::MatrixXd& matData);
+    Eigen::MatrixXd fitData(const HpiModelParameters& hpiModelParameters,const Eigen::MatrixXd& matData);
 
 protected:
 
@@ -160,25 +160,25 @@ private:
 
     //=========================================================================================================
     /**
-     * Check if the ModelParameters changed.
+     * Check if the HpiModelParameters changed.
      *
-     * @param[in] modelParameters     The model parameters.
+     * @param[in] hpiModelParameters     The model parameters.
      * @return true if changed
      */
-    bool checkModelParameters(const ModelParameters& modelParameters);
+    bool checkModelParameters(const HpiModelParameters& hpiModelParameters);
 
     //=========================================================================================================
     /**
-     * Check if the ModelParameters are empty. HPI and sampling frequencies need to be set.
+     * Check if the HpiModelParameters are empty. HPI and sampling frequencies need to be set.
      *
-     * @param[in] modelParameters     The model parameters.
+     * @param[in] hpiModelParameters     The model parameters.
      * @return true if empty
      */
-    bool checkEmpty(const ModelParameters& modelParameters);
+    bool checkEmpty(const HpiModelParameters& hpiModelParameters);
 
     Eigen::MatrixXd m_matInverseSignalModel;
     int m_iCurrentModelCols;
-    ModelParameters m_modelParameters;
+    HpiModelParameters m_modelParameters;
 };
 
 //=============================================================================================================

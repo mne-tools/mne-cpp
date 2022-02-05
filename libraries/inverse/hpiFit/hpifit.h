@@ -151,20 +151,20 @@ public:
      *
      * @param[in]   matProjectedData            Data to estimate the HPI positions from. Projectars should be already applied.
      * @param[in]   matProjectors               The projectors to apply.
-     * @param[in]   modelParameters             The model parameters to use for the Hpi Fitting, especially to compute the coil amplitudes.
+     * @param[in]   hpiModelParameters             The model parameters to use for the Hpi Fitting, especially to compute the coil amplitudes.
      * @param[in]   matCoilsHead                The hpi coil locations in head space.
      * @param[in]   bOrderFrequencies           Order Hpi coils yes/no.
      * @param[out]  hpiFitResult                The fitting results.
      */
     void fit(const Eigen::MatrixXd& matProjectedData,
              const Eigen::MatrixXd& matProjectors,
-             const ModelParameters& modelParameters,
+             const HpiModelParameters& hpiModelParameters,
              const Eigen::MatrixXd& matCoilsHead,
              HpiFitResult& hpiFitResult);
 
     void fit(const Eigen::MatrixXd& matProjectedData,
              const Eigen::MatrixXd& matProjectors,
-             const ModelParameters& modelParameters,
+             const HpiModelParameters& hpiModelParameters,
              const Eigen::MatrixXd& matCoilsHead,
              const bool bOrderFrequencies,
              HpiFitResult& hpiFitResult);
@@ -196,12 +196,12 @@ private:
      * Fit linear model to data to get amplitudes for the dipole fit.
      *
      * @param[in]   matProjectedData    Projected data to estimate the HPI positions from.
-     * @param[in]   modelParameters     The model parameters to use for the hpi signal model.
+     * @param[in]   hpiModelParameters     The model parameters to use for the hpi signal model.
      * @param[out]  matAmplitudes       The computed amplitudes amplitudes (n_channels x n_coils).
      *
      */
     void computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
-                           const ModelParameters& modelParameters,
+                           const HpiModelParameters& hpiModelParameters,
                            Eigen::MatrixXd& matAmplitudes);
 
     //=========================================================================================================
