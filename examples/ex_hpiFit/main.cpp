@@ -226,14 +226,14 @@ int main(int argc, char *argv[])
     const auto& matProjectedData = hpiDataUpdater.getProjectedData();
     const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
     const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
-    ModelParameters modelParameters = setModelParameters(vecFreqs,
+    HpiModelParameters hpiModelParameters = setModelParameters(vecFreqs,
                                                          pFiffInfo->sfreq,
                                                          pFiffInfo->linefreq,
                                                          bFast);
 
     HpiFitResult hpiFitResult;
-    HPI.fit(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,true,hpiFitResult);
-    modelParameters.vecHpiFreqs = hpiFitResult.hpiFreqs;
+    HPI.fit(matProjectedData,matPreparedProjectors,hpiModelParameters,matCoilsHead,true,hpiFitResult);
+    hpiModelParameters.vecHpiFreqs = hpiFitResult.hpiFreqs;
 
     float fTimer = 0.0;
 
@@ -257,7 +257,7 @@ int main(int argc, char *argv[])
         const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
         HPI.fit(matProjectedData,
                 matPreparedProjectors,
-                modelParameters,
+                hpiModelParameters,
                 matCoilsHead,
                 hpiFitResult);
         fTimer = timer.elapsed();

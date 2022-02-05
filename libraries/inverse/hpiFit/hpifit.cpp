@@ -103,18 +103,18 @@ HPIFit::HPIFit(const SensorSet sensorSet)
 
 void HPIFit::fit(const MatrixXd& matProjectedData,
                  const MatrixXd& matProjectors,
-                 const ModelParameters& modelParameters,
+                 const HpiModelParameters& hpiModelParameters,
                  const MatrixXd& matCoilsHead,
                  HpiFitResult& hpiFitResult)
 {
-    fit(matProjectedData,matProjectors,modelParameters,matCoilsHead,false,hpiFitResult);
+    fit(matProjectedData,matProjectors,hpiModelParameters,matCoilsHead,false,hpiFitResult);
 }
 
 //=============================================================================================================
 
 void HPIFit::fit(const MatrixXd& matProjectedData,
                  const MatrixXd& matProjectors,
-                 const ModelParameters& modelParameters,
+                 const HpiModelParameters& hpiModelParameters,
                  const MatrixXd& matCoilsHead,
                  const bool bOrderFrequencies,
                  HpiFitResult& hpiFitResult)
@@ -122,10 +122,10 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
     // TODO: Check for dimensions
     MatrixXd matAmplitudes;
     computeAmplitudes(matProjectedData,
-                      modelParameters,
+                      hpiModelParameters,
                       matAmplitudes);
 
-    int iNumCoils = modelParameters.iNHpiCoils;
+    int iNumCoils = hpiModelParameters.iNHpiCoils;
     MatrixXd matCoilsDev = MatrixXd::Zero(iNumCoils,3);
     computeCoilLocation(matAmplitudes,
                         matProjectors,
@@ -140,7 +140,7 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
                                                   matCoilsHead);
 
         matCoilsDev = order(vecOrder,matCoilsDev);
-        hpiFitResult.hpiFreqs = order(vecOrder,modelParameters.vecHpiFreqs);
+        hpiFitResult.hpiFreqs = order(vecOrder,hpiModelParameters.vecHpiFreqs);
     }
 
     computeHeadPosition(matCoilsDev,
@@ -153,15 +153,15 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
 //=============================================================================================================
 
 void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
-                               const ModelParameters& modelParameters,
+                               const HpiModelParameters& hpiModelParameters,
                                Eigen::MatrixXd& matAmplitudes)
 {
     // fit model
-    MatrixXd matTopo = m_signalModel.fitData(modelParameters,matProjectedData);
+    MatrixXd matTopo = m_signalModel.fitData(hpiModelParameters,matProjectedData);
     matTopo.transposeInPlace();
 
     // split into sine and cosine amplitudes
-    int iNumCoils = modelParameters.iNHpiCoils;
+    int iNumCoils = hpiModelParameters.iNHpiCoils;
 
     MatrixXd matAmpSine(matProjectedData.cols(), iNumCoils);
     MatrixXd matAmpCosine(matProjectedData.cols(), iNumCoils);

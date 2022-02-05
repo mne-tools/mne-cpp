@@ -63,18 +63,18 @@ using namespace Eigen;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-ModelParameters INVERSELIB::setModelParameters(const QVector<int> vecHpiFreqs,
+HpiModelParameters INVERSELIB::setModelParameters(const QVector<int> vecHpiFreqs,
                                                const int iSampleFreq,
                                                const int iLineFreq,
                                                const bool bBasic)
 {
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = vecHpiFreqs;
-    modelParameters.iNHpiCoils = vecHpiFreqs.size();
-    modelParameters.iSampleFreq = iSampleFreq;
-    modelParameters.iLineFreq = iLineFreq;
-    modelParameters.bBasic = bBasic;
-    return modelParameters;
+    HpiModelParameters hpiModelParameters;
+    hpiModelParameters.vecHpiFreqs = vecHpiFreqs;
+    hpiModelParameters.iNHpiCoils = vecHpiFreqs.size();
+    hpiModelParameters.iSampleFreq = iSampleFreq;
+    hpiModelParameters.iLineFreq = iLineFreq;
+    hpiModelParameters.bBasic = bBasic;
+    return hpiModelParameters;
 }
 
 //=============================================================================================================
@@ -88,15 +88,15 @@ SignalModel::SignalModel()
 
 //=============================================================================================================
 
-MatrixXd SignalModel::fitData(const ModelParameters& modelParameters,const MatrixXd& matData)
+MatrixXd SignalModel::fitData(const HpiModelParameters& hpiModelParameters,const MatrixXd& matData)
 {
 
-    if(checkEmpty(modelParameters)) {
+    if(checkEmpty(hpiModelParameters)) {
         MatrixXd matTopo;
         return matTopo;
     }
 
-    bool bParametersChanged = checkModelParameters(modelParameters);
+    bool bParametersChanged = checkModelParameters(hpiModelParameters);
     bool bDimensionsChanged = checkDataDimensions(matData.cols());
 
     if(bDimensionsChanged || bParametersChanged) {
@@ -121,28 +121,28 @@ bool SignalModel::checkDataDimensions(const int iCols)
 
 //=============================================================================================================
 
-bool SignalModel::checkModelParameters(const ModelParameters& modelParameters)
+bool SignalModel::checkModelParameters(const HpiModelParameters& hpiModelParameters)
 {
     bool bHasChanged = false;
-    if((m_modelParameters.iSampleFreq != modelParameters.iSampleFreq) ||
-        (m_modelParameters.iLineFreq != modelParameters.iLineFreq) ||
-        (m_modelParameters.iNHpiCoils != modelParameters.iNHpiCoils) ||
-        (m_modelParameters.vecHpiFreqs != modelParameters.vecHpiFreqs) ||
-        (m_modelParameters.bBasic != modelParameters.bBasic)) {
+    if((m_modelParameters.iSampleFreq != hpiModelParameters.iSampleFreq) ||
+        (m_modelParameters.iLineFreq != hpiModelParameters.iLineFreq) ||
+        (m_modelParameters.iNHpiCoils != hpiModelParameters.iNHpiCoils) ||
+        (m_modelParameters.vecHpiFreqs != hpiModelParameters.vecHpiFreqs) ||
+        (m_modelParameters.bBasic != hpiModelParameters.bBasic)) {
         bHasChanged = true;
-        m_modelParameters = modelParameters;
+        m_modelParameters = hpiModelParameters;
     }
     return bHasChanged;
 }
 
 //=============================================================================================================
 
-bool SignalModel::checkEmpty(const ModelParameters& modelParameters)
+bool SignalModel::checkEmpty(const HpiModelParameters& hpiModelParameters)
 {
-    if(modelParameters.vecHpiFreqs.empty()) {
+    if(hpiModelParameters.vecHpiFreqs.empty()) {
         std::cout << "SignalModel::checkEmpty - no Hpi frequencies set" << std::endl;
         return true;
-    } else if(modelParameters.iSampleFreq == 0) {
+    } else if(hpiModelParameters.iSampleFreq == 0) {
         std::cout << "SignalModel::checkEmpty - no sampling frequencies set" << std::endl;
         return true;
     }

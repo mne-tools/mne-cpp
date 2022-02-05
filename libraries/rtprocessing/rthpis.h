@@ -70,7 +70,7 @@ namespace INVERSELIB {
     struct SensorSet;
     class HPIFit;
     struct HpiFitResult;
-    struct ModelParameters;
+    struct HpiModelParameters;
 }
 
 //=============================================================================================================
@@ -111,7 +111,7 @@ public:
      */
     void doWork(const Eigen::MatrixXd& matData,
                 const Eigen::MatrixXd& matProjectors,
-                const INVERSELIB::ModelParameters& modelParameters,
+                const INVERSELIB::HpiModelParameters& hpiModelParameters,
                 const Eigen::MatrixXd& matCoilsHead);
 
 protected:
@@ -166,7 +166,7 @@ public:
      *
      * @param[in] vCoilFreqs  The coil frequencies.
      */
-    void setModelParameters(INVERSELIB::ModelParameters modelParameters);
+    void setModelParameters(INVERSELIB::HpiModelParameters hpiModelParameters);
 
     //=========================================================================================================
     /**
@@ -207,13 +207,13 @@ protected:
     Eigen::MatrixXd m_matCoilsHead;           /**< Vector contains the HPI coil frequencies. */
     Eigen::MatrixXd m_matProjectors;        /**< Holds the matrix with the SSP and compensator projectors.*/
     INVERSELIB::SensorSet m_sensorSet;
-    INVERSELIB::ModelParameters m_modelParameters;
+    INVERSELIB::HpiModelParameters m_modelParameters;
 
 signals:
     void newHpiFitResultAvailable(const INVERSELIB::HpiFitResult &fitResult);
     void operate(const Eigen::MatrixXd& matData,
                  const Eigen::MatrixXd& matProjectors,
-                 const INVERSELIB::ModelParameters& modelParameters,
+                 const INVERSELIB::HpiModelParameters& hpiModelParameters,
                  const Eigen::MatrixXd& matCoilsHead);
 };
 

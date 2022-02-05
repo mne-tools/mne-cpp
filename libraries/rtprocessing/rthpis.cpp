@@ -72,7 +72,7 @@ RtHpiWorker::RtHpiWorker(const SensorSet sensorSet)
 
 void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
                          const Eigen::MatrixXd& matProjectors,
-                         const ModelParameters& modelParameters,
+                         const HpiModelParameters& hpiModelParameters,
                          const Eigen::MatrixXd& matCoilsHead)
 {
     if(this->thread()->isInterruptionRequested()) {
@@ -87,7 +87,7 @@ void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
 
     m_pHpiFit->fit(matData,
                    matProjectors,
-                   modelParameters,
+                   hpiModelParameters,
                    matCoilsHead,
                    fitResult);
 
@@ -146,9 +146,9 @@ void RtHpi::append(const MatrixXd &data)
 
 //=============================================================================================================
 
-void RtHpi::setModelParameters(ModelParameters modelParameters)
+void RtHpi::setModelParameters(HpiModelParameters hpiModelParameters)
 {
-    m_modelParameters = modelParameters;
+    m_modelParameters = hpiModelParameters;
 }
 
 //=============================================================================================================

@@ -548,7 +548,7 @@ void Hpi::run()
     }
 
     // init hpi fit
-    ModelParameters modelParameters = setModelParameters(m_vCoilFreqs,
+    HpiModelParameters hpiModelParameters = setModelParameters(m_vCoilFreqs,
                                                          m_pFiffInfo->sfreq,
                                                          m_pFiffInfo->linefreq,
                                                          false);
@@ -610,7 +610,7 @@ void Hpi::run()
                         matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
 
                 m_mutex.lock();
-                modelParameters = setModelParameters(m_vCoilFreqs,
+                hpiModelParameters = setModelParameters(m_vCoilFreqs,
                                                      m_pFiffInfo->sfreq,
                                                      m_pFiffInfo->linefreq,
                                                      false);
@@ -623,7 +623,7 @@ void Hpi::run()
                 // Perform actual fitting
                 HPI.fit(hpiDataUpdater.getProjectedData(),
                         hpiDataUpdater.getProjectors(),
-                        modelParameters,
+                        hpiModelParameters,
                         hpiDataUpdater.getHpiDigitizer(),
                         bOrder,
                         fitResult);
