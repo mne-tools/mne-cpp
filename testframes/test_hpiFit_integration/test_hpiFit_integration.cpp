@@ -179,10 +179,10 @@ void TestHpiFitIntegration::initTestCase()
     HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
     int iSampleFreq = pFiffInfo->sfreq;
     int iLineFreq = pFiffInfo->linefreq;
-    ModelParameters modelParameters = setModelParameters(vFreqs,
-                                                         iSampleFreq,
-                                                         iLineFreq,
-                                                         true);
+    HpiModelParameters hpiModelParameters(vFreqs,
+                                          iSampleFreq,
+                                          iLineFreq,
+                                          true);
 
     from = first + mRefPos(0,0)*pFiffInfo->sfreq;
     to = from + quantum;
@@ -197,8 +197,11 @@ void TestHpiFitIntegration::initTestCase()
     const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
 
     HpiFitResult hpiFitResult;
-    HPI.fit(matProjectedData,matPreparedProjectors,modelParameters,matCoilsHead,true,hpiFitResult);
-    modelParameters.vecHpiFreqs = hpiFitResult.hpiFreqs;
+    HPI.fit(matProjectedData,matPreparedProjectors,hpiModelParameters,matCoilsHead,true,hpiFitResult);
+    hpiModelParameters = HpiModelParameters(hpiFitResult.hpiFreqs,
+                                            pFiffInfo->sfreq,
+                                            pFiffInfo->linefreq,
+                                            true);
     vFreqs = hpiFitResult.hpiFreqs;
 
     qInfo() << "[done]";
@@ -219,7 +222,7 @@ void TestHpiFitIntegration::initTestCase()
         const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
         HPI.fit(matProjectedData,
                 matPreparedProjectors,
-                modelParameters,
+                hpiModelParameters,
                 matCoilsHead,
                 hpiFitResult);
 

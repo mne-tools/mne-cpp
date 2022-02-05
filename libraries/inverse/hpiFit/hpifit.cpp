@@ -43,6 +43,7 @@
 #include "sensorset.h"
 #include "hpidataupdater.h"
 #include "signalmodel.h"
+#include "hpimodelparameters.h"
 
 #include <utils/ioutils.h>
 #include <utils/mnemath.h>
@@ -125,7 +126,7 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
                       hpiModelParameters,
                       matAmplitudes);
 
-    int iNumCoils = hpiModelParameters.iNHpiCoils;
+    int iNumCoils = hpiModelParameters.iNHpiCoils();
     MatrixXd matCoilsDev = MatrixXd::Zero(iNumCoils,3);
     computeCoilLocation(matAmplitudes,
                         matProjectors,
@@ -140,7 +141,7 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
                                                   matCoilsHead);
 
         matCoilsDev = order(vecOrder,matCoilsDev);
-        hpiFitResult.hpiFreqs = order(vecOrder,hpiModelParameters.vecHpiFreqs);
+        hpiFitResult.hpiFreqs = order(vecOrder,hpiModelParameters.vecHpiFreqs());
     }
 
     computeHeadPosition(matCoilsDev,
@@ -161,7 +162,7 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
     matTopo.transposeInPlace();
 
     // split into sine and cosine amplitudes
-    int iNumCoils = hpiModelParameters.iNHpiCoils;
+    int iNumCoils = hpiModelParameters.iNHpiCoils();
 
     MatrixXd matAmpSine(matProjectedData.cols(), iNumCoils);
     MatrixXd matAmpCosine(matProjectedData.cols(), iNumCoils);

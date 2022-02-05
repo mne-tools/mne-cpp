@@ -79,7 +79,6 @@ public:
 
 private slots:
     void initTestCase();
-    void testSetModelParameters();
     void testFitData_emptyHpiFres();
     void testFitData_emptySFreq();
     void testFitData_basic_4coils();
@@ -111,43 +110,14 @@ void TestSignalModel::initTestCase()
 
 //=============================================================================================================
 
-void TestSignalModel::testSetModelParameters()
-{
-    int iSampleFreq = 1;
-    int iLineFreq = 1;
-    QVector<int> vecHpiFreqs = {1,2};
-    int iNHpiCoils = 2;
-    bool bBasic = true;
-
-    ModelParameters modelParametersExpected;
-    modelParametersExpected.vecHpiFreqs = vecHpiFreqs;
-    modelParametersExpected.iNHpiCoils = iNHpiCoils;
-    modelParametersExpected.iSampleFreq = iSampleFreq;
-    modelParametersExpected.iLineFreq = iLineFreq;
-    modelParametersExpected.bBasic = bBasic;
-
-    ModelParameters modelParametersActual = setModelParameters(vecHpiFreqs,
-                                                               iSampleFreq,
-                                                               iLineFreq,
-                                                               bBasic);
-
-    QVERIFY2(modelParametersExpected.vecHpiFreqs == modelParametersActual.vecHpiFreqs,"HPI frequencies do not match.");
-    QVERIFY2(modelParametersExpected.iNHpiCoils == modelParametersActual.iNHpiCoils,"Number of coils does not match.");
-    QVERIFY2(modelParametersExpected.iSampleFreq == modelParametersActual.iSampleFreq,"Sampling frequency does not match.");
-    QVERIFY2(modelParametersExpected.iLineFreq == modelParametersActual.iLineFreq,"Line frequency does not match.");
-    QVERIFY2(modelParametersExpected.bBasic == modelParametersActual.bBasic,"Model selection does not match.");
-}
-
-//=============================================================================================================
-
 void TestSignalModel::testFitData_emptyHpiFres()
 {
-    ModelParameters modelParameters;
+    HpiModelParameters hpiModelParameters;
 
     SignalModel signalModel = SignalModel();
     MatrixXd matSimData = MatrixXd::Identity(10,10);
 
-    MatrixXd matAmpActual = signalModel.fitData(modelParameters,matSimData);
+    MatrixXd matAmpActual = signalModel.fitData(hpiModelParameters,matSimData);
     MatrixXd matAmpExpected;
 
     // use summed squared error ssd
@@ -160,13 +130,13 @@ void TestSignalModel::testFitData_emptyHpiFres()
 
 void TestSignalModel::testFitData_emptySFreq()
 {
-    ModelParameters modelParameters;
-    modelParameters.vecHpiFreqs = {1,2,3,4};
+    QVector<int> vecHpiFreqs = {1,2,3,4};
+    HpiModelParameters hpiModelParameters(vecHpiFreqs,0,0,true);
 
     SignalModel signalModel = SignalModel();
     MatrixXd matSimData = MatrixXd::Identity(10,10);
 
-    MatrixXd matAmpActual = signalModel.fitData(modelParameters,matSimData);
+    MatrixXd matAmpActual = signalModel.fitData(hpiModelParameters,matSimData);
     MatrixXd matAmpExpected;
 
     // use summed squared error ssd
@@ -184,13 +154,13 @@ void TestSignalModel::testFitData_basic_4coils()
     int iLineFreq = 60;
     QVector<int> vecHpiFreqs = {154,158,161,166};
     bool bBasic = true;
-    ModelParameters modelParameters = setModelParameters(vecHpiFreqs,
-                                                         iSampleFreq,
-                                                         iLineFreq,
-                                                         bBasic);
+    HpiModelParameters hpiModelParameters(vecHpiFreqs,
+                                          iSampleFreq,
+                                          iLineFreq,
+                                          bBasic);
     SignalModel signalModel = SignalModel();
 
-    int iNumCoils = modelParameters.vecHpiFreqs.size();
+    int iNumCoils = hpiModelParameters.iNHpiCoils();
     int iSamLoc = 200;
     int iNchan = 10;
 
@@ -202,10 +172,10 @@ void TestSignalModel::testFitData_basic_4coils()
     double dAmpSine = 0.5;
     double dAmpCosine = 0.25;
 
-    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/modelParameters.iSampleFreq;
+    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/hpiModelParameters.iSampleFreq();
 
     for(int i = 0; i < iNumCoils; ++i) {
-        matSimData.row(i) = dAmpSine * sin(2*M_PI*modelParameters.vecHpiFreqs[i]*vecTime.array()) + dAmpCosine * cos(2*M_PI*modelParameters.vecHpiFreqs[i]*vecTime.array());
+        matSimData.row(i) = dAmpSine * sin(2*M_PI*hpiModelParameters.vecHpiFreqs()[i]*vecTime.array()) + dAmpCosine * cos(2*M_PI*hpiModelParameters.vecHpiFreqs()[i]*vecTime.array());
     }
 
     MatrixXd matAmpExpected = MatrixXd::Zero(2*iNumCoils,iNchan);
@@ -219,7 +189,7 @@ void TestSignalModel::testFitData_basic_4coils()
     matAmpExpected(7,3) = dAmpCosine;
 
     /// Act
-    MatrixXd matAmpActual = signalModel.fitData(modelParameters,matSimData);
+    MatrixXd matAmpActual = signalModel.fitData(hpiModelParameters,matSimData);
 
     /// Assert
     // use summed squared error ssd
@@ -237,13 +207,13 @@ void TestSignalModel::testFitData_basic_5coils()
     int iLineFreq = 60;
     QVector<int> vecHpiFreqs = {154,158,161,166,172};
     bool bBasic = true;
-    ModelParameters modelParameters = setModelParameters(vecHpiFreqs,
-                                                         iSampleFreq,
-                                                         iLineFreq,
-                                                         bBasic);
+    HpiModelParameters hpiModelParameters(vecHpiFreqs,
+                                          iSampleFreq,
+                                          iLineFreq,
+                                          bBasic);
     SignalModel signalModel = SignalModel();
 
-    int iNumCoils = modelParameters.vecHpiFreqs.size();
+    int iNumCoils = hpiModelParameters.iNHpiCoils();
     int iSamLoc = 200;
     int iNchan = 10;
 
@@ -254,10 +224,10 @@ void TestSignalModel::testFitData_basic_5coils()
     double dAmpSine = 0.5;
     double dAmpCosine = 0.25;
 
-    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/modelParameters.iSampleFreq;
+    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/hpiModelParameters.iSampleFreq();
 
     for(int i = 0; i < iNumCoils; ++i) {
-        matSimData.row(i) = dAmpSine * sin(2*M_PI*modelParameters.vecHpiFreqs[i]*vecTime.array()) + dAmpCosine * cos(2*M_PI*modelParameters.vecHpiFreqs[i]*vecTime.array());
+        matSimData.row(i) = dAmpSine * sin(2*M_PI*hpiModelParameters.vecHpiFreqs()[i]*vecTime.array()) + dAmpCosine * cos(2*M_PI*hpiModelParameters.vecHpiFreqs()[i]*vecTime.array());
     }
 
     MatrixXd matAmpExpected = MatrixXd::Zero(2*iNumCoils,iNchan);
@@ -274,7 +244,7 @@ void TestSignalModel::testFitData_basic_5coils()
     matAmpExpected(9,4) = dAmpCosine;
 
     /// Act
-    MatrixXd matAmpActual = signalModel.fitData(modelParameters,matSimData);
+    MatrixXd matAmpActual = signalModel.fitData(hpiModelParameters,matSimData);
 
     /// Assert
     // use summed squared error ssd
@@ -293,14 +263,14 @@ void TestSignalModel::testFitData_advanced_4coils()
     int iLineFreq = 60;
     QVector<int> vecHpiFreqs = {154,158,161,166};
     bool bBasic = false;
-    ModelParameters modelParameters = setModelParameters(vecHpiFreqs,
-                                                         iSampleFreq,
-                                                         iLineFreq,
-                                                         bBasic);
+    HpiModelParameters hpiModelParameters(vecHpiFreqs,
+                                          iSampleFreq,
+                                          iLineFreq,
+                                          bBasic);
 
     SignalModel signalModel = SignalModel();
 
-    int iNumCoils = modelParameters.vecHpiFreqs.size();
+    int iNumCoils = hpiModelParameters.iNHpiCoils();
     int iSamLoc = 200;
     int iNchan = 10;
 
@@ -311,12 +281,12 @@ void TestSignalModel::testFitData_advanced_4coils()
     double dAmpSine = 0.75;
     double dAmpCosine = 0.5;
     double dAmpLine = 0.3;
-    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/modelParameters.iSampleFreq;
+    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/hpiModelParameters.iSampleFreq();
     VectorXd vecTime2 = vecTime;
     vecTime2.fill(1);
     for(int i = 0; i < iNumCoils; ++i) {
-        matSimData.row(i) = dAmpSine * sin(2*M_PI*modelParameters.vecHpiFreqs[i]*vecTime.array())
-                            + dAmpCosine * cos(2*M_PI*modelParameters.vecHpiFreqs[i]*vecTime.array())
+        matSimData.row(i) = dAmpSine * sin(2*M_PI*hpiModelParameters.vecHpiFreqs()[i]*vecTime.array())
+                            + dAmpCosine * cos(2*M_PI*hpiModelParameters.vecHpiFreqs()[i]*vecTime.array())
                             + dAmpLine * sin(2*M_PI*60*vecTime.array())
                             + dAmpLine/2 * sin(2*M_PI*60*2*vecTime.array())
                             + dAmpLine/3 * sin(2*M_PI*60*3*vecTime.array())
@@ -335,7 +305,7 @@ void TestSignalModel::testFitData_advanced_4coils()
     matAmpExpected(7,3) = dAmpCosine;
 
     /// Act
-    MatrixXd matAmpActual = signalModel.fitData(modelParameters,matSimData);
+    MatrixXd matAmpActual = signalModel.fitData(hpiModelParameters,matSimData);
 
     /// Assert
     // use summed squared error ssd
@@ -353,13 +323,13 @@ void TestSignalModel::testFitData_advanced_5coils()
     int iLineFreq = 60;
     QVector<int> vecHpiFreqs = {154,158,161,166,172};
     bool bBasic = false;
-    ModelParameters modelParameters = setModelParameters(vecHpiFreqs,
-                                                         iSampleFreq,
-                                                         iLineFreq,
-                                                         bBasic);
+    HpiModelParameters hpiModelParameters(vecHpiFreqs,
+                                         iSampleFreq,
+                                         iLineFreq,
+                                         bBasic);
     SignalModel signalModel = SignalModel();
 
-    int iNumCoils = modelParameters.vecHpiFreqs.size();
+    int iNumCoils = hpiModelParameters.iNHpiCoils();
     int iSamLoc = 200;
     int iNchan = 10;
 
@@ -370,11 +340,11 @@ void TestSignalModel::testFitData_advanced_5coils()
     double dAmpSine = 0.75;
     double dAmpCosine = 0.5;
     double dAmpLine = 0.3;
-    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/modelParameters.iSampleFreq;
+    VectorXd vecTime = VectorXd::LinSpaced(iSamLoc, 0, iSamLoc-1) *1.0/hpiModelParameters.iSampleFreq();
 
     for(int i = 0; i < iNumCoils; ++i) {
-        matSimData.row(i) = dAmpSine * sin(2*M_PI*modelParameters.vecHpiFreqs[i]*vecTime.array())
-                            + dAmpCosine * cos(2*M_PI*modelParameters.vecHpiFreqs[i]*vecTime.array())
+        matSimData.row(i) = dAmpSine * sin(2*M_PI*hpiModelParameters.vecHpiFreqs()[i]*vecTime.array())
+                            + dAmpCosine * cos(2*M_PI*hpiModelParameters.vecHpiFreqs()[i]*vecTime.array())
                             + dAmpLine * sin(2*M_PI*60*vecTime.array())
                             + dAmpLine/2 * sin(2*M_PI*60*2*vecTime.array())
                             + dAmpLine/3 * sin(2*M_PI*60*3*vecTime.array());
@@ -394,7 +364,7 @@ void TestSignalModel::testFitData_advanced_5coils()
     matAmpExpected(9,4) = dAmpCosine;
 
     /// Act
-    MatrixXd matAmpActual = signalModel.fitData(modelParameters,matSimData);
+    MatrixXd matAmpActual = signalModel.fitData(hpiModelParameters,matSimData);
 
     /// Assert
     // use summed squared error ssd

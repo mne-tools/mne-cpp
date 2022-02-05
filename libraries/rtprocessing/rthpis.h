@@ -70,7 +70,7 @@ namespace INVERSELIB {
     struct SensorSet;
     class HPIFit;
     struct HpiFitResult;
-    struct HpiModelParameters;
+    class HpiModelParameters;
 }
 
 //=============================================================================================================

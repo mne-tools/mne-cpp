@@ -77,6 +77,7 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     hpiFit/hpidataupdater.cpp \
+    hpiFit/hpimodelparameters.cpp \
     hpiFit/signalmodel.cpp \
     inverse_global.cpp \
     minimumNorm/minimumnorm.cpp \
@@ -99,6 +100,7 @@ SOURCES += \
 
 HEADERS +=\
     hpiFit/hpidataupdater.h \
+    hpiFit/hpimodelparameters.h \
     hpiFit/signalmodel.h \
     inverse_global.h \
     IInverseAlgorithm.h \

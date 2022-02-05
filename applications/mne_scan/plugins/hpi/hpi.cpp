@@ -548,10 +548,10 @@ void Hpi::run()
     }
 
     // init hpi fit
-    HpiModelParameters hpiModelParameters = setModelParameters(m_vCoilFreqs,
-                                                         m_pFiffInfo->sfreq,
-                                                         m_pFiffInfo->linefreq,
-                                                         false);
+    HpiModelParameters hpiModelParameters(m_vCoilFreqs,
+                                          m_pFiffInfo->sfreq,
+                                          m_pFiffInfo->linefreq,
+                                          false);
     HpiFitResult fitResult;
     fitResult.hpiFreqs = m_vCoilFreqs;
     fitResult.errorDistances = QVector<double>(m_vCoilFreqs.size());
@@ -610,10 +610,10 @@ void Hpi::run()
                         matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
 
                 m_mutex.lock();
-                hpiModelParameters = setModelParameters(m_vCoilFreqs,
-                                                     m_pFiffInfo->sfreq,
-                                                     m_pFiffInfo->linefreq,
-                                                     false);
+                hpiModelParameters = HpiModelParameters(m_vCoilFreqs,
+                                                        m_pFiffInfo->sfreq,
+                                                        m_pFiffInfo->linefreq,
+                                                        false);
                 hpiDataUpdater.checkForUpdate(m_pFiffInfo);
                 hpiDataUpdater.prepareDataAndProjectors(matDataMerged,m_matCompProjectors);
                 bOrder = m_bDoFreqOrder;
