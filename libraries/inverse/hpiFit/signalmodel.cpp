@@ -36,6 +36,7 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "hpimodelparameters.h"
 #include "signalmodel.h"
 #include <utils/mnemath.h>
 #include <iostream>
@@ -63,32 +64,19 @@ using namespace Eigen;
 // DEFINE GLOBAL METHODS
 //=============================================================================================================
 
-HpiModelParameters INVERSELIB::setModelParameters(const QVector<int> vecHpiFreqs,
-                                               const int iSampleFreq,
-                                               const int iLineFreq,
-                                               const bool bBasic)
-{
-    HpiModelParameters hpiModelParameters;
-    hpiModelParameters.vecHpiFreqs = vecHpiFreqs;
-    hpiModelParameters.iNHpiCoils = vecHpiFreqs.size();
-    hpiModelParameters.iSampleFreq = iSampleFreq;
-    hpiModelParameters.iLineFreq = iLineFreq;
-    hpiModelParameters.bBasic = bBasic;
-    return hpiModelParameters;
-}
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 SignalModel::SignalModel()
+    : m_iCurrentModelCols(0),
+      m_modelParameters(HpiModelParameters())
 {
-    m_iCurrentModelCols = 0;
 }
 
 //=============================================================================================================
 
-MatrixXd SignalModel::fitData(const HpiModelParameters& hpiModelParameters,const MatrixXd& matData)
+MatrixXd SignalModel::fitData(const HpiModelParameters& hpiModelParameters, const MatrixXd& matData)
 {
 
     if(checkEmpty(hpiModelParameters)) {
@@ -96,10 +84,12 @@ MatrixXd SignalModel::fitData(const HpiModelParameters& hpiModelParameters,const
         return matTopo;
     }
 
-    bool bParametersChanged = checkModelParameters(hpiModelParameters);
-    bool bDimensionsChanged = checkDataDimensions(matData.cols());
+    bool bParametersChanged = m_modelParameters != hpiModelParameters;
+    bool bDimensionsChanged = m_iCurrentModelCols != matData.cols();
 
     if(bDimensionsChanged || bParametersChanged) {
+        m_iCurrentModelCols = matData.cols();
+        m_modelParameters = hpiModelParameters;
         selectModelAndCompute();
     }
 
@@ -124,11 +114,11 @@ bool SignalModel::checkDataDimensions(const int iCols)
 bool SignalModel::checkModelParameters(const HpiModelParameters& hpiModelParameters)
 {
     bool bHasChanged = false;
-    if((m_modelParameters.iSampleFreq != hpiModelParameters.iSampleFreq) ||
-        (m_modelParameters.iLineFreq != hpiModelParameters.iLineFreq) ||
-        (m_modelParameters.iNHpiCoils != hpiModelParameters.iNHpiCoils) ||
-        (m_modelParameters.vecHpiFreqs != hpiModelParameters.vecHpiFreqs) ||
-        (m_modelParameters.bBasic != hpiModelParameters.bBasic)) {
+    if((m_modelParameters.iSampleFreq() != hpiModelParameters.iSampleFreq()) ||
+        (m_modelParameters.iLineFreq() != hpiModelParameters.iLineFreq()) ||
+        (m_modelParameters.iNHpiCoils() != hpiModelParameters.iNHpiCoils()) ||
+        (m_modelParameters.vecHpiFreqs() != hpiModelParameters.vecHpiFreqs()) ||
+        (m_modelParameters.bBasic() != hpiModelParameters.bBasic())) {
         bHasChanged = true;
         m_modelParameters = hpiModelParameters;
     }
@@ -139,10 +129,10 @@ bool SignalModel::checkModelParameters(const HpiModelParameters& hpiModelParamet
 
 bool SignalModel::checkEmpty(const HpiModelParameters& hpiModelParameters)
 {
-    if(hpiModelParameters.vecHpiFreqs.empty()) {
+    if(hpiModelParameters.vecHpiFreqs().empty()) {
         std::cout << "SignalModel::checkEmpty - no Hpi frequencies set" << std::endl;
         return true;
-    } else if(hpiModelParameters.iSampleFreq == 0) {
+    } else if(hpiModelParameters.iSampleFreq() == 0) {
         std::cout << "SignalModel::checkEmpty - no sampling frequencies set" << std::endl;
         return true;
     }
@@ -153,7 +143,7 @@ bool SignalModel::checkEmpty(const HpiModelParameters& hpiModelParameters)
 
 void SignalModel::selectModelAndCompute()
 {
-    if(m_modelParameters.bBasic) {
+    if(m_modelParameters.bBasic()) {
         computeInverseBasicModel();
     } else {
         computeInverseAdvancedModel();
@@ -164,16 +154,16 @@ void SignalModel::selectModelAndCompute()
 
 void SignalModel::computeInverseBasicModel()
 {
-    int iNumCoils = m_modelParameters.iNHpiCoils;
+    int iNumCoils = m_modelParameters.iNHpiCoils();
     MatrixXd matSimsig;
-    VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/m_modelParameters.iSampleFreq;
+    VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/m_modelParameters.iSampleFreq();
 
     // Generate simulated data Matrix
     matSimsig.conservativeResize(m_iCurrentModelCols,iNumCoils*2);
 
     for(int i = 0; i < iNumCoils; ++i) {
-        matSimsig.col(i) = sin(2*M_PI*m_modelParameters.vecHpiFreqs[i]*vecTime.array());
-        matSimsig.col(i+iNumCoils) = cos(2*M_PI*m_modelParameters.vecHpiFreqs[i]*vecTime.array());
+        matSimsig.col(i) = sin(2*M_PI*m_modelParameters.vecHpiFreqs()[i]*vecTime.array());
+        matSimsig.col(i+iNumCoils) = cos(2*M_PI*m_modelParameters.vecHpiFreqs()[i]*vecTime.array());
     }
     m_matInverseSignalModel = UTILSLIB::MNEMath::pinv(matSimsig);
 }
@@ -182,19 +172,20 @@ void SignalModel::computeInverseBasicModel()
 
 void SignalModel::computeInverseAdvancedModel()
 {
-    int iNumCoils = m_modelParameters.iNHpiCoils;
+    int iNumCoils = m_modelParameters.iNHpiCoils();
+    int iSampleFreq = m_modelParameters.iSampleFreq();
     MatrixXd matSimsig;
     MatrixXd matSimsigInvTemp;
 
-    VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/m_modelParameters.iSampleFreq;
+    VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/iSampleFreq;
 
     // add linefreq + harmonics + DC part to model
     matSimsig.conservativeResize(m_iCurrentModelCols,iNumCoils*4+2);
     for(int i = 0; i < iNumCoils; ++i) {
-        matSimsig.col(i) = sin(2*M_PI*m_modelParameters.vecHpiFreqs[i]*vecTime.array());
-        matSimsig.col(i+iNumCoils) = cos(2*M_PI*m_modelParameters.vecHpiFreqs[i]*vecTime.array());
-        matSimsig.col(i+2*iNumCoils) = sin(2*M_PI*m_modelParameters.iLineFreq*(i+1)*vecTime.array());
-        matSimsig.col(i+3*iNumCoils) = cos(2*M_PI*m_modelParameters.iLineFreq*(i+1)*vecTime.array());
+        matSimsig.col(i) = sin(2*M_PI*m_modelParameters.vecHpiFreqs()[i]*vecTime.array());
+        matSimsig.col(i+iNumCoils) = cos(2*M_PI*m_modelParameters.vecHpiFreqs()[i]*vecTime.array());
+        matSimsig.col(i+2*iNumCoils) = sin(2*M_PI*m_modelParameters.iLineFreq()*(i+1)*vecTime.array());
+        matSimsig.col(i+3*iNumCoils) = cos(2*M_PI*m_modelParameters.iLineFreq()*(i+1)*vecTime.array());
     }
     matSimsig.col(iNumCoils*4) = RowVectorXd::LinSpaced(m_iCurrentModelCols, -0.5, 0.5);
     matSimsig.col(iNumCoils*4+1).fill(1);

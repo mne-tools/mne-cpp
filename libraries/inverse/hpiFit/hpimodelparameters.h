@@ -1,13 +1,13 @@
 //=============================================================================================================
 /**
- * @file     SignalModel.h
- * @author   Ruben Dörfel <doerfelruben@aol.com>
+ * @file     hpimodelparameters.h
+ * @author   Ruben Doerfel <doerfelruben@aol.com>
  * @since    0.1.0
- * @date     December, 2021
+ * @date     February, 2022
  *
  * @section  LICENSE
  *
- * Copyright (C) 2021, Ruben Dörfel. All rights reserved.
+ * Copyright (C) 2022, Ruben Doerfel. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -28,42 +28,44 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     SignalModel class declaration.
+ * @brief     HpiModelParameters class declaration.
  *
  */
 
-#ifndef SignalModel_H
-#define SignalModel_H
+#ifndef INVERSELIBE_HPIMODELPARAMETERS_H
+#define INVERSELIBE_HPIMODELPARAMETERS_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
 #include "../inverse_global.h"
-#include "hpimodelparameters.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QObject>
 #include <QSharedPointer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
-
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace INVERSELIB
-{
 //=============================================================================================================
-// Declare all structures to be used
+// DEFINE NAMESPACE INVERSELIBE
 //=============================================================================================================
 
+
+namespace INVERSELIB {
+
+
+//=============================================================================================================
+// INVERSELIBE FORWARD DECLARATIONS
+//=============================================================================================================
 
 //=============================================================================================================
 /**
@@ -71,88 +73,137 @@ namespace INVERSELIB
  *
  * @brief Brief description of this class.
  */
-class INVERSESHARED_EXPORT SignalModel
+class INVERSESHARED_EXPORT HpiModelParameters
 {
-
 public:
-    typedef QSharedPointer<SignalModel> SPtr;            /**< Shared pointer type for SignalModel. */
-    typedef QSharedPointer<const SignalModel> ConstSPtr; /**< Const shared pointer type for SignalModel. */
+    typedef QSharedPointer<HpiModelParameters> SPtr;            /**< Shared pointer type for HpiModelParameters. */
+    typedef QSharedPointer<const HpiModelParameters> ConstSPtr; /**< Const shared pointer type for HpiModelParameters. */
 
     //=========================================================================================================
     /**
-     * Constructs a SignalModel object.
-     */
-    explicit SignalModel();
+    * Defaul Constructor.
+    *
+    */
+    HpiModelParameters();
 
     //=========================================================================================================
     /**
-     * Fit the data to the model constructed from given model parameters.
-     *
-     * @param[in] hpiModelParameters   The HpiModelParameters.
-     * @param[in] matData           The data matrix.
-     *
-     * @return the fitted data
-     *
-     */
-    Eigen::MatrixXd fitData(const HpiModelParameters& hpiModelParameters,
-                            const Eigen::MatrixXd& matData);
+    * Constructs a HpiModelParameters object.
+    *
+    * @param[in] vecHpiFreqs     The Hpi frequencies.
+    * @param[in] iSampleFreq     The sampling frequency.
+    * @param[in] iLineFreq       The line Frequency
+    * @param[in] bBasic          Create a basic model without line frequeny or not.
+    */
+    explicit HpiModelParameters(const QVector<int> vecHpiFreqs,
+                                const int iSampleFreq,
+                                const int iLineFreq,
+                                const bool bBasic);
 
-protected:
+    //=========================================================================================================
+    /**
+     * Copy constructor.
+     *
+     * @param[in] hpiModelParameter   HpiModelParameters which should be copied.
+     */
+    HpiModelParameters(const HpiModelParameters &hpiModelParameter);
+
+    //=========================================================================================================
+
+    HpiModelParameters operator= (const HpiModelParameters& other);
+    inline bool operator== (const HpiModelParameters &b) const;
+    inline bool operator!= (const HpiModelParameters &b) const;
+
+    //=========================================================================================================
+    /**
+    * Inline functions to get acces to parameters.
+    */
+
+    inline QVector<int> vecHpiFreqs() const;
+    inline int iNHpiCoils() const;
+    inline int iSampleFreq() const;
+    inline int iLineFreq() const;
+    inline bool bBasic() const;
 
 private:
     //=========================================================================================================
     /**
-     * Selects the model to compute and calls coresponding compute function.
-     *
-     */
-    void selectModelAndCompute();
+    * Compute the number of coils.
+    */
+    void computeNumberOfCoils();
 
     //=========================================================================================================
     /**
-     * Computes the model.
-     *
-     */
-    void computeInverseBasicModel();
-    void computeInverseAdvancedModel();
+    * Check line frequencies and set model type accordingly.
+    */
+    void checkForLineFreq();
 
-    //=========================================================================================================
-    /**
-     * Check if dimensions of input data match the model.
-     *
-     * @param[in] iCols     The number of Clumns to compare.
-     * @return true if changed
-     *
-     */
-    bool checkDataDimensions(const int iCols);
-
-    //=========================================================================================================
-    /**
-     * Check if the HpiModelParameters changed.
-     *
-     * @param[in] hpiModelParameters     The model parameters.
-     * @return true if changed
-     */
-    bool checkModelParameters(const HpiModelParameters& hpiModelParameters);
-
-    //=========================================================================================================
-    /**
-     * Check if the HpiModelParameters are empty. HPI and sampling frequencies need to be set.
-     *
-     * @param[in] hpiModelParameters     The model parameters.
-     * @return true if empty
-     */
-    bool checkEmpty(const HpiModelParameters& hpiModelParameters);
-
-    Eigen::MatrixXd m_matInverseSignalModel;
-    int m_iCurrentModelCols;
-    HpiModelParameters m_modelParameters;
+    QVector<int> m_vecHpiFreqs;
+    int m_iNHpiCoils = 0;
+    int m_iSampleFreq = 0;
+    int m_iLineFreq = 0;
+    bool m_bBasic = true;
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-} // namespace INVERSELIB
+inline QVector<int> HpiModelParameters::vecHpiFreqs() const
+{
+    return m_vecHpiFreqs;
+}
 
-#endif // SignalModel_H
+//=============================================================================================================
+
+inline int HpiModelParameters::iNHpiCoils() const
+{
+    return m_iNHpiCoils;
+}
+
+//=============================================================================================================
+
+inline int HpiModelParameters::iSampleFreq() const
+
+//=============================================================================================================
+
+{
+    return m_iSampleFreq;
+}
+
+//=============================================================================================================
+
+inline int HpiModelParameters::iLineFreq() const
+{
+    return m_iLineFreq;
+}
+
+//=============================================================================================================
+
+inline bool HpiModelParameters::bBasic() const
+{
+    return m_bBasic;
+}
+
+//=============================================================================================================
+
+inline bool HpiModelParameters::operator== (const HpiModelParameters &b) const
+{
+    return (this->vecHpiFreqs() == b.vecHpiFreqs() &&
+            this->iNHpiCoils() == b.iNHpiCoils() &&
+            this->iSampleFreq() == b.iSampleFreq() &&
+            this->iLineFreq() == b.iLineFreq() &&
+            this->bBasic() == b.bBasic());
+}
+
+//=============================================================================================================
+
+inline bool HpiModelParameters::operator!= (const HpiModelParameters &b) const
+{
+    return !(*this==b);
+}
+
+} // namespace INVERSELIBE
+
+#endif // INVERSELIBE_HPIMODELPARAMETERS_H
 

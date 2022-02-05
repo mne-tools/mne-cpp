@@ -134,7 +134,7 @@ RtHpi::~RtHpi()
 
 void RtHpi::append(const MatrixXd &data)
 {
-    if(m_modelParameters.iNHpiCoils >= 3) {
+    if(m_modelParameters.iNHpiCoils() >= 3) {
         emit operate(data,
                      m_matProjectors,
                      m_modelParameters,

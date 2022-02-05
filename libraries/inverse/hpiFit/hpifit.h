@@ -82,8 +82,9 @@ namespace FIFFLIB{
 
 namespace INVERSELIB
 {
-struct SensorSet;
-class SignalModel;
+    struct SensorSet;
+    class SignalModel;
+    class HpiModelParameters;
 //=============================================================================================================
 // Declare all structures to be used
 //=============================================================================================================
