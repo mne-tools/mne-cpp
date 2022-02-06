@@ -67,14 +67,10 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-HpiDataUpdater::HpiDataUpdater()
-{
-
-}
-
 //=============================================================================================================
 
 HpiDataUpdater::HpiDataUpdater(const FiffInfo::SPtr pFiffInfo)
+    : m_sensors(SensorSet(nullptr))
 {
     updateBadChannels(pFiffInfo);
     updateChannels(pFiffInfo);
@@ -117,8 +113,8 @@ void HpiDataUpdater::updateChannels(FiffInfo::SPtr pFiffInfo)
 
 void HpiDataUpdater::updateSensors(const QList<FIFFLIB::FiffChInfo>& lChannels)
 {
-    int iAccuracy = 2;
-    m_sensors = m_sensorSetCreator.updateSensorSet(lChannels,iAccuracy);
+    Accuracy accuracy = Accuracy::high;
+    m_sensors = m_sensorSetCreator.updateSensorSet(lChannels,accuracy);
 }
 
 //=============================================================================================================
