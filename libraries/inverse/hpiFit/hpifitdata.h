@@ -153,7 +153,7 @@ protected:
      * same output.
      */
     Eigen::MatrixXd compute_leadfield(const Eigen::MatrixXd& matPos,
-                                      const SensorSet& sensors);
+                                      const SensorSet sensors);
 
     //=========================================================================================================
     /**
@@ -164,7 +164,7 @@ protected:
      */
     DipFitError dipfitError(const Eigen::MatrixXd& matPos,
                             const Eigen::MatrixXd& matData,
-                            const SensorSet& sensors,
+                            const SensorSet sensors,
                             const Eigen::MatrixXd& matProjectors);
 
     //=========================================================================================================
@@ -185,7 +185,7 @@ protected:
                                int iDisplay,
                                const Eigen::MatrixXd& matData,
                                const Eigen::MatrixXd& matProjectors,
-                               const SensorSet& sensors,
+                               const SensorSet sensors,
                                int &iSimplexNumitr);
 };
 

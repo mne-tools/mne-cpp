@@ -70,36 +70,66 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
+SensorSet::SensorSet(const FwdCoilSet::SPtr pFwdSensorSet)
+{
+    if(pFwdSensorSet!=nullptr) {
+        convertFromFwdCoilSet(pFwdSensorSet);
+    }
+}
+
+//=============================================================================================================
+
+void SensorSet::convertFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> pFwdSensorSet)
+{
+    m_ncoils = pFwdSensorSet->ncoil;
+    m_np = pFwdSensorSet->coils[0]->np;
+    initMatrices(m_ncoils,m_np);
+
+    // get data froms Fwd Coilset
+    for(int i = 0; i < m_ncoils; i++){
+        FwdCoil* coil = (pFwdSensorSet->coils[i]);
+        MatrixXd matRmag = MatrixXd::Zero(m_np,3);
+        MatrixXd matCosmag = MatrixXd::Zero(m_np,3);
+        RowVectorXd vecW(m_np);
+
+        m_r0(i,0) = coil->r0[0];
+        m_r0(i,1) = coil->r0[1];
+        m_r0(i,2) = coil->r0[2];
+
+        m_ez(i,0) = coil->ez[0];
+        m_ez(i,1) = coil->ez[1];
+        m_ez(i,2) = coil->ez[2];
+
+        for (int p = 0; p < m_np; p++){
+            m_w(i*m_np+p) = coil->w[p];
+            for (int c = 0; c < 3; c++) {
+                matRmag(p,c)   = coil->rmag[p][c];
+                matCosmag(p,c) = coil->cosmag[p][c];
+            }
+        }
+
+        m_cosmag.block(i*m_np,0,m_np,3) = matCosmag;
+        m_rmag.block(i*m_np,0,m_np,3) = matRmag;
+    }
+    m_tra = MatrixXd::Identity(m_ncoils,m_ncoils);
+}
+
+//=============================================================================================================
+
+void SensorSet::initMatrices(int m_ncoils, int m_np)
+{
+    m_ez = MatrixXd(m_ncoils,3);
+    m_r0 = MatrixXd(m_ncoils,3);
+    m_rmag = MatrixXd(m_ncoils*m_np,3);
+    m_cosmag = MatrixXd(m_ncoils*m_np,3);
+    m_cosmag = MatrixXd(m_ncoils*m_np,3);
+    m_tra = MatrixXd(m_ncoils,m_ncoils);
+    m_w = RowVectorXd(m_ncoils*m_np);
+}
+
+//=============================================================================================================
+
 SensorSetCreator::SensorSetCreator()
-{
-    m_sensors = SensorSet();
-    m_sensors.ncoils = 0;
-    m_sensors.np = 0;
-}
-
-//=============================================================================================================
-
-SensorSet SensorSetCreator::updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
-                                const int iAccuracy)
-{
-    if(channelList.size() == 0) {
-        std::cout<<std::endl<< "HPIFit::updateSensor - No channels. Returning.";
-        return SensorSet();
-    }
-
-    if(!m_pCoilDefinitions) {
-        readCoilDefinitions();
-    }
-
-    auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(channelList, channelList.size(), iAccuracy, nullptr));
-
-    convertFromFwdCoilSet(pCoilMeg);
-    return m_sensors;
-}
-
-//=============================================================================================================
-
-void SensorSetCreator::readCoilDefinitions()
 {
     QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
     m_pCoilDefinitions = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath));
@@ -107,54 +137,15 @@ void SensorSetCreator::readCoilDefinitions()
 
 //=============================================================================================================
 
-void SensorSetCreator::convertFromFwdCoilSet(const FwdCoilSet::SPtr pCoilMeg)
+SensorSet SensorSetCreator::updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
+                                            const Accuracy accuracy)
 {
-    int iNchan = pCoilMeg->ncoil;
-    int iNp = pCoilMeg->coils[0]->np;
-
-    m_sensors.ncoils = iNchan;
-    m_sensors.np = iNp;
-
-    initMatrices(iNchan,iNp);
-
-    // get data froms Fwd Coilset
-    for(int i = 0; i < iNchan; i++){
-        FwdCoil* coil = (pCoilMeg->coils[i]);
-        MatrixXd matRmag = MatrixXd::Zero(iNp,3);
-        MatrixXd matCosmag = MatrixXd::Zero(iNp,3);
-        RowVectorXd vecW(iNp);
-
-        m_sensors.r0(i,0) = coil->r0[0];
-        m_sensors.r0(i,1) = coil->r0[1];
-        m_sensors.r0(i,2) = coil->r0[2];
-
-        m_sensors.ez(i,0) = coil->ez[0];
-        m_sensors.ez(i,1) = coil->ez[1];
-        m_sensors.ez(i,2) = coil->ez[2];
-
-        for (int p = 0; p < iNp; p++){
-            m_sensors.w(i*iNp+p) = coil->w[p];
-            for (int c = 0; c < 3; c++) {
-                matRmag(p,c)   = coil->rmag[p][c];
-                matCosmag(p,c) = coil->cosmag[p][c];
-            }
-        }
-
-        m_sensors.cosmag.block(i*iNp,0,iNp,3) = matCosmag;
-        m_sensors.rmag.block(i*iNp,0,iNp,3) = matRmag;
+    if(channelList.isEmpty()) {
+        return SensorSet();
+    } else {
+        auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(channelList, channelList.size(), static_cast<int>(accuracy), nullptr));
+        return SensorSet(pCoilMeg);
     }
-    m_sensors.tra = MatrixXd::Identity(iNchan,iNchan);
 }
 
 //=============================================================================================================
-
-void SensorSetCreator::initMatrices(const int iNchan, const int iNp)
-{
-    m_sensors.ez = MatrixXd(iNchan,3);
-    m_sensors.r0 = MatrixXd(iNchan,3);
-    m_sensors.rmag = MatrixXd(iNchan*iNp,3);
-    m_sensors.cosmag = MatrixXd(iNchan*iNp,3);
-    m_sensors.cosmag = MatrixXd(iNchan*iNp,3);
-    m_sensors.tra = MatrixXd(iNchan,iNchan);
-    m_sensors.w = RowVectorXd(iNchan*iNp);
-}
