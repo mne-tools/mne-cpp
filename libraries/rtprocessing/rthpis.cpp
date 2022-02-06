@@ -99,14 +99,13 @@ void RtHpiWorker::doWork(const Eigen::MatrixXd& matData,
 //=============================================================================================================
 
 RtHpi::RtHpi(const SensorSet sensorSet, QObject *parent)
-: QObject(parent)
+: QObject(parent),
+  m_sensorSet(sensorSet)
 {
     qRegisterMetaType<INVERSELIB::HpiFitResult>("INVERSELIB::HpiFitResult");
     qRegisterMetaType<QVector<int> >("QVector<int>");
     qRegisterMetaType<QSharedPointer<FIFFLIB::FiffInfo> >("QSharedPointer<FIFFLIB::FiffInfo>");
     qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
-
-    m_sensorSet = sensorSet;
 
     RtHpiWorker *worker = new RtHpiWorker(m_sensorSet);
     worker->moveToThread(&m_workerThread);

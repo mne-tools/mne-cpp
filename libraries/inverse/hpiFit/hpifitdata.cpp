@@ -72,6 +72,7 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 HPIFitData::HPIFitData()
+    : m_sensors(SensorSet())
 {
 }
 
@@ -162,12 +163,12 @@ Eigen::MatrixXd HPIFitData::magnetic_dipole(Eigen::MatrixXd matPos,
 
 //=============================================================================================================
 
-Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& matPos, const SensorSet& sensors)
+Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& matPos, const SensorSet sensors)
 {
 
     Eigen::MatrixXd matPnt, matOri, matLf;
-    matPnt = sensors.rmag; // position of each integrationpoint
-    matOri = sensors.cosmag; // mOrientation of each coil
+    matPnt = sensors.rmag(); // position of each integrationpoint
+    matOri = sensors.cosmag(); // mOrientation of each coil
 
     matLf = magnetic_dipole(matPos, matPnt, matOri);
 
@@ -178,21 +179,21 @@ Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& matPos, con
 
 DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& matPos,
                                     const Eigen::MatrixXd& matData,
-                                    const SensorSet& sensors,
+                                    const SensorSet sensors,
                                     const Eigen::MatrixXd& matProjectors)
 {
     // Variable Declaration
     struct DipFitError e;
     Eigen::MatrixXd matLfSensor, matDif;
     Eigen::MatrixXd matLf(matData.size(),3);
-    int iNp = sensors.np;
+    int iNp = sensors.np();
 
     // calculate lf for all sensorpoints
     matLfSensor = compute_leadfield(matPos, sensors);
 
     // apply averaging per coil
-    for(int i = 0; i < sensors.ncoils; i++){
-        matLf.row(i) = sensors.w.segment(i*iNp,iNp) * matLfSensor.block(i*iNp,0,iNp,matLfSensor.cols());
+    for(int i = 0; i < sensors.ncoils(); i++){
+        matLf.row(i) = sensors.w(i) * matLfSensor.block(i*iNp,0,iNp,matLfSensor.cols());
     }
     //matLf = sensors.tra * matLf;
 
@@ -224,7 +225,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& matPos,
                                        int iDisplay,
                                        const Eigen::MatrixXd& matData,
                                        const Eigen::MatrixXd& matProjectors,
-                                       const SensorSet& sensors,
+                                       const SensorSet sensors,
                                        int &iSimplexNumitr)
 {
     double tolx, tolf, rho, chi, psi, sigma, func_evals, usual_delta, zero_term_delta, temp1, temp2;

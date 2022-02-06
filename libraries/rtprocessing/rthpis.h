@@ -67,7 +67,7 @@ namespace FIFFLIB {
 }
 
 namespace INVERSELIB {
-    struct SensorSet;
+    class SensorSet;
     class HPIFit;
     struct HpiFitResult;
     class HpiModelParameters;

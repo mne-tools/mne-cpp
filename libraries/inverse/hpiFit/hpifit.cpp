@@ -87,17 +87,13 @@ using namespace FWDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-HPIFit::HPIFit()
-{
-
-}
-
 //=============================================================================================================
 
-HPIFit::HPIFit(const SensorSet sensorSet)
+HPIFit::HPIFit(const SensorSet& sensorSet)
+    : m_sensors(sensorSet),
+      m_signalModel(SignalModel())
 {
-    m_sensors = sensorSet;
-    m_signalModel = SignalModel();
+
 }
 
 //=============================================================================================================
@@ -212,16 +208,16 @@ void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
             int iChIdx = 0;
             VectorXd::Index indMax;
             matAmplitudes.col(j).maxCoeff(&indMax);
-            if(indMax < m_sensors.ncoils) {
+            if(indMax < m_sensors.ncoils()) {
                 iChIdx = indMax;
             }
             vecChIdcs(j) = iChIdx;
         }
         // and go 3 cm inwards from max channels
         for (int j = 0; j < vecChIdcs.rows(); ++j) {
-            if(vecChIdcs(j) < m_sensors.ncoils) {
-                Vector3d r0 = m_sensors.r0.row(vecChIdcs(j));
-                Vector3d ez = m_sensors.ez.row(vecChIdcs(j));
+            if(vecChIdcs(j) < m_sensors.ncoils()) {
+                Vector3d r0 = m_sensors.r0(vecChIdcs(j));
+                Vector3d ez = m_sensors.ez(vecChIdcs(j));
                 matCoilsDev.row(j) = (-1 * ez * 0.03 + r0);
             }
         }

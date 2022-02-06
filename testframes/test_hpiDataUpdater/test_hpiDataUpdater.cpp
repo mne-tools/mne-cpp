@@ -304,9 +304,8 @@ void TestHpiDataUpdater::testPrepareData_bads()
 void TestHpiDataUpdater::testGetSensors()
 {
     // extract data for channels to use
-    int iAccuracy = 2;
     SensorSetCreator sensorCreator;
-    SensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithoutBads,iAccuracy);
+    SensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithoutBads,Accuracy::high);
 
     HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
 
@@ -314,12 +313,7 @@ void TestHpiDataUpdater::testGetSensors()
     SensorSet sensorsActual = hpiData.getSensors();
 
     /// assert
-    QVERIFY2(sensorsExpected.np == sensorsActual.np,"Number of integration points does not match.");
-    QVERIFY2(sensorsExpected.ncoils == sensorsActual.ncoils,"Number of channels does not match.");
-    QVERIFY2(sensorsExpected.rmag.rows() == sensorsActual.rmag.rows(),"Number of points for computation does not match.");
-    QVERIFY2(sensorsExpected.cosmag.rows() == sensorsActual.cosmag.rows(),"Number of points for computation does not match.");
-    QVERIFY2(sensorsExpected.tra.size() == sensorsActual.tra.size(),"Size of square matrix does not match.");
-    QVERIFY2(sensorsExpected.w.size() == sensorsActual.w.size(),"Number of iweights does not match");
+    QVERIFY(sensorsExpected==sensorsActual);
 }
 
 //=============================================================================================================
@@ -330,7 +324,7 @@ void TestHpiDataUpdater::testGetSensors_bads()
     int iAccuracy = 2;
 
     SensorSetCreator sensorCreator;
-    SensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithBads,iAccuracy);
+    SensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithBads,Accuracy::high);
 
     m_pFiffInfo->bads << "MEG0113" << "MEG0112";
     HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
@@ -339,12 +333,7 @@ void TestHpiDataUpdater::testGetSensors_bads()
     SensorSet sensorsActual = hpiData.getSensors();
 
     /// assert
-    QVERIFY2(sensorsExpected.np == sensorsActual.np,"Number of integration points does not match.");
-    QVERIFY2(sensorsExpected.ncoils == sensorsActual.ncoils,"Number of channels does not match.");
-    QVERIFY2(sensorsExpected.rmag.rows() == sensorsActual.rmag.rows(),"Number of points for computation does not match.");
-    QVERIFY2(sensorsExpected.cosmag.rows() == sensorsActual.cosmag.rows(),"Number of points for computation does not match.");
-    QVERIFY2(sensorsExpected.tra.size() == sensorsActual.tra.size(),"Size of square matrix does not match.");
-    QVERIFY2(sensorsExpected.w.size() == sensorsActual.w.size(),"Number of iweights does not match");
+    QVERIFY(sensorsExpected==sensorsActual);
 }
 
 //=============================================================================================================
@@ -353,21 +342,15 @@ void TestHpiDataUpdater::testCheckForUpdates_sensors()
 {
     HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
     m_pFiffInfo->bads << "MEG0113" << "MEG0112";
-    int iAccuracy = 2;
     SensorSetCreator sensorCreator;
-    SensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithBads,iAccuracy);
+    SensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithBads,Accuracy::high);
 
     /// act
     hpiData.checkForUpdate(m_pFiffInfo);
     SensorSet sensorsActual = hpiData.getSensors();
 
     /// assert
-    QVERIFY2(sensorsExpected.np == sensorsActual.np,"Number of integration points does not match.");
-    QVERIFY2(sensorsExpected.ncoils == sensorsActual.ncoils,"Number of channels does not match.");
-    QVERIFY2(sensorsExpected.rmag.rows() == sensorsActual.rmag.rows(),"Number of points for computation does not match.");
-    QVERIFY2(sensorsExpected.cosmag.rows() == sensorsActual.cosmag.rows(),"Number of points for computation does not match.");
-    QVERIFY2(sensorsExpected.tra.size() == sensorsActual.tra.size(),"Size of square matrix does not match.");
-    QVERIFY2(sensorsExpected.w.size() == sensorsActual.w.size(),"Number of iweights does not match");
+    QVERIFY(sensorsExpected==sensorsActual);
 }
 
 //=============================================================================================================

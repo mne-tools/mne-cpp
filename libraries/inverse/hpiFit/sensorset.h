@@ -75,24 +75,168 @@ namespace FIFFLIB{
 
 namespace INVERSELIB
 {
+enum class Accuracy : int{high = 2, medium = 1, low = 0};
 
-/**
- * The strucut specifing the sensor parameters.
- */
-struct SensorSet {
-    Eigen::MatrixXd ez;
-    Eigen::MatrixXd r0;
-    Eigen::MatrixXd rmag;
-    Eigen::MatrixXd cosmag;
-    Eigen::MatrixXd tra;
-    Eigen::RowVectorXd w;
-    int ncoils;
-    int np;
+class INVERSESHARED_EXPORT SensorSet {
+
+public:
+    typedef QSharedPointer<SensorSet> SPtr;            /**< Shared pointer type for SensorSet. */
+    typedef QSharedPointer<const SensorSet> ConstSPtr; /**< Const shared pointer type for SensorSet. */
+
+    //=========================================================================================================
+    /**
+     * Default Constructor.
+     */
+    explicit SensorSet() = default;
+
+    //=========================================================================================================
+    /**
+     * SensorSet that yiealds sensor position, orientation and weights for geometric averaging.
+     *
+     * @param[in] pFwdCoilSet   The FwdCoilSet to extract the data from.
+     *
+     */
+    explicit SensorSet(const QSharedPointer<FWDLIB::FwdCoilSet> pFwdCoilSet);
+
+    inline int np() const;
+    inline int ncoils() const;
+    inline Eigen::VectorXd ez(int iSensor) const;
+    inline Eigen::MatrixXd ez() const;
+
+    inline Eigen::VectorXd r0(int iSensor) const;
+    inline Eigen::MatrixXd r0() const;
+
+    inline Eigen::MatrixXd rmag(int iSensor) const;
+    inline Eigen::MatrixXd rmag() const;
+
+    inline Eigen::MatrixXd cosmag(int iSensor) const;
+    inline Eigen::MatrixXd cosmag() const;
+
+    inline Eigen::MatrixXd tra(int iSensor) const;
+    inline Eigen::MatrixXd tra() const;
+
+    inline Eigen::RowVectorXd w(int iSensor) const;
+    inline Eigen::RowVectorXd w() const;
+
+    inline bool operator== (const SensorSet &b) const;
+    inline bool operator!= (const SensorSet &b) const;
+
+private:
+    //=========================================================================================================
+    /**
+     * Convert data from FwdCoilSet to the sensorset format.
+     * @param[in] iNchan   The number of channels.
+     * @param[in] iAcc     The number of integration points.
+     */
+    void convertFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> pFwdCoilSet);
+
+    //=========================================================================================================
+    /**
+     * Initialize member matrices for specific size.
+     * @param[in] iNchan   The number of channels.
+     * @param[in] iAcc     The number of integration points.
+     */
+    void initMatrices(int iNchan, int iNp);
+
+    Eigen::MatrixXd m_ez{Eigen::MatrixXd(0,0)};
+    Eigen::MatrixXd m_r0{Eigen::MatrixXd(0,0)};
+    Eigen::MatrixXd m_rmag{Eigen::MatrixXd(0,0)};
+    Eigen::MatrixXd m_cosmag{Eigen::MatrixXd(0,0)};
+    Eigen::MatrixXd m_tra{Eigen::MatrixXd(0,0)};
+    Eigen::RowVectorXd m_w{Eigen::RowVectorXd(0)};
+    int m_ncoils{0};
+    int m_np{0};
 };
 
 //=============================================================================================================
-// INVERSELIB FORWARD DECLARATIONS
+// INLINE DEFINITIONS
 //=============================================================================================================
+
+inline int SensorSet::np() const
+{
+    return m_np;
+}
+
+inline int SensorSet::ncoils() const
+{
+    return m_ncoils;
+}
+
+inline Eigen::VectorXd SensorSet::ez(int iSensor) const
+{
+    return m_ez.row(iSensor);
+}
+
+inline Eigen::MatrixXd SensorSet::ez() const
+{
+    return m_ez;
+}
+
+inline Eigen::VectorXd SensorSet::r0(int iSensor) const
+{
+    return m_r0.row(iSensor);
+}
+
+inline Eigen::MatrixXd SensorSet::r0() const
+{
+    return m_r0;
+}
+
+inline Eigen::RowVectorXd SensorSet::w(int iSensor) const
+{
+    return m_w.segment(iSensor*m_np,m_np);
+}
+
+inline Eigen::RowVectorXd SensorSet::w() const
+{
+    return m_w;
+}
+
+inline Eigen::MatrixXd SensorSet::rmag(int iSensor) const
+{
+    return m_rmag.block(iSensor*m_np,0,m_np,3);
+}
+
+inline Eigen::MatrixXd SensorSet::rmag() const
+{
+    return m_rmag;
+}
+
+inline Eigen::MatrixXd SensorSet::cosmag(int iSensor) const
+{
+    return m_cosmag.block(iSensor*m_np,0,m_np,3);
+}
+
+inline Eigen::MatrixXd SensorSet::cosmag() const
+{
+    return m_cosmag;
+}
+
+inline Eigen::MatrixXd SensorSet::tra() const
+{
+    return m_tra;
+}
+//=============================================================================================================
+
+inline bool SensorSet::operator== (const SensorSet &b) const
+{
+    return (this->ez() == b.ez() &&
+            this->r0() == b.r0() &&
+            this->rmag() == b.rmag() &&
+            this->cosmag() == b.cosmag() &&
+            this->tra() == b.tra() &&
+            this->w() == b.w() &&
+            this->np() == b.np() &&
+            this->ncoils() == b.ncoils());
+}
+
+//=============================================================================================================
+
+inline bool SensorSet::operator!= (const SensorSet &b) const
+{
+    bool equal = this==&b;
+    return !(equal);
+}
 
 //=============================================================================================================
 /**
@@ -104,8 +248,8 @@ class INVERSESHARED_EXPORT SensorSetCreator
 {
 
 public:
-    typedef QSharedPointer<SensorSet> SPtr;            /**< Shared pointer type for SensorSet. */
-    typedef QSharedPointer<const SensorSet> ConstSPtr; /**< Const shared pointer type for SensorSet. */
+    typedef QSharedPointer<SensorSetCreator> SPtr;            /**< Shared pointer type for SensorSet. */
+    typedef QSharedPointer<const SensorSetCreator> ConstSPtr; /**< Const shared pointer type for SensorSet. */
 
     //=========================================================================================================
     /**
@@ -121,49 +265,13 @@ public:
      * @param[in] iAccuracy     The accuracy level to use for the sensor set.
      *
      */
-
     SensorSet updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
-                         const int iAccuracy);
-
-    Eigen::MatrixXd ez;
-    Eigen::MatrixXd r0;
-    Eigen::MatrixXd rmag;
-    Eigen::MatrixXd cosmag;
-    Eigen::MatrixXd tra;
-    Eigen::RowVectorXd w;
-    int ncoils;
-    int np;
+                              const Accuracy accuracy);
 
 protected:
 
 private:
-
-    //=========================================================================================================
-    /**
-     * read coil definitions if necessary
-     *
-     */
-    void readCoilDefinitions();
-
-    //=========================================================================================================
-    /**
-     * convert data from FwdCoilSet to SensorSet.
-     *
-     * @param[in] pCoilMeg   The initialized fwd coilset to get data from.
-     *
-     */
-    void convertFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> pCoilMeg);
-
-    //=========================================================================================================
-    /**
-     * initialize member matrices for specific size.
-     * @param[in] iNchan   The number of channels.
-     * @param[in] iAcc     The number of integration points.
-     */
-    void initMatrices(const int iNchan, const int iNp);
-
-    SensorSet m_sensors;
-    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilDefinitions;    // the coil definitions as template
+    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilDefinitions{nullptr};    // the coil definitions as template
 };
 
 //=============================================================================================================

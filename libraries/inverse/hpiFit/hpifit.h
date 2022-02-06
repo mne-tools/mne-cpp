@@ -82,7 +82,7 @@ namespace FIFFLIB{
 
 namespace INVERSELIB
 {
-    struct SensorSet;
+    class SensorSet;
     class SignalModel;
     class HpiModelParameters;
 //=============================================================================================================
@@ -133,6 +133,7 @@ public:
 
     //=========================================================================================================
     /**
+<<<<<<< Updated upstream
      * Default constructor.
      *
      */
@@ -144,7 +145,7 @@ public:
      *
      * @param[in] SensorSet     The MEG sensorSet used for the hpi fitting.
      */
-    explicit HPIFit(const SensorSet sensorSet);
+    explicit HPIFit(const SensorSet& sensorSet);
 
     //=========================================================================================================
     /**
@@ -152,7 +153,7 @@ public:
      *
      * @param[in]   matProjectedData            Data to estimate the HPI positions from. Projectars should be already applied.
      * @param[in]   matProjectors               The projectors to apply.
-     * @param[in]   hpiModelParameters             The model parameters to use for the Hpi Fitting, especially to compute the coil amplitudes.
+     * @param[in]   hpiModelParameters          The model parameters to use for the Hpi Fitting, especially to compute the coil amplitudes.
      * @param[in]   matCoilsHead                The hpi coil locations in head space.
      * @param[in]   bOrderFrequencies           Order Hpi coils yes/no.
      * @param[out]  hpiFitResult                The fitting results.
@@ -321,8 +322,8 @@ private:
                        const Eigen::MatrixXd matCoilsDev,
                        const Eigen::MatrixXd matTrans);
 
-    SensorSet m_sensors;            /**< The sensor struct that contains information about all sensors. */
-    SignalModel m_signalModel;      /**< The signal model for the Hpi signals used to compute extract the coil amplitudes */
+    SensorSet m_sensors{SensorSet()};            /**< The sensor struct that contains information about all sensors. */
+    SignalModel m_signalModel{SignalModel()};      /**< The signal model for the Hpi signals used to compute extract the coil amplitudes */
 
 };
 
