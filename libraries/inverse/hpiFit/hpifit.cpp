@@ -67,6 +67,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QVector>
 #include <QFuture>
 #include <QtConcurrent/QtConcurrent>
 
