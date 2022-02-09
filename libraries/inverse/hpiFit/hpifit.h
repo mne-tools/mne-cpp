@@ -202,7 +202,7 @@ private:
      *
      */
     Eigen::MatrixXd computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
-                           const HpiModelParameters& hpiModelParameters);
+                                      const HpiModelParameters& hpiModelParameters);
 
     //=========================================================================================================
     /**
@@ -212,21 +212,26 @@ private:
      * @param[in]   matProjectors       The projectors to apply.
      * @param[in]   transDevHead        The dev head transformation matrix for an initial guess.
      * @param[in]   matCoilsHead        The hpi coil locations in head space.
-     * @param[out]  matCoilDev          The computed hpi coil locations in device space.
-     * @param[out]  vecGoF              The goodness of fit for each fitted HPI coil.
      * @param[in]   iMaxIterations      The maximum allowed number of iterations used to fit the dipoles. Default is 500.
      * @param[in]   fAbortError         The error which will lead to aborting the dipole fitting process. Default is 1e-9.
-     *
+     * @return Returns the coil parameters for the fitted coils.
      */
-    void computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
-                             const Eigen::MatrixXd& matProjectors,
-                             const FIFFLIB::FiffCoordTrans& transDevHead,
-                             const QVector<double>& vecError,
-                             const Eigen::MatrixXd& matHeadHPI,
-                             Eigen::MatrixXd& matCoilDev,
-                             Eigen::VectorXd& vecGoF,
-                             const int iMaxIterations = 500,
-                             const float fAbortError = 1e-9);
+    CoilParam computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
+                                  const Eigen::MatrixXd& matProjectors,
+                                  const FIFFLIB::FiffCoordTrans& transDevHead,
+                                  const QVector<double>& vecError,
+                                  const Eigen::MatrixXd& matCoilsHead,
+                                  const int iMaxIterations = 500,
+                                  const float fAbortError = 1e-9);
+
+    //=========================================================================================================
+    /**
+     * Compute the goodness of fit from the dipole fit error.
+     *
+     * @param[in]   vecDipFitError      The dipole fit error.
+     * @return Returns the goodness of fit.
+     */
+    Eigen::VectorXd computeGoF(const Eigen::VectorXd& vecDipFitError);
 
     //=========================================================================================================
     /**

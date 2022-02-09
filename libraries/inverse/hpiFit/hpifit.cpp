@@ -121,25 +121,23 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
     MatrixXd matAmplitudes = computeAmplitudes(matProjectedData,
                                                hpiModelParameters);
 
-    int iNumCoils = hpiModelParameters.iNHpiCoils();
-    MatrixXd matCoilsDev = MatrixXd::Zero(iNumCoils,3);
-    computeCoilLocation(matAmplitudes,
-                        matProjectors,
-                        hpiFitResult.devHeadTrans,
-                        hpiFitResult.errorDistances,
-                        matCoilsHead,
-                        matCoilsDev,
-                        hpiFitResult.GoF);
+    CoilParam fittedCoils = computeCoilLocation(matAmplitudes,
+                                                matProjectors,
+                                                hpiFitResult.devHeadTrans,
+                                                hpiFitResult.errorDistances,
+                                                matCoilsHead);
+
+    hpiFitResult.GoF = computeGoF(fittedCoils.dpfiterror);
 
     if(bOrderFrequencies) {
-        std::vector<int> vecOrder = findCoilOrder(matCoilsDev,
+        std::vector<int> vecOrder = findCoilOrder(fittedCoils.pos,
                                                   matCoilsHead);
 
-        matCoilsDev = order(vecOrder,matCoilsDev);
+        fittedCoils.pos = order(vecOrder,fittedCoils.pos);
         hpiFitResult.hpiFreqs = order(vecOrder,hpiModelParameters.vecHpiFreqs());
     }
 
-    computeHeadPosition(matCoilsDev,
+    computeHeadPosition(fittedCoils.pos,
                         matCoilsHead,
                         hpiFitResult.devHeadTrans,
                         hpiFitResult.errorDistances,
@@ -180,15 +178,13 @@ Eigen::MatrixXd HPIFit::computeAmplitudes(const Eigen::MatrixXd& matProjectedDat
 
 //=============================================================================================================
 
-void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
-                                 const MatrixXd& matProjectors,
-                                 const FIFFLIB::FiffCoordTrans& transDevHead,
-                                 const QVector<double>& vecError,
-                                 const MatrixXd& matCoilsHead,
-                                 Eigen::MatrixXd& matCoilLoc,
-                                 Eigen::VectorXd& vecGoF,
-                                 const int iMaxIterations,
-                                 const float fAbortError)
+CoilParam HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
+                                      const MatrixXd& matProjectors,
+                                      const FIFFLIB::FiffCoordTrans& transDevHead,
+                                      const QVector<double>& vecError,
+                                      const MatrixXd& matCoilsHead,
+                                      const int iMaxIterations,
+                                      const float fAbortError)
 {
     int iNumCoils = matAmplitudes.cols();
     MatrixXd matCoilsDev = MatrixXd::Zero(iNumCoils,3);
@@ -237,15 +233,19 @@ void HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
                   iMaxIterations,
                   fAbortError);
 
-    // return data
-    vecGoF = coil.dpfiterror;
-    for(int i = 0; i < vecGoF.size(); ++i) {
-        vecGoF(i) = 1 - vecGoF(i);
-    }
-
-    matCoilLoc = std::move(coil.pos);
+    return coil;
 }
 
+//=============================================================================================================
+
+Eigen::VectorXd HPIFit::computeGoF(const Eigen::VectorXd& vecDipFitError)
+{
+    VectorXd vecGoF(vecDipFitError.size());
+    for(int i = 0; i < vecDipFitError.size(); ++i) {
+        vecGoF(i) = 1 - vecDipFitError(i);
+    }
+    return vecGoF;
+}
 //=============================================================================================================
 
 void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilsDev,
