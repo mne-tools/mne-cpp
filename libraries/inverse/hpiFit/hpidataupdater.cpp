@@ -1,13 +1,13 @@
 //=============================================================================================================
 /**
  * @file     hpidataupdater.cpp
- * @author   Ruben Doerfel <doerfelruben@aol.com>
- * @since    0.1.0
+ * @author   Ruben DÖrfel <doerfelruben@aol.com>
+ * @since    0.1.9
  * @date     December, 2021
  *
  * @section  LICENSE
  *
- * Copyright (C) 2021, Ruben Dörfel. All rights reserved.
+ * Copyright (C) 2021, Ruben DÖrfel. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -70,7 +70,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 HpiDataUpdater::HpiDataUpdater(const FiffInfo::SPtr pFiffInfo)
-    : m_sensors(SensorSet(nullptr))
+    : m_sensors(SensorSet())
 {
     updateBadChannels(pFiffInfo);
     updateChannels(pFiffInfo);

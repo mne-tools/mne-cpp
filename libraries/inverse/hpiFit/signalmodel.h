@@ -2,7 +2,7 @@
 /**
  * @file     SignalModel.h
  * @author   Ruben Dörfel <doerfelruben@aol.com>
- * @since    0.1.0
+ * @since    0.1.9
  * @date     December, 2021
  *
  * @section  LICENSE
@@ -32,8 +32,8 @@
  *
  */
 
-#ifndef SignalModel_H
-#define SignalModel_H
+#ifndef SIGNALMODEL_H
+#define SIGNALMODEL_H
 
 //=============================================================================================================
 // INCLUDES
