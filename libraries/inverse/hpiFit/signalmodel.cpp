@@ -72,8 +72,7 @@ MatrixXd SignalModel::fitData(const HpiModelParameters& hpiModelParameters, cons
 {
 
     if(checkEmpty(hpiModelParameters)) {
-        MatrixXd matTopo;
-        return matTopo;
+        return MatrixXd();
     }
 
     bool bParametersChanged = m_modelParameters != hpiModelParameters;
@@ -85,8 +84,7 @@ MatrixXd SignalModel::fitData(const HpiModelParameters& hpiModelParameters, cons
         selectModelAndCompute();
     }
 
-    MatrixXd matTopo = m_matInverseSignalModel * matData.transpose();
-    return matTopo;
+    return m_matInverseSignalModel * matData.transpose();
 }
 
 //=============================================================================================================
