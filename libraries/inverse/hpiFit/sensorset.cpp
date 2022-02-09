@@ -73,13 +73,13 @@ using namespace Eigen;
 SensorSet::SensorSet(const FwdCoilSet::SPtr pFwdSensorSet)
 {
     if(pFwdSensorSet!=nullptr) {
-        convertFromFwdCoilSet(pFwdSensorSet);
+        initFromFwdCoilSet(pFwdSensorSet);
     }
 }
 
 //=============================================================================================================
 
-void SensorSet::convertFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> pFwdSensorSet)
+void SensorSet::initFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> pFwdSensorSet)
 {
     m_ncoils = pFwdSensorSet->ncoil;
     m_np = pFwdSensorSet->coils[0]->np;
@@ -116,15 +116,15 @@ void SensorSet::convertFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> p
 
 //=============================================================================================================
 
-void SensorSet::initMatrices(int m_ncoils, int m_np)
+void SensorSet::initMatrices(int ncoils, int np)
 {
-    m_ez = MatrixXd(m_ncoils,3);
-    m_r0 = MatrixXd(m_ncoils,3);
-    m_rmag = MatrixXd(m_ncoils*m_np,3);
-    m_cosmag = MatrixXd(m_ncoils*m_np,3);
-    m_cosmag = MatrixXd(m_ncoils*m_np,3);
-    m_tra = MatrixXd(m_ncoils,m_ncoils);
-    m_w = RowVectorXd(m_ncoils*m_np);
+    m_ez = MatrixXd(ncoils,3);
+    m_r0 = MatrixXd(ncoils,3);
+    m_rmag = MatrixXd(ncoils*np,3);
+    m_cosmag = MatrixXd(ncoils*np,3);
+    m_cosmag = MatrixXd(ncoils*np,3);
+    m_tra = MatrixXd(ncoils,ncoils);
+    m_w = RowVectorXd(ncoils*np);
 }
 
 //=============================================================================================================
@@ -138,7 +138,7 @@ SensorSetCreator::SensorSetCreator()
 //=============================================================================================================
 
 SensorSet SensorSetCreator::updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
-                                            const Accuracy accuracy)
+                                            const Accuracy& accuracy)
 {
     if(channelList.isEmpty()) {
         return SensorSet();
