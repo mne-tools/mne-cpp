@@ -82,9 +82,8 @@ public:
     //=========================================================================================================
     /**
     * Defaul Constructor.
-    *
     */
-    HpiModelParameters();
+    HpiModelParameters() = default;
 
     //=========================================================================================================
     /**
@@ -138,11 +137,11 @@ private:
     */
     void checkForLineFreq();
 
-    QVector<int> m_vecHpiFreqs;
-    int m_iNHpiCoils = 0;
-    int m_iSampleFreq = 0;
-    int m_iLineFreq = 0;
-    bool m_bBasic = true;
+    QVector<int> m_vecHpiFreqs{QVector<int>()};
+    int m_iNHpiCoils{0};
+    int m_iSampleFreq{0};
+    int m_iLineFreq{0};
+    bool m_bBasic{true};
 };
 
 //=============================================================================================================

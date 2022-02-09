@@ -82,7 +82,7 @@ public:
     /**
      * Constructs a SignalModel object.
      */
-    explicit SignalModel();
+    explicit SignalModel() = default;
 
     //=========================================================================================================
     /**
@@ -96,8 +96,6 @@ public:
      */
     Eigen::MatrixXd fitData(const HpiModelParameters& hpiModelParameters,
                             const Eigen::MatrixXd& matData);
-
-protected:
 
 private:
     //=========================================================================================================
@@ -143,9 +141,9 @@ private:
      */
     bool checkEmpty(const HpiModelParameters& hpiModelParameters);
 
-    Eigen::MatrixXd m_matInverseSignalModel;
-    int m_iCurrentModelCols;
-    HpiModelParameters m_modelParameters;
+    Eigen::MatrixXd m_matInverseSignalModel{Eigen::MatrixXd(0,0)};
+    int m_iCurrentModelCols{0};
+    HpiModelParameters m_modelParameters{HpiModelParameters()};
 };
 
 //=============================================================================================================
