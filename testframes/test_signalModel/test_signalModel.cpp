@@ -2,7 +2,7 @@
 /**
  * @file     test_signalModel.cpp
  * @author   Ruben Dörfel <doerfelruben@aol.com>
- * @since    0.1.0
+ * @since    0.1.9
  * @date     December, 2021
  *
  * @section  LICENSE
