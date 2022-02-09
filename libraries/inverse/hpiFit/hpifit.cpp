@@ -126,9 +126,6 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
                                                 hpiFitResult.devHeadTrans,
                                                 hpiFitResult.errorDistances,
                                                 matCoilsHead);
-
-    hpiFitResult.GoF = computeGoF(fittedCoils.dpfiterror);
-
     if(bOrderFrequencies) {
         std::vector<int> vecOrder = findCoilOrder(fittedCoils.pos,
                                                   matCoilsHead);
@@ -137,11 +134,16 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
         hpiFitResult.hpiFreqs = order(vecOrder,hpiModelParameters.vecHpiFreqs());
     }
 
-    computeHeadPosition(fittedCoils.pos,
-                        matCoilsHead,
-                        hpiFitResult.devHeadTrans,
-                        hpiFitResult.errorDistances,
-                        hpiFitResult.fittedCoils);
+    hpiFitResult.GoF = computeGoF(fittedCoils.dpfiterror);
+
+    hpiFitResult.fittedCoils = getFittedPointSet(fittedCoils.pos);
+
+    hpiFitResult.devHeadTrans = computeDeviceHeadTransformation(fittedCoils.pos,
+                                                                matCoilsHead);
+
+    hpiFitResult.errorDistances = computeEstimationError(fittedCoils.pos,
+                                                         matCoilsHead,
+                                                         hpiFitResult.devHeadTrans);
 }
 
 //=============================================================================================================
@@ -246,17 +248,22 @@ Eigen::VectorXd HPIFit::computeGoF(const Eigen::VectorXd& vecDipFitError)
     }
     return vecGoF;
 }
+
 //=============================================================================================================
 
-void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilsDev,
-                                 const Eigen::MatrixXd& matCoilsHead,
-                                 FIFFLIB::FiffCoordTrans& transDevHead,
-                                 QVector<double> &vecError,
-                                 FIFFLIB::FiffDigPointSet& fittedPointSet)
+FIFFLIB::FiffCoordTrans HPIFit::computeDeviceHeadTransformation(const Eigen::MatrixXd& matCoilsDev,
+                                                                const Eigen::MatrixXd& matCoilsHead)
 {
     MatrixXd matTrans = computeTransformation(matCoilsHead,matCoilsDev);
-    transDevHead = FiffCoordTrans::make(1,4,matTrans.cast<float>(),true);
+    return FiffCoordTrans::make(1,4,matTrans.cast<float>(),true);
+}
 
+//=============================================================================================================
+
+QVector<double> HPIFit::computeEstimationError(const Eigen::MatrixXd& matCoilsDev,
+                                               const Eigen::MatrixXd& matCoilsHead,
+                                               const FIFFLIB::FiffCoordTrans& transDevHead)
+{
     //Calculate Error
     MatrixXd matTemp = matCoilsDev;
     MatrixXd matTestPos = transDevHead.apply_trans(matTemp.cast<float>()).cast<double>();
@@ -264,12 +271,20 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilsDev,
 
     // compute error
     int iNumCoils = matCoilsDev.rows();
-    vecError = QVector<double>(iNumCoils);
+    QVector<double> vecError(iNumCoils);
     for(int i = 0; i < matDiffPos.rows(); ++i) {
         vecError[i] = matDiffPos.row(i).norm();
     }
+    return vecError;
+}
 
-    fittedPointSet.clear();
+//=============================================================================================================
+
+FIFFLIB::FiffDigPointSet HPIFit::getFittedPointSet(const Eigen::MatrixXd& matCoilsDev)
+{
+    FiffDigPointSet fittedPointSet;
+    int iNumCoils = matCoilsDev.rows();
+
     for(int i = 0; i < iNumCoils; ++i) {
         FiffDigPoint digPoint;
         digPoint.kind = FIFFV_POINT_EEG; //Store as EEG so they have a different color
@@ -280,7 +295,9 @@ void HPIFit::computeHeadPosition(const Eigen::MatrixXd& matCoilsDev,
 
         fittedPointSet << digPoint;
     }
+    return fittedPointSet;
 }
+
 
 //=============================================================================================================
 
