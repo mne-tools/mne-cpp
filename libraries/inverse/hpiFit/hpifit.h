@@ -97,6 +97,13 @@ struct CoilParam {
     Eigen::MatrixXd mom;
     Eigen::VectorXd dpfiterror;
     Eigen::VectorXd dpfitnumitr;
+
+    CoilParam(int iNumCoils)
+        : pos(Eigen::MatrixXd(iNumCoils,3)),
+          mom(Eigen::MatrixXd::Zero(iNumCoils,3)),
+          dpfiterror(Eigen::VectorXd::Zero(iNumCoils)),
+          dpfitnumitr(Eigen::VectorXd::Zero(iNumCoils))
+    {}
 };
 
 /**
@@ -284,13 +291,13 @@ private:
      *
      * @return Returns the coil parameters.
      */
-    CoilParam dipfit(struct CoilParam coil,
+    CoilParam dipfit(const Eigen::MatrixXd matCoilsSeed,
                      const SensorSet& sensors,
                      const Eigen::MatrixXd &matData,
-                     int iNumCoils,
+                     const int iNumCoils,
                      const Eigen::MatrixXd &t_matProjectors,
-                     int iMaxIterations,
-                     float fAbortError);
+                     const int iMaxIterations,
+                     const float fAbortError);
 
     //=========================================================================================================
     /**
@@ -313,8 +320,8 @@ private:
      *
      * @return Returns the order of the coils in head space.
      */
-    std::vector<int> findCoilOrder(const Eigen::MatrixXd matCoilsDev,
-                                   const Eigen::MatrixXd matCoilsHead);
+    std::vector<int> findCoilOrder(const Eigen::MatrixXd& matCoilsDev,
+                                   const Eigen::MatrixXd& matCoilsHead);
 
     //=========================================================================================================
     /**
@@ -325,11 +332,11 @@ private:
      *
      * @return Returns the ordered vector/matrix.
      */
-    Eigen::MatrixXd order(const std::vector<int> vecOrder,
-                          const Eigen::MatrixXd matToOrder);
+    Eigen::MatrixXd order(const std::vector<int>& vecOrder,
+                          const Eigen::MatrixXd& matToOrder);
 
-    QVector<int> order(const std::vector<int> vecOrder,
-                       const QVector<int> vecToOrder);
+    QVector<int> order(const std::vector<int>& vecOrder,
+                       const QVector<int>& vecToOrder);
 
     //=========================================================================================================
     /**
@@ -341,12 +348,12 @@ private:
      *
      * @return Returns the registration error.
      */
-    double objectTrans(const Eigen::MatrixXd matHeadCoil,
-                       const Eigen::MatrixXd matCoilsDev,
-                       const Eigen::MatrixXd matTrans);
+    double objectTrans(const Eigen::MatrixXd& matHeadCoil,
+                       const Eigen::MatrixXd& matCoilsDev,
+                       const Eigen::MatrixXd& matTrans);
 
-    SensorSet m_sensors{SensorSet()};            /**< The sensor struct that contains information about all sensors. */
-    SignalModel m_signalModel{SignalModel()};      /**< The signal model for the Hpi signals used to compute extract the coil amplitudes */
+    SensorSet m_sensors;            /**< The sensor struct that contains information about all sensors. */
+    SignalModel m_signalModel;      /**< The signal model for the Hpi signals used to compute extract the coil amplitudes */
 
 };
 
