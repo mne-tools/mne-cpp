@@ -2,7 +2,7 @@
 /**
  * @file     sensorset.cpp
  * @author   Ruben Dörfel <doerfelruben@aol.com>
- * @since    0.1.0
+ * @since    0.1.9
  * @date     November, 2021
  *
  * @section  LICENSE

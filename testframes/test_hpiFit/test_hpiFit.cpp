@@ -2,7 +2,7 @@
 /**
  * @file     main.cpp
  * @author   Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>;
- * @since    0.1.0
+ * @since    0.1.9
  * @date     February, 2020
  *
  * @section  LICENSE
