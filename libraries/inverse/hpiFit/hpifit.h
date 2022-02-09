@@ -198,12 +198,11 @@ private:
      *
      * @param[in]   matProjectedData    Projected data to estimate the HPI positions from.
      * @param[in]   hpiModelParameters     The model parameters to use for the hpi signal model.
-     * @param[out]  matAmplitudes       The computed amplitudes amplitudes (n_channels x n_coils).
+     * @return  matAmplitudes       The computed amplitudes amplitudes (n_channels x n_coils).
      *
      */
-    void computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
-                           const HpiModelParameters& hpiModelParameters,
-                           Eigen::MatrixXd& matAmplitudes);
+    Eigen::MatrixXd computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
+                           const HpiModelParameters& hpiModelParameters);
 
     //=========================================================================================================
     /**
