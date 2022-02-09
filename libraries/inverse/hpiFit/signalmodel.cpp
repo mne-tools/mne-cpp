@@ -68,14 +68,6 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SignalModel::SignalModel()
-    : m_iCurrentModelCols(0),
-      m_modelParameters(HpiModelParameters())
-{
-}
-
-//=============================================================================================================
-
 MatrixXd SignalModel::fitData(const HpiModelParameters& hpiModelParameters, const MatrixXd& matData)
 {
 

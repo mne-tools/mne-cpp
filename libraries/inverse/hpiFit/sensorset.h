@@ -268,8 +268,6 @@ public:
     SensorSet updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
                               const Accuracy accuracy);
 
-protected:
-
 private:
     QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilDefinitions{nullptr};    // the coil definitions as template
 };
