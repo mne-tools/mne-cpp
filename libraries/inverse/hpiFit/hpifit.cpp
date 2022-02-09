@@ -118,10 +118,8 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
                  HpiFitResult& hpiFitResult)
 {
     // TODO: Check for dimensions
-    MatrixXd matAmplitudes;
-    computeAmplitudes(matProjectedData,
-                      hpiModelParameters,
-                      matAmplitudes);
+    MatrixXd matAmplitudes = computeAmplitudes(matProjectedData,
+                                               hpiModelParameters);
 
     int iNumCoils = hpiModelParameters.iNHpiCoils();
     MatrixXd matCoilsDev = MatrixXd::Zero(iNumCoils,3);
@@ -150,9 +148,8 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
 
 //=============================================================================================================
 
-void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
-                               const HpiModelParameters& hpiModelParameters,
-                               Eigen::MatrixXd& matAmplitudes)
+Eigen::MatrixXd HPIFit::computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
+                                          const HpiModelParameters& hpiModelParameters)
 {
     // fit model
     MatrixXd matTopo = m_signalModel.fitData(hpiModelParameters,matProjectedData);
@@ -178,7 +175,7 @@ void HPIFit::computeAmplitudes(const Eigen::MatrixXd& matProjectedData,
         }
     }
 
-    matAmplitudes = std::move(matAmpSine);
+    return matAmpSine;
 }
 
 //=============================================================================================================
