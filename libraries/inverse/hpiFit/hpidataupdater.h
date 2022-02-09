@@ -128,8 +128,6 @@ public:
     inline const Eigen::MatrixXd& getProjectedData();
     inline const SensorSet& getSensors();
 
-protected:
-
 private:
     //=========================================================================================================
     /**

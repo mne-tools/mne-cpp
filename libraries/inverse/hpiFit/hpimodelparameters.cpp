@@ -61,19 +61,6 @@ using namespace INVERSELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-//=============================================================================================================
-
-HpiModelParameters::HpiModelParameters()
-    : m_vecHpiFreqs(QVector<int>()),
-      m_iNHpiCoils(0),
-      m_iSampleFreq(0),
-      m_iLineFreq(0),
-      m_bBasic(true)
-{
-}
-
-//=============================================================================================================
-
 HpiModelParameters::HpiModelParameters(const QVector<int> vecHpiFreqs,
                                        const int iSampleFreq,
                                        const int iLineFreq,
