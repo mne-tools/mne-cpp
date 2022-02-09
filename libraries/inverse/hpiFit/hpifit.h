@@ -235,20 +235,40 @@ private:
 
     //=========================================================================================================
     /**
-     * Compute the device to head transformation and error measures.
+     * Compute the device to head transformation matrix.
      *
      * @param[in]   matCoilsDev         The estimated coil positions in device space.
      * @param[in]   matCoilsHead        The hpi coil locations in head space.
-     * @param[out]  transDevHead        The dev head transformation matrix.
+     * @return  Returns the dev head transformation matrix.
      * @param[out]  vecError            The HPI estimation Error in mm for each fitted HPI coil.
      * @param[out]  fittedPointSet      The final fitted positions in form of a digitizer set.
      *
      */
-    void computeHeadPosition(const Eigen::MatrixXd& matCoilsDev,
-                             const Eigen::MatrixXd& matCoilsHead,
-                             FIFFLIB::FiffCoordTrans& transDevHead,
-                             QVector<double> &vecError,
-                             FIFFLIB::FiffDigPointSet& fittedPointSet);
+    FIFFLIB::FiffCoordTrans computeDeviceHeadTransformation(const Eigen::MatrixXd& matCoilsDev,
+                                                            const Eigen::MatrixXd& matCoilsHead);
+
+    //=========================================================================================================
+    /**
+     * Compute the distance between fitted and digitized coils.
+     *
+     * @param[in]   matCoilsDev         The estimated coil positions in device space.
+     * @param[in]   matCoilsHead        The hpi coil locations in head space.
+     * @param[out]  transDevHead        The dev->head transformation matrix.
+     * @return Returns the coil estimation error.
+     */
+    QVector<double> computeEstimationError(const Eigen::MatrixXd& matCoilsDev,
+                                           const Eigen::MatrixXd& matCoilsHead,
+                                           const FIFFLIB::FiffCoordTrans& transDevHead);
+
+    //=========================================================================================================
+    /**
+     * Converts the fitted coils from a MAtrix into a fitted point set.
+     *
+     * @param[in]   matCoilsDev         The estimated coil positions in device space.
+     * @return The final fitted positions in form of a digitizer set.
+     *
+     */
+    FIFFLIB::FiffDigPointSet getFittedPointSet(const Eigen::MatrixXd& matCoilsDev);
 
     //=========================================================================================================
     /**
