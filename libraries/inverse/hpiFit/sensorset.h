@@ -124,11 +124,11 @@ public:
 private:
     //=========================================================================================================
     /**
-     * Convert data from FwdCoilSet to the sensorset format.
+     * Initialize data from FwdCoilSet to the sensorset format.
      * @param[in] iNchan   The number of channels.
      * @param[in] iAcc     The number of integration points.
      */
-    void convertFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> pFwdCoilSet);
+    void initFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> pFwdCoilSet);
 
     //=========================================================================================================
     /**
@@ -266,7 +266,7 @@ public:
      *
      */
     SensorSet updateSensorSet(const QList<FIFFLIB::FiffChInfo>& channelList,
-                              const Accuracy accuracy);
+                              const Accuracy& accuracy);
 
 private:
     QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilDefinitions{nullptr};    // the coil definitions as template
