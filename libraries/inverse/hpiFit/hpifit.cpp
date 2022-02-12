@@ -2,7 +2,7 @@
 /**
  * @file     hpifit.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>;
+ *           Ruben Dörfel <doerfelruben@aol.com>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     March, 2017

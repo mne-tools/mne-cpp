@@ -2,7 +2,7 @@
 /**
  * @file     hpifitdata.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Ruben Doerfel <doerfelruben@aol.com>;
+ *           Ruben Dörfel <doerfelruben@aol.com>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     April, 2017

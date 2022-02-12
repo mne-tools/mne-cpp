@@ -1,13 +1,13 @@
 //=============================================================================================================
 /**
  * @file     hpimodelparameters.h
- * @author   Ruben DÖrfel <doerfelruben@aol.com>
+ * @author   Ruben Dörfel <doerfelruben@aol.com>
  * @since    0.1.9
  * @date     February, 2022
  *
  * @section  LICENSE
  *
- * Copyright (C) 2022, Ruben DÖrfel. All rights reserved.
+ * Copyright (C) 2022, Ruben Dörfel. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
