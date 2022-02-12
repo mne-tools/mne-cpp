@@ -118,30 +118,33 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
                  HpiFitResult& hpiFitResult)
 {
     // TODO: Check for dimensions
+
+
+
     MatrixXd matAmplitudes = computeAmplitudes(matProjectedData,
                                                hpiModelParameters);
 
-    CoilParam fittedCoils = computeCoilLocation(matAmplitudes,
+    CoilParam fittedCoilParams = computeCoilLocation(matAmplitudes,
                                                 matProjectors,
                                                 hpiFitResult.devHeadTrans,
                                                 hpiFitResult.errorDistances,
                                                 matCoilsHead);
     if(bOrderFrequencies) {
-        std::vector<int> vecOrder = findCoilOrder(fittedCoils.pos,
+        std::vector<int> vecOrder = findCoilOrder(fittedCoilParams.pos,
                                                   matCoilsHead);
 
-        fittedCoils.pos = order(vecOrder,fittedCoils.pos);
+        fittedCoilParams.pos = order(vecOrder,fittedCoilParams.pos);
         hpiFitResult.hpiFreqs = order(vecOrder,hpiModelParameters.vecHpiFreqs());
     }
 
-    hpiFitResult.GoF = computeGoF(fittedCoils.dpfiterror);
+    hpiFitResult.GoF = computeGoF(fittedCoilParams.dpfiterror);
 
-    hpiFitResult.fittedCoils = getFittedPointSet(fittedCoils.pos);
+    hpiFitResult.fittedCoils = getFittedPointSet(fittedCoilParams.pos);
 
-    hpiFitResult.devHeadTrans = computeDeviceHeadTransformation(fittedCoils.pos,
+    hpiFitResult.devHeadTrans = computeDeviceHeadTransformation(fittedCoilParams.pos,
                                                                 matCoilsHead);
 
-    hpiFitResult.errorDistances = computeEstimationError(fittedCoils.pos,
+    hpiFitResult.errorDistances = computeEstimationError(fittedCoilParams.pos,
                                                          matCoilsHead,
                                                          hpiFitResult.devHeadTrans);
 }
@@ -220,15 +223,14 @@ CoilParam HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
     }
 
     // dipole fit
-    CoilParam coil = dipfit(matCoilsSeed,
-                            m_sensors,
-                            matAmplitudes,
-                            iNumCoils,
-                            matProjectors,
-                            iMaxIterations,
-                            fAbortError);
+    return dipfit(matCoilsSeed,
+                  m_sensors,
+                  matAmplitudes,
+                  iNumCoils,
+                  matProjectors,
+                  iMaxIterations,
+                  fAbortError);
 
-    return coil;
 }
 
 //=============================================================================================================
