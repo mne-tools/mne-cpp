@@ -101,6 +101,7 @@ private slots:
     void testFit_advanced_gof();  // compare gof to specified value
     void testFit_basic_error();  // compare error to specified value
     void testFit_advanced_error();  // compare error to specified value
+    void testCheckForUpdate();
     void testFindOrder();  // test with all possible frequency oders
     void cleanupTestCase();  // clean-up at the end
 
@@ -411,6 +412,48 @@ void TestHpiFit::testFit_advanced_error()
 
     HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
     HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
+    hpiDataUpdater.prepareDataAndProjectors(m_matData,m_matProjectors);
+    const auto& matProjectedData = hpiDataUpdater.getProjectedData();
+    const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();
+    const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
+
+    HpiFitResult hpiFitResult;
+
+    HPI.fit(matProjectedData,
+            matPreparedProjectors,
+            hpiModelParameters,
+            matCoilsHead,
+            hpiFitResult);
+
+    QVector<double> vecError = hpiFitResult.errorDistances;
+
+    /// assert
+    double dLocalizationErrorMean = 1000.0 * std::accumulate(vecError.begin(), vecError.end(), .0) / vecError.size();
+    QVERIFY(dLocalizationErrorMean < dLocalizationErrorTol);
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testCheckForUpdate()
+{
+    /// prepare
+    int iSampleFreq = m_pFiffInfo->sfreq;
+    int iLineFreq = m_pFiffInfo->linefreq;
+    QVector<int> vecHpiFreqs = {166, 154, 161, 158};
+    bool bBasic = false;
+    HpiModelParameters hpiModelParameters(vecHpiFreqs,
+                                          iSampleFreq,
+                                          iLineFreq,
+                                          bBasic);
+
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
+
+    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
+    hpiDataUpdater.checkForUpdate(m_pFiffInfo);
+
+    HPI.checkForUpdate(hpiDataUpdater.getSensors());
+
     hpiDataUpdater.prepareDataAndProjectors(m_matData,m_matProjectors);
     const auto& matProjectedData = hpiDataUpdater.getProjectedData();
     const auto& matPreparedProjectors = hpiDataUpdater.getProjectors();

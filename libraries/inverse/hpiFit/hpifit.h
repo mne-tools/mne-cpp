@@ -155,6 +155,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Checks if SensorSet has changed and updates member SensorSet.
+     *
+     * @param[in] SensorSet     The MEG sensorSet used for the hpi fitting.
+     */
+    void checkForUpdate(const SensorSet& sensorSet);
+
+    //=========================================================================================================
+    /**
      * Perform one single HPI fit.
      *
      * @param[in]   matProjectedData            Data to estimate the HPI positions from. Projectars should be already applied.

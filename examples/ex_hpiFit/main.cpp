@@ -107,8 +107,6 @@ int main(int argc, char *argv[])
     QCommandLineOption inFreqs("freqs", "The frequencies used.", "in","154,158,161,166");
     QCommandLineOption inSave("save", "Store the fitting results [0,1].", "in","0");
     QCommandLineOption inVerbose("verbose", "Print to command line [0,1].", "in","1");
-    QCommandLineOption inDrop("drop", "Only use tree best coils, yes/no.", "in","0");
-    QCommandLineOption inDebug("debug", "Save debug info during HPI fit [0,1].", "in","0");
     QCommandLineOption inFast("fast", "Do fast fits [0,1].", "in","0");
     QCommandLineOption outName("fileOut", "The output file name for movement data.", "out","position.txt");
 
@@ -118,8 +116,6 @@ int main(int argc, char *argv[])
     parser.addOption(inFreqs);
     parser.addOption(inSave);
     parser.addOption(inVerbose);
-    parser.addOption(inDrop);
-    parser.addOption(inDebug);
     parser.addOption(inFast);
     parser.addOption(outName);
 
@@ -141,8 +137,6 @@ int main(int argc, char *argv[])
     QFile t_fileIn(parser.value(inFile));
     bool bSave = parser.value(inSave).toInt();
     bool bVerbose = parser.value(inVerbose).toInt();
-    bool bDrop = parser.value(inDrop).toInt();
-    bool bDoDebug = parser.value(inDebug).toInt();
     bool bFast = parser.value(inFast).toInt();
     QString sNameOut(parser.value(outName));
 

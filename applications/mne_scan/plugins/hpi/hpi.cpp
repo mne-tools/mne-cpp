@@ -564,7 +564,6 @@ void Hpi::run()
     HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
     HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
 
-    bool bDrop = false;
     double dErrorMax = 0.0;
     double dMeanErrorDist = 0.0;
     double dAllowedMovement = 0.0;
@@ -615,6 +614,8 @@ void Hpi::run()
                                                         m_pFiffInfo->linefreq,
                                                         false);
                 hpiDataUpdater.checkForUpdate(m_pFiffInfo);
+                HPI.checkForUpdate(hpiDataUpdater.getSensors());
+
                 hpiDataUpdater.prepareDataAndProjectors(matDataMerged,m_matCompProjectors);
                 bOrder = m_bDoFreqOrder;
                 m_bDoFreqOrder = false;

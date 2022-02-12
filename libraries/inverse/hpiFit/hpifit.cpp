@@ -99,6 +99,15 @@ HPIFit::HPIFit(const SensorSet& sensorSet)
 
 //=============================================================================================================
 
+void HPIFit::checkForUpdate(const SensorSet &sensorSet)
+{
+    if(m_sensors != sensorSet) {
+        m_sensors = sensorSet;
+    }
+}
+
+//=============================================================================================================
+
 void HPIFit::fit(const MatrixXd& matProjectedData,
                  const MatrixXd& matProjectors,
                  const HpiModelParameters& hpiModelParameters,
