@@ -131,8 +131,8 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
         return;
     }
 
-    MatrixXd matAmplitudes = computeAmplitudes(matProjectedData,
-                                               hpiModelParameters);
+    const MatrixXd matAmplitudes = computeAmplitudes(matProjectedData,
+                                                     hpiModelParameters);
 
     CoilParam fittedCoilParams = computeCoilLocation(matAmplitudes,
                                                      matProjectors,
@@ -140,8 +140,8 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
                                                      hpiFitResult.errorDistances,
                                                      matCoilsHead);
     if(bOrderFrequencies) {
-        std::vector<int> vecOrder = findCoilOrder(fittedCoilParams.pos,
-                                                  matCoilsHead);
+        const std::vector<int> vecOrder = findCoilOrder(fittedCoilParams.pos,
+                                                        matCoilsHead);
 
         fittedCoilParams.pos = order(vecOrder,fittedCoilParams.pos);
         hpiFitResult.hpiFreqs = order(vecOrder,hpiModelParameters.vecHpiFreqs());
@@ -169,7 +169,7 @@ Eigen::MatrixXd HPIFit::computeAmplitudes(const Eigen::MatrixXd& matProjectedDat
     matTopo.transposeInPlace();
 
     // split into sine and cosine amplitudes
-    int iNumCoils = hpiModelParameters.iNHpiCoils();
+    const int iNumCoils = hpiModelParameters.iNHpiCoils();
 
     MatrixXd matAmpSine(matProjectedData.cols(), iNumCoils);
     MatrixXd matAmpCosine(matProjectedData.cols(), iNumCoils);
@@ -201,10 +201,10 @@ CoilParam HPIFit::computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
                                       const int iMaxIterations,
                                       const float fAbortError)
 {
-    int iNumCoils = matAmplitudes.cols();
+    const int iNumCoils = matAmplitudes.cols();
     MatrixXd matCoilsSeed = MatrixXd::Zero(iNumCoils,3);
 
-    double dError = std::accumulate(vecError.begin(), vecError.end(), .0) / vecError.size();
+    const double dError = std::accumulate(vecError.begin(), vecError.end(), .0) / vecError.size();
 
     if(transDevHead.trans != MatrixXd::Identity(4,4).cast<float>() && dError < 0.010) {
         // if good last fit, use old trafo

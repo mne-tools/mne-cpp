@@ -75,8 +75,8 @@ MatrixXd SignalModel::fitData(const HpiModelParameters& hpiModelParameters, cons
         return MatrixXd();
     }
 
-    bool bParametersChanged = m_modelParameters != hpiModelParameters;
-    bool bDimensionsChanged = m_iCurrentModelCols != matData.cols();
+    const bool bParametersChanged = m_modelParameters != hpiModelParameters;
+    const bool bDimensionsChanged = m_iCurrentModelCols != matData.cols();
 
     if(bDimensionsChanged || bParametersChanged) {
         m_iCurrentModelCols = matData.cols();
@@ -144,9 +144,9 @@ void SignalModel::selectModelAndCompute()
 
 void SignalModel::computeInverseBasicModel()
 {
-    int iNumCoils = m_modelParameters.iNHpiCoils();
+    const int iNumCoils = m_modelParameters.iNHpiCoils();
     MatrixXd matSimsig;
-    VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/m_modelParameters.iSampleFreq();
+    const VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/m_modelParameters.iSampleFreq();
 
     // Generate simulated data Matrix
     matSimsig.conservativeResize(m_iCurrentModelCols,iNumCoils*2);
@@ -162,12 +162,12 @@ void SignalModel::computeInverseBasicModel()
 
 void SignalModel::computeInverseAdvancedModel()
 {
-    int iNumCoils = m_modelParameters.iNHpiCoils();
-    int iSampleFreq = m_modelParameters.iSampleFreq();
+    const int iNumCoils = m_modelParameters.iNHpiCoils();
+    const int iSampleFreq = m_modelParameters.iSampleFreq();
     MatrixXd matSimsig;
     MatrixXd matSimsigInvTemp;
 
-    VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/iSampleFreq;
+    const VectorXd vecTime = VectorXd::LinSpaced(m_iCurrentModelCols, 0, m_iCurrentModelCols-1) *1.0/iSampleFreq;
 
     // add linefreq + harmonics + DC part to model
     matSimsig.conservativeResize(m_iCurrentModelCols,iNumCoils*4+2);
