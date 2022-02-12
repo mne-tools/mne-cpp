@@ -221,23 +221,40 @@ private:
 
     //=========================================================================================================
     /**
-     * Compute the coil locations using dipole fit.
+     * Compute initial coil positions for the dipole fit.
      *
      * @param[in]   matAmplitudes       The amplitudes fitted using computeAmplitudes.
-     * @param[in]   matProjectors       The projectors to apply.
      * @param[in]   transDevHead        The dev head transformation matrix for an initial guess.
+     * @param[in]   vecError            The Error Distances from the last fit.
      * @param[in]   matCoilsHead        The hpi coil locations in head space.
-     * @param[in]   iMaxIterations      The maximum allowed number of iterations used to fit the dipoles. Default is 500.
-     * @param[in]   fAbortError         The error which will lead to aborting the dipole fitting process. Default is 1e-9.
-     * @return Returns the coil parameters for the fitted coils.
+     * @return Returns the seed points.
      */
-    CoilParam computeCoilLocation(const Eigen::MatrixXd& matAmplitudes,
-                                  const Eigen::MatrixXd& matProjectors,
-                                  const FIFFLIB::FiffCoordTrans& transDevHead,
-                                  const QVector<double>& vecError,
-                                  const Eigen::MatrixXd& matCoilsHead,
-                                  const int iMaxIterations = 500,
-                                  const float fAbortError = 1e-9);
+    Eigen::MatrixXd computeSeedPoints(const Eigen::MatrixXd& matAmplitudes,
+                                      const FIFFLIB::FiffCoordTrans& transDevHead,
+                                      const QVector<double>& vecError,
+                                      const Eigen::MatrixXd& matCoilsHead);
+
+    //=========================================================================================================
+    /**
+     * Fits dipoles for the given coils and a given data set.
+     *
+     * @param[in]   coil              The coil parameters.
+     * @param[in]   sensors           The sensor information.
+     * @param[in]   matData           The data which used to fit the coils.
+     * @param[in]   iNumCoils         The number of coils.
+     * @param[in]   t_matProjectors   The projectors to apply.
+     * @param[in]   iMaxIterations    The maximum allowed number of iterations used to fit the dipoles. Default is 500.
+     * @param[in]   fAbortError       The error which will lead to aborting the dipole fitting process. Default is 1e-9.
+     *
+     * @return Returns the coil parameters.
+     */
+    CoilParam dipfit(const Eigen::MatrixXd matCoilsSeed,
+                     const SensorSet& sensors,
+                     const Eigen::MatrixXd &matData,
+                     const int iNumCoils,
+                     const Eigen::MatrixXd &t_matProjectors,
+                     const int iMaxIterations,
+                     const float fAbortError);
 
     //=========================================================================================================
     /**
@@ -284,28 +301,6 @@ private:
      *
      */
     FIFFLIB::FiffDigPointSet getFittedPointSet(const Eigen::MatrixXd& matCoilsDev);
-
-    //=========================================================================================================
-    /**
-     * Fits dipoles for the given coils and a given data set.
-     *
-     * @param[in]   coil              The coil parameters.
-     * @param[in]   sensors           The sensor information.
-     * @param[in]   matData           The data which used to fit the coils.
-     * @param[in]   iNumCoils         The number of coils.
-     * @param[in]   t_matProjectors   The projectors to apply.
-     * @param[in]   iMaxIterations    The maximum allowed number of iterations used to fit the dipoles. Default is 500.
-     * @param[in]   fAbortError       The error which will lead to aborting the dipole fitting process. Default is 1e-9.
-     *
-     * @return Returns the coil parameters.
-     */
-    CoilParam dipfit(const Eigen::MatrixXd matCoilsSeed,
-                     const SensorSet& sensors,
-                     const Eigen::MatrixXd &matData,
-                     const int iNumCoils,
-                     const Eigen::MatrixXd &t_matProjectors,
-                     const int iMaxIterations,
-                     const float fAbortError);
 
     //=========================================================================================================
     /**
