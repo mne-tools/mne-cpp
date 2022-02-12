@@ -87,7 +87,7 @@ void SensorSet::initFromFwdCoilSet(const QSharedPointer<FWDLIB::FwdCoilSet> pFwd
 
     // get data froms Fwd Coilset
     for(int i = 0; i < m_ncoils; i++){
-        FwdCoil* coil = (pFwdSensorSet->coils[i]);
+        const FwdCoil* coil = (pFwdSensorSet->coils[i]);
         MatrixXd matRmag = MatrixXd::Zero(m_np,3);
         MatrixXd matCosmag = MatrixXd::Zero(m_np,3);
         RowVectorXd vecW(m_np);
@@ -131,7 +131,7 @@ void SensorSet::initMatrices(int ncoils, int np)
 
 SensorSetCreator::SensorSetCreator()
 {
-    QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
+    const QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
     m_pCoilDefinitions = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath));
 }
 

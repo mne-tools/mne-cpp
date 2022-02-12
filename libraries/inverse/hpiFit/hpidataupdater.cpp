@@ -90,7 +90,7 @@ void HpiDataUpdater::updateBadChannels(FiffInfo::SPtr pFiffInfo)
 void HpiDataUpdater::updateChannels(FiffInfo::SPtr pFiffInfo)
 {
     // Get the indices of inner layer channels and exclude bad channels and create channellist
-    int iNumCh = pFiffInfo->nchan;
+    const int iNumCh = pFiffInfo->nchan;
     m_lChannels.clear();
     m_vecInnerind.clear();
     for (int i = 0; i < iNumCh; ++i) {
@@ -113,7 +113,7 @@ void HpiDataUpdater::updateChannels(FiffInfo::SPtr pFiffInfo)
 
 void HpiDataUpdater::updateSensors(const QList<FIFFLIB::FiffChInfo>& lChannels)
 {
-    Accuracy accuracy = Accuracy::high;
+    const Accuracy accuracy = Accuracy::high;
     m_sensors = m_sensorSetCreator.updateSensorSet(lChannels,accuracy);
 }
 
@@ -150,7 +150,7 @@ void HpiDataUpdater::updateHpiDigitizer(const QList<FiffDigPoint>& lDig)
 
 void HpiDataUpdater::checkForUpdate(const FiffInfo::SPtr pFiffInfo)
 {
-    bool bUpdate = checkIfChanged(pFiffInfo->bads,pFiffInfo->chs);
+    const bool bUpdate = checkIfChanged(pFiffInfo->bads,pFiffInfo->chs);
     if(bUpdate)
     {
         updateBadChannels(pFiffInfo);
