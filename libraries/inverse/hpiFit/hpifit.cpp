@@ -117,18 +117,28 @@ void HPIFit::fit(const MatrixXd& matProjectedData,
                  const bool bOrderFrequencies,
                  HpiFitResult& hpiFitResult)
 {
-    // TODO: Check for dimensions
-
-
+    if(matProjectedData.rows() != matProjectors.rows()) {
+        std::cout<< "HPIFit::fit - Projector and data dimensions do not match. Returning."<<std::endl;
+        return;
+    } else if(hpiModelParameters.iNHpiCoils()!= matCoilsHead.rows()) {
+        std::cout<< "HPIFit::fit - Number of coils and hpi digitizers do not match. Returning."<<std::endl;
+        return;
+    } else if(matProjectedData.rows()==0 || matProjectors.rows()==0) {
+        std::cout<< "HPIFit::fit - No data or Projectors passed. Returning."<<std::endl;
+        return;
+    } else if(m_sensors.ncoils() != matProjectedData.rows()) {
+        std::cout<< "HPIFit::fit - Number of channels in sensors and data do not match. Returning."<<std::endl;
+        return;
+    }
 
     MatrixXd matAmplitudes = computeAmplitudes(matProjectedData,
                                                hpiModelParameters);
 
     CoilParam fittedCoilParams = computeCoilLocation(matAmplitudes,
-                                                matProjectors,
-                                                hpiFitResult.devHeadTrans,
-                                                hpiFitResult.errorDistances,
-                                                matCoilsHead);
+                                                     matProjectors,
+                                                     hpiFitResult.devHeadTrans,
+                                                     hpiFitResult.errorDistances,
+                                                     matCoilsHead);
     if(bOrderFrequencies) {
         std::vector<int> vecOrder = findCoilOrder(fittedCoilParams.pos,
                                                   matCoilsHead);

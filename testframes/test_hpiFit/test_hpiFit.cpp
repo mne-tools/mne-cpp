@@ -93,6 +93,10 @@ public:
 private slots:
     void initTestCase(); // run once at the very beginning
     void init(); // run before each test
+    void testFit_dimensions_dataAndProjectors();
+    void testFit_dimensions_nCoils();
+    void testFit_dimensions_emptyData();
+    void testFit_dimensions_dataAndSensors();
     void testFit_basic_gof();  // test with advanced model and projectors
     void testFit_advanced_gof();  // compare gof to specified value
     void testFit_basic_error();  // compare error to specified value
@@ -171,6 +175,116 @@ void TestHpiFit::init()
 {
     // run at beginning of each test
     m_pFiffInfo =  QSharedPointer<FiffInfo>(new FiffInfo(m_raw.info));
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testFit_dimensions_dataAndProjectors()
+{
+    HpiModelParameters hpiModelParameters;
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
+
+    hpiDataUpdater.prepareDataAndProjectors(m_matData,m_matProjectors);
+    const auto& matProjectedData = hpiDataUpdater.getProjectedData();
+    const auto matPreparedProjectors = MatrixXd::Zero(306,306);
+    const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
+
+    HpiFitResult hpiFitResult;
+
+    HPI.fit(matProjectedData,
+            matPreparedProjectors,
+            hpiModelParameters,
+            matCoilsHead,
+            hpiFitResult);
+
+    QVERIFY(hpiFitResult.errorDistances.isEmpty());
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testFit_dimensions_nCoils()
+{
+    HpiModelParameters hpiModelParameters;
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
+
+    hpiDataUpdater.prepareDataAndProjectors(m_matData,m_matProjectors);
+    const auto& matProjectedData = hpiDataUpdater.getProjectedData();
+    const auto matPreparedProjectors = hpiDataUpdater.getProjectors();
+    const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
+
+    HpiFitResult hpiFitResult;
+
+    HPI.fit(matProjectedData,
+            matPreparedProjectors,
+            hpiModelParameters,
+            matCoilsHead,
+            hpiFitResult);
+
+    QVERIFY(hpiFitResult.errorDistances.isEmpty());
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testFit_dimensions_emptyData()
+{
+    int iSampleFreq = m_pFiffInfo->sfreq;
+    int iLineFreq = m_pFiffInfo->linefreq;
+    QVector<int> vecHpiFreqs = {166, 154, 161, 158};
+    bool bBasic = true;
+    HpiModelParameters hpiModelParameters(vecHpiFreqs,
+                                          iSampleFreq,
+                                          iLineFreq,
+                                          bBasic);
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
+    const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
+
+    HpiFitResult hpiFitResult;
+
+    HPI.fit(MatrixXd(),
+            MatrixXd(),
+            hpiModelParameters,
+            matCoilsHead,
+            hpiFitResult);
+
+    QVERIFY(hpiFitResult.errorDistances.isEmpty());
+}
+
+//=============================================================================================================
+
+void TestHpiFit::testFit_dimensions_dataAndSensors()
+{
+    int iSampleFreq = m_pFiffInfo->sfreq;
+    int iLineFreq = m_pFiffInfo->linefreq;
+    QVector<int> vecHpiFreqs = {166, 154, 161, 158};
+    bool bBasic = true;
+    HpiModelParameters hpiModelParameters(vecHpiFreqs,
+                                          iSampleFreq,
+                                          iLineFreq,
+                                          bBasic);
+
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
+
+    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
+    hpiDataUpdater.checkForUpdate(m_pFiffInfo);
+
+    hpiDataUpdater.prepareDataAndProjectors(m_matData,m_matProjectors);
+    const auto& matProjectedData = hpiDataUpdater.getProjectedData();
+    const auto matPreparedProjectors = hpiDataUpdater.getProjectors();
+    const auto& matCoilsHead = hpiDataUpdater.getHpiDigitizer();
+
+    HpiFitResult hpiFitResult;
+
+    HPI.fit(matProjectedData,
+            matPreparedProjectors,
+            hpiModelParameters,
+            matCoilsHead,
+            hpiFitResult);
+
+    QVERIFY(hpiFitResult.errorDistances.isEmpty());
 }
 
 //=============================================================================================================
