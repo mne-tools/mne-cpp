@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * @file     main.cpp
- * @author   Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>;
+ * @author   Ruben Dörfel <doerfelruben@aol.com>;
  * @since    0.1.0
  * @date     February, 2020
  *
