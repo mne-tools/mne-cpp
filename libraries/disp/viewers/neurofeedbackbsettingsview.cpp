@@ -252,7 +252,7 @@ void NeurofeedbackBSettingsView::updateStatusObject()
         for(int i = 0; i<image.width(); ++i){
             for(int j=0; j<image.height(); ++j){
                 if(image.pixelColor(i, j) == Qt::white){
-                    image.setPixelColor(i,j,QColorConstants::Transparent);
+                    image.setPixelColor(i,j,QColor(0,0,0,255));
                 }
             }
         }

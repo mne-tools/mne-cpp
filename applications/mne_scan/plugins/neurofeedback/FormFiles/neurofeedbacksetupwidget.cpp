@@ -120,8 +120,8 @@ NeurofeedbackSetupWidget::NeurofeedbackSetupWidget(Neurofeedback* pNeurofeedback
     ui.m_qGroupBox_NeurofeedbackOptions->setLayout(settingsLayoutN);
 
 
-    connect(buttonGroupOutput, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::idClicked), m_pNeurofeedback, &Neurofeedback::changeOutput);
-    connect(buttonGroupOutput, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::idClicked), this, &NeurofeedbackSetupWidget::changeiOutput);
+    connect(buttonGroupOutput, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), m_pNeurofeedback, &Neurofeedback::changeOutput);
+    connect(buttonGroupOutput, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &NeurofeedbackSetupWidget::changeiOutput);
     connect(pNeurofeedbackFSettingsView, &NeurofeedbackFSettingsView::changeSliders, m_pNeurofeedback, &Neurofeedback::changeSliders);
     connect(pNeurofeedbackFSettingsView, &NeurofeedbackFSettingsView::changeballCh, m_pNeurofeedback, &Neurofeedback::changeballCh);
     connect(pNeurofeedbackFSettingsView, &NeurofeedbackFSettingsView::changeMax, m_pNeurofeedback, &Neurofeedback::changeFMax);

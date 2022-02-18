@@ -218,11 +218,11 @@ NeurofeedbackCSettingsView::NeurofeedbackCSettingsView(const QString& sSettingsP
     connect(m_pui->lineEdit_Class2, static_cast<void (QLineEdit::*)(const QString &)> (&QLineEdit::textEdited), this, &NeurofeedbackCSettingsView::onUpdateLineEditClass2);
     connect(m_pui->lineEdit_Class3, static_cast<void (QLineEdit::*)(const QString &)> (&QLineEdit::textEdited), this, &NeurofeedbackCSettingsView::onUpdateLineEditClass3);
     connect(m_pui->lineEdit_Class4, static_cast<void (QLineEdit::*)(const QString &)> (&QLineEdit::textEdited), this, &NeurofeedbackCSettingsView::onUpdateLineEditClass4);
-    connect(buttonGroupC0, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::idClicked), this, &NeurofeedbackCSettingsView::onUpdateButtonGroupC0);
-    connect(buttonGroupC1, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::idClicked), this, &NeurofeedbackCSettingsView::onUpdateButtonGroupC1);
-    connect(buttonGroupC2, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::idClicked), this, &NeurofeedbackCSettingsView::onUpdateButtonGroupC2);
-    connect(buttonGroupC3, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::idClicked), this, &NeurofeedbackCSettingsView::onUpdateButtonGroupC3);
-    connect(buttonGroupC4, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::idClicked), this, &NeurofeedbackCSettingsView::onUpdateButtonGroupC4);
+    connect(buttonGroupC0, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &NeurofeedbackCSettingsView::onUpdateButtonGroupC0);
+    connect(buttonGroupC1, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &NeurofeedbackCSettingsView::onUpdateButtonGroupC1);
+    connect(buttonGroupC2, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &NeurofeedbackCSettingsView::onUpdateButtonGroupC2);
+    connect(buttonGroupC3, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &NeurofeedbackCSettingsView::onUpdateButtonGroupC3);
+    connect(buttonGroupC4, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &NeurofeedbackCSettingsView::onUpdateButtonGroupC4);
     connect(m_pui->spinBox_C0, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &NeurofeedbackCSettingsView::onUpdateSpinboxClass0);
     connect(m_pui->spinBox_C1, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &NeurofeedbackCSettingsView::onUpdateSpinboxClass1);
     connect(m_pui->spinBox_C2, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &NeurofeedbackCSettingsView::onUpdateSpinboxClass2);

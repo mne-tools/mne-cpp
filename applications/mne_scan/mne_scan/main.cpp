@@ -138,6 +138,7 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(hpi);
     Q_INIT_RESOURCE(disp3d);
     Q_INIT_RESOURCE(scDisp);
+    Q_INIT_RESOURCE(neurofeedback);
     #ifdef WITHBRAINAMP
     Q_INIT_RESOURCE(brainamp);
     #endif
