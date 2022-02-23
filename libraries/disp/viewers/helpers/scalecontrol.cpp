@@ -82,6 +82,7 @@ ScaleControl::ScaleControl(const char* label,
     initLabel(label);
     initSpinBox();
     initSlider();
+    initMenu();
     updateNLMapConstants();
     setRange(min, max);
 }
@@ -277,11 +278,13 @@ void ScaleControl::initMenu()
 
     QAction* maxVal = new QAction("Edit maximum value");
     connect(maxVal, &QAction::triggered,
-            this, &ScaleControl::promptMinValueChange,
+            this, &ScaleControl::promptMaxValueChange,
             Qt::UniqueConnection);
     m_pSettingsMenu->addAction(maxVal);//takes ownership
 
     m_pUi->toolButton->setMenu(m_pSettingsMenu);
+    m_pUi->toolButton->setPopupMode(QToolButton::InstantPopup);
+    m_pUi->toolButton->setArrowType(Qt::ArrowType::NoArrow);
 }
 
 //=============================================================================================================
