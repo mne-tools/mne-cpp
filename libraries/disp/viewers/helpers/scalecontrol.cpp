@@ -36,6 +36,8 @@
 #include "ui_scalecontrol.h"
 #include <math.h>
 
+#include <QInputDialog>
+
 using namespace DISPLIB;
 
 const static float  m_dDefaultMin(0.0f);
@@ -259,4 +261,53 @@ double ScaleControl::mapSliderToSpinBox(int dScale)
 double ScaleControl::value() const
 {
     return m_pUi->spinBox->value();
+}
+
+//=============================================================================================================
+
+void ScaleControl::initMenu()
+{
+    m_pSettingsMenu = new QMenu(this); //Scale Control takes ownership of this QMenu and will trigger its deletion.
+
+    QAction* minVal = new QAction("Edit minimum value");
+    connect(minVal, &QAction::triggered,
+            this, &ScaleControl::promptMinValueChange,
+            Qt::UniqueConnection);
+    m_pSettingsMenu->addAction(minVal);//takes ownership
+
+    QAction* maxVal = new QAction("Edit maximum value");
+    connect(maxVal, &QAction::triggered,
+            this, &ScaleControl::promptMinValueChange,
+            Qt::UniqueConnection);
+    m_pSettingsMenu->addAction(maxVal);//takes ownership
+
+    m_pUi->toolButton->setMenu(m_pSettingsMenu);
+}
+
+//=============================================================================================================
+
+void ScaleControl::promptMinValueChange()
+{
+    bool ok;
+    double min = QInputDialog::getDouble(this, tr("Minimum Value"),
+                                         tr("Please input a new minumum value:"),
+                                         m_pUi->spinBox->minimum(), 0.01, 100000,
+                                         2, &ok, Qt::WindowFlags(), 1);
+    if(ok && min <= m_pUi->spinBox->maximum()){
+        setRange(min, m_pUi->spinBox->maximum());
+    }
+}
+
+//=============================================================================================================
+
+void ScaleControl::promptMaxValueChange()
+{
+    bool ok;
+    double max = QInputDialog::getDouble(this, tr("Maximum Value"),
+                                         tr("Please input a new maximum value:"),
+                                         m_pUi->spinBox->maximum(), 0.01, 100000,
+                                         2, &ok, Qt::WindowFlags(), 1);
+    if(ok && max >= m_pUi->spinBox->minimum()){
+        setRange(m_pUi->spinBox->minimum(), max);
+    }
 }
