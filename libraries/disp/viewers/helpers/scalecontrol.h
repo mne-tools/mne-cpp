@@ -45,6 +45,7 @@
 //=============================================================================================================
 
 #include <QWidget>
+#include <QMenu>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -212,6 +213,12 @@ private:
 
     //=========================================================================================================
     /**
+     * Initializes the menu options for fine control of the scaling.
+     */
+    void initMenu();
+
+    //=========================================================================================================
+    /**
      * Callback executed whenever the value of the spinbox has changed.
      *
      * @param[in] dScale The new value of the spinbox.
@@ -277,6 +284,18 @@ private:
      */
     inline float weightedSensitivity(float fSensitivity);
 
+    //=========================================================================================================
+    /**
+     * Prompts user to set minimum value
+     */
+    void promptMinValueChange();
+
+    //=========================================================================================================
+    /**
+     * @Prompts user to set maximum value
+     */
+    void promptMaxValueChange();
+
     Ui::ScaleControlWidget* m_pUi;                          /**< Pointer to the user interface object. */
     bool                    m_bManagingSpinBoxChange;       /**< Bool member guarding the state of the spinbox. */
     bool                    m_bManagingSliderChange;        /**< Bool member guarding the state of the slider. */
@@ -286,6 +305,8 @@ private:
     float                   m_fMapYconstant;                /**< Y constant in the non-linear mapping curve for the slider. */
     float                   m_fMapKconstant;                /**< K constant in the non-linear mapping curve for the slider. */
     bool                    m_bSliderInverted;              /**< State variable to store the inverted or not state of the slider. */
+
+    QMenu*                  m_pSettingsMenu;
 };
 
 
