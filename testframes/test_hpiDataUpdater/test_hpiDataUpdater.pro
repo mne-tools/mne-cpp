@@ -1,13 +1,13 @@
 #==============================================================================================================
 #
-# @file     ex_hpiFit.pro
-# @author   Ruben Dörfel <doerfelruben@aol.com>;
-# @since    0.1.0
-# @date     January, 2020
+# @file     test_hpiDataUpdater.pro
+# @author   Ruben Dörfel <doerfelruben@aol.com>
+# @since    0.1.9
+# @date     December, 2021
 #
 # @section  LICENSE
 #
-# Copyright (C) 2020, Ruben Dörfel. All rights reserved.
+# Copyright (C) 2021, Ruben Dörfel. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -28,7 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the ex_hpiFit example.
+# @brief    This project file generates the makefile to build the test_hpiDataUpdater test.
 #
 #==============================================================================================================
 
@@ -36,7 +36,8 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += widgets concurrent network
+QT += testlib concurrent network
+QT -= gui
 
 CONFIG   += console
 !contains(MNECPP_CONFIG, withAppBundles) {
@@ -45,7 +46,7 @@ CONFIG   += console
 
 DESTDIR =  $${MNE_BINARY_DIR}
 
-TARGET = ex_hpiFit
+TARGET = test_hpiDataUpdater
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -57,39 +58,35 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lmnecppDisp3Dd \
-            -lmnecppDispd \
-            -lmnecppEventsd \
-            -lmnecppRtProcessingd \
+    LIBS += -lmnecppRtProcessingd \
             -lmnecppConnectivityd \
-            -lmnecppInversed \
-            -lmnecppFwdd \
-            -lmnecppMned \
-            -lmnecppFiffd \
-            -lmnecppFsd \
-            -lmnecppUtilsd \
+	    -lmnecppInversed \
+	    -lmnecppFwdd \
+	    -lmnecppMned \
+	    -lmnecppFiffd \
+	    -lmnecppFsd \
+	    -lmnecppUtilsd \
 } else {
-    LIBS += -lmnecppDisp3D \
-            -lmnecppDisp \
-            -lmnecppEvents \
-            -lmnecppRtProcessing \
+    LIBS += -lmnecppRtProcessing \
             -lmnecppConnectivity \
-            -lmnecppInverse \
-            -lmnecppFwd \
-            -lmnecppMne \
-            -lmnecppFiff \
-            -lmnecppFs \
-            -lmnecppUtils \
+	    -lmnecppInverse \
+	    -lmnecppFwd \
+	    -lmnecppMne \
+	    -lmnecppFiff \
+	    -lmnecppFs \
+	    -lmnecppUtils \
 }
 
-SOURCES += main.cpp
+SOURCES += \
+    test_hpiDataUpdater.cpp
 
-clang {
-    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
-} else {
-    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
-}
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
+
+contains(MNECPP_CONFIG, withCodeCov) {
+    QMAKE_CXXFLAGS += --coverage
+    QMAKE_LFLAGS += --coverage
+}
 
 unix:!macx {
     QMAKE_RPATHDIR += $ORIGIN/../lib
@@ -99,7 +96,7 @@ macx {
     QMAKE_LFLAGS += -Wl,-rpath,@executable_path/../lib
 }
 
-# Activate FFTW backend in Eigen for non-static builds only
+# Activate FFTW backend in Eigen
 contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
     DEFINES += EIGEN_FFTW_DEFAULT
     INCLUDEPATH += $$shell_path($${FFTW_DIR_INCLUDE})
@@ -107,14 +104,16 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
 
     win32 {
         # On Windows
-        LIBS += -llibfftw3-3 \
-                -llibfftw3f-3 \
-                -llibfftw3l-3 \
+	LIBS += -llibfftw3-3 \
+	        -llibfftw3f-3 \
+		-llibfftw3l-3 \
     }
 
     unix:!macx {
         # On Linux
-        LIBS += -lfftw3 \
-                -lfftw3_threads \
+	LIBS += -lfftw3 \
+	        -lfftw3_threads \
     }
 }
+
+HEADERS +=

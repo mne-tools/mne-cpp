@@ -47,6 +47,7 @@
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimehpiresult.h>
 #include <inverse/hpiFit/hpifit.h>
+#include <inverse/hpiFit/hpidataupdater.h>
 
 #include <fiff/fiff_info.h>
 #include <fiff/c/fiff_digitizer_data.h>
@@ -547,14 +548,21 @@ void Hpi::run()
     }
 
     // init hpi fit
+    HpiModelParameters hpiModelParameters(m_vCoilFreqs,
+                                          m_pFiffInfo->sfreq,
+                                          m_pFiffInfo->linefreq,
+                                          false);
     HpiFitResult fitResult;
+    fitResult.hpiFreqs = m_vCoilFreqs;
+    fitResult.errorDistances = QVector<double>(m_vCoilFreqs.size());
     fitResult.devHeadTrans = m_pFiffInfo->dev_head_t;
     fitResult.devHeadTrans.from = 1;
     fitResult.devHeadTrans.to = 4;
 
     FiffCoordTrans transDevHeadRef = m_pFiffInfo->dev_head_t;
 
-    HPIFit HPI = HPIFit(m_pFiffInfo, true);
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
 
     double dErrorMax = 0.0;
     double dMeanErrorDist = 0.0;
@@ -571,6 +579,7 @@ void Hpi::run()
     m_mutex.unlock();
 
     MatrixXd matDataMerged(m_pFiffInfo->chs.size(), fittingWindowSize);
+    bool bOrder = false;
 
     while(!isInterruptionRequested()) {
         m_mutex.lock();
@@ -591,7 +600,7 @@ void Hpi::run()
                 m_mutex.lock();
                 if(m_bDoSingleHpi) {
                     m_bDoSingleHpi = false;
-                    fitResult.devHeadTrans.clear();
+                    fitResult = HpiFitResult();
                 }
                 fitResult.sFilePathDigitzers = m_sFilePathDigitzers;
                 m_mutex.unlock();
@@ -599,33 +608,32 @@ void Hpi::run()
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matDataMerged.cols()-iDataIndexCounter) =
                         matData.block(0, 0, matData.rows(), matDataMerged.cols()-iDataIndexCounter);
 
-                // Perform HPI fit
                 m_mutex.lock();
-                if(m_bDoFreqOrder) {
-                    // find correct frequencie order if requested
-                    HPI.findOrder(matDataMerged,
-                                  m_matCompProjectors,
-                                  fitResult.devHeadTrans,
-                                  m_vCoilFreqs,
-                                  fitResult.errorDistances,
-                                  fitResult.GoF,
-                                  fitResult.fittedCoils,
-                                  m_pFiffInfo);
-                    m_bDoFreqOrder = false;
-                }
+                hpiModelParameters = HpiModelParameters(m_vCoilFreqs,
+                                                        m_pFiffInfo->sfreq,
+                                                        m_pFiffInfo->linefreq,
+                                                        false);
+                hpiDataUpdater.checkForUpdate(m_pFiffInfo);
+                HPI.checkForUpdate(hpiDataUpdater.getSensors());
+
+                hpiDataUpdater.prepareDataAndProjectors(matDataMerged,m_matCompProjectors);
+                bOrder = m_bDoFreqOrder;
+                m_bDoFreqOrder = false;
                 m_mutex.unlock();
 
                 // Perform actual fitting
-                m_mutex.lock();
-                HPI.fitHPI(matDataMerged,
-                           m_matCompProjectors,
-                           fitResult.devHeadTrans,
-                           m_vCoilFreqs,
-                           fitResult.errorDistances,
-                           fitResult.GoF,
-                           fitResult.fittedCoils,
-                           m_pFiffInfo);
-                m_mutex.unlock();
+                HPI.fit(hpiDataUpdater.getProjectedData(),
+                        hpiDataUpdater.getProjectors(),
+                        hpiModelParameters,
+                        hpiDataUpdater.getHpiDigitizer(),
+                        bOrder,
+                        fitResult);
+
+                if(bOrder) {
+                    m_mutex.lock();
+                    m_vCoilFreqs = fitResult.hpiFreqs;
+                    m_mutex.unlock();
+                }
 
                 //Check if the error meets distance requirement
                 if(fitResult.errorDistances.size() > 0) {

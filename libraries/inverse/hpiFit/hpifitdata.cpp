@@ -2,7 +2,7 @@
 /**
  * @file     hpifitdata.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>;
+ *           Ruben Dörfel <doerfelruben@aol.com>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
  * @date     April, 2017
@@ -40,6 +40,8 @@
 
 #include "hpifitdata.h"
 #include "hpifit.h"
+#include "sensorset.h"
+
 #include <utils/mnemath.h>
 
 #include <iostream>
@@ -70,6 +72,7 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 HPIFitData::HPIFitData()
+    : m_sensors(SensorSet())
 {
 }
 
@@ -87,18 +90,18 @@ void HPIFitData::doDipfitConcurrent()
     int iSimplexNumitr = 0;
 
     this->m_coilPos = fminsearch(vecCurrentCoil,
-                               iMaxiter,
-                               2 * iMaxiter * vecCurrentCoil.cols(),
-                               iDisplay,
-                               vecCurrentData,
-                               this->m_matProjector,
-                               currentSensors,
-                               iSimplexNumitr);
+                                iMaxiter,
+                                2 * iMaxiter * vecCurrentCoil.cols(),
+                                iDisplay,
+                                vecCurrentData,
+                                this->m_matProjector,
+                                currentSensors,
+                                iSimplexNumitr);
 
     this->m_errorInfo = dipfitError(vecCurrentCoil,
-                                  vecCurrentData,
-                                  currentSensors,
-                                  this->m_matProjector);
+                                    vecCurrentData,
+                                    currentSensors,
+                                    this->m_matProjector);
 
     this->m_errorInfo.numIterations = iSimplexNumitr;
 }
@@ -164,8 +167,8 @@ Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& matPos, con
 {
 
     Eigen::MatrixXd matPnt, matOri, matLf;
-    matPnt = sensors.rmag; // position of each integrationpoint
-    matOri = sensors.cosmag; // mOrientation of each coil
+    matPnt = sensors.rmag(); // position of each integrationpoint
+    matOri = sensors.cosmag(); // mOrientation of each coil
 
     matLf = magnetic_dipole(matPos, matPnt, matOri);
 
@@ -176,21 +179,21 @@ Eigen::MatrixXd HPIFitData::compute_leadfield(const Eigen::MatrixXd& matPos, con
 
 DipFitError HPIFitData::dipfitError(const Eigen::MatrixXd& matPos,
                                     const Eigen::MatrixXd& matData,
-                                    const struct SensorSet& sensors,
+                                    const SensorSet& sensors,
                                     const Eigen::MatrixXd& matProjectors)
 {
     // Variable Declaration
     struct DipFitError e;
     Eigen::MatrixXd matLfSensor, matDif;
     Eigen::MatrixXd matLf(matData.size(),3);
-    int iNp = sensors.np;
+    int iNp = sensors.np();
 
     // calculate lf for all sensorpoints
     matLfSensor = compute_leadfield(matPos, sensors);
 
     // apply averaging per coil
-    for(int i = 0; i < sensors.ncoils; i++){
-        matLf.row(i) = sensors.w.segment(i*iNp,iNp) * matLfSensor.block(i*iNp,0,iNp,matLfSensor.cols());
+    for(int i = 0; i < sensors.ncoils(); i++){
+        matLf.row(i) = sensors.w(i) * matLfSensor.block(i*iNp,0,iNp,matLfSensor.cols());
     }
     //matLf = sensors.tra * matLf;
 
@@ -222,7 +225,7 @@ Eigen::MatrixXd HPIFitData::fminsearch(const Eigen::MatrixXd& matPos,
                                        int iDisplay,
                                        const Eigen::MatrixXd& matData,
                                        const Eigen::MatrixXd& matProjectors,
-                                       const struct SensorSet& sensors,
+                                       const SensorSet& sensors,
                                        int &iSimplexNumitr)
 {
     double tolx, tolf, rho, chi, psi, sigma, func_evals, usual_delta, zero_term_delta, temp1, temp2;

@@ -1,8 +1,8 @@
 #==============================================================================================================
 #
 # @file     test_hpiFit.pro
-# @author   Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>;
-# @since    0.1.0
+# @author   Ruben Dörfel <doerfelruben@aol.com>;
+# @since    0.1.9
 # @date     February, 2020
 #
 # @section  LICENSE
@@ -79,6 +79,7 @@ CONFIG(debug, debug|release) {
 
 SOURCES += \
     test_hpiFit.cpp
+
 
 clang {
     QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
