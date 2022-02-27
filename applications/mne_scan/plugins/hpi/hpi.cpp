@@ -217,7 +217,12 @@ void Hpi::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 }
             }
 
-            if(m_bDoContinousHpi && (m_vCoilFreqs.size() >= 3)) {
+            m_mutex.lock();
+            bool bDoContinousHpi = m_bDoContinousHpi;
+            int iNumberHpiCoils = m_vCoilFreqs.size();
+            m_mutex.unlock();
+
+            if(bDoContinousHpi && (iNumberHpiCoils >= 3)) {
                 for(unsigned char i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
                     // Please note that we do not need a copy here since this function will block until
                     // the buffer accepts new data again. Hence, the data is not deleted in the actual
@@ -283,14 +288,7 @@ void Hpi::updateDigitizerInfo()
 
 void Hpi::initPluginControlWidgets()
 {
-    bool bFiffInfo = false;
-    m_mutex.lock();
     if(m_pFiffInfo) {
-        bFiffInfo = true;
-    }
-    m_mutex.unlock();
-
-    if(bFiffInfo) {
         QList<QWidget*> plControlWidgets;
 
         // Projects Settings
@@ -366,14 +364,19 @@ void Hpi::updateProjections()
         }
         m_mutex.unlock();
 
+        m_mutex.lock();
         Eigen::MatrixXd matProjectors = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
         Eigen::MatrixXd matComp = Eigen::MatrixXd::Identity(m_pFiffInfo->chs.size(), m_pFiffInfo->chs.size());
 
-        if(m_bUseSSP) {
+        bool bUseSSP = m_bUseSSP;
+        m_mutex.unlock();
+
+        if(bUseSSP) {
             // Use SSP + SGM + calibration
             //Do a copy here because we are going to change the activity flags of the SSP's
+            m_mutex.lock();
             FiffInfo infoTemp = *(m_pFiffInfo.data());
-
+            m_mutex.unlock();
             //Turn on all SSP
             for(int i = 0; i < infoTemp.projs.size(); ++i) {
                 infoTemp.projs[i].active = true;
@@ -387,13 +390,19 @@ void Hpi::updateProjections()
             }
         }
 
-        if(m_bUseComp) {
+        m_mutex.lock();
+        bool bUseComp = m_bUseComp;
+        m_mutex.unlock();
+
+        if(bUseComp) {
             // Setup Comps
             FiffCtfComp newComp;
             //Do this always from 0 since we always read new raw data, we never actually perform a multiplication on already existing data
+            m_mutex.lock();
             if(m_pFiffInfo->make_compensator(0, 101, newComp)) {
                 matComp = newComp.data->data;
             }
+            m_mutex.unlock();
         }
 
         m_mutex.lock();
@@ -448,7 +457,11 @@ void Hpi::onDigitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers,
 
 void Hpi::onDoSingleHpiFit()
 {
-    if(m_vCoilFreqs.size() < 3) {
+    m_mutex.lock();
+    int iNumberHpiCoils = m_vCoilFreqs.size();
+    m_mutex.unlock();
+
+    if(iNumberHpiCoils < 3) {
        QMessageBox msgBox;
        msgBox.setText("Please input HPI coil frequencies first.");
        msgBox.exec();
@@ -464,14 +477,16 @@ void Hpi::onDoSingleHpiFit()
 
 void Hpi::onDoFreqOrder()
 {
-    if(m_vCoilFreqs.size() < 3) {
+    m_mutex.lock();
+    int iNumberHpiCoils = m_vCoilFreqs.size();
+    m_mutex.unlock();
+
+    if(iNumberHpiCoils < 3) {
        QMessageBox msgBox;
        msgBox.setText("Please input HPI coil frequencies first.");
        msgBox.exec();
        return;
     }
-
-    m_mutex.lock();
     m_bDoFreqOrder = true;
     m_mutex.unlock();
 }
@@ -489,7 +504,9 @@ void Hpi::onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs)
 
 void Hpi::onSspStatusChanged(bool bChecked)
 {
+    m_mutex.lock();
     m_bUseSSP = bChecked;
+    m_mutex.unlock();
     updateProjections();
 }
 
@@ -497,7 +514,9 @@ void Hpi::onSspStatusChanged(bool bChecked)
 
 void Hpi::onCompStatusChanged(bool bChecked)
 {
+    m_mutex.lock();
     m_bUseComp = bChecked;
+    m_mutex.unlock();
     updateProjections();
 }
 
@@ -505,14 +524,11 @@ void Hpi::onCompStatusChanged(bool bChecked)
 
 void Hpi::onContHpiStatusChanged(bool bChecked)
 {
-//    if(m_vCoilFreqs.size() < 3) {
-//       QMessageBox msgBox;
-//       msgBox.setText("Please load a digitizer set with at least 3 HPI coils first.");
-//       msgBox.exec();
-//       return;
-//    }
 
+    m_mutex.lock();
     m_bDoContinousHpi = bChecked;
+    m_mutex.unlock();
+
 }
 
 //=============================================================================================================
@@ -527,7 +543,9 @@ void Hpi::setFittingWindowSize(int winSize)
 
 void Hpi::onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans)
 {
+    m_mutex.lock();
     m_pFiffInfo->dev_head_t = devHeadTrans;
+    m_mutex.unlock();
 }
 
 //=============================================================================================================
@@ -535,28 +553,20 @@ void Hpi::onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans)
 void Hpi::run()
 {
     // Wait for fiff info
-    bool bFiffInfo = false;
-
-    while(true) {
-        m_mutex.lock();
-        if(m_pFiffInfo) {
-            bFiffInfo = true;
-        }
-        m_mutex.unlock();
-        if(bFiffInfo) {
-            break;
-        }
+    while(!m_pFiffInfo) {
         msleep(100);
     }
 
-    // init hpi fit
+    m_mutex.lock();
+    FiffCoordTrans transDevHeadRef = m_pFiffInfo->dev_head_t;
+    int fittingWindowSize = m_iFittingWindowSize;
+    MatrixXd matDataMerged(m_pFiffInfo->chs.size(), fittingWindowSize);
+    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
+    m_mutex.unlock();
+
+    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
     HpiFitResult fitResult;
     HpiModelParameters hpiModelParameters;
-
-    FiffCoordTrans transDevHeadRef = m_pFiffInfo->dev_head_t;
-
-    HpiDataUpdater hpiDataUpdater = HpiDataUpdater(m_pFiffInfo);
-    HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
 
     double dErrorMax = 0.0;
     double dMeanErrorDist = 0.0;
@@ -569,11 +579,7 @@ void Hpi::run()
     int iDataIndexCounter = 0;
     MatrixXd matData;
 
-    m_mutex.lock();
-    int fittingWindowSize = m_iFittingWindowSize;
-    m_mutex.unlock();
 
-    MatrixXd matDataMerged(m_pFiffInfo->chs.size(), fittingWindowSize);
     bool bOrder = false;
 
     while(!isInterruptionRequested()) {
