@@ -614,8 +614,11 @@ void Hpi::run()
                                                         m_pFiffInfo->sfreq,
                                                         m_pFiffInfo->linefreq,
                                                         false);
-                hpiDataUpdater.checkForUpdate(m_pFiffInfo);
-                HPI.checkForUpdate(hpiDataUpdater.getSensors());
+                bool bHasChanged = hpiDataUpdater.checkForUpdate(m_pFiffInfo);
+
+                if(bHasChanged) {
+                    HPI.setSensorSet(hpiDataUpdater.getSensors());
+                }
 
                 hpiDataUpdater.prepareDataAndProjectors(matDataMerged,m_matCompProjectors);
                 bOrder = m_bDoFreqOrder;

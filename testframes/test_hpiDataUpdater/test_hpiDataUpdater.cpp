@@ -89,6 +89,7 @@ private slots:
     void testPrepareData();
     void testGetSensors();
     void testGetSensors_bads();
+    void testCheckForUpdates_return();
     void testCheckForUpdates_sensors();
     void testCheckForUpdates_data();
     void testCheckForUpdates_projectors();
@@ -336,6 +337,22 @@ void TestHpiDataUpdater::testGetSensors_bads()
 
 //=============================================================================================================
 
+void TestHpiDataUpdater::testCheckForUpdates_return()
+{
+    HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
+    m_pFiffInfo->bads << "MEG0113" << "MEG0112";
+    SensorSetCreator sensorCreator;
+    SensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithBads,Accuracy::high);
+
+    /// act
+    bool hasChanged = hpiData.checkForUpdate(m_pFiffInfo);
+
+    /// assert
+    QVERIFY(hasChanged);
+}
+
+//=============================================================================================================
+
 void TestHpiDataUpdater::testCheckForUpdates_sensors()
 {
     HpiDataUpdater hpiData = HpiDataUpdater(m_pFiffInfo);
@@ -344,7 +361,7 @@ void TestHpiDataUpdater::testCheckForUpdates_sensors()
     SensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithBads,Accuracy::high);
 
     /// act
-    hpiData.checkForUpdate(m_pFiffInfo);
+    bool bHasChanged = hpiData.checkForUpdate(m_pFiffInfo);
     SensorSet sensorsActual = hpiData.getSensors();
 
     /// assert
@@ -364,7 +381,7 @@ void TestHpiDataUpdater::testCheckForUpdates_data()
     }
 
     /// act
-    hpiData.checkForUpdate(m_pFiffInfo);
+    bool bHasChanged = hpiData.checkForUpdate(m_pFiffInfo);
     hpiData.prepareDataAndProjectors(m_matData,m_matProjectors);
     MatrixXd matDataPrepared = hpiData.getData();
 
@@ -393,7 +410,7 @@ void TestHpiDataUpdater::testCheckForUpdates_projectors()
     }
 
     // act
-    hpiData.checkForUpdate(m_pFiffInfo);
+    bool bHasChanged = hpiData.checkForUpdate(m_pFiffInfo);
     hpiData.prepareDataAndProjectors(m_matData,matProj);
     MatrixXd matProjPrepared = hpiData.getProjectors();
 

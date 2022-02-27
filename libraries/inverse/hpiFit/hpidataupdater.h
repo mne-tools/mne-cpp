@@ -103,9 +103,9 @@ public:
      * Check if information in FiffInfo changed and update if necessary.
      *
      * @param[in] pFiffInfo     The FiffInfo to check for changes.
-     *
+     * @return If information in pFiffInfo has changed and data was updated.
      */
-    void checkForUpdate(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
+    bool checkForUpdate(const QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo);
 
     //=========================================================================================================
     /**
