@@ -70,9 +70,9 @@ namespace INVERSELIB {
 
 //=============================================================================================================
 /**
- * Description of what this class is intended to do (in detail).
+ * HpiModelParamers holds the information to be used for the HpiFit in general, ans especially for extracting the hpi coil amplitudes from the measurement.
  *
- * @brief Brief description of this class.
+ * @brief HpiModelParamers holds the information to be used for the HpiFit in general, ans especially for extracting the hpi coil amplitudes from the measurement.
  */
 class INVERSESHARED_EXPORT HpiModelParameters
 {
