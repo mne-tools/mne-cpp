@@ -32,8 +32,8 @@
  *
  */
 
-#ifndef INVERSELIBE_HPIMODELPARAMETERS_H
-#define INVERSELIBE_HPIMODELPARAMETERS_H
+#ifndef HPIMODELPARAMETERS_H
+#define HPIMODELPARAMETERS_H
 
 //=============================================================================================================
 // INCLUDES
