@@ -550,16 +550,8 @@ void Hpi::run()
     }
 
     // init hpi fit
-    HpiModelParameters hpiModelParameters(m_vCoilFreqs,
-                                          m_pFiffInfo->sfreq,
-                                          m_pFiffInfo->linefreq,
-                                          false);
     HpiFitResult fitResult;
-    fitResult.hpiFreqs = m_vCoilFreqs;
-    fitResult.errorDistances = QVector<double>(m_vCoilFreqs.size());
-    fitResult.devHeadTrans = m_pFiffInfo->dev_head_t;
-    fitResult.devHeadTrans.from = 1;
-    fitResult.devHeadTrans.to = 4;
+    HpiModelParameters hpiModelParameters;
 
     FiffCoordTrans transDevHeadRef = m_pFiffInfo->dev_head_t;
 
