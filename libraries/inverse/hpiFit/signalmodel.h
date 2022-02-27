@@ -80,12 +80,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs a SignalModel object.
-     */
-    explicit SignalModel() = default;
-
-    //=========================================================================================================
-    /**
      * Fit the data to the model constructed from given model parameters.
      *
      * @param[in] hpiModelParameters   The HpiModelParameters.

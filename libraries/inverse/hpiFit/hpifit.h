@@ -140,13 +140,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Default constructor.
-     *
-     */
-    explicit HPIFit();
-
-    //=========================================================================================================
-    /**
      * Constructs the HPI from a SensorSet.
      *
      * @param[in] SensorSet     The MEG sensorSet used for the hpi fitting.

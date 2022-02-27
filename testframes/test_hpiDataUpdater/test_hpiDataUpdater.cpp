@@ -321,8 +321,6 @@ void TestHpiDataUpdater::testGetSensors()
 void TestHpiDataUpdater::testGetSensors_bads()
 {
     // extract data for channels to use
-    int iAccuracy = 2;
-
     SensorSetCreator sensorCreator;
     SensorSet sensorsExpected = sensorCreator.updateSensorSet(m_lChannelsWithBads,Accuracy::high);
 
