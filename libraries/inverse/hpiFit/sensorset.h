@@ -269,7 +269,7 @@ public:
                               const Accuracy& accuracy);
 
 private:
-    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilDefinitions{nullptr};    // the coil definitions as template
+    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilDefinitions;    // the coil definitions as template
 };
 
 //=============================================================================================================
