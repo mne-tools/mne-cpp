@@ -80,6 +80,12 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
     m_sSettingsPath = sSettingsPath;
     m_pUi->setupUi(this);
 
+    // Disable change of window size for now
+    bool bWindowsize = false;
+    m_pUi->frame_samplesToFit->setVisible(bWindowsize);
+    m_pUi->label_3->setVisible(bWindowsize);
+    m_pUi->m_spinBox_samplesToFit->setVisible(bWindowsize);
+
     connect(m_pUi->m_pushButton_loadDigitizers, &QPushButton::released,
             this, &HpiSettingsView::onLoadDigitizers);
     connect(m_pUi->m_pushButton_doFreqOrder, &QPushButton::clicked,
