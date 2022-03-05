@@ -487,6 +487,7 @@ void Hpi::onDoFreqOrder()
        msgBox.exec();
        return;
     }
+    m_mutex.lock();
     m_bDoFreqOrder = true;
     m_mutex.unlock();
 }
