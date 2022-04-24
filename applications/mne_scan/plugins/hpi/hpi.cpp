@@ -647,7 +647,6 @@ void Hpi::run()
         // check if fitting window size has changed and resize matData if necessary
         if(iFittingWindowSize != m_iFittingWindowSize) {
             iFittingWindowSize = m_iFittingWindowSize;
-            std::cout << "Fitting window size: " << iFittingWindowSize << "\n";
             matDataMerged.resize(m_pFiffInfo->chs.size(), iFittingWindowSize);
             iRepetitionIndexCounter = 0;
         }
@@ -655,7 +654,6 @@ void Hpi::run()
         // check if time between fits has changed
         if(iRepetitionTimeInSamples != m_iRepetitionTimeInSamples) {
             iRepetitionTimeInSamples = m_iRepetitionTimeInSamples;
-            std::cout << "Repetition time in samples: " << iRepetitionTimeInSamples << "\n";
             iRepetitionIndexCounter = 0;
         }
         m_mutex.unlock();
@@ -664,19 +662,12 @@ void Hpi::run()
         if(m_pCircularBuffer->pop(matData)) {
             if(iRepetitionIndexCounter + matData.cols() < iRepetitionTimeInSamples) {
                 iRepetitionIndexCounter += matData.cols();
-                qDebug() << "Samples im repetition counter:" << iRepetitionIndexCounter << "From: " << iRepetitionTimeInSamples;
 
             } else if(iDataIndexCounter + matData.cols() < iFittingWindowSize) {
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matData.cols()) = matData;
                 iDataIndexCounter += matData.cols();
-                qDebug() << "Samples im data counter:" << iDataIndexCounter << "From: " << iFittingWindowSize;
 
             } else {
-                qDebug() << "Time elapsed:" << timer.restart();
-                qDebug() << "matDataMerged samples:" << matDataMerged.cols();
-                qDebug() << "fittingWindowSize:" << iFittingWindowSize;
-                qDebug() << "repetition time in samples:" << iRepetitionTimeInSamples;
-
                 m_mutex.lock();
                 if(m_bDoSingleHpi) {
                     m_bDoSingleHpi = false;
