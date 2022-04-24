@@ -241,11 +241,11 @@ private:
 
     //=========================================================================================================
     /**
-     * Set fitting window size when doing continuous hpi.
+     * Set fitting window size when doing continuous hpi using the repetition time as measure.
      *
-     * @param[in] winSize    window size in samples
+     * @param[in] dRepetitionTime    Repetition time in seconds
      */
-    void setFittingWindowSize(int winSize);
+    void setFittingWindowSize(double dRepetitionTime);
 
     //=========================================================================================================
     /**
@@ -289,6 +289,19 @@ private:
      */
     void updateDigitizerInfo();
 
+    //=========================================================================================================
+    /**
+     * Returns the optimal window size for hpi computation
+     *
+     * Compute the optimal window size based on minimal detectable frequency difference between HPI
+     * freqeuencies and line frequency (+ harmonics).
+     *
+     * @return optimal Windowsize
+     */
+    int computeOptimalWindowsize();
+
+
+
     void resetState();
 
     QMutex                      m_mutex;                    /**< The threads mutex.*/
@@ -298,8 +311,8 @@ private:
     QString                     m_sFilePathDigitzers;       /**< The file path to the current digitzers. */
 
     qint16                      m_iNumberBadChannels;       /**< The number of bad channels.*/
-    qint16                      m_iFittingWindowSize;       /**< The number of samples in each fitting window.*/
-
+    qint16                      m_iRepetitionWindowSize;    /**< The number of samples to wait between fits.*/
+    int                     	m_iFittingWindowSize;       /**< The number of samples in each fitting window.*/
     double                      m_dAllowedMeanErrorDist;    /**< The allowed error distance in order for the last fit to be counted as a good fit.*/
     double                      m_dAllowedMovement;         /**< The allowed head movement regarding reference head position.*/
     double                      m_dAllowedRotation;         /**< The allowed head rotation regarding reference head position in degree.*/
