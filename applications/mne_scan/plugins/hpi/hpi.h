@@ -298,7 +298,7 @@ private:
      *
      * @return optimal Windowsize
      */
-    int computeOptimalWindowsize();
+    int computeMinimalWindowsize();
 
 
 
@@ -311,7 +311,7 @@ private:
     QString                     m_sFilePathDigitzers;       /**< The file path to the current digitzers. */
 
     qint16                      m_iNumberBadChannels;       /**< The number of bad channels.*/
-    qint16                      m_iRepetitionWindowSize;    /**< The number of samples to wait between fits.*/
+    qint16                      m_iRepetitionTimeInSamples;    /**< The number of samples to wait between fits.*/
     int                     	m_iFittingWindowSize;       /**< The number of samples in each fitting window.*/
     double                      m_dAllowedMeanErrorDist;    /**< The allowed error distance in order for the last fit to be counted as a good fit.*/
     double                      m_dAllowedMovement;         /**< The allowed head movement regarding reference head position.*/

@@ -87,7 +87,7 @@ constexpr const int defaultFittingWindowSize(300);
 
 Hpi::Hpi()
 : m_iNumberBadChannels(0)
-, m_iRepetitionWindowSize(defaultFittingWindowSize)
+, m_iRepetitionTimeInSamples(defaultFittingWindowSize)
 , m_dAllowedMeanErrorDist(10)
 , m_dAllowedMovement(3)
 , m_dAllowedRotation(5)
@@ -524,7 +524,7 @@ void Hpi::onContHpiStatusChanged(bool bChecked)
 void Hpi::setFittingWindowSize(double dRepetitionTime)
 {
     QMutexLocker locker(&m_mutex);
-    m_iRepetitionWindowSize = dRepetitionTime * m_pFiffInfo->sfreq;
+    m_iRepetitionTimeInSamples = dRepetitionTime * m_pFiffInfo->sfreq;
 }
 
 //=============================================================================================================
@@ -554,7 +554,7 @@ int Hpi::computeMinimalWindowsize()
     }
 
     // sort vector in increasing order
-    std::sort(vecFreqs.constBegin(), vecFreqs.constEnd());
+    std::sort(vecFreqs.begin(), vecFreqs.end());
 
     // get minimimal required frequency difference
     int iMinDeltaF = dSFreq;
@@ -613,38 +613,55 @@ void Hpi::run()
     double dMovement = 0.0;
     double dRotation = 0.0;
 
+    int iRepetitionIndexCounter = 0;
     int iDataIndexCounter = 0;
     MatrixXd matData;
 
     m_mutex.lock();
-    int fittingWindowSize = m_iRepetitionWindowSize;
+    int iFittingWindowSize = m_iFittingWindowSize;
+    int iRepetitionTimeInSamples = m_iRepetitionTimeInSamples;
+
     m_mutex.unlock();
 
-    MatrixXd matDataMerged(m_pFiffInfo->chs.size(), fittingWindowSize);
+    MatrixXd matDataMerged(m_pFiffInfo->chs.size(), iFittingWindowSize);
     bool bOrder = false;
     QElapsedTimer timer;
     timer.start();
 
     while(!isInterruptionRequested()) {
         m_mutex.lock();
-        if(fittingWindowSize != m_iRepetitionWindowSize) {
-            fittingWindowSize = m_iRepetitionWindowSize;
-            std::cout << "Fitting window size: " << fittingWindowSize << "\n";
-            matDataMerged.resize(m_pFiffInfo->chs.size(), fittingWindowSize);
-            iDataIndexCounter = 0;
+        // check if fitting window size has changed and resize matData if necessary
+        if(iFittingWindowSize != m_iFittingWindowSize) {
+            iFittingWindowSize = m_iFittingWindowSize;
+            std::cout << "Fitting window size: " << iFittingWindowSize << "\n";
+            matDataMerged.resize(m_pFiffInfo->chs.size(), iFittingWindowSize);
+            iRepetitionIndexCounter = 0;
+        }
+
+        // check if time between fits has changed
+        if(iRepetitionTimeInSamples != m_iRepetitionTimeInSamples) {
+            iRepetitionTimeInSamples = m_iRepetitionTimeInSamples;
+            std::cout << "Repetition time in samples: " << iRepetitionTimeInSamples << "\n";
+            iRepetitionIndexCounter = 0;
         }
         m_mutex.unlock();
+
         //pop matrix
         if(m_pCircularBuffer->pop(matData)) {
-            if(iDataIndexCounter + matData.cols() < matDataMerged.cols()) {
+            if(iRepetitionIndexCounter + matData.cols() < iRepetitionTimeInSamples) {
+                iRepetitionIndexCounter += matData.cols();
+                qDebug() << "Samples im repetition counter:" << iRepetitionIndexCounter << "From: " << iRepetitionTimeInSamples;
+
+            } else if(iDataIndexCounter + matData.cols() < iFittingWindowSize) {
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matData.cols()) = matData;
                 iDataIndexCounter += matData.cols();
-                qDebug() << "Data im counter:" << iDataIndexCounter;
+                qDebug() << "Samples im data counter:" << iDataIndexCounter << "From: " << iFittingWindowSize;
 
             } else {
                 qDebug() << "Time elapsed:" << timer.restart();
                 qDebug() << "matDataMerged samples:" << matDataMerged.cols();
-                qDebug() << "fittingWindowSize:" << fittingWindowSize;
+                qDebug() << "fittingWindowSize:" << iFittingWindowSize;
+                qDebug() << "repetition time in samples:" << iRepetitionTimeInSamples;
 
                 m_mutex.lock();
                 if(m_bDoSingleHpi) {
@@ -720,6 +737,7 @@ void Hpi::run()
                     }
                 }
 
+                iRepetitionIndexCounter = 0;
                 iDataIndexCounter = 0;
             }
         }
