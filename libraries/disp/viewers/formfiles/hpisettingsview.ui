@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab_loadDigitizers">
       <attribute name="title">
@@ -319,7 +319,7 @@
           <item>
            <widget class="QCheckBox" name="m_checkBox_continousHPI">
             <property name="text">
-             <string>Do continous HPI fitting at</string>
+             <string>Do continous HPI fitting </string>
             </property>
            </widget>
           </item>
@@ -328,6 +328,12 @@
        </item>
        <item>
         <widget class="QFrame" name="frame_samplesToFit">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
          <property name="minimumSize">
           <size>
            <width>61</width>
@@ -340,15 +346,46 @@
          <property name="frameShadow">
           <enum>QFrame::Raised</enum>
          </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <property name="topMargin">
-           <number>4</number>
-          </property>
-          <property name="bottomMargin">
-           <number>4</number>
-          </property>
-          <item>
-           <widget class="QSpinBox" name="m_spinBox_samplesToFit">
+         <layout class="QFormLayout" name="formLayout_5">
+          <item row="0" column="0">
+           <widget class="QDoubleSpinBox" name="m_doubleSpinBox_fittingRepetitionTime">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="maximumSize">
+             <size>
+              <width>70</width>
+              <height>16777215</height>
+             </size>
+            </property>
+            <property name="decimals">
+             <number>2</number>
+            </property>
+            <property name="minimum">
+             <double>0.200000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>30.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.500000000000000</double>
+            </property>
+            <property name="value">
+             <double>1.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QSpinBox" name="m_spinBox_windowSize">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="maximumSize">
              <size>
               <width>70</width>
@@ -356,20 +393,30 @@
              </size>
             </property>
             <property name="minimum">
-             <number>10</number>
+             <number>50</number>
             </property>
             <property name="maximum">
-             <number>1000000</number>
+             <number>1000</number>
+            </property>
+            <property name="singleStep">
+             <number>10</number>
             </property>
             <property name="value">
-             <number>10</number>
+             <number>200</number>
             </property>
            </widget>
           </item>
-          <item>
+          <item row="0" column="1">
            <widget class="QLabel" name="label_3">
             <property name="text">
-             <string>Win Size [Samples]</string>
+             <string>Time between fits [Seconds]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>Window Size [Milliseconds]</string>
             </property>
            </widget>
           </item>

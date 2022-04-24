@@ -322,7 +322,9 @@ void Hpi::initPluginControlWidgets()
                 this, &Hpi::onAllowedMovementChanged);
         connect(pHpiSettingsView, &HpiSettingsView::allowedRotationChanged,
                 this, &Hpi::onAllowedRotationChanged);
-        connect(pHpiSettingsView, &HpiSettingsView::fittingRepetitionTimeChanged,
+        connect(pHpiSettingsView, &HpiSettingsView::repetitionTimeChanged,
+                this, &Hpi::setTimeBetweenFits);
+        connect(pHpiSettingsView, &HpiSettingsView::fittingWindowTimeChanged,
                 this, &Hpi::setFittingWindowSize);
         connect(this, &Hpi::errorsChanged,
                 pHpiSettingsView, &HpiSettingsView::setErrorLabels, Qt::BlockingQueuedConnection);
@@ -330,7 +332,8 @@ void Hpi::initPluginControlWidgets()
                 pHpiSettingsView, &HpiSettingsView::setMovementResults, Qt::BlockingQueuedConnection);
         connect(this, &Hpi::newDigitizerList,
                 pHpiSettingsView, &HpiSettingsView::newDigitizerList);
-
+        connect(this, &Hpi::minimumWindowSizeChanged,
+                pHpiSettingsView, &HpiSettingsView::setMinimumWindowSize);
 
         onSspStatusChanged(pHpiSettingsView->getSspStatusChanged());
         onCompStatusChanged(pHpiSettingsView->getCompStatusChanged());
@@ -521,10 +524,18 @@ void Hpi::onContHpiStatusChanged(bool bChecked)
 
 //=============================================================================================================
 
-void Hpi::setFittingWindowSize(double dRepetitionTime)
+void Hpi::setTimeBetweenFits(double dRepetitionTime)
 {
     QMutexLocker locker(&m_mutex);
     m_iRepetitionTimeInSamples = dRepetitionTime * m_pFiffInfo->sfreq;
+}
+
+//=============================================================================================================
+
+void Hpi::setFittingWindowSize(double dFittingWindowSizeInMillisecons)
+{
+    QMutexLocker locker(&m_mutex);
+    m_iFittingWindowSize = dFittingWindowSizeInMillisecons / 1000.0 * m_pFiffInfo->sfreq;
 }
 
 //=============================================================================================================
@@ -567,7 +578,10 @@ int Hpi::computeMinimalWindowsize()
     }
 
     // compute buffersize needed to provide this resolution in frequency space N = FS/df
-    return ceil(dSFreq/iMinDeltaF);
+    int iWindowSize = ceil(dSFreq/iMinDeltaF);
+    minimumWindowSizeChanged(iWindowSize/dSFreq);
+
+    return iWindowSize;
 }
 
 //=============================================================================================================

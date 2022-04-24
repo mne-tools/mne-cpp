@@ -239,13 +239,22 @@ private:
      */
     void onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans);
 
+
     //=========================================================================================================
     /**
-     * Set fitting window size when doing continuous hpi using the repetition time as measure.
+     * Set repetition time between hpi fits.
      *
      * @param[in] dRepetitionTime    Repetition time in seconds
      */
-    void setFittingWindowSize(double dRepetitionTime);
+    void setTimeBetweenFits(double dRepetitionTimeInSeconds);
+
+    //=========================================================================================================
+    /**
+     * Set hpi fitting window size.
+     *
+     * @param[in] dFittingWindowSizeInSeconds    Fitting window size in seconds
+     */
+    void setFittingWindowSize(double dFittingWindowSizeInSeconds);
 
     //=========================================================================================================
     /**
@@ -334,6 +343,8 @@ private:
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeHpiResult>::SPtr           m_pHpiOutput;           /**< The RealTimeHpiResult of the Hpi output.*/
 
 signals:
+    void minimumWindowSizeChanged(const double dWindowSizeInSeconds);
+
     void errorsChanged(const QVector<double>& vErrors,
                        double dMeanErrorDist);
     void movementResultsChanged(double dMovement,

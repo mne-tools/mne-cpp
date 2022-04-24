@@ -119,6 +119,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Updates the minimal window time for hpi fits.
+     *
+     * @param[in] dMinimumWindowTime in seconds.
+     */
+    void setMinimumWindowSize(double dMinimumWindowTime);
+
+    //=========================================================================================================
+    /**
      * Get the SSP checked status.
      *
      * @return  The current SSP checked status.
@@ -167,11 +175,11 @@ public:
 
     //=========================================================================================================
     /**
-     * Get number of fits per second to do when performing continuous hpi
+     * Get the time between hpi fits in seconds.
      *
-     * @return  Number of fits per second
+     * @return  Repetition time between fits in seconds.
      */
-    int getFittingWindowSize();
+    double getFittingRepetitionTime();
 
     //=========================================================================================================
     /**
@@ -382,11 +390,19 @@ signals:
 
     //=========================================================================================================
     /**
-     * Emit this signal when 'fits per second' control gets updated.
+     * Emit this signal when 'Time between fits' control gets updated.
      *
-     * @param[in] iFitsPerSecond    How many fits per second we should do.
+     * @param[in] dTimeBetweenFitsInSecs    The time between fits in seconds.
      */
-    void fittingWindowSizeChanged(int iFitsPerSecond);
+    void repetitionTimeChanged(double dTimeBetweenFitsInSecs);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal when 'Time between fits' control gets updated.
+     *
+     * @param[in] dWindowSizeInSeconds    The window size to use for hpi fits in seconds.
+     */
+    void fittingWindowTimeChanged(double dWindowSizeInSeconds);
 
     //=========================================================================================================
     /**
