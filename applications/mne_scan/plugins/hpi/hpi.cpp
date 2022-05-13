@@ -326,6 +326,8 @@ void Hpi::initPluginControlWidgets()
                 this, &Hpi::setFittingWindowSize);
         connect(this, &Hpi::errorsChanged,
                 pHpiSettingsView, &HpiSettingsView::setErrorLabels, Qt::BlockingQueuedConnection);
+        connect(this, &Hpi::gofChanged,
+                pHpiSettingsView, &HpiSettingsView::setGoFLabels, Qt::BlockingQueuedConnection);
         connect(this, &Hpi::movementResultsChanged,
                 pHpiSettingsView, &HpiSettingsView::setMovementResults, Qt::BlockingQueuedConnection);
         connect(this, &Hpi::newDigitizerList,
@@ -566,6 +568,7 @@ void Hpi::run()
 
     double dErrorMax = 0.0;
     double dMeanErrorDist = 0.0;
+    double dMeanGoF = 0.0;
     double dAllowedMovement = 0.0;
     double dAllowedRotation = 0.0;
     double dMovement = 0.0;
@@ -638,8 +641,10 @@ void Hpi::run()
                 //Check if the error meets distance requirement
                 if(fitResult.errorDistances.size() > 0) {
                     dMeanErrorDist = std::accumulate(fitResult.errorDistances.begin(), fitResult.errorDistances.end(), .0) / fitResult.errorDistances.size();
+                    dMeanGoF = fitResult.GoF.mean();
 
                     emit errorsChanged(fitResult.errorDistances, dMeanErrorDist);
+                    emit gofChanged(fitResult.GoF, dMeanGoF);
 
                     m_mutex.lock();
                     dErrorMax = m_dAllowedMeanErrorDist;
