@@ -53,6 +53,8 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
+
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
@@ -105,7 +107,18 @@ public:
      * @param[in] dMeanErrorDist    the mean error value.
      */
     void setErrorLabels(const QVector<double>& vError,
-                        double dMeanErrorDist);
+                        const double dMeanErrorDist);
+
+    //=========================================================================================================
+    /**
+     * Updates the gof related labels.
+     *
+     * @param[in] vGoF            the new gof values.
+     * @param[in] dMeanGof    the mean gof value.
+     */
+
+    void setGoFLabels(const Eigen::VectorXd & vGoF,
+                      const double dMeanGof);
 
     //=========================================================================================================
     /**

@@ -323,6 +323,8 @@ private:
 signals:
     void errorsChanged(const QVector<double>& vErrors,
                        double dMeanErrorDist);
+    void gofChanged(const Eigen::VectorXd& vGoF,
+                    const double dMeanGoF);
     void movementResultsChanged(double dMovement,
                                 double dRotation);
     void devHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans);
