@@ -79,7 +79,7 @@ using namespace INVERSELIB;
 // DEFINE LOCAL CONSTANTS
 //=============================================================================================================
 
-constexpr const int defaultFittingWindowSize(300);
+constexpr const int defaultFittingWindowSize(2000);
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -485,7 +485,7 @@ void Hpi::onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs)
     m_vCoilFreqs = vCoilFreqs;
     m_mutex.unlock();
 
-    int iMinimalWindowSize = computeMinimalWindowsize();
+    const int iMinimalWindowSize = computeMinimalWindowsize();
 
     m_mutex.lock();
     m_iFittingWindowSize = iMinimalWindowSize;
@@ -579,7 +579,7 @@ int Hpi::computeMinimalWindowsize()
 
     // compute buffersize needed to provide this resolution in frequency space N = FS/df
     int iWindowSize = ceil(dSFreq/iMinDeltaF);
-    minimumWindowSizeChanged(iWindowSize/dSFreq);
+    emit minimumWindowSizeChanged(iWindowSize/dSFreq);
 
     return iWindowSize;
 }
