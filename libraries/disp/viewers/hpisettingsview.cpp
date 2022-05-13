@@ -128,7 +128,7 @@ HpiSettingsView::~HpiSettingsView()
 //=============================================================================================================
 
 void HpiSettingsView::setErrorLabels(const QVector<double>& vError,
-                                     double dMeanErrorDist)
+                                     const double dMeanErrorDist)
 {
     //Update eror labels and change from m to mm
     QString sGof("0mm");
@@ -150,6 +150,25 @@ void HpiSettingsView::setErrorLabels(const QVector<double>& vError,
         m_pUi->m_label_fitFeedback->setText("Last fit: Good");
         m_pUi->m_label_fitFeedback->setStyleSheet("QLabel { background-color : green;}");
     }
+}
+
+//=============================================================================================================
+
+void HpiSettingsView::setGoFLabels(const Eigen::VectorXd & vGoF,
+                                   const double dMeanGof)
+{
+    //Update eror labels and change from m to mm
+    QString sGof("00.00");
+
+    for(int i = 0; i < vGoF.size(); ++i) {
+        if(i < m_pUi->m_tableWidget_errors->rowCount()) {
+            sGof = QString::number(vGoF[i]*100,'f',2)+QString(" %");
+            m_pUi->m_tableWidget_errors->item(i, 2)->setText(sGof);
+        }
+    }
+
+    m_pUi->m_average_gof_set->setText(QString::number(dMeanGof*100,'f',2)+QString(" %"));
+
 }
 
 //=========================================================================================================
@@ -377,7 +396,7 @@ void HpiSettingsView::onAddCoil()
         m_vCoilFreqs.append(-1);
     }
 
-    // Add column 0 in error table widget
+    // Add column 0 in error table widget (coil number)
     m_pUi->m_tableWidget_errors->insertRow(m_pUi->m_tableWidget_errors->rowCount());
     QTableWidgetItem* pTableItemB = new QTableWidgetItem(QString::number(m_pUi->m_tableWidget_Frequencies->rowCount()));
     pTableItemB->setFlags(Qt::ItemIsEnabled);
@@ -385,12 +404,19 @@ void HpiSettingsView::onAddCoil()
                                         0,
                                         pTableItemB);
 
-    // Add column 1 in error table widget
+    // Add column 1 in error table widget (error)
     QTableWidgetItem* pTableItemC = new QTableWidgetItem("0mm");
     pTableItemC->setFlags(Qt::ItemIsEnabled);
     m_pUi->m_tableWidget_errors->setItem(m_pUi->m_tableWidget_errors->rowCount()-1,
                                         1,
                                         pTableItemC);
+
+    // Add column 2 in error table widget (gof)
+    QTableWidgetItem* pTableItemD = new QTableWidgetItem("00.00");
+    pTableItemD->setFlags(Qt::ItemIsEnabled);
+    m_pUi->m_tableWidget_errors->setItem(m_pUi->m_tableWidget_errors->rowCount()-1,
+                                         2,
+                                         pTableItemD);
 
     emit coilFrequenciesChanged(m_vCoilFreqs);
 }
@@ -532,6 +558,13 @@ void HpiSettingsView::addCoilErrorToGUI()
     m_pUi->m_tableWidget_errors->setItem(m_pUi->m_tableWidget_errors->rowCount()-1,
                                         1,
                                         pTableItemC);
+
+    // Add column 2 in error table widget
+    QTableWidgetItem* pTableItemD = new QTableWidgetItem("00.00%");
+    pTableItemD->setFlags(Qt::ItemIsEnabled);
+    m_pUi->m_tableWidget_errors->setItem(m_pUi->m_tableWidget_errors->rowCount()-1,
+                                         2,
+                                         pTableItemD);
 }
 
 //=============================================================================================================
@@ -547,6 +580,8 @@ void HpiSettingsView::clearCoilGUI()
     m_pUi->m_tableWidget_errors->setRowCount(0);
     m_pUi->m_tableWidget_errors->setHorizontalHeaderItem(0, new QTableWidgetItem("#Coil"));
     m_pUi->m_tableWidget_errors->setHorizontalHeaderItem(1, new QTableWidgetItem("Error"));
+    m_pUi->m_tableWidget_errors->setHorizontalHeaderItem(2, new QTableWidgetItem("GoF"));
+
 }
 
 //=============================================================================================================
