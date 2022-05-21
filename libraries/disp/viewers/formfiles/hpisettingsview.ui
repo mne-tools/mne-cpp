@@ -419,7 +419,7 @@
         </widget>
        </item>
        <item>
-        <widget class="QTableWidget" name="m_tableWidget_errors">
+        <widget class="QTableWidget" name="m_tableWidget_results">
          <property name="minimumSize">
           <size>
            <width>0</width>
@@ -690,7 +690,7 @@
   <tabstop>m_checkBox_useSSP</tabstop>
   <tabstop>m_checkBox_useComp</tabstop>
   <tabstop>m_pushButton_doSingleFit</tabstop>
-  <tabstop>m_tableWidget_errors</tabstop>
+  <tabstop>m_tableWidget_results</tabstop>
   <tabstop>m_doubleSpinBox_maxHPIContinousDist</tabstop>
   <tabstop>m_doubleSpinBox_moveThreshold</tabstop>
   <tabstop>m_doubleSpinBox_rotThreshold</tabstop>

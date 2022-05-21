@@ -134,9 +134,9 @@ void HpiSettingsView::setErrorLabels(const QVector<double>& vError,
     QString sGof("0mm");
 
     for(int i = 0; i < vError.size(); ++i) {
-        if(i < m_pUi->m_tableWidget_errors->rowCount()) {
+        if(i < m_pUi->m_tableWidget_results->rowCount()) {
             sGof = QString::number(vError[i]*1000,'f',2)+QString(" mm");
-            m_pUi->m_tableWidget_errors->item(i, 1)->setText(sGof);
+            m_pUi->m_tableWidget_results->item(i, 1)->setText(sGof);
         }
     }
 
@@ -157,13 +157,13 @@ void HpiSettingsView::setErrorLabels(const QVector<double>& vError,
 void HpiSettingsView::setGoFLabels(const Eigen::VectorXd & vGoF,
                                    const double dMeanGof)
 {
-    //Update eror labels and change from m to mm
+    //Update gof labels and change to %
     QString sGof("00.00");
 
     for(int i = 0; i < vGoF.size(); ++i) {
-        if(i < m_pUi->m_tableWidget_errors->rowCount()) {
+        if(i < m_pUi->m_tableWidget_results->rowCount()) {
             sGof = QString::number(vGoF[i]*100,'f',2)+QString(" %");
-            m_pUi->m_tableWidget_errors->item(i, 2)->setText(sGof);
+            m_pUi->m_tableWidget_results->item(i, 2)->setText(sGof);
         }
     }
 
@@ -397,24 +397,24 @@ void HpiSettingsView::onAddCoil()
     }
 
     // Add column 0 in error table widget (coil number)
-    m_pUi->m_tableWidget_errors->insertRow(m_pUi->m_tableWidget_errors->rowCount());
+    m_pUi->m_tableWidget_results->insertRow(m_pUi->m_tableWidget_results->rowCount());
     QTableWidgetItem* pTableItemB = new QTableWidgetItem(QString::number(m_pUi->m_tableWidget_Frequencies->rowCount()));
     pTableItemB->setFlags(Qt::ItemIsEnabled);
-    m_pUi->m_tableWidget_errors->setItem(m_pUi->m_tableWidget_errors->rowCount()-1,
+    m_pUi->m_tableWidget_results->setItem(m_pUi->m_tableWidget_results->rowCount()-1,
                                         0,
                                         pTableItemB);
 
     // Add column 1 in error table widget (error)
     QTableWidgetItem* pTableItemC = new QTableWidgetItem("0mm");
     pTableItemC->setFlags(Qt::ItemIsEnabled);
-    m_pUi->m_tableWidget_errors->setItem(m_pUi->m_tableWidget_errors->rowCount()-1,
+    m_pUi->m_tableWidget_results->setItem(m_pUi->m_tableWidget_results->rowCount()-1,
                                         1,
                                         pTableItemC);
 
     // Add column 2 in error table widget (gof)
     QTableWidgetItem* pTableItemD = new QTableWidgetItem("00.00");
     pTableItemD->setFlags(Qt::ItemIsEnabled);
-    m_pUi->m_tableWidget_errors->setItem(m_pUi->m_tableWidget_errors->rowCount()-1,
+    m_pUi->m_tableWidget_results->setItem(m_pUi->m_tableWidget_results->rowCount()-1,
                                          2,
                                          pTableItemD);
 
@@ -435,10 +435,10 @@ void HpiSettingsView::onRemoveCoil()
             m_pUi->m_tableWidget_Frequencies->item(i, 0)->setText(QString::number(i+1));
         }
 
-        m_pUi->m_tableWidget_errors->removeRow(row);
+        m_pUi->m_tableWidget_results->removeRow(row);
 
-        for (int i = 0; i < m_pUi->m_tableWidget_errors->rowCount(); ++i) {
-            m_pUi->m_tableWidget_errors->item(i, 0)->setText(QString::number(i+1));
+        for (int i = 0; i < m_pUi->m_tableWidget_results->rowCount(); ++i) {
+            m_pUi->m_tableWidget_results->item(i, 0)->setText(QString::number(i+1));
         }
 
         emit coilFrequenciesChanged(m_vCoilFreqs);
@@ -545,24 +545,24 @@ void HpiSettingsView::addCoilFreqToGUI(int iCoilFreq)
 void HpiSettingsView::addCoilErrorToGUI()
 {
     // Add column 0 in error table widget
-    m_pUi->m_tableWidget_errors->insertRow(m_pUi->m_tableWidget_errors->rowCount());
+    m_pUi->m_tableWidget_results->insertRow(m_pUi->m_tableWidget_results->rowCount());
     QTableWidgetItem* pTableItemB = new QTableWidgetItem(QString::number(m_pUi->m_tableWidget_Frequencies->rowCount()));
     pTableItemB->setFlags(Qt::ItemIsEnabled);
-    m_pUi->m_tableWidget_errors->setItem(m_pUi->m_tableWidget_errors->rowCount()-1,
+    m_pUi->m_tableWidget_results->setItem(m_pUi->m_tableWidget_results->rowCount()-1,
                                         0,
                                         pTableItemB);
 
     // Add column 1 in error table widget
     QTableWidgetItem* pTableItemC = new QTableWidgetItem("0mm");
     pTableItemC->setFlags(Qt::ItemIsEnabled);
-    m_pUi->m_tableWidget_errors->setItem(m_pUi->m_tableWidget_errors->rowCount()-1,
+    m_pUi->m_tableWidget_results->setItem(m_pUi->m_tableWidget_results->rowCount()-1,
                                         1,
                                         pTableItemC);
 
     // Add column 2 in error table widget
     QTableWidgetItem* pTableItemD = new QTableWidgetItem("00.00%");
     pTableItemD->setFlags(Qt::ItemIsEnabled);
-    m_pUi->m_tableWidget_errors->setItem(m_pUi->m_tableWidget_errors->rowCount()-1,
+    m_pUi->m_tableWidget_results->setItem(m_pUi->m_tableWidget_results->rowCount()-1,
                                          2,
                                          pTableItemD);
 }
@@ -576,11 +576,11 @@ void HpiSettingsView::clearCoilGUI()
     m_pUi->m_tableWidget_Frequencies->setHorizontalHeaderItem(0, new QTableWidgetItem("#Coil"));
     m_pUi->m_tableWidget_Frequencies->setHorizontalHeaderItem(1, new QTableWidgetItem("Frequency (Hz)"));
 
-    m_pUi->m_tableWidget_errors->clear();
-    m_pUi->m_tableWidget_errors->setRowCount(0);
-    m_pUi->m_tableWidget_errors->setHorizontalHeaderItem(0, new QTableWidgetItem("#Coil"));
-    m_pUi->m_tableWidget_errors->setHorizontalHeaderItem(1, new QTableWidgetItem("Error"));
-    m_pUi->m_tableWidget_errors->setHorizontalHeaderItem(2, new QTableWidgetItem("GoF"));
+    m_pUi->m_tableWidget_results->clear();
+    m_pUi->m_tableWidget_results->setRowCount(0);
+    m_pUi->m_tableWidget_results->setHorizontalHeaderItem(0, new QTableWidgetItem("#Coil"));
+    m_pUi->m_tableWidget_results->setHorizontalHeaderItem(1, new QTableWidgetItem("Error"));
+    m_pUi->m_tableWidget_results->setHorizontalHeaderItem(2, new QTableWidgetItem("GoF"));
 
 }
 
