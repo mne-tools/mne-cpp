@@ -72,7 +72,7 @@ namespace MNESCAN
 // MNESCAN FORWARD DECLARATIONS
 //=============================================================================================================
 
-class PluginGui;
+class PluginSceneGui;
 
 class PluginScene : public QGraphicsScene
 {
@@ -84,7 +84,7 @@ public:
 
     enum Mode { InsertPluginItem, InsertLine, MovePluginItem};
 
-    explicit PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui);
+    explicit PluginScene(QMenu *pMenuPluginItem, PluginSceneGui *pPluginGui);
 
     ~PluginScene();
 
@@ -121,7 +121,7 @@ protected:
 private:
 //    bool isItemChange(int type);
 
-    PluginGui*  m_pPluginGui;   /**< Corresponding plugin gui. */
+    PluginSceneGui*  m_pPluginGui;   /**< Corresponding plugin gui. */
 
     //Current info
     Mode            m_mode;

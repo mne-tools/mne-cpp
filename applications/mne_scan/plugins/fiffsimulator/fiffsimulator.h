@@ -147,14 +147,6 @@ public:
     virtual QString getName() const;
     virtual QString getBuildInfo();
 
-    //=========================================================================================================
-    /**
-     * Creates the setup widget.
-     *
-     * @return Returns the setup widget.
-     */
-    virtual QWidget* setupWidget();
-
 protected:
     virtual void run();
 

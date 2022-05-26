@@ -37,7 +37,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "plugingui.h"
+#include "pluginscenegui.h"
 
 #include "arrow.h"
 #include "pluginitem.h"
@@ -68,7 +68,7 @@ using namespace MNESCAN;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginGui::PluginGui(SCSHAREDLIB::PluginManager *pPluginManager,
+PluginSceneGui::PluginSceneGui(SCSHAREDLIB::PluginManager *pPluginManager,
                      SCSHAREDLIB::PluginSceneManager *pPluginSceneManager)
 : m_pPluginManager(pPluginManager)
 , m_pPluginSceneManager(pPluginSceneManager)
@@ -90,10 +90,10 @@ PluginGui::PluginGui(SCSHAREDLIB::PluginManager *pPluginManager,
     //m_pPluginScene->setSceneRect(0, 0, 200, 500);
 
     connect(m_pPluginScene, &PluginScene::itemInserted,
-            this, &PluginGui::itemInserted);
+            this, &PluginSceneGui::itemInserted);
 
     connect(m_pPluginScene, &PluginScene::selectionChanged,
-            this, &PluginGui::newItemSelected);
+            this, &PluginSceneGui::newItemSelected);
 
     m_pGraphicsView = new QGraphicsView(m_pPluginScene);
     setCentralWidget(m_pGraphicsView);
@@ -119,7 +119,7 @@ PluginGui::PluginGui(SCSHAREDLIB::PluginManager *pPluginManager,
 
 //=============================================================================================================
 
-PluginGui::~PluginGui()
+PluginSceneGui::~PluginSceneGui()
 {
     //
     // Save current configuration
@@ -152,7 +152,7 @@ PluginGui::~PluginGui()
 
 //=============================================================================================================
 
-void PluginGui::clearScene()
+void PluginSceneGui::clearScene()
 {
     foreach (QGraphicsItem *item, m_pPluginScene->items())
     {
@@ -170,7 +170,7 @@ void PluginGui::clearScene()
 
 //=============================================================================================================
 
-void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
+void PluginSceneGui::loadConfig(const QString& sPath, const QString& sFileName)
 {
     qDebug() << "load" << sPath+"/"+sFileName;
 
@@ -284,7 +284,7 @@ void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
 
 //=============================================================================================================
 
-void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
+void PluginSceneGui::saveConfig(const QString& sPath, const QString& sFileName)
 {
     qDebug() << "Save Config" << sPath+"/"+sFileName;
     QDomDocument doc("PluginConfig");
@@ -347,7 +347,7 @@ void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
 
 //=============================================================================================================
 
-void PluginGui::uiSetupRunningState(bool state)
+void PluginSceneGui::uiSetupRunningState(bool state)
 {
     if(state)
     {
@@ -365,7 +365,7 @@ void PluginGui::uiSetupRunningState(bool state)
 
 //=============================================================================================================
 
-bool PluginGui::removePlugin(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin)
+bool PluginSceneGui::removePlugin(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin)
 {
     bool bRemoved = m_pPluginSceneManager->removePlugin(pPlugin);
 
@@ -402,7 +402,7 @@ bool PluginGui::removePlugin(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin)
 
 //=============================================================================================================
 
-void PluginGui::actionGroupTriggered(QAction* action)
+void PluginSceneGui::actionGroupTriggered(QAction* action)
 {
     m_pPluginScene->setActionPluginItem(action);
     m_pPluginScene->setMode(PluginScene::InsertPluginItem);
@@ -410,7 +410,7 @@ void PluginGui::actionGroupTriggered(QAction* action)
 
 //=============================================================================================================
 
-void PluginGui::itemInserted(PluginItem *item)
+void PluginSceneGui::itemInserted(PluginItem *item)
 {
     if(item) {
         m_pCurrentPlugin = item->plugin();
@@ -425,7 +425,7 @@ void PluginGui::itemInserted(PluginItem *item)
 
 //=============================================================================================================
 
-void PluginGui::newItemSelected()
+void PluginSceneGui::newItemSelected()
 {
     SCSHAREDLIB::AbstractPlugin::SPtr pPlugin;
     SCSHAREDLIB::PluginConnectorConnection::SPtr pConnection;
@@ -455,7 +455,7 @@ void PluginGui::newItemSelected()
 
 //=============================================================================================================
 
-void PluginGui::deleteItem()
+void PluginSceneGui::deleteItem()
 {
     //Remove Arrows ToDo Connections
     foreach (QGraphicsItem *item, m_pPluginScene->selectedItems())
@@ -488,14 +488,14 @@ void PluginGui::deleteItem()
 
 //=============================================================================================================
 
-void PluginGui::pointerGroupClicked(int)
+void PluginSceneGui::pointerGroupClicked(int)
 {
     m_pPluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
 }
 
 //=============================================================================================================
 
-void PluginGui::bringToFront()
+void PluginSceneGui::bringToFront()
 {
     if (m_pPluginScene->selectedItems().isEmpty())
         return;
@@ -513,7 +513,7 @@ void PluginGui::bringToFront()
 
 //=============================================================================================================
 
-void PluginGui::sendToBack()
+void PluginSceneGui::sendToBack()
 {
     if (m_pPluginScene->selectedItems().isEmpty())
         return;
@@ -531,28 +531,28 @@ void PluginGui::sendToBack()
 
 //=============================================================================================================
 
-void PluginGui::createActions()
+void PluginSceneGui::createActions()
 {
     deleteAction = new QAction(QIcon(":/images/delete.png"), tr("&Delete"), this);
     deleteAction->setShortcut(tr("Delete"));
     deleteAction->setStatusTip(tr("Delete item from diagram (Del)"));
-    connect(deleteAction, &QAction::triggered, this, &PluginGui::deleteItem);
+    connect(deleteAction, &QAction::triggered, this, &PluginSceneGui::deleteItem);
 
     toFrontAction = new QAction(QIcon(":/images/bringtofront.png"),
                                 tr("Bring to &Front"), this);
     toFrontAction->setShortcut(tr("Ctrl+F"));
     toFrontAction->setStatusTip(tr("Bring item to front (Ctrl+F)"));
-    connect(toFrontAction, &QAction::triggered, this, &PluginGui::bringToFront);
+    connect(toFrontAction, &QAction::triggered, this, &PluginSceneGui::bringToFront);
 
     sendBackAction = new QAction(QIcon(":/images/sendtoback.png"), tr("Send to &Back"), this);
     sendBackAction->setShortcut(tr("Ctrl+B"));
     sendBackAction->setStatusTip(tr("Send item to back (Ctrl+B)"));
-    connect(sendBackAction, &QAction::triggered, this, &PluginGui::sendToBack);
+    connect(sendBackAction, &QAction::triggered, this, &PluginSceneGui::sendToBack);
 }
 
 //=============================================================================================================
 
-void PluginGui::createMenuItem()
+void PluginSceneGui::createMenuItem()
 {
     m_pMenuItem = new QMenu;
     m_pMenuItem->addAction(deleteAction);
@@ -563,19 +563,22 @@ void PluginGui::createMenuItem()
 
 //=============================================================================================================
 
-void PluginGui::createToolbars()
+void PluginSceneGui::createToolbars()
 {
     //Plugins Toolbar
     m_pActionGroupPlugins = new QActionGroup(this);
     m_pActionGroupPlugins->setExclusive(false);
     connect(m_pActionGroupPlugins, &QActionGroup::triggered,
-            this, &PluginGui::actionGroupTriggered);
+            this, &PluginSceneGui::actionGroupTriggered);
 
     //Sensors
     m_pSensorToolButton = new QToolButton;
     QMenu *menuSensors = new QMenu;
-    for(qint32 i = 0; i < m_pPluginManager->getSensorPlugins().size(); ++i)
-        createItemAction(m_pPluginManager->getSensorPlugins()[i]->getName(), menuSensors);
+    for(auto& plugin : m_pPluginManager->getSensorPlugins()){
+        if(plugin->isScenePlugin()){
+            createItemAction(plugin->getName(), menuSensors);
+        }
+    }
 
     m_pSensorToolButton->setMenu(menuSensors);
     m_pSensorToolButton->setPopupMode(QToolButton::InstantPopup);
@@ -586,8 +589,11 @@ void PluginGui::createToolbars()
     //Algorithms
     m_pAlgorithmToolButton = new QToolButton;
     QMenu *menuAlgorithms = new QMenu;
-    for(qint32 i = 0; i < m_pPluginManager->getAlgorithmPlugins().size(); ++i)
-        createItemAction(m_pPluginManager->getAlgorithmPlugins()[i]->getName(), menuAlgorithms);
+    for(auto& plugin : m_pPluginManager->getAlgorithmPlugins()){
+        if(plugin->isScenePlugin()){
+            createItemAction(plugin->getName(), menuAlgorithms);
+        }
+    }
 
     m_pAlgorithmToolButton->setMenu(menuAlgorithms);
     m_pAlgorithmToolButton->setPopupMode(QToolButton::InstantPopup);
@@ -626,7 +632,7 @@ void PluginGui::createToolbars()
     m_pButtonGroupPointers->addButton(m_pLinePointerButton, int(PluginScene::InsertLine));
 
     connect(m_pButtonGroupPointers, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked),
-            this, &PluginGui::pointerGroupClicked);
+            this, &PluginSceneGui::pointerGroupClicked);
 
     m_pToolBarPointer = new QToolBar(tr("Pointer type"), this);
 
@@ -655,7 +661,7 @@ void PluginGui::createToolbars()
 
 //=============================================================================================================
 
-QAction* PluginGui::createItemAction(QString name, QMenu* menu)
+QAction* PluginSceneGui::createItemAction(QString name, QMenu* menu)
 {
     QAction* action = menu->addAction(name);
     m_pActionGroupPlugins->addAction(action);

@@ -124,7 +124,6 @@ public:
     virtual bool stop();
     virtual AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
-    virtual QWidget* setupWidget();
     virtual QString getBuildInfo();
 
     //=========================================================================================================
@@ -276,6 +275,12 @@ private:
      */
     int popUpYesNo(const QString& sText,
                    const QString& sInfoText);
+
+    //=========================================================================================================
+    void initGUI();
+
+    //=========================================================================================================
+    void initGUIActions();
 
     bool                                    m_bWriteToFile;                 /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                    m_bUseRecordTimer;              /**< Flag whether to use data recording timer.*/

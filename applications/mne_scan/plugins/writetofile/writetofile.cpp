@@ -79,18 +79,7 @@ WriteToFile::WriteToFile()
 , m_iRecordingMSeconds(5*60*1000)
 , m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr(new CircularBuffer_Matrix_double(40)))
 {
-    m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
-    m_pActionRecordFile->setStatusTip(tr("Start Recording"));
-    connect(m_pActionRecordFile.data(), &QAction::triggered,
-            this, &WriteToFile::toggleRecordingFile);
-    addPluginAction(m_pActionRecordFile);
-
-    m_pActionClipRecording = new QAction(QIcon(":/images/analyze.png"), tr("Send to MNE Analyze"),this);
-    m_pActionClipRecording->setStatusTip(tr("Clip Recording"));
-    connect(m_pActionClipRecording.data(), &QAction::triggered,
-            this, &WriteToFile::clipRecording);
-    addPluginAction(m_pActionClipRecording);
-    m_pActionClipRecording->setVisible(false);
+    initGUI();
 
     //Init timers
     if(!m_pRecordTimer) {
@@ -174,14 +163,6 @@ AbstractPlugin::PluginType WriteToFile::getType() const
 QString WriteToFile::getName() const
 {
     return "Write To File";
-}
-
-//=============================================================================================================
-
-QWidget* WriteToFile::setupWidget()
-{
-    WriteToFileSetupWidget* setupWidget = new WriteToFileSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
-    return setupWidget;
 }
 
 //=============================================================================================================
@@ -632,3 +613,30 @@ int WriteToFile::popUpYesNo(const QString& sText,
     return ret;
 }
 
+//=============================================================================================================
+
+void WriteToFile::initGUI()
+{
+    m_pGUI = std::make_unique<PluginGUI>();
+    initGUIActions();
+    m_pGUI->setSetupWidget(new WriteToFileSetupWidget(this));
+}
+
+//=============================================================================================================
+
+void WriteToFile::initGUIActions()
+{
+    m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
+    m_pActionRecordFile->setStatusTip(tr("Start Recording"));
+    connect(m_pActionRecordFile.data(), &QAction::triggered,
+            this, &WriteToFile::toggleRecordingFile);
+
+    m_pGUI->addPluginAction(m_pActionRecordFile);
+
+    m_pActionClipRecording = new QAction(QIcon(":/images/analyze.png"), tr("Send to MNE Analyze"),this);
+    m_pActionClipRecording->setStatusTip(tr("Clip Recording"));
+    connect(m_pActionClipRecording.data(), &QAction::triggered,
+            this, &WriteToFile::clipRecording);
+    m_pGUI->addPluginAction(m_pActionClipRecording);
+    m_pActionClipRecording->setVisible(false);
+}

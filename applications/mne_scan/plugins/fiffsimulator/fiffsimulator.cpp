@@ -89,6 +89,9 @@ FiffSimulator::FiffSimulator()
     //init channels when fiff info is available
     connect(this, &FiffSimulator::fiffInfoAvailable,
             this, &FiffSimulator::initConnector);
+
+    m_pGUI = std::make_unique<PluginGUI>();
+    m_pGUI->setSetupWidget(new FiffSimulatorSetupWidget(this));
 }
 
 //=============================================================================================================
@@ -197,15 +200,6 @@ AbstractPlugin::PluginType FiffSimulator::getType() const
 QString FiffSimulator::getName() const
 {
     return "Fiff Simulator";
-}
-
-//=============================================================================================================
-
-QWidget* FiffSimulator::setupWidget()
-{
-    //widget is later distroyed by CentralWidget - so it has to be created everytime new
-    QWidget * pWidget(new FiffSimulatorSetupWidget(this));
-    return pWidget;
 }
 
 //=============================================================================================================

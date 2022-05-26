@@ -136,12 +136,15 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns the set up widget for configuration of AbstractAlgorithm.
-     * Pure virtual method inherited by AbstractPlugin.
-     *
-     * @return the setup widget.
+     * Returns whether a plugin has a GUI component.
      */
-    virtual QWidget* setupWidget() = 0; //setup();
+    virtual inline bool hasGUI() const;
+
+    //=========================================================================================================
+    /**
+     * Whether the plugin can be added to a scene.
+     */
+    virtual bool inline isScenePlugin() const;
 
 protected:
     //=========================================================================================================
@@ -161,6 +164,21 @@ inline bool AbstractAlgorithm::multiInstanceAllowed() const
 {
     return true;
 }
+
+//=============================================================================================================
+
+inline bool AbstractAlgorithm::hasGUI() const
+{
+    return true;
+}
+
+//=============================================================================================================
+
+inline bool AbstractAlgorithm::isScenePlugin() const
+{
+    return true;
+}
+
 } // NAMESPACE
 
 Q_DECLARE_INTERFACE(SCSHAREDLIB::AbstractAlgorithm, "scsharedlib/1.0")

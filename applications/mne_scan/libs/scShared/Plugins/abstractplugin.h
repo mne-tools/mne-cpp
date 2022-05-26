@@ -41,10 +41,14 @@
 
 #include "../scshared_global.h"
 
+#include "plugingui.h"
+
 #include "../Management/pluginoutputdata.h"
 #include "../Management/plugininputdata.h"
 
 #include <disp/viewers/abstractview.h>
+
+#include <memory>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -142,11 +146,9 @@ public:
 
     //=========================================================================================================
     /**
-     * A list of actions for the current plugin.
-     *
-     * @return a list of plugin actions.
+     * Whether the plugin can be added to a scene.
      */
-    inline QList< QAction* > getPluginActions();
+    virtual bool isScenePlugin() const = 0;
 
     //=========================================================================================================
     /**
@@ -172,16 +174,13 @@ public:
      *
      * @return true if multi instantiation of plugin is allowed.
      */
-    virtual inline bool multiInstanceAllowed() const = 0;
+    virtual inline bool multiInstanceAllowed() const;
 
     //=========================================================================================================
     /**
-     * Returns the set up widget for configuration of the AbstractPlugin.
-     * Pure virtual method.
-     *
-     * @return the setup widget.
+     * Returns whether a plugin has a GUI component.
      */
-    virtual QWidget* setupWidget() = 0; //setup()
+    virtual bool hasGUI() const = 0;
 
     //=========================================================================================================
     /**
@@ -194,6 +193,7 @@ public:
     inline InputConnectorList& getInputConnectors(){return m_inputConnectors;}
     inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
 
+    inline const PluginGUI* getGUI() const;
 signals:
     //=========================================================================================================
     /**
@@ -223,21 +223,12 @@ protected:
      */
     virtual void run() = 0;
 
-    //=========================================================================================================
-    /**
-     * Adds a plugin action to the current plugin.
-     *
-     * @param[in] pAction  pointer to the action to be added to the plugin.
-     */
-    inline void addPluginAction(QAction* pAction);
-
     InputConnectorList m_inputConnectors;       /**< Set of input connectors associated with this plug-in. */
     OutputConnectorList m_outputConnectors;     /**< Set of output connectors associated with this plug-in. */
 
     bool m_bPluginControlWidgetsInit = false;   /**< Flag to indicate if the plugin control widgets were initialized already. */
 
-private:
-    QList< QAction* >   m_qListPluginActions;  /**< List of plugin actions. */
+    std::unique_ptr<PluginGUI>  m_pGUI;          /**< Plugin GUI. */
 };
 
 //=============================================================================================================
@@ -251,16 +242,9 @@ inline bool AbstractPlugin::multiInstanceAllowed() const
 
 //=============================================================================================================
 
-inline QList< QAction* > AbstractPlugin::getPluginActions()
+inline const PluginGUI* AbstractPlugin::getGUI() const
 {
-    return m_qListPluginActions;
-}
-
-//=============================================================================================================
-
-inline void AbstractPlugin::addPluginAction(QAction* pAction)
-{
-    m_qListPluginActions.append(pAction);
+    return m_pGUI.get();
 }
 
 //=============================================================================================================

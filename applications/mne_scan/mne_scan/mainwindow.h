@@ -43,6 +43,7 @@
 #include "info.h"
 #include "mainsplashscreen.h"
 #include "mainsplashscreencloser.h"
+#include "pluginscenegui.h"
 
 #include <disp/viewers/abstractview.h>
 
@@ -103,7 +104,7 @@ namespace MNESCAN
 //=============================================================================================================
 
 class StartUpWidget;
-class PluginGui;
+class PluginSceneGui;
 class RunWidget;
 class PluginDockWidget;
 
@@ -429,7 +430,7 @@ private:
 
     LogLevel                            m_eLogLevelCurrent;             /**< Holds the current log level.*/
 
-    QPointer<PluginGui>                 m_pPluginGui;                   /**< Holds the plugin GUI.*/
+    QPointer<PluginSceneGui>                 m_pPluginGui;                   /**< Holds the plugin GUI.*/
 
     QPointer<DISPLIB::QuickControlView> m_pQuickControlView;            /**< quick control widget. */
 
