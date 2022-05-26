@@ -48,6 +48,7 @@
 #include <scDisp/measurementwidget.h>
 #include <scDisp/realtimemultisamplearraywidget.h>
 #include <scDisp/realtimeevokedsetwidget.h>
+#include <scDisp/realtimeneurofeedbackwidget.h>
 
 #include <disp/viewers/multiview.h>
 #include <disp/viewers/multiviewwindow.h>
@@ -844,12 +845,16 @@ void MainWindow::onDockLocationChanged(QWidget* pWidget)
                     pView->updateOpenGLViewport();
                 } else if(RealTimeEvokedSetWidget* pView = qobject_cast<RealTimeEvokedSetWidget*>(widget)) {
                     pView->updateOpenGLViewport();
+                } else if(RealTimeNeurofeedbackWidget* pView = qobject_cast<RealTimeNeurofeedbackWidget*>(widget)) {
+                    pView->updateOpenGLViewport();
                 }
             }
         }
     } else if(RealTimeMultiSampleArrayWidget* pView = qobject_cast<RealTimeMultiSampleArrayWidget*>(pWidget)) {
         pView->updateOpenGLViewport();
     } else if(RealTimeEvokedSetWidget* pView = qobject_cast<RealTimeEvokedSetWidget*>(pWidget)) {
+        pView->updateOpenGLViewport();
+    } else if(RealTimeNeurofeedbackWidget* pView = qobject_cast<RealTimeNeurofeedbackWidget*>(pWidget)) {
         pView->updateOpenGLViewport();
     }
 }

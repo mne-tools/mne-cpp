@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
- * @file     measurementtypes.cpp
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     August, 2013
+ * @file     neurofeedback_global.cpp
+ * @author   Simon Marxgut <simon.marxgut@umit-tirol.at>
+ * @since    0.1.9
+ * @date     November, 2021
  *
  * @section  LICENSE
  *
- * Copyright (C) 2013, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2021, Simon Marxgut. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MeasurementTypes class.
+ * @brief    neurofeedback plugin global definitions.
  *
  */
 
@@ -37,46 +36,18 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "measurementtypes.h"
-
-#include "measurement.h"
-#include "realtimemultisamplearray.h"
-#include "numeric.h"
-#include "realtimesourceestimate.h"
-#include "realtimeconnectivityestimate.h"
-#include "realtimespectrum.h"
-#include "realtimesamplearraychinfo.h"
-#include "realtimecov.h"
-#include "realtimeevokedset.h"
-#include "realtimeneurofeedbackresult.h"
+#include "neurofeedback_global.h"
 
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE METHODS
 //=============================================================================================================
 
-using namespace SCMEASLIB;
-
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-MeasurementTypes::MeasurementTypes(QObject *parent)
-: QObject(parent)
-{
-}
+const char* NEUROFEEDBACKPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();};
 
 //=============================================================================================================
 
-void MeasurementTypes::registerTypes()
-{
-    qRegisterMetaType< Measurement::SPtr >("Measurement::SPtr");
-    qRegisterMetaType< RealTimeMultiSampleArray::SPtr >("RealTimeMultiSampleArray::SPtr");
-    qRegisterMetaType< Numeric::SPtr >("Numeric::SPtr");
-    qRegisterMetaType< RealTimeSpectrum::SPtr >("RealTimeSpectrum::SPtr");
-    qRegisterMetaType< RealTimeSourceEstimate::SPtr >("RealTimeSourceEstimate::SPtr");
-    qRegisterMetaType< RealTimeConnectivityEstimate::SPtr >("RealTimeConnectivityEstimate::SPtr");
-    qRegisterMetaType< RealTimeCov::SPtr >("RealTimeCov::SPtr");
-    qRegisterMetaType< RealTimeEvokedSet::SPtr >("RealTimeEvokedSet::SPtr");
-    qRegisterMetaType< RealTimeSampleArrayChInfo::SPtr >("RealTimeSampleArrayChInfo::SPtr");
-    qRegisterMetaType< RealTimeNeurofeedbackResult::SPtr >("RealTimeNeurofeedbackResult::SPtr");
-}
+const char* NEUROFEEDBACKPLUGIN::buildHash(){ return UTILSLIB::gitHash();};
+
+//=============================================================================================================
+
+const char* NEUROFEEDBACKPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();};

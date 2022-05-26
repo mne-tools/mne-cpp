@@ -95,10 +95,12 @@ SOURCES += \
     realtimemultisamplearraywidget.cpp \
     realtimeevokedsetwidget.cpp \
     realtimecovwidget.cpp \
+    realtimeneurofeedbackwidget.cpp \
     realtimespectrumwidget.cpp \
     realtime3dwidget.cpp \
 
 HEADERS += \
+    realtimeneurofeedbackwidget.h \
     scdisp_global.h \
     measurementwidget.h \
     realtimemultisamplearraywidget.h \

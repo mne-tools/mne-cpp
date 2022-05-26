@@ -1,14 +1,13 @@
 #==============================================================================================================
 #
-# @file     scMeas.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Lorenz Esch <lesch@mgh.harvard.edu>
+# @file     neurofeedback.pro
+# @author   Simon Marxgut <simon.marxgut@umit-tirol.at>
 # @since    0.1.0
-# @date     July, 2012
+# @date     November, 2021
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh, Lorenz Esch. All rights reserved.
+# Copyright (C) 2021, Simon Marxgut. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,7 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the scMeas library.
+# @brief    This project file generates the makefile for the Neurofeedback Plugin.
 #
 #==============================================================================================================
 
@@ -37,18 +36,20 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-CONFIG += skip_target_version_ext
+QT += core widgets
 
-DEFINES += SCMEAS_LIBRARY
+CONFIG += skip_target_version_ext plugin
 
-DESTDIR = $${MNE_LIBRARY_DIR}
+DEFINES += NEUROFEEDBACK_PLUGIN
 
-TARGET = scMeas
+DESTDIR = $${MNE_BINARY_DIR}/mne_scan_plugins
+
+TARGET = neurofeedback
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-contains(MNECPP_CONFIG, static) {
+contains(MNECPP_CONFIG, static){
     CONFIG += staticlib
     DEFINES += STATICBUILD
 } else {
@@ -57,64 +58,45 @@ contains(MNECPP_CONFIG, static) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lmnecppConnectivityd \
-            -lmnecppMned \
+    LIBS += -lscSharedd \
+            -lscDispd \
+            -lscMeasd \
             -lmnecppFiffd \
-            -lmnecppFsd \
             -lmnecppUtilsd \
 } else {
-    LIBS += -lmnecppConnectivity \
-            -lmnecppMne \
+    LIBS += -lscShared \
+            -lscDisp \
+            -lscMeas \
             -lmnecppFiff \
-            -lmnecppFs \
             -lmnecppUtils \
 }
 
 SOURCES += \
-    realtimeneurofeedbackresult.cpp \
-    realtimesourceestimate.cpp \
-    realtimeconnectivityestimate.cpp \
-    realtimemultisamplearray.cpp \
-    realtimesamplearraychinfo.cpp \
-    numeric.cpp \
-    measurement.cpp \
-    measurementtypes.cpp \
-    realtimeevokedset.cpp \
-    realtimecov.cpp \
-    realtimehpiresult.cpp \
-    realtimespectrum.cpp \
-    realtimefwdsolution.cpp
+        FormFiles/neurofeedbacksetupwidget.cpp \
+        neurofeedback.cpp \
+        neurofeedback_global.cpp
 
 HEADERS += \
-    realtimeneurofeedbackresult.h \
-    scmeas_global.h \
-    realtimesourceestimate.h \
-    realtimeconnectivityestimate.h \
-    realtimemultisamplearray.h \
-    realtimesamplearraychinfo.h \
-    numeric.h \
-    measurement.h \
-    measurementtypes.h \
-    realtimeevokedset.h \
-    realtimecov.h \
-    realtimehpiresult.h \
-    realtimespectrum.h \
-    realtimefwdsolution.h
+        FormFiles/neurofeedbacksetupwidget.h \
+        neurofeedback.h \
+        neurofeedback_global.h
+
+FORMS += \
+        FormFiles/neurofeedbacksetup.ui
 
 clang {
-    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
+    QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR}
 } else {
-    INCLUDEPATH += $${EIGEN_INCLUDE_DIR} 
+    INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 }
+
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_SCAN_INCLUDE_DIR}
 
-win32:!contains(MNECPP_CONFIG, static) {
-    QMAKE_POST_LINK += $$QMAKE_COPY $$shell_path($${MNE_LIBRARY_DIR}/$${TARGET}.dll) $${MNE_BINARY_DIR}
-}
+OTHER_FILES += neurofeedback.json
 
-macx {
-    QMAKE_LFLAGS_SONAME = -Wl,-install_name,@rpath/
+unix:!macx {
+    QMAKE_RPATHDIR += $ORIGIN/../../lib
 }
 
 # Activate FFTW backend in Eigen for non-static builds only
@@ -136,3 +118,41 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
                 -lfftw3_threads \
     }
 }
+
+#DISTFILES += \
+#    neurofeedback.json \
+#    neurofeedback.pro.user
+
+################################################## BUILD TIMESTAMP/HASH UPDATER ############################################
+
+FILE_TO_UPDATE = neurofeedback_global.cpp
+win32 {
+    CONFIG(debug, debug|release) {
+        OBJ_TARJET = debug\neurofeedback_global.obj
+    } else {
+        OBJ_TARJET = release\neurofeedback_global.obj
+    }
+}
+
+ALL_FILES += $$HEADERS
+ALL_FILES += $$SOURCES
+ALL_FILES -= $$FILE_TO_UPDATE
+
+FileUpdater.target = phonyFileUpdater
+for (I_FILE, ALL_FILES) {
+    FileUpdater.depends += $${PWD}/$${I_FILE}
+}
+
+unix|macx {
+    FileUpdater.commands = touch $${PWD}/$${FILE_TO_UPDATE} ; echo PASTA > phonyFileUpdater
+}
+
+win32 {
+    FileUpdater.commands = copy /y $$shell_path($${PWD})\\$${FILE_TO_UPDATE} +,, $$shell_path($${PWD})\\$${FILE_TO_UPDATE} & echo PASTA > phonyFileUpdater
+    OrderForcerTarget.target = $${OBJ_TARJET}
+    OrderForcerTarget.depends += phonyFileUpdater
+    QMAKE_EXTRA_TARGETS += OrderForcerTarget
+}
+
+PRE_TARGETDEPS += phonyFileUpdater
+QMAKE_EXTRA_TARGETS += FileUpdater

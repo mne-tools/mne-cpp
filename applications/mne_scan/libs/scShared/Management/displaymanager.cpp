@@ -44,7 +44,7 @@
 #include <scDisp/realtimeevokedsetwidget.h>
 #include <scDisp/realtimecovwidget.h>
 #include <scDisp/realtimespectrumwidget.h>
-
+#include <scDisp/realtimeneurofeedbackwidget.h>
 #include <scMeas/realtimemultisamplearray.h>
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimeconnectivityestimate.h>
@@ -52,6 +52,7 @@
 #include <scMeas/realtimecov.h>
 #include <scMeas/realtimespectrum.h>
 #include <scMeas/realtimehpiresult.h>
+#include <scMeas/realtimeneurofeedbackresult.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -182,6 +183,17 @@ QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList &outputConnect
 
             vboxLayout->addWidget(fsWidget);
             fsWidget->init();
+        } else if (pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeNeurofeedbackResult> >()) {
+
+            RealTimeNeurofeedbackWidget* nfWidget = new RealTimeNeurofeedbackWidget(pT, newDisp);
+
+            qListActions.append(nfWidget->getDisplayActions());
+
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+                    nfWidget, &RealTimeNeurofeedbackWidget::update, Qt::BlockingQueuedConnection);
+
+            vboxLayout->addWidget(nfWidget);
+            nfWidget->init();
         }
     }
 

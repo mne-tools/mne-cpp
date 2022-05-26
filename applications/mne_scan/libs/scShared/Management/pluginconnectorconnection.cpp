@@ -47,6 +47,7 @@
 #include <scMeas/realtimesourceestimate.h>
 #include <scMeas/realtimehpiresult.h>
 #include <scMeas/realtimefwdsolution.h>
+#include <scMeas/realtimeneurofeedbackresult.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -107,6 +108,20 @@ bool PluginConnectorConnection::createConnection()
             QSharedPointer< PluginOutputData<RealTimeMultiSampleArray> > senderRTMSA = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<RealTimeMultiSampleArray> >();
             QSharedPointer< PluginInputData<RealTimeMultiSampleArray> > receiverRTMSA = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeMultiSampleArray> >();
             if(senderRTMSA && receiverRTMSA)
+            {
+                // We need to use BlockingQueuedConnection here because the FiffSimulator is still dispatching its data from a different thread via the direct connect signal method
+                m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(),
+                                                                 m_pReceiver->getInputConnectors()[j]->getName()),
+                                          connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
+                                                  m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
+                bConnected = true;
+                break;
+            }
+
+            //Cast to RealTimeNeurofeedbackResult
+            QSharedPointer< PluginOutputData<RealTimeNeurofeedbackResult> > senderRTNR = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<RealTimeNeurofeedbackResult> >();
+            QSharedPointer< PluginInputData<RealTimeNeurofeedbackResult> > receiverRTNR = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeNeurofeedbackResult> >();
+            if(senderRTNR && receiverRTNR)
             {
                 // We need to use BlockingQueuedConnection here because the FiffSimulator is still dispatching its data from a different thread via the direct connect signal method
                 m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(),
@@ -211,6 +226,11 @@ ConnectorDataType PluginConnectorConnection::getDataType(QSharedPointer<PluginCo
     QSharedPointer< PluginInputData<SCMEASLIB::RealTimeMultiSampleArray> > RTMSA_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::RealTimeMultiSampleArray> >();
     if(RTMSA_Out || RTMSA_In)
         return ConnectorDataType::_RTMSA;
+
+    QSharedPointer< PluginOutputData<SCMEASLIB::RealTimeNeurofeedbackResult> > RTNR_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::RealTimeNeurofeedbackResult> >();
+    QSharedPointer< PluginInputData<SCMEASLIB::RealTimeNeurofeedbackResult> > RTNR_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::RealTimeNeurofeedbackResult> >();
+    if(RTNR_Out || RTNR_In)
+        return ConnectorDataType::_RTNR;
 
     QSharedPointer< PluginOutputData<SCMEASLIB::RealTimeCov> > RTC_Out = pPluginConnector.dynamicCast< PluginOutputData<SCMEASLIB::RealTimeCov> >();
     QSharedPointer< PluginInputData<SCMEASLIB::RealTimeCov> > RTC_In = pPluginConnector.dynamicCast< PluginInputData<SCMEASLIB::RealTimeCov> >();

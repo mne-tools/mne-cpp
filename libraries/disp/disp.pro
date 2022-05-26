@@ -107,6 +107,10 @@ SOURCES += \
     viewers/averagelayoutview.cpp \
     viewers/fwdsettingsview.cpp \
     viewers/helpers/scalecontrol.cpp \
+    viewers/neurofeedbackbsettingsview.cpp \
+    viewers/neurofeedbackcsettingsview.cpp \
+    viewers/neurofeedbackfsettingsview.cpp \
+    viewers/neurofeedbacksettingsview.cpp \
     viewers/progressview.cpp \
     viewers/spectrumview.cpp \
     viewers/modalityselectionview.cpp \
@@ -166,6 +170,10 @@ HEADERS += \
     viewers/averagelayoutview.h \
     viewers/fwdsettingsview.h \
     viewers/helpers/scalecontrol.h \
+    viewers/neurofeedbackbsettingsview.h \
+    viewers/neurofeedbackcsettingsview.h \
+    viewers/neurofeedbackfsettingsview.h \
+    viewers/neurofeedbacksettingsview.h \
     viewers/progressview.h \
     viewers/spectrumview.h \
     viewers/modalityselectionview.h \
@@ -228,6 +236,10 @@ FORMS += \
     viewers/formfiles/channelselectionview.ui \
     viewers/formfiles/coregsettingsview.ui \
     viewers/formfiles/fwdsettingsview.ui \
+    viewers/formfiles/neurofeedbackbsettingsview.ui \
+    viewers/formfiles/neurofeedbackcsettingsview.ui \
+    viewers/formfiles/neurofeedbackfsettingsview.ui \
+    viewers/formfiles/neurofeedbacksettingsview.ui \
     viewers/formfiles/progressview.ui \
     viewers/formfiles/spharasettingsview.ui \
     viewers/formfiles/fiffrawviewsettings.ui \
@@ -286,6 +298,7 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
     }
 }
 
+
 ################################################## BUILD TIMESTAMP/HASH UPDATER ############################################
 
 FILE_TO_UPDATE = disp_global.cpp
@@ -319,3 +332,4 @@ win32 {
 
 PRE_TARGETDEPS += phonyFileUpdater
 QMAKE_EXTRA_TARGETS += FileUpdater
+

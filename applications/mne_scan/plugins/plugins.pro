@@ -47,6 +47,8 @@ SUBDIRS += \
     babymeg \
     natus \
 
+
+
     contains(MNECPP_CONFIG, withBrainAmp) {
         SUBDIRS += brainamp \           # Build guide -> https://mne-cpp.github.io/pages/development/brainamp.html
     }
@@ -72,8 +74,12 @@ SUBDIRS += \
     rtcmne \
     averaging \
     covariance \
+    neurofeedback \
     noisereduction \
     neuronalconnectivity \
     writetofile \
     hpi \
     rtfwd \
+
+
+

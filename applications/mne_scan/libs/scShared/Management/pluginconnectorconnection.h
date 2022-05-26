@@ -66,14 +66,15 @@ namespace SCSHAREDLIB
  */
 enum ConnectorDataType
 {
-    _N,         /**< Numeric. */
-    _RTMSA,     /**< Real-Time Multi Sample Array. */
-    _RTES,      /**< Real-Time Evoked Set. */
-    _RTC,       /**< Real-Time Covariance. */
-    _RTSE,      /**< Real-Time Source Estimate. */
-    _RTHR,      /**< Real-Time Hpi Result. */
-    _RTFS,      /**< Real-Time Forward Solution. */
-    _None,      /**< None. */
+    _N,         /**< Numeric */
+    _RTMSA,     /**< Real-Time Multi Sample Array */
+    _RTES,      /**< Real-Time Evoked Set */
+    _RTC,       /**< Real-Time Covariance */
+    _RTSE,      /**< Real-Time Source Estimate */
+    _RTHR,      /**< Real-Time Hpi Result */
+    _RTFS,      /**< Real-Time Forward Solution */
+    _RTNR,      /**< Real-Time Neurofeedback Result */
+    _None,      /**< None */
 };
 
 //=============================================================================================================
