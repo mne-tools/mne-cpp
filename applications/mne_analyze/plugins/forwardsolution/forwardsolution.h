@@ -59,6 +59,10 @@ namespace ANSHAREDLIB {
     class Communicator;
 }
 
+namespace DISPLIB {
+    class FwdSettingsView;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE FORWARDSOLUTIONPLUGIN
 //=============================================================================================================
@@ -112,6 +116,8 @@ public:
 
 private:    
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals. */
+
+    DISPLIB::FwdSettingsView*                               m_pFwdSettingsView;
 };
 
 } // NAMESPACE

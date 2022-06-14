@@ -41,11 +41,15 @@
 
 #include <anShared/Management/communicator.h>
 
+#include <disp/viewers/fwdsettingsview.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
+#include <QDockWidget>
+#include <QVBoxLayout>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -95,7 +99,7 @@ void ForwardSolution::unload()
 
 QString ForwardSolution::getName() const
 {
-    return "Source Localization";
+    return "Forward Solution";
 }
 
 //=============================================================================================================
@@ -116,9 +120,18 @@ QWidget *ForwardSolution::getView()
 
 QDockWidget* ForwardSolution::getControl()
 {
-    //QDockWidget* pControl = new QDockWidget(getName());
+    m_pFwdSettingsView = new DISPLIB::FwdSettingsView();
 
-    return Q_NULLPTR;
+    QVBoxLayout* pControlLayout = new QVBoxLayout();
+    pControlLayout->addWidget(m_pFwdSettingsView);
+
+    QScrollArea* pControlScrollArea = new QScrollArea();
+    pControlScrollArea->setLayout(pControlLayout);
+
+    QDockWidget* pControlDock = new QDockWidget(this->getName());
+    pControlDock->setWidget(pControlScrollArea);
+
+    return pControlDock;
 }
 
 //=============================================================================================================
