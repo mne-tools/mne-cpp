@@ -50,6 +50,7 @@
 
 #include <QWidget>
 #include <QListWidget>
+#include <QGraphicsItem>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -60,7 +61,6 @@
 //=============================================================================================================
 
 class QListWidgetItem;
-class QGraphicsItem;
 
 namespace Ui {
     class ChannelSelectionViewWidget;
@@ -396,7 +396,7 @@ private:
     QSharedPointer<ChannelInfoModel>    m_pChannelInfoModel;                /**< Pointer to the channel info model. */
 
     QMap<QString,QPointF>               m_layoutMap;                        /**< QMap with the loaded layout. each channel name correspond to a QPointF variable. */
-    QMap<QString,QStringList>           m_selectionGroupsMap;               /**< QMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/
+    QMultiMap<QString,QStringList>      m_selectionGroupsMap;               /**< QMultiMap with the loaded selection groups. Each group name holds a string list with the corresponding channels of the group.*/
 
     SelectionScene*                     m_pSelectionScene;                  /**< Pointer to the selection scene class. */
 

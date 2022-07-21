@@ -71,10 +71,10 @@ TfSettingsView::TfSettingsView(const QString& sSettingsPath,
 
     loadSettings();
 
-    connect(m_pUi->m_spinBox_trialNumber, static_cast<void (QSpinBox::*)(const QString&)>(&QSpinBox::valueChanged),
+    connect(m_pUi->m_spinBox_trialNumber, &QSpinBox::valueChanged,
             this, &TfSettingsView::onNumberTrialRowChanged);
 
-    connect(m_pUi->m_spinBox_rowNumber, static_cast<void (QSpinBox::*)(const QString&)>(&QSpinBox::valueChanged),
+    connect(m_pUi->m_spinBox_rowNumber, &QSpinBox::valueChanged,
             this, &TfSettingsView::onNumberTrialRowChanged);
 
     this->setWindowTitle("Time frequency Settings");

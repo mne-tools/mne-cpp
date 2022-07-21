@@ -42,6 +42,7 @@
 
 #include "../disp_global.h"
 #include "abstractview.h"
+#include <fiff/fiff_dig_point.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -64,7 +65,6 @@ namespace Ui {
 }
 
 namespace FIFFLIB {
-    class FiffDigPoint;
     class FiffDigPointSet;
 }
 

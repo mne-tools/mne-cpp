@@ -49,7 +49,7 @@
 #include <QMap>
 #include <QWidget>
 #if !defined(NO_QOPENGLWIDGET)
-#include <QOpenGLWidget>
+#include <QtOpenGLWidgets/QOpenGLWidget>
 #endif
 
 //=============================================================================================================

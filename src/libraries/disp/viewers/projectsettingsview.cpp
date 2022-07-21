@@ -115,11 +115,11 @@ ProjectSettingsView::ProjectSettingsView(const QString& sSettingsPath,
 
 void ProjectSettingsView::connectGui()
 {
-    connect(m_pUi->m_qComboBox_ProjectSelection,static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
-                this,&ProjectSettingsView::selectNewProject);
+//    connect(m_pUi->m_qComboBox_ProjectSelection,static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
+//                this,&ProjectSettingsView::selectNewProject);
 
-    connect(m_pUi->m_qComboBox_SubjectSelection,static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
-                this,&ProjectSettingsView::selectNewSubject);
+//    connect(m_pUi->m_qComboBox_SubjectSelection,static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
+//                this,&ProjectSettingsView::selectNewSubject);
 
     connect(m_pUi->m_qLineEditParadigm,&QLineEdit::textChanged,
                 this,&ProjectSettingsView::paradigmChanged);

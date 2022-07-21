@@ -91,7 +91,7 @@ public:
      * @param[in] bFrameless    Flag specifying whether this widget is frameless.
      */
     DraggableFramelessWidget(QWidget *parent = 0,
-                             Qt::WindowFlags flags = 0,
+                             Qt::WindowFlags flags = Qt::Window,
                              bool bRoundEdges = false,
                              bool bDraggable = true,
                              bool bFrameless = true);

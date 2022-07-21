@@ -49,6 +49,9 @@
 #include <QSharedPointer>
 #include <QPointer>
 #include <Qt3DRender/QGeometryRenderer>
+#include <Qt3DCore/QGeometry>
+#include <Qt3DCore/QBuffer>
+#include <Qt3DCore/QAttribute>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -57,12 +60,6 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-namespace Qt3DRender {
-        class QGeometry;
-        class QBuffer;
-        class QAttribute;
-}
 
 namespace Qt3DCore {
         class QNode;
@@ -103,7 +100,7 @@ public:
     /**
      * Constructs a GeometryMultiplier object.
      */
-    explicit GeometryMultiplier(QSharedPointer<Qt3DRender::QGeometry> tGeometry,
+    explicit GeometryMultiplier(QSharedPointer<Qt3DCore::QGeometry> tGeometry,
                                                       Qt3DCore::QNode *tParent = nullptr);
 
     //=========================================================================================================
@@ -166,15 +163,15 @@ private:
      */
     QByteArray buildColorBuffer(const QVector<QColor> &tInstanceColor);
 
-    QSharedPointer<Qt3DRender::QGeometry>           m_pGeometry;
+    QSharedPointer<Qt3DCore::QGeometry>             m_pGeometry;
 
-    QPointer<Qt3DRender::QBuffer>                   m_pTransformBuffer;
+    QPointer<Qt3DCore::QBuffer>                   m_pTransformBuffer;
 
-    QPointer<Qt3DRender::QBuffer>                   m_pColorBuffer;
+    QPointer<Qt3DCore::QBuffer>                   m_pColorBuffer;
 
-    QPointer<Qt3DRender::QAttribute>                m_pTransformAttribute;
+    QPointer<Qt3DCore::QAttribute>                m_pTransformAttribute;
 
-    QPointer<Qt3DRender::QAttribute>                m_pColorAttribute;
+    QPointer<Qt3DCore::QAttribute>                m_pColorAttribute;
 };
 
 //=============================================================================================================

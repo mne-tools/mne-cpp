@@ -227,8 +227,9 @@ void DipoleFit::onPerformDipoleFit(const QString& sFitName)
 
     triggerLoadingStart("Performing Dipole Fit...");
 
-    m_Future = QtConcurrent::run(this,
-                                 &DipoleFit::dipoleFitCalculation);
+    m_Future = QtConcurrent::run([this] {
+        return this->dipoleFitCalculation();
+    });
 
     m_FutureWatcher.setFuture(m_Future);
 }
