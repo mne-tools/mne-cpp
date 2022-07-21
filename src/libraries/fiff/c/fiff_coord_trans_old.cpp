@@ -773,7 +773,7 @@ FiffCoordTransOld *FiffCoordTransOld::mne_read_transform_ascii(char *name, int f
     float dum;
 
     if ((in = fopen(name,"r")) == NULL) {
-        qCritical(name);
+        qCritical("%s", name);
         goto bad;
     }
     for (k = 0; k < 3; k++) {
