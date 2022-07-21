@@ -411,7 +411,7 @@ void BabyMEG::comFLL(QString t_sFLLControlCommand)
     int strlen = t_sFLLControlCommand.size();
     QByteArray Scmd = m_pMyClientComm->MGH_LM_Int2Byte(strlen);
     QByteArray SC = QByteArray("COMS")+Scmd;
-    SC.append(t_sFLLControlCommand);
+    SC.append(t_sFLLControlCommand.toUtf8());
     m_pMyClientComm->SendCommandToBabyMEGShortConnection(SC);
 }
 

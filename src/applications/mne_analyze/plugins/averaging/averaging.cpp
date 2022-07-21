@@ -402,12 +402,12 @@ void Averaging::computeAverage()
 
     triggerLoadingStart("Calculating average...");
 
-    m_Future = QtConcurrent::run(this,
-                                 &Averaging::averageCalculation,
-                                 *this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data(),
-                                 m_pFiffRawModel->getEventModel()->getEventMatrix(),
-                                 m_filterKernel,
-                                 *m_pFiffRawModel->getFiffInfo());
+    m_Future = QtConcurrent::run([&, this] {
+        return this->averageCalculation(*this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data(),
+                                        m_pFiffRawModel->getEventModel()->getEventMatrix(),
+                                        m_filterKernel,
+                                        *m_pFiffRawModel->getFiffInfo());
+    });
     m_FutureWatcher.setFuture(m_Future);
 }
 

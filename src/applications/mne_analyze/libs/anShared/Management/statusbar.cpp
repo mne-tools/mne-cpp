@@ -173,7 +173,7 @@ void StatusBar::enterEvent(QEvent *event)
     m_pHoverWidget->move(this->mapToGlobal(QPoint(static_cast<QHoverEvent*>(event)->pos().y(), static_cast<QHoverEvent*>(event)->pos().x())).x(), this->parentWidget()->mapToGlobal(this->pos()).y() - this->height() - m_pHoverWidget->height() - 5);
     m_pHoverWidget->show();
 
-    QWidget::enterEvent(event);
+    QWidget::enterEvent(static_cast<QEnterEvent*>(event));
 }
 
 //=============================================================================================================

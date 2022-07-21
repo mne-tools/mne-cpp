@@ -47,6 +47,7 @@
 //=============================================================================================================
 
 #include <QVector3D>
+#include <QRegularExpression>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -104,9 +105,11 @@ QVariant ChannelInfoModel::headerData(int section, Qt::Orientation orientation, 
     if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
         return QVariant();
 
+    Qt::Alignment a;
     switch(role) {
         case Qt::TextAlignmentRole:
-            return Qt::AlignHCenter + Qt::AlignVCenter;
+            a = Qt::AlignHCenter | Qt::AlignVCenter;
+            return QVariant(a);
 
         case Qt::DisplayRole: {
             //Return the number and description/comment of the fiff evoked data in the set as vertical header
@@ -198,7 +201,8 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
                     return v;
 
                 case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
+                    Qt::Alignment a = Qt::AlignHCenter | Qt::AlignVCenter;
+                    return QVariant(a);
             }
         }//end column check
 
@@ -216,7 +220,8 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
                     return v;
 
                 case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
+                    Qt::Alignment a = Qt::AlignHCenter | Qt::AlignVCenter;
+                    return QVariant(a);
             }
         }//end column check
 
@@ -236,7 +241,8 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
                     return v;
 
                 case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
+                    Qt::Alignment a = Qt::AlignHCenter | Qt::AlignVCenter;
+                    return QVariant(a);
             }
         }//end column check
 
@@ -256,7 +262,8 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
                     return v;
 
                 case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
+                    Qt::Alignment a = Qt::AlignHCenter | Qt::AlignVCenter;
+                    return QVariant(a);
             }
         }//end column check
 
@@ -274,7 +281,8 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
                     return v;
 
                 case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
+                    Qt::Alignment a = Qt::AlignHCenter | Qt::AlignVCenter;
+                    return QVariant(a);
             }
         }//end column check
 
@@ -300,7 +308,8 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
                     return v;
 
                 case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
+                    Qt::Alignment a = Qt::AlignHCenter | Qt::AlignVCenter;
+                    return QVariant(a);
             }
         }//end column check
 
@@ -318,7 +327,8 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
                     return v;
 
                 case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
+                    Qt::Alignment a = Qt::AlignHCenter | Qt::AlignVCenter;
+                    return QVariant(a);
             }
         }//end column check
 
@@ -338,7 +348,8 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
                     return v;
 
                 case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
+                    Qt::Alignment a = Qt::AlignHCenter | Qt::AlignVCenter;
+                    return QVariant(a);
             }
         }//end column check
 
@@ -360,7 +371,8 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
                     return v;
 
                 case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
+                    Qt::Alignment a = Qt::AlignHCenter | Qt::AlignVCenter;
+                    return QVariant(a);
             }
         }//end column check
 
@@ -427,7 +439,8 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
 //                }
 
                 case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
+                    Qt::Alignment a = Qt::AlignHCenter | Qt::AlignVCenter;
+                    return QVariant(a);
             }
         }
 
@@ -445,7 +458,8 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
                     return v;
 
                 case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
+                    Qt::Alignment a = Qt::AlignHCenter | Qt::AlignVCenter;
+                    return QVariant(a);
             }
         }//end column check
 
@@ -467,7 +481,8 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
                     return v;
 
                 case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
+                    Qt::Alignment a = Qt::AlignHCenter | Qt::AlignVCenter;
+                    return QVariant(a);
             }
         }//end column check
 
@@ -481,7 +496,8 @@ QVariant ChannelInfoModel::data(const QModelIndex &index, int role) const
                     return v;
 
                 case Qt::TextAlignmentRole:
-                    return Qt::AlignHCenter + Qt::AlignVCenter;
+                    Qt::Alignment a = Qt::AlignHCenter | Qt::AlignVCenter;
+                    return QVariant(a);
             }
         }//end column check
     } // end index.valid() check
@@ -616,13 +632,13 @@ void ChannelInfoModel::mapLayoutToChannels()
         //Get current channel information
         FiffChInfo chInfo = channelList.at(i);
         QString chName = chInfo.ch_name;
-        QRegExp regExpRemove;
+        QRegularExpression regExpRemove;
         bool flagOk = false;
 
         switch(chInfo.kind) {
             case FIFFV_MEG_CH:
                 //Scan for MEG string and other characters
-                regExpRemove = QRegExp("(MEG|-|_|/|\| )");
+                regExpRemove = QRegularExpression("(MEG|-|_|/|\| )");
                 chName.remove(regExpRemove);
 
                 //After cleaning the string try to convert the residual to an int number
@@ -633,7 +649,7 @@ void ChannelInfoModel::mapLayoutToChannels()
 
             case FIFFV_EEG_CH: {
                 //Scan for EEG string and other characters
-                regExpRemove = QRegExp("(EEG|-|_|/|\| )");
+                regExpRemove = QRegularExpression("(EEG|-|_|/|\| )");
                 chName.remove(regExpRemove);
 
                 //After cleaning the string try to convert the residual to an int number

@@ -63,7 +63,7 @@ MainSplashScreen::MainSplashScreen ()
 //=============================================================================================================
 
 MainSplashScreen::MainSplashScreen (const QPixmap & pixmap)
-: MainSplashScreen(pixmap, 0)
+: MainSplashScreen(pixmap, Qt::Widget)
 {
 }
 

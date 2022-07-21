@@ -53,7 +53,7 @@
 #include <QPointer>
 #include <QAction>
 #include <QFile>
-#include <QTime>
+#include <QElapsedTimer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -296,7 +296,7 @@ private:
 
     QFile                                   m_qFileOut;                     /**< QFile for writing to fif file.*/
     QString                                 m_sRecordFileName;              /**< Current record file. */
-    QTime                                   m_recordingStartedTime;         /**< The time when the recording started.*/
+    QElapsedTimer                           m_recordingStartedTime;         /**< The time when the recording started.*/
 
     QPointer<QAction>                       m_pActionRecordFile;            /**< start recording action. */
     QPointer<QAction>                       m_pActionClipRecording;

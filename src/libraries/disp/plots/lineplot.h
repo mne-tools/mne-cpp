@@ -78,7 +78,7 @@ namespace DISPLIB
  *
  * @brief Line Plot
  */
-class DISPSHARED_EXPORT LinePlot : public QtCharts::QChartView
+class DISPSHARED_EXPORT LinePlot : public QChartView
 {
     Q_OBJECT
 
@@ -180,8 +180,8 @@ private:
     QString                 m_sXLabel;          /**< X axes label. */
     QString                 m_sYLabel;          /**< Y axes label. */
 
-    QtCharts::QLineSeries*  m_pLineSeries;      /**< Line series. */
-    QtCharts::QChart*       m_pChart;           /**< The chart. */
+    QLineSeries*            m_pLineSeries;      /**< Line series. */
+    QChart*                 m_pChart;           /**< The chart. */
 };
 
 //=============================================================================================================

@@ -76,7 +76,6 @@ PluginConnectorConnectionWidget::PluginConnectorConnectionWidget(PluginConnector
     qint32 curRow = 0;
 
     QGridLayout *layout = new QGridLayout;
-    layout->setMargin(5);
     layout->addWidget(m_pLabel,curRow,0,1,3);
     ++curRow;
 

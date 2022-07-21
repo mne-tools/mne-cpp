@@ -73,7 +73,6 @@ StartUpWidget::StartUpWidget(QWidget *parent)
     bottomFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QVBoxLayout *layout = new QVBoxLayout;
-    layout->setMargin(5);
     layout->addWidget(topFiller);
     layout->addWidget(m_pLabel_Info);
     layout->addWidget(bottomFiller);

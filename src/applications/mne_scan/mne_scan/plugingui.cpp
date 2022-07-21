@@ -108,7 +108,7 @@ PluginGui::PluginGui(SCSHAREDLIB::PluginManager *pPluginManager,
     if(loadingState)
     {
         settings.setValue(QString("MNEScan/loadingState"), false);
-        loadConfig(QStandardPaths::writableLocation(QStandardPaths::DataLocation), "default.xml");
+        loadConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation), "default.xml");
     }
 
     settings.setValue(QString("MNEScan/loadingState"), true);
@@ -124,7 +124,7 @@ PluginGui::~PluginGui()
     //
     // Save current configuration
     //
-    saveConfig(QStandardPaths::writableLocation(QStandardPaths::DataLocation),"default.xml");
+    saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),"default.xml");
 
     m_pCurrentPlugin.reset();
 
@@ -395,7 +395,7 @@ bool PluginGui::removePlugin(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin)
         selectedPluginChanged(m_pCurrentPlugin);
     }
 
-    saveConfig(QStandardPaths::writableLocation(QStandardPaths::DataLocation),"default.xml");
+    saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),"default.xml");
 
     return bRemoved;
 }
@@ -420,7 +420,7 @@ void PluginGui::itemInserted(PluginItem *item)
     m_pButtonGroupPointers->button(int(PluginScene::MovePluginItem))->setChecked(true);
     m_pPluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
 
-    saveConfig(QStandardPaths::writableLocation(QStandardPaths::DataLocation),"default.xml");
+    saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),"default.xml");
 }
 
 //=============================================================================================================
@@ -488,7 +488,7 @@ void PluginGui::deleteItem()
 
 //=============================================================================================================
 
-void PluginGui::pointerGroupClicked(int)
+void PluginGui::pointerGroupClicked(QAbstractButton*)
 {
     m_pPluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
 }
@@ -625,7 +625,7 @@ void PluginGui::createToolbars()
     m_pButtonGroupPointers->addButton(m_pPointerButton, int(PluginScene::MovePluginItem));
     m_pButtonGroupPointers->addButton(m_pLinePointerButton, int(PluginScene::InsertLine));
 
-    connect(m_pButtonGroupPointers, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked),
+    connect(m_pButtonGroupPointers, &QButtonGroup::buttonClicked,
             this, &PluginGui::pointerGroupClicked);
 
     m_pToolBarPointer = new QToolBar(tr("Pointer type"), this);

@@ -48,6 +48,9 @@
 
 #include <Qt3DRender/QGeometryRenderer>
 #include <QPointer>
+#include <Qt3DCore/QBuffer>
+#include <Qt3DCore/QAttribute>
+#include <Qt3DCore/QGeometry>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -58,10 +61,6 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-namespace Qt3DRender {
-    class QBuffer;
-}
 
 //=============================================================================================================
 // DEFINE NAMESPACE DISP3DLIB
@@ -170,7 +169,7 @@ public:
      *
      * @param[in] pAttribute       New QAttribute.
      */
-    void addAttribute(Qt3DRender::QAttribute *pAttribute);
+    void addAttribute(Qt3DCore::QAttribute *pAttribute);
 
 protected:
     //=========================================================================================================
@@ -179,17 +178,17 @@ protected:
      */
     void init();
 
-    QPointer<Qt3DRender::QBuffer>       m_pVertexDataBuffer;       /**< The vertex buffer. */
-    QPointer<Qt3DRender::QBuffer>       m_pNormalDataBuffer;       /**< The normal buffer. */
-    QPointer<Qt3DRender::QBuffer>       m_pColorDataBuffer;        /**< The color buffer. */
-    QPointer<Qt3DRender::QBuffer>       m_pIndexDataBuffer;        /**< The index buffer. */
+    QPointer<Qt3DCore::QBuffer>       m_pVertexDataBuffer;       /**< The vertex buffer. */
+    QPointer<Qt3DCore::QBuffer>       m_pNormalDataBuffer;       /**< The normal buffer. */
+    QPointer<Qt3DCore::QBuffer>       m_pColorDataBuffer;        /**< The color buffer. */
+    QPointer<Qt3DCore::QBuffer>       m_pIndexDataBuffer;        /**< The index buffer. */
 
-    QPointer<Qt3DRender::QGeometry>     m_pCustomGeometry;         /**< The custom geometry. */
+    QPointer<Qt3DCore::QGeometry>       m_pCustomGeometry;         /**< The custom geometry. */
 
-    QPointer<Qt3DRender::QAttribute>    m_pIndexAttribute;         /**< The index attribute. */
-    QPointer<Qt3DRender::QAttribute>    m_pVertexAttribute;        /**< The position attribute. */
-    QPointer<Qt3DRender::QAttribute>    m_pNormalAttribute;        /**< The normal attribute. */
-    QPointer<Qt3DRender::QAttribute>    m_pColorAttribute;         /**< The color attribute. */
+    QPointer<Qt3DCore::QAttribute>      m_pIndexAttribute;         /**< The index attribute. */
+    QPointer<Qt3DCore::QAttribute>      m_pVertexAttribute;        /**< The position attribute. */
+    QPointer<Qt3DCore::QAttribute>      m_pNormalAttribute;        /**< The normal attribute. */
+    QPointer<Qt3DCore::QAttribute>      m_pColorAttribute;         /**< The color attribute. */
 
     int                                 m_iNumVert;                 /**< The total number of set vertices. */
 };

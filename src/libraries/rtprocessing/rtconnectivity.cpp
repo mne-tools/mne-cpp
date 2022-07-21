@@ -40,7 +40,6 @@
 
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/connectivity.h>
-#include <connectivity/network/network.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES

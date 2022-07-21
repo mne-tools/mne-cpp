@@ -268,7 +268,7 @@ FwdEegSphereModel* FwdEegSphereModel::fwd_create_eeg_sphere_model(const QString&
     /*
    * Sort...
    */
-    qSort (new_model->layers.begin(), new_model->layers.end(), FwdEegSphereLayer::comp_layers);
+    std::sort(new_model->layers.begin(), new_model->layers.end(), FwdEegSphereLayer::comp_layers);
 
     /*
    * Scale the radiuses

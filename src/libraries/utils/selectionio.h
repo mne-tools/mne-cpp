@@ -86,7 +86,7 @@ public:
      * @param[in] path holds the file path of the .sel file which is to be read.
      * @param[in] selectionMap holds the map to which the read selection groups are stored.
      */
-    static bool readMNESelFile(QString path, QMap<QString,QStringList> &selectionMap);
+    static bool readMNESelFile(QString path, QMultiMap<QString,QStringList> &selectionMap);
 
     //=========================================================================================================
     /**
@@ -102,7 +102,7 @@ public:
      * @param[in] path holds the file path of the .mon file which is to be read.
      * @param[in] selectionMap holds the map to which the read selection groups are stored.
      */
-    static bool readBrainstormMonFile(QString path, QMap<QString,QStringList> &selectionMap);
+    static bool readBrainstormMonFile(QString path, QMultiMap<QString,QStringList> &selectionMap);
 
     //=========================================================================================================
     /**
@@ -118,7 +118,7 @@ public:
      * @param[in] path holds the file path of the .sel file which is to be read.
      * @param[in] selectionMap holds the map to which the read selection groups are stored.
      */
-    static bool writeMNESelFile(QString path, const QMap<QString,QStringList> &selectionMap);
+    static bool writeMNESelFile(QString path, const QMultiMap<QString,QStringList> &selectionMap);
 
     //=========================================================================================================
     /**
@@ -134,7 +134,7 @@ public:
      * @param[in] path holds the file path of the .mon file which is to be read.
      * @param[in] selectionMap holds the map to which the read selection groups are stored.
      */
-    static bool writeBrainstormMonFiles(QString path, const QMap<QString,QStringList> &selectionMap);
+    static bool writeBrainstormMonFiles(QString path, const QMultiMap<QString,QStringList> &selectionMap);
 
     //=========================================================================================================
     /**

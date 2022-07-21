@@ -61,7 +61,7 @@
 #include <Qt3DRender/QBlendEquationArguments>
 #include <Qt3DRender/QCullFace>
 #include <Qt3DRender/QRenderCapture>
-#include <QGLFormat>
+#include <QOpenGLVersionProfile>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -96,7 +96,9 @@ CustomFrameGraph::CustomFrameGraph(Qt3DCore::QNode *parent)
 , m_bUseOpenGl4_3(false)
 {
     //Test for OpenGL version 4.3
-    if(QGLFormat::openGLVersionFlags() >= QGLFormat::OpenGL_Version_4_3) {
+    QOpenGLVersionProfile profile;
+    auto version = profile.version();
+    if ((version.first == 4 && version.second >= 3) || (version.first > 4)) {
         m_bUseOpenGl4_3 = true;
     }
 

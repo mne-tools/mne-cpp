@@ -563,15 +563,6 @@ private:
 
     //=========================================================================================================
     /**
-     * This is helper function, its main purpose is to avoid code redundancy.
-     *
-     * @param[in] loadFunction The function that will be run in the background. Should be either loadEarlierBlocks or loadLaterBlocks.
-     * @param[in] numBlocks The Number of blocks to load.
-     */
-    void startBackgroundOperation(int (FiffRawViewModel::*loadFunction)(int), int iBlocksToLoad);
-
-    //=========================================================================================================
-    /**
      * This is run concurrently
      *
      * @param[in] iCursorRequested Cursor that points to the requested sample.

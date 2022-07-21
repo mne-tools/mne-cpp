@@ -523,12 +523,12 @@ void CoRegistration::onFitICP()
 
     triggerLoadingStart("Performing ICP ...");
 
-    // start icp
-    m_Future = QtConcurrent::run(this,
-                                 &CoRegistration::computeICP,
-                                 m_transHeadMri,
-                                 m_digSetHead,
-                                 *m_pBem.data());
+    // start icp  
+    m_Future = QtConcurrent::run([&, this] {
+        return this->computeICP(m_transHeadMri,
+                                m_digSetHead,
+                                *m_pBem.data());
+    });
 
     m_FutureWatcher.setFuture(m_Future);
 

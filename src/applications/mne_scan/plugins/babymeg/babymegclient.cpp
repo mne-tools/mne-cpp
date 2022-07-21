@@ -493,7 +493,7 @@ void BabyMEGClient::ReadNextBlock(int tmp)
 void BabyMEGClient::SendCommand(QString s)
 {
     QByteArray array;
-    array.append(s);
+    array.append(s.toUtf8());
 
     qint64 WrtNum;
 

@@ -112,7 +112,7 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 
     if (outFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
         QTextStream textStream(&outFile);
-        textStream << txt << endl;
+        textStream << txt << Qt::endl;
     } else {
         qDebug() << "Unable to read data from file";
     }

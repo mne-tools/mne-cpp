@@ -42,7 +42,6 @@
 #include "ui_hpisettingsview.h"
 
 #include <fiff/fiff_dig_point_set.h>
-#include <fiff/fiff_dig_point.h>
 #include <iostream>
 
 //=============================================================================================================
@@ -111,7 +110,6 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
 
     //Init coil freqs
     m_vCoilFreqs << 293 << 307 << 314 << 321;
-    qRegisterMetaTypeStreamOperators<QVector<int> >("QVector<int>");
 
     loadSettings();
 }

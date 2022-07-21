@@ -311,7 +311,7 @@ QByteArray FiffStreamServer::parseToId(QString& p_sRawId, qint32& p_iParsedId)
                 {
                     p_iParsedId = i.key();
                     QString str = QString("\tconvert alias '%1' => %2\r\n").arg(i.value()->getAlias()).arg(i.key());
-                    t_blockCmdIdInfo.append(str);
+                    t_blockCmdIdInfo.append(str.toUtf8());
                     break;
                 }
             }
@@ -321,7 +321,7 @@ QByteArray FiffStreamServer::parseToId(QString& p_sRawId, qint32& p_iParsedId)
     if(p_iParsedId != -1)
     {
         QString str = QString("\tselect FiffStreamClient %1\r\n").arg(p_iParsedId);
-        t_blockCmdIdInfo.append(str);
+        t_blockCmdIdInfo.append(str.toUtf8());
     }
     else
     {

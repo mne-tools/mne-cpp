@@ -417,8 +417,8 @@ inline std::ostream& operator<<(std::ostream& out, const MNELIB::MNEInverseOpera
     out << "\n nchan: " << p_MNEInverseOperator.nchan << std::endl;
     out << "\n coord_frame:\n\t" << p_MNEInverseOperator.coord_frame << std::endl;
 
-    out << "\n eigen_leads: " << p_MNEInverseOperator.eigen_leads << std::endl;
-    out << "\n eigen_fields:\n\t" << p_MNEInverseOperator.eigen_fields << std::endl;
+    out << "\n eigen_leads: " << *(p_MNEInverseOperator.eigen_leads) << std::endl;
+    out << "\n eigen_fields:\n\t" << *(p_MNEInverseOperator.eigen_fields) << std::endl;
 
     return out;
 }

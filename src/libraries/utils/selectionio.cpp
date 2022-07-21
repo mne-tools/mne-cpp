@@ -69,7 +69,7 @@ SelectionIO::SelectionIO()
 
 //=============================================================================================================
 
-bool SelectionIO::readMNESelFile(QString path, QMap<QString,QStringList> &selectionMap)
+bool SelectionIO::readMNESelFile(QString path, QMultiMap<QString,QStringList> &selectionMap)
 {
     //Open .sel file
     if(!path.contains(".sel"))
@@ -157,7 +157,7 @@ bool SelectionIO::readMNESelFile(const std::string& path, std::multimap<std::str
 
 //=============================================================================================================
 
-bool SelectionIO::readBrainstormMonFile(QString path, QMap<QString,QStringList> &selectionMap)
+bool SelectionIO::readBrainstormMonFile(QString path, QMultiMap<QString,QStringList> &selectionMap)
 {
     //Open .sel file
     if(!path.contains(".mon"))
@@ -235,7 +235,7 @@ bool SelectionIO::readBrainstormMonFile(const std::string& path, std::multimap<s
 
 //=============================================================================================================
 
-bool SelectionIO::writeMNESelFile(QString path, const QMap<QString,QStringList> &selectionMap)
+bool SelectionIO::writeMNESelFile(QString path, const QMultiMap<QString,QStringList> &selectionMap)
 {
     //Open .sel file
     if(!path.contains(".sel"))
@@ -250,7 +250,7 @@ bool SelectionIO::writeMNESelFile(QString path, const QMap<QString,QStringList> 
     //Write selections to file
     QTextStream out(&file);
 
-    QMap<QString, QStringList>::const_iterator i = selectionMap.constBegin();
+    QMultiMap<QString, QStringList>::const_iterator i = selectionMap.constBegin();
     while (i != selectionMap.constEnd()) {
         out << i.key() << ":";
 
@@ -294,13 +294,13 @@ bool SelectionIO::writeMNESelFile(const std::string& path, const std::map<std::s
 
 //=============================================================================================================
 
-bool SelectionIO::writeBrainstormMonFiles(QString path, const QMap<QString,QStringList> &selectionMap)
+bool SelectionIO::writeBrainstormMonFiles(QString path, const QMultiMap<QString,QStringList> &selectionMap)
 {
     //Open .sel file
     if(!path.contains(".mon"))
         return false;
 
-    QMapIterator<QString,QStringList> i(selectionMap);
+    QMultiMapIterator<QString,QStringList> i(selectionMap);
     while (i.hasNext()) {
         i.next();
 
