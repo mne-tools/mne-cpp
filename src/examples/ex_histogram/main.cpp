@@ -67,6 +67,7 @@
 
 #include <QVector>
 #include <QTime>
+#include <QElapsedTimer>
 #include <QDebug>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QMainWindow>
@@ -214,7 +215,7 @@ int main(int argc, char *argv[])
     Eigen::VectorXi resultFrequency;
 
     //start of the histogram calculation, similar to matlab function of the same name
-    QTime myTimerHistCounts;
+    QElapsedTimer myTimerHistCounts;
     myTimerHistCounts.start();
     Eigen::VectorXd dataSine;
     dataSine = sineWaveGenerator(1.0e-6,(1.0/1.0e6), 0.0, 1.0);  //creates synthetic data using sineWaveGenerator function
@@ -229,7 +230,7 @@ int main(int argc, char *argv[])
     Spline* displayObj = new Spline(0, "MNE-CPP Histogram Example (Spline)");
     //Bar* displayObj = new Bar("MNE-CPP Histogram Example (Bar)");
 
-    QTime myTimerHistogram;
+    QElapsedTimer myTimerHistogram;
     myTimerHistogram.start();
     displayObj->setData(resultClassLimit, resultFrequency);
     QVector3D thresholdLines1(2.1e-10f, 5.0e-8f, 6.0e-7f);

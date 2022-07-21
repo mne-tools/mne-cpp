@@ -605,7 +605,6 @@ void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
         } else {
             // there are some blocks in the intersection of the old and the new window that can stay in the buffer:
             // simply load earlier blocks
-            //startBackgroundOperation(&FiffRawViewModel::loadEarlierBlocks, blockDist);
             postBlockLoad(loadEarlierBlocks(blockDist));
         }
     } else if (targetCursor + (m_iVisibleWindowSize * m_iSamplesPerBlock) >= m_iFiffCursorBegin + ((m_iPreloadBufferSize + 1) + m_iVisibleWindowSize) * m_iSamplesPerBlock
@@ -626,7 +625,6 @@ void FiffRawViewModel::updateHorizontalScrollPosition(qint32 newScrollPosition)
         } else {
             // there are some blocks in the intersection of the old and the new window that can stay in the buffer:
             // simply load later blocks
-            //startBackgroundOperation(&FiffRawViewModel::loadLaterBlocks, blockDist);
             postBlockLoad(loadLaterBlocks(blockDist));
         }
     }
@@ -669,15 +667,6 @@ void FiffRawViewModel::updateEndStartFlags()
 {
     m_bStartOfFileReached = m_iFiffCursorBegin <= absoluteFirstSample();
     m_bEndOfFileReached = (m_iFiffCursorBegin + m_iTotalBlockCount * m_iSamplesPerBlock) >= absoluteLastSample();
-}
-
-//=============================================================================================================
-
-void FiffRawViewModel::startBackgroundOperation(int (FiffRawViewModel::*loadFunction)(int), int iBlocksToLoad)
-{
-    m_bCurrentlyLoading = true;
-    QFuture<int> future = QtConcurrent::run(this, loadFunction, iBlocksToLoad);
-    m_blockLoadFutureWatcher.setFuture(future);
 }
 
 //=============================================================================================================
@@ -1019,7 +1008,7 @@ void FiffRawViewModel::reloadAllData()
 
 bool FiffRawViewModel::hasSavedEvents()
 {
-    return m_pEventModel;
+    return m_pEventModel == nullptr;
 }
 
 //=============================================================================================================

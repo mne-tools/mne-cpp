@@ -48,7 +48,7 @@
 #include <QTabWidget>
 #include <QSettings>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QDebug>
 
 //=============================================================================================================
@@ -298,7 +298,7 @@ void QuickControlView::loadSettings()
 
     QPoint pos = settings.value(m_sSettingsPath + QString("/QuickControlView/ViewPos"), QPoint(100,100)).toPoint();
 
-    QRect screenRect = QApplication::desktop()->screenGeometry();
+    QRect screenRect = QApplication::primaryScreen()->geometry();
     if(!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {
         move(QPoint(100,100));
     } else {

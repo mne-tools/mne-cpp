@@ -496,12 +496,9 @@ void EventView::onDetectTriggers(const QString &sChannelName,
 
     emit loadingStart("Detecting triggers...");
 
-    m_Future = QtConcurrent::run(this,
-                                 &EventView::detectTriggerCalculations,
-                                 sChannelName,
-                                 dThreshold,
-                                 *m_pFiffRawModel->getFiffInfo(),
-                                 *this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data());
+    m_Future = QtConcurrent::run([&, this] {
+        return this->detectTriggerCalculations(sChannelName, dThreshold, *m_pFiffRawModel->getFiffInfo(),*this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data());
+    });
     m_FutureWatcher.setFuture(m_Future);
 
 }

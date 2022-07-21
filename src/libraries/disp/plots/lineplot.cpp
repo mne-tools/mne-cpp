@@ -53,7 +53,6 @@
 
 using namespace DISPLIB;
 using namespace Eigen;
-using namespace QtCharts;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

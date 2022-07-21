@@ -59,6 +59,7 @@
 
 using namespace UTILSLIB;
 using namespace Eigen;
+using Qt::endl;
 
 //=============================================================================================================
 // DEFINES

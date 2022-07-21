@@ -322,11 +322,14 @@ QVariant EventModel::headerData(int section,
                                 Qt::Orientation orientation,
                                 int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
+    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole) {
         return QVariant();
+    }
 
-    if(role==Qt::TextAlignmentRole)
-        return Qt::AlignHCenter + Qt::AlignVCenter;
+    if(role==Qt::TextAlignmentRole) {
+        Qt::Alignment a = Qt::AlignHCenter | Qt::AlignVCenter;
+        return QVariant(a);
+    }
 
     if(orientation == Qt::Horizontal) {
         switch(section) {

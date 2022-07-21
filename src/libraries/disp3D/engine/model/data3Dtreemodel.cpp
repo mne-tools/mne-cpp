@@ -65,7 +65,6 @@
 #include <QSharedPointer>
 #include <Qt3DCore/QEntity>
 #include <QSurfaceFormat>
-#include <QGLFormat>
 
 //=============================================================================================================
 // EIGEN INCLUDES

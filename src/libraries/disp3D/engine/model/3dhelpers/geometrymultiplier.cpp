@@ -43,9 +43,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <Qt3DRender/QGeometry>
-#include <Qt3DRender/QBuffer>
-#include <Qt3DRender/QAttribute>
+#include <Qt3DCore/QGeometry>
+#include <Qt3DCore/QBuffer>
+#include <Qt3DCore/QAttribute>
 
 #include <Qt3DCore/QNode>
 
@@ -72,14 +72,14 @@ using namespace Qt3DRender;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-GeometryMultiplier::GeometryMultiplier(QSharedPointer<Qt3DRender::QGeometry> tGeometry,
+GeometryMultiplier::GeometryMultiplier(QSharedPointer<Qt3DCore::QGeometry> tGeometry,
                                          Qt3DCore::QNode *tParent)
 : QGeometryRenderer(tParent)
 , m_pGeometry(tGeometry)
-, m_pTransformBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
-, m_pColorBuffer(new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer))
-, m_pTransformAttribute(new QAttribute())
-, m_pColorAttribute(new QAttribute())
+, m_pTransformBuffer(new Qt3DCore::QBuffer())
+, m_pColorBuffer(new Qt3DCore::QBuffer())
+, m_pTransformAttribute(new Qt3DCore::QAttribute())
+, m_pColorAttribute(new Qt3DCore::QAttribute())
 {
     init();
 }
@@ -128,8 +128,8 @@ void GeometryMultiplier::init()
 {
     //Set transform attribute parameter
     m_pTransformAttribute->setName(QStringLiteral("instanceModelMatrix"));
-    m_pTransformAttribute->setAttributeType(QAttribute::VertexAttribute);
-    m_pTransformAttribute->setVertexBaseType(QAttribute::Float);
+    m_pTransformAttribute->setAttributeType(Qt3DCore::QAttribute::VertexAttribute);
+    m_pTransformAttribute->setVertexBaseType(Qt3DCore::QAttribute::Float);
     m_pTransformAttribute->setVertexSize(16);
     m_pTransformAttribute->setDivisor(1);
     m_pTransformAttribute->setByteOffset(0);
@@ -137,8 +137,8 @@ void GeometryMultiplier::init()
 
     //Set color attribute parameters
     m_pColorAttribute->setName(QStringLiteral("instanceColor"));
-    m_pColorAttribute->setAttributeType(QAttribute::VertexAttribute);
-    m_pColorAttribute->setVertexBaseType(QAttribute::Float);
+    m_pColorAttribute->setAttributeType(Qt3DCore::QAttribute::VertexAttribute);
+    m_pColorAttribute->setVertexBaseType(Qt3DCore::QAttribute::Float);
     m_pColorAttribute->setVertexSize(4);
 
     //Set divisor 0 to enable empty color buffer

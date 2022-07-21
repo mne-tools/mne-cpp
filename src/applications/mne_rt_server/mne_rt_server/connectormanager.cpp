@@ -312,9 +312,9 @@ QByteArray ConnectorManager::getConnectorList(bool p_bFlagJSON) const
             for( ; it != s_vecConnectors.end(); ++it)
             {
                 if((*it)->isActive())
-                    t_blockConnectorList.append(QString("  *  (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()));
+                    t_blockConnectorList.append(QString("  *  (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()).toUtf8());
                 else
-                    t_blockConnectorList.append(QString("     (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()));
+                    t_blockConnectorList.append(QString("     (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()).toUtf8());
             }
         }
         else
@@ -494,19 +494,19 @@ QByteArray ConnectorManager::setActiveConnector(qint32 ID)
            this->connectActiveConnector();
 
             str = QString("\t%1 activated.\r\n\n").arg(t_pNewActiveConnector->getName());
-            p_blockClientList.append(str);
+            p_blockClientList.append(str.toUtf8());
         }
         else
         {
             str = QString("\tID %1 doesn't match a connector ID.\r\n\n").arg(ID);
-            p_blockClientList.append(str);
+            p_blockClientList.append(str.toUtf8());
             p_blockClientList.append(getConnectorList());
         }
     }
     else
     {
         str = QString("\t%1 is already active.\r\n\n").arg(getActiveConnector()->getName());
-        p_blockClientList.append(str);
+        p_blockClientList.append(str.toUtf8());
     }
 
     return p_blockClientList;

@@ -490,7 +490,7 @@ bool IOUtils::read_eigen_matrix(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
         {
             QString line = in.readLine();
             if(!line.contains("#")) {
-                QStringList fields = line.split(QRegExp("\\s+"));
+                QStringList fields = line.split(QRegularExpression("\\s+"));
 
                 //Delete last element if it is a blank character
                 if(fields.at(fields.size()-1) == "")
