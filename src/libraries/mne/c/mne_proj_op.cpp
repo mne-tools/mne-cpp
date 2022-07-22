@@ -484,7 +484,7 @@ MneProjOp *MneProjOp::mne_read_proj_op_from_node(FiffStream::SPtr &stream, const
     FiffDirNode::SPtr node;
     int         k;
     QString     item_desc,desc_tag;
-    int         global_nchan,item_nchan,nlist;
+    int         global_nchan,item_nchan;
     QStringList item_names;
     int         item_kind;
     float       **item_vectors = NULL;

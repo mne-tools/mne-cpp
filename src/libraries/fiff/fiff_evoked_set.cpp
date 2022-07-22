@@ -197,7 +197,7 @@ bool FiffEvokedSet::find_evoked(const FiffEvokedSet& p_FiffEvokedSet) const
         return false;
     }
     else
-        printf("\nFound %d evoked response data sets in %s :\n",(int)p_FiffEvokedSet.evoked.size(),p_FiffEvokedSet.info.filename.toUtf8().constData());
+        printf("\nFound %lld evoked response data sets in %s :\n",p_FiffEvokedSet.evoked.size(),p_FiffEvokedSet.info.filename.toUtf8().constData());
 
     for(qint32 i = 0; i < p_FiffEvokedSet.evoked.size(); ++i) {
         printf("%s (%s)\n",p_FiffEvokedSet.evoked.at(i).comment.toUtf8().constData(),p_FiffEvokedSet.evoked.at(i).aspectKindToString().toUtf8().constBegin());
@@ -253,7 +253,7 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice,
     QString t;
     if(!t_pStream->get_evoked_entries(evoked_node, comments, aspect_kinds, t))
         t = QString("None found, must use integer");
-    printf("\tFound %d datasets\n", (int)evoked_node.size());
+    printf("\tFound %lld datasets\n", evoked_node.size());
 
     for(qint32 i = 0; i < comments.size(); ++i)
     {

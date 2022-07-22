@@ -56,10 +56,10 @@ FiffChInfo::FiffChInfo()
 , kind(0)
 , range(1.0f)
 , cal(1.0f)
-, coord_frame(FIFFV_COORD_UNKNOWN)
 , unit(0)
 , unit_mul(0)
 , ch_name(QString(""))
+, coord_frame(FIFFV_COORD_UNKNOWN)
 {
     coil_trans.setIdentity();
 }
@@ -73,12 +73,12 @@ FiffChInfo::FiffChInfo(const FiffChInfo &p_FiffChInfo)
 , range(p_FiffChInfo.range)
 , cal(p_FiffChInfo.cal)
 , chpos(p_FiffChInfo.chpos)
-, coil_trans(p_FiffChInfo.coil_trans)
-, eeg_loc(p_FiffChInfo.eeg_loc)
-, coord_frame(p_FiffChInfo.coord_frame)
 , unit(p_FiffChInfo.unit)
 , unit_mul(p_FiffChInfo.unit_mul)
 , ch_name(p_FiffChInfo.ch_name)
+, coil_trans(p_FiffChInfo.coil_trans)
+, eeg_loc(p_FiffChInfo.eeg_loc)
+, coord_frame(p_FiffChInfo.coord_frame)
 {
 }
 

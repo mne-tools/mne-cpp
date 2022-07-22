@@ -98,6 +98,8 @@ FiffDigitizerData::FiffDigitizerData(const FiffDigitizerData& p_FiffDigitizerDat
 , head_mri_t_adj(p_FiffDigitizerData.head_mri_t_adj)
 , points(p_FiffDigitizerData.points)
 , coord_frame(p_FiffDigitizerData.coord_frame)
+, active(p_FiffDigitizerData.active)
+, discard(p_FiffDigitizerData.discard)
 , npoint(p_FiffDigitizerData.npoint)
 , mri_fids(p_FiffDigitizerData.mri_fids)
 , nfids(p_FiffDigitizerData.nfids)
@@ -107,8 +109,6 @@ FiffDigitizerData::FiffDigitizerData(const FiffDigitizerData& p_FiffDigitizerDat
 , closest(p_FiffDigitizerData.closest)
 , closest_point(p_FiffDigitizerData.closest_point)
 , dist_valid(p_FiffDigitizerData.dist_valid)
-, active(p_FiffDigitizerData.active)
-, discard(p_FiffDigitizerData.discard)
 {
 }
 

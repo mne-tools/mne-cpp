@@ -68,7 +68,6 @@ bool MNE::read_events(QString t_sEventName,
 {
     QFile t_EventFile;
     qint32 p;
-    bool status = false;
 
     if (t_sEventName.isEmpty()) {
         p = t_fileRawName.indexOf(".fif");

@@ -548,6 +548,7 @@ int MneCovMatrix::mne_decompose_eigen_cov_small(MneCovMatrix *c, float p_small, 
             return FAIL;
 
         np = c->ncov*(c->ncov+1)/2;
+        (void)np; // squash unused variable warning, what is this for?
         c->lambda = MALLOC_30(c->ncov,double);
         c->eigen  = ALLOC_CMATRIX_30(c->ncov,c->ncov);
         if (mne_decompose_eigen (c->cov,c->lambda,c->eigen,c->ncov) != 0)

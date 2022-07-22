@@ -232,7 +232,6 @@ void mne_matt_mat_mult2_20 (float **m1,float **m2,float **result,
     #else
     int j,k,p;
     float sum;
-    int  one = 1;
 
     for (j = 0; j < d1; j++)
         for (k = 0; k < d3; k++) {

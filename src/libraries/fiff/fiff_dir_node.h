@@ -46,7 +46,6 @@
 #include "fiff_types.h"
 #include "fiff_dir_entry.h"
 #include "fiff_id.h"
-#include "fiff_explain.h"
 
 //=============================================================================================================
 // QT INCLUDES
