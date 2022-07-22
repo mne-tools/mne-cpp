@@ -143,7 +143,7 @@ MneMshDisplaySurface::~MneMshDisplaySurface()
     FREE_44(surf_name);
     FREE_44(picked);
     if (user_data_free)
-      delete user_data;
+      (*user_data_free)(user_data);
 
     for (int k = 0; k < nmap; k++)
       delete maps[k];

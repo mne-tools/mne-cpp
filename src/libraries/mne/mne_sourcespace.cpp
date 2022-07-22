@@ -302,7 +302,7 @@ bool MNESourceSpace::readFromStream(FiffStream::SPtr& p_pStream,
 //           src(k) = this;
     }
 
-    printf("\t%d source spaces read\n", spaces.size());
+    printf("\t%lld source spaces read\n", spaces.size());
 
     if(open_here)
         p_pStream->close();
@@ -768,7 +768,7 @@ void MNESourceSpace::writeToStream(FiffStream* p_pStream)
         p_pStream->end_block(FIFFB_MNE_SOURCE_SPACE);
         printf("[done]\n");
     }
-    printf("\t%d source spaces written\n", m_qListHemispheres.size());
+    printf("\t%lld source spaces written\n", m_qListHemispheres.size());
 }
 
 //=============================================================================================================

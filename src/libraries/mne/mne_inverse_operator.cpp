@@ -781,7 +781,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
             forward.prepare_forward(info, p_outNoiseCov, false, gain_info, gain, p_outNoiseCov, whitener, n_nzero);
         }
     }
-    printf("\tComputing inverse operator with %d channels.\n", gain_info.ch_names.size());
+    printf("\tComputing inverse operator with %lld channels.\n", gain_info.ch_names.size());
 
     //
     // 6. Compose the source covariance matrix
