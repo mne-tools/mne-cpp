@@ -2206,7 +2206,7 @@ int MneSurfaceOrVolume::mne_find_sources_in_label(char *label, MneSourceSpaceOld
        * Read the label file
        */
     if ((in = fopen(label,"r")) == NULL) {
-        qCritical(label);//err_set_sys_error(label);
+        qCritical("%s", label);//err_set_sys_error(label);
         goto out;
     }
     c = fgetc(in);
@@ -2354,7 +2354,7 @@ int MneSurfaceOrVolume::mne_write_label(char *label, char *comment, int *sel, in
        * Read the label file
        */
     if ((out = fopen(label,"w")) == NULL) {
-        qCritical(label);//err_set_sys_error(label);
+        qCritical("%s", label);//err_set_sys_error(label);
         goto out;
     }
     if (comment == NULL)
@@ -2970,7 +2970,7 @@ void MneSurfaceOrVolume::get_head_scale(FIFFLIB::FiffDigitizerData* dig,
         }
     }
 
-    if (UTILSLIB::Sphere::fit_sphere_to_points(dig_rr,ndig,simplex_size,r0,&Rdig) == FAIL){
+    if (!UTILSLIB::Sphere::fit_sphere_to_points(dig_rr,ndig,simplex_size,r0,&Rdig)){
         goto out;
     }
 
@@ -2992,7 +2992,7 @@ void MneSurfaceOrVolume::get_head_scale(FIFFLIB::FiffDigitizerData* dig,
         }
     }
 
-    if (UTILSLIB::Sphere::fit_sphere_to_points(head_rr,nhead,simplex_size,r0,&Rscalp) == FAIL) {
+    if (!UTILSLIB::Sphere::fit_sphere_to_points(head_rr,nhead,simplex_size,r0,&Rscalp)) {
         goto out;
     }
 
@@ -3423,7 +3423,7 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
     int   which;
 
     if (fp == NULL) {
-        qCritical(fname);
+        qCritical("%s", fname);
         goto bad;
     }
     if (mne_read_int3(fp,&magic) != 0) {
@@ -3633,7 +3633,7 @@ int MneSurfaceOrVolume::mne_read_curvature_file(char  *fname,
     int   val,k;
 
     if (!fp) {
-        qCritical(fname);
+        qCritical("%s", fname);
         goto bad;
     }
     if (mne_read_int3(fp,&magic) != 0) {

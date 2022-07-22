@@ -120,8 +120,6 @@ void fromFloatEigenMatrix_14(const Eigen::MatrixXf& from_mat, float **& to_mat)
 MneNamedMatrix::MneNamedMatrix()
 : nrow(0)
 , ncol(0)
-, rowlist(NULL)
-, collist(NULL)
 , data(NULL)
 {
 }

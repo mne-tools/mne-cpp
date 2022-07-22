@@ -212,7 +212,6 @@ using namespace MNELIB;
 
 MneProjOp::MneProjOp()
 : nitems (0)
-, names (NULL)
 , nch (0)
 , nvec (0)
 , proj_data (NULL)
