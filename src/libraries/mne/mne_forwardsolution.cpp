@@ -245,7 +245,8 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
         else
             printf("Cluster Right Hemisphere\n");
 
-        Colortable t_CurrentColorTable = p_AnnotationSet[h].getColortable();
+        const Annotation annotation = p_AnnotationSet[h];
+        Colortable t_CurrentColorTable = annotation.getColortable();
         VectorXi label_ids = t_CurrentColorTable.getLabelIds();
 
         // Get label ids for every vertex
@@ -1244,7 +1245,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
         bads = t_pStream->read_bad_channels(t_pStream->dirtree());
         if(bads.size() > 0)
         {
-            printf("\t%d bad channels ( ",bads.size());
+            printf("\t%lld bad channels ( ",bads.size());
             for(qint32 i = 0; i < bads.size(); ++i)
                 printf("\"%s\" ", bads[i].toUtf8().constData());
             printf(") read\n");
@@ -1773,7 +1774,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
     // Figure out which ones have been used
     if(info.chs.size() != G.rows())
     {
-        printf("Error G.rows() and length of info.chs do not match: %ld != %i", G.rows(), info.chs.size()); //ToDo throw
+        printf("Error G.rows() and length of info.chs do not match: %ld != %lli", G.rows(), info.chs.size()); //ToDo throw
         return;
     }
 

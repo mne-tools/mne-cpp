@@ -126,7 +126,7 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
     MatrixXd timesDummy;
     MatrixXd times;
 
-    QScopedPointer<MNEEpochData> epoch(Q_NULLPTR);
+    std::unique_ptr<MNEEpochData> epoch(Q_NULLPTR);
 
     for (p = 0; p < count; ++p) {
         // Read a data segment
@@ -159,10 +159,10 @@ MNEEpochDataList MNEEpochDataList::readEpochs(const FiffRawData& raw,
             //Check if data block has the same size as the previous one
             if(!data.isEmpty()) {
                 if(epoch->epoch.size() == data.last()->epoch.size()) {
-                    data.append(MNEEpochData::SPtr(epoch.take()));//List takes ownwership of the pointer - no delete need
+                    data.append(MNEEpochData::SPtr(epoch.release()));//List takes ownwership of the pointer - no delete need
                 }
             } else {
-                data.append(MNEEpochData::SPtr(epoch.take()));//List takes ownwership of the pointer - no delete need
+                data.append(MNEEpochData::SPtr(epoch.release()));//List takes ownwership of the pointer - no delete need
             }
         } else {
             qWarning("[MNEEpochDataList::readEpochs] Can't read the event data segments.");
