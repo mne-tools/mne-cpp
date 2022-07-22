@@ -587,6 +587,8 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
 //                            matGainDiff = itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_G_partial.block(0, k*3, t_G_partial.rows(), 3);
                         }
                     }
+                    (void)j_min; // squash compiler warning, set but unused
+
 
 //                    qListGainDist.append(matGainDiff);
 

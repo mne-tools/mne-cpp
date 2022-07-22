@@ -562,8 +562,8 @@ void mne_mat_vec_mult2_32 (float **m,float *v,float *result, int d1,int d2)
 MneCTFCompDataSet::MneCTFCompDataSet()
 :ncomp(0)
 ,nch(0)
-,current(NULL)
 ,undo(NULL)
+,current(NULL)
 {
 }
 

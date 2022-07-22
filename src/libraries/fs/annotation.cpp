@@ -65,9 +65,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 Annotation::Annotation()
-: m_sFilePath("")
-, m_sFileName("")
-, m_iHemi(-1)
+: m_iHemi(-1)
 {
 }
 
@@ -84,9 +82,7 @@ Annotation::Annotation(const QString& p_sFileName)
 //=============================================================================================================
 
 Annotation::Annotation(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir)
-: m_sFilePath("")
-, m_sFileName("")
-, m_iHemi(-1)
+: m_iHemi(-1)
 {
     Annotation::read(subject_id, hemi, atlas, subjects_dir, *this);
 }
@@ -94,9 +90,7 @@ Annotation::Annotation(const QString &subject_id, qint32 hemi, const QString &at
 //=============================================================================================================
 
 Annotation::Annotation(const QString &path, qint32 hemi, const QString &atlas)
-: m_sFilePath("")
-, m_sFileName("")
-, m_iHemi(-1)
+: m_iHemi(-1)
 {
     Annotation::read(path, hemi, atlas, *this);
 }

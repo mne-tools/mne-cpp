@@ -311,19 +311,20 @@ static int comp_points1(const void *vp1,const void *vp2)
         return -1;
 }
 
-static int comp_points2(const void *vp1,const void *vp2)
+// Squash compiler warning, unused function
+//static int comp_points2(const void *vp1,const void *vp2)
 
-{
-    MneNearest* v1 = (MneNearest*)vp1;
-    MneNearest* v2 = (MneNearest*)vp2;
+//{
+//    MneNearest* v1 = (MneNearest*)vp1;
+//    MneNearest* v2 = (MneNearest*)vp2;
 
-    if (v1->vert > v2->vert)
-        return 1;
-    else if (v1->vert == v2->vert)
-        return 0;
-    else
-        return -1;
-}
+//    if (v1->vert > v2->vert)
+//        return 1;
+//    else if (v1->vert == v2->vert)
+//        return 0;
+//    else
+//        return -1;
+//}
 
 void mne_sort_nearest_by_nearest(MneNearest* points, int npoint)
 
@@ -519,6 +520,7 @@ int MneSurfaceOrVolume::mne_filter_source_spaces(MneSurfaceOld* surf, float limi
                 }
             }
     }
+    (void)minnode; // squash compiler warning, this is unused
     if (omit_outside > 0)
         printf("%d source space points omitted because they are outside the inner skull surface.\n",
                omit_outside);
@@ -703,6 +705,7 @@ void *MneSurfaceOrVolume::filter_source_space(void *arg)
             }
         }
     }
+    (void)minnode; // squash compiler warning, set but unused
     if (omit_outside > 0)
         printf("%d source space points omitted because they are outside the inner skull surface.\n",
                 omit_outside);
@@ -1545,6 +1548,7 @@ void MneSurfaceOrVolume::mne_find_closest_on_surface_approx(MneSurfaceOld* s, fl
             nearest[k] =  mne_project_to_surface(s,p,r[k],0,dist ? dist+k : &mydist);
         }
     }
+    (void)was; // squash compiler warning, set but unused
 
     printf("[done]\n");
     delete p;
@@ -3992,6 +3996,7 @@ MneVolGeom* MneSurfaceOrVolume::read_vol_geom(FILE *fp)
         delete vg;
         vg = new MneVolGeom();
     }
+    (void)fail; // squash compiler warning, set but unused
     return vg;
 }
 
