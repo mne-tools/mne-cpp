@@ -6,7 +6,7 @@ on:
     - main
 
 jobs:
-  MinQt5Dynamic:
+  MinQtDynamic:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -98,7 +98,7 @@ jobs:
       run: |
         ./tools/deployment/deploy.bat dynamic pack
 
-  MaxQt5Dynamic:
+  MaxQtDynamic:
     runs-on: ${{ matrix.os }}
 
     strategy:
@@ -347,7 +347,7 @@ jobs:
       run: |
         ./tools/deployment/deploy.bat static pack
 
-  TestsQt5:
+  Tests:
     runs-on: ${{ matrix.os }}
 
     strategy:
