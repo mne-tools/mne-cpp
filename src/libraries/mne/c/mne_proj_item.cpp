@@ -64,8 +64,8 @@ using namespace MNELIB;
 
 MneProjItem::MneProjItem()
 : vecs (NULL)
-, kind (FIFFV_PROJ_ITEM_NONE)
 , nvec (0)
+, kind (FIFFV_PROJ_ITEM_NONE)
 , active (TRUE)
 , active_file (FALSE)
 , has_meg (FALSE)

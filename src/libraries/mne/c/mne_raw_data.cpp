@@ -332,7 +332,7 @@ void mne_fft_ana(float *data,int np, float **precalcp)
       * FFT analysis for real data
       */
 {
-    float *precalc;
+    //float *precalc;
 
     printf("##################### DEBUG Error: FFT analysis needs to be implemented");
 
@@ -355,8 +355,8 @@ void mne_fft_syn(float *data,int np, float **precalcp)
       * FFT synthesis for real data
       */
 {
-    float *precalc;
-    float mult;
+    //float *precalc;
+    //float mult;
 
     printf("##################### DEBUG Error: FFT synthesis needs to be implemented");
 
@@ -884,35 +884,35 @@ static int approx_ring_buf_size = APPROX_RING_BUF_SIZE;
 
 MneRawData::MneRawData()
 :info(NULL)
+,nbad(0)
+,bad(NULL)
 ,bufs(NULL)
 ,nbuf(0)
-,proj(NULL)
-,bad(NULL)
-,nbad(0)
+,filt_bufs(NULL)
+,nfilt_buf(0)
 ,first_samp(0)
 ,omit_samp(0)
 ,omit_samp_old(0)
-,event_list(NULL)
-,max_event(0)
-,dig_trigger_mask(0)
-,ring(NULL)
-,filt_ring(NULL)
-,filt_bufs(NULL)
-,nfilt_buf(0)
 ,first_sample_val(NULL)
+,proj(NULL)
+,sss(NULL)
+,comp(NULL)
+,comp_file(MNE_CTFV_NOGRAD)
+,comp_now(MNE_CTFV_NOGRAD)
 ,filter(NULL)
 ,filter_data(NULL)
 ,filter_data_free(NULL)
+,event_list(NULL)
+,max_event(0)
+,dig_trigger_mask(0)
 ,offsets(NULL)
+,ring(NULL)
+,filt_ring(NULL)
 ,deriv(NULL)
 ,deriv_matched(NULL)
 ,deriv_offsets(NULL)
 ,user(NULL)
 ,user_free(NULL)
-,comp(NULL)
-,comp_file(MNE_CTFV_NOGRAD)
-,comp_now(MNE_CTFV_NOGRAD)
-,sss(NULL)
 {
 }
 
@@ -1661,6 +1661,7 @@ int MneRawData::mne_raw_pick_data_filt(MneRawData *data, mneChSelection sel, int
             }
         }
     }
+    (void)bs2; // squash compiler warning, this is unused
     FREE_CMATRIX_36(deriv_vals);
     FREE_36(dc);
     return OK;
