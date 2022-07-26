@@ -197,7 +197,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        qt: [6.2.4]
+        qt: [6.2.0]
         os: [ubuntu-latest, macos-latest, windows-2019]
 
     steps:
@@ -458,13 +458,13 @@ jobs:
       if: (matrix.os == 'ubuntu-latest') || (matrix.os == 'macos-latest')
       uses: jurplel/install-qt-action@v3
       with:
-        version: 6.2.4
+        version: 6.2.0
         modules: qtcharts
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2019'
       uses: jurplel/install-qt-action@v3
       with:
-        version: 6.2.4
+        version: 6.2.0
         arch: win64_msvc2019_64
         modules: qtcharts
     - name: Install jom (Windows)
