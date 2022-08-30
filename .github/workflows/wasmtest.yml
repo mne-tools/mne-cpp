@@ -13,49 +13,10 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
-    - name: Setup emscripten compiler 
+    - name: Setup and build WASM
       run: |
         cd ..
-        # Get the emsdk repo
-        git clone https://github.com/emscripten-core/emsdk.git
-        # Enter that directory and pull
-        cd emsdk
-        git pull
-        # Download and install the latest SDK tools.
-        ./emsdk install 1.39.7     
-    # - name: Install Qt
-    #   run: |
-    #     # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
-    #     wget -O qt5_5151_static_binaries_wasm.tar.gz https://www.dropbox.com/s/6uxny1ruajf3q91/qt5_5151_static_binaries_wasm.tar.gz?dl=1
-    #     mkdir ../Qt5_binaries
-    #     tar xvzf qt5_51512_static_binaries_wasm.tar.gz -C ../ -P  
-    # Uncomment this if you want to build Qt statically in this workflow         
-    - name: Compile wasm Qt version
-      run: |
-        cd ..
-        # Make the "latest" emscripten SDK "active" for the current user.
-        ./emsdk/emsdk activate 1.39.7
-        # Activate PATH and other environment variables in the current terminal
-        source ./emsdk/emsdk_env.sh
-        # Clone Qt5 repo
-        git clone https://code.qt.io/qt/qt5.git -b 5.15.2
-        cd qt5
-        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg
-        # Configure Qt5
-        ./configure -xplatform wasm-emscripten -feature-thread -skip webengine -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -prefix "$PWD/../Qt5_binaries"
-        make module-qtbase module-qtsvg module-qtcharts -j4
-        make install -j4
-    - name: Configure and compile MNE-CPP
-      run: |
-        cd ..
-        # Make the "latest" emscripten SDK "active" for the current user.
-        ./emsdk/emsdk activate 1.39.7
-        # Activate PATH and other environment variables in the current terminal
-        source ./emsdk/emsdk_env.sh
-        # Compile MNE-CPP        
-        cd mne-cpp
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG=wasm
-        make -j4        
+        ./mne-cpp/tools/deployment/wasm.sh --source https://github.com/mne-tools/mne-cpp.git --qt 5.15 --emsdk 3.1.20
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
