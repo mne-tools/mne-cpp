@@ -1,5 +1,8 @@
 #!/bin/bash
 
+argc=$#
+argv=("$@")
+
 ## User editable through flags
 SOURCE_REPO=""
 EMSDK_VERSION="latest"
@@ -18,8 +21,13 @@ for (( j=0; j<argc; j++)); do
     fi
 done
 
-if [ "$1" ]; then
-	SOURCE_REPO="$1"
+echo "${SOURCE_REPO}"
+
+echo "${EMSDK_VERSION}"
+
+echo "${QT_VERSION}"
+
+if [ "${SOURCE_REPO}" ]; then
 	echo "Source repo set to ${SOURCE_REPO}"
 else
 	echo "No source specified."
