@@ -562,48 +562,17 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
-    - name: Setup emscripten compiler
+    - name: Setup and build WASM
       run: |
         cd ..
-        # Get the emsdk repo
-        git clone https://github.com/emscripten-core/emsdk.git
-        # Enter that directory and pull
-        cd emsdk
-        git pull
-        # Download and install the latest SDK tools.
-        ./emsdk install 1.39.7
-    - name: Compile wasm Qt version
-      run: |
-        cd ..
-        # Make the "latest" emscripten SDK "active" for the current user.
-        ./emsdk/emsdk activate 1.39.7
-        # Activate PATH and other environment variables in the current terminal
-        source ./emsdk/emsdk_env.sh
-        # Clone Qt5 repo
-        git clone https://code.qt.io/qt/qt5.git -b 5.15.2
-        cd qt5
-        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg
-        # Configure Qt5
-        ./configure -xplatform wasm-emscripten -feature-thread -skip webengine -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -prefix "$PWD/../Qt5_binaries"
-        make module-qtbase module-qtsvg module-qtcharts -j4
-        make install -j4
-    - name: Configure and compile MNE-CPP
-      run: |
-        cd ..
-        # Make the "latest" emscripten SDK "active" for the current user.
-        ./emsdk/emsdk activate 1.39.7
-        # Activate PATH and other environment variables in the current terminal
-        source ./emsdk/emsdk_env.sh
-        # Compile MNE-CPP
-        cd mne-cpp
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG=wasm
-        make -j4
+        ./mne-cpp/tools/deployment/wasm.sh --source https://github.com/mne-tools/mne-cpp.git --qt 5.15 --emsdk 3.1.20
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
         credentials: ${{secrets.GIT_CREDENTIALS}}
     - name: Clone and update mne-cpp/wasm:gh-pages
       run: |
+        cd mne-cpp
         # Delete folders which we do not want to ship
         rm -r bin/mne_analyze_plugins
         rm -r bin/mne-cpp-test-data
