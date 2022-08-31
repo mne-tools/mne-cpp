@@ -14,7 +14,7 @@ jobs:
       max-parallel: 3
       matrix:
         qt: [5.10.1]
-        os: [ubuntu-18.04, macos-latest, windows-2016]
+        os: [ubuntu-18.04, macos-latest, windows-2019]
 
     steps:
     - name: Clone repository
@@ -35,20 +35,20 @@ jobs:
         version: ${{ matrix.qt }}
         modules: qtcharts
     - name: Install Qt (Windows)
-      if: matrix.os == 'windows-2016'
+      if: matrix.os == 'windows-2019'
       uses: jurplel/install-qt-action@v2
       with:
         version: ${{ matrix.qt }}
         arch: win64_msvc2017_64
         modules: qtcharts
     - name: Install jom (Windows)
-      if: matrix.os == 'windows-2016'
+      if: matrix.os == 'windows-2019'
       run: |
         Invoke-WebRequest https://www.dropbox.com/s/gbf8sdx8wqxcrnd/jom.zip?dl=1 -OutFile .\jom.zip
         expand-archive -path "jom.zip"
         echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Compile BrainFlow submodule (Windows)
-      if: matrix.os == 'windows-2016'
+      if: matrix.os == 'windows-2019'
       run: |
         cd applications\mne_scan\plugins\brainflowboard\brainflow
         mkdir build
@@ -65,7 +65,7 @@ jobs:
         make
         make install
     - name: Compile LSL submodule (Windows)
-      if: matrix.os == 'windows-2016'
+      if: matrix.os == 'windows-2019'
       run: |
         cd applications\mne_scan\plugins\lsladapter\liblsl
         mkdir build
@@ -87,7 +87,7 @@ jobs:
         qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl MNECPP_CONFIG+=withAppBundles
         make -j4
     - name: Configure and compile MNE-CPP (Windows)
-      if: matrix.os == 'windows-2016'
+      if: matrix.os == 'windows-2019'
       run: |
         # Setup VS compiler
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
