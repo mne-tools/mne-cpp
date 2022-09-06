@@ -6,8 +6,8 @@
 # reuse them if they are already present. 
 ###
 
-argc=$#
-argv=("$@")
+argc=$# # number of arguments passed (not counting the command itself)
+argv=("$@") # list of arguments passed (not including the command itself)
 
 ## User editable through flags
 SOURCE_REPO=""
@@ -20,14 +20,18 @@ set -e
 for (( j=0; j<argc; j++)); do
     if [ "${argv[j]}" == "--source" ] || [ "${argv[j]}" == "-s" ]; then
         SOURCE_REPO="${argv[j+1]}" 
+		j=$j+1
     elif [ "${argv[j]}" == "--emsdk" ] || [ "${argv[j]}" == "-e" ]; then
         EMSDK_VERSION="${argv[j+1]}" 
+		j=$j+1
     elif [ "${argv[j]}" == "--qt" ] || [ "${argv[j]}" == "-q" ]; then
-        QT_VERSION="${argv[j+1]}" 
+        QT_VERSION="${argv[j+1]}"
+		j=$j+1
     fi
 done
 
-# echo "${SOURCE_REPO}"
+## Left for debugging purposes
+# echo "Source re${SOURCE_REPO}"
 # echo "${EMSDK_VERSION}"
 # echo "${QT_VERSION}"
 
