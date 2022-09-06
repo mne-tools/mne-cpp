@@ -572,7 +572,6 @@ jobs:
         credentials: ${{secrets.GIT_CREDENTIALS}}
     - name: Clone and update mne-cpp/wasm:gh-pages
       run: |
-        cd mne-cpp
         # Delete folders which we do not want to ship
         rm -r bin/mne_analyze_plugins
         rm -r bin/mne-cpp-test-data
