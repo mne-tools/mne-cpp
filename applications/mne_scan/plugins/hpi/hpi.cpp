@@ -79,7 +79,7 @@ using namespace INVERSELIB;
 // DEFINE LOCAL CONSTANTS
 //=============================================================================================================
 
-constexpr const int defaultFittingWindowSize(300);
+constexpr const int defaultFittingWindowSize(2000);
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -87,7 +87,7 @@ constexpr const int defaultFittingWindowSize(300);
 
 Hpi::Hpi()
 : m_iNumberBadChannels(0)
-, m_iFittingWindowSize(defaultFittingWindowSize)
+, m_iRepetitionTimeInSamples(defaultFittingWindowSize)
 , m_dAllowedMeanErrorDist(10)
 , m_dAllowedMovement(3)
 , m_dAllowedRotation(5)
@@ -322,7 +322,9 @@ void Hpi::initPluginControlWidgets()
                 this, &Hpi::onAllowedMovementChanged);
         connect(pHpiSettingsView, &HpiSettingsView::allowedRotationChanged,
                 this, &Hpi::onAllowedRotationChanged);
-        connect(pHpiSettingsView, &HpiSettingsView::fittingWindowSizeChanged,
+        connect(pHpiSettingsView, &HpiSettingsView::repetitionTimeChanged,
+                this, &Hpi::setTimeBetweenFits);
+        connect(pHpiSettingsView, &HpiSettingsView::fittingWindowTimeChanged,
                 this, &Hpi::setFittingWindowSize);
         connect(this, &Hpi::errorsChanged,
                 pHpiSettingsView, &HpiSettingsView::setErrorLabels, Qt::BlockingQueuedConnection);
@@ -332,14 +334,15 @@ void Hpi::initPluginControlWidgets()
                 pHpiSettingsView, &HpiSettingsView::setMovementResults, Qt::BlockingQueuedConnection);
         connect(this, &Hpi::newDigitizerList,
                 pHpiSettingsView, &HpiSettingsView::newDigitizerList);
-
+        connect(this, &Hpi::minimumWindowSizeChanged,
+                pHpiSettingsView, &HpiSettingsView::setMinimumWindowSize);
 
         onSspStatusChanged(pHpiSettingsView->getSspStatusChanged());
         onCompStatusChanged(pHpiSettingsView->getCompStatusChanged());
         onAllowedMeanErrorDistChanged(pHpiSettingsView->getAllowedMeanErrorDistChanged());
         onAllowedMovementChanged(pHpiSettingsView->getAllowedMovementChanged());
         onAllowedRotationChanged(pHpiSettingsView->getAllowedRotationChanged());
-        setFittingWindowSize(pHpiSettingsView->getFittingWindowSize());
+        setFittingWindowSize(pHpiSettingsView->getFittingRepetitionTime());
         onContHpiStatusChanged(pHpiSettingsView->continuousHPIChecked());
 
         plControlWidgets.append(pHpiSettingsView);
@@ -483,6 +486,12 @@ void Hpi::onCoilFrequenciesChanged(const QVector<int>& vCoilFreqs)
     m_mutex.lock();
     m_vCoilFreqs = vCoilFreqs;
     m_mutex.unlock();
+
+    const int iMinimalWindowSize = computeMinimalWindowsize();
+
+    m_mutex.lock();
+    m_iFittingWindowSize = iMinimalWindowSize;
+    m_mutex.unlock();
 }
 
 //=============================================================================================================
@@ -517,10 +526,18 @@ void Hpi::onContHpiStatusChanged(bool bChecked)
 
 //=============================================================================================================
 
-void Hpi::setFittingWindowSize(int winSize)
+void Hpi::setTimeBetweenFits(double dRepetitionTime)
 {
     QMutexLocker locker(&m_mutex);
-    m_iFittingWindowSize = winSize;
+    m_iRepetitionTimeInSamples = dRepetitionTime * m_pFiffInfo->sfreq;
+}
+
+//=============================================================================================================
+
+void Hpi::setFittingWindowSize(double dFittingWindowSizeInMillisecons)
+{
+    QMutexLocker locker(&m_mutex);
+    m_iFittingWindowSize = dFittingWindowSizeInMillisecons / 1000.0 * m_pFiffInfo->sfreq;
 }
 
 //=============================================================================================================
@@ -528,6 +545,45 @@ void Hpi::setFittingWindowSize(int winSize)
 void Hpi::onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans)
 {
     m_pFiffInfo->dev_head_t = devHeadTrans;
+}
+
+//=============================================================================================================
+
+int Hpi::computeMinimalWindowsize()
+{
+    m_mutex.lock();
+    double dSFreq = m_pFiffInfo->sfreq;
+    double dLineFreq = m_pFiffInfo->linefreq;
+    QVector<int> vecFreqs = m_vCoilFreqs;
+    m_mutex.unlock();
+
+    // get number of harmonics to take into account
+    int iMaxHpiFreq = *std::max_element(vecFreqs.constBegin(), vecFreqs.constEnd());
+    int nHarmonics = ceil(iMaxHpiFreq/dLineFreq);
+
+    // append frequency vector
+    for(int i = 1;  i <=  nHarmonics; i++) {
+        vecFreqs << dLineFreq * i;
+    }
+
+    // sort vector in increasing order
+    std::sort(vecFreqs.begin(), vecFreqs.end());
+
+    // get minimimal required frequency difference
+    int iMinDeltaF = dSFreq;
+
+    for(int i = 0; i < vecFreqs.size() - 1; i++) {
+        int iSubsequentDeltaF = vecFreqs[i+1] - vecFreqs[i];
+        if(iSubsequentDeltaF< iMinDeltaF) {
+            iMinDeltaF = iSubsequentDeltaF;
+        }
+    }
+
+    // compute buffersize needed to provide this resolution in frequency space N = FS/df
+    int iWindowSize = ceil(dSFreq/iMinDeltaF);
+    emit minimumWindowSizeChanged(iWindowSize/dSFreq);
+
+    return iWindowSize;
 }
 
 //=============================================================================================================
@@ -574,31 +630,46 @@ void Hpi::run()
     double dMovement = 0.0;
     double dRotation = 0.0;
 
+    int iRepetitionIndexCounter = 0;
     int iDataIndexCounter = 0;
     MatrixXd matData;
 
     m_mutex.lock();
-    int fittingWindowSize = m_iFittingWindowSize;
+    int iFittingWindowSize = m_iFittingWindowSize;
+    int iRepetitionTimeInSamples = m_iRepetitionTimeInSamples;
+
     m_mutex.unlock();
 
-    MatrixXd matDataMerged(m_pFiffInfo->chs.size(), fittingWindowSize);
+    MatrixXd matDataMerged(m_pFiffInfo->chs.size(), iFittingWindowSize);
     bool bOrder = false;
+    QElapsedTimer timer;
+    timer.start();
 
     while(!isInterruptionRequested()) {
         m_mutex.lock();
-        if(fittingWindowSize != m_iFittingWindowSize) {
-            fittingWindowSize = m_iFittingWindowSize;
-            std::cout << "Fitting window size: " << fittingWindowSize << "\n";
-            matDataMerged.resize(m_pFiffInfo->chs.size(), fittingWindowSize);
-            iDataIndexCounter = 0;
+        // check if fitting window size has changed and resize matData if necessary
+        if(iFittingWindowSize != m_iFittingWindowSize) {
+            iFittingWindowSize = m_iFittingWindowSize;
+            matDataMerged.resize(m_pFiffInfo->chs.size(), iFittingWindowSize);
+            iRepetitionIndexCounter = 0;
+        }
+
+        // check if time between fits has changed
+        if(iRepetitionTimeInSamples != m_iRepetitionTimeInSamples) {
+            iRepetitionTimeInSamples = m_iRepetitionTimeInSamples;
+            iRepetitionIndexCounter = 0;
         }
         m_mutex.unlock();
 
         //pop matrix
         if(m_pCircularBuffer->pop(matData)) {
-            if(iDataIndexCounter + matData.cols() < matDataMerged.cols()) {
+            if(iRepetitionIndexCounter + matData.cols() < iRepetitionTimeInSamples) {
+                iRepetitionIndexCounter += matData.cols();
+
+            } else if(iDataIndexCounter + matData.cols() < iFittingWindowSize) {
                 matDataMerged.block(0, iDataIndexCounter, matData.rows(), matData.cols()) = matData;
                 iDataIndexCounter += matData.cols();
+
             } else {
                 m_mutex.lock();
                 if(m_bDoSingleHpi) {
@@ -676,6 +747,7 @@ void Hpi::run()
                     }
                 }
 
+                iRepetitionIndexCounter = 0;
                 iDataIndexCounter = 0;
             }
         }

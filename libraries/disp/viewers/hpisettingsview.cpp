@@ -98,8 +98,10 @@ HpiSettingsView::HpiSettingsView(const QString& sSettingsPath,
             this, &HpiSettingsView::compStatusChanged);
     connect(m_pUi->m_checkBox_continousHPI, &QCheckBox::clicked,
             this, &HpiSettingsView::contHpiStatusChanged);
-    connect(m_pUi->m_spinBox_samplesToFit, QOverload<int>::of(&QSpinBox::valueChanged),
-            this, &HpiSettingsView::fittingWindowSizeChanged);
+    connect(m_pUi->m_doubleSpinBox_repTime, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &HpiSettingsView::repetitionTimeChanged);
+    connect(m_pUi->m_spinBox_windowSize, QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &HpiSettingsView::fittingWindowTimeChanged);
     connect(m_pUi->m_doubleSpinBox_maxHPIContinousDist, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &HpiSettingsView::allowedMeanErrorDistChanged);
     connect(m_pUi->m_doubleSpinBox_moveThreshold, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
@@ -190,6 +192,27 @@ void HpiSettingsView::setMovementResults(double dMovement,
 
 //=============================================================================================================
 
+void HpiSettingsView::setMinimumWindowSize(double dWindowSize)
+{
+    QSignalBlocker blockeWindowr(m_pUi->m_spinBox_windowSize);
+    QSignalBlocker blockerTime(m_pUi->m_doubleSpinBox_repTime);
+
+    int iMinimumInMs = ceil(dWindowSize*1000);
+    m_pUi->m_spinBox_windowSize->setMinimum(iMinimumInMs);
+    m_pUi->m_doubleSpinBox_repTime->setMinimum(dWindowSize);
+
+    if(m_pUi->m_spinBox_windowSize->value() < iMinimumInMs) {
+        m_pUi->m_spinBox_windowSize->setValue(iMinimumInMs);
+    }
+
+    if(m_pUi->m_doubleSpinBox_repTime->value() < dWindowSize) {
+        m_pUi->m_doubleSpinBox_repTime->setValue(dWindowSize);
+    }
+
+}
+
+//=============================================================================================================
+
 bool HpiSettingsView::getSspStatusChanged()
 {
     return m_pUi->m_checkBox_useSSP->isChecked();
@@ -233,9 +256,9 @@ bool HpiSettingsView::continuousHPIChecked()
 
 //=============================================================================================================
 
-int HpiSettingsView::getFittingWindowSize()
+double HpiSettingsView::getFittingRepetitionTime()
 {
-    return m_pUi->m_spinBox_samplesToFit->value();
+    return m_pUi->m_doubleSpinBox_repTime->value();
 }
 
 //=============================================================================================================
@@ -257,14 +280,11 @@ void HpiSettingsView::saveSettings()
     settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/useCOMP"),
                       QVariant::fromValue(m_pUi->m_checkBox_useComp->isChecked()));
 
-    settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/continousHPI"),\
-                      QVariant::fromValue(m_pUi->m_checkBox_continousHPI->isChecked()));
-
     settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/maxError"),
                       QVariant::fromValue(m_pUi->m_doubleSpinBox_maxHPIContinousDist->value()));
 
     settings.setValue(m_sSettingsPath + QString("/HpiSettingsView/fittingWindowSize"),
-                      QVariant::fromValue(m_pUi->m_spinBox_samplesToFit->value()));
+                      QVariant::fromValue(m_pUi->m_doubleSpinBox_repTime->value()));
 }
 
 //=============================================================================================================
@@ -284,9 +304,8 @@ void HpiSettingsView::loadSettings()
 
     m_pUi->m_checkBox_useSSP->setChecked(settings.value(m_sSettingsPath + QString("/HpiSettingsView/useSSP"), false).toBool());
     m_pUi->m_checkBox_useComp->setChecked(settings.value(m_sSettingsPath + QString("/HpiSettingsView/useCOMP"), false).toBool());
-    m_pUi->m_checkBox_continousHPI->setChecked(settings.value(m_sSettingsPath + QString("/HpiSettingsView/continousHPI"), false).toBool());
     m_pUi->m_doubleSpinBox_maxHPIContinousDist->setValue(settings.value(m_sSettingsPath + QString("/HpiSettingsView/maxError"), 10.0).toDouble());
-    m_pUi->m_spinBox_samplesToFit->setValue(settings.value(m_sSettingsPath + QString("/HpiSettingsView/fittingWindowSize"), 300).toInt());
+    m_pUi->m_doubleSpinBox_repTime->setValue(settings.value(m_sSettingsPath + QString("/HpiSettingsView/fittingWindowSize"), 300).toInt());
 }
 
 //=============================================================================================================

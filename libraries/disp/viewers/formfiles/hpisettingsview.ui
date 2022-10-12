@@ -319,7 +319,7 @@
           <item>
            <widget class="QCheckBox" name="m_checkBox_continousHPI">
             <property name="text">
-             <string>Do continous HPI fitting at</string>
+             <string>Do continous HPI fitting </string>
             </property>
            </widget>
           </item>
@@ -327,49 +327,63 @@
         </widget>
        </item>
        <item>
-        <widget class="QFrame" name="frame">
-         <property name="minimumSize">
-          <size>
-           <width>61</width>
-           <height>35</height>
-          </size>
+        <widget class="QGroupBox" name="groupBox_3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
          </property>
-         <property name="frameShape">
-          <enum>QFrame::StyledPanel</enum>
+         <property name="title">
+          <string/>
          </property>
-         <property name="frameShadow">
-          <enum>QFrame::Raised</enum>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <property name="topMargin">
-           <number>4</number>
-          </property>
-          <property name="bottomMargin">
-           <number>4</number>
-          </property>
-          <item>
-           <widget class="QSpinBox" name="m_spinBox_samplesToFit">
-            <property name="maximumSize">
-             <size>
-              <width>70</width>
-              <height>16777215</height>
-             </size>
-            </property>
+         <layout class="QFormLayout" name="formLayout_5">
+          <item row="1" column="0">
+           <widget class="QSpinBox" name="m_spinBox_windowSize">
             <property name="minimum">
-             <number>10</number>
+             <number>200</number>
             </property>
             <property name="maximum">
-             <number>1000000</number>
+             <number>1000</number>
+            </property>
+            <property name="singleStep">
+             <number>100</number>
             </property>
             <property name="value">
-             <number>10</number>
+             <number>333</number>
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QLabel" name="label_3">
+          <item row="0" column="0">
+           <widget class="QDoubleSpinBox" name="m_doubleSpinBox_repTime">
+            <property name="decimals">
+             <number>1</number>
+            </property>
+            <property name="minimum">
+             <double>0.200000000000000</double>
+            </property>
+            <property name="maximum">
+             <double>30.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.100000000000000</double>
+            </property>
+            <property name="value">
+             <double>2.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QLabel" name="m_label_repTime">
             <property name="text">
-             <string>Win Size [Samples]</string>
+             <string>Time between fits [seconds]</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QLabel" name="m_label_windowSize">
+            <property name="text">
+             <string>Window size [ms]</string>
             </property>
            </widget>
           </item>
@@ -575,6 +589,12 @@
           </item>
           <item row="0" column="1">
            <widget class="QDoubleSpinBox" name="m_doubleSpinBox_moveThreshold">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="suffix">
              <string> mm</string>
             </property>
@@ -595,6 +615,12 @@
           </item>
           <item row="1" column="1">
            <widget class="QDoubleSpinBox" name="m_doubleSpinBox_rotThreshold">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="suffix">
              <string> °</string>
             </property>
@@ -624,6 +650,12 @@
           </item>
           <item row="0" column="1">
            <widget class="QLineEdit" name="m_qLineEdit_moveResult">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -638,6 +670,12 @@
           </item>
           <item row="1" column="1">
            <widget class="QLineEdit" name="m_qLineEdit_rotResult">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>

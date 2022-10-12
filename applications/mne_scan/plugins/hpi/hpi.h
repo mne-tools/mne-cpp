@@ -239,13 +239,22 @@ private:
      */
     void onDevHeadTransAvailable(const FIFFLIB::FiffCoordTrans& devHeadTrans);
 
+
     //=========================================================================================================
     /**
-     * Set fitting window size when doing continuous hpi.
+     * Set repetition time between hpi fits.
      *
-     * @param[in] winSize    window size in samples
+     * @param[in] dRepetitionTime    Repetition time in seconds
      */
-    void setFittingWindowSize(int winSize);
+    void setTimeBetweenFits(double dRepetitionTimeInSeconds);
+
+    //=========================================================================================================
+    /**
+     * Set hpi fitting window size.
+     *
+     * @param[in] dFittingWindowSizeInSeconds    Fitting window size in seconds
+     */
+    void setFittingWindowSize(double dFittingWindowSizeInSeconds);
 
     //=========================================================================================================
     /**
@@ -289,6 +298,19 @@ private:
      */
     void updateDigitizerInfo();
 
+    //=========================================================================================================
+    /**
+     * Returns the optimal window size for hpi computation
+     *
+     * Compute the optimal window size based on minimal detectable frequency difference between HPI
+     * freqeuencies and line frequency (+ harmonics).
+     *
+     * @return optimal Windowsize
+     */
+    int computeMinimalWindowsize();
+
+
+
     void resetState();
 
     QMutex                      m_mutex;                    /**< The threads mutex.*/
@@ -298,8 +320,8 @@ private:
     QString                     m_sFilePathDigitzers;       /**< The file path to the current digitzers. */
 
     qint16                      m_iNumberBadChannels;       /**< The number of bad channels.*/
-    qint16                      m_iFittingWindowSize;       /**< The number of samples in each fitting window.*/
-
+    qint16                      m_iRepetitionTimeInSamples;    /**< The number of samples to wait between fits.*/
+    int                     	m_iFittingWindowSize;       /**< The number of samples in each fitting window.*/
     double                      m_dAllowedMeanErrorDist;    /**< The allowed error distance in order for the last fit to be counted as a good fit.*/
     double                      m_dAllowedMovement;         /**< The allowed head movement regarding reference head position.*/
     double                      m_dAllowedRotation;         /**< The allowed head rotation regarding reference head position in degree.*/
@@ -321,6 +343,8 @@ private:
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeHpiResult>::SPtr           m_pHpiOutput;           /**< The RealTimeHpiResult of the Hpi output.*/
 
 signals:
+    void minimumWindowSizeChanged(const double dWindowSizeInSeconds);
+
     void errorsChanged(const QVector<double>& vErrors,
                        double dMeanErrorDist);
     void gofChanged(const Eigen::VectorXd& vGoF,
