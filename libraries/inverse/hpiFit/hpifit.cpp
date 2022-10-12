@@ -99,7 +99,7 @@ HPIFit::HPIFit(const SensorSet& sensorSet)
 
 //=============================================================================================================
 
-void HPIFit::checkForUpdate(const SensorSet &sensorSet)
+void HPIFit::setSensorSet(const SensorSet &sensorSet)
 {
     if(m_sensors != sensorSet) {
         m_sensors = sensorSet;

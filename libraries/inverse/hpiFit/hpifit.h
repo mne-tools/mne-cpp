@@ -140,13 +140,6 @@ public:
 
     //=========================================================================================================
     /**
-     * Default constructor.
-     *
-     */
-    explicit HPIFit();
-
-    //=========================================================================================================
-    /**
      * Constructs the HPI from a SensorSet.
      *
      * @param[in] SensorSet     The MEG sensorSet used for the hpi fitting.
@@ -159,7 +152,7 @@ public:
      *
      * @param[in] SensorSet     The MEG sensorSet used for the hpi fitting.
      */
-    void checkForUpdate(const SensorSet& sensorSet);
+    void setSensorSet(const SensorSet& sensorSet);
 
     //=========================================================================================================
     /**
@@ -170,7 +163,7 @@ public:
      * @param[in]   hpiModelParameters          The model parameters to use for the Hpi Fitting, especially to compute the coil amplitudes.
      * @param[in]   matCoilsHead                The hpi coil locations in head space.
      * @param[in]   bOrderFrequencies           Order Hpi coils yes/no.
-     * @param[out]  hpiFitResult                The fitting results.
+     * @param[in,out]  hpiFitResult                The fitting results.
      */
     void fit(const Eigen::MatrixXd& matProjectedData,
              const Eigen::MatrixXd& matProjectors,

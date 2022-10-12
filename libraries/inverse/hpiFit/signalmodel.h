@@ -67,9 +67,9 @@ namespace INVERSELIB
 
 //=============================================================================================================
 /**
- * Description of what this class is intended to do (in detail).
+ * This class creates and fits a linear model to extract the amplitudes of the hpi coils from measurement data.
  *
- * @brief Brief description of this class.
+ * @brief This class creates and fits a linear model to extract the amplitudes of the hpi coils from measurement data..
  */
 class INVERSESHARED_EXPORT SignalModel
 {
@@ -77,12 +77,6 @@ class INVERSESHARED_EXPORT SignalModel
 public:
     typedef QSharedPointer<SignalModel> SPtr;            /**< Shared pointer type for SignalModel. */
     typedef QSharedPointer<const SignalModel> ConstSPtr; /**< Const shared pointer type for SignalModel. */
-
-    //=========================================================================================================
-    /**
-     * Constructs a SignalModel object.
-     */
-    explicit SignalModel() = default;
 
     //=========================================================================================================
     /**

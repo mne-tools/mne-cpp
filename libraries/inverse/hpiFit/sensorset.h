@@ -75,7 +75,14 @@ namespace FIFFLIB{
 
 namespace INVERSELIB
 {
-enum class Accuracy : int{high = 2, medium = 1, low = 0};
+enum class Accuracy : int{low = 0, medium = 1, high = 2};
+
+//=============================================================================================================
+/**
+ * A SensorSet object holds information about the position and orientation of the MEG sensor arrays.
+ *
+ * @brief A SensorSet object holds information about the position and orientation of the MEG sensor arrays.
+ */
 
 class INVERSESHARED_EXPORT SensorSet {
 
@@ -240,9 +247,9 @@ inline bool SensorSet::operator!= (const SensorSet &b) const
 
 //=============================================================================================================
 /**
- * Create a SensorSet struct from a channel list with specified accuracy.
+ * Create a SensorSet struct from a channel list with specified accuracy. Reads sensor information from Coil Definition file.
  *
- * @brief Brief description of this class.
+ * @brief Create a SensorSet struct from a channel list with specified accuracy. Reads sensor information from Coil Definition file.
  */
 class INVERSESHARED_EXPORT SensorSetCreator
 {
@@ -269,7 +276,7 @@ public:
                               const Accuracy& accuracy);
 
 private:
-    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilDefinitions{nullptr};    // the coil definitions as template
+    QSharedPointer<FWDLIB::FwdCoilSet>  m_pCoilDefinitions;    // the coil definitions as template
 };
 
 //=============================================================================================================

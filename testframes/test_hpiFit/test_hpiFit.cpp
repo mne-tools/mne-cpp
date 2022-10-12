@@ -450,9 +450,9 @@ void TestHpiFit::testCheckForUpdate()
     HPIFit HPI = HPIFit(hpiDataUpdater.getSensors());
 
     m_pFiffInfo->bads << "MEG0113" << "MEG0112";
-    hpiDataUpdater.checkForUpdate(m_pFiffInfo);
+    bool bHasChanged = hpiDataUpdater.checkForUpdate(m_pFiffInfo);
 
-    HPI.checkForUpdate(hpiDataUpdater.getSensors());
+    HPI.setSensorSet(hpiDataUpdater.getSensors());
 
     hpiDataUpdater.prepareDataAndProjectors(m_matData,m_matProjectors);
     const auto& matProjectedData = hpiDataUpdater.getProjectedData();

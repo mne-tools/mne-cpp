@@ -148,7 +148,7 @@ void HpiDataUpdater::updateHpiDigitizer(const QList<FiffDigPoint>& lDig)
 
 //=============================================================================================================
 
-void HpiDataUpdater::checkForUpdate(const FiffInfo::SPtr pFiffInfo)
+bool HpiDataUpdater::checkForUpdate(const FiffInfo::SPtr pFiffInfo)
 {
     const bool bUpdate = checkIfChanged(pFiffInfo->bads,pFiffInfo->chs);
     if(bUpdate)
@@ -158,6 +158,7 @@ void HpiDataUpdater::checkForUpdate(const FiffInfo::SPtr pFiffInfo)
         updateHpiDigitizer(pFiffInfo->dig);
         updateSensors(m_lChannels);
     }
+    return bUpdate;
 }
 
 //=============================================================================================================
