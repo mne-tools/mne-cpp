@@ -43,6 +43,9 @@
 
 #include <disp/viewers/fwdsettingsview.h>
 
+#include <fwd/computeFwd/compute_fwd.h>
+#include <fwd/computeFwd/compute_fwd_settings.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -187,6 +190,47 @@ void ForwardSolution::onDoForwardComputation()
     m_mutex.lock();
     m_bDoFwdComputation = true;
     m_mutex.unlock();
+
+    m_pFwdSettings->pFiffInfo = m_pFiffInfo;
+
+    emit statusInformationChanged(0);           // initializing
+    FWDLIB::ComputeFwd::SPtr pComputeFwd = FWDLIB::ComputeFwd::SPtr(new FWDLIB::ComputeFwd(m_pFwdSettings));
+
+    QFile t_fSolution(m_pFwdSettings->solname);
+    MNELIB::MNEForwardSolution::SPtr pFwdSolution;
+    MNELIB::MNEForwardSolution::SPtr pClusteredFwd;
+
+    emit statusInformationChanged(4);           // not computed
+
+    emit statusInformationChanged(1);   // computing
+    m_mutex.lock();
+    m_bBusy = true;
+    m_mutex.unlock();
+
+    // compute and store
+    pComputeFwd->calculateFwd();
+    pComputeFwd->storeFwd();
+
+    // get Mne Forward Solution (in future this is not necessary, ComputeForward will have this as member)
+    pFwdSolution = MNELIB::MNEForwardSolution::SPtr(new MNELIB::MNEForwardSolution(t_fSolution, false, true));
+
+    // emit results to control widget
+    emit fwdSolutionAvailable(pFwdSolution->source_ori,
+                              pFwdSolution->coord_frame,
+                              pFwdSolution->nsource,
+                              pFwdSolution->nchan,
+                              pFwdSolution->src.size());
+
+    if(m_bDoClustering) {
+        emit statusInformationChanged(3);               // clustering
+        pClusteredFwd = MNELIB::MNEForwardSolution::SPtr(new MNELIB::MNEForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), 200)));
+        emit clusteringAvailable(pClusteredFwd->nsource);
+        emit statusInformationChanged(5);               //finished
+        m_pFwdSolution = pClusteredFwd;
+    } else {
+        emit statusInformationChanged(5);
+        m_pFwdSolution = pFwdSolution;
+    }
 }
 
 //=============================================================================================================
@@ -194,12 +238,6 @@ void ForwardSolution::onDoForwardComputation()
 void ForwardSolution::onRecompStatusChanged(bool bDoRecomputation)
 {
     m_mutex.lock();
-    if(!m_pHpiInput) {
-        QMessageBox msgBox;
-        msgBox.setText("Please connect the Hpi plugin.");
-        msgBox.exec();
-        return;
-    }
     m_bDoRecomputation = bDoRecomputation;
     m_mutex.unlock();
 }

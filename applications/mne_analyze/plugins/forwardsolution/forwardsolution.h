@@ -69,6 +69,15 @@ namespace FSLIB{
     class AnnotationSet;
 }
 
+namespace FWDLIB {
+    class ComputeFwdSettings;
+    class ComputeFwd;
+}
+
+namespace MNELIB {
+    class MNEForwardSolution;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE FORWARDSOLUTIONPLUGIN
 //=============================================================================================================
@@ -184,6 +193,10 @@ private:
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals. */
 
     DISPLIB::FwdSettingsView*                               m_pFwdSettingsView;
+
+    QSharedPointer<FWDLIB::ComputeFwdSettings>              m_pFwdSettings;         /**< Forward Solution Settings. */
+
+    QSharedPointer<MNELIB::MNEForwardSolution>              m_pFwdSolution;
 
     QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                /**< Fiff measurement info.*/
     FIFFLIB::FiffCoordTrans                                 m_transDevHead;             /**< Updated meg->head transformation. */
