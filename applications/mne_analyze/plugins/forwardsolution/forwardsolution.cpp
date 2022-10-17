@@ -131,6 +131,25 @@ QDockWidget* ForwardSolution::getControl()
     QDockWidget* pControlDock = new QDockWidget(this->getName());
     pControlDock->setWidget(pControlScrollArea);
 
+    // connect incoming signals
+    connect(m_pFwdSettingsView, &DISPLIB::FwdSettingsView::recompStatusChanged,
+            this, &ForwardSolution::onRecompStatusChanged);
+    connect(m_pFwdSettingsView, &DISPLIB::FwdSettingsView::clusteringStatusChanged,
+            this, &ForwardSolution::onClusteringStatusChanged);
+    connect(m_pFwdSettingsView, &DISPLIB::FwdSettingsView::atlasDirChanged,
+            this, &ForwardSolution::onAtlasDirChanged);
+    connect(m_pFwdSettingsView, &DISPLIB::FwdSettingsView::doForwardComputation,
+            this, &ForwardSolution::onDoForwardComputation);
+
+    // connect outgoing signals
+    connect(this, &ForwardSolution::statusInformationChanged,
+            m_pFwdSettingsView, &DISPLIB::FwdSettingsView::setRecomputationStatus, Qt::BlockingQueuedConnection);
+    connect(this, &ForwardSolution::fwdSolutionAvailable,
+            m_pFwdSettingsView, &DISPLIB::FwdSettingsView::setSolutionInformation, Qt::BlockingQueuedConnection);
+    connect(this, &ForwardSolution::clusteringAvailable,
+            m_pFwdSettingsView, &DISPLIB::FwdSettingsView::setClusteredInformation, Qt::BlockingQueuedConnection);
+
+
     return pControlDock;
 }
 
@@ -159,4 +178,53 @@ QVector<EVENT_TYPE> ForwardSolution::getEventSubscriptions(void) const
 QString ForwardSolution::getBuildInfo()
 {
     return QString(FORWARDSOLUTIONPLUGIN::buildDateTime()) + QString(" - ")  + QString(FORWARDSOLUTIONPLUGIN::buildHash());
+}
+
+//=============================================================================================================
+
+void ForwardSolution::onDoForwardComputation()
+{
+    m_mutex.lock();
+    m_bDoFwdComputation = true;
+    m_mutex.unlock();
+}
+
+//=============================================================================================================
+
+void ForwardSolution::onRecompStatusChanged(bool bDoRecomputation)
+{
+    m_mutex.lock();
+    if(!m_pHpiInput) {
+        QMessageBox msgBox;
+        msgBox.setText("Please connect the Hpi plugin.");
+        msgBox.exec();
+        return;
+    }
+    m_bDoRecomputation = bDoRecomputation;
+    m_mutex.unlock();
+}
+
+//=============================================================================================================
+
+void ForwardSolution::onClusteringStatusChanged(bool bDoClustering)
+{
+    if(m_pAnnotationSet->isEmpty()) {
+        QMessageBox msgBox;
+        msgBox.setText("Please load an annotation set befor clustering.");
+        msgBox.exec();
+        return;
+    }
+    m_mutex.lock();
+    m_bDoClustering = bDoClustering;
+    m_mutex.unlock();
+}
+
+//=============================================================================================================
+
+void ForwardSolution::onAtlasDirChanged(const QString& sDirPath, const FSLIB::AnnotationSet::SPtr pAnnotationSet)
+{
+    m_mutex.lock();
+    m_sAtlasDir = sDirPath;
+    m_pAnnotationSet = pAnnotationSet;
+    m_mutex.unlock();
 }

@@ -44,6 +44,8 @@
 
 #include <anShared/Plugins/abstractplugin.h>
 
+#include <fiff/fiff_coord_trans.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -61,6 +63,10 @@ namespace ANSHAREDLIB {
 
 namespace DISPLIB {
     class FwdSettingsView;
+}
+
+namespace FSLIB{
+    class AnnotationSet;
 }
 
 //=============================================================================================================
@@ -114,10 +120,87 @@ public:
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
-private:    
+private slots:
+    //=========================================================================================================
+    /**
+     * Call this funciton whenever a forward computation was requested.
+     */
+    void onDoForwardComputation();
+
+    //=========================================================================================================
+    /**
+     * Call this function whenever the recompution status changed.
+     *
+     * @param[in] bDoRecomputation    If recomputation is activated.
+     */
+    void onRecompStatusChanged(bool bDoRecomputation);
+
+    //=========================================================================================================
+    /**
+     * Call this function whenever the clustering status changed.
+     *
+     * @param[in] bDoClustering   If clustering is activated.
+     */
+    void onClusteringStatusChanged(bool bDoRecomputation);
+
+    //=========================================================================================================
+    /**
+     * Call this function whenever the atlas directory is set.
+     *
+     * @param[in] sDirPath              The path to the atlas directory.
+     * @param[in] pAnnotationSet        The Annotation set.
+     */
+    void onAtlasDirChanged(const QString& sDirPath,
+                           const QSharedPointer<FSLIB::AnnotationSet> pAnnotationSet);
+
+signals:
+    //=========================================================================================================
+    /**
+     * Emitted when forward solution is available
+     */
+    void fwdSolutionAvailable(FIFFLIB::fiff_int_t iSourceOri,
+                              FIFFLIB::fiff_int_t iCoordFrame,
+                              int iNSource,
+                              int iNChan,
+                              int iNSpaces);
+
+    //=========================================================================================================
+    /**
+     * Emitted whenever clustered forward solution is available
+     */
+    void clusteringAvailable(int iNSource);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the clustering status changed
+     * (0 Initializing, 1 Computing, 2 Recomputing, 3 Clustering, 4 Not Computed, 5 Finished).
+     *
+     * @param[in] iStatus            status of recomputation.
+     */
+    void statusInformationChanged(int iStatus);
+
+private:
+
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals. */
 
     DISPLIB::FwdSettingsView*                               m_pFwdSettingsView;
+
+    QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                /**< Fiff measurement info.*/
+    FIFFLIB::FiffCoordTrans                                 m_transDevHead;             /**< Updated meg->head transformation. */
+    QSharedPointer<FSLIB::AnnotationSet>                    m_pAnnotationSet;       /**< Annotation set. */
+
+    QMutex                                                  m_mutex;                    /**< The threads mutex.*/
+
+    float                                                   m_fThreshRot;               /**< The allowed rotation in degree.**/
+    float                                                   m_fThreshMove;              /**< The Allowed movement in mm.**/
+    bool                                                    m_bBusy;                    /**< Indicates if we have to update headposition.**/
+    bool                                                    m_bDoRecomputation;         /**< If recomputation is activated.**/
+    bool                                                    m_bDoClustering;            /**< If clustering is activated.**/
+    bool                                                    m_bDoFwdComputation;        /**< Do a forward computation. **/
+
+    QString                                                 m_sAtlasDir;                /**< File to Atlas. */
+
+
 };
 
 } // NAMESPACE
