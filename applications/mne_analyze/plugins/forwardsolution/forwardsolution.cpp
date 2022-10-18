@@ -40,6 +40,9 @@
 #include "forwardsolution.h"
 
 #include <anShared/Management/communicator.h>
+#include <anShared/Management/analyzedata.h>
+
+#include <anShared/Model/forwardsolutionmodel.h>
 
 #include <disp/viewers/fwdsettingsview.h>
 
@@ -231,6 +234,11 @@ void ForwardSolution::onDoForwardComputation()
         emit statusInformationChanged(5);
         m_pFwdSolution = pFwdSolution;
     }
+
+    QSharedPointer<ANSHAREDLIB::ForwardSolutionModel> pFwdSolModel = QSharedPointer<ANSHAREDLIB::ForwardSolutionModel>(new ANSHAREDLIB::ForwardSolutionModel(m_pFwdSolution));
+
+    m_pAnalyzeData->addModel<ANSHAREDLIB::ForwardSolutionModel>(pFwdSolModel,
+                                                                "Fwd. Sol. - " + QDateTime::currentDateTime().toString());
 }
 
 //=============================================================================================================

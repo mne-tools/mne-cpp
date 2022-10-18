@@ -69,6 +69,7 @@ ForwardSolutionModel::ForwardSolutionModel(QObject* parent)
 ForwardSolutionModel::ForwardSolutionModel(QSharedPointer<MNELIB::MNEForwardSolution> pFwdSolution,
                                            QObject* parent)
 : AbstractModel( parent)
+, m_pFwdSolution(pFwdSolution)
 {
 }
 
@@ -93,7 +94,7 @@ int ForwardSolutionModel::columnCount(const QModelIndex &parent) const
 //=============================================================================================================
 
 QVariant ForwardSolutionModel::data(const QModelIndex &index,
-                             int role) const
+                                    int role) const
 {
     Q_UNUSED(index);
     Q_UNUSED(role);

@@ -141,7 +141,15 @@ private:
      *
      * @param[in] iSample    The sample to be send.
      */
-    void onSendSamplePos(int iSample);
+    void sendNewEventSample(int iSample);
+
+    //=========================================================================================================
+    /**
+     * Handles if a new sample position should be dispatched
+     *
+     * @param[in] iSample    The sample to be send.
+     */
+    void sendSampleSelected(int iSample);
 
     //=========================================================================================================
     /**

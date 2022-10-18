@@ -172,7 +172,7 @@ QWidget *Events::getView()
 void Events::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-    case EVENT_TYPE::NEW_EVENT_ADDED:
+    case EVENT_TYPE::ADD_NEW_EVENT:
         emit newEventAvailable(e->getData().toInt());
         onTriggerRedraw();
         break;
@@ -192,7 +192,7 @@ void Events::handleEvent(QSharedPointer<Event> e)
 QVector<EVENT_TYPE> Events::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
-    temp.push_back(NEW_EVENT_ADDED);
+    temp.push_back(ADD_NEW_EVENT);
     temp.push_back(SELECTED_MODEL_CHANGED);
     temp.push_back(MODEL_REMOVED);
 

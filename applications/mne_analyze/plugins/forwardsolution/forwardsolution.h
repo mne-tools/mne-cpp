@@ -189,7 +189,6 @@ signals:
     void statusInformationChanged(int iStatus);
 
 private:
-
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals. */
 
     DISPLIB::FwdSettingsView*                               m_pFwdSettingsView;

@@ -56,6 +56,10 @@
 
 namespace ANSHAREDLIB {
     class Communicator;
+    class AbstractModel;
+    class FiffRawViewModel;
+    class AveragingDataModel;
+    class ForwardSolutionModel;
 }
 
 //=============================================================================================================
@@ -109,8 +113,40 @@ public:
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
-private:    
+private:
+
+    enum Mode{
+        SOURCE_LOC_FROM_AVG,
+        SOURCE_LOC_FROM_SINGLE_TRIAL
+    };
+
+    void sourceLocalizationFromAverage();
+
+    void sourceLocalizationFromSingleTrial();
+
+    //=========================================================================================================
+    /**
+     * Loads new Fiff model whan current loaded model is changed
+     *
+     * @param[in, out] pNewModel    pointer to currently loaded FiffRawView Model.
+     */
+    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+
+    //=========================================================================================================
+    /**
+     * Handles clearing view if currently used model is being removed
+     *
+     * @param[in] pRemovedModel    Pointer to model being removed.
+     */
+    void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
+
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals. */
+
+    QSharedPointer<ANSHAREDLIB::ForwardSolutionModel>       m_pFwdSolutionModel;
+    QSharedPointer<ANSHAREDLIB::AveragingDataModel>         m_pAverageDataModel;
+    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pRawDataModel;
+
+    Mode m_sourceLocalizationMode;
 };
 
 } // NAMESPACE

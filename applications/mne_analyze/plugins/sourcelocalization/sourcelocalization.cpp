@@ -39,6 +39,9 @@
 #include "sourcelocalization.h"
 
 #include <anShared/Management/communicator.h>
+#include <anShared/Model/abstractmodel.h>
+#include <anShared/Model/fiffrawviewmodel.h>
+#include <anShared/Model/averagingdatamodel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -59,6 +62,9 @@ using namespace ANSHAREDLIB;
 
 SourceLocalization::SourceLocalization()
 : m_pCommu(Q_NULLPTR)
+, m_pFwdSolutionModel(Q_NULLPTR)
+, m_pAverageDataModel(Q_NULLPTR)
+, m_pRawDataModel(Q_NULLPTR)
 {
 }
 
@@ -125,8 +131,14 @@ QDockWidget* SourceLocalization::getControl()
 void SourceLocalization::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
-        default:
-            qWarning() << "[SourceLocalization::handleEvent] Received an Event that is not handled by switch cases.";
+    case EVENT_TYPE::SELECTED_MODEL_CHANGED:
+        onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
+        break;
+    case EVENT_TYPE::MODEL_REMOVED:
+        onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
+        break;
+    default:
+        qWarning() << "[Events::handleEvent] Received an Event that is not handled by switch cases.";
     }
 }
 
@@ -135,7 +147,9 @@ void SourceLocalization::handleEvent(QSharedPointer<Event> e)
 QVector<EVENT_TYPE> SourceLocalization::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
-    //temp.push_back(SELECTED_MODEL_CHANGED);
+    temp.push_back(SELECTED_MODEL_CHANGED);
+    temp.push_back(MODEL_REMOVED);
+    temp.push_back(SAMPLE_SELECTED);
 
     return temp;
 }
@@ -145,4 +159,67 @@ QVector<EVENT_TYPE> SourceLocalization::getEventSubscriptions(void) const
 QString SourceLocalization::getBuildInfo()
 {
     return QString(SOURCELOCALIZATIONPLUGIN::buildDateTime()) + QString(" - ")  + QString(SOURCELOCALIZATIONPLUGIN::buildHash());
+}
+
+//=============================================================================================================
+
+void SourceLocalization::sourceLocalizationFromAverage()
+{
+    if(m_sourceLocalizationMode != SOURCE_LOC_FROM_AVG) {
+        return;
+    }
+
+    if(!m_pFwdSolutionModel){
+        qInfo() << "[SourceLocalization::performSourceLocalization] No forward solution available.";
+        return;
+    }
+
+    if(!m_pAverageDataModel){
+        qInfo() << "[SourceLocalization::performSourceLocalization] No average model available.";
+        return;
+    }
+}
+
+//=============================================================================================================
+
+void SourceLocalization::sourceLocalizationFromSingleTrial()
+{
+    if(m_sourceLocalizationMode != SOURCE_LOC_FROM_SINGLE_TRIAL) {
+        return;
+    }
+
+    if(!m_pFwdSolutionModel){
+        qInfo() << "[SourceLocalization::performSourceLocalization] No forward solution available.";
+        return;
+    }
+
+
+}
+
+
+//=============================================================================================================
+
+void SourceLocalization::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+{
+    switch(pNewModel->getType()){
+        case ANSHAREDLIB::ANSHAREDLIB_FIFFRAW_MODEL:
+            m_pRawDataModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
+            break;
+        case ANSHAREDLIB::ANSHAREDLIB_AVERAGING_MODEL:
+            m_pAverageDataModel = qSharedPointerCast<AveragingDataModel>(pNewModel);
+            sourceLocalizationFromAverage();
+            break;
+        case ANSHAREDLIB::ANSHAREDLIB_FORWARDSOLUTION_MODEL:
+            m_pFwdSolutionModel = qSharedPointerCast<ForwardSolutionModel>(pNewModel);
+            break;
+        default:
+            break;
+    }
+}
+
+//=============================================================================================================
+
+void SourceLocalization::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
+{
+
 }
