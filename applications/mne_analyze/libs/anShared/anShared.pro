@@ -96,12 +96,14 @@ SOURCES += \
     Model/fiffrawviewmodel.cpp \
     Model/eventmodel.cpp \
     Model/averagingdatamodel.cpp \
+    Model/forwardsolutionmodel.cpp \
     Model/mricoordmodel.cpp \
     Model/covariancemodel.cpp \
     Plugins/abstractplugin.cpp
 
 HEADERS += \
     Model/dipolefitmodel.h \
+    Model/forwardsolutionmodel.h \
     Model/mricoordmodel.h \
     Model/covariancemodel.h \
     Plugins/abstractplugin.h \

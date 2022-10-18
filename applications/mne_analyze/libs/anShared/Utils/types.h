@@ -87,7 +87,8 @@ namespace ANSHAREDLIB
         ANSHAREDLIB_BEMDATA_MODEL,
         ANSHAREDLIB_NOISE_MODEL,
         ANSHAREDLIB_MRICOORD_MODEL,
-        ANSHAREDLIB_DIPOLEFIT_MODEL
+        ANSHAREDLIB_DIPOLEFIT_MODEL,
+        ANSHAREDLIB_FORWARDSOLUTION_MODEL
     };
 
     //=========================================================================================================
