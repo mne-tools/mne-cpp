@@ -42,12 +42,19 @@
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>
 
+#include <anShared/Model/abstractmodel.h>
 #include <anShared/Model/forwardsolutionmodel.h>
+#include <anShared/Model/fiffrawviewmodel.h>
+#include <anShared/Model/averagingdatamodel.h>
 
 #include <disp/viewers/fwdsettingsview.h>
 
+#include <fiff/fiff_stream.h>
+
 #include <fwd/computeFwd/compute_fwd.h>
 #include <fwd/computeFwd/compute_fwd_settings.h>
+
+#include <fs/annotationset.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -70,7 +77,28 @@ using namespace ANSHAREDLIB;
 
 ForwardSolution::ForwardSolution()
 : m_pCommu(Q_NULLPTR)
+, m_pFwdSettings(new FWDLIB::ComputeFwdSettings)
+, m_bBusy(false)
+, m_bDoRecomputation(false)
+, m_bDoClustering(true)
+, m_bDoFwdComputation(false)
 {
+    // set init values
+    m_pFwdSettings->solname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/your-solution-fwd.fif";
+    m_pFwdSettings->mriname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/all-trans.fif";
+    m_pFwdSettings->bemname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif";
+    m_pFwdSettings->srcname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif";
+    m_pFwdSettings->measname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
+    m_pFwdSettings->transname.clear();
+    m_pFwdSettings->eeg_model_name = "Default";
+    m_pFwdSettings->include_meg = true;
+    m_pFwdSettings->include_eeg = true;
+    m_pFwdSettings->accurate = true;
+    m_pFwdSettings->mindist = 5.0f/1000.0f;
+
+    m_sAtlasDir = QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label";
+
+    m_pAnnotationSet = FSLIB::AnnotationSet::SPtr(new FSLIB::AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
 }
 
 //=============================================================================================================
@@ -164,6 +192,9 @@ QDockWidget* ForwardSolution::getControl()
 void ForwardSolution::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
+        case EVENT_TYPE::SELECTED_MODEL_CHANGED:
+            onModelChanged(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel> >());
+            break;
         default:
             qWarning() << "[ForwardSolution::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -174,7 +205,7 @@ void ForwardSolution::handleEvent(QSharedPointer<Event> e)
 QVector<EVENT_TYPE> ForwardSolution::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
-    //temp.push_back(SELECTED_MODEL_CHANGED);
+    temp.push_back(SELECTED_MODEL_CHANGED);
 
     return temp;
 }
@@ -190,9 +221,72 @@ QString ForwardSolution::getBuildInfo()
 
 void ForwardSolution::onDoForwardComputation()
 {
-    m_mutex.lock();
+    if(!m_pFiffInfo){
+        qInfo() << "No FiffInfo source available for forward solution computation.";
+        return;
+    }
+
+    qInfo() << "Performing forward solution computation.";
+
+    QFile t_fBem(m_pFwdSettings->bemname);
+    FIFFLIB::FiffStream::SPtr stream(new FIFFLIB::FiffStream(&t_fBem));
+    if(!stream->open()) {
+        QMessageBox msgBox;
+        msgBox.setText("The bem model cannot be opend. Chosse another file.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+        msgBox.exec();
+        stream->close();
+        return;
+    }
+    stream->close();
+
+    // Read source space
+    QFile t_fSource(m_pFwdSettings->srcname);
+    stream = FIFFLIB::FiffStream::SPtr(new FIFFLIB::FiffStream(&t_fSource));
+    if(!stream->open()) {
+        QMessageBox msgBox;
+        msgBox.setText("The source space cannot be opend. Chosse another file.");
+        msgBox.setText(m_pFwdSettings->srcname);
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+        msgBox.exec();
+        stream->close();
+        return;
+    }
+    stream->close();
+
+    // Read MRI transformation
+    QFile t_fMri(m_pFwdSettings->mriname);
+    stream = FIFFLIB::FiffStream::SPtr(new FIFFLIB::FiffStream(&t_fMri));
+    if(!stream->open()) {
+        QMessageBox msgBox;
+        msgBox.setText("The mri - head transformation cannot be opend. Chosse another file.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+        msgBox.exec();
+        stream->close();
+        return;
+    }
+    stream->close();
+
+    // Read measurement
+    QFile t_fMeas(m_pFwdSettings->measname);
+    stream = FIFFLIB::FiffStream::SPtr(new FIFFLIB::FiffStream(&t_fMri));
+    if(!stream->open()) {
+        QMessageBox msgBox;
+        msgBox.setText("The meaurement file cannot be opend. Chosse another file.");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.setWindowFlags(Qt::WindowStaysOnTopHint);
+        msgBox.exec();
+        stream->close();
+        return;
+    }
+    stream->close();
+
+    qInfo() << "Verified source files for forward solution computation.";
+
     m_bDoFwdComputation = true;
-    m_mutex.unlock();
 
     m_pFwdSettings->pFiffInfo = m_pFiffInfo;
 
@@ -206,9 +300,7 @@ void ForwardSolution::onDoForwardComputation()
     emit statusInformationChanged(4);           // not computed
 
     emit statusInformationChanged(1);   // computing
-    m_mutex.lock();
     m_bBusy = true;
-    m_mutex.unlock();
 
     // compute and store
     pComputeFwd->calculateFwd();
@@ -239,15 +331,15 @@ void ForwardSolution::onDoForwardComputation()
 
     m_pAnalyzeData->addModel<ANSHAREDLIB::ForwardSolutionModel>(pFwdSolModel,
                                                                 "Fwd. Sol. - " + QDateTime::currentDateTime().toString());
+
+    qInfo() << "New soultion available";
 }
 
 //=============================================================================================================
 
 void ForwardSolution::onRecompStatusChanged(bool bDoRecomputation)
 {
-    m_mutex.lock();
     m_bDoRecomputation = bDoRecomputation;
-    m_mutex.unlock();
 }
 
 //=============================================================================================================
@@ -260,17 +352,37 @@ void ForwardSolution::onClusteringStatusChanged(bool bDoClustering)
         msgBox.exec();
         return;
     }
-    m_mutex.lock();
     m_bDoClustering = bDoClustering;
-    m_mutex.unlock();
 }
 
 //=============================================================================================================
 
 void ForwardSolution::onAtlasDirChanged(const QString& sDirPath, const FSLIB::AnnotationSet::SPtr pAnnotationSet)
 {
-    m_mutex.lock();
     m_sAtlasDir = sDirPath;
     m_pAnnotationSet = pAnnotationSet;
-    m_mutex.unlock();
+}
+
+//=============================================================================================================
+
+void ForwardSolution::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
+{
+    switch(pNewModel->getType()){
+         case ANSHAREDLIB::ANSHAREDLIB_FIFFRAW_MODEL:{
+            auto pRawDataModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
+            if(pRawDataModel){
+                m_pFiffInfo = pRawDataModel->getFiffInfo();
+            }
+            break;
+        }
+        case ANSHAREDLIB::ANSHAREDLIB_AVERAGING_MODEL:{
+            auto pAverageDataModel = qSharedPointerCast<AveragingDataModel>(pNewModel);
+            if(pAverageDataModel){
+                m_pFiffInfo = pAverageDataModel->getFiffInfo();
+            }
+            break;
+        }
+        default:
+            break;
+    }
 }

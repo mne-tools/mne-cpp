@@ -146,6 +146,8 @@ private:
     QSharedPointer<ANSHAREDLIB::AveragingDataModel>         m_pAverageDataModel;
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pRawDataModel;
 
+    int                                                     m_iSelectedSample;
+
     Mode m_sourceLocalizationMode;
 };
 

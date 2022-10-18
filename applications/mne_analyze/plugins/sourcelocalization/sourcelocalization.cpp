@@ -39,9 +39,11 @@
 #include "sourcelocalization.h"
 
 #include <anShared/Management/communicator.h>
+
 #include <anShared/Model/abstractmodel.h>
 #include <anShared/Model/fiffrawviewmodel.h>
 #include <anShared/Model/averagingdatamodel.h>
+#include <anShared/Model/forwardsolutionmodel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -137,6 +139,9 @@ void SourceLocalization::handleEvent(QSharedPointer<Event> e)
     case EVENT_TYPE::MODEL_REMOVED:
         onModelRemoved(e->getData().value<QSharedPointer<ANSHAREDLIB::AbstractModel>>());
         break;
+    case EVENT_TYPE::SAMPLE_SELECTED:
+        m_iSelectedSample = e->getData().value<int>();
+        sourceLocalizationFromSingleTrial();
     default:
         qWarning() << "[Events::handleEvent] Received an Event that is not handled by switch cases.";
     }
@@ -192,10 +197,7 @@ void SourceLocalization::sourceLocalizationFromSingleTrial()
         qInfo() << "[SourceLocalization::performSourceLocalization] No forward solution available.";
         return;
     }
-
-
 }
-
 
 //=============================================================================================================
 

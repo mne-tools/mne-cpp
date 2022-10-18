@@ -59,6 +59,7 @@
 
 namespace ANSHAREDLIB {
     class Communicator;
+    class AbstractModel;
 }
 
 namespace DISPLIB {
@@ -189,6 +190,16 @@ signals:
     void statusInformationChanged(int iStatus);
 
 private:
+
+    //=========================================================================================================
+    /**
+     * Loads new Fiff model whan current loaded model is changed
+     *
+     * @param[in, out] pNewModel    pointer to currently loaded FiffRawView Model.
+     */
+    void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
+
+
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals. */
 
     DISPLIB::FwdSettingsView*                               m_pFwdSettingsView;
@@ -212,7 +223,7 @@ private:
 
     QString                                                 m_sAtlasDir;                /**< File to Atlas. */
 
-
+    QString                                                 m_sFiffInfoSource;
 };
 
 } // NAMESPACE
