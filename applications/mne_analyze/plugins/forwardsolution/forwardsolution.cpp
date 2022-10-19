@@ -155,6 +155,7 @@ QWidget *ForwardSolution::getView()
 QDockWidget* ForwardSolution::getControl()
 {
     m_pFwdSettingsView = new DISPLIB::FwdSettingsView();
+    m_pFwdSettingsView->setSettings(m_pFwdSettings);
 
     QVBoxLayout* pControlLayout = new QVBoxLayout();
     pControlLayout->addWidget(m_pFwdSettingsView);

@@ -2,12 +2,13 @@
 /**
  * @file     fwdsettingsview.h
  * @author   Ruben Dörfel <ruben.doerfel@tu-ilmenau.de>
+ *           Gabriel B Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.1
  * @date     May, 2020
  *
  * @section  LICENSE
  *
- * Copyright (C) 2020, Ruben Dörfel. All rights reserved.
+ * Copyright (C) 2020, Ruben Dörfel, Gabriel B Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -61,6 +62,10 @@
 
 namespace FSLIB {
     class AnnotationSet;
+}
+
+namespace FWDLIB{
+    class ComputeFwdSettings;
 }
 
 namespace Ui {
@@ -179,6 +184,8 @@ public:
      */
     void clearView();
 
+    void setSettings(QSharedPointer<FWDLIB::ComputeFwdSettings>  pSettings);
+
 protected:
     //=========================================================================================================
     /**
@@ -201,6 +208,95 @@ protected:
     Ui::FwdSettingsViewWidget*                  m_pUi;                  /**< The rtFwd dialog. */
 
     QString                                     m_sSettingsPath;        /**< The settings path to store the GUI settings to. */
+
+    QSharedPointer<FWDLIB::ComputeFwdSettings>  m_pFwdSettings;
+
+private:
+    //=========================================================================================================
+    /**
+     * Shows forward solution directory selection dialog
+     */
+    void showFwdDirDialog();
+
+    //=========================================================================================================
+    /**
+     * change name of solution file
+     */
+    void onSolNameChanged();
+
+    //=========================================================================================================
+    /**
+     * Shows measurement selection dialog
+     */
+    void showMeasFileDialog();
+
+    //=========================================================================================================
+    /**
+     * Shows source space selection dialog
+     */
+    void showSourceFileDialog();
+
+    //=========================================================================================================
+    /**
+     * Shows Bem model selection dialog
+     */
+    void showBemFileDialog();
+
+    //=========================================================================================================
+    /**
+     * Shows Mri->Head transformation selection dialog
+     */
+    void showMriFileDialog();
+
+    //=========================================================================================================
+    /**
+     * Shows output file selection dialog
+     */
+    void showMinDistDirDialog();
+
+    QString     m_sMinDistDir;
+
+    //=========================================================================================================
+    /**
+     * Change name of MinDistDir output
+     */
+    void onMinDistNameChanged();
+
+    //=========================================================================================================
+    /**
+     * Shows EEG model selection dialog
+     */
+    void showEEGModelFileDialog();
+
+    //=========================================================================================================
+    /**
+     * Shows EEG model name selection selection dialog
+     */
+    void onEEGModelNameChanged();
+
+    //=========================================================================================================
+    /**
+     * Change value of minimum distance skull - source
+     */
+    void onMinDistChanged();
+
+    //=========================================================================================================
+    /**
+     * Change EEG sphere radius
+     */
+    void onEEGSphereRadChanged();
+
+    //=========================================================================================================
+    /**
+     * Change EEG sphere origin
+     */
+    void onEEGSphereOriginChanged();
+
+    //=========================================================================================================
+    /**
+     * Change settings from checkboxes
+     */
+    void onCheckStateChanged();
 
 signals:
     //=========================================================================================================
