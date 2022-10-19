@@ -171,22 +171,21 @@ QDockWidget* ForwardSolution::getControl()
 
     // connect incoming signals
     connect(m_pFwdSettingsView, &DISPLIB::FwdSettingsView::recompStatusChanged,
-            this, &ForwardSolution::onRecompStatusChanged);
+            this, &ForwardSolution::onRecompStatusChanged, Qt::UniqueConnection);
     connect(m_pFwdSettingsView, &DISPLIB::FwdSettingsView::clusteringStatusChanged,
-            this, &ForwardSolution::onClusteringStatusChanged);
+            this, &ForwardSolution::onClusteringStatusChanged, Qt::UniqueConnection);
     connect(m_pFwdSettingsView, &DISPLIB::FwdSettingsView::atlasDirChanged,
-            this, &ForwardSolution::onAtlasDirChanged);
+            this, &ForwardSolution::onAtlasDirChanged, Qt::UniqueConnection);
     connect(m_pFwdSettingsView, &DISPLIB::FwdSettingsView::doForwardComputation,
-            this, &ForwardSolution::onDoForwardComputation);
+            this, &ForwardSolution::onDoForwardComputation, Qt::UniqueConnection);
 
     // connect outgoing signals
     connect(this, &ForwardSolution::statusInformationChanged,
-            m_pFwdSettingsView, &DISPLIB::FwdSettingsView::setRecomputationStatus, Qt::BlockingQueuedConnection);
+            m_pFwdSettingsView, &DISPLIB::FwdSettingsView::setRecomputationStatus, Qt::UniqueConnection);
     connect(this, &ForwardSolution::fwdSolutionAvailable,
-            m_pFwdSettingsView, &DISPLIB::FwdSettingsView::setSolutionInformation, Qt::BlockingQueuedConnection);
+            m_pFwdSettingsView, &DISPLIB::FwdSettingsView::setSolutionInformation, Qt::UniqueConnection);
     connect(this, &ForwardSolution::clusteringAvailable,
-            m_pFwdSettingsView, &DISPLIB::FwdSettingsView::setClusteredInformation, Qt::BlockingQueuedConnection);
-
+            m_pFwdSettingsView, &DISPLIB::FwdSettingsView::setClusteredInformation, Qt::UniqueConnection);
 
     return pControlDock;
 }
@@ -225,6 +224,7 @@ QString ForwardSolution::getBuildInfo()
 
 void ForwardSolution::onDoForwardComputation()
 {
+
     if(!m_pFiffInfo){
         qInfo() << "No FiffInfo source available for forward solution computation.";
         return;
