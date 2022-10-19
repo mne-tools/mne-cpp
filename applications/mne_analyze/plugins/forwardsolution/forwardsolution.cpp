@@ -39,8 +39,6 @@
 
 #include "forwardsolution.h"
 
-#include "FormFiles/fwdsetupwidget.h"
-
 #include <anShared/Management/communicator.h>
 #include <anShared/Management/analyzedata.h>
 
@@ -157,22 +155,18 @@ QWidget *ForwardSolution::getView()
 QDockWidget* ForwardSolution::getControl()
 {
     m_pFwdSettingsView = new DISPLIB::FwdSettingsView();
-//    m_pFwdSetupView = new FwdSetupWidget(m_pFwdSettings);
 
-//    QVBoxLayout* pControlLayout = new QVBoxLayout();
-//    pControlLayout->addWidget(m_pFwdSettingsView);
-//    pControlLayout->addWidget(m_pFwdSetupView);
-//    pControlLayout->setSpacing(0);
+    QVBoxLayout* pControlLayout = new QVBoxLayout();
+    pControlLayout->addWidget(m_pFwdSettingsView);
 
-//    QWidget* containerWidget = new QWidget();
-//    containerWidget->setLayout(pControlLayout);
+    QWidget* containerWidget = new QWidget();
+    containerWidget->setLayout(pControlLayout);
 
-//    QScrollArea* pControlScrollArea = new QScrollArea();
-//    pControlScrollArea->setWidget(containerWidget);
+    QScrollArea* pControlScrollArea = new QScrollArea();
+    pControlScrollArea->setWidget(containerWidget);
 
     QDockWidget* pControlDock = new QDockWidget(this->getName());
-//    pControlDock->setWidget(pControlScrollArea);
-    pControlDock->setWidget(m_pFwdSettingsView);
+    pControlDock->setWidget(pControlScrollArea);
 
     // connect incoming signals
     connect(m_pFwdSettingsView, &DISPLIB::FwdSettingsView::recompStatusChanged,

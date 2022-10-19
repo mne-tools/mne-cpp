@@ -89,17 +89,12 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    FormFiles/fwdsetupwidget.cpp \
     forwardsolution.cpp \
     forwardsolution_global.cpp \
 
 HEADERS += \
-    FormFiles/fwdsetupwidget.h \
     forwardsolution_global.h \
     forwardsolution.h \
-
-FORMS += \
-    FormFiles/fwdsetupwidget.ui
 
 OTHER_FILES += forwardsolution.json
 

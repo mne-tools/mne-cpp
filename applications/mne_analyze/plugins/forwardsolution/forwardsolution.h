@@ -86,8 +86,6 @@ namespace MNELIB {
 namespace FORWARDSOLUTIONPLUGIN
 {
 
-class FwdSetupWidget;
-
 //=============================================================================================================
 // FORWARDSOLUTIONPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
@@ -205,7 +203,6 @@ private:
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals. */
 
     DISPLIB::FwdSettingsView*                               m_pFwdSettingsView;
-    FwdSetupWidget*                                         m_pFwdSetupView;
 
     QSharedPointer<FWDLIB::ComputeFwdSettings>              m_pFwdSettings;         /**< Forward Solution Settings. */
 
