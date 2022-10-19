@@ -45,6 +45,8 @@
 #include <anShared/Model/averagingdatamodel.h>
 #include <anShared/Model/forwardsolutionmodel.h>
 
+#include <inverse/minimumNorm/minimumnorm.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -67,6 +69,8 @@ SourceLocalization::SourceLocalization()
 , m_pFwdSolutionModel(Q_NULLPTR)
 , m_pAverageDataModel(Q_NULLPTR)
 , m_pRawDataModel(Q_NULLPTR)
+, m_iSelectedSample(-1)
+, m_bUpdateMinNorm(false)
 {
 }
 
@@ -197,6 +201,23 @@ void SourceLocalization::sourceLocalizationFromSingleTrial()
         qInfo() << "[SourceLocalization::performSourceLocalization] No forward solution available.";
         return;
     }
+
+    if(!m_pRawDataModel){
+        qInfo() << "[SourceLocalization::performSourceLocalization] No raw data model available.";
+        return;
+    }
+
+
+    if(m_bUpdateMinNorm) {
+        m_pMinimumNorm = INVERSELIB::MinimumNorm::SPtr(new INVERSELIB::MinimumNorm(m_invOp, 1.0f / pow(1.0f, 2), "MNE"));
+        m_bUpdateMinNorm = false;
+
+        // Set up the inverse according to the parameters.
+        // Use 1 nave here because in case of evoked data as input the minimum norm will always be updated when the source estimate is calculated (see run method).
+        m_pMinimumNorm->doInverseSetup(1,true);
+    }
+
+
 }
 
 //=============================================================================================================
@@ -213,6 +234,7 @@ void SourceLocalization::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractMode
             break;
         case ANSHAREDLIB::ANSHAREDLIB_FORWARDSOLUTION_MODEL:
             m_pFwdSolutionModel = qSharedPointerCast<ForwardSolutionModel>(pNewModel);
+
             break;
         default:
             break;

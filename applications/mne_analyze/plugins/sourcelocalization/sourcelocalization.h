@@ -43,6 +43,8 @@
 
 #include <anShared/Plugins/abstractplugin.h>
 
+#include <mne/mne_inverse_operator.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -60,6 +62,10 @@ namespace ANSHAREDLIB {
     class FiffRawViewModel;
     class AveragingDataModel;
     class ForwardSolutionModel;
+}
+
+namespace INVERSELIB {
+    class MinimumNorm;
 }
 
 //=============================================================================================================
@@ -146,7 +152,13 @@ private:
     QSharedPointer<ANSHAREDLIB::AveragingDataModel>         m_pAverageDataModel;
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pRawDataModel;
 
-    int                                                     m_iSelectedSample;
+    QSharedPointer<INVERSELIB::MinimumNorm> m_pMinimumNorm;
+
+    MNELIB::MNEInverseOperator      m_invOp;                    /**< The inverse operator. */
+
+
+    int         m_iSelectedSample;
+    bool        m_bUpdateMinNorm;
 
     Mode m_sourceLocalizationMode;
 };
