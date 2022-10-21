@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     forwardsolutionmodel.cpp
+ * @file     sourceestimatemodel.cpp
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.9
  * @date     October, 2022
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the ForwardSolutionModel Class.
+ * @brief    Definition of the SourceEstimateModel Class.
  *
  */
 
@@ -37,9 +37,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "forwardsolutionmodel.h"
+
+#include "sourceestimatemodel.h"
 
 #include <mne/mne_forwardsolution.h>
+#include <mne/mne_sourceestimate.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -61,23 +63,25 @@ using namespace ANSHAREDLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ForwardSolutionModel::ForwardSolutionModel(QObject* parent)
+SourceEstimateModel::SourceEstimateModel(QObject* parent)
 :AbstractModel(parent)
 {
 }
 
 //=============================================================================================================
 
-ForwardSolutionModel::ForwardSolutionModel(QSharedPointer<MNELIB::MNEForwardSolution> pFwdSolution,
-                                           QObject* parent)
+SourceEstimateModel::SourceEstimateModel(QSharedPointer<MNELIB::MNESourceEstimate> pSourceEstimate,
+                                         QSharedPointer<MNELIB::MNEForwardSolution> pFwdSolution,
+                                         QObject* parent)
 : AbstractModel( parent)
+, m_pSourceEstimate(pSourceEstimate)
 , m_pFwdSolution(pFwdSolution)
 {
 }
 
 //=============================================================================================================
 
-int ForwardSolutionModel::rowCount(const QModelIndex &parent) const
+int SourceEstimateModel::rowCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
 
@@ -86,7 +90,7 @@ int ForwardSolutionModel::rowCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-int ForwardSolutionModel::columnCount(const QModelIndex &parent) const
+int SourceEstimateModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent);
 
@@ -95,7 +99,7 @@ int ForwardSolutionModel::columnCount(const QModelIndex &parent) const
 
 //=============================================================================================================
 
-QVariant ForwardSolutionModel::data(const QModelIndex &index,
+QVariant SourceEstimateModel::data(const QModelIndex &index,
                                     int role) const
 {
     Q_UNUSED(index);
@@ -106,14 +110,21 @@ QVariant ForwardSolutionModel::data(const QModelIndex &index,
 
 //=============================================================================================================
 
-Qt::ItemFlags ForwardSolutionModel::flags(const QModelIndex &index) const
+Qt::ItemFlags SourceEstimateModel::flags(const QModelIndex &index) const
 {
     return QAbstractItemModel::flags(index);
 }
 
 //=============================================================================================================
 
-QSharedPointer<MNELIB::MNEForwardSolution> ForwardSolutionModel::getFwdSolution()
+QSharedPointer<MNELIB::MNEForwardSolution> SourceEstimateModel::getFwdSolution()
 {
     return m_pFwdSolution;
+}
+
+//=============================================================================================================
+
+QSharedPointer<MNELIB::MNESourceEstimate> SourceEstimateModel::getSourceEstimate()
+{
+    return m_pSourceEstimate;
 }

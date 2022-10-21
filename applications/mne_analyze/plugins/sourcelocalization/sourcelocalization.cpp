@@ -136,6 +136,7 @@ QDockWidget* SourceLocalization::getControl()
 {
     //QDockWidget* pControl = new QDockWidget(getName());
 
+
     return Q_NULLPTR;
 }
 
@@ -267,7 +268,7 @@ void SourceLocalization::sourceLocalizationFromSingleTrial()
             *pSourceEstimate = pSourceEstimate->reduce(iTimePointSps,1);
         }
 //        m_pAnalyzeData->addModel<ANSHAREDLIB::ForwardSolutionModel>(pFwdSolModel,
-//                                                                    "Src. Est. - " + QDateTime::currentDateTime().toString());
+//                                                                    "Src. Est. - " + QString::number(m_iSelectedSample));
     }
 
 

@@ -221,4 +221,13 @@ inline bool MNESourceEstimate::isEmpty() const
 }
 } //NAMESPACE
 
+#ifndef metatype_mnesourceestimate
+Q_DECLARE_METATYPE(MNELIB::MNESourceEstimate);/**< Provides QT META type declaration of the MNELIB::MNEForwardSolution type. For signal/slot and QVariant usage.*/
+#endif
+
+#ifndef metatype_mnesourceestimatesptr
+#define metatype_mnesourceestimatesptr
+Q_DECLARE_METATYPE(MNELIB::MNESourceEstimate::SPtr);/**< Provides QT META type declaration of the MNELIB::MNEForwardSolution::SPtr type. For signal/slot and QVariant usage.*/
+#endif
+
 #endif // MNESOURCEESTIMATE_H

@@ -590,11 +590,12 @@ inline bool operator== (const MNEForwardSolution &a, const MNEForwardSolution &b
 } // NAMESPACE
 
 #ifndef metatype_mneforwardsolution
+#define metatype_mneforwardsolution
 Q_DECLARE_METATYPE(MNELIB::MNEForwardSolution);/**< Provides QT META type declaration of the MNELIB::MNEForwardSolution type. For signal/slot and QVariant usage.*/
 #endif
 
 #ifndef metatype_mneforwardsolutionsptr
-#define metatype_fiffevokedsetsptr
+#define metatype_mneforwardsolutionsptr
 Q_DECLARE_METATYPE(MNELIB::MNEForwardSolution::SPtr);/**< Provides QT META type declaration of the MNELIB::MNEForwardSolution::SPtr type. For signal/slot and QVariant usage.*/
 #endif
 

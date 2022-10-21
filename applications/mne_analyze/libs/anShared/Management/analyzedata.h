@@ -297,6 +297,13 @@ public:
                                BIDS_UNKNOWN);
             break;
         }
+        case ANSHAREDLIB_SOURCEESTIMATE_MODEL:{
+            pItem->setData(data);
+            m_pData->addToData(pItem,
+                               m_SelectedFunctionalData,
+                               BIDS_UNKNOWN);
+            break;
+        }
         case ANSHAREDLIB_FIFFRAW_MODEL: {
             pItem->setData(data);
             QModelIndex index = m_SelectedItem;

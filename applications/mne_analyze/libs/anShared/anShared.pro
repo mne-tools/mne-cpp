@@ -99,6 +99,7 @@ SOURCES += \
     Model/forwardsolutionmodel.cpp \
     Model/mricoordmodel.cpp \
     Model/covariancemodel.cpp \
+    Model/sourceestimatemodel.cpp \
     Plugins/abstractplugin.cpp
 
 HEADERS += \
@@ -106,6 +107,7 @@ HEADERS += \
     Model/forwardsolutionmodel.h \
     Model/mricoordmodel.h \
     Model/covariancemodel.h \
+    Model/sourceestimatemodel.h \
     Plugins/abstractplugin.h \
     anshared_global.h \
     Model/abstractmodel.h \
