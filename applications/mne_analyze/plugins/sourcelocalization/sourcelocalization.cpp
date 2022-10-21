@@ -47,11 +47,18 @@
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
+#include <mne/mne_inverse_operator.h>
+#include <mne/mne_sourceestimate.h>>
+
+#include <fiff/fiff_raw_data.h>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
+#include <QtConcurrent>
+#include <QFuture>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -207,14 +214,60 @@ void SourceLocalization::sourceLocalizationFromSingleTrial()
         return;
     }
 
+    Eigen::MatrixXd data, times;
 
-    if(m_bUpdateMinNorm) {
-        m_pMinimumNorm = INVERSELIB::MinimumNorm::SPtr(new INVERSELIB::MinimumNorm(m_invOp, 1.0f / pow(1.0f, 2), "MNE"));
-        m_bUpdateMinNorm = false;
+    float starting_sec = m_pRawDataModel->getSamplingFrequency() * static_cast<float>(m_iSelectedSample);
 
-        // Set up the inverse according to the parameters.
-        // Use 1 nave here because in case of evoked data as input the minimum norm will always be updated when the source estimate is calculated (see run method).
-        m_pMinimumNorm->doInverseSetup(1,true);
+    if(!m_pRawDataModel->getFiffIO()->m_qlistRaw.front()->read_raw_segment_times(data,
+                                                                                times,
+                                                                                starting_sec,
+                                                                                starting_sec + m_pRawDataModel->getSamplingFrequency()
+                                                                                ))
+    {
+        qWarning() << "Unable to load raw data for source estimation.";
+        return;
+    }
+
+    auto covEstimate = estimateCovariance(data, m_pRawDataModel->getFiffInfo().data());
+
+    MNELIB::MNEInverseOperator invOp(*m_pRawDataModel->getFiffInfo().data(),
+                                     *m_pFwdSolutionModel->getFwdSolution().data(),
+                                     covEstimate,
+                                     0.2f,
+                                     0.8f);
+
+    auto pMinimumNorm = INVERSELIB::MinimumNorm::SPtr(new INVERSELIB::MinimumNorm(invOp, 1.0f / pow(1.0f, 2), "MNE"));
+
+    // Set up the inverse according to the parameters.
+    // Use 1 nave here because in case of evoked data as input the minimum norm will always be updated when the source estimate is calculated (see run method).
+    pMinimumNorm->doInverseSetup(1,true);
+
+    int iNumberChannels = invOp.noise_cov->names.size();
+    float tstep = 1.0f / m_pRawDataModel->getFiffInfo()->sfreq;
+    auto lChNamesFiffInfo = m_pRawDataModel->getFiffInfo()->ch_names;
+    auto lChNamesInvOp = invOp.noise_cov->names;
+    int iTimePointSps = m_pRawDataModel->getFiffInfo()->sfreq * 0.001f;
+
+    MatrixXd matDataResized;
+    matDataResized.resize(iNumberChannels, data.cols());
+
+    for(int j = 0; j < iNumberChannels; ++j) {
+        matDataResized.row(j) = data.row(lChNamesFiffInfo.indexOf(lChNamesInvOp.at(j)));
+    }
+
+    //TODO: Add picking here. See evoked part as input.
+    QSharedPointer<MNELIB::MNESourceEstimate> pSourceEstimate = QSharedPointer<MNELIB::MNESourceEstimate>(new MNELIB::MNESourceEstimate());
+    *pSourceEstimate = pMinimumNorm->calculateInverse(matDataResized,
+                                                      0.0f,
+                                                      tstep,
+                                                      true);
+
+    if(!pSourceEstimate->isEmpty()) {
+        if(iTimePointSps < pSourceEstimate->data.cols() && iTimePointSps >= 0) {
+            *pSourceEstimate = pSourceEstimate->reduce(iTimePointSps,1);
+        }
+//        m_pAnalyzeData->addModel<ANSHAREDLIB::ForwardSolutionModel>(pFwdSolModel,
+//                                                                    "Src. Est. - " + QDateTime::currentDateTime().toString());
     }
 
 
@@ -246,4 +299,84 @@ void SourceLocalization::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractMode
 void SourceLocalization::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
 
+}
+
+//=============================================================================================================
+
+FIFFLIB::FiffCov SourceLocalization::estimateCovariance(const Eigen::MatrixXd& matData,
+                                                        FIFFLIB::FiffInfo* info)
+{
+    QList<Eigen::MatrixXd> lData;
+    lData.push_back(matData);
+
+    int iSamples = matData.cols();
+
+    QFuture<CovComputeResult> result = QtConcurrent::mappedReduced(lData,
+                                                                   computeCov,
+                                                                   reduceCov);
+
+    result.waitForFinished();
+
+    CovComputeResult finalResult = result.result();
+
+    //Final computation
+    FIFFLIB::FiffCov computedCov;
+    computedCov.data = finalResult.matData;
+
+    QStringList exclude;
+    for(int i = 0; i<info->chs.size(); i++) {
+        if(info->chs.at(i).kind != FIFFV_MEG_CH &&
+           info->chs.at(i).kind != FIFFV_EEG_CH) {
+            exclude << info->chs.at(i).ch_name;
+        }
+    }
+    bool doProj = true;
+
+    if(iSamples > 0) {
+        finalResult.mu /= (float)iSamples;
+        computedCov.data.array() -= iSamples * (finalResult.mu * finalResult.mu.transpose()).array();
+        computedCov.data.array() /= (iSamples - 1);
+
+        computedCov.kind = FIFFV_MNE_NOISE_COV;
+        computedCov.diag = false;
+        computedCov.dim = computedCov.data.rows();
+
+        //ToDo do picks
+        computedCov.names = info->ch_names;
+        computedCov.projs = info->projs;
+        computedCov.bads = info->bads;
+        computedCov.nfree = iSamples;
+
+        // regularize noise covariance
+        computedCov = computedCov.regularize(*info, 0.05, 0.05, 0.1, doProj, exclude);
+
+        return computedCov;
+    } else {
+        qWarning() << "[RtCov::estimateCovariance] Number of samples equals zero. Regularization not possible. Returning empty covariance estimation.";
+        return FIFFLIB::FiffCov();
+    }
+
+}
+
+//=============================================================================================================
+
+SourceLocalization::CovComputeResult SourceLocalization::computeCov(const MatrixXd &matData)
+{
+    CovComputeResult result;
+    result.mu = matData.rowwise().sum();
+    result.matData = matData * matData.transpose();
+    return result;
+}
+
+//=============================================================================================================
+
+void SourceLocalization::reduceCov(CovComputeResult& finalResult, const CovComputeResult &tempResult)
+{
+    if(finalResult.matData.size() == 0 || finalResult.mu.size() == 0) {
+        finalResult.mu = tempResult.mu;
+        finalResult.matData = tempResult.matData;
+    } else {
+        finalResult.mu += tempResult.mu;
+        finalResult.matData += tempResult.matData;
+    }
 }

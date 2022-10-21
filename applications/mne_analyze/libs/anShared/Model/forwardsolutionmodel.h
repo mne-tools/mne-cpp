@@ -138,6 +138,8 @@ public:
      */
     inline QModelIndex parent(const QModelIndex &index) const override;
 
+    QSharedPointer<MNELIB::MNEForwardSolution> getFwdSolution();
+
 private:
     QSharedPointer<MNELIB::MNEForwardSolution> m_pFwdSolution;
 };

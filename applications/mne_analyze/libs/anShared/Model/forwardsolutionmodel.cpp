@@ -110,3 +110,10 @@ Qt::ItemFlags ForwardSolutionModel::flags(const QModelIndex &index) const
 {
     return QAbstractItemModel::flags(index);
 }
+
+//=============================================================================================================
+
+QSharedPointer<MNELIB::MNEForwardSolution> ForwardSolutionModel::getFwdSolution()
+{
+    return m_pFwdSolution;
+}

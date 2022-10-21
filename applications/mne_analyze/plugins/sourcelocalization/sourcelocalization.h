@@ -121,6 +121,11 @@ public:
 
 private:
 
+    struct CovComputeResult {
+        Eigen::VectorXd mu;
+        Eigen::MatrixXd matData;
+    };
+
     enum Mode{
         SOURCE_LOC_FROM_AVG,
         SOURCE_LOC_FROM_SINGLE_TRIAL
@@ -146,15 +151,39 @@ private:
      */
     void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
 
+    //=========================================================================================================
+    /**
+     * Perform actual covariance estimation.
+     *
+     * @param[in] inputData  Data to estimate the covariance from.
+     */
+    FIFFLIB::FiffCov estimateCovariance(const Eigen::MatrixXd& matData,
+                                        FIFFLIB::FiffInfo* info);
+
+    //=========================================================================================================
+    /**
+     * Computer multiplication with transposed.
+     *
+     * @param[in] matData  Data to self multiply with.
+     *
+     * @return   The multiplication result.
+     */
+    static CovComputeResult computeCov(const Eigen::MatrixXd &matData);
+
+    //=========================================================================================================
+    /**
+     * Computer multiplication with transposed.
+     *
+     * @param[out]   finalResult     The final covariance estimation.
+     * @param[in]   tempResult      The intermediate result from the compute function.
+     */
+    static void reduceCov(CovComputeResult& finalResult, const CovComputeResult &tempResult);
+
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals. */
 
     QSharedPointer<ANSHAREDLIB::ForwardSolutionModel>       m_pFwdSolutionModel;
     QSharedPointer<ANSHAREDLIB::AveragingDataModel>         m_pAverageDataModel;
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pRawDataModel;
-
-    QSharedPointer<INVERSELIB::MinimumNorm> m_pMinimumNorm;
-
-    MNELIB::MNEInverseOperator      m_invOp;                    /**< The inverse operator. */
 
 
     int         m_iSelectedSample;
