@@ -43,8 +43,7 @@
 #include <anShared/Model/bemdatamodel.h>
 #include <anShared/Model/dipolefitmodel.h>
 #include <anShared/Model/abstractmodel.h>
-
-
+#include <anShared/Model/sourceestimatemodel.h>
 
 #include <disp3D/viewers/sourceestimateview.h>
 #include <disp3D/engine/view/view3D.h>
@@ -55,6 +54,7 @@
 #include <disp3D/engine/model/items/bem/bemtreeitem.h>
 #include <disp3D/engine/model/items/bem/bemsurfacetreeitem.h>
 #include <disp3D/engine/model/items/sourcedata/ecddatatreeitem.h>
+#include <disp3D/engine/model/items/sourcedata/mnedatatreeitem.h>
 
 #include <disp/viewers/control3dview.h>
 
@@ -83,6 +83,8 @@ View3D::View3D()
     : m_pCommu(Q_NULLPTR)
     , m_pBemTreeCoreg(Q_NULLPTR)
     , m_pDigitizerCoreg(Q_NULLPTR)
+    , m_pDipoleFit(Q_NULLPTR)
+    , m_pRtMNEItem(Q_NULLPTR)
     , m_pView3D(Q_NULLPTR)
     , m_bPickingActivated(false)
 {
@@ -361,10 +363,58 @@ void View3D::newDipoleFit(const INVERSELIB::ECDSet &ecdSet)
 
 //=============================================================================================================
 
+void View3D::newSourceLoc(QSharedPointer<ANSHAREDLIB::SourceEstimateModel> pModel)
+{
+    auto pSourcEstimate = pModel->getSourceEstimate();
+    auto pFwdSolution = pModel->getFwdSolution();
+    auto pHeadTrans = pModel->getMRIHeadTrans();
+    auto pAnnotationSet = pModel->getAnnotationSet();
+    auto pSurfSet = pModel->getSurfSet();
+
+    if(pSourcEstimate && pFwdSolution && pHeadTrans && pAnnotationSet && pSurfSet){
+        if(!m_pRtMNEItem){
+            m_pRtMNEItem = m_p3DModel->addSourceData("Subject", "Functional Data",
+                                                         *pSourcEstimate,
+                                                         *pFwdSolution,
+                                                         *pSurfSet,
+                                                         *pAnnotationSet);
+            m_pRtMNEItem->setLoopState(false);
+            m_pRtMNEItem->setTimeInterval(17);
+            m_pRtMNEItem->setThresholds(QVector3D(0.0,5,10));
+            m_pRtMNEItem->setColormapType("Hot");
+            m_pRtMNEItem->setVisualizationType("Annotation based");
+            m_pRtMNEItem->setNumberAverages(1); // Set to 1 because we want to enable time point picking which only includes one sample
+            m_pRtMNEItem->setAlpha(1.0);
+            m_pRtMNEItem->setStreamingState(true);
+            //m_pRtMNEItem->setSFreq();
+        } else {
+            m_pRtMNEItem->addData(*pSourcEstimate);
+        }
+
+    } else {
+        qWarning() << "[View3D::newSourceLoc] Missing data in sourec loc model:";
+        if(!pSourcEstimate) qWarning() << "Source Estimate missing.";
+        if(!pFwdSolution) qWarning() << "Fwd Solution missing.";
+        if(!pHeadTrans) qWarning() << "MRI Head Trans missing.";
+        if(!pAnnotationSet) qWarning() << "AnnotationSet missing.";
+        if(!pSurfSet) qWarning() << "Surface Set missing.";
+        return;
+    }
+}
+
+//=============================================================================================================
+
 void View3D::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel)
 {
-    if(pNewModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL) {
+    switch(pNewModel->getType()){
+    case MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL:
         newDipoleFit(qSharedPointerCast<DipoleFitModel>(pNewModel)->data(QModelIndex()).value<INVERSELIB::ECDSet>());
+        break;
+    case MODEL_TYPE::ANSHAREDLIB_SOURCEESTIMATE_MODEL:
+        newSourceLoc(qSharedPointerCast<SourceEstimateModel>(pNewModel));
+        break;
+    default:
+        break;
     }
 }
 

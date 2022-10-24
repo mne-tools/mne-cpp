@@ -80,9 +80,12 @@ public:
     SourceEstimateModel(QObject* parent = Q_NULLPTR);
 
     //=========================================================================================================
-    SourceEstimateModel(QSharedPointer<MNELIB::MNESourceEstimate> pSourceEstimate,
-                        QSharedPointer<MNELIB::MNEForwardSolution> pFwdSolution,
-                        QObject* parent = Q_NULLPTR);
+    SourceEstimateModel(QSharedPointer<MNELIB::MNESourceEstimate>   pSourceEstimate = Q_NULLPTR,
+                        QSharedPointer<MNELIB::MNEForwardSolution>  pFwdSolution    = Q_NULLPTR,
+                        QSharedPointer<FIFFLIB::FiffCoordTrans>     pCoord          = Q_NULLPTR,
+                        QSharedPointer<FSLIB::AnnotationSet>        pAnnotationSet  = Q_NULLPTR,
+                        QSharedPointer<FSLIB::SurfaceSet>           pSurfaceSet     = Q_NULLPTR,
+                        QObject*                                    parent          = Q_NULLPTR);
 
     //=========================================================================================================
     /**
@@ -149,8 +152,17 @@ public:
      */
     inline QModelIndex parent(const QModelIndex &index) const override;
 
-    QSharedPointer<MNELIB::MNESourceEstimate> getSourceEstimate();
-    QSharedPointer<MNELIB::MNEForwardSolution> getFwdSolution();
+    QSharedPointer<MNELIB::MNESourceEstimate> getSourceEstimate() const;
+    QSharedPointer<MNELIB::MNEForwardSolution> getFwdSolution() const;
+    QSharedPointer<FIFFLIB::FiffCoordTrans> getMRIHeadTrans() const;
+    QSharedPointer<FSLIB::AnnotationSet> getAnnotationSet() const;
+    QSharedPointer<FSLIB::SurfaceSet> getSurfSet() const;
+
+    void setSourceEstimate(QSharedPointer<MNELIB::MNESourceEstimate> pSourceEstimate);
+    void setFwdSolution(QSharedPointer<MNELIB::MNEForwardSolution> pFwdSol);
+    void setMRIHeadTrans( QSharedPointer<FIFFLIB::FiffCoordTrans> pCoord);
+    void setAnnotationSet(QSharedPointer<FSLIB::AnnotationSet> pAnnot);
+    void setSurfSet(QSharedPointer<FSLIB::SurfaceSet> pSurfSet);
 
 private:
     QSharedPointer<MNELIB::MNESourceEstimate>   m_pSourceEstimate;

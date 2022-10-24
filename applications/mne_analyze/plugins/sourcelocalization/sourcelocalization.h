@@ -179,11 +179,39 @@ private:
      */
     static void reduceCov(CovComputeResult& finalResult, const CovComputeResult &tempResult);
 
+    //=========================================================================================================
+    /**
+     * Slot called when the method changed.
+     *
+     * @param[in] method        The new method.
+     */
+    void onMethodChanged(const QString &method);
+
+    //=========================================================================================================
+    /**
+     * Slot called when the trigger type changed.
+     *
+     * @param[in] triggerType        The new trigger type.
+     */
+    void onTriggerTypeChanged(const QString& triggerType);
+
+    //=========================================================================================================
+    /**
+     * Slot called when the time point changes.
+     *
+     * @param[in] iTimePointMs        The new time point in ms.
+     */
+    void onTimePointValueChanged(int iTimePointMs);
+
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals. */
 
     QSharedPointer<ANSHAREDLIB::ForwardSolutionModel>       m_pFwdSolutionModel;
     QSharedPointer<ANSHAREDLIB::AveragingDataModel>         m_pAverageDataModel;
     QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pRawDataModel;
+
+
+    QString                         m_sAvrType;                 /**< The average type. */
+    QString                         m_sMethod;                  /**< The method: "MNE" | "dSPM" | "sLORETA". */
 
 
     int         m_iSelectedSample;

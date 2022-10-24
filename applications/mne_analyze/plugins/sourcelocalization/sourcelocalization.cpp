@@ -138,6 +138,13 @@ QDockWidget* SourceLocalization::getControl()
 {
     DISPLIB::MinimumNormSettingsView* pMinimumNormSettingsView = new DISPLIB::MinimumNormSettingsView(QString("MNESCAN/%1").arg(this->getName()));
 
+    connect(pMinimumNormSettingsView, &DISPLIB::MinimumNormSettingsView::methodChanged,
+            this, &SourceLocalization::onMethodChanged);
+    connect(pMinimumNormSettingsView, &DISPLIB::MinimumNormSettingsView::triggerTypeChanged,
+            this, &SourceLocalization::onTriggerTypeChanged);
+    connect(pMinimumNormSettingsView, &DISPLIB::MinimumNormSettingsView::timePointChanged,
+            this, &SourceLocalization::onTimePointValueChanged);
+
     QVBoxLayout* pControlLayout = new QVBoxLayout();
     pControlLayout->addWidget(pMinimumNormSettingsView);
 
@@ -250,7 +257,7 @@ void SourceLocalization::sourceLocalizationFromSingleTrial()
                                      0.2f,
                                      0.8f);
 
-    auto pMinimumNorm = INVERSELIB::MinimumNorm::SPtr(new INVERSELIB::MinimumNorm(invOp, 1.0f / pow(1.0f, 2), "MNE"));
+    auto pMinimumNorm = INVERSELIB::MinimumNorm::SPtr(new INVERSELIB::MinimumNorm(invOp, 1.0f / pow(1.0f, 2), m_sMethod));
 
     // Set up the inverse according to the parameters.
     // Use 1 nave here because in case of evoked data as input the minimum norm will always be updated when the source estimate is calculated (see run method).
@@ -393,4 +400,36 @@ void SourceLocalization::reduceCov(CovComputeResult& finalResult, const CovCompu
         finalResult.mu += tempResult.mu;
         finalResult.matData += tempResult.matData;
     }
+}
+
+//=============================================================================================================
+
+void SourceLocalization::onMethodChanged(const QString& method)
+{
+    m_sMethod = method;
+}
+
+//=============================================================================================================
+
+void SourceLocalization::onTriggerTypeChanged(const QString& triggerType)
+{
+    m_sAvrType = triggerType;
+}
+
+//=============================================================================================================
+
+void SourceLocalization::onTimePointValueChanged(int iTimePointMs)
+{
+    Q_UNUSED(iTimePointMs);
+//    if(m_pFiffInfoInput && m_pCircularEvokedBuffer) {
+//        m_qMutex.lock();
+//        m_iTimePointSps = m_pFiffInfoInput->sfreq * (float)iTimePointMs * 0.001f;
+//        m_qMutex.unlock();
+
+//        if(this->isRunning()) {
+//            while(!m_pCircularEvokedBuffer->push(m_currentEvoked)) {
+//                //Do nothing until the circular buffer is ready to accept new data again
+//            }
+//        }
+//    }
 }

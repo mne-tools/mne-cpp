@@ -70,12 +70,18 @@ SourceEstimateModel::SourceEstimateModel(QObject* parent)
 
 //=============================================================================================================
 
-SourceEstimateModel::SourceEstimateModel(QSharedPointer<MNELIB::MNESourceEstimate> pSourceEstimate,
-                                         QSharedPointer<MNELIB::MNEForwardSolution> pFwdSolution,
-                                         QObject* parent)
+SourceEstimateModel::SourceEstimateModel(QSharedPointer<MNELIB::MNESourceEstimate>   pSourceEstimate,
+                                         QSharedPointer<MNELIB::MNEForwardSolution>  pFwdSolution,
+                                         QSharedPointer<FIFFLIB::FiffCoordTrans>     pCoord,
+                                         QSharedPointer<FSLIB::AnnotationSet>        pAnnotationSet,
+                                         QSharedPointer<FSLIB::SurfaceSet>           pSurfaceSet,
+                                         QObject*                                    parent          )
 : AbstractModel( parent)
 , m_pSourceEstimate(pSourceEstimate)
 , m_pFwdSolution(pFwdSolution)
+, m_pCoord(pCoord)
+, m_pAnnotationSet(pAnnotationSet)
+, m_pSurfaceSet(pSurfaceSet)
 {
 }
 
@@ -117,14 +123,70 @@ Qt::ItemFlags SourceEstimateModel::flags(const QModelIndex &index) const
 
 //=============================================================================================================
 
-QSharedPointer<MNELIB::MNESourceEstimate> SourceEstimateModel::getSourceEstimate()
+QSharedPointer<MNELIB::MNESourceEstimate> SourceEstimateModel::getSourceEstimate() const
 {
     return m_pSourceEstimate;
 }
 
 //=============================================================================================================
 
-QSharedPointer<MNELIB::MNEForwardSolution> SourceEstimateModel::getFwdSolution()
+QSharedPointer<MNELIB::MNEForwardSolution> SourceEstimateModel::getFwdSolution() const
 {
     return m_pFwdSolution;
+}
+
+//=============================================================================================================
+
+QSharedPointer<FIFFLIB::FiffCoordTrans> SourceEstimateModel::getMRIHeadTrans() const
+{
+    return m_pCoord;
+}
+
+//=============================================================================================================
+
+QSharedPointer<FSLIB::AnnotationSet> SourceEstimateModel::getAnnotationSet() const
+{
+    return m_pAnnotationSet;
+}
+
+//=============================================================================================================
+
+QSharedPointer<FSLIB::SurfaceSet> SourceEstimateModel::getSurfSet() const
+{
+    return m_pSurfaceSet;
+}
+
+//=============================================================================================================
+
+void SourceEstimateModel::setSourceEstimate(QSharedPointer<MNELIB::MNESourceEstimate> pSourceEstimate)
+{
+    m_pSourceEstimate = pSourceEstimate;
+}
+
+//=============================================================================================================
+
+void SourceEstimateModel::setFwdSolution(QSharedPointer<MNELIB::MNEForwardSolution> pFwdSol)
+{
+    m_pFwdSolution = pFwdSol;
+}
+
+//=============================================================================================================
+
+void SourceEstimateModel::setMRIHeadTrans( QSharedPointer<FIFFLIB::FiffCoordTrans> pCoord)
+{
+    m_pCoord = pCoord;
+}
+
+//=============================================================================================================
+
+void SourceEstimateModel::setAnnotationSet(QSharedPointer<FSLIB::AnnotationSet> pAnnot)
+{
+    m_pAnnotationSet = pAnnot;
+}
+
+//=============================================================================================================
+
+void SourceEstimateModel::setSurfSet(QSharedPointer<FSLIB::SurfaceSet> pSurfSet)
+{
+    m_pSurfaceSet = pSurfSet;
 }
