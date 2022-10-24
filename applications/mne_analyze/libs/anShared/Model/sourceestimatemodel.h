@@ -47,6 +47,15 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+namespace FIFFLIB{
+    class FiffCoordTrans;
+}
+
+namespace FSLIB{
+    class AnnotationSet;
+    class SurfaceSet;
+}
+
 namespace MNELIB {
     class MNEForwardSolution;
     class MNESourceEstimate;
@@ -140,13 +149,15 @@ public:
      */
     inline QModelIndex parent(const QModelIndex &index) const override;
 
-    QSharedPointer<MNELIB::MNEForwardSolution> getFwdSolution();
     QSharedPointer<MNELIB::MNESourceEstimate> getSourceEstimate();
-
+    QSharedPointer<MNELIB::MNEForwardSolution> getFwdSolution();
 
 private:
-    QSharedPointer<MNELIB::MNESourceEstimate> m_pSourceEstimate;
-    QSharedPointer<MNELIB::MNEForwardSolution> m_pFwdSolution;
+    QSharedPointer<MNELIB::MNESourceEstimate>   m_pSourceEstimate;
+    QSharedPointer<MNELIB::MNEForwardSolution>  m_pFwdSolution;
+    QSharedPointer<FIFFLIB::FiffCoordTrans>     m_pCoord;
+    QSharedPointer<FSLIB::AnnotationSet>        m_pAnnotationSet;
+    QSharedPointer<FSLIB::SurfaceSet>           m_pSurfaceSet;
 };
 
 //=============================================================================================================

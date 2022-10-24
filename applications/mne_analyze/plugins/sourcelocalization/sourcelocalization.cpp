@@ -48,7 +48,9 @@
 #include <inverse/minimumNorm/minimumnorm.h>
 
 #include <mne/mne_inverse_operator.h>
-#include <mne/mne_sourceestimate.h>>
+#include <mne/mne_sourceestimate.h>
+
+#include <disp/viewers/minimumnormsettingsview.h>
 
 #include <fiff/fiff_raw_data.h>
 
@@ -134,10 +136,21 @@ QWidget *SourceLocalization::getView()
 
 QDockWidget* SourceLocalization::getControl()
 {
-    //QDockWidget* pControl = new QDockWidget(getName());
+    DISPLIB::MinimumNormSettingsView* pMinimumNormSettingsView = new DISPLIB::MinimumNormSettingsView(QString("MNESCAN/%1").arg(this->getName()));
 
+    QVBoxLayout* pControlLayout = new QVBoxLayout();
+    pControlLayout->addWidget(pMinimumNormSettingsView);
 
-    return Q_NULLPTR;
+    QWidget* containerWidget = new QWidget();
+    containerWidget->setLayout(pControlLayout);
+
+    QScrollArea* pControlScrollArea = new QScrollArea();
+    pControlScrollArea->setWidget(containerWidget);
+
+    QDockWidget* pControlDock = new QDockWidget(this->getName());
+    pControlDock->setWidget(pControlScrollArea);
+
+    return pControlDock;
 }
 
 //=============================================================================================================

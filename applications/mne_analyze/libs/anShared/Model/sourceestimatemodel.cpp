@@ -117,14 +117,14 @@ Qt::ItemFlags SourceEstimateModel::flags(const QModelIndex &index) const
 
 //=============================================================================================================
 
-QSharedPointer<MNELIB::MNEForwardSolution> SourceEstimateModel::getFwdSolution()
+QSharedPointer<MNELIB::MNESourceEstimate> SourceEstimateModel::getSourceEstimate()
 {
-    return m_pFwdSolution;
+    return m_pSourceEstimate;
 }
 
 //=============================================================================================================
 
-QSharedPointer<MNELIB::MNESourceEstimate> SourceEstimateModel::getSourceEstimate()
+QSharedPointer<MNELIB::MNEForwardSolution> SourceEstimateModel::getFwdSolution()
 {
-    return m_pSourceEstimate;
+    return m_pFwdSolution;
 }
