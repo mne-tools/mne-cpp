@@ -1,0 +1,94 @@
+cmake_minimum_required(VERSION 3.14)
+project(mne_disp LANGUAGES CXX)
+
+#Handle qt uic, moc, rrc automatically
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Concurrent Widgets Svg OpenGl)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Concurrent Widgets Svg OpenGl)
+
+set(SOURCES
+    disp_global.cpp
+    plots/imagesc.cpp
+    plots/plot.cpp
+    plots/graph.cpp
+    plots/tfplot.cpp
+    plots/helpers/colormap.cpp
+    viewers/abstractview.cpp
+    viewers/applytoview.cpp
+    viewers/coregsettingsview.cpp
+    viewers/dipolefitview.cpp
+    viewers/filterdesignview.cpp
+    viewers/averagelayoutview.cpp
+    viewers/fwdsettingsview.cpp
+    viewers/helpers/scalecontrol.cpp
+    viewers/progressview.cpp
+    viewers/spectrumview.cpp
+    viewers/modalityselectionview.cpp
+    viewers/butterflyview.cpp
+    viewers/channelselectionview.cpp
+    viewers/spectrumsettingsview.cpp
+    viewers/scalingview.cpp
+    viewers/projectorsview.cpp
+    viewers/compensatorview.cpp
+    viewers/filtersettingsview.cpp
+    viewers/spharasettingsview.cpp
+    viewers/fiffrawviewsettings.cpp
+    viewers/averageselectionview.cpp
+    viewers/triggerdetectionview.cpp
+    viewers/quickcontrolview.cpp
+    viewers/connectivitysettingsview.cpp
+    viewers/minimumnormsettingsview.cpp
+    viewers/averagingsettingsview.cpp
+    viewers/projectsettingsview.cpp
+    viewers/control3dview.cpp
+    viewers/tfsettingsview.cpp
+    viewers/artifactsettingsview.cpp
+    viewers/rtfiffrawview.cpp
+    viewers/multiviewwindow.cpp
+    viewers/multiview.cpp
+    viewers/hpisettingsview.cpp
+    viewers/covariancesettingsview.cpp
+    viewers/bidsview.cpp
+    viewers/helpers/rtfiffrawviewmodel.cpp
+    viewers/helpers/rtfiffrawviewdelegate.cpp
+    viewers/helpers/evokedsetmodel.cpp
+    viewers/helpers/layoutscene.cpp
+    viewers/helpers/averagescene.cpp
+    viewers/helpers/averagesceneitem.cpp
+    viewers/helpers/filterplotscene.cpp
+    viewers/helpers/selectionscene.cpp
+    viewers/helpers/selectionsceneitem.cpp
+    viewers/helpers/channelinfomodel.cpp
+    viewers/helpers/mneoperator.cpp
+    viewers/helpers/draggableframelesswidget.cpp
+    viewers/helpers/frequencyspectrumdelegate.cpp
+    viewers/helpers/frequencyspectrummodel.cpp
+    viewers/helpers/bidsviewmodel.cpp
+)
+
+add_library(${PROJECT_NAME} ${SOURCES})
+
+target_include_directories(${PROJECT_NAME} PUBLIC ../)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Svg
+    Qt${QT_VERSION_MAJOR}::OpenGl
+    eigen
+    utils
+    fiff
+    fs
+    mne
+    fwd
+    inverse
+    rtprocessing
+    events
+)
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE mne_LIBRARY)
