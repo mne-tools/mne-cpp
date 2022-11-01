@@ -45,4 +45,4 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_inverse
 )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE rtprocessing_LIBRARY)
+target_compile_definitions(${PROJECT_NAME} PRIVATE rtprocessing_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")

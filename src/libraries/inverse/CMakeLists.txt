@@ -48,4 +48,4 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_fwd
 )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE inverse_LIBRARY)
+target_compile_definitions(${PROJECT_NAME} PRIVATE inverse_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
