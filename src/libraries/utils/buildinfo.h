@@ -78,8 +78,8 @@ constexpr auto dateTimeNow()
  */
 constexpr auto gitHash()
 {
-#ifdef GIT_HASH
-    return GIT_HASH;
+#ifdef MNE_GIT_HASH_SHORT
+    return MNE_GIT_HASH_SHORT;
 #else
     return "Git hash not defined.";
 #endif
@@ -91,8 +91,8 @@ constexpr auto gitHash()
  */
 constexpr auto gitHashLong()
 {
-#ifdef GIT_HASH_LONG
-    return GIT_HASH_LONG;
+#ifdef MNE_GIT_HASH_LONG
+    return MNE_GIT_HASH_LONG;
 #else
     return "Git hash long not defined.";
 #endif
