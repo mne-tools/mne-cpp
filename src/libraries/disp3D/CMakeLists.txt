@@ -86,15 +86,15 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::3DExtras
     Qt${QT_VERSION_MAJOR}::Charts
     eigen
-    utils
-    connectivity
-    fiff
-    fs
-    mne
-    fwd
-    inverse
-    rtprocessing
-    disp
+    mne_utils
+    mne_connectivity
+    mne_fiff
+    mne_fs
+    mne_mne
+    mne_fwd
+    mne_inverse
+    mne_rtprocessing
+    mne_disp
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE mne_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")

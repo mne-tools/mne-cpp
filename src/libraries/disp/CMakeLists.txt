@@ -15,6 +15,9 @@ set(SOURCES
     plots/plot.cpp
     plots/graph.cpp
     plots/tfplot.cpp
+    plots/bar.cpp
+    plots/spline.cpp
+    plots/lineplot.cpp
     plots/helpers/colormap.cpp
     viewers/abstractview.cpp
     viewers/applytoview.cpp
@@ -69,16 +72,19 @@ set(SOURCES
     viewers/helpers/bidsviewmodel.cpp
 )
 
+set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/viewers/formfiles")
+
 set(FILE_TO_UPDATE disp_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-
 add_library(${PROJECT_NAME} ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
+
+target_include_directories(${PROJECT_NAME} PRIVATE .)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
@@ -92,14 +98,14 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::3DExtras
     Qt${QT_VERSION_MAJOR}::Charts
     eigen
-    utils
-    fiff
-    fs
-    mne
-    fwd
-    inverse
-    rtprocessing
-    events
+    mne_utils
+    mne_fiff
+    mne_fs
+    mne_mne
+    mne_fwd
+    mne_inverse
+    mne_rtprocessing
+    mne_events
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE mne_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
