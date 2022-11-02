@@ -27,6 +27,28 @@ set(SOURCES
     utils_global.cpp
 )
 
+set(HEADERS
+    buildinfo.h
+    file.h
+    kmeans.h
+    utils_global.h
+    mnemath.h
+    ioutils.h
+    layoutloader.h
+    layoutmaker.h
+    selectionio.h
+    spectrogram.h
+    warp.h
+    sphere.h
+    simplex_algorithm.h
+    generics/circularbuffer.h
+    generics/commandpattern.h
+    generics/observerpattern.h
+    generics/applicationlogger.h
+    spectral.h
+    mnetracer.h
+)
+
 set(FILE_TO_UPDATE utils_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
