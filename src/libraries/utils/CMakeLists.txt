@@ -18,36 +18,29 @@ set(SOURCES
     layoutmaker.cpp
     selectionio.cpp
     spectrogram.cpp
-    utils_global.cpp
     warp.cpp
     sphere.cpp
     generics/observerpattern.cpp
     generics/applicationlogger.cpp
     spectral.cpp
     mnetracer.cpp
+    utils_global.cpp
 )
 
 set(FILE_TO_UPDATE utils_global.cpp)
-set(FILES ${SOURCES})
-list(REMOVE_ITEM FILES ${FILE_TO_UPDATE})
+
+set(SOURCE_PATHS ${SOURCES})
+list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
+set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES})
 
-add_custom_target(buildinfo
-                  DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/global_info)
-
-add_custom_command(OUTPUT global_info
-                   DEPENDS ${FILES}
-                   COMMAND ${CMAKE_COMMAND} -E touch_nocreate ${CMAKE_CURRENT_SOURCE_DIR}/${FILE_TO_UPDATE})
-
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
-add_dependencies(${PROJECT_NAME} buildinfo)
-
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Concurrent
-    eigen
+  Qt${QT_VERSION_MAJOR}::Core
+  Qt${QT_VERSION_MAJOR}::Concurrent
+  eigen
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE utils_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
