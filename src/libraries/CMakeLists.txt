@@ -12,3 +12,6 @@ add_subdirectory(inverse)
 add_subdirectory(communication)
 add_subdirectory(rtprocessing)
 add_subdirectory(connectivity)
+
+add_subdirectory(disp)
+add_subdirectory(disp3D)
