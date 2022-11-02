@@ -24,6 +24,12 @@ set(SOURCES
     fwd_thread_arg.cpp
 )
 
+set(FILE_TO_UPDATE fwd_global.cpp)
+
+set(SOURCE_PATHS ${SOURCES})
+list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
+set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
+
 add_library(${PROJECT_NAME} ${SOURCES})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
