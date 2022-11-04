@@ -6,10 +6,11 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Concurrent Network)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Concurrent Network)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets 3DRender Concurrent Network)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets 3DRender Concurrent Network)
 
 set(SOURCES
+    connectivitysettingsmanager.h
     main.cpp
 )
 
@@ -27,6 +28,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   Qt${QT_VERSION_MAJOR}::Core
   Qt${QT_VERSION_MAJOR}::Widgets
   Qt${QT_VERSION_MAJOR}::Concurrent
+  Qt${QT_VERSION_MAJOR}::3DRender
   Qt${QT_VERSION_MAJOR}::Network
   mne_rtprocessing
   mne_connectivity
