@@ -54,6 +54,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_rtprocessing
     mne_connectivity
     mne_events
+    scDisp
+    scShared
+    scMeas
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE scan_ftbuffer_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
