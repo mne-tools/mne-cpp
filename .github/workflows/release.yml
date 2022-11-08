@@ -85,13 +85,13 @@ jobs:
     #     cd qt5_shadow
     #     # Configure Qt5
     #     ../qt5/configure -static -release -prefix "../Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license
-    #     make module-qtbase module-qtsvg module-qtcharts module-qt3d -j4
-    #     make install -j4
+    #     cmake --build build
+    #     cmake --build build
     - name: Configure and compile MNE-CPP
       run: |
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
-        make -j4
-        make install -j4
+        ../Qt5_binaries/bin/cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
+        cmake --build build
     - name: Deploy binaries
       run: |
         ./tools/deployment/deploy.bat static pack
@@ -140,13 +140,13 @@ jobs:
     #     cd qt5_shadow
     #     # Configure Qt5
     #     ../qt5/configure -static -release -prefix "../Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license
-    #     make module-qtbase module-qtsvg module-qtcharts module-qt3d -j
-    #     make install -j
+    #     cmake --build build
+    #     cmake --build build
     - name: Configure and compile MNE-CPP
       run: |
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static MNECPP_CONFIG+=withAppBundles
-        make -j
-        make install -j
+        ../Qt5_binaries/bin/cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
+        cmake --build build
     - name: Deploy binaries
       run: |
         ./tools/deployment/deploy.bat static pack
@@ -208,14 +208,14 @@ jobs:
     #     Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
     #     # Configure Qt5
     #     ..\qt5\configure.bat -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "..\Qt5_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -opensource -confirm-license
-    #     jom -j4
+    #     cmake --build build
     #     nmake install
     - name: Configure and compile MNE-CPP
       run: |
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        ..\Qt5_binaries\bin\qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=static
-        jom -j4
+        ..\Qt5_binaries\bin\cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
     - name: Deploy binaries
       run: |
         ./tools/deployment/deploy.bat static pack
@@ -266,7 +266,7 @@ jobs:
         cd build
         cmake -DCMAKE_INSTALL_PREFIX=../installed ..
         make
-        make install
+        cmake --build build
     - name: Compile LSL submodule
       run: |
         cd applications/mne_scan/plugins/lsladapter/liblsl
@@ -274,11 +274,11 @@ jobs:
         cd build
         cmake ..
         make
-        make install
+        cmake --build build
     - name: Configure and compile MNE-CPP
       run: |
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
-        make -j4
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
     - name: Deploy binaries
       run: |
         ./tools/deployment/deploy.bat dynamic pack
@@ -328,7 +328,7 @@ jobs:
         cd applications/mne_scan/plugins/brainflowboard/brainflow/build
         cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
         make
-        make install
+        cmake --build build
     - name: Compile LSL submodule
       run: |
         cd applications/mne_scan/plugins/lsladapter/liblsl
@@ -336,11 +336,11 @@ jobs:
         cd build
         cmake ..
         make
-        make install
+        cmake --build build
     - name: Configure and compile MNE-CPP
       run: |
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl MNECPP_CONFIG+=withAppBundles
-        make -j4
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
     - name: Deploy binaries (MacOS)
       run: |
         ./tools/deployment/deploy.bat dynamic pack
@@ -408,8 +408,8 @@ jobs:
       run: |
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=noExamples MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
-        jom -j4
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
     - name: Deploy binaries (Windows)
       run: |
         ./tools/deployment/deploy.bat dynamic pack
@@ -458,8 +458,8 @@ jobs:
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |
-        qmake -r MNECPP_CONFIG+=withCodeCov MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
-        make -j4
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
     - name: Run tests and upload results to Codecov
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
