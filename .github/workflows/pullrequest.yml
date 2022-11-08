@@ -63,7 +63,7 @@ jobs:
         cd build
         cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
         make
-        make install
+        cmake --build build
     - name: Compile LSL submodule (Windows)
       if: matrix.os == 'windows-2019'
       run: |
@@ -80,20 +80,20 @@ jobs:
         cd build
         cmake ..
         make
-        make install
+        cmake --build build
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-18.04') || (matrix.os == 'macos-latest')
       run: |
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl MNECPP_CONFIG+=withAppBundles
-        make -j4
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
         # Setup VS compiler
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
-        jom -j4
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
     - name: Deploy binaries
       run: |
         ./tools/deployment/deploy.bat dynamic pack
@@ -155,7 +155,7 @@ jobs:
         cd build
         cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
         make
-        make install
+        cmake --build build
     - name: Compile LSL submodule (Windows)
       if: matrix.os == 'windows-2019'
       run: |
@@ -172,20 +172,20 @@ jobs:
         cd build
         cmake ..
         make
-        make install
+        cmake --build build
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-18.04') || (matrix.os == 'macos-latest')
       run: |
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl MNECPP_CONFIG+=withAppBundles
-        make -j4
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
         # Setup VS compiler
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=withBrainFlow MNECPP_CONFIG+=withLsl
-        jom -j4
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
     - name: Deploy binaries
       run: |
         ./tools/deployment/deploy.bat dynamic pack
@@ -241,16 +241,16 @@ jobs:
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-18.04') || (matrix.os == 'macos-latest')
       run: |
-        ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static
-        make -j4
+        ../Qt5_binaries/bin/cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
         # Setup VS compiler
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        ..\Qt5_binaries\bin\qmake -r MNECPP_CONFIG+=noTests MNECPP_CONFIG+=static
-        jom -j4
+        ..\Qt5_binaries\bin\cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
     - name: Deploy binaries
       run: |
         ./tools/deployment/deploy.bat static pack
@@ -302,21 +302,21 @@ jobs:
     - name: Configure and compile MNE-CPP (Linux)
       if: matrix.os == 'ubuntu-18.04'
       run: |
-        qmake -r MNECPP_CONFIG+=withCodeCov MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
-        make -j4
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
     - name: Configure and compile MNE-CPP (MacOS)
       if: matrix.os == 'macos-latest'
       run: |
-        qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
-        make -j4
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
         # Setup VS compiler
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        qmake -r MNECPP_CONFIG+=noApplications MNECPP_CONFIG+=noExamples
-        jom -j4
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
     - name: Run tests (Linux)
       if: matrix.os == 'ubuntu-18.04'
       env:
