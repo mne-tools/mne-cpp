@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(scan_writetofile LANGUAGES CXX)
+project(scan_rtfwd LANGUAGES CXX)
 
 #Handle qt uic, moc, rrc automatically
 set(CMAKE_AUTOUIC ON)
@@ -10,22 +10,22 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Svg)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Svg)
 
 set(SOURCES
-    writetofile.cpp 
-    FormFiles/writetofilesetupwidget.cpp 
-    writetofile_global.cpp
+    rtfwd.cpp 
+    FormFiles/rtfwdsetupwidget.cpp 
+    rtfwd_global.cpp
 )
 
 set(HEADERS
-    writetofile_global.h 
-    writetofile.h 
-    FormFiles/writetofilesetupwidget.h
+    rtfwd_global.h 
+    rtfwd.h 
+    FormFiles/rtfwdsetupwidget.h
 )
 
 set(RESOURCES
-    writetofile.qrc    
+    rtfwd.qrc    
 )
 
-set(FILE_TO_UPDATE writetofile_global.cpp)
+set(FILE_TO_UPDATE rtfwd_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
@@ -50,6 +50,9 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_rtprocessing
     mne_connectivity
     mne_events
+    scDisp
+    scShared
+    scMeas
 )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE scan_writetofile_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+target_compile_definitions(${PROJECT_NAME} PRIVATE scan_rtfwd_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
