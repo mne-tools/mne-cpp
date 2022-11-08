@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(analyze_channelselection LANGUAGES CXX)
+project(rtserver_fiffsimulator LANGUAGES CXX)
 
 #Handle qt uic, moc, rrc automatically
 set(CMAKE_AUTOUIC ON)

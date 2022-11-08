@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(scan_lsladapter LANGUAGES CXX)
+project(scan_natus LANGUAGES CXX)
 
 #Handle qt uic, moc, rrc automatically
 set(CMAKE_AUTOUIC ON)
@@ -10,30 +10,26 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Network Concurren
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Network Concurrent)
 
 set(SOURCES
-    lsladapter.cpp 
-    lsladapter_global.cpp 
-    lsladapterproducer.cpp 
-    FormFiles/lsladaptersetup.cpp 
+    natus.cpp
+    natus_global.cpp
+    natusproducer.cpp
+    FormFiles/natussetup.cpp
 )
 
 set(HEADERS
-    lsladapter.h 
-    lsladapter_global.h 
-    lsladapterproducer.h 
-    FormFiles/lsladaptersetup.h 
+    natus.h
+    natus_global.h
+    natusproducer.h
+    FormFiles/natussetup.h
 )
 
-set(RESOURCES
-    lsladapter.qrc    
-)
-
-set(FILE_TO_UPDATE lsladapter_global.cpp)
+set(FILE_TO_UPDATE natus_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
@@ -58,4 +54,4 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     scMeas
 )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE scan_lsladapter_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+target_compile_definitions(${PROJECT_NAME} PRIVATE scan_natus_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")

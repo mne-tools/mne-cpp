@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(ex_st_clustered_inverse_pwl_rap_music LANGUAGES CXX)
+project(mne_anonymize LANGUAGES CXX)
 
 #Handle qt uic, moc, rrc automatically
 set(CMAKE_AUTOUIC ON)
