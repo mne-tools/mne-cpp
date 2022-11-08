@@ -26,23 +26,24 @@ else()
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  Qt${QT_VERSION_MAJOR}::Core
-  Qt${QT_VERSION_MAJOR}::Widgets
-  Qt${QT_VERSION_MAJOR}::3DRender
-  Qt${QT_VERSION_MAJOR}::Concurrent
-  Qt${QT_VERSION_MAJOR}::Network
-  mne_rtprocessing
-  mne_connectivity
-  mne_inverse
-  mne_fwd
-  mne_mne
-  mne_fiff
-  mne_fs
-  mne_utils
-  mne_events
-  mne_disp
-  mne_disp3D
-  eigen
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::3DRender
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    Qt${QT_VERSION_MAJOR}::Network
+    mne_rtprocessing
+    mne_connectivity
+    mne_inverse
+    mne_fwd
+    mne_mne
+    mne_fiff
+    mne_fs
+    mne_utils
+    mne_events
+    mne_disp
+    mne_disp3D
+    eigen
+	anShared
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
