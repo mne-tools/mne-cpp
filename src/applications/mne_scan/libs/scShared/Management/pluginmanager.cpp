@@ -117,6 +117,7 @@ void PluginManager::loadPlugins(const QString& dir)
         // Exclude .exp and .lib files (only relevant for windows builds)
         if(!file.contains(".exp") && !file.contains(".lib")) {
             this->setFileName(PluginsDir.absoluteFilePath(file));
+            qDebug() << PluginsDir.absoluteFilePath(file);
             QObject *pPlugin = this->instance();
 
             // AbstractPlugin
