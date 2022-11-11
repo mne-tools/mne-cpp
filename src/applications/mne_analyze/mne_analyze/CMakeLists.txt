@@ -15,13 +15,23 @@ set(SOURCES
     analyzecore.cpp
 )
 
+set(HEADERS
+    info.h
+    mainwindow.h
+    analyzecore.h
+)
+
+set(RESOURCES
+    mne_analyze.qrc
+)
+
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES})
+    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES} ${HEADERS} ${RESOURCES})
 else()
     if(ANDROID)
-        add_library(${PROJECT_NAME} SHARED ${SOURCES})
+        add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS} ${RESOURCES})
     else()
-        add_executable(${PROJECT_NAME} ${SOURCES})
+        add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
     endif()
 endif()
 
