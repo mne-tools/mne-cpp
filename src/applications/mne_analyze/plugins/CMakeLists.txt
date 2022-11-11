@@ -1,3 +1,6 @@
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mne_analyze_plugins)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mne_analyze_plugins)
+
 add_subdirectory(averaging)
 add_subdirectory(channelselection)
 add_subdirectory(controlmanager)

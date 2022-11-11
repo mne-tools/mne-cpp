@@ -1,3 +1,5 @@
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out/${CMAKE_BUILD_TYPE}/examples)
+
 add_subdirectory(ex_averaging)
 add_subdirectory(ex_cancel_noise)
 add_subdirectory(ex_compute_forward)
