@@ -1,3 +1,5 @@
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/out/${CMAKE_BUILD_TYPE}/apps)
+
 add_subdirectory(mne_analyze)
 add_subdirectory(mne_scan)
 add_subdirectory(mne_anonymize)
