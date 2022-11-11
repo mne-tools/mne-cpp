@@ -12,7 +12,11 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Svg OpenGL 3
 set(SOURCES
     view3d.cpp 
     view3d_global.cpp
-    3dview.cpp
+)
+
+set(HEADERS
+    view3d_global.h
+    view3d.h
 )
 
 set(FILE_TO_UPDATE view3d_global.cpp)
@@ -21,7 +25,7 @@ set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
@@ -37,6 +41,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Charts
     eigen
     mne_disp
+    mne_disp3D
     mne_utils
     mne_fiff
     mne_fs
@@ -45,7 +50,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_inverse
     mne_rtprocessing
     mne_events
-	anShared
+    anShared
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE analyze_view3d_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")

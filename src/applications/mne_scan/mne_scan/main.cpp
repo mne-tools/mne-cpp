@@ -156,7 +156,10 @@ int main(int argc, char *argv[])
 
     // Set default font
     int id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Light.ttf");
-    app.setFont(QFont(QFontDatabase::applicationFontFamilies(id).at(0)));
+
+    if(id != -1){
+        app.setFont(QFont(QFontDatabase::applicationFontFamilies(id).at(0)));
+    }
 
     //Store application info to use QSettings
     QCoreApplication::setOrganizationName(CInfo::OrganizationName());

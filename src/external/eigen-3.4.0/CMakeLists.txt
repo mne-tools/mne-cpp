@@ -476,13 +476,13 @@ endif()
 install(DIRECTORY Eigen DESTINATION ${INCLUDE_INSTALL_DIR} COMPONENT Devel)
 
 
-option(EIGEN_BUILD_DOC "Enable creation of Eigen documentation" ON)
+option(EIGEN_BUILD_DOC "Enable creation of Eigen documentation" OFF)
 if(EIGEN_BUILD_DOC)
   add_subdirectory(doc EXCLUDE_FROM_ALL)
 endif()
 
 
-option(BUILD_TESTING "Enable creation of Eigen tests." ON)
+option(BUILD_TESTING "Enable creation of Eigen tests." OFF)
 if(BUILD_TESTING)
   include(EigenConfigureTesting)
 

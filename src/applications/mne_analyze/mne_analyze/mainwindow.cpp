@@ -413,7 +413,10 @@ void MainWindow::changeStyle()
 
         // Set default font
         int id = QFontDatabase::addApplicationFont(":/fonts/Roboto-Light.ttf");
-        pApp->setFont(QFont(QFontDatabase::applicationFontFamilies(id).at(0)));
+
+        if(id != -1){
+            pApp->setFont(QFont(QFontDatabase::applicationFontFamilies(id).at(0)));
+        }
     }
 }
 

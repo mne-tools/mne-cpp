@@ -6,8 +6,8 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets 3DRender Concurrent Network)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets 3DRender Concurrent Network)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets 3DRender Concurrent Network Xml)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets 3DRender Concurrent Network Xml)
 
 set(SOURCES
     main.cpp 
@@ -33,13 +33,18 @@ set(HEADERS
     mainwindow.h
 )
 
+set(RESOURCES
+    mne_scan.qrc
+
+)
+
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES})
+    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES} ${HEADERS} ${RESOURCES})
 else()
     if(ANDROID)
-        add_library(${PROJECT_NAME} SHARED ${SOURCES})
+        add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS} ${RESOURCES})
     else()
-        add_executable(${PROJECT_NAME} ${SOURCES})
+        add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
     endif()
 endif()
 
@@ -49,6 +54,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   Qt${QT_VERSION_MAJOR}::3DRender
   Qt${QT_VERSION_MAJOR}::Concurrent
   Qt${QT_VERSION_MAJOR}::Network
+  Qt${QT_VERSION_MAJOR}::Xml
   mne_rtprocessing
   mne_connectivity
   mne_inverse
