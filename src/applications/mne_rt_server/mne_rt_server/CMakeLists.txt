@@ -46,6 +46,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Concurrent
     Qt${QT_VERSION_MAJOR}::Network
     mne_connectivity
+    mne_communication
     mne_fiff
     mne_utils
     eigen

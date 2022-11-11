@@ -26,13 +26,34 @@ set(SOURCES
     Plugins/abstractplugin.cpp
 )
 
+set(HEADERS
+    Model/dipolefitmodel.h
+    Model/mricoordmodel.h
+    Model/covariancemodel.h
+    Plugins/abstractplugin.h
+    anshared_global.h
+    Model/abstractmodel.h
+    Management/analyzedata.h
+    Management/pluginmanager.h
+    Management/event.h
+    Management/communicator.h
+    Management/eventmanager.h
+    Management/statusbar.h
+    Utils/metatypes.h
+    Utils/types.h
+    Model/bemdatamodel.h
+    Model/fiffrawviewmodel.h
+    Model/eventmodel.h
+    Model/averagingdatamodel.h
+)
+
 # set(FILE_TO_UPDATE anshared_global.cpp)
 
 # set(SOURCE_PATHS ${SOURCES})
 # list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 # set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
