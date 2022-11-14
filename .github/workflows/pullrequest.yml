@@ -62,8 +62,7 @@ jobs:
         mkdir build
         cd build
         cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
-        make
-        cmake --build build
+        cmake --build .
     - name: Compile LSL submodule (Windows)
       if: matrix.os == 'windows-2019'
       run: |
@@ -79,8 +78,7 @@ jobs:
         mkdir build
         cd build
         cmake ..
-        make
-        cmake --build build
+        cmake --build .
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-18.04') || (matrix.os == 'macos-latest')
       run: |
@@ -154,8 +152,7 @@ jobs:
         mkdir build
         cd build
         cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
-        make
-        cmake --build build
+        cmake --build .
     - name: Compile LSL submodule (Windows)
       if: matrix.os == 'windows-2019'
       run: |
@@ -171,8 +168,7 @@ jobs:
         mkdir build
         cd build
         cmake ..
-        make
-        cmake --build build
+        cmake --build .
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-18.04') || (matrix.os == 'macos-latest')
       run: |
