@@ -55,6 +55,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_inverse
     mne_rtprocessing
     mne_events
+    mne_connectivity
     scMeas
 )
 
