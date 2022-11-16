@@ -30,6 +30,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Svg
     eigen
     mne_disp
+    mne_disp3D
     mne_utils
     mne_fiff
     mne_fs
