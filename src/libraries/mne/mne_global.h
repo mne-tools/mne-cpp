@@ -50,7 +50,7 @@
 
 #if defined(STATICBUILD)
 #  define MNESHARED_EXPORT
-#elif defined(MNE_LIBRARY)
+#elif defined(MNE_MNE_LIBRARY)
 #  define MNESHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
 #  define MNESHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */

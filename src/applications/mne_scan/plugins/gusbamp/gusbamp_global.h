@@ -52,7 +52,7 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(GUSBAMP_PLUGIN)
+#if defined(SCAN_GUSBAMP_PLUGIN)
 #  define GUSBAMPSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
 #  define GUSBAMPSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */

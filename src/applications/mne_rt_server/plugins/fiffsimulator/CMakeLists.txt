@@ -41,4 +41,4 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_communication
 )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE analyze_channelselection_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+target_compile_definitions(${PROJECT_NAME} PRIVATE RTSERVER_FIFFSIMULATOR_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
