@@ -53,6 +53,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_rtprocessing
     mne_connectivity
     mne_events
+    mne_communication
     scDisp
     scShared
     scMeas
