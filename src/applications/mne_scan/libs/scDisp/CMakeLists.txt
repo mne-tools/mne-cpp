@@ -55,6 +55,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_inverse
     mne_rtprocessing
     mne_events
+    scMeas
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE scDisp_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
