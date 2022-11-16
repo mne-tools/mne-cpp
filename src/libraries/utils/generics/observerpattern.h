@@ -69,7 +69,7 @@ class Subject;
  *
  * @brief The IObserver interface provides the base class of every observer of the observer design pattern.
  */
-class IObserver
+class UTILSSHARED_EXPORT IObserver
 {
 public:
     typedef QSharedPointer<IObserver> SPtr;             /**< Shared pointer type for IObserver. */
