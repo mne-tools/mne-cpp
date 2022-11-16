@@ -50,7 +50,7 @@
 
 #if defined(STATICBUILD)
 #  define COMMUNICATIONSHARED_EXPORT
-#elif defined(COMMUNICATION_LIBRARY)
+#elif defined(MNE_COMMUNICATION_LIBRARY)
 #  define COMMUNICATIONSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
 #  define COMMUNICATIONSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */

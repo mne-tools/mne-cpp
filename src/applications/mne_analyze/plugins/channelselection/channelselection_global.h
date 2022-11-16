@@ -51,7 +51,7 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(CHANNELSELECTION_PLUGIN)
+#if defined(ANALYZE_CHANNELSELECTION_PLUGIN)
 #  define CHANNELSELECTIONSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
 #  define CHANNELSELECTIONSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */

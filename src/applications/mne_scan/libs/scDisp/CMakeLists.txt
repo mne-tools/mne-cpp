@@ -6,8 +6,8 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Svg 3DCore 3DRender)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Svg 3DCore 3DRender)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Svg 3DCore 3DRender 3DExtras)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Svg 3DCore 3DRender 3DExtras)
 
 set(SOURCES
     measurementwidget.cpp
@@ -44,6 +44,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Svg
     Qt${QT_VERSION_MAJOR}::3DCore
     Qt${QT_VERSION_MAJOR}::3DRender
+    Qt${QT_VERSION_MAJOR}::3DExtras
     eigen
     mne_disp
     mne_disp3D
@@ -59,4 +60,4 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     scMeas
 )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE scDisp_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+target_compile_definitions(${PROJECT_NAME} PRIVATE SCDISP_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
