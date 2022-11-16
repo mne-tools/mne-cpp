@@ -49,7 +49,7 @@
 
 #if defined(STATICBUILD)
 #  define DISP3DSHARED_EXPORT
-#elif defined(DISP3D_LIBRARY)
+#elif defined(MNE_DISP3D_LIBRARY)
 #  define DISP3DSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
 #  define DISP3DSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
