@@ -87,9 +87,6 @@ jobs:
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
-        # Setup VS compiler
-        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
-        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
         cmake --build build --config Release
     - name: Deploy binaries
@@ -177,9 +174,6 @@ jobs:
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
-        # Setup VS compiler
-        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
-        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
         cmake --build build --config Release
     - name: Deploy binaries
@@ -242,9 +236,6 @@ jobs:
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
-        # Setup VS compiler
-        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
-        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="..\Qt5_binaries" -DBUILD_SHARED_LIBS=OFF
         cmake --build build --config Release
     - name: Deploy binaries
@@ -308,11 +299,8 @@ jobs:
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
-        # Setup VS compiler
-        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
-        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-        cmake --build build
+        cmake --build build --config Release
     - name: Run tests (Linux)
       if: matrix.os == 'ubuntu-18.04'
       env:
