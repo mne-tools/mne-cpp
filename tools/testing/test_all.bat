@@ -125,23 +125,28 @@ doPrintHelp() {
 
 ## input arguments parsing
 
-if [[ -z "$1" ]]; then 
-  echo "Running script in default mode."
-  echo " "
-else
-  if [[ $1 == verbose ]]; then 
-    VerboseMode="true"
-  elif [[ $1 == help ]]; then 
-    doPrintHelp
-    exit 1
-  fi
+argc=$#
+argv=("$@")
 
-  if [[ $2 == withCoverage ]]; then
+RunCodeCoverage="false"
+VerboseMode="false"
+BuildType="Release"
+
+
+for (( j=0; j<argc; j++)); do
+  if [ "${argv[j]}" == "verbose" ]; then
+    BUILD_COMMAND=1
+  elif [ "${argv[j]}" == "help" ]; then
+    doPrintHelp="true"
+    exit 1
+  elif [ "${argv[j]}" == "withCoverage" ]; then
     RunCodeCoverage="true"
-  else 
-    RunCodeCoverage="false"
+  elif [ "${argv[j]}" == "Debug" ]; then
+    BuildType="Debug"
+  elif [ "${argv[j]}" == "Release" ]; then
+    BuildType="Release"
   fi
-fi
+done
 
 doPrintConfiguration
 
@@ -159,7 +164,7 @@ CompoundOutput=0
 testColumnWidth=60
 printf "%${testColumnWidth}s %s\n" " Test Name " " Result "
 
-for test in $RepoRootDir/bin/test_*;
+for test in $RepoRootDir/out/${BuildType}/tests/test_*;
 do
   # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
   # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.
