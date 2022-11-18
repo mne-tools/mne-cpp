@@ -17,7 +17,7 @@ add_subdirectory(test_mne_msh_display_surface_set)
 add_subdirectory(test_mne_project_to_surface)
 add_subdirectory(test_utils_circularbuffer)
 add_subdirectory(test_sensorSet)
-add_subdirectory(test_signalMode
+add_subdirectory(test_signalModel)
 
 add_subdirectory(test_interpolation)
 add_subdirectory(test_geometryinfo)
