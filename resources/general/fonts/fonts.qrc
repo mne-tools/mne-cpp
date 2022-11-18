@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/fonts">
+        <file>Lato-Black.ttf</file>
+        <file>Lato-Light.ttf</file>
+        <file>Roboto-Black.ttf</file>
+        <file>Roboto-Light.ttf</file>
+    </qresource>
+</RCC>
