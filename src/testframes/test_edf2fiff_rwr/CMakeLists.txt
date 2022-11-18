@@ -6,11 +6,17 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets 3DRender Concurrent Network)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets 3DRender Concurrent Network)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets 3DRender Concurrent Network Test)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets 3DRender Concurrent Network Test)
 
 set(SOURCES
     test_edf2fiff_rwr.cpp
+    ../../applications/mne_edf2fiff/edf_raw_data.cpp
+    ../../applications/mne_edf2fiff/edf_info.cpp
+    ../../applications/mne_edf2fiff/edf_ch_info.cpp
+    ../../applications/mne_edf2fiff/edf_raw_data.h
+    ../../applications/mne_edf2fiff/edf_info.h
+    ../../applications/mne_edf2fiff/edf_ch_info.h
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -29,6 +35,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   Qt${QT_VERSION_MAJOR}::3DRender
   Qt${QT_VERSION_MAJOR}::Concurrent
   Qt${QT_VERSION_MAJOR}::Network
+  Qt${QT_VERSION_MAJOR}::Test
   mne_rtprocessing
   mne_connectivity
   mne_inverse
