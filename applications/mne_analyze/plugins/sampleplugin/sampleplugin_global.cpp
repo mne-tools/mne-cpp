@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
- * @file     sampleplugin_global.h
- * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
- * @since    0.1.5
- * @date     August, 2020
+ * @file     sampleplugin_global.cpp
+ * @author   Juan G Prieto <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel B Motta <gbmotta@mgh.harvard.edu>;
+ * @since    0.1.9
+ * @date     September, 2021
  *
  * @section  LICENSE
  *
- * Copyright (C) 2020, Gabriel Motta. All rights reserved.
+ * Copyright (C) 2021, Juan G Prieto, Gabriel B Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -28,48 +29,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the DataViewer library export/import macros.
+ * @brief    sampleplugin plugin global definitions.
  *
  */
 
-#ifndef SAMPLEPLUGIN_GLOBAL_H
-#define SAMPLEPLUGIN_GLOBAL_H
-
 //=============================================================================================================
-// QT INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include "sampleplugin_global.h"
+#include "utils/buildinfo.h"
 
 //=============================================================================================================
-// PREPROCESSOR DEFINES
+// DEFINE METHODS
 //=============================================================================================================
 
-#if defined(SAMPLEPLUGIN_PLUGIN)
-#  define SAMPLEPLUGINSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define SAMPLEPLUGINSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
-
-namespace SAMPLEPLUGINPLUGIN{
+const char* SAMPLEPLUGINPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();};
 
 //=============================================================================================================
-/**
- * Returns build date and time.
- */
-SAMPLEPLUGINSHARED_EXPORT const char* buildDateTime();
+
+const char* SAMPLEPLUGINPLUGIN::buildHash(){ return UTILSLIB::gitHash();};
 
 //=============================================================================================================
-/**
- * Returns abbreviated build git hash.
- */
-SAMPLEPLUGINSHARED_EXPORT const char* buildHash();
 
-//=============================================================================================================
-/**
- * Returns full build git hash.
- */
-SAMPLEPLUGINSHARED_EXPORT const char* buildHashLong();
-}
-
-#endif // SAMPLEPLUGIN_GLOBAL_H
+const char* SAMPLEPLUGINPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();};

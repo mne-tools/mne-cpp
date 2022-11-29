@@ -72,7 +72,7 @@ SamplePlugin::~SamplePlugin()
 
 //=============================================================================================================
 
-QSharedPointer<IPlugin> SamplePlugin::clone() const
+QSharedPointer<AbstractPlugin> SamplePlugin::clone() const
 {
     QSharedPointer<SamplePlugin> pSamplePluginClone = QSharedPointer<SamplePlugin>::create();
     return pSamplePluginClone;
@@ -161,3 +161,13 @@ QVector<EVENT_TYPE> SamplePlugin::getEventSubscriptions(void) const
 
     return temp;
 }
+
+//=============================================================================================================
+
+QString SamplePlugin::getBuildInfo()
+{
+    return QString(SAMPLEPLUGINPLUGIN::buildDateTime()) + QString(" - ") + QString(SAMPLEPLUGINPLUGIN::buildHash());
+
+}
+
+
