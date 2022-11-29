@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
- * @file     dummytoolbox_global.h
- * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     February, 2013
+ * @file     dummytoolbox_global.cpp
+ * @author   Juan G Prieto <jgarciaprieto@mgh.harvard.edu>;
+ *           Gabriel B Motta <gbmotta@mgh.harvard.edu>;
+ * @since    0.1.9
+ * @date     November, 2022
  *
  * @section  LICENSE
  *
- * Copyright (C) 2013, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2021, Juan G Prieto, Gabriel B Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,50 +29,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the DummyToolbox library export/import macros.
+ * @brief    averaging plugin global definitions.
  *
  */
 
-#ifndef DUMMYTOOLBOX_GLOBAL_H
-#define DUMMYTOOLBOX_GLOBAL_H
-
 //=============================================================================================================
-// QT INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include "dummytoolbox_global.h"
+#include <utils/buildinfo.h>
 
 //=============================================================================================================
-// PREPROCESSOR DEFINES
+// DEFINE METHODS
 //=============================================================================================================
 
-#if defined(DUMMYTOOLBOX_PLUGIN)
-#  define DUMMYTOOLBOXSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define DUMMYTOOLBOXSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
-
-namespace DUMMYTOOLBOXPLUGIN {
+const char* DUMMYTOOLBOXPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();};
 
 //=============================================================================================================
-/**
- * Returns build date and time.
- */
-DUMMYTOOLBOXSHARED_EXPORT const char* buildDateTime();
+
+const char* DUMMYTOOLBOXPLUGIN::buildHash(){ return UTILSLIB::gitHash();};
 
 //=============================================================================================================
-/**
- * Returns abbreviated build git hash.
- */
-DUMMYTOOLBOXSHARED_EXPORT const char* buildHash();
 
-//=============================================================================================================
-/**
- * Returns full build git hash.
- */
-DUMMYTOOLBOXSHARED_EXPORT const char* buildHashLong();
-
-}
-
-
-#endif // DUMMYTOOLBOX_GLOBAL_H
+const char* DUMMYTOOLBOXPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();};
