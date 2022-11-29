@@ -88,6 +88,13 @@ QSharedPointer<AbstractPlugin> DummyToolbox::clone() const
 
 //=============================================================================================================
 
+QString DummyToolbox::getBuildInfo()
+{
+    return QString(DUMMYTOOLBOXPLUGIN::buildDateTime()) + QString(" - ") + QString(DUMMYTOOLBOXPLUGIN::buildHash());
+}
+
+//=============================================================================================================
+
 void DummyToolbox::init()
 {
     // Input

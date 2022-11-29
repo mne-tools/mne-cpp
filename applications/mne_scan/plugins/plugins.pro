@@ -68,7 +68,7 @@ SUBDIRS += \
 
 #Algorithms
 SUBDIRS += \
-    #dummytoolbox \
+    dummytoolbox \
     rtcmne \
     averaging \
     covariance \
