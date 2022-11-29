@@ -231,12 +231,12 @@ jobs:
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-18.04') || (matrix.os == 'macos-latest')
       run: |
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_MODULE_PATH="../Qt5_binaries" -DBUILD_SHARED_LIBS=OFF
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DQT_DIR="../Qt5_binaries/lib/cmake/Qt5" -DBUILD_SHARED_LIBS=OFF
         cmake --build build
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DCMAKE_MODULE_PATH="..\Qt5_binaries" -DBUILD_SHARED_LIBS=OFF
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DQT_DIR="..\Qt5_binaries\lib\cmake\Qt5" -DBUILD_SHARED_LIBS=OFF
         cmake --build build --config Release
     - name: Deploy binaries
       run: |
