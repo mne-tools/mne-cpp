@@ -49,6 +49,7 @@
 #include <scShared/Plugins/abstractalgorithm.h>
 #include <utils/generics/circularbuffer.h>
 #include <scMeas/realtimemultisamplearray.h>
+#include <fiff/fiff.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -115,6 +116,7 @@ public:
     virtual SCSHAREDLIB::AbstractPlugin::PluginType getType() const;
     virtual QString getName() const;
     virtual QWidget* setupWidget();
+    virtual QString getBuildInfo();
 
     //=========================================================================================================
     /**
