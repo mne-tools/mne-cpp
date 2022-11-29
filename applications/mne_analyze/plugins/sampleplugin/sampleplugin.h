@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "sampleplugin_global.h"
-#include <anShared/Interfaces/IPlugin.h>
+#include <anShared/Plugins/abstractplugin.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -72,12 +72,12 @@ namespace SAMPLEPLUGINPLUGIN
  *
  * @brief The SamplePlugin class provides a view with all currently loaded models.
  */
-class SAMPLEPLUGINSHARED_EXPORT SamplePlugin : public ANSHAREDLIB::IPlugin
+class SAMPLEPLUGINSHARED_EXPORT SamplePlugin : public ANSHAREDLIB::AbstractPlugin
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "sampleplugin.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(ANSHAREDLIB::IPlugin)
+    Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
 
 public:
     //=========================================================================================================
@@ -93,13 +93,14 @@ public:
     virtual ~SamplePlugin() override;
 
     // IPlugin functions
-    virtual QSharedPointer<IPlugin> clone() const override;
+    virtual QSharedPointer<AbstractPlugin> clone() const override;
     virtual void init() override;
     virtual void unload() override;
     virtual QString getName() const override;
     virtual QMenu* getMenu() override;
     virtual QDockWidget* getControl() override;
     virtual QWidget* getView() override;
+    virtual QString getBuildInfo() override;
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
