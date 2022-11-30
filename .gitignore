@@ -70,3 +70,5 @@ mne-cpp.pro.user*
 
 # Generated docu Docker files
 /_site
+
+build/*

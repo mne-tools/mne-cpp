@@ -82,12 +82,12 @@ jobs:
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-18.04') || (matrix.os == 'macos-latest')
       run: |
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
         cmake --build build
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
         cmake --build build --config Release
     - name: Deploy binaries
       run: |
@@ -169,12 +169,12 @@ jobs:
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-18.04') || (matrix.os == 'macos-latest')
       run: |
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
         cmake --build build
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
         cmake --build build --config Release
     - name: Deploy binaries
       run: |
@@ -233,12 +233,12 @@ jobs:
       run: |
         export QT_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
         export Qt5_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
         cmake --build build
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
         cmake --build build --config Release
     - name: Deploy binaries
       run: |
@@ -291,17 +291,17 @@ jobs:
     - name: Configure and compile MNE-CPP (Linux)
       if: matrix.os == 'ubuntu-18.04'
       run: |
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
         cmake --build build
     - name: Configure and compile MNE-CPP (MacOS)
       if: matrix.os == 'macos-latest'
       run: |
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
         cmake --build build
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
         cmake --build build --config Release
     - name: Run tests (Linux)
       if: matrix.os == 'ubuntu-18.04'
