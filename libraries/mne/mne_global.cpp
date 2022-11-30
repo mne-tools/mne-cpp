@@ -43,12 +43,12 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* MNELIB::buildDateTime(){ return UTILSLIB::dateTimeNow();};
+const char* MNELIB::buildDateTime(){ return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
 
-const char* MNELIB::buildHash(){ return UTILSLIB::gitHash();};
+const char* MNELIB::buildHash(){ return UTILSLIB::gitHash();}
 
 //=============================================================================================================
 
-const char* MNELIB::buildHashLong(){ return UTILSLIB::gitHashLong();};
+const char* MNELIB::buildHashLong(){ return UTILSLIB::gitHashLong();}

@@ -43,14 +43,14 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* BRAINFLOWBOARDPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();};
+const char* BRAINFLOWBOARDPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
 
-const char* BRAINFLOWBOARDPLUGIN::buildHash(){ return UTILSLIB::gitHash();};
+const char* BRAINFLOWBOARDPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
 
 //=============================================================================================================
 
-const char* BRAINFLOWBOARDPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();};
+const char* BRAINFLOWBOARDPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}
 
 

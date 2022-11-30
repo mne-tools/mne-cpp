@@ -43,12 +43,12 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* COREGISTRATIONPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();};
+const char* COREGISTRATIONPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
 
-const char* COREGISTRATIONPLUGIN::buildHash(){ return UTILSLIB::gitHash();};
+const char* COREGISTRATIONPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
 
 //=============================================================================================================
 
-const char* COREGISTRATIONPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();};
+const char* COREGISTRATIONPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}

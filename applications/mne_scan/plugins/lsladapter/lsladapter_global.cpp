@@ -43,12 +43,12 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* LSLADAPTERPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();};
+const char* LSLADAPTERPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
 
-const char* LSLADAPTERPLUGIN::buildHash(){ return UTILSLIB::gitHash();};
+const char* LSLADAPTERPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
 
 //=============================================================================================================
 
-const char* LSLADAPTERPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();};
+const char* LSLADAPTERPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}

@@ -43,12 +43,12 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* RTPROCESSINGLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();};
+const char* RTPROCESSINGLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
 
-const char* RTPROCESSINGLIB::buildHash(){ return UTILSLIB::gitHash();};
+const char* RTPROCESSINGLIB::buildHash(){ return UTILSLIB::gitHash();}
 
 //=============================================================================================================
 
-const char* RTPROCESSINGLIB::buildHashLong(){ return UTILSLIB::gitHashLong();};
+const char* RTPROCESSINGLIB::buildHashLong(){ return UTILSLIB::gitHashLong();}

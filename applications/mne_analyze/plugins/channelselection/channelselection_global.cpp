@@ -43,12 +43,12 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* CHANNELSELECTIONPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();};
+const char* CHANNELSELECTIONPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
 
-const char* CHANNELSELECTIONPLUGIN::buildHash(){ return UTILSLIB::gitHash();};
+const char* CHANNELSELECTIONPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
 
 //=============================================================================================================
 
-const char* CHANNELSELECTIONPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();};
+const char* CHANNELSELECTIONPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}

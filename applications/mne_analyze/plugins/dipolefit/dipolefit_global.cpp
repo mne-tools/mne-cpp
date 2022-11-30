@@ -43,12 +43,12 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* DIPOLEFITPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();};
+const char* DIPOLEFITPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
 
-const char* DIPOLEFITPLUGIN::buildHash(){ return UTILSLIB::gitHash();};
+const char* DIPOLEFITPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
 
 //=============================================================================================================
 
-const char* DIPOLEFITPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();};
+const char* DIPOLEFITPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}
