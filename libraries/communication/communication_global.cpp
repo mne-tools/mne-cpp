@@ -43,12 +43,12 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* COMMUNICATIONLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();};
+const char* COMMUNICATIONLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
 
-const char* COMMUNICATIONLIB::buildHash(){ return UTILSLIB::gitHash();};
+const char* COMMUNICATIONLIB::buildHash(){ return UTILSLIB::gitHash();}
 
 //=============================================================================================================
 
-const char* COMMUNICATIONLIB::buildHashLong(){ return UTILSLIB::gitHashLong();};
+const char* COMMUNICATIONLIB::buildHashLong(){ return UTILSLIB::gitHashLong();}

@@ -43,12 +43,12 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* FILTERINGPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();};
+const char* FILTERINGPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
 
-const char* FILTERINGPLUGIN::buildHash(){ return UTILSLIB::gitHash();};
+const char* FILTERINGPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
 
 //=============================================================================================================
 
-const char* FILTERINGPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();};
+const char* FILTERINGPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}

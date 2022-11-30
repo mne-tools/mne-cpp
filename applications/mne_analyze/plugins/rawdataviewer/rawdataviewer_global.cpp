@@ -43,12 +43,12 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* RAWDATAVIEWERPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();};
+const char* RAWDATAVIEWERPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
 
-const char* RAWDATAVIEWERPLUGIN::buildHash(){ return UTILSLIB::gitHash();};
+const char* RAWDATAVIEWERPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
 
 //=============================================================================================================
 
-const char* RAWDATAVIEWERPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();};
+const char* RAWDATAVIEWERPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}
