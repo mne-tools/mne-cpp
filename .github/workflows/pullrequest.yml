@@ -232,6 +232,7 @@ jobs:
       if: (matrix.os == 'ubuntu-18.04') || (matrix.os == 'macos-latest')
       run: |
         export QT_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
+        export Qt5_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
         cmake --build build
     - name: Configure and compile MNE-CPP (Windows)
