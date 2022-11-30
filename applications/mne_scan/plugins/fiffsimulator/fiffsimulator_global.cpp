@@ -43,12 +43,12 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* FIFFSIMULATORPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();};
+const char* FIFFSIMULATORPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
 
-const char* FIFFSIMULATORPLUGIN::buildHash(){ return UTILSLIB::gitHash();};
+const char* FIFFSIMULATORPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
 
 //=============================================================================================================
 
-const char* FIFFSIMULATORPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();};
+const char* FIFFSIMULATORPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}

@@ -43,13 +43,13 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* EVENTSPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();};
+const char* EVENTSPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
 
-const char* EVENTSPLUGIN::buildHash(){ return UTILSLIB::gitHash();};
+const char* EVENTSPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
 
 //=============================================================================================================
 
-const char* EVENTSPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();};
+const char* EVENTSPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}
 

@@ -43,12 +43,12 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* DISPLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();};
+const char* DISPLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
 
-const char* DISPLIB::buildHash(){ return UTILSLIB::gitHash();};
+const char* DISPLIB::buildHash(){ return UTILSLIB::gitHash();}
 
 //=============================================================================================================
 
-const char* DISPLIB::buildHashLong(){ return UTILSLIB::gitHashLong();};
+const char* DISPLIB::buildHashLong(){ return UTILSLIB::gitHashLong();}

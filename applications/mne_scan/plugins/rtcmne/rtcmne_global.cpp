@@ -43,12 +43,12 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* RTCMNEPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();};
+const char* RTCMNEPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
 
-const char* RTCMNEPLUGIN::buildHash(){ return UTILSLIB::gitHash();};
+const char* RTCMNEPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
 
 //=============================================================================================================
 
-const char* RTCMNEPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();};
+const char* RTCMNEPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}

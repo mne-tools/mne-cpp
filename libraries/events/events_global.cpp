@@ -43,12 +43,12 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* EVENTSLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();};
+const char* EVENTSLIB::buildDateTime(){ return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
 
-const char* EVENTSLIB::buildHash(){ return UTILSLIB::gitHash();};
+const char* EVENTSLIB::buildHash(){ return UTILSLIB::gitHash();}
 
 //=============================================================================================================
 
-const char* EVENTSLIB::buildHashLong(){ return UTILSLIB::gitHashLong();};
+const char* EVENTSLIB::buildHashLong(){ return UTILSLIB::gitHashLong();}
