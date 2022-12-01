@@ -238,8 +238,8 @@ jobs:
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
-        set QT_DIR="%cd%\..\Qt5_binaries\lib\cmake/Qt5"
-        set Qt5_DIR="%cd%\..\Qt5_binaries\lib\cmake/Qt5"
+        set QT_DIR="%cd%\..\Qt5_binaries\lib\cmake\Qt5"
+        set Qt5_DIR="%cd%\..\Qt5_binaries\lib\cmake\Qt5"
         cmake -B build -S src -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
         cmake --build build --config Release
     - name: Deploy binaries
