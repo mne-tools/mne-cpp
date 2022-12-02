@@ -214,6 +214,8 @@ jobs:
     #     nmake install
     - name: Configure and compile MNE-CPP
       run: |
+        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         $env:QT_DIR += "$PWD\..\Qt5_binaries\lib\cmake\Qt5"
         $env:Qt5_DIR += "$PWD\..\Qt5_binaries\lib\cmake\Qt5"
         cmake -B build -S src -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
