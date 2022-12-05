@@ -602,6 +602,10 @@ include (CMakePackageConfigHelpers)
 add_library (eigen INTERFACE)
 add_library (Eigen3::Eigen ALIAS eigen)
 target_compile_definitions (eigen INTERFACE ${EIGEN_DEFINITIONS})
+
+if(BUILD_SHARED_LIBS EQUAL OFF)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+endif()
 target_include_directories (eigen INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
