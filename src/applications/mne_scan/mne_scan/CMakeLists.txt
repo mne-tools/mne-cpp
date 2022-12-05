@@ -35,7 +35,6 @@ set(HEADERS
 
 set(RESOURCES
     mne_scan.qrc
-
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -71,6 +70,22 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   scShared
   scMeas
 )
+
+if(BUILD_SHARED_LIBS EQUAL OFF)
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        scan_averaging
+        scan_babymeg
+        scan_covariance
+        scan_fiffsimulator
+        scan_ftbuffer
+        scan_hpi
+        scan_natus
+        scan_neuronalconnectivity
+        scan_noisereduction
+        scan_rtcmne
+        scan_rtfwd
+        scan_writetofile)
+endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
