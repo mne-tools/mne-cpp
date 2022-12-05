@@ -37,3 +37,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_utils)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_FS_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+
+if(BUILD_SHARED_LIBS EQUAL OFF)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+endif()

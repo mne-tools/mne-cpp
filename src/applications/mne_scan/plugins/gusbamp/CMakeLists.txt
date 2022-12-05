@@ -62,3 +62,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE SCAN_GUSBAMP_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+
+if(BUILD_SHARED_LIBS EQUAL OFF)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+endif()
