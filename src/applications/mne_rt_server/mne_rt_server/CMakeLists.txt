@@ -52,6 +52,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     eigen
 )
 
+if(BUILD_SHARED_LIBS EQUAL OFF)
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        rtserver_fiffsimulator)
+endif()
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
     MACOSX_BUNDLE ${BUILD_MAC_APP_BUNDLE}

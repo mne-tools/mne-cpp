@@ -56,6 +56,22 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 	anShared
 )
 
+if(BUILD_SHARED_LIBS EQUAL OFF)
+    target_link_libraries(${PROJECT_NAME} PRIVATE
+        analyze_averaging
+        analyze_channelselection
+        analyze_controlmanager
+        analyze_coregistration
+        analyze_dataloader
+        analyze_datamanager
+        analyze_dipolefit
+        analyze_events
+        analyze_filtering
+        analyze_rawdataviewer
+        analyze_sourcelocalization
+        analyze_view3d)
+endif()
+
 set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
     MACOSX_BUNDLE ${BUILD_MAC_APP_BUNDLE}
