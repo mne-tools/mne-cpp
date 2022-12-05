@@ -21,7 +21,7 @@ execute_process(COMMAND git log -1 --format=%H
 
 set(CMAKE_CXX_STANDARD 14)
 
-option(BUILD_SHARED_LIBS "Build using shared libraries" OFF)
+option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 option(BUILD_MAC_APP_BUNDLE "Build app bundle on macos" OFF)
 
 
