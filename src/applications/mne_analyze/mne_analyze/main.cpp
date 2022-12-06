@@ -91,7 +91,19 @@ int main(int argc, char *argv[])
     #ifdef STATICBUILD
         #ifndef WASMBUILD
             Q_INIT_RESOURCE(mne_disp3d);
+            Q_INIT_RESOURCE(analyze_view3d);
+            Q_INIT_RESOURCE(analyze_dipolefit);
+            Q_INIT_RESOURCE(analyze_coregistration);
+            Q_INIT_RESOURCE(analyze_sourcelocalization);
         #endif
+        Q_INIT_RESOURCE(analyze_averaging);
+        Q_INIT_RESOURCE(analyze_channelselection);
+        Q_INIT_RESOURCE(analyze_controlmanager);
+        Q_INIT_RESOURCE(analyze_dataloader);
+        Q_INIT_RESOURCE(analyze_datamanager);
+        Q_INIT_RESOURCE(analyze_events);
+        Q_INIT_RESOURCE(analyze_filtering);
+        Q_INIT_RESOURCE(analyze_rawdataviewer);
     #endif
 
     QApplication app(argc, argv);
