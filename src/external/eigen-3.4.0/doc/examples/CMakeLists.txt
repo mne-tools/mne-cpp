@@ -18,3 +18,4 @@ endforeach()
 if(EIGEN_COMPILER_SUPPORT_CPP11)
 ei_add_target_property(nullary_indexing COMPILE_FLAGS "-std=c++11")
 endif()
+

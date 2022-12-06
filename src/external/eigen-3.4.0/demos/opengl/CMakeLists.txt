@@ -26,3 +26,4 @@ else()
   message(STATUS "OpenGL demo disabled because Qt4 and/or OpenGL have not been found.")
 
 endif()
+

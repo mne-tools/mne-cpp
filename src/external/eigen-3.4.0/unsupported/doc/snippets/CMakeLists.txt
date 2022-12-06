@@ -24,3 +24,5 @@ foreach(snippet_src ${snippets_SRCS})
   set_source_files_properties(${CMAKE_CURRENT_BINARY_DIR}/${compile_snippet_src}
                               PROPERTIES OBJECT_DEPENDS ${snippet_src})
 endforeach(snippet_src)
+
+
