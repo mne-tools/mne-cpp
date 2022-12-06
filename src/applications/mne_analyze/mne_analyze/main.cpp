@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
     // When building a static version of MNE Analyze we have to init all resource (.qrc) files here manually
     #ifdef STATICBUILD
         #ifndef WASMBUILD
-            Q_INIT_RESOURCE(disp3d);
+            Q_INIT_RESOURCE(mne_disp3d);
         #endif
     #endif
 

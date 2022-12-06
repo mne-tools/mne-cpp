@@ -96,7 +96,7 @@ using namespace MNELIB;
 int main(int argc, char *argv[])
 {
     #ifdef STATICBUILD
-    Q_INIT_RESOURCE(disp3d);
+    Q_INIT_RESOURCE(mne_disp3d);
     #endif
 
     qInstallMessageHandler(ApplicationLogger::customLogWriter);
