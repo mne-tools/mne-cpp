@@ -126,27 +126,28 @@ int main(int argc, char *argv[])
 {
     // When building a static version of MNE Scan we have to init all resource (.qrc) files here manually
     #ifdef STATICBUILD
-    Q_INIT_RESOURCE(babymeg);
-    Q_INIT_RESOURCE(fiffsimulator);
-    Q_INIT_RESOURCE(covariance);
-    Q_INIT_RESOURCE(noisereduction);
-    Q_INIT_RESOURCE(rtcmne);
-    Q_INIT_RESOURCE(averaging);
-    Q_INIT_RESOURCE(writetofile);
-    Q_INIT_RESOURCE(hpi);
-    Q_INIT_RESOURCE(disp3d);
+    Q_INIT_RESOURCE(scan_babymeg);
+    Q_INIT_RESOURCE(scan_fiffsimulator);
+    Q_INIT_RESOURCE(scan_ftbuffer);
+    Q_INIT_RESOURCE(scan_covariance);
+    Q_INIT_RESOURCE(scan_noisereduction);
+    Q_INIT_RESOURCE(scan_rtcmne);
+    Q_INIT_RESOURCE(scan_averaging);
+    Q_INIT_RESOURCE(scan_writetofile);
+    Q_INIT_RESOURCE(scan_hpi);
+    Q_INIT_RESOURCE(mne_disp3d);
     Q_INIT_RESOURCE(scDisp);
     #ifdef WITHBRAINAMP
-    Q_INIT_RESOURCE(brainamp);
+    Q_INIT_RESOURCE(scan_brainamp);
     #endif
     #ifdef WITHEEGOSPORTS
-    Q_INIT_RESOURCE(eegosports);
+    Q_INIT_RESOURCE(scan_eegosports);
     #endif
     #ifdef WITHGUSBAMP
-    Q_INIT_RESOURCE(gusbamp);
+    Q_INIT_RESOURCE(scan_gusbamp);
     #endif
     #ifdef WITHTMSI
-    Q_INIT_RESOURCE(tmsi);
+    Q_INIT_RESOURCE(scan_tmsi);
     #endif
     #endif
 
