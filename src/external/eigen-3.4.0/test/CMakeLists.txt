@@ -463,3 +463,5 @@ endif()
 # Register all smoke tests
 include("EigenSmokeTestList")
 ei_add_smoke_tests("${ei_smoke_test_list}")
+
+

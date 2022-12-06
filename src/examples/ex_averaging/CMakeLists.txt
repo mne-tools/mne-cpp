@@ -51,3 +51,7 @@ install(TARGETS ${PROJECT_NAME}
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()
+
+if(BUILD_SHARED_LIBS EQUAL OFF)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+endif()
