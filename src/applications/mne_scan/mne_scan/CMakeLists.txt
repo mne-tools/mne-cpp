@@ -71,7 +71,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   scMeas
 )
 
-if(BUILD_SHARED_LIBS EQUAL OFF)
+if(NOT BUILD_SHARED_LIBS)
     target_link_libraries(${PROJECT_NAME} PRIVATE
         scan_averaging
         scan_babymeg

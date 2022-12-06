@@ -52,7 +52,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     eigen
 )
 
-if(BUILD_SHARED_LIBS EQUAL OFF)
+if(NOT BUILD_SHARED_LIBS)
     target_link_libraries(${PROJECT_NAME} PRIVATE
         rtserver_fiffsimulator)
 endif()
@@ -71,6 +71,6 @@ if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()
 
-if(BUILD_SHARED_LIBS EQUAL OFF)
+if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
