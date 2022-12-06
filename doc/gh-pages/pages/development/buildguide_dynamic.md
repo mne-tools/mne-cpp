@@ -52,7 +52,7 @@ git fetch --all
 git rebase upstream/main
 ```
 
-## Compile the Cource Code
+## Compile the Source Code
 
 ### Via QtCreator (recommended)
 
