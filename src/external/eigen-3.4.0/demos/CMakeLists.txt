@@ -11,3 +11,5 @@ if(NOT EIGEN_TEST_NOQT)
     message(STATUS "Qt4 not found, so disabling the mandelbrot and opengl demos")
   endif()
 endif()
+
+

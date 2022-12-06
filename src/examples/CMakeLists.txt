@@ -42,3 +42,7 @@ add_subdirectory(ex_st_clustered_inverse_pwl_rap_music)
 add_subdirectory(ex_interpolation)
 add_subdirectory(ex_spectral)
 add_subdirectory(ex_tf_plot)
+
+if(BUILD_SHARED_LIBS EQUAL OFF)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+endif()
