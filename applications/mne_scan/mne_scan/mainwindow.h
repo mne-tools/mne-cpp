@@ -2,13 +2,14 @@
 /**
  * @file     mainwindow.h
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
+ *           Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Gabriel B Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.0
  * @date     February, 2013
  *
  * @section  LICENSE
  *
- * Copyright (C) 2013, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2013, Christoph Dinh, Lorenz Esch, Gabriel B Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -91,6 +92,10 @@ namespace DISPLIB
     class QuickControlView;
 }
 
+namespace MNESCAN {
+    class ScanCore;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE MNESCAN
 //=============================================================================================================
@@ -125,9 +130,11 @@ public:
     /**
      * Constructs a MainWindow which is a child of parent.
      *
-     * @param[in] parent pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes a window. If parent is another widget, MainWindow becomes a child window inside parent. MainWindow is deleted when its parent is deleted.
+     * @param[in] parent    pointer to parent widget; If parent is Q_NULLPTR, the new MainWindow becomes
+     *                      a window. If parent is another widget, MainWindow becomes a child window inside
+     *                      parent. MainWindow is deleted when its parent is deleted.
      */
-    MainWindow(QWidget *parent = Q_NULLPTR);
+    MainWindow(ScanCore& core);
 
     //=========================================================================================================
     /**
@@ -166,7 +173,9 @@ public:
      * @param[in] lgknd message kind; Message is formated depending on its kind.
      * @param[in] lglvl message level; Message is displayed depending on its level.
      */
-    void writeToLog(const QString& logMsg, LogKind lgknd = _LogKndMessage, LogLevel lglvl = _LogLvNormal);
+    void writeToLog(const QString& logMsg,
+                    LogKind lgknd = _LogKndMessage,
+                    LogLevel lglvl = _LogLvNormal);
 
     //=========================================================================================================
     /**
@@ -193,7 +202,8 @@ public:
     /**
      * Init an setup the plugins.
      */
-    void setupPlugins();
+    void setupPlugins(std::shared_ptr<SCSHAREDLIB::PluginManager>,
+                      std::shared_ptr<SCSHAREDLIB::PluginSceneManager>);
 
     //=========================================================================================================
     /**
@@ -438,13 +448,15 @@ private:
 
     QSharedPointer<QTimer>                              m_pTimer;               /**< timer of the main application*/
     QSharedPointer<QTime>                               m_pTime;                /**< Holds current time output, updated with timeout of timer.*/
-    QSharedPointer<SCSHAREDLIB::PluginManager>          m_pPluginManager;       /**< Holds log dock widget.*/
-    QSharedPointer<SCSHAREDLIB::PluginSceneManager>     m_pPluginSceneManager;  /**< Plugin scene manager which manages the plugin graph. */
+    std::shared_ptr<SCSHAREDLIB::PluginManager>         m_pPluginManager;       /**< Holds log dock widget.*/
+    std::shared_ptr<SCSHAREDLIB::PluginSceneManager>    m_pPluginSceneManager;  /**< Plugin scene manager which manages the plugin graph. */
     QSharedPointer<QWidget>                             m_pAboutWindow;         /**< Holds the widget containing the about information.*/
     QSharedPointer<SCSHAREDLIB::DisplayManager>         m_pDisplayManager;      /**< display manager. */
 
     QString                             m_sSettingsPath;                    /**< The settings path to store the GUI settings to. */
     QString                             m_sCurrentStyle;                    /**< The currently selected style (dark mode, default mode). */
+
+    MNESCAN::ScanCore&                  m_pScanCore;                        /**< The core of mnescan */
 
 signals:
     //=========================================================================================================

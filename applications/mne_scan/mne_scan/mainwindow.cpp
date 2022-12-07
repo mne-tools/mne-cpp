@@ -2,13 +2,14 @@
 /**
  * @file     mainwindow.cpp
  * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
+ *           Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Gabriel B Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.0
  * @date     February, 2013
  *
  * @section  LICENSE
  *
- * Copyright (C) 2013, Christoph Dinh, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2013, Christoph Dinh, Lorenz Esch, Gabriel B Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -57,6 +58,7 @@
 #include <utils/buildinfo.h>
 
 #include "mainwindow.h"
+#include "scancore.h"
 #include "startupwidget.h"
 #include "plugingui.h"
 #include "info.h"
@@ -95,18 +97,17 @@ constexpr unsigned long waitUntilHidingSplashScreen(1);     /**< Seconds to wait
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MainWindow::MainWindow(QWidget *parent)
-: QMainWindow(parent)
+MainWindow::MainWindow(ScanCore& core)
+: QMainWindow(nullptr)
 , m_bIsRunning(false)
 , m_iTimeoutMSec(1000)
 , m_pStartUpWidget(new StartUpWidget(this))
 , m_eLogLevelCurrent(_LogLvMax)
 , m_pTime(new QTime(0, 0))
-, m_pPluginManager(new SCSHAREDLIB::PluginManager(this))
-, m_pPluginSceneManager(new SCSHAREDLIB::PluginSceneManager(this))
 , m_pDisplayManager(new SCSHAREDLIB::DisplayManager(this))
 , m_sSettingsPath("MNESCAN/MainWindow")
 , m_sCurrentStyle("default")
+, m_pScanCore(core)
 {
     printf( "%s - Version %s\n",
             CInfo::AppNameShort().toUtf8().constData(),
@@ -121,11 +122,6 @@ MainWindow::MainWindow(QWidget *parent)
     setUnifiedTitleAndToolBarOnMac(false);
 
     initSplashScreen();
-
-    setupPlugins();
-    setupUI();
-
-    loadSettings();
 
     //Load application icon for linux builds only, mac and win executables have built in icons from .pro file
 #ifdef __linux__
@@ -159,9 +155,11 @@ MainWindow::~MainWindow()
 
 //=============================================================================================================
 
-void MainWindow::setupPlugins()
+void MainWindow::setupPlugins(std::shared_ptr<SCSHAREDLIB::PluginManager> pPluginManager,
+                              std::shared_ptr<SCSHAREDLIB::PluginSceneManager> pPluginSceneManager)
 {
-    m_pPluginManager->loadPlugins(qApp->applicationDirPath()+pluginDir);
+    m_pPluginManager = pPluginManager;
+    m_pPluginSceneManager = pPluginSceneManager;
 }
 
 //=============================================================================================================
@@ -180,6 +178,8 @@ void MainWindow::setupUI()
     createLogDockWindow();
 
     initStatusBar();
+
+    loadSettings();
 }
 
 //=============================================================================================================
@@ -271,7 +271,7 @@ void MainWindow::initSplashScreen(bool bShowSplashScreen)
     m_pSplashScreen = MainSplashScreen::SPtr::create(splashPixMap,
                                                     Qt::WindowFlags() | Qt::WindowStaysOnTopHint );
     if(m_pSplashScreen && m_pPluginManager) {
-        QObject::connect(m_pPluginManager.data(), &PluginManager::pluginLoaded,
+        QObject::connect(m_pPluginManager.get(), &PluginManager::pluginLoaded,
                          m_pSplashScreen.data(), &MainSplashScreen::showMessage);
     }
 
@@ -692,7 +692,7 @@ void MainWindow::createPluginDockWindow()
     m_pPluginGuiDockWidget = new QDockWidget(tr("Plugins"), this);
     m_pPluginGuiDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    m_pPluginGui = new PluginGui(m_pPluginManager.data(), m_pPluginSceneManager.data());
+    m_pPluginGui = new PluginGui(m_pPluginManager.get(), m_pPluginSceneManager.get());
     m_pPluginGui->setParent(m_pPluginGuiDockWidget);
     m_pPluginGuiDockWidget->setWidget(m_pPluginGui);
 
@@ -912,13 +912,13 @@ void MainWindow::writeToLog(const QString& logMsg,
 void MainWindow::startMeasurement()
 {
     // Save pipeline before starting just in case a crash occurs
+    std::cout << "Hey!\n";
     m_pPluginGui->saveConfig(QStandardPaths::writableLocation(QStandardPaths::DataLocation),"default.xml");
 
     writeToLog(tr("Starting real-time measurement..."), _LogKndMessage, _LogLvMin);
 
-    if(!m_pPluginSceneManager->startPlugins()) {
+    if(!m_pScanCore.startMeasurement()) {
         QMessageBox::information(0, tr("MNE Scan - Start"), QString(QObject::tr("Not able to start all plugins!")), QMessageBox::Ok);
-        m_pPluginSceneManager->stopPlugins();
         return;
     }
 
@@ -944,7 +944,7 @@ void MainWindow::stopMeasurement()
     writeToLog(tr("Stopping real-time measurement..."), _LogKndMessage, _LogLvMin);
 
     //Stop all plugins
-    m_pPluginSceneManager->stopPlugins();
+    m_pScanCore.stopMeasurement();
     m_pDisplayManager->clean();
 
     // Hide and clear QuickControlView

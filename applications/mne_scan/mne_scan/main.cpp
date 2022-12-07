@@ -39,6 +39,7 @@
 
 #include "mainsplashscreen.h"
 #include "mainwindow.h"
+#include "scancore.h"
 
 #include <scMeas/measurementtypes.h>
 #include <scMeas/realtimemultisamplearray.h>
@@ -163,9 +164,8 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName(CInfo::AppNameShort());
     QCoreApplication::setOrganizationDomain("www.mne-cpp.org");
 
-    SCMEASLIB::MeasurementTypes::registerTypes();
-
-    MainWindow mainWin;
+    //MainWindow mainWin;
+    ScanCore scanCore;
 
     QSurfaceFormat fmt;
     fmt.setSamples(10);
