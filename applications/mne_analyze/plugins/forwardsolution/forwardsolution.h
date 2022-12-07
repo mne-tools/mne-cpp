@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
- * @file     sourcelocalization.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.6
- * @date     August, 2020
+ * @file     forwardsolution.h
+ * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
+ *           Juan G Prieto <jgarciaprieto@mgh.harvard.edu>
+ * @since    0.1.9
+ * @date     June, 2022
  *
  * @section  LICENSE
  *
- * Copyright (C) 2020, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2022, Gabriel B Motta, Juan G Prieto. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -28,22 +29,22 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    SourceLocalization class declaration.
+ * @brief    ForwardSolution class declaration.
  *
  */
 
-#ifndef MNEANALYZE_SOURCELOCALIZATION_H
-#define MNEANALYZE_SOURCELOCALIZATION_H
+#ifndef MNEANALYZE_FORWARDSOLUTION_H
+#define MNEANALYZE_FORWARDSOLUTION_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "sourcelocalization_global.h"
+#include "forwardsolution_global.h"
 
 #include <anShared/Plugins/abstractplugin.h>
 
-#include <mne/mne_inverse_operator.h>
+#include <fiff/fiff_coord_trans.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -59,51 +60,61 @@
 namespace ANSHAREDLIB {
     class Communicator;
     class AbstractModel;
-    class FiffRawViewModel;
-    class AveragingDataModel;
-    class ForwardSolutionModel;
 }
 
-namespace INVERSELIB {
-    class MinimumNorm;
+namespace DISPLIB {
+    class FwdSettingsView;
+}
+
+namespace FSLIB{
+    class AnnotationSet;
+}
+
+namespace FWDLIB {
+    class ComputeFwdSettings;
+    class ComputeFwd;
+}
+
+namespace MNELIB {
+    class MNEForwardSolution;
 }
 
 //=============================================================================================================
-// DEFINE NAMESPACE SOURCELOCALIZATIONPLUGIN
+// DEFINE NAMESPACE FORWARDSOLUTIONPLUGIN
 //=============================================================================================================
 
-namespace SOURCELOCALIZATIONPLUGIN
+namespace FORWARDSOLUTIONPLUGIN
 {
 
 //=============================================================================================================
-// SOURCELOCALIZATIONPLUGIN FORWARD DECLARATIONS
+// FORWARDSOLUTIONPLUGIN FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
 /**
- * SourceLocalization Plugin
+ * ForwardSolution Plugin
  *
- * @brief The sourcelocalization class provides a plugin for computing averages.
+ * @brief The forwardsolution class provides a plugin for computing averages.
  */
-class SOURCELOCALIZATIONSHARED_EXPORT SourceLocalization : public ANSHAREDLIB::AbstractPlugin
+class FORWARDSOLUTIONSHARED_EXPORT ForwardSolution : public ANSHAREDLIB::AbstractPlugin
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "sourcelocalization.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "ansharedlib/1.0" FILE "forwardsolution.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(ANSHAREDLIB::AbstractPlugin)
 
 public:
     //=========================================================================================================
     /**
-     * Constructs an SourceLocalization object.
+     * Constructs an ForwardSolution object.
      */
-    SourceLocalization();
+    ForwardSolution();
 
     //=========================================================================================================
     /**
-     * Destroys the SourceLocalization object.
+     * Destroys the ForwardSolution object.
      */
-    ~SourceLocalization() override;
+    ~ForwardSolution() override;
 
     // AbstractPlugin functions
     virtual QSharedPointer<AbstractPlugin> clone() const override;
@@ -119,21 +130,66 @@ public:
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
+private slots:
+    //=========================================================================================================
+    /**
+     * Call this funciton whenever a forward computation was requested.
+     */
+    void onDoForwardComputation();
+
+    //=========================================================================================================
+    /**
+     * Call this function whenever the recompution status changed.
+     *
+     * @param[in] bDoRecomputation    If recomputation is activated.
+     */
+    void onRecompStatusChanged(bool bDoRecomputation);
+
+    //=========================================================================================================
+    /**
+     * Call this function whenever the clustering status changed.
+     *
+     * @param[in] bDoClustering   If clustering is activated.
+     */
+    void onClusteringStatusChanged(bool bDoRecomputation);
+
+    //=========================================================================================================
+    /**
+     * Call this function whenever the atlas directory is set.
+     *
+     * @param[in] sDirPath              The path to the atlas directory.
+     * @param[in] pAnnotationSet        The Annotation set.
+     */
+    void onAtlasDirChanged(const QString& sDirPath,
+                           const QSharedPointer<FSLIB::AnnotationSet> pAnnotationSet);
+
+signals:
+    //=========================================================================================================
+    /**
+     * Emitted when forward solution is available
+     */
+    void fwdSolutionAvailable(FIFFLIB::fiff_int_t iSourceOri,
+                              FIFFLIB::fiff_int_t iCoordFrame,
+                              int iNSource,
+                              int iNChan,
+                              int iNSpaces);
+
+    //=========================================================================================================
+    /**
+     * Emitted whenever clustered forward solution is available
+     */
+    void clusteringAvailable(int iNSource);
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever the clustering status changed
+     * (0 Initializing, 1 Computing, 2 Recomputing, 3 Clustering, 4 Not Computed, 5 Finished).
+     *
+     * @param[in] iStatus            status of recomputation.
+     */
+    void statusInformationChanged(int iStatus);
+
 private:
-
-    struct CovComputeResult {
-        Eigen::VectorXd mu;
-        Eigen::MatrixXd matData;
-    };
-
-    enum Mode{
-        SOURCE_LOC_FROM_AVG,
-        SOURCE_LOC_FROM_SINGLE_TRIAL
-    };
-
-    void sourceLocalizationFromAverage();
-
-    void sourceLocalizationFromSingleTrial();
 
     //=========================================================================================================
     /**
@@ -143,83 +199,33 @@ private:
      */
     void onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel);
 
-    //=========================================================================================================
-    /**
-     * Handles clearing view if currently used model is being removed
-     *
-     * @param[in] pRemovedModel    Pointer to model being removed.
-     */
-    void onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel);
-
-    //=========================================================================================================
-    /**
-     * Perform actual covariance estimation.
-     *
-     * @param[in] inputData  Data to estimate the covariance from.
-     */
-    FIFFLIB::FiffCov estimateCovariance(const Eigen::MatrixXd& matData,
-                                        FIFFLIB::FiffInfo* info);
-
-    //=========================================================================================================
-    /**
-     * Computer multiplication with transposed.
-     *
-     * @param[in] matData  Data to self multiply with.
-     *
-     * @return   The multiplication result.
-     */
-    static CovComputeResult computeCov(const Eigen::MatrixXd &matData);
-
-    //=========================================================================================================
-    /**
-     * Computer multiplication with transposed.
-     *
-     * @param[out]   finalResult     The final covariance estimation.
-     * @param[in]   tempResult      The intermediate result from the compute function.
-     */
-    static void reduceCov(CovComputeResult& finalResult, const CovComputeResult &tempResult);
-
-    //=========================================================================================================
-    /**
-     * Slot called when the method changed.
-     *
-     * @param[in] method        The new method.
-     */
-    void onMethodChanged(const QString &method);
-
-    //=========================================================================================================
-    /**
-     * Slot called when the trigger type changed.
-     *
-     * @param[in] triggerType        The new trigger type.
-     */
-    void onTriggerTypeChanged(const QString& triggerType);
-
-    //=========================================================================================================
-    /**
-     * Slot called when the time point changes.
-     *
-     * @param[in] iTimePointMs        The new time point in ms.
-     */
-    void onTimePointValueChanged(int iTimePointMs);
 
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals. */
 
-    QSharedPointer<ANSHAREDLIB::ForwardSolutionModel>       m_pFwdSolutionModel;
-    QSharedPointer<ANSHAREDLIB::AveragingDataModel>         m_pAverageDataModel;
-    QSharedPointer<ANSHAREDLIB::FiffRawViewModel>           m_pRawDataModel;
+    DISPLIB::FwdSettingsView*                               m_pFwdSettingsView;
 
+    QSharedPointer<FWDLIB::ComputeFwdSettings>              m_pFwdSettings;         /**< Forward Solution Settings. */
 
-    QString                         m_sAvrType;                 /**< The average type. */
-    QString                         m_sMethod;                  /**< The method: "MNE" | "dSPM" | "sLORETA". */
+    QSharedPointer<MNELIB::MNEForwardSolution>              m_pFwdSolution;
 
+    QSharedPointer<FIFFLIB::FiffInfo>                       m_pFiffInfo;                /**< Fiff measurement info.*/
+    FIFFLIB::FiffCoordTrans                                 m_transDevHead;             /**< Updated meg->head transformation. */
+    QSharedPointer<FSLIB::AnnotationSet>                    m_pAnnotationSet;       /**< Annotation set. */
 
-    int         m_iSelectedSample;
-    bool        m_bUpdateMinNorm;
+    QMutex                                                  m_mutex;                    /**< The threads mutex.*/
 
-    Mode m_sourceLocalizationMode;
+    float                                                   m_fThreshRot;               /**< The allowed rotation in degree.**/
+    float                                                   m_fThreshMove;              /**< The Allowed movement in mm.**/
+    bool                                                    m_bBusy;                    /**< Indicates if we have to update headposition.**/
+    bool                                                    m_bDoRecomputation;         /**< If recomputation is activated.**/
+    bool                                                    m_bDoClustering;            /**< If clustering is activated.**/
+    bool                                                    m_bDoFwdComputation;        /**< Do a forward computation. **/
+
+    QString                                                 m_sAtlasDir;                /**< File to Atlas. */
+
+    QString                                                 m_sFiffInfoSource;
 };
 
 } // NAMESPACE
 
-#endif // MNEANALYZE_SOURCELOCALIZATION_H
+#endif // MNEANALYZE_FORWARDSOLUTION_H

@@ -59,7 +59,7 @@
 
 //SUB-ITEMS
 #define BIDS_AVERAGE                20
-#define BIDS_EVENT             21
+#define BIDS_EVENT                  21
 #define BIDS_DIPOLE                 22
 
 #define BIDS_UNKNOWN                99

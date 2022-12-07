@@ -107,7 +107,10 @@ void RawDataViewer::init()
     m_pFiffRawView->setAttribute(Qt::WA_DeleteOnClose, false);
 
     connect(m_pFiffRawView.data(), &FiffRawView::sendSamplePos,
-            this, &RawDataViewer::onSendSamplePos, Qt::UniqueConnection);
+            this, &RawDataViewer::sendNewEventSample, Qt::UniqueConnection);
+
+    connect(m_pFiffRawView.data(), &FiffRawView::sendLastClickPos,
+            this, &RawDataViewer::sendSampleSelected,  Qt::UniqueConnection);
 
     connect(m_pFiffRawView.data(), &FiffRawView::realtimeDataUpdated,
             this, &RawDataViewer::onNewRealtimeData, Qt::UniqueConnection);
@@ -256,12 +259,22 @@ void RawDataViewer::onModelChanged(QSharedPointer<AbstractModel> pNewModel)
 
 //=============================================================================================================
 
-void RawDataViewer::onSendSamplePos(int iSample)
+void RawDataViewer::sendNewEventSample(int iSample)
 {
     QVariant data;
     data.setValue(iSample);
 
-    m_pCommu->publishEvent(EVENT_TYPE::NEW_EVENT_ADDED, data);
+    m_pCommu->publishEvent(EVENT_TYPE::ADD_NEW_EVENT, data);
+}
+
+//=============================================================================================================
+
+void RawDataViewer::sendSampleSelected(int iSample)
+{
+    QVariant data;
+    data.setValue(iSample);
+
+    m_pCommu->publishEvent(EVENT_TYPE::SAMPLE_SELECTED, data);
 }
 
 //=============================================================================================================

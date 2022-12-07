@@ -1,13 +1,14 @@
 #==============================================================================================================
 #
-# @file     sourcelocalization.pro
-# @author   Lorenz Esch <lesch@mgh.harvard.edu>
-# @since    0.1.6
-# @date     August, 2020
+# @file     forwardsolution.pro
+# @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
+#           Juan G Prieto <jgarciaprieto@mgh.harvard.edu>
+# @since    0.1.9
+# @date     June, 2022
 #
 # @section  LICENSE
 #
-# Copyright (C) 2020, Lorenz Esch. All rights reserved.
+# Copyright (C) 2022, Gabriel B Motta, Juan G Prieto. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -28,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the sourcelocalization plugin.
+# @brief    This project file generates the makefile for the forwardsolution plugin.
 #
 #==============================================================================================================
 
@@ -36,11 +37,11 @@ include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT += gui widgets concurrent
+QT += gui widgets
 
 CONFIG += skip_target_version_ext plugin
 
-DEFINES += SOURCELOCALIZATION_PLUGIN
+DEFINES += FORWARDSOLUTION_PLUGIN
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_analyze_plugins
 
@@ -48,7 +49,7 @@ contains(MNECPP_CONFIG, wasm) {
     DEFINES += WASMBUILD
 }
 
-TARGET = sourcelocalization
+TARGET = forwardsolution
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -88,14 +89,14 @@ CONFIG(debug, debug|release) {
 }
 
 SOURCES += \
-    sourcelocalization.cpp \
-    sourcelocalization_global.cpp
+    forwardsolution.cpp \
+    forwardsolution_global.cpp \
 
 HEADERS += \
-    sourcelocalization_global.h \
-    sourcelocalization.h \
+    forwardsolution_global.h \
+    forwardsolution.h \
 
-OTHER_FILES += sourcelocalization.json
+OTHER_FILES += forwardsolution.json
 
 clang {
     QMAKE_CXXFLAGS += -isystem $${EIGEN_INCLUDE_DIR} 
@@ -131,12 +132,12 @@ contains(MNECPP_CONFIG, useFFTW):!contains(MNECPP_CONFIG, static) {
 
 ################################################## BUILD TIMESTAMP/HASH UPDATER ############################################
 
-FILE_TO_UPDATE = sourcelocalization_global.cpp
+FILE_TO_UPDATE = forwardsolution_global.cpp
 win32 {
     CONFIG(debug, debug|release) {
-        OBJ_TARJET = debug\sourcelocalization_global.obj
+        OBJ_TARJET = debug\forwardsolution_global.obj
     } else {
-        OBJ_TARJET = release\sourcelocalization_global.obj
+        OBJ_TARJET = release\forwardsolution_global.obj
     }
 }
 

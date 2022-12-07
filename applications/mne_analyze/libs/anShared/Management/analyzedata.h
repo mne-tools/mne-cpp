@@ -290,6 +290,20 @@ public:
                                BIDS_DIPOLE);
             break;
         }
+        case ANSHAREDLIB_FORWARDSOLUTION_MODEL:{
+            pItem->setData(data);
+            m_pData->addToData(pItem,
+                               m_SelectedFunctionalData,
+                               BIDS_UNKNOWN);
+            break;
+        }
+        case ANSHAREDLIB_SOURCEESTIMATE_MODEL:{
+            pItem->setData(data);
+            m_pData->addToData(pItem,
+                               m_SelectedFunctionalData,
+                               BIDS_UNKNOWN);
+            break;
+        }
         case ANSHAREDLIB_FIFFRAW_MODEL: {
             pItem->setData(data);
             QModelIndex index = m_SelectedItem;
@@ -299,7 +313,7 @@ public:
             break;
         }
         default:{
-            qWarning() << "[AnalyzeData::addModel] Model type not supported";
+            qWarning() << "[AnalyzeData::addModel] Model type not recognized.";
             break;
         }
         }

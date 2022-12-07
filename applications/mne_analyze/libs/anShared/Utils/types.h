@@ -87,7 +87,9 @@ namespace ANSHAREDLIB
         ANSHAREDLIB_BEMDATA_MODEL,
         ANSHAREDLIB_NOISE_MODEL,
         ANSHAREDLIB_MRICOORD_MODEL,
-        ANSHAREDLIB_DIPOLEFIT_MODEL
+        ANSHAREDLIB_DIPOLEFIT_MODEL,
+        ANSHAREDLIB_FORWARDSOLUTION_MODEL,
+        ANSHAREDLIB_SOURCEESTIMATE_MODEL
     };
 
     //=========================================================================================================
@@ -100,7 +102,7 @@ namespace ANSHAREDLIB
         PLUGIN_INIT_FINISHED,       ///< [NO DATA] Send when all plugins finished initializing
         STATUS_BAR_MSG,             ///< [QString] Send a message to the status bar (part of gui)
         SELECTED_MODEL_CHANGED,     ///< [QSharedPointer<ANSHAREDLIB::AbstractModel>>] Send whenever the selection changes in the datamanager plugin
-        NEW_EVENT_ADDED,            ///< [int] event send whenever the user adds a new event in the rawdataviewer plugin
+        ADD_NEW_EVENT,            ///< [int] event send whenever the user adds a new event in the rawdataviewer plugin
         EVENTS_UPDATED,             ///< [NO DATA] send when events or events-groups have changed
         TRIGGER_REDRAW,             ///< [NO DATA] send when viewer needs to be updated
         TRIGGER_ACTIVE_CHANGED,     ///< [int] send when the trigger active state was toggled
@@ -122,7 +124,8 @@ namespace ANSHAREDLIB
         FIDUCIAL_CHANGED,           ///< [int] event send when fiducial was changed
         SET_DATA3D_TREE_MODEL,      ///< [QSharedPointer<DISP3DLIB::Data3DTreeModel>] send when a new 3D Model is set
         VIEW3D_SETTINGS_CHANGED,    ///< [ANSHAREDLIB::View3DParameters] send to trigger view 3D settings update
-        MODEL_REMOVED               ///< [QSharedPointer<ANSHAREDLIB::AbstractModel>>] send to alert plugins when model is being removed
+        MODEL_REMOVED,              ///< [QSharedPointer<ANSHAREDLIB::AbstractModel>>] send to alert plugins when model is being removed
+        SAMPLE_SELECTED
     };
 
     //=========================================================================================================

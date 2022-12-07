@@ -314,6 +314,14 @@ signals:
      */
     void sendSamplePos(int iSample);
 
+    //=========================================================================================================
+    /**
+     * Emits sample number where last clicked
+     *
+     * @param[in] iSample      sample number last clicked.
+     */
+    void sendLastClickPos(int iSample);
+
 private:
     //=========================================================================================================
     /**

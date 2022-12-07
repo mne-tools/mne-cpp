@@ -62,6 +62,7 @@ namespace ANSHAREDLIB {
     class BemDataModel;
     class AbstractModel;
     class DipoleFitModel;
+    class SourceEstimateModel;
 }
 
 namespace DISP3DLIB {
@@ -70,6 +71,7 @@ namespace DISP3DLIB {
     class BemTreeItem;
     class DigitizerSetTreeItem;
     class EcdDataTreeItem;
+    class MneDataTreeItem;
 }
 
 namespace DISPLIB {
@@ -202,6 +204,9 @@ private:
     void newDipoleFit(const INVERSELIB::ECDSet& ecdSet);
 
     //=========================================================================================================
+    void newSourceLoc(QSharedPointer<ANSHAREDLIB::SourceEstimateModel> pModel);
+
+    //=========================================================================================================
     /**
      * Loads new  model when current loaded model is changed
      *
@@ -226,6 +231,8 @@ private:
     DISP3DLIB::DigitizerSetTreeItem*                        m_pDigitizerCoreg;      /**< The 3D item pointing to the tracked digitizers. */
     DISP3DLIB::DigitizerSetTreeItem*                        m_pMriFidCoreg;         /**< The 3D item pointing to the mri fiducials. */
     DISP3DLIB::EcdDataTreeItem*                             m_pDipoleFit;           /**< The 3D item pointing to the dipole fit. */
+    DISP3DLIB::MneDataTreeItem*                             m_pRtMNEItem;           /**< The Disp3D real time items. */
+
 
     DISP3DLIB::View3D*                                      m_pView3D;              /**< The Disp3D view. */
     DISPLIB::Control3DView*                                 m_pControl3DView;       /**< The 3D Control view. */
