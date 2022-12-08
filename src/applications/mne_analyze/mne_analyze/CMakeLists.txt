@@ -70,6 +70,8 @@ if(NOT BUILD_SHARED_LIBS)
         analyze_rawdataviewer
         analyze_sourcelocalization
         analyze_view3d)
+        
+    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
@@ -84,8 +86,4 @@ install(TARGETS ${PROJECT_NAME}
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
-endif()
-
-if(NOT BUILD_SHARED_LIBS)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
