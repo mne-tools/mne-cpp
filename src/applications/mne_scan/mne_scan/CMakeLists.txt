@@ -85,6 +85,8 @@ if(NOT BUILD_SHARED_LIBS)
         scan_rtcmne
         scan_rtfwd
         scan_writetofile)
+    
+        target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
