@@ -14,12 +14,22 @@ set(SOURCES
     fiffproducer.cpp
 )
 
-set(HEADERS
-    fiffsimulator.h
-    fiffsimulator_global.h 
-    fiffproducer.h 
-#    ../../mne_rt_server/IConnector.h
-)
+
+
+if(NOT BUILD_SHARED_LIBS)
+    set(HEADERS
+        fiffsimulator.h
+        fiffsimulator_global.h 
+        fiffproducer.h 
+    )
+else()
+    set(HEADERS
+        fiffsimulator.h
+        fiffsimulator_global.h 
+        fiffproducer.h 
+        ../../mne_rt_server/IConnector.h
+    )
+endif()
 
 set(FILE_TO_UPDATE channelselection_global.cpp)
 
