@@ -9,11 +9,11 @@ set(MNE_GIT_HASH_LONG "No git hash")
 
 execute_process(COMMAND git log -1 --format=%h
                 OUTPUT_VARIABLE MNE_GIT_HASH_SHORT
-                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 execute_process(COMMAND git log -1 --format=%H
                 OUTPUT_VARIABLE MNE_GIT_HASH_LONG
-                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+                WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
                 OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 ##==============================================================================
