@@ -18,7 +18,7 @@ set(HEADERS
     fiffsimulator.h
     fiffsimulator_global.h 
     fiffproducer.h 
-    ../../mne_rt_server/IConnector.h
+#    ../../mne_rt_server/IConnector.h
 )
 
 set(FILE_TO_UPDATE channelselection_global.cpp)
@@ -44,5 +44,5 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 target_compile_definitions(${PROJECT_NAME} PRIVATE RTSERVER_FIFFSIMULATOR_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
 
 if(NOT BUILD_SHARED_LIBS)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD QT_STATICPLUGIN)
 endif()
