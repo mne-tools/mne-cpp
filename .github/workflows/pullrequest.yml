@@ -83,7 +83,7 @@ jobs:
       if: (matrix.os == 'ubuntu-18.04') || (matrix.os == 'macos-latest')
       run: |
         cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
-        cmake --build build
+        cmake --build build --parallel $(expr $(nproc --all) / 2)
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
@@ -170,7 +170,7 @@ jobs:
       if: (matrix.os == 'ubuntu-18.04') || (matrix.os == 'macos-latest')
       run: |
         cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
-        cmake --build build
+        cmake --build build --parallel $(expr $(nproc --all) / 2)
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
@@ -234,7 +234,7 @@ jobs:
         export QT_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
         export Qt5_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
         cmake -B build -S src -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
-        cmake --build build
+        cmake --build build --parallel $(expr $(nproc --all) / 2)
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
@@ -296,12 +296,12 @@ jobs:
       if: matrix.os == 'ubuntu-18.04'
       run: |
         cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
-        cmake --build build
+        cmake --build build --parallel $(expr $(nproc --all) / 2)
     - name: Configure and compile MNE-CPP (MacOS)
       if: matrix.os == 'macos-latest'
       run: |
         cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
-        cmake --build build
+        cmake --build build --parallel $(expr $(nproc --all) / 2)
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
