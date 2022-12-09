@@ -270,7 +270,7 @@ jobs:
         cd build
         cmake -DCMAKE_INSTALL_PREFIX=../installed ..
         make
-        cmake --build build
+        cmake --build build --parallel $(expr $(nproc --all) / 2)
     - name: Compile LSL submodule
       run: |
         cd applications/mne_scan/plugins/lsladapter/liblsl
@@ -278,11 +278,11 @@ jobs:
         cd build
         cmake ..
         make
-        cmake --build build
+        cmake --build build --parallel $(expr $(nproc --all) / 2)
     - name: Configure and compile MNE-CPP
       run: |
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-        cmake --build build
+        cmake --build build --parallel $(expr $(nproc --all) / 2)
     - name: Deploy binaries
       run: |
         ./tools/deployment/deploy.bat dynamic pack
@@ -332,7 +332,7 @@ jobs:
         cd applications/mne_scan/plugins/brainflowboard/brainflow/build
         cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
         make
-        cmake --build build
+        cmake --build build --parallel $(expr $(nproc --all) / 2)
     - name: Compile LSL submodule
       run: |
         cd applications/mne_scan/plugins/lsladapter/liblsl
@@ -340,11 +340,11 @@ jobs:
         cd build
         cmake ..
         make
-        cmake --build build
+        cmake --build build --parallel $(expr $(nproc --all) / 2)
     - name: Configure and compile MNE-CPP
       run: |
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-        cmake --build build
+        cmake --build build --parallel $(expr $(nproc --all) / 2)
     - name: Deploy binaries (MacOS)
       run: |
         ./tools/deployment/deploy.bat dynamic pack
