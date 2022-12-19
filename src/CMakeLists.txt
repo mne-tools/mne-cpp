@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.14)
 project(mne_cpp LANGUAGES CXX)
 
+set(CMAKE_CXX_STANDARD 14)
+
 ##==============================================================================
 ## Save git hash for project
 
@@ -21,15 +23,18 @@ execute_process(COMMAND git log -1 --format=%H
 
 set(CMAKE_CXX_STANDARD 14)
 
-option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
-option(BUILD_MAC_APP_BUNDLE "Build app bundle on macos" OFF)
+option(BUILD_SHARED_LIBS    "Build using shared libraries"  ON )
+option(BUILD_MAC_APP_BUNDLE "Build app bundle on macos"     OFF)
 
+option(NO_EXAMPLES          "Skip building examples"        OFF)
+option(NO_APPLICATIONS      "Skip building applications"    OFF)
+option(NO_TESTS             "Skip building tests"           OFF)
 
-option(NO_EXAMPLES "Skip building examples" OFF)
-option(NO_APPLICATIONS "Skip building applications" OFF)
-option(NO_TESTS "Skip building tests" OFF)
+#Equivalent to NO_EXAMPLES, NO_APPLICATIONS and NO_TESTS
+option(LIB_ONLY             "Build only the libraries."     OFF)
 
-option(LIB_ONLY "Build only the libraries. Equivalent to NO_EXAMPLES NO_APPLICATIONS and NO_TESTS" OFF)
+#Equivalent to NO_EXAMPLES and NO_TESTS
+option(FOR_RELEASE          "Build only libs and apps."     OFF)
 
 ##==============================================================================
 ## Add subdirecotries
@@ -37,14 +42,18 @@ option(LIB_ONLY "Build only the libraries. Equivalent to NO_EXAMPLES NO_APPLICAT
 add_subdirectory(libraries)
 add_subdirectory(external)
 
-if(NOT NO_APPLICATIONS)
-    add_subdirectory(applications)
-endif()
+if(NOT LIB_ONLY)
+    if(NOT NO_APPLICATIONS)
+        add_subdirectory(applications)
+    endif()
 
-if(NOT NO_EXAMPLES)
-    add_subdirectory(examples)
-endif()
+    if(NOT FOR_RELEASE)
+        if(NOT NO_EXAMPLES)
+            add_subdirectory(examples)
+        endif()
 
-if(NOT NO_TESTS)
-    add_subdirectory(testframes)
+        if(NOT NO_TESTS)
+            add_subdirectory(testframes)
+        endif()
+    endif()
 endif()
