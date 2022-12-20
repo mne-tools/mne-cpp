@@ -28,13 +28,32 @@ set(SOURCES
     helpers/filterio.cpp
 )
 
+set(HEADERS
+    icp.h
+    rtprocessing_global.h
+    rtcov.h
+    rtinvop.h
+    averaging.h
+    rtaveraging.h
+    rtnoise.h
+    rthpis.h
+    filter.h
+    detecttrigger.h
+    sphara.h
+    rtconnectivity.h
+    helpers/cosinefilter.h
+    helpers/parksmcclellan.h
+    helpers/filterkernel.h
+    helpers/filterio.h
+)
+
 set(FILE_TO_UPDATE rtprocessing_global.cpp.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 

@@ -29,13 +29,33 @@ set(SOURCES
     connectivity.cpp
 )
 
+set(HEADERS
+    connectivity_global.h
+    metrics/abstractmetric.h
+    metrics/correlation.h
+    metrics/crosscorrelation.h
+    metrics/coherency.h
+    metrics/coherence.h
+    metrics/imagcoherence.h
+    metrics/unbiasedsquaredphaselagindex.h
+    metrics/phaselockingvalue.h
+    metrics/weightedphaselagindex.h
+    metrics/debiasedsquaredweightedphaselagindex.h
+    metrics/phaselagindex.h
+    network/network.h
+    network/networknode.h
+    network/networkedge.h
+    connectivitysettings.h
+    connectivity.h
+)
+
 set(FILE_TO_UPDATE connectivity_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 

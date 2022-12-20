@@ -63,6 +63,62 @@ set(SOURCES
     engine/view/orbitalcameracontroller.cpp
 )
 
+set(HEADERS
+    engine/view/view3D.h
+    engine/delegate/data3Dtreedelegate.h
+    engine/model/data3Dtreemodel.h
+    engine/model/items/subject/subjecttreeitem.h
+    engine/model/items/measurement/measurementtreeitem.h
+    engine/model/items/freesurfer/fssurfacetreeitem.h
+    engine/model/items/freesurfer/fsannotationtreeitem.h
+    engine/model/items/hemisphere/hemispheretreeitem.h
+    engine/model/items/sourcespace/sourcespacetreeitem.h
+    engine/model/items/sourcedata/mnedatatreeitem.h
+    engine/model/items/sourcedata/ecddatatreeitem.h
+    engine/model/items/network/networktreeitem.h
+    engine/model/items/bem/bemtreeitem.h
+    engine/model/items/bem/bemsurfacetreeitem.h
+    engine/model/items/sensorspace/sensorsettreeitem.h
+    engine/model/items/sensorspace/sensorsurfacetreeitem.h
+    engine/model/items/sensorspace/sensorpositiontreeitem.h
+    engine/model/items/digitizer/digitizertreeitem.h
+    engine/model/items/digitizer/digitizersettreeitem.h
+    engine/model/items/mri/mritreeitem.h
+    engine/model/items/common/abstracttreeitem.h
+    engine/model/items/common/abstract3Dtreeitem.h
+    engine/model/items/common/metatreeitem.h
+    engine/model/items/common/abstractmeshtreeitem.h
+    engine/model/items/common/types.h
+    engine/model/items/common/gpuinterpolationitem.h
+    engine/model/workers/rtSourceLoc/rtsourcedataworker.h
+    engine/model/workers/rtSourceLoc/rtsourcedatacontroller.h
+    engine/model/workers/rtSourceLoc/rtsourceinterpolationmatworker.h
+    engine/model/workers/rtSensorData/rtsensordataworker.h
+    engine/model/workers/rtSensorData/rtsensordatacontroller.h
+    engine/model/workers/rtSensorData/rtsensorinterpolationmatworker.h
+    engine/model/3dhelpers/renderable3Dentity.h
+    engine/model/3dhelpers/custommesh.h
+    engine/model/items/common/types.h
+    engine/model/materials/pervertexphongalphamaterial.h
+    engine/model/materials/pervertextessphongalphamaterial.h
+    engine/model/materials/shownormalsmaterial.h
+    engine/model/materials/networkmaterial.h
+    viewers/ecdview.h
+    viewers/abstractview.h
+    viewers/networkview.h
+    viewers/sourceestimateview.h
+    disp3D_global.h
+    engine/model/items/sensordata/sensordatatreeitem.h
+    helpers/interpolation/interpolation.h
+    helpers/geometryinfo/geometryinfo.h
+    engine/model/3dhelpers/geometrymultiplier.h
+    engine/model/materials/geometrymultipliermaterial.h
+    engine/view/customframegraph.h
+    engine/model/materials/gpuinterpolationmaterial.h
+    engine/model/materials/abstractphongalphamaterial.h
+    engine/view/orbitalcameracontroller.h
+)
+
 set(FILE_TO_UPDATE disp3D_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
@@ -70,7 +126,7 @@ list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 
-add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 

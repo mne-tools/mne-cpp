@@ -60,13 +60,66 @@ set(SOURCES
     c/mne_mgh_tag_group.cpp
 )
 
+set(HEADERS
+    mne.h
+    mne_global.h
+    mne_sourcespace.h
+    mne_hemisphere.h
+    mne_forwardsolution.h
+    mne_sourceestimate.h
+    mne_inverse_operator.h
+    mne_epoch_data.h
+    mne_epoch_data_list.h
+    mne_cluster_info.h
+    mne_surface.h
+    mne_corsourceestimate.h
+    mne_bem.h
+    mne_bem_surface.h
+    mne_project_to_surface.h
+    c/mne_cov_matrix.h
+    c/mne_ctf_comp_data.h
+    c/mne_ctf_comp_data_set.h
+    c/mne_deriv.h
+    c/mne_deriv_set.h
+    c/mne_mne_data.h
+    c/mne_named_matrix.h
+    c/mne_proj_item.h
+    c/mne_proj_op.h
+    c/mne_raw_buf_def.h
+    c/mne_raw_data.h
+    c/mne_raw_info.h
+    c/mne_sss_data.h
+    c/mne_triangle.h
+    c/mne_types.h
+    c/mne_types_mne-c.h
+    c/mne_vol_geom.h
+    c/mne_nearest.h
+    c/mne_patch_info.h
+    c/mne_source_space_old.h
+    c/mne_surface_old.h
+    c/mne_surface_or_volume.h
+    c/filter_thread_arg.h
+    c/mne_msh_display_surface.h
+    c/mne_msh_display_surface_set.h
+    c/mne_msh_picked.h
+    c/mne_morph_map.h
+    c/mne_msh_color_scale_def.h
+    c/mne_proj_data.h
+    c/mne_msh_light.h
+    c/mne_msh_light_set.h
+    c/mne_surface_patch.h
+    c/mne_msh_eyes.h
+    c/mne_mgh_tag.h
+    c/mne_mgh_tag_group.h
+)
+
 set(FILE_TO_UPDATE mne_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 

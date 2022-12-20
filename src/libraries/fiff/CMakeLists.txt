@@ -40,13 +40,49 @@ set(SOURCES
     fifffilesharer.cpp
 )
 
+set(HEADERS
+    fiff.h
+    fiff_global.h
+    fiff_explain.h
+    fiff_file.h
+    fiff_types.h
+    fiff_id.h
+    fiff_constants.h
+    fiff_tag.h
+    fiff_coord_trans.h
+    fiff_ch_info.h
+    fiff_proj.h
+    fiff_named_matrix.h
+    fiff_ctf_comp.h
+    fiff_info.h
+    fiff_raw_data.h
+    fiff_dir_entry.h
+    fiff_raw_dir.h
+    fiff_dig_point.h
+    fiff_ch_pos.h
+    fiff_cov.h
+    fiff_stream.h
+    fiff_info_base.h
+    fiff_evoked.h
+    fiff_evoked_set.h
+    fiff_io.h
+    fiff_dig_point_set.h
+    fiff_dir_node.h
+    c/fiff_coord_trans_old.h
+    c/fiff_sparse_matrix.h
+    c/fiff_types_mne-c.h
+    c/fiff_digitizer_data.h
+    c/fiff_coord_trans_set.h
+    fifffilesharer.h
+)
+
 set(FILE_TO_UPDATE fiff_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 

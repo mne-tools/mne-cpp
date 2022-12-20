@@ -33,13 +33,39 @@ set(SOURCES
     hpiFit/sensorset.cpp
 )
 
+set(HEADERS
+    hpiFit/hpidataupdater.h
+    hpiFit/hpimodelparameters.h
+    hpiFit/signalmodel.h
+    inverse_global.h
+    IInverseAlgorithm.h
+    minimumNorm/minimumnorm.h
+    rapMusic/rapmusic.h
+    rapMusic/pwlrapmusic.h
+    rapMusic/dipole.h
+    dipoleFit/analyze_types.h
+    dipoleFit/dipole_fit.h
+    dipoleFit/dipole_fit_data.h
+    dipoleFit/dipole_fit_settings.h
+    dipoleFit/dipole_forward.h
+    dipoleFit/ecd.h
+    dipoleFit/ecd_set.h
+    dipoleFit/guess_data.h
+    c/mne_inverse_operator.h
+    c/mne_meas_data.h
+    c/mne_meas_data_set.h
+    hpiFit/hpifit.h
+    hpiFit/hpifitdata.h
+    hpiFit/sensorset.h
+)
+
 set(FILE_TO_UPDATE inverse_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
