@@ -14,13 +14,18 @@ set(SOURCES
     channelselection_global.cpp
 )
 
+set(HEADERS
+    channelselection_global.h
+    channelselection.h
+)
+
 set(FILE_TO_UPDATE channelselection_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
