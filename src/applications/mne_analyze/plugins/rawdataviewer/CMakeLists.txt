@@ -16,11 +16,11 @@ set(SOURCES
     rawdataviewer_global.cpp
 )
 
-set(SOURCES
-    rawdataviewer.hpp 
-    fiffrawview.hpp 
-    fiffrawviewdelegate.hpp 
-    rawdataviewer_global.hpp
+set(HEADERS
+    rawdataviewer.h 
+    fiffrawview.h 
+    fiffrawviewdelegate.h 
+    rawdataviewer_global.h
 )
 
 set(FILE_TO_UPDATE dipolefit_global.cpp)

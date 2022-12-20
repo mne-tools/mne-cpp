@@ -17,10 +17,10 @@ set(SOURCES
 )
 
 set(HEADERS
-    events.hpp 
-    eventdelegate.hpp 
-    events_global.hpp 
-    eventview.hpp
+    events.h 
+    eventdelegate.h 
+    events_global.h
+    eventview.h
 )
 
 set(FILE_TO_UPDATE events_global.cpp)
