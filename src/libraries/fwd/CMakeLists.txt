@@ -24,13 +24,29 @@ set(SOURCES
     fwd_thread_arg.cpp
 )
 
+set(HEADERS
+    fwd_global.h
+    computeFwd/compute_fwd_settings.h
+    computeFwd/compute_fwd.h
+    fwd_bem_model.h
+    fwd_bem_solution.h
+    fwd_coil.h
+    fwd_coil_set.h
+    fwd_comp_data.h
+    fwd_eeg_sphere_layer.h
+    fwd_eeg_sphere_model.h
+    fwd_eeg_sphere_model_set.h
+    fwd_thread_arg.h
+    fwd_types.h
+)
+
 set(FILE_TO_UPDATE fwd_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 

@@ -72,6 +72,69 @@ set(SOURCES
     viewers/helpers/bidsviewmodel.cpp
 )
 
+set(HEADERS
+    disp_global.h
+    plots/imagesc.h
+    plots/plot.h
+    plots/graph.h
+    plots/tfplot.h
+    plots/bar.h
+    plots/spline.h
+    plots/lineplot.h
+    plots/helpers/colormap.h
+    viewers/abstractview.h
+    viewers/applytoview.h
+    viewers/coregsettingsview.h
+    viewers/dipolefitview.h
+    viewers/filterdesignview.h
+    viewers/averagelayoutview.h
+    viewers/fwdsettingsview.h
+    viewers/helpers/scalecontrol.h
+    viewers/progressview.h
+    viewers/spectrumview.h
+    viewers/modalityselectionview.h
+    viewers/butterflyview.h
+    viewers/channelselectionview.h
+    viewers/spectrumsettingsview.h
+    viewers/scalingview.h
+    viewers/projectorsview.h
+    viewers/compensatorview.h
+    viewers/filtersettingsview.h
+    viewers/spharasettingsview.h
+    viewers/fiffrawviewsettings.h
+    viewers/averageselectionview.h
+    viewers/triggerdetectionview.h
+    viewers/quickcontrolview.h
+    viewers/connectivitysettingsview.h
+    viewers/minimumnormsettingsview.h
+    viewers/averagingsettingsview.h
+    viewers/projectsettingsview.h
+    viewers/control3dview.h
+    viewers/tfsettingsview.h
+    viewers/artifactsettingsview.h
+    viewers/rtfiffrawview.h
+    viewers/multiviewwindow.h
+    viewers/multiview.h
+    viewers/hpisettingsview.h
+    viewers/covariancesettingsview.h
+    viewers/bidsview.h
+    viewers/helpers/rtfiffrawviewdelegate.h
+    viewers/helpers/rtfiffrawviewmodel.h
+    viewers/helpers/evokedsetmodel.h
+    viewers/helpers/layoutscene.h
+    viewers/helpers/averagescene.h
+    viewers/helpers/averagesceneitem.h
+    viewers/helpers/filterplotscene.h
+    viewers/helpers/selectionscene.h
+    viewers/helpers/selectionsceneitem.h
+    viewers/helpers/channelinfomodel.h
+    viewers/helpers/mneoperator.h
+    viewers/helpers/draggableframelesswidget.h
+    viewers/helpers/frequencyspectrumdelegate.h
+    viewers/helpers/frequencyspectrummodel.h
+    viewers/helpers/bidsviewmodel.h
+)
+
 set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/viewers/formfiles")
 
 set(FILE_TO_UPDATE disp_global.cpp)
@@ -80,7 +143,7 @@ set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
