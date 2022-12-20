@@ -16,13 +16,20 @@ set(SOURCES
     rawdataviewer_global.cpp
 )
 
+set(SOURCES
+    rawdataviewer.hpp 
+    fiffrawview.hpp 
+    fiffrawviewdelegate.hpp 
+    rawdataviewer_global.hpp
+)
+
 set(FILE_TO_UPDATE dipolefit_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-add_library(${PROJECT_NAME} ${SOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
