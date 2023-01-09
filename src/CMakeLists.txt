@@ -22,6 +22,17 @@ option(LIB_ONLY "Build only the libraries." OFF)
 option(FOR_RELEASE "Build only libs and apps." OFF)
 
 ##==============================================================================
+## FFTW Options 
+
+option(USE_FFTW "Use fftw backend for eigen" ON)
+
+set(FFTW_DIR_LIBS "${PROJECT_SOURCE_DIR}/external/fftw/lib")
+set(FFTW_DIR_INCLUDE "${PROJECT_SOURCE_DIR}/external/fftw/api")
+if(USE_FFTW)
+  set(EIGEN_FFTW_DEFAULT)
+endif()
+
+##==============================================================================
 ## Misc. settings
 
 # Generate json file detailing project compilation. (Typically for LSPs)
@@ -49,15 +60,15 @@ add_subdirectory(libraries)
 add_subdirectory(external)
 
 if(NOT LIB_ONLY)
-    if(NOT NO_APPLICATIONS)
-        add_subdirectory(applications)
+  if(NOT NO_APPLICATIONS)
+    add_subdirectory(applications)
+  endif()
+  if(NOT FOR_RELEASE)
+    if(NOT NO_EXAMPLES)
+      add_subdirectory(examples)
     endif()
-    if(NOT FOR_RELEASE)
-        if(NOT NO_EXAMPLES)
-            add_subdirectory(examples)
-        endif()
-        if(NOT NO_TESTS)
-            add_subdirectory(testframes)
-        endif()
+    if(NOT NO_TESTS)
+      add_subdirectory(testframes)
     endif()
+  endif()
 endif()

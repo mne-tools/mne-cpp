@@ -48,6 +48,21 @@ set(HEADERS
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
+set(FFTW_LIBS "")
+
+if(USE_FFTW)
+  if (WIN32)
+    set(FFTW_LIBS
+      ${FFTW_DIR_LIBS}/libfftw3-3
+      ${FFTW_DIR_LIBS}/libfftw3f-3
+      ${FFTW_DIR_LIBS}/libfftwf3l-3
+    )
+  elseif(UNIX AND NOT APPLE)
+    set(FFTW_LIBS ${FFTW_DIR_LIBS}/libfftw3.so)
+  endif()
+  target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE})
+endif()
+
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -60,7 +75,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_fs
     mne_mne
     mne_connectivity
-)
+    ${FFTW_LIBS})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE SCMEAS_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
 
