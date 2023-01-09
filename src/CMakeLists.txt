@@ -24,10 +24,10 @@ option(FOR_RELEASE "Build only libs and apps." OFF)
 ##==============================================================================
 ## FFTW Options 
 
-option(USE_FFTW "Use fftw backend for eigen" ON)
+option(USE_FFTW "Use fftw backend for eigen" OFF)
 
-set(FFTW_DIR_LIBS "${PROJECT_SOURCE_DIR}/external/fftw/lib")
-set(FFTW_DIR_INCLUDE "${PROJECT_SOURCE_DIR}/external/fftw/api")
+set(FFTW_DIR_LIBS "${PROJECT_SOURCE_DIR}/external/fftw")
+set(FFTW_DIR_INCLUDE "${PROJECT_SOURCE_DIR}/external/fftw")
 if(USE_FFTW)
   set(EIGEN_FFTW_DEFAULT)
 endif()
