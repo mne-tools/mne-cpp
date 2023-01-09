@@ -66,9 +66,11 @@ Makefile
 mne-cpp.pro.user*
 
 # FFTW
-/include/3rdParty/fftw
+/src/external/fftw
 
 # Generated docu Docker files
 /_site
 
 build/*
+
+.cache/*
