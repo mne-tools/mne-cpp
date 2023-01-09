@@ -35,14 +35,15 @@ set(FFTW_LIBS "")
 if(USE_FFTW)
   if (WIN32)
     set(FFTW_LIBS
-      ${FFTW_DIR_LIBS}/libfftw3-3
-      ${FFTW_DIR_LIBS}/libfftw3f-3
-      ${FFTW_DIR_LIBS}/libfftwf3l-3
+      ${FFTW_DIR_LIBS}/libfftw3-3.dll
+      ${FFTW_DIR_LIBS}/libfftw3f-3.dll
+      ${FFTW_DIR_LIBS}/libfftwf3l-3.dll
     )
+    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE})
   elseif(UNIX AND NOT APPLE)
-    set(FFTW_LIBS ${FFTW_DIR_LIBS}/libfftw3.so)
+    set(FFTW_LIBS ${FFTW_DIR_LIBS}/lib/libfftw3.so)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE}/api)
   endif()
-  target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE})
 endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
