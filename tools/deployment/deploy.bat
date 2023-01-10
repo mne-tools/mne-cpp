@@ -25,17 +25,17 @@
     IF "%LINK_OPTION%"=="dynamic" (
         
         Rem Solve for dependencies only mne_scan.exe and mnecppDisp3D.dll since it links all needed qt and mne-cpp libs
-        windeployqt %BASE_PATH%\bin\mne_scan.exe
-        windeployqt %BASE_PATH%\bin\mnecppDisp3D.dll
+        windeployqt %BASE_PATH%\out\Release\apps\mne_scan.exe
+        windeployqt %BASE_PATH%\out\Release\apps\mnecppDisp3D.dll
         Rem Copy LSL and Brainflowlibraries manually
-        xcopy %BASE_PATH%\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* %BASE_PATH%\bin\ /s /i
-        xcopy %BASE_PATH%\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll %BASE_PATH%\bin\ /i
+        xcopy %BASE_PATH%\src\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* %BASE_PATH%\out\Release\apps\ /s /i
+        xcopy %BASE_PATH%\src\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll %BASE_PATH%\out\Release\apps\ /i
         
         IF "%PACK_OPTION%"=="pack" (
             Rem Delete folders which we do not want to ship
-            rmdir %BASE_PATH%\bin\mne-cpp-test-data /s /q 
+            rmdir %BASE_PATH%\out\Release\apps\mne-cpp-test-data /s /q 
             Rem Creating archive of all win deployed applications
-            7z a %BASE_PATH%\mne-cpp-windows-dynamic-x86_64.zip %BASE_PATH%\bin
+            7z a %BASE_PATH%\mne-cpp-windows-dynamic-x86_64.zip %BASE_PATH%\out\Release
         )
 
     ) ELSE IF "%LINK_OPTION%"=="static" (
@@ -43,13 +43,13 @@
         IF "%PACK_OPTION%"=="pack" (
             Rem This script needs to be run from the top level mne-cpp repo folder
             Rem Delete folders which we do not want to ship
-            rmdir %BASE_PATH%\bin\mne_rt_server_plugins /s /q
-            rmdir %BASE_PATH%\bin\mne-cpp-test-data /s /q
-            rmdir %BASE_PATH%\bin\mne_scan_plugins /s /q
-            rmdir %BASE_PATH%\bin\mne_analyze_plugins /s /q
+            rmdir %BASE_PATH%\out\Release\apps\mne_rt_server_plugins /s /q
+            rmdir %BASE_PATH%\out\Release\apps\mne-cpp-test-data /s /q
+            rmdir %BASE_PATH%\out\Release\apps\mne_scan_plugins /s /q
+            rmdir %BASE_PATH%\out\Release\apps\mne_analyze_plugins /s /q
             
             Rem Creating archive of everything in the bin directory
-            7z a %BASE_PATH%\mne-cpp-windows-static-x86_64.zip %BASE_PATH%\bin        
+            7z a %BASE_PATH%\mne-cpp-windows-static-x86_64.zip %BASE_PATH%\out\Release        
         )
         
     ) ELSE (
@@ -85,51 +85,51 @@ if [ "$(uname)" == "Darwin" ]; then
         cd ${BASE_PATH}
 
         # Call macdeployqt on all .app bundles in the bin folder
-        for f in ./bin/*.app; do $Qt5_DIR/bin/macdeployqt $f ; done
+        for f in ./out/Release/apps/*.app; do $Qt5_DIR/bin/macdeployqt $f ; done
 
         # Solve for dependencies for mne_scan.app bundle
-        cp -a bin/mne_scan_plugins/. bin/mne_scan.app/Contents/MacOS/mne_scan_plugins
-        cp -a bin/resources/. bin/mne_scan.app/Contents/MacOS/resources
-        cp -a applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. bin/mne_scan.app/Contents/Frameworks
-        cp -a applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. bin/mne_scan.app/Contents/Frameworks
-        cp -a lib/. bin/mne_scan.app/Contents/Frameworks
-        # cp -a $Qt5_DIR/plugins/renderers/. bin/mne_scan.app/Contents/PlugIns/renderers
+        cp -a out/Release/apps/mne_scan_plugins/. out/Release/apps/mne_scan.app/Contents/MacOS/mne_scan_plugins
+        cp -a out/Release/apps/resources/. out/Release/apps/mne_scan.app/Contents/MacOS/resources
+        cp -a src/applications/mne_scan/plugins/brainflowboard/brainflow/installed/out/Release/lib/. out/Release/apps/mne_scan.app/Contents/Frameworks
+        cp -a src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/Release/lib/. out/Release/apps/mne_scan.app/Contents/Frameworks
+        cp -a out/Release/lib/. out/Release/apps/mne_scan.app/Contents/Frameworks
+        # cp -a $Qt5_DIR/plugins/renderers/. out/Release/apps/mne_scan.app/Contents/PlugIns/renderers
 
         # Solve for dependencies for mne_analyze.app bundle
-        cp -a bin/mne_analyze_plugins/. bin/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
-        cp -a bin/resources/. bin/mne_analyze.app/Contents/MacOS/resources
-        cp -a lib/. bin/mne_analyze.app/Contents/Frameworks
-        # cp -a $Qt5_DIR/plugins/renderers/. bin/mne_analyze.app/Contents/PlugIns/renderers
+        cp -a out/Release/apps/mne_analyze_plugins/. out/Release/apps/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
+        cp -a out/Release/apps/resources/. out/Release/apps/mne_analyze.app/Contents/MacOS/resources
+        cp -a out/Release/lib/. out/Release/apps/mne_analyze.app/Contents/Frameworks
+        # cp -a $Qt5_DIR/plugins/renderers/. out/Release/apps/mne_analyze.app/Contents/PlugIns/renderers
 
         # Solve for dependencies for mne_rt_server.app bundle
-        cp -a bin/mne_rt_server_plugins/. bin/mne_rt_server.app/Contents/MacOS/mne_rt_server_plugins
-        cp -a bin/resources/. bin/mne_rt_server.app/Contents/MacOS/resources
-        cp -a lib/. bin/mne_rt_server.app/Contents/Frameworks
+        cp -a out/Release/apps/mne_rt_server_plugins/. out/Release/apps/mne_rt_server.app/Contents/MacOS/mne_rt_server_plugins
+        cp -a out/Release/apps/resources/. out/Release/apps/mne_rt_server.app/Contents/MacOS/resources
+        cp -a out/Release/lib/. out/Release/apps/mne_rt_server.app/Contents/Frameworks
 
         # Solve for dependencies for mne_forward_solution.app bundle
-        cp -a bin/resources/. bin/mne_forward_solution.app/Contents/MacOS/resources
-        cp -a lib/. bin/mne_forward_solution.app/Contents/Frameworks
+        cp -a out/Release/apps/resources/. out/Release/apps/mne_forward_solution.app/Contents/MacOS/resources
+        cp -a out/Release/lib/. out/Release/apps/mne_forward_solution.app/Contents/Frameworks
 
         # Solve for dependencies for mne_dipole_fit.app bundle
-        cp -a bin/resources/. bin/mne_dipole_fit.app/Contents/MacOS/resources
-        cp -a lib/. bin/mne_dipole_fit.app/Contents/Frameworks
+        cp -a out/Release/apps/resources/. out/Release/apps/mne_dipole_fit.app/Contents/MacOS/resources
+        cp -a out/Release/lib/. out/Release/apps/mne_dipole_fit.app/Contents/Frameworks
 
         # Solve for dependencies for mne_anonymize.app bundle
-        cp -a bin/resources/. bin/mne_anonymize.app/Contents/MacOS/resources
-        cp -a lib/. bin/mne_anonymize.app/Contents/Frameworks
+        cp -a out/Release/apps/resources/. out/Release/apps/mne_anonymize.app/Contents/MacOS/resources
+        cp -a out/Release/lib/. out/Release/apps/mne_anonymize.app/Contents/Frameworks
 
 
         if [[ ${PACK_OPTION} == pack ]]; then
 
             # Delete folders which we do not want to ship
-            rm -r bin/mne-cpp-test-data
-            rm -r bin/mne_scan_plugins
-            rm -r bin/mne_analyze_plugins
-            rm -r bin/mne_rt_server_plugins
-            rm -r bin/resources
+            rm -r out/Release/apps/mne-cpp-test-data
+            rm -r out/Release/apps/mne_scan_plugins
+            rm -r out/Release/apps/mne_analyze_plugins
+            rm -r out/Release/apps/mne_rt_server_plugins
+            rm -r out/Release/apps/resources
 
             # Creating archive of all macos deployed applications
-            tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz bin/.
+            tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz out/Release/apps/.
         fi
 
 
@@ -139,33 +139,33 @@ if [ "$(uname)" == "Darwin" ]; then
 
         # This script needs to be run from the top level mne-cpp repo folder
         # Solve for dependencies for mne_scan.app bundle
-        cp -a bin/resources/. bin/mne_scan.app/Contents/MacOS/resources
+        cp -a out/Release/apps/resources/. out/Release/apps/mne_scan.app/Contents/MacOS/resources
 
         # Solve for dependencies for mne_analyze.app bundle
-        cp -a bin/resources/. bin/mne_analyze.app/Contents/MacOS/resources
+        cp -a out/Release/apps/resources/. out/Release/apps/mne_analyze.app/Contents/MacOS/resources
 
         # Solve for dependencies for mne_rt_server.app bundle
-        cp -a bin/resources/. bin/mne_rt_server.app/Contents/MacOS/resources
+        cp -a out/Release/apps/resources/. out/Release/apps/mne_rt_server.app/Contents/MacOS/resources
 
         # Solve for dependencies for mne_forward_solution.app bundle
-        cp -a bin/resources/. bin/mne_forward_solution.app/Contents/MacOS/resources
+        cp -a out/Release/apps/resources/. out/Release/apps/mne_forward_solution.app/Contents/MacOS/resources
 
         # Solve for dependencies for mne_dipole_fit.app bundle
-        cp -a bin/resources/. bin/mne_dipole_fit.app/Contents/MacOS/resources
+        cp -a out/Release/apps/resources/. out/Release/apps/mne_dipole_fit.app/Contents/MacOS/resources
 
         # Solve for dependencies for mne_anonymize.app bundle
-        cp -a bin/resources/. bin/mne_anonymize.app/Contents/MacOS/resources
+        cp -a out/Release/apps/resources/. out/Release/apps/mne_anonymize.app/Contents/MacOS/resources
 
         if [[ ${PACK_OPTION} == pack ]]; then
             # Delete folders which we do not want to ship
-            rm -r bin/mne-cpp-test-data
-            rm -r bin/mne_scan_plugins
-            rm -r bin/mne_analyze_plugins
-            rm -r bin/mne_rt_server_plugins
-            rm -r bin/resources
+            rm -r out/Release/apps/mne-cpp-test-data
+            rm -r out/Release/apps/mne_scan_plugins
+            rm -r out/Release/apps/mne_analyze_plugins
+            rm -r out/Release/apps/mne_rt_server_plugins
+            rm -r out/Release/apps/resources
 
             # Creating archive of all macos deployed applications
-            tar cfvz mne-cpp-macos-static-x86_64.tar.gz bin/.
+            tar cfvz mne-cpp-macos-static-x86_64.tar.gz out/Release/apps/.
         fi
 
     else 
@@ -197,10 +197,10 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     if [[ ${LINK_OPTION} == dynamic ]]; then
 
         # Copy additional brainflow libs
-        cp -a ${BASE_PATH}/applications/mne_scan/plugins/brainflowboard/brainflow/installed/lib/. ${BASE_PATH}/lib/
+        cp -a ${BASE_PATH}/src/applications/mne_scan/plugins/brainflowboard/brainflow/installed/out/Release/lib/. ${BASE_PATH}/out/Release/lib/
 
         # Copy additional LSL libs
-        cp -a ${BASE_PATH}/applications/mne_scan/plugins/lsladapter/liblsl/build/install/lib/. ${BASE_PATH}/lib/
+        cp -a ${BASE_PATH}/src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/Release/lib/. ${BASE_PATH}/out/Release/lib/
 
         # Install some additional packages so linuxdeployqt can find them
         sudo apt-get update
@@ -211,7 +211,7 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         sudo apt-get install libxcb-render-util0
         sudo apt-get install libbluetooth3
         sudo apt-get install libxcb-xinerama0 
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/out/Release/lib/x86_64-linux-gnu/
 
         cd ${BASE_PATH}
 
@@ -227,23 +227,23 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
 
         # linuxdeployqt uses mne_scan and mne_analyze binary to resolve dependencies
         cd ${BASE_PATH}/mne-cpp
-        ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_scan -verbose2 -extra-plugins=renderers
-        ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_analyze -verbose2 -extra-plugins=renderers
+        ../linuxdeployqt-continuous-x86_64.AppImage out/Release/apps/mne_scan -verbose2 -extra-plugins=renderers
+        ../linuxdeployqt-continuous-x86_64.AppImage out/Release/apps/mne_analyze -verbose2 -extra-plugins=renderers
 
         # Manually copy in the libxcb-xinerama library which is needed by plugins/platforms/libxcb.so
-        cp /usr/lib/x86_64-linux-gnu/libxcb-xinerama.so.0 ${BASE_PATH}/mne-cpp/lib/
+        cp /usr/out/Release/lib/x86_64-linux-gnu/libxcb-xinerama.so.0 ${BASE_PATH}/mne-cpp/out/Release/lib/
 
         if [[ ${PACK_OPTION} == pack ]]; then
             echo 
-            echo ldd ./bin/mne_scan
-            ldd ./bin/mne_scan
+            echo ldd ./out/Release/apps/mne_scan
+            ldd ./out/Release/apps/mne_scan
 
             echo 
             echo ldd ./plugins/platforms/libqxcb.so
             ldd ./plugins/platforms/libqxcb.so
 
             # Delete folders which we do not want to ship
-            rm -r bin/mne-cpp-test-data
+            rm -r out/Release/apps/mne-cpp-test-data
 
             # Creating archive of everything in current directory
             tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz ./*    
@@ -263,7 +263,7 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         sudo apt-get install libxcb-render-util0
         sudo apt-get install libbluetooth3
         sudo apt-get install libxcb-xinerama0
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/lib/x86_64-linux-gnu/
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/out/Release/lib/x86_64-linux-gnu/
 
         # Downloading linuxdeployqt from continious release
         wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
@@ -277,22 +277,22 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
 
         # linuxdeployqt uses mne_scan and mne_analyze binary to resolve dependencies
         cd mne-cpp
-        ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_scan -verbose2 -extra-plugins=renderers
-        ../linuxdeployqt-continuous-x86_64.AppImage bin/mne_analyze -verbose2 -extra-plugins=renderers
+        ../linuxdeployqt-continuous-x86_64.AppImage out/Release/apps/mne_scan -verbose2 -extra-plugins=renderers
+        ../linuxdeployqt-continuous-x86_64.AppImage out/Release/apps/mne_analyze -verbose2 -extra-plugins=renderers
 
         echo
-        echo ldd ./bin/mne_scan
-        ldd ./bin/mne_scan
+        echo ldd ./out/Release/apps/mne_scan
+        ldd ./out/Release/apps/mne_scan
 
         # Delete folders which we do not want to ship
-        rm -r bin/mne_rt_server_plugins
-        rm -r bin/mne-cpp-test-data
-        rm -r bin/mne_scan_plugins
-        rm -r bin/mne_analyze_plugins
+        rm -r out/Release/apps/mne_rt_server_plugins
+        rm -r out/Release/apps/mne-cpp-test-data
+        rm -r out/Release/apps/mne_scan_plugins
+        rm -r out/Release/apps/mne_analyze_plugins
 
         if [[ ${PACK_OPTION} == pack ]]; then
             # Creating archive of everything in the bin directory
-            tar cfvz ../mne-cpp-linux-static-x86_64.tar.gz bin/. lib/.
+            tar cfvz ../mne-cpp-linux-static-x86_64.tar.gz out/Release/apps/. out/Release/lib/.
         fi
 
         rm -fr mne-cpp
@@ -309,3 +309,4 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
 fi
 
 exit 0
+
