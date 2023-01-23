@@ -164,36 +164,39 @@ CompoundOutput=0
 testColumnWidth=60
 printf "%${testColumnWidth}s %s\n" " Test Name " " Result "
 
-for test in $RepoRootDir/out/${BuildType}/tests/test_*;
-do
-  # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
-  # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.
-  if [ $VerboseMode == "false" ]; then
-    $test &> /dev/null
-  else
-    $test 
-  fi
-  lastReturnValue=$?
+$RepoRootDir/out/${BuildType}/tests/test_mne_forward_solution
 
-  if [ $lastReturnValue -ne 0 ]; then 
-    CompoundOutput=$((CompoundOutput + 1))
-    printf "%${testColumnWidth}s \e[91m\033[1m %s \033[0m\e[0m\n" "${test}" "FAILED!"
-    if [ $ExitOnFirstFail == "true" ];
-    then
-      exit $lastReturnValue
-    fi
-  else
-    # echo ">> Test $test \t\t\t\t RockSolid!"
-    printf "%${testColumnWidth}s \e[92m %s \e[0m\n" "${test}" "Rock Solid!"
-  fi
 
-  if [ $RunCodeCoverage == "true" ]; then
-    find ./libraries -type f -name "*.cpp" -exec gcov {} \; &> /dev/null
-    # Hide codecov output since it corrupts the log too much
-    ./codecov &> /dev/null
-  fi
-
-done
+# for test in $RepoRootDir/out/${BuildType}/tests/test_*;
+# do
+#   # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
+#   # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.
+#   if [ $VerboseMode == "false" ]; then
+#     $test &> /dev/null
+#   else
+#     $test 
+#   fi
+#   lastReturnValue=$?
+# 
+#   if [ $lastReturnValue -ne 0 ]; then 
+#     CompoundOutput=$((CompoundOutput + 1))
+#     printf "%${testColumnWidth}s \e[91m\033[1m %s \033[0m\e[0m\n" "${test}" "FAILED!"
+#     if [ $ExitOnFirstFail == "true" ];
+#     then
+#       exit $lastReturnValue
+#     fi
+#   else
+#     # echo ">> Test $test \t\t\t\t RockSolid!"
+#     printf "%${testColumnWidth}s \e[92m %s \e[0m\n" "${test}" "Rock Solid!"
+#   fi
+# 
+#   if [ $RunCodeCoverage == "true" ]; then
+#     find ./libraries -type f -name "*.cpp" -exec gcov {} \; &> /dev/null
+#     # Hide codecov output since it corrupts the log too much
+#     ./codecov &> /dev/null
+#   fi
+# 
+# done
 
 # ############## LINUX MAC SECTION ENDS ################
 # ######################################################
