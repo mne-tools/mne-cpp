@@ -261,6 +261,8 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
+      
+    - name: check
       run: pwd
 
     - name: Clone mne-cpp test data
