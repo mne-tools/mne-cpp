@@ -89,7 +89,7 @@ jobs:
   #     run: |
   #       cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
   #       cmake --build build --config Release
-  #   - name: Deploy binaries
+  #   Tests                        Tests                        PullRequest           pullrequest.yml      pull_request- name: Deploy binaries
   #     run: |
   #       ./tools/deployment/deploy.bat dynamic pack
   #
@@ -198,7 +198,7 @@ jobs:
   #       python-version: '3.7'
   #       architecture: 'x64'
   #   - name: Install OpenGL (Linux)
-  #     if: matrix.os == 'ubuntu-18.04'
+  #     if: matrix.os == 'ubuntu-18.04'(
   #     run: |
   #       sudo add-apt-repository "deb http://security.ubuntu.com/ubuntu xenial-security main"
   #       sudo apt-get update -q
@@ -255,77 +255,80 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        os: [ubuntu-18.04, macos-latest, windows-2019]
+        # os: [ubuntu-18.04, macos-latest, windows-2019]
+        os: [ macos-11]
 
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
+      run: pwd
+
     - name: Clone mne-cpp test data
       run: git clone https://github.com/mne-tools/mne-cpp-test-data.git ./out/Release/tests/mne-cpp-test-data
-    - name: Install Python 3.7 version
-      uses: actions/setup-python@v1
-      with:
-        python-version: '3.7'
-        architecture: 'x64'
-    - name: Install Codecov
-      if: matrix.os == 'ubuntu-18.04'
-      run: |
-        curl -Os https://uploader.codecov.io/latest/linux/codecov
-        chmod +x codecov
-        echo "${pwd}" >> $GITHUB_PATH
+    # - name: Install Python 3.7 version
+    #   uses: actions/setup-python@v1
+    #   with:
+    #     python-version: '3.7'
+    #     architecture: 'x64'
+    # - name: Install Codecov
+    #   if: matrix.os == 'ubuntu-18.04'
+    #   run: |
+    #     curl -Os https://uploader.codecov.io/latest/linux/codecov
+    #     chmod +x codecov
+    #     echo "${pwd}" >> $GITHUB_PATH
     - name: Install Qt (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-18.04') || (matrix.os == 'macos-latest')
+      if: (matrix.os == 'ubuntu-18.04') || (matrix.os == 'macos-11')
       uses: jurplel/install-qt-action@v2
       with:
         version: 5.15.2
         modules: qtcharts
-    - name: Install Qt (Windows)
-      if: matrix.os == 'windows-2019'
-      uses: jurplel/install-qt-action@v2
-      with:
-        version: 5.15.2
-        arch: win64_msvc2019_64
-        modules: qtcharts
-    - name: Install jom (Windows)
-      if: matrix.os == 'windows-2019'
-      run: |
-        Invoke-WebRequest https://www.dropbox.com/s/gbf8sdx8wqxcrnd/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip"
-        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
-    - name: Configure and compile MNE-CPP (Linux)
-      if: matrix.os == 'ubuntu-18.04'
-      run: |
-        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
-        cmake --build build --parallel $(expr $(nproc --all) / 2)
+    # - name: Install Qt (Windows)
+    #   if: matrix.os == 'windows-2019'
+    #   uses: jurplel/install-qt-action@v2
+    #   with:
+    #     version: 5.15.2
+    #     arch: win64_msvc2019_64
+    #     modules: qtcharts
+    # - name: Install jom (Windows)
+    #   if: matrix.os == 'windows-2019'
+    #   run: |
+    #     Invoke-WebRequest https://www.dropbox.com/s/gbf8sdx8wqxcrnd/jom.zip?dl=1 -OutFile .\jom.zip
+    #     expand-archive -path "jom.zip"
+    #     echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+    # - name: Configure and compile MNE-CPP (Linux)
+    #   if: matrix.os == 'ubuntu-18.04'
+    #   run: |
+    #     cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+    #     cmake --build build --parallel $(expr $(nproc --all) / 2)
     - name: Configure and compile MNE-CPP (MacOS)
-      if: matrix.os == 'macos-latest'
+      if: matrix.os == 'macos-11'
       run: |
         cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
         cmake --build build
-    - name: Configure and compile MNE-CPP (Windows)
-      if: matrix.os == 'windows-2019'
-      run: |
-        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
-        cmake --build build --config Release
-    - name: Run tests (Linux)
-      if: matrix.os == 'ubuntu-18.04'
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        QTEST_FUNCTION_TIMEOUT: 900000
-      run: |
-        ./tools/testing/test_all.bat verbose withCoverage
+    # - name: Configure and compile MNE-CPP (Windows)
+    #   if: matrix.os == 'windows-2019'
+    #   run: |
+    #     cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+    #     cmake --build build --config Release
+    # - name: Run tests (Linux)
+    #   if: matrix.os == 'ubuntu-18.04'
+    #   env:
+    #     CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+    #     QTEST_FUNCTION_TIMEOUT: 900000
+    #   run: |
+    #     ./tools/testing/test_all.bat verbose withCoverage
     - name: Run tests (MacOS)
-      if: matrix.os == 'macos-latest'
+      if: matrix.os == 'macos-11'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
         ./tools/testing/test_all.bat verbose
-    - name: Run tests (Windows)
-      if: matrix.os == 'windows-2019'
-      env:
-        QTEST_FUNCTION_TIMEOUT: 900000
-      run: |
-        ./tools/testing/test_all.bat verbose
+    # - name: Run tests (Windows)
+    #   if: matrix.os == 'windows-2019'
+    #   env:
+    #     QTEST_FUNCTION_TIMEOUT: 900000
+    #   run: |
+    #     ./tools/testing/test_all.bat verbose
 
   # Doxygen:
   #   runs-on: ubuntu-18.04
