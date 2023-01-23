@@ -301,7 +301,7 @@ jobs:
       if: matrix.os == 'macos-latest'
       run: |
         cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
-        cmake --build build --parallel $(expr $(nproc --all) / 2)
+        cmake --build build
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
