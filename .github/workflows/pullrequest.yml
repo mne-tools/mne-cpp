@@ -409,7 +409,7 @@ jobs:
         cd build
         cmake ..
         cmake --build .
-   - name: Configure and compile MNE-CPP
+    - name: Configure and compile MNE-CPP
       run: |
         ./tools/building/build_project.bat
     - name: Deploy binaries (MacOS)
