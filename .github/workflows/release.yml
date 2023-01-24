@@ -256,8 +256,8 @@ jobs:
         architecture: 'x64'
     - name: Install BrainFlow and LSL submodules
       run: |
-        git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
-        git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
+        git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
+        git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
@@ -265,7 +265,7 @@ jobs:
         modules: qtcharts
     - name: Compile BrainFlow submodule
       run: |
-        cd applications/mne_scan/plugins/brainflowboard/brainflow
+        cd src/applications/mne_scan/plugins/brainflowboard/brainflow
         mkdir build
         cd build
         cmake -DCMAKE_INSTALL_PREFIX=../installed ..
@@ -273,7 +273,7 @@ jobs:
         cmake --build build --parallel $(expr $(nproc --all) / 2)
     - name: Compile LSL submodule
       run: |
-        cd applications/mne_scan/plugins/lsladapter/liblsl
+        cd src/applications/mne_scan/plugins/lsladapter/liblsl
         mkdir build
         cd build
         cmake ..
@@ -281,8 +281,7 @@ jobs:
         cmake --build build --parallel $(expr $(nproc --all) / 2)
     - name: Configure and compile MNE-CPP
       run: |
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-        cmake --build build --parallel $(expr $(nproc --all) / 2)
+        ./tools/building/build_project.bat
     - name: Deploy binaries
       run: |
         ./tools/deployment/deploy.bat dynamic pack
@@ -319,8 +318,8 @@ jobs:
         architecture: 'x64'
     - name: Install BrainFlow and LSL submodules
       run: |
-        git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
-        git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
+        git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
+        git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
@@ -328,14 +327,14 @@ jobs:
         modules: qtcharts
     - name: Compile BrainFlow submodule
       run: |
-        mkdir applications/mne_scan/plugins/brainflowboard/brainflow/build
-        cd applications/mne_scan/plugins/brainflowboard/brainflow/build
+        mkdir src/applications/mne_scan/plugins/brainflowboard/brainflow/build
+        cd src/applications/mne_scan/plugins/brainflowboard/brainflow/build
         cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
         make
         cmake --build build --parallel $(expr $(nproc --all) / 2)
     - name: Compile LSL submodule
       run: |
-        cd applications/mne_scan/plugins/lsladapter/liblsl
+        cd src/applications/mne_scan/plugins/lsladapter/liblsl
         mkdir build
         cd build
         cmake ..
@@ -343,8 +342,7 @@ jobs:
         cmake --build build --parallel $(expr $(nproc --all) / 2)
     - name: Configure and compile MNE-CPP
       run: |
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-        cmake --build build --parallel $(expr $(nproc --all) / 2)
+        ./tools/building/build_project.bat
     - name: Deploy binaries (MacOS)
       run: |
         ./tools/deployment/deploy.bat dynamic pack
@@ -381,8 +379,8 @@ jobs:
         architecture: 'x64'
     - name: Install BrainFlow and LSL submodules
       run: |
-        git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
-        git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
+        git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
+        git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt
       uses: jurplel/install-qt-action@v2
       with:
@@ -396,14 +394,14 @@ jobs:
         echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Compile BrainFlow submodule
       run: |
-        cd applications\mne_scan\plugins\brainflowboard\brainflow
+        cd src\applications\mne_scan\plugins\brainflowboard\brainflow
         mkdir build
         cd build
         cmake -G "Visual Studio 16 2019" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
         cmake --build . --target install --config Release
     - name: Compile LSL submodule
       run: |
-        cd applications\mne_scan\plugins\lsladapter\liblsl
+        cd src\applications\mne_scan\plugins\lsladapter\liblsl
         mkdir build
         cd build
         cmake .. -G "Visual Studio 16 2019" -A x64
@@ -412,8 +410,7 @@ jobs:
       run: |
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-        cmake --build build
+        ./tools/building/build_project.bat
     - name: Deploy binaries (Windows)
       run: |
         ./tools/deployment/deploy.bat dynamic pack
@@ -462,8 +459,7 @@ jobs:
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |
-        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-        cmake --build build
+        ./tools/building/build_project.bat
     - name: Run tests and upload results to Codecov
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
