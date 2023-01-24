@@ -1,8 +1,16 @@
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../out/${CMAKE_BUILD_TYPE}/tests)
 file(COPY ${CMAKE_SOURCE_DIR}/../resources DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
-set(CMAKE_INSTALL_RPATH "\${ORIGIN}/../lib/")
+if(APPLE)
+    set(CMAKE_INSTALL_RPATH "@executable_path/../lib")
+  if(NOT BUILD_MAC_APP_BUNDLE)
+    set(CMAKE_MACOSX_RPATH TRUE)
+  endif()
+else()
+    set(CMAKE_INSTALL_RPATH "\${ORIGIN}/../lib")
+endif()
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 add_subdirectory(test_coregistration)
 
