@@ -20,10 +20,6 @@ SCRIPT_PATH="$(
     )"
 BASE_PATH=${SCRIPT_PATH}/../..
 
-
-export QT_DIR="~/Qt/5.15.2/clang_64/lib/cmake/Qt5"
-export Qt5_DIR="~/Qt/5.15.2/clang_64/lib/cmake/Qt5"
-
 cmake -B ${BASE_PATH}/build -S ${BASE_PATH}/src -DCMAKE_BUILD_TYPE=Release
 
 if [ "$(uname)" == "Darwin" ]; then
