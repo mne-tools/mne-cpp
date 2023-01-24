@@ -1,7 +1,11 @@
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../out/${CMAKE_BUILD_TYPE}/tests)
 file(COPY ${CMAKE_SOURCE_DIR}/../resources DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
+set(CMAKE_INSTALL_RPATH "\${ORIGIN}/../lib/")
+set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+
 add_subdirectory(test_coregistration)
+
 add_subdirectory(test_dipole_fit)
 add_subdirectory(test_fiff_coord_trans)
 add_subdirectory(test_fiff_rwr)
