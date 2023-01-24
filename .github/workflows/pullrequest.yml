@@ -341,17 +341,15 @@ jobs:
         cd src/applications/mne_scan/plugins/brainflowboard/brainflow
         mkdir build
         cd build
-        cmake -DCMAKE_INSTALL_PREFIX=../installed ..
-        make
-        cmake --build build --parallel $(expr $(nproc --all) / 2)
+        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
+        cmake --build .
     - name: Compile LSL submodule
       run: |
         cd src/applications/mne_scan/plugins/lsladapter/liblsl
         mkdir build
         cd build
         cmake ..
-        make
-        cmake --build build --parallel $(expr $(nproc --all) / 2)
+        cmake --build .
     - name: Configure and compile MNE-CPP
       run: |
         ./tools/building/build_project.bat
@@ -399,20 +397,19 @@ jobs:
         modules: qtcharts
     - name: Compile BrainFlow submodule
       run: |
-        mkdir src/applications/mne_scan/plugins/brainflowboard/brainflow/build
-        cd src/applications/mne_scan/plugins/brainflowboard/brainflow/build
+        cd src/applications/mne_scan/plugins/brainflowboard/brainflow
+        mkdir build
+        cd build
         cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
-        make
-        cmake --build build --parallel $(expr $(nproc --all) / 2)
+        cmake --build .
     - name: Compile LSL submodule
       run: |
         cd src/applications/mne_scan/plugins/lsladapter/liblsl
         mkdir build
         cd build
         cmake ..
-        make
-        cmake --build build --parallel $(expr $(nproc --all) / 2)
-    - name: Configure and compile MNE-CPP
+        cmake --build .
+   - name: Configure and compile MNE-CPP
       run: |
         ./tools/building/build_project.bat
     - name: Deploy binaries (MacOS)
