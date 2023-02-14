@@ -36,23 +36,17 @@
 #ifndef FIELDLINE_H
 #define FIELDLINE_H //============================================================================================================= INCLUDES =============================================================================================================
 
-#include "fieldline/fieldline_global.h"
-#include "fieldline/fieldline_acq_system_controller.h"
-#include "fieldline/fieldline_plugin_gui.h"
+#include "fieldline_global.h"
 
-#include <fiff/fiff.h>
-#include <fiff/fiff_info.h>
-
-#include <scShared/Plugins/abstractsensor.h>
+// #include <scShared/Plugins/abstractsensor.h>
 // #include <utils/generics/circularbuffer.h>
-#include <memory>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QObject>
-#include <QSharedPointer>
+// #include <QObject>
+// #include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -61,22 +55,23 @@
 // #include <Eigen/Core>
 
 //=============================================================================================================
-// FORWARD DECLARATION
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
 namespace SCMEASLIB {
-class RealTimeMultiSampleArray;
+    class RealTimeMultiSampleArray;
 }
 
 namespace FIFFLIB {
-class FiffInfo;
+    class FiffInfo;
 }
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIELDLINEPLUGIN
 //=============================================================================================================
 
-namespace FIELDLINEPLUGIN {
+namespace FIELDLINEPLUGIN
+{
 
 //=============================================================================================================
 // FIELDLINEPLUGIN FORWARD DECLARATIONS
@@ -91,7 +86,8 @@ namespace FIELDLINEPLUGIN {
  *
  * @brief The Fieldline class provides a EEG connector for receiving data from Fieldline API.
  */
-class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
+class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor
+{
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "fieldline.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
@@ -99,7 +95,7 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
 
     // friend class FieldlineSetup;
 
- public:
+public:
     //=========================================================================================================
     /**
      * Constructs a Fieldline.
@@ -110,7 +106,7 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
     /**
      * Destroys the Fieldline.
      */
-    ~Fieldline();
+    virtual ~Fieldline();
 
     //=========================================================================================================
     /**
@@ -134,7 +130,7 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
     /**
      * Sets up the fiff info with the current data chosen by the user.
      */
-    // void setUpFiffInfo();
+    void setUpFiffInfo();
 
     //=========================================================================================================
     /**
@@ -149,44 +145,40 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
     virtual bool stop();
 
     virtual AbstractPlugin::PluginType getType() const;
-
     virtual QString getName() const;
-
     virtual QWidget* setupWidget();
-
     virtual QString getBuildInfo();
 
- protected:
+protected:
     //=========================================================================================================
     /**
      * Call this function whenenver you received new data.
      *
      * @param[in] matData The new data.
      */
-    // void onNewDataAvailable(const Eigen::MatrixXd &matData);
+    void onNewDataAvailable(const Eigen::MatrixXd &matData);
 
     //=========================================================================================================
     /**
-     * the starting point for the thread. after calling start(), the newly created thread calls this function.
-     * returning from this method will end the execution of the thread.
-     * pure virtual method inherited by qthread.
+     * The starting point for the thread. After calling start(), the newly created thread calls this function.
+     * Returning from this method will end the execution of the thread.
+     * Pure virtual method inherited by QThread.
      */
-  virtual void run();
-   
+    virtual void run();
 
-  std::unique_ptr<FieldlineAcqSystemController> acqSystem;
-  std::unique_ptr<FieldlinePluginGUI> guiWidget;
+    int      m_iSamplingFreq;        /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
+    int      m_iNumberChannels;      /**< The number of channels to be received.*/
+    int      m_iSamplesPerBlock;     /**< The number of samples per block to be received.*/
 
-  // int m_iSamplingFreq;  /**< The sampling frequency defined by the user via the gui (in hertz).*/
-  // int m_iNumberChannels;  /**< The number of channels to be received.*/
-  // int m_iSamplesPerBlock;  /**< The number of samples per block to be received.*/
-  // QString m_qStringResourcePath;  /**< The path to the EEG resource directory.*/
-  // QThread m_pProducerThread;  /**< The thread used to host the producer.*/
-  // // QSharedPointer<FIELDLINEPLUGIN::FieldlineProducer>      m_pFieldlineProducer;  /**< The producer object.*/
-  // QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>  m_pCircularBuffer;     /**< Holds incoming raw data. */
-  //
-  QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRTMSA_Fieldline;     /**< The RealTimeSampleArray to provide the EEG data.*/
-  QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff measurement info.*/ };
+    QString  m_qStringResourcePath;  /**< The path to the EEG resource directory.*/
+
+    QThread                                                 m_pProducerThread;     /**< The thread used to host the producer.*/
+    QSharedPointer<FIELDLINEPLUGIN::FieldlineProducer>      m_pFieldlineProducer;  /**< The producer object.*/
+    QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>  m_pCircularBuffer;     /**< Holds incoming raw data. */
+
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRMTSA_Fieldline;     /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<FIFFLIB::FiffInfo>                                                       m_pFiffInfo;        /**< Fiff measurement info.*/
+};
 
 }  // namespace FIELDLINEPLUGIN
 

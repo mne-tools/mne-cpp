@@ -17,7 +17,7 @@ add_subdirectory(fiffsimulator)
 add_subdirectory(ftbuffer)
 add_subdirectory(babymeg)
 add_subdirectory(natus)
-add_subdirectory(fieldline)
+# add_subdirectory(fieldline)
 
 # Algorithm Plugin
 add_subdirectory(rtcmne)
