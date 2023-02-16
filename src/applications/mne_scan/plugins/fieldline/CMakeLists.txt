@@ -10,15 +10,15 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Network Concurren
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Network Concurrent)
 
 set(SOURCES
-    # natus.cpp
     fieldline_global.cpp
+    fieldline.cpp
     # natusproducer.cpp
     # FormFiles/natussetup.cpp
 )
 
 set(HEADERS
-    # natus.h
     fieldline_global.h
+    fieldline.h
     # natusproducer.h
     # FormFiles/natussetup.h
 )
