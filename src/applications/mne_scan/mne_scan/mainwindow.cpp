@@ -594,6 +594,67 @@ void MainWindow::createMenus()
     if(!m_pMenuFile) {
         m_pMenuFile = menuBar()->addMenu(tr("&File"));
         m_pMenuFile->addAction(m_pActionNewConfig);
+        m_pMenuFile->addAction(m_pActionOpenConfig);
+        m_pMenuFile->addAction(m_pActionSaveConfig);
+        m_pMenuFile->addSeparator();
+        m_pMenuFile->addAction(m_pActionExit);
+    }
+
+    // View menu
+    if(!m_pMenuView) {
+        m_pMenuView = menuBar()->addMenu(tr("&View"));
+    }
+
+    m_pMenuView->clear();
+
+    if(m_pDockWidget_Log) {
+        m_pMenuView->addAction(m_pDockWidget_Log->toggleViewAction());
+    }
+    m_pMenuLgLv = m_pMenuView->addMenu(tr("&Log Level"));
+    m_pMenuLgLv->addAction(m_pActionMinLgLv);
+    m_pMenuLgLv->addAction(m_pActionNormLgLv);
+    m_pMenuLgLv->addAction(m_pActionMaxLgLv);
+    m_pMenuView->addSeparator();
+
+    if(m_pPluginGuiDockWidget) {
+        m_pMenuView->addAction(m_pPluginGuiDockWidget->toggleViewAction());
+    }
+
+    for(int i = 0; i < m_qListDynamicDisplayMenuActions.size(); ++i) {
+        m_pMenuView->addAction(m_qListDynamicDisplayMenuActions.at(i));
+    }
+
+    menuBar()->addSeparator();
+
+    // Help Appearance
+    if(!m_pMenuAppearance) {
+        m_pMenuAppearance = menuBar()->addMenu(tr("&Appearance"));
+        m_pMenuAppearance->addMenu("Styles")->addActions(m_pActionStyleGroup->actions());
+        m_pMenuAppearance->addMenu("Modes")->addActions(m_pActionModeGroup->actions());
+    }
+
+    // Help menu
+    if(!m_pMenuHelp) {
+        m_pMenuHelp = menuBar()->addMenu(tr("&Help"));
+        m_pMenuHelp->addAction(m_pActionHelpContents);
+        m_pMenuHelp->addSeparator();
+        m_pMenuHelp->addAction(m_pActionAbout);
+    }
+}
+
+//=============================================================================================================
+
+void MainWindow::createToolBars()
+{
+    //Control
+    if(!m_pToolBar) {
+        m_pToolBar = addToolBar(tr("Control"));
+        m_pToolBar->addAction(m_pActionRun);
+        m_pToolBar->addAction(m_pActionStop);
+        m_pActionStop->setEnabled(false);
+
+        m_pToolBar->addSeparator();
+
         m_pLabelTime = new QLabel(this);
         m_pToolBar->addWidget(m_pLabelTime);
         m_pLabelTime->setText(QTime(0, 0).toString());
