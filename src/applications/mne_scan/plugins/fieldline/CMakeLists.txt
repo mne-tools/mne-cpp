@@ -24,11 +24,13 @@ set(HEADERS
 set(FILE_TO_UPDATE fieldline_global.cpp)
 
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/fieldline.json)
-  message("File fieldline.json exists.")
+  # message("File fieldline.json exists.")
 else()
-  message("File fieldline.json does not exist.")
-  message("Creating a new fieldline.json file.")
-  execute_process(COMMAND "echo ")
+  # message("File fieldline.json does not exist.")
+  # message("Creating a new fieldline.json file.")
+  execute_process(COMMAND "echo \"\""
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_FILE fieldline.json)
 endif()
 
 set(SOURCE_PATHS ${SOURCES})
@@ -78,8 +80,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${FFTW_LIBS})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-  SCAN_FIELDLINE_PLUGIN
-  MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"
+  SCAN_FIELDLINE_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"
   MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}"
 )
 
