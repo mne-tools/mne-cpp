@@ -35,6 +35,7 @@
 
 #ifndef FIELDLINE_H
 #define FIELDLINE_H //============================================================================================================= INCLUDES =============================================================================================================
+
 #include "fieldline_global.h"
 
 #include <scShared/Plugins/abstractsensor.h>
@@ -45,7 +46,6 @@
 //=============================================================================================================
 
 #include <QObject>
-// #include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -54,12 +54,13 @@
 // #include <Eigen/Core>
 
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// FORWARD DECLARATION
 //=============================================================================================================
 
 // namespace SCMEASLIB {
 // class RealTimeMultiSampleArray;
 // }
+// u
 // namespace FIFFLIB {
 // class FiffInfo;
 // }
@@ -84,7 +85,6 @@ namespace FIELDLINEPLUGIN {
  * @brief The Fieldline class provides a EEG connector for receiving data from Fieldline API.
  */
 class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
-
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "fieldline.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
@@ -166,7 +166,7 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
      */
     virtual void run();
 
-    // int m_iSamplingFreq;  /**< The sampling frequency defined by the user via the gui (in hertz).*/
+    int m_iSamplingFreq;  /**< The sampling frequency defined by the user via the gui (in hertz).*/
     // int m_iNumberChannels;  /**< The number of channels to be received.*/
     // int m_iSamplesPerBlock;  /**< The number of samples per block to be received.*/
     //
@@ -177,7 +177,7 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
     // QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>  m_pCircularBuffer;     /**< Holds incoming raw data. */
     //
     // QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRMTSA_Fieldline;     /**< The RealTimeSampleArray to provide the EEG data.*/
-    // QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff measurement info.*/
+   // QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff measurement info.*/
 };
 
 }  // namespace FIELDLINEPLUGIN

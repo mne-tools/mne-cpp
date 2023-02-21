@@ -43,12 +43,12 @@
 // DEFINE METHODS
 //=============================================================================================================
 
-const char* FIELDLINEPLUGIN::buildDateTime(){ return UTILSLIB::dateTimeNow();}
+const char* FIELDLINEPLUGIN::buildDateTime() { return UTILSLIB::dateTimeNow();}
 
 //=============================================================================================================
 
-const char* FIELDLINEPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
+const char* FIELDLINEPLUGIN::buildHash() { return UTILSLIB::gitHash();}
 
 //=============================================================================================================
 
-const char* FIELDLINEPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}
+const char* FIELDLINEPLUGIN::buildHashLong() { return UTILSLIB::gitHashLong();}
