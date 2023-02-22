@@ -72,7 +72,7 @@ namespace FIELDLINEPLUGIN {
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Fieldline::Fieldline() : m_iSamplingFreq(1000) {
+Fieldline::Fieldline() {
   qDebug() << "Creating Fieldline object";
 }
 
@@ -89,6 +89,7 @@ Fieldline::~Fieldline() {
 //=============================================================================================================
 
 QSharedPointer<SCSHAREDLIB::AbstractPlugin> Fieldline::clone() const {
+  qDebug() << "Cloning Fieldline.";
   QSharedPointer<SCSHAREDLIB::AbstractPlugin> pFieldlineClone(new Fieldline());
   return pFieldlineClone;
 }
@@ -99,11 +100,14 @@ void Fieldline::init() {
 
   // m_outputConnectors.append(m_pRMTSA_Natus);
   qDebug() << "Init Fieldline";
+  acqSystem = std::make_unique<FieldlineAcqSystemController>();
 }
 
 //=============================================================================================================
 
-void Fieldline::unload() { qDebug() << "unload Fieldline"; }
+void Fieldline::unload() { 
+  qDebug() << "unload Fieldline"; 
+}
 
 //=============================================================================================================
 
@@ -174,6 +178,8 @@ QString Fieldline::getName() const {
 
 QWidget *Fieldline::setupWidget() {
   qDebug() << "setupWidget Fieldline";
+  guiWidget = std::make_unique<FieldlinePluginGUI>();
+
   // NatusSetup* widget = new NatusSetup(this);//widget is later destroyed by
   // CentralWidget - so it has to be created everytime new
 

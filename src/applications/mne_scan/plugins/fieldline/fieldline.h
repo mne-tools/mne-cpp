@@ -37,9 +37,12 @@
 #define FIELDLINE_H //============================================================================================================= INCLUDES =============================================================================================================
 
 #include "fieldline_global.h"
+#include "fieldline_acq_system_controller.h"
+#include "fieldline_plugin_gui.h"
 
 #include <scShared/Plugins/abstractsensor.h>
 // #include <utils/generics/circularbuffer.h>
+#include <memory>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -164,20 +167,22 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
      * returning from this method will end the execution of the thread.
      * pure virtual method inherited by qthread.
      */
-    virtual void run();
+  virtual void run();
+   
 
-    int m_iSamplingFreq;  /**< The sampling frequency defined by the user via the gui (in hertz).*/
-    // int m_iNumberChannels;  /**< The number of channels to be received.*/
-    // int m_iSamplesPerBlock;  /**< The number of samples per block to be received.*/
-    //
-    // QString m_qStringResourcePath;  /**< The path to the EEG resource directory.*/
-    //
-    // QThread m_pProducerThread;  /**< The thread used to host the producer.*/
-    // // QSharedPointer<FIELDLINEPLUGIN::FieldlineProducer>      m_pFieldlineProducer;  /**< The producer object.*/
-    // QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>  m_pCircularBuffer;     /**< Holds incoming raw data. */
-    //
-    // QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRMTSA_Fieldline;     /**< The RealTimeSampleArray to provide the EEG data.*/
-   // QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff measurement info.*/
+  std::unique_ptr<FieldlineAcqSystemController> acqSystem;
+  std::unique_ptr<FieldlinePluginGUI> guiWidget;
+
+  // int m_iSamplingFreq;  /**< The sampling frequency defined by the user via the gui (in hertz).*/
+  // int m_iNumberChannels;  /**< The number of channels to be received.*/
+  // int m_iSamplesPerBlock;  /**< The number of samples per block to be received.*/
+  // QString m_qStringResourcePath;  /**< The path to the EEG resource directory.*/
+  // QThread m_pProducerThread;  /**< The thread used to host the producer.*/
+  // // QSharedPointer<FIELDLINEPLUGIN::FieldlineProducer>      m_pFieldlineProducer;  /**< The producer object.*/
+  // QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>  m_pCircularBuffer;     /**< Holds incoming raw data. */
+  //
+  // QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRMTSA_Fieldline;     /**< The RealTimeSampleArray to provide the EEG data.*/
+  // QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff measurement info.*/
 };
 
 }  // namespace FIELDLINEPLUGIN
