@@ -72,5 +72,6 @@ mne-cpp.pro.user*
 /_site
 
 build/*
-
+build-*/
 .cache/*
+
