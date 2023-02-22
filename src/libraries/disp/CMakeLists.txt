@@ -56,6 +56,9 @@ set(SOURCES
     viewers/hpisettingsview.cpp
     viewers/covariancesettingsview.cpp
     viewers/bidsview.cpp
+    viewers/fl_sensor.cpp
+    viewers/fl_chassis.cpp
+    viewers/fl_rack.cpp
     viewers/helpers/rtfiffrawviewmodel.cpp
     viewers/helpers/rtfiffrawviewdelegate.cpp
     viewers/helpers/evokedsetmodel.cpp
@@ -119,6 +122,9 @@ set(HEADERS
     viewers/hpisettingsview.h
     viewers/covariancesettingsview.h
     viewers/bidsview.h
+    viewers/fl_sensor.h
+    viewers/fl_chassis.h
+    viewers/fl_rack.h
     viewers/helpers/rtfiffrawviewdelegate.h
     viewers/helpers/rtfiffrawviewmodel.h
     viewers/helpers/evokedsetmodel.h

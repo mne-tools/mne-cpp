@@ -44,6 +44,7 @@
 
 #include "fieldline.h"
 
+#include <disp/viewers/fl_rack.h>
 // #include "fieldlineproducer.h"
 // #include "FormFiles/fieldlinesetup.h"
 
@@ -57,6 +58,9 @@
 // #include <QSettings>
 #include <QDebug>
 #include <QLabel>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QSpacerItem>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -186,7 +190,17 @@ QWidget *Fieldline::setupWidget() {
   // init properties dialog
   //  widget->initGui();
 
-  return new QLabel("Fieldline \n   OPM");
+
+
+
+  auto* frame = new QWidget();
+  frame->setLayout(new QHBoxLayout());
+
+  frame->layout()->addWidget(new fl_rack());
+
+  return frame;
+
+  // return new QLabel("Fieldline \n   OPM");
 }
 
 //=============================================================================================================
