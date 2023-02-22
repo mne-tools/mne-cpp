@@ -37,9 +37,11 @@
 namespace FIELDLINEPLUGIN {
 
 
-class FieldlineSystemController {
+class FieldlineAcqSystemController {
  public:
-  FieldlineSystemController() noexcept;
+  FieldlineAcqSystemController() noexcept;
+
+  ~FieldlineAcqSystemController() noexcept;
 
 
  private:
