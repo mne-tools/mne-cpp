@@ -10,15 +10,29 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED
   COMPONENTS Core Widgets Network Concurrent)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED
   COMPONENTS Core Widgets Network Concurrent)
+find_package(Python COMPONENTS Interpreter Development)
+cmake_path(GET Python_EXECUTABLE PARENT_PATH Python_BIN_DIR)
+
+set(PYTHON_COMPILE_FLAGS "--cflags")
+execute_process(COMMAND
+  ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config ${PYTHON_COMPILE_FLAGS}
+  OUTPUT_VARIABLE Python_FLAGS
+)
+
+
 
 set(SOURCES
     fieldline_global.cpp
     fieldline.cpp
+    fieldline_acq_system_controller.cpp
+    fieldline_plugin_gui.cpp
 )
 
 set(HEADERS
     fieldline_global.h
     fieldline.h
+    fieldline_acq_system_controller.h
+    fieldline_plugin_gui.h
 )
 
 set(FILE_TO_UPDATE fieldline_global.cpp)
@@ -58,8 +72,7 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt${QT_VERSION_MAJOR}::Core
+target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Network
     Qt${QT_VERSION_MAJOR}::Concurrent
@@ -77,8 +90,13 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     scDisp
     scShared
     scMeas
-    ${FFTW_LIBS})
+    ${FFTW_LIBS}
+    PRIVATE python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR})
 
+target_link_directories(${PROJECT_NAME} PRIVATE ${Python_LIBRARY_DIRS})
+separate_arguments(Python_FLAGS_NORM UNIX_COMMAND "${Python_FLAGS}")
+target_compile_options(${PROJECT_NAME} PRIVATE ${Python_FLAGS_NORM})
+  
 target_compile_definitions(${PROJECT_NAME} PRIVATE
   SCAN_FIELDLINE_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"
   MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}"
