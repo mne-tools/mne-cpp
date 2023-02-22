@@ -10,7 +10,7 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED
   COMPONENTS Core Widgets Network Concurrent)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED
   COMPONENTS Core Widgets Network Concurrent)
-find_package(Python COMPONENTS Interpreter Development)
+find_package(Python REQUIRED COMPONENTS Interpreter Development)
 cmake_path(GET Python_EXECUTABLE PARENT_PATH Python_BIN_DIR)
 
 set(PYTHON_COMPILE_FLAGS "--cflags")
@@ -91,7 +91,8 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core
     scShared
     scMeas
     ${FFTW_LIBS}
-    PRIVATE python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR})
+#    PRIVATE python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}
+    )
 
 target_link_directories(${PROJECT_NAME} PRIVATE ${Python_LIBRARY_DIRS})
 separate_arguments(Python_FLAGS_NORM UNIX_COMMAND "${Python_FLAGS}")
