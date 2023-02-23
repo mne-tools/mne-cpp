@@ -8,7 +8,7 @@ nav_order: 6
 
 ## Note on CMake
 
-Our project has recently undertaken a large migration from qmake to cmake. Qmake is Qt's old build system created for building the qt project. CMake, especially modern versions (>3.0), has become a de facto standard for project building in c++. Aside from following in Qt's footsteps, as they themselves have switched to cmake, we belive that cmake is a better framework for the project's long term maintainability, and will reduce the learning curve for potential contributors.
+MNE-CPP has migrated from using qmake to cmake as a buildsystem generator tool. Qmake is Qt's old build system created for building the qt project. CMake, especially modern versions (>3.0), has become a de facto standard for project building in c++. Aside from following in Qt's footsteps, as they themselves have switched to cmake, we belive that cmake is a better framework for the project's long term maintainability, and will reduce the learning curve for potential contributors.
 
 We apologise for any of the growing pains that will inevitably occur, and we appreciate any and all feedback or suggestions, either through github or email. We will keep the qmake build instructions on here, and the last instance of the project still in qmake is still avilable on github in the `qmake` branch. 
 
