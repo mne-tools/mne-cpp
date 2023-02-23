@@ -36,9 +36,9 @@
 #ifndef FIELDLINE_H
 #define FIELDLINE_H //============================================================================================================= INCLUDES =============================================================================================================
 
-#include "fieldline_global.h"
-#include "fieldline_acq_system_controller.h"
-#include "fieldline_plugin_gui.h"
+#include "fieldline/fieldline_global.h"
+#include "fieldline/fieldline_acq_system_controller.h"
+#include "fieldline/fieldline_plugin_gui.h"
 
 #include <scShared/Plugins/abstractsensor.h>
 // #include <utils/generics/circularbuffer.h>
