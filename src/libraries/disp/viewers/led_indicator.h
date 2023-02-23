@@ -62,7 +62,7 @@
 //=============================================================================================================
 
 namespace Ui {
-class led_ind;
+    class led_indicator;
 }
 
 //=============================================================================================================
@@ -94,17 +94,19 @@ private:
     void turnOffBlink();
     void handleBlink();
 
-    std::unique_ptr<Ui::led_ind> ui;
+    std::unique_ptr<Ui::led_indicator> ui;
     std::unique_ptr<QGraphicsScene> m_pScene;
 
     int blink_time_ms;
     QTimer blink_timer;
+    bool blink_state;
+
 
     static QColor default_color;
     static QString default_label;
 
     QGraphicsEllipseItem* circle_led;
-    QBrush blink_brush;
+    QBrush off_brush;
     QBrush on_brush;
 };
 }//namespace DISPLIB
