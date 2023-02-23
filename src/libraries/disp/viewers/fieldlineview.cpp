@@ -37,11 +37,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fieldlineview.h"
-
 #include "ui_fl_rack.h"
 #include "ui_fl_chassis.h"
 
+#include "fieldlineview.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -86,15 +85,15 @@ FieldlineView::FieldlineView(int num_chassis, QWidget *parent)
 
 FieldlineView::FieldlineView(QWidget *parent)
 : QWidget(parent)
-, ui(std::make_unique<Ui::fl_rack>())
+, ui(new Ui::fl_rack())
 {
     ui->setupUi(this);
 }
-
 //=============================================================================================================
 
 FieldlineView::~FieldlineView()
 {
+    delete ui;
 }
 
 //=============================================================================================================
@@ -108,94 +107,129 @@ void FieldlineView::configure(int num_chassis)
 
 void FieldlineView::configure(int num_chassis, int num_sensors)
 {
-
-    ui->frame->layout()->addWidget(new fl_chassis());
+    clear();
+    for(int i = 0; i < num_chassis; ++i){
+        chassis.push_back(new fl_chassis(num_sensors));
+        ui->frame->layout()->addWidget(chassis.back());
+    }
 }
 
 //=============================================================================================================
 
-void FieldlineView::setColor(int chassis_id, int sensnor_num, QColor color)
+void FieldlineView::clear()
 {
+    for(auto* c : chassis){
+        ui->frame->layout()->removeWidget(c);
+    }
+};
 
+//=============================================================================================================
+
+void FieldlineView::setColor(int chassis_id, int sensor_num, const QColor& color)
+{
+    if(chassis_id >= chassis.size() || chassis_id < 0){
+        return;
+    }
+    chassis.at(chassis_id)->setColor(sensor_num, color);
 }
 
 //=============================================================================================================
 
-void FieldlineView::setColor(int chassis_id, int sensnor_num, QColor color, bool blinking)
+void FieldlineView::setColor(int chassis_id, int sensor_num, const QColor& color, bool blinking)
 {
-
+    if(chassis_id >= chassis.size() || chassis_id < 0){
+        return;
+    }
+    chassis.at(chassis_id)->setColor(sensor_num, color, blinking);
 }
 
 //=============================================================================================================
 
-void FieldlineView::setChassisColor(int chassis_id, QColor color)
+void FieldlineView::setChassisColor(int chassis_id, const QColor& color)
 {
-
+    if(chassis_id >= chassis.size() || chassis_id < 0){
+        return;
+    }
+    chassis.at(chassis_id)->setColor(color);
 }
 
 //=============================================================================================================
 
-void FieldlineView::setChassisColor(int chassis_id, QColor color, bool blinking)
+void FieldlineView::setChassisColor(int chassis_id, const QColor& color, bool blinking)
 {
-
+    if(chassis_id >= chassis.size() || chassis_id < 0){
+        return;
+    }
+    chassis.at(chassis_id)->setColor(color, blinking);
 }
 
 //=============================================================================================================
 
-void FieldlineView::setAllColor(QColor color)
+void FieldlineView::setAllColor(const QColor& color)
 {
-
+    for(auto* c : chassis){
+        c->setColor(color);
+    }
 }
 
 //=============================================================================================================
 
-void FieldlineView::setAllColor(QColor color, bool blinking)
+void FieldlineView::setAllColor(const QColor& color, bool blinking)
 {
-
+    for(auto* c : chassis){
+        c->setColor(color, blinking);
+    }
 }
 
 //=============================================================================================================
 
-void FieldlineView::setBlinkState(int chassis_id, int sensnor_num, bool blinking)
+void FieldlineView::setBlinkState(int chassis_id, int sensor_num, bool blinking)
 {
-
+    if(chassis_id >= chassis.size() || chassis_id < 0){
+        return;
+    }
+    chassis.at(chassis_id)->setBlinkState(sensor_num, blinking);
 }
 
 //=============================================================================================================
 
 void FieldlineView::setChassisBlinkState(int chassis_id, bool blinking)
 {
-
+    if(chassis_id >= chassis.size() || chassis_id < 0){
+        return;
+    }
+    chassis.at(chassis_id)->setBlinkState(blinking);
 }
 
 //=============================================================================================================
 
 void FieldlineView::setAllBlinkState(bool blinking)
 {
-
+    for(auto* c : chassis){
+        c->setBlinkState(blinking);
+    }
 }
 
 //=============================================================================================================
 
 void FieldlineView::setDefaultNumSensors(int num_sensors)
 {
-
+    default_num_sensors = num_sensors;
 }
 
 //=============================================================================================================
 
-fl_chassis::fl_chassis(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::fl_chassis)
+fl_chassis::fl_chassis(int num_sensors, QWidget *parent )
+: QWidget(parent)
+, ui(new Ui::fl_chassis())
 {
     ui->setupUi(this);
 
-    for(int i = 0; i < 16; ++i){
-        sensors.push_back(std::make_unique<fl_sensor>());
-        sensors.back()->setLabel(QString::number(i+1));
-        ui->sensor_frame->layout()->addWidget(sensors.back().get());
+    for(int i = 0; i < num_sensors; ++i){
+        sensors.push_back(new LEDIndicator());
+        sensors.back()->setLabel(QString::number(i + 1));
+        ui->sensor_frame->layout()->addWidget(sensors.back());
     }
-    sensors.back()->setBlink(true);
 }
 
 //=============================================================================================================
@@ -203,4 +237,60 @@ fl_chassis::fl_chassis(QWidget *parent) :
 fl_chassis::~fl_chassis()
 {
     delete ui;
+}
+
+//=============================================================================================================
+
+void fl_chassis::setColor(int sensor_num, const QColor& color)
+{
+    if(sensor_num > sensors.size() || sensor_num < 1){
+        return;
+    }
+    sensors.at(sensor_num - 1)->setColor(color);
+}
+
+//=============================================================================================================
+
+void fl_chassis::setColor(int sensor_num, const QColor& color, bool blinking)
+{
+    setColor(sensor_num, color);
+    setBlinkState(sensor_num, blinking);
+}
+
+//=============================================================================================================
+
+void fl_chassis::setColor(const QColor& color)
+{
+    for(auto* sensor : sensors){
+        sensor->setColor(color);
+    }
+}
+
+//=============================================================================================================
+
+void fl_chassis::setColor(const QColor& color, bool blinking)
+{
+    for(auto* sensor : sensors){
+        sensor->setColor(color);
+        sensor->setBlink(blinking);
+    }
+}
+
+//=============================================================================================================
+
+void fl_chassis::setBlinkState(int sensor_num, bool blinking)
+{
+    if(sensor_num > sensors.size() || sensor_num < 1){
+        return;
+    }
+    sensors.at(sensor_num - 1)->setBlink(blinking);
+}
+
+//=============================================================================================================
+
+void fl_chassis::setBlinkState(bool blinking)
+{
+    for(auto* sensor : sensors){
+        sensor->setBlink(blinking);
+    }
 }
