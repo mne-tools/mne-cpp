@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>fl_sensor</class>
- <widget class="QWidget" name="fl_sensor">
+ <class>led_ind</class>
+ <widget class="QWidget" name="led_ind">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>225</height>
+    <height>242</height>
    </rect>
   </property>
   <property name="sizePolicy">

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     fl_sensor.h
+ * @file     fl_rack.h
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  *           Juan Garcia-Prieto <juangpc@gmail.com>
  * @since    0.1.9
@@ -29,12 +29,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     FieldlineSensor class declaration.
+ * @brief     FieldlineView class declaration.
  *
  */
 
-#ifndef FL_SENSOR_H
-#define FL_SENSOR_H
+#ifndef FIELDLINE_UI_VIEW_H
+#define FIELDLINE_UI_VIEW_H
 
 //=============================================================================================================
 // INCLUDES
@@ -42,16 +42,17 @@
 
 #include "../disp_global.h"
 
+#include "led_indicator.h"
+
 #include <memory>
+#include <vector>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QWidget>
-#include <QGraphicsScene>
-#include <QTimer>
-#include <QGraphicsEllipseItem>
+#include <QColor>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -62,7 +63,8 @@
 //=============================================================================================================
 
 namespace Ui {
-class fl_sensor;
+class fl_rack;
+class fl_chassis;
 }
 
 //=============================================================================================================
@@ -72,41 +74,60 @@ class fl_sensor;
 namespace DISPLIB
 {
 
-class FieldlineSensor : public QWidget
+class fl_chassis;
+
+//=============================================================================================================
+class FieldlineView : public QWidget
 {
     Q_OBJECT
 
 public:
-    FieldlineSensor(const QString& label, const QColor& led_color, QWidget *parent = nullptr);
-    FieldlineSensor(const QString& label, QWidget *parent = nullptr);
-    explicit FieldlineSensor(QWidget *parent = nullptr);
-    ~FieldlineSensor();
+    FieldlineView(int num_chassis, int sensors_per_chassis, QWidget *parent = nullptr);
+    FieldlineView(int num_chassis, QWidget *parent = nullptr);
+    explicit FieldlineView(QWidget *parent = nullptr);
 
-    void setLabel(const QString& label);
-    void setBlink(bool state);
-    void setColor(const QColor& color);
+    ~FieldlineView();
 
-protected:
-    virtual void resizeEvent(QResizeEvent *event);
+    void configure(int num_chassis);
+    void configure(int num_chassis, int num_sensors);
+
+    void setColor(int chassis_id, int sensnor_num, QColor color);
+    void setColor(int chassis_id, int sensnor_num, QColor color, bool blinking);
+
+    void setChassisColor(int chassis_id, QColor color);
+    void setChassisColor(int chassis_id, QColor color, bool blinking);
+
+    void setAllColor(QColor color);
+    void setAllColor(QColor color, bool blinking);
+
+    void setBlinkState(int chassis_id, int sensnor_num, bool blinking);
+    void setChassisBlinkState(int chassis_id, bool blinking);
+    void setAllBlinkState(bool blinking);
+
+    static void setDefaultNumSensors(int num_sensors);
+private:
+    static int default_num_sensors;
+
+    std::unique_ptr<Ui::fl_rack> ui;
+
+    std::vector<std::unique_ptr<fl_chassis>> chassis;
+};
+
+//=============================================================================================================
+class fl_chassis : public QWidget
+{
+    Q_OBJECT
+
+public:
+    explicit fl_chassis(QWidget *parent = nullptr);
+    ~fl_chassis();
 
 private:
-    void turnOnBlink();
-    void turnOffBlink();
-    void handleBlink();
-
-    std::unique_ptr<Ui::fl_sensor> ui;
-    std::unique_ptr<QGraphicsScene> m_pScene;
-
-    int blink_time_ms;
-    QTimer blink_timer;
-
-    static QColor default_color;
-    static QString default_label;
-
-    QGraphicsEllipseItem* circle_led;
-    QBrush blink_brush;
-    QBrush on_brush;
+    Ui::fl_chassis *ui;
+    std::vector<std::unique_ptr<DISPLIB::LEDIndicator>> sensors;
 };
+
+
 }//namespace DISPLIB
 
-#endif // FL_SENSOR_H
+#endif // FIELDLINE_UI_VIEW_H

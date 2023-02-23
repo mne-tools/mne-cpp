@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     fl_rack.h
+ * @file     led_indicator.h
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  *           Juan Garcia-Prieto <juangpc@gmail.com>
  * @since    0.1.9
@@ -29,19 +29,18 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     FieldlineView class declaration.
+ * @brief     FieldlineSensor class declaration.
  *
  */
 
-#ifndef FL_RACK_H
-#define FL_RACK_H
+#ifndef LED_INDICATOR_H
+#define LED_INDICATOR_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "../disp_global.h"
-#include "fl_chassis.h"
 
 #include <memory>
 
@@ -50,7 +49,9 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QColor>
+#include <QGraphicsScene>
+#include <QTimer>
+#include <QGraphicsEllipseItem>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -61,7 +62,7 @@
 //=============================================================================================================
 
 namespace Ui {
-class fl_rack;
+class led_ind;
 }
 
 //=============================================================================================================
@@ -71,42 +72,41 @@ class fl_rack;
 namespace DISPLIB
 {
 
-class FieldlineView : public QWidget
+class LEDIndicator : public QWidget
 {
     Q_OBJECT
 
 public:
-    FieldlineView(int num_chassis, int sensors_per_chassis, QWidget *parent = nullptr);
-    FieldlineView(int num_chassis, QWidget *parent = nullptr);
-    explicit FieldlineView(QWidget *parent = nullptr);
+    LEDIndicator(const QString& label, const QColor& led_color, QWidget *parent = nullptr);
+    LEDIndicator(const QString& label, QWidget *parent = nullptr);
+    explicit LEDIndicator(QWidget *parent = nullptr);
+    ~LEDIndicator();
 
-    ~FieldlineView();
+    void setLabel(const QString& label);
+    void setBlink(bool state);
+    void setColor(const QColor& color);
 
-    void configure(int num_chassis);
-    void configure(int num_chassis, int num_sensors);
+protected:
+    virtual void resizeEvent(QResizeEvent *event);
 
-    void setColor(int chassis_id, int sensnor_num, QColor color);
-    void setColor(int chassis_id, int sensnor_num, QColor color, bool blinking);
-
-    void setChassisColor(int chassis_id, QColor color);
-    void setChassisColor(int chassis_id, QColor color, bool blinking);
-
-    void setAllColor(QColor color);
-    void setAllColor(QColor color, bool blinking);
-
-    void setBlinkState(int chassis_id, int sensnor_num, bool blinking);
-    void setChassisBlinkState(int chassis_id, bool blinking);
-    void setAllBlinkState(bool blinking);
-
-    static void setDefaultNumSensors(int num_sensors);
 private:
-    static int default_num_sensors;
+    void turnOnBlink();
+    void turnOffBlink();
+    void handleBlink();
 
-    std::unique_ptr<Ui::fl_rack> ui;
+    std::unique_ptr<Ui::led_ind> ui;
+    std::unique_ptr<QGraphicsScene> m_pScene;
 
-    std::vector<std::unique_ptr<fl_chassis>> chassis;
+    int blink_time_ms;
+    QTimer blink_timer;
+
+    static QColor default_color;
+    static QString default_label;
+
+    QGraphicsEllipseItem* circle_led;
+    QBrush blink_brush;
+    QBrush on_brush;
 };
-
 }//namespace DISPLIB
 
-#endif // FL_RACK_H
+#endif // LED_INDICATOR_H

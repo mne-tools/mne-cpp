@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     fl_rack.cpp
+ * @file     led_indicator.cpp
  * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
  *           Juan Garcia-Prieto <juangpc@gmail.com>
  * @since    0.1.9
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     FieldlineView class definition.
+ * @brief     LEDIndicator class definition.
  *
  */
 
@@ -37,10 +37,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fl_rack.h"
-#include "fl_chassis.h"
-
-#include "ui_fl_rack.h"
+#include "led_indicator.h"
+#include "ui_led_indicator.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -54,129 +52,107 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using DISPLIB::FieldlineView;
-using DISPLIB::fl_chassis;
+using DISPLIB::LEDIndicator;
 
 //=============================================================================================================
 // DEFINE STATIC METHODS
 //=============================================================================================================
 
-int FieldlineView::default_num_sensors = 16;
+QColor LEDIndicator::default_color = Qt::red;
+QString LEDIndicator::default_label = "XX";
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-FieldlineView::FieldlineView(int num_chassis, int sensors_per_chassis, QWidget *parent)
-: FieldlineView(parent)
-{
-    configure(num_chassis, sensors_per_chassis);
-}
-
-//=============================================================================================================
-
-FieldlineView::FieldlineView(int num_chassis, QWidget *parent)
-: FieldlineView(num_chassis, default_num_sensors, parent)
-{
-}
-
-//=============================================================================================================
-
-FieldlineView::FieldlineView(QWidget *parent)
+LEDIndicator::LEDIndicator(const QString& label, const QColor& led_color, QWidget *parent)
 : QWidget(parent)
-, ui(std::make_unique<Ui::fl_rack>())
+, ui(std::make_unique<Ui::led_ind>())
+, blink_brush(QBrush(Qt::transparent))
+, on_brush(QBrush(led_color))
+, blink_time_ms(200)
 {
+    m_pScene = std::make_unique<QGraphicsScene>();
+
     ui->setupUi(this);
+    ui->graphicsView->setStyleSheet("background:transparent");
+    ui->label->setText(label);
+    ui->graphicsView->setScene(m_pScene.get());
+
+    circle_led = m_pScene->addEllipse(0,0,this->width()/3,this->width()/3, QPen(Qt::black), on_brush);
 }
 
 //=============================================================================================================
 
-FieldlineView::~FieldlineView()
+LEDIndicator::LEDIndicator(const QString& label, QWidget *parent)
+: LEDIndicator(label, default_color, parent)
 {
 }
 
 //=============================================================================================================
 
-void FieldlineView::configure(int num_chassis)
+LEDIndicator::LEDIndicator(QWidget *parent)
+: LEDIndicator(default_label, default_color, parent)
 {
-    configure(num_chassis, default_num_sensors);
 }
 
 //=============================================================================================================
 
-void FieldlineView::configure(int num_chassis, int num_sensors)
+LEDIndicator::~LEDIndicator()
 {
-
-    ui->frame->layout()->addWidget(new fl_chassis());
 }
 
 //=============================================================================================================
 
-void FieldlineView::setColor(int chassis_id, int sensnor_num, QColor color)
+void LEDIndicator::setLabel(const QString& label)
 {
-
+    ui->label->setText(label);
 }
 
 //=============================================================================================================
 
-void FieldlineView::setColor(int chassis_id, int sensnor_num, QColor color, bool blinking)
+void LEDIndicator::resizeEvent(QResizeEvent *event)
 {
+    auto bounds = m_pScene->itemsBoundingRect();
+    bounds.setWidth(bounds.width() * 1.2);
+    bounds.setHeight(bounds.height() * 1.2);
+    ui->graphicsView->fitInView(bounds, Qt::KeepAspectRatio);
 
+    QWidget::resizeEvent(event);
 }
 
 //=============================================================================================================
 
-void FieldlineView::setChassisColor(int chassis_id, QColor color)
+void LEDIndicator::setBlink(bool state)
 {
-
+    state ? turnOnBlink() : turnOffBlink();
 }
 
 //=============================================================================================================
 
-void FieldlineView::setChassisColor(int chassis_id, QColor color, bool blinking)
+void LEDIndicator::turnOnBlink()
 {
-
+    connect(&blink_timer, &QTimer::timeout,
+            this, &LEDIndicator::handleBlink, Qt::UniqueConnection);
+    blink_timer.start(blink_time_ms);
 }
 
 //=============================================================================================================
 
-void FieldlineView::setAllColor(QColor color)
+void LEDIndicator::turnOffBlink()
 {
-
+    blink_timer.stop();
+    circle_led->setBrush(on_brush);
 }
 
 //=============================================================================================================
 
-void FieldlineView::setAllColor(QColor color, bool blinking)
+void LEDIndicator::handleBlink()
 {
+    static bool blink_state = false;
 
-}
+    blink_state ? circle_led->setBrush(blink_brush)
+                : circle_led->setBrush(on_brush);
 
-//=============================================================================================================
-
-void FieldlineView::setBlinkState(int chassis_id, int sensnor_num, bool blinking)
-{
-
-}
-
-//=============================================================================================================
-
-void FieldlineView::setChassisBlinkState(int chassis_id, bool blinking)
-{
-
-}
-
-//=============================================================================================================
-
-void FieldlineView::setAllBlinkState(bool blinking)
-{
-
-}
-
-//=============================================================================================================
-
-static void setDefaultNumSensors(int num_sensors)
-{
-
+    blink_state = !blink_state;
 }
