@@ -41,7 +41,7 @@
 
 
 #define PY_SSIZE_T_CLEAN
-//#include "Python.h"
+#include "Python.h"
 
 #include "fieldline_acq_system_controller.h"
 
@@ -60,24 +60,24 @@ FieldlineAcqSystemController::FieldlineAcqSystemController() noexcept {
   // initialize channels
   //
   //
-//  Py_Initialize();
-//  PyConfig config;
-//  PyConfig_InitPythonConfig(&config);
-//  config.module_search_paths_set = 1;
-//  PyWideStringList_Append(&config.module_search_paths, L".");
-//  Py_InitializeFromConfig(&config);
-//  FILE* py_file = fopen("main.py", "r");
-//  PyObject* global_dict = PyDict_New();
-//  PyObject* local_dict = PyDict_New();
-//  PyObject* result = PyRun_File(py_file,
-//                                "main.py",
-//                                Py_file_input,
-//                                global_dict,
-//                                local_dict);
-//  Py_DECREF(global_dict);
-//  Py_DECREF(local_dict);
-//  Py_DECREF(result);
-//  fclose(py_file);
+  Py_Initialize();
+  PyConfig config;
+  PyConfig_InitPythonConfig(&config);
+  config.module_search_paths_set = 1;
+  PyWideStringList_Append(&config.module_search_paths, L".");
+  Py_InitializeFromConfig(&config);
+  FILE* py_file = fopen("main.py", "r");
+  PyObject* global_dict = PyDict_New();
+  PyObject* local_dict = PyDict_New();
+  PyObject* result = PyRun_File(py_file,
+                                "main.py",
+                                Py_file_input,
+                                global_dict,
+                                local_dict);
+  Py_DECREF(global_dict);
+  Py_DECREF(local_dict);
+  Py_DECREF(result);
+  fclose(py_file);
   
 }
 

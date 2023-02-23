@@ -44,7 +44,7 @@
 
 #include "fieldline.h"
 
-#include <disp/viewers/fl_rack.h>
+#include <disp/viewers/fieldlineview.h>
 // #include "fieldlineproducer.h"
 // #include "FormFiles/fieldlinesetup.h"
 
@@ -196,7 +196,11 @@ QWidget *Fieldline::setupWidget() {
   auto* frame = new QWidget();
   frame->setLayout(new QHBoxLayout());
 
-  frame->layout()->addWidget(new fl_rack());
+  auto* flWidget = new DISPLIB::FieldlineView(2, 16);
+
+  frame->layout()->addWidget(flWidget);
+  flWidget->setBlinkState(0, 2, true);
+  flWidget->setBlinkState(1, 5, true);
 
   return frame;
 
