@@ -123,7 +123,7 @@ Disp
 
 ### Continuous Integration
 
- * Cleanup qmake files for transition to cmake (Qt6 only supports cmake)
+ * Cleanup qmake files for transition to CMake (Qt6 only supports CMake)
  * Move deployment to CI
  * Outsource deployment commands to scripts
  * Update ubuntu runners
@@ -153,7 +153,7 @@ Disp
  * Make building without app bundles on macOS the default (can be reverted by using the new flag withAppBundles)
  * Fix Wasm problems introduced by PR #713 (View3D controls in control manager plugin)
  * Cleanup mne-cpp.pri file
- * Move resources folder back to bin folder to reduce complexity in the qmake/cmake files
+ * Move resources folder back to bin folder to reduce complexity in the qmake/CMake files
  * Add @executable_path to rpath setup when building for macOS. (can start the executable from the explorer)
 
 ### Authors
