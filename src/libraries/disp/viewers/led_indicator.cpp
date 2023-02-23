@@ -44,10 +44,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QScrollBar>
-#include <QMouseEvent>
-#include <QDebug>
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -71,24 +67,19 @@ QString LEDIndicator::default_label = "XX";
 
 LEDIndicator::LEDIndicator(const QString& label, const QColor& led_color, QWidget *parent)
 : QWidget(parent)
-, ui(std::make_unique<Ui::led_indicator>())
-, off_brush(QBrush(Qt::transparent))
+, ui(std::make_unique<Ui::led_ind>())
+, blink_brush(QBrush(Qt::transparent))
 , on_brush(QBrush(led_color))
 , blink_time_ms(200)
-, blink_state(false)
 {
     m_pScene = std::make_unique<QGraphicsScene>();
 
     ui->setupUi(this);
     ui->graphicsView->setStyleSheet("background:transparent");
-    ui->graphicsView->horizontalScrollBar()->hide();
-    ui->graphicsView->verticalScrollBar()->hide();
     ui->label->setText(label);
     ui->graphicsView->setScene(m_pScene.get());
 
     circle_led = m_pScene->addEllipse(0,0,this->width()/3,this->width()/3, QPen(Qt::black), on_brush);
-
-    this->setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
 //=============================================================================================================
@@ -120,20 +111,6 @@ void LEDIndicator::setLabel(const QString& label)
 
 //=============================================================================================================
 
-void LEDIndicator::setBlink(bool state)
-{
-    state ? turnOnBlink() : turnOffBlink();
-}
-
-//=============================================================================================================
-
-void LEDIndicator::setColor(const QColor& color)
-{
-    on_brush.setColor(color);
-}
-
-//=============================================================================================================
-
 void LEDIndicator::resizeEvent(QResizeEvent *event)
 {
     auto bounds = m_pScene->itemsBoundingRect();
@@ -142,6 +119,13 @@ void LEDIndicator::resizeEvent(QResizeEvent *event)
     ui->graphicsView->fitInView(bounds, Qt::KeepAspectRatio);
 
     QWidget::resizeEvent(event);
+}
+
+//=============================================================================================================
+
+void LEDIndicator::setBlink(bool state)
+{
+    state ? turnOnBlink() : turnOffBlink();
 }
 
 //=============================================================================================================
@@ -165,7 +149,9 @@ void LEDIndicator::turnOffBlink()
 
 void LEDIndicator::handleBlink()
 {
-    blink_state ? circle_led->setBrush(off_brush)
+    static bool blink_state = false;
+
+    blink_state ? circle_led->setBrush(blink_brush)
                 : circle_led->setBrush(on_brush);
 
     blink_state = !blink_state;

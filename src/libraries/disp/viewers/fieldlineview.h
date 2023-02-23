@@ -63,8 +63,8 @@
 //=============================================================================================================
 
 namespace Ui {
-    class fl_rack;
-    class fl_chassis;
+class fl_rack;
+class fl_chassis;
 }
 
 //=============================================================================================================
@@ -82,64 +82,49 @@ class FieldlineView : public QWidget
     Q_OBJECT
 
 public:
-    explicit FieldlineView(QWidget *parent = nullptr);
     FieldlineView(int num_chassis, int sensors_per_chassis, QWidget *parent = nullptr);
     FieldlineView(int num_chassis, QWidget *parent = nullptr);
+    explicit FieldlineView(QWidget *parent = nullptr);
+
     ~FieldlineView();
 
     void configure(int num_chassis);
     void configure(int num_chassis, int num_sensors);
 
-    void clear();
+    void setColor(int chassis_id, int sensnor_num, QColor color);
+    void setColor(int chassis_id, int sensnor_num, QColor color, bool blinking);
 
-    void setColor(size_t chassis_id, size_t sensor_num, const QColor& color);
-    void setColor(size_t chassis_id, size_t sensor_num, const QColor& color, bool blinking);
+    void setChassisColor(int chassis_id, QColor color);
+    void setChassisColor(int chassis_id, QColor color, bool blinking);
 
-    void setChassisColor(size_t chassis_id, const QColor& color);
-    void setChassisColor(size_t chassis_id, const QColor& color, bool blinking);
+    void setAllColor(QColor color);
+    void setAllColor(QColor color, bool blinking);
 
-    void setAllColor(const QColor& color);
-    void setAllColor(const QColor &color, bool blinking);
-
-    void setBlinkState(size_t chassis_id, size_t sensor_num, bool blinking);
-    void setChassisBlinkState(size_t chassis_id, bool blinking);
+    void setBlinkState(int chassis_id, int sensnor_num, bool blinking);
+    void setChassisBlinkState(int chassis_id, bool blinking);
     void setAllBlinkState(bool blinking);
 
     static void setDefaultNumSensors(int num_sensors);
 private:
     static int default_num_sensors;
 
-    Ui::fl_rack* ui;
-    std::vector<fl_chassis*> chassis;
+    std::unique_ptr<Ui::fl_rack> ui;
+
+    std::vector<std::unique_ptr<fl_chassis>> chassis;
 };
 
 //=============================================================================================================
-
 class fl_chassis : public QWidget
 {
     Q_OBJECT
 
 public:
-    fl_chassis(int num_sensors, QWidget *parent = nullptr);
+    explicit fl_chassis(QWidget *parent = nullptr);
     ~fl_chassis();
 
-    void setColor(size_t sensor_num, const QColor& color);
-    void setColor(size_t sensor_num, const QColor& color, bool blinking);
-    void setColor(const QColor& color);
-    void setColor(const QColor& color, bool blinking);
-
-    void setBlinkState(size_t sensor_num, bool blinking);
-    void setBlinkState(bool blinking);
-
-signals:
-    void clicked(int sensor, const QPoint& pos);
-
-private slots:
-    void rightClickMenu(int sensor, const QPoint& pos);
-
 private:
-    Ui::fl_chassis* ui;
-    std::vector<DISPLIB::LEDIndicator*> sensors;
+    Ui::fl_chassis *ui;
+    std::vector<std::unique_ptr<DISPLIB::LEDIndicator>> sensors;
 };
 
 
