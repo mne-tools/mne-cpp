@@ -72,7 +72,8 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Network
     Qt${QT_VERSION_MAJOR}::Concurrent
@@ -91,13 +92,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE Qt${QT_VERSION_MAJOR}::Core
     scShared
     scMeas
     ${FFTW_LIBS}
-#    PRIVATE python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}
-    )
+    python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR})
 
 target_link_directories(${PROJECT_NAME} PRIVATE ${Python_LIBRARY_DIRS})
 separate_arguments(Python_FLAGS_NORM UNIX_COMMAND "${Python_FLAGS}")
 target_compile_options(${PROJECT_NAME} PRIVATE ${Python_FLAGS_NORM})
-  
+
 target_compile_definitions(${PROJECT_NAME} PRIVATE
   SCAN_FIELDLINE_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"
   MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}"
