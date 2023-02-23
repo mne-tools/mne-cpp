@@ -19,8 +19,6 @@ execute_process(COMMAND
   OUTPUT_VARIABLE Python_FLAGS
 )
 
-
-
 set(SOURCES
     fieldline_global.cpp
     fieldline.cpp
