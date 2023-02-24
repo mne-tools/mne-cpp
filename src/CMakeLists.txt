@@ -21,6 +21,12 @@ option(LIB_ONLY "Build only the libraries." OFF)
 # Equivalent to NO_EXAMPLES and NO_TESTS
 option(FOR_RELEASE "Build only libs and apps." OFF)
 
+option(WITH_CODE_COV "Build with code" OFF)
+if(WITH_CODE_COV)
+  add_compile_options("--coverage")
+  add_link_options("--coverage")
+endif()
+
 ##==============================================================================
 ## FFTW Options 
 
