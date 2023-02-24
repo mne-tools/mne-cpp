@@ -279,8 +279,14 @@ jobs:
         expand-archive -path "jom.zip"
         echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Configure and compile MNE-CPP
+      if: (matrix.os == 'macos-11') || (matrix.os == 'windows-2019')
       run: |
         ./tools/building/build_project.bat  
+    - name: Configure and compile MNE-CPP
+      if: matrix.os == 'ubuntu-18.04'
+      run: |
+        cmake -DCMAKE_BUILD_TYPE="Release" -DWITH_CODE_COV=ON -B build -S src 
+        cmake --build ${BASE_PATH}/build --parallel $(expr $(nproc --all) / 2)
     - name: Run tests (Linux)
       if: matrix.os == 'ubuntu-18.04'
       env:
