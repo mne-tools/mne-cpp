@@ -92,17 +92,17 @@ public:
 
     void clear();
 
-    void setColor(int chassis_id, int sensor_num, const QColor& color);
-    void setColor(int chassis_id, int sensor_num, const QColor& color, bool blinking);
+    void setColor(size_t chassis_id, size_t sensor_num, const QColor& color);
+    void setColor(size_t chassis_id, size_t sensor_num, const QColor& color, bool blinking);
 
-    void setChassisColor(int chassis_id, const QColor& color);
-    void setChassisColor(int chassis_id, const QColor& color, bool blinking);
+    void setChassisColor(size_t chassis_id, const QColor& color);
+    void setChassisColor(size_t chassis_id, const QColor& color, bool blinking);
 
     void setAllColor(const QColor& color);
     void setAllColor(const QColor &color, bool blinking);
 
-    void setBlinkState(int chassis_id, int sensor_num, bool blinking);
-    void setChassisBlinkState(int chassis_id, bool blinking);
+    void setBlinkState(size_t chassis_id, size_t sensor_num, bool blinking);
+    void setChassisBlinkState(size_t chassis_id, bool blinking);
     void setAllBlinkState(bool blinking);
 
     static void setDefaultNumSensors(int num_sensors);
@@ -123,12 +123,12 @@ public:
     fl_chassis(int num_sensors, QWidget *parent = nullptr);
     ~fl_chassis();
 
-    void setColor(int sensor_num, const QColor& color);
-    void setColor(int sensor_num, const QColor& color, bool blinking);
+    void setColor(size_t sensor_num, const QColor& color);
+    void setColor(size_t sensor_num, const QColor& color, bool blinking);
     void setColor(const QColor& color);
     void setColor(const QColor& color, bool blinking);
 
-    void setBlinkState(int sensor_num, bool blinking);
+    void setBlinkState(size_t sensor_num, bool blinking);
     void setBlinkState(bool blinking);
 private:
     Ui::fl_chassis* ui;

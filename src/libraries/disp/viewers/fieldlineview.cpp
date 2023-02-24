@@ -125,9 +125,9 @@ void FieldlineView::clear()
 
 //=============================================================================================================
 
-void FieldlineView::setColor(int chassis_id, int sensor_num, const QColor& color)
+void FieldlineView::setColor(size_t chassis_id, size_t sensor_num, const QColor& color)
 {
-    if(chassis_id >= chassis.size() || chassis_id < 0){
+    if(chassis_id >= chassis.size()){
         return;
     }
     chassis.at(chassis_id)->setColor(sensor_num, color);
@@ -135,9 +135,9 @@ void FieldlineView::setColor(int chassis_id, int sensor_num, const QColor& color
 
 //=============================================================================================================
 
-void FieldlineView::setColor(int chassis_id, int sensor_num, const QColor& color, bool blinking)
+void FieldlineView::setColor(size_t chassis_id, size_t sensor_num, const QColor& color, bool blinking)
 {
-    if(chassis_id >= chassis.size() || chassis_id < 0){
+    if(chassis_id >= chassis.size()){
         return;
     }
     chassis.at(chassis_id)->setColor(sensor_num, color, blinking);
@@ -145,9 +145,9 @@ void FieldlineView::setColor(int chassis_id, int sensor_num, const QColor& color
 
 //=============================================================================================================
 
-void FieldlineView::setChassisColor(int chassis_id, const QColor& color)
+void FieldlineView::setChassisColor(size_t chassis_id, const QColor& color)
 {
-    if(chassis_id >= chassis.size() || chassis_id < 0){
+    if(chassis_id >= chassis.size()){
         return;
     }
     chassis.at(chassis_id)->setColor(color);
@@ -155,9 +155,9 @@ void FieldlineView::setChassisColor(int chassis_id, const QColor& color)
 
 //=============================================================================================================
 
-void FieldlineView::setChassisColor(int chassis_id, const QColor& color, bool blinking)
+void FieldlineView::setChassisColor(size_t chassis_id, const QColor& color, bool blinking)
 {
-    if(chassis_id >= chassis.size() || chassis_id < 0){
+    if(chassis_id >= chassis.size()){
         return;
     }
     chassis.at(chassis_id)->setColor(color, blinking);
@@ -183,9 +183,9 @@ void FieldlineView::setAllColor(const QColor& color, bool blinking)
 
 //=============================================================================================================
 
-void FieldlineView::setBlinkState(int chassis_id, int sensor_num, bool blinking)
+void FieldlineView::setBlinkState(size_t chassis_id, size_t sensor_num, bool blinking)
 {
-    if(chassis_id >= chassis.size() || chassis_id < 0){
+    if(chassis_id >= chassis.size()){
         return;
     }
     chassis.at(chassis_id)->setBlinkState(sensor_num, blinking);
@@ -193,9 +193,9 @@ void FieldlineView::setBlinkState(int chassis_id, int sensor_num, bool blinking)
 
 //=============================================================================================================
 
-void FieldlineView::setChassisBlinkState(int chassis_id, bool blinking)
+void FieldlineView::setChassisBlinkState(size_t chassis_id, bool blinking)
 {
-    if(chassis_id >= chassis.size() || chassis_id < 0){
+    if(chassis_id >= chassis.size()){
         return;
     }
     chassis.at(chassis_id)->setBlinkState(blinking);
@@ -241,7 +241,7 @@ fl_chassis::~fl_chassis()
 
 //=============================================================================================================
 
-void fl_chassis::setColor(int sensor_num, const QColor& color)
+void fl_chassis::setColor(size_t sensor_num, const QColor& color)
 {
     if(sensor_num > sensors.size() || sensor_num < 1){
         return;
@@ -251,7 +251,7 @@ void fl_chassis::setColor(int sensor_num, const QColor& color)
 
 //=============================================================================================================
 
-void fl_chassis::setColor(int sensor_num, const QColor& color, bool blinking)
+void fl_chassis::setColor(size_t sensor_num, const QColor& color, bool blinking)
 {
     setColor(sensor_num, color);
     setBlinkState(sensor_num, blinking);
@@ -278,7 +278,7 @@ void fl_chassis::setColor(const QColor& color, bool blinking)
 
 //=============================================================================================================
 
-void fl_chassis::setBlinkState(int sensor_num, bool blinking)
+void fl_chassis::setBlinkState(size_t sensor_num, bool blinking)
 {
     if(sensor_num > sensors.size() || sensor_num < 1){
         return;
