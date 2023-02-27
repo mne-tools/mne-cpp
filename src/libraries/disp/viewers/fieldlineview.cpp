@@ -120,6 +120,7 @@ void FieldlineView::clear()
 {
     for(auto* c : chassis){
         ui->frame->layout()->removeWidget(c);
+        c->deleteLater();
     }
 };
 
