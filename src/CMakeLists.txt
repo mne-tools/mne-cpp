@@ -44,6 +44,23 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
 endif()
 
 ##==============================================================================
+## Dissalow in-soure builds by default
+
+if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
+  if(NOT DEFINED FORCE_IN_SOURCE_BUILD)
+    message(FATAL_ERROR
+      "We dissalow in-sourec builds by default because they are typically a bad idea."
+      "\n Remove \"${CMAKE_SOURCE_DIR}/CMakeCache.txt\" and \"${CMAKE_SOURCE_DIR}/CMakeFiles\" and try again from another folder:"
+      "\n "
+      "\n mkdir build"
+      "\n cmake -B build -S src" 
+      "\n " 
+      "\n If you are absolutley sure of what you are doing, you can pass in FORCE_IN_SOURCE_BUILD to CMake to force in-soure building (not recommended!)"
+    )
+  endif()
+endif()
+
+##==============================================================================
 ## Save git hash for project
 
 set(MNE_GIT_HASH_SHORT "No git hash")
