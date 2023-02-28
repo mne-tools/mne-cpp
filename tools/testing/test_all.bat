@@ -188,7 +188,7 @@ do
   fi
 
   if [ $RunCodeCoverage == "true" ]; then
-    find ./libraries -type f -name "*.cpp" -exec gcov {} \; &> /dev/null
+    find ./src/libraries -type f -name "*.cpp" -exec gcov {} \; &> /dev/null
     # Hide codecov output since it corrupts the log too much
     ./codecov &> /dev/null
   fi

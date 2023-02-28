@@ -75,3 +75,6 @@ build/*
 build-*/
 .cache/*
 
+codecov
+
+

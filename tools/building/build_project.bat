@@ -1,30 +1,159 @@
 :<<BATCH
     :;@echo off
+    :; # ####################################################
     :; # ########## WINDOWS SECTION #########################
        
 
-    SET SCRIPT_PATH=%~dp0
-    SET BASE_PATH=%SCRIPT_PATH%..\..
+    SET ScriptPath=%~dp0
+    SET BasePath=%ScriptPath%..\..
 
-    cmake -B %BASE_PATH%\build -S %BASE_PATH%\src -DCMAKE_BUILD_TYPE=Release
-    cmake --build %BASE_PATH%\build --config Release
+    SET VerboseMode=False
+    SET BuildType="Release"
+    SET WithCodeCoverage="false"
+    SET BuildFolder=""
+    SET SourceFolder=""
+    SET NumProcesses="1"
+    
+    SHIFT & SHIFT
+    :loop
+    IF NOT "%1"=="" (
+      IF "%1"=="help" (
+        goto :showHelp
+      )
+      IF "%1"=="Release" (
+        set BuildType="Release"
+        SHIFT
+      )
+      IF "%1"=="Debug" (
+        set BuildType="Debug"
+        SHIFT
+      )
+      IF "%1"=="coverage" (
+        set WithCodeCoverage=True
+        SHIFT
+      )
+
+      SHIFT
+      GOTO :loop
+    )
+
+    set BuildFolder=%BasePath%\build\%BuildType%
+    set SrcFolder=%BasePath%\src
+
+    call:doPrintConfiguration
+
+    exit /B 
+
+    echo cmake -B %BuildFolder% -S %BasePath%\src -DCMAKE_BUILD_TYPE=%BuildType%
+    echo cmake --build %BuildFolder% --config %BuildType%
+
+    :doPrintConfiguration
+      echo.
+      echo =========================================
+      echo verbose = %VerboseMode%
+      echo BuildType =%BuildType%
+      echo Coverage =%WithCodeCoverage%
+      echo BuildFolder  =%BuildFolder%
+      echo SourceFolder =%SourceFolder%
+      echo NumProcesses = %NumProcesses%
+      echo .
+      echo =========================================
+      echo .
+    exit /B 0
 
     :; # ########## WINDOWS SECTION ENDS ####################
     :; # ####################################################
     exit /b
 BATCH
+# ######################################################
+# ############## LINUX MAC SECTION STARTS ##############
+#!/bin/bash
 
-SCRIPT_PATH="$(
-        cd "$(dirname "$0")" >/dev/null 2>&1
+#####  default parameters
+
+argc=$#
+argv=("$@")
+
+function cleanAbsPath()
+{
+    local  cleanAbsPathStr="$( #spawns a new bash interpreter
+        cd "$1" >/dev/null 2>&1 #change directory to that folder
         pwd -P
     )"
-BASE_PATH=${SCRIPT_PATH}/../..
+    echo "$cleanAbsPathStr"
+}
 
-cmake -B ${BASE_PATH}/build -S ${BASE_PATH}/src -DCMAKE_BUILD_TYPE=Release
+VerboseMode="false"
+BuildType="Release"
+WithCodeCoverage="false"
+BuildFolder=""
+SourceFolder=""
+NumProcesses="1"
+
+ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
+BasePath="$(cleanAbsPath "$ScriptPath/../..")"
 
 if [ "$(uname)" == "Darwin" ]; then
-    cmake --build ${BASE_PATH}/build --parallel $(sysctl -n hw.physicalcpu)
+    NumProcesses=$(sysctl -n hw.physicalcpu)
 else 
-    cmake --build ${BASE_PATH}/build --parallel $(expr $(nproc --all) / 2)
+    NumProcesses=$(expr $(nproc --all) / 2)
 fi
 
+doPrintConfiguration() {
+  echo " "
+  echo ========================================================================
+  echo ======================== MNE-CPP BUILD CONFIG ==========================
+  echo " "
+  echo " ScriptPath   = $ScriptPath"
+  echo " BasePath     = $BasePath"
+  echo " BuildFolder  = $BuildFolder"
+  echo " SourceFolder = $SourceFolder"
+  echo " "
+  echo " VerboseMode = $VerboseMode"
+  echo " Buildtype = $BuildType"
+  echo " WithCodeCoverage = $WithCodeCoverage"
+  echo " NumProcesses = $NumProcesses"
+  echo " "
+  echo ========================================================================
+  echo ========================================================================
+  echo " "
+}
+
+doPrintHelp() {
+  echo " "
+  echo "MNE-CPP building script help."
+  echo ""
+  echo "Usage: ./build_project.bat [verbose] [(Release)/Debug] [coverage]"
+  echo ""
+}
+
+for (( j=0; j<argc; j++)); do
+  if [ "${argv[j]}" == "verbose" ]; then
+    VerboseMode="true"
+  elif [ "${argv[j]}" == "coverage" ]; then
+    WithCodeCoverage="true"
+  elif [ "${argv[j]}" == "Debug" ]; then
+    BuildType="Debug"
+  elif [ "${argv[j]}" == "Release" ]; then
+    BuildType="Release"
+  elif [ "${argv[j]}" == "help" ]; then
+    doPrintHelp
+    exit 1
+  fi
+done
+
+if [ "$WithCodeCoverage" == "false"  ]; then
+  CoverageOption=""
+elif [ "$WithCodeCoverage" == "true"  ]; then
+  CoverageOption="-DWITH_CODE_COV=ON"
+fi
+
+BuildFolder=${BasePath}/build/${BuildType}
+SourceFolder=${BasePath}/src
+
+doPrintConfiguration
+
+cmake -B ${BuildFolder} -S ${SourceFolder} -DCMAKE_BUILD_TYPE=${BuildType} ${CoverageOption}
+cmake --build ${BuildFolder} --parallel $NumProcesses
+
+exit 0
