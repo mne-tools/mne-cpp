@@ -44,6 +44,11 @@ endif()
 # Generate json file detailing project compilation. (Typically for LSPs)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+# If no build type is specified, default to Release
+if(NOT DEFINED CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE "Release")
+endif()
+
 ##==============================================================================
 ## Save git hash for project
 
