@@ -45,6 +45,8 @@
 //=============================================================================================================
 
 #include <QScrollBar>
+#include <QMouseEvent>
+#include <QDebug>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -85,6 +87,8 @@ LEDIndicator::LEDIndicator(const QString& label, const QColor& led_color, QWidge
     ui->graphicsView->setScene(m_pScene.get());
 
     circle_led = m_pScene->addEllipse(0,0,this->width()/3,this->width()/3, QPen(Qt::black), on_brush);
+
+    this->setContextMenuPolicy(Qt::CustomContextMenu);
 }
 
 //=============================================================================================================
