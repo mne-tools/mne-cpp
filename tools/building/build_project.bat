@@ -76,8 +76,8 @@ argv=("$@")
 
 function cleanAbsPath()
 {
-    local  cleanAbsPathStr="$(
-        cd "$1" >/dev/null 2>&1 
+    local  cleanAbsPathStr="$( #spawns a new bash interpreter
+        cd "$1" >/dev/null 2>&1 #change directory to that folder
         pwd -P
     )"
     echo "$cleanAbsPathStr"
@@ -154,6 +154,6 @@ SourceFolder=${BasePath}/src
 doPrintConfiguration
 exit 0
 
-cmake -B ${BuildFolder} -S ${SourceFolder} -DCMAKE_BUILD_TYPE=${BuildType} $CoverageOption
+cmake -B ${BuildFolder} -S ${SourceFolder} -DCMAKE_BUILD_TYPE=${BuildType} ${CoverageOption}
 cmake --build ${BuildFolder} --parallel $NumProcesses
 
