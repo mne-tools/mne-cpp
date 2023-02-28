@@ -42,10 +42,13 @@
 
     call:doPrintConfiguration
 
-    exit /B 
-
-    echo cmake -B %BuildFolder% -S %BasePath%\src -DCMAKE_BUILD_TYPE=%BuildType%
+    echo cmake -B %BuildFolder% -S %BasePath%\src -DCMAKE_BUILD_TYPE=%BuildType%-DCMAKE_CXX_FLAGS="/MP"
     echo cmake --build %BuildFolder% --config %BuildType%
+
+    cmake -B %BuildFolder% -S %BasePath%\src -DCMAKE_BUILD_TYPE=%BuildType%-DCMAKE_CXX_FLAGS="/MP"
+    cmake --build %BuildFolder% --config %BuildType%
+
+    exit /B 
 
     :doPrintConfiguration
       echo.
