@@ -152,8 +152,8 @@ BuildFolder=${BasePath}/build/${BuildType}
 SourceFolder=${BasePath}/src
 
 doPrintConfiguration
-exit 0
 
 cmake -B ${BuildFolder} -S ${SourceFolder} -DCMAKE_BUILD_TYPE=${BuildType} ${CoverageOption}
 cmake --build ${BuildFolder} --parallel $NumProcesses
 
+exit 0
