@@ -101,7 +101,6 @@ private:
     QTimer blink_timer;
     bool blink_state;
 
-
     static QColor default_color;
     static QString default_label;
 

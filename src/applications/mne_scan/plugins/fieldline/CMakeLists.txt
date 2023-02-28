@@ -10,15 +10,15 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED
   COMPONENTS Core Widgets Network Concurrent)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED
   COMPONENTS Core Widgets Network Concurrent)
-find_package(Python REQUIRED COMPONENTS Interpreter Development)
-cmake_path(GET Python_EXECUTABLE PARENT_PATH Python_BIN_DIR)
-
-set(PYTHON_COMPILE_FLAGS "--cflags")
-execute_process(COMMAND
-  ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config ${PYTHON_COMPILE_FLAGS}
-  OUTPUT_VARIABLE Python_FLAGS
-)
-
+# find_package(Python REQUIRED COMPONENTS Interpreter Development)
+# cmake_path(GET Python_EXECUTABLE PARENT_PATH Python_BIN_DIR)
+#
+# set(PYTHON_COMPILE_FLAGS "--cflags")
+# execute_process(COMMAND
+#   ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config ${PYTHON_COMPILE_FLAGS}
+#   OUTPUT_VARIABLE Python_FLAGS
+# )
+#
 set(SOURCES
     fieldline_global.cpp
     fieldline.cpp
@@ -90,11 +90,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     scShared
     scMeas
     ${FFTW_LIBS}
-    python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR})
+    # python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR})
+  )
 
-target_link_directories(${PROJECT_NAME} PRIVATE ${Python_LIBRARY_DIRS})
-separate_arguments(Python_FLAGS_NORM UNIX_COMMAND "${Python_FLAGS}")
-target_compile_options(${PROJECT_NAME} PRIVATE ${Python_FLAGS_NORM})
+# target_link_directories(${PROJECT_NAME} PRIVATE ${Python_LIBRARY_DIRS})
+# separate_arguments(Python_FLAGS_NORM UNIX_COMMAND "${Python_FLAGS}")
+# target_compile_options(${PROJECT_NAME} PRIVATE ${Python_FLAGS_NORM})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
   SCAN_FIELDLINE_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"

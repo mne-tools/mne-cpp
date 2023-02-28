@@ -130,6 +130,13 @@ public:
 
     void setBlinkState(size_t sensor_num, bool blinking);
     void setBlinkState(bool blinking);
+
+signals:
+    void clicked(int sensor, const QPoint& pos);
+
+private slots:
+    void rightClickMenu(int sensor, const QPoint& pos);
+
 private:
     Ui::fl_chassis* ui;
     std::vector<DISPLIB::LEDIndicator*> sensors;

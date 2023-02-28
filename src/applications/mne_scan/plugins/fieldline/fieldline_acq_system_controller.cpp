@@ -41,7 +41,7 @@
 
 
 #define PY_SSIZE_T_CLEAN
-#include "Python.h"
+// #include "Python.h"
 
 #include "fieldline_acq_system_controller.h"
 
