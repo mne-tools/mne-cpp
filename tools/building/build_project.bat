@@ -7,8 +7,59 @@
     SET ScriptPath=%~dp0
     SET BasePath=%ScriptPath%..\..
 
-    cmake -B %BasePath%\build -S %BasePath%\src -DCMAKE_BUILD_TYPE=Release
-    cmake --build %BasePath%\build --config Release
+    SET VerboseMode=False
+    SET BuildType="Release"
+    SET WithCodeCoverage="false"
+    SET BuildFolder=""
+    SET SourceFolder=""
+    SET NumProcesses="1"
+    
+    SHIFT & SHIFT
+    :loop
+    IF NOT "%1"=="" (
+      IF "%1"=="help" (
+        goto :showHelp
+      )
+      IF "%1"=="Release" (
+        set BuildType="Release"
+        SHIFT
+      )
+      IF "%1"=="Debug" (
+        set BuildType="Debug"
+        SHIFT
+      )
+      IF "%1"=="coverage" (
+        set WithCodeCoverage=True
+        SHIFT
+      )
+
+      SHIFT
+      GOTO :loop
+    )
+
+    set BuildFolder=%BasePath%\build\%BuildType%
+    set SrcFolder=%BasePath%\src
+
+    call:doPrintConfiguration
+
+    exit /B 
+
+    echo cmake -B %BuildFolder% -S %BasePath%\src -DCMAKE_BUILD_TYPE=%BuildType%
+    echo cmake --build %BuildFolder% --config %BuildType%
+
+    :doPrintConfiguration
+      echo.
+      echo =========================================
+      echo verbose = %VerboseMode%
+      echo BuildType =%BuildType%
+      echo Coverage =%WithCodeCoverage%
+      echo BuildFolder  =%BuildFolder%
+      echo SourceFolder =%SourceFolder%
+      echo NumProcesses = %NumProcesses%
+      echo .
+      echo =========================================
+      echo .
+    exit /B 0
 
     :; # ########## WINDOWS SECTION ENDS ####################
     :; # ####################################################
