@@ -19,9 +19,9 @@
 *.qm
 
 # Bin folder with exceptions
-lib/
-bin/
-out/
+/lib/
+/bin/
+/out/
 
 # External device SDKs (if installed)
 /applications/mne_scan/plugins/eegosports/eemagine/
