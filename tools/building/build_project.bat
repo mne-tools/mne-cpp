@@ -7,12 +7,10 @@
     SET ScriptPath=%~dp0
     SET BasePath=%ScriptPath%..\..
 
-    SET VerboseMode=False
-    SET BuildType="Release"
-    SET WithCodeCoverage="false"
-    SET BuildFolder=""
-    SET SourceFolder=""
-    SET NumProcesses="1"
+    SET "VerboseMode=False"
+    SET "BuildType=Release"
+    SET "WithCodeCoverage=False"
+    SET "NumProcesses=1"
     
     SHIFT & SHIFT
     :loop
@@ -21,15 +19,15 @@
         goto :showHelp
       )
       IF "%1"=="Release" (
-        set BuildType="Release"
+        SET "BuildType=Release"
         SHIFT
       )
       IF "%1"=="Debug" (
-        set BuildType="Debug"
+        SET "BuildType=Debug"
         SHIFT
       )
       IF "%1"=="coverage" (
-        set WithCodeCoverage=True
+        SET "WithCodeCoverage=true"
         SHIFT
       )
 
@@ -37,13 +35,13 @@
       GOTO :loop
     )
 
-    set BuildFolder=%BasePath%\build\%BuildType%
-    set SrcFolder=%BasePath%\src
+    SET BuildFolder=%BasePath%\build\%BuildType%
+    SET SrcFolder=%BasePath%\src
 
     call:doPrintConfiguration
 
-    echo cmake -B %BuildFolder% -S %BasePath%\src -DCMAKE_BUILD_TYPE=%BuildType%-DCMAKE_CXX_FLAGS="/MP"
-    echo cmake --build %BuildFolder% --config %BuildType%
+    ECHO Cmake -B %BuildFolder% -S %BasePath%\src -DCMAKE_BUILD_TYPE=%BuildType%-DCMAKE_CXX_FLAGS="/MP"
+    ECHO Cmake --build %BuildFolder% --config %BuildType%
 
     cmake -B %BuildFolder% -S %BasePath%\src -DCMAKE_BUILD_TYPE=%BuildType%-DCMAKE_CXX_FLAGS="/MP"
     cmake --build %BuildFolder% --config %BuildType%
@@ -51,17 +49,17 @@
     exit /B 
 
     :doPrintConfiguration
-      echo.
-      echo =========================================
-      echo verbose = %VerboseMode%
-      echo BuildType =%BuildType%
-      echo Coverage =%WithCodeCoverage%
-      echo BuildFolder  =%BuildFolder%
-      echo SourceFolder =%SourceFolder%
-      echo NumProcesses = %NumProcesses%
-      echo .
-      echo =========================================
-      echo .
+      ECHO.
+      ECHO =========================================
+      ECHO verbose = %VerboseMode%
+      ECHO BuildType =%BuildType%
+      ECHO Coverage =%WithCodeCoverage%
+      ECHO BuildFolder  =%BuildFolder%
+      ECHO SourceFolder =%SourceFolder%
+      ECHO NumProcesses = %NumProcesses%
+      ECHO .
+      ECHO =========================================
+      ECHO .
     exit /B 0
 
     :; # ########## WINDOWS SECTION ENDS ####################
