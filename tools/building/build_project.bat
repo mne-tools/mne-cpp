@@ -1,30 +1,99 @@
 :<<BATCH
     :;@echo off
+    :; # ####################################################
     :; # ########## WINDOWS SECTION #########################
        
 
-    SET SCRIPT_PATH=%~dp0
-    SET BASE_PATH=%SCRIPT_PATH%..\..
+    SET ScriptPath=%~dp0
+    SET BasePath=%ScriptPath%..\..
 
-    cmake -B %BASE_PATH%\build -S %BASE_PATH%\src -DCMAKE_BUILD_TYPE=Release
-    cmake --build %BASE_PATH%\build --config Release
+    cmake -B %BasePath%\build -S %BasePath%\src -DCMAKE_BUILD_TYPE=Release
+    cmake --build %BasePath%\build --config Release
 
     :; # ########## WINDOWS SECTION ENDS ####################
     :; # ####################################################
     exit /b
 BATCH
+# ######################################################
+# ############## LINUX MAC SECTION STARTS ##############
+#!/bin/bash
 
-SCRIPT_PATH="$(
-        cd "$(dirname "$0")" >/dev/null 2>&1
-        pwd -P
-    )"
-BASE_PATH=${SCRIPT_PATH}/../..
+#####  default parameters
 
-cmake -B ${BASE_PATH}/build -S ${BASE_PATH}/src -DCMAKE_BUILD_TYPE=Release
+argc=$#
+argv=("$@")
+
+VerboseMode="false"
+BuildType="Release"
+WithCodeCoverage="false"
+BuildFolder=""
+SourceFolder=""
+NumProcesses="1"
+
+ScriptPath="$(readlink -f $(dirname "$0"))"
+BasePath="$(readlink -f $ScriptPath/../..)"
 
 if [ "$(uname)" == "Darwin" ]; then
-    cmake --build ${BASE_PATH}/build --parallel $(sysctl -n hw.physicalcpu)
+    NumProcesses=$(sysctl -n hw.physicalcpu)
 else 
-    cmake --build ${BASE_PATH}/build --parallel $(expr $(nproc --all) / 2)
+    NumProcesses=$(expr $(nproc --all) / 2)
 fi
+
+doPrintConfiguration() {
+  echo " "
+  echo ========================================================================
+  echo ======================== MNE-CPP BUILD CONFIG ==========================
+  echo " "
+  echo " ScriptPath   = $ScriptPath"
+  echo " BasePath     = $BasePath"
+  echo " BuildFolder  = $BuildFolder"
+  echo " SourceFolder = $SourceFolder"
+  echo " "
+  echo " VerboseMode = $VerboseMode"
+  echo " Buildtype = $BuildType"
+  echo " WithCodeCoverage = $WithCodeCoverage"
+  echo " NumProcesses = $NumProcesses"
+  echo " "
+  echo ========================================================================
+  echo ========================================================================
+  echo " "
+}
+
+doPrintHelp() {
+  echo " "
+  echo "MNE-CPP building script help."
+  echo ""
+  echo "Usage: ./build_project.bat [verbose] [(Release)/Debug] [coverage]"
+  echo ""
+}
+
+for (( j=0; j<argc; j++)); do
+  if [ "${argv[j]}" == "verbose" ]; then
+    VerboseMode="true"
+  elif [ "${argv[j]}" == "coverage" ]; then
+    WithCodeCoverage="true"
+  elif [ "${argv[j]}" == "Debug" ]; then
+    BuildType="Debug"
+  elif [ "${argv[j]}" == "Release" ]; then
+    BuildType="Release"
+  elif [ "${argv[j]}" == "help" ]; then
+    doPrintHelp
+    exit 1
+  fi
+done
+
+if [ "$WithCodeCoverage" == "false"  ]; then
+  CoverageOption=""
+elif [ "$WithCodeCoverage" == "true"  ]; then
+  CoverageOption="-DWITH_CODE_COV=ON"
+fi
+
+BuildFolder=${BasePath}/build/${BuildType}
+SourceFolder=${BasePath}/src
+
+doPrintConfiguration
+# exit 1
+
+echo cmake -B ${BuildFolder} -S ${SourceFolder} -DCMAKE_BUILD_TYPE=${BuildType} $CoverageOption
+echo cmake --build ${BuildFolder} --parallel $NumProcesses
 
