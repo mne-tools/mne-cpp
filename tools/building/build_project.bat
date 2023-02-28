@@ -74,6 +74,15 @@ BATCH
 argc=$#
 argv=("$@")
 
+function cleanAbsPath()
+{
+    local  cleanAbsPathStr="$(
+        cd "$1" >/dev/null 2>&1 
+        pwd -P
+    )"
+    echo "$cleanAbsPathStr"
+}
+
 VerboseMode="false"
 BuildType="Release"
 WithCodeCoverage="false"
@@ -81,8 +90,8 @@ BuildFolder=""
 SourceFolder=""
 NumProcesses="1"
 
-ScriptPath="$(readlink -f $(dirname "$0"))"
-BasePath="$(readlink -f $ScriptPath/../..)"
+ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
+BasePath="$(cleanAbsPath "$ScriptPath/../..")"
 
 if [ "$(uname)" == "Darwin" ]; then
     NumProcesses=$(sysctl -n hw.physicalcpu)
@@ -143,7 +152,7 @@ BuildFolder=${BasePath}/build/${BuildType}
 SourceFolder=${BasePath}/src
 
 doPrintConfiguration
-# exit 1
+exit 0
 
 cmake -B ${BuildFolder} -S ${SourceFolder} -DCMAKE_BUILD_TYPE=${BuildType} $CoverageOption
 cmake --build ${BuildFolder} --parallel $NumProcesses
