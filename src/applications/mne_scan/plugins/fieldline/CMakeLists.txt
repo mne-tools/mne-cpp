@@ -78,7 +78,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     eigen
     mne_disp
     mne_utils
-    # mne_fiff
+    mne_fiff
     # mne_fs
     # mne_mne
     # mne_fwd

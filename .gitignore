@@ -73,7 +73,7 @@ compile_commands.json
 # Generated docu Docker files
 /_site
 
-build-*/*
+build*/*
 
 .cache/*
 
