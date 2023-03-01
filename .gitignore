@@ -63,6 +63,7 @@ Makefile
 .project
 .settings
 .vscode
+.session
 mne-cpp.pro.user*
 
 # FFTW
