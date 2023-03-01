@@ -12,3 +12,18 @@ SignalGenSetupWidget::~SignalGenSetupWidget()
 {
     delete ui;
 }
+
+void SignalGenSetupWidget::setConfig(const Config& config)
+{
+
+}
+
+void SignalGenSetupWidget::numChannelsChanged(int numChannels)
+{
+
+}
+
+void SignalGenSetupWidget::sampleFreqChanged(int sampleFreq)
+{
+
+}

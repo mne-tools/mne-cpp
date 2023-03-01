@@ -11,11 +11,13 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Network Conc
 
 set(SOURCES
     signalgen_global.cpp
+    signalgensetupwidget.cpp
     signalgen.cpp
 )
 
 set(HEADERS
     signalgen_global.h
+    signalgensetupwidget.h
     signalgen.h
 )
 
