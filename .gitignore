@@ -20,6 +20,8 @@
 
 # Bin folder with exceptions
 /lib/
+/bin/
+/out*/
 
 # External device SDKs (if installed)
 /applications/mne_scan/plugins/eegosports/eemagine/
@@ -71,9 +73,8 @@ compile_commands.json
 # Generated docu Docker files
 /_site
 
-/build*
-/out*
-/resources/data*
+build-*/*
+
 .cache/*
 
 codecov

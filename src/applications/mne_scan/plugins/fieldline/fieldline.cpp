@@ -48,8 +48,7 @@
 // #include "fieldlineproducer.h"
 // #include "FormFiles/fieldlinesetup.h"
 
-// #include <fiff/fiff.h>
-// #include <scMeas/realtimemultisamplearray.h>
+#include <scMeas/realtimemultisamplearray.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -102,8 +101,15 @@ QSharedPointer<SCSHAREDLIB::AbstractPlugin> Fieldline::clone() const {
 
 void Fieldline::init() {
 
-  // m_outputConnectors.append(m_pRMTSA_Natus);
-  qDebug() << "Init Fieldline";
+  // we instantiante  
+  m_pRTMSA_Fieldline = SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::create(
+      this,
+      "Fieldline Plugin",
+      "FieldlinePlguin output");
+  
+  m_outputConnectors.append(m_pRTMSA_Fieldline);
+
+  qDebug() << " ^^^^^^^^^^^^^^^^^^^^ Init Fieldline  (....again)";
   acqSystem = std::make_unique<FieldlineAcqSystemController>();
 }
 
@@ -133,7 +139,7 @@ bool Fieldline::start() {
   // m_pRMTSA_Natus->measurementData()->initFromFiffInfo(m_pFiffInfo);
   // m_pRMTSA_Natus->measurementData()->setMultiArraySize(1);
   //
-  // QThread::start();
+  QThread::start();
   //
   // // Start the producer
   // m_pNatusProducer =
@@ -149,12 +155,12 @@ bool Fieldline::start() {
 //=============================================================================================================
 
 bool Fieldline::stop() {
-
-  // requestInterruption();
-  // wait(500);
+  requestInterruption();
+  wait(500);
+  // m_pRMTSA_Natus->measurementData()->clear();
+  //
   //
   // // Clear all data in the buffer connected to displays and other plugins
-  // m_pRMTSA_Natus->measurementData()->clear();
   // m_pCircularBuffer->clear();
   //
   // m_pProducerThread.quit();
@@ -174,7 +180,7 @@ SCSHAREDLIB::AbstractPlugin::PluginType Fieldline::getType() const {
 //=============================================================================================================
 
 QString Fieldline::getName() const {
-  qDebug() << "getName Fieldline";
+  // qDebug() << "getName Fieldline";
   return QString("Fieldline OPM");
 }
 
@@ -221,16 +227,52 @@ QWidget *Fieldline::setupWidget() {
 
 void Fieldline::run() {
   qDebug() << "run Fieldline";
-  // MatrixXd matData;
-  //
-  // while(!isInterruptionRequested()) {
-  //     if(m_pCircularBuffer->pop(matData)) {
+
+  m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo());
+
+  m_pFiffInfo->sfreq = 1000.0f;
+  m_pFiffInfo->nchan = 32;
+  m_pFiffInfo->chs.clear();
+
+  for (int chan_i = 0; chan_i < m_pFiffInfo->nchan; ++chan_i) {
+    FIFFLIB::FiffChInfo channel;
+    channel.ch_name = "Ch. " + QString::number(chan_i);
+    channel.kind = FIFFV_MEG_CH;
+    channel.unit = FIFF_UNIT_T;
+    channel.unit_mul = FIFF_UNITM_NONE;
+    channel.chpos.coil_type = FIFFV_COIL_NONE;
+    m_pFiffInfo->chs.append(channel);
+    m_pFiffInfo->ch_names.append(channel.ch_name);
+  }
+
+  m_pRTMSA_Fieldline->measurementData()->initFromFiffInfo(m_pFiffInfo);  //     if(m_pCircularBuffer->pop(matData)) {
+  m_pRTMSA_Fieldline->measurementData()->setMultiArraySize(1);
+  m_pRTMSA_Fieldline->measurementData()->setVisibility(true);
+
+  Eigen::MatrixXd matData;
+  matData.resize(m_pFiffInfo->nchan, 200);
+  // matData.setZero();
+
+  for(;;) {
+    //gather the data
+
+    matData = Eigen::MatrixXd::Random(m_pFiffInfo->nchan, 200);
+    matData *= 4e-12;
+
+    msleep(200);
+
+    if (isInterruptionRequested()) 
+      break;
+    m_pRTMSA_Fieldline->measurementData()->setValue(matData);
+  }
+  
   //         //emit values
   //         if(!isInterruptionRequested()) {
   //             m_pRMTSA_Natus->measurementData()->setValue(matData);
   //         }
   //     }
   // }
+  qDebug() << "run Fieldline finished";
 }
 
 //=============================================================================================================

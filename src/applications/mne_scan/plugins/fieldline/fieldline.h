@@ -40,6 +40,9 @@
 #include "fieldline/fieldline_acq_system_controller.h"
 #include "fieldline/fieldline_plugin_gui.h"
 
+#include <fiff/fiff.h>
+#include <fiff/fiff_info.h>
+
 #include <scShared/Plugins/abstractsensor.h>
 // #include <utils/generics/circularbuffer.h>
 #include <memory>
@@ -49,6 +52,7 @@
 //=============================================================================================================
 
 #include <QObject>
+#include <QSharedPointer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -60,13 +64,13 @@
 // FORWARD DECLARATION
 //=============================================================================================================
 
-// namespace SCMEASLIB {
-// class RealTimeMultiSampleArray;
-// }
-// u
-// namespace FIFFLIB {
-// class FiffInfo;
-// }
+namespace SCMEASLIB {
+class RealTimeMultiSampleArray;
+}
+
+namespace FIFFLIB {
+class FiffInfo;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIELDLINEPLUGIN
@@ -181,9 +185,8 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
   // // QSharedPointer<FIELDLINEPLUGIN::FieldlineProducer>      m_pFieldlineProducer;  /**< The producer object.*/
   // QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>  m_pCircularBuffer;     /**< Holds incoming raw data. */
   //
-  // QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRMTSA_Fieldline;     /**< The RealTimeSampleArray to provide the EEG data.*/
-  // QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff measurement info.*/
-};
+  QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRTMSA_Fieldline;     /**< The RealTimeSampleArray to provide the EEG data.*/
+  QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff measurement info.*/ };
 
 }  // namespace FIELDLINEPLUGIN
 
