@@ -49,8 +49,10 @@
     exit /B 
 
     :doPrintConfiguration
-      ECHO.
-      ECHO =========================================
+      ECHO .
+      ECHO ====================================================================
+      ECHO ===================== MNE-CPP BUILD CONFIG =========================
+      ECHO .
       ECHO verbose = %VerboseMode%
       ECHO BuildType =%BuildType%
       ECHO Coverage =%WithCodeCoverage%
@@ -58,7 +60,8 @@
       ECHO SourceFolder =%SourceFolder%
       ECHO NumProcesses = %NumProcesses%
       ECHO .
-      ECHO =========================================
+      ECHO ====================================================================
+      ECHO ====================================================================
       ECHO .
     exit /B 0
 
