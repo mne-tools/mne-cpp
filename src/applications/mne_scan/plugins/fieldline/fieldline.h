@@ -110,7 +110,7 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
     /**
      * Destroys the Fieldline.
      */
-    virtual ~Fieldline();
+    ~Fieldline();
 
     //=========================================================================================================
     /**

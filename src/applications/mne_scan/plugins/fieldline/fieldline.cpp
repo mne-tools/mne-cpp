@@ -86,7 +86,6 @@ Fieldline::~Fieldline() {
   // if(this->isRunning()) {
   //     this->stop();
   // }
-  qDebug() << "Destroying Fieldline object";
 }
 
 //=============================================================================================================
