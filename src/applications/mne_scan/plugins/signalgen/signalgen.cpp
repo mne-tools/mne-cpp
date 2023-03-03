@@ -38,6 +38,7 @@
 //=============================================================================================================
 
 #include "signalgen.h"
+#include "FormFiles/signalgensetupwidget.h"
 #include <utils/ioutils.h>
 #include <fiff/fiff_info.h>
 #include <fiff/c/fiff_digitizer_data.h>
@@ -164,11 +165,14 @@ QString SignalGen::getName() const
 
 QWidget* SignalGen::setupWidget()
 {
-    //widget is later distroyed by CentralWidget - so it has to be created everytime new
+    auto* widget = new SignalGenSetupWidget();
 
-    return new QLabel("Hello");
-//    QWidget * pWidget(new SignalGenSetupWidget(this));
-//    return pWidget;
+    connect(widget, &SignalGenSetupWidget::numChannelsChanged, [this](int nchans){this->numChannels = nchans;});
+    connect(widget, &SignalGenSetupWidget::sampleFreqChanged, [this](int freq){this->sample_freq = freq;});
+
+    widget->setConfig({1, 999, numChannels, 100, 10000, static_cast<int>(sample_freq)});
+
+    return widget;
 }
 
 //=============================================================================================================
@@ -215,7 +219,7 @@ void SignalGen::initOutput()
     for (int i = 0; i< m_pFiffInfo->nchan; i++){
         FIFFLIB::FiffChInfo channel;
 
-        channel.ch_name = "Ch. " + QString::number(i);
+        channel.ch_name = "Ch. " + QString::number(i + 1);
         channel.kind = FIFFV_MEG_CH;
         channel.unit = FIFF_UNIT_T;
         channel.unit_mul = FIFF_UNITM_NONE;
@@ -223,7 +227,7 @@ void SignalGen::initOutput()
 
         m_pFiffInfo->chs.append(channel);
 
-        m_pFiffInfo->ch_names.append("Ch. " + QString::number(i));
+        m_pFiffInfo->ch_names.append(m_pFiffInfo->chs[i].ch_name);
     }
 
     m_pRTMSA_SignalGen->measurementData()->initFromFiffInfo(m_pFiffInfo);
