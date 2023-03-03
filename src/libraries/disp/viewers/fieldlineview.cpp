@@ -235,7 +235,12 @@ fl_chassis::fl_chassis(int num_sensors, QWidget *parent )
         auto& last_item = sensors.back();
         sensors.back()->setLabel(QString::number(i + 1));
         ui->sensor_frame->layout()->addWidget(sensors.back());
-        connect(sensors.back(), &QWidget::customContextMenuRequested, [this, i, &last_item](const QPoint& pos){this->emit clicked(i, last_item->mapToGlobal(pos)); qDebug() << "clicked " << i+1;});
+        connect(sensors.back(), &QWidget::customContextMenuRequested,
+                [this, i, &last_item](const QPoint& pos) {
+            qDebug() << "clicked " << i+1;
+            qDebug() << "global pos: " << last_item->mapToGlobal(pos);
+            this->emit clicked(i, last_item->mapToGlobal(pos));
+        });
         connect(this, &fl_chassis::clicked, this, &fl_chassis::rightClickMenu, Qt::UniqueConnection);
     }
 }
@@ -307,19 +312,19 @@ void fl_chassis::setBlinkState(bool blinking)
 
 void fl_chassis::rightClickMenu(int sensor, const QPoint& pos)
 {
-//    auto* menu = new QMenu();
+    auto* menu = new QMenu();
 
-//    auto blink_on_sensor = menu->addAction("Blink ON - " + QString::number(sensor));
-//    auto blink_on_chassis = menu->addAction("Blink ON - Whole Chassis");
+    auto blink_on_sensor = menu->addAction("Blink ON - " + QString::number(sensor));
+    auto blink_on_chassis = menu->addAction("Blink ON - Whole Chassis");
 
-//    auto blink_off_sensor = menu->addAction("Blink OFF -  " + QString::number(sensor));
-//    auto blink_off_chassis = menu->addAction("Blink OFF - Whole Chassis");
+    auto blink_off_sensor = menu->addAction("Blink OFF -  " + QString::number(sensor));
+    auto blink_off_chassis = menu->addAction("Blink OFF - Whole Chassis");
 
-//    connect(blink_on_sensor, &QAction::triggered,[this, sensor](){this->setBlinkState(sensor, true);});
-//    connect(blink_off_sensor, &QAction::triggered,[this, sensor](){this->setBlinkState(sensor, false);});
+    connect(blink_on_sensor, &QAction::triggered,[this, sensor](){this->setBlinkState(sensor, true);});
+    connect(blink_off_sensor, &QAction::triggered,[this, sensor](){this->setBlinkState(sensor, false);});
 
-//    connect(blink_on_chassis, &QAction::triggered,[this, sensor](){this->setBlinkState(true);});
-//    connect(blink_off_chassis, &QAction::triggered,[this, sensor](){this->setBlinkState(false);});
+    connect(blink_on_chassis, &QAction::triggered,[this, sensor](){this->setBlinkState(true);});
+    connect(blink_off_chassis, &QAction::triggered,[this, sensor](){this->setBlinkState(false);});
 
-//    menu->exec(pos);
+    menu->exec(pos);
 }
