@@ -36,21 +36,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "timefrequency.h"
+#include "timefrequency/timefrequency.h"
 
-// #include <disp/viewers/scalingview.h>
-// #include <disp/viewers/projectorsview.h>
-// #include <disp/viewers/filtersettingsview.h>
-// #include <disp/viewers/filterdesignview.h>
-// #include <disp/viewers/compensatorview.h>
-// #include <disp/viewers/spharasettingsview.h>
-//
-// #include <rtprocessing/filter.h>
-// #include <rtprocessing/sphara.h>
-//
 #include <utils/ioutils.h>
 
 #include <scMeas/realtimemultisamplearray.h>
+#include <scShared/plugins/abstractplugin.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -66,22 +57,14 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-// using namespace SCMEASLIB;
-// using namespace UTILSLIB;
-// using namespace DISPLIB;
-// using namespace RTPROCESSINGLIB;
-// using namespace FIFFLIB;
-// using namespace SCSHAREDLIB;
-// using namespace Eigen;
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
+
 namespace TIMEFREQUENCYPLUGIN {
 
-
 TimeFrequency::TimeFrequency()
-: m_pTimeFrequencyIntput(Q_NULLPTR)
+: m_pTimeFrequencyInput(Q_NULLPTR)
 // : m_bCompActivated(false)
 // , m_bSpharaActive(false)
 // , m_bProjActivated(false)
@@ -120,16 +103,13 @@ void TimeFrequency::init()
         create(this, "TimeFrequencyIn", "TimeFrequency input data");
     m_inputConnectors.append(m_pTimeFrequencyInput);
     m_pTimeFrequencyInput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
-
-    // Output
-    // m_pTimeFrequencyOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "TimeFrequencyOut", "TimeFrequency output data");
-    // m_outputConnectors.append(m_pTimeFrequencyOutput);
 }
 
 //=============================================================================================================
 
 void TimeFrequency::unload()
 {
+
 }
 
 //=============================================================================================================
@@ -148,8 +128,6 @@ bool TimeFrequency::stop()
     requestInterruption();
    
     wait(500);
-
-    // m_pTimeFrequencyOutput->measurementData()->clear();
 
     return true;
 }
@@ -172,154 +150,10 @@ QString TimeFrequency::getName() const
 
 QWidget* TimeFrequency::setupWidget()
 {
-    // TimeFrequencySetupWidget* setupWidget = new TimeFrequencySetupWidget(this);  
-    // // widget is later distroyed by CentralWidget - so it has to be created everytime new
-    QLabel* setupWidget("Time Frequency Baby");
+    QString* setupWidget("Time Frequency Baby");
     return setupWidget;
 }
 
-//=============================================================================================================
-
-// void TimeFrequency::update(SCMEASLIB::Measurement::SPtr pMeasurement)
-// {
-//     if(QSharedPointer<RealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<RealTimeMultiSampleArray>()) {
-//         //Check if the fiff info was inititalized
-//         if(!m_pFiffInfo) {
-//             m_pFiffInfo = pRTMSA->info();
-//
-//             //Init the multiplication matrices
-//             m_matSparseProjMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-//             m_matSparseCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-//             m_matSparseSpharaMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-//             m_matSparseProjCompMult = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-//             m_matSparseFull = SparseMatrix<double>(m_pFiffInfo->chs.size(),m_pFiffInfo->chs.size());
-//
-//             m_matSparseProjMult.setIdentity();
-//             m_matSparseCompMult.setIdentity();
-//             m_matSparseSpharaMult.setIdentity();
-//             m_matSparseProjCompMult.setIdentity();
-//             m_matSparseFull.setIdentity();
-//
-//             //Init output
-//             m_pTimeFrequencyOutput->measurementData()->initFromFiffInfo(m_pFiffInfo);
-//             m_pTimeFrequencyOutput->measurementData()->setMultiArraySize(1);
-//         }
-//
-//         // Check if data is present
-//         if(pRTMSA->getMultiSampleArray().size() > 0) {
-//             //Init widgets
-//             if(m_iMaxFilterTapSize == -1) {
-//                 m_iMaxFilterTapSize = pRTMSA->getMultiSampleArray().first().cols();
-//                 initPluginControlWidgets();
-//                 QThread::start();
-//             }
-//
-//             for(unsigned char i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
-//                 // Please note that we do not need a copy here since this function will block until
-//                 // the buffer accepts new data again. Hence, the data is not deleted in the actual
-//                 // Measurement function after it emitted the notify signal.
-//                 while(!m_pCircularBuffer->push(pRTMSA->getMultiSampleArray()[i])) {
-//                     //Do nothing until the circular buffer is ready to accept new data again
-//                 }
-//             }
-//         }
-//     }
-// }
-//
-// //=============================================================================================================
-//
-// void TimeFrequency::initPluginControlWidgets()
-// {
-//     if(m_pFiffInfo) {
-//         QList<QWidget*> plControlWidgets;
-//
-//         // Projectors
-//         ProjectorsView* pProjectorsView = new ProjectorsView(QString("MNESCAN/%1/").arg(this->getName()));
-//         connect(this, &TimeFrequency::guiModeChanged,
-//                 pProjectorsView, &ProjectorsView::setGuiMode);
-//         pProjectorsView->setObjectName("group_tab_Settings_SSP");
-//         plControlWidgets.append(pProjectorsView);
-//
-//         connect(pProjectorsView, &ProjectorsView::projSelectionChanged,
-//                 this, &TimeFrequency::updateProjection);
-//
-//         pProjectorsView->setProjectors(m_pFiffInfo->projs);
-//
-//         // Compensators
-//         CompensatorView* pCompensatorView = new CompensatorView(QString("MNESCAN/%1/").arg(this->getName()));
-//         connect(this, &TimeFrequency::guiModeChanged,
-//                 pCompensatorView, &CompensatorView::setGuiMode);
-//         pCompensatorView->setObjectName("group_tab_Settings_Comp");
-//         plControlWidgets.append(pCompensatorView);
-//
-//         connect(pCompensatorView, &CompensatorView::compSelectionChanged,
-//                 this, &TimeFrequency::updateCompensator);
-//
-//         pCompensatorView->setCompensators(m_pFiffInfo->comps);
-//
-//         // Filter
-//         FilterSettingsView* pFilterSettingsView = new FilterSettingsView(QString("MNESCAN/%1/").arg(this->getName()));
-//         connect(this, &TimeFrequency::guiModeChanged,
-//                 pFilterSettingsView, &FilterSettingsView::setGuiMode);
-//         pFilterSettingsView->setObjectName("group_tab_Settings_Filter");
-//         plControlWidgets.append(pFilterSettingsView);
-//
-//         connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChannelTypeChanged,
-//                 this, &TimeFrequency::setFilterChannelType);
-//
-//         connect(pFilterSettingsView->getFilterView().data(), &FilterDesignView::filterChanged,
-//                 this, &TimeFrequency::setFilter);
-//
-//         connect(pFilterSettingsView, &FilterSettingsView::filterActivationChanged,
-//                 this, &TimeFrequency::setFilterActive);
-//
-//         pFilterSettingsView->setSamplingRate(m_pFiffInfo->sfreq);
-//         pFilterSettingsView->getFilterView()->setMaxAllowedFilterTaps(m_iMaxFilterTapSize);
-//
-//         this->setFilterActive(pFilterSettingsView->getFilterActive());
-//         this->setFilterChannelType(pFilterSettingsView->getFilterView()->getChannelType());
-//
-//         // SPHARA settings
-//         SpharaSettingsView* pSpharaSettingsView = new SpharaSettingsView(QString("MNESCAN/%1").arg(this->getName()));
-//         connect(this, &TimeFrequency::guiModeChanged,
-//                 pSpharaSettingsView, &SpharaSettingsView::setGuiMode);
-//         pSpharaSettingsView->setObjectName("group_tab_Settings_SPHARA");
-//         plControlWidgets.append(pSpharaSettingsView);
-//
-//         connect(pSpharaSettingsView, &SpharaSettingsView::spharaActivationChanged,
-//                 this, &TimeFrequency::setSpharaActive);
-//
-//         connect(pSpharaSettingsView, &SpharaSettingsView::spharaOptionsChanged,
-//                 this, &TimeFrequency::setSpharaOptions);
-//
-//         emit pluginControlWidgetsChanged(plControlWidgets, this->getName());
-//     }
-// }
-//
-// //=============================================================================================================
-//
-// void TimeFrequency::setSpharaActive(bool state)
-// {
-//     m_mutex.lock();
-//     m_bSpharaActive = state;
-//     m_mutex.unlock();
-// }
-//
-// //=============================================================================================================
-//
-// void TimeFrequency::setSpharaOptions(const QString& sSytemType,
-//                                       int nBaseFctsFirst,
-//                                       int nBaseFctsSecond)
-// {
-//     m_mutex.lock();
-//     m_iNBaseFctsFirst = nBaseFctsFirst;
-//     m_iNBaseFctsSecond = nBaseFctsSecond;
-//     m_sCurrentSystem = sSytemType;
-//     m_mutex.unlock();
-//
-//     createSpharaOperator();
-// }
-//
 //=============================================================================================================
 
 void TimeFrequency::run()
@@ -329,7 +163,7 @@ void TimeFrequency::run()
     // createSpharaOperator();
 
     // Init
-    MatrixXd matData;
+    Eigen::MatrixXd matData;
     // matData.
     // QScopedPointer<RTPROCESSINGLIB::FilterOverlapAdd> pRtFilter(new RTPROCESSINGLIB::FilterOverlapAdd());
 

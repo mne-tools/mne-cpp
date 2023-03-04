@@ -47,6 +47,7 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QWidget>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -118,7 +119,6 @@ class TIMEFREQUENCYSHARED_EXPORT TimeFrequency : public SCSHAREDLIB::AbstractAlg
     virtual QString getName() const;
     virtual QWidget* setupWidget();
     virtual QString getBuildInfo();
-
  protected:
     virtual void run();
     //=========================================================================================================
@@ -130,10 +130,8 @@ class TIMEFREQUENCYSHARED_EXPORT TimeFrequency : public SCSHAREDLIB::AbstractAlg
      */
 
  private:
-    QSharedPointer<FIFFLIB::FiffInfo>
-       m_pFiffInfo;  /**< Fiff measurement info.*/
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr
-    m_pTimeFrequencyInput;  /**< The RealTimeMultiSampleArray of the TimeFrequency input.*/
+    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff measurement info.*/
+    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pTimeFrequencyInput;  /**< The RealTimeMultiSampleArray of the TimeFrequency input.*/
 };
 
 }  // namespace TIMEFREQUENCYPLUGIN

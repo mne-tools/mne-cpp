@@ -10,13 +10,13 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Svg)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Svg)
 
 set(SOURCES
-    timefrequency.cpp 
+    timefrequency.cpp
     timefrequency_global.cpp
 )
 
 set(HEADERS
-    timefrequency_global.h 
-    timefrequency.h 
+    timefrequency_global.h
+    timefrequency.h
 )
 
 set(FILE_TO_UPDATE timefrequency_global.cpp)
@@ -57,7 +57,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     # mne_mne
     # mne_fwd
     # mne_inverse
-    mne_rtprocessing
+    # mne_rtprocessing
     # mne_connectivity
     # mne_events
     scDisp
