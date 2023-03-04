@@ -98,9 +98,9 @@ ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
 BasePath="$(cleanAbsPath "$ScriptPath/../..")"
 
 if [ "$(uname)" == "Darwin" ]; then
-    NumProcesses=$(sysctl -n hw.physicalcpu)
+    NumProcesses=$(sysctl -n hw.logicalcpu)
 else 
-    NumProcesses=$(expr $(nproc --all) / 2)
+    NumProcesses=$(expr $(nproc --all))
 fi
 
 doPrintConfiguration() {
