@@ -6,8 +6,10 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Svg)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Svg)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS 
+  Core Widgets Network Concurrent)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED 
+  COMPONENTS Core Widgets Network Concurrent)
 
 set(SOURCES
     timefrequency.cpp
@@ -25,7 +27,7 @@ set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 set(FFTW_LIBS "")
 
@@ -48,7 +50,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC ../)
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Svg
+    Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::Concurrent
     eigen
     mne_disp
     mne_utils

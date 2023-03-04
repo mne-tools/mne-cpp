@@ -46,6 +46,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QObject>
 #include <QSharedPointer>
 #include <QWidget>
 
@@ -58,24 +59,19 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB{
-class FiffInfo;
+namespace SCMEASLIB {
+class RealTimeMultiSampleArray;
 }
 
-// namespace RTPROCESSINGLIB{
-// class Filter;
-// }
-
-namespace SCMEASLIB{
-class RealTimeMultiSampleArray;
+namespace FIFFLIB {
+class FiffInfo;
 }
 
 //=============================================================================================================
 // DEFINE NAMESPACE TIMEFREQUENCYPLUGIN
 //=============================================================================================================
 
-namespace TIMEFREQUENCYPLUGIN
-{
+namespace TIMEFREQUENCYPLUGIN {
 
 //=============================================================================================================
 // TIMEFREQUENCYPLUGIN FORWARD DECLARATIONS
@@ -84,9 +80,7 @@ namespace TIMEFREQUENCYPLUGIN
 //=============================================================================================================
 /**
  * DECLARE CLASS TimeFrequency
- *
- * @brief The TimeFrequency class provides a tools to compute and show time-frequency maps.
- */
+ * @brief The TimeFrequency class provides a tools to compute and show time-frequency maps. */
 class TIMEFREQUENCYSHARED_EXPORT TimeFrequency : public SCSHAREDLIB::AbstractAlgorithm
 {
     Q_OBJECT
@@ -130,8 +124,8 @@ class TIMEFREQUENCYSHARED_EXPORT TimeFrequency : public SCSHAREDLIB::AbstractAlg
      */
 
  private:
+    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRTMSATimeFrequencyInput;  /**< The RealTimeMultiSampleArray of the TimeFrequency input.*/
     QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff measurement info.*/
-    SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pTimeFrequencyInput;  /**< The RealTimeMultiSampleArray of the TimeFrequency input.*/
 };
 
 }  // namespace TIMEFREQUENCYPLUGIN

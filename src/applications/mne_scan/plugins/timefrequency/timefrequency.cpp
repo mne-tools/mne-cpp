@@ -41,13 +41,14 @@
 #include <utils/ioutils.h>
 
 #include <scMeas/realtimemultisamplearray.h>
-#include <scShared/plugins/abstractplugin.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QDebug>
+#include <QString>
+#include <QLabel>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -64,15 +65,7 @@
 namespace TIMEFREQUENCYPLUGIN {
 
 TimeFrequency::TimeFrequency()
-: m_pTimeFrequencyInput(Q_NULLPTR)
-// : m_bCompActivated(false)
-// , m_bSpharaActive(false)
-// , m_bProjActivated(false)
-// , m_bFilterActivated(false)
-// , m_iMaxFilterLength(1)
-// , m_iMaxFilterTapSize(-1)
-// , m_sCurrentSystem("VectorView")
-// , m_pCircularBuffer(QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>::create(40))
+: m_pRTMSATimeFrequencyInput(Q_NULLPTR)
 {
     qDebug() << "[TimeFrequency::TimeFrequency] Creating Plugin Object.";
 }
@@ -82,7 +75,7 @@ TimeFrequency::TimeFrequency()
 TimeFrequency::~TimeFrequency()
 {
     if(this->isRunning()) {
-        stop();
+        TimeFrequency::stop();
     }
 }
 
@@ -99,10 +92,10 @@ QSharedPointer<AbstractPlugin> TimeFrequency::clone() const
 void TimeFrequency::init()
 {
     // Input
-    m_pTimeFrequencyInput = PluginInputData<RealTimeMultiSampleArray>::
+    m_pRTMSATimeFrequencyInput = PluginInputData<RealTimeMultiSampleArray>::
         create(this, "TimeFrequencyIn", "TimeFrequency input data");
-    m_inputConnectors.append(m_pTimeFrequencyInput);
-    m_pTimeFrequencyInput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
+    m_inputConnectors.append(m_pRTMSATimeFrequencyInput);
+    m_pRTMSATimeFrequencyInput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
 }
 
 //=============================================================================================================
@@ -173,7 +166,7 @@ void TimeFrequency::run()
         msleep(500);
         // Send the data to the connected plugins and the display
         if(!isInterruptionRequested()) {
-            m_pTimeFrequencyInput->measurementData()->setValue(matData);
+            m_pRTMSATimeFrequencyInput->measurementData()->setValue(matData);
         }
     }
 }
