@@ -135,33 +135,36 @@ createFiffInfo(int numChassis, int numChannels, float sfreq = 1000.f) {
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Fieldline::Fieldline() { qDebug() << "Creating Fieldline object"; }
-
-//=============================================================================================================
-
-Fieldline::~Fieldline() {
-  // If the program is closed while the sampling is in process
-  // if(this->isRunning()) {
-  //     this->stop();
-  // }
+Fieldline::Fieldline()
+{
 }
 
 //=============================================================================================================
 
-QSharedPointer<SCSHAREDLIB::AbstractPlugin> Fieldline::clone() const {
-  qDebug() << "Cloning Fieldline.";
+Fieldline::~Fieldline()
+{
+   if(this->isRunning()) {
+       Fieldline::stop();
+   }
+}
+
+//=============================================================================================================
+
+QSharedPointer<SCSHAREDLIB::AbstractPlugin> Fieldline::clone() const
+{
   QSharedPointer<SCSHAREDLIB::AbstractPlugin> pFieldlineClone(new Fieldline());
   return pFieldlineClone;
 }
 
 //=============================================================================================================
 
-void Fieldline::init() {
+void Fieldline::init()
+{
   // we instantiante
   m_pRTMSA_Fieldline = SCSHAREDLIB::PluginOutputData<
-      SCMEASLIB::RealTimeMultiSampleArray>::create(this, "Fieldline Plugin",
+      SCMEASLIB::RealTimeMultiSampleArray>::create(this, "Fieldline Out",
                                                    "FieldlinePlguin output");
-
+  m_pRTMSA_Fieldline->measurementData()->setName(this->getName());
   m_outputConnectors.append(m_pRTMSA_Fieldline);
 
   qDebug() << " ^^^^^^^^^^^^^^^^^^^^ Init Fieldline  (....again)";
@@ -170,13 +173,14 @@ void Fieldline::init() {
 
 //=============================================================================================================
 
-void Fieldline::unload() { qDebug() << "unload Fieldline"; }
+void Fieldline::unload()
+{
+}
 
 //=============================================================================================================
 
-bool Fieldline::start() {
-  qDebug() << "start Fieldline";
-
+bool Fieldline::start()
+{
   // Init circular buffer to transmit data from the producer to this thread
   // if(!m_pCircularBuffer) {
   //     m_pCircularBuffer = QSharedPointer<CircularBuffer_Matrix_double>(new
@@ -207,40 +211,34 @@ bool Fieldline::start() {
 
 //=============================================================================================================
 
-bool Fieldline::stop() {
+bool Fieldline::stop()
+{
   requestInterruption();
   wait(500);
-  // m_pRMTSA_Natus->measurementData()->clear();
-  //
-  //
-  // // Clear all data in the buffer connected to displays and other plugins
-  // m_pCircularBuffer->clear();
-  //
-  // m_pProducerThread.quit();
-  // m_pProducerThread.wait();
-  qDebug() << "Stop Fieldline";
+  m_pRTMSA_Fieldline->measurementData()->clear();
 
   return true;
 }
 
 //=============================================================================================================
 
-SCSHAREDLIB::AbstractPlugin::PluginType Fieldline::getType() const {
-  qDebug() << "getType Fieldline";
+SCSHAREDLIB::AbstractPlugin::PluginType Fieldline::getType() const
+{
   return SCSHAREDLIB::AbstractPlugin::PluginType::_ISensor;
 }
 
 //=============================================================================================================
 
-QString Fieldline::getName() const {
-  // qDebug() << "getName Fieldline";
-  return QString("Fieldline OPM");
+QString Fieldline::getName() const
+{
+  return "Fieldline OPM";
 }
 
 //=============================================================================================================
 
-QWidget *Fieldline::setupWidget() {
-  qDebug() << "setupWidget Fieldline";
+QWidget *Fieldline::setupWidget()
+{
+
   guiWidget = std::make_unique<FieldlinePluginGUI>();
 
   // NatusSetup* widget = new NatusSetup(this);//widget is later destroyed by
@@ -259,8 +257,6 @@ QWidget *Fieldline::setupWidget() {
   flWidget->setBlinkState(1, 5, true);
 
   return frame;
-
-  // return new QLabel("Fieldline \n   OPM");
 }
 
 //=============================================================================================================
@@ -276,8 +272,6 @@ QWidget *Fieldline::setupWidget() {
 //=============================================================================================================
 
 void Fieldline::run() {
-  qDebug() << "run Fieldline";
-
   m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo());
 
   m_pFiffInfo->sfreq = 1000.0f;
@@ -315,20 +309,11 @@ void Fieldline::run() {
       break;
     m_pRTMSA_Fieldline->measurementData()->setValue(matData);
   }
-
-  //         //emit values
-  //         if(!isInterruptionRequested()) {
-  //             m_pRMTSA_Natus->measurementData()->setValue(matData);
-  //         }
-  //     }
-  // }
-  qDebug() << "run Fieldline finished";
 }
 
 //=============================================================================================================
 
 QString Fieldline::getBuildInfo() {
-  qDebug() << "getBuildInfo Fieldline";
   return QString(buildDateTime()) + QString(" - ") + QString(buildHash());
 }
 

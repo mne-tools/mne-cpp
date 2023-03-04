@@ -578,12 +578,14 @@ void MainWindow::createActions()
     connect(m_pActionStop.data(), &QAction::triggered,
             this, &MainWindow::stopMeasurement);
 
-    //Display Toolbar
-    m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget"),this);
+    //  Display Toolbar
+    m_pActionQuickControl = new QAction(
+            QIcon(":/images/quickControl.png"),
+            tr("Show quick control widget"),this);
     m_pActionQuickControl->setStatusTip(tr("Show quick control widget"));
     connect(m_pActionQuickControl.data(), &QAction::triggered,
             m_pQuickControlView.data(), &QuickControlView::show);
-    m_pActionQuickControl->setVisible(false);
+    m_pActionQuickControl->setVisible(true);
 }
 
 //=============================================================================================================
@@ -646,8 +648,8 @@ void MainWindow::createMenus()
 
 void MainWindow::createToolBars()
 {
-    //Control
-    if(!m_pToolBar) {
+    //  Control
+    if (!m_pToolBar) {
         m_pToolBar = addToolBar(tr("Control"));
         m_pToolBar->addAction(m_pActionRun);
         m_pToolBar->addAction(m_pActionStop);
@@ -656,12 +658,13 @@ void MainWindow::createToolBars()
         m_pToolBar->addSeparator();
 
         m_pLabelTime = new QLabel(this);
-        m_pToolBar->addWidget(m_pLabelTime);
+        m_pLabelTime->setStatusTip("Measurement time duration.");
         m_pLabelTime->setText(QTime(0, 0).toString());
+        m_pToolBar->addWidget(m_pLabelTime);
     }
 
-    //Plugin
-    if(!m_pDynamicPluginToolBar) {
+    //  Plugin
+    if (!m_pDynamicPluginToolBar) {
         m_pDynamicPluginToolBar = addToolBar(tr("Plugin Control"));
     }
 
@@ -811,7 +814,8 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::AbstractP
                        lPlugins.at(i)->getName() == "GUSBAmp"||
                        lPlugins.at(i)->getName() == "LSL Adapter"||
                        lPlugins.at(i)->getName() == "TMSI"||
-                       lPlugins.at(i)->getName() == "BrainAMP") {
+                       lPlugins.at(i)->getName() == "BrainAMP" ||
+                       lPlugins.at(i)->getName() == "Fieldline OPM") {
                         pMultiViewWinow = m_pMultiView->addWidgetBottom(pWidget, sCurPluginName);
                     } else {
                         pMultiViewWinow = m_pMultiView->addWidgetTop(pWidget, sCurPluginName);

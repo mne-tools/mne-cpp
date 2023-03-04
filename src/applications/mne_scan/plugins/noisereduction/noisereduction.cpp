@@ -112,7 +112,7 @@ NoiseReduction::NoiseReduction()
 NoiseReduction::~NoiseReduction()
 {
     if(this->isRunning()) {
-        stop();
+        NoiseReduction::stop();
     }
 }
 
