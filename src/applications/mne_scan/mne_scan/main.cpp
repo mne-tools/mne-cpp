@@ -92,6 +92,7 @@ Q_IMPORT_PLUGIN(NeuronalConnectivity)
 Q_IMPORT_PLUGIN(FtBuffer)
 Q_IMPORT_PLUGIN(WriteToFile)
 Q_IMPORT_PLUGIN(Hpi)
+Q_IMPORT_PLUGIN(Fieldline)
 //Q_IMPORT_PLUGIN(DummyToolbox)
 #ifdef WITHGUSBAMP
 Q_IMPORT_PLUGIN(GUSBAmp)
@@ -134,6 +135,7 @@ int main(int argc, char *argv[])
     Q_INIT_RESOURCE(averaging);
     Q_INIT_RESOURCE(writetofile);
     Q_INIT_RESOURCE(hpi);
+    Q_INIT_RESOURCE(fieldline);
     #ifdef WITHBRAINAMP
     Q_INIT_RESOURCE(brainamp);
     #endif

@@ -236,11 +236,12 @@ fl_chassis::fl_chassis(int num_sensors, QWidget *parent )
         sensors.back()->setLabel(QString::number(i + 1));
         ui->sensor_frame->layout()->addWidget(sensors.back());
         connect(sensors.back(), &QWidget::customContextMenuRequested,
-                [this, i, &last_item](const QPoint& pos) {
-            qDebug() << "clicked " << i+1;
-            qDebug() << "global pos: " << last_item->mapToGlobal(pos);
-            this->emit clicked(i, last_item->mapToGlobal(pos));
-        });
+        [this, i, &last_item](const QPoint& pos)
+            {
+                qDebug() << "clicked " << i+1;
+                qDebug() << "global pos: " << last_item->mapToGlobal(pos);
+                this->emit clicked(i, last_item->mapToGlobal(pos));
+            });
         connect(this, &fl_chassis::clicked, this, &fl_chassis::rightClickMenu, Qt::UniqueConnection);
     }
 }
@@ -256,7 +257,8 @@ fl_chassis::~fl_chassis()
 
 void fl_chassis::setColor(size_t sensor_num, const QColor& color)
 {
-    if(sensor_num > sensors.size() || sensor_num < 1){
+    if(sensor_num > sensors.size() || sensor_num < 1)
+    {
         return;
     }
     sensors.at(sensor_num - 1)->setColor(color);

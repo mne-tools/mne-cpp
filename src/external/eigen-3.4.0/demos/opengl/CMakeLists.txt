@@ -3,7 +3,7 @@ find_package(OpenGL)
 
 if(QT4_FOUND AND OPENGL_FOUND)
 
-  set(QT_USE_QTOPENGL TRUE)
+  set(QT_USE_QTOPENGL FALSE)
   include(${QT_USE_FILE})
 
   set(CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -26,4 +26,5 @@ else()
   message(STATUS "OpenGL demo disabled because Qt4 and/or OpenGL have not been found.")
 
 endif()
+
 

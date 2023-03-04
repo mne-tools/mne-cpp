@@ -157,7 +157,6 @@ QSharedPointer<SCSHAREDLIB::AbstractPlugin> Fieldline::clone() const {
 //=============================================================================================================
 
 void Fieldline::init() {
-
   // we instantiante
   m_pRTMSA_Fieldline = SCSHAREDLIB::PluginOutputData<
       SCMEASLIB::RealTimeMultiSampleArray>::create(this, "Fieldline Plugin",
@@ -297,13 +296,12 @@ void Fieldline::run() {
   }
 
   m_pRTMSA_Fieldline->measurementData()->initFromFiffInfo(
-      m_pFiffInfo); //     if(m_pCircularBuffer->pop(matData)) {
+      m_pFiffInfo);  //     if(m_pCircularBuffer->pop(matData)) {
   m_pRTMSA_Fieldline->measurementData()->setMultiArraySize(1);
   m_pRTMSA_Fieldline->measurementData()->setVisibility(true);
 
   Eigen::MatrixXd matData;
   matData.resize(m_pFiffInfo->nchan, 200);
-  // matData.setZero();
 
   for (;;) {
     // gather the data
@@ -311,7 +309,7 @@ void Fieldline::run() {
     matData = Eigen::MatrixXd::Random(m_pFiffInfo->nchan, 200);
     matData *= 4e-12;
 
-    msleep(200);
+    msleep(2000);
 
     if (isInterruptionRequested())
       break;
