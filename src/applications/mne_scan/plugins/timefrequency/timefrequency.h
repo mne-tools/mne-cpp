@@ -119,13 +119,15 @@ class TIMEFREQUENCYSHARED_EXPORT TimeFrequency : public SCSHAREDLIB::AbstractAlg
 
  public:
     //=========================================================================================================
+    void update(QSharedPointer<SCMEASLIB::Measurement> pMeasurement);
     /**
      * Other methods can go here...
      */
 
  private:
-    QSharedPointer<SCSHAREDLIB::PluginInputData<SCMEASLIB::RealTimeMultiSampleArray>> m_pRTMSATimeFrequencyInput;  /**< The RealTimeMultiSampleArray of the TimeFrequency input.*/
-    QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff measurement info.*/
+    QSharedPointer<SCSHAREDLIB::PluginInputData <SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA_In;  /**< The RealTimeMultiSampleArray of the TimeFrequency input.*/
+    QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> > m_pRTMSA_Out;  /**< The RealTimeMultiSampleArray to provide time-frequency data to other plugins.*/
+    //QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff measurement info.*/
 };
 
 }  // namespace TIMEFREQUENCYPLUGIN

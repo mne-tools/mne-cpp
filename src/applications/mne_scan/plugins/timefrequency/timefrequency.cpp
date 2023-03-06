@@ -65,7 +65,8 @@
 namespace TIMEFREQUENCYPLUGIN {
 
 TimeFrequency::TimeFrequency()
-: m_pRTMSATimeFrequencyInput(Q_NULLPTR)
+: m_pRTMSA_In(Q_NULLPTR),
+  m_pRTMSA_Out(Q_NULLPTR)
 {
     qDebug() << "[TimeFrequency::TimeFrequency] Creating Plugin Object.";
 }
@@ -81,7 +82,7 @@ TimeFrequency::~TimeFrequency()
 
 //=============================================================================================================
 
-QSharedPointer<AbstractPlugin> TimeFrequency::clone() const
+QSharedPointer<SCSHAREDLIB::AbstractPlugin> TimeFrequency::clone() const
 {
     QSharedPointer<TimeFrequency> pTimeFrequencyClone(new TimeFrequency);
     return pTimeFrequencyClone;
@@ -91,11 +92,20 @@ QSharedPointer<AbstractPlugin> TimeFrequency::clone() const
 
 void TimeFrequency::init()
 {
-    // Input
-    m_pRTMSATimeFrequencyInput = PluginInputData<RealTimeMultiSampleArray>::
-        create(this, "TimeFrequencyIn", "TimeFrequency input data");
-    m_inputConnectors.append(m_pRTMSATimeFrequencyInput);
-    m_pRTMSATimeFrequencyInput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
+    //  Input
+    m_pRTMSA_In = SCSHAREDLIB::PluginInputData<
+        SCMEASLIB::RealTimeMultiSampleArray>::
+        create(this, "TimeFrequencyIn", "TimeFrequency in data");
+    connect(m_pRTMSA_In.data(), &SCSHAREDLIB::PluginInputConnector::notify,
+            this, &TimeFrequency::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTMSA_In);
+
+    //  Output
+    m_pRTMSA_Out = SCSHAREDLIB::PluginOutputData<
+    SCMEASLIB::RealTimeMultiSampleArray>::
+        create(this, "TimeFrequencyOut", "TimeFrequencyPluginOutputdata");
+    m_pRTMSA_Out->measurementData()->setName(this->getName());
+    m_outputConnectors.append(m_pRTMSA_Out);
 }
 
 //=============================================================================================================
@@ -110,7 +120,6 @@ void TimeFrequency::unload()
 bool TimeFrequency::start()
 {
     //Start thread as soon as we have received the first data block. See update().
-
     return true;
 }
 
@@ -127,7 +136,7 @@ bool TimeFrequency::stop()
 
 //=============================================================================================================
 
-AbstractPlugin::PluginType TimeFrequency::getType() const
+SCSHAREDLIB::AbstractPlugin::PluginType TimeFrequency::getType() const
 {
     return _IAlgorithm;
 }
@@ -143,31 +152,29 @@ QString TimeFrequency::getName() const
 
 QWidget* TimeFrequency::setupWidget()
 {
-    QString* setupWidget("Time Frequency Baby");
-    return setupWidget;
+    return new QLabel("Time Frequency Baby");
 }
 
 //=============================================================================================================
+void TimeFrequency::update(QSharedPointer<SCMEASLIB::Measurement> pMeasurement)
+{
+    qDebug() << "new data!";
+}
 
 void TimeFrequency::run()
 {
-    // Read and create SPHARA operator for the first time
-    // initSphara();
-    // createSpharaOperator();
 
     // Init
     Eigen::MatrixXd matData;
     // matData.
-    // QScopedPointer<RTPROCESSINGLIB::FilterOverlapAdd> pRtFilter(new RTPROCESSINGLIB::FilterOverlapAdd());
-
     while (true)
     {
-        // Get the current data
         msleep(500);
-        // Send the data to the connected plugins and the display
-        if(!isInterruptionRequested()) {
-            m_pRTMSATimeFrequencyInput->measurementData()->setValue(matData);
-        }
+        if(isInterruptionRequested())
+            break;
+        qDebug() << "run!!";
+
+        // m_pRTMSA_Out->measurementData()->setValue(matData);
     }
 }
 
