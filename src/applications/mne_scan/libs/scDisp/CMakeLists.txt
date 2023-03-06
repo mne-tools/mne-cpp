@@ -34,7 +34,11 @@ set(HEADERS
 # list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 # set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+set(RESOURCES
+  scDisp.qrc
+)
+
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
 
 set(FFTW_LIBS "")
 
