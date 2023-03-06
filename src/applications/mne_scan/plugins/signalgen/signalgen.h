@@ -105,7 +105,7 @@ public:
 
     enum Mode{
         Zero,
-        Sine,
+        Wave,
         Noise
     };
 
@@ -176,9 +176,11 @@ protected:
     QMutex                  m_qMutex;                       /**< The mutex to ensure thread safety.*/
 
     int numChannels;
-    int samplesPerBlock;
+    int numBlocksPerSecond;
 
     float sample_freq;
+
+    float gen_freq;
 
     Mode    m_mode;
 

@@ -43,6 +43,7 @@
 #include <fiff/fiff_info.h>
 #include <fiff/c/fiff_digitizer_data.h>
 #include <scMeas/realtimemultisamplearray.h>
+#include <cmath>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -74,8 +75,9 @@ using namespace Eigen;
 
 SignalGen::SignalGen()
 : numChannels(32)
-, samplesPerBlock(200)
+, numBlocksPerSecond(5)
 , sample_freq(1000.f)
+, gen_freq(3)
 , m_mode(Mode::Noise)
 {
 }
@@ -169,8 +171,17 @@ QWidget* SignalGen::setupWidget()
 
     connect(widget, &SignalGenSetupWidget::numChannelsChanged, [this](int nchans){this->numChannels = nchans;});
     connect(widget, &SignalGenSetupWidget::sampleFreqChanged, [this](int freq){this->sample_freq = freq;});
+    connect(widget, &SignalGenSetupWidget::blocksPerSecondChanged, [this](int bps){this->numBlocksPerSecond = bps;});
+    connect(widget, &SignalGenSetupWidget::genFreqChanged, [this](int freq){this->gen_freq = freq;});
 
-    widget->setConfig({1, 999, numChannels, 100, 10000, static_cast<int>(sample_freq)});
+    connect(widget, &SignalGenSetupWidget::modeChanged, [this](Mode m){this->m_mode = m;});
+
+    widget->defineChannelSettings(1, 999, numChannels);
+    widget->defineSampleFreqSettings(100, 10000, static_cast<int>(sample_freq));
+    widget->defineBlockSettings(1, 100, numBlocksPerSecond);
+    widget->defineGeneratedFreqSettings(1,999, gen_freq);
+
+    widget->defineMode(m_mode);
 
     return widget;
 }
@@ -180,9 +191,14 @@ QWidget* SignalGen::setupWidget()
 void SignalGen::run()
 {
     MatrixXd matValue;
+    int samplesPerBlock = sample_freq / numBlocksPerSecond;
+
     matValue.resize(numChannels, samplesPerBlock);
 
-    int sleep_time = 1000 * samplesPerBlock / sample_freq;
+    int sleep_time_ms = 1000 * samplesPerBlock / sample_freq;
+
+    double time = 0;
+    double pi = 2*acos(0.0);
 
     while(!isInterruptionRequested()) {
         switch(m_mode){
@@ -190,7 +206,15 @@ void SignalGen::run()
             matValue = MatrixXd::Zero(numChannels, samplesPerBlock);
             break;
         }
-        case Mode::Sine: {
+        case Mode::Wave: {
+            for(auto i = 0; i < matValue.cols(); ++i){
+                time += 1/sample_freq;
+                auto value = sin(2 * pi * gen_freq * time);
+                for (auto& val : matValue.col(i)){
+                    val = value;
+                }
+            }
+            matValue *= 1e-12;
             break;
         }
         case Mode::Noise:{
@@ -200,7 +224,7 @@ void SignalGen::run()
         }
         }
         m_pRTMSA_SignalGen->measurementData()->setValue(matValue);
-        msleep(sleep_time);
+        msleep(sleep_time_ms);
     }
 }
 
