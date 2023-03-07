@@ -176,21 +176,20 @@ doPrintHelp() {
   echo " "
   echo "MNE-CPP building script help."
   echo " "
-  echo "Usage: ./build_project.bat [Options]
+  echo "Usage: ./build_project.bat [Options]"
   echo " "
   echo "All builds will be parallel."
   echo "All options can be used in undefined order."
   echo " "
-  echo " [help] - Print this help."
-  echo " [mock] - Show commands don't execute them."
-  echo " [clean] - Delete build and out folders for your options, before 
-  echo "           building again.
-  echo " [(Release*)/Debug*] - Set the build type (Debug/Release) and a name"
-  echo "                       it. For ex. Release_testA will build in release
-  echo "                       mode with a build folder /build/Release_testA 
-  echo "                       and an out folder /out/Release_testA."
-  echo " [coverage] -  Enable code coverage."
-  echo " [rebuild] - Only rebuild existing build-system configuration."
+  echo "[help] - Print this help."
+  echo "[mock] - Show commands do not execute them."
+  echo "[clean] - Delete build and out folders for your configuration and exit."
+  echo "[Release*/Debug*] - Set the build type (Debug/Release) and name it."
+  echo "                    For example, Release_testA will build in release"
+  echo "                    mode with a build folder /build/Release_testA"
+  echo "                    and an out folder /out/Release_testA."
+  echo "[coverage] -  Enable code coverage."
+  echo "[rebuild] - Only rebuild existing build-system configuration."
   echo " "
 }
 
@@ -249,17 +248,21 @@ if [ "${CleanBuild}" == "true" ]; then
   echo " "
   ${MockText}rm -fr ${BuildFolder}
   ${MockText}rm -fr ${OutFolder}
+  exit 0
 fi
 
 if [ "${Rebuild}" == "false" ]; then
-  echo "cmake configuring build project." 
+  echo " "
+  echo "Configuring build project:" 
   ${MockText}cmake -B ${BuildFolder} -S ${SourceFolder} -DCMAKE_BUILD_TYPE=${BuildType} -DBINARY_OUTPUT_DIRECTORY=${OutFolder} ${CoverageOption}
 fi
 
-echo "Compile..."
+echo " "
+echo "Compiling:"
 ${MockText}cmake --build ${BuildFolder} --parallel $NumProcesses
 
 echo "Copy compile_commands.json file to root folder."
 ${MockText}cp -v ${BuildFolder}/compile_commands.json ${BaseFolder}
 
 exit 0
+
