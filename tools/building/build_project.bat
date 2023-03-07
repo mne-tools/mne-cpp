@@ -5,7 +5,7 @@
        
 
     SET ScriptPath=%~dp0
-    SET BasePath=%ScriptPath%..\..
+    SET BaseFolder=%ScriptPath%..\..
 
     SET "VerboseMode=False"
     SET "BuildType=Release"
@@ -35,15 +35,15 @@
       GOTO :loop
     )
 
-    SET BuildFolder=%BasePath%\build\%BuildType%
-    SET SrcFolder=%BasePath%\src
+    SET BuildFolder=%BaseFolder%\build\%BuildType%
+    SET SrcFolder=%BaseFolder%\src
 
     call:doPrintConfiguration
 
-    ECHO Cmake -B %BuildFolder% -S %BasePath%\src -DCMAKE_BUILD_TYPE=%BuildType%-DCMAKE_CXX_FLAGS="/MP"
+    ECHO Cmake -B %BuildFolder% -S %BaseFolder%\src -DCMAKE_BUILD_TYPE=%BuildType%-DCMAKE_CXX_FLAGS="/MP"
     ECHO Cmake --build %BuildFolder% --config %BuildType%
 
-    cmake -B %BuildFolder% -S %BasePath%\src -DCMAKE_BUILD_TYPE=%BuildType%-DCMAKE_CXX_FLAGS="/MP"
+    cmake -B %BuildFolder% -S %BaseFolder%\src -DCMAKE_BUILD_TYPE=%BuildType%-DCMAKE_CXX_FLAGS="/MP"
     cmake --build %BuildFolder% --config %BuildType%
 
     exit /B 
@@ -87,15 +87,17 @@ function cleanAbsPath()
     echo "$cleanAbsPathStr"
 }
 
-VerboseMode="false"
-BuildType="Release"
-WithCodeCoverage="false"
-BuildFolder=""
-SourceFolder=""
-NumProcesses="1"
-
 ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
-BasePath="$(cleanAbsPath "$ScriptPath/../..")"
+BaseFolder="$(cleanAbsPath "$ScriptPath/../..")"
+SourceFolder=""
+BuildFolder=""
+OutFolder=""
+BuildType="Release"
+BuildName="Release"
+WithCodeCoverage="false"
+CleanBuild="false"
+NumProcesses="1"
+MockBuild="false"
 
 if [ "$(uname)" == "Darwin" ]; then
     NumProcesses=$(sysctl -n hw.logicalcpu)
@@ -109,14 +111,17 @@ doPrintConfiguration() {
   echo ======================== MNE-CPP BUILD CONFIG ==========================
   echo " "
   echo " ScriptPath   = $ScriptPath"
-  echo " BasePath     = $BasePath"
-  echo " BuildFolder  = $BuildFolder"
+  echo " BaseFolder   = $BaseFolder"
   echo " SourceFolder = $SourceFolder"
+  echo " BuildFolder  = $BuildFolder"
+  echo " OutFolder    = $OutFolder"
   echo " "
-  echo " VerboseMode = $VerboseMode"
   echo " Buildtype = $BuildType"
+  echo " BuildName = $BuildName"
+  echo " CleanBuild = $CleanBuild"
   echo " WithCodeCoverage = $WithCodeCoverage"
   echo " NumProcesses = $NumProcesses"
+  echo " MockBuild = $MockBuild"
   echo " "
   echo ========================================================================
   echo ========================================================================
@@ -127,23 +132,33 @@ doPrintHelp() {
   echo " "
   echo "MNE-CPP building script help."
   echo ""
-  echo "Usage: ./build_project.bat [verbose] [(Release)/Debug] [coverage]"
+  echo "Usage: ./build_project.bat [help] [mock] [clean] [(Release*)/Debug*] [coverage]"
   echo ""
 }
 
+SubStrDebug="Debug"
+SubStrRelease="Release"
 for (( j=0; j<argc; j++)); do
-  if [ "${argv[j]}" == "verbose" ]; then
-    VerboseMode="true"
-  elif [ "${argv[j]}" == "coverage" ]; then
+  if [ "${argv[j]}" == "coverage" ]; then
     WithCodeCoverage="true"
-  elif [ "${argv[j]}" == "Debug" ]; then
-    BuildType="Debug"
-  elif [ "${argv[j]}" == "Release" ]; then
-    BuildType="Release"
+  elif [ "${argv[j]}" == "clean" ]; then
+    CleanBuild="true"
+  elif [ "${argv[j]}" == "mock" ]; then
+    MockBuild="true"
   elif [ "${argv[j]}" == "help" ]; then
     doPrintHelp
     exit 1
   fi
+  case ${argv[j]} in
+    *"Debug"*)
+      BuildType="Debug"
+      BuildName="${argv[j]}"
+      ;;
+    *"Release"*)
+      BuildType="Release"
+      BuildName="${argv[j]}"
+      ;;
+  esac
 done
 
 if [ "$WithCodeCoverage" == "false"  ]; then
@@ -152,12 +167,33 @@ elif [ "$WithCodeCoverage" == "true"  ]; then
   CoverageOption="-DWITH_CODE_COV=ON"
 fi
 
-BuildFolder=${BasePath}/build/${BuildType}
-SourceFolder=${BasePath}/src
+SourceFolder=${BaseFolder}/src
+BuildFolder=${BaseFolder}/build/${BuildName}
+OutFolder=${BaseFolder}/out/${BuildName}
 
 doPrintConfiguration
 
-cmake -B ${BuildFolder} -S ${SourceFolder} -DCMAKE_BUILD_TYPE=${BuildType} ${CoverageOption}
-cmake --build ${BuildFolder} --parallel $NumProcesses
+if [ "${MockBuild}" == "true" ]; then
+  MockText="echo "
+  echo " "
+  echo "Mock mode ON. Commands to be executed: "
+  echo " "
+else
+  MockText=""
+fi
+
+if [ "${CleanBuild}" == "true" ]; then
+  echo "Deleting folders: "
+  echo "  ${BuildFolder}"
+  echo "  ${OutFolder}"
+  echo " "
+  ${MockText}rm -fr ${BuildFolder}
+  ${MockText}rm -fr ${OutFolder}
+fi
+
+${MockText}cmake -B ${BuildFolder} -S ${SourceFolder} -DCMAKE_BUILD_TYPE=${BuildType} -DBINARY_OUTPUT_DIRECTORY=${OutFolder} ${CoverageOption}
+${MockText}cmake --build ${BuildFolder} --parallel $NumProcesses
+
+${MockText}cp -v ${BuildFolder}/compile_commands.json ${BaseFolder}
 
 exit 0

@@ -65,6 +65,7 @@ Makefile
 .vscode
 .session
 mne-cpp.pro.user*
+compile_commands.json
 
 # FFTW
 /src/external/fftw
@@ -73,7 +74,7 @@ mne-cpp.pro.user*
 /_site
 
 build/*
-build-*/
+build*/*
 .cache/*
 
 codecov
