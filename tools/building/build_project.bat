@@ -96,6 +96,7 @@ BuildType="Release"
 BuildName="Release"
 WithCodeCoverage="false"
 CleanBuild="false"
+Rebuild="false"
 NumProcesses="1"
 MockBuild="false"
 
@@ -119,6 +120,7 @@ doPrintConfiguration() {
   echo " Buildtype = $BuildType"
   echo " BuildName = $BuildName"
   echo " CleanBuild = $CleanBuild"
+  echo " Rebuild = $Rebuild"
   echo " WithCodeCoverage = $WithCodeCoverage"
   echo " NumProcesses = $NumProcesses"
   echo " MockBuild = $MockBuild"
@@ -131,9 +133,23 @@ doPrintConfiguration() {
 doPrintHelp() {
   echo " "
   echo "MNE-CPP building script help."
-  echo ""
-  echo "Usage: ./build_project.bat [help] [mock] [clean] [(Release*)/Debug*] [coverage]"
-  echo ""
+  echo " "
+  echo "Usage: ./build_project.bat [Options]
+  echo " "
+  echo "All builds will be parallel."
+  echo "All options can be used in undefined order."
+  echo " "
+  echo " [help] - Print this help."
+  echo " [mock] - Show commands don't execute them."
+  echo " [clean] - Delete build and out folders for your options, before 
+  echo "           building again.
+  echo " [(Release*)/Debug*] - Set the build type (Debug/Release) and a name"
+  echo "                       it. For ex. Release_testA will build in release
+  echo "                       mode with a build folder /build/Release_testA 
+  echo "                       and an out folder /out/Release_testA."
+  echo " [coverage] -  Enable code coverage."
+  echo " [rebuild] - Only rebuild existing build-system configuration."
+  echo " "
 }
 
 SubStrDebug="Debug"
@@ -145,6 +161,8 @@ for (( j=0; j<argc; j++)); do
     CleanBuild="true"
   elif [ "${argv[j]}" == "mock" ]; then
     MockBuild="true"
+  elif [ "${argv[j]}" == "rebuild" ]; then
+    Rebuild="true"
   elif [ "${argv[j]}" == "help" ]; then
     doPrintHelp
     exit 1
@@ -191,9 +209,15 @@ if [ "${CleanBuild}" == "true" ]; then
   ${MockText}rm -fr ${OutFolder}
 fi
 
-${MockText}cmake -B ${BuildFolder} -S ${SourceFolder} -DCMAKE_BUILD_TYPE=${BuildType} -DBINARY_OUTPUT_DIRECTORY=${OutFolder} ${CoverageOption}
+if [ "${Rebuild}" == "false" ]; then
+  echo "cmake configuring build project." 
+  ${MockText}cmake -B ${BuildFolder} -S ${SourceFolder} -DCMAKE_BUILD_TYPE=${BuildType} -DBINARY_OUTPUT_DIRECTORY=${OutFolder} ${CoverageOption}
+fi
+
+echo "Compile..."
 ${MockText}cmake --build ${BuildFolder} --parallel $NumProcesses
 
+echo "Copy compile_commands.json file to root folder."
 ${MockText}cp -v ${BuildFolder}/compile_commands.json ${BaseFolder}
 
 exit 0
