@@ -9,7 +9,7 @@ on:
 
 jobs:
   CreateRelease:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
     - name: Clone repository
@@ -55,7 +55,7 @@ jobs:
         hub release create -m "Development Builds" dev_build --prerelease
 
   LinuxStatic:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     needs: CreateRelease
 
     steps:
@@ -243,7 +243,7 @@ jobs:
         overwrite: true
 
   LinuxDynamic:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
 
     steps:
     - name: Clone repository
@@ -430,7 +430,7 @@ jobs:
   Tests:
     # Only run for dev releases
     if: endsWith(github.ref, 'main') == true
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     needs: CreateRelease
 
     steps:
@@ -462,7 +462,7 @@ jobs:
         ./tools/testing/test_all.bat verbose withCoverage
 
   Doxygen:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     needs: CreateRelease
 
     steps:
