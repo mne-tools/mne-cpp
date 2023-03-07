@@ -5,7 +5,7 @@ on:
 
 jobs:
   ScanLinux:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Clone repository
         uses: actions/checkout@v2
