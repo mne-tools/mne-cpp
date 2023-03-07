@@ -7,8 +7,19 @@
     SET ScriptPath=%~dp0
     SET BaseFolder=%ScriptPath%..\..
 
+    SET SourceFolder=
+    SET BuildFolder=
+    SET OutFolder=
+
+    SET "MockBuild=False"
+    SET MockText=
+
+    SET "CleanBuild=False"
+
     SET "VerboseMode=False"
     SET "BuildType=Release"
+    SET "BuilldName=Release"
+
     SET "WithCodeCoverage=False"
     SET "NumProcesses=1"
     
@@ -18,33 +29,57 @@
       IF "%1"=="help" (
         goto :showHelp
       )
-      IF "%1"=="Release" (
-        SET "BuildType=Release"
+      IF NOT "%1"=="%1:Release=%" (
+        SET BuildType=Release
+        SET BuildName=%1
         SHIFT
       )
-      IF "%1"=="Debug" (
+      IF NOT "%1"=="%1:Debug=%" (
         SET "BuildType=Debug"
+        SET BuildName=%1
         SHIFT
       )
       IF "%1"=="coverage" (
-        SET "WithCodeCoverage=true"
+        SET "WithCodeCoverage=True"
         SHIFT
       )
-
+      IF "%1"=="mock" (
+        SET "MockBuild=True"
+        SHIFT
+      )
+      IF "%1"=="clean" (
+        SET "CleanBuild=True"
+        SHIFT
+      )
       SHIFT
       GOTO :loop
     )
 
-    SET BuildFolder=%BaseFolder%\build\%BuildType%
-    SET SrcFolder=%BaseFolder%\src
+    SET SourceFolder=%BaseFolder%\src
+    SET BuildFolder=%BaseFolder%\build\%BuildName%
+    SET OutFolder=%BaseFolder%\out\%BuildName%
 
     call:doPrintConfiguration
 
-    ECHO Cmake -B %BuildFolder% -S %BaseFolder%\src -DCMAKE_BUILD_TYPE=%BuildType%-DCMAKE_CXX_FLAGS="/MP"
-    ECHO Cmake --build %BuildFolder% --config %BuildType%
+    IF "%MockText%"=="True"(
+        ECHO .
+        ECHO Mock mode ON. Commands to be executed: 
+        ECHO .
+        SET "MockText=ECHO "
+    )
+    
+    IF "%CleanBuild%"=="True"(
+        echo Deleting folders: 
+        echo   %BuildFolder%
+        echo   %OutFolder%
+        echo .
 
-    cmake -B %BuildFolder% -S %BaseFolder%\src -DCMAKE_BUILD_TYPE=%BuildType%-DCMAKE_CXX_FLAGS="/MP"
-    cmake --build %BuildFolder% --config %BuildType%
+        RMDIR /S /Q %BuildFolder%
+        RMDIR /S /Q %OutFolder%
+    )
+
+    %MockText%cmake -B %BuildFolder% -S %SourceFolder% -DCMAKE_BUILD_TYPE=%BuildType% -DBINARY_OUTPUT_DIRECTORY=%OutFolder% -DCMAKE_CXX_FLAGS="/MP"
+    %MockText%cmake --build %BuildFolder% --config %BuildType%
 
     exit /B 
 
@@ -53,8 +88,15 @@
       ECHO ====================================================================
       ECHO ===================== MNE-CPP BUILD CONFIG =========================
       ECHO .
-      ECHO verbose = %VerboseMode%
-      ECHO BuildType =%BuildType%
+      ECHO ScriptPath   = %ScriptPath%
+      ECHO BaseFolder   = %BaseFolder%
+      ECHO SourceFolder = %SourceFolder%
+      ECHO BuildFolder  = %BuildFolder%
+      ECHO OutFolder    = %OutFolder%
+      ECHO .
+      ECHO BuildType    = %BuildType%
+      ECHO BuildName    = %BuildName%
+      ECHO CleanBuild   = %CleanBuild%
       ECHO Coverage =%WithCodeCoverage%
       ECHO BuildFolder  =%BuildFolder%
       ECHO SourceFolder =%SourceFolder%
