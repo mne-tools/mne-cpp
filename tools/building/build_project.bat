@@ -1,8 +1,11 @@
 :<<BATCH
-    :;@echo off
+    @echo off
     :; # ####################################################
     :; # ########## WINDOWS SECTION #########################
        
+  
+    setlocal EnableDelayedExpansion
+
 
     SET ScriptPath=%~dp0
     SET BaseFolder=%ScriptPath%..\..
@@ -18,39 +21,41 @@
 
     SET "VerboseMode=False"
     SET "BuildType=Release"
-    SET "BuilldName=Release"
+    SET "BuildName=Release"
 
     SET "WithCodeCoverage=False"
     SET "NumProcesses=1"
     
-    SHIFT & SHIFT
     :loop
     IF NOT "%1"=="" (
+      ECHO 1 is -%1-
       IF "%1"=="help" (
         goto :showHelp
       )
-      IF NOT "%1"=="%1:Release=%" (
+      set Arg=%1
+      ECHO ARG is -!Arg!-
+
+      ECHO DDD !Arg! !Arg:Debug=!
+      echo RRR !Arg! !Arg:Release=!
+
+      IF NOT x!Arg!==x!Arg:Release=! (
         SET BuildType=Release
-        SET BuildName=%1
-        SHIFT
+        SET BuildName=!Arg!
       )
-      IF NOT "%1"=="%1:Debug=%" (
-        SET "BuildType=Debug"
-        SET BuildName=%1
-        SHIFT
+      IF NOT x!Arg!==x!Arg:Debug=! (
+        SET BuildType=Debug
+        SET BuildName=!Arg!
       )
       IF "%1"=="coverage" (
         SET "WithCodeCoverage=True"
-        SHIFT
       )
       IF "%1"=="mock" (
         SET "MockBuild=True"
-        SHIFT
       )
       IF "%1"=="clean" (
         SET "CleanBuild=True"
-        SHIFT
       )
+
       SHIFT
       GOTO :loop
     )
@@ -61,14 +66,14 @@
 
     call:doPrintConfiguration
 
-    IF "%MockText%"=="True"(
+    IF "%MockBuild%"=="True" (
         ECHO .
         ECHO Mock mode ON. Commands to be executed: 
         ECHO .
         SET "MockText=ECHO "
     )
     
-    IF "%CleanBuild%"=="True"(
+    IF "%CleanBuild%"=="True" (
         echo Deleting folders: 
         echo   %BuildFolder%
         echo   %OutFolder%
@@ -101,6 +106,7 @@
       ECHO BuildFolder  =%BuildFolder%
       ECHO SourceFolder =%SourceFolder%
       ECHO NumProcesses = %NumProcesses%
+      ECHO MockBuild = %MockBuild%
       ECHO .
       ECHO ====================================================================
       ECHO ====================================================================
