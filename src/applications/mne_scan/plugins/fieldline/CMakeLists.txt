@@ -134,8 +134,9 @@ endif()
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES
-  OBJECT_DEPENDS "${SOURCE_PATHS}")
-link_directories(${Python_LDFLAGS_NORM})
+  OBJECT_DEPENDS "${SOURCE_PATHS}"
+)
+
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
 set(FFTW_LIBS "")
@@ -155,6 +156,8 @@ if(USE_FFTW)
 endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../ ${Python_INCLUDE_DIRS})
+
+target_link_directories(${PROJECT_NAME} PRIVATE ${Python_LIB_DIR})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
   Qt${QT_VERSION_MAJOR}::Core
@@ -176,13 +179,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   scShared
   scMeas
   ${FFTW_LIBS}
-  ${Python_LIB_DIR}/libpython${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}.so
-  ${Python_LDFlags_NORM}
+  python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}
 )
 
 separate_arguments(Python_CFLAGS_NORM UNIX_COMMAND "${Python_CFLAGS}")
 target_compile_options(${PROJECT_NAME} PRIVATE ${Python_CFLAGS_NORM})
-
+add_link_options(${Python_LDFLAGS_NORM})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
   SCAN_FIELDLINE_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"
