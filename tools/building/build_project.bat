@@ -25,18 +25,17 @@
 
     SET "WithCodeCoverage=False"
     SET "NumProcesses=1"
+
+    SET "Rebuild=False"
     
     :loop
     IF NOT "%1"=="" (
       ECHO 1 is -%1-
       IF "%1"=="help" (
-        goto :showHelp
+        call:showHelp
+        goto :end_of_script
       )
       set Arg=%1
-      ECHO ARG is -!Arg!-
-
-      ECHO DDD !Arg! !Arg:Debug=!
-      echo RRR !Arg! !Arg:Release=!
 
       IF NOT x!Arg!==x!Arg:Release=! (
         SET BuildType=Release
@@ -54,6 +53,9 @@
       )
       IF "%1"=="clean" (
         SET "CleanBuild=True"
+      )
+      IF "%1"=="rebuild" (
+        SET "Rebuild=True"
       )
 
       SHIFT
@@ -81,10 +83,19 @@
 
         RMDIR /S /Q %BuildFolder%
         RMDIR /S /Q %OutFolder%
+
+        goto :end_of_script
     )
 
-    %MockText%cmake -B %BuildFolder% -S %SourceFolder% -DCMAKE_BUILD_TYPE=%BuildType% -DBINARY_OUTPUT_DIRECTORY=%OutFolder% -DCMAKE_CXX_FLAGS="/MP"
+    IF "%Rebuild%"=="False" (
+        ECHO .
+        ECHO Configuring build project
+        %MockText%cmake -B %BuildFolder% -S %SourceFolder% -DCMAKE_BUILD_TYPE=%BuildType% -DBINARY_OUTPUT_DIRECTORY=%OutFolder% -DCMAKE_CXX_FLAGS="/MP"
+    )
+
     %MockText%cmake --build %BuildFolder% --config %BuildType%
+
+    :end_of_script
 
     exit /B 
 
@@ -102,16 +113,37 @@
       ECHO BuildType    = %BuildType%
       ECHO BuildName    = %BuildName%
       ECHO CleanBuild   = %CleanBuild%
-      ECHO Coverage =%WithCodeCoverage%
-      ECHO BuildFolder  =%BuildFolder%
-      ECHO SourceFolder =%SourceFolder%
+      ECHO Rebuild      = %Rebuild%
+      ECHO Coverage     = %WithCodeCoverage%
       ECHO NumProcesses = %NumProcesses%
-      ECHO MockBuild = %MockBuild%
+      ECHO MockBuild    = %MockBuild%
       ECHO .
       ECHO ====================================================================
       ECHO ====================================================================
       ECHO .
     exit /B 0
+
+    :showHelp
+      ECHO . 
+      ECHO MNE-CPP building script help.
+      ECHO . 
+      ECHO Usage: ./build_project.bat [Options]
+      ECHO .
+      ECHO All builds will be parallel.
+      ECHO All options can be used in undefined order.
+      ECHO .
+      ECHO [help] - Print this help.
+      ECHO [mock] - Show commands do not execute them.
+      ECHO [clean] - Delete build and out folders for your configuration and exit.
+      ECHO [Release*/Debug*] - Set the build type Debug/Release and name it.
+      ECHO                     For example, Release_testA will build in release
+      ECHO                     mode with a build folder /build/Release_testA
+      ECHO                     and an out folder /out/Release_testA.
+      ECHO [coverage] -  Enable code coverage.
+      ECHO [rebuild] - Only rebuild existing build-system configuration.
+      ECHO .
+    exit /B 0
+
 
     :; # ########## WINDOWS SECTION ENDS ####################
     :; # ####################################################
