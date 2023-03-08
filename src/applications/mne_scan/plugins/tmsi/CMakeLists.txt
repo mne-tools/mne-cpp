@@ -37,6 +37,13 @@ set(HEADERS
     FormFiles/tmsisetupprojectwidget.h
 )
 
+set(UI
+    FormFiles/tmsisetup.ui
+    FormFiles/tmsimanualannotationwidget.ui
+    FormFiles/tmsiimpedancewidget.ui
+    FormFiles/tmsisetupprojectwidget.ui
+)
+
 set(RESOURCES
     tmsi.qrc    
 )
@@ -47,7 +54,7 @@ set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES} ${UI})
 
 set(FFTW_LIBS "")
 
