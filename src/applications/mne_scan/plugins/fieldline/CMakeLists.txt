@@ -10,15 +10,84 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED
   COMPONENTS Core Widgets Network Concurrent)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED
   COMPONENTS Core Widgets Network Concurrent)
-# find_package(Python REQUIRED COMPONENTS Interpreter Development)
-# cmake_path(GET Python_EXECUTABLE PARENT_PATH Python_BIN_DIR)
+find_package(Python REQUIRED COMPONENTS Interpreter Development)
+cmake_path(GET Python_EXECUTABLE PARENT_PATH Python_BIN_DIR)
+
+#if(AWK MATCHES ".+-NOTFOUND")
+#    message(FATAL_ERROR "FATAL: awk (and mawk and gawk) could not be found (${AWK}).")
+#else()
+#    execute_process(
+#        COMMAND /bin/sh -c "\"${AWK}\" '$1 ~ /^#define/ && $2 ~ /^LIB_(MAJVER|MINVER|PATCH|BUILD)$/\ { print \"set(\${PRJNAME}_\" $2 \" \" $3 \")\" }' \"${CMAKE_SOURCE_DIR}/version.h\""
+#        RESULT_VARIABLE AWK_EXITCODE
+#        OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/version.cmake"
+#        )
+#    message(STATUS "Exit code from awk: ${AWK_EXITCODE}")
+#    include(${CMAKE_CURRENT_BINARY_DIR}/version.cmake)
+#endif()
+
+#set(Python_EXECUTABLE /autofs/cluster/fusion/juan/anaconda3/bin/python)
+#cmake_path(GET Python_EXECUTABLE PARENT_PATH Python_BIN_DIR)
+#if (WIN32)
+#  execute_process(COMMAND CMD /c echo bar OUTPUT_VARIABLE FOO)
+#else()
+#  message("holaaaaaaa")
+#  execute_process(
+#    COMMAND "python -c 'import platform; major, minor, patch = platform.python_version_tuple(); print(minor)'"
+#    OUTPUT_VARIABLE Python_version)
+#endif (WIN32)
+#message("Python executable: " ${Python_EXECUTABLE})
+#message("Python_version: " ${Python_version})
 #
-# set(PYTHON_COMPILE_FLAGS "--cflags")
-# execute_process(COMMAND
-#   ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config ${PYTHON_COMPILE_FLAGS}
-#   OUTPUT_VARIABLE Python_FLAGS
-# )
+#    execute_process(
+#        COMMAND /bin/sh -c "\"${AWK}\" '$1 ~ /^#define/ && $2 ~ /^LIB_(MAJVER|MINVER|PATCH|BUILD)$/\ { print \"set(\${PRJNAME}_\" $2 \" \" $3 \")\" }' \"${CMAKE_SOURCE_DIR}/version.h\""
+#        RESULT_VARIABLE AWK_EXITCODE
+#        OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/version.cmake"
+#        )
 #
+
+#execute_process(
+#  "echo $(dirname $(which python))"
+#  WORKING_DIRECTORY .
+#  OUTPUT_VARIABLE Python_BIN_DIR
+#)
+
+#execute_process(COMMAND
+#  /usr/bin/zsh -c " python -c 'import platform; major, minor, patch = platform.python_version_tuple(); print(major)'"
+#  OUTPUT_VARIABLE Python_VERSION_MAJOR
+#)
+#execute_process(COMMAND
+#  /usr/bin/zsh -c "python -c 'import platform; major, minor, patch = platform.python_version_tuple(); print(minor)'"
+#  OUTPUT_VARIABLE Python_VERSION_MINOR
+#)
+#
+#set(Python_EXECUTABLE ${Python_BIN_DIR}/python)
+#execute_process(COMMAND
+#  bash -c "${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config --includes"
+#  OUTPUT_VARIABLE Python_INCLUDE_DIRS
+#)
+#execute_process(COMMAND
+#  bash -c "${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config --cflags"
+#  OUTPUT_VARIABLE Python_CFLAGS
+#)
+#execute_process(COMMAND
+#  bash -c "${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config --libs"
+#  OUTPUT_VARIABLE Python_LIBS
+#)
+#execute_process(COMMAND
+#  bash -c "${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config --ldflags"
+#  OUTPUT_VARIABLE Python_LDFLAGS
+#)
+
+message("python       bin dir: " ${Python_BIN_DIR})
+message("python    executable: " ${Python_EXECUTABLE})
+message("python version major: " ${Python_VERSION_MAJOR})
+message("python version minor: " ${Python_VERSION_MINOR})
+message("python  include dirs: " ${Python_INCLUDE_DIRS})
+message("python        cflags: " ${Python_CFLAGS})
+message("python   cflags norm: " ${Python_CFLAGS_NORM})
+message("python     libraries: " ${Python_LIBS})
+message("python     lib flags: " ${Python_LDFLAGS})
+
 set(SOURCES
     fieldline_global.cpp
     fieldline.cpp
@@ -41,7 +110,7 @@ else()
   # message("File fieldline.json does not exist.")
   # message("Creating a new fieldline.json file.")
   execute_process(COMMAND "echo \"\""
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    WORKING_DIRECTORY ${CMAKE_C
     OUTPUT_FILE fieldline.json)
 endif()
 
@@ -68,41 +137,45 @@ if(USE_FFTW)
   endif()
 endif()
 
-target_include_directories(${PROJECT_NAME} PUBLIC ../)
+target_include_directories(${PROJECT_NAME} PUBLIC ../ ${Python_INCLUDE_DIRS})
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Network
-    Qt${QT_VERSION_MAJOR}::Concurrent
-    eigen
-    mne_disp
-    mne_utils
-    mne_fiff
-    # mne_fs
-    # mne_mne
-    # mne_fwd
-    # mne_inverse
-    # mne_rtprocessing
-    # mne_connectivity
-    # mne_events
-    scDisp
-    scShared
-    scMeas
-    ${FFTW_LIBS}
-    # python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR})
-  )
+  Qt${QT_VERSION_MAJOR}::Core
+  Qt${QT_VERSION_MAJOR}::Widgets
+  Qt${QT_VERSION_MAJOR}::Network
+  Qt${QT_VERSION_MAJOR}::Concurrent
+  eigen
+  mne_disp
+  mne_utils
+  mne_fiff
+  # mne_fs
+  # mne_mne
+  # mne_fwd
+  # mne_inverse
+  # mne_rtprocessing
+  # mne_connectivity
+  # mne_events
+  scDisp
+  scShared
+  scMeas
+  ${FFTW_LIBS}
+  python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}
+  ${Python_LIBS}
+)
 
-# target_link_directories(${PROJECT_NAME} PRIVATE ${Python_LIBRARY_DIRS})
-# separate_arguments(Python_FLAGS_NORM UNIX_COMMAND "${Python_FLAGS}")
-# target_compile_options(${PROJECT_NAME} PRIVATE ${Python_FLAGS_NORM})
+target_link_directories(${PROJECT_NAME} PRIVATE ${Python_LDFLAGS})
+separate_arguments(Python_CFLAGS_NORM UNIX_COMMAND "${Python_CFLAGS}")
+target_compile_options(${PROJECT_NAME} PRIVATE ${Python_CFLAGS_NORM})
+
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
   SCAN_FIELDLINE_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"
   MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}"
 )
 
+
 if(NOT BUILD_SHARED_LIBS)
   target_compile_definitions(${PROJECT_NAME} PRIVATE
     STATICBUILD QT_STATICPLUGIN)
 endif()
+
