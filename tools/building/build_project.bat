@@ -196,6 +196,7 @@ doShowLogo() {
 
 doShowLogoFlames() {
   echo "                                        "
+  echo "                                        "
   echo "     *       )             (   (        "
   echo "   (  \`   (  (         (   )\ ))\ )     "
   echo "   )\))(  )\())(       )\ (()/(()/(     "
@@ -347,18 +348,17 @@ fi
 
 if [ "${Rebuild}" == "false" ]; then
   echo " "
-  echo "Configuring build project:" 
+  echo "Build system configuring:" 
   ${MockText}cmake -B ${BuildFolder} -S ${SourceFolder} -DCMAKE_BUILD_TYPE=${BuildType} -DBINARY_OUTPUT_DIRECTORY=${OutFolder} ${CoverageOption}
 fi
 
 echo " "
 echo "Compiling:"
 ${MockText}cmake --build ${BuildFolder} --parallel $NumProcesses
-
 if [ $? -eq 0 ]; then
-  doShowLogoFlames
+  BuildSuccessful="true"
 else
-  doshowBuildFailed
+  BuildSuccessful="false"
 fi
 
 echo " "
@@ -366,11 +366,15 @@ echo " "
 echo "Copy compile_commands.json to root folder."
 echo " "
 ${MockText}cp -v ${BuildFolder}/compile_commands.json ${BaseFolder}
+echo " "
+echo " "
 
-echo " "
-echo " "
+if [ "${BuildSuccessful}" == "true" ]; then
+  doShowLogoFlames
+else
+  doShowBuildFailed
+fi
 
 exit 0
-
 
 
