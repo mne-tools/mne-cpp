@@ -179,12 +179,54 @@ CleanBuild="false"
 Rebuild="false"
 NumProcesses="1"
 MockBuild="false"
+MockText=""
+PrintHelp="false"
 
-if [ "$(uname)" == "Darwin" ]; then
-    NumProcesses=$(sysctl -n hw.logicalcpu)
-else 
-    NumProcesses=$(expr $(nproc --all))
-fi
+doShowLogo() {
+  echo "                                      "
+  echo "                                      "
+  echo "    _    _ _  _ ___     ___ __  ___   "
+  echo "   |  \/  | \| | __|   / __| _ \ _ \  "
+  echo "   | |\/| | .\` | _|   | (__|  _/  _/  "
+  echo "   |_|  |_|_|\_|___|   \___|_| |_|    "
+  echo "                                      "
+  echo "   Building tool                      "
+  echo "                                      "
+}
+
+doShowLogoFlames() {
+  echo "                                        "
+  echo "     *       )             (   (        "
+  echo "   (  \`   (  (         (   )\ ))\ )     "
+  echo "   )\))(  )\())(       )\ (()/(()/(     "
+  echo "  ((_)()\((_)\ )\ ___(((_) /(_))(_))    "
+  echo "  (_()((_)_((_|(_)___)\___(_))(_))      "
+  echo "  |  \/  | \| | __| ((/ __| _ \ _ \     "
+  echo "  | |\/| | .\` | _|   | (__|  _/  _/     "
+  echo "  |_|  |_|_|\_|___|   \___|_| |_|       "
+  echo "                                        "
+  echo "                                        "
+  echo "  Build successful                      "
+  echo "                                        "
+  echo "                                        "
+}
+
+doShowBuildFailed() {
+  echo "                                                      "
+  echo "                                                      "
+  echo "   _           _ _     _     __      _ _          _   "
+  echo "  | |         (_) |   | |   / _|    (_) |        | |  "
+  echo "  | |__  _   _ _| | __| |  | |_ __ _ _| | ___  __| |  "
+  echo "  | '_ \| | | | | |/ _\` |  |  _/ _\` | | |/ _ \/ _\` |  "
+  echo "  | |_) | |_| | | | (_| |  | || (_| | | |  __/ (_| |  "
+  echo "  |_.__/ \__,_|_|_|\__,_|  |_| \__,_|_|_|\___|\__,_|  "
+  echo "                                                      "
+  echo "                                                      "
+  echo "  Here we go...                                       "
+  echo "                                                      "
+  echo "                                                      "
+}
+
 
 doPrintConfiguration() {
   echo " "
@@ -204,6 +246,8 @@ doPrintConfiguration() {
   echo " WithCodeCoverage = $WithCodeCoverage"
   echo " NumProcesses = $NumProcesses"
   echo " MockBuild = $MockBuild"
+  echo " MockText = $MockText"
+  echo " PrintHelp = $PrintHelp"
   echo " "
   echo ========================================================================
   echo ========================================================================
@@ -212,22 +256,20 @@ doPrintConfiguration() {
 
 doPrintHelp() {
   echo " "
-  echo "MNE-CPP building script help."
-  echo " "
   echo "Usage: ./build_project.bat [Options]"
   echo " "
   echo "All builds will be parallel."
   echo "All options can be used in undefined order."
   echo " "
-  echo "[help] - Print this help."
-  echo "[mock] - Show commands do not execute them."
+  echo "[help]  - Print this help."
+  echo "[mock]  - Show commands do not execute them."
   echo "[clean] - Delete build and out folders for your configuration and exit."
   echo "[Release*/Debug*] - Set the build type (Debug/Release) and name it."
   echo "                    For example, Release_testA will build in release"
   echo "                    mode with a build folder /build/Release_testA"
   echo "                    and an out folder /out/Release_testA."
-  echo "[coverage] -  Enable code coverage."
-  echo "[rebuild] - Only rebuild existing build-system configuration."
+  echo "[coverage] - Enable code coverage."
+  echo "[rebuild]  - Only rebuild existing build-system configuration."
   echo " "
 }
 
@@ -243,8 +285,7 @@ for (( j=0; j<argc; j++)); do
   elif [ "${argv[j]}" == "rebuild" ]; then
     Rebuild="true"
   elif [ "${argv[j]}" == "help" ]; then
-    doPrintHelp
-    exit 1
+    PrintHelp="true"
   fi
   case ${argv[j]} in
     *"Debug"*)
@@ -268,7 +309,20 @@ SourceFolder=${BaseFolder}/src
 BuildFolder=${BaseFolder}/build/${BuildName}
 OutFolder=${BaseFolder}/out/${BuildName}
 
-doPrintConfiguration
+if [ "$(uname)" == "Darwin" ]; then
+    NumProcesses=$(sysctl -n hw.logicalcpu)
+else 
+    NumProcesses=$(expr $(nproc --all))
+fi
+
+#### command execution starts here
+
+doShowLogo
+
+if [ "${PrintHelp}" == "true" ]; then
+  doPrintHelp
+  exit 0
+fi
 
 if [ "${MockBuild}" == "true" ]; then
   MockText="echo "
@@ -278,6 +332,8 @@ if [ "${MockBuild}" == "true" ]; then
 else
   MockText=""
 fi
+
+doPrintConfiguration
 
 if [ "${CleanBuild}" == "true" ]; then
   echo "Deleting folders: "
@@ -299,8 +355,22 @@ echo " "
 echo "Compiling:"
 ${MockText}cmake --build ${BuildFolder} --parallel $NumProcesses
 
-echo "Copy compile_commands.json file to root folder."
+if [ $? -eq 0 ]; then
+  doShowLogoFlames
+else
+  doshowBuildFailed
+fi
+
+echo " "
+echo " "
+echo "Copy compile_commands.json to root folder."
+echo " "
 ${MockText}cp -v ${BuildFolder}/compile_commands.json ${BaseFolder}
 
+echo " "
+echo " "
+
 exit 0
+
+
 
