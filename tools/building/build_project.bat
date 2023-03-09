@@ -32,6 +32,7 @@
     IF NOT "%1"=="" (
       ECHO 1 is -%1-
       IF "%1"=="help" (
+        call:showLogo
         call:showHelp
         goto :end_of_script
       )
@@ -66,6 +67,7 @@
     SET BuildFolder=%BaseFolder%\build\%BuildName%
     SET OutFolder=%BaseFolder%\out\%BuildName%
 
+    call:showLogo
     call:doPrintConfiguration
 
     IF "%MockBuild%"=="True" (
@@ -91,13 +93,23 @@
         ECHO .
         ECHO Configuring build project
         %MockText%cmake -B %BuildFolder% -S %SourceFolder% -DCMAKE_BUILD_TYPE=%BuildType% -DBINARY_OUTPUT_DIRECTORY=%OutFolder% -DCMAKE_CXX_FLAGS="/MP"
+        xcopy %BuildFolder%\compile_commands.json %BaseFolder%\compile_commands.json
     )
 
-    %MockText%cmake --build %BuildFolder% --config %BuildType%
+    %MockText%cmake --build %BuildFolder% --config %BuildType% && call::sucess || call:fail
+
 
     :end_of_script
 
     exit /B 
+
+    :buildSuccessful
+      call:showBuildSuccessful
+    exit /B 0
+
+    :buildFailed
+      call:showBuildFailed
+    exit /B 1
 
     :doPrintConfiguration
       ECHO .
@@ -144,7 +156,55 @@
       ECHO .
     exit /B 0
 
+    :showLogo
+      ECHO . 
+      ECHO .
+      ECHO .
+      ECHO      _    _ _  _ ___     ___ __  ___   
+      ECHO     |  \/  | \| | __|   / __| _ \ _ \  
+      ECHO     | |\/| | .\` | _|   | (__|  _/  _/  
+      ECHO     |_|  |_|_|\_|___|   \___|_| |_|    
+      ECHO .
+      ECHO     Build tool                         
+      ECHO .
+    exit /B 0
 
+    :showBuildSuccessful
+      ECHO . 
+      ECHO .
+      ECHO       *       )             (   (        
+      ECHO     (  \`   (  (         (   )\ ))\ )     
+      ECHO     )\))(  )\())(       )\ (()/(()/(     
+      ECHO    ((_)()\((_)\ )\ ___(((_) /(_))(_))    
+      ECHO    (_()((_)_((_|(_)___)\___(_))(_))      
+      ECHO    |  \/  | \| | __| ((/ __| _ \ _ \     
+      ECHO    | |\/| | .\` | _|   | (__|  _/  _/     
+      ECHO    |_|  |_|_|\_|___|   \___|_| |_|       
+      ECHO .
+      ECHO .
+      ECHO    Build successful                      
+      ECHO .
+      ECHO .
+    exit /B 0
+
+    :showBuildFailed
+      ECHO .
+      ECHO .
+      ECHO .
+      ECHO     _           _ _     _     __      _ _          _   
+      ECHO    | |         (_) |   | |   / _|    (_) |        | |  
+      ECHO    | |__  _   _ _| | __| |  | |_ __ _ _| | ___  __| |  
+      ECHO    | '_ \| | | | | |/ _\` |  |  _/ _\` | | |/ _ \/ _\` |  
+      ECHO    | |_) | |_| | | | (_| |  | || (_| | | |  __/ (_| |  
+      ECHO    |_.__/ \__,_|_|_|\__,_|  |_| \__,_|_|_|\___|\__,_|  
+      ECHO .
+      ECHO .
+      ECHO    Here we go...                                       
+      ECHO .
+      ECHO .
+    exit /B 0
+
+  
     :; # ########## WINDOWS SECTION ENDS ####################
     :; # ####################################################
     exit /b
