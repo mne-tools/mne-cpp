@@ -190,7 +190,7 @@ doShowLogo() {
   echo "   | |\/| | .\` | _|   | (__|  _/  _/  "
   echo "   |_|  |_|_|\_|___|   \___|_| |_|    "
   echo "                                      "
-  echo "   Building tool                      "
+  echo "   Build tool                         "
   echo "                                      "
 }
 
@@ -348,7 +348,7 @@ fi
 
 if [ "${Rebuild}" == "false" ]; then
   echo " "
-  echo "Build system configuring:" 
+  echo "Configuring Build System:" 
   ${MockText}cmake -B ${BuildFolder} -S ${SourceFolder} -DCMAKE_BUILD_TYPE=${BuildType} -DBINARY_OUTPUT_DIRECTORY=${OutFolder} ${CoverageOption}
 fi
 
