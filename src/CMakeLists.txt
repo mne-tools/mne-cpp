@@ -45,9 +45,9 @@ endif()
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # If no build type is specified, default to Release
-if(NOT DEFINED CMAKE_BUILD_TYPE)
+if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release")
-  message("Build type not defined. Using default value: ${CMAKE_BUILD_TYPE}")
+  message("-- [MNE-CPP] Build type not defined. Using default value: ${CMAKE_BUILD_TYPE}")
 endif()
 
 if(NOT DEFINED CMAKE_BINARY_DIR)
@@ -56,7 +56,7 @@ endif()
 
 if(NOT DEFINED BINARY_OUTPUT_DIRECTORY)
   set(BINARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../out/${CMAKE_BUILD_TYPE})
-  message("Build name not defined. Using default value: ${BINARY_OUTPUT_DIRECTORY}")
+  message("-- [MNE-CPP] Build name not defined. Using default value: ${BINARY_OUTPUT_DIRECTORY}")
 endif()
 
 ##==============================================================================
