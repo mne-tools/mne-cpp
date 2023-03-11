@@ -21,11 +21,7 @@ set(SOURCES
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES})
 else()
-    if(ANDROID)
-        add_library(${PROJECT_NAME} SHARED ${SOURCES})
-    else()
-        add_executable(${PROJECT_NAME} ${SOURCES})
-    endif()
+    add_executable(${PROJECT_NAME} ${SOURCES})
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
