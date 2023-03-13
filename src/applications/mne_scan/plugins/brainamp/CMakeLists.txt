@@ -30,18 +30,18 @@ set(HEADERS
 set(UI
     FormFiles/brainampsetup.ui
     FormFiles/brainampsetupprojectwidget.ui
-
 )
 
 set(RESOURCES
-    brainamp.qrc    
+    brainamp.qrc
 )
 
 set(FILE_TO_UPDATE babymeg_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
+set_source_files_properties(${FILE_TO_UPDATE}
+    PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES} ${UI})
 
@@ -82,8 +82,13 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     scMeas
     ${FFTW_LIBS})
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE SCAN_BRAINAMP_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE SCAN_BRAINAMP_PLUGIN
+    MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"
+    MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}"
+)
 
 if(NOT BUILD_SHARED_LIBS)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD QT_STATICPLUGIN)
+    target_compile_definitions(${PROJECT_NAME}
+        PRIVATE STATICBUILD QT_STATICPLUGIN)
 endif()

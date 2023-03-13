@@ -53,7 +53,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_disp
     mne_disp3D
     eigen
-	anShared
+    anShared
 )
 
 if(NOT BUILD_SHARED_LIBS)
@@ -70,7 +70,7 @@ if(NOT BUILD_SHARED_LIBS)
         analyze_rawdataviewer
         analyze_sourcelocalization
         analyze_view3d)
-        
+
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
 
