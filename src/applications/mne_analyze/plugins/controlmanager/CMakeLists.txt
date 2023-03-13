@@ -10,7 +10,7 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Svg)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Svg)
 
 set(SOURCES
-    controlmanager.cpp 
+    controlmanager.cpp
     controlmanager_global.cpp
 )
 
@@ -60,11 +60,16 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_inverse
     mne_rtprocessing
     mne_events
-	anShared
+    anShared
     ${FFTW_LIBS})
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE ANALYZE_CONTROLMANAGER_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE ANALYZE_CONTROLMANAGER_PLUGIN
+    MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"
+    MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}"
+)
 
 if(NOT BUILD_SHARED_LIBS)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD QT_STATICPLUGIN)
+    target_compile_definitions(${PROJECT_NAME}
+	PRIVATE STATICBUILD QT_STATICPLUGIN)
 endif()

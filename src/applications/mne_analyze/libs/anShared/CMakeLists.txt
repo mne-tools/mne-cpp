@@ -10,19 +10,19 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Svg)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Svg)
 
 set(SOURCES
-    Management/analyzedata.cpp 
-    Management/pluginmanager.cpp 
-    Management/event.cpp 
-    Management/communicator.cpp 
-    Management/eventmanager.cpp 
-    Management/statusbar.cpp 
-    Model/bemdatamodel.cpp 
-    Model/dipolefitmodel.cpp 
-    Model/fiffrawviewmodel.cpp 
-    Model/eventmodel.cpp 
-    Model/averagingdatamodel.cpp 
-    Model/mricoordmodel.cpp 
-    Model/covariancemodel.cpp 
+    Management/analyzedata.cpp
+    Management/pluginmanager.cpp
+    Management/event.cpp
+    Management/communicator.cpp
+    Management/eventmanager.cpp
+    Management/statusbar.cpp
+    Model/bemdatamodel.cpp
+    Model/dipolefitmodel.cpp
+    Model/fiffrawviewmodel.cpp
+    Model/eventmodel.cpp
+    Model/averagingdatamodel.cpp
+    Model/mricoordmodel.cpp
+    Model/covariancemodel.cpp
     Plugins/abstractplugin.cpp
 )
 
@@ -51,7 +51,8 @@ set(HEADERS
 
 # set(SOURCE_PATHS ${SOURCES})
 # list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-# set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
+# set_source_files_properties(${FILE_TO_UPDATE}
+#   PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 
@@ -89,7 +90,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_events
     ${FFTW_LIBS})
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE ANSHARED_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+target_compile_definitions(${PROJECT_NAME}
+  PRIVATE ANSHARED_LIBRARY
+  MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"
+  MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
 
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
