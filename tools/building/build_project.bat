@@ -3,9 +3,7 @@
     :; # ####################################################
     :; # ########## WINDOWS SECTION #########################
        
-  
     setlocal EnableDelayedExpansion
-
 
     SET ScriptPath=%~dp0
     SET BaseFolder=%ScriptPath%..\..
@@ -98,7 +96,6 @@
 
     %MockText%cmake --build %BuildFolder% --config %BuildType% && call::sucess || call:fail
 
-
     :end_of_script
 
     exit /B 
@@ -159,7 +156,6 @@
     :showLogo
       ECHO . 
       ECHO .
-      ECHO .
       ECHO      _    _ _  _ ___     ___ __  ___   
       ECHO     |  \/  | \| | __|   / __| _ \ _ \  
       ECHO     | |\/| | .\` | _|   | (__|  _/  _/  
@@ -181,14 +177,11 @@
       ECHO    | |\/| | .\` | _|   | (__|  _/  _/     
       ECHO    |_|  |_|_|\_|___|   \___|_| |_|       
       ECHO .
-      ECHO .
       ECHO    Build successful                      
-      ECHO .
       ECHO .
     exit /B 0
 
     :showBuildFailed
-      ECHO .
       ECHO .
       ECHO .
       ECHO     _           _ _     _     __      _ _          _   
@@ -198,13 +191,10 @@
       ECHO    | |_) | |_| | | | (_| |  | || (_| | | |  __/ (_| |  
       ECHO    |_.__/ \__,_|_|_|\__,_|  |_| \__,_|_|_|\___|\__,_|  
       ECHO .
-      ECHO .
       ECHO    Here we go...                                       
-      ECHO .
       ECHO .
     exit /B 0
 
-  
     :; # ########## WINDOWS SECTION ENDS ####################
     :; # ####################################################
     exit /b
@@ -266,14 +256,11 @@ doShowLogoFlames() {
   echo "  | |\/| | .\` | _|   | (__|  _/  _/     "
   echo "  |_|  |_|_|\_|___|   \___|_| |_|       "
   echo "                                        "
-  echo "                                        "
   echo "  Build successful                      "
-  echo "                                        "
   echo "                                        "
 }
 
 doShowBuildFailed() {
-  echo "                                                      "
   echo "                                                      "
   echo "   _           _ _     _     __      _ _          _   "
   echo "  | |         (_) |   | |   / _|    (_) |        | |  "
@@ -282,9 +269,7 @@ doShowBuildFailed() {
   echo "  | |_) | |_| | | | (_| |  | || (_| | | |  __/ (_| |  "
   echo "  |_.__/ \__,_|_|_|\__,_|  |_| \__,_|_|_|\___|\__,_|  "
   echo "                                                      "
-  echo "                                                      "
   echo "  Here we go...                                       "
-  echo "                                                      "
   echo "                                                      "
 }
 
@@ -425,7 +410,7 @@ echo " "
 echo " "
 echo "Copy compile_commands.json to root folder."
 echo " "
-${MockText}cp -v ${BuildFolder}/compile_commands.json ${BaseFolder}
+${MockText}cp ${BuildFolder}/compile_commands.json ${BaseFolder}
 echo " "
 echo " "
 
