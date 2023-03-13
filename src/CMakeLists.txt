@@ -49,6 +49,14 @@ if(NOT DEFINED CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release")
 endif()
 
+if(NOT DEFINED CMAKE_BINARY_DIR)
+  set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../build)
+endif()
+
+if(NOT DEFINED BINARY_OUTPUT_DIRECTORY)
+  set(BINARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../out/${CMAKE_BUILD_TYPE})
+endif()
+
 ##==============================================================================
 ## Dissalow in-soure builds by default
 
