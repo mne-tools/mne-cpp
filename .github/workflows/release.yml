@@ -567,9 +567,9 @@ jobs:
     - name: Clone and update mne-cpp/wasm:gh-pages
       run: |
         # Delete folders which we do not want to ship
-        rm -r bin/mne_analyze_plugins
-        rm -r bin/mne-cpp-test-data
-        rm -r bin/MNE-sample-data
+        rm -r /mne_analyze_plugins
+        rm -r resources/mne-cpp-test-data
+        rm -r resources/MNE-sample-data
         # Replace logo
         cp -RT tools/design/logos/qtlogo.svg bin/qtlogo.svg
         # Clone repo and update with new wasm versions
