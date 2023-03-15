@@ -555,7 +555,7 @@ FilterParameter::FilterParameter()
 
 FilterParameter::FilterParameter(QString sName)
 :FilterParameter(sName,"")
-{  
+{
 }
 
 //=============================================================================================================

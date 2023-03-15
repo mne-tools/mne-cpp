@@ -83,7 +83,7 @@ class Network;
  * @brief This class computes the imaginary coherence connectivity metric.
  */
 class CONNECTIVITYSHARED_EXPORT ImagCoherence : public AbstractMetric
-{    
+{
 
 public:
     typedef QSharedPointer<ImagCoherence> SPtr;            /**< Shared pointer type for ImagCoherence. */

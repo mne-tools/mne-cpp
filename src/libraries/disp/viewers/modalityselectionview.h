@@ -82,7 +82,7 @@ class DISPSHARED_EXPORT ModalitySelectionView : public AbstractView
 {
     Q_OBJECT
 
-public:    
+public:
     typedef QSharedPointer<ModalitySelectionView> SPtr;              /**< Shared pointer type for ModalitySelectionView. */
     typedef QSharedPointer<const ModalitySelectionView> ConstSPtr;   /**< Const shared pointer type for ModalitySelectionView. */
 

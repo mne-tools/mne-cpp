@@ -102,7 +102,7 @@ using namespace Eigen;
  * @return the value that was set to exit() (which is 0 if exit() is called via quit()).
  */
 int main(int argc, char *argv[])
-{    
+{
     #ifdef STATICBUILD
     // Q_INIT_RESOURCE(mne_disp3d);
     #endif

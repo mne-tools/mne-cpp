@@ -84,7 +84,7 @@ class Network;
  * @brief This class computes the phase locking value connectivity metric.
  */
 class CONNECTIVITYSHARED_EXPORT PhaseLockingValue : public AbstractMetric
-{    
+{
 
 public:
     typedef QSharedPointer<PhaseLockingValue> SPtr;            /**< Shared pointer type for PhaseLockingValue. */

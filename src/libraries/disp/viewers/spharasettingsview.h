@@ -79,7 +79,7 @@ class DISPSHARED_EXPORT SpharaSettingsView : public AbstractView
 {
     Q_OBJECT
 
-public:    
+public:
     typedef QSharedPointer<SpharaSettingsView> SPtr;              /**< Shared pointer type for SpharaSettingsView. */
     typedef QSharedPointer<const SpharaSettingsView> ConstSPtr;   /**< Const shared pointer type for SpharaSettingsView. */
 

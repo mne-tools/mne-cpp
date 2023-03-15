@@ -96,7 +96,7 @@
 typedef int int32_t;
 typedef short int16_t;
 typedef unsigned short uint16_t;
-#endif 
+#endif
 #if defined(WIN32)
 typedef __int32 int32_t;
 typedef __int16 int16_t;

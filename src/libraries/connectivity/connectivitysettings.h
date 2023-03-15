@@ -89,7 +89,7 @@ namespace CONNECTIVITYLIB {
  * @brief This class is a container for connectivity settings.
  */
 class CONNECTIVITYSHARED_EXPORT ConnectivitySettings
-{    
+{
 
 public:
     typedef QSharedPointer<ConnectivitySettings> SPtr;            /**< Shared pointer type for ConnectivitySettings. */

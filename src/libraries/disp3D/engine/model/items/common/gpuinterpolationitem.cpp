@@ -230,7 +230,7 @@ void GpuInterpolationItem::addNewRtData(const VectorXf &tSignalVec)
 //=============================================================================================================
 
 void GpuInterpolationItem::setThresholds(const QVector3D &tVecThresholds)
-{   
+{
     this->setMaterialParameter(QVariant::fromValue(tVecThresholds.x()), QStringLiteral("fThresholdX"));
     this->setMaterialParameter(QVariant::fromValue(tVecThresholds.z()), QStringLiteral("fThresholdZ"));
 }

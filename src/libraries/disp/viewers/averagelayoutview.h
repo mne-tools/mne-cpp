@@ -86,7 +86,7 @@ class DISPSHARED_EXPORT AverageLayoutView : public AbstractView
 {
     Q_OBJECT
 
-public:    
+public:
     typedef QSharedPointer<AverageLayoutView> SPtr;              /**< Shared pointer type for AverageLayoutView. */
     typedef QSharedPointer<const AverageLayoutView> ConstSPtr;   /**< Const shared pointer type for AverageLayoutView. */
 

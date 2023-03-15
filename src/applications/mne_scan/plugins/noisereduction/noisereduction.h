@@ -161,7 +161,7 @@ public:
                           int nBaseFctsFirst,
                           int nBaseFctsSecond);
 
-protected:    
+protected:
     //=========================================================================================================
     /**
      * AbstractAlgorithm function

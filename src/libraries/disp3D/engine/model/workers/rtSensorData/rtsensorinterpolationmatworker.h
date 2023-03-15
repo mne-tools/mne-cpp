@@ -133,7 +133,7 @@ public:
      */
     void setBadChannels(const FIFFLIB::FiffInfo& info);
 
-protected:    
+protected:
     //=========================================================================================================
     /**
      * Calculate the interpolation operator based on the set interpolation info.

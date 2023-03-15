@@ -5,7 +5,7 @@
 :;#
 :;# This script is based on an open-source cross-platform script template.
 :;# For more information you can visit: https://github.com/juangpc/multiplatform_bash_cmd
-:;# 
+:;#
 
 :<<BATCH
     :;@echo off

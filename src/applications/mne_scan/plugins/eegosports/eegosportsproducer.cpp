@@ -113,7 +113,7 @@ void EEGoSportsProducer::start(int iSamplesPerBlock,
 //=============================================================================================================
 
 void EEGoSportsProducer::stop()
-{    
+{
     requestInterruption();
     wait();
 

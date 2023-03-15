@@ -405,7 +405,7 @@ bool EventView::newUserGroup(const QString& sName,
 //=============================================================================================================
 
 void EventView::groupChanged()
-{    
+{
     auto selection = m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows();
 
     if(!selection.size()){

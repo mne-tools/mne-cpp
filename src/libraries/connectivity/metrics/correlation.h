@@ -79,7 +79,7 @@ class Network;
  * @brief This class computes the correlation metric.
  */
 class CONNECTIVITYSHARED_EXPORT Correlation : public AbstractMetric
-{    
+{
 
 public:
     typedef QSharedPointer<Correlation> SPtr;            /**< Shared pointer type for Correlation. */

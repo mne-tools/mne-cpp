@@ -6,7 +6,7 @@
 :;#
 :;# This script is based ßon an open-source cross-platform script template.
 :;# For more information you can visit: https://github.com/juangpc/multiplatform_bash_cmd
-:;# 
+:;#
 
 :<<BATCH
   :; # ########## WINDOWS SECTION #########################
@@ -71,7 +71,7 @@ exit /B %compoundOutput%
   echo.
 exit /B 0
 
-:doPrintHelp 
+:doPrintHelp
   echo.
   echo MNE-CPP testing script help.
   echo This script will run all applications in bin folder starting with test_*
@@ -81,7 +81,7 @@ exit /B 0
   @REM call:doPrintConfiguration
 exit /B 0
 
-:success 
+:success
   echo [92m%~1[0m
 exit /B 0
 

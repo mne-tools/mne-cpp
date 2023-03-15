@@ -86,7 +86,7 @@ class %{CN}
      Q_OBJECT
 @endif
 
-public:  
+public:
 @if '%{Base}' === 'QObject'
     typedef QSharedPointer<%{CN}> SPtr;            /**< Shared pointer type for %{CN}. */
     typedef QSharedPointer<const %{CN}> ConstSPtr; /**< Const shared pointer type for %{CN}. */

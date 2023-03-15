@@ -150,7 +150,7 @@ public:
                            const QList<FSLIB::Label> &lLabels,
                            const Eigen::VectorXi &vecVertNo);
 
-protected:    
+protected:
     //=========================================================================================================
     /**
      * Calculate the interpolation operator based on the set interpolation info.

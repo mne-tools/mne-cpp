@@ -85,7 +85,7 @@ enum ColorMaps {
  * @brief Vector plot
  */
 class DISPSHARED_EXPORT TFplot : public QWidget
-{    
+{
     Q_OBJECT
 
 public:
