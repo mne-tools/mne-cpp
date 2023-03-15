@@ -137,7 +137,6 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq,
     text->setPos((numberCoeff+(m_iDiagramMarginsHoriz*2))/3.2,-70);
     text->setDefaultTextColor(m_cPenColor);
 
-
     //HORIZONTAL
     //Draw horizontal lines
     QPen pen(Qt::DotLine);

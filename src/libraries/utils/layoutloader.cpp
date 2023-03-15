@@ -305,7 +305,6 @@ bool LayoutLoader::readMNELoutFile(const std::string &path, QMap<std::string, QP
         return false;
     }
 
-
     std::string line;
 
     while(std::getline(inFile, line)){

@@ -154,7 +154,6 @@ void SettingsControllerGui::fileInChanged(const QString& strInFile)
         return;
     }
 
-
     m_fiInFile.setFile(newfiInFile.absoluteFilePath());
     m_pAnonymizer->setInFile(m_fiInFile.absoluteFilePath());
 

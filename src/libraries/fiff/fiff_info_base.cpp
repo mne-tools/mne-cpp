@@ -316,4 +316,3 @@ QStringList FiffInfoBase::get_channel_types()
     return lChannelTypes;
 }
 
-

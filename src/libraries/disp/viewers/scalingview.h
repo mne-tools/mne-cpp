@@ -105,7 +105,6 @@ DISPSHARED_EXPORT float getScalingValue(const QMap<qint32, float>& qMapChScaling
                                         int iChannelKind,
                                         int iChannelUnit);
 
-
 //=============================================================================================================
 /**
  * DECLARE CLASS ScalingView

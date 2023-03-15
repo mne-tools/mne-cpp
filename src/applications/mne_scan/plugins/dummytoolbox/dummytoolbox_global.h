@@ -74,5 +74,4 @@ DUMMYTOOLBOXSHARED_EXPORT const char* buildHashLong();
 
 }
 
-
 #endif // DUMMYTOOLBOX_GLOBAL_H

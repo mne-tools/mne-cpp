@@ -57,7 +57,6 @@ namespace Ui {
 namespace DISPLIB
 {
 
-
 class DISPSHARED_EXPORT ProgressView : public AbstractView
 {
 public:

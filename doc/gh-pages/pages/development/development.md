@@ -33,7 +33,3 @@ Below are some resources to get you started developing within MNE-CPP. Depending
 
 It is a good idea to go through the [contribution tutorial](contribute.md) and make sure that you can build from source. Understand the continious integration pipeline we have in place and how to write a unit test. Make sure that your changes don't break the project compilation before submitting your contribution to the project itself.
 
-
-
-
-

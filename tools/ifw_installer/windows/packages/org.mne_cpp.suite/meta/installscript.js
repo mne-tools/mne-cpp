@@ -36,11 +36,9 @@ function Component()
 {
     // default constructor
 
-
     installer.installationFinished.connect(this, Component.prototype.installationFinishedPageIsShown);
     installer.finishButtonClicked.connect(this, Component.prototype.installationFinished);
 }
-
 
 //*************************************************************************************************************
 
@@ -59,7 +57,6 @@ Component.prototype.createOperations = function()
     }
 }
 
-
 //*************************************************************************************************************
 
 Component.prototype.installationFinishedPageIsShown = function()
@@ -72,7 +69,6 @@ Component.prototype.installationFinishedPageIsShown = function()
         console.log(e);
     }
 }
-
 
 //*************************************************************************************************************
 

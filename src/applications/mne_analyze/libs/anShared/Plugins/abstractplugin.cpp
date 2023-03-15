@@ -80,7 +80,6 @@ bool AbstractPlugin::hasBeenInitialized() const
     return m_bInitialized;
 }
 
-
 //=============================================================================================================
 
 void AbstractPlugin::cmdLineStartup(const QStringList& sArguments)

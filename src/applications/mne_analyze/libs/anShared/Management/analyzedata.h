@@ -318,7 +318,6 @@ private:
      */
     QList<QStandardItem*> getAllItems(QModelIndex parent = QModelIndex()) const;
 
-
     QPointer<DISPLIB::BidsViewModel>        m_pData;                    /**< The BidsViewModel that holds all the subject, session, and data items. */
 
     QPointer<ANSHAREDLIB::Communicator>     m_pCommu;                   /**< Used to send events. */
