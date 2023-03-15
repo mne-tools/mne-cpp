@@ -271,7 +271,6 @@ doShowBuildFailed() {
   echo "                                                      "
 }
 
-
 doPrintConfiguration() {
   echo " "
   echo ========================================================================
@@ -419,5 +418,4 @@ else
 fi
 
 exit 0
-
 

@@ -83,8 +83,6 @@ int main(int argc, char *argv[])
 {
 #ifdef STATICBUILD
 
-
-
 #endif
 
     qInstallMessageHandler(ApplicationLogger::customLogWriter);

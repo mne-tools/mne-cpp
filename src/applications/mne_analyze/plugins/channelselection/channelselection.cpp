@@ -279,7 +279,6 @@ void ChannelSelection::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel>
     }
 }
 
-
 //=============================================================================================================
 
 QString ChannelSelection::getBuildInfo()

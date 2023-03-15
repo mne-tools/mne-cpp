@@ -16,7 +16,6 @@ Development Release
 |-------|-------|-------|
 | dev_build | [Latest commit](https://github.com/mne-tools/mne-cpp/commits/main){:target="_blank" rel="noopener"} | <span class="fs-2"> [Windows](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-windows-dynamic-x86_64.zip){: .btn .btn-green } [Linux](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-linux-dynamic-x86_64.tar.gz){: .btn .btn-green } [MacOS](https://github.com/mne-tools/mne-cpp/releases/download/dev_build/mne-cpp-macos-dynamic-x86_64.tar.gz){: .btn .btn-green } </span> |
 
-
 ---
 
 If your platform is not supported you can build the code yourself. We have a specific guide on how to do that ([build the project from source](../development/buildguide.md)).

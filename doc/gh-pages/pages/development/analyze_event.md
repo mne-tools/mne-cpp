@@ -32,7 +32,6 @@ void Filtering::setFilterChannelType(const QString& sType)
 ```
 The string `sType` is added to QVariant `data` with `setValue()`
 
-
 ## Receiving Events
 
 To receive an event or a certain type, a plugin has to subscribe to that event type. This can be done in a plugin's implementation of IPlugin's `getEventSubscriptions()` by returning a vector of all the vent types the plugin is subscribing to. Below is a code snippet of the Averaging plugin subscribing to events.

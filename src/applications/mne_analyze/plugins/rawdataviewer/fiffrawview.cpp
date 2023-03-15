@@ -489,7 +489,6 @@ bool FiffRawView::eventFilter(QObject *object, QEvent *event)
 
     }
 
-
     return QWidget::eventFilter(object, event);
 }
 
@@ -608,7 +607,6 @@ void FiffRawView::updateTimeLabels(int iValue)
     strRight = QString("%1 | %2 sec").arg(QString().number(iSample)).arg(QString().number(iSample / m_pModel->getFiffInfo()->sfreq, 'f', 2));
     m_pEndTimeLabel->setText(strRight);
 }
-
 
 //=============================================================================================================
 

@@ -218,7 +218,6 @@ void EEGoSportsSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath
     m_pUi->m_comboBox_Nasion->addItems(elcChannelNames);
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsSetupProjectWidget::changeCap()

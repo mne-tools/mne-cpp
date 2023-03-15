@@ -326,7 +326,6 @@ bool LayoutMaker::makeLayout(const std::vector<std::vector<float> > &inputPoints
         outFile << "0.000000 0.000000 0.000000 0.000000" << std::endl;
     }
 
-
     for(int k = 0; k < nchan; k++) {
         point.clear();
 

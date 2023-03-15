@@ -109,7 +109,6 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
     connect(m_pUi->m_qComboBox_BemItems, &QComboBox::currentTextChanged,
             this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
 
-
     // Connect Fiducial Pickings
     connect(m_pUi->m_qCheckBox_PickFiducials, &QCheckBox::stateChanged,
             this, &CoregSettingsView::onPickingStatus);

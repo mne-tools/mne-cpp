@@ -150,7 +150,6 @@ RTPROCESINGSHARED_EXPORT bool discard3DPointOutliers(const QSharedPointer<MNELIB
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-
 } // namespace
 
 #endif // ICP_H

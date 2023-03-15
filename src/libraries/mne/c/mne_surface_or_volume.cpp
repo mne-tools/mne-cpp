@@ -2854,8 +2854,6 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
     FiffDigitizerData*  dig = NULL;
     float          nasion_weight = 5.0;
 
-
-
     if (!head_dig) {
         qCritical("MEG head coordinate system digitizer data not available");
         goto bad;
@@ -2911,7 +2909,6 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
 
         scale_display_surface(head_surf,scales);
     }
-
 
     // Initial alignment
     FREE_17(head_dig->head_mri_t_adj);
