@@ -45,7 +45,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
+    MACOSX_BUNDLE_GUI_IDENTIFIER mne-cpp.org
     MACOSX_BUNDLE ${BUILD_MAC_APP_BUNDLE}
     WIN32_EXECUTABLE TRUE
 )
