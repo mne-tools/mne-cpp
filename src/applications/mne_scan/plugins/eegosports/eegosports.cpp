@@ -87,7 +87,7 @@ using namespace Eigen;
 
 EEGoSports::EEGoSports()
 : m_pRMTSA_EEGoSports(0)
-, m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/eegosports/")
+, m_qStringResourcePath(qApp->applicationDirPath()+"/../resources/mne_scan/plugins/eegosports/")
 , m_pEEGoSportsProducer(new EEGoSportsProducer(this))
 , m_dLPAShift(0.01)
 , m_dRPAShift(0.01)
@@ -137,7 +137,7 @@ void EEGoSports::init()
     m_bWriteDriverDebugToFile = false;
     m_bCheckImpedances = false;
 
-    m_sElcFilePath = settings.value(QString("EEGOSPORTS/elcFilePath"), QString(QCoreApplication::applicationDirPath() + "resources/general/3DLayouts/standard_waveguard66.elc")).toString();
+    m_sElcFilePath = settings.value(QString("EEGOSPORTS/elcFilePath"), QString(QCoreApplication::applicationDirPath() + ../..resources/general/3DLayouts/standard_waveguard66.elc")).toString();
 
     m_sCardinalFilePath = settings.value(QString("EEGOSPORTS/cardinalFilePath"), QString("")).toString();
 

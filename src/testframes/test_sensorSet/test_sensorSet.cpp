@@ -109,7 +109,7 @@ void TestSensorSet::initTestCase()
 {
     qInstallMessageHandler(ApplicationLogger::customLogWriter);
 
-    QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
+    QString qPath = QString(QCoreApplication::applicationDirPath() + "/../resources/general/coilDefinitions/coil_def.dat");
     m_pCoilDefinitions = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath));
 
     // Setup for reading the raw data

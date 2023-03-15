@@ -224,17 +224,17 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
     } else if(RealTimeHpiResult::SPtr pRTHR = qSharedPointerDynamicCast<RealTimeHpiResult>(pMeasurement)) {
         if(!m_pBemHeadAvr) {
             // Add sensor surface BabyMeg
-            QFile t_fileBabyMEGSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/BabyMEG.fif");
+            QFile t_fileBabyMEGSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "../resources/general/sensorSurfaces/BabyMEG.fif");
             MNEBem t_babyMEGsensorSurfaceBEM(t_fileBabyMEGSensorSurfaceBEM);
             m_pData3DModel->addMegSensorInfo("Device", "BabyMEG", QList<FiffChInfo>(), t_babyMEGsensorSurfaceBEM)->setCheckState(Qt::Unchecked);
 
             // Add sensor surface VectorView
-            QFile t_fileVVSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
+            QFile t_fileVVSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "../resources/general/sensorSurfaces/306m_rt.fif");
             MNEBem t_sensorVVSurfaceBEM(t_fileVVSensorSurfaceBEM);
             m_pData3DModel->addMegSensorInfo("Device", "VectorView", QList<FiffChInfo>(), t_sensorVVSurfaceBEM);
 
             // Add average head surface
-            QFile t_fileHeadAvr(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif");;
+            QFile t_fileHeadAvr(QCoreApplication::applicationDirPath() + "../resources/general/hpiAlignment/fsaverage-head.fif");;
             MNEBem t_BemHeadAvr(t_fileHeadAvr);
             m_pBemHeadAvr = m_pData3DModel->addBemData("Subject", "Average head", t_BemHeadAvr);
         }
@@ -327,7 +327,7 @@ void RealTime3DWidget::alignFiducials(QSharedPointer<FIFFLIB::FiffDigitizerData>
 {
     std::unique_ptr<MneMshDisplaySurfaceSet> pMneMshDisplaySurfaceSet = std::make_unique<MneMshDisplaySurfaceSet>();
     MneMshDisplaySurfaceSet::add_bem_surface(pMneMshDisplaySurfaceSet.get(),
-                                             QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-head.fif",
+                                             QCoreApplication::applicationDirPath() + "/../resources/general/hpiAlignment/fsaverage-head.fif",
                                              FIFFV_BEM_SURF_ID_HEAD,
                                              "head",
                                              1,
@@ -335,7 +335,7 @@ void RealTime3DWidget::alignFiducials(QSharedPointer<FIFFLIB::FiffDigitizerData>
 
     MneMshDisplaySurface* surface = pMneMshDisplaySurfaceSet->surfs[0];
 
-    QFile t_fileDigDataReference(QCoreApplication::applicationDirPath() + "/resources/general/hpiAlignment/fsaverage-fiducials.fif");
+    QFile t_fileDigDataReference(QCoreApplication::applicationDirPath() + "/../resources/general/hpiAlignment/fsaverage-fiducials.fif");
 
     float scales[3];
     QScopedPointer<FiffDigitizerData> t_digDataReference(new FiffDigitizerData(t_fileDigDataReference));

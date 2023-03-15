@@ -2081,7 +2081,7 @@ void ComputeFwd::initFwd()
         if ( !QCoreApplication::startingUp() ) {
             qPath = QCoreApplication::applicationDirPath() + QString("/resources/general/coilDefinitions/coil_def.dat");
         } else if (!file.exists()) {
-            qPath = "./resources/general/coilDefinitions/coil_def.dat";
+            qPath = "../resources/general/coilDefinitions/coil_def.dat";
         }
 
         m_templates = FwdCoilSet::read_coil_defs(qPath);

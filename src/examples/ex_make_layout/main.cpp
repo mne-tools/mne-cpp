@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Make Layout Example");
     parser.addHelpOption();
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption chKindOption("coilType", "The coil type <out>.", "coilType", "3012"); // 3012 = FIFFV_COIL_VV_PLANAR_T1, use coil type instead of kind because this way we can distinguish between different layers (outer, inner, etc.), see fiff_constants for details FIFFV_REF_MEG_CH FIFFV_COIL_BABY_REF_MAG FIFFV_COIL_BABY_MAG
     QCommandLineOption outputOption("fileOut", "The output file <out>.", "out", "makeLayout_default.lout");
     QCommandLineOption mirrorxOption("mirrorX", "Mirror final layout along x-axis <mirrorX>.", "mirrorX", "0");

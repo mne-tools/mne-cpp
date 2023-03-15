@@ -87,7 +87,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Evoked Grad Amp Example");
     parser.addHelpOption();
 
-    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption doBaselineption("doBaseline", "Do baseline correction.", "doBaseline", "false");
 
     parser.addOption(evokedFileOption);

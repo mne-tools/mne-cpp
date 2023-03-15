@@ -83,7 +83,7 @@ using namespace Eigen;
  *
  * Example:
  *
- * ex_hpiFit --fileIn C:/Git/mne-cpp/bin/../data/MNE-sample-data/chpi/raw/phantom/2khz_3.fif --freqs 293,307,314,321 --verbose 1 --fileOut 2k_3 --buffer 600 --save 1
+ * ex_hpiFit --fileIn C:/Git/mne-cpp/bin/../resources/data/MNE-sample-data/chpi/raw/phantom/2khz_3.fif --freqs 293,307,314,321 --verbose 1 --fileOut 2k_3 --buffer 600 --save 1
  *
  * By default, the example uses the mne-cpp-test-data set.
  *
@@ -279,6 +279,6 @@ int main(int argc, char *argv[])
             << "Average Duration:" << matPosition.col(9).mean() << "ms";
 
     if(bSave) {
-        IOUtils::write_eigen_matrix(matPosition, QString(QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/" + sNameOut));
+        IOUtils::write_eigen_matrix(matPosition, QString(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/" + sNameOut));
     }
 }

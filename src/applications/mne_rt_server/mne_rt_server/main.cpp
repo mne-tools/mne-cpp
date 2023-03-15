@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 
     // Parse input file for mne_rt_server's FiffSimulator
     if(parser.isSet("file")) {
-        QFile file(QCoreApplication::applicationDirPath() + "/resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg");
+        QFile file(QCoreApplication::applicationDirPath() + "../resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg");
 
         if (QFileInfo(parser.value(inFileOpt)).exists()) {
             if (file.open(QIODevice::Truncate | QIODevice::Text | QIODevice::WriteOnly)) {
@@ -109,17 +109,17 @@ int main(int argc, char *argv[])
 
                 qInfo() << QString("[MneRtServer::main] Streaming file %1").arg(parser.value(inFileOpt));
             } else {
-                qWarning() << QString("[MneRtServer::main] Could not open %1").arg(QCoreApplication::applicationDirPath() + "/resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg");
+                qWarning() << QString("[MneRtServer::main] Could not open %1").arg(QCoreApplication::applicationDirPath() + "../resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg");
             }
         } else {
             qWarning("[MneRtServer::main] Provided file does not exist. Falling back to default one.");
 
             if (file.open(QIODevice::Truncate | QIODevice::Text | QIODevice::WriteOnly)) {
                 QTextStream stream(&file);
-                stream << QString("simFile = <pathTo>/../data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+                stream << QString("simFile = <pathTo>/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
                 file.close();
             } else {
-                qWarning() << QString("[MneRtServer::main] Could not open %1").arg(QCoreApplication::applicationDirPath() + "/resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg");
+                qWarning() << QString("[MneRtServer::main] Could not open %1").arg(QCoreApplication::applicationDirPath() + "../resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg");
             }
         }
     }

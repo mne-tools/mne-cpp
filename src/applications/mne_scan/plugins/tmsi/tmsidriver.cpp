@@ -150,7 +150,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
 
     //Open file to write to
     if(m_bWriteDriverDebugToFile)
-        m_outputFileStream.open("resources/mne_scan/plugins/tmsi/TMSi_Driver_Debug.txt", ios::trunc); //ios::trunc deletes old file data
+        m_outputFileStream.open(../resources/mne_scan/plugins/tmsi/TMSi_Driver_Debug.txt", ios::trunc); //ios::trunc deletes old file data
 
     //Check if device handler already exists and a connection was established before
 //    if(m_HandleMaster != NULL)

@@ -412,7 +412,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
     //
     qint32 configConnector = -1;
     QString configFileName("plugin.cfg");
-    QFile configFile(QString("%1/resources/mne_rt_server/plugins/"+configFileName).arg(QCoreApplication::applicationDirPath()));
+    QFile configFile(QString("%1../resources/mne_rt_server/plugins/"+configFileName).arg(QCoreApplication::applicationDirPath()));
     if(!configFile.open(QIODevice::ReadOnly)) {
         printf("Not able to read config file... %s\n", configFile.fileName().toUtf8().constData());
     }

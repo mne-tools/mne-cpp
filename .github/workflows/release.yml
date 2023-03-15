@@ -568,7 +568,11 @@ jobs:
       run: |
         # Delete folders which we do not want to ship
         rm -r /mne_analyze_plugins
+        rm -r resources/conventions
         rm -r resources/data
+        rm -r resources/general
+        rm -r resources/mne_rt_server
+        rm -r resources/wizards
         # Replace logo
         cp -RT resources/design/logos/qtlogo.svg bin/qtlogo.svg
         # Clone repo and update with new wasm versions

@@ -89,7 +89,7 @@ if [ "$(uname)" == "Darwin" ]; then
 
         # Solve for dependencies for mne_scan.app bundle
         cp -a out/Release/apps/mne_scan_plugins/. out/Release/apps/mne_scan.app/Contents/MacOS/mne_scan_plugins
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_scan.app/Contents/MacOS/resources
+        cp -a out/Release/resources/mne_scan out/Release/apps/mne_scan.app/Contents/MacOS/resources/mne_scan
         cp -a src/applications/mne_scan/plugins/brainflowboard/brainflow/installed/out/Release/lib/. out/Release/apps/mne_scan.app/Contents/Frameworks
         cp -a src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/Release/lib/. out/Release/apps/mne_scan.app/Contents/Frameworks
         cp -a out/Release/lib/. out/Release/apps/mne_scan.app/Contents/Frameworks
@@ -97,25 +97,25 @@ if [ "$(uname)" == "Darwin" ]; then
 
         # Solve for dependencies for mne_analyze.app bundle
         cp -a out/Release/apps/mne_analyze_plugins/. out/Release/apps/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_analyze.app/Contents/MacOS/resources
+        cp -a out/Release/resources/mne_analyze out/Release/apps/mne_analyze.app/Contents/MacOS/resources/mne_analyze
         cp -a out/Release/lib/. out/Release/apps/mne_analyze.app/Contents/Frameworks
         # cp -a $Qt5_DIR/plugins/renderers/. out/Release/apps/mne_analyze.app/Contents/PlugIns/renderers
 
         # Solve for dependencies for mne_rt_server.app bundle
         cp -a out/Release/apps/mne_rt_server_plugins/. out/Release/apps/mne_rt_server.app/Contents/MacOS/mne_rt_server_plugins
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_rt_server.app/Contents/MacOS/resources
+        cp -a out/Release/resources/mne_rt_server out/Release/apps/mne_rt_server.app/Contents/MacOS/resources
         cp -a out/Release/lib/. out/Release/apps/mne_rt_server.app/Contents/Frameworks
 
         # Solve for dependencies for mne_forward_solution.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_forward_solution.app/Contents/MacOS/resources
+        cp -a out/Release/resources/ out/Release/apps/mne_forward_solution.app/Contents/MacOS/resources/
         cp -a out/Release/lib/. out/Release/apps/mne_forward_solution.app/Contents/Frameworks
 
         # Solve for dependencies for mne_dipole_fit.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_dipole_fit.app/Contents/MacOS/resources
+        cp -a out/Release/resources/mne_dipole_fit out/Release/apps/mne_dipole_fit.app/Contents/MacOS/resources
         cp -a out/Release/lib/. out/Release/apps/mne_dipole_fit.app/Contents/Frameworks
 
         # Solve for dependencies for mne_anonymize.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_anonymize.app/Contents/MacOS/resources
+        cp -a out/Release/resources out/Release/apps/mne_anonymize.app/Contents/MacOS/resources
         cp -a out/Release/lib/. out/Release/apps/mne_anonymize.app/Contents/Frameworks
 
 
@@ -126,7 +126,7 @@ if [ "$(uname)" == "Darwin" ]; then
             rm -r out/Release/apps/mne_scan_plugins
             rm -r out/Release/apps/mne_analyze_plugins
             rm -r out/Release/apps/mne_rt_server_plugins
-            rm -r out/Release/apps/resources
+            rm -r out/Release/resources
 
             # Creating archive of all macos deployed applications
             tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz out/Release/apps/.
@@ -139,22 +139,22 @@ if [ "$(uname)" == "Darwin" ]; then
 
         # This script needs to be run from the top level mne-cpp repo folder
         # Solve for dependencies for mne_scan.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_scan.app/Contents/MacOS/resources
+        cp -a out/Release/resources out/Release/apps/mne_scan.app/Contents/MacOS/resources
 
         # Solve for dependencies for mne_analyze.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_analyze.app/Contents/MacOS/resources
+        cp -a out/Release/resources out/Release/apps/mne_analyze.app/Contents/MacOS/resources
 
         # Solve for dependencies for mne_rt_server.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_rt_server.app/Contents/MacOS/resources
+        cp -a out/Release/resources out/Release/apps/mne_rt_server.app/Contents/MacOS/resources
 
         # Solve for dependencies for mne_forward_solution.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_forward_solution.app/Contents/MacOS/resources
+        cp -a out/Release/resources out/Release/apps/mne_forward_solution.app/Contents/MacOS/resources
 
         # Solve for dependencies for mne_dipole_fit.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_dipole_fit.app/Contents/MacOS/resources
+        cp -a out/Release/resources out/Release/apps/mne_dipole_fit.app/Contents/MacOS/resources
 
         # Solve for dependencies for mne_anonymize.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_anonymize.app/Contents/MacOS/resources
+        cp -a out/Release/resources out/Release/apps/mne_anonymize.app/Contents/MacOS/resources
 
         if [[ ${PACK_OPTION} == pack ]]; then
             # Delete folders which we do not want to ship
@@ -162,7 +162,7 @@ if [ "$(uname)" == "Darwin" ]; then
             rm -r out/Release/apps/mne_scan_plugins
             rm -r out/Release/apps/mne_analyze_plugins
             rm -r out/Release/apps/mne_rt_server_plugins
-            rm -r out/Release/apps/resources
+            rm -r out/Release/resources
 
             # Creating archive of all macos deployed applications
             tar cfvz mne-cpp-macos-static-x86_64.tar.gz out/Release/apps/.
