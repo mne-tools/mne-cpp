@@ -28,11 +28,7 @@ set(RESOURCES
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES} ${HEADERS} ${RESOURCES})
 else()
-    if(ANDROID)
-        add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS} ${RESOURCES})
-    else()
-        add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
-    endif()
+    add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
@@ -53,7 +49,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_disp
     mne_disp3D
     eigen
-	anShared
+    anShared
 )
 
 if(NOT BUILD_SHARED_LIBS)
@@ -70,12 +66,12 @@ if(NOT BUILD_SHARED_LIBS)
         analyze_rawdataviewer
         analyze_sourcelocalization
         analyze_view3d)
-        
+
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER my.example.com
+    MACOSX_BUNDLE_GUI_IDENTIFIER mne-cpp.org
     MACOSX_BUNDLE ${BUILD_MAC_APP_BUNDLE}
     WIN32_EXECUTABLE TRUE
 )
