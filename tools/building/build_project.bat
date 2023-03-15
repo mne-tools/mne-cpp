@@ -75,10 +75,10 @@
     )
     
     IF "%CleanBuild%"=="True" (
-        echo Deleting folders: 
-        echo   %BuildFolder%
-        echo   %OutFolder%
-        echo .
+        ECHO Deleting folders: 
+        ECHO   %BuildFolder%
+        ECHO   %OutFolder%
+        ECHO.
 
         RMDIR /S /Q %BuildFolder%
         RMDIR /S /Q %OutFolder%
