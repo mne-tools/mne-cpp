@@ -2,10 +2,6 @@
 	path = src/applications/mne_scan/plugins/lsladapter/liblsl
 	url = https://github.com/sccn/liblsl.git
 	branch = master
-[submodule "bin/mne-cpp-test-data"]
-	path = bin/mne-cpp-test-data
-	url = https://github.com/mne-tools/mne-cpp-test-data.git
-	branch = master
 [submodule "src/applications/mne_scan/plugins/brainflowboard/brainflow"]
 	path = src/applications/mne_scan/plugins/brainflowboard/brainflow
 	url = https://github.com/brainflow-dev/brainflow
