@@ -47,7 +47,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # If no build type is specified, default to Release
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release")
-  message("-- [MNE-CPP] Build type not defined. Using default value: ${CMAKE_BUILD_TYPE}")
+  message("-- [MNE-CPP] Build type not defined."
+    "Using default value:"
+    "${CMAKE_BUILD_TYPE}"
+  )
 endif()
 
 if(NOT DEFINED CMAKE_BINARY_DIR)
@@ -56,7 +59,10 @@ endif()
 
 if(NOT DEFINED BINARY_OUTPUT_DIRECTORY)
   set(BINARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../out/${CMAKE_BUILD_TYPE})
-  message("-- [MNE-CPP] Build name not defined. Using default value: ${BINARY_OUTPUT_DIRECTORY}")
+  message(
+    "-- [MNE-CPP] Build name not defined."
+    " Using default value: ${BINARY_OUTPUT_DIRECTORY}"
+  )
 endif()
 
 ##==============================================================================
@@ -65,13 +71,17 @@ endif()
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   if(NOT DEFINED FORCE_IN_SOURCE_BUILD)
     message(FATAL_ERROR
-      "We dissalow in-sourec builds by default because they are typically a bad idea."
-      "\n Remove \"${CMAKE_SOURCE_DIR}/CMakeCache.txt\" and \"${CMAKE_SOURCE_DIR}/CMakeFiles\" and try again from another folder:"
+      "We dissalow in-sourec builds by default because they are typically"
+      " a bad idea."
+      "\n Remove \"${CMAKE_SOURCE_DIR}/CMakeCache.txt\" and "
+      "\"${CMAKE_SOURCE_DIR}/CMakeFiles\" and try again from another folder:"
       "\n "
       "\n mkdir build"
-      "\n cmake -B build -S src" 
-      "\n " 
-      "\n If you are absolutley sure of what you are doing, you can pass in FORCE_IN_SOURCE_BUILD to CMake to force in-soure building (not recommended!)"
+      "\n cmake -B build -S src"
+      "\n "
+      "\n If you are absolutley sure of what you are doing, you can pass in "
+      "FORCE_IN_SOURCE_BUILD to CMake to force in-soure building "
+      "(not recommended!)"
     )
   endif()
 endif()
@@ -110,3 +120,15 @@ if(NOT LIB_ONLY)
     endif()
   endif()
 endif()
+
+##==============================================================================
+## Add symbolic links to data folders
+
+execute_process(
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${BINARY_OUTPUT_DIRECTORY}
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${BINARY_OUTPUT_DIRECTORY}/data
+  COMMAND ${CMAKE_COMMAND} -E create_symlink
+    ../resources/data ${BINARY_OUTPUT_DIRECTORY}/data
+  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
