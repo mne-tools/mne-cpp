@@ -80,8 +80,8 @@
         ECHO   %OutFolder%
         ECHO.
 
-        RMDIR /S /Q %BuildFolder%
-        RMDIR /S /Q %OutFolder%
+        %MockText%RMDIR /S /Q %BuildFolder%
+        %MockText%RMDIR /S /Q %OutFolder%
 
         goto :endOfScript
     )
