@@ -102,5 +102,5 @@ General:
 
 ## Examples
 ```
-mne_dipole_fit --meas ./MNE-sample-data/MEG/sample/sample_audvis-ave.fif --noise ./MNE-sample-data/MEG/sample/sample_audvis-cov.fif --bem ./MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif --mri ./MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif --set 1 --meg --tmin 32 --tmax 148 --bmin -100 --bmax 0 --gui --dip ./MNE-sample-data/Result/dip-result.dat
+mne_dipole_fit --meas ../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif --noise ../resources/data/MNE-sample-data/MEG/sample/sample_audvis-cov.fif --bem ../resources/data/MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif --mri ../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif --set 1 --meg --tmin 32 --tmax 148 --bmin -100 --bmax 0 --gui --dip ../resources/data/MNE-sample-data/Result/dip-result.dat
 ``` -->

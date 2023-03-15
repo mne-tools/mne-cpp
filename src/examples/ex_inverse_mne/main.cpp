@@ -93,8 +93,8 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Inverse MNE Example");
     parser.addHelpOption();
 
-    QCommandLineOption evokedFileOption("ave", "Path to evoked <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption invFileOption("inv", "Path to inverse operator <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
+    QCommandLineOption evokedFileOption("ave", "Path to evoked <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption invFileOption("inv", "Path to inverse operator <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-meg-eeg-inv.fif");
     QCommandLineOption snrOption("snr", "The <snr> value used for computation.", "snr", "1.0");
     QCommandLineOption methodOption("method", "Inverse estimation <method>, i.e., 'MNE', 'dSPM' or 'sLORETA'.", "method", "dSPM");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");

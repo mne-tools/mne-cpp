@@ -236,7 +236,7 @@ void TestHpiFitIntegration::initTestCase()
 
     }
     // For debug: position file for HPIFit
-    //    UTILSLIB::IOUtils::write_eigen_matrix(mHpiPos, QCoreApplication::applicationDirPath() + "/MNE-sample-data/mHpiPos.txt");
+    //    UTILSLIB::IOUtils::write_eigen_matrix(mHpiPos, QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/mHpiPos.txt");
 }
 
 //=============================================================================================================

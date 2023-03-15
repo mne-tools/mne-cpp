@@ -90,4 +90,4 @@ Once built, applications can be run from within QtCreator using the run button o
 
 ## Test the Build
 
-You might have to add the folders including the Qt libraries to your OS's corresponding environment variables. In order to run the examples you must download the MNE-Sample-Data-Set from [here](https://osf.io/86qa2/download){:target="_blank" rel="noopener"} and extract the files to `mne-cpp/out/Release/tests/MNE-sample-data`. Once finished you can try to run one of the examples, e.g., ex_disp_3D. If the build was successful the example should start and display a window including a 3D brain as well as a source localization result.
+You might have to add the folders including the Qt libraries to your OS's corresponding environment variables. In order to run the examples you must download the MNE-Sample-Data-Set from [here](https://osf.io/86qa2/download){:target="_blank" rel="noopener"} and extract the files to `mne-cpp/out/Release/resources/MNE-sample-data`. Once finished you can try to run one of the examples, e.g., ex_disp_3D. If the build was successful the example should start and display a window including a 3D brain as well as a source localization result.
