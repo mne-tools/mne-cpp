@@ -106,9 +106,9 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Compute Inverse Powell RAP-MUSIC Example");
     parser.addHelpOption();
-    QCommandLineOption fwdFileOption("fwd", "Path to forward solution <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QCommandLineOption evokedFileOption("ave", "Path to evoked <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption subjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects");
+    QCommandLineOption fwdFileOption("fwd", "Path to forward solution <file>.", "file", QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QCommandLineOption evokedFileOption("ave", "Path to evoked <file>.", "file", QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption subjectDirectoryOption("subjDir", "Path to subject <directory>.", "directory", QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/subjects");
     QCommandLineOption subjectOption("subj", "Selected <subject>.", "subject", "sample");
     QCommandLineOption stcFileOption("stcOut", "Path to stc <file>, which is to be written.", "file", "");//"RapMusic.stc");
     QCommandLineOption numDipolePairsOption("numDip", "<number> of dipole pairs to localize.", "number", "1");

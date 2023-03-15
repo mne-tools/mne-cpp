@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Disp Example");
     parser.addHelpOption();
 
-    QCommandLineOption inputOption({"file", "f"}, "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption inputOption({"file", "f"}, "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption endianOption({"endian", "e", "en"}, "The file's endianness. 'little' or 'big'", "endian", "big");
     QCommandLineOption padEndOption("pad", "Adds -1 to end of stream to account for unfinished file (use for neuromag2ft)");
 

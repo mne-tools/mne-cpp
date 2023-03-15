@@ -160,7 +160,7 @@ int main(int argc, char *argv[])
     qint64 iTime = 0;
     timer.start();
 
-    QString sRaw = "/cluster/fusion/lesch/Git/mne-cpp-lorenze/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
+    QString sRaw = "/cluster/fusion/lesch/Git/mne-cpp-lorenze/bin/../data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
     MatrixXd matDataOrig, matData;
     MatrixXd times;
     QFile t_fileRaw(sRaw);

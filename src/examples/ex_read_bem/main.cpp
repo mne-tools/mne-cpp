@@ -81,13 +81,13 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("Read BEM Example");
     parser.addHelpOption();
-    QCommandLineOption bemFileInOption("bem", "Path to BEM <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    QCommandLineOption bemFileInOption("bem", "Path to BEM <file>.", "file", QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/subjects/sample/bem/sample-head.fif");
     QCommandLineOption bemFileOutOption("bemOut", "Path to BEM <file>, which is to be written.", "file", "./sample-head-test.fif");
 
-//    QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif"
-//    QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-all-src.fif"
-//    QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif"
-//    QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif"
+//    QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif"
+//    QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/subjects/sample/bem/sample-all-src.fif"
+//    QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/subjects/sample/bem/sample-5120-bem-sol.fif"
+//    QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/subjects/sample/bem/sample-5120-bem.fif"
 
     parser.addOption(bemFileInOption);
     parser.addOption(bemFileOutOption);

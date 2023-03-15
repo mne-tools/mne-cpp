@@ -105,17 +105,17 @@ int main(int argc, char *argv[])
     // specify necessary information for forward computation
     ComputeFwdSettings::SPtr pSettings = ComputeFwdSettings::SPtr(new ComputeFwdSettings);
 
-    QFile t_fileBemName(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
-    QFile t_fileSrcName(QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif");
+    QFile t_fileBemName(QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
+    QFile t_fileSrcName(QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif");
 
     pSettings->include_meg = true;
     pSettings->include_eeg = true;
     pSettings->accurate = true;
-    pSettings->srcname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif";
+    pSettings->srcname = QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif";
     pSettings->measname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
     pSettings->mriname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif";
     pSettings->transname.clear();
-    pSettings->bemname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif";
+    pSettings->bemname = QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif";
     pSettings->mindist = 5.0f/1000.0f;
     pSettings->solname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
 

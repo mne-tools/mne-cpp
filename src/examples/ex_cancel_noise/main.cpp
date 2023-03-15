@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Cancel Noise Example");
     parser.addHelpOption();
 
-    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption evokedFileOption("ave", "Path to the evoked/average <file>.", "file", QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     QCommandLineOption destCompsOption("destComps", "<Destination> of the compensator which is to be calculated.", "destination", "2");
 
     parser.addOption(evokedFileOption);

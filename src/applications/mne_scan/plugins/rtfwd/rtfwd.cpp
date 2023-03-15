@@ -94,11 +94,11 @@ RtFwd::RtFwd()
 , m_bDoFwdComputation(false)
 {
     // set init values
-    m_pFwdSettings->solname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/your-solution-fwd.fif";
-    m_pFwdSettings->mriname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/all-trans.fif";
-    m_pFwdSettings->bemname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif";
-    m_pFwdSettings->srcname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif";
-    m_pFwdSettings->measname = QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
+    m_pFwdSettings->solname = QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/your-solution-fwd.fif";
+    m_pFwdSettings->mriname = QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/MEG/sample/all-trans.fif";
+    m_pFwdSettings->bemname = QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif";
+    m_pFwdSettings->srcname = QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/subjects/sample/bem/sample-oct-6-src.fif";
+    m_pFwdSettings->measname = QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
     m_pFwdSettings->transname.clear();
     m_pFwdSettings->eeg_model_name = "Default";
     m_pFwdSettings->include_meg = true;
@@ -106,7 +106,7 @@ RtFwd::RtFwd()
     m_pFwdSettings->accurate = true;
     m_pFwdSettings->mindist = 5.0f/1000.0f;
 
-    m_sAtlasDir = QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label";
+    m_sAtlasDir = QCoreApplication::applicationDirPath() + "/../data/MNE-sample-data/subjects/sample/label";
 }
 
 //=============================================================================================================
