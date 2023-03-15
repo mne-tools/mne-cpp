@@ -181,7 +181,7 @@ protected:
     QSharedPointer<QMap<QString, QColor> >      m_qMapAverageColor;             /**< Average colors. */
     QSharedPointer<QMap<QString, bool> >        m_qMapAverageActivation;        /**< Average activation status. */
 
-signals:    
+signals:
     //=========================================================================================================
     /**
      * Emmited when new average color is available

@@ -102,7 +102,7 @@ TFplot::TFplot(Eigen::MatrixXd tf_matrix,
 TFplot::TFplot(Eigen::MatrixXd tf_matrix,
                qreal sample_rate,
                ColorMaps cmap = Jet)
-{   
+{
     calc_plot(tf_matrix, sample_rate, cmap, 0, 0);
 }
 

@@ -84,7 +84,7 @@ class Network;
  * @brief This class computes the weighted phase lag index connectivity metric.
  */
 class CONNECTIVITYSHARED_EXPORT DebiasedSquaredWeightedPhaseLagIndex : public AbstractMetric
-{    
+{
 
 public:
     typedef QSharedPointer<DebiasedSquaredWeightedPhaseLagIndex> SPtr;            /**< Shared pointer type for DebiasedSquaredWeightedPhaseLagIndex. */

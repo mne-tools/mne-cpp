@@ -17,8 +17,8 @@ set(SOURCES
 )
 
 set(HEADERS
-covariance_global.h 
-covariance.h 
+covariance_global.h
+covariance.h
 FormFiles/covariancesetupwidget.h
 )
 

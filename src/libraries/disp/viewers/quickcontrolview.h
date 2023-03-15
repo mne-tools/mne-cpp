@@ -222,7 +222,7 @@ protected:
      */
     void onOpacityChange(qint32 value);
 
-private:       
+private:
     QString                                             m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
     QString                                             m_sName;                        /**< Name of the widget which uses this quick control. */
     Ui::QuickControlViewWidget*                         m_pUi;                          /**< The generated UI file. */

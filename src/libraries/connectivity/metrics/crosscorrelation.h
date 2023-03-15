@@ -80,7 +80,7 @@ class Network;
  * @brief This class computes the cross correlation connectivity metric.
  */
 class CONNECTIVITYSHARED_EXPORT CrossCorrelation : public AbstractMetric
-{    
+{
 
 public:
     typedef QSharedPointer<CrossCorrelation> SPtr;            /**< Shared pointer type for CrossCorrelation. */
