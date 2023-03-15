@@ -186,7 +186,6 @@ private:
 
     //=========================================================================================================
 
-
     RtFwd*                     m_pRtFwd;        /**< Holds a pointer to corresponding RtFwd.*/
 
     Ui::RtFwdSetupWidgetClass  m_ui;            /**< Holds the user interface for the RtFwdSetupWidget.*/

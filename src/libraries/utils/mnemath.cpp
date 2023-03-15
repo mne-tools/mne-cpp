@@ -323,7 +323,6 @@ MatrixXd MNEMath::legendre(qint32 n,
     return y;
 }
 
-
 //=============================================================================================================
 
 MatrixXd MNEMath::legendre(qint32 n,

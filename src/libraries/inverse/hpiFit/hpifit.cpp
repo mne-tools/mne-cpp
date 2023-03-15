@@ -287,7 +287,6 @@ CoilParam HPIFit::dipfit(const MatrixXd matCoilsSeed,
                                                  &HPIFitData::doDipfitConcurrent);
         future.waitForFinished();
 
-
         //Transform results to final coil information
         for(qint32 i = 0; i < lCoilData.size(); ++i) {
             coil.pos.row(i) = lCoilData.at(i).m_coilPos;

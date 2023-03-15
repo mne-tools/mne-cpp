@@ -333,7 +333,6 @@ void Hpi::initPluginControlWidgets()
         connect(this, &Hpi::newDigitizerList,
                 pHpiSettingsView, &HpiSettingsView::newDigitizerList);
 
-
         onSspStatusChanged(pHpiSettingsView->getSspStatusChanged());
         onCompStatusChanged(pHpiSettingsView->getCompStatusChanged());
         onAllowedMeanErrorDistChanged(pHpiSettingsView->getAllowedMeanErrorDistChanged());

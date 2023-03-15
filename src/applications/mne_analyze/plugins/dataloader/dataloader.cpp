@@ -495,7 +495,6 @@ void DataLoader::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewM
     }
 }
 
-
 //=============================================================================================================
 
 QString DataLoader::getBuildInfo()

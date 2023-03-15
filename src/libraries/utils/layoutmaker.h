@@ -147,7 +147,6 @@ public:
                            bool mirrorXAxis = false,
                            bool mirrorYAxis = false);
 
-
 private:
     static void sphere_coord(float x,
                       float y,

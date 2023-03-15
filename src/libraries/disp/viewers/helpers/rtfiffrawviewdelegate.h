@@ -268,7 +268,6 @@ private:
      */
     inline double retrieveSamplingPeriod() const;
 
-
     RtFiffRawView*      m_pParent;          /**< Pointer to parent class. **/
     QPoint              m_markerPosition;   /**< Current mouse position used to draw the marker in the plot. */
     QList<QPainterPath> m_painterPaths;     /**< List of all current painter paths for each row. */

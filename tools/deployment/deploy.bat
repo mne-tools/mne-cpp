@@ -118,7 +118,6 @@ if [ "$(uname)" == "Darwin" ]; then
         cp -a out/Release/apps/resources/. out/Release/apps/mne_anonymize.app/Contents/MacOS/resources
         cp -a out/Release/lib/. out/Release/apps/mne_anonymize.app/Contents/Frameworks
 
-
         if [[ ${PACK_OPTION} == pack ]]; then
 
             # Delete folders which we do not want to ship
@@ -131,7 +130,6 @@ if [ "$(uname)" == "Darwin" ]; then
             # Creating archive of all macos deployed applications
             tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz out/Release/apps/.
         fi
-
 
     elif [[ ${LINK_OPTION} == static ]]; then
 
@@ -249,7 +247,6 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
             tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz ./*    
         fi
         rm -fr mne-cpp
-
 
     elif [[ ${LINK_OPTION} == static ]]; then
 

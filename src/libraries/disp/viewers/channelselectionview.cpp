@@ -626,7 +626,6 @@ bool ChannelSelectionView::loadSelectionGroups(QString path)
 
     m_pUi->m_lineEdit_loadedFile->setText(QFileInfo(path).fileName());
 
-
     if(m_bSetup){
         saveSettings();
     }

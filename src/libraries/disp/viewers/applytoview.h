@@ -32,7 +32,6 @@
  *
  */
 
-
 #ifndef APPLYTOVIEW_H
 #define APPLYTOVIEW_H
 

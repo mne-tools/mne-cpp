@@ -1,6 +1,5 @@
 #define FP highp
 
-
 uniform FP vec3 ka;            // Ambient reflectivity
 uniform FP vec3 kd;            // Diffuse reflectivity
 uniform FP vec3 ks;            // Specular reflectivity

@@ -112,7 +112,6 @@ private:
      */
     void onImpedanceButtonClicked();
 
-
     //=========================================================================================================
     /**
      * Sets flag for writing to a file.

@@ -309,7 +309,6 @@ private:
     QMenu*                  m_pSettingsMenu;
 };
 
-
 }//DISPLIB NAMESPACE
 
 #endif // SCALECONTROL_H

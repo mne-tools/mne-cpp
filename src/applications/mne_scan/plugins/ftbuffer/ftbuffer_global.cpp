@@ -53,4 +53,3 @@ const char* FTBUFFERPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
 
 const char* FTBUFFERPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}
 
-

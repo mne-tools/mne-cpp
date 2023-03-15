@@ -306,7 +306,6 @@ QModelIndex BidsViewModel::moveSessionToSubject(QModelIndex subjectIndex,
 
     sessionItem->parent()->takeRow(sessionItem->row());
 
-
     subjectItem->setChild(subjectItem->rowCount(), sessionItem);
     subjectItem->setData(subjectIndex, BIDS_ITEM_SUBJECT);
 

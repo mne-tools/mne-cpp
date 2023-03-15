@@ -255,7 +255,6 @@ private:
      */
     void designFilter();
 
-
     double          m_sFreq;                /**< the sampling frequency. */
     double          m_dCenterFreq;          /**< contains center freq of the filter. */
     double          m_dBandwidth;           /**< contains bandwidth of the filter. */

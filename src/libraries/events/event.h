@@ -293,4 +293,3 @@ struct hash<EVENTSLIB::EVENTSINTERNAL::EventINT>
 
 #endif // EVENT_H
 
-

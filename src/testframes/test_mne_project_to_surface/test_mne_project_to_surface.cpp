@@ -62,7 +62,6 @@
 using namespace MNELIB;
 using namespace Eigen;
 
-
 //=============================================================================================================
 /**
  * DECLARE CLASS TestMNEProjectToSurface

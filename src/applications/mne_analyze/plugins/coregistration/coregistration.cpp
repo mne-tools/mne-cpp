@@ -813,7 +813,6 @@ bool CoRegistration::removeFromBemList(QSharedPointer<ANSHAREDLIB::AbstractModel
     return false;
 }
 
-
 //=============================================================================================================
 
 QString CoRegistration::getBuildInfo()

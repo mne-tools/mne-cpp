@@ -164,7 +164,6 @@ private:
      */
     void initPluginManager();
 
-
     //=========================================================================================================
     /**
      * This initializes the MainWindow.
@@ -182,7 +181,6 @@ private:
      * Load plugins from plugin directory and then initializes their data.
      */
     void loadandInitPlugins();
-
 
     QSharedPointer<ANSHAREDLIB::PluginManager>      m_pPluginManager;       /**< Holds plugin manager. */
     QSharedPointer<ANSHAREDLIB::AnalyzeData>        m_pAnalyzeData;         /**< The global data base. */

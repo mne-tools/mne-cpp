@@ -452,7 +452,6 @@ void BrainFlowBoard::releaseSession(bool useQmessage)
     }
 }
 
-
 //=============================================================================================================
 
 QString BrainFlowBoard::getBuildInfo()

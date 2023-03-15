@@ -45,7 +45,6 @@
 
 #include <QDebug>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -189,7 +188,6 @@ EventManager::getEventsBetween(int sampleStart, int sampleEnd, const std::vector
 {
     int memoryHint = (sampleEnd-sampleStart)/200;
     auto pEventsList(allocateOutputContainer<Event>(memoryHint));
-
 
     auto eventStart = m_EventsListBySample.lower_bound(sampleStart);
     auto eventEnd = m_EventsListBySample.upper_bound(sampleEnd);

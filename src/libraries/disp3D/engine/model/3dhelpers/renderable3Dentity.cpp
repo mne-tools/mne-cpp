@@ -393,7 +393,6 @@ void Renderable3DEntity::setPosition(const QVector3D& position)
     emit positionChanged(m_position);
 }
 
-
 //=============================================================================================================
 
 void Renderable3DEntity::applyScale(float scale)

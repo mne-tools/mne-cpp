@@ -132,7 +132,6 @@ RunCodeCoverage="false"
 VerboseMode="false"
 BuildType="Release"
 
-
 for (( j=0; j<argc; j++)); do
   if [ "${argv[j]}" == "verbose" ]; then
     BUILD_COMMAND=1

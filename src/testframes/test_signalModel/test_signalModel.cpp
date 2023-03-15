@@ -253,7 +253,6 @@ void TestSignalModel::testFitData_basic_5coils()
     QVERIFY(dSSD < dErrorTol);
 }
 
-
 //=============================================================================================================
 
 void TestSignalModel::testFitData_advanced_4coils()

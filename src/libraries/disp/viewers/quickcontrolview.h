@@ -114,7 +114,6 @@ public:
      */
     void clear();
 
-
     QVBoxLayout* findTabWidgetLayout(const QString& sTabName);
 
     //=========================================================================================================

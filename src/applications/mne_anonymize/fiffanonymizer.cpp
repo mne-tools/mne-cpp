@@ -234,7 +234,6 @@ int FiffAnonymizer::anonymizeFile()
     printIfVerbose("Reading info in the file.");
     processHeaderTags();
 
-
     while( (m_pTag->next != -1) && (!m_pInStream->device()->atEnd()))
     {
         readTag();

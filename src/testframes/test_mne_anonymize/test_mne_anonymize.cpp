@@ -138,7 +138,6 @@ void TestMneAnonymize::testDefaultOutput()
 
 }
 
-
 //=============================================================================================================
 
 void TestMneAnonymize::testDeleteInputFile()

@@ -44,7 +44,6 @@
 
 #include <inverse/dipoleFit/dipole_fit_settings.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -301,7 +300,6 @@ private:
 
     QFutureWatcher<INVERSELIB::ECDSet>                      m_FutureWatcher;        /**< Future watcher for notifing of completed fit calculations. */
     QFuture<INVERSELIB::ECDSet>                             m_Future;               /**< Future for performing fit calculations of separate thread. */
-
 
 signals:
 

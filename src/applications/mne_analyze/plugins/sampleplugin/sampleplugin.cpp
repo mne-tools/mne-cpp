@@ -42,7 +42,6 @@
 #include <anShared/Management/communicator.h>
 #include <anShared/Utils/metatypes.h>
 
-
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -169,5 +168,4 @@ QString SamplePlugin::getBuildInfo()
     return QString(SAMPLEPLUGINPLUGIN::buildDateTime()) + QString(" - ") + QString(SAMPLEPLUGINPLUGIN::buildHash());
 
 }
-
 

@@ -730,7 +730,6 @@ void Averaging::updateEvokedSetModel()
     m_pAverageLayoutView->updateData();
 }
 
-
 //=============================================================================================================
 
 QString Averaging::getBuildInfo()

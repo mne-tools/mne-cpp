@@ -414,7 +414,6 @@ private:
      */
     void createDefaultGroupIfNeeded();
 
-
     std::multimap<int, EVENTSINTERNAL::EventINT>    m_EventsListBySample;           /**< List of events organized by sample.*/
     std::unordered_map<idNum, int>                  m_MapIdToSample;                /**< EventId to sample relationship table.*/
     std::map<idNum, EVENTSINTERNAL::EventGroupINT>  m_GroupsList;                   /**< Storage of eventgroups.*/

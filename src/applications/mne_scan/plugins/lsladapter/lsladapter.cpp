@@ -402,7 +402,6 @@ void LSLAdapter::onBlockSizeChanged(const int newBlockSize)
     m_iOutputBlockSize = newBlockSize;
 }
 
-
 //=============================================================================================================
 
 QString LSLAdapter::getBuildInfo()

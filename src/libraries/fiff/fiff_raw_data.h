@@ -202,7 +202,6 @@ public:
     Eigen::MatrixXd proj;       /**< SSP operator to apply to the data. */
     FiffCtfComp comp;           /**< Compensator. */
 
-
 };
 } // NAMESPACE
 
