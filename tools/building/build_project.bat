@@ -28,7 +28,6 @@
     
     :loop
     IF NOT "%1"=="" (
-      ECHO 1 is -%1-
       IF "%1"=="help" (
         call:showLogo
         call:showHelp
@@ -69,9 +68,9 @@
     call:doPrintConfiguration
 
     IF "%MockBuild%"=="True" (
-        ECHO .
+        ECHO.
         ECHO Mock mode ON. Commands to be executed: 
-        ECHO .
+        ECHO.
         SET "MockText=ECHO "
     )
     
@@ -88,7 +87,7 @@
     )
 
     IF "%Rebuild%"=="False" (
-        ECHO .
+        ECHO.
         ECHO Configuring build project
         %MockText%cmake -B %BuildFolder% -S %SourceFolder% -DCMAKE_BUILD_TYPE=%BuildType% -DBINARY_OUTPUT_DIRECTORY=%OutFolder% -DCMAKE_CXX_FLAGS="/MP"
         xcopy %BuildFolder%\compile_commands.json %BaseFolder%\compile_commands.json
@@ -109,16 +108,16 @@
     exit /B 1
 
     :doPrintConfiguration
-      ECHO .
+      ECHO.
       ECHO ====================================================================
       ECHO ===================== MNE-CPP BUILD CONFIG =========================
-      ECHO .
+      ECHO.
       ECHO ScriptPath   = %ScriptPath%
       ECHO BaseFolder   = %BaseFolder%
       ECHO SourceFolder = %SourceFolder%
       ECHO BuildFolder  = %BuildFolder%
       ECHO OutFolder    = %OutFolder%
-      ECHO .
+      ECHO.
       ECHO BuildType    = %BuildType%
       ECHO BuildName    = %BuildName%
       ECHO CleanBuild   = %CleanBuild%
@@ -126,21 +125,21 @@
       ECHO Coverage     = %WithCodeCoverage%
       ECHO NumProcesses = %NumProcesses%
       ECHO MockBuild    = %MockBuild%
-      ECHO .
+      ECHO.
       ECHO ====================================================================
       ECHO ====================================================================
-      ECHO .
+      ECHO.
     exit /B 0
 
     :showHelp
-      ECHO . 
+      ECHO. 
       ECHO MNE-CPP building script help.
-      ECHO . 
+      ECHO. 
       ECHO Usage: ./build_project.bat [Options]
-      ECHO .
+      ECHO.
       ECHO All builds will be parallel.
       ECHO All options can be used in undefined order.
-      ECHO .
+      ECHO.
       ECHO [help] - Print this help.
       ECHO [mock] - Show commands do not execute them.
       ECHO [clean] - Delete build and out folders for your configuration and exit.
@@ -150,7 +149,7 @@
       ECHO                     and an out folder /out/Release_testA.
       ECHO [coverage] -  Enable code coverage.
       ECHO [rebuild] - Only rebuild existing build-system configuration.
-      ECHO .
+      ECHO.
     exit /B 0
 
     :showLogo
