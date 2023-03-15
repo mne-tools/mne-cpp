@@ -90,7 +90,6 @@
         ECHO.
         ECHO Configuring build project
         %MockText%cmake -B %BuildFolder% -S %SourceFolder% -DCMAKE_BUILD_TYPE=%BuildType% -DBINARY_OUTPUT_DIRECTORY=%OutFolder% -DCMAKE_CXX_FLAGS="/MP"
-        xcopy %BuildFolder%\compile_commands.json %BaseFolder%\compile_commands.json
     )
 
     %MockText%cmake --build %BuildFolder% --config %BuildType% && call::buildSuccessful || call:buildFailed
