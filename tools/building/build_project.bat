@@ -32,7 +32,7 @@
       IF "%1"=="help" (
         call:showLogo
         call:showHelp
-        goto :end_of_script
+        goto :endOfScript
       )
       set Arg=%1
 
@@ -84,7 +84,7 @@
         RMDIR /S /Q %BuildFolder%
         RMDIR /S /Q %OutFolder%
 
-        goto :end_of_script
+        goto :endOfScript
     )
 
     IF "%Rebuild%"=="False" (
@@ -94,9 +94,9 @@
         xcopy %BuildFolder%\compile_commands.json %BaseFolder%\compile_commands.json
     )
 
-    %MockText%cmake --build %BuildFolder% --config %BuildType% && call::sucess || call:fail
+    %MockText%cmake --build %BuildFolder% --config %BuildType% && call::buildSuccessful || call:buildFailed
 
-    :end_of_script
+    :endOfScript
 
     exit /B 
 
@@ -154,45 +154,45 @@
     exit /B 0
 
     :showLogo
-      ECHO . 
-      ECHO .
-      ECHO      _    _ _  _ ___     ___ __  ___   
-      ECHO     |  \/  | \| | __|   / __| _ \ _ \  
-      ECHO     | |\/| | .\` | _|   | (__|  _/  _/  
-      ECHO     |_|  |_|_|\_|___|   \___|_| |_|    
-      ECHO .
-      ECHO     Build tool                         
-      ECHO .
+      ECHO.
+      ECHO.
+      ECHO     _    _ _  _ ___     ___ __  ___   
+      ECHO    ^|  \/  ^| \^| ^| __^|   / __^| _ \ _ \  
+      ECHO    ^| ^|\/^| ^| .\ ^| _^|   ^| (__^|  _/  _/  
+      ECHO    ^|_^|  ^|_^|_^|\_^|___^|   \___^|_^| ^|_^|    
+      ECHO.
+      ECHO    Build tool                         
+      ECHO.
     exit /B 0
 
     :showBuildSuccessful
-      ECHO . 
-      ECHO .
-      ECHO       *       )             (   (        
-      ECHO     (  \`   (  (         (   )\ ))\ )     
-      ECHO     )\))(  )\())(       )\ (()/(()/(     
-      ECHO    ((_)()\((_)\ )\ ___(((_) /(_))(_))    
-      ECHO    (_()((_)_((_|(_)___)\___(_))(_))      
-      ECHO    |  \/  | \| | __| ((/ __| _ \ _ \     
-      ECHO    | |\/| | .\` | _|   | (__|  _/  _/     
-      ECHO    |_|  |_|_|\_|___|   \___|_| |_|       
-      ECHO .
-      ECHO    Build successful                      
-      ECHO .
+      ECHO.
+      ECHO.
+      ECHO      *       )             (   (        
+      ECHO    (  \`   (  (         (   )\ ))\ )    
+      ECHO    )\))(  )\())(       )\ (()/(()/(     
+      ECHO   ((_)()\((_)\ )\ ___(((_) /(_))(_))    
+      ECHO   (_()((_)_((_^|(_)___)\___(_))(_))      
+      ECHO   ^|  \/  ^| \^| ^| __^| ((/ __^| _ \ _ \     
+      ECHO   ^| ^|\/^| ^| .\`^| _^|   ^| (__^|  _/  _/     
+      ECHO   ^|_^|  ^|_^|_^|\_^|___^|   \___^|_^| ^|_^|       
+      ECHO.
+      ECHO   Build successful                      
+      ECHO.
     exit /B 0
 
     :showBuildFailed
-      ECHO .
-      ECHO .
-      ECHO     _           _ _     _     __      _ _          _   
-      ECHO    | |         (_) |   | |   / _|    (_) |        | |  
-      ECHO    | |__  _   _ _| | __| |  | |_ __ _ _| | ___  __| |  
-      ECHO    | '_ \| | | | | |/ _\` |  |  _/ _\` | | |/ _ \/ _\` |  
-      ECHO    | |_) | |_| | | | (_| |  | || (_| | | |  __/ (_| |  
-      ECHO    |_.__/ \__,_|_|_|\__,_|  |_| \__,_|_|_|\___|\__,_|  
-      ECHO .
-      ECHO    Here we go...                                       
-      ECHO .
+      ECHO.
+      ECHO.
+      ECHO    _           _ _     _     __      _ _          _   
+      ECHO   ^| ^|         (_) ^|   ^| ^|   / _^|    (_) ^|        ^| ^|  
+      ECHO   ^| ^|__  _   _ _^| ^| __^| ^|  ^| ^|_ __ _ _^| ^| ___  __^| ^|  
+      ECHO   ^| '_ \^| ^| ^| ^| ^| ^|/ _` ^|  ^|  _/ _` ^| ^| ^|/ _ \/ _` ^|  
+      ECHO   ^| ^|_) ^| ^|_^| ^| ^| ^| (_^| ^|  ^| ^|^| (_^| ^| ^| ^|  __/ (_^| ^|  
+      ECHO   ^|_.__/ \__,_^|_^|_^|\__,_^|  ^|_^| \__,_^|_^|_^|\___^|\__,_^|  
+      ECHO.
+      ECHO   Here we go...                                       
+      ECHO.
     exit /B 0
 
     :; # ########## WINDOWS SECTION ENDS ####################
