@@ -354,7 +354,7 @@ OutFolder=${BaseFolder}/out/${BuildName}
 
 if [ "$(uname)" == "Darwin" ]; then
     NumProcesses=$(sysctl -n hw.logicalcpu)
-else 
+else
     NumProcesses=$(expr $(nproc --all))
 fi
 

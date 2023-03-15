@@ -85,7 +85,7 @@ class DISPSHARED_EXPORT FilterSettingsView : public AbstractView
 {
     Q_OBJECT
 
-public:    
+public:
     typedef QSharedPointer<FilterSettingsView> SPtr;              /**< Shared pointer type for FilterSettingsView. */
     typedef QSharedPointer<const FilterSettingsView> ConstSPtr;   /**< Const shared pointer type for FilterSettingsView. */
 

@@ -772,7 +772,7 @@ define FIFF_DECIMATION_FACTOR  19  * Collector; not used anywhere?
 #define FIFFV_SEG_REGION_ID_HEART    FIFF_BEM_SURF_ID_HEART     
 #define FIFFV_SEG_REGION_ID_LUNGS    FIFF_BEM_SURF_ID_LUNGS     
 #define FIFFV_SEG_REGION_ID_TORSO    FIFF_BEM_SURF_ID_TORSO     
-/*				                               
+/*
  * FIFF_BEM_APPROX		     
  */				     
 #define FIFFV_BEM_APPROX_CONST        1     /**< The constant potential approach. */

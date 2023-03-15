@@ -172,7 +172,7 @@ void QuickControlView::addWidgets(const QList<QWidget*>& lWidgets,
 void QuickControlView::addWidget(QWidget* pWidget,
                                  const QString& sTabName,
                                  bool bAddToEnd)
-{    
+{
     if(QVBoxLayout* pTabWidgetLayout = findTabWidgetLayout(sTabName)) {
         int iPos = bAddToEnd ? -1 : 0;
         pTabWidgetLayout->insertWidget(iPos,
@@ -187,7 +187,7 @@ void QuickControlView::addGroupBox(QWidget* pWidget,
                                    const QString& sGroupBoxName,
                                    const QString& sTabName,
                                    bool bAddToEnd)
-{    
+{
     if(QVBoxLayout* pTabWidgetLayout = findTabWidgetLayout(sTabName)) {
         int iPos = bAddToEnd ? -1 : 0;
         QGroupBox* pGroupBox = new QGroupBox(sGroupBoxName);

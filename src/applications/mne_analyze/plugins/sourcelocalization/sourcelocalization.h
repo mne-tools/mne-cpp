@@ -109,7 +109,7 @@ public:
     virtual void handleEvent(QSharedPointer<ANSHAREDLIB::Event> e) override;
     virtual QVector<ANSHAREDLIB::EVENT_TYPE> getEventSubscriptions() const override;
 
-private:    
+private:
     QPointer<ANSHAREDLIB::Communicator>                     m_pCommu;                   /**< To broadcst signals. */
 };
 

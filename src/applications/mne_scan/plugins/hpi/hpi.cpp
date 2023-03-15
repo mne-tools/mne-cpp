@@ -432,7 +432,7 @@ void Hpi::onAllowedRotationChanged(double dAllowedRotation)
 
 void Hpi::onDigitizersChanged(const QList<FIFFLIB::FiffDigPoint>& lDigitzers,
                               const QString& sFilePath)
-{    
+{
     m_mutex.lock();
     if(m_pFiffInfo) {
         m_pFiffInfo->dig = lDigitzers;

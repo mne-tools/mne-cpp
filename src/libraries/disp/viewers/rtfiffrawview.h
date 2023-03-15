@@ -95,7 +95,7 @@ class RtFiffRawViewDelegate;
  * @brief The RtFiffRawView class provides a real-time channel view display
  */
 class DISPSHARED_EXPORT RtFiffRawView : public AbstractView
-{    
+{
     Q_OBJECT
 
 public:
@@ -483,7 +483,7 @@ protected:
 
     QString                                     m_sSettingsPath;                /**< The settings path to store the GUI settings to. */
 
-signals:    
+signals:
     //=========================================================================================================
     /**
      * position is emitted whenever user moves the mouse inside of the table view viewport
