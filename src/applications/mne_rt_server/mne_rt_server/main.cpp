@@ -116,7 +116,7 @@ int main(int argc, char *argv[])
 
             if (file.open(QIODevice::Truncate | QIODevice::Text | QIODevice::WriteOnly)) {
                 QTextStream stream(&file);
-                stream << QString("simFile = <pathTo>/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+                stream << QString("simFile = <pathTo>/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
                 file.close();
             } else {
                 qWarning() << QString("[MneRtServer::main] Could not open %1").arg(QCoreApplication::applicationDirPath() + "/resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg");

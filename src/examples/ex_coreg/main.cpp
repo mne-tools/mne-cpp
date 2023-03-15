@@ -107,9 +107,9 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Example Coregistration");
     parser.addHelpOption();
 
-    QCommandLineOption digOption("dig", "The destination point set", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    QCommandLineOption bemOption("bem", "The bem file", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/bem/sample-head.fif");
-    QCommandLineOption transOption("trans", "The MRI-Head transformation file", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
+    QCommandLineOption digOption("dig", "The destination point set", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    QCommandLineOption bemOption("bem", "The bem file", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-head.fif");
+    QCommandLineOption transOption("trans", "The MRI-Head transformation file", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw-trans.fif");
     QCommandLineOption scaleOption("scale", "Weather to scale during the registration or not", "bool", "false");
     QCommandLineOption tolOption("tol", "The convergence limit for the icp algorithm.", "float", "0.001");
     QCommandLineOption distOption("dist", "The maximum distance between digitizer and head shape in mm.", "float", "0.02");
