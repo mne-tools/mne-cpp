@@ -63,7 +63,7 @@ git rebase upstream/main
 3. In QtCreator select the Release mode in the lower left corner.
 4. In the Qt Creator's Projects window, right mouse click on the top level MNE-CPP tree item and select Run CMake. Wait until progress bar in lower right corner turns green (this step may take some time).
 5. Right mouse click again and then hit Build (this step may take some time). Wait until progress bar in lower right corner turns green.
-6. After the build process is finished, go to the `mne-cpp/bin` folder. All applications and libraries should have been created throughout the build process.
+6. After the build process is finished, go to the `mne-cppout/Release` folder. All applications and libraries should have been created throughout the build process.
 
 For building on CentOS and other linux distros with older gcc versions, check if RHEL Developer Toolsets are available with newer versions. In Qt Creator, under `Tools > Options > Kits > Compilers`, you can add a new compiler, and then add it to your build kit in `Tools > Options > Kits > Kits`.
 

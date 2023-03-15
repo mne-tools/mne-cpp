@@ -286,7 +286,7 @@ void FiffSimulator::init()
     //
     // Read cfg file
     //
-    QFile t_qFile(QString("%1/resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg").arg(QCoreApplication::applicationDirPath()));
+    QFile t_qFile(QString("%1/../resources/mne_rt_server/plugins/fiffsimulator/FiffSimulation.cfg").arg(QCoreApplication::applicationDirPath()));
     if (t_qFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         QTextStream in(&t_qFile);
