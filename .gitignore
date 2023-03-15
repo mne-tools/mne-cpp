@@ -20,7 +20,6 @@
 
 # Bin folder with exceptions
 /lib/
-/bin/
 
 # External device SDKs (if installed)
 /applications/mne_scan/plugins/eegosports/eemagine/
@@ -28,7 +27,6 @@
 /applications/mne_scan/plugins/brainamp/BrainAmpIoCtl.h
 
 # Installer framework
-/tools/ifw_installer/*
 !linux/
 !mac/
 !windows/
