@@ -90,7 +90,7 @@ FwdSettingsView::FwdSettingsView(const QString& sSettingsPath,
     m_pUi->m_lineEdit_iNDipoleClustered->setText("Not Clustered");
 
     // load init annotation set
-    QString t_sAtlasDir = QCoreApplication::applicationDirPath() + "/MNE-sample-data/subjects/sample/label";
+    QString t_sAtlasDir = QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/label";
     m_pUi->m_qLineEdit_AtlasDirName->setText(t_sAtlasDir);
 
     AnnotationSet::SPtr t_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(t_sAtlasDir+"/lh.aparc.a2009s.annot", t_sAtlasDir+"/rh.aparc.a2009s.annot"));

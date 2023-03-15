@@ -360,13 +360,13 @@ void DataLoader::onSaveFilePressed(FileType type)
         case DATA_FILE:{
             sFile = tr("Save File");
             sFileType = tr("Fiff file(*.fif *.fiff)");
-            sDir = "/MNE-sample-data";
+            sDir = "/../resources/data/MNE-sample-data";
             break;
         }
         case EVENT_FILE: {
             sFile = tr("Save Events");
             sFileType = tr("Event file(*.eve)");
-            sDir = "/MNE-sample-data";
+            sDir = "/../resources/data/MNE-sample-data";
             break;
         }
         case AVERAGE_FILE: {
@@ -421,7 +421,7 @@ void DataLoader::onLoadSubjectPressed()
 {
     QString dir = QFileDialog::getExistingDirectory(Q_NULLPTR,
                                                        tr("select directory"),
-                                                       QDir::currentPath()+"/MNE-sample-data");
+                                                       QDir::currentPath()+"/../resources/data/MNE-sample-data");
 
     if(dir.isEmpty()){
         qDebug() << "Empty input";

@@ -91,8 +91,8 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Read Epochs Example");
     parser.addHelpOption();
 
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
     QCommandLineOption evokedIdxOption("aveIdx", "The average <index> to choose from the average file.", "index", "3");
     QCommandLineOption pickAllOption("pickAll", "Pick all channels.", "pickAll", "true");
     QCommandLineOption keepCompOption("keepComp", "Keep compensators.", "keepComp", "false");

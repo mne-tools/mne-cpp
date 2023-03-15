@@ -83,8 +83,8 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Read Write Raw Example");
     parser.addHelpOption();
 
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QCommandLineOption outputOption("fileOut", "The output file <out>.", "out", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/test_output.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption outputOption("fileOut", "The output file <out>.", "out", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/test_output.fif");
 
     parser.addOption(inputOption);
     parser.addOption(outputOption);
