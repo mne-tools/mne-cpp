@@ -249,7 +249,7 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v2
     - name: Clone mne-cpp test data
-      run: git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
+      run: git clone https://github.com/mne-tools/mne-cpp-test-data.git ./resources/mne-cpp-test-data
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:

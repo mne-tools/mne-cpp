@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="/tools/design/logos/MNE-CPP_Logo.svg"><img src="/tools/design/logos/MNE-CPP_Logo.svg" width="400" height="200" alt="MNE-CPP"></a>
+  <a href="/resources/design/logos/MNE-CPP_Logo.svg"><img src="/resources/design/logos/MNE-CPP_Logo.svg" width="400" height="200" alt="MNE-CPP"></a>
 </p>
 <p align="center">
 <a href="https://github.com/mne-tools/mne-cpp/actions" target="_blank">

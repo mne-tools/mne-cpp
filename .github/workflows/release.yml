@@ -558,7 +558,7 @@ jobs:
         rm -r bin/mne-cpp-test-data
         rm -r bin/MNE-sample-data
         # Replace logo
-        cp -RT tools/design/logos/qtlogo.svg bin/qtlogo.svg
+        cp -RT resources/design/logos/qtlogo.svg bin/qtlogo.svg
         # Clone repo and update with new wasm versions
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name LorenzE
