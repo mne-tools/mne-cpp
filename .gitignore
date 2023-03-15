@@ -28,7 +28,7 @@
 /applications/mne_scan/plugins/brainamp/BrainAmpIoCtl.h
 
 # Installer framework
-/tools/ifw_installer/*
+/resources/ifw_installer/*
 !linux/
 !mac/
 !windows/
