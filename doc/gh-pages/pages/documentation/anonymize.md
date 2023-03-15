@@ -89,37 +89,37 @@ The easiest way to run `mne_anonymize` is by just running the application and us
 For specifying an input file to anonymize:
 
 ```
-mne_anonymize --no-gui --in ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif
+mne_anonymize --no-gui --in ../data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif
 ```
 
 If you are concerned with the space in your drive, you can delete the input file immediately after anonymization through the option `--delete_input_file`. By default, before file deletion the user will be prompted to confirm the deletion of the input file:
 
 ```
-mne_anonymize --no-gui --in ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file
+mne_anonymize --no-gui --in ../data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file
 ```
 
 You can avoid confirming the deletion with the flag `--avoid_delete_confirmation`:
 
 ```
-mne_anonymize --no-gui --in ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file --avoid_delete_confirmation
+mne_anonymize --no-gui --in ../data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file --avoid_delete_confirmation
 ```
 
 If you specify the input and the output files with the same name, by default the application will ask you to confirm deletion of the input file. You can also avoid the confirmation and force the deletion with the option `--avoid_delete_confirmation`.
 
 ```
-mne_anonymize --no-gui --in ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --out ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file --avoid_delete_confirmation
+mne_anonymize --no-gui --in ../data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif --out ../data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif --delete_input_file --avoid_delete_confirmation
 ```
 
 In order to **substract** 35 days from all measurement dates, both in the ID and `FIFF_MEAS_DATE` tags, use:
 
 ```
-mne_anonymize --in ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif --measurement_date_offset 35
+mne_anonymize --in ../data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif --measurement_date_offset 35
 ```
 
 Typical use with abbreviated options. This command will call `mne_anonymize`, specify the input file, set verbose mode and brute mode on. It will also set `delete_input_file` on, avoiding the deletion confirmation, and finally set the measurement date to be 35 days before the date registered in the file.
 
 ```
-mne_anonymize -i ./MNE-sample-data/MEG/sample/sample_audvis_raw.fif -vbdf --mdo 35
+mne_anonymize -i ../data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif -vbdf --mdo 35
 ```
 
 ## Introduction to HIPAA law 

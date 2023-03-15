@@ -54,7 +54,7 @@ pDataModel->addBemData("sample", "BEM", bem);
 //Add source-level data for left hemisphere
 MNESourceEstimate sourceData(QFile("sample_audvis-meg-eeg-lh.stc"));
 MNEForwardSolution fwd(QFile("sample_audvis-meg-eeg-oct-6-fwd.fif"));
-SurfaceSet surfSet("sample", 0, "inflated", "./MNE-sample-data/subjects");
+SurfaceSet surfSet("sample", 0, "inflated", "../data/MNE-sample-data/subjects");
 pDataModel->addSourceData("sample", "audvis", sourceData, fwd, surfSet);
 ```
 
