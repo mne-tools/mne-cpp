@@ -122,13 +122,26 @@ if(NOT LIB_ONLY)
 endif()
 
 ##==============================================================================
-## Add symbolic links to data folders
+## Add symbolic link to project data folder
+
+set(PROJECT_DATA_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../resources/data)
+set(OUTPUT_DATA_DIRECTORY ${BINARY_OUTPUT_DIRECTORY}/data)
+
+cmake_path(
+  NORMAL_PATH     PROJECT_DATA_DIRECTORY
+  OUTPUT_VARIABLE PROJECT_DATA_DIRECTORY
+)
+
+cmake_path(
+  NORMAL_PATH     OUTPUT_DATA_DIRECTORY
+  OUTPUT_VARIABLE OUTPUT_DATA_DIRECTORY
+)
+
+message(STATUS "PROJECT_DATA_DIRECTORY=${PROJECT_DATA_DIRECTORY}")
+message(STATUS "OUTPUT_DATA_DIRECTORY=${OUTPUT_DATA_DIRECTORY}")
 
 execute_process(
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${BINARY_OUTPUT_DIRECTORY}
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${BINARY_OUTPUT_DIRECTORY}/data
   COMMAND ${CMAKE_COMMAND} -E create_symlink
-    ../resources/data ${BINARY_OUTPUT_DIRECTORY}/data
-  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+  ${PROJECT_DATA_DIRECTORY} ${OUTPUT_DATA_DIRECTORY}
 )
 
