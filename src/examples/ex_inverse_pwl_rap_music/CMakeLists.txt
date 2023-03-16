@@ -24,12 +24,11 @@ else()
     endif()
 endif()
 
+set(QT_REQUIRED_COMPONENT_LIBS QT_REQUIRED_COMPONENTS)
+list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
-  Qt${QT_VERSION_MAJOR}::Core
-  Qt${QT_VERSION_MAJOR}::Widgets
-  Qt${QT_VERSION_MAJOR}::3DRender
-  Qt${QT_VERSION_MAJOR}::Concurrent
-  Qt${QT_VERSION_MAJOR}::Network
+  ${QT_REQUIRED_COMPONENT_LIBS}
   mne_rtprocessing
   mne_connectivity
   mne_inverse

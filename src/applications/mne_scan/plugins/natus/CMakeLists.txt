@@ -54,11 +54,11 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
+set(QT_REQUIRED_COMPONENT_LIBS QT_REQUIRED_COMPONENTS)
+list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Network
-    Qt${QT_VERSION_MAJOR}::Concurrent
+    ${QT_REQUIRED_COMPONENT_LIBS}
     eigen
     mne_disp
     mne_utils
