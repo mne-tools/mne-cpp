@@ -58,7 +58,7 @@
       IF "%1"=="rebuild" (
         SET "Rebuild=True"
       )
-      IF "%1"=="rebuild" (
+      IF "%1"=="static" (
         SET "CMakeConfigFlags=!CMakeConfigFlags! -DBUILD_SHARED_LIBS=OFF"
       )
       SHIFT
