@@ -6,8 +6,9 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Concurrent Widgets OpenGL 3DCore 3DRender 3DInput 3DExtras Charts)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Concurrent Widgets OpenGL 3DCore 3DRender 3DInput 3DExtras Charts)
+set(QT_REQUIRED_COMPONENTS Core Concurrent Widgets OpenGL 3DCore 3DRender 3DInput 3DExtras Charts)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
     disp3D_global.cpp
