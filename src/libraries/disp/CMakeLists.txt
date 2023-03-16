@@ -1,12 +1,17 @@
 cmake_minimum_required(VERSION 3.14)
 project(mne_disp LANGUAGES CXX)
 
-#Handle qt uic, moc, rrc automatically
+# Handle qt uic, moc, rrc automatically
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Concurrent Widgets Svg OpenGL 3DCore 3DRender 3DInput 3DExtras Charts)
+set(QT_REQUIRED_COMPONENTS Core Concurrent Widgets Svg Charts)
+
+if(NOT WASM)
+  list(APPEND QT_REQUIRED_COMPONENTS OpenGL 3DCore 3DRender 3DInput 3DExtras)
+endif()
+
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
@@ -70,8 +75,7 @@ set(SOURCES
     viewers/helpers/draggableframelesswidget.cpp
     viewers/helpers/frequencyspectrumdelegate.cpp
     viewers/helpers/frequencyspectrummodel.cpp
-    viewers/helpers/bidsviewmodel.cpp
-)
+    viewers/helpers/bidsviewmodel.cpp)
 
 set(HEADERS
     disp_global.h
@@ -133,8 +137,7 @@ set(HEADERS
     viewers/helpers/draggableframelesswidget.h
     viewers/helpers/frequencyspectrumdelegate.h
     viewers/helpers/frequencyspectrummodel.h
-    viewers/helpers/bidsviewmodel.h
-)
+    viewers/helpers/bidsviewmodel.h)
 
 set(UI
     viewers/formfiles/applytoview.ui
@@ -166,19 +169,18 @@ set(FILE_TO_UPDATE disp_global.cpp)
 
 set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
+set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS
+                                                         "${SOURCE_PATHS}")
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI})
 
 set(FFTW_LIBS "")
 
 if(USE_FFTW)
-  if (WIN32)
+  if(WIN32)
     set(FFTW_LIBS
-      ${FFTW_DIR_LIBS}/libfftw3-3.dll
-      ${FFTW_DIR_LIBS}/libfftw3f-3.dll
-      ${FFTW_DIR_LIBS}/libfftwf3l-3.dll
-    )
+        ${FFTW_DIR_LIBS}/libfftw3-3.dll ${FFTW_DIR_LIBS}/libfftw3f-3.dll
+        ${FFTW_DIR_LIBS}/libfftwf3l-3.dll)
     target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE})
   elseif(UNIX AND NOT APPLE)
     set(FFTW_LIBS ${FFTW_DIR_LIBS}/lib/libfftw3.so)
@@ -188,7 +190,7 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
-target_include_directories(${PROJECT_NAME} PRIVATE .    ${FFTW_LIBS})
+target_include_directories(${PROJECT_NAME} PRIVATE . ${FFTW_LIBS})
 
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
@@ -206,8 +208,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_events
 )
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_DISP_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+target_compile_definitions(
+  ${PROJECT_NAME}
+  PRIVATE MNE_DISP_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"
+          MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
 
 if(NOT BUILD_SHARED_LIBS)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+  target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
