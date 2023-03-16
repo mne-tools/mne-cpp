@@ -91,8 +91,7 @@ jobs:
       run: |
         export QT_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
         export Qt5_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
-        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
-        cmake --build build
+        ./tools/building/build_project.bat  
     - name: Deploy binaries
       run: |
         ./tools/deployment/deploy.bat static pack
@@ -147,8 +146,7 @@ jobs:
       run: |
         export QT_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
         export Qt5_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
-        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
-        cmake --build build
+        ./tools/building/build_project.bat 
     - name: Deploy binaries
       run: |
         ./tools/deployment/deploy.bat static pack
@@ -218,8 +216,7 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         $env:QT_DIR += "$PWD\..\Qt5_binaries\lib\cmake\Qt5"
         $env:Qt5_DIR += "$PWD\..\Qt5_binaries\lib\cmake\Qt5"
-        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
-        cmake --build build --config Release
+        ./tools/building/build_project.bat 
     - name: Deploy binaries
       run: |
         ./tools/deployment/deploy.bat static pack

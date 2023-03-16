@@ -25,6 +25,9 @@
     SET "NumProcesses=1"
 
     SET "Rebuild=False"
+
+
+    SET "CMakeConfigFlags="
     
     :loop
     IF NOT "%1"=="" (
@@ -55,7 +58,9 @@
       IF "%1"=="rebuild" (
         SET "Rebuild=True"
       )
-
+      IF "%1"=="rebuild" (
+        SET "CMakeConfigFlags=!CMakeConfigFlags! -DBUILD_SHARED_LIBS=OFF"
+      )
       SHIFT
       GOTO :loop
     )
@@ -89,7 +94,7 @@
     IF "%Rebuild%"=="False" (
         ECHO.
         ECHO Configuring build project
-        %MockText%cmake -B %BuildFolder% -S %SourceFolder% -DCMAKE_BUILD_TYPE=%BuildType% -DBINARY_OUTPUT_DIRECTORY=%OutFolder% -DCMAKE_CXX_FLAGS="/MP"
+        %MockText%cmake -B %BuildFolder% -S %SourceFolder% -DCMAKE_BUILD_TYPE=%BuildType% -DBINARY_OUTPUT_DIRECTORY=%OutFolder% -DCMAKE_CXX_FLAGS="/MP" %CMakeConfigFlags%
     )
 
     %MockText%cmake --build %BuildFolder% --config %BuildType% && call::buildSuccessful || call:buildFailed
@@ -146,8 +151,10 @@
       ECHO                     For example, Release_testA will build in release
       ECHO                     mode with a build folder /build/Release_testA
       ECHO                     and an out folder /out/Release_testA.
-      ECHO [coverage] -  Enable code coverage.
-      ECHO [rebuild] - Only rebuild existing build-system configuration.
+      ECHO [coverage] - Enable code coverage.
+      ECHO [rebuild]  - Only rebuild existing build-system configuration.
+      ECHO [static]   - Build project statically. QT_DIR and Qt5_DIR must be set to"
+      ECHO              Point to a static version of Qt."
       ECHO.
     exit /B 0
 
@@ -229,6 +236,7 @@ NumProcesses="1"
 MockBuild="false"
 MockText=""
 PrintHelp="false"
+CMakeConfigFlags=""
 
 doShowLogo() {
   echo "                                      "
@@ -313,6 +321,8 @@ doPrintHelp() {
   echo "                    and an out folder /out/Release_testA."
   echo "[coverage] - Enable code coverage."
   echo "[rebuild]  - Only rebuild existing build-system configuration."
+  echo "[static]   - Build project statically. QT_DIR and Qt5_DIR must be set to"
+  echo "             point to a static version of Qt."
   echo " "
 }
 
@@ -329,6 +339,8 @@ for (( j=0; j<argc; j++)); do
     Rebuild="true"
   elif [ "${argv[j]}" == "help" ]; then
     PrintHelp="true"
+  elif [ "${argv[j]}" == "static" ]; then
+    CMakeConfigFlags="${CMakeConfigFlags} --DBUILD_SHARED_LIBS=OFF"
   fi
   case ${argv[j]} in
     *"Debug"*)
@@ -391,7 +403,7 @@ fi
 if [ "${Rebuild}" == "false" ]; then
   echo " "
   echo "Configuring Build System:" 
-  ${MockText}cmake -B ${BuildFolder} -S ${SourceFolder} -DCMAKE_BUILD_TYPE=${BuildType} -DBINARY_OUTPUT_DIRECTORY=${OutFolder} ${CoverageOption}
+  ${MockText}cmake -B ${BuildFolder} -S ${SourceFolder} -DCMAKE_BUILD_TYPE=${BuildType} -DBINARY_OUTPUT_DIRECTORY=${OutFolder} ${CoverageOption} ${CMakeConfigFlags}
 fi
 
 echo " "
