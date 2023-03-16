@@ -145,7 +145,7 @@ private:
      */
     void changeQLineEdits();
 
-signals:    
+signals:
     //=========================================================================================================
     /**
      * Emit this signal whenever the cardinal points changed.

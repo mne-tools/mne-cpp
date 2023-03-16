@@ -84,7 +84,7 @@ class Network;
  * @brief This class computes the coherency connectivity metric.
  */
 class CONNECTIVITYSHARED_EXPORT Coherency : public AbstractMetric
-{    
+{
 
 public:
     typedef QSharedPointer<Coherency> SPtr;            /**< Shared pointer type for Coherency. */

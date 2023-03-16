@@ -100,7 +100,7 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
 , m_pPluginManager(Q_NULLPTR)
 , m_pAnalyzeData(Q_NULLPTR)
 , m_pMainWindow(Q_NULLPTR)
-{    
+{
     // Initialize cmd line parser
     initCmdLineParser();
 

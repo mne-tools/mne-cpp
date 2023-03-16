@@ -85,7 +85,7 @@ class FrequencySpectrumModel;
  * @brief The SpectrumView class provides a spectrum view
  */
 class DISPSHARED_EXPORT SpectrumView : public AbstractView
-{    
+{
     Q_OBJECT
 
 public:

@@ -171,7 +171,7 @@ void DataManager::onCurrentlySelectedModelChanged(const QVariant& data)
 //=============================================================================================================
 
 void DataManager::onRemoveItem(const QModelIndex& index)
-{    
+{
     m_pAnalyzeData->removeModel(index);
 }
 
