@@ -219,7 +219,7 @@ jobs:
       run: |
         export QT_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
         export Qt5_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
-        ./tools/building/build_project.bat  
+        ./tools/building/build_project.bat static 
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
@@ -227,7 +227,7 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         $env:QT_DIR += "$PWD\..\Qt5_binaries\lib\cmake\Qt5"
         $env:Qt5_DIR += "$PWD\..\Qt5_binaries\lib\cmake\Qt5"
-        ./tools/building/build_project.bat  
+        ./tools/building/build_project.bat static
     - name: Deploy binaries
       run: |
         ./tools/deployment/deploy.bat static pack
