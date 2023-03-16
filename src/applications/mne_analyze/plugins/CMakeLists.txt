@@ -1,9 +1,11 @@
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mne_analyze_plugins)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mne_analyze_plugins)
 if(WIN32)
   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
   set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_LIBRARY_OUTPUT_DIRECTORY})
 endif()
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mne_analyze_plugins)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/mne_analyze_plugins)
 if(WIN32)
   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_RELEASE ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
   set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY})
@@ -23,6 +25,9 @@ add_subdirectory(events)
 add_subdirectory(filtering)
 add_subdirectory(rawdataviewer)
 add_subdirectory(sourcelocalization)
-add_subdirectory(view3d)
 
-#add_subdirectory(sampleplugin)
+if(NOT WASM)
+  add_subdirectory(view3d)
+endif()
+
+# add_subdirectory(sampleplugin)
