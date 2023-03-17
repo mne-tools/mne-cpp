@@ -43,8 +43,8 @@
         IF "%PACK_OPTION%"=="pack" (
             Rem This script needs to be run from the top level mne-cpp repo folder
             Rem Delete folders which we do not want to ship
-            rmdir %BASE_PATH%\out\Release\apps\mne_rt_server_plugins /s /q
             rmdir %BASE_PATH%\out\Release\resources\data /s /q
+            rmdir %BASE_PATH%\out\Release\apps\mne_rt_server_plugins /s /q
             rmdir %BASE_PATH%\out\Release\apps\mne_scan_plugins /s /q
             rmdir %BASE_PATH%\out\Release\apps\mne_analyze_plugins /s /q
             
@@ -215,12 +215,6 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
         sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
 
-        # Creating a directory for linuxdeployqt to create results 
-        sudo mkdir -p -m777 mne-cpp
-
-        # Copying built data to folder for easy packaging   
-        cp -r ${BASE_PATH}/bin ${BASE_PATH}/lib ${BASE_PATH}/mne-cpp/
-
         # linuxdeployqt uses mne_scan and mne_analyze binary to resolve dependencies
         cd ${BASE_PATH}/mne-cpp
         ../linuxdeployqt-continuous-x86_64.AppImage out/Release/apps/mne_scan -verbose2 -extra-plugins=renderers
@@ -244,7 +238,6 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
             # Creating archive of everything in current directory
             tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz ./*    
         fi
-        rm -fr mne-cpp
 
     elif [[ ${LINK_OPTION} == static ]]; then
 
@@ -267,9 +260,6 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         # Creating a directory for linuxdeployqt to create results 
         sudo mkdir -p -m777 mne-cpp
 
-        # Copying built data to folder for easy packaging   
-        cp -r ./bin ./lib mne-cpp/
-
         # linuxdeployqt uses mne_scan and mne_analyze binary to resolve dependencies
         cd mne-cpp
         ../linuxdeployqt-continuous-x86_64.AppImage out/Release/apps/mne_scan -verbose2 -extra-plugins=renderers
@@ -280,8 +270,8 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         ldd ./out/Release/apps/mne_scan
 
         # Delete folders which we do not want to ship
-        rm -r out/Release/apps/mne_rt_server_plugins
         rm -r out/Release/resources/data
+        rm -r out/Release/apps/mne_rt_server_plugins
         rm -r out/Release/apps/mne_scan_plugins
         rm -r out/Release/apps/mne_analyze_plugins
 
@@ -289,8 +279,6 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
             # Creating archive of everything in the bin directory
             tar cfvz ../mne-cpp-linux-static-x86_64.tar.gz out/Release/apps/. out/Release/lib/.
         fi
-
-        rm -fr mne-cpp
 
     else 
         echo "Input argument link_option is invalid."

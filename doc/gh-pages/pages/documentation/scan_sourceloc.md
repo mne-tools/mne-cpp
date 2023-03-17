@@ -9,8 +9,8 @@ nav_order: 2
 This tutorial will show how you can set up an acquisition and real-time source localization pipeline in MNE Scan.
 
 * Make sure you correctly [setup the MNE Sample Data Set](../download/sample_data.md). On MacOS please make sure that you copied the MNE-Sample-data-set to mne_scan.app/Contents/MacOS/ as well.
-* Start mne_rt_server in your mne-cpp/bin folder.
-* Start mne_scan in your mne-cpp/bin folder.
+* Start mne_rt_server in your mne-cpp/out/Release folder.
+* Start mne_scan in your mne-cpp/out/Release folder.
 * Navigate to the "Sensor Plugins" and "Algorithm Plugins" buttons in the plugin window. Select and position the following plugins onto the plugin scene:
     * Sensor Plugins - FiffSimulator
     * Algorithm Plugins - Averaging
