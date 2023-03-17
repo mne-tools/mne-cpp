@@ -340,7 +340,7 @@ for (( j=0; j<argc; j++)); do
   elif [ "${argv[j]}" == "help" ]; then
     PrintHelp="true"
   elif [ "${argv[j]}" == "static" ]; then
-    CMakeConfigFlags="${CMakeConfigFlags} --DBUILD_SHARED_LIBS=OFF"
+    CMakeConfigFlags="${CMakeConfigFlags} -DBUILD_SHARED_LIBS=OFF"
   fi
   case ${argv[j]} in
     *"Debug"*)
