@@ -11,7 +11,7 @@ MNE-CPP is an open-source project and is made better by contributions from our u
 1. Setup MNE-CPP to [build from source](buildguide.md).
 2. Familiarize yourself with our [coding conventions](contr_style.md).
 3. Create a new feature-related branch. Do not issue a Pull Request from your fork's main branch. Make your changes to that feature-branch commit.
-4. Run tests locally via calling the testing scripts in `tools/testing`. Make sure you have the `bin/mne-cpp-test-data` submodule enabled. 
+4. Run tests locally via calling the testing scripts in `tools/testing`. Make sure you have the `resources/data/mne-cpp-test-data` submodule enabled. 
 5. Check if your changes pass the cross-platform CI tests by running `git push origin <yourBranchName>:testci -f`. Check the Actions tab on your forked MNE-CPP repository's Github page and fix possible problems.
 6. Push your changes to your remote (forked GitHub) repository.
 7. Once all CI tests pass, go to your remote (forked GitHub) repository via the GitHub website and create a pull request:

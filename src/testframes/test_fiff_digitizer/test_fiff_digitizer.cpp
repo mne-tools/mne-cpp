@@ -98,7 +98,7 @@ void TestFiffDigitizer::initTestCase()
 {
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     //Read the results produced with MNE-CPP
-    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
     digDataLoaded = FiffDigitizerData(t_fileIn);
 
     //Prepare reference result

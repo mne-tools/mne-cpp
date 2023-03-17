@@ -97,8 +97,8 @@ void TestFiffCoordTrans::initTestCase()
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
 
     // Reference file (Read) and test file (Write)
-    QFile fileTransRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif");
-    QFile fileTransTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test-trans.fif");
+    QFile fileTransRef(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif");
+    QFile fileTransTest(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test-trans.fif");
 
     // read reference
     m_transRef = FiffCoordTrans(fileTransRef);
@@ -122,7 +122,7 @@ void TestFiffCoordTrans::compareTrans()
 
 void TestFiffCoordTrans::cleanupTestCase()
 {
-    QFile fileTransTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test-trans.fif");
+    QFile fileTransTest(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test-trans.fif");
     fileTransTest.remove();
 }
 
