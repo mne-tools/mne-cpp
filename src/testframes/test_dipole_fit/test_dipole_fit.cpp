@@ -98,7 +98,7 @@ void TestDipoleFit::initTestCase()
 
 void TestDipoleFit::dipoleFitSimple()
 {
-    QString refFileName(QCoreApplication::applicationDirPath() + "../resources/data/mne-cpp-test-data/Result/ref_dip_fit.dat");
+    QString refFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref_dip_fit.dat");
     QFile testFile;
 
     //*********************************************************************************************************
@@ -110,7 +110,7 @@ void TestDipoleFit::dipoleFitSimple()
     //Following is equivalent to: --meas ../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif --set 1 --meg
     //--eeg --tmin 32 --tmax 148 --bmin -100 --bmax 0 --dip ../resources/data/mne-cpp-test-data/Result/dip_fit.dat
     DipoleFitSettings settings;
-    testFile.setFileName(QCoreApplication::applicationDirPath() + "../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"); QVERIFY( testFile.exists() );
+    testFile.setFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"); QVERIFY( testFile.exists() );
     settings.measname = testFile.fileName();
     settings.is_raw = false;
     settings.setno = 1;
@@ -120,7 +120,7 @@ void TestDipoleFit::dipoleFitSimple()
     settings.tmax = 148.0f/1000.0f;
     settings.bmin = -100.0f/1000.0f;
     settings.bmax = 0.0f/1000.0f;
-    settings.dipname = QCoreApplication::applicationDirPath() + "../resources/data/mne-cpp-test-data/Result/dip_fit.dat";
+    settings.dipname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/dip_fit.dat";
 
     settings.checkIntegrity();
 
@@ -168,7 +168,7 @@ void TestDipoleFit::dipoleFitSimple()
 
 void TestDipoleFit::dipoleFitAdvanced()
 {
-    QString refFileName(QCoreApplication::applicationDirPath() + "../resources/data/mne-cpp-test-data/Result/ref_dip-5120-bem-result.dat");
+    QString refFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref_dip-5120-bem-result.dat");
     QFile testFile;
 
     //*********************************************************************************************************
@@ -183,7 +183,7 @@ void TestDipoleFit::dipoleFitAdvanced()
     //--mindist 0 --guessrad 100
     DipoleFitSettings settings;
 
-    testFile.setFileName(QCoreApplication::applicationDirPath() + "../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"); QVERIFY( testFile.exists() );
+    testFile.setFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif"); QVERIFY( testFile.exists() );
     settings.measname = testFile.fileName();
 
     settings.is_raw = false;

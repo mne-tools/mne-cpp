@@ -116,10 +116,12 @@ TestCoregistration::TestCoregistration()
 void TestCoregistration::initTestCase()
 {
     // Create files
-    QFile t_fileDig(QCoreApplication::applicationDirPath() + "../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif");
-    QFile t_fileBem(QCoreApplication::applicationDirPath() + "../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif");
-    QFile t_fileTransRefFit(QCoreApplication::applicationDirPath() + "../resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif");
-    QFile t_fileTransRefIcp(QCoreApplication::applicationDirPath() + "../resources/data/mne-cpp-test-data/Result/icp-trans.fif");
+    QFile t_fileDig(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif");
+    QFile t_fileBem(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif");
+    QFile t_fileTransRefFit(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif");
+    QFile t_fileTransRefIcp(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/icp-trans.fif");
+
+    QDebug() << "We have the data!";
 
     float fTol = 0.01f/1000.0f;
     float fMaxDist = 0.02f;
