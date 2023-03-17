@@ -224,6 +224,10 @@ function cleanAbsPath()
     echo "$cleanAbsPathStr"
 }
 
+
+EXIT_FAIL=1
+EXIT_SUCCESS=0
+
 ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
 BaseFolder="$(cleanAbsPath "$ScriptPath/../..")"
 SourceFolder=""
@@ -378,7 +382,7 @@ doShowLogo
 
 if [ "${PrintHelp}" == "true" ]; then
   doPrintHelp
-  exit 0
+  exit ${EXIT_SUCCESS}
 fi
 
 if [ "${MockBuild}" == "true" ]; then
@@ -399,7 +403,7 @@ if [ "${CleanBuild}" == "true" ]; then
   echo " "
   ${MockText}rm -fr ${BuildFolder}
   ${MockText}rm -fr ${OutFolder}
-  exit 0
+  exit ${EXIT_SUCCESS}
 fi
 
 if [ "${Rebuild}" == "false" ]; then
@@ -427,11 +431,11 @@ echo " "
 
 if [ "${BuildSuccessful}" == "true" ]; then
   doShowLogoFlames
-  exit 0
+  exit ${EXIT_SUCCESS}
 else
   doShowBuildFailed
-  exit 1
+  exit ${EXIT_FAIL}
 fi
 
-exit 0
+exit ${EXIT_FAIL}
 
