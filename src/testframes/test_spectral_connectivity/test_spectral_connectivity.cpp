@@ -146,7 +146,7 @@ void TestSpectralConnectivity::spectralConnectivityCoherence()
     //*********************************************************************************************************
 
     MatrixXd refConnectivity;
-    QString refFileName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_coh.txt");
+    QString refFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_coh.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_dRefConnectivityOutput = refConnectivity.col(0).mean();
 
@@ -172,7 +172,7 @@ void TestSpectralConnectivity::spectralConnectivityImagCoherence()
     //*********************************************************************************************************
 
     MatrixXd refConnectivity;
-    QString refFileName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_imagcoh.txt");
+    QString refFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_imagcoh.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_dRefConnectivityOutput = refConnectivity.col(0).mean();
 
@@ -199,7 +199,7 @@ void TestSpectralConnectivity::spectralConnectivityPLV()
     //*********************************************************************************************************
 
     MatrixXd refConnectivity;
-    QString refFileName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_plv.txt");
+    QString refFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_plv.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_dRefConnectivityOutput = refConnectivity.col(0).mean();
 
@@ -226,7 +226,7 @@ void TestSpectralConnectivity::spectralConnectivityPLI()
     //*********************************************************************************************************
 
     MatrixXd refConnectivity;
-    QString refFileName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_pli.txt");
+    QString refFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_pli.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_dRefConnectivityOutput = refConnectivity.col(0).mean();
 
@@ -253,7 +253,7 @@ void TestSpectralConnectivity::spectralConnectivityPLI2()
     //*********************************************************************************************************
 
     MatrixXd refConnectivity;
-    QString refFileName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_pli2.txt");
+    QString refFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_pli2.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_dRefConnectivityOutput = refConnectivity.col(0).mean();
 
@@ -280,7 +280,7 @@ void TestSpectralConnectivity::spectralConnectivityWPLI()
     //*********************************************************************************************************
 
     MatrixXd refConnectivity;
-    QString refFileName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_wpli.txt");
+    QString refFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_wpli.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_dRefConnectivityOutput = refConnectivity.col(0).mean();
 
@@ -307,7 +307,7 @@ void TestSpectralConnectivity::spectralConnectivityWPLI2()
     //*********************************************************************************************************
 
     MatrixXd refConnectivity;
-    QString refFileName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_wpli2.txt");
+    QString refFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_wpli2.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_dRefConnectivityOutput = refConnectivity.col(0).mean();
 
@@ -336,7 +336,7 @@ void TestSpectralConnectivity::spectralConnectivityXCOR()
     //*********************************************************************************************************
 
     MatrixXd refConnectivity;
-    QString refFileName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_xcor.txt");
+    QString refFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/Connectivity/ref_spectral_connectivity_xcor.txt");
     IOUtils::read_eigen_matrix(refConnectivity, refFileName);
     m_dRefConnectivityOutput = refConnectivity(0,1);
 
@@ -361,7 +361,7 @@ void TestSpectralConnectivity::spectralConnectivityXCOR()
 QList<MatrixXd> TestSpectralConnectivity::readConnectivityData()
 {
     MatrixXd inputTrials;
-    QString dataFileName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
+    QString dataFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/data_spectral_connectivity.txt");
     IOUtils::read_eigen_matrix(inputTrials, dataFileName);
     int iNTrials = inputTrials.rows() / 2;
 

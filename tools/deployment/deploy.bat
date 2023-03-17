@@ -33,7 +33,7 @@
         
         IF "%PACK_OPTION%"=="pack" (
             Rem Delete folders which we do not want to ship
-            rmdir %BASE_PATH%\out\Release\apps\mne-cpp-test-data /s /q 
+            rmdir %BASE_PATH%\out\Release\resources\data /s /q 
             Rem Creating archive of all win deployed applications
             7z a %BASE_PATH%\mne-cpp-windows-dynamic-x86_64.zip %BASE_PATH%\out\Release
         )
@@ -44,7 +44,7 @@
             Rem This script needs to be run from the top level mne-cpp repo folder
             Rem Delete folders which we do not want to ship
             rmdir %BASE_PATH%\out\Release\apps\mne_rt_server_plugins /s /q
-            rmdir %BASE_PATH%\out\Release\apps\mne-cpp-test-data /s /q
+            rmdir %BASE_PATH%\out\Release\resources\data /s /q
             rmdir %BASE_PATH%\out\Release\apps\mne_scan_plugins /s /q
             rmdir %BASE_PATH%\out\Release\apps\mne_analyze_plugins /s /q
             
@@ -121,11 +121,10 @@ if [ "$(uname)" == "Darwin" ]; then
         if [[ ${PACK_OPTION} == pack ]]; then
 
             # Delete folders which we do not want to ship
-            rm -r out/Release/apps/mne-cpp-test-data
+            rm -r out/Release/resouces/data
             rm -r out/Release/apps/mne_scan_plugins
             rm -r out/Release/apps/mne_analyze_plugins
             rm -r out/Release/apps/mne_rt_server_plugins
-            rm -r out/Release/apps/resources
 
             # Creating archive of all macos deployed applications
             tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz out/Release/apps/.
@@ -156,11 +155,10 @@ if [ "$(uname)" == "Darwin" ]; then
 
         if [[ ${PACK_OPTION} == pack ]]; then
             # Delete folders which we do not want to ship
-            rm -r out/Release/apps/mne-cpp-test-data
+            rm -r out/Release/resources/data
             rm -r out/Release/apps/mne_scan_plugins
             rm -r out/Release/apps/mne_analyze_plugins
             rm -r out/Release/apps/mne_rt_server_plugins
-            rm -r out/Release/apps/resources
 
             # Creating archive of all macos deployed applications
             tar cfvz mne-cpp-macos-static-x86_64.tar.gz out/Release/apps/.
@@ -241,7 +239,7 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
             ldd ./plugins/platforms/libqxcb.so
 
             # Delete folders which we do not want to ship
-            rm -r out/Release/apps/mne-cpp-test-data
+            rm -r out/Release/resources/data
 
             # Creating archive of everything in current directory
             tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz ./*    
@@ -283,7 +281,7 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
 
         # Delete folders which we do not want to ship
         rm -r out/Release/apps/mne_rt_server_plugins
-        rm -r out/Release/apps/mne-cpp-test-data
+        rm -r out/Release/resources/data
         rm -r out/Release/apps/mne_scan_plugins
         rm -r out/Release/apps/mne_analyze_plugins
 

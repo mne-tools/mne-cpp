@@ -114,14 +114,14 @@ void TestFiltering::initTestCase()
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     qDebug() << "Epsilon" << dEpsilon;
 
-    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QFile t_fileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/rtfilter_filterdata_out_raw.fif");
+    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+    QFile t_fileOut(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/rtfilter_filterdata_out_raw.fif");
 
     // Filter in Python is created with following function: mne.filter.design_mne_c_filter(raw.info['sfreq'], 5, 10, 1, 1)
     // This will create a filter with with 8193 elements/taps/Order. In order to be concise with the MNE-CPP implementation
     // the filter is cut to the Order used in mne-cpp (1024, see below).//
     // The actual filtering was performed with the function: mne.filter._overlap_add_filter(dataIn, filter_python, phase = 'linear')
-    QFile t_fileRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_rtfilter_filterdata_raw.fif");
+    QFile t_fileRef(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref_rtfilter_filterdata_raw.fif");
 
     // Make sure test folder exists
     QFileInfo t_fileOutInfo(t_fileOut);
@@ -233,7 +233,7 @@ void TestFiltering::compareTimes()
 
 void TestFiltering::cleanupTestCase()
 {
-    QFile t_fileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/rtfilter_filterdata_out_raw.fif");
+    QFile t_fileOut(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/rtfilter_filterdata_out_raw.fif");
     t_fileOut.remove();
 }
 

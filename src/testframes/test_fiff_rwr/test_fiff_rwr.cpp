@@ -106,8 +106,8 @@ void TestFiffRWR::initTestCase()
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
     qDebug() << "dEpsilon" << dEpsilon;
 
-    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QFile t_fileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_test_rwr_out.fif");
+    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+    QFile t_fileOut(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_test_rwr_out.fif");
 
     //
     //   Make sure test folder exists

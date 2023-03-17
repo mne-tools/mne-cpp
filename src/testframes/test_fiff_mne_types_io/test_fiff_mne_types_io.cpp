@@ -86,8 +86,8 @@ private:
 
 TestFiffMneTypesIO::TestFiffMneTypesIO()
 : dEpsilon(0.000001)
-, sRawName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif")
-, sEvokedName(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif")
+, sRawName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif")
+, sEvokedName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif")
 {
 }
 

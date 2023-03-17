@@ -131,7 +131,7 @@ void TestHpiFitIntegration::initTestCase()
     qInstallMessageHandler(ApplicationLogger::customLogWriter);
     qInfo() << "Error Translation" << dErrorTrans;
     qInfo() << "Error Quaternion" << dErrorQuat;
-    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
+    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
 
     // Make sure test folder exists
     QFileInfo t_fileInInfo(t_fileIn);
@@ -161,8 +161,8 @@ void TestHpiFitIntegration::initTestCase()
     fiff_int_t quantum = ceil(quantum_sec*pFiffInfo->sfreq);
 
     // Read Quaternion File from maxfilter and calculated movements/rotations with python
-    IOUtils::read_eigen_matrix(mRefPos, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
-    IOUtils::read_eigen_matrix(mRefResult, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref_angle_move.txt");
+    IOUtils::read_eigen_matrix(mRefPos, QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref_hpiFit_pos.txt");
+    IOUtils::read_eigen_matrix(mRefResult, QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref_angle_move.txt");
 
     mHpiResult = mRefResult;
 

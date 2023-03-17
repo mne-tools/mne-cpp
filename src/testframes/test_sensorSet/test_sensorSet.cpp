@@ -113,7 +113,7 @@ void TestSensorSet::initTestCase()
     m_pCoilDefinitions = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath));
 
     // Setup for reading the raw data
-    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
+    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
     FiffRawData raw = FiffRawData(t_fileIn);
     FiffInfo::SPtr pFiffInfo =  FiffInfo::SPtr(new FiffInfo(raw.info));
 

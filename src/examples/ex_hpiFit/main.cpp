@@ -85,7 +85,7 @@ using namespace Eigen;
  *
  * ex_hpiFit --fileIn C:/Git/mne-cpp/bin/MNE-sample-data/chpi/raw/phantom/2khz_3.fif --freqs 293,307,314,321 --verbose 1 --fileOut 2k_3 --buffer 600 --save 1
  *
- * By default, the example uses the mne-cpp-test-data set.
+ * By default, the example uses the resources/data/mne-cpp-test-data set.
  *
  */
 
@@ -99,9 +99,9 @@ int main(int argc, char *argv[])
     QCommandLineParser parser;
     parser.setApplicationDescription("hpiFit Example");
     parser.addHelpOption();
-    qInfo() << "Please download the mne-cpp-test-data folder from Github (mne-tools) into mne-cpp/bin.";
+    qInfo() << "Please download the mne-cpp-test-data folder from Github (mne-tools) into mne-cpp/resources/data.";
 
-    QCommandLineOption inFile("fileIn", "The input file.", "in", QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
+    QCommandLineOption inFile("fileIn", "The input file.", "in", QCoreApplication::applicationDirPath() + "../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
     QCommandLineOption inWindow("window", "The window size for the HPI fit in ms.", "in","400");
     QCommandLineOption inStep("step", "The step size in ms.", "in","10");
     QCommandLineOption inFreqs("freqs", "The frequencies used.", "in","154,158,161,166");

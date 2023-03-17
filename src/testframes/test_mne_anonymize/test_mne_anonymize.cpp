@@ -113,8 +113,8 @@ void TestMneAnonymize::initTestCase()
 void TestMneAnonymize::testDefaultOutput()
 {
     // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QString sFileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
+    QString sFileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+    QString sFileOut(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
 
     qInfo() << "\n\n-------------------------testDefaultOutput-------------------------------------";
     qInfo() << "sFileIn" << sFileIn;
@@ -143,9 +143,9 @@ void TestMneAnonymize::testDefaultOutput()
 void TestMneAnonymize::testDeleteInputFile()
 {
     // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QString sFileInTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing0.fif");
-    QString sFileOutTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing0_anonymized.fif");
+    QString sFileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+    QString sFileInTest(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/testing0.fif");
+    QString sFileOutTest(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/testing0_anonymized.fif");
 
     qInfo() << "\n\n-------------------------testDeleteInputFile-------------------------------------";
     qInfo() << "sFileIn" << sFileIn;
@@ -177,9 +177,9 @@ void TestMneAnonymize::testDeleteInputFile()
 void TestMneAnonymize::testInPlace()
 {
     // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QString sFileInTest(QCoreApplication::applicationDirPath() +  "/mne-cpp-test-data/MEG/sample/testing1.fif");
-    QString sFileOutTest(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/testing1.fif");
+    QString sFileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+    QString sFileInTest(QCoreApplication::applicationDirPath() +  "/../resources/data/mne-cpp-test-data/MEG/sample/testing1.fif");
+    QString sFileOutTest(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/testing1.fif");
 
     qInfo() << "\n\n-------------------------testInPlace-------------------------------------";
     qInfo() << "sFileIn" << sFileIn;
@@ -207,8 +207,8 @@ void TestMneAnonymize::testInPlace()
 
 void TestMneAnonymize::testDefaultAnonymizationOfTags()
 {
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QString sFileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
+    QString sFileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+    QString sFileOut(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
 
     qInfo() << "\n\n-------------------------testDefaultAnonymizationOfTags-------------------------------------";
     qInfo() << "sFileIn" << sFileIn;
@@ -241,8 +241,8 @@ void TestMneAnonymize::testDefaultAnonymizationOfTags()
 void TestMneAnonymize::compareBirthdayOffsetOption()
 {
     // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QString sFileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
+    QString sFileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+    QString sFileOut(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
 
     qInfo() << "\n\n-------------------------compareBirthdayOffsetOption-------------------------------------";
     qInfo() << "sFileIn" << sFileIn;
@@ -278,8 +278,8 @@ void TestMneAnonymize::compareBirthdayOffsetOption()
 void TestMneAnonymize::compareMeasureDateOffsetOption()
 {
     // Init testing arguments
-    QString sFileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
-    QString sFileOut(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
+    QString sFileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif");
+    QString sFileOut(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw_anonymized.fif");
 
     qInfo() << "\n\n-------------------------compareMeasureDateOffsetOption-------------------------------------";
     qInfo() << "sFileIn" << sFileIn;
