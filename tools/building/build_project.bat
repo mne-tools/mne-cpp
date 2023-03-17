@@ -8,12 +8,15 @@
     SET ScriptPath=%~dp0
     SET BaseFolder=%ScriptPath%..\..
 
-    SET SourceFolder=
-    SET BuildFolder=
-    SET OutFolder=
+    SET "EXIT_FAIL=1"
+    SET "EXIT_SUCCESS=0"
+
+    SET "SourceFolder="
+    SET "BuildFolder="
+    SET "OutFolder="
 
     SET "MockBuild=False"
-    SET MockText=
+    SET "MockText="
 
     SET "CleanBuild=False"
 
@@ -25,7 +28,6 @@
     SET "NumProcesses=1"
 
     SET "Rebuild=False"
-
 
     SET "CMakeConfigFlags="
     
@@ -105,11 +107,11 @@
 
     :buildSuccessful
       call:showBuildSuccessful
-    exit /B 0
+    exit /B %EXIT_SUCCESS%
 
     :buildFailed
       call:showBuildFailed
-    exit /B 1
+    exit /B %EXIT_FAIL%
 
     :doPrintConfiguration
       ECHO.
