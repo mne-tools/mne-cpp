@@ -121,8 +121,6 @@ void TestCoregistration::initTestCase()
     QFile t_fileTransRefFit(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif");
     QFile t_fileTransRefIcp(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/icp-trans.fif");
 
-    QDebug() << "We have the data!";
-
     float fTol = 0.01f/1000.0f;
     float fMaxDist = 0.02f;
 
