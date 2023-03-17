@@ -26,6 +26,7 @@
         
         Rem Solve for dependencies only mne_scan.exe and mnecppDisp3D.dll since it links all needed qt and mne-cpp libs
         windeployqt %BASE_PATH%\out\Release\apps\mne_scan.exe
+        windeployqt %BASE_PATH%\out\Release\apps\mne_analyze.exe
         windeployqt %BASE_PATH%\out\Release\apps\mnecppDisp3D.dll
         Rem Copy LSL and Brainflowlibraries manually
         xcopy %BASE_PATH%\src\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* %BASE_PATH%\out\Release\apps\ /s /i
@@ -43,7 +44,7 @@
         IF "%PACK_OPTION%"=="pack" (
             Rem This script needs to be run from the top level mne-cpp repo folder
             Rem Delete folders which we do not want to ship
-            rmdir %BASE_PATH%\out\Release\resources\data /s /q
+            rmdir %BASE_PATH%\out\Release\resources /s /q
             rmdir %BASE_PATH%\out\Release\apps\mne_rt_server_plugins /s /q
             rmdir %BASE_PATH%\out\Release\apps\mne_scan_plugins /s /q
             rmdir %BASE_PATH%\out\Release\apps\mne_analyze_plugins /s /q
@@ -122,6 +123,7 @@ if [ "$(uname)" == "Darwin" ]; then
 
             # Delete folders which we do not want to ship
             rm -r out/Release/resouces/data
+            # delete these folders because they are in the macos app containers already
             rm -r out/Release/apps/mne_scan_plugins
             rm -r out/Release/apps/mne_analyze_plugins
             rm -r out/Release/apps/mne_rt_server_plugins
@@ -155,13 +157,14 @@ if [ "$(uname)" == "Darwin" ]; then
 
         if [[ ${PACK_OPTION} == pack ]]; then
             # Delete folders which we do not want to ship
-            rm -r out/Release/resources/data
-            rm -r out/Release/apps/mne_scan_plugins
-            rm -r out/Release/apps/mne_analyze_plugins
-            rm -r out/Release/apps/mne_rt_server_plugins
+            cp -r out/Release/ mne-cpp
+            rm -r mne-cpp/resources/data
+            rm -r mne-cpp/apps/mne_scan_plugins
+            rm -r mne-cpp/apps/mne_analyze_plugins
+            rm -r mne-cpp/apps/mne_rt_server_plugins
 
             # Creating archive of all macos deployed applications
-            tar cfvz mne-cpp-macos-static-x86_64.tar.gz out/Release/apps/.
+            tar cfvz mne-cpp-macos-static-x86_64.tar.gz mne-cpp
         fi
 
     else 
@@ -233,10 +236,11 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
             ldd ./plugins/platforms/libqxcb.so
 
             # Delete folders which we do not want to ship
-            rm -r out/Release/resources/data
+            cp -r out/Release/ mne-cpp
+            rm -r mne-cpp/resources/data
 
             # Creating archive of everything in current directory
-            tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz ./*    
+            tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz mne-cpp   
         fi
 
     elif [[ ${LINK_OPTION} == static ]]; then
@@ -270,14 +274,15 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         ldd ./out/Release/apps/mne_scan
 
         # Delete folders which we do not want to ship
-        rm -r out/Release/resources/data
-        rm -r out/Release/apps/mne_rt_server_plugins
-        rm -r out/Release/apps/mne_scan_plugins
-        rm -r out/Release/apps/mne_analyze_plugins
+        cp -r out/Release mne-cpp
+        rm -r mne-cpp/resources/data
+        rm -r mne-cpp/apps/mne_rt_server_plugins
+        rm -r mne-cpp/apps/mne_scan_plugins
+        rm -r mne-cpp/apps/mne_analyze_plugins
 
         if [[ ${PACK_OPTION} == pack ]]; then
             # Creating archive of everything in the bin directory
-            tar cfvz ../mne-cpp-linux-static-x86_64.tar.gz out/Release/apps/. out/Release/lib/.
+            tar cfvz ../mne-cpp-linux-static-x86_64.tar.gz mne-cpp
         fi
 
     else 
