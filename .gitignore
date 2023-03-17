@@ -72,6 +72,7 @@ compile_commands.json
 
 /build*
 /out*
+/resources/data*
 .cache/*
 
 codecov
