@@ -27,7 +27,7 @@ jobs:
         git config --global user.email dev@dev.com
         git config --global user.name dev
         # Save the wasm files first
-        cp -RT bin/ ../bin
+        cp -RT out/Release/ ../bin
         # Replace logo
         cp -RT resources/design/logos/qtlogo.svg ../bin/qtlogo.svg
         # Checkout the gh-pages branch

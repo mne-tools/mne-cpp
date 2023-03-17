@@ -35,7 +35,7 @@ The `MacOSDynamic` workflow run in [release.yml](https://github.com/mne-tools/mn
 
 Dependency solving for libraries and executables is done via the `macdeployqt` tool, which is officially developed and maintained by Qt. Calling `macdeployqt` is performed in the [deploy_macos](https://github.com/mne-tools/mne-cpp/blob/main/tools/deployment/deploy.bat){:target="_blank" rel="noopener"} file. All MNE-CPP libraries are manually copied to the .app's `Contents/Frameworks` folder. The resource and applications' plugins folders are copied to the corresponding `mne-cpp/out/Release/apps/<app_name>.app/` folders. 
 
-The, no longer needed, folders `mne-cpp/resources/data/mne-cpp-test-data`, `mne-cpp/bin/mne_scan_plugins`, `mne-cpp/bin/mne_analyze_plugins`, `mne-cpp/bin/mne_rt_server_plugins` and `mne-cpp/bin/resources` are deleted before packaging. The folder `mne-cpp/bin` is compressed to a .tar.gz file and uploaded as release assets to the corresponding GitHub release.
+The, no longer needed, folders `mne-cpp/resources/data/mne-cpp-test-data`, `mne-cpp/resources/mne_scan_plugins`, `mne-cpp/resources/mne_analyze_plugins`, `mne-cpp/resources/mne_rt_server_plugins` and `mne-cpp/resources/resources` are deleted before packaging. The folder `mne-cpp/resources` is compressed to a .tar.gz file and uploaded as release assets to the corresponding GitHub release.
 
 ## Static Builds
 
