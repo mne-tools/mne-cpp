@@ -198,7 +198,7 @@
       ECHO.
       ECHO   Here we go...                                       
       ECHO.
-    exit /B 0
+    exit /B 1
 
     :; # ########## WINDOWS SECTION ENDS ####################
     :; # ####################################################
@@ -425,8 +425,10 @@ echo " "
 
 if [ "${BuildSuccessful}" == "true" ]; then
   doShowLogoFlames
+  exit 0
 else
   doShowBuildFailed
+  exit 1
 fi
 
 exit 0
