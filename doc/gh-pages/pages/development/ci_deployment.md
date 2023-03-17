@@ -21,14 +21,14 @@ The `WinDynamic` workflow run in [release.yml](https://github.com/mne-tools/mne-
 
 Dependency solving for libraries and executables is done via the `windeployqt` tool, which is officially developed and maintained by Qt. Calling `windeployqt` is performed in the [deploy.bat](https://github.com/mne-tools/mne-cpp/blob/main/tools/deployment/deploy.bat){:target="_blank" rel="noopener"} file with `dynamic` as first argument. `windeployqt` is called on the MNE Scan .exe and the Disp3D .dll file. Disp3D is the most top level library and links against all needed Qt modules. MNE Scan links against all relevant Qt modules application wise. Subsequently, Qt and all needed system libraries reside in the `mne-cpp/out/Release` folder.
 
-The no longer needed folder `resources/mne-cpp-test-data`is deleted before packaging. The folder `mne-cpp/out/Release` is compressed to a .zip file and uploaded as release asset to the corresponding GitHub release.
+The no longer needed folder `resources/data/mne-cpp-test-data`is deleted before packaging. The folder `mne-cpp/out/Release` is compressed to a .zip file and uploaded as release asset to the corresponding GitHub release.
 
 ### Linux
 The `LinuxDynamic` workflow run in [release.yml](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/release.yml){:target="_blank" rel="noopener"} is configured to exclude examples as well as tests. The `RPATH` is specified in the executable's .pro file in order to link to the libraries in `mne-cpp/lib`.
 
 Dependency solving for libraries and executables is done via the [linuxdeployqt](https://github.com/probonopd/linuxdeployqt){:target="_blank" rel="noopener"} tool. Calling `linuxdeployqt` is performed in the [deploy.bat](https://github.com/mne-tools/mne-cpp/blob/main/tools/deployment/deploy.bat){:target="_blank" rel="noopener"} script (Remember that in unix/linux environments, the extension of a file has no special meaning, being just part of the filename).
 
-The, no longer needed, folder `mne-cpp/resources/mne-cpp-test-data` is deleted before packaging.  The folders `mne-cpp/out/Release/apps`, `mne-cpp/out/Release/lib`, `mne-cpp/out/Release/plugins`, `mne-cpp/out/Release/translations` are compressed to a .tar.gz file and uploaded as release assets to the corresponding GitHub release. 
+The, no longer needed, folder `mne-cpp/resources/data/mne-cpp-test-data` is deleted before packaging.  The folders `mne-cpp/out/Release/apps`, `mne-cpp/out/Release/lib`, `mne-cpp/out/Release/plugins`, `mne-cpp/out/Release/translations` are compressed to a .tar.gz file and uploaded as release assets to the corresponding GitHub release. 
 
 ### MacOS
 The `MacOSDynamic` workflow run in [release.yml](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/release.yml){:target="_blank" rel="noopener"} is configured to exclude examples as well as tests. All applications are build as .app bundles using the `withAppBundles` configuration flag.
