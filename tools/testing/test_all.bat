@@ -20,10 +20,13 @@ set basePath=%scriptPath%..\..
 set printOutput=False
 set stopOnFirstFail=False
 set runCodeCoverage=False
+set binOutputFolder=Release
 
 @REM parse input argument
-set verboseModeInput=%1
-set runCodeCoverageInput=%2
+set binOutputFolder=%1
+set verboseModeInput=%2
+set runCodeCoverageInput=%3
+
 
 if "%verboseModeInput%"=="verbose" (
   set printOutput=True
@@ -44,7 +47,7 @@ call:doPrintConfiguration
 
 set /A "compoundOutput=0"
 
-cd %basePath%\bin
+cd %basePath%\out\%binOutputFolder%
 
 for /f %%f in ('dir test_*.exe /s /b ^| findstr /v "d.exe"') do (
   if "%printOutput%"=="True" (
@@ -64,6 +67,7 @@ exit /B %compoundOutput%
 :doPrintConfiguration
   echo.
   echo =========================================
+  echo binFolder = %binOutputFolder%
   echo verbose = %printOutput%
   echo exitOnFail = %stopOnFirstFail%
   echo runCodeCoverage = %runCodeCoverage%
@@ -76,7 +80,7 @@ exit /B 0
   echo MNE-CPP testing script help.
   echo This script will run all applications in bin folder starting with test_*
   echo For help run: ./test_all.bat help
-  echo Normal call has none or 2 arguments: ./test_all.bat [verbose] [withCoverage]
+  echo Normal call has none or 3 arguments: ./test_all.bat [binFolder] [verbose] [withCoverage]
   echo.
   @REM call:doPrintConfiguration
 exit /B 0
