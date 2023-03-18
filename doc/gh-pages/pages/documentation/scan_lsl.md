@@ -35,5 +35,5 @@ For a MSVC 2017 build you need to use `Visual Studio 15 2017 Win64` instead.
 
 * After the steps above make sure that you use the `MNECPP_CONFIG` flag `withLsl`. You can also set the flag manually in the [mne-cpp.pri file](https://github.com/mne-tools/mne-cpp/blob/main/mne-cpp.pri#L135){:target="_blank" rel="noopener"}.
 * Build MNE Scan.
-* LSL has a dynamic library which must be in your search path before you run MNE Scan. You need to copy `lsl.dll` from `mne-cpp\applications\mne_scan\plugins\lsladapter\liblsl\install\bin` to your executable folder `mne-cpp\bin`.
+* LSL has a dynamic library which must be in your search path before you run MNE Scan. You need to copy `lsl.dll` from `mne-cpp\applications\mne_scan\plugins\lsladapter\liblsl\install\bin` to your executable folder `mne-cpp\out\Release\apps`.
 * Start MNE Scan

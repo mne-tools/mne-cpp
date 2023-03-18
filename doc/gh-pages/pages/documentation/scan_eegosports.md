@@ -24,7 +24,7 @@ Now, the whole EEGoSports plugin can be rebuilt. MNE Scan will then contain the 
 
 For a correct recognition of the EEGoSports device, the operating system compatible driver has to be installed with the delivered software. Furthermore the two files `eego-SDK.lib` and `eego-SDK.dll` from the driver's library have to be copied to the location:
 
-`\mne-cpp\bin`
+`\mne-cpp\out\Release\apps\`
 
 In a last step, for older SDK versions the license files which are delivered with the device have to be copied to
 
