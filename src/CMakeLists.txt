@@ -140,9 +140,17 @@ cmake_path(
 message(STATUS "PROJECT_RESOURCES_DIR=${PROJECT_RESOURCES_DIR}")
 message(STATUS "OUTPUT_RESOURCES_DIR=${OUTPUT_RESOURCES_DIR}")
 
-execute_process(
-  COMMAND ${CMAKE_COMMAND} -E make_directory ${BINARY_OUTPUT_DIRECTORY}
-  COMMAND ${CMAKE_COMMAND} -E create_symlink
-  ${PROJECT_RESOURCES_DIR} ${OUTPUT_RESOURCES_DIR}
-)
 
+if(WIN32)
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${BINARY_OUTPUT_DIRECTORY}
+    COMMAND ${CMAKE_COMMAND} -E copy_directory_if_different
+    ${PROJECT_RESOURCES_DIR} ${OUTPUT_RESOURCES_DIR}
+  )
+else()
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${BINARY_OUTPUT_DIRECTORY}
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+    ${PROJECT_RESOURCES_DIR} ${OUTPUT_RESOURCES_DIR}
+  )
+endif()
