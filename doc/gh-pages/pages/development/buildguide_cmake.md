@@ -71,9 +71,9 @@ For building on CentOS and other linux distros with older gcc versions, check if
 
 Navigate to the mne-cpp base project folder.
 
-We provide a cross-platform build script to automatically run CMake and build. This can be run with:
+We provide a cross-platform build script to automatically run CMake and build. Try print its help to understand how it works. This can be run with:
 ```
-./tools/building/build_project.bat
+./tools/build_project.bat help
 ```
 
 Alternatively, you can manually run:
