@@ -78,7 +78,7 @@ jobs:
         ./tools/build_project.bat  
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat dynamic pack
+        ./tools/deploy.bat dynamic pack
 
   MaxQtDynamic:
     runs-on: ${{ matrix.os }}
@@ -152,7 +152,7 @@ jobs:
         ./tools/build_project.bat  
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat dynamic pack
+        ./tools/deploy.bat dynamic pack
 
   QtStatic:
     runs-on: ${{ matrix.os }}
@@ -212,7 +212,7 @@ jobs:
         ./tools/build_project.bat static
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat static pack
+        ./tools/deploy.bat static pack
 
   Tests:
     runs-on: ${{ matrix.os }}
@@ -267,19 +267,19 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        ./tools/testing/test_all.bat verbose withCoverage
+        ./tools/test_all.bat verbose withCoverage
     - name: Run tests (MacOS)
       if: matrix.os == 'macos-11'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        ./tools/testing/test_all.bat verbose
+        ./tools/test_all.bat verbose
     - name: Run tests (Windows)
       if: matrix.os == 'windows-2019'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        ./tools/testing/test_all.bat Release verbose
+        ./tools/test_all.bat Release verbose
 
   Doxygen:
     runs-on: ubuntu-20.04

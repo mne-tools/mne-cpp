@@ -94,7 +94,7 @@ jobs:
         ./tools/build_project.bat static 
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat static pack
+        ./tools/deploy.bat static pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -149,7 +149,7 @@ jobs:
         ./tools/build_project.bat static
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat static pack
+        ./tools/deploy.bat static pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -214,7 +214,7 @@ jobs:
         ./tools/build_project.bat static
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat static pack
+        ./tools/deploy.bat static pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -273,7 +273,7 @@ jobs:
         ./tools/build_project.bat
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat dynamic pack
+        ./tools/deploy.bat dynamic pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -332,7 +332,7 @@ jobs:
         ./tools/build_project.bat
     - name: Deploy binaries (MacOS)
       run: |
-        ./tools/deployment/deploy.bat dynamic pack
+        ./tools/deploy.bat dynamic pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -394,7 +394,7 @@ jobs:
         ./tools/build_project.bat
     - name: Deploy binaries (Windows)
       run: |
-        ./tools/deployment/deploy.bat dynamic pack
+        ./tools/deploy.bat dynamic pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -446,7 +446,7 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        ./tools/testing/test_all.bat verbose withCoverage
+        ./tools/test_all.bat verbose withCoverage
 
   Doxygen:
     runs-on: ubuntu-20.04
@@ -546,7 +546,7 @@ jobs:
     - name: Setup and build WASM
       run: |
         cd ..
-        ./mne-cpp/tools/deployment/wasm.sh --source https://github.com/mne-tools/mne-cpp.git --qt 5.15 --emsdk 3.1.20
+        ./mne-cpp/tools/wasm.sh --source https://github.com/mne-tools/mne-cpp.git --qt 5.15 --emsdk 3.1.20
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
