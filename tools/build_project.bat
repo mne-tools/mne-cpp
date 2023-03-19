@@ -6,7 +6,7 @@
     setlocal EnableDelayedExpansion
 
     SET ScriptPath=%~dp0
-    SET BaseFolder=%ScriptPath%..\..
+    SET BaseFolder=%ScriptPath%..
 
     SET "EXIT_FAIL=1"
     SET "EXIT_SUCCESS=0"
@@ -232,7 +232,7 @@ EXIT_FAIL=1
 EXIT_SUCCESS=0
 
 ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
-BaseFolder="$(cleanAbsPath "$ScriptPath/../..")"
+BaseFolder="$(cleanAbsPath "$ScriptPath/..")"
 SourceFolder=""
 BuildFolder=""
 OutFolder=""
