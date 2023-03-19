@@ -37,7 +37,7 @@
         )
 
         for /f %%f in ('dir *.exe /s /b') do (
-            windwployqt %%f
+            windeployqt %%f
         )
 
         REM Solve dependencies for libraries
@@ -158,7 +158,8 @@
         ECHO Linkage option not defined. 
         ECHO Use: static or dynamic.
     )
-        
+    
+    cd %BASE_PATH%
     :; # ########## WINDOWS SECTION ENDS ####################
     :; # ####################################################
     exit /b
