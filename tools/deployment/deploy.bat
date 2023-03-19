@@ -24,13 +24,96 @@
 
     IF "%LINK_OPTION%"=="dynamic" (
         
-        Rem Solve for dependencies only mne_scan.exe and mnecppDisp3D.dll since it links all needed qt and mne-cpp libs
-        windeployqt %BASE_PATH%\out\Release\apps\mne_scan.exe
-        windeployqt %BASE_PATH%\out\Release\apps\mne_analyze.exe
-        windeployqt %BASE_PATH%\out\Release\apps\mnecppDisp3D.dll
-        Rem Copy LSL and Brainflowlibraries manually
-        xcopy %BASE_PATH%\src\applications\mne_scan\plugins\brainflowboard\brainflow\installed\lib\* %BASE_PATH%\out\Release\apps\ /s /i
-        xcopy %BASE_PATH%\src\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll %BASE_PATH%\out\Release\apps\ /i
+        Rem Solve dependencies for libraries
+        windeployqt %BASE_PATH%\out\Release\mne_utils.dll
+        windeployqt %BASE_PATH%\out\Release\mne_fiff.dll
+        windeployqt %BASE_PATH%\out\Release\mne_fs.dll
+        windeployqt %BASE_PATH%\out\Release\mne_events.dll
+        windeployqt %BASE_PATH%\out\Release\mne_mne.dll
+        windeployqt %BASE_PATH%\out\Release\mne_fwd.dll
+        windeployqt %BASE_PATH%\out\Release\mne_inverse.dll
+        windeployqt %BASE_PATH%\out\Release\mne_communication.dll
+        windeployqt %BASE_PATH%\out\Release\mne_rtprocessing.dll
+        windeployqt %BASE_PATH%\out\Release\mne_connectivity.dll
+        windeployqt %BASE_PATH%\out\Release\mne_disp.dll
+        windeployqt %BASE_PATH%\out\Release\mne_disp3D.dll
+
+        REM solve dependencies for applications
+        windeployqt %BASE_PATH%\out\Release\mne_analyze
+        windeployqt %BASE_PATH%\out\Release\mne_scan
+        windeployqt %BASE_PATH%\out\Release\mne_anonymize
+        windeployqt %BASE_PATH%\out\Release\mne_rt_server
+        windeployqt %BASE_PATH%\out\Release\mne_forward_solution
+        windeployqt %BASE_PATH%\out\Release\mne_edf2fiff
+        windeployqt %BASE_PATH%\out\Release\mne_dipole_fit
+
+        REM solve dependencies for tests 
+        windeployqt %BASE_PATH%\out\Release\test_coregistration.exe
+        windeployqt %BASE_PATH%\out\Release\test_dipole_fit.exe
+        windeployqt %BASE_PATH%\out\Release\test_edf2fiff_rwr.exe
+        windeployqt %BASE_PATH%\out\Release\test_fiff_coord_trans.exe
+        windeployqt %BASE_PATH%\out\Release\test_fiff_cov.exe
+        windeployqt %BASE_PATH%\out\Release\test_fiff_digitizer.exe
+        windeployqt %BASE_PATH%\out\Release\test_fiff_mne_types_io.exe
+        windeployqt %BASE_PATH%\out\Release\test_fiff_rwr.exe
+        windeployqt %BASE_PATH%\out\Release\test_filtering.exe
+        windeployqt %BASE_PATH%\out\Release\test_geometryinfo.exe
+        windeployqt %BASE_PATH%\out\Release\test_hpiDataUpdater.exe
+        windeployqt %BASE_PATH%\out\Release\test_hpiFit.exe
+        windeployqt %BASE_PATH%\out\Release\test_hpiFit_integration.exe
+        windeployqt %BASE_PATH%\out\Release\test_hpiModelParameter.exe
+        windeployqt %BASE_PATH%\out\Release\test_interpolation.exe
+        windeployqt %BASE_PATH%\out\Release\test_mne_anonymize.exe
+        windeployqt %BASE_PATH%\out\Release\test_mne_forward_solution.exe
+        windeployqt %BASE_PATH%\out\Release\test_mne_msh_display_surface_set.exe
+        windeployqt %BASE_PATH%\out\Release\test_mne_project_to_surface.ex
+        windeployqt %BASE_PATH%\out\Release\test_sensorSet.exe
+        windeployqt %BASE_PATH%\out\Release\test_signalModel.exe
+        windeployqt %BASE_PATH%\out\Release\test_spectral_connectivity.exe
+        windeployqt %BASE_PATH%\out\Release\test_utils_circularbuffer.exe
+
+        Rem solve dependencies with test
+        windeployqt %BASE_PATH%\out\Release\ex_averaging.exe
+        windeployqt %BASE_PATH%\out\Release\ex_cancel_noise.exe
+        windeployqt %BASE_PATH%\out\Release\ex_clustered_inverse_mne.exe
+        windeployqt %BASE_PATH%\out\Release\ex_clustered_inverse_mne_raw.exe
+        windeployqt %BASE_PATH%\out\Release\ex_clustered_inverse_pwl_rap_music_raw.exe
+        windeployqt %BASE_PATH%\out\Release\ex_clustered_inverse_rap_music_raw.exe    
+        windeployqt %BASE_PATH%\out\Release\ex_compute_forward.pro.exe
+        windeployqt %BASE_PATH%\out\Release\ex_connectivity.exe
+        windeployqt %BASE_PATH%\out\Release\ex_connectivity_comparison.exe
+        windeployqt %BASE_PATH%\out\Release\ex_connectivity_performace.exe
+        windeployqt %BASE_PATH%\out\Release\ex_coreg.exe
+        windeployqt %BASE_PATH%\out\Release\ex_disp.exe
+        windeployqt %BASE_PATH%\out\Release\ex_disp3D.exe
+        windeployqt %BASE_PATH%\out\Release\ex_evoked_grad_amp.exe
+        windeployqt %BASE_PATH%\out\Release\ex_fiff.exe
+        windeployqt %BASE_PATH%\out\Release\ex_fiff_sniffer.exe
+        windeployqt %BASE_PATH%\out\Release\ex_file_utils.exe
+        windeployqt %BASE_PATH%\out\Release\ex_filtering.exe
+        windeployqt %BASE_PATH%\out\Release\ex_find_Evoked.exe
+        windeployqt %BASE_PATH%\out\Release\ex_fs_surface.exe
+        windeployqt %BASE_PATH%\out\Release\ex_histogram.exe
+        windeployqt %BASE_PATH%\out\Release\ex_hpi_fit.exe
+        windeployqt %BASE_PATH%\out\Release\ex_interpolation.exe
+        windeployqt %BASE_PATH%\out\Release\ex_inverse_mne.exe
+        windeployqt %BASE_PATH%\out\Release\ex_inverse_mne_raw.exe
+        windeployqt %BASE_PATH%\out\Release\ex_inverse_pwl_rap_music.exe
+        windeployqt %BASE_PATH%\out\Release\ex_inverse_rap_music.exe
+        windeployqt %BASE_PATH%\out\Release\ex_make_inverse_operator.exe
+        windeployqt %BASE_PATH%\out\Release\ex_make_layout.exe
+        windeployqt %BASE_PATH%\out\Release\ex_read_bem.exe
+        windeployqt %BASE_PATH%\out\Release\ex_read_epochs.exe
+        windeployqt %BASE_PATH%\out\Release\ex_read_evoked.exe
+        windeployqt %BASE_PATH%\out\Release\ex_read_fwd.exe
+        windeployqt %BASE_PATH%\out\Release\ex_read_fwd_disp_3D.exe
+        windeployqt %BASE_PATH%\out\Release\ex_read_raw.exe
+        windeployqt %BASE_PATH%\out\Release\ex_read_write_raw.exe
+        windeployqt %BASE_PATH%\out\Release\ex_roi_clustered_inverse_pwl_rap_music.exe
+        windeployqt %BASE_PATH%\out\Release\ex_spectral.exe
+        windeployqt %BASE_PATH%\out\Release\ex_st_clustered_inverse_pwl_rap_music.exe 
+
+        Rem xcopy %BASE_PATH%\src\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll %BASE_PATH%\out\Release\apps\ /i
         
         IF "%PACK_OPTION%"=="pack" (
             Rem Delete folders which we do not want to ship
@@ -150,7 +233,7 @@ if [ "$(uname)" == "Darwin" ]; then
         cp -a out/Release/apps/resources/. out/Release/apps/mne_forward_solution.app/Contents/MacOS/resources
 
         # Solve for dependencies for mne_dipole_fit.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_dipole_fit.app/Contents/MacOS/resources
+        cp -a out/Release/apps/resources/. out/Release/apps/mne_dipole_target_compile_definitions(mytgt PRIVATE BUILT_SHARED=$<BOOL:${BUILD_SHARED_LIBS}>) # or using `if()` for the bool conversiofit.app/Contents/MacOS/resources
 
         # Solve for dependencies for mne_anonymize.app bundle
         cp -a out/Release/apps/resources/. out/Release/apps/mne_anonymize.app/Contents/MacOS/resources
