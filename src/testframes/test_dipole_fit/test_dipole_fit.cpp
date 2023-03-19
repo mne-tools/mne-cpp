@@ -45,6 +45,7 @@
 //=============================================================================================================
 
 #include <QtTest>
+#include <QDebug>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -92,12 +93,16 @@ TestDipoleFit::TestDipoleFit()
 
 void TestDipoleFit::initTestCase()
 {
+    //printf(">>>>>>>>>>>>>>>>>>>>>>>>> Dipole Fit Init >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 }
 
 //=============================================================================================================
 
 void TestDipoleFit::dipoleFitSimple()
 {
+    //printf(">>>>>>>>>>>>>>>>>>>>>>>>> Dipole FitSimple >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>> Dipole FitSimple >>>>>>>>>>>>>>>>>>>>>>>>>\n";
+
     QString refFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref_dip_fit.dat");
     QFile testFile;
 
@@ -105,7 +110,7 @@ void TestDipoleFit::dipoleFitSimple()
     // Dipole Fit Settings
     //*********************************************************************************************************
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Dipole Fit Settings >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    //printf(">>>>>>>>>>>>>>>>>>>>>>>>> Dipole Fit Settings >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     //Following is equivalent to: --meas ../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif --set 1 --meg
     //--eeg --tmin 32 --tmax 148 --bmin -100 --bmax 0 --dip ../resources/data/mne-cpp-test-data/Result/dip_fit.dat
@@ -124,38 +129,38 @@ void TestDipoleFit::dipoleFitSimple()
 
     settings.checkIntegrity();
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Settings Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    //printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Settings Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
     //*********************************************************************************************************
     // Compute Dipole Fit
     //*********************************************************************************************************
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    //printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     DipoleFit dipFit(&settings);
     ECDSet set = dipFit.calculateFit();
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    //printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
     //*********************************************************************************************************
     // Write Read Dipole Fit
     //*********************************************************************************************************
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Write Read Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    //printf(">>>>>>>>>>>>>>>>>>>>>>>>> Write Read Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     set.save_dipoles_dip(settings.dipname);
     m_ECDSet = ECDSet::read_dipoles_dip(settings.dipname);
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Write Read Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    //printf("<<<<<<<<<<<<<<<<<<<<<<<<< Write Read Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
     //*********************************************************************************************************
     // Load reference Dipole Set
     //*********************************************************************************************************
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Load Dipole Fit Reference Set >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    //printf(">>>>>>>>>>>>>>>>>>>>>>>>> Load Dipole Fit Reference Set >>>>>>>>>>>>>>>>>>>>>>>>>\n");
     m_refECDSet = ECDSet::read_dipoles_dip(refFileName);
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Reference Set Loaded <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    //printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Reference Set Loaded <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
     //*********************************************************************************************************
     // Compare Fit
@@ -175,7 +180,7 @@ void TestDipoleFit::dipoleFitAdvanced()
     // Dipole Fit Settings
     //*********************************************************************************************************
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Dipole Fit Settings >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    //printf(">>>>>>>>>>>>>>>>>>>>>>>>> Dipole Fit Settings >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     //Following is equivalent to: --meas ../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif --set 1
     //--noise ../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-cov.fif --bem ../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif
@@ -216,38 +221,38 @@ void TestDipoleFit::dipoleFitAdvanced()
 
     settings.checkIntegrity();
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Settings Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    //printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Settings Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
     //*********************************************************************************************************
     // Compute Dipole Fit
     //*********************************************************************************************************
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    //printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     DipoleFit dipFit(&settings);
     ECDSet set = dipFit.calculateFit();
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    //printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
     //*********************************************************************************************************
     // Write Read Dipole Fit
     //*********************************************************************************************************
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Write Read Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    //printf(">>>>>>>>>>>>>>>>>>>>>>>>> Write Read Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     set.save_dipoles_dip(settings.dipname);
     m_ECDSet = ECDSet::read_dipoles_dip(settings.dipname);
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Write Read Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    //printf("<<<<<<<<<<<<<<<<<<<<<<<<< Write Read Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
     //*********************************************************************************************************
     // Load reference Dipole Set
     //*********************************************************************************************************
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Load Dipole Fit Reference Set >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    //printf(">>>>>>>>>>>>>>>>>>>>>>>>> Load Dipole Fit Reference Set >>>>>>>>>>>>>>>>>>>>>>>>>\n");
     m_refECDSet = ECDSet::read_dipoles_dip(refFileName);
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Reference Set Loaded <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    //printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Reference Set Loaded <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 
     //*********************************************************************************************************
     // Compare Fit
@@ -264,20 +269,20 @@ void TestDipoleFit::compareFit()
     // Write Read Dipole Fit
     //*********************************************************************************************************
 
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare Dipole Fits >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    //printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare Dipole Fits >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     QVERIFY( m_refECDSet.size() == m_ECDSet.size() );
 
     for (int i = 0; i < m_refECDSet.size(); ++i)
     {
-        printf("Compare orig Dipole %d: %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n", i,
-                1000*m_ECDSet[i].time,1000*m_ECDSet[i].time,
-                1000*m_ECDSet[i].rd[0],1000*m_ECDSet[i].rd[1],1000*m_ECDSet[i].rd[2],
-                1e9*m_ECDSet[i].Q.norm(),1e9*m_ECDSet[i].Q[0],1e9*m_ECDSet[i].Q[1],1e9*m_ECDSet[i].Q[2],100.0*m_ECDSet[i].good);
-        printf("         ref Dipole %d: %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n", i,
-                1000*m_refECDSet[i].time,1000*m_refECDSet[i].time,
-                1000*m_refECDSet[i].rd[0],1000*m_refECDSet[i].rd[1],1000*m_refECDSet[i].rd[2],
-                1e9*m_refECDSet[i].Q.norm(),1e9*m_refECDSet[i].Q[0],1e9*m_refECDSet[i].Q[1],1e9*m_refECDSet[i].Q[2],100.0*m_refECDSet[i].good);
+        //printf("Compare orig Dipole %d: %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n", i,
+                // 1000*m_ECDSet[i].time,1000*m_ECDSet[i].time,
+                // 1000*m_ECDSet[i].rd[0],1000*m_ECDSet[i].rd[1],1000*m_ECDSet[i].rd[2],
+                // 1e9*m_ECDSet[i].Q.norm(),1e9*m_ECDSet[i].Q[0],1e9*m_ECDSet[i].Q[1],1e9*m_ECDSet[i].Q[2],100.0*m_ECDSet[i].good);
+        //printf("         ref Dipole %d: %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n", i,
+                // 1000*m_refECDSet[i].time,1000*m_refECDSet[i].time,
+                // 1000*m_refECDSet[i].rd[0],1000*m_refECDSet[i].rd[1],1000*m_refECDSet[i].rd[2],
+                // 1e9*m_refECDSet[i].Q.norm(),1e9*m_refECDSet[i].Q[0],1e9*m_refECDSet[i].Q[1],1e9*m_refECDSet[i].Q[2],100.0*m_refECDSet[i].good);
 
         QVERIFY( m_ECDSet[i].valid == m_refECDSet[i].valid );
         QVERIFY( m_ECDSet[i].time - m_refECDSet[i].time < epsilon );
@@ -289,7 +294,7 @@ void TestDipoleFit::compareFit()
         QVERIFY( m_ECDSet[i].neval == m_refECDSet[i].neval );
     }
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compare Dipole Fits Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    //printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compare Dipole Fits Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
 }
 
 //=============================================================================================================
