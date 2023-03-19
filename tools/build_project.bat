@@ -29,40 +29,47 @@
     SET "NumProcesses=1"
 
     SET "Rebuild=False"
-
     SET "CMakeConfigFlags="
-    
+    SET "ExtraArgs="
+    SET "ExtraSection=False"
+
     :loop
     IF NOT "%1"=="" (
-      IF "%1"=="help" (
+      IF "%ExtraSection%"=="True" (
+        SET "ExtraArgs=!ExtraArgs! %1"
+      )
+      IF "%ExtraSection%"=="False" IF "%1"=="help" (
         call:showLogo
         call:showHelp
         goto :endOfScript
       )
       set Arg=%1
 
-      IF NOT x!Arg!==x!Arg:Release=! (
+      IF "%ExtraSection%"=="False" IF NOT x!Arg!==x!Arg:Release=! (
         SET BuildType=Release
         SET BuildName=!Arg!
       )
-      IF NOT x!Arg!==x!Arg:Debug=! (
+      IF "%ExtraSection%"=="False" IF NOT x!Arg!==x!Arg:Debug=! (
         SET BuildType=Debug
         SET BuildName=!Arg!
       )
-      IF "%1"=="coverage" (
+      IF "%ExtraSection%"=="False" IF "%1"=="coverage" (
         SET "WithCodeCoverage=True"
       )
-      IF "%1"=="mock" (
+      IF "%ExtraSection%"=="False" IF "%1"=="mock" (
         SET "MockBuild=True"
       )
-      IF "%1"=="clean" (
+      IF "%ExtraSection%"=="False" IF "%1"=="clean" (
         SET "CleanBuild=True"
       )
-      IF "%1"=="rebuild" (
+      IF "%ExtraSection%"=="False" IF "%1"=="rebuild" (
         SET "Rebuild=True"
       )
-      IF "%1"=="static" (
+      IF "%ExtraSection%"=="False" IF "%1"=="static" (
         SET "CMakeConfigFlags=!CMakeConfigFlags! -DBUILD_SHARED_LIBS=OFF"
+      )
+      IF "%ExtraSection%"=="False" IF "%1"=="--" (
+        SET "ExtraSection=True"
       )
       SHIFT
       GOTO :loop
@@ -127,13 +134,16 @@
       ECHO BuildFolder  = %BuildFolder%
       ECHO OutFolder    = %OutFolder%
       ECHO.
+      ECHO VerboseMode  = %VerboseMode%
+      ECHO MockBuild    = %MockBuild%
+      ECHO CleanBuild   = %CleanBuild%
       ECHO BuildType    = %BuildType%
       ECHO BuildName    = %BuildName%
-      ECHO CleanBuild   = %CleanBuild%
       ECHO Rebuild      = %Rebuild%
       ECHO Coverage     = %WithCodeCoverage%
       ECHO NumProcesses = %NumProcesses%
-      ECHO MockBuild    = %MockBuild%
+      ECHO CMakeConfigFlags = %CMakeConfigFlags%
+      ECHO ExtraARgs    = %ExtraArgs%
       ECHO.
       ECHO ====================================================================
       ECHO ====================================================================
@@ -149,8 +159,8 @@
       ECHO All builds will be parallel.
       ECHO All options can be used in undefined order.
       ECHO.
-      ECHO [help] - Print this help.
-      ECHO [mock] - Show commands do not execute them.
+      ECHO [help]  - Print this help.
+      ECHO [mock]  - Show commands do not execute them.
       ECHO [clean] - Delete build and out folders for your configuration and exit.
       ECHO [Release*/Debug*] - Set the build type Debug/Release and name it.
       ECHO                     For example, Release_testA will build in release
@@ -158,8 +168,10 @@
       ECHO                     and an out folder /out/Release_testA.
       ECHO [coverage] - Enable code coverage.
       ECHO [rebuild]  - Only rebuild existing build-system configuration.
-      ECHO [static]   - Build project statically. QT_DIR and Qt5_DIR must be set to"
-      ECHO              Point to a static version of Qt."
+      ECHO [static]   - Build project statically. QT_DIR and Qt5_DIR must be set to
+      ECHO              point to a static version of Qt.
+      ECHO [--]       - Mark beginning of Extra-arguments section. Any argument
+      ECHO              following the double dash will be passed on to cmake.      
       ECHO.
     exit /B 0
 
