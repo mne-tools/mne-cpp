@@ -29,7 +29,7 @@ set runCodeCoverageInput=%3
 
 
 if "%verboseModeInput%"=="verbose" (
-  set printOutput=True
+  set printOutput="True"
 ) else (
   if "%verboseModeInput%"=="help" (
     call:doPrintHelp
@@ -56,6 +56,7 @@ for /f %%f in ('dir test_*.exe /s /b ^| findstr /v "d.exe"') do (
     %%f > null 2>&1 && call:success %%~nxf || call:fail %%~nxf
   )
 )
+rm -f null
 
 cd %scriptPath%
 
