@@ -15,7 +15,7 @@
 @REM Setup default values
 setlocal
 set scriptPath=%~dp0
-set basePath=%scriptPath%..\..
+set basePath=%scriptPath%..
 
 set printOutput=False
 set stopOnFirstFail=False
@@ -50,7 +50,7 @@ set /A "compoundOutput=0"
 cd %basePath%\out\%binOutputFolder%
 
 for /f %%f in ('dir test_*.exe /s /b ^| findstr /v "d.exe"') do (
-  if "%printOutput%"=="True" (
+  if %printOutput%=="True" (
     %%f && call:success %%~nxf || call:fail %%~nxf
   ) else (
     %%f > null 2>&1 && call:success %%~nxf || call:fail %%~nxf
@@ -157,7 +157,7 @@ doPrintConfiguration
 
 ##########
 
-RepoRootDir="$(dirname "$BASH_SOURCE")/../.."
+RepoRootDir="$(dirname "$BASH_SOURCE")/.."
 echo $RepoRootDir
 
 if [[ $(uname) == "Linux" ]]; then

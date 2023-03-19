@@ -12,7 +12,7 @@
     :; # ########## WINDOWS SECTION #########################
 
     SET SCRIPT_PATH=%~dp0
-    SET BASE_PATH=%SCRIPT_PATH%..\..
+    SET BASE_PATH=%SCRIPT_PATH%..
     SET LINK_OPTION=%1
     SET PACK_OPTION=%2
     
@@ -158,7 +158,7 @@ if [ "$(uname)" == "Darwin" ]; then
         cd "$(dirname "$0")" >/dev/null 2>&1
         pwd -P
     )"
-    BASE_PATH=${SCRIPT_PATH}/../..
+    BASE_PATH=${SCRIPT_PATH}/..
 
     if [ -z ${LINK_OPTION} ]; then
         LINK_OPTION=dynamic
