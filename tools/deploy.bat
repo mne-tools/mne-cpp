@@ -15,6 +15,8 @@
     SET BASE_PATH=%SCRIPT_PATH%..
     SET LINK_OPTION=%1
     SET PACK_OPTION=%2
+    SET OUT_DIR_NAME=%3
+    SET BUILD_NAME=Release\
     
     SETX VCINSTALLDIR "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\"
 
@@ -22,117 +24,132 @@
         SET LINK_OPTION=dynamic
     )
 
+    IF "%OUT_DIR_NAME%"=="" (
+        SET OUT_DIR_NAME=%BASE_PATH%\out\Release
+    )
+
     IF "%LINK_OPTION%"=="dynamic" (
         
-        Rem Solve dependencies for libraries
-        windeployqt %BASE_PATH%\out\Release\bin\mne_utils.dll
-        windeployqt %BASE_PATH%\out\Release\bin\mne_fiff.dll
-        windeployqt %BASE_PATH%\out\Release\bin\mne_fs.dll
-        windeployqt %BASE_PATH%\out\Release\bin\mne_events.dll
-        windeployqt %BASE_PATH%\out\Release\bin\mne_mne.dll
-        windeployqt %BASE_PATH%\out\Release\bin\mne_fwd.dll
-        windeployqt %BASE_PATH%\out\Release\bin\mne_inverse.dll
-        windeployqt %BASE_PATH%\out\Release\bin\mne_communication.dll
-        windeployqt %BASE_PATH%\out\Release\bin\mne_rtprocessing.dll
-        windeployqt %BASE_PATH%\out\Release\bin\mne_connectivity.dll
-        windeployqt %BASE_PATH%\out\Release\bin\mne_disp.dll
-        windeployqt %BASE_PATH%\out\Release\bin\mne_disp3D.dll
+        cd %OUT_DIR_NAME%\apps
+
+        for /f %%f in ('dir *.dll /s /b') do (
+          windeployqt %%f
+        )
+
+        for /f %%f in ('dir *.exe /s /b') do (
+            windwployqt %%f
+        )
+
+        REM Solve dependencies for libraries
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_utils.dll
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_fiff.dll
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_fs.dll
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_events.dll
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_mne.dll
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_fwd.dll
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_inverse.dll
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_communication.dll
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_rtprocessing.dll
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_connectivity.dll
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_disp.dll
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_disp3D.dll
 
         REM solve dependencies for applications
-        windeployqt %BASE_PATH%\out\Release\bin\mne_analyze
-        windeployqt %BASE_PATH%\out\Release\bin\mne_scan
-        windeployqt %BASE_PATH%\out\Release\bin\mne_anonymize
-        windeployqt %BASE_PATH%\out\Release\bin\mne_rt_server
-        windeployqt %BASE_PATH%\out\Release\bin\mne_forward_solution
-        windeployqt %BASE_PATH%\out\Release\bin\mne_edf2fiff
-        windeployqt %BASE_PATH%\out\Release\bin\mne_dipole_fit
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_analyze
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_scan
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_anonymize
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_rt_server
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_forward_solution
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_edf2fiff
+        REM windeployqt %BASE_PATH%\out\Release\bin\mne_dipole_fit
 
         REM solve dependencies for tests 
-        windeployqt %BASE_PATH%\out\Release\bin\test_coregistration.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_dipole_fit.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_edf2fiff_rwr.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_fiff_coord_trans.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_fiff_cov.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_fiff_digitizer.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_fiff_mne_types_io.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_fiff_rwr.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_filtering.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_geometryinfo.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_hpiDataUpdater.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_hpiFit.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_hpiFit_integration.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_hpiModelParameter.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_interpolation.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_mne_anonymize.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_mne_forward_solution.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_mne_msh_display_surface_set.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_mne_project_to_surface.ex
-        windeployqt %BASE_PATH%\out\Release\bin\test_sensorSet.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_signalModel.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_spectral_connectivity.exe
-        windeployqt %BASE_PATH%\out\Release\bin\test_utils_circularbuffer.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_coregistration.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_dipole_fit.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_edf2fiff_rwr.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_fiff_coord_trans.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_fiff_cov.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_fiff_digitizer.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_fiff_mne_types_io.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_fiff_rwr.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_filtering.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_geometryinfo.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_hpiDataUpdater.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_hpiFit.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_hpiFit_integration.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_hpiModelParameter.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_interpolation.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_mne_anonymize.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_mne_forward_solution.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_mne_msh_display_surface_set.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_mne_project_to_surface.ex
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_sensorSet.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_signalModel.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_spectral_connectivity.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\test_utils_circularbuffer.exe
 
-        Rem solve dependencies with test
-        windeployqt %BASE_PATH%\out\Release\bin\ex_averaging.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_cancel_noise.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_clustered_inverse_mne.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_clustered_inverse_mne_raw.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_clustered_inverse_pwl_rap_music_raw.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_clustered_inverse_rap_music_raw.exe    
-        windeployqt %BASE_PATH%\out\Release\bin\ex_compute_forward.pro.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_connectivity.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_connectivity_comparison.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_connectivity_performace.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_coreg.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_disp.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_disp3D.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_evoked_grad_amp.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_fiff.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_fiff_sniffer.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_file_utils.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_filtering.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_find_Evoked.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_fs_surface.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_histogram.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_hpi_fit.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_interpolation.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_inverse_mne.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_inverse_mne_raw.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_inverse_pwl_rap_music.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_inverse_rap_music.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_make_inverse_operator.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_make_layout.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_read_bem.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_read_epochs.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_read_evoked.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_read_fwd.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_read_fwd_disp_3D.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_read_raw.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_read_write_raw.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_roi_clustered_inverse_pwl_rap_music.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_spectral.exe
-        windeployqt %BASE_PATH%\out\Release\bin\ex_st_clustered_inverse_pwl_rap_music.exe 
+        REM solve dependencies with test
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_averaging.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_cancel_noise.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_clustered_inverse_mne.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_clustered_inverse_mne_raw.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_clustered_inverse_pwl_rap_music_raw.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_clustered_inverse_rap_music_raw.exe    
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_compute_forward.pro.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_connectivity.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_connectivity_comparison.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_connectivity_performace.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_coreg.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_disp.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_disp3D.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_evoked_grad_amp.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_fiff.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_fiff_sniffer.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_file_utils.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_filtering.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_find_Evoked.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_fs_surface.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_histogram.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_hpi_fit.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_interpolation.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_inverse_mne.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_inverse_mne_raw.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_inverse_pwl_rap_music.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_inverse_rap_music.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_make_inverse_operator.exe
+        REM windeployqtoyqt %BASE_PATH%\out\Release\bin\ex_make_layout.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_read_bem.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_read_epochs.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_read_evoked.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_read_fwd.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_read_fwd_disp_3D.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_read_raw.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_read_write_raw.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_roi_clustered_inverse_pwl_rap_music.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_spectral.exe
+        REM windeployqt %BASE_PATH%\out\Release\bin\ex_st_clustered_inverse_pwl_rap_music.exe 
 
-        Rem xcopy %BASE_PATH%\src\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll %BASE_PATH%\out\Release\apps\ /i
+        REM xcopy %BASE_PATH%\src\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll %BASE_PATH%\out\Release\apps\ /i
         
         IF "%PACK_OPTION%"=="pack" (
-            Rem Delete folders which we do not want to ship
-            rmdir %BASE_PATH%\out\Release\bin\resources\data /s /q 
-            Rem Creating archive of all win deployed applications
-            7z a %BASE_PATH%\mne-cpp-windows-dynamic-x86_64.zip %BASE_PATH%\out\Release
+            cd %BASE_PATH%
+            REM Delete folders which we do not want to ship
+            rmdir %OUT_DIR_NAME%\resources\data /s /q 
+            REM Creating archive of all win deployed applications
+            7z a %BASE_PATH%\mne-cpp-windows-dynamic-x86_64.zip %OUT_DIR_NAME%
         )
 
     ) ELSE IF "%LINK_OPTION%"=="static" (
         
         IF "%PACK_OPTION%"=="pack" (
-            Rem This script needs to be run from the top level mne-cpp repo folder
-            Rem Delete folders which we do not want to ship
+            REM This script needs to be run from the top level mne-cpp repo folder
+            REM Delete folders which we do not want to ship
             rmdir %BASE_PATH%\out\Release\bin\resources /s /q
             rmdir %BASE_PATH%\out\Release\bin\apps\mne_rt_server_plugins /s /q
             rmdir %BASE_PATH%\out\Release\bin\apps\mne_scan_plugins /s /q
             rmdir %BASE_PATH%\out\Release\bin\apps\mne_analyze_plugins /s /q
             
-            Rem Creating archive of everything in the bin directory
+            REM Creating archive of everything in the bin directory
             7z a %BASE_PATH%\mne-cpp-windows-static-x86_64.zip %BASE_PATH%\out\Release        
         )
         
