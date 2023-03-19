@@ -11,7 +11,7 @@
     :; # ########## WINDOWS SECTION #########################
 
     SET SCRIPT_PATH=%~dp0
-    SET BASE_PATH=%SCRIPT_PATH%..\..
+    SET BASE_PATH=%SCRIPT_PATH%..
 
     FOR %%x in (%*) do (
         IF "%%~x" == "lsl" (
@@ -46,7 +46,7 @@ BATCH
         cd "$(dirname "$0")" >/dev/null 2>&1
         pwd -P
     )"
-    BASE_PATH=${SCRIPT_PATH}/../..
+    BASE_PATH=${SCRIPT_PATH}/..
 
     argc=$#
     argv=("$@")
