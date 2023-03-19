@@ -28,7 +28,7 @@ if(WITH_CODE_COV)
 endif()
 
 ##==============================================================================
-## FFTW Options 
+## FFTW Options
 
 option(USE_FFTW "Use fftw backend for eigen" OFF)
 
@@ -145,6 +145,4 @@ execute_process(
   COMMAND ${CMAKE_COMMAND} -E create_symlink
   ${PROJECT_RESOURCES_DIR} ${OUTPUT_RESOURCES_DIR}
 )
-
-
 
