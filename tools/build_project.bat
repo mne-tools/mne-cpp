@@ -170,8 +170,9 @@
       ECHO [rebuild]  - Only rebuild existing build-system configuration.
       ECHO [static]   - Build project statically. QT_DIR and Qt5_DIR must be set to
       ECHO              point to a static version of Qt.
-      ECHO [--]       - Mark beginning of Extra-arguments section. Any argument
-      ECHO              following the double dash will be passed on to cmake.      
+      ECHO [--]       - Mark beginning of extra-arguments section. Any argument
+      ECHO              following the double dash will be passed on to cmake 
+      ECHO              directly without it being parsed.      
       ECHO.
     exit /B 0
 
@@ -209,7 +210,7 @@
       ECHO    _           _ _     _     __      _ _          _   
       ECHO   ^| ^|         (_) ^|   ^| ^|   / _^|    (_) ^|        ^| ^|  
       ECHO   ^| ^|__  _   _ _^| ^| __^| ^|  ^| ^|_ __ _ _^| ^| ___  __^| ^|  
-      ECHO   ^| '_ \^| ^| ^| ^| ^| ^|/ _` ^|  ^|  _/ _` ^| ^| ^|/ _ \/ _` ^|  
+      ECHO   ^| '_ \^| ^| ^| ^| ^| ^|/ _' ^|  ^|  _/ _' ^| ^| '|/ _ \/ _' ^|  
       ECHO   ^| ^|_) ^| ^|_^| ^| ^| ^| (_^| ^|  ^| ^|^| (_^| ^| ^| ^|  __/ (_^| ^|  
       ECHO   ^|_.__/ \__,_^|_^|_^|\__,_^|  ^|_^| \__,_^|_^|_^|\___^|\__,_^|  
       ECHO.
@@ -258,13 +259,14 @@ MockBuild="false"
 MockText=""
 PrintHelp="false"
 CMakeConfigFlags=""
+ExtraArgs=""
+ExtraSection=False
 
 doShowLogo() {
   echo "                                      "
-  echo "                                      "
   echo "    _    _ _  _ ___     ___ __  ___   "
   echo "   |  \/  | \| | __|   / __| _ \ _ \  "
-  echo "   | |\/| | .\` | _|   | (__|  _/  _/  "
+  echo "   | |\/| |  \` | _|   | (__|  _/  _/  "
   echo "   |_|  |_|_|\_|___|   \___|_| |_|    "
   echo "                                      "
   echo "   Build tool                         "
@@ -272,7 +274,6 @@ doShowLogo() {
 }
 
 doShowLogoFlames() {
-  echo "                                        "
   echo "                                        "
   echo "     *       )             (   (        "
   echo "   (  \`   (  (         (   )\ ))\ )     "
@@ -320,6 +321,7 @@ doPrintConfiguration() {
   echo " MockBuild = $MockBuild"
   echo " MockText = $MockText"
   echo " PrintHelp = $PrintHelp"
+  echo " ExtraArgs = $ExtraArgs"
   echo " "
   echo ========================================================================
   echo ========================================================================
@@ -344,6 +346,9 @@ doPrintHelp() {
   echo "[rebuild]  - Only rebuild existing build-system configuration."
   echo "[static]   - Build project statically. QT_DIR and Qt5_DIR must be set to"
   echo "             point to a static version of Qt."
+  ECHO "[--]       - Mark beginning of extra-arguments section. Any argument"
+  ECHO "             following the double dash will be passed on to cmake"
+  ECHO "             directly without it being parsed."
   echo " "
 }
 
@@ -373,6 +378,11 @@ for (( j=0; j<argc; j++)); do
       BuildName="${argv[j]}"
       ;;
   esac
+  if [ "${argv[j]}" == "--" ]; then
+    for ((j++ ; j<argc; j++)); do
+      ExtraArgs="${ExtraArgs} ${argv[j]}"
+    done
+  fi
 done
 
 if [ "$WithCodeCoverage" == "false"  ]; then
@@ -424,7 +434,12 @@ fi
 if [ "${Rebuild}" == "false" ]; then
   echo " "
   echo "Configuring Build System:" 
-  ${MockText}cmake -B ${BuildFolder} -S ${SourceFolder} -DCMAKE_BUILD_TYPE=${BuildType} -DBINARY_OUTPUT_DIRECTORY=${OutFolder} ${CoverageOption} ${CMakeConfigFlags}
+  ${MockText}cmake -B ${BuildFolder} -S ${SourceFolder} \
+    -DCMAKE_BUILD_TYPE=${BuildType} \
+    -DBINARY_OUTPUT_DIRECTORY=${OutFolder} \
+    ${CoverageOption} \
+    ${CMakeConfigFlags}
+    ${ExtraArgs}
 fi
 
 echo " "
