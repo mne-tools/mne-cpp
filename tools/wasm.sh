@@ -82,17 +82,39 @@ echo "Qt set up."
 GIT_HASH=$(git rev-parse HEAD)
 # cd ..
 
-# export QT_DIR="/home/gbm/Documents/Code/mne_wasm/Qt5_binaries/lib/cmake/Qt5"
-# export Qt5_DIR="/home/gbm/Documents/Code/mne_wasm/Qt5_binaries/lib/cmake/Qt5"
 # echo $QT_DIR
 #
 # export PATH="/home/gbm/Documents/Code/mne_wasm/Qt5_binaries/bin:$PATH"
 # export LD_LIBRARY_PATH="/home/gbm/Documents/Code/mne_wasm/Qt5_binaries/lib:$LD_LIBRARY_PATH"
 #
-export CMAKE_PREFIX_PATH="${PROJECT_PATH}/Qt5_binaries/lib/cmake/Qt5"
 
-emcmake cmake -B build -S src -DWASM=ON
- 
+# export CMAKE_PREFIX_PATH="${PROJECT_PATH}/Qt5_binaries:${CMAKE_PREFIX_PATH}"
+# export QT_DIR="${PROJECT_PATH}/Qt5_binaries/lib/cmake/Qt5"
+# export Qt5_DIR="${PROJECT_PATH}/Qt5_binaries/lib/cmake/Qt5"
+
+# export PATH="${PROJECT_PATH}/Qt5_binaries/bin:$PATH"
+# export LD_LIBRARY_PATH="${PROJECT_PATH}/mne_wasm/Qt5_binaries/lib:$LD_LIBRARY_PATH"
+
+
+# echo "QT DIR = $QT_DIR"
+# echo "Qt5_DIR = $Qt5_DIR"
+# echo "PREFIX_PATH = ${CMAKE_PREFIX_PATH}"
+
+#emconfigure
+
+QT_CMAKE_FLAGS=""
+
+for d in ${PROJECT_PATH}/Qt5_binaries/lib/cmake/* ; do
+	d=$(basename ${d})
+    QT_CMAKE_FLAGS="${QT_CMAKE_FLAGS} -D${d}_DIR=${PROJECT_PATH}/Qt5_binaries/lib/cmake/${d}"
+done
+
+echo "DIRS ---> ${QT_CMAKE_FLAGS}"
+
+emcmake cmake -B build -S src -DWASM=ON -DQT_DIR=${PROJECT_PATH}/Qt5_binaries/lib/cmake/Qt5 ${QT_CMAKE_FLAGS}
+
+#-DWASM_QT_PATH=${PROJECT_PATH}/Qt5_binaries/lib/cmake/Qt5
+
 cmake --build build
 
 echo "Done"
