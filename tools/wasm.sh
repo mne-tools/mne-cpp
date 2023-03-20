@@ -115,7 +115,7 @@ emcmake cmake -B build -S src -DWASM=ON -DQT_DIR=${PROJECT_PATH}/Qt5_binaries/li
 
 #-DWASM_QT_PATH=${PROJECT_PATH}/Qt5_binaries/lib/cmake/Qt5
 
-cmake --build build
+cmake --build build --parallel $(expr $(nproc --all))
 
 echo "Done"
 
@@ -126,9 +126,9 @@ else
 	echo "Cloning coi fix repo..."
 	git clone https://github.com/gzuidhof/coi-serviceworker.git
 fi
-cp coi-serviceworker/coi-serviceworker.js mne-cpp/bin
-sed -i '0,/.*<script.*/s//\t<script src=\"coi-serviceworker.js\"><\/script>\n&/' mne-cpp/bin/mne_anonymize.html
-sed -i '0,/.*<script.*/s//\t<script src=\"coi-serviceworker.js\"><\/script>\n&/' mne-cpp/bin/mne_analyze.html
+cp coi-serviceworker/coi-serviceworker.js out/Release/apps
+sed -i '0,/.*<script.*/s//\t<script src=\"coi-serviceworker.js\"><\/script>\n&/' out/Release/apps/mne_anonymize.html
+sed -i '0,/.*<script.*/s//\t<script src=\"coi-serviceworker.js\"><\/script>\n&/' out/Release/apps/mne_analyze.html
 
 ## Build log
 echo "Saving build and system parameters..."
