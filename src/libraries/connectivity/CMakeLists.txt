@@ -79,13 +79,17 @@ target_include_directories(${PROJECT_NAME} PUBLIC ../)
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    ${QT_REQUIRED_COMPONENT_LIBS}
-    eigen
+set(MNE_LIBS_REQUIRED 
     mne_utils
     mne_fiff
     mne_fs
     mne_mne
+)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    ${QT_REQUIRED_COMPONENT_LIBS}
+    ${MNE_LIBS_REQUIRED}
+    eigen
     ${FFTW_LIBS})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_CONNECTIVITY_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")

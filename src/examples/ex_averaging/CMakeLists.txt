@@ -23,8 +23,7 @@ endif()
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
-  ${QT_REQUIRED_COMPONENT_LIBS}
+set(MNE_LIBS_REQUIRED 
   mne_rtprocessing
   mne_connectivity
   mne_inverse
@@ -33,6 +32,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   mne_fiff
   mne_fs
   mne_utils
+)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+  ${QT_REQUIRED_COMPONENT_LIBS}
+  ${MNE_LIBS_REQUIRED}
   eigen
 )
 

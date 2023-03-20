@@ -69,9 +69,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC ../)
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
-    ${QT_REQUIRED_COMPONENT_LIBS}
-    eigen
+set(MNE_LIBS_REQUIRED 
     mne_disp
     mne_utils
     mne_fiff
@@ -81,6 +79,12 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_inverse
     mne_rtprocessing
     mne_events
+)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    ${QT_REQUIRED_COMPONENT_LIBS}
+    ${MNE_LIBS_REQUIRED}
+    eigen
     scMeas
     scDisp
     ${FFTW_LIBS})
