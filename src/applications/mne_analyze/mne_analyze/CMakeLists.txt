@@ -42,8 +42,11 @@ set(MNE_LIBS_REQUIRED
     mne_utils
     mne_events
     mne_disp
-    mne_disp3D
 )
+
+if(NOT WASM)
+  list(APPEND MNE_LIBS_REQUIRED mne_disp3D)
+endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
@@ -53,20 +56,25 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 if(NOT BUILD_SHARED_LIBS)
-  target_link_libraries(
-    ${PROJECT_NAME}
-    PRIVATE analyze_averaging
-            analyze_channelselection
-            analyze_controlmanager
-            analyze_coregistration
-            analyze_dataloader
-            analyze_datamanager
-            analyze_dipolefit
-            analyze_events
-            analyze_filtering
-            analyze_rawdataviewer
-            analyze_sourcelocalization
-            analyze_view3d)
+  set(MNE_AN_PLUGINS 
+      analyze_averaging
+      analyze_channelselection
+      analyze_controlmanager
+      analyze_coregistration
+      analyze_dataloader
+      analyze_datamanager
+      analyze_dipolefit
+      analyze_events
+      analyze_filtering
+      analyze_rawdataviewer
+      analyze_sourcelocalization
+  )
+  
+  if(NOT WASM)
+    list(APPEND MNE_AN_PLUGINS analyze_view3d)
+  endif()
+
+  target_link_libraries(${PROJECT_NAME} PRIVATE ${MNE_AN_PLUGINS})
 
   target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
