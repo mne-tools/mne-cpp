@@ -9,134 +9,91 @@
 
 :<<BATCH
     :;@echo off
+    :; # ####################################################
     :; # ########## WINDOWS SECTION #########################
 
     SET SCRIPT_PATH=%~dp0
     SET BASE_PATH=%SCRIPT_PATH%..
-    SET LINK_OPTION=%1
-    SET PACK_OPTION=%2
-    SET OUT_DIR_NAME=%3
-    SET BUILD_NAME=Release\
+    SET CURRENT_PATH=
     
     SETX VCINSTALLDIR "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\"
 
-    IF "%LINK_OPTION%"=="" (
-        SET LINK_OPTION=dynamic
+    SET "LINK_OPTION=dynamic"
+    SET "PACK_OPTION="
+    SET "BUILD_NAME="
+    SET "MOCK_BUILD=False"
+    SET "MOCK_TEXT="
+
+    :loop
+    IF NOT "%1"=="" (
+        IF "%1"=="dynamic" (
+            SET "LINK_OPTION=dynamic"
+        )
+        IF "%1"=="static" (
+            SET "LINK_OPTION=dynamic"
+        )   
+        IF "%1"=="pack" (
+            SET "PACK_OPTION=True"
+        )   
+        IF "%1"=="help" (
+            GOTO :showHelp
+            GOTO :endOfScript
+        )   
+        IF "%1"=="mock" (
+            SET "MOCK_BUILD=True"
+        )
+        for /F "tokens=1 delims==" %%a in ("%1") do (
+            REM ECHO %%a
+            REM ECHO %%b
+            IF "%%a"=="build-name" (
+                SET "BUILD_NAME"=="%%b"
+            )
+        ) 
+        SHIFT
+        GOTO :loop
     )
 
-    IF "%OUT_DIR_NAME%"=="" (
-        SET OUT_DIR_NAME=%BASE_PATH%\out\Release
+    SET "OUT_DIR_NAME=%BASE_PATH%\out\%BUILD_NAME%"
+
+    IF "%MOCK_BUILD%"=="True" (
+        ECHO.
+        ECHO Mock mode ON. Commands to be executed: 
+        ECHO.
+        SET "MOCK_TEXT=ECHO "
     )
+
+    call :doPrintConfiguration
 
     IF "%LINK_OPTION%"=="dynamic" (
         
         cd %OUT_DIR_NAME%\apps
 
-        for /f %%f in ('dir *.dll /s /b') do (
-          windeployqt %%f
-        )
-
-        for /f %%f in ('dir *.exe /s /b') do (
-            windeployqt %%f
-        )
-
         REM Solve dependencies for libraries
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_utils.dll
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_fiff.dll
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_fs.dll
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_events.dll
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_mne.dll
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_fwd.dll
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_inverse.dll
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_communication.dll
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_rtprocessing.dll
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_connectivity.dll
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_disp.dll
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_disp3D.dll
+        for /f %%f in ('dir *.dll /s /b') do (
+          %MOCK_TEXT%windeployqt %%f
+        )
 
         REM solve dependencies for applications
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_analyze
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_scan
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_anonymize
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_rt_server
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_forward_solution
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_edf2fiff
-        REM windeployqt %BASE_PATH%\out\Release\bin\mne_dipole_fit
+        for /f %%f in ('dir *.exe /s /b') do (
+            %MOCK_TEXT%windeployqt %%f
+        )
 
         REM solve dependencies for tests 
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_coregistration.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_dipole_fit.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_edf2fiff_rwr.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_fiff_coord_trans.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_fiff_cov.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_fiff_digitizer.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_fiff_mne_types_io.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_fiff_rwr.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_filtering.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_geometryinfo.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_hpiDataUpdater.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_hpiFit.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_hpiFit_integration.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_hpiModelParameter.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_interpolation.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_mne_anonymize.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_mne_forward_solution.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_mne_msh_display_surface_set.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_mne_project_to_surface.ex
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_sensorSet.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_signalModel.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_spectral_connectivity.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\test_utils_circularbuffer.exe
+        for /f %%f in ('dir test_*.exe /s /b') do (
+            %MOCK_TEXT%windeployqt %%f
+        )
 
-        REM solve dependencies with test
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_averaging.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_cancel_noise.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_clustered_inverse_mne.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_clustered_inverse_mne_raw.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_clustered_inverse_pwl_rap_music_raw.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_clustered_inverse_rap_music_raw.exe    
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_compute_forward.pro.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_connectivity.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_connectivity_comparison.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_connectivity_performace.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_coreg.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_disp.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_disp3D.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_evoked_grad_amp.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_fiff.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_fiff_sniffer.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_file_utils.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_filtering.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_find_Evoked.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_fs_surface.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_histogram.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_hpi_fit.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_interpolation.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_inverse_mne.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_inverse_mne_raw.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_inverse_pwl_rap_music.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_inverse_rap_music.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_make_inverse_operator.exe
-        REM windeployqtoyqt %BASE_PATH%\out\Release\bin\ex_make_layout.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_read_bem.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_read_epochs.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_read_evoked.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_read_fwd.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_read_fwd_disp_3D.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_read_raw.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_read_write_raw.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_roi_clustered_inverse_pwl_rap_music.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_spectral.exe
-        REM windeployqt %BASE_PATH%\out\Release\bin\ex_st_clustered_inverse_pwl_rap_music.exe 
+        REM solve dependencies for examples 
+        for /f %%f in ('dir ex_*.exe /s /b') do (
+            %MOCK_TEXT%windeployqt %%f
+        )
 
-        REM xcopy %BASE_PATH%\src\applications\mne_scan\plugins\lsladapter\liblsl\build\install\bin\lsl.dll %BASE_PATH%\out\Release\apps\ /i
-        
         IF "%PACK_OPTION%"=="pack" (
             cd %BASE_PATH%
             REM Delete folders which we do not want to ship
-            rmdir %OUT_DIR_NAME%\resources\data /s /q 
+            %MOCK_TEXT%rmdir %OUT_DIR_NAME%\resources\data /s /q 
             REM Creating archive of all win deployed applications
-            7z a %BASE_PATH%\mne-cpp-windows-dynamic-x86_64.zip %OUT_DIR_NAME%
+            %MOCK_TEXT%7z a %BASE_PATH%\mne-cpp-windows-dynamic-x86_64.zip %OUT_DIR_NAME%
         )
 
     ) ELSE IF "%LINK_OPTION%"=="static" (
@@ -144,24 +101,60 @@
         IF "%PACK_OPTION%"=="pack" (
             REM This script needs to be run from the top level mne-cpp repo folder
             REM Delete folders which we do not want to ship
-            rmdir %BASE_PATH%\out\Release\bin\resources /s /q
-            rmdir %BASE_PATH%\out\Release\bin\apps\mne_rt_server_plugins /s /q
-            rmdir %BASE_PATH%\out\Release\bin\apps\mne_scan_plugins /s /q
-            rmdir %BASE_PATH%\out\Release\bin\apps\mne_analyze_plugins /s /q
+            %MOCK_TEXT%rmdir %BASE_PATH%\out\\bin\resources /s /q
+            %MOCK_TEXT%rmdir %BASE_PATH%\out\\bin\apps\mne_rt_server_plugins /s /q
+            %MOCK_TEXT%rmdir %BASE_PATH%\out\\bin\apps\mne_scan_plugins /s /q
+            %MOCK_TEXT%rmdir %BASE_PATH%\out\\bin\apps\mne_analyze_plugins /s /q
             
             REM Creating archive of everything in the bin directory
-            7z a %BASE_PATH%\mne-cpp-windows-static-x86_64.zip %BASE_PATH%\out\Release        
+            %MOCK_TEXT%7z a %BASE_PATH%\mne-cpp-windows-static-x86_64.zip %BASE_PATH%\out\        
         )
         
     ) ELSE (
-        ECHO Your link option: %LINK_OPTION%
-        ECHO Linkage option not defined. 
-        ECHO Use: static or dynamic.
+        ECHO Your link option: %LINK_OPTION% not defined.
+        goto :showHelp
+        goto :endOfScript
     )
     
-    cd %BASE_PATH%
+    :endOfScript
+
+    exit /B
+
+    :showHelp
+      ECHO. 
+      ECHO MNE-CPP Deplyment script help.
+      ECHO. 
+      ECHO Usage: ./deploy.bat [Options]
+      ECHO.
+      ECHO [help]  - Print this help.
+      ECHO [dynamic/static] - Set the link type as dynamic (default) or static.
+      ECHO [pack] - Enable output packaging into a compressed file.
+      ECHO [build-name=]  - Specify the name of the build to deploy and 
+      ECHO                         (if specified) pack.
+      ECHO.
+    exit /B 0
+
+    :doPrintConfiguration
+      ECHO.
+      ECHO ====================================================================
+      ECHO ===================== MNE-CPP DEPLOY SCRIPT =========================
+      ECHO.
+      ECHO LINK_OPTION  = %LINK_OPTION%
+      ECHO PACK_OPTION  = %PACK_OPTION%
+      ECHO BUILD_NAME   = %BUILD_NAME%
+      ECHO OUT_DIR_NAME = %OUT_DIR_NAME%
+      ECHO MOCK_BUILD   = %MOCK_BUILD%
+      ECHO MOCK_TEXT    = %MOCK_TEXT%
+      ECHO.
+      ECHO ====================================================================
+      ECHO ====================================================================
+      ECHO.
+    exit /B 0
+
+    cd %CD%
+
     :; # ########## WINDOWS SECTION ENDS ####################
-    :; # ####################################################
+    :; #####################################################
     exit /b
 BATCH
 
@@ -170,109 +163,193 @@ if [ "$(uname)" == "Darwin" ]; then
     # ######################################################
     # ############## MAC SECTION ###########################
 
-    LINK_OPTION=$1
-    PACK_OPTION=$2
-    SCRIPT_PATH="$(
-        cd "$(dirname "$0")" >/dev/null 2>&1
+argc=$#
+argv=("$@")
+
+function cleanAbsPath()
+{
+    local  cleanAbsPathStr="$( #spawns a new bash interpreter
+        cd "$1" >/dev/null 2>&1 #change directory to that folder
         pwd -P
     )"
-    BASE_PATH=${SCRIPT_PATH}/..
+    echo "$cleanAbsPathStr"
+}
 
-    if [ -z ${LINK_OPTION} ]; then
-        LINK_OPTION=dynamic
+
+EXIT_FAIL=1
+EXIT_SUCCESS=0
+ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
+BasePath="$(cleanAbsPath "$ScriptPath/..")"
+OutDirName=""
+LinkOption="dynamic"
+PackOption=""
+BuildName=""
+MockDeploy="False"
+MockText=""
+
+doPrintConfiguration() {
+  echo " "
+  echo ========================================================================
+  echo ======================== MNE-CPP BUILD CONFIG ==========================
+  echo " "
+  echo " ScriptPath = $ScriptPath"
+  echo " BasePath   = $BasePath"
+  echo " OutDirName = $OutDirName"
+  echo " "
+  echo " LinkOption = $LinkOption"
+  echo " PackOption = $PackOption"
+  echo " BuildName  = $BuildName"
+  echo " MockDeploy = $MockDeploy"
+  echo " MockText   = $MockText"
+  echo " "
+  echo ========================================================================
+  echo ========================================================================
+  echo " "
+}
+
+doPrintHelp() {
+  echo " "
+  echo "Usage: ./deploy.bat [Options]"
+  echo " "
+  echo "All options can be used in undefined order."
+  echo " "
+  echo "[help] - Print this help."
+  echo "[mock] - Show commands do not execute them."
+  echo "[dynamic/static] - Set the link type as dynamic (default) or static."
+  echo "[pack] - Enable packaging of applications into a compressed file."
+  echo "[build-name=] - Specify the name of the build to deploy."
+  echo " "
+}
+
+for (( j=0; j<argc; j++ )); do
+    if [ "${argv[j]}" == "dynamic" ]; then
+        LinkOption="dynamic"
+    elif [ "${argv[j]}" == "static" ]; then
+        LinkOption="static"
+    elif [ "${argv[j]}" == "pack" ]; then
+        PackOption="pack"
+    elif [ "${argv[j]}" == "help" ]; then
+        PrintHelp="true"
+    elif [ "${argv[j]}" == "mock" ]; then
+        MockBuild="true"
+    fi
+    inkarg=(${${argv[j]}//=/ })
+    if [ "${inkarg[0]}" == "build-name" ]; then
+        BuildName="${inkarg[1]}"
+    fi
+done
+
+OutFolder=${BASE_PATH}/out/${BuildName}
+
+if [ "${MockBuild}" == "true" ]; then
+  MockText="echo "
+  echo " "
+  echo "Mock mode ON. Commands to be executed: "
+  echo " "
+else
+  MockText=""
+fi
+
+
+if [ "${PrintHelp}" == "true" ]; then
+    doPrintHelp
+    exit(EXIT_SUCCESS)
+fi
+
+doPrintConfiguration
+
+exit
+
+if [[ ${LinkOption} == dynamic ]]; then
+
+    # Call macdeployqt on all .app bundles in the bin folder
+    for f in ${BasePath}/out/${BuildName}/apps/*.app; do $Qt5_DIR/bin/macdeployqt $f ; done
+
+    # Solve for dependencies for mne_scan.app bundle
+    cp -a ${BasePath}/out/${BuildName}/apps/mne_scan_plugins/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/mne_scan_plugins
+    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/resources
+    cp -a src/applications/mne_scan/plugins/brainflowboard/brainflow/installed/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
+    cp -a src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
+    cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
+    # cp -a $Qt5_DIR/plugins/renderers/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/PlugIns/renderers
+
+    # Solve for dependencies for mne_analyze.app bundle
+    cp -a ${BasePath}/out/${BuildName}/apps/mne_analyze_plugins/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
+    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/resources
+    cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/Frameworks
+    # cp -a $Qt5_DIR/plugins/renderers/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/PlugIns/renderers
+
+    # Solve for dependencies for mne_rt_server.app bundle
+    cp -a ${BasePath}/out/${BuildName}/apps/mne_rt_server_plugins/. ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/mne_rt_server_plugins
+    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/resources
+    cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/Frameworks
+
+    # Solve for dependencies for mne_forward_solution.app bundle
+    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/MacOS/resources
+    cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/Frameworks
+
+    # Solve for dependencies for mne_dipole_fit.app bundle
+    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_dipole_fit.app/Contents/MacOS/resources
+    cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_dipole_fit.app/Contents/Frameworks
+
+    # Solve for dependencies for mne_anonymize.app bundle
+    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/MacOS/resources
+    cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/Frameworks
+
+    if [[ ${PACK_OPTION} == pack ]]; then
+
+        # Delete folders which we do not want to ship
+        rm -r ${BasePath}/out/${BuildName}/resouces/data
+        # delete these folders because they are in the macos app containers already
+        rm -r ${BasePath}/out/${BuildName}/apps/mne_scan_plugins
+        rm -r ${BasePath}/out/${BuildName}/apps/mne_analyze_plugins
+        rm -r ${BasePath}/out/${BuildName}/apps/mne_rt_server_plugins
+
+        # Creating archive of all macos deployed applications
+        tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz ${BasePath}/out/${BuildName}/apps/.
     fi
 
-    if [[ ${LINK_OPTION} == dynamic ]]; then
+elif [[ ${LINK_OPTION} == static ]]; then
 
-        cd ${BASE_PATH}
+    cd ${BASE_PATH}
 
-        # Call macdeployqt on all .app bundles in the bin folder
-        for f in ./out/Release/apps/*.app; do $Qt5_DIR/bin/macdeployqt $f ; done
+    # This script needs to be run from the top level mne-cpp repo folder
+    # Solve for dependencies for mne_scan.app bundle
+    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/resources
 
-        # Solve for dependencies for mne_scan.app bundle
-        cp -a out/Release/apps/mne_scan_plugins/. out/Release/apps/mne_scan.app/Contents/MacOS/mne_scan_plugins
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_scan.app/Contents/MacOS/resources
-        cp -a src/applications/mne_scan/plugins/brainflowboard/brainflow/installed/out/Release/lib/. out/Release/apps/mne_scan.app/Contents/Frameworks
-        cp -a src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/Release/lib/. out/Release/apps/mne_scan.app/Contents/Frameworks
-        cp -a out/Release/lib/. out/Release/apps/mne_scan.app/Contents/Frameworks
-        # cp -a $Qt5_DIR/plugins/renderers/. out/Release/apps/mne_scan.app/Contents/PlugIns/renderers
+    # Solve for dependencies for mne_analyze.app bundle
+    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/resources
 
-        # Solve for dependencies for mne_analyze.app bundle
-        cp -a out/Release/apps/mne_analyze_plugins/. out/Release/apps/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_analyze.app/Contents/MacOS/resources
-        cp -a out/Release/lib/. out/Release/apps/mne_analyze.app/Contents/Frameworks
-        # cp -a $Qt5_DIR/plugins/renderers/. out/Release/apps/mne_analyze.app/Contents/PlugIns/renderers
+    # Solve for dependencies for mne_rt_server.app bundle
+    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/resources
 
-        # Solve for dependencies for mne_rt_server.app bundle
-        cp -a out/Release/apps/mne_rt_server_plugins/. out/Release/apps/mne_rt_server.app/Contents/MacOS/mne_rt_server_plugins
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_rt_server.app/Contents/MacOS/resources
-        cp -a out/Release/lib/. out/Release/apps/mne_rt_server.app/Contents/Frameworks
+    # Solve for dependencies for mne_forward_solution.app bundle
+    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/MacOS/resources
 
-        # Solve for dependencies for mne_forward_solution.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_forward_solution.app/Contents/MacOS/resources
-        cp -a out/Release/lib/. out/Release/apps/mne_forward_solution.app/Contents/Frameworks
+    # Solve for dependencies for mne_dipole_fit.app bundle
+    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_dipole_target_compile_definitions(mytgt PRIVATE BUILT_SHARED=$<BOOL:${BUILD_SHARED_LIBS}>) # or using `if()` for the bool conversiofit.app/Contents/MacOS/resources
 
-        # Solve for dependencies for mne_dipole_fit.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_dipole_fit.app/Contents/MacOS/resources
-        cp -a out/Release/lib/. out/Release/apps/mne_dipole_fit.app/Contents/Frameworks
+    # Solve for dependencies for mne_anonymize.app bundle
+    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/MacOS/resources
 
-        # Solve for dependencies for mne_anonymize.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_anonymize.app/Contents/MacOS/resources
-        cp -a out/Release/lib/. out/Release/apps/mne_anonymize.app/Contents/Frameworks
+    if [[ ${PACK_OPTION} == pack ]]; then
+        # Delete folders which we do not want to ship
+        cp -r ${BasePath}/out/${BuildName}/ mne-cpp
+        rm -r mne-cpp/resources/data
+        rm -r mne-cpp/apps/mne_scan_plugins
+        rm -r mne-cpp/apps/mne_analyze_plugins
+        rm -r mne-cpp/apps/mne_rt_server_plugins
 
-        if [[ ${PACK_OPTION} == pack ]]; then
-
-            # Delete folders which we do not want to ship
-            rm -r out/Release/resouces/data
-            # delete these folders because they are in the macos app containers already
-            rm -r out/Release/apps/mne_scan_plugins
-            rm -r out/Release/apps/mne_analyze_plugins
-            rm -r out/Release/apps/mne_rt_server_plugins
-
-            # Creating archive of all macos deployed applications
-            tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz out/Release/apps/.
-        fi
-
-    elif [[ ${LINK_OPTION} == static ]]; then
-
-        cd ${BASE_PATH}
-
-        # This script needs to be run from the top level mne-cpp repo folder
-        # Solve for dependencies for mne_scan.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_scan.app/Contents/MacOS/resources
-
-        # Solve for dependencies for mne_analyze.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_analyze.app/Contents/MacOS/resources
-
-        # Solve for dependencies for mne_rt_server.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_rt_server.app/Contents/MacOS/resources
-
-        # Solve for dependencies for mne_forward_solution.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_forward_solution.app/Contents/MacOS/resources
-
-        # Solve for dependencies for mne_dipole_fit.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_dipole_target_compile_definitions(mytgt PRIVATE BUILT_SHARED=$<BOOL:${BUILD_SHARED_LIBS}>) # or using `if()` for the bool conversiofit.app/Contents/MacOS/resources
-
-        # Solve for dependencies for mne_anonymize.app bundle
-        cp -a out/Release/apps/resources/. out/Release/apps/mne_anonymize.app/Contents/MacOS/resources
-
-        if [[ ${PACK_OPTION} == pack ]]; then
-            # Delete folders which we do not want to ship
-            cp -r out/Release/ mne-cpp
-            rm -r mne-cpp/resources/data
-            rm -r mne-cpp/apps/mne_scan_plugins
-            rm -r mne-cpp/apps/mne_analyze_plugins
-            rm -r mne-cpp/apps/mne_rt_server_plugins
-
-            # Creating archive of all macos deployed applications
-            tar cfvz mne-cpp-macos-static-x86_64.tar.gz mne-cpp
-        fi
-
-    else 
-        echo "Input argument link_option is invalid."
-        echo "Input argument link_option is set to ${LINK_OPTION}."
-        echo "Use: static or dynamic"
+        # Creating archive of all macos deployed applications
+        tar cfvz mne-cpp-macos-static-x86_64.tar.gz mne-cpp
     fi
+
+else 
+    echo "Input argument link_option is invalid."
+    doPrintConfiguration
+    doPrintHelp
+    exit{EXIT_FAIL}
+fi
 
     # ############## MAC SECTION ENDS ######################
     # ######################################################
@@ -297,10 +374,10 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
     if [[ ${LINK_OPTION} == dynamic ]]; then
 
         # Copy additional brainflow libs
-        cp -a ${BASE_PATH}/src/applications/mne_scan/plugins/brainflowboard/brainflow/installed/out/Release/lib/. ${BASE_PATH}/out/Release/lib/
+        cp -a ${BASE_PATH}/src/applications/mne_scan/plugins/brainflowboard/brainflow/installed/out/${BuildName}/lib/. ${BASE_PATH}/out/${BuildName}/lib/
 
         # Copy additional LSL libs
-        cp -a ${BASE_PATH}/src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/Release/lib/. ${BASE_PATH}/out/Release/lib/
+        cp -a ${BASE_PATH}/src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/${BuildName}/lib/. ${BASE_PATH}/out/${BuildName}/lib/
 
         # Install some additional packages so linuxdeployqt can find them
         sudo apt-get update
@@ -311,7 +388,7 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         sudo apt-get install libxcb-render-util0
         sudo apt-get install libbluetooth3
         sudo apt-get install libxcb-xinerama0 
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/out/Release/lib/x86_64-linux-gnu/
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/out/${BuildName}/lib/x86_64-linux-gnu/
 
         cd ${BASE_PATH}
 
@@ -321,23 +398,23 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
 
         # linuxdeployqt uses mne_scan and mne_analyze binary to resolve dependencies
         cd ${BASE_PATH}/mne-cpp
-        ../linuxdeployqt-continuous-x86_64.AppImage out/Release/apps/mne_scan -verbose2 -extra-plugins=renderers
-        ../linuxdeployqt-continuous-x86_64.AppImage out/Release/apps/mne_analyze -verbose2 -extra-plugins=renderers
+        ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_scan -verbose2 -extra-plugins=renderers
+        ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_analyze -verbose2 -extra-plugins=renderers
 
         # Manually copy in the libxcb-xinerama library which is needed by plugins/platforms/libxcb.so
-        cp /usr/out/Release/lib/x86_64-linux-gnu/libxcb-xinerama.so.0 ${BASE_PATH}/mne-cpp/out/Release/lib/
+        cp /usr/out/${BuildName}/lib/x86_64-linux-gnu/libxcb-xinerama.so.0 ${BASE_PATH}/mne-cpp/out/${BuildName}/lib/
 
         if [[ ${PACK_OPTION} == pack ]]; then
             echo 
-            echo ldd ./out/Release/apps/mne_scan
-            ldd ./out/Release/apps/mne_scan
+            echo ldd ./out/${BuildName}/apps/mne_scan
+            ldd ./out/${BuildName}/apps/mne_scan
 
             echo 
             echo ldd ./plugins/platforms/libqxcb.so
             ldd ./plugins/platforms/libqxcb.so
 
             # Delete folders which we do not want to ship
-            cp -r out/Release/ mne-cpp
+            cp -r ${BasePath}/out/${BuildName}/ mne-cpp
             rm -r mne-cpp/resources/data
 
             # Creating archive of everything in current directory
@@ -356,7 +433,7 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         sudo apt-get install libxcb-render-util0
         sudo apt-get install libbluetooth3
         sudo apt-get install libxcb-xinerama0
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/out/Release/lib/x86_64-linux-gnu/
+        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/out/${BuildName}/lib/x86_64-linux-gnu/
 
         # Downloading linuxdeployqt from continious release
         wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
@@ -367,15 +444,15 @@ elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
 
         # linuxdeployqt uses mne_scan and mne_analyze binary to resolve dependencies
         cd mne-cpp
-        ../linuxdeployqt-continuous-x86_64.AppImage out/Release/apps/mne_scan -verbose2 -extra-plugins=renderers
-        ../linuxdeployqt-continuous-x86_64.AppImage out/Release/apps/mne_analyze -verbose2 -extra-plugins=renderers
+        ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_scan -verbose2 -extra-plugins=renderers
+        ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_analyze -verbose2 -extra-plugins=renderers
 
         echo
-        echo ldd ./out/Release/apps/mne_scan
-        ldd ./out/Release/apps/mne_scan
+        echo ldd ./out/${BuildName}/apps/mne_scan
+        ldd ./out/${BuildName}/apps/mne_scan
 
         # Delete folders which we do not want to ship
-        cp -r out/Release mne-cpp
+        cp -r ${BasePath}/out/ mne-cpp
         rm -r mne-cpp/resources/data
         rm -r mne-cpp/apps/mne_rt_server_plugins
         rm -r mne-cpp/apps/mne_scan_plugins
