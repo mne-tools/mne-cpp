@@ -21,6 +21,8 @@ function cleanAbsPath()
 SCRIPT_PATH="$(cleanAbsPath "$(dirname "$0")")"
 PROJECT_PATH="$(cleanAbsPath "$SCRIPT_PATH/../..")"
 
+cd ${PROJECT_PATH}
+
 ## User editable through flags
 SOURCE_REPO=""
 EMSDK_VERSION="latest"
@@ -30,10 +32,7 @@ QT_VERSION="5.15"
 set -e
 
 for (( j=0; j<argc; j++)); do
-    if [ "${argv[j]}" == "--source" ] || [ "${argv[j]}" == "-s" ]; then
-        SOURCE_REPO="${argv[j+1]}" 
-		j=$j+1
-    elif [ "${argv[j]}" == "--emsdk" ] || [ "${argv[j]}" == "-e" ]; then
+    if [ "${argv[j]}" == "--emsdk" ] || [ "${argv[j]}" == "-e" ]; then
         EMSDK_VERSION="${argv[j+1]}" 
 		j=$j+1
     elif [ "${argv[j]}" == "--qt" ] || [ "${argv[j]}" == "-q" ]; then
@@ -43,17 +42,8 @@ for (( j=0; j<argc; j++)); do
 done
 
 ## Left for debugging purposes
-# echo "Source re${SOURCE_REPO}"
 # echo "${EMSDK_VERSION}"
 # echo "${QT_VERSION}"
-
-if [ "${SOURCE_REPO}" ]; then
-	echo "Source repo set to ${SOURCE_REPO}"
-else
-	echo "No source specified."
-	echo "Please set a source with the '--source' flag."
-	exit 1
-fi
 
 ## emsdk
 echo "Setting up emsdk ${EMSDK_VERSION}..."
@@ -87,18 +77,6 @@ else
 fi
 echo "Qt set up."
 
-## Building the project
-echo "Building source repo..."
-REPO_FOLDER=$(echo "${SOURCE_REPO}" | grep -oP '[^/]*(?=\.git$)')
-if [ -d "${REPO_FOLDER}" ]; then
-	echo "Found existing source repo."
-else
-	echo "Cloning source repo..."
-	git clone ${SOURCE_REPO}
-fi
-
-cd ${REPO_FOLDER}
-
 # ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG=wasm
 # make -j4
 GIT_HASH=$(git rev-parse HEAD)
@@ -111,9 +89,9 @@ GIT_HASH=$(git rev-parse HEAD)
 # export PATH="/home/gbm/Documents/Code/mne_wasm/Qt5_binaries/bin:$PATH"
 # export LD_LIBRARY_PATH="/home/gbm/Documents/Code/mne_wasm/Qt5_binaries/lib:$LD_LIBRARY_PATH"
 #
-export CMAKE_PREFIX_PATH="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
+export CMAKE_PREFIX_PATH="${PROJECT_PATH}/Qt5_binaries/lib/cmake/Qt5"
 
-emcmake cmake -B build -S src 
+emcmake cmake -B build -S src -DWASM=ON
  
 cmake --build build
 
