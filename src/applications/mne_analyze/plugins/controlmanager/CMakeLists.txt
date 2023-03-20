@@ -51,7 +51,6 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 set(MNE_LIBS_REQUIRED 
     mne_disp
-    mne_disp3D
     mne_utils
     mne_fiff
     mne_fs
@@ -61,6 +60,10 @@ set(MNE_LIBS_REQUIRED
     mne_rtprocessing
     mne_events
 )
+
+if(NOT WASM)
+  list(APPEND MNE_LIBS_REQUIRED mne_disp3D)
+endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
