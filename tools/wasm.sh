@@ -9,6 +9,18 @@
 argc=$# # number of arguments passed (not counting the command itself)
 argv=("$@") # list of arguments passed (not including the command itself)
 
+function cleanAbsPath()
+{
+    local CLEAN_ABS_PATH="$( #spawns a new bash interpreter
+        cd "$1" >/dev/null 2>&1 #change directory to that folder
+        pwd -P
+    )"
+    echo "$CLEAN_ABS_PATH"
+}
+
+SCRIPT_PATH="$(cleanAbsPath "$(dirname "$0")")"
+PROJECT_PATH="$(cleanAbsPath "$SCRIPT_PATH/../..")"
+
 ## User editable through flags
 SOURCE_REPO=""
 EMSDK_VERSION="latest"
@@ -84,11 +96,27 @@ else
 	echo "Cloning source repo..."
 	git clone ${SOURCE_REPO}
 fi
+
 cd ${REPO_FOLDER}
-../Qt5_binaries/bin/qmake -r MNECPP_CONFIG=wasm
-make -j4
+
+# ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG=wasm
+# make -j4
 GIT_HASH=$(git rev-parse HEAD)
-cd ..
+# cd ..
+
+# export QT_DIR="/home/gbm/Documents/Code/mne_wasm/Qt5_binaries/lib/cmake/Qt5"
+# export Qt5_DIR="/home/gbm/Documents/Code/mne_wasm/Qt5_binaries/lib/cmake/Qt5"
+# echo $QT_DIR
+#
+# export PATH="/home/gbm/Documents/Code/mne_wasm/Qt5_binaries/bin:$PATH"
+# export LD_LIBRARY_PATH="/home/gbm/Documents/Code/mne_wasm/Qt5_binaries/lib:$LD_LIBRARY_PATH"
+#
+export CMAKE_PREFIX_PATH="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
+
+emcmake cmake -B build -S src 
+ 
+cmake --build build
+
 echo "Done"
 
 ## WASM coi fix
