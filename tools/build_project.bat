@@ -352,8 +352,6 @@ doPrintHelp() {
   echo " "
 }
 
-SubStrDebug="Debug"
-SubStrRelease="Release"
 for (( j=0; j<argc; j++)); do
   if [ "${argv[j]}" == "coverage" ]; then
     WithCodeCoverage="true"
