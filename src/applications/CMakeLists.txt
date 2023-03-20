@@ -56,11 +56,9 @@ if(NOT WASM)
   if(BUILD_MNE_SCAN)
     add_subdirectory(mne_scan)
   endif()
-
   if(BUILD_MNE_RT_SERVER)
     add_subdirectory(mne_rt_server)
   endif()
-
   if(BUILD_MNE_FORWARD_SOLUTION)
     add_subdirectory(mne_forward_solution)
   endif()

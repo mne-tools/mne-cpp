@@ -52,6 +52,8 @@ option(WASM "Setup build for wasm" OFF)
 
 if(WASM)
   add_compile_definitions(WASMBUILD)
+  add_link_options(--bind)
+  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
   # set(CMAKE_PREFIX_PATH ${WASM_QT_PATH})
   # message("CPP - ${CMAKE_PREFIX_PATH}")
   set(BUILD_SHARED_LIBS OFF)
