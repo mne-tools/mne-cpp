@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
 project(mne_cpp LANGUAGES CXX)
 
-# ==============================================================================
-# Global build options
+##==============================================================================
+## Global build options
 
 set(CMAKE_CXX_STANDARD 14)
 
@@ -45,8 +45,8 @@ if(USE_FFTW)
   set(EIGEN_FFTW_DEFAULT)
 endif()
 
-# ==============================================================================
-# WASM
+##==============================================================================
+## WASM
 
 option(WASM "Setup build for wasm" OFF)
 
@@ -59,8 +59,8 @@ if(WASM)
   set(NO_EXAMPLES ON)
 endif()
 
-# ==============================================================================
-# Misc. settings
+##==============================================================================
+## Misc. settings
 
 # Generate json file detailing project compilation. (Typically for LSPs)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
@@ -86,8 +86,8 @@ if(NOT DEFINED BINARY_OUTPUT_DIRECTORY)
   )
 endif()
 
-# ==============================================================================
-# Dissalow in-soure builds by default
+##==============================================================================
+## Dissalow in-soure builds by default
 
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   if(NOT DEFINED FORCE_IN_SOURCE_BUILD)
@@ -107,12 +107,12 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   endif()
 endif()
 
-# ==============================================================================
+##==============================================================================
 find_package(QT NAMES Qt6 Qt5)
 message("QT_DIR - ${QT_DIR}")
 
-# ==============================================================================
-# Save git hash for project
+##==============================================================================
+## Save git hash for project
 
 set(MNE_GIT_HASH_SHORT "No git hash")
 set(MNE_GIT_HASH_LONG "No git hash")
@@ -128,8 +128,8 @@ execute_process(
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-# ==============================================================================
-# Add subdirecotries
+##==============================================================================
+## Add subdirectories
 
 add_subdirectory(libraries)
 add_subdirectory(external)
