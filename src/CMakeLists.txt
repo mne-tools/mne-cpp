@@ -52,6 +52,9 @@ option(WASM "Setup build for wasm" OFF)
 
 if(WASM)
   add_compile_definitions(WASMBUILD)
+  # set(CMAKE_PREFIX_PATH ${WASM_QT_PATH})
+  # message("CPP - ${CMAKE_PREFIX_PATH}")
+  set(BUILD_SHARED_LIBS OFF)
   set(NO_TESTS ON)
   set(NO_EXAMPLES ON)
 endif()
@@ -103,6 +106,10 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
     )
   endif()
 endif()
+
+# ==============================================================================
+find_package(QT NAMES Qt6 Qt5)
+message("QT_DIR - ${QT_DIR}")
 
 # ==============================================================================
 # Save git hash for project
