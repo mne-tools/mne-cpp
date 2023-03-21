@@ -157,7 +157,8 @@
       ECHO Usage: ./build_project.bat [Options]
       ECHO.
       ECHO All builds will be parallel.
-      ECHO All options can be used in undefined order.
+      ECHO All options can be used in undefined order, except for the extra args, 
+      ECHO which have to be at the end.
       ECHO.
       ECHO [help]  - Print this help.
       ECHO [mock]  - Show commands do not execute them.
@@ -333,7 +334,8 @@ doPrintHelp() {
   echo "Usage: ./build_project.bat [Options]"
   echo " "
   echo "All builds will be parallel."
-  echo "All options can be used in undefined order."
+  echo "All options can be used in undefined order, except for the extra args," 
+  echo "which have to be at the end."
   echo " "
   echo "[help]  - Print this help."
   echo "[mock]  - Show commands do not execute them."
@@ -346,9 +348,9 @@ doPrintHelp() {
   echo "[rebuild]  - Only rebuild existing build-system configuration."
   echo "[static]   - Build project statically. QT_DIR and Qt5_DIR must be set to"
   echo "             point to a static version of Qt."
-  ECHO "[--]       - Mark beginning of extra-arguments section. Any argument"
-  ECHO "             following the double dash will be passed on to cmake"
-  ECHO "             directly without it being parsed."
+  echo "[--]       - mark beginning of extra-arguments section. any argument"
+  echo "             following the double dash will be passed on to cmake"
+  echo "             directly without it being parsed."
   echo " "
 }
 

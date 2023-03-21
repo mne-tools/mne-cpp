@@ -19,9 +19,9 @@
     SETX VCINSTALLDIR "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\"
 
     SET "LINK_OPTION=dynamic"
-    SET "PACK_OPTION="
+    SET "PACK_OPTION=false"
     SET "BUILD_NAME="
-    SET "MOCK_BUILD=False"
+    SET "MOCK_BUILD=false"
     SET "MOCK_TEXT="
 
     :loop
@@ -33,14 +33,14 @@
             SET "LINK_OPTION=dynamic"
         )   
         IF "%1"=="pack" (
-            SET "PACK_OPTION=True"
+            SET "PACK_OPTION=true"
         )   
         IF "%1"=="help" (
             GOTO :showHelp
             GOTO :endOfScript
         )   
         IF "%1"=="mock" (
-            SET "MOCK_BUILD=True"
+            SET "MOCK_BUILD=true"
         )
         for /F "tokens=1 delims==" %%a in ("%1") do (
             REM ECHO %%a
@@ -55,7 +55,7 @@
 
     SET "OUT_DIR_NAME=%BASE_PATH%\out\%BUILD_NAME%"
 
-    IF "%MOCK_BUILD%"=="True" (
+    IF "%MOCK_BUILD%"=="true" (
         ECHO.
         ECHO Mock mode ON. Commands to be executed: 
         ECHO.
@@ -88,7 +88,7 @@
             %MOCK_TEXT%windeployqt %%f
         )
 
-        IF "%PACK_OPTION%"=="pack" (
+        IF "%PACK_OPTION%"=="true" (
             cd %BASE_PATH%
             REM Delete folders which we do not want to ship
             %MOCK_TEXT%rmdir %OUT_DIR_NAME%\resources\data /s /q 
@@ -98,7 +98,7 @@
 
     ) ELSE IF "%LINK_OPTION%"=="static" (
         
-        IF "%PACK_OPTION%"=="pack" (
+        IF "%PACK_OPTION%"=="true" (
             REM This script needs to be run from the top level mne-cpp repo folder
             REM Delete folders which we do not want to ship
             %MOCK_TEXT%rmdir %BASE_PATH%\out\\bin\resources /s /q
@@ -184,7 +184,199 @@ OutDirName=""
 LinkOption="dynamic"
 PackOption=""
 BuildName=""
-MockDeploy="False"
+MockDeploy="false"
+MockText=""
+
+doPrintConfiguration() {
+  echo " "
+  echo ========================================================================
+  echo ======================== MNE-CPP BUILD CONFIG ==========================
+  echo " "
+  echo " ScriptPath = $ScriptPath"
+  echo " BasePath   = $BasePath"
+  echo " OutDirName = $OutDirName"
+  echo " "
+  echo " LinkOption = $LinkOption"
+  echo " PackOption = $PackOption"
+  echo " BuildName  = $BuildName"
+  echo " MockDeploy = $MockDeploy"
+  echo " MockText   = $MockText"
+  echo " "
+  echo ========================================================================
+  echo ========================================================================
+  echo " "
+}
+
+doPrintHelp() {
+  echo " "
+  echo "Usage: ./deploy.bat [Options]"
+  echo " "
+  echo "All options can be used in undefined order."
+  echo " "
+  echo "[help] - Print this help."
+  echo "[mock] - Show commands do not execute them."
+  echo "[dynamic/static] - Set the link type as dynamic (default) or static."
+  echo "[pack] - Enable packaging of applications into a compressed file."
+  echo "[build-name=] - Specify the name of the build to deploy."
+  echo " "
+}
+
+for (( j=0; j<argc; j++ )); do
+    if [ "${argv[j]}" == "dynamic" ]; then
+        LinkOption="dynamic"
+    elif [ "${argv[j]}" == "static" ]; then
+        LinkOption="static"
+    elif [ "${argv[j]}" == "pack" ]; then
+        PackOption="true"
+    elif [ "${argv[j]}" == "help" ]; then
+        PrintHelp="true"
+    elif [ "${argv[j]}" == "mock" ]; then
+        MockBuild="true"
+    fi
+    inkarg=(${${argv[j]}//=/ })
+    if [ "${inkarg[0]}" == "build-name" ]; then
+        BuildName="${inkarg[1]}"
+    fi
+done
+
+OutFolder=${BASE_PATH}/out/${BuildName}
+
+if [ "${MockBuild}" == "true" ]; then
+  MockText="echo "
+  echo " "
+  echo "Mock mode ON. Commands to be executed: "
+  echo " "
+else
+  MockText=""
+fi
+
+if [ "${PrintHelp}" == "true" ]; then
+    doPrintHelp
+    exit(EXIT_SUCCESS)
+fi
+
+doPrintConfiguration
+
+if [[ ${LinkOption} == "dynamic" ]]; then
+
+    # Call macdeployqt on all .app bundles in the bin folder
+    for f in ${BasePath}/out/${BuildName}/apps/*.app; do $Qt5_DIR/bin/macdeployqt ${MockText}$f ; done
+
+    # Solve for dependencies for mne_scan.app bundle
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/mne_scan_plugins/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/mne_scan_plugins
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/resources
+    ${MockText}cp -a src/applications/mne_scan/plugins/brainflowboard/brainflow/installed/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
+    ${MockText}cp -a src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
+    # ${MockText}cp -a $Qt5_DIR/plugins/renderers/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/PlugIns/renderers
+
+    # Solve for dependencies for mne_analyze.app bundle
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/mne_analyze_plugins/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/resources
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/Frameworks
+    # ${MockText}cp -a $Qt5_DIR/plugins/renderers/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/PlugIns/renderers
+
+    # Solve for dependencies for mne_rt_server.app bundle
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/mne_rt_server_plugins/. ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/mne_rt_server_plugins
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/resources
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/Frameworks
+
+    # Solve for dependencies for mne_forward_solution.app bundle
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/MacOS/resources
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/Frameworks
+
+    # Solve for dependencies for mne_dipole_fit.app bundle
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_dipole_fit.app/Contents/MacOS/resources
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_dipole_fit.app/Contents/Frameworks
+
+    # Solve for dependencies for mne_anonymize.app bundle
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/MacOS/resources
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/Frameworks
+
+    if [[ ${PackOption} == "true" ]]; then
+
+        # Delete folders which we do not want to ship
+        ${MockText}rm -r ${BasePath}/out/${BuildName}/resouces/data
+        # delete these folders because they are in the macos app containers already
+        ${MockText}rm -r ${BasePath}/out/${BuildName}/apps/mne_scan_plugins
+        ${MockText}rm -r ${BasePath}/out/${BuildName}/apps/mne_analyze_plugins
+        ${MockText}rm -r ${BasePath}/out/${BuildName}/apps/mne_rt_server_plugins
+
+        # Creating archive of all macos deployed applications
+        ${MockText}tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz ${BasePath}/out/${BuildName}/apps/.
+    fi
+
+elif [[ ${LinkOption} == "static" ]]; then
+
+    # This script needs to be run from the top level mne-cpp repo folder
+    # Solve for dependencies for mne_scan.app bundle
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/resources
+
+    # Solve for dependencies for mne_analyze.app bundle
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/resources
+
+    # Solve for dependencies for mne_rt_server.app bundle
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/resources
+
+    # Solve for dependencies for mne_forward_solution.app bundle
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/MacOS/resources
+
+    # Solve for dependencies for mne_dipole_fit.app bundle
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_dipole_target_compile_definitions(mytgt PRIVATE BUILT_SHARED=$<BOOL:${BUILD_SHARED_LIBS}>) # or using `if()` for the bool conversiofit.app/Contents/MacOS/resources
+
+    # Solve for dependencies for mne_anonymize.app bundle
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/MacOS/resources
+
+    if [[ ${PackOption} == "true" ]]; then
+        # Delete folders which we do not want to ship
+        ${MockText}cp -r ${BasePath}/out/${BuildName}/ mne-cpp
+        ${MockText}rm -r mne-cpp/resources/data
+        ${MockText}rm -r mne-cpp/apps/mne_scan_plugins
+        ${MockText}rm -r mne-cpp/apps/mne_analyze_plugins
+        ${MockText}rm -r mne-cpp/apps/mne_rt_server_plugins
+
+        # Creating archive of all macos deployed applications
+        ${MockText}tar cfvz mne-cpp-macos-static-x86_64.tar.gz mne-cpp
+    fi
+
+else 
+    echo "Input argument link_option is invalid."
+    doPrintConfiguration
+    doPrintHelp
+    exit{EXIT_FAIL}
+fi
+
+    # ############## MAC SECTION ENDS ######################
+    # ######################################################
+
+elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+    
+    # ######################################################
+    # ############## LINUX SECTION #########################
+
+
+argc=$#
+argv=("$@")
+
+function cleanAbsPath()
+{
+    local  cleanAbsPathStr="$( #spawns a new bash interpreter
+        cd "$1" >/dev/null 2>&1 #change directory to that folder
+        pwd -P
+    )"
+    echo "$cleanAbsPathStr"
+}
+
+
+EXIT_FAIL=1
+EXIT_SUCCESS=0
+ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
+BasePath="$(cleanAbsPath "$ScriptPath/..")"
+OutDirName=""
+LinkOption="dynamic"
+PackOption=""
+BuildName=""
+MockDeploy="false"
 MockText=""
 
 doPrintConfiguration() {
@@ -239,7 +431,7 @@ for (( j=0; j<argc; j++ )); do
     fi
 done
 
-OutFolder=${BASE_PATH}/out/${BuildName}
+OutFolder=${BasePath}/out/${BuildName}
 
 if [ "${MockBuild}" == "true" ]; then
   MockText="echo "
@@ -249,8 +441,7 @@ if [ "${MockBuild}" == "true" ]; then
 else
   MockText=""
 fi
-
-
+    
 if [ "${PrintHelp}" == "true" ]; then
     doPrintHelp
     exit(EXIT_SUCCESS)
@@ -258,215 +449,97 @@ fi
 
 doPrintConfiguration
 
-exit
+if [[ ${LinkOption} == "dynamic" ]]; then
 
-if [[ ${LinkOption} == dynamic ]]; then
+    # Copy additional brainflow libs
+    ${MockText}cp -a ${BASE_PATH}/src/applications/mne_scan/plugins/brainflowboard/brainflow/installed/out/${BuildName}/lib/. ${BASE_PATH}/out/${BuildName}/lib/
 
-    # Call macdeployqt on all .app bundles in the bin folder
-    for f in ${BasePath}/out/${BuildName}/apps/*.app; do $Qt5_DIR/bin/macdeployqt $f ; done
+    # Copy additional LSL libs
+    ${MockText}cp -a ${BASE_PATH}/src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/${BuildName}/lib/. ${BASE_PATH}/out/${BuildName}/lib/
 
-    # Solve for dependencies for mne_scan.app bundle
-    cp -a ${BasePath}/out/${BuildName}/apps/mne_scan_plugins/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/mne_scan_plugins
-    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/resources
-    cp -a src/applications/mne_scan/plugins/brainflowboard/brainflow/installed/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
-    cp -a src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
-    cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
-    # cp -a $Qt5_DIR/plugins/renderers/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/PlugIns/renderers
+    # Install some additional packages so linuxdeployqt can find them
+    sudo apt-get update
+    sudo apt-get install libxkbcommon-x11-0
+    sudo apt-get install libxcb-icccm4
+    sudo apt-get install libxcb-image0
+    sudo apt-get install libxcb-keysyms1
+    sudo apt-get install libxcb-render-util0
+    sudo apt-get install libbluetooth3
+    sudo apt-get install libxcb-xinerama0 
+    ${MockText}export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/out/${BuildName}/lib/x86_64-linux-gnu/
 
-    # Solve for dependencies for mne_analyze.app bundle
-    cp -a ${BasePath}/out/${BuildName}/apps/mne_analyze_plugins/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
-    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/resources
-    cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/Frameworks
-    # cp -a $Qt5_DIR/plugins/renderers/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/PlugIns/renderers
+    # Downloading linuxdeployqt from continious release
+    ${MockText}get -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+    ${MockText}sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
 
-    # Solve for dependencies for mne_rt_server.app bundle
-    cp -a ${BasePath}/out/${BuildName}/apps/mne_rt_server_plugins/. ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/mne_rt_server_plugins
-    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/resources
-    cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/Frameworks
+    # linuxdeployqt uses mne_scan and mne_analyze binary to resolve dependencies
+    cd ${BASE_PATH}/mne-cpp
+    ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_scan -verbose2 -extra-plugins=renderers
+    ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_analyze -verbose2 -extra-plugins=renderers
 
-    # Solve for dependencies for mne_forward_solution.app bundle
-    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/MacOS/resources
-    cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/Frameworks
+    # Manually copy in the libxcb-xinerama library which is needed by plugins/platforms/libxcb.so
+    ${MockText}cp /usr/out/${BuildName}/lib/x86_64-linux-gnu/libxcb-xinerama.so.0 ${BASE_PATH}/mne-cpp/out/${BuildName}/lib/
 
-    # Solve for dependencies for mne_dipole_fit.app bundle
-    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_dipole_fit.app/Contents/MacOS/resources
-    cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_dipole_fit.app/Contents/Frameworks
-
-    # Solve for dependencies for mne_anonymize.app bundle
-    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/MacOS/resources
-    cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/Frameworks
-
-    if [[ ${PACK_OPTION} == pack ]]; then
-
-        # Delete folders which we do not want to ship
-        rm -r ${BasePath}/out/${BuildName}/resouces/data
-        # delete these folders because they are in the macos app containers already
-        rm -r ${BasePath}/out/${BuildName}/apps/mne_scan_plugins
-        rm -r ${BasePath}/out/${BuildName}/apps/mne_analyze_plugins
-        rm -r ${BasePath}/out/${BuildName}/apps/mne_rt_server_plugins
-
-        # Creating archive of all macos deployed applications
-        tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz ${BasePath}/out/${BuildName}/apps/.
-    fi
-
-elif [[ ${LINK_OPTION} == static ]]; then
-
-    cd ${BASE_PATH}
-
-    # This script needs to be run from the top level mne-cpp repo folder
-    # Solve for dependencies for mne_scan.app bundle
-    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/resources
-
-    # Solve for dependencies for mne_analyze.app bundle
-    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/resources
-
-    # Solve for dependencies for mne_rt_server.app bundle
-    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/resources
-
-    # Solve for dependencies for mne_forward_solution.app bundle
-    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/MacOS/resources
-
-    # Solve for dependencies for mne_dipole_fit.app bundle
-    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_dipole_target_compile_definitions(mytgt PRIVATE BUILT_SHARED=$<BOOL:${BUILD_SHARED_LIBS}>) # or using `if()` for the bool conversiofit.app/Contents/MacOS/resources
-
-    # Solve for dependencies for mne_anonymize.app bundle
-    cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/MacOS/resources
-
-    if [[ ${PACK_OPTION} == pack ]]; then
-        # Delete folders which we do not want to ship
-        cp -r ${BasePath}/out/${BuildName}/ mne-cpp
-        rm -r mne-cpp/resources/data
-        rm -r mne-cpp/apps/mne_scan_plugins
-        rm -r mne-cpp/apps/mne_analyze_plugins
-        rm -r mne-cpp/apps/mne_rt_server_plugins
-
-        # Creating archive of all macos deployed applications
-        tar cfvz mne-cpp-macos-static-x86_64.tar.gz mne-cpp
-    fi
-
-else 
-    echo "Input argument link_option is invalid."
-    doPrintConfiguration
-    doPrintHelp
-    exit{EXIT_FAIL}
-fi
-
-    # ############## MAC SECTION ENDS ######################
-    # ######################################################
-
-elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-    
-    # ######################################################
-    # ############## LINUX SECTION #########################
-
-    LINK_OPTION=$1
-    PACK_OPTION=$2
-    SCRIPT_PATH="$(
-        cd "$(dirname "$0")" >/dev/null 2>&1
-        pwd -P
-    )"
-    BASE_PATH=${SCRIPT_PATH}/../..
-
-    if [ -z ${LINK_OPTION} ]; then
-        LINK_OPTION=dynamic
-    fi
-
-    if [[ ${LINK_OPTION} == dynamic ]]; then
-
-        # Copy additional brainflow libs
-        cp -a ${BASE_PATH}/src/applications/mne_scan/plugins/brainflowboard/brainflow/installed/out/${BuildName}/lib/. ${BASE_PATH}/out/${BuildName}/lib/
-
-        # Copy additional LSL libs
-        cp -a ${BASE_PATH}/src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/${BuildName}/lib/. ${BASE_PATH}/out/${BuildName}/lib/
-
-        # Install some additional packages so linuxdeployqt can find them
-        sudo apt-get update
-        sudo apt-get install libxkbcommon-x11-0
-        sudo apt-get install libxcb-icccm4
-        sudo apt-get install libxcb-image0
-        sudo apt-get install libxcb-keysyms1
-        sudo apt-get install libxcb-render-util0
-        sudo apt-get install libbluetooth3
-        sudo apt-get install libxcb-xinerama0 
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/out/${BuildName}/lib/x86_64-linux-gnu/
-
-        cd ${BASE_PATH}
-
-        # Downloading linuxdeployqt from continious release
-        wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-        sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
-
-        # linuxdeployqt uses mne_scan and mne_analyze binary to resolve dependencies
-        cd ${BASE_PATH}/mne-cpp
-        ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_scan -verbose2 -extra-plugins=renderers
-        ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_analyze -verbose2 -extra-plugins=renderers
-
-        # Manually copy in the libxcb-xinerama library which is needed by plugins/platforms/libxcb.so
-        cp /usr/out/${BuildName}/lib/x86_64-linux-gnu/libxcb-xinerama.so.0 ${BASE_PATH}/mne-cpp/out/${BuildName}/lib/
-
-        if [[ ${PACK_OPTION} == pack ]]; then
-            echo 
-            echo ldd ./out/${BuildName}/apps/mne_scan
-            ldd ./out/${BuildName}/apps/mne_scan
-
-            echo 
-            echo ldd ./plugins/platforms/libqxcb.so
-            ldd ./plugins/platforms/libqxcb.so
-
-            # Delete folders which we do not want to ship
-            cp -r ${BasePath}/out/${BuildName}/ mne-cpp
-            rm -r mne-cpp/resources/data
-
-            # Creating archive of everything in current directory
-            tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz mne-cpp   
-        fi
-
-    elif [[ ${LINK_OPTION} == static ]]; then
-
-        cd ${BASE_PATH}
-
-        sudo apt-get update
-        sudo apt-get install libxkbcommon-x11-0
-        sudo apt-get install libxcb-icccm4
-        sudo apt-get install libxcb-image0
-        sudo apt-get install libxcb-keysyms1
-        sudo apt-get install libxcb-render-util0
-        sudo apt-get install libbluetooth3
-        sudo apt-get install libxcb-xinerama0
-        export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/out/${BuildName}/lib/x86_64-linux-gnu/
-
-        # Downloading linuxdeployqt from continious release
-        wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-        sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
-
-        # Creating a directory for linuxdeployqt to create results 
-        sudo mkdir -p -m777 mne-cpp
-
-        # linuxdeployqt uses mne_scan and mne_analyze binary to resolve dependencies
-        cd mne-cpp
-        ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_scan -verbose2 -extra-plugins=renderers
-        ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_analyze -verbose2 -extra-plugins=renderers
-
-        echo
+    if [[ ${PackOption} == "true" ]]; then
+        echo 
         echo ldd ./out/${BuildName}/apps/mne_scan
-        ldd ./out/${BuildName}/apps/mne_scan
+        ${MockText}ldd ./out/${BuildName}/apps/mne_scan
+
+        echo 
+        echo ldd ./plugins/platforms/libqxcb.so
+        ${MockText}ldd ./plugins/platforms/libqxcb.so
 
         # Delete folders which we do not want to ship
-        cp -r ${BasePath}/out/ mne-cpp
-        rm -r mne-cpp/resources/data
-        rm -r mne-cpp/apps/mne_rt_server_plugins
-        rm -r mne-cpp/apps/mne_scan_plugins
-        rm -r mne-cpp/apps/mne_analyze_plugins
+        ${MockText}cp -r ${BasePath}/out/${BuildName}/ mne-cpp
+        ${MockText}rm -r mne-cpp/resources/data
 
-        if [[ ${PACK_OPTION} == pack ]]; then
-            # Creating archive of everything in the bin directory
-            tar cfvz ../mne-cpp-linux-static-x86_64.tar.gz mne-cpp
-        fi
+        # Creating archive of everything in current directory
+        ${MockText}tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz mne-cpp   
+    fi
+
+elif [[ ${LinkOption} == "static" ]]; then
+
+    sudo apt-get update
+    sudo apt-get install libxkbcommon-x11-0
+    sudo apt-get install libxcb-icccm4
+    sudo apt-get install libxcb-image0
+    sudo apt-get install libxcb-keysyms1
+    sudo apt-get install libxcb-render-util0
+    sudo apt-get install libbluetooth3
+    sudo apt-get install libxcb-xinerama0
+    ${MockText}export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/out/${BuildName}/lib/x86_64-linux-gnu/
+
+    # Downloading linuxdeployqt from continious release
+    ${MockText}wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+    ${MockText}sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+
+    # Creating a directory for linuxdeployqt to create results 
+    ${MockText}sudo mkdir -p -m777 mne-cpp
+
+    # linuxdeployqt uses mne_scan and mne_analyze binary to resolve dependencies
+    cd mne-cpp
+    ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_scan -verbose2 -extra-plugins=renderers
+    ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_analyze -verbose2 -extra-plugins=renderers
+
+    echo
+    echo ldd ./out/${BuildName}/apps/mne_scan
+    ${MockText}ldd ./out/${BuildName}/apps/mne_scan
+
+    # Delete folders which we do not want to ship
+    ${MockText}cp -r ${BasePath}/out/ mne-cpp
+    ${MockText}rm -r mne-cpp/resources/data
+    ${MockText}rm -r mne-cpp/apps/mne_rt_server_plugins
+    ${MockText}rm -r mne-cpp/apps/mne_scan_plugins
+    ${MockText}rm -r mne-cpp/apps/mne_analyze_plugins
+
+    if [[ ${PackOption} == "true" ]]; then
+        # Creating archive of everything in the bin directory
+        ${MockText}tar cfvz ${BasePath}/mne-cpp-linux-static-x86_64.tar.gz mne-cpp
+    fi
 
     else 
-        echo "Input argument link_option is invalid."
-        echo "Input argument link_option is set to ${LINK_OPTION}."
-        echo "Use: static or dynamic"
+        echo "Error. Link optin can only be dynamic or static."
+        doPrintHelp
     fi
 
     # ############## LINUX SECTION ENDS ####################
