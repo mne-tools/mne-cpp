@@ -176,8 +176,8 @@ function cleanAbsPath()
 }
 
 
-EXIT_FAIL=1
 EXIT_SUCCESS=0
+EXIT_FAIL=1
 ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
 BasePath="$(cleanAbsPath "$ScriptPath/..")"
 OutDirName=""
@@ -252,7 +252,7 @@ fi
 
 if [ "${PrintHelp}" == "true" ]; then
     doPrintHelp
-    exit(EXIT_SUCCESS)
+    exit ${EXIT_SUCCESS} 
 fi
 
 doPrintConfiguration
@@ -343,7 +343,7 @@ else
     echo "Input argument link_option is invalid."
     doPrintConfiguration
     doPrintHelp
-    exit{EXIT_FAIL}
+    exit ${EXIT_FAIL}
 fi
 
     # ############## MAC SECTION ENDS ######################
@@ -444,7 +444,7 @@ fi
     
 if [ "${PrintHelp}" == "true" ]; then
     doPrintHelp
-    exit(EXIT_SUCCESS)
+    exit ${EXIT_SUCCESS} 
 fi
 
 doPrintConfiguration
@@ -540,6 +540,7 @@ elif [[ ${LinkOption} == "static" ]]; then
     else 
         echo "Error. Link optin can only be dynamic or static."
         doPrintHelp
+        exit ${EXIT_FAIL}
     fi
 
     # ############## LINUX SECTION ENDS ####################
