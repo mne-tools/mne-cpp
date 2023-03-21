@@ -1,11 +1,5 @@
 #!/bin/bash
 
-###
-# It is recommended you run this script while in an empty directory.
-# The script will download and build the necessary components, and 
-# reuse them if they are already present. 
-###
-
 argc=$# # number of arguments passed (not counting the command itself)
 argv=("$@") # list of arguments passed (not including the command itself)
 
@@ -24,7 +18,6 @@ PROJECT_PATH="$(cleanAbsPath "$SCRIPT_PATH/../..")"
 cd ${PROJECT_PATH}
 
 ## User editable through flags
-SOURCE_REPO=""
 EMSDK_VERSION="latest"
 QT_VERSION="5.15"
 
@@ -77,30 +70,8 @@ else
 fi
 echo "Qt set up."
 
-# ../Qt5_binaries/bin/qmake -r MNECPP_CONFIG=wasm
-# make -j4
+## Build project
 GIT_HASH=$(git rev-parse HEAD)
-# cd ..
-
-# echo $QT_DIR
-#
-# export PATH="/home/gbm/Documents/Code/mne_wasm/Qt5_binaries/bin:$PATH"
-# export LD_LIBRARY_PATH="/home/gbm/Documents/Code/mne_wasm/Qt5_binaries/lib:$LD_LIBRARY_PATH"
-#
-
-# export CMAKE_PREFIX_PATH="${PROJECT_PATH}/Qt5_binaries:${CMAKE_PREFIX_PATH}"
-# export QT_DIR="${PROJECT_PATH}/Qt5_binaries/lib/cmake/Qt5"
-# export Qt5_DIR="${PROJECT_PATH}/Qt5_binaries/lib/cmake/Qt5"
-
-# export PATH="${PROJECT_PATH}/Qt5_binaries/bin:$PATH"
-# export LD_LIBRARY_PATH="${PROJECT_PATH}/mne_wasm/Qt5_binaries/lib:$LD_LIBRARY_PATH"
-
-
-# echo "QT DIR = $QT_DIR"
-# echo "Qt5_DIR = $Qt5_DIR"
-# echo "PREFIX_PATH = ${CMAKE_PREFIX_PATH}"
-
-#emconfigure
 
 QT_CMAKE_FLAGS=""
 
@@ -112,9 +83,6 @@ done
 echo "DIRS ---> ${QT_CMAKE_FLAGS}"
 
 emcmake cmake -B build -S src -DWASM=ON -DQT_DIR=${PROJECT_PATH}/Qt5_binaries/lib/cmake/Qt5 ${QT_CMAKE_FLAGS}
-
-#-DWASM_QT_PATH=${PROJECT_PATH}/Qt5_binaries/lib/cmake/Qt5
-
 cmake --build build --parallel $(expr $(nproc --all))
 
 echo "Done"
