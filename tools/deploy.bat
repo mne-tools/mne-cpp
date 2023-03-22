@@ -233,7 +233,7 @@ for (( j=0; j<argc; j++ )); do
     elif [ "${argv[j]}" == "mock" ]; then
         MockBuild="true"
     fi
-    inkarg=(${${argv[j]}//=/ })
+    IFS='=' read -r -a inkarg <<< "$argv[j]"
     if [ "${inkarg[0]}" == "build-name" ]; then
         BuildName="${inkarg[1]}"
     fi
@@ -322,7 +322,7 @@ elif [[ ${LinkOption} == "static" ]]; then
     ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/MacOS/resources
 
     # Solve for dependencies for mne_dipole_fit.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_dipole_target_compile_definitions(mytgt PRIVATE BUILT_SHARED=$<BOOL:${BUILD_SHARED_LIBS}>) # or using `if()` for the bool conversiofit.app/Contents/MacOS/resources
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_dipole_fit.app/Contents/MacOS/resources 
 
     # Solve for dependencies for mne_anonymize.app bundle
     ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/MacOS/resources
