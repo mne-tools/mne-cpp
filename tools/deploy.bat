@@ -206,8 +206,8 @@ doPrintConfiguration() {
   echo " "
 }
 
+doPrintHelp() {
   echo " "
-  doPrintHelp() {
   echo "Usage: ./deploy.bat [Options]"
   echo " "
   echo "All options can be used in undefined order."
