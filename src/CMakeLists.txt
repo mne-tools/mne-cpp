@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.15)
-project(mne_cpp
-  LANGUAGES CXX
-)
+project(mne_cpp LANGUAGES CXX)
 
 ##==============================================================================
 ## Global build options
@@ -140,7 +138,6 @@ cmake_path(
 message(STATUS "PROJECT_RESOURCES_DIR=${PROJECT_RESOURCES_DIR}")
 message(STATUS "OUTPUT_RESOURCES_DIR=${OUTPUT_RESOURCES_DIR}")
 
-
 if(WIN32)
   execute_process(
     COMMAND ${CMAKE_COMMAND} -E make_directory ${BINARY_OUTPUT_DIRECTORY}
@@ -156,7 +153,6 @@ if(WIN32)
       ${PROJECT_RESOURCES_DIR} ${OUTPUT_RESOURCES_DIR}
     )
   endif()
-  
 else()
   execute_process(
     COMMAND ${CMAKE_COMMAND} -E make_directory ${BINARY_OUTPUT_DIRECTORY}
@@ -164,3 +160,4 @@ else()
     ${PROJECT_RESOURCES_DIR} ${OUTPUT_RESOURCES_DIR}
   )
 endif()
+
