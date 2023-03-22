@@ -156,6 +156,7 @@ for (( j=0; j<argc; j++)); do
     PrintHelp="true"
   elif [ "${argv[j]}" == "withCoverage" ]; then
     RunCodeCoverage="true"
+  fi
   IFS='=' read -r -a inkarg <<< "$argv[j]"
   if [ "${inkarg[0]}" == "build-name" ]; then
       BuildName="${inkarg[1]}"
