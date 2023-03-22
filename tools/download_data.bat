@@ -114,10 +114,10 @@ fi
 if [[ ${DownloadSampleData} == "true" ]]; then
   curl -O https://files.osf.io/v1/resources/rxvq7/providers/osfstorage/59c0e26f9ad5a1025c4ab159\?action\=download\&direct\&version\=6 
   mv 59c0e26f9ad5a1025c4ab159 ${ResourcesFolder}/data/MNE-sample-data.tar.gz
-  rm -fr ${ResourcesFolder}/data/MNE-sample-data
+  currentFolder=`pwd`
   cd ${ResourcesFolder}/data/
   tar -xvf MNE-sample-data.tar.gz 
-  cd ../..
+  cd ${currentFolder}
 fi
 
     # ############## LINUX MAC SECTION ENDS ######################
