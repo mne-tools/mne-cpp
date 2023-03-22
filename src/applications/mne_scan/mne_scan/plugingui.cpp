@@ -488,7 +488,7 @@ void PluginGui::deleteItem()
 
 //=============================================================================================================
 
-void PluginGui::pointerGroupClicked(QAbstractButton*)
+void PluginGui::pointerGroupClicked()
 {
     m_pPluginScene->setMode(PluginScene::Mode(m_pButtonGroupPointers->checkedId()));
 }
@@ -625,7 +625,7 @@ void PluginGui::createToolbars()
     m_pButtonGroupPointers->addButton(m_pPointerButton, int(PluginScene::MovePluginItem));
     m_pButtonGroupPointers->addButton(m_pLinePointerButton, int(PluginScene::InsertLine));
 
-    connect(m_pButtonGroupPointers, &QButtonGroup::buttonClicked,
+    connect(m_pButtonGroupPointers, QOverload<int>::of(&QButtonGroup::buttonClicked),
             this, &PluginGui::pointerGroupClicked);
 
     m_pToolBarPointer = new QToolBar(tr("Pointer type"), this);

@@ -193,9 +193,11 @@ inline bool RtNoise::isRunning()
 }
 } // NAMESPACE
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #ifndef metatype_matrix
 #define metatype_matrix
 Q_DECLARE_METATYPE(Eigen::MatrixXd); /**< Provides QT META type declaration of the Eigen::MatrixXd type. For signal/slot usage.*/
+#endif
 #endif
 
 #endif // RTNOISE_RTPROCESSING_H

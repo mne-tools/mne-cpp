@@ -61,6 +61,7 @@
 #include <QSettings>
 #include <QApplication>
 #include <QKeyEvent>
+#include <QScreen>
 
 //=============================================================================================================
 // EIGEN INCLUDES

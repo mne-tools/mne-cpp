@@ -48,7 +48,6 @@
 #include <Qt3DCore/QEntity>
 #include <Qt3DCore/QTransform>
 #include <Qt3DRender/QComputeCommand>
-#include <Qt3DCore/QAttribute>
 #include <Qt3DRender/QGeometryRenderer>
 #include <QBuffer>
 
@@ -78,9 +77,9 @@ GpuInterpolationItem::GpuInterpolationItem(Qt3DCore::QEntity *p3DEntityParent, i
 , m_bIsDataInit(false)
 , m_pGPUMaterial(new GpuInterpolationMaterial())
 , m_pCustomMesh(new CustomMesh)
-, m_pInterpolationMatBuffer(new Qt3DCore::QBuffer())
-, m_pOutputColorBuffer(new Qt3DCore::QBuffer())
-, m_pSignalDataBuffer(new Qt3DCore::QBuffer())
+, m_pInterpolationMatBuffer(new QT_NAMESPACE_3D::QBuffer())
+, m_pOutputColorBuffer(new QT_NAMESPACE_3D::QBuffer())
+, m_pSignalDataBuffer(new QT_NAMESPACE_3D::QBuffer())
 {
 }
 
@@ -106,9 +105,9 @@ void GpuInterpolationItem::initData(const MatrixX3f &matVertices,
     }
 
     //Create and add interpolated color signal attribute    
-    Qt3DCore::QAttribute* pInterpolatedSignalAttrib = new QAttribute;
-    pInterpolatedSignalAttrib->setAttributeType(Qt3DCore::QAttribute::VertexAttribute);
-    pInterpolatedSignalAttrib->setVertexBaseType(Qt3DCore::QAttribute::Float);
+    QT_NAMESPACE_3D::QAttribute* pInterpolatedSignalAttrib = new QAttribute;
+    pInterpolatedSignalAttrib->setAttributeType(QT_NAMESPACE_3D::QAttribute::VertexAttribute);
+    pInterpolatedSignalAttrib->setVertexBaseType(QT_NAMESPACE_3D::QAttribute::Float);
     pInterpolatedSignalAttrib->setVertexSize(4);
     pInterpolatedSignalAttrib->setByteOffset(0);
     pInterpolatedSignalAttrib->setByteStride(4 * sizeof(float));
