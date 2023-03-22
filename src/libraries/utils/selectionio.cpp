@@ -52,6 +52,7 @@
 #include <QTextStream>
 #include <QFile>
 #include <QDebug>
+#include <QScreen>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -300,10 +301,7 @@ bool SelectionIO::writeBrainstormMonFiles(QString path, const QMultiMap<QString,
     if(!path.contains(".mon"))
         return false;
 
-    QMultiMapIterator<QString,QStringList> i(selectionMap);
-    while (i.hasNext()) {
-        i.next();
-
+    for(auto i = selectionMap.constBegin(); i != selectionMap.constEnd(); i++) {
         QFileInfo fileInfo(path);
 
         QString newPath = QString("%1/%2.mon").arg(fileInfo.absolutePath()).arg(i.key());

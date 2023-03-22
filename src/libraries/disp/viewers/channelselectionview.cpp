@@ -215,10 +215,8 @@ void ChannelSelectionView::setCurrentlyMappedFiffChannels(const QStringList &map
     m_selectionGroupsMap.insert("All", m_currentlyLoadedFiffChannels);
 
     //Add selection groups to list widget
-    QMultiMapIterator<QString, QStringList> selectionIndex(m_selectionGroupsMap);
-    while (selectionIndex.hasNext()) {
-        selectionIndex.next();
-        m_pUi->m_listWidget_selectionGroups->insertItem(m_pUi->m_listWidget_selectionGroups->count(), selectionIndex.key());
+    for(auto i = m_selectionGroupsMap.constBegin(); i != m_selectionGroupsMap.constEnd(); i++) {
+        m_pUi->m_listWidget_selectionGroups->insertItem(m_pUi->m_listWidget_selectionGroups->count(), i.key());
     }
 
     //Set group all as slected item
@@ -618,10 +616,9 @@ bool ChannelSelectionView::loadSelectionGroups(QString path)
     m_selectionGroupsMap.insert("All EEG", names);
 
     //Add selection groups to list widget
-    QMultiMapIterator<QString, QStringList> selectionIndex(m_selectionGroupsMap);
-    while (selectionIndex.hasNext()) {
-        selectionIndex.next();
-        m_pUi->m_listWidget_selectionGroups->insertItem(m_pUi->m_listWidget_selectionGroups->count(), selectionIndex.key());
+
+    for(auto i = m_selectionGroupsMap.constBegin(); i != m_selectionGroupsMap.constEnd(); i++) {
+        m_pUi->m_listWidget_selectionGroups->insertItem(m_pUi->m_listWidget_selectionGroups->count(), i.key());
     }
 
     //Update selection
@@ -647,13 +644,9 @@ bool ChannelSelectionView::loadSelectionGroups(QString path)
 
 void ChannelSelectionView::cleanUpMEGChannels()
 {
-    QMultiMapIterator<QString,QStringList> selectionIndex(m_selectionGroupsMap);
-
     //Iterate through all loaded selection groups
-    while(selectionIndex.hasNext()) {
-        selectionIndex.next();
-
-        QStringList channelList = selectionIndex.value();
+    for(auto i = m_selectionGroupsMap.constBegin(); i != m_selectionGroupsMap.constEnd(); i++) {
+        QStringList channelList = i.value();
 
         //Search the current selection group for MEG channels which are not in the currently loaded layout file and delete them
         QMutableStringListIterator stringListIndex(channelList);
@@ -665,7 +658,7 @@ void ChannelSelectionView::cleanUpMEGChannels()
         }
 
         //Overwrite old selection groups channels
-        m_selectionGroupsMap.insert(selectionIndex.key(), channelList);
+        m_selectionGroupsMap.insert(i.key(), channelList);
     }
 }
 

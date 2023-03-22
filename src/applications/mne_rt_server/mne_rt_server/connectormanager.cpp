@@ -49,7 +49,7 @@
 #include <communication/rtCommand/commandmanager.h>
 
 #ifdef STATICBUILD
-#include <../plugins/fiffsimulator/fiffsimulator.h>
+#include "../plugins/fiffsimulator/fiffsimulator.h"
 #endif
 
 #include <iostream>

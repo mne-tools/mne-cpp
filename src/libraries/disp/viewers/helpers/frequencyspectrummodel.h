@@ -349,9 +349,11 @@ inline qint32 FrequencySpectrumModel::getUpperFrqBound() const
 }
 } // NAMESPACE
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #ifndef metatype_rowvectorxd
 #define metatype_rowvectorxd
 Q_DECLARE_METATYPE(Eigen::RowVectorXd);    /**< Provides QT META type declaration of the Eigen::RowVectorXd type. For signal/slot usage.*/
+#endif
 #endif
 
 #endif // FREQUENCYSPECTRUMMODEL_H

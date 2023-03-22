@@ -45,6 +45,7 @@
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_raw_data.h>
+#include <fiff/fiff_file.h>
 
 #include "edf_info.h"
 #include "edf_raw_data.h"

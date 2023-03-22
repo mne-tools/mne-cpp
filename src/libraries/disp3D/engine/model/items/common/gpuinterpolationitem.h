@@ -49,8 +49,17 @@
 
 #include <QSharedPointer>
 #include <QPointer>
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#define QT_NAMESPACE_3D Qt3DRender
+#include <Qt3DRender/QBuffer>
+#include <Qt3DRender/QAttribute>
+#else
+#define QT_NAMESPACE_3D Qt3DCore
 #include <Qt3DCore/QBuffer>
 #include <Qt3DCore/QAttribute>
+#endif
+
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -184,9 +193,9 @@ protected:
     QPointer<CustomMesh>                    m_pCustomMesh;                  /**< The actual mesh information (vertices, normals, colors). */
     QPointer<Qt3DRender::QComputeCommand>   m_pComputeCommand;              /**< The compute command defines the work group size for the compute shader code execution . */
 
-    QPointer<Qt3DCore::QBuffer>           m_pInterpolationMatBuffer;      /**< The QBuffer/GLBuffer holding the interpolation matrix data. */
-    QPointer<Qt3DCore::QBuffer>           m_pOutputColorBuffer;           /**< The QBuffer/GLBuffer holding the output color (interpolated) data. */
-    QPointer<Qt3DCore::QBuffer>           m_pSignalDataBuffer;            /**< The QBuffer/GLBuffer holding the signal data. */
+    QPointer<QT_NAMESPACE_3D::QBuffer>           m_pInterpolationMatBuffer;      /**< The QBuffer/GLBuffer holding the interpolation matrix data. */
+    QPointer<QT_NAMESPACE_3D::QBuffer>           m_pOutputColorBuffer;           /**< The QBuffer/GLBuffer holding the output color (interpolated) data. */
+    QPointer<QT_NAMESPACE_3D::QBuffer>           m_pSignalDataBuffer;            /**< The QBuffer/GLBuffer holding the signal data. */
 };
 
 //=============================================================================================================

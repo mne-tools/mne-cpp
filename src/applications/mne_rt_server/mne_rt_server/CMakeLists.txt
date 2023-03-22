@@ -32,7 +32,7 @@ set(HEADERS
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES})
+    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES} ${HEADERS})
 else()
     add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 endif()
