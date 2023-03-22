@@ -112,6 +112,15 @@ RunCodeCoverage="false"
 
 ##### function definitions
 
+function cleanAbsPath()
+{
+    local  cleanAbsPathStr="$( #spawns a new bash interpreter
+        cd "$1" >/dev/null 2>&1 #change directory to that folder
+        pwd -P
+    )"
+    echo "$cleanAbsPathStr"
+}
+
 doPrintConfiguration() {
   echo =========================================
   echo " "  VerboseMode = $VerboseMode
@@ -120,11 +129,12 @@ doPrintConfiguration() {
 }
 
 doPrintHelp() {
+  echo "Usage: ./test_all.bat [Options]"
   echo " "
-  echo "MNE-CPP testing script help."
-  echo "This script will run all applications in bin folder starting with test_*"
-  echo "For help run: ./test_all.bat help"
-  echo "Normal call has 2 or 3 arguments: ./test_all.bat [verbose] [withCoverage]"
+  echo "All options can be used in undefined order."
+  echo " "
+  echo "[help] - Print this help."
+  echo "[build-name=] - Specify the build-name of which to run its tests."
   echo " "
 }
 
@@ -133,43 +143,46 @@ doPrintHelp() {
 argc=$#
 argv=("$@")
 
-RunCodeCoverage="false"
 VerboseMode="false"
-BuildType="Release"
+RunCodeCoverage="false"
+BuildName="Release"
+PrintHelp="false"
 
 for (( j=0; j<argc; j++)); do
   if [ "${argv[j]}" == "verbose" ]; then
     BUILD_COMMAND=1
     VerboseMode="true"
   elif [ "${argv[j]}" == "help" ]; then
-    doPrintHelp="true"
-    exit 1
+    PrintHelp="true"
   elif [ "${argv[j]}" == "withCoverage" ]; then
     RunCodeCoverage="true"
-  elif [ "${argv[j]}" == "Debug" ]; then
-    BuildType="Debug"
-  elif [ "${argv[j]}" == "Release" ]; then
-    BuildType="Release"
+  IFS='=' read -r -a inkarg <<< "$argv[j]"
+  if [ "${inkarg[0]}" == "build-name" ]; then
+      BuildName="${inkarg[1]}"
   fi
 done
 
-doPrintConfiguration
-
-##########
-
-RepoRootDir="$(dirname "$BASH_SOURCE")/.."
-echo $RepoRootDir
-
-if [[ $(uname) == "Linux" ]]; then
-  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$RepoRootDir/lib
+if [ "${PrintHelp}" == "true" ]; then
+    doPrintHelp
+    exit ${EXIT_SUCCESS} 
 fi
 
-########## start calling each test with some formatting
-CompoundOutput=0
+doPrintConfiguration
+
+#
+ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
+BasePath="$(cleanAbsPath "$ScriptPath/..")"
+
+if [[ $(uname) == "Linux" ]]; then
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$BasePath/lib
+fi
+
+# start calling each test with some formatting
 testColumnWidth=60
 printf "%${testColumnWidth}s %s\n" " Test Name " " Result "
 
-for test in $RepoRootDir/out/${BuildType}/tests/test_*;
+CompoundOutput=0
+for test in $BasePath/out/${BuildName}/tests/test_*;
 do
   # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
   # Codecov is able to process multiple uploads and merge them as soon as the CI job is done.
@@ -182,7 +195,7 @@ do
 
   if [ $lastReturnValue -ne 0 ]; then 
     CompoundOutput=$((CompoundOutput + 1))
-    printf "%${testColumnWidth}s \e[91m\033[1m %s \033[0m\e[0m\n" "${test}" "FAILED!"
+    printf "%${testColumnWidth}s \e[91m\033[1m %s \033[0m\e[0m\n" "${test}" "Failed!"
     if [ $ExitOnFirstFail == "true" ];
     then
       exit $lastReturnValue
@@ -197,11 +210,10 @@ do
     # Hide codecov output since it corrupts the log too much
     ./codecov &> /dev/null
   fi
-
 done
+
+exit $CompoundOutput
 
 # ############## LINUX MAC SECTION ENDS ################
 # ######################################################
-
-exit $CompoundOutput
 
