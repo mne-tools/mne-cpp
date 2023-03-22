@@ -122,7 +122,7 @@ signals:
 
 private:
 
-    void pointerGroupClicked(QAbstractButton* button);
+    void pointerGroupClicked();
     void actionGroupTriggered(QAction* action);
 
     bool removePlugin(SCSHAREDLIB::AbstractPlugin::SPtr pPlugin);

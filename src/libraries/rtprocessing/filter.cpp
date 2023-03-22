@@ -41,6 +41,7 @@
 
 #include <utils/mnemath.h>
 #include <fiff/fiff_raw_data.h>
+#include <fiff/fiff_file.h>
 
 //=============================================================================================================
 // QT INCLUDES

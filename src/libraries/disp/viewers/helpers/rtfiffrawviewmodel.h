@@ -839,9 +839,11 @@ inline int RtFiffRawViewModel::getFirstSampleOffset() const
 }
 } // NAMESPACE
 
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #ifndef metatype_rowvectorpair
 #define metatype_rowvectorpair
 Q_DECLARE_METATYPE(DISPLIB::RowVectorPair);
+#endif
 #endif
 
 #endif // RTFIFFRAWVIEWMODEL_H
