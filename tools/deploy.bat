@@ -175,7 +175,6 @@ function cleanAbsPath()
     echo "$cleanAbsPathStr"
 }
 
-
 EXIT_SUCCESS=0
 EXIT_FAIL=1
 ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
@@ -207,8 +206,8 @@ doPrintConfiguration() {
   echo " "
 }
 
-doPrintHelp() {
   echo " "
+  doPrintHelp() {
   echo "Usage: ./deploy.bat [Options]"
   echo " "
   echo "All options can be used in undefined order."
