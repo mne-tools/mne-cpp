@@ -183,7 +183,7 @@ BasePath="$(cleanAbsPath "$ScriptPath/..")"
 OutDirName=""
 LinkOption="dynamic"
 PackOption=""
-BuildName=""
+BuildName="Release"
 MockDeploy="false"
 MockText=""
 
@@ -263,69 +263,69 @@ if [[ ${LinkOption} == "dynamic" ]]; then
     for f in ${BasePath}/out/${BuildName}/apps/*.app; do $Qt5_DIR/bin/macdeployqt ${MockText}$f ; done
 
     # Solve for dependencies for mne_scan.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/mne_scan_plugins/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/mne_scan_plugins
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/resources
-    ${MockText}cp -a src/applications/mne_scan/plugins/brainflowboard/brainflow/installed/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
-    ${MockText}cp -a src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
-    # ${MockText}cp -a $Qt5_DIR/plugins/renderers/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/PlugIns/renderers
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/mne_scan_plugins ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/mne_scan_plugins
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/resources
+    ${MockText}cp -a src/applications/mne_scan/plugins/brainflowboard/brainflow/installed/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
+    ${MockText}cp -a src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
+    # ${MockText}cp -a $Qt5_DIR/plugins/renderers ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/PlugIns/renderers
 
     # Solve for dependencies for mne_analyze.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/mne_analyze_plugins/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/resources
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/Frameworks
-    # ${MockText}cp -a $Qt5_DIR/plugins/renderers/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/PlugIns/renderers
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/mne_analyze_plugins ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/resources
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/Frameworks
+    # ${MockText}cp -a $Qt5_DIR/plugins/renderers ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/PlugIns/renderers
 
     # Solve for dependencies for mne_rt_server.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/mne_rt_server_plugins/. ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/mne_rt_server_plugins
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/resources
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/Frameworks
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/mne_rt_server_plugins ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/mne_rt_server_plugins
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/resources
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/Frameworks
 
     # Solve for dependencies for mne_forward_solution.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/MacOS/resources
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/Frameworks
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/MacOS/resources
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/Frameworks
 
     # Solve for dependencies for mne_dipole_fit.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_dipole_fit.app/Contents/MacOS/resources
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_dipole_fit.app/Contents/Frameworks
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_dipole_fit.app/Contents/MacOS/resources
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_dipole_fit.app/Contents/Frameworks
 
     # Solve for dependencies for mne_anonymize.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/MacOS/resources
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib/. ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/Frameworks
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/MacOS/resources
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/Frameworks
 
     if [[ ${PackOption} == "true" ]]; then
 
         # Delete folders which we do not want to ship
         ${MockText}rm -r ${BasePath}/out/${BuildName}/resouces/data
         # delete these folders because they are in the macos app containers already
+        ${MockText}rm -r ${BasePath}/out/${BuildName}/apps/mne_rt_server_plugins
         ${MockText}rm -r ${BasePath}/out/${BuildName}/apps/mne_scan_plugins
         ${MockText}rm -r ${BasePath}/out/${BuildName}/apps/mne_analyze_plugins
-        ${MockText}rm -r ${BasePath}/out/${BuildName}/apps/mne_rt_server_plugins
 
         # Creating archive of all macos deployed applications
-        ${MockText}tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz ${BasePath}/out/${BuildName}/apps/.
+        ${MockText}tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz ${BasePath}/out/${BuildName}/apps
     fi
 
 elif [[ ${LinkOption} == "static" ]]; then
 
     # This script needs to be run from the top level mne-cpp repo folder
     # Solve for dependencies for mne_scan.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/resources
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/resources
 
     # Solve for dependencies for mne_analyze.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/resources
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/resources
 
     # Solve for dependencies for mne_rt_server.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/resources
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/resources
 
     # Solve for dependencies for mne_forward_solution.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/MacOS/resources
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/MacOS/resources
 
     # Solve for dependencies for mne_dipole_fit.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_dipole_fit.app/Contents/MacOS/resources 
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_dipole_fit.app/Contents/MacOS/resources 
 
     # Solve for dependencies for mne_anonymize.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/resources/. ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/MacOS/resources
+    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/MacOS/resources
 
     if [[ ${PackOption} == "true" ]]; then
         # Delete folders which we do not want to ship
