@@ -210,7 +210,14 @@ bool Label::read(const QString& p_sFileName, Label &p_Label)
     for(qint32 i = 0; i < nv; ++i)
     {
         count = 0;
-        list = t_TextStream.readLine().split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        auto skip = QString::SkipEmptyParts;
+#else
+        auto skip = Qt::SkipEmptyParts;
+#endif
+
+        list = t_TextStream.readLine().split(QRegularExpression("\\s+"), skip);
 
         for(qint32 j = 0; j < list.size(); ++j)
         {
