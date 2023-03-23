@@ -78,15 +78,15 @@
             %MOCK_TEXT%windeployqt %%f
         )
 
-        REM solve dependencies for tests 
-        for /f %%f in ('dir test_*.exe /s /b') do (
-            %MOCK_TEXT%windeployqt %%f
-        )
-
-        REM solve dependencies for examples 
-        for /f %%f in ('dir ex_*.exe /s /b') do (
-            %MOCK_TEXT%windeployqt %%f
-        )
+        REM REM solve dependencies for tests 
+        REM for /f %%f in ('dir test_*.exe /s /b') do (
+        REM     %MOCK_TEXT%windeployqt %%f
+        REM )
+        REM
+        REM REM solve dependencies for examples 
+        REM for /f %%f in ('dir ex_*.exe /s /b') do (
+        REM     %MOCK_TEXT%windeployqt %%f
+        REM )
 
         IF "%PACK_OPTION%"=="true" (
             cd %BASE_PATH%
