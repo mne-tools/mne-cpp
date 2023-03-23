@@ -62,7 +62,7 @@ exit /B %compoundOutput%
 :doPrintConfiguration
   ECHO.
   ECHO ====================================================================
-  ECHO ===================== MNE-CPP TESTING SCRIPT =========================
+  ECHO ===================== MNE-CPP TESTING SCRIPT =======================
   ECHO.
   ECHO verboseMode = %verboseMode%
   ECHO buildName = %buildName%
