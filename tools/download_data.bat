@@ -8,13 +8,96 @@
 :;#
 
 :<<BATCH
-    :;@echo off
+    @echo off
     :; # ####################################################
     :; # ########## WINDOWS SECTION #########################
 
-    SET SCRIPT_PATH=%~dp0
-    SET BASE_PATH=%SCRIPT_PATH%..
-    SET CURRENT_PATH=
+    setlocal EnableDelayedExpansion
+
+    SET ScriptPath=%~dp0
+    SET BasePath=%ScriptPath%..
+
+    SET "EXIT_FAIL=1"
+    SET "EXIT_SUCCESS=0"
+
+    SET ResourcesPath=%BasePath%\resources
+    SET "DownloadTestData=False"
+    SET "DownloadSampleData=False"
+
+    :loop
+    IF NOT "%1"=="" (
+      IF "%1"=="all" (
+        SET "DownloadTestData=True"
+        SET "DownloadSampleData=True"
+      )
+      IF "%1"=="test-data" (
+        SET "DownloadTestData=True"
+      )
+      IF "%1"=="sample-data" (
+        SET "DownloadSampleData=True"
+      )
+      IF "%1"=="help" (
+          call:showHelp
+          goto:endOfScript
+      )
+      SHIFT
+      GOTO :loop
+    )
+
+    call:doPrintConfiguration
+
+    IF "%DownloadTestData%"=="True" (
+        git clone https://github.com/mne-tools/mne-cpp-test-data.git %ResourcesPath%\data\mne-cpp-test-data
+    )
+    IF "%DownloadSampleData%"=="True" (
+        currentFolder=%cd%
+        cd %ResourcesPath%\data
+        ECHO Downloading sample data ...
+        powershell.exe -Command "(new-object System.Net.WebClient).DownloadFile('https://files.osf.io/v1/resources/rxvq7/providers/osfstorage/59c0e26f9ad5a1025c4ab159', 'MNE-sample-data.tar.gz')"
+        ECHO Uncompressing data ...
+        tar -xf MNE-sample-data.tar.gz
+        symlink /D MNE-sample-data\subjects\sample\bem\inner_skull.surf MNE-sample-data\subjects\sample\bem\flash\inner_skull.surf
+        symlink /D MNE-sample-data\subjects\sample\bem\outer_skull.surf MNE-sample-data\subjects\sample\bem\flash\outer_skull.surf
+        symlink /D MNE-sample-data\subjects\sample\bem\outer_skin.surf MNE-sample-data\subjects\sample\bem\flash\outer_skin.surf
+        cd %currentFolder%
+    )
+
+:endOfScript
+
+exit /B 
+
+:doPrintConfiguration
+  ECHO.
+  ECHO ====================================================================
+  echo ======================== MNE-CPP DOWNLOAD DATA =====================
+  ECHO.
+  ECHO ScriptPath    = %ScriptPath%
+  ECHO BasePath      = %BasePath%
+  ECHO ResourcesPath = %ResourcesPath%
+  ECHO.
+  ECHO DownloadTestData   = %DownloadTestData%
+  ECHO DownloadSampleData = %DownloadSampleData%
+  ECHO.
+  ECHO ====================================================================
+  ECHO ====================================================================
+  ECHO.
+exit /B 0
+
+:showHelp
+  ECHO. 
+  ECHO MNE-CPP download data script help.
+  ECHO. 
+  ECHO Usage: ./download_data.bat [Options]
+  ECHO.
+  ECHO All builds will be parallel.
+  ECHO All options can be used in undefined order.
+  ECHO.
+  ECHO [help]  - Print this help.
+  ECHO [all]   - Download all datasets.
+  ECHO [test-data]   - Download mne-cpp-test-data.
+  ECHO [sample-data] - Download Sample dataset.
+  ECHO.
+exit /B 0
 
 
     :; # ########## WINDOWS SECTION ENDS ####################
@@ -42,22 +125,19 @@ EXIT_SUCCESS=0
 EXIT_FAIL=1
 ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
 BasePath="$(cleanAbsPath "$ScriptPath/..")"
-ResourcesFolder="$(cleanAbsPath "$BasePath/resources")"
-BuildName="Release"
-DownloadAllData="false"
+ResourcesPath="$(cleanAbsPath "$BasePath/resources")"
 DownloadTestData="false" 
 DownloadSampleData="false" 
 
 doPrintConfiguration() {
   echo " "
   echo ========================================================================
-  echo ======================== MNE-CPP BUILD CONFIG ==========================
+  echo ======================== MNE-CPP DOWNLOAD DATA ==========================
   echo " "
   echo " ScriptPath = $ScriptPath"
   echo " BasePath   = $BasePath"
-  echo " ResourcesFolder = $ResourcesFolder"
+  echo " ResourcesPath = $ResourcesPath"
   echo " "
-  echo " DownloadAllData = $DownloadAllData"
   echo " DownloadTestData = $DownloadTestData"
   echo " DownloadSampleData  = $DownloadSampleData"
   echo " "
@@ -87,7 +167,6 @@ fi
 
 for (( j=0; j<argc; j++ )); do
     if [ "${argv[j]}" == "all" ]; then
-        DownloadAllData="true"
         DownloadTestData="true"
         DownloadSampleData="true"
     elif [ "${argv[j]}" == "test-data" ]; then
@@ -105,17 +184,16 @@ if [ "${PrintHelp}" == "true" ]; then
     exit ${EXIT_SUCCESS} 
 fi
 
-OutFolder=${BASE_PATH}/out/${BuildName}
 doPrintConfiguration
 
 if [[ ${DownloadTestData} == "true" ]]; then
-  git clone https://github.com/mne-tools/mne-cpp-test-data.git ${ResourcesFolder}/data/mne-cpp-test-data
+  git clone https://github.com/mne-tools/mne-cpp-test-data.git ${ResourcesPath}/data/mne-cpp-test-data
 fi
 if [[ ${DownloadSampleData} == "true" ]]; then
   curl -O https://files.osf.io/v1/resources/rxvq7/providers/osfstorage/59c0e26f9ad5a1025c4ab159\?action\=download\&direct\&version\=6 
-  mv 59c0e26f9ad5a1025c4ab159 ${ResourcesFolder}/data/MNE-sample-data.tar.gz
+  mv 59c0e26f9ad5a1025c4ab159 ${ResourcesPath}/data/MNE-sample-data.tar.gz
   currentFolder=`pwd`
-  cd ${ResourcesFolder}/data/
+  cd ${ResourcesPath}/data/
   tar -xvf MNE-sample-data.tar.gz 
   cd ${currentFolder}
 fi
