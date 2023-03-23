@@ -107,12 +107,12 @@
     exit /B %EXIT_VALUE%
 
     :buildSuccessful
-      SET "EXIT_VALUE=0"
+      SET "EXIT_VALUE=%EXIT_SUCCESS%"
       call:showBuildSuccessful
     exit /B 0
 
     :buildFailed
-      SET "EXIT_VALUE=1"    
+      SET "EXIT_VALUE=%EXIT_FAIL%"    
       call:showBuildFailed
     exit /B 0
 
