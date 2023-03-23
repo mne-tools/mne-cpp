@@ -50,7 +50,7 @@ set /A "compoundOutput=0"
 cd %basePath%\out\%binOutputFolder%
 
 for /f %%f in ('dir test_*.exe /s /b ^| findstr /v "d.exe"') do (
-  if %printOutput%=="True" (
+  if "%printOutput%"=="True" (
     %%f && call:success %%~nxf || call:fail %%~nxf
   ) else (
     %%f > null 2>&1 && call:success %%~nxf || call:fail %%~nxf
@@ -168,7 +168,6 @@ fi
 
 doPrintConfiguration
 
-#
 ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
 BasePath="$(cleanAbsPath "$ScriptPath/..")"
 
