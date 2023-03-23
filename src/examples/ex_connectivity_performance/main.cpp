@@ -112,7 +112,10 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 
     if (outFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
         QTextStream textStream(&outFile);
-        textStream << txt << Qt::endl;
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+        using Qt::endl;
+#endif
+        textStream << txt << endl;
     } else {
         qDebug() << "Unable to read data from file";
     }
