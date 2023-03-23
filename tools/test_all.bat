@@ -17,29 +17,26 @@ setlocal
 set scriptPath=%~dp0
 set basePath=%scriptPath%..
 
-set printOutput=False
-set stopOnFirstFail=False
-set runCodeCoverage=False
-set binOutputFolder=Release
+set verboseMode=False
+set buildName=Release
 
-@REM parse input argument
-set binOutputFolder=%1
-set verboseModeInput=%2
-set runCodeCoverageInput=%3
-
-
-if "%verboseModeInput%"=="verbose" (
-  set printOutput="True"
-) else (
-  if "%verboseModeInput%"=="help" (
-    call:doPrintHelp
-    exit /B 0
+:loop
+IF NOT "%1"=="" (
+  IF "%1"=="help" (
+    call:showHelp
+    goto:endOfScript
+  )
+  IF "%1"=="verbose" (
+    SET "verboseMode=True"
+  )
+  for /F "tokens=1 delims==" %%a in ("%1") do (
+    IF "%%a"=="build-name" (
+      SET "buildName"=="%%b"
+    )
   )
 )
 
-if "%runCodeCoverageInput%"=="withCoverage" (
-  set runCodeCoverage=True
-)
+SET "binOutputFolder=%basePath%\out\%buildName%\apps"
 
 @REM start execution
 
@@ -47,9 +44,9 @@ call:doPrintConfiguration
 
 set /A "compoundOutput=0"
 
-cd %basePath%\out\%binOutputFolder%
+cd %binOutputFolder%
 
-for /f %%f in ('dir test_*.exe /s /b ^| findstr /v "d.exe"') do (
+for /f %%f in ('dir test_*.exe /s /b ') do (
   if "%printOutput%"=="True" (
     %%f && call:success %%~nxf || call:fail %%~nxf
   ) else (
@@ -58,40 +55,41 @@ for /f %%f in ('dir test_*.exe /s /b ^| findstr /v "d.exe"') do (
 )
 rm -f null
 
-cd %scriptPath%
+cd %cd%
 
 exit /B %compoundOutput%
 
-:; # this part should never get parsed other than the actual
-:; # functions defined herein.
-
 :doPrintConfiguration
-  echo.
-  echo =========================================
-  echo binFolder = %binOutputFolder%
-  echo verbose = %printOutput%
-  echo exitOnFail = %stopOnFirstFail%
-  echo runCodeCoverage = %runCodeCoverage%
-  echo =========================================
-  echo.
+  ECHO.
+  ECHO ====================================================================
+  ECHO ===================== MNE-CPP TESTING SCRIPT =========================
+  ECHO.
+  ECHO verboseMode = %verboseMode%
+  ECHO buildName = %buildName%
+  ECHO.
+  ECHO ====================================================================
+  ECHO ====================================================================
+  ECHO.
 exit /B 0
 
-:doPrintHelp
-  echo.
-  echo MNE-CPP testing script help.
-  echo This script will run all applications in bin folder starting with test_*
-  echo For help run: ./test_all.bat help
-  echo Normal call has none or 3 arguments: ./test_all.bat [binFolder] [verbose] [withCoverage]
-  echo.
-  @REM call:doPrintConfiguration
+:showHelp
+  ECHO. 
+  ECHO MNE-CPP Testing script help.
+  ECHO. 
+  ECHO Usage: ./test_all.bat [Options]
+  ECHO.
+  ECHO [help] - Print this help.
+  ECHO [verbose] - Enable output packaging into a compressed file.
+  ECHO [build-name=]  - Specify the name of the build to test 
+  ECHO.
 exit /B 0
 
 :success
-  echo [92m%~1[0m
+  ECHO [92m%~1[0m
 exit /B 0
 
 :fail
-  echo [91m%~1[0m
+  ECHO [91m%~1[0m
   set /A "compoundOutput+=1"
 exit /B 0
 
@@ -116,24 +114,24 @@ function cleanAbsPath()
 }
 
 doPrintConfiguration() {
-  echo.
+  echo " "
   echo =========================================
   echo " VerboseMode = $VerboseMode"
   echo " RunCodeCoverage = $RunCodeCoverage"
   echo " BuildName= $BuildName"
   echo =========================================
-  echo.
+  echo " "
 }
 
 doPrintHelp() {
   echo "Usage: ./test_all.bat [Options]"
-  echo.
+  echo " "
   echo "All options can be used in undefined order."
-  echo.
+  echo " "
   echo "[help] - Print this help."
   echo "[verbose] - Print tests output to in terminal."
   echo "[build-name=] - Specify the build-name of which to run its tests."
-  echo.
+  echo " "
 }
 
 ## input arguments parsing
