@@ -59,6 +59,7 @@
         symlink /D MNE-sample-data\subjects\sample\bem\inner_skull.surf MNE-sample-data\subjects\sample\bem\flash\inner_skull.surf
         symlink /D MNE-sample-data\subjects\sample\bem\outer_skull.surf MNE-sample-data\subjects\sample\bem\flash\outer_skull.surf
         symlink /D MNE-sample-data\subjects\sample\bem\outer_skin.surf MNE-sample-data\subjects\sample\bem\flash\outer_skin.surf
+        rm -f MNE-sample-data.tar.gz
         cd %currentFolder%
     )
 
