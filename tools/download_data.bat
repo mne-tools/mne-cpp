@@ -50,15 +50,15 @@
         git clone https://github.com/mne-tools/mne-cpp-test-data.git %ResourcesPath%\data\mne-cpp-test-data
     )
     IF "%DownloadSampleData%"=="True" (
-        currentFolder=%cd%
+        set currentFolder=%cd%
         cd %ResourcesPath%\data
         ECHO Downloading sample data ...
         powershell.exe -Command "(new-object System.Net.WebClient).DownloadFile('https://files.osf.io/v1/resources/rxvq7/providers/osfstorage/59c0e26f9ad5a1025c4ab159', 'MNE-sample-data.tar.gz')"
         ECHO Uncompressing data ...
         tar -xf MNE-sample-data.tar.gz
-        symlink /D MNE-sample-data\subjects\sample\bem\inner_skull.surf MNE-sample-data\subjects\sample\bem\flash\inner_skull.surf
-        symlink /D MNE-sample-data\subjects\sample\bem\outer_skull.surf MNE-sample-data\subjects\sample\bem\flash\outer_skull.surf
-        symlink /D MNE-sample-data\subjects\sample\bem\outer_skin.surf MNE-sample-data\subjects\sample\bem\flash\outer_skin.surf
+        mklink /D MNE-sample-data\subjects\sample\bem\inner_skull.surf MNE-sample-data\subjects\sample\bem\flash\inner_skull.surf
+        mklink /D MNE-sample-data\subjects\sample\bem\outer_skull.surf MNE-sample-data\subjects\sample\bem\flash\outer_skull.surf
+        mklink /D MNE-sample-data\subjects\sample\bem\outer_skin.surf MNE-sample-data\subjects\sample\bem\flash\outer_skin.surf
         rm -f MNE-sample-data.tar.gz
         cd %currentFolder%
     )
