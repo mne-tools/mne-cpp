@@ -10,6 +10,7 @@
 
     SET "EXIT_FAIL=1"
     SET "EXIT_SUCCESS=0"
+    SET "EXIT_VALUE=3"
 
     SET "SourceFolder="
     SET "BuildFolder="
@@ -99,19 +100,21 @@
         %MockText%cmake -B %BuildFolder% -S %SourceFolder% -DCMAKE_BUILD_TYPE=%BuildType% -DBINARY_OUTPUT_DIRECTORY=%OutFolder% -DCMAKE_CXX_FLAGS="/MP" %CMakeConfigFlags%
     )
 
-    %MockText%cmake --build %BuildFolder% --config %BuildType% && call::buildSuccessful || call:buildFailed
+    %MockText%cmake --build %BuildFolder% --config %BuildType% && call:buildSuccessful || call:buildFailed
 
     :endOfScript
 
-    exit /B 
+    exit /B %EXIT_VALUE%
 
     :buildSuccessful
+      SET "EXIT_VALUE=0"
       call:showBuildSuccessful
-    exit /B %EXIT_SUCCESS%
+    exit /B 0
 
     :buildFailed
+      SET "EXIT_VALUE=1"    
       call:showBuildFailed
-    exit /B %EXIT_FAIL%
+    exit /B 0
 
     :doPrintConfiguration
       ECHO.
