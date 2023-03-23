@@ -41,12 +41,6 @@ jobs:
         version: ${{ matrix.qt }}
         arch: win64_msvc2017_64
         modules: qtcharts
-    - name: Install jom (Windows)
-      if: matrix.os == 'windows-2019'
-      run: |
-        Invoke-WebRequest https://www.dropbox.com/s/gbf8sdx8wqxcrnd/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip"
-        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Compile BrainFlow submodule (Windows)
       if: matrix.os == 'windows-2019'
       run: |
@@ -133,12 +127,6 @@ jobs:
         version: ${{ matrix.qt }}
         arch: win64_msvc2019_64
         modules: qtcharts
-    - name: Install jom (Windows)
-      if: matrix.os == 'windows-2019'
-      run: |
-        Invoke-WebRequest https://www.dropbox.com/s/gbf8sdx8wqxcrnd/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip"
-        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Compile BrainFlow submodule (Windows)
       if: matrix.os == 'windows-2019'
       run: |
@@ -231,12 +219,6 @@ jobs:
         # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
         Invoke-WebRequest https://www.dropbox.com/s/z745z290s9pknih/qt5_5152_static_binaries_win.zip?dl=1 -OutFile .\qt5_5152_static_binaries_win.zip
         expand-archive -path "qt5_5152_static_binaries_win.zip" -destinationpath "..\"
-    - name: Install jom (Windows)
-      if: matrix.os == 'windows-2019'
-      run: |
-        Invoke-WebRequest https://www.dropbox.com/s/gbf8sdx8wqxcrnd/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip"
-        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
       run: |
@@ -290,12 +272,6 @@ jobs:
         version: 5.15.2
         arch: win64_msvc2019_64
         modules: qtcharts
-    - name: Install jom (Windows)
-      if: matrix.os == 'windows-2019'
-      run: |
-        Invoke-WebRequest https://www.dropbox.com/s/gbf8sdx8wqxcrnd/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip"
-        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Configure and compile MNE-CPP (Linux)
       if: matrix.os == 'ubuntu-20.04'
       run: |
