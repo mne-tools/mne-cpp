@@ -116,22 +116,24 @@ function cleanAbsPath()
 }
 
 doPrintConfiguration() {
+  echo.
   echo =========================================
   echo " VerboseMode = $VerboseMode"
   echo " RunCodeCoverage = $RunCodeCoverage"
   echo " BuildName= $BuildName"
   echo =========================================
+  echo.
 }
 
 doPrintHelp() {
   echo "Usage: ./test_all.bat [Options]"
-  echo " "
+  echo.
   echo "All options can be used in undefined order."
-  echo " "
+  echo.
   echo "[help] - Print this help."
   echo "[verbose] - Print tests output to in terminal."
   echo "[build-name=] - Specify the build-name of which to run its tests."
-  echo " "
+  echo.
 }
 
 ## input arguments parsing
