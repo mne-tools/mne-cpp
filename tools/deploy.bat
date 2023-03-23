@@ -101,17 +101,17 @@
         IF "%PACK_OPTION%"=="true" (
             REM This script needs to be run from the top level mne-cpp repo folder
             REM Delete folders which we do not want to ship
-            %MOCK_TEXT%rmdir %BASE_PATH%\out\\bin\resources /s /q
-            %MOCK_TEXT%rmdir %BASE_PATH%\out\\bin\apps\mne_rt_server_plugins /s /q
-            %MOCK_TEXT%rmdir %BASE_PATH%\out\\bin\apps\mne_scan_plugins /s /q
-            %MOCK_TEXT%rmdir %BASE_PATH%\out\\bin\apps\mne_analyze_plugins /s /q
+            %MOCK_TEXT%rmdir %OUT_DIR_NAME%\resources /s /q
+            %MOCK_TEXT%rmdir %OUT_DIR_NAME%\apps\mne_rt_server_plugins /s /q
+            %MOCK_TEXT%rmdir %OUT_DIR_NAME%\apps\mne_scan_plugins /s /q
+            %MOCK_TEXT%rmdir %OUT_DIR_NAME%\apps\mne_analyze_plugins /s /q
             
             REM Creating archive of everything in the bin directory
-            %MOCK_TEXT%7z a %BASE_PATH%\mne-cpp-windows-static-x86_64.zip %BASE_PATH%\out\        
+            %MOCK_TEXT%7z a %BASE_PATH%\mne-cpp-windows-static-x86_64.zip %OUT_DIR_NAME%
         )
         
     ) ELSE (
-        ECHO Your link option: %LINK_OPTION% not defined.
+        ECHO Your link option: %LINK_OPTION% is not defined.
         goto :showHelp
         goto :endOfScript
     )
