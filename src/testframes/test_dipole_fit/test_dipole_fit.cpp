@@ -123,7 +123,7 @@ void TestDipoleFit::dipoleFitSimple()
     settings.tmax = 148.0f/1000.0f;
     settings.bmin = -100.0f/1000.0f;
     settings.bmax = 0.0f/1000.0f;
-    settings.dipname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref_dip_fit.dat";
+    settings.dipname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/dip_fit.dat";
 
     settings.checkIntegrity();
 
@@ -273,14 +273,14 @@ void TestDipoleFit::compareFit()
 
     for (int i = 0; i < m_refECDSet.size(); ++i)
     {
-        //printf("Compare orig Dipole %d: %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n", i,
-                // 1000*m_ECDSet[i].time,1000*m_ECDSet[i].time,
-                // 1000*m_ECDSet[i].rd[0],1000*m_ECDSet[i].rd[1],1000*m_ECDSet[i].rd[2],
-                // 1e9*m_ECDSet[i].Q.norm(),1e9*m_ECDSet[i].Q[0],1e9*m_ECDSet[i].Q[1],1e9*m_ECDSet[i].Q[2],100.0*m_ECDSet[i].good);
-        //printf("         ref Dipole %d: %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n", i,
-                // 1000*m_refECDSet[i].time,1000*m_refECDSet[i].time,
-                // 1000*m_refECDSet[i].rd[0],1000*m_refECDSet[i].rd[1],1000*m_refECDSet[i].rd[2],
-                // 1e9*m_refECDSet[i].Q.norm(),1e9*m_refECDSet[i].Q[0],1e9*m_refECDSet[i].Q[1],1e9*m_refECDSet[i].Q[2],100.0*m_refECDSet[i].good);
+        printf("Compare orig Dipole %d: %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n", i,
+                1000*m_ECDSet[i].time,1000*m_ECDSet[i].time,
+                1000*m_ECDSet[i].rd[0],1000*m_ECDSet[i].rd[1],1000*m_ECDSet[i].rd[2],
+                1e9*m_ECDSet[i].Q.norm(),1e9*m_ECDSet[i].Q[0],1e9*m_ECDSet[i].Q[1],1e9*m_ECDSet[i].Q[2],100.0*m_ECDSet[i].good);
+        printf("         ref Dipole %d: %7.1f %7.1f %8.2f %8.2f %8.2f %8.3f %8.3f %8.3f %8.3f %6.1f\n", i,
+                1000*m_refECDSet[i].time,1000*m_refECDSet[i].time,
+                1000*m_refECDSet[i].rd[0],1000*m_refECDSet[i].rd[1],1000*m_refECDSet[i].rd[2],
+                1e9*m_refECDSet[i].Q.norm(),1e9*m_refECDSet[i].Q[0],1e9*m_refECDSet[i].Q[1],1e9*m_refECDSet[i].Q[2],100.0*m_refECDSet[i].good);
 
         QVERIFY( m_ECDSet[i].valid == m_refECDSet[i].valid );
         QVERIFY( m_ECDSet[i].time - m_refECDSet[i].time < epsilon );
