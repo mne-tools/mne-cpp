@@ -9,8 +9,9 @@
 :;#
 
 :<<BATCH
-  :; # ########## WINDOWS SECTION #########################
   @echo off
+  :; # ####################################################
+  :; # ########## WINDOWS SECTION #########################
   
 @REM Setup default values
 setlocal
@@ -29,11 +30,14 @@ IF NOT "%1"=="" (
   IF "%1"=="verbose" (
     SET "verboseMode=True"
   )
-  for /F "tokens=1 delims==" %%a in ("%1") do (
-    IF "%%a"=="build-name" (
-      SET "buildName"=="%%b"
+  IF "%1"=="build-name" (
+    IF NOT "%2"=="" (
+        SET "buildName=%2"
+        SHIFT
     )
   )
+  SHIFT
+  GOTO:loop
 )
 
 SET "binOutputFolder=%basePath%\out\%buildName%\apps"
@@ -62,7 +66,7 @@ exit /B %compoundOutput%
 :doPrintConfiguration
   ECHO.
   ECHO ====================================================================
-  ECHO ===================== MNE-CPP TESTING SCRIPT =======================
+  ECHO ===================== MNE-CPP TESTING SCRIPT =========================
   ECHO.
   ECHO verboseMode = %verboseMode%
   ECHO buildName = %buildName%
