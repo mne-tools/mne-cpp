@@ -8,19 +8,22 @@
 :;#
 
 :<<BATCH
-    :;@echo off
+    @echo off
     :; # ####################################################
     :; # ########## WINDOWS SECTION #########################
 
+    REM setlocal EnableDelayedExpansion
+
     SET SCRIPT_PATH=%~dp0
     SET BASE_PATH=%SCRIPT_PATH%..
-    SET CURRENT_PATH=
+    SET CURRENT_PATH=%cd%
     
-    SETX VCINSTALLDIR "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\"
+    REM SETX VCINSTALLDIR "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\"
+    SETX VCINSTALLDIR "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\"
 
     SET "LINK_OPTION=dynamic"
     SET "PACK_OPTION=false"
-    SET "BUILD_NAME="
+    SET "BUILD_NAME=Release"
     SET "MOCK_BUILD=false"
     SET "MOCK_TEXT="
 
@@ -30,7 +33,7 @@
             SET "LINK_OPTION=dynamic"
         )
         IF "%1"=="static" (
-            SET "LINK_OPTION=dynamic"
+            SET "LINK_OPTION=static"
         )   
         IF "%1"=="pack" (
             SET "PACK_OPTION=true"
@@ -42,13 +45,12 @@
         IF "%1"=="mock" (
             SET "MOCK_BUILD=true"
         )
-        for /F "tokens=1 delims==" %%a in ("%1") do (
-            REM ECHO %%a
-            REM ECHO %%b
-            IF "%%a"=="build-name" (
-                SET "BUILD_NAME"=="%%b"
+        IF "%1"=="build-name" (
+            IF NOT "%2"=="" (
+                SET "BUILD_NAME=%2"
+                SHIFT
             )
-        ) 
+        )
         SHIFT
         GOTO :loop
     )
@@ -63,7 +65,7 @@
     )
 
     call :doPrintConfiguration
-
+    
     IF "%LINK_OPTION%"=="dynamic" (
         
         cd %OUT_DIR_NAME%\apps
@@ -96,12 +98,14 @@
             %MOCK_TEXT%7z a %BASE_PATH%\mne-cpp-windows-dynamic-x86_64.zip %OUT_DIR_NAME%
         )
 
+        cd %cd%
+
     ) ELSE IF "%LINK_OPTION%"=="static" (
         
         IF "%PACK_OPTION%"=="true" (
             REM This script needs to be run from the top level mne-cpp repo folder
             REM Delete folders which we do not want to ship
-            %MOCK_TEXT%rmdir %OUT_DIR_NAME%\resources /s /q
+            %MOCK_TEXT%rmdir %OUT_DIR_NAME%\resources\data /s /q
             %MOCK_TEXT%rmdir %OUT_DIR_NAME%\apps\mne_rt_server_plugins /s /q
             %MOCK_TEXT%rmdir %OUT_DIR_NAME%\apps\mne_scan_plugins /s /q
             %MOCK_TEXT%rmdir %OUT_DIR_NAME%\apps\mne_analyze_plugins /s /q
@@ -234,7 +238,8 @@ for (( j=0; j<argc; j++ )); do
     fi
     IFS='=' read -r -a inkarg <<< "$argv[j]"
     if [ "${inkarg[0]}" == "build-name" ]; then
-        BuildName="${inkarg[1]}"
+        echo "ink"
+        set "BuildName=${inkarg[1]}"
     fi
 done
 
