@@ -73,7 +73,7 @@ using namespace Eigen;
 
 BrainAMP::BrainAMP()
 : m_pRMTSA_BrainAMP(0)
-, m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/brainamp/")
+, m_qStringResourcePath(qApp->applicationDirPath()+"/../resources/mne_scan/plugins/brainamp/")
 , m_pBrainAMPProducer(new BrainAMPProducer(this))
 , m_dLPAShift(0.01)
 , m_dRPAShift(0.01)

@@ -235,7 +235,7 @@ void FiffSimulator::initConnector()
         m_pRTMSA_FiffSimulator->measurementData()->setDigitizerData(m_pFiffDigData);
         m_pRTMSA_FiffSimulator->measurementData()->setMultiArraySize(1);
         m_pRTMSA_FiffSimulator->measurementData()->setVisibility(true);
-        m_pRTMSA_FiffSimulator->measurementData()->setXMLLayoutFile(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/FiffSimulator/VectorViewSimLayout.xml");
+        m_pRTMSA_FiffSimulator->measurementData()->setXMLLayoutFile(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/FiffSimulator/VectorViewSimLayout.xml");
     }
 }
 

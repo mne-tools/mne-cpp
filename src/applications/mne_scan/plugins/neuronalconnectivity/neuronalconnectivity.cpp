@@ -313,7 +313,7 @@ void NeuronalConnectivity::updateRTMSA(SCMEASLIB::Measurement::SPtr pMeasurement
             m_connectivitySettings.setSamplingFrequency(m_pFiffInfo->sfreq);
 
             //Set 3D sensor surface for visualization
-            QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
+            QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m_rt.fif");
             MNEBem::SPtr pSensorSurfaceVV = MNEBem::SPtr::create(t_filesensorSurfaceVV);
             m_pRTCEOutput->measurementData()->setSensorSurface(pSensorSurfaceVV);
             m_pRTCEOutput->measurementData()->setFiffInfo(m_pFiffInfo);
@@ -396,7 +396,7 @@ void NeuronalConnectivity::updateRTEV(SCMEASLIB::Measurement::SPtr pMeasurement)
                     m_connectivitySettings.setSamplingFrequency(m_pFiffInfo->sfreq);
 
                     //Set 3D sensor surface for visualization
-                    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
+                    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m_rt.fif");
                     MNEBem::SPtr pSensorSurfaceVV = MNEBem::SPtr::create(t_filesensorSurfaceVV);
                     m_pRTCEOutput->measurementData()->setSensorSurface(pSensorSurfaceVV);
                     m_pRTCEOutput->measurementData()->setFiffInfo(m_pFiffInfo);
