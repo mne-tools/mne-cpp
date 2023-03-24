@@ -268,7 +268,7 @@ int main(int argc, char *argv[])
     p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem)->setTransform(evoked.info.dev_head_t, true);
 
     //Read and show sensor helmets
-    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
+    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m_rt.fif");
     MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
     p3DDataModel->addMegSensorInfo("Sensors", "VectorView", evoked.info.chs, t_sensorSurfaceVV, evoked.info.bads);
 
