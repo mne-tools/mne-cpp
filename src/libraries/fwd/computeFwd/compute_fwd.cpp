@@ -2076,12 +2076,12 @@ void ComputeFwd::initFwd()
     // Create coil descriptions with transformation to head or MRI frame
 
     if (m_pSettings->include_meg) {
-        qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
+        qPath = QString(QCoreApplication::applicationDirPath() + "/../resources/general/coilDefinitions/coil_def.dat");
         file.setFileName(qPath);
         if ( !QCoreApplication::startingUp() ) {
-            qPath = QCoreApplication::applicationDirPath() + QString("/resources/general/coilDefinitions/coil_def.dat");
+            qPath = QCoreApplication::applicationDirPath() + QString("/../resources/general/coilDefinitions/coil_def.dat");
         } else if (!file.exists()) {
-            qPath = "./resources/general/coilDefinitions/coil_def.dat";
+            qPath = "./../resources/general/coilDefinitions/coil_def.dat";
         }
 
         m_templates = FwdCoilSet::read_coil_defs(qPath);

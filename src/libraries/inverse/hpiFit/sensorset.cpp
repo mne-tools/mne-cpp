@@ -131,7 +131,7 @@ void SensorSet::initMatrices(int ncoils, int np)
 
 SensorSetCreator::SensorSetCreator()
 {
-    const QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
+    const QString qPath = QString(QCoreApplication::applicationDirPath() + "/../resources/general/coilDefinitions/coil_def.dat");
     m_pCoilDefinitions = FwdCoilSet::SPtr(FwdCoilSet::read_coil_defs(qPath));
 }
 
