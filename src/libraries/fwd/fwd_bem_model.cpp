@@ -809,7 +809,7 @@ MneSurfaceOld* FwdBemModel::make_guesses(MneSurfaceOld* guess_surf, float guessr
         if ( !QCoreApplication::startingUp() )
             bemFile.setFileName(QCoreApplication::applicationDirPath() + QString("/../resources/general/surf2bem/icos.fif"));
         else if (!bemFile.exists())
-            bemFile.setFileName("./resources/general/surf2bem/icos.fif");
+            bemFile.setFileName("../resources/general/surf2bem/icos.fif");
 
         if( !bemFile.exists () ){
             qDebug() << bemFile.fileName() << "does not exists.";
