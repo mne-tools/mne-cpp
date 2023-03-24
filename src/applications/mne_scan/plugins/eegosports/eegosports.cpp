@@ -137,7 +137,7 @@ void EEGoSports::init()
     m_bWriteDriverDebugToFile = false;
     m_bCheckImpedances = false;
 
-    m_sElcFilePath = settings.value(QString("EEGOSPORTS/elcFilePath"), QString(QCoreApplication::applicationDirPath() + "resources/general/3DLayouts/standard_waveguard66.elc")).toString();
+    m_sElcFilePath = settings.value(QString("EEGOSPORTS/elcFilePath"), QString(QCoreApplication::applicationDirPath() + "../resources/general/3DLayouts/standard_waveguard66.elc")).toString();
 
     m_sCardinalFilePath = settings.value(QString("EEGOSPORTS/cardinalFilePath"), QString("")).toString();
 

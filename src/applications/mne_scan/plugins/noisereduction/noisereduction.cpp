@@ -658,8 +658,8 @@ void NoiseReduction::createSpharaOperator()
     }
 
     //Write final operator matrices to file
-//    IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultFirst.txt"));
-//    IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultSecond.txt"));
+//    IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "../resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultFirst.txt"));
+//    IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "../resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultSecond.txt"));
 
     //
     // Make operators sparse

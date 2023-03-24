@@ -116,12 +116,12 @@ void TestMneForwardSolution::computeForward()
     // --meg
     // --eeg
     // --accurate
-    // --src ./resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif
-    // --meas ./resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif
-    // --mri ./resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif
-    // --bem ./resources/data/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif
+    // --src ../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif
+    // --meas ../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif
+    // --mri ../resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif
+    // --bem ../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif
     // --mindist 5
-    // --fwd ./resources/data/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif
+    // --fwd ../resources/data/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif
 
     ComputeFwdSettings::SPtr pSettingsMEGEEG = ComputeFwdSettings::SPtr(new ComputeFwdSettings);
 
