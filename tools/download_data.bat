@@ -196,6 +196,7 @@ if [[ ${DownloadSampleData} == "true" ]]; then
   currentFolder=`pwd`
   cd ${ResourcesPath}/data/
   tar -xvf MNE-sample-data.tar.gz 
+  rm -fr MNE-sample-data.tar.gz
   cd ${currentFolder}
 fi
 
