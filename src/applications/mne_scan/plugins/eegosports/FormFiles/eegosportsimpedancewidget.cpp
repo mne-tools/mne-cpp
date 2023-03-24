@@ -298,7 +298,7 @@ void EEGoSportsImpedanceWidget::loadLayout()
 {
     QString sElcFilePath = QFileDialog::getOpenFileName(this,
                                                         tr("Open Layout"),
-                                                        "./resources/mne_scan/plugins/eegosports/loc_files/",
+                                                        "../resources/mne_scan/plugins/eegosports/loc_files/",
                                                         tr("ELC layout file (*.elc)"));
 
     // Load standard layout file

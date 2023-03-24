@@ -127,7 +127,7 @@ void TMSI::init()
 
     m_iTriggerType = 0;
 
-    m_sElcFilePath = QString("./resources/general/3DLayouts/standard_waveguard128_duke.elc");
+    m_sElcFilePath = QString("../resources/general/3DLayouts/standard_waveguard128_duke.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 

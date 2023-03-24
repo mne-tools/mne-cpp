@@ -722,7 +722,7 @@ void ChannelSelectionView::onBtnLoadUserSelection()
 {
     QString path = QFileDialog::getOpenFileName(this,
                                                 QString("Open selection file"),
-                                                QString("./general/resources/selectionGroups/"),
+                                                QString("../resources/general/selectionGroups/"),
                                                 tr("Selection files (*.sel *.mon)"));
 
     if(path.isEmpty())
@@ -739,7 +739,7 @@ void ChannelSelectionView::onBtnSaveUserSelection()
     QDate date;
     QString path = QFileDialog::getSaveFileName(this,
                                                 "Save user channel selection",
-                                                QString("./general/resources/selectionGroups/%1_%2_%3_UserSelection").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
+                                                QString("../resources/general/selectionGroups/%1_%2_%3_UserSelection").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
                                                 tr("MNE selection file(*.sel);; Brainstorm montage file(*.mon)"));
 
     QMap<QString, QStringList> tempMap = m_selectionGroupsMap;

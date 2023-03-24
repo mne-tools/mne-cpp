@@ -128,7 +128,7 @@ void BrainAMP::init()
     m_iSamplesPerBlock = settings.value(QString("BRAINAMP/samplesPerBlock"), 1000).toInt();
     m_bCheckImpedances = false;
 
-    m_sElcFilePath = settings.value(QString("BRAINAMP/elcFilePath"), QString("./Resources/3DLayouts/standard_waveguard64_duke.elc")).toString();
+    m_sElcFilePath = settings.value(QString("BRAINAMP/elcFilePath"), QString("../resources/general/3DLayouts/standard_waveguard64_duke.elc")).toString();
 
     m_sCardinalFilePath = settings.value(QString("BRAINAMP/cardinalFilePath"), QString("")).toString();
 

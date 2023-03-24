@@ -85,7 +85,7 @@ void GUSBAmpSetupProjectWidget::changeCap()
 {
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Change EEG cap layout",
-                                                "resources/mne_scan/plugins/gusbamp/loc_files",
+                                                "../resources/mne_scan/plugins/gusbamp/loc_files",
                                                  tr("Electrode location files (*.elc)"));
 
     if(path==NULL){
