@@ -388,7 +388,7 @@ int main(int argc, char *argv[])
 
     //Read and show sensor helmets
     if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
-        QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/resources/general/sensorSurfaces/306m_rt.fif");
+        QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m_rt.fif");
         MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
         tNetworkView.getTreeModel()->addMegSensorInfo("Sensors",
                                                       "VectorView",

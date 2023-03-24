@@ -66,7 +66,7 @@ using namespace FIFFLIB;
 
 GUSBAmp::GUSBAmp()
 : m_pRTMSA_GUSBAmp(0)
-, m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/gusbamp/")
+, m_qStringResourcePath(qApp->applicationDirPath()+"/../resources/mne_scan/plugins/gusbamp/")
 , m_pGUSBAmpProducer(new GUSBAmpProducer(this))
 , m_iNumberOfChannels(0)
 , m_iSamplesPerBlock(0)

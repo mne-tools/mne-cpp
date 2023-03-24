@@ -67,7 +67,7 @@ using namespace Eigen;
 
 TMSI::TMSI()
 : m_pRMTSA_TMSI(0)
-, m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/tmsi/")
+, m_qStringResourcePath(qApp->applicationDirPath()+"/../resources/mne_scan/plugins/tmsi/")
 , m_pTMSIProducer(new TMSIProducer(this))
 , m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_float>(new CircularBuffer_Matrix_float(8)))
 {
