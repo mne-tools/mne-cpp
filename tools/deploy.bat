@@ -236,7 +236,7 @@ for (( j=0; j<argc; j++ )); do
     elif [ "${argv[j]}" == "mock" ]; then
         MockBuild="true"
     fi
-    IFS='=' read -r -a inkarg <<< "$argv[j]"
+    IFS='=' read -r -a inkarg <<< "${argv[j]}"
     if [ "${inkarg[0]}" == "build-name" ]; then
         echo "ink"
         set "BuildName=${inkarg[1]}"
@@ -429,7 +429,7 @@ for (( j=0; j<argc; j++ )); do
     elif [ "${argv[j]}" == "mock" ]; then
         MockBuild="true"
     fi
-    IFS='=' read -r -a inkarg <<< "$argv[j]"
+    IFS='=' read -r -a inkarg <<< "${argv[j]}"
     if [ "${inkarg[0]}" == "build-name" ]; then
         BuildName="${inkarg[1]}"
     fi
