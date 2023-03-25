@@ -237,9 +237,9 @@ for (( j=0; j<argc; j++ )); do
         MockBuild="true"
     fi
     IFS='=' read -r -a inkarg <<< "${argv[j]}"
-    if [ "${inkarg[0]}" == "build-name" ]; then
+    if [[ "${inkarg[0]}" == "build-name" ]]; then
         echo "ink"
-        set "BuildName=${inkarg[1]}"
+        BuildName="${inkarg[1]}"
     fi
 done
 
@@ -269,8 +269,8 @@ if [[ ${LinkOption} == "dynamic" ]]; then
     # Solve for dependencies for mne_scan.app bundle
     ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/mne_scan_plugins ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/mne_scan_plugins
     ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/resources
-    ${MockText}cp -a src/applications/mne_scan/plugins/brainflowboard/brainflow/installed/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
-    ${MockText}cp -a src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
+    ${MockText}cp -a ${BasePath}/src/applications/mne_scan/plugins/brainflowboard/brainflow/installed/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
+    ${MockText}cp -a ${BasePath}/src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
     ${MockText}cp -a ${BasePath}/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
     # ${MockText}cp -a $Qt5_DIR/plugins/renderers ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/PlugIns/renderers
 
