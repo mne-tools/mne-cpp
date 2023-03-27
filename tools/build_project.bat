@@ -438,7 +438,7 @@ if [ "${Rebuild}" == "false" ]; then
     -DCMAKE_BUILD_TYPE=${BuildType} \
     -DBINARY_OUTPUT_DIRECTORY=${OutFolder} \
     ${CoverageOption} \
-    ${CMakeConfigFlags}
+    ${CMakeConfigFlags} \
     ${ExtraArgs}
 fi
 
