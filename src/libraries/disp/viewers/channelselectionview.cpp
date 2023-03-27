@@ -165,12 +165,12 @@ void ChannelSelectionView::initComboBoxes()
 
     //Initialise layout as neuromag vectorview with all channels
     QString selectionName("Vectorview-all.lout");
-    //loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/general/2DLayouts/"));
+    //loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/../resources/general/2DLayouts/"));
     setCurrentLayoutFile(selectionName);
 
     //Load selection groups again because they need to be reinitialised every time a new layout hase been loaded
     selectionName = QString("mne_browse_raw_vv.sel");
-    loadSelectionGroups(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/general/selectionGroups/"));
+    loadSelectionGroups(QCoreApplication::applicationDirPath() + selectionName.prepend("/../resources/general/selectionGroups/"));
 }
 
 //=============================================================================================================
@@ -442,7 +442,7 @@ void ChannelSelectionView::loadSettings()
     QSettings settings("MNECPP");
 
     setCurrentLayoutFile(settings.value(m_sSettingsPath + QString("/ChannelSelectionView/selectedLayoutFile"), "Vectorview-all.lout").toString());
-    loadSelectionGroups(QCoreApplication::applicationDirPath() + settings.value(m_sSettingsPath + QString("/ChannelSelectionView/selectedGroupFile"), "mne_browse_raw_vv.sel").toString().prepend("/resources/general/selectionGroups/"));
+    loadSelectionGroups(QCoreApplication::applicationDirPath() + settings.value(m_sSettingsPath + QString("/ChannelSelectionView/selectedGroupFile"), "mne_browse_raw_vv.sel").toString().prepend("/../resources/general/selectionGroups/"));
 
     qDebug() << "loadSettings: " << getCurrentLayoutFile();
 
@@ -577,7 +577,7 @@ bool ChannelSelectionView::loadSelectionGroups(QString path)
     m_pUi->m_listWidget_selectionGroups->clear();
 
     //Read selection from file and store to map
-    QString newPath = path; //QCoreApplication::applicationDirPath() + path.prepend("/resources/general/selectionGroups/");
+    QString newPath = path; //QCoreApplication::applicationDirPath() + path.prepend("/../resources/general/selectionGroups/");
 
     m_selectionGroupsMap.clear();
 
@@ -726,7 +726,7 @@ void ChannelSelectionView::onBtnLoadUserSelection()
 {
     QString path = QFileDialog::getOpenFileName(this,
                                                 QString("Open selection file"),
-                                                QString("./general/resources/selectionGroups/"),
+                                                QString("../resources/general/selectionGroups/"),
                                                 tr("Selection files (*.sel *.mon)"));
 
     if(path.isEmpty())
@@ -743,7 +743,7 @@ void ChannelSelectionView::onBtnSaveUserSelection()
     QDate date;
     QString path = QFileDialog::getSaveFileName(this,
                                                 "Save user channel selection",
-                                                QString("./general/resources/selectionGroups/%1_%2_%3_UserSelection").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
+                                                QString("../resources/general/selectionGroups/%1_%2_%3_UserSelection").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
                                                 tr("MNE selection file(*.sel);; Brainstorm montage file(*.mon)"));
 
     QMultiMap<QString, QStringList> tempMap = m_selectionGroupsMap;
@@ -775,7 +775,7 @@ void ChannelSelectionView::onBtnAddToSelectionGroups()
 void ChannelSelectionView::onComboBoxLayoutChanged()
 {
     QString selectionName(m_pUi->m_comboBox_layoutFile->currentText());
-    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/resources/general/2DLayouts/"));
+    loadLayout(QCoreApplication::applicationDirPath() + selectionName.prepend("/../resources/general/2DLayouts/"));
     updateBadChannels();
 }
 

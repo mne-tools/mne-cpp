@@ -114,8 +114,8 @@ void TestEDF2FIFFRWR::initTestCase()
 {
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
 
-    m_pFileIn = new QFile(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/EEG/test_reduced.edf");
-    m_pFileOut = new QFile(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/EEG/test_reduced_temporary.fif");
+    m_pFileIn = new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/EEG/test_reduced.edf");
+    m_pFileOut = new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/EEG/test_reduced_temporary.fif");
 
     // initialize EDF raw data
     m_pEDFRaw = new EDFRawData(m_pFileIn);

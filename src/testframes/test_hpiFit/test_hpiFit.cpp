@@ -133,7 +133,7 @@ void TestHpiFit::initTestCase()
 {
     qInstallMessageHandler(ApplicationLogger::customLogWriter);
 
-    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
+    QFile t_fileIn(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/test_hpiFit_raw.fif");
 
     // Make sure test folder exists
     QFileInfo t_fileInInfo(t_fileIn);

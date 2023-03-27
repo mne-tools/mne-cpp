@@ -6,10 +6,11 @@
     setlocal EnableDelayedExpansion
 
     SET ScriptPath=%~dp0
-    SET BaseFolder=%ScriptPath%..\..
+    SET BaseFolder=%ScriptPath%..
 
     SET "EXIT_FAIL=1"
     SET "EXIT_SUCCESS=0"
+    SET "EXIT_VALUE=3"
 
     SET "SourceFolder="
     SET "BuildFolder="
@@ -28,40 +29,47 @@
     SET "NumProcesses=1"
 
     SET "Rebuild=False"
-
     SET "CMakeConfigFlags="
-    
+    SET "ExtraArgs="
+    SET "ExtraSection=False"
+
     :loop
     IF NOT "%1"=="" (
-      IF "%1"=="help" (
+      IF "%ExtraSection%"=="True" (
+        SET "ExtraArgs=!ExtraArgs! %1"
+      )
+      IF "%ExtraSection%"=="False" IF "%1"=="help" (
         call:showLogo
         call:showHelp
         goto :endOfScript
       )
       set Arg=%1
 
-      IF NOT x!Arg!==x!Arg:Release=! (
+      IF "%ExtraSection%"=="False" IF NOT x!Arg!==x!Arg:Release=! (
         SET BuildType=Release
         SET BuildName=!Arg!
       )
-      IF NOT x!Arg!==x!Arg:Debug=! (
+      IF "%ExtraSection%"=="False" IF NOT x!Arg!==x!Arg:Debug=! (
         SET BuildType=Debug
         SET BuildName=!Arg!
       )
-      IF "%1"=="coverage" (
+      IF "%ExtraSection%"=="False" IF "%1"=="coverage" (
         SET "WithCodeCoverage=True"
       )
-      IF "%1"=="mock" (
+      IF "%ExtraSection%"=="False" IF "%1"=="mock" (
         SET "MockBuild=True"
       )
-      IF "%1"=="clean" (
+      IF "%ExtraSection%"=="False" IF "%1"=="clean" (
         SET "CleanBuild=True"
       )
-      IF "%1"=="rebuild" (
+      IF "%ExtraSection%"=="False" IF "%1"=="rebuild" (
         SET "Rebuild=True"
       )
-      IF "%1"=="static" (
+      IF "%ExtraSection%"=="False" IF "%1"=="static" (
         SET "CMakeConfigFlags=!CMakeConfigFlags! -DBUILD_SHARED_LIBS=OFF"
+      )
+      IF "%ExtraSection%"=="False" IF "%1"=="--" (
+        SET "ExtraSection=True"
       )
       SHIFT
       GOTO :loop
@@ -99,19 +107,21 @@
         %MockText%cmake -B %BuildFolder% -S %SourceFolder% -DCMAKE_BUILD_TYPE=%BuildType% -DBINARY_OUTPUT_DIRECTORY=%OutFolder% -DCMAKE_CXX_FLAGS="/MP" %CMakeConfigFlags%
     )
 
-    %MockText%cmake --build %BuildFolder% --config %BuildType% && call::buildSuccessful || call:buildFailed
+    %MockText%cmake --build %BuildFolder% --config %BuildType% && call:buildSuccessful || call:buildFailed
 
     :endOfScript
 
-    exit /B 
+    exit /B %EXIT_VALUE%
 
     :buildSuccessful
+      SET "EXIT_VALUE=%EXIT_SUCCESS%"
       call:showBuildSuccessful
-    exit /B %EXIT_SUCCESS%
+    exit /B 0
 
     :buildFailed
+      SET "EXIT_VALUE=%EXIT_FAIL%"    
       call:showBuildFailed
-    exit /B %EXIT_FAIL%
+    exit /B 0
 
     :doPrintConfiguration
       ECHO.
@@ -124,13 +134,16 @@
       ECHO BuildFolder  = %BuildFolder%
       ECHO OutFolder    = %OutFolder%
       ECHO.
+      ECHO VerboseMode  = %VerboseMode%
+      ECHO MockBuild    = %MockBuild%
+      ECHO CleanBuild   = %CleanBuild%
       ECHO BuildType    = %BuildType%
       ECHO BuildName    = %BuildName%
-      ECHO CleanBuild   = %CleanBuild%
       ECHO Rebuild      = %Rebuild%
       ECHO Coverage     = %WithCodeCoverage%
       ECHO NumProcesses = %NumProcesses%
-      ECHO MockBuild    = %MockBuild%
+      ECHO CMakeConfigFlags = %CMakeConfigFlags%
+      ECHO ExtraARgs    = %ExtraArgs%
       ECHO.
       ECHO ====================================================================
       ECHO ====================================================================
@@ -144,10 +157,11 @@
       ECHO Usage: ./build_project.bat [Options]
       ECHO.
       ECHO All builds will be parallel.
-      ECHO All options can be used in undefined order.
+      ECHO All options can be used in undefined order, except for the extra args, 
+      ECHO which have to be at the end.
       ECHO.
-      ECHO [help] - Print this help.
-      ECHO [mock] - Show commands do not execute them.
+      ECHO [help]  - Print this help.
+      ECHO [mock]  - Show commands do not execute them.
       ECHO [clean] - Delete build and out folders for your configuration and exit.
       ECHO [Release*/Debug*] - Set the build type Debug/Release and name it.
       ECHO                     For example, Release_testA will build in release
@@ -155,8 +169,11 @@
       ECHO                     and an out folder /out/Release_testA.
       ECHO [coverage] - Enable code coverage.
       ECHO [rebuild]  - Only rebuild existing build-system configuration.
-      ECHO [static]   - Build project statically. QT_DIR and Qt5_DIR must be set to"
-      ECHO              Point to a static version of Qt."
+      ECHO [static]   - Build project statically. QT_DIR and Qt5_DIR must be set to
+      ECHO              point to a static version of Qt.
+      ECHO [--]       - Mark beginning of extra-arguments section. Any argument
+      ECHO              following the double dash will be passed on to cmake 
+      ECHO              directly without it being parsed.      
       ECHO.
     exit /B 0
 
@@ -194,7 +211,7 @@
       ECHO    _           _ _     _     __      _ _          _   
       ECHO   ^| ^|         (_) ^|   ^| ^|   / _^|    (_) ^|        ^| ^|  
       ECHO   ^| ^|__  _   _ _^| ^| __^| ^|  ^| ^|_ __ _ _^| ^| ___  __^| ^|  
-      ECHO   ^| '_ \^| ^| ^| ^| ^| ^|/ _` ^|  ^|  _/ _` ^| ^| ^|/ _ \/ _` ^|  
+      ECHO   ^| '_ \^| ^| ^| ^| ^| ^|/ _` ^|  ^|  _/ _` ^| ^| ^|/ _ \/ _` ^|     
       ECHO   ^| ^|_) ^| ^|_^| ^| ^| ^| (_^| ^|  ^| ^|^| (_^| ^| ^| ^|  __/ (_^| ^|  
       ECHO   ^|_.__/ \__,_^|_^|_^|\__,_^|  ^|_^| \__,_^|_^|_^|\___^|\__,_^|  
       ECHO.
@@ -229,7 +246,7 @@ EXIT_FAIL=1
 EXIT_SUCCESS=0
 
 ScriptPath="$(cleanAbsPath "$(dirname "$0")")"
-BaseFolder="$(cleanAbsPath "$ScriptPath/../..")"
+BaseFolder="$(cleanAbsPath "$ScriptPath/..")"
 SourceFolder=""
 BuildFolder=""
 OutFolder=""
@@ -243,13 +260,14 @@ MockBuild="false"
 MockText=""
 PrintHelp="false"
 CMakeConfigFlags=""
+ExtraArgs=""
+ExtraSection=False
 
 doShowLogo() {
   echo "                                      "
-  echo "                                      "
   echo "    _    _ _  _ ___     ___ __  ___   "
   echo "   |  \/  | \| | __|   / __| _ \ _ \  "
-  echo "   | |\/| | .\` | _|   | (__|  _/  _/  "
+  echo "   | |\/| |  \` | _|   | (__|  _/  _/  "
   echo "   |_|  |_|_|\_|___|   \___|_| |_|    "
   echo "                                      "
   echo "   Build tool                         "
@@ -257,7 +275,6 @@ doShowLogo() {
 }
 
 doShowLogoFlames() {
-  echo "                                        "
   echo "                                        "
   echo "     *       )             (   (        "
   echo "   (  \`   (  (         (   )\ ))\ )     "
@@ -305,6 +322,7 @@ doPrintConfiguration() {
   echo " MockBuild = $MockBuild"
   echo " MockText = $MockText"
   echo " PrintHelp = $PrintHelp"
+  echo " ExtraArgs = $ExtraArgs"
   echo " "
   echo ========================================================================
   echo ========================================================================
@@ -316,7 +334,8 @@ doPrintHelp() {
   echo "Usage: ./build_project.bat [Options]"
   echo " "
   echo "All builds will be parallel."
-  echo "All options can be used in undefined order."
+  echo "All options can be used in undefined order, except for the extra args," 
+  echo "which have to be at the end."
   echo " "
   echo "[help]  - Print this help."
   echo "[mock]  - Show commands do not execute them."
@@ -329,11 +348,12 @@ doPrintHelp() {
   echo "[rebuild]  - Only rebuild existing build-system configuration."
   echo "[static]   - Build project statically. QT_DIR and Qt5_DIR must be set to"
   echo "             point to a static version of Qt."
+  echo "[--]       - mark beginning of extra-arguments section. any argument"
+  echo "             following the double dash will be passed on to cmake"
+  echo "             directly without it being parsed."
   echo " "
 }
 
-SubStrDebug="Debug"
-SubStrRelease="Release"
 for (( j=0; j<argc; j++)); do
   if [ "${argv[j]}" == "coverage" ]; then
     WithCodeCoverage="true"
@@ -358,6 +378,11 @@ for (( j=0; j<argc; j++)); do
       BuildName="${argv[j]}"
       ;;
   esac
+  if [ "${argv[j]}" == "--" ]; then
+    for ((j++ ; j<argc; j++)); do
+      ExtraArgs="${ExtraArgs} ${argv[j]}"
+    done
+  fi
 done
 
 if [ "$WithCodeCoverage" == "false"  ]; then
@@ -409,7 +434,12 @@ fi
 if [ "${Rebuild}" == "false" ]; then
   echo " "
   echo "Configuring Build System:" 
-  ${MockText}cmake -B ${BuildFolder} -S ${SourceFolder} -DCMAKE_BUILD_TYPE=${BuildType} -DBINARY_OUTPUT_DIRECTORY=${OutFolder} ${CoverageOption} ${CMakeConfigFlags}
+  ${MockText}cmake -B ${BuildFolder} -S ${SourceFolder} \
+    -DCMAKE_BUILD_TYPE=${BuildType} \
+    -DBINARY_OUTPUT_DIRECTORY=${OutFolder} \
+    ${CoverageOption} \
+    ${CMakeConfigFlags}
+    ${ExtraArgs}
 fi
 
 echo " "

@@ -107,7 +107,7 @@ void TestMneForwardSolution::computeForward()
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute/Write/Read MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     // Read reference forward solution
-    QString fwdMEGEEGFileRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QString fwdMEGEEGFileRef(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
     QFile fileFwdMEGEEGRef(fwdMEGEEGFileRef);
     m_pFwdMEGEEGRef = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(fileFwdMEGEEGRef));
 
@@ -116,25 +116,25 @@ void TestMneForwardSolution::computeForward()
     // --meg
     // --eeg
     // --accurate
-    // --src ./mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif
-    // --meas ./mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif
-    // --mri ./mne-cpp-test-data/MEG/sample/all-trans.fif
-    // --bem ./mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif
+    // --src ../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif
+    // --meas ../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif
+    // --mri ../resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif
+    // --bem ../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif
     // --mindist 5
-    // --fwd ./mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif
+    // --fwd ../resources/data/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif
 
     ComputeFwdSettings::SPtr pSettingsMEGEEG = ComputeFwdSettings::SPtr(new ComputeFwdSettings);
 
     pSettingsMEGEEG->include_meg = true;
     pSettingsMEGEEG->include_eeg = true;
     pSettingsMEGEEG->accurate = true;
-    pSettingsMEGEEG->srcname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
-    pSettingsMEGEEG->measname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
-    pSettingsMEGEEG->mriname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/MEG/sample/all-trans.fif";
+    pSettingsMEGEEG->srcname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-oct-6-src.fif";
+    pSettingsMEGEEG->measname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis_trunc_raw.fif";
+    pSettingsMEGEEG->mriname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/MEG/sample/all-trans.fif";
     pSettingsMEGEEG->transname.clear();
-    pSettingsMEGEEG->bemname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
+    pSettingsMEGEEG->bemname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif";
     pSettingsMEGEEG->mindist = 5.0f/1000.0f;
-    pSettingsMEGEEG->solname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
+    pSettingsMEGEEG->solname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
 
     QFile t_name(pSettingsMEGEEG->measname);
     FIFFLIB::FiffRawData raw(t_name);
@@ -179,7 +179,7 @@ void TestMneForwardSolution::computeForward()
 
 void TestMneForwardSolution::cleanupTestCase()
 {
-    QString fwdMEGEEGFileRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QString fwdMEGEEGFileRef(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QFile::remove(fwdMEGEEGFileRef);
 }
 

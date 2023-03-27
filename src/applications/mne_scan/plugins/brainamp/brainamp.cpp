@@ -73,7 +73,7 @@ using namespace Eigen;
 
 BrainAMP::BrainAMP()
 : m_pRMTSA_BrainAMP(0)
-, m_qStringResourcePath(qApp->applicationDirPath()+"/resources/mne_scan/plugins/brainamp/")
+, m_qStringResourcePath(qApp->applicationDirPath()+"/../resources/mne_scan/plugins/brainamp/")
 , m_pBrainAMPProducer(new BrainAMPProducer(this))
 , m_dLPAShift(0.01)
 , m_dRPAShift(0.01)
@@ -128,7 +128,7 @@ void BrainAMP::init()
     m_iSamplesPerBlock = settings.value(QString("BRAINAMP/samplesPerBlock"), 1000).toInt();
     m_bCheckImpedances = false;
 
-    m_sElcFilePath = settings.value(QString("BRAINAMP/elcFilePath"), QString("./Resources/3DLayouts/standard_waveguard64_duke.elc")).toString();
+    m_sElcFilePath = settings.value(QString("BRAINAMP/elcFilePath"), QString("../resources/general/3DLayouts/standard_waveguard64_duke.elc")).toString();
 
     m_sCardinalFilePath = settings.value(QString("BRAINAMP/cardinalFilePath"), QString("")).toString();
 

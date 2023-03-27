@@ -41,12 +41,6 @@ jobs:
         version: ${{ matrix.qt }}
         arch: win64_msvc2017_64
         modules: qtcharts
-    - name: Install jom (Windows)
-      if: matrix.os == 'windows-2019'
-      run: |
-        Invoke-WebRequest https://www.dropbox.com/s/gbf8sdx8wqxcrnd/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip"
-        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Compile BrainFlow submodule (Windows)
       if: matrix.os == 'windows-2019'
       run: |
@@ -96,7 +90,7 @@ jobs:
         cmake --build build
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat dynamic pack
+        ./tools/deploy.bat dynamic pack
 
   MaxQtDynamic:
     runs-on: ${{ matrix.os }}
@@ -133,12 +127,6 @@ jobs:
         version: ${{ matrix.qt }}
         arch: win64_msvc2019_64
         modules: qtcharts
-    - name: Install jom (Windows)
-      if: matrix.os == 'windows-2019'
-      run: |
-        Invoke-WebRequest https://www.dropbox.com/s/gbf8sdx8wqxcrnd/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip"
-        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Compile BrainFlow submodule (Windows)
       if: matrix.os == 'windows-2019'
       run: |
@@ -188,7 +176,7 @@ jobs:
         cmake --build build
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat dynamic pack
+        ./tools/deploy.bat dynamic pack
 
   QtStatic:
     runs-on: ${{ matrix.os }}
@@ -231,12 +219,6 @@ jobs:
         # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
         Invoke-WebRequest https://www.dropbox.com/s/z745z290s9pknih/qt5_5152_static_binaries_win.zip?dl=1 -OutFile .\qt5_5152_static_binaries_win.zip
         expand-archive -path "qt5_5152_static_binaries_win.zip" -destinationpath "..\"
-    - name: Install jom (Windows)
-      if: matrix.os == 'windows-2019'
-      run: |
-        Invoke-WebRequest https://www.dropbox.com/s/gbf8sdx8wqxcrnd/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip"
-        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
       run: |
@@ -252,7 +234,7 @@ jobs:
         cmake --build build
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat static pack
+        ./tools/deploy.bat static pack
 
   Tests:
     runs-on: ${{ matrix.os }}
@@ -267,7 +249,7 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v2
     - name: Clone mne-cpp test data
-      run: git clone https://github.com/mne-tools/mne-cpp-test-data.git ./bin/mne-cpp-test-data
+      run: git clone https://github.com/mne-tools/mne-cpp-test-data.git resources/data/mne-cpp-test-data
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -290,12 +272,6 @@ jobs:
         version: 5.15.2
         arch: win64_msvc2019_64
         modules: qtcharts
-    - name: Install jom (Windows)
-      if: matrix.os == 'windows-2019'
-      run: |
-        Invoke-WebRequest https://www.dropbox.com/s/gbf8sdx8wqxcrnd/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip"
-        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Configure and compile MNE-CPP (Linux)
       if: matrix.os == 'ubuntu-20.04'
       run: |
@@ -320,19 +296,19 @@ jobs:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        ./tools/testing/test_all.bat verbose withCoverage
+        ./tools/test_all.bat verbose withCoverage
     - name: Run tests (MacOS)
       if: matrix.os == 'macos-latest'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        ./tools/testing/test_all.bat verbose
+        ./tools/test_all.bat Release verbose
     - name: Run tests (Windows)
       if: matrix.os == 'windows-2019'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        ./tools/testing/test_all.bat verbose
+        ./tools/test_all.bat Release verbose
   Doxygen:
     runs-on: ubuntu-20.04
 

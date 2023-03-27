@@ -85,9 +85,9 @@ using namespace RTPROCESSINGLIB;
 BabyMEG::BabyMEG()
 : m_pCircularBuffer(CircularBuffer_Matrix_float::SPtr(new CircularBuffer_Matrix_float(40)))
 , m_iBufferSize(-1)
-, m_sFiffProjections(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/babymeg/header.fif")
-, m_sFiffCompensators(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/babymeg/compensator.fif")
-, m_sBadChannels(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/babymeg/both.bad")
+, m_sFiffProjections(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/babymeg/header.fif")
+, m_sFiffCompensators(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/babymeg/compensator.fif")
+, m_sBadChannels(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/babymeg/both.bad")
 {
     m_pActionSqdCtrl = new QAction(QIcon(":/images/sqdctrl.png"), tr("Squid Control"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));

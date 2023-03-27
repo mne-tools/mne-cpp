@@ -91,10 +91,10 @@ jobs:
       run: |
         export QT_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
         export Qt5_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
-        ./tools/building/build_project.bat static 
+        ./tools/build_project.bat static 
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat static pack
+        ./tools/deploy.bat static pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -146,10 +146,10 @@ jobs:
       run: |
         export QT_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
         export Qt5_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
-        ./tools/building/build_project.bat static
+        ./tools/build_project.bat static
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat static pack
+        ./tools/deploy.bat static pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -181,11 +181,6 @@ jobs:
       with:
         python-version: '3.7'
         architecture: 'x64'
-    - name: Install jom
-      run: |
-        Invoke-WebRequest https://www.dropbox.com/s/gbf8sdx8wqxcrnd/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip"
-        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Install Qt
       run: |
         # Download the pre-built static version of Qt, which was created with the buildqtbinaries.yml workflow
@@ -216,10 +211,10 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         $env:QT_DIR += "$PWD\..\Qt5_binaries\lib\cmake\Qt5"
         $env:Qt5_DIR += "$PWD\..\Qt5_binaries\lib\cmake\Qt5"
-        ./tools/building/build_project.bat static
+        ./tools/build_project.bat static
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat static pack
+        ./tools/deploy.bat static pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -275,10 +270,10 @@ jobs:
         cmake --build .
     - name: Configure and compile MNE-CPP
       run: |
-        ./tools/building/build_project.bat
+        ./tools/build_project.bat
     - name: Deploy binaries
       run: |
-        ./tools/deployment/deploy.bat dynamic pack
+        ./tools/deploy.bat dynamic pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -334,10 +329,10 @@ jobs:
         cmake --build .
     - name: Configure and compile MNE-CPP
       run: |
-        ./tools/building/build_project.bat
+        ./tools/build_project.bat
     - name: Deploy binaries (MacOS)
       run: |
-        ./tools/deployment/deploy.bat dynamic pack
+        ./tools/deploy.bat dynamic pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -378,11 +373,6 @@ jobs:
         version: 5.15.2
         arch: win64_msvc2019_64
         modules: qtcharts
-    - name: Install jom
-      run: |
-        Invoke-WebRequest https://www.dropbox.com/s/gbf8sdx8wqxcrnd/jom.zip?dl=1 -OutFile .\jom.zip
-        expand-archive -path "jom.zip"
-        echo "D:\a\mne-cpp\mne-cpp\jom" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Compile BrainFlow submodule
       run: |
         cd src\applications\mne_scan\plugins\brainflowboard\brainflow
@@ -401,10 +391,10 @@ jobs:
       run: |
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        ./tools/building/build_project.bat
+        ./tools/build_project.bat
     - name: Deploy binaries (Windows)
       run: |
-        ./tools/deployment/deploy.bat dynamic pack
+        ./tools/deploy.bat dynamic pack
     - name: Deploy binaries with stable release on Github
       if: endsWith(github.ref, 'main') == false
       uses: svenstaro/upload-release-action@v1-release
@@ -434,7 +424,7 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v2
     - name: Clone mne-cpp test data
-      run: git clone https://github.com/mne-tools/mne-cpp-test-data.git ./out/Release/tests/mne-cpp-test-data
+      run: git clone https://github.com/mne-tools/mne-cpp-test-data.git resources/data/mne-cpp-test-data
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -450,13 +440,13 @@ jobs:
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |
-        ./tools/building/build_project.bat Release coverage
+        ./tools/build_project.bat Release coverage
     - name: Run tests and upload results to Codecov
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
-        ./tools/testing/test_all.bat verbose withCoverage
+        ./tools/test_all.bat verbose withCoverage
 
   Doxygen:
     runs-on: ubuntu-20.04
@@ -556,7 +546,7 @@ jobs:
     - name: Setup and build WASM
       run: |
         cd ..
-        ./mne-cpp/tools/deployment/wasm.sh --source https://github.com/mne-tools/mne-cpp.git --qt 5.15 --emsdk 3.1.20
+        ./mne-cpp/tools/wasm.sh --source https://github.com/mne-tools/mne-cpp.git --qt 5.15 --emsdk 3.1.20
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
@@ -564,11 +554,10 @@ jobs:
     - name: Clone and update mne-cpp/wasm:gh-pages
       run: |
         # Delete folders which we do not want to ship
-        rm -r bin/mne_analyze_plugins
-        rm -r bin/mne-cpp-test-data
-        rm -r bin/MNE-sample-data
+        rm -r resources/mne_analyze_plugins
+        rm -r resources/data
         # Replace logo
-        cp -RT tools/design/logos/qtlogo.svg bin/qtlogo.svg
+        cp -RT resources/design/logos/qtlogo.svg bin/qtlogo.svg
         # Clone repo and update with new wasm versions
         git config --global user.email lorenzesch@hotmail.com
         git config --global user.name LorenzE

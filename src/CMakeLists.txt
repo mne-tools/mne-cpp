@@ -1,7 +1,5 @@
-cmake_minimum_required(VERSION 3.14)
-project(mne_cpp
-  LANGUAGES CXX
-)
+cmake_minimum_required(VERSION 3.15)
+project(mne_cpp LANGUAGES CXX)
 
 ##==============================================================================
 ## Global build options
@@ -28,7 +26,7 @@ if(WITH_CODE_COV)
 endif()
 
 ##==============================================================================
-## FFTW Options 
+## FFTW Options
 
 option(USE_FFTW "Use fftw backend for eigen" OFF)
 
@@ -47,7 +45,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # If no build type is specified, default to Release
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE "Release")
-  message("-- [MNE-CPP] Build type not defined. Using default value: ${CMAKE_BUILD_TYPE}")
+  message("-- [MNE-CPP] Build type not defined."
+    "Using default value:"
+    "${CMAKE_BUILD_TYPE}"
+  )
 endif()
 
 if(NOT DEFINED CMAKE_BINARY_DIR)
@@ -56,7 +57,10 @@ endif()
 
 if(NOT DEFINED BINARY_OUTPUT_DIRECTORY)
   set(BINARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../out/${CMAKE_BUILD_TYPE})
-  message("-- [MNE-CPP] Build name not defined. Using default value: ${BINARY_OUTPUT_DIRECTORY}")
+  message(
+    "-- [MNE-CPP] Build name not defined."
+    " Using default value: ${BINARY_OUTPUT_DIRECTORY}"
+  )
 endif()
 
 ##==============================================================================
@@ -65,13 +69,17 @@ endif()
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   if(NOT DEFINED FORCE_IN_SOURCE_BUILD)
     message(FATAL_ERROR
-      "We dissalow in-sourec builds by default because they are typically a bad idea."
-      "\n Remove \"${CMAKE_SOURCE_DIR}/CMakeCache.txt\" and \"${CMAKE_SOURCE_DIR}/CMakeFiles\" and try again from another folder:"
+      "We dissalow in-sourec builds by default because they are typically"
+      " a bad idea."
+      "\n Remove \"${CMAKE_SOURCE_DIR}/CMakeCache.txt\" and "
+      "\"${CMAKE_SOURCE_DIR}/CMakeFiles\" and try again from another folder:"
       "\n "
       "\n mkdir build"
-      "\n cmake -B build -S src" 
-      "\n " 
-      "\n If you are absolutley sure of what you are doing, you can pass in FORCE_IN_SOURCE_BUILD to CMake to force in-soure building (not recommended!)"
+      "\n cmake -B build -S src"
+      "\n "
+      "\n If you are absolutley sure of what you are doing, you can pass in "
+      "FORCE_IN_SOURCE_BUILD to CMake to force in-soure building "
+      "(not recommended!)"
     )
   endif()
 endif()
@@ -110,3 +118,38 @@ if(NOT LIB_ONLY)
     endif()
   endif()
 endif()
+
+##==============================================================================
+## Add symbolic links to project resources folder
+
+set(PROJECT_RESOURCES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources)
+set(OUTPUT_RESOURCES_DIR ${BINARY_OUTPUT_DIRECTORY}/resources)
+
+cmake_path(
+  NORMAL_PATH     PROJECT_RESOURCES_DIR
+  OUTPUT_VARIABLE PROJECT_RESOURCES_DIR
+)
+
+cmake_path(
+  NORMAL_PATH     OUTPUT_RESOURCES_DIR
+  OUTPUT_VARIABLE OUTPUT_RESOURCES_DIR
+)
+
+message(STATUS "PROJECT_RESOURCES_DIR=${PROJECT_RESOURCES_DIR}")
+message(STATUS "OUTPUT_RESOURCES_DIR=${OUTPUT_RESOURCES_DIR}")
+
+execute_process(
+  COMMAND ${CMAKE_COMMAND} -E make_directory ${BINARY_OUTPUT_DIRECTORY}
+)
+if(WIN32)
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${PROJECT_RESOURCES_DIR} ${OUTPUT_RESOURCES_DIR}
+  )
+else()
+  execute_process(
+    COMMAND ${CMAKE_COMMAND} -E create_symlink
+    ${PROJECT_RESOURCES_DIR} ${OUTPUT_RESOURCES_DIR}
+  )
+endif()
+

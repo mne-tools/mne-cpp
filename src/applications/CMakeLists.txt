@@ -3,7 +3,6 @@ if(WIN32)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 endif()
-file(COPY ${CMAKE_SOURCE_DIR}/../resources DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 if(APPLE)
     set(CMAKE_INSTALL_RPATH "@executable_path/../lib")
@@ -25,3 +24,4 @@ add_subdirectory(mne_rt_server)
 add_subdirectory(mne_forward_solution)
 add_subdirectory(mne_edf2fiff)
 add_subdirectory(mne_dipole_fit)
+

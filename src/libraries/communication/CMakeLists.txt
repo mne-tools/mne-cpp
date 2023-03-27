@@ -43,7 +43,7 @@ add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 set(FFTW_LIBS "")
 
 if(USE_FFTW)
-  if (WIN32)
+  if(WIN32)
     set(FFTW_LIBS
       ${FFTW_DIR_LIBS}/libfftw3-3.dll
       ${FFTW_DIR_LIBS}/libfftw3f-3.dll

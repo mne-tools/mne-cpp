@@ -16,7 +16,7 @@ jobs:
     - name: Setup and build WASM
       run: |
         cd ..
-        ./mne-cpp/tools/deployment/wasm.sh --source https://github.com/mne-tools/mne-cpp.git --qt 5.15 --emsdk 3.1.20
+        ./mne-cpp/tools/wasm.sh --source https://github.com/mne-tools/mne-cpp.git --qt 5.15 --emsdk 3.1.20
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
@@ -27,9 +27,9 @@ jobs:
         git config --global user.email dev@dev.com
         git config --global user.name dev
         # Save the wasm files first
-        cp -RT bin/ ../bin
+        cp -RT out/Release/ ../bin
         # Replace logo
-        cp -RT tools/design/logos/qtlogo.svg ../bin/qtlogo.svg
+        cp -RT resources/design/logos/qtlogo.svg ../bin/qtlogo.svg
         # Checkout the gh-pages branch
         git fetch origin gh-pages
         git checkout --track origin/gh-pages

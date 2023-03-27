@@ -50,7 +50,7 @@ FileLoader(int iOpenMode,
 
 The following steps will show you how to setup the MNE-CPP QtCreator wizard. This wizard is of great help to create new C++ classes which are conform with the MNE-CPP coding conventions. This helps streamlining the contribution process.
 
- 1. Navigate to your MNE-CPP repository `\tools\wizards`
+ 1. Navigate to your MNE-CPP repository `\resources\wizards`
  2. Copy the `mnecpp` folder to your QtCreator wizard folder location. Depending on your operating system, this folder will be in different locations ([see Qt documentation](https://doc.qt.io/qtcreator/creator-project-wizards.html) for more information). As an example, on Windows, if you installed your Qt instance in `C:\Qt` you should copy the `mnecpp` folder to `C:\Qt\Tools\QtCreator\share\qtcreator\templates\wizards`. On Mac, you should copy to `/Users/<userName>/Qt Creator.app/Contents/Resources/templates/wizards`. And on Linux, `/home/<userName>/Qt/share/qtcreator/templates/wizards/`.
  3. Restart QtCreator.
  4. Now you should be able to right click on the project where you want to add a new class and see the MNE-CPP category appear in the wizard.

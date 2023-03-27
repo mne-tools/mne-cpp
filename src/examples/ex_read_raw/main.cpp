@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
     parser.setApplicationDescription("Read Raw Example");
     parser.addHelpOption();
 
-    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption inputOption("fileIn", "The input file <in>.", "in", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption fromOption("from", "Read data from <from> (in seconds).", "from", "42.956");
     QCommandLineOption toOption("to", "Read data from <to> (in seconds).", "to", "320.670");
     QCommandLineOption inSamplesOption("inSamples", "Timing is set in samples.", "inSamples", "false");
