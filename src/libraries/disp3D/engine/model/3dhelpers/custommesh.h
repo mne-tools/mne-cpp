@@ -50,7 +50,7 @@
 #include <QPointer>
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-#define QT_NAMESPACE_3D Qt3DRender
+#define QT_COMPATIBILITY_3D Qt3DRender
 #include <Qt3DRender/QBuffer>
 #include <Qt3DRender/QAttribute>
 #include <Qt3DRender/QGeometry>
@@ -58,7 +58,7 @@
 #include <Qt3DCore/QBuffer>
 #include <Qt3DCore/QAttribute>
 #include <Qt3DCore/QGeometry>
-#define QT_NAMESPACE_3D Qt3DCore
+#define QT_COMPATIBILITY_3D Qt3DCore
 
 #endif
 
@@ -180,7 +180,7 @@ public:
      *
      * @param[in] pAttribute       New QAttribute.
      */
-    void addAttribute(QT_NAMESPACE_3D::QAttribute *pAttribute);
+    void addAttribute(QT_COMPATIBILITY_3D::QAttribute *pAttribute);
 
 protected:
     //=========================================================================================================
@@ -189,17 +189,17 @@ protected:
      */
     void init();
 
-    QPointer<QT_NAMESPACE_3D::QBuffer>       m_pVertexDataBuffer;       /**< The vertex buffer. */
-    QPointer<QT_NAMESPACE_3D::QBuffer>       m_pNormalDataBuffer;       /**< The normal buffer. */
-    QPointer<QT_NAMESPACE_3D::QBuffer>       m_pColorDataBuffer;        /**< The color buffer. */
-    QPointer<QT_NAMESPACE_3D::QBuffer>       m_pIndexDataBuffer;        /**< The index buffer. */
+    QPointer<QT_COMPATIBILITY_3D::QBuffer>       m_pVertexDataBuffer;       /**< The vertex buffer. */
+    QPointer<QT_COMPATIBILITY_3D::QBuffer>       m_pNormalDataBuffer;       /**< The normal buffer. */
+    QPointer<QT_COMPATIBILITY_3D::QBuffer>       m_pColorDataBuffer;        /**< The color buffer. */
+    QPointer<QT_COMPATIBILITY_3D::QBuffer>       m_pIndexDataBuffer;        /**< The index buffer. */
 
-    QPointer<QT_NAMESPACE_3D::QGeometry>       m_pCustomGeometry;         /**< The custom geometry. */
+    QPointer<QT_COMPATIBILITY_3D::QGeometry>       m_pCustomGeometry;         /**< The custom geometry. */
 
-    QPointer<QT_NAMESPACE_3D::QAttribute>      m_pIndexAttribute;         /**< The index attribute. */
-    QPointer<QT_NAMESPACE_3D::QAttribute>      m_pVertexAttribute;        /**< The position attribute. */
-    QPointer<QT_NAMESPACE_3D::QAttribute>      m_pNormalAttribute;        /**< The normal attribute. */
-    QPointer<QT_NAMESPACE_3D::QAttribute>      m_pColorAttribute;         /**< The color attribute. */
+    QPointer<QT_COMPATIBILITY_3D::QAttribute>      m_pIndexAttribute;         /**< The index attribute. */
+    QPointer<QT_COMPATIBILITY_3D::QAttribute>      m_pVertexAttribute;        /**< The position attribute. */
+    QPointer<QT_COMPATIBILITY_3D::QAttribute>      m_pNormalAttribute;        /**< The normal attribute. */
+    QPointer<QT_COMPATIBILITY_3D::QAttribute>      m_pColorAttribute;         /**< The color attribute. */
 
     int                                 m_iNumVert;                 /**< The total number of set vertices. */
 };

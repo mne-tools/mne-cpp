@@ -50,12 +50,12 @@
 #include <QPointer>
 #include <Qt3DRender/QGeometryRenderer>
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-#define QT_NAMESPACE_3D Qt3DRender
+#define QT_COMPATIBILITY_3D Qt3DRender
 #include <Qt3DRender/QGeometry>
 #include <Qt3DRender/QBuffer>
 #include <Qt3DRender/QAttribute>
 #else
-#define QT_NAMESPACE_3D Qt3DCore
+#define QT_COMPATIBILITY_3D Qt3DCore
 #include <Qt3DCore/QGeometry>
 #include <Qt3DCore/QBuffer>
 #include <Qt3DCore/QAttribute>
@@ -108,7 +108,7 @@ public:
     /**
      * Constructs a GeometryMultiplier object.
      */
-    explicit GeometryMultiplier(QSharedPointer<QT_NAMESPACE_3D::QGeometry> tGeometry,
+    explicit GeometryMultiplier(QSharedPointer<QT_COMPATIBILITY_3D::QGeometry> tGeometry,
                                                       Qt3DCore::QNode *tParent = nullptr);
 
     //=========================================================================================================
@@ -171,15 +171,15 @@ private:
      */
     QByteArray buildColorBuffer(const QVector<QColor> &tInstanceColor);
 
-    QSharedPointer<QT_NAMESPACE_3D::QGeometry>             m_pGeometry;
+    QSharedPointer<QT_COMPATIBILITY_3D::QGeometry>             m_pGeometry;
 
-    QPointer<QT_NAMESPACE_3D::QBuffer>                   m_pTransformBuffer;
+    QPointer<QT_COMPATIBILITY_3D::QBuffer>                   m_pTransformBuffer;
 
-    QPointer<QT_NAMESPACE_3D::QBuffer>                   m_pColorBuffer;
+    QPointer<QT_COMPATIBILITY_3D::QBuffer>                   m_pColorBuffer;
 
-    QPointer<QT_NAMESPACE_3D::QAttribute>                m_pTransformAttribute;
+    QPointer<QT_COMPATIBILITY_3D::QAttribute>                m_pTransformAttribute;
 
-    QPointer<QT_NAMESPACE_3D::QAttribute>                m_pColorAttribute;
+    QPointer<QT_COMPATIBILITY_3D::QAttribute>                m_pColorAttribute;
 };
 
 //=============================================================================================================
