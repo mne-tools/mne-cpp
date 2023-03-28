@@ -44,8 +44,8 @@ find_package(Python REQUIRED COMPONENTS Interpreter Development)
 #        OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/version.cmake"
 #        )
 #
-
-set(ANACONDA_DIR /autofs/cluster/fusion/juan/anaconda3)
+set(ANACONDA_DIR /opt/anaconda3)
+# set(ANACONDA_DIR /autofs/cluster/fusion/juan/anaconda3)
 set(Python_BIN_DIR ${ANACONDA_DIR}/bin)
 set(Python_LIB_DIR ${ANACONDA_DIR}/lib)
 set(Python_EXECUTABLE ${Python_BIN_DIR}/python)
@@ -168,13 +168,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
   mne_disp
   mne_utils
   mne_fiff
-  # mne_fs
-  # mne_mne
-  # mne_fwd
-  # mne_inverse
-  # mne_rtprocessing
-  # mne_connectivity
-  # mne_events
   scDisp
   scShared
   scMeas
@@ -190,7 +183,6 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
   SCAN_FIELDLINE_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"
   MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}"
 )
-
 
 if(NOT BUILD_SHARED_LIBS)
   target_compile_definitions(${PROJECT_NAME} PRIVATE

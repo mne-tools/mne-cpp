@@ -74,6 +74,7 @@ compile_commands.json
 /_site
 
 build*/*
+/resources/data*
 
 .cache/*
 
