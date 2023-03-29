@@ -307,4 +307,4 @@ QString Fieldline::getBuildInfo() {
   return QString(buildDateTime()) + QString(" - ") + QString(buildHash());
 }
 
-} // namespace FIELDLINEPLUGIN
+}  // namespace FIELDLINEPLUGIN
