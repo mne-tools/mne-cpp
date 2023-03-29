@@ -40,7 +40,7 @@
 #include "ui_fl_rack.h"
 #include "ui_fl_chassis.h"
 
-#include "fieldlineview.h"
+#include "fieldline/fieldline_view.h"
 
 //=============================================================================================================
 // QT INCLUDES

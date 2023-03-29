@@ -4,7 +4,6 @@
         <file alias="new.png">images/icons/new.png</file>
         <file alias="save.png">images/icons/save.png</file>
         <file alias="stop.png">images/icons/stop.png</file>
-        <file alias="quickControl.png">images/icons/quickControl.png</file>
         <file alias="sensor.png">images/icons/sensor.png</file>
         <file alias="io.png">images/icons/io.png</file>
         <file alias="algorithm.png">images/icons/algorithm.png</file>

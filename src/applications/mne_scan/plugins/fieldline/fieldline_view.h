@@ -40,9 +40,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp_global.h"
+#include "fieldline/fieldline_global.h"
 
-#include "led_indicator.h"
+#include "disp/viewers/led_indicator.h"
 
 #include <memory>
 #include <vector>

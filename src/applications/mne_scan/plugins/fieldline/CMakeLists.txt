@@ -110,6 +110,7 @@ set(SOURCES
     fieldline.cpp
     fieldline_acq_system_controller.cpp
     fieldline_plugin_gui.cpp
+    fieldline_view.cpp
 )
 
 set(HEADERS
@@ -117,6 +118,7 @@ set(HEADERS
     fieldline.h
     fieldline_acq_system_controller.h
     fieldline_plugin_gui.h
+    fieldline_view.h
 )
 
 set(FILE_TO_UPDATE fieldline_global.cpp)

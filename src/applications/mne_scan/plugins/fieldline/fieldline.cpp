@@ -44,7 +44,7 @@
 
 #include "fieldline.h"
 
-#include <disp/viewers/fieldlineview.h>
+#include "fieldline/fieldline_view.h" 
 // #include "fieldlineproducer.h"
 // #include "FormFiles/fieldlinesetup.h"
 
