@@ -176,7 +176,6 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
      * pure virtual method inherited by qthread.
      */
   virtual void run();
-   
 
   std::unique_ptr<FieldlineAcqSystemController> acqSystem;
   std::unique_ptr<FieldlinePluginGUI> guiWidget;

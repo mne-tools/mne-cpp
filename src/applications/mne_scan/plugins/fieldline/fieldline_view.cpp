@@ -37,8 +37,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ui_fl_rack.h"
-#include "ui_fl_chassis.h"
+#include "ui_fieldline_rack.h"
+#include "ui_fieldline_chassis.h"
 
 #include "fieldline/fieldline_view.h"
 

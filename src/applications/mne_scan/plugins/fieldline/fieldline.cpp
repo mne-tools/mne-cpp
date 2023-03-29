@@ -62,6 +62,7 @@
 #include <QVBoxLayout>
 #include <numeric>
 #include <vector>
+#include <utility>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -140,10 +141,11 @@ Fieldline::Fieldline() { qDebug() << "Creating Fieldline object"; }
 //=============================================================================================================
 
 Fieldline::~Fieldline() {
-   //If the program is closed while the sampling is in process
-   if(this->isRunning()) {
-       this->stop();
-   }
+  //If the program is closed while the sampling is in process
+  qDebug() << "Destroying Fieldline plugin.";
+  if(this->isRunning()) {
+    this->stop();
+  }
 }
 
 //=============================================================================================================

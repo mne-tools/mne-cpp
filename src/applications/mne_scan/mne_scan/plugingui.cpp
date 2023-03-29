@@ -286,7 +286,7 @@ void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
 
 void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
 {
-    qDebug() << "Save Config" << sPath+"/"+sFileName;
+    //qDebug() << "Save Config" << sPath+"/"+sFileName;
     QDomDocument doc("PluginConfig");
     QDomElement root = doc.createElement("PluginTree");
     doc.appendChild(root);
