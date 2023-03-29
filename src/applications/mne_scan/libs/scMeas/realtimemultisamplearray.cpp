@@ -158,7 +158,7 @@ void RealTimeMultiSampleArray::setValue(const MatrixXd& mat)
 //        else if(v[i] > m_qListChInfo[i].getMaxValue()) v[i] = m_qListChInfo[i].getMaxValue();
 //    }
 
-    //Store
+    // Store
     m_matSamples.push_back(mat);
 
     m_qMutex.unlock();

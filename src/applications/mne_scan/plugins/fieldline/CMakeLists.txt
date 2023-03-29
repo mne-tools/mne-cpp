@@ -108,17 +108,15 @@ message("python lib flags norm: " ${Python_LDFLAGS_NORM})
 set(SOURCES
     fieldline_global.cpp
     fieldline.cpp
-    fieldline_acq_system_controller.cpp
-    fieldline_plugin_gui.cpp
-    fieldline_view.cpp
+    fieldline_acqsystem.cpp
+    fieldlineview.cpp
 )
 
 set(HEADERS
     fieldline_global.h
     fieldline.h
-    fieldline_acq_system_controller.h
-    fieldline_plugin_gui.h
-    fieldline_view.h
+    fieldline_acqsystem.h
+    fieldlineview.h
 )
 
 set(FILE_TO_UPDATE fieldline_global.cpp)

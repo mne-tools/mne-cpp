@@ -42,27 +42,26 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fieldline.h"
-
-#include "fieldline/fieldline_view.h" 
-// #include "fieldlineproducer.h"
-// #include "FormFiles/fieldlinesetup.h"
+#include "fieldline/fieldline.h"
+#include "fieldline/fieldline_acqsystem.h"
+#include "fieldline/fieldlineview.h" 
 
 #include <scMeas/realtimemultisamplearray.h>
+// #include <utils/generics/circularbuffer.h>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 // #include <QSettings>
-#include <QDebug>
-#include <QHBoxLayout>
-#include <QLabel>
-#include <QSpacerItem>
-#include <QVBoxLayout>
-#include <numeric>
-#include <vector>
-#include <utility>
+// #include <QDebug>
+// #include <QHBoxLayout>
+// #include <QLabel>
+// #include <QSpacerItem>
+// #include <QVBoxLayout>
+// #include <numeric>
+// #include <vector>
+// #include <utility>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -95,55 +94,55 @@ namespace FIELDLINEPLUGIN {
 //   }
 // }
 
-QSharedPointer<FIFFLIB::FiffInfo>
-createFiffInfo(std::vector<std::vector<int>> fl_chassis, float sfreq = 1000.f) {
-  QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo;
-  pFiffInfo->sfreq = sfreq;
-  pFiffInfo->chs.clear();
-
-  int total_channels = 0;
-  int chassis_num = 0;
-  for (auto &chassis : fl_chassis) {
-    for (auto &sensor : chassis) {
-      FIFFLIB::FiffChInfo channel;
-      channel.ch_name = QString("%1:%2").arg(chassis_num, 2).arg(sensor, 2);
-      channel.kind = FIFFV_MEG_CH;
-      channel.unit = FIFF_UNIT_T;
-      channel.unit_mul = FIFF_UNITM_NONE;
-      channel.chpos.coil_type = FIFFV_COIL_NONE;
-      pFiffInfo->chs.append(channel);
-      pFiffInfo->ch_names.append(channel.ch_name);
-      ++total_channels;
-    }
-  }
-  pFiffInfo->nchan = total_channels;
-
-  return pFiffInfo;
-}
-
-QSharedPointer<FIFFLIB::FiffInfo>
-createFiffInfo(int numChassis, int numChannels, float sfreq = 1000.f) {
-  std::vector<std::vector<int>> fl;
-  for (int i = 0; i < numChassis; ++i) {
-    std::vector<int> ch(numChannels);
-    std::iota(ch.begin(), ch.end(), 1);
-    fl.push_back(std::move(ch));
-  }
-  return createFiffInfo(fl, sfreq);
-}
+// QSharedPointer<FIFFLIB::FiffInfo>
+// createFiffInfo(std::vector<std::vector<int>> fl_chassis, float sfreq = 1000.f) {
+//   QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo;
+//   pFiffInfo->sfreq = sfreq;
+//   pFiffInfo->chs.clear();
+//
+//   int total_channels = 0;
+//   int chassis_num = 0;
+//   for (auto &chassis : fl_chassis) {
+//     for (auto &sensor : chassis) {
+//       FIFFLIB::FiffChInfo channel;
+//       channel.ch_name = QString("%1:%2").arg(chassis_num, 2).arg(sensor, 2);
+//       channel.kind = FIFFV_MEG_CH;
+//       channel.unit = FIFF_UNIT_T;
+//       channel.unit_mul = FIFF_UNITM_NONE;
+//       channel.chpos.coil_type = FIFFV_COIL_NONE;
+//       pFiffInfo->chs.append(channel);
+//       pFiffInfo->ch_names.append(channel.ch_name);
+//       ++total_channels;
+//     }
+//   }
+//   pFiffInfo->nchan = total_channels;
+//
+//   return pFiffInfo;
+// }
+//
+// QSharedPointer<FIFFLIB::FiffInfo>
+// createFiffInfo(int numChassis, int numChannels, float sfreq = 1000.f) {
+//   std::vector<std::vector<int>> fl;
+//   for (int i = 0; i < numChassis; ++i) {
+//     std::vector<int> ch(numChannels);
+//     std::iota(ch.begin(), ch.end(), 1);
+//     fl.push_back(std::move(ch));
+//   }
+//   return createFiffInfo(fl, sfreq);
+// }
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Fieldline::Fieldline() { qDebug() << "Creating Fieldline object"; }
+Fieldline::Fieldline() {
+}
 
 //=============================================================================================================
 
 Fieldline::~Fieldline() {
-  //If the program is closed while the sampling is in process
   qDebug() << "Destroying Fieldline plugin.";
-  if(this->isRunning()) {
+  if (this->isRunning()) {
     this->stop();
   }
 }
@@ -151,7 +150,6 @@ Fieldline::~Fieldline() {
 //=============================================================================================================
 
 QSharedPointer<SCSHAREDLIB::AbstractPlugin> Fieldline::clone() const {
-  qDebug() << "Cloning Fieldline.";
   QSharedPointer<SCSHAREDLIB::AbstractPlugin> pFieldlineClone(new Fieldline());
   return pFieldlineClone;
 }
@@ -160,50 +158,28 @@ QSharedPointer<SCSHAREDLIB::AbstractPlugin> Fieldline::clone() const {
 
 void Fieldline::init() {
 
-  // we instantiante
-  m_pRTMSA_Fieldline = SCSHAREDLIB::PluginOutputData<
-      SCMEASLIB::RealTimeMultiSampleArray>::create(this, "Fieldline Plugin",
-                                                   "FieldlinePlguin output");
+  // data infrastructure
+  m_pRTMSA = SCSHAREDLIB::PluginOutputData
+    <SCMEASLIB::RealTimeMultiSampleArray>::create(this, "Fieldline Plugin",
+                                                  "FieldlinePlguin output");
+  m_outputConnectors.append(m_pRTMSA);
 
-  m_outputConnectors.append(m_pRTMSA_Fieldline);
-
-  qDebug() << " ^^^^^^^^^^^^^^^^^^^^ Init Fieldline  (....again)";
-  acqSystem = std::make_unique<FieldlineAcqSystemController>();
+  acqSystem = std::make_unique<FieldlineAcqSystemController>(this);
+  guiWidget = std::make_unique<FieldlineView>(this);
 }
 
 //=============================================================================================================
 
-void Fieldline::unload() { qDebug() << "unload Fieldline"; }
+void Fieldline::unload() {
+  qDebug() << "unload Fieldline";
+}
 
 //=============================================================================================================
 
 bool Fieldline::start() {
   qDebug() << "start Fieldline";
 
-  // Init circular buffer to transmit data from the producer to this thread
-  // if(!m_pCircularBuffer) {
-  //     m_pCircularBuffer = QSharedPointer<CircularBuffer_Matrix_double>(new
-  //     CircularBuffer_Matrix_double(10));
-  // }
-  //
-  // //Setup fiff info before setting up the RMTSA because we need it to init
-  // the RTMSA setUpFiffInfo();
-  //
-  // //Set the channel size of the RMTSA - this needs to be done here and NOT in
-  // the init() function because the user can change the number of channels
-  // during runtime
-  // m_pRMTSA_Natus->measurementData()->initFromFiffInfo(m_pFiffInfo);
-  // m_pRMTSA_Natus->measurementData()->setMultiArraySize(1);
-  //
   QThread::start();
-  //
-  // // Start the producer
-  // m_pNatusProducer =
-  // QSharedPointer<NatusProducer>::create(m_iSamplesPerBlock,
-  // m_iNumberChannels); m_pNatusProducer->moveToThread(&m_pProducerThread);
-  // connect(m_pNatusProducer.data(), &NatusProducer::newDataAvailable,
-  //         this, &Fieldline::onNewDataAvailable, Qt::DirectConnection);
-  // m_pProducerThread.start();
 
   return true;
 }
@@ -213,15 +189,6 @@ bool Fieldline::start() {
 bool Fieldline::stop() {
   requestInterruption();
   wait(500);
-  // m_pRMTSA_Natus->measurementData()->clear();
-  //
-  //
-  // // Clear all data in the buffer connected to displays and other plugins
-  // m_pCircularBuffer->clear();
-  //
-  // m_pProducerThread.quit();
-  // m_pProducerThread.wait();
-  qDebug() << "Stop Fieldline";
 
   return true;
 }
@@ -236,7 +203,6 @@ SCSHAREDLIB::AbstractPlugin::PluginType Fieldline::getType() const {
 //=============================================================================================================
 
 QString Fieldline::getName() const {
-  // qDebug() << "getName Fieldline";
   return QString("Fieldline OPM");
 }
 
@@ -244,7 +210,6 @@ QString Fieldline::getName() const {
 
 QWidget *Fieldline::setupWidget() {
   qDebug() << "setupWidget Fieldline";
-  guiWidget = std::make_unique<FieldlinePluginGUI>();
 
   // NatusSetup* widget = new NatusSetup(this);//widget is later destroyed by
   // CentralWidget - so it has to be created everytime new
@@ -252,17 +217,18 @@ QWidget *Fieldline::setupWidget() {
   // init properties dialog
   //  widget->initGui();
 
-  auto *frame = new QWidget();
-  frame->setLayout(new QHBoxLayout());
+  // auto *frame = new QWidget();
+  // frame->setLayout(new QHBoxLayout());
+  //
+  // auto *flWidget = new DISPLIB::FieldlineView(2, 16);
+  //
+  // frame->layout()->addWidget(flWidget);
+  // flWidget->setBlinkState(0, 2, true);
+  // flWidget->setBlinkState(1, 5, true);
+  //
+  // return frame;
 
-  auto *flWidget = new DISPLIB::FieldlineView(2, 16);
-
-  frame->layout()->addWidget(flWidget);
-  flWidget->setBlinkState(0, 2, true);
-  flWidget->setBlinkState(1, 5, true);
-
-  return frame;
-
+  return guiWidget->getWidget();
   // return new QLabel("Fieldline \n   OPM");
 }
 
@@ -281,52 +247,57 @@ QWidget *Fieldline::setupWidget() {
 void Fieldline::run() {
   qDebug() << "run Fieldline";
 
-  m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo());
-
-  m_pFiffInfo->sfreq = 1000.0f;
-  m_pFiffInfo->nchan = 32;
-  m_pFiffInfo->chs.clear();
-
-  for (int chan_i = 0; chan_i < m_pFiffInfo->nchan; ++chan_i) {
-    FIFFLIB::FiffChInfo channel;
-    channel.ch_name = "Ch. " + QString::number(chan_i);
-    channel.kind = FIFFV_MEG_CH;
-    channel.unit = FIFF_UNIT_T;
-    channel.unit_mul = FIFF_UNITM_NONE;
-    channel.chpos.coil_type = FIFFV_COIL_NONE;
-    m_pFiffInfo->chs.append(channel);
-    m_pFiffInfo->ch_names.append(channel.ch_name);
-  }
-
-  m_pRTMSA_Fieldline->measurementData()->initFromFiffInfo(
-      m_pFiffInfo); //     if(m_pCircularBuffer->pop(matData)) {
-  m_pRTMSA_Fieldline->measurementData()->setMultiArraySize(1);
-  m_pRTMSA_Fieldline->measurementData()->setVisibility(true);
-
-  Eigen::MatrixXd matData;
-  matData.resize(m_pFiffInfo->nchan, 200);
-  // matData.setZero();
-
-  for (;;) {
-    // gather the data
-
-    matData = Eigen::MatrixXd::Random(m_pFiffInfo->nchan, 200);
-    matData *= 4e-12;
-
-    msleep(200);
-
-    if (isInterruptionRequested())
-      break;
-    m_pRTMSA_Fieldline->measurementData()->setValue(matData);
-  }
-
-  //         //emit values
-  //         if(!isInterruptionRequested()) {
-  //             m_pRMTSA_Natus->measurementData()->setValue(matData);
-  //         }
-  //     }
+  // while (true) {
+  //   if (QThread::isInterruptionRequested())
+  //     break;
+  //   msleep(200);
   // }
-  qDebug() << "run Fieldline finished";
+  // m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo());
+  //
+  // m_pFiffInfo->sfreq = 1000.0f;
+  // m_pFiffInfo->nchan = 32;
+  // m_pFiffInfo->chs.clear();
+  //
+  // for (int chan_i = 0; chan_i < m_pFiffInfo->nchan; ++chan_i) {
+  //   FIFFLIB::FiffChInfo channel;
+  //   channel.ch_name = "Ch. " + QString::number(chan_i);
+  //   channel.kind = FIFFV_MEG_CH;
+  //   channel.unit = FIFF_UNIT_T;
+  //   channel.unit_mul = FIFF_UNITM_NONE;
+  //   channel.chpos.coil_type = FIFFV_COIL_NONE;
+  //   m_pFiffInfo->chs.append(channel);
+  //   m_pFiffInfo->ch_names.append(channel.ch_name);
+  // }
+  //
+  // m_pRTMSA_Fieldline->measurementData()->initFromFiffInfo(
+  //     m_pFiffInfo); //     if(m_pCircularBuffer->pop(matData)) {
+  // m_pRTMSA_Fieldline->measurementData()->setMultiArraySize(1);
+  // m_pRTMSA_Fieldline->measurementData()->setVisibility(true);
+  //
+  // Eigen::MatrixXd matData;
+  // matData.resize(m_pFiffInfo->nchan, 200);
+  // // matData.setZero();
+  //
+  // for (;;) {
+  //   // gather the data
+  //
+  //   matData = Eigen::MatrixXd::Random(m_pFiffInfo->nchan, 200);
+  //   matData *= 4e-12;
+  //
+  //   msleep(200);
+  //
+  //   if (isInterruptionRequested())
+  //     break;
+  //   m_pRTMSA_Fieldline->measurementData()->setValue(matData);
+  // }
+  //
+  // //         //emit values
+  // //         if(!isInterruptionRequested()) {
+  // //             m_pRMTSA_Natus->measurementData()->setValue(matData);
+  // //         }
+  // //     }
+  // // }
+  // qDebug() << "run Fieldline finished";
 }
 
 //=============================================================================================================
