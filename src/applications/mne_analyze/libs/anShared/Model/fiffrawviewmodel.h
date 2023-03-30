@@ -516,7 +516,7 @@ public:
      * @return true if there is an EventModel, false if not
 >>>>>>> MAINT: renaming and cleaning up
      */
-    bool hasSavedEvents();
+    bool hasEventModel();
 
     //=========================================================================================================
     /**

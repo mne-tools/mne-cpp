@@ -311,20 +311,19 @@ static int comp_points1(const void *vp1,const void *vp2)
         return -1;
 }
 
-// Squash compiler warning, unused function
-//static int comp_points2(const void *vp1,const void *vp2)
+static int comp_points2(const void *vp1,const void *vp2)
 
-//{
-//    MneNearest* v1 = (MneNearest*)vp1;
-//    MneNearest* v2 = (MneNearest*)vp2;
+{
+    MneNearest* v1 = (MneNearest*)vp1;
+    MneNearest* v2 = (MneNearest*)vp2;
 
-//    if (v1->vert > v2->vert)
-//        return 1;
-//    else if (v1->vert == v2->vert)
-//        return 0;
-//    else
-//        return -1;
-//}
+    if (v1->vert > v2->vert)
+        return 1;
+    else if (v1->vert == v2->vert)
+        return 0;
+    else
+        return -1;
+}
 
 void mne_sort_nearest_by_nearest(MneNearest* points, int npoint)
 

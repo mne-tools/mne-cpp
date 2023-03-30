@@ -63,7 +63,6 @@ namespace FIFFLIB {
 
 namespace CONNECTIVITYLIB {
     class ConnectivitySettings;
-//    class Network;
 }
 
 //=============================================================================================================

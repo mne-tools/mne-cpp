@@ -126,7 +126,11 @@ private:
      *
      * @param[in] event    event of type QHoverEvent that holds mouse position.
      */
-    void enterEvent(QEvent* event);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    void enterEvent(QEvent* event) override;
+#else
+    void enterEvent(QEnterEvent* event) override;
+#endif
 
     //=========================================================================================================
     /**

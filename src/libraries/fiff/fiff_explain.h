@@ -208,7 +208,7 @@ static _fiffExp _fiff_explanations[] = {
   { FIFF_VOL_BLOCKS,               "vol.  blocks   " },
   { FIFF_VOL_AVAIL_BLOCKS,         "vol. ablocks   " },
   { FIFF_VOL_FREE_BLOCKS,          "vol. fblocks   " },
-  { FIFF_VOL_BLOCK_SIZE,           "volume bsize   " }, 
+  { FIFF_VOL_BLOCK_SIZE,           "volume bsize   " },
   { FIFF_VOL_REAL_ROOT,            "volume rroot   " },
   { FIFF_VOL_SYMBOLIC_ROOT,        "volume sroot   " },
   { FIFF_VOL_DIRECTORY,            "volume dir     " },
@@ -255,7 +255,6 @@ static _fiffExp _fiff_block_explanations[] = {
 
 //=============================================================================================================
 
-#if 0 // unused
 static _fiffExp _fiff_unit_explanations[] = {
   /*
    * SI base units
@@ -314,7 +313,6 @@ static _fiffExp _fiff_unit_mul_explanations[] = {
   { FIFF_UNITM_F, "f" },
   { FIFF_UNITM_A, "a" },
   {-1, NULL }};
-#endif // if 0
 } // NAMESPACE
 
 #endif // FIFF_EXPLAIN_H
