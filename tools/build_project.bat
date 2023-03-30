@@ -210,8 +210,8 @@
       ECHO.
       ECHO    _           _ _     _     __      _ _          _   
       ECHO   ^| ^|         (_) ^|   ^| ^|   / _^|    (_) ^|        ^| ^|  
-      ECHO   ^| ^|__  _   _ _^| ^| __^| ^|  ^| ^|_ __ _ _^| ^| ___  __^| ^|  
-      ECHO   ^| '_ \^| ^| ^| ^| ^| ^|/ _` ^|  ^|  _/ _` ^| ^| ^|/ _ \/ _` ^|     
+      ECHO   ^| ^|__  _   _ _^| ^| __^| ^|  ^| ^|_ __,_ _^| ^| ___  __^| ^|  
+      ECHO   ^|  _ \^| ^| ^| ^| ^| ^|/ _  ^|  ^|  _/ _  ^| ^| ^|/ _ \/ _  ^|     
       ECHO   ^| ^|_) ^| ^|_^| ^| ^| ^| (_^| ^|  ^| ^|^| (_^| ^| ^| ^|  __/ (_^| ^|  
       ECHO   ^|_.__/ \__,_^|_^|_^|\__,_^|  ^|_^| \__,_^|_^|_^|\___^|\__,_^|  
       ECHO.
@@ -438,7 +438,7 @@ if [ "${Rebuild}" == "false" ]; then
     -DCMAKE_BUILD_TYPE=${BuildType} \
     -DBINARY_OUTPUT_DIRECTORY=${OutFolder} \
     ${CoverageOption} \
-    ${CMakeConfigFlags}
+    ${CMakeConfigFlags} \
     ${ExtraArgs}
 fi
 
