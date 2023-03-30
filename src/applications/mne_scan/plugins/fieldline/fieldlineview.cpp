@@ -80,8 +80,6 @@ namespace FIELDLINEPLUGIN {
 FieldlineView::FieldlineView(Fieldline* parent)
 : m_pFieldlinePlugin(parent)
 {
-
-
 }
 
 QWidget* FieldlineView::getWidget() const {

@@ -146,3 +146,4 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
 }  // namespace FIELDLINEPLUGIN
 
 #endif  // FIELDLINE_H
+

@@ -45,7 +45,6 @@ class FieldlineAcqSystemController {
 
   ~FieldlineAcqSystemController() noexcept;
 
-
  private:
    Fieldline* m_pFieldlinePlugin;
 };
