@@ -150,7 +150,11 @@ void StatusBar::onNewMessageReceived(const QSharedPointer<Event> pEvent)
 
 //=============================================================================================================
 
-void StatusBar::enterEvent(QEvent *event)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+void StatusBar::enterEvent(QEvent* event)
+#else
+void StatusBar::enterEvent(QEnterEvent* event)
+#endif
 {
     if(m_LoadingStack.isEmpty()){
         return;
@@ -164,16 +168,16 @@ void StatusBar::enterEvent(QEvent *event)
 
     QLabel* pMessageHeader = new QLabel("<u><b>Current Processes:</b></u>");
     layout->addWidget(pMessageHeader);
-    for (QString message: m_LoadingStack){
+    for (auto& message : m_LoadingStack){
         if(message != ""){
             layout->addWidget(new QLabel(message));
         }
     }
 
-    m_pHoverWidget->move(this->mapToGlobal(QPoint(static_cast<QHoverEvent*>(event)->pos().y(), static_cast<QHoverEvent*>(event)->pos().x())).x(), this->parentWidget()->mapToGlobal(this->pos()).y() - this->height() - m_pHoverWidget->height() - 5);
+    m_pHoverWidget->move(this->mapToGlobal(QPoint(static_cast<QEnterEvent*>(event)->pos().y(), static_cast<QEnterEvent*>(event)->pos().x())).x(), this->parentWidget()->mapToGlobal(this->pos()).y() - this->height() - m_pHoverWidget->height() - 5);
     m_pHoverWidget->show();
 
-    QWidget::enterEvent(static_cast<QEnterEvent*>(event));
+    QWidget::enterEvent(event);
 }
 
 //=============================================================================================================

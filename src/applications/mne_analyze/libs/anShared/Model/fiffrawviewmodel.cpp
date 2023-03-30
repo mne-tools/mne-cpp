@@ -1006,7 +1006,7 @@ void FiffRawViewModel::reloadAllData()
 
 //=============================================================================================================
 
-bool FiffRawViewModel::hasSavedEvents()
+bool FiffRawViewModel::hasEventModel()
 {
     return m_pEventModel != nullptr;
 }

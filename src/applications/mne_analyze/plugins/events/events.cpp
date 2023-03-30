@@ -207,7 +207,7 @@ void Events::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel
         emit disconnectFromModel();
         FiffRawViewModel::SPtr pFiffRawModel = qSharedPointerCast<FiffRawViewModel>(pNewModel);
 
-        if(pFiffRawModel->hasSavedEvents()){
+        if(pFiffRawModel->hasEventModel()){
             emit newEventModelAvailable(pFiffRawModel->getEventModel());
         } else {
             QSharedPointer<EventModel> pEventModel = QSharedPointer<EventModel>::create(pFiffRawModel);

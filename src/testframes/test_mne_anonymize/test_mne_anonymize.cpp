@@ -418,9 +418,9 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
         }
         case FIFF_SUBJ_BIRTH_DAY:
         {
-            QDateTime defaultDate(QDate(2000,1,1), QTime(1, 1, 0), Qt::LocalTime);
-            QDateTime inBirthday(QDate::fromJulianDay(*pTag->toJulian()), QTime(1, 1, 0), Qt::LocalTime);
-            QDateTime offSetBirtday(defaultDate.date().addDays(-35), QTime(1, 1, 0), Qt::LocalTime);
+            QDate defaultDate(QDate(2000,1,1));
+            QDate inBirthday(QDate::fromJulianDay(*pTag->toJulian()));
+            QDate offSetBirtday(defaultDate.addDays(-35));
 
             if(testArg == "SubjBirthdayOffset") {
                 QVERIFY(defaultDate == offSetBirtday);
