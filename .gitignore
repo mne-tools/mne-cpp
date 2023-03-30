@@ -58,6 +58,7 @@ Makefile
 .settings
 .vscode
 .session
+.clang-format
 mne-cpp.pro.user*
 compile_commands.json
 
