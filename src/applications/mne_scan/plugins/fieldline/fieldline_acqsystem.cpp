@@ -40,11 +40,14 @@
 #define PY_SSIZE_T_CLEAN
 #include "Python.h"
 
+#include <iomanip>
+#include <string>
+#include <iostream>
+
+#include <QCoreApplication>
+
 #include "fieldline/fieldline.h"
 #include "fieldline/fieldline_acqsystem.h"
-
-#include <iomanip>
-#include <iostream>
 
 //extern "C" {
 //
@@ -105,12 +108,10 @@
 //}
 
 namespace FIELDLINEPLUGIN {
-namespace FeildlineAcqSystemController {
 
 
-FieldlineAcqSystemController(Fieldline* parent,
-                             const std::string& resourcesPath) noexcept 
-: m_pFieldlinePlugin(parent), m_resourcesDir(resourcesPath)
+FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
+: m_pControllerParent(parent)
 {
   // pythonInterpreter initiate
   //
@@ -123,13 +124,19 @@ FieldlineAcqSystemController(Fieldline* parent,
   // initialize channels
   //
   //
+
+  const std::string resourcesPath(QCoreApplication::applicationDirPath().toStdString() + "/../resources/mne_scan/plugins/fieldline");
+  const std::wstring resourcesPath_w(resourcesPath.begin(), resourcesPath.end());
+  const std::string entryFile(resourcesPath + "/main.py");
+
   Py_Initialize();
   PyConfig config;
   PyConfig_InitPythonConfig(&config);
   config.module_search_paths_set = 1;
-  PyWideStringList_Append(&config.module_search_paths, L".");
+  PyWideStringList_Append(&config.module_search_paths, resourcesPath_w.c_str());
+  // PyWideStringList_Append(&config.module_search_paths,L".");
   Py_InitializeFromConfig(&config);
-  FILE *py_file = fopen("main.py", "r");
+  FILE *py_file = fopen(entryFile.c_str(), "r");
   PyObject *global_dict = PyDict_New();
   PyObject *local_dict = PyDict_New();
   PyObject *result =
@@ -140,15 +147,10 @@ FieldlineAcqSystemController(Fieldline* parent,
   fclose(py_file);
 }
 
-
-~FieldlineAcqSystemController() noexcept {
+FieldlineAcqSystem::~FieldlineAcqSystem() 
+{
+  qDebug() << "About to finalize python";
   // Py_Finalize();
 }
-
-void setResourcesDir(const std::string& path) {
-  m_resourcesDir = path;
-}
-
-} // namespace FieldlineAcqSystemController
 
 } // namespace FIELDLINEPLUGIN

@@ -164,7 +164,7 @@ void Fieldline::init() {
                                                   "FieldlinePlguin output");
   m_outputConnectors.append(m_pRTMSA);
 
-  acqSystem = std::make_unique<FieldlineAcqSystemController>(this);
+  acqSystem = std::make_unique<FieldlineAcqSystem>(this);
   guiWidget = std::make_unique<FieldlineView>(this);
 }
 

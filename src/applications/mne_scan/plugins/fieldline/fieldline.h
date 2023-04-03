@@ -70,7 +70,7 @@ class FiffInfo;
 
 namespace FIELDLINEPLUGIN {
 
-class FieldlineAcqSystemController;
+class FieldlineAcqSystem;
 class FieldlineView;
 
 //=============================================================================================================
@@ -115,7 +115,7 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
  protected:
   virtual void run();
 
-  std::unique_ptr<FieldlineAcqSystemController> acqSystem;
+  std::unique_ptr<FieldlineAcqSystem> acqSystem;
   std::unique_ptr<FieldlineView> guiWidget;
 
   // int m_iSamplingFreq;  /**< The sampling frequency defined by the user via the gui (in hertz).*/

@@ -35,24 +35,18 @@
 #ifndef FIELDLINEPLUGIN_FIELDLINEACQSYSTEM_H
 #define FIELDLINEPLUGIN_FIELDLINEACQSYSTEM_H
 
-#include <string>
-
 namespace FIELDLINEPLUGIN {
 
 class Fieldline;
 
-class FieldlineAcqSystemController {
+class FieldlineAcqSystem {
  public:
-  FieldlineAcqSystemController(Fieldline* parent,
-                               const std::string& resourcesPath) noexcept;
+  FieldlineAcqSystem(Fieldline* parent);
 
-  ~FieldlineAcqSystemController() noexcept;
-
-  void setResourcesDir(const std::string& path);
+  ~FieldlineAcqSystem();
 
  private:
-   Fieldline* m_pFieldlinePlugin;
-   std::string m_resourcesDir;
+   Fieldline* m_pControllerParent;
 };
 
 
