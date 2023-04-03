@@ -105,10 +105,13 @@
 //}
 
 namespace FIELDLINEPLUGIN {
+namespace FeildlineAcqSystemController {
 
 
-FieldlineAcqSystemController::FieldlineAcqSystemController(Fieldline* parent) noexcept 
-: m_pFieldlinePlugin(parent) {
+FieldlineAcqSystemController(Fieldline* parent,
+                             const std::string& resourcesPath) noexcept 
+: m_pFieldlinePlugin(parent), m_resourcesDir(resourcesPath)
+{
   // pythonInterpreter initiate
   //
   // run script
@@ -138,8 +141,14 @@ FieldlineAcqSystemController::FieldlineAcqSystemController(Fieldline* parent) no
 }
 
 
-FieldlineAcqSystemController::~FieldlineAcqSystemController() noexcept {
+~FieldlineAcqSystemController() noexcept {
   // Py_Finalize();
 }
+
+void setResourcesDir(const std::string& path) {
+  m_resourcesDir = path;
+}
+
+} // namespace FieldlineAcqSystemController
 
 } // namespace FIELDLINEPLUGIN

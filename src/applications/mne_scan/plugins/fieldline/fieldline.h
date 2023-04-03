@@ -75,9 +75,9 @@ class FieldlineView;
 
 //=============================================================================================================
 /**
- * The Fieldline class provides a EEG connector for receiving data from Fieldline box through its Python API.
+ * The Fieldline class provides a MEG connector for receiving data from Fieldline box through its Python API.
  *
- * @brief The Fieldline class provides a EEG connector for receiving data from Fieldline API.
+ * @brief The Fieldline class provides a MEG connector for receiving data from Fieldline API.
  */
 class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
     Q_OBJECT
@@ -89,7 +89,7 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
 
  public:
     //=========================================================================================================
-   // The plugin interface
+    // The plugin interface
     Fieldline();
 
     ~Fieldline();
@@ -113,20 +113,6 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
     virtual QString getBuildInfo();
 
  protected:
-    //=========================================================================================================
-    /**
-     * Call this function whenenver you received new data.
-     *
-     * @param[in] matData The new data.
-     */
-    // void onNewDataAvailable(const Eigen::MatrixXd &matData);
-
-    //=========================================================================================================
-    /**
-     * the starting point for the thread. after calling start(), the newly created thread calls this function.
-     * returning from this method will end the execution of the thread.
-     * pure virtual method inherited by qthread.
-     */
   virtual void run();
 
   std::unique_ptr<FieldlineAcqSystemController> acqSystem;
@@ -135,11 +121,11 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
   // int m_iSamplingFreq;  /**< The sampling frequency defined by the user via the gui (in hertz).*/
   // int m_iNumberChannels;  /**< The number of channels to be received.*/
   // int m_iSamplesPerBlock;  /**< The number of samples per block to be received.*/
-  // QString m_qStringResourcePath;  /**< The path to the EEG resource directory.*/
+  // QString m_qStringResourcePath;  /**< The path to the MEG resource directory.*/
   // QThread m_pProducerThread;  /**< The thread used to host the producer.*/
   // // QSharedPointer<FIELDLINEPLUGIN::FieldlineProducer>      m_pFieldlineProducer;  /**< The producer object.*/
   // QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>  m_pCircularBuffer;     /**< Holds incoming raw data. */
-  //
+
   QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRTMSA;     /**< The RealTimeSampleArray to provide the EEG data.*/
   QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff measurement info.*/ };
 
