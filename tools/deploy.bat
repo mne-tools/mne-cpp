@@ -423,7 +423,7 @@ for (( j=0; j<argc; j++ )); do
     elif [ "${argv[j]}" == "static" ]; then
         LinkOption="static"
     elif [ "${argv[j]}" == "pack" ]; then
-        PackOption="pack"
+        PackOption="true"
     elif [ "${argv[j]}" == "help" ]; then
         PrintHelp="true"
     elif [ "${argv[j]}" == "mock" ]; then
