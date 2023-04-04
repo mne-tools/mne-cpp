@@ -17,7 +17,7 @@ jobs:
       - name: Install Qt
         uses: jurplel/install-qt-action@v2
         with:
-          version: 5.10.1
+          version: 5.15.2
           modules: qtcharts
       - name: Coverity scripts
         run: |
@@ -25,7 +25,7 @@ jobs:
           COVERITY_SCAN_NOTIFICATION_EMAIL="mne_cpp@googlegroups.com"
           COVERITY_SCAN_BRANCH_PATTERN="main"
           COVERITY_SCAN_BUILD_COMMAND_PREPEND="cmake -B build -S . -DCMAKE_BUILD_TYPE=Release"
-          COVERITY_SCAN_BUILD_COMMAND="make -j4"
+          COVERITY_SCAN_BUILD_COMMAND="cmake --build build"
           COVERITY_SCAN_TOKEN=$COVTOKEN
           PLATFORM=`uname`
           TOOL_ARCHIVE=/tmp/cov-analysis-${PLATFORM}.tgz
