@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# aqt install-qt linux desktop 6.5.0 wasm_multithread -m qtcharts --autodesktop
+
 argc=$# # number of arguments passed (not counting the command itself)
 argv=("$@") # list of arguments passed (not including the command itself)
 
@@ -17,7 +19,7 @@ SAVE_LOG="true"
 SHOW_HELP="false"
 
 SCRIPT_PATH="$(cleanAbsPath "$(dirname "$0")")"
-PROJECT_BASE_PATH="$(cleanAbsPath "$SCRIPT_PATH/../..")"
+PROJECT_BASE_PATH="$(cleanAbsPath "$SCRIPT_PATH/..")"
 
 NUM_PARALLEL_PROC=1
 
@@ -92,10 +94,12 @@ BUILD_DIRECTORY=${PROJECT_BASE_PATH}/build/wasm
 OUTPUT_DIRECTORY=${PROJECT_BASE_PATH}/out/wasm
 
 ${Qt6_DIR}/wasm_multithread/bin/qt-cmake \
+	-DQT_HOST_PATH=${Qt6_DIR}/gcc_64 \
 	-DCMAKE_BUILD_TYPE=Release \
 	-DBINARY_OUTPUT_DIRECTORY=${OUTPUT_DIRECTORY} \
 	-S ${SOURCE_DIRECTORY} \
-	-B ${BUILD_DIRECTORY}
+	-B ${BUILD_DIRECTORY} \
+	-DWASM=ON
 
 cmake \
 	--build ${BUILD_DIRECTORY} \
