@@ -40,12 +40,15 @@ namespace FIELDLINEPLUGIN {
 class Fieldline;
 
 class FieldlineAcqSystem {
- public:
-  FieldlineAcqSystem(Fieldline* parent);
+public:
+   FieldlineAcqSystem(Fieldline* parent);
 
-  ~FieldlineAcqSystem();
+   ~FieldlineAcqSystem();
 
- private:
+private:
+   void preConfigurePython() const;
+   void runPythonFile(const char* file, const char* comment) const;
+
    Fieldline* m_pControllerParent;
 };
 

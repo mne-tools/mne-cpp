@@ -109,84 +109,55 @@
 
 namespace FIELDLINEPLUGIN {
 
+const std::string resourcesPath(QCoreApplication::applicationDirPath().toStdString() + "/../resources/mne_scan/plugins/fieldline/");
+const std::string entryFile(resourcesPath + "main.py");
+
 FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
 : m_pControllerParent(parent)
 {
-  const std::string resourcesPath(QCoreApplication::applicationDirPath().toStdString() + "/../resources/mne_scan/plugins/fieldline/");
-  const std::string base_exec_prefix(resourcesPath + "venv/");
-  const std::string base_executable(base_exec_prefix + "bin/python");
-  const std::string base_prefix(base_exec_prefix);
-  const std::string exec_prefix(base_exec_prefix);
-  const std::string executable(base_executable);
-  const std::string homePath(resourcesPath + "venv/lib/python3.9");
-  const std::string path_venv_modules(resourcesPath + "venv/lib/python3.9/site-packages");
-  const std::string path_env(resourcesPath + ":" + path_venv_modules);
-  const std::string entryFile(resourcesPath + "main.py");
+  preConfigurePython();
+  runPythonFile(entryFile.c_str(), "main.py");
+}
 
-  const std::wstring resourcesPath_w(resourcesPath.begin(), resourcesPath.end());
+FieldlineAcqSystem::~FieldlineAcqSystem() 
+{
+  qDebug() << "About to finalize python";
+  Py_Finalize();
+}
 
-//   PyStatus status;
-//   PyConfig config;
-//   PyConfig_InitPythonConfig(&config);
-//
-//   // status = PyConfig_SetBytesString(&config, &config.home, homePath.c_str());
-//   // status = PyConfig_SetBytesString(&config, &config.platlibdir, "lib");
-//   // status = PyConfig_SetBytesString(&config, &config.program_name, "mne_scan - fieldline opm");
-//   // config.pathconfig_warnings = 1;
-//   // status = PyConfig_SetBytesString(&config, &config.pythonpath_env, path_env.c_str());
-//   //
-//   // status = PyConfig_SetBytesString(&config, &config.base_exec_prefix, base_exec_prefix.c_str());
-//   status = PyConfig_SetBytesString(&config, &config.base_executable, base_executable.c_str());
-//   // status = PyConfig_SetBytesString(&config, &config.base_prefix, base_prefix.c_str());
-//   // status = PyConfig_SetBytesString(&config, &config.exec_prefix, exec_prefix.c_str());
-//   status = PyConfig_SetBytesString(&config, &config.executable, executable.c_str());
-//   config.module_search_paths_set = 1;
-//   status = PyWideStringList_Append(&config.module_search_paths, resourcesPath_w.c_str());
-// //  status = PyWideStringList_Append(&config.module_search_paths, resourcesPath_w.c_str() + );
-//   //
-//   status = Py_InitializeFromConfig(&config);
-//   PyConfig_Clear(&config);
+void FieldlineAcqSystem::preConfigurePython() const {
   Py_Initialize();
-
   PyObject* sys = PyImport_ImportModule("sys");
-
   PyObject* versionInfo = PyObject_GetAttrString(sys, "version_info");
   PyObject* versionInfoMajor = PyObject_GetAttrString(versionInfo, "major");
   PyObject* versionInfoMinor = PyObject_GetAttrString(versionInfo, "minor");
 
-  int versionMajor = PyLong_AsLong(versionInfoMajor);
-  int versionMinor = PyLong_AsLong(versionInfoMinor);
-  // if (PyLong_Check(versionMajor)) {
-    std::cout << "version major is " << versionMajor << "\n";
-    std::cout << "version minor is " << versionMinor << "\n";
-  // }
+  std::string pythonVerStr("pythonx.x/");
+  pythonVerStr.at(6) = '0' + PyLong_AsLong(versionInfoMajor);
+  pythonVerStr.at(8) = '0' + PyLong_AsLong(versionInfoMinor);
+
   Py_DECREF(versionInfoMajor);
   Py_DECREF(versionInfoMinor);
   Py_DECREF(versionInfo);
 
   PyObject* path = PyObject_GetAttrString(sys, "path");
 
+  const std::string path_venv_modules(resourcesPath + "venv/lib/" + pythonVerStr + "site-packages/");
   PyList_Insert(path, 0, PyUnicode_FromString(resourcesPath.c_str()));
   PyList_Insert(path, 1, PyUnicode_FromString(path_venv_modules.c_str()));
   Py_DECREF(sys);
   Py_DECREF(path);
+}
 
-
-  FILE *py_file = fopen(entryFile.c_str(), "r");
+void FieldlineAcqSystem::runPythonFile(const char* file, const char* comment) const {
+  FILE *py_file = fopen(file, "r");
   PyObject* global_dict = PyDict_New();
   PyObject* local_dict = PyDict_New();
-  PyObject* result = PyRun_File(py_file, "main.py", Py_file_input, global_dict, local_dict);
+  PyObject* result = PyRun_File(py_file, comment, Py_file_input, global_dict, local_dict);
   Py_DECREF(global_dict);
   Py_DECREF(local_dict);
   Py_DECREF(result);
   fclose(py_file);
-  Py_Finalize();
-}
-
-FieldlineAcqSystem::~FieldlineAcqSystem() 
-{
-  qDebug() << "About to finalize python";
-  // Py_Finalize();
 }
 
 } // namespace FIELDLINEPLUGIN
