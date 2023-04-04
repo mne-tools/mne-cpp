@@ -47,7 +47,6 @@ add_subdirectory(utils)
 
 add_subdirectory(fiff)
 add_subdirectory(fs)
-add_subdirectory(events)
 
 add_subdirectory(mne)
 add_subdirectory(fwd)
@@ -56,8 +55,8 @@ add_subdirectory(communication)
 add_subdirectory(rtprocessing)
 add_subdirectory(connectivity)
 
-add_subdirectory(disp)
-
 if(NOT WASM)
+  add_subdirectory(disp)
+  add_subdirectory(events)
   add_subdirectory(disp3D)
 endif()
