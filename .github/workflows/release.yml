@@ -565,7 +565,7 @@ jobs:
         modules: 'qtcharts'
     - name: Setup and build WASM
       run: |
-        ./mne-cpp/tools/wasm.sh --qt 5.15 --emsdk 3.1.20
+        ./mne-cpp/tools/wasm.sh --emsdk 3.1.25
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
