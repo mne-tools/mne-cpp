@@ -12,14 +12,20 @@ function cleanAbsPath()
     echo "$CLEAN_ABS_PATH"
 }
 
-SCRIPT_PATH="$(cleanAbsPath "$(dirname "$0")")"
-PROJECT_PATH="$(cleanAbsPath "$SCRIPT_PATH/../..")"
-
-cd ${PROJECT_PATH}
-
-## User editable through flags
 EMSDK_VERSION="latest"
-QT_VERSION="5.15"
+SAVE_LOG="true"
+SHOW_HELP="false"
+
+SCRIPT_PATH="$(cleanAbsPath "$(dirname "$0")")"
+PROJECT_BASE_PATH="$(cleanAbsPath "$SCRIPT_PATH/../..")"
+
+NUM_PARALLEL_PROC=1
+
+if [ "$(uname)" == "Darwin" ]; then
+    NUM_PARALLEL_PROC=$(sysctl -n hw.logicalcpu)
+else
+    NUM_PARALLEL_PROC=$(expr $(nproc --all))
+fi
 
 ## Stop at first error
 set -e
@@ -28,17 +34,42 @@ for (( j=0; j<argc; j++)); do
     if [ "${argv[j]}" == "--emsdk" ] || [ "${argv[j]}" == "-e" ]; then
         EMSDK_VERSION="${argv[j+1]}" 
 		j=$j+1
-    elif [ "${argv[j]}" == "--qt" ] || [ "${argv[j]}" == "-q" ]; then
-        QT_VERSION="${argv[j+1]}"
-		j=$j+1
-    fi
+	elif [ "${argv[j]}" == "--no-log" ]; then
+		SAVE_LOG="false"
+	elif [ "${argv[j]}" == "--help" ] || [ "${argv[j]}" == "-h" ]; then
+		SHOW_HELP="true"
+	fi
 done
 
-## Left for debugging purposes
-# echo "${EMSDK_VERSION}"
-# echo "${QT_VERSION}"
+if [ ${SHOW_HELP} == "true" ]; then
+	echo "MNE-CPP wasm build script"
+	echo ""
+	echo "Usage:"
+	echo "    wasm --emsdk <VERSION>"
+	echo ""
+	echo "Depends on the enviroment variable Qt6_DIR being set and having wasm qt installed."
+	echo "For more info, go to https://doc.qt.io/qt-6/wasm.html"
+	echo ""
+	echo "Options:"
+	echo "    --emsdk, -e  Set what version of emscripten to use."
+	echo "                 Qt recommends the following versions depending"
+	echo "                 on what version of Qt you use:"
+	echo "                    Qt 6.2 -> emsdk 2.0.14"
+	echo "                    Qt 6.3 -> emsdk 3.0.0"
+	echo "                    Qt 6.4 -> emsdk 3.1.14"
+	echo "                    Qt 6.5 -> emsdk 3.1.25"
+	echo ""
+  	echo "    --no-log     Omits build log."
+	echo ""
+	echo "    --help, -h   Prints this help text."
 
-## emsdk
+	exit 0
+fi
+
+# Make sure we run everything relative to root folder as pwd
+cd ${PROJECT_BASE_PATH}
+
+## Emscripten
 echo "Setting up emsdk ${EMSDK_VERSION}..."
 if [ -d "emsdk" ]; then
 	echo "Found emsdk folder."
@@ -46,6 +77,7 @@ else
 	echo "emsdk folder not found. Fetching repo..."
 	git clone https://github.com/emscripten-core/emsdk.git
 fi
+
 cd emsdk
 git pull
 ./emsdk install ${EMSDK_VERSION}
@@ -54,58 +86,31 @@ source ./emsdk_env.sh
 cd ..
 echo "emsdk set up."
 
-## Qt
-echo "Setting up Qt ${QT_VERSION}..."
-if [ -d "Qt5_binaries" ]; then
-	echo "Found Qt5_binaries folder."
-else
-	echo "Qt5_binaries folder not found. Fetching repo and building..."
-	git clone https://code.qt.io/qt/qt5.git -b ${QT_VERSION}
-	cd qt5
-	./init-repository -f --module-subset=qtbase,qtcharts,qtsvg
-	./configure -xplatform wasm-emscripten -feature-thread -skip webengine -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -prefix "$PWD/../Qt5_binaries"
-	make module-qtbase module-qtsvg module-qtcharts -j4
-	make install -j4
-	cd ..
-fi
-echo "Qt set up."
-
 ## Build project
-GIT_HASH=$(git rev-parse HEAD)
+SOURCE_DIRECTORY=${PROJECT_BASE_PATH}/src
+BUILD_DIRECTORY=${PROJECT_BASE_PATH}/build/wasm
+OUTPUT_DIRECTORY=${PROJECT_BASE_PATH}/out/wasm
 
-QT_CMAKE_FLAGS=""
+${Qt6_DIR}/wasm_multithread/bin/qt-cmake \
+	-DCMAKE_BUILD_TYPE=Release \
+	-DBINARY_OUTPUT_DIRECTORY=${OUTPUT_DIRECTORY} \
+	-S ${SOURCE_DIRECTORY} \
+	-B ${BUILD_DIRECTORY}
 
-for d in ${PROJECT_PATH}/Qt5_binaries/lib/cmake/* ; do
-	d=$(basename ${d})
-    QT_CMAKE_FLAGS="${QT_CMAKE_FLAGS} -D${d}_DIR=${PROJECT_PATH}/Qt5_binaries/lib/cmake/${d}"
-done
+cmake \
+	--build ${BUILD_DIRECTORY} \
+	--parallel ${NUM_PARALLEL_PROC}
 
-echo "DIRS ---> ${QT_CMAKE_FLAGS}"
-
-emcmake cmake -B build -S src -DWASM=ON -DQT_DIR=${PROJECT_PATH}/Qt5_binaries/lib/cmake/Qt5 ${QT_CMAKE_FLAGS}
-cmake --build build --parallel $(expr $(nproc --all))
-
-echo "Done"
-
-## WASM coi fix
-if [ -d "coi-serviceworker" ]; then
-	echo "Found existing coi fix repo."
-else
-	echo "Cloning coi fix repo..."
-	git clone https://github.com/gzuidhof/coi-serviceworker.git
+## Log
+if [ ${SAVE_LOG} == "true" ]; then
+	echo "Saving build and system parameters..."
+	touch build_info.txt
+	echo "System Info: $(uname -rvop)" >> build_info.txt
+	echo "emsdk version: ${EMSDK_VERSION}" >> build_info.txt
+	echo "Qt version: ${QT_VERSION}" >> build_info.txt
+	echo "Build time: $(date)" >> build_info.txt
+	echo "Build git hash: ${GIT_HASH}" >> build_info.txt
+	echo "Saved."
 fi
-cp coi-serviceworker/coi-serviceworker.js out/Release/apps
-sed -i '0,/.*<script.*/s//\t<script src=\"coi-serviceworker.js\"><\/script>\n&/' out/Release/apps/mne_anonymize.html
-sed -i '0,/.*<script.*/s//\t<script src=\"coi-serviceworker.js\"><\/script>\n&/' out/Release/apps/mne_analyze.html
-
-## Build log
-echo "Saving build and system parameters..."
-touch build_info.txt
-echo "System Info: $(uname -rvop)" >> build_info.txt
-echo "emsdk version: ${EMSDK_VERSION}" >> build_info.txt
-echo "Qt version: ${QT_VERSION}" >> build_info.txt
-echo "Build time: $(date)" >> build_info.txt
-echo "Build git hash: ${GIT_HASH}" >> build_info.txt
-echo "Saved."
 
 exit 0
