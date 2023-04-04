@@ -498,7 +498,7 @@ if [[ ${LinkOption} == "dynamic" ]]; then
         ${MockText}rm -r mne-cpp/resources/data
 
         # Creating archive of everything in current directory
-        ${MockText}tar cfvz ../mne-cpp-linux-dynamic-x86_64.tar.gz mne-cpp   
+        ${MockText}tar cfvz ${BasePath}/mne-cpp-linux-dynamic-x86_64.tar.gz mne-cpp   
     fi
 
 elif [[ ${LinkOption} == "static" ]]; then
