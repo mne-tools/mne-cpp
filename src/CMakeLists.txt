@@ -52,8 +52,6 @@ option(WASM "Setup build for wasm" OFF)
 
 if(WASM)
   add_compile_definitions(WASMBUILD)
-  # add_link_options(--bind)
-  # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
   set(BUILD_SHARED_LIBS OFF)
   set(NO_TESTS ON)
   set(NO_EXAMPLES ON)
@@ -179,4 +177,3 @@ else()
     ${PROJECT_RESOURCES_DIR} ${OUTPUT_RESOURCES_DIR}
   )
 endif()
-
