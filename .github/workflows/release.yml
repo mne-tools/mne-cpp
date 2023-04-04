@@ -573,7 +573,7 @@ jobs:
     - name: Clone and update mne-cpp/wasm:gh-pages
       run: |
         # Delete folders which we do not want to ship
-        rm -r out/Release/apps/mne_analyze_plugins
+        rm -r out/wasm/apps/mne_analyze_plugins
         rm -r resources/data
         # Replace logo
         cp -RT resources/design/logos/qtlogo.svg bin/qtlogo.svg
@@ -587,7 +587,7 @@ jobs:
         git commit --amend -a -m 'Update wasm builds' --allow-empty
         # Copy wasm files
         cd ..
-        cp -RT out/Release/apps wasm
+        cp -RT out/wasm/apps wasm
         cd wasm
         git add .
         git commit --amend -a -m 'Update wasm builds'
