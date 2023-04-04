@@ -72,7 +72,8 @@ compile_commands.json
 # Resources folders
 /src/external/fftw
 /resources/data*
-
+__pycache__/
+*.whl
 .cache/*
 
 codecov
