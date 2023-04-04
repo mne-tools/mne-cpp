@@ -56,7 +56,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 if(NOT BUILD_SHARED_LIBS)
-  set(MNE_AN_PLUGINS 
+  set(MNE_ANALYZE_PLUGINS 
       analyze_averaging
       analyze_channelselection
       analyze_controlmanager
@@ -71,10 +71,10 @@ if(NOT BUILD_SHARED_LIBS)
   )
   
   if(NOT WASM)
-    list(APPEND MNE_AN_PLUGINS analyze_view3d)
+    list(APPEND MNE_ANALYZE_PLUGINS analyze_view3d)
   endif()
 
-  target_link_libraries(${PROJECT_NAME} PRIVATE ${MNE_AN_PLUGINS})
+  target_link_libraries(${PROJECT_NAME} PRIVATE ${MNE_ANALYZE_PLUGINS})
 
   target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
