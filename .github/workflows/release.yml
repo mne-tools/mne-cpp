@@ -543,6 +543,26 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v2
+    - name: Install Qt Desktop
+      uses: jurplel/install-qt-action@v3
+      with:
+        aqtversion: '==3.1.*'
+        py7zrversion: '>=0.20.2'
+        version: '6.5.0'
+        host: 'linux'
+        target: 'desktop'
+        arch: 'gcc_64'
+        modules: 'qtcharts'
+    - name: Install Qt WASM
+      uses: jurplel/install-qt-action@v3
+      with:
+        aqtversion: '==3.1.*'
+        py7zrversion: '>=0.20.2'
+        version: '6.5.0'
+        host: 'linux'
+        target: 'desktop'
+        arch: 'wasm_multithread'
+        modules: 'qtcharts'
     - name: Setup and build WASM
       run: |
         ./mne-cpp/tools/wasm.sh --qt 5.15 --emsdk 3.1.20
