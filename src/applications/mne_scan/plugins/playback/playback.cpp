@@ -42,6 +42,8 @@
 
 #include <scMeas/realtimemultisamplearray.h>
 #include <fiff/fiff_stream.h>
+#include <fiff/fiff_info.h>
+#include <fiff/c/fiff_digitizer_data.h>
 #include <utils/file.h>
 
 //=============================================================================================================
@@ -66,7 +68,6 @@ using SCSHAREDLIB::AbstractSensor;
 using SCSHAREDLIB::AbstractPlugin;
 using SCSHAREDLIB::PluginOutputData;
 using SCMEASLIB::RealTimeMultiSampleArray;
-using Eigen::MatrixXd;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -124,11 +125,6 @@ bool Playback::start()
         return false;
     }
 
-    if (!sourceFile->open(QIODevice::ReadOnly)){
-        qWarning() << "[Playback::start] Unable to open:" << sourceFilePath;
-        return false;
-    }
-
     if (!loadFiffRawData()){
         qWarning() << "[Playback::start] Not able to read raw info or data from:" << sourceFilePath;
         return false;
@@ -181,16 +177,33 @@ QWidget* Playback::setupWidget()
 
 void Playback::run()
 {
-    int first = rawData.first_samp;
-    int last = rawData.last_samp;
+    initConnector();
+
+    int absolute_first = rawData.first_samp;
+    int absolute_last = rawData.last_samp;
+
     int bufferSize = rawData.info.sfreq;
-    MatrixXd data;
-    MatrixXd times;
+
+    int first = absolute_first;
+    int last = absolute_first;
+
+    Eigen::MatrixXd data;
+    Eigen::MatrixXd times;
+
+    QElapsedTimer timer;
 
     while(!isInterruptionRequested()) {
-        if(m_pCircularBuffer) {
-
+        timer.start();
+        last = first + bufferSize - 1;
+        if(last < absolute_last){
+            if(rawData.read_raw_segment(data,times,first,last)){
+                m_pRTMSA_Playback->measurementData()->setValue(data);
+            }
+        } else {
+            break;
         }
+        first += bufferSize;
+        sleep(1);
     }
 }
 
@@ -218,6 +231,21 @@ bool Playback::loadFiffRawData()
         rawData.clear();
         return false;
     }
+
+    m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo(rawData.info));
+    m_pFiffDigData = QSharedPointer<FIFFLIB::FiffDigitizerData>(new FIFFLIB::FiffDigitizerData());
+    rawData.file->read_digitizer_data(rawData.file->dirtree(), *m_pFiffDigData);
+
     return true;
 }
 
+//=============================================================================================================
+
+void Playback::initConnector()
+{
+    m_pRTMSA_Playback->measurementData()->initFromFiffInfo(m_pFiffInfo);
+    m_pRTMSA_Playback->measurementData()->setDigitizerData(m_pFiffDigData);
+    m_pRTMSA_Playback->measurementData()->setMultiArraySize(1);
+    m_pRTMSA_Playback->measurementData()->setVisibility(true);
+    m_pRTMSA_Playback->measurementData()->setXMLLayoutFile(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/FiffSimulator/VectorViewSimLayout.xml");
+}

@@ -135,12 +135,18 @@ private:
 
     bool loadFiffRawData();
 
+    void initConnector();
+
     SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSA_Playback;     /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
 
     QSharedPointer<UTILSLIB::CircularBuffer_Matrix_float>   m_pCircularBuffer;      /**< Holds incoming raw data. */
     QString sourceFilePath;
     std::unique_ptr<QFile> sourceFile;
     FIFFLIB::FiffRawData rawData;
+
+    QSharedPointer<FIFFLIB::FiffInfo>               m_pFiffInfo;                /**< Fiff measurement info.*/
+    QSharedPointer<FIFFLIB::FiffDigitizerData>      m_pFiffDigData;             /**< Fiff Digitizer Data. */
+
 
 public slots:
     void setSourceFile(QString filePath);
