@@ -22,8 +22,7 @@ set(HEADERS info.h mainwindow.h analyzecore.h)
 set(RESOURCES mne_analyze.qrc)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-  qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES} ${HEADERS}
-                    ${RESOURCES})
+  qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES} ${HEADERS} ${RESOURCES})
 else()
   add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
 endif()
@@ -79,16 +78,17 @@ if(NOT BUILD_SHARED_LIBS)
   target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
 
-set_target_properties(
-  ${PROJECT_NAME}
-  PROPERTIES MACOSX_BUNDLE_GUI_IDENTIFIER mne-cpp.org
-             MACOSX_BUNDLE ${BUILD_MAC_APP_BUNDLE}
-             WIN32_EXECUTABLE TRUE)
+set_target_properties(${PROJECT_NAME} PROPERTIES
+  MACOSX_BUNDLE_GUI_IDENTIFIER mne-cpp.org
+  MACOSX_BUNDLE ${BUILD_MAC_APP_BUNDLE}
+  WIN32_EXECUTABLE TRUE
+)
 
 install(
   TARGETS ${PROJECT_NAME}
   BUNDLE DESTINATION .
-  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
 
 if(QT_VERSION_MAJOR EQUAL 6)
   qt_finalize_executable(${PROJECT_NAME})
