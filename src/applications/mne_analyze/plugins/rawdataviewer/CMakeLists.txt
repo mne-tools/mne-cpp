@@ -15,11 +15,19 @@ endif()
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-set(SOURCES rawdataviewer.cpp fiffrawview.cpp fiffrawviewdelegate.cpp
-            rawdataviewer_global.cpp)
+set(SOURCES 
+  rawdataviewer.cpp 
+  fiffrawview.cpp 
+  fiffrawviewdelegate.cpp
+  rawdataviewer_global.cpp
+)
 
-set(HEADERS rawdataviewer.h fiffrawview.h fiffrawviewdelegate.h
-            rawdataviewer_global.h)
+set(HEADERS 
+  rawdataviewer.h
+  fiffrawview.h 
+  fiffrawviewdelegate.h
+  rawdataviewer_global.h
+)
 
 set(FILE_TO_UPDATE dipolefit_global.cpp)
 

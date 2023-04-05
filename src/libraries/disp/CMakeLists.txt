@@ -75,7 +75,8 @@ set(SOURCES
     viewers/helpers/draggableframelesswidget.cpp
     viewers/helpers/frequencyspectrumdelegate.cpp
     viewers/helpers/frequencyspectrummodel.cpp
-    viewers/helpers/bidsviewmodel.cpp)
+    viewers/helpers/bidsviewmodel.cpp
+)
 
 set(HEADERS
     disp_global.h
@@ -137,7 +138,8 @@ set(HEADERS
     viewers/helpers/draggableframelesswidget.h
     viewers/helpers/frequencyspectrumdelegate.h
     viewers/helpers/frequencyspectrummodel.h
-    viewers/helpers/bidsviewmodel.h)
+    viewers/helpers/bidsviewmodel.h
+)
 
 set(UI
     viewers/formfiles/applytoview.ui
@@ -161,7 +163,8 @@ set(UI
     viewers/formfiles/control3dview.ui
     viewers/formfiles/tfsettingsview.ui
     viewers/formfiles/hpisettingsview.ui
-    viewers/formfiles/bidsview.ui)
+    viewers/formfiles/bidsview.ui
+)
 
 set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/viewers/formfiles")
 
@@ -179,8 +182,10 @@ set(FFTW_LIBS "")
 if(USE_FFTW)
   if(WIN32)
     set(FFTW_LIBS
-        ${FFTW_DIR_LIBS}/libfftw3-3.dll ${FFTW_DIR_LIBS}/libfftw3f-3.dll
-        ${FFTW_DIR_LIBS}/libfftwf3l-3.dll)
+      ${FFTW_DIR_LIBS}/libfftw3-3.dll
+      ${FFTW_DIR_LIBS}/libfftw3f-3.dll
+      ${FFTW_DIR_LIBS}/libfftwf3l-3.dll
+    )
     target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE})
   elseif(UNIX AND NOT APPLE)
     set(FFTW_LIBS ${FFTW_DIR_LIBS}/lib/libfftw3.so)
@@ -212,10 +217,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     eigen
 )
 
-target_compile_definitions(
-  ${PROJECT_NAME}
-  PRIVATE MNE_DISP_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"
-          MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_DISP_LIBRARY MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
 
 if(NOT BUILD_SHARED_LIBS)
   target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
