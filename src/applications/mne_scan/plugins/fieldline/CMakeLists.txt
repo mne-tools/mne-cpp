@@ -11,50 +11,16 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED
   COMPONENTS Core Widgets Network Concurrent)
 find_package(Python REQUIRED COMPONENTS Interpreter Development)
-#cmake_path(GET Python_EXECUTABLE PARENT_PATH Python_BIN_DIR)
 
-#if(AWK MATCHES ".+-NOTFOUND")
-#    message(FATAL_ERROR "FATAL: awk (and mawk and gawk) could not be found (${AWK}).")
-#else()
-#    execute_process(
-#        COMMAND /bin/sh -c "\"${AWK}\" '$1 ~ /^#define/ && $2 ~ /^LIB_(MAJVER|MINVER|PATCH|BUILD)$/\ { print \"set(\${PRJNAME}_\" $2 \" \" $3 \")\" }' \"${CMAKE_SOURCE_DIR}/version.h\""
-#        RESULT_VARIABLE AWK_EXITCODE
-#        OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/version.cmake"
-#        )
-#    message(STATUS "Exit code from awk: ${AWK_EXITCODE}")
-#    include(${CMAKE_CURRENT_BINARY_DIR}/version.cmake)
-#endif()
+execute_process(
+  COMMAND echo $(cd $(dirname $(dirname $(which python))/../..); pwd -P)
+  OUTPUT_VARIABLE Python_PREFIX
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
 
-#set(Python_EXECUTABLE /autofs/cluster/fusion/juan/anaconda3/bin/python)
-#cmake_path(GET Python_EXECUTABLE PARENT_PATH Python_BIN_DIR)
-#if (WIN32)
-#  execute_process(COMMAND CMD /c echo bar OUTPUT_VARIABLE FOO)
-#else()
-#  message("holaaaaaaa")
-#  execute_process(
-#    COMMAND "python -c 'import platform; major, minor, patch = platform.python_version_tuple(); print(minor)'"
-#    OUTPUT_VARIABLE Python_version)
-#endif (WIN32)
-#message("Python executable: " ${Python_EXECUTABLE})
-#message("Python_version: " ${Python_version})
-#
-#    execute_process(
-#        COMMAND /bin/sh -c "\"${AWK}\" '$1 ~ /^#define/ && $2 ~ /^LIB_(MAJVER|MINVER|PATCH|BUILD)$/\ { print \"set(\${PRJNAME}_\" $2 \" \" $3 \")\" }' \"${CMAKE_SOURCE_DIR}/version.h\""
-#        RESULT_VARIABLE AWK_EXITCODE
-#        OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/version.cmake"
-#        )
-#
-set(ANACONDA_DIR /opt/anaconda3)
-# set(ANACONDA_DIR /autofs/cluster/fusion/juan/anaconda3)
-set(Python_BIN_DIR ${ANACONDA_DIR}/bin)
-set(Python_LIB_DIR ${ANACONDA_DIR}/lib)
+set(Python_BIN_DIR ${Python_PREFIX}/bin)
+set(Python_LIB_DIR ${Python_PREFIX}/lib)
 set(Python_EXECUTABLE ${Python_BIN_DIR}/python)
-
-#execute_process(
-#  COMMAND "echo $(dirname $(which ${ANACONDA_DIR}/bin/python))"
-#  WORKING_DIRECTORY .
-#  OUTPUT_VARIABLE Python_BIN_DIR
-#)
 
 execute_process(
   COMMAND ${Python_BIN_DIR}/python -c "import platform; major, minor, patch = platform.python_version_tuple(); print(major)"
