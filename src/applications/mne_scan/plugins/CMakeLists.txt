@@ -27,6 +27,7 @@ add_subdirectory(neuronalconnectivity)
 add_subdirectory(writetofile)
 add_subdirectory(hpi)
 add_subdirectory(rtfwd)
+add_subdirectory(playback)
 
 option(WITH_BRAINFLOW   "Build brainflow plugin"    OFF)
 option(WITH_LSL         "Build LSL plugin"          OFF)
