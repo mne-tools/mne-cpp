@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>IpMacPair</class>
+ <widget class="QWidget" name="IpMacPair">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>402</width>
+    <height>50</height>
+   </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>400</width>
+    <height>50</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QHBoxLayout" name="horizontalLayout">
+   <item>
+    <widget class="QLineEdit" name="macAddrLineEdit">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>25</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QLineEdit" name="IPLineEdit">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>25</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

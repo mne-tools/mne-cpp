@@ -103,6 +103,10 @@ set(HEADERS
     fieldlineview.h
 )
 
+set(UI_FILES
+  fieldlineview.ui
+)
+
 set(FILE_TO_UPDATE fieldline_global.cpp)
 
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/fieldline.json)
@@ -121,7 +125,7 @@ set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES
   OBJECT_DEPENDS "${SOURCE_PATHS}"
 )
 
-add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_FILES})
 
 set(FFTW_LIBS "")
 
