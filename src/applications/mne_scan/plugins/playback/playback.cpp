@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
  * @file     playback.cpp
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>,
- *           Gabriel B Motta <gbmotta@mgh.harvard.edu>
- * @since    0.1.0
- * @date     February, 2020
+ * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ * @since    0.1.9
+ * @date     April, 2023
  *
  * @section  LICENSE
  *
- * Copyright (C) 2020, Lorenz Esch, Gabriel B Motta. All rights reserved.
+ * Copyright (C) 2023, Gabriel B Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -62,8 +61,11 @@
 using PLAYBACKPLUGIN::Playback;
 using PLAYBACKPLUGIN::PlaybackSetupWidget;
 using UTILSLIB::File;
+using FIFFLIB::FiffStream;
 using SCSHAREDLIB::AbstractSensor;
 using SCSHAREDLIB::AbstractPlugin;
+using SCSHAREDLIB::PluginOutputData;
+using SCMEASLIB::RealTimeMultiSampleArray;
 using Eigen::MatrixXd;
 
 //=============================================================================================================
@@ -95,7 +97,9 @@ QSharedPointer<AbstractPlugin> Playback::clone() const
 
 void Playback::init()
 {
-
+    m_pRTMSA_Playback = PluginOutputData<RealTimeMultiSampleArray>::create(this, "Playback", "Playback Output");
+    m_pRTMSA_Playback->measurementData()->setName(this->getName());//Provide name to auto store widget settings
+    m_outputConnectors.append(m_pRTMSA_Playback);
 }
 
 //=============================================================================================================
@@ -108,6 +112,28 @@ void Playback::unload()
 
 bool Playback::start()
 {
+    if(sourceFilePath.isEmpty()){
+        qWarning() << "[Playback::start] Source path empty";
+        return false;
+    }
+
+    sourceFile = std::make_unique<QFile>(sourceFilePath);
+
+    if(!sourceFile->exists()){
+        qWarning() << "[Playback::start] Could not find:" << sourceFilePath;
+        return false;
+    }
+
+    if (!sourceFile->open(QIODevice::ReadOnly)){
+        qWarning() << "[Playback::start] Unable to open:" << sourceFilePath;
+        return false;
+    }
+
+    if (!loadFiffRawData()){
+        qWarning() << "[Playback::start] Not able to read raw info or data from:" << sourceFilePath;
+        return false;
+    }
+
     QThread::start();
 
     return true;
@@ -155,8 +181,11 @@ QWidget* Playback::setupWidget()
 
 void Playback::run()
 {
-    MatrixXd matData;
-    qint32 size = 0;
+    int first = rawData.first_samp;
+    int last = rawData.last_samp;
+    int bufferSize = rawData.info.sfreq;
+    MatrixXd data;
+    MatrixXd times;
 
     while(!isInterruptionRequested()) {
         if(m_pCircularBuffer) {
@@ -178,5 +207,17 @@ void Playback::setSourceFile(QString filePath)
 {
     sourceFilePath = filePath;
     qDebug() << "SET:" << sourceFilePath;
+}
+
+//=============================================================================================================
+
+bool Playback::loadFiffRawData()
+{
+    if(!FiffStream::setup_read_raw(*sourceFile, rawData))
+    {
+        rawData.clear();
+        return false;
+    }
+    return true;
 }
 

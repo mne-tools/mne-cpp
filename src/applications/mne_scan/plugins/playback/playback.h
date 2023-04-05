@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
  * @file     playback.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>,
- *           Gabriel B Motta <gbmotta@mgh.harvard.edu>
- * @since    0.1.0
- * @date     February, 2020
+ * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ * @since    0.1.9
+ * @date     April, 2023
  *
  * @section  LICENSE
  *
- * Copyright (C) 2020, Lorenz Esch, Gabriel B Motta . All rights reserved.
+ * Copyright (C) 2023, Gabriel B Motta. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -45,6 +44,8 @@
 #include <utils/generics/circularbuffer.h>
 #include <scShared/Plugins/abstractsensor.h>
 #include <fiff/fifffilesharer.h>
+
+#include <memory>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -132,8 +133,14 @@ private:
      */
     virtual void run();
 
+    bool loadFiffRawData();
+
+    SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray>::SPtr m_pRTMSA_Playback;     /**< The RealTimeMultiSampleArray to provide the rt_server Channels.*/
+
     QSharedPointer<UTILSLIB::CircularBuffer_Matrix_float>   m_pCircularBuffer;      /**< Holds incoming raw data. */
     QString sourceFilePath;
+    std::unique_ptr<QFile> sourceFile;
+    FIFFLIB::FiffRawData rawData;
 
 public slots:
     void setSourceFile(QString filePath);
