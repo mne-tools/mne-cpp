@@ -49,6 +49,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QFileDialog>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -141,8 +143,12 @@ QString Playback::getName() const
 
 QWidget* Playback::setupWidget()
 {
-    PlaybackSetupWidget* setupWidget = new PlaybackSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
-    return setupWidget;
+    PlaybackSetupWidget* widget = new PlaybackSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+
+    connect(widget, &PlaybackSetupWidget::newSourceFileSet,
+            this, &Playback::setSourceFile, Qt::UniqueConnection);
+
+    return widget;
 }
 
 //=============================================================================================================
@@ -165,3 +171,12 @@ QString Playback::getBuildInfo()
 {
     return QString(buildDateTime()) + QString(" - ")  + QString(buildHash());
 }
+
+//=============================================================================================================
+
+void Playback::setSourceFile(QString filePath)
+{
+    sourceFilePath = filePath;
+    qDebug() << "SET:" << sourceFilePath;
+}
+

@@ -59,6 +59,10 @@ PlaybackSetupWidget::PlaybackSetupWidget(Playback* toolbox, QWidget *parent)
 , m_pPlayback(toolbox)
 {
     ui.setupUi(this);
+    connect(ui.m_qPushButton_Browse, &QPushButton::pressed,
+            this, &PlaybackSetupWidget::browseFiles, Qt::UniqueConnection);
+    connect(ui.m_lineEditSourceFile, &QLineEdit::textChanged,
+            this, &PlaybackSetupWidget::newSourceFileSet, Qt::UniqueConnection);
 }
 
 //=============================================================================================================
@@ -67,3 +71,23 @@ PlaybackSetupWidget::~PlaybackSetupWidget()
 {
 }
 
+//=============================================================================================================
+
+void PlaybackSetupWidget::setSourceFile(QString filePath)
+{
+    ui.m_lineEditSourceFile->setText(filePath);
+}
+
+//=============================================================================================================
+
+void PlaybackSetupWidget::browseFiles()
+{
+    QString sFilePath = QFileDialog::getOpenFileName(Q_NULLPTR,
+                                                    tr("Open File"),
+                                                    QString(),
+                                                    tr("Fiff file (*.fif *.fiff);;Event file (*.eve)"));
+
+    if(!sFilePath.isEmpty()){
+        ui.m_lineEditSourceFile->setText(sFilePath);
+    }
+}

@@ -96,7 +96,7 @@ class PLAYBACKSHARED_EXPORT Playback : public SCSHAREDLIB::AbstractSensor
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "playback.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(SCSHAREDLIB::AbstractAlgorithm)
+    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
 
 public:
     //=========================================================================================================
@@ -133,7 +133,10 @@ private:
     virtual void run();
 
     QSharedPointer<UTILSLIB::CircularBuffer_Matrix_float>   m_pCircularBuffer;      /**< Holds incoming raw data. */
+    QString sourceFilePath;
 
+public slots:
+    void setSourceFile(QString filePath);
 };
 } // NAMESPACE
 

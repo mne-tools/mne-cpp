@@ -89,11 +89,18 @@ public:
      */
     ~PlaybackSetupWidget();
 
+    void setSourceFile(QString filePath);
+
 private:
+    void browseFiles();
 
     Playback* m_pPlayback;	/**< Holds a pointer to corresponding Playback.*/
 
-    Ui::PlaybackSetupWidgetClass ui;	/**< Holds the user interface for the PlaybackSetupWidget.*/
+    Ui::PlaybackSetupUi ui;	/**< Holds the user interface for the PlaybackSetupWidget.*/
+
+public:
+signals:
+    void newSourceFileSet(QString filePath);
 };
 } // NAMESPACE
 

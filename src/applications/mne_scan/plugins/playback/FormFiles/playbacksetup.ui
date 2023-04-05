@@ -115,10 +115,10 @@ p, li { white-space: pre-wrap; }
          </spacer>
         </item>
         <item row="0" column="0">
-         <widget class="QLineEdit" name="m_lineEditIP"/>
+         <widget class="QLineEdit" name="m_lineEditSourceFile"/>
         </item>
         <item row="1" column="0">
-         <widget class="QPushButton" name="m_qPushButton_Connect">
+         <widget class="QPushButton" name="m_qPushButton_Browse">
           <property name="text">
            <string>Browse Files</string>
           </property>
