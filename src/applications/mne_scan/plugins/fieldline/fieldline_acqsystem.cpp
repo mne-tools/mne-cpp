@@ -109,7 +109,8 @@
 
 namespace FIELDLINEPLUGIN {
 
-const std::string resourcesPath(QCoreApplication::applicationDirPath().toStdString() + "/../resources/mne_scan/plugins/fieldline/");
+const std::string resourcesPath(QCoreApplication::applicationDirPath().toStdString() + \
+                                "/../resources/mne_scan/plugins/fieldline/");
 const std::string entryFile(resourcesPath + "main.py");
 
 FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
@@ -142,7 +143,8 @@ void FieldlineAcqSystem::preConfigurePython() const {
 
   PyObject* path = PyObject_GetAttrString(sys, "path");
 
-  const std::string path_venv_modules(resourcesPath + "venv/lib/" + pythonVerStr + "site-packages/");
+  const std::string path_venv_modules(resourcesPath + "venv/lib/" + \
+                                      pythonVerStr + "site-packages/");
   PyList_Insert(path, 0, PyUnicode_FromString(resourcesPath.c_str()));
   PyList_Insert(path, 1, PyUnicode_FromString(path_venv_modules.c_str()));
   Py_DECREF(sys);
