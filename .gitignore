@@ -73,6 +73,7 @@ compile_commands.json
 /src/external/fftw
 /resources/data*
 __pycache__/
+venv/
 *.whl
 .cache/*
 
