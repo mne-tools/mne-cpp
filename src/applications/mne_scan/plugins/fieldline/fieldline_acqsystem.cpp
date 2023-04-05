@@ -120,38 +120,36 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
   runPythonFile(entryFile.c_str(), "main.py");
 }
 
-FieldlineAcqSystem::~FieldlineAcqSystem() 
+FieldlineAcqSystem::~FieldlineAcqSystem()
 {
   qDebug() << "About to finalize python";
   Py_Finalize();
 }
 
-void FieldlineAcqSystem::preConfigurePython() const {
+void FieldlineAcqSystem::preConfigurePython() const 
+{
   Py_Initialize();
   PyObject* sys = PyImport_ImportModule("sys");
   PyObject* versionInfo = PyObject_GetAttrString(sys, "version_info");
   PyObject* versionInfoMajor = PyObject_GetAttrString(versionInfo, "major");
   PyObject* versionInfoMinor = PyObject_GetAttrString(versionInfo, "minor");
-
-  std::string pythonVerStr("pythonx.x/");
-  pythonVerStr.at(6) = '0' + PyLong_AsLong(versionInfoMajor);
-  pythonVerStr.at(8) = '0' + PyLong_AsLong(versionInfoMinor);
-
+  const std::string pythonVer(std::to_string(PyLong_AsLong(versionInfoMajor)) + \
+                        "." + std::to_string(PyLong_AsLong(versionInfoMinor)));
   Py_DECREF(versionInfoMajor);
   Py_DECREF(versionInfoMinor);
   Py_DECREF(versionInfo);
 
   PyObject* path = PyObject_GetAttrString(sys, "path");
 
-  const std::string path_venv_modules(resourcesPath + "venv/lib/" + \
-                                      pythonVerStr + "site-packages/");
+  const std::string pathVenvMods(resourcesPath + "venv/lib/python" + pythonVer + "/site-packages/");
   PyList_Insert(path, 0, PyUnicode_FromString(resourcesPath.c_str()));
-  PyList_Insert(path, 1, PyUnicode_FromString(path_venv_modules.c_str()));
+  PyList_Insert(path, 1, PyUnicode_FromString(pathVenvMods.c_str()));
   Py_DECREF(sys);
   Py_DECREF(path);
 }
 
-void FieldlineAcqSystem::runPythonFile(const char* file, const char* comment) const {
+void FieldlineAcqSystem::runPythonFile(const char* file, const char* comment) const 
+{
   FILE *py_file = fopen(file, "r");
   PyObject* global_dict = PyDict_New();
   PyObject* local_dict = PyDict_New();
@@ -162,4 +160,4 @@ void FieldlineAcqSystem::runPythonFile(const char* file, const char* comment) co
   fclose(py_file);
 }
 
-} // namespace FIELDLINEPLUGIN
+}  // namespace FIELDLINEPLUGIN

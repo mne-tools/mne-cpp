@@ -7,23 +7,40 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED
-  COMPONENTS Core Widgets Network Concurrent)
+  COMPONENTS Core Widgets Network Concurrent
+)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED
-  COMPONENTS Core Widgets Network Concurrent)
-find_package(Python REQUIRED COMPONENTS Interpreter Development)
+  COMPONENTS Core Widgets Network Concurrent
+)
 
 execute_process(
-  COMMAND echo $(cd $(dirname $(dirname $(which python))/../..); pwd -P)
+  COMMAND which python
+  OUTPUT_VARIABLE Python_EXECUTABLE
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+execute_process(
+  COMMAND dirname ${Python_EXECUTABLE}
+  OUTPUT_VARIABLE Python_BIN_DIR
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+execute_process(
+  COMMAND pwd -P
+  WORKING_DIRECTORY ${Python_BIN_DIR}/..
   OUTPUT_VARIABLE Python_PREFIX
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-set(Python_BIN_DIR ${Python_PREFIX}/bin)
-set(Python_LIB_DIR ${Python_PREFIX}/lib)
-set(Python_EXECUTABLE ${Python_BIN_DIR}/python)
+execute_process(
+  COMMAND pwd -P
+  WORKING_DIRECTORY ${Python_PREFIX}/lib
+  OUTPUT_VARIABLE Python_LIB_DIR
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
 
 execute_process(
-  COMMAND ${Python_BIN_DIR}/python -c "import platform; major, minor, patch = platform.python_version_tuple(); print(major)"
+  COMMAND ${Python_EXECUTABLE} -c "import platform; major, minor, patch = platform.python_version_tuple(); print(major)"
   OUTPUT_VARIABLE Python_VERSION_MAJOR
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
@@ -59,6 +76,7 @@ execute_process(
 
 separate_arguments(Python_LDFLAGS_NORM UNIX_COMMAND "${Python_LDFLAGS}")
 
+message(    "python prefix dir: " ${Python_PREFIX})
 message(       "python bin dir: " ${Python_BIN_DIR})
 message(       "python lib dir: " ${Python_LIB_DIR})
 message(    "python executable: " ${Python_EXECUTABLE})

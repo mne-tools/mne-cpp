@@ -60,10 +60,11 @@
 //=============================================================================================================
 
 class QWidget;
-// namespace Ui {
+ namespace Ui {
+    class fieldline_view_ui
 //     class fieldline_rack;
 //     class fieldline_chassis;
-// }
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB

@@ -44,7 +44,7 @@
 
 #include "fieldline/fieldline.h"
 #include "fieldline/fieldline_acqsystem.h"
-#include "fieldline/fieldlineview.h" 
+#include "fieldline/fieldlineview.h"
 
 #include <scMeas/realtimemultisamplearray.h>
 // #include <utils/generics/circularbuffer.h>
@@ -149,15 +149,16 @@ Fieldline::~Fieldline() {
 
 //=============================================================================================================
 
-QSharedPointer<SCSHAREDLIB::AbstractPlugin> Fieldline::clone() const {
+QSharedPointer<SCSHAREDLIB::AbstractPlugin> Fieldline::clone() const
+{
   QSharedPointer<SCSHAREDLIB::AbstractPlugin> pFieldlineClone(new Fieldline());
   return pFieldlineClone;
 }
 
 //=============================================================================================================
 
-void Fieldline::init() {
-
+void Fieldline::init()
+{
   // data infrastructure
   m_pRTMSA = SCSHAREDLIB::PluginOutputData
     <SCMEASLIB::RealTimeMultiSampleArray>::create(this, "Fieldline Plugin",
