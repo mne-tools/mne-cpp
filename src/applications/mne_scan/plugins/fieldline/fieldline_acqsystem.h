@@ -41,7 +41,7 @@ class Fieldline;
 
 class FieldlineAcqSystem {
 public:
-   FieldlineAcqSystem(Fieldline* parent);
+   explicit FieldlineAcqSystem(Fieldline* parent);
 
    ~FieldlineAcqSystem();
 

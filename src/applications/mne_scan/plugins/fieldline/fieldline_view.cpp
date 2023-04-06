@@ -37,10 +37,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fieldline/fieldlineview.h"
+#include "fieldline/fieldline_view.h"
 #include "fieldline/fieldline.h"
-// #include "ui_fieldline_rack.h"
-// #include "ui_fieldline_chassis.h"
+#include "formfiles/ui_fieldline_view.h"
+#include "formfiles/ui_fieldline_rack.h"
+#include "formfiles/ui_fieldline_chassis.h"
+#include "formfiles/ui_macaddress_ip_box.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -48,6 +50,7 @@
 
 #include <QWidget>
 #include <QLabel>
+#include <QVBoxLayout>
 // #include <QMouseEvent>
 // #include <QDebug>
 // #include <QMenu>
@@ -76,17 +79,50 @@
 
 namespace FIELDLINEPLUGIN {
 
+int numChassis(2);
 
 FieldlineView::FieldlineView(Fieldline* parent)
-: m_pFieldlinePlugin(parent)
+: m_pFieldlinePlugin(parent),
+  m_pUi(new Ui::FieldlineSetupUi)
 {
+    m_pUi->setupUi(this);
+    QVBoxLayout* frameLayout = qobject_cast<QVBoxLayout*>(m_pUi->ipMacFrame->layout());
+
+    QHBoxLayout* ipMacLayout1 = new QHBoxLayout(m_pUi->ipMacFrame);
+    QLineEdit* ip1 = new QLineEdit("ip1");
+    ip1->setEnabled(false);
+    QLineEdit* macAddr1 = new QLineEdit("macaddr1");
+    ipMacLayout1->addWidget(macAddr1);
+    ipMacLayout1->addWidget(ip1);
+  
+    QHBoxLayout* ipMacLayout2 = new QHBoxLayout(m_pUi->ipMacFrame);
+    QLineEdit* ip2 = new QLineEdit("ip2");
+    ip2->setEnabled(false);
+    QLineEdit* macAddr2 = new QLineEdit("macaddr2");
+    ipMacLayout2->addWidget(macAddr2);
+    ipMacLayout2->addWidget(ip2);
+  
+    frameLayout->insertLayout(1, ipMacLayout1);
+    frameLayout->insertLayout(1, ipMacLayout2);
 }
 
-QWidget* FieldlineView::getWidget() const {
+void FieldlineView::initAcqRack(int numChassis, const std::vector<std::vector<int>>& sensors)
+{
+    QVBoxLayout* rackLayout = qobject_cast<QVBxLayout*>(m_pUi->fieldlineRackFrame->layout());
+    for (int i = 0; i < numChassis; i++) 
+    {
+      FieldlineChassis* chassis = new FieldlineChassis(sensors[i]);
 
-    QLabel* label = new QLabel("FieldlineView testing...");
-    return label;
+      rackLayout->addWidget(chassis);
+    }
+    
 }
+
+// QWidget* FieldlineView::getWidget() const {
+//
+//     // QLabel* label = new QLabel("FieldlineView testing...");
+//     return this;
+// }
 
 
 } // namespace FIELDLINEPLUGIN

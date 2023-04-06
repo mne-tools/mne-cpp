@@ -126,7 +126,7 @@ FieldlineAcqSystem::~FieldlineAcqSystem()
   Py_Finalize();
 }
 
-void FieldlineAcqSystem::preConfigurePython() const 
+void FieldlineAcqSystem::preConfigurePython() const
 {
   Py_Initialize();
   PyObject* sys = PyImport_ImportModule("sys");

@@ -1,8 +1,8 @@
 //=============================================================================================================
 /**
- * @file     fl_rack.h
- * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
- *           Juan Garcia-Prieto <juangpc@gmail.com>
+ * @file     fieldline_view.h
+ * @author   Juan Garcia-Prieto <jgarciaprieto@mgh.harvard.edu>
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.9
  * @date     February, 2023
  *
@@ -42,14 +42,11 @@
 
 // #include "disp/viewers/led_indicator.h"
 
-// #include <memory>
-// #include <vector>
-//
-// //=============================================================================================================
-// // QT INCLUDES
-// //=============================================================================================================
-//
-// #include <QColor>
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QWidget>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -59,11 +56,9 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class QWidget;
- namespace Ui {
-    class fieldline_view_ui
-//     class fieldline_rack;
-//     class fieldline_chassis;
+namespace Ui {
+   class FieldlineSetupUi;
+   class Fieldline_view_chassisUi;
 }
 
 //=============================================================================================================
@@ -76,13 +71,16 @@ class Fieldline;
 // class fieldline_chassis;
 
 //=============================================================================================================
-class FieldlineView /*: public QWidget */ {
-    // Q_OBJECT
 
-public:
-    FieldlineView(Fieldline* parent);
+class FieldlineView : public QWidget
+{
+    Q_OBJECT
 
-    QWidget* getWidget() const;
+ public:
+    explicit FieldlineView(Fieldline* parent);
+
+    void initAcqRack(int numChassis, const std::vector<std::vector<int>>& sensors);
+    // QWidget* getWidget() const;
     // FieldlineView(int num_chassis, int sensors_per_chassis, QWidget *parent = nullptr);
     // FieldlineView(int num_chassis, QWidget *parent = nullptr);
     // ~FieldlineView();
@@ -106,43 +104,13 @@ public:
     // void setAllBlinkState(bool blinking);
     //
     // static void setDefaultNumSensors(int num_sensors);
-private:
+ private:
     // static int default_num_sensors;
     //
-    // Ui::fieldline_rack* ui;
-    // std::vector<fieldline_chassis*> chassis;
     Fieldline* m_pFieldlinePlugin;
+    Ui::FieldlineSetupUi* m_pUi;
+    // std::vector<fieldline_chassis*> chassis;
 };
-
-//=============================================================================================================
-
-// class fieldline_chassis : public QWidget
-// {
-//     Q_OBJECT
-//
-// public:
-//     fl_chassis(int num_sensors, QWidget *parent = nullptr);
-//     ~fl_chassis();
-//
-//     void setColor(size_t sensor_num, const QColor& color);
-//     void setColor(size_t sensor_num, const QColor& color, bool blinking);
-//     void setColor(const QColor& color);
-//     void setColor(const QColor& color, bool blinking);
-//
-//     void setBlinkState(size_t sensor_num, bool blinking);
-//     void setBlinkState(bool blinking);
-//
-// signals:
-//     void clicked(int sensor, const QPoint& pos);
-//
-// private slots:
-//     void rightClickMenu(int sensor, const QPoint& pos);
-//
-// private:
-//     Ui::fl_chassis* ui;
-//     std::vector<DISPLIB::LEDIndicator*> sensors;
-// };
-
 
 }  // namespace FIELDLINEPLUGIN
 
