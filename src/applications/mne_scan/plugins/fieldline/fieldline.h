@@ -47,8 +47,6 @@
 
 #include <scShared/Plugins/abstractsensor.h>
 
-#include <memory>
-
 #include <QObject>
 #include <QSharedPointer>
 
@@ -81,11 +79,8 @@ class FieldlineView;
  */
 class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "fieldline.json") //New Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "fieldline.json")
     Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
-
-    // friend class FieldlineSetup;
 
  public:
     //=========================================================================================================
@@ -115,21 +110,14 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
  protected:
   virtual void run();
 
-  std::unique_ptr<FieldlineAcqSystem> acqSystem;
-  std::unique_ptr<FieldlineView> guiWidget;
-
-  // int m_iSamplingFreq;  /**< The sampling frequency defined by the user via the gui (in hertz).*/
-  // int m_iNumberChannels;  /**< The number of channels to be received.*/
-  // int m_iSamplesPerBlock;  /**< The number of samples per block to be received.*/
-  // QString m_qStringResourcePath;  /**< The path to the MEG resource directory.*/
-  // QThread m_pProducerThread;  /**< The thread used to host the producer.*/
-  // // QSharedPointer<FIELDLINEPLUGIN::FieldlineProducer>      m_pFieldlineProducer;  /**< The producer object.*/
-  // QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>  m_pCircularBuffer;     /**< Holds incoming raw data. */
+  FieldlineAcqSystem* acqSystem;
+  FieldlineView* guiWidget;
 
   QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRTMSA;     /**< The RealTimeSampleArray to provide the EEG data.*/
-  QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff measurement info.*/ };
+  QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff measurement info.*/
+};
 
 }  // namespace FIELDLINEPLUGIN
 
-#endif  // FIELDLINE_H
+#endif  // FIELDLINEPLUGIN_FIELDLINE_H
 

@@ -93,18 +93,21 @@ set(SOURCES
     fieldline_global.cpp
     fieldline.cpp
     fieldline_acqsystem.cpp
-    fieldlineview.cpp
+    fieldline_view.cpp
 )
 
 set(HEADERS
     fieldline_global.h
     fieldline.h
     fieldline_acqsystem.h
-    fieldlineview.h
+    fieldline_view.h
 )
 
 set(UI_FILES
-  fieldlineview.ui
+  formfiles/fieldline_view.ui
+  formfiles/fieldline_rack.ui
+  formfiles/fieldline_chassis.ui
+  formfiles/macaddress_ip_box.ui
 )
 
 set(FILE_TO_UPDATE fieldline_global.cpp)

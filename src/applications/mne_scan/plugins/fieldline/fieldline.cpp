@@ -44,7 +44,7 @@
 
 #include "fieldline/fieldline.h"
 #include "fieldline/fieldline_acqsystem.h"
-#include "fieldline/fieldlineview.h"
+#include "fieldline/fieldline_view.h"
 
 #include <scMeas/realtimemultisamplearray.h>
 // #include <utils/generics/circularbuffer.h>
@@ -52,16 +52,6 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-// #include <QSettings>
-// #include <QDebug>
-// #include <QHBoxLayout>
-// #include <QLabel>
-// #include <QSpacerItem>
-// #include <QVBoxLayout>
-// #include <numeric>
-// #include <vector>
-// #include <utility>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -165,14 +155,16 @@ void Fieldline::init()
                                                   "FieldlinePlguin output");
   m_outputConnectors.append(m_pRTMSA);
 
-  acqSystem = std::make_unique<FieldlineAcqSystem>(this);
-  guiWidget = std::make_unique<FieldlineView>(this);
+  acqSystem = new FieldlineAcqSystem(this);
+  guiWidget = new FieldlineView(this);
 }
 
 //=============================================================================================================
 
 void Fieldline::unload() {
   qDebug() << "unload Fieldline";
+  delete acqSystem;
+  // delete guiWidget;  // deleted by Qt
 }
 
 //=============================================================================================================
@@ -210,27 +202,7 @@ QString Fieldline::getName() const {
 //=============================================================================================================
 
 QWidget *Fieldline::setupWidget() {
-  qDebug() << "setupWidget Fieldline";
-
-  // NatusSetup* widget = new NatusSetup(this);//widget is later destroyed by
-  // CentralWidget - so it has to be created everytime new
-
-  // init properties dialog
-  //  widget->initGui();
-
-  // auto *frame = new QWidget();
-  // frame->setLayout(new QHBoxLayout());
-  //
-  // auto *flWidget = new DISPLIB::FieldlineView(2, 16);
-  //
-  // frame->layout()->addWidget(flWidget);
-  // flWidget->setBlinkState(0, 2, true);
-  // flWidget->setBlinkState(1, 5, true);
-  //
-  // return frame;
-
-  return guiWidget->getWidget();
-  // return new QLabel("Fieldline \n   OPM");
+  return guiWidget;
 }
 
 //=============================================================================================================
