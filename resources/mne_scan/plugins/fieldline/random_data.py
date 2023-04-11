@@ -10,7 +10,7 @@ def generate_data():
 
     data_values = [91599] + \
         [round(random.normalvariate(0, 1000))
-            for _ in range(1, num_sensors_per_chassis * num_chassis - 1)]
+            for _ in range(1, num_sensors_per_chassis * num_chassis + 1)]
 
     chassis_labels = [0] + [num for num in range(0, num_chassis) for _ in range(num_sensors_per_chassis)]
     sensor_labels = [0] + (list(range(1, num_sensors_per_chassis + 1))) * num_chassis
@@ -23,6 +23,8 @@ def generate_data():
         data_frames[global_l] = \
             {'data': data_i, 'sensor': f'{chassis_l:02}:{sensor_l:02}', 'sensor_id': sensor_l, 'data_type': data_type_l}
 
+
+    # data_frames = []
     return {'timestamp': timestamp, 'data_frames': data_frames}
 
 
