@@ -65,11 +65,10 @@ class FieldLineService:
         elapsed_time = end_time - start_time
         time.sleep(0.001 - elapsed_time)
         end_time = time.time()
-        
+
         elapsed_time = end_time - start_time
         elapsed_time_diff = (0.001 - elapsed_time)
-        
-        
+
         while(self.continue_data_acquisition):
             start_time = time.time()
             data = random_data.generate_data()
@@ -77,7 +76,7 @@ class FieldLineService:
             end_time = time.time()
             elapsed_time = end_time - start_time
             # time_to_sleep = max(0, .001 - elapsed_time)
-            time.sleep(0.001 + elapsed_time_diff - elapsed_time)
+            time.sleep(0.001 + elapsed_time_diff - 0.5 * elapsed_time)
             # print(f"elapsed_time: {elapsed_time:04}")
 
     def read_data(self, data_callback=None):
