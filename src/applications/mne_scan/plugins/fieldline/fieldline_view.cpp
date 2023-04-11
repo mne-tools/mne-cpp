@@ -1,8 +1,8 @@
 //=============================================================================================================
 /**
- * @file     fl_rack.cpp
- * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
- *           Juan Garcia-Prieto <juangpc@gmail.com>
+ * @file     fieldline_view.cpp
+ * @author   Juan Garcia-Prieto <jgarciaprieto@mgh.harvard.edu>
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.9
  * @date     February, 2023
  *
@@ -40,20 +40,12 @@
 #include "fieldline/fieldline_view.h"
 #include "fieldline/fieldline.h"
 #include "formfiles/ui_fieldline_view.h"
-#include "formfiles/ui_fieldline_rack.h"
-#include "formfiles/ui_fieldline_chassis.h"
-#include "formfiles/ui_macaddress_ip_box.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QLabel>
 #include <QVBoxLayout>
-// #include <QMouseEvent>
-// #include <QDebug>
-// #include <QMenu>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -63,14 +55,9 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-// using DISPLIB::FieldlineView;
-// using DISPLIB::fl_chassis;
-//
 //=============================================================================================================
 // DEFINE STATIC METHODS
 //=============================================================================================================
-
-// int FieldlineView::default_num_sensors = 16;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -79,13 +66,23 @@
 
 namespace FIELDLINEPLUGIN {
 
-int numChassis(2);
-
 FieldlineView::FieldlineView(Fieldline* parent)
 : m_pFieldlinePlugin(parent),
-  m_pUi(new Ui::FieldlineSetupUi)
+  m_pUi(new Ui::uiFieldlineView),
+  m_pAcqSystem(nullptr)
 {
     m_pUi->setupUi(this);
+    initTopMenu();
+    initTopMenuCallbacks();
+}
+
+FieldlineView::~FieldlineView()
+{
+    delete m_pUi;
+}
+
+void FieldlineView::initTopMenu()
+{
     QVBoxLayout* frameLayout = qobject_cast<QVBoxLayout*>(m_pUi->ipMacFrame->layout());
 
     QHBoxLayout* ipMacLayout1 = new QHBoxLayout(m_pUi->ipMacFrame);
@@ -94,87 +91,56 @@ FieldlineView::FieldlineView(Fieldline* parent)
     QLineEdit* macAddr1 = new QLineEdit("macaddr1");
     ipMacLayout1->addWidget(macAddr1);
     ipMacLayout1->addWidget(ip1);
-  
+
     QHBoxLayout* ipMacLayout2 = new QHBoxLayout(m_pUi->ipMacFrame);
     QLineEdit* ip2 = new QLineEdit("ip2");
     ip2->setEnabled(false);
     QLineEdit* macAddr2 = new QLineEdit("macaddr2");
     ipMacLayout2->addWidget(macAddr2);
     ipMacLayout2->addWidget(ip2);
-  
+
     frameLayout->insertLayout(1, ipMacLayout1);
     frameLayout->insertLayout(1, ipMacLayout2);
 }
 
-void FieldlineView::initAcqRack(int numChassis, const std::vector<std::vector<int>>& sensors)
+void FieldlineView::initCallbacks() 
 {
-    QVBoxLayout* rackLayout = qobject_cast<QVBxLayout*>(m_pUi->fieldlineRackFrame->layout());
-    for (int i = 0; i < numChassis; i++) 
-    {
-      FieldlineChassis* chassis = new FieldlineChassis(sensors[i]);
-
-      rackLayout->addWidget(chassis);
-    }
-    
 }
 
-// QWidget* FieldlineView::getWidget() const {
-//
-//     // QLabel* label = new QLabel("FieldlineView testing...");
-//     return this;
-// }
+void FieldlineView::initAcqSystem(int numChassis, const std::vector<std::vector<int>>& chans)
+{
+    displayAcqSystem();
+    initAcqSystemCallbacks();
+}
 
+void FieldlineView::displayAcqSystem() 
+{
+    QVBoxLayout* rackFrameLayout = qobject_cast<QVBxLayout*>(m_pUi->fieldlineRackFrame->layout());
+    for (int i = 0; i < numChassis; i++) 
+    {
+      FieldlineChassis* chassis = new FieldlineViewChassis(chans[i]);
 
-} // namespace FIELDLINEPLUGIN
+      rackFrameLayout->addWidget(chassis);
+    }
+}
+
+void FieldlineView::setChannelState(size_t chassis_i, size_t chan_i)
+{
+}
+
+statish FieldlineView::getChannelState(size_t chassis_i, size_t chan_i)
+{
+}
+
+statish FieldlineView::setAllChannelState(size_t chassis_i, statish)
+{
+}
+
+}  // namespace FIELDLINEPLUGIN
 
 //
-// FieldlineView::FieldlineView(int num_chassis, int sensors_per_chassis, QWidget *parent)
-// : FieldlineView(parent)
-// {
-//     configure(num_chassis, sensors_per_chassis);
-// }
-//
 // //=============================================================================================================
 //
-// FieldlineView::FieldlineView(int num_chassis, QWidget *parent)
-// : FieldlineView(num_chassis, default_num_sensors, parent)
-// {
-// }
-//
-// //=============================================================================================================
-//
-// FieldlineView::FieldlineView(QWidget *parent)
-// : QWidget(parent)
-// , ui(new Ui::fl_rack())
-// {
-//     ui->setupUi(this);
-// }
-// //=============================================================================================================
-//
-// FieldlineView::~FieldlineView()
-// {
-//     delete ui;
-// }
-//
-// //=============================================================================================================
-//
-// void FieldlineView::configure(int num_chassis)
-// {
-//     configure(num_chassis, default_num_sensors);
-// }
-//
-// //=============================================================================================================
-//
-// void FieldlineView::configure(int num_chassis, int num_sensors)
-// {
-//     clear();
-//     for(int i = 0; i < num_chassis; ++i){
-//         chassis.push_back(new fl_chassis(num_sensors));
-//         ui->frame->layout()->addWidget(chassis.back());
-//     }
-// }
-//
-// //=============================================================================================================
 //
 // void FieldlineView::clear()
 // {
@@ -186,22 +152,22 @@ void FieldlineView::initAcqRack(int numChassis, const std::vector<std::vector<in
 //
 // //=============================================================================================================
 //
-// void FieldlineView::setColor(size_t chassis_id, size_t sensor_num, const QColor& color)
+// void FieldlineView::setColor(size_t chassis_id, size_t chan_num, const QColor& color)
 // {
 //     if(chassis_id >= chassis.size()){
 //         return;
 //     }
-//     chassis.at(chassis_id)->setColor(sensor_num, color);
+//     chassis.at(chassis_id)->setColor(chan_num, color);
 // }
 //
 // //=============================================================================================================
 //
-// void FieldlineView::setColor(size_t chassis_id, size_t sensor_num, const QColor& color, bool blinking)
+// void FieldlineView::setColor(size_t chassis_id, size_t chan_num, const QColor& color, bool blinking)
 // {
 //     if(chassis_id >= chassis.size()){
 //         return;
 //     }
-//     chassis.at(chassis_id)->setColor(sensor_num, color, blinking);
+//     chassis.at(chassis_id)->setColor(chan_num, color, blinking);
 // }
 //
 // //=============================================================================================================
@@ -244,12 +210,12 @@ void FieldlineView::initAcqRack(int numChassis, const std::vector<std::vector<in
 //
 // //=============================================================================================================
 //
-// void FieldlineView::setBlinkState(size_t chassis_id, size_t sensor_num, bool blinking)
+// void FieldlineView::setBlinkState(size_t chassis_id, size_t chan_num, bool blinking)
 // {
 //     if(chassis_id >= chassis.size()){
 //         return;
 //     }
-//     chassis.at(chassis_id)->setBlinkState(sensor_num, blinking);
+//     chassis.at(chassis_id)->setBlinkState(chan_num, blinking);
 // }
 //
 // //=============================================================================================================
@@ -273,112 +239,7 @@ void FieldlineView::initAcqRack(int numChassis, const std::vector<std::vector<in
 //
 // //=============================================================================================================
 //
-// void FieldlineView::setDefaultNumSensors(int num_sensors)
+// void FieldlineView::setDefaultNumchans(int num_chans)
 // {
-//     default_num_sensors = num_sensors;
+//     default_num_chans = num_chans;
 // }
-//
-// //=============================================================================================================
-//
-// fl_chassis::fl_chassis(int num_sensors, QWidget *parent )
-// : QWidget(parent)
-// , ui(new Ui::fl_chassis())
-// {
-//     ui->setupUi(this);
-//
-//     for(int i = 0; i < num_sensors; ++i){
-//         sensors.push_back(new LEDIndicator());
-//         auto& last_item = sensors.back();
-//         sensors.back()->setLabel(QString::number(i + 1));
-//         ui->sensor_frame->layout()->addWidget(sensors.back());
-//         connect(sensors.back(), &QWidget::customContextMenuRequested, [this, i, &last_item](const QPoint& pos){this->emit clicked(i, last_item->mapToGlobal(pos)); qDebug() << "clicked " << i+1;});
-//         connect(this, &fl_chassis::clicked, this, &fl_chassis::rightClickMenu, Qt::UniqueConnection);
-//     }
-// }
-//
-// //=============================================================================================================
-//
-// fl_chassis::~fl_chassis()
-// {
-//     delete ui;
-// }
-//
-// //=============================================================================================================
-//
-// void fl_chassis::setColor(size_t sensor_num, const QColor& color)
-// {
-//     if(sensor_num > sensors.size() || sensor_num < 1){
-//         return;
-//     }
-//     sensors.at(sensor_num - 1)->setColor(color);
-// }
-//
-// //=============================================================================================================
-//
-// void fl_chassis::setColor(size_t sensor_num, const QColor& color, bool blinking)
-// {
-//     setColor(sensor_num, color);
-//     setBlinkState(sensor_num, blinking);
-// }
-//
-// //=============================================================================================================
-//
-// void fl_chassis::setColor(const QColor& color)
-// {
-//     for(auto* sensor : sensors){
-//         sensor->setColor(color);
-//     }
-// }
-//
-// //=============================================================================================================
-//
-// void fl_chassis::setColor(const QColor& color, bool blinking)
-// {
-//     for(auto* sensor : sensors){
-//         sensor->setColor(color);
-//         sensor->setBlink(blinking);
-//     }
-// }
-//
-// //=============================================================================================================
-//
-// void fl_chassis::setBlinkState(size_t sensor_num, bool blinking)
-// {
-//     if(sensor_num > sensors.size() || sensor_num < 1){
-//         return;
-//     }
-//     sensors.at(sensor_num - 1)->setBlink(blinking);
-// }
-//
-// //=============================================================================================================
-//
-// void fl_chassis::setBlinkState(bool blinking)
-// {
-//     for(auto* sensor : sensors){
-//         sensor->setBlink(blinking);
-//     }
-// }
-//
-// //=============================================================================================================
-//
-// void fl_chassis::rightClickMenu(int sensor, const QPoint& pos)
-// {
-// //    auto* menu = new QMenu();
-//
-// //    auto blink_on_sensor = menu->addAction("Blink ON - " + QString::number(sensor));
-// //    auto blink_on_chassis = menu->addAction("Blink ON - Whole Chassis");
-//
-// //    auto blink_off_sensor = menu->addAction("Blink OFF -  " + QString::number(sensor));
-// //    auto blink_off_chassis = menu->addAction("Blink OFF - Whole Chassis");
-//
-// //    connect(blink_on_sensor, &QAction::triggered,[this, sensor](){this->setBlinkState(sensor, true);});
-// //    connect(blink_off_sensor, &QAction::triggered,[this, sensor](){this->setBlinkState(sensor, false);});
-//
-// //    connect(blink_on_chassis, &QAction::triggered,[this, sensor](){this->setBlinkState(true);});
-// //    connect(blink_off_chassis, &QAction::triggered,[this, sensor](){this->setBlinkState(false);});
-//
-// //    menu->exec(pos);
-// }
-//
-//
-//

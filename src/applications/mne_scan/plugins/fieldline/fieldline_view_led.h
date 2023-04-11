@@ -1,9 +1,10 @@
 //=============================================================================================================
 /**
- * @file     fieldline_view.h
+ * @file     fieldline_view_led.h
  * @author   Juan Garcia-Prieto <jgarciaprieto@mgh.harvard.edu>
  *           Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.9
+ * @file     fieldline_view_chassis.h
  * @date     February, 2023
  *
  * @section  LICENSE
@@ -33,14 +34,11 @@
  *
  */
 
-#ifndef FIELDLINE_FIELDLINEVIEW_H
-#define FIELDLINE_FIELDLINEVIEW_H
-
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <vector>
+ // #include "disp/viewers/led_indicator.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -57,80 +55,42 @@
 //=============================================================================================================
 
 namespace Ui {
-class uiFieldlineView;
+class uiFieldlineViewChassis;
 }
-
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
 namespace FIELDLINEPLUGIN {
 
-class Fieldline;
-class FieldlineViewChassis;
-
-enum class FieldlineDataType {
-    DATA_BZ = 0,
-    DATA_BY = 1,
-    DATA_BX = 2
-};
-
-enum class FieldLineWaveType {
-    WAVE_OFF = 0,
-    WAVE_RAMP = 1,
-    WAVE_SINE = 2,
-};
-
-enum class FieldLineSensorStatusType {
-    SENSOR_OFF = 0,
-    SENSOR_RESTARTING = 1,
-    SENSOR_RESTARTED = 2,
-    SENSOR_COARSE_ZEROING = 3,
-    SENSOR_COARSE_ZEROED = 4,
-    SENSOR_FINE_ZEROING = 5,
-    SENSOR_FINE_ZEROED = 6,
-    SENSOR_ERROR = 7,
-    SENSOR_READY = 8,
-};
-
-enum class FieldLineConnectStatusType {
-    CONNECT_OK = 0,
-    CONNECT_NOT_READY = 1,
-    CONNECT_CHASSIS_MISSING = 2,
-};
-
 //=============================================================================================================
 
-class FieldlineView : public QWidget
+class FieldlineViewChassis : public QWidget
 {
     Q_OBJECT
 
  public:
-    explicit FieldlineView(Fieldline* parent);
-    ~FieldlineView();
-
-    // void setLedColor(size_t chassis_id, size_t chan_num, const QColor& color);
-    // void getLedColor()//
-    // void setLedAllColor(const QColor& color);
-    // void setLedAllColor(const QColor &color, bool blinking);
-    void setChannelState(size_t chassis_i, size_t chan_i);
-    statish getChannelState(size_t chassis_i, size_t chan_i);
-    void setAllChannelsState(size_t chassis_i, statish); 
+    FieldlineViewChassis(int num_sensors, QWidget *parent = nullptr);
+    ~FieldlineViewChassis();
+ //    void setColor(size_t sensor_num, const QColor& color);
+ //    void setColor(size_t sensor_num, const QColor& color, bool blinking);
+ //    void setColor(const QColor& color);
+ //    void setColor(const QColor& color, bool blinking);
+ //
+ //    void setBlinkState(size_t sensor_num, bool blinking);
+ //    void setBlinkState(bool blinking);
+ //
+ // signals:
+ //    void clicked(int sensor, const QPoint& pos);
+ //
+ // private slots:
+    // void rightClickMenu(int sensor, const QPoint& pos);
 
  private:
-    void initAcqSystem(int numChassis, const std::vector<std::vector<int>>& channels);
-
-    void initTopMenu();
-    void initTopMenuCallbacks();
-
-    void initAcqSystem();
-    void initAcqSystemCallbacks();
-
-    Fieldline* m_pFieldlinePlugin;
-    Ui::uiFieldlineView* m_pUi;
-    std::vector<FieldlineViewChassis>* m_pAcqSystem;
+    QWidget* m_pParent;
+    Ui::uiFieldlineViewChassis* m_pUi;
+    std::vector<FieldlineViewLed>* m_pSensors;
 };
 
 }  // namespace FIELDLINEPLUGIN
 
-#endif  // FIELDLINE_UI_VIEW_H

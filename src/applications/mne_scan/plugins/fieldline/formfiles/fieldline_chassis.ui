@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>fl_chassis</class>
- <widget class="QWidget" name="fl_chassis">
+ <class>uiFieldlineViewChassis</class>
+ <widget class="QWidget" name="uiFieldlineViewChassis">
   <property name="geometry">
    <rect>
     <x>0</x>

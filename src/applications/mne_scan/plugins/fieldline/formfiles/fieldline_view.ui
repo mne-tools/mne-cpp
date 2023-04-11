@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>FieldlineSetupUi</class>
- <widget class="QWidget" name="FieldlineSetupUi">
+ <class>uiFieldlineView</class>
+ <widget class="QWidget" name="uiFieldlineView">
   <property name="geometry">
    <rect>
     <x>0</x>
