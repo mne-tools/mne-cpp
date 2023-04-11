@@ -51,6 +51,47 @@ execute_process(
 )
 
 execute_process(
+  COMMAND which ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config
+  OUTPUT_VARIABLE Python_Config_EXECUTABLE
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+execute_process(
+  COMMAND dirname ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config
+  OUTPUT_VARIABLE Python_Config_DIR
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+execute_process(
+  COMMAND dirname ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config
+  OUTPUT_VARIABLE Python_Config_DIR
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+execute_process(
+  COMMAND readlink -f ${Python_EXECUTABLE}
+  OUTPUT_VARIABLE Python_EXECUTABLE_TRUE_PATH
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+execute_process(
+  COMMAND dirname ${Python_EXECUTABLE_TRUE_PATH}
+  OUTPUT_VARIABLE Python_BIN_TRUE_DIR
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+#get_filename_component(Python_BIN_DIR_CLEAN ${Python_BIN_DIR} ABSOLUTE)
+
+#get_filename_component(Python_Config_DIR_CLEAN ${Python_Config_DIR} ABSOLUTE)
+
+if(${Python_BIN_DIR} NOT STREQUAL ${Python_BIN_TRUE_DIR})
+    execute_process(
+      COMMAND ${CMAKE_COMMAND} -E create_symlink
+      ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config ${Python_BIN_TRUE_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config
+    )
+endif()
+
+execute_process(
   COMMAND ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config --includes
   OUTPUT_VARIABLE Python_INCLUDE_DIRS
   OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -107,7 +148,6 @@ set(UI_FILES
   formfiles/fieldline_view.ui
   formfiles/fieldline_rack.ui
   formfiles/fieldline_chassis.ui
-  formfiles/macaddress_ip_box.ui
 )
 
 set(FILE_TO_UPDATE fieldline_global.cpp)
