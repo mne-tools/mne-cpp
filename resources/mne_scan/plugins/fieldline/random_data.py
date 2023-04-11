@@ -27,6 +27,6 @@ def generate_data():
     # data_frames = []
     return {'timestamp': timestamp, 'data_frames': data_frames}
 
-
-data = generate_data()
-print(data)
+if __name__ == "__main__":
+    data = generate_data()
+    print(data)

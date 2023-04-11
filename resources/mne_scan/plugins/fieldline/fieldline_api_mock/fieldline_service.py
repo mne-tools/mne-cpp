@@ -1,3 +1,7 @@
+import threading
+import random_data
+import time
+
 class FieldLineService:
     def __init__(self, ip_list, prefix=""):
         """
@@ -12,6 +16,8 @@ class FieldLineService:
         # interfaces = netifaces.interfaces()
         self.network_interfaces = []
         self.ip_list = ip_list
+        self.continue_data_acquisition = False
+        self.data_acquisition_thread = None
         # for i in interfaces:
         #     print("interface %s" % i)
         #     if i.startswith('lo'):
@@ -43,14 +49,43 @@ class FieldLineService:
     def load_sensors(self):
         print("loading sensors")
         # return self.data_source.load_sensors()
+        self.list_of_sensors = {i: list(range(1, 16 + 1)) for i in range(0, 1 + 1)}
+
+        return self.list_of_sensors
 
     def get_chassis_list(self):
         print("get chassis list")
         # return self.data_source.get_chassis_list()
 
+    def data_acquisition(self):
+    
+        start_time = time.time()
+        data = random_data.generate_data()
+        end_time = time.time()
+        elapsed_time = end_time - start_time
+        time.sleep(0.001 - elapsed_time)
+        end_time = time.time()
+        
+        elapsed_time = end_time - start_time
+        elapsed_time_diff = (0.001 - elapsed_time)
+        
+        
+        while(self.continue_data_acquisition):
+            start_time = time.time()
+            data = random_data.generate_data()
+            self.callback_function(data)
+            end_time = time.time()
+            elapsed_time = end_time - start_time
+            # time_to_sleep = max(0, .001 - elapsed_time)
+            time.sleep(0.001 + elapsed_time_diff - elapsed_time)
+            # print(f"elapsed_time: {elapsed_time:04}")
+
     def read_data(self, data_callback=None):
-        print("read_data defined. Callback set to : " + data_callback.__name__)
+        if(data_callback is not None):
+            print(f"read_data defined. Callback set to : {data_callback.__name__}")
+            self.callback_function = data_callback
         # self.data_source.read_data(data_callback=data_callback)
+
 
     def start_adc(self, chassis_id):
         """
@@ -59,6 +94,9 @@ class FieldLineService:
             chassis_id - unique ID of chassis
         """
         print("start adc")
+        self.continue_data_acquisition = True
+        self.data_acquisition_thread = threading.Thread(target=self.data_acquisition)
+        self.data_acquisition_thread.start()
         # self.data_source.start_adc(chassis_id)
 
     def stop_adc(self, chassis_id):
@@ -68,6 +106,8 @@ class FieldLineService:
             chassis_id - unique ID of chassis
         """
         print("stop adc")
+        self.continue_data_acquisition = False
+        self.data_acquisition_thread.join(timeout=5)
         # self.data_source.stop_adc(chassis_id)
 
     def turn_off_sensors(self, sensor_dict):
@@ -91,6 +131,8 @@ class FieldLineService:
             on_completed - callback when all sensors have either succeeded or failed
         """
         print("restart sensors")
+        time.sleep(.3)
+        on_completed()
         # self.data_source.set_callbacks(on_next=on_next, on_error=on_error, on_completed=on_completed)
         # self.data_source.send_logic_command(sensor_dict, proto.LogicMessage.LOGIC_SENSOR_RESTART)
 
@@ -105,6 +147,8 @@ class FieldLineService:
             on_completed - callback when all sensors have either succeeded or failed
         """
         print("coarse zero sensor")
+        time.sleep(.3)
+        on_completed()
         # self.data_source.set_callbacks(on_next=on_next, on_error=on_error, on_completed=on_completed)
         # self.data_source.send_logic_command(sensor_dict, proto.LogicMessage.LOGIC_SENSOR_COARSE_ZERO)
 
@@ -119,6 +163,8 @@ class FieldLineService:
             on_completed - callback when all sensors have either succeeded or failed
         """
         print("fine zero sensors")
+        time.sleep(.3)
+        on_completed()
         # self.data_source.set_callbacks(on_next=on_next, on_error=on_error, on_completed=on_completed)
         # self.data_source.send_logic_command(sensor_dict, proto.LogicMessage.LOGIC_SENSOR_FINE_ZERO)
 
