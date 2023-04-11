@@ -50,52 +50,40 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-execute_process(
-  COMMAND which ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config
-  OUTPUT_VARIABLE Python_Config_EXECUTABLE
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-execute_process(
-  COMMAND dirname ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config
-  OUTPUT_VARIABLE Python_Config_DIR
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-execute_process(
-  COMMAND dirname ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config
-  OUTPUT_VARIABLE Python_Config_DIR
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-execute_process(
-  COMMAND readlink -f ${Python_EXECUTABLE}
-  OUTPUT_VARIABLE Python_EXECUTABLE_TRUE_PATH
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-execute_process(
-  COMMAND dirname ${Python_EXECUTABLE_TRUE_PATH}
-  OUTPUT_VARIABLE Python_BIN_TRUE_DIR
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
-
-#get_filename_component(Python_BIN_DIR_CLEAN ${Python_BIN_DIR} ABSOLUTE)
-
-#get_filename_component(Python_Config_DIR_CLEAN ${Python_Config_DIR} ABSOLUTE)
-
-if(${Python_BIN_DIR} NOT STREQUAL ${Python_BIN_TRUE_DIR})
+if(EXISTS ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config)
+    message(STATUS "python config found")
+else()
+    message(STATUS "python config not found")
     execute_process(
-      COMMAND ${CMAKE_COMMAND} -E create_symlink
-      ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config ${Python_BIN_TRUE_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config
+      COMMAND readlink -f ${Python_EXECUTABLE}
+      OUTPUT_VARIABLE Python_EXECUTABLE_TRUE_PATH
+      OUTPUT_STRIP_TRAILING_WHITESPACE
     )
+
+    execute_process(
+      COMMAND dirname ${Python_EXECUTABLE_TRUE_PATH}
+      OUTPUT_VARIABLE Python_BIN_TRUE_DIR
+      OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+
+    if(NOT EXISTS ${Python_BIN_TRUE_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config)
+        message(FATAL python-config not found. Python installation missing python-config.)
+    else()
+        execute_process(
+          COMMAND ${CMAKE_COMMAND} -E create_symlink
+          ${Python_BIN_TRUE_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config
+        )
+        message(STATUS "Creating sym link to python config")
+    endif()
 endif()
+
 
 execute_process(
   COMMAND ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config --includes
   OUTPUT_VARIABLE Python_INCLUDE_DIRS
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+
 execute_process(
   COMMAND ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config --cflags
   OUTPUT_VARIABLE Python_CFLAGS
@@ -117,18 +105,18 @@ execute_process(
 
 separate_arguments(Python_LDFLAGS_NORM UNIX_COMMAND "${Python_LDFLAGS}")
 
-message(    "python prefix dir: " ${Python_PREFIX})
-message(       "python bin dir: " ${Python_BIN_DIR})
-message(       "python lib dir: " ${Python_LIB_DIR})
-message(    "python executable: " ${Python_EXECUTABLE})
-message( "python version major: " ${Python_VERSION_MAJOR})
-message( "python version minor: " ${Python_VERSION_MINOR})
-message(  "python include dirs: " ${Python_INCLUDE_DIRS})
-message(        "python cflags: " ${Python_CFLAGS})
-message(   "python cflags norm: " ${Python_CFLAGS_NORM})
-message(     "python libraries: " ${Python_LIBS})
-message(     "python lib flags: " ${Python_LDFLAGS})
-message("python lib flags norm: " ${Python_LDFLAGS_NORM})
+message(      "python prefix dir: " ${Python_PREFIX})
+message(         "python bin dir: " ${Python_BIN_DIR})
+message(         "python lib dir: " ${Python_LIB_DIR})
+message(      "python executable: " ${Python_EXECUTABLE})
+message(   "python version major: " ${Python_VERSION_MAJOR})
+message(   "python version minor: " ${Python_VERSION_MINOR})
+message(    "python include dirs: " ${Python_INCLUDE_DIRS})
+message(          "python cflags: " ${Python_CFLAGS})
+message(     "python cflags norm: " ${Python_CFLAGS_NORM})
+message(       "python libraries: " ${Python_LIBS})
+message(       "python lib flags: " ${Python_LDFLAGS})
+message("  python lib flags norm: " ${Python_LDFLAGS_NORM})
 
 set(SOURCES
     fieldline_global.cpp
