@@ -191,8 +191,8 @@ if [[ ${DownloadTestData} == "true" ]]; then
   git clone https://github.com/mne-tools/mne-cpp-test-data.git ${ResourcesPath}/data/mne-cpp-test-data
 fi
 if [[ ${DownloadSampleData} == "true" ]]; then
-  curl -O https://files.osf.io/v1/resources/rxvq7/providers/osfstorage/59c0e26f9ad5a1025c4ab159\?action\=download\&direct\&version\=6 
-  mv 59c0e26f9ad5a1025c4ab159 ${ResourcesPath}/data/MNE-sample-data.tar.gz
+  curl -o MNE-sample-data.tar.gz https://files.osf.io/v1/resources/rxvq7/providers/osfstorage/59c0e26f9ad5a1025c4ab159\?action\=download\&direct\&version\=6
+  mv MNE-sample-data.tar.gz ${ResourcesPath}/data/
   currentFolder=`pwd`
   cd ${ResourcesPath}/data/
   tar -xvf MNE-sample-data.tar.gz 
