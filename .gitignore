@@ -76,6 +76,7 @@ __pycache__/
 venv/
 /resources/**/fieldline/*.whl
 /resources/**/fieldline/sample_restart.py
+/resources/**/fieldline/venv/
 .cache/*
 
 codecov
