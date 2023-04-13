@@ -46,6 +46,7 @@
 //=============================================================================================================
 
 #include <QVBoxLayout>
+#include <QLineEdit>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -68,12 +69,12 @@ namespace FIELDLINEPLUGIN {
 
 FieldlineView::FieldlineView(Fieldline* parent)
 : m_pFieldlinePlugin(parent),
-  m_pUi(new Ui::uiFieldlineView),
-  m_pAcqSystem(nullptr)
+  m_pUi(new Ui::uiFieldlineView)
+//  m_pAcqSystem(nullptr)
 {
     m_pUi->setupUi(this);
     initTopMenu();
-    initTopMenuCallbacks();
+//    initTopMenuCallbacks();
 }
 
 FieldlineView::~FieldlineView()
@@ -83,26 +84,43 @@ FieldlineView::~FieldlineView()
 
 void FieldlineView::initTopMenu()
 {
-    QVBoxLayout* frameLayout = qobject_cast<QVBoxLayout*>(m_pUi->ipMacFrame->layout());
-
-    QHBoxLayout* ipMacLayout1 = new QHBoxLayout(m_pUi->ipMacFrame);
-    QLineEdit* ip1 = new QLineEdit("ip1");
-    ip1->setEnabled(false);
-    QLineEdit* macAddr1 = new QLineEdit("macaddr1");
-    ipMacLayout1->addWidget(macAddr1);
-    ipMacLayout1->addWidget(ip1);
-
-    QHBoxLayout* ipMacLayout2 = new QHBoxLayout(m_pUi->ipMacFrame);
-    QLineEdit* ip2 = new QLineEdit("ip2");
-    ip2->setEnabled(false);
-    QLineEdit* macAddr2 = new QLineEdit("macaddr2");
-    ipMacLayout2->addWidget(macAddr2);
-    ipMacLayout2->addWidget(ip2);
-
-    frameLayout->insertLayout(1, ipMacLayout1);
-    frameLayout->insertLayout(1, ipMacLayout2);
+    m_pUi->topMenuFrame->setEnabled(true);
+    m_pUi->numChassisSpinBox->setMinimum(0);
+    m_pUi->numChassisSpinBox->setMaximum(6);
+    m_pUi->numChassisSpinBox->setValue(0);
+    QObject::connect(m_pUi->numChassisSpinBox,QOverload<int>::of(&QSpinBox::valueChanged),
+            this, &FieldlineView::setNumRowsIpMacFrame);
+    QObject::connect(m_pUi->findBtn, &QPushButton::clicked,
+                     this, &FieldlineView::findChassis);
 }
 
+void FieldlineView::setNumRowsIpMacFrame(int i)
+{
+    QVBoxLayout* frameLayout = qobject_cast<QVBoxLayout*>(m_pUi->ipMacFrame->layout());
+    if ( i < m_ipMacList.size())
+    {
+        frameLayout->removeWidget(qobject_cast<QWidget*>(m_ipMacList.back()));
+        m_ipMacList.pop_back();
+    }
+    if ( i > m_ipMacList.size())
+    {
+        QHBoxLayout* ipMacLayout = new QHBoxLayout(m_pUi->ipMacFrame);
+        QLineEdit* ip = new QLineEdit("0.0.0.0");
+        ip->setEnabled(false);
+        QLineEdit* macAddr = new QLineEdit("AF-70-04-21-2D-28");
+        ipMacLayout->addWidget(macAddr);
+        ipMacLayout->addWidget(ip);
+        frameLayout->insertLayout(m_ipMacList.size() + 1, ipMacLayout);
+        m_ipMacList.push_back(ipMacLayout);
+    }
+}
+
+void FieldlineView::findChassis()
+{
+    //generate list of mac addresses
+    //call class finder.
+    //    retrieve list of ips and set variable with it.
+}
 void FieldlineView::initCallbacks() 
 {
 }
@@ -110,31 +128,36 @@ void FieldlineView::initCallbacks()
 void FieldlineView::initAcqSystem(int numChassis, const std::vector<std::vector<int>>& chans)
 {
     displayAcqSystem();
-    initAcqSystemCallbacks();
 }
 
 void FieldlineView::displayAcqSystem() 
 {
-    QVBoxLayout* rackFrameLayout = qobject_cast<QVBxLayout*>(m_pUi->fieldlineRackFrame->layout());
-    for (int i = 0; i < numChassis; i++) 
-    {
-      FieldlineChassis* chassis = new FieldlineViewChassis(chans[i]);
+//    QVBoxLayout* rackFrameLayout = qobject_cast<QVBoxLayout*>(m_pUi->fieldlineRackFrame->layout());
+//    for (int i = 0; i < numChassis; i++)
+//    {
+//      FieldlineChassis* chassis = new FieldlineViewChassis(chans[i]);
 
-      rackFrameLayout->addWidget(chassis);
-    }
+//      rackFrameLayout->addWidget(chassis);
+//    }
 }
 
-void FieldlineView::setChannelState(size_t chassis_i, size_t chan_i)
-{
-}
 
-statish FieldlineView::getChannelState(size_t chassis_i, size_t chan_i)
-{
-}
+//void FieldlineView::on_numChassisSpinBox_valueChanged(int arg1)
+//{
 
-statish FieldlineView::setAllChannelState(size_t chassis_i, statish)
-{
-}
+//}
+
+//void FieldlineView::setChannelState(size_t chassis_i, size_t chan_i)
+//{
+//}
+
+//statish FieldlineView::getChannelState(size_t chassis_i, size_t chan_i)
+//{
+//}
+
+//statish FieldlineView::setAllChannelState(size_t chassis_i, statish)
+//{
+//}
 
 }  // namespace FIELDLINEPLUGIN
 

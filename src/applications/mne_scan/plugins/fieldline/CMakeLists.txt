@@ -121,21 +121,21 @@ message("  python lib flags norm: " ${Python_LDFLAGS_NORM})
 set(SOURCES
     fieldline_global.cpp
     fieldline.cpp
-    fieldline_acqsystem.cpp
+#    fieldline_acqsystem.cpp
     fieldline_view.cpp
 )
 
 set(HEADERS
     fieldline_global.h
     fieldline.h
-    fieldline_acqsystem.h
+#    fieldline_acqsystem.h
     fieldline_view.h
 )
 
 set(UI_FILES
     formfiles/fieldline_view.ui
     formfiles/fieldline_rack.ui
-    formfiles/fieldline_chassis.ui
+#    formfiles/fieldline_chassis.ui
 )
 
 set(FILE_TO_UPDATE fieldline_global.cpp)
@@ -192,7 +192,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     scShared
     scMeas
     ${FFTW_LIBS}
-    python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}
+    #python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}
 )
 
 separate_arguments(Python_CFLAGS_NORM UNIX_COMMAND "${Python_CFLAGS}")

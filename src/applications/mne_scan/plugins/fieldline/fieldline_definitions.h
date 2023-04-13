@@ -68,6 +68,6 @@ enum class FieldLineConnectStatusType {
     CONNECT_CHASSIS_MISSING = 2,
 };
 
-
-
 }  // namespace FIELDLINEPLUGIN
+
+#endif  // FIELDLINE_FIELDLINEDEFINITIONS_H

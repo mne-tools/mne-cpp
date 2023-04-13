@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "fieldline/fieldline.h"
-#include "fieldline/fieldline_acqsystem.h"
+//#include "fieldline/fieldline_acqsystem.h"
 #include "fieldline/fieldline_view.h"
 
 #include <scMeas/realtimemultisamplearray.h>
@@ -125,7 +125,11 @@ namespace FIELDLINEPLUGIN {
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Fieldline::Fieldline() {
+Fieldline::Fieldline()
+    :
+      //acqSystem(nullptr),
+      guiWidget(nullptr)
+{
 }
 
 //=============================================================================================================
@@ -155,7 +159,7 @@ void Fieldline::init()
                                                   "FieldlinePlguin output");
   m_outputConnectors.append(m_pRTMSA);
 
-  acqSystem = new FieldlineAcqSystem(this);
+//  acqSystem = new FieldlineAcqSystem(this);
   guiWidget = new FieldlineView(this);
 }
 
@@ -163,7 +167,7 @@ void Fieldline::init()
 
 void Fieldline::unload() {
   qDebug() << "unload Fieldline";
-  delete acqSystem;
+//  delete acqSystem;
   // delete guiWidget;  // deleted by Qt
 }
 

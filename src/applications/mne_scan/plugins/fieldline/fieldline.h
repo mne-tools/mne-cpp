@@ -68,7 +68,7 @@ class FiffInfo;
 
 namespace FIELDLINEPLUGIN {
 
-class FieldlineAcqSystem;
+//class FieldlineAcqSystem;
 class FieldlineView;
 
 //=============================================================================================================
@@ -110,7 +110,7 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
  protected:
   virtual void run();
 
-  FieldlineAcqSystem* acqSystem;
+//  FieldlineAcqSystem* acqSystem;
   FieldlineView* guiWidget;
 
   QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRTMSA;     /**< The RealTimeSampleArray to provide the EEG data.*/

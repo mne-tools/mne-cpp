@@ -63,11 +63,12 @@ class uiFieldlineView;
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
+class QHBoxLayout;
 
 namespace FIELDLINEPLUGIN {
 
 class Fieldline;
-class FieldlineViewChassis;
+//class FieldlineViewChassis;
 
 enum class FieldlineDataType {
     DATA_BZ = 0,
@@ -113,22 +114,27 @@ class FieldlineView : public QWidget
     // void getLedColor()//
     // void setLedAllColor(const QColor& color);
     // void setLedAllColor(const QColor &color, bool blinking);
-    void setChannelState(size_t chassis_i, size_t chan_i);
-    statish getChannelState(size_t chassis_i, size_t chan_i);
-    void setAllChannelsState(size_t chassis_i, statish); 
+//    void setChannelState(size_t chassis_i, size_t chan_i);
+//    statish getChannelState(size_t chassis_i, size_t chan_i);
+//    void setAllChannelsState(size_t chassis_i, statish);
 
- private:
+private slots:
+//    void on_numChassisSpinBox_valueChanged(int arg1);
+    void setNumRowsIpMacFrame(int i);
+private:
+    void displayAcqSystem();
     void initAcqSystem(int numChassis, const std::vector<std::vector<int>>& channels);
-
+    void initCallbacks();
     void initTopMenu();
-    void initTopMenuCallbacks();
+
 
     void initAcqSystem();
     void initAcqSystemCallbacks();
 
     Fieldline* m_pFieldlinePlugin;
     Ui::uiFieldlineView* m_pUi;
-    std::vector<FieldlineViewChassis>* m_pAcqSystem;
+    std::vector<QHBoxLayout*> m_ipMacList;
+//    std::vector<FieldlineViewChassis>* m_pAcqSystem;
 };
 
 }  // namespace FIELDLINEPLUGIN
