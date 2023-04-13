@@ -431,7 +431,6 @@ for (( j=0; j<argc; j++ )); do
         PrintHelp="true"
     elif [ "${argv[j]}" == "mock" ]; then
         MockBuild="true"
-    fi
     elif [ "${argv[j]}" == "martinos" ]; then
         MartinosOption="true"
     fi
