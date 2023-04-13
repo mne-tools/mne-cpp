@@ -9,15 +9,17 @@ set(CMAKE_CXX_STANDARD 14)
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 option(BUILD_MAC_APP_BUNDLE "Build app bundle on macos" OFF)
 
-option(NO_EXAMPLES "Skip building examples" OFF)
-option(NO_APPLICATIONS "Skip building applications" OFF)
-option(NO_TESTS "Skip building tests" OFF)
+option(BUILD_EXAMPLES "Build examples" OFF)
+option(BUILD_APPLICATIONS "Build applications" ON)
+option(BUILD_TESTS "Build tests" OFF)
 
-# Equivalent to NO_EXAMPLES, NO_APPLICATIONS and NO_TESTS
-option(LIB_ONLY "Build only the libraries." OFF)
+option(BUILD_ALL "Build entire project" OFF)
 
-# Equivalent to NO_EXAMPLES and NO_TESTS
-option(FOR_RELEASE "Build only libs and apps." OFF)
+if(BUILD_ALL)
+  set(BUILD_EXAMPLES ON)
+  set(BUILD_TESTS ON)
+  set(BUILD_APPLICATIONS ON)
+endif()
 
 option(WITH_CODE_COV "Build with code coverage enabled" OFF)
 if(WITH_CODE_COV)
@@ -105,20 +107,18 @@ execute_process(COMMAND git log -1 --format=%H
 add_subdirectory(libraries)
 add_subdirectory(external)
 
-if(NOT LIB_ONLY)
-  if(NOT NO_APPLICATIONS)
-    add_subdirectory(applications)
-  endif()
-  if(NOT FOR_RELEASE)
-    if(NOT NO_EXAMPLES)
-      add_subdirectory(examples)
-    endif()
-    if(NOT NO_TESTS)
-      add_subdirectory(testframes)
-    endif()
-  endif()
+if(BUILD_APPLICATIONS)
+  add_subdirectory(applications)
 endif()
 
+if(BUILD_EXAMPLES)
+  add_subdirectory(examples)
+endif()
+
+if(BUILD_TESTS)
+  add_subdirectory(testframes)
+endif()
+  
 ##==============================================================================
 ## Add symbolic links to project resources folder
 
