@@ -461,7 +461,7 @@ doPrintConfiguration
 if [[ ${LinkOption} == "dynamic" ]]; then
 
     if [[ ${MartinosOption} == "true"  ]]; then
-        if [[ -z ${Qt_ROOT_FOLDER} ]]; then
+        if [[ -z "${Qt_ROOT_FOLDER}" ]]; then
             echo "You need to define the variable: Qt_ROOT_FOLDER. And make it"
             echo "point to your Qt installation."
         else
