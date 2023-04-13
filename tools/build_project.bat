@@ -262,6 +262,8 @@ PrintHelp="false"
 CMakeConfigFlags=""
 ExtraArgs=""
 ExtraSection=False
+QtCustomPath=""
+ChillMode="false"
 
 doShowLogo() {
   echo "                                      "
@@ -317,6 +319,7 @@ doPrintConfiguration() {
   echo " BuildName = $BuildName"
   echo " CleanBuild = $CleanBuild"
   echo " Rebuild = $Rebuild"
+  echo " QtCustomPath = $QtCustomPath"
   echo " WithCodeCoverage = $WithCodeCoverage"
   echo " NumProcesses = $NumProcesses"
   echo " MockBuild = $MockBuild"
@@ -367,6 +370,12 @@ for (( j=0; j<argc; j++)); do
     PrintHelp="true"
   elif [ "${argv[j]}" == "static" ]; then
     CMakeConfigFlags="${CMakeConfigFlags} -DBUILD_SHARED_LIBS=OFF"
+  elif [ "${argv[j]}" == "chill" ]; then
+    ChillMode="true"
+  fi
+  IFS='=' read -r -a inkarg <<< "${argv[j]}"
+  if [ "${inkarg[0]}" == "qt" ]; then
+      QtCustomPath="${inkarg[1]}"
   fi
   case ${argv[j]} in
     *"Debug"*)
@@ -395,10 +404,18 @@ SourceFolder=${BaseFolder}/src
 BuildFolder=${BaseFolder}/build/${BuildName}
 OutFolder=${BaseFolder}/out/${BuildName}
 
-if [ "$(uname)" == "Darwin" ]; then
-    NumProcesses=$(sysctl -n hw.logicalcpu)
+if [ "${ChillMode}" == "true" ]; then
+  if [ "$(uname)" == "Darwin" ]; then
+      NumProcesses=$(expr $(sysctl -n hw.logicalcpu) / 3)
+  else
+      NumProcesses=$(expr $(nproc --all) / 3)
+  fi
 else
-    NumProcesses=$(expr $(nproc --all))
+  if [ "$(uname)" == "Darwin" ]; then
+      NumProcesses=$(sysctl -n hw.logicalcpu)
+  else
+      NumProcesses=$(expr $(nproc --all))
+  fi
 fi
 
 #### command execution starts here
@@ -417,6 +434,24 @@ if [ "${MockBuild}" == "true" ]; then
   echo " "
 else
   MockText=""
+fi
+
+if [ -n "${QtCustomPath}" ]; then
+  
+  for d in ${QtCustomPath}/lib/cmake/* ; do
+    d=$(basename ${d})
+    QT_CMAKE_FLAGS="${QT_CMAKE_FLAGS}
+      -D${d}_DIR=${QtCustomPath}/lib/cmake/${d}"
+    if [ "$d" == "Qt5" ]; then
+      QT_CMAKE_FLAGS="${QT_CMAKE_FLAGS}
+        -DQT_DIR=${QtCustomPath}/lib/cmake/${d}"
+    elif [ "$d" == "Qt6" ]; then
+      QT_CMAKE_FLAGS="${QT_CMAKE_FLAGS}
+        -DQT_DIR=${QtCustomPath}/lib/cmake/${d}"
+    fi
+  done
+
+  ExtraArgs="${ExtraArgs} ${QT_CMAKE_FLAGS}"
 fi
 
 doPrintConfiguration
