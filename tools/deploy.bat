@@ -521,7 +521,7 @@ if [[ ${LinkOption} == "dynamic" ]]; then
 elif [[ ${LinkOption} == "static" ]]; then
     if [[ ${MartinosOption} == "true"  ]]; then
         echo "OoOps!"
-        echo "Martinos Option not supported in static mode.
+        echo "Martinos Option not supported in static mode."
         echo " "
         exit 0
     fi
