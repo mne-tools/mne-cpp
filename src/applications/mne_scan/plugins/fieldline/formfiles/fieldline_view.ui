@@ -75,13 +75,13 @@
         </property>
         <property name="minimumSize">
          <size>
-          <width>0</width>
+          <width>350</width>
           <height>0</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>300</width>
+          <width>400</width>
           <height>110</height>
          </size>
         </property>
@@ -132,7 +132,7 @@
         </property>
         <layout class="QGridLayout" name="gridLayout">
          <item row="3" column="2">
-          <widget class="QPushButton" name="findBtn">
+          <widget class="QPushButton" name="disconnectBtn">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
              <horstretch>0</horstretch>
@@ -146,11 +146,11 @@
             </size>
            </property>
            <property name="text">
-            <string>Find Acq System </string>
+            <string>Disconnect</string>
            </property>
           </widget>
          </item>
-         <item row="3" column="3">
+         <item row="3" column="0">
           <widget class="QPushButton" name="connectBtn">
            <property name="minimumSize">
             <size>
@@ -163,7 +163,7 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="2">
+         <item row="0" column="0">
           <widget class="QLabel" name="label">
            <property name="text">
             <string>Number of Chassis</string>
@@ -173,7 +173,7 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="3">
+         <item row="0" column="2">
           <widget class="QSpinBox" name="numChassisSpinBox">
            <property name="maximumSize">
             <size>
@@ -196,6 +196,12 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>800</width>
+       <height>16777215</height>
+      </size>
      </property>
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>

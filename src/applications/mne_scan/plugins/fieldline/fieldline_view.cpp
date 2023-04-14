@@ -79,8 +79,7 @@ FieldlineView::FieldlineView(Fieldline* parent)
 {
     m_pUi->setupUi(this);
     initTopMenu();
-//    initTopMenuCallbacks();
-//    m_ipMacList.reserve(6);
+    initAcqSystem(2);
 }
 
 FieldlineView::~FieldlineView()
@@ -94,7 +93,6 @@ void FieldlineView::initTopMenu()
     m_pUi->numChassisSpinBox->setMinimum(0);
     m_pUi->numChassisSpinBox->setMaximum(6);
     m_pUi->numChassisSpinBox->setValue(0);
-
     m_pMacIpTable = new QTableWidget(this);
     m_pMacIpTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
     m_pMacIpTable->verticalHeader()->setSectionHidden(0,true);
@@ -105,17 +103,32 @@ void FieldlineView::initTopMenu()
     QVBoxLayout* macIpTableLayout = qobject_cast<QVBoxLayout*>(m_pUi->ipMacFrame->layout());
     macIpTableLayout->insertWidget(0, m_pMacIpTable);
 
-    connect( m_pMacIpTable, SIGNAL(cellDoubleClicked(int,int)),
-            this, SLOT( cellSelected(int,int)));
+    QObject::connect(m_pMacIpTable, QOverload<int, int>::of(&QTableWidget::cellDoubleClicked),
+                     this, &FieldlineView::macIpTableDoubleClicked);
+    QObject::connect(m_pMacIpTable, &QTableWidget::itemChanged,
+                     this, &FieldlineView::macIpTableValueChanged);
     QObject::connect(m_pUi->numChassisSpinBox,QOverload<int>::of(&QSpinBox::valueChanged),
                      this, &FieldlineView::setNumRowsIpMacFrame);
-    QObject::connect(m_pUi->findBtn, &QPushButton::clicked,
-                     this, &FieldlineView::findChassis);
-
+    QObject::connect(m_pUi->disconnectBtn, &QPushButton::clicked,
+                     this, &FieldlineView::disconnect);
 }
 
-void FieldlineView::cellSelected(int row, int col) {
-    std::cout << "row: " << row << " col " << col << "\n";
+void FieldlineView::macIpTableDoubleClicked(int row, int col) {
+    std::cout << "row: " << row << "   col: " << col << "\n";
+    std::cout.flush();
+    if ( col == 0 ) {
+//        std::string macAddr = findIP(m_pMacIpTable->item(row, col)->text.toStdString());
+        std::string macAddr("0.0.0.0");
+        m_pMacIpTable->item(row, col + 1)->setText(QString::fromStdString(macAddr));
+    }
+    if ( col == 1 ) {
+        // perhaps send ping?
+    }
+}
+
+void FieldlineView::macIpTableValueChanged(QTableWidgetItem* item)
+{
+    std::cout << "cell (" << item->row() << "," << item->column() << " changed to: " << item->text().toStdString() << "\n";
     std::cout.flush();
 }
 
@@ -123,9 +136,11 @@ void FieldlineView::setNumRowsIpMacFrame(int i)
 {
     m_pMacIpTable->setRowCount(i);
     m_pMacIpTable->setSortingEnabled(false);
-    m_pMacIpTable->setItem(i-1, 0, new QTableWidgetItem("Hello"));
-    m_pMacIpTable->setItem(i-1, 1, new QTableWidgetItem("Baby"));
-    m_pMacIpTable->setSortingEnabled(true);//    QVBoxLayout* vertIpMacLayout = qobject_cast<QVBoxLayout*>(m_pUi->ipMacFrame->layout());
+    m_pMacIpTable->setItem(i-1, 0, new QTableWidgetItem("AF-70-04-21-2D-28"));
+    m_pMacIpTable->setItem(i-1, 1, new QTableWidgetItem("0.0.0.0"));
+    m_pMacIpTable->item(i-1, 0)->setToolTip((QString("Doubleclick to find the IP.")));
+    m_pMacIpTable->setSortingEnabled(true);
+    //    QVBoxLayout* vertIpMacLayout = qobject_cast<QVBoxLayout*>(m_pUi->ipMacFrame->layout());
 //    if ( i < m_ipMacList.size())
 //    {
 //        vertIpMacLayout->removeItem(m_ipMacList.back());
@@ -145,7 +160,7 @@ void FieldlineView::setNumRowsIpMacFrame(int i)
 //    }
 }
 
-void FieldlineView::findChassis()
+void FieldlineView::disconnect()
 {
     qDebug() << "Find chasssis!\n";
     std::cout.flush();
@@ -155,31 +170,83 @@ void FieldlineView::findChassis()
     //    retrieve list of ips and set variable with it.
 }
 
-void FieldlineView::initCallbacks() 
+void FieldlineView::initAcqSystemTopButtons()
 {
+    QPushButton* button = new QPushButton(QString("Start"), m_pUi->acqSystemTopButtonsFrame);
+    QObject::connect(button, &QPushButton::clicked, this, &FieldlineView::startAllSensors);
+    acqSystemTopBtnMenuLayout->insertWidget(0, button);
+
+    button = new QPushButton(QString("Stop"), m_pUi->acqSystemTopButtonsFrame);
+    QObject::connect(button, &QPushButton::clicked, this, &FieldlineView::stopAllSensors);
+    acqSystemTopBtnMenuLayout->insertWidget(1, button);
+
+    button = new QPushButton(QString("Auto-Tune"), m_pUi->acqSystemTopButtonsFrame);
+    QObject::connect(button, &QPushButton::clicked, this, &FieldlineView::autoTuneAllSensors);
+    acqSystemTopBtnMenuLayout->insertWidget(3, button);
+
+    button = new QPushButton(QString("Restart Sensors"), m_pUi->acqSystemTopButtonsFrame);
+    QObject::connect(button, &QPushButton::clicked, this, &FieldlineView::restartAllSensors);
+    acqSystemTopBtnMenuLayout->insertWidget(4, button);
+
+    button = new QPushButton(QString("Coarse Zero"), m_pUi->acqSystemTopButtonsFrame);
+    QObject::connect(button, &QPushButton::clicked, this, &FieldlineView::coarseZeroAllSensors);
+    acqSystemTopBtnMenuLayout->insertWidget(5, button);
+
+    button = new QPushButton(QString("Fine Zero"), m_pUi->acqSystemTopButtonsFrame);
+    QObject::connect(button, &QPushButton::clicked, this, &FieldlineView::fineZeroAllSensors);
+    acqSystemTopBtnMenuLayout->insertWidget(6, button);
 }
 
-void FieldlineView::initAcqSystem(int numChassis, const std::vector<std::vector<int>>& chans)
+void FieldlineView::initAcqSystem(int numChassis)
 {
-    displayAcqSystem();
+    QHBoxLayout* acqSystemTopBtnMenuLayout = qobject_cast<QHBoxLayout*>(m_pUi->acqSystemTopButtonsFrame->layout());
+    initAcqSystemTopButtons();
+    for( int i = 0; i < numChassis; i++ ) {
+        m_pAcqSystem.emplace_back();
+    }
 }
 
-void FieldlineView::displayAcqSystem() 
+
+void FieldlineView::initAcqSystem()
 {
 //    QVBoxLayout* rackFrameLayout = qobject_cast<QVBoxLayout*>(m_pUi->fieldlineRackFrame->layout());
 //    for (int i = 0; i < numChassis; i++)
 //    {
 //      FieldlineChassis* chassis = new FieldlineViewChassis(chans[i]);
-
 //      rackFrameLayout->addWidget(chassis);
 //    }
 }
 
+void FieldlineView::startAllSensors() {
+    std::cout << "startAllSensors" << "\n";
+    std::cout.flush();
+}
 
-//void FieldlineView::on_numChassisSpinBox_valueChanged(int arg1)
-//{
+void FieldlineView::stopAllSensors() {
+    std::cout << "stopAllSensors" << "\n";
+    std::cout.flush();
+}
 
-//}
+void FieldlineView::autoTuneAllSensors() {
+    std::cout << "autoTuneAllSensors" << "\n";
+    std::cout.flush();
+}
+
+void FieldlineView::restartAllSensors() {
+    std::cout << "restartAllSensors" << "\n";
+    std::cout.flush();
+}
+
+void FieldlineView::coarseZeroAllSensors() {
+    std::cout << "coarseZeroAllSensors" << "\n";
+    std::cout.flush();
+}
+
+void FieldlineView::fineZeroAllSensors() {
+    std::cout << "fineZeroAllSensors" << "\n";
+    std::cout.flush();
+}
+
 
 //void FieldlineView::setChannelState(size_t chassis_i, size_t chan_i)
 //{

@@ -39,8 +39,8 @@
 
 // #include "fieldline/fieldline_view.h"
 // #include "fieldline/fieldline.h"
-#include "formfiles/ui_fieldline_view.h"
-#include "formfiles/ui_fieldline_rack.h"
+//#include "formfiles/ui_fieldline_view.h"
+//#include "formfiles/ui_fieldline_rack.h"
 #include "formfiles/ui_fieldline_chassis.h"
 
 //=============================================================================================================
@@ -75,11 +75,14 @@ namespace FIELDLINEPLUGIN {
 
 //=============================================================================================================
 
-FieldlineViewChassis::FieldlineViewChassis(int num_chans, QWidget *parent )
+FieldlineViewChassis::FieldlineViewChassis(QWidget *parent )
 : QWidget(parent)
-, m_pUi(new Ui::uiFieldlineViewChassis)
 {
-    ui->setupUi(this);
+   QVBoxLayout* layout = new QVBoxLayout;
+   QFrame* frame = new QFrame;
+
+   layout->addWidget(frame);
+   QWidget::setLayout(layout);
 }
 
 FieldlineViewChassis::~FieldlineViewChassis()

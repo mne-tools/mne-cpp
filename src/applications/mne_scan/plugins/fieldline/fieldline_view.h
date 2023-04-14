@@ -65,6 +65,7 @@ class uiFieldlineView;
 //=============================================================================================================
 class QHBoxLayout;
 class QTableWidget;
+class QTableWidgetItem;
 
 namespace FIELDLINEPLUGIN {
 
@@ -81,33 +82,29 @@ class FieldlineView : public QWidget
     explicit FieldlineView(Fieldline* parent);
     ~FieldlineView();
 
-    // void setLedColor(size_t chassis_id, size_t chan_num, const QColor& color);
-    // void getLedColor()//
-    // void setLedAllColor(const QColor& color);
-    // void setLedAllColor(const QColor &color, bool blinking);
-//    void setChannelState(size_t chassis_i, size_t chan_i);
-//    statish getChannelState(size_t chassis_i, size_t chan_i);
-//    void setAllChannelsState(size_t chassis_i, statish);
-
-private slots:
-//    void on_numChassisSpinBox_valueChanged(int arg1);
-    void setNumRowsIpMacFrame(int i);
 private:
-    void displayAcqSystem();
-    void initAcqSystem(int numChassis, const std::vector<std::vector<int>>& channels);
-    void initCallbacks();
+    void initAcqSystem(int numChassis);
     void initTopMenu();
-    void findChassis();
-    void cellSelected(int, int);
+    void disconnect();
+    void macIpTableDoubleClicked(int, int);
+    void macIpTableValueChanged(QTableWidgetItem* item);
 
     void initAcqSystem();
     void initAcqSystemCallbacks();
+    void initAcqSystemTopButtons();
+    void setNumRowsIpMacFrame(int i);
+
+    void startAllSensors();
+    void stopAllSensors();
+    void autoTuneAllSensors();
+    void restartAllSensors();
+    void coarseZeroAllSensors();
+    void fineZeroAllSensors();
 
     Fieldline* m_pFieldlinePlugin;
     Ui::uiFieldlineView* m_pUi;
     QTableWidget* m_pMacIpTable;
-//    std::vector<QHBoxLayout*> m_ipMacList;
-//    std::vector<FieldlineViewChassis>* m_pAcqSystem;
+    std::vector<FieldlineViewChassis> m_pAcqSystem;
 };
 
 }  // namespace FIELDLINEPLUGIN

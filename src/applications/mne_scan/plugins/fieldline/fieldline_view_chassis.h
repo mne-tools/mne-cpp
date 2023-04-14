@@ -44,7 +44,7 @@
 //=============================================================================================================
 
 #include <QWidget>
-int aalakjdflaskjdflkajsdlfkasjfdlksdjfsldkfjasldkjfasmssmkjlkjdfisldkfjasldkfjalskdjflaskdjfasldkfjasldkfjlkkkkkkkkkkkkkkk = 44;
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -53,9 +53,9 @@ int aalakjdflaskjdflkajsdlfkasjfdlksdjfsldkfjasldkjfasmssmkjlkjdfisldkfjasldkfja
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace Ui {
+//namespace Ui {
 // class uiFieldlineViewChassis;
-}
+//}
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
@@ -71,7 +71,7 @@ class FieldlineViewChassis : public QWidget
     Q_OBJECT
 
  public:
-    FieldlineViewChassis(int num_chans, QWidget *parent = nullptr);
+    FieldlineViewChassis(QWidget *parent = nullptr);
     ~FieldlineViewChassis();
     void setChannelState(size_t chan_i, statish);
     statish getChannelState(size_t chan_i);
@@ -90,9 +90,9 @@ class FieldlineViewChassis : public QWidget
    // void rightClickMenu(int chan, const QPoint& pos);
 
  private:
-    QWidget* m_pParent;
-    // Ui::uiFieldlineViewChassis* m_pUi;
-    // std::vector<FieldlineViewChannel>* m_pChannels;
+
+//    Ui::uiFieldlineViewChassis* m_pUi;
+    std::vector<FieldlineViewChannel> m_pChannels;
 };
 
 }  // namespace FIELDLINEPLUGIN

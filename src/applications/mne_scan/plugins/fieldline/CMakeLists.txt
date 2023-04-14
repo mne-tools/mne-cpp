@@ -123,6 +123,7 @@ set(SOURCES
     fieldline.cpp
 #    fieldline_acqsystem.cpp
     fieldline_view.cpp
+    fieldline_view_chassis.cpp
 )
 
 set(HEADERS
@@ -131,12 +132,12 @@ set(HEADERS
     fieldline.h
 #    fieldline_acqsystem.h
     fieldline_view.h
+    fieldline_view_chassis.h
 )
 
 set(UI_FILES
     formfiles/fieldline_view.ui
-    formfiles/fieldline_rack.ui
-#    formfiles/fieldline_chassis.ui
+    formfiles/fieldline_chassis.ui
 )
 
 set(FILE_TO_UPDATE fieldline_global.cpp)
