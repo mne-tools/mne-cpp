@@ -32,6 +32,8 @@
     SET "CMakeConfigFlags="
     SET "ExtraArgs="
     SET "ExtraSection=False"
+    SET "QtCustomPath="
+
 
     :loop
     IF NOT "%1"=="" (
@@ -70,6 +72,12 @@
       )
       IF "%ExtraSection%"=="False" IF "%1"=="--" (
         SET "ExtraSection=True"
+      )
+      IF "%1"=="qt" (
+        IF NOT "%2"=="" (
+            SET "QtCustomPath=%2"
+            SHIFT
+        )
       )
       SHIFT
       GOTO :loop
@@ -140,6 +148,7 @@
       ECHO BuildType    = %BuildType%
       ECHO BuildName    = %BuildName%
       ECHO Rebuild      = %Rebuild%
+      ECHO QtCustomPath = %QtCustomPath%
       ECHO Coverage     = %WithCodeCoverage%
       ECHO NumProcesses = %NumProcesses%
       ECHO CMakeConfigFlags = %CMakeConfigFlags%
@@ -171,6 +180,9 @@
       ECHO [rebuild]  - Only rebuild existing build-system configuration.
       ECHO [static]   - Build project statically. QT_DIR and Qt5_DIR must be set to
       ECHO              point to a static version of Qt.
+      ECHO [qt=\path\]- Use specified qt installation to build the project. This \path
+      ECHO              must point to the directory containing the bin and lib folders
+      ECHO              for the desired Qt version. ex. \some\path\to\Qt\5.15.2\msvc2019_64\
       ECHO [--]       - Mark beginning of extra-arguments section. Any argument
       ECHO              following the double dash will be passed on to cmake 
       ECHO              directly without it being parsed.      
@@ -351,6 +363,11 @@ doPrintHelp() {
   echo "[rebuild]  - Only rebuild existing build-system configuration."
   echo "[static]   - Build project statically. QT_DIR and Qt5_DIR must be set to"
   echo "             point to a static version of Qt."
+  echo "[qt=<path>]- Use specified qt installation to build the project. This path"
+  echo "             must point to the directory containing the bin and lib folders"
+  echo "             for the desired Qt version. ex. /some/path/to/Qt/5.15.2/gcc_64/"
+  echo "[chill]    - Use fewer threads when building the project. Takes longer but"
+  echo "             does not monopolize your computer's resources."
   echo "[--]       - mark beginning of extra-arguments section. any argument"
   echo "             following the double dash will be passed on to cmake"
   echo "             directly without it being parsed."
