@@ -382,6 +382,7 @@ PackOption=""
 BuildName=""
 MockDeploy="false"
 MockText=""
+MartinosOption="false"
 
 doPrintConfiguration() {
   echo " "
@@ -397,6 +398,7 @@ doPrintConfiguration() {
   echo " BuildName  = $BuildName"
   echo " MockDeploy = $MockDeploy"
   echo " MockText   = $MockText"
+  echo " Martinos   = $MartinosOption"
   echo " "
   echo ========================================================================
   echo ========================================================================
@@ -414,6 +416,7 @@ doPrintHelp() {
   echo "[dynamic/static] - Set the link type as dynamic (default) or static."
   echo "[pack] - Enable packaging of applications into a compressed file."
   echo "[build-name=] - Specify the name of the build to deploy."
+  echo "[martinos] - Specify if the installation of for Martinos Center Centos."
   echo " "
 }
 
@@ -428,6 +431,8 @@ for (( j=0; j<argc; j++ )); do
         PrintHelp="true"
     elif [ "${argv[j]}" == "mock" ]; then
         MockBuild="true"
+    elif [ "${argv[j]}" == "martinos" ]; then
+        MartinosOption="true"
     fi
     IFS='=' read -r -a inkarg <<< "${argv[j]}"
     if [ "${inkarg[0]}" == "build-name" ]; then
@@ -455,54 +460,70 @@ doPrintConfiguration
 
 if [[ ${LinkOption} == "dynamic" ]]; then
 
-    # Copy additional brainflow libs
-    ${MockText}cp -a ${BASE_PATH}/src/applications/mne_scan/plugins/brainflowboard/brainflow/installed/out/${BuildName}/lib/. ${BASE_PATH}/out/${BuildName}/lib/
+    if [[ ${MartinosOption} == "true"  ]]; then
+        if [[ -z "${Qt_ROOT_FOLDER}" ]]; then
+            echo "You need to define the variable: Qt_ROOT_FOLDER. And make it"
+            echo "point to your Qt installation."
+        else
+            cp -r ${Qt_ROOT_FOLDER}/plugins/platforms ${BASE_PATH}/out/${BUILD_NAME}/apps
+            cp -r ${Qt_ROOT_FOLDER}/plugins/xcbglintegrations ${BASE_PATH}/out/${BUILD_NAME}/apps
+            cp -r ${Qt_ROOT_FOLDER}/lib/*.so ${BASE_PATH}/out/${BUILD_NAME}/lib
+        fi
+    else
+        # Copy additional brainflow libs
+        ${MockText}cp -a ${BASE_PATH}/src/applications/mne_scan/plugins/brainflowboard/brainflow/installed/out/${BuildName}/lib/. ${BASE_PATH}/out/${BuildName}/lib/
 
-    # Copy additional LSL libs
-    ${MockText}cp -a ${BASE_PATH}/src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/${BuildName}/lib/. ${BASE_PATH}/out/${BuildName}/lib/
+        # Copy additional LSL libs
+        ${MockText}cp -a ${BASE_PATH}/src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/${BuildName}/lib/. ${BASE_PATH}/out/${BuildName}/lib/
 
-    # Install some additional packages so linuxdeployqt can find them
-    sudo apt-get update
-    sudo apt-get install libxkbcommon-x11-0
-    sudo apt-get install libxcb-icccm4
-    sudo apt-get install libxcb-image0
-    sudo apt-get install libxcb-keysyms1
-    sudo apt-get install libxcb-render-util0
-    sudo apt-get install libbluetooth3
-    sudo apt-get install libxcb-xinerama0 
-    ${MockText}export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/out/${BuildName}/lib/x86_64-linux-gnu/
+        # Install some additional packages so linuxdeployqt can find them
+        sudo apt-get update
+        sudo apt-get install libxkbcommon-x11-0
+        sudo apt-get install libxcb-icccm4
+        sudo apt-get install libxcb-image0
+        sudo apt-get install libxcb-keysyms1
+        sudo apt-get install libxcb-render-util0
+        sudo apt-get install libbluetooth3
+        sudo apt-get install libxcb-xinerama0
+        ${MockText}export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/out/${BuildName}/lib/x86_64-linux-gnu/
 
-    # Downloading linuxdeployqt from continious release
-    ${MockText}get -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-    ${MockText}sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+        # Downloading linuxdeployqt from continious release
+        ${MockText}get -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
+        ${MockText}sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
 
-    # linuxdeployqt uses mne_scan and mne_analyze binary to resolve dependencies
-    cd ${BASE_PATH}/mne-cpp
-    ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_scan -verbose2 -extra-plugins=renderers
-    ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_analyze -verbose2 -extra-plugins=renderers
+        # linuxdeployqt uses mne_scan and mne_analyze binary to resolve dependencies
+        cd ${BASE_PATH}/mne-cpp
+        ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_scan -verbose2 -extra-plugins=renderers
+        ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_analyze -verbose2 -extra-plugins=renderers
 
-    # Manually copy in the libxcb-xinerama library which is needed by plugins/platforms/libxcb.so
-    ${MockText}cp /usr/out/${BuildName}/lib/x86_64-linux-gnu/libxcb-xinerama.so.0 ${BASE_PATH}/mne-cpp/out/${BuildName}/lib/
+        # Manually copy in the libxcb-xinerama library which is needed by plugins/platforms/libxcb.so
+        ${MockText}cp /usr/out/${BuildName}/lib/x86_64-linux-gnu/libxcb-xinerama.so.0 ${BASE_PATH}/mne-cpp/out/${BuildName}/lib/
 
-    if [[ ${PackOption} == "true" ]]; then
-        echo 
-        echo ldd ./out/${BuildName}/apps/mne_scan
-        ${MockText}ldd ./out/${BuildName}/apps/mne_scan
+        if [[ ${PackOption} == "true" ]]; then
+            echo
+            echo ldd ./out/${BuildName}/apps/mne_scan
+            ${MockText}ldd ./out/${BuildName}/apps/mne_scan
 
-        echo 
-        echo ldd ./plugins/platforms/libqxcb.so
-        ${MockText}ldd ./plugins/platforms/libqxcb.so
+            echo
+            echo ldd ./plugins/platforms/libqxcb.so
+            ${MockText}ldd ./plugins/platforms/libqxcb.so
 
-        # Delete folders which we do not want to ship
-        ${MockText}cp -r ${BasePath}/out/${BuildName}/ mne-cpp
-        ${MockText}rm -r mne-cpp/resources/data
+            # Delete folders which we do not want to ship
+            ${MockText}cp -r ${BasePath}/out/${BuildName}/ mne-cpp
+            ${MockText}rm -r mne-cpp/resources/data
 
-        # Creating archive of everything in current directory
-        ${MockText}tar cfvz ${BasePath}/mne-cpp-linux-dynamic-x86_64.tar.gz mne-cpp   
+            # Creating archive of everything in current directory
+            ${MockText}tar cfvz ${BasePath}/mne-cpp-linux-dynamic-x86_64.tar.gz mne-cpp
+        fi
     fi
 
 elif [[ ${LinkOption} == "static" ]]; then
-
+    if [[ ${MartinosOption} == "true"  ]]; then
+        echo "OoOps!"
+        echo "Martinos Option not supported in static mode."
+        echo " "
+        exit 0
+    fi
     sudo apt-get update
     sudo apt-get install libxkbcommon-x11-0
     sudo apt-get install libxcb-icccm4
