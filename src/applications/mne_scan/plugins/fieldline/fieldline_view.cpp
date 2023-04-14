@@ -46,7 +46,12 @@
 //=============================================================================================================
 
 #include <QVBoxLayout>
+#include <QHBoxLayout>
+#include <QHeaderView>
+#include <QTableWidget>
 #include <QLineEdit>
+#include <QDebug>
+#include <QStringList>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -75,6 +80,7 @@ FieldlineView::FieldlineView(Fieldline* parent)
     m_pUi->setupUi(this);
     initTopMenu();
 //    initTopMenuCallbacks();
+//    m_ipMacList.reserve(6);
 }
 
 FieldlineView::~FieldlineView()
@@ -88,39 +94,67 @@ void FieldlineView::initTopMenu()
     m_pUi->numChassisSpinBox->setMinimum(0);
     m_pUi->numChassisSpinBox->setMaximum(6);
     m_pUi->numChassisSpinBox->setValue(0);
+
+    m_pMacIpTable = new QTableWidget(this);
+    m_pMacIpTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
+    m_pMacIpTable->verticalHeader()->setSectionHidden(0,true);
+
+    m_pMacIpTable->setColumnCount(2);
+    m_pMacIpTable->setHorizontalHeaderLabels(QStringList({"Mac","IP"}));
+
+    QVBoxLayout* macIpTableLayout = qobject_cast<QVBoxLayout*>(m_pUi->ipMacFrame->layout());
+    macIpTableLayout->insertWidget(0, m_pMacIpTable);
+
+    connect( m_pMacIpTable, SIGNAL(cellDoubleClicked(int,int)),
+            this, SLOT( cellSelected(int,int)));
     QObject::connect(m_pUi->numChassisSpinBox,QOverload<int>::of(&QSpinBox::valueChanged),
-            this, &FieldlineView::setNumRowsIpMacFrame);
+                     this, &FieldlineView::setNumRowsIpMacFrame);
     QObject::connect(m_pUi->findBtn, &QPushButton::clicked,
                      this, &FieldlineView::findChassis);
+
+}
+
+void FieldlineView::cellSelected(int row, int col) {
+    std::cout << "row: " << row << " col " << col << "\n";
+    std::cout.flush();
 }
 
 void FieldlineView::setNumRowsIpMacFrame(int i)
 {
-    QVBoxLayout* frameLayout = qobject_cast<QVBoxLayout*>(m_pUi->ipMacFrame->layout());
-    if ( i < m_ipMacList.size())
-    {
-        frameLayout->removeWidget(qobject_cast<QWidget*>(m_ipMacList.back()));
-        m_ipMacList.pop_back();
-    }
-    if ( i > m_ipMacList.size())
-    {
-        QHBoxLayout* ipMacLayout = new QHBoxLayout(m_pUi->ipMacFrame);
-        QLineEdit* ip = new QLineEdit("0.0.0.0");
-        ip->setEnabled(false);
-        QLineEdit* macAddr = new QLineEdit("AF-70-04-21-2D-28");
-        ipMacLayout->addWidget(macAddr);
-        ipMacLayout->addWidget(ip);
-        frameLayout->insertLayout(m_ipMacList.size() + 1, ipMacLayout);
-        m_ipMacList.push_back(ipMacLayout);
-    }
+    m_pMacIpTable->setRowCount(i);
+    m_pMacIpTable->setSortingEnabled(false);
+    m_pMacIpTable->setItem(i-1, 0, new QTableWidgetItem("Hello"));
+    m_pMacIpTable->setItem(i-1, 1, new QTableWidgetItem("Baby"));
+    m_pMacIpTable->setSortingEnabled(true);//    QVBoxLayout* vertIpMacLayout = qobject_cast<QVBoxLayout*>(m_pUi->ipMacFrame->layout());
+//    if ( i < m_ipMacList.size())
+//    {
+//        vertIpMacLayout->removeItem(m_ipMacList.back());
+//        delete m_ipMacList.back();
+//        m_ipMacList.pop_back();
+//    }
+//    if ( i > m_ipMacList.size())
+//    {
+//        QHBoxLayout* ipMacLayout = new QHBoxLayout(m_pUi->ipMacFrame);
+//        QLineEdit* ip = new QLineEdit("0.0.0.0");
+//        ip->setEnabled(false);
+//        QLineEdit* macAddr = new QLineEdit("AF-70-04-21-2D-28");
+//        ipMacLayout->addWidget(macAddr);
+//        ipMacLayout->addWidget(ip);
+//        vertIpMacLayout->insertLayout(m_ipMacList.size() + 1, ipMacLayout);
+//        m_ipMacList.push_back(ipMacLayout);
+//    }
 }
 
 void FieldlineView::findChassis()
 {
+    qDebug() << "Find chasssis!\n";
+    std::cout.flush();
+
     //generate list of mac addresses
     //call class finder.
     //    retrieve list of ips and set variable with it.
 }
+
 void FieldlineView::initCallbacks() 
 {
 }

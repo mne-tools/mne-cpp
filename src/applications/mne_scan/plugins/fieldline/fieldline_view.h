@@ -64,41 +64,12 @@ class uiFieldlineView;
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 class QHBoxLayout;
+class QTableWidget;
 
 namespace FIELDLINEPLUGIN {
 
 class Fieldline;
-//class FieldlineViewChassis;
-
-enum class FieldlineDataType {
-    DATA_BZ = 0,
-    DATA_BY = 1,
-    DATA_BX = 2
-};
-
-enum class FieldLineWaveType {
-    WAVE_OFF = 0,
-    WAVE_RAMP = 1,
-    WAVE_SINE = 2,
-};
-
-enum class FieldLineSensorStatusType {
-    SENSOR_OFF = 0,
-    SENSOR_RESTARTING = 1,
-    SENSOR_RESTARTED = 2,
-    SENSOR_COARSE_ZEROING = 3,
-    SENSOR_COARSE_ZEROED = 4,
-    SENSOR_FINE_ZEROING = 5,
-    SENSOR_FINE_ZEROED = 6,
-    SENSOR_ERROR = 7,
-    SENSOR_READY = 8,
-};
-
-enum class FieldLineConnectStatusType {
-    CONNECT_OK = 0,
-    CONNECT_NOT_READY = 1,
-    CONNECT_CHASSIS_MISSING = 2,
-};
+// class FieldlineViewChassis;
 
 //=============================================================================================================
 
@@ -126,14 +97,16 @@ private:
     void initAcqSystem(int numChassis, const std::vector<std::vector<int>>& channels);
     void initCallbacks();
     void initTopMenu();
-
+    void findChassis();
+    void cellSelected(int, int);
 
     void initAcqSystem();
     void initAcqSystemCallbacks();
 
     Fieldline* m_pFieldlinePlugin;
     Ui::uiFieldlineView* m_pUi;
-    std::vector<QHBoxLayout*> m_ipMacList;
+    QTableWidget* m_pMacIpTable;
+//    std::vector<QHBoxLayout*> m_ipMacList;
 //    std::vector<FieldlineViewChassis>* m_pAcqSystem;
 };
 

@@ -127,6 +127,7 @@ set(SOURCES
 
 set(HEADERS
     fieldline_global.h
+    fieldline_definitions.h
     fieldline.h
 #    fieldline_acqsystem.h
     fieldline_view.h
