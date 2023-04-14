@@ -87,15 +87,32 @@
     SET BuildFolder=%BaseFolder%\build\%BuildName%
     SET OutFolder=%BaseFolder%\out\%BuildName%
 
-    call:showLogo
-    call:doPrintConfiguration
-
     IF "%MockBuild%"=="True" (
         ECHO.
         ECHO Mock mode ON. Commands to be executed: 
         ECHO.
         SET "MockText=ECHO "
     )
+
+    IF NOT [%QtCustomPath]==[] (
+      FOR /D %%s in (!QtCustomPath!\lib\cmake\*) do (
+
+        set LIB_NAME=%%s
+        ECHO !LIB_NAME!
+
+        set "ExtraArgs=!ExtraArgs! -D%%s_DIR=%QtCustomPath%/lib/cmake/%%s"
+
+        IF "%%s"=="Qt5" (
+          set "ExtraArgs=!ExtraArgs! -DQT_DIR=%QtCustomPath%/lib/cmake/%%s"
+        )
+        IF "%%s"=="Qt6" (
+          set "ExtraArgs=!ExtraArgs! -DQT_DIR=%QtCustomPath%/lib/cmake/%%s"
+        )
+      )
+    )
+
+    call:showLogo
+    call:doPrintConfiguration
     
     IF "%CleanBuild%"=="True" (
         ECHO Deleting folders: 
@@ -152,7 +169,7 @@
       ECHO Coverage     = %WithCodeCoverage%
       ECHO NumProcesses = %NumProcesses%
       ECHO CMakeConfigFlags = %CMakeConfigFlags%
-      ECHO ExtraARgs    = %ExtraArgs%
+      ECHO ExtraArgs    = %ExtraArgs%
       ECHO.
       ECHO ====================================================================
       ECHO ====================================================================
