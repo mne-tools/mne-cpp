@@ -99,14 +99,11 @@
 
         set LIB_NAME=%%~ns
         set "ExtraArgs=!ExtraArgs! -D!LIB_NAME!_DIR=%%s"
-        
-        :: set "%LIB_NAME%_DIR=%%s"
-        :: echo !LIB_NAME!=!%LIB_NAME%_DIR!
 
-        IF "%%s"=="Qt5" (
+        IF "!LIB_NAME!"=="Qt5" (
           set "ExtraArgs=!ExtraArgs! -DQT_DIR=%%s"
         )
-        IF "%%s"=="Qt6" (
+        IF "!LIB_NAME!"=="Qt6" (
           set "ExtraArgs=!ExtraArgs! -DQT_DIR=%%s"
         )
       )
