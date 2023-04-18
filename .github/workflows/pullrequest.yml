@@ -259,8 +259,7 @@ jobs:
     - name: Configure and compile MNE-CPP
       if: matrix.os == 'ubuntu-20.04'
       run: |
-        cmake -DCMAKE_BUILD_TYPE="Release" -DWITH_CODE_COV=ON -B build -S src 
-        cmake --build build --parallel $(expr $(nproc --all) / 2)
+        ./tools/build_project.bat all coverage
     - name: Run tests (Linux)
       if: matrix.os == 'ubuntu-20.04'
       env:
