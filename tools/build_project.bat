@@ -97,16 +97,17 @@
     IF NOT [%QtCustomPath]==[] (
       FOR /D %%s in (!QtCustomPath!\lib\cmake\*) do (
 
-        set LIB_NAME=%%s
-        ECHO !LIB_NAME!
-
-        set "ExtraArgs=!ExtraArgs! -D%%s_DIR=%QtCustomPath%/lib/cmake/%%s"
+        set LIB_NAME=%%~ns
+        set "ExtraArgs=!ExtraArgs! -D!LIB_NAME!_DIR=%%s"
+        
+        :: set "%LIB_NAME%_DIR=%%s"
+        :: echo !LIB_NAME!=!%LIB_NAME%_DIR!
 
         IF "%%s"=="Qt5" (
-          set "ExtraArgs=!ExtraArgs! -DQT_DIR=%QtCustomPath%/lib/cmake/%%s"
+          set "ExtraArgs=!ExtraArgs! -DQT_DIR=%%s"
         )
         IF "%%s"=="Qt6" (
-          set "ExtraArgs=!ExtraArgs! -DQT_DIR=%QtCustomPath%/lib/cmake/%%s"
+          set "ExtraArgs=!ExtraArgs! -DQT_DIR=%%s"
         )
       )
     )
