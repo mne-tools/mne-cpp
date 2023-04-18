@@ -65,7 +65,7 @@ git rebase upstream/main
 1. Go to your cloned repository folder and run the `mne-cpp.pro` file with QtCreator.
 2. The first time you open the mne-cpp.pro file you will be prompted to configure the project with a pre-defined kit. Select the appropriate kit, e.g., `Desktop Qt 5.15.1 MSVC2019 64bit` and configure the project.
 3. In QtCreator select the Release mode in the lower left corner.
-4. In the Qt Creator's Projects window, right mouse click on the top level MNE-CPP tree item and select Run qmake. Wait until progress bar in lower right corner turns green (this step may take some time).
+4. In the Qt Creator's Projects window, right mouse click on the top level MNE-CPP tree item and select Run qmake. Wait until the progress bar in lower right corner turns green (this step may take some time).
 5. Right mouse click again and then hit Build (this step may take some time). Wait until progress bar in lower right corner turns green.
 6. After the build process is finished, go to the `mne-cpp/out/Release` folder. All applications and libraries should have been created throughout the build process.
 
