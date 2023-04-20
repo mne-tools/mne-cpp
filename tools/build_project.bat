@@ -20,8 +20,6 @@
     SET "MockText="
 
     SET "CleanBuild=False"
-    SET "CleanAll=False"
-    SET "BuildAll=False"
 
     SET "VerboseMode=False"
     SET "BuildType=Release"
@@ -65,12 +63,6 @@
       )
       IF "%ExtraSection%"=="False" IF "%1"=="clean" (
         SET "CleanBuild=True"
-      )
-      IF "%ExtraSection%"=="False" IF "%1"=="clean-all" (
-        SET "CleanAll=True"
-      )
-      IF "%ExtraSection%"=="False" IF "%1"=="all" (
-        SET "BuildAll=True"
       )
       IF "%ExtraSection%"=="False" IF "%1"=="rebuild" (
         SET "Rebuild=True"
@@ -130,23 +122,6 @@
         %MockText%RMDIR /S /Q %OutFolder%
 
         goto :endOfScript
-    )
-
-    IF "%CleanAll%"=="True" (
-        ECHO Deleting folders: 
-        ECHO   %BaseFolder%\build\
-        ECHO   %BaseFolder%\out\
-        ECHO.
-
-        %MockText%RMDIR /S /Q %BaseFolder%\build\
-        %MockText%RMDIR /S /Q %BaseFolder%\out\
-
-        goto :endOfScript
-    )
-
-    IF "%BuildAll%"=="True" (
-      ECHO Building full project. 
-      set "CMakeConfigFlags=!CMakeConfigFlags! -DBUILD_ALL=ON"
     )
 
     IF "%Rebuild%"=="False" (
@@ -211,9 +186,7 @@
       ECHO.
       ECHO [help]  - Print this help.
       ECHO [mock]  - Show commands do not execute them.
-      ECHO [all]   - Build entire project (libraries, applicatiojs, examples, tests)
       ECHO [clean] - Delete build and out folders for your configuration and exit.
-      ECHO [clean-all] - Delete all build and out folders.
       ECHO [Release*/Debug*] - Set the build type Debug/Release and name it.
       ECHO                     For example, Release_testA will build in release
       ECHO                     mode with a build folder /build/Release_testA
@@ -308,8 +281,6 @@ BuildType="Release"
 BuildName="Release"
 WithCodeCoverage="false"
 CleanBuild="false"
-CleanAll="false"
-BuildAll="false"
 Rebuild="false"
 NumProcesses="1"
 MockBuild="false"
@@ -398,9 +369,7 @@ doPrintHelp() {
   echo " "
   echo "[help]  - Print this help."
   echo "[mock]  - Show commands do not execute them."
-  echo "[all]   - Build entire project (libraries, applicatiojs, examples, tests)"
   echo "[clean] - Delete build and out folders for your configuration and exit."
-  echo "[clean-all] - Delete all build and out folders."
   echo "[Release*/Debug*] - Set the build type (Debug/Release) and name it."
   echo "                    For example, Release_testA will build in release"
   echo "                    mode with a build folder /build/Release_testA"
@@ -412,8 +381,6 @@ doPrintHelp() {
   echo "[qt=<path>]- Use specified qt installation to build the project. This path"
   echo "             must point to the directory containing the bin and lib folders"
   echo "             for the desired Qt version. ex. /some/path/to/Qt/5.15.2/gcc_64/"
-  echo "[chill]    - Use fewer threads when building the project. Takes longer but"
-  echo "             does not monopolize your computer's resources."
   echo "[--]       - mark beginning of extra-arguments section. any argument"
   echo "             following the double dash will be passed on to cmake"
   echo "             directly without it being parsed."
@@ -425,10 +392,6 @@ for (( j=0; j<argc; j++)); do
     WithCodeCoverage="true"
   elif [ "${argv[j]}" == "clean" ]; then
     CleanBuild="true"
-  elif [ "${argv[j]}" == "clean-all" ]; then
-    CleanAll="true"
-  elif [ "${argv[j]}" == "all" ]; then
-    BuildAll="true"
   elif [ "${argv[j]}" == "mock" ]; then
     MockBuild="true"
   elif [ "${argv[j]}" == "rebuild" ]; then
@@ -437,8 +400,6 @@ for (( j=0; j<argc; j++)); do
     PrintHelp="true"
   elif [ "${argv[j]}" == "static" ]; then
     CMakeConfigFlags="${CMakeConfigFlags} -DBUILD_SHARED_LIBS=OFF"
-  elif [ "${argv[j]}" == "chill" ]; then
-    ChillMode="true"
   fi
   IFS='=' read -r -a inkarg <<< "${argv[j]}"
   if [ "${inkarg[0]}" == "qt" ]; then
@@ -471,18 +432,10 @@ SourceFolder=${BaseFolder}/src
 BuildFolder=${BaseFolder}/build/${BuildName}
 OutFolder=${BaseFolder}/out/${BuildName}
 
-if [ "${ChillMode}" == "true" ]; then
-  if [ "$(uname)" == "Darwin" ]; then
-      NumProcesses=$(expr $(sysctl -n hw.logicalcpu) / 3)
-  else
-      NumProcesses=$(expr $(nproc --all) / 3)
-  fi
+if [ "$(uname)" == "Darwin" ]; then
+  NumProcesses=$(sysctl -n hw.logicalcpu)
 else
-  if [ "$(uname)" == "Darwin" ]; then
-      NumProcesses=$(sysctl -n hw.logicalcpu)
-  else
-      NumProcesses=$(expr $(nproc --all))
-  fi
+  NumProcesses=$(expr $(nproc --all))
 fi
 
 #### command execution starts here
@@ -531,21 +484,6 @@ if [ "${CleanBuild}" == "true" ]; then
   ${MockText}rm -fr ${BuildFolder}
   ${MockText}rm -fr ${OutFolder}
   exit ${EXIT_SUCCESS}
-fi
-
-if [ "${CleanAll}" == "true" ]; then
-  echo "Deleting folders: "
-  echo "  ${BaseFolder}/build/"
-  echo "  ${BaseFolder}/out/"
-  echo " "
-  ${MockText}rm -fr ${BaseFolder}/build
-  ${MockText}rm -fr ${BaseFolder}/out
-  exit ${EXIT_SUCCESS}
-fi
-
-if [ "${BuildAll}" == "true" ]; then
-  echo "Building full project."
-  CMakeConfigFlags="${CMakeConfigFlags} -DBUILD_ALL=ON"
 fi
 
 if [ "${Rebuild}" == "false" ]; then
