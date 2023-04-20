@@ -45,6 +45,7 @@
 #include "fieldline/fieldline.h"
 //#include "fieldline/fieldline_acqsystem.h"
 #include "fieldline/fieldline_view.h"
+#include "fieldline/ipfinder.h"
 
 #include <scMeas/realtimemultisamplearray.h>
 // #include <utils/generics/circularbuffer.h>
@@ -126,9 +127,9 @@ namespace FIELDLINEPLUGIN {
 //=============================================================================================================
 
 Fieldline::Fieldline()
-    :
-      //acqSystem(nullptr),
-      guiWidget(nullptr)
+ : 
+  //acqSystem(nullptr),
+  guiWidget(nullptr)
 {
 }
 
@@ -167,7 +168,7 @@ void Fieldline::init()
 
 void Fieldline::unload() {
   qDebug() << "unload Fieldline";
-//  delete acqSystem;
+  //  delete acqSystem;
   // delete guiWidget;  // deleted by Qt
 }
 
@@ -211,13 +212,15 @@ QWidget *Fieldline::setupWidget() {
 
 //=============================================================================================================
 
-// void Fieldline::onNewDataAvailable(const Eigen::MatrixXd &matData) {
-//
-//     while(!m_pCircularBuffer->push(matData)) {
-//         //Do nothing until the circular buffer is ready to accept new data
-//         again
-//     }
-// }
+std::string Fieldline::findIp(const std::string& neti, const std::string& mac) {
+
+  IPFINDER::IpFinder ipFinder;
+  ipFinder.addMacAddress(mac);
+  ipFinder.findIps();
+  // ipFinder.macIpList.
+  return ipFinder.macIpList[0].ip;
+
+}
 
 //=============================================================================================================
 

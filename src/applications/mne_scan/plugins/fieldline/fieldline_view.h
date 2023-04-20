@@ -104,7 +104,7 @@ private:
     Fieldline* m_pFieldlinePlugin;
     Ui::uiFieldlineView* m_pUi;
     QTableWidget* m_pMacIpTable;
-    std::vector<FieldlineViewChassis> m_pAcqSystem;
+    // std::vector<FieldlineViewChassis> m_pAcqSystem;
 };
 
 }  // namespace FIELDLINEPLUGIN

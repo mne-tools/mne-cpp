@@ -68,7 +68,7 @@ class FiffInfo;
 
 namespace FIELDLINEPLUGIN {
 
-//class FieldlineAcqSystem;
+// class FieldlineAcqSystem;
 class FieldlineView;
 
 //=============================================================================================================
@@ -77,38 +77,40 @@ class FieldlineView;
  *
  * @brief The Fieldline class provides a MEG connector for receiving data from Fieldline API.
  */
-class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor {
+class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor
+{
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "fieldline.json")
     Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
 
  public:
-    //=========================================================================================================
-    // The plugin interface
-    Fieldline();
+  //=========================================================================================================
+  // The plugin interface
+  Fieldline();
 
-    ~Fieldline();
+  ~Fieldline();
 
-    virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
+  virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
 
-    virtual void init();
+  virtual void init();
 
-    virtual void unload();
+  virtual void unload();
 
-    virtual bool start();
+  virtual bool start();
 
-    virtual bool stop();
+  virtual bool stop();
 
-    virtual AbstractPlugin::PluginType getType() const;
+  virtual AbstractPlugin::PluginType getType() const;
 
-    virtual QString getName() const;
+  virtual QString getName() const;
 
-    virtual QWidget* setupWidget();
+  virtual QWidget* setupWidget();
 
-    virtual QString getBuildInfo();
+  virtual QString getBuildInfo();
 
  protected:
   virtual void run();
+  std::string findIp(const std::string& neti, const std::string& mac);
 
 //  FieldlineAcqSystem* acqSystem;
   FieldlineView* guiWidget;

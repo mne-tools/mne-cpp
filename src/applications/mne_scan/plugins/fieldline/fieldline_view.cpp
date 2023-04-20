@@ -172,6 +172,8 @@ void FieldlineView::disconnect()
 
 void FieldlineView::initAcqSystemTopButtons()
 {
+    QHBoxLayout* acqSystemTopBtnMenuLayout = qobject_cast<QHBoxLayout*>(m_pUi->acqSystemTopButtonsFrame->layout());
+
     QPushButton* button = new QPushButton(QString("Start"), m_pUi->acqSystemTopButtonsFrame);
     QObject::connect(button, &QPushButton::clicked, this, &FieldlineView::startAllSensors);
     acqSystemTopBtnMenuLayout->insertWidget(0, button);
@@ -199,11 +201,11 @@ void FieldlineView::initAcqSystemTopButtons()
 
 void FieldlineView::initAcqSystem(int numChassis)
 {
-    QHBoxLayout* acqSystemTopBtnMenuLayout = qobject_cast<QHBoxLayout*>(m_pUi->acqSystemTopButtonsFrame->layout());
+    // QHBoxLayout* acqSystemTopBtnMenuLayout = qobject_cast<QHBoxLayout*>(m_pUi->acqSystemTopButtonsFrame->layout());
     initAcqSystemTopButtons();
-    for( int i = 0; i < numChassis; i++ ) {
-        m_pAcqSystem.emplace_back();
-    }
+    // for( int i = 0; i < numChassis; i++ ) {
+    //     m_pAcqSystem.emplace_back();
+    // }
 }
 
 

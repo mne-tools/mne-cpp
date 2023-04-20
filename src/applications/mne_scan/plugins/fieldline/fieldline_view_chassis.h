@@ -33,11 +33,14 @@
  *
  */
 
+#ifndef FIELDLINEPLUGIN_FIELDLINEVIEW_H
+
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 // #include "disp/viewers/led_indicator.h"
+#include "fieldline/fieldline_definitions.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -71,10 +74,10 @@ class FieldlineViewChassis : public QWidget
     Q_OBJECT
 
  public:
-    FieldlineViewChassis(QWidget *parent = nullptr);
+    explicit FieldlineViewChassis(QWidget *parent = nullptr);
     ~FieldlineViewChassis();
-    void setChannelState(size_t chan_i, statish);
-    statish getChannelState(size_t chan_i);
+    void setChannelState(size_t chan_i, FieldLineSensorStatusType status);
+    FieldLineSensorStatusType getChannelState(size_t chan_i);
 //    void setColor(size_t chan_num, const QColor& color);
 //    void setColor(size_t chan_num, const QColor& color, bool blinking);
 //    void setColor(const QColor& color);
@@ -87,7 +90,7 @@ class FieldlineViewChassis : public QWidget
 //    void clicked(int chan, const QPoint& pos);
 //
 // private slots:
-   // void rightClickMenu(int chan, const QPoint& pos);
+// void rightClickMenu(int chan, const QPoint& pos);
 
  private:
 
@@ -97,3 +100,4 @@ class FieldlineViewChassis : public QWidget
 
 }  // namespace FIELDLINEPLUGIN
 
+#endif  // FIELDLINEPLUGIN_FIELDLINEVIEW_H

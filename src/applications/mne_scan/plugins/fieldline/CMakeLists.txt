@@ -116,14 +116,16 @@ message(          "python cflags: " ${Python_CFLAGS})
 message(     "python cflags norm: " ${Python_CFLAGS_NORM})
 message(       "python libraries: " ${Python_LIBS})
 message(       "python lib flags: " ${Python_LDFLAGS})
-message("  python lib flags norm: " ${Python_LDFLAGS_NORM})
+message(  "python lib flags norm: " ${Python_LDFLAGS_NORM})
 
 set(SOURCES
     fieldline_global.cpp
     fieldline.cpp
 #    fieldline_acqsystem.cpp
     fieldline_view.cpp
-    fieldline_view_chassis.cpp
+    # fieldline_view_chassis.cpp
+    ipfinder.cpp
+    ipfinder_network.cpp
 )
 
 set(HEADERS
@@ -132,7 +134,9 @@ set(HEADERS
     fieldline.h
 #    fieldline_acqsystem.h
     fieldline_view.h
-    fieldline_view_chassis.h
+    # fieldline_view_chassis.h
+    ipfinder.h
+    ipfinder_network.h
 )
 
 set(UI_FILES
