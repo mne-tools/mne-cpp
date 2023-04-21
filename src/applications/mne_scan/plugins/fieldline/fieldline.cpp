@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "fieldline/fieldline.h"
-//#include "fieldline/fieldline_acqsystem.h"
+#include "fieldline/fieldline_acqsystem.h"
 #include "fieldline/fieldline_view.h"
 #include "fieldline/ipfinder.h"
 
@@ -53,6 +53,7 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+#include <QLabel>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -128,7 +129,7 @@ namespace FIELDLINEPLUGIN {
 
 Fieldline::Fieldline()
  : 
-  //acqSystem(nullptr),
+  acqSystem(nullptr),
   guiWidget(nullptr)
 {
 }
@@ -160,7 +161,7 @@ void Fieldline::init()
                                                   "FieldlinePlguin output");
   m_outputConnectors.append(m_pRTMSA);
 
-//  acqSystem = new FieldlineAcqSystem(this);
+  acqSystem = new FieldlineAcqSystem(this);
   guiWidget = new FieldlineView(this);
 }
 
@@ -168,7 +169,7 @@ void Fieldline::init()
 
 void Fieldline::unload() {
   qDebug() << "unload Fieldline";
-  //  delete acqSystem;
+  delete acqSystem;
   // delete guiWidget;  // deleted by Qt
 }
 
@@ -208,25 +209,26 @@ QString Fieldline::getName() const {
 
 QWidget *Fieldline::setupWidget() {
   return guiWidget;
+  // return new QLabel("hola!");
 }
 
 //=============================================================================================================
 
-std::string Fieldline::findIp(const std::string& neti, const std::string& mac) {
-
-  IPFINDER::IpFinder ipFinder;
-  ipFinder.addMacAddress(mac);
-  ipFinder.findIps();
-  // ipFinder.macIpList.
-  return ipFinder.macIpList[0].ip;
-
+void Fieldline::findIpAsync(const std::string& mac,
+                            std::function<void(const std::string&)> callback) {
+  std::thread ipFinder([&mac, &callback]{
+    IPFINDER::IpFinder ipFinder;
+    ipFinder.addMacAddress(mac);
+    ipFinder.findIps();
+    callback(ipFinder.macIpList[0].ip);
+  });
 }
 
 //=============================================================================================================
 
 void Fieldline::run() {
   qDebug() << "run Fieldline";
-
+}
   // while (true) {
   //   if (QThread::isInterruptionRequested())
   //     break;
@@ -278,7 +280,7 @@ void Fieldline::run() {
   // //     }
   // // }
   // qDebug() << "run Fieldline finished";
-}
+// }
 
 //=============================================================================================================
 

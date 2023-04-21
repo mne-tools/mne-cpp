@@ -46,7 +46,6 @@
 
 #include <QCoreApplication>
 
-#include "fieldline/fieldline.h"
 #include "fieldline/fieldline_acqsystem.h"
 
 //extern "C" {
@@ -107,10 +106,12 @@
 //  return PyModule_Create(&my_module_def);
 //}
 
+// using FIELDLINEPLUGIN;
+// using FIELDLINEPLUGIN::FieldlineAcqSystem;
 namespace FIELDLINEPLUGIN {
+// using FIELDLINEPLUGIN::Fieldline;
 
-const std::string resourcesPath(QCoreApplication::applicationDirPath().toStdString() + \
-                                "/../resources/mne_scan/plugins/fieldline/");
+const std::string resourcesPath(QCoreApplication::applicationDirPath().toStdString() + "/../resources/mne_scan/plugins/fieldline/");
 const std::string entryFile(resourcesPath + "main.py");
 
 FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
@@ -118,6 +119,7 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
 {
   preConfigurePython();
   runPythonFile(entryFile.c_str(), "main.py");
+  // std::cout << "addr: " << m_pControllerParent << "\n";
 }
 
 FieldlineAcqSystem::~FieldlineAcqSystem()
@@ -150,14 +152,24 @@ void FieldlineAcqSystem::preConfigurePython() const
 
 void FieldlineAcqSystem::runPythonFile(const char* file, const char* comment) const 
 {
+  std::cout << "we're up here!\n";
+  std::cout.flush();
   FILE *py_file = fopen(file, "r");
-  PyObject* global_dict = PyDict_New();
-  PyObject* local_dict = PyDict_New();
-  PyObject* result = PyRun_File(py_file, comment, Py_file_input, global_dict, local_dict);
-  Py_DECREF(global_dict);
-  Py_DECREF(local_dict);
-  Py_DECREF(result);
-  fclose(py_file);
+  if (py_file) 
+  {
+    std::cout << "we're here!\n";
+    std::cout.flush();
+    PyObject* global_dict = PyDict_New();
+    PyObject* local_dict = PyDict_New();
+    PyObject* result = PyRun_File(py_file, comment, Py_file_input, global_dict, local_dict);
+    std::cout << "we're down here!\n";
+    std::cout.flush();
+    Py_XDECREF(global_dict);
+    Py_XDECREF(local_dict);
+    Py_XDECREF(result);
+    fclose(py_file);
+  }
 }
 
 }  // namespace FIELDLINEPLUGIN
+

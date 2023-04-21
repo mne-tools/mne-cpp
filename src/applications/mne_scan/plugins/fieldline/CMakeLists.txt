@@ -103,6 +103,7 @@ execute_process(
 )
 
 separate_arguments(Python_LDFLAGS_NORM UNIX_COMMAND "${Python_LDFLAGS}")
+separate_arguments(Python_INCLUDE_DIRS_NORM UNIX_COMMAND "${Python_INCLUDE_DIRS}")
 
 message(      "python prefix dir: " ${Python_PREFIX})
 message(         "python bin dir: " ${Python_BIN_DIR})
@@ -111,6 +112,7 @@ message(      "python executable: " ${Python_EXECUTABLE})
 message(   "python version major: " ${Python_VERSION_MAJOR})
 message(   "python version minor: " ${Python_VERSION_MINOR})
 message(    "python include dirs: " ${Python_INCLUDE_DIRS})
+message("python include dirs norm: " ${Python_INCLUDE_DIRS_NORM})
 message(          "python cflags: " ${Python_CFLAGS})
 message(     "python cflags norm: " ${Python_CFLAGS_NORM})
 message(       "python libraries: " ${Python_LIBS})
@@ -163,14 +165,14 @@ set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES
     OBJECT_DEPENDS "${SOURCE_PATHS}"
 )
 
-add_link_options(${Python_LDFLAGS})
+# add_link_options(${Python_LDFLAGS_NORM})
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_FILES})
 
 set(FFTW_LIBS "")
 
 if(USE_FFTW)
-if (WIN32)
+if(WIN32)
     set(FFTW_LIBS
         ${FFTW_DIR_LIBS}/libfftw3-3.dll
         ${FFTW_DIR_LIBS}/libfftw3f-3.dll
@@ -183,11 +185,15 @@ elseif(UNIX AND NOT APPLE)
 endif()
 endif()
 
-# target_include_directories(${PROJECT_NAME} PUBLIC ../ ${Python_INCLUDE_DIRS})
+separate_arguments(Python_CFLAGS_NORM UNIX_COMMAND "${Python_CFLAGS}")
+separate_arguments(Python_LDFLAGS_NORM UNIX_COMMAND "${Python_LDFLAGS}")
+
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
+target_compile_options(${PROJECT_NAME} PRIVATE ${Python_CFLAGS_NORM} ${Python_INCLUDE_DIRS_NORM})
+# target_compile_options(${PROJECT_NAME} PRIVATE ${Python_CFLAGS_NORM})
 
 target_link_directories(${PROJECT_NAME} PRIVATE ${Python_LIB_DIR})
-
+# target_link_options(${PROJECT_NAME} PRIVATE ${Python_LDFLAGS})
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Widgets
@@ -203,16 +209,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${FFTW_LIBS}
     python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}
 )
-
-separate_arguments(Python_CFLAGS_NORM UNIX_COMMAND "${Python_CFLAGS}")
-separate_arguments(Python_LDFLAGS_NORM UNIX_COMMAND "${Python_LDFLAGS}")
-
-target_compile_options(${PROJECT_NAME} PRIVATE ${Python_CFLAGS_NORM} ${Python_INCLUDE_DIRS})
-
-message(          "python cflags2: " ${Python_CFLAGS})
-message(     "python cflags norm2: " ${Python_CFLAGS_NORM})
-message(       "python lib flags2: " ${Python_LDFLAGS})
-message(  "python lib flags norm2: " ${Python_LDFLAGS_NORM})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     SCAN_FIELDLINE_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"

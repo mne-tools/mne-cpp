@@ -68,7 +68,7 @@ class FiffInfo;
 
 namespace FIELDLINEPLUGIN {
 
-// class FieldlineAcqSystem;
+class FieldlineAcqSystem;
 class FieldlineView;
 
 //=============================================================================================================
@@ -110,9 +110,11 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor
 
  protected:
   virtual void run();
-  std::string findIp(const std::string& neti, const std::string& mac);
 
-//  FieldlineAcqSystem* acqSystem;
+  void findIpAsync(const std::string& mac,
+                   std::function<void(const std::string&)> callback);
+
+  FieldlineAcqSystem* acqSystem;
   FieldlineView* guiWidget;
 
   QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRTMSA;     /**< The RealTimeSampleArray to provide the EEG data.*/

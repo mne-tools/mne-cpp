@@ -35,9 +35,11 @@
 #ifndef FIELDLINEPLUGIN_FIELDLINEACQSYSTEM_H
 #define FIELDLINEPLUGIN_FIELDLINEACQSYSTEM_H
 
+#include "fieldline/fieldline.h"
+
 namespace FIELDLINEPLUGIN {
 
-class Fieldline;
+// class Fieldline;
 
 class FieldlineAcqSystem {
  public:
@@ -51,7 +53,6 @@ class FieldlineAcqSystem {
 
      Fieldline* m_pControllerParent;
 };
-
 
 }  // namespace FIELDLINEPLUGIN
 
