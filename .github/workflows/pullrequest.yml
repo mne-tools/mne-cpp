@@ -75,7 +75,7 @@ jobs:
         cmake --build .
     - name: Configure and compile MNE-CPP
       run: |
-        ./tools/build_project.bat -- -DBUILD_ALL=ON
+        ./tools/build_project.bat -- "-DBUILD_ALL=ON"
     - name: Deploy binaries
       run: |
         ./tools/deploy.bat dynamic pack
@@ -149,7 +149,7 @@ jobs:
         cmake --build .
     - name: Configure and compile MNE-CPP
       run: |
-        ./tools/build_project.bat -- -DBUILD_ALL=ON
+        ./tools/build_project.bat -- "-DBUILD_ALL=ON"
     - name: Deploy binaries
       run: |
         ./tools/deploy.bat dynamic pack
@@ -201,7 +201,7 @@ jobs:
       run: |
         export QT_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
         export Qt5_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
-        ./tools/build_project.bat static -- -DBUILD_ALL=ON 
+        ./tools/build_project.bat static -- "-DBUILD_ALL=ON" 
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2019'
       run: |
@@ -209,7 +209,7 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         $env:QT_DIR += "$PWD\..\Qt5_binaries\lib\cmake\Qt5"
         $env:Qt5_DIR += "$PWD\..\Qt5_binaries\lib\cmake\Qt5"
-        ./tools/build_project.bat static -- -DBUILD_ALL=ON
+        ./tools/build_project.bat static -- "-DBUILD_ALL=ON"
     - name: Deploy binaries
       run: |
         ./tools/deploy.bat static pack
@@ -255,11 +255,11 @@ jobs:
     - name: Configure and compile MNE-CPP
       if: (matrix.os == 'macos-11') || (matrix.os == 'windows-2019')
       run: |
-        ./tools/build_project.bat -- -DBUILD_ALL=ON  
+        ./tools/build_project.bat -- "-DBUILD_ALL=ON"  
     - name: Configure and compile MNE-CPP
       if: matrix.os == 'ubuntu-20.04'
       run: |
-        ./tools/build_project.bat coverage -- -DBUILD_ALL=ON
+        ./tools/build_project.bat coverage -- "-DBUILD_ALL=ON"
     - name: Run tests (Linux)
       if: matrix.os == 'ubuntu-20.04'
       env:
