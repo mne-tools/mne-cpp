@@ -77,7 +77,6 @@ else()
     endif()
 endif()
 
-
 execute_process(
     COMMAND ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config --includes
     OUTPUT_VARIABLE Python_INCLUDE_DIRS
@@ -121,7 +120,7 @@ message(  "python lib flags norm: " ${Python_LDFLAGS_NORM})
 set(SOURCES
     fieldline_global.cpp
     fieldline.cpp
-#    fieldline_acqsystem.cpp
+    fieldline_acqsystem.cpp
     fieldline_view.cpp
     # fieldline_view_chassis.cpp
     ipfinder.cpp
@@ -132,7 +131,7 @@ set(HEADERS
     fieldline_global.h
     fieldline_definitions.h
     fieldline.h
-#    fieldline_acqsystem.h
+    fieldline_acqsystem.h
     fieldline_view.h
     # fieldline_view_chassis.h
     ipfinder.h
@@ -158,10 +157,13 @@ execute_process(COMMAND "echo \"\""
 endif()
 
 set(SOURCE_PATHS ${SOURCES})
+
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES
     OBJECT_DEPENDS "${SOURCE_PATHS}"
 )
+
+add_link_options(${Python_LDFLAGS})
 
 add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_FILES})
 
@@ -181,7 +183,8 @@ elseif(UNIX AND NOT APPLE)
 endif()
 endif()
 
-target_include_directories(${PROJECT_NAME} PUBLIC ../ ${Python_INCLUDE_DIRS})
+# target_include_directories(${PROJECT_NAME} PUBLIC ../ ${Python_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
 target_link_directories(${PROJECT_NAME} PRIVATE ${Python_LIB_DIR})
 
@@ -198,12 +201,18 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     scShared
     scMeas
     ${FFTW_LIBS}
-    #python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}
+    python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}
 )
 
 separate_arguments(Python_CFLAGS_NORM UNIX_COMMAND "${Python_CFLAGS}")
-target_compile_options(${PROJECT_NAME} PRIVATE ${Python_CFLAGS_NORM})
-add_link_options(${Python_LDFLAGS_NORM})
+separate_arguments(Python_LDFLAGS_NORM UNIX_COMMAND "${Python_LDFLAGS}")
+
+target_compile_options(${PROJECT_NAME} PRIVATE ${Python_CFLAGS_NORM} ${Python_INCLUDE_DIRS})
+
+message(          "python cflags2: " ${Python_CFLAGS})
+message(     "python cflags norm2: " ${Python_CFLAGS_NORM})
+message(       "python lib flags2: " ${Python_LDFLAGS})
+message(  "python lib flags norm2: " ${Python_LDFLAGS_NORM})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     SCAN_FIELDLINE_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"
