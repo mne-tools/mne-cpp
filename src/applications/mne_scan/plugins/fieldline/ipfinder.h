@@ -45,7 +45,7 @@
 namespace IPFINDER {
 
 struct MacIp {
-  MacIp(const std::string& mac_, 
+  MacIp(const std::string& mac_,
         const std::string& ip_)
   : mac(mac_), ip(ip_)
   {};
@@ -63,14 +63,14 @@ void systemCalltoFile(const std::string& call,
 void delete_file(const std::string& filename);
 
 class IpFinder {
-public: 
+ public:
   IpFinder();
   void findIps();
   void addMacAddress(const std::string& mac);
   bool allIpsFound() const;
 
   std::vector<MacIp> macIpList;
-private:
+ private:
   const char* arp_table_filename;
   void findIpsInARPTable();
   int numRetriesMax;
@@ -82,3 +82,4 @@ private:
 
 
 #endif  // IPFINDER_H
+

@@ -105,29 +105,19 @@ execute_process(
 separate_arguments(Python_LDFLAGS_NORM UNIX_COMMAND "${Python_LDFLAGS}")
 separate_arguments(Python_INCLUDE_DIRS_NORM UNIX_COMMAND "${Python_INCLUDE_DIRS}")
 
-message(      "python prefix dir: " ${Python_PREFIX})
-message(         "python bin dir: " ${Python_BIN_DIR})
-message(         "python lib dir: " ${Python_LIB_DIR})
-message(      "python executable: " ${Python_EXECUTABLE})
-message(   "python version major: " ${Python_VERSION_MAJOR})
-message(   "python version minor: " ${Python_VERSION_MINOR})
-message(    "python include dirs: " ${Python_INCLUDE_DIRS})
-message("python include dirs norm: " ${Python_INCLUDE_DIRS_NORM})
-message(          "python cflags: " ${Python_CFLAGS})
-message(     "python cflags norm: " ${Python_CFLAGS_NORM})
-message(       "python libraries: " ${Python_LIBS})
-message(       "python lib flags: " ${Python_LDFLAGS})
-message(  "python lib flags norm: " ${Python_LDFLAGS_NORM})
-
-set(SOURCES
-    fieldline_global.cpp
-    fieldline.cpp
-    fieldline_acqsystem.cpp
-    fieldline_view.cpp
-    # fieldline_view_chassis.cpp
-    ipfinder.cpp
-    ipfinder_network.cpp
-)
+message("        python prefix dir: " ${Python_PREFIX})
+message("           python bin dir: " ${Python_BIN_DIR})
+message("           python lib dir: " ${Python_LIB_DIR})
+message("        python executable: " ${Python_EXECUTABLE})
+message("     python version major: " ${Python_VERSION_MAJOR})
+message("     python version minor: " ${Python_VERSION_MINOR})
+message("      python include dirs: " ${Python_INCLUDE_DIRS})
+message(" python include dirs norm: " ${Python_INCLUDE_DIRS_NORM})
+message("            python cflags: " ${Python_CFLAGS})
+message("       python cflags norm: " ${Python_CFLAGS_NORM})
+message("         python libraries: " ${Python_LIBS})
+message("         python lib flags: " ${Python_LDFLAGS})
+message("    python lib flags norm: " ${Python_LDFLAGS_NORM})
 
 set(HEADERS
     fieldline_global.h
@@ -137,7 +127,17 @@ set(HEADERS
     fieldline_view.h
     # fieldline_view_chassis.h
     ipfinder.h
-    ipfinder_network.h
+    ipfinder_network_unix.h
+)
+
+set(SOURCES
+    fieldline_global.cpp
+    fieldline.cpp
+    fieldline_acqsystem.cpp
+    fieldline_view.cpp
+    # fieldline_view_chassis.cpp
+    ipfinder.cpp
+    ipfinder_network_unix.cpp
 )
 
 set(UI_FILES
@@ -148,10 +148,10 @@ set(UI_FILES
 set(FILE_TO_UPDATE fieldline_global.cpp)
 
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/fieldline.json)
-    # message("File fieldline.json exists.")
+# message("File fieldline.json exists.")
 else()
-    # message("File fieldline.json does not exist.")
-    # message("Creating a new fieldline.json file.")
+# message("File fieldline.json does not exist.")
+# message("Creating a new fieldline.json file.")
 execute_process(COMMAND "echo \"\""
     WORKING_DIRECTORY ${CMAKE_C
     OUTPUT_FILE fieldline.json
@@ -189,11 +189,12 @@ separate_arguments(Python_CFLAGS_NORM UNIX_COMMAND "${Python_CFLAGS}")
 separate_arguments(Python_LDFLAGS_NORM UNIX_COMMAND "${Python_LDFLAGS}")
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
-target_compile_options(${PROJECT_NAME} PRIVATE ${Python_CFLAGS_NORM} ${Python_INCLUDE_DIRS_NORM})
-# target_compile_options(${PROJECT_NAME} PRIVATE ${Python_CFLAGS_NORM})
+target_compile_options(${PROJECT_NAME} PRIVATE
+    ${Python_CFLAGS_NORM} ${Python_INCLUDE_DIRS_NORM}
+)
 
 target_link_directories(${PROJECT_NAME} PRIVATE ${Python_LIB_DIR})
-# target_link_options(${PROJECT_NAME} PRIVATE ${Python_LDFLAGS})
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Widgets
@@ -216,8 +217,6 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 )
 
 if(NOT BUILD_SHARED_LIBS)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
-        STATICBUILD QT_STATICPLUGIN
-)
+target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD QT_STATICPLUGIN)
 endif()
 

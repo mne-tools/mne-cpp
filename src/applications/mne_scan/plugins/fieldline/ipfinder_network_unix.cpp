@@ -11,13 +11,9 @@
 #include <string>
 #include <vector>
 
-namespace IPFINDER {
+#include "fieldline/ipfinder_network_unix.h"
 
-struct Network {
-    std::string baseAddress;
-    int numOfHosts;
-    std::vector<std::string> hostIPs;
-};
+namespace IPFINDER {
 
 void printNetworks(const std::vector<Network>& networks) {
     std::cout << "Networks:" << std::endl;
@@ -60,12 +56,11 @@ std::vector<Network> getNetworksClassC() {
             std::string network_address(inet_ntoa(network_addr));
 
             // Calculate the number of possible hosts in the network
-            // int num_of_bits = 32 - __builtin_popcount(mask_addr.s_addr);
             std::bitset<32> mask(mask_addr.s_addr);
             int num_of_bits = 32 - mask.count();
-            int num_of_hosts = (1 << num_of_bits) - 2;            // Calculate the IP addresses of all possible hosts in the network
+            int num_of_hosts = (1 << num_of_bits) - 2;
 
-            if (num_of_hosts > 255) 
+            if (num_of_hosts > 255)
               continue;
 
             std::vector<std::string> host_ips;

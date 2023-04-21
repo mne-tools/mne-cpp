@@ -53,7 +53,7 @@
 #include <unistd.h>
 
 #include "ipfinder.h"
-#include "ipfinder_network.h"
+#include "ipfinder_network_unix.h"
 
 namespace IPFINDER {
 

@@ -14,8 +14,9 @@ struct Network {
 
 void printNetworks(const std::vector<Network>& networks);
 
-std::vector<Network> getNetworksClassC(); 
+std::vector<Network> getNetworksClassC();
 
 }  // namespace IPFINDER
 
 #endif  // IPFINDER_GETNETWORKS_H
+
