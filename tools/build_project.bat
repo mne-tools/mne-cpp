@@ -38,7 +38,7 @@
     :loop
     IF NOT "%1"=="" (
       IF "%ExtraSection%"=="True" (
-        SET "ExtraArgs=!ExtraArgs! %1"
+        SET "ExtraArgs=!ExtraArgs! %~1"
       )
       IF "%ExtraSection%"=="False" IF "%1"=="help" (
         call:showLogo
