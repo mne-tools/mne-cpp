@@ -440,7 +440,7 @@ jobs:
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |
-        ./tools/build_project.bat coverage -- -DBUILD_ALL=ON
+        ./tools/build_project.bat coverage -- "-DBUILD_ALL=ON"
     - name: Run tests and upload results to Codecov
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
