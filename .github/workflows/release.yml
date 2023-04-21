@@ -91,7 +91,7 @@ jobs:
       run: |
         export QT_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
         export Qt5_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
-        ./tools/build_project.bat all static 
+        ./tools/build_project.bat static 
     - name: Deploy binaries
       run: |
         ./tools/deploy.bat static pack
@@ -146,7 +146,7 @@ jobs:
       run: |
         export QT_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
         export Qt5_DIR="$(pwd)/../Qt5_binaries/lib/cmake/Qt5"
-        ./tools/build_project.bat all static
+        ./tools/build_project.bat static
     - name: Deploy binaries
       run: |
         ./tools/deploy.bat static pack
@@ -211,7 +211,7 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         $env:QT_DIR += "$PWD\..\Qt5_binaries\lib\cmake\Qt5"
         $env:Qt5_DIR += "$PWD\..\Qt5_binaries\lib\cmake\Qt5"
-        ./tools/build_project.bat all static
+        ./tools/build_project.bat static
     - name: Deploy binaries
       run: |
         ./tools/deploy.bat static pack
@@ -270,7 +270,7 @@ jobs:
         cmake --build .
     - name: Configure and compile MNE-CPP
       run: |
-        ./tools/build_project.bat all
+        ./tools/build_project.bat
     - name: Deploy binaries
       run: |
         ./tools/deploy.bat dynamic pack
@@ -329,7 +329,7 @@ jobs:
         cmake --build .
     - name: Configure and compile MNE-CPP
       run: |
-        ./tools/build_project.bat all
+        ./tools/build_project.bat
     - name: Deploy binaries (MacOS)
       run: |
         ./tools/deploy.bat dynamic pack
@@ -391,7 +391,7 @@ jobs:
       run: |
         cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        ./tools/build_project.bat all
+        ./tools/build_project.bat
     - name: Deploy binaries (Windows)
       run: |
         ./tools/deploy.bat dynamic pack
@@ -440,7 +440,7 @@ jobs:
         modules: qtcharts
     - name: Configure and compile MNE-CPP
       run: |
-        ./tools/build_project.bat all Release coverage
+        ./tools/build_project.bat coverage -- -DBUILD_ALL=ON
     - name: Run tests and upload results to Codecov
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
