@@ -20,6 +20,7 @@
     SET "MockText="
 
     SET "CleanBuild=False"
+    SET "BuildAll=False"
 
     SET "VerboseMode=False"
     SET "BuildType=Release"
@@ -63,6 +64,9 @@
       )
       IF "%ExtraSection%"=="False" IF "%1"=="clean" (
         SET "CleanBuild=True"
+      )
+      IF "%ExtraSection%"=="False" IF "%1"=="all" (
+        SET "BuildAll=True"
       )
       IF "%ExtraSection%"=="False" IF "%1"=="rebuild" (
         SET "Rebuild=True"
@@ -122,6 +126,11 @@
         %MockText%RMDIR /S /Q %OutFolder%
 
         goto :endOfScript
+    )
+
+    IF "%BuildAll%"=="True" (
+      ECHO Building full project. 
+      set "CMakeConfigFlags=!CMakeConfigFlags! -DBUILD_ALL=ON"
     )
 
     IF "%Rebuild%"=="False" (
@@ -186,6 +195,7 @@
       ECHO.
       ECHO [help]  - Print this help.
       ECHO [mock]  - Show commands do not execute them.
+      ECHO [all]   - Build entire project (libraries, applicatiojs, examples, tests)
       ECHO [clean] - Delete build and out folders for your configuration and exit.
       ECHO [Release*/Debug*] - Set the build type Debug/Release and name it.
       ECHO                     For example, Release_testA will build in release
@@ -281,6 +291,7 @@ BuildType="Release"
 BuildName="Release"
 WithCodeCoverage="false"
 CleanBuild="false"
+BuildAll="false"
 Rebuild="false"
 NumProcesses="1"
 MockBuild="false"
@@ -290,7 +301,6 @@ CMakeConfigFlags=""
 ExtraArgs=""
 ExtraSection=False
 QtCustomPath=""
-ChillMode="false"
 
 doShowLogo() {
   echo "                                      "
@@ -369,6 +379,7 @@ doPrintHelp() {
   echo " "
   echo "[help]  - Print this help."
   echo "[mock]  - Show commands do not execute them."
+  echo "[all]   - Build entire project (libraries, applicatiojs, examples, tests)"
   echo "[clean] - Delete build and out folders for your configuration and exit."
   echo "[Release*/Debug*] - Set the build type (Debug/Release) and name it."
   echo "                    For example, Release_testA will build in release"
@@ -392,6 +403,8 @@ for (( j=0; j<argc; j++)); do
     WithCodeCoverage="true"
   elif [ "${argv[j]}" == "clean" ]; then
     CleanBuild="true"
+  elif [ "${argv[j]}" == "all" ]; then
+    BuildAll="true"
   elif [ "${argv[j]}" == "mock" ]; then
     MockBuild="true"
   elif [ "${argv[j]}" == "rebuild" ]; then
@@ -486,6 +499,11 @@ if [ "${CleanBuild}" == "true" ]; then
   exit ${EXIT_SUCCESS}
 fi
 
+if [ "${BuildAll}" == "true" ]; then
+  echo "Building full project."
+  CMakeConfigFlags="${CMakeConfigFlags} -DBUILD_ALL=ON"
+fi
+
 if [ "${Rebuild}" == "false" ]; then
   echo " "
   echo "Configuring Build System:" 
@@ -523,4 +541,3 @@ else
 fi
 
 exit ${EXIT_FAIL}
-
