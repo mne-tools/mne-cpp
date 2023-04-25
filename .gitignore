@@ -52,16 +52,6 @@ ui_*.h
 *.user
 Makefile
 
-# IDE settings
-.cproject
-.project
-.settings
-.vscode
-.session
-.clang-format
-mne-cpp.pro.user*
-compile_commands.json
-
 # Generated docu Docker files
 /_site
 
@@ -80,3 +70,16 @@ venv/
 .cache/*
 
 codecov
+
+# IDE settings
+.cproject
+.project
+.settings
+.vscode
+.session
+.clang-format
+mne-cpp.pro.user*
+compile_commands.json
+CPPLINT.cfg
+
+
