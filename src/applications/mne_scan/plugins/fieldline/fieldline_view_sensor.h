@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
- * @file     fieldline.h
- * @author   Juan GarciaPrieto <jgarciaprieto@mgh.harvard.edu>;
- *           Gabriel B Motta <gbmotta@mgh.harvard.edu>;
- * @since    0.1.0
+ * @file     fieldline_view_chassis.h
+ * @author   Juan Garcia-Prieto <jgarciaprieto@mgh.harvard.edu>
+ *           Gabriel Motta <gbmotta@mgh.harvard.edu>
+ * @since    0.1.9
  * @date     February, 2023
  *
  * @section  LICENSE
  *
- * Copyright (C) 2023, Juan G Prieto, Gabriel B Motta. All rights reserved.
+ * Copyright (C) 2023, Gabriel Motta, Juan Garcia-Prieto. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,101 +29,61 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the Fieldline plugin class.
+ * @brief     FieldlineView class declaration.
  *
  */
 
-#ifndef FIELDLINEPLUGIN_FIELDLINE_H
-#define FIELDLINEPLUGIN_FIELDLINE_H
+#ifndef FIELDLINEPLUGIN_FIELDLINEVIEWSENSOR
+#define FIELDLINEPLUGIN_FIELDLINEVIEWSENSOR
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "fieldline/fieldline_global.h"
-
-#include <fiff/fiff.h>
-#include <fiff/fiff_info.h>
-
-#include <scShared/Plugins/abstractsensor.h>
-
-#include <QObject>
-#include <QSharedPointer>
-
-#include <string>
-
 //=============================================================================================================
-// FORWARD DECLARATION
+// QT INCLUDES
 //=============================================================================================================
 
-namespace SCMEASLIB {
-class RealTimeMultiSampleArray;
+#include <QWidget>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace Ui {
+class uiFieldlineViewSensor;
 }
 
-namespace FIFFLIB {
-class FiffInfo;
-}
 
 //=============================================================================================================
-// DEFINE NAMESPACE FIELDLINEPLUGIN
+// DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
 namespace FIELDLINEPLUGIN {
 
-class FieldlineAcqSystem;
-class FieldlineView;
+class FieldlineViewChassis;
 
 //=============================================================================================================
-/**
- * The Fieldline class provides a MEG connector for receiving data from Fieldline box through its Python API.
- *
- * @brief The Fieldline class provides a MEG connector for receiving data from Fieldline API.
- */
-class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor
+
+class FieldlineViewSensor: public QWidget
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "fieldline.json")
-    Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
 
  public:
-  //=========================================================================================================
-  // The plugin interface
-  Fieldline();
+    explicit FieldlineViewSensor(FieldlineViewChassis *parent, int index);
+    ~FieldlineViewSensor();
 
-  ~Fieldline();
-
-  virtual QSharedPointer<SCSHAREDLIB::AbstractPlugin> clone() const;
-
-  virtual void init();
-
-  virtual void unload();
-
-  virtual bool start();
-
-  virtual bool stop();
-
-  virtual AbstractPlugin::PluginType getType() const;
-
-  virtual QString getName() const;
-
-  virtual QWidget* setupWidget();
-
-  virtual QString getBuildInfo();
-
-  void findIpAsync(const std::string mac,
-                   std::function<void(const std::string)> callback);
- protected:
-  virtual void run();
-
-
-  FieldlineAcqSystem* acqSystem;
-  FieldlineView* guiWidget;
-
-  QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRTMSA;     /**< The RealTimeSampleArray to provide the EEG data.*/
-  QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff measurement info.*/
+ private:
+    FieldlineViewChassis *m_pFieldlineViewChassis;
+    Ui::uiFieldlineViewSensor* m_pUi; 
+    int m_sensorIndex;
 };
 
 }  // namespace FIELDLINEPLUGIN
 
-#endif  // FIELDLINEPLUGIN_FIELDLINE_H
+#endif  //  FIELDLINEPLUGIN_FIELDLINEVIEWSENSOR_H
 

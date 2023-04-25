@@ -70,7 +70,7 @@ class QTableWidgetItem;
 namespace FIELDLINEPLUGIN {
 
 class Fieldline;
-// class FieldlineViewChassis;
+class FieldlineViewChassis;
 
 //=============================================================================================================
 
@@ -87,9 +87,7 @@ private:
     void initTopMenu();
     void disconnect();
     void macIpTableDoubleClicked(int, int);
-    void macIpTableValueChanged(QTableWidgetItem* item);
 
-    void initAcqSystem();
     void initAcqSystemCallbacks();
     void initAcqSystemTopButtons();
     void setNumRowsIpMacFrame(int i);
@@ -104,7 +102,7 @@ private:
     Fieldline* m_pFieldlinePlugin;
     Ui::uiFieldlineView* m_pUi;
     QTableWidget* m_pMacIpTable;
-    // std::vector<FieldlineViewChassis> m_pAcqSystem;
+    std::vector<FieldlineViewChassis*> m_pAcqSystem;
 };
 
 }  // namespace FIELDLINEPLUGIN

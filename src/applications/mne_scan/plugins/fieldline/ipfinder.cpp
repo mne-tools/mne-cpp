@@ -57,7 +57,6 @@
 
 namespace IPFINDER {
 
-const std::regex MAC_REGEX("[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}:[0-9a-f]{2}");
 const std::regex IP_REGEX("[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}");
 const char* default_table_file = "~/.ipfinder_171921";
 const int defaultNumRetriesMax = 3;
@@ -99,16 +98,43 @@ void delete_file(const std::string& filename) {
 }
 
 IpFinder::IpFinder()
- : arp_table_filename(default_table_file),
-  numRetriesMax(defaultNumRetriesMax),
+  : numRetriesMax(defaultNumRetriesMax),
   numRetries(0)
 {  
+  arp_table_filename = generateRandomArpTableFileName();
+}
+
+//void IpFinder::addMacAddress(const std::string& mac) {
+//  std::smatch macParsed;
+//  if (std::regex_search(mac, macParsed, MAC_REGEX)) {
+//    macIpList.emplace_back(MacIp(macParsed[0],""));
+//  }
+//}
+
+std::string IpFinder::generateRandomArpTableFileName() {
+  std::string newFileName(".ipfinder_");
+  const std::string charset = "abcdefghijklmpqrstuvwxyz0123456789";
+  const int strLen(8);
+
+  for(int i =0; i < strLen; i++) {
+    int index = rand() % charset.length();
+    newFileName += charset[index];
+  }
+  return newFileName;
 }
 
 void IpFinder::addMacAddress(const std::string& mac) {
+  std::regex MAC_REGEX("[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}");
   std::smatch macParsed;
-  if (std::regex_search(mac, macParsed, MAC_REGEX)) {
-    macIpList.emplace_back(MacIp(macParsed[0],""));
+  auto bla = std::regex_search(mac, macParsed, MAC_REGEX);
+  if (bla) {
+    if (macParsed.size() > 0) {
+      macIpList.emplace_back(MacIp(macParsed[0],"0.0.0.0"));
+    } else {
+      std::cerr << "Error: no matches found for MAC address " << mac << std::endl;
+    }
+  } else {
+    std::cerr << "Error: failed to match MAC address " << mac << " with regular expression." << std::endl;
   }
 }
 
@@ -116,8 +142,8 @@ void IpFinder::findIps() {
   numRetries += 1;
   findIpsInARPTable();
   if (!allIpsFound() && (numRetries < numRetriesMax)) {
-      sendPingsAroundNetwork();
-      findIps();
+    sendPingsAroundNetwork();
+    findIps();
   }
 }
 
@@ -126,6 +152,7 @@ void IpFinder::findIpsInARPTable() {
   std::ifstream fp(arp_table_filename);
   if (!fp.is_open()) {
     std::cout << "Error: Unable to open arp file table.\n";
+    std::cout.flush();
     return;
   } 
   std::string line;

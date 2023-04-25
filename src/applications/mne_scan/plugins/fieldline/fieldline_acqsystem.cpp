@@ -164,9 +164,9 @@ void FieldlineAcqSystem::runPythonFile(const char* file, const char* comment) co
     PyObject* result = PyRun_File(py_file, comment, Py_file_input, global_dict, local_dict);
     std::cout << "we're down here!\n";
     std::cout.flush();
-    Py_XDECREF(global_dict);
-    Py_XDECREF(local_dict);
-    Py_XDECREF(result);
+    Py_DECREF(global_dict);
+    Py_DECREF(local_dict);
+    Py_DECREF(result);
     fclose(py_file);
   }
 }

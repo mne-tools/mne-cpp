@@ -33,14 +33,14 @@
  *
  */
 
-#ifndef FIELDLINEPLUGIN_FIELDLINEVIEW_H
+#ifndef FIELDLINEPLUGIN_FIELDLINEVIEWCHASSIS_H
+#define FIELDLINEPLUGIN_FIELDLINEVIEWCHASSIS_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-// #include "disp/viewers/led_indicator.h"
-#include "fieldline/fieldline_definitions.h"
+#include <vector>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -56,16 +56,18 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-//namespace Ui {
-// class uiFieldlineViewChassis;
-//}
+namespace Ui {
+class uiFieldlineViewChassis;
+}
+
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
 
 namespace FIELDLINEPLUGIN {
 
-class FieldlineViewChannel;
+class FieldlineView;
+class FieldlineViewSensor;
 
 //=============================================================================================================
 
@@ -74,30 +76,17 @@ class FieldlineViewChassis : public QWidget
     Q_OBJECT
 
  public:
-    explicit FieldlineViewChassis(QWidget *parent = nullptr);
+    explicit FieldlineViewChassis(FieldlineView *parent, int num); 
     ~FieldlineViewChassis();
-    void setChannelState(size_t chan_i, FieldLineSensorStatusType status);
-    FieldLineSensorStatusType getChannelState(size_t chan_i);
-//    void setColor(size_t chan_num, const QColor& color);
-//    void setColor(size_t chan_num, const QColor& color, bool blinking);
-//    void setColor(const QColor& color);
-//    void setColor(const QColor& color, bool blinking);
-//
-//    void setBlinkState(size_t chan_num, bool blinking);
-//    void setBlinkState(bool blinking);
-//
-// signals:
-//    void clicked(int chan, const QPoint& pos);
-//
-// private slots:
-// void rightClickMenu(int chan, const QPoint& pos);
 
  private:
-
-//    Ui::uiFieldlineViewChassis* m_pUi;
-    std::vector<FieldlineViewChannel> m_pChannels;
+    FieldlineView *m_pFieldlineView;
+    Ui::uiFieldlineViewChassis* m_pUi;
+    std::vector<FieldlineViewSensor*> m_pSensors;
+    int chassisNum;
+    int numSensors;
 };
 
 }  // namespace FIELDLINEPLUGIN
 
-#endif  // FIELDLINEPLUGIN_FIELDLINEVIEW_H
+#endif  //  FIELDLINEPLUGIN_FIELDLINEVIEWCHASSIS_H

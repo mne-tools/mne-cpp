@@ -37,8 +37,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "fieldline/fieldline_view.h"
 #include "fieldline/fieldline.h"
+#include "fieldline/fieldline_view.h"
+#include "fieldline/fieldline_view_chassis.h"
 #include "formfiles/ui_fieldline_view.h"
 
 //=============================================================================================================
@@ -52,6 +53,9 @@
 #include <QLineEdit>
 #include <QDebug>
 #include <QStringList>
+
+#include <string>
+#include <iostream>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -72,10 +76,9 @@
 
 namespace FIELDLINEPLUGIN {
 
-FieldlineView::FieldlineView(Fieldline* parent)
+FieldlineView::FieldlineView(Fieldline *parent)
 : m_pFieldlinePlugin(parent),
   m_pUi(new Ui::uiFieldlineView)
-//  m_pAcqSystem(nullptr)
 {
     m_pUi->setupUi(this);
     initTopMenu();
@@ -95,51 +98,46 @@ void FieldlineView::initTopMenu()
     m_pUi->numChassisSpinBox->setValue(0);
     m_pMacIpTable = new QTableWidget(this);
     m_pMacIpTable->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    m_pMacIpTable->verticalHeader()->setSectionHidden(0,true);
+    m_pMacIpTable->verticalHeader()->setSectionHidden(0, true);
 
     m_pMacIpTable->setColumnCount(2);
-    m_pMacIpTable->setHorizontalHeaderLabels(QStringList({"Mac","IP"}));
+    m_pMacIpTable->setHorizontalHeaderLabels(QStringList({"Mac", "IP"}));
 
     QVBoxLayout* macIpTableLayout = qobject_cast<QVBoxLayout*>(m_pUi->ipMacFrame->layout());
     macIpTableLayout->insertWidget(0, m_pMacIpTable);
 
     QObject::connect(m_pMacIpTable, QOverload<int, int>::of(&QTableWidget::cellDoubleClicked),
                      this, &FieldlineView::macIpTableDoubleClicked);
-    QObject::connect(m_pMacIpTable, &QTableWidget::itemChanged,
-                     this, &FieldlineView::macIpTableValueChanged);
-    QObject::connect(m_pUi->numChassisSpinBox,QOverload<int>::of(&QSpinBox::valueChanged),
+    QObject::connect(m_pUi->numChassisSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
                      this, &FieldlineView::setNumRowsIpMacFrame);
     QObject::connect(m_pUi->disconnectBtn, &QPushButton::clicked,
                      this, &FieldlineView::disconnect);
 }
 
 void FieldlineView::macIpTableDoubleClicked(int row, int col) {
-    std::cout << "row: " << row << "   col: " << col << "\n";
-    std::cout.flush();
     if ( col == 0 ) {
-//        std::string macAddr = findIP(m_pMacIpTable->item(row, col)->text.toStdString());
-        std::string macAddr("0.0.0.0");
-        m_pMacIpTable->item(row, col + 1)->setText(QString::fromStdString(macAddr));
-    }
-    if ( col == 1 ) {
-        // perhaps send ping?
+        std::cout << "cell (" << row << "," << col << ") "
+                  << " doubleclicked : " << m_pMacIpTable->item(row, col)->text().toStdString() << "\n";
+        std::cout.flush();
+        auto callback = [this, row, col](const std::string str) {
+            std::cout << "inside callback! :" << str << " \n";
+            m_pMacIpTable->item(row, col+1)->setText(str.c_str());
+            m_pMacIpTable->repaint();
+        };
+        m_pFieldlinePlugin->findIpAsync(m_pMacIpTable->item(row, col)->text().toStdString(), callback);
     }
 }
 
-void FieldlineView::macIpTableValueChanged(QTableWidgetItem* item)
+void FieldlineView::setNumRowsIpMacFrame(int numRows)
 {
-    std::cout << "cell (" << item->row() << "," << item->column() << " changed to: " << item->text().toStdString() << "\n";
-    std::cout.flush();
-}
-
-void FieldlineView::setNumRowsIpMacFrame(int i)
-{
-    m_pMacIpTable->setRowCount(i);
-    m_pMacIpTable->setSortingEnabled(false);
-    m_pMacIpTable->setItem(i-1, 0, new QTableWidgetItem("AF-70-04-21-2D-28"));
-    m_pMacIpTable->setItem(i-1, 1, new QTableWidgetItem("0.0.0.0"));
-    m_pMacIpTable->item(i-1, 0)->setToolTip((QString("Doubleclick to find the IP.")));
-    m_pMacIpTable->setSortingEnabled(true);
+    m_pMacIpTable->setRowCount(numRows);
+    if (numRows > 0) {
+        m_pMacIpTable->setSortingEnabled(false);
+        m_pMacIpTable->setItem(numRows-1, 0, new QTableWidgetItem("AF:70:04:21:2D:28"));
+        m_pMacIpTable->setItem(numRows-1, 1, new QTableWidgetItem("0.0.0.0"));
+        m_pMacIpTable->item(numRows-1, 0)->setToolTip((QString("Doubleclick to find the IP.")));
+        m_pMacIpTable->setSortingEnabled(true);
+    }
     //    QVBoxLayout* vertIpMacLayout = qobject_cast<QVBoxLayout*>(m_pUi->ipMacFrame->layout());
 //    if ( i < m_ipMacList.size())
 //    {
@@ -152,7 +150,7 @@ void FieldlineView::setNumRowsIpMacFrame(int i)
 //        QHBoxLayout* ipMacLayout = new QHBoxLayout(m_pUi->ipMacFrame);
 //        QLineEdit* ip = new QLineEdit("0.0.0.0");
 //        ip->setEnabled(false);
-//        QLineEdit* macAddr = new QLineEdit("AF-70-04-21-2D-28");
+//        QLineEdit* macAddr = new QLineEdit("AF:70:04:21:2D:28");
 //        ipMacLayout->addWidget(macAddr);
 //        ipMacLayout->addWidget(ip);
 //        vertIpMacLayout->insertLayout(m_ipMacList.size() + 1, ipMacLayout);
@@ -203,21 +201,27 @@ void FieldlineView::initAcqSystem(int numChassis)
 {
     // QHBoxLayout* acqSystemTopBtnMenuLayout = qobject_cast<QHBoxLayout*>(m_pUi->acqSystemTopButtonsFrame->layout());
     initAcqSystemTopButtons();
-    // for( int i = 0; i < numChassis; i++ ) {
-    //     m_pAcqSystem.emplace_back();
-    // }
+    
+    QVBoxLayout* acqSystemRackLayout = qobject_cast<QVBoxLayout*>(m_pUi->chassisRackFrame->layout());
+
+    for( int i = 0; i < numChassis; i++ ) {
+        FieldlineViewChassis* pChassis = new FieldlineViewChassis(this, i);
+        acqSystemRackLayout->insertWidget(i, pChassis);
+        //lkajdsflkasjdf
+        m_pAcqSystem.push_back(pChassis);
+    }
 }
 
 
-void FieldlineView::initAcqSystem()
-{
+// void FieldlineView::initAcqSystem()
+// {
 //    QVBoxLayout* rackFrameLayout = qobject_cast<QVBoxLayout*>(m_pUi->fieldlineRackFrame->layout());
 //    for (int i = 0; i < numChassis; i++)
 //    {
 //      FieldlineChassis* chassis = new FieldlineViewChassis(chans[i]);
 //      rackFrameLayout->addWidget(chassis);
 //    }
-}
+// }
 
 void FieldlineView::startAllSensors() {
     std::cout << "startAllSensors" << "\n";

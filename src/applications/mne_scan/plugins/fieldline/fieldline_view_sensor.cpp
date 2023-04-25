@@ -37,18 +37,20 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <vector>
+
+#include <iostream>
+
 // #include "fieldline/fieldline.h"
-#include "fieldline/fieldline_view.h"
-#include "fieldline/fieldline_view_chassis.h"
+// #include "fieldline/fieldline_view.h"
 #include "fieldline/fieldline_view_sensor.h"
-#include "formfiles/ui_fieldline_view_chassis.h"
+// #include "fieldline/fieldline_view_chassis.h"
+#include "formfiles/ui_fieldline_view_sensor.h"
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 //
-// #include <QWidget>
+#include <QWidget>
 // #include <QLabel>
 // #include <QVBoxLayout>
 // #include <QMouseEvent>
@@ -76,33 +78,26 @@ namespace FIELDLINEPLUGIN {
 
 //=============================================================================================================
 
-FieldlineViewChassis::FieldlineViewChassis(FieldlineView *parent, int num )
-: QWidget(parent),
-  m_pFieldlineView(parent),
-  m_pUi(new Ui::uiFieldlineViewChassis),
-  chassisNum(num),
-  numSensors(16)
-  {
+FieldlineViewSensor::FieldlineViewSensor(FieldlineViewChassis *parent, int index)
+: m_pFieldlineViewChassis(parent),
+ m_pUi(new Ui::uiFieldlineViewSensor),
+ m_sensorIndex(index)
+{
     m_pUi->setupUi(this);
-
-    std::string chassisName("Fieldline Chassis ");
-    chassisName += std::to_string(chassisNum);
-    m_pUi->chassisName->setText(QString::fromStdString(chassisName));
-    QHBoxLayout* sensorLayout = qobject_cast<QHBoxLayout*>(m_pUi->sensorFrame->layout());
-
-    for (int i = 0; i < numSensors; i++) {
-        FieldlineViewSensor* pSensor = new FieldlineViewSensor(this, i);
-        sensorLayout->insertWidget(i, pSensor);
-        m_pSensors.push_back(pSensor);
-    }
+  
+   // QVBoxLayout* layout = new QVBoxLayout;
+   // QFrame* frame = new QFrame;
+   //
+   // layout->addWidget(frame);
+   // QWidget::setLayout(layout);
 }
 
-FieldlineViewChassis::~FieldlineViewChassis()
+FieldlineViewSensor::~FieldlineViewSensor()
 {
     delete m_pUi;
 }
 
-// FieldlineViewChassis::initChannels(size_t numChans)
+// FieldlineViewSensor::initChannels(size_t numChans)
 // {
 //     // for(int i = 0; i < num_chans; ++i){
 //     //     chans.push_back(new LEDIndicator());
@@ -110,13 +105,13 @@ FieldlineViewChassis::~FieldlineViewChassis()
 //     //     chans.back()->setLabel(QString::number(i + 1));
 //     //     ui->chan_frame->layout()->addWidget(chans.back());
 //     //     connect(chans.back(), &QWidget::customContextMenuRequested, [this, i, &last_item](const QPoint& pos){this->emit clicked(i, last_item->mapToGlobal(pos)); qDebug() << "clicked " << i+1;});
-//     //     connect(this, &FieldlineViewChassis::clicked, this, &FieldlineViewChassis::rightClickMenu, Qt::UniqueConnection);
+//     //     connect(this, &FieldlineViewSensor::clicked, this, &FieldlineViewSensor::rightClickMenu, Qt::UniqueConnection);
 //     // }
 // }
 
 //=============================================================================================================
 //
-// void FieldlineViewChassis::setColor(size_t chan_num, const QColor& color)
+// void FieldlineViewSensor::setColor(size_t chan_num, const QColor& color)
 // {
 //     if(chan_num > chans.size() || chan_num < 1){
 //         return;
@@ -126,7 +121,7 @@ FieldlineViewChassis::~FieldlineViewChassis()
 //
 // //=============================================================================================================
 //
-// void FieldlineViewChassis::setColor(size_t chan_num, const QColor& color, bool blinking)
+// void FieldlineViewSensor::setColor(size_t chan_num, const QColor& color, bool blinking)
 // {
 //     setColor(chan_num, color);
 //     setBlinkState(chan_num, blinking);
@@ -134,7 +129,7 @@ FieldlineViewChassis::~FieldlineViewChassis()
 //
 // //=============================================================================================================
 //
-// void FieldlineViewChassis::setColor(const QColor& color)
+// void FieldlineViewSensor::setColor(const QColor& color)
 // {
 //     for(auto* chan : chans){
 //         chan->setColor(color);
@@ -143,7 +138,7 @@ FieldlineViewChassis::~FieldlineViewChassis()
 //
 // //=============================================================================================================
 //
-// void FieldlineViewChassis::setColor(const QColor& color, bool blinking)
+// void FieldlineViewSensor::setColor(const QColor& color, bool blinking)
 // {
 //     for(auto* chan : chans){
 //         chan->setColor(color);
@@ -153,7 +148,7 @@ FieldlineViewChassis::~FieldlineViewChassis()
 //
 // //=============================================================================================================
 //
-// void FieldlineViewChassis::setBlinkState(size_t chan_num, bool blinking)
+// void FieldlineViewSensor::setBlinkState(size_t chan_num, bool blinking)
 // {
 //     if(chan_num > chans.size() || chan_num < 1){
 //         return;
@@ -163,7 +158,7 @@ FieldlineViewChassis::~FieldlineViewChassis()
 //
 // //=============================================================================================================
 //
-// void FieldlineViewChassis::setBlinkState(bool blinking)
+// void FieldlineViewSensor::setBlinkState(bool blinking)
 // {
 //     for(auto* chan : chans){
 //         chan->setBlink(blinking);
@@ -172,7 +167,7 @@ FieldlineViewChassis::~FieldlineViewChassis()
 //
 // //=============================================================================================================
 //
-// void FieldlineViewChassis::rightClickMenu(int chan, const QPoint& pos)
+// void FieldlineViewSensor::rightClickMenu(int chan, const QPoint& pos)
 // {
 // //    auto* menu = new QMenu();
 //
@@ -192,4 +187,5 @@ FieldlineViewChassis::~FieldlineViewChassis()
 // } 
 
 }  // namespace FIELDLINEPLUGIN
+
 

@@ -41,6 +41,7 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+#include <string>
 
 #include "fieldline/fieldline.h"
 #include "fieldline/fieldline_acqsystem.h"
@@ -214,14 +215,26 @@ QWidget *Fieldline::setupWidget() {
 
 //=============================================================================================================
 
-void Fieldline::findIpAsync(const std::string& mac,
-                            std::function<void(const std::string&)> callback) {
-  std::thread ipFinder([&mac, &callback]{
+void Fieldline::findIpAsync(const std::string mac,
+                            std::function<void(const std::string)> callback) {
+  std::cout << "outside here!\n";
+  std::cout << "mac: " << mac << "\n";
+  std::thread ipFinder([=]{
     IPFINDER::IpFinder ipFinder;
     ipFinder.addMacAddress(mac);
+    std::cout << "here inside!\n";
+    std::cout << "mac: " << mac << "\n";
+    std::cout.flush();
     ipFinder.findIps();
-    callback(ipFinder.macIpList[0].ip);
+    if (ipFinder.macIpList.size() == 0) {
+
+      std::cout.flush();
+      callback(ipFinder.macIpList[0].ip);
+    } else {
+      callback(std::string("Mac address not valid."));
+    }
   });
+  ipFinder.detach();
 }
 
 //=============================================================================================================

@@ -71,7 +71,8 @@ class IpFinder {
 
   std::vector<MacIp> macIpList;
  private:
-  const char* arp_table_filename;
+  std::string generateRandomArpTableFileName();
+  std::string arp_table_filename;
   void findIpsInARPTable();
   int numRetriesMax;
   int numRetries;

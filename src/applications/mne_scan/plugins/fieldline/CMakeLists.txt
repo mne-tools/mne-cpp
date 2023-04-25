@@ -13,6 +13,103 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED
     COMPONENTS Core Widgets Network Concurrent
 )
 
+set(HEADERS
+    fieldline_global.h
+    fieldline_definitions.h
+    fieldline.h
+    fieldline_acqsystem.h
+    fieldline_view.h
+    fieldline_view_chassis.h
+    fieldline_view_sensor.h
+    ipfinder.h
+    ipfinder_network_unix.h
+)
+
+set(SOURCES
+    fieldline_global.cpp
+    fieldline.cpp
+    fieldline_acqsystem.cpp
+    fieldline_view.cpp
+    fieldline_view_chassis.cpp
+    fieldline_view_sensor.cpp
+    ipfinder.cpp
+    ipfinder_network_unix.cpp
+)
+
+set(UI_FILES
+    formfiles/fieldline_view.ui
+    formfiles/fieldline_view_chassis.ui
+    formfiles/fieldline_view_sensor.ui
+)
+
+set(FILE_TO_UPDATE fieldline_global.cpp)
+
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/fieldline.json)
+# message("File fieldline.json exists.")
+else()
+# message("File fieldline.json does not exist.")
+# message("Creating a new fieldline.json file.")
+execute_process(COMMAND "echo \"\""
+    WORKING_DIRECTORY ${CMAKE_C
+    OUTPUT_FILE fieldline.json
+)
+endif()
+
+set(SOURCE_PATHS ${SOURCES})
+
+list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
+set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES
+    OBJECT_DEPENDS "${SOURCE_PATHS}"
+)
+
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_FILES})
+
+set(FFTW_LIBS "")
+
+if(USE_FFTW)
+if(WIN32)
+    set(FFTW_LIBS
+        ${FFTW_DIR_LIBS}/libfftw3-3.dll
+        ${FFTW_DIR_LIBS}/libfftw3f-3.dll
+        ${FFTW_DIR_LIBS}/libfftwf3l-3.dll
+    )
+    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE})
+elseif(UNIX AND NOT APPLE)
+    set(FFTW_LIBS ${FFTW_DIR_LIBS}/lib/libfftw3.so)
+    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE}/api)
+endif()
+endif()
+
+target_include_directories(${PROJECT_NAME} PUBLIC ../)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Network
+    Qt${QT_VERSION_MAJOR}::Concurrent
+    eigen
+    mne_disp
+    mne_utils
+    mne_fiff
+    scDisp
+    scShared
+    scMeas
+    ${FFTW_LIBS}
+)
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE
+    SCAN_FIELDLINE_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"
+    MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}"
+)
+
+if(NOT BUILD_SHARED_LIBS)
+target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD QT_STATICPLUGIN)
+endif()
+
+# ###################################################################
+# ######### Python Dependencies #####################################
+# ###################################################################
+
 execute_process(
     COMMAND which python
     OUTPUT_VARIABLE Python_EXECUTABLE
@@ -89,8 +186,6 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-separate_arguments(Python_CFLAGS_NORM UNIX_COMMAND "${Python_CFLAGS}")
-
 execute_process(
     COMMAND ${Python_BIN_DIR}/python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}-config --libs
     OUTPUT_VARIABLE Python_LIBS
@@ -102,9 +197,18 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-separate_arguments(Python_LDFLAGS_NORM UNIX_COMMAND "${Python_LDFLAGS}")
-separate_arguments(Python_INCLUDE_DIRS_NORM UNIX_COMMAND "${Python_INCLUDE_DIRS}")
+set(Python_VERSION_MAJOR "3")
+set(Python_VERSION_MINOR "9")
+set(Python_LIB_DIR "/opt/anaconda3/lib")
+set(Python_INCLUDE_DIRS "-I/opt/anacnda3/include/python3.9")
+set(Python_CFLAGS "-I/opt/anaconda3/include/python3.9 -I/opt/anaconda2/include/python3.9 -Wno-unused-result -Wsign-compare -Wunreachable-code -DNDEBUG -fwrapv -O2 -Wall -fPIC -O2 -isystem /opt/anaconda3/include -arch x86_64 -I/opt/anaconda3/include -fPIC -O2 -isystem /opt/anaconda3/include -arch x86_64")
+set(Python_LDFLAGS "-L/opt/anaconda3/lib/python3.9/config-3.9-darwin -ldl -framework CoreFoundation")
 
+separate_arguments(Python_INCLUDE_DIRS_NORM UNIX_COMMAND "${Python_INCLUDE_DIRS}")
+separate_arguments(Python_CFLAGS_NORM UNIX_COMMAND "${Python_CFLAGS}")
+separate_arguments(Python_LDFLAGS_NORM UNIX_COMMAND "${Python_LDFLAGS}")
+
+message(" ")
 message("        python prefix dir: " ${Python_PREFIX})
 message("           python bin dir: " ${Python_BIN_DIR})
 message("           python lib dir: " ${Python_LIB_DIR})
@@ -112,111 +216,25 @@ message("        python executable: " ${Python_EXECUTABLE})
 message("     python version major: " ${Python_VERSION_MAJOR})
 message("     python version minor: " ${Python_VERSION_MINOR})
 message("      python include dirs: " ${Python_INCLUDE_DIRS})
-message(" python include dirs norm: " ${Python_INCLUDE_DIRS_NORM})
+message("*python include dirs norm: " ${Python_INCLUDE_DIRS_NORM})
 message("            python cflags: " ${Python_CFLAGS})
-message("       python cflags norm: " ${Python_CFLAGS_NORM})
-message("         python libraries: " ${Python_LIBS})
-message("         python lib flags: " ${Python_LDFLAGS})
-message("    python lib flags norm: " ${Python_LDFLAGS_NORM})
+message("      *python cflags norm: " ${Python_CFLAGS_NORM})
+message("              python libs: " ${Python_LIBS})
+message("           python ldflags: " ${Python_LDFLAGS})
+message("     *python ldflags norm: " ${Python_LDFLAGS_NORM})
+message("  (*)Message missrepresents content of lists.")
+message(" ")
 
-set(HEADERS
-    fieldline_global.h
-    fieldline_definitions.h
-    fieldline.h
-    fieldline_acqsystem.h
-    fieldline_view.h
-    # fieldline_view_chassis.h
-    ipfinder.h
-    ipfinder_network_unix.h
-)
-
-set(SOURCES
-    fieldline_global.cpp
-    fieldline.cpp
-    fieldline_acqsystem.cpp
-    fieldline_view.cpp
-    # fieldline_view_chassis.cpp
-    ipfinder.cpp
-    ipfinder_network_unix.cpp
-)
-
-set(UI_FILES
-    formfiles/fieldline_view.ui
-    formfiles/fieldline_chassis.ui
-)
-
-set(FILE_TO_UPDATE fieldline_global.cpp)
-
-if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/fieldline.json)
-# message("File fieldline.json exists.")
-else()
-# message("File fieldline.json does not exist.")
-# message("Creating a new fieldline.json file.")
-execute_process(COMMAND "echo \"\""
-    WORKING_DIRECTORY ${CMAKE_C
-    OUTPUT_FILE fieldline.json
-)
-endif()
-
-set(SOURCE_PATHS ${SOURCES})
-
-list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
-set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES
-    OBJECT_DEPENDS "${SOURCE_PATHS}"
-)
-
-# add_link_options(${Python_LDFLAGS_NORM})
-
-add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI_FILES})
-
-set(FFTW_LIBS "")
-
-if(USE_FFTW)
-if(WIN32)
-    set(FFTW_LIBS
-        ${FFTW_DIR_LIBS}/libfftw3-3.dll
-        ${FFTW_DIR_LIBS}/libfftw3f-3.dll
-        ${FFTW_DIR_LIBS}/libfftwf3l-3.dll
-    )
-    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE})
-elseif(UNIX AND NOT APPLE)
-    set(FFTW_LIBS ${FFTW_DIR_LIBS}/lib/libfftw3.so)
-    target_include_directories(${PROJECT_NAME} PRIVATE ${FFTW_DIR_INCLUDE}/api)
-endif()
-endif()
-
-separate_arguments(Python_CFLAGS_NORM UNIX_COMMAND "${Python_CFLAGS}")
-separate_arguments(Python_LDFLAGS_NORM UNIX_COMMAND "${Python_LDFLAGS}")
-
-target_include_directories(${PROJECT_NAME} PUBLIC ../)
 target_compile_options(${PROJECT_NAME} PRIVATE
     ${Python_CFLAGS_NORM} ${Python_INCLUDE_DIRS_NORM}
 )
-
-target_link_directories(${PROJECT_NAME} PRIVATE ${Python_LIB_DIR})
-
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Network
-    Qt${QT_VERSION_MAJOR}::Concurrent
-    eigen
-    mne_disp
-    mne_utils
-    mne_fiff
-    scDisp
-    scShared
-    scMeas
-    ${FFTW_LIBS}
     python${Python_VERSION_MAJOR}.${Python_VERSION_MINOR}
 )
+target_link_directories(${PROJECT_NAME} PRIVATE ${Python_LIB_DIR})
+target_link_options(${PROJECT_NAME} PRIVATE ${Python_LDFLAGS_NORM})
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE
-    SCAN_FIELDLINE_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"
-    MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}"
-)
-
-if(NOT BUILD_SHARED_LIBS)
-target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD QT_STATICPLUGIN)
-endif()
+# ###################################################################
+# ###################################################################
+# ###################################################################
 
