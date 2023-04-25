@@ -176,7 +176,8 @@ void Fieldline::unload() {
 
 //=============================================================================================================
 
-bool Fieldline::start() {
+bool Fieldline::start()
+{
   qDebug() << "start Fieldline";
 
   QThread::start();
@@ -217,8 +218,7 @@ QWidget *Fieldline::setupWidget() {
 
 void Fieldline::findIpAsync(const std::string mac,
                             std::function<void(const std::string)> callback) {
-  std::cout << "outside here!\n";
-  std::cout << "mac: " << mac << "\n";
+  std::cout << "outside here! mac: " << mac << "               \n";
   std::thread ipFinder([=]{
     IPFINDER::IpFinder ipFinder;
     ipFinder.addMacAddress(mac);
@@ -227,7 +227,6 @@ void Fieldline::findIpAsync(const std::string mac,
     std::cout.flush();
     ipFinder.findIps();
     if (ipFinder.macIpList.size() == 0) {
-
       std::cout.flush();
       callback(ipFinder.macIpList[0].ip);
     } else {

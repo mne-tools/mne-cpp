@@ -76,8 +76,9 @@ class FieldlineViewChassis : public QWidget
     Q_OBJECT
 
  public:
-    explicit FieldlineViewChassis(FieldlineView *parent, int num); 
+    explicit FieldlineViewChassis(FieldlineView *parent, int num);
     ~FieldlineViewChassis();
+
 
  private:
     FieldlineView *m_pFieldlineView;

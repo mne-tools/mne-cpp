@@ -37,8 +37,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <vector>
-// #include "fieldline/fieldline.h"
+#include <string>
+
+// #include "fieldlin/fieldline.h"
 #include "fieldline/fieldline_view.h"
 #include "fieldline/fieldline_view_chassis.h"
 #include "fieldline/fieldline_view_sensor.h"
@@ -71,7 +72,6 @@
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
 namespace FIELDLINEPLUGIN {
 
 //=============================================================================================================
@@ -101,95 +101,6 @@ FieldlineViewChassis::~FieldlineViewChassis()
 {
     delete m_pUi;
 }
-
-// FieldlineViewChassis::initChannels(size_t numChans)
-// {
-//     // for(int i = 0; i < num_chans; ++i){
-//     //     chans.push_back(new LEDIndicator());
-//     //     auto& last_item = chans.back();
-//     //     chans.back()->setLabel(QString::number(i + 1));
-//     //     ui->chan_frame->layout()->addWidget(chans.back());
-//     //     connect(chans.back(), &QWidget::customContextMenuRequested, [this, i, &last_item](const QPoint& pos){this->emit clicked(i, last_item->mapToGlobal(pos)); qDebug() << "clicked " << i+1;});
-//     //     connect(this, &FieldlineViewChassis::clicked, this, &FieldlineViewChassis::rightClickMenu, Qt::UniqueConnection);
-//     // }
-// }
-
-//=============================================================================================================
-//
-// void FieldlineViewChassis::setColor(size_t chan_num, const QColor& color)
-// {
-//     if(chan_num > chans.size() || chan_num < 1){
-//         return;
-//     }
-//     chans.at(chan_num - 1)->setColor(color);
-// }
-//
-// //=============================================================================================================
-//
-// void FieldlineViewChassis::setColor(size_t chan_num, const QColor& color, bool blinking)
-// {
-//     setColor(chan_num, color);
-//     setBlinkState(chan_num, blinking);
-// }
-//
-// //=============================================================================================================
-//
-// void FieldlineViewChassis::setColor(const QColor& color)
-// {
-//     for(auto* chan : chans){
-//         chan->setColor(color);
-//     }
-// }
-//
-// //=============================================================================================================
-//
-// void FieldlineViewChassis::setColor(const QColor& color, bool blinking)
-// {
-//     for(auto* chan : chans){
-//         chan->setColor(color);
-//         chan->setBlink(blinking);
-//     }
-// }
-//
-// //=============================================================================================================
-//
-// void FieldlineViewChassis::setBlinkState(size_t chan_num, bool blinking)
-// {
-//     if(chan_num > chans.size() || chan_num < 1){
-//         return;
-//     }
-//     chans.at(chan_num - 1)->setBlink(blinking);
-// }
-//
-// //=============================================================================================================
-//
-// void FieldlineViewChassis::setBlinkState(bool blinking)
-// {
-//     for(auto* chan : chans){
-//         chan->setBlink(blinking);
-//     }
-// }
-//
-// //=============================================================================================================
-//
-// void FieldlineViewChassis::rightClickMenu(int chan, const QPoint& pos)
-// {
-// //    auto* menu = new QMenu();
-//
-// //    auto blink_on_chan = menu->addAction("Blink ON - " + QString::number(chan));
-// //    auto blink_on_chassis = menu->addAction("Blink ON - Whole Chassis");
-//
-// //    auto blink_off_chan = menu->addAction("Blink OFF -  " + QString::number(chan));
-// //    auto blink_off_chassis = menu->addAction("Blink OFF - Whole Chassis");
-//
-// //    connect(blink_on_chan, &QAction::triggered,[this, chan](){this->setBlinkState(chan, true);});
-// //    connect(blink_off_chan, &QAction::triggered,[this, chan](){this->setBlinkState(chan, false);});
-//
-// //    connect(blink_on_chassis, &QAction::triggered,[this, chan](){this->setBlinkState(true);});
-// //    connect(blink_off_chassis, &QAction::triggered,[this, chan](){this->setBlinkState(false);});
-//
-// //    menu->exec(pos);
-// } 
 
 }  // namespace FIELDLINEPLUGIN
 

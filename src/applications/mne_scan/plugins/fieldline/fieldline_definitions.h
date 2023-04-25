@@ -50,7 +50,7 @@ enum class FieldLineWaveType {
     WAVE_SINE = 2,
 };
 
-enum class FieldLineSensorStatusType {
+enum class FieldlineSensorStatusType {
     SENSOR_OFF = 0,
     SENSOR_RESTARTING = 1,
     SENSOR_RESTARTED = 2,

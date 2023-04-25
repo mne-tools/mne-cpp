@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     fieldline_view_chassis.h
+ * @file     fieldline_view_sensor.h
  * @author   Juan Garcia-Prieto <jgarciaprieto@mgh.harvard.edu>
  *           Gabriel Motta <gbmotta@mgh.harvard.edu>
  * @since    0.1.9
@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     FieldlineView class declaration.
+ * @brief     FieldlineView Sensor class declaration.
  *
  */
 
@@ -39,6 +39,7 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+#include "fieldline/fieldline_definitions.h"
 
 //=============================================================================================================
 // QT INCLUDES
@@ -58,10 +59,12 @@ namespace Ui {
 class uiFieldlineViewSensor;
 }
 
-
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
+
+class QGraphicsScene;
+class QGraphicsEllipseItem;
 
 namespace FIELDLINEPLUGIN {
 
@@ -76,13 +79,20 @@ class FieldlineViewSensor: public QWidget
  public:
     explicit FieldlineViewSensor(FieldlineViewChassis *parent, int index);
     ~FieldlineViewSensor();
+    void setState(FieldlineSensorStatusType state);
+    FieldlineSensorStatusType getState() const;
+
+ protected:
+    virtual void resizeEvent(QResizeEvent *event);
 
  private:
     FieldlineViewChassis *m_pFieldlineViewChassis;
-    Ui::uiFieldlineViewSensor* m_pUi; 
+    Ui::uiFieldlineViewSensor* m_pUi;
+    QGraphicsScene *m_pScene;
+    QGraphicsEllipseItem* m_pCircleLed;
+    FieldlineSensorStatusType m_state;
     int m_sensorIndex;
 };
-
 }  // namespace FIELDLINEPLUGIN
 
 #endif  //  FIELDLINEPLUGIN_FIELDLINEVIEWSENSOR_H
