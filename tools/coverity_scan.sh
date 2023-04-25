@@ -22,8 +22,8 @@ echo -e "Coverity working path: ${COV_WORKING_PATH}"
 COVERITY_SCAN_PROJECT_NAME="mne-tools/mne-cpp"
 COVERITY_SCAN_NOTIFICATION_EMAIL="mne_cpp@googlegroups.com"
 COVERITY_SCAN_BRANCH_PATTERN="main"
-COVERITY_SCAN_BUILD_COMMAND_PREPEND="cmake -B build -S src -DCMAKE_BUILD_TYPE=Release"
-COVERITY_SCAN_BUILD_COMMAND="cmake --build build"
+COVERITY_SCAN_BUILD_COMMAND_PREPEND="cmake -B ${BaseFolder}/build -S ${BaseFolder}/src -DCMAKE_BUILD_TYPE=Release"
+COVERITY_SCAN_BUILD_COMMAND="cmake --build ${BaseFolder}/build"
 COVERITY_SCAN_TOKEN=$1
 
 echo -e "Build commands: "
@@ -63,7 +63,7 @@ echo -e "Found tool directory: ${TOOL_DIR}"
 echo -e "\033[33;1mRunning Coverity Scan Analysis Tool...\033[0m"
 
 COV_BUILD_OPTIONS=""
-RESULTS_DIR="${COV_WORKING_PATH}/cov-int"
+RESULTS_DIR="cov-int"
 
 echo -e "Building..."
 eval "${COVERITY_SCAN_BUILD_COMMAND_PREPEND}"
@@ -73,7 +73,7 @@ cov-import-scm --dir $RESULTS_DIR --scm git --log $RESULTS_DIR/scm_log.txt 2>&1
 RESULTS_ARCHIVE='analysis-results.tgz'
 
 echo -e "Zipping results..."
-tar czf $RESULTS_ARCHIVE $RESULTS_DIR
+tar czf $RESULTS_ARCHIVE $RESULTS_DIR 
 echo -e "Zipping done."
 
 SHA=`git rev-parse --short HEAD`
