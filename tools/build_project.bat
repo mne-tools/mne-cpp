@@ -195,7 +195,7 @@
       ECHO.
       ECHO [help]  - Print this help.
       ECHO [mock]  - Show commands do not execute them.
-      ECHO [all]   - Build entire project (libraries, applicatiojs, examples, tests)
+      ECHO [all]   - Build entire project (libraries, applications, examples, tests).
       ECHO [clean] - Delete build and out folders for your configuration and exit.
       ECHO [Release*/Debug*] - Set the build type Debug/Release and name it.
       ECHO                     For example, Release_testA will build in release
@@ -379,7 +379,7 @@ doPrintHelp() {
   echo " "
   echo "[help]  - Print this help."
   echo "[mock]  - Show commands do not execute them."
-  echo "[all]   - Build entire project (libraries, applicatiojs, examples, tests)"
+  echo "[all]   - Build entire project (libraries, applications, examples, tests)."
   echo "[clean] - Delete build and out folders for your configuration and exit."
   echo "[Release*/Debug*] - Set the build type (Debug/Release) and name it."
   echo "                    For example, Release_testA will build in release"
