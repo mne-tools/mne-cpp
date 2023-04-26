@@ -138,13 +138,13 @@ bool SelectionIO::readMNESelFile(const std::string& path, std::multimap<std::str
             std::stringstream stream{line};
             std::vector<std::string> firstSplit;
             for (std::string element; std::getline(stream, line, ':');){
-                firstSplit.push_back(std::move(element));
+                firstSplit.push_back(element);
             }
             std::string key = firstSplit.at(0);
 
             std::vector<std::string> secondSplit;
             for (std::string element; std::getline(stream, line, '|');){
-                secondSplit.push_back(std::move(element));
+                secondSplit.push_back(element);
             }
             if(secondSplit.back() == ""){
                 secondSplit.pop_back();
