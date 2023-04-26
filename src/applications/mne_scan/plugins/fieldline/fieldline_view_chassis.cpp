@@ -81,26 +81,58 @@ FieldlineViewChassis::FieldlineViewChassis(FieldlineView *parent, int num )
   m_pFieldlineView(parent),
   m_pUi(new Ui::uiFieldlineViewChassis),
   chassisNum(num),
-  numSensors(16)
+  numSensors(16),
+  sensorLedUpdateFreq(150)
   {
     m_pUi->setupUi(this);
 
     std::string chassisName("Fieldline Chassis ");
     chassisName += std::to_string(chassisNum);
     m_pUi->chassisName->setText(QString::fromStdString(chassisName));
-    QHBoxLayout* sensorLayout = qobject_cast<QHBoxLayout*>(m_pUi->sensorFrame->layout());
+    createSensors();
+    chassisActive.store(true);
+    chassisRunning.store(true);
+    updateSensorLedThread = std::thread(&FieldlineViewChassis::updateSensorLeds, this);
+}
 
-    for (int i = 0; i < numSensors; i++) {
-        FieldlineViewSensor* pSensor = new FieldlineViewSensor(this, i);
-        sensorLayout->insertWidget(i, pSensor);
-        m_pSensors.push_back(pSensor);
+void FieldlineViewChassis::updateSensorLeds()
+{
+  while (chassisRunning.load()) {
+    while (chassisActive.load()) {
+      for (auto pSensor : m_pSensors) {
+        pSensor->updateLedState();
+      }
+      std::this_thread::sleep_for(sensorLedUpdateFreq);
     }
+  }
+}
+
+void FieldlineViewChassis::createSensors()
+{
+  QHBoxLayout* sensorLayout = qobject_cast<QHBoxLayout*>(m_pUi->sensorFrame->layout());
+  for (int i = 0; i < numSensors; i++) {
+    FieldlineViewSensor* pSensor = new FieldlineViewSensor(this, i);
+    sensorLayout->insertWidget(i, pSensor);
+    m_pSensors.push_back(pSensor);
+  }
 }
 
 FieldlineViewChassis::~FieldlineViewChassis()
 {
-    delete m_pUi;
+    // delete m_pUi;
+  chassisActive.store(false);
+  chassisRunning.store(false);
+  if (updateSensorLedThread.joinable()) {
+    updateSensorLedThread.join();
+  }
 }
+
+void FieldlineViewChassis::setActive()
+{
+  chassisActive.store(true);
+}
+
+
 
 }  // namespace FIELDLINEPLUGIN
 

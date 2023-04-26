@@ -39,6 +39,8 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
+#include <chrono>
 #include "fieldline/fieldline_definitions.h"
 
 //=============================================================================================================
@@ -81,17 +83,27 @@ class FieldlineViewSensor: public QWidget
     ~FieldlineViewSensor();
     void setState(FieldlineSensorStatusType state);
     FieldlineSensorStatusType getState() const;
+    void updateLedState();
 
  protected:
     virtual void resizeEvent(QResizeEvent *event);
 
  private:
+    void updateTimeStamp();
+    void switchLedState();
+
     FieldlineViewChassis *m_pFieldlineViewChassis;
-    Ui::uiFieldlineViewSensor* m_pUi;
-    QGraphicsScene *m_pScene;
-    QGraphicsEllipseItem* m_pCircleLed;
-    FieldlineSensorStatusType m_state;
     int m_sensorIndex;
+    FieldlineSensorStatusType m_sensorState;
+    std::chrono::time_point<std::chrono::steady_clock> timeStamp;
+    std::chrono::milliseconds ledChangePeriod;
+
+    enum class LedState { A, B };
+    LedState ledState;
+
+    Ui::uiFieldlineViewSensor *m_pUi;
+    QGraphicsScene *m_pScene;
+    QGraphicsEllipseItem *m_pCircleLed;
 };
 }  // namespace FIELDLINEPLUGIN
 

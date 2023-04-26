@@ -119,7 +119,7 @@ void FieldlineView::macIpTableDoubleClicked(int row, int col) {
         std::cout << "cell (" << row << "," << col << ") "
                   << " doubleclicked : " << m_pMacIpTable->item(row, col)->text().toStdString() << "\n";
         std::cout.flush();
-        auto callback = [this, row, col](const std::string str) {
+        auto callback = [this, row, col](const std::string& str) {
             std::cout << "inside callback! :" << str << " \n";
             m_pMacIpTable->item(row, col+1)->setText(str.c_str());
             m_pMacIpTable->repaint();
@@ -131,6 +131,12 @@ void FieldlineView::macIpTableDoubleClicked(int row, int col) {
 void FieldlineView::setNumRowsIpMacFrame(int numRows)
 {
     m_pMacIpTable->setRowCount(numRows);
+    QStringList vertLabels;
+    for ( int i = 0; i < numRows; i++ ) {
+        vertLabels.push_back(QString::number(i));
+    }
+    m_pMacIpTable->setVerticalHeaderLabels(vertLabels);
+
     if (numRows > 0) {
         m_pMacIpTable->setSortingEnabled(false);
         m_pMacIpTable->setItem(numRows-1, 0, new QTableWidgetItem("AF:70:04:21:2D:28"));

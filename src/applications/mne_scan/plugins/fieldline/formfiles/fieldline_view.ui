@@ -38,7 +38,7 @@
    <item>
     <widget class="QFrame" name="topMenuFrame">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -46,7 +46,7 @@
      <property name="minimumSize">
       <size>
        <width>600</width>
-       <height>100</height>
+       <height>120</height>
       </size>
      </property>
      <property name="maximumSize">

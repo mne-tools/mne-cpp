@@ -41,6 +41,9 @@
 //=============================================================================================================
 
 #include <vector>
+#include <thread>
+#include <mutex>
+#include <atomic>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -78,14 +81,20 @@ class FieldlineViewChassis : public QWidget
  public:
     explicit FieldlineViewChassis(FieldlineView *parent, int num);
     ~FieldlineViewChassis();
-
+    void setActive();
 
  private:
+    void createSensors();
+    void updateSensorLeds();
     FieldlineView *m_pFieldlineView;
     Ui::uiFieldlineViewChassis* m_pUi;
     std::vector<FieldlineViewSensor*> m_pSensors;
     int chassisNum;
     int numSensors;
+    std::chrono::milliseconds sensorLedUpdateFreq;
+    std::thread updateSensorLedThread;
+    std::atomic<bool> chassisActive;
+    std::atomic<bool> chassisRunning;
 };
 
 }  // namespace FIELDLINEPLUGIN

@@ -83,19 +83,21 @@ namespace FIELDLINEPLUGIN {
 FieldlineViewSensor::FieldlineViewSensor(FieldlineViewChassis *parent, int index)
 : QWidget(parent),
   m_pFieldlineViewChassis(parent),
+  m_sensorIndex(index),
+  m_sensorState(FieldlineSensorStatusType::SENSOR_OFF),
+  ledChangePeriod(600),
+  ledState(LedState::A),
   m_pUi(new Ui::uiFieldlineViewSensor),
-  m_sensorIndex(index)
+  m_pScene(new QGraphicsScene)
 {
+    updateTimeStamp();
     m_pUi->setupUi(this);
 
-
-    m_pScene = new QGraphicsScene();
     m_pUi->ledQGraphView->setStyleSheet("background:transparent");
     m_pUi->ledQGraphView->horizontalScrollBar()->hide();
     m_pUi->ledQGraphView->verticalScrollBar()->hide();
     m_pUi->label->setText(QString::number(index));
     m_pUi->ledQGraphView->setScene(m_pScene);
-    // m_pUi->ledQGraphView->fitInView(m_pScene, Qt::KeepAspectRatio);
 
     m_pCircleLed = m_pScene->addEllipse(0, 0, this->width()/3., this->width()/3.,
                                         QPen(Qt::black), QBrush(QColor(200, 1, 1)));
@@ -103,12 +105,11 @@ FieldlineViewSensor::FieldlineViewSensor(FieldlineViewChassis *parent, int index
 
 FieldlineViewSensor::~FieldlineViewSensor()
 {
-    delete m_pUi;
+    // delete m_pUi;
 }
 
 void FieldlineViewSensor::resizeEvent(QResizeEvent *event)
 {
-    // m_pUi->ledQGraphView->fitInView(, Qt::KeepAspectRatio);
     auto bounds = m_pScene->itemsBoundingRect();
     bounds.setWidth(bounds.width() * 1.2);
     bounds.setHeight(bounds.height() * 1.2);
@@ -118,13 +119,36 @@ void FieldlineViewSensor::resizeEvent(QResizeEvent *event)
     QWidget::resizeEvent(event);
 }
 
-
 void FieldlineViewSensor::setState(FieldlineSensorStatusType state) {
-    m_state = state;
+    m_sensorState = state;
+    updateTimeStamp();
 }
 
 FieldlineSensorStatusType FieldlineViewSensor::getState() const {
-    return m_state;
+    return m_sensorState;
+}
+
+void FieldlineViewSensor::updateTimeStamp()
+{
+    timeStamp = std::chrono::steady_clock::now();
+}
+
+void FieldlineViewSensor::updateLedState()
+{
+    std::chrono::time_point<std::chrono::steady_clock>  now = std::chrono::steady_clock::now();
+    std::chrono::milliseconds duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - timeStamp);
+    if (duration >= ledChangePeriod) {
+        switchLedState();
+    }
+}
+
+void FieldlineViewSensor::switchLedState() {
+    if (ledState == LedState::A) {
+        ledState = LedState::B;
+    } else {
+        ledState = LedState::B;
+    }
+    updateTimeStamp();
 }
 
 }  // namespace FIELDLINEPLUGIN
