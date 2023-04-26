@@ -322,7 +322,7 @@ void FiffRawViewDelegate::createEventsPath(const QModelIndex &index,
     auto events = t_pEventModel->getEventsToDisplay(iStart, iStart + data.size());
     if (!t_pEventModel->getShowSelected()){
         // Paint all events
-        for(auto event : *events){
+        for(const auto& event : *events){
             painter->setPen(QPen(t_pEventModel->getGroupColor(event.groupId), 1, Qt::SolidLine));
             int eventSample = event.sample;
             painter->drawLine(fInitX + static_cast<float>(eventSample - iStart) * dDx,
@@ -333,7 +333,7 @@ void FiffRawViewDelegate::createEventsPath(const QModelIndex &index,
     } else {
         // Paint selected events
         auto selection = t_pEventModel->getEventSelection();
-        for(auto item : selection){
+        for(const auto& item : selection){
             if (item < events->size()){
                 painter->setPen(QPen(t_pEventModel->getGroupColor(events->at(item).groupId), 1, Qt::SolidLine));
                 int eventSample = events->at(item).sample;

@@ -426,7 +426,7 @@ void EVENTSINTERNAL::EventSharedMemManager::processNewEvent(const EventUpdate& n
 void EVENTSINTERNAL::EventSharedMemManager::processDeleteEvent(const EventUpdate& ne)
 {
     auto eventsInSample = m_pEventManager->getEventsInSample(ne.getSample());
-    for(auto e: *eventsInSample)
+    for(auto& e: *eventsInSample)
     {
         if(e.groupId == m_GroupId)
         {
