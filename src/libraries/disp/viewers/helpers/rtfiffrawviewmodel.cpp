@@ -1383,18 +1383,7 @@ double RtFiffRawViewModel::getMaxValueFromRawViewModel(int row) const
 
 void RtFiffRawViewModel::addEvent(int iSample)
 {
-    auto pGroups = m_EventManager.getAllGroups();
-    for(auto g : *pGroups){
-        qDebug() << "Group: " << g.name.c_str() << "- Id: " << g.id;
-    }
-
     m_EventManager.addEvent(iSample);
-
-    auto pEvents = m_EventManager.getAllEvents();
-
-    for(auto e : *pEvents){
-        qDebug() << "Event> Sample: " << e.sample << "- Id: " << e.id;
-    }
 }
 
 //=============================================================================================================

@@ -450,7 +450,7 @@ bool EventModel::saveToFile(const QString& sPath)
 
     QTextStream out(bufferOut, QIODevice::ReadWrite);
     auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
-    for (auto event : *events){
+    for (const auto& event : *events){
         out << "  " << event.sample << "   " << QString::number(static_cast<float>(event.sample - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          0         1" << endl;
     }
 
@@ -471,7 +471,7 @@ bool EventModel::saveToFile(const QString& sPath)
 
     QTextStream out(&file);
     auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
-    for (auto event : *events){
+    for (const auto& event : *events){
         out << "  " << event.sample << "   " << QString::number(static_cast<float>(event.sample - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          0         1" << "\n";
 //        out << "  " << iEvent << "   " << QString::number(static_cast<float>(iEvent - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          1         0" << endl;
     }
@@ -711,7 +711,7 @@ void EventModel::updateSelectedGroups(const QList<QModelIndex> &indexList)
 {
     clearGroupSelection();
 
-    for(auto row : indexList){
+    for(const auto& row : indexList){
         addToSelectedGroups(row.data(Qt::UserRole).toInt());
     }
 
