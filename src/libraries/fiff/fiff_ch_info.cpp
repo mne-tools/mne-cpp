@@ -59,6 +59,8 @@ FiffChInfo::FiffChInfo()
 , unit(0)
 , unit_mul(0)
 , ch_name(QString(""))
+, coil_trans()
+, eeg_loc()
 , coord_frame(FIFFV_COORD_UNKNOWN)
 {
     coil_trans.setIdentity();
