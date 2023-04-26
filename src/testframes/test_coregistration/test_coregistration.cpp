@@ -173,7 +173,7 @@ void TestCoregistration::initTestCase()
     fiff_int_t iFrom = digSetSrc[0].coord_frame;
     fiff_int_t iTo = bemSurface.data()->coord_frame;
     transFitMatched = FiffCoordTrans::make(iFrom, iTo, matTrans);
-    transPerformICP = *new FiffCoordTrans(transFitMatched);
+    transPerformICP = FiffCoordTrans(transFitMatched);
 
     // Prepare Icp:
     VectorXf vecWeightsICP(digSetHsp.size()); // Weigths vector
