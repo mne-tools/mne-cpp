@@ -167,6 +167,8 @@ QWidget* Playback::setupWidget()
 {
     PlaybackSetupWidget* widget = new PlaybackSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
+    widget->setSourceFile(sourceFilePath);
+
     connect(widget, &PlaybackSetupWidget::newSourceFileSet,
             this, &Playback::setSourceFile, Qt::UniqueConnection);
 
