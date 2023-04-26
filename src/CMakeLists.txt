@@ -27,6 +27,13 @@ if(WITH_CODE_COV)
   add_link_options("--coverage")
 endif()
 
+option(NO_IPC "Build project with no interprocess communication features (shared memory)" OFF)
+
+if(NO_IPC)
+    add_compile_definitions(NO_IPC)
+endif()
+
+
 ##==============================================================================
 ## FFTW Options
 
