@@ -583,7 +583,7 @@ void MainWindow::createActions()
     m_pActionQuickControl->setStatusTip(tr("Show quick control widget"));
     connect(m_pActionQuickControl.data(), &QAction::triggered,
             m_pQuickControlView.data(), &QuickControlView::show);
-    m_pActionQuickControl->setVisible(true);
+    m_pActionQuickControl->setVisible(false);
 }
 
 //=============================================================================================================
