@@ -231,10 +231,10 @@ protected:
      */
     inline void addPluginAction(QAction* pAction);
 
-    InputConnectorList m_inputConnectors;      /**< Set of input connectors associated with this plug-in. */
-    OutputConnectorList m_outputConnectors;    /**< Set of output connectors associated with this plug-in. */
+    InputConnectorList m_inputConnectors;       /**< Set of input connectors associated with this plug-in. */
+    OutputConnectorList m_outputConnectors;     /**< Set of output connectors associated with this plug-in. */
 
-    bool m_bPluginControlWidgetsInit = false;  /**< Flag to indicate if the plugin control widgets were initialized already. */
+    bool m_bPluginControlWidgetsInit = false;   /**< Flag to indicate if the plugin control widgets were initialized already. */
 
 private:
     QList< QAction* >   m_qListPluginActions;  /**< List of plugin actions. */
