@@ -18,7 +18,7 @@ add_subdirectory(ftbuffer)
 add_subdirectory(babymeg)
 add_subdirectory(natus)
 if (UNIX)
-    add_subdirectory(fieldline)
+#    add_subdirectory(fieldline)
 endif()
 
 # Algorithm Plugin

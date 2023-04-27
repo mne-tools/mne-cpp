@@ -811,8 +811,10 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::AbstractP
                        lPlugins.at(i)->getName() == "GUSBAmp"||
                        lPlugins.at(i)->getName() == "LSL Adapter"||
                        lPlugins.at(i)->getName() == "TMSI"||
-                       lPlugins.at(i)->getName() == "BrainAMP" ||
-                       lPlugins.at(i)->getName() == "Fieldline OPM") {
+                       lPlugins.at(i)->getName() == "BrainAMP") {
+                       // lPlugins.at(i)->getName() == "Fieldline OPM") {
+                       // lPlugins.at(i)->getName() == "BrainAMP" ||
+                       // lPlugins.at(i)->getName() == "Fieldline OPM") {
                         pMultiViewWinow = m_pMultiView->addWidgetBottom(pWidget, sCurPluginName);
                     } else {
                         pMultiViewWinow = m_pMultiView->addWidgetTop(pWidget, sCurPluginName);
