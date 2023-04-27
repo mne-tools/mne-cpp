@@ -578,10 +578,8 @@ void MainWindow::createActions()
     connect(m_pActionStop.data(), &QAction::triggered,
             this, &MainWindow::stopMeasurement);
 
-    //  Display Toolbar
-    m_pActionQuickControl = new QAction(
-            QIcon(":/images/quickControl.png"),
-            tr("Show quick control widget"),this);
+    //Display Toolbar
+    m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"),tr("Show quick control widget"),this);
     m_pActionQuickControl->setStatusTip(tr("Show quick control widget"));
     connect(m_pActionQuickControl.data(), &QAction::triggered,
             m_pQuickControlView.data(), &QuickControlView::show);
