@@ -199,7 +199,7 @@ bool Fieldline::stop() {
 //=============================================================================================================
 
 SCSHAREDLIB::AbstractPlugin::PluginType Fieldline::getType() const {
-  qDebug() << "getType Fieldline";
+  // qDebug() << "getType Fieldline";
   return SCSHAREDLIB::AbstractPlugin::PluginType::_ISensor;
 }
 

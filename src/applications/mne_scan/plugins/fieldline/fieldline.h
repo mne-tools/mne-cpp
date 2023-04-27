@@ -84,6 +84,7 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "fieldline.json")
     Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
+
  public:
   //=========================================================================================================
   // The plugin interface
