@@ -579,7 +579,7 @@ void MainWindow::createActions()
             this, &MainWindow::stopMeasurement);
 
     //Display Toolbar
-    m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"),tr("Show quick control widget"),this);
+    m_pActionQuickControl = new QAction(QIcon(":/images/quickControl.png"), tr("Show quick control widget"),this);
     m_pActionQuickControl->setStatusTip(tr("Show quick control widget"));
     connect(m_pActionQuickControl.data(), &QAction::triggered,
             m_pQuickControlView.data(), &QuickControlView::show);
@@ -656,13 +656,12 @@ void MainWindow::createToolBars()
         m_pToolBar->addSeparator();
 
         m_pLabelTime = new QLabel(this);
-        m_pLabelTime->setStatusTip("Measurement time duration.");
-        m_pLabelTime->setText(QTime(0, 0).toString());
         m_pToolBar->addWidget(m_pLabelTime);
+        m_pLabelTime->setText(QTime(0, 0).toString());
     }
 
-    //  Plugin
-    if (!m_pDynamicPluginToolBar) {
+    //Plugin
+    if(!m_pDynamicPluginToolBar) {
         m_pDynamicPluginToolBar = addToolBar(tr("Plugin Control"));
     }
 
