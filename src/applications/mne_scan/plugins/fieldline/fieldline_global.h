@@ -40,6 +40,9 @@
 // INCLUDES
 //=============================================================================================================
 
+#include <string>
+#include <iostream>
+
 #include <utils/buildinfo.h>
 
 //=============================================================================================================
@@ -53,9 +56,9 @@
 //=============================================================================================================
 
 #if defined(SCAN_FIELDLINE_PLUGIN)
-#  define FIELDLINESHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#  define FIELDLINESHARED_EXPORT Q_DECL_EXPORT
 #else
-#  define FIELDLINESHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define FIELDLINESHARED_EXPORT Q_DECL_IMPORT
 #endif
 
 namespace FIELDLINEPLUGIN{
@@ -76,6 +79,12 @@ FIELDLINESHARED_EXPORT const char* buildHash();
 /**
  * Returns full build git hash.
  */
-FIELDLINESHARED_EXPORT const char* buildHashLong(); }  // namespace FIELDLINEPLUGIN
+FIELDLINESHARED_EXPORT const char* buildHashLong();
+
+void printLog(const std::string& str);
+
+}  // namespace FIELDLINEPLUGIN
+
+
 
 #endif  // FIELDLINE_GLOBAL_H

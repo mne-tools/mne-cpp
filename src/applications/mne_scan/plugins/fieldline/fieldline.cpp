@@ -129,16 +129,15 @@ namespace FIELDLINEPLUGIN {
 //=============================================================================================================
 
 Fieldline::Fieldline()
- : 
-  acqSystem(nullptr),
+: acqSystem(nullptr),
   guiWidget(nullptr)
 {
+  printLog("constructor fieldline plugin");
 }
 
 //=============================================================================================================
 
 Fieldline::~Fieldline() {
-  qDebug() << "Destroying Fieldline plugin.";
   if (this->isRunning()) {
     this->stop();
   }
@@ -156,21 +155,23 @@ QSharedPointer<SCSHAREDLIB::AbstractPlugin> Fieldline::clone() const
 
 void Fieldline::init()
 {
+  printLog("Fieldline init");
   // data infrastructure
-  m_pRTMSA = SCSHAREDLIB::PluginOutputData
-    <SCMEASLIB::RealTimeMultiSampleArray>::create(this, "Fieldline Plugin",
-                                                  "FieldlinePlguin output");
-  m_outputConnectors.append(m_pRTMSA);
+  // m_pRTMSA = SCSHAREDLIB::PluginOutputData
+  //   <SCMEASLIB::RealTimeMultiSampleArray>::create(this, "Fieldline Plugin",
+  //                                                 "FieldlinePlguin output");
+  // m_outputConnectors.append(m_pRTMSA);
 
-  acqSystem = new FieldlineAcqSystem(this);
-  guiWidget = new FieldlineView(this);
+  // acqSystem = new FieldlineAcqSystem(this);
+  // guiWidget = new FieldlineView(this);
 }
 
 //=============================================================================================================
 
 void Fieldline::unload() {
   qDebug() << "unload Fieldline";
-  delete acqSystem;
+  printLog("unload");
+  // delete acqSystem;
   // delete guiWidget;  // deleted by Qt
 }
 
@@ -179,6 +180,7 @@ void Fieldline::unload() {
 bool Fieldline::start()
 {
   qDebug() << "start Fieldline";
+  std::cout.flush();
 
   QThread::start();
 
@@ -190,7 +192,7 @@ bool Fieldline::start()
 bool Fieldline::stop() {
   requestInterruption();
   wait(500);
-
+  printLog("stop");
   return true;
 }
 
@@ -210,21 +212,22 @@ QString Fieldline::getName() const {
 //=============================================================================================================
 
 QWidget *Fieldline::setupWidget() {
-  return guiWidget;
-  // return new QLabel("hola!");
+  printLog("setupWidget");
+  // return guiWidget;
+  return new QLabel("hola!");
 }
 
 //=============================================================================================================
 
 void Fieldline::findIpAsync(const std::string mac,
                             std::function<void(const std::string)> callback) {
-  std::cout << "outside here! mac: " << mac << "               \n";
+  // std::cout << "outside here! mac: " << mac << "\n";
   std::thread ipFinder([=]{
     IPFINDER::IpFinder ipFinder;
     ipFinder.addMacAddress(mac);
-    std::cout << "here inside!\n";
-    std::cout << "mac: " << mac << "\n";
-    std::cout.flush();
+    // std::cout << "here inside!\n";
+    // std::cout << "mac: " << mac << "\n";
+    // std::cout.flush();
     ipFinder.findIps();
     if (ipFinder.macIpList.size() == 0) {
       std::cout.flush();
@@ -240,6 +243,7 @@ void Fieldline::findIpAsync(const std::string mac,
 
 void Fieldline::run() {
   qDebug() << "run Fieldline";
+  std::cout.flush();
 }
   // while (true) {
   //   if (QThread::isInterruptionRequested())
@@ -298,6 +302,7 @@ void Fieldline::run() {
 
 QString Fieldline::getBuildInfo() {
   qDebug() << "getBuildInfo Fieldline";
+  std::cout.flush();
   return QString(buildDateTime()) + QString(" - ") + QString(buildHash());
 }
 

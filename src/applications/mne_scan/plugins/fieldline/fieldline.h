@@ -73,7 +73,7 @@ namespace FIELDLINEPLUGIN {
 class FieldlineAcqSystem;
 class FieldlineView;
 
-//=============================================================================================================
+//============================================================================================================
 /**
  * The Fieldline class provides a MEG connector for receiving data from Fieldline box through its Python API.
  *
@@ -84,7 +84,6 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "scsharedlib/1.0" FILE "fieldline.json")
     Q_INTERFACES(SCSHAREDLIB::AbstractSensor)
-
  public:
   //=========================================================================================================
   // The plugin interface
