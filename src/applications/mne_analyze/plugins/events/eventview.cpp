@@ -268,7 +268,7 @@ void EventView::removeEvent()
 
     std::set<int> set;
 
-    for (auto index : indexList){
+    for (const auto& index : indexList){
         set.insert(index.row());
     }
 

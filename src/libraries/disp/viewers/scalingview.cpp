@@ -185,7 +185,7 @@ ScalingView::~ScalingView()
 
     delete m_pUi;
 
-    for(auto control : m_qMapScaleControls)
+    for(auto& control : m_qMapScaleControls)
     {
         delete control;
     }

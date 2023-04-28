@@ -350,7 +350,7 @@ bool EventManager::deleteEvents(const std::vector<idNum>& eventIds)
 bool EventManager::deleteEvents(std::unique_ptr<std::vector<Event> > eventIds)
 {
     bool status(eventIds->size());
-    for(auto e: *eventIds){
+    for(auto& e: *eventIds){
         status = status && deleteEvent(e.id);
     }
     return status;
