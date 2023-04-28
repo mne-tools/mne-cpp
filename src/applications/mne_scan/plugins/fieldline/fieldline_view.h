@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include <vector>
+#include <string>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -78,20 +79,25 @@ class FieldlineView : public QWidget
 {
     Q_OBJECT
 
- public:
+public:
     explicit FieldlineView(Fieldline* parent);
     ~FieldlineView();
+ signals:
+    void updateMacIpTable(int row, int col, const QString& str);
 
-private:
+ private:
     void initAcqSystem(int numChassis);
     void initTopMenu();
-    void disconnect();
-    void macIpTableDoubleClicked(int, int);
+
+    void updateMacIpTableItem(int row, int col, const QString& str);
 
     void initAcqSystemCallbacks();
     void initAcqSystemTopButtons();
     void setNumRowsIpMacFrame(int i);
 
+    void findIps();
+    void connectToAcqSys();
+    void disconnectFromAcqSys();
     void startAllSensors();
     void stopAllSensors();
     void autoTuneAllSensors();

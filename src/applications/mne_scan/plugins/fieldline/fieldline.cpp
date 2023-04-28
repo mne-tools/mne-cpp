@@ -129,8 +129,7 @@ namespace FIELDLINEPLUGIN {
 //=============================================================================================================
 
 Fieldline::Fieldline()
-: acqSystem(nullptr),
-  guiWidget(nullptr)
+: m_pAcqSystem(nullptr)
 {
   printLog("constructor fieldline plugin");
 }
@@ -162,44 +161,38 @@ void Fieldline::init()
   //                                                 "FieldlinePlguin output");
   // m_outputConnectors.append(m_pRTMSA);
 
-  // acqSystem = new FieldlineAcqSystem(this);
-  // guiWidget = new FieldlineView(this);
+  m_pAcqSystem = new FieldlineAcqSystem(this);
 }
 
 //=============================================================================================================
 
 void Fieldline::unload() {
-  qDebug() << "unload Fieldline";
   printLog("unload");
-  // delete acqSystem;
-  // delete guiWidget;  // deleted by Qt
+  delete m_pAcqSystem;
 }
 
 //=============================================================================================================
 
 bool Fieldline::start()
 {
-  qDebug() << "start Fieldline";
-  std::cout.flush();
-
+  printLog("start Fieldline");
   QThread::start();
-
   return true;
 }
 
 //=============================================================================================================
 
 bool Fieldline::stop() {
+  printLog("stop");
   requestInterruption();
   wait(500);
-  printLog("stop");
   return true;
 }
 
 //=============================================================================================================
 
 SCSHAREDLIB::AbstractPlugin::PluginType Fieldline::getType() const {
-  // qDebug() << "getType Fieldline";
+  printLog("getType Fieldline");
   return SCSHAREDLIB::AbstractPlugin::PluginType::_ISensor;
 }
 
@@ -212,38 +205,33 @@ QString Fieldline::getName() const {
 //=============================================================================================================
 
 QWidget *Fieldline::setupWidget() {
-  printLog("setupWidget");
-  // return guiWidget;
-  return new QLabel("hola!");
+  return new FieldlineView(this);
 }
 
 //=============================================================================================================
 
-void Fieldline::findIpAsync(const std::string mac,
-                            std::function<void(const std::string)> callback) {
-  // std::cout << "outside here! mac: " << mac << "\n";
-  std::thread ipFinder([=]{
-    IPFINDER::IpFinder ipFinder;
-    ipFinder.addMacAddress(mac);
-    // std::cout << "here inside!\n";
-    // std::cout << "mac: " << mac << "\n";
-    // std::cout.flush();
-    ipFinder.findIps();
-    if (ipFinder.macIpList.size() == 0) {
-      std::cout.flush();
-      callback(ipFinder.macIpList[0].ip);
-    } else {
-      callback(std::string("Mac address not valid."));
-    }
-  });
+void Fieldline::findIpAsync(std::vector<std::string>& macList,
+                            std::function<void(std::vector<std::string>&)> callback) {
+    std::thread ipFinder([macList, callback] {
+        IPFINDER::IpFinder ipFinder;
+        for (auto& mac : macList) {
+            ipFinder.addMacAddress(mac);
+        }
+        ipFinder.findIps();
+        std::vector<std::string> ipList;
+        ipList.reserve(ipFinder.macIpList.size());
+        for (int i = 0; i < ipFinder.macIpList.size(); i++ ) {
+            ipList.emplace_back(ipFinder.macIpList[i].ip);
+        }
+        callback(ipList);
+    });
   ipFinder.detach();
 }
 
 //=============================================================================================================
 
 void Fieldline::run() {
-  qDebug() << "run Fieldline";
-  std::cout.flush();
+  printLog("run Fieldline");
 }
   // while (true) {
   //   if (QThread::isInterruptionRequested())
@@ -295,14 +283,13 @@ void Fieldline::run() {
   // //         }
   // //     }
   // // }
-  // qDebug() << "run Fieldline finished";
+  // printLog("run Fieldline finished");
 // }
 
 //=============================================================================================================
 
 QString Fieldline::getBuildInfo() {
-  qDebug() << "getBuildInfo Fieldline";
-  std::cout.flush();
+  printLog("getBuildInfo Fieldline");
   return QString(buildDateTime()) + QString(" - ") + QString(buildHash());
 }
 

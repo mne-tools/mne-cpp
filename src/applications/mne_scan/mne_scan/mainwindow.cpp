@@ -801,20 +801,18 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::AbstractP
                     // Please note that the MultiView will take ownership of the MultiViewWindow which inherits from QWidget
                     MultiViewWindow* pMultiViewWinow = Q_NULLPTR;
 
-                    if(lPlugins.at(i)->getName() == "Filter" ||
-                       lPlugins.at(i)->getName() == "Fiff Simulator" ||
-                       lPlugins.at(i)->getName() == "FtBuffer" ||
-                       lPlugins.at(i)->getName() == "Natus" ||
-                       lPlugins.at(i)->getName() == "BabyMEG"||
-                       lPlugins.at(i)->getName() == "BrainFlow"||
-                       lPlugins.at(i)->getName() == "EEGoSports"||
-                       lPlugins.at(i)->getName() == "GUSBAmp"||
-                       lPlugins.at(i)->getName() == "LSL Adapter"||
-                       lPlugins.at(i)->getName() == "TMSI"||
-                       lPlugins.at(i)->getName() == "BrainAMP") {
-                       // lPlugins.at(i)->getName() == "Fieldline OPM") {
-                       // lPlugins.at(i)->getName() == "BrainAMP" ||
-                       // lPlugins.at(i)->getName() == "Fieldline OPM") {
+                    if (lPlugins.at(i)->getName() == "Filter" ||
+                        lPlugins.at(i)->getName() == "Fiff Simulator" ||
+                        lPlugins.at(i)->getName() == "FtBuffer" ||
+                        lPlugins.at(i)->getName() == "Natus" ||
+                        lPlugins.at(i)->getName() == "BabyMEG" ||
+                        lPlugins.at(i)->getName() == "BrainFlow" ||
+                        lPlugins.at(i)->getName() == "EEGoSports" ||
+                        lPlugins.at(i)->getName() == "GUSBAmp" ||
+                        lPlugins.at(i)->getName() == "LSL Adapter" ||
+                        lPlugins.at(i)->getName() == "TMSI" ||
+                        lPlugins.at(i)->getName() == "BrainAMP" ||
+                        lPlugins.at(i)->getName() == "Fieldline OPM") {
                         pMultiViewWinow = m_pMultiView->addWidgetBottom(pWidget, sCurPluginName);
                     } else {
                         pMultiViewWinow = m_pMultiView->addWidgetTop(pWidget, sCurPluginName);

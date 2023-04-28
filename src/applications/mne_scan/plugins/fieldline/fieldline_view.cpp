@@ -50,8 +50,6 @@
 #include <QHBoxLayout>
 #include <QHeaderView>
 #include <QTableWidget>
-#include <QLineEdit>
-#include <QDebug>
 #include <QStringList>
 
 #include <string>
@@ -83,6 +81,8 @@ FieldlineView::FieldlineView(Fieldline *parent)
     m_pUi->setupUi(this);
     initTopMenu();
     initAcqSystem(2);
+    connect(this, &FieldlineView::updateMacIpTable,
+            this, &FieldlineView::updateMacIpTableItem);
 }
 
 FieldlineView::~FieldlineView()
@@ -102,30 +102,39 @@ void FieldlineView::initTopMenu()
 
     m_pMacIpTable->setColumnCount(2);
     m_pMacIpTable->setHorizontalHeaderLabels(QStringList({"Mac", "IP"}));
+    m_pMacIpTable->horizontalHeader()->setSortIndicatorShown(false);
 
     QVBoxLayout* macIpTableLayout = qobject_cast<QVBoxLayout*>(m_pUi->ipMacFrame->layout());
     macIpTableLayout->insertWidget(0, m_pMacIpTable);
 
-    QObject::connect(m_pMacIpTable, QOverload<int, int>::of(&QTableWidget::cellDoubleClicked),
-                     this, &FieldlineView::macIpTableDoubleClicked);
+    // QObject::connect(m_pMacIpTable, QOverload<int, int>::of(&QTableWidget::cellDoubleClicked),
+    //                  this, &FieldlineView::macIpTableDoubleClicked);
     QObject::connect(m_pUi->numChassisSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
                      this, &FieldlineView::setNumRowsIpMacFrame);
+    QObject::connect(m_pUi->findIPsBtn, &QPushButton::clicked,
+                     this, &FieldlineView::findIps);
+    QObject::connect(m_pUi->connectBtn, &QPushButton::clicked,
+                     this, &FieldlineView::connectToAcqSys);
     QObject::connect(m_pUi->disconnectBtn, &QPushButton::clicked,
-                     this, &FieldlineView::disconnect);
+                     this, &FieldlineView::disconnectFromAcqSys);
 }
 
-void FieldlineView::macIpTableDoubleClicked(int row, int col) {
-    if ( col == 0 ) {
-        std::cout << "cell (" << row << "," << col << ") "
-                  << " doubleclicked : " << m_pMacIpTable->item(row, col)->text().toStdString() << "\n";
-        std::cout.flush();
-        auto callback = [this, row, col](const std::string& str) {
-            std::cout << "inside callback! :" << str << " \n";
-            m_pMacIpTable->item(row, col+1)->setText(str.c_str());
-            m_pMacIpTable->repaint();
-        };
-        m_pFieldlinePlugin->findIpAsync(m_pMacIpTable->item(row, col)->text().toStdString(), callback);
+void FieldlineView::findIps() {
+    std::vector<std::string> macList;
+    macList.reserve(m_pMacIpTable->rowCount());
+    for (int i = 0; i < m_pMacIpTable->rowCount(); i++) {
+       macList.emplace_back(m_pMacIpTable->item(i, 0)->text().toStdString());
     }
+    auto callback = [this](std::vector<std::string>& ipList) {
+        for (size_t i = 0; i < ipList.size(); i++ ) {
+            emit this->updateMacIpTable(i, 1, QString::fromStdString(ipList[i]));
+        }
+    };
+    m_pFieldlinePlugin->findIpAsync(macList, callback);
+}
+
+void FieldlineView::updateMacIpTableItem(int row, int col, const QString& str) {
+    m_pMacIpTable->item(row, col)->setText(str);
 }
 
 void FieldlineView::setNumRowsIpMacFrame(int numRows)
@@ -139,7 +148,7 @@ void FieldlineView::setNumRowsIpMacFrame(int numRows)
 
     if (numRows > 0) {
         m_pMacIpTable->setSortingEnabled(false);
-        m_pMacIpTable->setItem(numRows-1, 0, new QTableWidgetItem("AF:70:04:21:2D:28"));
+        m_pMacIpTable->setItem(numRows-1, 0, new QTableWidgetItem("a0:b1:c2:d3:e4:f5"));
         m_pMacIpTable->setItem(numRows-1, 1, new QTableWidgetItem("0.0.0.0"));
         m_pMacIpTable->item(numRows-1, 0)->setToolTip((QString("Doubleclick to find the IP.")));
         m_pMacIpTable->setSortingEnabled(true);
@@ -164,11 +173,12 @@ void FieldlineView::setNumRowsIpMacFrame(int numRows)
 //    }
 }
 
-void FieldlineView::disconnect()
-{
-    qDebug() << "Find chasssis!\n";
-    std::cout.flush();
+void FieldlineView::connectToAcqSys() {
+    printLog("connect!\n");
+}
 
+void FieldlineView::disconnectFromAcqSys() {
+    printLog("disconnect!\n");
     //generate list of mac addresses
     //call class finder.
     //    retrieve list of ips and set variable with it.
@@ -207,13 +217,10 @@ void FieldlineView::initAcqSystem(int numChassis)
 {
     // QHBoxLayout* acqSystemTopBtnMenuLayout = qobject_cast<QHBoxLayout*>(m_pUi->acqSystemTopButtonsFrame->layout());
     initAcqSystemTopButtons();
-    
     QVBoxLayout* acqSystemRackLayout = qobject_cast<QVBoxLayout*>(m_pUi->chassisRackFrame->layout());
-
-    for( int i = 0; i < numChassis; i++ ) {
+    for (int i = 0; i < numChassis; i++) {
         FieldlineViewChassis* pChassis = new FieldlineViewChassis(this, i);
         acqSystemRackLayout->insertWidget(i, pChassis);
-        //lkajdsflkasjdf
         m_pAcqSystem.push_back(pChassis);
     }
 }

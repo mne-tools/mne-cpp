@@ -41,16 +41,37 @@
 
 #include <string>
 #include <vector>
+#include <regex>
 
 namespace IPFINDER {
 
-struct MacIp {
+struct MacIp
+{
   MacIp(const std::string& mac_,
-        const std::string& ip_)
-  : mac(mac_), ip(ip_)
+        const std::string& ip_,
+        bool value)
+  : mac(mac_), ip(ip_), valid(value)
+  {};
+  MacIp()
+  : mac(""), ip(""), valid(false)
   {};
   std::string mac;
   std::string ip;
+  bool valid;
+};
+
+struct Defaults {
+  static const char regexIpStr[];
+  static const char regexMacStr[];
+  static const char tableFile[];
+  static const char pingCommand[];
+  static const char pingCommandOpts[];
+  static const char deleteFileCommand[];
+  static const int numRetriesMax;
+  static const char arpTableFilePrefix[];
+  static const char randomCharset[];
+  static const int randomStringLength;
+  static const char defaultIpStr[];
 };
 
 void printMacIpList(const std::vector<MacIp>& macIpList);
@@ -60,7 +81,7 @@ void sendPingsAroundNetwork();
 void systemCalltoFile(const std::string& call,
                       const std::string& filename);
 
-void delete_file(const std::string& filename);
+void deleteFile(const std::string& filename);
 
 class IpFinder {
  public:
@@ -70,6 +91,7 @@ class IpFinder {
   bool allIpsFound() const;
 
   std::vector<MacIp> macIpList;
+
  private:
   std::string generateRandomArpTableFileName();
   std::string arp_table_filename;
@@ -78,7 +100,7 @@ class IpFinder {
   int numRetries;
 };
 
-}  // namespace IpFinder
+}  // namespace IPFINDER
 
 
 

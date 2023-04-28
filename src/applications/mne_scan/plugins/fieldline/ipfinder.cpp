@@ -57,9 +57,17 @@
 
 namespace IPFINDER {
 
-const std::regex IP_REGEX("[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}");
-const char* default_table_file = "~/.ipfinder_171921";
-const int defaultNumRetriesMax = 3;
+const char Defaults::regexIpStr[] = "[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}";
+const char Defaults::regexMacStr[] = "[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}";
+const char Defaults::tableFile[] = ".ipfinder_171921";
+const char Defaults::pingCommand[] = "ping";
+const char Defaults::pingCommandOpts[] = " -c 1 -w 0.002";
+const char Defaults::deleteFileCommand[] = "rm -f";
+const int Defaults::numRetriesMax = 3;
+const char Defaults::arpTableFilePrefix[] = ".ipfinder_";
+const char Defaults::randomCharset[] = "abcdefghijklmpqrstuvwxyz0123456789";
+const int Defaults::randomStringLength = 8;
+const char Defaults::defaultIpStr[] = "0.0.0.0";
 
 void printMacIpList(const std::vector<MacIp>& macIpList) {
   for (const MacIp& macip_i : macIpList) {
@@ -70,14 +78,14 @@ void printMacIpList(const std::vector<MacIp>& macIpList) {
 }
 
 void sendPingsAroundNetwork() {
-  std::string appStr("ping");
-  std::string appFlags("-c 1 -w 0.002");
+  std::string appStr(Defaults::pingCommand);
+  std::string appFlags(Defaults::pingCommandOpts);
   std::vector<std::thread> threads;
   std::vector<Network> networks = getNetworksClassC();
 
   for (auto& netw_i : networks) {
     for (auto& hostIp : netw_i.hostIPs) {
-      std::string commandStr = appStr + " " + appFlags + " " + hostIp + " &>/dev/null";
+      std::string commandStr = appStr + appFlags + " " + hostIp + " &>/dev/null";
       threads.emplace_back([=]{std::system(commandStr.c_str());});
     }
   }
@@ -86,37 +94,30 @@ void sendPingsAroundNetwork() {
   }
 }
 
-void systemCalltoFile(const std::string& call, const std::string& filename) { 
+void systemCalltoFile(const std::string& call, const std::string& filename) {
   std::string callStr(call);
   callStr.append(" > ").append(filename);
   std::system(callStr.c_str());
 }
 
-void delete_file(const std::string& filename) {
-  std::string command("rm -f");
+void deleteFile(const std::string& filename) {
+  std::string command(Defaults::deleteFileCommand);
   std::system(command.append(" ").append(filename).c_str());
 }
 
 IpFinder::IpFinder()
-  : numRetriesMax(defaultNumRetriesMax),
+  : numRetriesMax(Defaults::numRetriesMax),
   numRetries(0)
-{  
+{
   arp_table_filename = generateRandomArpTableFileName();
 }
 
-//void IpFinder::addMacAddress(const std::string& mac) {
-//  std::smatch macParsed;
-//  if (std::regex_search(mac, macParsed, MAC_REGEX)) {
-//    macIpList.emplace_back(MacIp(macParsed[0],""));
-//  }
-//}
-
 std::string IpFinder::generateRandomArpTableFileName() {
-  std::string newFileName(".ipfinder_");
-  const std::string charset = "abcdefghijklmpqrstuvwxyz0123456789";
-  const int strLen(8);
+  std::string newFileName(Defaults::arpTableFilePrefix);
+  const std::string charset(Defaults::randomCharset);
+  const int strLen(Defaults::randomStringLength);
 
-  for(int i =0; i < strLen; i++) {
+  for (int i = 0; i < strLen; i++) {
     int index = rand() % charset.length();
     newFileName += charset[index];
   }
@@ -124,12 +125,12 @@ std::string IpFinder::generateRandomArpTableFileName() {
 }
 
 void IpFinder::addMacAddress(const std::string& mac) {
-  std::regex MAC_REGEX("[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}:[0-9a-fA-F]{2}");
+  std::regex macRegex(Defaults::regexMacStr);
   std::smatch macParsed;
-  auto bla = std::regex_search(mac, macParsed, MAC_REGEX);
-  if (bla) {
+  auto validMac = std::regex_search(mac, macParsed, macRegex);
+  if (validMac) {
     if (macParsed.size() > 0) {
-      macIpList.emplace_back(MacIp(macParsed[0],"0.0.0.0"));
+      macIpList.emplace_back(MacIp(macParsed[0], "0.0.0.0", false));
     } else {
       std::cerr << "Error: no matches found for MAC address " << mac << std::endl;
     }
@@ -154,7 +155,8 @@ void IpFinder::findIpsInARPTable() {
     std::cout << "Error: Unable to open arp file table.\n";
     std::cout.flush();
     return;
-  } 
+  }
+
   std::string line;
   for (MacIp& macip_i : macIpList) {
     while (std::getline(fp, line)) {
@@ -162,24 +164,26 @@ void IpFinder::findIpsInARPTable() {
       std::regex mac_i(macip_i.mac);
       if (std::regex_search(line, mac_found, mac_i)) {
         std::smatch ip_found;
-        if (std::regex_search(line, ip_found, IP_REGEX)) {
+        std::regex regexIP(Defaults::regexIpStr);
+        if (std::regex_search(line, ip_found, regexIP)) {
           macip_i.ip = ip_found[0];
+          macip_i.valid = true;
         }
       }
     }
   }
   fp.close();
-  delete_file(arp_table_filename);
+  deleteFile(arp_table_filename);
 }
 
 bool IpFinder::allIpsFound() const {
-  for (const MacIp& macip_i: macIpList) {
-    if (macip_i.ip.empty()) {
+  for (const MacIp& macip_i : macIpList) {
+    if (macip_i.valid) {
       return false;
     }
   }
   return true;
 }
 
-}  // namepsace IPFINDER
+}  // namespace IPFINDER
 
