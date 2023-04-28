@@ -606,9 +606,9 @@ void EventManager::stopSharedMemory()
 
 bool EventManager::isSharedMemoryInit()
 {
-    #ifndef NO_IPC
+#ifndef NO_IPC
     return m_pSharedMemManager->isInit();
-    #endif
+#endif
     return 0;
 }
 
