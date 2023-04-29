@@ -34,15 +34,6 @@
  */
 
 //=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "fieldline/fieldline.h"
-#include "fieldline/fieldline_view.h"
-#include "fieldline/fieldline_view_chassis.h"
-#include "formfiles/ui_fieldline_view.h"
-
-//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -60,8 +51,13 @@
 //=============================================================================================================
 
 //=============================================================================================================
-// USED NAMESPACES
+// INCLUDES
 //=============================================================================================================
+
+#include "fieldline/fieldline.h"
+#include "fieldline/fieldline_view.h"
+#include "fieldline/fieldline_view_chassis.h"
+#include "formfiles/ui_fieldline_view.h"
 
 //=============================================================================================================
 // DEFINE STATIC METHODS
@@ -107,8 +103,6 @@ void FieldlineView::initTopMenu()
     QVBoxLayout* macIpTableLayout = qobject_cast<QVBoxLayout*>(m_pUi->ipMacFrame->layout());
     macIpTableLayout->insertWidget(0, m_pMacIpTable);
 
-    // QObject::connect(m_pMacIpTable, QOverload<int, int>::of(&QTableWidget::cellDoubleClicked),
-    //                  this, &FieldlineView::macIpTableDoubleClicked);
     QObject::connect(m_pUi->numChassisSpinBox, QOverload<int>::of(&QSpinBox::valueChanged),
                      this, &FieldlineView::setNumRowsIpMacFrame);
     QObject::connect(m_pUi->findIPsBtn, &QPushButton::clicked,
@@ -126,7 +120,7 @@ void FieldlineView::findIps() {
        macList.emplace_back(m_pMacIpTable->item(i, 0)->text().toStdString());
     }
     auto callback = [this](std::vector<std::string>& ipList) {
-        for (size_t i = 0; i < ipList.size(); i++ ) {
+        for (size_t i = 0; i < ipList.size(); i++) {
             emit this->updateMacIpTable(i, 1, QString::fromStdString(ipList[i]));
         }
     };
