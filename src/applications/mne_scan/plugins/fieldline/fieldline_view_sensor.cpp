@@ -113,7 +113,6 @@ void FieldlineViewSensor::resizeEvent(QResizeEvent *event)
     auto bounds = m_pScene->itemsBoundingRect();
     bounds.setWidth(bounds.width() * 1.2);
     bounds.setHeight(bounds.height() * 1.2);
-    std::cout << "Resize: " << bounds.width() << " , " << bounds.height() << "\n"; std::cout.flush();
     m_pUi->ledQGraphView->fitInView(bounds, Qt::KeepAspectRatio);
 
     QWidget::resizeEvent(event);

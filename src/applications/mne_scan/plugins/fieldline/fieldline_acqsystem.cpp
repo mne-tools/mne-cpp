@@ -106,10 +106,7 @@
 //  return PyModule_Create(&my_module_def);
 //}
 
-// using FIELDLINEPLUGIN;
-// using FIELDLINEPLUGIN::FieldlineAcqSystem;
 namespace FIELDLINEPLUGIN {
-// using FIELDLINEPLUGIN::Fieldline;
 
 const std::string resourcesPath(QCoreApplication::applicationDirPath().toStdString() + "/../resources/mne_scan/plugins/fieldline/");
 const std::string entryFile(resourcesPath + "main.py");
@@ -117,20 +114,19 @@ const std::string entryFile(resourcesPath + "main.py");
 FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
 : m_pControllerParent(parent)
 {
+  Py_Initialize();
   preConfigurePython();
   runPythonFile(entryFile.c_str(), "main.py");
-  // std::cout << "addr: " << m_pControllerParent << "\n";
 }
 
 FieldlineAcqSystem::~FieldlineAcqSystem()
 {
-  qDebug() << "About to finalize python";
+  printLog("About to finalize python");
   Py_Finalize();
 }
 
 void FieldlineAcqSystem::preConfigurePython() const
 {
-  Py_Initialize();
   PyObject* sys = PyImport_ImportModule("sys");
   PyObject* versionInfo = PyObject_GetAttrString(sys, "version_info");
   PyObject* versionInfoMajor = PyObject_GetAttrString(versionInfo, "major");
@@ -152,18 +148,12 @@ void FieldlineAcqSystem::preConfigurePython() const
 
 void FieldlineAcqSystem::runPythonFile(const char* file, const char* comment) const 
 {
-  std::cout << "we're up here!\n";
-  std::cout.flush();
   FILE *py_file = fopen(file, "r");
   if (py_file) 
   {
-    std::cout << "we're here!\n";
-    std::cout.flush();
     PyObject* global_dict = PyDict_New();
     PyObject* local_dict = PyDict_New();
     PyObject* result = PyRun_File(py_file, comment, Py_file_input, global_dict, local_dict);
-    std::cout << "we're down here!\n";
-    std::cout.flush();
     Py_DECREF(global_dict);
     Py_DECREF(local_dict);
     Py_DECREF(result);
