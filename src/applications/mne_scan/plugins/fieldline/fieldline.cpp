@@ -43,6 +43,7 @@
 //=============================================================================================================
 #include <string>
 #include <vector>
+#include <thread>
 
 #include "fieldline/fieldline.h"
 #include "fieldline/fieldline_acqsystem.h"

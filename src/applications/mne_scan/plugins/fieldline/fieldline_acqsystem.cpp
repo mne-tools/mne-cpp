@@ -43,6 +43,8 @@
 #include <iomanip>
 #include <string>
 #include <iostream>
+#include <thread>
+#include <chrono>
 
 #include <QCoreApplication>
 
@@ -112,24 +114,115 @@ const std::string resourcesPath(QCoreApplication::applicationDirPath().toStdStri
                                 "/../resources/mne_scan/plugins/fieldline/");
 const std::string entryFile(resourcesPath + "main.py");
 
+
+void callback1() {
+  printLog("This is callback1.");
+
+}
+
+static PyObject* callback1_py(PyObject* self, PyObject* args) {
+  callback1();
+  return Py_None;
+}
+
+static struct PyMethodDef callbacksMethods[] = {
+  {"callback1", callback1_py, METH_VARARGS, "Call to callback1"},
+  {NULL, NULL, 0, NULL}
+};
+
+static PyModuleDef CallModule = {
+  PyModuleDef_HEAD_INIT, "calls", NULL, -1, callbacksMethods,
+  NULL, NULL, NULL, NULL
+};
+
+static PyObject* PyInit_calls(void) {
+  return PyModule_Create(&CallModule);
+}
+
+
+
+
+
+
+
+
+
+
 FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
 : m_pControllerParent(parent)
 {
-  Py_InitializeEx(0);
-  PyEval_InitThreads();
+  Py_Initialize();
 
   preConfigurePython();
   //  runPythonFile(entryFile.c_str(), "main.py");
-  // loadPythonModule("callback");
+  m_pCallbackModule = (void*)loadPythonModule("callback");
+
+  if (Py_IsInitialized()) {
+    PyImport_AddModule("calls");
+    PyObject* pyModule = PyInit_calls();
+    PyObject* sys_modules = PyImport_GetModuleDict();
+    PyDict_SetItemString(sys_modules, "calls", pyModule);
+    Py_DECREF(pyModule);
+  }
+
+  m_pCallsModule = (void*)loadPythonModule("calls");
+
+  m_pThreadState = (void*)PyEval_SaveThread();
 }
 
 FieldlineAcqSystem::~FieldlineAcqSystem()
 {
+  PyEval_RestoreThread((PyThreadState*)m_pThreadState);
   printLog("About to finalize python");
+  Py_DECREF(m_pCallbackModule);
+  Py_DECREF(m_pCallsModule);
   Py_Finalize();
 }
 
-void FieldlineAcqSystem::loadPythonModule(const char* moduleName)
+void FieldlineAcqSystem::setCallback() 
+{
+
+  PyGILState_STATE gstate;
+  gstate = PyGILState_Ensure();
+
+  PyObject *pSetCallbackFunc = NULL;
+  PyObject *pCallback1 = NULL;
+  PyObject *pArgs = NULL;
+  PyObject *pResult = NULL; 
+
+  // Get a reference to the function
+  pSetCallbackFunc = PyObject_GetAttrString((PyObject*)m_pCallbackModule, "set_callback");
+  if (pSetCallbackFunc == NULL) {
+    printLog(std::string("Error finding function: ").append("set_callback").c_str());
+    PyErr_Print();
+  }
+
+  printLog("I'm here!!!!!");
+  pCallback1 = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callback1");
+  if (pCallback1 && PyCallable_Check(pCallback1)) {
+    pArgs = PyTuple_New(1);
+    PyTuple_SetItem(pArgs, 0, pCallback1);
+  }
+  else {
+    if (PyErr_Occurred())
+      PyErr_Print();
+    printLog(std::string("Cannot find function callback1 in calls module."));
+  }
+  // Call the set_callback function
+  pResult = PyObject_CallObject(pSetCallbackFunc, pArgs);
+  if (pResult == NULL) {
+    printLog(std::string("Error calling function: ").append("set_callback").c_str());
+    PyErr_Print();
+  }
+  Py_XDECREF(pSetCallbackFunc);
+  Py_XDECREF(pCallback1);
+  Py_XDECREF(pArgs);
+  Py_XDECREF(pResult);
+
+  PyGILState_Release(gstate);
+}
+
+void* FieldlineAcqSystem::loadPythonModule(const char* moduleName)
 {
   // Import the callback_module Python module
   PyObject* pModule = PyImport_ImportModule(moduleName);
@@ -137,29 +230,41 @@ void FieldlineAcqSystem::loadPythonModule(const char* moduleName)
     printLog(std::string("Error importing: ").append(moduleName).c_str());
     PyErr_Print();
   }
+  return (void*)pModule;
 }
 
-void FieldlineAcqSystem::callFunction(const char* moduleName, const char* funcName)
+
+void FieldlineAcqSystem::callFunctionAsync(const char* moduleName, const char* funcName)
 {
-  if (!Py_IsInitialized()) {
-    Py_Initialize();
-  }
-  // Py_BEGIN_ALLOW_THREADS
+    printLog("Right before spawning threads!");
+    auto lambda = [this, moduleName, funcName]() {
+       printLog("in the thread!");
+       printLog(std::string("Module name: ").append(moduleName));
+       printLog(std::string("Func name: ").append(funcName));
+       this->callFunction(moduleName, funcName);
+    };
+    std::thread t(lambda);
+    t.detach();
+}
+
+void FieldlineAcqSystem::callFunction(const std::string moduleName, const std::string funcName)
+{
   PyGILState_STATE gstate;
   gstate = PyGILState_Ensure();
 
-  PyObject* pModule = PyImport_ImportModule(moduleName);
-  if (pModule == NULL) {
-    printLog(std::string("Error importing module: ").append(funcName));
-    PyErr_Print();
-  }
+  // PyObject* pModule = PyImport_ImportModule(moduleName.c_str());
+  // PyObject* pModule = PyImport_GetModule(PyUnicode_FromString(moduleName.c_str()));
+  // if (pModule == NULL) {
+  //   printLog(std::string("Error importing module: ").append(moduleName).c_str());
+  //   PyErr_Print();
+  // }
 
   // Get a reference to the start function
-  PyObject* pStartFunc = PyObject_GetAttrString(pModule, funcName);
+  PyObject* pStartFunc = PyObject_GetAttrString((PyObject*)m_pCallbackModule, funcName.c_str());
   if (pStartFunc == NULL) {
     printLog(std::string("Error finding function: ").append(funcName).c_str());
     PyErr_Print();
-    Py_DECREF(pModule);
+    // Py_DECREF(pModule);
   }
 
   // Call the start function
@@ -167,20 +272,16 @@ void FieldlineAcqSystem::callFunction(const char* moduleName, const char* funcNa
   if (pResult == NULL) {
     printLog(std::string("Error calling function: ").append(funcName).c_str());
     PyErr_Print();
-    Py_DECREF(pModule);
+    // Py_DECREF(pModule);
     Py_DECREF(pStartFunc);
   }
 
-  Py_DECREF(pModule);
+  // Py_DECREF(pModule);
   Py_DECREF(pStartFunc);
   Py_DECREF(pResult);
 
   PyGILState_Release(gstate);
-  if (Py_IsInitialized()) {
-      Py_Finalize();  // Py_END_ALLOW_THREADS
-  }
 }
-
 
 void FieldlineAcqSystem::preConfigurePython() const
 {

@@ -35,11 +35,11 @@
 #ifndef FIELDLINEPLUGIN_FIELDLINEACQSYSTEM_H
 #define FIELDLINEPLUGIN_FIELDLINEACQSYSTEM_H
 
+#include <string>
+
 #include "fieldline/fieldline.h"
 
 namespace FIELDLINEPLUGIN {
-
-// class Fieldline;
 
 class FieldlineAcqSystem {
  public:
@@ -47,14 +47,21 @@ class FieldlineAcqSystem {
 
     ~FieldlineAcqSystem();
 
-    void callFunction(const char* moduleName, const char* funcName);
+    void callFunctionAsync(const char* moduleName, const char* funcName);
+
+    void callFunction(const std::string moduleName, const std::string funcName);
+
+    void setCallback();
 
  private:
     void preConfigurePython() const;
     void runPythonFile(const char* file, const char* comment) const;
-    void loadPythonModule(const char* moduleName);
+    void* loadPythonModule(const char* moduleName);
 
     Fieldline* m_pControllerParent;
+    void* m_pThreadState;
+    void* m_pCallbackModule;
+    void* m_pCallsModule;
 };
 
 }  // namespace FIELDLINEPLUGIN

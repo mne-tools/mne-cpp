@@ -193,7 +193,7 @@ void FieldlineView::initAcqSystemTopButtons()
 
     button = new QPushButton(QString("Auto-Tune"), m_pUi->acqSystemTopButtonsFrame);
     QObject::connect(button, &QPushButton::clicked, this, &FieldlineView::autoTuneAllSensors);
-    acqSystemTopBtnMenuLayout->insertWidget(3, button);
+    acqSystemTopBtnMenuLayout->insertWidget(3, button);  // after the spacer
 
     button = new QPushButton(QString("Restart Sensors"), m_pUi->acqSystemTopButtonsFrame);
     QObject::connect(button, &QPushButton::clicked, this, &FieldlineView::restartAllSensors);
@@ -233,16 +233,17 @@ void FieldlineView::initAcqSystem(int numChassis)
 
 void FieldlineView::startAllSensors() {
     printLog("startAllSensors");
-    m_pFieldlinePlugin->m_pAcqSystem->callFunction("callback", "start");
+    m_pFieldlinePlugin->m_pAcqSystem->callFunctionAsync("callback", "start");
 }
 
 void FieldlineView::stopAllSensors() {
     printLog("stopAllSensors");
-    m_pFieldlinePlugin->m_pAcqSystem->callFunction("callback", "stop");
+    m_pFieldlinePlugin->m_pAcqSystem->callFunctionAsync("callback", "stop");
 }
 
 void FieldlineView::autoTuneAllSensors() {
     printLog("autoTuneAllSensors");
+    m_pFieldlinePlugin->m_pAcqSystem->setCallback();
 }
 
 void FieldlineView::restartAllSensors() {
