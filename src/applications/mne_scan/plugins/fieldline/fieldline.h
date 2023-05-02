@@ -113,10 +113,11 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor
 
   void findIpAsync(std::vector<std::string>& macList,
                    std::function<void(std::vector<std::string>&)> callback);
+  FieldlineAcqSystem* m_pAcqSystem;
+
  protected:
   virtual void run();
 
-  FieldlineAcqSystem* m_pAcqSystem;
 
   QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRTMSA;     /**< The RealTimeSampleArray to provide the EEG data.*/
   QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff measurement info.*/

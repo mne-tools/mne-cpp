@@ -47,11 +47,14 @@ class FieldlineAcqSystem {
 
     ~FieldlineAcqSystem();
 
- private:
-     void preConfigurePython() const;
-     void runPythonFile(const char* file, const char* comment) const;
+    void callFunction(const char* moduleName, const char* funcName);
 
-     Fieldline* m_pControllerParent;
+ private:
+    void preConfigurePython() const;
+    void runPythonFile(const char* file, const char* comment) const;
+    void loadPythonModule(const char* moduleName);
+
+    Fieldline* m_pControllerParent;
 };
 
 }  // namespace FIELDLINEPLUGIN

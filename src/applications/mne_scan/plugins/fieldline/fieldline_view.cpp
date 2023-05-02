@@ -57,6 +57,7 @@
 #include "fieldline/fieldline.h"
 #include "fieldline/fieldline_view.h"
 #include "fieldline/fieldline_view_chassis.h"
+#include "fieldline/fieldline_acqsystem.h"
 #include "formfiles/ui_fieldline_view.h"
 
 //=============================================================================================================
@@ -231,33 +232,29 @@ void FieldlineView::initAcqSystem(int numChassis)
 // }
 
 void FieldlineView::startAllSensors() {
-    std::cout << "startAllSensors" << "\n";
-    std::cout.flush();
+    printLog("startAllSensors");
+    m_pFieldlinePlugin->m_pAcqSystem->callFunction("callback", "start");
 }
 
 void FieldlineView::stopAllSensors() {
-    std::cout << "stopAllSensors" << "\n";
-    std::cout.flush();
+    printLog("stopAllSensors");
+    m_pFieldlinePlugin->m_pAcqSystem->callFunction("callback", "stop");
 }
 
 void FieldlineView::autoTuneAllSensors() {
-    std::cout << "autoTuneAllSensors" << "\n";
-    std::cout.flush();
+    printLog("autoTuneAllSensors");
 }
 
 void FieldlineView::restartAllSensors() {
-    std::cout << "restartAllSensors" << "\n";
-    std::cout.flush();
+    printLog("restartAllSensors");
 }
 
 void FieldlineView::coarseZeroAllSensors() {
-    std::cout << "coarseZeroAllSensors" << "\n";
-    std::cout.flush();
+    printLog("coarseZeroAllSensors");
 }
 
 void FieldlineView::fineZeroAllSensors() {
-    std::cout << "fineZeroAllSensors" << "\n";
-    std::cout.flush();
+    printLog("fineZeroAllSensors");
 }
 
 

@@ -108,15 +108,19 @@
 
 namespace FIELDLINEPLUGIN {
 
-const std::string resourcesPath(QCoreApplication::applicationDirPath().toStdString() + "/../resources/mne_scan/plugins/fieldline/");
+const std::string resourcesPath(QCoreApplication::applicationDirPath().toStdString() +
+                                "/../resources/mne_scan/plugins/fieldline/");
 const std::string entryFile(resourcesPath + "main.py");
 
 FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
 : m_pControllerParent(parent)
 {
-  Py_Initialize();
+  Py_InitializeEx(0);
+  PyEval_InitThreads();
+
   preConfigurePython();
-  runPythonFile(entryFile.c_str(), "main.py");
+  //  runPythonFile(entryFile.c_str(), "main.py");
+  // loadPythonModule("callback");
 }
 
 FieldlineAcqSystem::~FieldlineAcqSystem()
@@ -124,6 +128,59 @@ FieldlineAcqSystem::~FieldlineAcqSystem()
   printLog("About to finalize python");
   Py_Finalize();
 }
+
+void FieldlineAcqSystem::loadPythonModule(const char* moduleName)
+{
+  // Import the callback_module Python module
+  PyObject* pModule = PyImport_ImportModule(moduleName);
+  if (pModule == NULL) {
+    printLog(std::string("Error importing: ").append(moduleName).c_str());
+    PyErr_Print();
+  }
+}
+
+void FieldlineAcqSystem::callFunction(const char* moduleName, const char* funcName)
+{
+  if (!Py_IsInitialized()) {
+    Py_Initialize();
+  }
+  // Py_BEGIN_ALLOW_THREADS
+  PyGILState_STATE gstate;
+  gstate = PyGILState_Ensure();
+
+  PyObject* pModule = PyImport_ImportModule(moduleName);
+  if (pModule == NULL) {
+    printLog(std::string("Error importing module: ").append(funcName));
+    PyErr_Print();
+  }
+
+  // Get a reference to the start function
+  PyObject* pStartFunc = PyObject_GetAttrString(pModule, funcName);
+  if (pStartFunc == NULL) {
+    printLog(std::string("Error finding function: ").append(funcName).c_str());
+    PyErr_Print();
+    Py_DECREF(pModule);
+  }
+
+  // Call the start function
+  PyObject* pResult = PyObject_CallObject(pStartFunc, NULL);
+  if (pResult == NULL) {
+    printLog(std::string("Error calling function: ").append(funcName).c_str());
+    PyErr_Print();
+    Py_DECREF(pModule);
+    Py_DECREF(pStartFunc);
+  }
+
+  Py_DECREF(pModule);
+  Py_DECREF(pStartFunc);
+  Py_DECREF(pResult);
+
+  PyGILState_Release(gstate);
+  if (Py_IsInitialized()) {
+      Py_Finalize();  // Py_END_ALLOW_THREADS
+  }
+}
+
 
 void FieldlineAcqSystem::preConfigurePython() const
 {
@@ -138,18 +195,18 @@ void FieldlineAcqSystem::preConfigurePython() const
   Py_DECREF(versionInfo);
 
   PyObject* path = PyObject_GetAttrString(sys, "path");
+  PyList_Insert(path, 0, PyUnicode_FromString(resourcesPath.c_str()));
+  Py_DECREF(sys);
 
   const std::string pathVenvMods(resourcesPath + "venv/lib/python" + pythonVer + "/site-packages/");
-  PyList_Insert(path, 0, PyUnicode_FromString(resourcesPath.c_str()));
   PyList_Insert(path, 1, PyUnicode_FromString(pathVenvMods.c_str()));
-  Py_DECREF(sys);
   Py_DECREF(path);
 }
 
-void FieldlineAcqSystem::runPythonFile(const char* file, const char* comment) const 
+void FieldlineAcqSystem::runPythonFile(const char* file, const char* comment) const
 {
   FILE *py_file = fopen(file, "r");
-  if (py_file) 
+  if (py_file)
   {
     PyObject* global_dict = PyDict_New();
     PyObject* local_dict = PyDict_New();

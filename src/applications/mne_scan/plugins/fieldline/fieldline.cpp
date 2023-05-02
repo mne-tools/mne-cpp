@@ -42,6 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 #include <string>
+#include <vector>
 
 #include "fieldline/fieldline.h"
 #include "fieldline/fieldline_acqsystem.h"
@@ -220,7 +221,7 @@ void Fieldline::findIpAsync(std::vector<std::string>& macList,
         ipFinder.findIps();
         std::vector<std::string> ipList;
         ipList.reserve(ipFinder.macIpList.size());
-        for (int i = 0; i < ipFinder.macIpList.size(); i++ ) {
+        for (size_t i = 0; i < ipFinder.macIpList.size(); i++) {
             ipList.emplace_back(ipFinder.macIpList[i].ip);
         }
         callback(ipList);
