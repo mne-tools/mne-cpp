@@ -56,7 +56,8 @@ class FieldlineAcqSystem {
  private:
     void preConfigurePython() const;
     void runPythonFile(const char* file, const char* comment) const;
-    void* loadPythonModule(const char* moduleName);
+    void* loadModule(const char* moduleName);
+    void* loadCModule(const char* moduleName, void* (*moduleInitFunc)(void));
 
     Fieldline* m_pControllerParent;
     void* m_pThreadState;

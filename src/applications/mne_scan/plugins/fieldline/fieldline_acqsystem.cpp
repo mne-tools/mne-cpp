@@ -117,7 +117,6 @@ const std::string entryFile(resourcesPath + "main.py");
 
 void callback1() {
   printLog("This is callback1.");
-
 }
 
 static PyObject* callback1_py(PyObject* self, PyObject* args) {
@@ -139,41 +138,23 @@ static PyObject* PyInit_calls(void) {
   return PyModule_Create(&CallModule);
 }
 
-
-
-
-
-
-
-
-
-
 FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
 : m_pControllerParent(parent)
 {
   Py_Initialize();
 
   preConfigurePython();
-  //  runPythonFile(entryFile.c_str(), "main.py");
-  m_pCallbackModule = (void*)loadPythonModule("callback");
 
-  if (Py_IsInitialized()) {
-    PyImport_AddModule("calls");
-    PyObject* pyModule = PyInit_calls();
-    PyObject* sys_modules = PyImport_GetModuleDict();
-    PyDict_SetItemString(sys_modules, "calls", pyModule);
-    Py_DECREF(pyModule);
-  }
+  m_pCallbackModule = loadModule("callback");
 
-  m_pCallsModule = (void*)loadPythonModule("calls");
+  m_pCallsModule = loadCModule("calls", *(void*(*)(void))&PyInit_calls);
 
   m_pThreadState = (void*)PyEval_SaveThread();
 }
 
 FieldlineAcqSystem::~FieldlineAcqSystem()
 {
-  PyEval_RestoreThread((PyThreadState*)m_pThreadState);
-  printLog("About to finalize python");
+  PyEval_RestoreThread(reinterpret_cast<PyThreadState*>(m_pThreadState));
   Py_DECREF(m_pCallbackModule);
   Py_DECREF(m_pCallsModule);
   Py_Finalize();
@@ -181,14 +162,13 @@ FieldlineAcqSystem::~FieldlineAcqSystem()
 
 void FieldlineAcqSystem::setCallback() 
 {
-
   PyGILState_STATE gstate;
   gstate = PyGILState_Ensure();
 
   PyObject *pSetCallbackFunc = NULL;
   PyObject *pCallback1 = NULL;
   PyObject *pArgs = NULL;
-  PyObject *pResult = NULL; 
+  PyObject *pResult = NULL;
 
   // Get a reference to the function
   pSetCallbackFunc = PyObject_GetAttrString((PyObject*)m_pCallbackModule, "set_callback");
@@ -197,13 +177,11 @@ void FieldlineAcqSystem::setCallback()
     PyErr_Print();
   }
 
-  printLog("I'm here!!!!!");
   pCallback1 = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callback1");
   if (pCallback1 && PyCallable_Check(pCallback1)) {
     pArgs = PyTuple_New(1);
     PyTuple_SetItem(pArgs, 0, pCallback1);
-  }
-  else {
+  } else {
     if (PyErr_Occurred())
       PyErr_Print();
     printLog(std::string("Cannot find function callback1 in calls module."));
@@ -222,28 +200,48 @@ void FieldlineAcqSystem::setCallback()
   PyGILState_Release(gstate);
 }
 
-void* FieldlineAcqSystem::loadPythonModule(const char* moduleName)
+void* FieldlineAcqSystem::loadModule(const char* moduleName)
 {
-  // Import the callback_module Python module
+  PyGILState_STATE gstate;
+  gstate = PyGILState_Ensure();
+
   PyObject* pModule = PyImport_ImportModule(moduleName);
   if (pModule == NULL) {
-    printLog(std::string("Error importing: ").append(moduleName).c_str());
+    printLog(std::string("Error loading module ").append(moduleName).append(".").c_str());
     PyErr_Print();
   }
+
+  PyGILState_Release(gstate);
+
   return (void*)pModule;
 }
 
+void* FieldlineAcqSystem::loadCModule(const char* moduleName, void*(*moduleInitFunc)(void))
+{
+  PyGILState_STATE gstate;
+  gstate = PyGILState_Ensure();
+
+  if (Py_IsInitialized())
+  {
+    PyImport_AddModule(moduleName);
+    PyObject* pyModule = (PyObject*)moduleInitFunc();
+    PyObject* sys_modules = PyImport_GetModuleDict();
+    PyDict_SetItemString(sys_modules, moduleName, pyModule);
+    Py_DECREF(pyModule);
+  } else {
+    PyImport_AppendInittab(moduleName, (PyObject*(*)(void)) moduleInitFunc);
+  }
+
+  PyGILState_Release(gstate);
+
+  return loadModule(moduleName);
+}
 
 void FieldlineAcqSystem::callFunctionAsync(const char* moduleName, const char* funcName)
 {
-    printLog("Right before spawning threads!");
-    auto lambda = [this, moduleName, funcName]() {
-       printLog("in the thread!");
-       printLog(std::string("Module name: ").append(moduleName));
-       printLog(std::string("Func name: ").append(funcName));
+    std::thread t([this, moduleName, funcName]() {
        this->callFunction(moduleName, funcName);
-    };
-    std::thread t(lambda);
+    });
     t.detach();
 }
 
@@ -252,32 +250,34 @@ void FieldlineAcqSystem::callFunction(const std::string moduleName, const std::s
   PyGILState_STATE gstate;
   gstate = PyGILState_Ensure();
 
-  // PyObject* pModule = PyImport_ImportModule(moduleName.c_str());
-  // PyObject* pModule = PyImport_GetModule(PyUnicode_FromString(moduleName.c_str()));
-  // if (pModule == NULL) {
-  //   printLog(std::string("Error importing module: ").append(moduleName).c_str());
-  //   PyErr_Print();
-  // }
-
-  // Get a reference to the start function
-  PyObject* pStartFunc = PyObject_GetAttrString((PyObject*)m_pCallbackModule, funcName.c_str());
-  if (pStartFunc == NULL) {
-    printLog(std::string("Error finding function: ").append(funcName).c_str());
-    PyErr_Print();
-    // Py_DECREF(pModule);
+  PyObject* pModule = PyImport_GetModule(PyUnicode_FromString(moduleName.c_str()));
+  if (pModule == NULL) {
+    printLog(std::string("Module ").append(moduleName).append(" has not been imported yet.").c_str());
+    printLog(std::string("Attempting to import the module ").append(moduleName).append(".").c_str());
+    pModule = PyImport_ImportModule(moduleName.c_str());
+    if (pModule == NULL) {
+      PyErr_Print();
+      printLog(std::string("Import failed. Can't find ").append(moduleName).append(".").c_str());
+    }
   }
 
-  // Call the start function
-  PyObject* pResult = PyObject_CallObject(pStartFunc, NULL);
+  PyObject* pFunc = PyObject_GetAttrString(pModule, funcName.c_str());
+  if (pFunc == NULL) {
+    printLog(std::string("Error finding function: ").append(funcName).c_str());
+    PyErr_Print();
+    Py_DECREF(pModule);
+  }
+
+  PyObject* pResult = PyObject_CallObject(pFunc, NULL);
   if (pResult == NULL) {
     printLog(std::string("Error calling function: ").append(funcName).c_str());
     PyErr_Print();
-    // Py_DECREF(pModule);
-    Py_DECREF(pStartFunc);
+    Py_DECREF(pModule);
+    Py_DECREF(pFunc);
   }
 
-  // Py_DECREF(pModule);
-  Py_DECREF(pStartFunc);
+  Py_DECREF(pModule);
+  Py_DECREF(pFunc);
   Py_DECREF(pResult);
 
   PyGILState_Release(gstate);

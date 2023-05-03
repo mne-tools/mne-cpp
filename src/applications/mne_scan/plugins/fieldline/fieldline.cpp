@@ -51,7 +51,7 @@
 #include "fieldline/ipfinder.h"
 
 #include <scMeas/realtimemultisamplearray.h>
-// #include <utils/generics/circularbuffer.h>
+#include <utils/generics/circularbuffer.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -132,8 +132,9 @@ namespace FIELDLINEPLUGIN {
 
 Fieldline::Fieldline()
 : m_pAcqSystem(nullptr)
+, m_pCircularBuffer(QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>(new UTILSLIB::CircularBuffer_Matrix_double(10)))
 {
-  printLog("constructor fieldline plugin");
+  // printLog("constructor fieldline plugin");
 }
 
 //=============================================================================================================
@@ -157,11 +158,13 @@ QSharedPointer<SCSHAREDLIB::AbstractPlugin> Fieldline::clone() const
 void Fieldline::init()
 {
   printLog("Fieldline init");
+  m_pCircularBuffer = QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>::create(10);
   // data infrastructure
-  // m_pRTMSA = SCSHAREDLIB::PluginOutputData
-  //   <SCMEASLIB::RealTimeMultiSampleArray>::create(this, "Fieldline Plugin",
-  //                                                 "FieldlinePlguin output");
-  // m_outputConnectors.append(m_pRTMSA);
+  m_pRTMSA = SCSHAREDLIB::PluginOutputData
+    <SCMEASLIB::RealTimeMultiSampleArray>::create(this, "Fieldline Plugin",
+                                                  "FieldlinePlguin output");
+  m_pRTMSA->measurementData()->setName(this->getName());  // Provide name to auto store widget settings
+  m_outputConnectors.append(m_pRTMSA);
 
   m_pAcqSystem = new FieldlineAcqSystem(this);
 }
@@ -178,8 +181,34 @@ void Fieldline::unload() {
 bool Fieldline::start()
 {
   printLog("start Fieldline");
+
+  initFiffInfo();
+
   QThread::start();
   return true;
+}
+
+void Fieldline::initFiffInfo() 
+{
+  QSharedPointer<FIFFLIB::FiffInfo> info;
+  info->sfreq = 1000.0f;
+  info->nchan = 32;
+  info->chs.clear();
+  for (int chan_i = 0; chan_i < info->nchan; chan_i++) {
+    FIFFLIB::FiffChInfo channel;
+    channel.kind = FIFFV_MEG_CH;
+    channel.unit = FIFF_UNIT_T;
+    channel.unit_mul = FIFF_UNITM_NONE;
+    channel.chpos.coil_type = FIFFV_COIL_NONE;
+    std::string channel_name(std::string("Ch. ") + std::to_string(chan_i));
+    channel.ch_name = QString::fromStdString(channel_name);
+    info->chs.append(channel);
+    info->ch_names.append(QString::fromStdString(channel_name));
+  }
+
+  m_pRTMSA->measurementData()->initFromFiffInfo(info);
+  m_pRTMSA->measurementData()->setMultiArraySize(1);
+  m_pRTMSA->measurementData()->setVisibility(true);
 }
 
 //=============================================================================================================
@@ -188,6 +217,10 @@ bool Fieldline::stop() {
   printLog("stop");
   requestInterruption();
   wait(500);
+
+  m_pRTMSA->measurementData()->clear();
+  m_pCircularBuffer->clear();
+
   return true;
 }
 
@@ -232,67 +265,31 @@ void Fieldline::findIpAsync(std::vector<std::string>& macList,
 
 //=============================================================================================================
 
-void Fieldline::run() {
-  printLog("run Fieldline");
+void Fieldline::run() 
+{
+  Eigen::MatrixXd matData;
+
+  while (!isInterruptionRequested()) {
+    if (m_pCircularBuffer->pop(matData)) {
+      if (!isInterruptionRequested()) {
+        m_pRTMSA->measurementData()->setValue(matData);
+      }
+    }
+  }
 }
-  // while (true) {
-  //   if (QThread::isInterruptionRequested())
-  //     break;
-  //   msleep(200);
-  // }
-  // m_pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo());
-  //
-  // m_pFiffInfo->sfreq = 1000.0f;
-  // m_pFiffInfo->nchan = 32;
-  // m_pFiffInfo->chs.clear();
-  //
-  // for (int chan_i = 0; chan_i < m_pFiffInfo->nchan; ++chan_i) {
-  //   FIFFLIB::FiffChInfo channel;
-  //   channel.ch_name = "Ch. " + QString::number(chan_i);
-  //   channel.kind = FIFFV_MEG_CH;
-  //   channel.unit = FIFF_UNIT_T;
-  //   channel.unit_mul = FIFF_UNITM_NONE;
-  //   channel.chpos.coil_type = FIFFV_COIL_NONE;
-  //   m_pFiffInfo->chs.append(channel);
-  //   m_pFiffInfo->ch_names.append(channel.ch_name);
-  // }
-  //
-  // m_pRTMSA_Fieldline->measurementData()->initFromFiffInfo(
-  //     m_pFiffInfo); //     if(m_pCircularBuffer->pop(matData)) {
-  // m_pRTMSA_Fieldline->measurementData()->setMultiArraySize(1);
-  // m_pRTMSA_Fieldline->measurementData()->setVisibility(true);
-  //
-  // Eigen::MatrixXd matData;
-  // matData.resize(m_pFiffInfo->nchan, 200);
-  // // matData.setZero();
-  //
-  // for (;;) {
-  //   // gather the data
-  //
-  //   matData = Eigen::MatrixXd::Random(m_pFiffInfo->nchan, 200);
-  //   matData *= 4e-12;
-  //
-  //   msleep(200);
-  //
-  //   if (isInterruptionRequested())
-  //     break;
-  //   m_pRTMSA_Fieldline->measurementData()->setValue(matData);
-  // }
-  //
-  // //         //emit values
-  // //         if(!isInterruptionRequested()) {
-  // //             m_pRMTSA_Natus->measurementData()->setValue(matData);
-  // //         }
-  // //     }
-  // // }
-  // printLog("run Fieldline finished");
-// }
 
 //=============================================================================================================
 
 QString Fieldline::getBuildInfo() {
   printLog("getBuildInfo Fieldline");
   return QString(buildDateTime()) + QString(" - ") + QString(buildHash());
+}
+
+void Fieldline::newData(double* mat, size_t numSamples, size_t numChannels) 
+{
+    while(!m_pCircularBuffer->push(Eigen::Map<Eigen::MatrixXd>(mat, numSamples, numChannels))) {
+        printLog("Fieldline Plugin: Pushing data to circular buffer failed... Trying again.");
+    }
 }
 
 }  // namespace FIELDLINEPLUGIN

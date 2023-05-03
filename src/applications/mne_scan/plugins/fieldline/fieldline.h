@@ -44,6 +44,7 @@
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
+#include <utils/generics/circularbuffer.h>
 
 #include <scShared/Plugins/abstractsensor.h>
 
@@ -115,12 +116,16 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor
                    std::function<void(std::vector<std::string>&)> callback);
   FieldlineAcqSystem* m_pAcqSystem;
 
+  void newData(double* mat, size_t numSamples, size_t numChannels);
+
  protected:
   virtual void run();
-
+ private:
+  void initFiffInfo();
 
   QSharedPointer<SCSHAREDLIB::PluginOutputData<SCMEASLIB::RealTimeMultiSampleArray> >     m_pRTMSA;     /**< The RealTimeSampleArray to provide the EEG data.*/
   QSharedPointer<FIFFLIB::FiffInfo> m_pFiffInfo;  /**< Fiff measurement info.*/
+  QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double> m_pCircularBuffer;  /**< Holds incoming raw data. */
 };
 
 }  // namespace FIELDLINEPLUGIN
