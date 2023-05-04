@@ -39,12 +39,13 @@ pandoc \
     doc2/gh-pages/pages/development/*.md \
     doc2/gh-pages/pages/documentation/*.md \
     -f gfm \
-    -o test.pdf \
+    -o MNECPP.pdf \
     --pdf-engine=xelatex \
     -V geometry:top=.75in \
     -V geometry:left=1in \
     -V geometry:right=1in \
     -V geometry:bottom=.75in \
+    -V 'monofont:Courier New' \
     --extract-media=media_dir \
     --resource-path=doc2/gh-pages/images:doc2/gh-pages/images/lib:doc2/gh-pages/images/analyze
 
