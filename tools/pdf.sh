@@ -48,5 +48,5 @@ pandoc \
     --extract-media=media_dir \
     --resource-path=doc2/gh-pages/images:doc2/gh-pages/images/lib:doc2/gh-pages/images/analyze
 
-rm -r doc2
+rm -r doc2 media_dir
 
