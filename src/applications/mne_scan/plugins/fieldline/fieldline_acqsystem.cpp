@@ -237,6 +237,11 @@ void* FieldlineAcqSystem::loadCModule(const char* moduleName, void*(*moduleInitF
   return loadModule(moduleName);
 }
 
+
+PyObject* var1, var2;
+
+int (*var)(void);
+
 void FieldlineAcqSystem::callFunctionAsync(const char* moduleName, const char* funcName)
 {
     std::thread t([this, moduleName, funcName]() {
