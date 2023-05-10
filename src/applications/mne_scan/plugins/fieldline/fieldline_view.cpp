@@ -233,12 +233,14 @@ void FieldlineView::initAcqSystem(int numChassis)
 
 void FieldlineView::startAllSensors() {
     printLog("startAllSensors");
-    m_pFieldlinePlugin->m_pAcqSystem->callFunctionAsync("callback", "start");
+    // m_pFieldlinePlugin->m_pAcqSystem->callFunctionAsync("callback", "start");
+    m_pFieldlinePlugin->m_pAcqSystem->startADC();
 }
 
 void FieldlineView::stopAllSensors() {
     printLog("stopAllSensors");
-    m_pFieldlinePlugin->m_pAcqSystem->callFunctionAsync("callback", "stop");
+    // m_pFieldlinePlugin->m_pAcqSystem->callFunctionAsync("callback", "stop");
+    m_pFieldlinePlugin->m_pAcqSystem->stopADC();
 }
 
 void FieldlineView::autoTuneAllSensors() {

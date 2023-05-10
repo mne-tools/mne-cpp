@@ -50,92 +50,239 @@
 
 #include "fieldline/fieldline_acqsystem.h"
 
-//extern "C" {
-//
-//PyObject *restartFinished(PyObject *self, PyObject *args) {
-//  long chassis, sensor;
-//  if (PyArg_ParseTuple(args, "ii", &chassis, &sensor)) {
-//      std::cout << std::setfill('0') << std::setw(2) << chassis << ":" << sensor
-//                          << " - restart finished;\n";
-//  } else {
-//      std::cout << "A sensor has finished restarting!\n";
-//  }
-//
-//  return NULL;
-//}
-//PyObject *coarseZeroFinished(PyObject *self, PyObject *args) {
-//  long chassis, sensor;
-//  if (PyArg_ParseTuple(args, "ii", &chassis, &sensor)) {
-//      std::cout << std::setfill('0') << std::setw(2) << chassis << ":" << sensor
-//                          << " - coarse zero finished;\n";
-//  } else {
-//      std::cout << "A sensor has finished coarse zeroing!\n";
-//  }
-//
-//  return NULL;
-//}
-//PyObject *fineZeroFinished(PyObject *self, PyObject *args) {
-//  long chassis, sensor;
-//  if (PyArg_ParseTuple(args, "ii", &chassis, &sensor)) {
-//      std::cout << std::setfill('0') << std::setw(2) << chassis << ":" << sensor
-//                          << " - fine zero finished;\n";
-//  } else {
-//      std::cout << "A sensor has finished fine zeroing!\n";
-//  }
-//
-//  return NULL;
-//}
-//}
-//
-//static PyMethodDef my_module_methods[] = {
-//      {"restartFinished", restartFinished, METH_VARARGS, " "},
-//      {"coarseZeroFinished", coarseZeroFinished, METH_VARARGS, " "},
-//      {"fineZeroFinished", fineZeroFinished, METH_VARARGS, " "},
-//      {NULL, NULL, 0, NULL}};
-//
-//static PyModuleDef my_module_def = {
-//      PyModuleDef_HEAD_INIT,
-//      "mne_cpp_callbacks",
-//      "A module of callback functions for mne-cpp.",
-//      -1,
-//      my_module_methods,
-//      NULL,
-//      NULL,
-//      NULL,
-//      NULL};
-//
-//PyMODINIT_FUNC PyInit_my_module(void) {
-//  return PyModule_Create(&my_module_def);
-//}
-
 namespace FIELDLINEPLUGIN {
 
 const std::string resourcesPath(QCoreApplication::applicationDirPath().toStdString() +
                                                                 "/../resources/mne_scan/plugins/fieldline/");
 const std::string entryFile(resourcesPath + "main.py");
 
+bool restartFinished = false;
 
-void callback1() {
-    printLog("This is callback1.");
+void callbackOnFinishedWhileRestart(int chassisId, int sensorId) {
+    std::cout << "Sensor: (" << chassisId << ", " << sensorId << ") Finished restart.\n";
 }
 
-static PyObject* callback1_py(PyObject* self, PyObject* args) {
-    callback1();
+void callbackOnFinishedWhileCoarseZero(int chassisId, int sensorId) {
+    std::cout << "Sensor: (" << chassisId << ", " << sensorId << ") Finished coarse zero.\n";
+}
+
+void callbackOnFinishedWhileFineZero(int chassisId, int sensorId) {
+    std::cout << "Sensor: (" << chassisId << ", " << sensorId << ") Finished fine zero.\n";
+}
+
+void callbackOnErrorWhileRestart(int chassisId, int sensorId, int errorId) {
+    std::cout << "Error while restarting sensor: (" << chassisId << ", " << sensorId << ") Code: " << errorId << ".\n";
+}
+
+void callbackOnErrorWhileCoarseZero(int chassisId, int sensorId, int errorId) {
+    std::cout << "Error while restarting sensor: (" << chassisId << ", " << sensorId << ") Code: " << errorId << ".\n";
+}
+
+void callbackOnErrorWhileFineZero(int chassisId, int sensorId, int errorId) {
+    std::cout << "Error while restarting sensor: (" << chassisId << ", " << sensorId << ") Code: " << errorId << ".\n";
+}
+
+void callbackOnCompletionRestart() {
+    std::cout << "About to change restartFinished\n";
+    restartFinished = true;
+    std::cout << "Restart of sensors, finished.\n";
+}
+
+void callbackOnCompletionCoarseZero() {
+    std::cout << "Coarse zero of sensors, finished.\n";
+}
+
+void callbackOnCompletionFineZero() {
+    std::cout << "Fine zero of sensors, finished.\n";
+}
+
+static PyObject* callbackOnFinishedWhileRestart_py(PyObject* self, PyObject* args) {
+    int chassis, sensor;
+    if (!PyArg_ParseTuple(args, "ii", &chassis, &sensor)) {
+        return NULL;
+    }
+    callbackOnFinishedWhileRestart(chassis, sensor);
     return Py_None;
 }
 
-static struct PyMethodDef callbacksMethods[] = {
-    {"callback1", callback1_py, METH_VARARGS, "Call to callback1"},
+static PyObject* callbackOnFinishedWhileCoarseZero_py(PyObject* self, PyObject* args) {
+    int chassis, sensor;
+    if (!PyArg_ParseTuple(args, "ii", &chassis, &sensor)) {
+        return NULL;
+    }
+    callbackOnFinishedWhileCoarseZero(chassis, sensor);
+    return Py_None;
+}
+
+static PyObject* callbackOnFinishedWhileFineZero_py(PyObject* self, PyObject* args) {
+    int chassis, sensor;
+    if (!PyArg_ParseTuple(args, "ii", &chassis, &sensor)) {
+        return NULL;
+    }
+    callbackOnFinishedWhileFineZero(chassis, sensor);
+    return Py_None;
+}
+
+static PyObject* callbackOnErrorWhileRestart_py(PyObject* self, PyObject* args) {
+    int chassis, sensor, error;
+    if (!PyArg_ParseTuple(args, "iii", &chassis, &sensor, &error)) {
+        return NULL;
+    }
+    callbackOnErrorWhileRestart(chassis, sensor, error);
+    return Py_None;
+}
+
+static PyObject* callbackOnErrorWhileCoarseZero_py(PyObject* self, PyObject* args) {
+    int chassis, sensor, error;
+    if (!PyArg_ParseTuple(args, "iii", &chassis, &sensor, &error)) {
+        return NULL;
+    }
+    callbackOnErrorWhileCoarseZero(chassis, sensor, error);
+    return Py_None;
+}
+
+static PyObject* callbackOnErrorWhileFinzeZero_py(PyObject* self, PyObject* args) {
+    int chassis, sensor, error;
+    if (!PyArg_ParseTuple(args, "iii", &chassis, &sensor, &error)) {
+        return NULL;
+    }
+    callbackOnErrorWhileFineZero(chassis, sensor, error);
+    return Py_None;
+}
+
+static PyObject* callbackOnCompletionRestart_py(PyObject* self, PyObject* args) {
+    Py_ssize_t arg_count = PyTuple_Size(args);
+    if (arg_count != 0) {
+        PyErr_SetString(PyExc_ValueError, "This function should be called with no arguments.");
+        return nullptr;
+    }
+    callbackOnCompletionRestart();
+    return Py_None;
+}
+
+static PyObject* callbackOnCompletionCoarseZero_py(PyObject* self, PyObject* args) {
+    Py_ssize_t arg_count = PyTuple_Size(args);
+    if (arg_count != 0) {
+        PyErr_SetString(PyExc_ValueError, "This function should be called with no arguments.");
+        return nullptr;
+    }
+    callbackOnCompletionCoarseZero();
+    return Py_None;
+}
+
+static PyObject* callbackOnCompletionFineZero_py(PyObject* self, PyObject* args) {
+    Py_ssize_t arg_count = PyTuple_Size(args);
+    if (arg_count != 0) {
+        PyErr_SetString(PyExc_ValueError, "This function should be called with no arguments.");
+        return nullptr;
+    }
+    callbackOnCompletionFineZero();
+    return Py_None;
+}
+
+static struct PyMethodDef fieldlineCallbacksMethods[] = {
+    {"callbackOnFinishedWhileRestart", callbackOnFinishedWhileRestart_py,
+        METH_VARARGS, "Function to be called when a sensor has finished its restart."},
+    {"callbackOnFinishedWhileCoarseZero", callbackOnFinishedWhileCoarseZero_py,
+        METH_VARARGS, "Function to be called when a sensor has finished its coarse zeroing."},
+    {"callbackOnFinishedWhileFineZero", callbackOnFinishedWhileFineZero_py,
+        METH_VARARGS, "Function to be called when a sensor has finished its fine zeroing."},
+    {"callbackOnErrorWhileRestart", callbackOnErrorWhileRestart_py,
+        METH_VARARGS, "Function to be called when a sensor has an error while restarting."},
+    {"callbackOnErrorWhileCoarseZero", callbackOnErrorWhileCoarseZero_py,
+        METH_VARARGS, "Function to be called when a sensor has an error while coarse zeroing."},
+    {"callbackOnErrorWhileFinzeZero", callbackOnErrorWhileFinzeZero_py,
+        METH_VARARGS, "Function to be called when a sensor has an error while fine zeroing"},
+    {"callbackOnCompletionRestart", callbackOnCompletionRestart_py,
+        METH_VARARGS, "Function to be called when restarting has finished for all sensors."},
+    {"callbackOnCompletionCoarseZero", callbackOnCompletionCoarseZero_py,
+        METH_VARARGS, "Function to be called when coarse zeroing has finished for all sensors."},
+    {"callbackOnCompletionFineZero", callbackOnCompletionFineZero_py,
+        METH_VARARGS, "Function to be called when fine zeroing has finished for all sensors."},
     {NULL, NULL, 0, NULL}
 };
 
-static PyModuleDef CallModule = {
-    PyModuleDef_HEAD_INIT, "calls", NULL, -1, callbacksMethods,
+static PyModuleDef FieldlineCallbacksModule = {
+    PyModuleDef_HEAD_INIT, "fieldline_callbacks", NULL, -1, fieldlineCallbacksMethods,
     NULL, NULL, NULL, NULL
 };
 
-static PyObject* PyInit_calls(void) {
-    return PyModule_Create(&CallModule);
+static PyObject* PyInit_fieldline_callbacks(void) {
+    return PyModule_Create(&FieldlineCallbacksModule);
+}
+
+static FieldlineAcqSystem* acq_system(nullptr);
+
+struct dataValue {
+    double value;
+    char label[5+1];
+};
+
+void dataParser(const dataValue* data, int size) {
+    double* samplesArray = new double[size];
+    for (int i = 0; i < size; i++) {
+        samplesArray[i] = data[i].value;
+        // std::cout << "(" << data[i].label << ") - " << data[i].value << "\n";
+    }
+    if (acq_system != nullptr) {
+        acq_system->m_pControllerParent->newData(samplesArray, size);
+    }
+}
+
+static PyObject* dict_parser(PyObject* self, PyObject* args) {
+    PyObject* dataDict;
+    if (!PyArg_ParseTuple(args, "O", &dataDict)) {
+        PyErr_SetString(PyExc_TypeError, "data is not valid.");
+        return NULL;
+    }
+
+    PyObject* data_frames = PyDict_GetItemString(dataDict, "data_frames");
+    if (!data_frames || !PyDict_Check(data_frames)) {
+        PyErr_SetString(PyExc_TypeError, "data_frames is not a dictionary.");
+        return NULL;
+    }
+
+    int num_channels = PyDict_Size(data_frames);
+    // std::cout << "Num channels: " << num_channels << "\n";
+    // int* data = new int()
+    dataValue* dataValues = new dataValue[num_channels];
+    PyObject* key;
+    PyObject* value;
+    PyObject* data;
+    PyObject* sensorName;
+    Py_ssize_t pos = 0;
+
+    while (PyDict_Next(data_frames, &pos, &key, &value)) {
+        // int num_values = PyDict_Size(value);
+        // std::cout << "Num values: " << num_values << "\n";
+        data = PyDict_GetItemString(value, "data");
+        sensorName = PyDict_GetItemString(value, "sensor");
+        // std::cout << "Sensor " << PyUnicode_AsUTF8(sensorName)
+        //           << ": " << PyLong_AsLong(data)
+        //           << " - pos: " << pos << "\n";
+        dataValues[pos-1].value = (double) PyLong_AsLong(data);
+        memcpy((void*)dataValues[pos-1].label,(void*)PyUnicode_AsUTF8(sensorName), 5);
+        dataValues[pos-1].label[5] = static_cast<char>(0);
+    }
+
+    dataParser(dataValues, num_channels);
+
+    delete[] dataValues;
+    return Py_None;
+}
+
+static struct PyMethodDef callbacksParseMethods[] = {
+  {"dict_parser", dict_parser, METH_VARARGS, "Parse dictionary"},
+  {NULL, NULL, 0, NULL}
+};
+
+static PyModuleDef CallbacksParseModule = {
+  PyModuleDef_HEAD_INIT, "callbacks_parsing", NULL, -1, callbacksParseMethods,
+  NULL, NULL, NULL, NULL
+};
+
+static PyObject* PyInit_callbacks_parsing(void) {
+  return PyModule_Create(&CallbacksParseModule);
 }
 
 FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
@@ -148,9 +295,22 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     m_pCallbackModule = loadModule("callback");
 
 
-    m_pCallsModule = loadCModule("calls", *(void*(*)(void))&PyInit_calls);
+    m_pCallsModule = loadCModule("fieldline_callbacks", *(void*(*)(void))&PyInit_fieldline_callbacks);
+    PyObject* parseCallbacksModule = (PyObject*)loadCModule("callbacks_parsing", *(void*(*)(void))&PyInit_callbacks_parsing);
+    if (parseCallbacksModule == NULL)
+    {
+      printLog("callbacks module wrong!");
+    } else{
+      printLog("callbacks module ok!");
+    }
 
     PyObject* FieldlineModule = (PyObject*)loadModule("fieldline_api_mock.fieldline_service");
+    if (FieldlineModule == NULL)
+    {
+      printLog("fieldline module wrong!");
+    } else{
+      printLog("fieldline module ok!");
+    }
 
     PyObject* fService = PyObject_GetAttrString(FieldlineModule, "FieldLineService");
     if (fService == NULL)
@@ -161,7 +321,7 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     }
     PyObject* ipList = Py_BuildValue("([ss])", "8.8.8.8", "1.1.1.1");
     PyObject* fServiceInstance = PyObject_CallObject(fService, ipList);
-    printLog("here!!!");
+    m_fServiceInstance = (void*) fServiceInstance;
     if (fServiceInstance == NULL)
     {
       printLog("fServiceInstance wrong!");
@@ -175,28 +335,107 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     } else{
       printLog("openMethod ok!");
     }
-    PyObject* pResult = PyObject_CallMethodNoArgs(fServiceInstance, PyUnicode_FromString("open"));
+    PyObject* pResult = PyObject_CallNoArgs(openMethod);
     if (pResult == NULL)
     {
       printLog("pResult wrong!");
     } else{
       printLog("pResult ok!");
     }
-    PyObject* pResult2 = PyObject_CallNoArgs(openMethod);
-    if (pResult2 == NULL)
+
+    PyObject* setCloseLoop = PyObject_GetAttrString(fServiceInstance, "set_closed_loop");
+    PyObject* trueTuple = PyTuple_New(1);
+    PyTuple_SetItem(trueTuple, 0, Py_True);
+    PyObject* pResult2 = PyObject_CallObject(setCloseLoop, trueTuple);
+
+    PyObject* loadSensors = PyObject_GetAttrString(fServiceInstance, "load_sensors");
+    PyObject* sensors = PyObject_CallNoArgs(loadSensors);
+    PyObject* restartAllSensors = PyObject_GetAttrString(fServiceInstance, "restart_sensors");
+
+    if (restartAllSensors == NULL)
     {
-      printLog("pResult2 wrong!");
-    } else{
-      printLog("pResult2 ok!");
+        printLog("restart sensors broken");
+    } else {
+        printLog("restartAllSensors ok!");
     }
 
-    Py_DECREF(FieldlineModule);
-    Py_DECREF(fService);
-    Py_DECREF(ipList);
-    Py_DECREF(fServiceInstance);
-    Py_DECREF(openMethod);
-    Py_DECREF(pResult);
+    PyObject* callback_on_finished = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnFinishedWhileRestart");
+    if (callback_on_finished == NULL)
+    {
+        printLog("callback on finished broken");
+    } else {
+        printLog("callback restart ok!");
+    }
+    PyObject* callback_on_error = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnErrorWhileRestart");
+    if (callback_on_error == NULL)
+    {
+        printLog("callback on error broken");
+    } else {
+        printLog("callback error ok!");
+    }
+    PyObject* callback_on_completion = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnCompletionRestart");
+    if (callback_on_completion == NULL)
+    {
+        printLog("callback on completion broken");
+    } else {
+        printLog("callback completion ok!");
+    }
 
+    PyObject* argsRestart = PyTuple_New(4);
+    PyTuple_SetItem(argsRestart, 0, sensors);
+    PyTuple_SetItem(argsRestart, 1, callback_on_finished);
+    PyTuple_SetItem(argsRestart, 2, callback_on_error);
+    PyTuple_SetItem(argsRestart, 3, callback_on_completion);
+
+    restartFinished = false;
+
+    PyObject* resultRestart = PyObject_CallObject(restartAllSensors, argsRestart);
+
+    while (restartFinished == false) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        printLog("waiting...");
+    }
+
+    PyObject* readDataFcn = PyObject_GetAttrString(fServiceInstance, "read_data");
+    if (readDataFcn == NULL) {
+        printLog("problem readDataFcn");
+    } else {
+        printLog("readDataFcn ok");
+    }
+
+    PyObject* parserCallback = PyObject_GetAttrString(parseCallbacksModule, "dict_parser");
+    if (parserCallback == NULL) {
+        printLog("problem parserCallback");
+    } else {
+        printLog("parserCallback ok");
+    }
+    PyObject* argsSetDataParser = PyTuple_New(1);
+    PyTuple_SetItem(argsSetDataParser, 0, parserCallback);
+
+    PyObject* result33 = PyObject_CallObject(readDataFcn, argsSetDataParser);
+    if (result33 == NULL)
+    {
+        printLog("result33 bad");
+    } else {
+        printLog("result33 ok");
+    }
+
+
+    // register "this" into somewhere findable by python's execution flow.
+    acq_system = this;
+
+    // Py_DECREF(argsSetDataParser);
+    // Py_DECREF(setCloseLoop);
+    // Py_DECREF(trueTuple);
+    // Py_DECREF(pResult2);
+    //
+    // Py_DECREF(FieldlineModule);
+    // Py_DECREF(fService);
+    // Py_DECREF(ipList);
+    // Py_DECREF(fServiceInstance);
+    // Py_DECREF(openMethod);
+    // Py_DECREF(pResult);
+    //
     m_pThreadState = (void*)PyEval_SaveThread();
 }
 
@@ -213,37 +452,75 @@ void FieldlineAcqSystem::setCallback()
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
 
-    PyObject *pSetCallbackFunc = NULL;
-    PyObject *pCallback1 = NULL;
-    PyObject *pArgs = NULL;
-    PyObject *pResult = NULL;
+    // PyObject *pSetCallbackFunc = NULL;
+    // PyObject *pCallback1 = NULL;
+    // PyObject *pArgs = NULL;
+    // PyObject *pResult = NULL;
+    //
+    // // Get a reference to the function
+    // pSetCallbackFunc = PyObject_GetAttrString((PyObject*)m_pCallbackModule, "set_callback");
+    // if (pSetCallbackFunc == NULL) {
+    //     printLog(std::string("Error finding function: ").append("set_callback").c_str());
+    //     PyErr_Print();
+    // }
+    //
+    // pCallback1 = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callback1");
+    // if (pCallback1 && PyCallable_Check(pCallback1)) {
+    //     pArgs = PyTuple_New(1);
+    //     PyTuple_SetItem(pArgs, 0, pCallback1);
+    // } else {
+    //     if (PyErr_Occurred())
+    //         PyErr_Print();
+    //     printLog(std::string("Cannot find function callback1 in calls module."));
+    // }
+    // // Call the set_callback function
+    // pResult = PyObject_CallObject(pSetCallbackFunc, pArgs);
+    // if (pResult == NULL) {
+    //     printLog(std::string("Error calling function: ").append("set_callback").c_str());
+    //     PyErr_Print();
+    // }
+    // Py_XDECREF(pSetCallbackFunc);
+    // Py_XDECREF(pCallback1);
+    // Py_XDECREF(pArgs);
+    // Py_XDECREF(pResult);
+    //
+    PyGILState_Release(gstate);
+}
 
-    // Get a reference to the function
-    pSetCallbackFunc = PyObject_GetAttrString((PyObject*)m_pCallbackModule, "set_callback");
-    if (pSetCallbackFunc == NULL) {
-        printLog(std::string("Error finding function: ").append("set_callback").c_str());
-        PyErr_Print();
-    }
+void FieldlineAcqSystem::startADC() {
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
 
-    pCallback1 = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callback1");
-    if (pCallback1 && PyCallable_Check(pCallback1)) {
-        pArgs = PyTuple_New(1);
-        PyTuple_SetItem(pArgs, 0, pCallback1);
+    PyObject* start_data = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "start_adc");
+    PyObject* argsStartData = PyTuple_New(1);
+    PyObject* zeroArg = PyLong_FromLong(0);
+    PyTuple_SetItem(argsStartData, 0, zeroArg);
+    PyObject* startResult = PyObject_CallObject(start_data, argsStartData);
+    if (startResult == NULL)
+    {
+        printLog("startResult bad");
     } else {
-        if (PyErr_Occurred())
-            PyErr_Print();
-        printLog(std::string("Cannot find function callback1 in calls module."));
+        printLog("startResult ok");
     }
-    // Call the set_callback function
-    pResult = PyObject_CallObject(pSetCallbackFunc, pArgs);
-    if (pResult == NULL) {
-        printLog(std::string("Error calling function: ").append("set_callback").c_str());
-        PyErr_Print();
+
+    PyGILState_Release(gstate);
+}
+
+void FieldlineAcqSystem::stopADC() {
+    PyGILState_STATE gstate;
+    gstate = PyGILState_Ensure();
+
+    PyObject* stop_data = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "stop_adc");
+    PyObject* argsstopData = PyTuple_New(1);
+    PyObject* stopArg = PyLong_FromLong(0);
+    PyTuple_SetItem(argsstopData, 0, stopArg);
+    PyObject* stopResult = PyObject_CallObject(stop_data, argsstopData);
+    if (stopResult == NULL)
+    {
+        printLog("stopResult bad");
+    } else {
+        printLog("stopResult ok");
     }
-    Py_XDECREF(pSetCallbackFunc);
-    Py_XDECREF(pCallback1);
-    Py_XDECREF(pArgs);
-    Py_XDECREF(pResult);
 
     PyGILState_Release(gstate);
 }
@@ -344,8 +621,10 @@ void FieldlineAcqSystem::preConfigurePython() const
     Py_DECREF(versionInfo);
 
     PyObject* path = PyObject_GetAttrString(sys, "path");
-    PyList_Insert(path, 0, PyUnicode_FromString(resourcesPath.c_str()));
+    PyObject* resourcesObj = PyUnicode_FromString(resourcesPath.c_str());
+    PyList_Insert(path, 0, resourcesObj);
     Py_DECREF(sys);
+    Py_DECREF(resourcesObj);
 
     const std::string pathVenvMods(resourcesPath + "venv/lib/python" + pythonVer + "/site-packages/");
     printLog(pathVenvMods);

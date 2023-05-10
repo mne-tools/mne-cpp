@@ -158,7 +158,7 @@ QSharedPointer<SCSHAREDLIB::AbstractPlugin> Fieldline::clone() const
 void Fieldline::init()
 {
   printLog("Fieldline init");
-  m_pCircularBuffer = QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>::create(10);
+  m_pCircularBuffer = QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>::create(40);
   // data infrastructure
   m_pRTMSA = SCSHAREDLIB::PluginOutputData
     <SCMEASLIB::RealTimeMultiSampleArray>::create(this, "Fieldline Plugin",
@@ -188,7 +188,7 @@ bool Fieldline::start()
   return true;
 }
 
-void Fieldline::initFiffInfo() 
+void Fieldline::initFiffInfo()
 {
   QSharedPointer<FIFFLIB::FiffInfo> info;
   info->sfreq = 1000.0f;
@@ -285,9 +285,9 @@ QString Fieldline::getBuildInfo() {
   return QString(buildDateTime()) + QString(" - ") + QString(buildHash());
 }
 
-void Fieldline::newData(double* mat, size_t numSamples, size_t numChannels) 
+void Fieldline::newData(double* data, size_t numChannels)
 {
-    while(!m_pCircularBuffer->push(Eigen::Map<Eigen::MatrixXd>(mat, numSamples, numChannels))) {
+    while(!m_pCircularBuffer->push(Eigen::Map<Eigen::MatrixXd>(data, 1, numChannels))) {
         printLog("Fieldline Plugin: Pushing data to circular buffer failed... Trying again.");
     }
 }

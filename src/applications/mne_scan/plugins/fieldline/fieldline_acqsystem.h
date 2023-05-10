@@ -52,6 +52,9 @@ class FieldlineAcqSystem {
     void callFunction(const std::string moduleName, const std::string funcName);
 
     void setCallback();
+    void startADC();
+    void stopADC();
+    Fieldline* m_pControllerParent;
 
  private:
     void preConfigurePython() const;
@@ -59,7 +62,8 @@ class FieldlineAcqSystem {
     void* loadModule(const char* moduleName);
     void* loadCModule(const char* moduleName, void* (*moduleInitFunc)(void));
 
-    Fieldline* m_pControllerParent;
+    // bool m_restartFinished;
+    void* m_fServiceInstance;
     void* m_pThreadState;
     void* m_pCallbackModule;
     void* m_pCallsModule;

@@ -59,6 +59,7 @@ class FieldLineService:
             print("Loading sensors.")
             return self.sensors
         else:
+            print("Cannot load sensors.")
             print("Fieldline service closed.")
 
     def get_chassis_list(self):
@@ -113,7 +114,7 @@ class FieldLineService:
             end_time = time.time()
             elapsed_time = end_time - start_time
             # time_to_sleep = max(0, .001 - elapsed_time)
-            time.sleep(sampling_period + elapsed_time_diff - 0.6 * elapsed_time)
+            time.sleep(abs(sampling_period + elapsed_time_diff - 0.7 * elapsed_time))
             # print(f"elapsed_time: {elapsed_time:04}")
         # start_time = time.time()
         # end_time = time.time()
@@ -136,6 +137,7 @@ class FieldLineService:
         #     time.sleep(time_to_sleep_final)
 
     def read_data(self, data_callback=None):
+        print("Setting the data callback fcn.")
         if self.is_open:
             if(data_callback is not None):
                 self.callback_function = data_callback
@@ -161,7 +163,7 @@ class FieldLineService:
             print("Fieldline service closed.")
             return None
 
-    def stop_adc(self, chassis_id):
+    def stop_adc(self, _):
         """
             Stop ADC from chassis
 

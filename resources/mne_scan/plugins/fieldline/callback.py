@@ -13,6 +13,7 @@ def default_callback1():
     print(f'Counter: {counter}')
     counter += 1
 
+
 def default_callback2():
     with open("output.txt", "a") as f:
         f.write("default_callback2\n")

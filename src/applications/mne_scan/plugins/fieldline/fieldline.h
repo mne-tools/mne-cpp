@@ -116,7 +116,7 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor
                    std::function<void(std::vector<std::string>&)> callback);
   FieldlineAcqSystem* m_pAcqSystem;
 
-  void newData(double* mat, size_t numSamples, size_t numChannels);
+  void newData(double* data, size_t numChannels);
 
  protected:
   virtual void run();
