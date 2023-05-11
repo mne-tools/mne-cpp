@@ -52,6 +52,7 @@
 #include <QSharedPointer>
 
 #include <string>
+#include <vector>
 
 //=============================================================================================================
 // FORWARD DECLARATION
@@ -116,7 +117,7 @@ class FIELDLINESHARED_EXPORT Fieldline : public SCSHAREDLIB::AbstractSensor
                    std::function<void(std::vector<std::string>&)> callback);
   FieldlineAcqSystem* m_pAcqSystem;
 
-  void newData(double* data, size_t numChannels);
+  void newData(double* data, size_t numChannels, size_t numSamples);
 
  protected:
   virtual void run();

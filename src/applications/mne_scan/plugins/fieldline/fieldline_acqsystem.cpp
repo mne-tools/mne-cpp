@@ -213,22 +213,6 @@ static PyObject* PyInit_fieldline_callbacks(void) {
 
 static FieldlineAcqSystem* acq_system(nullptr);
 
-struct dataValue {
-    double value;
-    char label[5+1];
-};
-
-void dataParser(const dataValue* data, int size) {
-    double* samplesArray = new double[size];
-    for (int i = 0; i < size; i++) {
-        samplesArray[i] = data[i].value;
-        // std::cout << "(" << data[i].label << ") - " << data[i].value << "\n";
-    }
-    if (acq_system != nullptr) {
-        acq_system->m_pControllerParent->newData(samplesArray, size);
-    }
-}
-
 static PyObject* dict_parser(PyObject* self, PyObject* args) {
     PyObject* dataDict;
     if (!PyArg_ParseTuple(args, "O", &dataDict)) {
@@ -242,32 +226,16 @@ static PyObject* dict_parser(PyObject* self, PyObject* args) {
         return NULL;
     }
 
-    int num_channels = PyDict_Size(data_frames);
-    // std::cout << "Num channels: " << num_channels << "\n";
-    // int* data = new int()
-    dataValue* dataValues = new dataValue[num_channels];
     PyObject* key;
     PyObject* value;
-    PyObject* data;
-    PyObject* sensorName;
     Py_ssize_t pos = 0;
 
     while (PyDict_Next(data_frames, &pos, &key, &value)) {
-        // int num_values = PyDict_Size(value);
-        // std::cout << "Num values: " << num_values << "\n";
-        data = PyDict_GetItemString(value, "data");
-        sensorName = PyDict_GetItemString(value, "sensor");
-        // std::cout << "Sensor " << PyUnicode_AsUTF8(sensorName)
-        //           << ": " << PyLong_AsLong(data)
-        //           << " - pos: " << pos << "\n";
-        dataValues[pos-1].value = (double) PyLong_AsLong(data);
-        memcpy((void*)dataValues[pos-1].label,(void*)PyUnicode_AsUTF8(sensorName), 5);
-        dataValues[pos-1].label[5] = static_cast<char>(0);
+        PyObject* data = PyDict_GetItemString(value, "data");
+        // printLog(std::string("pos: ") + std::to_string(pos));
+        // printLog(std::string("value: ") + std::to_string((double) PyLong_AsLong(data)));
+        acq_system->addSampleToSamplesColumn((int) pos-1, (double) PyLong_AsLong(data));
     }
-
-    dataParser(dataValues, num_channels);
-
-    delete[] dataValues;
     return Py_None;
 }
 
@@ -286,7 +254,9 @@ static PyObject* PyInit_callbacks_parsing(void) {
 }
 
 FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
-: m_pControllerParent(parent)
+: m_pControllerParent(parent),
+  m_numSamplesPerBlock(200),
+  m_numSensors(33)
 {
     Py_Initialize();
 
@@ -423,7 +393,7 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
 
     // register "this" into somewhere findable by python's execution flow.
     acq_system = this;
-
+    initSampleArrays();
     // Py_DECREF(argsSetDataParser);
     // Py_DECREF(setCloseLoop);
     // Py_DECREF(trueTuple);
@@ -644,6 +614,33 @@ void FieldlineAcqSystem::runPythonFile(const char* file, const char* comment) co
         Py_DECREF(local_dict);
         Py_DECREF(result);
         fclose(py_file);
+    }
+}
+
+void FieldlineAcqSystem::initSampleArrays()
+{
+    m_samplesBlock = new double[m_numSensors * m_numSamplesPerBlock];
+    m_samplesBlock2 = new double[m_numSensors * m_numSamplesPerBlock];
+}
+
+void FieldlineAcqSystem::addSampleToSamplesColumn(int sensorIdx, double value)
+{
+    static int sampleIdx = 0;
+    // printLog(std::string("sensorIdx: ") + std::to_string(sensorIdx));
+    // printLog(std::string("sampleIdx: ") + std::to_string(sampleIdx));
+    // printLog(std::string("m_numSensors = ") + std::to_string(m_numSensors));
+    // printLog(std::string("m_numSamplesPerBlock = ") + std::to_string(m_numSamplesPerBlock));
+    // printLog(std::string("m_samplesBlock[").append(std::to_string(sensorIdx * m_numSamplesPerBlock + sampleIdx)).append("] = ").append(std::to_string(value)));
+    m_samplesBlock[sensorIdx * m_numSamplesPerBlock + sampleIdx] = value;
+    if (sensorIdx == m_numSensors -1) {
+        sampleIdx++;
+        if (sampleIdx == m_numSamplesPerBlock) {
+            sampleIdx = 0;
+            memcpy((void*)m_samplesBlock2, (void*)m_samplesBlock, m_numSamplesPerBlock * m_numSensors);
+            std::thread([this](){
+                m_pControllerParent->newData(m_samplesBlock2, m_numSensors, m_numSamplesPerBlock);
+            });
+        }
     }
 }
 

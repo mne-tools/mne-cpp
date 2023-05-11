@@ -132,9 +132,8 @@ namespace FIELDLINEPLUGIN {
 
 Fieldline::Fieldline()
 : m_pAcqSystem(nullptr)
-, m_pCircularBuffer(QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>(new UTILSLIB::CircularBuffer_Matrix_double(10)))
+, m_pFiffInfo(QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo()))
 {
-  // printLog("constructor fieldline plugin");
 }
 
 //=============================================================================================================
@@ -159,11 +158,10 @@ void Fieldline::init()
 {
   printLog("Fieldline init");
   m_pCircularBuffer = QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>::create(40);
-  // data infrastructure
   m_pRTMSA = SCSHAREDLIB::PluginOutputData
     <SCMEASLIB::RealTimeMultiSampleArray>::create(this, "Fieldline Plugin",
                                                   "FieldlinePlguin output");
-  m_pRTMSA->measurementData()->setName(this->getName());  // Provide name to auto store widget settings
+  m_pRTMSA->measurementData()->setName(this->getName());
   m_outputConnectors.append(m_pRTMSA);
 
   m_pAcqSystem = new FieldlineAcqSystem(this);
@@ -190,11 +188,10 @@ bool Fieldline::start()
 
 void Fieldline::initFiffInfo()
 {
-  QSharedPointer<FIFFLIB::FiffInfo> info;
-  info->sfreq = 1000.0f;
-  info->nchan = 32;
-  info->chs.clear();
-  for (int chan_i = 0; chan_i < info->nchan; chan_i++) {
+  m_pFiffInfo->sfreq = 1000.0f;
+  m_pFiffInfo->nchan = 33;
+  m_pFiffInfo->chs.clear();
+  for (int chan_i = 0; chan_i < m_pFiffInfo->nchan; chan_i++) {
     FIFFLIB::FiffChInfo channel;
     channel.kind = FIFFV_MEG_CH;
     channel.unit = FIFF_UNIT_T;
@@ -202,11 +199,11 @@ void Fieldline::initFiffInfo()
     channel.chpos.coil_type = FIFFV_COIL_NONE;
     std::string channel_name(std::string("Ch. ") + std::to_string(chan_i));
     channel.ch_name = QString::fromStdString(channel_name);
-    info->chs.append(channel);
-    info->ch_names.append(QString::fromStdString(channel_name));
+    m_pFiffInfo->chs.append(channel);
+    m_pFiffInfo->ch_names.append(QString::fromStdString(channel_name));
   }
 
-  m_pRTMSA->measurementData()->initFromFiffInfo(info);
+  m_pRTMSA->measurementData()->initFromFiffInfo(m_pFiffInfo);
   m_pRTMSA->measurementData()->setMultiArraySize(1);
   m_pRTMSA->measurementData()->setVisibility(true);
 }
@@ -265,13 +262,17 @@ void Fieldline::findIpAsync(std::vector<std::string>& macList,
 
 //=============================================================================================================
 
-void Fieldline::run() 
+void Fieldline::run()
 {
   Eigen::MatrixXd matData;
+  matData.resize(m_pFiffInfo->nchan, 200);
 
   while (!isInterruptionRequested()) {
     if (m_pCircularBuffer->pop(matData)) {
       if (!isInterruptionRequested()) {
+        // matData = Eigen::MatrixXd::Random(m_pFiffInfo->nchan, 200);
+        matData *= 4e-12;
+        // msleep(200);
         m_pRTMSA->measurementData()->setValue(matData);
       }
     }
@@ -285,9 +286,18 @@ QString Fieldline::getBuildInfo() {
   return QString(buildDateTime()) + QString(" - ") + QString(buildHash());
 }
 
-void Fieldline::newData(double* data, size_t numChannels)
+//=============================================================================================================
+
+void Fieldline::newData(double* data, size_t numChannels, size_t numSamples)
 {
-    while(!m_pCircularBuffer->push(Eigen::Map<Eigen::MatrixXd>(data, 1, numChannels))) {
+    Eigen::MatrixXd matData;
+    matData.resize(numChannels, numSamples);
+    for (size_t i = 0; i < numChannels; i++) {
+        for (size_t j = 0; j < numSamples; j++) {
+            matData(i, j) = data[i * numSamples + j];
+        }
+    }
+    while (!m_pCircularBuffer->push(matData)) {
         printLog("Fieldline Plugin: Pushing data to circular buffer failed... Trying again.");
     }
 }

@@ -114,7 +114,8 @@ class FieldLineService:
             end_time = time.time()
             elapsed_time = end_time - start_time
             # time_to_sleep = max(0, .001 - elapsed_time)
-            time.sleep(abs(sampling_period + elapsed_time_diff - 0.7 * elapsed_time))
+            # time.sleep(abs(sampling_period + elapsed_time_diff - 0.7 * elapsed_time))
+            time.sleep(sampling_period)
             # print(f"elapsed_time: {elapsed_time:04}")
         # start_time = time.time()
         # end_time = time.time()
