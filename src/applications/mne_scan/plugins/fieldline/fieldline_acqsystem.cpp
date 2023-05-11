@@ -636,10 +636,11 @@ void FieldlineAcqSystem::addSampleToSamplesColumn(int sensorIdx, double value)
         sampleIdx++;
         if (sampleIdx == m_numSamplesPerBlock) {
             sampleIdx = 0;
-            memcpy((void*)m_samplesBlock2, (void*)m_samplesBlock, m_numSamplesPerBlock * m_numSensors);
-            std::thread([this](){
-                m_pControllerParent->newData(m_samplesBlock2, m_numSensors, m_numSamplesPerBlock);
-            });
+            m_pControllerParent->newData(m_samplesBlock, m_numSensors, m_numSamplesPerBlock);
+            // memcpy((void*)m_samplesBlock2, (void*)m_samplesBlock, m_numSamplesPerBlock * m_numSensors);
+            // std::thread([this](){
+            //     m_pControllerParent->newData(m_samplesBlock2, m_numSensors, m_numSamplesPerBlock);
+            // });
         }
     }
 }

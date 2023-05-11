@@ -264,19 +264,19 @@ void Fieldline::findIpAsync(std::vector<std::string>& macList,
 
 void Fieldline::run()
 {
-  Eigen::MatrixXd matData;
-  matData.resize(m_pFiffInfo->nchan, 200);
-
-  while (!isInterruptionRequested()) {
-    if (m_pCircularBuffer->pop(matData)) {
-      if (!isInterruptionRequested()) {
-        // matData = Eigen::MatrixXd::Random(m_pFiffInfo->nchan, 200);
-        matData *= 4e-12;
-        // msleep(200);
-        m_pRTMSA->measurementData()->setValue(matData);
-      }
-    }
-  }
+  // Eigen::MatrixXd matData;
+  // matData.resize(m_pFiffInfo->nchan, 200);
+  //
+  // while (!isInterruptionRequested()) {
+  //   if (m_pCircularBuffer->pop(matData)) {
+  //     if (!isInterruptionRequested()) {
+  //       // matData = Eigen::MatrixXd::Random(m_pFiffInfo->nchan, 200);
+  //       matData *= 4e-12;
+  //       // msleep(200);
+  //       m_pRTMSA->measurementData()->setValue(matData);
+  //     }
+  //   }
+  // }
 }
 
 //=============================================================================================================
@@ -297,9 +297,11 @@ void Fieldline::newData(double* data, size_t numChannels, size_t numSamples)
             matData(i, j) = data[i * numSamples + j];
         }
     }
-    while (!m_pCircularBuffer->push(matData)) {
-        printLog("Fieldline Plugin: Pushing data to circular buffer failed... Trying again.");
-    }
+    m_pRTMSA->measurementData()->setValue(matData);
+    //
+    // while (!m_pCircularBuffer->push(matData)) {
+    //     printLog("Fieldline Plugin: Pushing data to circular buffer failed... Trying again.");
+    // }
 }
 
 }  // namespace FIELDLINEPLUGIN
