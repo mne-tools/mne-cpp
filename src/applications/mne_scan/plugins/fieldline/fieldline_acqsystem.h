@@ -49,7 +49,7 @@ class FieldlineAcqSystem {
 
     void callFunctionAsync(const char* moduleName, const char* funcName);
 
-    void callFunction(const std::string moduleName, const std::string funcName);
+    void callFunction(const std::string& moduleName, const std::string& funcName);
 
     void setCallback();
     void startADC();

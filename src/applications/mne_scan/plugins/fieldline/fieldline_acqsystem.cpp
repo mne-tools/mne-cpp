@@ -394,26 +394,46 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     // register "this" into somewhere findable by python's execution flow.
     acq_system = this;
     initSampleArrays();
-    // Py_DECREF(argsSetDataParser);
-    // Py_DECREF(setCloseLoop);
-    // Py_DECREF(trueTuple);
-    // Py_DECREF(pResult2);
-    //
-    // Py_DECREF(FieldlineModule);
-    // Py_DECREF(fService);
-    // Py_DECREF(ipList);
-    // Py_DECREF(fServiceInstance);
-    // Py_DECREF(openMethod);
-    // Py_DECREF(pResult);
-    //
+
+    Py_DECREF(parseCallbacksModule);
+    Py_DECREF(FieldlineModule);
+    Py_DECREF(fService);
+    Py_DECREF(ipList);
+    Py_DECREF(fServiceInstance);
+    Py_DECREF(openMethod);
+    Py_DECREF(pResult);
+    Py_DECREF(setCloseLoop);
+    Py_DECREF(trueTuple);
+    Py_DECREF(pResult2);
+    Py_DECREF(loadSensors);
+    Py_DECREF(restartAllSensors);
+    Py_DECREF(callback_on_finished);
+    Py_DECREF(callback_on_error);
+    Py_DECREF(callback_on_completion);
+    Py_DECREF(argsRestart);
+    Py_DECREF(resultRestart);
+    Py_DECREF(readDataFcn);
+    Py_DECREF(parserCallback);
+    Py_DECREF(argsSetDataParser);
+    Py_DECREF(result33);
+
     m_pThreadState = (void*)PyEval_SaveThread();
 }
 
 FieldlineAcqSystem::~FieldlineAcqSystem()
 {
     PyEval_RestoreThread(reinterpret_cast<PyThreadState*>(m_pThreadState));
-    Py_DECREF(m_pCallbackModule);
-    Py_DECREF(m_pCallsModule);
+
+    Py_XDECREF(m_pCallbackModule);
+    Py_XDECREF(m_pCallsModule);
+
+    if (m_samplesBlock) {
+        delete[] m_samplesBlock;
+    }
+    if (m_samplesBlock2) {
+        delete[] m_samplesBlock2;
+    }
+
     Py_Finalize();
 }
 
@@ -473,6 +493,10 @@ void FieldlineAcqSystem::startADC() {
         printLog("startResult ok");
     }
 
+    Py_DECREF(argsStartData);
+    Py_DECREF(zeroArg);
+    Py_DECREF(startResult);
+
     PyGILState_Release(gstate);
 }
 
@@ -492,6 +516,10 @@ void FieldlineAcqSystem::stopADC() {
         printLog("stopResult ok");
     }
 
+    Py_DECREF(argsstopData);
+    Py_DECREF(stopArg);
+    Py_DECREF(stopResult);
+
     PyGILState_Release(gstate);
 }
 
@@ -506,6 +534,8 @@ void* FieldlineAcqSystem::loadModule(const char* moduleName)
         PyErr_Print();
     }
 
+    Py_DECREF(pModule);
+
     PyGILState_Release(gstate);
 
     return (void*)pModule;
@@ -519,16 +549,14 @@ void* FieldlineAcqSystem::loadCModule(const char* moduleName, void*(*moduleInitF
     if (Py_IsInitialized())
     {
         PyImport_AddModule(moduleName);
-        PyObject* pyModule = (PyObject*)moduleInitFunc();
+        PyObject* PyModule = (PyObject*)moduleInitFunc();
         PyObject* sys_modules = PyImport_GetModuleDict();
-        PyDict_SetItemString(sys_modules, moduleName, pyModule);
-        Py_DECREF(pyModule);
+        PyDict_SetItemString(sys_modules, moduleName, PyModule);
+        Py_DECREF(PyModule);
     } else {
         PyImport_AppendInittab(moduleName, (PyObject*(*)(void)) moduleInitFunc);
     }
-
     PyGILState_Release(gstate);
-
     return loadModule(moduleName);
 }
 
@@ -540,7 +568,7 @@ void FieldlineAcqSystem::callFunctionAsync(const char* moduleName, const char* f
         t.detach();
 }
 
-void FieldlineAcqSystem::callFunction(const std::string moduleName, const std::string funcName)
+void FieldlineAcqSystem::callFunction(const std::string& moduleName, const std::string& funcName)
 {
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
@@ -553,6 +581,7 @@ void FieldlineAcqSystem::callFunction(const std::string moduleName, const std::s
         if (pModule == NULL) {
             PyErr_Print();
             printLog(std::string("Import failed. Can't find ").append(moduleName).append(".").c_str());
+            printLog("Check the Path.");
         }
     }
 
@@ -560,20 +589,17 @@ void FieldlineAcqSystem::callFunction(const std::string moduleName, const std::s
     if (pFunc == NULL) {
         printLog(std::string("Error finding function: ").append(funcName).c_str());
         PyErr_Print();
-        Py_DECREF(pModule);
     }
 
     PyObject* pResult = PyObject_CallObject(pFunc, NULL);
     if (pResult == NULL) {
         printLog(std::string("Error calling function: ").append(funcName).c_str());
         PyErr_Print();
-        Py_DECREF(pModule);
-        Py_DECREF(pFunc);
     }
 
-    Py_DECREF(pModule);
-    Py_DECREF(pFunc);
-    Py_DECREF(pResult);
+    Py_XDECREF(pModule);
+    Py_XDECREF(pFunc);
+    Py_XDECREF(pResult);
 
     PyGILState_Release(gstate);
 }
