@@ -301,6 +301,7 @@ CMakeConfigFlags=""
 ExtraArgs=""
 ExtraSection=False
 QtCustomPath=""
+EchoFlag=""
 
 doShowLogo() {
   echo "                                      "
@@ -314,22 +315,22 @@ doShowLogo() {
 }
 
 doShowLogoFlames() {
-  echo "\033[32m"
-  echo "\033[31m     *       )             (   (        "
-  echo "\033[31m   (  \`   (  (         (   )\ ))\ )     "
-  echo "\033[33m   )\))(  )\())(       )\ (()/(()/(     "
-  echo "\033[33m  ((_)()\((_)\ )\ ___(((_) /(_))(_))    "
-  echo "\033[37m  (_()((_)_((_|(_)___)\___(_))(_))      "
-  echo "\033[32m  |  \/  | \| | __| ((/ __| _ \ _ \     "
+  echo ${EchoFlag} "\033[32m"
+  echo ${EchoFlag} "\033[31m     *       )             (   (        "
+  echo ${EchoFlag} "\033[31m   (  \`   (  (         (   )\ ))\ )     "
+  echo ${EchoFlag} "\033[33m   )\))(  )\())(       )\ (()/(()/(     "
+  echo ${EchoFlag} "\033[33m  ((_)()\((_)\ )\ ___(((_) /(_))(_))    "
+  echo ${EchoFlag} "\033[37m  (_()((_)_((_|(_)___)\___(_))(_))      "
+  echo ${EchoFlag} "\033[32m  |  \/  | \| | __| ((/ __| _ \ _ \     "
   echo "  | |\/| | .\` | _|   | (__|  _/  _/     "
   echo "  |_|  |_|_|\_|___|   \___|_| |_|       "
   echo "                                        "
   echo "  Build successful                      "
-  echo "\033[0m"
+  echo ${EchoFlag} "\033[0m"
 }
 
 doShowBuildFailed() {
-  echo "\033[31m"
+  echo ${EchoFlag} "\033[31m"
   echo "   _           _ _     _     __      _ _          _   "
   echo "  | |         (_) |   | |   / _|    (_) |        | |  "
   echo "  | |__  _   _ _| | __| |  | |_ __ _ _| | ___  __| |  "
@@ -338,7 +339,7 @@ doShowBuildFailed() {
   echo "  |_.__/ \__,_|_|_|\__,_|  |_| \__,_|_|_|\___|\__,_|  "
   echo "                                                      "
   echo "  Here we go...                                       "
-  echo "\033[0m"
+  echo ${EchoFlag} "\033[0m"
 }
 
 doPrintConfiguration() {
@@ -449,6 +450,7 @@ if [ "$(uname)" == "Darwin" ]; then
   NumProcesses=$(sysctl -n hw.logicalcpu)
 else
   NumProcesses=$(expr $(nproc --all))
+  EchoFlag="-e"
 fi
 
 #### command execution starts here
