@@ -15,29 +15,34 @@ option(BUILD_TESTS "Build tests" OFF)
 
 option(BUILD_ALL "Build entire project" OFF)
 
+option(WITH_CODE_COV "Build with code coverage enabled" OFF)
+
+option(NO_IPC "Build project with no interprocess communication features (shared memory)" OFF)
+
+option(WASM "Setup build for wasm" OFF)
+
+option(USE_FFTW "Use fftw backend for eigen" OFF)
+
+##==============================================================================
+## Set up compilation based on options
+
 if(BUILD_ALL)
   set(BUILD_EXAMPLES ON)
   set(BUILD_TESTS ON)
   set(BUILD_APPLICATIONS ON)
 endif()
 
-option(WITH_CODE_COV "Build with code coverage enabled" OFF)
-if(WITH_CODE_COV)
-  add_compile_options("--coverage")
-  add_link_options("--coverage")
+if(WASM)
+  add_compile_definitions(WASMBUILD)
+  set(BUILD_SHARED_LIBS OFF)
+  set(NO_TESTS ON)
+  set(NO_EXAMPLES ON)
+  set(NO_IPC ON)
 endif()
-
-option(NO_IPC "Build project with no interprocess communication features (shared memory)" OFF)
 
 if(NO_IPC)
     add_compile_definitions(NO_IPC)
 endif()
-
-
-##==============================================================================
-## FFTW Options
-
-option(USE_FFTW "Use fftw backend for eigen" OFF)
 
 set(FFTW_DIR_LIBS "${PROJECT_SOURCE_DIR}/external/fftw")
 set(FFTW_DIR_INCLUDE "${PROJECT_SOURCE_DIR}/external/fftw")
@@ -45,16 +50,9 @@ if(USE_FFTW)
   set(EIGEN_FFTW_DEFAULT)
 endif()
 
-##==============================================================================
-## WASM
-
-option(WASM "Setup build for wasm" OFF)
-
-if(WASM)
-  add_compile_definitions(WASMBUILD)
-  set(BUILD_SHARED_LIBS OFF)
-  set(NO_TESTS ON)
-  set(NO_EXAMPLES ON)
+if(WITH_CODE_COV)
+  add_compile_options("--coverage")
+  add_link_options("--coverage")
 endif()
 
 ##==============================================================================
