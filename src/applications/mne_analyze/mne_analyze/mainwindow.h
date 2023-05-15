@@ -155,7 +155,7 @@ public:
      */
     void updatePluginsUI();
 
-signals:    
+signals:
     //=========================================================================================================
     /**
      * Signal emmited when the main window is closed

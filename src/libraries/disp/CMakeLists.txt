@@ -6,8 +6,9 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Concurrent Widgets Svg OpenGL 3DCore 3DRender 3DInput 3DExtras Charts)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Concurrent Widgets Svg OpenGL 3DCore 3DRender 3DInput 3DExtras Charts)
+set(QT_REQUIRED_COMPONENTS Core Concurrent Widgets Svg OpenGL 3DCore 3DRender 3DInput 3DExtras Charts)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
     disp_global.cpp
@@ -135,6 +136,30 @@ set(HEADERS
     viewers/helpers/bidsviewmodel.h
 )
 
+set(UI
+    viewers/formfiles/applytoview.ui
+    viewers/formfiles/coregsettingsview.ui
+    viewers/formfiles/dipolefitview.ui
+    viewers/formfiles/filterdesignview.ui
+    viewers/formfiles/fwdsettingsview.ui
+    viewers/formfiles/scalecontrol.ui
+    viewers/formfiles/progressview.ui
+    viewers/formfiles/channelselectionview.ui
+    viewers/formfiles/scalingview.ui
+    viewers/formfiles/filtersettingsview.ui
+    viewers/formfiles/spharasettingsview.ui
+    viewers/formfiles/fiffrawviewsettings.ui
+    viewers/formfiles/triggerdetectionview.ui
+    viewers/formfiles/quickcontrolview.ui
+    viewers/formfiles/connectivitysettingsview.ui
+    viewers/formfiles/minimumnormsettingsview.ui
+    viewers/formfiles/averagingsettingsview.ui
+    viewers/formfiles/projectsettingsview.ui
+    viewers/formfiles/control3dview.ui
+    viewers/formfiles/tfsettingsview.ui
+    viewers/formfiles/hpisettingsview.ui
+    viewers/formfiles/bidsview.ui)
+
 set(CMAKE_AUTOUIC_SEARCH_PATHS "${CMAKE_CURRENT_SOURCE_DIR}/viewers/formfiles")
 
 set(FILE_TO_UPDATE disp_global.cpp)
@@ -143,7 +168,7 @@ set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${UI})
 
 set(FFTW_LIBS "")
 
@@ -165,17 +190,11 @@ target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
 target_include_directories(${PROJECT_NAME} PRIVATE .    ${FFTW_LIBS})
 
+set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
+list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Concurrent
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Svg
-    Qt${QT_VERSION_MAJOR}::OpenGL
-    Qt${QT_VERSION_MAJOR}::3DCore
-    Qt${QT_VERSION_MAJOR}::3DRender
-    Qt${QT_VERSION_MAJOR}::3DInput
-    Qt${QT_VERSION_MAJOR}::3DExtras
-    Qt${QT_VERSION_MAJOR}::Charts
+    ${QT_REQUIRED_COMPONENT_LIBS}
     eigen
     mne_utils
     mne_fiff

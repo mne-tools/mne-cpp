@@ -62,7 +62,6 @@
 using namespace MNELIB;
 using namespace Eigen;
 
-
 //=============================================================================================================
 /**
  * DECLARE CLASS TestMNEProjectToSurface
@@ -101,8 +100,8 @@ TestMNEProjectToSurface::TestMNEProjectToSurface()
 
 void TestMNEProjectToSurface::initTestCase()
 {
-    QFile t_fileBem(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif");
-    QString sRef(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/mne_project_to_surface.txt");
+    QFile t_fileBem(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-1280-1280-1280-bem.fif");
+    QString sRef(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/mne_project_to_surface.txt");
 
     MNEBem bemHead(t_fileBem);
     MNEBemSurface::SPtr bemSurface = MNEBemSurface::SPtr::create(bemHead[0]);

@@ -53,7 +53,9 @@
 
 using namespace DISPLIB;
 using namespace Eigen;
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 using namespace QtCharts;
+#endif
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS

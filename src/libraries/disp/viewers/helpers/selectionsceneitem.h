@@ -132,5 +132,4 @@ Q_DECLARE_METATYPE(DISPLIB::SelectionItem);
 Q_DECLARE_METATYPE(DISPLIB::SelectionItem*);
 #endif
 
-
 #endif // SELECTIONSCENEITEM_H

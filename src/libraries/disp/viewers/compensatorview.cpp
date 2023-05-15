@@ -215,7 +215,7 @@ void CompensatorView::redrawGUI()
 //=============================================================================================================
 
 void CompensatorView::onCheckCompStatusChanged()
-{    
+{
    if(QCheckBox* pCheckBox = qobject_cast<QCheckBox*>(sender())) {
         bool currentState = false;
         QString compName = pCheckBox->text();

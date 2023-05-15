@@ -102,7 +102,7 @@ void TestMneMshDisplaySurfaceSet::initTestCase()
     //Calculate the alignment of the fiducials
     m_pSurfSetBemLoaded = MneMshDisplaySurfaceSet::SPtr(new MneMshDisplaySurfaceSet());
     MneMshDisplaySurfaceSet::add_bem_surface(m_pSurfSetBemLoaded.data(),
-                                             QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif",
+                                             QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif",
                                              FIFFV_BEM_SURF_ID_BRAIN,
                                              "5120",
                                              1,
@@ -124,7 +124,7 @@ void TestMneMshDisplaySurfaceSet::compareSurface()
 //=============================================================================================================
 
 void TestMneMshDisplaySurfaceSet::cleanupTestCase()
-{    
+{
 }
 
 //=============================================================================================================

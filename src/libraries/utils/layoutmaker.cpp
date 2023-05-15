@@ -181,6 +181,10 @@ bool LayoutMaker::makeLayout(const QList<QVector<float> > &inputPoints,
         out.setDevice(&outFile);
     }
 
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+    using Qt::endl;
+#endif
+
     out << "0.000000 0.000000 0.000000 0.000000" << endl;
 
     for(k = 0; k < nchan; k++) {
@@ -202,7 +206,7 @@ bool LayoutMaker::makeLayout(const QList<QVector<float> > &inputPoints,
             if(k < names.size()) {
                 out << k+1 << " " << point[0] << " " << point[1] << " " << w << " " << h << " " << names.at(k) << endl;
             } else {
-                out << k+1 << " " << point[0] << " " << point[1] << " " << w << " " << h <<endl;
+                out << k+1 << " " << point[0] << " " << point[1] << " " << w << " " << h << endl;
             }
         }
     }
@@ -326,7 +330,6 @@ bool LayoutMaker::makeLayout(const std::vector<std::vector<float> > &inputPoints
         outFile << "0.000000 0.000000 0.000000 0.000000" << std::endl;
     }
 
-
     for(int k = 0; k < nchan; k++) {
         point.clear();
 
@@ -343,7 +346,7 @@ bool LayoutMaker::makeLayout(const std::vector<std::vector<float> > &inputPoints
         outputPoints.push_back(point);
 
         if(writeFile) {
-            if((k) < names.size()) {
+            if((k) < (int)names.size()) {
                 outFile << k+1 << " " << point[0] << " " << point[1] << " " << w << " " << h << " " << names.at(k) << std::endl;
             } else {
                 outFile << k+1 << " " << point[0] << " " << point[1] << " " << w << " " << h << std::endl;

@@ -90,7 +90,6 @@ FiffDigPointSet::FiffDigPointSet(QList<FIFFLIB::FiffDigPoint> pointList)
 {
 }
 
-
 //=============================================================================================================
 
 FiffDigPointSet::FiffDigPointSet(QIODevice &p_IODevice)   //const FiffDigPointSet &p_FiffDigPointSet
@@ -222,7 +221,7 @@ void FiffDigPointSet::writeToStream(FiffStream* p_pStream)
         p_pStream->write_dig_point(m_qListDigPoint[h]);
     }
 
-    printf("\t%d digitizer points written\n", m_qListDigPoint.size());
+    printf("\t%lld digitizer points written\n", m_qListDigPoint.size());
     p_pStream->end_block(FIFFB_ISOTRAK);
     p_pStream->end_block(FIFFB_MEAS_INFO);
     p_pStream->end_block(FIFFB_MEAS);

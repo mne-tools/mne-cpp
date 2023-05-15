@@ -78,7 +78,7 @@ using namespace ANSHAREDLIB;
 
 DipoleFit::DipoleFit()
 {
-    m_DipoleSettings.dipname = QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/dip-5120-bem_fit.dat";
+    m_DipoleSettings.dipname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/dip-5120-bem_fit.dat";
 }
 
 //=============================================================================================================
@@ -227,8 +227,9 @@ void DipoleFit::onPerformDipoleFit(const QString& sFitName)
 
     triggerLoadingStart("Performing Dipole Fit...");
 
-    m_Future = QtConcurrent::run(this,
-                                 &DipoleFit::dipoleFitCalculation);
+    m_Future = QtConcurrent::run([this] {
+        return this->dipoleFitCalculation();
+    });
 
     m_FutureWatcher.setFuture(m_Future);
 }

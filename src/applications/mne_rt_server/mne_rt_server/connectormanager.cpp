@@ -49,7 +49,7 @@
 #include <communication/rtCommand/commandmanager.h>
 
 #ifdef STATICBUILD
-#include <../plugins/fiffsimulator/fiffsimulator.h>
+#include "../plugins/fiffsimulator/fiffsimulator.h"
 #endif
 
 #include <iostream>
@@ -312,9 +312,9 @@ QByteArray ConnectorManager::getConnectorList(bool p_bFlagJSON) const
             for( ; it != s_vecConnectors.end(); ++it)
             {
                 if((*it)->isActive())
-                    t_blockConnectorList.append(QString("  *  (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()));
+                    t_blockConnectorList.append(QString("  *  (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()).toUtf8());
                 else
-                    t_blockConnectorList.append(QString("     (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()));
+                    t_blockConnectorList.append(QString("     (%1) %2\r\n").arg((*it)->getConnectorID()).arg((*it)->getName()).toUtf8());
             }
         }
         else
@@ -412,7 +412,7 @@ void ConnectorManager::loadConnectors(const QString& dir)
     //
     qint32 configConnector = -1;
     QString configFileName("plugin.cfg");
-    QFile configFile(QString("%1/resources/mne_rt_server/plugins/"+configFileName).arg(QCoreApplication::applicationDirPath()));
+    QFile configFile(QString("%1/../resources/mne_rt_server/plugins/"+configFileName).arg(QCoreApplication::applicationDirPath()));
     if(!configFile.open(QIODevice::ReadOnly)) {
         printf("Not able to read config file... %s\n", configFile.fileName().toUtf8().constData());
     }
@@ -494,19 +494,19 @@ QByteArray ConnectorManager::setActiveConnector(qint32 ID)
            this->connectActiveConnector();
 
             str = QString("\t%1 activated.\r\n\n").arg(t_pNewActiveConnector->getName());
-            p_blockClientList.append(str);
+            p_blockClientList.append(str.toUtf8());
         }
         else
         {
             str = QString("\tID %1 doesn't match a connector ID.\r\n\n").arg(ID);
-            p_blockClientList.append(str);
+            p_blockClientList.append(str.toUtf8());
             p_blockClientList.append(getConnectorList());
         }
     }
     else
     {
         str = QString("\t%1 is already active.\r\n\n").arg(getActiveConnector()->getName());
-        p_blockClientList.append(str);
+        p_blockClientList.append(str.toUtf8());
     }
 
     return p_blockClientList;

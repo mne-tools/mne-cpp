@@ -305,7 +305,12 @@ void DipoleFitView::initGui()
     connect(m_pUi->comboBox_mri, &QComboBox::currentTextChanged,
             this, &DipoleFitView::selectedMri, Qt::UniqueConnection);
     connect(m_pUi->comboBox_meas, &QComboBox::currentTextChanged, [=](const QString& sFileName){
-            QString sName = sFileName.split(".",QString::SkipEmptyParts).at(0);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+            auto skip = QString::SkipEmptyParts;
+#else
+            auto skip = Qt::SkipEmptyParts;
+#endif
+            QString sName = sFileName.split(".",skip).at(0);
             if(sName.endsWith("-ave") || sName.endsWith("_ave") || sName.endsWith("-raw") || sName.endsWith("_raw")){
                 sName.chop(4);
             }

@@ -587,6 +587,8 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
 //                            matGainDiff = itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_G_partial.block(0, k*3, t_G_partial.rows(), 3);
                         }
                     }
+                    (void)j_min; // squash compiler warning, set but unused
+
 
 //                    qListGainDist.append(matGainDiff);
 
@@ -781,7 +783,7 @@ MNEInverseOperator MNEInverseOperator::make_inverse_operator(const FiffInfo &inf
             forward.prepare_forward(info, p_outNoiseCov, false, gain_info, gain, p_outNoiseCov, whitener, n_nzero);
         }
     }
-    printf("\tComputing inverse operator with %d channels.\n", gain_info.ch_names.size());
+    printf("\tComputing inverse operator with %lld channels.\n", gain_info.ch_names.size());
 
     //
     // 6. Compose the source covariance matrix

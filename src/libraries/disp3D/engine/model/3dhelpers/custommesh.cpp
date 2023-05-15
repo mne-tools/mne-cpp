@@ -46,10 +46,6 @@
 #include <QSharedPointer>
 #include <QVector3D>
 
-#include <Qt3DRender/QGeometry>
-#include <Qt3DRender/QAttribute>
-#include <Qt3DRender/QBuffer>
-
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -95,46 +91,46 @@ CustomMesh::CustomMesh(const MatrixX3f& tMatVert,
 
 void CustomMesh::init()
 {
-    m_pCustomGeometry = new Qt3DRender::QGeometry(this);
+    m_pCustomGeometry = new QT_COMPATIBILITY_3D::QGeometry(this);
 
     this->setGeometry(m_pCustomGeometry);
 
-    m_pVertexDataBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer);
-    m_pNormalDataBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer);
-    m_pColorDataBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer);
-    m_pIndexDataBuffer = new Qt3DRender::QBuffer(Qt3DRender::QBuffer::IndexBuffer);
+    m_pVertexDataBuffer = new QT_COMPATIBILITY_3D::QBuffer();
+    m_pNormalDataBuffer = new QT_COMPATIBILITY_3D::QBuffer();
+    m_pColorDataBuffer = new QT_COMPATIBILITY_3D::QBuffer();
+    m_pIndexDataBuffer = new QT_COMPATIBILITY_3D::QBuffer();
 
-    m_pIndexAttribute = new Qt3DRender::QAttribute();
-    m_pIndexAttribute->setAttributeType(Qt3DRender::QAttribute::IndexAttribute);
-    m_pIndexAttribute->setDataType(Qt3DRender::QAttribute::UnsignedInt);
+    m_pIndexAttribute = new QT_COMPATIBILITY_3D::QAttribute();
+    m_pIndexAttribute->setAttributeType(QT_COMPATIBILITY_3D::QAttribute::IndexAttribute);
+    m_pIndexAttribute->setVertexBaseType(QT_COMPATIBILITY_3D::QAttribute::UnsignedInt);
     m_pIndexAttribute->setByteOffset(0);
     m_pIndexAttribute->setBuffer(m_pIndexDataBuffer);
 
-    m_pVertexAttribute = new Qt3DRender::QAttribute();
-    m_pVertexAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
-    m_pVertexAttribute->setDataType(Qt3DRender::QAttribute::Float);
-    m_pVertexAttribute->setDataSize(3);
+    m_pVertexAttribute = new QT_COMPATIBILITY_3D::QAttribute();
+    m_pVertexAttribute->setAttributeType(QT_COMPATIBILITY_3D::QAttribute::VertexAttribute);
+    m_pVertexAttribute->setVertexBaseType(QT_COMPATIBILITY_3D::QAttribute::Float);
+    m_pVertexAttribute->setVertexSize(3);
     m_pVertexAttribute->setByteOffset(0);
     m_pVertexAttribute->setByteStride(3 * sizeof(float));
-    m_pVertexAttribute->setName(Qt3DRender::QAttribute::defaultPositionAttributeName());
+    m_pVertexAttribute->setName(QT_COMPATIBILITY_3D::QAttribute::defaultPositionAttributeName());
     m_pVertexAttribute->setBuffer(m_pVertexDataBuffer);
 
-    m_pNormalAttribute = new Qt3DRender::QAttribute();
-    m_pNormalAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
-    m_pNormalAttribute->setDataType(Qt3DRender::QAttribute::Float);
-    m_pNormalAttribute->setDataSize(3);
+    m_pNormalAttribute = new QT_COMPATIBILITY_3D::QAttribute();
+    m_pNormalAttribute->setAttributeType(QT_COMPATIBILITY_3D::QAttribute::VertexAttribute);
+    m_pNormalAttribute->setVertexBaseType(QT_COMPATIBILITY_3D::QAttribute::Float);
+    m_pNormalAttribute->setVertexSize(3);
     m_pNormalAttribute->setByteOffset(0);
     m_pNormalAttribute->setByteStride(3 * sizeof(float));
-    m_pNormalAttribute->setName(Qt3DRender::QAttribute::defaultNormalAttributeName());
+    m_pNormalAttribute->setName(QT_COMPATIBILITY_3D::QAttribute::defaultNormalAttributeName());
     m_pNormalAttribute->setBuffer(m_pNormalDataBuffer);
 
-    m_pColorAttribute = new Qt3DRender::QAttribute();
-    m_pColorAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
-    m_pColorAttribute->setDataType(Qt3DRender::QAttribute::Float);
-    m_pColorAttribute->setDataSize(4);
+    m_pColorAttribute = new QT_COMPATIBILITY_3D::QAttribute();
+    m_pColorAttribute->setAttributeType(QT_COMPATIBILITY_3D::QAttribute::VertexAttribute);
+    m_pColorAttribute->setVertexBaseType(QT_COMPATIBILITY_3D::QAttribute::Float);
+    m_pColorAttribute->setVertexSize(4);
     m_pColorAttribute->setByteOffset(0);
     m_pColorAttribute->setByteStride(4 * sizeof(float));
-    m_pColorAttribute->setName(Qt3DRender::QAttribute::defaultColorAttributeName());
+    m_pColorAttribute->setName(QT_COMPATIBILITY_3D::QAttribute::defaultColorAttributeName());
     m_pColorAttribute->setBuffer(m_pColorDataBuffer);
 
     m_pCustomGeometry->addAttribute(m_pVertexAttribute);
@@ -278,7 +274,7 @@ void CustomMesh::setMeshData(const MatrixX3f& tMatVert,
 
 //=============================================================================================================
 
-void CustomMesh::addAttribute(Qt3DRender::QAttribute *pAttribute)
+void CustomMesh::addAttribute(QT_COMPATIBILITY_3D::QAttribute *pAttribute)
 {
     m_pCustomGeometry->addAttribute(pAttribute);
 }

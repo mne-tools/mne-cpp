@@ -218,14 +218,13 @@ void EEGoSportsSetupProjectWidget::updateCardinalComboBoxes(const QString& sPath
     m_pUi->m_comboBox_Nasion->addItems(elcChannelNames);
 }
 
-
 //=============================================================================================================
 
 void EEGoSportsSetupProjectWidget::changeCap()
 {
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Change EEG cap layout",
-                                                "resources/mne_scan/plugins/eegosports/loc_files",
+                                                "../resources/mne_scan/plugins/eegosports/loc_files",
                                                  tr("Electrode location files (*.elc)"));
 
     if(path==NULL){
@@ -242,7 +241,7 @@ void EEGoSportsSetupProjectWidget::changeCardinalFile()
 {
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Change cardinal file",
-                                                "resources/mne_scan/plugins/loc_files",
+                                                "../resources/mne_scan/plugins/loc_files",
                                                  tr("Electrode location files (*.elc)"));
 
     if(path==NULL)

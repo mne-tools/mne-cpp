@@ -112,6 +112,9 @@ void customMessageHandler(QtMsgType type, const QMessageLogContext &context, con
 
     if (outFile.open(QIODevice::WriteOnly | QIODevice::Append)) {
         QTextStream textStream(&outFile);
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+        using Qt::endl;
+#endif
         textStream << txt << endl;
     } else {
         qDebug() << "Unable to read data from file";
@@ -160,7 +163,7 @@ int main(int argc, char *argv[])
     qint64 iTime = 0;
     timer.start();
 
-    QString sRaw = "/cluster/fusion/lesch/Git/mne-cpp-lorenze/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
+    QString sRaw = QCoreApplication::applicationDirPath() + "../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
     MatrixXd matDataOrig, matData;
     MatrixXd times;
     QFile t_fileRaw(sRaw);
@@ -226,7 +229,7 @@ int main(int argc, char *argv[])
                     m_iNumberSamples = lNumberSamples.at(j);
 
                     //Create new folder
-                    m_sCurrentDir = QString("/cluster/fusion/lesch/connectivity_performance_%1_%2_%3/%4/%5_%6_%7").arg(QHostInfo::localHostName()).arg(AbstractMetric::m_iNumberBinAmount).arg(iStorageModeActive).arg(sConnectivityMethodList.at(i)).arg(QString::number(lNumberChannels.at(k))).arg(QString::number(lNumberSamples.at(j))).arg(QString::number(lNumberTrials.at(l)));
+                    m_sCurrentDir = QCoreApplication::applicationDirPath() + QString("./connectivity_performance_%1_%2_%3/%4/%5_%6_%7").arg(QHostInfo::localHostName()).arg(AbstractMetric::m_iNumberBinAmount).arg(iStorageModeActive).arg(sConnectivityMethodList.at(i)).arg(QString::number(lNumberChannels.at(k))).arg(QString::number(lNumberSamples.at(j))).arg(QString::number(lNumberTrials.at(l)));
                     QDir().mkpath(m_sCurrentDir);
 
                     //Write basic information to file

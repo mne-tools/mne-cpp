@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="/tools/design/logos/MNE-CPP_Logo.svg"><img src="/tools/design/logos/MNE-CPP_Logo.svg" width="400" height="200" alt="MNE-CPP"></a>
+  <a href="/resources/design/logos/MNE-CPP_Logo.svg"><img src="/resources/design/logos/MNE-CPP_Logo.svg" width="400" height="200" alt="MNE-CPP"></a>
 </p>
 <p align="center">
 <a href="https://github.com/mne-tools/mne-cpp/actions" target="_blank">
@@ -23,7 +23,9 @@ MNE-CPP is an open-source software framework which offers a variety of neuroscie
 Build from source
 -----------------
 
-To get the latest source code and compile it please follow the [build guide](https://mne-cpp.github.io/pages/development/buildguide.html). The minimum requirements to build MNE-CPP are:
+`tools/build_project.bat` builds the project for Windows, Linux, and MacOS.
+
+For more in depth information on how to compile the project, please follow the [build guide](https://mne-cpp.github.io/pages/development/buildguide.html). The minimum requirements to build MNE-CPP are:
 
   * Compiler
     * Windows - [MSVC 2015](https://visualstudio.microsoft.com/vs/older-downloads/) or later

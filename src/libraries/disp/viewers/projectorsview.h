@@ -41,6 +41,7 @@
 
 #include "../disp_global.h"
 #include "abstractview.h"
+#include <fiff/fiff_proj.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -57,10 +58,6 @@
 //=============================================================================================================
 
 class QCheckBox;
-
-namespace FIFFLIB {
-    class FiffProj;
-}
 
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
@@ -83,7 +80,7 @@ class DISPSHARED_EXPORT ProjectorsView : public AbstractView
 {
     Q_OBJECT
 
-public:    
+public:
     typedef QSharedPointer<ProjectorsView> SPtr;              /**< Shared pointer type for ProjectorsView. */
     typedef QSharedPointer<const ProjectorsView> ConstSPtr;   /**< Const shared pointer type for ProjectorsView. */
 

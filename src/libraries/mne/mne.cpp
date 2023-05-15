@@ -68,7 +68,6 @@ bool MNE::read_events(QString t_sEventName,
 {
     QFile t_EventFile;
     qint32 p;
-    bool status = false;
 
     if (t_sEventName.isEmpty()) {
         p = t_fileRawName.indexOf(".fif");
@@ -241,7 +240,7 @@ void MNE::setup_compensators(FiffRawData& raw,
             raw.info.projs[k].active = true;
         }
 
-        printf("%d projection items activated\n",raw.info.projs.size());
+        printf("%lld projection items activated\n",raw.info.projs.size());
         // Create the projector
 //        fiff_int_t nproj = MNE::make_projector_info(raw.info, raw.proj); Using the member function instead
         fiff_int_t nproj = raw.info.make_projector(raw.proj);

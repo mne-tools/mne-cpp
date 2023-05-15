@@ -48,8 +48,13 @@
 
 #include <QMap>
 #include <QWidget>
+#include <QtGlobal>
 #if !defined(NO_QOPENGLWIDGET)
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <QOpenGLWidget>
+#else
+#include <QtOpenGLWidgets/QOpenGLWidget>
+#endif
 #endif
 
 //=============================================================================================================

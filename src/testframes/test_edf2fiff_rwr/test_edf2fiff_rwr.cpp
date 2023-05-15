@@ -33,7 +33,6 @@
 *
 */
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -102,7 +101,6 @@ private:
     QVector<MatrixXd> m_vRawChunksFromWrittenFIFF;
 };
 
-
 //*************************************************************************************************************
 
 TestEDF2FIFFRWR::TestEDF2FIFFRWR()
@@ -110,22 +108,20 @@ TestEDF2FIFFRWR::TestEDF2FIFFRWR()
 
 }
 
-
 //*************************************************************************************************************
 
 void TestEDF2FIFFRWR::initTestCase()
 {
     qInstallMessageHandler(UTILSLIB::ApplicationLogger::customLogWriter);
 
-    m_pFileIn = new QFile(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/EEG/test_reduced.edf");
-    m_pFileOut = new QFile(QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/EEG/test_reduced_temporary.fif");
+    m_pFileIn = new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/EEG/test_reduced.edf");
+    m_pFileOut = new QFile(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/EEG/test_reduced_temporary.fif");
 
     // initialize EDF raw data
     m_pEDFRaw = new EDFRawData(m_pFileIn);
 
     QVERIFY(m_pEDFRaw->getInfo().getAllChannelInfos().size() != 0);
 }
-
 
 //*************************************************************************************************************
 
@@ -138,7 +134,6 @@ void TestEDF2FIFFRWR::testEDF2FiffConversion()
     QVERIFY(std::abs(m_pEDFRaw->getInfo().getFrequency() - m_pFiffRaw->info.sfreq) <= m_fEpsilon);  // float-comparisons via '==' are unsafe
     QVERIFY(m_pEDFRaw->getInfo().getSampleCount() == m_pFiffRaw->last_samp - m_pFiffRaw->first_samp);
 }
-
 
 //*************************************************************************************************************
 
@@ -170,7 +165,6 @@ void TestEDF2FIFFRWR::testEDFReadAndFiffWrite()
 
     QVERIFY(iSamplesRead == m_pEDFRaw->getInfo().getSampleCount());
 }
-
 
 //*************************************************************************************************************
 
@@ -215,7 +209,6 @@ void TestEDF2FIFFRWR::testFiffReadingAndValueEquality()
     }
 }
 
-
 //*************************************************************************************************************
 
 void TestEDF2FIFFRWR::cleanupTestCase()
@@ -235,7 +228,6 @@ void TestEDF2FIFFRWR::cleanupTestCase()
     delete m_pFileOut;
     delete m_pFileIn;
 }
-
 
 //*************************************************************************************************************
 //=============================================================================================================

@@ -36,7 +36,6 @@ layout (std430, binding = 2) buffer InputVec
     float inputData[];
 };
 
-
 //FORWARD DECLARATIONS
 float linearSlope(float x, float m, float n);
 vec3 colorMapHot(float x);
@@ -99,14 +98,12 @@ void main(void)
     }
 }
 
-
 //*************************************************************************
 
 float linearSlope(float x, float m, float n)
 {
     return m * x + n;
 }
-
 
 //*************************************************************************
 
@@ -152,7 +149,6 @@ vec3 colorMapJet(float x)
     return outColor;
 }
 
-
 //*************************************************************************
 
 vec3 colorMapHot(float x)
@@ -184,7 +180,6 @@ vec3 colorMapHot(float x)
     return outColor;
 }
 
-
 //*************************************************************************
 
 vec3 colorMapHotNeg1(float x)
@@ -215,7 +210,6 @@ vec3 colorMapHotNeg1(float x)
 
     return outColor;
 }
-
 
 //*************************************************************************
 
@@ -251,6 +245,5 @@ vec3 colorMapHotNeg2(float x)
 
     return outColor;
 }
-
 
 //*************************************************************************

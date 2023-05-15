@@ -50,7 +50,7 @@ Here you execute and declare everything that is necessary for setting up your te
 
 ```cpp
 Eigen::MatrixXd mDataFromFile;
-UTILSLIB::IOUtils::read_eigen_matrix(mDataFromFile, QCoreApplication::applicationDirPath() + "/mne-cpp-test-data/Result/<yourFile>.txt");
+UTILSLIB::IOUtils::read_eigen_matrix(mDataFromFile, QCoreApplication::applicationDirPath() + "../resources/data/mne-cpp-test-data/Result/<yourFile>.txt");
 ```
 
 All files you use, have to be added to [mne-cpp-test-data](https://github.com/mne-tools/mne-cpp-test-data){:target="_blank" rel="noopener"}. In case you need to add new data open a Pull Request to this repository. The files you use should be as small as possible. If you need a .fif file, have a look at the already existing data first.

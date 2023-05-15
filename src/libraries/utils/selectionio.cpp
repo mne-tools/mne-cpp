@@ -52,6 +52,7 @@
 #include <QTextStream>
 #include <QFile>
 #include <QDebug>
+#include <QScreen>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -69,7 +70,7 @@ SelectionIO::SelectionIO()
 
 //=============================================================================================================
 
-bool SelectionIO::readMNESelFile(QString path, QMap<QString,QStringList> &selectionMap)
+bool SelectionIO::readMNESelFile(QString path, QMultiMap<QString,QStringList> &selectionMap)
 {
     //Open .sel file
     if(!path.contains(".sel"))
@@ -104,7 +105,7 @@ bool SelectionIO::readMNESelFile(QString path, QMap<QString,QStringList> &select
                 secondSplit.removeLast();
 
             //Add to map
-            selectionMap.insertMulti(key, secondSplit);
+            selectionMap.insert(key, secondSplit);
         }
     }
 
@@ -137,13 +138,13 @@ bool SelectionIO::readMNESelFile(const std::string& path, std::multimap<std::str
             std::stringstream stream{line};
             std::vector<std::string> firstSplit;
             for (std::string element; std::getline(stream, line, ':');){
-                firstSplit.push_back(std::move(element));
+                firstSplit.push_back(element);
             }
             std::string key = firstSplit.at(0);
 
             std::vector<std::string> secondSplit;
             for (std::string element; std::getline(stream, line, '|');){
-                secondSplit.push_back(std::move(element));
+                secondSplit.push_back(element);
             }
             if(secondSplit.back() == ""){
                 secondSplit.pop_back();
@@ -157,7 +158,7 @@ bool SelectionIO::readMNESelFile(const std::string& path, std::multimap<std::str
 
 //=============================================================================================================
 
-bool SelectionIO::readBrainstormMonFile(QString path, QMap<QString,QStringList> &selectionMap)
+bool SelectionIO::readBrainstormMonFile(QString path, QMultiMap<QString,QStringList> &selectionMap)
 {
     //Open .sel file
     if(!path.contains(".mon"))
@@ -188,7 +189,7 @@ bool SelectionIO::readBrainstormMonFile(QString path, QMap<QString,QStringList> 
     }
 
     //Add to map
-    selectionMap.insertMulti(groupName, channels);
+    selectionMap.insert(groupName, channels);
 
     file.close();
 
@@ -235,7 +236,7 @@ bool SelectionIO::readBrainstormMonFile(const std::string& path, std::multimap<s
 
 //=============================================================================================================
 
-bool SelectionIO::writeMNESelFile(QString path, const QMap<QString,QStringList> &selectionMap)
+bool SelectionIO::writeMNESelFile(QString path, const QMultiMap<QString,QStringList> &selectionMap)
 {
     //Open .sel file
     if(!path.contains(".sel"))
@@ -250,7 +251,7 @@ bool SelectionIO::writeMNESelFile(QString path, const QMap<QString,QStringList> 
     //Write selections to file
     QTextStream out(&file);
 
-    QMap<QString, QStringList>::const_iterator i = selectionMap.constBegin();
+    QMultiMap<QString, QStringList>::const_iterator i = selectionMap.constBegin();
     while (i != selectionMap.constEnd()) {
         out << i.key() << ":";
 
@@ -294,16 +295,13 @@ bool SelectionIO::writeMNESelFile(const std::string& path, const std::map<std::s
 
 //=============================================================================================================
 
-bool SelectionIO::writeBrainstormMonFiles(QString path, const QMap<QString,QStringList> &selectionMap)
+bool SelectionIO::writeBrainstormMonFiles(QString path, const QMultiMap<QString,QStringList> &selectionMap)
 {
     //Open .sel file
     if(!path.contains(".mon"))
         return false;
 
-    QMapIterator<QString,QStringList> i(selectionMap);
-    while (i.hasNext()) {
-        i.next();
-
+    for(auto i = selectionMap.constBegin(); i != selectionMap.constEnd(); i++) {
         QFileInfo fileInfo(path);
 
         QString newPath = QString("%1/%2.mon").arg(fileInfo.absolutePath()).arg(i.key());

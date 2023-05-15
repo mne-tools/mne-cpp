@@ -6,11 +6,12 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Svg)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Svg)
+set(QT_REQUIRED_COMPONENTS Core Widgets Svg)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
-    controlmanager.cpp 
+    controlmanager.cpp
     controlmanager_global.cpp
 )
 
@@ -45,10 +46,11 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
+set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
+list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Svg
+    ${QT_REQUIRED_COMPONENT_LIBS}
     eigen
     mne_disp
     mne_disp3D
@@ -60,11 +62,16 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     mne_inverse
     mne_rtprocessing
     mne_events
-	anShared
+    anShared
     ${FFTW_LIBS})
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE ANALYZE_CONTROLMANAGER_PLUGIN MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}" MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}")
+target_compile_definitions(${PROJECT_NAME}
+    PRIVATE ANALYZE_CONTROLMANAGER_PLUGIN
+    MNE_GIT_HASH_SHORT="${MNE_GIT_HASH_SHORT}"
+    MNE_GIT_HASH_LONG="${MNE_GIT_HASH_LONG}"
+)
 
 if(NOT BUILD_SHARED_LIBS)
-    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD QT_STATICPLUGIN)
+    target_compile_definitions(${PROJECT_NAME}
+	PRIVATE STATICBUILD QT_STATICPLUGIN)
 endif()

@@ -67,7 +67,6 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
@@ -269,7 +268,7 @@ void EventView::removeEvent()
 
     std::set<int> set;
 
-    for (auto index : indexList){
+    for (const auto& index : indexList){
         set.insert(index.row());
     }
 
@@ -406,7 +405,7 @@ bool EventView::newUserGroup(const QString& sName,
 //=============================================================================================================
 
 void EventView::groupChanged()
-{    
+{
     auto selection = m_pUi->m_listWidget_groupListWidget->selectionModel()->selectedRows();
 
     if(!selection.size()){
@@ -497,12 +496,9 @@ void EventView::onDetectTriggers(const QString &sChannelName,
 
     emit loadingStart("Detecting triggers...");
 
-    m_Future = QtConcurrent::run(this,
-                                 &EventView::detectTriggerCalculations,
-                                 sChannelName,
-                                 dThreshold,
-                                 *m_pFiffRawModel->getFiffInfo(),
-                                 *this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data());
+    m_Future = QtConcurrent::run([&, this] {
+        return this->detectTriggerCalculations(sChannelName, dThreshold, *m_pFiffRawModel->getFiffInfo(),*this->m_pFiffRawModel->getFiffIO()->m_qlistRaw.first().data());
+    });
     m_FutureWatcher.setFuture(m_Future);
 
 }
@@ -550,7 +546,6 @@ QMap<double,QList<int>> EventView::detectTriggerCalculations(const QString& sCha
 }
 
 //=============================================================================================================
-
 
 void EventView::onNewFiffRawViewModel(QSharedPointer<ANSHAREDLIB::FiffRawViewModel> pFiffRawModel)
 {

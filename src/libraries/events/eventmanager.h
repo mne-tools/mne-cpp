@@ -43,8 +43,10 @@
 #include "events_global.h"
 #include "event.h"
 #include "eventgroup.h"
-#include "eventsharedmemmanager.h"
 
+#ifndef NO_IPC
+#include "eventsharedmemmanager.h"
+#endif
 //=============================================================================================================
 // STD INCLUDES
 //=============================================================================================================
@@ -414,19 +416,20 @@ private:
      */
     void createDefaultGroupIfNeeded();
 
-
     std::multimap<int, EVENTSINTERNAL::EventINT>    m_EventsListBySample;           /**< List of events organized by sample.*/
     std::unordered_map<idNum, int>                  m_MapIdToSample;                /**< EventId to sample relationship table.*/
     std::map<idNum, EVENTSINTERNAL::EventGroupINT>  m_GroupsList;                   /**< Storage of eventgroups.*/
 
+#ifndef NO_IPC
     std::unique_ptr<EVENTSINTERNAL::EventSharedMemManager>  m_pSharedMemManager;    /**< Pointer to a shared manager object.*/
+    friend class EVENTSINTERNAL::EventSharedMemManager;
+#endif
 
     idNum   m_iEventIdCounter;          /**< This counter will serve as an eventId until this get error-prone. However it can be easily updated.*/
     idNum   m_iGroupIdCounter;          /**< This counter will serve as a groupId counter, and id generator.*/
     bool    m_bDefaultGroupNotCreated;  /**< State variable to know if the default group has been created, and thus decide to create it again or not. */
     idNum   m_DefaultGroupId;           /**< The id of the default group.*/
 
-    friend class EVENTSINTERNAL::EventSharedMemManager;
 };
 
 //=============================================================================================================

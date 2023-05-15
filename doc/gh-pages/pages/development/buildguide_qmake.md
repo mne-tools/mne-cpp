@@ -16,7 +16,6 @@ Make sure you have one of the following compilers installed:
 |---------|-------|-------|
 | min. MSVC 2015 (We recommend the [MSVC 2019 Community Version](https://visualstudio.microsoft.com/vs/older-downloads/){:target="_blank" rel="noopener"} compiler. During install exclude everything except for VC++, Win 10 SDK and ATL support) | min. [GCC 5.3.1](https://gcc.gnu.org/releases.html){:target="_blank" rel="noopener"} | min. [Clang 3.5](https://developer.apple.com/xcode/){:target="_blank" rel="noopener"}|
 
-
 ## Build from Source (Dynamic Linking)
 
 ### Get Qt
@@ -66,9 +65,9 @@ git rebase upstream/main
 1. Go to your cloned repository folder and run the `mne-cpp.pro` file with QtCreator.
 2. The first time you open the mne-cpp.pro file you will be prompted to configure the project with a pre-defined kit. Select the appropriate kit, e.g., `Desktop Qt 5.15.1 MSVC2019 64bit` and configure the project.
 3. In QtCreator select the Release mode in the lower left corner.
-4. In the Qt Creator's Projects window, right mouse click on the top level MNE-CPP tree item and select Run qmake. Wait until progress bar in lower right corner turns green (this step may take some time).
+4. In the Qt Creator's Projects window, right mouse click on the top level MNE-CPP tree item and select Run qmake. Wait until the progress bar in lower right corner turns green (this step may take some time).
 5. Right mouse click again and then hit Build (this step may take some time). Wait until progress bar in lower right corner turns green.
-6. After the build process is finished, go to the `mne-cpp/bin` folder. All applications and libraries should have been created throughout the build process.
+6. After the build process is finished, go to the `mne-cpp/out/Release` folder. All applications and libraries should have been created throughout the build process.
 
 For building on CentOS and other linux distros with older gcc versions, check if RHEL Developer Toolsets are available with newer versions. In Qt Creator, under `Tools > Options > Kits > Compilers`, you can add a new compiler, and then add it to your build kit in `Tools > Options > Kits > Kits`.
 
@@ -90,8 +89,7 @@ Once built, applications can be run from within QtCreator using the run button o
 
 ### Test the Build
 
-You might have to add the folders including the Qt libraries to your OS's corresponding environment variables. In order to run the examples you must download the MNE-Sample-Data-Set from [here](https://osf.io/86qa2/download){:target="_blank" rel="noopener"} and extract the files to `mne-cpp/bin/MNE-sample-data`. Once finished you can try to run one of the examples, e.g., ex_disp_3D. If the build was successful the example should start and display a window including a 3D brain as well as a source localization result.
-
+You might have to add the folders including the Qt libraries to your OS's corresponding environment variables. In order to run the examples you must download the MNE-Sample-Data-Set from [here](https://osf.io/86qa2/download){:target="_blank" rel="noopener"} and extract the files to `mne-cpp/resources/data/MNE-sample-data`. Once finished you can try to run one of the examples, e.g., ex_disp_3D. If the build was successful the example should start and display a window including a 3D brain as well as a source localization result.
 
 ## Build from Source (Static Linking)
 
@@ -214,4 +212,4 @@ cd mne-cpp_shadow
 make -j8
 ```
 
-All MNE-CPP applications (MNE Scan, examples, tests, etc.) should now be in the `mne-cpp/bin` folder.
+All MNE-CPP applications (MNE Scan, examples, tests, etc.) should now be in the `mne-cpp/out/Release` folder.

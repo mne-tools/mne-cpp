@@ -76,10 +76,9 @@ class DISPSHARED_EXPORT AbstractView : public QWidget
 {
     Q_OBJECT
 
-public:    
+public:
     typedef QSharedPointer<AbstractView> SPtr;              /**< Shared pointer type for AbstractView. */
     typedef QSharedPointer<const AbstractView> ConstSPtr;   /**< Const shared pointer type for AbstractView. */
-
 
     enum StyleMode {
         Default,

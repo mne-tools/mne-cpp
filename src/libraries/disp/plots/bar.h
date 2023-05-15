@@ -139,8 +139,16 @@ public:
                                      Eigen::VectorXi& vecExponentValues);
 
 private:
-    QPointer<QtCharts::QChart>             m_pChart;    /**< QChart object that will be shown in the widget. */
-    QPointer<QtCharts::QBarCategoryAxis>   m_pAxis;     /**< Customized axis for bar histogram*/
+
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    QPointer<QtCharts::QChart>              m_pChart;   /**< QChart object that will be shown in the widget. */
+    QPointer<QtCharts::QBarCategoryAxis>    m_pAxis;    /**< Customized axis for bar histogram*/
+#else
+    QPointer<QChart>                m_pChart;    /**< QChart object that will be shown in the widget. */
+    QPointer<QBarCategoryAxis>      m_pAxis;     /**< Customized axis for bar histogram*/
+#endif
+
 };
 
 //=============================================================================================================
@@ -176,6 +184,9 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
                      const Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>& matClassFrequencyData,
                      int iPrecisionValue)
 {
+    #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    using namespace QtCharts;
+    #endif
     Eigen::VectorXd resultDisplayValues;
     Eigen::VectorXi resultExponentValues;
     int iClassAmount = matClassFrequencyData.rows();
@@ -184,7 +195,7 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
     //Setup legends
     QString histogramExponent;
     histogramExponent = "X-axis scale: 10e" + QString::number(resultExponentValues(0));
-    QtCharts::QBarSet* set = new QtCharts::QBarSet(histogramExponent);
+    QBarSet* set = new QBarSet(histogramExponent);
     QStringList categories;
     QString currentLimits;
     int classFreq;
@@ -199,7 +210,7 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
     }
 
     //Create new series, then clear the plot and update with new data
-    QtCharts::QBarSeries *series = new QtCharts::QBarSeries();
+    QBarSeries *series = new QBarSeries();
     series->append(set);
 
     m_pChart->removeAllSeries();

@@ -68,7 +68,7 @@ void ImportantClass::importantMethod(int a)
 ### Automatically adding all the methods in a class to MNE Tracer
 If you are interested in tracing every single method in a class, instead of manually adding the macro ```MNE_TRACE()``` to every single method, you can use a Python tool we have developed that includes the macro automatically in your ```.cpp``` file.
 
-The script is ```tools/python``` named ```mnetracer.py```. To use it just do as follows:
+The script is in ```tools``` named ```mnetracer.py```. To use it just do as follows:
 
 - To add the ```MNE_TRACE()``` macro to every method:
 ```python

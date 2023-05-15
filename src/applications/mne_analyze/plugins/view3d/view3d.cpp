@@ -44,8 +44,6 @@
 #include <anShared/Model/dipolefitmodel.h>
 #include <anShared/Model/abstractmodel.h>
 
-
-
 #include <disp3D/viewers/sourceestimateview.h>
 #include <disp3D/engine/view/view3D.h>
 #include <disp3D/engine/model/data3Dtreemodel.h>

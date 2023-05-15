@@ -3978,12 +3978,12 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
 
         //    QString qPath("/usr/pubsw/packages/mne/stable/share/mne/coil_def.dat");
 
-        QString qPath = QString(QCoreApplication::applicationDirPath() + "/resources/general/coilDefinitions/coil_def.dat");
+        QString qPath = QString(QCoreApplication::applicationDirPath() + "/../resources/general/coilDefinitions/coil_def.dat");
         QFile file(qPath);
         if ( !QCoreApplication::startingUp() )
-            qPath = QCoreApplication::applicationDirPath() + QString("/resources/general/coilDefinitions/coil_def.dat");
+            qPath = QCoreApplication::applicationDirPath() + QString("/../resources/general/coilDefinitions/coil_def.dat");
         else if (!file.exists())
-            qPath = "./resources/general/coilDefinitions/coil_def.dat";
+            qPath = "../resources/general/coilDefinitions/coil_def.dat";
 
         char *coilfile = MALLOC_3(strlen(qPath.toUtf8().data())+1,char);
         strcpy(coilfile,qPath.toUtf8().data());

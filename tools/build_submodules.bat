@@ -4,14 +4,14 @@
 :;#
 :;# This script is based on an open-source cross-platform script template.
 :;# For more information you can visit: https://github.com/juangpc/multiplatform_bash_cmd
-:;# 
+:;#
 
 :<<BATCH
     :;@echo off
     :; # ########## WINDOWS SECTION #########################
 
     SET SCRIPT_PATH=%~dp0
-    SET BASE_PATH=%SCRIPT_PATH%..\..
+    SET BASE_PATH=%SCRIPT_PATH%..
 
     FOR %%x in (%*) do (
         IF "%%~x" == "lsl" (
@@ -46,7 +46,7 @@ BATCH
         cd "$(dirname "$0")" >/dev/null 2>&1
         pwd -P
     )"
-    BASE_PATH=${SCRIPT_PATH}/../..
+    BASE_PATH=${SCRIPT_PATH}/..
 
     argc=$#
     argv=("$@")

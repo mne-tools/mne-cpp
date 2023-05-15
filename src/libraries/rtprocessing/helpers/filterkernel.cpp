@@ -71,8 +71,6 @@ using namespace RTPROCESSINGLIB;
 using namespace Eigen;
 using namespace UTILSLIB;
 
-
-
 //=============================================================================================================
 // INIT STATIC MEMBERS
 //=============================================================================================================
@@ -557,7 +555,7 @@ FilterParameter::FilterParameter()
 
 FilterParameter::FilterParameter(QString sName)
 :FilterParameter(sName,"")
-{  
+{
 }
 
 //=============================================================================================================

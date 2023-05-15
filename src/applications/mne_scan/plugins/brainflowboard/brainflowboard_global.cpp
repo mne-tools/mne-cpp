@@ -53,4 +53,3 @@ const char* BRAINFLOWBOARDPLUGIN::buildHash(){ return UTILSLIB::gitHash();}
 
 const char* BRAINFLOWBOARDPLUGIN::buildHashLong(){ return UTILSLIB::gitHashLong();}
 
-

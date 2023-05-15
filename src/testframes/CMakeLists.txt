@@ -1,9 +1,10 @@
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../out/${CMAKE_BUILD_TYPE}/tests)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIRECTORY}/tests)
+
 if(WIN32)
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${BINARY_OUTPUT_DIRECTORY}/apps)
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
   set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 endif()
-file(COPY ${CMAKE_SOURCE_DIR}/../resources DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 
 if(APPLE)
     set(CMAKE_INSTALL_RPATH "@executable_path/../lib")
@@ -13,6 +14,7 @@ if(APPLE)
 else()
     set(CMAKE_INSTALL_RPATH "\${ORIGIN}/../lib")
 endif()
+
 set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
@@ -41,3 +43,4 @@ add_subdirectory(test_geometryinfo)
 add_subdirectory(test_spectral_connectivity)
 add_subdirectory(test_mne_anonymize)
 add_subdirectory(test_edf2fiff_rwr)
+

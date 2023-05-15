@@ -45,7 +45,6 @@
 
 #include <QDebug>
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -62,13 +61,14 @@ static std::string defaultGroupName("Default"); /**< A name to be used as the na
 //=============================================================================================================
 
 EventManager::EventManager()
-: m_pSharedMemManager(std::make_unique<EVENTSINTERNAL::EventSharedMemManager>(this))
-, m_iEventIdCounter(invalidID)
+: m_iEventIdCounter(invalidID)
 , m_iGroupIdCounter(invalidID)
 , m_bDefaultGroupNotCreated(true)
 , m_DefaultGroupId(invalidID)
 {
-
+#ifndef NO_IPC
+    m_pSharedMemManager = std::make_unique<EVENTSINTERNAL::EventSharedMemManager>(this);
+#endif
 }
 
 //=============================================================================================================
@@ -189,7 +189,6 @@ EventManager::getEventsBetween(int sampleStart, int sampleEnd, const std::vector
 {
     int memoryHint = (sampleEnd-sampleStart)/200;
     auto pEventsList(allocateOutputContainer<Event>(memoryHint));
-
 
     auto eventStart = m_EventsListBySample.lower_bound(sampleStart);
     auto eventEnd = m_EventsListBySample.upper_bound(sampleEnd);
@@ -351,7 +350,7 @@ bool EventManager::deleteEvents(const std::vector<idNum>& eventIds)
 bool EventManager::deleteEvents(std::unique_ptr<std::vector<Event> > eventIds)
 {
     bool status(eventIds->size());
-    for(auto e: *eventIds){
+    for(auto& e: *eventIds){
         status = status && deleteEvent(e.id);
     }
     return status;
@@ -580,28 +579,37 @@ bool EventManager::addEventsToGroup(const std::vector<idNum>& eventIds, const id
 
 void EventManager::initSharedMemory()
 {
+#ifndef NO_IPC
     initSharedMemory(SharedMemoryMode::READ);
+#endif
 }
 
 //=============================================================================================================
 
 void EventManager::initSharedMemory(SharedMemoryMode mode)
 {
+#ifndef NO_IPC
     m_pSharedMemManager->init(mode);
+#endif
 }
 
 //=============================================================================================================
 
 void EventManager::stopSharedMemory()
 {
+#ifndef NO_IPC
     m_pSharedMemManager->stop();
+#endif
 }
 
 //=============================================================================================================
 
 bool EventManager::isSharedMemoryInit()
 {
+#ifndef NO_IPC
     return m_pSharedMemManager->isInit();
+#endif
+    return 0;
 }
 
 void EventManager::createDefaultGroupIfNeeded()

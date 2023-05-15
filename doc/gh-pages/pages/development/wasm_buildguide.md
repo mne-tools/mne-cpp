@@ -113,15 +113,15 @@ MNE-CPP needs to be build statically. This is automatically done if the `wasm` f
 ```
 mkdir mne-cpp_shadow
 cd mne-cpp_shadow
-../qt5_wasm_binaries/bin/qmake ../mne-cpp/mne-cpp.pro MNECPP_CONFIG=wasm
+../qt5_wasm_binaries/resources/qmake ../mne-cpp/mne-cpp.pro MNECPP_CONFIG=wasm
 make -j8
 ```
 
-This should build all Wasm enabled applications, e.g. MNE Analyze, to `mne-cpp/bin`.
+This should build all Wasm enabled applications, e.g. MNE Analyze, to `mne-cpp/out/Release`.
 
 ## Run an Application
 
-Navigate to `mne-cpp/bin` and start a server:
+Navigate to `mne-cpp/out/Release` and start a server:
 
 ```
 python3 -m http.server

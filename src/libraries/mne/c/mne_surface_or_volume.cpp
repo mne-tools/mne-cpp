@@ -519,6 +519,7 @@ int MneSurfaceOrVolume::mne_filter_source_spaces(MneSurfaceOld* surf, float limi
                 }
             }
     }
+    (void)minnode; // squash compiler warning, this is unused
     if (omit_outside > 0)
         printf("%d source space points omitted because they are outside the inner skull surface.\n",
                omit_outside);
@@ -703,6 +704,7 @@ void *MneSurfaceOrVolume::filter_source_space(void *arg)
             }
         }
     }
+    (void)minnode; // squash compiler warning, set but unused
     if (omit_outside > 0)
         printf("%d source space points omitted because they are outside the inner skull surface.\n",
                 omit_outside);
@@ -1545,6 +1547,7 @@ void MneSurfaceOrVolume::mne_find_closest_on_surface_approx(MneSurfaceOld* s, fl
             nearest[k] =  mne_project_to_surface(s,p,r[k],0,dist ? dist+k : &mydist);
         }
     }
+    (void)was; // squash compiler warning, set but unused
 
     printf("[done]\n");
     delete p;
@@ -2206,7 +2209,7 @@ int MneSurfaceOrVolume::mne_find_sources_in_label(char *label, MneSourceSpaceOld
        * Read the label file
        */
     if ((in = fopen(label,"r")) == NULL) {
-        qCritical(label);//err_set_sys_error(label);
+        qCritical("%s", label);//err_set_sys_error(label);
         goto out;
     }
     c = fgetc(in);
@@ -2354,7 +2357,7 @@ int MneSurfaceOrVolume::mne_write_label(char *label, char *comment, int *sel, in
        * Read the label file
        */
     if ((out = fopen(label,"w")) == NULL) {
-        qCritical(label);//err_set_sys_error(label);
+        qCritical("%s", label);//err_set_sys_error(label);
         goto out;
     }
     if (comment == NULL)
@@ -2854,8 +2857,6 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
     FiffDigitizerData*  dig = NULL;
     float          nasion_weight = 5.0;
 
-
-
     if (!head_dig) {
         qCritical("MEG head coordinate system digitizer data not available");
         goto bad;
@@ -2911,7 +2912,6 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
 
         scale_display_surface(head_surf,scales);
     }
-
 
     // Initial alignment
     FREE_17(head_dig->head_mri_t_adj);
@@ -2973,7 +2973,7 @@ void MneSurfaceOrVolume::get_head_scale(FIFFLIB::FiffDigitizerData* dig,
         }
     }
 
-    if (UTILSLIB::Sphere::fit_sphere_to_points(dig_rr,ndig,simplex_size,r0,&Rdig) == FAIL){
+    if (!UTILSLIB::Sphere::fit_sphere_to_points(dig_rr,ndig,simplex_size,r0,&Rdig)){
         goto out;
     }
 
@@ -2995,7 +2995,7 @@ void MneSurfaceOrVolume::get_head_scale(FIFFLIB::FiffDigitizerData* dig,
         }
     }
 
-    if (UTILSLIB::Sphere::fit_sphere_to_points(head_rr,nhead,simplex_size,r0,&Rscalp) == FAIL) {
+    if (!UTILSLIB::Sphere::fit_sphere_to_points(head_rr,nhead,simplex_size,r0,&Rscalp)) {
         goto out;
     }
 
@@ -3426,7 +3426,7 @@ int MneSurfaceOrVolume::mne_read_triangle_file(char  *fname,
     int   which;
 
     if (fp == NULL) {
-        qCritical(fname);
+        qCritical("%s", fname);
         goto bad;
     }
     if (mne_read_int3(fp,&magic) != 0) {
@@ -3636,7 +3636,7 @@ int MneSurfaceOrVolume::mne_read_curvature_file(char  *fname,
     int   val,k;
 
     if (!fp) {
-        qCritical(fname);
+        qCritical("%s", fname);
         goto bad;
     }
     if (mne_read_int3(fp,&magic) != 0) {
@@ -3995,6 +3995,7 @@ MneVolGeom* MneSurfaceOrVolume::read_vol_geom(FILE *fp)
         delete vg;
         vg = new MneVolGeom();
     }
+    (void)fail; // squash compiler warning, set but unused
     return vg;
 }
 

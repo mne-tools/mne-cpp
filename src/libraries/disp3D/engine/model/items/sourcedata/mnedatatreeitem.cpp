@@ -98,7 +98,7 @@ MneDataTreeItem::~MneDataTreeItem()
 //=============================================================================================================
 
 void MneDataTreeItem::initItem()
-{    
+{
     this->setCheckable(true);
     this->setCheckState(Qt::Checked);
     this->setEditable(false);
@@ -208,7 +208,7 @@ void MneDataTreeItem::initData(const MNEForwardSolution& tForwardSolution,
                                const SurfaceSet& tSurfSet,
                                const AnnotationSet& tAnnotSet,
                                Qt3DCore::QEntity* p3DEntityParent)
-{   
+{
     if(tForwardSolution.src.size() < 2 || tAnnotSet.size() < 2 || tSurfSet.size() < 2) {
         qDebug() << "MneDataTreeItem::initData - Two hemisphere were not found. Check input.";
         qDebug() << "MneDataTreeItem::initData - tForwardSolution.src.size(): "<<tForwardSolution.src.size();

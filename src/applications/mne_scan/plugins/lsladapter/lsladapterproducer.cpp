@@ -85,7 +85,7 @@ LSLAdapterProducer::~LSLAdapterProducer()
 //=============================================================================================================
 
 void LSLAdapterProducer::readStream()
-{   
+{
     // check if we have a stream info
     if (m_bHasStreamInfo == false) {
         qDebug() << "[LSLAdapterProducer::readStream] No stream info was supplied !";

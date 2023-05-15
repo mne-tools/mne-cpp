@@ -102,7 +102,7 @@ QSharedPointer<AbstractPlugin> BrainFlowBoard::clone() const
 //=============================================================================================================
 
 void BrainFlowBoard::init()
-{    
+{
     m_pOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "BrainFlowBoard", "BrainFlow Board Output");
     m_pOutput->measurementData()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pOutput);
@@ -451,7 +451,6 @@ void BrainFlowBoard::releaseSession(bool useQmessage)
         msgBox.exec();
     }
 }
-
 
 //=============================================================================================================
 

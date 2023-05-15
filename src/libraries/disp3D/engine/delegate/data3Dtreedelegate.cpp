@@ -315,7 +315,7 @@ QWidget *Data3DTreeDelegate::createEditor(QWidget* parent, const QStyleOptionVie
 //=============================================================================================================
 
 void Data3DTreeDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
-{    
+{
     const Data3DTreeModel* pData3DTreeModel = static_cast<const Data3DTreeModel*>(index.model());
     const AbstractTreeItem* pAbstractItem = static_cast<const AbstractTreeItem*>(pData3DTreeModel->itemFromIndex(index));
 

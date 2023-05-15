@@ -6,8 +6,9 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Svg)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Svg)
+set(QT_REQUIRED_COMPONENTS Core Widgets Svg)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
     tmsi.cpp 
@@ -37,6 +38,13 @@ set(HEADERS
     FormFiles/tmsisetupprojectwidget.h
 )
 
+set(UI
+    FormFiles/tmsisetup.ui
+    FormFiles/tmsimanualannotationwidget.ui
+    FormFiles/tmsiimpedancewidget.ui
+    FormFiles/tmsisetupprojectwidget.ui
+)
+
 set(RESOURCES
     tmsi.qrc    
 )
@@ -47,7 +55,7 @@ set(SOURCE_PATHS ${SOURCES})
 list(TRANSFORM SOURCE_PATHS PREPEND "${CMAKE_CURRENT_SOURCE_DIR}/")
 set_source_files_properties(${FILE_TO_UPDATE} PROPERTIES OBJECT_DEPENDS "${SOURCE_PATHS}")
 
-add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES} ${UI})
 
 set(FFTW_LIBS "")
 
@@ -67,10 +75,11 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
+set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
+list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Svg
+    ${QT_REQUIRED_COMPONENT_LIBS}
     eigen
     mne_disp
     mne_utils

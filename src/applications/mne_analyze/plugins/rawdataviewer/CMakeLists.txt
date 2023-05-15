@@ -6,8 +6,9 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Widgets Svg OpenGL 3DCore 3DRender 3DInput 3DExtras Charts)
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Widgets Svg OpenGL 3DCore 3DRender 3DInput 3DExtras Charts)
+set(QT_REQUIRED_COMPONENTS Core Widgets Svg OpenGL 3DCore 3DRender 3DInput 3DExtras Charts)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
     rawdataviewer.cpp 
@@ -49,16 +50,11 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
 
+set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
+list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
+
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt${QT_VERSION_MAJOR}::Core
-    Qt${QT_VERSION_MAJOR}::Widgets
-    Qt${QT_VERSION_MAJOR}::Svg
-    Qt${QT_VERSION_MAJOR}::OpenGL
-    Qt${QT_VERSION_MAJOR}::3DCore
-    Qt${QT_VERSION_MAJOR}::3DRender
-    Qt${QT_VERSION_MAJOR}::3DInput
-    Qt${QT_VERSION_MAJOR}::3DExtras
-    Qt${QT_VERSION_MAJOR}::Charts
+    ${QT_REQUIRED_COMPONENT_LIBS}
     eigen
     mne_disp
     mne_utils

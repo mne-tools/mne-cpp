@@ -62,7 +62,6 @@
 // Eigen INCLUDES
 //=============================================================================================================
 
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -323,11 +322,14 @@ QVariant EventModel::headerData(int section,
                                 Qt::Orientation orientation,
                                 int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
+    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole) {
         return QVariant();
+    }
 
-    if(role==Qt::TextAlignmentRole)
-        return Qt::AlignHCenter + Qt::AlignVCenter;
+    if(role==Qt::TextAlignmentRole) {
+        Qt::Alignment a = Qt::AlignHCenter | Qt::AlignVCenter;
+        return QVariant(a);
+    }
 
     if(orientation == Qt::Horizontal) {
         switch(section) {
@@ -364,7 +366,6 @@ bool EventModel::removeRows(int position,
 
     return true;
 }
-
 
 //=============================================================================================================
 
@@ -449,7 +450,7 @@ bool EventModel::saveToFile(const QString& sPath)
 
     QTextStream out(bufferOut, QIODevice::ReadWrite);
     auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
-    for (auto event : *events){
+    for (const auto& event : *events){
         out << "  " << event.sample << "   " << QString::number(static_cast<float>(event.sample - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          0         1" << endl;
     }
 
@@ -470,7 +471,7 @@ bool EventModel::saveToFile(const QString& sPath)
 
     QTextStream out(&file);
     auto events = m_EventManager.getEventsInGroups(m_selectedEventGroups);
-    for (auto event : *events){
+    for (const auto& event : *events){
         out << "  " << event.sample << "   " << QString::number(static_cast<float>(event.sample - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          0         1" << "\n";
 //        out << "  " << iEvent << "   " << QString::number(static_cast<float>(iEvent - m_pFiffModel->absoluteFirstSample()) / this->getFreq(), 'f', 4) << "          1         0" << endl;
     }
@@ -710,7 +711,7 @@ void EventModel::updateSelectedGroups(const QList<QModelIndex> &indexList)
 {
     clearGroupSelection();
 
-    for(auto row : indexList){
+    for(const auto& row : indexList){
         addToSelectedGroups(row.data(Qt::UserRole).toInt());
     }
 

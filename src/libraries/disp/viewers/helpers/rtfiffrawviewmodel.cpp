@@ -238,13 +238,13 @@ QVariant RtFiffRawViewModel::headerData(int section, Qt::Orientation orientation
 void RtFiffRawViewModel::initSphara()
 {
     //Load SPHARA matrices for babymeg and vectorview
-    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QCoreApplication::applicationDirPath() + QString("/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
-    IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QCoreApplication::applicationDirPath() + QString("/resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaVVGradLoaded, QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Grad.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaVVMagLoaded, QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/Vectorview_SPHARA_InvEuclidean_Mag.txt"));
 
-    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QCoreApplication::applicationDirPath() + QString("/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
-    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QCoreApplication::applicationDirPath() + QString("/resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGInnerLoaded, QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Inner.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaBabyMEGOuterLoaded, QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/BabyMEG_SPHARA_InvEuclidean_Outer.txt"));
 
-    IOUtils::read_eigen_matrix(m_matSpharaEEGLoaded, QCoreApplication::applicationDirPath() + QString("/resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt"));
+    IOUtils::read_eigen_matrix(m_matSpharaEEGLoaded, QCoreApplication::applicationDirPath() + QString("/../resources/mne_scan/plugins/noisereduction/SPHARA/Current_SPHARA_EEG.txt"));
 
     //Generate indices used to create the SPHARA operators for VectorView
     m_vecIndicesFirstVV.resize(0);
@@ -835,9 +835,9 @@ void RtFiffRawViewModel::updateSpharaOptions(const QString& sSytemType, int nBas
         }
 
         //Write final operator matrices to file
-//        IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultFirst.txt"));
-//        IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultSecond.txt"));
-//        IOUtils::write_eigen_matrix(m_matSpharaEEGLoaded, QString(QCoreApplication::applicationDirPath() + "/resources/mne_scan/plugins/noisereduction/SPHARA/m_matSpharaEEGLoaded.txt"));
+//        IOUtils::write_eigen_matrix(matSpharaMultFirst, QString(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultFirst.txt"));
+//        IOUtils::write_eigen_matrix(matSpharaMultSecond, QString(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/noisereduction/SPHARA/matSpharaMultSecond.txt"));
+//        IOUtils::write_eigen_matrix(m_matSpharaEEGLoaded, QString(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/noisereduction/SPHARA/m_matSpharaEEGLoaded.txt"));
 
         //
         // Make operators sparse
@@ -1383,18 +1383,7 @@ double RtFiffRawViewModel::getMaxValueFromRawViewModel(int row) const
 
 void RtFiffRawViewModel::addEvent(int iSample)
 {
-    auto pGroups = m_EventManager.getAllGroups();
-    for(auto g : *pGroups){
-        qDebug() << "Group: " << g.name.c_str() << "- Id: " << g.id;
-    }
-
     m_EventManager.addEvent(iSample);
-
-    auto pEvents = m_EventManager.getAllEvents();
-
-    for(auto e : *pEvents){
-        qDebug() << "Event> Sample: " << e.sample << "- Id: " << e.id;
-    }
 }
 
 //=============================================================================================================

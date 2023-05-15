@@ -20,8 +20,6 @@
 
 # Bin folder with exceptions
 /lib/
-/bin/
-/out/
 
 # External device SDKs (if installed)
 /applications/mne_scan/plugins/eegosports/eemagine/
@@ -29,7 +27,6 @@
 /applications/mne_scan/plugins/brainamp/BrainAmpIoCtl.h
 
 # Installer framework
-/tools/ifw_installer/*
 !linux/
 !mac/
 !windows/
@@ -65,6 +62,7 @@ Makefile
 .vscode
 .session
 mne-cpp.pro.user*
+compile_commands.json
 
 # FFTW
 /src/external/fftw
@@ -72,10 +70,9 @@ mne-cpp.pro.user*
 # Generated docu Docker files
 /_site
 
-build/*
-build-*/
+/build*
+/out*
+/resources/data*
 .cache/*
 
 codecov
-
-

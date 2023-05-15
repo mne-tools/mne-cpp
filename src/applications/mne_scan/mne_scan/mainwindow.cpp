@@ -317,7 +317,7 @@ void MainWindow::openConfiguration()
 
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Open MNE Scan Configuration File",
-                                                QStandardPaths::writableLocation(QStandardPaths::DataLocation),
+                                                QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),
                                                  tr("Configuration file (*.xml)"));
 
     QFileInfo qFileInfo(path);
@@ -333,7 +333,7 @@ void MainWindow::saveConfiguration()
     QString path = QFileDialog::getSaveFileName(
                 this,
                 "Save MNE Scan Configuration File",
-                QStandardPaths::writableLocation(QStandardPaths::DataLocation),
+                QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),
                  tr("Configuration file (*.xml)"));
 
     QFileInfo qFileInfo(path);
@@ -914,7 +914,7 @@ void MainWindow::writeToLog(const QString& logMsg,
 void MainWindow::startMeasurement()
 {
     // Save pipeline before starting just in case a crash occurs
-    m_pPluginGui->saveConfig(QStandardPaths::writableLocation(QStandardPaths::DataLocation),"default.xml");
+    m_pPluginGui->saveConfig(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),"default.xml");
 
     writeToLog(tr("Starting real-time measurement..."), _LogKndMessage, _LogLvMin);
 

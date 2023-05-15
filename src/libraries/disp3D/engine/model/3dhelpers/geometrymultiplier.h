@@ -49,6 +49,17 @@
 #include <QSharedPointer>
 #include <QPointer>
 #include <Qt3DRender/QGeometryRenderer>
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+#define QT_COMPATIBILITY_3D Qt3DRender
+#include <Qt3DRender/QGeometry>
+#include <Qt3DRender/QBuffer>
+#include <Qt3DRender/QAttribute>
+#else
+#define QT_COMPATIBILITY_3D Qt3DCore
+#include <Qt3DCore/QGeometry>
+#include <Qt3DCore/QBuffer>
+#include <Qt3DCore/QAttribute>
+#endif
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -57,12 +68,6 @@
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-namespace Qt3DRender {
-        class QGeometry;
-        class QBuffer;
-        class QAttribute;
-}
 
 namespace Qt3DCore {
         class QNode;
@@ -103,7 +108,7 @@ public:
     /**
      * Constructs a GeometryMultiplier object.
      */
-    explicit GeometryMultiplier(QSharedPointer<Qt3DRender::QGeometry> tGeometry,
+    explicit GeometryMultiplier(QSharedPointer<QT_COMPATIBILITY_3D::QGeometry> tGeometry,
                                                       Qt3DCore::QNode *tParent = nullptr);
 
     //=========================================================================================================
@@ -166,15 +171,15 @@ private:
      */
     QByteArray buildColorBuffer(const QVector<QColor> &tInstanceColor);
 
-    QSharedPointer<Qt3DRender::QGeometry>           m_pGeometry;
+    QSharedPointer<QT_COMPATIBILITY_3D::QGeometry>             m_pGeometry;
 
-    QPointer<Qt3DRender::QBuffer>                   m_pTransformBuffer;
+    QPointer<QT_COMPATIBILITY_3D::QBuffer>                   m_pTransformBuffer;
 
-    QPointer<Qt3DRender::QBuffer>                   m_pColorBuffer;
+    QPointer<QT_COMPATIBILITY_3D::QBuffer>                   m_pColorBuffer;
 
-    QPointer<Qt3DRender::QAttribute>                m_pTransformAttribute;
+    QPointer<QT_COMPATIBILITY_3D::QAttribute>                m_pTransformAttribute;
 
-    QPointer<Qt3DRender::QAttribute>                m_pColorAttribute;
+    QPointer<QT_COMPATIBILITY_3D::QAttribute>                m_pColorAttribute;
 };
 
 //=============================================================================================================

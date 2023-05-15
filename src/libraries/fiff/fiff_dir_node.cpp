@@ -41,6 +41,7 @@
 #include "fiff_dir_node.h"
 #include "fiff_stream.h"
 #include "fiff_tag.h"
+#include "fiff_explain.h"
 //#include "fiff_ctf_comp.h"
 //#include "fiff_proj.h"
 //#include "fiff_info.h"
@@ -67,10 +68,10 @@ FiffDirNode::FiffDirNode()
 FiffDirNode::FiffDirNode(const FiffDirNode* p_FiffDirTree)
 : type(p_FiffDirTree->type)
 , id(p_FiffDirTree->id)
-, parent_id(p_FiffDirTree->parent_id)
 , dir(p_FiffDirTree->dir)
 , nent_tree(p_FiffDirTree->nent_tree)
 , parent(p_FiffDirTree->parent)
+, parent_id(p_FiffDirTree->parent_id)
 , children(p_FiffDirTree->children)
 {
 }

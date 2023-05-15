@@ -273,7 +273,6 @@ protected:
      */
     virtual void keyPressEvent(QKeyEvent * event);
 
-
     //=========================================================================================================
     /**
      * This function gets called whenever the combo box is altered by the user via the gui.

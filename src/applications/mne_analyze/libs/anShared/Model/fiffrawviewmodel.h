@@ -516,7 +516,7 @@ public:
      * @return true if there is an EventModel, false if not
 >>>>>>> MAINT: renaming and cleaning up
      */
-    bool hasSavedEvents();
+    bool hasEventModel();
 
     //=========================================================================================================
     /**
@@ -560,15 +560,6 @@ private:
      * This is a helper method thats is meant to correctly set the endOfFile / startOfFile flags whenever needed
      */
     void updateEndStartFlags();
-
-    //=========================================================================================================
-    /**
-     * This is helper function, its main purpose is to avoid code redundancy.
-     *
-     * @param[in] loadFunction The function that will be run in the background. Should be either loadEarlierBlocks or loadLaterBlocks.
-     * @param[in] numBlocks The Number of blocks to load.
-     */
-    void startBackgroundOperation(int (FiffRawViewModel::*loadFunction)(int), int iBlocksToLoad);
 
     //=========================================================================================================
     /**

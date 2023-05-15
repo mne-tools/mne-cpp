@@ -48,7 +48,7 @@
 #include <QTabWidget>
 #include <QSettings>
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QDebug>
 
 //=============================================================================================================
@@ -172,7 +172,7 @@ void QuickControlView::addWidgets(const QList<QWidget*>& lWidgets,
 void QuickControlView::addWidget(QWidget* pWidget,
                                  const QString& sTabName,
                                  bool bAddToEnd)
-{    
+{
     if(QVBoxLayout* pTabWidgetLayout = findTabWidgetLayout(sTabName)) {
         int iPos = bAddToEnd ? -1 : 0;
         pTabWidgetLayout->insertWidget(iPos,
@@ -187,7 +187,7 @@ void QuickControlView::addGroupBox(QWidget* pWidget,
                                    const QString& sGroupBoxName,
                                    const QString& sTabName,
                                    bool bAddToEnd)
-{    
+{
     if(QVBoxLayout* pTabWidgetLayout = findTabWidgetLayout(sTabName)) {
         int iPos = bAddToEnd ? -1 : 0;
         QGroupBox* pGroupBox = new QGroupBox(sGroupBoxName);
@@ -298,7 +298,7 @@ void QuickControlView::loadSettings()
 
     QPoint pos = settings.value(m_sSettingsPath + QString("/QuickControlView/ViewPos"), QPoint(100,100)).toPoint();
 
-    QRect screenRect = QApplication::desktop()->screenGeometry();
+    QRect screenRect = QApplication::primaryScreen()->geometry();
     if(!screenRect.contains(pos) && QGuiApplication::screens().size() == 1) {
         move(QPoint(100,100));
     } else {

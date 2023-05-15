@@ -23,7 +23,6 @@ nav_order: 3
 
 | Dinh, C.; Luessi, M.; Sun, L.; Haueisen, J.; Hämäläinen, M.S.: MNE-X: MEG/EEG Real-Time Acquisition, Real-Time Processing, and Real-Time Source Localization Framework. Biomedizinische Technik (Berl.) (2013), 58, [DOI: 10.1515/bmt-2013-4184](https://www.degruyter.com/view/journals/bmte/58/SI-1-Track-G/article-000010151520134184.xml){:target="_blank" rel="noopener"} |
 
-
 | Dinh, C.; Rühle, J.; Bollmann, S.; Haueisen, J.; Güllmar, D.: A GPU-accelerated Performance Optimized RAP-MUSIC Algorithm for Real-Time Source Localization. Biomedizinische Technik (Berl.) (2012), 57 [DOI: 10.1515/bmt-2012-4260 ](https://www.degruyter.com/view/journals/bmte/57/SI-1-Track-O/article-p808.xml){:target="_blank" rel="noopener"} |
 
 | Dinh, C.; Strohmeier, D.; Haueisen, J.; Güllmar, D.: Brain Atlas based Region of Interest Selection for Real-Time Source Localization using K-Means Lead Field Clustering and RAP-MUSIC. Biomedizinische Technik (Berl.) (2012), 57 |

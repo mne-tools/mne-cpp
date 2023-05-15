@@ -802,7 +802,7 @@ QList<FiffCtfComp> FiffStream::read_ctf_comp(const FiffDirNode::SPtr& p_Node, co
     }
 
     if (compdata.size() > 0)
-        qInfo("\tRead %d compensation matrices\n",compdata.size());
+        qInfo("\tRead %lld compensation matrices\n",compdata.size());
 
     return compdata;
 }
@@ -1544,7 +1544,7 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirNode::SPtr& p_Node)
 
     if (projdata.size() > 0)
     {
-        printf("\tRead a total of %d projection items:\n", projdata.size());
+        printf("\tRead a total of %lld projection items:\n", projdata.size());
         for(qint32 k = 0; k < projdata.size(); ++k)
         {
             printf("\t\t%s (%d x %d)",projdata[k].desc.toUtf8().constData(), projdata[k].data->nrow, projdata[k].data->ncol);
