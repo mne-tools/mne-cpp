@@ -197,12 +197,12 @@ execute_process(
     OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-set(Python_VERSION_MAJOR "3")
-set(Python_VERSION_MINOR "9")
-set(Python_LIB_DIR "/opt/anaconda3/lib")
-set(Python_INCLUDE_DIRS "-I/opt/anacnda3/include/python3.9")
-set(Python_CFLAGS "-I/opt/anaconda3/include/python3.9 -I/opt/anaconda2/include/python3.9 -Wno-unused-result -Wsign-compare -Wunreachable-code -DNDEBUG -fwrapv -O2 -Wall -fPIC -O2 -isystem /opt/anaconda3/include -arch x86_64 -I/opt/anaconda3/include -fPIC -O2 -isystem /opt/anaconda3/include -arch x86_64")
-set(Python_LDFLAGS "-L/opt/anaconda3/lib/python3.9/config-3.9-darwin -ldl -framework CoreFoundation")
+# set(Python_VERSION_MAJOR "3")
+# set(Python_VERSION_MINOR "9")
+# set(Python_LIB_DIR "/opt/anaconda3/lib")
+# set(Python_INCLUDE_DIRS "-I/opt/anacnda3/include/python3.9")
+# set(Python_CFLAGS "-I/opt/anaconda3/include/python3.9 -I/opt/anaconda2/include/python3.9 -Wno-unused-result -Wsign-compare -Wunreachable-code -DNDEBUG -fwrapv -O2 -Wall -fPIC -O2 -isystem /opt/anaconda3/include -arch x86_64 -I/opt/anaconda3/include -fPIC -O2 -isystem /opt/anaconda3/include -arch x86_64")
+# set(Python_LDFLAGS "-L/opt/anaconda3/lib/python3.9/config-3.9-darwin -ldl -framework CoreFoundation")
 
 separate_arguments(Python_INCLUDE_DIRS_NORM UNIX_COMMAND "${Python_INCLUDE_DIRS}")
 separate_arguments(Python_CFLAGS_NORM UNIX_COMMAND "${Python_CFLAGS}")
@@ -233,6 +233,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 target_link_directories(${PROJECT_NAME} PRIVATE ${Python_LIB_DIR})
 target_link_options(${PROJECT_NAME} PRIVATE ${Python_LDFLAGS_NORM})
+
+target_compile_definitions(${PROJECT_NAME} PRIVATE 
+    PYTHON_VERSION_MAJOR=${Python_VERSION_MAJOR}
+    PYTHON_VERSION_MINOR=${Python_VERSION_MINOR}
+)
 
 # ###################################################################
 # ###################################################################

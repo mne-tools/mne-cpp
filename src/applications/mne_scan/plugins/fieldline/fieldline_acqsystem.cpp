@@ -40,6 +40,16 @@
 #define PY_SSIZE_T_CLEAN
 #include "Python.h"
 
+#define QUOTE(str) #str
+#define EXPAND_AND_QUOTE(str) QUOTE(str)
+
+const char libPythonBugFix[] = "libpython" 
+                                EXPAND_AND_QUOTE(PYTHON_VERSION_MAJOR)
+                                "."
+                                EXPAND_AND_QUOTE(PYTHON_VERSION_MINOR)
+                                ".so";
+
+#include <dlfcn.h>
 #include <iomanip>
 #include <string>
 #include <iostream>
@@ -258,6 +268,10 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
   m_numSamplesPerBlock(200),
   m_numSensors(33)
 {
+    printLog("Initializing Python");
+    printLog(libPythonBugFix);
+    void*const libBugFix = dlopen(libPythonBugFix, RTLD_LAZY | RTLD_GLOBAL);
+    
     Py_Initialize();
 
     preConfigurePython();
@@ -274,7 +288,8 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
       printLog("callbacks module ok!");
     }
 
-    PyObject* FieldlineModule = (PyObject*)loadModule("fieldline_api_mock.fieldline_service");
+   // PyObject* FieldlineModule = (PyObject*)loadModule("fieldline_api_mock.fieldline_service");
+    PyObject* FieldlineModule = (PyObject*)loadModule("fieldline_api.fieldline_service");
     if (FieldlineModule == NULL)
     {
       printLog("fieldline module wrong!");
