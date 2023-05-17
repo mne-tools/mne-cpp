@@ -284,6 +284,7 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
 {
     printLog("Initializing Python");
     printLog(libPythonBugFix);
+
     void*const libBugFix = dlopen(libPythonBugFix, RTLD_LAZY | RTLD_GLOBAL);
     
     Py_Initialize();
@@ -327,13 +328,9 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     } else{
       printLog("fServiceInstance ok!");
     }
-    PyObject* openMethod = PyObject_GetAttrString(fServiceInstance, "open");
-    if (openMethod == NULL)
-    {
-      printLog("openMethod wrong!");
-    } else{
-      printLog("openMethod ok!");
-    }
+
+    Py_DECREF(ipList);
+
 
 
     m_pThreadState = (void*)PyEval_SaveThread();
@@ -343,13 +340,22 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
 
-        PyObject* pResult = PyObject_CallNoArgs(openMethod);
-        if (pResult == NULL)
+    PyObject* openMethod = PyObject_GetAttrString(fServiceInstance, "open");
+    if (openMethod == NULL)
         {
-          printLog("pResult wrong!");
+            printLog("openMethod wrong!");
         } else{
-          printLog("pResult ok!");
-        }
+        printLog("openMethod ok!");
+    }
+
+    PyObject* openMethodCall = PyObject_CallNoArgs(openMethod);
+    if (openMethodCall == NULL)
+    {
+      printLog("openMethodCall wrong!");
+    } else{
+      printLog("openMethodCall ok!");
+    }
+    Py_DECREF(openMethodCall);
 
     PyGILState_Release(gstate);
 
@@ -357,16 +363,22 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     // PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
 
+    // =========================================================================
+    // =========================================================================
 
         PyObject* setCloseLoop = PyObject_GetAttrString(fServiceInstance, "set_closed_loop");
         PyObject* trueTuple = PyTuple_New(1);
         PyTuple_SetItem(trueTuple, 0, Py_True);
         PyObject* pResult2 = PyObject_CallObject(setCloseLoop, trueTuple);
+        Py_DECREF(setCloseLoop);
+        Py_DECREF(trueTuple);
+        Py_DECREF(pResult2);
 
         PyObject* loadSensors = PyObject_GetAttrString(fServiceInstance, "load_sensors");
         PyObject* sensors = PyObject_CallNoArgs(loadSensors);
-    // =========================================================================
-    // =========================================================================
+        Py_INCREF(loadSensors);
+        Py_INCREF(sensors);
+
         PyObject* restartAllSensors = PyObject_GetAttrString(fServiceInstance, "restart_sensors");
 
         if (restartAllSensors == NULL)
@@ -441,9 +453,7 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     // =========================================================================
     gstate = PyGILState_Ensure();
 
-
         PyObject* coarseZeroAllSensors = PyObject_GetAttrString(fServiceInstance, "coarse_zero_sensors");
-
         if (coarseZeroAllSensors == NULL)
         {
             printLog("coarse zero sensors broken");
@@ -589,10 +599,13 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     // =========================================================================
     // =========================================================================
 
-    //
     //  PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
 
+    Py_DECREF(loadSensors);
+    Py_XDECREF(loadSensors);
+    Py_DECREF(sensors);
+    Py_XDECREF(sensors);
 
 
     PyObject* readDataFcn = PyObject_GetAttrString(fServiceInstance, "read_data");
@@ -632,14 +645,8 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     Py_DECREF(parseCallbacksModule);
     Py_DECREF(FieldlineModule);
     Py_DECREF(fService);
-    Py_DECREF(ipList);
     Py_DECREF(fServiceInstance);
     Py_DECREF(openMethod);
-    Py_DECREF(pResult);
-    Py_DECREF(setCloseLoop);
-    Py_DECREF(trueTuple);
-    Py_DECREF(pResult2);
-    Py_DECREF(loadSensors);
     Py_DECREF(readDataFcn);
     Py_DECREF(parserCallback);
     Py_DECREF(argsSetDataParser);
