@@ -87,11 +87,11 @@ void callbackOnErrorWhileRestart(int chassisId, int sensorId, int errorId) {
 }
 
 void callbackOnErrorWhileCoarseZero(int chassisId, int sensorId, int errorId) {
-    std::cout << "Error while restarting sensor: (" << chassisId << ", " << sensorId << ") Code: " << errorId << ".\n";
+    std::cout << "Error while coarse zeroing sensor: (" << chassisId << ", " << sensorId << ") Code: " << errorId << ".\n";
 }
 
 void callbackOnErrorWhileFineZero(int chassisId, int sensorId, int errorId) {
-    std::cout << "Error while restarting sensor: (" << chassisId << ", " << sensorId << ") Code: " << errorId << ".\n";
+    std::cout << "Error while fine zeroing sensor: (" << chassisId << ", " << sensorId << ") Code: " << errorId << ".\n";
 }
 
 void callbackOnCompletionRestart() {
@@ -214,7 +214,7 @@ static struct PyMethodDef fieldlineCallbacksMethods[] = {
         METH_VARARGS, "Function to be called when a sensor has an error while restarting."},
     {"callbackOnErrorWhileCoarseZero", callbackOnErrorWhileCoarseZero_py,
         METH_VARARGS, "Function to be called when a sensor has an error while coarse zeroing."},
-    {"callbackOnErrorWhileFinzeZero", callbackOnErrorWhileFinzeZero_py,
+    {"callbackOnErrorWhileFineZero", callbackOnErrorWhileFinzeZero_py,
         METH_VARARGS, "Function to be called when a sensor has an error while fine zeroing"},
     {"callbackOnCompletionRestart", callbackOnCompletionRestart_py,
         METH_VARARGS, "Function to be called when restarting has finished for all sensors."},
@@ -328,10 +328,9 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     } else{
       printLog("fServiceInstance ok!");
     }
+    Py_DECREF(fService);
 
     Py_DECREF(ipList);
-
-
 
     m_pThreadState = (void*)PyEval_SaveThread();
 
@@ -355,11 +354,13 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     } else{
       printLog("openMethodCall ok!");
     }
+    Py_DECREF(openMethod);
     Py_DECREF(openMethodCall);
 
     PyGILState_Release(gstate);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+
     // PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
 
@@ -528,7 +529,6 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     // =========================================================================
     gstate = PyGILState_Ensure();
 
-
         PyObject* fineZeroAllSensors = PyObject_GetAttrString(fServiceInstance, "fine_zero_sensors");
 
         if (fineZeroAllSensors == NULL)
@@ -568,8 +568,11 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
 
         std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
+        PyObject* loadSensors3 = PyObject_GetAttrString(fServiceInstance, "load_sensors");
+        PyObject* sensors3 = PyObject_CallNoArgs(loadSensors);
+
         PyObject* argsFineZero = PyTuple_New(4);
-        PyTuple_SetItem(argsFineZero, 0, sensors);
+        PyTuple_SetItem(argsFineZero, 0, sensors3);
         PyTuple_SetItem(argsFineZero, 1, callback_on_finished_fine_zero);
         PyTuple_SetItem(argsFineZero, 2, callback_on_error_fine_zero);
         PyTuple_SetItem(argsFineZero, 3, callback_on_completion_fine_zero);
@@ -583,6 +586,10 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
         } else {
             printLog("fine zero call call ok!");
         }
+        Py_DECREF(sensors);
+
+        Py_DECREF(sensors3);
+        Py_DECREF(loadSensors3);
 
         Py_DECREF(fineZeroAllSensors);
         Py_DECREF(callback_on_finished_fine_zero);
@@ -624,13 +631,17 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     PyObject* argsSetDataParser = PyTuple_New(1);
     PyTuple_SetItem(argsSetDataParser, 0, parserCallback);
 
-    PyObject* result33 = PyObject_CallObject(readDataFcn, argsSetDataParser);
-    if (result33 == NULL)
+    PyObject* readDataReturn = PyObject_CallObject(readDataFcn, argsSetDataParser);
+    if (readDataReturn == NULL)
     {
-        printLog("result33 bad");
+        printLog("readDataReturn bad");
     } else {
-        printLog("result33 ok");
+        printLog("readDataReturn ok");
     }
+    Py_DECREF(readDataReturn);
+    Py_DECREF(readDataFcn);
+    Py_DECREF(parserCallback);
+    Py_DECREF(argsSetDataParser);
 
     PyGILState_Release(gstate);
 
@@ -644,13 +655,7 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
 
     Py_DECREF(parseCallbacksModule);
     Py_DECREF(FieldlineModule);
-    Py_DECREF(fService);
     Py_DECREF(fServiceInstance);
-    Py_DECREF(openMethod);
-    Py_DECREF(readDataFcn);
-    Py_DECREF(parserCallback);
-    Py_DECREF(argsSetDataParser);
-    Py_DECREF(result33);
 
     PyGILState_Release(gstate);
     // m_pThreadState = (void*)PyEval_SaveThread();
