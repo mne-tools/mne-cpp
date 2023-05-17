@@ -112,6 +112,7 @@ static PyObject* callbackOnFinishedWhileRestart_py(PyObject* self, PyObject* arg
         return NULL;
     }
     callbackOnFinishedWhileRestart(chassis, sensor);
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
@@ -121,6 +122,7 @@ static PyObject* callbackOnFinishedWhileCoarseZero_py(PyObject* self, PyObject* 
         return NULL;
     }
     callbackOnFinishedWhileCoarseZero(chassis, sensor);
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
@@ -130,6 +132,7 @@ static PyObject* callbackOnFinishedWhileFineZero_py(PyObject* self, PyObject* ar
         return NULL;
     }
     callbackOnFinishedWhileFineZero(chassis, sensor);
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
@@ -139,6 +142,7 @@ static PyObject* callbackOnErrorWhileRestart_py(PyObject* self, PyObject* args) 
         return NULL;
     }
     callbackOnErrorWhileRestart(chassis, sensor, error);
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
@@ -148,6 +152,7 @@ static PyObject* callbackOnErrorWhileCoarseZero_py(PyObject* self, PyObject* arg
         return NULL;
     }
     callbackOnErrorWhileCoarseZero(chassis, sensor, error);
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
@@ -157,6 +162,7 @@ static PyObject* callbackOnErrorWhileFinzeZero_py(PyObject* self, PyObject* args
         return NULL;
     }
     callbackOnErrorWhileFineZero(chassis, sensor, error);
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
@@ -167,6 +173,7 @@ static PyObject* callbackOnCompletionRestart_py(PyObject* self, PyObject* args) 
         return nullptr;
     }
     callbackOnCompletionRestart();
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
@@ -177,6 +184,7 @@ static PyObject* callbackOnCompletionCoarseZero_py(PyObject* self, PyObject* arg
         return nullptr;
     }
     callbackOnCompletionCoarseZero();
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
@@ -187,6 +195,7 @@ static PyObject* callbackOnCompletionFineZero_py(PyObject* self, PyObject* args)
         return nullptr;
     }
     callbackOnCompletionFineZero();
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
@@ -246,6 +255,7 @@ static PyObject* dict_parser(PyObject* self, PyObject* args) {
         // printLog(std::string("value: ") + std::to_string((double) PyLong_AsLong(data)));
         acq_system->addSampleToSamplesColumn((int) pos-1, (double) PyLong_AsLong(data));
     }
+    Py_INCREF(Py_None);
     return Py_None;
 }
 
