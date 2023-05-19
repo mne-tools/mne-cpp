@@ -57,19 +57,24 @@ class FieldlineAcqSystem {
     Fieldline* m_pControllerParent;
     void initSampleArrays();
     void addSampleToSamplesColumn(int sensorIdx, double value);
+    void restartAllSensors();
+    void coarseZeroAllSensors();
+    void fineZeroAllSensors();
 
  private:
     void preConfigurePython() const;
     void runPythonFile(const char* file, const char* comment) const;
     void* loadModule(const char* moduleName);
     void* loadCModule(const char* moduleName, void* (*moduleInitFunc)(void));
+    void* loadSensors();
+    void setDataCallback();
 
     int m_numSamplesPerBlock;
     int m_numSensors;
     void* m_fServiceInstance;
     void* m_pThreadState;
-    void* m_pCallbackModule;
     void* m_pCallsModule;
+    void* m_pOpenMethod;
     double* m_samplesBlock;
     double* m_samplesBlock2;
 };

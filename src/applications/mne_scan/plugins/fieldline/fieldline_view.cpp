@@ -42,6 +42,7 @@
 #include <QHeaderView>
 #include <QTableWidget>
 #include <QStringList>
+#include <QPushButton>
 
 #include <string>
 #include <iostream>
@@ -234,7 +235,7 @@ void FieldlineView::initAcqSystem(int numChassis)
 void FieldlineView::startAllSensors() {
     printLog("startAllSensors");
     // m_pFieldlinePlugin->m_pAcqSystem->callFunctionAsync("callback", "start");
-    m_pFieldlinePlugin->m_pAcqSystem->startADC();
+//    m_pFieldlinePlugin->m_pAcqSystem->startADC();
 }
 
 void FieldlineView::stopAllSensors() {
@@ -245,19 +246,31 @@ void FieldlineView::stopAllSensors() {
 
 void FieldlineView::autoTuneAllSensors() {
     printLog("autoTuneAllSensors");
-    m_pFieldlinePlugin->m_pAcqSystem->setCallback();
+    //m_pFieldlinePlugin->m_pAcqSystem->setCallback();
 }
 
 void FieldlineView::restartAllSensors() {
     printLog("restartAllSensors");
+    std::thread t([this]{
+                    m_pFieldlinePlugin->m_pAcqSystem->restartAllSensors();
+                });
+    t.detach();
 }
 
 void FieldlineView::coarseZeroAllSensors() {
     printLog("coarseZeroAllSensors");
+    std::thread t([this]{
+                    m_pFieldlinePlugin->m_pAcqSystem->coarseZeroAllSensors();
+                });
+    t.detach();
 }
 
 void FieldlineView::fineZeroAllSensors() {
     printLog("fineZeroAllSensors");
+    std::thread t([this]{
+                    m_pFieldlinePlugin->m_pAcqSystem->fineZeroAllSensors();
+                });
+    t.detach();
 }
 
 

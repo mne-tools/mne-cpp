@@ -66,6 +66,85 @@ const std::string resourcesPath(QCoreApplication::applicationDirPath().toStdStri
                                                                 "/../resources/mne_scan/plugins/fieldline/");
 const std::string entryFile(resourcesPath + "main.py");
 
+struct GILHandler {
+    GILHandler():isAcquired(false) { 
+        acquireGIL();
+    }
+
+    ~GILHandler() {
+        releaseGIL();
+    }
+
+    void acquireGIL() {
+        if (!isAcquired) {
+            m_gstate = PyGILState_Ensure();
+            isAcquired = true;
+        }
+    }
+    void releaseGIL() {
+        if (isAcquired) {
+            PyGILState_Release(m_gstate);
+            isAcquired = false;
+        }
+    }
+
+    bool isAcquired;
+    PyGILState_STATE m_gstate;
+};
+
+struct AcqOpener {
+    AcqOpener(PyObject* s): m_serviceInstance(s) {
+        openAcq();
+    }
+    ~AcqOpener() {
+        closeAcq();
+    }
+
+    void openAcq() {
+        PyObject* openMethod = PyObject_GetAttrString(m_serviceInstance, "open");
+        if (openMethod == NULL)
+        {
+            printLog("openMethod wrong!");
+        } else{
+            printLog("openMethod ok!");
+        }
+
+        PyObject* openMethodCall = PyObject_CallNoArgs(openMethod);
+        if (openMethodCall == NULL)
+        {
+          printLog("openMethodCall wrong!");
+        } else{
+          printLog("openMethodCall ok!");
+        }
+        Py_DECREF(openMethod);
+        Py_DECREF(openMethodCall);
+    }
+
+    void closeAcq() {
+        PyObject* closeMethod = PyObject_GetAttrString(m_serviceInstance, "close");
+        if (closeMethod == NULL)
+            {
+                printLog("closeMethod wrong!");
+            } else{
+            printLog("closeMethod ok!");
+        }
+
+        PyObject* closeMethodCall = PyObject_CallNoArgs(closeMethod);
+        if (closeMethodCall == NULL)
+        {
+          printLog("closeMethodCall wrong!");
+        } else{
+          printLog("closeMethodCall ok!");
+        }
+
+        Py_DECREF(closeMethod);
+        Py_DECREF(closeMethodCall);
+    }
+
+    PyObject* m_serviceInstance;
+
+};
+
 bool restartFinished = false;
 bool coarseZeroFinished = false;
 bool fineZeroFinished = false;
@@ -239,12 +318,14 @@ static FieldlineAcqSystem* acq_system(nullptr);
 static PyObject* dict_parser(PyObject* self, PyObject* args) {
     PyObject* dataDict;
     if (!PyArg_ParseTuple(args, "O", &dataDict)) {
+        printLog("problem with dataDict.");
         PyErr_SetString(PyExc_TypeError, "data is not valid.");
         return NULL;
     }
 
     PyObject* data_frames = PyDict_GetItemString(dataDict, "data_frames");
     if (!data_frames || !PyDict_Check(data_frames)) {
+        printLog("Problem with data frames.");
         PyErr_SetString(PyExc_TypeError, "data_frames is not a dictionary.");
         return NULL;
     }
@@ -258,6 +339,8 @@ static PyObject* dict_parser(PyObject* self, PyObject* args) {
         printLog(std::string("pos: ") + std::to_string(pos));
         printLog(std::string("value: ") + std::to_string((double) PyLong_AsLong(data)));
         acq_system->addSampleToSamplesColumn((int) pos-1, (double) PyLong_AsLong(data));
+        if (pos == 2) 
+            break;
     }
     Py_INCREF(Py_None);
     return Py_None;
@@ -280,31 +363,23 @@ static PyObject* PyInit_callbacks_parsing(void) {
 FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
 : m_pControllerParent(parent),
   m_numSamplesPerBlock(200),
-  m_numSensors(19)
+  m_numSensors(2)
 {
     printLog("Initializing Python");
     printLog(libPythonBugFix);
 
     void*const libBugFix = dlopen(libPythonBugFix, RTLD_LAZY | RTLD_GLOBAL);
+
+    acq_system = this;
     
     Py_Initialize();
 
     preConfigurePython();
 
-    m_pCallbackModule = loadModule("callback");
-
-
     m_pCallsModule = loadCModule("fieldline_callbacks", *(void*(*)(void))&PyInit_fieldline_callbacks);
-    PyObject* parseCallbacksModule = (PyObject*)loadCModule("callbacks_parsing", *(void*(*)(void))&PyInit_callbacks_parsing);
-    if (parseCallbacksModule == NULL)
-    {
-      printLog("callbacks module wrong!");
-    } else{
-      printLog("callbacks module ok!");
-    }
 
-   // PyObject* FieldlineModule = (PyObject*)loadModule("fieldline_api_mock.fieldline_service");
-    PyObject* FieldlineModule = (PyObject*)loadModule("fieldline_api.fieldline_service");
+    PyObject* FieldlineModule = (PyObject*)loadModule("fieldline_api_mock.fieldline_service");
+    //PyObject* FieldlineModule = (PyObject*)loadModule("fieldline_api.fieldline_service");
     if (FieldlineModule == NULL)
     {
       printLog("fieldline module wrong!");
@@ -328,297 +403,308 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     } else{
       printLog("fServiceInstance ok!");
     }
-    Py_DECREF(fService);
 
+    Py_DECREF(FieldlineModule);
+    Py_DECREF(fService);
     Py_DECREF(ipList);
 
+    setDataCallback();
+
+    {
+        AcqOpener o((PyObject*)m_fServiceInstance);
+
+        PyObject* setCloseLoopCall = PyObject_GetAttrString(fServiceInstance, "set_closed_loop");
+        PyObject* trueTuple = PyTuple_New(1);
+        PyTuple_SetItem(trueTuple, 0, Py_True);
+        PyObject* setCloseLoopCallResult = PyObject_CallObject(setCloseLoopCall, trueTuple);
+        if (setCloseLoopCallResult == NULL)
+        {
+          printLog("setCloseLoopCallResult wrong!");
+        } else{
+          printLog("setCloseLoopCallResult ok!");
+        }
+
+        Py_DECREF(setCloseLoopCall);
+        Py_DECREF(trueTuple);
+        Py_DECREF(setCloseLoopCallResult);
+    }
+
+    initSampleArrays();
+
     m_pThreadState = (void*)PyEval_SaveThread();
+}
+
+FieldlineAcqSystem::~FieldlineAcqSystem()
+{
+    PyEval_RestoreThread(reinterpret_cast<PyThreadState*>(m_pThreadState));
+
+    Py_XDECREF(m_fServiceInstance);
+    Py_XDECREF(m_pCallsModule);
+
+    if (m_samplesBlock) {
+        delete[] m_samplesBlock;
+    }
+    if (m_samplesBlock2) {
+        delete[] m_samplesBlock2;
+    }
+
+    Py_Finalize();
+}
+
+void* FieldlineAcqSystem::loadSensors() {
+    PyObject* loadSensors = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "load_sensors");
+    PyObject* sensors = PyObject_CallNoArgs(loadSensors);
+    Py_DECREF(loadSensors);
+    return (void*)sensors;
+}
+
+void FieldlineAcqSystem::restartAllSensors() {
+
+    restartFinished = false;
+
+    GILHandler g;
+
+    AcqOpener opener((PyObject*)m_fServiceInstance);
+
+    PyObject* sensors = (PyObject*) loadSensors();
+
+    PyObject* restartAllSensorsCall = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "restart_sensors");
+    if (restartAllSensorsCall == NULL)
+    {
+        printLog("restart sensors broken");
+    } else {
+        printLog("restartAllSensors ok!");
+    }
+
+    PyObject* callback_on_finished = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnFinishedWhileRestart");
+    if (callback_on_finished == NULL)
+    {
+        printLog("callback on finished broken");
+    } else {
+        printLog("callback restart ok!");
+    }
+
+    PyObject* callback_on_error = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnErrorWhileRestart");
+    if (callback_on_error == NULL)
+    {
+        printLog("callback on error broken");
+    } else {
+        printLog("callback error ok!");
+    }
+
+    PyObject* callback_on_completion = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnCompletionRestart");
+    if (callback_on_completion == NULL)
+    {
+        printLog("callback on completion broken");
+    } else {
+        printLog("callback completion ok!");
+    }
+
+    PyObject* argsRestart = PyTuple_New(4);
+    PyTuple_SetItem(argsRestart, 0, sensors);
+    PyTuple_SetItem(argsRestart, 1, callback_on_finished);
+    PyTuple_SetItem(argsRestart, 2, callback_on_error);
+    PyTuple_SetItem(argsRestart, 3, callback_on_completion);
+
+    PyObject* resultRestart = PyObject_CallObject(restartAllSensorsCall, argsRestart);
+    if (resultRestart == NULL)
+    {
+        printLog("restart call broken");
+    } else {
+        printLog("restart call ok!");
+    }
+
+    g.releaseGIL();
+
+    while (restartFinished == false) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(600));
+    }
+
+    g.acquireGIL();
+
+    Py_DECREF(sensors);
+    Py_DECREF(restartAllSensorsCall);
+    Py_DECREF(callback_on_finished);
+    Py_DECREF(callback_on_error);
+    Py_DECREF(callback_on_completion);
+    Py_DECREF(argsRestart);
+    Py_DECREF(resultRestart);
+}
+
+void FieldlineAcqSystem::coarseZeroAllSensors() {
+
+    coarseZeroFinished = false;
+
+    GILHandler g;
+
+    AcqOpener opener((PyObject*)m_fServiceInstance);
+
+    PyObject* sensors = (PyObject*) loadSensors();
+
+    PyObject* coarseZeroAllSensorsCall = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "coarse_zero_sensors");
+    if (coarseZeroAllSensorsCall == NULL)
+    {
+        printLog("coarse zero sensors broken");
+    } else {
+        printLog("coarseZeroAllSensors ok!");
+    }
+
+    PyObject* callback_on_finished_coarse_zero = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnFinishedWhileCoarseZero");
+    if (callback_on_finished_coarse_zero == NULL)
+    {
+        printLog("callback on finished coarse zero broken");
+    } else {
+        printLog("callback on finished coarse zero ok!");
+    }
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
-
-    PyObject* openMethod = PyObject_GetAttrString(fServiceInstance, "open");
-    if (openMethod == NULL)
-        {
-            printLog("openMethod wrong!");
-        } else{
-        printLog("openMethod ok!");
-    }
-
-    PyObject* openMethodCall = PyObject_CallNoArgs(openMethod);
-    if (openMethodCall == NULL)
+    PyObject* callback_on_error_coarse_zero = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnErrorWhileCoarseZero");
+    if (callback_on_error_coarse_zero == NULL)
     {
-      printLog("openMethodCall wrong!");
-    } else{
-      printLog("openMethodCall ok!");
+        printLog("callback on error coarse zero broken");
+    } else {
+        printLog("callback coarse zero error ok!");
     }
-    Py_DECREF(openMethod);
-    Py_DECREF(openMethodCall);
-
-    PyGILState_Release(gstate);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
     
-    // PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    PyObject* callback_on_completion_coarse_zero = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnCompletionCoarseZero");
+    if (callback_on_completion_coarse_zero == NULL)
+    {
+        printLog("callback on completion coarse zero broken");
+    } else {
+        printLog("callback coarse zero completion ok!");
+    }
 
-    // =========================================================================
-    // =========================================================================
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
-        PyObject* setCloseLoop = PyObject_GetAttrString(fServiceInstance, "set_closed_loop");
-        PyObject* trueTuple = PyTuple_New(1);
-        PyTuple_SetItem(trueTuple, 0, Py_True);
-        PyObject* pResult2 = PyObject_CallObject(setCloseLoop, trueTuple);
-        Py_DECREF(setCloseLoop);
-        Py_DECREF(trueTuple);
-        Py_DECREF(pResult2);
+    PyObject* argsCoarseZero = PyTuple_New(4);
+    PyTuple_SetItem(argsCoarseZero, 0, sensors);
+    PyTuple_SetItem(argsCoarseZero, 1, callback_on_finished_coarse_zero);
+    PyTuple_SetItem(argsCoarseZero, 2, callback_on_error_coarse_zero);
+    PyTuple_SetItem(argsCoarseZero, 3, callback_on_completion_coarse_zero);
 
-        PyObject* loadSensors = PyObject_GetAttrString(fServiceInstance, "load_sensors");
-        PyObject* sensors = PyObject_CallNoArgs(loadSensors);
-        Py_INCREF(loadSensors);
-        Py_INCREF(sensors);
+    PyObject* resultCoarseZero = PyObject_CallObject(coarseZeroAllSensorsCall, argsCoarseZero);
+    if (resultCoarseZero == NULL)
+    {
+        printLog("call coarsezero call broken");
+    } else {
+        printLog("coarse zero call call ok!");
+    }
+    
+    g.releaseGIL();
 
-        PyObject* restartAllSensors = PyObject_GetAttrString(fServiceInstance, "restart_sensors");
+    while (coarseZeroFinished == false) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(600));
+    }
 
-        if (restartAllSensors == NULL)
-        {
-            printLog("restart sensors broken");
-        } else {
-            printLog("restartAllSensors ok!");
-        }
+    g.acquireGIL();
 
-        PyObject* callback_on_finished = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnFinishedWhileRestart");
-        if (callback_on_finished == NULL)
-        {
-            printLog("callback on finished broken");
-        } else {
-            printLog("callback restart ok!");
-        }
+    Py_DECREF(sensors);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    Py_DECREF(coarseZeroAllSensorsCall);
+    Py_DECREF(callback_on_finished_coarse_zero);
+    Py_DECREF(callback_on_error_coarse_zero);
+    Py_DECREF(callback_on_completion_coarse_zero);
+    Py_DECREF(argsCoarseZero);
+    Py_DECREF(resultCoarseZero);
+}
 
-        PyObject* callback_on_error = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnErrorWhileRestart");
-        if (callback_on_error == NULL)
-        {
-            printLog("callback on error broken");
-        } else {
-            printLog("callback error ok!");
-        }
+void FieldlineAcqSystem::fineZeroAllSensors() {
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        
-        PyObject* callback_on_completion = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnCompletionRestart");
-        if (callback_on_completion == NULL)
-        {
-            printLog("callback on completion broken");
-        } else {
-            printLog("callback completion ok!");
-        }
+    fineZeroFinished = false;
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    GILHandler g;
 
-        PyObject* argsRestart = PyTuple_New(4);
-        PyTuple_SetItem(argsRestart, 0, sensors);
-        PyTuple_SetItem(argsRestart, 1, callback_on_finished);
-        PyTuple_SetItem(argsRestart, 2, callback_on_error);
-        PyTuple_SetItem(argsRestart, 3, callback_on_completion);
+    AcqOpener opener((PyObject*)m_fServiceInstance);
 
-        restartFinished = false;
+    PyObject* sensors = (PyObject*) loadSensors();
 
-         //PyObject* resultRestart = PyObject_CallObject(restartAllSensors, argsRestart);
-         //if (resultRestart == NULL)
-         //{
-             //printLog("restart call broken");
-         //} else {
-             //printLog("restart call ok!");
-         //}
- //
-         //Py_DECREF(restartAllSensors);
-        Py_DECREF(callback_on_finished);
-        Py_DECREF(callback_on_error);
-        Py_DECREF(callback_on_completion);
-        Py_DECREF(argsRestart);
-        //Py_DECREF(resultRestart);
+    PyObject* fineZeroAllSensorsCall = PyObject_GetAttrString((PyObject*) m_fServiceInstance, "fine_zero_sensors");
 
-    PyGILState_Release(gstate);
+    if (fineZeroAllSensorsCall == NULL)
+    {
+        printLog("fine zero sensors broken");
+    } else {
+        printLog("fineZeroAllSensors ok!");
+    }
 
-     //while (restartFinished == false) {
-         //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-     //}
-    std::this_thread::sleep_for(std::chrono::milliseconds(3000));
+    PyObject* callback_on_finished_fine_zero = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnFinishedWhileFineZero");
+    if (callback_on_finished_fine_zero == NULL)
+    {
+        printLog("callback on finished fine zero broken");
+    } else {
+        printLog("callback on finished fine zero ok!");
+    }
 
-    // =========================================================================
-    // =========== coarse zero =================================================
-    // =========================================================================
-    gstate = PyGILState_Ensure();
+    PyObject* callback_on_error_fine_zero = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnErrorWhileFineZero");
+    if (callback_on_error_fine_zero == NULL)
+    {
+        printLog("callback on error fine zero broken");
+    } else {
+        printLog("callback fine zero error ok!");
+    }
 
-        PyObject* coarseZeroAllSensors = PyObject_GetAttrString(fServiceInstance, "coarse_zero_sensors");
-        if (coarseZeroAllSensors == NULL)
-        {
-            printLog("coarse zero sensors broken");
-        } else {
-            printLog("coarseZeroAllSensors ok!");
-        }
+    PyObject* callback_on_completion_fine_zero = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnCompletionFineZero");
+    if (callback_on_completion_fine_zero == NULL)
+    {
+        printLog("callback on completion fine zero broken");
+    } else {
+        printLog("callback fine zero completion ok!");
+    }
 
-        PyObject* callback_on_finished_coarse_zero = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnFinishedWhileCoarseZero");
-        if (callback_on_finished_coarse_zero == NULL)
-        {
-            printLog("callback on finished coarse zero broken");
-        } else {
-            printLog("callback on finished coarse zero ok!");
-        }
+    PyObject* argsFineZero = PyTuple_New(4);
+    PyTuple_SetItem(argsFineZero, 0, sensors);
+    PyTuple_SetItem(argsFineZero, 1, callback_on_finished_fine_zero);
+    PyTuple_SetItem(argsFineZero, 2, callback_on_error_fine_zero);
+    PyTuple_SetItem(argsFineZero, 3, callback_on_completion_fine_zero);
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    PyObject* resultFineZero = PyObject_CallObject(fineZeroAllSensorsCall, argsFineZero);
+    if (resultFineZero == NULL)
+    {
+        printLog("call finezero call broken");
+    } else {
+        printLog("fine zero call call ok!");
+    }
 
-        PyObject* callback_on_error_coarse_zero = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnErrorWhileCoarseZero");
-        if (callback_on_error_coarse_zero == NULL)
-        {
-            printLog("callback on error coarse zero broken");
-        } else {
-            printLog("callback coarse zero error ok!");
-        }
+    g.releaseGIL();
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        
-        PyObject* callback_on_completion_coarse_zero = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnCompletionCoarseZero");
-        if (callback_on_completion_coarse_zero == NULL)
-        {
-            printLog("callback on completion coarse zero broken");
-        } else {
-            printLog("callback coarse zero completion ok!");
-        }
+    while (fineZeroFinished == false) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(600));
+    }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    g.acquireGIL();
 
-        PyObject* argsCoarseZero = PyTuple_New(4);
-        PyTuple_SetItem(argsCoarseZero, 0, sensors);
-        PyTuple_SetItem(argsCoarseZero, 1, callback_on_finished_coarse_zero);
-        PyTuple_SetItem(argsCoarseZero, 2, callback_on_error_coarse_zero);
-        PyTuple_SetItem(argsCoarseZero, 3, callback_on_completion_coarse_zero);
+    Py_DECREF(sensors);
 
-        coarseZeroFinished = false;
+    Py_DECREF(fineZeroAllSensorsCall);
+    Py_DECREF(callback_on_finished_fine_zero);
+    Py_DECREF(callback_on_error_fine_zero);
+    Py_DECREF(callback_on_completion_fine_zero);
+    Py_DECREF(argsFineZero);
+    Py_DECREF(resultFineZero);
+}
 
-        //PyObject* resultCoarseZero = PyObject_CallObject(coarseZeroAllSensors, argsCoarseZero);
-        //if (resultCoarseZero == NULL)
-        //{
-        //    printLog("call coarsezero call broken");
-        //} else {
-        //    printLog("coarse zero call call ok!");
-        //}
+void FieldlineAcqSystem::setDataCallback() {
 
-        Py_DECREF(coarseZeroAllSensors);
-        Py_DECREF(callback_on_finished_coarse_zero);
-        Py_DECREF(callback_on_error_coarse_zero);
-        Py_DECREF(callback_on_completion_coarse_zero);
-        Py_DECREF(argsCoarseZero);
-        //Py_DECREF(resultCoarseZero);
+    GILHandler g;
 
-    PyGILState_Release(gstate);
+    AcqOpener opener((PyObject*)m_fServiceInstance);
 
-    //while (coarseZeroFinished == false) {
-    //    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    //}
-    // =========================================================================
-    // =========================================================================
-
-
-    // =========================================================================
-    // ============ fine zero ==================================================
-    // =========================================================================
-    gstate = PyGILState_Ensure();
-
-        PyObject* fineZeroAllSensors = PyObject_GetAttrString(fServiceInstance, "fine_zero_sensors");
-
-        if (fineZeroAllSensors == NULL)
-        {
-            printLog("fine zero sensors broken");
-        } else {
-            printLog("fineZeroAllSensors ok!");
-        }
-
-        PyObject* callback_on_finished_fine_zero = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnFinishedWhileFineZero");
-        if (callback_on_finished_fine_zero == NULL)
-        {
-            printLog("callback on finished fine zero broken");
-        } else {
-            printLog("callback on finished fine zero ok!");
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-        PyObject* callback_on_error_fine_zero = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnErrorWhileFineZero");
-        if (callback_on_error_fine_zero == NULL)
-        {
-            printLog("callback on error fine zero broken");
-        } else {
-            printLog("callback fine zero error ok!");
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        
-        PyObject* callback_on_completion_fine_zero = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callbackOnCompletionFineZero");
-        if (callback_on_completion_fine_zero == NULL)
-        {
-            printLog("callback on completion fine zero broken");
-        } else {
-            printLog("callback fine zero completion ok!");
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-        PyObject* loadSensors3 = PyObject_GetAttrString(fServiceInstance, "load_sensors");
-        PyObject* sensors3 = PyObject_CallNoArgs(loadSensors);
-
-        PyObject* argsFineZero = PyTuple_New(4);
-        PyTuple_SetItem(argsFineZero, 0, sensors3);
-        PyTuple_SetItem(argsFineZero, 1, callback_on_finished_fine_zero);
-        PyTuple_SetItem(argsFineZero, 2, callback_on_error_fine_zero);
-        PyTuple_SetItem(argsFineZero, 3, callback_on_completion_fine_zero);
-
-        fineZeroFinished = false;
-
-        //PyObject* resultFineZero = PyObject_CallObject(fineZeroAllSensors, argsFineZero);
-        //if (resultFineZero == NULL)
-        //{
-        //    printLog("call finezero call broken");
-        //} else {
-        //    printLog("fine zero call call ok!");
-        //}
-        Py_DECREF(sensors);
-
-        Py_DECREF(sensors3);
-        Py_DECREF(loadSensors3);
-
-        Py_DECREF(fineZeroAllSensors);
-        Py_DECREF(callback_on_finished_fine_zero);
-        Py_DECREF(callback_on_error_fine_zero);
-        Py_DECREF(callback_on_completion_fine_zero);
-        Py_DECREF(argsFineZero);
-        //Py_DECREF(resultFineZero);
-
-    //PyGILState_Release(gstate);
-
-   // while (fineZeroFinished == false) {
-   //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-   // }
-    // =========================================================================
-    // =========================================================================
-    //  PyGILState_STATE gstate;
-    //gstate = PyGILState_Ensure();
-
-    //Py_DECREF(loadSensors);
-    //Py_XDECREF(loadSensors);
-    //Py_DECREF(sensors);
-    //Py_XDECREF(sensors);
-
-
-    PyObject* readDataFcn = PyObject_GetAttrString(fServiceInstance, "read_data");
+    PyObject* readDataFcn = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "read_data");
     if (readDataFcn == NULL) {
         printLog("problem readDataFcn");
     } else {
         printLog("readDataFcn ok");
+    }
+
+    PyObject* parseCallbacksModule = (PyObject*)loadCModule("callbacks_parsing", *(void*(*)(void))&PyInit_callbacks_parsing);
+    if (parseCallbacksModule == NULL)
+    {
+      printLog("callbacks module wrong!");
+    } else{
+      printLog("callbacks module ok!");
     }
 
     PyObject* parserCallback = PyObject_GetAttrString(parseCallbacksModule, "dict_parser");
@@ -642,45 +728,13 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     Py_DECREF(parserCallback);
     Py_DECREF(argsSetDataParser);
 
-    PyGILState_Release(gstate);
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    // PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
-
-    // register "this" into somewhere findable by python's execution flow.
-    acq_system = this;
-    initSampleArrays();
-
     Py_DECREF(parseCallbacksModule);
-    Py_DECREF(FieldlineModule);
-    Py_DECREF(fServiceInstance);
 
-    PyGILState_Release(gstate);
-    // m_pThreadState = (void*)PyEval_SaveThread();
-}
-
-FieldlineAcqSystem::~FieldlineAcqSystem()
-{
-    PyEval_RestoreThread(reinterpret_cast<PyThreadState*>(m_pThreadState));
-
-    Py_XDECREF(m_pCallbackModule);
-    Py_XDECREF(m_pCallsModule);
-
-    if (m_samplesBlock) {
-        delete[] m_samplesBlock;
-    }
-    if (m_samplesBlock2) {
-        delete[] m_samplesBlock2;
-    }
-
-    Py_Finalize();
 }
 
 void FieldlineAcqSystem::setCallback()
 {
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    GILHandler g;
 
     // PyObject *pSetCallbackFunc = NULL;
     // PyObject *pCallback1 = NULL;
@@ -714,12 +768,12 @@ void FieldlineAcqSystem::setCallback()
     // Py_XDECREF(pArgs);
     // Py_XDECREF(pResult);
     //
-    PyGILState_Release(gstate);
 }
 
 void FieldlineAcqSystem::startADC() {
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    GILHandler g;
+
+    AcqOpener o((PyObject*)m_fServiceInstance);
 
     PyObject* start_data = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "start_adc");
     PyObject* argsStartData = PyTuple_New(1);
@@ -736,13 +790,11 @@ void FieldlineAcqSystem::startADC() {
     Py_DECREF(argsStartData);
     Py_DECREF(zeroArg);
     Py_DECREF(startResult);
-
-    PyGILState_Release(gstate);
 }
 
 void FieldlineAcqSystem::stopADC() {
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    GILHandler g;
+    AcqOpener o((PyObject*)m_fServiceInstance);
 
     PyObject* stop_data = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "stop_adc");
     PyObject* argsstopData = PyTuple_New(1);
@@ -759,14 +811,11 @@ void FieldlineAcqSystem::stopADC() {
     Py_DECREF(argsstopData);
     Py_DECREF(stopArg);
     Py_DECREF(stopResult);
-
-    PyGILState_Release(gstate);
 }
 
 void* FieldlineAcqSystem::loadModule(const char* moduleName)
 {
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    GILHandler g;
 
     PyObject* pModule = PyImport_ImportModule(moduleName);
     if (pModule == NULL) {
@@ -776,15 +825,12 @@ void* FieldlineAcqSystem::loadModule(const char* moduleName)
 
     Py_DECREF(pModule);
 
-    PyGILState_Release(gstate);
-
     return (void*)pModule;
 }
 
 void* FieldlineAcqSystem::loadCModule(const char* moduleName, void*(*moduleInitFunc)(void))
 {
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    GILHandler g;
 
     if (Py_IsInitialized())
     {
@@ -796,7 +842,7 @@ void* FieldlineAcqSystem::loadCModule(const char* moduleName, void*(*moduleInitF
     } else {
         PyImport_AppendInittab(moduleName, (PyObject*(*)(void)) moduleInitFunc);
     }
-    PyGILState_Release(gstate);
+
     return loadModule(moduleName);
 }
 
@@ -810,8 +856,7 @@ void FieldlineAcqSystem::callFunctionAsync(const char* moduleName, const char* f
 
 void FieldlineAcqSystem::callFunction(const std::string& moduleName, const std::string& funcName)
 {
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    GILHandler g;
 
     PyObject* pModule = PyImport_GetModule(PyUnicode_FromString(moduleName.c_str()));
     if (pModule == NULL) {
@@ -840,8 +885,6 @@ void FieldlineAcqSystem::callFunction(const std::string& moduleName, const std::
     Py_XDECREF(pModule);
     Py_XDECREF(pFunc);
     Py_XDECREF(pResult);
-
-    PyGILState_Release(gstate);
 }
 
 void FieldlineAcqSystem::preConfigurePython() const
