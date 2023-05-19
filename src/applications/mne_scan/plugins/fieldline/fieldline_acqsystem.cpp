@@ -255,8 +255,8 @@ static PyObject* dict_parser(PyObject* self, PyObject* args) {
 
     while (PyDict_Next(data_frames, &pos, &key, &value)) {
         PyObject* data = PyDict_GetItemString(value, "data");
-        // printLog(std::string("pos: ") + std::to_string(pos));
-        // printLog(std::string("value: ") + std::to_string((double) PyLong_AsLong(data)));
+        printLog(std::string("pos: ") + std::to_string(pos));
+        printLog(std::string("value: ") + std::to_string((double) PyLong_AsLong(data)));
         acq_system->addSampleToSamplesColumn((int) pos-1, (double) PyLong_AsLong(data));
     }
     Py_INCREF(Py_None);
@@ -280,7 +280,7 @@ static PyObject* PyInit_callbacks_parsing(void) {
 FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
 : m_pControllerParent(parent),
   m_numSamplesPerBlock(200),
-  m_numSensors(33)
+  m_numSensors(19)
 {
     printLog("Initializing Python");
     printLog(libPythonBugFix);
@@ -360,7 +360,7 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     PyGILState_Release(gstate);
 
     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
+    
     // PyGILState_STATE gstate;
     gstate = PyGILState_Ensure();
 
@@ -427,26 +427,26 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
 
         restartFinished = false;
 
-        PyObject* resultRestart = PyObject_CallObject(restartAllSensors, argsRestart);
-        if (resultRestart == NULL)
-        {
-            printLog("restart call broken");
-        } else {
-            printLog("restart call ok!");
-        }
-
-        Py_DECREF(restartAllSensors);
+         //PyObject* resultRestart = PyObject_CallObject(restartAllSensors, argsRestart);
+         //if (resultRestart == NULL)
+         //{
+             //printLog("restart call broken");
+         //} else {
+             //printLog("restart call ok!");
+         //}
+ //
+         //Py_DECREF(restartAllSensors);
         Py_DECREF(callback_on_finished);
         Py_DECREF(callback_on_error);
         Py_DECREF(callback_on_completion);
         Py_DECREF(argsRestart);
-        Py_DECREF(resultRestart);
+        //Py_DECREF(resultRestart);
 
     PyGILState_Release(gstate);
 
-    while (restartFinished == false) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    }
+     //while (restartFinished == false) {
+         //std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+     //}
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
 
     // =========================================================================
@@ -500,26 +500,26 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
 
         coarseZeroFinished = false;
 
-        PyObject* resultCoarseZero = PyObject_CallObject(coarseZeroAllSensors, argsCoarseZero);
-        if (resultCoarseZero == NULL)
-        {
-            printLog("call coarsezero call broken");
-        } else {
-            printLog("coarse zero call call ok!");
-        }
+        //PyObject* resultCoarseZero = PyObject_CallObject(coarseZeroAllSensors, argsCoarseZero);
+        //if (resultCoarseZero == NULL)
+        //{
+        //    printLog("call coarsezero call broken");
+        //} else {
+        //    printLog("coarse zero call call ok!");
+        //}
 
         Py_DECREF(coarseZeroAllSensors);
         Py_DECREF(callback_on_finished_coarse_zero);
         Py_DECREF(callback_on_error_coarse_zero);
         Py_DECREF(callback_on_completion_coarse_zero);
         Py_DECREF(argsCoarseZero);
-        Py_DECREF(resultCoarseZero);
+        //Py_DECREF(resultCoarseZero);
 
     PyGILState_Release(gstate);
 
-    while (coarseZeroFinished == false) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    }
+    //while (coarseZeroFinished == false) {
+    //    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    //}
     // =========================================================================
     // =========================================================================
 
@@ -579,13 +579,13 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
 
         fineZeroFinished = false;
 
-        PyObject* resultFineZero = PyObject_CallObject(fineZeroAllSensors, argsFineZero);
-        if (resultFineZero == NULL)
-        {
-            printLog("call finezero call broken");
-        } else {
-            printLog("fine zero call call ok!");
-        }
+        //PyObject* resultFineZero = PyObject_CallObject(fineZeroAllSensors, argsFineZero);
+        //if (resultFineZero == NULL)
+        //{
+        //    printLog("call finezero call broken");
+        //} else {
+        //    printLog("fine zero call call ok!");
+        //}
         Py_DECREF(sensors);
 
         Py_DECREF(sensors3);
@@ -596,23 +596,22 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
         Py_DECREF(callback_on_error_fine_zero);
         Py_DECREF(callback_on_completion_fine_zero);
         Py_DECREF(argsFineZero);
-        Py_DECREF(resultFineZero);
+        //Py_DECREF(resultFineZero);
 
-    PyGILState_Release(gstate);
+    //PyGILState_Release(gstate);
 
-    while (fineZeroFinished == false) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    }
+   // while (fineZeroFinished == false) {
+   //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+   // }
     // =========================================================================
     // =========================================================================
-
     //  PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
+    //gstate = PyGILState_Ensure();
 
-    Py_DECREF(loadSensors);
-    Py_XDECREF(loadSensors);
-    Py_DECREF(sensors);
-    Py_XDECREF(sensors);
+    //Py_DECREF(loadSensors);
+    //Py_XDECREF(loadSensors);
+    //Py_DECREF(sensors);
+    //Py_XDECREF(sensors);
 
 
     PyObject* readDataFcn = PyObject_GetAttrString(fServiceInstance, "read_data");
