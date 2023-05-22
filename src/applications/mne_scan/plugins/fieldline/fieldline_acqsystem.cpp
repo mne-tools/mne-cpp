@@ -316,6 +316,7 @@ static PyObject* PyInit_fieldline_callbacks(void) {
 static FieldlineAcqSystem* acq_system(nullptr);
 
 static PyObject* dict_parser(PyObject* self, PyObject* args) {
+    printLog("heeeelo!!!!!");
     PyObject* dataDict;
     if (!PyArg_ParseTuple(args, "O", &dataDict)) {
         printLog("problem with dataDict.");
@@ -378,9 +379,13 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     
     Py_Initialize();
 
+    m_pThreadState = (void*)PyEval_SaveThread();
+
+    GILHandler g;
+
     preConfigurePython();
 
-    //runPythonFile("./config2.py","bla");
+    runPythonFile("./config2.py","bla");
 
     m_pCallsModule = loadCModule("fieldline_callbacks", *(void*(*)(void))&PyInit_fieldline_callbacks);
 
@@ -414,46 +419,19 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
     Py_XDECREF(fService);
     Py_XDECREF(ipList);
 
-    //setDataCallback();
-
-    {
-        AcqOpener o((PyObject*)m_fServiceInstance);
-
-        PyObject* setCloseLoopCall = PyObject_GetAttrString(fServiceInstance, "set_closed_loop");
-        PyObject* trueTuple = PyTuple_New(1);
-        PyTuple_SetItem(trueTuple, 0, Py_True);
-        PyObject* setCloseLoopCallResult = PyObject_CallObject(setCloseLoopCall, trueTuple);
-        if (setCloseLoopCallResult == NULL)
-        {
-          printLog("setCloseLoopCallResult wrong!");
-        } else{
-          printLog("setCloseLoopCallResult ok!");
-        }
-
-        Py_XDECREF(setCloseLoopCall);
-        Py_XDECREF(trueTuple);
-        Py_XDECREF(setCloseLoopCallResult);
-    }
-
     initSampleArrays();
-
-    m_pThreadState = (void*)PyEval_SaveThread();
 }
 
 FieldlineAcqSystem::~FieldlineAcqSystem()
 {
-    PyEval_RestoreThread(reinterpret_cast<PyThreadState*>(m_pThreadState));
-
+    GILHandler g;
+    
     Py_XDECREF(m_fServiceInstance);
     Py_XDECREF(m_pCallsModule);
 
     if (m_samplesBlock) {
         delete[] m_samplesBlock;
     }
-    if (m_samplesBlock2) {
-        delete[] m_samplesBlock2;
-    }
-
     Py_Finalize();
 }
 
@@ -464,6 +442,27 @@ void* FieldlineAcqSystem::loadSensors() {
     return (void*)sensors;
 }
 
+void FieldlineAcqSystem::setCloseLoop() {
+
+    GILHandler g;
+
+    AcqOpener o((PyObject*)m_fServiceInstance);
+
+    PyObject* setCloseLoopCall = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "set_closed_loop");
+    PyObject* trueTuple = PyTuple_New(1);
+    PyTuple_SetItem(trueTuple, 0, Py_True);
+    PyObject* setCloseLoopCallResult = PyObject_CallObject(setCloseLoopCall, trueTuple);
+    if (setCloseLoopCallResult == NULL)
+    {
+      printLog("setCloseLoopCallResult wrong!");
+    } else{
+      printLog("setCloseLoopCallResult ok!");
+    }
+
+    Py_XDECREF(setCloseLoopCall);
+    Py_XDECREF(trueTuple);
+    Py_XDECREF(setCloseLoopCallResult);
+}
 
 // for activating trigger sensor: service.restart_sensors({0:[0]})
 // for deactivating trigger sensors: service.turn_off_sensors({0:[0]})
@@ -476,7 +475,7 @@ void FieldlineAcqSystem::restartAllSensors() {
 
     GILHandler g;
 
-    AcqOpener opener((PyObject*)m_fServiceInstance);
+    AcqOpener o((PyObject*)m_fServiceInstance);
 
     PyObject* sensors = (PyObject*) loadSensors();
 
@@ -526,13 +525,11 @@ void FieldlineAcqSystem::restartAllSensors() {
         printLog("restart call ok!");
     }
 
-    g.releaseGIL();
-
+    Py_BEGIN_ALLOW_THREADS
     while (restartFinished == false) {
         std::this_thread::sleep_for(std::chrono::milliseconds(600));
     }
-
-    g.acquireGIL();
+    Py_END_ALLOW_THREADS
 
     Py_XDECREF(sensors);
     Py_XDECREF(restartAllSensorsCall);
@@ -549,7 +546,7 @@ void FieldlineAcqSystem::coarseZeroAllSensors() {
 
     GILHandler g;
 
-    AcqOpener opener((PyObject*)m_fServiceInstance);
+    AcqOpener o((PyObject*)m_fServiceInstance);
 
     PyObject* sensors = (PyObject*) loadSensors();
 
@@ -605,16 +602,13 @@ void FieldlineAcqSystem::coarseZeroAllSensors() {
         printLog("coarse zero call call ok!");
     }
     
-    g.releaseGIL();
-
+    Py_BEGIN_ALLOW_THREADS
     while (coarseZeroFinished == false) {
         std::this_thread::sleep_for(std::chrono::milliseconds(600));
     }
-
-    g.acquireGIL();
+    Py_END_ALLOW_THREADS
 
     Py_XDECREF(sensors);
-
     Py_XDECREF(coarseZeroAllSensorsCall);
     Py_XDECREF(callback_on_finished_coarse_zero);
     Py_XDECREF(callback_on_error_coarse_zero);
@@ -629,7 +623,7 @@ void FieldlineAcqSystem::fineZeroAllSensors() {
 
     GILHandler g;
 
-    AcqOpener opener((PyObject*)m_fServiceInstance);
+    AcqOpener o((PyObject*)m_fServiceInstance);
 
     PyObject* sensors = (PyObject*) loadSensors();
 
@@ -680,16 +674,13 @@ void FieldlineAcqSystem::fineZeroAllSensors() {
         printLog("fine zero call call ok!");
     }
 
-    g.releaseGIL();
-
+    Py_BEGIN_ALLOW_THREADS
     while (fineZeroFinished == false) {
         std::this_thread::sleep_for(std::chrono::milliseconds(600));
     }
-
-    g.acquireGIL();
+    Py_END_ALLOW_THREADS
 
     Py_XDECREF(sensors);
-
     Py_XDECREF(fineZeroAllSensorsCall);
     Py_XDECREF(callback_on_finished_fine_zero);
     Py_XDECREF(callback_on_error_fine_zero);
@@ -740,68 +731,68 @@ void FieldlineAcqSystem::setDataCallback() {
     Py_XDECREF(parserCallback);
     Py_XDECREF(argsSetDataParser);
     Py_XDECREF(readDataReturn);
-
-}
-
-void FieldlineAcqSystem::setCallback()
-{
-    GILHandler g;
-
-    // PyObject *pSetCallbackFunc = NULL;
-    // PyObject *pCallback1 = NULL;
-    // PyObject *pArgs = NULL;
-    // PyObject *pResult = NULL;
-    //
-    // // Get a reference to the function
-    // pSetCallbackFunc = PyObject_GetAttrString((PyObject*)m_pCallbackModule, "set_callback");
-    // if (pSetCallbackFunc == NULL) {
-    //     printLog(std::string("Error finding function: ").append("set_callback").c_str());
-    //     PyErr_Print();
-    // }
-    //
-    // pCallback1 = PyObject_GetAttrString((PyObject*)m_pCallsModule, "callback1");
-    // if (pCallback1 && PyCallable_Check(pCallback1)) {
-    //     pArgs = PyTuple_New(1);
-    //     PyTuple_SetItem(pArgs, 0, pCallback1);
-    // } else {
-    //     if (PyErr_Occurred())
-    //         PyErr_Print();
-    //     printLog(std::string("Cannot find function callback1 in calls module."));
-    // }
-    // // Call the set_callback function
-    // pResult = PyObject_CallObject(pSetCallbackFunc, pArgs);
-    // if (pResult == NULL) {
-    //     printLog(std::string("Error calling function: ").append("set_callback").c_str());
-    //     PyErr_Print();
-    // }
-    // Py_XDECREF(pSetCallbackFunc);
-    // Py_XDECREF(pCallback1);
-    // Py_XDECREF(pArgs);
-    // Py_XDECREF(pResult);
-    //
 }
 
 void FieldlineAcqSystem::startADC() {
+
     GILHandler g;
 
-    //AcqOpener o((PyObject*)m_fServiceInstance);
-        PyObject* openMethod = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "open");
-        if (openMethod == NULL)
-        {
-            printLog("openMethod wrong!");
-        } else{
-            printLog("openMethod ok!");
-        }
+    PyObject* openMethod = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "open");
+    if (openMethod == NULL)
+    {
+        printLog("openMethod wrong!");
+    } else{
+        printLog("openMethod ok!");
+    }
 
-        PyObject* openMethodCall = PyObject_CallNoArgs(openMethod);
-        if (openMethodCall == NULL)
-        {
-          printLog("openMethodCall wrong!");
-        } else{
-          printLog("openMethodCall ok!");
-        }
-        Py_XDECREF(openMethod);
-        Py_XDECREF(openMethodCall);
+    PyObject* openMethodCall = PyObject_CallNoArgs(openMethod);
+    if (openMethodCall == NULL)
+    {
+      printLog("openMethodCall wrong!");
+    } else{
+      printLog("openMethodCall ok!");
+    }
+    Py_XDECREF(openMethod);
+    Py_XDECREF(openMethodCall);
+
+    PyObject* readDataCall = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "read_data");
+    if (readDataCall == NULL) {
+        printLog("problem readDataCall");
+    } else {
+        printLog("readDataCall ok");
+    }
+
+    PyObject* parseCallbacksModule = (PyObject*)loadCModule("callbacks_parsing", *(void*(*)(void))&PyInit_callbacks_parsing);
+    if (parseCallbacksModule == NULL)
+    {
+      printLog("callbacks module wrong!");
+    } else{
+      printLog("callbacks module ok!");
+    }
+
+    PyObject* parserCallback = PyObject_GetAttrString(parseCallbacksModule, "dict_parser");
+    if (parserCallback == NULL) {
+        printLog("problem parserCallback");
+    } else {
+        printLog("parserCallback ok");
+    }
+    PyObject* argsSetDataParser = PyTuple_New(1);
+    PyTuple_SetItem(argsSetDataParser, 0, parserCallback);
+
+    PyObject* readDataReturn = PyObject_CallObject(readDataCall, argsSetDataParser);
+    if (readDataReturn == NULL)
+    {
+        printLog("readDataReturn bad");
+    } else {
+        printLog("readDataReturn ok");
+    }
+
+    Py_XDECREF(readDataCall);
+    Py_XDECREF(parseCallbacksModule);
+    //Py_XDECREF(parserCallback);
+    Py_XDECREF(argsSetDataParser);
+    Py_XDECREF(readDataReturn);
+
 
     PyObject* start_data = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "start_adc");
     PyObject* argsStartData = PyTuple_New(1);
@@ -822,7 +813,6 @@ void FieldlineAcqSystem::startADC() {
 
 void FieldlineAcqSystem::stopADC() {
     GILHandler g;
-    AcqOpener o((PyObject*)m_fServiceInstance);
 
     PyObject* stop_data = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "stop_adc");
     PyObject* argsstopData = PyTuple_New(1);
@@ -837,24 +827,24 @@ void FieldlineAcqSystem::stopADC() {
         printLog("stopResult ok");
     }
 
-        PyObject* closeMethod = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "close");
-        if (closeMethod == NULL)
-            {
-                printLog("closeMethod wrong!");
-            } else{
-            printLog("closeMethod ok!");
-        }
+    PyObject* closeMethod = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "close");
+    if (closeMethod == NULL)
+    {
+        printLog("closeMethod wrong!");
+    } else{
+        printLog("closeMethod ok!");
+    }
 
-        PyObject* closeMethodCall = PyObject_CallNoArgs(closeMethod);
-        if (closeMethodCall == NULL)
-        {
-          printLog("closeMethodCall wrong!");
-        } else{
-          printLog("closeMethodCall ok!");
-        }
+    PyObject* closeMethodCall = PyObject_CallNoArgs(closeMethod);
+    if (closeMethodCall == NULL)
+    {
+      printLog("closeMethodCall wrong!");
+    } else{
+      printLog("closeMethodCall ok!");
+    }
 
-        Py_XDECREF(closeMethod);
-        Py_XDECREF(closeMethodCall);
+    Py_XDECREF(closeMethod);
+    Py_XDECREF(closeMethodCall);
 
     Py_XDECREF(argsstopData);
     Py_XDECREF(stopArg);
@@ -978,7 +968,6 @@ void FieldlineAcqSystem::runPythonFile(const char* file, const char* comment) co
 void FieldlineAcqSystem::initSampleArrays()
 {
     m_samplesBlock = new double[m_numSensors * m_numSamplesPerBlock];
-    m_samplesBlock2 = new double[m_numSensors * m_numSamplesPerBlock];
 }
 
 void FieldlineAcqSystem::addSampleToSamplesColumn(int sensorIdx, double value)
@@ -995,10 +984,6 @@ void FieldlineAcqSystem::addSampleToSamplesColumn(int sensorIdx, double value)
         if (sampleIdx == m_numSamplesPerBlock) {
             sampleIdx = 0;
             m_pControllerParent->newData(m_samplesBlock, m_numSensors, m_numSamplesPerBlock);
-            // memcpy((void*)m_samplesBlock2, (void*)m_samplesBlock, m_numSamplesPerBlock * m_numSensors);
-            // std::thread([this](){
-            //     m_pControllerParent->newData(m_samplesBlock2, m_numSensors, m_numSamplesPerBlock);
-            // });
         }
     }
 }

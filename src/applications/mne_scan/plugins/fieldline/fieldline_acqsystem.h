@@ -51,7 +51,6 @@ class FieldlineAcqSystem {
 
     void callFunction(const std::string& moduleName, const std::string& funcName);
 
-    void setCallback();
     void startADC();
     void stopADC();
     Fieldline* m_pControllerParent;
@@ -61,6 +60,7 @@ class FieldlineAcqSystem {
     void coarseZeroAllSensors();
     void fineZeroAllSensors();
     void setDataCallback();
+   void setCloseLoop();
 
  private:
     void preConfigurePython() const;
