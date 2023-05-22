@@ -195,7 +195,7 @@ bool Fieldline::start()
 void Fieldline::initFiffInfo()
 {
   m_pFiffInfo->sfreq = 1000.0f;
-  m_pFiffInfo->nchan = 2;
+  m_pFiffInfo->nchan = 3;
   m_pFiffInfo->chs.clear();
   for (int chan_i = 0; chan_i < m_pFiffInfo->nchan; chan_i++) {
     FIFFLIB::FiffChInfo channel;

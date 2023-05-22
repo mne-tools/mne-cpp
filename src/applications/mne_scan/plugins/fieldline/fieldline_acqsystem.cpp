@@ -316,7 +316,6 @@ static PyObject* PyInit_fieldline_callbacks(void) {
 static FieldlineAcqSystem* acq_system(nullptr);
 
 static PyObject* dict_parser(PyObject* self, PyObject* args) {
-    printLog("heeeelo!!!!!");
     PyObject* dataDict;
     if (!PyArg_ParseTuple(args, "O", &dataDict)) {
         printLog("problem with dataDict.");
@@ -337,14 +336,15 @@ static PyObject* dict_parser(PyObject* self, PyObject* args) {
 
     while (PyDict_Next(data_frames, &pos, &key, &value)) {
         PyObject* data = PyDict_GetItemString(value, "data");
-        printLog(std::string("pos: ") + std::to_string(pos));
-        printLog(std::string("value: ") + std::to_string((double) PyLong_AsLong(data)));
-        float sample = (double) PyLong_AsLong(data);
+        //printLog(std::string("pos: ") + std::to_string(pos));
+        //printLog(std::string("value: ") + std::to_string((double) PyLong_AsLong(data)));
+        double sample = PyLong_AsDouble(data);
+
         Py_BEGIN_ALLOW_THREADS
-        acq_system->addSampleToSamplesColumn((int) pos-1, sample);
+        acq_system->addSampleToSamplesColumn(pos-1, sample);
         Py_END_ALLOW_THREADS
 
-        if (pos == 2) 
+        if (pos == 3) 
             break;
     }
     Py_INCREF(Py_None);
@@ -368,7 +368,7 @@ static PyObject* PyInit_callbacks_parsing(void) {
 FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
 : m_pControllerParent(parent),
   m_numSamplesPerBlock(200),
-  m_numSensors(2)
+  m_numSensors(3)
 {
     printLog("Initializing Python");
     printLog(libPythonBugFix);
@@ -970,15 +970,12 @@ void FieldlineAcqSystem::initSampleArrays()
     m_samplesBlock = new double[m_numSensors * m_numSamplesPerBlock];
 }
 
-void FieldlineAcqSystem::addSampleToSamplesColumn(int sensorIdx, double value)
+void FieldlineAcqSystem::addSampleToSamplesColumn(size_t sensorIdx, double value)
 {
-    static int sampleIdx = 0;
-    // printLog(std::string("sensorIdx: ") + std::to_string(sensorIdx));
-    // printLog(std::string("sampleIdx: ") + std::to_string(sampleIdx));
-    // printLog(std::string("m_numSensors = ") + std::to_string(m_numSensors));
-    // printLog(std::string("m_numSamplesPerBlock = ") + std::to_string(m_numSamplesPerBlock));
-    // printLog(std::string("m_samplesBlock[").append(std::to_string(sensorIdx * m_numSamplesPerBlock + sampleIdx)).append("] = ").append(std::to_string(value)));
-    m_samplesBlock[sensorIdx * m_numSamplesPerBlock + sampleIdx] = value;
+    static size_t sampleIdx = 0;
+    std::cout << "Value: " << 2.27e-15 * value << "\n";
+    std::cout.flush();
+    m_samplesBlock[sensorIdx * m_numSamplesPerBlock + sampleIdx] = 2.27e-15 * value;
     if (sensorIdx == m_numSensors -1) {
         sampleIdx++;
         if (sampleIdx == m_numSamplesPerBlock) {
