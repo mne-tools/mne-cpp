@@ -116,8 +116,8 @@ struct AcqOpener {
         } else{
           printLog("openMethodCall ok!");
         }
-        Py_DECREF(openMethod);
-        Py_DECREF(openMethodCall);
+        Py_XDECREF(openMethod);
+        Py_XDECREF(openMethodCall);
     }
 
     void closeAcq() {
@@ -137,8 +137,8 @@ struct AcqOpener {
           printLog("closeMethodCall ok!");
         }
 
-        Py_DECREF(closeMethod);
-        Py_DECREF(closeMethodCall);
+        Py_XDECREF(closeMethod);
+        Py_XDECREF(closeMethodCall);
     }
 
     PyObject* m_serviceInstance;
@@ -338,7 +338,11 @@ static PyObject* dict_parser(PyObject* self, PyObject* args) {
         PyObject* data = PyDict_GetItemString(value, "data");
         printLog(std::string("pos: ") + std::to_string(pos));
         printLog(std::string("value: ") + std::to_string((double) PyLong_AsLong(data)));
-        acq_system->addSampleToSamplesColumn((int) pos-1, (double) PyLong_AsLong(data));
+        float sample = (double) PyLong_AsLong(data);
+        Py_BEGIN_ALLOW_THREADS
+        acq_system->addSampleToSamplesColumn((int) pos-1, sample);
+        Py_END_ALLOW_THREADS
+
         if (pos == 2) 
             break;
     }
@@ -376,10 +380,12 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
 
     preConfigurePython();
 
+    //runPythonFile("./config2.py","bla");
+
     m_pCallsModule = loadCModule("fieldline_callbacks", *(void*(*)(void))&PyInit_fieldline_callbacks);
 
-    PyObject* FieldlineModule = (PyObject*)loadModule("fieldline_api_mock.fieldline_service");
-    //PyObject* FieldlineModule = (PyObject*)loadModule("fieldline_api.fieldline_service");
+    //PyObject* FieldlineModule = (PyObject*)loadModule("fieldline_api_mock.fieldline_service");
+    PyObject* FieldlineModule = (PyObject*)loadModule("fieldline_api.fieldline_service");
     if (FieldlineModule == NULL)
     {
       printLog("fieldline module wrong!");
@@ -404,11 +410,11 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
       printLog("fServiceInstance ok!");
     }
 
-    Py_DECREF(FieldlineModule);
-    Py_DECREF(fService);
-    Py_DECREF(ipList);
+    Py_XDECREF(FieldlineModule);
+    Py_XDECREF(fService);
+    Py_XDECREF(ipList);
 
-    setDataCallback();
+    //setDataCallback();
 
     {
         AcqOpener o((PyObject*)m_fServiceInstance);
@@ -424,9 +430,9 @@ FieldlineAcqSystem::FieldlineAcqSystem(Fieldline* parent)
           printLog("setCloseLoopCallResult ok!");
         }
 
-        Py_DECREF(setCloseLoopCall);
-        Py_DECREF(trueTuple);
-        Py_DECREF(setCloseLoopCallResult);
+        Py_XDECREF(setCloseLoopCall);
+        Py_XDECREF(trueTuple);
+        Py_XDECREF(setCloseLoopCallResult);
     }
 
     initSampleArrays();
@@ -454,9 +460,15 @@ FieldlineAcqSystem::~FieldlineAcqSystem()
 void* FieldlineAcqSystem::loadSensors() {
     PyObject* loadSensors = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "load_sensors");
     PyObject* sensors = PyObject_CallNoArgs(loadSensors);
-    Py_DECREF(loadSensors);
+    Py_XDECREF(loadSensors);
     return (void*)sensors;
 }
+
+
+// for activating trigger sensor: service.restart_sensors({0:[0]})
+// for deactivating trigger sensors: service.turn_off_sensors({0:[0]})
+// typical calibration value: 2.27e-15 T
+//
 
 void FieldlineAcqSystem::restartAllSensors() {
 
@@ -522,13 +534,13 @@ void FieldlineAcqSystem::restartAllSensors() {
 
     g.acquireGIL();
 
-    Py_DECREF(sensors);
-    Py_DECREF(restartAllSensorsCall);
-    Py_DECREF(callback_on_finished);
-    Py_DECREF(callback_on_error);
-    Py_DECREF(callback_on_completion);
-    Py_DECREF(argsRestart);
-    Py_DECREF(resultRestart);
+    Py_XDECREF(sensors);
+    Py_XDECREF(restartAllSensorsCall);
+    Py_XDECREF(callback_on_finished);
+    Py_XDECREF(callback_on_error);
+    Py_XDECREF(callback_on_completion);
+    Py_XDECREF(argsRestart);
+    Py_XDECREF(resultRestart);
 }
 
 void FieldlineAcqSystem::coarseZeroAllSensors() {
@@ -601,14 +613,14 @@ void FieldlineAcqSystem::coarseZeroAllSensors() {
 
     g.acquireGIL();
 
-    Py_DECREF(sensors);
+    Py_XDECREF(sensors);
 
-    Py_DECREF(coarseZeroAllSensorsCall);
-    Py_DECREF(callback_on_finished_coarse_zero);
-    Py_DECREF(callback_on_error_coarse_zero);
-    Py_DECREF(callback_on_completion_coarse_zero);
-    Py_DECREF(argsCoarseZero);
-    Py_DECREF(resultCoarseZero);
+    Py_XDECREF(coarseZeroAllSensorsCall);
+    Py_XDECREF(callback_on_finished_coarse_zero);
+    Py_XDECREF(callback_on_error_coarse_zero);
+    Py_XDECREF(callback_on_completion_coarse_zero);
+    Py_XDECREF(argsCoarseZero);
+    Py_XDECREF(resultCoarseZero);
 }
 
 void FieldlineAcqSystem::fineZeroAllSensors() {
@@ -676,14 +688,14 @@ void FieldlineAcqSystem::fineZeroAllSensors() {
 
     g.acquireGIL();
 
-    Py_DECREF(sensors);
+    Py_XDECREF(sensors);
 
-    Py_DECREF(fineZeroAllSensorsCall);
-    Py_DECREF(callback_on_finished_fine_zero);
-    Py_DECREF(callback_on_error_fine_zero);
-    Py_DECREF(callback_on_completion_fine_zero);
-    Py_DECREF(argsFineZero);
-    Py_DECREF(resultFineZero);
+    Py_XDECREF(fineZeroAllSensorsCall);
+    Py_XDECREF(callback_on_finished_fine_zero);
+    Py_XDECREF(callback_on_error_fine_zero);
+    Py_XDECREF(callback_on_completion_fine_zero);
+    Py_XDECREF(argsFineZero);
+    Py_XDECREF(resultFineZero);
 }
 
 void FieldlineAcqSystem::setDataCallback() {
@@ -692,11 +704,11 @@ void FieldlineAcqSystem::setDataCallback() {
 
     AcqOpener opener((PyObject*)m_fServiceInstance);
 
-    PyObject* readDataFcn = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "read_data");
-    if (readDataFcn == NULL) {
-        printLog("problem readDataFcn");
+    PyObject* readDataCall = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "read_data");
+    if (readDataCall == NULL) {
+        printLog("problem readDataCall");
     } else {
-        printLog("readDataFcn ok");
+        printLog("readDataCall ok");
     }
 
     PyObject* parseCallbacksModule = (PyObject*)loadCModule("callbacks_parsing", *(void*(*)(void))&PyInit_callbacks_parsing);
@@ -716,19 +728,18 @@ void FieldlineAcqSystem::setDataCallback() {
     PyObject* argsSetDataParser = PyTuple_New(1);
     PyTuple_SetItem(argsSetDataParser, 0, parserCallback);
 
-    PyObject* readDataReturn = PyObject_CallObject(readDataFcn, argsSetDataParser);
+    PyObject* readDataReturn = PyObject_CallObject(readDataCall, argsSetDataParser);
     if (readDataReturn == NULL)
     {
         printLog("readDataReturn bad");
     } else {
         printLog("readDataReturn ok");
     }
-    Py_DECREF(readDataReturn);
-    Py_DECREF(readDataFcn);
-    Py_DECREF(parserCallback);
-    Py_DECREF(argsSetDataParser);
-
-    Py_DECREF(parseCallbacksModule);
+    Py_XDECREF(readDataCall);
+    Py_XDECREF(parseCallbacksModule);
+    Py_XDECREF(parserCallback);
+    Py_XDECREF(argsSetDataParser);
+    Py_XDECREF(readDataReturn);
 
 }
 
@@ -773,7 +784,24 @@ void FieldlineAcqSystem::setCallback()
 void FieldlineAcqSystem::startADC() {
     GILHandler g;
 
-    AcqOpener o((PyObject*)m_fServiceInstance);
+    //AcqOpener o((PyObject*)m_fServiceInstance);
+        PyObject* openMethod = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "open");
+        if (openMethod == NULL)
+        {
+            printLog("openMethod wrong!");
+        } else{
+            printLog("openMethod ok!");
+        }
+
+        PyObject* openMethodCall = PyObject_CallNoArgs(openMethod);
+        if (openMethodCall == NULL)
+        {
+          printLog("openMethodCall wrong!");
+        } else{
+          printLog("openMethodCall ok!");
+        }
+        Py_XDECREF(openMethod);
+        Py_XDECREF(openMethodCall);
 
     PyObject* start_data = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "start_adc");
     PyObject* argsStartData = PyTuple_New(1);
@@ -787,9 +815,9 @@ void FieldlineAcqSystem::startADC() {
         printLog("startResult ok");
     }
 
-    Py_DECREF(argsStartData);
-    Py_DECREF(zeroArg);
-    Py_DECREF(startResult);
+    Py_XDECREF(argsStartData);
+    Py_XDECREF(zeroArg);
+    Py_XDECREF(startResult);
 }
 
 void FieldlineAcqSystem::stopADC() {
@@ -799,6 +827,7 @@ void FieldlineAcqSystem::stopADC() {
     PyObject* stop_data = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "stop_adc");
     PyObject* argsstopData = PyTuple_New(1);
     PyObject* stopArg = PyLong_FromLong(0);
+
     PyTuple_SetItem(argsstopData, 0, stopArg);
     PyObject* stopResult = PyObject_CallObject(stop_data, argsstopData);
     if (stopResult == NULL)
@@ -808,9 +837,28 @@ void FieldlineAcqSystem::stopADC() {
         printLog("stopResult ok");
     }
 
-    Py_DECREF(argsstopData);
-    Py_DECREF(stopArg);
-    Py_DECREF(stopResult);
+        PyObject* closeMethod = PyObject_GetAttrString((PyObject*)m_fServiceInstance, "close");
+        if (closeMethod == NULL)
+            {
+                printLog("closeMethod wrong!");
+            } else{
+            printLog("closeMethod ok!");
+        }
+
+        PyObject* closeMethodCall = PyObject_CallNoArgs(closeMethod);
+        if (closeMethodCall == NULL)
+        {
+          printLog("closeMethodCall wrong!");
+        } else{
+          printLog("closeMethodCall ok!");
+        }
+
+        Py_XDECREF(closeMethod);
+        Py_XDECREF(closeMethodCall);
+
+    Py_XDECREF(argsstopData);
+    Py_XDECREF(stopArg);
+    Py_XDECREF(stopResult);
 }
 
 void* FieldlineAcqSystem::loadModule(const char* moduleName)
@@ -823,7 +871,7 @@ void* FieldlineAcqSystem::loadModule(const char* moduleName)
         PyErr_Print();
     }
 
-    Py_DECREF(pModule);
+    Py_XDECREF(pModule);
 
     return (void*)pModule;
 }
@@ -838,7 +886,7 @@ void* FieldlineAcqSystem::loadCModule(const char* moduleName, void*(*moduleInitF
         PyObject* PyModule = (PyObject*)moduleInitFunc();
         PyObject* sys_modules = PyImport_GetModuleDict();
         PyDict_SetItemString(sys_modules, moduleName, PyModule);
-        Py_DECREF(PyModule);
+        Py_XDECREF(PyModule);
     } else {
         PyImport_AppendInittab(moduleName, (PyObject*(*)(void)) moduleInitFunc);
     }
@@ -895,20 +943,21 @@ void FieldlineAcqSystem::preConfigurePython() const
     PyObject* versionInfoMinor = PyObject_GetAttrString(versionInfo, "minor");
     const std::string pythonVer(std::to_string(PyLong_AsLong(versionInfoMajor)) + \
                                                 "." + std::to_string(PyLong_AsLong(versionInfoMinor)));
-    Py_DECREF(versionInfoMajor);
-    Py_DECREF(versionInfoMinor);
-    Py_DECREF(versionInfo);
+    Py_XDECREF(versionInfoMajor);
+    Py_XDECREF(versionInfoMinor);
+    Py_XDECREF(versionInfo);
 
     PyObject* path = PyObject_GetAttrString(sys, "path");
     PyObject* resourcesObj = PyUnicode_FromString(resourcesPath.c_str());
     PyList_Insert(path, 0, resourcesObj);
-    Py_DECREF(sys);
-    Py_DECREF(resourcesObj);
+    Py_XDECREF(resourcesObj);
 
     const std::string pathVenvMods(resourcesPath + "venv/lib/python" + pythonVer + "/site-packages/");
     printLog(pathVenvMods);
     PyList_Insert(path, 1, PyUnicode_FromString(pathVenvMods.c_str()));
-    Py_DECREF(path);
+    Py_XDECREF(path);
+
+    Py_XDECREF(sys);
 }
 
 void FieldlineAcqSystem::runPythonFile(const char* file, const char* comment) const
@@ -919,9 +968,9 @@ void FieldlineAcqSystem::runPythonFile(const char* file, const char* comment) co
         PyObject* global_dict = PyDict_New();
         PyObject* local_dict = PyDict_New();
         PyObject* result = PyRun_File(py_file, comment, Py_file_input, global_dict, local_dict);
-        Py_DECREF(global_dict);
-        Py_DECREF(local_dict);
-        Py_DECREF(result);
+        Py_XDECREF(global_dict);
+        Py_XDECREF(local_dict);
+        Py_XDECREF(result);
         fclose(py_file);
     }
 }

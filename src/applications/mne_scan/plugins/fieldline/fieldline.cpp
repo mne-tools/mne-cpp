@@ -183,6 +183,8 @@ bool Fieldline::start()
   initFiffInfo();
 
   std::thread t([this]{
+                  m_pAcqSystem->setDataCallback();
+                  std::this_thread::sleep_for(std::chrono::milliseconds(100));
                   m_pAcqSystem->startADC();
               });
   t.detach();
@@ -217,6 +219,9 @@ void Fieldline::initFiffInfo()
 
 bool Fieldline::stop() {
   printLog("stop");
+
+  m_pAcqSystem->stopADC();
+
   requestInterruption();
   wait(500);
 

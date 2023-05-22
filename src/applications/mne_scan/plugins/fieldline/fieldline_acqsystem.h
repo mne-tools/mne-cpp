@@ -60,6 +60,7 @@ class FieldlineAcqSystem {
     void restartAllSensors();
     void coarseZeroAllSensors();
     void fineZeroAllSensors();
+    void setDataCallback();
 
  private:
     void preConfigurePython() const;
@@ -67,7 +68,6 @@ class FieldlineAcqSystem {
     void* loadModule(const char* moduleName);
     void* loadCModule(const char* moduleName, void* (*moduleInitFunc)(void));
     void* loadSensors();
-    void setDataCallback();
 
     int m_numSamplesPerBlock;
     int m_numSensors;
