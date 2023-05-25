@@ -14,7 +14,8 @@ function cleanAbsPath()
     echo "$CLEAN_ABS_PATH"
 }
 
-EMSDK_VERSION="latest"
+ECHO_FLAG=""
+EMSDK_VERSION="3.1.25"
 SAVE_LOG="true"
 SHOW_HELP="false"
 
@@ -23,10 +24,12 @@ PROJECT_BASE_PATH="$(cleanAbsPath "$SCRIPT_PATH/..")"
 
 NUM_PARALLEL_PROC=1
 
+
 if [ "$(uname)" == "Darwin" ]; then
     NUM_PARALLEL_PROC=$(sysctl -n hw.logicalcpu)
 else
     NUM_PARALLEL_PROC=$(expr $(nproc --all))
+    ECHO_FLAG="-e"
 fi
 
 ## Stop at first error
@@ -38,6 +41,9 @@ for (( j=0; j<argc; j++)); do
 		j=$j+1
 	elif [ "${argv[j]}" == "--no-log" ]; then
 		SAVE_LOG="false"
+	elif [ "${argv[j]}" == "--qt" ] || [ "${argv[j]}" == "-q" ]; then
+	        export Qt6_DIR="${argv[j+1]}"
+	        j=$j+1
 	elif [ "${argv[j]}" == "--help" ] || [ "${argv[j]}" == "-h" ]; then
 		SHOW_HELP="true"
 	fi
@@ -45,6 +51,8 @@ done
 
 if [ ${SHOW_HELP} == "true" ]; then
 	echo "MNE-CPP wasm build script"
+	echo ""
+	echo "  This script is meant to be used with Qt version 6.5 and up."
 	echo ""
 	echo "Usage:"
 	echo "    wasm --emsdk <VERSION>"
@@ -54,12 +62,17 @@ if [ ${SHOW_HELP} == "true" ]; then
 	echo ""
 	echo "Options:"
 	echo "    --emsdk, -e  Set what version of emscripten to use."
-	echo "                 Qt recommends the following versions depending"
-	echo "                 on what version of Qt you use:"
+	echo "                 Qt recommends the following versions depending on what version"
+	echo "                 of Qt you use:"
 	echo "                    Qt 6.2 -> emsdk 2.0.14"
 	echo "                    Qt 6.3 -> emsdk 3.0.0"
 	echo "                    Qt 6.4 -> emsdk 3.1.14"
 	echo "                    Qt 6.5 -> emsdk 3.1.25"
+	echo ""
+	echo "    --qt, -q     Set path to qt installation manually."
+	echo "                 This path should be the directory that contains the wasm and"
+        echo "                 system qt folders (for example, in linux, the dir should"
+        echo "                 contain gcc_64 and wasm_multithread). Must be an absolute path."
 	echo ""
   	echo "    --no-log     Omits build log."
 	echo ""
@@ -70,6 +83,12 @@ fi
 
 # Make sure we run everything relative to root folder as pwd
 cd ${PROJECT_BASE_PATH}
+
+if [ -z "$Qt6_DIR" ]; then
+        echo ${ECHO_FLAG} "\033[31m[ERROR]\033[0m Qt6_DIR not set."
+        echo "Please set Qt6_DIR as an enviroment variable or pass it as an argument when calling with script using '--qt <DIR_PATH>"
+        exit 1
+fi
 
 ## Emscripten
 echo "Setting up emsdk ${EMSDK_VERSION}..."
