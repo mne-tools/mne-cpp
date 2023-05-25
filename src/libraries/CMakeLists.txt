@@ -55,8 +55,9 @@ add_subdirectory(communication)
 add_subdirectory(rtprocessing)
 add_subdirectory(connectivity)
 
+add_subdirectory(events)
+add_subdirectory(disp)
+
 if(NOT WASM)
-  add_subdirectory(disp)
-  add_subdirectory(events)
   add_subdirectory(disp3D)
 endif()

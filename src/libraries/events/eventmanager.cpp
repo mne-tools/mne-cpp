@@ -272,12 +272,13 @@ Event EventManager::addEvent(int sample, idNum groupId)
     EVENTSINTERNAL::EventINT newEvent(generateNewEventId(), sample, groupId);
     insertEvent(newEvent);
 
+#ifndef NO_IPC
     if(m_pSharedMemManager->isInit())
     {
         qDebug() << "Sending event to SM: Sample: " << sample;
         m_pSharedMemManager->addEvent(newEvent.getSample());
     }
-
+#endif
     return Event(newEvent);
 }
 
@@ -312,10 +313,14 @@ bool EventManager::deleteEvent(idNum eventId) noexcept
 {
     bool eventFound(false);
     eventFound = eraseEvent(eventId);
+
+
+#ifndef NO_IPC
     if(eventFound && m_pSharedMemManager->isInit())
     {
         m_pSharedMemManager->deleteEvent(m_MapIdToSample.at(eventId));
     }
+#endif
     return eventFound;
 }
 

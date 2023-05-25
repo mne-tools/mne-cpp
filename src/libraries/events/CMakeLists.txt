@@ -10,21 +10,36 @@ set(QT_REQUIRED_COMPONENTS Core Concurrent Network)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-set(SOURCES
-    event.cpp
-    eventgroup.cpp
-    eventmanager.cpp
-    events_global.cpp
-    eventsharedmemmanager.cpp
-)
 
-set(HEADERS
-    event.h
-    eventgroup.h
-    events_global.h
-    eventmanager.h
-    eventsharedmemmanager.h
-)
+if(NO_IPC)
+    set(SOURCES
+        event.cpp
+        eventgroup.cpp
+        eventmanager.cpp
+        events_global.cpp
+    )
+    set(HEADERS
+        event.h
+        eventgroup.h
+        events_global.h
+        eventmanager.h
+    )
+else()
+    set(SOURCES
+        event.cpp
+        eventgroup.cpp
+        eventmanager.cpp
+        events_global.cpp
+        eventsharedmemmanager.cpp
+    )
+    set(HEADERS
+        event.h
+        eventgroup.h
+        events_global.h
+        eventmanager.h
+        eventsharedmemmanager.h
+    )
+endif()
 
 set(FILE_TO_UPDATE events_global.cpp)
 
