@@ -444,6 +444,9 @@ float EventModel::getFreq()
 
 bool EventModel::saveToFile(const QString& sPath)
 {
+#if QT_VERSION > QT_VERSION_CHECK(6, 0, 0)
+    using Qt::endl;
+#endif
     #ifdef WASMBUILD
     //QBuffer* bufferOut = new QBuffer;
     QByteArray* bufferOut = new QByteArray;

@@ -46,6 +46,10 @@
 
 #ifndef NO_IPC
 #include "eventsharedmemmanager.h"
+#else
+namespace EVENTSLIB{
+    enum SharedMemoryMode { READ, WRITE, READWRITE };
+}
 #endif
 //=============================================================================================================
 // STD INCLUDES
