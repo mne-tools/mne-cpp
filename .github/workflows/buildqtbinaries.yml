@@ -12,7 +12,7 @@ jobs:
     
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install OpenGL
       run: |
         sudo apt-get install build-essential libgl1-mesa-dev
@@ -45,7 +45,7 @@ jobs:
     
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Compile static Qt version
       run: |
         # Clone Qt5 repo
@@ -75,7 +75,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -118,7 +118,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Setup emscripten compiler 
       run: |
         cd ..
