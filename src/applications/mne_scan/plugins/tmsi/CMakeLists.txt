@@ -40,7 +40,7 @@ set(HEADERS
 
 set(UI
     FormFiles/tmsisetup.ui
-    FormFiles/tmsimanualannotationwidget.ui
+    FormFiles/tmsimanualannotation.ui
     FormFiles/tmsiimpedancewidget.ui
     FormFiles/tmsisetupprojectwidget.ui
 )
@@ -74,6 +74,7 @@ if(USE_FFTW)
 endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC ../)
+target_include_directories(${PROJECT_NAME} PRIVATE .)
 
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
