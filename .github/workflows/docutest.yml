@@ -12,7 +12,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Clone doc/gh-pages into gh-pages branch
       run: |
         git config --global user.email dev@dev.com

@@ -13,7 +13,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Create new branch with the tag's name (stable release only)
       if: endsWith(github.ref, 'main') == false
       run: |
@@ -60,7 +60,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install OpenGL
       run: |
         sudo apt-get update -q
@@ -120,7 +120,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Qt
       run: |
         # Download the pre-built static version of Qt, which was created with the buildqtbinaries.yml workflow
@@ -175,7 +175,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -239,7 +239,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -298,7 +298,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -357,7 +357,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Python 3.7 version
       uses: actions/setup-python@v1
       with:
@@ -422,7 +422,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Clone mne-cpp test data
       run: git clone https://github.com/mne-tools/mne-cpp-test-data.git resources/data/mne-cpp-test-data
     - name: Install Python 3.7 version
@@ -454,7 +454,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Qt Dev Tools, Doxygen and Graphviz
       run: |
         sudo apt-get update -qq
@@ -513,7 +513,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
@@ -542,7 +542,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Qt Desktop
       uses: jurplel/install-qt-action@v3
       with:
