@@ -30,13 +30,13 @@ jobs:
         git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qt }}
         modules: qtcharts
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2019'
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qt }}
         arch: win64_msvc2017_64
@@ -116,13 +116,13 @@ jobs:
         git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qt }}
         modules: qtcharts
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2019'
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qt }}
         arch: win64_msvc2019_64
@@ -261,13 +261,13 @@ jobs:
         sudo pip install codecov
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         version: 5.15.0
         modules: qtcharts
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2019'
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         version: 5.15.2
         arch: win64_msvc2019_64

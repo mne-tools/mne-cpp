@@ -250,7 +250,7 @@ jobs:
         git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
         git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         version: 5.15.2
         modules: qtcharts
@@ -309,7 +309,7 @@ jobs:
         git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
         git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         version: 5.14.2
         modules: qtcharts
@@ -368,7 +368,7 @@ jobs:
         git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
         git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         version: 5.15.2
         arch: win64_msvc2019_64
@@ -434,7 +434,7 @@ jobs:
       run: |
         sudo pip install codecov
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         version: 5.15.2
         modules: qtcharts
