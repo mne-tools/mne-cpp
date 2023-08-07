@@ -74,6 +74,9 @@
       IF "%ExtraSection%"=="False" IF "%1"=="static" (
         SET "CMakeConfigFlags=!CMakeConfigFlags! -DBUILD_SHARED_LIBS=OFF"
       )
+      IF "%ExtraSection%"=="False" IF "%1"=="tmsi" (
+        SET "CMakeConfigFlags=!CMakeConfigFlags! -DWITH_TMSI=ON"
+      )
       IF "%ExtraSection%"=="False" IF "%1"=="--" (
         SET "ExtraSection=True"
       )
@@ -205,6 +208,7 @@
       ECHO [rebuild]  - Only rebuild existing build-system configuration.
       ECHO [static]   - Build project statically. QT_DIR and Qt5_DIR must be set to
       ECHO              point to a static version of Qt.
+      ECHO [tmsi]     - Build tmsi plugin for mne-scan (needs SDK installed)
       ECHO [qt=\path\]- Use specified qt installation to build the project. This \path
       ECHO              must point to the directory containing the bin and lib folders
       ECHO              for the desired Qt version. ex. \some\path\to\Qt\5.15.2\msvc2019_64\
