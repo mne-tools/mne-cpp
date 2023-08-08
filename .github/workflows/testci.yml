@@ -18,9 +18,9 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Python 3.7 version
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
         python-version: '3.7'
         architecture: 'x64'
@@ -30,13 +30,13 @@ jobs:
         git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qt }}
         modules: qtcharts
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2019'
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qt }}
         arch: win64_msvc2017_64
@@ -104,9 +104,9 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Python 3.7 version
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
         python-version: '3.7'
         architecture: 'x64'
@@ -116,13 +116,13 @@ jobs:
         git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qt }}
         modules: qtcharts
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2019'
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qt }}
         arch: win64_msvc2019_64
@@ -189,9 +189,9 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Python 3.7 version
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
         python-version: '3.7'
         architecture: 'x64'
@@ -247,11 +247,11 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Clone mne-cpp test data
       run: git clone https://github.com/mne-tools/mne-cpp-test-data.git resources/data/mne-cpp-test-data
     - name: Install Python 3.7 version
-      uses: actions/setup-python@v1
+      uses: actions/setup-python@v4
       with:
         python-version: '3.7'
         architecture: 'x64'
@@ -261,13 +261,13 @@ jobs:
         sudo pip install codecov
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         version: 5.15.0
         modules: qtcharts
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2019'
-      uses: jurplel/install-qt-action@v2
+      uses: jurplel/install-qt-action@v3
       with:
         version: 5.15.2
         arch: win64_msvc2019_64
@@ -314,7 +314,7 @@ jobs:
 
     steps:
     - name: Clone repository
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Install Qt Dev Tools, Doxygen and Graphviz
       run: |
         sudo apt-get update -q
