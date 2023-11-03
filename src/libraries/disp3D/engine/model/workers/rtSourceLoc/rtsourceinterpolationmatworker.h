@@ -50,6 +50,7 @@
 #include <QSharedPointer>
 #include <QVector>
 #include <QMap>
+#include <QObject>
 
 //=============================================================================================================
 // EIGEN INCLUDES

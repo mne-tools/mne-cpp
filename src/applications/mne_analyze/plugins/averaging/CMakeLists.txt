@@ -10,6 +10,10 @@ set(QT_REQUIRED_COMPONENTS Core Widgets Svg)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
+if (Qt6_FOUND)
+    find_package(Qt6 REQUIRED COMPONENTS OpenGLWidgets)
+endif()
+
 set(SOURCES
     averaging.cpp
     averaging_global.cpp
