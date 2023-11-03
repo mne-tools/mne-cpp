@@ -10,6 +10,10 @@ set(QT_REQUIRED_COMPONENTS Core Widgets Svg 3DCore 3DRender 3DExtras)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
+if (Qt6_FOUND)
+    find_package(Qt6 REQUIRED COMPONENTS OpenGLWidgets)
+endif()
+
 set(SOURCES
     measurementwidget.cpp
     realtimemultisamplearraywidget.cpp
