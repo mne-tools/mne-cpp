@@ -141,6 +141,9 @@ int main(int argc, char *argv[])
     #endif
 
     qInstallMessageHandler(customMessageHandler);
+    QCoreApplication a(argc, argv);
+
+    m_sCurrentDir = QCoreApplication::applicationDirPath();
 
 //    printf("globalInstance()->maxThreadCount(): %d\n",QThreadPool::globalInstance()->maxThreadCount());
 //    QThreadPool::globalInstance()->setMaxThreadCount(24);
@@ -163,7 +166,7 @@ int main(int argc, char *argv[])
     qint64 iTime = 0;
     timer.start();
 
-    QString sRaw = QCoreApplication::applicationDirPath() + "../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
+    QString sRaw = QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif";
     MatrixXd matDataOrig, matData;
     MatrixXd times;
     QFile t_fileRaw(sRaw);
@@ -229,7 +232,7 @@ int main(int argc, char *argv[])
                     m_iNumberSamples = lNumberSamples.at(j);
 
                     //Create new folder
-                    m_sCurrentDir = QCoreApplication::applicationDirPath() + QString("./connectivity_performance_%1_%2_%3/%4/%5_%6_%7").arg(QHostInfo::localHostName()).arg(AbstractMetric::m_iNumberBinAmount).arg(iStorageModeActive).arg(sConnectivityMethodList.at(i)).arg(QString::number(lNumberChannels.at(k))).arg(QString::number(lNumberSamples.at(j))).arg(QString::number(lNumberTrials.at(l)));
+                    m_sCurrentDir = QCoreApplication::applicationDirPath() + QString("/connectivity_performance_%1_%2_%3/%4/%5_%6_%7").arg(QHostInfo::localHostName()).arg(AbstractMetric::m_iNumberBinAmount).arg(iStorageModeActive).arg(sConnectivityMethodList.at(i)).arg(QString::number(lNumberChannels.at(k))).arg(QString::number(lNumberSamples.at(j))).arg(QString::number(lNumberTrials.at(l)));
                     QDir().mkpath(m_sCurrentDir);
 
                     //Write basic information to file
