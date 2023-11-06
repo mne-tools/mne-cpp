@@ -90,6 +90,7 @@ public:
      * @param[in] parent        parent of widget.
      */
     MinimumNormSettingsView(const QString& sSettingsPath = "",
+                            const QString& sMethod = "",
                             QWidget *parent = 0,
                             Qt::WindowFlags f = Qt::Widget);
 
@@ -165,6 +166,7 @@ protected:
     void onTimePointValueChanged();
 
     Ui::MinimumNormSettingsViewWidget* m_pUi;
+    QString m_sMethod;
 
 signals:
     //=========================================================================================================

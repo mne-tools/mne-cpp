@@ -134,11 +134,14 @@ int main(int argc, char *argv[])
     QCommandLineOption tMinOption("tmin", "The time minimum value for averaging in seconds relativ to the trigger onset.", "value", "-0.1");
     QCommandLineOption tMaxOption("tmax", "The time maximum value for averaging in seconds relativ to the trigger onset.", "value", "0.4");
     QCommandLineOption eventsFileOption("eve", "Path to the event <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif");
-    QCommandLineOption rawFileOption("raw", "Path to the raw <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QCommandLineOption rawFileOption("fileIn", "Path to the raw <file>.", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QCommandLineOption subjectOption("subj", "Selected <subject> (for source level usage only).", "subject", "sample");
     QCommandLineOption subjectPathOption("subjDir", "Selected <subjectPath> (for source level usage only).", "subjectPath", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
     QCommandLineOption fwdOption("fwd", "Path to forwad solution <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QCommandLineOption covFileOption("cov", "Path to the covariance <file> (for source level usage only).", "file", QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+    QCommandLineOption trialOption("ntrials", "The number of averaged trials.", "value", "200");
+    QCommandLineOption freqMinOption("freqmin", "The lower frequency bound for connectivity computation.", "value", "7.0");
+    QCommandLineOption freqMaxOption("freqmax", "The upper frequency bound for connectivity computation.", "value", "13.0");
     parser.addOption(annotOption);
     parser.addOption(subjectOption);
     parser.addOption(subjectPathOption);
@@ -155,6 +158,9 @@ int main(int argc, char *argv[])
     parser.addOption(rawFileOption);
     parser.addOption(tMinOption);
     parser.addOption(tMaxOption);
+    parser.addOption(trialOption);
+    parser.addOption(freqMinOption);
+    parser.addOption(freqMaxOption);
 
     parser.process(a);
 
@@ -173,6 +179,9 @@ int main(int argc, char *argv[])
     float fTMax = parser.value(tMaxOption).toFloat();
     double dSnr = parser.value(snrOption).toDouble();
     int iEvent = parser.value(evokedIndexOption).toInt();
+    int iNumTrials = parser.value(trialOption).toInt();
+    double dFreqMin = parser.value(freqMinOption).toDouble();
+    double dFreqMax = parser.value(freqMaxOption).toDouble();
 
     bool bDoSourceLoc = false;
     bool bDoClust = false;
@@ -226,7 +235,9 @@ int main(int argc, char *argv[])
 
     // Read the epochs and reject bad epochs. Note, that SSPs are automatically applied to the data if MNE::setup_compensators was called beforehand.
     QMap<QString,double> mapReject;
-    mapReject.insert("eog", 300e-06);
+    mapReject.insert("eog", 100e-06);
+    mapReject.insert("grad", 3000e-13);
+    mapReject.insert("mag", 3.5e-12);
 
     MNEEpochDataList data = MNEEpochDataList::readEpochs(raw,
                                                          events,
@@ -239,8 +250,8 @@ int main(int argc, char *argv[])
     data.applyBaselineCorrection(pair);
 
     FiffEvoked evoked = data.average(raw.info,
-                                     0,
-                                     data.first()->epoch.cols()-1);
+                                     fTMin,
+                                     fTMax);
     MNESourceEstimate sourceEstimateEvoked;
 
     QStringList exclude;
@@ -300,7 +311,7 @@ int main(int argc, char *argv[])
 
         // Cluster forward solution;
         if(bDoClust) {
-            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 200);
+            t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
         } else {
             t_clusteredFwd = t_Fwd;
         }
@@ -340,7 +351,8 @@ int main(int argc, char *argv[])
     // Compute the connectivity estimates for the methods to be compared
     conSettings.setConnectivityMethods(QStringList() << "COH" << "COR" << "XCOR" << "PLI" << "IMAGCOH" << "PLV" << "WPLI" << "USPLI" << "DSWPLI");
 
-    for(int i = 0; i < matDataList.size(); i++) {
+    iNumTrials = qMin(iNumTrials, matDataList.size());
+    for(int i = 0; i < iNumTrials; i++) {
         // Only calculate connectivity for post stim
         int samplesToCutOut = abs(fTMin*raw.info.sfreq);
         conSettings.append(matDataList.at(i).block(0,
@@ -366,7 +378,7 @@ int main(int argc, char *argv[])
     mColor.insert("DSWPLI",Vector4i(25, 10, 255, 1));
 
     for(int j = 0; j < lNetworks.size(); ++j) {
-        lNetworks[j].setFrequencyRange(7.0f, 13.0f);
+        lNetworks[j].setFrequencyRange(dFreqMin, dFreqMax);
         lNetworks[j].normalize();
         VisualizationInfo visInfo = lNetworks.at(j).getVisualizationInfo();
         visInfo.sMethod = "Color";
@@ -385,6 +397,9 @@ int main(int argc, char *argv[])
     for(int j = 0; j < lNetworkTreeItems.size(); ++j) {
         lNetworkTreeItems.at(j)->setThresholds(QVector3D(0.9,0.95,1.0));
     }
+
+    tNetworkView.getConnectivitySettingsView()->setNumberTrials(iNumTrials);
+    tNetworkView.getConnectivitySettingsView().data()->setFrequencyBand(dFreqMin,dFreqMax);
 
     //Read and show sensor helmets
     if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
@@ -413,6 +428,12 @@ int main(int argc, char *argv[])
             pRTDataItem->setAlpha(0.25f);
         }
     }
+
+    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::numberTrialsChanged,
+                     [&tNetworkView,iNumTrials] () {tNetworkView.getConnectivitySettingsView().data()->setNumberTrials(iNumTrials);});
+
+    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::freqBandChanged,
+                     [&tNetworkView,dFreqMin,dFreqMax] () {tNetworkView.getConnectivitySettingsView().data()->setFrequencyBand(dFreqMin,dFreqMax);});
 
     return a.exec();
 }
