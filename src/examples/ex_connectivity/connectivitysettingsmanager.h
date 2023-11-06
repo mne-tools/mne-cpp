@@ -101,11 +101,23 @@ public:
         // Default frequency range
         m_fFreqBandLow = 7.0f;
         m_fFreqBandHigh = 13.0f;
+
+        //set coloring
+        mColor.insert("COR",Vector4i(90, 26, 100, 1));
+        mColor.insert("XCOR",Vector4i(255, 20, 80, 1));
+        mColor.insert("PLI",Vector4i(255, 255, 0, 1));
+        mColor.insert("COH",Vector4i(2, 89, 100, 1));
+        mColor.insert("IMAGCOH",Vector4i(50, 255, 48, 1));
+        mColor.insert("PLV",Vector4i(0, 255, 255, 1));
+        mColor.insert("WPLI",Vector4i(255, 0, 100, 1));
+        mColor.insert("USPLI",Vector4i(255, 89, 200, 1));
+        mColor.insert("DSWPLI",Vector4i(25, 10, 255, 1));
     }
 
     ConnectivitySettings    m_settings;
     RtConnectivity::SPtr    m_pRtConnectivity;
     QList<Network>          m_networkData;
+    QMap<QString,Vector4i>  mColor;
 
     float                   m_fFreqBandLow;
     float                   m_fFreqBandHigh;
@@ -203,7 +215,13 @@ public:
 
         for(int i = 0; i < connectivityResults.size(); ++i) {
             m_networkData[i].setFrequencyRange(m_fFreqBandLow, m_fFreqBandHigh);
-            //m_networkData[i].normalize();
+            m_networkData[i].normalize();
+
+            VisualizationInfo visInfo = m_networkData[i].getVisualizationInfo();
+            visInfo.sMethod = "Color";
+            visInfo.colNodes = mColor[m_networkData[i].getConnectivityMethod()];
+            visInfo.colEdges = mColor[m_networkData[i].getConnectivityMethod()];
+            m_networkData[i].setVisualizationInfo(visInfo);
 
 //            if(!m_networkData.isEmpty()) {
 //                Network network = m_networkData.first();

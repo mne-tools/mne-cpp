@@ -115,6 +115,16 @@ public:
      */
     void setNumberTrials(int iNumberTrials);
 
+
+    //=========================================================================================================
+    /**
+     * Sets the frequency band.
+     *
+     * @param[in] dFreqLow        The lower frequency.
+     * @param[in] dFreqHigh       The upper frequency.
+     */
+    void setFrequencyBand(double dFreqLow, double dFreqHigh);
+
     //=========================================================================================================
     /**
      * Get the current connectivity metric.

@@ -132,6 +132,14 @@ void ConnectivitySettingsView::setNumberTrials(int iNumberTrials)
 
 //=============================================================================================================
 
+void ConnectivitySettingsView::setFrequencyBand(double dFreqLow, double dFreqHigh)
+{
+    m_pUi->m_spinBox_freqLow->setValue(dFreqLow);
+    m_pUi->m_spinBox_freqHigh->setValue(dFreqHigh);
+}
+
+//=============================================================================================================
+
 QString ConnectivitySettingsView::getConnectivityMetric()
 {
     return m_pUi->m_comboBox_method->currentText();

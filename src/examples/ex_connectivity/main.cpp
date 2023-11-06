@@ -258,13 +258,14 @@ int main(int argc, char *argv[])
                                                          mapReject,
                                                          exludeChs);
     data.dropRejected();
+
     QPair<float, float> pair(fTMin, 0.0f);
     data.applyBaselineCorrection(pair);
 
     // Average epochs. Do not use SSPs.
     FiffEvoked evoked = data.average(raw.info,
-                                     0,
-                                     data.first()->epoch.cols()-1);
+                                     fTMin,
+                                     fTMax);
 
     MNESourceEstimate sourceEstimateEvoked;
     VectorXi vDataIndices;
@@ -285,7 +286,7 @@ int main(int argc, char *argv[])
                 picks.conservativeResize(picks.cols()+1);
                 picks(picks.cols()-1) = picksTmp(i);
             }
-        } else if (sCoilType.contains("medg", Qt::CaseInsensitive)) {
+        } else if (sCoilType.contains("mag", Qt::CaseInsensitive)) {
             picks = raw.info.pick_types(QString("mag"),false,false,QStringList(),exclude);
         }
 
@@ -331,7 +332,7 @@ int main(int argc, char *argv[])
             t_clusteredFwd = t_Fwd.cluster_forward_solution(tAnnotSet, 40);
         } else {
             t_clusteredFwd = t_Fwd;
-        }     
+        }
 
         MNEInverseOperator inverse_operator(raw.info,
                                             t_clusteredFwd,
@@ -340,7 +341,7 @@ int main(int argc, char *argv[])
                                             0.8f);
 
         // Compute inverse solution
-        MinimumNorm minimumNorm(inverse_operator, 1.0 / pow(1.0, 2), method);
+        MinimumNorm minimumNorm(inverse_operator, lambda2, method);
         minimumNorm.doInverseSetup(1, true);
 
         picks = raw.info.pick_types(QString("all"),true,false,QStringList(),exclude);
@@ -348,6 +349,7 @@ int main(int argc, char *argv[])
         for(int i = 0; i < data.size(); i++) {
             sourceEstimate = minimumNorm.calculateInverse(data.at(i)->epoch,
                                                           evoked.times[0],
+                                                          //0.0f,
                                                           1.0/raw.info.sfreq,
                                                           true);
 
@@ -364,7 +366,7 @@ int main(int argc, char *argv[])
         pConnectivitySettingsManager->m_matEvokedSource = sourceEstimateEvoked.data;
 
         //Generate network nodes and define ROIs
-        QList<Label> lLabels;
+        /*QList<Label> lLabels;
         QList<RowVector4i> qListLabelRGBAs;
         QStringList lWantedLabels;
 
@@ -388,7 +390,8 @@ int main(int argc, char *argv[])
 
         //Generate node vertices based on picked labels
         MatrixX3f matNodePositions = t_clusteredFwd.getSourcePositionsByLabel(lLabels, tSurfSetInflated);
-        pConnectivitySettingsManager->m_settings.setNodePositions(matNodePositions);
+        pConnectivitySettingsManager->m_settings.setNodePositions(matNodePositions);*/
+        pConnectivitySettingsManager->m_settings.setNodePositions(t_clusteredFwd, tSurfSetInflated);
     }
 
     pConnectivitySettingsManager->epochs = data;
@@ -399,13 +402,18 @@ int main(int argc, char *argv[])
     pConnectivitySettingsManager->m_settings.setWindowType("hanning");
 
     ConnectivitySettings::IntermediateTrialData connectivityData;
-    for(int i = 0; i < matDataList.size(); i++) {
-        connectivityData.matData.resize(vDataIndices.rows(),matDataList.at(i).cols()-samplesToCutOut);
+    int iNumTrials = matDataList.size();
+    for(int i = 0; i < iNumTrials; i++) {
+        /*connectivityData.matData.resize(vDataIndices.rows(),matDataList.at(i).cols()-samplesToCutOut);
 
         for(int j = 0; j < vDataIndices.rows(); j++) {
             // Only calculate connectivity for post stim
             connectivityData.matData.row(j) = matDataList.at(i).row(vDataIndices(j)).segment(samplesToCutOut, matDataList.at(i).cols()-samplesToCutOut);
-        }
+        }*/
+        connectivityData.matData = matDataList.at(i).block(0,
+                                                           samplesToCutOut,
+                                                           matDataList.at(i).rows(),
+                                                           matDataList.at(i).cols()-samplesToCutOut);
 
         pConnectivitySettingsManager->m_settings.append(connectivityData);
         pConnectivitySettingsManager->m_dataListOriginal.append(connectivityData);
@@ -419,22 +427,26 @@ int main(int argc, char *argv[])
                      pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onConnectivityMetricChanged);
 
     QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::numberTrialsChanged,
-                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onNumberTrialsChanged);
+                     //pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onNumberTrialsChanged);
+                     [&pConnectivitySettingsManager,&tNetworkView,iNumTrials] (int a) {
+                         tNetworkView.getConnectivitySettingsView()->setNumberTrials(qMin(iNumTrials,a));
+                         pConnectivitySettingsManager.data()->onNumberTrialsChanged(qMin(iNumTrials,a));});
+
 
     QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::freqBandChanged,
                      pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onFreqBandChanged);
 
     QObject::connect(pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::newConnectivityResultAvailable,
                      [&](const QString& a, const QString& b, const Network& c) {if(NetworkTreeItem* pNetworkTreeItem = tNetworkView.addData(a,b,c)) {
-                                                                                    //pNetworkTreeItem->setThresholds(QVector3D(0.9,0.95,1.0));
+                                                                                    pNetworkTreeItem->setThresholds(QVector3D(0.9,0.95,1.0));
                                                                                 }});
 
-    QPointer<TfSettingsView> pTfSettingsView = new TfSettingsView();
+    //QPointer<TfSettingsView> pTfSettingsView = new TfSettingsView();
     QList<QWidget*> lWidgets;
-    lWidgets << pTfSettingsView;
+    /*lWidgets << pTfSettingsView;
 
     QObject::connect(pTfSettingsView.data(), &TfSettingsView::numberTrialRowChanged,
-                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::plotTimeCourses);
+                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::plotTimeCourses);*/
 
     //Read and show sensor helmets
     if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
@@ -463,7 +475,7 @@ int main(int argc, char *argv[])
                                                       t_sensorSurfaceVV,
                                                       raw.info.bads);
     } else {
-        QPointer<MinimumNormSettingsView> pMinimumNormSettingsView = new MinimumNormSettingsView("EX_CONNECTIVITY");
+        QPointer<MinimumNormSettingsView> pMinimumNormSettingsView = new MinimumNormSettingsView("EX_CONNECTIVITY", sSourceLocMethod);
         lWidgets << pMinimumNormSettingsView;
 
         QObject::connect(pMinimumNormSettingsView.data(), &MinimumNormSettingsView::timePointChanged,
@@ -512,8 +524,9 @@ int main(int argc, char *argv[])
     }
 
     tNetworkView.setQuickControlWidgets(lWidgets);
-    tNetworkView.getConnectivitySettingsView()->setNumberTrials(200);
-    pConnectivitySettingsManager->onNumberTrialsChanged(200);
+    tNetworkView.getConnectivitySettingsView()->setNumberTrials(iNumTrials);
+    pConnectivitySettingsManager->onNumberTrialsChanged(iNumTrials);
+    pConnectivitySettingsManager->onFreqBandChanged(tNetworkView.getConnectivitySettingsView()->getLowerFreq(),tNetworkView.getConnectivitySettingsView()->getUpperFreq());
 
     return a.exec();
 }

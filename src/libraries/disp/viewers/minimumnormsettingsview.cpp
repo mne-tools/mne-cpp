@@ -61,12 +61,14 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 MinimumNormSettingsView::MinimumNormSettingsView(const QString& sSettingsPath,
+                                                 const QString& sMethod,
                                                  QWidget *parent,
                                                  Qt::WindowFlags f)
 : AbstractView(parent, f)
 , m_pUi(new Ui::MinimumNormSettingsViewWidget)
 {
     m_sSettingsPath = sSettingsPath;
+    m_sMethod = sMethod;
     m_pUi->setupUi(this);
 
     connect(m_pUi->m_comboBox_method, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentTextChanged),
@@ -77,6 +79,12 @@ MinimumNormSettingsView::MinimumNormSettingsView(const QString& sSettingsPath,
 
     connect(m_pUi->m_spinBox_timepoint, &QSpinBox::editingFinished,
             this, &MinimumNormSettingsView::onTimePointValueChanged);
+
+    if(!m_sMethod.isEmpty())
+    {
+        m_pUi->m_comboBox_method->setCurrentIndex(m_pUi->m_comboBox_method->findText(m_sMethod));
+        m_pUi->m_comboBox_method->setEnabled(false);
+    }
 
     this->setWindowTitle("MinimumNorm Settings");
     this->setMinimumWidth(330);
