@@ -11,26 +11,26 @@ find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
-    main.cpp 
-    mainsplashscreencloser.cpp 
-    startupwidget.cpp 
-    mainsplashscreen.cpp 
-    pluginscene.cpp 
-    pluginitem.cpp 
-    plugingui.cpp 
-    arrow.cpp 
+    main.cpp
+    mainsplashscreencloser.cpp
+    startupwidget.cpp
+    mainsplashscreen.cpp
+    pluginscene.cpp
+    pluginitem.cpp
+    plugingui.cpp
+    arrow.cpp
     mainwindow.cpp
 )
 
 set(HEADERS
-    info.h 
-    mainsplashscreencloser.h 
-    startupwidget.h 
-    mainsplashscreen.h 
-    pluginscene.h 
-    pluginitem.h 
-    plugingui.h 
-    arrow.h 
+    info.h
+    mainsplashscreencloser.h
+    startupwidget.h
+    mainsplashscreen.h
+    pluginscene.h
+    pluginitem.h
+    plugingui.h
+    arrow.h
     mainwindow.h
 )
 

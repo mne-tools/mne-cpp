@@ -460,15 +460,24 @@ void RtFiffRawViewDelegate::createPlotPath(const QModelIndex &index,
 
     // The plot works as a rolling time-cursor, ploting data on top of previous
     // runs. You always plot one whole window of data, between first sample and
-    // numSamplesToPlot (or data.second) Even if the only change is a new block
-    // of samples to the left of the time-cursor. At any time, to the left of
-    // the time-cursor you have the most recent data (A part) corresponding to
-    // the current roll. To the right of the time-cursor, you have data
-    // corresponding to the previous roll.
+    // numSamplesToPlot (or data.second). Even if the only change is a new
+    // block of samples to the left of the time-cursor. At any time, to the
+    // left of the time-cursor you have the most recent data (A part)
+    // corresponding to the current roll. To the right of the time-cursor, you
+    // have data corresponding to the previous roll.
     for (int j = 0; j < data.second; ++j) {
-        dY = data.first[j];
-        path.lineTo(calcPoint(path, dPixelsPerSample, dY,
-                              dChannelOffset, dScaleY));
+        if (j < iTimeCursorSample) {
+            // A part
+            dY = data.first[j];  // - data.first[0];
+        } else {
+            // B part
+            dY = data.first[j];  // - firstValuePreviousPlot;
+        }
+        path.lineTo(calcPoint(path,
+                              dPixelsPerSample,
+                              dY,
+                              dChannelOffset,
+                              dScaleY));
     }
 }
 

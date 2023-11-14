@@ -67,6 +67,7 @@ set(SOURCES
     viewers/hpisettingsview.cpp
     viewers/covariancesettingsview.cpp
     viewers/bidsview.cpp
+    viewers/led_indicator.cpp
     viewers/helpers/rtfiffrawviewmodel.cpp
     viewers/helpers/rtfiffrawviewdelegate.cpp
     viewers/helpers/evokedsetmodel.cpp
@@ -130,6 +131,7 @@ set(HEADERS
     viewers/hpisettingsview.h
     viewers/covariancesettingsview.h
     viewers/bidsview.h
+    viewers/led_indicator.h
     viewers/helpers/rtfiffrawviewdelegate.h
     viewers/helpers/rtfiffrawviewmodel.h
     viewers/helpers/evokedsetmodel.h
