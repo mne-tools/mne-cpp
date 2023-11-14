@@ -22,6 +22,7 @@ add_subdirectory(fiffsimulator)
 add_subdirectory(ftbuffer)
 add_subdirectory(babymeg)
 add_subdirectory(natus)
+add_subdirectory(randomdata)
 
 # Algorithm Plugin
 add_subdirectory(rtcmne)
@@ -32,6 +33,7 @@ add_subdirectory(neuronalconnectivity)
 add_subdirectory(writetofile)
 add_subdirectory(hpi)
 add_subdirectory(rtfwd)
+add_subdirectory(timefrequency)
 
 option(WITH_BRAINFLOW   "Build brainflow plugin"    OFF)
 option(WITH_LSL         "Build LSL plugin"          OFF)
