@@ -53,6 +53,9 @@
 #include <utils/generics/circularbuffer.h>
 #include <fstream>
 
+#include <thread>
+#include <atomic>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -260,6 +263,9 @@ private:
     QSharedPointer<EEGoSportsProducer>  m_pEEGoSportsProducer;              /**< The EEGoSportsProducer.*/
 
     QMutex                              m_mutex;                            /**< Holds the threads mutex.*/
+
+    std::thread             m_OutputProcessingThread;
+    std::atomic_bool        m_bProcessOutput;
 };
 } // NAMESPACE
 

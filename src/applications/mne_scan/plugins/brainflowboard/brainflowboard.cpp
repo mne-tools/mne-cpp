@@ -69,6 +69,7 @@ BrainFlowBoard::BrainFlowBoard()
 , m_sStreamerParams("")
 , m_uiSamplesPerBlock(100)
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
+, m_bProcessOutput(false)
 {
     m_pShowSettingsAction = new QAction(QIcon(":/images/options.png"), tr("Streaming Settings"),this);
     m_pShowSettingsAction->setStatusTip(tr("Streaming Settings"));
@@ -244,7 +245,8 @@ bool BrainFlowBoard::start()
         msgBox.exec();
         return false;
     }
-    QThread::start();
+    m_bProcessOutput = true;
+    m_OutputProcessingThread = std::thread(&BrainFlowBoard::run, this);
     return true;
 }
 
@@ -256,8 +258,11 @@ bool BrainFlowBoard::stop()
         if(m_pBoardShim) {
             m_pBoardShim->stop_stream();
         }
-        requestInterruption();
-        wait(500);
+        m_bProcessOutput = false;
+
+        if(m_OutputProcessingThread.joinable()){
+            m_OutputProcessingThread.join();
+        }
         m_pOutput->measurementData()->clear();
     } catch (const BrainFlowException &err) {
         BoardShim::log_message((int)LogLevels::LEVEL_ERROR, err.what());
@@ -388,12 +393,12 @@ void BrainFlowBoard::run()
     BrainFlowArray<double, 2> data;
     QList<Eigen::VectorXd> lSampleBlockBuffer;
 
-    while(!isInterruptionRequested()) {
-        usleep(lSamplingPeriod);
+    while(m_bProcessOutput) {
+        std::this_thread::sleep_for(std::chrono::microseconds(lSamplingPeriod));
         iSampleIterator = 0;
 
         //get samples from device until the complete matrix is filled, i.e. the samples per block size is met
-        while(iSampleIterator < m_uiSamplesPerBlock && !isInterruptionRequested()) {
+        while(iSampleIterator < m_uiSamplesPerBlock && m_bProcessOutput) {
             //Get sample block from device
             data = m_pBoardShim->get_board_data ();
             if (data.get_size(1) == 0) {

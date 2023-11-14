@@ -50,6 +50,9 @@
 #include <scShared/Plugins/abstractsensor.h>
 #include <utils/generics/circularbuffer.h>
 
+#include <thread>
+#include <atomic>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -319,6 +322,8 @@ protected:
     QPointer<QAction>                       m_pActionSqdCtrl;               /**< show squid control. */
     QPointer<QAction>                       m_pActionUpdateFiffInfo;        /**< Update Fiff Info action. */
 
+    std::thread             m_OutputProcessingThread;
+    std::atomic_bool        m_bProcessOutput;
 signals:
     //=========================================================================================================
     /**

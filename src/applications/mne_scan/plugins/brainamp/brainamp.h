@@ -47,6 +47,9 @@
 #include <scShared/Plugins/abstractsensor.h>
 #include <utils/generics/circularbuffer.h>
 
+#include <thread>
+#include <atomic>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -232,6 +235,9 @@ private:
     QAction*                            m_pActionSetupStimulus;             /**< starts stimulus feature. */
 
     QMutex                              m_mutex;
+
+    std::thread             m_OutputProcessingThread;
+    std::atomic_bool        m_bProcessOutput;
 };
 } // NAMESPACE
 

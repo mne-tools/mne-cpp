@@ -45,6 +45,8 @@
 #include <scShared/Plugins/abstractsensor.h>
 #include <communication/rtClient/rtcmdclient.h>
 #include <utils/generics/circularbuffer.h>
+#include <thread>
+#include <atomic>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -211,6 +213,10 @@ protected:
     QTimer                  m_cmdConnectionTimer;           /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
 
     QMutex                  m_qMutex;                       /**< The mutex to ensure thread safety.*/
+
+    std::thread             m_OutputProcessingThread;
+    std::atomic_bool        m_OutputProcessingThreadRunning;
+    std::atomic_bool        m_StopOutputProcessingThread;
 
 signals:
     //=========================================================================================================

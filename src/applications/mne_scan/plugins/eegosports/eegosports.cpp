@@ -98,6 +98,7 @@ EEGoSports::EEGoSports()
 , m_sRPA("2RD")
 , m_sNasion("0Z")
 , m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_double>(new CircularBuffer_Matrix_double(10)))
+, m_bProcessOutput(false)
 {
 }
 
@@ -106,7 +107,7 @@ EEGoSports::EEGoSports()
 EEGoSports::~EEGoSports()
 {
     //If the program is closed while the sampling is in process
-    if(this->isRunning()) {
+    if(m_bProcessOutput) {
         this->stop();    
     }
 }
@@ -564,7 +565,8 @@ bool EEGoSports::start()
                                  m_bCheckImpedances);
 
     if(m_pEEGoSportsProducer->isRunning()) {
-        QThread::start();
+        m_bProcessOutput = true;
+        m_OutputProcessingThread = std::thread(&EEGoSports::run, this);;
         return true;
     } else {
         qWarning() << "[EEGoSports::start] EEGoSports thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (EEGO-SDK.dll) is not installed in one of the monitored dll path." << endl;
@@ -577,8 +579,11 @@ bool EEGoSports::start()
 bool EEGoSports::stop()
 {
     // Stop this (consumer) thread first
-    requestInterruption();
-    wait(500);
+    m_bProcessOutput = false;
+
+    if(m_OutputProcessingThread.joinable()){
+        m_OutputProcessingThread.join();
+    }
 
     //Stop the producer thread
     m_pEEGoSportsProducer->stop();
@@ -660,7 +665,7 @@ void EEGoSports::onUpdateCardinalPoints(const QString& sLPA, double dLPA, const 
 void EEGoSports::showImpedanceDialog()
 {
     // Open Impedance dialog only if no sampling process is active
-    if(!this->isRunning()) {
+    if(!m_bProcessOutput) {
         if(m_pEEGoSportsImpedanceWidget == NULL) {
             m_pEEGoSportsImpedanceWidget = QSharedPointer<EEGoSportsImpedanceWidget>(new EEGoSportsImpedanceWidget(this));
         }
@@ -700,7 +705,7 @@ void EEGoSports::run()
 {
     MatrixXd matData;
 
-    while(!isInterruptionRequested()) {
+    while(m_bProcessOutput) {
         if(m_pEEGoSportsProducer->isRunning()) {
             // Check impedances - send new impedance values to graphic scene
             if(m_bCheckImpedances) {

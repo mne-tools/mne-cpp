@@ -70,6 +70,7 @@ FtBuffer::FtBuffer()
 , m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_double>(new CircularBuffer_Matrix_double(10)))
 , m_sBufferAddress("127.0.0.1")
 , m_iBufferPort(1972)
+, m_bProcessOutput(false)
 {
 }
 
@@ -133,7 +134,8 @@ bool FtBuffer::start()
     qInfo() << "[FtBuffer::start] Producer thread created, sending work command...";
     emit workCommand();
 
-    QThread::start();
+    m_bProcessOutput = true;
+    m_OutputProcessingThread = std::thread(&FtBuffer::run, this);
 
     return true;
 }
@@ -146,14 +148,17 @@ bool FtBuffer::stop()
 
     m_bIsConfigured = false;
 
-    requestInterruption();
-    wait(500);
+    m_bProcessOutput = false;
+
+    if(m_OutputProcessingThread.joinable()){
+        m_OutputProcessingThread.join();
+    }
 
     //stops separate producer/client thread first
     m_pProducerThread.requestInterruption();
     int itries = 0;
     while(m_pProducerThread.isRunning()) {
-        msleep(10);
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         if(itries > 10){
             break;
         }
@@ -200,12 +205,12 @@ void FtBuffer::run()
 {
     MatrixXd matData;
 
-    while(!isInterruptionRequested()) {
+    while(m_bProcessOutput) {
         //qDebug() << "[FtBuffer::run] m_pFiffInfo->dig.size()" << m_pFiffInfo->dig.size();
         //pop matrix
         if(m_pCircularBuffer->pop(matData)) {
             //emit values
-            if(!isInterruptionRequested()) {
+            if(m_bProcessOutput) {
                 m_pRTMSA_BufferOutput->measurementData()->setValue(matData);
             }
         }

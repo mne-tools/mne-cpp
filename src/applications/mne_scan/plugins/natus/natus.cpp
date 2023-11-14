@@ -75,6 +75,7 @@ Natus::Natus()
 , m_qStringResourcePath(qApp->applicationDirPath()+"/../resources/mne_scan/plugins/natus/")
 , m_pRMTSA_Natus(PluginOutputData<RealTimeMultiSampleArray>::create(this, "Natus", "EEG output data"))
 , m_pFiffInfo(QSharedPointer<FiffInfo>::create())
+, m_bProcessOutput(false)
 {
     m_pRMTSA_Natus->measurementData()->setName(this->getName());//Provide name to auto store widget settings
 }
@@ -84,7 +85,7 @@ Natus::Natus()
 Natus::~Natus()
 {
     //If the program is closed while the sampling is in process
-    if(this->isRunning()) {
+    if(m_bProcessOutput) {
         this->stop();
     }
 }
@@ -229,7 +230,8 @@ bool Natus::start()
     m_pRMTSA_Natus->measurementData()->initFromFiffInfo(m_pFiffInfo);
     m_pRMTSA_Natus->measurementData()->setMultiArraySize(1);
 
-    QThread::start();
+    m_bProcessOutput = true;
+    m_OutputProcessingThread = std::thread(&Natus::run, this);
 
     // Start the producer
     m_pNatusProducer = QSharedPointer<NatusProducer>::create(m_iSamplesPerBlock, m_iNumberChannels);
@@ -245,8 +247,11 @@ bool Natus::start()
 
 bool Natus::stop()
 {
-    requestInterruption();
-    wait(500);
+    m_bProcessOutput = false;
+
+    if(m_OutputProcessingThread.joinable()){
+        m_OutputProcessingThread.join();
+    }
 
     // Clear all data in the buffer connected to displays and other plugins
     m_pRMTSA_Natus->measurementData()->clear();
@@ -299,10 +304,10 @@ void Natus::run()
 {
     MatrixXd matData;
 
-    while(!isInterruptionRequested()) {
+    while(m_bProcessOutput) {
         if(m_pCircularBuffer->pop(matData)) {
             //emit values
-            if(!isInterruptionRequested()) {
+            if(m_bProcessOutput) {
                 m_pRMTSA_Natus->measurementData()->setValue(matData);
             }
         }

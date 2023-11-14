@@ -72,6 +72,7 @@ GUSBAmp::GUSBAmp()
 , m_iSamplesPerBlock(0)
 , m_iSampleRate(128)
 , m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_float>(new CircularBuffer_Matrix_float(8)))
+, m_bProcessOutput(false)
 {
     m_viChannelsToAcquire = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16};
 
@@ -86,7 +87,7 @@ GUSBAmp::GUSBAmp()
 GUSBAmp::~GUSBAmp()
 {
     //If the program is closed while the sampling is in process
-    if(this->isRunning()){
+    if(m_bProcessOutput){
         this->stop();
     }
 }
@@ -212,7 +213,8 @@ bool GUSBAmp::start()
 
     //start the thread for ring buffer
     if(m_pGUSBAmpProducer->isRunning())  {
-        QThread::start();
+        m_bProcessOutput = true;
+        m_OutputProcessingThread = std::thread(&GUSBAmp::run, this);
         return true;
     } else  {
         qWarning() << "Plugin GUSBAmp - ERROR - GUSBAmpProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (GUSBAmpSDK.dll / GUSBAmpSDK32bit.dll) is not installed in the system32 / SysWOW64 directory" << endl;
@@ -225,8 +227,11 @@ bool GUSBAmp::start()
 bool GUSBAmp::stop()
 {
     // Stop this (consumer) thread first
-    requestInterruption();
-    wait(500);
+    m_bProcessOutput = false;
+
+    if(m_OutputProcessingThread.joinable()){
+        m_OutputProcessingThread.join();
+    }
 
     //Stop the producer thread first
     m_pGUSBAmpProducer->stop();
@@ -271,7 +276,7 @@ void GUSBAmp::run()
     qint32 size = 0;
     MatrixXf matValue;
 
-    while(!isInterruptionRequested()) {
+    while(m_bProcessOutput) {
         //pop matrix only if the producer thread is running
         if(m_pGUSBAmpProducer->isRunning()) {
             //pop matrix

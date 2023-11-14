@@ -60,6 +60,9 @@
 
 #include <fiff/fiff.h>
 
+#include <thread>
+#include <atomic>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -254,6 +257,9 @@ private:
 
     QAction*                            m_pActionImpedance;                 /**< shows impedance widget. */
     QAction*                            m_pActionSetupProject;              /**< shows setup project dialog. */
+
+    std::thread             m_OutputProcessingThread;
+    std::atomic_bool        m_bProcessOutput;
 };
 } // NAMESPACE
 

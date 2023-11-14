@@ -178,7 +178,7 @@ void FiffSimulatorProducer::run()
         m_producerMutex.unlock();
 
         // Only perform data reading if the measurement was started
-        if(m_pFiffSimulator->isRunning()) {
+        if(m_pFiffSimulator->m_OutputProcessingThreadRunning) {
             m_pRtDataClient->readRawBuffer(m_pFiffSimulator->m_pFiffInfo->nchan,
                                            matData,
                                            kind);

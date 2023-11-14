@@ -55,6 +55,9 @@
 
 #include <utils/generics/circularbuffer.h>
 
+#include <thread>
+#include <atomic>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -253,6 +256,9 @@ private:
 
     QString                                                                             m_sBufferAddress;               /**< The address used to connect to the buffer if starting without being connected */
     int                                                                                 m_iBufferPort;                  /**< The port used to connect to the buffer if starting without being connected */
+
+    std::thread             m_OutputProcessingThread;
+    std::atomic_bool        m_bProcessOutput;
 };
 }//namespace end brace
 

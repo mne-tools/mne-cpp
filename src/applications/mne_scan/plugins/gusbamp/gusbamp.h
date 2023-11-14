@@ -50,6 +50,9 @@
 #include "FormFiles/gusbampsetupwidget.h"
 #include "FormFiles/gusbampsetupprojectwidget.h"
 
+#include <thread>
+#include <atomic>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -211,6 +214,9 @@ private:
     std::vector<int>            m_viSizeOfSampleMatrix;     /**< vector including the size of the two dimensional sample Matrix. */
     std::vector<int>            m_viChannelsToAcquire;      /**< vector of the calling numbers of the channels to be acquired. */
     Eigen::RowVectorXd          m_cals;
+
+    std::thread             m_OutputProcessingThread;
+    std::atomic_bool        m_bProcessOutput;
 };
 } // NAMESPACE
 

@@ -95,6 +95,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 , m_pCircularBuffer(CircularBuffer<CONNECTIVITYLIB::Network>::SPtr::create(40))
 , m_pRtConnectivity(RtConnectivity::SPtr::create())
 , m_pActionShowYourWidget(Q_NULLPTR)
+, m_bProcessOutput(false)
 {
     AbstractMetric::m_bStorageModeIsActive = true;
     AbstractMetric::m_iNumberBinStart = 0;
@@ -109,7 +110,7 @@ NeuronalConnectivity::NeuronalConnectivity()
 
 NeuronalConnectivity::~NeuronalConnectivity()
 {
-    if(this->isRunning()) {
+    if(m_bProcessOutput) {
         stop();
     }
 }
@@ -195,7 +196,8 @@ void NeuronalConnectivity::unload()
 bool NeuronalConnectivity::start()
 {
     //Start thread
-    QThread::start();
+    m_bProcessOutput = true;
+    m_OutputProcessingThread = std::thread(&NeuronalConnectivity::run, this);
 
     return true;
 }
@@ -206,8 +208,11 @@ bool NeuronalConnectivity::stop()
 {
     m_pRtConnectivity->restart();
 
-    requestInterruption();
-    wait(500);
+    m_bProcessOutput = false;
+
+    if(m_OutputProcessingThread.joinable()){
+        m_OutputProcessingThread.join();
+    }
 
     m_bPluginControlWidgetsInit = false;
 
@@ -510,13 +515,13 @@ void NeuronalConnectivity::run()
             break;
         }
         m_mutex.unlock();
-        msleep(100);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     int skip_count = 0;
     Network network;
 
-    while(!isInterruptionRequested()) {
+    while(m_bProcessOutput) {
         //Do processing after skip count has reached limit
         if((skip_count % m_iDownSample) == 0) {
             if(m_pCircularBuffer->pop(network)) {
@@ -562,7 +567,7 @@ void NeuronalConnectivity::onMetricChanged(const QString& sMetric)
 
     m_sConnectivityMethods = QStringList() << sMetric;
     m_connectivitySettings.setConnectivityMethods(m_sConnectivityMethods);
-    if(m_pRtConnectivity && this->isRunning()) {
+    if(m_pRtConnectivity && m_bProcessOutput) {
         m_pRtConnectivity->restart();
         m_pRtConnectivity->append(m_connectivitySettings);
     }
