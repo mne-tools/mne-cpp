@@ -2,7 +2,7 @@
 /**
  * @file     brainflowboard_global.cpp
  * @author   Juan G Prieto <jgarciaprieto@mgh.harvard.edu>;
- *           Gabriel B Motta <gbmotta@mgh.harvard.edu>;
+ *           Gabriel B Motta <gabrielbenmotta@gmail.com>;
  * @since    0.1.9
  * @date     September, 2021
  *

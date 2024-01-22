@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * @file     channelselection.h
- * @author   Gabriel Motta <gbmotta@mgh.harvard.edu
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com
  * @since    0.1.5
  * @date     July, 2020
  *

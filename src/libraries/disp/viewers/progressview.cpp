@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * @file     progressview.cpp
- * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.6
  * @date     September, 2020
  *

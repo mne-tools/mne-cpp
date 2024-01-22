@@ -2,7 +2,7 @@
 /**
  * @file     event.cpp
  * @author   Juan Garcia-Prieto <juangpc@gmail.com>
- *           Gabriel Motta <gbmotta@mgh.harvard.edu>;
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>;
  * @since    0.1.8
  * @date     February, 2021
  *

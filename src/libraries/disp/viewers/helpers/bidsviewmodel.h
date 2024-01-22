@@ -2,7 +2,7 @@
 /**
  * @file     bidsviewmodel.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>
- *           Gabriel Motta <gbmotta@mgh.harvard.edu>
+ *           Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.6
  * @date     October, 2020
  *

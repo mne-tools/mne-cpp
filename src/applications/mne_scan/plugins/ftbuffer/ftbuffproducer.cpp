@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * @file     ftbuffproducer.cpp
- * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>;
+ * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Lorenz Esch <lorenz.esch@tu-ilmenau.de>
  * @since    0.1.0
  * @date     January, 2020

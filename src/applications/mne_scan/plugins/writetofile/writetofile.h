@@ -2,7 +2,7 @@
 /**
  * @file     writetofile.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>,
- *           Gabriel B Motta <gbmotta@mgh.harvard.edu>
+ *           Gabriel B Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.0
  * @date     February, 2020
  *

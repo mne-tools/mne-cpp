@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * @file     ftheaderparser.cpp
- * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
  *           Juan Garcia-Prieto <juangpc@gmail.com>;
  * @since    0.1.9
  * @date     July, 2021

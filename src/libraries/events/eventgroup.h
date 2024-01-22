@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * @file     eventgroup.h
- * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>;
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>;
  *           Juan Garcia-Prieto <juangpc@gmail.com>
  * @since    0.1.8
  * @date     February, 2021
