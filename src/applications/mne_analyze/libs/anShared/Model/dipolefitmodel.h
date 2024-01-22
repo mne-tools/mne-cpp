@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * @file     dipolefitmodel.h
- * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.7
  * @date     November, 2020
  *
