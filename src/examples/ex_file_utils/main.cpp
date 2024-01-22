@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * @file     main.cpp
- * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.9
  * @date     September, 2021
  *

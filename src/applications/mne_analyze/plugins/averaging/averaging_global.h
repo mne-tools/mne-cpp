@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * @file     averaging_global.h
- * @author   Gabriel Motta <gbmotta@mgh.harvard.edu>
+ * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.2
  * @date     May, 2020
  *

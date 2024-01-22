@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
  * @file     utils_global.h
- * @author   Gabriel B Motta <gbmotta@mgh.harvard.edu>;
+ * @author   Gabriel B Motta <gabrielbenmotta@gmail.com>;
  *           Juan G Prieto <jgarciaprieto@mgh.harvard.edu>;
  *           Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
