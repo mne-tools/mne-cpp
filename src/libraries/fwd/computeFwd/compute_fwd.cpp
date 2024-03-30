@@ -1867,11 +1867,6 @@ void ComputeFwd::initFwd()
     m_listEegChs = QList<FiffChInfo>();
     m_listCompChs = QList<FiffChInfo>();
 
-    if(!m_pSettings->compute_grad) {
-        m_meg_forward_grad = Q_NULLPTR;
-        m_eeg_forward_grad = Q_NULLPTR;
-    }
-
     int iNMeg               = 0;
     int iNEeg               = 0;
     int iNComp              = 0;
