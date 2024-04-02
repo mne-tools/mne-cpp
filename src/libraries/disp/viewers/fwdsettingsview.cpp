@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "fwdsettingsview.h"
+#include "QtWidgets/qspinbox.h"
 #include "ui_fwdsettingsview.h"
 
 #include <fs/annotationset.h>
@@ -115,6 +116,8 @@ FwdSettingsView::FwdSettingsView(const QString& sSettingsPath,
             this, &FwdSettingsView::onClusteringStatusChanged);
     connect(m_pUi->m_qPushButton_ComputeForward, &QPushButton::clicked,
             this, &FwdSettingsView::doForwardComputation);
+    connect(m_pUi->m_spinBox_iNDipoleClustered, &QSpinBox::valueChanged,
+            this, &FwdSettingsView::clusterNumberChanged);
 
     // load settings
     loadSettings();

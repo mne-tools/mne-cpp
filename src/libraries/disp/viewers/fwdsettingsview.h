@@ -122,6 +122,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Get status of cluster size spin box.
+     *
+     * @return  Desired number of sources in clustered source space.
+     */
+    int getClusterNumber();
+
+    //=========================================================================================================
+    /**
      * Shows atlas selection dialog
      */
     void showAtlasDirDialog();
@@ -234,6 +242,14 @@ signals:
      * Emit this signal whenever a forward computation is supposed to be triggered.
      */
     void doForwardComputation();
+
+    //=========================================================================================================
+    /**
+     * Emit this signal whenever a forward computation is supposed to be triggered.
+     *
+     * @param[in] iNCluster    Number of desired sources in the clustered source space.
+     */
+    void clusterNumberChanged(int iNCluster);
 
 };
 

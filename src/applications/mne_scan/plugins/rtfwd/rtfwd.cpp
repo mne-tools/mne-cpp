@@ -105,6 +105,7 @@ RtFwd::RtFwd()
     m_pFwdSettings->include_eeg = true;
     m_pFwdSettings->accurate = true;
     m_pFwdSettings->mindist = 5.0f/1000.0f;
+    m_pFwdSettings->ncluster = 200;
 
     m_sAtlasDir = QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/label";
 }
@@ -345,6 +346,7 @@ void RtFwd::onDoForwardComputation()
 {
     m_mutex.lock();
     m_bDoFwdComputation = true;
+    // get value for number in cluster and set m_pFwdSettings->ncluster here
     m_mutex.unlock();
 }
 
@@ -513,7 +515,7 @@ void RtFwd::run()
 
         if(bDoClustering && bFwdReady) {
             emit statusInformationChanged(3);               // clustering
-            pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), 200)));
+            pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), m_pFwdSettings->ncluster)));
             emit clusteringAvailable(pClusteredFwd->nsource);
 
             m_pRTFSOutput->measurementData()->setValue(pClusteredFwd);
