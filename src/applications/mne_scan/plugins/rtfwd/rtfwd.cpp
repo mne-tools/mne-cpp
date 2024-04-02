@@ -321,6 +321,8 @@ void RtFwd::initPluginControlWidgets()
                 this, &RtFwd::onClusteringStatusChanged);
         connect(pFwdSettingsView, &FwdSettingsView::atlasDirChanged,
                 this, &RtFwd::onAtlasDirChanged);
+        connect(pFwdSettingsView, &FwdSettingsView::clusterNumberChanged,
+                this, &RtFwd::onClusterNumberChanged);
         connect(pFwdSettingsView, &FwdSettingsView::doForwardComputation,
                 this, &RtFwd::onDoForwardComputation);
 
@@ -387,6 +389,15 @@ void RtFwd::onAtlasDirChanged(const QString& sDirPath, const AnnotationSet::SPtr
     m_mutex.lock();
     m_sAtlasDir = sDirPath;
     m_pAnnotationSet = pAnnotationSet;
+    m_mutex.unlock();
+}
+
+//=============================================================================================================
+
+void RtFwd::onClusterNumberChanged(int iNClusterNumber)
+{
+    m_mutex.lock();
+    m_pFwdSettings->ncluster = iNClusterNumber;
     m_mutex.unlock();
 }
 
