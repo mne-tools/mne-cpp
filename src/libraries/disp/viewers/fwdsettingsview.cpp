@@ -89,6 +89,7 @@ FwdSettingsView::FwdSettingsView(const QString& sSettingsPath,
     m_pUi->m_lineEdit_sSourceOri->setText("fixed");
     m_pUi->m_lineEdit_sCoordFrame->setText("Head Space");
     m_pUi->m_lineEdit_iNDipoleClustered->setText("Not Clustered");
+    m_pUi->m_spinBox_iNDipoleClustered->setValue(200);
 
     // load init annotation set
     QString t_sAtlasDir = QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/label";
@@ -254,6 +255,13 @@ void FwdSettingsView::setSolutionInformation(FIFFLIB::fiff_int_t iSourceOri,
 bool FwdSettingsView::getClusteringStatusChanged()
 {
     return m_pUi->m_checkBox_bDoClustering->isChecked();
+}
+
+//=============================================================================================================
+
+int FwdSettingsView::getClusterNumber()
+{
+    return m_pUi->m_spinBox_iNDipoleClustered->value();
 }
 
 //=============================================================================================================

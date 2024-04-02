@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>333</width>
+    <width>362</width>
     <height>939</height>
    </rect>
   </property>
@@ -226,7 +226,7 @@
         <item>
          <widget class="QLabel" name="label_5">
           <property name="text">
-           <string>Desired number of clustered Sources</string>
+           <string>Number of sources per cluster</string>
           </property>
          </widget>
         </item>
@@ -239,10 +239,10 @@
            </size>
           </property>
           <property name="minimum">
-           <number>20</number>
+           <number>5</number>
           </property>
           <property name="maximum">
-           <number>1000</number>
+           <number>999</number>
           </property>
          </widget>
         </item>
