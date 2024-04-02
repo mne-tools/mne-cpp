@@ -131,6 +131,7 @@ public:
     bool do_all;
     QStringList labels;         /**< Compute the solution only for these labels. */
     int nlabel;
+    int ncluster;               /**< Number of sources desired in clustered solution. */
 
     QString eeg_model_file;     /**< File of EEG sphere model specifications. */
     QString eeg_model_name;     /**< Name of the EEG model to use. */
