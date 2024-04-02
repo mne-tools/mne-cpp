@@ -192,6 +192,14 @@ private:
 
     //=========================================================================================================
     /**
+     * Call this function whenever the number of dipoles per cluster changed.
+     *
+     * @param[in] iNClusterNumber   Number of dipoles per cluster.
+     */
+    void onClusterNumberChanged(int iNClusterNumber);
+
+    //=========================================================================================================
+    /**
      * Call this function whenever the atlas directory is set.
      *
      * @param[in] sDirPath              The path to the atlas directory.
