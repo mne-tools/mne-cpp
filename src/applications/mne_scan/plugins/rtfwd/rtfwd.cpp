@@ -91,6 +91,7 @@ RtFwd::RtFwd()
 , m_bBusy(false)
 , m_bDoRecomputation(false)
 , m_bDoClustering(true)
+, m_bNClusterChanged(true)
 , m_bDoFwdComputation(false)
 {
     // set init values
@@ -348,7 +349,6 @@ void RtFwd::onDoForwardComputation()
 {
     m_mutex.lock();
     m_bDoFwdComputation = true;
-    // get value for number in cluster and set m_pFwdSettings->ncluster here
     m_mutex.unlock();
 }
 
@@ -398,6 +398,7 @@ void RtFwd::onClusterNumberChanged(int iNClusterNumber)
 {
     m_mutex.lock();
     m_pFwdSettings->ncluster = iNClusterNumber;
+    m_bNClusterChanged = true;
     m_mutex.unlock();
 }
 
@@ -438,6 +439,7 @@ void RtFwd::run()
     bool bDoRecomputation = false;              // indicate if we want to recompute
     bool bDoClustering = false;                 // indicate if we want to cluster
     bool bFwdReady = false;                     // only cluster if fwd is ready
+    bool bNClusterChanged = false;              // Perform new clustering when cluster size changed
     bool bHpiConnectected = false;              // only update/recompute if hpi is connected
     bool bDoFwdComputation = false;             // compute forward if requested
     bool bIsInit = false;                       // only recompute if initial fwd solulion is calculated
@@ -470,10 +472,9 @@ void RtFwd::run()
             m_mutex.lock();
             if(!m_bDoClustering) {
                 m_pRTFSOutput->measurementData()->setValue(pFwdSolution);
-                bFwdReady = false;                  // make sure to not cluster
                 emit statusInformationChanged(5);   //finished
             }
-            bFwdReady = true;                       // enable cluster
+            bFwdReady = true;                       // provide fwd for clustering if wanted
             m_bDoFwdComputation = false;            // don't call this again if not requested
             bIsInit = true;                         // init computation finished -> recomputation possible
             m_mutex.unlock();
@@ -513,7 +514,7 @@ void RtFwd::run()
 
                 if(!bDoClustering) {
                     m_pRTFSOutput->measurementData()->setValue(pFwdSolution);
-                    bFwdReady = false;
+                    //bFwdReady = false; // doesn't seem to be necessary? bDoClustering = false anyway
                     emit statusInformationChanged(5);       //finished
                 }
             }
@@ -522,18 +523,22 @@ void RtFwd::run()
         // do clustering if requested and fwd is ready
         m_mutex.lock();
         bDoClustering = m_bDoClustering;
+        bNClusterChanged = m_bNClusterChanged;
         m_mutex.unlock();
 
-        if(bDoClustering && bFwdReady) {
+        if(bDoClustering && bFwdReady && bNClusterChanged) {
             emit statusInformationChanged(3);               // clustering
             pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(pFwdSolution->cluster_forward_solution(*m_pAnnotationSet.data(), m_pFwdSettings->ncluster)));
             emit clusteringAvailable(pClusteredFwd->nsource);
 
             m_pRTFSOutput->measurementData()->setValue(pClusteredFwd);
 
-            bFwdReady = false;
+            //bFwdReady = false; // fwd remains ready, allows for reclustering.
+            m_mutex.lock();
+            m_bNClusterChanged = false;
+            m_mutex.unlock();
 
-            emit statusInformationChanged(5);               //finished
+            emit statusInformationChanged(6);               //finished
         }
     }
 }
