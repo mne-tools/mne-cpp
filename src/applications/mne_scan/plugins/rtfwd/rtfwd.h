@@ -216,6 +216,8 @@ private:
     bool                                        m_bBusy;                    /**< Indicates if we have to update headposition.**/
     bool                                        m_bDoRecomputation;         /**< If recomputation is activated.**/
     bool                                        m_bDoClustering;            /**< If clustering is activated.**/
+    bool                                        m_bNClusterChanged;         /**< Perform new clustering when cluster size changed**/
+
     bool                                        m_bDoFwdComputation;        /**< Do a forward computation. **/
 
     QString                                     m_sAtlasDir;                /**< File to Atlas. */
