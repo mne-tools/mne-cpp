@@ -82,7 +82,7 @@ FwdSettingsView::FwdSettingsView(const QString& sSettingsPath,
 
     // init
     m_pUi->m_checkBox_bDoRecomputation->setChecked(false);
-    m_pUi->m_checkBox_bDoClustering->setChecked(false);
+    m_pUi->m_checkBox_bDoClustering->setChecked(true);
     m_pUi->m_lineEdit_iNChan->setText(QString::number(0));
     m_pUi->m_lineEdit_iNSourceSpace->setText(QString::number(0));
     m_pUi->m_lineEdit_iNDipole->setText(QString::number(0));
@@ -90,6 +90,7 @@ FwdSettingsView::FwdSettingsView(const QString& sSettingsPath,
     m_pUi->m_lineEdit_sCoordFrame->setText("Head Space");
     m_pUi->m_lineEdit_iNDipoleClustered->setText("Not Clustered");
     m_pUi->m_spinBox_iNDipoleClustered->setValue(200);
+    m_pUi->m_spinBox_iNDipoleClustered->setKeyboardTracking(false);
 
     // load init annotation set
     QString t_sAtlasDir = QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/label";
@@ -117,7 +118,7 @@ FwdSettingsView::FwdSettingsView(const QString& sSettingsPath,
             this, &FwdSettingsView::onClusteringStatusChanged);
     connect(m_pUi->m_qPushButton_ComputeForward, &QPushButton::clicked,
             this, &FwdSettingsView::doForwardComputation);
-    connect(m_pUi->m_spinBox_iNDipoleClustered, &QSpinBox::valueChanged,
+    connect(m_pUi->m_spinBox_iNDipoleClustered, QOverload<int>::of(&QSpinBox::valueChanged),
             this, &FwdSettingsView::clusterNumberChanged);
 
     // load settings
@@ -207,6 +208,9 @@ void FwdSettingsView::setRecomputationStatus(int iStatus)
     } else if (iStatus == 4) {
         m_pUi->m_label_recomputationFeedback->setText("Not Computed");
         m_pUi->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : red;}");
+    } else if (iStatus == 5) {
+        m_pUi->m_label_recomputationFeedback->setText("Not Clustered");
+        m_pUi->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : yellow;}");
     } else {
         m_pUi->m_label_recomputationFeedback->setText("Finished");
         m_pUi->m_label_recomputationFeedback->setStyleSheet("QLabel { background-color : green;}");
