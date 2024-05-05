@@ -93,6 +93,7 @@ NoiseReduction::NoiseReduction()
 , m_pCircularBuffer(QSharedPointer<UTILSLIB::CircularBuffer_Matrix_double>::create(40))
 , m_pNoiseReductionInput(Q_NULLPTR)
 , m_pNoiseReductionOutput(Q_NULLPTR)
+, m_bProcessOutput(false)
 {
     if(m_sCurrentSystem == "BabyMEG") {
         m_iNBaseFctsFirst = 270;
@@ -111,7 +112,7 @@ NoiseReduction::NoiseReduction()
 
 NoiseReduction::~NoiseReduction()
 {
-    if(this->isRunning()) {
+    if(m_bProcessOutput) {
         stop();
     }
 }
@@ -159,8 +160,11 @@ bool NoiseReduction::start()
 
 bool NoiseReduction::stop()
 {
-    requestInterruption();
-    wait(500);
+    m_bProcessOutput = false;
+
+    if(m_OutputProcessingThread.joinable()){
+        m_OutputProcessingThread.join();
+    }
 
     m_iMaxFilterTapSize = -1;
 
@@ -224,7 +228,8 @@ void NoiseReduction::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             if(m_iMaxFilterTapSize == -1) {
                 m_iMaxFilterTapSize = pRTMSA->getMultiSampleArray().first().cols();
                 initPluginControlWidgets();
-                QThread::start();
+                m_bProcessOutput = true;
+                m_OutputProcessingThread = std::thread(&NoiseReduction::run, this);
             }
 
             for(unsigned char i = 0; i < pRTMSA->getMultiSampleArray().size(); ++i) {
@@ -345,7 +350,7 @@ void NoiseReduction::run()
     MatrixXd matData;
     QScopedPointer<RTPROCESSINGLIB::FilterOverlapAdd> pRtFilter(new RTPROCESSINGLIB::FilterOverlapAdd());
 
-    while(!isInterruptionRequested()) {
+    while(m_bProcessOutput) {
         // Get the current data
         if(m_pCircularBuffer->pop(matData)) {
             m_mutex.lock();
@@ -409,7 +414,7 @@ void NoiseReduction::run()
             m_mutex.unlock();
 
             //Send the data to the connected plugins and the display
-            if(!isInterruptionRequested()) {
+            if(m_bProcessOutput) {
                 m_pNoiseReductionOutput->measurementData()->setValue(matData);
             }
         }

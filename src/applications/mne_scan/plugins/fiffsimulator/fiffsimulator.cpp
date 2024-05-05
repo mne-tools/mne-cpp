@@ -46,6 +46,7 @@
 #include <fiff/fiff_info.h>
 #include <fiff/c/fiff_digitizer_data.h>
 #include <scMeas/realtimemultisamplearray.h>
+#include <chrono>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -56,6 +57,7 @@
 #include <QtCore/QFile>
 #include <QMutexLocker>
 #include <QList>
+#include <QThread>
 
 #include <QDebug>
 
@@ -85,6 +87,8 @@ FiffSimulator::FiffSimulator()
 , m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_float>(new CircularBuffer_Matrix_float(40)))
 , m_pRtCmdClient(QSharedPointer<RtCmdClient>::create())
 , m_iDefaultPortCmdClient(4217)
+, m_OutputProcessingThreadRunning(false)
+, m_StopOutputProcessingThread(false)
 {
     //init channels when fiff info is available
     connect(this, &FiffSimulator::fiffInfoAvailable,
@@ -95,7 +99,7 @@ FiffSimulator::FiffSimulator()
 
 FiffSimulator::~FiffSimulator()
 {
-    if(m_pFiffSimulatorProducer->isRunning() || this->isRunning()) {
+    if(m_pFiffSimulatorProducer->isRunning() || m_OutputProcessingThreadRunning) {
         stop();
     }
 }
@@ -148,13 +152,14 @@ bool FiffSimulator::start()
         m_pFiffSimulatorProducer->start();
 
         // Wait one sec so the producer can update the m_iDataClientId accordingly
-        msleep(1000);
+        std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
         // Start Measurement at mne_rt_server
         (*m_pRtCmdClient)["start"].pValues()[0].setValue(m_pFiffSimulatorProducer->m_iDataClientId);
         (*m_pRtCmdClient)["start"].send();
 
-        QThread::start();
+        m_OutputProcessingThread = std::thread(&FiffSimulator::run, this);
+        m_OutputProcessingThreadRunning = true;
 
         return true;
     }
@@ -167,8 +172,11 @@ bool FiffSimulator::start()
 bool FiffSimulator::stop()
 {
     // Stop this (consumer) thread first
-    requestInterruption();
-    wait(500);
+    m_StopOutputProcessingThread = true;
+
+    if(m_OutputProcessingThread.joinable()){
+        m_OutputProcessingThread.join();
+    }
 
     // Stop producer thread second
     m_pFiffSimulatorProducer->stop();
@@ -181,6 +189,8 @@ bool FiffSimulator::stop()
     // Clear all data in the buffer connected to displays and other plugins
     m_pRTMSA_FiffSimulator->measurementData()->clear();
     m_pCircularBuffer->clear();
+
+    m_StopOutputProcessingThread = false;
 
     return true;
 }
@@ -214,11 +224,11 @@ void FiffSimulator::run()
 {
     MatrixXf matValue;
 
-    while(!isInterruptionRequested()) {
+    while(!m_StopOutputProcessingThread) {
         //pop matrix
         if(m_pCircularBuffer->pop(matValue)) {
             //emit values
-            if(!isInterruptionRequested()) {
+            if(!m_StopOutputProcessingThread) {
                 m_pRTMSA_FiffSimulator->measurementData()->setValue(matValue.cast<double>());
             }
         }

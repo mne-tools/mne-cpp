@@ -70,6 +70,7 @@ TMSI::TMSI()
 , m_qStringResourcePath(qApp->applicationDirPath()+"/../resources/mne_scan/plugins/tmsi/")
 , m_pTMSIProducer(new TMSIProducer(this))
 , m_pCircularBuffer(QSharedPointer<CircularBuffer_Matrix_float>(new CircularBuffer_Matrix_float(8)))
+, m_bProcessOutput(false)
 {
     // Create record file option action bar item/button
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup project"), this);
@@ -89,7 +90,7 @@ TMSI::TMSI()
 TMSI::~TMSI()
 {
     //If the program is closed while the sampling is in process
-    if(this->isRunning()) {
+    if(m_bProcessOutput) {
         this->stop();
     }
 }
@@ -485,7 +486,7 @@ bool TMSI::start()
                            m_bWriteDriverDebugToFile,
                            m_bUseCommonAverage,
                            m_bCheckImpedances);
-    wait(500);
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
 
     if(m_pTMSIProducer->isRunning()) {
         // Init BCIFeatureWindow for visualization
@@ -496,7 +497,8 @@ bool TMSI::start()
             m_pTmsiManualAnnotationWidget->show();
         }
 
-        QThread::start();
+        m_bProcessOutput = true;
+        m_OutputProcessingThread = std::thread(&TMSI::run, this);
         return true;
     } else {
         qWarning() << "[TMSI::start] TMSIProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (TMSiSDK.dll / TMSiSDK32bit.dll) is not installed in the system32 / SysWOW64 directory" << endl;
@@ -512,8 +514,11 @@ bool TMSI::stop()
     m_pTMSIProducer->stop();
 
     //Wait until this thread (TMSI) is stopped
-    requestInterruption();
-    wait(500);
+    m_bProcessOutput = false;
+
+    if(m_OutputProcessingThread.joinable()){
+        m_OutputProcessingThread.join();
+    }
 
     // Clear all data in the buffer connected to displays and other plugins
     m_pRMTSA_TMSI->measurementData()->clear();
@@ -568,7 +573,7 @@ void TMSI::run()
     qint32 size = 0;
     MatrixXf matData;
 
-    while(!isInterruptionRequested()) {
+    while(m_bProcessOutput) {
         // Check impedances - send new impedance values to graphic scene
         if(m_pTMSIProducer->isRunning() && m_bCheckImpedances) {
             if(m_pCircularBuffer->pop(matData)) {
@@ -629,7 +634,7 @@ void TMSI::run()
 void TMSI::showImpedanceDialog()
 {
     // Open Impedance dialog only if no sampling process is active
-    if(!this->isRunning()) {
+    if(!m_bProcessOutput) {
         if(m_pTmsiImpedanceWidget == NULL) {
             m_pTmsiImpedanceWidget = QSharedPointer<TMSIImpedanceWidget>(new TMSIImpedanceWidget(this));
         }

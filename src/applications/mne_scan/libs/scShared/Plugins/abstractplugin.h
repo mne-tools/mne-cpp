@@ -50,7 +50,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QThread>
+#include <QObject>
 #include <QCoreApplication>
 #include <QSharedPointer>
 #include <QAction>
@@ -76,7 +76,7 @@ namespace SCSHAREDLIB
  *
  * @brief The AbstractPlugin class is the base interface class of all plugins.
  */
-class SCSHAREDSHARED_EXPORT AbstractPlugin : public QThread
+class SCSHAREDSHARED_EXPORT AbstractPlugin : public QObject
 {
     Q_OBJECT
 

@@ -82,6 +82,7 @@ using namespace Eigen;
 Covariance::Covariance()
 : m_iEstimationSamples(2000)
 , m_pCircularBuffer(CircularBuffer_Matrix_double::SPtr::create(40))
+, m_bProcessOutput(false)
 {
 }
 
@@ -89,7 +90,7 @@ Covariance::Covariance()
 
 Covariance::~Covariance()
 {
-    if(this->isRunning())
+    if(m_bProcessOutput)
         stop();
 }
 
@@ -158,7 +159,8 @@ void Covariance::unload()
 bool Covariance::start()
 {
     // Start thread
-    QThread::start();
+    m_bProcessOutput = true;
+    m_OutputProcessingThread = std::thread(&Covariance::run, this);
 
     return true;
 }
@@ -167,8 +169,11 @@ bool Covariance::start()
 
 bool Covariance::stop()
 {
-    requestInterruption();
-    wait(500);
+    m_bProcessOutput = false;
+
+    if(m_OutputProcessingThread.joinable()){
+        m_OutputProcessingThread.join();
+    }
 
     m_bPluginControlWidgetsInit = false;
 
@@ -249,7 +254,7 @@ void Covariance::run()
             break;
         }
         m_mutex.unlock();
-        msleep(100);
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 
     MatrixXd matData;
@@ -260,7 +265,7 @@ void Covariance::run()
     RTPROCESSINGLIB::RtCov rtCov(m_pFiffInfo);
 
     // Start processing data
-    while(!isInterruptionRequested()) {
+    while(m_bProcessOutput) {
         // Get the current data
         if(m_pCircularBuffer->pop(matData)) {
             m_mutex.lock();

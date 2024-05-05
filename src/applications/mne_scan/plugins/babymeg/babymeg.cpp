@@ -88,6 +88,7 @@ BabyMEG::BabyMEG()
 , m_sFiffProjections(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/babymeg/header.fif")
 , m_sFiffCompensators(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/babymeg/compensator.fif")
 , m_sBadChannels(QCoreApplication::applicationDirPath() + "/../resources/mne_scan/plugins/babymeg/both.bad")
+, m_bProcessOutput(false)
 {
     m_pActionSqdCtrl = new QAction(QIcon(":/images/sqdctrl.png"), tr("Squid Control"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -107,7 +108,7 @@ BabyMEG::BabyMEG()
 
 BabyMEG::~BabyMEG()
 {
-    if(this->isRunning()) {
+    if(m_bProcessOutput) {
         stop();
     }
 
@@ -208,7 +209,8 @@ bool BabyMEG::start()
     initConnector();
 
     // Start thread
-    QThread::start();
+    m_bProcessOutput = true;
+    m_OutputProcessingThread = std::thread(&BabyMEG::run, this);
 
     return true;
 }
@@ -217,8 +219,11 @@ bool BabyMEG::start()
 
 bool BabyMEG::stop()
 {
-    requestInterruption();
-    wait(2000);
+    m_bProcessOutput = false;
+
+    if(m_OutputProcessingThread.joinable()){
+        m_OutputProcessingThread.join();
+    }
 
     // Clear all data in the buffer connected to displays and other plugins
     m_pRTMSABabyMEG->measurementData()->clear();
@@ -260,13 +265,13 @@ void BabyMEG::run()
 {
     MatrixXf matValue;
 
-    while(!isInterruptionRequested()) {
+    while(m_bProcessOutput) {
         //pop matrix
         if(m_pCircularBuffer->pop(matValue)) {
             //Create digital trigger information
             createDigTrig(matValue);
 
-            if(!isInterruptionRequested()) {
+            if(m_bProcessOutput) {
                 m_pRTMSABabyMEG->measurementData()->setValue(this->calibrate(matValue));
             }
         }
@@ -352,7 +357,7 @@ void BabyMEG::setFiffData(QByteArray data)
         IOUtils::swap_floatp(rawData.data()+i);
     }
 
-    if(this->isRunning()) {
+    if(m_bProcessOutput) {
         while(!m_pCircularBuffer->push(rawData)) {
             //Do nothing until the circular buffer is ready to accept new data again
         }
