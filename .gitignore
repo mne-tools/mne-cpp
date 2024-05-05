@@ -18,9 +18,6 @@
 *.pdb
 *.qm
 
-# Bin folder with exceptions
-/lib/
-
 # External device SDKs (if installed)
 /applications/mne_scan/plugins/eegosports/eemagine/
 /applications/mne_scan/plugins/gusbamp/gtec_gUSBamp.h
@@ -55,24 +52,34 @@ ui_*.h
 *.user
 Makefile
 
+# Generated docu Docker files
+/_site
+
+# Binary data folders
+/build*
+/out*
+
+# Resources folders
+/src/external/fftw
+/resources/data*
+__pycache__/
+venv/
+/resources/**/fieldline/*.whl
+/resources/**/fieldline/sample_restart.py
+/resources/**/fieldline/venv/
+.cache/*
+
+codecov
+
 # IDE settings
 .cproject
 .project
 .settings
 .vscode
 .session
+.clang-format
 mne-cpp.pro.user*
 compile_commands.json
+CPPLINT.cfg
 
-# FFTW
-/src/external/fftw
 
-# Generated docu Docker files
-/_site
-
-/build*
-/out*
-/resources/data*
-.cache/*
-
-codecov
