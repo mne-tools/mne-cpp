@@ -189,7 +189,8 @@ inline qint32 FiffId::storageSize()
 inline bool operator== (const FiffId &a, const FiffId &b)
 {
     return (a.version == b.version &&
-            a.machid == b.machid &&
+            a.machid[0] == b.machid[0] &&
+            a.machid[1] == b.machid[1] &&
             a.time.secs == b.time.secs &&
             a.time.usecs == b.time.usecs);
 }
