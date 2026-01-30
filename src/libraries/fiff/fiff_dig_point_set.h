@@ -51,6 +51,7 @@
 #include <QList>
 
 #include "fiff_stream.h"
+#include "fiff_dig_point.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES

@@ -4,7 +4,7 @@ project(mne_cpp LANGUAGES CXX)
 ##==============================================================================
 ## Global build options
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 option(BUILD_MAC_APP_BUNDLE "Build app bundle on macos" OFF)
