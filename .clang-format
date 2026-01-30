@@ -1,0 +1,78 @@
+# .clang-format  (Qt-Creator-ish / MNE-CPP-ish)
+Language: Cpp
+
+# --- Indentation / tabs ---
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+# --- Braces / blocks ---
+BreakBeforeBraces: Attach        # class {, function {, namespace { on same line
+IndentBraces: false
+BraceWrapping:
+  AfterClass: false
+  AfterControlStatement: false
+  AfterEnum: false
+  AfterFunction: false
+  AfterNamespace: false
+  AfterStruct: false
+  AfterUnion: false
+  BeforeCatch: false
+  BeforeElse: false
+  SplitEmptyFunction: false
+  SplitEmptyRecord: false
+  SplitEmptyNamespace: false
+
+# --- Namespaces ---
+NamespaceIndentation: None
+CompactNamespaces: false
+
+# --- Access specifiers ---
+IndentAccessModifiers: false
+AccessModifierOffset: 0
+
+# --- switch/case ---
+IndentCaseLabels: false
+
+# --- Alignment ---
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignOperands: DontAlign
+AlignTrailingComments: false
+
+# --- Spacing ---
+# NOTE: clang-format cannot enforce a space before the parentheses in function
+# declarations/definitions like: MainSplashScreen::MainSplashScreen ()
+# That part would require a separate tool (e.g., clang-tidy custom check) or manual.
+SpaceBeforeParens: ControlStatements  # if (x), while (x), for (x)
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpaceInEmptyParentheses: false
+
+# Pointer/reference spacing: match "const QPixmap & pixmap"
+PointerAlignment: Left          # affects '*' placement (Type* var)
+ReferenceAlignment: Left        # puts '&' with type, not variable
+SpaceAroundPointerQualifiers: Default
+
+# --- Constructor initializer lists (your style) ---
+BreakConstructorInitializers: BeforeColon
+ConstructorInitializerIndentWidth: 0
+ContinuationIndentWidth: 0
+PackConstructorInitializers: Never
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+# results in:
+# Foo::Foo()
+# : Bar(...)
+# {
+# }
+
+# --- Line breaking / wrapping ---
+ColumnLimit: 0                  # do not wrap (keeps your long license lines)
+ReflowComments: false           # do not reflow Doxygen/license blocks
+CommentPragmas: '^//={5,}.*$'   # treat your "====" separators as pragmas (helps keep them intact)
+SortIncludes: false
+
+# --- Short statements ---
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
