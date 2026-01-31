@@ -20,10 +20,10 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v3
     - name: Install Python 3.10 version
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
-        architecture: 'x64'
+        architecture: ${{ matrix.os == 'macos-26' && 'arm64' || 'x64' }}
     - name: Install BrainFlow and LSL submodules
       run: |
         git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
@@ -106,10 +106,10 @@ jobs:
     - name: Clone repository
       uses: actions/checkout@v3
     - name: Install Python 3.10 version
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
-        architecture: 'x64'
+        architecture: ${{ matrix.os == 'macos-26' && 'arm64' || 'x64' }}
     - name: Install BrainFlow and LSL submodules
       run: |
         git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
@@ -193,10 +193,10 @@ jobs:
     - name: Clone mne-cpp test data
       run: git clone https://github.com/mne-tools/mne-cpp-test-data.git resources/data/mne-cpp-test-data
     - name: Install Python 3.10 version
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
         python-version: '3.10'
-        architecture: 'x64'
+        architecture: ${{ matrix.os == 'macos-26' && 'arm64' || 'x64' }}
     - name: Install Codecov
       if: matrix.os == 'ubuntu-24.04'
       run: |
