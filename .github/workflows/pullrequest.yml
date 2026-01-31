@@ -22,7 +22,7 @@ jobs:
     - name: Install Python 3.7 version
       uses: actions/setup-python@v4
       with:
-        python-version: '3.7'
+        python-version: '3.10'
         architecture: 'x64'
     - name: Install BrainFlow and LSL submodules
       run: |
@@ -96,7 +96,7 @@ jobs:
     - name: Install Python 3.7 version
       uses: actions/setup-python@v4
       with:
-        python-version: '3.7'
+        python-version: '3.10'
         architecture: 'x64'
     - name: Install BrainFlow and LSL submodules
       run: |
