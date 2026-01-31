@@ -1,0 +1,180 @@
+//=============================================================================================================
+/**
+ * @file     brainview.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
+ * @since    0.1.0
+ * @date     January, 2026
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2026, Christoph Dinh. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    BrainView class declaration.
+ *
+ */
+
+#ifndef BRAINVIEW_H
+#define BRAINVIEW_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "brainrenderer.h"
+#include "brainsurface.h"
+#include <QWidget>
+#include <QRhiWidget>
+#include <QMap>
+#include <QElapsedTimer>
+#include <memory> 
+
+class QLabel;
+class QTimer; 
+
+//=============================================================================================================
+/**
+ * BrainView is the main widget for the 3D brain visualization. It handles user interaction,
+ * surface loading, and coordinates with the BrainRenderer.
+ *
+ * @brief    BrainView class.
+ */
+class BrainView : public QRhiWidget
+{
+    Q_OBJECT
+
+public:
+    //=========================================================================================================
+    /**
+     * Constructor
+     *
+     * @param[in] parent     Parent widget.
+     */
+    explicit BrainView(QWidget *parent = nullptr);
+
+    //=========================================================================================================
+    /**
+     * Destructor
+     */
+    ~BrainView();
+
+    //=========================================================================================================
+    /**
+     * Load a FreeSurfer surface file.
+     *
+     * @param[in] subjectPath Path to subjects directory.
+     * @param[in] subject    Subject name.
+     * @param[in] hemi       Hemisphere ("lh" or "rh").
+     * @param[in] type       Surface type (e.g., "pial", "inflated").
+     * @return True if successful.
+     */
+    bool loadSurface(const QString &subjectPath, const QString &subject, const QString &hemi, const QString &type);
+    
+    //=========================================================================================================
+    /**
+     * Load an atlas annotation file (.annot).
+     *
+     * @param[in] subjectPath Path to subjects directory.
+     * @param[in] subject    Subject name.
+     * @param[in] hemi       Hemisphere ("lh" or "rh").
+     * @return True if successful.
+     */
+    bool loadAtlas(const QString &subjectPath, const QString &subject, const QString &hemi);
+
+public slots:
+    //=========================================================================================================
+    /**
+     * Set the active surface type to search for (e.g. "pial").
+     *
+     * @param[in] type       The surface type to activate.
+     */
+    void setActiveSurface(const QString &type);
+    
+    //=========================================================================================================
+    /**
+     * Set the shader mode (Standard, Holographic, Atlas).
+     *
+     * @param[in] mode       The shader mode to set.
+     */
+    void setShaderMode(const QString &mode);
+    
+    //=========================================================================================================
+    /**
+     * Set the overlay mode (Surface, Annotation, Scientific).
+     *
+     * @param[in] mode       The visualization mode to set.
+     */
+    void setVisualizationMode(const QString &mode);
+    
+    //=========================================================================================================
+    /**
+     * Toggle visibility of a hemisphere.
+     * 
+     * @param[in] hemiIdx    0 for LH, 1 for RH.
+     * @param[in] visible    Visibility state.
+     */
+    void setHemiVisible(int hemiIdx, bool visible);
+
+    //=========================================================================================================
+    /**
+     * Enable or disable lighting for the scene.
+     *
+     * @param[in] enabled    True to enable lighting, false to disable.
+     */
+    void setLightingEnabled(bool enabled);
+
+    //=========================================================================================================
+    /**
+     * Save a snapshot of the current view to a file.
+     */
+    void saveSnapshot();
+
+protected:
+    void initialize(QRhiCommandBuffer *cb) override;
+    void render(QRhiCommandBuffer *cb) override;
+    
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+    void wheelEvent(QWheelEvent *event) override;
+    void keyPressEvent(QKeyEvent *event) override;
+
+private:
+    std::unique_ptr<BrainRenderer> m_renderer;
+    QMap<QString, std::shared_ptr<BrainSurface>> m_surfaces;
+    std::shared_ptr<BrainSurface> m_activeSurface;
+    QString m_activeSurfaceType;
+    
+    BrainRenderer::ShaderMode m_shaderMode = BrainRenderer::Standard;
+    bool m_lightingEnabled = true;
+    
+    float m_rotation = 0.0f;
+    float m_pitch = 0.0f;
+    float m_zoom = 0.0f;
+    QPoint m_lastMousePos;
+    
+    int m_frameCount = 0;
+    QElapsedTimer m_fpsTimer;
+    QLabel *m_fpsLabel = nullptr;
+    QTimer *m_updateTimer = nullptr;
+    int m_snapshotCounter = 0;
+};
+
+#endif // BRAINVIEW_H

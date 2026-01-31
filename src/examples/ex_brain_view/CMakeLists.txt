@@ -12,9 +12,22 @@ set(QT_REQUIRED_COMPONENTS Core Gui Widgets ShaderTools)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
+message(WARNING "DEBUG: QT_VERSION_MAJOR = ${QT_VERSION_MAJOR}")
+if(TARGET Qt6::Gui)
+    message(WARNING "DEBUG: Target Qt6::Gui exists")
+else()
+    message(WARNING "DEBUG: Target Qt6::Gui DOES NOT EXIST")
+endif()
+if(TARGET Qt::Gui)
+    message(WARNING "DEBUG: Target Qt::Gui exists")
+endif()
+
 # Define the source files
 set(SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
+    main.cpp
+    brainview.cpp
+    brainrenderer.cpp
+    brainsurface.cpp
 )
 
 # Add the executable unconditionally for debugging
@@ -32,10 +45,15 @@ if(TARGET Qt6::Gui)
     # Qt6_DIR is usually <QT_PREFIX>/lib/cmake/Qt6
     # Headers are usually <QT_PREFIX>/lib/QtGui.framework/Headers/<VER>/QtGui
     
+    message(WARNING "DEBUG: Qt6_DIR = ${Qt6_DIR}")
+    message(WARNING "DEBUG: Qt6_VERSION = ${Qt6_VERSION}")
+    
     find_path(QRHI_PRIVATE_HEADER_DIR "rhi/qrhi.h"
         HINTS
-        "${Qt6_DIR}/../../../QtGui.framework/Headers/${QT_VERSION}/QtGui"
-        "${Qt6_DIR}/../../../include/QtGui/${QT_VERSION}/QtGui"
+        "${Qt6_DIR}/../../../QtGui.framework/Headers/${Qt6_VERSION}/QtGui"
+        "${Qt6_DIR}/../../../QtGui.framework/Versions/A/Headers/${Qt6_VERSION}/QtGui"
+        "${Qt6_DIR}/../../../include/QtGui/${Qt6_VERSION}/QtGui"
+        "/Users/christoph.dinh/Qt/6.10.2/macos/lib/QtGui.framework/Headers/6.10.2/QtGui"
         NO_DEFAULT_PATH
     )
     
@@ -55,12 +73,12 @@ qt_add_shaders(${MNE_CPP_EXAMPLE_TARGET} "brain_shaders"
     BASE
         "shaders"
     FILES
-        "shaders/brain.vert"
-        "shaders/brain.frag"
-        "shaders/brain_exp.vert"
-        "shaders/brain_exp.frag"
-        "shaders/brain_atlas.vert"
-        "shaders/brain_atlas.frag"
+        "shaders/standard.vert"
+        "shaders/standard.frag"
+        "shaders/holographic.vert"
+        "shaders/holographic.frag"
+        "shaders/glossy.vert"
+        "shaders/glossy.frag"
 )
 
 # Link against MNE-CPP libraries and Qt
