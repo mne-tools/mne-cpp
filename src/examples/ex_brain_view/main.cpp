@@ -351,19 +351,30 @@ private:
         m_pipelineBackColor.reset();
         
         QRhiGraphicsPipeline::TargetBlend blend;
-        blend.enable = (m_shaderMode != Standard);
-        if (blend.enable) {
+        if (m_shaderMode == Holographic) {
+            blend.enable = true;
             blend.srcColor = QRhiGraphicsPipeline::SrcAlpha;
-            blend.dstColor = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+            blend.dstColor = QRhiGraphicsPipeline::One; // Additive
             blend.srcAlpha = QRhiGraphicsPipeline::One;
-            blend.dstAlpha = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+            blend.dstAlpha = QRhiGraphicsPipeline::One;
+            
+            m_pipeline->setTargetBlends({ blend });
+            m_pipeline->setDepthTest(true);
+            m_pipeline->setDepthWrite(false);
+            m_pipeline->setDepthOp(QRhiGraphicsPipeline::Less);
+            m_pipeline->setCullMode(QRhiGraphicsPipeline::None);
+        } else {
+            blend.enable = (m_shaderMode != Standard);
+            if (blend.enable) {
+                blend.srcColor = QRhiGraphicsPipeline::SrcAlpha;
+                blend.dstColor = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+            }
+            m_pipeline->setTargetBlends({ blend });
+            m_pipeline->setDepthTest(true);
+            m_pipeline->setDepthWrite(true);
+            m_pipeline->setDepthOp(QRhiGraphicsPipeline::Less);
+            m_pipeline->setCullMode(QRhiGraphicsPipeline::Back);
         }
-        
-        m_pipeline->setTargetBlends({ blend });
-        m_pipeline->setDepthTest(true);
-        m_pipeline->setDepthWrite(true);
-        m_pipeline->setDepthOp(QRhiGraphicsPipeline::Less);
-        m_pipeline->setCullMode(QRhiGraphicsPipeline::Back);
         
         m_pipeline->setSampleCount(sampleCount());
         
