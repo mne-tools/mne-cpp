@@ -1,0 +1,68 @@
+# ============================================================================
+# Antigravity Agent Configuration
+# ============================================================================
+# This file defines which rules the agent must follow and which tools
+# it may use when modifying this repository.
+# ============================================================================
+
+version: 1
+
+# ----------------------------------------------------------------------------
+# Rule ingestion
+# ----------------------------------------------------------------------------
+rules:
+  include:
+    - rules/formatting.md
+
+  # Enforcement level for loaded rules.
+  # Values depend on Antigravity build; common ones: strict | hard | blocking.
+  enforcement: strict
+
+# ----------------------------------------------------------------------------
+# System instructions appended to the agent prompt
+# ----------------------------------------------------------------------------
+system_prompt_append: |
+  You are working in a C++ / Qt codebase.
+  Before creating or modifying any C++ source or header files:
+
+  1. Read and follow .agent/rules/formatting.md.
+  2. Insert the mandatory file header template for new files.
+  3. Run clang-format using the repository root .clang-format file.
+  4. Do not reflow license headers or separator banners.
+  5. Avoid formatting-only diffs unless required.
+
+# ----------------------------------------------------------------------------
+# Tooling permissions
+# ----------------------------------------------------------------------------
+tools:
+  enabled:
+    - clang-format
+    - git
+    - shell
+
+# ----------------------------------------------------------------------------
+# Formatting automation (optional but recommended)
+# ----------------------------------------------------------------------------
+formatting:
+  auto_run: clang-format
+  config: .clang-format
+
+# ----------------------------------------------------------------------------
+# Language / project hints
+# ----------------------------------------------------------------------------
+project:
+  languages:
+    - cpp
+    - cxx
+    - h
+    - hpp
+
+  frameworks:
+    - qt
+
+# ----------------------------------------------------------------------------
+# Safety rails for autonomous edits
+# ----------------------------------------------------------------------------
+policies:
+  avoid_large_formatting_only_commits: true
+  require_rules_compliance: true

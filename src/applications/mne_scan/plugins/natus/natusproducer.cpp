@@ -69,7 +69,7 @@ NatusProducer::NatusProducer(int iBlockSize, int iChannelSize, QObject *parent)
 , m_iMatDataSampleIterator(1)
 {
     //Init socket
-    m_pUdpSocket = QSharedPointer<QUdpSocket>(new QUdpSocket(this));
+    m_pUdpSocket = QSharedPointer<QUdpSocket>(new QUdpSocket());
     m_pUdpSocket->bind(QHostAddress::AnyIPv4, 50000);
     connect(m_pUdpSocket.data(), &QUdpSocket::readyRead,
             this, &NatusProducer::readPendingDatagrams);

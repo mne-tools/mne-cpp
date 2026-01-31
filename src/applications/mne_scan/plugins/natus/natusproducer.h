@@ -48,6 +48,7 @@
 #include <QUdpSocket>
 #include <QNetworkDatagram>
 #include <QObject>
+#include <QSharedPointer>
 
 //=============================================================================================================
 // EIGEN INCLUDES
