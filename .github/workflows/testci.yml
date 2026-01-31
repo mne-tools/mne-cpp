@@ -33,14 +33,14 @@ jobs:
       uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qt }}
-        modules: qtcharts
+        modules: qtcharts qt3d
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2025'
       uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qt }}
         arch: win64_msvc2022_64
-        modules: qtcharts
+        modules: qtcharts qt3d
     - name: Compile BrainFlow submodule (Windows)
       if: matrix.os == 'windows-2025'
       run: |
@@ -119,14 +119,14 @@ jobs:
       uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qt }}
-        modules: qtcharts
+        modules: qtcharts qt3d
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2025'
       uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qt }}
         arch: win64_msvc2022_64
-        modules: qtcharts
+        modules: qtcharts qt3d
     - name: Compile BrainFlow submodule (Windows)
       if: matrix.os == 'windows-2025'
       run: |
@@ -206,14 +206,14 @@ jobs:
       uses: jurplel/install-qt-action@v3
       with:
         version: 6.10.2
-        modules: qtcharts
+        modules: qtcharts qt3d
     - name: Install Qt (Windows)
       if: matrix.os == 'windows-2025'
       uses: jurplel/install-qt-action@v3
       with:
         version: 6.10.2
         arch: win64_msvc2022_64
-        modules: qtcharts
+        modules: qtcharts qt3d
     - name: Configure and compile MNE-CPP (Linux)
       if: matrix.os == 'ubuntu-24.04'
       run: |
