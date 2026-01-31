@@ -28,11 +28,12 @@ Build from source
 For more in depth information on how to compile the project, please follow the [build guide](https://mne-cpp.github.io/pages/development/buildguide.html). The minimum requirements to build MNE-CPP are:
 
   * Compiler
-    * Windows - [MSVC 2015](https://visualstudio.microsoft.com/vs/older-downloads/) or later
-    * Linux - [GCC 5.3.1](https://gcc.gnu.org/releases.html) or later
-    * MacOS - [Clang 3.5](https://developer.apple.com/xcode/) or later
+    * Windows - [MSVC 2022](https://visualstudio.microsoft.com/vs/) or later
+    * Linux - [GCC 13](https://gcc.gnu.org/releases.html) or later
+    * MacOS - [Clang 14](https://developer.apple.com/xcode/) or later
   * External dependencies
-    * [Qt 5.10](https://www.qt.io/) or later
+    * [Qt 6.10](https://www.qt.io/) or later
+    * [Python 3.10](https://www.python.org/) or later
 
 Releases
 --------
@@ -54,7 +55,7 @@ License
 
 MNE-CPP is **BSD-licenced** (3 clause):
 
-    Copyright (c) 2011-2021, authors of MNE-CPP. All rights reserved.
+    Copyright (c) 2011-2026, authors of MNE-CPP. All rights reserved.
 
     Redistribution and use in source and binary forms, with or without
     modification, are permitted provided that the following conditions are met:
