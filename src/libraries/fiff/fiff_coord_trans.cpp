@@ -183,7 +183,12 @@ void FiffCoordTrans::writeToStream(FiffStream* pStream)
 
 MatrixX3f FiffCoordTrans::apply_trans(const MatrixX3f& rr, bool do_move) const
 {
-    MatrixX4f rr_ones = do_move ? MatrixX4f::Ones(rr.rows(),4) : MatrixX4f::Zero(rr.rows(),4);
+    MatrixX4f rr_ones(rr.rows(), 4);
+    if(do_move) {
+        rr_ones.setOnes();
+    } else {
+        rr_ones.setZero();
+    }
     rr_ones.block(0,0,rr.rows(),3) = rr;
     return rr_ones*trans.block<3,4>(0,0).transpose();
 }
@@ -192,7 +197,12 @@ MatrixX3f FiffCoordTrans::apply_trans(const MatrixX3f& rr, bool do_move) const
 
 MatrixX3f FiffCoordTrans::apply_inverse_trans(const MatrixX3f& rr, bool do_move) const
 {
-    MatrixX4f rr_ones = do_move ? MatrixX4f::Ones(rr.rows(),4) : MatrixX4f::Zero(rr.rows(),4);
+    MatrixX4f rr_ones(rr.rows(), 4);
+    if(do_move) {
+        rr_ones.setOnes();
+    } else {
+        rr_ones.setZero();
+    }
     rr_ones.block(0,0,rr.rows(),3) = rr;
     return rr_ones*invtrans.block<3,4>(0,0).transpose();
 }
