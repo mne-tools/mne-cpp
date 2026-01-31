@@ -55,6 +55,8 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class QSplashScreen;
+
 namespace ANSHAREDLIB
 {
     class AbstractPlugin;
@@ -73,6 +75,7 @@ namespace MNEANALYZE {
 //=============================================================================================================
 
 class MainWindow;
+
 
 //=============================================================================================================
 /**
@@ -160,9 +163,11 @@ private:
 
     //=========================================================================================================
     /**
-     * This initializes the PluginManager.
+     * Initializes the plugin manager.
+     *
+     * @param[in] pSplash   Pointer to the splash screen.
      */
-    void initPluginManager();
+    void initPluginManager(QSplashScreen* pSplash = Q_NULLPTR);
 
     //=========================================================================================================
     /**

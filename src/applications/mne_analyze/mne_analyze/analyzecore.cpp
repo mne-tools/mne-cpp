@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include <functional>
+#include <QSplashScreen>
 #include "analyzecore.h"
 #include "mainwindow.h"
 #include "../libs/anShared/Plugins/abstractplugin.h"
@@ -106,7 +107,7 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
 
     //show splash screen for 1 second
     QPixmap pixmap(":/images/splashscreen_mne_analyze.png");
-    QSplashScreen splash(pixmap);
+    QSplashScreen splash(pixmap, Qt::WindowStaysOnTopHint);
     splash.show();
 
     registerMetaTypes();
@@ -114,7 +115,7 @@ AnalyzeCore::AnalyzeCore(QObject* parent)
     initGlobalData();
 
     initEventSystem();
-    initPluginManager();
+    initPluginManager(&splash);
     initMainWindow();
 
     splash.hide();
@@ -190,9 +191,16 @@ void AnalyzeCore::initEventSystem()
 
 //=============================================================================================================
 
-void AnalyzeCore::initPluginManager()
+void AnalyzeCore::initPluginManager(QSplashScreen* pSplash)
 {
     m_pPluginManager = QSharedPointer<PluginManager>::create();
+
+    if(pSplash) {
+        QObject::connect(m_pPluginManager.data(), &PluginManager::pluginLoaded,
+                         pSplash, [pSplash](const QString& msg) {
+            pSplash->showMessage(msg, Qt::AlignLeft, Qt::black);
+        });
+    }
     loadandInitPlugins();
 }
 

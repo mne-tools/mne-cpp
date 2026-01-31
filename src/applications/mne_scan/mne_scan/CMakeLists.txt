@@ -36,6 +36,7 @@ set(HEADERS
 
 set(RESOURCES
     mne_scan.qrc
+    images/appIcons/mne_scan.icns
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -91,6 +92,7 @@ endif()
 set_target_properties(${PROJECT_NAME} PROPERTIES
     MACOSX_BUNDLE_GUI_IDENTIFIER mne-cpp.org
     MACOSX_BUNDLE ${BUILD_MAC_APP_BUNDLE}
+    MACOSX_BUNDLE_ICON_FILE mne_scan.icns
     WIN32_EXECUTABLE TRUE
 )
 

@@ -95,6 +95,7 @@ void PluginManager::loadPluginsFromDirectory(const QString& dir)
 #else
     QDir pluginsDir(dir);
     foreach(const QString &file, pluginsDir.entryList(QDir::NoDotAndDotDot | QDir::Files)) {
+        emit pluginLoaded("Loading " + file);
         loadPlugin(pluginsDir.absoluteFilePath(file));
     }
 #endif
@@ -138,6 +139,7 @@ void PluginManager::initPlugins(QSharedPointer<AnalyzeData> data)
 {
     for(AbstractPlugin* plugin : m_qVecPlugins)
     {
+        emit pluginLoaded("Initializing " + plugin->getName());
         if(plugin->hasBeenInitialized() == false)
         {
             plugin->setGlobalData(data);

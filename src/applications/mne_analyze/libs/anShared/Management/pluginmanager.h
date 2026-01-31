@@ -143,7 +143,20 @@ public:
      */
     void shutdown();
 
+
+signals:
+    //=========================================================================================================
+    /**
+     * Emitted when a plugin is loaded.
+     *
+     * @param[in] msg       message to display.
+     * @param[in] alignment alignment of the message.
+     * @param[in] color     color of the message.
+     */
+    void pluginLoaded(const QString& msg);
+
 private:
+
     //=========================================================================================================
     /**
      * Insert a plugin into the vector of plugins inserted.

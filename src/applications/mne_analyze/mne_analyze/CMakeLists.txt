@@ -19,7 +19,10 @@ set(SOURCES main.cpp mainwindow.cpp analyzecore.cpp)
 
 set(HEADERS info.h mainwindow.h analyzecore.h)
 
-set(RESOURCES mne_analyze.qrc)
+set(RESOURCES
+    mne_analyze.qrc
+    resources/images/appIcons/mne_analyze.icns
+)
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES} ${HEADERS} ${RESOURCES})
@@ -81,6 +84,7 @@ endif()
 set_target_properties(${PROJECT_NAME} PROPERTIES
   MACOSX_BUNDLE_GUI_IDENTIFIER mne-cpp.org
   MACOSX_BUNDLE ${BUILD_MAC_APP_BUNDLE}
+  MACOSX_BUNDLE_ICON_FILE mne_analyze.icns
   WIN32_EXECUTABLE TRUE
 )
 
