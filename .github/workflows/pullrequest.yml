@@ -19,7 +19,7 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v3
-    - name: Install Python 3.7 version
+    - name: Install Python 3.10 version
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
@@ -93,7 +93,7 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v3
-    - name: Install Python 3.7 version
+    - name: Install Python 3.10 version
       uses: actions/setup-python@v4
       with:
         python-version: '3.10'
