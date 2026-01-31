@@ -3,7 +3,7 @@ name: TestCI
 on:
   push:
     branches:
-    - testci
+    - v2.0-dev
 
 jobs:
   MinQtDynamic:
@@ -13,8 +13,8 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        qt: [5.10.1]
-        os: [ubuntu-20.04, macos-latest, windows-2019]
+        qt: [6.10.2]
+        os: [ubuntu-24.04, macos-26, windows-2025]
 
     steps:
     - name: Clone repository
@@ -29,28 +29,28 @@ jobs:
         git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
         git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
+      if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
       uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qt }}
         modules: qtcharts
     - name: Install Qt (Windows)
-      if: matrix.os == 'windows-2019'
+      if: matrix.os == 'windows-2025'
       uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qt }}
-        arch: win64_msvc2017_64
+        arch: win64_msvc2019_64
         modules: qtcharts
     - name: Compile BrainFlow submodule (Windows)
-      if: matrix.os == 'windows-2019'
+      if: matrix.os == 'windows-2025'
       run: |
         cd applications\mne_scan\plugins\brainflowboard\brainflow
         mkdir build
         cd build
-        cmake -G "Visual Studio 16 2019" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
+        cmake -G "Visual Studio 17 2022" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=10.0 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
         cmake --build . --target install --config Release
     - name: Compile BrainFlow submodule (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
+      if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
       run: |
         cd applications/mne_scan/plugins/brainflowboard/brainflow
         mkdir build
@@ -59,15 +59,15 @@ jobs:
         make
         cmake --build build
     - name: Compile LSL submodule (Windows)
-      if: matrix.os == 'windows-2019'
+      if: matrix.os == 'windows-2025'
       run: |
         cd applications\mne_scan\plugins\lsladapter\liblsl
         mkdir build
         cd build
-        cmake .. -G "Visual Studio 16 2019" -A x64
+        cmake .. -G "Visual Studio 17 2022" -A x64
         cmake --build . --config Release --target install
     - name: Compile LSL submodule (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
+      if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
       run: |
         cd applications/mne_scan/plugins/lsladapter/liblsl
         mkdir build
@@ -76,15 +76,15 @@ jobs:
         make
         cmake --build build
     - name: Configure and compile MNE-CPP (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
+      if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
       run: |
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
         cmake --build build
     - name: Configure and compile MNE-CPP (Windows)
-      if: matrix.os == 'windows-2019'
+      if: matrix.os == 'windows-2025'
       run: |
         # Setup VS compiler
-        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\amd64\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
         cmake --build build
@@ -99,8 +99,8 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        qt: [5.15.2]
-        os: [ubuntu-20.04, macos-latest, windows-2019]
+        qt: [6.10.2]
+        os: [ubuntu-24.04, macos-26, windows-2025]
 
     steps:
     - name: Clone repository
@@ -115,28 +115,28 @@ jobs:
         git submodule update --init applications/mne_scan/plugins/brainflowboard/brainflow
         git submodule update --init applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
+      if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
       uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qt }}
         modules: qtcharts
     - name: Install Qt (Windows)
-      if: matrix.os == 'windows-2019'
+      if: matrix.os == 'windows-2025'
       uses: jurplel/install-qt-action@v3
       with:
         version: ${{ matrix.qt }}
         arch: win64_msvc2019_64
         modules: qtcharts
     - name: Compile BrainFlow submodule (Windows)
-      if: matrix.os == 'windows-2019'
+      if: matrix.os == 'windows-2025'
       run: |
         cd applications\mne_scan\plugins\brainflowboard\brainflow
         mkdir build
         cd build
-        cmake -G "Visual Studio 16 2019" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
+        cmake -G "Visual Studio 17 2022" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=10.0 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
         cmake --build . --target install --config Release
     - name: Compile BrainFlow submodule (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
+      if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
       run: |
         cd applications/mne_scan/plugins/brainflowboard/brainflow
         mkdir build
@@ -145,15 +145,15 @@ jobs:
         cmake --build build
         cmake --build build
     - name: Compile LSL submodule (Windows)
-      if: matrix.os == 'windows-2019'
+      if: matrix.os == 'windows-2025'
       run: |
         cd applications\mne_scan\plugins\lsladapter\liblsl
         mkdir build
         cd build
-        cmake .. -G "Visual Studio 16 2019" -A x64
+        cmake .. -G "Visual Studio 17 2022" -A x64
         cmake --build . --config Release --target install
     - name: Compile LSL submodule (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
+      if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
       run: |
         cd applications/mne_scan/plugins/lsladapter/liblsl
         mkdir build
@@ -162,79 +162,21 @@ jobs:
         make
         cmake --build build
     - name: Configure and compile MNE-CPP (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
+      if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
       run: |
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
         cmake --build build
     - name: Configure and compile MNE-CPP (Windows)
-      if: matrix.os == 'windows-2019'
+      if: matrix.os == 'windows-2025'
       run: |
         # Setup VS compiler
-        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
         cmake --build build
     - name: Deploy binaries
       run: |
         ./tools/deploy.bat dynamic pack
-
-  QtStatic:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      fail-fast: false
-      max-parallel: 3
-      matrix:
-        os: [ubuntu-20.04, macos-latest, windows-2019]
-
-    steps:
-    - name: Clone repository
-      uses: actions/checkout@v3
-    - name: Install Python 3.7 version
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.7'
-        architecture: 'x64'
-    - name: Install OpenGL (Linux)
-      if: matrix.os == 'ubuntu-20.04'
-      run: |
-        sudo apt-get update -q
-        sudo apt-get install build-essential libgl1-mesa-dev
-    - name: Install Qt (Linux)
-      if: matrix.os == 'ubuntu-20.04'
-      run: |
-        # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
-        wget -O qt5_5152_static_binaries_linux.tar.gz https://www.dropbox.com/s/tje7jp6tsn2dxdd/qt5_5152_static_binaries_linux.tar.gz?dl=0
-        mkdir ../Qt5_binaries
-        tar xvzf qt5_5152_static_binaries_linux.tar.gz -C ../ -P
-    - name: Install Qt (MacOS)
-      if: matrix.os == 'macos-latest'
-      run: |
-        # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
-        wget -O qt5_5152_static_binaries_macos.tar.gz https://www.dropbox.com/s/2hfv7q38k528tfz/qt5_5152_static_binaries_macos.tar.gz?dl=1
-        tar xvzf qt5_5152_static_binaries_macos.tar.gz -P
-    - name: Install Qt (Windows)
-      if: matrix.os == 'windows-2019'
-      run: |
-        # Download the pre-built static version of Qt, which was created with the generateBinaries.yml workflow
-        Invoke-WebRequest https://www.dropbox.com/s/z745z290s9pknih/qt5_5152_static_binaries_win.zip?dl=1 -OutFile .\qt5_5152_static_binaries_win.zip
-        expand-archive -path "qt5_5152_static_binaries_win.zip" -destinationpath "..\"
-    - name: Configure and compile MNE-CPP (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
-      run: |
-        ../Qt5_binaries/bin/cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-        cmake --build build
-    - name: Configure and compile MNE-CPP (Windows)
-      if: matrix.os == 'windows-2019'
-      run: |
-        # Setup VS compiler
-        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
-        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        ..\Qt5_binaries\bin\cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-        cmake --build build
-    - name: Deploy binaries
-      run: |
-        ./tools/deploy.bat static pack
 
   Tests:
     runs-on: ${{ matrix.os }}
@@ -243,7 +185,7 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        os: [ubuntu-20.04, macos-latest, windows-2019]
+        os: [ubuntu-24.04, macos-26, windows-2025]
 
     steps:
     - name: Clone repository
@@ -256,61 +198,61 @@ jobs:
         python-version: '3.7'
         architecture: 'x64'
     - name: Install Codecov
-      if: matrix.os == 'ubuntu-20.04'
+      if: matrix.os == 'ubuntu-24.04'
       run: |
         sudo pip install codecov
     - name: Install Qt (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-latest')
+      if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
       uses: jurplel/install-qt-action@v3
       with:
-        version: 5.15.0
+        version: 6.10.2
         modules: qtcharts
     - name: Install Qt (Windows)
-      if: matrix.os == 'windows-2019'
+      if: matrix.os == 'windows-2025'
       uses: jurplel/install-qt-action@v3
       with:
-        version: 5.15.2
+        version: 6.10.2
         arch: win64_msvc2019_64
         modules: qtcharts
     - name: Configure and compile MNE-CPP (Linux)
-      if: matrix.os == 'ubuntu-20.04'
+      if: matrix.os == 'ubuntu-24.04'
       run: |
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
         cmake --build build
     - name: Configure and compile MNE-CPP (MacOS)
-      if: matrix.os == 'macos-latest'
+      if: matrix.os == 'macos-26'
       run: |
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
         cmake --build build
     - name: Configure and compile MNE-CPP (Windows)
-      if: matrix.os == 'windows-2019'
+      if: matrix.os == 'windows-2025'
       run: |
         # Setup VS compiler
-        cmd.exe /c "call `"C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
         cmake --build build
     - name: Run tests (Linux)
-      if: matrix.os == 'ubuntu-20.04'
+      if: matrix.os == 'ubuntu-24.04'
       env:
         CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
         ./tools/test_all.bat verbose withCoverage
     - name: Run tests (MacOS)
-      if: matrix.os == 'macos-latest'
+      if: matrix.os == 'macos-26'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
         ./tools/test_all.bat Release verbose
     - name: Run tests (Windows)
-      if: matrix.os == 'windows-2019'
+      if: matrix.os == 'windows-2025'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
         ./tools/test_all.bat Release verbose
   Doxygen:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
 
     steps:
     - name: Clone repository
