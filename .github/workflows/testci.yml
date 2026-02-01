@@ -44,6 +44,9 @@ jobs:
     - name: Compile BrainFlow submodule (Windows)
       if: matrix.os == 'windows-2025'
       run: |
+        $path = "src\applications\mne_scan\plugins\brainflowboard\brainflow\src\board_controller\muse\muse_bglib\muse_bglib_helper.cpp"
+        $txt = "#include <chrono>`r`n" + [System.IO.File]::ReadAllText($path)
+        [System.IO.File]::WriteAllText($path, $txt)
         cd src\applications\mne_scan\plugins\brainflowboard\brainflow
         mkdir build
         cd build
@@ -128,6 +131,9 @@ jobs:
     - name: Compile BrainFlow submodule (Windows)
       if: matrix.os == 'windows-2025'
       run: |
+        $path = "src\applications\mne_scan\plugins\brainflowboard\brainflow\src\board_controller\muse\muse_bglib\muse_bglib_helper.cpp"
+        $txt = "#include <chrono>`r`n" + [System.IO.File]::ReadAllText($path)
+        [System.IO.File]::WriteAllText($path, $txt)
         cd src\applications\mne_scan\plugins\brainflowboard\brainflow
         mkdir build
         cd build
