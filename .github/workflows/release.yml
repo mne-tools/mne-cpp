@@ -88,7 +88,7 @@ jobs:
         cd src/applications/mne_scan/plugins/lsladapter/liblsl
         mkdir build
         cd build
-        cmake ..
+        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
         cmake --build .
     - name: Configure and compile MNE-CPP
       run: |
@@ -147,7 +147,7 @@ jobs:
         cd src/applications/mne_scan/plugins/lsladapter/liblsl
         mkdir build
         cd build
-        cmake ..
+        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
         cmake --build .
     - name: Configure and compile MNE-CPP
       run: |
