@@ -75,7 +75,7 @@ jobs:
       uses: jurplel/install-qt-action@v3
       with:
         version: 6.10.2
-        modules: qtcharts qt3d
+        modules: qtcharts qt3d qtshadertools
     - name: Compile BrainFlow submodule
       run: |
         cd src/applications/mne_scan/plugins/brainflowboard/brainflow
@@ -134,7 +134,7 @@ jobs:
       uses: jurplel/install-qt-action@v3
       with:
         version: 6.10.2
-        modules: qtcharts qt3d
+        modules: qtcharts qt3d qtshadertools
     - name: Compile BrainFlow submodule
       run: |
         cd src/applications/mne_scan/plugins/brainflowboard/brainflow
@@ -194,7 +194,7 @@ jobs:
       with:
         version: 6.10.2
         arch: win64_msvc2022_64
-        modules: qtcharts qt3d
+        modules: qtcharts qt3d qtshadertools
     - name: Compile BrainFlow submodule
       run: |
         cd src\applications\mne_scan\plugins\brainflowboard\brainflow
@@ -259,7 +259,7 @@ jobs:
       uses: jurplel/install-qt-action@v3
       with:
         version: 6.10.2
-        modules: qtcharts qt3d
+        modules: qtcharts qt3d qtshadertools
     - name: Configure and compile MNE-CPP
       run: |
         ./tools/build_project.bat coverage all
@@ -374,7 +374,7 @@ jobs:
         host: 'linux'
         target: 'desktop'
         arch: 'gcc_64'
-        modules: 'qtcharts qt3d'
+        modules: 'qtcharts qt3d qtshadertools'
     - name: Install Qt WASM
       uses: jurplel/install-qt-action@v3
       with:
@@ -384,7 +384,7 @@ jobs:
         host: 'linux'
         target: 'desktop'
         arch: 'wasm_multithread'
-        modules: 'qtcharts qt3d'
+        modules: 'qtcharts qt3d qtshadertools'
     - name: Setup and build WASM
       run: |
         ./tools/wasm.sh --emsdk 3.1.25
