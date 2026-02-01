@@ -17,7 +17,6 @@ set(SOURCES
     brainrenderer.cpp
     brainsurface.cpp
     sourceestimateoverlay.cpp
-    surfaceinterpolation.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -34,6 +33,7 @@ set(MNE_LIBS_REQUIRED
     mne_fiff
     mne_mne
     mne_disp
+    mne_disp3D
     mne_utils
 )
 

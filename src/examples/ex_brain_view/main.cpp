@@ -153,6 +153,11 @@ int main(int argc, char *argv[])
     minThresh->setRange(0, 1e12);
     midThresh->setRange(0, 1e12);
     maxThresh->setRange(0, 1e12);
+    
+    // Set default values (matching SourceEstimateOverlay defaults)
+    minThresh->setValue(0.0);
+    midThresh->setValue(0.5);
+    maxThresh->setValue(10.0); // Using 10.0 as a reasonable initial max for visualization
     threshLayout->addWidget(minThresh);
     threshLayout->addWidget(midThresh);
     threshLayout->addWidget(maxThresh);

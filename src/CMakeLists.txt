@@ -9,7 +9,7 @@ set(CMAKE_CXX_STANDARD 20)
 option(BUILD_SHARED_LIBS "Build using shared libraries" ON)
 option(BUILD_MAC_APP_BUNDLE "Build app bundle on macos" OFF)
 
-option(BUILD_EXAMPLES "Build examples" OFF)
+option(BUILD_EXAMPLES "Build examples" ON)
 option(BUILD_APPLICATIONS "Build applications" ON)
 option(BUILD_TESTS "Build tests" OFF)
 

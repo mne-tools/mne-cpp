@@ -40,7 +40,8 @@
 #include "brainsurface.h"
 
 #include <disp/plots/helpers/colormap.h>
-#include "surfaceinterpolation.h"
+#include <disp3D/helpers/interpolation/interpolation.h>
+#include <disp3D/helpers/geometryinfo/geometryinfo.h>
 
 #include <QFile>
 #include <QDebug>
@@ -143,7 +144,8 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface *surface, int timeIndex)
     if (interpMat && interpMat->rows() == static_cast<int>(vertexCount) && 
         interpMat->cols() == sourceData.size()) {
         // Use interpolation to spread values to all vertices
-        interpolatedData = SurfaceInterpolation::interpolateSignal(*interpMat, sourceData);
+        // Note: interpolateSignal returns by value, not QSharedPointer, so assignment matches
+        interpolatedData = DISP3DLIB::Interpolation::interpolateSignal(interpMat, QSharedPointer<Eigen::VectorXf>::create(sourceData));
     } else {
         // Fall back to sparse visualization (direct mapping)
         interpolatedData = Eigen::VectorXf::Zero(vertexCount);
@@ -306,9 +308,9 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface *surface, in
 
     qDebug() << "SourceEstimateOverlay: Computing interpolation matrix for hemi" << hemi;
 
-    // Get vertices (neighbors not needed for Euclidean interpolation)
+    // Get vertices and neighbor information needed for Dijkstra (SCDC)
     Eigen::MatrixX3f matVertices = surface->verticesAsMatrix();
-    // QVector<QVector<int>> vecNeighbors = surface->computeNeighbors();
+    QVector<QVector<int>> vecNeighbors = surface->computeNeighbors();
 
     // Build source vertex subset from STC
     QVector<int> vecSourceVertices;
@@ -320,33 +322,35 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface *surface, in
     qDebug() << "SourceEstimateOverlay: Surface has" << matVertices.rows() << "vertices,"
              << vecSourceVertices.size() << "sources";
     
-    // Debug: show source vertex range to understand coverage
-    if (!vecSourceVertices.isEmpty()) {
-        int minVert = *std::min_element(vecSourceVertices.begin(), vecSourceVertices.end());
-        int maxVert = *std::max_element(vecSourceVertices.begin(), vecSourceVertices.end());
-        qDebug() << "SourceEstimateOverlay: Source vertex range:" << minVert << "-" << maxVert
-                 << "(surface max:" << matVertices.rows() - 1 << ")";
-        
-        // Debug: show first few actual vertex indices
-        QString firstVertices, lastVertices;
-        for (int i = 0; i < qMin(5, vecSourceVertices.size()); ++i) {
-            firstVertices += QString::number(vecSourceVertices[i]) + " ";
-        }
-        for (int i = qMax(0, vecSourceVertices.size() - 5); i < vecSourceVertices.size(); ++i) {
-            lastVertices += QString::number(vecSourceVertices[i]) + " ";
-        }
-        qDebug() << "SourceEstimateOverlay: First vertices:" << firstVertices.trimmed();
-        qDebug() << "SourceEstimateOverlay: Last vertices:" << lastVertices.trimmed();
+    if (vecSourceVertices.isEmpty()) {
+        qWarning() << "SourceEstimateOverlay: No source vertices found";
+        return;
     }
 
-    // Compute interpolation matrix using fast Euclidean distance
-    // This avoids the slow geodesic distance calculation (Dijkstra)
-    *pMatPtr = SurfaceInterpolation::createInterpolationMatrixEuclidean(
+    // 1. Calculate Distance Table (Geodesic distance on surface)
+    // This uses Dijkstra's algorithm via GeometryInfo::scdc
+    // Note: This can be slow for many sources!
+    qDebug() << "SourceEstimateOverlay: Computing distance table (SCDC)...";
+    QSharedPointer<Eigen::MatrixXd> distTable = DISP3DLIB::GeometryInfo::scdc(
         matVertices,
+        vecNeighbors,
         vecSourceVertices,
-        SurfaceInterpolation::cubic,
-        cancelDist,
-        3); // 3 nearest neighbors
+        cancelDist
+    );
+
+    if (!distTable || distTable->rows() == 0) {
+        qWarning() << "SourceEstimateOverlay: Failed to compute distance table";
+        return;
+    }
+
+    // 2. Create Interpolation Matrix
+    qDebug() << "SourceEstimateOverlay: Creating interpolation matrix...";
+    *pMatPtr = DISP3DLIB::Interpolation::createInterpolationMat(
+        vecSourceVertices,
+        distTable,
+        DISP3DLIB::Interpolation::cubic,  // Use cubic interpolation function
+        cancelDist
+    );
 
     if (*pMatPtr && (*pMatPtr)->rows() > 0) {
         qDebug() << "SourceEstimateOverlay: Interpolation matrix created:" 

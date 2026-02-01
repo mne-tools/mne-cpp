@@ -246,13 +246,12 @@ void BrainView::render(QRhiCommandBuffer *cb)
     QMatrix4x4 projection;
     projection.perspective(45.0f, float(outputSize.width()) / float(outputSize.height()), 0.01f, 100.0f);
 
-    float azimuth = m_rotation * M_PI / 180.0f;
-    float elevation = m_pitch * M_PI / 180.0f;
     float distance = 0.5f - m_zoom * 0.03f;
+    QVector3D cameraPos = m_cameraRotation.rotatedVector(QVector3D(0, 0, distance));
+    QVector3D upVector = m_cameraRotation.rotatedVector(QVector3D(0, 1, 0));
 
-    QVector3D cameraPos(distance * cos(elevation) * sin(azimuth), distance * sin(elevation), distance * cos(elevation) * cos(azimuth));
     QMatrix4x4 view;
-    view.lookAt(cameraPos, QVector3D(0, 0, 0), QVector3D(0, 1, 0));
+    view.lookAt(cameraPos, QVector3D(0, 0, 0), upVector);
 
     BrainRenderer::SceneData sceneData;
     sceneData.mvp = rhi()->clipSpaceCorrMatrix();
@@ -290,11 +289,14 @@ void BrainView::mouseMoveEvent(QMouseEvent *event)
 {
     if (event->buttons() & Qt::LeftButton) {
         QPoint diff = event->pos() - m_lastMousePos;
-        m_rotation -= diff.x() * 0.5f;
-        m_pitch += diff.y() * 0.5f;
+        float speed = 0.5f;
+        // Rotate around local Y (up) and X (right) axes
+        QQuaternion paramY = QQuaternion::fromAxisAndAngle(0, 1, 0, -diff.x() * speed);
+        QQuaternion paramX = QQuaternion::fromAxisAndAngle(1, 0, 0, -diff.y() * speed);
 
-        if (m_pitch > 89.0f) m_pitch = 89.0f;
-        if (m_pitch < -89.0f) m_pitch = -89.0f;
+        // Apply rotations relative to current camera orientation
+        m_cameraRotation = m_cameraRotation * paramY * paramX;
+        m_cameraRotation.normalize();
 
         m_lastMousePos = event->pos();
         update();
@@ -346,7 +348,7 @@ bool BrainView::loadSourceEstimate(const QString &lhPath, const QString &rhPath)
             if (it.key().endsWith(m_activeSurfaceType)) {
                 int hemi = it.value()->hemi();
                 qDebug() << "BrainView: Computing interpolation for" << it.key() << "hemi" << hemi;
-                m_sourceOverlay->computeInterpolationMatrix(it.value().get(), hemi, 0.15);
+                m_sourceOverlay->computeInterpolationMatrix(it.value().get(), hemi);
             }
         }
         

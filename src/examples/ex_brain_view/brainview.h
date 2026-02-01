@@ -47,6 +47,7 @@
 #include <QMap>
 #include <QElapsedTimer>
 #include <memory> 
+#include <QQuaternion> 
 
 class QLabel;
 class QTimer; 
@@ -220,8 +221,7 @@ private:
     BrainRenderer::ShaderMode m_shaderMode = BrainRenderer::Standard;
     bool m_lightingEnabled = true;
     
-    float m_rotation = 0.0f;
-    float m_pitch = 0.0f;
+    QQuaternion m_cameraRotation;
     float m_zoom = 0.0f;
     QPoint m_lastMousePos;
     

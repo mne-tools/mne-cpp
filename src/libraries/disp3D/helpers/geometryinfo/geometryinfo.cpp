@@ -262,8 +262,10 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> matOutputDistMatri
     // outer loop, iterated for each vertex of 'vertSubset' between 'begin' and 'end'
     for (qint32 i = iBegin; i < iEnd; ++i) {
         // init phase of dijkstra: set source node for current iteration and reset data fields
-        if(i ==123)
-            qDebug() << "blabla";
+        if ((i - iBegin) > 0 && (i - iBegin) % 100 == 0) {
+            qDebug() << "GeometryInfo::iterativeDijkstra progress:" << (i - iBegin) << "/" << (iEnd - iBegin) << " (Thread range:" << iBegin << "-" << iEnd << ")";
+        }
+
         qint32 iRoot = vecVertSubset.at(i);
         vertexQ.clear();
         vecMinDists.fill(INF);

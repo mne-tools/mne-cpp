@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(ex_compute_forward.pro LANGUAGES CXX)
+project(ex_compute_forward LANGUAGES CXX)
 
 #Handle qt uic, moc, rrc automatically
 set(CMAKE_AUTOUIC ON)
