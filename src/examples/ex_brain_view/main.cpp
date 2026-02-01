@@ -47,6 +47,10 @@
 #include <QCommandLineParser>
 #include <QDebug>
 #include <QTimer>
+#include <QPushButton>
+#include <QSlider>
+#include <QDoubleSpinBox>
+#include <QFileDialog>
 
 #include "brainview.h"
 
@@ -124,7 +128,46 @@ int main(int argc, char *argv[])
     controlLayout->addWidget(rhCheck);
     controlLayout->addStretch();
     
+    // Source Estimate Group
+    QGroupBox *stcGroup = new QGroupBox("Source Estimate");
+    QVBoxLayout *stcLayout = new QVBoxLayout(stcGroup);
+    
+    QPushButton *loadStcBtn = new QPushButton("Load STC...");
+    
+    QLabel *colormapLabel = new QLabel("Colormap:");
+    QComboBox *colormapCombo = new QComboBox();
+    colormapCombo->addItems({"Hot", "Jet", "Viridis", "Cool", "RedBlue", "Bone"});
+    
+    QLabel *timeLabel = new QLabel("Time: 0.000 s");
+    QSlider *timeSlider = new QSlider(Qt::Horizontal);
+    timeSlider->setEnabled(false);
+    
+    QLabel *threshLabel = new QLabel("Thresholds:");
+    QHBoxLayout *threshLayout = new QHBoxLayout();
+    QDoubleSpinBox *minThresh = new QDoubleSpinBox();
+    QDoubleSpinBox *midThresh = new QDoubleSpinBox();
+    QDoubleSpinBox *maxThresh = new QDoubleSpinBox();
+    minThresh->setDecimals(6);
+    midThresh->setDecimals(6);
+    maxThresh->setDecimals(6);
+    minThresh->setRange(0, 1e12);
+    midThresh->setRange(0, 1e12);
+    maxThresh->setRange(0, 1e12);
+    threshLayout->addWidget(minThresh);
+    threshLayout->addWidget(midThresh);
+    threshLayout->addWidget(maxThresh);
+    
+    stcLayout->addWidget(loadStcBtn);
+    stcLayout->addWidget(colormapLabel);
+    stcLayout->addWidget(colormapCombo);
+    stcLayout->addWidget(threshLabel);
+    stcLayout->addLayout(threshLayout);
+    stcLayout->addWidget(timeSlider);
+    stcLayout->addWidget(timeLabel);
+    stcLayout->addStretch();
+    
     sideLayout->addWidget(controlGroup);
+    sideLayout->addWidget(stcGroup);
     sideLayout->addStretch();
     
     // Brain View Widget
@@ -164,6 +207,41 @@ int main(int argc, char *argv[])
     QObject::connect(rhCheck, &QCheckBox::toggled, [brainView](bool checked){
         brainView->setHemiVisible(1, checked);
     });
+    
+    // Source Estimate Connections
+    QObject::connect(loadStcBtn, &QPushButton::clicked, [&](){
+        QString lhPath = QFileDialog::getOpenFileName(nullptr, "Select LH STC", "", "STC Files (*-lh.stc *.stc)");
+        if (lhPath.isEmpty()) return;
+        QString rhPath = lhPath;
+        rhPath.replace("-lh.stc", "-rh.stc");
+        brainView->loadSourceEstimate(lhPath, rhPath);
+    });
+    
+    QObject::connect(brainView, &BrainView::sourceEstimateLoaded, [&](int numPoints){
+        timeSlider->setEnabled(true);
+        timeSlider->setRange(0, numPoints - 1);
+        timeSlider->setValue(0);
+        overlayCombo->addItem("Source Estimate");
+    });
+    
+    QObject::connect(timeSlider, &QSlider::valueChanged, brainView, &BrainView::setTimePoint);
+    
+    QObject::connect(brainView, &BrainView::timePointChanged, [&](int /*idx*/, float time){
+        timeLabel->setText(QString("Time: %1 s").arg(time, 0, 'f', 3));
+    });
+    
+    QObject::connect(colormapCombo, &QComboBox::currentTextChanged, brainView, &BrainView::setSourceColormap);
+    
+    auto updateThresholds = [&](){
+        brainView->setSourceThresholds(
+            static_cast<float>(minThresh->value()),
+            static_cast<float>(midThresh->value()),
+            static_cast<float>(maxThresh->value())
+        );
+    };
+    QObject::connect(minThresh, QOverload<double>::of(&QDoubleSpinBox::valueChanged), updateThresholds);
+    QObject::connect(midThresh, QOverload<double>::of(&QDoubleSpinBox::valueChanged), updateThresholds);
+    QObject::connect(maxThresh, QOverload<double>::of(&QDoubleSpinBox::valueChanged), updateThresholds);
     
     // Sync initial state
     brainView->setHemiVisible(0, lhCheck->isChecked());

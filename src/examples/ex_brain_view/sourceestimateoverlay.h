@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     brainsurface.h
+ * @file     sourceestimateoverlay.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
  * @date     January, 2026
@@ -28,204 +28,181 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    BrainSurface class declaration.
+ * @brief    SourceEstimateOverlay class declaration.
  *
  */
 
-#ifndef BRAINSURFACE_H
-#define BRAINSURFACE_H
+#ifndef SOURCEESTIMATEOVERLAY_H
+#define SOURCEESTIMATEOVERLAY_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include <mne/mne_sourceestimate.h>
 #include <QVector>
-#include <QVector3D>
-#include <QColor>
-#include <memory>
-#include <rhi/qrhi.h>
-#include <fs/surface.h>
-#include <fs/annotation.h>
-
-#include <Eigen/Core>
-#include <atomic>
+#include <QString>
+#include <QSharedPointer>
+#include <Eigen/Sparse>
 
 //=============================================================================================================
-// STRUCTS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-struct VertexData {
-    QVector3D pos;
-    QVector3D norm;
-    uint32_t color; // ABGR or RGBA depending on RHI
-};
+class BrainSurface;
 
 //=============================================================================================================
 /**
- * BrainSurface manages the geometry and visual properties of a single brain mesh.
+ * SourceEstimateOverlay manages source estimate data (.stc files) and applies
+ * colormap visualization to brain surfaces.
  *
- * @brief    BrainSurface class.
+ * @brief    SourceEstimateOverlay class.
  */
-class BrainSurface
+class SourceEstimateOverlay
 {
 public:
     //=========================================================================================================
     /**
-     * Default Constructor
+     * Constructor
      */
-    BrainSurface();
+    SourceEstimateOverlay();
 
     //=========================================================================================================
     /**
      * Destructor
      */
-    ~BrainSurface();
-
-    enum VisualizationMode {
-        ModeSurface,
-        ModeAnnotation,
-        ModeScientific, // Curvature
-        ModeSourceEstimate // Source estimate overlay
-    };
+    ~SourceEstimateOverlay();
 
     //=========================================================================================================
     /**
-     * Set the visibility of the surface.
+     * Load a source estimate file (.stc) for a hemisphere.
      *
-     * @param[in] visible    True if visible.
-     */
-    void setVisible(bool visible);
-
-    //=========================================================================================================
-    /**
-     * Check if the surface is visible.
-     *
-     * @return True if visible.
-     */
-    bool isVisible() const { return m_visible; }
-    
-    //=========================================================================================================
-    /**
-     * Set the hemisphere index.
-     *
-     * @param[in] hemi       0 for Left, 1 for Right.
-     */
-    void setHemi(int hemi) { m_hemi = hemi; }
-
-    //=========================================================================================================
-    /**
-     * Get the hemisphere index.
-     *
-     * @return Hemisphere index (0=LH, 1=RH).
-     */
-    int hemi() const { return m_hemi; }
-
-    //=========================================================================================================
-    /**
-     * Load geometry from a FreeSurfer surface.
-     *
-     * @param[in] surf       Input FreeSurfer surface.
-     */
-    void fromSurface(const FSLIB::Surface &surf);
-
-    //=========================================================================================================
-    /**
-     * Load annotation data from file.
-     *
-     * @param[in] path       Path to the .annot file.
+     * @param[in] path       Path to the .stc file.
+     * @param[in] hemi       Hemisphere index (0=lh, 1=rh).
      * @return True if successful.
      */
-    bool loadAnnotation(const QString &path);
+    bool loadStc(const QString &path, int hemi);
 
     //=========================================================================================================
     /**
-     * Set the visualization mode (Surface, Annotation, Scientific).
+     * Check if source estimate data is loaded.
      *
-     * @param[in] mode       VisualizationMode enum.
+     * @return True if data is loaded for at least one hemisphere.
      */
-    void setVisualizationMode(VisualizationMode mode);
+    bool isLoaded() const;
 
     //=========================================================================================================
     /**
-     * Apply source estimate colors to vertices.
+     * Apply source estimate colors to a brain surface at a given time index.
      *
-     * @param[in] colors     Vector of packed ABGR colors, one per vertex.
+     * @param[in] surface    Pointer to the brain surface.
+     * @param[in] timeIndex  Time sample index.
      */
-    void applySourceEstimateColors(const QVector<uint32_t> &colors);
-    
-    //=========================================================================================================
-    /**
-     * Update graphics buffers (vertex/index) on the GPU.
-     *
-     * @param[in] rhi        Pointer to QRhi instance.
-     * @param[in] u          Resource update batch.
-     */
-    void updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u);
-    
-    QRhiBuffer* vertexBuffer() const { return m_vertexBuffer.get(); }
-    QRhiBuffer* indexBuffer() const { return m_indexBuffer.get(); }
-    uint32_t indexCount() const { return m_indexCount; }
-    uint32_t vertexCount() const { return m_vertexData.size(); }
-    
-    //=========================================================================================================
-    /**
-     * Get minimum X coordinate.
-     *
-     * @return Minimum X value.
-     */
-    float minX() const;
+    void applyToSurface(BrainSurface *surface, int timeIndex);
 
     //=========================================================================================================
     /**
-     * Get maximum X coordinate.
+     * Compute interpolation matrix for a surface.
+     * This spreads sparse source values to all surface vertices.
      *
-     * @return Maximum X value.
+     * @param[in] surface       Pointer to the brain surface.
+     * @param[in] hemi          Hemisphere index (0=lh, 1=rh).
+     * @param[in] cancelDist    Cancel distance for interpolation (default 0.05m).
      */
-    float maxX() const;
+    void computeInterpolationMatrix(BrainSurface *surface, int hemi, double cancelDist = 0.05);
 
     //=========================================================================================================
     /**
-     * Translate all vertices along the X axis.
+     * Set the colormap to use for visualization.
      *
-     * @param[in] offset     Amount to translate.
+     * @param[in] name       Colormap name ("Hot", "Jet", "Viridis", "Cool", "RedBlue").
      */
-    void translateX(float offset);
+    void setColormap(const QString &name);
 
     //=========================================================================================================
     /**
-     * Compute neighbor vertices from triangle connectivity.
-     * Required for surface-constrained distance calculations.
+     * Get the current colormap name.
      *
-     * @return Vector of neighbor indices for each vertex.
+     * @return The colormap name.
      */
-    QVector<QVector<int>> computeNeighbors() const;
+    QString colormap() const { return m_colormap; }
 
     //=========================================================================================================
     /**
-     * Get vertex positions as Eigen matrix.
+     * Set threshold values for normalization.
+     * Values below min are transparent, values above max are clamped.
      *
-     * @return Nx3 matrix of vertex positions.
+     * @param[in] min        Minimum threshold.
+     * @param[in] mid        Mid-point threshold (used for some colormaps).
+     * @param[in] max        Maximum threshold.
      */
-    Eigen::MatrixX3f verticesAsMatrix() const;
+    void setThresholds(float min, float mid, float max);
+
+    //=========================================================================================================
+    /**
+     * Get the number of time points in the source estimate.
+     *
+     * @return Number of time samples.
+     */
+    int numTimePoints() const;
+
+    //=========================================================================================================
+    /**
+     * Get the time value at a given index.
+     *
+     * @param[in] idx        Time sample index.
+     * @return Time in seconds.
+     */
+    float timeAtIndex(int idx) const;
+
+    //=========================================================================================================
+    /**
+     * Get the minimum time value.
+     *
+     * @return Time in seconds.
+     */
+    float tmin() const;
+
+    //=========================================================================================================
+    /**
+     * Get the time step between samples.
+     *
+     * @return Time step in seconds.
+     */
+    float tstep() const;
+
+    //=========================================================================================================
+    /**
+     * Get the data range (min/max values) across all time points for auto-thresholding.
+     *
+     * @param[out] minVal    Minimum data value.
+     * @param[out] maxVal    Maximum data value.
+     */
+    void getDataRange(double &minVal, double &maxVal) const;
 
 private:
-    void updateVertexColors();
+    //=========================================================================================================
+    /**
+     * Convert a normalized value [0,1] to a color using the current colormap.
+     *
+     * @param[in] value      Normalized value in [0,1].
+     * @param[in] alpha      Alpha value for the color.
+     * @return Packed ABGR color.
+     */
+    uint32_t valueToColor(double value, uint8_t alpha = 255) const;
 
-    QVector<VertexData> m_vertexData;
-    QVector<uint32_t> m_indexData;
-    uint32_t m_indexCount = 0;
-    
-    FSLIB::Annotation m_annotation;
-    bool m_hasAnnotation = false;
-    VisualizationMode m_visMode = ModeSurface;
-    QVector<float> m_curvature;
-    
-    std::atomic<bool> m_visible{true};
-    int m_hemi = -1; // 0=lh, 1=rh
+    MNELIB::MNESourceEstimate m_stcLh;      /**< Left hemisphere source estimate. */
+    MNELIB::MNESourceEstimate m_stcRh;      /**< Right hemisphere source estimate. */
+    bool m_hasLh = false;                    /**< Flag indicating LH data loaded. */
+    bool m_hasRh = false;                    /**< Flag indicating RH data loaded. */
 
-    std::unique_ptr<QRhiBuffer> m_vertexBuffer;
-    std::unique_ptr<QRhiBuffer> m_indexBuffer;
-    bool m_bBuffersDirty = true;
+    QString m_colormap = "Hot";              /**< Current colormap name. */
+    float m_threshMin = 0.0f;                /**< Minimum threshold. */
+    float m_threshMid = 0.5f;                /**< Mid threshold. */
+    float m_threshMax = 1.0f;                /**< Maximum threshold. */
+
+    QSharedPointer<Eigen::SparseMatrix<float>> m_interpolationMatLh;  /**< LH interpolation matrix. */
+    QSharedPointer<Eigen::SparseMatrix<float>> m_interpolationMatRh;  /**< RH interpolation matrix. */
 };
 
-#endif // BRAINSURFACE_H
+#endif // SOURCEESTIMATEOVERLAY_H

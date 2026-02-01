@@ -41,6 +41,7 @@
 
 #include "brainrenderer.h"
 #include "brainsurface.h"
+#include "sourceestimateoverlay.h"
 #include <QWidget>
 #include <QRhiWidget>
 #include <QMap>
@@ -147,6 +148,60 @@ public slots:
      */
     void saveSnapshot();
 
+    //=========================================================================================================
+    /**
+     * Load source estimate files (.stc) for both hemispheres.
+     *
+     * @param[in] lhPath     Path to left hemisphere .stc file.
+     * @param[in] rhPath     Path to right hemisphere .stc file.
+     * @return True if successful.
+     */
+    bool loadSourceEstimate(const QString &lhPath, const QString &rhPath);
+
+    //=========================================================================================================
+    /**
+     * Set the current time point for source estimate visualization.
+     *
+     * @param[in] index      Time sample index.
+     */
+    void setTimePoint(int index);
+
+    //=========================================================================================================
+    /**
+     * Set the colormap for source estimate visualization.
+     *
+     * @param[in] name       Colormap name ("Hot", "Jet", etc.).
+     */
+    void setSourceColormap(const QString &name);
+
+    //=========================================================================================================
+    /**
+     * Set threshold values for source estimate visualization.
+     *
+     * @param[in] min        Minimum threshold.
+     * @param[in] mid        Mid-point threshold.
+     * @param[in] max        Maximum threshold.
+     */
+    void setSourceThresholds(float min, float mid, float max);
+
+signals:
+    //=========================================================================================================
+    /**
+     * Emitted when the time point changes.
+     *
+     * @param[in] index      Time sample index.
+     * @param[in] time       Time in seconds.
+     */
+    void timePointChanged(int index, float time);
+
+    //=========================================================================================================
+    /**
+     * Emitted when a source estimate is loaded.
+     *
+     * @param[in] numTimePoints     Number of time samples in the source estimate.
+     */
+    void sourceEstimateLoaded(int numTimePoints);
+
 protected:
     void initialize(QRhiCommandBuffer *cb) override;
     void render(QRhiCommandBuffer *cb) override;
@@ -175,6 +230,9 @@ private:
     QLabel *m_fpsLabel = nullptr;
     QTimer *m_updateTimer = nullptr;
     int m_snapshotCounter = 0;
+    
+    std::unique_ptr<SourceEstimateOverlay> m_sourceOverlay;
+    int m_currentTimePoint = 0;
 };
 
 #endif // BRAINVIEW_H

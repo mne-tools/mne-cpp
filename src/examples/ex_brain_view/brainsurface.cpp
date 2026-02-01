@@ -133,6 +133,21 @@ void BrainSurface::setVisualizationMode(VisualizationMode mode)
 
 //=============================================================================================================
 
+void BrainSurface::applySourceEstimateColors(const QVector<uint32_t> &colors)
+{
+    // Set mode to source estimate
+    m_visMode = ModeSourceEstimate;
+    
+    // Apply colors to vertices
+    for (int i = 0; i < qMin(colors.size(), m_vertexData.size()); ++i) {
+        m_vertexData[i].color = colors[i];
+    }
+    
+    m_bBuffersDirty = true;
+}
+
+//=============================================================================================================
+
 void BrainSurface::updateVertexColors()
 {
     // Reset to white first
@@ -243,3 +258,41 @@ void BrainSurface::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
     u->uploadStaticBuffer(m_indexBuffer.get(), m_indexData.constData());
     m_bBuffersDirty = false;
 }
+
+//=============================================================================================================
+
+QVector<QVector<int>> BrainSurface::computeNeighbors() const
+{
+    QVector<QVector<int>> neighbors(m_vertexData.size());
+    
+    // Triangles are stored in m_indexData as triplets
+    for (int i = 0; i + 2 < m_indexData.size(); i += 3) {
+        int v0 = m_indexData[i];
+        int v1 = m_indexData[i + 1];
+        int v2 = m_indexData[i + 2];
+        
+        // Add bidirectional edges
+        if (!neighbors[v0].contains(v1)) neighbors[v0].append(v1);
+        if (!neighbors[v0].contains(v2)) neighbors[v0].append(v2);
+        if (!neighbors[v1].contains(v0)) neighbors[v1].append(v0);
+        if (!neighbors[v1].contains(v2)) neighbors[v1].append(v2);
+        if (!neighbors[v2].contains(v0)) neighbors[v2].append(v0);
+        if (!neighbors[v2].contains(v1)) neighbors[v2].append(v1);
+    }
+    
+    return neighbors;
+}
+
+//=============================================================================================================
+
+Eigen::MatrixX3f BrainSurface::verticesAsMatrix() const
+{
+    Eigen::MatrixX3f mat(m_vertexData.size(), 3);
+    for (int i = 0; i < m_vertexData.size(); ++i) {
+        mat(i, 0) = m_vertexData[i].pos.x();
+        mat(i, 1) = m_vertexData[i].pos.y();
+        mat(i, 2) = m_vertexData[i].pos.z();
+    }
+    return mat;
+}
+

@@ -317,3 +317,86 @@ void BrainView::keyPressEvent(QKeyEvent *event)
         saveSnapshot();
     }
 }
+
+//=============================================================================================================
+
+bool BrainView::loadSourceEstimate(const QString &lhPath, const QString &rhPath)
+{
+    m_sourceOverlay = std::make_unique<SourceEstimateOverlay>();
+    
+    bool success = true;
+    
+    if (!lhPath.isEmpty()) {
+        if (!m_sourceOverlay->loadStc(lhPath, 0)) {
+            qWarning() << "BrainView: Failed to load LH source estimate:" << lhPath;
+            success = false;
+        }
+    }
+    
+    if (!rhPath.isEmpty()) {
+        if (!m_sourceOverlay->loadStc(rhPath, 1)) {
+            qWarning() << "BrainView: Failed to load RH source estimate:" << rhPath;
+            success = false;
+        }
+    }
+    
+    if (m_sourceOverlay->isLoaded()) {
+        // Compute interpolation matrices for all surfaces
+        for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+            if (it.key().endsWith(m_activeSurfaceType)) {
+                int hemi = it.value()->hemi();
+                qDebug() << "BrainView: Computing interpolation for" << it.key() << "hemi" << hemi;
+                m_sourceOverlay->computeInterpolationMatrix(it.value().get(), hemi, 0.15);
+            }
+        }
+        
+        emit sourceEstimateLoaded(m_sourceOverlay->numTimePoints());
+        setTimePoint(0);
+        return true;
+    }
+    
+    m_sourceOverlay.reset();
+    return false;
+}
+
+//=============================================================================================================
+
+void BrainView::setTimePoint(int index)
+{
+    if (!m_sourceOverlay || !m_sourceOverlay->isLoaded()) return;
+    
+    m_currentTimePoint = qBound(0, index, m_sourceOverlay->numTimePoints() - 1);
+    
+    // Apply source estimate to all surfaces matching active type
+    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+        if (it.key().endsWith(m_activeSurfaceType)) {
+            m_sourceOverlay->applyToSurface(it.value().get(), m_currentTimePoint);
+        }
+    }
+    
+    emit timePointChanged(m_currentTimePoint, m_sourceOverlay->timeAtIndex(m_currentTimePoint));
+    update();
+}
+
+//=============================================================================================================
+
+void BrainView::setSourceColormap(const QString &name)
+{
+    if (m_sourceOverlay) {
+        m_sourceOverlay->setColormap(name);
+        // Re-apply current time point with new colormap
+        setTimePoint(m_currentTimePoint);
+    }
+}
+
+//=============================================================================================================
+
+void BrainView::setSourceThresholds(float min, float mid, float max)
+{
+    if (m_sourceOverlay) {
+        m_sourceOverlay->setThresholds(min, mid, max);
+        // Re-apply current time point with new thresholds
+        setTimePoint(m_currentTimePoint);
+    }
+}
+
