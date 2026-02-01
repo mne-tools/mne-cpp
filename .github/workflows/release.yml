@@ -97,7 +97,7 @@ jobs:
       run: |
         ./tools/deploy.bat dynamic pack
     - name: Deploy binaries with stable release on Github
-      if: endsWith(github.ref, 'main') == false
+      if: startsWith(github.ref, 'refs/tags/')
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -106,7 +106,7 @@ jobs:
         tag: ${{ github.ref }}
         overwrite: true
     - name: Deploy binaries with dev release on Github
-      if: endsWith(github.ref, 'main') == true
+      if: endsWith(github.ref, 'v2.0-dev') == true
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -156,7 +156,7 @@ jobs:
       run: |
         ./tools/deploy.bat dynamic pack
     - name: Deploy binaries with stable release on Github
-      if: endsWith(github.ref, 'main') == false
+      if: startsWith(github.ref, 'refs/tags/')
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -165,7 +165,7 @@ jobs:
         tag: ${{ github.ref }}
         overwrite: true
     - name: Deploy binaries with dev release on Github
-      if: endsWith(github.ref, 'main') == true
+      if: endsWith(github.ref, 'v2.0-dev') == true
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -295,7 +295,7 @@ jobs:
       with:
         credentials: ${{secrets.GIT_CREDENTIALS}}
     - name: Deploy qch docu data base with stable release on Github
-      if: endsWith(github.ref, 'v2.0-dev') == false
+      if: startsWith(github.ref, 'refs/tags/')
       uses: svenstaro/upload-release-action@v1-release
       with:
         repo_token: ${{ secrets.GITHUB_TOKEN }}
