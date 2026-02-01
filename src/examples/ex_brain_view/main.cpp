@@ -248,6 +248,7 @@ int main(int argc, char *argv[])
     brainView->setHemiVisible(1, rhCheck->isChecked());
     
     mainLayout->addWidget(sidePanel);
+    // BrainView inherits QRhiWidget (Qt 6.7+) -> QWidget
     mainLayout->addWidget(brainView);
     
     mainWindow.resize(1200, 800);

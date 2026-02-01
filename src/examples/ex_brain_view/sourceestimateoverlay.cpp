@@ -306,9 +306,9 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface *surface, in
 
     qDebug() << "SourceEstimateOverlay: Computing interpolation matrix for hemi" << hemi;
 
-    // Get vertices and neighbors from surface
+    // Get vertices (neighbors not needed for Euclidean interpolation)
     Eigen::MatrixX3f matVertices = surface->verticesAsMatrix();
-    QVector<QVector<int>> vecNeighbors = surface->computeNeighbors();
+    // QVector<QVector<int>> vecNeighbors = surface->computeNeighbors();
 
     // Build source vertex subset from STC
     QVector<int> vecSourceVertices;
@@ -339,25 +339,20 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface *surface, in
         qDebug() << "SourceEstimateOverlay: Last vertices:" << lastVertices.trimmed();
     }
 
-    // Compute distance table using surface-constrained distances
-    QSharedPointer<Eigen::MatrixXd> matDistTable = SurfaceInterpolation::computeDistanceTable(
+    // Compute interpolation matrix using fast Euclidean distance
+    // This avoids the slow geodesic distance calculation (Dijkstra)
+    *pMatPtr = SurfaceInterpolation::createInterpolationMatrixEuclidean(
         matVertices,
-        vecNeighbors,
         vecSourceVertices,
-        cancelDist);
+        SurfaceInterpolation::cubic,
+        cancelDist,
+        3); // 3 nearest neighbors
 
-    if (matDistTable && matDistTable->rows() > 0) {
-        // Create interpolation matrix using cubic interpolation
-        *pMatPtr = SurfaceInterpolation::createInterpolationMatrix(
-            vecSourceVertices,
-            matDistTable,
-            SurfaceInterpolation::cubic,
-            cancelDist);
-
+    if (*pMatPtr && (*pMatPtr)->rows() > 0) {
         qDebug() << "SourceEstimateOverlay: Interpolation matrix created:" 
                  << (*pMatPtr)->rows() << "x" << (*pMatPtr)->cols();
     } else {
-        qWarning() << "SourceEstimateOverlay: Failed to compute distance table";
+        qWarning() << "SourceEstimateOverlay: Failed to compute interpolation matrix";
     }
 }
 

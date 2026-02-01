@@ -6,7 +6,7 @@ Subject="sample"
 Hemi=0
 
 # Construct the full path to the executable
-BuildPath="/Users/christoph.dinh/Programming/mne-cpp/out/Release/examples/ex_brain_view"
+BuildPath="/Users/christoph.dinh/Programming/mne-cpp/out/Release/examples/ex_brain_view.app/Contents/MacOS/ex_brain_view"
 
 # Kill any existing instances
 pkill -f ex_brain_view || true

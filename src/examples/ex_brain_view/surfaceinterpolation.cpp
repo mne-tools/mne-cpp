@@ -45,6 +45,8 @@
 #include <cmath>
 #include <set>
 #include <limits>
+#include <algorithm>
+#include <QFuture>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -107,7 +109,8 @@ QSharedPointer<SparseMatrix<float>> SurfaceInterpolation::createInterpolationMat
     const QVector<int> &sourceVertices,
     const QSharedPointer<MatrixXd> &distanceTable,
     InterpolationFunction interpFunc,
-    double cancelDist)
+    double cancelDist,
+    int maxNeighbors)
 {
     if (!distanceTable || distanceTable->rows() == 0 || distanceTable->cols() == 0) {
         qDebug() << "[SurfaceInterpolation] Empty distance table";
@@ -135,29 +138,221 @@ QSharedPointer<SparseMatrix<float>> SurfaceInterpolation::createInterpolationMat
             int colIdx = sourceVertices.indexOf(row);
             triplets.append(Triplet<float>(row, colIdx, 1.0f));
         } else {
-            // Interpolate from nearby sources
+            // Interpolation from nearby sources
             QVector<QPair<int, float>> nearbyWeights;
             float weightSum = 0.0f;
 
             const RowVectorXd &rowDists = distanceTable->row(row);
 
+            // Collect all valid neighbors within cancelDist
             for (int col = 0; col < numCols; ++col) {
                 float dist = rowDists[col];
                 if (dist < cancelDist) {
-                    float weight = std::fabs(1.0f / interpFunc(dist));
-                    weightSum += weight;
-                    nearbyWeights.append(qMakePair(col, weight));
+                    nearbyWeights.append(qMakePair(col, dist));
                 }
             }
 
+            // Optimization: Keep only k-nearest neighbors if maxNeighbors is set
+            if (maxNeighbors > 0 && nearbyWeights.size() > maxNeighbors) {
+                // Sort by distance (ascending)
+                std::sort(nearbyWeights.begin(), nearbyWeights.end(),
+                    [](const QPair<int, float> &a, const QPair<int, float> &b) {
+                        return a.second < b.second;
+                    });
+                
+                // Keep only top k
+                nearbyWeights.resize(maxNeighbors);
+            }
+
+            // Calculate weights for the selected neighbors
+            for (auto &nw : nearbyWeights) {
+                float dist = nw.second;
+                // Avoid division by zero for very small distances (should be handled by sourceSet check, but safety first)
+                float weight = (dist < 1e-6) ? 1.0f : std::fabs(1.0f / interpFunc(dist));
+                
+                // Update the pair's second value to be the weight instead of distance
+                nw.second = weight;
+                weightSum += weight;
+            }
+
             // Normalize weights and add to triplets
-            for (const auto &nw : nearbyWeights) {
-                triplets.append(Triplet<float>(row, nw.first, nw.second / weightSum));
+            if (weightSum > 0.0f) {
+                for (const auto &nw : nearbyWeights) {
+                    triplets.append(Triplet<float>(row, nw.first, nw.second / weightSum));
+                }
             }
         }
     }
 
     interpMatrix->setFromTriplets(triplets.begin(), triplets.end());
+    return interpMatrix;
+}
+
+//=============================================================================================================
+
+QSharedPointer<Eigen::SparseMatrix<float>> SurfaceInterpolation::createInterpolationMatrixEuclidean(
+    const Eigen::MatrixX3f &vertices,
+    const QVector<int> &sourceVertices,
+    InterpolationFunction interpFunc,
+    double cancelDist,
+    int maxNeighbors)
+{
+    if (vertices.rows() == 0 || sourceVertices.isEmpty()) {
+        qDebug() << "[SurfaceInterpolation] Empty vertices or source vertices";
+        return QSharedPointer<Eigen::SparseMatrix<float>>::create();
+    }
+
+    const int numRows = vertices.rows();
+    const int numCols = sourceVertices.size();
+    const float cancelDistSq = cancelDist * cancelDist;
+
+    // 1. Compute Bounding Box of Source Vertices
+    Eigen::Vector3f minBounds(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+    Eigen::Vector3f maxBounds(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
+
+    // Pre-calculate source positions and update bounds
+    Eigen::MatrixX3f sourcePositions(numCols, 3);
+    for(int i = 0; i < numCols; ++i) {
+        int srcIdx = sourceVertices[i];
+        if (srcIdx < 0 || srcIdx >= numRows) {
+            qWarning() << "[SurfaceInterpolation] Source vertex index out of bounds:" << srcIdx;
+            continue;
+        }
+        
+        Eigen::Vector3f pos = vertices.row(srcIdx); // Implicit transpose (1x3 -> 3x1) handled by assignment
+        sourcePositions.row(i) = pos;
+        
+        minBounds = minBounds.cwiseMin(pos);
+        maxBounds = maxBounds.cwiseMax(pos);
+    }
+
+    // 2. Setup Spatial Grid
+    // Cell size should be at least cancelDist to ensure we check enough area
+    float cellSize = std::max(static_cast<float>(cancelDist), 1e-4f);
+    
+    int dimX = std::ceil((maxBounds.x() - minBounds.x()) / cellSize) + 1;
+    int dimY = std::ceil((maxBounds.y() - minBounds.y()) / cellSize) + 1;
+    int dimZ = std::ceil((maxBounds.z() - minBounds.z()) / cellSize) + 1;
+    
+    // Flattened grid: index = x + y*dimX + z*dimX*dimY
+    QVector<QVector<int>> grid(dimX * dimY * dimZ);
+
+    // 3. Populate Grid
+    for(int i = 0; i < numCols; ++i) {
+        Eigen::Vector3f pos = sourcePositions.row(i);
+        int gx = static_cast<int>((pos.x() - minBounds.x()) / cellSize);
+        int gy = static_cast<int>((pos.y() - minBounds.y()) / cellSize);
+        int gz = static_cast<int>((pos.z() - minBounds.z()) / cellSize);
+        
+        // Clamp to be safe (though logic above should prevent overflow)
+        gx = std::clamp(gx, 0, dimX - 1);
+        gy = std::clamp(gy, 0, dimY - 1);
+        gz = std::clamp(gz, 0, dimZ - 1);
+        
+        grid[gx + gy * dimX + gz * dimX * dimY].append(i);
+    }
+
+    qDebug() << "[SurfaceInterpolation] Spatial Grid created:" << dimX << "x" << dimY << "x" << dimZ 
+             << "CellSize:" << cellSize << "Sources:" << numCols;
+
+    // 4. Parallel Neighbor Search
+    auto computeRange = [vertices, sourcePositions, grid, minBounds, cellSize, dimX, dimY, dimZ, numCols, interpFunc, cancelDistSq, maxNeighbors](int begin, int end) -> QVector<Eigen::Triplet<float>> {
+        QVector<Eigen::Triplet<float>> localTriplets;
+        localTriplets.reserve((end - begin) * (maxNeighbors > 0 ? maxNeighbors : 10));
+
+        // Offsets for 3x3x3 block search
+        int offsets[27][3];
+        int idx = 0;
+        for(int z=-1; z<=1; ++z)
+            for(int y=-1; y<=1; ++y)
+                for(int x=-1; x<=1; ++x) {
+                    offsets[idx][0] = x; offsets[idx][1] = y; offsets[idx][2] = z;
+                    idx++;
+                }
+
+        for (int row = begin; row < end; ++row) {
+            Eigen::Vector3f vPos = vertices.row(row);
+            
+            // Find grid cell for this vertex
+            int vx = static_cast<int>((vPos.x() - minBounds.x()) / cellSize);
+            int vy = static_cast<int>((vPos.y() - minBounds.y()) / cellSize);
+            int vz = static_cast<int>((vPos.z() - minBounds.z()) / cellSize);
+            
+            QVector<QPair<int, float>> neighbors;
+            
+            // Search 3x3x3 block
+            for (int i = 0; i < 27; ++i) {
+                int nx = vx + offsets[i][0];
+                int ny = vy + offsets[i][1];
+                int nz = vz + offsets[i][2];
+                
+                if (nx >= 0 && nx < dimX && ny >= 0 && ny < dimY && nz >= 0 && nz < dimZ) {
+                    const QVector<int>& cellSources = grid[nx + ny * dimX + nz * dimX * dimY];
+                    
+                    for (int srcIdx : cellSources) {
+                        float distSq = (vPos - sourcePositions.row(srcIdx).transpose()).squaredNorm();
+                        if (distSq < cancelDistSq) {
+                            neighbors.append(qMakePair(srcIdx, distSq));
+                        }
+                    }
+                }
+            }
+
+            // Optimization: Keep only k-nearest neighbors
+            if (maxNeighbors > 0 && neighbors.size() > maxNeighbors) {
+                std::partial_sort(neighbors.begin(), neighbors.begin() + maxNeighbors, neighbors.end(),
+                    [](const QPair<int, float> &a, const QPair<int, float> &b) {
+                        return a.second < b.second;
+                    });
+                neighbors.resize(maxNeighbors);
+            }
+
+            // Calculate weights
+            float weightSum = 0.0f;
+            for (auto &nw : neighbors) {
+                float dist = std::sqrt(nw.second);
+                float weight = (dist < 1e-6f) ? 1.0f : std::fabs(1.0f / interpFunc(dist));
+                nw.second = weight;
+                weightSum += weight;
+            }
+
+            if (weightSum > 0.0f) {
+                for (const auto &nw : neighbors) {
+                    localTriplets.append(Eigen::Triplet<float>(row, nw.first, nw.second / weightSum));
+                }
+            }
+        }
+        return localTriplets;
+    };
+
+    // Run in parallel
+    int coreCount = QThread::idealThreadCount();
+    if (coreCount <= 0) coreCount = 2;
+    
+    int chunkSize = numRows / coreCount;
+    if (chunkSize < 100) {
+        chunkSize = numRows;
+        coreCount = 1;
+    }
+
+    QVector<QFuture<QVector<Eigen::Triplet<float>>>> futures;
+    int start = 0;
+
+    for (int i = 0; i < coreCount; ++i) {
+        int end = (i == coreCount - 1) ? numRows : start + chunkSize;
+        futures.append(QtConcurrent::run(computeRange, start, end));
+        start = end;
+    }
+
+    QVector<Eigen::Triplet<float>> allTriplets;
+    for (auto &f : futures) {
+        f.waitForFinished();
+        allTriplets.append(f.result());
+    }
+
+    auto interpMatrix = QSharedPointer<Eigen::SparseMatrix<float>>::create(numRows, numCols);
+    interpMatrix->setFromTriplets(allTriplets.begin(), allTriplets.end());
+    
     return interpMatrix;
 }
 

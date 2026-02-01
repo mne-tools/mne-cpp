@@ -110,9 +110,30 @@ public:
      */
     static QSharedPointer<Eigen::SparseMatrix<float>> createInterpolationMatrix(
         const QVector<int> &sourceVertices,
-        const QSharedPointer<Eigen::MatrixXd> &distanceTable,
         InterpolationFunction interpFunc,
-        double cancelDist = std::numeric_limits<float>::infinity());
+        double cancelDist = std::numeric_limits<float>::infinity(),
+        int maxNeighbors = -1);
+
+    //=========================================================================================================
+    /**
+     * @brief Create sparse interpolation weight matrix using Euclidean distance (Grid/Brute-force).
+     *
+     * Faster than surface-based interpolation for initial setup, but ignores surface topology.
+     * Finds k-nearest neighbors in 3D space.
+     *
+     * @param[in] vertices         Mesh vertices (targets).
+     * @param[in] sourceVertices   Indices of source vertices.
+     * @param[in] interpFunc       Interpolation function.
+     * @param[in] cancelDist       Maximum distance.
+     * @param[in] maxNeighbors     Number of neighbors to find (k).
+     * @return Sparse interpolation matrix.
+     */
+    static QSharedPointer<Eigen::SparseMatrix<float>> createInterpolationMatrixEuclidean(
+        const Eigen::MatrixX3f &vertices,
+        const QVector<int> &sourceVertices,
+        InterpolationFunction interpFunc,
+        double cancelDist,
+        int maxNeighbors);
 
     //=========================================================================================================
     /**
