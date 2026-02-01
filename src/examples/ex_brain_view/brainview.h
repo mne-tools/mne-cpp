@@ -42,6 +42,7 @@
 #include "brainrenderer.h"
 #include "brainsurface.h"
 #include "sourceestimateoverlay.h"
+#include <mne/mne_bem.h>
 #include <QWidget>
 #include <QRhiWidget>
 #include <QMap>
@@ -101,6 +102,15 @@ public:
      */
     bool loadAtlas(const QString &subjectPath, const QString &subject, const QString &hemi);
 
+    //=========================================================================================================
+    /**
+     * Load BEM surfaces from a FIF file.
+     *
+     * @param[in] fifPath    Path to BEM FIF file.
+     * @return True if successful.
+     */
+    bool loadBem(const QString &fifPath);
+
 public slots:
     //=========================================================================================================
     /**
@@ -134,6 +144,15 @@ public slots:
      * @param[in] visible    Visibility state.
      */
     void setHemiVisible(int hemiIdx, bool visible);
+
+    //=========================================================================================================
+    /**
+     * Toggle visibility of a BEM surface layer.
+     * 
+     * @param[in] name       "head", "outer_skull", or "inner_skull".
+     * @param[in] visible    Visibility state.
+     */
+    void setBemVisible(const QString &name, bool visible);
 
     //=========================================================================================================
     /**
@@ -222,6 +241,7 @@ private:
     bool m_lightingEnabled = true;
     
     QQuaternion m_cameraRotation;
+    QVector3D m_sceneCenter = QVector3D(0,0,0);
     float m_zoom = 0.0f;
     QPoint m_lastMousePos;
     

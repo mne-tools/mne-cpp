@@ -46,6 +46,7 @@
 #include <rhi/qrhi.h>
 #include <fs/surface.h>
 #include <fs/annotation.h>
+#include <mne/mne_bem.h>
 
 #include <Eigen/Core>
 #include <atomic>
@@ -127,6 +128,15 @@ public:
      * @param[in] surf       Input FreeSurfer surface.
      */
     void fromSurface(const FSLIB::Surface &surf);
+
+    //=========================================================================================================
+    /**
+     * Load geometry from a MNE BEM surface.
+     *
+     * @param[in] surf       Input BEM surface.
+     * @param[in] color      Base color for the surface.
+     */
+    void fromBemSurface(const MNELIB::MNEBemSurface &surf, const QColor &color = Qt::white);
 
     //=========================================================================================================
     /**

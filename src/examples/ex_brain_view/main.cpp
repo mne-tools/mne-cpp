@@ -70,12 +70,14 @@ int main(int argc, char *argv[])
         QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
     QCommandLineOption subjectOption("subject", "Subject", "name", "sample");
     QCommandLineOption hemiOption("hemi", "Hemi", "hemi", "0");
-    parser.addOptions({subjectPathOption, subjectOption, hemiOption});
+    QCommandLineOption bemOption("bem", "BEM File", "path", "");
+    parser.addOptions({subjectPathOption, subjectOption, hemiOption, bemOption});
     parser.process(app);
     
     QString subPath = parser.value(subjectPathOption);
     QString subName = parser.value(subjectOption);
     int hemi = parser.value(hemiOption).toInt();
+    QString bemPath = parser.value(bemOption);
 
     QMainWindow mainWindow;
     mainWindow.setWindowTitle("MNE-CPP Brain View (Modular)");
@@ -113,10 +115,17 @@ int main(int argc, char *argv[])
     
     QCheckBox *lhCheck = new QCheckBox("Left Hemisphere");
     lhCheck->setChecked(true);
-    // lhCheck->setStyleSheet("color: white;"); // Use default style for consistency
     
     QCheckBox *rhCheck = new QCheckBox("Right Hemisphere");
     rhCheck->setChecked(true);
+    
+    // BEM Checks
+    QCheckBox *headCheck = new QCheckBox("Head Surface");
+    headCheck->setChecked(true);
+    QCheckBox *outerCheck = new QCheckBox("Outer Skull");
+    outerCheck->setChecked(true);
+    QCheckBox *innerCheck = new QCheckBox("Inner Skull");
+    innerCheck->setChecked(true);
     
     controlLayout->addWidget(surfLabel);
     controlLayout->addWidget(surfCombo);
@@ -126,6 +135,12 @@ int main(int argc, char *argv[])
     controlLayout->addWidget(shaderCombo);
     controlLayout->addWidget(lhCheck);
     controlLayout->addWidget(rhCheck);
+    
+    controlLayout->addWidget(new QLabel("------- BEM -------"));
+    controlLayout->addWidget(headCheck);
+    controlLayout->addWidget(outerCheck);
+    controlLayout->addWidget(innerCheck);
+    
     controlLayout->addStretch();
     
     // Source Estimate Group
@@ -195,6 +210,11 @@ int main(int argc, char *argv[])
     // Load Atlases (Annotations) after all surfaces are loaded
     brainView->loadAtlas(subPath, subName, "lh");
     brainView->loadAtlas(subPath, subName, "rh");
+    
+    // Load BEM
+    if (!bemPath.isEmpty()) {
+        brainView->loadBem(bemPath);
+    }
 
     // Set initial mode to Annotation (Scientific implies this too if chosen)
     // The UI default for overlayCombo is "Surface" (index 0). 
@@ -211,6 +231,16 @@ int main(int argc, char *argv[])
     });
     QObject::connect(rhCheck, &QCheckBox::toggled, [brainView](bool checked){
         brainView->setHemiVisible(1, checked);
+    });
+    
+    QObject::connect(headCheck, &QCheckBox::toggled, [brainView](bool checked){
+        brainView->setBemVisible("head", checked);
+    });
+    QObject::connect(outerCheck, &QCheckBox::toggled, [brainView](bool checked){
+        brainView->setBemVisible("outer_skull", checked);
+    });
+    QObject::connect(innerCheck, &QCheckBox::toggled, [brainView](bool checked){
+        brainView->setBemVisible("inner_skull", checked);
     });
     
     // Source Estimate Connections
@@ -251,6 +281,9 @@ int main(int argc, char *argv[])
     // Sync initial state
     brainView->setHemiVisible(0, lhCheck->isChecked());
     brainView->setHemiVisible(1, rhCheck->isChecked());
+    brainView->setBemVisible("head", headCheck->isChecked());
+    brainView->setBemVisible("outer_skull", outerCheck->isChecked());
+    brainView->setBemVisible("inner_skull", innerCheck->isChecked());
     
     mainLayout->addWidget(sidePanel);
     // BrainView inherits QRhiWidget (Qt 6.7+) -> QWidget

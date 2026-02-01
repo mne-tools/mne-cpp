@@ -100,6 +100,47 @@ void BrainSurface::fromSurface(const FSLIB::Surface &surf)
 
 //=============================================================================================================
 
+//=============================================================================================================
+
+void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface &surf, const QColor &color)
+{
+    m_vertexData.clear();
+    m_indexData.clear();
+    m_curvature.clear(); // BEM has no curvature info usually
+
+    int nVerts = surf.rr.rows();
+    m_vertexData.reserve(nVerts);
+    
+    // Compute normals if missing
+    Eigen::MatrixX3f nn = surf.nn;
+    if (nn.rows() != nVerts) {
+        nn = FSLIB::Surface::compute_normals(surf.rr, surf.tris);
+    }
+    
+    uint32_t colorVal = (color.alpha() << 24) | (color.blue() << 16) | (color.green() << 8) | color.red();
+
+    for (int i = 0; i < nVerts; ++i) {
+        VertexData v;
+        v.pos = QVector3D(surf.rr(i, 0), surf.rr(i, 1), surf.rr(i, 2));
+        v.norm = QVector3D(nn(i, 0), nn(i, 1), nn(i, 2));
+        v.color = colorVal;
+        m_vertexData.append(v);
+    }
+
+    int nTris = surf.tris.rows();
+    m_indexData.reserve(nTris * 3);
+    for (int i = 0; i < nTris; ++i) {
+        m_indexData.append(surf.tris(i, 0));
+        m_indexData.append(surf.tris(i, 1));
+        m_indexData.append(surf.tris(i, 2));
+    }
+    m_indexCount = m_indexData.size();
+    
+    m_bBuffersDirty = true;
+}
+
+//=============================================================================================================
+
 bool BrainSurface::loadAnnotation(const QString &path)
 {
     if (!FSLIB::Annotation::read(path, m_annotation)) {
