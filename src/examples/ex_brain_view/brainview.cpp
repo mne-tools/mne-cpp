@@ -236,9 +236,17 @@ void BrainView::setActiveSurface(const QString &type)
 
 void BrainView::setShaderMode(const QString &modeName)
 {
-    if (modeName == "Standard") m_shaderMode = BrainRenderer::Standard;
-    else if (modeName == "Holographic") m_shaderMode = BrainRenderer::Holographic;
-    else if (modeName == "Glossy Realistic") m_shaderMode = BrainRenderer::Atlas;
+    if (modeName == "Standard") m_brainShaderMode = BrainRenderer::Standard;
+    else if (modeName == "Holographic") m_brainShaderMode = BrainRenderer::Holographic;
+    else if (modeName == "Glossy Realistic") m_brainShaderMode = BrainRenderer::Atlas;
+    update();
+}
+
+void BrainView::setBemShaderMode(const QString &modeName)
+{
+    if (modeName == "Standard") m_bemShaderMode = BrainRenderer::Standard;
+    else if (modeName == "Holographic") m_bemShaderMode = BrainRenderer::Holographic;
+    else if (modeName == "Glossy Realistic") m_bemShaderMode = BrainRenderer::Atlas;
     update();
 }
 
@@ -286,6 +294,16 @@ void BrainView::setBemVisible(const QString &name, bool visible)
     }
 }
 
+void BrainView::setBemHighContrast(bool enabled)
+{
+    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+        if (it.key().startsWith("bem_")) {
+            it.value()->setUseDefaultColor(enabled);
+        }
+    }
+    update();
+}
+
 //=============================================================================================================
 
 void BrainView::setLightingEnabled(bool enabled)
@@ -322,7 +340,7 @@ void BrainView::render(QRhiCommandBuffer *cb)
     m_frameCount++;
     if (m_fpsTimer.elapsed() >= 500) {
         float fps = m_frameCount / (m_fpsTimer.elapsed() / 1000.0f);
-        QString modeStr = (m_shaderMode == BrainRenderer::Holographic) ? "Holographic" : (m_shaderMode == BrainRenderer::Atlas) ? "Atlas" : "Standard";
+        QString modeStr = (m_brainShaderMode == BrainRenderer::Holographic) ? "Holographic" : (m_brainShaderMode == BrainRenderer::Atlas) ? "Atlas" : "Standard";
         m_fpsLabel->setText(QString("FPS: %1\nVertices: %2\nShader: %3").arg(fps, 0, 'f', 1).arg(m_activeSurface->vertexCount()).arg(modeStr));
         m_frameCount = 0;
         m_fpsTimer.restart();
@@ -357,7 +375,8 @@ void BrainView::render(QRhiCommandBuffer *cb)
     sceneData.lightDir = cameraPos.normalized(); // Headlight
     sceneData.lightingEnabled = m_lightingEnabled;
 
-    m_renderer->initialize(rhi(), renderTarget()->renderPassDescriptor(), sampleCount(), m_shaderMode);
+    // Initialize renderer without specific mode
+    m_renderer->initialize(rhi(), renderTarget()->renderPassDescriptor(), sampleCount());
     
     m_renderer->beginFrame(cb, renderTarget());
     
@@ -368,7 +387,8 @@ void BrainView::render(QRhiCommandBuffer *cb)
         
         // Render if it's a BEM surface (always render if loaded) or matches active type (pial/inflated)
         if (isBem || isMatchingType) {
-            m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get());
+            BrainRenderer::ShaderMode mode = isBem ? m_bemShaderMode : m_brainShaderMode;
+            m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), mode);
         }
     }
     

@@ -217,13 +217,22 @@ public:
      * @return Nx3 matrix of vertex positions.
      */
     Eigen::MatrixX3f verticesAsMatrix() const;
-
+    
+    //=========================================================================================================
+    /**
+     * Set/Get whether to use the default surface color.
+     */
+    void setUseDefaultColor(bool useDefault);
+    
 private:
     void updateVertexColors();
 
     QVector<VertexData> m_vertexData;
     QVector<uint32_t> m_indexData;
     uint32_t m_indexCount = 0;
+    
+    QColor m_defaultColor = Qt::white;
+    QColor m_baseColor = Qt::white;
     
     FSLIB::Annotation m_annotation;
     bool m_hasAnnotation = false;

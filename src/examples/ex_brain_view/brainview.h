@@ -130,6 +130,14 @@ public slots:
     
     //=========================================================================================================
     /**
+     * Set the shader mode for BEM surfaces (Standard, Holographic, Atlas).
+     *
+     * @param[in] mode       The shader mode to set.
+     */
+    void setBemShaderMode(const QString &mode);
+    
+    //=========================================================================================================
+    /**
      * Set the overlay mode (Surface, Annotation, Scientific).
      *
      * @param[in] mode       The visualization mode to set.
@@ -153,6 +161,14 @@ public slots:
      * @param[in] visible    Visibility state.
      */
     void setBemVisible(const QString &name, bool visible);
+
+    //=========================================================================================================
+    /**
+     * Set whether BEM surfaces should use their standard (colorful) definition or white.
+     * 
+     * @param[in] enabled    True to use standard colors (Red/Green/Blue), False for White.
+     */
+    void setBemHighContrast(bool enabled);
 
     //=========================================================================================================
     /**
@@ -203,7 +219,7 @@ public slots:
      * @param[in] max        Maximum threshold.
      */
     void setSourceThresholds(float min, float mid, float max);
-
+    
     //=========================================================================================================
     /**
      * Get the time step of the loaded source estimate.
@@ -245,7 +261,8 @@ private:
     std::shared_ptr<BrainSurface> m_activeSurface;
     QString m_activeSurfaceType;
     
-    BrainRenderer::ShaderMode m_shaderMode = BrainRenderer::Standard;
+    BrainRenderer::ShaderMode m_brainShaderMode = BrainRenderer::Standard;
+    BrainRenderer::ShaderMode m_bemShaderMode = BrainRenderer::Standard;
     bool m_lightingEnabled = true;
     
     QQuaternion m_cameraRotation;

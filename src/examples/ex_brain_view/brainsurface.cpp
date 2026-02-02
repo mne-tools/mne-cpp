@@ -117,6 +117,8 @@ void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface &surf, const QColo
         nn = FSLIB::Surface::compute_normals(surf.rr, surf.tris);
     }
     
+    m_defaultColor = color;
+    m_baseColor = color;
     uint32_t colorVal = (color.alpha() << 24) | (color.blue() << 16) | (color.green() << 8) | color.red();
 
     for (int i = 0; i < nVerts; ++i) {
@@ -189,11 +191,20 @@ void BrainSurface::applySourceEstimateColors(const QVector<uint32_t> &colors)
 
 //=============================================================================================================
 
+void BrainSurface::setUseDefaultColor(bool useDefault)
+{
+    m_baseColor = useDefault ? m_defaultColor : Qt::white;
+    updateVertexColors();
+    m_bBuffersDirty = true;
+}
+
 void BrainSurface::updateVertexColors()
 {
-    // Reset to white first
+    uint32_t baseVal = (m_baseColor.alpha() << 24) | (m_baseColor.blue() << 16) | (m_baseColor.green() << 8) | m_baseColor.red();
+
+    // Reset to base color first
     for (auto &v : m_vertexData) {
-        v.color = 0xFFFFFFFF; 
+        v.color = baseVal; 
     }
 
     if (m_visMode == ModeAnnotation) {
@@ -218,10 +229,6 @@ void BrainSurface::updateVertexColors()
                 
                 if (colorIdx >= 0) {
                     QColor c(ct.table(colorIdx, 0), ct.table(colorIdx, 1), ct.table(colorIdx, 2), 255);
-                    // QColor to uint32_t ABGR/RGBA (little endian)
-                    // For RHI (Metal/Vulkan), typically ABGR (0xAABBGGRR)
-                    // Qt's toRgb().rgb() gives 0xAARRGGBB, we might need to swizzle in shader or here.
-                    // Assuming typical little endian reading:
                     uint32_t r = c.red();
                     uint32_t g = c.green();
                     uint32_t b = c.blue();
@@ -235,11 +242,6 @@ void BrainSurface::updateVertexColors()
         // Curvature > 0: Light Gray (Gyri)
         // Curvature <= 0: Dark Gray (Sulci)
         for (int i = 0; i < m_vertexData.size() && i < m_curvature.size(); ++i) {
-             // 0x66 = 102 (Dark), 0x99 = 153 (Light) or go higher contrast
-             // Dark Gray: 0xFF202020
-             // Standard Gray: 0xFF808080 or White?
-             // FreeSurfer style: Sulci (concave, < 0) are Dark, Gyri (convex, > 0) are Light.
-             
              uint32_t val;
              if (m_curvature[i] > 0) {
                  // Sulcus (Concave) -> Dark

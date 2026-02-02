@@ -60,13 +60,8 @@ BrainRenderer::~BrainRenderer()
 
 //=============================================================================================================
 
-void BrainRenderer::initialize(QRhi *rhi, QRhiRenderPassDescriptor *rp, int sampleCount, ShaderMode mode)
+void BrainRenderer::initialize(QRhi *rhi, QRhiRenderPassDescriptor *rp, int sampleCount)
 {
-    if (m_mode != mode) {
-        m_mode = mode;
-        m_resourcesDirty = true;
-    }
-    
     if (m_resourcesDirty) {
         createResources(rhi, rp, sampleCount);
     }
@@ -76,74 +71,88 @@ void BrainRenderer::initialize(QRhi *rhi, QRhiRenderPassDescriptor *rp, int samp
 
 void BrainRenderer::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int sampleCount)
 {
-    auto getShader = [](const QString &name) {
-        QFile f(name);
-        return f.open(QIODevice::ReadOnly) ? QShader::fromSerialized(f.readAll()) : QShader();
-    };
-
-    QString vert = (m_mode == Holographic) ? ":/holographic.vert.qsb" : (m_mode == Atlas) ? ":/glossy.vert.qsb" : ":/standard.vert.qsb";
-    QString frag = (m_mode == Holographic) ? ":/holographic.frag.qsb" : (m_mode == Atlas) ? ":/glossy.frag.qsb" : ":/standard.frag.qsb";
-
-    QShader vS = getShader(vert);
-    QShader fS = getShader(frag);
-
-    if (!vS.isValid() || !fS.isValid()) {
-        qWarning() << "BrainRenderer: Could not load shaders" << vert << frag;
-        return;
-    }
-
+    // Create Uniform Buffer
     if (!m_uniformBuffer) {
         m_uniformBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::UniformBuffer, 128));
         m_uniformBuffer->create();
     }
-
-    m_srb.reset(rhi->newShaderResourceBindings());
-    m_srb->setBindings({
-        QRhiShaderResourceBinding::uniformBuffer(0, QRhiShaderResourceBinding::VertexStage | QRhiShaderResourceBinding::FragmentStage, m_uniformBuffer.get())
-    });
-    m_srb->create();
-
-    m_pipeline.reset(rhi->newGraphicsPipeline());
-    m_pipelineBackColor.reset();
-
-    QRhiGraphicsPipeline::TargetBlend blend;
-    if (m_mode == Holographic) {
-        blend.enable = true;
-        blend.srcColor = QRhiGraphicsPipeline::SrcAlpha;
-        blend.dstColor = QRhiGraphicsPipeline::One;
-        blend.srcAlpha = QRhiGraphicsPipeline::SrcAlpha;
-        blend.dstAlpha = QRhiGraphicsPipeline::One;
+    
+    // Create SRB
+    if (!m_srb) {
+        m_srb.reset(rhi->newShaderResourceBindings());
+        m_srb->setBindings({
+            QRhiShaderResourceBinding::uniformBuffer(0, QRhiShaderResourceBinding::VertexStage | QRhiShaderResourceBinding::FragmentStage, m_uniformBuffer.get())
+        });
+        m_srb->create();
     }
-
-    auto setup = [&](std::unique_ptr<QRhiGraphicsPipeline>& p, QRhiGraphicsPipeline::CullMode cull) {
-        p->setShaderStages({{ QRhiShaderStage::Vertex, vS }, { QRhiShaderStage::Fragment, fS }});
-        
-        QRhiVertexInputLayout il;
-        il.setBindings({{ 28 }});
-        il.setAttributes({{ 0, 0, QRhiVertexInputAttribute::Float3, 0 }, 
-                          { 0, 1, QRhiVertexInputAttribute::Float3, 12 }, 
-                          { 0, 2, QRhiVertexInputAttribute::UNormByte4, 24 }});
-        p->setVertexInputLayout(il);
-        p->setShaderResourceBindings(m_srb.get());
-        p->setRenderPassDescriptor(rp);
-        p->setSampleCount(sampleCount);
-        p->setCullMode(cull);
-        if (m_mode == Holographic) {
-            p->setTargetBlends({blend});
-            p->setDepthTest(false);
-            p->setDepthWrite(false);
-        } else {
-            p->setDepthTest(true);
-            p->setDepthWrite(true);
-        }
-        p->create();
+    
+    // Shader Loader
+    auto getShader = [](const QString &name) {
+        QFile f(name);
+        return f.open(QIODevice::ReadOnly) ? QShader::fromSerialized(f.readAll()) : QShader();
     };
+    
+    // List of modes to initialize
+    QList<ShaderMode> modes = {Standard, Holographic, Atlas};
+    
+    for (ShaderMode mode : modes) {
+        QString vert = (mode == Holographic) ? ":/holographic.vert.qsb" : (mode == Atlas) ? ":/glossy.vert.qsb" : ":/standard.vert.qsb";
+        QString frag = (mode == Holographic) ? ":/holographic.frag.qsb" : (mode == Atlas) ? ":/glossy.frag.qsb" : ":/standard.frag.qsb";
+        
+        QShader vS = getShader(vert);
+        QShader fS = getShader(frag);
+        
+        if (!vS.isValid() || !fS.isValid()) {
+            qWarning() << "BrainRenderer: Could not load shaders for mode" << mode << vert << frag;
+            continue;
+        }
 
-    if (m_mode == Holographic) {
-        m_pipelineBackColor.reset(rhi->newGraphicsPipeline());
-        setup(m_pipelineBackColor, QRhiGraphicsPipeline::Front);
+        // Setup Pipeline
+        auto pipeline = std::unique_ptr<QRhiGraphicsPipeline>(rhi->newGraphicsPipeline());
+        
+        QRhiGraphicsPipeline::TargetBlend blend;
+        if (mode == Holographic) {
+             blend.enable = true;
+             blend.srcColor = QRhiGraphicsPipeline::SrcAlpha;
+             blend.dstColor = QRhiGraphicsPipeline::One;
+             blend.srcAlpha = QRhiGraphicsPipeline::SrcAlpha;
+             blend.dstAlpha = QRhiGraphicsPipeline::One;
+        }
+        
+        auto setup = [&](QRhiGraphicsPipeline* p, QRhiGraphicsPipeline::CullMode cull) {
+            p->setShaderStages({{ QRhiShaderStage::Vertex, vS }, { QRhiShaderStage::Fragment, fS }});
+            
+            QRhiVertexInputLayout il;
+            il.setBindings({{ 28 }});
+            il.setAttributes({{ 0, 0, QRhiVertexInputAttribute::Float3, 0 }, 
+                              { 0, 1, QRhiVertexInputAttribute::Float3, 12 }, 
+                              { 0, 2, QRhiVertexInputAttribute::UNormByte4, 24 }});
+            p->setVertexInputLayout(il);
+            p->setShaderResourceBindings(m_srb.get());
+            p->setRenderPassDescriptor(rp);
+            p->setSampleCount(sampleCount);
+            p->setCullMode(cull);
+            if (mode == Holographic) {
+                p->setTargetBlends({blend});
+                p->setDepthTest(false);
+                p->setDepthWrite(false);
+            } else {
+                p->setDepthTest(true);
+                p->setDepthWrite(true);
+            }
+            p->create();
+        };
+
+        if (mode == Holographic) {
+            auto pipelineBack = std::unique_ptr<QRhiGraphicsPipeline>(rhi->newGraphicsPipeline());
+            setup(pipelineBack.get(), QRhiGraphicsPipeline::Front);
+            m_pipelinesBackColor[mode] = std::move(pipelineBack);
+            setup(pipeline.get(), QRhiGraphicsPipeline::Back); // Front faces
+        } else {
+             setup(pipeline.get(), QRhiGraphicsPipeline::Back);
+        }
+        m_pipelines[mode] = std::move(pipeline);
     }
-    setup(m_pipeline, QRhiGraphicsPipeline::Back);
 
     m_resourcesDirty = false;
 }
@@ -165,9 +174,15 @@ void BrainRenderer::endFrame(QRhiCommandBuffer *cb)
 
 //=============================================================================================================
 
-void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, BrainSurface *surface)
+void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, BrainSurface *surface, ShaderMode mode)
 {
-    if (!surface || !m_pipeline || !surface->isVisible()) return;
+    if (!surface || !surface->isVisible()) return;
+
+    // Check if pipeline for this mode exists
+    if (m_pipelines.find(mode) == m_pipelines.end()) return;
+    
+    auto *pipeline = m_pipelines[mode].get();
+    if (!pipeline) return;
 
     QRhiResourceUpdateBatch *u = rhi->nextResourceUpdateBatch();
     surface->updateBuffers(rhi, u);
@@ -188,6 +203,9 @@ void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
         cb->drawIndexed(surface->indexCount());
     };
 
-    if (m_pipelineBackColor) draw(m_pipelineBackColor.get());
-    draw(m_pipeline.get());
+    if (mode == Holographic && m_pipelinesBackColor.count(Holographic) > 0) {
+        draw(m_pipelinesBackColor[Holographic].get());
+    }
+    
+    draw(pipeline);
 }

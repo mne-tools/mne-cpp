@@ -100,11 +100,26 @@ int main(int argc, char *argv[])
     surfCombo->addItems({"pial", "inflated", "white"});
     
     // Controls: Shader Mode (Material)
-    QLabel *shaderLabel = new QLabel("Shader:");
+    QLabel *shaderLabel = new QLabel("Brain Shader:");
     QComboBox *shaderCombo = new QComboBox();
     shaderCombo->addItem("Standard");
     shaderCombo->addItem("Holographic");
     shaderCombo->addItem("Glossy Realistic");
+
+    QLabel *bemShaderLabel = new QLabel("Head Shader:");
+    QComboBox *bemShaderCombo = new QComboBox();
+    bemShaderCombo->addItem("Standard");
+    bemShaderCombo->addItem("Holographic");
+    bemShaderCombo->addItem("Glossy Realistic");
+    bemShaderCombo->setEnabled(false); // Disabled by default as linked
+
+    QCheckBox *linkShadersCheck = new QCheckBox("Link Shaders");
+    linkShadersCheck->setChecked(true);
+    linkShadersCheck->setToolTip("When checked, Head Shader follows Brain Shader selection.");
+
+    QCheckBox *bemColorCheck = new QCheckBox("Show BEM Colors");
+    bemColorCheck->setChecked(true);
+    bemColorCheck->setToolTip("Toggle between standard Red/Green/Blue colors and White/Overlay colors.");
     
     // Controls: Overlay (Data)
     QLabel *overlayLabel = new QLabel("Overlay:");
@@ -133,10 +148,15 @@ int main(int argc, char *argv[])
     controlLayout->addWidget(overlayCombo);
     controlLayout->addWidget(shaderLabel);
     controlLayout->addWidget(shaderCombo);
+    controlLayout->addWidget(linkShadersCheck);
+    controlLayout->addWidget(bemColorCheck);
+    controlLayout->addWidget(bemShaderLabel);
+    controlLayout->addWidget(bemShaderCombo);
     controlLayout->addWidget(lhCheck);
     controlLayout->addWidget(rhCheck);
     
     controlLayout->addWidget(new QLabel("------- BEM -------"));
+    // bemColorCheck moved above
     controlLayout->addWidget(headCheck);
     controlLayout->addWidget(outerCheck);
     controlLayout->addWidget(innerCheck);
@@ -242,7 +262,49 @@ int main(int argc, char *argv[])
 
     // Connections
     QObject::connect(surfCombo, &QComboBox::currentTextChanged, brainView, &BrainView::setActiveSurface);
+    
+    // Handle Inflated Surface Logic (Disable BEM)
+    QObject::connect(surfCombo, &QComboBox::currentTextChanged, [=](const QString &text){
+        bool isInflated = (text == "inflated");
+        
+        if (isInflated) {
+            // Uncheck to hide
+            headCheck->setChecked(false);
+            outerCheck->setChecked(false);
+            innerCheck->setChecked(false);
+            
+            // Disable
+            headCheck->setEnabled(false);
+            outerCheck->setEnabled(false);
+            innerCheck->setEnabled(false);
+        } else {
+            // Enable
+            headCheck->setEnabled(true);
+            outerCheck->setEnabled(true);
+            innerCheck->setEnabled(true);
+        }
+    });
+    
+    // Shader Connections
+    // Brain Shader updates model
     QObject::connect(shaderCombo, &QComboBox::currentTextChanged, brainView, &BrainView::setShaderMode);
+    // Also update BEM shader if linked
+    QObject::connect(shaderCombo, &QComboBox::currentTextChanged, [=](const QString &text){
+        if (linkShadersCheck->isChecked()) {
+            bemShaderCombo->setCurrentText(text);
+        }
+    });
+
+    // BEM Shader updates BEM model
+    QObject::connect(bemShaderCombo, &QComboBox::currentTextChanged, brainView, &BrainView::setBemShaderMode);
+    
+    // Link Checkbox Logic
+    QObject::connect(linkShadersCheck, &QCheckBox::toggled, [=](bool checked){
+        bemShaderCombo->setEnabled(!checked);
+        if (checked) {
+            bemShaderCombo->setCurrentText(shaderCombo->currentText());
+        }
+    });
     QObject::connect(overlayCombo, &QComboBox::currentTextChanged, brainView, &BrainView::setVisualizationMode);
     
     QObject::connect(lhCheck, &QCheckBox::toggled, [brainView](bool checked){
@@ -261,6 +323,7 @@ int main(int argc, char *argv[])
     QObject::connect(innerCheck, &QCheckBox::toggled, [brainView](bool checked){
         brainView->setBemVisible("inner_skull", checked);
     });
+    QObject::connect(bemColorCheck, &QCheckBox::toggled, brainView, &BrainView::setBemHighContrast);
     
     // Source Estimate Connections
     QObject::connect(loadStcBtn, &QPushButton::clicked, [&](){
@@ -308,8 +371,6 @@ int main(int argc, char *argv[])
             static_cast<float>(maxThresh->value())
         );
     };
-    QObject::connect(minThresh, QOverload<double>::of(&QDoubleSpinBox::valueChanged), updateThresholds);
-    QObject::connect(midThresh, QOverload<double>::of(&QDoubleSpinBox::valueChanged), updateThresholds);
     QObject::connect(minThresh, QOverload<double>::of(&QDoubleSpinBox::valueChanged), updateThresholds);
     QObject::connect(midThresh, QOverload<double>::of(&QDoubleSpinBox::valueChanged), updateThresholds);
     QObject::connect(maxThresh, QOverload<double>::of(&QDoubleSpinBox::valueChanged), updateThresholds);

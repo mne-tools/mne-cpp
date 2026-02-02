@@ -42,6 +42,7 @@
 #include <rhi/qrhi.h>
 #include <QMatrix4x4>
 #include <QVector3D>
+#include <map>
 #include <memory>
 #include "brainsurface.h"
 
@@ -82,13 +83,13 @@ public:
     //=========================================================================================================
     /**
      * Initialize resources (shaders, pipelines) for the given RHI and render pass.
+     * Ensures pipelines for all supported modes are created.
      *
      * @param[in] rhi        Pointer to QRhi instance.
      * @param[in] rp         Render pass descriptor.
      * @param[in] sampleCount  MSAA sample count.
-     * @param[in] mode       Shader mode to use.
      */
-    void initialize(QRhi *rhi, QRhiRenderPassDescriptor *rp, int sampleCount, ShaderMode mode);
+    void initialize(QRhi *rhi, QRhiRenderPassDescriptor *rp, int sampleCount);
     
     //=========================================================================================================
     /**
@@ -107,8 +108,9 @@ public:
      * @param[in] rhi        QRhi pointer.
      * @param[in] data       Scene uniforms (MVP, light, etc).
      * @param[in] surface    Pointer to surface to draw.
+     * @param[in] mode       Shader mode to use for this surface.
      */
-    void renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, BrainSurface *surface);
+    void renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, BrainSurface *surface, ShaderMode mode);
 
     //=========================================================================================================
     /**
@@ -122,11 +124,13 @@ private:
     void createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int sampleCount);
     
     std::unique_ptr<QRhiShaderResourceBindings> m_srb;
-    std::unique_ptr<QRhiGraphicsPipeline> m_pipeline;
-    std::unique_ptr<QRhiGraphicsPipeline> m_pipelineBackColor; // For Holographic back faces
+    
+    // Pipelines for each mode
+    std::map<ShaderMode, std::unique_ptr<QRhiGraphicsPipeline>> m_pipelines;
+    std::map<ShaderMode, std::unique_ptr<QRhiGraphicsPipeline>> m_pipelinesBackColor; // For Holographic back faces
+    
     std::unique_ptr<QRhiBuffer> m_uniformBuffer;
     
-    ShaderMode m_mode = Standard;
     bool m_resourcesDirty = true;
 };
 
