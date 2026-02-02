@@ -501,3 +501,13 @@ void BrainView::setSourceThresholds(float min, float mid, float max)
     }
 }
 
+//=============================================================================================================
+
+float BrainView::stcStep() const
+{
+    if (m_sourceOverlay && m_sourceOverlay->isLoaded()) {
+        return m_sourceOverlay->tstep();
+    }
+    return 0.0f;
+}
+

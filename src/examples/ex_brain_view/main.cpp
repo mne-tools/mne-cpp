@@ -176,12 +176,31 @@ int main(int argc, char *argv[])
     threshLayout->addWidget(minThresh);
     threshLayout->addWidget(midThresh);
     threshLayout->addWidget(maxThresh);
+
+    // Playback Controls
+    QLabel *playbackLabel = new QLabel("Playback:");
+    QHBoxLayout *playbackLayout = new QHBoxLayout();
+    QPushButton *playButton = new QPushButton("Play");
+    QComboBox *speedCombo = new QComboBox();
+    speedCombo->addItem("0.1x", 0.1);
+    speedCombo->addItem("0.25x", 0.25);
+    speedCombo->addItem("0.5x", 0.5);
+    speedCombo->addItem("1.0x", 1.0);
+    speedCombo->addItem("2.0x", 2.0);
+    speedCombo->setCurrentIndex(3); // Default 1.0x
+
+    playbackLayout->addWidget(playButton);
+    playbackLayout->addWidget(speedCombo);
+    
+    QTimer *stcTimer = new QTimer();
     
     stcLayout->addWidget(loadStcBtn);
     stcLayout->addWidget(colormapLabel);
     stcLayout->addWidget(colormapCombo);
     stcLayout->addWidget(threshLabel);
     stcLayout->addLayout(threshLayout);
+    stcLayout->addWidget(playbackLabel);
+    stcLayout->addLayout(playbackLayout);
     stcLayout->addWidget(timeSlider);
     stcLayout->addWidget(timeLabel);
     stcLayout->addStretch();
@@ -256,7 +275,22 @@ int main(int argc, char *argv[])
         timeSlider->setEnabled(true);
         timeSlider->setRange(0, numPoints - 1);
         timeSlider->setValue(0);
+        timeSlider->setEnabled(true);
+        timeSlider->setRange(0, numPoints - 1);
+        timeSlider->setValue(0);
         overlayCombo->addItem("Source Estimate");
+        
+        // Reset playback
+        playButton->setText("Play");
+        stcTimer->stop();
+        
+        // Calculate interval
+        float tstep = brainView->stcStep();
+        if (tstep > 0) {
+            double factor = speedCombo->currentData().toDouble();
+            int interval = static_cast<int>((tstep * 1000.0f) / factor);
+            stcTimer->setInterval(interval);
+        }
     });
     
     QObject::connect(timeSlider, &QSlider::valueChanged, brainView, &BrainView::setTimePoint);
@@ -276,7 +310,37 @@ int main(int argc, char *argv[])
     };
     QObject::connect(minThresh, QOverload<double>::of(&QDoubleSpinBox::valueChanged), updateThresholds);
     QObject::connect(midThresh, QOverload<double>::of(&QDoubleSpinBox::valueChanged), updateThresholds);
+    QObject::connect(minThresh, QOverload<double>::of(&QDoubleSpinBox::valueChanged), updateThresholds);
+    QObject::connect(midThresh, QOverload<double>::of(&QDoubleSpinBox::valueChanged), updateThresholds);
     QObject::connect(maxThresh, QOverload<double>::of(&QDoubleSpinBox::valueChanged), updateThresholds);
+
+    // Playback Logic
+    QObject::connect(playButton, &QPushButton::clicked, [=](){
+        if (stcTimer->isActive()) {
+            stcTimer->stop();
+            playButton->setText("Play");
+        } else {
+            stcTimer->start();
+            playButton->setText("Pause");
+        }
+    });
+    
+    QObject::connect(speedCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [=](){
+        float tstep = brainView->stcStep();
+        if (tstep > 0) {
+            double factor = speedCombo->currentData().toDouble();
+            int interval = static_cast<int>((tstep * 1000.0f) / factor);
+            stcTimer->setInterval(interval);
+        }
+    });
+
+    QObject::connect(stcTimer, &QTimer::timeout, [=](){
+        int next = timeSlider->value() + 1;
+        if (next >= timeSlider->maximum()) {
+            next = 0; // Loop
+        }
+        timeSlider->setValue(next);
+    });
     
     // Sync initial state
     brainView->setHemiVisible(0, lhCheck->isChecked());

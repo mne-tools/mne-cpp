@@ -204,6 +204,14 @@ public slots:
      */
     void setSourceThresholds(float min, float mid, float max);
 
+    //=========================================================================================================
+    /**
+     * Get the time step of the loaded source estimate.
+     * 
+     * @return Time step in seconds. Returns 0 if not loaded.
+     */
+    float stcStep() const;
+
 signals:
     //=========================================================================================================
     /**
