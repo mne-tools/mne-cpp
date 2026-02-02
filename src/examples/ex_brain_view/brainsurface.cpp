@@ -141,6 +141,54 @@ void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface &surf, const QColo
     m_bBuffersDirty = true;
 }
 
+void BrainSurface::createFromData(const Eigen::MatrixX3f &vertices, const Eigen::MatrixX3i &triangles, const QColor &color)
+{
+    // Compute spherical normals (legacy behavior / fallback)
+    // Note: detailed normals should be passed via the overload for specific shapes
+    Eigen::MatrixX3f normals(vertices.rows(), 3);
+    for(int i=0; i<vertices.rows(); ++i) {
+        QVector3D p(vertices(i, 0), vertices(i, 1), vertices(i, 2));
+        QVector3D n = p.normalized();
+        normals(i, 0) = n.x();
+        normals(i, 1) = n.y();
+        normals(i, 2) = n.z();
+    }
+    createFromData(vertices, normals, triangles, color);
+}
+
+void BrainSurface::createFromData(const Eigen::MatrixX3f &vertices, const Eigen::MatrixX3f &normals, const Eigen::MatrixX3i &triangles, const QColor &color)
+{
+    m_vertexData.clear();
+    m_indexData.clear();
+    m_curvature.clear(); 
+
+    int nVerts = vertices.rows();
+    m_vertexData.reserve(nVerts);
+    
+    m_defaultColor = color;
+    m_baseColor = color;
+    uint32_t colorVal = (color.alpha() << 24) | (color.blue() << 16) | (color.green() << 8) | color.red();
+
+    for (int i = 0; i < nVerts; ++i) {
+        VertexData v;
+        v.pos = QVector3D(vertices(i, 0), vertices(i, 1), vertices(i, 2));
+        v.norm = QVector3D(normals(i, 0), normals(i, 1), normals(i, 2));
+        v.color = colorVal;
+        m_vertexData.append(v);
+    }
+
+    int nTris = triangles.rows();
+    m_indexData.reserve(nTris * 3);
+    for (int i = 0; i < nTris; ++i) {
+        m_indexData.append(triangles(i, 0));
+        m_indexData.append(triangles(i, 1));
+        m_indexData.append(triangles(i, 2));
+    }
+    m_indexCount = m_indexData.size();
+    
+    m_bBuffersDirty = true;
+}
+
 //=============================================================================================================
 
 bool BrainSurface::loadAnnotation(const QString &path)

@@ -50,8 +50,14 @@
 #include <mne/mne_surface.h>
 #include <fs/surfaceset.h>
 #include <fs/surface.h>
+#include <fiff/fiff.h>
+#include <fiff/fiff_dig_point_set.h>
+#include <fiff/fiff_info.h>
+#include <fiff/fiff_stream.h>
 
 using namespace FSLIB;
+using namespace FIFFLIB;
+using namespace MNELIB;
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -217,6 +223,253 @@ bool BrainView::loadBem(const QString &fifPath)
     return true;
 }
 
+bool BrainView::loadSensors(const QString &fifPath)
+{
+    QFile file(fifPath);
+    if (!file.exists()) {
+        qWarning() << "BrainView: File does not exist:" << fifPath;
+        return false;
+    }
+
+    // Read Fiff Info using FiffStream
+    FiffInfo info;
+    FiffDigPointSet digSet;
+    FiffStream::SPtr stream;
+    FiffDirNode::SPtr tree;
+    
+    // 1. Try to read as a raw/evoked file to get Info
+    stream = FiffStream::SPtr(new FiffStream(&file));
+    if (!stream->open()) {
+        qWarning() << "BrainView: Failed to open stream:" << fifPath;
+        return false;
+    }
+
+    tree = stream->dirtree();
+    // Read info
+    FiffDirNode::SPtr nodeInfo;
+    if(!stream->read_meas_info(tree, info, nodeInfo)) {
+        qWarning() << "BrainView: Failed to read measurement info";
+        return false;
+    }
+    
+    // Use the loaded info
+    bool hasInfo = !info.isEmpty();
+
+    if (hasInfo) {
+        // Extract MEG/EEG
+        qDebug() << "BrainView: Loaded Info. Channels:" << info.chs.size();
+        
+        m_megSensors.clear();
+        m_eegSensors.clear();
+        
+        // 1. Cube Generator (Flat Shading, 24 vertices)
+        auto createCube = [](const QVector3D &pos, const QColor &color, float size) -> std::shared_ptr<BrainSurface> {
+            auto surf = std::make_shared<BrainSurface>();
+            float s = size / 2.0f;
+            
+            // 6 faces * 4 verts = 24 vertices
+            Eigen::MatrixX3f rr(24, 3);
+            Eigen::MatrixX3f nn(24, 3);
+            
+            // Define faces: Front, Back, Top, Bottom, Right, Left
+            // Front (z=s)
+            rr.row(0) << -s, -s, s; nn.row(0) << 0, 0, 1;
+            rr.row(1) <<  s, -s, s; nn.row(1) << 0, 0, 1;
+            rr.row(2) <<  s,  s, s; nn.row(2) << 0, 0, 1;
+            rr.row(3) << -s,  s, s; nn.row(3) << 0, 0, 1;
+            // Back (z=-s)
+            rr.row(4) <<  s, -s, -s; nn.row(4) << 0, 0, -1;
+            rr.row(5) << -s, -s, -s; nn.row(5) << 0, 0, -1;
+            rr.row(6) << -s,  s, -s; nn.row(6) << 0, 0, -1;
+            rr.row(7) <<  s,  s, -s; nn.row(7) << 0, 0, -1;
+            // Top (y=s)
+            rr.row(8) << -s, s,  s; nn.row(8) << 0, 1, 0;
+            rr.row(9) <<  s, s,  s; nn.row(9) << 0, 1, 0;
+            rr.row(10)<<  s, s, -s; nn.row(10)<< 0, 1, 0;
+            rr.row(11)<< -s, s, -s; nn.row(11)<< 0, 1, 0;
+            // Bottom (y=-s)
+            rr.row(12)<< -s, -s, -s; nn.row(12)<< 0, -1, 0;
+            rr.row(13)<<  s, -s, -s; nn.row(13)<< 0, -1, 0;
+            rr.row(14)<<  s, -s,  s; nn.row(14)<< 0, -1, 0;
+            rr.row(15)<< -s, -s,  s; nn.row(15)<< 0, -1, 0;
+            // Right (x=s)
+            rr.row(16)<< s, -s,  s; nn.row(16)<< 1, 0, 0;
+            rr.row(17)<< s, -s, -s; nn.row(17)<< 1, 0, 0;
+            rr.row(18)<< s,  s, -s; nn.row(18)<< 1, 0, 0;
+            rr.row(19)<< s,  s,  s; nn.row(19)<< 1, 0, 0;
+            // Left (x=-s)
+            rr.row(20)<< -s, -s, -s; nn.row(20)<< -1, 0, 0;
+            rr.row(21)<< -s, -s,  s; nn.row(21)<< -1, 0, 0;
+            rr.row(22)<< -s,  s,  s; nn.row(22)<< -1, 0, 0;
+            rr.row(23)<< -s,  s, -s; nn.row(23)<< -1, 0, 0;
+
+            // Shift to position
+            for(int i=0; i<24; ++i) {
+                rr(i,0) += pos.x();
+                rr(i,1) += pos.y();
+                rr(i,2) += pos.z();
+            }
+
+            // Indices
+            Eigen::MatrixX3i tris(12, 3);
+            // 0,1,2, 0,2,3 for each face
+            for(int f=0; f<6; ++f) {
+                int base = f*4;
+                tris.row(f*2)   << base, base+1, base+2;
+                tris.row(f*2+1) << base, base+2, base+3;
+            }
+            
+            surf->createFromData(rr, nn, tris, color);
+            return surf;
+        };
+        
+        // 2. Icosahedron Generator (Smooth Shading, 12 vertices)
+        auto createIcosahedron = [](const QVector3D &pos, const QColor &color, float radius) -> std::shared_ptr<BrainSurface> {
+            auto surf = std::make_shared<BrainSurface>();
+            float t = (1.0f + std::sqrt(5.0f)) / 2.0f;
+            
+            Eigen::MatrixX3f rr(12, 3);
+            rr << -1, t, 0,  1, t, 0,  -1, -t, 0,  1, -t, 0,
+                  0, -1, t,  0, 1, t,  0, -1, -t,  0, 1, -t,
+                  t, 0, -1,  t, 0, 1,  -t, 0, -1,  -t, 0, 1;
+            
+            Eigen::MatrixX3f nn(12, 3);
+            
+            for(int i=0; i<12; ++i) {
+                QVector3D v(rr(i,0), rr(i,1), rr(i,2));
+                v.normalize();
+                nn(i,0)=v.x(); nn(i,1)=v.y(); nn(i,2)=v.z(); // Normal is radial
+                // Scale position
+                rr(i,0) = v.x() * radius + pos.x();
+                rr(i,1) = v.y() * radius + pos.y();
+                rr(i,2) = v.z() * radius + pos.z();
+            }
+            
+            Eigen::MatrixX3i tris(20, 3);
+            tris << 0, 11, 5, 0, 5, 1, 0, 1, 7, 0, 7, 10, 0, 10, 11,
+                    1, 5, 9, 5, 11, 4, 11, 10, 2, 10, 7, 6, 7, 1, 8,
+                    3, 9, 4, 3, 4, 2, 3, 2, 6, 3, 6, 8, 3, 8, 9,
+                    4, 9, 5, 2, 4, 11, 6, 2, 10, 8, 6, 7, 9, 8, 1;
+
+            surf->createFromData(rr, nn, tris, color);
+            return surf;
+        };
+
+        for (const auto &ch : info.chs) {
+            if (ch.kind == FIFFV_MEG_CH) {
+                QVector3D pos(ch.chpos.r0(0), ch.chpos.r0(1), ch.chpos.r0(2));
+                // Gold for MEG: #FFD700
+                auto surf = createCube(pos, QColor(255, 215, 0), 0.012f); 
+                m_megSensors.append(surf);
+            }
+            else if (ch.kind == FIFFV_EEG_CH) {
+                QVector3D pos(ch.chpos.r0(0), ch.chpos.r0(1), ch.chpos.r0(2));
+                // Cyan for EEG: #00FFFF
+                auto surf = createIcosahedron(pos, QColor(0, 255, 255), 0.008f); 
+                m_eegSensors.append(surf);
+            }
+        }
+    }
+    
+    // 3. Digitizers
+    // Try to read dig points if not in info (or just use info.dig)
+    QList<FiffDigPoint> points;
+    if (hasInfo) {
+        // If we read info successfully, use its digitizers (even if empty - likely means none exist)
+        points = info.dig;
+    } else {
+        // Try reading directly as dig set (only if stream was valid but no info read)
+        // Since stream is valid, the file is a FIF file.
+        file.reset();
+        digSet = FiffDigPointSet(file);
+        // Copy to list
+        for(int i=0; i<digSet.size(); ++i) points.append(digSet[i]);
+    }
+
+    m_digitizers.clear();
+    
+    // Check if we already defined createIcosahedron or need to redefine?
+    // It's in the scope of `if(hasInfo)` above. We need these helpers available here too.
+    // Let's redefine createIcosahedron for digitizers here (or move out of if(hasInfo))
+    // Moving out is better but changing indentation is annoying with replace tool.
+    // I'll just copy the lambda definition.
+    auto createSphereDig = [](const QVector3D &pos, const QColor &color, float radius) -> std::shared_ptr<BrainSurface> {
+        auto surf = std::make_shared<BrainSurface>();
+        float t = (1.0f + std::sqrt(5.0f)) / 2.0f;
+        
+        Eigen::MatrixX3f rr(12, 3);
+        rr << -1, t, 0,  1, t, 0,  -1, -t, 0,  1, -t, 0,
+              0, -1, t,  0, 1, t,  0, -1, -t,  0, 1, -t,
+              t, 0, -1,  t, 0, 1,  -t, 0, -1,  -t, 0, 1;
+        
+        Eigen::MatrixX3f nn(12, 3);
+        for(int i=0; i<12; ++i) {
+            QVector3D v(rr(i,0), rr(i,1), rr(i,2));
+            v.normalize();
+            nn(i,0)=v.x(); nn(i,1)=v.y(); nn(i,2)=v.z();
+            rr(i,0) = v.x() * radius + pos.x();
+            rr(i,1) = v.y() * radius + pos.y();
+            rr(i,2) = v.z() * radius + pos.z();
+        }
+        Eigen::MatrixX3i tris(20, 3);
+        tris << 0, 11, 5, 0, 5, 1, 0, 1, 7, 0, 7, 10, 0, 10, 11,
+                1, 5, 9, 5, 11, 4, 11, 10, 2, 10, 7, 6, 7, 1, 8,
+                3, 9, 4, 3, 4, 2, 3, 2, 6, 3, 6, 8, 3, 8, 9,
+                4, 9, 5, 2, 4, 11, 6, 2, 10, 8, 6, 7, 9, 8, 1;
+        surf->createFromData(rr, nn, tris, color);
+        return surf;
+    };
+
+    for (const auto &p : points) {
+        QVector3D pos(p.r[0], p.r[1], p.r[2]);
+        QColor col(192, 192, 192); // Silver
+        float size = 0.005f; // 5mm
+        
+        if (p.kind == FIFFV_POINT_CARDINAL) {
+            col = QColor(255, 0, 0); // Red
+            size = 0.01f;
+        } else if (p.kind == FIFFV_POINT_HPI) {
+            col = QColor(255, 165, 0); // Orange
+            size = 0.008f;
+        } else if (p.kind == FIFFV_POINT_EEG) {
+            col = QColor(0, 255, 255); // Cyan
+             size = 0.008f;
+        }
+        
+        auto surf = createSphereDig(pos, col, size);
+        m_digitizers.append(surf);
+    }
+    
+    qDebug() << "BrainView: Sensors Loaded. MEG:" << m_megSensors.size() 
+             << "EEG:" << m_eegSensors.size() 
+             << "Dig:" << m_digitizers.size();
+             
+    // Store in general surfaces map for rendering updates? 
+    // Ideally we keep them separate to toggle easier, but render loop needs to see them.
+    // For now, let's add them to m_surfaces with special keys.
+    
+    // Helper to add list
+    auto addList = [&](const QList<std::shared_ptr<BrainSurface>> &list, QString prefix) {
+        for(int i=0; i<list.size(); ++i) {
+           m_surfaces[prefix + QString::number(i)] = list[i];
+           // Default to hidden
+           list[i]->setVisible(false); 
+        }
+    };
+    
+    // Clear old sensor surfaces from map first (if any)
+    for(auto it = m_surfaces.begin(); it != m_surfaces.end();) {
+        if(it.key().startsWith("sens_")) it = m_surfaces.erase(it);
+        else ++it;
+    }
+
+    addList(m_megSensors, "sens_meg_");
+    addList(m_eegSensors, "sens_eeg_");
+    addList(m_digitizers, "sens_dig_");
+
+    return hasInfo || !digSet.isEmpty();
+}
+
 void BrainView::setActiveSurface(const QString &type)
 {
     // Just update the active type. Render loop will pick matching surfaces.
@@ -247,6 +500,25 @@ void BrainView::setBemShaderMode(const QString &modeName)
     if (modeName == "Standard") m_bemShaderMode = BrainRenderer::Standard;
     else if (modeName == "Holographic") m_bemShaderMode = BrainRenderer::Holographic;
     else if (modeName == "Glossy Realistic") m_bemShaderMode = BrainRenderer::Atlas;
+    update();
+}
+
+void BrainView::setSensorVisible(const QString &type, bool visible)
+{
+    QString prefix;
+    if (type == "MEG") prefix = "sens_meg_";
+    else if (type == "EEG") prefix = "sens_eeg_";
+    else if (type == "Digitizer") prefix = "sens_dig_";
+    else return;
+    
+    int count = 0;
+    for(auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+        if (it.key().startsWith(prefix)) {
+            it.value()->setVisible(visible);
+            count++;
+        }
+    }
+    qDebug() << "Toggled" << type << "sensors:" << visible << "(" << count << "items)";
     update();
 }
 
@@ -386,8 +658,14 @@ void BrainView::render(QRhiCommandBuffer *cb)
         bool isMatchingType = it.key().endsWith(m_activeSurfaceType);
         
         // Render if it's a BEM surface (always render if loaded) or matches active type (pial/inflated)
-        if (isBem || isMatchingType) {
+        // OR if it's a sensor (starts with sens_)
+        bool isSensor = it.key().startsWith("sens_");
+        
+        if (isBem || isMatchingType || isSensor) {
             BrainRenderer::ShaderMode mode = isBem ? m_bemShaderMode : m_brainShaderMode;
+            // Force holographic shader for sensors
+            if (isSensor) mode = BrainRenderer::Holographic;
+            
             m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), mode);
         }
     }

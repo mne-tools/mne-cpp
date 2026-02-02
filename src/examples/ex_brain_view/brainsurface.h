@@ -140,6 +140,27 @@ public:
 
     //=========================================================================================================
     /**
+     * Create surface from raw vertex and triangle data.
+     *
+     * @param[in] vertices   Nx3 matrix of vertex positions.
+     * @param[in] triangles  Mx3 matrix of triangle indices.
+     * @param[in] color      Surface color.
+     */
+    void createFromData(const Eigen::MatrixX3f &vertices, const Eigen::MatrixX3i &triangles, const QColor &color);
+
+    //=========================================================================================================
+    /**
+     * Create surface from raw vertex, normal and triangle data.
+     *
+     * @param[in] vertices   Nx3 matrix of vertex positions.
+     * @param[in] normals    Nx3 matrix of vertex normals.
+     * @param[in] triangles  Mx3 matrix of triangle indices.
+     * @param[in] color      Surface color.
+     */
+    void createFromData(const Eigen::MatrixX3f &vertices, const Eigen::MatrixX3f &normals, const Eigen::MatrixX3i &triangles, const QColor &color);
+
+    //=========================================================================================================
+    /**
      * Load annotation data from file.
      *
      * @param[in] path       Path to the .annot file.

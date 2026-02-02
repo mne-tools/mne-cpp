@@ -110,6 +110,15 @@ public:
      * @return True if successful.
      */
     bool loadBem(const QString &fifPath);
+    
+    //=========================================================================================================
+    /**
+     * Load sensors (meg/eeg/digitizer) from a raw/average FIF file or montage.
+     *
+     * @param[in] fifPath    Path to FIF file.
+     * @return True if successful.
+     */
+    bool loadSensors(const QString &fifPath);
 
 public slots:
     //=========================================================================================================
@@ -169,6 +178,15 @@ public slots:
      * @param[in] enabled    True to use standard colors (Red/Green/Blue), False for White.
      */
     void setBemHighContrast(bool enabled);
+
+    //=========================================================================================================
+    /**
+     * Toggle visibility of sensor groups.
+     * 
+     * @param[in] type       "MEG", "EEG", or "Digitizer".
+     * @param[in] visible    Visibility state.
+     */
+    void setSensorVisible(const QString &type, bool visible);
 
     //=========================================================================================================
     /**
@@ -260,6 +278,11 @@ private:
     QMap<QString, std::shared_ptr<BrainSurface>> m_surfaces;
     std::shared_ptr<BrainSurface> m_activeSurface;
     QString m_activeSurfaceType;
+    
+    // Sensors (Lists of surfaces/meshes for coils/electrodes)
+    QList<std::shared_ptr<BrainSurface>> m_megSensors;
+    QList<std::shared_ptr<BrainSurface>> m_eegSensors;
+    QList<std::shared_ptr<BrainSurface>> m_digitizers;
     
     BrainRenderer::ShaderMode m_brainShaderMode = BrainRenderer::Standard;
     BrainRenderer::ShaderMode m_bemShaderMode = BrainRenderer::Standard;

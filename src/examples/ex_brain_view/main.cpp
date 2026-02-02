@@ -212,6 +212,29 @@ int main(int argc, char *argv[])
     playbackLayout->addWidget(playButton);
     playbackLayout->addWidget(speedCombo);
     
+    // Sensor Controls
+    QGroupBox *sensorGroup = new QGroupBox("Sensors");
+    QVBoxLayout *sensorLayout = new QVBoxLayout(sensorGroup);
+    
+    QPushButton *loadDigBtn = new QPushButton("Load Digitizer...");
+    
+    QCheckBox *showMegCheck = new QCheckBox("Show MEG");
+    showMegCheck->setChecked(true);
+    showMegCheck->setEnabled(false); // Disabled until loaded
+    
+    QCheckBox *showEegCheck = new QCheckBox("Show EEG");
+    showEegCheck->setChecked(true);
+    showEegCheck->setEnabled(false);
+    
+    QCheckBox *showDigCheck = new QCheckBox("Show Digitizer");
+    showDigCheck->setChecked(true);
+    showDigCheck->setEnabled(false);
+    
+    sensorLayout->addWidget(loadDigBtn);
+    sensorLayout->addWidget(showMegCheck);
+    sensorLayout->addWidget(showEegCheck);
+    sensorLayout->addWidget(showDigCheck);
+    
     QTimer *stcTimer = new QTimer();
     
     stcLayout->addWidget(loadStcBtn);
@@ -227,6 +250,7 @@ int main(int argc, char *argv[])
     
     sideLayout->addWidget(controlGroup);
     sideLayout->addWidget(stcGroup);
+    sideLayout->addWidget(sensorGroup);
     sideLayout->addStretch();
     
     // Brain View Widget
@@ -403,6 +427,35 @@ int main(int argc, char *argv[])
         timeSlider->setValue(next);
     });
     
+    // Sensor Connections
+    QObject::connect(loadDigBtn, &QPushButton::clicked, [&](){
+        QString path = QFileDialog::getOpenFileName(nullptr, "Load Digitizer / Montage", "", "FIF Files (*.fif)");
+        if (path.isEmpty()) return;
+        
+        bool success = brainView->loadSensors(path);
+        
+        if (success) {
+            showMegCheck->setEnabled(true);
+            showEegCheck->setEnabled(true);
+            showDigCheck->setEnabled(true);
+            
+            // Default visibility
+            brainView->setSensorVisible("MEG", showMegCheck->isChecked());
+            brainView->setSensorVisible("EEG", showEegCheck->isChecked());
+            brainView->setSensorVisible("Digitizer", showDigCheck->isChecked());
+        }
+    });
+
+    QObject::connect(showMegCheck, &QCheckBox::toggled, [=](bool checked){
+        brainView->setSensorVisible("MEG", checked);
+    });
+    QObject::connect(showEegCheck, &QCheckBox::toggled, [=](bool checked){
+        brainView->setSensorVisible("EEG", checked);
+    });
+    QObject::connect(showDigCheck, &QCheckBox::toggled, [=](bool checked){
+        brainView->setSensorVisible("Digitizer", checked);
+    });
+
     // Sync initial state
     brainView->setHemiVisible(0, lhCheck->isChecked());
     brainView->setHemiVisible(1, rhCheck->isChecked());
