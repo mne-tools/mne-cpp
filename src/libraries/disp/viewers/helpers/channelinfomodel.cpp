@@ -85,7 +85,7 @@ ChannelInfoModel::ChannelInfoModel(QObject *parent)
 int ChannelInfoModel::rowCount(const QModelIndex & /*parent*/) const
 {
     //Return number of stored evoked sets
-    if(!m_pFiffInfo->chs.size()==0)
+    if(!m_pFiffInfo->chs.isEmpty())
         return m_pFiffInfo->chs.size();
     else
         return 0;
@@ -565,7 +565,7 @@ void ChannelInfoModel::setFiffInfo(FiffInfo::SPtr& pFiffInfo)
 
 //=============================================================================================================
 
-void ChannelInfoModel::assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators)
+void ChannelInfoModel::assignedOperatorsChanged(const QMultiMap<int,QSharedPointer<MNEOperator> > &assignedOperators)
 {
     beginResetModel();
 
@@ -638,7 +638,7 @@ void ChannelInfoModel::mapLayoutToChannels()
         switch(chInfo.kind) {
             case FIFFV_MEG_CH:
                 //Scan for MEG string and other characters
-                regExpRemove = QRegularExpression("(MEG|-|_|/|\| )");
+                regExpRemove = QRegularExpression("(MEG|-|_|/|\\| )");
                 chName.remove(regExpRemove);
 
                 //After cleaning the string try to convert the residual to an int number
@@ -649,7 +649,7 @@ void ChannelInfoModel::mapLayoutToChannels()
 
             case FIFFV_EEG_CH: {
                 //Scan for EEG string and other characters
-                regExpRemove = QRegularExpression("(EEG|-|_|/|\| )");
+                regExpRemove = QRegularExpression("(EEG|-|_|/|\\| )");
                 chName.remove(regExpRemove);
 
                 //After cleaning the string try to convert the residual to an int number

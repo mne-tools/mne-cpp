@@ -49,6 +49,7 @@
 #include <QAbstractTableModel>
 #include <QSharedPointer>
 #include <QPointF>
+#include <QMultiMap>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -135,7 +136,7 @@ public:
      *
      * @param[in] assignedOperators the filter operators which are currently active.
      */
-    void assignedOperatorsChanged(const QMap<int,QSharedPointer<MNEOperator> > &assignedOperators);
+    void assignedOperatorsChanged(const QMultiMap<int,QSharedPointer<MNEOperator> > &assignedOperators);
 
     //=========================================================================================================
     /**
@@ -195,7 +196,7 @@ protected:
 
     QSharedPointer<FIFFLIB::FiffInfo>           m_pFiffInfo;            /**< The fiff info of the currently loaded fiff file. */
 
-    QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels.*/
+    QMultiMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels.*/
     QMap<QString,QPointF>                       m_layoutMap;            /**< The current layout map with a position for all MEG and EEG channels. */
 
     QStringList                 m_aliasNames;           /**< list of given channel aliases. */
