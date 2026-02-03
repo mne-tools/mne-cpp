@@ -43,6 +43,7 @@
 #include "brainsurface.h"
 #include "sourceestimateoverlay.h"
 #include <mne/mne_bem.h>
+#include <fiff/fiff_coord_trans.h>
 #include <QWidget>
 #include <QRhiWidget>
 #include <QMap>
@@ -119,6 +120,15 @@ public:
      * @return True if successful.
      */
     bool loadSensors(const QString &fifPath);
+
+    //=========================================================================================================
+    /**
+     * Load a Head<->MRI transformation file (-trans.fif).
+     *
+     * @param[in] fifPath    Path to the trans file.
+     * @return True if successful.
+     */
+    bool loadTransformation(const QString &fifPath);
 
 public slots:
     //=========================================================================================================
@@ -264,6 +274,8 @@ signals:
      */
     void sourceEstimateLoaded(int numTimePoints);
 
+
+
 protected:
     void initialize(QRhiCommandBuffer *cb) override;
     void render(QRhiCommandBuffer *cb) override;
@@ -301,6 +313,8 @@ private:
     
     std::unique_ptr<SourceEstimateOverlay> m_sourceOverlay;
     int m_currentTimePoint = 0;
+    
+    FIFFLIB::FiffCoordTrans m_headToMriTrans;
 };
 
 #endif // BRAINVIEW_H

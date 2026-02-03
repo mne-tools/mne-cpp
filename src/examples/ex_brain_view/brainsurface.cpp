@@ -332,6 +332,38 @@ void BrainSurface::translateX(float offset)
 
 //=============================================================================================================
 
+void BrainSurface::transform(const QMatrix4x4 &m)
+{
+    // Extract 3x3 normal matrix (inverse transpose of upper-left 3x3)
+    // QMatrix4x4::normalMatrix() returns QMatrix3x3.
+    QMatrix3x3 normalMat = m.normalMatrix();
+
+    for (auto &v : m_vertexData) {
+        // Transform position
+        v.pos = m.map(v.pos);
+        
+        // Transform normal
+        // Note: QMatrix3x3 * QVector3D isn't directly supported by some Qt versions conveniently,
+        // but let's assume standard multiplication works or do manually.
+        // Actually QVector3D operator*(QMatrix4x4) exists but is row-vector mul.
+        // QMatrix4x4 operator*(QVector3D) is standard column-vector mul.
+        
+        // Use generic map method or just manual multiply if needed.
+        // Easier: mapVector for vectors (ignores translation) but needs to be normal matrix for non-uniform scales.
+        // If scale is uniform, mapVector is fine.
+        
+        // Let's do it manually to be safe with QMatrix3x3
+        const float *d = normalMat.constData();
+        float nx = d[0]*v.norm.x() + d[3]*v.norm.y() + d[6]*v.norm.z();
+        float ny = d[1]*v.norm.x() + d[4]*v.norm.y() + d[7]*v.norm.z();
+        float nz = d[2]*v.norm.x() + d[5]*v.norm.y() + d[8]*v.norm.z();
+        v.norm = QVector3D(nx, ny, nz).normalized();
+    }
+    m_bBuffersDirty = true;
+}
+
+//=============================================================================================================
+
 void BrainSurface::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
 {
     if (!m_bBuffersDirty && m_vertexBuffer && m_indexBuffer) return;

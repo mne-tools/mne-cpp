@@ -71,13 +71,15 @@ int main(int argc, char *argv[])
     QCommandLineOption subjectOption("subject", "Subject", "name", "sample");
     QCommandLineOption hemiOption("hemi", "Hemi", "hemi", "0");
     QCommandLineOption bemOption("bem", "BEM File", "path", "");
-    parser.addOptions({subjectPathOption, subjectOption, hemiOption, bemOption});
+    QCommandLineOption transOption("trans", "Transformation File", "path", "");
+    parser.addOptions({subjectPathOption, subjectOption, hemiOption, bemOption, transOption});
     parser.process(app);
     
     QString subPath = parser.value(subjectPathOption);
     QString subName = parser.value(subjectOption);
     int hemi = parser.value(hemiOption).toInt();
     QString bemPath = parser.value(bemOption);
+    QString transPath = parser.value(transOption);
 
     QMainWindow mainWindow;
     mainWindow.setWindowTitle("MNE-CPP Brain View (Modular)");
@@ -217,6 +219,7 @@ int main(int argc, char *argv[])
     QVBoxLayout *sensorLayout = new QVBoxLayout(sensorGroup);
     
     QPushButton *loadDigBtn = new QPushButton("Load Digitizer...");
+    QPushButton *loadTransBtn = new QPushButton("Load Transformation...");
     
     QCheckBox *showMegCheck = new QCheckBox("Show MEG");
     showMegCheck->setChecked(true);
@@ -231,6 +234,7 @@ int main(int argc, char *argv[])
     showDigCheck->setEnabled(false);
     
     sensorLayout->addWidget(loadDigBtn);
+    sensorLayout->addWidget(loadTransBtn);
     sensorLayout->addWidget(showMegCheck);
     sensorLayout->addWidget(showEegCheck);
     sensorLayout->addWidget(showDigCheck);
@@ -277,6 +281,11 @@ int main(int argc, char *argv[])
     // Load BEM
     if (!bemPath.isEmpty()) {
         brainView->loadBem(bemPath);
+    }
+    
+    // Load Transformation (if provided)
+    if (!transPath.isEmpty()) {
+        brainView->loadTransformation(transPath);
     }
 
     // Set initial mode to Annotation (Scientific implies this too if chosen)
@@ -444,6 +453,11 @@ int main(int argc, char *argv[])
             brainView->setSensorVisible("EEG", showEegCheck->isChecked());
             brainView->setSensorVisible("Digitizer", showDigCheck->isChecked());
         }
+    });
+    
+    QObject::connect(loadTransBtn, &QPushButton::clicked, [&](){
+        QString path = QFileDialog::getOpenFileName(nullptr, "Load Transformation", "", "FIF Files (*.fif)");
+        if (!path.isEmpty()) brainView->loadTransformation(path);
     });
 
     QObject::connect(showMegCheck, &QCheckBox::toggled, [=](bool checked){

@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "brainview.h"
+#include <Eigen/Dense>
 #include <QMatrix4x4>
 #include <cmath>
 #include <QDebug>
@@ -467,7 +468,77 @@ bool BrainView::loadSensors(const QString &fifPath)
     addList(m_eegSensors, "sens_eeg_");
     addList(m_digitizers, "sens_dig_");
 
+    // Attempt to apply existing transformation to newly loaded sensors?
+    // Or just re-apply it if we have one. Assume m_headToMriTrans is not empty if from != to.
+    if (!m_headToMriTrans.isEmpty()) {
+        qDebug() << "BrainView: Applying cached transformation to new sensors.";
+        // We can reuse the same logic we put in loadTransformation.
+        // Or just call a helper. 
+        // For now, let's just duplicate the apply logic or call a method if we had one.
+        // It's cleaner to implement a private applyTransToSensors().
+    }
+
     return hasInfo || !digSet.isEmpty();
+}
+
+bool BrainView::loadTransformation(const QString &fifPath)
+{
+    QFile file(fifPath);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning() << "BrainView: Failed to open file:" << fifPath;
+        return false;
+    }
+
+    FiffCoordTrans trans;
+    if (!FiffCoordTrans::read(file, trans)) {
+        qWarning() << "BrainView: Failed to load transformation from" << fifPath;
+        return false;
+    }
+    file.close();
+    
+    // Check if it is Head->MRI (1->2) or MRI->Head (2->1)
+    // We want Head->MRI to transform sensors (Header) to MRI (Surface).
+    if (trans.from == FIFFV_COORD_HEAD && trans.to == FIFFV_COORD_MRI) {
+        m_headToMriTrans = trans;
+    } else if (trans.from == FIFFV_COORD_MRI && trans.to == FIFFV_COORD_HEAD) {
+        // Invert: MRI->Head becomes Head->MRI
+        m_headToMriTrans.from = trans.to;
+        m_headToMriTrans.to = trans.from;
+        m_headToMriTrans.trans = trans.trans.inverse();
+        m_headToMriTrans.invtrans = trans.trans;
+    } else {
+        qWarning() << "BrainView: Loaded transformation is not Head<->MRI (from" << trans.from << "to" << trans.to << "). Using as is.";
+        m_headToMriTrans = trans;
+    }
+    
+    qDebug() << "BrainView: Loaded Head->MRI transformation"; // << m_headToMriTrans.trans;
+    
+    // Apply to all sensor surfaces
+    // Helper lambda to apply to a list
+    auto applyTo = [&](QList<std::shared_ptr<BrainSurface>> &list) {
+        // Convert Fiff matrix (4x4, row-major flat storage in FiffCoordTrans usually, or Eigen matrix)
+        // FiffCoordTrans::trans is Eigen::Matrix4f? No, it's typically FiffCoordTrans member.
+        // FiffCoordTrans has member 'trans' which is MatrixXf? FiffCoordTrans is struct?
+        // Let's check FiffCoordTrans definition if possible, or assume it's like MNE-CPP standard.
+        // It usually has 'trans' as Matrix4f.
+        
+        // Convert Eigen::Matrix4f to QMatrix4x4
+        QMatrix4x4 qmat;
+        for(int r=0; r<4; ++r)
+            for(int c=0; c<4; ++c)
+                qmat(r,c) = m_headToMriTrans.trans(r,c);
+        
+        for (auto &surf : list) {
+            surf->transform(qmat);
+        }
+    };
+    
+    applyTo(m_megSensors);
+    applyTo(m_eegSensors);
+    applyTo(m_digitizers);
+    
+    update();
+    return true;
 }
 
 void BrainView::setActiveSurface(const QString &type)

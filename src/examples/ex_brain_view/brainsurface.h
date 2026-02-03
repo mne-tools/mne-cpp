@@ -224,6 +224,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Apply a generic 4x4 transformation matrix to all vertices and normals.
+     *
+     * @param[in] m          Transformation matrix.
+     */
+    void transform(const QMatrix4x4 &m);
+
+    //=========================================================================================================
+    /**
      * Compute neighbor vertices from triangle connectivity.
      * Required for surface-constrained distance calculations.
      *
