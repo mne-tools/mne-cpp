@@ -42,6 +42,9 @@
 
 #include "mne_fiff_exp.h"
 
+#include <fiff/fiff_tag.h>
+#include <fiff/fiff_stream.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -224,6 +227,16 @@ private:
      * Refactored: mne_sort_fiff_explanations (explanation.c)
      */
     void sort_fiff_explanations();
+
+    void print_file_id (FILE *out, FIFFLIB::FiffTag::SPtr tag);
+
+    void print_ch_info (FILE *out, FIFFLIB::FiffTag::SPtr tag);
+
+    void print_transform(FILE *out, FIFFLIB::FiffTag::SPtr tag);
+
+    void print_dig_point(FILE *out, FIFFLIB::FiffTag::SPtr tag);
+
+    void print_matrix(FILE *out, FIFFLIB::FiffStream::SPtr stream, FIFFLIB::FiffDirEntry::SPtr this_ent);
 
 private:
     QList<MneFiffExp> m_qListExp;     /**< List of Explanations. */

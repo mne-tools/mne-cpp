@@ -82,5 +82,5 @@ int main(int argc, char *argv[])
     MneFiffExpSet expSet = MneFiffExpSet::read_fiff_explanations(QCoreApplication::applicationDirPath()+"/resources/general/explanations/fiff_explanations.txt");
     expSet.show_fiff_contents(stdout, settings);
 
-    return app.exec();
+    return 0;
 }

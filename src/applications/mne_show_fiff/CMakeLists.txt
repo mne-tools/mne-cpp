@@ -60,6 +60,22 @@ install(TARGETS ${PROJECT_NAME}
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
+# Copy resource files
+set(RESOURCE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources/general/explanations)
+file(MAKE_DIRECTORY ${RESOURCE_DIR})
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+    ${CMAKE_SOURCE_DIR}/../resources/general/explanations/fiff_explanations.txt
+    ${RESOURCE_DIR}/fiff_explanations.txt
+    COMMENT "Copying fiff_explanations.txt to build directory"
+)
+
+if(APPLE)
+    set_source_files_properties(${CMAKE_SOURCE_DIR}/../resources/general/explanations/fiff_explanations.txt
+        PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/general/explanations")
+    target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/../resources/general/explanations/fiff_explanations.txt)
+endif()
+
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()

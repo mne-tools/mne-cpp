@@ -243,6 +243,107 @@ QList<MneFiffExp>::const_iterator MneFiffExpSet::constEnd() const
 
 //*************************************************************************************************************
 
+//*************************************************************************************************************
+
+void MneFiffExpSet::print_file_id (FILE *out, FiffTag::SPtr tag)
+{
+    FiffId id = tag->toFiffID();
+    struct tm *ltime;
+    time_t time_val;
+    char buf[100];
+
+    fprintf(out,"\t%d.%d ",id.version>>16,id.version & 0xFFFF);
+    fprintf(out,"0x%x%x ",id.machid[0],id.machid[1]);
+
+    time_val = id.time.secs;
+    ltime = localtime(&time_val);
+    (void)strftime(buf,100,"%c",ltime);
+
+    fprintf(out,"%s",buf);
+}
+
+
+//*************************************************************************************************************
+
+void MneFiffExpSet::print_ch_info (FILE *out, FiffTag::SPtr tag)
+{
+    FiffChInfo info = tag->toChInfo();
+    QList<MneFiffExp>::const_iterator exp;
+    QString text1, text2, text3;
+
+    exp = this->find_fiff_explanation(CLASS_UNIT, info.unit);
+    text1 = (exp != this->constEnd()) ? exp->text : "N/A";
+
+    exp = this->find_fiff_explanation(CLASS_UNITM, info.unit_mul);
+    text2 = (exp != this->constEnd()) ? exp->text : "";
+
+    exp = this->find_fiff_explanation(CLASS_CH_KIND, info.kind);
+    text3 = (exp != this->constEnd()) ? exp->text : "N/A";
+
+    fprintf(out,"\t%3d \"%s\" (%s %3d) [%s%s]", info.scanNo, info.ch_name.toUtf8().constData(), text3.toUtf8().constData(), info.logNo, text2.toUtf8().constData(), text1.toUtf8().constData());
+    fprintf(out,"\trange %g cal %g", info.range, info.cal);
+}
+
+
+//*************************************************************************************************************
+
+void MneFiffExpSet::print_transform(FILE *out, FiffTag::SPtr tag)
+{
+    FiffCoordTrans t = tag->toCoordTrans();
+    int k, p;
+    int frame;
+    fprintf(out,"\t");
+    for (frame = t.from, k = 0; k < 2; k++) {
+        fprintf(out,"%s", FIFFLIB::FiffCoordTrans::frame_name(frame).toUtf8().constData());
+        if (k == 0) {
+            fprintf(out," -> ");
+            frame = t.to;
+        }
+        else {
+            fprintf(out,"\n");
+            for (p = 0; p < 3; p++)
+                fprintf(out,"%24s\t%8.5f %8.5f %8.5f %8.2f\n"," ",t.trans(p,0),t.trans(p,1),t.trans(p,2),1000*t.trans(p,3));
+            fprintf(out,"%24s\t%8.5f %8.5f %8.5f %8.2f"," ",0.0,0.0,0.0,1.0);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MneFiffExpSet::print_dig_point(FILE *out, FiffTag::SPtr tag)
+{
+    FiffDigPoint point = tag->toDigPoint();
+    switch (point.kind) {
+    case FIFFV_POINT_CARDINAL :
+        fprintf(out,"\tcardinal %3d ",point.ident);
+        break;
+    case FIFFV_POINT_HPI :
+        fprintf(out,"\thpi      %3d ",point.ident);
+        break;
+    case FIFFV_POINT_EEG :
+        fprintf(out,"\teeg      %3d ",point.ident);
+        break;
+    case FIFFV_POINT_EXTRA :
+        fprintf(out,"\textra    %3d ",point.ident);
+        break;
+    }
+    fprintf(out,"(%6.1f,%6.1f,%6.1f)",1000*point.r[0],1000*point.r[1], 1000*point.r[2]);
+}
+
+
+//*************************************************************************************************************
+
+void MneFiffExpSet::print_matrix(FILE *out, FiffStream::SPtr stream, FiffDirEntry::SPtr this_ent)
+{
+    // Simplified matrix info since we don't want to read the whole tag yet if it's large,
+    // but FiffStream has some matrix reading logic.
+    fprintf(out, "\tMatrix type %d, size %d bytes", this_ent->type, this_ent->size);
+}
+
+
+//*************************************************************************************************************
+
 bool MneFiffExpSet::show_fiff_contents(FILE *out, const MneShowFiffSettings &settings)
 {
     return show_fiff_contents(out,settings.inname, settings.verbose,settings.tags,settings.indent,settings.long_strings,settings.blocks_only);
@@ -300,6 +401,8 @@ bool MneFiffExpSet::show_fiff_contents(FILE *out, const QString &name, bool verb
         //        for (auto this_ent : stream->dir()) {//C++11
         for (int i = 0; i < stream->dir().size(); ++i) {
             this_ent = stream->dir()[i];
+            if (this_ent->kind == -1) {
+            }
             if (tags.size() == 0)
                 show_it = true;
             else {
@@ -354,8 +457,7 @@ bool MneFiffExpSet::show_fiff_contents(FILE *out, const QString &name, bool verb
                     else
                         fprintf(out,"%4d = %-18s",this_ent->kind,"Not explained");
                     if (FiffTag::fiff_type_fundamental(this_ent->type) == FIFFTS_FS_MATRIX) {
-                        fprintf(out,"TODO print_matrix");
-                        //                        print_matrix(out,in,this_ent);
+                        this->print_matrix(out, stream, this_ent);
                     }
                     else {
                         switch (this_ent->type) {
@@ -391,9 +493,8 @@ bool MneFiffExpSet::show_fiff_contents(FILE *out, const QString &name, bool verb
                             break;
                         case FIFFT_JULIAN :
                             if (stream->read_tag(tag,this_ent->pos)) {
-                                fprintf(out,"TODO fiff_caldate");
-                                //                                fiff_caldate (*(fiff_julian_t *)tag.data,&day,&month,&year);
-                                fprintf(out,"\t%d.%d.%d",day,month,year);
+                                // MNE-CPP doesn't seem to have a direct julian to caldate, skipping for now or simplistic print
+                                fprintf(out,"\tJulian date tag");
                             }
                             break;
                         case FIFFT_STRING :
@@ -450,20 +551,15 @@ bool MneFiffExpSet::show_fiff_contents(FILE *out, const QString &name, bool verb
                             break;
                         case FIFFT_CH_INFO_STRUCT :
                             if (stream->read_tag(tag,this_ent->pos))
-                                fprintf(out,"TODO print_ch_info");
-                            //                                print_ch_info (out,set,(fiff_ch_info_t *)tag.data);
+                                this->print_ch_info(out, tag);
                             break;
                         case FIFFT_ID_STRUCT :
                             if (stream->read_tag(tag,this_ent->pos))
-                                fprintf(out,"TODO print_file_id");
-                            //                                if (tag.size == sizeof(fiff_id_t))
-                            //                                    print_file_id (out,(fiff_id_t *)tag.data);
+                                this->print_file_id(out, tag);
                             break;
                         case FIFFT_DIG_POINT_STRUCT :
                             if (stream->read_tag(tag,this_ent->pos))
-                                fprintf(out,"TODO print_dig_point");
-                            //                                if (tag.size == sizeof(fiff_dig_point_t))
-                            //                                    print_dig_point (out,(fiff_dig_point_t *)tag.data);
+                                this->print_dig_point(out, tag);
                             break;
                         case FIFFT_DIG_STRING_STRUCT :
                             if (stream->read_tag(tag,this_ent->pos)) {
@@ -476,9 +572,7 @@ bool MneFiffExpSet::show_fiff_contents(FILE *out, const QString &name, bool verb
                             break;
                         case FIFFT_COORD_TRANS_STRUCT :
                             if (stream->read_tag(tag,this_ent->pos))
-                                fprintf(out,"TODO print_transform");
-                            //                                if (tag.size == sizeof(fiff_coord_trans_t))
-                            //                                    print_transform   (out,(fiff_coord_trans_t *)tag.data);
+                                this->print_transform(out, tag);
                             break;
                         default :
                             if (this_ent->kind == FIFF_DIG_STRING)
