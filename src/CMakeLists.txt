@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.15)
 project(mne_cpp LANGUAGES CXX)
 
+set(MNE_CPP_VERSION_MAJOR 2)
+set(MNE_CPP_VERSION_MINOR 0)
+set(MNE_CPP_VERSION_PATCH 0)
+
+
 ##==============================================================================
 ## Global build options
 
@@ -71,11 +76,11 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 if(NOT DEFINED CMAKE_BINARY_DIR)
-  set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/../build/${CMAKE_BUILD_TYPE})
+  set(CMAKE_BINARY_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../build/${CMAKE_BUILD_TYPE})
 endif()
 
 if(NOT DEFINED BINARY_OUTPUT_DIRECTORY)
-  set(BINARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/../out/${CMAKE_BUILD_TYPE})
+  set(BINARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../out/${CMAKE_BUILD_TYPE})
   message(
     "-- [MNE-CPP] Build name not defined."
     " Using default value: ${BINARY_OUTPUT_DIRECTORY}"
@@ -138,9 +143,16 @@ if(BUILD_EXAMPLES)
   add_subdirectory(examples)
 endif()
 
+
 if(BUILD_TESTS)
   add_subdirectory(testframes)
 endif()
+
+option(MNE_ENABLE_INSTALLER "Enable building the installer" OFF)
+if(MNE_ENABLE_INSTALLER)
+    include(${CMAKE_CURRENT_SOURCE_DIR}/../tools/packaging/Installer.cmake)
+endif()
+
   
 ##==============================================================================
 ## Add symbolic links to project resources folder

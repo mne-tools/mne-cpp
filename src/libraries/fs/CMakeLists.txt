@@ -74,3 +74,10 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE MNE_FS_LIBRARY MNE_GIT_HASH_S
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
+
+install(TARGETS ${PROJECT_NAME}
+    RUNTIME DESTINATION bin COMPONENT runtime
+    LIBRARY DESTINATION lib COMPONENT runtime
+    ARCHIVE DESTINATION lib COMPONENT development
+)
+

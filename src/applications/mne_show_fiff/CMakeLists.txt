@@ -76,6 +76,11 @@ if(APPLE)
     target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/../resources/general/explanations/fiff_explanations.txt)
 endif()
 
+install(FILES ${CMAKE_SOURCE_DIR}/../resources/general/explanations/fiff_explanations.txt
+    DESTINATION ${CMAKE_INSTALL_BINDIR}/resources/general/explanations
+    COMPONENT applications
+)
+
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
 endif()
