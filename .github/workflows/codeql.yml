@@ -61,7 +61,7 @@ jobs:
         cd src/applications/mne_scan/plugins/brainflowboard/brainflow
         mkdir build
         cd build
-        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
+        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" ..
         cmake --build . --target install
 
     - name: Compile LSL submodule
