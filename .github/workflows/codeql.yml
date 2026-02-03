@@ -1,0 +1,84 @@
+name: "CodeQL"
+
+on:
+  push:
+    branches: [ "main", "v2.0-dev" ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "main" ]
+  schedule:
+    - cron: '28 15 * * 1'
+
+jobs:
+  analyze:
+    name: Analyze
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'cpp' ]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Install Python 3.10
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install BrainFlow and LSL submodules
+      run: |
+        git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
+        git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
+
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: 6.10.2
+        modules: qtcharts qt3d qtshadertools
+
+    # Initialize CodeQL tools for scanning.
+    - name: Initialize CodeQL
+      uses: github/codeql-action/init@v2
+      with:
+        languages: ${{ matrix.language }}
+        # If you wish to specify custom queries, you can do so here or in a config file.
+        # By default, queries listed here will override any specified in a config file.
+        # Prefix the list here with "+" to use these queries and those in the config file.
+        
+        # Details on CodeQL's query packs refer to : https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
+        # queries: security-extended,security-and-quality
+
+    # Dependencies Build Steps (BrainFlow & LSL) - needed for linking
+    - name: Compile BrainFlow submodule
+      run: |
+        cd src/applications/mne_scan/plugins/brainflowboard/brainflow
+        mkdir build
+        cd build
+        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
+        cmake --build . --target install
+
+    - name: Compile LSL submodule
+      run: |
+        cd src/applications/mne_scan/plugins/lsladapter/liblsl
+        mkdir build
+        cd build
+        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
+        cmake --build . --target install
+
+    # Build MNE-CPP
+    - name: Configure and compile MNE-CPP
+      run: |
+       cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+       cmake --build build
+
+    - name: Perform CodeQL Analysis
+      uses: github/codeql-action/analyze@v2
+      with:
+        category: "/language:${{ matrix.language }}"
