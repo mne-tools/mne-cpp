@@ -386,9 +386,27 @@ bool BrainView::loadSensors(const QString &fifPath)
             return surf;
         };
 
+        // Prepare Device->Head transformation for MEG
+        QMatrix4x4 devHeadTrans;
+        if (!info.dev_head_t.isEmpty()) {
+            // Check if it is indeed Device->Head
+            if (info.dev_head_t.from == FIFFV_COORD_DEVICE && info.dev_head_t.to == FIFFV_COORD_HEAD) {
+                for(int r=0; r<4; ++r)
+                    for(int c=0; c<4; ++c)
+                        devHeadTrans(r,c) = info.dev_head_t.trans(r,c);
+                qDebug() << "BrainView: Computed Dev->Head transformation for MEG sensors.";
+            }
+        }
+
         for (const auto &ch : info.chs) {
             if (ch.kind == FIFFV_MEG_CH) {
                 QVector3D pos(ch.chpos.r0(0), ch.chpos.r0(1), ch.chpos.r0(2));
+                
+                // Transform MEG from Device to Head space
+                if (!devHeadTrans.isIdentity()) {
+                    pos = devHeadTrans * pos;
+                }
+                
                 // Gold for MEG: #FFD700
                 auto surf = createCube(pos, QColor(255, 215, 0), 0.012f); 
                 m_megSensors.append(surf);
@@ -502,10 +520,21 @@ bool BrainView::loadSensors(const QString &fifPath)
     // Or just re-apply it if we have one. Assume m_headToMriTrans is not empty if from != to.
     if (!m_headToMriTrans.isEmpty()) {
         qDebug() << "BrainView: Applying cached transformation to new sensors.";
-        // We can reuse the same logic we put in loadTransformation.
-        // Or just call a helper. 
-        // For now, let's just duplicate the apply logic or call a method if we had one.
-        // It's cleaner to implement a private applyTransToSensors().
+        
+        QMatrix4x4 qmat;
+        for(int r=0; r<4; ++r)
+            for(int c=0; c<4; ++c)
+                qmat(r,c) = m_headToMriTrans.trans(r,c);
+        
+        auto applyTo = [&](const QList<std::shared_ptr<BrainSurface>> &list) {
+            for (auto &surf : list) {
+                surf->transform(qmat);
+            }
+        };
+
+        applyTo(m_megSensors);
+        applyTo(m_eegSensors);
+        applyTo(m_digitizers);
     }
 
     return hasInfo || !digSet.isEmpty();
@@ -514,11 +543,8 @@ bool BrainView::loadSensors(const QString &fifPath)
 bool BrainView::loadTransformation(const QString &fifPath)
 {
     QFile file(fifPath);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qWarning() << "BrainView: Failed to open file:" << fifPath;
-        return false;
-    }
-
+    // Don't open explicitly, FiffCoordTrans::read opens the device via FiffStream.
+    
     FiffCoordTrans trans;
     if (!FiffCoordTrans::read(file, trans)) {
         qWarning() << "BrainView: Failed to load transformation from" << fifPath;
