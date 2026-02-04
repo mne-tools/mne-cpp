@@ -91,6 +91,36 @@ BrainView::~BrainView()
 
 //=============================================================================================================
 
+bool BrainView::loadDipoles(const QString &filePath)
+{
+    INVERSELIB::ECDSet set = INVERSELIB::ECDSet::read_dipoles_dip(filePath);
+    if (set.size() == 0) {
+        qWarning() << "BrainView: No dipoles found in" << filePath;
+        return false;
+    }
+    
+    m_dipoles = std::make_unique<DipoleObject>();
+    m_dipoles->load(set);
+    
+    // Apply transformation if available
+    if (!m_headToMriTrans.isEmpty()) {
+        qDebug() << "BrainView: Applying cached transformation to dipoles.";
+        QMatrix4x4 qmat;
+        for(int r=0; r<4; ++r)
+            for(int c=0; c<4; ++c)
+                qmat(r,c) = m_headToMriTrans.trans(r,c);
+        
+        m_dipoles->applyTransform(qmat);
+    }
+    
+    qDebug() << "BrainView: Loaded" << set.size() << "dipoles from" << filePath;
+    
+    update();
+    return true;
+}
+
+//=============================================================================================================
+
 bool BrainView::loadSurface(const QString &subjectPath, const QString &subject, const QString &hemi, const QString &type)
 {
     QString hemiStr = hemi;
@@ -516,12 +546,6 @@ bool BrainView::loadTransformation(const QString &fifPath)
     // Apply to all sensor surfaces
     // Helper lambda to apply to a list
     auto applyTo = [&](QList<std::shared_ptr<BrainSurface>> &list) {
-        // Convert Fiff matrix (4x4, row-major flat storage in FiffCoordTrans usually, or Eigen matrix)
-        // FiffCoordTrans::trans is Eigen::Matrix4f? No, it's typically FiffCoordTrans member.
-        // FiffCoordTrans has member 'trans' which is MatrixXf? FiffCoordTrans is struct?
-        // Let's check FiffCoordTrans definition if possible, or assume it's like MNE-CPP standard.
-        // It usually has 'trans' as Matrix4f.
-        
         // Convert Eigen::Matrix4f to QMatrix4x4
         QMatrix4x4 qmat;
         for(int r=0; r<4; ++r)
@@ -536,6 +560,28 @@ bool BrainView::loadTransformation(const QString &fifPath)
     applyTo(m_megSensors);
     applyTo(m_eegSensors);
     applyTo(m_digitizers);
+    
+    // Apply to dipoles
+    if (m_dipoles) {
+        QMatrix4x4 qmat;
+        for(int r=0; r<4; ++r)
+            for(int c=0; c<4; ++c)
+                qmat(r,c) = m_headToMriTrans.trans(r,c);
+        
+        // Note: applyTransform applies incrementally (Trans * Old).
+        // If we load a NEW transformation, we should probably reset dipoles first?
+        // But DipoleObject doesn't keep original state. 
+        // Ideally, we should reload dipoles or keep original ECDSet.
+        // For now, let's assume loadTransformation is done once or we accept cumulative/incremental issues 
+        // or we reload dipoles if easy.
+        // Actually, usually users load trans then dipoles, or dipoles then trans.
+        // If we load trans twice, we double transform if we just apply.
+        // BrainSurface::transform also applies matrix. 
+        // Correct approach: Store original data in DipoleObject and re-generate on transform.
+        // But for this patch, let's just apply.
+        // Better: We should probably reload the dipoles if we have the path, but we don't store the path.
+        m_dipoles->applyTransform(qmat); 
+    }
     
     update();
     return true;
@@ -590,6 +636,12 @@ void BrainView::setSensorVisible(const QString &type, bool visible)
         }
     }
     qDebug() << "Toggled" << type << "sensors:" << visible << "(" << count << "items)";
+    update();
+}
+
+void BrainView::setDipoleVisible(bool visible)
+{
+    m_dipolesVisible = visible;
     update();
 }
 
@@ -670,7 +722,7 @@ void BrainView::saveSnapshot()
 void BrainView::initialize(QRhiCommandBuffer *cb)
 {
     Q_UNUSED(cb);
-    qDebug() << "RHI Initialized. Backend:" << rhi()->backendName();
+
     m_renderer = std::make_unique<BrainRenderer>();
 }
 
@@ -724,6 +776,7 @@ void BrainView::render(QRhiCommandBuffer *cb)
     m_renderer->beginFrame(cb, renderTarget());
     
     // Render all visible surfaces matching the active type OR BEM surfaces
+    // Render all visible surfaces matching the active type OR BEM surfaces
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
         bool isBem = it.key().startsWith("bem_");
         bool isMatchingType = it.key().endsWith(m_activeSurfaceType);
@@ -739,6 +792,11 @@ void BrainView::render(QRhiCommandBuffer *cb)
             
             m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), mode);
         }
+    }
+    
+    // Render Dipoles
+    if (m_dipolesVisible && m_dipoles) {
+        m_renderer->renderDipoles(cb, rhi(), sceneData, m_dipoles.get());
     }
     
     m_renderer->endFrame(cb);

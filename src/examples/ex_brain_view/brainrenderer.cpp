@@ -93,11 +93,16 @@ void BrainRenderer::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int
     };
     
     // List of modes to initialize
-    QList<ShaderMode> modes = {Standard, Holographic, Atlas};
+    QList<ShaderMode> modes = {Standard, Holographic, Atlas, Dipole};
     
     for (ShaderMode mode : modes) {
-        QString vert = (mode == Holographic) ? ":/holographic.vert.qsb" : (mode == Atlas) ? ":/glossy.vert.qsb" : ":/standard.vert.qsb";
-        QString frag = (mode == Holographic) ? ":/holographic.frag.qsb" : (mode == Atlas) ? ":/glossy.frag.qsb" : ":/standard.frag.qsb";
+        QString vert = (mode == Holographic) ? ":/holographic.vert.qsb" : 
+                       (mode == Atlas) ? ":/glossy.vert.qsb" : 
+                       (mode == Dipole) ? ":/dipole.vert.qsb" : ":/standard.vert.qsb";
+        
+        QString frag = (mode == Holographic) ? ":/holographic.frag.qsb" : 
+                       (mode == Atlas) ? ":/glossy.frag.qsb" : 
+                       (mode == Dipole) ? ":/dipole.frag.qsb" : ":/standard.frag.qsb";
         
         QShader vS = getShader(vert);
         QShader fS = getShader(frag);
@@ -117,16 +122,46 @@ void BrainRenderer::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int
              blend.dstColor = QRhiGraphicsPipeline::One;
              blend.srcAlpha = QRhiGraphicsPipeline::SrcAlpha;
              blend.dstAlpha = QRhiGraphicsPipeline::One;
+        } else if (mode == Dipole) {
+             blend.enable = true;
+             blend.srcColor = QRhiGraphicsPipeline::SrcAlpha;
+             blend.dstColor = QRhiGraphicsPipeline::OneMinusSrcAlpha;
+             blend.srcAlpha = QRhiGraphicsPipeline::SrcAlpha;
+             blend.dstAlpha = QRhiGraphicsPipeline::OneMinusSrcAlpha;
         }
         
         auto setup = [&](QRhiGraphicsPipeline* p, QRhiGraphicsPipeline::CullMode cull) {
             p->setShaderStages({{ QRhiShaderStage::Vertex, vS }, { QRhiShaderStage::Fragment, fS }});
             
             QRhiVertexInputLayout il;
-            il.setBindings({{ 28 }});
-            il.setAttributes({{ 0, 0, QRhiVertexInputAttribute::Float3, 0 }, 
-                              { 0, 1, QRhiVertexInputAttribute::Float3, 12 }, 
-                              { 0, 2, QRhiVertexInputAttribute::UNormByte4, 24 }});
+            
+            if (mode == Dipole) {
+                il.setBindings({
+                    { 6 * sizeof(float) },       // Binding 0: Vertex Data (Pos + Normal) -> stride 6 floats
+                    { 20 * sizeof(float), QRhiVertexInputBinding::PerInstance } // Binding 1: Instance Data (Mat4 + Color) -> stride 20 floats
+                });
+                
+                il.setAttributes({
+                    // Vertex Buffer (Binding 0)
+                    { 0, 0, QRhiVertexInputAttribute::Float3, 0 },                   // Pos
+                    { 0, 1, QRhiVertexInputAttribute::Float3, 3 * sizeof(float) },   // Normal
+                    
+                    // Instance Buffer (Binding 1)
+                    // Model Matrix (4 x vec4)
+                    { 1, 2, QRhiVertexInputAttribute::Float4, 0 },
+                    { 1, 3, QRhiVertexInputAttribute::Float4, 4 * sizeof(float) },
+                    { 1, 4, QRhiVertexInputAttribute::Float4, 8 * sizeof(float) },
+                    { 1, 5, QRhiVertexInputAttribute::Float4, 12 * sizeof(float) },
+                    // Color
+                    { 1, 6, QRhiVertexInputAttribute::Float4, 16 * sizeof(float) }
+                });
+            } else {
+                il.setBindings({{ 28 }});
+                il.setAttributes({{ 0, 0, QRhiVertexInputAttribute::Float3, 0 }, 
+                                  { 0, 1, QRhiVertexInputAttribute::Float3, 12 }, 
+                                  { 0, 2, QRhiVertexInputAttribute::UNormByte4, 24 }});
+            }
+            
             p->setVertexInputLayout(il);
             p->setShaderResourceBindings(m_srb.get());
             p->setRenderPassDescriptor(rp);
@@ -134,7 +169,12 @@ void BrainRenderer::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int
             p->setCullMode(cull);
             if (mode == Holographic) {
                 p->setTargetBlends({blend});
-                p->setDepthTest(false);
+                p->setDepthTest(true);
+                p->setDepthWrite(false);
+            } else if (mode == Dipole) {
+                p->setTargetBlends({blend});
+                p->setCullMode(QRhiGraphicsPipeline::None);
+                p->setDepthTest(true);
                 p->setDepthWrite(false);
             } else {
                 p->setDepthTest(true);
@@ -208,4 +248,39 @@ void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
     }
     
     draw(pipeline);
+}
+
+//=============================================================================================================
+
+void BrainRenderer::renderDipoles(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, DipoleObject *dipoles)
+{
+    if (!dipoles || !dipoles->isVisible() || dipoles->instanceCount() == 0) return;
+
+    if (m_pipelines.find(Dipole) == m_pipelines.end()) return;
+    
+    auto *pipeline = m_pipelines[Dipole].get();
+    if (!pipeline) return;
+
+    QRhiResourceUpdateBatch *u = rhi->nextResourceUpdateBatch();
+    dipoles->updateBuffers(rhi, u);
+
+    u->updateDynamicBuffer(m_uniformBuffer.get(), 0, 64, data.mvp.constData());
+    u->updateDynamicBuffer(m_uniformBuffer.get(), 64, 12, &data.cameraPos);
+    u->updateDynamicBuffer(m_uniformBuffer.get(), 80, 12, &data.lightDir);
+    float lighting = data.lightingEnabled ? 1.0f : 0.0f;
+    u->updateDynamicBuffer(m_uniformBuffer.get(), 92, 4, &lighting);
+
+    cb->resourceUpdate(u);
+
+    cb->setGraphicsPipeline(pipeline);
+    cb->setShaderResources(m_srb.get());
+    
+    const QRhiCommandBuffer::VertexInput bindings[2] = {
+        QRhiCommandBuffer::VertexInput(dipoles->vertexBuffer(), 0),
+        QRhiCommandBuffer::VertexInput(dipoles->instanceBuffer(), 0)
+    };
+    
+    cb->setVertexInput(0, 2, bindings, dipoles->indexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
+    
+    cb->drawIndexed(dipoles->indexCount(), dipoles->instanceCount());
 }

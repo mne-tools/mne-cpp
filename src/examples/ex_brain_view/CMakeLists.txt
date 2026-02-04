@@ -17,6 +17,7 @@ set(SOURCES
     brainrenderer.cpp
     brainsurface.cpp
     sourceestimateoverlay.cpp
+    dipoleobject.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -34,6 +35,7 @@ set(MNE_LIBS_REQUIRED
     mne_mne
     mne_disp
     mne_disp3D
+    mne_inverse
     mne_utils
 )
 
@@ -51,6 +53,8 @@ qt_add_shaders(${PROJECT_NAME} "brain_shaders"
         "shaders/holographic.frag"
         "shaders/glossy.vert"
         "shaders/glossy.frag"
+        "shaders/dipole.vert"
+        "shaders/dipole.frag"
 )
 
 # Link against MNE-CPP libraries and Qt

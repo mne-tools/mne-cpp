@@ -51,6 +51,7 @@
 #include <QSlider>
 #include <QDoubleSpinBox>
 #include <QFileDialog>
+#include <QFile>
 
 #include "brainview.h"
 
@@ -195,8 +196,11 @@ int main(int argc, char *argv[])
     minThresh->setValue(0.0);
     midThresh->setValue(0.5);
     maxThresh->setValue(10.0); // Using 10.0 as a reasonable initial max for visualization
+    threshLayout->addWidget(new QLabel("Min"));
     threshLayout->addWidget(minThresh);
+    threshLayout->addWidget(new QLabel("Mid"));
     threshLayout->addWidget(midThresh);
+    threshLayout->addWidget(new QLabel("Max"));
     threshLayout->addWidget(maxThresh);
 
     // Playback Controls
@@ -254,6 +258,18 @@ int main(int argc, char *argv[])
     
     sideLayout->addWidget(controlGroup);
     sideLayout->addWidget(stcGroup);
+    
+    // Dipole Group
+    QGroupBox *dipoleGroup = new QGroupBox("Dipoles");
+    QVBoxLayout *dipoleLayout = new QVBoxLayout(dipoleGroup);
+    QPushButton *loadDipoleBtn = new QPushButton("Load Dipoles...");
+    QCheckBox *showDipoleCheck = new QCheckBox("Show Dipoles");
+    showDipoleCheck->setChecked(true);
+    showDipoleCheck->setEnabled(false);
+    dipoleLayout->addWidget(loadDipoleBtn);
+    dipoleLayout->addWidget(showDipoleCheck);
+    
+    sideLayout->addWidget(dipoleGroup);
     sideLayout->addWidget(sensorGroup);
     sideLayout->addStretch();
     
@@ -360,10 +376,38 @@ int main(int argc, char *argv[])
     
     // Source Estimate Connections
     QObject::connect(loadStcBtn, &QPushButton::clicked, [&](){
-        QString lhPath = QFileDialog::getOpenFileName(nullptr, "Select LH STC", "", "STC Files (*-lh.stc *.stc)");
-        if (lhPath.isEmpty()) return;
-        QString rhPath = lhPath;
-        rhPath.replace("-lh.stc", "-rh.stc");
+        QString path = QFileDialog::getOpenFileName(nullptr, "Select Source Estimate", "", "STC Files (*-lh.stc *-rh.stc *.stc)");
+        if (path.isEmpty()) return;
+        
+        QString lhPath;
+        QString rhPath;
+        
+        // Detect hemisphere and potential sibling
+        if (path.contains("-lh.stc")) {
+            lhPath = path;
+            QString sibling = path;
+            sibling.replace("-lh.stc", "-rh.stc");
+            if (QFile::exists(sibling)) rhPath = sibling;
+        } else if (path.contains("-rh.stc")) {
+            rhPath = path;
+            QString sibling = path;
+            sibling.replace("-rh.stc", "-lh.stc");
+            if (QFile::exists(sibling)) lhPath = sibling;
+        } else {
+            // Default behavior if not strictly named -lh/-rh
+            // Try to assume it's LH and check for RH?
+            // Or just try to load this one file as LH? 
+            // In strict STC world, filename usually ends in -lh by convention for loading.
+            // But if user picks 'test.stc', assume it's a single file.
+            // Let's assume it is LH for now or try to match pattern.
+            // Actually, BrainView needs explicit LH/RH paths to know where to put it.
+            // If the user loads a file that doesn't follow convention, we might not know the hemi.
+            // But standard MNE-C/Python uses -lh.stc.
+            // Let's try to infer. If fail, maybe force LH?
+            qWarning() << "Selected file does not follow -lh/-rh convention. Assuming it is LH and checking for RH pattern if applicable.";
+            lhPath = path; 
+        }
+        
         brainView->loadSourceEstimate(lhPath, rhPath);
     });
     
@@ -468,6 +512,21 @@ int main(int argc, char *argv[])
     });
     QObject::connect(showDigCheck, &QCheckBox::toggled, [=](bool checked){
         brainView->setSensorVisible("Digitizer", checked);
+    });
+
+    // Dipole Connections
+    QObject::connect(loadDipoleBtn, &QPushButton::clicked, [&](){
+        QString path = QFileDialog::getOpenFileName(nullptr, "Load Dipoles", "", "Dipole Files (*.dip)");
+        if (!path.isEmpty()) {
+            if (brainView->loadDipoles(path)) {
+                showDipoleCheck->setEnabled(true);
+                brainView->setDipoleVisible(showDipoleCheck->isChecked());
+            }
+        }
+    });
+
+    QObject::connect(showDipoleCheck, &QCheckBox::toggled, [=](bool checked){
+        brainView->setDipoleVisible(checked);
     });
 
     // Sync initial state

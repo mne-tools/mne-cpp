@@ -45,6 +45,7 @@
 #include <map>
 #include <memory>
 #include "brainsurface.h"
+#include "dipoleobject.h"
 
 //=============================================================================================================
 /**
@@ -70,7 +71,8 @@ public:
     enum ShaderMode {
         Standard,
         Holographic,
-        Atlas
+        Atlas,
+        Dipole
     };
 
     struct SceneData {
@@ -111,6 +113,17 @@ public:
      * @param[in] mode       Shader mode to use for this surface.
      */
     void renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, BrainSurface *surface, ShaderMode mode);
+
+    //=========================================================================================================
+    /**
+     * Render dipoles using instanced rendering.
+     *
+     * @param[in] cb         Command buffer.
+     * @param[in] rhi        QRhi pointer.
+     * @param[in] data       Scene uniforms.
+     * @param[in] dipoles    Pointer to DipoleObject.
+     */
+    void renderDipoles(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, DipoleObject *dipoles);
 
     //=========================================================================================================
     /**

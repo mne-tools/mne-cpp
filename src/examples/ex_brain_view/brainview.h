@@ -41,6 +41,7 @@
 
 #include "brainrenderer.h"
 #include "brainsurface.h"
+#include "dipoleobject.h"
 #include "sourceestimateoverlay.h"
 #include <mne/mne_bem.h>
 #include <fiff/fiff_coord_trans.h>
@@ -130,6 +131,15 @@ public:
      */
     bool loadTransformation(const QString &fifPath);
 
+    //=========================================================================================================
+    /**
+     * Load ECD dipoles from a .dip file.
+     *
+     * @param[in] filePath    Path to the .dip file.
+     * @return True if successful.
+     */
+    bool loadDipoles(const QString &filePath);
+
 public slots:
     //=========================================================================================================
     /**
@@ -197,6 +207,14 @@ public slots:
      * @param[in] visible    Visibility state.
      */
     void setSensorVisible(const QString &type, bool visible);
+
+    //=========================================================================================================
+    /**
+     * Toggle visibility of dipoles.
+     * 
+     * @param[in] visible    Visibility state.
+     */
+    void setDipoleVisible(bool visible);
 
     //=========================================================================================================
     /**
@@ -312,9 +330,11 @@ private:
     int m_snapshotCounter = 0;
     
     std::unique_ptr<SourceEstimateOverlay> m_sourceOverlay;
+    std::unique_ptr<DipoleObject> m_dipoles;
     int m_currentTimePoint = 0;
     
     FIFFLIB::FiffCoordTrans m_headToMriTrans;
+    bool m_dipolesVisible = true;
 };
 
 #endif // BRAINVIEW_H
