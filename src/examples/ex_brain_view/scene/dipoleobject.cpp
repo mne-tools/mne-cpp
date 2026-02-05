@@ -85,6 +85,9 @@ void DipoleObject::load(const INVERSELIB::ECDSet &ecdSet)
         data[i].color[1] = QRandomGenerator::global()->generateDouble();
         data[i].color[2] = QRandomGenerator::global()->generateDouble();
         data[i].color[3] = 1.0f;
+        
+        // Selection state
+        data[i].isSelected = 0.0f;
     }
     
     if (m_instanceCount > 0) {
@@ -289,4 +292,69 @@ void DipoleObject::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
         u->updateDynamicBuffer(m_instanceBuffer.get(), 0, m_instanceData.size(), m_instanceData.constData());
         m_instancesDirty = false;
     }
+}
+
+int DipoleObject::intersect(const QVector3D &rayOrigin, const QVector3D &rayDir, float &dist) const
+{
+    if (m_instanceCount == 0) return -1;
+    
+    int closestIdx = -1;
+    float closestDist = std::numeric_limits<float>::max();
+    
+    const InstanceData *data = reinterpret_cast<const InstanceData*>(m_instanceData.constData());
+    
+    // Geometry radius ~ 0.005 (base) to 0.01 (height). 
+    // Let's use a slightly larger hit radius to make selection easier and more accurate.
+    const float baseRadius = 0.02f; 
+
+    for (int i = 0; i < m_instanceCount; ++i) {
+        // Extract translation (last column)
+        QVector3D center(data[i].model[12], data[i].model[13], data[i].model[14]);
+        
+        // Extract scale (length of first column) - assumes uniform scale roughly
+        QVector3D col0(data[i].model[0], data[i].model[1], data[i].model[2]);
+        float scale = col0.length();
+        
+        float radius = baseRadius * scale;
+        
+        // Ray-Sphere Intersection
+        QVector3D L = center - rayOrigin;
+        float tca = QVector3D::dotProduct(L, rayDir);
+        
+        if (tca < 0) continue; // Behind ray
+        
+        float d2 = QVector3D::dotProduct(L, L) - tca * tca;
+        if (d2 > radius * radius) continue; // Miss
+        
+        float thc = std::sqrt(radius * radius - d2);
+        float t0 = tca - thc;
+        float t1 = tca + thc;
+        
+        float t = t0;
+        if (t < 0) t = t1;
+        if (t < 0) continue;
+        
+        if (t < closestDist) {
+            closestDist = t;
+            closestIdx = i;
+        }
+    }
+    
+    if (closestIdx != -1) {
+        dist = closestDist;
+        return closestIdx;
+    }
+    
+    return -1;
+}
+
+void DipoleObject::setSelected(int index, bool selected)
+{
+    if (index < 0 || index >= m_instanceCount) return;
+    
+    InstanceData *data = reinterpret_cast<InstanceData*>(m_instanceData.data());
+    
+    data[index].isSelected = selected ? 1.0f : 0.0f;
+    
+    m_instancesDirty = true;
 }

@@ -11,7 +11,7 @@ layout(location = 0) out vec4 fragColor;
 layout(std140, binding = 0) uniform UniformBlock {
     mat4 mvp;
     vec3 cameraPos;
-    float _pad1;
+    float isSelected;
     vec3 lightDir;
     float _pad2;
     float lightingEnabled;
@@ -58,6 +58,15 @@ void main() {
     float alpha_data = 0.4 + 0.5 * fresnel;
     
     float final_alpha = mix(alpha_shell, alpha_data, is_data);
+    
+    // --- Selection Highlight (Silver Rim) ---
+    if (isSelected > 0.5) {
+        float selectionRim = pow(1.0 - N_dot_V, 3.0);
+        vec3 whiteColor = vec3(1.0, 1.1, 1.2); // Cool White
+        base_rgb += whiteColor * 0.2; // Constant boost
+        base_rgb += whiteColor * selectionRim * 1.0;
+        final_alpha = clamp(final_alpha + 0.1 + selectionRim * 0.5, 0.0, 1.0);
+    }
     
     // Modulate RGB by alpha for additive blending
     fragColor = vec4(base_rgb * final_alpha, final_alpha);

@@ -13,7 +13,7 @@ layout(location = 4) out float v_curvature;
 layout(std140, binding = 0) uniform UniformBlock {
     mat4 mvp;
     vec3 cameraPos;
-    float _pad1;
+    float isSelected;
     vec3 lightDir;
     float _pad2;
     float lightingEnabled;

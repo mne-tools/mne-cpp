@@ -233,6 +233,20 @@ public:
 
     //=========================================================================================================
     /**
+     * Test ray intersection with this surface.
+     * 
+     * @param[in] rayOrigin  Ray origin in world/local space (object is assumed at 0,0,0 usually unless transformed externally).
+     *                       Note: The BrainSurface vertices are typically already transformed (e.g. by View3D model matrix logic? 
+     *                       No, BrainView applies matrix in shader. The vertices here are raw. 
+     *                       So ray must be transformed to local space OR vertices transformed to world.
+     * @param[in] rayDir     Ray direction (normalized).
+     * @param[out] dist      Distance to intersection.
+     * @return True if intersected.
+     */
+    bool intersects(const QVector3D &rayOrigin, const QVector3D &rayDir, float &dist) const;
+
+    //=========================================================================================================
+    /**
      * Translate all vertices along the X axis.
      *
      * @param[in] offset     Amount to translate.
@@ -270,6 +284,9 @@ public:
      */
     void setUseDefaultColor(bool useDefault);
     
+    void setSelected(bool selected);
+    bool isSelected() const { return m_selected; }
+    
 private:
     void updateVertexColors();
 
@@ -285,7 +302,8 @@ private:
     VisualizationMode m_visMode = ModeSurface;
     QVector<float> m_curvature;
     
-    std::atomic<bool> m_visible{true};
+    bool m_visible = true;
+    bool m_selected = false;
     int m_hemi = -1; // 0=lh, 1=rh
 
     std::unique_ptr<QRhiBuffer> m_vertexBuffer;

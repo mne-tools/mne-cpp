@@ -11,7 +11,7 @@ layout(location = 0) out vec4 fragColor;
 layout(std140, binding = 0) uniform UniformBlock {
     mat4 mvp;
     vec3 cameraPos;
-    float _pad1;
+    float isSelected;
     vec3 lightDir;
     float _pad2;
     float lightingEnabled;
@@ -43,6 +43,14 @@ void main() {
     
     // === COMBINE ===
     vec3 final_color = ambient + diffuse + specular;
+    
+    // --- Suble Hover Glow (Silver Rim) ---
+    if (isSelected > 0.5) {
+        float fresnel = pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 3.0);
+        vec3 glowColor = vec3(1.0, 1.0, 1.0); // Pure White/Silver
+        final_color += glowColor * 0.15; 
+        final_color += glowColor * fresnel * 0.85;
+    }
     
     // Opaque rendering for atlas
     fragColor = vec4(final_color, 1.0);

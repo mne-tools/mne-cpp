@@ -231,6 +231,14 @@ public slots:
 
     //=========================================================================================================
     /**
+     * Cast rays from screen position to find intersected objects.
+     * 
+     * @param[in] pos        2D mouse position.
+     */
+    void castRay(const QPoint &pos);
+
+    //=========================================================================================================
+    /**
      * Set the colormap for source estimate visualization.
      *
      * @param[in] name       Colormap name ("Hot", "Jet", etc.).
@@ -322,8 +330,11 @@ private:
     std::unique_ptr<DipoleObject> m_dipoles;
     int m_currentTimePoint = 0;
     
-    FIFFLIB::FiffCoordTrans m_headToMriTrans;
-    bool m_dipolesVisible = true;
+     FIFFLIB::FiffCoordTrans m_headToMriTrans;
+     bool m_dipolesVisible = true;
+     
+     QStandardItem* m_hoveredItem = nullptr;
+     int m_hoveredIndex = -1;
 };
 
 #endif // BRAINVIEW_H

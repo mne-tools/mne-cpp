@@ -33,6 +33,19 @@ public:
     
     QVector3D debugFirstDipolePosition() const; // For debugging
 
+    void setSelected(int index, bool selected);
+
+    //=========================================================================================================
+    /**
+     * Test ray intersection with dipoles.
+     * 
+     * @param[in] rayOrigin  Ray origin in world space.
+     * @param[in] rayDir     Ray direction (normalized).
+     * @param[out] dist      Distance to intersection.
+     * @return Index of intersected dipole, or -1 if none.
+     */
+    int intersect(const QVector3D &rayOrigin, const QVector3D &rayDir, float &dist) const;
+
 private:
     void createGeometry();
     
@@ -51,12 +64,9 @@ private:
     
     // Instance data: Model Matrix (4x4) + Color (vec4)
     struct InstanceData {
-        // Mat4 is 4 columns of vec4. Layout in standard is column-major.
-        // However, in shader we use row vectors for attributes to assemble mat4.
-        // Let's stick to standard layout and handle in shader.
-        // Actually, easiest is 4 vec4s for matrix columns/rows.
         float model[16]; 
         float color[4];
+        float isSelected; // 1.0 = selected, 0.0 = not
     };
     
     QByteArray m_vertexData;
@@ -65,6 +75,8 @@ private:
     
     bool m_geometryDirty = false;
     bool m_instancesDirty = false;
+    
+    std::vector<QVector4D> m_originalColors;
 };
 
 #endif // DIPOLEOBJECT_H

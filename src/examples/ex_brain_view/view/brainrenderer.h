@@ -105,6 +105,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Set uniforms that are shared for the entire frame.
+     * 
+     * @param[in] data       Scene uniforms (MVP, light, etc).
+     */
+    void updateSceneUniforms(QRhi *rhi, const SceneData &data);
+
+    //=========================================================================================================
+    /**
      * Render a single surface. Must be called between beginFrame and endFrame.
      *
      * @param[in] cb         Command buffer.
@@ -144,6 +152,8 @@ private:
     std::map<ShaderMode, std::unique_ptr<QRhiGraphicsPipeline>> m_pipelinesBackColor; // For Holographic back faces
     
     std::unique_ptr<QRhiBuffer> m_uniformBuffer;
+    int m_uniformBufferOffsetAlignment = 0;
+    int m_currentUniformOffset = 0;
     
     bool m_resourcesDirty = true;
 };

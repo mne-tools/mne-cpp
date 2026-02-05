@@ -52,6 +52,7 @@
 #include <QDoubleSpinBox>
 #include <QFileDialog>
 #include <QFile>
+#include <QScrollArea>
 
 #include "brainview.h"
 #include "model/braintreemodel.h"
@@ -93,13 +94,24 @@ int main(int argc, char *argv[])
     QHBoxLayout *mainLayout = new QHBoxLayout(centralWidget);
     mainWindow.setCentralWidget(centralWidget);
 
-    // Side Panel (Controls)
+    // Side Panel (Controls) with Scroll Area
+    QScrollArea *scrollArea = new QScrollArea;
+    scrollArea->setFixedWidth(270); // Slightly wider to account for scrollbar
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    scrollArea->setFrameShape(QFrame::NoFrame);
+
     QWidget *sidePanel = new QWidget;
-    sidePanel->setFixedWidth(250);
+    sidePanel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     QVBoxLayout *sideLayout = new QVBoxLayout(sidePanel);
+    sideLayout->setContentsMargins(5, 5, 5, 5);
+    sideLayout->setSpacing(5);
+    scrollArea->setWidget(sidePanel);
     
     QGroupBox *controlGroup = new QGroupBox("Controls");
     QVBoxLayout *controlLayout = new QVBoxLayout(controlGroup);
+    controlLayout->setContentsMargins(10, 15, 10, 10);
+    controlLayout->setSpacing(8);
     
     // Controls: Surface Selector
     QLabel *surfLabel = new QLabel("Surface Type:");
@@ -127,6 +139,9 @@ int main(int argc, char *argv[])
     QCheckBox *bemColorCheck = new QCheckBox("Show BEM Colors");
     bemColorCheck->setChecked(true);
     bemColorCheck->setToolTip("Toggle between standard Red/Green/Blue colors and White/Overlay colors.");
+    
+    // Ensure group box itself doesn't have too much margin
+    controlGroup->setFlat(true);
     
     // Controls: Overlay (Data)
     QLabel *overlayLabel = new QLabel("Overlay:");
@@ -173,6 +188,8 @@ int main(int argc, char *argv[])
     // Source Estimate Group
     QGroupBox *stcGroup = new QGroupBox("Source Estimate");
     QVBoxLayout *stcLayout = new QVBoxLayout(stcGroup);
+    stcLayout->setContentsMargins(10, 15, 10, 10);
+    stcLayout->setSpacing(8);
     
     QPushButton *loadStcBtn = new QPushButton("Load STC...");
     
@@ -196,16 +213,17 @@ int main(int argc, char *argv[])
     midThresh->setRange(0, 1e12);
     maxThresh->setRange(0, 1e12);
     
-    // Set default values (matching SourceEstimateOverlay defaults)
     minThresh->setValue(0.0);
     midThresh->setValue(0.5);
     maxThresh->setValue(10.0); // Using 10.0 as a reasonable initial max for visualization
-    threshLayout->addWidget(new QLabel("Min"));
-    threshLayout->addWidget(minThresh);
-    threshLayout->addWidget(new QLabel("Mid"));
-    threshLayout->addWidget(midThresh);
-    threshLayout->addWidget(new QLabel("Max"));
-    threshLayout->addWidget(maxThresh);
+    
+    QGridLayout *threshGrid = new QGridLayout();
+    threshGrid->addWidget(new QLabel("Min"), 0, 0);
+    threshGrid->addWidget(minThresh, 0, 1);
+    threshGrid->addWidget(new QLabel("Mid"), 1, 0);
+    threshGrid->addWidget(midThresh, 1, 1);
+    threshGrid->addWidget(new QLabel("Max"), 2, 0);
+    threshGrid->addWidget(maxThresh, 2, 1);
 
     // Playback Controls
     QLabel *playbackLabel = new QLabel("Playback:");
@@ -225,6 +243,8 @@ int main(int argc, char *argv[])
     // Sensor Controls
     QGroupBox *sensorGroup = new QGroupBox("Sensors");
     QVBoxLayout *sensorLayout = new QVBoxLayout(sensorGroup);
+    sensorLayout->setContentsMargins(10, 15, 10, 10);
+    sensorLayout->setSpacing(8);
     
     QPushButton *loadDigBtn = new QPushButton("Load Digitizer...");
     QPushButton *loadTransBtn = new QPushButton("Load Transformation...");
@@ -253,7 +273,7 @@ int main(int argc, char *argv[])
     stcLayout->addWidget(colormapLabel);
     stcLayout->addWidget(colormapCombo);
     stcLayout->addWidget(threshLabel);
-    stcLayout->addLayout(threshLayout);
+    stcLayout->addLayout(threshGrid);
     stcLayout->addWidget(playbackLabel);
     stcLayout->addLayout(playbackLayout);
     stcLayout->addWidget(timeSlider);
@@ -266,6 +286,8 @@ int main(int argc, char *argv[])
     // Dipole Group
     QGroupBox *dipoleGroup = new QGroupBox("Dipoles");
     QVBoxLayout *dipoleLayout = new QVBoxLayout(dipoleGroup);
+    dipoleLayout->setContentsMargins(10, 15, 10, 10);
+    dipoleLayout->setSpacing(8);
     QPushButton *loadDipoleBtn = new QPushButton("Load Dipoles...");
     QCheckBox *showDipoleCheck = new QCheckBox("Show Dipoles");
     showDipoleCheck->setChecked(true);
@@ -566,7 +588,7 @@ int main(int argc, char *argv[])
     brainView->setBemVisible("outer_skull", outerCheck->isChecked());
     brainView->setBemVisible("inner_skull", innerCheck->isChecked());
     
-    mainLayout->addWidget(sidePanel);
+    mainLayout->addWidget(scrollArea);
     // BrainView inherits QRhiWidget (Qt 6.7+) -> QWidget
     mainLayout->addWidget(brainView);
     

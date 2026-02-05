@@ -40,6 +40,7 @@
 #include <Eigen/Dense>
 #include "bemtreeitem.h"
 #include <QMatrix4x4>
+#include <QVector4D>
 #include <cmath>
 #include <QDebug>
 #include <QApplication>
@@ -78,6 +79,7 @@ BrainView::BrainView(QWidget *parent)
     setMinimumSize(800, 600);
     setSampleCount(1);
     setApi(Api::Metal);
+    setMouseTracking(true); // Enable hover events
     
     m_updateTimer = new QTimer(this);
     connect(m_updateTimer, &QTimer::timeout, this, QOverload<>::of(&BrainView::update));
@@ -184,6 +186,13 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
              // Map it
              m_itemSurfaceMap[item] = brainSurf;
              
+             // Apply Head-to-MRI transformation if available (BEM is in Head space)
+             if (!m_headToMriTrans.isEmpty()) {
+                 QMatrix4x4 m;
+                 for(int r=0; r<4; ++r) for(int c=0; c<4; ++c) m(r,c) = m_headToMriTrans.trans(r,c);
+                 brainSurf->transform(m);
+             }
+
              // Legacy map support (Use item text e.g. "bem_head")
              m_surfaces["bem_" + bemItem->text()] = brainSurf;
              
@@ -262,6 +271,14 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
             brainSurf->setVisible(sensItem->isVisible());
             m_itemSurfaceMap[item] = brainSurf;
             
+            // Apply Head-to-MRI transformation if available
+            // Note: meg positions in info might already be head-space, but check if we need this global trans
+            if (!m_headToMriTrans.isEmpty()) {
+                QMatrix4x4 m;
+                for(int r=0; r<4; ++r) for(int c=0; c<4; ++c) m(r,c) = m_headToMriTrans.trans(r,c);
+                brainSurf->transform(m);
+            }
+
             // Legacy map support
             QString keyPrefix = "sens_";
             if (parentText.contains("MEG")) keyPrefix = "sens_meg_";
@@ -529,8 +546,6 @@ void BrainView::render(QRhiCommandBuffer *cb)
     model.translate(-m_sceneCenter);
     sceneData.mvp *= model; // Apply model transform
     
-    sceneData.mvp *= model; // Apply model transform
-    
     sceneData.cameraPos = cameraPos; // Camera pos is in world space, but we moved object. 
     // Actually, view matrix looks at (0,0,0). Object is moved to (0,0,0). So cameraPos is correct relative to object center.
     
@@ -597,12 +612,6 @@ void BrainView::render(QRhiCommandBuffer *cb)
         }
     }
     
-    // Render Dipoles from Map (New Model Architecture)
-    for(auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
-        if (it.value()->isVisible()) {
-             m_renderer->renderDipoles(cb, rhi(), sceneData, it.value().get());
-        }
-    }
     
     // Render Dipoles
     if (m_dipolesVisible && m_dipoles) {
@@ -636,6 +645,8 @@ void BrainView::mouseMoveEvent(QMouseEvent *event)
 
         m_lastMousePos = event->pos();
         update();
+    } else {
+        castRay(event->pos());
     }
 }
 
@@ -894,28 +905,141 @@ bool BrainView::loadTransformation(const QString &transPath)
     
 
     
-    // Apply to sensors and dipoles
-    QMatrix4x4 qmat;
-    for(int r=0; r<4; ++r)
-        for(int c=0; c<4; ++c)
-            qmat(r,c) = m_headToMriTrans.trans(r,c);
-            
-    // Apply to sensors in m_surfaces
-    int count = 0;
-    for(auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-        if (it.key().startsWith("sens_")) {
-            it.value()->transform(qmat);
-            count++;
+    // Apply to all existing BEM, Sensor and Dipole objects
+    if (!m_headToMriTrans.isEmpty()) {
+        QMatrix4x4 qmat;
+        for(int r=0; r<4; ++r) for(int c=0; c<4; ++c) qmat(r,c) = m_headToMriTrans.trans(r,c);
+        
+        int surfCount = 0;
+        for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+            if (it.key().startsWith("bem_") || it.key().startsWith("sens_")) {
+                it.value()->transform(qmat);
+                surfCount++;
+            }
         }
-    }
-    // Apply to dipoles in m_itemDipoleMap
-    int dipCount = 0;
-    for(auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
-        it.value()->applyTransform(qmat);
-        dipCount++;
+        int dipCount = 0;
+        for (auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
+            it.value()->applyTransform(qmat);
+            dipCount++;
+        }
+        qDebug() << "Applied Head-to-MRI to" << surfCount << "surfaces and" << dipCount << "dipole objects.";
     }
 
-    
     return true;
 }
 
+
+//=============================================================================================================
+
+void BrainView::castRay(const QPoint &pos)
+{
+    // 1. Setup Matrix Stack (Must match render exactly)
+    QSize outputSize = renderTarget()->pixelSize();
+    QMatrix4x4 projection;
+    float farPlane = m_sceneSize * 20.0f;
+    if (farPlane < 100.0f) farPlane = 100.0f;
+    projection.perspective(45.0f, float(outputSize.width()) / float(outputSize.height()), m_sceneSize * 0.01f, farPlane);
+    
+    float baseDistance = m_sceneSize * 1.5f;
+    float distance = baseDistance - m_zoom * (m_sceneSize * 0.05f); 
+    QVector3D cameraPos = m_cameraRotation.rotatedVector(QVector3D(0, 0, distance));
+    QVector3D upVector = m_cameraRotation.rotatedVector(QVector3D(0, 1, 0));
+    QMatrix4x4 view;
+    view.lookAt(cameraPos, QVector3D(0, 0, 0), upVector);
+    
+    QMatrix4x4 model;
+    model.translate(-m_sceneCenter);
+    QMatrix4x4 pvm = projection * view * model;
+    QMatrix4x4 invPVM = pvm.inverted();
+    
+    float ndcX = (2.0f * pos.x()) / width() - 1.0f;
+    float ndcY = 1.0f - (2.0f * pos.y()) / height(); 
+    
+    QVector4D vNear(ndcX, ndcY, -1.0f, 1.0f);
+    QVector4D vFar(ndcX, ndcY, 1.0f, 1.0f);
+    
+    QVector4D pNear = invPVM * vNear;
+    QVector4D pFar = invPVM * vFar;
+    pNear /= pNear.w();
+    pFar /= pFar.w();
+    
+    QVector3D rayOrigin = pNear.toVector3D();
+    QVector3D rayDir = (pFar.toVector3D() - pNear.toVector3D()).normalized();
+    
+    
+    
+    float closestDist = std::numeric_limits<float>::max();
+    QStandardItem* hitItem = nullptr;
+    QString hitInfo;
+    
+    int hitIndex = -1;
+    
+    // Check Surfaces (Sensors, Hemisphere, BEM)
+    // Note: iterating map keys is fast enough for < 100 objects
+    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+        if (!it.value()->isVisible()) continue;
+        
+        // Optim: Skip hemispheres for now (too slow without octree)
+        // unless it's a sensor
+        bool isSensor = it.key().startsWith("sens_");
+        // if (!isSensor && it.value()->vertexCount() > 5000) continue;
+        
+        float dist;
+        if (it.value()->intersects(rayOrigin, rayDir, dist)) {
+             if (dist < closestDist) {
+                 closestDist = dist;
+                 // Find item in map
+                 // m_surfaces doesn't store Item pointer directly as key.
+                 // But m_itemSurfaceMap does.
+                 for(auto i = m_itemSurfaceMap.begin(); i != m_itemSurfaceMap.end(); ++i) {
+                     if (i.value() == it.value()) {
+                         hitItem = const_cast<QStandardItem*>(i.key());
+                         hitInfo = hitItem->text();
+                         break;
+                     }
+                 }
+                 if (!hitItem && isSensor) hitInfo = it.key(); // Fallback
+                 hitIndex = -1;
+             }
+        }
+    }
+    
+    // Check Dipoles
+    for(auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
+         if (!it.value()->isVisible()) continue;
+         
+         float dist;
+         int dipIdx = it.value()->intersect(rayOrigin, rayDir, dist);
+         if (dipIdx != -1) {
+             if (dist < closestDist) {
+                 closestDist = dist;
+                 hitItem = const_cast<QStandardItem*>(it.key());
+                 hitInfo = QString("%1 (Dipole %2)").arg(hitItem->text()).arg(dipIdx);
+                 hitIndex = dipIdx;
+             }
+         }
+     }
+    
+    if (hitItem != m_hoveredItem || hitIndex != m_hoveredIndex) {
+        // Deselect previous
+        if (m_hoveredItem) {
+             if (m_itemSurfaceMap.contains(m_hoveredItem)) {
+                 m_itemSurfaceMap[m_hoveredItem]->setSelected(false);
+             } else if (m_itemDipoleMap.contains(m_hoveredItem)) {
+                 m_itemDipoleMap[m_hoveredItem]->setSelected(m_hoveredIndex, false);
+             }
+        }
+    
+        m_hoveredItem = hitItem;
+        m_hoveredIndex = hitIndex;
+        
+        if (m_hoveredItem) {
+             // Select new
+             if (m_itemSurfaceMap.contains(m_hoveredItem)) {
+                 m_itemSurfaceMap[m_hoveredItem]->setSelected(true);
+             } else if (m_itemDipoleMap.contains(m_hoveredItem)) {
+                 m_itemDipoleMap[m_hoveredItem]->setSelected(m_hoveredIndex, true);
+             }
+        }
+    }
+}

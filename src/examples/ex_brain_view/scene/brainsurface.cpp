@@ -258,6 +258,7 @@ void BrainSurface::updateVertexColors()
 {
     uint32_t baseVal = (m_baseColor.alpha() << 24) | (m_baseColor.blue() << 16) | (m_baseColor.green() << 8) | m_baseColor.red();
 
+
     // Reset to base color first
     for (auto &v : m_vertexData) {
         v.color = baseVal; 
@@ -452,5 +453,110 @@ void BrainSurface::boundingBox(QVector3D &min, QVector3D &max) const
         max.setX(std::max(max.x(), v.pos.x()));
         max.setY(std::max(max.y(), v.pos.y()));
         max.setZ(std::max(max.z(), v.pos.z()));
+    }
+}
+
+bool BrainSurface::intersects(const QVector3D &rayOrigin, const QVector3D &rayDir, float &dist) const
+{
+    if (m_vertexData.isEmpty()) return false;
+
+    // 1. AABB Check
+    QVector3D min, max;
+    boundingBox(min, max);
+    
+    // Ray-AABB slab method with small epsilon padding
+    float eps = 1e-4f;
+    float tmin = (min.x() - eps - rayOrigin.x()) / rayDir.x();
+    float tmax = (max.x() + eps - rayOrigin.x()) / rayDir.x();
+    if (tmin > tmax) std::swap(tmin, tmax);
+    
+    float tymin = (min.y() - eps - rayOrigin.y()) / rayDir.y();
+    float tymax = (max.y() + eps - rayOrigin.y()) / rayDir.y();
+    if (tmin > tymax || tymin > tmax) return false;
+    if (tymin > tmin) tmin = tymin;
+    if (tymax < tmax) tmax = tymax;
+    
+    float tzmin = (min.z() - eps - rayOrigin.z()) / rayDir.z();
+    float tzmax = (max.z() + eps - rayOrigin.z()) / rayDir.z();
+    if (tzmin > tzmax) std::swap(tzmin, tzmax);
+    
+    if (tmin > tzmax || tzmin > tmax) return false;
+    
+    if (tzmin > tmin) tmin = tzmin;
+    if (tzmax < tmax) tmax = tzmax;
+    
+    // Debug AABB failures for BrainSurface (large mesh)
+    static int debugCounter = 0;
+    if (m_vertexData.size() > 5000 && debugCounter++ % 60 == 0) {
+        // qDebug() << "BrainSurface(Large) AABB Hit. tmin:" << tmin << "tmax:" << tmax << "Ray:" << rayOrigin << rayDir;
+    }
+    
+    // access to tmin, tmax for debug if needed
+    // If we passed AABB, check triangles if vertex count is small (e.g. Sensor)
+    // For large brain meshes (100k+), this is too slow without Octree.
+    // Heuristic: If < 1000 vertices, do full check. Else, accept AABB hit ?? 
+    // No, AABB hit on brain is basically "entire screen".
+    // For now: Only precise check for "Sensors" (small).
+    
+    // if (m_vertexData.size() > 5000) {
+    //    // Just AABB for big meshes? No that's useless for picking specific gyri.
+    //    // Return false for now for big meshes to avoid selecting the whole head when trying to pick sensors.
+    //    return false; 
+    // }
+
+    float closestDist = std::numeric_limits<float>::max();
+    bool hit = false;
+    
+    // Brute-force triangle intersection
+    for (int i = 0; i < m_indexData.size(); i += 3) {
+        const QVector3D &v0 = m_vertexData[m_indexData[i]].pos;
+        const QVector3D &v1 = m_vertexData[m_indexData[i+1]].pos;
+        const QVector3D &v2 = m_vertexData[m_indexData[i+2]].pos;
+        
+        // Möller–Trumbore intersection algorithm
+        // Relaxing epsilon for steep angles/large scales
+        const float EPSILON = 1e-6f; 
+        QVector3D edge1 = v1 - v0;
+        QVector3D edge2 = v2 - v0;
+        QVector3D h = QVector3D::crossProduct(rayDir, edge2);
+        float a = QVector3D::dotProduct(edge1, h);
+        
+        // Use backface culling or double sided? 
+        // For brain we usually want double sided if we click from inside, 
+        // but for now let's just make it more robust.
+        if (std::abs(a) < 1e-10f) continue; // Extremely parallel
+        
+        const float BARY_EPSILON = 1e-4f;
+        
+        float f = 1.0f / a;
+        QVector3D s = rayOrigin - v0;
+        float u = f * QVector3D::dotProduct(s, h);
+        if (u < -BARY_EPSILON || u > 1.0f + BARY_EPSILON) continue;
+        
+        QVector3D q = QVector3D::crossProduct(s, edge1);
+        float v = f * QVector3D::dotProduct(rayDir, q);
+        if (v < -BARY_EPSILON || u + v > 1.0f + BARY_EPSILON) continue;
+        
+        float t = f * QVector3D::dotProduct(edge2, q);
+        if (t > 0.0f && t < closestDist) {
+            closestDist = t;
+            hit = true;
+        }
+    }
+    
+    if (hit) {
+        dist = closestDist;
+        return true;
+    }
+
+    return false;
+}
+
+void BrainSurface::setSelected(bool selected)
+{
+    if (m_selected != selected) {
+        m_selected = selected;
+        updateVertexColors();
+        m_bBuffersDirty = true;
     }
 }
