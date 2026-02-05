@@ -189,7 +189,8 @@ void BrainRenderer::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int
             m_pipelinesBackColor[mode] = std::move(pipelineBack);
             setup(pipeline.get(), QRhiGraphicsPipeline::Back); // Front faces
         } else {
-             setup(pipeline.get(), QRhiGraphicsPipeline::Back);
+             // Culling: None (Double-sided) to be safe for FreeSurfer meshes
+             setup(pipeline.get(), QRhiGraphicsPipeline::None);
         }
         m_pipelines[mode] = std::move(pipeline);
     }

@@ -54,6 +54,10 @@
 #include <QFile>
 
 #include "brainview.h"
+#include "model/braintreemodel.h"
+#include <fs/surface.h>
+#include <fs/surfaceset.h>
+#include <mne/mne_bem.h>
 
 //=============================================================================================================
 // MAIN
@@ -275,34 +279,66 @@ int main(int argc, char *argv[])
     
     // Brain View Widget
     BrainView *brainView = new BrainView();
+    // Explicit cast to QObject* to avoid ambiguity if any
+    BrainTreeModel *model = new BrainTreeModel(static_cast<QObject*>(brainView));
+    brainView->setModel(model);
+    
+    // Debug: Blue background is set in BrainRenderer::beginFrame directly
+    
     brainView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     
     // Initial Load
     qDebug() << "Loading surfaces...";
-    // LH
-    brainView->loadSurface(subPath, subName, "lh", "pial");
-    brainView->loadSurface(subPath, subName, "lh", "inflated");
-    brainView->loadSurface(subPath, subName, "lh", "white");
-    // brainView->loadAtlas(subPath, subName, "lh"); // Moved to end
-    
-    // RH
-    brainView->loadSurface(subPath, subName, "rh", "pial");
-    brainView->loadSurface(subPath, subName, "rh", "inflated");
-    brainView->loadSurface(subPath, subName, "rh", "white");
+    auto loadHemi = [&](const QString &hemi) {
+        QStringList types = {"pial", "inflated", "white"};
+        for(const auto &type : types) {
+             FSLIB::Surface surf(subPath + "/" + subName + "/surf/" + hemi + "." + type);
+             if (!surf.isEmpty()) {
+                 model->addSurface(subName, hemi, type, surf);
+                 qDebug() << "Added " << hemi << type;
+             }
+        }
+        
+        // Load Atlas (Annotation)
+        QString annotPath = subPath + "/" + subName + "/label/" + hemi + ".aparc.annot";
+        FSLIB::Annotation annot(annotPath);
+        if (!annot.isEmpty()) {
+            model->addAnnotation(subName, hemi, annot);
+            qDebug() << "Added annotation for " << hemi;
+        }
+    };
 
-    // Load Atlases (Annotations) after all surfaces are loaded
-    brainView->loadAtlas(subPath, subName, "lh");
-    brainView->loadAtlas(subPath, subName, "rh");
+    loadHemi("lh");
+    loadHemi("rh");
     
     // Load BEM
     if (!bemPath.isEmpty()) {
-        brainView->loadBem(bemPath);
+        QFile bemFile(bemPath);
+        if (bemFile.exists()) {
+            MNELIB::MNEBem bem(bemFile);
+            for(int i=0; i<bem.size(); ++i) {
+                QString name;
+                // IDs: 4=Head, 3=Outer Skull, 1=Inner Skull (Standard MNE/FS)
+                switch(bem[i].id) {
+                    case 4: name = "bem_head"; break;        // FIFFV_BEM_SURF_ID_HEAD
+                    case 3: name = "bem_outer_skull"; break; // FIFFV_BEM_SURF_ID_OUTER_SKULL
+                    case 1: name = "bem_inner_skull"; break; // FIFFV_BEM_SURF_ID_INNER_SKULL
+                    default: name = QString("bem_%1").arg(i); break;
+                }
+                model->addBemSurface(subName, name, bem[i]);
+                qDebug() << "Added BEM:" << name;
+            }
+        } else {
+             qDebug() << "BEM path provided but file not found:" << bemPath;
+        }
     }
     
     // Load Transformation (if provided)
+    /*
     if (!transPath.isEmpty()) {
         brainView->loadTransformation(transPath);
     }
+    */
 
     // Set initial mode to Annotation (Scientific implies this too if chosen)
     // The UI default for overlayCombo is "Surface" (index 0). 
@@ -482,26 +518,21 @@ int main(int argc, char *argv[])
     
     // Sensor Connections
     QObject::connect(loadDigBtn, &QPushButton::clicked, [&](){
-        QString path = QFileDialog::getOpenFileName(nullptr, "Load Digitizer / Montage", "", "FIF Files (*.fif)");
+        QString path = QFileDialog::getOpenFileName(nullptr, "Select Sensor/Digitizer File", "", "FIF Files (*.fif)");
         if (path.isEmpty()) return;
         
-        bool success = brainView->loadSensors(path);
-        
-        if (success) {
+        if (brainView->loadSensors(path)) {
             showMegCheck->setEnabled(true);
             showEegCheck->setEnabled(true);
             showDigCheck->setEnabled(true);
-            
-            // Default visibility
-            brainView->setSensorVisible("MEG", showMegCheck->isChecked());
-            brainView->setSensorVisible("EEG", showEegCheck->isChecked());
-            brainView->setSensorVisible("Digitizer", showDigCheck->isChecked());
         }
     });
     
     QObject::connect(loadTransBtn, &QPushButton::clicked, [&](){
-        QString path = QFileDialog::getOpenFileName(nullptr, "Load Transformation", "", "FIF Files (*.fif)");
-        if (!path.isEmpty()) brainView->loadTransformation(path);
+        QString path = QFileDialog::getOpenFileName(nullptr, "Select Transformation", "", "FIF Files (*.fif)");
+        if (path.isEmpty()) return;
+        
+        brainView->loadTransformation(path);
     });
 
     QObject::connect(showMegCheck, &QCheckBox::toggled, [=](bool checked){
@@ -516,12 +547,11 @@ int main(int argc, char *argv[])
 
     // Dipole Connections
     QObject::connect(loadDipoleBtn, &QPushButton::clicked, [&](){
-        QString path = QFileDialog::getOpenFileName(nullptr, "Load Dipoles", "", "Dipole Files (*.dip)");
-        if (!path.isEmpty()) {
-            if (brainView->loadDipoles(path)) {
-                showDipoleCheck->setEnabled(true);
-                brainView->setDipoleVisible(showDipoleCheck->isChecked());
-            }
+        QString path = QFileDialog::getOpenFileName(nullptr, "Select Dipoles", "", "Dipole Files (*.dip *.bdip)");
+        if (path.isEmpty()) return;
+        
+        if (brainView->loadDipoles(path)) {
+            showDipoleCheck->setEnabled(true);
         }
     });
 

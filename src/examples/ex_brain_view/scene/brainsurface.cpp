@@ -203,6 +203,14 @@ bool BrainSurface::loadAnnotation(const QString &path)
     return true;
 }
 
+void BrainSurface::addAnnotation(const FSLIB::Annotation &annotation)
+{
+    m_annotation = annotation;
+    m_hasAnnotation = true;
+    updateVertexColors();
+    m_bBuffersDirty = true;
+}
+
 
 //=============================================================================================================
 
@@ -367,6 +375,14 @@ void BrainSurface::transform(const QMatrix4x4 &m)
 void BrainSurface::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
 {
     if (!m_bBuffersDirty && m_vertexBuffer && m_indexBuffer) return;
+    
+    // Debug logging
+    if (m_vertexData.size() > 0) {
+        qDebug() << "BrainSurface: Updating Buffers. Vertex Count:" << m_vertexData.size();
+        qDebug() << "  VertexData Size:" << sizeof(VertexData) << "Expected: 28";
+        qDebug() << "  First Vertex Pos:" << m_vertexData[0].pos;
+        qDebug() << "  First Vertex Color:" << Qt::hex << m_vertexData[0].color << Qt::dec;
+    }
 
     if (!m_vertexBuffer) {
         m_vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, m_vertexData.size() * sizeof(VertexData)));
@@ -419,3 +435,27 @@ Eigen::MatrixX3f BrainSurface::verticesAsMatrix() const
     return mat;
 }
 
+
+//=============================================================================================================
+
+void BrainSurface::boundingBox(QVector3D &min, QVector3D &max) const
+{
+    if (m_vertexData.isEmpty()) {
+        min = QVector3D(0,0,0);
+        max = QVector3D(0,0,0);
+        return;
+    }
+
+    min = m_vertexData[0].pos;
+    max = m_vertexData[0].pos;
+
+    for (const auto &v : m_vertexData) {
+        min.setX(std::min(min.x(), v.pos.x()));
+        min.setY(std::min(min.y(), v.pos.y()));
+        min.setZ(std::min(min.z(), v.pos.z()));
+        
+        max.setX(std::max(max.x(), v.pos.x()));
+        max.setY(std::max(max.y(), v.pos.y()));
+        max.setZ(std::max(max.z(), v.pos.z()));
+    }
+}

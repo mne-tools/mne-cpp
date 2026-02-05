@@ -13,11 +13,17 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 # Define the source files
 set(SOURCES
     main.cpp
-    brainview.cpp
-    brainrenderer.cpp
-    brainsurface.cpp
-    sourceestimateoverlay.cpp
-    dipoleobject.cpp
+    view/brainview.cpp
+    view/brainrenderer.cpp
+    scene/brainsurface.cpp
+    scene/sourceestimateoverlay.cpp
+    scene/dipoleobject.cpp
+    model/items/abstracttreeitem.cpp
+    model/items/surfacetreeitem.cpp
+    model/items/bemtreeitem.cpp
+    model/braintreemodel.cpp
+    model/items/sensortreeitem.cpp
+    model/items/dipoletreeitem.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -25,6 +31,14 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
 else()
     add_executable(${PROJECT_NAME} ${SOURCES})
 endif()
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+    .
+    view
+    scene
+    model
+    model/items
+)
 
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")

@@ -170,6 +170,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Add annotation data directly.
+     *
+     * @param[in] annotation Input annotation data.
+     */
+    void addAnnotation(const FSLIB::Annotation &annotation);
+
+    //=========================================================================================================
+    /**
      * Set the visualization mode (Surface, Annotation, Scientific).
      *
      * @param[in] mode       VisualizationMode enum.
@@ -213,6 +221,15 @@ public:
      * @return Maximum X value.
      */
     float maxX() const;
+
+    //=========================================================================================================
+    /**
+     * Get bounding box of the surface.
+     * 
+     * @param[out] min       Minimum coordinates.
+     * @param[out] max       Maximum coordinates.
+     */
+    void boundingBox(QVector3D &min, QVector3D &max) const;
 
     //=========================================================================================================
     /**

@@ -43,6 +43,9 @@
 #include "brainsurface.h"
 #include "dipoleobject.h"
 #include "sourceestimateoverlay.h"
+#include "braintreemodel.h"
+#include "surfacetreeitem.h"
+
 #include <mne/mne_bem.h>
 #include <fiff/fiff_coord_trans.h>
 #include <QWidget>
@@ -83,64 +86,15 @@ public:
 
     //=========================================================================================================
     /**
-     * Load a FreeSurfer surface file.
+     * Set the data model.
      *
-     * @param[in] subjectPath Path to subjects directory.
-     * @param[in] subject    Subject name.
-     * @param[in] hemi       Hemisphere ("lh" or "rh").
-     * @param[in] type       Surface type (e.g., "pial", "inflated").
-     * @return True if successful.
+     * @param[in] model      Pointer to BrainTreeModel.
      */
-    bool loadSurface(const QString &subjectPath, const QString &subject, const QString &hemi, const QString &type);
-    
-    //=========================================================================================================
-    /**
-     * Load an atlas annotation file (.annot).
-     *
-     * @param[in] subjectPath Path to subjects directory.
-     * @param[in] subject    Subject name.
-     * @param[in] hemi       Hemisphere ("lh" or "rh").
-     * @return True if successful.
-     */
-    bool loadAtlas(const QString &subjectPath, const QString &subject, const QString &hemi);
-
-    //=========================================================================================================
-    /**
-     * Load BEM surfaces from a FIF file.
-     *
-     * @param[in] fifPath    Path to BEM FIF file.
-     * @return True if successful.
-     */
-    bool loadBem(const QString &fifPath);
-    
-    //=========================================================================================================
-    /**
-     * Load sensors (meg/eeg/digitizer) from a raw/average FIF file or montage.
-     *
-     * @param[in] fifPath    Path to FIF file.
-     * @return True if successful.
-     */
-    bool loadSensors(const QString &fifPath);
-
-    //=========================================================================================================
-    /**
-     * Load a Head<->MRI transformation file (-trans.fif).
-     *
-     * @param[in] fifPath    Path to the trans file.
-     * @return True if successful.
-     */
-    bool loadTransformation(const QString &fifPath);
-
-    //=========================================================================================================
-    /**
-     * Load ECD dipoles from a .dip file.
-     *
-     * @param[in] filePath    Path to the .dip file.
-     * @return True if successful.
-     */
-    bool loadDipoles(const QString &filePath);
+    void setModel(BrainTreeModel *model);
 
 public slots:
+    void onRowsInserted(const QModelIndex &parent, int first, int last);
+    void onDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles);
     //=========================================================================================================
     /**
      * Set the active surface type to search for (e.g. "pial").
@@ -242,6 +196,33 @@ public slots:
 
     //=========================================================================================================
     /**
+     * Load sensors (MEG/EEG/Digitizers) from a FIF file.
+     *
+     * @param[in] fifPath    Path to the FIF file.
+     * @return True if successful.
+     */
+    bool loadSensors(const QString &fifPath);
+
+    //=========================================================================================================
+    /**
+     * Load dipoles from a .dip or .bdip file.
+     *
+     * @param[in] dipPath    Path to the dipole file.
+     * @return True if successful.
+     */
+    bool loadDipoles(const QString &dipPath);
+
+    //=========================================================================================================
+    /**
+     * Load a coordinate transformation from a FIF file.
+     *
+     * @param[in] transPath  Path to the transformation file.
+     * @return True if successful.
+     */
+    bool loadTransformation(const QString &transPath);
+
+    //=========================================================================================================
+    /**
      * Set the current time point for source estimate visualization.
      *
      * @param[in] index      Time sample index.
@@ -305,7 +286,14 @@ protected:
 
 private:
     std::unique_ptr<BrainRenderer> m_renderer;
-    QMap<QString, std::shared_ptr<BrainSurface>> m_surfaces;
+    BrainTreeModel* m_model = nullptr;
+    
+    // Map Model Items to Render Resources
+    QMap<const QStandardItem*, std::shared_ptr<BrainSurface>> m_itemSurfaceMap;
+    QMap<const QStandardItem*, std::shared_ptr<DipoleObject>> m_itemDipoleMap;
+
+    // Legacy/Helper maps (refactoring TODO: remove if fully replaced by model mapping)
+    QMap<QString, std::shared_ptr<BrainSurface>> m_surfaces; 
     std::shared_ptr<BrainSurface> m_activeSurface;
     QString m_activeSurfaceType;
     
@@ -320,6 +308,7 @@ private:
     
     QQuaternion m_cameraRotation;
     QVector3D m_sceneCenter = QVector3D(0,0,0);
+    float m_sceneSize = 0.3f; // Default ~30cm
     float m_zoom = 0.0f;
     QPoint m_lastMousePos;
     
