@@ -93,14 +93,14 @@ void BrainRenderer::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int
     };
     
     // List of modes to initialize
-    QList<ShaderMode> modes = {Standard, Holographic, Atlas, Dipole};
+    QList<ShaderMode> modes = {Standard, Holographic, Atlas, Dipole, XRay};
     
     for (ShaderMode mode : modes) {
-        QString vert = (mode == Holographic) ? ":/holographic.vert.qsb" : 
+        QString vert = (mode == Holographic || mode == XRay) ? ":/holographic.vert.qsb" : 
                        (mode == Atlas) ? ":/glossy.vert.qsb" : 
                        (mode == Dipole) ? ":/dipole.vert.qsb" : ":/standard.vert.qsb";
         
-        QString frag = (mode == Holographic) ? ":/holographic.frag.qsb" : 
+        QString frag = (mode == Holographic || mode == XRay) ? ":/holographic.frag.qsb" : 
                        (mode == Atlas) ? ":/glossy.frag.qsb" : 
                        (mode == Dipole) ? ":/dipole.frag.qsb" : ":/standard.frag.qsb";
         
@@ -116,7 +116,7 @@ void BrainRenderer::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int
         auto pipeline = std::unique_ptr<QRhiGraphicsPipeline>(rhi->newGraphicsPipeline());
         
         QRhiGraphicsPipeline::TargetBlend blend;
-        if (mode == Holographic) {
+        if (mode == Holographic || mode == XRay) {
              blend.enable = true;
              blend.srcColor = QRhiGraphicsPipeline::SrcAlpha;
              blend.dstColor = QRhiGraphicsPipeline::One;
@@ -171,6 +171,10 @@ void BrainRenderer::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int
                 p->setTargetBlends({blend});
                 p->setDepthTest(true);
                 p->setDepthWrite(false);
+            } else if (mode == XRay) {
+                p->setTargetBlends({blend});
+                p->setDepthTest(false); // Disable Depth Test to see through head
+                p->setDepthWrite(false);
             } else if (mode == Dipole) {
                 p->setTargetBlends({blend});
                 p->setCullMode(QRhiGraphicsPipeline::None);
@@ -183,7 +187,7 @@ void BrainRenderer::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int
             p->create();
         };
 
-        if (mode == Holographic) {
+        if (mode == Holographic || mode == XRay) { // Handle XRay back-faces same as Holographic
             auto pipelineBack = std::unique_ptr<QRhiGraphicsPipeline>(rhi->newGraphicsPipeline());
             setup(pipelineBack.get(), QRhiGraphicsPipeline::Front);
             m_pipelinesBackColor[mode] = std::move(pipelineBack);

@@ -72,7 +72,8 @@ public:
         Standard,
         Holographic,
         Atlas,
-        Dipole
+        Dipole,
+        XRay
     };
 
     struct SceneData {

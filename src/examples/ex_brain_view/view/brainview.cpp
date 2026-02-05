@@ -111,7 +111,6 @@ void BrainView::setModel(BrainTreeModel *model)
 
 void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
 {
-    qDebug() << "BrainView::onRowsInserted Parent:" << parent << "First:" << first << "Last:" << last;
 
     if (!m_model) return;
 
@@ -119,17 +118,7 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
         QModelIndex index = m_model->index(i, 0, parent);
         QStandardItem* item = m_model->itemFromIndex(index);
         
-        qDebug() << "  Processing Row:" << i << "Text:" << item->text();
-        
         AbstractTreeItem* absItem = dynamic_cast<AbstractTreeItem*>(item);
-        if (!absItem) {
-             qDebug() << "    Not an AbstractTreeItem (likely a group header)";
-        } else {
-             qDebug() << "    Is AbstractTreeItem. Type:" << absItem->type();
-             if (m_itemSurfaceMap.contains(item)) {
-                 qDebug() << "    Already mapped to surface.";
-             }
-        }
         
         // Handle Surface Items
         if (absItem && absItem->type() == AbstractTreeItem::SurfaceItem + QStandardItem::UserType) {
@@ -162,14 +151,14 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
             }
             m_surfaces[key] = brainSurf;
             
-            qDebug() << "BrainView: Added surface with key:" << key;
+
             
             // Check for annotations
             if (!surfItem->annotationData().isEmpty()) {
                 brainSurf->addAnnotation(surfItem->annotationData());
             }
 
-            qDebug() << "BrainView: Added surface from model row" << i;
+
             
             // Set active if first
             // Set active if first
@@ -177,7 +166,7 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
                 m_activeSurface = brainSurf;
                 m_activeSurfaceType = surfItem->text();
                 
-                qDebug() << "BrainView: Set active surface to" << m_activeSurfaceType;
+
             }
         }
         // Check for BEM Item (using dynamic_cast for safety)
@@ -196,15 +185,14 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
              m_itemSurfaceMap[item] = brainSurf;
              
              // Legacy map support (Use item text e.g. "bem_head")
-             m_surfaces[bemItem->text()] = brainSurf;
+             m_surfaces["bem_" + bemItem->text()] = brainSurf;
              
-             qDebug() << "BrainView: Added BEM surface from model row" << i << "Name:" << bemItem->text();
+
         }
         
         // Handle Sensor Items
         if (absItem && absItem->type() == AbstractTreeItem::SensorItem + QStandardItem::UserType) {
             SensorTreeItem* sensItem = static_cast<SensorTreeItem*>(absItem);
-            qDebug() << "    Processing SensorItem:" << sensItem->text();
             
             std::shared_ptr<BrainSurface> brainSurf;
             
@@ -261,7 +249,7 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
             QString parentText = "";
             if (sensItem->parent()) parentText = sensItem->parent()->text();
             
-            qDebug() << "      Parent Text:" << parentText;
+
             
             if (parentText.contains("MEG")) {
                  brainSurf = createCube(sensItem->position(), sensItem->color(), sensItem->scale());
@@ -321,7 +309,7 @@ void BrainView::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bot
              if (absItem) {
                  if (roles.contains(AbstractTreeItem::VisibleRole)) {
                      surf->setVisible(absItem->isVisible());
-                     qDebug() << "Updated visibility for" << item->text();
+
                  }
                  if (roles.contains(AbstractTreeItem::ColorRole)) {
                      // Update color (not fully impl in BrainSurface yet for uniform override, but prepared)
@@ -395,7 +383,6 @@ void BrainView::setSensorVisible(const QString &type, bool visible)
             count++;
         }
     }
-    qDebug() << "Toggled" << type << "sensors:" << visible << "(" << count << "items)";
     update();
 }
 
@@ -423,16 +410,12 @@ void BrainView::setVisualizationMode(const QString &modeName)
 
 void BrainView::setHemiVisible(int hemiIdx, bool visible)
 {
-    qDebug() << "setHemiVisible called for hemi" << hemiIdx << "Visible:" << visible;
     int count = 0;
     for (auto surf : m_surfaces) {
         if (surf->hemi() == hemiIdx) {
             surf->setVisible(visible);
-            qDebug() << "  Surf:" << surf.get() << "Hemi:" << surf->hemi() << "Set Visible:" << visible;
-            count++;
         }
     }
-    qDebug() << "Updated visibility for" << count << "surfaces.";
     update();
 }
 
@@ -461,7 +444,6 @@ void BrainView::setBemVisible(const QString &name, bool visible)
                  }
             }
         }
-        qDebug() << "BrainView: setBemVisible could not find key:" << key;
     }
 }
 
@@ -490,7 +472,7 @@ void BrainView::saveSnapshot()
     QImage img = grabFramebuffer();
     QString fileName = QString("snapshot_refactor_%1.png").arg(m_snapshotCounter++, 4, 10, QChar('0'));
     img.save(fileName);
-    qDebug() << "Saved snapshot to" << fileName;
+
 }
 
 //=============================================================================================================
@@ -572,30 +554,31 @@ void BrainView::render(QRhiCommandBuffer *cb)
         }
     }
     
-    // Pass 2: Holographic/Transparent Surfaces (Sensors)
-    // Render these AFTER opaque surfaces because they don't write to depth buffer.
-    // Also SORT them Back-to-Front for correct alpha blending if they overlap.
-    
+    // Pass 2: Transparent Surfaces (Sensors & BEM) sorted Back-to-Front
     struct RenderItem {
         BrainSurface* surf;
         float dist;
+        BrainRenderer::ShaderMode mode;
     };
     QVector<RenderItem> transparentItems;
     
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-        if (it.key().startsWith("sens_")) {
-            if (it.key().contains("dig")) {
-                 // qDebug() << "BrainView: Found digitizer in render loop:" << it.key() << "Visible:" << it.value()->isVisible();
-            }
-            if (!it.value()->isVisible()) continue;
+        bool isSensor = it.key().startsWith("sens_");
+        bool isBem = it.key().startsWith("bem_");
+        
+        if (!isSensor && !isBem) continue;
+        if (!it.value()->isVisible()) continue;
 
-            QVector3D min, max;
-            it.value()->boundingBox(min, max);
-            QVector3D center = (min + max) * 0.5f;
-            // Distance to camera position (which is in World Space relative to Model 0,0,0)
-            float d = (sceneData.cameraPos - center).lengthSquared();
-            transparentItems.append({it.value().get(), d});
-        }
+        QVector3D min, max;
+        it.value()->boundingBox(min, max);
+        QVector3D center = (min + max) * 0.5f;
+        // Distance to camera position
+        float d = (sceneData.cameraPos - center).lengthSquared();
+        
+        BrainRenderer::ShaderMode mode = BrainRenderer::Holographic;
+        if (isBem) mode = m_bemShaderMode;
+        
+        transparentItems.append({it.value().get(), d, mode});
     }
     
     // Sort Back-to-Front (Descenting distance)
@@ -604,15 +587,7 @@ void BrainView::render(QRhiCommandBuffer *cb)
     });
     
     for (const auto &item : transparentItems) {
-        m_renderer->renderSurface(cb, rhi(), sceneData, item.surf, BrainRenderer::Holographic);
-    }
-    
-    // Pass 3: Transparent (BEM)
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-        if (!it.key().startsWith("bem_")) continue;
-        
-        // BEM surfaces are always "active" if loaded/visible
-        m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), m_bemShaderMode);
+        m_renderer->renderSurface(cb, rhi(), sceneData, item.surf, item.mode);
     }
     
     // Render Dipoles from Map
@@ -708,7 +683,7 @@ bool BrainView::loadSourceEstimate(const QString &lhPath, const QString &rhPath)
         for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
             if (it.key().endsWith(m_activeSurfaceType)) {
                 int hemi = it.value()->hemi();
-                qDebug() << "BrainView: Computing interpolation for" << it.key() << "hemi" << hemi;
+
                 m_sourceOverlay->computeInterpolationMatrix(it.value().get(), hemi);
             }
         }
@@ -808,7 +783,6 @@ bool BrainView::loadSensors(const QString &fifPath) {
               for(int c=0; c<4; ++c)
                   devHeadQTrans(r,c) = info.dev_head_t.trans(r,c);
       } else if (!info.dev_head_t.isEmpty()) {
-          qDebug() << "BrainView: Skipping dev_head_t application. From:" << info.dev_head_t.from << "To:" << info.dev_head_t.to;
       }
 
       for (const auto &ch : info.chs) {
@@ -918,11 +892,7 @@ bool BrainView::loadTransformation(const QString &transPath)
         m_headToMriTrans = trans;
     }
     
-    qDebug() << "BrainView: Loaded transformation" << m_headToMriTrans.from << "->" << m_headToMriTrans.to;
-    qDebug() << "BrainView: Transformation Matrix:\n" 
-             << m_headToMriTrans.trans(0,0) << m_headToMriTrans.trans(0,1) << m_headToMriTrans.trans(0,2) << m_headToMriTrans.trans(0,3) << "\n"
-             << m_headToMriTrans.trans(1,0) << m_headToMriTrans.trans(1,1) << m_headToMriTrans.trans(1,2) << m_headToMriTrans.trans(1,3) << "\n"
-             << m_headToMriTrans.trans(2,0) << m_headToMriTrans.trans(2,1) << m_headToMriTrans.trans(2,2) << m_headToMriTrans.trans(2,3);
+
     
     // Apply to sensors and dipoles
     QMatrix4x4 qmat;
@@ -938,15 +908,13 @@ bool BrainView::loadTransformation(const QString &transPath)
             count++;
         }
     }
-    qDebug() << "BrainView: Applied transformation to" << count << "sensor surfaces.";
-
     // Apply to dipoles in m_itemDipoleMap
     int dipCount = 0;
     for(auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
         it.value()->applyTransform(qmat);
         dipCount++;
     }
-    qDebug() << "BrainView: Applied transformation to" << dipCount << "dipole objects.";
+
     
     return true;
 }

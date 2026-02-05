@@ -37,12 +37,12 @@
 //=============================================================================================================
 
 #include "brainsurface.h"
-#include <QDebug>
+
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
-#include <QDebug>
+
 
 //=============================================================================================================
 
@@ -377,12 +377,7 @@ void BrainSurface::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
     if (!m_bBuffersDirty && m_vertexBuffer && m_indexBuffer) return;
     
     // Debug logging
-    if (m_vertexData.size() > 0) {
-        qDebug() << "BrainSurface: Updating Buffers. Vertex Count:" << m_vertexData.size();
-        qDebug() << "  VertexData Size:" << sizeof(VertexData) << "Expected: 28";
-        qDebug() << "  First Vertex Pos:" << m_vertexData[0].pos;
-        qDebug() << "  First Vertex Color:" << Qt::hex << m_vertexData[0].color << Qt::dec;
-    }
+
 
     if (!m_vertexBuffer) {
         m_vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, m_vertexData.size() * sizeof(VertexData)));
