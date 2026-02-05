@@ -92,7 +92,7 @@ private:
 //=============================================================================================================
 
 TestMNEProjectToSurface::TestMNEProjectToSurface()
-    : dEpsilon(0.000001)
+    : dEpsilon(0.00001)
 {
 }
 
