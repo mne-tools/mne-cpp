@@ -54,7 +54,7 @@
 #include <QFile>
 #include <QScrollArea>
 
-#include "brainview.h"
+#include "view/brainview.h"
 #include "model/braintreemodel.h"
 #include <fs/surface.h>
 #include <fs/surfaceset.h>
@@ -261,11 +261,16 @@ int main(int argc, char *argv[])
     showDigCheck->setChecked(true);
     showDigCheck->setEnabled(false);
     
+    QCheckBox *applyTransCheck = new QCheckBox("Apply Transformation");
+    applyTransCheck->setChecked(true);
+    applyTransCheck->setToolTip("Apply Head-to-MRI transformation to sensors if available.");
+    
     sensorLayout->addWidget(loadDigBtn);
     sensorLayout->addWidget(loadTransBtn);
     sensorLayout->addWidget(showMegCheck);
     sensorLayout->addWidget(showEegCheck);
     sensorLayout->addWidget(showDigCheck);
+    sensorLayout->addWidget(applyTransCheck);
     
     QTimer *stcTimer = new QTimer();
     
@@ -299,15 +304,16 @@ int main(int argc, char *argv[])
     sideLayout->addWidget(sensorGroup);
     sideLayout->addStretch();
     
-    // Brain View Widget
     BrainView *brainView = new BrainView();
-    // Explicit cast to QObject* to avoid ambiguity if any
     BrainTreeModel *model = new BrainTreeModel(static_cast<QObject*>(brainView));
     brainView->setModel(model);
-    
-    // Debug: Blue background is set in BrainRenderer::beginFrame directly
-    
-    brainView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    // Load Transformation (if provided)
+    /*
+    if (!transPath.isEmpty()) {
+        brainView->loadTransformation(transPath);
+    }
+    */
     
     // Initial Load
     qDebug() << "Loading surfaces...";
@@ -342,10 +348,10 @@ int main(int argc, char *argv[])
                 QString name;
                 // IDs: 4=Head, 3=Outer Skull, 1=Inner Skull (Standard MNE/FS)
                 switch(bem[i].id) {
-                    case 4: name = "bem_head"; break;        // FIFFV_BEM_SURF_ID_HEAD
-                    case 3: name = "bem_outer_skull"; break; // FIFFV_BEM_SURF_ID_OUTER_SKULL
-                    case 1: name = "bem_inner_skull"; break; // FIFFV_BEM_SURF_ID_INNER_SKULL
-                    default: name = QString("bem_%1").arg(i); break;
+                    case 4: name = "head"; break;        // FIFFV_BEM_SURF_ID_HEAD
+                    case 3: name = "outer_skull"; break; // FIFFV_BEM_SURF_ID_OUTER_SKULL
+                    case 1: name = "inner_skull"; break; // FIFFV_BEM_SURF_ID_INNER_SKULL
+                    default: name = QString("%1").arg(i); break;
                 }
                 model->addBemSurface(subName, name, bem[i]);
                 qDebug() << "Added BEM:" << name;
@@ -355,20 +361,12 @@ int main(int argc, char *argv[])
         }
     }
     
-    // Load Transformation (if provided)
-    /*
-    if (!transPath.isEmpty()) {
-        brainView->loadTransformation(transPath);
-    }
-    */
-
     // Set initial mode to Annotation (Scientific implies this too if chosen)
-    // The UI default for overlayCombo is "Surface" (index 0). 
-    // So logic will follow UI.
     qDebug() << "Surfaces loaded.";
 
     // Connections
     QObject::connect(surfCombo, &QComboBox::currentTextChanged, brainView, &BrainView::setActiveSurface);
+
     
     // Handle Inflated Surface Logic (Disable BEM)
     QObject::connect(surfCombo, &QComboBox::currentTextChanged, [=](const QString &text){
@@ -431,6 +429,11 @@ int main(int argc, char *argv[])
         brainView->setBemVisible("inner_skull", checked);
     });
     QObject::connect(bemColorCheck, &QCheckBox::toggled, brainView, &BrainView::setBemHighContrast);
+    
+    // Initial Sycn for BEM visibility (since they default to visible in model but unchecked in UI)
+    brainView->setBemVisible("head", headCheck->isChecked());
+    brainView->setBemVisible("outer_skull", outerCheck->isChecked());
+    brainView->setBemVisible("inner_skull", innerCheck->isChecked());
     
     // Source Estimate Connections
     QObject::connect(loadStcBtn, &QPushButton::clicked, [&](){
@@ -566,6 +569,8 @@ int main(int argc, char *argv[])
     QObject::connect(showDigCheck, &QCheckBox::toggled, [=](bool checked){
         brainView->setSensorVisible("Digitizer", checked);
     });
+
+    QObject::connect(applyTransCheck, &QCheckBox::toggled, brainView, &BrainView::setSensorTransEnabled);
 
     // Dipole Connections
     QObject::connect(loadDipoleBtn, &QPushButton::clicked, [&](){

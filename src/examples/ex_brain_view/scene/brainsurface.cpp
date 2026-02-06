@@ -96,6 +96,8 @@ void BrainSurface::fromSurface(const FSLIB::Surface &surf)
     
     // Initial coloring based on current visualization mode
     updateVertexColors();
+
+    m_originalVertexData = m_vertexData;
 }
 
 //=============================================================================================================
@@ -138,6 +140,7 @@ void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface &surf, const QColo
     }
     m_indexCount = m_indexData.size();
     
+    m_originalVertexData = m_vertexData;
     m_bBuffersDirty = true;
 }
 
@@ -186,6 +189,7 @@ void BrainSurface::createFromData(const Eigen::MatrixX3f &vertices, const Eigen:
     }
     m_indexCount = m_indexData.size();
     
+    m_originalVertexData = m_vertexData;
     m_bBuffersDirty = true;
 }
 
@@ -236,6 +240,7 @@ void BrainSurface::applySourceEstimateColors(const QVector<uint32_t> &colors)
 {
     // Set mode to source estimate
     m_visMode = ModeSourceEstimate;
+    m_stcColors = colors;
     
     // Apply colors to vertices
     for (int i = 0; i < qMin(colors.size(), m_vertexData.size()); ++i) {
@@ -311,6 +316,56 @@ void BrainSurface::updateVertexColors()
              m_vertexData[i].color = (255 << 24) | (val << 16) | (val << 8) | val;
         }
     }
+    else if (m_visMode == ModeSourceEstimate) {
+        for (int i = 0; i < m_vertexData.size() && i < m_stcColors.size(); ++i) {
+            m_vertexData[i].color = m_stcColors[i];
+        }
+    }
+
+    // Apply selection highlight (brightening)
+    if (m_selected || m_selectedRegionId != -1) {
+        if (!m_hasAnnotation || m_selectedRegionId == -1 || m_visMode != ModeAnnotation) {
+            // Highlight whole hemisphere if no specific region selected or not in annotation mode
+            if (m_selected) {
+                 for (auto &v : m_vertexData) {
+                    uint32_t a = (v.color >> 24) & 0xFF;
+                    uint32_t b = (v.color >> 16) & 0xFF;
+                    uint32_t g = (v.color >> 8) & 0xFF;
+                    uint32_t r = v.color & 0xFF;
+
+                    r = std::min(255u, r + 40);
+                    g = std::min(255u, g + 40);
+                    b = std::min(255u, b + 40);
+
+                    v.color = (a << 24) | (b << 16) | (g << 8) | r;
+                }
+            }
+        } else {
+            // Highlight only the selected region
+            const Eigen::VectorXi &vertices = m_annotation.getVertices();
+            const Eigen::VectorXi &labelIds = m_annotation.getLabelIds();
+            
+            for (int i = 0; i < labelIds.rows(); ++i) {
+                if (labelIds(i) == m_selectedRegionId) {
+                    int vertexIdx = vertices(i);
+                    if (vertexIdx >= 0 && vertexIdx < m_vertexData.size()) {
+                        uint32_t &c = m_vertexData[vertexIdx].color;
+                        uint32_t a = (c >> 24) & 0xFF;
+                        uint32_t b = (c >> 16) & 0xFF;
+                        uint32_t g = (c >> 8) & 0xFF;
+                        uint32_t r = c & 0xFF;
+
+                        // Yellowish highlight (r+60, g+60, b+20)
+                        r = std::min(255u, r + 70);
+                        g = std::min(255u, g + 70);
+                        b = std::min(255u, b + 20);
+
+                        c = (a << 24) | (b << 16) | (g << 8) | r;
+                    }
+                }
+            }
+        }
+    }
 }
 
 float BrainSurface::minX() const
@@ -369,6 +424,18 @@ void BrainSurface::transform(const QMatrix4x4 &m)
         v.norm = QVector3D(nx, ny, nz).normalized();
     }
     m_bBuffersDirty = true;
+}
+
+//=============================================================================================================
+
+void BrainSurface::applyTransform(const QMatrix4x4 &m)
+{
+    m_vertexData = m_originalVertexData;
+    if (!m.isIdentity()) {
+        transform(m);
+    } else {
+        m_bBuffersDirty = true;
+    }
 }
 
 //=============================================================================================================
@@ -456,8 +523,9 @@ void BrainSurface::boundingBox(QVector3D &min, QVector3D &max) const
     }
 }
 
-bool BrainSurface::intersects(const QVector3D &rayOrigin, const QVector3D &rayDir, float &dist) const
+bool BrainSurface::intersects(const QVector3D &rayOrigin, const QVector3D &rayDir, float &dist, int &vertexIdx) const
 {
+    vertexIdx = -1;
     if (m_vertexData.isEmpty()) return false;
 
     // 1. AABB Check
@@ -506,12 +574,16 @@ bool BrainSurface::intersects(const QVector3D &rayOrigin, const QVector3D &rayDi
 
     float closestDist = std::numeric_limits<float>::max();
     bool hit = false;
+    int closestVert = -1;
     
     // Brute-force triangle intersection
     for (int i = 0; i < m_indexData.size(); i += 3) {
-        const QVector3D &v0 = m_vertexData[m_indexData[i]].pos;
-        const QVector3D &v1 = m_vertexData[m_indexData[i+1]].pos;
-        const QVector3D &v2 = m_vertexData[m_indexData[i+2]].pos;
+        int i0 = m_indexData[i];
+        int i1 = m_indexData[i+1];
+        int i2 = m_indexData[i+2];
+        const QVector3D &v0 = m_vertexData[i0].pos;
+        const QVector3D &v1 = m_vertexData[i1].pos;
+        const QVector3D &v2 = m_vertexData[i2].pos;
         
         // Möller–Trumbore intersection algorithm
         // Relaxing epsilon for steep angles/large scales
@@ -541,15 +613,85 @@ bool BrainSurface::intersects(const QVector3D &rayOrigin, const QVector3D &rayDi
         if (t > 0.0f && t < closestDist) {
             closestDist = t;
             hit = true;
+            
+            // Find closest vertex of the hit triangle to the hit point
+            QVector3D hitPoint = rayOrigin + t * rayDir;
+            float d0 = (v0 - hitPoint).lengthSquared();
+            float d1 = (v1 - hitPoint).lengthSquared();
+            float d2 = (v2 - hitPoint).lengthSquared();
+            
+            if (d0 < d1 && d0 < d2) closestVert = i0;
+            else if (d1 < d2) closestVert = i1;
+            else closestVert = i2;
         }
     }
     
     if (hit) {
         dist = closestDist;
-        return true;
+        vertexIdx = closestVert;
+    }
+    
+    return hit;
+}
+
+//=============================================================================================================
+
+QString BrainSurface::getAnnotationLabel(int vertexIdx) const
+{
+    if (!m_hasAnnotation || vertexIdx < 0 || vertexIdx >= m_vertexData.size()) {
+        return "";
     }
 
-    return false;
+    const Eigen::VectorXi &vertices = m_annotation.getVertices();
+    const Eigen::VectorXi &labelIds = m_annotation.getLabelIds();
+    const FSLIB::Colortable &ct = m_annotation.getColortable();
+
+    // The .annot file might not contain all vertices if it's sparse, 
+    // but usually it contains a mapping for all.
+    // Let's find the labelId for this vertex.
+    int labelId = -1;
+    for (int i = 0; i < vertices.rows(); ++i) {
+        if (vertices(i) == vertexIdx) {
+            labelId = labelIds(i);
+            break;
+        }
+    }
+
+    if (labelId == -1) return "Unknown";
+
+    // Find the name in colortable
+    for (int i = 0; i < ct.numEntries; ++i) {
+        if (ct.table(i, 4) == labelId) {
+            return ct.struct_names[i];
+        }
+    }
+
+    return "Unknown";
+}
+
+int BrainSurface::getAnnotationLabelId(int vertexIdx) const
+{
+    if (!m_hasAnnotation || vertexIdx < 0) return -1;
+
+    const Eigen::VectorXi &vertices = m_annotation.getVertices();
+    const Eigen::VectorXi &labelIds = m_annotation.getLabelIds();
+
+    for (int i = 0; i < vertices.rows(); ++i) {
+        if (vertices(i) == vertexIdx) {
+            return labelIds(i);
+        }
+    }
+
+    return -1;
+}
+
+void BrainSurface::setSelectedRegion(int regionId)
+{
+    if (m_selectedRegionId != regionId) {
+        m_selectedRegionId = regionId;
+        updateVertexColors();
+        m_bBuffersDirty = true;
+    }
 }
 
 void BrainSurface::setSelected(bool selected)

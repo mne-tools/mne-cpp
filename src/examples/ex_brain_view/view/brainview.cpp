@@ -91,6 +91,13 @@ BrainView::BrainView(QWidget *parent)
     m_fpsLabel->resize(300, 100);
 
     m_fpsTimer.start();
+
+    m_regionLabel = new QLabel(this);
+    m_regionLabel->setStyleSheet("color: white; font-weight: bold; font-family: sans-serif; font-size: 16px; background: rgba(0,0,0,100); padding: 5px;");
+    m_regionLabel->setText("");
+    m_regionLabel->move(10, 120); // Below FPS label
+    m_regionLabel->resize(300, 40);
+    m_regionLabel->hide();
 }
 
 BrainView::~BrainView()
@@ -275,8 +282,10 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
             // Note: meg positions in info might already be head-space, but check if we need this global trans
             if (!m_headToMriTrans.isEmpty()) {
                 QMatrix4x4 m;
-                for(int r=0; r<4; ++r) for(int c=0; c<4; ++c) m(r,c) = m_headToMriTrans.trans(r,c);
-                brainSurf->transform(m);
+                if (m_applySensorTrans) {
+                    for(int r=0; r<4; ++r) for(int c=0; c<4; ++c) m(r,c) = m_headToMriTrans.trans(r,c);
+                }
+                brainSurf->applyTransform(m);
             }
 
             // Legacy map support
@@ -288,10 +297,9 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
             QString key = keyPrefix + sensItem->text() + "_" + QString::number((quintptr)sensItem);
             m_surfaces[key] = brainSurf;
             
-            qDebug() << "      Registered surface with key:" << key;
+
         }
         
-        // Handle Dipole Items
         // Handle Dipole Items
         if (absItem && absItem->type() == AbstractTreeItem::DipoleItem + QStandardItem::UserType) {
             DipoleTreeItem* dipItem = static_cast<DipoleTreeItem*>(absItem);
@@ -403,6 +411,15 @@ void BrainView::setSensorVisible(const QString &type, bool visible)
     update();
 }
 
+void BrainView::setSensorTransEnabled(bool enabled)
+{
+    if (m_applySensorTrans != enabled) {
+        m_applySensorTrans = enabled;
+        refreshSensorTransforms();
+        update();
+    }
+}
+
 void BrainView::setDipoleVisible(bool visible)
 {
     m_dipolesVisible = visible;
@@ -417,6 +434,7 @@ void BrainView::setVisualizationMode(const QString &modeName)
     if (modeName == "Annotation") mode = BrainSurface::ModeAnnotation;
     if (modeName == "Scientific") mode = BrainSurface::ModeScientific;
     
+    m_currentVisMode = mode;
     for (auto surf : m_surfaces) {
         surf->setVisualizationMode(mode);
     }
@@ -690,6 +708,7 @@ bool BrainView::loadSourceEstimate(const QString &lhPath, const QString &rhPath)
     }
     
     if (m_sourceOverlay->isLoaded()) {
+        m_currentVisMode = BrainSurface::ModeSourceEstimate;
         // Compute interpolation matrices for all surfaces
         for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
             if (it.key().endsWith(m_activeSurfaceType)) {
@@ -904,23 +923,34 @@ bool BrainView::loadTransformation(const QString &transPath)
     }
     
 
-    
-    // Apply to all existing Sensor objects
-    if (!m_headToMriTrans.isEmpty()) {
-        QMatrix4x4 qmat;
-        for(int r=0; r<4; ++r) for(int c=0; c<4; ++c) qmat(r,c) = m_headToMriTrans.trans(r,c);
-        
-        int surfCount = 0;
-        for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-            if (it.key().startsWith("sens_")) {
-                it.value()->transform(qmat);
-                surfCount++;
-            }
-        }
-        qDebug() << "Applied Head-to-MRI to" << surfCount << "sensor surfaces.";
-    }
+    refreshSensorTransforms();
 
     return true;
+}
+
+void BrainView::refreshSensorTransforms()
+{
+    QMatrix4x4 qmat;
+    if (m_applySensorTrans && !m_headToMriTrans.isEmpty()) {
+        for(int r=0; r<4; ++r) {
+            for(int c=0; c<4; ++c) {
+                qmat(r,c) = m_headToMriTrans.trans(r,c);
+            }
+        }
+    }
+
+    int surfCount = 0;
+    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+        if (it.key().startsWith("sens_") && it.value()) {
+            it.value()->applyTransform(qmat);
+            surfCount++;
+        }
+    }
+    // Also check item map just in case (redundant but safe)
+    for (auto surf : m_itemSurfaceMap) {
+         // We don't have a reliable way to check prefix here without extra logic, 
+         // but m_surfaces should cover it.
+    }
 }
 
 
@@ -970,22 +1000,16 @@ void BrainView::castRay(const QPoint &pos)
     int hitIndex = -1;
     
     // Check Surfaces (Sensors, Hemisphere, BEM)
-    // Note: iterating map keys is fast enough for < 100 objects
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
         if (!it.value()->isVisible()) continue;
         
-        // Optim: Skip hemispheres for now (too slow without octree)
-        // unless it's a sensor
         bool isSensor = it.key().startsWith("sens_");
-        // if (!isSensor && it.value()->vertexCount() > 5000) continue;
         
         float dist;
-        if (it.value()->intersects(rayOrigin, rayDir, dist)) {
+        int vertexIdx = -1;
+        if (it.value()->intersects(rayOrigin, rayDir, dist, vertexIdx)) {
              if (dist < closestDist) {
                  closestDist = dist;
-                 // Find item in map
-                 // m_surfaces doesn't store Item pointer directly as key.
-                 // But m_itemSurfaceMap does.
                  for(auto i = m_itemSurfaceMap.begin(); i != m_itemSurfaceMap.end(); ++i) {
                      if (i.value() == it.value()) {
                          hitItem = const_cast<QStandardItem*>(i.key());
@@ -993,8 +1017,8 @@ void BrainView::castRay(const QPoint &pos)
                          break;
                      }
                  }
-                 if (!hitItem && isSensor) hitInfo = it.key(); // Fallback
-                 hitIndex = -1;
+                 if (!hitItem && isSensor) hitInfo = it.key(); 
+                 hitIndex = vertexIdx;
              }
         }
     }
@@ -1014,12 +1038,34 @@ void BrainView::castRay(const QPoint &pos)
              }
          }
      }
+
+    // Handle Region Name for Annotations
+    QString currentRegion;
+    int currentRegionId = -1;
+    if (hitItem && m_itemSurfaceMap.contains(hitItem)) {
+        currentRegion = m_itemSurfaceMap[hitItem]->getAnnotationLabel(hitIndex);
+        currentRegionId = m_itemSurfaceMap[hitItem]->getAnnotationLabelId(hitIndex);
+    }
+
+    if (currentRegion != m_hoveredRegion) {
+        m_hoveredRegion = currentRegion;
+        emit hoveredRegionChanged(m_hoveredRegion);
+        if (m_regionLabel) {
+            if (m_hoveredRegion.isEmpty() || m_currentVisMode != BrainSurface::ModeAnnotation) {
+                m_regionLabel->hide();
+            } else {
+                m_regionLabel->setText(QString("Region: %1").arg(m_hoveredRegion));
+                m_regionLabel->show();
+            }
+        }
+    }
     
     if (hitItem != m_hoveredItem || hitIndex != m_hoveredIndex) {
         // Deselect previous
         if (m_hoveredItem) {
              if (m_itemSurfaceMap.contains(m_hoveredItem)) {
                  m_itemSurfaceMap[m_hoveredItem]->setSelected(false);
+                 m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(-1);
              } else if (m_itemDipoleMap.contains(m_hoveredItem)) {
                  m_itemDipoleMap[m_hoveredItem]->setSelected(m_hoveredIndex, false);
              }
@@ -1031,10 +1077,17 @@ void BrainView::castRay(const QPoint &pos)
         if (m_hoveredItem) {
              // Select new
              if (m_itemSurfaceMap.contains(m_hoveredItem)) {
-                 m_itemSurfaceMap[m_hoveredItem]->setSelected(true);
+                 if (m_currentVisMode == BrainSurface::ModeAnnotation) {
+                     m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(currentRegionId);
+                 } else {
+                     m_itemSurfaceMap[m_hoveredItem]->setSelected(true);
+                 }
              } else if (m_itemDipoleMap.contains(m_hoveredItem)) {
                  m_itemDipoleMap[m_hoveredItem]->setSelected(m_hoveredIndex, true);
              }
         }
+    } else if (m_hoveredItem && m_itemSurfaceMap.contains(m_hoveredItem) && m_currentVisMode == BrainSurface::ModeAnnotation) {
+        m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(currentRegionId);
     }
+    update();
 }

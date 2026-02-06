@@ -40,11 +40,11 @@
 //=============================================================================================================
 
 #include "brainrenderer.h"
-#include "brainsurface.h"
-#include "dipoleobject.h"
-#include "sourceestimateoverlay.h"
-#include "braintreemodel.h"
-#include "surfacetreeitem.h"
+#include "../scene/brainsurface.h"
+#include "../scene/dipoleobject.h"
+#include "../scene/sourceestimateoverlay.h"
+#include "../model/braintreemodel.h"
+#include "../model/items/surfacetreeitem.h"
 
 #include <mne/mne_bem.h>
 #include <fiff/fiff_coord_trans.h>
@@ -52,6 +52,7 @@
 #include <QRhiWidget>
 #include <QMap>
 #include <QElapsedTimer>
+#include <QStandardItem>
 #include <memory> 
 #include <QQuaternion> 
 
@@ -161,6 +162,14 @@ public slots:
      * @param[in] visible    Visibility state.
      */
     void setSensorVisible(const QString &type, bool visible);
+
+    //=========================================================================================================
+    /**
+     * Set whether sensor transformations (if loaded) should be applied.
+     * 
+     * @param[in] enabled    True to apply transformations, False to show original positions.
+     */
+    void setSensorTransEnabled(bool enabled);
 
     //=========================================================================================================
     /**
@@ -281,7 +290,8 @@ signals:
      */
     void sourceEstimateLoaded(int numTimePoints);
 
-
+private:
+    void refreshSensorTransforms();
 
 protected:
     void initialize(QRhiCommandBuffer *cb) override;
@@ -291,6 +301,9 @@ protected:
     void mouseMoveEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
+
+signals:
+    void hoveredRegionChanged(const QString &regionName);
 
 private:
     std::unique_ptr<BrainRenderer> m_renderer;
@@ -312,6 +325,7 @@ private:
     
     BrainRenderer::ShaderMode m_brainShaderMode = BrainRenderer::Standard;
     BrainRenderer::ShaderMode m_bemShaderMode = BrainRenderer::Standard;
+    BrainSurface::VisualizationMode m_currentVisMode = BrainSurface::ModeSurface;
     bool m_lightingEnabled = true;
     
     QQuaternion m_cameraRotation;
@@ -331,10 +345,13 @@ private:
     int m_currentTimePoint = 0;
     
      FIFFLIB::FiffCoordTrans m_headToMriTrans;
+     bool m_applySensorTrans = true;
      bool m_dipolesVisible = true;
      
      QStandardItem* m_hoveredItem = nullptr;
      int m_hoveredIndex = -1;
+     QString m_hoveredRegion;
+     QLabel* m_regionLabel = nullptr;
 };
 
 #endif // BRAINVIEW_H

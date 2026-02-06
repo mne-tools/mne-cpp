@@ -1,5 +1,4 @@
 #include "braintreemodel.h"
-#include "braintreemodel.h"
 #include "surfacetreeitem.h"
 #include "bemtreeitem.h"
 #include "sensortreeitem.h"
@@ -90,6 +89,7 @@ BemTreeItem* BrainTreeModel::addBemSurface(const QString &subject, const QString
     // Usually BEM is added once.
     
     BemTreeItem *bemItem = new BemTreeItem(bemName, bemSurf);
+    bemItem->setVisible(true); // Default to visible
     
     // Set default colors based on type/name
     // Set colors based on ID (matching zeiss-intent)
@@ -103,8 +103,6 @@ BemTreeItem* BrainTreeModel::addBemSurface(const QString &subject, const QString
     } else {
          bemItem->setColor(QColor(100, 100, 100)); // Grey default
     }
-    
-    subjItem->appendRow(bemItem);
     
     subjItem->appendRow(bemItem);
     

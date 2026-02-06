@@ -243,9 +243,25 @@ public:
      * @param[out] dist      Distance to intersection.
      * @return True if intersected.
      */
-    bool intersects(const QVector3D &rayOrigin, const QVector3D &rayDir, float &dist) const;
+    bool intersects(const QVector3D &rayOrigin, const QVector3D &rayDir, float &dist, int &vertexIdx) const;
 
     //=========================================================================================================
+    /**
+     * Get the annotation label name for a given vertex.
+     * 
+     * @param[in] vertexIdx  Index of the vertex.
+     * @return Label name.
+     */
+    QString getAnnotationLabel(int vertexIdx) const;
+    int getAnnotationLabelId(int vertexIdx) const;
+
+    //=========================================================================================================
+    /**
+     * Set the selected region for highlighting.
+     * 
+     * @param[in] regionId   The ID of the region to highlight.
+     */
+    void setSelectedRegion(int regionId);
     /**
      * Translate all vertices along the X axis.
      *
@@ -260,6 +276,15 @@ public:
      * @param[in] m          Transformation matrix.
      */
     void transform(const QMatrix4x4 &m);
+
+    //=========================================================================================================
+    /**
+     * Apply a transformation to the surface starting from the original data.
+     * Note: This prevents transformation accumulation.
+     *
+     * @param[in] m          Transformation matrix.
+     */
+    void applyTransform(const QMatrix4x4 &m);
 
     //=========================================================================================================
     /**
@@ -291,6 +316,7 @@ private:
     void updateVertexColors();
 
     QVector<VertexData> m_vertexData;
+    QVector<VertexData> m_originalVertexData;
     QVector<uint32_t> m_indexData;
     uint32_t m_indexCount = 0;
     
@@ -301,9 +327,11 @@ private:
     bool m_hasAnnotation = false;
     VisualizationMode m_visMode = ModeSurface;
     QVector<float> m_curvature;
+    QVector<uint32_t> m_stcColors;
     
     bool m_visible = true;
     bool m_selected = false;
+    int m_selectedRegionId = -1;
     int m_hemi = -1; // 0=lh, 1=rh
 
     std::unique_ptr<QRhiBuffer> m_vertexBuffer;
