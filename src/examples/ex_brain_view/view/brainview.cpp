@@ -186,12 +186,12 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
              // Map it
              m_itemSurfaceMap[item] = brainSurf;
              
-             // Apply Head-to-MRI transformation if available (BEM is in Head space)
-             if (!m_headToMriTrans.isEmpty()) {
-                 QMatrix4x4 m;
-                 for(int r=0; r<4; ++r) for(int c=0; c<4; ++c) m(r,c) = m_headToMriTrans.trans(r,c);
-                 brainSurf->transform(m);
-             }
+ //            // Apply Head-to-MRI transformation if available (BEM is in Head space)
+ //            if (!m_headToMriTrans.isEmpty()) {
+ //                QMatrix4x4 m;
+ //                for(int r=0; r<4; ++r) for(int c=0; c<4; ++c) m(r,c) = m_headToMriTrans.trans(r,c);
+ //                brainSurf->transform(m);
+ //            }
 
              // Legacy map support (Use item text e.g. "bem_head")
              m_surfaces["bem_" + bemItem->text()] = brainSurf;
@@ -905,24 +905,19 @@ bool BrainView::loadTransformation(const QString &transPath)
     
 
     
-    // Apply to all existing BEM, Sensor and Dipole objects
+    // Apply to all existing Sensor objects
     if (!m_headToMriTrans.isEmpty()) {
         QMatrix4x4 qmat;
         for(int r=0; r<4; ++r) for(int c=0; c<4; ++c) qmat(r,c) = m_headToMriTrans.trans(r,c);
         
         int surfCount = 0;
         for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-            if (it.key().startsWith("bem_") || it.key().startsWith("sens_")) {
+            if (it.key().startsWith("sens_")) {
                 it.value()->transform(qmat);
                 surfCount++;
             }
         }
-        int dipCount = 0;
-        for (auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
-            it.value()->applyTransform(qmat);
-            dipCount++;
-        }
-        qDebug() << "Applied Head-to-MRI to" << surfCount << "surfaces and" << dipCount << "dipole objects.";
+        qDebug() << "Applied Head-to-MRI to" << surfCount << "sensor surfaces.";
     }
 
     return true;

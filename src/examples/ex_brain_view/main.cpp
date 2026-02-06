@@ -88,7 +88,7 @@ int main(int argc, char *argv[])
     QString transPath = parser.value(transOption);
 
     QMainWindow mainWindow;
-    mainWindow.setWindowTitle("MNE-CPP Brain View (Modular)");
+    mainWindow.setWindowTitle("MNE-CPP Brain View");
     
     QWidget *centralWidget = new QWidget;
     QHBoxLayout *mainLayout = new QHBoxLayout(centralWidget);
