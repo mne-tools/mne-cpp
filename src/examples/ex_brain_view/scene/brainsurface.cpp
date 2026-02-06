@@ -324,23 +324,7 @@ void BrainSurface::updateVertexColors()
 
     // Apply selection highlight (brightening)
     if (m_selected || m_selectedRegionId != -1) {
-        if (!m_hasAnnotation || m_selectedRegionId == -1 || m_visMode != ModeAnnotation) {
-            // Highlight whole hemisphere if no specific region selected or not in annotation mode
-            if (m_selected) {
-                 for (auto &v : m_vertexData) {
-                    uint32_t a = (v.color >> 24) & 0xFF;
-                    uint32_t b = (v.color >> 16) & 0xFF;
-                    uint32_t g = (v.color >> 8) & 0xFF;
-                    uint32_t r = v.color & 0xFF;
-
-                    r = std::min(255u, r + 40);
-                    g = std::min(255u, g + 40);
-                    b = std::min(255u, b + 40);
-
-                    v.color = (a << 24) | (b << 16) | (g << 8) | r;
-                }
-            }
-        } else {
+        if (m_hasAnnotation && m_selectedRegionId != -1) {
             // Highlight only the selected region
             const Eigen::VectorXi &vertices = m_annotation.getVertices();
             const Eigen::VectorXi &labelIds = m_annotation.getLabelIds();
@@ -363,6 +347,20 @@ void BrainSurface::updateVertexColors()
                         c = (a << 24) | (b << 16) | (g << 8) | r;
                     }
                 }
+            }
+        } else if (m_selected) {
+            // Highlight whole hemisphere if no specific region selected
+            for (auto &v : m_vertexData) {
+                uint32_t a = (v.color >> 24) & 0xFF;
+                uint32_t b = (v.color >> 16) & 0xFF;
+                uint32_t g = (v.color >> 8) & 0xFF;
+                uint32_t r = v.color & 0xFF;
+
+                r = std::min(255u, r + 40);
+                g = std::min(255u, g + 40);
+                b = std::min(255u, b + 40);
+
+                v.color = (a << 24) | (b << 16) | (g << 8) | r;
             }
         }
     }
@@ -662,7 +660,12 @@ QString BrainSurface::getAnnotationLabel(int vertexIdx) const
     // Find the name in colortable
     for (int i = 0; i < ct.numEntries; ++i) {
         if (ct.table(i, 4) == labelId) {
-            return ct.struct_names[i];
+            QString name = ct.struct_names[i];
+            // Remove null characters and trailing whitespace that might cause "strange signs"
+            while (!name.isEmpty() && (name.endsWith('\0') || name.endsWith(' '))) {
+                name.chop(1);
+            }
+            return name;
         }
     }
 

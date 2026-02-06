@@ -1051,7 +1051,7 @@ void BrainView::castRay(const QPoint &pos)
         m_hoveredRegion = currentRegion;
         emit hoveredRegionChanged(m_hoveredRegion);
         if (m_regionLabel) {
-            if (m_hoveredRegion.isEmpty() || m_currentVisMode != BrainSurface::ModeAnnotation) {
+            if (m_hoveredRegion.isEmpty()) {
                 m_regionLabel->hide();
             } else {
                 m_regionLabel->setText(QString("Region: %1").arg(m_hoveredRegion));
@@ -1077,17 +1077,25 @@ void BrainView::castRay(const QPoint &pos)
         if (m_hoveredItem) {
              // Select new
              if (m_itemSurfaceMap.contains(m_hoveredItem)) {
-                 if (m_currentVisMode == BrainSurface::ModeAnnotation) {
+                 if (currentRegionId != -1) {
                      m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(currentRegionId);
+                     m_itemSurfaceMap[m_hoveredItem]->setSelected(false);
                  } else {
                      m_itemSurfaceMap[m_hoveredItem]->setSelected(true);
+                     m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(-1);
                  }
              } else if (m_itemDipoleMap.contains(m_hoveredItem)) {
                  m_itemDipoleMap[m_hoveredItem]->setSelected(m_hoveredIndex, true);
              }
         }
-    } else if (m_hoveredItem && m_itemSurfaceMap.contains(m_hoveredItem) && m_currentVisMode == BrainSurface::ModeAnnotation) {
-        m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(currentRegionId);
+    } else if (m_hoveredItem && m_itemSurfaceMap.contains(m_hoveredItem)) {
+        if (currentRegionId != -1) {
+            m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(currentRegionId);
+            m_itemSurfaceMap[m_hoveredItem]->setSelected(false);
+        } else {
+            m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(-1);
+            m_itemSurfaceMap[m_hoveredItem]->setSelected(true);
+        }
     }
     update();
 }
