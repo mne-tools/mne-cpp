@@ -93,6 +93,7 @@ void BrainSurface::fromSurface(const FSLIB::Surface &surf)
     m_indexCount = m_indexData.size();
     
     m_bBuffersDirty = true;
+    m_bAABBDirty = true;
     
     // Initial coloring based on current visualization mode
     updateVertexColors();
@@ -264,10 +265,28 @@ void BrainSurface::updateVertexColors()
     uint32_t baseVal = (m_baseColor.alpha() << 24) | (m_baseColor.blue() << 16) | (m_baseColor.green() << 8) | m_baseColor.red();
 
 
-    // Reset to base color first
-    for (auto &v : m_vertexData) {
-        v.color = baseVal; 
+    // Reset to base color first, but apply curvature shading if available
+    // This provides sulci/gyri visibility even in Surface mode
+    if (!m_curvature.isEmpty() && m_curvature.size() == m_vertexData.size()) {
+        // Use curvature-based grayscale for depth perception
+        for (int i = 0; i < m_vertexData.size(); ++i) {
+            uint32_t val;
+            if (m_curvature[i] > 0) {
+                // Sulcus (Concave) -> Medium-Dark gray
+                val = 0x90; // Medium gray (was 0x40 in Scientific mode)
+            } else {
+                // Gyrus (Convex) -> Light gray/white
+                val = 0xE8; // Light gray (was 0xAA in Scientific mode)
+            }
+            m_vertexData[i].color = (255 << 24) | (val << 16) | (val << 8) | val;
+        }
+    } else {
+        // Fallback: no curvature data, use base color
+        for (auto &v : m_vertexData) {
+            v.color = baseVal; 
+        }
     }
+
 
     if (m_visMode == ModeAnnotation) {
         if (!m_hasAnnotation || m_vertexData.isEmpty()) return;
@@ -322,8 +341,26 @@ void BrainSurface::updateVertexColors()
         }
     }
 
-    // Apply selection highlight (brightening)
+    // Apply selection highlight (golden tint blend for visibility)
     if (m_selected || m_selectedRegionId != -1) {
+        // Gold highlight color for visibility on any base
+        const uint32_t goldR = 255, goldG = 200, goldB = 80;
+        const float blendFactor = 0.4f; // 40% gold blend
+        
+        auto blendToGold = [&](uint32_t &c) {
+            uint32_t a = (c >> 24) & 0xFF;
+            uint32_t b = (c >> 16) & 0xFF;
+            uint32_t g = (c >> 8) & 0xFF;
+            uint32_t r = c & 0xFF;
+            
+            // Blend towards gold
+            r = static_cast<uint32_t>(r * (1.0f - blendFactor) + goldR * blendFactor);
+            g = static_cast<uint32_t>(g * (1.0f - blendFactor) + goldG * blendFactor);
+            b = static_cast<uint32_t>(b * (1.0f - blendFactor) + goldB * blendFactor);
+            
+            c = (a << 24) | (b << 16) | (g << 8) | r;
+        };
+        
         if (m_hasAnnotation && m_selectedRegionId != -1) {
             // Highlight only the selected region
             const Eigen::VectorXi &vertices = m_annotation.getVertices();
@@ -333,34 +370,14 @@ void BrainSurface::updateVertexColors()
                 if (labelIds(i) == m_selectedRegionId) {
                     int vertexIdx = vertices(i);
                     if (vertexIdx >= 0 && vertexIdx < m_vertexData.size()) {
-                        uint32_t &c = m_vertexData[vertexIdx].color;
-                        uint32_t a = (c >> 24) & 0xFF;
-                        uint32_t b = (c >> 16) & 0xFF;
-                        uint32_t g = (c >> 8) & 0xFF;
-                        uint32_t r = c & 0xFF;
-
-                        // Yellowish highlight (r+60, g+60, b+20)
-                        r = std::min(255u, r + 70);
-                        g = std::min(255u, g + 70);
-                        b = std::min(255u, b + 20);
-
-                        c = (a << 24) | (b << 16) | (g << 8) | r;
+                        blendToGold(m_vertexData[vertexIdx].color);
                     }
                 }
             }
         } else if (m_selected) {
             // Highlight whole hemisphere if no specific region selected
             for (auto &v : m_vertexData) {
-                uint32_t a = (v.color >> 24) & 0xFF;
-                uint32_t b = (v.color >> 16) & 0xFF;
-                uint32_t g = (v.color >> 8) & 0xFF;
-                uint32_t r = v.color & 0xFF;
-
-                r = std::min(255u, r + 40);
-                g = std::min(255u, g + 40);
-                b = std::min(255u, b + 40);
-
-                v.color = (a << 24) | (b << 16) | (g << 8) | r;
+                blendToGold(v.color);
             }
         }
     }
@@ -390,6 +407,7 @@ void BrainSurface::translateX(float offset)
         v.pos.setX(v.pos.x() + offset);
     }
     m_bBuffersDirty = true;
+    m_bAABBDirty = true;
 }
 
 //=============================================================================================================
@@ -422,6 +440,7 @@ void BrainSurface::transform(const QMatrix4x4 &m)
         v.norm = QVector3D(nx, ny, nz).normalized();
     }
     m_bBuffersDirty = true;
+    m_bAABBDirty = true;
 }
 
 //=============================================================================================================
@@ -433,6 +452,7 @@ void BrainSurface::applyTransform(const QMatrix4x4 &m)
         transform(m);
     } else {
         m_bBuffersDirty = true;
+        m_bAABBDirty = true;
     }
 }
 
@@ -501,6 +521,12 @@ Eigen::MatrixX3f BrainSurface::verticesAsMatrix() const
 
 void BrainSurface::boundingBox(QVector3D &min, QVector3D &max) const
 {
+    if (!m_bAABBDirty) {
+        min = m_aabbMin;
+        max = m_aabbMax;
+        return;
+    }
+
     if (m_vertexData.isEmpty()) {
         min = QVector3D(0,0,0);
         max = QVector3D(0,0,0);
@@ -519,6 +545,10 @@ void BrainSurface::boundingBox(QVector3D &min, QVector3D &max) const
         max.setY(std::max(max.y(), v.pos.y()));
         max.setZ(std::max(max.z(), v.pos.z()));
     }
+
+    m_aabbMin = min;
+    m_aabbMax = max;
+    m_bAABBDirty = false;
 }
 
 bool BrainSurface::intersects(const QVector3D &rayOrigin, const QVector3D &rayDir, float &dist, int &vertexIdx) const
@@ -526,97 +556,94 @@ bool BrainSurface::intersects(const QVector3D &rayOrigin, const QVector3D &rayDi
     vertexIdx = -1;
     if (m_vertexData.isEmpty()) return false;
 
-    // 1. AABB Check
+    // 1. AABB Check (Cached)
     QVector3D min, max;
     boundingBox(min, max);
     
-    // Ray-AABB slab method with small epsilon padding
-    float eps = 1e-4f;
-    float tmin = (min.x() - eps - rayOrigin.x()) / rayDir.x();
-    float tmax = (max.x() + eps - rayOrigin.x()) / rayDir.x();
-    if (tmin > tmax) std::swap(tmin, tmax);
-    
-    float tymin = (min.y() - eps - rayOrigin.y()) / rayDir.y();
-    float tymax = (max.y() + eps - rayOrigin.y()) / rayDir.y();
-    if (tmin > tymax || tymin > tmax) return false;
-    if (tymin > tmin) tmin = tymin;
-    if (tymax < tmax) tmax = tymax;
-    
-    float tzmin = (min.z() - eps - rayOrigin.z()) / rayDir.z();
-    float tzmax = (max.z() + eps - rayOrigin.z()) / rayDir.z();
-    if (tzmin > tzmax) std::swap(tzmin, tzmax);
-    
-    if (tmin > tzmax || tzmin > tmax) return false;
-    
-    if (tzmin > tmin) tmin = tzmin;
-    if (tzmax < tmax) tmax = tzmax;
-    
-    // Debug AABB failures for BrainSurface (large mesh)
-    static int debugCounter = 0;
-    if (m_vertexData.size() > 5000 && debugCounter++ % 60 == 0) {
-        // qDebug() << "BrainSurface(Large) AABB Hit. tmin:" << tmin << "tmax:" << tmax << "Ray:" << rayOrigin << rayDir;
+    // Ray-AABB slab method (Double Precision for stability)
+    double eps = 1e-4;
+    double origin[3] = {rayOrigin.x(), rayOrigin.y(), rayOrigin.z()};
+    double dir[3] = {rayDir.x(), rayDir.y(), rayDir.z()};
+    double minB[3] = {min.x() - eps, min.y() - eps, min.z() - eps};
+    double maxB[3] = {max.x() + eps, max.y() + eps, max.z() + eps};
+
+    // Extract individual components for triangle intersection (Möller–Trumbore)
+    double originX = origin[0], originY = origin[1], originZ = origin[2];
+    double dirX = dir[0], dirY = dir[1], dirZ = dir[2];
+
+    double tmin = -std::numeric_limits<double>::max();
+    double tmax = std::numeric_limits<double>::max();
+
+    for (int i = 0; i < 3; ++i) {
+        if (std::abs(dir[i]) < 1e-15) {
+            if (origin[i] < minB[i] || origin[i] > maxB[i]) return false;
+        } else {
+            double t1 = (minB[i] - origin[i]) / dir[i];
+            double t2 = (maxB[i] - origin[i]) / dir[i];
+            if (t1 > t2) std::swap(t1, t2);
+            if (t1 > tmin) tmin = t1;
+            if (t2 < tmax) tmax = t2;
+            if (tmin > tmax) return false;
+        }
     }
     
-    // access to tmin, tmax for debug if needed
-    // If we passed AABB, check triangles if vertex count is small (e.g. Sensor)
-    // For large brain meshes (100k+), this is too slow without Octree.
-    // Heuristic: If < 1000 vertices, do full check. Else, accept AABB hit ?? 
-    // No, AABB hit on brain is basically "entire screen".
-    // For now: Only precise check for "Sensors" (small).
-    
-    // if (m_vertexData.size() > 5000) {
-    //    // Just AABB for big meshes? No that's useless for picking specific gyri.
-    //    // Return false for now for big meshes to avoid selecting the whole head when trying to pick sensors.
-    //    return false; 
-    // }
+    if (tmax < 1e-7) return false;
 
-    float closestDist = std::numeric_limits<float>::max();
+    // 2. Triangle intersection
+    double closestDist = std::numeric_limits<double>::max();
     bool hit = false;
     int closestVert = -1;
     
-    // Brute-force triangle intersection
+    // Brute-force triangle intersection using Double Precision Möller–Trumbore
+    // Note: For 100k+ vertices this is slow, ideally we'd use an Octree/BVH.
+    // However, since we only do this on mouse-over, results are usually acceptable if not too many surfaces are active.
     for (int i = 0; i < m_indexData.size(); i += 3) {
         int i0 = m_indexData[i];
         int i1 = m_indexData[i+1];
         int i2 = m_indexData[i+2];
-        const QVector3D &v0 = m_vertexData[i0].pos;
-        const QVector3D &v1 = m_vertexData[i1].pos;
-        const QVector3D &v2 = m_vertexData[i2].pos;
+        const QVector3D &v0q = m_vertexData[i0].pos;
+        const QVector3D &v1q = m_vertexData[i1].pos;
+        const QVector3D &v2q = m_vertexData[i2].pos;
+
+        double v0x = v0q.x(), v0y = v0q.y(), v0z = v0q.z();
+        double v1x = v1q.x(), v1y = v1q.y(), v1z = v1q.z();
+        double v2x = v2q.x(), v2y = v2q.y(), v2z = v2q.z();
         
-        // Möller–Trumbore intersection algorithm
-        // Relaxing epsilon for steep angles/large scales
-        const float EPSILON = 1e-6f; 
-        QVector3D edge1 = v1 - v0;
-        QVector3D edge2 = v2 - v0;
-        QVector3D h = QVector3D::crossProduct(rayDir, edge2);
-        float a = QVector3D::dotProduct(edge1, h);
+        double edge1x = v1x - v0x, edge1y = v1y - v0y, edge1z = v1z - v0z;
+        double edge2x = v2x - v0x, edge2y = v2y - v0y, edge2z = v2z - v0z;
         
-        // Use backface culling or double sided? 
-        // For brain we usually want double sided if we click from inside, 
-        // but for now let's just make it more robust.
-        if (std::abs(a) < 1e-10f) continue; // Extremely parallel
+        double hx = dirY * edge2z - dirZ * edge2y;
+        double hy = dirZ * edge2x - dirX * edge2z;
+        double hz = dirX * edge2y - dirY * edge2x;
         
-        const float BARY_EPSILON = 1e-4f;
+        double a = edge1x * hx + edge1y * hy + edge1z * hz;
+        if (std::abs(a) < 1e-18) continue; // Purely parallel
         
-        float f = 1.0f / a;
-        QVector3D s = rayOrigin - v0;
-        float u = f * QVector3D::dotProduct(s, h);
-        if (u < -BARY_EPSILON || u > 1.0f + BARY_EPSILON) continue;
+        double f = 1.0 / a;
+        double sx = originX - v0x, sy = originY - v0y, sz = originZ - v0z;
+        double u = f * (sx * hx + sy * hy + sz * hz);
+        if (u < -1e-7 || u > 1.0000001) continue;
         
-        QVector3D q = QVector3D::crossProduct(s, edge1);
-        float v = f * QVector3D::dotProduct(rayDir, q);
-        if (v < -BARY_EPSILON || u + v > 1.0f + BARY_EPSILON) continue;
+        double qx = sy * edge1z - sz * edge1y;
+        double qy = sz * edge1x - sx * edge1z;
+        double qz = sx * edge1y - sy * edge1x;
         
-        float t = f * QVector3D::dotProduct(edge2, q);
-        if (t > 0.0f && t < closestDist) {
+        double v = f * (dirX * qx + dirY * qy + dirZ * qz);
+        if (v < -1e-7 || u + v > 1.0000001) continue;
+        
+        double t = f * (edge2x * qx + edge2y * qy + edge2z * qz);
+        if (t > 1e-7 && t < closestDist) {
             closestDist = t;
             hit = true;
             
             // Find closest vertex of the hit triangle to the hit point
-            QVector3D hitPoint = rayOrigin + t * rayDir;
-            float d0 = (v0 - hitPoint).lengthSquared();
-            float d1 = (v1 - hitPoint).lengthSquared();
-            float d2 = (v2 - hitPoint).lengthSquared();
+            double hitX = originX + t * dirX;
+            double hitY = originY + t * dirY;
+            double hitZ = originZ + t * dirZ;
+            
+            double d0 = (v0x - hitX)*(v0x - hitX) + (v0y - hitY)*(v0y - hitY) + (v0z - hitZ)*(v0z - hitZ);
+            double d1 = (v1x - hitX)*(v1x - hitX) + (v1y - hitY)*(v1y - hitY) + (v1z - hitZ)*(v1z - hitZ);
+            double d2 = (v2x - hitX)*(v2x - hitX) + (v2y - hitY)*(v2y - hitY) + (v2z - hitZ)*(v2z - hitZ);
             
             if (d0 < d1 && d0 < d2) closestVert = i0;
             else if (d1 < d2) closestVert = i1;
@@ -625,11 +652,62 @@ bool BrainSurface::intersects(const QVector3D &rayOrigin, const QVector3D &rayDi
     }
     
     if (hit) {
-        dist = closestDist;
+        dist = static_cast<float>(closestDist);
         vertexIdx = closestVert;
+        return true;
     }
     
-    return hit;
+    // 3. Proximity Fallback: If no exact intersection, find closest vertex to the ray
+    // This handles cases where the ray passes between triangles or near edges
+    // Inspired by legacy MNE's nearest_triangle_point approach
+    
+    // Compute a reasonable threshold based on scene scale (~3mm for brain surfaces)
+    double proximityThreshold = 0.003; // 3mm in meters
+    double closestVertDist = std::numeric_limits<double>::max();
+    int fallbackVert = -1;
+    double fallbackT = 0.0;
+    
+    for (int i = 0; i < m_vertexData.size(); ++i) {
+        const QVector3D &vq = m_vertexData[i].pos;
+        double vx = vq.x(), vy = vq.y(), vz = vq.z();
+        
+        // Vector from ray origin to vertex
+        double px = vx - originX;
+        double py = vy - originY;
+        double pz = vz - originZ;
+        
+        // Project vertex onto ray: t = (P dot D) / (D dot D)
+        // Since rayDir is normalized, D dot D = 1
+        double t = px * dirX + py * dirY + pz * dirZ;
+        
+        // Only consider vertices in front of the camera
+        if (t < 1e-7) continue;
+        
+        // Closest point on ray to vertex
+        double cpx = originX + t * dirX;
+        double cpy = originY + t * dirY;
+        double cpz = originZ + t * dirZ;
+        
+        // Distance from vertex to closest point on ray
+        double dx = vx - cpx;
+        double dy = vy - cpy;
+        double dz = vz - cpz;
+        double distToRay = std::sqrt(dx*dx + dy*dy + dz*dz);
+        
+        if (distToRay < proximityThreshold && distToRay < closestVertDist) {
+            closestVertDist = distToRay;
+            fallbackVert = i;
+            fallbackT = t;
+        }
+    }
+    
+    if (fallbackVert >= 0) {
+        dist = static_cast<float>(fallbackT);
+        vertexIdx = fallbackVert;
+        return true;
+    }
+    
+    return false;
 }
 
 //=============================================================================================================

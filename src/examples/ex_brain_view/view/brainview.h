@@ -352,6 +352,11 @@ private:
      int m_hoveredIndex = -1;
      QString m_hoveredRegion;
      QLabel* m_regionLabel = nullptr;
+     
+     // Debug Intersection Pointer
+     std::shared_ptr<BrainSurface> m_debugPointerSurface;
+     QVector3D m_lastIntersectionPoint;
+     bool m_hasIntersection = false;
 };
 
 #endif // BRAINVIEW_H

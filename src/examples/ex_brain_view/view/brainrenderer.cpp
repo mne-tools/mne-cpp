@@ -99,15 +99,15 @@ void BrainRenderer::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int
     };
     
     // List of modes to initialize
-    QList<ShaderMode> modes = {Standard, Holographic, Atlas, Dipole, XRay};
+    QList<ShaderMode> modes = {Standard, Holographic, Anatomical, Dipole, XRay};
     
     for (ShaderMode mode : modes) {
         QString vert = (mode == Holographic || mode == XRay) ? ":/holographic.vert.qsb" : 
-                       (mode == Atlas) ? ":/glossy.vert.qsb" : 
+                       (mode == Anatomical) ? ":/anatomical.vert.qsb" : 
                        (mode == Dipole) ? ":/dipole.vert.qsb" : ":/standard.vert.qsb";
         
         QString frag = (mode == Holographic || mode == XRay) ? ":/holographic.frag.qsb" : 
-                       (mode == Atlas) ? ":/glossy.frag.qsb" : 
+                       (mode == Anatomical) ? ":/anatomical.frag.qsb" : 
                        (mode == Dipole) ? ":/dipole.frag.qsb" : ":/standard.frag.qsb";
         
         QShader vS = getShader(vert);
@@ -260,8 +260,13 @@ void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
     u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 76, 4, &selected);
     
     u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 80, 12, &data.lightDir);
+    
+    // Pass tissue type for anatomical shader (offset 92, uses original _pad2 slot)
+    float tissueType = static_cast<float>(surface->tissueType());
+    u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 92, 4, &tissueType);
+    
     float lighting = data.lightingEnabled ? 1.0f : 0.0f;
-    u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 92, 4, &lighting);
+    u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 96, 4, &lighting);
 
     cb->resourceUpdate(u); 
 

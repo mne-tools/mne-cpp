@@ -71,7 +71,7 @@ public:
     enum ShaderMode {
         Standard,
         Holographic,
-        Atlas,
+        Anatomical,
         Dipole,
         XRay
     };

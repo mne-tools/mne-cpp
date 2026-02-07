@@ -15,7 +15,7 @@ layout(std140, binding = 0) uniform UniformBlock {
     vec3 cameraPos;
     float isSelected;
     vec3 lightDir;
-    float _pad2;
+    float tissueType;  // 0=Unknown, 1=Brain, 2=Skin, 3=OuterSkull, 4=InnerSkull
     float lightingEnabled;
     vec3 _pad3;
 };
@@ -27,7 +27,7 @@ void main() {
     // Use actual vertex normal
     v_normal = normalize(normal);
     
-    // Extract curvature from color
+    // Extract curvature from color (grayscale value)
     v_curvature = color.r;
     
     // Pass color

@@ -123,13 +123,13 @@ int main(int argc, char *argv[])
     QComboBox *shaderCombo = new QComboBox();
     shaderCombo->addItem("Standard");
     shaderCombo->addItem("Holographic");
-    shaderCombo->addItem("Glossy Realistic");
+    shaderCombo->addItem("Anatomical");
 
     QLabel *bemShaderLabel = new QLabel("Head Shader:");
     QComboBox *bemShaderCombo = new QComboBox();
     bemShaderCombo->addItem("Standard");
     bemShaderCombo->addItem("Holographic");
-    bemShaderCombo->addItem("Glossy Realistic");
+    bemShaderCombo->addItem("Anatomical");
     bemShaderCombo->setEnabled(false); // Disabled by default as linked
 
     QCheckBox *linkShadersCheck = new QCheckBox("Link Shaders");

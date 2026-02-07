@@ -11,7 +11,7 @@ layout(std140, binding = 0) uniform UniformBlock {
     vec3 cameraPos;
     float isSelected; // 0.0 or 1.0 (replaces _pad1)
     vec3 lightDir;
-    float _pad2;
+    float tissueType;  // 0=Unknown, 1=Brain, 2=Skin, 3=OuterSkull, 4=InnerSkull
     float lightingEnabled;
     vec3 _pad3;
 };
@@ -20,25 +20,42 @@ void main() {
     vec3 N = normalize(v_normal);
     vec3 L = normalize(lightDir);
     vec3 V = normalize(cameraPos - v_worldPos);
+    vec3 H = normalize(L + V); // Half-vector for Blinn-Phong
     
-    // Simple Lambertian shading
-    float diff = max(dot(N, L), 0.0);
+    // Lambertian diffuse with smoother falloff
+    float NdotL = max(dot(N, L), 0.0);
+    float diff = NdotL;
     
-    // Use curvature color (black for sulci, white for gyri)
+    // Blinn-Phong specular for surface sheen
+    float NdotH = max(dot(N, H), 0.0);
+    float spec = pow(NdotH, 32.0) * 0.3;
+    
+    // Base color from curvature (gyri=light, sulci=dark)
     vec3 baseColor = v_color;
     
-    // Ambient + Diffuse (High brightness for gyri)
-    vec3 ambient = baseColor * 0.8;
-    vec3 diffuse = baseColor * diff * 0.8;
+    // Richer brain tissue tones - warm ivory/cream instead of pure white
+    vec3 warmTint = vec3(1.0, 0.97, 0.94); // Subtle warm tint
+    baseColor *= warmTint;
     
-    vec3 finalColor = clamp(ambient + diffuse, 0.0, 1.0);
+    // Improved lighting with lower ambient for better depth perception
+    float ambient = 0.35;  // Much lower ambient for visible shadows
+    float diffuseStrength = 0.65;  // Stronger diffuse for depth
     
-    // --- Suble Hover Glow (Silver Rim) ---
+    // Add subtle fill light from below to prevent pure-black sulci
+    vec3 fillLightDir = normalize(vec3(0.0, -0.5, 0.3));
+    float fillDiff = max(dot(N, fillLightDir), 0.0) * 0.15;
+    
+    vec3 finalColor = baseColor * (ambient + diff * diffuseStrength + fillDiff);
+    finalColor += vec3(0.95, 0.95, 1.0) * spec; // Cool-tinted specular
+    
+    finalColor = clamp(finalColor, 0.0, 1.0);
+    
+    // --- Enhanced Hover Glow (Golden-Yellow for visibility) ---
     if (isSelected > 0.5) {
-        float fresnel = pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 3.0);
-        vec3 glowColor = vec3(1.0, 1.0, 1.0); // Pure White/Silver
-        finalColor += glowColor * 0.15; // Base glow 
-        finalColor += glowColor * fresnel * 0.85; // Rim glow
+        float fresnel = pow(1.0 - clamp(dot(N, V), 0.0, 1.0), 2.5);
+        vec3 glowColor = vec3(1.0, 0.85, 0.3); // Gold/Yellow for visibility
+        finalColor = mix(finalColor, glowColor, 0.25); // Blend base with gold
+        finalColor += glowColor * fresnel * 0.6; // Golden rim glow
     }
     
     // Opaque

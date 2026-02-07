@@ -13,9 +13,9 @@ layout(location = 4) out float v_curvature;
 layout(std140, binding = 0) uniform UniformBlock {
     mat4 mvp;
     vec3 cameraPos;
-    float _pad1;
+    float isSelected;
     vec3 lightDir;
-    float _pad2;
+    float tissueType;  // 0=Unknown, 1=Brain, 2=Skin, 3=OuterSkull, 4=InnerSkull
     float lightingEnabled;
     vec3 _pad3;
 };

@@ -95,9 +95,83 @@ BrainView::BrainView(QWidget *parent)
     m_regionLabel = new QLabel(this);
     m_regionLabel->setStyleSheet("color: white; font-weight: bold; font-family: sans-serif; font-size: 16px; background: rgba(0,0,0,100); padding: 5px;");
     m_regionLabel->setText("");
-    m_regionLabel->move(10, 120); // Below FPS label
+    m_regionLabel->move(10, 120); 
     m_regionLabel->resize(300, 40);
     m_regionLabel->hide();
+
+    // Setup Debug Pointer: Semi-transparent sphere for subtle intersection indicator
+    m_debugPointerSurface = std::make_shared<BrainSurface>();
+    
+    // Create UV sphere (more visually appealing than a cube)
+    const float radius = 0.002f; // 2mm radius
+    const int latSegments = 8;   // Latitude bands
+    const int lonSegments = 12;  // Longitude segments
+    
+    int numVerts = (latSegments - 1) * lonSegments + 2; // +2 for poles
+    int numTris = (latSegments - 2) * lonSegments * 2 + lonSegments * 2; // Quads + pole fans
+    
+    Eigen::MatrixX3f rr(numVerts, 3);
+    Eigen::MatrixX3f nn(numVerts, 3);
+    Eigen::MatrixX3i tris(numTris, 3);
+    
+    int vIdx = 0;
+    // Top pole
+    rr.row(vIdx) << 0, radius, 0;
+    nn.row(vIdx) << 0, 1, 0;
+    vIdx++;
+    
+    // Middle rings
+    for (int lat = 1; lat < latSegments; ++lat) {
+        float theta = M_PI * lat / latSegments;
+        float sinT = std::sin(theta);
+        float cosT = std::cos(theta);
+        for (int lon = 0; lon < lonSegments; ++lon) {
+            float phi = 2.0f * M_PI * lon / lonSegments;
+            float x = sinT * std::cos(phi);
+            float y = cosT;
+            float z = sinT * std::sin(phi);
+            rr.row(vIdx) << radius * x, radius * y, radius * z;
+            nn.row(vIdx) << x, y, z;
+            vIdx++;
+        }
+    }
+    
+    // Bottom pole
+    rr.row(vIdx) << 0, -radius, 0;
+    nn.row(vIdx) << 0, -1, 0;
+    int bottomPole = vIdx;
+    
+    // Triangles
+    int tIdx = 0;
+    // Top cap (fan)
+    for (int lon = 0; lon < lonSegments; ++lon) {
+        int next = (lon + 1) % lonSegments;
+        tris.row(tIdx++) << 0, 1 + lon, 1 + next;
+    }
+    
+    // Middle quads
+    for (int lat = 0; lat < latSegments - 2; ++lat) {
+        int ringStart = 1 + lat * lonSegments;
+        int nextRingStart = ringStart + lonSegments;
+        for (int lon = 0; lon < lonSegments; ++lon) {
+            int curr = ringStart + lon;
+            int next = ringStart + (lon + 1) % lonSegments;
+            int currBelow = nextRingStart + lon;
+            int nextBelow = nextRingStart + (lon + 1) % lonSegments;
+            tris.row(tIdx++) << curr, currBelow, next;
+            tris.row(tIdx++) << next, currBelow, nextBelow;
+        }
+    }
+    
+    // Bottom cap (fan)
+    int lastRingStart = 1 + (latSegments - 2) * lonSegments;
+    for (int lon = 0; lon < lonSegments; ++lon) {
+        int next = (lon + 1) % lonSegments;
+        tris.row(tIdx++) << lastRingStart + lon, bottomPole, lastRingStart + next;
+    }
+    
+    // Semi-transparent white/cyan for subtle appearance on any surface
+    m_debugPointerSurface->createFromData(rr, nn, tris, QColor(200, 255, 255, 160));
 }
 
 BrainView::~BrainView()
@@ -147,6 +221,9 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
             // Set properties
             brainSurf->setVisible(surfItem->isVisible());
             
+            // Brain surfaces (pial, white, inflated, etc.) are brain tissue
+            brainSurf->setTissueType(BrainSurface::TissueBrain);
+            
             // Map it
             // Map it
             m_itemSurfaceMap[item] = brainSurf;
@@ -190,6 +267,20 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
              
              brainSurf->setVisible(bemItem->isVisible());
              
+             // Set tissue type based on surface name
+             QString surfName = bemItem->text().toLower();
+             if (surfName.contains("head") || surfName.contains("skin") || surfName.contains("scalp")) {
+                 brainSurf->setTissueType(BrainSurface::TissueSkin);
+             } else if (surfName.contains("outer") && surfName.contains("skull")) {
+                 brainSurf->setTissueType(BrainSurface::TissueOuterSkull);
+             } else if (surfName.contains("inner") && surfName.contains("skull")) {
+                 brainSurf->setTissueType(BrainSurface::TissueInnerSkull);
+             } else if (surfName.contains("skull")) {
+                 brainSurf->setTissueType(BrainSurface::TissueOuterSkull); // Default skull to outer
+             } else if (surfName.contains("brain")) {
+                 brainSurf->setTissueType(BrainSurface::TissueBrain);
+             }
+             
              // Map it
              m_itemSurfaceMap[item] = brainSurf;
              
@@ -203,6 +294,7 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
              // Legacy map support (Use item text e.g. "bem_head")
              m_surfaces["bem_" + bemItem->text()] = brainSurf;
              
+
 
         }
         
@@ -381,7 +473,7 @@ void BrainView::setShaderMode(const QString &modeName)
 {
     if (modeName == "Standard") m_brainShaderMode = BrainRenderer::Standard;
     else if (modeName == "Holographic") m_brainShaderMode = BrainRenderer::Holographic;
-    else if (modeName == "Glossy Realistic") m_brainShaderMode = BrainRenderer::Atlas;
+    else if (modeName == "Anatomical") m_brainShaderMode = BrainRenderer::Anatomical;
     update();
 }
 
@@ -389,7 +481,7 @@ void BrainView::setBemShaderMode(const QString &modeName)
 {
     if (modeName == "Standard") m_bemShaderMode = BrainRenderer::Standard;
     else if (modeName == "Holographic") m_bemShaderMode = BrainRenderer::Holographic;
-    else if (modeName == "Glossy Realistic") m_bemShaderMode = BrainRenderer::Atlas;
+    else if (modeName == "Anatomical") m_bemShaderMode = BrainRenderer::Anatomical;
     update();
 }
 
@@ -528,7 +620,7 @@ void BrainView::render(QRhiCommandBuffer *cb)
     m_frameCount++;
     if (m_fpsTimer.elapsed() >= 500) {
         float fps = m_frameCount / (m_fpsTimer.elapsed() / 1000.0f);
-        QString modeStr = (m_brainShaderMode == BrainRenderer::Holographic) ? "Holographic" : (m_brainShaderMode == BrainRenderer::Atlas) ? "Atlas" : "Standard";
+        QString modeStr = (m_brainShaderMode == BrainRenderer::Holographic) ? "Holographic" : (m_brainShaderMode == BrainRenderer::Anatomical) ? "Anatomical" : "Standard";
         m_fpsLabel->setText(QString("FPS: %1\nVertices: %2\nShader: %3").arg(fps, 0, 'f', 1).arg(m_activeSurface->vertexCount()).arg(modeStr));
         m_frameCount = 0;
         m_fpsTimer.restart();
@@ -634,6 +726,18 @@ void BrainView::render(QRhiCommandBuffer *cb)
     // Render Dipoles
     if (m_dipolesVisible && m_dipoles) {
         m_renderer->renderDipoles(cb, rhi(), sceneData, m_dipoles.get());
+    }
+
+    // Render Debug Intersection Pointer
+    if (m_hasIntersection && m_debugPointerSurface) {
+        BrainRenderer::SceneData debugSceneData = sceneData;
+        
+        QMatrix4x4 translation;
+        translation.translate(m_lastIntersectionPoint);
+        
+        debugSceneData.mvp = rhi()->clipSpaceCorrMatrix() * projection * view * model * translation;
+        
+        m_renderer->renderSurface(cb, rhi(), debugSceneData, m_debugPointerSurface.get(), BrainRenderer::Holographic);
     }
     
     m_renderer->endFrame(cb);
@@ -975,7 +1079,9 @@ void BrainView::castRay(const QPoint &pos)
     QMatrix4x4 model;
     model.translate(-m_sceneCenter);
     QMatrix4x4 pvm = projection * view * model;
-    QMatrix4x4 invPVM = pvm.inverted();
+    bool invertible;
+    QMatrix4x4 invPVM = pvm.inverted(&invertible);
+    if (!invertible) return;
     
     float ndcX = (2.0f * pos.x()) / width() - 1.0f;
     float ndcY = 1.0f - (2.0f * pos.y()) / height(); 
@@ -991,7 +1097,7 @@ void BrainView::castRay(const QPoint &pos)
     QVector3D rayOrigin = pNear.toVector3D();
     QVector3D rayDir = (pFar.toVector3D() - pNear.toVector3D()).normalized();
     
-    
+    m_hasIntersection = false;
     
     float closestDist = std::numeric_limits<float>::max();
     QStandardItem* hitItem = nullptr;
@@ -1004,12 +1110,21 @@ void BrainView::castRay(const QPoint &pos)
         if (!it.value()->isVisible()) continue;
         
         bool isSensor = it.key().startsWith("sens_");
+        bool isBem = it.key().startsWith("bem_");
+        
+        // Brain surfaces: only pick if matching active surface type (same as render)
+        if (!isSensor && !isBem) {
+            if (!it.key().endsWith(m_activeSurfaceType)) continue;
+        }
         
         float dist;
         int vertexIdx = -1;
         if (it.value()->intersects(rayOrigin, rayDir, dist, vertexIdx)) {
              if (dist < closestDist) {
                  closestDist = dist;
+                 m_hasIntersection = true;
+                 m_lastIntersectionPoint = rayOrigin + dist * rayDir;
+
                  for(auto i = m_itemSurfaceMap.begin(); i != m_itemSurfaceMap.end(); ++i) {
                      if (i.value() == it.value()) {
                          hitItem = const_cast<QStandardItem*>(i.key());

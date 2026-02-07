@@ -89,6 +89,14 @@ public:
         ModeSourceEstimate // Source estimate overlay
     };
 
+    enum TissueType {
+        TissueUnknown = 0,
+        TissueBrain = 1,
+        TissueSkin = 2,       // Head/Scalp surface
+        TissueOuterSkull = 3, // Outer skull bone
+        TissueInnerSkull = 4  // Inner skull bone
+    };
+
     //=========================================================================================================
     /**
      * Set the visibility of the surface.
@@ -112,6 +120,22 @@ public:
      * @param[in] hemi       0 for Left, 1 for Right.
      */
     void setHemi(int hemi) { m_hemi = hemi; }
+
+    //=========================================================================================================
+    /**
+     * Set the tissue type (Brain, Skin, Skull, etc.).
+     *
+     * @param[in] type       TissueType enum value.
+     */
+    void setTissueType(TissueType type) { m_tissueType = type; }
+
+    //=========================================================================================================
+    /**
+     * Get the tissue type.
+     *
+     * @return TissueType enum value.
+     */
+    TissueType tissueType() const { return m_tissueType; }
 
     //=========================================================================================================
     /**
@@ -333,10 +357,15 @@ private:
     bool m_selected = false;
     int m_selectedRegionId = -1;
     int m_hemi = -1; // 0=lh, 1=rh
+    TissueType m_tissueType = TissueUnknown;
 
     std::unique_ptr<QRhiBuffer> m_vertexBuffer;
     std::unique_ptr<QRhiBuffer> m_indexBuffer;
     bool m_bBuffersDirty = true;
+    
+    mutable QVector3D m_aabbMin;
+    mutable QVector3D m_aabbMax;
+    mutable bool m_bAABBDirty = true;
 };
 
 #endif // BRAINSURFACE_H
