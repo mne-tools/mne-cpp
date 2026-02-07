@@ -284,8 +284,8 @@ void TestDipoleFit::compareFit()
 
         QVERIFY( m_ECDSet[i].valid == m_refECDSet[i].valid );
         QVERIFY( m_ECDSet[i].time - m_refECDSet[i].time < epsilon );
-        QVERIFY( m_ECDSet[i].rd == m_refECDSet[i].rd );
-        QVERIFY( m_ECDSet[i].Q == m_refECDSet[i].Q );
+        QVERIFY( (m_ECDSet[i].rd - m_refECDSet[i].rd).norm() < epsilon );
+        QVERIFY( (m_ECDSet[i].Q - m_refECDSet[i].Q).norm() < epsilon );
         QVERIFY( m_ECDSet[i].good - m_refECDSet[i].good < epsilon );
         QVERIFY( m_ECDSet[i].khi2 - m_refECDSet[i].khi2 < epsilon );
         QVERIFY( m_ECDSet[i].nfree == m_refECDSet[i].nfree );
