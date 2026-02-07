@@ -464,6 +464,51 @@ void BrainView::setActiveSurface(const QString &type)
         key = "rh_" + type;
         if (m_surfaces.contains(key)) m_activeSurface = m_surfaces[key];
     }
+    
+    // Reposition hemispheres for inflated surfaces
+    // Inflated surfaces in FreeSurfer are centered at origin for each hemisphere,
+    // so they overlap when rendered together. We need to separate them side-by-side.
+    bool isInflated = (type == "inflated");
+    
+    QString lhKey = "lh_" + type;
+    QString rhKey = "rh_" + type;
+    
+    if (isInflated && m_surfaces.contains(lhKey) && m_surfaces.contains(rhKey)) {
+        auto lhSurf = m_surfaces[lhKey];
+        auto rhSurf = m_surfaces[rhKey];
+        
+        // First reset to original positions
+        QMatrix4x4 identity;
+        lhSurf->applyTransform(identity);
+        rhSurf->applyTransform(identity);
+        
+        // Get bounding boxes after reset
+        float lhMaxX = lhSurf->maxX();
+        float rhMinX = rhSurf->minX();
+        
+        // Small gap between hemispheres (5mm)
+        const float gap = 0.005f;
+        
+        // Translate left hemisphere so its right max is at -gap/2
+        // Translate right hemisphere so its left min is at +gap/2
+        // This centers the zero point between both hemispheres
+        float lhOffset = -gap/2.0f - lhMaxX;
+        float rhOffset = gap/2.0f - rhMinX;
+        
+        lhSurf->translateX(lhOffset);
+        rhSurf->translateX(rhOffset);
+    } else {
+        // For non-inflated surfaces, reset to original positions
+        // This removes any translations applied for inflated view
+        QMatrix4x4 identity;
+        if (m_surfaces.contains(lhKey)) {
+            m_surfaces[lhKey]->applyTransform(identity);
+        }
+        if (m_surfaces.contains(rhKey)) {
+            m_surfaces[rhKey]->applyTransform(identity);
+        }
+    }
+    
     update();
 }
 
