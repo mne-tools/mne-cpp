@@ -173,6 +173,14 @@ BrainView::BrainView(QWidget *parent)
     
     // Semi-transparent white/cyan for subtle appearance on any surface
     m_debugPointerSurface->createFromData(rr, nn, tris, QColor(200, 255, 255, 160));
+    
+    // Initialize multi-view fixed cameras
+    // Top view: looking down Y-axis (from above)
+    m_multiViewCameras[0] = QQuaternion::fromAxisAndAngle(1, 0, 0, 90);
+    // Left view: looking from -X towards center (side view)
+    m_multiViewCameras[1] = QQuaternion::fromAxisAndAngle(0, 1, 0, -90);
+    // Front view: looking from +Z towards center (default front)
+    m_multiViewCameras[2] = QQuaternion::fromAxisAndAngle(0, 0, 1, 0); // Identity for front
 }
 
 BrainView::~BrainView()
@@ -191,6 +199,14 @@ void BrainView::setModel(BrainTreeModel *model)
     
     // Initial population if not empty?
     // For now assuming we set model before adding data or iterate.
+}
+
+//=============================================================================================================
+
+void BrainView::setInitialCameraRotation(const QQuaternion &rotation)
+{
+    m_cameraRotation = rotation;
+    update();
 }
 
 void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
@@ -571,6 +587,7 @@ void BrainView::setVisualizationMode(const QString &modeName)
     BrainSurface::VisualizationMode mode = BrainSurface::ModeSurface;
     if (modeName == "Annotation") mode = BrainSurface::ModeAnnotation;
     if (modeName == "Scientific") mode = BrainSurface::ModeScientific;
+    if (modeName == "Source Estimate") mode = BrainSurface::ModeSourceEstimate;
     
     m_currentVisMode = mode;
     for (auto surf : m_surfaces) {
@@ -650,6 +667,32 @@ void BrainView::saveSnapshot()
 
 //=============================================================================================================
 
+void BrainView::showSingleView()
+{
+    m_viewMode = SingleView;
+    update();
+}
+
+//=============================================================================================================
+
+void BrainView::showMultiView()
+{
+    m_viewMode = MultiView;
+    update();
+}
+
+//=============================================================================================================
+
+void BrainView::setViewportEnabled(int index, bool enabled)
+{
+    if (index >= 0 && index < 4) {
+        m_viewportEnabled[index] = enabled;
+        update();
+    }
+}
+
+//=============================================================================================================
+
 void BrainView::initialize(QRhiCommandBuffer *cb)
 {
     Q_UNUSED(cb);
@@ -672,60 +715,123 @@ void BrainView::render(QRhiCommandBuffer *cb)
         m_fpsTimer.restart();
     }
 
-    QSize outputSize = renderTarget()->pixelSize();
-    QMatrix4x4 projection;
-    // Adjust planes based on scene size (e.g. 15cm -> Far 3m, Near 1mm)
-    float farPlane = m_sceneSize * 20.0f;
-    if (farPlane < 100.0f) farPlane = 100.0f; // Minimum 100 units
-    projection.perspective(45.0f, float(outputSize.width()) / float(outputSize.height()), m_sceneSize * 0.01f, farPlane);
-
-    // Default distance relative to size. 1.5x diagonal is usually good for framing.
-    float baseDistance = m_sceneSize * 1.5f;
-    // Adapt zoom speed: 100 zoom steps should cover the range
-    float distance = baseDistance - m_zoom * (m_sceneSize * 0.05f); 
-    
-    QVector3D cameraPos = m_cameraRotation.rotatedVector(QVector3D(0, 0, distance));
-    QVector3D upVector = m_cameraRotation.rotatedVector(QVector3D(0, 1, 0));
-    
-    QMatrix4x4 view;
-    view.lookAt(cameraPos, QVector3D(0, 0, 0), upVector);
-
-    BrainRenderer::SceneData sceneData;
-    sceneData.mvp = rhi()->clipSpaceCorrMatrix();
-    sceneData.mvp *= projection;
-    
-    // View Matrix
-    sceneData.mvp *= view;
-    
-    // Model Matrix: Translate to center
-    QMatrix4x4 model;
-    model.translate(-m_sceneCenter);
-    sceneData.mvp *= model; // Apply model transform
-    
-    sceneData.cameraPos = cameraPos; // Camera pos is in world space, but we moved object. 
-    // Actually, view matrix looks at (0,0,0). Object is moved to (0,0,0). So cameraPos is correct relative to object center.
-    
-    sceneData.lightDir = cameraPos.normalized(); // Headlight
-    sceneData.lightingEnabled = m_lightingEnabled;
-
-    // Initialize renderer without specific mode
+    // Initialize renderer
     m_renderer->initialize(rhi(), renderTarget()->renderPassDescriptor(), sampleCount());
-    
     m_renderer->beginFrame(cb, renderTarget());
     
-    // Render all visible surfaces matching the active type OR BEM surfaces
-    // Render all visible surfaces matching the active type OR BEM surfaces
-    // Pass 1: Opaque Surfaces (Head, Brain, etc.)
+    // Determine viewport configuration
+    QSize outputSize = renderTarget()->pixelSize();
+    
+    // Fixed camera offsets for multi-view (relative to user's interactive rotation)
+    // Top, Bottom, Front, Left in 2x2 grid
+    QVector<QQuaternion> viewOffsets = {
+        QQuaternion::fromAxisAndAngle(1, 0, 0, 90),   // Top - look from +Y down
+        QQuaternion::fromAxisAndAngle(1, 0, 0, -90),  // Bottom - look from -Y up
+        QQuaternion(),                                  // Front - default
+        QQuaternion::fromAxisAndAngle(0, 1, 0, -90)   // Left - look from -X
+    };
+    
+    // Per-viewport shader modes for multi-view (different visualization per viewport)
+    QVector<BrainRenderer::ShaderMode> viewportShaders = {
+        BrainRenderer::Anatomical,   // Top - detailed anatomy view
+        BrainRenderer::Standard,     // Bottom - standard solid view
+        BrainRenderer::Holographic,  // Front - holographic/activity view
+        BrainRenderer::Anatomical    // Left - anatomical side view
+    };
+    
+    // Build list of enabled viewports
+    QVector<int> enabledViewports;
+    if (m_viewMode == MultiView) {
+        for (int i = 0; i < 4; ++i) {
+            if (m_viewportEnabled[i]) {
+                enabledViewports.append(i);
+            }
+        }
+        // Fallback: if all disabled, show first one
+        if (enabledViewports.isEmpty()) {
+            enabledViewports.append(0);
+        }
+    } else {
+        enabledViewports.append(0); // Single view mode
+    }
+    
+    int numEnabled = enabledViewports.size();
+    
+    for (int slot = 0; slot < numEnabled; ++slot) {
+        int vp = (m_viewMode == MultiView) ? enabledViewports[slot] : 0;
+        
+        // Calculate viewport position based on number of enabled viewports
+        QRhiViewport viewport;
+        float aspectRatio;
+        
+        if (m_viewMode == MultiView && numEnabled > 1) {
+            // Dynamic layout based on number of enabled viewports
+            int cols = (numEnabled <= 2) ? numEnabled : 2;  // 1-2: columns, 3-4: 2 columns
+            int rows = (numEnabled <= 2) ? 1 : 2;            // 1-2: 1 row, 3-4: 2 rows
+            
+            int slotCol = slot % cols;
+            int slotRow = slot / cols;
+            
+            int cellW = outputSize.width() / cols;
+            int cellH = outputSize.height() / rows;
+            
+            viewport = QRhiViewport(slotCol * cellW, (rows - 1 - slotRow) * cellH, cellW, cellH);
+            aspectRatio = float(cellW) / float(cellH);
+        } else {
+            viewport = QRhiViewport(0, 0, outputSize.width(), outputSize.height());
+            aspectRatio = float(outputSize.width()) / float(outputSize.height());
+        }
+        
+        // Set viewport
+        cb->setViewport(viewport);
+        
+        // Calculate camera for this viewport
+        QQuaternion effectiveRotation = m_cameraRotation;
+        if (m_viewMode == MultiView) {
+            effectiveRotation = viewOffsets[vp] * m_cameraRotation;
+        }
+        
+        QMatrix4x4 projection;
+        float farPlane = m_sceneSize * 20.0f;
+        if (farPlane < 100.0f) farPlane = 100.0f;
+        projection.perspective(45.0f, aspectRatio, m_sceneSize * 0.01f, farPlane);
+
+        float baseDistance = m_sceneSize * 1.5f;
+        float distance = baseDistance - m_zoom * (m_sceneSize * 0.05f);
+        
+        QVector3D cameraPos = effectiveRotation.rotatedVector(QVector3D(0, 0, distance));
+        QVector3D upVector = effectiveRotation.rotatedVector(QVector3D(0, 1, 0));
+        
+        QMatrix4x4 view;
+        view.lookAt(cameraPos, QVector3D(0, 0, 0), upVector);
+
+        BrainRenderer::SceneData sceneData;
+        sceneData.mvp = rhi()->clipSpaceCorrMatrix();
+        sceneData.mvp *= projection;
+        sceneData.mvp *= view;
+        
+        QMatrix4x4 model;
+        model.translate(-m_sceneCenter);
+        sceneData.mvp *= model;
+        
+        sceneData.cameraPos = cameraPos;
+        sceneData.lightDir = cameraPos.normalized();
+        sceneData.lightingEnabled = m_lightingEnabled;
+
+    // Pass 1: Opaque Surfaces (Brain surfaces)
+    // Use viewport-specific shader in multi-view mode, otherwise use global setting
+    BrainRenderer::ShaderMode currentShader = (m_viewMode == MultiView) ? viewportShaders[vp] : m_brainShaderMode;
+    
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
         if (it.key().startsWith("bem_")) continue;
         if (it.key().startsWith("sens_")) continue;
         
         if (it.key().endsWith(m_activeSurfaceType)) {
-            m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), m_brainShaderMode);
+            m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), currentShader);
         }
     }
     
-    // Pass 2: Transparent Surfaces (Sensors & BEM) sorted Back-to-Front
+    // Pass 2: Transparent Surfaces sorted Back-to-Front
     struct RenderItem {
         BrainSurface* surf;
         float dist;
@@ -743,7 +849,6 @@ void BrainView::render(QRhiCommandBuffer *cb)
         QVector3D min, max;
         it.value()->boundingBox(min, max);
         QVector3D center = (min + max) * 0.5f;
-        // Distance to camera position
         float d = (sceneData.cameraPos - center).lengthSquared();
         
         BrainRenderer::ShaderMode mode = BrainRenderer::Holographic;
@@ -752,39 +857,40 @@ void BrainView::render(QRhiCommandBuffer *cb)
         transparentItems.append({it.value().get(), d, mode});
     }
     
-    // Sort Back-to-Front (Descenting distance)
     std::sort(transparentItems.begin(), transparentItems.end(), [](const RenderItem &a, const RenderItem &b) {
-        return a.dist > b.dist; 
+        return a.dist > b.dist;
     });
     
     for (const auto &item : transparentItems) {
         m_renderer->renderSurface(cb, rhi(), sceneData, item.surf, item.mode);
     }
     
-    // Render Dipoles from Map
+    // Render Dipoles
     for(auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
         if (it.value()->isVisible() && m_dipolesVisible) {
              m_renderer->renderDipoles(cb, rhi(), sceneData, it.value().get());
         }
     }
     
-    
-    // Render Dipoles
     if (m_dipolesVisible && m_dipoles) {
         m_renderer->renderDipoles(cb, rhi(), sceneData, m_dipoles.get());
     }
 
-    // Render Debug Intersection Pointer
-    if (m_hasIntersection && m_debugPointerSurface) {
+    // Debug Intersection Pointer (only in single view for now)
+    if (m_viewMode == SingleView && m_hasIntersection && m_debugPointerSurface) {
         BrainRenderer::SceneData debugSceneData = sceneData;
         
         QMatrix4x4 translation;
         translation.translate(m_lastIntersectionPoint);
         
-        debugSceneData.mvp = rhi()->clipSpaceCorrMatrix() * projection * view * model * translation;
+        QMatrix4x4 modelMat;
+        modelMat.translate(-m_sceneCenter);
+        debugSceneData.mvp = rhi()->clipSpaceCorrMatrix() * projection * view * modelMat * translation;
         
         m_renderer->renderSurface(cb, rhi(), debugSceneData, m_debugPointerSurface.get(), BrainRenderer::Holographic);
     }
+    
+    } // End of viewport loop
     
     m_renderer->endFrame(cb);
 }
@@ -926,7 +1032,7 @@ void BrainView::onStcLoadingFinished(bool success)
     m_sourceOverlay->updateThresholdsFromData();
     
     if (m_sourceOverlay->isLoaded()) {
-        m_currentVisMode = BrainSurface::ModeSourceEstimate;
+        setVisualizationMode("Source Estimate");
         emit sourceEstimateLoaded(m_sourceOverlay->numTimePoints());
         setTimePoint(0);
     } else {

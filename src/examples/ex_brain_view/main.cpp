@@ -54,6 +54,8 @@
 #include <QFile>
 #include <QScrollArea>
 #include <QProgressBar>
+#include <QGridLayout>
+#include <QStackedWidget>
 
 #include "view/brainview.h"
 #include "model/braintreemodel.h"
@@ -187,6 +189,41 @@ int main(int argc, char *argv[])
     controlLayout->addWidget(headCheck);
     controlLayout->addWidget(outerCheck);
     controlLayout->addWidget(innerCheck);
+    
+    // Multi-View Toggle
+    controlLayout->addWidget(new QLabel("------- View -------"));
+    QCheckBox *multiViewCheck = new QCheckBox("Multi-View (4 cameras)");
+    multiViewCheck->setChecked(false);
+    multiViewCheck->setToolTip("Toggle between single interactive camera and four fixed camera views.");
+    controlLayout->addWidget(multiViewCheck);
+    
+    // Individual Viewport Toggles (only active in Multi-View mode)
+    QHBoxLayout *vpRow1 = new QHBoxLayout();
+    QHBoxLayout *vpRow2 = new QHBoxLayout();
+    
+    QCheckBox *vpTopCheck = new QCheckBox("Top");
+    QCheckBox *vpBottomCheck = new QCheckBox("Bottom");
+    QCheckBox *vpFrontCheck = new QCheckBox("Front");
+    QCheckBox *vpLeftCheck = new QCheckBox("Left");
+    
+    vpTopCheck->setChecked(true);
+    vpBottomCheck->setChecked(true);
+    vpFrontCheck->setChecked(true);
+    vpLeftCheck->setChecked(true);
+    
+    // Disable until multi-view is enabled
+    vpTopCheck->setEnabled(false);
+    vpBottomCheck->setEnabled(false);
+    vpFrontCheck->setEnabled(false);
+    vpLeftCheck->setEnabled(false);
+    
+    vpRow1->addWidget(vpTopCheck);
+    vpRow1->addWidget(vpBottomCheck);
+    vpRow2->addWidget(vpFrontCheck);
+    vpRow2->addWidget(vpLeftCheck);
+    
+    controlLayout->addLayout(vpRow1);
+    controlLayout->addLayout(vpRow2);
     
     controlLayout->addStretch();
     
@@ -322,6 +359,7 @@ int main(int argc, char *argv[])
     sideLayout->addWidget(sensorGroup);
     sideLayout->addStretch();
     
+    // Single BrainView with multi-viewport support (better performance than multiple widgets)
     BrainView *brainView = new BrainView();
     BrainTreeModel *model = new BrainTreeModel(static_cast<QObject*>(brainView));
     brainView->setModel(model);
@@ -409,16 +447,13 @@ int main(int argc, char *argv[])
     });
     
     // Shader Connections
-    // Brain Shader updates model
     QObject::connect(shaderCombo, &QComboBox::currentTextChanged, brainView, &BrainView::setShaderMode);
-    // Also update BEM shader if linked
     QObject::connect(shaderCombo, &QComboBox::currentTextChanged, [=](const QString &text){
         if (linkShadersCheck->isChecked()) {
             bemShaderCombo->setCurrentText(text);
         }
     });
 
-    // BEM Shader updates BEM model
     QObject::connect(bemShaderCombo, &QComboBox::currentTextChanged, brainView, &BrainView::setBemShaderMode);
     
     // Link Checkbox Logic
@@ -428,7 +463,17 @@ int main(int argc, char *argv[])
             bemShaderCombo->setCurrentText(shaderCombo->currentText());
         }
     });
-    QObject::connect(overlayCombo, &QComboBox::currentTextChanged, brainView, &BrainView::setVisualizationMode);
+    
+    QObject::connect(overlayCombo, &QComboBox::currentTextChanged, [=](const QString &text){
+        // Set visualization mode
+        brainView->setVisualizationMode(text);
+        
+        // Stop playback when switching away from Source Estimate
+        if (text != "Source Estimate" && stcTimer->isActive()) {
+            stcTimer->stop();
+            playButton->setText("Play");
+        }
+    });
     
     QObject::connect(lhCheck, &QCheckBox::toggled, [brainView](bool checked){
         brainView->setHemiVisible(0, checked);
@@ -448,7 +493,36 @@ int main(int argc, char *argv[])
     });
     QObject::connect(bemColorCheck, &QCheckBox::toggled, brainView, &BrainView::setBemHighContrast);
     
-    // Initial Sycn for BEM visibility (since they default to visible in model but unchecked in UI)
+    // Multi-View Toggle - toggles between single and 4-viewport mode in BrainView
+    QObject::connect(multiViewCheck, &QCheckBox::toggled, [=](bool checked){
+        // Enable/disable individual viewport checkboxes
+        vpTopCheck->setEnabled(checked);
+        vpBottomCheck->setEnabled(checked);
+        vpFrontCheck->setEnabled(checked);
+        vpLeftCheck->setEnabled(checked);
+        
+        if (checked) {
+            brainView->showMultiView();
+        } else {
+            brainView->showSingleView();
+        }
+    });
+    
+    // Individual Viewport Connections (0=Top, 1=Bottom, 2=Front, 3=Left)
+    QObject::connect(vpTopCheck, &QCheckBox::toggled, [brainView](bool checked){
+        brainView->setViewportEnabled(0, checked);
+    });
+    QObject::connect(vpBottomCheck, &QCheckBox::toggled, [brainView](bool checked){
+        brainView->setViewportEnabled(1, checked);
+    });
+    QObject::connect(vpFrontCheck, &QCheckBox::toggled, [brainView](bool checked){
+        brainView->setViewportEnabled(2, checked);
+    });
+    QObject::connect(vpLeftCheck, &QCheckBox::toggled, [brainView](bool checked){
+        brainView->setViewportEnabled(3, checked);
+    });
+    
+    // Initial Sync for BEM visibility (since they default to visible in model but unchecked in UI)
     brainView->setBemVisible("head", headCheck->isChecked());
     brainView->setBemVisible("outer_skull", outerCheck->isChecked());
     brainView->setBemVisible("inner_skull", innerCheck->isChecked());
@@ -504,6 +578,7 @@ int main(int argc, char *argv[])
         timeSlider->setRange(0, numPoints - 1);
         timeSlider->setValue(0);
         overlayCombo->addItem("Source Estimate");
+        overlayCombo->setCurrentText("Source Estimate");
         
         // Reset playback
         playButton->setText("Play");
@@ -543,6 +618,10 @@ int main(int argc, char *argv[])
             stcTimer->stop();
             playButton->setText("Play");
         } else {
+            // Switch to Source Estimate overlay when starting playback
+            if (overlayCombo->currentText() != "Source Estimate") {
+                overlayCombo->setCurrentText("Source Estimate");
+            }
             stcTimer->start();
             playButton->setText("Pause");
         }
@@ -566,7 +645,7 @@ int main(int argc, char *argv[])
     });
     
     // Sensor Connections
-    QObject::connect(loadDigBtn, &QPushButton::clicked, [&](){
+    QObject::connect(loadDigBtn, &QPushButton::clicked, [brainView, showMegCheck, showEegCheck, showDigCheck](){
         QString path = QFileDialog::getOpenFileName(nullptr, "Select Sensor/Digitizer File", "", "FIF Files (*.fif)");
         if (path.isEmpty()) return;
         
@@ -577,27 +656,27 @@ int main(int argc, char *argv[])
         }
     });
     
-    QObject::connect(loadTransBtn, &QPushButton::clicked, [&](){
+    QObject::connect(loadTransBtn, &QPushButton::clicked, [brainView](){
         QString path = QFileDialog::getOpenFileName(nullptr, "Select Transformation", "", "FIF Files (*.fif)");
         if (path.isEmpty()) return;
         
         brainView->loadTransformation(path);
     });
 
-    QObject::connect(showMegCheck, &QCheckBox::toggled, [=](bool checked){
+    QObject::connect(showMegCheck, &QCheckBox::toggled, [brainView](bool checked){
         brainView->setSensorVisible("MEG", checked);
     });
-    QObject::connect(showEegCheck, &QCheckBox::toggled, [=](bool checked){
+    QObject::connect(showEegCheck, &QCheckBox::toggled, [brainView](bool checked){
         brainView->setSensorVisible("EEG", checked);
     });
-    QObject::connect(showDigCheck, &QCheckBox::toggled, [=](bool checked){
+    QObject::connect(showDigCheck, &QCheckBox::toggled, [brainView](bool checked){
         brainView->setSensorVisible("Digitizer", checked);
     });
 
     QObject::connect(applyTransCheck, &QCheckBox::toggled, brainView, &BrainView::setSensorTransEnabled);
 
     // Dipole Connections
-    QObject::connect(loadDipoleBtn, &QPushButton::clicked, [&](){
+    QObject::connect(loadDipoleBtn, &QPushButton::clicked, [brainView, showDipoleCheck](){
         QString path = QFileDialog::getOpenFileName(nullptr, "Select Dipoles", "", "Dipole Files (*.dip *.bdip)");
         if (path.isEmpty()) return;
         
@@ -606,7 +685,7 @@ int main(int argc, char *argv[])
         }
     });
 
-    QObject::connect(showDipoleCheck, &QCheckBox::toggled, [=](bool checked){
+    QObject::connect(showDipoleCheck, &QCheckBox::toggled, [brainView](bool checked){
         brainView->setDipoleVisible(checked);
     });
 

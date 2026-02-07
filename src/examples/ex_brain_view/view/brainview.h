@@ -73,6 +73,15 @@ class BrainView : public QRhiWidget
     Q_OBJECT
 
 public:
+    /**
+     * View mode for single or multi-viewport display.
+     */
+    enum ViewMode {
+        SingleView,     /**< Single viewport with interactive camera */
+        MultiView       /**< Three viewports with fixed cameras (top, left, front) */
+    };
+
+public:
     //=========================================================================================================
     /**
      * Constructor
@@ -94,6 +103,15 @@ public:
      * @param[in] model      Pointer to BrainTreeModel.
      */
     void setModel(BrainTreeModel *model);
+
+    //=========================================================================================================
+    /**
+     * Set the initial camera rotation for this view.
+     * Each view can start from a different orientation (e.g., top, front, left).
+     *
+     * @param[in] rotation   Initial camera rotation quaternion.
+     */
+    void setInitialCameraRotation(const QQuaternion &rotation);
 
 public slots:
     void onRowsInserted(const QModelIndex &parent, int first, int last);
@@ -194,6 +212,35 @@ public slots:
      * Save a snapshot of the current view to a file.
      */
     void saveSnapshot();
+
+    //=========================================================================================================
+    /**
+     * Switch to single-view mode (one viewport, interactive camera).
+     */
+    void showSingleView();
+
+    //=========================================================================================================
+    /**
+     * Switch to multi-view mode (four viewports: top, bottom, front, left).
+     */
+    void showMultiView();
+
+    //=========================================================================================================
+    /**
+     * Enable or disable a specific viewport in multi-view mode.
+     * 
+     * @param[in] index      Viewport index (0=Top, 1=Bottom, 2=Front, 3=Left).
+     * @param[in] enabled    True to enable, false to disable.
+     */
+    void setViewportEnabled(int index, bool enabled);
+
+    //=========================================================================================================
+    /**
+     * Get the current view mode.
+     *
+     * @return Current ViewMode.
+     */
+    ViewMode viewMode() const { return m_viewMode; }
 
     //=========================================================================================================
     /**
@@ -382,6 +429,11 @@ private:
      QThread* m_loadingThread = nullptr;
      StcLoadingWorker* m_stcWorker = nullptr;
      bool m_isLoadingStc = false;
+     
+     // Multi-view support
+     ViewMode m_viewMode = SingleView;
+     QQuaternion m_multiViewCameras[4]; // Top, Bottom, Front, Left views
+     bool m_viewportEnabled[4] = {true, true, true, true}; // Which viewports are active
 };
 
 #endif // BRAINVIEW_H
