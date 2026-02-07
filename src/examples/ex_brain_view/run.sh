@@ -5,6 +5,12 @@ SubjectPath="${MNE_DATA_PATH:-$HOME/mne_data/MNE-sample-data/subjects}"
 Subject="sample"
 Hemi=0
 
+# Default data paths
+MneSampleDataPath="${MNE_DATA_PATH:-$HOME/mne_data/MNE-sample-data}"
+StcFile="${MneSampleDataPath}/MEG/sample/sample_audvis-meg-eeg-lh.stc"
+DigitizerFile="${MneSampleDataPath}/MEG/sample/sample_audvis_raw.fif"
+TransFile="${MneSampleDataPath}/MEG/sample/all-trans.fif"
+
 # Default build path (assuming run from project root or similar structure)
 # Try to find the executable relative to the script location
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
@@ -25,4 +31,5 @@ fi
 BemFile="${SubjectPath}/${Subject}/bem/sample-5120-5120-5120-bem.fif"
 
 echo "launching ex_brain_view from $BuildPath..."
-"$BuildPath" --subjectPath "$SubjectPath" --subject "$Subject" --hemi "$Hemi" --bem "$BemFile"
+"$BuildPath" --subjectPath "$SubjectPath" --subject "$Subject" --hemi "$Hemi" --bem "$BemFile" \
+    --stc "$StcFile" --digitizer "$DigitizerFile" --trans "$TransFile"

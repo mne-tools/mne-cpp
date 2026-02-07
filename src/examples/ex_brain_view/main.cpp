@@ -79,7 +79,9 @@ int main(int argc, char *argv[])
     QCommandLineOption hemiOption("hemi", "Hemi", "hemi", "0");
     QCommandLineOption bemOption("bem", "BEM File", "path", "");
     QCommandLineOption transOption("trans", "Transformation File", "path", "");
-    parser.addOptions({subjectPathOption, subjectOption, hemiOption, bemOption, transOption});
+    QCommandLineOption stcOption("stc", "Source Estimate File", "path", "");
+    QCommandLineOption digitizerOption("digitizer", "Digitizer/Sensor File", "path", "");
+    parser.addOptions({subjectPathOption, subjectOption, hemiOption, bemOption, transOption, stcOption, digitizerOption});
     parser.process(app);
     
     QString subPath = parser.value(subjectPathOption);
@@ -87,6 +89,8 @@ int main(int argc, char *argv[])
     int hemi = parser.value(hemiOption).toInt();
     QString bemPath = parser.value(bemOption);
     QString transPath = parser.value(transOption);
+    QString stcPath = parser.value(stcOption);
+    QString digitizerPath = parser.value(digitizerOption);
 
     QMainWindow mainWindow;
     mainWindow.setWindowTitle("MNE-CPP Brain View");
@@ -251,15 +255,15 @@ int main(int argc, char *argv[])
     QPushButton *loadTransBtn = new QPushButton("Load Transformation...");
     
     QCheckBox *showMegCheck = new QCheckBox("Show MEG");
-    showMegCheck->setChecked(true);
+    showMegCheck->setChecked(false);
     showMegCheck->setEnabled(false); // Disabled until loaded
     
     QCheckBox *showEegCheck = new QCheckBox("Show EEG");
-    showEegCheck->setChecked(true);
+    showEegCheck->setChecked(false);
     showEegCheck->setEnabled(false);
     
     QCheckBox *showDigCheck = new QCheckBox("Show Digitizer");
-    showDigCheck->setChecked(true);
+    showDigCheck->setChecked(false);
     showDigCheck->setEnabled(false);
     
     QCheckBox *applyTransCheck = new QCheckBox("Apply Transformation");
@@ -605,6 +609,59 @@ int main(int argc, char *argv[])
     QObject::connect(showDipoleCheck, &QCheckBox::toggled, [=](bool checked){
         brainView->setDipoleVisible(checked);
     });
+
+    // Auto-load digitizer file if provided via command line
+    if (!digitizerPath.isEmpty() && QFile::exists(digitizerPath)) {
+        qDebug() << "Auto-loading digitizer from:" << digitizerPath;
+        if (brainView->loadSensors(digitizerPath)) {
+            showMegCheck->setEnabled(true);
+            showEegCheck->setEnabled(true);
+            showDigCheck->setEnabled(true);
+            
+            // Sync visibility with checkbox states
+            brainView->setSensorVisible("MEG", showMegCheck->isChecked());
+            brainView->setSensorVisible("EEG", showEegCheck->isChecked());
+            brainView->setSensorVisible("Digitizer", showDigCheck->isChecked());
+        }
+    }
+    
+    // Auto-load transformation file if provided via command line
+    if (!transPath.isEmpty() && QFile::exists(transPath)) {
+        qDebug() << "Auto-loading transformation from:" << transPath;
+        brainView->loadTransformation(transPath);
+    }
+    
+    // Auto-load STC file if provided via command line
+    if (!stcPath.isEmpty() && QFile::exists(stcPath)) {
+        qDebug() << "Auto-loading source estimate from:" << stcPath;
+        
+        QString lhPath;
+        QString rhPath;
+        
+        // Detect hemisphere and potential sibling
+        if (stcPath.contains("-lh.stc")) {
+            lhPath = stcPath;
+            QString sibling = stcPath;
+            sibling.replace("-lh.stc", "-rh.stc");
+            if (QFile::exists(sibling)) rhPath = sibling;
+        } else if (stcPath.contains("-rh.stc")) {
+            rhPath = stcPath;
+            QString sibling = stcPath;
+            sibling.replace("-rh.stc", "-lh.stc");
+            if (QFile::exists(sibling)) lhPath = sibling;
+        } else {
+            lhPath = stcPath;
+        }
+        
+        // Show progress UI
+        loadStcBtn->setEnabled(false);
+        stcStatusLabel->setText("Starting...");
+        stcStatusLabel->show();
+        stcProgressBar->setValue(0);
+        stcProgressBar->show();
+        
+        brainView->loadSourceEstimate(lhPath, rhPath);
+    }
 
     // Sync initial state
     brainView->setHemiVisible(0, lhCheck->isChecked());
