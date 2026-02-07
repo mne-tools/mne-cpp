@@ -180,6 +180,30 @@ public:
      */
     void getDataRange(double &minVal, double &maxVal) const;
 
+    //=========================================================================================================
+    /**
+     * Set the source estimate data directly (used by async loader).
+     *
+     * @param[in] stc        The source estimate data.
+     * @param[in] hemi       Hemisphere index (0=lh, 1=rh).
+     */
+    void setStcData(const MNELIB::MNESourceEstimate &stc, int hemi);
+
+    //=========================================================================================================
+    /**
+     * Set the interpolation matrix directly (used by async loader).
+     *
+     * @param[in] mat        The interpolation matrix.
+     * @param[in] hemi       Hemisphere index (0=lh, 1=rh).
+     */
+    void setInterpolationMatrix(QSharedPointer<Eigen::SparseMatrix<float>> mat, int hemi);
+
+    //=========================================================================================================
+    /**
+     * Update thresholds based on loaded data range.
+     */
+    void updateThresholdsFromData();
+
 private:
     //=========================================================================================================
     /**

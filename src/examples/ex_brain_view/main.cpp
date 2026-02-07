@@ -53,6 +53,7 @@
 #include <QFileDialog>
 #include <QFile>
 #include <QScrollArea>
+#include <QProgressBar>
 
 #include "view/brainview.h"
 #include "model/braintreemodel.h"
@@ -274,7 +275,20 @@ int main(int argc, char *argv[])
     
     QTimer *stcTimer = new QTimer();
     
+    // Progress indicator for STC loading
+    QLabel *stcStatusLabel = new QLabel("");
+    stcStatusLabel->setStyleSheet("color: #666; font-style: italic;");
+    stcStatusLabel->setWordWrap(true);
+    stcStatusLabel->hide();
+    
+    QProgressBar *stcProgressBar = new QProgressBar();
+    stcProgressBar->setRange(0, 100);
+    stcProgressBar->setValue(0);
+    stcProgressBar->hide();
+    
     stcLayout->addWidget(loadStcBtn);
+    stcLayout->addWidget(stcStatusLabel);
+    stcLayout->addWidget(stcProgressBar);
     stcLayout->addWidget(colormapLabel);
     stcLayout->addWidget(colormapCombo);
     stcLayout->addWidget(threshLabel);
@@ -436,7 +450,7 @@ int main(int argc, char *argv[])
     brainView->setBemVisible("inner_skull", innerCheck->isChecked());
     
     // Source Estimate Connections
-    QObject::connect(loadStcBtn, &QPushButton::clicked, [&](){
+    QObject::connect(loadStcBtn, &QPushButton::clicked, [=](){
         QString path = QFileDialog::getOpenFileName(nullptr, "Select Source Estimate", "", "STC Files (*-lh.stc *-rh.stc *.stc)");
         if (path.isEmpty()) return;
         
@@ -456,26 +470,32 @@ int main(int argc, char *argv[])
             if (QFile::exists(sibling)) lhPath = sibling;
         } else {
             // Default behavior if not strictly named -lh/-rh
-            // Try to assume it's LH and check for RH?
-            // Or just try to load this one file as LH? 
-            // In strict STC world, filename usually ends in -lh by convention for loading.
-            // But if user picks 'test.stc', assume it's a single file.
-            // Let's assume it is LH for now or try to match pattern.
-            // Actually, BrainView needs explicit LH/RH paths to know where to put it.
-            // If the user loads a file that doesn't follow convention, we might not know the hemi.
-            // But standard MNE-C/Python uses -lh.stc.
-            // Let's try to infer. If fail, maybe force LH?
-            qWarning() << "Selected file does not follow -lh/-rh convention. Assuming it is LH and checking for RH pattern if applicable.";
+            qWarning() << "Selected file does not follow -lh/-rh convention. Assuming it is LH.";
             lhPath = path; 
         }
+        
+        // Show progress UI
+        loadStcBtn->setEnabled(false);
+        stcStatusLabel->setText("Starting...");
+        stcStatusLabel->show();
+        stcProgressBar->setValue(0);
+        stcProgressBar->show();
         
         brainView->loadSourceEstimate(lhPath, rhPath);
     });
     
-    QObject::connect(brainView, &BrainView::sourceEstimateLoaded, [&](int numPoints){
-        timeSlider->setEnabled(true);
-        timeSlider->setRange(0, numPoints - 1);
-        timeSlider->setValue(0);
+    // Connect progress signal
+    QObject::connect(brainView, &BrainView::stcLoadingProgress, [=](int percent, const QString &message){
+        stcProgressBar->setValue(percent);
+        stcStatusLabel->setText(message);
+    });
+    
+    QObject::connect(brainView, &BrainView::sourceEstimateLoaded, [=](int numPoints){
+        // Hide progress UI
+        stcStatusLabel->hide();
+        stcProgressBar->hide();
+        loadStcBtn->setEnabled(true);
+        
         timeSlider->setEnabled(true);
         timeSlider->setRange(0, numPoints - 1);
         timeSlider->setValue(0);

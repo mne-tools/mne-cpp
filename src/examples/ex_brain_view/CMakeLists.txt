@@ -18,6 +18,7 @@ set(SOURCES
     scene/brainsurface.cpp
     scene/sourceestimateoverlay.cpp
     scene/dipoleobject.cpp
+    scene/stcloadingworker.cpp
     model/items/abstracttreeitem.cpp
     model/items/surfacetreeitem.cpp
     model/items/bemtreeitem.cpp

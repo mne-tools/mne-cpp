@@ -360,3 +360,40 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface *surface, in
     }
 }
 
+//=============================================================================================================
+
+void SourceEstimateOverlay::setStcData(const MNELIB::MNESourceEstimate &stc, int hemi)
+{
+    if (hemi == 0) {
+        m_stcLh = stc;
+        m_hasLh = true;
+    } else {
+        m_stcRh = stc;
+        m_hasRh = true;
+    }
+}
+
+//=============================================================================================================
+
+void SourceEstimateOverlay::setInterpolationMatrix(QSharedPointer<Eigen::SparseMatrix<float>> mat, int hemi)
+{
+    if (hemi == 0) {
+        m_interpolationMatLh = mat;
+    } else {
+        m_interpolationMatRh = mat;
+    }
+}
+
+//=============================================================================================================
+
+void SourceEstimateOverlay::updateThresholdsFromData()
+{
+    if (m_hasLh || m_hasRh) {
+        double minVal, maxVal;
+        getDataRange(minVal, maxVal);
+        m_threshMin = minVal;
+        m_threshMax = maxVal;
+        m_threshMid = (minVal + maxVal) / 2.0;
+        qDebug() << "SourceEstimateOverlay: Auto thresholds set to" << m_threshMin << m_threshMid << m_threshMax;
+    }
+}

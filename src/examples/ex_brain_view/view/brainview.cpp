@@ -62,6 +62,7 @@
 #include <inverse/dipoleFit/ecd_set.h>
 #include "sensortreeitem.h"
 #include "dipoletreeitem.h"
+#include "../scene/stcloadingworker.h"
 
 using namespace FSLIB;
 using namespace FIFFLIB;
@@ -838,42 +839,99 @@ void BrainView::keyPressEvent(QKeyEvent *event)
 
 bool BrainView::loadSourceEstimate(const QString &lhPath, const QString &rhPath)
 {
+    // Prevent multiple simultaneous loads
+    if (m_isLoadingStc) {
+        qWarning() << "BrainView: STC loading already in progress";
+        return false;
+    }
+    
+    // Find surfaces for the current active type
+    BrainSurface* lhSurface = nullptr;
+    BrainSurface* rhSurface = nullptr;
+    
+    QString lhKey = "lh_" + m_activeSurfaceType;
+    QString rhKey = "rh_" + m_activeSurfaceType;
+    
+    if (m_surfaces.contains(lhKey)) {
+        lhSurface = m_surfaces[lhKey].get();
+    }
+    if (m_surfaces.contains(rhKey)) {
+        rhSurface = m_surfaces[rhKey].get();
+    }
+    
+    if (!lhSurface && !rhSurface) {
+        qWarning() << "BrainView: No surfaces available for STC loading";
+        return false;
+    }
+    
+    // Clean up any previous loading thread
+    if (m_loadingThread) {
+        m_loadingThread->quit();
+        m_loadingThread->wait();
+        delete m_loadingThread;
+        m_loadingThread = nullptr;
+    }
+    
+    // Create overlay for results
     m_sourceOverlay = std::make_unique<SourceEstimateOverlay>();
     
-    bool success = true;
+    // Create worker and thread
+    m_loadingThread = new QThread(this);
+    m_stcWorker = new StcLoadingWorker(lhPath, rhPath, lhSurface, rhSurface);
+    m_stcWorker->moveToThread(m_loadingThread);
     
-    if (!lhPath.isEmpty()) {
-        if (!m_sourceOverlay->loadStc(lhPath, 0)) {
-            qWarning() << "BrainView: Failed to load LH source estimate:" << lhPath;
-            success = false;
+    // Connect signals
+    connect(m_loadingThread, &QThread::started, m_stcWorker, &StcLoadingWorker::process);
+    connect(m_stcWorker, &StcLoadingWorker::progress, this, &BrainView::stcLoadingProgress);
+    connect(m_stcWorker, &StcLoadingWorker::finished, this, &BrainView::onStcLoadingFinished);
+    connect(m_stcWorker, &StcLoadingWorker::finished, m_loadingThread, &QThread::quit);
+    connect(m_loadingThread, &QThread::finished, m_stcWorker, &QObject::deleteLater);
+    
+    m_isLoadingStc = true;
+    
+    // Start loading
+    m_loadingThread->start();
+    
+    return true;
+}
+
+//=============================================================================================================
+
+void BrainView::onStcLoadingFinished(bool success)
+{
+    m_isLoadingStc = false;
+    
+    if (!success || !m_stcWorker) {
+        qWarning() << "BrainView: Async STC loading failed";
+        m_sourceOverlay.reset();
+        return;
+    }
+    
+    // Transfer data from worker to overlay
+    if (m_stcWorker->hasLh()) {
+        m_sourceOverlay->setStcData(m_stcWorker->stcLh(), 0);
+        if (m_stcWorker->interpolationMatLh()) {
+            m_sourceOverlay->setInterpolationMatrix(m_stcWorker->interpolationMatLh(), 0);
         }
     }
     
-    if (!rhPath.isEmpty()) {
-        if (!m_sourceOverlay->loadStc(rhPath, 1)) {
-            qWarning() << "BrainView: Failed to load RH source estimate:" << rhPath;
-            success = false;
+    if (m_stcWorker->hasRh()) {
+        m_sourceOverlay->setStcData(m_stcWorker->stcRh(), 1);
+        if (m_stcWorker->interpolationMatRh()) {
+            m_sourceOverlay->setInterpolationMatrix(m_stcWorker->interpolationMatRh(), 1);
         }
     }
+    
+    // Update thresholds based on data
+    m_sourceOverlay->updateThresholdsFromData();
     
     if (m_sourceOverlay->isLoaded()) {
         m_currentVisMode = BrainSurface::ModeSourceEstimate;
-        // Compute interpolation matrices for all surfaces
-        for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-            if (it.key().endsWith(m_activeSurfaceType)) {
-                int hemi = it.value()->hemi();
-
-                m_sourceOverlay->computeInterpolationMatrix(it.value().get(), hemi);
-            }
-        }
-        
         emit sourceEstimateLoaded(m_sourceOverlay->numTimePoints());
         setTimePoint(0);
-        return true;
+    } else {
+        m_sourceOverlay.reset();
     }
-    
-    m_sourceOverlay.reset();
-    return false;
 }
 
 //=============================================================================================================

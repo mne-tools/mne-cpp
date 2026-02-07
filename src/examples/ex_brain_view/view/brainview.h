@@ -55,9 +55,11 @@
 #include <QStandardItem>
 #include <memory> 
 #include <QQuaternion> 
+#include <QThread>
 
 class QLabel;
-class QTimer; 
+class QTimer;
+class StcLoadingWorker;
 
 //=============================================================================================================
 /**
@@ -290,6 +292,24 @@ signals:
      */
     void sourceEstimateLoaded(int numTimePoints);
 
+    //=========================================================================================================
+    /**
+     * Emitted to report STC loading progress.
+     *
+     * @param[in] percent        Progress percentage (0-100).
+     * @param[in] message        Status message.
+     */
+    void stcLoadingProgress(int percent, const QString &message);
+
+private slots:
+    //=========================================================================================================
+    /**
+     * Called when async STC loading finishes.
+     *
+     * @param[in] success    True if loading succeeded.
+     */
+    void onStcLoadingFinished(bool success);
+
 private:
     void refreshSensorTransforms();
 
@@ -357,6 +377,11 @@ private:
      std::shared_ptr<BrainSurface> m_debugPointerSurface;
      QVector3D m_lastIntersectionPoint;
      bool m_hasIntersection = false;
+     
+     // Async loading
+     QThread* m_loadingThread = nullptr;
+     StcLoadingWorker* m_stcWorker = nullptr;
+     bool m_isLoadingStc = false;
 };
 
 #endif // BRAINVIEW_H
