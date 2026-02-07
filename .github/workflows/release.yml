@@ -30,23 +30,30 @@ jobs:
         fi
     - name: Update dev_build tag and release (dev release only)
       if: endsWith(github.ref, 'v2.0-dev') == true
+      timeout-minutes: 5
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
+        set -x  # Enable debug output
+        
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
         git config --global user.name "github-actions[bot]"
         
         # Configure git to use GITHUB_TOKEN
-        git remote set-url origin https://x-access-token:${GITHUB_TOKEN}@github.com/${{ github.repository }}
+        git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
         
-        # Delete current dev_build release remotely.
-        # Must be done before deleting the remote tag associated with the dev_build release.
-        # This prevents a draft release to be left over after we delete the tag remotely.
-        # Using gh cli instead of hub as it is the modern standard and pre-installed
-        gh release delete dev_build --yes || true
+        # Delete current dev_build release remotely (if it exists)
+        echo "Attempting to delete existing dev_build release..."
+        if gh release view dev_build > /dev/null 2>&1; then
+          gh release delete dev_build --yes --cleanup-tag
+          echo "Existing release deleted."
+        else
+          echo "No existing dev_build release found, skipping deletion."
+        fi
         
-        # Delete current tag remotely
-        git push origin :refs/tags/dev_build || true
+        # Delete current tag remotely (if it exists)
+        echo "Attempting to delete existing dev_build tag..."
+        git push origin :refs/tags/dev_build 2>/dev/null || echo "Tag did not exist remotely, continuing."
         
         # Change dev_build tag to point to newest commit
         git tag dev_build -f -a -m "Development Builds"
@@ -55,7 +62,9 @@ jobs:
         git push origin dev_build -f
         
         # Create new dev_build release
+        echo "Creating new dev_build release..."
         gh release create dev_build --prerelease --title "Development Builds" --notes "Development Builds"
+        echo "Release created successfully."
 
 
 
