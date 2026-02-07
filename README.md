@@ -8,8 +8,8 @@
 <a href="https://codecov.io/gh/mne-tools/mne-cpp" target="_blank">
     <img src="https://codecov.io/gh/mne-tools/mne-cpp/branch/main/graph/badge.svg" alt="CodeCov">
 </a>
-<a href="https://scan.coverity.com/projects/mne-tools-mne-cpp" target="_blank">
-    <img src="https://scan.coverity.com/projects/8955/badge.svg" alt="Coverity">
+<a href="https://github.com/mne-tools/mne-cpp/actions/workflows/codeql.yml" target="_blank">
+    <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/codeql.yml/badge.svg" alt="CodeQL">
 </a>
 <a href="https://gitter.im/mne-tools/mne-cpp?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge" target="_blank">
     <img src="https://badges.gitter.im/mne-tools/mne-cpp.svg" alt="Gitter">
