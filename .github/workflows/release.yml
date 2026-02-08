@@ -387,26 +387,25 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v3
+    # Note: Qt 6.10.2 WASM exists but isn't yet available via aqt. Using 6.8.0 for now.
+    # When aqt supports 6.10.2, update version and emsdk to 4.0.7
     - name: Install Qt Desktop
       uses: jurplel/install-qt-action@v3
       with:
-        version: '6.10.2'
+        version: '6.8.0'
         host: 'linux'
         target: 'desktop'
         arch: 'linux_gcc_64'
         modules: 'qtcharts qt3d qtshadertools'
     - name: Install Qt WASM
-      uses: jurplel/install-qt-action@v3
-      with:
-        version: '6.10.2'
-        host: 'linux'
-        target: 'desktop'
-        arch: 'wasm_multithread'
-        modules: 'qtcharts qt3d qtshadertools'
-        aqtversion: '==3.2.*'
+      run: |
+        pip install aqtinstall
+        aqt install-qt all_os wasm 6.8.0 wasm_multithread --outputdir ${{ runner.tool_cache }}/Qt --modules qtcharts qt3d qtshadertools
+        echo "Qt6_DIR=${{ runner.tool_cache }}/Qt/6.8.0/wasm_multithread" >> $GITHUB_ENV
     - name: Setup and build WASM
       run: |
-        ./tools/wasm.sh --emsdk 3.1.25
+        export PATH="${{ runner.tool_cache }}/Qt/6.8.0/wasm_multithread/bin:$PATH"
+        ./tools/wasm.sh --emsdk 3.1.56
     # TODO: Uncomment when chdinh has access to mne-cpp organization
     # - name: Setup Github credentials
     #   uses: fusion-engineering/setup-git-credentials@v2
