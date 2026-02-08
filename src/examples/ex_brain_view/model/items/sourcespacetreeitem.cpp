@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
- * @file     main.cpp
+ * @file     sourcespacetreeitem.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
- * @date     January, 2026
+ * @date     February, 2026
  *
  * @section  LICENSE
  *
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Brain View example application.
+ * @brief    SourceSpaceTreeItem class implementation.
  *
  */
 
@@ -36,47 +36,34 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QCommandLineParser>
-
-#include "app/mainwindow.h"
+#include "sourcespacetreeitem.h"
 
 //=============================================================================================================
-// MAIN
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+SourceSpaceTreeItem::SourceSpaceTreeItem(const QString &text,
+                                         const QVector<QVector3D> &positions,
+                                         const QColor &color,
+                                         float scale,
+                                         int type)
+    : AbstractTreeItem(text, type)
+    , m_positions(positions)
+    , m_scale(scale)
 {
-    QApplication app(argc, argv);
+    setColor(color);
+}
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("QRhi Brain View");
-    parser.addHelpOption();
+//=============================================================================================================
 
-    QCommandLineOption subjectPathOption("subjectPath", "Path to subjects directory", "path",
-        QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
-    QCommandLineOption subjectOption("subject", "Subject name", "name", "sample");
-    QCommandLineOption hemiOption("hemi", "Hemisphere (unused)", "hemi", "0");
-    QCommandLineOption bemOption("bem", "BEM file path", "path", "");
-    QCommandLineOption transOption("trans", "Transformation file path", "path", "");
-    QCommandLineOption stcOption("stc", "Source estimate file path", "path", "");
-    QCommandLineOption digitizerOption("digitizer", "Digitizer/sensor file path", "path", "");
-    QCommandLineOption srcSpaceOption("srcSpace", "Source space / forward solution file path", "path", "");
+const QVector<QVector3D>& SourceSpaceTreeItem::positions() const
+{
+    return m_positions;
+}
 
-    parser.addOptions({subjectPathOption, subjectOption, hemiOption, bemOption, transOption, stcOption, digitizerOption, srcSpaceOption});
-    parser.process(app);
+//=============================================================================================================
 
-    MainWindow mainWindow;
-    mainWindow.loadInitialData(
-        parser.value(subjectPathOption),
-        parser.value(subjectOption),
-        parser.value(bemOption),
-        parser.value(transOption),
-        parser.value(stcOption),
-        parser.value(digitizerOption),
-        parser.value(srcSpaceOption)
-    );
-    mainWindow.show();
-
-    return app.exec();
+float SourceSpaceTreeItem::scale() const
+{
+    return m_scale;
 }

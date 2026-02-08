@@ -12,7 +12,7 @@ add_subdirectory(ex_compute_forward)
 
 ## Examples requiring mne_disp3D (which needs Qt3D) - check if available
 find_package(Qt6 QUIET COMPONENTS 3DRender)
-if(Qt6_3DRender_FOUND)
+if(Qt63DRender_FOUND)
   add_subdirectory(ex_clustered_inverse_mne)
   add_subdirectory(ex_clustered_inverse_mne_raw)
   add_subdirectory(ex_clustered_inverse_pwl_rap_music_raw)

@@ -47,6 +47,7 @@
 #include "../model/items/surfacetreeitem.h"
 
 #include <mne/mne_bem.h>
+#include <mne/mne_sourcespace.h>
 #include <fiff/fiff_coord_trans.h>
 #include <QWidget>
 #include <QRhiWidget>
@@ -269,6 +270,23 @@ public slots:
      * @return True if successful.
      */
     bool loadDipoles(const QString &dipPath);
+
+    //=========================================================================================================
+    /**
+     * Load source space from a FIF file (forward solution or source space file).
+     *
+     * @param[in] fwdPath    Path to the FIF file containing source space data.
+     * @return True if successful.
+     */
+    bool loadSourceSpace(const QString &fwdPath);
+
+    //=========================================================================================================
+    /**
+     * Toggle visibility of source space points.
+     *
+     * @param[in] visible    Visibility state.
+     */
+    void setSourceSpaceVisible(bool visible);
 
     //=========================================================================================================
     /**

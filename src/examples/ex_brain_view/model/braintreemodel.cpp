@@ -3,7 +3,9 @@
 #include "bemtreeitem.h"
 #include "sensortreeitem.h"
 #include "dipoletreeitem.h"
+#include "sourcespacetreeitem.h"
 #include <inverse/dipoleFit/ecd_set.h>
+#include <mne/mne_hemisphere.h>
 
 BrainTreeModel::BrainTreeModel(QObject *parent)
     : QStandardItemModel(parent)
@@ -132,4 +134,44 @@ void BrainTreeModel::addDipoles(const INVERSELIB::ECDSet &set)
     item->setCheckable(true);
     item->setCheckState(Qt::Checked);
     this->appendRow(item);
+}
+
+//=============================================================================================================
+
+void BrainTreeModel::addSourceSpace(const MNELIB::MNESourceSpace &srcSpace)
+{
+    QStandardItem* parentItem = new QStandardItem("Source Space");
+    parentItem->setCheckable(true);
+    parentItem->setCheckState(Qt::Checked);
+
+    // Color: LH = bright cyan, RH = bright magenta
+    QColor lhColor(0, 230, 180);    // Vibrant cyan-green for left hemisphere
+    QColor rhColor(230, 80, 230);   // Vibrant magenta for right hemisphere
+
+    for (int h = 0; h < srcSpace.size(); ++h) {
+        const MNELIB::MNEHemisphere &hemi = srcSpace[h];
+        QColor color = (h == 0) ? lhColor : rhColor;
+        QString hemiLabel = (h == 0) ? "LH" : "RH";
+
+        // Collect all source point positions for this hemisphere
+        QVector<QVector3D> positions;
+        positions.reserve(hemi.vertno.size());
+        for (int i = 0; i < hemi.vertno.size(); ++i) {
+            int vIdx = hemi.vertno(i);
+            if (vIdx < 0 || vIdx >= hemi.rr.rows()) continue;
+            positions.append(QVector3D(hemi.rr(vIdx, 0), hemi.rr(vIdx, 1), hemi.rr(vIdx, 2)));
+        }
+
+        // One item per hemisphere with all positions batched
+        parentItem->appendRow(new SourceSpaceTreeItem(hemiLabel, positions, color, 0.00025f));
+        qDebug() << "BrainTreeModel: Source space" << hemiLabel
+                 << "- points:" << positions.size()
+                 << "coord_frame:" << hemi.coord_frame;
+        if (!positions.isEmpty()) {
+            qDebug() << "  First point:" << positions.first()
+                     << "  Last point:" << positions.last();
+        }
+    }
+
+    this->appendRow(parentItem);
 }

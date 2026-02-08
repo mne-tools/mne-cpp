@@ -5,6 +5,7 @@
 #include <fs/surface.h>
 #include <fs/annotation.h>
 #include <mne/mne_bem_surface.h>
+#include <mne/mne_sourcespace.h>
 
 namespace INVERSELIB {
 class ECDSet;
@@ -34,6 +35,9 @@ public:
     // Helpers to populate the tree
     void addSensors(const QString &type, const QList<QStandardItem*> &items);
     void addDipoles(const INVERSELIB::ECDSet &set);
+
+    // Add source space points
+    void addSourceSpace(const MNELIB::MNESourceSpace &srcSpace);
 
 private:
    // Helpers to find specific items

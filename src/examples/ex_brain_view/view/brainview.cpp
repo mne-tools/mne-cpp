@@ -62,6 +62,7 @@
 #include <inverse/dipoleFit/ecd_set.h>
 #include "sensortreeitem.h"
 #include "dipoletreeitem.h"
+#include "sourcespacetreeitem.h"
 #include "../workers/stcloadingworker.h"
 
 using namespace FSLIB;
@@ -419,6 +420,71 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
             m_itemDipoleMap[item] = dipObject;
         }
         
+        // Handle Source Space Items (one item per hemisphere, batched mesh)
+        if (absItem && absItem->type() == AbstractTreeItem::SourceSpaceItem + QStandardItem::UserType) {
+            SourceSpaceTreeItem* srcItem = static_cast<SourceSpaceTreeItem*>(absItem);
+            const QVector<QVector3D>& positions = srcItem->positions();
+            if (positions.isEmpty()) continue;
+
+            const float r = srcItem->scale();
+            const QColor color = srcItem->color();
+            const int nPts = positions.size();
+
+            // Tiny octahedron template (6 verts, 8 tris) — looks like a small dot
+            const int nVPerPt = 6;
+            const int nTPerPt = 8;
+            Eigen::MatrixX3f templateV(6, 3);
+            templateV <<  r, 0, 0,
+                         -r, 0, 0,
+                          0, r, 0,
+                          0,-r, 0,
+                          0, 0, r,
+                          0, 0,-r;
+            // Smooth normals (point outward from center = same as vertex position normalized)
+            Eigen::MatrixX3f templateN(6, 3);
+            templateN <<  1, 0, 0,
+                         -1, 0, 0,
+                          0, 1, 0,
+                          0,-1, 0,
+                          0, 0, 1,
+                          0, 0,-1;
+            Eigen::MatrixX3i templateT(8, 3);
+            templateT << 0,2,4, 2,1,4, 1,3,4, 3,0,4,
+                         2,0,5, 1,2,5, 3,1,5, 0,3,5;
+
+            // Merge all dots into a single mesh
+            Eigen::MatrixX3f allVerts(nPts * nVPerPt, 3);
+            Eigen::MatrixX3f allNorms(nPts * nVPerPt, 3);
+            Eigen::MatrixX3i allTris(nPts * nTPerPt, 3);
+
+            for (int p = 0; p < nPts; ++p) {
+                const QVector3D& pos = positions[p];
+                int vOff = p * nVPerPt;
+                int tOff = p * nTPerPt;
+                for (int iv = 0; iv < nVPerPt; ++iv) {
+                    allVerts(vOff + iv, 0) = templateV(iv, 0) + pos.x();
+                    allVerts(vOff + iv, 1) = templateV(iv, 1) + pos.y();
+                    allVerts(vOff + iv, 2) = templateV(iv, 2) + pos.z();
+                    allNorms.row(vOff + iv) = templateN.row(iv);
+                }
+                for (int it = 0; it < nTPerPt; ++it) {
+                    allTris(tOff + it, 0) = templateT(it, 0) + vOff;
+                    allTris(tOff + it, 1) = templateT(it, 1) + vOff;
+                    allTris(tOff + it, 2) = templateT(it, 2) + vOff;
+                }
+            }
+
+            auto brainSurf = std::make_shared<BrainSurface>();
+            brainSurf->createFromData(allVerts, allNorms, allTris, color);
+            brainSurf->setVisible(srcItem->isVisible());
+            m_itemSurfaceMap[item] = brainSurf;
+
+            QString key = "srcsp_" + srcItem->text();
+            m_surfaces[key] = brainSurf;
+            qDebug() << "BrainView: Created batched source space mesh" << key
+                     << "with" << nPts << "points," << allVerts.rows() << "vertices,"
+                     << allTris.rows() << "triangles";
+        }
 
         
         // Check children recursively
@@ -825,10 +891,18 @@ void BrainView::render(QRhiCommandBuffer *cb)
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
         if (it.key().startsWith("bem_")) continue;
         if (it.key().startsWith("sens_")) continue;
+        if (it.key().startsWith("srcsp_")) continue;
         
         if (it.key().endsWith(m_activeSurfaceType)) {
             m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), currentShader);
         }
+    }
+    
+    // Pass 1b: Source Space Points (use same shader as brain for consistent depth/blend)
+    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+        if (!it.key().startsWith("srcsp_")) continue;
+        if (!it.value()->isVisible()) continue;
+        m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), currentShader);
     }
     
     // Pass 2: Transparent Surfaces sorted Back-to-Front
@@ -876,7 +950,7 @@ void BrainView::render(QRhiCommandBuffer *cb)
         m_renderer->renderDipoles(cb, rhi(), sceneData, m_dipoles.get());
     }
 
-    // Debug Intersection Pointer (only in single view for now)
+    // Intersection Pointer
     if (m_viewMode == SingleView && m_hasIntersection && m_debugPointerSurface) {
         BrainRenderer::SceneData debugSceneData = sceneData;
         
@@ -1206,6 +1280,54 @@ bool BrainView::loadDipoles(const QString &dipPath)
 
 //=============================================================================================================
 
+bool BrainView::loadSourceSpace(const QString &fwdPath)
+{
+    QFile file(fwdPath);
+    if (!file.exists()) {
+        qWarning() << "BrainView: Source space file not found:" << fwdPath;
+        return false;
+    }
+
+    MNELIB::MNESourceSpace srcSpace;
+    FIFFLIB::FiffStream::SPtr stream(new FIFFLIB::FiffStream(&file));
+    if (!stream->open()) {
+        qWarning() << "BrainView: Failed to open FIF stream for source space";
+        return false;
+    }
+
+    if (!MNELIB::MNESourceSpace::readFromStream(stream, true, srcSpace)) {
+        qWarning() << "BrainView: Failed to read source space from" << fwdPath;
+        return false;
+    }
+
+    if (srcSpace.isEmpty()) {
+        qWarning() << "BrainView: Source space is empty";
+        return false;
+    }
+
+    qDebug() << "BrainView: Loaded source space with" << srcSpace.size() << "hemispheres";
+    for (int h = 0; h < srcSpace.size(); ++h) {
+        qDebug() << "  Hemi" << h << ": nuse =" << srcSpace[h].nuse << "np =" << srcSpace[h].np;
+    }
+
+    m_model->addSourceSpace(srcSpace);
+    return true;
+}
+
+//=============================================================================================================
+
+void BrainView::setSourceSpaceVisible(bool visible)
+{
+    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+        if (it.key().startsWith("srcsp_")) {
+            it.value()->setVisible(visible);
+        }
+    }
+    update();
+}
+
+//=============================================================================================================
+
 bool BrainView::loadTransformation(const QString &transPath)
 {
     QFile file(transPath);
@@ -1317,6 +1439,7 @@ void BrainView::castRay(const QPoint &pos)
     // Check Surfaces (Sensors, Hemisphere, BEM)
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
         if (!it.value()->isVisible()) continue;
+        if (it.key().startsWith("srcsp_")) continue;
         
         bool isSensor = it.key().startsWith("sens_");
         bool isBem = it.key().startsWith("bem_");

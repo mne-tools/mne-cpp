@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
- * @file     main.cpp
+ * @file     sourcespacetreeitem.h
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    0.1.0
- * @date     January, 2026
+ * @date     February, 2026
  *
  * @section  LICENSE
  *
@@ -28,55 +28,68 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Brain View example application.
+ * @brief    SourceSpaceTreeItem class declaration.
  *
  */
+
+#ifndef SOURCESPACETREEITEM_H
+#define SOURCESPACETREEITEM_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QCommandLineParser>
+#include "abstracttreeitem.h"
 
-#include "app/mainwindow.h"
+#include <QVector3D>
+#include <QVector>
 
 //=============================================================================================================
-// MAIN
-//=============================================================================================================
-
-int main(int argc, char *argv[])
+/**
+ * SourceSpaceTreeItem represents a single source space point in the tree model.
+ * Each item stores its 3D position and rendering scale.
+ *
+ * @brief    Source space point tree item.
+ */
+class SourceSpaceTreeItem : public AbstractTreeItem
 {
-    QApplication app(argc, argv);
+public:
+    //=========================================================================================================
+    /**
+     * Constructs a SourceSpaceTreeItem for a hemisphere.
+     *
+     * @param[in] text       Display text for the item (e.g. "LH", "RH").
+     * @param[in] positions  3D positions of all source points in this hemisphere (in meters).
+     * @param[in] color      Color for rendering.
+     * @param[in] scale      Radius/size of each rendered sphere.
+     * @param[in] type       Item type identifier.
+     */
+    explicit SourceSpaceTreeItem(const QString &text,
+                                 const QVector<QVector3D> &positions,
+                                 const QColor &color,
+                                 float scale,
+                                 int type = AbstractTreeItem::SourceSpaceItem);
+    ~SourceSpaceTreeItem() = default;
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription("QRhi Brain View");
-    parser.addHelpOption();
+    //=========================================================================================================
+    /**
+     * Returns all source point positions.
+     *
+     * @return Vector of position vectors.
+     */
+    const QVector<QVector3D>& positions() const;
 
-    QCommandLineOption subjectPathOption("subjectPath", "Path to subjects directory", "path",
-        QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects");
-    QCommandLineOption subjectOption("subject", "Subject name", "name", "sample");
-    QCommandLineOption hemiOption("hemi", "Hemisphere (unused)", "hemi", "0");
-    QCommandLineOption bemOption("bem", "BEM file path", "path", "");
-    QCommandLineOption transOption("trans", "Transformation file path", "path", "");
-    QCommandLineOption stcOption("stc", "Source estimate file path", "path", "");
-    QCommandLineOption digitizerOption("digitizer", "Digitizer/sensor file path", "path", "");
-    QCommandLineOption srcSpaceOption("srcSpace", "Source space / forward solution file path", "path", "");
+    //=========================================================================================================
+    /**
+     * Returns the rendering scale.
+     *
+     * @return Scale value.
+     */
+    float scale() const;
 
-    parser.addOptions({subjectPathOption, subjectOption, hemiOption, bemOption, transOption, stcOption, digitizerOption, srcSpaceOption});
-    parser.process(app);
+private:
+    QVector<QVector3D> m_positions;  /**< 3D positions of all source points. */
+    float m_scale;                   /**< Radius/size for rendering. */
+};
 
-    MainWindow mainWindow;
-    mainWindow.loadInitialData(
-        parser.value(subjectPathOption),
-        parser.value(subjectOption),
-        parser.value(bemOption),
-        parser.value(transOption),
-        parser.value(stcOption),
-        parser.value(digitizerOption),
-        parser.value(srcSpaceOption)
-    );
-    mainWindow.show();
-
-    return app.exec();
-}
+#endif // SOURCESPACETREEITEM_H

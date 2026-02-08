@@ -290,12 +290,6 @@ jobs:
       with:
         python-version: '3.7'
         architecture: 'x64'
-    - name: Install Codecov
-      if: matrix.os == 'ubuntu-latest'
-      run: |
-        curl -Os https://uploader.codecov.io/latest/linux/codecov
-        chmod +x codecov
-        echo "${pwd}" >> $GITHUB_PATH
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-11')
       uses: jurplel/install-qt-action@v3
@@ -320,10 +314,14 @@ jobs:
     - name: Run tests (Linux)
       if: matrix.os == 'ubuntu-latest'
       env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
         QTEST_FUNCTION_TIMEOUT: 900000
       run: |
         ./tools/test_all.bat verbose withCoverage
+    - name: Upload coverage to Codecov
+      if: matrix.os == 'ubuntu-latest'
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
     - name: Run tests (MacOS)
       if: matrix.os == 'macos-latest'
       env:

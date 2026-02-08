@@ -299,6 +299,20 @@ void MainWindow::setupUI()
     dipoleLayout->addWidget(m_loadDipoleBtn);
     dipoleLayout->addWidget(m_showDipoleCheck);
 
+    // ===== Source Space Group =====
+    QGroupBox *srcSpaceGroup = new QGroupBox("Source Space");
+    QVBoxLayout *srcSpaceLayout = new QVBoxLayout(srcSpaceGroup);
+    srcSpaceLayout->setContentsMargins(10, 15, 10, 10);
+    srcSpaceLayout->setSpacing(8);
+
+    m_loadSrcSpaceBtn = new QPushButton("Load Source Space...");
+    m_showSrcSpaceCheck = new QCheckBox("Show Source Space");
+    m_showSrcSpaceCheck->setChecked(false);
+    m_showSrcSpaceCheck->setEnabled(false);
+
+    srcSpaceLayout->addWidget(m_loadSrcSpaceBtn);
+    srcSpaceLayout->addWidget(m_showSrcSpaceCheck);
+
     // ===== Sensor Group =====
     QGroupBox *sensorGroup = new QGroupBox("Sensors");
     QVBoxLayout *sensorLayout = new QVBoxLayout(sensorGroup);
@@ -335,6 +349,7 @@ void MainWindow::setupUI()
     sideLayout->addWidget(controlGroup);
     sideLayout->addWidget(stcGroup);
     sideLayout->addWidget(dipoleGroup);
+    sideLayout->addWidget(srcSpaceGroup);
     sideLayout->addWidget(sensorGroup);
     sideLayout->addStretch();
 
@@ -557,6 +572,20 @@ void MainWindow::setupConnections()
 
     connect(m_showDipoleCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setDipoleVisible(checked); });
 
+    // Source Space
+    connect(m_loadSrcSpaceBtn, &QPushButton::clicked, [this]() {
+        QString path = QFileDialog::getOpenFileName(this, "Select Source Space / Forward Solution", "",
+            "Source Space Files (*-src.fif *-fwd.fif);;All FIF Files (*.fif)");
+        if (path.isEmpty()) return;
+        if (m_brainView->loadSourceSpace(path)) {
+            m_showSrcSpaceCheck->setEnabled(true);
+            m_showSrcSpaceCheck->setChecked(false);
+            m_brainView->setSourceSpaceVisible(false);
+        }
+    });
+
+    connect(m_showSrcSpaceCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSourceSpaceVisible(checked); });
+
     // Sync initial state
     m_brainView->setHemiVisible(0, m_lhCheck->isChecked());
     m_brainView->setHemiVisible(1, m_rhCheck->isChecked());
@@ -572,7 +601,8 @@ void MainWindow::loadInitialData(const QString &subjectPath,
                                   const QString &bemPath,
                                   const QString &transPath,
                                   const QString &stcPath,
-                                  const QString &digitizerPath)
+                                  const QString &digitizerPath,
+                                  const QString &srcSpacePath)
 {
     qDebug() << "Loading surfaces...";
 
@@ -602,6 +632,16 @@ void MainWindow::loadInitialData(const QString &subjectPath,
     if (!transPath.isEmpty() && QFile::exists(transPath)) {
         qDebug() << "Auto-loading transformation from:" << transPath;
         m_brainView->loadTransformation(transPath);
+    }
+
+    // Auto-load source space
+    if (!srcSpacePath.isEmpty() && QFile::exists(srcSpacePath)) {
+        qDebug() << "Auto-loading source space from:" << srcSpacePath;
+        if (m_brainView->loadSourceSpace(srcSpacePath)) {
+            m_showSrcSpaceCheck->setEnabled(true);
+            m_showSrcSpaceCheck->setChecked(false);
+            m_brainView->setSourceSpaceVisible(false);
+        }
     }
 
     // Auto-load STC

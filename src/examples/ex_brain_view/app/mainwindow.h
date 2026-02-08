@@ -97,7 +97,8 @@ public:
                          const QString &bemPath = QString(),
                          const QString &transPath = QString(),
                          const QString &stcPath = QString(),
-                         const QString &digitizerPath = QString());
+                         const QString &digitizerPath = QString(),
+                         const QString &srcSpacePath = QString());
 
 private:
     void setupUI();
@@ -159,6 +160,10 @@ private:
     // Control widgets - Dipoles
     QPushButton *m_loadDipoleBtn = nullptr;
     QCheckBox *m_showDipoleCheck = nullptr;
+
+    // Control widgets - Source Space
+    QPushButton *m_loadSrcSpaceBtn = nullptr;
+    QCheckBox *m_showSrcSpaceCheck = nullptr;
 };
 
 #endif // MAINWINDOW_H

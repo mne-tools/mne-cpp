@@ -204,13 +204,12 @@ do
     # echo ">> Test $test \t\t\t\t RockSolid!"
     printf "%${testColumnWidth}s \e[92m %s \e[0m\n" "${test}" "Rock Solid!"
   fi
-
-  if [ "$RunCodeCoverage" == "true" ]; then
-    find ./src/libraries -type f -name "*.cpp" -exec gcov {} \; &> /dev/null
-    # Hide codecov output since it corrupts the log too much
-    ./codecov &> /dev/null
-  fi
 done
+
+if [ "$RunCodeCoverage" == "true" ]; then
+  echo "Generating coverage data..."
+  find ./src/libraries -type f -name "*.cpp" -exec gcov {} + &> /dev/null
+fi
 
 exit $CompoundOutput
 

@@ -461,16 +461,16 @@ void BrainSurface::applyTransform(const QMatrix4x4 &m)
 void BrainSurface::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
 {
     if (!m_bBuffersDirty && m_vertexBuffer && m_indexBuffer) return;
-    
-    // Debug logging
 
+    const quint32 vbufSize = m_vertexData.size() * sizeof(VertexData);
+    const quint32 ibufSize = m_indexData.size() * sizeof(uint32_t);
 
     if (!m_vertexBuffer) {
-        m_vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, m_vertexData.size() * sizeof(VertexData)));
+        m_vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, vbufSize));
         m_vertexBuffer->create();
     }
     if (!m_indexBuffer) {
-        m_indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, m_indexData.size() * sizeof(uint32_t)));
+        m_indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, ibufSize));
         m_indexBuffer->create();
     }
 

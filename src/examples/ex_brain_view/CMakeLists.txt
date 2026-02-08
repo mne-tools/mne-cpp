@@ -26,6 +26,7 @@ set(SOURCES
     model/braintreemodel.cpp
     model/items/sensortreeitem.cpp
     model/items/dipoletreeitem.cpp
+    model/items/sourcespacetreeitem.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
