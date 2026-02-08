@@ -399,7 +399,7 @@ jobs:
         modules: 'qtcharts qt3d qtshadertools'
     - name: Install Qt WASM
       run: |
-        pip install aqtinstall
+        pip install 'aqtinstall>=3.3'
         aqt install-qt all_os wasm 6.8.0 wasm_multithread --outputdir ${{ runner.tool_cache }}/Qt --modules qtcharts qt3d qtshadertools
         echo "Qt6_DIR=${{ runner.tool_cache }}/Qt/6.8.0/wasm_multithread" >> $GITHUB_ENV
     - name: Setup and build WASM
