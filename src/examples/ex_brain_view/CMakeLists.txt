@@ -19,7 +19,7 @@ set(SOURCES
     renderable/brainsurface.cpp
     renderable/sourceestimateoverlay.cpp
     renderable/dipoleobject.cpp
-    renderable/stcloadingworker.cpp
+    workers/stcloadingworker.cpp
     model/items/abstracttreeitem.cpp
     model/items/surfacetreeitem.cpp
     model/items/bemtreeitem.cpp
@@ -39,6 +39,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     app
     view
     renderable
+    workers
     model
     model/items
 )
