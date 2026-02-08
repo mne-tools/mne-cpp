@@ -325,6 +325,7 @@ jobs:
         overwrite: true
     - name: Update documentation at Github pages
       run: |
+        git config --global credential.helper store
         cd doc/doxygen
         git config --global user.email christoph.dinh@mne-cpp.org
         git config --global user.name chdinh
@@ -357,6 +358,7 @@ jobs:
         credentials: ${{secrets.GIT_CREDENTIALS}}
     - name: Clone doc/gh-pages into gh-pages branch
       run: |
+        git config --global credential.helper store
         git config --global user.email christoph.dinh@mne-cpp.org
         git config --global user.name chdinh
         git clone -b main --single-branch https://github.com/mne-cpp/mne-cpp.github.io.git
@@ -409,6 +411,7 @@ jobs:
         credentials: ${{secrets.GIT_CREDENTIALS}}
     - name: Clone and update mne-cpp/wasm:gh-pages
       run: |
+        git config --global credential.helper store
         # Delete folders which we do not want to ship
         rm -r out/wasm/apps/mne_analyze_plugins
         rm -r resources/data
