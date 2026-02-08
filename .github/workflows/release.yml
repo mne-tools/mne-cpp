@@ -70,6 +70,7 @@ jobs:
 
   LinuxDynamic:
     runs-on: ubuntu-24.04
+    needs: CreateRelease
 
     steps:
     - name: Clone repository
@@ -129,6 +130,7 @@ jobs:
 
   MacOSDynamic:
     runs-on: macos-26
+    needs: CreateRelease
 
     steps:
     - name: Clone repository
@@ -188,6 +190,7 @@ jobs:
 
   WinDynamic:
     runs-on: windows-2025
+    needs: CreateRelease
 
     steps:
     - name: Clone repository
