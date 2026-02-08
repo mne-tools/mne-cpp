@@ -389,19 +389,12 @@ jobs:
       uses: actions/checkout@v3
     # Note: Qt 6.10.2 WASM exists but isn't yet available via aqt. Using 6.8.0 for now.
     # When aqt supports 6.10.2, update version and emsdk to 4.0.7
-    - name: Install Qt Desktop
-      uses: jurplel/install-qt-action@v3
-      with:
-        version: '6.8.0'
-        host: 'linux'
-        target: 'desktop'
-        arch: 'linux_gcc_64'
-        modules: 'qtcharts qt3d qtshadertools'
-        dir: '${{ runner.tool_cache }}/Qt'
-    - name: Install Qt WASM
+    - name: Install Qt Desktop and WASM
       run: |
         pip install 'aqtinstall>=3.3'
-        # Note: qt3d is not available for WASM
+        # Install desktop Qt (needed as host for WASM cross-compilation)
+        aqt install-qt linux desktop 6.8.0 linux_gcc_64 --outputdir ${{ runner.tool_cache }}/Qt --modules qtcharts qt3d qtshadertools
+        # Install WASM Qt (qt3d not available for WASM)
         aqt install-qt all_os wasm 6.8.0 wasm_multithread --outputdir ${{ runner.tool_cache }}/Qt --modules qtcharts qtshadertools
         # Qt6_DIR should point to the parent (6.8.0/) because wasm.sh appends wasm_multithread/bin/qt-cmake
         echo "Qt6_DIR=${{ runner.tool_cache }}/Qt/6.8.0" >> $GITHUB_ENV
