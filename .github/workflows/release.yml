@@ -385,22 +385,18 @@ jobs:
     - name: Install Qt Desktop
       uses: jurplel/install-qt-action@v3
       with:
-        aqtversion: '==3.1.*'
-        py7zrversion: '>=0.20.2'
-        version: '6.8.0'
+        version: '6.10.2'
         host: 'linux'
         target: 'desktop'
-        arch: 'gcc_64'
+        arch: 'linux_gcc_64'
         modules: 'qtcharts qt3d qtshadertools'
     - name: Install Qt WASM
       uses: jurplel/install-qt-action@v3
       with:
-        aqtversion: '==3.1.*'
-        py7zrversion: '>=0.20.2'
-        version: '6.8.0'
+        version: '6.10.2'
         host: 'linux'
         target: 'desktop'
-        arch: 'wasm_multithread'
+        arch: 'wasm_singlethread'
         modules: 'qtcharts qt3d qtshadertools'
     - name: Setup and build WASM
       run: |
