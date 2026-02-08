@@ -13,12 +13,13 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 # Define the source files
 set(SOURCES
     main.cpp
+    app/mainwindow.cpp
     view/brainview.cpp
     view/brainrenderer.cpp
-    scene/brainsurface.cpp
-    scene/sourceestimateoverlay.cpp
-    scene/dipoleobject.cpp
-    scene/stcloadingworker.cpp
+    renderable/brainsurface.cpp
+    renderable/sourceestimateoverlay.cpp
+    renderable/dipoleobject.cpp
+    renderable/stcloadingworker.cpp
     model/items/abstracttreeitem.cpp
     model/items/surfacetreeitem.cpp
     model/items/bemtreeitem.cpp
@@ -35,8 +36,9 @@ endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE
     .
+    app
     view
-    scene
+    renderable
     model
     model/items
 )

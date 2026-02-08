@@ -40,9 +40,9 @@
 //=============================================================================================================
 
 #include "brainrenderer.h"
-#include "../scene/brainsurface.h"
-#include "../scene/dipoleobject.h"
-#include "../scene/sourceestimateoverlay.h"
+#include "../renderable/brainsurface.h"
+#include "../renderable/dipoleobject.h"
+#include "../renderable/sourceestimateoverlay.h"
 #include "../model/braintreemodel.h"
 #include "../model/items/surfacetreeitem.h"
 

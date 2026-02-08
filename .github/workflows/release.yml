@@ -397,15 +397,16 @@ jobs:
         target: 'desktop'
         arch: 'linux_gcc_64'
         modules: 'qtcharts qt3d qtshadertools'
+        dir: '${{ runner.tool_cache }}/Qt'
     - name: Install Qt WASM
       run: |
         pip install 'aqtinstall>=3.3'
         # Note: qt3d is not available for WASM
         aqt install-qt all_os wasm 6.8.0 wasm_multithread --outputdir ${{ runner.tool_cache }}/Qt --modules qtcharts qtshadertools
-        echo "Qt6_DIR=${{ runner.tool_cache }}/Qt/6.8.0/wasm_multithread" >> $GITHUB_ENV
+        # Qt6_DIR should point to the parent (6.8.0/) because wasm.sh appends wasm_multithread/bin/qt-cmake
+        echo "Qt6_DIR=${{ runner.tool_cache }}/Qt/6.8.0" >> $GITHUB_ENV
     - name: Setup and build WASM
       run: |
-        export PATH="${{ runner.tool_cache }}/Qt/6.8.0/wasm_multithread/bin:$PATH"
         ./tools/wasm.sh --emsdk 3.1.56
     # TODO: Uncomment when chdinh has access to mne-cpp organization
     # - name: Setup Github credentials

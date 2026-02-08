@@ -62,7 +62,7 @@
 #include <inverse/dipoleFit/ecd_set.h>
 #include "sensortreeitem.h"
 #include "dipoletreeitem.h"
-#include "../scene/stcloadingworker.h"
+#include "../renderable/stcloadingworker.h"
 
 using namespace FSLIB;
 using namespace FIFFLIB;
