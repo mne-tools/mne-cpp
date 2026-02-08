@@ -3,482 +3,531 @@ name: Linux|MacOS|Win|WASM
 on:
   push:
     tags:
-    - v0.*
+      - v0.*
     branches:
-    - v2.0-dev
+      - v2.0-dev
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# This grants GITHUB_TOKEN write access to THIS repo only.
+# Cross-repo pushes will use secrets.GIT_CREDENTIALS (classic PAT via setup-git-credentials).
+permissions:
+  contents: write
+
+env:
+  PYTHON_VERSION: "3.10"
+  QT_VERSION: "6.10.2"
+  QT_MODULES: "qtcharts qt3d qtshadertools"
 
 jobs:
   CreateRelease:
     runs-on: ubuntu-24.04
-
     steps:
-    - name: Clone repository
-      uses: actions/checkout@v3
+      - name: Clone repository
+        uses: actions/checkout@v3
 
-    - name: Create new branch with the tag's name (stable release only)
-      if: endsWith(github.ref, 'v2.0-dev') == false
-      run: |
-        currentVersionPatch=`echo ${GITHUB_REF#refs/tags/} | cut -d. -f3`
-        # Only branch off if we have a new minor version bump, which will always result in the patch version to be 0
-        if [[ "$currentVersionPatch" == 0 ]]; then
-          echo Branching off $currentVersionPatch
-          # Setup Git
-          git config --global user.email christoph.dinh@mne-cpp.org
-          git config --global user.name chdinh
-          # Create new branch named after the new version tag
-          git checkout -b ${GITHUB_REF#refs/tags/}
-          git push origin refs/heads/${GITHUB_REF#refs/tags/}
-        fi
+      # Stable release only (tags): create a branch named like the tag if patch==0
+      - name: Create new branch with the tag's name (stable release only)
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: bash
+        run: |
+          set -euo pipefail
+          currentVersionPatch="$(echo ${GITHUB_REF#refs/tags/} | cut -d. -f3)"
+          if [[ "$currentVersionPatch" == "0" ]]; then
+            echo "Branching off ${GITHUB_REF#refs/tags/}"
+            git config --global user.email christoph.dinh@mne-cpp.org
+            git config --global user.name chdinh
+            git checkout -b ${GITHUB_REF#refs/tags/}
+            git push origin refs/heads/${GITHUB_REF#refs/tags/}
+          fi
 
-    - name: Update dev_build tag and release (dev release only)
-      if: endsWith(github.ref, 'v2.0-dev') == true
-      timeout-minutes: 5
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      run: |
-        set -x  # Enable debug output
+      # Dev branch only: update dev_build tag + prerelease
+      - name: Update dev_build tag and release (dev release only)
+        if: github.ref == 'refs/heads/v2.0-dev'
+        timeout-minutes: 5
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          set -x
 
-        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
 
-        # Configure git to use GITHUB_TOKEN
-        git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
+          # Ensure git uses GITHUB_TOKEN for THIS repo only
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}"
 
-        # Delete current dev_build release remotely (if it exists)
-        echo "Attempting to delete existing dev_build release..."
-        if gh release view dev_build > /dev/null 2>&1; then
-          gh release delete dev_build --yes --cleanup-tag
-          echo "Existing release deleted."
-        else
-          echo "No existing dev_build release found, skipping deletion."
-        fi
+          echo "Attempting to delete existing dev_build release..."
+          if gh release view dev_build > /dev/null 2>&1; then
+            gh release delete dev_build --yes --cleanup-tag
+            echo "Existing release deleted."
+          else
+            echo "No existing dev_build release found, skipping deletion."
+          fi
 
-        # Delete current tag remotely (if it exists)
-        echo "Attempting to delete existing dev_build tag..."
-        git push origin :refs/tags/dev_build 2>/dev/null || echo "Tag did not exist remotely, continuing."
+          echo "Attempting to delete existing dev_build tag..."
+          git push origin :refs/tags/dev_build 2>/dev/null || true
 
-        # Change dev_build tag to point to newest commit
-        git tag dev_build -f -a -m "Development Builds"
+          git tag dev_build -f -a -m "Development Builds"
+          git push origin dev_build -f
 
-        # Send the new tag
-        git push origin dev_build -f
-
-        # Create new dev_build release
-        echo "Creating new dev_build release..."
-        gh release create dev_build --prerelease --title "Development Builds" --notes "Development Builds"
-        echo "Release created successfully."
-
+          echo "Creating new dev_build release..."
+          gh release create dev_build --prerelease --title "Development Builds" --notes "Development Builds"
+          echo "Release created successfully."
 
   LinuxDynamic:
     runs-on: ubuntu-24.04
-
+    needs: CreateRelease
     steps:
-    - name: Clone repository
-      uses: actions/checkout@v3
+      - name: Clone repository
+        uses: actions/checkout@v3
 
-    - name: Install Python 3.10 version
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-        architecture: 'x64'
+      - name: Install Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          architecture: x64
 
-    - name: Install BrainFlow and LSL submodules
-      run: |
-        git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
-        git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
+      - name: Install BrainFlow and LSL submodules
+        shell: bash
+        run: |
+          set -euo pipefail
+          git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
+          git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
 
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v3
-      with:
-        version: 6.10.2
-        modules: qtcharts qt3d qtshadertools
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: ${{ env.QT_VERSION }}
+          modules: ${{ env.QT_MODULES }}
 
-    - name: Compile BrainFlow submodule
-      run: |
-        cd src/applications/mne_scan/plugins/brainflowboard/brainflow
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" ..
-        cmake --build .
+      - name: Compile BrainFlow submodule
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd src/applications/mne_scan/plugins/brainflowboard/brainflow
+          mkdir -p build
+          cd build
+          cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" ..
+          cmake --build . --config Release
 
-    - name: Compile LSL submodule
-      run: |
-        cd src/applications/mne_scan/plugins/lsladapter/liblsl
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" ..
-        cmake --build .
+      - name: Compile LSL submodule
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd src/applications/mne_scan/plugins/lsladapter/liblsl
+          mkdir -p build
+          cd build
+          cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" ..
+          cmake --build . --config Release
 
-    - name: Configure and compile MNE-CPP
-      run: |
-        ./tools/build_project.bat
+      - name: Configure and compile MNE-CPP
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./tools/build_project.bat
 
-    - name: Deploy binaries
-      run: |
-        ./tools/deploy.bat dynamic pack
+      - name: Deploy binaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./tools/deploy.bat dynamic pack
 
-    - name: Deploy binaries with stable release on Github
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: mne-cpp-linux-dynamic-x86_64.tar.gz
-        asset_name: mne-cpp-linux-dynamic-x86_64.tar.gz
-        tag: ${{ github.ref }}
-        overwrite: true
+      - name: Deploy binaries with stable release on GitHub
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: mne-cpp-linux-dynamic-x86_64.tar.gz
+          asset_name: mne-cpp-linux-dynamic-x86_64.tar.gz
+          tag: ${{ github.ref }}
+          overwrite: true
 
-    - name: Deploy binaries with dev release on Github
-      if: endsWith(github.ref, 'v2.0-dev') == true
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: mne-cpp-linux-dynamic-x86_64.tar.gz
-        asset_name: mne-cpp-linux-dynamic-x86_64-v2.0-dev.tar.gz
-        tag: dev_build
-        overwrite: true
-
+      - name: Deploy binaries with dev release on GitHub
+        if: github.ref == 'refs/heads/v2.0-dev'
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: mne-cpp-linux-dynamic-x86_64.tar.gz
+          asset_name: mne-cpp-linux-dynamic-x86_64-v2.0-dev.tar.gz
+          tag: dev_build
+          overwrite: true
 
   MacOSDynamic:
     runs-on: macos-26
-
+    needs: CreateRelease
     steps:
-    - name: Clone repository
-      uses: actions/checkout@v3
+      - name: Clone repository
+        uses: actions/checkout@v3
 
-    - name: Install Python 3.10 version
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-        architecture: 'arm64'
+      - name: Install Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          architecture: arm64
 
-    - name: Install BrainFlow and LSL submodules
-      run: |
-        git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
-        git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
+      - name: Install BrainFlow and LSL submodules
+        shell: bash
+        run: |
+          set -euo pipefail
+          git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
+          git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
 
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v3
-      with:
-        version: 6.10.2
-        modules: qtcharts qt3d qtshadertools
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: ${{ env.QT_VERSION }}
+          modules: ${{ env.QT_MODULES }}
 
-    - name: Compile BrainFlow submodule
-      run: |
-        cd src/applications/mne_scan/plugins/brainflowboard/brainflow
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" ..
-        cmake --build .
+      - name: Compile BrainFlow submodule
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd src/applications/mne_scan/plugins/brainflowboard/brainflow
+          mkdir -p build
+          cd build
+          cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" ..
+          cmake --build . --config Release
 
-    - name: Compile LSL submodule
-      run: |
-        cd src/applications/mne_scan/plugins/lsladapter/liblsl
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
-        cmake --build .
+      - name: Compile LSL submodule
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd src/applications/mne_scan/plugins/lsladapter/liblsl
+          mkdir -p build
+          cd build
+          cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
+          cmake --build . --config Release
 
-    - name: Configure and compile MNE-CPP
-      run: |
-        ./tools/build_project.bat
+      - name: Configure and compile MNE-CPP
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./tools/build_project.bat
 
-    - name: Deploy binaries (MacOS)
-      run: |
-        ./tools/deploy.bat dynamic pack
+      - name: Deploy binaries (MacOS)
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./tools/deploy.bat dynamic pack
 
-    - name: Deploy binaries with stable release on Github
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: mne-cpp-macos-dynamic-x86_64.tar.gz
-        asset_name: mne-cpp-macos-dynamic-x86_64.tar.gz
-        tag: ${{ github.ref }}
-        overwrite: true
+      - name: Deploy binaries with stable release on GitHub
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: mne-cpp-macos-dynamic-x86_64.tar.gz
+          asset_name: mne-cpp-macos-dynamic-x86_64.tar.gz
+          tag: ${{ github.ref }}
+          overwrite: true
 
-    - name: Deploy binaries with dev release on Github
-      if: endsWith(github.ref, 'v2.0-dev') == true
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: mne-cpp-macos-dynamic-x86_64.tar.gz
-        asset_name: mne-cpp-macos-dynamic-x86_64-v2.0-dev.tar.gz
-        tag: dev_build
-        overwrite: true
-
+      - name: Deploy binaries with dev release on GitHub
+        if: github.ref == 'refs/heads/v2.0-dev'
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: mne-cpp-macos-dynamic-x86_64.tar.gz
+          asset_name: mne-cpp-macos-dynamic-x86_64-v2.0-dev.tar.gz
+          tag: dev_build
+          overwrite: true
 
   WinDynamic:
     runs-on: windows-2025
-
+    needs: CreateRelease
     steps:
-    - name: Clone repository
-      uses: actions/checkout@v3
+      - name: Clone repository
+        uses: actions/checkout@v3
 
-    - name: Install Python 3.10 version
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-        architecture: 'x64'
+      - name: Install Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          architecture: x64
 
-    - name: Install BrainFlow and LSL submodules
-      run: |
-        git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
-        git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
+      - name: Install BrainFlow and LSL submodules
+        shell: bash
+        run: |
+          set -euo pipefail
+          git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
+          git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
 
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v3
-      with:
-        version: 6.10.2
-        arch: win64_msvc2022_64
-        modules: qtcharts qt3d qtshadertools
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: ${{ env.QT_VERSION }}
+          arch: win64_msvc2022_64
+          modules: ${{ env.QT_MODULES }}
 
-    - name: Compile BrainFlow submodule
-      run: |
-        $path = "src\applications\mne_scan\plugins\brainflowboard\brainflow\src\board_controller\muse\muse_bglib\muse_bglib_helper.cpp"
-        $txt = "#include <chrono>`r`n" + [System.IO.File]::ReadAllText($path)
-        [System.IO.File]::WriteAllText($path, $txt)
-        cd src\applications\mne_scan\plugins\brainflowboard\brainflow
-        mkdir build
-        cd build
-        cmake -G "Visual Studio 17 2022" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=10.0 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
-        cmake --build . --target install --config Release
+      - name: Compile BrainFlow submodule
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          $path = "src\applications\mne_scan\plugins\brainflowboard\brainflow\src\board_controller\muse\muse_bglib\muse_bglib_helper.cpp"
+          $txt = "#include <chrono>`r`n" + [System.IO.File]::ReadAllText($path)
+          [System.IO.File]::WriteAllText($path, $txt)
+          cd src\applications\mne_scan\plugins\brainflowboard\brainflow
+          mkdir build
+          cd build
+          cmake -G "Visual Studio 17 2022" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=10.0 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
+          cmake --build . --target install --config Release
 
-    - name: Compile LSL submodule
-      run: |
-        cd src\applications\mne_scan\plugins\lsladapter\liblsl
-        mkdir build
-        cd build
-        cmake .. -G "Visual Studio 17 2022" -A x64
-        cmake --build . --config Release --target install
+      - name: Compile LSL submodule
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          cd src\applications\mne_scan\plugins\lsladapter\liblsl
+          mkdir build
+          cd build
+          cmake .. -G "Visual Studio 17 2022" -A x64
+          cmake --build . --config Release --target install
 
-    - name: Configure and compile MNE-CPP
-      run: |
-        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
-        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        ./tools/build_project.bat
+      - name: Configure and compile MNE-CPP
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+          Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+          ./tools/build_project.bat
 
-    - name: Deploy binaries (Windows)
-      run: |
-        ./tools/deploy.bat dynamic pack
+      - name: Deploy binaries (Windows)
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = "Stop"
+          ./tools/deploy.bat dynamic pack
 
-    - name: Deploy binaries with stable release on Github
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: mne-cpp-windows-dynamic-x86_64.zip
-        asset_name: mne-cpp-windows-dynamic-x86_64.zip
-        tag: ${{ github.ref }}
-        overwrite: true
+      - name: Deploy binaries with stable release on GitHub
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: mne-cpp-windows-dynamic-x86_64.zip
+          asset_name: mne-cpp-windows-dynamic-x86_64.zip
+          tag: ${{ github.ref }}
+          overwrite: true
 
-    - name: Deploy binaries with dev release on Github
-      if: endsWith(github.ref, 'v2.0-dev') == true
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: mne-cpp-windows-dynamic-x86_64.zip
-        asset_name: mne-cpp-windows-dynamic-x86_64-v2.0-dev.zip
-        tag: dev_build
-        overwrite: true
-
+      - name: Deploy binaries with dev release on GitHub
+        if: github.ref == 'refs/heads/v2.0-dev'
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: mne-cpp-windows-dynamic-x86_64.zip
+          asset_name: mne-cpp-windows-dynamic-x86_64-v2.0-dev.zip
+          tag: dev_build
+          overwrite: true
 
   Tests:
-    # Only run for dev releases
-    if: endsWith(github.ref, 'v2.0-dev') == true
+    if: github.ref == 'refs/heads/v2.0-dev'
     runs-on: ubuntu-24.04
     needs: CreateRelease
-
     steps:
-    - name: Clone repository
-      uses: actions/checkout@v3
+      - name: Clone repository
+        uses: actions/checkout@v3
 
-    - name: Clone mne-cpp test data
-      run: git clone https://github.com/mne-tools/mne-cpp-test-data.git resources/data/mne-cpp-test-data
+      - name: Clone mne-cpp test data
+        shell: bash
+        run: |
+          set -euo pipefail
+          git clone https://github.com/mne-tools/mne-cpp-test-data.git resources/data/mne-cpp-test-data
 
-    - name: Install Python 3.10 version
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.10'
-        architecture: 'x64'
+      - name: Install Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          architecture: x64
 
-    - name: Install Codecov
-      run: |
-        sudo pip install codecov
+      - name: Install Codecov
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -U pip
+          pip install codecov
 
-    - name: Install Qt
-      uses: jurplel/install-qt-action@v3
-      with:
-        version: 6.10.2
-        modules: qtcharts qt3d qtshadertools
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v3
+        with:
+          version: ${{ env.QT_VERSION }}
+          modules: ${{ env.QT_MODULES }}
 
-    - name: Configure and compile MNE-CPP
-      run: |
-        ./tools/build_project.bat coverage all
+      - name: Configure and compile MNE-CPP
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./tools/build_project.bat coverage all
 
-    - name: Run tests and upload results to Codecov
-      env:
-        CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
-        QTEST_FUNCTION_TIMEOUT: 900000
-      run: |
-        ./tools/test_all.bat verbose withCoverage
-
+      - name: Run tests and upload results to Codecov
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+          QTEST_FUNCTION_TIMEOUT: 900000
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./tools/test_all.bat verbose withCoverage
 
   Doxygen:
     runs-on: ubuntu-24.04
     needs: CreateRelease
-
     steps:
-    - name: Clone repository
-      uses: actions/checkout@v3
+      - name: Clone repository
+        uses: actions/checkout@v3
 
-    - name: Install Qt Dev Tools, Doxygen and Graphviz
-      run: |
-        sudo apt-get update -qq
-        sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
+      - name: Install Qt Dev Tools, Doxygen and Graphviz
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
 
-    - name: Run Doxygen and package result
-      run: |
-        git fetch --all
-        git checkout origin/main
-        cd doc/doxygen
-        doxygen mne-cpp_doxyfile
+      - name: Run Doxygen and package result
+        shell: bash
+        run: |
+          set -euo pipefail
+          git fetch --all
+          git checkout origin/main
+          cd doc/doxygen
+          doxygen mne-cpp_doxyfile
 
-    - name: Setup Github credentials
-      uses: fusion-engineering/setup-git-credentials@v2
-      with:
-        credentials: ${{secrets.GIT_CREDENTIALS}}
+      - name: Deploy qch docu data base with stable release on GitHub
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: doc/doxygen/qt-creator_doc/mne-cpp.qch
+          asset_name: mne-cpp-doc-qtcreator.qch
+          tag: ${{ github.ref }}
+          overwrite: true
 
-    - name: Deploy qch docu data base with stable release on Github
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: doc/doxygen/qt-creator_doc/mne-cpp.qch
-        asset_name: mne-cpp-doc-qtcreator.qch
-        tag: ${{ github.ref }}
-        overwrite: true
+      - name: Deploy qch docu data base with dev release on GitHub
+        if: github.ref == 'refs/heads/v2.0-dev'
+        uses: svenstaro/upload-release-action@v1-release
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: doc/doxygen/qt-creator_doc/mne-cpp.qch
+          asset_name: mne-cpp-doc-qtcreator-v2.0-dev.qch
+          tag: dev_build
+          overwrite: true
 
-    - name: Deploy qch docu data base with dev release on Github
-      uses: svenstaro/upload-release-action@v1-release
-      with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
-        file: doc/doxygen/qt-creator_doc/mne-cpp.qch
-        asset_name: mne-cpp-doc-qtcreator-v2.0-dev.qch
-        tag: dev_build
-        overwrite: true
+      - name: Setup Github credentials (cross-repo pushes)
+        if: github.ref == 'refs/heads/v2.0-dev'
+        uses: fusion-engineering/setup-git-credentials@v2
+        with:
+          credentials: ${{ secrets.GIT_CREDENTIALS }}
 
-    - name: Update documentation at Github pages
-      run: |
-        cd doc/doxygen
-        git config --global user.email christoph.dinh@mne-cpp.org
-        git config --global user.name chdinh
-        git clone -b gh-pages https://github.com/mne-cpp/doxygen-api gh-pages
-        cd gh-pages
-        # Remove all files first
-        git rm * -r
-        git commit --amend -a -m 'Update docu' --allow-empty
-        touch .nojekyll
-        # Copy doxygen files
-        cp -r ../html/* .
-        # Add all new files, commit and push
-        git add *
-        git add .nojekyll
-        git commit --amend -a -m 'Update docu'
-        git push -f --all
-
+      - name: Update documentation at GitHub pages (doxygen-api)
+        if: github.ref == 'refs/heads/v2.0-dev'
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd doc/doxygen
+          git config --global user.email christoph.dinh@mne-cpp.org
+          git config --global user.name chdinh
+          git clone -b gh-pages https://github.com/mne-cpp/doxygen-api gh-pages
+          cd gh-pages
+          git rm -r --ignore-unmatch .
+          touch .nojekyll
+          cp -r ../html/* .
+          git add -A
+          git commit --allow-empty -m 'Update docu'
+          git push -f origin gh-pages
 
   gh-pages:
-    # Only run for dev releases
-    if: endsWith(github.ref, 'v2.0-dev') == true
+    if: github.ref == 'refs/heads/v2.0-dev'
     runs-on: ubuntu-24.04
     needs: CreateRelease
-
     steps:
-    - name: Clone repository
-      uses: actions/checkout@v3
+      - name: Clone repository
+        uses: actions/checkout@v3
 
-    - name: Setup Github credentials
-      uses: fusion-engineering/setup-git-credentials@v2
-      with:
-        credentials: ${{secrets.GIT_CREDENTIALS}}
+      - name: Setup Github credentials (cross-repo pushes)
+        uses: fusion-engineering/setup-git-credentials@v2
+        with:
+          credentials: ${{ secrets.GIT_CREDENTIALS }}
 
-    - name: Clone doc/gh-pages into gh-pages branch
-      run: |
-        git config --global user.email christoph.dinh@mne-cpp.org
-        git config --global user.name chdinh
-        git clone -b main --single-branch https://github.com/mne-cpp/mne-cpp.github.io.git
-        cd mne-cpp.github.io
-        # Remove all files first
-        git rm * -r
-        git commit --amend -a -m 'Update docu' --allow-empty
-        cd ..
-        cp -RT doc/gh-pages mne-cpp.github.io
-        cd mne-cpp.github.io
-        git add .
-        git commit --amend -a -m 'Update docu'
-        git push -f --all
+      - name: Clone doc/gh-pages into mne-cpp.github.io:main
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config --global user.email christoph.dinh@mne-cpp.org
+          git config --global user.name chdinh
 
+          git clone -b main --single-branch https://github.com/mne-cpp/mne-cpp.github.io.git
+          cd mne-cpp.github.io
+
+          git rm -r --ignore-unmatch .
+          git commit --allow-empty -m 'Update docu' || true
+          cd ..
+
+          cp -RT doc/gh-pages mne-cpp.github.io
+          cd mne-cpp.github.io
+
+          git add -A
+          git commit --allow-empty -m 'Update docu'
+          git push -f origin main
 
   WebAssembly:
-    # Only run for dev releases
-    if: endsWith(github.ref, 'v2.0-dev') == true
+    if: github.ref == 'refs/heads/v2.0-dev'
     runs-on: ubuntu-24.04
     needs: CreateRelease
-
     steps:
-    - name: Clone repository
-      uses: actions/checkout@v3
+      - name: Clone repository
+        uses: actions/checkout@v3
 
-    - name: Install Qt Desktop
-      uses: jurplel/install-qt-action@v3
-      with:
-        aqtversion: '==3.1.*'
-        py7zrversion: '>=0.20.2'
-        version: '6.8.0'
-        host: 'linux'
-        target: 'desktop'
-        arch: 'gcc_64'
-        modules: 'qtcharts qt3d qtshadertools'
+      - name: Install Qt Desktop
+        uses: jurplel/install-qt-action@v3
+        with:
+          aqtversion: '==3.1.*'
+          py7zrversion: '>=0.20.2'
+          version: '6.8.0'
+          host: 'linux'
+          target: 'desktop'
+          arch: 'gcc_64'
+          modules: 'qtcharts qt3d qtshadertools'
 
-    - name: Install Qt WASM
-      uses: jurplel/install-qt-action@v3
-      with:
-        aqtversion: '==3.1.*'
-        py7zrversion: '>=0.20.2'
-        version: '6.8.0'
-        host: 'linux'
-        target: 'desktop'
-        arch: 'wasm_multithread'
-        modules: 'qtcharts qt3d qtshadertools'
+      - name: Install Qt WASM
+        uses: jurplel/install-qt-action@v3
+        with:
+          aqtversion: '==3.1.*'
+          py7zrversion: '>=0.20.2'
+          version: '6.8.0'
+          host: 'linux'
+          target: 'desktop'
+          arch: 'wasm_multithread'
+          modules: 'qtcharts qt3d qtshadertools'
 
-    - name: Setup and build WASM
-      run: |
-        ./tools/wasm.sh --emsdk 3.1.25
+      - name: Setup and build WASM
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./tools/wasm.sh --emsdk 3.1.25
 
-    - name: Setup Github credentials
-      uses: fusion-engineering/setup-git-credentials@v2
-      with:
-        credentials: ${{secrets.GIT_CREDENTIALS}}
+      - name: Setup Github credentials (cross-repo pushes)
+        uses: fusion-engineering/setup-git-credentials@v2
+        with:
+          credentials: ${{ secrets.GIT_CREDENTIALS }}
 
-    - name: Clone and update mne-cpp/wasm:gh-pages
-      run: |
-        # Delete folders which we do not want to ship
-        rm -r out/wasm/apps/mne_analyze_plugins
-        rm -r resources/data
-        # Replace logo
-        cp -RT resources/design/logos/qtlogo.svg bin/qtlogo.svg
-        # Clone repo and update with new wasm versions
-        git config --global user.email christoph.dinh@mne-cpp.org
-        git config --global user.name chdinh
-        git clone -b gh-pages --single-branch https://github.com/mne-cpp/wasm.git
-        cd wasm
-        # Remove all files first
-        git rm * -r
-        git commit --amend -a -m 'Update wasm builds' --allow-empty
-        # Copy wasm files
-        cd ..
-        cp -RT out/wasm/apps wasm
-        cd wasm
-        git add .
-        git commit --amend -a -m 'Update wasm builds'
-        git push -f --all
+      - name: Clone and update mne-cpp/wasm:gh-pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -r out/wasm/apps/mne_analyze_plugins || true
+          rm -r resources/data || true
+          cp -RT resources/design/logos/qtlogo.svg bin/qtlogo.svg
+
+          git config --global user.email christoph.dinh@mne-cpp.org
+          git config --global user.name chdinh
+
+          git clone -b gh-pages --single-branch https://github.com/mne-cpp/wasm.git
+          cd wasm
+
+          git rm -r --ignore-unmatch .
+          git commit --allow-empty -m 'Update wasm builds' || true
+          cd ..
+
+          cp -RT out/wasm/apps wasm
+          cd wasm
+
+          git add -A
+          git commit --allow-empty -m 'Update wasm builds'
+          git push -f origin gh-pages
