@@ -324,12 +324,13 @@ jobs:
         tag: dev_build
         overwrite: true
     - name: Update documentation at Github pages
+      env:
+        GIT_CREDENTIALS: ${{ secrets.GIT_CREDENTIALS }}
       run: |
-        git config --global credential.helper store
         cd doc/doxygen
         git config --global user.email christoph.dinh@mne-cpp.org
         git config --global user.name chdinh
-        git clone -b gh-pages https://github.com/mne-cpp/doxygen-api gh-pages
+        git clone -b gh-pages "https://${GIT_CREDENTIALS}@github.com/mne-cpp/doxygen-api" gh-pages
         cd gh-pages
         # Remove all files first
         git rm * -r
@@ -357,11 +358,13 @@ jobs:
       with:
         credentials: ${{secrets.GIT_CREDENTIALS}}
     - name: Clone doc/gh-pages into gh-pages branch
+      env:
+        GIT_CREDENTIALS: ${{ secrets.GIT_CREDENTIALS }}
       run: |
-        git config --global credential.helper store
         git config --global user.email christoph.dinh@mne-cpp.org
         git config --global user.name chdinh
-        git clone -b main --single-branch https://github.com/mne-cpp/mne-cpp.github.io.git
+        # Clone using credentials embedded in URL
+        git clone -b main --single-branch "https://${GIT_CREDENTIALS}@github.com/mne-cpp/mne-cpp.github.io.git"
         cd mne-cpp.github.io
         # Remove all files first
         git rm * -r
@@ -394,10 +397,11 @@ jobs:
       uses: jurplel/install-qt-action@v3
       with:
         version: '6.10.2'
-        host: 'all_os'
-        target: 'wasm'
+        host: 'linux'
+        target: 'desktop'
         arch: 'wasm_multithread'
         modules: 'qtcharts qt3d qtshadertools'
+        aqtversion: '==3.2.*'
     - name: Setup and build WASM
       run: |
         ./tools/wasm.sh --emsdk 3.1.25
@@ -406,8 +410,9 @@ jobs:
       with:
         credentials: ${{secrets.GIT_CREDENTIALS}}
     - name: Clone and update mne-cpp/wasm:gh-pages
+      env:
+        GIT_CREDENTIALS: ${{ secrets.GIT_CREDENTIALS }}
       run: |
-        git config --global credential.helper store
         # Delete folders which we do not want to ship
         rm -r out/wasm/apps/mne_analyze_plugins
         rm -r resources/data
@@ -416,7 +421,7 @@ jobs:
         # Clone repo and update with new wasm versions
         git config --global user.email christoph.dinh@mne-cpp.org
         git config --global user.name chdinh
-        git clone -b gh-pages --single-branch https://github.com/mne-cpp/wasm.git
+        git clone -b gh-pages --single-branch "https://${GIT_CREDENTIALS}@github.com/mne-cpp/wasm.git"
         cd wasm
         # Remove all files first
         git rm * -r
