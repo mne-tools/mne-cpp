@@ -215,7 +215,7 @@ jobs:
     - name: Configure and compile MNE-CPP (Linux)
       if: matrix.os == 'ubuntu-24.04'
       run: |
-        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DWITH_CODE_COV=ON
         cmake --build build
     - name: Configure and compile MNE-CPP (MacOS)
       if: matrix.os == 'macos-26'
