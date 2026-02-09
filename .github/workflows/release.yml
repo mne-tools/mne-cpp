@@ -153,13 +153,29 @@ jobs:
       run: |
         git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
         git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
-    - name: Download static Qt binaries
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Install dependencies
       run: |
-        gh release download qt_binaries -p "qt6_6102_static_binaries_linux.tar.gz" -R ${{ github.repository }}
-        mkdir -p ../Qt6_static
-        tar xfz qt6_6102_static_binaries_linux.tar.gz -C ../Qt6_static --strip-components=1
+        sudo apt-get update -q
+        sudo apt-get install -q build-essential libgl1-mesa-dev libvulkan-dev ninja-build
+    - name: Cache static Qt binaries
+      id: cache-qt-static
+      uses: actions/cache@v4
+      with:
+        path: ../Qt6_static
+        key: qt-6.10.2-static-linux-x86_64
+    - name: Build static Qt from source
+      if: steps.cache-qt-static.outputs.cache-hit != 'true'
+      run: |
+        cd ..
+        git clone https://code.qt.io/qt/qt5.git -b v6.10.2
+        cd qt5
+        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d,qtshadertools
+        cd ..
+        mkdir qt6_shadow
+        cd qt6_shadow
+        ../qt5/configure -static -release -prefix "$GITHUB_WORKSPACE/../Qt6_static" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -qt-libpng -qt-pcre -- -DCMAKE_BUILD_TYPE=Release
+        cmake --build . --parallel $(nproc)
+        cmake --install .
     - name: Compile BrainFlow submodule
       run: |
         cd src/applications/mne_scan/plugins/brainflowboard/brainflow
@@ -176,7 +192,7 @@ jobs:
         cmake --build .
     - name: Configure and compile MNE-CPP (static)
       run: |
-        export CMAKE_PREFIX_PATH=$(pwd)/../Qt6_static
+        export CMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/../Qt6_static
         ./tools/build_project.bat static
     - name: Deploy binaries
       run: |
@@ -294,13 +310,28 @@ jobs:
       run: |
         git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
         git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
-    - name: Download static Qt binaries
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Install dependencies
       run: |
-        gh release download qt_binaries -p "qt6_6102_static_binaries_macos.tar.gz" -R ${{ github.repository }}
-        mkdir -p ../Qt6_static
-        tar xfz qt6_6102_static_binaries_macos.tar.gz -C ../Qt6_static --strip-components=1
+        brew install ninja
+    - name: Cache static Qt binaries
+      id: cache-qt-static
+      uses: actions/cache@v4
+      with:
+        path: ../Qt6_static
+        key: qt-6.10.2-static-macos-arm64
+    - name: Build static Qt from source
+      if: steps.cache-qt-static.outputs.cache-hit != 'true'
+      run: |
+        cd ..
+        git clone https://code.qt.io/qt/qt5.git -b v6.10.2
+        cd qt5
+        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d,qtshadertools
+        cd ..
+        mkdir qt6_shadow
+        cd qt6_shadow
+        ../qt5/configure -static -release -prefix "$GITHUB_WORKSPACE/../Qt6_static" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -- -DCMAKE_BUILD_TYPE=Release
+        cmake --build . --parallel $(sysctl -n hw.ncpu)
+        cmake --install .
     - name: Compile BrainFlow submodule
       run: |
         cd src/applications/mne_scan/plugins/brainflowboard/brainflow
@@ -317,7 +348,7 @@ jobs:
         cmake --build .
     - name: Configure and compile MNE-CPP (static)
       run: |
-        export CMAKE_PREFIX_PATH=$(pwd)/../Qt6_static
+        export CMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/../Qt6_static
         ./tools/build_project.bat static
     - name: Deploy binaries (MacOS)
       run: |
@@ -441,12 +472,30 @@ jobs:
       run: |
         git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
         git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
-    - name: Download static Qt binaries
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Install ninja
       run: |
-        gh release download qt_binaries -p "qt6_6102_static_binaries_win.zip" -R ${{ github.repository }}
-        7z x qt6_6102_static_binaries_win.zip -o"$env:GITHUB_WORKSPACE\..\Qt6_static"
+        choco install ninja
+    - name: Cache static Qt binaries
+      id: cache-qt-static
+      uses: actions/cache@v4
+      with:
+        path: ..\Qt6_static
+        key: qt-6.10.2-static-windows-x86_64
+    - name: Build static Qt from source
+      if: steps.cache-qt-static.outputs.cache-hit != 'true'
+      run: |
+        cd ..
+        git clone https://code.qt.io/qt/qt5.git -b v6.10.2
+        cd qt5
+        perl init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d,qtshadertools
+        cd ..
+        mkdir qt6_shadow
+        cd qt6_shadow
+        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        ..\qt5\configure.bat -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "$env:GITHUB_WORKSPACE\..\Qt6_static" -skip webengine -nomake tools -nomake tests -nomake examples -opensource -confirm-license
+        cmake --build . --parallel $env:NUMBER_OF_PROCESSORS
+        cmake --install .
     - name: Compile BrainFlow submodule
       run: |
         $path = "src\applications\mne_scan\plugins\brainflowboard\brainflow\src\board_controller\muse\muse_bglib\muse_bglib_helper.cpp"
@@ -468,7 +517,7 @@ jobs:
       run: |
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        $env:CMAKE_PREFIX_PATH = "$env:GITHUB_WORKSPACE\..\Qt6_static\Qt6_binaries"
+        $env:CMAKE_PREFIX_PATH = "$env:GITHUB_WORKSPACE\..\Qt6_static"
         ./tools/build_project.bat static
     - name: Deploy binaries (Windows)
       run: |
