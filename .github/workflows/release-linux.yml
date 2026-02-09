@@ -1,0 +1,171 @@
+name: Release Linux
+
+on:
+  workflow_call:
+
+jobs:
+  LinuxDynamic:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v3
+    - name: Install Python 3.10 version
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        architecture: 'x64'
+    - name: Install BrainFlow and LSL submodules
+      run: |
+        git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
+        git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: 6.10.2
+        modules: qtcharts qt3d qtshadertools
+    - name: Install Qt Installer Framework
+      run: |
+        pip install aqtinstall
+        aqt install-tool linux desktop tools_ifw qt.tools.ifw.47 --outputdir $RUNNER_TOOL_CACHE/Qt
+        echo "$RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/4.7/bin" >> $GITHUB_PATH
+    - name: Compile BrainFlow submodule
+      run: |
+        cd src/applications/mne_scan/plugins/brainflowboard/brainflow
+        mkdir build
+        cd build
+        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" ..
+        cmake --build .
+    - name: Compile LSL submodule
+      run: |
+        cd src/applications/mne_scan/plugins/lsladapter/liblsl
+        mkdir build
+        cd build
+        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" ..
+        cmake --build .
+    - name: Configure and compile MNE-CPP
+      run: |
+        ./tools/build_project.bat
+    - name: Deploy binaries
+      run: |
+        ./tools/deploy.bat dynamic pack
+    - name: Deploy binaries with stable release on Github
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-linux-dynamic-x86_64.tar.gz
+        asset_name: mne-cpp-${{ github.ref_name }}-linux-dynamic-x86_64.tar.gz
+        tag: ${{ github.ref }}
+        overwrite: true
+    - name: Deploy binaries with dev release on Github
+      if: endsWith(github.ref, 'v2.0-dev') == true
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-linux-dynamic-x86_64.tar.gz
+        asset_name: mne-cpp-v2.0-dev-linux-dynamic-x86_64.tar.gz
+        tag: dev_build
+        overwrite: true
+    # Build installer reusing the same environment (saves full rebuild)
+    - name: Build installer
+      run: |
+        ./tools/build_installer.sh
+    - name: Deploy installer with stable release on Github
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: build_installer/MNE-CPP-*-Linux.run
+        file_glob: true
+        asset_name: mne-cpp-${{ github.ref_name }}-linux-installer-x86_64.run
+        tag: ${{ github.ref }}
+        overwrite: true
+    - name: Deploy installer with dev release on Github
+      if: endsWith(github.ref, 'v2.0-dev') == true
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: build_installer/MNE-CPP-*-Linux.run
+        file_glob: true
+        asset_name: mne-cpp-v2.0-dev-linux-installer-x86_64.run
+        tag: dev_build
+        overwrite: true
+
+  LinuxStatic:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v3
+    - name: Install Python 3.10 version
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        architecture: 'x64'
+    - name: Install BrainFlow and LSL submodules
+      run: |
+        git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
+        git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -q
+        sudo apt-get install -q build-essential libgl1-mesa-dev libvulkan-dev ninja-build
+    - name: Cache static Qt binaries
+      id: cache-qt-static
+      uses: actions/cache@v4
+      with:
+        path: ../Qt6_static
+        key: qt-6.10.2-static-linux-x86_64
+    - name: Build static Qt from source
+      if: steps.cache-qt-static.outputs.cache-hit != 'true'
+      run: |
+        cd ..
+        git clone https://code.qt.io/qt/qt5.git -b v6.10.2
+        cd qt5
+        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d,qtshadertools
+        cd ..
+        mkdir qt6_shadow
+        cd qt6_shadow
+        ../qt5/configure -static -release -prefix "$GITHUB_WORKSPACE/../Qt6_static" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -qt-libpng -qt-pcre -- -DCMAKE_BUILD_TYPE=Release
+        cmake --build . --parallel $(nproc)
+        cmake --install .
+    - name: Compile BrainFlow submodule
+      run: |
+        cd src/applications/mne_scan/plugins/brainflowboard/brainflow
+        mkdir build
+        cd build
+        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" ..
+        cmake --build .
+    - name: Compile LSL submodule
+      run: |
+        cd src/applications/mne_scan/plugins/lsladapter/liblsl
+        mkdir build
+        cd build
+        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" ..
+        cmake --build .
+    - name: Configure and compile MNE-CPP (static)
+      run: |
+        export CMAKE_PREFIX_PATH=$GITHUB_WORKSPACE/../Qt6_static
+        ./tools/build_project.bat static
+    - name: Deploy binaries
+      run: |
+        ./tools/deploy.bat static pack
+    - name: Deploy binaries with stable release on Github
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-linux-static-x86_64.tar.gz
+        asset_name: mne-cpp-${{ github.ref_name }}-linux-static-x86_64.tar.gz
+        tag: ${{ github.ref }}
+        overwrite: true
+    - name: Deploy binaries with dev release on Github
+      if: endsWith(github.ref, 'v2.0-dev') == true
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-linux-static-x86_64.tar.gz
+        asset_name: mne-cpp-v2.0-dev-linux-static-x86_64.tar.gz
+        tag: dev_build
+        overwrite: true

@@ -1,0 +1,183 @@
+name: Release Windows
+
+on:
+  workflow_call:
+
+jobs:
+  WinDynamic:
+    runs-on: windows-2025
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v3
+    - name: Install Python 3.10 version
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        architecture: 'x64'
+    - name: Install BrainFlow and LSL submodules
+      run: |
+        git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
+        git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
+    - name: Install Qt
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: 6.10.2
+        arch: win64_msvc2022_64
+        modules: qtcharts qt3d qtshadertools
+    - name: Install Qt Installer Framework
+      run: |
+        pip install aqtinstall
+        aqt install-tool windows desktop tools_ifw qt.tools.ifw.47 --outputdir $env:RUNNER_TOOL_CACHE/Qt
+        echo "$env:RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/4.7/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+    - name: Compile BrainFlow submodule
+      run: |
+        $path = "src\applications\mne_scan\plugins\brainflowboard\brainflow\src\board_controller\muse\muse_bglib\muse_bglib_helper.cpp"
+        $txt = "#include <chrono>`r`n" + [System.IO.File]::ReadAllText($path)
+        [System.IO.File]::WriteAllText($path, $txt)
+        cd src\applications\mne_scan\plugins\brainflowboard\brainflow
+        mkdir build
+        cd build
+        cmake -G "Visual Studio 17 2022" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=10.0 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
+        cmake --build . --target install --config Release
+    - name: Compile LSL submodule
+      run: |
+        cd src\applications\mne_scan\plugins\lsladapter\liblsl
+        mkdir build
+        cd build
+        cmake .. -G "Visual Studio 17 2022" -A x64
+        cmake --build . --config Release --target install
+    - name: Configure and compile MNE-CPP
+      run: |
+        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        ./tools/build_project.bat
+    - name: Deploy binaries (Windows)
+      run: |
+        ./tools/deploy.bat dynamic pack
+    - name: Deploy binaries with stable release on Github
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-windows-dynamic-x86_64.zip
+        asset_name: mne-cpp-${{ github.ref_name }}-windows-dynamic-x86_64.zip
+        tag: ${{ github.ref }}
+        overwrite: true
+    - name: Deploy binaries with dev release on Github
+      if: endsWith(github.ref, 'v2.0-dev') == true
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-windows-dynamic-x86_64.zip
+        asset_name: mne-cpp-v2.0-dev-windows-dynamic-x86_64.zip
+        tag: dev_build
+        overwrite: true
+    # Build installer reusing the same environment (saves full rebuild)
+    - name: Build installer
+      run: |
+        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        cmake -S src -B build_installer -DMNE_ENABLE_INSTALLER=ON -DCMAKE_BUILD_TYPE=Release
+        cmake --build build_installer --target package
+    - name: Deploy installer with stable release on Github
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: build_installer/MNE-CPP-*-win64.exe
+        file_glob: true
+        asset_name: mne-cpp-${{ github.ref_name }}-windows-installer-x86_64.exe
+        tag: ${{ github.ref }}
+        overwrite: true
+    - name: Deploy installer with dev release on Github
+      if: endsWith(github.ref, 'v2.0-dev') == true
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: build_installer/MNE-CPP-*-win64.exe
+        file_glob: true
+        asset_name: mne-cpp-v2.0-dev-windows-installer-x86_64.exe
+        tag: dev_build
+        overwrite: true
+
+  WinStatic:
+    runs-on: windows-2025
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v3
+    - name: Install Python 3.10 version
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        architecture: 'x64'
+    - name: Install BrainFlow and LSL submodules
+      run: |
+        git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
+        git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
+    - name: Install ninja
+      run: |
+        choco install ninja
+    - name: Cache static Qt binaries
+      id: cache-qt-static
+      uses: actions/cache@v4
+      with:
+        path: ..\Qt6_static
+        key: qt-6.10.2-static-windows-x86_64
+    - name: Build static Qt from source
+      if: steps.cache-qt-static.outputs.cache-hit != 'true'
+      run: |
+        cd ..
+        git clone https://code.qt.io/qt/qt5.git -b v6.10.2
+        mkdir qt6_shadow
+        cd qt6_shadow
+        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        ..\qt5\configure.bat -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "$env:GITHUB_WORKSPACE\..\Qt6_static" -skip webengine -nomake tools -nomake tests -nomake examples -opensource -confirm-license -init-submodules -submodules qtbase,qtcharts,qtsvg,qt3d,qtshadertools
+        cmake --build . --parallel $env:NUMBER_OF_PROCESSORS
+        cmake --install .
+    - name: Compile BrainFlow submodule
+      run: |
+        $path = "src\applications\mne_scan\plugins\brainflowboard\brainflow\src\board_controller\muse\muse_bglib\muse_bglib_helper.cpp"
+        $txt = "#include <chrono>`r`n" + [System.IO.File]::ReadAllText($path)
+        [System.IO.File]::WriteAllText($path, $txt)
+        cd src\applications\mne_scan\plugins\brainflowboard\brainflow
+        mkdir build
+        cd build
+        cmake -G "Visual Studio 17 2022" -A x64 -DMSVC_RUNTIME=static -DCMAKE_SYSTEM_VERSION=10.0 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
+        cmake --build . --target install --config Release
+    - name: Compile LSL submodule
+      run: |
+        cd src\applications\mne_scan\plugins\lsladapter\liblsl
+        mkdir build
+        cd build
+        cmake .. -G "Visual Studio 17 2022" -A x64
+        cmake --build . --config Release --target install
+    - name: Configure and compile MNE-CPP (static)
+      run: |
+        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        $env:CMAKE_PREFIX_PATH = "$env:GITHUB_WORKSPACE\..\Qt6_static"
+        ./tools/build_project.bat static
+    - name: Deploy binaries (Windows)
+      run: |
+        ./tools/deploy.bat static pack
+    - name: Deploy binaries with stable release on Github
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-windows-static-x86_64.zip
+        asset_name: mne-cpp-${{ github.ref_name }}-windows-static-x86_64.zip
+        tag: ${{ github.ref }}
+        overwrite: true
+    - name: Deploy binaries with dev release on Github
+      if: endsWith(github.ref, 'v2.0-dev') == true
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        file: mne-cpp-windows-static-x86_64.zip
+        asset_name: mne-cpp-v2.0-dev-windows-static-x86_64.zip
+        tag: dev_build
+        overwrite: true
