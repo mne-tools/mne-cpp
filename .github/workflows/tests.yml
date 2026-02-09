@@ -1,4 +1,4 @@
-name: TestCI
+name: Tests
 
 on:
   push:

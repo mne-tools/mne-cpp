@@ -5,6 +5,9 @@
 <a href="https://github.com/mne-tools/mne-cpp/actions/workflows/release.yml" target="_blank">
     <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/release.yml/badge.svg" alt="Release">
 </a>
+<a href="https://github.com/mne-tools/mne-cpp/actions/workflows/tests.yml" target="_blank">
+    <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/tests.yml/badge.svg" alt="Tests">
+</a>
 <a href="https://codecov.io/gh/mne-tools/mne-cpp" target="_blank">
     <img src="https://codecov.io/gh/mne-tools/mne-cpp/branch/main/graph/badge.svg" alt="CodeCov">
 </a>
