@@ -17,3 +17,19 @@ float SensorTreeItem::scale() const
 {
     return m_scale;
 }
+
+void SensorTreeItem::setOrientation(const QMatrix4x4 &orient)
+{
+    m_orientation = orient;
+    m_hasOrientation = true;
+}
+
+const QMatrix4x4& SensorTreeItem::orientation() const
+{
+    return m_orientation;
+}
+
+bool SensorTreeItem::hasOrientation() const
+{
+    return m_hasOrientation;
+}

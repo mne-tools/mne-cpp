@@ -322,67 +322,125 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
             
             std::shared_ptr<BrainSurface> brainSurf;
             
-            // ... (keep generators) ...
-            auto createCube = [](const QVector3D &pos, const QColor &color, float size) {
+            // Oriented flat plate for MEG sensors (10x10x1mm cuboid with coil_trans rotation)
+            auto createOrientedPlate = [](const QVector3D &pos, const QMatrix4x4 &orient, const QColor &color, float size) {
                 auto surf = std::make_shared<BrainSurface>();
-                float s = size / 2.0f;
-                // 6 faces * 4 verts = 24 vertices
-                Eigen::MatrixX3f rr(24, 3); Eigen::MatrixX3f nn(24, 3);
-                // Front
-                rr.row(0) << -s, -s, s; nn.row(0) << 0, 0, 1; rr.row(1) << s, -s, s;  nn.row(1) << 0, 0, 1;
-                rr.row(2) << s, s, s;   nn.row(2) << 0, 0, 1; rr.row(3) << -s, s, s;  nn.row(3) << 0, 0, 1;
-                // Back
-                rr.row(4) << s, -s, -s;   nn.row(4) << 0, 0, -1; rr.row(5) << -s, -s, -s;  nn.row(5) << 0, 0, -1;
-                rr.row(6) << -s, s, -s;   nn.row(6) << 0, 0, -1; rr.row(7) << s, s, -s;    nn.row(7) << 0, 0, -1;
-                // Top
-                rr.row(8) << -s, s, s;    nn.row(8) << 0, 1, 0;  rr.row(9) << s, s, s;     nn.row(9) << 0, 1, 0;
-                rr.row(10) << s, s, -s;   nn.row(10) << 0, 1, 0; rr.row(11) << -s, s, -s;  nn.row(11) << 0, 1, 0;
-                // Bottom
-                rr.row(12) << -s, -s, -s; nn.row(12) << 0, -1, 0; rr.row(13) << s, -s, -s;  nn.row(13) << 0, -1, 0;
-                rr.row(14) << s, -s, s;   nn.row(14) << 0, -1, 0; rr.row(15) << -s, -s, s;  nn.row(15) << 0, -1, 0;
-                // Right
-                rr.row(16) << s, -s, s;   nn.row(16) << 1, 0, 0;  rr.row(17) << s, -s, -s;  nn.row(17) << 1, 0, 0;
-                rr.row(18) << s, s, -s;   nn.row(18) << 1, 0, 0;  rr.row(19) << s, s, s;    nn.row(19) << 1, 0, 0;
-                // Left
-                rr.row(20) << -s, -s, -s; nn.row(20) << -1, 0, 0; rr.row(21) << -s, -s, s;  nn.row(21) << -1, 0, 0;
-                rr.row(22) << -s, s, s;   nn.row(22) << -1, 0, 0; rr.row(23) << -s, s, -s;  nn.row(23) << -1, 0, 0;
+                float hw = size / 2.0f;      // half-width  (5mm)
+                float hh = size / 2.0f;      // half-height (5mm)
+                float hd = size * 0.05f;     // half-depth  (0.5mm) — thin plate
 
-                for (int i = 0; i < 24; ++i) { rr(i, 0) += pos.x(); rr(i, 1) += pos.y(); rr(i, 2) += pos.z(); }
+                // 8 corners in local space, then rotated by coil orientation
+                Eigen::Vector3f corners[8] = {
+                    {-hw, -hh, -hd}, { hw, -hh, -hd}, { hw,  hh, -hd}, {-hw,  hh, -hd},  // back
+                    {-hw, -hh,  hd}, { hw, -hh,  hd}, { hw,  hh,  hd}, {-hw,  hh,  hd}   // front
+                };
+
+                // Extract 3x3 rotation from orientation
+                Eigen::Matrix3f rot;
+                for (int r = 0; r < 3; ++r)
+                    for (int c = 0; c < 3; ++c)
+                        rot(r, c) = orient(r, c);
+
+                for (auto &c : corners) c = rot * c;
+
+                // 6 faces, 4 verts each = 24 verts
+                Eigen::MatrixX3f rr(24, 3), nn(24, 3);
                 Eigen::MatrixX3i tris(12, 3);
+
+                // Face definitions: {v0,v1,v2,v3}, normal direction
+                int faces[6][4] = {
+                    {4,5,6,7}, {1,0,3,2},  // front(+Z), back(-Z)
+                    {3,7,6,2}, {0,1,5,4},  // top(+Y), bottom(-Y)
+                    {1,2,6,5}, {0,4,7,3}   // right(+X), left(-X)
+                };
+
                 for (int f = 0; f < 6; ++f) {
-                    int base = f * 4; tris.row(f * 2) << base, base + 1, base + 2; tris.row(f * 2 + 1) << base, base + 2, base + 3;
+                    Eigen::Vector3f v0 = corners[faces[f][0]];
+                    Eigen::Vector3f v1 = corners[faces[f][1]];
+                    Eigen::Vector3f v2 = corners[faces[f][2]];
+                    Eigen::Vector3f fn = (v1 - v0).cross(v2 - v0).normalized();
+                    int base = f * 4;
+                    for (int k = 0; k < 4; ++k) {
+                        Eigen::Vector3f v = corners[faces[f][k]];
+                        rr.row(base + k) << v.x() + pos.x(), v.y() + pos.y(), v.z() + pos.z();
+                        nn.row(base + k) = fn;
+                    }
+                    tris.row(f * 2)     << base, base + 1, base + 2;
+                    tris.row(f * 2 + 1) << base, base + 2, base + 3;
                 }
+
                 surf->createFromData(rr, nn, tris, color);
                 return surf;
             };
 
-            auto createIcosahedron = [](const QVector3D &pos, const QColor &color, float radius) {
+            // Smooth sphere (subdivided icosahedron) for EEG and digitizer points
+            auto createSphere = [](const QVector3D &pos, const QColor &color, float radius) {
                 auto surf = std::make_shared<BrainSurface>();
-                float t = (1.0f + std::sqrt(5.0f)) / 2.0f;
-                Eigen::MatrixX3f rr(12, 3);
-                rr << -1, t, 0, 1, t, 0, -1, -t, 0, 1, -t, 0, 0, -1, t, 0, 1, t, 0, -1, -t, 0, 1, -t, t, 0, -1, t, 0, 1, -t, 0, -1, -t, 0, 1;
-                Eigen::MatrixX3f nn(12, 3);
-                for (int i = 0; i < 12; ++i) {
-                    QVector3D v(rr(i, 0), rr(i, 1), rr(i, 2)); v.normalize(); nn(i, 0) = v.x(); nn(i, 1) = v.y(); nn(i, 2) = v.z();
-                    rr(i, 0) = v.x() * radius + pos.x(); rr(i, 1) = v.y() * radius + pos.y(); rr(i, 2) = v.z() * radius + pos.z();
+                const float phi = (1.0f + std::sqrt(5.0f)) / 2.0f;
+                QVector<Eigen::Vector3f> verts;
+                verts.reserve(42);
+                verts << Eigen::Vector3f(-1, phi, 0) << Eigen::Vector3f( 1, phi, 0)
+                      << Eigen::Vector3f(-1,-phi, 0) << Eigen::Vector3f( 1,-phi, 0)
+                      << Eigen::Vector3f( 0,-1, phi) << Eigen::Vector3f( 0, 1, phi)
+                      << Eigen::Vector3f( 0,-1,-phi) << Eigen::Vector3f( 0, 1,-phi)
+                      << Eigen::Vector3f( phi, 0,-1) << Eigen::Vector3f( phi, 0, 1)
+                      << Eigen::Vector3f(-phi, 0,-1) << Eigen::Vector3f(-phi, 0, 1);
+                for (auto &v : verts) v.normalize();
+
+                QVector<Eigen::Vector3i> faces;
+                faces << Eigen::Vector3i(0,11,5)  << Eigen::Vector3i(0,5,1)
+                      << Eigen::Vector3i(0,1,7)   << Eigen::Vector3i(0,7,10)
+                      << Eigen::Vector3i(0,10,11) << Eigen::Vector3i(1,5,9)
+                      << Eigen::Vector3i(5,11,4)  << Eigen::Vector3i(11,10,2)
+                      << Eigen::Vector3i(10,7,6)  << Eigen::Vector3i(7,1,8)
+                      << Eigen::Vector3i(3,9,4)   << Eigen::Vector3i(3,4,2)
+                      << Eigen::Vector3i(3,2,6)   << Eigen::Vector3i(3,6,8)
+                      << Eigen::Vector3i(3,8,9)   << Eigen::Vector3i(4,9,5)
+                      << Eigen::Vector3i(2,4,11)  << Eigen::Vector3i(6,2,10)
+                      << Eigen::Vector3i(8,6,7)   << Eigen::Vector3i(9,8,1);
+
+                // Subdivide once for smoothness (42 verts, 80 tris)
+                QMap<QPair<int,int>, int> cache;
+                auto mid = [&](int a, int b) -> int {
+                    auto key = qMakePair(qMin(a,b), qMax(a,b));
+                    if (cache.contains(key)) return cache[key];
+                    int idx = verts.size();
+                    verts.append((verts[a] + verts[b]).normalized());
+                    cache[key] = idx;
+                    return idx;
+                };
+                QVector<Eigen::Vector3i> newFaces;
+                newFaces.reserve(80);
+                for (const auto &f : faces) {
+                    int ab = mid(f(0), f(1)), bc = mid(f(1), f(2)), ca = mid(f(2), f(0));
+                    newFaces << Eigen::Vector3i(f(0), ab, ca) << Eigen::Vector3i(f(1), bc, ab)
+                             << Eigen::Vector3i(f(2), ca, bc) << Eigen::Vector3i(ab, bc, ca);
                 }
-                Eigen::MatrixX3i tris(20, 3);
-                tris << 0, 11, 5, 0, 5, 1, 0, 1, 7, 0, 7, 10, 0, 10, 11, 1, 5, 9, 5, 11, 4, 11, 10, 2, 10, 7, 6, 7, 1, 8, 3, 9, 4, 3, 4, 2, 3, 2, 6, 3, 6, 8, 3, 8, 9, 4, 9, 5, 2, 4, 11, 6, 2, 10, 8, 6, 7, 9, 8, 1;
+
+                int nV = verts.size(), nT = newFaces.size();
+                Eigen::MatrixX3f rr(nV, 3), nn(nV, 3);
+                for (int i = 0; i < nV; ++i) {
+                    nn(i, 0) = verts[i].x(); nn(i, 1) = verts[i].y(); nn(i, 2) = verts[i].z();
+                    rr(i, 0) = verts[i].x() * radius + pos.x();
+                    rr(i, 1) = verts[i].y() * radius + pos.y();
+                    rr(i, 2) = verts[i].z() * radius + pos.z();
+                }
+                Eigen::MatrixX3i tris(nT, 3);
+                for (int i = 0; i < nT; ++i) tris.row(i) = newFaces[i];
+
                 surf->createFromData(rr, nn, tris, color);
                 return surf;
             };
             
             QString parentText = "";
             if (sensItem->parent()) parentText = sensItem->parent()->text();
-            
 
-            
-            if (parentText.contains("MEG")) {
-                 brainSurf = createCube(sensItem->position(), sensItem->color(), sensItem->scale());
-            } else if (parentText.contains("EEG")) {
-                 brainSurf = createIcosahedron(sensItem->position(), sensItem->color(), sensItem->scale());
+            if (parentText.contains("MEG") && sensItem->hasOrientation()) {
+                 brainSurf = createOrientedPlate(sensItem->position(), sensItem->orientation(),
+                                                  sensItem->color(), sensItem->scale());
             } else {
-                 brainSurf = createIcosahedron(sensItem->position(), sensItem->color(), sensItem->scale());
+                 // EEG and Digitizer: smooth spheres
+                 brainSurf = createSphere(sensItem->position(), sensItem->color(), sensItem->scale());
             }
             
             brainSurf->setVisible(sensItem->isVisible());
@@ -430,29 +488,78 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
             const QColor color = srcItem->color();
             const int nPts = positions.size();
 
-            // Tiny octahedron template (6 verts, 8 tris) — looks like a small dot
-            const int nVPerPt = 6;
-            const int nTPerPt = 8;
-            Eigen::MatrixX3f templateV(6, 3);
-            templateV <<  r, 0, 0,
-                         -r, 0, 0,
-                          0, r, 0,
-                          0,-r, 0,
-                          0, 0, r,
-                          0, 0,-r;
-            // Smooth normals (point outward from center = same as vertex position normalized)
-            Eigen::MatrixX3f templateN(6, 3);
-            templateN <<  1, 0, 0,
-                         -1, 0, 0,
-                          0, 1, 0,
-                          0,-1, 0,
-                          0, 0, 1,
-                          0, 0,-1;
-            Eigen::MatrixX3i templateT(8, 3);
-            templateT << 0,2,4, 2,1,4, 1,3,4, 3,0,4,
-                         2,0,5, 1,2,5, 3,1,5, 0,3,5;
+            // Build template: subdivided icosahedron for smooth sphere look (matches disp3D)
+            // Start with base icosahedron (12 verts, 20 tris)
+            const float phi = (1.0f + std::sqrt(5.0f)) / 2.0f;
+            QVector<Eigen::Vector3f> icoV;
+            icoV.reserve(42);
+            icoV << Eigen::Vector3f(-1, phi, 0) << Eigen::Vector3f( 1, phi, 0)
+                 << Eigen::Vector3f(-1,-phi, 0) << Eigen::Vector3f( 1,-phi, 0)
+                 << Eigen::Vector3f( 0,-1, phi) << Eigen::Vector3f( 0, 1, phi)
+                 << Eigen::Vector3f( 0,-1,-phi) << Eigen::Vector3f( 0, 1,-phi)
+                 << Eigen::Vector3f( phi, 0,-1) << Eigen::Vector3f( phi, 0, 1)
+                 << Eigen::Vector3f(-phi, 0,-1) << Eigen::Vector3f(-phi, 0, 1);
+            for (auto& v : icoV) v.normalize();
 
-            // Merge all dots into a single mesh
+            QVector<Eigen::Vector3i> icoT;
+            icoT.reserve(80);
+            icoT << Eigen::Vector3i(0,11,5)  << Eigen::Vector3i(0,5,1)
+                 << Eigen::Vector3i(0,1,7)   << Eigen::Vector3i(0,7,10)
+                 << Eigen::Vector3i(0,10,11) << Eigen::Vector3i(1,5,9)
+                 << Eigen::Vector3i(5,11,4)  << Eigen::Vector3i(11,10,2)
+                 << Eigen::Vector3i(10,7,6)  << Eigen::Vector3i(7,1,8)
+                 << Eigen::Vector3i(3,9,4)   << Eigen::Vector3i(3,4,2)
+                 << Eigen::Vector3i(3,2,6)   << Eigen::Vector3i(3,6,8)
+                 << Eigen::Vector3i(3,8,9)   << Eigen::Vector3i(4,9,5)
+                 << Eigen::Vector3i(2,4,11)  << Eigen::Vector3i(6,2,10)
+                 << Eigen::Vector3i(8,6,7)   << Eigen::Vector3i(9,8,1);
+
+            // Subdivide once: split each triangle edge at midpoint → 42 verts, 80 tris
+            QMap<QPair<int,int>, int> midpointCache;
+            auto getMidpoint = [&](int a, int b) -> int {
+                auto key = qMakePair(qMin(a,b), qMax(a,b));
+                if (midpointCache.contains(key)) return midpointCache[key];
+                Eigen::Vector3f mid = (icoV[a] + icoV[b]).normalized();
+                int idx = icoV.size();
+                icoV.append(mid);
+                midpointCache[key] = idx;
+                return idx;
+            };
+
+            QVector<Eigen::Vector3i> newTris;
+            newTris.reserve(80);
+            for (const auto& tri : icoT) {
+                int a = getMidpoint(tri(0), tri(1));
+                int b = getMidpoint(tri(1), tri(2));
+                int c = getMidpoint(tri(2), tri(0));
+                newTris << Eigen::Vector3i(tri(0), a, c)
+                        << Eigen::Vector3i(tri(1), b, a)
+                        << Eigen::Vector3i(tri(2), c, b)
+                        << Eigen::Vector3i(a, b, c);
+            }
+
+            const int nVPerPt = icoV.size();   // 42
+            const int nTPerPt = newTris.size(); // 80
+
+            // Build template arrays scaled to radius
+            Eigen::MatrixX3f templateV(nVPerPt, 3);
+            Eigen::MatrixX3f templateN(nVPerPt, 3);
+            for (int iv = 0; iv < nVPerPt; ++iv) {
+                templateN(iv, 0) = icoV[iv].x();
+                templateN(iv, 1) = icoV[iv].y();
+                templateN(iv, 2) = icoV[iv].z();
+                templateV(iv, 0) = icoV[iv].x() * r;
+                templateV(iv, 1) = icoV[iv].y() * r;
+                templateV(iv, 2) = icoV[iv].z() * r;
+            }
+            Eigen::MatrixX3i templateT(nTPerPt, 3);
+            for (int it = 0; it < nTPerPt; ++it) {
+                templateT(it, 0) = newTris[it](0);
+                templateT(it, 1) = newTris[it](1);
+                templateT(it, 2) = newTris[it](2);
+            }
+
+            // Merge all spheres into a single mesh
             Eigen::MatrixX3f allVerts(nPts * nVPerPt, 3);
             Eigen::MatrixX3f allNorms(nPts * nVPerPt, 3);
             Eigen::MatrixX3i allTris(nPts * nTPerPt, 3);
@@ -1211,10 +1318,29 @@ bool BrainView::loadSensors(const QString &fifPath) {
                   pos = devHeadQTrans.map(pos);
               }
 
-              megItems.append(new SensorTreeItem(ch.ch_name, pos, QColor(255, 215, 0), 0.012f));
+              // disp3D style: gray, 10mm flat plate
+              auto *item = new SensorTreeItem(ch.ch_name, pos, QColor(100, 100, 100), 0.01f);
+
+              // Store coil orientation (ex, ey, ez columns from coil_trans)
+              QMatrix4x4 orient;
+              for (int r = 0; r < 3; ++r)
+                  for (int c = 0; c < 3; ++c)
+                      orient(r, c) = ch.coil_trans(r, c);
+              // If transforming MEG to head space, also rotate the orientation
+              if (hasDevHead) {
+                  QMatrix4x4 devHeadRot;
+                  for (int r = 0; r < 3; ++r)
+                      for (int c = 0; c < 3; ++c)
+                          devHeadRot(r, c) = devHeadQTrans(r, c);
+                  orient = devHeadRot * orient;
+              }
+              item->setOrientation(orient);
+
+              megItems.append(item);
           } else if (ch.kind == FIFFV_EEG_CH) {
               QVector3D pos(ch.chpos.r0(0), ch.chpos.r0(1), ch.chpos.r0(2));
-              eegItems.append(new SensorTreeItem(ch.ch_name, pos, QColor(0, 255, 255), 0.008f));
+              // EEG: cyan spheres, 2mm radius
+              eegItems.append(new SensorTreeItem(ch.ch_name, pos, QColor(0, 200, 220), 0.002f));
           }
       }
       
@@ -1225,33 +1351,53 @@ bool BrainView::loadSensors(const QString &fifPath) {
   // Try to load digitizers if available in info
   QList<QStandardItem*> digItems;
   if (hasInfo && info.dig.size() > 0) {
+      int hpiCount = 0, eegCount = 0, extraCount = 0;
       for (const auto &p : info.dig) {
         QVector3D pos(p.r[0], p.r[1], p.r[2]);
-        QColor col(192, 192, 192);
-        float size = 0.005f;
+        QColor col(255, 0, 255);  // Default: magenta (extra/head shape points)
+        float size = 0.001f;       // Default: 1mm
+        QString name;
         
-        if (p.kind == FIFFV_POINT_CARDINAL) { col = QColor(255, 0, 0); size = 0.01f; }
-        else if (p.kind == FIFFV_POINT_HPI) { col = QColor(255, 165, 0); size = 0.008f; }
-        else if (p.kind == FIFFV_POINT_EEG) { col = QColor(0, 255, 255); size = 0.008f; }
+        if (p.kind == FIFFV_POINT_CARDINAL) {
+            size = 0.002f;  // 2mm for cardinal points
+            if (p.ident == FIFFV_POINT_NASION)       { col = QColor(0, 255, 0); name = "Nasion"; }
+            else if (p.ident == FIFFV_POINT_LPA)     { col = QColor(255, 0, 0); name = "LPA"; }
+            else if (p.ident == FIFFV_POINT_RPA)     { col = QColor(0, 0, 255); name = "RPA"; }
+            else                                     { col = QColor(0, 255, 0); name = QString("Cardinal %1").arg(p.ident); }
+        }
+        else if (p.kind == FIFFV_POINT_HPI)    { col = QColor(128, 0, 0); size = 0.001f; name = QString("HPI %1").arg(++hpiCount); }
+        else if (p.kind == FIFFV_POINT_EEG)    { col = QColor(0, 255, 255); size = 0.001f; name = QString("EEG %1").arg(++eegCount); }
+        else if (p.kind == FIFFV_POINT_EXTRA)  { col = QColor(255, 0, 255); size = 0.001f; name = QString("Head Shape %1").arg(++extraCount); }
+        else                                   { name = QString("Point %1").arg(digItems.size() + 1); }
         
-        digItems.append(new SensorTreeItem("Dig", pos, col, size));
+        digItems.append(new SensorTreeItem(name, pos, col, size));
       }
       m_model->addSensors("Digitizer", digItems);
   } else if (!hasInfo) { // If no info, try to load as dig set
       file.reset(); // Reset to read as dig set
       digSet = FiffDigPointSet(file);
       if (digSet.size() > 0) {
+          int hpiCount = 0, eegCount = 0, extraCount = 0;
           for(int i=0; i<digSet.size(); ++i) {
               const auto &p = digSet[i];
               QVector3D pos(p.r[0], p.r[1], p.r[2]);
-              QColor col(192, 192, 192); // Silver
-              float size = 0.005f;
+              QColor col(255, 0, 255);  // Default: magenta
+              float size = 0.001f;
+              QString name;
 
-              if (p.kind == FIFFV_POINT_CARDINAL) { col = QColor(255, 0, 0); size = 0.01f; }
-              else if (p.kind == FIFFV_POINT_HPI) { col = QColor(255, 165, 0); size = 0.008f; }
-              else if (p.kind == FIFFV_POINT_EEG) { col = QColor(0, 255, 255); size = 0.008f; }
+              if (p.kind == FIFFV_POINT_CARDINAL) {
+                  size = 0.002f;
+                  if (p.ident == FIFFV_POINT_NASION)       { col = QColor(0, 255, 0); name = "Nasion"; }
+                  else if (p.ident == FIFFV_POINT_LPA)     { col = QColor(255, 0, 0); name = "LPA"; }
+                  else if (p.ident == FIFFV_POINT_RPA)     { col = QColor(0, 0, 255); name = "RPA"; }
+                  else                                     { col = QColor(0, 255, 0); name = QString("Cardinal %1").arg(p.ident); }
+              }
+              else if (p.kind == FIFFV_POINT_HPI)    { col = QColor(128, 0, 0); size = 0.001f; name = QString("HPI %1").arg(++hpiCount); }
+              else if (p.kind == FIFFV_POINT_EEG)    { col = QColor(0, 255, 255); size = 0.001f; name = QString("EEG %1").arg(++eegCount); }
+              else if (p.kind == FIFFV_POINT_EXTRA)  { col = QColor(255, 0, 255); size = 0.001f; name = QString("Head Shape %1").arg(++extraCount); }
+              else                                   { name = QString("Point %1").arg(i + 1); }
               
-              digItems.append(new SensorTreeItem("Dig", pos, col, size));
+              digItems.append(new SensorTreeItem(name, pos, col, size));
           }
           m_model->addSensors("Digitizer", digItems);
       }
@@ -1494,14 +1640,48 @@ void BrainView::castRay(const QPoint &pos)
         currentRegionId = m_itemSurfaceMap[hitItem]->getAnnotationLabelId(hitIndex);
     }
 
-    if (currentRegion != m_hoveredRegion) {
-        m_hoveredRegion = currentRegion;
+    // Build display label: show contextual info depending on what was hit
+    QString displayLabel;
+    if (!currentRegion.isEmpty()) {
+        // Brain surface with annotation
+        displayLabel = QString("Region: %1").arg(currentRegion);
+    } else if (!hitInfo.isEmpty()) {
+        // Determine what type of object was hit from the surface key
+        QString hitKey;
+        for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+            if (hitItem && m_itemSurfaceMap.contains(hitItem) && m_itemSurfaceMap[hitItem] == it.value()) {
+                hitKey = it.key();
+                break;
+            }
+        }
+        // If no key found via item map, try hitInfo directly
+        if (hitKey.isEmpty()) hitKey = hitInfo;
+
+        if (hitKey.startsWith("sens_meg_")) {
+            displayLabel = QString("MEG: %1").arg(hitInfo);
+        } else if (hitKey.startsWith("sens_eeg_")) {
+            displayLabel = QString("EEG: %1").arg(hitInfo);
+        } else if (hitKey.startsWith("sens_dig_")) {
+            displayLabel = QString("Digitizer: %1").arg(hitInfo);
+        } else if (hitKey.startsWith("bem_")) {
+            QString compartment = hitKey.mid(4); // strip "bem_"
+            // Capitalize first letter
+            if (!compartment.isEmpty()) compartment[0] = compartment[0].toUpper();
+            compartment.replace("_", " ");
+            displayLabel = QString("BEM: %1").arg(compartment);
+        } else if (hitInfo.contains("Dipole")) {
+            displayLabel = hitInfo;
+        }
+    }
+
+    if (displayLabel != m_hoveredRegion) {
+        m_hoveredRegion = displayLabel;
         emit hoveredRegionChanged(m_hoveredRegion);
         if (m_regionLabel) {
             if (m_hoveredRegion.isEmpty()) {
                 m_regionLabel->hide();
             } else {
-                m_regionLabel->setText(QString("Region: %1").arg(m_hoveredRegion));
+                m_regionLabel->setText(m_hoveredRegion);
                 m_regionLabel->show();
             }
         }

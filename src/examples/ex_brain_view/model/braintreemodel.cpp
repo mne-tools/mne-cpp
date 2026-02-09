@@ -144,13 +144,11 @@ void BrainTreeModel::addSourceSpace(const MNELIB::MNESourceSpace &srcSpace)
     parentItem->setCheckable(true);
     parentItem->setCheckState(Qt::Checked);
 
-    // Color: LH = bright cyan, RH = bright magenta
-    QColor lhColor(0, 230, 180);    // Vibrant cyan-green for left hemisphere
-    QColor rhColor(230, 80, 230);   // Vibrant magenta for right hemisphere
+    // Color: pinkish-red matching disp3D's source space rendering
+    QColor srcColor(212, 28, 92);
 
     for (int h = 0; h < srcSpace.size(); ++h) {
         const MNELIB::MNEHemisphere &hemi = srcSpace[h];
-        QColor color = (h == 0) ? lhColor : rhColor;
         QString hemiLabel = (h == 0) ? "LH" : "RH";
 
         // Collect all source point positions for this hemisphere
@@ -162,8 +160,8 @@ void BrainTreeModel::addSourceSpace(const MNELIB::MNESourceSpace &srcSpace)
             positions.append(QVector3D(hemi.rr(vIdx, 0), hemi.rr(vIdx, 1), hemi.rr(vIdx, 2)));
         }
 
-        // One item per hemisphere with all positions batched
-        parentItem->appendRow(new SourceSpaceTreeItem(hemiLabel, positions, color, 0.00025f));
+        // One item per hemisphere with all positions batched (0.00075 = 0.75mm radius, same as disp3D)
+        parentItem->appendRow(new SourceSpaceTreeItem(hemiLabel, positions, srcColor, 0.00075f));
         qDebug() << "BrainTreeModel: Source space" << hemiLabel
                  << "- points:" << positions.size()
                  << "coord_frame:" << hemi.coord_frame;
