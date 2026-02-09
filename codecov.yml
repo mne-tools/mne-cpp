@@ -30,4 +30,6 @@ comment:
   require_changes: no
   
 ignore:
-  - "include/.*"  # ignore folders and all its contents
+  - "src/external/**"       # third-party libraries (e.g. Eigen)
+  - "src/examples/**"       # example code is not part of coverage
+  - "src/testframes/**"     # test harnesses themselves
