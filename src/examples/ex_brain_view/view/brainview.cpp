@@ -1643,8 +1643,19 @@ void BrainView::castRay(const QPoint &pos)
     // Build display label: show contextual info depending on what was hit
     QString displayLabel;
     if (!currentRegion.isEmpty()) {
-        // Brain surface with annotation
-        displayLabel = QString("Region: %1").arg(currentRegion);
+        // Brain surface with annotation — determine hemisphere from surface key
+        QString hemi;
+        for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+            if (hitItem && m_itemSurfaceMap.contains(hitItem) && m_itemSurfaceMap[hitItem] == it.value()) {
+                if (it.key().startsWith("lh")) hemi = "lh";
+                else if (it.key().startsWith("rh")) hemi = "rh";
+                break;
+            }
+        }
+        if (!hemi.isEmpty())
+            displayLabel = QString("Region: %1 (%2)").arg(currentRegion, hemi);
+        else
+            displayLabel = QString("Region: %1").arg(currentRegion);
     } else if (!hitInfo.isEmpty()) {
         // Determine what type of object was hit from the surface key
         QString hitKey;

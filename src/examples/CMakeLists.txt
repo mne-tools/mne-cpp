@@ -9,6 +9,7 @@ endif()
 add_subdirectory(ex_averaging)
 add_subdirectory(ex_cancel_noise)
 add_subdirectory(ex_compute_forward)
+add_subdirectory(ex_brain_view)
 
 ## Examples requiring mne_disp3D (which needs Qt3D) - check if available
 find_package(Qt6 QUIET COMPONENTS 3DRender)
@@ -50,5 +51,4 @@ if(Qt63DRender_FOUND)
   add_subdirectory(ex_spectral)
   add_subdirectory(ex_st_clustered_inverse_pwl_rap_music)
   add_subdirectory(ex_tf_plot)
-  add_subdirectory(ex_brain_view)
 endif()

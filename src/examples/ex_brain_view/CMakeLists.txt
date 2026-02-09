@@ -27,6 +27,8 @@ set(SOURCES
     model/items/sensortreeitem.cpp
     model/items/dipoletreeitem.cpp
     model/items/sourcespacetreeitem.cpp
+    helpers/geometryinfo.cpp
+    helpers/interpolation.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -43,6 +45,7 @@ target_include_directories(${PROJECT_NAME} PRIVATE
     workers
     model
     model/items
+    helpers
 )
 
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
@@ -53,7 +56,6 @@ set(MNE_LIBS_REQUIRED
     mne_fiff
     mne_mne
     mne_disp
-    mne_disp3D
     mne_inverse
     mne_utils
 )

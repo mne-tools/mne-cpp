@@ -40,8 +40,8 @@
 #include "brainsurface.h"
 
 #include <disp/plots/helpers/colormap.h>
-#include <disp3D/helpers/interpolation/interpolation.h>
-#include <disp3D/helpers/geometryinfo/geometryinfo.h>
+#include "helpers/interpolation.h"
+#include "helpers/geometryinfo.h"
 
 #include <QFile>
 #include <QDebug>
@@ -145,7 +145,7 @@ void SourceEstimateOverlay::applyToSurface(BrainSurface *surface, int timeIndex)
         interpMat->cols() == sourceData.size()) {
         // Use interpolation to spread values to all vertices
         // Note: interpolateSignal returns by value, not QSharedPointer, so assignment matches
-        interpolatedData = DISP3DLIB::Interpolation::interpolateSignal(interpMat, QSharedPointer<Eigen::VectorXf>::create(sourceData));
+        interpolatedData = BRAINVIEWLIB::Interpolation::interpolateSignal(interpMat, QSharedPointer<Eigen::VectorXf>::create(sourceData));
     } else {
         // Fall back to sparse visualization (direct mapping)
         interpolatedData = Eigen::VectorXf::Zero(vertexCount);
@@ -331,7 +331,7 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface *surface, in
     // This uses Dijkstra's algorithm via GeometryInfo::scdc
     // Note: This can be slow for many sources!
     qDebug() << "SourceEstimateOverlay: Computing distance table (SCDC)...";
-    QSharedPointer<Eigen::MatrixXd> distTable = DISP3DLIB::GeometryInfo::scdc(
+    QSharedPointer<Eigen::MatrixXd> distTable = BRAINVIEWLIB::GeometryInfo::scdc(
         matVertices,
         vecNeighbors,
         vecSourceVertices,
@@ -345,10 +345,10 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface *surface, in
 
     // 2. Create Interpolation Matrix
     qDebug() << "SourceEstimateOverlay: Creating interpolation matrix...";
-    *pMatPtr = DISP3DLIB::Interpolation::createInterpolationMat(
+    *pMatPtr = BRAINVIEWLIB::Interpolation::createInterpolationMat(
         vecSourceVertices,
         distTable,
-        DISP3DLIB::Interpolation::cubic,  // Use cubic interpolation function
+        BRAINVIEWLIB::Interpolation::cubic,  // Use cubic interpolation function
         cancelDist
     );
 

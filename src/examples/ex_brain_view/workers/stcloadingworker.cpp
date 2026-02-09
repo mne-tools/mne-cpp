@@ -39,8 +39,8 @@
 #include "stcloadingworker.h"
 #include "brainsurface.h"
 
-#include <disp3D/helpers/interpolation/interpolation.h>
-#include <disp3D/helpers/geometryinfo/geometryinfo.h>
+#include "helpers/interpolation.h"
+#include "helpers/geometryinfo.h"
 
 #include <QFile>
 #include <QDebug>
@@ -131,7 +131,7 @@ void StcLoadingWorker::process()
         if (!vecSourceVertices.isEmpty()) {
             // Compute distance table (SCDC - geodesic distance)
             emit progress(15, "Computing LH geodesic distances (SCDC)...");
-            QSharedPointer<Eigen::MatrixXd> distTable = DISP3DLIB::GeometryInfo::scdc(
+            QSharedPointer<Eigen::MatrixXd> distTable = BRAINVIEWLIB::GeometryInfo::scdc(
                 matVertices,
                 vecNeighbors,
                 vecSourceVertices,
@@ -140,10 +140,10 @@ void StcLoadingWorker::process()
 
             if (distTable && distTable->rows() > 0) {
                 emit progress(35, "Creating LH interpolation matrix...");
-                m_interpMatLh = DISP3DLIB::Interpolation::createInterpolationMat(
+                m_interpMatLh = BRAINVIEWLIB::Interpolation::createInterpolationMat(
                     vecSourceVertices,
                     distTable,
-                    DISP3DLIB::Interpolation::cubic,
+                    BRAINVIEWLIB::Interpolation::cubic,
                     m_cancelDist
                 );
 
@@ -174,7 +174,7 @@ void StcLoadingWorker::process()
         if (!vecSourceVertices.isEmpty()) {
             // Compute distance table (SCDC - geodesic distance)
             emit progress(55, "Computing RH geodesic distances (SCDC)...");
-            QSharedPointer<Eigen::MatrixXd> distTable = DISP3DLIB::GeometryInfo::scdc(
+            QSharedPointer<Eigen::MatrixXd> distTable = BRAINVIEWLIB::GeometryInfo::scdc(
                 matVertices,
                 vecNeighbors,
                 vecSourceVertices,
@@ -183,10 +183,10 @@ void StcLoadingWorker::process()
 
             if (distTable && distTable->rows() > 0) {
                 emit progress(75, "Creating RH interpolation matrix...");
-                m_interpMatRh = DISP3DLIB::Interpolation::createInterpolationMat(
+                m_interpMatRh = BRAINVIEWLIB::Interpolation::createInterpolationMat(
                     vecSourceVertices,
                     distTable,
-                    DISP3DLIB::Interpolation::cubic,
+                    BRAINVIEWLIB::Interpolation::cubic,
                     m_cancelDist
                 );
 
