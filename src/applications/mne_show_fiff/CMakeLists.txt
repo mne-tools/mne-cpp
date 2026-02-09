@@ -55,9 +55,9 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 
 # Install
 install(TARGETS ${PROJECT_NAME}
-    BUNDLE DESTINATION .
-    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    BUNDLE DESTINATION . COMPONENT applications
+    RUNTIME DESTINATION bin COMPONENT applications
+    LIBRARY DESTINATION lib COMPONENT applications
 )
 
 # Copy resource files
@@ -77,7 +77,7 @@ if(APPLE)
 endif()
 
 install(FILES ${CMAKE_SOURCE_DIR}/../resources/general/explanations/fiff_explanations.txt
-    DESTINATION ${CMAKE_INSTALL_BINDIR}/resources/general/explanations
+    DESTINATION bin/resources/general/explanations
     COMPONENT applications
 )
 

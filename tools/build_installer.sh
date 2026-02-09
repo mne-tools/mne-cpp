@@ -1,4 +1,27 @@
 #!/bin/bash
+#
+# MNE-CPP Installer Generation Script
+#
+# Builds the MNE-CPP installer package using CPack (Qt Installer Framework).
+#
+# Installer Components:
+#   1. Applications       - MNE-CPP binaries (required)
+#   2. Runtime Libraries  - Shared libraries (required, hidden)
+#   3. Development SDK    - Headers, static libs, CMake config (opt-in)
+#   4. MNE Sample Dataset - Downloads ~1.5 GB sample data (opt-in)
+#   5. MNE Python         - Installs MNE-Python via pip (opt-in)
+#   6. PATH Configuration - Sets PATH and environment variables (opt-in)
+#
+# Usage:
+#   ./tools/build_installer.sh
+#
+# Prerequisites:
+#   - CMake 3.15+
+#   - Qt (set CMAKE_PREFIX_PATH)
+#   - Qt Installer Framework (binarycreator in PATH or QtInstallerFramework_DIR set)
+#
+
+set -e
 
 # Define build directory
 BUILD_DIR="build_installer"
@@ -35,6 +58,21 @@ fi
 echo "-----------------------------------------------------------------"
 echo "           MNE-CPP Installer Generation Script                   "
 echo "-----------------------------------------------------------------"
+echo ""
+echo "  Components included:"
+echo "    [required] Applications (binaries)"
+echo "    [required] Runtime Libraries (shared libs)"
+echo "    [opt-in]  Development SDK (headers + static libs + CMake config)"
+echo "    [opt-in]  MNE Sample Dataset (download script)"
+echo "    [opt-in]  MNE Python (pip install script)"
+echo "    [opt-in]  PATH Configuration (environment setup script)"
+echo ""
+
+# Ensure packaging scripts are executable
+SCRIPTS_DIR="tools/packaging/scripts"
+if [ -d "$SCRIPTS_DIR" ]; then
+    chmod +x "$SCRIPTS_DIR"/*.sh 2>/dev/null || true
+fi
 
 # Configure project with installer enabled
 echo "1. Configuring project with MNE_ENABLE_INSTALLER=ON..."
@@ -56,4 +94,9 @@ fi
 
 echo "-----------------------------------------------------------------"
 echo "Success! Installer generated in $BUILD_DIR"
+echo ""
+echo "Post-installation scripts available at:"
+echo "  ${BUILD_DIR}/scripts/download_sample_data.sh"
+echo "  ${BUILD_DIR}/scripts/install_mne_python.sh"
+echo "  ${BUILD_DIR}/scripts/configure_environment.sh"
 echo "-----------------------------------------------------------------"

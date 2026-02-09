@@ -125,6 +125,15 @@ endif()
 install(TARGETS ${PROJECT_NAME}
     RUNTIME DESTINATION bin COMPONENT runtime
     LIBRARY DESTINATION lib COMPONENT runtime
-    ARCHIVE DESTINATION lib COMPONENT development
+    ARCHIVE DESTINATION lib COMPONENT sdk
 )
+
+# Install public headers for SDK
+foreach(_header ${HEADERS})
+    get_filename_component(_dir "${_header}" DIRECTORY)
+    install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/${_header}"
+        DESTINATION include/${PROJECT_NAME}/${_dir}
+        COMPONENT sdk
+    )
+endforeach()
 

@@ -2,8 +2,8 @@
   <a href="/resources/design/logos/MNE-CPP_Logo.svg"><img src="/resources/design/logos/MNE-CPP_Logo.svg" width="400" height="200" alt="MNE-CPP"></a>
 </p>
 <p align="center">
-<a href="https://github.com/mne-tools/mne-cpp/actions" target="_blank">
-    <img src="https://github.com/mne-tools/mne-cpp/workflows/Linux%7CMacOS%7CWin%7CWASM/badge.svg" alt="Github Actions">
+<a href="https://github.com/mne-tools/mne-cpp/actions/workflows/release.yml" target="_blank">
+    <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/release.yml/badge.svg" alt="Release">
 </a>
 <a href="https://codecov.io/gh/mne-tools/mne-cpp" target="_blank">
     <img src="https://codecov.io/gh/mne-tools/mne-cpp/branch/main/graph/badge.svg" alt="CodeCov">
