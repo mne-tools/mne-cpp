@@ -9,7 +9,14 @@ endif()
 add_subdirectory(ex_averaging)
 add_subdirectory(ex_cancel_noise)
 add_subdirectory(ex_compute_forward)
-add_subdirectory(ex_brain_view)
+
+## ex_brain_view requires Qt6::GuiPrivate which is not available in WASM builds
+if(NOT WASM)
+  find_package(Qt6 QUIET COMPONENTS GuiPrivate)
+  if(Qt6GuiPrivate_FOUND)
+    add_subdirectory(ex_brain_view)
+  endif()
+endif()
 
 ## Examples requiring mne_disp3D (which needs Qt3D) - check if available
 find_package(Qt6 QUIET COMPONENTS 3DRender)
