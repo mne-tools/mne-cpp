@@ -708,8 +708,8 @@ jobs:
     - name: Install Qt Installer Framework
       run: |
         pip install aqtinstall
-        aqt install-tool linux desktop tools_ifw qt.tools.ifw.48 --outputdir $RUNNER_TOOL_CACHE/Qt
-        echo "$RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/4.8/bin" >> $GITHUB_PATH
+        aqt install-tool linux desktop tools_ifw qt.tools.ifw.47 --outputdir $RUNNER_TOOL_CACHE/Qt
+        echo "$RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/4.7/bin" >> $GITHUB_PATH
     - name: Compile BrainFlow submodule
       run: |
         cd src/applications/mne_scan/plugins/brainflowboard/brainflow
@@ -782,8 +782,8 @@ jobs:
     - name: Install Qt Installer Framework
       run: |
         pip install aqtinstall
-        aqt install-tool mac desktop tools_ifw qt.tools.ifw.48 --outputdir $RUNNER_TOOL_CACHE/Qt
-        echo "$RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/4.8/bin" >> $GITHUB_PATH
+        aqt install-tool mac desktop tools_ifw qt.tools.ifw.47 --outputdir $RUNNER_TOOL_CACHE/Qt
+        echo "$RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/4.7/bin" >> $GITHUB_PATH
     - name: Compile BrainFlow submodule
       run: |
         cd src/applications/mne_scan/plugins/brainflowboard/brainflow
@@ -857,8 +857,8 @@ jobs:
     - name: Install Qt Installer Framework
       run: |
         pip install aqtinstall
-        aqt install-tool windows desktop tools_ifw qt.tools.ifw.48 --outputdir $env:RUNNER_TOOL_CACHE/Qt
-        echo "$env:RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/4.8/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+        aqt install-tool windows desktop tools_ifw qt.tools.ifw.47 --outputdir $env:RUNNER_TOOL_CACHE/Qt
+        echo "$env:RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/4.7/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Compile BrainFlow submodule
       run: |
         $path = "src\applications\mne_scan\plugins\brainflowboard\brainflow\src\board_controller\muse\muse_bglib\muse_bglib_helper.cpp"
