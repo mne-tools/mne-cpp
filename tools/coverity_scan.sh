@@ -21,7 +21,7 @@ echo -e "Coverity working path: ${COV_WORKING_PATH}"
 
 COVERITY_SCAN_PROJECT_NAME="mne-tools/mne-cpp"
 COVERITY_SCAN_NOTIFICATION_EMAIL="mne_cpp@googlegroups.com"
-COVERITY_SCAN_BRANCH_PATTERN="main"
+COVERITY_SCAN_BRANCH_PATTERN="v2.0-dev"
 COVERITY_SCAN_BUILD_COMMAND_PREPEND="cmake -B ${BaseFolder}/build -S ${BaseFolder}/src -DCMAKE_BUILD_TYPE=Release"
 COVERITY_SCAN_BUILD_COMMAND="cmake --build ${BaseFolder}/build"
 COVERITY_SCAN_TOKEN=$1
