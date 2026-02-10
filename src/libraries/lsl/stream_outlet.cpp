@@ -187,7 +187,9 @@ private:
 
         // --- Set up UDP socket for multicast discovery ---
         QUdpSocket udpSocket;
+#ifndef Q_OS_WASM
         udpSocket.setSocketOption(QAbstractSocket::MulticastTtlOption, 1);
+#endif
 
         // --- Prepare the handshake header ---
         // "LSL1" (4 bytes) + channel_count (4 bytes, little-endian int)

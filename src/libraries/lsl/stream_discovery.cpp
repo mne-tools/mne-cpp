@@ -82,11 +82,13 @@ std::vector<lsl::stream_info> lsl::resolve_streams(double timeout)
         return results;
     }
 
-    // Join the multicast group
+#ifndef Q_OS_WASM
+    // Join the multicast group (not available on WebAssembly)
     if (!udpSocket.joinMulticastGroup(DISCOVERY_MULTICAST_GROUP)) {
         qDebug() << "[lsl::resolve_streams] Failed to join multicast group:" << udpSocket.errorString();
         // Continue anyway — broadcast messages may still be received on some platforms
     }
+#endif
 
     // Listen for the specified timeout
     int timeoutMs = static_cast<int>(timeout * 1000.0);
@@ -135,8 +137,10 @@ std::vector<lsl::stream_info> lsl::resolve_streams(double timeout)
         }
     }
 
+#ifndef Q_OS_WASM
     // Leave multicast group and close
     udpSocket.leaveMulticastGroup(DISCOVERY_MULTICAST_GROUP);
+#endif
     udpSocket.close();
 
     return results;
