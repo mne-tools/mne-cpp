@@ -72,6 +72,7 @@ set(MNE_LIBS_REQUIRED
     mne_rtprocessing
     mne_connectivity
     mne_events
+    mne_lsl
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

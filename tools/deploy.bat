@@ -269,7 +269,6 @@ if [[ ${LinkOption} == "dynamic" ]]; then
     # Solve for dependencies for mne_scan.app bundle
     ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/mne_scan_plugins ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/mne_scan_plugins
     ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/resources
-    ${MockText}cp -a ${BasePath}/src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
     ${MockText}cp -a ${BasePath}/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
     # ${MockText}cp -a $Qt5_DIR/plugins/renderers ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/PlugIns/renderers
 
@@ -469,9 +468,6 @@ if [[ ${LinkOption} == "dynamic" ]]; then
             cp -r ${Qt_ROOT_FOLDER}/lib/*.so ${BASE_PATH}/out/${BUILD_NAME}/lib
         fi
     else
-        # Copy additional LSL libs
-        ${MockText}cp -a ${BASE_PATH}/src/applications/mne_scan/plugins/lsladapter/liblsl/build/install/out/${BuildName}/lib/. ${BASE_PATH}/out/${BuildName}/lib/
-
         # Install some additional packages so linuxdeployqt can find them
         sudo apt-get update
         sudo apt-get install libxkbcommon-x11-0

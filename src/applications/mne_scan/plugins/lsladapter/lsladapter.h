@@ -43,7 +43,7 @@
 
 #include <scShared/Plugins/abstractsensor.h>
 
-#include <lsl_cpp.h>
+#include <lsl/lsl.h>
 
 //=============================================================================================================
 // QT INCLUDES

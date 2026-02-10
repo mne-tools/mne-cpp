@@ -44,6 +44,7 @@ set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 
 add_subdirectory(utils)
+add_subdirectory(lsl)
 
 add_subdirectory(fiff)
 add_subdirectory(fs)

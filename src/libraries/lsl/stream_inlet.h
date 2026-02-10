@@ -1,14 +1,13 @@
 //=============================================================================================================
 /**
- * @file     lsladaptersetup.h
- * @author   Simon Heinke <Simon.Heinke@tu-ilmenau.de>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
- * @since    0.1.0
- * @date     February, 2019
+ * @file     stream_inlet.h
+ * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @since    2.0.0
+ * @date     February, 2026
  *
  * @section  LICENSE
  *
- * Copyright (C) 2019, Simon Heinke, Lorenz Esch. All rights reserved.
+ * Copyright (C) 2026, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -29,114 +28,121 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Contains the declaration of the LSLAdapterSetup class.
+ * @brief    Contains the declaration of the stream_inlet class.
  *
  */
 
-#ifndef LSLADAPTERSETUP_H
-#define LSLADAPTERSETUP_H
+#ifndef LSL_STREAM_INLET_H
+#define LSL_STREAM_INLET_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ui_lsladaptersetup.h"
-
-#include <lsl/lsl.h>
-
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtWidgets>
+#include "lsl_global.h"
+#include "stream_info.h"
 
 //=============================================================================================================
-// DEFINE NAMESPACE LSLADAPTERPLUGIN
+// STL INCLUDES
 //=============================================================================================================
 
-namespace LSLADAPTERPLUGIN
-{
+#include <vector>
+#include <memory>
+#include <type_traits>
+
+//=============================================================================================================
+// DEFINE NAMESPACE lsl
+//=============================================================================================================
+
+namespace lsl {
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class StreamInletPrivate;
+
 //=============================================================================================================
 /**
- * DECLARE CLASS LSLAdapterSetup
+ * @brief A stream inlet to receive data from a stream_outlet on the network.
  *
- * @brief The LSLAdapterSetup class provides the LSLAdapter configuration window.
+ * The stream_inlet connects to an outlet (described by a stream_info obtained from resolve_streams)
+ * over TCP and reads data from it. Data is received as chunks of multichannel float samples.
+ *
+ * This class is API-compatible with the liblsl stream_inlet to serve as a drop-in replacement.
  */
-class LSLAdapterSetup : public QWidget
+class LSLSHARED_EXPORT stream_inlet
 {
-    Q_OBJECT
-
 public:
     //=========================================================================================================
     /**
-     * Constructs a LSLAdapterSetup which is a child of parent.
+     * Construct a new stream_inlet from a resolved stream_info.
      *
-     * @param[in] parent pointer to potential parent widget.
+     * @param[in] info  A stream_info object (typically obtained from resolve_streams).
      */
-    LSLAdapterSetup(int initialBlockSize, QWidget *parent = Q_NULLPTR);
+    explicit stream_inlet(const stream_info& info);
 
     //=========================================================================================================
     /**
-     * Destructor of LSLAdapterSetup: default
+     * Destructor. Closes the connection if still open.
      */
-    ~LSLAdapterSetup() = default;
+    ~stream_inlet();
 
-public slots:
     //=========================================================================================================
     /**
-     * This is called by the LSL Adapter, when it has finished scanning and filtering available LSL streams.
+     * Open the TCP connection to the outlet and begin receiving data.
      *
-     * @param[in] vStreamInfos A vector of available LSL streams.
-     * @param[in] currentStream The current LSL stream.
+     * @throws std::runtime_error if the connection cannot be established.
      */
-    void onLSLScanResults(const QVector<lsl::stream_info>& vStreamInfos, const lsl::stream_info& currentStream);
+    void open_stream();
 
-private slots:
-    // auto-generated slots:
-    void on_refreshAvailableStreams_released();
+    //=========================================================================================================
+    /**
+     * Close the TCP connection to the outlet.
+     */
+    void close_stream();
 
-    void on_listLSLStreams_itemDoubleClicked(QListWidgetItem *pItem);
+    //=========================================================================================================
+    /**
+     * Check whether new samples are available in the internal buffer.
+     *
+     * Also performs a non-blocking read from the TCP socket to collect any pending data.
+     *
+     * @return True if at least one complete sample is available.
+     */
+    bool samples_available();
 
-    void on_blockSizeEdit_editingFinished();
+    //=========================================================================================================
+    /**
+     * Pull a chunk of multichannel data from the inlet.
+     *
+     * Returns all complete samples currently in the buffer. Template is provided for API
+     * compatibility with liblsl; only float is supported in this implementation.
+     *
+     * @tparam T  The data type (must be float).
+     * @return    A vector of samples, where each sample is a vector of channel values.
+     */
+    template<typename T>
+    std::vector<std::vector<T>> pull_chunk()
+    {
+        static_assert(std::is_same<T, float>::value,
+                      "lsl::stream_inlet::pull_chunk<T>: only float is supported");
+        return pull_chunk_float();
+    }
+
+    //=========================================================================================================
+    /**
+     * Pull a chunk of float data (non-template version).
+     *
+     * @return A vector of samples, where each sample is a vector of float channel values.
+     */
+    std::vector<std::vector<float>> pull_chunk_float();
 
 private:
-    //=========================================================================================================
-    /**
-     * Helper method to update textfields.
-     */
-    void updateTextFields();
-
-    QMap<QListWidgetItem*, lsl::stream_info>    m_mItemToStreamInfo;
-    QListWidgetItem*                            m_pCurrentSelectedStream;
-
-    Ui::LSLSetupWidget                          ui;
-
-signals:
-    //=========================================================================================================
-    /**
-     * This tells the LSL Adapter that the user wants to refresh the displayed list of available LSL streams.
-     */
-    void refreshAvailableStreams();
-
-    //=========================================================================================================
-    /**
-     * This tells the LSL Adapter that the user has changed the stream selection.
-     *
-     * @param[in] stream The newly selected LSL stream, represented by stream_info object.
-     */
-    void streamSelectionChanged(const lsl::stream_info& stream);
-
-    //=========================================================================================================
-    /**
-     * This tells the LSL Adapter that the user has changed the desired output block size
-     */
-    void blockSizeChanged(const int newBlockSize);
+    /** Opaque implementation pointer (PIMPL). */
+    std::unique_ptr<StreamInletPrivate> m_pImpl;
 };
-} // NAMESPACE
 
-#endif // LSLADAPTERSETUP_H
+} // namespace lsl
+
+#endif // LSL_STREAM_INLET_H

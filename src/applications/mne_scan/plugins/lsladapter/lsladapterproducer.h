@@ -47,7 +47,7 @@
 #include <scMeas/realtimemultisamplearray.h>
 #include <scShared/Management/pluginoutputdata.h>
 
-#include <lsl_cpp.h>
+#include <lsl/lsl.h>
 
 //=============================================================================================================
 // QT INCLUDES

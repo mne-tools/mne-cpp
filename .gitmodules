@@ -2,7 +2,3 @@
 	path = resources/data/mne-cpp-test-data
 	url = https://github.com/mne-tools/mne-cpp-test-data.git
 	branch = master
-[submodule "src/applications/mne_scan/plugins/lsladapter/liblsl"]
-	path = src/applications/mne_scan/plugins/lsladapter/liblsl
-	url = https://github.com/sccn/liblsl.git
-	branch = master
