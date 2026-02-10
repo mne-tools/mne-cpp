@@ -139,7 +139,7 @@
     IF "%Rebuild%"=="False" (
         ECHO.
         ECHO Configuring build project
-        %MockText%cmake -B %BuildFolder% -S %SourceFolder% -DCMAKE_BUILD_TYPE=%BuildType% -DBINARY_OUTPUT_DIRECTORY=%OutFolder% -DCMAKE_CXX_FLAGS="/MP" %CMakeConfigFlags% %ExtraArgs%
+        %MockText%cmake -B %BuildFolder% -S %SourceFolder% -DCMAKE_BUILD_TYPE=%BuildType% -DBINARY_OUTPUT_DIRECTORY=%OutFolder% -DCMAKE_CXX_FLAGS="/EHsc /MP" %CMakeConfigFlags% %ExtraArgs%
     )
 
     %MockText%cmake --build %BuildFolder% --config %BuildType% && call:buildSuccessful || call:buildFailed

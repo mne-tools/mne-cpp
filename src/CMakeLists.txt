@@ -60,6 +60,10 @@ if(WITH_CODE_COV)
   add_link_options("--coverage")
 endif()
 
+if(MSVC)
+  add_compile_options(/EHsc /MP)
+endif()
+
 ##==============================================================================
 ## Misc. settings
 
