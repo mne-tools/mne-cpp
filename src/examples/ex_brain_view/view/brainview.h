@@ -431,6 +431,12 @@ private:
     std::unique_ptr<DipoleObject> m_dipoles;
     int m_currentTimePoint = 0;
     
+    //=========================================================================================================
+    /**
+     * Update the scene bounding box based on visible objects.
+     */
+    void updateSceneBounds();
+    
      FIFFLIB::FiffCoordTrans m_headToMriTrans;
      bool m_applySensorTrans = true;
      bool m_dipolesVisible = true;

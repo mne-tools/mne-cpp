@@ -30,7 +30,9 @@ fi
 
 BemFile="${SubjectPath}/${Subject}/bem/sample-5120-5120-5120-bem.fif"
 SrcSpaceFile="${SubjectPath}/${Subject}/bem/sample-oct-6-orig-src.fif"
+AtlasFile="${SubjectPath}/${Subject}/label/lh.aparc.annot"
 
 echo "launching ex_brain_view from $BuildPath..."
 "$BuildPath" --subjectPath "$SubjectPath" --subject "$Subject" --hemi "$Hemi" --bem "$BemFile" \
-    --stc "$StcFile" --digitizer "$DigitizerFile" --trans "$TransFile" --srcSpace "$SrcSpaceFile"
+    --stc "$StcFile" --digitizer "$DigitizerFile" --trans "$TransFile" --srcSpace "$SrcSpaceFile" \
+    --atlas "$AtlasFile"

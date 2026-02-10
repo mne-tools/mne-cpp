@@ -91,6 +91,8 @@ public:
      * @param[in] transPath      Optional transformation file path.
      * @param[in] stcPath        Optional STC file path.
      * @param[in] digitizerPath  Optional digitizer/sensor file path.
+     * @param[in] srcSpacePath   Optional source space file path.
+     * @param[in] atlasPath      Optional atlas annotation file path.
      */
     void loadInitialData(const QString &subjectPath,
                          const QString &subjectName,
@@ -98,7 +100,8 @@ public:
                          const QString &transPath = QString(),
                          const QString &stcPath = QString(),
                          const QString &digitizerPath = QString(),
-                         const QString &srcSpacePath = QString());
+                         const QString &srcSpacePath = QString(),
+                         const QString &atlasPath = QString());
 
 private:
     void setupUI();
@@ -124,6 +127,7 @@ private:
     QCheckBox *m_rhCheck = nullptr;
 
     // Control widgets - BEM
+    QPushButton *m_loadBemBtn = nullptr;
     QCheckBox *m_headCheck = nullptr;
     QCheckBox *m_outerCheck = nullptr;
     QCheckBox *m_innerCheck = nullptr;
@@ -134,6 +138,10 @@ private:
     QCheckBox *m_vpBottomCheck = nullptr;
     QCheckBox *m_vpFrontCheck = nullptr;
     QCheckBox *m_vpLeftCheck = nullptr;
+
+    // Control widgets - Brain Surface
+    QPushButton *m_loadSurfaceBtn = nullptr;
+    QPushButton *m_loadAtlasBtn = nullptr;
 
     // Control widgets - STC
     QPushButton *m_loadStcBtn = nullptr;

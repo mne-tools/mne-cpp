@@ -730,6 +730,7 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
             onRowsInserted(index, 0, m_model->rowCount(index) - 1);
         }
     }
+    updateSceneBounds();
     update();
 }
 
@@ -761,6 +762,7 @@ void BrainView::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bot
              }
          }
     }
+    updateSceneBounds();
     update();
 }
 
@@ -830,7 +832,57 @@ void BrainView::setActiveSurface(const QString &type)
         }
     }
     
+    updateSceneBounds();
     update();
+}
+
+void BrainView::updateSceneBounds()
+{
+    QVector3D min(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+    QVector3D max(std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest(), std::numeric_limits<float>::lowest());
+    bool hasContent = false;
+    
+    // Iterate over all surfaces
+    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+        if (it.value()->isVisible()) {
+            QVector3D sMin, sMax;
+            it.value()->boundingBox(sMin, sMax);
+            
+            min.setX(std::min(min.x(), sMin.x()));
+            min.setY(std::min(min.y(), sMin.y()));
+            min.setZ(std::min(min.z(), sMin.z()));
+            
+            max.setX(std::max(max.x(), sMax.x()));
+            max.setY(std::max(max.y(), sMax.y()));
+            max.setZ(std::max(max.z(), sMax.z()));
+            hasContent = true;
+        }
+    }
+    
+    // Iterate over all dipoles
+    for (auto it = m_itemDipoleMap.begin(); it != m_itemDipoleMap.end(); ++it) {
+        if (it.value()->isVisible()) {
+            // Dipoles don't have a bounding box method in DipoleObject yet, 
+            // but we can approximate or skip for now. 
+            // Ideally DipoleObject should expose bounds. 
+            // For now, let's assume surfaces dictate the scene size usually.
+        }
+    }
+    
+    if (hasContent) {
+        m_sceneCenter = (min + max) * 0.5f;
+        
+        QVector3D diag = max - min;
+        m_sceneSize = std::max(diag.x(), std::max(diag.y(), diag.z()));
+        
+        // Ensure non-zero size
+        if (m_sceneSize < 0.01f) m_sceneSize = 0.3f;
+        
+    } else {
+        // Default
+        m_sceneCenter = QVector3D(0,0,0);
+        m_sceneSize = 0.3f;
+    }
 }
 
 //=============================================================================================================
@@ -870,6 +922,7 @@ void BrainView::setSensorVisible(const QString &type, bool visible)
             count++;
         }
     }
+    updateSceneBounds();
     update();
 }
 
@@ -885,6 +938,7 @@ void BrainView::setSensorTransEnabled(bool enabled)
 void BrainView::setDipoleVisible(bool visible)
 {
     m_dipolesVisible = visible;
+    updateSceneBounds();
     update();
 }
 
@@ -914,6 +968,7 @@ void BrainView::setHemiVisible(int hemiIdx, bool visible)
             surf->setVisible(visible);
         }
     }
+    updateSceneBounds();
     update();
 }
 
@@ -943,6 +998,7 @@ void BrainView::setBemVisible(const QString &name, bool visible)
             }
         }
     }
+    updateSceneBounds();
 }
 
 void BrainView::setBemHighContrast(bool enabled)
@@ -1012,13 +1068,34 @@ void BrainView::initialize(QRhiCommandBuffer *cb)
 
 void BrainView::render(QRhiCommandBuffer *cb)
 {
-    if (!m_activeSurface) return;
+    // Check if there is anything to render
+    bool hasSurfaces = !m_surfaces.isEmpty();
+    bool hasDipoles = !m_itemDipoleMap.isEmpty() || m_dipoles; // Check managed dipoles too
+    
+    // If absolutely nothing is loaded, render black background
+    if (!hasSurfaces && !hasDipoles) {
+        // No surface loaded: render a black background instead of leaving the widget uninitialized
+        if (!m_renderer) {
+            m_renderer = std::make_unique<BrainRenderer>();
+        }
+        m_renderer->initialize(rhi(), renderTarget()->renderPassDescriptor(), sampleCount());
+        m_renderer->beginFrame(cb, renderTarget());
+        m_renderer->endFrame(cb);
+        return;
+    }
+    
+    // Ensure active surface pointer is valid if possible, otherwise just use first available for stats
+    if (!m_activeSurface && !m_surfaces.isEmpty()) {
+        m_activeSurface = m_surfaces.begin().value();
+    }
+
 
     m_frameCount++;
     if (m_fpsTimer.elapsed() >= 500) {
         float fps = m_frameCount / (m_fpsTimer.elapsed() / 1000.0f);
         QString modeStr = (m_brainShaderMode == BrainRenderer::Holographic) ? "Holographic" : (m_brainShaderMode == BrainRenderer::Anatomical) ? "Anatomical" : "Standard";
-        m_fpsLabel->setText(QString("FPS: %1\nVertices: %2\nShader: %3").arg(fps, 0, 'f', 1).arg(m_activeSurface->vertexCount()).arg(modeStr));
+        int vCount = m_activeSurface ? m_activeSurface->vertexCount() : 0;
+        m_fpsLabel->setText(QString("FPS: %1\nVertices: %2\nShader: %3").arg(fps, 0, 'f', 1).arg(vCount).arg(modeStr));
         m_frameCount = 0;
         m_fpsTimer.restart();
     }
@@ -1289,8 +1366,25 @@ bool BrainView::loadSourceEstimate(const QString &lhPath, const QString &rhPath)
         rhSurface = m_surfaces[rhKey].get();
     }
     
+    // Fallback: if active surface type didn't match, search for any lh_*/rh_* brain surface
+    if (!lhSurface || !rhSurface) {
+        for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+            if (it.value() && it.value()->tissueType() == BrainSurface::TissueBrain) {
+                if (!lhSurface && it.key().startsWith("lh_")) {
+                    lhSurface = it.value().get();
+                    qDebug() << "BrainView: Using fallback LH surface:" << it.key();
+                } else if (!rhSurface && it.key().startsWith("rh_")) {
+                    rhSurface = it.value().get();
+                    qDebug() << "BrainView: Using fallback RH surface:" << it.key();
+                }
+            }
+        }
+    }
+    
     if (!lhSurface && !rhSurface) {
-        qWarning() << "BrainView: No surfaces available for STC loading";
+        qWarning() << "BrainView: No surfaces available for STC loading."
+                   << "Active surface type:" << m_activeSurfaceType
+                   << "Available keys:" << m_surfaces.keys();
         return false;
     }
     
@@ -1813,6 +1907,13 @@ void BrainView::castRay(const QPoint &pos)
             displayLabel = QString("BEM: %1").arg(compartment);
         } else if (hitInfo.contains("Dipole")) {
             displayLabel = hitInfo;
+        } else {
+            // Fallback: Check if it's a hemisphere based on the key
+            if (hitKey.startsWith("lh_")) {
+                displayLabel = "Left Hemisphere";
+            } else if (hitKey.startsWith("rh_")) {
+                displayLabel = "Right Hemisphere";
+            }
         }
     }
 

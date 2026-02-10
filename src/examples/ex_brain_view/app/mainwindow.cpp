@@ -56,6 +56,8 @@
 #include <QDoubleSpinBox>
 #include <QFileDialog>
 #include <QFile>
+#include <QDir>
+#include <QFileInfo>
 #include <QScrollArea>
 #include <QProgressBar>
 #include <QGridLayout>
@@ -106,13 +108,18 @@ void MainWindow::setupUI()
     sideLayout->setSpacing(5);
     scrollArea->setWidget(sidePanel);
 
-    // ===== Control Group =====
-    QGroupBox *controlGroup = new QGroupBox("Controls");
-    QVBoxLayout *controlLayout = new QVBoxLayout(controlGroup);
-    controlLayout->setContentsMargins(10, 15, 10, 10);
-    controlLayout->setSpacing(8);
+    // (Old controls moved to surfGroup/viewGroup)
+
+    // ===== Brain Surface Group =====
+    QGroupBox *surfGroup = new QGroupBox("Brain Surface");
+    QVBoxLayout *surfLayout = new QVBoxLayout(surfGroup);
+    surfLayout->setContentsMargins(10, 15, 10, 10);
+    surfLayout->setSpacing(8);
 
     // Surface Selector
+    m_loadSurfaceBtn = new QPushButton("Load Surface...");
+    m_loadAtlasBtn = new QPushButton("Load Atlas...");
+
     QLabel *surfLabel = new QLabel("Surface Type:");
     m_surfCombo = new QComboBox;
     m_surfCombo->addItems({"pial", "inflated", "white"});
@@ -127,15 +134,13 @@ void MainWindow::setupUI()
     m_bemShaderCombo->addItems({"Standard", "Holographic", "Anatomical"});
     m_bemShaderCombo->setEnabled(false);
 
-    m_linkShadersCheck = new QCheckBox("Link Shaders");
+    m_linkShadersCheck = new QCheckBox("Link Shaders to Brain Surface");
     m_linkShadersCheck->setChecked(true);
     m_linkShadersCheck->setToolTip("When checked, Head Shader follows Brain Shader selection.");
 
     m_bemColorCheck = new QCheckBox("Show BEM Colors");
     m_bemColorCheck->setChecked(true);
     m_bemColorCheck->setToolTip("Toggle between standard Red/Green/Blue colors and White/Overlay colors.");
-
-    controlGroup->setFlat(true);
 
     // Overlay
     QLabel *overlayLabel = new QLabel("Overlay:");
@@ -156,58 +161,33 @@ void MainWindow::setupUI()
     m_innerCheck = new QCheckBox("Inner Skull");
     m_innerCheck->setChecked(true);
 
-    controlLayout->addWidget(surfLabel);
-    controlLayout->addWidget(m_surfCombo);
-    controlLayout->addWidget(overlayLabel);
-    controlLayout->addWidget(m_overlayCombo);
-    controlLayout->addWidget(shaderLabel);
-    controlLayout->addWidget(m_shaderCombo);
-    controlLayout->addWidget(m_linkShadersCheck);
-    controlLayout->addWidget(m_bemColorCheck);
-    controlLayout->addWidget(bemShaderLabel);
-    controlLayout->addWidget(m_bemShaderCombo);
-    controlLayout->addWidget(m_lhCheck);
-    controlLayout->addWidget(m_rhCheck);
+    surfLayout->addWidget(m_loadSurfaceBtn);
+    surfLayout->addWidget(m_loadAtlasBtn);
+    surfLayout->addWidget(surfLabel);
+    surfLayout->addWidget(m_surfCombo);
+    surfLayout->addWidget(overlayLabel);
+    surfLayout->addWidget(m_overlayCombo);
+    surfLayout->addWidget(shaderLabel);
+    surfLayout->addWidget(m_shaderCombo);
+    surfLayout->addWidget(m_lhCheck);
+    surfLayout->addWidget(m_rhCheck);
 
-    controlLayout->addWidget(new QLabel("------- BEM -------"));
-    controlLayout->addWidget(m_headCheck);
-    controlLayout->addWidget(m_outerCheck);
-    controlLayout->addWidget(m_innerCheck);
+    // ===== BEM Surface Group =====
+    QGroupBox *bemGroup = new QGroupBox("BEM Surface");
+    QVBoxLayout *bemLayout = new QVBoxLayout(bemGroup);
+    bemLayout->setContentsMargins(10, 15, 10, 10);
+    bemLayout->setSpacing(8);
 
-    // Multi-View Toggle
-    controlLayout->addWidget(new QLabel("------- View -------"));
-    m_multiViewCheck = new QCheckBox("Multi-View (4 cameras)");
-    m_multiViewCheck->setChecked(false);
-    m_multiViewCheck->setToolTip("Toggle between single interactive camera and four fixed camera views.");
-    controlLayout->addWidget(m_multiViewCheck);
+    m_loadBemBtn = new QPushButton("Load BEM...");
 
-    // Viewport Toggles
-    QHBoxLayout *vpRow1 = new QHBoxLayout();
-    QHBoxLayout *vpRow2 = new QHBoxLayout();
-
-    m_vpTopCheck = new QCheckBox("Top");
-    m_vpBottomCheck = new QCheckBox("Bottom");
-    m_vpFrontCheck = new QCheckBox("Front");
-    m_vpLeftCheck = new QCheckBox("Left");
-
-    m_vpTopCheck->setChecked(true);
-    m_vpBottomCheck->setChecked(true);
-    m_vpFrontCheck->setChecked(true);
-    m_vpLeftCheck->setChecked(true);
-
-    m_vpTopCheck->setEnabled(false);
-    m_vpBottomCheck->setEnabled(false);
-    m_vpFrontCheck->setEnabled(false);
-    m_vpLeftCheck->setEnabled(false);
-
-    vpRow1->addWidget(m_vpTopCheck);
-    vpRow1->addWidget(m_vpBottomCheck);
-    vpRow2->addWidget(m_vpFrontCheck);
-    vpRow2->addWidget(m_vpLeftCheck);
-
-    controlLayout->addLayout(vpRow1);
-    controlLayout->addLayout(vpRow2);
-    controlLayout->addStretch();
+    bemLayout->addWidget(m_loadBemBtn);
+    bemLayout->addWidget(m_headCheck);
+    bemLayout->addWidget(m_outerCheck);
+    bemLayout->addWidget(m_innerCheck);
+    bemLayout->addWidget(m_bemColorCheck);
+    bemLayout->addWidget(bemShaderLabel);
+    bemLayout->addWidget(m_bemShaderCombo);
+    bemLayout->addWidget(m_linkShadersCheck);
 
     // ===== Source Estimate Group =====
     QGroupBox *stcGroup = new QGroupBox("Source Estimate");
@@ -366,12 +346,53 @@ void MainWindow::setupUI()
     sensorLayout->addWidget(m_showDigExtraCheck);
     sensorLayout->addWidget(m_applyTransCheck);
 
+    // ===== View Group =====
+    QGroupBox *viewGroup = new QGroupBox("View");
+    QVBoxLayout *viewLayout = new QVBoxLayout(viewGroup);
+    viewLayout->setContentsMargins(10, 15, 10, 10);
+    viewLayout->setSpacing(8);
+
+    // Multi-View Toggle
+    m_multiViewCheck = new QCheckBox("Multi-View (4 cameras)");
+    m_multiViewCheck->setChecked(false);
+    m_multiViewCheck->setToolTip("Toggle between single interactive camera and four fixed camera views.");
+    viewLayout->addWidget(m_multiViewCheck);
+
+    // Viewport Toggles
+    QHBoxLayout *vpRow1 = new QHBoxLayout();
+    QHBoxLayout *vpRow2 = new QHBoxLayout();
+
+    m_vpTopCheck = new QCheckBox("Top");
+    m_vpBottomCheck = new QCheckBox("Bottom");
+    m_vpFrontCheck = new QCheckBox("Front");
+    m_vpLeftCheck = new QCheckBox("Left");
+
+    m_vpTopCheck->setChecked(true);
+    m_vpBottomCheck->setChecked(true);
+    m_vpFrontCheck->setChecked(true);
+    m_vpLeftCheck->setChecked(true);
+
+    m_vpTopCheck->setEnabled(false);
+    m_vpBottomCheck->setEnabled(false);
+    m_vpFrontCheck->setEnabled(false);
+    m_vpLeftCheck->setEnabled(false);
+
+    vpRow1->addWidget(m_vpTopCheck);
+    vpRow1->addWidget(m_vpBottomCheck);
+    vpRow2->addWidget(m_vpFrontCheck);
+    vpRow2->addWidget(m_vpLeftCheck);
+
+    viewLayout->addLayout(vpRow1);
+    viewLayout->addLayout(vpRow2);
+
     // Assemble side panel
-    sideLayout->addWidget(controlGroup);
+    sideLayout->addWidget(surfGroup);
+    sideLayout->addWidget(bemGroup);
     sideLayout->addWidget(stcGroup);
     sideLayout->addWidget(dipoleGroup);
     sideLayout->addWidget(srcSpaceGroup);
     sideLayout->addWidget(sensorGroup);
+    sideLayout->addWidget(viewGroup);
     sideLayout->addStretch();
 
     // ===== Brain View =====
@@ -431,6 +452,13 @@ void MainWindow::setupConnections()
     connect(m_lhCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setHemiVisible(0, checked); });
     connect(m_rhCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setHemiVisible(1, checked); });
 
+    // BEM loading
+    connect(m_loadBemBtn, &QPushButton::clicked, [this]() {
+        QString path = QFileDialog::getOpenFileName(this, "Select BEM Surface", "", "BEM Files (*-bem.fif *-bem-sol.fif);;FIF Files (*.fif);;All Files (*)");
+        if (path.isEmpty()) return;
+        loadBem("User", path);
+    });
+
     // BEM visibility
     connect(m_headCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setBemVisible("head", checked); });
     connect(m_outerCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setBemVisible("outer_skull", checked); });
@@ -453,6 +481,39 @@ void MainWindow::setupConnections()
     connect(m_vpBottomCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(1, checked); });
     connect(m_vpFrontCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(2, checked); });
     connect(m_vpLeftCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(3, checked); });
+
+    // Brain Surface
+    connect(m_loadSurfaceBtn, &QPushButton::clicked, [this]() {
+        QString path = QFileDialog::getOpenFileName(this, "Select Surface", "", "FreeSurfer Surface (*.pial *.inflated *.white *.orig);;All Files (*)");
+        if (path.isEmpty()) return;
+
+        // Guess hemi and type
+        QString fileName = QFileInfo(path).fileName();
+        QString hemi = fileName.contains("lh.") ? "lh" : (fileName.contains("rh.") ? "rh" : "lh");
+        QString type = "pial";
+        if (fileName.contains("inflated")) type = "inflated";
+        else if (fileName.contains("white")) type = "white";
+        else if (fileName.contains("orig")) type = "orig";
+
+        Surface surf(path);
+        if (!surf.isEmpty()) {
+            m_model->addSurface("User", hemi, type, surf);
+        }
+    });
+
+    connect(m_loadAtlasBtn, &QPushButton::clicked, [this]() {
+        QString path = QFileDialog::getOpenFileName(this, "Select Atlas", "", "FreeSurfer Annotation (*.annot);;All Files (*)");
+        if (path.isEmpty()) return;
+
+        // Guess hemi
+        QString fileName = QFileInfo(path).fileName();
+        QString hemi = fileName.contains("lh.") ? "lh" : (fileName.contains("rh.") ? "rh" : "lh");
+
+        Annotation annot(path);
+        if (!annot.isEmpty()) {
+            m_model->addAnnotation("User", hemi, annot);
+        }
+    });
 
     // STC loading
     connect(m_loadStcBtn, &QPushButton::clicked, [this]() {
@@ -640,18 +701,58 @@ void MainWindow::loadInitialData(const QString &subjectPath,
                                   const QString &transPath,
                                   const QString &stcPath,
                                   const QString &digitizerPath,
-                                  const QString &srcSpacePath)
+                                  const QString &srcSpacePath,
+                                  const QString &atlasPath)
 {
-    qDebug() << "Loading surfaces...";
+    // Check if the subject directory actually exists before attempting to load
+    QString subjectDir = subjectPath + "/" + subjectName + "/surf";
+    QDir surfDir(subjectDir);
+    if (!surfDir.exists()) {
+        qDebug() << "No surface data found. Subject directory does not exist:" << subjectDir;
+        qDebug() << "Use --subjectPath and --subject options to specify data location,";
+        qDebug() << "or load data interactively through the UI.";
+    } else {
+        qDebug() << "Loading surfaces...";
+        loadHemisphere(subjectPath, subjectName, "lh");
+        loadHemisphere(subjectPath, subjectName, "rh");
+        qDebug() << "Surfaces loaded.";
+    }
 
-    loadHemisphere(subjectPath, subjectName, "lh");
-    loadHemisphere(subjectPath, subjectName, "rh");
+    // Auto-load atlas annotation (explicit path overrides auto-discovery in loadHemisphere)
+    if (!atlasPath.isEmpty() && QFile::exists(atlasPath)) {
+        qDebug() << "Auto-loading atlas from:" << atlasPath;
+        QString fileName = QFileInfo(atlasPath).fileName();
+        QString lhAnnotPath, rhAnnotPath;
+
+        if (fileName.startsWith("lh.")) {
+            lhAnnotPath = atlasPath;
+            rhAnnotPath = QFileInfo(atlasPath).absolutePath() + "/" + fileName.mid(3).prepend("rh.");
+        } else if (fileName.startsWith("rh.")) {
+            rhAnnotPath = atlasPath;
+            lhAnnotPath = QFileInfo(atlasPath).absolutePath() + "/" + fileName.mid(3).prepend("lh.");
+        } else {
+            lhAnnotPath = atlasPath;
+        }
+
+        if (!lhAnnotPath.isEmpty() && QFile::exists(lhAnnotPath)) {
+            Annotation annot(lhAnnotPath);
+            if (!annot.isEmpty()) {
+                m_model->addAnnotation(subjectName, "lh", annot);
+                qDebug() << "Added atlas annotation for lh";
+            }
+        }
+        if (!rhAnnotPath.isEmpty() && QFile::exists(rhAnnotPath)) {
+            Annotation annot(rhAnnotPath);
+            if (!annot.isEmpty()) {
+                m_model->addAnnotation(subjectName, "rh", annot);
+                qDebug() << "Added atlas annotation for rh";
+            }
+        }
+    }
 
     if (!bemPath.isEmpty()) {
         loadBem(subjectName, bemPath);
     }
-
-    qDebug() << "Surfaces loaded.";
 
     // Auto-load digitizer
     if (!digitizerPath.isEmpty() && QFile::exists(digitizerPath)) {
@@ -716,7 +817,11 @@ void MainWindow::loadHemisphere(const QString &subjectPath, const QString &subje
 {
     QStringList types = {"pial", "inflated", "white"};
     for (const auto &type : types) {
-        Surface surf(subjectPath + "/" + subjectName + "/surf/" + hemi + "." + type);
+        QString surfPath = subjectPath + "/" + subjectName + "/surf/" + hemi + "." + type;
+        if (!QFile::exists(surfPath)) {
+            continue;
+        }
+        Surface surf(surfPath);
         if (!surf.isEmpty()) {
             m_model->addSurface(subjectName, hemi, type, surf);
             qDebug() << "Added" << hemi << type;
@@ -725,10 +830,12 @@ void MainWindow::loadHemisphere(const QString &subjectPath, const QString &subje
 
     // Load Atlas (Annotation)
     QString annotPath = subjectPath + "/" + subjectName + "/label/" + hemi + ".aparc.annot";
-    Annotation annot(annotPath);
-    if (!annot.isEmpty()) {
-        m_model->addAnnotation(subjectName, hemi, annot);
-        qDebug() << "Added annotation for" << hemi;
+    if (QFile::exists(annotPath)) {
+        Annotation annot(annotPath);
+        if (!annot.isEmpty()) {
+            m_model->addAnnotation(subjectName, hemi, annot);
+            qDebug() << "Added annotation for" << hemi;
+        }
     }
 }
 

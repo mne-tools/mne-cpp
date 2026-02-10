@@ -62,8 +62,9 @@ int main(int argc, char *argv[])
     QCommandLineOption stcOption("stc", "Source estimate file path", "path", "");
     QCommandLineOption digitizerOption("digitizer", "Digitizer/sensor file path", "path", "");
     QCommandLineOption srcSpaceOption("srcSpace", "Source space / forward solution file path", "path", "");
+    QCommandLineOption atlasOption("atlas", "Atlas annotation file path (lh or rh, sibling auto-detected)", "path", "");
 
-    parser.addOptions({subjectPathOption, subjectOption, hemiOption, bemOption, transOption, stcOption, digitizerOption, srcSpaceOption});
+    parser.addOptions({subjectPathOption, subjectOption, hemiOption, bemOption, transOption, stcOption, digitizerOption, srcSpaceOption, atlasOption});
     parser.process(app);
 
     MainWindow mainWindow;
@@ -74,7 +75,8 @@ int main(int argc, char *argv[])
         parser.value(transOption),
         parser.value(stcOption),
         parser.value(digitizerOption),
-        parser.value(srcSpaceOption)
+        parser.value(srcSpaceOption),
+        parser.value(atlasOption)
     );
     mainWindow.show();
 
