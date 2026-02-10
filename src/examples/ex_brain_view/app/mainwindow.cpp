@@ -334,6 +334,23 @@ void MainWindow::setupUI()
     m_showDigCheck->setChecked(false);
     m_showDigCheck->setEnabled(false);
 
+    // Per-category digitizer visibility
+    m_showDigCardinalCheck = new QCheckBox("  Cardinal (NAS/LPA/RPA)");
+    m_showDigCardinalCheck->setChecked(false);
+    m_showDigCardinalCheck->setEnabled(false);
+
+    m_showDigHpiCheck = new QCheckBox("  HPI Coils");
+    m_showDigHpiCheck->setChecked(false);
+    m_showDigHpiCheck->setEnabled(false);
+
+    m_showDigEegCheck = new QCheckBox("  EEG Points");
+    m_showDigEegCheck->setChecked(false);
+    m_showDigEegCheck->setEnabled(false);
+
+    m_showDigExtraCheck = new QCheckBox("  Head Shape");
+    m_showDigExtraCheck->setChecked(false);
+    m_showDigExtraCheck->setEnabled(false);
+
     m_applyTransCheck = new QCheckBox("Apply Transformation");
     m_applyTransCheck->setChecked(true);
     m_applyTransCheck->setToolTip("Apply Head-to-MRI transformation to sensors if available.");
@@ -343,6 +360,10 @@ void MainWindow::setupUI()
     sensorLayout->addWidget(m_showMegCheck);
     sensorLayout->addWidget(m_showEegCheck);
     sensorLayout->addWidget(m_showDigCheck);
+    sensorLayout->addWidget(m_showDigCardinalCheck);
+    sensorLayout->addWidget(m_showDigHpiCheck);
+    sensorLayout->addWidget(m_showDigEegCheck);
+    sensorLayout->addWidget(m_showDigExtraCheck);
     sensorLayout->addWidget(m_applyTransCheck);
 
     // Assemble side panel
@@ -547,6 +568,7 @@ void MainWindow::setupConnections()
             m_showMegCheck->setEnabled(true);
             m_showEegCheck->setEnabled(true);
             m_showDigCheck->setEnabled(true);
+            // Sub-category checkboxes stay disabled until master is toggled on
         }
     });
 
@@ -558,7 +580,23 @@ void MainWindow::setupConnections()
 
     connect(m_showMegCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("MEG", checked); });
     connect(m_showEegCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("EEG", checked); });
-    connect(m_showDigCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("Digitizer", checked); });
+    connect(m_showDigCheck, &QCheckBox::toggled, [this](bool checked) {
+        m_brainView->setSensorVisible("Digitizer", checked);
+        // Enable/disable sub-category checkboxes based on master toggle
+        m_showDigCardinalCheck->setEnabled(checked);
+        m_showDigHpiCheck->setEnabled(checked);
+        m_showDigEegCheck->setEnabled(checked);
+        m_showDigExtraCheck->setEnabled(checked);
+        // When master is turned on, check all sub-categories; when off, uncheck them
+        m_showDigCardinalCheck->setChecked(checked);
+        m_showDigHpiCheck->setChecked(checked);
+        m_showDigEegCheck->setChecked(checked);
+        m_showDigExtraCheck->setChecked(checked);
+    });
+    connect(m_showDigCardinalCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("Digitizer/Cardinal", checked); });
+    connect(m_showDigHpiCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("Digitizer/HPI", checked); });
+    connect(m_showDigEegCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("Digitizer/EEG", checked); });
+    connect(m_showDigExtraCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("Digitizer/Extra", checked); });
     connect(m_applyTransCheck, &QCheckBox::toggled, m_brainView, &BrainView::setSensorTransEnabled);
 
     // Dipoles
@@ -622,6 +660,7 @@ void MainWindow::loadInitialData(const QString &subjectPath,
             m_showMegCheck->setEnabled(true);
             m_showEegCheck->setEnabled(true);
             m_showDigCheck->setEnabled(true);
+            // Sub-category checkboxes stay disabled until master is toggled on
             m_brainView->setSensorVisible("MEG", m_showMegCheck->isChecked());
             m_brainView->setSensorVisible("EEG", m_showEegCheck->isChecked());
             m_brainView->setSensorVisible("Digitizer", m_showDigCheck->isChecked());

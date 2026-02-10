@@ -4,6 +4,7 @@
 #include "sensortreeitem.h"
 #include "dipoletreeitem.h"
 #include "sourcespacetreeitem.h"
+#include "digitizersettreeitem.h"
 #include <inverse/dipoleFit/ecd_set.h>
 #include <mne/mne_hemisphere.h>
 
@@ -172,4 +173,18 @@ void BrainTreeModel::addSourceSpace(const MNELIB::MNESourceSpace &srcSpace)
     }
 
     this->appendRow(parentItem);
+}
+
+//=============================================================================================================
+
+void BrainTreeModel::addDigitizerData(const QList<FIFFLIB::FiffDigPoint> &digitizerPoints)
+{
+    if (digitizerPoints.isEmpty()) return;
+
+    auto *setItem = new DigitizerSetTreeItem("Digitizer", digitizerPoints);
+    this->appendRow(setItem);
+
+    qDebug() << "BrainTreeModel: Added digitizer set with"
+             << setItem->totalPointCount() << "points in"
+             << setItem->rowCount() << "categories";
 }

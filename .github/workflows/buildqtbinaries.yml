@@ -30,11 +30,11 @@ jobs:
         cd qt6_shadow
         # Configure Qt6
         ../qt5/configure -static -release -prefix "../Qt6_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -qt-libpng -qt-pcre -- -DCMAKE_BUILD_TYPE=Release
-        cmake --build . --parallel 4
+        cmake --build . --parallel $(nproc)
         cmake --install .
     - name: Package binaries
       run: |
-        tar cfvz qt6_6102_static_binaries_linux.tar.gz ../Qt6_binaries/.
+        tar cfvz qt6_6102_static_binaries_linux.tar.gz -C ../Qt6_binaries .
     - uses: actions/upload-artifact@v4
       with:
         name: qt6_6102_static_binaries_linux.tar.gz
@@ -68,11 +68,11 @@ jobs:
         cd qt6_shadow
         # Configure Qt6
         ../qt5/configure -static -release -prefix "../Qt6_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -- -DCMAKE_BUILD_TYPE=Release
-        cmake --build . --parallel 4
+        cmake --build . --parallel $(sysctl -n hw.ncpu)
         cmake --install .
     - name: Package binaries
       run: |
-        tar cfvz qt6_6102_static_binaries_macos.tar.gz ../Qt6_binaries/.
+        tar cfvz qt6_6102_static_binaries_macos.tar.gz -C ../Qt6_binaries .
     - uses: actions/upload-artifact@v4
       with:
         name: qt6_6102_static_binaries_macos.tar.gz
@@ -114,11 +114,12 @@ jobs:
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
         # Configure Qt6
         ..\qt5\configure.bat -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "..\Qt6_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -opensource -confirm-license
-        cmake --build . --parallel 4
+        cmake --build . --parallel $env:NUMBER_OF_PROCESSORS
         cmake --install .
     - name: Package binaries
       run: |
-        7z a qt6_6102_static_binaries_win.zip ..\Qt6_binaries
+        cd ..\Qt6_binaries
+        7z a ..\mne-cpp\qt6_6102_static_binaries_win.zip .
     - uses: actions/upload-artifact@v4
       with:
         name: qt6_6102_static_binaries_win.zip
@@ -158,11 +159,11 @@ jobs:
         cd qt6_shadow
         # Configure Qt6 for wasm
         ../qt5/configure -qt-host-path /usr -xplatform wasm-emscripten -feature-thread -skip webengine -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -prefix "$PWD/../Qt6_binaries" -- -DCMAKE_BUILD_TYPE=Release
-        cmake --build . --parallel 4
+        cmake --build . --parallel $(nproc)
         cmake --install .
     - name: Package binaries
       run: |
-        tar cfvz qt6_6102_static_binaries_wasm.tar.gz ../Qt6_binaries/.
+        tar cfvz qt6_6102_static_binaries_wasm.tar.gz -C ../Qt6_binaries .
     - uses: actions/upload-artifact@v4
       with:
         name: qt6_6102_static_binaries_wasm.tar.gz

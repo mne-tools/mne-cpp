@@ -27,6 +27,8 @@ set(SOURCES
     model/items/sensortreeitem.cpp
     model/items/dipoletreeitem.cpp
     model/items/sourcespacetreeitem.cpp
+    model/items/digitizertreeitem.cpp
+    model/items/digitizersettreeitem.cpp
     helpers/geometryinfo.cpp
     helpers/interpolation.cpp
 )

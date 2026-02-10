@@ -125,8 +125,18 @@ jobs:
       with:
         path: ..\Qt6_static
         key: qt-6.10.2-static-windows-x86_64
-    - name: Build static Qt from source
+    - name: Download pre-built static Qt
+      id: download-qt-static
       if: steps.cache-qt-static.outputs.cache-hit != 'true'
+      continue-on-error: true
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release download qt_binaries -p "qt6_6102_static_binaries_win.zip" -D $env:TEMP
+        mkdir ..\Qt6_static -Force
+        7z x "$env:TEMP\qt6_6102_static_binaries_win.zip" -o"..\Qt6_static" -y
+    - name: Build static Qt from source
+      if: steps.cache-qt-static.outputs.cache-hit != 'true' && steps.download-qt-static.outcome != 'success'
       run: |
         cd ..
         git clone https://code.qt.io/qt/qt5.git -b v6.10.2

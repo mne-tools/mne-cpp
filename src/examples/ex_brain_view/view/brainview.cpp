@@ -63,6 +63,8 @@
 #include "sensortreeitem.h"
 #include "dipoletreeitem.h"
 #include "sourcespacetreeitem.h"
+#include "digitizertreeitem.h"
+#include "digitizersettreeitem.h"
 #include "../workers/stcloadingworker.h"
 
 using namespace FSLIB;
@@ -593,6 +595,133 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
                      << allTris.rows() << "triangles";
         }
 
+        // Handle Digitizer Items (batched sphere mesh per category, same technique as Source Space)
+        if (absItem && absItem->type() == AbstractTreeItem::DigitizerItem + QStandardItem::UserType) {
+            DigitizerTreeItem* digItem = static_cast<DigitizerTreeItem*>(absItem);
+            const QVector<QVector3D>& positions = digItem->positions();
+            if (positions.isEmpty()) continue;
+
+            const float r = digItem->scale();
+            const QColor color = digItem->color();
+            const int nPts = positions.size();
+
+            // Build subdivided icosahedron template (42 verts, 80 tris)
+            const float phi = (1.0f + std::sqrt(5.0f)) / 2.0f;
+            QVector<Eigen::Vector3f> icoV;
+            icoV.reserve(42);
+            icoV << Eigen::Vector3f(-1, phi, 0) << Eigen::Vector3f( 1, phi, 0)
+                 << Eigen::Vector3f(-1,-phi, 0) << Eigen::Vector3f( 1,-phi, 0)
+                 << Eigen::Vector3f( 0,-1, phi) << Eigen::Vector3f( 0, 1, phi)
+                 << Eigen::Vector3f( 0,-1,-phi) << Eigen::Vector3f( 0, 1,-phi)
+                 << Eigen::Vector3f( phi, 0,-1) << Eigen::Vector3f( phi, 0, 1)
+                 << Eigen::Vector3f(-phi, 0,-1) << Eigen::Vector3f(-phi, 0, 1);
+            for (auto& v : icoV) v.normalize();
+
+            QVector<Eigen::Vector3i> icoT;
+            icoT.reserve(80);
+            icoT << Eigen::Vector3i(0,11,5)  << Eigen::Vector3i(0,5,1)
+                 << Eigen::Vector3i(0,1,7)   << Eigen::Vector3i(0,7,10)
+                 << Eigen::Vector3i(0,10,11) << Eigen::Vector3i(1,5,9)
+                 << Eigen::Vector3i(5,11,4)  << Eigen::Vector3i(11,10,2)
+                 << Eigen::Vector3i(10,7,6)  << Eigen::Vector3i(7,1,8)
+                 << Eigen::Vector3i(3,9,4)   << Eigen::Vector3i(3,4,2)
+                 << Eigen::Vector3i(3,2,6)   << Eigen::Vector3i(3,6,8)
+                 << Eigen::Vector3i(3,8,9)   << Eigen::Vector3i(4,9,5)
+                 << Eigen::Vector3i(2,4,11)  << Eigen::Vector3i(6,2,10)
+                 << Eigen::Vector3i(8,6,7)   << Eigen::Vector3i(9,8,1);
+
+            QMap<QPair<int,int>, int> midCache;
+            auto getMid = [&](int a, int b) -> int {
+                auto key = qMakePair(qMin(a,b), qMax(a,b));
+                if (midCache.contains(key)) return midCache[key];
+                Eigen::Vector3f mid = (icoV[a] + icoV[b]).normalized();
+                int idx = icoV.size();
+                icoV.append(mid);
+                midCache[key] = idx;
+                return idx;
+            };
+
+            QVector<Eigen::Vector3i> newTris;
+            newTris.reserve(80);
+            for (const auto& tri : icoT) {
+                int a = getMid(tri(0), tri(1));
+                int b = getMid(tri(1), tri(2));
+                int c = getMid(tri(2), tri(0));
+                newTris << Eigen::Vector3i(tri(0), a, c)
+                        << Eigen::Vector3i(tri(1), b, a)
+                        << Eigen::Vector3i(tri(2), c, b)
+                        << Eigen::Vector3i(a, b, c);
+            }
+
+            const int nVPerPt = icoV.size();
+            const int nTPerPt = newTris.size();
+
+            Eigen::MatrixX3f templateV(nVPerPt, 3), templateN(nVPerPt, 3);
+            for (int iv = 0; iv < nVPerPt; ++iv) {
+                templateN(iv, 0) = icoV[iv].x();
+                templateN(iv, 1) = icoV[iv].y();
+                templateN(iv, 2) = icoV[iv].z();
+                templateV(iv, 0) = icoV[iv].x() * r;
+                templateV(iv, 1) = icoV[iv].y() * r;
+                templateV(iv, 2) = icoV[iv].z() * r;
+            }
+            Eigen::MatrixX3i templateT(nTPerPt, 3);
+            for (int it = 0; it < nTPerPt; ++it)
+                templateT.row(it) << newTris[it](0), newTris[it](1), newTris[it](2);
+
+            // Merge all spheres into a single batched mesh
+            Eigen::MatrixX3f allVerts(nPts * nVPerPt, 3);
+            Eigen::MatrixX3f allNorms(nPts * nVPerPt, 3);
+            Eigen::MatrixX3i allTris(nPts * nTPerPt, 3);
+
+            for (int p = 0; p < nPts; ++p) {
+                const QVector3D& pos = positions[p];
+                int vOff = p * nVPerPt;
+                int tOff = p * nTPerPt;
+                for (int iv = 0; iv < nVPerPt; ++iv) {
+                    allVerts(vOff + iv, 0) = templateV(iv, 0) + pos.x();
+                    allVerts(vOff + iv, 1) = templateV(iv, 1) + pos.y();
+                    allVerts(vOff + iv, 2) = templateV(iv, 2) + pos.z();
+                    allNorms.row(vOff + iv) = templateN.row(iv);
+                }
+                for (int it = 0; it < nTPerPt; ++it) {
+                    allTris(tOff + it, 0) = templateT(it, 0) + vOff;
+                    allTris(tOff + it, 1) = templateT(it, 1) + vOff;
+                    allTris(tOff + it, 2) = templateT(it, 2) + vOff;
+                }
+            }
+
+            auto brainSurf = std::make_shared<BrainSurface>();
+            brainSurf->createFromData(allVerts, allNorms, allTris, color);
+            brainSurf->setVisible(digItem->isVisible());
+
+            // Apply Head-to-MRI transformation if available (same pattern as sensors:
+            // always call applyTransform so m_originalVertexData is established;
+            // identity matrix when transform is off)
+            if (!m_headToMriTrans.isEmpty()) {
+                QMatrix4x4 m;
+                if (m_applySensorTrans) {
+                    for(int rr=0; rr<4; ++rr) for(int cc=0; cc<4; ++cc) m(rr,cc) = m_headToMriTrans.trans(rr,cc);
+                }
+                brainSurf->applyTransform(m);
+            }
+
+            m_itemSurfaceMap[item] = brainSurf;
+
+            // Category name for legacy map key
+            QString catName;
+            switch (digItem->pointKind()) {
+                case DigitizerTreeItem::Cardinal: catName = "cardinal"; break;
+                case DigitizerTreeItem::HPI:      catName = "hpi"; break;
+                case DigitizerTreeItem::EEG:      catName = "eeg"; break;
+                case DigitizerTreeItem::Extra:    catName = "extra"; break;
+            }
+            QString key = "dig_" + catName;
+            m_surfaces[key] = brainSurf;
+            qDebug() << "BrainView: Created batched digitizer mesh" << key
+                     << "with" << nPts << "points," << allVerts.rows() << "vertices";
+        }
+
         
         // Check children recursively
         if (m_model->hasChildren(index)) {
@@ -725,7 +854,11 @@ void BrainView::setSensorVisible(const QString &type, bool visible)
     QString prefix;
     if (type == "MEG") prefix = "sens_meg_";
     else if (type == "EEG") prefix = "sens_eeg_";
-    else if (type == "Digitizer") prefix = "sens_dig_";
+    else if (type == "Digitizer") prefix = "dig_";
+    else if (type == "Digitizer/Cardinal") prefix = "dig_cardinal";
+    else if (type == "Digitizer/HPI") prefix = "dig_hpi";
+    else if (type == "Digitizer/EEG") prefix = "dig_eeg";
+    else if (type == "Digitizer/Extra") prefix = "dig_extra";
     else return;
     
     int count = 0;
@@ -999,6 +1132,7 @@ void BrainView::render(QRhiCommandBuffer *cb)
         if (it.key().startsWith("bem_")) continue;
         if (it.key().startsWith("sens_")) continue;
         if (it.key().startsWith("srcsp_")) continue;
+        if (it.key().startsWith("dig_")) continue;
         
         if (it.key().endsWith(m_activeSurfaceType)) {
             m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), currentShader);
@@ -1008,6 +1142,13 @@ void BrainView::render(QRhiCommandBuffer *cb)
     // Pass 1b: Source Space Points (use same shader as brain for consistent depth/blend)
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
         if (!it.key().startsWith("srcsp_")) continue;
+        if (!it.value()->isVisible()) continue;
+        m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), currentShader);
+    }
+
+    // Pass 1c: Digitizer Points (opaque small spheres, render like source space)
+    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+        if (!it.key().startsWith("dig_")) continue;
         if (!it.value()->isVisible()) continue;
         m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), currentShader);
     }
@@ -1348,62 +1489,26 @@ bool BrainView::loadSensors(const QString &fifPath) {
       if (!eegItems.isEmpty()) m_model->addSensors("EEG", eegItems);
   }
   
-  // Try to load digitizers if available in info
-  QList<QStandardItem*> digItems;
+  // Load digitizer points with proper categorization (Cardinal, HPI, EEG, Extra)
+  bool hasDigitizer = false;
   if (hasInfo && info.dig.size() > 0) {
-      int hpiCount = 0, eegCount = 0, extraCount = 0;
-      for (const auto &p : info.dig) {
-        QVector3D pos(p.r[0], p.r[1], p.r[2]);
-        QColor col(255, 0, 255);  // Default: magenta (extra/head shape points)
-        float size = 0.001f;       // Default: 1mm
-        QString name;
-        
-        if (p.kind == FIFFV_POINT_CARDINAL) {
-            size = 0.002f;  // 2mm for cardinal points
-            if (p.ident == FIFFV_POINT_NASION)       { col = QColor(0, 255, 0); name = "Nasion"; }
-            else if (p.ident == FIFFV_POINT_LPA)     { col = QColor(255, 0, 0); name = "LPA"; }
-            else if (p.ident == FIFFV_POINT_RPA)     { col = QColor(0, 0, 255); name = "RPA"; }
-            else                                     { col = QColor(0, 255, 0); name = QString("Cardinal %1").arg(p.ident); }
-        }
-        else if (p.kind == FIFFV_POINT_HPI)    { col = QColor(128, 0, 0); size = 0.001f; name = QString("HPI %1").arg(++hpiCount); }
-        else if (p.kind == FIFFV_POINT_EEG)    { col = QColor(0, 255, 255); size = 0.001f; name = QString("EEG %1").arg(++eegCount); }
-        else if (p.kind == FIFFV_POINT_EXTRA)  { col = QColor(255, 0, 255); size = 0.001f; name = QString("Head Shape %1").arg(++extraCount); }
-        else                                   { name = QString("Point %1").arg(digItems.size() + 1); }
-        
-        digItems.append(new SensorTreeItem(name, pos, col, size));
-      }
-      m_model->addSensors("Digitizer", digItems);
-  } else if (!hasInfo) { // If no info, try to load as dig set
-      file.reset(); // Reset to read as dig set
+      m_model->addDigitizerData(info.dig);
+      hasDigitizer = true;
+  } else if (!hasInfo) {
+      // If no info block, try to load as a standalone dig point set
+      file.reset();
       digSet = FiffDigPointSet(file);
       if (digSet.size() > 0) {
-          int hpiCount = 0, eegCount = 0, extraCount = 0;
-          for(int i=0; i<digSet.size(); ++i) {
-              const auto &p = digSet[i];
-              QVector3D pos(p.r[0], p.r[1], p.r[2]);
-              QColor col(255, 0, 255);  // Default: magenta
-              float size = 0.001f;
-              QString name;
-
-              if (p.kind == FIFFV_POINT_CARDINAL) {
-                  size = 0.002f;
-                  if (p.ident == FIFFV_POINT_NASION)       { col = QColor(0, 255, 0); name = "Nasion"; }
-                  else if (p.ident == FIFFV_POINT_LPA)     { col = QColor(255, 0, 0); name = "LPA"; }
-                  else if (p.ident == FIFFV_POINT_RPA)     { col = QColor(0, 0, 255); name = "RPA"; }
-                  else                                     { col = QColor(0, 255, 0); name = QString("Cardinal %1").arg(p.ident); }
-              }
-              else if (p.kind == FIFFV_POINT_HPI)    { col = QColor(128, 0, 0); size = 0.001f; name = QString("HPI %1").arg(++hpiCount); }
-              else if (p.kind == FIFFV_POINT_EEG)    { col = QColor(0, 255, 255); size = 0.001f; name = QString("EEG %1").arg(++eegCount); }
-              else if (p.kind == FIFFV_POINT_EXTRA)  { col = QColor(255, 0, 255); size = 0.001f; name = QString("Head Shape %1").arg(++extraCount); }
-              else                                   { name = QString("Point %1").arg(i + 1); }
-              
-              digItems.append(new SensorTreeItem(name, pos, col, size));
+          QList<FiffDigPoint> digPoints;
+          for (int i = 0; i < digSet.size(); ++i) {
+              digPoints.append(digSet[i]);
           }
-          m_model->addSensors("Digitizer", digItems);
+          m_model->addDigitizerData(digPoints);
+          hasDigitizer = true;
       }
   }
   
-  return hasInfo || !digItems.isEmpty();
+  return hasInfo || hasDigitizer;
 }
 
 //=============================================================================================================
@@ -1522,7 +1627,7 @@ void BrainView::refreshSensorTransforms()
 
     int surfCount = 0;
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-        if (it.key().startsWith("sens_") && it.value()) {
+        if ((it.key().startsWith("sens_") || it.key().startsWith("dig_")) && it.value()) {
             it.value()->applyTransform(qmat);
             surfCount++;
         }
@@ -1589,9 +1694,10 @@ void BrainView::castRay(const QPoint &pos)
         
         bool isSensor = it.key().startsWith("sens_");
         bool isBem = it.key().startsWith("bem_");
+        bool isDig = it.key().startsWith("dig_");
         
         // Brain surfaces: only pick if matching active surface type (same as render)
-        if (!isSensor && !isBem) {
+        if (!isSensor && !isBem && !isDig) {
             if (!it.key().endsWith(m_activeSurfaceType)) continue;
         }
         
@@ -1672,6 +1778,29 @@ void BrainView::castRay(const QPoint &pos)
             displayLabel = QString("MEG: %1").arg(hitInfo);
         } else if (hitKey.startsWith("sens_eeg_")) {
             displayLabel = QString("EEG: %1").arg(hitInfo);
+        } else if (hitKey.startsWith("dig_")) {
+            // Resolve the specific point name from the batched mesh.
+            // Each sphere in the batch has 42 vertices (icosahedron subdivided once).
+            QString pointName;
+            if (hitItem && hitIndex >= 0) {
+                AbstractTreeItem* absHit = dynamic_cast<AbstractTreeItem*>(hitItem);
+                if (absHit && absHit->type() == AbstractTreeItem::DigitizerItem + QStandardItem::UserType) {
+                    DigitizerTreeItem* digHit = static_cast<DigitizerTreeItem*>(absHit);
+                    const int vertsPerSphere = 42;
+                    int ptIdx = hitIndex / vertsPerSphere;
+                    const QStringList& names = digHit->pointNames();
+                    if (ptIdx >= 0 && ptIdx < names.size()) {
+                        pointName = names[ptIdx];
+                    }
+                }
+            }
+            QString category = hitKey.mid(4); // strip "dig_"
+            if (!category.isEmpty()) category[0] = category[0].toUpper();
+            if (!pointName.isEmpty()) {
+                displayLabel = QString("Digitizer: %1 (%2)").arg(pointName, category);
+            } else {
+                displayLabel = QString("Digitizer (%1)").arg(category);
+            }
         } else if (hitKey.startsWith("sens_dig_")) {
             displayLabel = QString("Digitizer: %1").arg(hitInfo);
         } else if (hitKey.startsWith("bem_")) {
@@ -1704,6 +1833,7 @@ void BrainView::castRay(const QPoint &pos)
              if (m_itemSurfaceMap.contains(m_hoveredItem)) {
                  m_itemSurfaceMap[m_hoveredItem]->setSelected(false);
                  m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(-1);
+                 m_itemSurfaceMap[m_hoveredItem]->setSelectedVertexRange(-1, 0);
              } else if (m_itemDipoleMap.contains(m_hoveredItem)) {
                  m_itemDipoleMap[m_hoveredItem]->setSelected(m_hoveredIndex, false);
              }
@@ -1715,7 +1845,17 @@ void BrainView::castRay(const QPoint &pos)
         if (m_hoveredItem) {
              // Select new
              if (m_itemSurfaceMap.contains(m_hoveredItem)) {
-                 if (currentRegionId != -1) {
+                 // Check if this is a digitizer batched mesh — highlight single sphere
+                 AbstractTreeItem* absHitSel = dynamic_cast<AbstractTreeItem*>(m_hoveredItem);
+                 bool isDigitizer = absHitSel &&
+                     (absHitSel->type() == AbstractTreeItem::DigitizerItem + QStandardItem::UserType);
+
+                 if (isDigitizer && m_hoveredIndex >= 0) {
+                     const int vertsPerSphere = 42;
+                     int sphereIdx = m_hoveredIndex / vertsPerSphere;
+                     m_itemSurfaceMap[m_hoveredItem]->setSelectedVertexRange(
+                         sphereIdx * vertsPerSphere, vertsPerSphere);
+                 } else if (currentRegionId != -1) {
                      m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(currentRegionId);
                      m_itemSurfaceMap[m_hoveredItem]->setSelected(false);
                  } else {
@@ -1727,7 +1867,16 @@ void BrainView::castRay(const QPoint &pos)
              }
         }
     } else if (m_hoveredItem && m_itemSurfaceMap.contains(m_hoveredItem)) {
-        if (currentRegionId != -1) {
+        AbstractTreeItem* absHitUpd = dynamic_cast<AbstractTreeItem*>(m_hoveredItem);
+        bool isDigitizer = absHitUpd &&
+            (absHitUpd->type() == AbstractTreeItem::DigitizerItem + QStandardItem::UserType);
+
+        if (isDigitizer && m_hoveredIndex >= 0) {
+            const int vertsPerSphere = 42;
+            int sphereIdx = m_hoveredIndex / vertsPerSphere;
+            m_itemSurfaceMap[m_hoveredItem]->setSelectedVertexRange(
+                sphereIdx * vertsPerSphere, vertsPerSphere);
+        } else if (currentRegionId != -1) {
             m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(currentRegionId);
             m_itemSurfaceMap[m_hoveredItem]->setSelected(false);
         } else {

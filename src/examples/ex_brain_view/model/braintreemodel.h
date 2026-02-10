@@ -6,6 +6,7 @@
 #include <fs/annotation.h>
 #include <mne/mne_bem_surface.h>
 #include <mne/mne_sourcespace.h>
+#include <fiff/fiff_dig_point.h>
 
 namespace INVERSELIB {
 class ECDSet;
@@ -35,6 +36,9 @@ public:
     // Helpers to populate the tree
     void addSensors(const QString &type, const QList<QStandardItem*> &items);
     void addDipoles(const INVERSELIB::ECDSet &set);
+
+    // Add digitizer points with proper categorization (Cardinal, HPI, EEG, Extra)
+    void addDigitizerData(const QList<FIFFLIB::FiffDigPoint> &digitizerPoints);
 
     // Add source space points
     void addSourceSpace(const MNELIB::MNESourceSpace &srcSpace);

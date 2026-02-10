@@ -23,7 +23,8 @@ public:
         BemItem,
         SensorItem,
         DipoleItem,
-        SourceSpaceItem
+        SourceSpaceItem,
+        DigitizerItem
     };
 
     explicit AbstractTreeItem(const QString &text = "", int type = AbstractItem);

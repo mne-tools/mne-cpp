@@ -155,6 +155,10 @@ private:
     QCheckBox *m_showMegCheck = nullptr;
     QCheckBox *m_showEegCheck = nullptr;
     QCheckBox *m_showDigCheck = nullptr;
+    QCheckBox *m_showDigCardinalCheck = nullptr;
+    QCheckBox *m_showDigHpiCheck = nullptr;
+    QCheckBox *m_showDigEegCheck = nullptr;
+    QCheckBox *m_showDigExtraCheck = nullptr;
     QCheckBox *m_applyTransCheck = nullptr;
 
     // Control widgets - Dipoles

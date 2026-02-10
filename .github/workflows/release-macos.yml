@@ -116,8 +116,18 @@ jobs:
       with:
         path: ../Qt6_static
         key: qt-6.10.2-static-macos-arm64
-    - name: Build static Qt from source
+    - name: Download pre-built static Qt
+      id: download-qt-static
       if: steps.cache-qt-static.outputs.cache-hit != 'true'
+      continue-on-error: true
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release download qt_binaries -p "qt6_6102_static_binaries_macos.tar.gz" -D /tmp
+        mkdir -p ../Qt6_static
+        tar xfz /tmp/qt6_6102_static_binaries_macos.tar.gz -C ../Qt6_static
+    - name: Build static Qt from source
+      if: steps.cache-qt-static.outputs.cache-hit != 'true' && steps.download-qt-static.outcome != 'success'
       run: |
         cd ..
         git clone https://code.qt.io/qt/qt5.git -b v6.10.2

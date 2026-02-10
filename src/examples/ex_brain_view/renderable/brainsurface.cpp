@@ -375,10 +375,29 @@ void BrainSurface::updateVertexColors()
                 }
             }
         } else if (m_selected) {
-            // Highlight whole hemisphere if no specific region selected
+            // Highlight whole surface if no specific region or vertex range selected
             for (auto &v : m_vertexData) {
                 blendToGold(v.color);
             }
+        }
+    }
+
+    // Apply vertex-range highlight (for individual points in batched meshes)
+    // Use bright white-yellow with high blend factor for strong visibility on small spheres
+    if (m_selectedVertexStart >= 0 && m_selectedVertexCount > 0) {
+        const uint32_t hlR = 255, hlG = 255, hlB = 180;
+        const float blendFactor = 0.85f;
+        int end = qMin(m_selectedVertexStart + m_selectedVertexCount, (int)m_vertexData.size());
+        for (int i = m_selectedVertexStart; i < end; ++i) {
+            uint32_t &c = m_vertexData[i].color;
+            uint32_t a = (c >> 24) & 0xFF;
+            uint32_t b = (c >> 16) & 0xFF;
+            uint32_t g = (c >> 8) & 0xFF;
+            uint32_t r = c & 0xFF;
+            r = static_cast<uint32_t>(r * (1.0f - blendFactor) + hlR * blendFactor);
+            g = static_cast<uint32_t>(g * (1.0f - blendFactor) + hlG * blendFactor);
+            b = static_cast<uint32_t>(b * (1.0f - blendFactor) + hlB * blendFactor);
+            c = (a << 24) | (b << 16) | (g << 8) | r;
         }
     }
 }
@@ -779,6 +798,16 @@ void BrainSurface::setSelected(bool selected)
 {
     if (m_selected != selected) {
         m_selected = selected;
+        updateVertexColors();
+        m_bBuffersDirty = true;
+    }
+}
+
+void BrainSurface::setSelectedVertexRange(int start, int count)
+{
+    if (m_selectedVertexStart != start || m_selectedVertexCount != count) {
+        m_selectedVertexStart = start;
+        m_selectedVertexCount = count;
         updateVertexColors();
         m_bBuffersDirty = true;
     }

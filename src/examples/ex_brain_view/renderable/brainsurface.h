@@ -335,6 +335,15 @@ public:
     
     void setSelected(bool selected);
     bool isSelected() const { return m_selected; }
+
+    /**
+     * Highlight a contiguous range of vertices (e.g. a single sphere in a batched mesh).
+     * Pass start=-1 to clear the vertex range highlight.
+     *
+     * @param[in] start  First vertex index to highlight (-1 to clear).
+     * @param[in] count  Number of vertices to highlight.
+     */
+    void setSelectedVertexRange(int start, int count);
     
 private:
     void updateVertexColors();
@@ -356,6 +365,8 @@ private:
     bool m_visible = true;
     bool m_selected = false;
     int m_selectedRegionId = -1;
+    int m_selectedVertexStart = -1;
+    int m_selectedVertexCount = 0;
     int m_hemi = -1; // 0=lh, 1=rh
     TissueType m_tissueType = TissueUnknown;
 
