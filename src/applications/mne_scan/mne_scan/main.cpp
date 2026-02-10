@@ -108,9 +108,6 @@ Q_IMPORT_PLUGIN(LSLAdapter)
 #ifdef WITHTMSI
 Q_IMPORT_PLUGIN(TMSI)
 #endif
-#ifdef WITHBRAINFLOW
-Q_IMPORT_PLUGIN(BrainFlowBoard)
-#endif
 #endif
 
 //=============================================================================================================

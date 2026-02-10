@@ -2,7 +2,7 @@
 /**
  * @file     brainsurface.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    0.1.0
+ * @since    2.0.0
  * @date     January, 2026
  *
  * @section  LICENSE

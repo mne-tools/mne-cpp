@@ -32,9 +32,8 @@ jobs:
       with:
         python-version: '3.10'
 
-    - name: Install BrainFlow and LSL submodules
+    - name: Install LSL submodule
       run: |
-        git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
         git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
 
     - name: Install Qt
@@ -55,15 +54,7 @@ jobs:
         # Details on CodeQL's query packs refer to : https://docs.github.com/en/code-security/code-scanning/automatically-scanning-your-code-for-vulnerabilities-and-errors/configuring-code-scanning#using-queries-in-ql-packs
         # queries: security-extended,security-and-quality
 
-    # Dependencies Build Steps (BrainFlow & LSL) - needed for linking
-    - name: Compile BrainFlow submodule
-      run: |
-        cd src/applications/mne_scan/plugins/brainflowboard/brainflow
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" ..
-        cmake --build . --target install
-
+    # Dependencies Build Steps (LSL) - needed for linking
     - name: Compile LSL submodule
       run: |
         cd src/applications/mne_scan/plugins/lsladapter/liblsl

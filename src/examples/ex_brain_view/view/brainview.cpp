@@ -1,8 +1,10 @@
 //=============================================================================================================
 /**
  * @file     brainview.cpp
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
- * @since    0.1.0
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
+ *           Lars Debor <Lars.Debor@tu-ilmenau.de>;
+ *           Lorenz Esch <lesch@mgh.harvard.edu>
+ * @since    2.0.0
  * @date     January, 2026
  *
  * @section  LICENSE

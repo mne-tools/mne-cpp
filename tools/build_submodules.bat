@@ -23,15 +23,6 @@
             cmake .. -G "Visual Studio 16 2019" -A x64
             cmake --build . --config Release --target install
         )
-        IF "%%~x" == "brainflow" (
-            cd %BASE_PATH%
-            git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
-            cd src\applications\mne_scan\plugins\brainflowboard\brainflow
-            mkdir build
-            cd build
-            cmake -G "Visual Studio 16 2019" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=8.1 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
-            cmake --build . --target install --config Release
-        )
     )
         
     :; # ########## WINDOWS SECTION ENDS ####################
@@ -59,14 +50,6 @@ BATCH
             mkdir build
             cd build
             cmake ..
-            cmake --build .
-        elif [ "${argv[j]}" == "brainflow" ]; then
-            cd ${BASE_PATH}
-            git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
-            cd src/applications/mne_scan/plugins/brainflowboard/brainflow
-            mkdir build
-            cd build
-            cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
             cmake --build .
         fi
     done

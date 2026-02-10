@@ -806,7 +806,6 @@ void MainWindow::initMultiViewWidget(QList<QSharedPointer<SCSHAREDLIB::AbstractP
                        lPlugins.at(i)->getName() == "FtBuffer" ||
                        lPlugins.at(i)->getName() == "Natus" ||
                        lPlugins.at(i)->getName() == "BabyMEG"||
-                       lPlugins.at(i)->getName() == "BrainFlow"||
                        lPlugins.at(i)->getName() == "EEGoSports"||
                        lPlugins.at(i)->getName() == "GUSBAmp"||
                        lPlugins.at(i)->getName() == "LSL Adapter"||

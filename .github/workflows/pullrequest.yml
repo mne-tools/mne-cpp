@@ -24,9 +24,8 @@ jobs:
       with:
         python-version: '3.10'
         architecture: ${{ matrix.os == 'macos-26' && 'arm64' || 'x64' }}
-    - name: Install BrainFlow and LSL submodules
+    - name: Install LSL submodule
       run: |
-        git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
         git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
@@ -41,25 +40,6 @@ jobs:
         version: ${{ matrix.qt }}
         arch: win64_msvc2022_64
         modules: qtcharts qt3d qtshadertools
-    - name: Compile BrainFlow submodule (Windows)
-      if: matrix.os == 'windows-2025'
-      run: |
-        $path = "src\applications\mne_scan\plugins\brainflowboard\brainflow\src\board_controller\muse\muse_bglib\muse_bglib_helper.cpp"
-        $txt = "#include <chrono>`r`n" + [System.IO.File]::ReadAllText($path)
-        [System.IO.File]::WriteAllText($path, $txt)
-        cd src\applications\mne_scan\plugins\brainflowboard\brainflow
-        mkdir build
-        cd build
-        cmake -G "Visual Studio 17 2022" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=10.0 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
-        cmake --build . --target install --config Release
-    - name: Compile BrainFlow submodule (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
-      run: |
-        cd src/applications/mne_scan/plugins/brainflowboard/brainflow
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
-        cmake --build .
     - name: Compile LSL submodule (Windows)
       if: matrix.os == 'windows-2025'
       run: |
@@ -101,9 +81,8 @@ jobs:
       with:
         python-version: '3.10'
         architecture: ${{ matrix.os == 'macos-26' && 'arm64' || 'x64' }}
-    - name: Install BrainFlow and LSL submodules
+    - name: Install LSL submodule
       run: |
-        git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
         git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt (Linux|MacOS)
       if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
@@ -118,25 +97,6 @@ jobs:
         version: ${{ matrix.qt }}
         arch: win64_msvc2022_64
         modules: qtcharts qt3d qtshadertools
-    - name: Compile BrainFlow submodule (Windows)
-      if: matrix.os == 'windows-2025'
-      run: |
-        $path = "src\applications\mne_scan\plugins\brainflowboard\brainflow\src\board_controller\muse\muse_bglib\muse_bglib_helper.cpp"
-        $txt = "#include <chrono>`r`n" + [System.IO.File]::ReadAllText($path)
-        [System.IO.File]::WriteAllText($path, $txt)
-        cd src\applications\mne_scan\plugins\brainflowboard\brainflow
-        mkdir build
-        cd build
-        cmake -G "Visual Studio 17 2022" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=10.0 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
-        cmake --build . --target install --config Release
-    - name: Compile BrainFlow submodule (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
-      run: |
-        cd src/applications/mne_scan/plugins/brainflowboard/brainflow
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
-        cmake --build .
     - name: Compile LSL submodule (Windows)
       if: matrix.os == 'windows-2025'
       run: |
@@ -169,25 +129,6 @@ jobs:
         version: ${{ matrix.qt }}
         arch: win64_msvc2022_64
         modules: qtcharts qt3d qtshadertools
-    - name: Compile BrainFlow submodule (Windows)
-      if: matrix.os == 'windows-2025'
-      run: |
-        $path = "src\applications\mne_scan\plugins\brainflowboard\brainflow\src\board_controller\muse\muse_bglib\muse_bglib_helper.cpp"
-        $txt = "#include <chrono>`r`n" + [System.IO.File]::ReadAllText($path)
-        [System.IO.File]::WriteAllText($path, $txt)
-        cd src\applications\mne_scan\plugins\brainflowboard\brainflow
-        mkdir build
-        cd build
-        cmake -G "Visual Studio 17 2022" -A x64 -DMSVC_RUNTIME=dynamic -DCMAKE_SYSTEM_VERSION=10.0 -DCMAKE_INSTALL_PREFIX="$env:GITHUB_WORKSPACE\applications\mne_scan\plugins\brainflowboard\brainflow\installed" ..
-        cmake --build . --target install --config Release
-    - name: Compile BrainFlow submodule (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
-      run: |
-        cd src/applications/mne_scan/plugins/brainflowboard/brainflow
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release ..
-        cmake --build .
     - name: Compile LSL submodule (Windows)
       if: matrix.os == 'windows-2025'
       run: |

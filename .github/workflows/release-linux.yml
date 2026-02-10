@@ -15,9 +15,8 @@ jobs:
       with:
         python-version: '3.10'
         architecture: 'x64'
-    - name: Install BrainFlow and LSL submodules
+    - name: Install LSL submodule
       run: |
-        git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
         git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install Qt
       uses: jurplel/install-qt-action@v3
@@ -29,13 +28,6 @@ jobs:
         pip install aqtinstall
         aqt install-tool linux desktop tools_ifw qt.tools.ifw.47 --outputdir $RUNNER_TOOL_CACHE/Qt
         echo "$RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/4.7/bin" >> $GITHUB_PATH
-    - name: Compile BrainFlow submodule
-      run: |
-        cd src/applications/mne_scan/plugins/brainflowboard/brainflow
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" ..
-        cmake --build .
     - name: Compile LSL submodule
       run: |
         cd src/applications/mne_scan/plugins/lsladapter/liblsl
@@ -103,9 +95,8 @@ jobs:
       with:
         python-version: '3.10'
         architecture: 'x64'
-    - name: Install BrainFlow and LSL submodules
+    - name: Install LSL submodule
       run: |
-        git submodule update --init src/applications/mne_scan/plugins/brainflowboard/brainflow
         git submodule update --init src/applications/mne_scan/plugins/lsladapter/liblsl
     - name: Install dependencies
       run: |
@@ -140,13 +131,6 @@ jobs:
         ../qt5/configure -static -release -prefix "$GITHUB_WORKSPACE/../Qt6_static" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -qt-libpng -qt-pcre -- -DCMAKE_BUILD_TYPE=Release
         cmake --build . --parallel $(nproc)
         cmake --install .
-    - name: Compile BrainFlow submodule
-      run: |
-        cd src/applications/mne_scan/plugins/brainflowboard/brainflow
-        mkdir build
-        cd build
-        cmake -DCMAKE_INSTALL_PREFIX=../installed -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Wno-deprecated-declarations" ..
-        cmake --build .
     - name: Compile LSL submodule
       run: |
         cd src/applications/mne_scan/plugins/lsladapter/liblsl

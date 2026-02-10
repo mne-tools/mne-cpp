@@ -33,7 +33,6 @@ add_subdirectory(writetofile)
 add_subdirectory(hpi)
 add_subdirectory(rtfwd)
 
-option(WITH_BRAINFLOW   "Build brainflow plugin"    OFF)
 option(WITH_LSL         "Build LSL plugin"          OFF)
 option(WITH_BRAINAMP    "Build BrainAMP pluign"     OFF)
 option(WITH_EEGO        "Build Eego Sport plugin"   OFF)
@@ -54,10 +53,6 @@ endif()
 
 if(WITH_TMSI)
     add_subdirectory(tmsi)
-endif()
-
-if(WITH_BRAINFLOW)
-    add_subdirectory(brainflowboard)
 endif()
 
 if(WITH_LSL)
