@@ -210,7 +210,7 @@ jobs:
         rm -r out/wasm/apps/mne_analyze_plugins
         rm -r resources/data
         # Replace logo
-        cp -RT resources/design/logos/qtlogo.svg bin/qtlogo.svg
+        cp resources/design/logos/qtlogo.svg out/wasm/apps/qtlogo.svg
         # Clone repo and update with new wasm versions
         git config --global user.email christoph.dinh@mne-cpp.org
         git config --global user.name chdinh
