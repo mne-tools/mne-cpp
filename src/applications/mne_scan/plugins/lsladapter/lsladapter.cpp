@@ -276,7 +276,12 @@ void LSLAdapter::onLSLStreamScanReady()
 QVector<lsl::stream_info> LSLAdapter::scanAvailableLSLStreams()
 {
     // no filtering implemented so far, simply get all streams
-    QVector<lsl::stream_info> vAvailableStreams = QVector<lsl::stream_info>::fromStdVector(lsl::resolve_streams());
+    const auto streams = lsl::resolve_streams();
+    QVector<lsl::stream_info> vAvailableStreams;
+    vAvailableStreams.reserve(static_cast<int>(streams.size()));
+    for(const auto& stream : streams) {
+        vAvailableStreams.append(stream);
+    }
     // do validity checks for all stream infos
     for(int i = 0; i < vAvailableStreams.size(); ++i) {
         if(isValid(vAvailableStreams[i]) == false) {

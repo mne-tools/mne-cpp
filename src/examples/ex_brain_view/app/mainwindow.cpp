@@ -63,6 +63,7 @@
 #include <QGridLayout>
 #include <QTimer>
 #include <QDebug>
+#include <QCoreApplication>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -306,6 +307,33 @@ void MainWindow::setupUI()
     m_showMegCheck->setChecked(false);
     m_showMegCheck->setEnabled(false);
 
+    m_showMegGradCheck = new QCheckBox("  Gradiometers");
+    m_showMegGradCheck->setChecked(false);
+    m_showMegGradCheck->setEnabled(false);
+
+    m_showMegMagCheck = new QCheckBox("  Magnetometers");
+    m_showMegMagCheck->setChecked(false);
+    m_showMegMagCheck->setEnabled(false);
+
+    m_showMegHelmetCheck = new QCheckBox("  Helmet Surface");
+    m_showMegHelmetCheck->setChecked(false);
+    m_showMegHelmetCheck->setEnabled(false);
+
+    QLabel *megHelmetLabel = new QLabel("MEG Helmet Surface:");
+    m_megHelmetCombo = new QComboBox;
+    m_megHelmetCombo->addItem("Auto", "");
+    m_megHelmetCombo->setEnabled(false);
+    m_megHelmetCombo->setToolTip("Override the auto-selected helmet surface.");
+
+    QDir megHelmetDir(QCoreApplication::applicationDirPath()
+        + "/../resources/general/sensorSurfaces");
+    if (megHelmetDir.exists()) {
+        const QStringList files = megHelmetDir.entryList(QStringList() << "*.fif", QDir::Files, QDir::Name);
+        for (const auto &file : files) {
+            m_megHelmetCombo->addItem(file, megHelmetDir.absoluteFilePath(file));
+        }
+    }
+
     m_showEegCheck = new QCheckBox("Show EEG");
     m_showEegCheck->setChecked(false);
     m_showEegCheck->setEnabled(false);
@@ -338,6 +366,11 @@ void MainWindow::setupUI()
     sensorLayout->addWidget(m_loadDigBtn);
     sensorLayout->addWidget(m_loadTransBtn);
     sensorLayout->addWidget(m_showMegCheck);
+    sensorLayout->addWidget(m_showMegGradCheck);
+    sensorLayout->addWidget(m_showMegMagCheck);
+    sensorLayout->addWidget(m_showMegHelmetCheck);
+    sensorLayout->addWidget(megHelmetLabel);
+    sensorLayout->addWidget(m_megHelmetCombo);
     sensorLayout->addWidget(m_showEegCheck);
     sensorLayout->addWidget(m_showDigCheck);
     sensorLayout->addWidget(m_showDigCardinalCheck);
@@ -626,7 +659,12 @@ void MainWindow::setupConnections()
         if (path.isEmpty()) return;
 
         if (m_brainView->loadSensors(path)) {
+            m_lastSensorPath = path;
             m_showMegCheck->setEnabled(true);
+            m_showMegGradCheck->setEnabled(false);
+            m_showMegMagCheck->setEnabled(false);
+            m_showMegHelmetCheck->setEnabled(false);
+            m_megHelmetCombo->setEnabled(true);
             m_showEegCheck->setEnabled(true);
             m_showDigCheck->setEnabled(true);
             // Sub-category checkboxes stay disabled until master is toggled on
@@ -640,6 +678,35 @@ void MainWindow::setupConnections()
     });
 
     connect(m_showMegCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("MEG", checked); });
+    connect(m_showMegCheck, &QCheckBox::toggled, [this](bool checked) {
+        m_showMegGradCheck->setEnabled(checked);
+        m_showMegMagCheck->setEnabled(checked);
+        m_showMegHelmetCheck->setEnabled(checked);
+        m_showMegGradCheck->setChecked(checked);
+        m_showMegMagCheck->setChecked(checked);
+        m_showMegHelmetCheck->setChecked(checked);
+    });
+    connect(m_showMegGradCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("MEG/Grad", checked); });
+    connect(m_showMegMagCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("MEG/Mag", checked); });
+    connect(m_showMegHelmetCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("MEG Helmet", checked); });
+    connect(m_megHelmetCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() {
+        const QString overridePath = m_megHelmetCombo->currentData().toString();
+        m_brainView->setMegHelmetOverride(overridePath);
+        if (!m_lastSensorPath.isEmpty()) {
+            if (m_brainView->loadSensors(m_lastSensorPath)) {
+                m_brainView->setSensorVisible("MEG", m_showMegCheck->isChecked());
+                m_brainView->setSensorVisible("MEG/Grad", m_showMegGradCheck->isChecked());
+                m_brainView->setSensorVisible("MEG/Mag", m_showMegMagCheck->isChecked());
+                m_brainView->setSensorVisible("MEG Helmet", m_showMegHelmetCheck->isChecked());
+                m_brainView->setSensorVisible("EEG", m_showEegCheck->isChecked());
+                m_brainView->setSensorVisible("Digitizer", m_showDigCheck->isChecked());
+                m_brainView->setSensorVisible("Digitizer/Cardinal", m_showDigCardinalCheck->isChecked());
+                m_brainView->setSensorVisible("Digitizer/HPI", m_showDigHpiCheck->isChecked());
+                m_brainView->setSensorVisible("Digitizer/EEG", m_showDigEegCheck->isChecked());
+                m_brainView->setSensorVisible("Digitizer/Extra", m_showDigExtraCheck->isChecked());
+            }
+        }
+    });
     connect(m_showEegCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("EEG", checked); });
     connect(m_showDigCheck, &QCheckBox::toggled, [this](bool checked) {
         m_brainView->setSensorVisible("Digitizer", checked);
@@ -758,7 +825,12 @@ void MainWindow::loadInitialData(const QString &subjectPath,
     if (!digitizerPath.isEmpty() && QFile::exists(digitizerPath)) {
         qDebug() << "Auto-loading digitizer from:" << digitizerPath;
         if (m_brainView->loadSensors(digitizerPath)) {
+            m_lastSensorPath = digitizerPath;
             m_showMegCheck->setEnabled(true);
+            m_showMegGradCheck->setEnabled(false);
+            m_showMegMagCheck->setEnabled(false);
+            m_showMegHelmetCheck->setEnabled(false);
+            m_megHelmetCombo->setEnabled(true);
             m_showEegCheck->setEnabled(true);
             m_showDigCheck->setEnabled(true);
             // Sub-category checkboxes stay disabled until master is toggled on

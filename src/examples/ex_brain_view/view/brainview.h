@@ -196,6 +196,14 @@ public slots:
 
     //=========================================================================================================
     /**
+     * Override the auto-selected MEG helmet surface path.
+     *
+     * @param[in] path       Absolute path to a helmet surface file. Empty to use auto selection.
+     */
+    void setMegHelmetOverride(const QString &path);
+
+    //=========================================================================================================
+    /**
      * Toggle visibility of dipoles.
      * 
      * @param[in] visible    Visibility state.
@@ -437,29 +445,31 @@ private:
      */
     void updateSceneBounds();
     
-     FIFFLIB::FiffCoordTrans m_headToMriTrans;
-     bool m_applySensorTrans = true;
-     bool m_dipolesVisible = true;
+    FIFFLIB::FiffCoordTrans m_headToMriTrans;
+    bool m_applySensorTrans = true;
+    QString m_megHelmetOverridePath;
+    bool m_dipolesVisible = true;
      
-     QStandardItem* m_hoveredItem = nullptr;
-     int m_hoveredIndex = -1;
-     QString m_hoveredRegion;
-     QLabel* m_regionLabel = nullptr;
+    QStandardItem* m_hoveredItem = nullptr;
+    int m_hoveredIndex = -1;
+    QString m_hoveredRegion;
+    QString m_hoveredSurfaceKey;
+    QLabel* m_regionLabel = nullptr;
      
-     // Debug Intersection Pointer
-     std::shared_ptr<BrainSurface> m_debugPointerSurface;
-     QVector3D m_lastIntersectionPoint;
-     bool m_hasIntersection = false;
+    // Debug Intersection Pointer
+    std::shared_ptr<BrainSurface> m_debugPointerSurface;
+    QVector3D m_lastIntersectionPoint;
+    bool m_hasIntersection = false;
      
-     // Async loading
-     QThread* m_loadingThread = nullptr;
-     StcLoadingWorker* m_stcWorker = nullptr;
-     bool m_isLoadingStc = false;
+    // Async loading
+    QThread* m_loadingThread = nullptr;
+    StcLoadingWorker* m_stcWorker = nullptr;
+    bool m_isLoadingStc = false;
      
-     // Multi-view support
-     ViewMode m_viewMode = SingleView;
-     QQuaternion m_multiViewCameras[4]; // Top, Bottom, Front, Left views
-     bool m_viewportEnabled[4] = {true, true, true, true}; // Which viewports are active
+    // Multi-view support
+    ViewMode m_viewMode = SingleView;
+    QQuaternion m_multiViewCameras[4]; // Top, Bottom, Front, Left views
+    bool m_viewportEnabled[4] = {true, true, true, true}; // Which viewports are active
 };
 
 #endif // BRAINVIEW_H

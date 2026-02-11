@@ -161,6 +161,10 @@ private:
     QPushButton *m_loadDigBtn = nullptr;
     QPushButton *m_loadTransBtn = nullptr;
     QCheckBox *m_showMegCheck = nullptr;
+    QCheckBox *m_showMegGradCheck = nullptr;
+    QCheckBox *m_showMegMagCheck = nullptr;
+    QCheckBox *m_showMegHelmetCheck = nullptr;
+    QComboBox *m_megHelmetCombo = nullptr;
     QCheckBox *m_showEegCheck = nullptr;
     QCheckBox *m_showDigCheck = nullptr;
     QCheckBox *m_showDigCardinalCheck = nullptr;
@@ -176,6 +180,8 @@ private:
     // Control widgets - Source Space
     QPushButton *m_loadSrcSpaceBtn = nullptr;
     QCheckBox *m_showSrcSpaceCheck = nullptr;
+
+    QString m_lastSensorPath;
 };
 
 #endif // MAINWINDOW_H

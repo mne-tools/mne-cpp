@@ -38,6 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
+
 #include "brainview.h"
 #include <Eigen/Dense>
 #include "bemtreeitem.h"
@@ -52,10 +53,13 @@
 #include <QKeyEvent>
 #include <QWheelEvent>
 #include <QFile>
+#include <QCoreApplication>
 #include <mne/mne_surface.h>
+#include <mne/mne_bem.h>
 #include <fs/surfaceset.h>
 #include <fs/surface.h>
 #include <fiff/fiff.h>
+#include <fiff/fiff_constants.h>
 #include <fiff/fiff_dig_point_set.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_stream.h>
@@ -100,7 +104,6 @@ BrainView::BrainView(QWidget *parent)
     m_updateTimer->start(16); // ~60 FPS update
 
     m_fpsLabel = new QLabel(this);
-    m_fpsLabel->setStyleSheet("color: white; font-weight: bold; font-family: sans-serif; font-size: 16px; background: rgba(0,0,0,100); padding: 5px;");
     m_fpsLabel->move(10, 10);
     m_fpsLabel->resize(300, 100);
 
@@ -385,6 +388,140 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
                 return surf;
             };
 
+            // Oriented barbell for MEG gradiometers (two spheres + thin rod)
+            auto createOrientedBarbell = [](const QVector3D &pos, const QMatrix4x4 &orient, const QColor &color, float size) {
+                auto surf = std::make_shared<BrainSurface>();
+
+                Eigen::Matrix3f rot;
+                for (int r = 0; r < 3; ++r)
+                    for (int c = 0; c < 3; ++c)
+                        rot(r, c) = orient(r, c);
+
+                const float halfSpan = size * 0.6f;
+                const float sphereR = size * 0.2f;
+                const float rodR = size * 0.08f;
+
+                QVector<Eigen::Vector3f> verts;
+                QVector<Eigen::Vector3f> norms;
+                QVector<Eigen::Vector3i> tris;
+
+                auto appendSphere = [&](const QVector3D &center, float radius) {
+                    const float phi = (1.0f + std::sqrt(5.0f)) / 2.0f;
+                    QVector<Eigen::Vector3f> sVerts;
+                    sVerts << Eigen::Vector3f(-1, phi, 0) << Eigen::Vector3f( 1, phi, 0)
+                           << Eigen::Vector3f(-1,-phi, 0) << Eigen::Vector3f( 1,-phi, 0)
+                           << Eigen::Vector3f( 0,-1, phi) << Eigen::Vector3f( 0, 1, phi)
+                           << Eigen::Vector3f( 0,-1,-phi) << Eigen::Vector3f( 0, 1,-phi)
+                           << Eigen::Vector3f( phi, 0,-1) << Eigen::Vector3f( phi, 0, 1)
+                           << Eigen::Vector3f(-phi, 0,-1) << Eigen::Vector3f(-phi, 0, 1);
+                    for (auto &v : sVerts) v.normalize();
+
+                    QVector<Eigen::Vector3i> sFaces;
+                    sFaces << Eigen::Vector3i(0,11,5)  << Eigen::Vector3i(0,5,1)
+                           << Eigen::Vector3i(0,1,7)   << Eigen::Vector3i(0,7,10)
+                           << Eigen::Vector3i(0,10,11) << Eigen::Vector3i(1,5,9)
+                           << Eigen::Vector3i(5,11,4)  << Eigen::Vector3i(11,10,2)
+                           << Eigen::Vector3i(10,7,6)  << Eigen::Vector3i(7,1,8)
+                           << Eigen::Vector3i(3,9,4)   << Eigen::Vector3i(3,4,2)
+                           << Eigen::Vector3i(3,2,6)   << Eigen::Vector3i(3,6,8)
+                           << Eigen::Vector3i(3,8,9)   << Eigen::Vector3i(4,9,5)
+                           << Eigen::Vector3i(2,4,11)  << Eigen::Vector3i(6,2,10)
+                           << Eigen::Vector3i(8,6,7)   << Eigen::Vector3i(9,8,1);
+
+                    QMap<QPair<int,int>, int> cache;
+                    auto mid = [&](int a, int b) -> int {
+                        auto key = qMakePair(qMin(a,b), qMax(a,b));
+                        if (cache.contains(key)) return cache[key];
+                        int idx = sVerts.size();
+                        sVerts.append((sVerts[a] + sVerts[b]).normalized());
+                        cache[key] = idx;
+                        return idx;
+                    };
+                    QVector<Eigen::Vector3i> newFaces;
+                    newFaces.reserve(80);
+                    for (const auto &f : sFaces) {
+                        int ab = mid(f(0), f(1)), bc = mid(f(1), f(2)), ca = mid(f(2), f(0));
+                        newFaces << Eigen::Vector3i(f(0), ab, ca) << Eigen::Vector3i(f(1), bc, ab)
+                                 << Eigen::Vector3i(f(2), ca, bc) << Eigen::Vector3i(ab, bc, ca);
+                    }
+
+                    const int base = verts.size();
+                    verts.reserve(base + sVerts.size());
+                    norms.reserve(base + sVerts.size());
+                    tris.reserve(tris.size() + newFaces.size());
+
+                    QVector3D c = center;
+                    for (const auto &v : sVerts) {
+                        Eigen::Vector3f vn = rot * v;
+                        Eigen::Vector3f vp = rot * (v * radius);
+                        verts.append(Eigen::Vector3f(vp.x() + c.x(), vp.y() + c.y(), vp.z() + c.z()));
+                        norms.append(vn.normalized());
+                    }
+                    for (const auto &f : newFaces) {
+                        tris.append(Eigen::Vector3i(base + f(0), base + f(1), base + f(2)));
+                    }
+                };
+
+                auto appendRod = [&]() {
+                    float hx = rodR;
+                    float hy = halfSpan;
+                    float hz = rodR;
+                    Eigen::Vector3f corners[8] = {
+                        {-hx, -hy, -hz}, { hx, -hy, -hz}, { hx,  hy, -hz}, {-hx,  hy, -hz},
+                        {-hx, -hy,  hz}, { hx, -hy,  hz}, { hx,  hy,  hz}, {-hx,  hy,  hz}
+                    };
+                    for (auto &c : corners) c = rot * c;
+
+                    int faces[6][4] = {
+                        {4,5,6,7}, {1,0,3,2},
+                        {3,7,6,2}, {0,1,5,4},
+                        {1,2,6,5}, {0,4,7,3}
+                    };
+
+                    const int base = verts.size();
+                    verts.reserve(base + 24);
+                    norms.reserve(base + 24);
+                    tris.reserve(tris.size() + 12);
+
+                    for (int f = 0; f < 6; ++f) {
+                        Eigen::Vector3f v0 = corners[faces[f][0]];
+                        Eigen::Vector3f v1 = corners[faces[f][1]];
+                        Eigen::Vector3f v2 = corners[faces[f][2]];
+                        Eigen::Vector3f fn = (v1 - v0).cross(v2 - v0).normalized();
+                        int faceBase = base + f * 4;
+                        for (int k = 0; k < 4; ++k) {
+                            Eigen::Vector3f v = corners[faces[f][k]];
+                            verts.append(Eigen::Vector3f(v.x() + pos.x(), v.y() + pos.y(), v.z() + pos.z()));
+                            norms.append(fn);
+                        }
+                        tris.append(Eigen::Vector3i(faceBase, faceBase + 1, faceBase + 2));
+                        tris.append(Eigen::Vector3i(faceBase, faceBase + 2, faceBase + 3));
+                    }
+                };
+
+                QVector3D axis = QVector3D(rot(0,1), rot(1,1), rot(2,1));
+                appendSphere(pos + axis * halfSpan, sphereR);
+                appendSphere(pos - axis * halfSpan, sphereR);
+                appendRod();
+
+                Eigen::MatrixX3f rr(verts.size(), 3), nn(norms.size(), 3);
+                Eigen::MatrixX3i tt(tris.size(), 3);
+                for (int i = 0; i < verts.size(); ++i) {
+                    rr(i, 0) = verts[i].x();
+                    rr(i, 1) = verts[i].y();
+                    rr(i, 2) = verts[i].z();
+                    nn(i, 0) = norms[i].x();
+                    nn(i, 1) = norms[i].y();
+                    nn(i, 2) = norms[i].z();
+                }
+                for (int i = 0; i < tris.size(); ++i) {
+                    tt.row(i) = tris[i];
+                }
+
+                surf->createFromData(rr, nn, tt, color);
+                return surf;
+            };
+
             // Smooth sphere (subdivided icosahedron) for EEG and digitizer points
             auto createSphere = [](const QVector3D &pos, const QColor &color, float radius) {
                 auto surf = std::make_shared<BrainSurface>();
@@ -447,9 +584,12 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
             QString parentText = "";
             if (sensItem->parent()) parentText = sensItem->parent()->text();
 
-            if (parentText.contains("MEG") && sensItem->hasOrientation()) {
-                 brainSurf = createOrientedPlate(sensItem->position(), sensItem->orientation(),
-                                                  sensItem->color(), sensItem->scale());
+              if (parentText.contains("MEG/Grad") && sensItem->hasOrientation()) {
+                  brainSurf = createOrientedBarbell(sensItem->position(), sensItem->orientation(),
+                                             sensItem->color(), sensItem->scale());
+              } else if (parentText.contains("MEG/Mag") && sensItem->hasOrientation()) {
+                  brainSurf = createOrientedPlate(sensItem->position(), sensItem->orientation(),
+                                            sensItem->color(), sensItem->scale());
             } else {
                  // EEG and Digitizer: smooth spheres
                  brainSurf = createSphere(sensItem->position(), sensItem->color(), sensItem->scale());
@@ -470,7 +610,9 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
 
             // Legacy map support
             QString keyPrefix = "sens_";
-            if (parentText.contains("MEG")) keyPrefix = "sens_meg_";
+            if (parentText.contains("MEG/Grad")) keyPrefix = "sens_meg_grad_";
+            else if (parentText.contains("MEG/Mag")) keyPrefix = "sens_meg_mag_";
+            else if (parentText.contains("MEG")) keyPrefix = "sens_meg_";
             else if (parentText.contains("EEG")) keyPrefix = "sens_eeg_";
             else if (parentText.contains("Digitizer")) keyPrefix = "sens_dig_";
             
@@ -915,6 +1057,9 @@ void BrainView::setSensorVisible(const QString &type, bool visible)
 {
     QString prefix;
     if (type == "MEG") prefix = "sens_meg_";
+    else if (type == "MEG/Grad") prefix = "sens_meg_grad_";
+    else if (type == "MEG/Mag") prefix = "sens_meg_mag_";
+    else if (type == "MEG Helmet") prefix = "sens_surface_meg";
     else if (type == "EEG") prefix = "sens_eeg_";
     else if (type == "Digitizer") prefix = "dig_";
     else if (type == "Digitizer/Cardinal") prefix = "dig_cardinal";
@@ -941,6 +1086,13 @@ void BrainView::setSensorTransEnabled(bool enabled)
         refreshSensorTransforms();
         update();
     }
+}
+
+//=============================================================================================================
+
+void BrainView::setMegHelmetOverride(const QString &path)
+{
+    m_megHelmetOverridePath = path;
 }
 
 void BrainView::setDipoleVisible(bool visible)
@@ -1537,7 +1689,8 @@ bool BrainView::loadSensors(const QString &fifPath) {
   }
 
   if (hasInfo) {
-      QList<QStandardItem*> megItems;
+      QList<QStandardItem*> megGradItems;
+      QList<QStandardItem*> megMagItems;
       QList<QStandardItem*> eegItems;
       
       // Prepare Device->Head transformation
@@ -1557,7 +1710,7 @@ bool BrainView::loadSensors(const QString &fifPath) {
       for (const auto &ch : info.chs) {
           if (ch.kind == FIFFV_MEG_CH) {
               QVector3D pos(ch.chpos.r0(0), ch.chpos.r0(1), ch.chpos.r0(2));
-              
+
               // Transform MEG from Device to Head space
               if (hasDevHead) {
                   pos = devHeadQTrans.map(pos);
@@ -1581,16 +1734,117 @@ bool BrainView::loadSensors(const QString &fifPath) {
               }
               item->setOrientation(orient);
 
-              megItems.append(item);
+              if (ch.unit == FIFF_UNIT_T_M) {
+                  megGradItems.append(item);
+              } else {
+                  megMagItems.append(item);
+              }
           } else if (ch.kind == FIFFV_EEG_CH) {
               QVector3D pos(ch.chpos.r0(0), ch.chpos.r0(1), ch.chpos.r0(2));
               // EEG: cyan spheres, 2mm radius
               eegItems.append(new SensorTreeItem(ch.ch_name, pos, QColor(0, 200, 220), 0.002f));
           }
       }
-      
-      if (!megItems.isEmpty()) m_model->addSensors("MEG", megItems);
+
+      if (!megGradItems.isEmpty()) m_model->addSensors("MEG/Grad", megGradItems);
+      if (!megMagItems.isEmpty()) m_model->addSensors("MEG/Mag", megMagItems);
       if (!eegItems.isEmpty()) m_model->addSensors("EEG", eegItems);
+
+      // Load and add MEG helmet surface if MEG channels are present
+      if (!megGradItems.isEmpty() || !megMagItems.isEmpty()) {
+          auto pickHelmetFile = [&info]() -> QString {
+              int coilType = -1;
+              int nMeg = 0;
+              for (const auto &ch : info.chs) {
+                  if (ch.kind == FIFFV_MEG_CH) {
+                      coilType = ch.chpos.coil_type & 0xFFFF;
+                      ++nMeg;
+                  }
+              }
+
+              QString fileName = "306m.fif";
+              if (coilType == FIFFV_COIL_BABY_GRAD) {
+                  fileName = "BabySQUID.fif";
+              } else if (coilType == FIFFV_COIL_NM_122) {
+                  fileName = "122m.fif";
+              } else if (coilType == FIFFV_COIL_CTF_GRAD) {
+                  fileName = "CTF_275.fif";
+              } else if (coilType == FIFFV_COIL_KIT_GRAD) {
+                  fileName = "KIT.fif";
+              } else if (coilType == FIFFV_COIL_MAGNES_MAG || coilType == FIFFV_COIL_MAGNES_GRAD) {
+                  fileName = (nMeg > 150) ? "Magnes_3600wh.fif" : "Magnes_2500wh.fif";
+              } else if (coilType / 1000 == 3) {
+                  fileName = "306m.fif";
+              }
+
+              return QCoreApplication::applicationDirPath()
+                  + "/../resources/general/sensorSurfaces/" + fileName;
+          };
+
+          QString helmetPath;
+          if (!m_megHelmetOverridePath.isEmpty()) {
+              helmetPath = m_megHelmetOverridePath;
+              if (!QFile::exists(helmetPath)) {
+                  qWarning() << "MEG helmet override file not found:" << helmetPath
+                             << "- falling back to auto selection.";
+                  helmetPath.clear();
+              }
+          }
+
+          if (helmetPath.isEmpty()) {
+              helmetPath = pickHelmetFile();
+          }
+
+          if (!QFile::exists(helmetPath)) {
+              QString fallback = QCoreApplication::applicationDirPath()
+                  + "/../resources/general/sensorSurfaces/306m.fif";
+              if (QFile::exists(fallback)) {
+                  helmetPath = fallback;
+              }
+          }
+
+          if (!QFile::exists(helmetPath)) {
+              qWarning() << "MEG helmet surface file not found. Checked:" << helmetPath;
+          }
+
+          if (QFile::exists(helmetPath)) {
+              QFile helmetFile(helmetPath);
+              MNELIB::MNEBem helmetBem(helmetFile);
+              if (helmetBem.size() > 0) {
+                  MNELIB::MNEBemSurface helmetSurf = helmetBem[0];
+
+                  if (helmetSurf.nn.rows() != helmetSurf.rr.rows()) {
+                      helmetSurf.nn = FSLIB::Surface::compute_normals(helmetSurf.rr, helmetSurf.tris);
+                  }
+
+                  if (hasDevHead) {
+                      QMatrix3x3 normalMat = devHeadQTrans.normalMatrix();
+                      for (int i = 0; i < helmetSurf.rr.rows(); ++i) {
+                          QVector3D pos(helmetSurf.rr(i, 0), helmetSurf.rr(i, 1), helmetSurf.rr(i, 2));
+                          pos = devHeadQTrans.map(pos);
+                          helmetSurf.rr(i, 0) = pos.x();
+                          helmetSurf.rr(i, 1) = pos.y();
+                          helmetSurf.rr(i, 2) = pos.z();
+
+                          QVector3D nn(helmetSurf.nn(i, 0), helmetSurf.nn(i, 1), helmetSurf.nn(i, 2));
+                          const float *d = normalMat.constData();
+                          float nx = d[0] * nn.x() + d[3] * nn.y() + d[6] * nn.z();
+                          float ny = d[1] * nn.x() + d[4] * nn.y() + d[7] * nn.z();
+                          float nz = d[2] * nn.x() + d[5] * nn.y() + d[8] * nn.z();
+                          QVector3D n = QVector3D(nx, ny, nz).normalized();
+                          helmetSurf.nn(i, 0) = n.x();
+                          helmetSurf.nn(i, 1) = n.y();
+                          helmetSurf.nn(i, 2) = n.z();
+                      }
+                  }
+
+                  auto helmetSurface = std::make_shared<BrainSurface>();
+                  helmetSurface->fromBemSurface(helmetSurf, QColor(0, 0, 77, 200));
+                  helmetSurface->setVisible(false);
+                  m_surfaces["sens_surface_meg"] = helmetSurface;
+              }
+          }
+      }
   }
   
   // Load digitizer points with proper categorization (Cardinal, HPI, EEG, Extra)
@@ -1769,8 +2023,8 @@ void BrainView::castRay(const QPoint &pos)
     QMatrix4x4 invPVM = pvm.inverted(&invertible);
     if (!invertible) return;
     
-    float ndcX = (2.0f * pos.x()) / width() - 1.0f;
-    float ndcY = 1.0f - (2.0f * pos.y()) / height(); 
+    float ndcX = (2.0f * pos.x()) / outputSize.width() - 1.0f;
+    float ndcY = 1.0f - (2.0f * pos.y()) / outputSize.height();
     
     QVector4D vNear(ndcX, ndcY, -1.0f, 1.0f);
     QVector4D vFar(ndcX, ndcY, 1.0f, 1.0f);
@@ -1852,6 +2106,7 @@ void BrainView::castRay(const QPoint &pos)
 
     // Build display label: show contextual info depending on what was hit
     QString displayLabel;
+    QString hitKey;
     if (!currentRegion.isEmpty()) {
         // Brain surface with annotation — determine hemisphere from surface key
         QString hemi;
@@ -1868,7 +2123,6 @@ void BrainView::castRay(const QPoint &pos)
             displayLabel = QString("Region: %1").arg(currentRegion);
     } else if (!hitInfo.isEmpty()) {
         // Determine what type of object was hit from the surface key
-        QString hitKey;
         for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
             if (hitItem && m_itemSurfaceMap.contains(hitItem) && m_itemSurfaceMap[hitItem] == it.value()) {
                 hitKey = it.key();
@@ -1878,7 +2132,9 @@ void BrainView::castRay(const QPoint &pos)
         // If no key found via item map, try hitInfo directly
         if (hitKey.isEmpty()) hitKey = hitInfo;
 
-        if (hitKey.startsWith("sens_meg_")) {
+        if (hitKey.startsWith("sens_surface_meg")) {
+            displayLabel = "MEG Helmet";
+        } else if (hitKey.startsWith("sens_meg_")) {
             displayLabel = QString("MEG: %1").arg(hitInfo);
         } else if (hitKey.startsWith("sens_eeg_")) {
             displayLabel = QString("EEG: %1").arg(hitInfo);
@@ -1937,8 +2193,15 @@ void BrainView::castRay(const QPoint &pos)
             }
         }
     }
+
+    QString hoveredSurfaceKey;
+    if (hitKey.startsWith("sens_surface_meg")) {
+        hoveredSurfaceKey = hitKey;
+        // Avoid the debug pointer looking like a phantom sensor on the helmet.
+        m_hasIntersection = false;
+    }
     
-    if (hitItem != m_hoveredItem || hitIndex != m_hoveredIndex) {
+    if (hitItem != m_hoveredItem || hitIndex != m_hoveredIndex || hoveredSurfaceKey != m_hoveredSurfaceKey) {
         // Deselect previous
         if (m_hoveredItem) {
              if (m_itemSurfaceMap.contains(m_hoveredItem)) {
@@ -1949,9 +2212,15 @@ void BrainView::castRay(const QPoint &pos)
                  m_itemDipoleMap[m_hoveredItem]->setSelected(m_hoveredIndex, false);
              }
         }
+        if (!m_hoveredSurfaceKey.isEmpty() && m_surfaces.contains(m_hoveredSurfaceKey)) {
+            m_surfaces[m_hoveredSurfaceKey]->setSelected(false);
+            m_surfaces[m_hoveredSurfaceKey]->setSelectedRegion(-1);
+            m_surfaces[m_hoveredSurfaceKey]->setSelectedVertexRange(-1, 0);
+        }
     
         m_hoveredItem = hitItem;
         m_hoveredIndex = hitIndex;
+        m_hoveredSurfaceKey = hoveredSurfaceKey;
         
         if (m_hoveredItem) {
              // Select new
@@ -1976,6 +2245,9 @@ void BrainView::castRay(const QPoint &pos)
              } else if (m_itemDipoleMap.contains(m_hoveredItem)) {
                  m_itemDipoleMap[m_hoveredItem]->setSelected(m_hoveredIndex, true);
              }
+        } else if (!m_hoveredSurfaceKey.isEmpty() && m_surfaces.contains(m_hoveredSurfaceKey)) {
+            m_surfaces[m_hoveredSurfaceKey]->setSelected(true);
+            m_surfaces[m_hoveredSurfaceKey]->setSelectedRegion(-1);
         }
     } else if (m_hoveredItem && m_itemSurfaceMap.contains(m_hoveredItem)) {
         AbstractTreeItem* absHitUpd = dynamic_cast<AbstractTreeItem*>(m_hoveredItem);
@@ -1994,6 +2266,8 @@ void BrainView::castRay(const QPoint &pos)
             m_itemSurfaceMap[m_hoveredItem]->setSelectedRegion(-1);
             m_itemSurfaceMap[m_hoveredItem]->setSelected(true);
         }
+    } else if (!m_hoveredSurfaceKey.isEmpty() && m_surfaces.contains(m_hoveredSurfaceKey)) {
+        m_surfaces[m_hoveredSurfaceKey]->setSelected(true);
     }
     update();
 }
