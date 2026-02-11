@@ -140,6 +140,14 @@ public:
 
     //=========================================================================================================
     /**
+     * Get the current threshold values.
+     */
+    float thresholdMin() const { return m_threshMin; }
+    float thresholdMid() const { return m_threshMid; }
+    float thresholdMax() const { return m_threshMax; }
+
+    //=========================================================================================================
+    /**
      * Get the number of time points in the source estimate.
      *
      * @return Number of time samples.

@@ -1608,6 +1608,9 @@ void BrainView::onStcLoadingFinished(bool success)
     
     // Update thresholds based on data
     m_sourceOverlay->updateThresholdsFromData();
+    emit sourceThresholdsUpdated(m_sourceOverlay->thresholdMin(),
+                                 m_sourceOverlay->thresholdMid(),
+                                 m_sourceOverlay->thresholdMax());
     
     if (m_sourceOverlay->isLoaded()) {
         setVisualizationMode("Source Estimate");

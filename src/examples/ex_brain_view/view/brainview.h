@@ -369,6 +369,16 @@ signals:
 
     //=========================================================================================================
     /**
+     * Emitted when auto-thresholds are set from loaded source estimate data.
+     *
+     * @param[in] min     Minimum threshold.
+     * @param[in] mid     Mid threshold.
+     * @param[in] max     Maximum threshold.
+     */
+    void sourceThresholdsUpdated(float min, float mid, float max);
+
+    //=========================================================================================================
+    /**
      * Emitted to report STC loading progress.
      *
      * @param[in] percent        Progress percentage (0-100).

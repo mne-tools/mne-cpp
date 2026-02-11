@@ -64,6 +64,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QCoreApplication>
+#include <QSignalBlocker>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -604,6 +605,15 @@ void MainWindow::setupConnections()
             int interval = static_cast<int>((tstep * 1000.0f) / factor);
             m_stcTimer->setInterval(interval);
         }
+    });
+
+    connect(m_brainView, &BrainView::sourceThresholdsUpdated, [this](float min, float mid, float max) {
+        const QSignalBlocker blockMin(m_minThresh);
+        const QSignalBlocker blockMid(m_midThresh);
+        const QSignalBlocker blockMax(m_maxThresh);
+        m_minThresh->setValue(static_cast<double>(min));
+        m_midThresh->setValue(static_cast<double>(mid));
+        m_maxThresh->setValue(static_cast<double>(max));
     });
 
     connect(m_timeSlider, &QSlider::valueChanged, m_brainView, &BrainView::setTimePoint);
