@@ -2023,8 +2023,8 @@ void BrainView::castRay(const QPoint &pos)
     QMatrix4x4 invPVM = pvm.inverted(&invertible);
     if (!invertible) return;
     
-    float ndcX = (2.0f * pos.x()) / outputSize.width() - 1.0f;
-    float ndcY = 1.0f - (2.0f * pos.y()) / outputSize.height();
+    float ndcX = (2.0f * pos.x()) / width() - 1.0f;
+    float ndcY = 1.0f - (2.0f * pos.y()) / height(); 
     
     QVector4D vNear(ndcX, ndcY, -1.0f, 1.0f);
     QVector4D vFar(ndcX, ndcY, 1.0f, 1.0f);
