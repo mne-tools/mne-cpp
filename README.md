@@ -28,6 +28,10 @@ Build from source
 
 `tools/build_project.bat` builds the project for Windows, Linux, and MacOS.
 
+For IDE discovery and manual builds, configure from the repository root:
+
+`cmake -S . -B build`
+
 For more in depth information on how to compile the project, please follow the [build guide](https://mne-cpp.github.io/pages/development/buildguide.html). The minimum requirements to build MNE-CPP are:
 
   * Compiler

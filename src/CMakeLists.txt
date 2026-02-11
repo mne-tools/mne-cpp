@@ -103,7 +103,7 @@ if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
       "\"${CMAKE_SOURCE_DIR}/CMakeFiles\" and try again from another folder:"
       "\n "
       "\n mkdir build"
-      "\n cmake -B build -S src"
+      "\n cmake -S . -B build"
       "\n "
       "\n If you are absolutley sure of what you are doing, you can pass in "
       "FORCE_IN_SOURCE_BUILD to CMake to force in-soure building "

@@ -40,7 +40,7 @@ jobs:
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
       run: |
-        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
         cmake --build build
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2025'
@@ -48,7 +48,7 @@ jobs:
         # Setup VS compiler
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
         cmake --build build
     - name: Deploy binaries
       run: |
@@ -88,7 +88,7 @@ jobs:
     - name: Configure and compile MNE-CPP (Linux|MacOS)
       if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
       run: |
-        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
         cmake --build build
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2025'
@@ -96,7 +96,7 @@ jobs:
         # Setup VS compiler
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
         cmake --build build
     - name: Deploy binaries
       run: |
@@ -137,12 +137,12 @@ jobs:
     - name: Configure and compile MNE-CPP (Linux)
       if: matrix.os == 'ubuntu-24.04'
       run: |
-        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DWITH_CODE_COV=ON
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DWITH_CODE_COV=ON
         cmake --build build
     - name: Configure and compile MNE-CPP (MacOS)
       if: matrix.os == 'macos-26'
       run: |
-        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
         cmake --build build
     - name: Configure and compile MNE-CPP (Windows)
       if: matrix.os == 'windows-2025'
@@ -150,7 +150,7 @@ jobs:
         # Setup VS compiler
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        cmake -B build -S src -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
         cmake --build build
     - name: Run tests (Linux)
       if: matrix.os == 'ubuntu-24.04'
