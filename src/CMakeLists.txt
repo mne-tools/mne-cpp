@@ -134,6 +134,11 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE)
 
 ##==============================================================================
+## Define resource directory (before subdirectories so they can use it)
+
+set(PROJECT_RESOURCES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources)
+
+##==============================================================================
 ## Add subdirectories
 
 add_subdirectory(libraries)
@@ -161,7 +166,6 @@ endif()
 ##==============================================================================
 ## Add symbolic links to project resources folder
 
-set(PROJECT_RESOURCES_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../resources)
 set(OUTPUT_RESOURCES_DIR ${BINARY_OUTPUT_DIRECTORY}/resources)
 
 cmake_path(
