@@ -65,18 +65,18 @@ set(RESOURCE_DIR ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/resources/general/explanation
 file(MAKE_DIRECTORY ${RESOURCE_DIR})
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
-    ${CMAKE_SOURCE_DIR}/../resources/general/explanations/fiff_explanations.txt
+    ${CMAKE_SOURCE_DIR}/resources/general/explanations/fiff_explanations.txt
     ${RESOURCE_DIR}/fiff_explanations.txt
     COMMENT "Copying fiff_explanations.txt to build directory"
 )
 
 if(APPLE)
-    set_source_files_properties(${CMAKE_SOURCE_DIR}/../resources/general/explanations/fiff_explanations.txt
+    set_source_files_properties(${CMAKE_SOURCE_DIR}/resources/general/explanations/fiff_explanations.txt
         PROPERTIES MACOSX_PACKAGE_LOCATION "Resources/general/explanations")
-    target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/../resources/general/explanations/fiff_explanations.txt)
+    target_sources(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/resources/general/explanations/fiff_explanations.txt)
 endif()
 
-install(FILES ${CMAKE_SOURCE_DIR}/../resources/general/explanations/fiff_explanations.txt
+install(FILES ${CMAKE_SOURCE_DIR}/resources/general/explanations/fiff_explanations.txt
     DESTINATION bin/resources/general/explanations
     COMPONENT applications
 )

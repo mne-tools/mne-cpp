@@ -154,13 +154,13 @@ void EventWindow::initMVCSettings()
 
 void EventWindow::initCheckBoxes()
 {
-    connect(ui->m_checkBox_activateEvents,&QCheckBox::stateChanged, [=](int state){
+    connect(ui->m_checkBox_activateEvents,&QCheckBox::stateChanged, [this](int state){
         m_pMainWindow->m_pDataWindow->getDataDelegate()->m_bActivateEvents = state;
         jumpToEvent(ui->m_tableView_eventTableView->selectionModel()->currentIndex(), QModelIndex());
         m_pMainWindow->m_pDataWindow->updateDataTableViews();
     });
 
-    connect(ui->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged, [=](int state){
+    connect(ui->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged, [this](int state){
         m_pMainWindow->m_pDataWindow->getDataDelegate()->m_bShowSelectedEventsOnly = state;
         jumpToEvent(ui->m_tableView_eventTableView->selectionModel()->currentIndex(), QModelIndex());
         m_pMainWindow->m_pDataWindow->updateDataTableViews();
@@ -177,7 +177,7 @@ void EventWindow::initComboBoxes()
     ui->m_comboBox_filterTypes->setCurrentText("All");
 
     //Connect filter types to event model
-    connect(ui->m_comboBox_filterTypes, &QComboBox::currentTextChanged,[=](QString string){
+    connect(ui->m_comboBox_filterTypes, &QComboBox::currentTextChanged,[this](QString string){
         m_pEventModel->setEventFilterType(string);
         m_pMainWindow->m_pDataWindow->updateDataTableViews();
     });

@@ -414,7 +414,7 @@ bool DataWindow::eventFilter(QObject *object, QEvent *event)
     if (object == ui->m_tableView_rawTableView->viewport() && event->type() == QEvent::MouseButtonDblClick) {
         QMouseEvent* mouseEventCast = static_cast<QMouseEvent*>(event);
         if(mouseEventCast->button() == Qt::LeftButton) {
-            m_pDataMarker->move(mouseEventCast->localPos().x() + ui->m_tableView_rawTableView->verticalHeader()->width() + ui->m_tableView_rawTableView->x(), m_pDataMarker->y());
+            m_pDataMarker->move(mouseEventCast->position().x() + ui->m_tableView_rawTableView->verticalHeader()->width() + ui->m_tableView_rawTableView->x(), m_pDataMarker->y());
 
             //Deselect channel which was selected through the double click -> dirty hack
             //ui->m_tableView_rawTableView->selectionModel()->select(ui->m_tableView_rawTableView->selectionModel()->currentIndex(), QItemSelectionModel::Deselect);
@@ -465,12 +465,12 @@ void DataWindow::customContextMenuRequested(QPoint pos)
     QMenu *markingSubMenu = new QMenu("Mark channels",menu);
 
     QAction* doMarkChBad = markingSubMenu->addAction(tr("Mark as bad"));
-    connect(doMarkChBad,&QAction::triggered, [=](){
+    connect(doMarkChBad,&QAction::triggered, [this, selected](){
         m_pRawModel->markChBad(selected,1);
     });
 
     QAction* doMarkChGood = markingSubMenu->addAction(tr("Mark as good"));
-    connect(doMarkChGood,&QAction::triggered, [=](){
+    connect(doMarkChGood,&QAction::triggered, [this, selected](){
         m_pRawModel->markChBad(selected,0);
     });
 
@@ -482,7 +482,7 @@ void DataWindow::customContextMenuRequested(QPoint pos)
         it.next();
         QAction* doApplyFilter = filtOpSubMenu->addAction(tr("%1").arg(it.key()));
 
-        connect(doApplyFilter,&QAction::triggered, [=](){
+        connect(doApplyFilter,&QAction::triggered, [this, selected, it](){
             m_pRawModel->applyOperator(selected,it.value());
         });
     }
@@ -494,7 +494,7 @@ void DataWindow::customContextMenuRequested(QPoint pos)
         it.next();
         QAction* doApplyFilter = filtOpAllSubMenu->addAction(tr("%1").arg(it.key()));
 
-        connect(doApplyFilter,&QAction::triggered, [=](){
+        connect(doApplyFilter,&QAction::triggered, [this, it](){
             m_pRawModel->applyOperator(QModelIndexList(),it.value());
         });
     }
@@ -509,7 +509,7 @@ void DataWindow::customContextMenuRequested(QPoint pos)
         it.next();
         QAction* undoApplyFilter = undoFiltOpSelSubMenu->addAction(tr("%1").arg(it.key()));
 
-        connect(undoApplyFilter,&QAction::triggered, [=](){
+        connect(undoApplyFilter,&QAction::triggered, [this, selected, it](){
             m_pRawModel->undoFilter(selected,it.value());
         });
     }
@@ -518,13 +518,13 @@ void DataWindow::customContextMenuRequested(QPoint pos)
 
     //undo all filterting to selected channels
     QAction* undoApplyFilterSel = undoFiltOpSubMenu->addAction(tr("Undo FilterOperators to selected channels"));
-    connect(undoApplyFilterSel,&QAction::triggered, [=](){
+    connect(undoApplyFilterSel,&QAction::triggered, [this, selected](){
         m_pRawModel->undoFilter(selected);
     });
 
     //undo all filtering to all channels
     QAction* undoApplyFilterAll = undoFiltOpSubMenu->addAction(tr("Undo FilterOperators to all channels"));
-    connect(undoApplyFilterAll,&QAction::triggered, [=](){
+    connect(undoApplyFilterAll,&QAction::triggered, [this](){
         m_pRawModel->undoFilter();
     });
 

@@ -99,7 +99,7 @@ if(APPLE)
     )
 
     foreach(GROUP ${RESOURCE_GROUPS})
-        file(GLOB GROUP_FILES "${CMAKE_SOURCE_DIR}/../resources/general/${GROUP}/*")
+        file(GLOB GROUP_FILES "${CMAKE_SOURCE_DIR}/resources/general/${GROUP}/*")
         set_source_files_properties(${GROUP_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION "MacOS/../resources/general/${GROUP}")
         list(APPEND SOURCES ${GROUP_FILES})
     endforeach()
