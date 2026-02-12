@@ -51,6 +51,7 @@
 #include <mne/mne_bem.h>
 #include <mne/mne_sourcespace.h>
 #include <fiff/fiff_coord_trans.h>
+#include <fiff/fiff_evoked.h>
 #include <QWidget>
 #include <QRhiWidget>
 #include <QMap>
@@ -59,6 +60,7 @@
 #include <memory> 
 #include <QQuaternion> 
 #include <QThread>
+#include <Eigen/Sparse>
 
 class QLabel;
 class QTimer;
@@ -292,6 +294,16 @@ public slots:
 
     //=========================================================================================================
     /**
+     * Load sensor measurements from an evoked/average FIF file.
+     *
+     * @param[in] evokedPath   Path to the evoked/average FIF file.
+     * @param[in] aveIndex     Dataset index to load from the file.
+     * @return True if successful.
+     */
+    bool loadSensorField(const QString &evokedPath, int aveIndex = 0);
+
+    //=========================================================================================================
+    /**
      * Toggle visibility of source space points.
      *
      * @param[in] visible    Visibility state.
@@ -340,6 +352,48 @@ public slots:
      * @param[in] max        Maximum threshold.
      */
     void setSourceThresholds(float min, float mid, float max);
+
+    //=========================================================================================================
+    /**
+     * Set the time point for sensor field maps.
+     *
+     * @param[in] index      Time sample index.
+     */
+    void setSensorFieldTimePoint(int index);
+
+    //=========================================================================================================
+    /**
+     * Set visibility for sensor field maps.
+     *
+     * @param[in] type       "MEG" or "EEG".
+     * @param[in] visible    Visibility state.
+     */
+    void setSensorFieldVisible(const QString &type, bool visible);
+
+    //=========================================================================================================
+    /**
+     * Set contour visibility for sensor field maps.
+     *
+     * @param[in] type       "MEG" or "EEG".
+     * @param[in] visible    Visibility state.
+     */
+    void setSensorFieldContourVisible(const QString &type, bool visible);
+
+    //=========================================================================================================
+    /**
+     * Choose MEG mapping surface (helmet or head).
+     *
+     * @param[in] useHead    True to map MEG on head surface.
+     */
+    void setMegFieldMapOnHead(bool useHead);
+
+    //=========================================================================================================
+    /**
+     * Set colormap for sensor field maps.
+     *
+     * @param[in] name       Colormap name.
+     */
+    void setSensorFieldColormap(const QString &name);
     
     //=========================================================================================================
     /**
@@ -369,6 +423,14 @@ signals:
 
     //=========================================================================================================
     /**
+     * Emitted when sensor field data is loaded.
+     *
+     * @param[in] numTimePoints     Number of time samples.
+     */
+    void sensorFieldLoaded(int numTimePoints);
+
+    //=========================================================================================================
+    /**
      * Emitted when auto-thresholds are set from loaded source estimate data.
      *
      * @param[in] min     Minimum threshold.
@@ -386,6 +448,15 @@ signals:
      */
     void stcLoadingProgress(int percent, const QString &message);
 
+    //=========================================================================================================
+    /**
+     * Emitted when the sensor field time point changes.
+     *
+     * @param[in] index      Time sample index.
+     * @param[in] time       Time in seconds.
+     */
+    void sensorFieldTimePointChanged(int index, float time);
+
 private slots:
     //=========================================================================================================
     /**
@@ -397,6 +468,16 @@ private slots:
 
 private:
     void refreshSensorTransforms();
+    bool buildSensorFieldMapping();
+    void applySensorFieldMap();
+    void updateContourSurfaces(const QString &prefix,
+                               const BrainSurface &surface,
+                               const QVector<float> &values,
+                               float step,
+                               bool visible);
+    float contourStep(float minVal, float maxVal, int targetTicks) const;
+    QString findHeadSurfaceKey() const;
+    QString findHelmetSurfaceKey() const;
 
 protected:
     void initialize(QRhiCommandBuffer *cb) override;
@@ -480,6 +561,27 @@ private:
     ViewMode m_viewMode = SingleView;
     QQuaternion m_multiViewCameras[4]; // Top, Bottom, Front, Left views
     bool m_viewportEnabled[4] = {true, true, true, true}; // Which viewports are active
+
+    // Sensor field mapping
+    FIFFLIB::FiffEvoked m_sensorEvoked;
+    bool m_sensorFieldLoaded = false;
+    int m_sensorFieldTimePoint = 0;
+    bool m_showMegFieldMap = false;
+    bool m_showEegFieldMap = false;
+    bool m_showMegFieldContours = false;
+    bool m_showEegFieldContours = false;
+    bool m_megFieldMapOnHead = false;
+    QString m_sensorFieldColormap = "MNE";
+    QString m_megFieldSurfaceKey;
+    QString m_eegFieldSurfaceKey;
+    QString m_megFieldContourPrefix = "sens_contour_meg";
+    QString m_eegFieldContourPrefix = "sens_contour_eeg";
+    QVector<int> m_megFieldPick;
+    QVector<int> m_eegFieldPick;
+    QVector<Eigen::Vector3f> m_megFieldPositions;
+    QVector<Eigen::Vector3f> m_eegFieldPositions;
+    QSharedPointer<Eigen::MatrixXf> m_megFieldMapping;
+    QSharedPointer<Eigen::MatrixXf> m_eegFieldMapping;
 };
 
 #endif // BRAINVIEW_H

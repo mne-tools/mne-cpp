@@ -196,6 +196,32 @@ void BrainSurface::createFromData(const Eigen::MatrixX3f &vertices, const Eigen:
 
 //=============================================================================================================
 
+Eigen::MatrixX3f BrainSurface::vertexPositions() const
+{
+    Eigen::MatrixX3f rr(m_vertexData.size(), 3);
+    for (int i = 0; i < m_vertexData.size(); ++i) {
+        rr(i, 0) = m_vertexData[i].pos.x();
+        rr(i, 1) = m_vertexData[i].pos.y();
+        rr(i, 2) = m_vertexData[i].pos.z();
+    }
+    return rr;
+}
+
+//=============================================================================================================
+
+Eigen::MatrixX3f BrainSurface::vertexNormals() const
+{
+    Eigen::MatrixX3f nn(m_vertexData.size(), 3);
+    for (int i = 0; i < m_vertexData.size(); ++i) {
+        nn(i, 0) = m_vertexData[i].norm.x();
+        nn(i, 1) = m_vertexData[i].norm.y();
+        nn(i, 2) = m_vertexData[i].norm.z();
+    }
+    return nn;
+}
+
+//=============================================================================================================
+
 bool BrainSurface::loadAnnotation(const QString &path)
 {
     if (!FSLIB::Annotation::read(path, m_annotation)) {

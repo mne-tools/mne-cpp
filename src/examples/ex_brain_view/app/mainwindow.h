@@ -53,6 +53,7 @@ class QTimer;
 class QDoubleSpinBox;
 class QPushButton;
 class QProgressBar;
+class QSpinBox;
 class BrainView;
 class BrainTreeModel;
 
@@ -160,6 +161,7 @@ private:
     // Control widgets - Sensors
     QPushButton *m_loadDigBtn = nullptr;
     QPushButton *m_loadTransBtn = nullptr;
+    QPushButton *m_loadSensorDataBtn = nullptr;
     QCheckBox *m_showMegCheck = nullptr;
     QCheckBox *m_showMegGradCheck = nullptr;
     QCheckBox *m_showMegMagCheck = nullptr;
@@ -167,6 +169,14 @@ private:
     QComboBox *m_megHelmetCombo = nullptr;
     QCheckBox *m_showEegCheck = nullptr;
     QCheckBox *m_showDigCheck = nullptr;
+    QCheckBox *m_showMegFieldCheck = nullptr;
+    QCheckBox *m_showEegFieldCheck = nullptr;
+    QCheckBox *m_showMegFieldContoursCheck = nullptr;
+    QCheckBox *m_showEegFieldContoursCheck = nullptr;
+    QCheckBox *m_megFieldMapOnHeadCheck = nullptr;
+    QSlider *m_sensorTimeSlider = nullptr;
+    QLabel *m_sensorTimeLabel = nullptr;
+    QSpinBox *m_evokedIndexSpin = nullptr;
     QCheckBox *m_showDigCardinalCheck = nullptr;
     QCheckBox *m_showDigHpiCheck = nullptr;
     QCheckBox *m_showDigEegCheck = nullptr;

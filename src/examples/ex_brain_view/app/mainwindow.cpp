@@ -65,6 +65,7 @@
 #include <QDebug>
 #include <QCoreApplication>
 #include <QSignalBlocker>
+#include <QSpinBox>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -201,7 +202,7 @@ void MainWindow::setupUI()
 
     QLabel *colormapLabel = new QLabel("Colormap:");
     m_colormapCombo = new QComboBox;
-    m_colormapCombo->addItems({"Hot", "Jet", "Viridis", "Cool", "RedBlue", "Bone"});
+    m_colormapCombo->addItems({"MNE", "Hot", "Jet", "Viridis", "Cool", "RedBlue", "Bone"});
 
     m_timeLabel = new QLabel("Time: 0.000 s");
     m_timeSlider = new QSlider(Qt::Horizontal);
@@ -303,6 +304,11 @@ void MainWindow::setupUI()
 
     m_loadDigBtn = new QPushButton("Load Digitizer...");
     m_loadTransBtn = new QPushButton("Load Transformation...");
+    m_loadSensorDataBtn = new QPushButton("Load Measurement...");
+    QLabel *evokedIndexLabel = new QLabel("Evoked Index:");
+    m_evokedIndexSpin = new QSpinBox;
+    m_evokedIndexSpin->setRange(0, 999);
+    m_evokedIndexSpin->setValue(0);
 
     m_showMegCheck = new QCheckBox("Show MEG");
     m_showMegCheck->setChecked(false);
@@ -343,6 +349,30 @@ void MainWindow::setupUI()
     m_showDigCheck->setChecked(false);
     m_showDigCheck->setEnabled(false);
 
+    m_showMegFieldCheck = new QCheckBox("  MEG Field Map");
+    m_showMegFieldCheck->setChecked(false);
+    m_showMegFieldCheck->setEnabled(false);
+
+    m_showEegFieldCheck = new QCheckBox("  EEG Potential Map");
+    m_showEegFieldCheck->setChecked(false);
+    m_showEegFieldCheck->setEnabled(false);
+
+    m_showMegFieldContoursCheck = new QCheckBox("    MEG Contours");
+    m_showMegFieldContoursCheck->setChecked(false);
+    m_showMegFieldContoursCheck->setEnabled(false);
+
+    m_showEegFieldContoursCheck = new QCheckBox("    EEG Contours");
+    m_showEegFieldContoursCheck->setChecked(false);
+    m_showEegFieldContoursCheck->setEnabled(false);
+
+    m_megFieldMapOnHeadCheck = new QCheckBox("    MEG Map on Head Surface");
+    m_megFieldMapOnHeadCheck->setChecked(false);
+    m_megFieldMapOnHeadCheck->setEnabled(false);
+
+    m_sensorTimeLabel = new QLabel("Sensor Time: 0.000 s");
+    m_sensorTimeSlider = new QSlider(Qt::Horizontal);
+    m_sensorTimeSlider->setEnabled(false);
+
     // Per-category digitizer visibility
     m_showDigCardinalCheck = new QCheckBox("  Cardinal (NAS/LPA/RPA)");
     m_showDigCardinalCheck->setChecked(false);
@@ -366,6 +396,9 @@ void MainWindow::setupUI()
 
     sensorLayout->addWidget(m_loadDigBtn);
     sensorLayout->addWidget(m_loadTransBtn);
+    sensorLayout->addWidget(m_loadSensorDataBtn);
+    sensorLayout->addWidget(evokedIndexLabel);
+    sensorLayout->addWidget(m_evokedIndexSpin);
     sensorLayout->addWidget(m_showMegCheck);
     sensorLayout->addWidget(m_showMegGradCheck);
     sensorLayout->addWidget(m_showMegMagCheck);
@@ -378,6 +411,13 @@ void MainWindow::setupUI()
     sensorLayout->addWidget(m_showDigHpiCheck);
     sensorLayout->addWidget(m_showDigEegCheck);
     sensorLayout->addWidget(m_showDigExtraCheck);
+    sensorLayout->addWidget(m_showMegFieldCheck);
+    sensorLayout->addWidget(m_showEegFieldCheck);
+    sensorLayout->addWidget(m_showMegFieldContoursCheck);
+    sensorLayout->addWidget(m_showEegFieldContoursCheck);
+    sensorLayout->addWidget(m_megFieldMapOnHeadCheck);
+    sensorLayout->addWidget(m_sensorTimeLabel);
+    sensorLayout->addWidget(m_sensorTimeSlider);
     sensorLayout->addWidget(m_applyTransCheck);
 
     // ===== View Group =====
@@ -622,6 +662,7 @@ void MainWindow::setupConnections()
     });
 
     connect(m_colormapCombo, &QComboBox::currentTextChanged, m_brainView, &BrainView::setSourceColormap);
+    connect(m_colormapCombo, &QComboBox::currentTextChanged, m_brainView, &BrainView::setSensorFieldColormap);
 
     auto updateThresholds = [this]() {
         m_brainView->setSourceThresholds(
@@ -687,6 +728,22 @@ void MainWindow::setupConnections()
         m_brainView->loadTransformation(path);
     });
 
+    connect(m_loadSensorDataBtn, &QPushButton::clicked, [this]() {
+        QString path = QFileDialog::getOpenFileName(this, "Select Evoked/Average", "", "Evoked/Average Files (*.fif)");
+        if (path.isEmpty()) return;
+
+        if (m_brainView->loadSensorField(path, m_evokedIndexSpin->value())) {
+            m_showMegFieldCheck->setEnabled(true);
+            m_showEegFieldCheck->setEnabled(true);
+            m_showMegFieldContoursCheck->setEnabled(true);
+            m_showEegFieldContoursCheck->setEnabled(true);
+            m_megFieldMapOnHeadCheck->setEnabled(true);
+            m_sensorTimeSlider->setEnabled(true);
+            m_showMegFieldCheck->setChecked(true);
+            m_showEegFieldCheck->setChecked(true);
+        }
+    });
+
     connect(m_showMegCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("MEG", checked); });
     connect(m_showMegCheck, &QCheckBox::toggled, [this](bool checked) {
         m_showMegGradCheck->setEnabled(checked);
@@ -736,6 +793,22 @@ void MainWindow::setupConnections()
     connect(m_showDigEegCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("Digitizer/EEG", checked); });
     connect(m_showDigExtraCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("Digitizer/Extra", checked); });
     connect(m_applyTransCheck, &QCheckBox::toggled, m_brainView, &BrainView::setSensorTransEnabled);
+
+    connect(m_showMegFieldCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorFieldVisible("MEG", checked); });
+    connect(m_showEegFieldCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorFieldVisible("EEG", checked); });
+    connect(m_showMegFieldContoursCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorFieldContourVisible("MEG", checked); });
+    connect(m_showEegFieldContoursCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorFieldContourVisible("EEG", checked); });
+    connect(m_megFieldMapOnHeadCheck, &QCheckBox::toggled, m_brainView, &BrainView::setMegFieldMapOnHead);
+    connect(m_sensorTimeSlider, &QSlider::valueChanged, m_brainView, &BrainView::setSensorFieldTimePoint);
+
+    connect(m_brainView, &BrainView::sensorFieldLoaded, [this](int numPoints) {
+        m_sensorTimeSlider->setRange(0, numPoints - 1);
+        m_sensorTimeSlider->setValue(0);
+        m_sensorTimeLabel->setText("Sensor Time: 0.000 s");
+    });
+    connect(m_brainView, &BrainView::sensorFieldTimePointChanged, [this](int, float time) {
+        m_sensorTimeLabel->setText(QString("Sensor Time: %1 s").arg(time, 0, 'f', 3));
+    });
 
     // Dipoles
     connect(m_loadDipoleBtn, &QPushButton::clicked, [this]() {

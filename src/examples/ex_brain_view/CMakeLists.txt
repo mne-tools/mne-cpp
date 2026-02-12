@@ -31,6 +31,7 @@ set(SOURCES
     model/items/digitizersettreeitem.cpp
     helpers/geometryinfo.cpp
     helpers/interpolation.cpp
+    helpers/field_map.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -56,6 +57,7 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 set(MNE_LIBS_REQUIRED
     mne_fs
     mne_fiff
+    mne_fwd
     mne_mne
     mne_disp
     mne_inverse

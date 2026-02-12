@@ -229,6 +229,24 @@ public:
     QRhiBuffer* indexBuffer() const { return m_indexBuffer.get(); }
     uint32_t indexCount() const { return m_indexCount; }
     uint32_t vertexCount() const { return m_vertexData.size(); }
+
+    //=========================================================================================================
+    /**
+     * Get a copy of the current vertex positions.
+     */
+    Eigen::MatrixX3f vertexPositions() const;
+
+    //=========================================================================================================
+    /**
+     * Get a copy of the current vertex normals.
+     */
+    Eigen::MatrixX3f vertexNormals() const;
+
+    //=========================================================================================================
+    /**
+     * Get the triangle index buffer.
+     */
+    QVector<uint32_t> triangleIndices() const { return m_indexData; }
     
     //=========================================================================================================
     /**
