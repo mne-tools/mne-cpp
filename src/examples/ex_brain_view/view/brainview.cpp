@@ -2799,6 +2799,9 @@ void BrainView::castRay(const QPoint &pos)
                  m_hasIntersection = true;
                  m_lastIntersectionPoint = rayOrigin + dist * rayDir;
 
+                 hitItem = nullptr;
+                 hitInfo.clear();
+
                  for(auto i = m_itemSurfaceMap.begin(); i != m_itemSurfaceMap.end(); ++i) {
                      if (i.value() == it.value()) {
                          hitItem = const_cast<QStandardItem*>(i.key());
@@ -2929,8 +2932,6 @@ void BrainView::castRay(const QPoint &pos)
     QString hoveredSurfaceKey;
     if (hitKey.startsWith("sens_surface_meg")) {
         hoveredSurfaceKey = hitKey;
-        // Avoid the debug pointer looking like a phantom sensor on the helmet.
-        m_hasIntersection = false;
     }
     
     if (hitItem != m_hoveredItem || hitIndex != m_hoveredIndex || hoveredSurfaceKey != m_hoveredSurfaceKey) {

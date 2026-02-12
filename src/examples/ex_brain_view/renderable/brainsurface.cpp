@@ -678,77 +678,37 @@ bool BrainSurface::intersects(const QVector3D &rayOrigin, const QVector3D &rayDi
         
         double t = f * (edge2x * qx + edge2y * qy + edge2z * qz);
         if (t > 1e-7 && t < closestDist) {
-            closestDist = t;
-            hit = true;
+            // Check barycentric coordinates with Fixed Relative Tolerance (25%)
+            // Relative tolerance scales with triangle size:
+            // - Large triangles (Helmet): Tolerates large gaps (~cm scale)
+            // - Small triangles (Brain): Tolerates small errors (~mm scale)
+            // This prevents clicking 'through' sparse meshes while staying precise on dense ones.
+            constexpr double tol = 0.25; 
             
-            // Find closest vertex of the hit triangle to the hit point
-            double hitX = originX + t * dirX;
-            double hitY = originY + t * dirY;
-            double hitZ = originZ + t * dirZ;
-            
-            double d0 = (v0x - hitX)*(v0x - hitX) + (v0y - hitY)*(v0y - hitY) + (v0z - hitZ)*(v0z - hitZ);
-            double d1 = (v1x - hitX)*(v1x - hitX) + (v1y - hitY)*(v1y - hitY) + (v1z - hitZ)*(v1z - hitZ);
-            double d2 = (v2x - hitX)*(v2x - hitX) + (v2y - hitY)*(v2y - hitY) + (v2z - hitZ)*(v2z - hitZ);
-            
-            if (d0 < d1 && d0 < d2) closestVert = i0;
-            else if (d1 < d2) closestVert = i1;
-            else closestVert = i2;
+            if (u >= -tol && v >= -tol && u + v <= 1.0 + tol) {
+                closestDist = t;
+                hit = true;
+                
+                // Find closest vertex of the hit triangle to the hit point
+                // (Used for region lookup)
+                double hitX = originX + t * dirX;
+                double hitY = originY + t * dirY;
+                double hitZ = originZ + t * dirZ;
+                
+                double d0 = (v0x - hitX)*(v0x - hitX) + (v0y - hitY)*(v0y - hitY) + (v0z - hitZ)*(v0z - hitZ);
+                double d1 = (v1x - hitX)*(v1x - hitX) + (v1y - hitY)*(v1y - hitY) + (v1z - hitZ)*(v1z - hitZ);
+                double d2 = (v2x - hitX)*(v2x - hitX) + (v2y - hitY)*(v2y - hitY) + (v2z - hitZ)*(v2z - hitZ);
+                
+                if (d0 < d1 && d0 < d2) closestVert = i0;
+                else if (d1 < d2) closestVert = i1;
+                else closestVert = i2;
+            }
         }
     }
     
     if (hit) {
         dist = static_cast<float>(closestDist);
         vertexIdx = closestVert;
-        return true;
-    }
-    
-    // 3. Proximity Fallback: If no exact intersection, find closest vertex to the ray
-    // This handles cases where the ray passes between triangles or near edges
-    // Inspired by legacy MNE's nearest_triangle_point approach
-    
-    // Compute a reasonable threshold based on scene scale (~3mm for brain surfaces)
-    double proximityThreshold = 0.003; // 3mm in meters
-    double closestVertDist = std::numeric_limits<double>::max();
-    int fallbackVert = -1;
-    double fallbackT = 0.0;
-    
-    for (int i = 0; i < m_vertexData.size(); ++i) {
-        const QVector3D &vq = m_vertexData[i].pos;
-        double vx = vq.x(), vy = vq.y(), vz = vq.z();
-        
-        // Vector from ray origin to vertex
-        double px = vx - originX;
-        double py = vy - originY;
-        double pz = vz - originZ;
-        
-        // Project vertex onto ray: t = (P dot D) / (D dot D)
-        // Since rayDir is normalized, D dot D = 1
-        double t = px * dirX + py * dirY + pz * dirZ;
-        
-        // Only consider vertices in front of the camera
-        if (t < 1e-7) continue;
-        
-        // Closest point on ray to vertex
-        double cpx = originX + t * dirX;
-        double cpy = originY + t * dirY;
-        double cpz = originZ + t * dirZ;
-        
-        // Distance from vertex to closest point on ray
-        double dx = vx - cpx;
-        double dy = vy - cpy;
-        double dz = vz - cpz;
-        double distToRay = std::sqrt(dx*dx + dy*dy + dz*dz);
-        
-        if (distToRay < proximityThreshold && distToRay < closestVertDist) {
-            closestVertDist = distToRay;
-            fallbackVert = i;
-            fallbackT = t;
-        }
-    }
-    
-    if (fallbackVert >= 0) {
-        dist = static_cast<float>(fallbackT);
-        vertexIdx = fallbackVert;
         return true;
     }
     
