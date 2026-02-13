@@ -67,6 +67,9 @@
 #include <QSignalBlocker>
 #include <QSpinBox>
 #include <QSettings>
+#include <QRadioButton>
+#include <QButtonGroup>
+#include <QAbstractButton>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -504,6 +507,37 @@ void MainWindow::setupUI()
     m_multiViewCheck->setToolTip("Toggle between single interactive camera and four fixed camera views.");
     viewLayout->addWidget(m_multiViewCheck);
 
+    QLabel *editTargetLabel = new QLabel("Apply Visualization To:");
+    viewLayout->addWidget(editTargetLabel);
+
+    m_viewEditTargetGroup = new QButtonGroup(this);
+    m_editTopRadio = new QRadioButton("Top");
+    m_editPerspectiveRadio = new QRadioButton("Perspective");
+    m_editFrontRadio = new QRadioButton("Front");
+    m_editLeftRadio = new QRadioButton("Left");
+
+    m_viewEditTargetGroup->addButton(m_editTopRadio, 0);
+    m_viewEditTargetGroup->addButton(m_editPerspectiveRadio, 1);
+    m_viewEditTargetGroup->addButton(m_editFrontRadio, 2);
+    m_viewEditTargetGroup->addButton(m_editLeftRadio, 3);
+
+    m_editPerspectiveRadio->setChecked(true);
+    m_editTopRadio->setEnabled(false);
+    m_editPerspectiveRadio->setEnabled(false);
+    m_editFrontRadio->setEnabled(false);
+    m_editLeftRadio->setEnabled(false);
+
+    QHBoxLayout *editRow1 = new QHBoxLayout();
+    editRow1->addWidget(m_editTopRadio);
+    editRow1->addWidget(m_editPerspectiveRadio);
+
+    QHBoxLayout *editRow2 = new QHBoxLayout();
+    editRow2->addWidget(m_editFrontRadio);
+    editRow2->addWidget(m_editLeftRadio);
+
+    viewLayout->addLayout(editRow1);
+    viewLayout->addLayout(editRow2);
+
     // Viewport Toggles
     QHBoxLayout *vpRow1 = new QHBoxLayout();
     QHBoxLayout *vpRow2 = new QHBoxLayout();
@@ -564,8 +598,53 @@ void MainWindow::setupUI()
 
 void MainWindow::setupConnections()
 {
+    auto refreshVisualizationControls = [this]() {
+        const int target = m_brainView->visualizationEditTarget();
+
+        {
+            const QSignalBlocker blockSurf(m_surfCombo);
+            m_surfCombo->setCurrentText(m_brainView->activeSurfaceForTarget(target));
+        }
+
+        {
+            const QSignalBlocker blockShader(m_shaderCombo);
+            m_shaderCombo->setCurrentText(m_brainView->shaderModeForTarget(target));
+        }
+
+        {
+            const QSignalBlocker blockOverlay(m_overlayCombo);
+            m_overlayCombo->setCurrentText(m_brainView->overlayModeForTarget(target));
+        }
+
+        if (m_linkShadersCheck->isChecked()) {
+            const QSignalBlocker blockBem(m_bemShaderCombo);
+            m_bemShaderCombo->setCurrentText(m_shaderCombo->currentText());
+        }
+
+        const bool isInflated = (m_surfCombo->currentText() == "inflated");
+        if (isInflated) {
+            m_headCheck->setChecked(false);
+            m_outerCheck->setChecked(false);
+            m_innerCheck->setChecked(false);
+        }
+        m_headCheck->setEnabled(!isInflated);
+        m_outerCheck->setEnabled(!isInflated);
+        m_innerCheck->setEnabled(!isInflated);
+
+        m_brainView->setActiveSurface(m_surfCombo->currentText());
+        m_brainView->setShaderMode(m_shaderCombo->currentText());
+        m_brainView->setVisualizationMode(m_overlayCombo->currentText());
+        if (m_linkShadersCheck->isChecked()) {
+            m_brainView->setBemShaderMode(m_shaderCombo->currentText());
+        } else {
+            m_brainView->setBemShaderMode(m_bemShaderCombo->currentText());
+        }
+    };
+
     // Surface type
-    connect(m_surfCombo, &QComboBox::currentTextChanged, m_brainView, &BrainView::setActiveSurface);
+    connect(m_surfCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
+        m_brainView->setActiveSurface(text);
+    });
 
     // Inflated surface logic
     connect(m_surfCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
@@ -581,7 +660,9 @@ void MainWindow::setupConnections()
     });
 
     // Shaders
-    connect(m_shaderCombo, &QComboBox::currentTextChanged, m_brainView, &BrainView::setShaderMode);
+    connect(m_shaderCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
+        m_brainView->setShaderMode(text);
+    });
     connect(m_shaderCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
         if (m_linkShadersCheck->isChecked()) {
             m_bemShaderCombo->setCurrentText(text);
@@ -593,6 +674,11 @@ void MainWindow::setupConnections()
         if (checked) {
             m_bemShaderCombo->setCurrentText(m_shaderCombo->currentText());
         }
+    });
+
+    connect(m_viewEditTargetGroup, &QButtonGroup::idClicked, [this, refreshVisualizationControls](int id) {
+        m_brainView->setVisualizationEditTarget(id);
+        refreshVisualizationControls();
     });
 
     // Overlay
@@ -623,17 +709,32 @@ void MainWindow::setupConnections()
     connect(m_bemColorCheck, &QCheckBox::toggled, m_brainView, &BrainView::setBemHighContrast);
 
     // Multi-view
-    connect(m_multiViewCheck, &QCheckBox::toggled, [this](bool checked) {
+    connect(m_multiViewCheck, &QCheckBox::toggled, [this, refreshVisualizationControls](bool checked) {
         m_vpTopCheck->setEnabled(checked);
         m_vpBottomCheck->setEnabled(checked);
         m_vpFrontCheck->setEnabled(checked);
         m_vpLeftCheck->setEnabled(checked);
         m_resetMultiViewLayoutBtn->setEnabled(checked);
+
+        m_editTopRadio->setEnabled(checked);
+        m_editPerspectiveRadio->setEnabled(checked);
+        m_editFrontRadio->setEnabled(checked);
+        m_editLeftRadio->setEnabled(checked);
+
         if (checked) {
+            int target = m_viewEditTargetGroup->checkedId();
+            if (target < 0 || target > 3) {
+                target = 1;
+                m_editPerspectiveRadio->setChecked(true);
+            }
+            m_brainView->setVisualizationEditTarget(target);
             m_brainView->showMultiView();
         } else {
+            m_brainView->setVisualizationEditTarget(-1);
             m_brainView->showSingleView();
         }
+
+        refreshVisualizationControls();
     });
     connect(m_vpTopCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(0, checked); });
     connect(m_vpBottomCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(1, checked); });
@@ -947,6 +1048,10 @@ void MainWindow::setupConnections()
     m_vpFrontCheck->setEnabled(isMultiView);
     m_vpLeftCheck->setEnabled(isMultiView);
     m_resetMultiViewLayoutBtn->setEnabled(isMultiView);
+    m_editTopRadio->setEnabled(isMultiView);
+    m_editPerspectiveRadio->setEnabled(isMultiView);
+    m_editFrontRadio->setEnabled(isMultiView);
+    m_editLeftRadio->setEnabled(isMultiView);
 
     {
         const QSignalBlocker blockTop(m_vpTopCheck);
@@ -958,6 +1063,21 @@ void MainWindow::setupConnections()
         m_vpFrontCheck->setChecked(m_brainView->isViewportEnabled(2));
         m_vpLeftCheck->setChecked(m_brainView->isViewportEnabled(3));
     }
+
+    int editTarget = m_brainView->visualizationEditTarget();
+    if (isMultiView) {
+        if (editTarget < 0 || editTarget > 3) {
+            editTarget = 1;
+        }
+        if (QAbstractButton* button = m_viewEditTargetGroup->button(editTarget)) {
+            const QSignalBlocker blockTarget(m_viewEditTargetGroup);
+            button->setChecked(true);
+        }
+        m_brainView->setVisualizationEditTarget(editTarget);
+    } else {
+        m_brainView->setVisualizationEditTarget(-1);
+    }
+    refreshVisualizationControls();
 }
 
 //=============================================================================================================

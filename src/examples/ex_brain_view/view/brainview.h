@@ -255,6 +255,35 @@ public slots:
     void resetMultiViewLayout();
 
     /**
+     * Select which view's visualization settings are edited by UI controls.
+     *
+     * @param[in] target     -1=Single, 0=Top, 1=Perspective, 2=Front, 3=Left.
+     */
+    void setVisualizationEditTarget(int target);
+
+    /**
+     * Get current visualization edit target.
+     *
+     * @return               -1=Single, 0=Top, 1=Perspective, 2=Front, 3=Left.
+     */
+    int visualizationEditTarget() const;
+
+    /**
+     * Get configured surface type for a target view.
+     */
+    QString activeSurfaceForTarget(int target) const;
+
+    /**
+     * Get configured shader mode name for a target view.
+     */
+    QString shaderModeForTarget(int target) const;
+
+    /**
+     * Get configured overlay mode name for a target view.
+     */
+    QString overlayModeForTarget(int target) const;
+
+    /**
      * Check if a multi-view viewport is enabled.
      *
      * @param[in] index      Viewport index (0=Top, 1=Perspective, 2=Front, 3=Left).
@@ -534,6 +563,7 @@ private:
     void logPerspectiveRotation(const QString& context) const;
     void loadMultiViewSettings();
     void saveMultiViewSettings() const;
+    void updateInflatedSurfaceTransforms();
 
     std::unique_ptr<BrainRenderer> m_renderer;
     BrainTreeModel* m_model = nullptr;
@@ -546,6 +576,9 @@ private:
     QMap<QString, std::shared_ptr<BrainSurface>> m_surfaces; 
     std::shared_ptr<BrainSurface> m_activeSurface;
     QString m_activeSurfaceType;
+    QString m_singleViewSurfaceType = "pial";
+    QString m_multiViewSurfaceTypes[4] = {"pial", "pial", "pial", "pial"};
+    int m_visualizationEditTarget = -1;
     
     // Sensors (Lists of surfaces/meshes for coils/electrodes)
     QList<std::shared_ptr<BrainSurface>> m_megSensors;
@@ -553,8 +586,22 @@ private:
     QList<std::shared_ptr<BrainSurface>> m_digitizers;
     
     BrainRenderer::ShaderMode m_brainShaderMode = BrainRenderer::Standard;
+    BrainRenderer::ShaderMode m_singleViewShaderMode = BrainRenderer::Standard;
+    BrainRenderer::ShaderMode m_multiViewShaderModes[4] = {
+        BrainRenderer::Anatomical,
+        BrainRenderer::Standard,
+        BrainRenderer::Holographic,
+        BrainRenderer::Anatomical
+    };
     BrainRenderer::ShaderMode m_bemShaderMode = BrainRenderer::Standard;
     BrainSurface::VisualizationMode m_currentVisMode = BrainSurface::ModeSurface;
+    BrainSurface::VisualizationMode m_singleViewVisMode = BrainSurface::ModeSurface;
+    BrainSurface::VisualizationMode m_multiViewVisModes[4] = {
+        BrainSurface::ModeSurface,
+        BrainSurface::ModeSurface,
+        BrainSurface::ModeSurface,
+        BrainSurface::ModeSurface
+    };
     bool m_lightingEnabled = true;
     
     QQuaternion m_cameraRotation;

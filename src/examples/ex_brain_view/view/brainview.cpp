@@ -95,6 +95,61 @@ QQuaternion perspectivePresetRotation()
     return QQuaternion::fromEulerAngles(-45.0f, -40.0f, -130.0f);
 }
 
+int normalizedVisualizationTarget(int target)
+{
+    return std::clamp(target, -1, 3);
+}
+
+BrainRenderer::ShaderMode shaderModeFromName(const QString& modeName)
+{
+    if (modeName == "Holographic") {
+        return BrainRenderer::Holographic;
+    }
+    if (modeName == "Anatomical") {
+        return BrainRenderer::Anatomical;
+    }
+    return BrainRenderer::Standard;
+}
+
+QString shaderModeName(BrainRenderer::ShaderMode mode)
+{
+    if (mode == BrainRenderer::Holographic) {
+        return "Holographic";
+    }
+    if (mode == BrainRenderer::Anatomical) {
+        return "Anatomical";
+    }
+    return "Standard";
+}
+
+BrainSurface::VisualizationMode visualizationModeFromName(const QString& modeName)
+{
+    if (modeName == "Annotation") {
+        return BrainSurface::ModeAnnotation;
+    }
+    if (modeName == "Scientific") {
+        return BrainSurface::ModeScientific;
+    }
+    if (modeName == "Source Estimate") {
+        return BrainSurface::ModeSourceEstimate;
+    }
+    return BrainSurface::ModeSurface;
+}
+
+QString visualizationModeName(BrainSurface::VisualizationMode mode)
+{
+    if (mode == BrainSurface::ModeAnnotation) {
+        return "Annotation";
+    }
+    if (mode == BrainSurface::ModeScientific) {
+        return "Scientific";
+    }
+    if (mode == BrainSurface::ModeSourceEstimate) {
+        return "Source Estimate";
+    }
+    return "Surface";
+}
+
 std::unique_ptr<FiffCoordTransOld> toOldTransform(const FiffCoordTrans& trans)
 {
     if (trans.isEmpty()) {
@@ -1027,6 +1082,7 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
             onRowsInserted(index, 0, m_model->rowCount(index) - 1);
         }
     }
+    updateInflatedSurfaceTransforms();
     updateSceneBounds();
     update();
 }
@@ -1074,7 +1130,13 @@ void BrainView::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bot
 
 void BrainView::setActiveSurface(const QString &type)
 {
-    // Just update the active type. Render loop will pick matching surfaces.
+    const int target = normalizedVisualizationTarget(m_visualizationEditTarget);
+    if (target < 0) {
+        m_singleViewSurfaceType = type;
+    } else {
+        m_multiViewSurfaceTypes[target] = type;
+    }
+
     m_activeSurfaceType = type;
     
     // Update m_activeSurface pointer to one of the matching surfaces for stats/helpers
@@ -1085,49 +1147,8 @@ void BrainView::setActiveSurface(const QString &type)
         if (m_surfaces.contains(key)) m_activeSurface = m_surfaces[key];
     }
     
-    // Reposition hemispheres for inflated surfaces
-    // Inflated surfaces in FreeSurfer are centered at origin for each hemisphere,
-    // so they overlap when rendered together. We need to separate them side-by-side.
-    bool isInflated = (type == "inflated");
-    
-    QString lhKey = "lh_" + type;
-    QString rhKey = "rh_" + type;
-    
-    if (isInflated && m_surfaces.contains(lhKey) && m_surfaces.contains(rhKey)) {
-        auto lhSurf = m_surfaces[lhKey];
-        auto rhSurf = m_surfaces[rhKey];
-        
-        // First reset to original positions
-        QMatrix4x4 identity;
-        lhSurf->applyTransform(identity);
-        rhSurf->applyTransform(identity);
-        
-        // Get bounding boxes after reset
-        float lhMaxX = lhSurf->maxX();
-        float rhMinX = rhSurf->minX();
-        
-        // Small gap between hemispheres (5mm)
-        const float gap = 0.005f;
-        
-        // Translate left hemisphere so its right max is at -gap/2
-        // Translate right hemisphere so its left min is at +gap/2
-        // This centers the zero point between both hemispheres
-        float lhOffset = -gap/2.0f - lhMaxX;
-        float rhOffset = gap/2.0f - rhMinX;
-        
-        lhSurf->translateX(lhOffset);
-        rhSurf->translateX(rhOffset);
-    } else {
-        // For non-inflated surfaces, reset to original positions
-        // This removes any translations applied for inflated view
-        QMatrix4x4 identity;
-        if (m_surfaces.contains(lhKey)) {
-            m_surfaces[lhKey]->applyTransform(identity);
-        }
-        if (m_surfaces.contains(rhKey)) {
-            m_surfaces[rhKey]->applyTransform(identity);
-        }
-    }
+    updateInflatedSurfaceTransforms();
+    saveMultiViewSettings();
     
     updateSceneBounds();
     update();
@@ -1186,10 +1207,106 @@ void BrainView::updateSceneBounds()
 
 void BrainView::setShaderMode(const QString &modeName)
 {
-    if (modeName == "Standard") m_brainShaderMode = BrainRenderer::Standard;
-    else if (modeName == "Holographic") m_brainShaderMode = BrainRenderer::Holographic;
-    else if (modeName == "Anatomical") m_brainShaderMode = BrainRenderer::Anatomical;
+    const BrainRenderer::ShaderMode mode = shaderModeFromName(modeName);
+    const int target = normalizedVisualizationTarget(m_visualizationEditTarget);
+    if (target < 0) {
+        m_singleViewShaderMode = mode;
+    } else {
+        m_multiViewShaderModes[target] = mode;
+    }
+
+    m_brainShaderMode = mode;
+    saveMultiViewSettings();
     update();
+}
+
+//=============================================================================================================
+
+void BrainView::setVisualizationEditTarget(int target)
+{
+    m_visualizationEditTarget = normalizedVisualizationTarget(target);
+
+    const int selected = m_visualizationEditTarget;
+    m_activeSurfaceType = (selected < 0) ? m_singleViewSurfaceType : m_multiViewSurfaceTypes[selected];
+    m_brainShaderMode = (selected < 0) ? m_singleViewShaderMode : m_multiViewShaderModes[selected];
+    m_currentVisMode = (selected < 0) ? m_singleViewVisMode : m_multiViewVisModes[selected];
+
+    for (auto surf : m_surfaces) {
+        surf->setVisualizationMode(m_currentVisMode);
+    }
+    saveMultiViewSettings();
+}
+
+//=============================================================================================================
+
+int BrainView::visualizationEditTarget() const
+{
+    return m_visualizationEditTarget;
+}
+
+//=============================================================================================================
+
+QString BrainView::activeSurfaceForTarget(int target) const
+{
+    const int selected = normalizedVisualizationTarget(target);
+    return (selected < 0) ? m_singleViewSurfaceType : m_multiViewSurfaceTypes[selected];
+}
+
+//=============================================================================================================
+
+QString BrainView::shaderModeForTarget(int target) const
+{
+    const int selected = normalizedVisualizationTarget(target);
+    const BrainRenderer::ShaderMode mode = (selected < 0) ? m_singleViewShaderMode : m_multiViewShaderModes[selected];
+    return shaderModeName(mode);
+}
+
+//=============================================================================================================
+
+QString BrainView::overlayModeForTarget(int target) const
+{
+    const int selected = normalizedVisualizationTarget(target);
+    const BrainSurface::VisualizationMode mode = (selected < 0) ? m_singleViewVisMode : m_multiViewVisModes[selected];
+    return visualizationModeName(mode);
+}
+
+//=============================================================================================================
+
+void BrainView::updateInflatedSurfaceTransforms()
+{
+    const bool needsInflated = (m_singleViewSurfaceType == "inflated")
+                               || (m_multiViewSurfaceTypes[0] == "inflated")
+                               || (m_multiViewSurfaceTypes[1] == "inflated")
+                               || (m_multiViewSurfaceTypes[2] == "inflated")
+                               || (m_multiViewSurfaceTypes[3] == "inflated");
+
+    const QString lhKey = "lh_inflated";
+    const QString rhKey = "rh_inflated";
+
+    if (!m_surfaces.contains(lhKey) || !m_surfaces.contains(rhKey)) {
+        return;
+    }
+
+    auto lhSurf = m_surfaces[lhKey];
+    auto rhSurf = m_surfaces[rhKey];
+
+    QMatrix4x4 identity;
+    lhSurf->applyTransform(identity);
+    rhSurf->applyTransform(identity);
+
+    if (!needsInflated) {
+        return;
+    }
+
+    const float lhMaxX = lhSurf->maxX();
+    const float rhMinX = rhSurf->minX();
+
+    const float gap = 0.005f;
+    const float lhOffset = -gap / 2.0f - lhMaxX;
+    const float rhOffset = gap / 2.0f - rhMinX;
+
+    lhSurf->translateX(lhOffset);
+    rhSurf->translateX(rhOffset);
 }
 
 void BrainView::setBemShaderMode(const QString &modeName)
@@ -1253,15 +1370,19 @@ void BrainView::setDipoleVisible(bool visible)
 
 void BrainView::setVisualizationMode(const QString &modeName)
 {
-    BrainSurface::VisualizationMode mode = BrainSurface::ModeSurface;
-    if (modeName == "Annotation") mode = BrainSurface::ModeAnnotation;
-    if (modeName == "Scientific") mode = BrainSurface::ModeScientific;
-    if (modeName == "Source Estimate") mode = BrainSurface::ModeSourceEstimate;
+    const BrainSurface::VisualizationMode mode = visualizationModeFromName(modeName);
+    const int target = normalizedVisualizationTarget(m_visualizationEditTarget);
+    if (target < 0) {
+        m_singleViewVisMode = mode;
+    } else {
+        m_multiViewVisModes[target] = mode;
+    }
     
     m_currentVisMode = mode;
     for (auto surf : m_surfaces) {
         surf->setVisualizationMode(mode);
     }
+    saveMultiViewSettings();
     update();
 }
 
@@ -1686,10 +1807,32 @@ void BrainView::loadMultiViewSettings()
     m_viewportEnabled[2] = settings.value("viewportEnabled2", true).toBool();
     m_viewportEnabled[3] = settings.value("viewportEnabled3", true).toBool();
 
+    m_singleViewSurfaceType = settings.value("singleViewSurfaceType", "pial").toString();
+    m_multiViewSurfaceTypes[0] = settings.value("multiSurfaceType0", "pial").toString();
+    m_multiViewSurfaceTypes[1] = settings.value("multiSurfaceType1", "pial").toString();
+    m_multiViewSurfaceTypes[2] = settings.value("multiSurfaceType2", "pial").toString();
+    m_multiViewSurfaceTypes[3] = settings.value("multiSurfaceType3", "pial").toString();
+
+    m_singleViewShaderMode = shaderModeFromName(settings.value("singleViewShader", "Standard").toString());
+    m_multiViewShaderModes[0] = shaderModeFromName(settings.value("multiShader0", "Anatomical").toString());
+    m_multiViewShaderModes[1] = shaderModeFromName(settings.value("multiShader1", "Standard").toString());
+    m_multiViewShaderModes[2] = shaderModeFromName(settings.value("multiShader2", "Holographic").toString());
+    m_multiViewShaderModes[3] = shaderModeFromName(settings.value("multiShader3", "Anatomical").toString());
+
+    m_singleViewVisMode = visualizationModeFromName(settings.value("singleViewOverlay", "Surface").toString());
+    m_multiViewVisModes[0] = visualizationModeFromName(settings.value("multiOverlay0", "Surface").toString());
+    m_multiViewVisModes[1] = visualizationModeFromName(settings.value("multiOverlay1", "Surface").toString());
+    m_multiViewVisModes[2] = visualizationModeFromName(settings.value("multiOverlay2", "Surface").toString());
+    m_multiViewVisModes[3] = visualizationModeFromName(settings.value("multiOverlay3", "Surface").toString());
+
+    m_visualizationEditTarget = normalizedVisualizationTarget(settings.value("visualizationEditTarget", -1).toInt());
+
     settings.endGroup();
 
     m_multiSplitX = std::clamp(m_multiSplitX, 0.15f, 0.85f);
     m_multiSplitY = std::clamp(m_multiSplitY, 0.15f, 0.85f);
+
+    setVisualizationEditTarget(m_visualizationEditTarget);
 }
 
 //=============================================================================================================
@@ -1709,6 +1852,22 @@ void BrainView::saveMultiViewSettings() const
     settings.setValue("viewportEnabled1", m_viewportEnabled[1]);
     settings.setValue("viewportEnabled2", m_viewportEnabled[2]);
     settings.setValue("viewportEnabled3", m_viewportEnabled[3]);
+    settings.setValue("singleViewSurfaceType", m_singleViewSurfaceType);
+    settings.setValue("multiSurfaceType0", m_multiViewSurfaceTypes[0]);
+    settings.setValue("multiSurfaceType1", m_multiViewSurfaceTypes[1]);
+    settings.setValue("multiSurfaceType2", m_multiViewSurfaceTypes[2]);
+    settings.setValue("multiSurfaceType3", m_multiViewSurfaceTypes[3]);
+    settings.setValue("singleViewShader", shaderModeName(m_singleViewShaderMode));
+    settings.setValue("multiShader0", shaderModeName(m_multiViewShaderModes[0]));
+    settings.setValue("multiShader1", shaderModeName(m_multiViewShaderModes[1]));
+    settings.setValue("multiShader2", shaderModeName(m_multiViewShaderModes[2]));
+    settings.setValue("multiShader3", shaderModeName(m_multiViewShaderModes[3]));
+    settings.setValue("singleViewOverlay", visualizationModeName(m_singleViewVisMode));
+    settings.setValue("multiOverlay0", visualizationModeName(m_multiViewVisModes[0]));
+    settings.setValue("multiOverlay1", visualizationModeName(m_multiViewVisModes[1]));
+    settings.setValue("multiOverlay2", visualizationModeName(m_multiViewVisModes[2]));
+    settings.setValue("multiOverlay3", visualizationModeName(m_multiViewVisModes[3]));
+    settings.setValue("visualizationEditTarget", m_visualizationEditTarget);
     settings.endGroup();
 }
 
@@ -1780,7 +1939,7 @@ void BrainView::render(QRhiCommandBuffer *cb)
     m_frameCount++;
     if (m_fpsTimer.elapsed() >= 500) {
         float fps = m_frameCount / (m_fpsTimer.elapsed() / 1000.0f);
-        QString modeStr = (m_brainShaderMode == BrainRenderer::Holographic) ? "Holographic" : (m_brainShaderMode == BrainRenderer::Anatomical) ? "Anatomical" : "Standard";
+        QString modeStr = (m_singleViewShaderMode == BrainRenderer::Holographic) ? "Holographic" : (m_singleViewShaderMode == BrainRenderer::Anatomical) ? "Anatomical" : "Standard";
         int vCount = m_activeSurface ? m_activeSurface->vertexCount() : 0;
         m_fpsLabel->setText(QString("FPS: %1\nVertices: %2\nShader: %3").arg(fps, 0, 'f', 1).arg(vCount).arg(modeStr));
         m_fpsLabel->move(width() - m_fpsLabel->width() - 10, 10);
@@ -1809,14 +1968,6 @@ void BrainView::render(QRhiCommandBuffer *cb)
             * QQuaternion::fromAxisAndAngle(0, 1, 0, -90)   // Left - +90° pitch
     };
     
-    // Per-viewport shader modes for multi-view (different visualization per viewport)
-    QVector<BrainRenderer::ShaderMode> viewportShaders = {
-        BrainRenderer::Anatomical,   // Top - detailed anatomy view
-        BrainRenderer::Standard,     // Perspective - standard solid view
-        BrainRenderer::Holographic,  // Front - holographic/activity view
-        BrainRenderer::Anatomical    // Left - anatomical side view
-    };
-    
     // Build list of enabled viewports
     QVector<int> enabledViewports;
     if (m_viewMode == MultiView) {
@@ -1837,6 +1988,15 @@ void BrainView::render(QRhiCommandBuffer *cb)
     
     for (int slot = 0; slot < numEnabled; ++slot) {
         int vp = (m_viewMode == MultiView) ? enabledViewports[slot] : 0;
+
+        const BrainSurface::VisualizationMode desiredVisMode =
+            (m_viewMode == MultiView) ? m_multiViewVisModes[vp] : m_singleViewVisMode;
+        if (m_currentVisMode != desiredVisMode) {
+            m_currentVisMode = desiredVisMode;
+            for (auto surf : m_surfaces) {
+                surf->setVisualizationMode(m_currentVisMode);
+            }
+        }
         
         const QRect paneRect = (m_viewMode == MultiView)
             ? multiViewSlotRect(slot, numEnabled, outputSize)
@@ -1917,7 +2077,8 @@ void BrainView::render(QRhiCommandBuffer *cb)
 
     // Pass 1: Opaque Surfaces (Brain surfaces)
     // Use viewport-specific shader in multi-view mode, otherwise use global setting
-    BrainRenderer::ShaderMode currentShader = (m_viewMode == MultiView) ? viewportShaders[vp] : m_brainShaderMode;
+    BrainRenderer::ShaderMode currentShader = (m_viewMode == MultiView) ? m_multiViewShaderModes[vp] : m_singleViewShaderMode;
+    const QString activeSurfaceType = (m_viewMode == MultiView) ? m_multiViewSurfaceTypes[vp] : m_singleViewSurfaceType;
     
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
         if (it.key().startsWith("bem_")) continue;
@@ -1925,7 +2086,7 @@ void BrainView::render(QRhiCommandBuffer *cb)
         if (it.key().startsWith("srcsp_")) continue;
         if (it.key().startsWith("dig_")) continue;
         
-        if (it.key().endsWith(m_activeSurfaceType)) {
+        if (it.key().endsWith(activeSurfaceType)) {
             m_renderer->renderSurface(cb, rhi(), sceneData, it.value().get(), currentShader);
         }
     }
@@ -3342,6 +3503,7 @@ void BrainView::castRay(const QPoint &pos)
     }
 
     const int vp = (m_viewMode == MultiView) ? enabledViewports[activeSlot] : 0;
+    const QString activeSurfaceType = (m_viewMode == MultiView) ? m_multiViewSurfaceTypes[vp] : m_singleViewSurfaceType;
 
     QVector<QQuaternion> viewOffsets = {
         QQuaternion::fromAxisAndAngle(0, 0, 1, 180),
@@ -3420,7 +3582,7 @@ void BrainView::castRay(const QPoint &pos)
         
         // Brain surfaces: only pick if matching active surface type (same as render)
         if (!isSensor && !isBem && !isDig) {
-            if (!it.key().endsWith(m_activeSurfaceType)) continue;
+            if (!it.key().endsWith(activeSurfaceType)) continue;
         }
         
         float dist;

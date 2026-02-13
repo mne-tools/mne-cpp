@@ -54,6 +54,8 @@ class QDoubleSpinBox;
 class QPushButton;
 class QProgressBar;
 class QSpinBox;
+class QRadioButton;
+class QButtonGroup;
 class BrainView;
 class BrainTreeModel;
 
@@ -138,6 +140,11 @@ private:
 
     // Control widgets - View
     QCheckBox *m_multiViewCheck = nullptr;
+    QButtonGroup *m_viewEditTargetGroup = nullptr;
+    QRadioButton *m_editTopRadio = nullptr;
+    QRadioButton *m_editPerspectiveRadio = nullptr;
+    QRadioButton *m_editFrontRadio = nullptr;
+    QRadioButton *m_editLeftRadio = nullptr;
     QCheckBox *m_vpTopCheck = nullptr;
     QCheckBox *m_vpBottomCheck = nullptr;
     QCheckBox *m_vpFrontCheck = nullptr;
