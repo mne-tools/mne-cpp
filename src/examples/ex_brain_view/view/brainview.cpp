@@ -129,12 +129,8 @@ QQuaternion multiViewPresetOffset(int preset)
     case 4: // Bottom – opposite of Top
         return QQuaternion::fromAxisAndAngle(1, 0, 0, 180)
             * QQuaternion::fromAxisAndAngle(0, 0, 1, 180);
-    case 5: // Back – Front rotated 180° around vertical
-        return QQuaternion::fromAxisAndAngle(0, 1, 0, 180)
-            * QQuaternion::fromAxisAndAngle(0, 0, 1, 180)
-            * QQuaternion::fromAxisAndAngle(1, 0, 0, 90)
-            * QQuaternion::fromAxisAndAngle(0, 0, 1, 180)
-            * QQuaternion::fromAxisAndAngle(0, 0, 1, 180);
+    case 5: // Back – camera behind the head at -Y, up = +Z
+        return QQuaternion::fromAxisAndAngle(1, 0, 0, 90);
     case 6: // Right – opposite of Left
         return QQuaternion::fromAxisAndAngle(1, 0, 0, 90)
             * QQuaternion::fromAxisAndAngle(0, 1, 0, 90);
@@ -477,6 +473,12 @@ BrainView::BrainView(QWidget *parent)
 
 BrainView::~BrainView()
 {
+    // Stop worker thread before destroying anything it may reference
+    if (m_loadingThread) {
+        m_loadingThread->quit();
+        m_loadingThread->wait();
+    }
+
     saveMultiViewSettings();
 }
 
