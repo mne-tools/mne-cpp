@@ -109,6 +109,9 @@ private:
     void setupConnections();
     void loadHemisphere(const QString &subjectPath, const QString &subjectName, const QString &hemi);
     void loadBem(const QString &subjectName, const QString &bemPath);
+    void loadDataPathSettings();
+    void rememberDataPath(const QString &category, const QString &filePath);
+    QString dataDialogStartPath(const QString &category) const;
 
 private:
     // Core components
@@ -139,6 +142,8 @@ private:
     QCheckBox *m_vpBottomCheck = nullptr;
     QCheckBox *m_vpFrontCheck = nullptr;
     QCheckBox *m_vpLeftCheck = nullptr;
+    QPushButton *m_resetMultiViewLayoutBtn = nullptr;
+    QCheckBox *m_showInfoCheck = nullptr;
 
     // Control widgets - Brain Surface
     QPushButton *m_loadSurfaceBtn = nullptr;
@@ -192,6 +197,7 @@ private:
     QCheckBox *m_showSrcSpaceCheck = nullptr;
 
     QString m_lastSensorPath;
+    QString m_lastDataPath;
 };
 
 #endif // MAINWINDOW_H

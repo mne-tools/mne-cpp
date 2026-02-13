@@ -66,6 +66,7 @@
 #include <QCoreApplication>
 #include <QSignalBlocker>
 #include <QSpinBox>
+#include <QSettings>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -83,10 +84,81 @@ MainWindow::MainWindow(QWidget *parent)
 {
     setWindowTitle("MNE-CPP Brain View");
 
+    loadDataPathSettings();
+
     setupUI();
     setupConnections();
 
     resize(1200, 800);
+}
+
+//=============================================================================================================
+
+void MainWindow::loadDataPathSettings()
+{
+    QSettings settings("MNECPP");
+    settings.beginGroup("ex_brain_view/MainWindow");
+
+    const QString defaultPath = settings.value("lastDataPath/default", QString()).toString();
+    const QString legacyPath = settings.value("lastDataPath", QString()).toString();
+
+    if (!defaultPath.isEmpty() && QDir(defaultPath).exists()) {
+        m_lastDataPath = defaultPath;
+    } else if (!legacyPath.isEmpty() && QDir(legacyPath).exists()) {
+        m_lastDataPath = legacyPath;
+    }
+    settings.endGroup();
+
+    if (!m_lastDataPath.isEmpty() && !QDir(m_lastDataPath).exists()) {
+        m_lastDataPath.clear();
+    }
+}
+
+//=============================================================================================================
+
+void MainWindow::rememberDataPath(const QString &category, const QString &filePath)
+{
+    if (category.isEmpty() || filePath.isEmpty()) {
+        return;
+    }
+
+    const QString dirPath = QFileInfo(filePath).absolutePath();
+    if (dirPath.isEmpty()) {
+        return;
+    }
+
+    QSettings settings("MNECPP");
+    settings.beginGroup("ex_brain_view/MainWindow");
+    settings.setValue(QString("lastDataPath/%1").arg(category), dirPath);
+    settings.setValue("lastDataPath/default", dirPath);
+    settings.endGroup();
+
+    m_lastDataPath = dirPath;
+}
+
+//=============================================================================================================
+
+QString MainWindow::dataDialogStartPath(const QString &category) const
+{
+    QSettings settings("MNECPP");
+    settings.beginGroup("ex_brain_view/MainWindow");
+    const QString categoryPath = settings.value(QString("lastDataPath/%1").arg(category), QString()).toString();
+    const QString defaultPath = settings.value("lastDataPath/default", QString()).toString();
+    settings.endGroup();
+
+    if (!categoryPath.isEmpty() && QDir(categoryPath).exists()) {
+        return categoryPath;
+    }
+
+    if (!defaultPath.isEmpty() && QDir(defaultPath).exists()) {
+        return defaultPath;
+    }
+
+    if (!m_lastDataPath.isEmpty() && QDir(m_lastDataPath).exists()) {
+        return m_lastDataPath;
+    }
+
+    return QDir::homePath();
 }
 
 //=============================================================================================================
@@ -437,7 +509,7 @@ void MainWindow::setupUI()
     QHBoxLayout *vpRow2 = new QHBoxLayout();
 
     m_vpTopCheck = new QCheckBox("Top");
-    m_vpBottomCheck = new QCheckBox("Bottom");
+    m_vpBottomCheck = new QCheckBox("Perspective");
     m_vpFrontCheck = new QCheckBox("Front");
     m_vpLeftCheck = new QCheckBox("Left");
 
@@ -458,6 +530,16 @@ void MainWindow::setupUI()
 
     viewLayout->addLayout(vpRow1);
     viewLayout->addLayout(vpRow2);
+
+    m_resetMultiViewLayoutBtn = new QPushButton("Reset Multi-View Layout");
+    m_resetMultiViewLayoutBtn->setEnabled(false);
+    viewLayout->addWidget(m_resetMultiViewLayoutBtn);
+
+    // Info Panel Toggle
+    m_showInfoCheck = new QCheckBox("Show Info Panel");
+    m_showInfoCheck->setChecked(true);
+    m_showInfoCheck->setToolTip("Toggle the FPS / vertex / shader info overlay.");
+    viewLayout->addWidget(m_showInfoCheck);
 
     // Assemble side panel
     sideLayout->addWidget(surfGroup);
@@ -528,8 +610,9 @@ void MainWindow::setupConnections()
 
     // BEM loading
     connect(m_loadBemBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select BEM Surface", "", "BEM Files (*-bem.fif *-bem-sol.fif);;FIF Files (*.fif);;All Files (*)");
+        QString path = QFileDialog::getOpenFileName(this, "Select BEM Surface", dataDialogStartPath("bem"), "BEM Files (*-bem.fif *-bem-sol.fif);;FIF Files (*.fif);;All Files (*)");
         if (path.isEmpty()) return;
+        rememberDataPath("bem", path);
         loadBem("User", path);
     });
 
@@ -545,6 +628,7 @@ void MainWindow::setupConnections()
         m_vpBottomCheck->setEnabled(checked);
         m_vpFrontCheck->setEnabled(checked);
         m_vpLeftCheck->setEnabled(checked);
+        m_resetMultiViewLayoutBtn->setEnabled(checked);
         if (checked) {
             m_brainView->showMultiView();
         } else {
@@ -555,11 +639,14 @@ void MainWindow::setupConnections()
     connect(m_vpBottomCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(1, checked); });
     connect(m_vpFrontCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(2, checked); });
     connect(m_vpLeftCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(3, checked); });
+    connect(m_resetMultiViewLayoutBtn, &QPushButton::clicked, m_brainView, &BrainView::resetMultiViewLayout);
+    connect(m_showInfoCheck, &QCheckBox::toggled, m_brainView, &BrainView::setInfoPanelVisible);
 
     // Brain Surface
     connect(m_loadSurfaceBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select Surface", "", "FreeSurfer Surface (*.pial *.inflated *.white *.orig);;All Files (*)");
+        QString path = QFileDialog::getOpenFileName(this, "Select Surface", dataDialogStartPath("surface"), "FreeSurfer Surface (*.pial *.inflated *.white *.orig);;All Files (*)");
         if (path.isEmpty()) return;
+        rememberDataPath("surface", path);
 
         // Guess hemi and type
         QString fileName = QFileInfo(path).fileName();
@@ -576,8 +663,9 @@ void MainWindow::setupConnections()
     });
 
     connect(m_loadAtlasBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select Atlas", "", "FreeSurfer Annotation (*.annot);;All Files (*)");
+        QString path = QFileDialog::getOpenFileName(this, "Select Atlas", dataDialogStartPath("atlas"), "FreeSurfer Annotation (*.annot);;All Files (*)");
         if (path.isEmpty()) return;
+        rememberDataPath("atlas", path);
 
         // Guess hemi
         QString fileName = QFileInfo(path).fileName();
@@ -591,8 +679,9 @@ void MainWindow::setupConnections()
 
     // STC loading
     connect(m_loadStcBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select Source Estimate", "", "STC Files (*-lh.stc *-rh.stc *.stc)");
+        QString path = QFileDialog::getOpenFileName(this, "Select Source Estimate", dataDialogStartPath("stc"), "STC Files (*-lh.stc *-rh.stc *.stc)");
         if (path.isEmpty()) return;
+        rememberDataPath("stc", path);
 
         QString lhPath, rhPath;
         if (path.contains("-lh.stc")) {
@@ -706,8 +795,9 @@ void MainWindow::setupConnections()
 
     // Sensors
     connect(m_loadDigBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select Sensor/Digitizer File", "", "FIF Files (*.fif)");
+        QString path = QFileDialog::getOpenFileName(this, "Select Sensor/Digitizer File", dataDialogStartPath("digitizer"), "FIF Files (*.fif)");
         if (path.isEmpty()) return;
+        rememberDataPath("digitizer", path);
 
         if (m_brainView->loadSensors(path)) {
             m_lastSensorPath = path;
@@ -723,14 +813,16 @@ void MainWindow::setupConnections()
     });
 
     connect(m_loadTransBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select Transformation", "", "FIF Files (*.fif)");
+        QString path = QFileDialog::getOpenFileName(this, "Select Transformation", dataDialogStartPath("transform"), "FIF Files (*.fif)");
         if (path.isEmpty()) return;
+        rememberDataPath("transform", path);
         m_brainView->loadTransformation(path);
     });
 
     connect(m_loadSensorDataBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select Evoked/Average", "", "Evoked/Average Files (*.fif)");
+        QString path = QFileDialog::getOpenFileName(this, "Select Evoked/Average", dataDialogStartPath("measurement"), "Evoked/Average Files (*.fif)");
         if (path.isEmpty()) return;
+        rememberDataPath("measurement", path);
 
         if (m_brainView->loadSensorField(path, m_evokedIndexSpin->value())) {
             m_showMegFieldCheck->setEnabled(true);
@@ -812,8 +904,9 @@ void MainWindow::setupConnections()
 
     // Dipoles
     connect(m_loadDipoleBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select Dipoles", "", "Dipole Files (*.dip *.bdip)");
+        QString path = QFileDialog::getOpenFileName(this, "Select Dipoles", dataDialogStartPath("dipole"), "Dipole Files (*.dip *.bdip)");
         if (path.isEmpty()) return;
+        rememberDataPath("dipole", path);
         if (m_brainView->loadDipoles(path)) {
             m_showDipoleCheck->setEnabled(true);
         }
@@ -823,9 +916,10 @@ void MainWindow::setupConnections()
 
     // Source Space
     connect(m_loadSrcSpaceBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select Source Space / Forward Solution", "",
+        QString path = QFileDialog::getOpenFileName(this, "Select Source Space / Forward Solution", dataDialogStartPath("srcspace"),
             "Source Space Files (*-src.fif *-fwd.fif);;All FIF Files (*.fif)");
         if (path.isEmpty()) return;
+        rememberDataPath("srcspace", path);
         if (m_brainView->loadSourceSpace(path)) {
             m_showSrcSpaceCheck->setEnabled(true);
             m_showSrcSpaceCheck->setChecked(false);
@@ -841,6 +935,29 @@ void MainWindow::setupConnections()
     m_brainView->setBemVisible("head", m_headCheck->isChecked());
     m_brainView->setBemVisible("outer_skull", m_outerCheck->isChecked());
     m_brainView->setBemVisible("inner_skull", m_innerCheck->isChecked());
+
+    const bool isMultiView = (m_brainView->viewMode() == BrainView::MultiView);
+    {
+        const QSignalBlocker blockMulti(m_multiViewCheck);
+        m_multiViewCheck->setChecked(isMultiView);
+    }
+
+    m_vpTopCheck->setEnabled(isMultiView);
+    m_vpBottomCheck->setEnabled(isMultiView);
+    m_vpFrontCheck->setEnabled(isMultiView);
+    m_vpLeftCheck->setEnabled(isMultiView);
+    m_resetMultiViewLayoutBtn->setEnabled(isMultiView);
+
+    {
+        const QSignalBlocker blockTop(m_vpTopCheck);
+        const QSignalBlocker blockPerspective(m_vpBottomCheck);
+        const QSignalBlocker blockFront(m_vpFrontCheck);
+        const QSignalBlocker blockLeft(m_vpLeftCheck);
+        m_vpTopCheck->setChecked(m_brainView->isViewportEnabled(0));
+        m_vpBottomCheck->setChecked(m_brainView->isViewportEnabled(1));
+        m_vpFrontCheck->setChecked(m_brainView->isViewportEnabled(2));
+        m_vpLeftCheck->setChecked(m_brainView->isViewportEnabled(3));
+    }
 }
 
 //=============================================================================================================
@@ -870,6 +987,7 @@ void MainWindow::loadInitialData(const QString &subjectPath,
 
     // Auto-load atlas annotation (explicit path overrides auto-discovery in loadHemisphere)
     if (!atlasPath.isEmpty() && QFile::exists(atlasPath)) {
+        rememberDataPath("atlas", atlasPath);
         qDebug() << "Auto-loading atlas from:" << atlasPath;
         QString fileName = QFileInfo(atlasPath).fileName();
         QString lhAnnotPath, rhAnnotPath;
@@ -901,11 +1019,13 @@ void MainWindow::loadInitialData(const QString &subjectPath,
     }
 
     if (!bemPath.isEmpty()) {
+        rememberDataPath("bem", bemPath);
         loadBem(subjectName, bemPath);
     }
 
     // Auto-load digitizer
     if (!digitizerPath.isEmpty() && QFile::exists(digitizerPath)) {
+        rememberDataPath("digitizer", digitizerPath);
         qDebug() << "Auto-loading digitizer from:" << digitizerPath;
         if (m_brainView->loadSensors(digitizerPath)) {
             m_lastSensorPath = digitizerPath;
@@ -925,12 +1045,14 @@ void MainWindow::loadInitialData(const QString &subjectPath,
 
     // Auto-load transformation
     if (!transPath.isEmpty() && QFile::exists(transPath)) {
+        rememberDataPath("transform", transPath);
         qDebug() << "Auto-loading transformation from:" << transPath;
         m_brainView->loadTransformation(transPath);
     }
 
     // Auto-load source space
     if (!srcSpacePath.isEmpty() && QFile::exists(srcSpacePath)) {
+        rememberDataPath("srcspace", srcSpacePath);
         qDebug() << "Auto-loading source space from:" << srcSpacePath;
         if (m_brainView->loadSourceSpace(srcSpacePath)) {
             m_showSrcSpaceCheck->setEnabled(true);
@@ -941,6 +1063,7 @@ void MainWindow::loadInitialData(const QString &subjectPath,
 
     // Auto-load STC
     if (!stcPath.isEmpty() && QFile::exists(stcPath)) {
+        rememberDataPath("stc", stcPath);
         qDebug() << "Auto-loading source estimate from:" << stcPath;
 
         QString lhPath, rhPath;

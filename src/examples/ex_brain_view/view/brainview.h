@@ -61,10 +61,12 @@
 #include <QQuaternion> 
 #include <QThread>
 #include <Eigen/Sparse>
+#include <QRect>
 
 class QLabel;
 class QTimer;
 class StcLoadingWorker;
+class QFrame;
 
 //=============================================================================================================
 /**
@@ -234,7 +236,7 @@ public slots:
 
     //=========================================================================================================
     /**
-     * Switch to multi-view mode (four viewports: top, bottom, front, left).
+        * Switch to multi-view mode (four viewports: top, perspective, front, left).
      */
     void showMultiView();
 
@@ -242,10 +244,31 @@ public slots:
     /**
      * Enable or disable a specific viewport in multi-view mode.
      * 
-     * @param[in] index      Viewport index (0=Top, 1=Bottom, 2=Front, 3=Left).
+        * @param[in] index      Viewport index (0=Top, 1=Perspective, 2=Front, 3=Left).
      * @param[in] enabled    True to enable, false to disable.
      */
     void setViewportEnabled(int index, bool enabled);
+
+    /**
+     * Reset the multi-view splitter layout to equal-sized panes.
+     */
+    void resetMultiViewLayout();
+
+    /**
+     * Check if a multi-view viewport is enabled.
+     *
+     * @param[in] index      Viewport index (0=Top, 1=Perspective, 2=Front, 3=Left).
+     * @return               True if enabled, false otherwise.
+     */
+    bool isViewportEnabled(int index) const;
+
+    //=========================================================================================================
+    /**
+     * Show or hide the info panel (FPS, vertices, shader).
+     *
+     * @param[in] visible    True to show, false to hide.
+     */
+    void setInfoPanelVisible(bool visible);
 
     //=========================================================================================================
     /**
@@ -485,13 +508,33 @@ protected:
     
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
     void wheelEvent(QWheelEvent *event) override;
     void keyPressEvent(QKeyEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
 
 signals:
     void hoveredRegionChanged(const QString &regionName);
 
 private:
+    enum class SplitterHit {
+        None,
+        Vertical,
+        Horizontal,
+        Both
+    };
+
+    int enabledViewportCount() const;
+    int viewportIndexAt(const QPoint& pos) const;
+    QRect multiViewSlotRect(int slot, int numEnabled, const QSize& outputSize) const;
+    SplitterHit hitTestSplitter(const QPoint& pos, int numEnabled, const QSize& outputSize) const;
+    void updateSplitterCursor(const QPoint& pos);
+    void updateViewportSeparators();
+    void updateOverlayLayout();
+    void logPerspectiveRotation(const QString& context) const;
+    void loadMultiViewSettings();
+    void saveMultiViewSettings() const;
+
     std::unique_ptr<BrainRenderer> m_renderer;
     BrainTreeModel* m_model = nullptr;
     
@@ -525,6 +568,7 @@ private:
     QLabel *m_fpsLabel = nullptr;
     QTimer *m_updateTimer = nullptr;
     int m_snapshotCounter = 0;
+    bool m_infoPanelVisible = true;
     
     std::unique_ptr<SourceEstimateOverlay> m_sourceOverlay;
     std::unique_ptr<DipoleObject> m_dipoles;
@@ -546,6 +590,7 @@ private:
     QString m_hoveredRegion;
     QString m_hoveredSurfaceKey;
     QLabel* m_regionLabel = nullptr;
+    QLabel* m_viewportNameLabels[4] = {nullptr, nullptr, nullptr, nullptr};
      
     // Debug Intersection Pointer
     std::shared_ptr<BrainSurface> m_debugPointerSurface;
@@ -559,8 +604,18 @@ private:
      
     // Multi-view support
     ViewMode m_viewMode = SingleView;
-    QQuaternion m_multiViewCameras[4]; // Top, Bottom, Front, Left views
+    QQuaternion m_multiViewCameras[4]; // Top, Perspective, Front, Left views
     bool m_viewportEnabled[4] = {true, true, true, true}; // Which viewports are active
+    float m_multiSplitX = 0.5f;
+    float m_multiSplitY = 0.5f;
+    bool m_isDraggingSplitter = false;
+    SplitterHit m_activeSplitter = SplitterHit::None;
+    int m_splitterHitTolerancePx = 6;
+    int m_splitterMinPanePx = 80;
+    int m_separatorLinePx = 2;
+    QFrame* m_verticalSeparator = nullptr;
+    QFrame* m_horizontalSeparator = nullptr;
+    bool m_perspectiveRotatedSincePress = false;
 
     // Sensor field mapping
     FIFFLIB::FiffEvoked m_sensorEvoked;

@@ -49,11 +49,14 @@
 #include <QApplication>
 #include <QTimer>
 #include <QLabel>
+#include <QFrame>
 #include <memory>
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <QWheelEvent>
+#include <QResizeEvent>
 #include <QFile>
+#include <QSettings>
 #include <QCoreApplication>
 #include <mne/mne_surface.h>
 #include <mne/mne_bem.h>
@@ -87,6 +90,11 @@ using namespace MNELIB;
 
 namespace
 {
+QQuaternion perspectivePresetRotation()
+{
+    return QQuaternion::fromEulerAngles(-45.0f, -40.0f, -130.0f);
+}
+
 std::unique_ptr<FiffCoordTransOld> toOldTransform(const FiffCoordTrans& trans)
 {
     if (trans.isEmpty()) {
@@ -195,20 +203,57 @@ BrainView::BrainView(QWidget *parent)
     m_updateTimer->start(16); // ~60 FPS update
 
     m_fpsLabel = new QLabel(this);
-    m_fpsLabel->setStyleSheet("color: white; font-weight: bold; font-family: monospace; font-size: 13px; background: rgba(0,0,0,100); padding: 5px;");
+    m_fpsLabel->setStyleSheet("color: white; font-weight: bold; font-family: monospace; font-size: 13px; background: transparent; padding: 5px;");
     m_fpsLabel->setAttribute(Qt::WA_TransparentForMouseEvents);
-    m_fpsLabel->move(10, 10);
-    m_fpsLabel->resize(300, 100);
+    m_fpsLabel->setAlignment(Qt::AlignRight | Qt::AlignTop);
+    m_fpsLabel->resize(220, 80);
+    m_fpsLabel->move(width() - m_fpsLabel->width() - 10, 10);
     m_fpsLabel->raise();
 
     m_fpsTimer.start();
 
     m_regionLabel = new QLabel(this);
-    m_regionLabel->setStyleSheet("color: white; font-weight: bold; font-family: sans-serif; font-size: 16px; background: rgba(0,0,0,100); padding: 5px;");
+    m_regionLabel->setStyleSheet("color: white; font-weight: bold; font-family: sans-serif; font-size: 16px; background: transparent; padding: 5px;");
     m_regionLabel->setText("");
-    m_regionLabel->move(10, 120); 
-    m_regionLabel->resize(300, 40);
+    m_regionLabel->move(10, 10); 
+    m_regionLabel->resize(300, 30);
     m_regionLabel->hide();
+
+    const QStringList viewportNames = {"Top", "Perspective", "Front", "Left"};
+    for (int i = 0; i < 4; ++i) {
+        m_viewportNameLabels[i] = new QLabel(this);
+        m_viewportNameLabels[i]->setStyleSheet("color: white; font-weight: bold; font-family: sans-serif; font-size: 12px; background: transparent; padding: 2px 4px;");
+        m_viewportNameLabels[i]->setAttribute(Qt::WA_TransparentForMouseEvents);
+        m_viewportNameLabels[i]->setText(viewportNames[i]);
+        m_viewportNameLabels[i]->adjustSize();
+        m_viewportNameLabels[i]->hide();
+    }
+
+    m_verticalSeparator = new QFrame(this);
+    m_verticalSeparator->setFrameShape(QFrame::NoFrame);
+    m_verticalSeparator->setAttribute(Qt::WA_TransparentForMouseEvents);
+    m_verticalSeparator->hide();
+
+    m_horizontalSeparator = new QFrame(this);
+    m_horizontalSeparator->setFrameShape(QFrame::NoFrame);
+    m_horizontalSeparator->setAttribute(Qt::WA_TransparentForMouseEvents);
+    m_horizontalSeparator->hide();
+
+    QColor sepColor = palette().color(QPalette::Midlight);
+    if (sepColor.alpha() == 255) {
+        sepColor.setAlpha(180);
+    }
+    const QString sepStyle = QString("background-color: rgba(%1,%2,%3,%4);")
+                                 .arg(sepColor.red())
+                                 .arg(sepColor.green())
+                                 .arg(sepColor.blue())
+                                 .arg(sepColor.alpha());
+    m_verticalSeparator->setStyleSheet(sepStyle);
+    m_horizontalSeparator->setStyleSheet(sepStyle);
+
+    loadMultiViewSettings();
+    updateViewportSeparators();
+    updateOverlayLayout();
 
     // Setup Debug Pointer: Semi-transparent sphere for subtle intersection indicator
     m_debugPointerSurface = std::make_shared<BrainSurface>();
@@ -285,16 +330,23 @@ BrainView::BrainView(QWidget *parent)
     m_debugPointerSurface->createFromData(rr, nn, tris, QColor(200, 255, 255, 160));
     
     // Initialize multi-view fixed cameras
-    // Top view: looking down Y-axis (from above)
-    m_multiViewCameras[0] = QQuaternion::fromAxisAndAngle(1, 0, 0, 90);
-    // Left view: looking from -X towards center (side view)
-    m_multiViewCameras[1] = QQuaternion::fromAxisAndAngle(0, 1, 0, -90);
-    // Front view: looking from +Z towards center (default front)
-    m_multiViewCameras[2] = QQuaternion::fromAxisAndAngle(0, 0, 1, 0); // Identity for front
+    // Top view: rotate 180° around roll axis (Z)
+    m_multiViewCameras[0] = QQuaternion::fromAxisAndAngle(0, 0, 1, 180);
+    // Perspective view: rounded preset from user-selected orientation
+    m_multiViewCameras[1] = perspectivePresetRotation();
+    // Front view: current orientation plus relative +180° roll and +180° yaw
+    m_multiViewCameras[2] = QQuaternion::fromAxisAndAngle(0, 1, 0, 180)
+                            * QQuaternion::fromAxisAndAngle(0, 0, 1, 180)
+                            * QQuaternion::fromAxisAndAngle(1, 0, 0, 90)
+                            * QQuaternion::fromAxisAndAngle(0, 0, 1, 180);
+    // Left view: current left orientation plus +90° pitch
+    m_multiViewCameras[3] = QQuaternion::fromAxisAndAngle(1, 0, 0, 90)
+                            * QQuaternion::fromAxisAndAngle(0, 1, 0, -90);
 }
 
 BrainView::~BrainView()
 {
+    saveMultiViewSettings();
 }
 
 //=============================================================================================================
@@ -316,6 +368,7 @@ void BrainView::setModel(BrainTreeModel *model)
 void BrainView::setInitialCameraRotation(const QQuaternion &rotation)
 {
     m_cameraRotation = rotation;
+    saveMultiViewSettings();
     update();
 }
 
@@ -1288,6 +1341,12 @@ void BrainView::saveSnapshot()
 void BrainView::showSingleView()
 {
     m_viewMode = SingleView;
+    m_isDraggingSplitter = false;
+    m_activeSplitter = SplitterHit::None;
+    unsetCursor();
+    saveMultiViewSettings();
+    updateViewportSeparators();
+    updateOverlayLayout();
     update();
 }
 
@@ -1296,7 +1355,361 @@ void BrainView::showSingleView()
 void BrainView::showMultiView()
 {
     m_viewMode = MultiView;
+    saveMultiViewSettings();
+    updateViewportSeparators();
+    updateOverlayLayout();
     update();
+}
+
+//=============================================================================================================
+
+void BrainView::resetMultiViewLayout()
+{
+    m_multiSplitX = 0.5f;
+    m_multiSplitY = 0.5f;
+    saveMultiViewSettings();
+    updateViewportSeparators();
+    updateOverlayLayout();
+    update();
+}
+
+bool BrainView::isViewportEnabled(int index) const
+{
+    if (index < 0 || index >= 4) {
+        return false;
+    }
+
+    return m_viewportEnabled[index];
+}
+
+//=============================================================================================================
+
+int BrainView::enabledViewportCount() const
+{
+    if (m_viewMode != MultiView) {
+        return 1;
+    }
+
+    int numEnabled = 0;
+    for (int i = 0; i < 4; ++i) {
+        if (m_viewportEnabled[i]) {
+            ++numEnabled;
+        }
+    }
+
+    return numEnabled > 0 ? numEnabled : 1;
+}
+
+//=============================================================================================================
+
+int BrainView::viewportIndexAt(const QPoint& pos) const
+{
+    if (m_viewMode != MultiView) {
+        return 0;
+    }
+
+    QVector<int> enabledViewports;
+    for (int i = 0; i < 4; ++i) {
+        if (m_viewportEnabled[i]) {
+            enabledViewports.append(i);
+        }
+    }
+    if (enabledViewports.isEmpty()) {
+        enabledViewports.append(0);
+    }
+
+    const int numEnabled = enabledViewports.size();
+    for (int slot = 0; slot < numEnabled; ++slot) {
+        const QRect pane = multiViewSlotRect(slot, numEnabled, size());
+        if (pane.contains(pos)) {
+            return enabledViewports[slot];
+        }
+    }
+
+    return -1;
+}
+
+//=============================================================================================================
+
+QRect BrainView::multiViewSlotRect(int slot, int numEnabled, const QSize& outputSize) const
+{
+    if (numEnabled <= 1) {
+        return QRect(0, 0, outputSize.width(), outputSize.height());
+    }
+
+    const int width = outputSize.width();
+    const int height = outputSize.height();
+
+    if (numEnabled == 2) {
+        const int leftW = std::clamp(static_cast<int>(std::lround(width * m_multiSplitX)),
+                                     m_splitterMinPanePx,
+                                     std::max(m_splitterMinPanePx, width - m_splitterMinPanePx));
+        const int rightW = std::max(1, width - leftW);
+        if (slot == 0) {
+            return QRect(0, 0, leftW, height);
+        }
+        return QRect(leftW, 0, rightW, height);
+    }
+
+    const int leftW = std::clamp(static_cast<int>(std::lround(width * m_multiSplitX)),
+                                 m_splitterMinPanePx,
+                                 std::max(m_splitterMinPanePx, width - m_splitterMinPanePx));
+    const int rightW = std::max(1, width - leftW);
+    const int topH = std::clamp(static_cast<int>(std::lround(height * m_multiSplitY)),
+                                m_splitterMinPanePx,
+                                std::max(m_splitterMinPanePx, height - m_splitterMinPanePx));
+    const int bottomH = std::max(1, height - topH);
+
+    const int col = slot % 2;
+    const int row = slot / 2;
+
+    const int x = (col == 0) ? 0 : leftW;
+    const int y = (row == 0) ? 0 : topH;
+    const int w = (col == 0) ? leftW : rightW;
+    const int h = (row == 0) ? topH : bottomH;
+
+    return QRect(x, y, w, h);
+}
+
+//=============================================================================================================
+
+BrainView::SplitterHit BrainView::hitTestSplitter(const QPoint& pos, int numEnabled, const QSize& outputSize) const
+{
+    if (m_viewMode != MultiView || numEnabled <= 1) {
+        return SplitterHit::None;
+    }
+
+    const int width = outputSize.width();
+    const int height = outputSize.height();
+
+    if (numEnabled == 2) {
+        const int splitX = std::clamp(static_cast<int>(std::lround(width * m_multiSplitX)),
+                                      m_splitterMinPanePx,
+                                      std::max(m_splitterMinPanePx, width - m_splitterMinPanePx));
+        const bool nearVertical = std::abs(pos.x() - splitX) <= m_splitterHitTolerancePx;
+        return nearVertical ? SplitterHit::Vertical : SplitterHit::None;
+    }
+
+    const int splitX = std::clamp(static_cast<int>(std::lround(width * m_multiSplitX)),
+                                  m_splitterMinPanePx,
+                                  std::max(m_splitterMinPanePx, width - m_splitterMinPanePx));
+    const int splitY = std::clamp(static_cast<int>(std::lround(height * m_multiSplitY)),
+                                  m_splitterMinPanePx,
+                                  std::max(m_splitterMinPanePx, height - m_splitterMinPanePx));
+
+    const bool nearVertical = std::abs(pos.x() - splitX) <= m_splitterHitTolerancePx;
+    const bool nearHorizontal = std::abs(pos.y() - splitY) <= m_splitterHitTolerancePx;
+
+    if (nearVertical && nearHorizontal) {
+        return SplitterHit::Both;
+    }
+    if (nearVertical) {
+        return SplitterHit::Vertical;
+    }
+    if (nearHorizontal) {
+        return SplitterHit::Horizontal;
+    }
+
+    return SplitterHit::None;
+}
+
+//=============================================================================================================
+
+void BrainView::updateSplitterCursor(const QPoint& pos)
+{
+    const SplitterHit hit = hitTestSplitter(pos, enabledViewportCount(), size());
+
+    switch (hit) {
+        case SplitterHit::Vertical:
+            setCursor(Qt::SizeHorCursor);
+            break;
+        case SplitterHit::Horizontal:
+            setCursor(Qt::SizeVerCursor);
+            break;
+        case SplitterHit::Both:
+            setCursor(Qt::SizeAllCursor);
+            break;
+        case SplitterHit::None:
+        default:
+            unsetCursor();
+            break;
+    }
+}
+
+//=============================================================================================================
+
+void BrainView::updateViewportSeparators()
+{
+    if (!m_verticalSeparator || !m_horizontalSeparator) {
+        return;
+    }
+
+    m_verticalSeparator->hide();
+    m_horizontalSeparator->hide();
+
+    const int numEnabled = enabledViewportCount();
+    if (m_viewMode != MultiView || numEnabled <= 1) {
+        return;
+    }
+
+    const int widthPx = std::max(1, width());
+    const int heightPx = std::max(1, height());
+
+    const int splitX = std::clamp(static_cast<int>(std::lround(widthPx * m_multiSplitX)),
+                                  m_splitterMinPanePx,
+                                  std::max(m_splitterMinPanePx, widthPx - m_splitterMinPanePx));
+
+    m_verticalSeparator->setGeometry(splitX - m_separatorLinePx / 2,
+                                     0,
+                                     m_separatorLinePx,
+                                     heightPx);
+    m_verticalSeparator->show();
+    m_verticalSeparator->raise();
+
+    if (numEnabled >= 3) {
+        const int splitY = std::clamp(static_cast<int>(std::lround(heightPx * m_multiSplitY)),
+                                      m_splitterMinPanePx,
+                                      std::max(m_splitterMinPanePx, heightPx - m_splitterMinPanePx));
+
+        m_horizontalSeparator->setGeometry(0,
+                                           splitY - m_separatorLinePx / 2,
+                                           widthPx,
+                                           m_separatorLinePx);
+        m_horizontalSeparator->show();
+        m_horizontalSeparator->raise();
+    }
+
+    updateOverlayLayout();
+}
+
+//=============================================================================================================
+
+void BrainView::updateOverlayLayout()
+{
+    if (m_fpsLabel) {
+        m_fpsLabel->move(width() - m_fpsLabel->width() - 10, 10);
+        m_fpsLabel->setVisible(m_infoPanelVisible);
+        m_fpsLabel->raise();
+    }
+
+    if (m_regionLabel) {
+        const int regionY = (m_viewMode == MultiView) ? 38 : 10;
+        m_regionLabel->move(10, regionY);
+        if (!m_regionLabel->text().isEmpty()) {
+            m_regionLabel->raise();
+        }
+    }
+
+    for (int i = 0; i < 4; ++i) {
+        if (m_viewportNameLabels[i]) {
+            m_viewportNameLabels[i]->hide();
+        }
+    }
+
+    if (m_viewMode != MultiView) {
+        return;
+    }
+
+    QVector<int> enabledViewports;
+    for (int i = 0; i < 4; ++i) {
+        if (m_viewportEnabled[i]) {
+            enabledViewports.append(i);
+        }
+    }
+    if (enabledViewports.isEmpty()) {
+        enabledViewports.append(0);
+    }
+
+    const int numEnabled = enabledViewports.size();
+    const QSize overlaySize = size();
+    for (int slot = 0; slot < numEnabled; ++slot) {
+        const int vp = enabledViewports[slot];
+        QLabel* label = m_viewportNameLabels[vp];
+        if (!label) {
+            continue;
+        }
+
+        const QRect pane = multiViewSlotRect(slot, numEnabled, overlaySize);
+        label->adjustSize();
+        label->move(pane.x() + 8, pane.y() + 8);
+        label->show();
+        label->raise();
+    }
+}
+
+//=============================================================================================================
+
+void BrainView::logPerspectiveRotation(const QString& context) const
+{
+    const QQuaternion perspectivePreset = perspectivePresetRotation();
+    const QQuaternion effective = m_cameraRotation * perspectivePreset;
+
+    qDebug() << "BrainView Perspective Rotation [" << context << "]"
+             << "userQuat=" << m_cameraRotation
+             << "userEuler=" << m_cameraRotation.toEulerAngles()
+             << "effectiveQuat=" << effective
+             << "effectiveEuler=" << effective.toEulerAngles();
+}
+
+//=============================================================================================================
+
+void BrainView::loadMultiViewSettings()
+{
+    QSettings settings("MNECPP");
+    settings.beginGroup("ex_brain_view/BrainView");
+
+    m_multiSplitX = settings.value("multiSplitX", 0.5f).toFloat();
+    m_multiSplitY = settings.value("multiSplitY", 0.5f).toFloat();
+
+    const int savedViewMode = settings.value("viewMode", static_cast<int>(SingleView)).toInt();
+    m_viewMode = (savedViewMode == static_cast<int>(MultiView)) ? MultiView : SingleView;
+
+    const bool hasCameraQuat = settings.contains("cameraRotW")
+                               && settings.contains("cameraRotX")
+                               && settings.contains("cameraRotY")
+                               && settings.contains("cameraRotZ");
+    if (hasCameraQuat) {
+        const float w = settings.value("cameraRotW", 1.0f).toFloat();
+        const float x = settings.value("cameraRotX", 0.0f).toFloat();
+        const float y = settings.value("cameraRotY", 0.0f).toFloat();
+        const float z = settings.value("cameraRotZ", 0.0f).toFloat();
+        m_cameraRotation = QQuaternion(w, x, y, z);
+        if (m_cameraRotation.lengthSquared() <= std::numeric_limits<float>::epsilon()) {
+            m_cameraRotation = QQuaternion();
+        } else {
+            m_cameraRotation.normalize();
+        }
+    }
+
+    m_viewportEnabled[0] = settings.value("viewportEnabled0", true).toBool();
+    m_viewportEnabled[1] = settings.value("viewportEnabled1", true).toBool();
+    m_viewportEnabled[2] = settings.value("viewportEnabled2", true).toBool();
+    m_viewportEnabled[3] = settings.value("viewportEnabled3", true).toBool();
+
+    settings.endGroup();
+
+    m_multiSplitX = std::clamp(m_multiSplitX, 0.15f, 0.85f);
+    m_multiSplitY = std::clamp(m_multiSplitY, 0.15f, 0.85f);
+}
+
+//=============================================================================================================
+
+void BrainView::saveMultiViewSettings() const
+{
+    QSettings settings("MNECPP");
+    settings.beginGroup("ex_brain_view/BrainView");
+    settings.setValue("multiSplitX", m_multiSplitX);
+    settings.setValue("multiSplitY", m_multiSplitY);
+    settings.setValue("viewMode", static_cast<int>(m_viewMode));
+    settings.setValue("cameraRotW", m_cameraRotation.scalar());
+    settings.setValue("cameraRotX", m_cameraRotation.x());
+    settings.setValue("cameraRotY", m_cameraRotation.y());
+    settings.setValue("cameraRotZ", m_cameraRotation.z());
+    settings.setValue("viewportEnabled0", m_viewportEnabled[0]);
+    settings.setValue("viewportEnabled1", m_viewportEnabled[1]);
+    settings.setValue("viewportEnabled2", m_viewportEnabled[2]);
+    settings.setValue("viewportEnabled3", m_viewportEnabled[3]);
+    settings.endGroup();
 }
 
 //=============================================================================================================
@@ -1305,8 +1718,28 @@ void BrainView::setViewportEnabled(int index, bool enabled)
 {
     if (index >= 0 && index < 4) {
         m_viewportEnabled[index] = enabled;
+        saveMultiViewSettings();
+        updateViewportSeparators();
+        updateOverlayLayout();
         update();
     }
+}
+
+//=============================================================================================================
+
+void BrainView::setInfoPanelVisible(bool visible)
+{
+    m_infoPanelVisible = visible;
+    updateOverlayLayout();
+}
+
+//=============================================================================================================
+
+void BrainView::resizeEvent(QResizeEvent *event)
+{
+    QRhiWidget::resizeEvent(event);
+    updateViewportSeparators();
+    updateOverlayLayout();
 }
 
 //=============================================================================================================
@@ -1350,6 +1783,7 @@ void BrainView::render(QRhiCommandBuffer *cb)
         QString modeStr = (m_brainShaderMode == BrainRenderer::Holographic) ? "Holographic" : (m_brainShaderMode == BrainRenderer::Anatomical) ? "Anatomical" : "Standard";
         int vCount = m_activeSurface ? m_activeSurface->vertexCount() : 0;
         m_fpsLabel->setText(QString("FPS: %1\nVertices: %2\nShader: %3").arg(fps, 0, 'f', 1).arg(vCount).arg(modeStr));
+        m_fpsLabel->move(width() - m_fpsLabel->width() - 10, 10);
         m_fpsLabel->raise();
         m_frameCount = 0;
         m_fpsTimer.restart();
@@ -1363,18 +1797,22 @@ void BrainView::render(QRhiCommandBuffer *cb)
     QSize outputSize = renderTarget()->pixelSize();
     
     // Fixed camera offsets for multi-view (relative to user's interactive rotation)
-    // Top, Bottom, Front, Left in 2x2 grid
+    // Top, Perspective, Front, Left in 2x2 grid
     QVector<QQuaternion> viewOffsets = {
-        QQuaternion::fromAxisAndAngle(1, 0, 0, 90),   // Top - look from +Y down
-        QQuaternion::fromAxisAndAngle(1, 0, 0, -90),  // Bottom - look from -Y up
-        QQuaternion(),                                  // Front - default
-        QQuaternion::fromAxisAndAngle(0, 1, 0, -90)   // Left - look from -X
+        QQuaternion::fromAxisAndAngle(0, 0, 1, 180),  // Top - 180° roll
+        perspectivePresetRotation(), // Perspective - rounded preferred preset
+        QQuaternion::fromAxisAndAngle(0, 1, 0, 180)
+            * QQuaternion::fromAxisAndAngle(0, 0, 1, 180)
+            * QQuaternion::fromAxisAndAngle(1, 0, 0, 90)
+            * QQuaternion::fromAxisAndAngle(0, 0, 1, 180), // Front - +180° roll and +180° yaw
+        QQuaternion::fromAxisAndAngle(1, 0, 0, 90)
+            * QQuaternion::fromAxisAndAngle(0, 1, 0, -90)   // Left - +90° pitch
     };
     
     // Per-viewport shader modes for multi-view (different visualization per viewport)
     QVector<BrainRenderer::ShaderMode> viewportShaders = {
         BrainRenderer::Anatomical,   // Top - detailed anatomy view
-        BrainRenderer::Standard,     // Bottom - standard solid view
+        BrainRenderer::Standard,     // Perspective - standard solid view
         BrainRenderer::Holographic,  // Front - holographic/activity view
         BrainRenderer::Anatomical    // Left - anatomical side view
     };
@@ -1400,35 +1838,54 @@ void BrainView::render(QRhiCommandBuffer *cb)
     for (int slot = 0; slot < numEnabled; ++slot) {
         int vp = (m_viewMode == MultiView) ? enabledViewports[slot] : 0;
         
-        // Calculate viewport position based on number of enabled viewports
-        QRhiViewport viewport;
-        float aspectRatio;
-        
+        const QRect paneRect = (m_viewMode == MultiView)
+            ? multiViewSlotRect(slot, numEnabled, outputSize)
+            : QRect(0, 0, outputSize.width(), outputSize.height());
+
+        QRect renderRect = paneRect;
         if (m_viewMode == MultiView && numEnabled > 1) {
-            // Dynamic layout based on number of enabled viewports
-            int cols = (numEnabled <= 2) ? numEnabled : 2;  // 1-2: columns, 3-4: 2 columns
-            int rows = (numEnabled <= 2) ? 1 : 2;            // 1-2: 1 row, 3-4: 2 rows
-            
-            int slotCol = slot % cols;
-            int slotRow = slot / cols;
-            
-            int cellW = outputSize.width() / cols;
-            int cellH = outputSize.height() / rows;
-            
-            viewport = QRhiViewport(slotCol * cellW, (rows - 1 - slotRow) * cellH, cellW, cellH);
-            aspectRatio = float(cellW) / float(cellH);
-        } else {
-            viewport = QRhiViewport(0, 0, outputSize.width(), outputSize.height());
-            aspectRatio = float(outputSize.width()) / float(outputSize.height());
+            constexpr int separatorPx = 2;
+
+            if (numEnabled == 2) {
+                if (slot == 0) {
+                    renderRect.setWidth(std::max(1, renderRect.width() - separatorPx));
+                }
+            } else {
+                const int col = slot % 2;
+                const int row = slot / 2;
+
+                const bool hasRightNeighbor = (col == 0)
+                                              && (slot + 1 < numEnabled)
+                                              && ((slot / 2) == ((slot + 1) / 2));
+                const bool hasBottomNeighbor = (row == 0)
+                                               && (slot + 2 < numEnabled);
+
+                if (hasRightNeighbor) {
+                    renderRect.setWidth(std::max(1, renderRect.width() - separatorPx));
+                }
+                if (hasBottomNeighbor) {
+                    renderRect.setHeight(std::max(1, renderRect.height() - separatorPx));
+                }
+            }
         }
+
+        const int viewX = renderRect.x();
+        const int viewY = outputSize.height() - (renderRect.y() + renderRect.height());
+        const int viewW = std::max(1, renderRect.width());
+        const int viewH = std::max(1, renderRect.height());
+
+        QRhiViewport viewport(viewX, viewY, viewW, viewH);
+        const float aspectRatio = float(viewW) / float(viewH);
         
         // Set viewport
         cb->setViewport(viewport);
         
         // Calculate camera for this viewport
-        QQuaternion effectiveRotation = m_cameraRotation;
+        const QQuaternion perspectivePreset = perspectivePresetRotation();
+        QQuaternion effectiveRotation = m_cameraRotation * perspectivePreset;
         if (m_viewMode == MultiView) {
-            effectiveRotation = viewOffsets[vp] * m_cameraRotation;
+            effectiveRotation = (vp == 1) ? (m_cameraRotation * viewOffsets[vp])
+                                          : viewOffsets[vp];
         }
         
         QMatrix4x4 projection;
@@ -1533,7 +1990,7 @@ void BrainView::render(QRhiCommandBuffer *cb)
     }
 
     // Intersection Pointer
-    if (m_viewMode == SingleView && m_hasIntersection && m_debugPointerSurface) {
+    if (m_hasIntersection && m_debugPointerSurface) {
         BrainRenderer::SceneData debugSceneData = sceneData;
         
         QMatrix4x4 translation;
@@ -1555,6 +2012,22 @@ void BrainView::render(QRhiCommandBuffer *cb)
 
 void BrainView::mousePressEvent(QMouseEvent *e)
 {
+    if (e->button() == Qt::LeftButton) {
+        m_perspectiveRotatedSincePress = false;
+    }
+
+    if (e->button() == Qt::LeftButton && m_viewMode == MultiView) {
+        const int numEnabled = enabledViewportCount();
+        const SplitterHit hit = hitTestSplitter(e->pos(), numEnabled, size());
+        if (hit != SplitterHit::None) {
+            m_isDraggingSplitter = true;
+            m_activeSplitter = hit;
+            m_lastMousePos = e->pos();
+            updateSplitterCursor(e->pos());
+            return;
+        }
+    }
+
     m_lastMousePos = e->pos();
 }
 
@@ -1562,21 +2035,113 @@ void BrainView::mousePressEvent(QMouseEvent *e)
 
 void BrainView::mouseMoveEvent(QMouseEvent *event)
 {
+    if (m_isDraggingSplitter && (event->buttons() & Qt::LeftButton)) {
+        const int widthPx = std::max(1, width());
+        const int heightPx = std::max(1, height());
+
+        if (m_activeSplitter == SplitterHit::Vertical || m_activeSplitter == SplitterHit::Both) {
+            const int minX = m_splitterMinPanePx;
+            const int maxX = std::max(minX, widthPx - m_splitterMinPanePx);
+            const int clampedX = std::clamp(event->pos().x(), minX, maxX);
+            m_multiSplitX = float(clampedX) / float(widthPx);
+        }
+
+        if (m_activeSplitter == SplitterHit::Horizontal || m_activeSplitter == SplitterHit::Both) {
+            const int minY = m_splitterMinPanePx;
+            const int maxY = std::max(minY, heightPx - m_splitterMinPanePx);
+            const int clampedY = std::clamp(event->pos().y(), minY, maxY);
+            m_multiSplitY = float(clampedY) / float(heightPx);
+        }
+
+        m_lastMousePos = event->pos();
+        updateViewportSeparators();
+        update();
+        return;
+    }
+
     if (event->buttons() & Qt::LeftButton) {
+        if (m_viewMode == MultiView) {
+            const int activeVp = viewportIndexAt(event->pos());
+            if (activeVp != 1) {
+                m_lastMousePos = event->pos();
+                return;
+            }
+
+            QPoint diff = event->pos() - m_lastMousePos;
+            float speed = 0.5f;
+
+            const QQuaternion perspectivePreset = perspectivePresetRotation();
+            QQuaternion effectiveRotation = m_cameraRotation * perspectivePreset;
+
+            const QVector3D upAxis = effectiveRotation.rotatedVector(QVector3D(0, 1, 0)).normalized();
+            const QVector3D rightAxis = effectiveRotation.rotatedVector(QVector3D(1, 0, 0)).normalized();
+
+            QQuaternion yaw = QQuaternion::fromAxisAndAngle(upAxis, -diff.x() * speed);
+            QQuaternion pitch = QQuaternion::fromAxisAndAngle(rightAxis, -diff.y() * speed);
+
+            effectiveRotation = yaw * pitch * effectiveRotation;
+            m_cameraRotation = effectiveRotation * perspectivePreset.conjugated();
+            m_cameraRotation.normalize();
+
+            m_perspectiveRotatedSincePress = true;
+            m_lastMousePos = event->pos();
+            update();
+            return;
+        }
+
         QPoint diff = event->pos() - m_lastMousePos;
         float speed = 0.5f;
-        // Rotate around local Y (up) and X (right) axes
-        QQuaternion paramY = QQuaternion::fromAxisAndAngle(0, 1, 0, -diff.x() * speed);
-        QQuaternion paramX = QQuaternion::fromAxisAndAngle(1, 0, 0, -diff.y() * speed);
 
-        // Apply rotations relative to current camera orientation
-        m_cameraRotation = m_cameraRotation * paramY * paramX;
+        const QQuaternion perspectivePreset = perspectivePresetRotation();
+        QQuaternion effectiveRotation = m_cameraRotation * perspectivePreset;
+
+        const QVector3D upAxis = effectiveRotation.rotatedVector(QVector3D(0, 1, 0)).normalized();
+        const QVector3D rightAxis = effectiveRotation.rotatedVector(QVector3D(1, 0, 0)).normalized();
+
+        QQuaternion yaw = QQuaternion::fromAxisAndAngle(upAxis, -diff.x() * speed);
+        QQuaternion pitch = QQuaternion::fromAxisAndAngle(rightAxis, -diff.y() * speed);
+
+        effectiveRotation = yaw * pitch * effectiveRotation;
+        m_cameraRotation = effectiveRotation * perspectivePreset.conjugated();
         m_cameraRotation.normalize();
+
+        if (m_viewMode == MultiView) {
+            m_perspectiveRotatedSincePress = true;
+        }
 
         m_lastMousePos = event->pos();
         update();
     } else {
+        if (m_viewMode == MultiView) {
+            updateSplitterCursor(event->pos());
+        } else {
+            unsetCursor();
+        }
         castRay(event->pos());
+    }
+}
+
+//=============================================================================================================
+
+void BrainView::mouseReleaseEvent(QMouseEvent *event)
+{
+    if (event->button() == Qt::LeftButton && m_isDraggingSplitter) {
+        m_isDraggingSplitter = false;
+        m_activeSplitter = SplitterHit::None;
+        saveMultiViewSettings();
+        updateSplitterCursor(event->pos());
+        return;
+    }
+
+    if (event->button() == Qt::LeftButton && m_viewMode == MultiView && m_perspectiveRotatedSincePress) {
+        m_perspectiveRotatedSincePress = false;
+        saveMultiViewSettings();
+    }
+
+    if (m_viewMode == MultiView) {
+        updateSplitterCursor(event->pos());
+    } else {
+        unsetCursor();
     }
 }
 
@@ -1594,6 +2159,11 @@ void BrainView::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_S) {
         saveSnapshot();
+    } else if (event->key() == Qt::Key_R) {
+        m_cameraRotation = QQuaternion();
+        logPerspectiveRotation("reset-initial");
+        saveMultiViewSettings();
+        update();
     }
 }
 
@@ -2734,38 +3304,99 @@ void BrainView::applySensorFieldMap()
 
 void BrainView::castRay(const QPoint &pos)
 {
-    // 1. Setup Matrix Stack (Must match render exactly)
-    QSize outputSize = renderTarget()->pixelSize();
+    // 1. Setup Matrix Stack (Must match render exactly, including multiview pane layout)
+    const QSize outputSize = size();
+
+    QVector<int> enabledViewports;
+    if (m_viewMode == MultiView) {
+        for (int i = 0; i < 4; ++i) {
+            if (m_viewportEnabled[i]) {
+                enabledViewports.append(i);
+            }
+        }
+        if (enabledViewports.isEmpty()) {
+            enabledViewports.append(0);
+        }
+    } else {
+        enabledViewports.append(0);
+    }
+
+    const int numEnabled = enabledViewports.size();
+    int activeSlot = 0;
+    QRect activePane(0, 0, outputSize.width(), outputSize.height());
+
+    bool hasValidPane = true;
+    if (m_viewMode == MultiView && numEnabled > 1) {
+        bool foundSlot = false;
+        for (int slot = 0; slot < numEnabled; ++slot) {
+            const QRect pane = multiViewSlotRect(slot, numEnabled, outputSize);
+            if (pane.contains(pos)) {
+                activeSlot = slot;
+                activePane = pane;
+                foundSlot = true;
+                break;
+            }
+        }
+
+        hasValidPane = foundSlot;
+    }
+
+    const int vp = (m_viewMode == MultiView) ? enabledViewports[activeSlot] : 0;
+
+    QVector<QQuaternion> viewOffsets = {
+        QQuaternion::fromAxisAndAngle(0, 0, 1, 180),
+        perspectivePresetRotation(),
+        QQuaternion::fromAxisAndAngle(0, 1, 0, 180)
+            * QQuaternion::fromAxisAndAngle(0, 0, 1, 180)
+            * QQuaternion::fromAxisAndAngle(1, 0, 0, 90)
+            * QQuaternion::fromAxisAndAngle(0, 0, 1, 180),
+        QQuaternion::fromAxisAndAngle(1, 0, 0, 90)
+            * QQuaternion::fromAxisAndAngle(0, 1, 0, -90)
+    };
+
+    const QQuaternion perspectivePreset = perspectivePresetRotation();
+    QQuaternion effectiveRotation = m_cameraRotation * perspectivePreset;
+    if (m_viewMode == MultiView) {
+        effectiveRotation = (vp == 1) ? (m_cameraRotation * viewOffsets[vp])
+                                      : viewOffsets[vp];
+    }
+
     QMatrix4x4 projection;
     float farPlane = m_sceneSize * 20.0f;
     if (farPlane < 100.0f) farPlane = 100.0f;
-    projection.perspective(45.0f, float(outputSize.width()) / float(outputSize.height()), m_sceneSize * 0.01f, farPlane);
-    
+    const float aspect = float(std::max(1, activePane.width())) / float(std::max(1, activePane.height()));
+    projection.perspective(45.0f, aspect, m_sceneSize * 0.01f, farPlane);
+
     float baseDistance = m_sceneSize * 1.5f;
-    float distance = baseDistance - m_zoom * (m_sceneSize * 0.05f); 
-    QVector3D cameraPos = m_cameraRotation.rotatedVector(QVector3D(0, 0, distance));
-    QVector3D upVector = m_cameraRotation.rotatedVector(QVector3D(0, 1, 0));
+    float distance = baseDistance - m_zoom * (m_sceneSize * 0.05f);
+    QVector3D cameraPos = effectiveRotation.rotatedVector(QVector3D(0, 0, distance));
+    QVector3D upVector = effectiveRotation.rotatedVector(QVector3D(0, 1, 0));
     QMatrix4x4 view;
     view.lookAt(cameraPos, QVector3D(0, 0, 0), upVector);
-    
+
     QMatrix4x4 model;
     model.translate(-m_sceneCenter);
     QMatrix4x4 pvm = projection * view * model;
     bool invertible;
     QMatrix4x4 invPVM = pvm.inverted(&invertible);
     if (!invertible) return;
-    
-    float ndcX = (2.0f * pos.x()) / width() - 1.0f;
-    float ndcY = 1.0f - (2.0f * pos.y()) / height(); 
-    
+
+    const float localX = float(pos.x() - activePane.x());
+    const float localY = float(pos.y() - activePane.y());
+    const float paneW = float(std::max(1, activePane.width()));
+    const float paneH = float(std::max(1, activePane.height()));
+
+    float ndcX = (2.0f * localX) / paneW - 1.0f;
+    float ndcY = 1.0f - (2.0f * localY) / paneH;
+
     QVector4D vNear(ndcX, ndcY, -1.0f, 1.0f);
     QVector4D vFar(ndcX, ndcY, 1.0f, 1.0f);
-    
+
     QVector4D pNear = invPVM * vNear;
     QVector4D pFar = invPVM * vFar;
     pNear /= pNear.w();
     pFar /= pFar.w();
-    
+
     QVector3D rayOrigin = pNear.toVector3D();
     QVector3D rayDir = (pFar.toVector3D() - pNear.toVector3D()).normalized();
     
@@ -2777,6 +3408,7 @@ void BrainView::castRay(const QPoint &pos)
     
     int hitIndex = -1;
     
+    if (hasValidPane) {
     // Check Surfaces (Sensors, Hemisphere, BEM)
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
         if (!it.value()->isVisible()) continue;
@@ -2829,7 +3461,8 @@ void BrainView::castRay(const QPoint &pos)
                  hitIndex = dipIdx;
              }
          }
-     }
+    }
+    }
 
     // Handle Region Name for Annotations
     QString currentRegion;
