@@ -52,6 +52,7 @@
 #include <mne/mne_sourcespace.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_evoked.h>
+#include <fiff/fiff_evoked_set.h>
 #include <QWidget>
 #include <QRhiWidget>
 #include <QMap>
@@ -146,6 +147,11 @@ public slots:
      * @param[in] mode       The shader mode to set.
      */
     void setBemShaderMode(const QString &mode);
+
+    /**
+     * Synchronize all BEM shader targets to their respective brain shader targets.
+     */
+    void syncBemShadersToBrainShaders();
     
     //=========================================================================================================
     /**
@@ -279,9 +285,31 @@ public slots:
     QString shaderModeForTarget(int target) const;
 
     /**
+     * Get configured BEM shader mode name for a target view.
+     */
+    QString bemShaderModeForTarget(int target) const;
+
+    /**
      * Get configured overlay mode name for a target view.
      */
     QString overlayModeForTarget(int target) const;
+
+    /**
+     * Check object visibility for a given target view.
+     *
+     * @param[in] object     Object key (e.g. "lh", "bem_head", "sens_meg").
+     * @param[in] target     -1=Single, 0=Top, 1=Perspective, 2=Front, 3=Left.
+     * @return               True if visible, false otherwise.
+     */
+    bool objectVisibleForTarget(const QString &object, int target) const;
+
+    /**
+     * Check whether MEG field mapping uses head surface for a target.
+     *
+     * @param[in] target     -1=Single, 0=Top, 1=Perspective, 2=Front, 3=Left.
+     * @return               True if MEG map uses head surface.
+     */
+    bool megFieldMapOnHeadForTarget(int target) const;
 
     /**
      * Check if a multi-view viewport is enabled.
@@ -345,6 +373,18 @@ public slots:
     bool loadSourceSpace(const QString &fwdPath);
 
     //=========================================================================================================
+    /**
+     * Probe evoked data sets in a FIF file.
+     *
+     * Returns a list of descriptive strings for each evoked set found
+     * (e.g. "0: Left Auditory (Average, nave=55)"). The list is empty
+     * if the file cannot be read.
+     *
+     * @param[in] evokedPath   Path to the evoked/average FIF file.
+     * @return Descriptive labels for each evoked set.
+     */
+    static QStringList probeEvokedSets(const QString &evokedPath);
+
     /**
      * Load sensor measurements from an evoked/average FIF file.
      *
@@ -455,6 +495,50 @@ public slots:
      */
     float stcStep() const;
 
+    //=========================================================================================================
+    /**
+     * Get the start time of the loaded source estimate.
+     * 
+     * @return Start time in seconds. Returns 0 if not loaded.
+     */
+    float stcTmin() const;
+
+    //=========================================================================================================
+    /**
+     * Get the number of time points in the loaded source estimate.
+     *
+     * @return Number of time points. Returns 0 if not loaded.
+     */
+    int stcNumTimePoints() const;
+
+    //=========================================================================================================
+    /**
+     * Find the closest sensor field time index for a given time in seconds.
+     *
+     * @param[in] timeSec    Time in seconds.
+     * @return Closest sample index, or -1 if no sensor field data loaded.
+     */
+    int closestSensorFieldIndex(float timeSec) const;
+
+    //=========================================================================================================
+    /**
+     * Find the closest STC time index for a given time in seconds.
+     *
+     * @param[in] timeSec    Time in seconds.
+     * @return Closest sample index, or -1 if no STC data loaded.
+     */
+    int closestStcIndex(float timeSec) const;
+
+    //=========================================================================================================
+    /**
+     * Get the time range of the loaded sensor field (evoked) data.
+     *
+     * @param[out] tmin      Start time in seconds.
+     * @param[out] tmax      End time in seconds.
+     * @return True if sensor field data is loaded, false otherwise.
+     */
+    bool sensorFieldTimeRange(float &tmin, float &tmax) const;
+
 signals:
     //=========================================================================================================
     /**
@@ -519,6 +603,62 @@ private slots:
     void onStcLoadingFinished(bool success);
 
 private:
+    /**
+     * Per-object visibility flags for a single view.
+     */
+    struct ViewVisibilityProfile {
+        bool lh = true;
+        bool rh = true;
+        bool bemHead = true;
+        bool bemOuterSkull = true;
+        bool bemInnerSkull = true;
+        bool sensMeg = false;
+        bool sensMegGrad = false;
+        bool sensMegMag = false;
+        bool sensMegHelmet = false;
+        bool sensEeg = false;
+        bool dig = false;
+        bool digCardinal = false;
+        bool digHpi = false;
+        bool digEeg = false;
+        bool digExtra = false;
+        bool megFieldMap = false;
+        bool eegFieldMap = false;
+        bool megFieldContours = false;
+        bool eegFieldContours = false;
+        bool dipoles = true;
+        bool sourceSpace = false;
+        bool megFieldMapOnHead = false;
+    };
+
+    /**
+     * Encapsulates all per-view state for a single viewport (single view or
+     * one pane in multi-view).  The class stores five instances: one for the
+     * single-view and four for the multi-view panes.
+     */
+    struct SubView {
+        QString                         surfaceType      = "pial";
+        BrainRenderer::ShaderMode       brainShader      = BrainRenderer::Standard;
+        BrainRenderer::ShaderMode       bemShader        = BrainRenderer::Standard;
+        BrainSurface::VisualizationMode overlayMode      = BrainSurface::ModeSurface;
+        ViewVisibilityProfile           visibility;
+        float                           zoom             = 0.0f;
+        QVector2D                       pan;
+        QQuaternion                     perspectiveRotation;
+        int                             preset           = 1;   // 0=Top,1=Perspective,2=Front,3=Left,4=Bottom,5=Back,6=Right
+        bool                            enabled          = true;
+    };
+
+    /** Return the SubView for a given target (-1 = single, 0..3 = multi). */
+    SubView&       subViewForTarget(int target);
+    const SubView& subViewForTarget(int target) const;
+
+    static bool objectVisibleFromProfile(const ViewVisibilityProfile &profile, const QString &object);
+    static void setObjectVisibleInProfile(ViewVisibilityProfile &profile, const QString &object, bool visible);
+    ViewVisibilityProfile& visibilityProfileForTarget(int target);
+    const ViewVisibilityProfile& visibilityProfileForTarget(int target) const;
+    bool shouldRenderSurfaceForView(const QString &key, const ViewVisibilityProfile &profile) const;
+
     void refreshSensorTransforms();
     bool buildSensorFieldMapping();
     void applySensorFieldMap();
@@ -562,6 +702,7 @@ private:
     void updateViewportSeparators();
     void updateOverlayLayout();
     void updateViewportLabelHighlight();
+    void showViewportPresetMenu(int viewport, const QPoint &globalPos);
     void logPerspectiveRotation(const QString& context) const;
     void loadMultiViewSettings();
     void saveMultiViewSettings() const;
@@ -578,38 +719,27 @@ private:
     QMap<QString, std::shared_ptr<BrainSurface>> m_surfaces; 
     std::shared_ptr<BrainSurface> m_activeSurface;
     QString m_activeSurfaceType;
-    QString m_singleViewSurfaceType = "pial";
-    QString m_multiViewSurfaceTypes[4] = {"pial", "pial", "pial", "pial"};
-    int m_visualizationEditTarget = -1;
+
+    // ── SubView state ──────────────────────────────────────────────────
+    SubView m_singleView;                           // single-view state
+    SubView m_subViews[4];                          // multi-view panes 0..3
+    int m_visualizationEditTarget = -1;             // -1=single, 0..3=multi
     
     // Sensors (Lists of surfaces/meshes for coils/electrodes)
     QList<std::shared_ptr<BrainSurface>> m_megSensors;
     QList<std::shared_ptr<BrainSurface>> m_eegSensors;
     QList<std::shared_ptr<BrainSurface>> m_digitizers;
     
+    // ── Active (runtime) copies — kept in sync with selected SubView ──
     BrainRenderer::ShaderMode m_brainShaderMode = BrainRenderer::Standard;
-    BrainRenderer::ShaderMode m_singleViewShaderMode = BrainRenderer::Standard;
-    BrainRenderer::ShaderMode m_multiViewShaderModes[4] = {
-        BrainRenderer::Anatomical,
-        BrainRenderer::Standard,
-        BrainRenderer::Holographic,
-        BrainRenderer::Anatomical
-    };
     BrainRenderer::ShaderMode m_bemShaderMode = BrainRenderer::Standard;
     BrainSurface::VisualizationMode m_currentVisMode = BrainSurface::ModeSurface;
-    BrainSurface::VisualizationMode m_singleViewVisMode = BrainSurface::ModeSurface;
-    BrainSurface::VisualizationMode m_multiViewVisModes[4] = {
-        BrainSurface::ModeSurface,
-        BrainSurface::ModeSurface,
-        BrainSurface::ModeSurface,
-        BrainSurface::ModeSurface
-    };
     bool m_lightingEnabled = true;
     
     QQuaternion m_cameraRotation;
     QVector3D m_sceneCenter = QVector3D(0,0,0);
     float m_sceneSize = 0.3f; // Default ~30cm
-    float m_zoom = 0.0f;
+    float m_zoom = 0.0f;      // single-view zoom (kept separate from SubView for now)
     QPoint m_lastMousePos;
     
     int m_frameCount = 0;
@@ -640,6 +770,7 @@ private:
     QString m_hoveredSurfaceKey;
     QLabel* m_regionLabel = nullptr;
     QLabel* m_viewportNameLabels[4] = {nullptr, nullptr, nullptr, nullptr};
+    QLabel* m_viewportInfoLabels[4] = {nullptr, nullptr, nullptr, nullptr};
      
     // Debug Intersection Pointer
     std::shared_ptr<BrainSurface> m_debugPointerSurface;
@@ -654,9 +785,6 @@ private:
     // Multi-view support
     ViewMode m_viewMode = SingleView;
     QQuaternion m_multiViewCameras[4]; // Top, Perspective, Front, Left views
-    bool m_viewportEnabled[4] = {true, true, true, true}; // Which viewports are active
-    float m_multiViewZoom[4] = {0.0f, 0.0f, 0.0f, 0.0f}; // Per-viewport zoom
-    QVector2D m_multiViewPan[4]; // Per-viewport 2D pan offset (view-local)
     float m_multiSplitX = 0.5f;
     float m_multiSplitY = 0.5f;
     bool m_isDraggingSplitter = false;
@@ -672,10 +800,6 @@ private:
     FIFFLIB::FiffEvoked m_sensorEvoked;
     bool m_sensorFieldLoaded = false;
     int m_sensorFieldTimePoint = 0;
-    bool m_showMegFieldMap = false;
-    bool m_showEegFieldMap = false;
-    bool m_showMegFieldContours = false;
-    bool m_showEegFieldContours = false;
     bool m_megFieldMapOnHead = false;
     QString m_sensorFieldColormap = "MNE";
     QString m_megFieldSurfaceKey;
