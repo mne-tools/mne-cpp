@@ -544,6 +544,7 @@ protected:
 
 signals:
     void hoveredRegionChanged(const QString &regionName);
+    void visualizationEditTargetChanged(int target);
 
 private:
     enum class SplitterHit {
@@ -560,6 +561,7 @@ private:
     void updateSplitterCursor(const QPoint& pos);
     void updateViewportSeparators();
     void updateOverlayLayout();
+    void updateViewportLabelHighlight();
     void logPerspectiveRotation(const QString& context) const;
     void loadMultiViewSettings();
     void saveMultiViewSettings() const;
@@ -653,6 +655,8 @@ private:
     ViewMode m_viewMode = SingleView;
     QQuaternion m_multiViewCameras[4]; // Top, Perspective, Front, Left views
     bool m_viewportEnabled[4] = {true, true, true, true}; // Which viewports are active
+    float m_multiViewZoom[4] = {0.0f, 0.0f, 0.0f, 0.0f}; // Per-viewport zoom
+    QVector2D m_multiViewPan[4]; // Per-viewport 2D pan offset (view-local)
     float m_multiSplitX = 0.5f;
     float m_multiSplitY = 0.5f;
     bool m_isDraggingSplitter = false;

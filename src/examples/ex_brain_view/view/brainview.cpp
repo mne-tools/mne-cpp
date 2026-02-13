@@ -1224,6 +1224,7 @@ void BrainView::setShaderMode(const QString &modeName)
 
 void BrainView::setVisualizationEditTarget(int target)
 {
+    const int prev = m_visualizationEditTarget;
     m_visualizationEditTarget = normalizedVisualizationTarget(target);
 
     const int selected = m_visualizationEditTarget;
@@ -1234,7 +1235,15 @@ void BrainView::setVisualizationEditTarget(int target)
     for (auto surf : m_surfaces) {
         surf->setVisualizationMode(m_currentVisMode);
     }
+
+    // Update viewport label highlighting
+    updateViewportLabelHighlight();
+
     saveMultiViewSettings();
+
+    if (prev != m_visualizationEditTarget) {
+        emit visualizationEditTargetChanged(m_visualizationEditTarget);
+    }
 }
 
 //=============================================================================================================
@@ -1756,6 +1765,28 @@ void BrainView::updateOverlayLayout()
         label->show();
         label->raise();
     }
+
+    updateViewportLabelHighlight();
+}
+
+//=============================================================================================================
+
+void BrainView::updateViewportLabelHighlight()
+{
+    static const QString normalStyle =
+        QStringLiteral("color: white; font-weight: bold; font-family: sans-serif; "
+                       "font-size: 12px; background: transparent; padding: 2px 4px;");
+    static const QString selectedStyle =
+        QStringLiteral("color: #FFD54F; font-weight: bold; font-family: sans-serif; "
+                       "font-size: 13px; background: rgba(255,213,79,40); "
+                       "border: 1px solid #FFD54F; border-radius: 3px; padding: 2px 6px;");
+
+    for (int i = 0; i < 4; ++i) {
+        if (!m_viewportNameLabels[i]) continue;
+        const bool selected = (m_viewMode == MultiView && m_visualizationEditTarget == i);
+        m_viewportNameLabels[i]->setStyleSheet(selected ? selectedStyle : normalStyle);
+        m_viewportNameLabels[i]->adjustSize();
+    }
 }
 
 //=============================================================================================================
@@ -1827,6 +1858,13 @@ void BrainView::loadMultiViewSettings()
 
     m_visualizationEditTarget = normalizedVisualizationTarget(settings.value("visualizationEditTarget", -1).toInt());
 
+    for (int i = 0; i < 4; ++i) {
+        m_multiViewZoom[i] = settings.value(QStringLiteral("multiViewZoom%1").arg(i), 0.0f).toFloat();
+        m_multiViewPan[i] = QVector2D(
+            settings.value(QStringLiteral("multiViewPanX%1").arg(i), 0.0f).toFloat(),
+            settings.value(QStringLiteral("multiViewPanY%1").arg(i), 0.0f).toFloat());
+    }
+
     settings.endGroup();
 
     m_multiSplitX = std::clamp(m_multiSplitX, 0.15f, 0.85f);
@@ -1868,6 +1906,11 @@ void BrainView::saveMultiViewSettings() const
     settings.setValue("multiOverlay2", visualizationModeName(m_multiViewVisModes[2]));
     settings.setValue("multiOverlay3", visualizationModeName(m_multiViewVisModes[3]));
     settings.setValue("visualizationEditTarget", m_visualizationEditTarget);
+    for (int i = 0; i < 4; ++i) {
+        settings.setValue(QStringLiteral("multiViewZoom%1").arg(i), m_multiViewZoom[i]);
+        settings.setValue(QStringLiteral("multiViewPanX%1").arg(i), m_multiViewPan[i].x());
+        settings.setValue(QStringLiteral("multiViewPanY%1").arg(i), m_multiViewPan[i].y());
+    }
     settings.endGroup();
 }
 
@@ -2053,14 +2096,26 @@ void BrainView::render(QRhiCommandBuffer *cb)
         if (farPlane < 100.0f) farPlane = 100.0f;
         projection.perspective(45.0f, aspectRatio, m_sceneSize * 0.01f, farPlane);
 
+        // Per-viewport zoom: use per-view zoom in multiview, global zoom in single view
+        const float vpZoom = (m_viewMode == MultiView) ? m_multiViewZoom[vp] : m_zoom;
         float baseDistance = m_sceneSize * 1.5f;
-        float distance = baseDistance - m_zoom * (m_sceneSize * 0.05f);
+        float distance = baseDistance - vpZoom * (m_sceneSize * 0.05f);
         
         QVector3D cameraPos = effectiveRotation.rotatedVector(QVector3D(0, 0, distance));
         QVector3D upVector = effectiveRotation.rotatedVector(QVector3D(0, 1, 0));
+
+        // Per-viewport pan: shift look-at target in the view plane
+        QVector3D lookAt(0, 0, 0);
+        if (m_viewMode == MultiView && vp != 1) {
+            const QVector2D &pan = m_multiViewPan[vp];
+            const QVector3D right = effectiveRotation.rotatedVector(QVector3D(1, 0, 0)).normalized();
+            const QVector3D up = upVector.normalized();
+            lookAt += right * pan.x() + up * pan.y();
+            cameraPos += right * pan.x() + up * pan.y();
+        }
         
         QMatrix4x4 view;
-        view.lookAt(cameraPos, QVector3D(0, 0, 0), upVector);
+        view.lookAt(cameraPos, lookAt, upVector);
 
         BrainRenderer::SceneData sceneData;
         sceneData.mvp = rhi()->clipSpaceCorrMatrix();
@@ -2187,6 +2242,12 @@ void BrainView::mousePressEvent(QMouseEvent *e)
             updateSplitterCursor(e->pos());
             return;
         }
+
+        // Select the clicked viewport as the active edit target
+        const int clickedVp = viewportIndexAt(e->pos());
+        if (clickedVp >= 0 && clickedVp != m_visualizationEditTarget) {
+            setVisualizationEditTarget(clickedVp);
+        }
     }
 
     m_lastMousePos = e->pos();
@@ -2223,33 +2284,47 @@ void BrainView::mouseMoveEvent(QMouseEvent *event)
     if (event->buttons() & Qt::LeftButton) {
         if (m_viewMode == MultiView) {
             const int activeVp = viewportIndexAt(event->pos());
-            if (activeVp != 1) {
+
+            if (activeVp >= 0 && activeVp != 1) {
+                // Planar views (Top/Front/Left): pan along the view plane
+                const QPoint diff = event->pos() - m_lastMousePos;
+                const float panSpeed = m_sceneSize * 0.002f;
+                m_multiViewPan[activeVp] += QVector2D(-diff.x() * panSpeed,
+                                                       diff.y() * panSpeed);
                 m_lastMousePos = event->pos();
+                update();
                 return;
             }
 
-            QPoint diff = event->pos() - m_lastMousePos;
-            float speed = 0.5f;
+            if (activeVp == 1) {
+                // Perspective view: rotate
+                QPoint diff = event->pos() - m_lastMousePos;
+                float speed = 0.5f;
 
-            const QQuaternion perspectivePreset = perspectivePresetRotation();
-            QQuaternion effectiveRotation = m_cameraRotation * perspectivePreset;
+                const QQuaternion perspectivePreset = perspectivePresetRotation();
+                QQuaternion effectiveRotation = m_cameraRotation * perspectivePreset;
 
-            const QVector3D upAxis = effectiveRotation.rotatedVector(QVector3D(0, 1, 0)).normalized();
-            const QVector3D rightAxis = effectiveRotation.rotatedVector(QVector3D(1, 0, 0)).normalized();
+                const QVector3D upAxis = effectiveRotation.rotatedVector(QVector3D(0, 1, 0)).normalized();
+                const QVector3D rightAxis = effectiveRotation.rotatedVector(QVector3D(1, 0, 0)).normalized();
 
-            QQuaternion yaw = QQuaternion::fromAxisAndAngle(upAxis, -diff.x() * speed);
-            QQuaternion pitch = QQuaternion::fromAxisAndAngle(rightAxis, -diff.y() * speed);
+                QQuaternion yaw = QQuaternion::fromAxisAndAngle(upAxis, -diff.x() * speed);
+                QQuaternion pitch = QQuaternion::fromAxisAndAngle(rightAxis, -diff.y() * speed);
 
-            effectiveRotation = yaw * pitch * effectiveRotation;
-            m_cameraRotation = effectiveRotation * perspectivePreset.conjugated();
-            m_cameraRotation.normalize();
+                effectiveRotation = yaw * pitch * effectiveRotation;
+                m_cameraRotation = effectiveRotation * perspectivePreset.conjugated();
+                m_cameraRotation.normalize();
 
-            m_perspectiveRotatedSincePress = true;
+                m_perspectiveRotatedSincePress = true;
+                m_lastMousePos = event->pos();
+                update();
+                return;
+            }
+
             m_lastMousePos = event->pos();
-            update();
             return;
         }
 
+        // Single-view rotation
         QPoint diff = event->pos() - m_lastMousePos;
         float speed = 0.5f;
 
@@ -2265,10 +2340,6 @@ void BrainView::mouseMoveEvent(QMouseEvent *event)
         effectiveRotation = yaw * pitch * effectiveRotation;
         m_cameraRotation = effectiveRotation * perspectivePreset.conjugated();
         m_cameraRotation.normalize();
-
-        if (m_viewMode == MultiView) {
-            m_perspectiveRotatedSincePress = true;
-        }
 
         m_lastMousePos = event->pos();
         update();
@@ -2299,6 +2370,11 @@ void BrainView::mouseReleaseEvent(QMouseEvent *event)
         saveMultiViewSettings();
     }
 
+    // Save pan offset after dragging in a planar viewport
+    if (event->button() == Qt::LeftButton && m_viewMode == MultiView && !m_perspectiveRotatedSincePress) {
+        saveMultiViewSettings();
+    }
+
     if (m_viewMode == MultiView) {
         updateSplitterCursor(event->pos());
     } else {
@@ -2310,7 +2386,17 @@ void BrainView::mouseReleaseEvent(QMouseEvent *event)
 
 void BrainView::wheelEvent(QWheelEvent *event)
 {
-    m_zoom += event->angleDelta().y() / 120.0f;
+    const float delta = event->angleDelta().y() / 120.0f;
+
+    if (m_viewMode == MultiView) {
+        const int vp = viewportIndexAt(event->position().toPoint());
+        if (vp >= 0 && vp < 4) {
+            m_multiViewZoom[vp] += delta;
+            saveMultiViewSettings();
+        }
+    } else {
+        m_zoom += delta;
+    }
     update();
 }
 

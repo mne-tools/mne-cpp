@@ -67,8 +67,6 @@
 #include <QSignalBlocker>
 #include <QSpinBox>
 #include <QSettings>
-#include <QRadioButton>
-#include <QButtonGroup>
 #include <QAbstractButton>
 
 //=============================================================================================================
@@ -507,37 +505,6 @@ void MainWindow::setupUI()
     m_multiViewCheck->setToolTip("Toggle between single interactive camera and four fixed camera views.");
     viewLayout->addWidget(m_multiViewCheck);
 
-    QLabel *editTargetLabel = new QLabel("Apply Visualization To:");
-    viewLayout->addWidget(editTargetLabel);
-
-    m_viewEditTargetGroup = new QButtonGroup(this);
-    m_editTopRadio = new QRadioButton("Top");
-    m_editPerspectiveRadio = new QRadioButton("Perspective");
-    m_editFrontRadio = new QRadioButton("Front");
-    m_editLeftRadio = new QRadioButton("Left");
-
-    m_viewEditTargetGroup->addButton(m_editTopRadio, 0);
-    m_viewEditTargetGroup->addButton(m_editPerspectiveRadio, 1);
-    m_viewEditTargetGroup->addButton(m_editFrontRadio, 2);
-    m_viewEditTargetGroup->addButton(m_editLeftRadio, 3);
-
-    m_editPerspectiveRadio->setChecked(true);
-    m_editTopRadio->setEnabled(false);
-    m_editPerspectiveRadio->setEnabled(false);
-    m_editFrontRadio->setEnabled(false);
-    m_editLeftRadio->setEnabled(false);
-
-    QHBoxLayout *editRow1 = new QHBoxLayout();
-    editRow1->addWidget(m_editTopRadio);
-    editRow1->addWidget(m_editPerspectiveRadio);
-
-    QHBoxLayout *editRow2 = new QHBoxLayout();
-    editRow2->addWidget(m_editFrontRadio);
-    editRow2->addWidget(m_editLeftRadio);
-
-    viewLayout->addLayout(editRow1);
-    viewLayout->addLayout(editRow2);
-
     // Viewport Toggles
     QHBoxLayout *vpRow1 = new QHBoxLayout();
     QHBoxLayout *vpRow2 = new QHBoxLayout();
@@ -676,8 +643,9 @@ void MainWindow::setupConnections()
         }
     });
 
-    connect(m_viewEditTargetGroup, &QButtonGroup::idClicked, [this, refreshVisualizationControls](int id) {
-        m_brainView->setVisualizationEditTarget(id);
+    // When user clicks a viewport in BrainView, refresh the visualization controls
+    connect(m_brainView, &BrainView::visualizationEditTargetChanged,
+            [this, refreshVisualizationControls](int /*target*/) {
         refreshVisualizationControls();
     });
 
@@ -716,18 +684,9 @@ void MainWindow::setupConnections()
         m_vpLeftCheck->setEnabled(checked);
         m_resetMultiViewLayoutBtn->setEnabled(checked);
 
-        m_editTopRadio->setEnabled(checked);
-        m_editPerspectiveRadio->setEnabled(checked);
-        m_editFrontRadio->setEnabled(checked);
-        m_editLeftRadio->setEnabled(checked);
-
         if (checked) {
-            int target = m_viewEditTargetGroup->checkedId();
-            if (target < 0 || target > 3) {
-                target = 1;
-                m_editPerspectiveRadio->setChecked(true);
-            }
-            m_brainView->setVisualizationEditTarget(target);
+            // Default to Perspective (1) when switching to multi-view
+            m_brainView->setVisualizationEditTarget(1);
             m_brainView->showMultiView();
         } else {
             m_brainView->setVisualizationEditTarget(-1);
@@ -1048,10 +1007,6 @@ void MainWindow::setupConnections()
     m_vpFrontCheck->setEnabled(isMultiView);
     m_vpLeftCheck->setEnabled(isMultiView);
     m_resetMultiViewLayoutBtn->setEnabled(isMultiView);
-    m_editTopRadio->setEnabled(isMultiView);
-    m_editPerspectiveRadio->setEnabled(isMultiView);
-    m_editFrontRadio->setEnabled(isMultiView);
-    m_editLeftRadio->setEnabled(isMultiView);
 
     {
         const QSignalBlocker blockTop(m_vpTopCheck);
@@ -1064,14 +1019,12 @@ void MainWindow::setupConnections()
         m_vpLeftCheck->setChecked(m_brainView->isViewportEnabled(3));
     }
 
-    int editTarget = m_brainView->visualizationEditTarget();
+    // The BrainView already restored m_visualizationEditTarget from QSettings.
+    // If multi-view, ensure it's a valid pane (default to Perspective).
     if (isMultiView) {
+        int editTarget = m_brainView->visualizationEditTarget();
         if (editTarget < 0 || editTarget > 3) {
             editTarget = 1;
-        }
-        if (QAbstractButton* button = m_viewEditTargetGroup->button(editTarget)) {
-            const QSignalBlocker blockTarget(m_viewEditTargetGroup);
-            button->setChecked(true);
         }
         m_brainView->setVisualizationEditTarget(editTarget);
     } else {

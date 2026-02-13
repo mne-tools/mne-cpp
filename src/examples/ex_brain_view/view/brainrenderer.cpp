@@ -77,8 +77,8 @@ void BrainRenderer::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int
     
     // Create Uniform Buffer
     if (!m_uniformBuffer) {
-        // Size for 1024 slots with alignment (approx 256KB)
-        m_uniformBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::UniformBuffer, 1024 * m_uniformBufferOffsetAlignment));
+        // Size for 8192 slots with alignment — enough for 4 viewports × ~1000 surfaces
+        m_uniformBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::UniformBuffer, 8192 * m_uniformBufferOffsetAlignment));
         m_uniformBuffer->create();
     }
     
@@ -253,7 +253,11 @@ void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
     // Dynamic slot update
     int offset = m_currentUniformOffset;
     m_currentUniformOffset += m_uniformBufferOffsetAlignment;
-    if (m_currentUniformOffset >= m_uniformBuffer->size()) m_currentUniformOffset = 0; // Wrap around if too many (shouldn't happen)
+    if (m_currentUniformOffset >= m_uniformBuffer->size()) {
+        qWarning("BrainRenderer: uniform buffer overflow (%d / %d bytes) — too many surfaces. Some draws will be skipped.",
+                 m_currentUniformOffset, (int)m_uniformBuffer->size());
+        return;  // Skip this draw rather than silently corrupt earlier viewport data
+    }
 
     u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 0, 64, data.mvp.constData());
     u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 64, 12, &data.cameraPos);
