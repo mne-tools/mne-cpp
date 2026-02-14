@@ -40,6 +40,7 @@
 
 #include <QSettings>
 #include <cmath>
+#include <limits>
 
 //=============================================================================================================
 // ViewVisibilityProfile
@@ -279,12 +280,33 @@ bool multiViewPresetIsPerspective(int preset)
 }
 
 //=============================================================================================================
+// SubView factory
+//=============================================================================================================
+
+SubView SubView::defaultForIndex(int index)
+{
+    static constexpr BrainRenderer::ShaderMode kShaderCycle[] = {
+        BrainRenderer::Anatomical,
+        BrainRenderer::Standard,
+        BrainRenderer::Holographic,
+    };
+    static constexpr int kNumShaders = 3;
+    static constexpr int kNumPresets = 7;  // Top..Right
+
+    SubView sv;
+    sv.preset      = index % kNumPresets;
+    sv.brainShader = kShaderCycle[index % kNumShaders];
+    sv.enabled     = true;
+    return sv;
+}
+
+//=============================================================================================================
 // Enum ↔ string conversion
 //=============================================================================================================
 
-int normalizedVisualizationTarget(int target)
+int normalizedVisualizationTarget(int target, int maxIndex)
 {
-    return std::clamp(target, -1, 3);
+    return std::clamp(target, -1, maxIndex);
 }
 
 //=============================================================================================================
@@ -359,4 +381,66 @@ QRgb mneAnalyzeColor(double v)
     int b = static_cast<int>(std::round((bb[seg] + t * (bb[seg + 1] - bb[seg])) * 255.0));
 
     return qRgb(std::clamp(r, 0, 255), std::clamp(g, 0, 255), std::clamp(b, 0, 255));
+}
+
+//=============================================================================================================
+// SubView serialisation
+//=============================================================================================================
+
+void SubView::load(const QSettings &settings, const QString &prefix,
+                   const QQuaternion &fallbackRotation)
+{
+    surfaceType = settings.value(prefix + "surfaceType", surfaceType).toString();
+    brainShader = shaderModeFromName(settings.value(prefix + "shader", shaderModeName(brainShader)).toString());
+    bemShader   = shaderModeFromName(settings.value(prefix + "bemShader", shaderModeName(bemShader)).toString());
+    overlayMode = visualizationModeFromName(settings.value(prefix + "overlay", visualizationModeName(overlayMode)).toString());
+
+    visibility.load(settings, prefix + "vis_");
+
+    zoom = settings.value(prefix + "zoom", zoom).toFloat();
+    pan = QVector2D(
+        settings.value(prefix + "panX", pan.x()).toFloat(),
+        settings.value(prefix + "panY", pan.y()).toFloat());
+    preset = std::clamp(settings.value(prefix + "preset", preset).toInt(), 0, 6);
+
+    const bool hasQuat = settings.contains(prefix + "perspRotW")
+                      && settings.contains(prefix + "perspRotX")
+                      && settings.contains(prefix + "perspRotY")
+                      && settings.contains(prefix + "perspRotZ");
+    if (hasQuat) {
+        const float w = settings.value(prefix + "perspRotW", 1.0f).toFloat();
+        const float x = settings.value(prefix + "perspRotX", 0.0f).toFloat();
+        const float y = settings.value(prefix + "perspRotY", 0.0f).toFloat();
+        const float z = settings.value(prefix + "perspRotZ", 0.0f).toFloat();
+        perspectiveRotation = QQuaternion(w, x, y, z);
+        if (perspectiveRotation.lengthSquared() <= std::numeric_limits<float>::epsilon()) {
+            perspectiveRotation = QQuaternion();
+        } else {
+            perspectiveRotation.normalize();
+        }
+    } else {
+        perspectiveRotation = fallbackRotation;
+    }
+}
+
+//=============================================================================================================
+
+void SubView::save(QSettings &settings, const QString &prefix) const
+{
+    settings.setValue(prefix + "surfaceType", surfaceType);
+    settings.setValue(prefix + "shader",    shaderModeName(brainShader));
+    settings.setValue(prefix + "bemShader", shaderModeName(bemShader));
+    settings.setValue(prefix + "overlay",   visualizationModeName(overlayMode));
+
+    visibility.save(settings, prefix + "vis_");
+
+    settings.setValue(prefix + "zoom",   zoom);
+    settings.setValue(prefix + "panX",   pan.x());
+    settings.setValue(prefix + "panY",   pan.y());
+    settings.setValue(prefix + "preset", preset);
+
+    settings.setValue(prefix + "perspRotW", perspectiveRotation.scalar());
+    settings.setValue(prefix + "perspRotX", perspectiveRotation.x());
+    settings.setValue(prefix + "perspRotY", perspectiveRotation.y());
+    settings.setValue(prefix + "perspRotZ", perspectiveRotation.z());
 }

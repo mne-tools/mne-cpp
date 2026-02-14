@@ -178,6 +178,37 @@ struct SubView
      */
     void applyOverlayToSurfaces(
         QMap<QString, std::shared_ptr<BrainSurface>> &surfaces) const;
+
+    // ── Serialisation ──────────────────────────────────────────────────
+
+    /**
+     * Load this SubView's state from QSettings under the given prefix.
+     *
+     * @param[in] settings  Settings store to read from.
+     * @param[in] prefix    Key prefix (e.g. "multi0_").
+     * @param[in] fallbackRotation  Rotation to use if no saved quaternion exists.
+     */
+    void load(const QSettings &settings, const QString &prefix,
+              const QQuaternion &fallbackRotation = QQuaternion());
+
+    /**
+     * Save this SubView's state to QSettings under the given prefix.
+     *
+     * @param[out] settings  Settings store to write to.
+     * @param[in]  prefix    Key prefix (e.g. "multi0_").
+     */
+    void save(QSettings &settings, const QString &prefix) const;
+
+    // ── Factory ─────────────────────────────────────────────────────────
+
+    /**
+     * Return default SubView configuration for viewport @p index.
+     *
+     * The preset cycles through the 7 camera orientations (Top, Perspective,
+     * Front, Left, Bottom, Back, Right) and the shader cycles through
+     * Anatomical → Standard → Holographic.
+     */
+    static SubView defaultForIndex(int index);
 };
 
 //=============================================================================================================
@@ -210,9 +241,13 @@ bool multiViewPresetIsPerspective(int preset);
 //=============================================================================================================
 
 /**
- * Clamp a visualization target index to [-1, 3].
+ * Clamp a visualization target index to [-1, maxIndex].
+ *
+ * @param[in] target   Raw target index (-1 = single view, 0+ = multi pane).
+ * @param[in] maxIndex Upper bound (inclusive).  Defaults to 3 for backwards
+ *                     compatibility, but callers should pass viewportCount-1.
  */
-int normalizedVisualizationTarget(int target);
+int normalizedVisualizationTarget(int target, int maxIndex = 3);
 
 /** Convert a shader name ("Standard", "Holographic", "Anatomical") to enum. */
 BrainRenderer::ShaderMode shaderModeFromName(const QString &name);

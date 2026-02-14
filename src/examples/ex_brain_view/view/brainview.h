@@ -64,8 +64,8 @@
 #include <QMap>
 #include <QElapsedTimer>
 #include <QStandardItem>
-#include <memory> 
-#include <QQuaternion> 
+#include <memory>
+#include <QQuaternion>
 #include <QThread>
 #include <Eigen/Sparse>
 #include <QRect>
@@ -137,7 +137,7 @@ public slots:
      * @param[in] type       The surface type to activate.
      */
     void setActiveSurface(const QString &type);
-    
+
     //=========================================================================================================
     /**
      * Set the shader mode (Standard, Holographic, Atlas).
@@ -145,7 +145,7 @@ public slots:
      * @param[in] mode       The shader mode to set.
      */
     void setShaderMode(const QString &mode);
-    
+
     //=========================================================================================================
     /**
      * Set the shader mode for BEM surfaces (Standard, Holographic, Atlas).
@@ -158,7 +158,7 @@ public slots:
      * Synchronize all BEM shader targets to their respective brain shader targets.
      */
     void syncBemShadersToBrainShaders();
-    
+
     //=========================================================================================================
     /**
      * Set the overlay mode (Surface, Annotation, Scientific).
@@ -166,11 +166,11 @@ public slots:
      * @param[in] mode       The visualization mode to set.
      */
     void setVisualizationMode(const QString &mode);
-    
+
     //=========================================================================================================
     /**
      * Toggle visibility of a hemisphere.
-     * 
+     *
      * @param[in] hemiIdx    0 for LH, 1 for RH.
      * @param[in] visible    Visibility state.
      */
@@ -179,7 +179,7 @@ public slots:
     //=========================================================================================================
     /**
      * Toggle visibility of a BEM surface layer.
-     * 
+     *
      * @param[in] name       "head", "outer_skull", or "inner_skull".
      * @param[in] visible    Visibility state.
      */
@@ -188,7 +188,7 @@ public slots:
     //=========================================================================================================
     /**
      * Set whether BEM surfaces should use their standard (colorful) definition or white.
-     * 
+     *
      * @param[in] enabled    True to use standard colors (Red/Green/Blue), False for White.
      */
     void setBemHighContrast(bool enabled);
@@ -196,7 +196,7 @@ public slots:
     //=========================================================================================================
     /**
      * Toggle visibility of sensor groups.
-     * 
+     *
      * @param[in] type       "MEG", "EEG", or "Digitizer".
      * @param[in] visible    Visibility state.
      */
@@ -205,7 +205,7 @@ public slots:
     //=========================================================================================================
     /**
      * Set whether sensor transformations (if loaded) should be applied.
-     * 
+     *
      * @param[in] enabled    True to apply transformations, False to show original positions.
      */
     void setSensorTransEnabled(bool enabled);
@@ -221,7 +221,7 @@ public slots:
     //=========================================================================================================
     /**
      * Toggle visibility of dipoles.
-     * 
+     *
      * @param[in] visible    Visibility state.
      */
     void setDipoleVisible(bool visible);
@@ -269,7 +269,7 @@ public slots:
     //=========================================================================================================
     /**
      * Enable or disable a specific viewport in multi-view mode.
-     * 
+     *
         * @param[in] index      Viewport index (0=Top, 1=Perspective, 2=Front, 3=Left).
      * @param[in] enabled    True to enable, false to disable.
      */
@@ -442,7 +442,7 @@ public slots:
     //=========================================================================================================
     /**
      * Cast rays from screen position to find intersected objects.
-     * 
+     *
      * @param[in] pos        2D mouse position.
      */
     void castRay(const QPoint &pos);
@@ -506,11 +506,11 @@ public slots:
      * @param[in] name       Colormap name.
      */
     void setSensorFieldColormap(const QString &name);
-    
+
     //=========================================================================================================
     /**
      * Get the time step of the loaded source estimate.
-     * 
+     *
      * @return Time step in seconds. Returns 0 if not loaded.
      */
     float stcStep() const;
@@ -518,7 +518,7 @@ public slots:
     //=========================================================================================================
     /**
      * Get the start time of the loaded source estimate.
-     * 
+     *
      * @return Start time in seconds. Returns 0 if not loaded.
      */
     float stcTmin() const;
@@ -613,6 +613,22 @@ signals:
      */
     void sensorFieldTimePointChanged(int index, float time);
 
+    //=========================================================================================================
+    /**
+     * Emitted when the hovered brain region changes.
+     *
+     * @param[in] regionName  Name of the region under the cursor.
+     */
+    void hoveredRegionChanged(const QString &regionName);
+
+    //=========================================================================================================
+    /**
+     * Emitted when the active visualization edit target changes.
+     *
+     * @param[in] target  New target index (-1 = single, 0..N-1 = multi pane).
+     */
+    void visualizationEditTargetChanged(int target);
+
 private slots:
     //=========================================================================================================
     /**
@@ -652,7 +668,7 @@ private:
 protected:
     void initialize(QRhiCommandBuffer *cb) override;
     void render(QRhiCommandBuffer *cb) override;
-    
+
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void mouseReleaseEvent(QMouseEvent *event) override;
@@ -660,12 +676,9 @@ protected:
     void keyPressEvent(QKeyEvent *event) override;
     void resizeEvent(QResizeEvent *event) override;
 
-signals:
-    void hoveredRegionChanged(const QString &regionName);
-    void visualizationEditTargetChanged(int target);
-
 private:
     // ── Layout helpers (delegate to MultiViewLayout) ───────────────────
+    QVector<int> enabledViewportIndices() const;
     int enabledViewportCount() const;
     int viewportIndexAt(const QPoint& pos) const;
     QRect multiViewSlotRect(int slot, int numEnabled, const QSize& outputSize) const;
@@ -682,118 +695,113 @@ private:
     void saveMultiViewSettings() const;
     void updateInflatedSurfaceTransforms();
 
-// ── Rendering ───────────────────────────────────────────────────────
-    std::unique_ptr<BrainRenderer> m_renderer;
-    BrainTreeModel* m_model = nullptr;
-    
-    // Map Model Items to Render Resources
-    QMap<const QStandardItem*, std::shared_ptr<BrainSurface>> m_itemSurfaceMap;
-    QMap<const QStandardItem*, std::shared_ptr<DipoleObject>> m_itemDipoleMap;
+    // ── Rendering ───────────────────────────────────────────────────────
+    std::unique_ptr<BrainRenderer> m_renderer;      /**< GPU renderer for all surfaces/dipoles. */
+    BrainTreeModel* m_model = nullptr;              /**< Data model driving the scene graph (not owned). */
 
-    // Legacy/Helper maps (refactoring TODO: remove if fully replaced by model mapping)
-    QMap<QString, std::shared_ptr<BrainSurface>> m_surfaces; 
-    std::shared_ptr<BrainSurface> m_activeSurface;
-    QString m_activeSurfaceType;
+    QMap<const QStandardItem*, std::shared_ptr<BrainSurface>> m_itemSurfaceMap;  /**< Model-item → renderable surface. */
+    QMap<const QStandardItem*, std::shared_ptr<DipoleObject>> m_itemDipoleMap;   /**< Model-item → dipole renderable. */
+
+    QMap<QString, std::shared_ptr<BrainSurface>> m_surfaces;  /**< Key → surface lookup (e.g. "lh_pial", "bem_head"). */
+    std::shared_ptr<BrainSurface> m_activeSurface;            /**< Currently selected brain surface for stats. */
+    QString m_activeSurfaceType;                              /**< Type name of the active surface (e.g. "pial"). */
 
     // ── SubView state ──────────────────────────────────────────────────
-    SubView m_singleView;                           // single-view state
-    SubView m_subViews[4];                          // multi-view panes 0..3
-    int m_visualizationEditTarget = -1;             // -1=single, 0..3=multi
-    
-    // Sensors (Lists of surfaces/meshes for coils/electrodes)
-    QList<std::shared_ptr<BrainSurface>> m_megSensors;
-    QList<std::shared_ptr<BrainSurface>> m_eegSensors;
-    QList<std::shared_ptr<BrainSurface>> m_digitizers;
-    
-    // ── Active (runtime) copies — kept in sync with selected SubView ──
-    BrainRenderer::ShaderMode m_brainShaderMode = BrainRenderer::Standard;
-    BrainRenderer::ShaderMode m_bemShaderMode = BrainRenderer::Standard;
-    BrainSurface::VisualizationMode m_currentVisMode = BrainSurface::ModeSurface;
-    bool m_lightingEnabled = true;
-    
-    // ── Extracted components ───────────────────────────────────────────
-    CameraController   m_camera;
-    MultiViewLayout    m_layout;
-    SensorFieldMapper  m_fieldMapper;
+    static constexpr int kDefaultViewportCount = 4; /**< Default number of multi-view panes. */
+    SubView m_singleView;                           /**< Render state for single-view mode. */
+    QVector<SubView> m_subViews;                    /**< Per-pane render state for multi-view mode. */
+    int m_visualizationEditTarget = -1;             /**< Active pane for UI edits (-1 = single, 0..N-1 = multi). */
 
-    QQuaternion m_cameraRotation;
-    QVector3D m_sceneCenter = QVector3D(0,0,0);
-    float m_sceneSize = 0.3f;
-    float m_zoom = 0.0f;
-    QPoint m_lastMousePos;
-    
+    // ── Active (runtime) copies — kept in sync with selected SubView ──
+    BrainRenderer::ShaderMode m_brainShaderMode = BrainRenderer::Standard;      /**< Current brain shader mode. */
+    BrainRenderer::ShaderMode m_bemShaderMode = BrainRenderer::Standard;        /**< Current BEM shader mode. */
+    BrainSurface::VisualizationMode m_currentVisMode = BrainSurface::ModeSurface; /**< Current overlay mode. */
+    bool m_lightingEnabled = true;                  /**< Whether per-fragment lighting is active. */
+
+    // ── Extracted components ───────────────────────────────────────────
+    CameraController   m_camera;                    /**< Camera maths helper. */
+    MultiViewLayout    m_layout;                    /**< Multi-view pane geometry and splitter logic. */
+    SensorFieldMapper  m_fieldMapper;               /**< Sensor → surface field mapping helper. */
+
+    // ── Camera state ───────────────────────────────────────────────────
+    QQuaternion m_cameraRotation;                   /**< Global camera orientation quaternion. */
+    QVector3D m_sceneCenter = QVector3D(0, 0, 0);   /**< Bounding-box centre of the scene. */
+    float m_sceneSize = 0.3f;                       /**< Bounding-box diagonal of the scene (metres). */
+    float m_zoom = 0.0f;                            /**< Zoom level for single-view mode. */
+    QPoint m_lastMousePos;                          /**< Previous mouse position for drag deltas. */
+
     // ── UI overlays ────────────────────────────────────────────────────
-    int m_frameCount = 0;
-    QElapsedTimer m_fpsTimer;
-    QLabel *m_fpsLabel = nullptr;
-    QLabel *m_singleViewInfoLabel = nullptr;
-    QTimer *m_updateTimer = nullptr;
-    int m_snapshotCounter = 0;
-    bool m_infoPanelVisible = true;
-    
-    std::unique_ptr<SourceEstimateOverlay> m_sourceOverlay;
-    std::unique_ptr<DipoleObject> m_dipoles;
-    int m_currentTimePoint = 0;
-    
-    /**
-     * Update the scene bounding box based on visible objects.
-     */
+    int m_frameCount = 0;                           /**< Frames rendered since last FPS sample. */
+    QElapsedTimer m_fpsTimer;                       /**< Timer for FPS measurement. */
+    QLabel *m_fpsLabel = nullptr;                   /**< Overlay label showing FPS and vertex count. */
+    QLabel *m_singleViewInfoLabel = nullptr;        /**< Overlay label for single-view shader/surface info. */
+    QTimer *m_updateTimer = nullptr;                /**< Periodic repaint timer (~60 Hz). */
+    int m_snapshotCounter = 0;                      /**< Sequential counter for snapshot filenames. */
+    bool m_infoPanelVisible = true;                 /**< Whether the info overlay panel is shown. */
+
+    // ── Source estimate ────────────────────────────────────────────────
+    std::unique_ptr<SourceEstimateOverlay> m_sourceOverlay; /**< Active source estimate overlay data. */
+    std::unique_ptr<DipoleObject> m_dipoles;        /**< Standalone dipole set (loaded via file). */
+    int m_currentTimePoint = 0;                     /**< Current source estimate time sample index. */
+
+    /** Update the scene bounding box based on visible objects. */
     void updateSceneBounds();
-    
-    FIFFLIB::FiffCoordTrans m_headToMriTrans;
-    bool m_applySensorTrans = true;
-    QString m_megHelmetOverridePath;
-    bool m_dipolesVisible = true;
-     
-    QStandardItem* m_hoveredItem = nullptr;
-    int m_hoveredIndex = -1;
-    QString m_hoveredRegion;
-    QString m_hoveredSurfaceKey;
-    QLabel* m_regionLabel = nullptr;
-    QLabel* m_viewportNameLabels[4] = {nullptr, nullptr, nullptr, nullptr};
-    QLabel* m_viewportInfoLabels[4] = {nullptr, nullptr, nullptr, nullptr};
-     
-    // Debug Intersection Pointer
-    std::shared_ptr<BrainSurface> m_debugPointerSurface;
-    QVector3D m_lastIntersectionPoint;
-    bool m_hasIntersection = false;
-     
-    // Async loading
-    QThread* m_loadingThread = nullptr;
-    StcLoadingWorker* m_stcWorker = nullptr;
-    bool m_isLoadingStc = false;
-     
+
+    // ── Coordinate transforms ──────────────────────────────────────────
+    FIFFLIB::FiffCoordTrans m_headToMriTrans;       /**< Head-to-MRI coordinate transform. */
+    bool m_applySensorTrans = true;                 /**< Whether to apply the transform to sensors/digitizers. */
+    QString m_megHelmetOverridePath;                /**< Optional override path for MEG helmet surface. */
+    bool m_dipolesVisible = true;                   /**< Whether dipoles are rendered. */
+
+    // ── Ray-pick hover state ───────────────────────────────────────────
+    QStandardItem* m_hoveredItem = nullptr;         /**< Model item currently under the cursor. */
+    int m_hoveredIndex = -1;                        /**< Vertex index at the hover point. */
+    QString m_hoveredRegion;                        /**< Atlas region name at the hover point. */
+    QString m_hoveredSurfaceKey;                    /**< Surface map key at the hover point. */
+    QLabel* m_regionLabel = nullptr;                /**< Overlay label showing the hovered region name. */
+    QVector<QLabel*> m_viewportNameLabels;          /**< Per-viewport name labels (e.g. "Top", "Front"). */
+    QVector<QLabel*> m_viewportInfoLabels;          /**< Per-viewport info labels (shader, surface info). */
+
+    // ── Debug intersection ─────────────────────────────────────────────
+    std::shared_ptr<BrainSurface> m_debugPointerSurface; /**< Semi-transparent sphere at hit point. */
+    QVector3D m_lastIntersectionPoint;              /**< World-space position of last ray hit. */
+    bool m_hasIntersection = false;                 /**< Whether the last ray cast produced a hit. */
+
+    // ── Async STC loading ──────────────────────────────────────────────
+    QThread* m_loadingThread = nullptr;             /**< Background thread for STC file loading. */
+    StcLoadingWorker* m_stcWorker = nullptr;        /**< Worker object performing the STC load. */
+    bool m_isLoadingStc = false;                    /**< True while an async STC load is in progress. */
+
     // ── Multi-view support ─────────────────────────────────────────────
-    ViewMode m_viewMode = SingleView;
-    int m_viewCount = 1;
-    QQuaternion m_multiViewCameras[4];
-    float m_multiSplitX = 0.5f;
-    float m_multiSplitY = 0.5f;
-    bool m_isDraggingSplitter = false;
-    SplitterHit m_activeSplitter = SplitterHit::None;
-    int m_splitterHitTolerancePx = 6;
-    int m_splitterMinPanePx = 80;
-    int m_separatorLinePx = 2;
-    QFrame* m_verticalSeparator = nullptr;
-    QFrame* m_horizontalSeparator = nullptr;
-    bool m_perspectiveRotatedSincePress = false;
+    ViewMode m_viewMode = SingleView;               /**< Current view mode (single or multi). */
+    int m_viewCount = 1;                            /**< Number of viewports to show (1..kDefaultViewportCount). */
+    float m_multiSplitX = 0.5f;                     /**< Horizontal splitter position (0..1). */
+    float m_multiSplitY = 0.5f;                     /**< Vertical splitter position (0..1). */
+    bool m_isDraggingSplitter = false;              /**< True while the user is dragging a splitter. */
+    SplitterHit m_activeSplitter = SplitterHit::None; /**< Which splitter is being dragged. */
+    int m_splitterHitTolerancePx = 6;               /**< Pixel tolerance for splitter hit testing. */
+    int m_splitterMinPanePx = 80;                   /**< Minimum pane size in pixels. */
+    int m_separatorLinePx = 2;                      /**< Separator line thickness in pixels. */
+    QFrame* m_verticalSeparator = nullptr;          /**< Visual separator between left/right panes. */
+    QFrame* m_horizontalSeparator = nullptr;        /**< Visual separator between top/bottom panes. */
+    bool m_perspectiveRotatedSincePress = false;    /**< True if mouse drag rotated a perspective pane. */
 
     // ── Sensor field mapping state ─────────────────────────────────────
-    FIFFLIB::FiffEvoked m_sensorEvoked;
-    bool m_sensorFieldLoaded = false;
-    int m_sensorFieldTimePoint = 0;
-    bool m_megFieldMapOnHead = false;
-    QString m_sensorFieldColormap = QStringLiteral("MNE");
-    QString m_megFieldSurfaceKey;
-    QString m_eegFieldSurfaceKey;
-    QString m_megFieldContourPrefix = QStringLiteral("sens_contour_meg");
-    QString m_eegFieldContourPrefix = QStringLiteral("sens_contour_eeg");
-    QVector<int> m_megFieldPick;
-    QVector<int> m_eegFieldPick;
-    QVector<Eigen::Vector3f> m_megFieldPositions;
-    QVector<Eigen::Vector3f> m_eegFieldPositions;
-    QSharedPointer<Eigen::MatrixXf> m_megFieldMapping;
-    QSharedPointer<Eigen::MatrixXf> m_eegFieldMapping;
+    FIFFLIB::FiffEvoked m_sensorEvoked;             /**< Loaded evoked data for field mapping. */
+    bool m_sensorFieldLoaded = false;               /**< Whether evoked sensor data has been loaded. */
+    int m_sensorFieldTimePoint = 0;                 /**< Current time sample index for field display. */
+    bool m_megFieldMapOnHead = false;               /**< Whether MEG field map is projected onto head surface. */
+    QString m_sensorFieldColormap = QStringLiteral("MNE"); /**< Colormap name for field visualisation. */
+    QString m_megFieldSurfaceKey;                   /**< Surface key used for MEG field mapping. */
+    QString m_eegFieldSurfaceKey;                   /**< Surface key used for EEG field mapping. */
+    QString m_megFieldContourPrefix = QStringLiteral("sens_contour_meg"); /**< Key prefix for MEG contour surfaces. */
+    QString m_eegFieldContourPrefix = QStringLiteral("sens_contour_eeg"); /**< Key prefix for EEG contour surfaces. */
+    QVector<int> m_megFieldPick;                    /**< Channel indices picked for MEG field mapping. */
+    QVector<int> m_eegFieldPick;                    /**< Channel indices picked for EEG field mapping. */
+    QVector<Eigen::Vector3f> m_megFieldPositions;   /**< 3D positions of MEG sensor coils. */
+    QVector<Eigen::Vector3f> m_eegFieldPositions;   /**< 3D positions of EEG electrode locations. */
+    QSharedPointer<Eigen::MatrixXf> m_megFieldMapping; /**< Interpolation matrix: MEG sensors → surface. */
+    QSharedPointer<Eigen::MatrixXf> m_eegFieldMapping; /**< Interpolation matrix: EEG sensors → surface. */
 };
 
 #endif // BRAINVIEW_H

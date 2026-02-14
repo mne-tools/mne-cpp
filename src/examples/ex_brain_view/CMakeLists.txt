@@ -14,6 +14,7 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 set(SOURCES
     main.cpp
     app/mainwindow.cpp
+    core/dataloader.cpp
     core/viewstate.cpp
     geometry/meshfactory.cpp
     input/cameracontroller.cpp
