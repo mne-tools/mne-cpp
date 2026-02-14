@@ -511,40 +511,20 @@ void MainWindow::setupUI()
     viewLayout->setContentsMargins(10, 15, 10, 10);
     viewLayout->setSpacing(8);
 
-    // Multi-View Toggle
-    m_multiViewCheck = new QCheckBox("Multi-View (4 cameras)");
-    m_multiViewCheck->setChecked(false);
-    m_multiViewCheck->setToolTip("Toggle between single interactive camera and four fixed camera views.");
-    viewLayout->addWidget(m_multiViewCheck);
+    // View Count Selector
+    QHBoxLayout *viewCountRow = new QHBoxLayout();
+    viewCountRow->addWidget(new QLabel("Layout:"));
+    m_viewCountCombo = new QComboBox();
+    m_viewCountCombo->addItem("1 View",  1);
+    m_viewCountCombo->addItem("2 Views (Split)", 2);
+    m_viewCountCombo->addItem("3 Views", 3);
+    m_viewCountCombo->addItem("4 Views (Grid)", 4);
+    m_viewCountCombo->setCurrentIndex(0);
+    m_viewCountCombo->setToolTip("Number of viewport panes: 1 = single, 2 = split, 3 = two + one, 4 = 2×2 grid.");
+    viewCountRow->addWidget(m_viewCountCombo);
+    viewLayout->addLayout(viewCountRow);
 
-    // Viewport Toggles
-    QHBoxLayout *vpRow1 = new QHBoxLayout();
-    QHBoxLayout *vpRow2 = new QHBoxLayout();
-
-    m_vpTopCheck = new QCheckBox("Top");
-    m_vpBottomCheck = new QCheckBox("Perspective");
-    m_vpFrontCheck = new QCheckBox("Front");
-    m_vpLeftCheck = new QCheckBox("Left");
-
-    m_vpTopCheck->setChecked(true);
-    m_vpBottomCheck->setChecked(true);
-    m_vpFrontCheck->setChecked(true);
-    m_vpLeftCheck->setChecked(true);
-
-    m_vpTopCheck->setEnabled(false);
-    m_vpBottomCheck->setEnabled(false);
-    m_vpFrontCheck->setEnabled(false);
-    m_vpLeftCheck->setEnabled(false);
-
-    vpRow1->addWidget(m_vpTopCheck);
-    vpRow1->addWidget(m_vpBottomCheck);
-    vpRow2->addWidget(m_vpFrontCheck);
-    vpRow2->addWidget(m_vpLeftCheck);
-
-    viewLayout->addLayout(vpRow1);
-    viewLayout->addLayout(vpRow2);
-
-    m_resetMultiViewLayoutBtn = new QPushButton("Reset Multi-View Layout");
+    m_resetMultiViewLayoutBtn = new QPushButton("Reset Layout");
     m_resetMultiViewLayoutBtn->setEnabled(false);
     viewLayout->addWidget(m_resetMultiViewLayoutBtn);
 
@@ -764,29 +744,14 @@ void MainWindow::setupConnections()
     connect(m_innerCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setBemVisible("inner_skull", checked); });
     connect(m_bemColorCheck, &QCheckBox::toggled, m_brainView, &BrainView::setBemHighContrast);
 
-    // Multi-view
-    connect(m_multiViewCheck, &QCheckBox::toggled, [this, refreshVisualizationControls](bool checked) {
-        m_vpTopCheck->setEnabled(checked);
-        m_vpBottomCheck->setEnabled(checked);
-        m_vpFrontCheck->setEnabled(checked);
-        m_vpLeftCheck->setEnabled(checked);
-        m_resetMultiViewLayoutBtn->setEnabled(checked);
-
-        if (checked) {
-            // Default to Perspective (1) when switching to multi-view
-            m_brainView->setVisualizationEditTarget(1);
-            m_brainView->showMultiView();
-        } else {
-            m_brainView->setVisualizationEditTarget(-1);
-            m_brainView->showSingleView();
-        }
-
+    // View count dropdown
+    connect(m_viewCountCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            [this, refreshVisualizationControls](int index) {
+        const int count = m_viewCountCombo->itemData(index).toInt();
+        m_brainView->setViewCount(count);
+        m_resetMultiViewLayoutBtn->setEnabled(count > 1);
         refreshVisualizationControls();
     });
-    connect(m_vpTopCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(0, checked); });
-    connect(m_vpBottomCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(1, checked); });
-    connect(m_vpFrontCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(2, checked); });
-    connect(m_vpLeftCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(3, checked); });
     connect(m_resetMultiViewLayoutBtn, &QPushButton::clicked, m_brainView, &BrainView::resetMultiViewLayout);
     connect(m_showInfoCheck, &QCheckBox::toggled, m_brainView, &BrainView::setInfoPanelVisible);
 
@@ -807,6 +772,10 @@ void MainWindow::setupConnections()
         Surface surf(path);
         if (!surf.isEmpty()) {
             m_model->addSurface("User", hemi, type, surf);
+            // Set the combo to the loaded surface type so the active pane
+            // renders this surface.  Without this, the pane keeps its old
+            // surfaceType and may not match the newly loaded surface.
+            m_surfCombo->setCurrentText(type);
         }
     });
 
@@ -1151,26 +1120,10 @@ void MainWindow::setupConnections()
 
     const bool isMultiView = (m_brainView->viewMode() == BrainView::MultiView);
     {
-        const QSignalBlocker blockMulti(m_multiViewCheck);
-        m_multiViewCheck->setChecked(isMultiView);
+        const QSignalBlocker blockCombo(m_viewCountCombo);
+        m_viewCountCombo->setCurrentIndex(m_brainView->viewCount() - 1);
     }
-
-    m_vpTopCheck->setEnabled(isMultiView);
-    m_vpBottomCheck->setEnabled(isMultiView);
-    m_vpFrontCheck->setEnabled(isMultiView);
-    m_vpLeftCheck->setEnabled(isMultiView);
     m_resetMultiViewLayoutBtn->setEnabled(isMultiView);
-
-    {
-        const QSignalBlocker blockTop(m_vpTopCheck);
-        const QSignalBlocker blockPerspective(m_vpBottomCheck);
-        const QSignalBlocker blockFront(m_vpFrontCheck);
-        const QSignalBlocker blockLeft(m_vpLeftCheck);
-        m_vpTopCheck->setChecked(m_brainView->isViewportEnabled(0));
-        m_vpBottomCheck->setChecked(m_brainView->isViewportEnabled(1));
-        m_vpFrontCheck->setChecked(m_brainView->isViewportEnabled(2));
-        m_vpLeftCheck->setChecked(m_brainView->isViewportEnabled(3));
-    }
 
     // The BrainView already restored m_visualizationEditTarget from QSettings.
     // If multi-view, ensure it's a valid pane (default to Perspective).
@@ -1209,6 +1162,10 @@ void MainWindow::loadInitialData(const QString &subjectPath,
         loadHemisphere(subjectPath, subjectName, "lh");
         loadHemisphere(subjectPath, subjectName, "rh");
         qDebug() << "Surfaces loaded.";
+
+        // After bulk-loading surfaces, sync the combo & active pane so the
+        // selected pane renders the first loaded surface type ("pial").
+        m_surfCombo->setCurrentText("pial");
     }
 
     // Auto-load atlas annotation (explicit path overrides auto-discovery in loadHemisphere)

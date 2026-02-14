@@ -136,11 +136,7 @@ private:
     QCheckBox *m_innerCheck = nullptr;
 
     // Control widgets - View
-    QCheckBox *m_multiViewCheck = nullptr;
-    QCheckBox *m_vpTopCheck = nullptr;
-    QCheckBox *m_vpBottomCheck = nullptr;
-    QCheckBox *m_vpFrontCheck = nullptr;
-    QCheckBox *m_vpLeftCheck = nullptr;
+    QComboBox *m_viewCountCombo = nullptr;
     QPushButton *m_resetMultiViewLayoutBtn = nullptr;
     QCheckBox *m_showInfoCheck = nullptr;
 

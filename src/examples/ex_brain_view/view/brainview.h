@@ -42,6 +42,12 @@
 //=============================================================================================================
 
 #include "brainrenderer.h"
+#include "multiviewlayout.h"
+#include "../core/viewstate.h"
+#include "../input/cameracontroller.h"
+#include "../input/raypicker.h"
+#include "../scene/sensorfieldmapper.h"
+#include "../geometry/meshfactory.h"
 #include "../renderable/brainsurface.h"
 #include "../renderable/dipoleobject.h"
 #include "../renderable/sourceestimateoverlay.h"
@@ -245,6 +251,20 @@ public slots:
         * Switch to multi-view mode (four viewports: top, perspective, front, left).
      */
     void showMultiView();
+
+    //=========================================================================================================
+    /**
+     * Set the number of visible viewport panes (1–4).
+     *
+     * @param[in] count  Number of panes: 1 = single, 2 = side-by-side,
+     *                   3 = two + one, 4 = 2×2 grid.
+     */
+    void setViewCount(int count);
+
+    /**
+     * @return Current number of visible viewport panes (1–4).
+     */
+    int  viewCount() const { return m_viewCount; }
 
     //=========================================================================================================
     /**
@@ -603,73 +623,31 @@ private slots:
     void onStcLoadingFinished(bool success);
 
 private:
-    /**
-     * Per-object visibility flags for a single view.
-     */
-    struct ViewVisibilityProfile {
-        bool lh = true;
-        bool rh = true;
-        bool bemHead = true;
-        bool bemOuterSkull = true;
-        bool bemInnerSkull = true;
-        bool sensMeg = false;
-        bool sensMegGrad = false;
-        bool sensMegMag = false;
-        bool sensMegHelmet = false;
-        bool sensEeg = false;
-        bool dig = false;
-        bool digCardinal = false;
-        bool digHpi = false;
-        bool digEeg = false;
-        bool digExtra = false;
-        bool megFieldMap = false;
-        bool eegFieldMap = false;
-        bool megFieldContours = false;
-        bool eegFieldContours = false;
-        bool dipoles = true;
-        bool sourceSpace = false;
-        bool megFieldMapOnHead = false;
-    };
-
-    /**
-     * Encapsulates all per-view state for a single viewport (single view or
-     * one pane in multi-view).  The class stores five instances: one for the
-     * single-view and four for the multi-view panes.
-     */
-    struct SubView {
-        QString                         surfaceType      = "pial";
-        BrainRenderer::ShaderMode       brainShader      = BrainRenderer::Standard;
-        BrainRenderer::ShaderMode       bemShader        = BrainRenderer::Standard;
-        BrainSurface::VisualizationMode overlayMode      = BrainSurface::ModeSurface;
-        ViewVisibilityProfile           visibility;
-        float                           zoom             = 0.0f;
-        QVector2D                       pan;
-        QQuaternion                     perspectiveRotation;
-        int                             preset           = 1;   // 0=Top,1=Perspective,2=Front,3=Left,4=Bottom,5=Back,6=Right
-        bool                            enabled          = true;
-    };
+    // Note: ViewVisibilityProfile and SubView are defined in core/viewstate.h.
+    // SplitterHit is defined in view/multiviewlayout.h.
 
     /** Return the SubView for a given target (-1 = single, 0..3 = multi). */
     SubView&       subViewForTarget(int target);
     const SubView& subViewForTarget(int target) const;
 
-    static bool objectVisibleFromProfile(const ViewVisibilityProfile &profile, const QString &object);
-    static void setObjectVisibleInProfile(ViewVisibilityProfile &profile, const QString &object, bool visible);
     ViewVisibilityProfile& visibilityProfileForTarget(int target);
     const ViewVisibilityProfile& visibilityProfileForTarget(int target) const;
-    bool shouldRenderSurfaceForView(const QString &key, const ViewVisibilityProfile &profile) const;
 
     void refreshSensorTransforms();
+
+    // ── Sensor field mapping (delegated to SensorFieldMapper) ──────────
     bool buildSensorFieldMapping();
     void applySensorFieldMap();
+    QString findHeadSurfaceKey() const;
+    QString findHelmetSurfaceKey() const;
+
+    // ── Contour helpers (TODO: migrate to SensorFieldMapper) ──────────
+    float contourStep(float minVal, float maxVal, int targetTicks) const;
     void updateContourSurfaces(const QString &prefix,
                                const BrainSurface &surface,
                                const QVector<float> &values,
                                float step,
                                bool visible);
-    float contourStep(float minVal, float maxVal, int targetTicks) const;
-    QString findHeadSurfaceKey() const;
-    QString findHelmetSurfaceKey() const;
 
 protected:
     void initialize(QRhiCommandBuffer *cb) override;
@@ -687,17 +665,13 @@ signals:
     void visualizationEditTargetChanged(int target);
 
 private:
-    enum class SplitterHit {
-        None,
-        Vertical,
-        Horizontal,
-        Both
-    };
-
+    // ── Layout helpers (delegate to MultiViewLayout) ───────────────────
     int enabledViewportCount() const;
     int viewportIndexAt(const QPoint& pos) const;
     QRect multiViewSlotRect(int slot, int numEnabled, const QSize& outputSize) const;
     SplitterHit hitTestSplitter(const QPoint& pos, int numEnabled, const QSize& outputSize) const;
+
+    // ── Helpers ────────────────────────────────────────────────────────
     void updateSplitterCursor(const QPoint& pos);
     void updateViewportSeparators();
     void updateOverlayLayout();
@@ -708,6 +682,7 @@ private:
     void saveMultiViewSettings() const;
     void updateInflatedSurfaceTransforms();
 
+// ── Rendering ───────────────────────────────────────────────────────
     std::unique_ptr<BrainRenderer> m_renderer;
     BrainTreeModel* m_model = nullptr;
     
@@ -736,15 +711,22 @@ private:
     BrainSurface::VisualizationMode m_currentVisMode = BrainSurface::ModeSurface;
     bool m_lightingEnabled = true;
     
+    // ── Extracted components ───────────────────────────────────────────
+    CameraController   m_camera;
+    MultiViewLayout    m_layout;
+    SensorFieldMapper  m_fieldMapper;
+
     QQuaternion m_cameraRotation;
     QVector3D m_sceneCenter = QVector3D(0,0,0);
-    float m_sceneSize = 0.3f; // Default ~30cm
-    float m_zoom = 0.0f;      // single-view zoom (kept separate from SubView for now)
+    float m_sceneSize = 0.3f;
+    float m_zoom = 0.0f;
     QPoint m_lastMousePos;
     
+    // ── UI overlays ────────────────────────────────────────────────────
     int m_frameCount = 0;
     QElapsedTimer m_fpsTimer;
     QLabel *m_fpsLabel = nullptr;
+    QLabel *m_singleViewInfoLabel = nullptr;
     QTimer *m_updateTimer = nullptr;
     int m_snapshotCounter = 0;
     bool m_infoPanelVisible = true;
@@ -753,7 +735,6 @@ private:
     std::unique_ptr<DipoleObject> m_dipoles;
     int m_currentTimePoint = 0;
     
-    //=========================================================================================================
     /**
      * Update the scene bounding box based on visible objects.
      */
@@ -782,9 +763,10 @@ private:
     StcLoadingWorker* m_stcWorker = nullptr;
     bool m_isLoadingStc = false;
      
-    // Multi-view support
+    // ── Multi-view support ─────────────────────────────────────────────
     ViewMode m_viewMode = SingleView;
-    QQuaternion m_multiViewCameras[4]; // Top, Perspective, Front, Left views
+    int m_viewCount = 1;
+    QQuaternion m_multiViewCameras[4];
     float m_multiSplitX = 0.5f;
     float m_multiSplitY = 0.5f;
     bool m_isDraggingSplitter = false;
@@ -796,16 +778,16 @@ private:
     QFrame* m_horizontalSeparator = nullptr;
     bool m_perspectiveRotatedSincePress = false;
 
-    // Sensor field mapping
+    // ── Sensor field mapping state ─────────────────────────────────────
     FIFFLIB::FiffEvoked m_sensorEvoked;
     bool m_sensorFieldLoaded = false;
     int m_sensorFieldTimePoint = 0;
     bool m_megFieldMapOnHead = false;
-    QString m_sensorFieldColormap = "MNE";
+    QString m_sensorFieldColormap = QStringLiteral("MNE");
     QString m_megFieldSurfaceKey;
     QString m_eegFieldSurfaceKey;
-    QString m_megFieldContourPrefix = "sens_contour_meg";
-    QString m_eegFieldContourPrefix = "sens_contour_eeg";
+    QString m_megFieldContourPrefix = QStringLiteral("sens_contour_meg");
+    QString m_eegFieldContourPrefix = QStringLiteral("sens_contour_eeg");
     QVector<int> m_megFieldPick;
     QVector<int> m_eegFieldPick;
     QVector<Eigen::Vector3f> m_megFieldPositions;

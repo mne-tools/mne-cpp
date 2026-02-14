@@ -166,10 +166,11 @@ void BrainRenderer::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int
                     { 1, 7, QRhiVertexInputAttribute::Float, 20 * sizeof(float) }
                 });
             } else {
-                il.setBindings({{ 28 }});
+                il.setBindings({{ 32 }});
                 il.setAttributes({{ 0, 0, QRhiVertexInputAttribute::Float3, 0 }, 
                                   { 0, 1, QRhiVertexInputAttribute::Float3, 12 }, 
-                                  { 0, 2, QRhiVertexInputAttribute::UNormByte4, 24 }});
+                                  { 0, 2, QRhiVertexInputAttribute::UNormByte4, 24 },
+                                  { 0, 3, QRhiVertexInputAttribute::UNormByte4, 28 }});
             }
             
             p->setVertexInputLayout(il);
@@ -194,6 +195,7 @@ void BrainRenderer::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int
                 p->setDepthTest(true);
                 p->setDepthWrite(true);
             }
+            p->setFlags(QRhiGraphicsPipeline::UsesScissor);
             p->create();
         };
 
@@ -218,7 +220,10 @@ void BrainRenderer::beginFrame(QRhiCommandBuffer *cb, QRhiRenderTarget *rt)
 {
     m_currentUniformOffset = 0;
     cb->beginPass(rt, QColor(0, 0, 0), { 1.0f, 0 });
-    cb->setViewport(QRhiViewport(0, 0, rt->pixelSize().width(), rt->pixelSize().height()));
+    const int w = rt->pixelSize().width();
+    const int h = rt->pixelSize().height();
+    cb->setViewport(QRhiViewport(0, 0, w, h));
+    cb->setScissor(QRhiScissor(0, 0, w, h));
 }
 
 //=============================================================================================================
@@ -274,7 +279,16 @@ void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
     float lighting = data.lightingEnabled ? 1.0f : 0.0f;
     u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 96, 4, &lighting);
 
-    cb->resourceUpdate(u); 
+    float overlayMode = data.overlayMode;
+    u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 100, 4, &overlayMode);
+
+    cb->resourceUpdate(u);
+
+    // Re-assert the per-pane viewport and scissor after resourceUpdate.
+    // The scissor provides a hard pixel clip that guarantees no cross-pane
+    // bleeding, regardless of Metal render-encoder restarts.
+    cb->setViewport(data.viewport);
+    cb->setScissor(data.scissor);
 
     auto draw = [&](QRhiGraphicsPipeline *p) {
         cb->setGraphicsPipeline(p);
@@ -319,6 +333,10 @@ void BrainRenderer::renderDipoles(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
     u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 92, 4, &lighting);
 
     cb->resourceUpdate(u);
+
+    // Re-assert the per-pane viewport and scissor.
+    cb->setViewport(data.viewport);
+    cb->setScissor(data.scissor);
 
     cb->setGraphicsPipeline(pipeline);
     

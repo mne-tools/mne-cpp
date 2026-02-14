@@ -58,7 +58,8 @@
 struct VertexData {
     QVector3D pos;
     QVector3D norm;
-    uint32_t color; // ABGR or RGBA depending on RHI
+    uint32_t color;           // curvature / base / STC color  (ABGR packed)
+    uint32_t colorAnnotation; // annotation region color       (ABGR packed)
 };
 
 //=============================================================================================================

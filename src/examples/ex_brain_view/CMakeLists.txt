@@ -14,8 +14,14 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 set(SOURCES
     main.cpp
     app/mainwindow.cpp
+    core/viewstate.cpp
+    geometry/meshfactory.cpp
+    input/cameracontroller.cpp
+    input/raypicker.cpp
     view/brainview.cpp
     view/brainrenderer.cpp
+    view/multiviewlayout.cpp
+    scene/sensorfieldmapper.cpp
     renderable/brainsurface.cpp
     renderable/sourceestimateoverlay.cpp
     renderable/dipoleobject.cpp
@@ -43,7 +49,11 @@ endif()
 target_include_directories(${PROJECT_NAME} PRIVATE
     .
     app
+    core
+    geometry
+    input
     view
+    scene
     renderable
     workers
     model

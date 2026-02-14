@@ -5,6 +5,7 @@ layout(location = 1) in vec3 v_normal;
 layout(location = 2) in vec3 v_color;
 layout(location = 3) in vec3 v_viewDir;
 layout(location = 4) in float v_curvature;
+layout(location = 5) in vec3 v_annotColor;
 
 layout(location = 0) out vec4 fragColor;
 
@@ -15,23 +16,34 @@ layout(std140, binding = 0) uniform UniformBlock {
     vec3 lightDir;
     float tissueType;  // 0=Unknown, 1=Brain, 2=Skin, 3=OuterSkull, 4=InnerSkull
     float lightingEnabled;
-    vec3 _pad3;
+    float overlayMode; // 0=Surface, 1=Annotation, 2=Scientific, 3=SourceEstimate
+    float _pad1;
+    float _pad2;
 };
 
 void main() {
-    // Normalize interpolated vectors
     vec3 N = normalize(v_normal);
     vec3 V = normalize(v_viewDir);
     vec3 L = normalize(lightDir);
     
+    // Select effective vertex colour from overlayMode
+    vec3 effectiveColor;
+    if (overlayMode < 0.5) {
+        effectiveColor = vec3(1.0); // Surface: white
+    } else if (overlayMode < 1.5) {
+        effectiveColor = v_annotColor; // Annotation
+    } else {
+        effectiveColor = v_color; // Scientific / STC
+    }
+
     // === DATA DETECTION (Saturation) ===
-    float gray_val = dot(v_color, vec3(0.299, 0.587, 0.114));
-    float saturation = length(v_color - vec3(gray_val));
+    float gray_val = dot(effectiveColor, vec3(0.299, 0.587, 0.114));
+    float saturation = length(effectiveColor - vec3(gray_val));
     float is_data = smoothstep(0.05, 0.2, saturation);
     
     // === COLOR PALETTE ===
     vec3 shell_blue = vec3(0.0, 0.4, 0.8);
-    vec3 data_color = v_color;
+    vec3 data_color = effectiveColor;
     
     // === FRESNEL EFFECT ===
     float N_dot_V = abs(dot(N, V)); // Use abs for double-sided visibility

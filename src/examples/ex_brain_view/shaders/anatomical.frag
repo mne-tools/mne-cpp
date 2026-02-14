@@ -5,6 +5,7 @@ layout(location = 1) in vec3 v_normal;
 layout(location = 2) in vec3 v_color;
 layout(location = 3) in vec3 v_viewDir;
 layout(location = 4) in float v_curvature;
+layout(location = 5) in vec3 v_annotColor;
 
 layout(location = 0) out vec4 fragColor;
 
@@ -15,7 +16,9 @@ layout(std140, binding = 0) uniform UniformBlock {
     vec3 lightDir;
     float tissueType;  // 0=Unknown, 1=Brain, 2=Skin, 3=OuterSkull, 4=InnerSkull
     float lightingEnabled;
-    vec3 _pad3;
+    float overlayMode; // 0=Surface, 1=Annotation, 2=Scientific, 3=SourceEstimate
+    float _pad1;
+    float _pad2;
 };
 
 // Anatomically realistic tissue colors
@@ -118,6 +121,13 @@ void main() {
         specIntensity = 0.3;
     }
     
+    // ── Override with overlay colour when applicable ──
+    if (overlayMode > 0.5 && overlayMode < 1.5) {
+        baseColor = v_annotColor;   // Annotation
+    } else if (overlayMode > 2.5) {
+        baseColor = v_color;        // Source Estimate
+    }
+
     // === LIGHTING ===
     // Ambient occlusion based on curvature
     float ao = mix(0.7, 1.0, clamp(1.0 - v_curvature * 0.5, 0.0, 1.0));

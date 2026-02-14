@@ -77,12 +77,10 @@ void BrainSurface::fromSurface(const FSLIB::Surface &surf)
         VertexData v;
         v.pos = QVector3D(rr(i, 0), rr(i, 1), rr(i, 2));
         v.norm = QVector3D(nn(i, 0), nn(i, 1), nn(i, 2));
-        v.color = 0xFFFFFFFF; // Default white
+        v.color = 0xFFFFFFFF; // Default white (overwritten by updateVertexColors)
+        v.colorAnnotation = 0x00000000; // No annotation yet
         m_vertexData.append(v);
     }
-    
-    // Default to white (Surface mode)
-    // If we have curvature, we could use it, but start with standard.
 
     m_indexData.reserve(tris.rows() * 3);
     for (int i = 0; i < tris.rows(); ++i) {
@@ -129,6 +127,7 @@ void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface &surf, const QColo
         v.pos = QVector3D(surf.rr(i, 0), surf.rr(i, 1), surf.rr(i, 2));
         v.norm = QVector3D(nn(i, 0), nn(i, 1), nn(i, 2));
         v.color = colorVal;
+        v.colorAnnotation = 0x00000000;
         m_vertexData.append(v);
     }
 
@@ -178,6 +177,7 @@ void BrainSurface::createFromData(const Eigen::MatrixX3f &vertices, const Eigen:
         v.pos = QVector3D(vertices(i, 0), vertices(i, 1), vertices(i, 2));
         v.norm = QVector3D(normals(i, 0), normals(i, 1), normals(i, 2));
         v.color = colorVal;
+        v.colorAnnotation = 0x00000000;
         m_vertexData.append(v);
     }
 
@@ -254,22 +254,20 @@ void BrainSurface::setVisible(bool visible)
 
 void BrainSurface::setVisualizationMode(VisualizationMode mode)
 {
-    if (m_visMode != mode) {
-        m_visMode = mode;
-        updateVertexColors();
-        m_bBuffersDirty = true;
-    }
+    // Store the mode but do NOT re-write vertex data.
+    // The shader selects between color (curvature/STC) and
+    // colorAnnotation via the per-draw overlayMode uniform.
+    m_visMode = mode;
 }
 
 //=============================================================================================================
 
 void BrainSurface::applySourceEstimateColors(const QVector<uint32_t> &colors)
 {
-    // Set mode to source estimate
     m_visMode = ModeSourceEstimate;
     m_stcColors = colors;
     
-    // Apply colors to vertices
+    // Write STC colours into the primary color channel
     for (int i = 0; i < qMin(colors.size(), m_vertexData.size()); ++i) {
         m_vertexData[i].color = colors[i];
     }
@@ -283,149 +281,116 @@ void BrainSurface::setUseDefaultColor(bool useDefault)
 {
     m_baseColor = useDefault ? m_defaultColor : Qt::white;
     updateVertexColors();
-    m_bBuffersDirty = true;
 }
 
 void BrainSurface::updateVertexColors()
 {
-    uint32_t baseVal = (m_baseColor.alpha() << 24) | (m_baseColor.blue() << 16) | (m_baseColor.green() << 8) | m_baseColor.red();
-
-
-    // Reset to base color first, but apply curvature shading if available
-    // This provides sulci/gyri visibility even in Surface mode
+    // ── 1. Populate the primary "color" channel: curvature-based gray.
+    //       The shader uses this for Scientific mode and as a lighting base.
+    //       In Surface mode the shader overrides with white;
+    //       in STC mode applySourceEstimateColors() overwrites this later.
     if (!m_curvature.isEmpty() && m_curvature.size() == m_vertexData.size()) {
-        // Use curvature-based grayscale for depth perception
         for (int i = 0; i < m_vertexData.size(); ++i) {
-            uint32_t val;
-            if (m_curvature[i] > 0) {
-                // Sulcus (Concave) -> Medium-Dark gray
-                val = 0x90; // Medium gray (was 0x40 in Scientific mode)
-            } else {
-                // Gyrus (Convex) -> Light gray/white
-                val = 0xE8; // Light gray (was 0xAA in Scientific mode)
-            }
-            m_vertexData[i].color = (255 << 24) | (val << 16) | (val << 8) | val;
+            const uint32_t val = (m_curvature[i] > 0.0f) ? 0x40u : 0xAAu;
+            m_vertexData[i].color = (255u << 24) | (val << 16) | (val << 8) | val;
         }
     } else {
-        // Fallback: no curvature data, use base color
-        for (auto &v : m_vertexData) {
-            v.color = baseVal; 
+        // Fallback: normal-derived grayscale when curvature is unavailable
+        for (int i = 0; i < m_vertexData.size(); ++i) {
+            const float nz = m_vertexData[i].norm.normalized().z();
+            const float t  = std::clamp((nz + 1.0f) * 0.5f, 0.0f, 1.0f);
+            const uint32_t val = static_cast<uint32_t>(64.0f + t * (170.0f - 64.0f));
+            m_vertexData[i].color = (255u << 24) | (val << 16) | (val << 8) | val;
         }
     }
 
+    // ── 2. Populate colorAnnotation from loaded annotation data.
+    for (auto &v : m_vertexData) {
+        v.colorAnnotation = 0x00000000;
+    }
 
-    if (m_visMode == ModeAnnotation) {
-        if (!m_hasAnnotation || m_vertexData.isEmpty()) return;
-
+    if (m_hasAnnotation && !m_vertexData.isEmpty()) {
         const Eigen::VectorXi &vertices = m_annotation.getVertices();
         const Eigen::VectorXi &labelIds = m_annotation.getLabelIds();
         const FSLIB::Colortable &ct = m_annotation.getColortable();
 
         for (int i = 0; i < labelIds.rows(); ++i) {
             int vertexIdx = vertices(i);
-            
             if (vertexIdx >= 0 && vertexIdx < m_vertexData.size()) {
                 int colorIdx = -1;
-                // The labelId in .annot is often (R + G*2^8 + B*2^16)
-                for(int c=0; c < ct.numEntries; ++c) {
+                for (int c = 0; c < ct.numEntries; ++c) {
                     if (ct.table(c, 4) == labelIds(i)) {
                         colorIdx = c;
                         break;
                     }
                 }
-                
                 if (colorIdx >= 0) {
-                    QColor c(ct.table(colorIdx, 0), ct.table(colorIdx, 1), ct.table(colorIdx, 2), 255);
-                    uint32_t r = c.red();
-                    uint32_t g = c.green();
-                    uint32_t b = c.blue();
-                    // Let's pack as AABBGGRR (0xFF, B, G, R)
-                    m_vertexData[vertexIdx].color = (255 << 24) | (b << 16) | (g << 8) | r;
+                    uint32_t r = ct.table(colorIdx, 0);
+                    uint32_t g = ct.table(colorIdx, 1);
+                    uint32_t b = ct.table(colorIdx, 2);
+                    m_vertexData[vertexIdx].colorAnnotation =
+                        (255u << 24) | (b << 16) | (g << 8) | r;
                 }
             }
         }
     }
-    else if (m_visMode == ModeScientific) {
-        // Curvature > 0: Light Gray (Gyri)
-        // Curvature <= 0: Dark Gray (Sulci)
-        for (int i = 0; i < m_vertexData.size() && i < m_curvature.size(); ++i) {
-             uint32_t val;
-             if (m_curvature[i] > 0) {
-                 // Sulcus (Concave) -> Dark
-                 val = 0x40; // Dark Gray
-             } else {
-                 // Gyrus (Convex) -> Light
-                 val = 0xAA; // Light Gray
-             }
-             // Store as grayscale
-             m_vertexData[i].color = (255 << 24) | (val << 16) | (val << 8) | val;
-        }
-    }
-    else if (m_visMode == ModeSourceEstimate) {
-        for (int i = 0; i < m_vertexData.size() && i < m_stcColors.size(); ++i) {
-            m_vertexData[i].color = m_stcColors[i];
-        }
-    }
 
-    // Apply selection highlight (golden tint blend for visibility)
+    // ── 3. Selection highlight (gold tint) — applied to BOTH channels
     if (m_selected || m_selectedRegionId != -1) {
-        // Gold highlight color for visibility on any base
         const uint32_t goldR = 255, goldG = 200, goldB = 80;
-        const float blendFactor = 0.4f; // 40% gold blend
+        const float blendFactor = 0.4f;
         
         auto blendToGold = [&](uint32_t &c) {
             uint32_t a = (c >> 24) & 0xFF;
-            uint32_t b = (c >> 16) & 0xFF;
-            uint32_t g = (c >> 8) & 0xFF;
-            uint32_t r = c & 0xFF;
-            
-            // Blend towards gold
-            r = static_cast<uint32_t>(r * (1.0f - blendFactor) + goldR * blendFactor);
-            g = static_cast<uint32_t>(g * (1.0f - blendFactor) + goldG * blendFactor);
-            b = static_cast<uint32_t>(b * (1.0f - blendFactor) + goldB * blendFactor);
-            
-            c = (a << 24) | (b << 16) | (g << 8) | r;
+            uint32_t bv = (c >> 16) & 0xFF;
+            uint32_t gv = (c >> 8) & 0xFF;
+            uint32_t rv = c & 0xFF;
+            rv = static_cast<uint32_t>(rv * (1.0f - blendFactor) + goldR * blendFactor);
+            gv = static_cast<uint32_t>(gv * (1.0f - blendFactor) + goldG * blendFactor);
+            bv = static_cast<uint32_t>(bv * (1.0f - blendFactor) + goldB * blendFactor);
+            c = (a << 24) | (bv << 16) | (gv << 8) | rv;
         };
         
         if (m_hasAnnotation && m_selectedRegionId != -1) {
-            // Highlight only the selected region
             const Eigen::VectorXi &vertices = m_annotation.getVertices();
             const Eigen::VectorXi &labelIds = m_annotation.getLabelIds();
-            
             for (int i = 0; i < labelIds.rows(); ++i) {
                 if (labelIds(i) == m_selectedRegionId) {
                     int vertexIdx = vertices(i);
                     if (vertexIdx >= 0 && vertexIdx < m_vertexData.size()) {
                         blendToGold(m_vertexData[vertexIdx].color);
+                        blendToGold(m_vertexData[vertexIdx].colorAnnotation);
                     }
                 }
             }
         } else if (m_selected) {
-            // Highlight whole surface if no specific region or vertex range selected
             for (auto &v : m_vertexData) {
                 blendToGold(v.color);
+                blendToGold(v.colorAnnotation);
             }
         }
     }
 
-    // Apply vertex-range highlight (for individual points in batched meshes)
-    // Use bright white-yellow with high blend factor for strong visibility on small spheres
+    // ── 4. Vertex-range highlight (for batched sphere meshes)
     if (m_selectedVertexStart >= 0 && m_selectedVertexCount > 0) {
         const uint32_t hlR = 255, hlG = 255, hlB = 180;
         const float blendFactor = 0.85f;
         int end = qMin(m_selectedVertexStart + m_selectedVertexCount, (int)m_vertexData.size());
         for (int i = m_selectedVertexStart; i < end; ++i) {
-            uint32_t &c = m_vertexData[i].color;
-            uint32_t a = (c >> 24) & 0xFF;
-            uint32_t b = (c >> 16) & 0xFF;
-            uint32_t g = (c >> 8) & 0xFF;
-            uint32_t r = c & 0xFF;
-            r = static_cast<uint32_t>(r * (1.0f - blendFactor) + hlR * blendFactor);
-            g = static_cast<uint32_t>(g * (1.0f - blendFactor) + hlG * blendFactor);
-            b = static_cast<uint32_t>(b * (1.0f - blendFactor) + hlB * blendFactor);
-            c = (a << 24) | (b << 16) | (g << 8) | r;
+            for (uint32_t *c : { &m_vertexData[i].color, &m_vertexData[i].colorAnnotation }) {
+                uint32_t a = (*c >> 24) & 0xFF;
+                uint32_t bv = (*c >> 16) & 0xFF;
+                uint32_t gv = (*c >> 8) & 0xFF;
+                uint32_t rv = *c & 0xFF;
+                rv = static_cast<uint32_t>(rv * (1.0f - blendFactor) + hlR * blendFactor);
+                gv = static_cast<uint32_t>(gv * (1.0f - blendFactor) + hlG * blendFactor);
+                bv = static_cast<uint32_t>(bv * (1.0f - blendFactor) + hlB * blendFactor);
+                *c = (a << 24) | (bv << 16) | (gv << 8) | rv;
+            }
         }
     }
+
+    m_bBuffersDirty = true;
 }
 
 float BrainSurface::minX() const

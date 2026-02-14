@@ -83,6 +83,9 @@ public:
         QVector3D cameraPos;
         QVector3D lightDir;
         bool lightingEnabled;
+        float overlayMode = 0.0f;       // 0=Surface, 1=Annotation, 2=Scientific, 3=STC
+        QRhiViewport viewport;          // per-pane viewport – re-asserted before every draw
+        QRhiScissor scissor;            // per-pane scissor – hard pixel clip
     };
     
     //=========================================================================================================
