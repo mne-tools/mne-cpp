@@ -52,6 +52,7 @@ set(HEADERS
     core/surfacekeys.h
     core/dataloader.h
     core/viewstate.h
+    core/rendertypes.h
     geometry/meshfactory.h
     helpers/geometryinfo.h
     helpers/interpolation.h
@@ -152,6 +153,11 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${MNE_LIBS_REQUIRED}
     eigen
     ${FFTW_LIBS})
+
+# Qt6::GuiPrivate is PRIVATE — QRhi details are fully encapsulated in .cpp files.
+# Public headers use only forward declarations and lightweight rendertypes.h enums.
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    Qt${QT_VERSION_MAJOR}::GuiPrivate)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     MNE_DISP3D_RHI_LIBRARY

@@ -47,10 +47,7 @@
 #include <disp/viewers/control3dview.h>
 #include <disp/viewers/fiffrawviewsettings.h>
 
-#ifdef MNE_USE_DISP3D_LEGACY  // Disabled: old disp3D removed, pending migration to disp3D_rhi
-#include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/delegate/data3Dtreedelegate.h>
-#endif
+#include <disp3D_rhi/model/braintreemodel.h>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -164,14 +161,11 @@ QDockWidget *ControlManager::getControl()
     m_ViewParameters.m_iTimeSpacers = pFiffViewSettings->getDistanceTimeSpacer();
     m_ViewParameters.m_sImageType = "";
 
-    #ifdef MNE_USE_DISP3D_LEGACY  // Disabled: old disp3D removed
+    #ifndef WASMBUILD
     //View3D Settings
     m_pControl3DView = new DISPLIB::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), Q_NULLPTR, slControlFlags);
-    DISP3DLIB::Data3DTreeDelegate* pData3DTreeDelegate = new DISP3DLIB::Data3DTreeDelegate(this);
 
     pTabWidget->addTab(m_pControl3DView, "3D");
-
-    m_pControl3DView->setDelegate(pData3DTreeDelegate);
 
     connect(m_pControl3DView, &DISPLIB::Control3DView::sceneColorChanged,
             this, &ControlManager::onSceneColorChange);
@@ -221,9 +215,7 @@ void ControlManager::handleEvent(QSharedPointer<Event> e)
         break;
 
     case EVENT_TYPE::SET_DATA3D_TREE_MODEL:
-        #ifdef MNE_USE_DISP3D_LEGACY
-        init3DGui(e->getData().value<QSharedPointer<DISP3DLIB::Data3DTreeModel>>());
-        #endif
+        init3DGui(e->getData().value<QSharedPointer<BrainTreeModel>>());
         break;
     default:
         qWarning() << "[ControlManager::handleEvent] received an Event that is not handled by switch-cases";
@@ -322,12 +314,14 @@ void ControlManager::onMakeScreenshot(const QString& imageType)
 
 //=============================================================================================================
 
-#ifdef MNE_USE_DISP3D_LEGACY
-void ControlManager::init3DGui(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel)
+void ControlManager::init3DGui(QSharedPointer<BrainTreeModel> pModel)
 {
+#ifndef WASMBUILD
     m_pControl3DView->setModel(pModel.data());
-}
+#else
+    Q_UNUSED(pModel)
 #endif
+}
 
 //=============================================================================================================
 

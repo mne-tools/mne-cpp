@@ -42,16 +42,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/viewers/abstractview.h>
-#include <disp3D/engine/model/items/sourcedata/mnedatatreeitem.h>
-#include <disp3D/engine/model/items/sensordata/sensordatatreeitem.h>
-#include <disp3D/engine/model/items/digitizer/digitizersettreeitem.h>
-#include <disp3D/engine/model/items/bem/bemtreeitem.h>
-#include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
-#include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/helpers/geometryinfo/geometryinfo.h>
-#include <disp3D/helpers/interpolation/interpolation.h>
+#include <disp3D_rhi/view/brainview.h>
+#include <disp3D_rhi/model/braintreemodel.h>
+#include <disp3D_rhi/model/items/digitizersettreeitem.h>
+#include <disp3D_rhi/model/items/bemtreeitem.h>
 
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
@@ -70,6 +64,7 @@
 //=============================================================================================================
 
 #include <QApplication>
+#include <QDir>
 #include <QMainWindow>
 #include <QCommandLineParser>
 #include <QVector3D>
@@ -78,7 +73,6 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISP3DLIB;
 using namespace MNELIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
@@ -249,109 +243,74 @@ int main(int argc, char *argv[])
     //########################################################################################
 
     //Create 3D data model
-    AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
-    Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
+    BrainView *pBrainView = new BrainView();
+    BrainTreeModel *pModel = new BrainTreeModel();
+    pBrainView->setModel(pModel);
 
     //Add fressurfer surface set including both hemispheres
-    QList<FsSurfaceTreeItem*> lFsSurfaces = p3DDataModel->addSurfaceSet(parser.value(subjectOption),
-                                                                        "MRI",
-                                                                        tSurfSet,
-                                                                        tAnnotSet);
-
-    for(int i = 0; i < lFsSurfaces.size(); ++i) {
-        lFsSurfaces.at(i)->setTransform(evoked.info.dev_head_t, true);
+    for (auto it = tSurfSet.data().constBegin(); it != tSurfSet.data().constEnd(); ++it) {
+        int hIdx = it.key();
+        QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
+        QString surfType = it.value().surf().isEmpty() ? "inflated" : it.value().surf();
+        pModel->addSurface(parser.value(subjectOption), hemi, surfType, it.value());
+        if (tAnnotSet.size() > hIdx)
+            pModel->addAnnotation(parser.value(subjectOption), hemi, tAnnotSet[hIdx]);
     }
 
     //Read and show BEM
     QFile t_fileBem(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/subjects/sample/bem/sample-5120-5120-5120-bem.fif");
     MNEBem t_Bem(t_fileBem);
-    p3DDataModel->addBemData(parser.value(subjectOption), "BEM", t_Bem)->setTransform(evoked.info.dev_head_t, true);
+    for (int i = 0; i < t_Bem.size(); ++i) {
+        pModel->addBemSurface(parser.value(subjectOption), "BEM", t_Bem[i]);
+    }
 
     //Read and show sensor helmets
-    QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m_rt.fif");
-    MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-    p3DDataModel->addMegSensorInfo("Sensors", "VectorView", evoked.info.chs, t_sensorSurfaceVV, evoked.info.bads);
+    pBrainView->loadSensors(QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m_rt.fif");
 
-    // Read, co-register and show digitizer points
+    // Read and show digitizer points
     QFile t_fileDig(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     FiffDigPointSet t_Dig(t_fileDig);
 
     QFile coordTransfile(QCoreApplication::applicationDirPath() + "/../resources/data/MNE-sample-data/MEG/sample/all-trans.fif");
     FiffCoordTrans coordTrans(coordTransfile);
 
-    DigitizerSetTreeItem* pDigitizerSetTreeItem = p3DDataModel->addDigitizerData(parser.value(subjectOption), evoked.comment, t_Dig);
-    pDigitizerSetTreeItem->setTransform(coordTrans, true);
-    pDigitizerSetTreeItem->applyTransform(evoked.info.dev_head_t, true);
+    pModel->addDigitizerData(t_Dig.getList());
 
-    //add sensor item for MEG data
-    if (SensorDataTreeItem* pMegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
-                                                                             evoked.comment,
-                                                                             evoked.data,
-                                                                             t_sensorSurfaceVV[0],
-                                                                             evoked.info,
-                                                                             "MEG")) {
-        pMegSensorTreeItem->setLoopState(true);
-        pMegSensorTreeItem->setTimeInterval(17);
-        pMegSensorTreeItem->setNumberAverages(1);
-        pMegSensorTreeItem->setStreamingState(false);
-        pMegSensorTreeItem->setThresholds(QVector3D(0.0f, 3e-12f*0.5f, 3e-12f));
-        pMegSensorTreeItem->setColormapType("Jet");
-        pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
-    }
-
-    //add sensor item for EEG data
-    //Co-Register EEG points in order to correctly map them to the scalp
-    for(int i = 0; i < evoked.info.chs.size(); ++i) {
-        if(evoked.info.chs.at(i).kind == FIFFV_EEG_CH) {
-            Vector4f tempvec;
-            tempvec(0) = evoked.info.chs.at(i).chpos.r0(0);
-            tempvec(1) = evoked.info.chs.at(i).chpos.r0(1);
-            tempvec(2) = evoked.info.chs.at(i).chpos.r0(2);
-            tempvec(3) = 1;
-            tempvec = coordTrans.invtrans * tempvec;
-            evoked.info.chs[i].chpos.r0(0) = tempvec(0);
-            evoked.info.chs[i].chpos.r0(1) = tempvec(1);
-            evoked.info.chs[i].chpos.r0(2) = tempvec(2);
-        }
-    }
-
-    if (SensorDataTreeItem* pEegSensorTreeItem = p3DDataModel->addSensorData(parser.value(subjectOption),
-                                                                             evoked.comment,
-                                                                             evoked.data,
-                                                                             t_Bem[0],
-                                                                             evoked.info,
-                                                                             "EEG")) {
-        pEegSensorTreeItem->setLoopState(true);
-        pEegSensorTreeItem->setTimeInterval(17);
-        pEegSensorTreeItem->setNumberAverages(1);
-        pEegSensorTreeItem->setStreamingState(false);
-        pEegSensorTreeItem->setThresholds(QVector3D(0.0f, 6.0e-6f*0.5f, 6.0e-6f));
-        pEegSensorTreeItem->setColormapType("Jet");
-        pEegSensorTreeItem->setSFreq(evoked.info.sfreq);
-        pEegSensorTreeItem->setTransform(evoked.info.dev_head_t, true);
-    }
+    // Load sensor field data from evoked file for MEG/EEG field mapping
+    pBrainView->loadSensorField(parser.value(evokedFileOption), parser.value(evokedIndexOption).toInt());
 
     if(bAddRtSourceLoc) {
-        //Add rt source loc data and init some visualization values
-        if(MneDataTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption),
-                                                                      evoked.comment,
-                                                                      sourceEstimate,
-                                                                      t_clusteredFwd,
-                                                                      tSurfSet,
-                                                                      tAnnotSet)) {
-            pRTDataItem->setLoopState(true);
-            pRTDataItem->setTimeInterval(17);
-            pRTDataItem->setNumberAverages(1);
-            pRTDataItem->setAlpha(1.0);
-            pRTDataItem->setStreamingState(false);
-            pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
-            pRTDataItem->setVisualizationType("Annotation based");
-            pRTDataItem->setColormapType("Jet");
-            pRTDataItem->setTransform(evoked.info.dev_head_t, true);
-        }
+        // Write source estimate to temp files for visualization
+        int nVertLh = t_clusteredFwd.src[0].nuse;
+        MNESourceEstimate stcLh, stcRh;
+        stcLh.data = sourceEstimate.data.topRows(nVertLh);
+        stcLh.vertices = sourceEstimate.vertices.head(nVertLh);
+        stcLh.tmin = sourceEstimate.tmin;
+        stcLh.tstep = sourceEstimate.tstep;
+        stcLh.times = sourceEstimate.times;
+        stcRh.data = sourceEstimate.data.bottomRows(sourceEstimate.data.rows() - nVertLh);
+        stcRh.vertices = sourceEstimate.vertices.tail(sourceEstimate.vertices.size() - nVertLh);
+        stcRh.tmin = sourceEstimate.tmin;
+        stcRh.tstep = sourceEstimate.tstep;
+        stcRh.times = sourceEstimate.times;
+
+        QString tmpDir = QDir::tempPath();
+        QString lhStcPath = tmpDir + "/mnecpp_disp3d-lh.stc";
+        QString rhStcPath = tmpDir + "/mnecpp_disp3d-rh.stc";
+        QFile lhStcFile(lhStcPath);
+        stcLh.write(lhStcFile);
+        QFile rhStcFile(rhStcPath);
+        stcRh.write(rhStcFile);
+
+        // Load source estimate and configure visualization
+        QObject::connect(pBrainView, &BrainView::sourceEstimateLoaded, [&](int /*nTimePoints*/) {
+            pBrainView->setSourceColormap("Jet");
+            pBrainView->setSourceThresholds(0.0f, 0.5f, 10.0f);
+        });
+        pBrainView->loadSourceEstimate(lhStcPath, rhStcPath);
     }
 
-    p3DAbstractView->show();
+    pBrainView->show();
 
     return a.exec();
 }

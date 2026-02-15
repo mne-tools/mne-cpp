@@ -51,7 +51,6 @@
 
 #include <QtWidgets>
 #include <QtCore/QtPlugin>
-#include <Qt3DRender>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -64,13 +63,11 @@ namespace ANSHAREDLIB {
     class DipoleFitModel;
 }
 
-namespace DISP3DLIB {
-    class View3D;
-    class Data3DTreeModel;
-    class BemTreeItem;
-    class DigitizerSetTreeItem;
-    class EcdDataTreeItem;
-}
+class BrainView;
+class BrainTreeModel;
+class BemTreeItem;
+class DigitizerSetTreeItem;
+class DipoleTreeItem;
 
 namespace DISPLIB {
     class Control3DView;
@@ -174,9 +171,9 @@ private:
 
     //=========================================================================================================
     /**
-     * Handle incoming picking event from DISP3DLIB::3DView.
+     * Handle incoming picking event from BrainView.
      */
-    void newPickingEvent(Qt3DRender::QPickEvent *qPickEvent);
+    void newPickingEvent(const QVector3D &worldIntersection);
 
     //=========================================================================================================
     /**
@@ -184,7 +181,7 @@ private:
      *
      * @param[in] pModel   new 3D model to be emitted.
      */
-    void new3DModel(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel);
+    void new3DModel(QSharedPointer<BrainTreeModel> pModel);
 
     //=========================================================================================================
     /**
@@ -221,13 +218,10 @@ private:
 
     int                                                     m_iFiducial;            /**< Currently selected fiducial. */
 
-    QSharedPointer<DISP3DLIB::Data3DTreeModel>              m_p3DModel;             /**< The 3D model data. */
-    DISP3DLIB::BemTreeItem*                                 m_pBemTreeCoreg;        /**< TThe BEM head model of the coregistration plugin. */
-    DISP3DLIB::DigitizerSetTreeItem*                        m_pDigitizerCoreg;      /**< The 3D item pointing to the tracked digitizers. */
-    DISP3DLIB::DigitizerSetTreeItem*                        m_pMriFidCoreg;         /**< The 3D item pointing to the mri fiducials. */
-    DISP3DLIB::EcdDataTreeItem*                             m_pDipoleFit;           /**< The 3D item pointing to the dipole fit. */
+    QSharedPointer<BrainTreeModel>                          m_p3DModel;             /**< The 3D model data. */
+    BemTreeItem*                                            m_pBemTreeCoreg;        /**< TThe BEM head model of the coregistration plugin. */
 
-    DISP3DLIB::View3D*                                      m_pView3D;              /**< The Disp3D view. */
+    BrainView*                                              m_pView3D;              /**< The Disp3D view. */
     DISPLIB::Control3DView*                                 m_pControl3DView;       /**< The 3D Control view. */
 
     bool                                                    m_bPickingActivated;    /**< If Picking is activated*/

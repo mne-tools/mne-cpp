@@ -43,6 +43,8 @@
 
 #include "../disp3D_rhi_global.h"
 
+#include "../core/rendertypes.h"
+
 #include <rhi/qrhi.h>
 #include <QMatrix4x4>
 #include <QVector3D>
@@ -72,15 +74,16 @@ public:
      * Destructor
      */
     ~BrainRenderer();
-    
-    enum ShaderMode {
-        Standard,
-        Holographic,
-        Anatomical,
-        Dipole,
-        XRay,
-        ShowNormals
-    };
+
+    // ShaderMode is defined in core/rendertypes.h for lightweight inclusion.
+    // These aliases preserve backward compatibility.
+    using ShaderMode = ::ShaderMode;
+    static constexpr ShaderMode Standard     = ::Standard;
+    static constexpr ShaderMode Holographic  = ::Holographic;
+    static constexpr ShaderMode Anatomical   = ::Anatomical;
+    static constexpr ShaderMode Dipole       = ::Dipole;
+    static constexpr ShaderMode XRay         = ::XRay;
+    static constexpr ShaderMode ShowNormals  = ::ShowNormals;
 
     struct SceneData {
         QMatrix4x4 mvp;

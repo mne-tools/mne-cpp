@@ -44,15 +44,12 @@
 #include <anShared/Model/dipolefitmodel.h>
 #include <anShared/Model/abstractmodel.h>
 
-#include <disp3D/viewers/sourceestimateview.h>
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/delegate/data3Dtreedelegate.h>
-#include <disp3D/engine/model/items/digitizer/digitizersettreeitem.h>
-#include <disp3D/engine/model/items/digitizer/digitizertreeitem.h>
-#include <disp3D/engine/model/items/bem/bemtreeitem.h>
-#include <disp3D/engine/model/items/bem/bemsurfacetreeitem.h>
-#include <disp3D/engine/model/items/sourcedata/ecddatatreeitem.h>
+#include <disp3D_rhi/view/brainview.h>
+#include <disp3D_rhi/model/braintreemodel.h>
+#include <disp3D_rhi/model/items/digitizersettreeitem.h>
+#include <disp3D_rhi/model/items/digitizertreeitem.h>
+#include <disp3D_rhi/model/items/bemtreeitem.h>
+#include <disp3D_rhi/model/items/dipoletreeitem.h>
 
 #include <disp/viewers/control3dview.h>
 
@@ -63,7 +60,6 @@
 //=============================================================================================================
 
 #include <QDebug>
-#include <Qt3DRender>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -80,7 +76,6 @@ using namespace FIFFLIB;
 View3D::View3D()
     : m_pCommu(Q_NULLPTR)
     , m_pBemTreeCoreg(Q_NULLPTR)
-    , m_pDigitizerCoreg(Q_NULLPTR)
     , m_pView3D(Q_NULLPTR)
     , m_bPickingActivated(false)
 {
@@ -106,7 +101,7 @@ QSharedPointer<AbstractPlugin> View3D::clone() const
 void View3D::init()
 {
     m_pCommu = new Communicator(this);
-    m_p3DModel = QSharedPointer<DISP3DLIB::Data3DTreeModel>::create();
+    m_p3DModel = QSharedPointer<BrainTreeModel>::create();
 }
 
 //=============================================================================================================
@@ -135,32 +130,20 @@ QMenu *View3D::getMenu()
 QWidget *View3D::getView()
 {
     if(!m_pView3D) {
-        m_pView3D = new DISP3DLIB::View3D();
+        m_pView3D = new BrainView();
     }
 
-    m_pView3D->setModel(m_p3DModel);
+    m_pView3D->setModel(m_p3DModel.data());
     new3DModel(m_p3DModel);
 
-    connect(m_pView3D, &DISP3DLIB::View3D::pickEventOccured,
-            this, &View3D::newPickingEvent);
-
-    connect(this, &View3D::sceneColorChanged,
-            m_pView3D, &DISP3DLIB::View3D::setSceneColor);
-    connect(this, &View3D::rotationChanged,
-            m_pView3D, &DISP3DLIB::View3D::startStopCameraRotation);
-    connect(this, &View3D::showCoordAxis,
-            m_pView3D, &DISP3DLIB::View3D::toggleCoordAxis);
-    connect(this, &View3D::showFullScreen,
-            m_pView3D, &DISP3DLIB::View3D::showFullScreen);
-    connect(this, &View3D::lightColorChanged,
-            m_pView3D, &DISP3DLIB::View3D::setLightColor);
-    connect(this, &View3D::lightIntensityChanged,
-            m_pView3D, &DISP3DLIB::View3D::setLightIntensity);
+    // Note: BrainView (QRhiWidget) does not support scene color, camera rotation toggle,
+    // coord axis toggle, light color/intensity, or screenshot via direct slots.
+    // Use BrainView::saveSnapshot() for screenshots, setLightingEnabled() for lighting.
     connect(this, &View3D::takeScreenshotChanged,
-            m_pView3D, &DISP3DLIB::View3D::takeScreenshot);
+            m_pView3D, &BrainView::saveSnapshot);
 
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_pView3D, Q_NULLPTR, Qt::Widget);
-    return pWidgetContainer;
+    // BrainView is a QWidget (QRhiWidget), can be embedded directly
+    return m_pView3D;
 }
 
 //=============================================================================================================
@@ -232,15 +215,14 @@ void View3D::updateCoregBem(QSharedPointer<ANSHAREDLIB::BemDataModel> pNewModel)
         qWarning() << "[View3D::updateCoregBem] Null Bem Model pointer.";
         return;
     } else if(!m_p3DModel){
-        std::cout << "[View3D::updateCoregBem] Null Data3DTreeModel";
+        std::cout << "[View3D::updateCoregBem] Null BrainTreeModel";
         return;
     } else if(pNewModel->getType() == ANSHAREDLIB_BEMDATA_MODEL) {
-        m_pView3D->activatePicker(true);
-        m_pBemTreeCoreg = m_p3DModel->addBemData("Co-Registration",
-                                                 QFileInfo(pNewModel->getModelPath()).fileName(),
-                                                 *pNewModel->getBem().data());
-
-        m_pView3D->activatePicker(m_bPickingActivated);
+        if(!pNewModel->getBem().data()->isEmpty()) {
+            m_pBemTreeCoreg = m_p3DModel->addBemSurface("Co-Registration",
+                                                        QFileInfo(pNewModel->getModelPath()).fileName(),
+                                                        (*pNewModel->getBem().data())[0]);
+        }
     }
     return;
 }
@@ -249,18 +231,14 @@ void View3D::updateCoregBem(QSharedPointer<ANSHAREDLIB::BemDataModel> pNewModel)
 
 void View3D::updateCoregDigitizer(FiffDigPointSet digSet)
 {
-    m_pDigitizerCoreg = m_p3DModel->addDigitizerData("Co-Registration",
-                                                     "Digitizers",
-                                                     digSet);
+    m_p3DModel->addDigitizerData(digSet.getList());
     return;
 }
 
 //=============================================================================================================
 void View3D::updateCoregMriFid(FiffDigPointSet digSetFid)
 {
-    m_pMriFidCoreg = m_p3DModel->addDigitizerData("Co-Registration",
-                                                  "MRI Fiducials",
-                                                  digSetFid);
+    m_p3DModel->addDigitizerData(digSetFid.getList());
     return;
 }
 
@@ -268,7 +246,10 @@ void View3D::updateCoregMriFid(FiffDigPointSet digSetFid)
 
 void View3D::updateCoregTrans(FiffCoordTrans headMriTrans)
 {
-    m_pDigitizerCoreg->setTransform(headMriTrans,false);
+    // Note: Per-item transforms for digitizers are not yet supported in disp3D_rhi.
+    // The coregistration transform will need to be applied via BrainView's scene transform
+    // or by rebuilding the digitizer data in the transformed space.
+    Q_UNUSED(headMriTrans)
     return;
 }
 
@@ -276,7 +257,6 @@ void View3D::updateCoregTrans(FiffCoordTrans headMriTrans)
 
 void View3D::fiducialPicking(const bool bActivatePicking)
 {
-    m_pView3D->activatePicker(bActivatePicking);
     m_bPickingActivated = bActivatePicking;
 
     if(bActivatePicking) {
@@ -286,9 +266,9 @@ void View3D::fiducialPicking(const bool bActivatePicking)
 
 //=============================================================================================================
 
-void View3D::newPickingEvent(Qt3DRender::QPickEvent *qPickEvent)
+void View3D::newPickingEvent(const QVector3D &worldIntersection)
 {
-    QVariant data = QVariant::fromValue(qPickEvent->worldIntersection());
+    QVariant data = QVariant::fromValue(worldIntersection);
     m_pCommu->publishEvent(EVENT_TYPE::NEW_FIDUCIAL_PICKED, data);
 }
 
@@ -296,25 +276,15 @@ void View3D::newPickingEvent(Qt3DRender::QPickEvent *qPickEvent)
 
 void View3D::onFiducialChanged(const int iFiducial)
 {
-    switch(iFiducial) {
-        case FIFFV_POINT_LPA:
-            m_pView3D->setCameraRotation(90);
-            m_iFiducial = FIFFV_POINT_LPA;
-            return;
-        case FIFFV_POINT_NASION:
-            m_pView3D->setCameraRotation(0);
-            m_iFiducial = FIFFV_POINT_NASION;
-            return;
-        case FIFFV_POINT_RPA:
-            m_pView3D->setCameraRotation(270);
-            m_iFiducial = FIFFV_POINT_RPA;
-            return;
-    }
+    // Note: BrainView does not have setCameraRotation(int degrees).
+    // Camera rotation for fiducial picking is not yet supported in disp3D_rhi.
+    Q_UNUSED(iFiducial)
+    m_iFiducial = iFiducial;
 }
 
 //=============================================================================================================
 
-void View3D::new3DModel(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel)
+void View3D::new3DModel(QSharedPointer<BrainTreeModel> pModel)
 {
     m_pCommu->publishEvent(EVENT_TYPE::SET_DATA3D_TREE_MODEL, QVariant::fromValue(pModel));
 }
@@ -354,7 +324,7 @@ void View3D::settingsChanged(ANSHAREDLIB::View3DParameters viewParameters)
 
 void View3D::newDipoleFit(const INVERSELIB::ECDSet &ecdSet)
 {
-    m_pDipoleFit = m_p3DModel->addDipoleFitData("Dipole Fit", "Data", ecdSet);
+    m_p3DModel->addDipoles(ecdSet);
 }
 
 //=============================================================================================================
@@ -371,10 +341,6 @@ void View3D::onModelChanged(QSharedPointer<ANSHAREDLIB::AbstractModel> pNewModel
 void View3D::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedModel)
 {
     if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_DIPOLEFIT_MODEL) {
-        if(!m_pDipoleFit){
-            return;
-        }
-
         QList<QStandardItem *> lItemList = m_p3DModel->findItems("Dipole Fit");
         if(!lItemList.isEmpty()){
             for(QStandardItem * pItem : lItemList){
@@ -385,10 +351,10 @@ void View3D::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedM
             }
         }
 
-        m_pBemTreeCoreg = Q_NULLPTR;
-
-        m_pView3D->hide();
-        m_pView3D->show();
+        if(m_pView3D) {
+            m_pView3D->hide();
+            m_pView3D->show();
+        }
 
     } else if(pRemovedModel->getType() == MODEL_TYPE::ANSHAREDLIB_BEMDATA_MODEL){
         if(!m_pBemTreeCoreg){
@@ -411,8 +377,10 @@ void View3D::onModelRemoved(QSharedPointer<ANSHAREDLIB::AbstractModel> pRemovedM
 
         m_pBemTreeCoreg = Q_NULLPTR;
 
-        m_pView3D->hide();
-        m_pView3D->show();
+        if(m_pView3D) {
+            m_pView3D->hide();
+            m_pView3D->show();
+        }
     }
 }
 

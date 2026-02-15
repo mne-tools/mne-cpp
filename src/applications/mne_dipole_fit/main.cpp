@@ -44,9 +44,11 @@
 
 #include <mne/mne_bem.h>
 
-#ifdef MNE_USE_DISP3D_LEGACY  // Disabled: old disp3D removed, pending migration to disp3D_rhi
-#include <disp3D/viewers/ecdview.h>
-#endif
+#include <QFile>
+
+#include <disp3D_rhi/view/brainview.h>
+#include <disp3D_rhi/model/braintreemodel.h>
+#include <disp3D_rhi/model/items/dipoletreeitem.h>
 
 #include <fs/label.h>
 #include <fs/surfaceset.h>
@@ -65,7 +67,6 @@
 //=============================================================================================================
 
 using namespace INVERSELIB;
-//using namespace DISP3DLIB;  // Disabled: old disp3D removed, pending migration to disp3D_rhi
 using namespace FSLIB;
 using namespace MNELIB;
 using namespace UTILSLIB;
@@ -96,13 +97,25 @@ int main(int argc, char *argv[])
     DipoleFit dipFit(&settings);
     ECDSet set = dipFit.calculateFit();
 
-#ifdef MNE_USE_DISP3D_LEGACY  // Disabled: old disp3D removed, pending migration to disp3D_rhi
-    ECDView::SPtr pEcdViewer;
+    BrainView *pViewer = nullptr;
     if(settings.gui) {
-        pEcdViewer = ECDView::SPtr(new ECDView(settings, set));
-        pEcdViewer->show();
+        pViewer = new BrainView();
+        BrainTreeModel *pModel = new BrainTreeModel();
+        pModel->addDipoles(set);
+
+        // Load brain surface if available
+        if(!settings.bemname.isEmpty()) {
+            QFile bemFile(settings.bemname);
+            MNEBem bem(bemFile);
+            for(int i = 0; i < bem.size(); ++i) {
+                pModel->addBemSurface("Subject", "BEM", bem[i]);
+            }
+        }
+
+        pViewer->setModel(pModel);
+        pViewer->resize(800, 600);
+        pViewer->show();
     }
-#endif
 
     /*
      * Saving...

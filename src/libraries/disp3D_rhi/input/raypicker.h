@@ -42,8 +42,6 @@
 #include "../disp3D_rhi_global.h"
 
 #include "core/viewstate.h"
-#include "renderable/brainsurface.h"
-#include "renderable/dipoleobject.h"
 
 #include <QPoint>
 #include <QRect>
@@ -53,6 +51,9 @@
 #include <QStandardItem>
 
 #include <memory>
+
+class BrainSurface;
+class DipoleObject;
 
 //=============================================================================================================
 /**

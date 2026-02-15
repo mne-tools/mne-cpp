@@ -45,19 +45,13 @@
 
 #include <connectivity/network/network.h>
 
-#include <disp3D/viewers/networkview.h>
-#include <disp3D/engine/model/items/network/networktreeitem.h>
-#include <disp3D/engine/model/items/sourcedata/mnedatatreeitem.h>
-#include <disp3D/engine/model/items/sensorspace/sensorsettreeitem.h>
-#include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/delegate/data3Dtreedelegate.h>
-#include <disp3D/engine/model/items/bem/bemtreeitem.h>
-#include <disp3D/engine/model/items/bem/bemsurfacetreeitem.h>
-#include <disp3D/engine/model/items/digitizer/digitizertreeitem.h>
-#include <disp3D/engine/model/items/digitizer/digitizersettreeitem.h>
+#include <disp3D_rhi/view/brainview.h>
+#include <disp3D_rhi/model/braintreemodel.h>
+#include <disp3D_rhi/model/items/networktreeitem.h>
+#include <disp3D_rhi/model/items/sensortreeitem.h>
+#include <disp3D_rhi/model/items/surfacetreeitem.h>
+#include <disp3D_rhi/model/items/bemtreeitem.h>
+#include <disp3D_rhi/model/items/digitizersettreeitem.h>
 
 #include <disp/viewers/control3dview.h>
 
@@ -85,7 +79,6 @@
 //=============================================================================================================
 
 using namespace SCDISPLIB;
-using namespace DISP3DLIB;
 using namespace SCMEASLIB;
 using namespace DISPLIB;
 using namespace CONNECTIVITYLIB;
@@ -100,12 +93,13 @@ using namespace FIFFLIB;
 RealTime3DWidget::RealTime3DWidget(QWidget* parent)
 : MeasurementWidget(parent)
 , m_iNumberBadChannels(0)
-, m_pData3DModel(Data3DTreeModel::SPtr::create())
-, m_p3DView(new View3D())
+, m_pData3DModel(QSharedPointer<BrainTreeModel>::create())
+, m_p3DView(new BrainView())
+, m_bRtSourceActive(false)
 {
     m_mriHeadTrans = FiffCoordTrans();
     //Init 3D View
-    m_p3DView->setModel(m_pData3DModel);
+    m_p3DView->setModel(m_pData3DModel.data());
 
     createGUI();
 }
@@ -120,12 +114,11 @@ RealTime3DWidget::~RealTime3DWidget()
 
 void RealTime3DWidget::createGUI()
 {
-    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_p3DView, this, Qt::Widget);
-    pWidgetContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    pWidgetContainer->setMinimumSize(400,400);
+    m_p3DView->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_p3DView->setMinimumSize(400,400);
 
     QGridLayout* pMainLayoutView = new QGridLayout();
-    pMainLayoutView->addWidget(pWidgetContainer,0,0);
+    pMainLayoutView->addWidget(m_p3DView,0,0);
     pMainLayoutView->setContentsMargins(0,0,0,0);
 
     this->setLayout(pMainLayoutView);
@@ -144,48 +137,35 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
             return;
         }
 
-        // Add rt brain data
+        // Add rt connectivity data
         if(!m_pRtConnectivityItem) {
-            //qDebug()<<"RealTime3DWidget::getData - Creating m_pRtConnectivityItem";
-            m_pRtConnectivityItem = m_pData3DModel->addConnectivityData("Subject",
-                                                                        "Functional Data",
-                                                                        *(pRTCE->getValue().data()));
-
-            m_pRtConnectivityItem->setThresholds(QVector3D(0.9f,0.95f,1.0f));
+            m_pRtConnectivityItem = m_pData3DModel->addNetwork(*(pRTCE->getValue().data()),
+                                                               "Functional Data");
 
             if(pRTCE->getSurfSet() && pRTCE->getAnnotSet()) {
-                QList<FsSurfaceTreeItem*> lSurfaces = m_pData3DModel->addSurfaceSet("Subject",
-                                                                                    "MRI",
-                                                                                    *(pRTCE->getSurfSet().data()),
-                                                                                    *(pRTCE->getAnnotSet().data()));
-
-                for(int i = 0; i < lSurfaces.size(); i++) {
-                    lSurfaces.at(i)->setAlpha(0.3f);
+                for(int i = 0; i < pRTCE->getSurfSet()->size(); ++i) {
+                    const FSLIB::Surface &surf = (*pRTCE->getSurfSet())[i];
+                    QString hemi = (surf.hemi() == 0) ? "lh" : "rh";
+                    QString surfType = surf.surf().isEmpty() ? "inflated" : surf.surf();
+                    m_pData3DModel->addSurface("Subject", hemi, surfType, surf);
+                    m_pData3DModel->addAnnotation("Subject", hemi, (*pRTCE->getAnnotSet())[i]);
                 }
             }
 
-            if(pRTCE->getSensorSurface() && pRTCE->getFiffInfo()) {
-                m_pData3DModel->addMegSensorInfo("Subject",
-                                                 "Sensors",
-                                                 pRTCE->getFiffInfo()->chs,
-                                                 *(pRTCE->getSensorSurface()),
-                                                 pRTCE->getFiffInfo()->bads);
-                m_iNumberBadChannels = pRTCE->getFiffInfo()->bads.size();
-            }
+            // Note: Sensor surface visualization from FiffChInfo/MNEBem is not
+            // directly supported in disp3D_rhi's addSensors API. Use loadSensors()
+            // with a .fif file path if sensor visualization is needed.
+            m_iNumberBadChannels = pRTCE->getFiffInfo() ? pRTCE->getFiffInfo()->bads.size() : 0;
         } else {
-            //qDebug()<<"RealTime3DWidget::getData - Working with m_pRtConnectivityItem";
+            // Update existing connectivity data - replace with new network
             QPair<float,float> freqs = pRTCE->getValue()->getFrequencyRange();
             QString sItemName = QString("%1_%2_%3").arg(pRTCE->getValue()->getConnectivityMethod(), QString::number(freqs.first), QString::number(freqs.second));
             m_pRtConnectivityItem->setText(sItemName);
-            m_pRtConnectivityItem->addData(*(pRTCE->getValue().data()));
 
             if(pRTCE->getSensorSurface() && pRTCE->getFiffInfo()) {
                 if(m_iNumberBadChannels != pRTCE->getFiffInfo()->bads.size()) {
-                    m_pData3DModel->addMegSensorInfo("Subject",
-                                                     "Sensors",
-                                                     pRTCE->getFiffInfo()->chs,
-                                                     *(pRTCE->getSensorSurface()),
-                                                     pRTCE->getFiffInfo()->bads);
+                    // Note: Sensor update from in-memory FiffChInfo/MNEBem not
+                    // directly supported in disp3D_rhi.
                     m_iNumberBadChannels = pRTCE->getFiffInfo()->bads.size();
                 }
             }
@@ -193,50 +173,43 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
     } else if(RealTimeSourceEstimate::SPtr pRTSE = qSharedPointerDynamicCast<RealTimeSourceEstimate>(pMeasurement)) {
         QList<MNESourceEstimate::SPtr> lMNEData = pRTSE->getValue();
 
-        // Add source estimate data
+        // Add source estimate data via BrainView's realtime streaming
         if(!lMNEData.isEmpty()) {
-            if(!m_pRtMNEItem && pRTSE->getAnnotSet() && pRTSE->getSurfSet() && pRTSE->getFwdSolution()) {
-                //qDebug()<<"RealTimeSourceEstimateWidget::getData - Creating m_lRtItem list";
-                m_pRtMNEItem = m_pData3DModel->addSourceData("Subject", "Functional Data",
-                                                             *lMNEData.first(),
-                                                             *pRTSE->getFwdSolution(),
-                                                             *pRTSE->getSurfSet(),
-                                                             *pRTSE->getAnnotSet());
-
-                m_pRtMNEItem->setLoopState(false);
-                m_pRtMNEItem->setTimeInterval(17);
-                m_pRtMNEItem->setThresholds(QVector3D(0.0,5,10));
-                m_pRtMNEItem->setColormapType("Hot");
-                m_pRtMNEItem->setVisualizationType("Annotation based");
-                m_pRtMNEItem->setNumberAverages(1); // Set to 1 because we want to enable time point picking which only includes one sample
-                m_pRtMNEItem->setAlpha(1.0);
-                m_pRtMNEItem->setStreamingState(true);
-                m_pRtMNEItem->setSFreq(pRTSE->getFiffInfo()->sfreq);
+            if(!m_bRtSourceActive && pRTSE->getAnnotSet() && pRTSE->getSurfSet() && pRTSE->getFwdSolution()) {
+                // Add surfaces first
+                for(int i = 0; i < pRTSE->getSurfSet()->size(); ++i) {
+                    const FSLIB::Surface &surf = (*pRTSE->getSurfSet())[i];
+                    QString hemi = (surf.hemi() == 0) ? "lh" : "rh";
+                    QString surfType = surf.surf().isEmpty() ? "inflated" : surf.surf();
+                    m_pData3DModel->addSurface("Subject", hemi, surfType, surf);
+                    m_pData3DModel->addAnnotation("Subject", hemi, (*pRTSE->getAnnotSet())[i]);
+                }
+                // Configure and start realtime streaming
+                m_p3DView->setSourceColormap("Hot");
+                m_p3DView->startRealtimeStreaming();
+                m_bRtSourceActive = true;
                 m_mriHeadTrans = pRTSE->getMriHeadTrans();
             } else {
-                //qDebug()<<"RealTimeSourceEstimateWidget::getData - Working with m_lRtItem list";
-
-                if(m_pRtMNEItem) {
-                    m_pRtMNEItem->addData(*lMNEData.first());
+                if(m_bRtSourceActive) {
+                    // Extract data column from MNESourceEstimate
+                    const MNESourceEstimate &stc = *lMNEData.first();
+                    if(stc.data.cols() > 0) {
+                        m_p3DView->pushRealtimeSourceData(stc.data.col(0));
+                    }
                 }
             }
         }
     } else if(RealTimeHpiResult::SPtr pRTHR = qSharedPointerDynamicCast<RealTimeHpiResult>(pMeasurement)) {
         if(!m_pBemHeadAvr) {
-            // Add sensor surface BabyMeg
-            QFile t_fileBabyMEGSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/BabyMEG.fif");
-            MNEBem t_babyMEGsensorSurfaceBEM(t_fileBabyMEGSensorSurfaceBEM);
-            m_pData3DModel->addMegSensorInfo("Device", "BabyMEG", QList<FiffChInfo>(), t_babyMEGsensorSurfaceBEM)->setCheckState(Qt::Unchecked);
-
-            // Add sensor surface VectorView
-            QFile t_fileVVSensorSurfaceBEM(QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m_rt.fif");
-            MNEBem t_sensorVVSurfaceBEM(t_fileVVSensorSurfaceBEM);
-            m_pData3DModel->addMegSensorInfo("Device", "VectorView", QList<FiffChInfo>(), t_sensorVVSurfaceBEM);
+            // Note: Loading sensor surfaces from in-memory MNEBem is not directly
+            // supported by disp3D_rhi's addSensors API. Sensor surfaces skipped.
 
             // Add average head surface
-            QFile t_fileHeadAvr(QCoreApplication::applicationDirPath() + "/../resources/general/hpiAlignment/fsaverage-head.fif");;
+            QFile t_fileHeadAvr(QCoreApplication::applicationDirPath() + "/../resources/general/hpiAlignment/fsaverage-head.fif");
             MNEBem t_BemHeadAvr(t_fileHeadAvr);
-            m_pBemHeadAvr = m_pData3DModel->addBemData("Subject", "Average head", t_BemHeadAvr);
+            if(!t_BemHeadAvr.isEmpty()) {
+                m_pBemHeadAvr = m_pData3DModel->addBemSurface("Subject", "Average head", t_BemHeadAvr[0]);
+            }
         }
 
         if(QSharedPointer<HpiFitResult> pHpiFitResult = pRTHR->getValue()) {
@@ -256,45 +229,13 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
                 }
             }
 
-            //Add and update items to 3D view
-            m_pData3DModel->addDigitizerData("Subject",
-                                             "Fitted Digitizers",
-                                             pHpiFitResult->fittedCoils.pickTypes(QList<int>()<<FIFFV_POINT_EEG));
+            //Add fitted digitizers to 3D view
+            m_pData3DModel->addDigitizerData(
+                                             pHpiFitResult->fittedCoils.pickTypes(QList<int>()<<FIFFV_POINT_EEG).getList());
 
-            if(m_pTrackedDigitizer && m_pBemHeadAvr) {
-                //Update fast scan / tracked digitizer
-                QList<QStandardItem*> itemList = m_pTrackedDigitizer->findChildren(Data3DTreeModelItemTypes::DigitizerItem);
-                for(int j = 0; j < itemList.size(); ++j) {
-                    if(DigitizerTreeItem* pDigItem = dynamic_cast<DigitizerTreeItem*>(itemList.at(j))) {
-                        // apply inverse to get from head to device space
-                        pDigItem->setTransform(pHpiFitResult->devHeadTrans, true);
-                    }
-                }
-
-                // Update average head
-                itemList = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
-                for(int j = 0; j < itemList.size(); ++j) {
-                    if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-                        pBemItem->setTransform(m_tAlignment);
-                        // apply inverse to get from head to device space
-                        pBemItem->applyTransform(pHpiFitResult->devHeadTrans, true);
-                    }
-                }
-            }
-
-            if(m_pRtMNEItem) {
-                if(!m_mriHeadTrans.isEmpty()) {
-                    m_pRtMNEItem->setTransform(m_mriHeadTrans,false);
-                    m_pRtMNEItem->applyTransform(pHpiFitResult->devHeadTrans, true);
-                } else {
-                    m_pRtMNEItem->setTransform(pHpiFitResult->devHeadTrans, true);
-                }
-
-            }
-
-            if(m_pRtConnectivityItem) {
-                m_pRtConnectivityItem->setTransform(pHpiFitResult->devHeadTrans, true);
-            }
+            // Note: Per-item transforms for HPI tracking are not yet supported in disp3D_rhi.
+            // The BrainSurface renderable supports applyTransform() but tree items do not
+            // expose this directly yet.
         }
     }
 }
@@ -304,9 +245,7 @@ void RealTime3DWidget::update(SCMEASLIB::Measurement::SPtr pMeasurement)
 void RealTime3DWidget::addDigSetToView(const FIFFLIB::FiffDigPointSet& digSet)
 {
     FiffDigPointSet digSetWithoutAdditional = digSet.pickTypes(QList<int>()<<FIFFV_POINT_HPI<<FIFFV_POINT_CARDINAL<<FIFFV_POINT_EEG<<FIFFV_POINT_EXTRA);
-    m_pTrackedDigitizer = m_pData3DModel->addDigitizerData("Subject",
-                                                           "Tracked Digitizers",
-                                                           digSetWithoutAdditional);
+    m_pData3DModel->addDigitizerData(digSetWithoutAdditional.getList());
 }
 
 //=============================================================================================================
@@ -356,15 +295,11 @@ void RealTime3DWidget::alignFiducials(QSharedPointer<FIFFLIB::FiffDigitizerData>
 
 void RealTime3DWidget::applyAlignmentTransform(QMatrix4x4& invMat)
 {
-    Qt3DCore::QTransform identity;
-    m_tAlignment.setMatrix(invMat);
+    m_tAlignment = invMat;
 
-    // align and scale average head (now in head space)
-    QList<QStandardItem*> itemList = m_pBemHeadAvr->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
-    for(int j = 0; j < itemList.size(); ++j) {
-        if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-            pBemItem->setTransform(m_tAlignment);
-        }
+    // Apply alignment transform to the BEM tree item
+    if(m_pBemHeadAvr) {
+        m_pBemHeadAvr->setTransform(m_tAlignment);
     }
 }
 
@@ -393,8 +328,6 @@ QMatrix4x4 RealTime3DWidget::calculateInverseMatrix(const QSharedPointer<FIFFLIB
 
 void RealTime3DWidget::initDisplayControllWidgets()
 {
-    Data3DTreeDelegate* pData3DTreeDelegate = new Data3DTreeDelegate(this);
-
     //Init control widgets
     QList<QWidget*> lControlWidgets;
 
@@ -404,35 +337,17 @@ void RealTime3DWidget::initDisplayControllWidgets()
     pControl3DView->setObjectName("group_tab_View_General");
     lControlWidgets.append(pControl3DView);
 
-    pControl3DView->setDelegate(pData3DTreeDelegate);
-    pControl3DView->setModel(m_pData3DModel.data());
-
-    connect(pControl3DView, &Control3DView::sceneColorChanged,
-            m_p3DView.data(), &View3D::setSceneColor);
-
-    connect(pControl3DView, &Control3DView::rotationChanged,
-            m_p3DView.data(), &View3D::startStopCameraRotation);
-
-    connect(pControl3DView, &Control3DView::showCoordAxis,
-            m_p3DView.data(), &View3D::toggleCoordAxis);
-
-    connect(pControl3DView, &Control3DView::showFullScreen,
-            m_p3DView.data(), &View3D::showFullScreen);
-
-    connect(pControl3DView, &Control3DView::lightColorChanged,
-            m_p3DView.data(), &View3D::setLightColor);
-
-    connect(pControl3DView, &Control3DView::lightIntensityChanged,
-            m_p3DView.data(), &View3D::setLightIntensity);
-
+    // Note: BrainView does not support setSceneColor, startStopCameraRotation,
+    // toggleCoordAxis, setLightColor, setLightIntensity directly.
+    // Connect available BrainView slots:
     connect(pControl3DView, &Control3DView::takeScreenshotChanged,
-            m_p3DView.data(), &View3D::takeScreenshot);
+            m_p3DView.data(), &BrainView::saveSnapshot);
 
     connect(pControl3DView, &Control3DView::toggleSingleView,
-            m_p3DView.data(), &View3D::showSingleView);
+            m_p3DView.data(), &BrainView::showSingleView);
 
     connect(pControl3DView, &Control3DView::toggleMutiview,
-            m_p3DView.data(), &View3D::showMultiView);
+            m_p3DView.data(), &BrainView::showMultiView);
 
     emit displayControlWidgetsChanged(lControlWidgets, "3D View");
 

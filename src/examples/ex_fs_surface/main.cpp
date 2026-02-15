@@ -37,8 +37,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/viewers/abstractview.h>
-#include <disp3D/engine/model/data3Dtreemodel.h>
+#include <disp3D_rhi/view/brainview.h>
+#include <disp3D_rhi/model/braintreemodel.h>
 
 #include <fs/surfaceset.h>
 
@@ -56,7 +56,6 @@
 //=============================================================================================================
 
 using namespace FSLIB;
-using namespace DISP3DLIB;
 
 //=============================================================================================================
 // MAIN
@@ -104,30 +103,43 @@ int main(int argc, char *argv[])
     //
     SurfaceSet tSurfSetPial (subject, hemi, "pial", subjectPath);
 
-    AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
-    Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
+    BrainView *pBrainView = new BrainView();
+    BrainTreeModel *pModel = new BrainTreeModel();
+    pBrainView->setModel(pModel);
 
-    p3DDataModel->addSurfaceSet(subject, "pial", tSurfSetPial);
+    for (auto it = tSurfSetPial.data().constBegin(); it != tSurfSetPial.data().constEnd(); ++it) {
+        QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
+        pModel->addSurface(subject, hemi, "pial", it.value());
+    }
 
     //
     // inflated
     //
     SurfaceSet tSurfSetInflated (subject, hemi, "inflated", subjectPath);
-    p3DDataModel->addSurfaceSet(subject, "inflated", tSurfSetInflated);
+    for (auto it = tSurfSetInflated.data().constBegin(); it != tSurfSetInflated.data().constEnd(); ++it) {
+        QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
+        pModel->addSurface(subject, hemi, "inflated", it.value());
+    }
 
     //
     // orig
     //
     SurfaceSet tSurfSetOrig (subject, hemi, "orig", subjectPath);
-    p3DDataModel->addSurfaceSet(subject, "orig", tSurfSetOrig);
+    for (auto it = tSurfSetOrig.data().constBegin(); it != tSurfSetOrig.data().constEnd(); ++it) {
+        QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
+        pModel->addSurface(subject, hemi, "orig", it.value());
+    }
 
     //
     // white
     //
     SurfaceSet tSurfSetWhite (subject, hemi, "white", subjectPath);
-    p3DDataModel->addSurfaceSet(subject, "white", tSurfSetWhite);
+    for (auto it = tSurfSetWhite.data().constBegin(); it != tSurfSetWhite.data().constEnd(); ++it) {
+        QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
+        pModel->addSurface(subject, hemi, "white", it.value());
+    }
 
-    p3DAbstractView->show();
+    pBrainView->show();
 
     return a.exec();
 }

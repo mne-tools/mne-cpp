@@ -46,8 +46,8 @@
 
 #include <iostream>
 
-#include <disp3D/helpers/geometryinfo/geometryinfo.h>
-#include <disp3D/helpers/interpolation/interpolation.h>
+#include <disp3D_rhi/helpers/geometryinfo.h>
+#include <disp3D_rhi/helpers/interpolation.h>
 #include <fiff/fiff_constants.h>
 
 #include <utils/generics/applicationlogger.h>
@@ -67,7 +67,7 @@
 
 using namespace MNELIB;
 using namespace FIFFLIB;
-using namespace DISP3DLIB;
+using namespace DISP3DRHILIB;
 using namespace Eigen;
 
 //=============================================================================================================

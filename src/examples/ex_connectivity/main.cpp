@@ -43,12 +43,9 @@
 
 #include "connectivitysettingsmanager.h"
 
-#include <disp3D/viewers/networkview.h>
-#include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/model/items/network/networktreeitem.h>
-#include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
-#include <disp3D/engine/model/items/sourcedata/mnedatatreeitem.h>
-#include <disp3D/engine/model/items/digitizer/digitizersettreeitem.h>
+#include <disp3D_rhi/view/brainview.h>
+#include <disp3D_rhi/model/braintreemodel.h>
+#include <disp3D_rhi/model/items/networktreeitem.h>
 
 #include <connectivity/connectivity.h>
 #include <connectivity/connectivitysettings.h>
@@ -73,8 +70,7 @@
 #include <disp/viewers/minimumnormsettingsview.h>
 #include <disp/viewers/tfsettingsview.h>
 
-#include <disp3D/engine/model/items/network/networktreeitem.h>
-#include <disp3D/engine/model/items/sensordata/sensordatatreeitem.h>
+
 
 //=============================================================================================================
 // QT INCLUDES
@@ -87,14 +83,13 @@
 #include <QFile>
 #include <QObject>
 #include <QVariant>
-#include <Qt3DCore/QTransform>
+#include <QDir>
 #include <QMatrix4x4>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISP3DLIB;
 using namespace DISPLIB;
 using namespace INVERSELIB;
 using namespace Eigen;
@@ -420,113 +415,82 @@ int main(int argc, char *argv[])
     }
 
     //Create NetworkView
-    NetworkView tNetworkView;
-    tNetworkView.show();
+    // Create BrainView for visualization
+    BrainView *pBrainView = new BrainView();
+    BrainTreeModel *pModel = new BrainTreeModel();
+    pBrainView->setModel(pModel);
 
-    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::connectivityMetricChanged,
+    // Create ConnectivitySettingsView as standalone widget
+    QSharedPointer<ConnectivitySettingsView> pConnSettingsView = QSharedPointer<ConnectivitySettingsView>::create("EX_CONNECTIVITY");
+
+    QObject::connect(pConnSettingsView.data(), &ConnectivitySettingsView::connectivityMetricChanged,
                      pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onConnectivityMetricChanged);
 
-    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::numberTrialsChanged,
-                     //pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onNumberTrialsChanged);
-                     [&pConnectivitySettingsManager,&tNetworkView,iNumTrials] (int a) {
-                         tNetworkView.getConnectivitySettingsView()->setNumberTrials(qMin(iNumTrials,a));
+    QObject::connect(pConnSettingsView.data(), &ConnectivitySettingsView::numberTrialsChanged,
+                     [&pConnectivitySettingsManager,&pConnSettingsView,iNumTrials] (int a) {
+                         pConnSettingsView->setNumberTrials(qMin(iNumTrials,a));
                          pConnectivitySettingsManager.data()->onNumberTrialsChanged(qMin(iNumTrials,a));});
 
-
-    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::freqBandChanged,
+    QObject::connect(pConnSettingsView.data(), &ConnectivitySettingsView::freqBandChanged,
                      pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::onFreqBandChanged);
 
     QObject::connect(pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::newConnectivityResultAvailable,
-                     [&](const QString& a, const QString& b, const Network& c) {if(NetworkTreeItem* pNetworkTreeItem = tNetworkView.addData(a,b,c)) {
-                                                                                    pNetworkTreeItem->setThresholds(QVector3D(0.9,0.95,1.0));
-                                                                                }});
-
-    //QPointer<TfSettingsView> pTfSettingsView = new TfSettingsView();
-    QList<QWidget*> lWidgets;
-    /*lWidgets << pTfSettingsView;
-
-    QObject::connect(pTfSettingsView.data(), &TfSettingsView::numberTrialRowChanged,
-                     pConnectivitySettingsManager.data(), &ConnectivitySettingsManager::plotTimeCourses);*/
+                     [&](const QString& a, const QString& b, const Network& c) {
+                         pBrainView->loadNetwork(c, b);
+                         pBrainView->setNetworkThreshold(0.9);
+                     });
 
     //Read and show sensor helmets
     if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
         //Read and show sensor helmets
-        QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m_rt.fif");
-        MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-
-        if (SensorDataTreeItem* pMegSensorTreeItem = tNetworkView.getTreeModel()->addSensorData(parser.value(subjectOption),
-                                                                                                evoked.comment,
-                                                                                                evoked.data,
-                                                                                                t_sensorSurfaceVV[0],
-                                                                                                evoked.info,
-                                                                                                "MEG")) {
-                           pMegSensorTreeItem->setLoopState(true);
-                           pMegSensorTreeItem->setTimeInterval(17);
-                           pMegSensorTreeItem->setNumberAverages(1);
-                           pMegSensorTreeItem->setStreamingState(false);
-                           pMegSensorTreeItem->setThresholds(QVector3D(0.0f, 3e-12f*0.5f, 3e-12f));
-                           pMegSensorTreeItem->setColormapType("Jet");
-                           pMegSensorTreeItem->setSFreq(evoked.info.sfreq);
-        }
-
-        tNetworkView.getTreeModel()->addMegSensorInfo("Sensors",
-                                                      "VectorView",
-                                                      raw.info.chs,
-                                                      t_sensorSurfaceVV,
-                                                      raw.info.bads);
+        pBrainView->loadSensors(QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m_rt.fif");
     } else {
-        QPointer<MinimumNormSettingsView> pMinimumNormSettingsView = new MinimumNormSettingsView("EX_CONNECTIVITY", sSourceLocMethod);
-        lWidgets << pMinimumNormSettingsView;
+        // Add source estimate for source-level visualization
+        int nVertLh = t_clusteredFwd.src[0].nuse;
+        MNESourceEstimate stcLh, stcRh;
+        stcLh.data = sourceEstimateEvoked.data.topRows(nVertLh);
+        stcLh.vertices = sourceEstimateEvoked.vertices.head(nVertLh);
+        stcLh.tmin = sourceEstimateEvoked.tmin;
+        stcLh.tstep = sourceEstimateEvoked.tstep;
+        stcLh.times = sourceEstimateEvoked.times;
+        stcRh.data = sourceEstimateEvoked.data.bottomRows(sourceEstimateEvoked.data.rows() - nVertLh);
+        stcRh.vertices = sourceEstimateEvoked.vertices.tail(sourceEstimateEvoked.vertices.size() - nVertLh);
+        stcRh.tmin = sourceEstimateEvoked.tmin;
+        stcRh.tstep = sourceEstimateEvoked.tstep;
+        stcRh.times = sourceEstimateEvoked.times;
 
-        QObject::connect(pMinimumNormSettingsView.data(), &MinimumNormSettingsView::timePointChanged,
-                         [&](int a) {int aSamples = raw.info.sfreq * (float)a * 1.0e-03;
-                                     if(aSamples >= sourceEstimateEvoked.samples()-1) {
-                                        tNetworkView.getTreeModel()->addSourceData("sample",
-                                                                                   evoked.comment,
-                                                                                   sourceEstimateEvoked,
-                                                                                   t_clusteredFwd,
-                                                                                   tSurfSetInflated,
-                                                                                   tAnnotSet);
-                                     } else {
-                                        tNetworkView.getTreeModel()->addSourceData("sample",
-                                                                                   evoked.comment,
-                                                                                   sourceEstimateEvoked.reduce(aSamples,1),
-                                                                                   t_clusteredFwd,
-                                                                                   tSurfSetInflated,
-                                                                                   tAnnotSet);
-                                     }
-                                     });
+        QString tmpDir = QDir::tempPath();
+        QString lhStcPath = tmpDir + "/mnecpp_connectivity-lh.stc";
+        QString rhStcPath = tmpDir + "/mnecpp_connectivity-rh.stc";
+        QFile lhStcFile(lhStcPath);
+        stcLh.write(lhStcFile);
+        QFile rhStcFile(rhStcPath);
+        stcRh.write(rhStcFile);
 
-        //Add source loc data and init some visualization values
-        if(MneDataTreeItem* pRTDataItem = tNetworkView.getTreeModel()->addSourceData("sample",
-                                                                                     evoked.comment,
-                                                                                     sourceEstimateEvoked,
-                                                                                     t_clusteredFwd,
-                                                                                     tSurfSetInflated,
-                                                                                     tAnnotSet)) {
-            pRTDataItem->setLoopState(true);
-            pRTDataItem->setTimeInterval(17);
-            pRTDataItem->setNumberAverages(1);
-            pRTDataItem->setStreamingState(false);
-            pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
-            pRTDataItem->setVisualizationType("Interpolation based");
-            pRTDataItem->setColormapType("Jet");
-            pRTDataItem->setAlpha(0.75f);
+        // Add hemisphere surfaces
+        for (auto it = tSurfSetInflated.data().constBegin(); it != tSurfSetInflated.data().constEnd(); ++it) {
+            int hIdx = it.key();
+            QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
+            QString surfType = it.value().surf().isEmpty() ? "inflated" : it.value().surf();
+            pModel->addSurface("sample", hemi, surfType, it.value());
+            if (tAnnotSet.size() > hIdx)
+                pModel->addAnnotation("sample", hemi, tAnnotSet[hIdx]);
         }
 
-        QList<FsSurfaceTreeItem*> lHemis = tNetworkView.getTreeModel()->addSurfaceSet("sample",
-                                                                                      "MRI",
-                                                                                      tSurfSetInflated,
-                                                                                      tAnnotSet);
-
-        lHemis[0]->setAlpha(0.2f);
-        lHemis[1]->setAlpha(0.2f);
+        // Load source estimate and configure
+        QObject::connect(pBrainView, &BrainView::sourceEstimateLoaded, [&](int /*nTimePoints*/) {
+            pBrainView->setSourceColormap("Jet");
+            pBrainView->setSourceThresholds(0.0f, 0.5f, 10.0f);
+        });
+        pBrainView->loadSourceEstimate(lhStcPath, rhStcPath);
     }
 
-    tNetworkView.setQuickControlWidgets(lWidgets);
-    tNetworkView.getConnectivitySettingsView()->setNumberTrials(iNumTrials);
+    pConnSettingsView->setNumberTrials(iNumTrials);
     pConnectivitySettingsManager->onNumberTrialsChanged(iNumTrials);
-    pConnectivitySettingsManager->onFreqBandChanged(tNetworkView.getConnectivitySettingsView()->getLowerFreq(),tNetworkView.getConnectivitySettingsView()->getUpperFreq());
+    pConnectivitySettingsManager->onFreqBandChanged(pConnSettingsView->getLowerFreq(), pConnSettingsView->getUpperFreq());
+
+    pConnSettingsView->show();
+    pBrainView->show();
 
     return a.exec();
 }

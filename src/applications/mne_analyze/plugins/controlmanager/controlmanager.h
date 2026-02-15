@@ -64,11 +64,7 @@ namespace DISPLIB{
     class Control3DView;
 }
 
-#ifdef MNE_USE_DISP3D_LEGACY  // Disabled: old disp3D removed, pending migration to disp3D_rhi
-namespace DISP3DLIB {
-    class Data3DTreeModel;
-}
-#endif
+class BrainTreeModel;
 
 //=============================================================================================================
 // DEFINE NAMESPACE SURFERPLUGIN
@@ -172,15 +168,13 @@ private:
      */
     void onMakeScreenshot(const QString& imageType);
 
-    #ifdef MNE_USE_DISP3D_LEGACY  // Disabled: old disp3D removed, pending migration to disp3D_rhi
     //=========================================================================================================
     /**
      * Sets 3D model for the 3D controls
      *
      * @param[in] pModel   new 3D Model.
      */
-    void init3DGui(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel);
-    #endif
+    void init3DGui(QSharedPointer<BrainTreeModel> pModel);
 
     //=========================================================================================================
     /**

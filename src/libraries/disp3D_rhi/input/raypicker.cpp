@@ -37,6 +37,8 @@
 //=============================================================================================================
 
 #include "raypicker.h"
+#include "renderable/brainsurface.h"
+#include "renderable/dipoleobject.h"
 #include "model/items/abstracttreeitem.h"
 #include "model/items/digitizertreeitem.h"
 

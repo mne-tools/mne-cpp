@@ -120,7 +120,7 @@ namespace ANSHAREDLIB
         FID_PICKING_STATUS,         ///< [bool] event send whenever status of fiducial picking has changed
         NEW_FIDUCIAL_PICKED,        ///< [QVector3D] event send whenever a new fiducial was picked
         FIDUCIAL_CHANGED,           ///< [int] event send when fiducial was changed
-        SET_DATA3D_TREE_MODEL,      ///< [QSharedPointer<DISP3DLIB::Data3DTreeModel>] send when a new 3D Model is set
+        SET_DATA3D_TREE_MODEL,      ///< [QSharedPointer<BrainTreeModel>] send when a new 3D Model is set
         VIEW3D_SETTINGS_CHANGED,    ///< [ANSHAREDLIB::View3DParameters] send to trigger view 3D settings update
         MODEL_REMOVED               ///< [QSharedPointer<ANSHAREDLIB::AbstractModel>>] send to alert plugins when model is being removed
     };

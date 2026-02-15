@@ -40,9 +40,7 @@
 #include "displaymanager.h"
 
 #include <scDisp/realtimemultisamplearraywidget.h>
-#ifdef MNE_USE_DISP3D_LEGACY  // Disabled: old disp3D removed, pending migration to disp3D_rhi
 #include <scDisp/realtime3dwidget.h>
-#endif
 #include <scDisp/realtimeevokedsetwidget.h>
 #include <scDisp/realtimecovwidget.h>
 #include <scDisp/realtimespectrumwidget.h>
@@ -109,7 +107,6 @@ QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList &outputConnect
 
             vboxLayout->addWidget(rtmsaWidget);
             rtmsaWidget->init();
-#ifdef MNE_USE_DISP3D_LEGACY  // Disabled: old disp3D removed, pending migration to disp3D_rhi
         } else if (pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >()) {
             if(!m_pRealTime3DWidget) {
                 m_pRealTime3DWidget = new RealTime3DWidget(newDisp);
@@ -149,7 +146,6 @@ QWidget* DisplayManager::show(AbstractPlugin::OutputConnectorList &outputConnect
             // only holds one measurment and overwrites it immediatley after it emmited notify
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     m_pRealTime3DWidget.data(), &RealTime3DWidget::update, Qt::BlockingQueuedConnection);
-#endif
         } else if (pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvokedSet> >()) {
             RealTimeEvokedSetWidget* rtesWidget = new RealTimeEvokedSetWidget(pT, newDisp);
 

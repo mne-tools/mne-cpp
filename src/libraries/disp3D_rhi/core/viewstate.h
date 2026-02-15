@@ -41,14 +41,14 @@
 
 #include "../disp3D_rhi_global.h"
 
-#include "view/brainrenderer.h"
-#include "renderable/brainsurface.h"
+#include "rendertypes.h"
 
 #include <QString>
 #include <QMap>
 #include <QQuaternion>
 #include <QVector2D>
 #include <QVariant>
+#include <QColor>
 
 #include <algorithm>
 #include <memory>
@@ -58,6 +58,7 @@
 //=============================================================================================================
 
 class QSettings;
+class BrainSurface;
 
 //=============================================================================================================
 /**
@@ -143,9 +144,9 @@ struct SubView
 {
     // ── Per-view render configuration ──────────────────────────────────
     QString                         surfaceType      = "pial";
-    BrainRenderer::ShaderMode       brainShader      = BrainRenderer::Standard;
-    BrainRenderer::ShaderMode       bemShader        = BrainRenderer::Standard;
-    BrainSurface::VisualizationMode overlayMode      = BrainSurface::ModeSurface;
+    ShaderMode                      brainShader      = Standard;
+    ShaderMode                      bemShader        = Standard;
+    VisualizationMode               overlayMode      = ModeSurface;
     ViewVisibilityProfile           visibility;
 
     // ── Per-view camera state ─────────────────────────────────────────
@@ -253,16 +254,16 @@ bool multiViewPresetIsPerspective(int preset);
 int normalizedVisualizationTarget(int target, int maxIndex = 3);
 
 /** Convert a shader name ("Standard", "Holographic", "Anatomical") to enum. */
-BrainRenderer::ShaderMode shaderModeFromName(const QString &name);
+ShaderMode shaderModeFromName(const QString &name);
 
 /** Convert a ShaderMode enum to display string. */
-QString shaderModeName(BrainRenderer::ShaderMode mode);
+QString shaderModeName(ShaderMode mode);
 
 /** Convert a visualization mode name to enum. */
-BrainSurface::VisualizationMode visualizationModeFromName(const QString &name);
+VisualizationMode visualizationModeFromName(const QString &name);
 
 /** Convert a VisualizationMode enum to display string. */
-QString visualizationModeName(BrainSurface::VisualizationMode mode);
+QString visualizationModeName(VisualizationMode mode);
 
 //=============================================================================================================
 // FREE FUNCTIONS — colormap

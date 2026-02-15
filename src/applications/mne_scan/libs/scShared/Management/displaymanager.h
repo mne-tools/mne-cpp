@@ -61,11 +61,9 @@
 class QVBoxLayout;
 class QHBoxLayout;
 
-#ifdef MNE_USE_DISP3D_LEGACY  // Disabled: old disp3D removed, pending migration to disp3D_rhi
 namespace SCDISPLIB {
     class RealTime3DWidget;
 }
-#endif
 
 //=============================================================================================================
 // DEFINE NAMESPACE SCSHAREDLIB
@@ -123,9 +121,7 @@ public:
 private:
     QList<QMetaObject::Connection>              m_pListWidgetConnections;       /**< all widget connections.*/
 
-#ifdef MNE_USE_DISP3D_LEGACY  // Disabled: old disp3D removed, pending migration to disp3D_rhi
     QPointer<SCDISPLIB::RealTime3DWidget>       m_pRealTime3DWidget;
-#endif
 };
 } // NAMESPACE
 

@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "meshfactory.h"
+#include "renderable/brainsurface.h"
 #include <Eigen/Geometry>
 #include <QMap>
 #include <QPair>

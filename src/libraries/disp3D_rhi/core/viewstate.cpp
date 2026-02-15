@@ -38,6 +38,9 @@
 
 #include "viewstate.h"
 
+#include "renderable/brainsurface.h"
+#include "view/brainrenderer.h"
+
 #include <QSettings>
 #include <cmath>
 #include <limits>
@@ -289,10 +292,10 @@ bool multiViewPresetIsPerspective(int preset)
 
 SubView SubView::defaultForIndex(int index)
 {
-    static constexpr BrainRenderer::ShaderMode kShaderCycle[] = {
-        BrainRenderer::Anatomical,
-        BrainRenderer::Standard,
-        BrainRenderer::Holographic,
+    static constexpr ShaderMode kShaderCycle[] = {
+        Anatomical,
+        Standard,
+        Holographic,
     };
     static constexpr int kNumShaders = 3;
     static constexpr int kNumPresets = 7;  // Top..Right
@@ -315,39 +318,39 @@ int normalizedVisualizationTarget(int target, int maxIndex)
 
 //=============================================================================================================
 
-BrainRenderer::ShaderMode shaderModeFromName(const QString &name)
+ShaderMode shaderModeFromName(const QString &name)
 {
-    if (name == "Holographic") return BrainRenderer::Holographic;
-    if (name == "Anatomical")  return BrainRenderer::Anatomical;
-    return BrainRenderer::Standard;
+    if (name == "Holographic") return Holographic;
+    if (name == "Anatomical")  return Anatomical;
+    return Standard;
 }
 
 //=============================================================================================================
 
-QString shaderModeName(BrainRenderer::ShaderMode mode)
+QString shaderModeName(ShaderMode mode)
 {
-    if (mode == BrainRenderer::Holographic) return QStringLiteral("Holographic");
-    if (mode == BrainRenderer::Anatomical)  return QStringLiteral("Anatomical");
+    if (mode == Holographic) return QStringLiteral("Holographic");
+    if (mode == Anatomical)  return QStringLiteral("Anatomical");
     return QStringLiteral("Standard");
 }
 
 //=============================================================================================================
 
-BrainSurface::VisualizationMode visualizationModeFromName(const QString &name)
+VisualizationMode visualizationModeFromName(const QString &name)
 {
-    if (name == "Annotation")      return BrainSurface::ModeAnnotation;
-    if (name == "Scientific")      return BrainSurface::ModeScientific;
-    if (name == "Source Estimate")  return BrainSurface::ModeSourceEstimate;
-    return BrainSurface::ModeSurface;
+    if (name == "Annotation")      return ModeAnnotation;
+    if (name == "Scientific")      return ModeScientific;
+    if (name == "Source Estimate")  return ModeSourceEstimate;
+    return ModeSurface;
 }
 
 //=============================================================================================================
 
-QString visualizationModeName(BrainSurface::VisualizationMode mode)
+QString visualizationModeName(VisualizationMode mode)
 {
-    if (mode == BrainSurface::ModeAnnotation)     return QStringLiteral("Annotation");
-    if (mode == BrainSurface::ModeScientific)     return QStringLiteral("Scientific");
-    if (mode == BrainSurface::ModeSourceEstimate) return QStringLiteral("Source Estimate");
+    if (mode == ModeAnnotation)     return QStringLiteral("Annotation");
+    if (mode == ModeScientific)     return QStringLiteral("Scientific");
+    if (mode == ModeSourceEstimate) return QStringLiteral("Source Estimate");
     return QStringLiteral("Surface");
 }
 

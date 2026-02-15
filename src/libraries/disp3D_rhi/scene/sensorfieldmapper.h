@@ -42,7 +42,6 @@
 #include "../disp3D_rhi_global.h"
 
 #include "core/viewstate.h"
-#include "renderable/brainsurface.h"
 
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_coord_trans.h>
@@ -53,6 +52,8 @@
 #include <QSharedPointer>
 #include <QString>
 #include <memory>
+
+class BrainSurface;
 
 //=============================================================================================================
 /**

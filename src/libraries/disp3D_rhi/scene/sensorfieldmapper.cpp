@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "sensorfieldmapper.h"
+#include "renderable/brainsurface.h"
 #include "helpers/field_map.h"
 
 #include <fiff/fiff_ch_info.h>

@@ -38,17 +38,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/viewers/networkview.h>
-#include <disp3D/engine/model/data3Dtreemodel.h>
+#include <disp3D_rhi/view/brainview.h>
+#include <disp3D_rhi/model/braintreemodel.h>
+#include <disp3D_rhi/model/items/networktreeitem.h>
 
 #include <connectivity/connectivity.h>
 #include <connectivity/connectivitysettings.h>
 #include <connectivity/network/network.h>
 #include <connectivity/metrics/abstractmetric.h>
-
-#include <disp3D/engine/model/items/network/networktreeitem.h>
-#include <disp3D/engine/model/items/freesurfer/fssurfacetreeitem.h>
-#include <disp3D/engine/model/items/sourcedata/mnedatatreeitem.h>
 
 #include <fiff/fiff_raw_data.h>
 
@@ -75,6 +72,7 @@
 #include <QMainWindow>
 #include <QCommandLineParser>
 #include <QDebug>
+#include <QDir>
 #include <QFile>
 #include <QObject>
 
@@ -82,7 +80,6 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISP3DLIB;
 using namespace DISPLIB;
 using namespace INVERSELIB;
 using namespace Eigen;
@@ -387,53 +384,74 @@ int main(int argc, char *argv[])
         lNetworks[j].setVisualizationInfo(visInfo);
     }
 
-    //Create NetworkView
-    NetworkView tNetworkView;
-    tNetworkView.show();
-    QList<NetworkTreeItem*> lNetworkTreeItems = tNetworkView.addData("sample",
-                                                                     evoked.comment,
-                                                                     lNetworks);
+    // Create BrainView for visualization
+    BrainView *pBrainView = new BrainView();
+    BrainTreeModel *pModel = new BrainTreeModel();
+    pBrainView->setModel(pModel);
 
-    for(int j = 0; j < lNetworkTreeItems.size(); ++j) {
-        lNetworkTreeItems.at(j)->setThresholds(QVector3D(0.9,0.95,1.0));
+    // Load all networks
+    for(int j = 0; j < lNetworks.size(); ++j) {
+        pBrainView->loadNetwork(lNetworks[j], lNetworks[j].getConnectivityMethod());
     }
+    pBrainView->setNetworkThreshold(0.9);
 
-    tNetworkView.getConnectivitySettingsView()->setNumberTrials(iNumTrials);
-    tNetworkView.getConnectivitySettingsView().data()->setFrequencyBand(dFreqMin,dFreqMax);
+    // Create ConnectivitySettingsView as standalone widget
+    QSharedPointer<ConnectivitySettingsView> pConnSettingsView = QSharedPointer<ConnectivitySettingsView>::create("EX_CONNECTIVITY_COMP");
+    pConnSettingsView->setNumberTrials(iNumTrials);
+    pConnSettingsView->setFrequencyBand(dFreqMin, dFreqMax);
 
     //Read and show sensor helmets
     if(!bDoSourceLoc && sChType.contains("meg", Qt::CaseInsensitive)) {
-        QFile t_filesensorSurfaceVV(QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m_rt.fif");
-        MNEBem t_sensorSurfaceVV(t_filesensorSurfaceVV);
-        tNetworkView.getTreeModel()->addMegSensorInfo("Sensors",
-                                                      "VectorView",
-                                                      raw.info.chs,
-                                                      t_sensorSurfaceVV,
-                                                      raw.info.bads);
+        pBrainView->loadSensors(QCoreApplication::applicationDirPath() + "/../resources/general/sensorSurfaces/306m_rt.fif");
     } else {
-        //Add source loc data and init some visualization values
-        if(MneDataTreeItem* pRTDataItem = tNetworkView.getTreeModel()->addSourceData("sample",
-                                                                                     evoked.comment,
-                                                                                     sourceEstimateEvoked,
-                                                                                     t_clusteredFwd,
-                                                                                     tSurfSetInflated,
-                                                                                     tAnnotSet)) {
-            pRTDataItem->setLoopState(true);
-            pRTDataItem->setTimeInterval(17);
-            pRTDataItem->setNumberAverages(1);
-            pRTDataItem->setStreamingState(false);
-            pRTDataItem->setThresholds(QVector3D(0.0f,0.5f,10.0f));
-            pRTDataItem->setVisualizationType("Interpolation based");
-            pRTDataItem->setColormapType("Jet");
-            pRTDataItem->setAlpha(0.25f);
+        // Add source estimate for source-level visualization
+        int nVertLh = t_clusteredFwd.src[0].nuse;
+        MNESourceEstimate stcLh, stcRh;
+        stcLh.data = sourceEstimateEvoked.data.topRows(nVertLh);
+        stcLh.vertices = sourceEstimateEvoked.vertices.head(nVertLh);
+        stcLh.tmin = sourceEstimateEvoked.tmin;
+        stcLh.tstep = sourceEstimateEvoked.tstep;
+        stcLh.times = sourceEstimateEvoked.times;
+        stcRh.data = sourceEstimateEvoked.data.bottomRows(sourceEstimateEvoked.data.rows() - nVertLh);
+        stcRh.vertices = sourceEstimateEvoked.vertices.tail(sourceEstimateEvoked.vertices.size() - nVertLh);
+        stcRh.tmin = sourceEstimateEvoked.tmin;
+        stcRh.tstep = sourceEstimateEvoked.tstep;
+        stcRh.times = sourceEstimateEvoked.times;
+
+        QString tmpDir = QDir::tempPath();
+        QString lhStcPath = tmpDir + "/mnecpp_connectivity_comparison-lh.stc";
+        QString rhStcPath = tmpDir + "/mnecpp_connectivity_comparison-rh.stc";
+        QFile lhStcFile(lhStcPath);
+        stcLh.write(lhStcFile);
+        QFile rhStcFile(rhStcPath);
+        stcRh.write(rhStcFile);
+
+        // Add hemisphere surfaces
+        for (auto it = tSurfSetInflated.data().constBegin(); it != tSurfSetInflated.data().constEnd(); ++it) {
+            int hIdx = it.key();
+            QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
+            QString surfType = it.value().surf().isEmpty() ? "inflated" : it.value().surf();
+            pModel->addSurface("sample", hemi, surfType, it.value());
+            if (tAnnotSet.size() > hIdx)
+                pModel->addAnnotation("sample", hemi, tAnnotSet[hIdx]);
         }
+
+        // Load source estimate and configure
+        QObject::connect(pBrainView, &BrainView::sourceEstimateLoaded, [&](int /*nTimePoints*/) {
+            pBrainView->setSourceColormap("Jet");
+            pBrainView->setSourceThresholds(0.0f, 0.5f, 10.0f);
+        });
+        pBrainView->loadSourceEstimate(lhStcPath, rhStcPath);
     }
 
-    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::numberTrialsChanged,
-                     [&tNetworkView,iNumTrials] () {tNetworkView.getConnectivitySettingsView().data()->setNumberTrials(iNumTrials);});
+    QObject::connect(pConnSettingsView.data(), &ConnectivitySettingsView::numberTrialsChanged,
+                     [&pConnSettingsView,iNumTrials] () {pConnSettingsView->setNumberTrials(iNumTrials);});
 
-    QObject::connect(tNetworkView.getConnectivitySettingsView().data(), &ConnectivitySettingsView::freqBandChanged,
-                     [&tNetworkView,dFreqMin,dFreqMax] () {tNetworkView.getConnectivitySettingsView().data()->setFrequencyBand(dFreqMin,dFreqMax);});
+    QObject::connect(pConnSettingsView.data(), &ConnectivitySettingsView::freqBandChanged,
+                     [&pConnSettingsView,dFreqMin,dFreqMax] () {pConnSettingsView->setFrequencyBand(dFreqMin,dFreqMax);});
+
+    pConnSettingsView->show();
+    pBrainView->show();
 
     return a.exec();
 }

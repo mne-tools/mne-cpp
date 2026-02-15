@@ -41,6 +41,8 @@
 
 #include "../disp3D_rhi_global.h"
 
+#include "../core/rendertypes.h"
+
 #include <QVector>
 #include <QVector3D>
 #include <QColor>
@@ -85,12 +87,13 @@ public:
      */
     ~BrainSurface();
 
-    enum VisualizationMode {
-        ModeSurface,
-        ModeAnnotation,
-        ModeScientific, // Curvature
-        ModeSourceEstimate // Source estimate overlay
-    };
+    // VisualizationMode is defined in core/rendertypes.h for lightweight inclusion.
+    // These aliases preserve backward compatibility.
+    using VisualizationMode = ::VisualizationMode;
+    static constexpr VisualizationMode ModeSurface        = ::ModeSurface;
+    static constexpr VisualizationMode ModeAnnotation     = ::ModeAnnotation;
+    static constexpr VisualizationMode ModeScientific     = ::ModeScientific;
+    static constexpr VisualizationMode ModeSourceEstimate = ::ModeSourceEstimate;
 
     enum TissueType {
         TissueUnknown = 0,

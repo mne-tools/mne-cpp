@@ -25,7 +25,7 @@ set(SOURCES
     realtimeevokedsetwidget.cpp
     realtimecovwidget.cpp
     realtimespectrumwidget.cpp
-    # realtime3dwidget.cpp  # Disabled: depends on old Qt3D-based disp3D, pending migration to disp3D_rhi
+    realtime3dwidget.cpp
 )
 
 set(HEADERS
@@ -35,7 +35,7 @@ set(HEADERS
     realtimeevokedsetwidget.h
     realtimecovwidget.h
     realtimespectrumwidget.h
-    # realtime3dwidget.h  # Disabled: depends on old Qt3D-based disp3D, pending migration to disp3D_rhi
+    realtime3dwidget.h
 )
 
 # set(FILE_TO_UPDATE scDisp_global.cpp)

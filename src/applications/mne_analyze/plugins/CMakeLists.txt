@@ -32,7 +32,7 @@ add_subdirectory(rawdataviewer)
 add_subdirectory(sourcelocalization)
 
 if(NOT WASM)
-  # add_subdirectory(view3d)  # Disabled: depends on old Qt3D-based disp3D, pending migration to disp3D_rhi
+  add_subdirectory(view3d)
 endif()
 
 # add_subdirectory(sampleplugin)

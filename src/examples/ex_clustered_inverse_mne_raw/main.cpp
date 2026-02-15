@@ -55,10 +55,8 @@
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <disp3D/viewers/abstractview.h>
-#include <disp3D/engine/view/view3D.h>
-#include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/model/items/sourcedata/mnedatatreeitem.h>
+#include <disp3D_rhi/view/brainview.h>
+#include <disp3D_rhi/model/braintreemodel.h>
 
 #include <utils/mnemath.h>
 #include <utils/generics/applicationlogger.h>
@@ -73,6 +71,7 @@
 #include <QSet>
 #include <QElapsedTimer>
 #include <QCommandLineParser>
+#include <QDir>
 #include <QVector3D>
 #include <QRandomGenerator>
 
@@ -84,7 +83,6 @@ using namespace MNELIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
-using namespace DISP3DLIB;
 using namespace UTILSLIB;
 using namespace Eigen;
 
@@ -642,33 +640,57 @@ int main(int argc, char *argv[])
 //    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
 //    sourceEstimate = sourceEstimate.reduce(sample, 1);
 
-    AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
-    Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
+    // Write source estimate to temp files for visualization
+    int nVertLh = t_clusteredFwd.src[0].nuse;
+    MNESourceEstimate stcLh, stcRh;
+    stcLh.data = sourceEstimate.data.topRows(nVertLh);
+    stcLh.vertices = sourceEstimate.vertices.head(nVertLh);
+    stcLh.tmin = sourceEstimate.tmin;
+    stcLh.tstep = sourceEstimate.tstep;
+    stcLh.times = sourceEstimate.times;
+    stcRh.data = sourceEstimate.data.bottomRows(sourceEstimate.data.rows() - nVertLh);
+    stcRh.vertices = sourceEstimate.vertices.tail(sourceEstimate.vertices.size() - nVertLh);
+    stcRh.tmin = sourceEstimate.tmin;
+    stcRh.tstep = sourceEstimate.tstep;
+    stcRh.times = sourceEstimate.times;
 
-    p3DDataModel->addSurfaceSet(parser.value(subjectOption), "MRI", t_surfSet, t_annotationSet);
+    QString tmpDir = QDir::tempPath();
+    QString lhStcPath = tmpDir + "/mnecpp_ex_clustered_inverse_mne_raw-lh.stc";
+    QString rhStcPath = tmpDir + "/mnecpp_ex_clustered_inverse_mne_raw-rh.stc";
+    QFile lhStcFile(lhStcPath);
+    stcLh.write(lhStcFile);
+    QFile rhStcFile(rhStcPath);
+    stcRh.write(rhStcFile);
 
-    if(MneDataTreeItem* pRTDataItem = p3DDataModel->addSourceData(parser.value(subjectOption),
-                                                                  evoked.comment,
-                                                                  sourceEstimate,
-                                                                  t_clusteredFwd,
-                                                                  t_surfSet,
-                                                                  t_annotationSet)) {
-        pRTDataItem->setLoopState(true);
-        pRTDataItem->setTimeInterval(17);
-        pRTDataItem->setNumberAverages(1);
-        pRTDataItem->setStreamingState(true);
-        pRTDataItem->setThresholds(QVector3D(0.0,0.5,20.0));
-        pRTDataItem->setVisualizationType("Interpolation based");
-        pRTDataItem->setColormapType("Hot");
+    BrainView *pBrainView = new BrainView();
+    BrainTreeModel *pModel = new BrainTreeModel();
+    pBrainView->setModel(pModel);
+
+    for (auto it = t_surfSet.data().constBegin(); it != t_surfSet.data().constEnd(); ++it) {
+        int hIdx = it.key();
+        QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
+        QString surfType = it.value().surf().isEmpty() ? "inflated" : it.value().surf();
+        pModel->addSurface(parser.value(subjectOption), hemi, surfType, it.value());
+        if (t_annotationSet.size() > hIdx)
+            pModel->addAnnotation(parser.value(subjectOption), hemi, t_annotationSet[hIdx]);
     }
 
-    p3DAbstractView->show();
+    QObject::connect(pBrainView, &BrainView::sourceEstimateLoaded, [&](int /*nTimePoints*/) {
+        pBrainView->setSourceColormap("Hot");
+        pBrainView->setSourceThresholds(0.0f, 0.5f, 20.0f);
+        pBrainView->setRealtimeLooping(true);
+        pBrainView->setRealtimeInterval(17);
+        pBrainView->startRealtimeStreaming();
+    });
+    pBrainView->loadSourceEstimate(lhStcPath, rhStcPath);
 
     if(!t_sFileNameStc.isEmpty())
     {
         QFile t_fileClusteredStc(t_sFileNameStc);
         sourceEstimate.write(t_fileClusteredStc);
     }
+
+    pBrainView->show();
 
     return a.exec();
 }

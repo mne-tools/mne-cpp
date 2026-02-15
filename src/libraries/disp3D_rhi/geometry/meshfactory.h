@@ -42,12 +42,13 @@
 
 #include "../disp3D_rhi_global.h"
 
-#include "renderable/brainsurface.h"
-
 #include <QVector3D>
 #include <QMatrix4x4>
 #include <QColor>
+#include <Eigen/Core>
 #include <memory>
+
+class BrainSurface;
 
 //=============================================================================================================
 /**

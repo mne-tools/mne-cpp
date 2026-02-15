@@ -54,8 +54,8 @@
 //=============================================================================================================
 
 #include <QAction>
-#include <Qt3DCore/QTransform>
 #include <QPointer>
+#include <QMatrix4x4>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -65,14 +65,11 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace DISP3DLIB {
-    class NetworkTreeItem;
-    class View3D;
-    class Data3DTreeModel;
-    class MneDataTreeItem;
-    class BemTreeItem;
-    class DigitizerSetTreeItem;
-}
+class BrainView;
+class BrainTreeModel;
+class NetworkTreeItem;
+class BemTreeItem;
+class DigitizerSetTreeItem;
 
 namespace SCMEASLIB {
     class RealTimeConnectivityEstimate;
@@ -207,16 +204,16 @@ protected:
     FSLIB::AnnotationSet                                        m_annotationSet;        /**< The current annotation set. */
     FSLIB::SurfaceSet                                           m_surfSet;              /**< The current surface set. */
 
-    Qt3DCore::QTransform                                        m_tAlignment;           /**< Transformation matrix alignment fiducials/tracked in head space. */
+    QMatrix4x4                                                  m_tAlignment;           /**< Transformation matrix alignment fiducials/tracked in head space. */
     FIFFLIB::FiffCoordTrans                                     m_mriHeadTrans;         /**< The mri to head transformation. */
 
-    QSharedPointer<DISP3DLIB::Data3DTreeModel>                  m_pData3DModel;         /**< The Disp3D model. */
+    QSharedPointer<BrainTreeModel>                              m_pData3DModel;         /**< The Disp3D model. */
 
-    QPointer<DISP3DLIB::DigitizerSetTreeItem>                   m_pTrackedDigitizer;    /**< The 3D item pointing to the tracked digitizers. */
-    QPointer<DISP3DLIB::View3D>                                 m_p3DView;              /**< The Disp3D view. */
-    QPointer<DISP3DLIB::NetworkTreeItem>                        m_pRtConnectivityItem;  /**< The Disp3D real time item. */
-    QPointer<DISP3DLIB::MneDataTreeItem>                        m_pRtMNEItem;           /**< The Disp3D real time items. */
-    QPointer<DISP3DLIB::BemTreeItem>                            m_pBemHeadAvr;          /**< TThe fsaverage BEM head model. */
+    DigitizerSetTreeItem*                                    m_pTrackedDigitizer;    /**< The 3D item pointing to the tracked digitizers. */
+    QPointer<BrainView>                                         m_p3DView;              /**< The Disp3D view. */
+    NetworkTreeItem*                                            m_pRtConnectivityItem;  /**< The Disp3D real time item. */
+    bool                                                        m_bRtSourceActive;      /**< Whether realtime source is active. */
+    BemTreeItem*                                                m_pBemHeadAvr;          /**< The fsaverage BEM head model. */
     QPointer<QAction>                                           m_pActionQuickControl;  /**< Show quick control widget. */
 };
 } // NAMESPACE

@@ -38,11 +38,10 @@
 
 #include <iostream>
 
-#include <disp3D/viewers/abstractview.h>
-#include <disp3D/engine/model/items/digitizer/digitizersettreeitem.h>
-#include <disp3D/engine/model/data3Dtreemodel.h>
-#include <disp3D/engine/model/items/bem/bemsurfacetreeitem.h>
-#include <disp3D/engine/model/items/bem/bemtreeitem.h>
+#include <disp3D_rhi/view/brainview.h>
+#include <disp3D_rhi/model/braintreemodel.h>
+#include <disp3D_rhi/model/items/digitizersettreeitem.h>
+#include <disp3D_rhi/model/items/bemtreeitem.h>
 
 #include "fiff/fiff_dig_point_set.h"
 #include "fiff/fiff_dig_point.h"
@@ -77,7 +76,6 @@
 using namespace Eigen;
 using namespace UTILSLIB;
 using namespace FIFFLIB;
-using namespace DISP3DLIB;
 using namespace MNELIB;
 
 //=============================================================================================================
@@ -224,21 +222,18 @@ int main(int argc, char *argv[])
     qInfo() << "transHeadMriRef:";
     transHeadMriRef.print();
 
-    AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
-    Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
-    DigitizerSetTreeItem* pDigSrcSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Fiducials Transformed", digSetSrc);
-    DigitizerSetTreeItem* pDigHspSetTreeItem = p3DDataModel->addDigitizerData("Sample", "Digitizer", digSetHsp);
-    pDigSrcSetTreeItem->setTransform(transHeadMri,true);
+    BrainView *pBrainView = new BrainView();
+    BrainTreeModel *pModel = new BrainTreeModel();
+    pBrainView->setModel(pModel);
+    pModel->addDigitizerData(digSetSrc.getList());
+    pModel->addDigitizerData(digSetHsp.getList());
 
-    BemTreeItem* pBemItem = p3DDataModel->addBemData("Sample", "Head", bemHead);
-    QList<QStandardItem*> itemList = pBemItem->findChildren(Data3DTreeModelItemTypes::BemSurfaceItem);
-    for(int j = 0; j < itemList.size(); ++j) {
-        if(BemSurfaceTreeItem* pBemItem = dynamic_cast<BemSurfaceTreeItem*>(itemList.at(j))) {
-            pBemItem->setTransform(transHeadMri,true);
-        }
+    // Add BEM surfaces
+    for (int i = 0; i < bemHead.size(); ++i) {
+        pModel->addBemSurface("Sample", "Head", bemHead[i]);
     }
 
-    p3DAbstractView->show();
+    pBrainView->show();
 
     return a.exec();
 }

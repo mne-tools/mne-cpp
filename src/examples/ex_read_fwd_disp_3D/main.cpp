@@ -37,9 +37,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp3D/viewers/abstractview.h>
-#include <disp3D/engine/model/data3Dtreemodel.h>
+#include <disp3D_rhi/view/brainview.h>
+#include <disp3D_rhi/model/braintreemodel.h>
 
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
 #include <mne/mne_forwardsolution.h>
 #include <utils/generics/applicationlogger.h>
 
@@ -56,7 +58,6 @@
 //=============================================================================================================
 
 using namespace MNELIB;
-using namespace DISP3DLIB;
 using namespace MNELIB;
 using namespace UTILSLIB;
 using namespace FSLIB;
@@ -108,21 +109,28 @@ int main(int argc, char *argv[])
     QFile t_File(parser.value(fwdFileOption));
     MNEForwardSolution t_forwardSolution(t_File);
 
-    AbstractView::SPtr p3DAbstractView = AbstractView::SPtr(new AbstractView());
-    Data3DTreeModel::SPtr p3DDataModel = p3DAbstractView->getTreeModel();
+    BrainView *pBrainView = new BrainView();
+    BrainTreeModel *pModel = new BrainTreeModel();
+    pBrainView->setModel(pModel);
 
-//    //Option 1 - Visualize full source space
-//    p3DDataModel->addForwardSolution(parser.value(subjectOption), "FullForwardSolution", t_forwardSolution);
+    // Load surfaces from subject directory
+    SurfaceSet t_surfSet(parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(surfOption), parser.value(subjectPathOption));
+    AnnotationSet t_annotationSet(parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
 
-    //Option 2 - Visualize clustered source space
-    AnnotationSet t_annotationSet (parser.value(subjectOption), parser.value(hemiOption).toInt(), parser.value(annotOption), parser.value(subjectPathOption));
+    for (auto it = t_surfSet.data().constBegin(); it != t_surfSet.data().constEnd(); ++it) {
+        int hIdx = it.key();
+        QString hemi = (it.value().hemi() == 0) ? "lh" : "rh";
+        QString surfType = it.value().surf().isEmpty() ? "inflated" : it.value().surf();
+        pModel->addSurface(parser.value(subjectOption), hemi, surfType, it.value());
+        if (t_annotationSet.size() > hIdx)
+            pModel->addAnnotation(parser.value(subjectOption), hemi, t_annotationSet[hIdx]);
+    }
 
-    MNEForwardSolution t_clusteredFwd = t_forwardSolution.cluster_forward_solution(t_annotationSet, 40);
-    p3DDataModel->addForwardSolution(parser.value(subjectOption), "ClusteredForwardSolution", t_clusteredFwd);
-    p3DDataModel->addForwardSolution(parser.value(subjectOption), "ForwardSolution", t_forwardSolution);
+    // Load source space from forward solution file for visualization
+    pBrainView->loadSourceSpace(parser.value(fwdFileOption));
 
     //Visualize result in 3D
-    p3DAbstractView->show();
+    pBrainView->show();
 
     return a.exec();
 }

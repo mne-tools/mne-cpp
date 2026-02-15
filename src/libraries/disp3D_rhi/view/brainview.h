@@ -43,17 +43,13 @@
 
 #include "../disp3D_rhi_global.h"
 
-#include "brainrenderer.h"
+#include "../core/rendertypes.h"
 #include "multiviewlayout.h"
 #include "core/viewstate.h"
 #include "input/cameracontroller.h"
 #include "input/raypicker.h"
 #include "scene/sensorfieldmapper.h"
 #include "geometry/meshfactory.h"
-#include "renderable/brainsurface.h"
-#include "renderable/dipoleobject.h"
-#include "renderable/networkobject.h"
-#include "renderable/sourceestimateoverlay.h"
 #include "model/braintreemodel.h"
 #include "model/items/surfacetreeitem.h"
 
@@ -80,6 +76,11 @@ class StcLoadingWorker;
 class QFrame;
 class RtSourceDataController;
 class RtSensorDataController;
+class BrainRenderer;
+class BrainSurface;
+class DipoleObject;
+class NetworkObject;
+class SourceEstimateOverlay;
 
 //=============================================================================================================
 /**
@@ -892,9 +893,9 @@ private:
     int m_visualizationEditTarget = -1;             /**< Active pane for UI edits (-1 = single, 0..N-1 = multi). */
 
     // ── Active (runtime) copies — kept in sync with selected SubView ──
-    BrainRenderer::ShaderMode m_brainShaderMode = BrainRenderer::Standard;      /**< Current brain shader mode. */
-    BrainRenderer::ShaderMode m_bemShaderMode = BrainRenderer::Standard;        /**< Current BEM shader mode. */
-    BrainSurface::VisualizationMode m_currentVisMode = BrainSurface::ModeSurface; /**< Current overlay mode. */
+    ShaderMode m_brainShaderMode = Standard;      /**< Current brain shader mode. */
+    ShaderMode m_bemShaderMode = Standard;        /**< Current BEM shader mode. */
+    VisualizationMode m_currentVisMode = ModeSurface; /**< Current overlay mode. */
     bool m_lightingEnabled = true;                  /**< Whether per-fragment lighting is active. */
 
     // ── Extracted components ───────────────────────────────────────────

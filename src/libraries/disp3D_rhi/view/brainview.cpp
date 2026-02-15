@@ -40,6 +40,11 @@
 
 
 #include "brainview.h"
+#include "brainrenderer.h"
+#include "renderable/brainsurface.h"
+#include "renderable/dipoleobject.h"
+#include "renderable/networkobject.h"
+#include "renderable/sourceestimateoverlay.h"
 #include "core/surfacekeys.h"
 #include "core/dataloader.h"
 #include "model/items/bemtreeitem.h"
