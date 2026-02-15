@@ -37,8 +37,8 @@
 //=============================================================================================================
 
 #include "mainwindow.h"
-#include "../view/brainview.h"
-#include "../model/braintreemodel.h"
+#include <disp3D_rhi/view/brainview.h>
+#include <disp3D_rhi/model/braintreemodel.h>
 
 #include <fs/surface.h>
 #include <fs/surfaceset.h>

@@ -25,6 +25,7 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 set(MNE_LIBS_REQUIRED
     mne_disp
+    mne_disp3D_rhi
     mne_fiff
     mne_utils
 )
@@ -33,17 +34,6 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
     eigen
-)
-
-# Include the ex_brain_view source directory for worker headers
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/examples/ex_brain_view
-)
-
-# Add the worker source files directly (they are part of ex_brain_view, not a library)
-target_sources(${PROJECT_NAME} PRIVATE
-    ${CMAKE_SOURCE_DIR}/examples/ex_brain_view/workers/rtsensordataworker.cpp
-    ${CMAKE_SOURCE_DIR}/examples/ex_brain_view/workers/rtsensordatacontroller.cpp
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

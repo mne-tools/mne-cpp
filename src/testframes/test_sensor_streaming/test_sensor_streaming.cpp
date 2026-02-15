@@ -23,10 +23,10 @@
 #include <Eigen/Core>
 #include <cmath>
 
-#include "workers/rtsensordataworker.h"
-#include "workers/rtsensordatacontroller.h"
+#include <disp3D_rhi/workers/rtsensordataworker.h>
+#include <disp3D_rhi/workers/rtsensordatacontroller.h>
 
-using namespace BRAINVIEWLIB;
+using namespace DISP3DRHILIB;
 
 //=============================================================================================================
 /**

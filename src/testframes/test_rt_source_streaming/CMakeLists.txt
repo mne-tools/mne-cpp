@@ -10,13 +10,8 @@ set(QT_REQUIRED_COMPONENTS Core Gui Test)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-# Path to the ex_brain_view worker sources (compiled directly into the test)
-set(BRAIN_VIEW_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../examples/ex_brain_view)
-
 set(SOURCES
     test_rt_source_streaming.cpp
-    ${BRAIN_VIEW_DIR}/workers/rtsourcedataworker.cpp
-    ${BRAIN_VIEW_DIR}/workers/rtsourcedatacontroller.cpp
 )
 
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
@@ -25,16 +20,12 @@ else()
     add_executable(${PROJECT_NAME} ${SOURCES})
 endif()
 
-# Add ex_brain_view root as include path so that "workers/rtsourcedataworker.h" resolves
-target_include_directories(${PROJECT_NAME} PRIVATE
-    ${BRAIN_VIEW_DIR}
-)
-
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
 list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 set(MNE_LIBS_REQUIRED
   mne_disp
+  mne_disp3D_rhi
   mne_utils
 )
 
