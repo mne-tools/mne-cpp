@@ -51,6 +51,7 @@ class QSlider;
 class QLabel;
 class QTimer;
 class QDoubleSpinBox;
+class QSpinBox;
 class QPushButton;
 class QProgressBar;
 class BrainView;
@@ -188,6 +189,13 @@ private:
     QCheckBox *m_showNetworkCheck = nullptr;
     QSlider *m_networkThresholdSlider = nullptr;
     QComboBox *m_networkColormapCombo = nullptr;
+
+    // Control widgets - Sensor Streaming
+    QPushButton *m_sensorStreamBtn = nullptr;
+    QComboBox *m_sensorStreamModalityCombo = nullptr;
+    QCheckBox *m_sensorStreamLoopCheck = nullptr;
+    QComboBox *m_sensorStreamColormapCombo = nullptr;
+    QSpinBox *m_sensorStreamAvgSpin = nullptr;
 };
 
 #endif // MAINWINDOW_H

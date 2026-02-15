@@ -77,6 +77,7 @@ class QTimer;
 class StcLoadingWorker;
 class QFrame;
 class RtSourceDataController;
+class RtSensorDataController;
 
 //=============================================================================================================
 /**
@@ -643,6 +644,78 @@ public slots:
      */
     bool sensorFieldTimeRange(float &tmin, float &tmax) const;
 
+    //=========================================================================================================
+    // ── Real-time sensor data streaming ────────────────────────────────
+    //=========================================================================================================
+
+    /**
+     * Start real-time sensor data streaming for the specified modality.
+     * Creates the controller (if needed), feeds the loaded evoked data
+     * column-by-column, and begins the timer-driven streaming loop.
+     *
+     * Requires that sensor field data (evoked) has been loaded and
+     * the mapping matrix is built.
+     *
+     * @param[in] modality   "MEG" or "EEG".
+     */
+    void startRealtimeSensorStreaming(const QString &modality = QStringLiteral("MEG"));
+
+    //=========================================================================================================
+    /**
+     * Stop real-time sensor data streaming.
+     */
+    void stopRealtimeSensorStreaming();
+
+    //=========================================================================================================
+    /**
+     * Check whether real-time sensor streaming is active.
+     *
+     * @return True if streaming.
+     */
+    bool isRealtimeSensorStreaming() const;
+
+    //=========================================================================================================
+    /**
+     * Push a single sensor measurement vector into the real-time sensor pipeline.
+     * The vector should contain one value per picked channel
+     * (matching the active mapping matrix column count).
+     *
+     * @param[in] data       Sensor measurement vector.
+     */
+    void pushRealtimeSensorData(const Eigen::VectorXf &data);
+
+    //=========================================================================================================
+    /**
+     * Set the streaming speed for sensor streaming (interval between frames).
+     *
+     * @param[in] msec       Interval in milliseconds.
+     */
+    void setRealtimeSensorInterval(int msec);
+
+    //=========================================================================================================
+    /**
+     * Enable or disable looping for real-time sensor streaming.
+     *
+     * @param[in] enabled    True to loop.
+     */
+    void setRealtimeSensorLooping(bool enabled);
+
+    //=========================================================================================================
+    /**
+     * Set the number of averages for sensor streaming.
+     *
+     * @param[in] numAvr     Number of averages.
+     */
+    void setRealtimeSensorAverages(int numAvr);
+
+    //=========================================================================================================
+    /**
+     * Set the colormap used for sensor streaming visualization.
+     *
+     * @param[in] name       Colormap name.
+     */
+    void setRealtimeSensorColormap(const QString &name);
+
 signals:
     //=========================================================================================================
     /**
@@ -731,6 +804,16 @@ private slots:
      */
     void onRealtimeColorsAvailable(const QVector<uint32_t> &colorsLh,
                                    const QVector<uint32_t> &colorsRh);
+
+    //=========================================================================================================
+    /**
+     * Called when new per-vertex colors arrive from the real-time sensor streaming controller.
+     *
+     * @param[in] surfaceKey  Key identifying the target surface.
+     * @param[in] colors      Per-vertex ABGR color array.
+     */
+    void onRealtimeSensorColorsAvailable(const QString &surfaceKey,
+                                         const QVector<uint32_t> &colors);
 
 private:
     // Note: ViewVisibilityProfile and SubView are defined in core/viewstate.h.
@@ -871,6 +954,11 @@ private:
     // ── Real-time streaming ─────────────────────────────────────────────
     std::unique_ptr<RtSourceDataController> m_rtController; /**< Real-time source data streaming controller. */
     bool m_isRtStreaming = false;                   /**< True while real-time streaming is active. */
+
+    // ── Real-time sensor streaming ──────────────────────────────────────
+    std::unique_ptr<RtSensorDataController> m_rtSensorController; /**< Real-time sensor data streaming controller. */
+    bool m_isRtSensorStreaming = false;             /**< True while real-time sensor streaming is active. */
+    QString m_rtSensorModality;                     /**< Active modality: "MEG" or "EEG". */
 
     // ── Multi-view support ─────────────────────────────────────────────
     ViewMode m_viewMode = SingleView;               /**< Current view mode (single or multi). */

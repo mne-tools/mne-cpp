@@ -30,6 +30,8 @@ set(SOURCES
     workers/stcloadingworker.cpp
     workers/rtsourcedataworker.cpp
     workers/rtsourcedatacontroller.cpp
+    workers/rtsensordataworker.cpp
+    workers/rtsensordatacontroller.cpp
     model/items/abstracttreeitem.cpp
     model/items/surfacetreeitem.cpp
     model/items/bemtreeitem.cpp

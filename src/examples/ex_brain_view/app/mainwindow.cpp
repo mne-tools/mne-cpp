@@ -54,6 +54,7 @@
 #include <QPushButton>
 #include <QSlider>
 #include <QDoubleSpinBox>
+#include <QSpinBox>
 #include <QFileDialog>
 #include <QFile>
 #include <QDir>
@@ -330,6 +331,44 @@ void MainWindow::setupUI()
     networkLayout->addWidget(netCmapLabel);
     networkLayout->addWidget(m_networkColormapCombo);
 
+    // ===== Sensor Streaming Group =====
+    QGroupBox *sensorStreamGroup = new QGroupBox("Sensor Streaming");
+    QVBoxLayout *sensorStreamLayout = new QVBoxLayout(sensorStreamGroup);
+    sensorStreamLayout->setContentsMargins(10, 15, 10, 10);
+    sensorStreamLayout->setSpacing(8);
+
+    QLabel *ssModalityLabel = new QLabel("Modality:");
+    m_sensorStreamModalityCombo = new QComboBox;
+    m_sensorStreamModalityCombo->addItems({"MEG", "EEG"});
+    m_sensorStreamModalityCombo->setEnabled(false);
+
+    m_sensorStreamBtn = new QPushButton("Start Sensor Streaming");
+    m_sensorStreamBtn->setEnabled(false);
+
+    m_sensorStreamLoopCheck = new QCheckBox("Loop");
+    m_sensorStreamLoopCheck->setChecked(true);
+    m_sensorStreamLoopCheck->setEnabled(false);
+
+    QLabel *ssAvgLabel = new QLabel("Averages:");
+    m_sensorStreamAvgSpin = new QSpinBox;
+    m_sensorStreamAvgSpin->setRange(1, 100);
+    m_sensorStreamAvgSpin->setValue(1);
+    m_sensorStreamAvgSpin->setEnabled(false);
+
+    QLabel *ssCmapLabel = new QLabel("Colormap:");
+    m_sensorStreamColormapCombo = new QComboBox;
+    m_sensorStreamColormapCombo->addItems({"MNE", "Hot", "Jet", "Viridis", "Cool", "RedBlue"});
+    m_sensorStreamColormapCombo->setEnabled(false);
+
+    sensorStreamLayout->addWidget(ssModalityLabel);
+    sensorStreamLayout->addWidget(m_sensorStreamModalityCombo);
+    sensorStreamLayout->addWidget(m_sensorStreamBtn);
+    sensorStreamLayout->addWidget(m_sensorStreamLoopCheck);
+    sensorStreamLayout->addWidget(ssAvgLabel);
+    sensorStreamLayout->addWidget(m_sensorStreamAvgSpin);
+    sensorStreamLayout->addWidget(ssCmapLabel);
+    sensorStreamLayout->addWidget(m_sensorStreamColormapCombo);
+
     // ===== Sensor Group =====
     QGroupBox *sensorGroup = new QGroupBox("Sensors");
     QVBoxLayout *sensorLayout = new QVBoxLayout(sensorGroup);
@@ -429,6 +468,7 @@ void MainWindow::setupUI()
     sideLayout->addWidget(dipoleGroup);
     sideLayout->addWidget(srcSpaceGroup);
     sideLayout->addWidget(networkGroup);
+    sideLayout->addWidget(sensorStreamGroup);
     sideLayout->addWidget(sensorGroup);
     sideLayout->addWidget(viewGroup);
     sideLayout->addStretch();
@@ -762,6 +802,40 @@ void MainWindow::setupConnections()
     });
     connect(m_networkColormapCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
         m_brainView->setNetworkColormap(text);
+    });
+
+    // ── Sensor Streaming ────────────────────────────────────────────────
+    connect(m_brainView, &BrainView::sensorFieldLoaded, [this](int /*numTimePoints*/) {
+        m_sensorStreamBtn->setEnabled(true);
+        m_sensorStreamModalityCombo->setEnabled(true);
+        m_sensorStreamLoopCheck->setEnabled(true);
+        m_sensorStreamAvgSpin->setEnabled(true);
+        m_sensorStreamColormapCombo->setEnabled(true);
+    });
+
+    connect(m_sensorStreamBtn, &QPushButton::clicked, [this]() {
+        if (m_brainView->isRealtimeSensorStreaming()) {
+            m_brainView->stopRealtimeSensorStreaming();
+            m_sensorStreamBtn->setText("Start Sensor Streaming");
+        } else {
+            QString modality = m_sensorStreamModalityCombo->currentText();
+            m_brainView->startRealtimeSensorStreaming(modality);
+            if (m_brainView->isRealtimeSensorStreaming()) {
+                m_sensorStreamBtn->setText("Stop Sensor Streaming");
+            }
+        }
+    });
+
+    connect(m_sensorStreamLoopCheck, &QCheckBox::toggled, [this](bool checked) {
+        m_brainView->setRealtimeSensorLooping(checked);
+    });
+
+    connect(m_sensorStreamAvgSpin, QOverload<int>::of(&QSpinBox::valueChanged), [this](int value) {
+        m_brainView->setRealtimeSensorAverages(value);
+    });
+
+    connect(m_sensorStreamColormapCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
+        m_brainView->setRealtimeSensorColormap(text);
     });
 
     // Sync initial state
