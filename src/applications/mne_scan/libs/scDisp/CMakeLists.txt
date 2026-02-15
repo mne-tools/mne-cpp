@@ -6,7 +6,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Widgets Svg 3DCore 3DRender 3DExtras)
+set(QT_REQUIRED_COMPONENTS Core Widgets Svg)
 
 if(Qt6_FOUND OR QT_VERSION_MAJOR EQUAL 6)
     list(APPEND QT_REQUIRED_COMPONENTS OpenGLWidgets)
@@ -25,7 +25,7 @@ set(SOURCES
     realtimeevokedsetwidget.cpp
     realtimecovwidget.cpp
     realtimespectrumwidget.cpp
-    realtime3dwidget.cpp
+    # realtime3dwidget.cpp  # Disabled: depends on old Qt3D-based disp3D, pending migration to disp3D_rhi
 )
 
 set(HEADERS
@@ -35,7 +35,7 @@ set(HEADERS
     realtimeevokedsetwidget.h
     realtimecovwidget.h
     realtimespectrumwidget.h
-    realtime3dwidget.h
+    # realtime3dwidget.h  # Disabled: depends on old Qt3D-based disp3D, pending migration to disp3D_rhi
 )
 
 # set(FILE_TO_UPDATE scDisp_global.cpp)
@@ -73,7 +73,7 @@ list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
 
 set(MNE_LIBS_REQUIRED 
     mne_disp
-    mne_disp3D
+    mne_disp3D_rhi
     mne_utils
     mne_fiff
     mne_fs

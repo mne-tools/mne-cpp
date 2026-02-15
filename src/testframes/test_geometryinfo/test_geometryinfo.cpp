@@ -47,7 +47,7 @@
 
 #include <utils/generics/applicationlogger.h>
 
-#include <disp3D/helpers/geometryinfo/geometryinfo.h>
+#include <disp3D_rhi/helpers/geometryinfo.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 
@@ -61,7 +61,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace DISP3DLIB;
+using namespace DISP3DRHILIB;
 using namespace MNELIB;
 using namespace Eigen;
 using namespace FIFFLIB;

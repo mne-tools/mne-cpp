@@ -47,7 +47,7 @@
 #include <disp/viewers/control3dview.h>
 #include <disp/viewers/fiffrawviewsettings.h>
 
-#ifndef WASMBUILD
+#ifdef MNE_USE_DISP3D_LEGACY  // Disabled: old disp3D removed, pending migration to disp3D_rhi
 #include <disp3D/engine/model/data3Dtreemodel.h>
 #include <disp3D/engine/delegate/data3Dtreedelegate.h>
 #endif
@@ -164,7 +164,7 @@ QDockWidget *ControlManager::getControl()
     m_ViewParameters.m_iTimeSpacers = pFiffViewSettings->getDistanceTimeSpacer();
     m_ViewParameters.m_sImageType = "";
 
-    #ifndef WASMBUILD
+    #ifdef MNE_USE_DISP3D_LEGACY  // Disabled: old disp3D removed
     //View3D Settings
     m_pControl3DView = new DISPLIB::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), Q_NULLPTR, slControlFlags);
     DISP3DLIB::Data3DTreeDelegate* pData3DTreeDelegate = new DISP3DLIB::Data3DTreeDelegate(this);
@@ -221,7 +221,7 @@ void ControlManager::handleEvent(QSharedPointer<Event> e)
         break;
 
     case EVENT_TYPE::SET_DATA3D_TREE_MODEL:
-        #ifndef WASMBUILD
+        #ifdef MNE_USE_DISP3D_LEGACY
         init3DGui(e->getData().value<QSharedPointer<DISP3DLIB::Data3DTreeModel>>());
         #endif
         break;
@@ -322,7 +322,7 @@ void ControlManager::onMakeScreenshot(const QString& imageType)
 
 //=============================================================================================================
 
-#ifndef WASMBUILD
+#ifdef MNE_USE_DISP3D_LEGACY
 void ControlManager::init3DGui(QSharedPointer<DISP3DLIB::Data3DTreeModel> pModel)
 {
     m_pControl3DView->setModel(pModel.data());

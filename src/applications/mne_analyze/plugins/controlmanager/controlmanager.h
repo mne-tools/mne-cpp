@@ -64,7 +64,7 @@ namespace DISPLIB{
     class Control3DView;
 }
 
-#ifndef WASMBUILD
+#ifdef MNE_USE_DISP3D_LEGACY  // Disabled: old disp3D removed, pending migration to disp3D_rhi
 namespace DISP3DLIB {
     class Data3DTreeModel;
 }
@@ -172,7 +172,7 @@ private:
      */
     void onMakeScreenshot(const QString& imageType);
 
-    #ifndef WASMBUILD
+    #ifdef MNE_USE_DISP3D_LEGACY  // Disabled: old disp3D removed, pending migration to disp3D_rhi
     //=========================================================================================================
     /**
      * Sets 3D model for the 3D controls

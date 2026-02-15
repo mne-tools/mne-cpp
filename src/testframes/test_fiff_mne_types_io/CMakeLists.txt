@@ -6,7 +6,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Widgets 3DRender Concurrent Network Test)
+set(QT_REQUIRED_COMPONENTS Core Widgets Concurrent Network Test)
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
@@ -35,7 +35,7 @@ set(MNE_LIBS_REQUIRED
   mne_utils
   mne_events
   mne_disp
-  mne_disp3D
+  mne_disp3D_rhi
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

@@ -9,7 +9,7 @@ set(CMAKE_AUTORCC ON)
 set(QT_REQUIRED_COMPONENTS Core Widgets Concurrent Network)
 
 if(NOT WASM)
-  list(APPEND QT_REQUIRED_COMPONENTS OpenGL 3DRender)
+  list(APPEND QT_REQUIRED_COMPONENTS OpenGL)
 endif()
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
@@ -47,7 +47,7 @@ set(MNE_LIBS_REQUIRED
 )
 
 if(NOT WASM)
-  list(APPEND MNE_LIBS_REQUIRED mne_disp3D)
+  list(APPEND MNE_LIBS_REQUIRED mne_disp3D_rhi)
 endif()
 
 target_link_libraries(${PROJECT_NAME} PRIVATE

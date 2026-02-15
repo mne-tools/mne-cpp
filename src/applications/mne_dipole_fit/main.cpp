@@ -44,7 +44,9 @@
 
 #include <mne/mne_bem.h>
 
+#ifdef MNE_USE_DISP3D_LEGACY  // Disabled: old disp3D removed, pending migration to disp3D_rhi
 #include <disp3D/viewers/ecdview.h>
+#endif
 
 #include <fs/label.h>
 #include <fs/surfaceset.h>
@@ -63,7 +65,7 @@
 //=============================================================================================================
 
 using namespace INVERSELIB;
-using namespace DISP3DLIB;
+//using namespace DISP3DLIB;  // Disabled: old disp3D removed, pending migration to disp3D_rhi
 using namespace FSLIB;
 using namespace MNELIB;
 using namespace UTILSLIB;
@@ -94,11 +96,13 @@ int main(int argc, char *argv[])
     DipoleFit dipFit(&settings);
     ECDSet set = dipFit.calculateFit();
 
+#ifdef MNE_USE_DISP3D_LEGACY  // Disabled: old disp3D removed, pending migration to disp3D_rhi
     ECDView::SPtr pEcdViewer;
     if(settings.gui) {
         pEcdViewer = ECDView::SPtr(new ECDView(settings, set));
         pEcdViewer->show();
     }
+#endif
 
     /*
      * Saving...

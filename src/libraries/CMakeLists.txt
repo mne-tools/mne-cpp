@@ -60,6 +60,5 @@ add_subdirectory(events)
 add_subdirectory(disp)
 
 if(NOT WASM)
-  add_subdirectory(disp3D)
   add_subdirectory(disp3D_rhi)
 endif()

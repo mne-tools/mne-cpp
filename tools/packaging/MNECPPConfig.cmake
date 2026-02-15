@@ -42,7 +42,7 @@ set(MNE_CPP_LIBRARIES
     mne_connectivity
     mne_events
     mne_disp
-    mne_disp3D
+    mne_disp3D_rhi
 )
 
 # Add library directory to linker search path
