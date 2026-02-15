@@ -48,6 +48,7 @@
 #include "sourcespacetreeitem.h"
 #include "digitizertreeitem.h"
 #include "../workers/stcloadingworker.h"
+#include "../workers/rtsourcedatacontroller.h"
 #include "../helpers/field_map.h"
 
 #include <Eigen/Dense>
@@ -1944,6 +1945,146 @@ void BrainView::setSourceThresholds(float min, float mid, float max)
         // Re-apply current time point with new thresholds
         setTimePoint(m_currentTimePoint);
     }
+
+    // Also update thresholds on the real-time controller if active
+    if (m_rtController) {
+        m_rtController->setThresholds(min, mid, max);
+    }
+}
+
+//=============================================================================================================
+
+void BrainView::startRealtimeStreaming()
+{
+    if (m_isRtStreaming) {
+        qDebug() << "BrainView: Real-time streaming already active";
+        return;
+    }
+
+    // Require loaded STC data and interpolation matrices
+    if (!m_sourceOverlay || !m_sourceOverlay->isLoaded()) {
+        qWarning() << "BrainView: Cannot start streaming — no source estimate loaded";
+        return;
+    }
+
+    // Create controller on first use
+    if (!m_rtController) {
+        m_rtController = std::make_unique<RtSourceDataController>(this);
+        connect(m_rtController.get(), &RtSourceDataController::newSmoothedDataAvailable,
+                this, &BrainView::onRealtimeColorsAvailable);
+    }
+
+    // Propagate interpolation matrices from the overlay
+    m_rtController->setInterpolationMatrixLeft(m_sourceOverlay->interpolationMatLh());
+    m_rtController->setInterpolationMatrixRight(m_sourceOverlay->interpolationMatRh());
+
+    // Propagate current visualization parameters
+    m_rtController->setColormapType(m_sourceOverlay->colormap());
+    m_rtController->setThresholds(m_sourceOverlay->thresholdMin(),
+                                   m_sourceOverlay->thresholdMid(),
+                                   m_sourceOverlay->thresholdMax());
+    m_rtController->setSFreq(1.0 / m_sourceOverlay->tstep());
+
+    // Feed all STC time-points as data into the queue
+    int nTimePoints = m_sourceOverlay->numTimePoints();
+    qDebug() << "BrainView: Feeding" << nTimePoints << "time points into real-time queue";
+    m_rtController->clearData();
+
+    // Get source data column by column from the overlay and push to controller
+    for (int t = 0; t < nTimePoints; ++t) {
+        Eigen::VectorXd col = m_sourceOverlay->sourceDataColumn(t);
+        if (col.size() > 0) {
+            m_rtController->addData(col);
+        }
+    }
+
+    // Ensure source estimate overlay is in SourceEstimate mode
+    setVisualizationMode("Source Estimate");
+
+    // Start streaming
+    m_rtController->setStreamingState(true);
+    m_isRtStreaming = true;
+
+    qDebug() << "BrainView: Real-time streaming started";
+}
+
+//=============================================================================================================
+
+void BrainView::stopRealtimeStreaming()
+{
+    if (!m_isRtStreaming) return;
+
+    if (m_rtController) {
+        m_rtController->setStreamingState(false);
+    }
+    m_isRtStreaming = false;
+
+    qDebug() << "BrainView: Real-time streaming stopped";
+}
+
+//=============================================================================================================
+
+bool BrainView::isRealtimeStreaming() const
+{
+    return m_isRtStreaming;
+}
+
+//=============================================================================================================
+
+void BrainView::pushRealtimeSourceData(const Eigen::VectorXd &data)
+{
+    if (m_rtController) {
+        m_rtController->addData(data);
+    }
+}
+
+//=============================================================================================================
+
+void BrainView::setRealtimeInterval(int msec)
+{
+    if (m_rtController) {
+        m_rtController->setTimeInterval(msec);
+    }
+}
+
+//=============================================================================================================
+
+void BrainView::setRealtimeLooping(bool enabled)
+{
+    if (m_rtController) {
+        m_rtController->setLoopState(enabled);
+    }
+}
+
+//=============================================================================================================
+
+void BrainView::onRealtimeColorsAvailable(const QVector<uint32_t> &colorsLh,
+                                           const QVector<uint32_t> &colorsRh)
+{
+    // Apply colors to all brain surfaces matching active surface types
+    QSet<QString> activeTypes;
+    activeTypes.insert(m_singleView.surfaceType);
+    for (int i = 0; i < m_subViews.size(); ++i) {
+        activeTypes.insert(m_subViews[i].surfaceType);
+    }
+
+    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+        if (!it.value() || it.value()->tissueType() != BrainSurface::TissueBrain)
+            continue;
+
+        for (const QString &type : activeTypes) {
+            if (it.key().endsWith(type)) {
+                int hemi = it.value()->hemi();
+                const QVector<uint32_t> &colors = (hemi == 0) ? colorsLh : colorsRh;
+                if (!colors.isEmpty()) {
+                    it.value()->applySourceEstimateColors(colors);
+                }
+                break;
+            }
+        }
+    }
+
+    update();
 }
 
 //=============================================================================================================

@@ -74,6 +74,7 @@ class QLabel;
 class QTimer;
 class StcLoadingWorker;
 class QFrame;
+class RtSourceDataController;
 
 //=============================================================================================================
 /**
@@ -551,6 +552,53 @@ public slots:
 
     //=========================================================================================================
     /**
+     * Start real-time source data streaming.
+     * Creates the controller (if needed), feeds the loaded STC data column-by-column,
+     * and begins the timer-driven streaming loop.
+     */
+    void startRealtimeStreaming();
+
+    //=========================================================================================================
+    /**
+     * Stop real-time source data streaming.
+     */
+    void stopRealtimeStreaming();
+
+    //=========================================================================================================
+    /**
+     * Check whether real-time streaming is active.
+     *
+     * @return True if streaming.
+     */
+    bool isRealtimeStreaming() const;
+
+    //=========================================================================================================
+    /**
+     * Push a single source-data vector into the real-time pipeline.
+     * The vector should contain source values for all sources (LH + RH concatenated).
+     *
+     * @param[in] data       Source activity vector.
+     */
+    void pushRealtimeSourceData(const Eigen::VectorXd &data);
+
+    //=========================================================================================================
+    /**
+     * Set the streaming speed (interval between frames).
+     *
+     * @param[in] msec       Interval in milliseconds.
+     */
+    void setRealtimeInterval(int msec);
+
+    //=========================================================================================================
+    /**
+     * Enable or disable looping for real-time streaming.
+     *
+     * @param[in] enabled    True to loop.
+     */
+    void setRealtimeLooping(bool enabled);
+
+    //=========================================================================================================
+    /**
      * Get the time range of the loaded sensor field (evoked) data.
      *
      * @param[out] tmin      Start time in seconds.
@@ -637,6 +685,16 @@ private slots:
      * @param[in] success    True if loading succeeded.
      */
     void onStcLoadingFinished(bool success);
+
+    //=========================================================================================================
+    /**
+     * Called when new per-vertex colors arrive from the real-time streaming controller.
+     *
+     * @param[in] colorsLh   Per-vertex ABGR colors for the left hemisphere.
+     * @param[in] colorsRh   Per-vertex ABGR colors for the right hemisphere.
+     */
+    void onRealtimeColorsAvailable(const QVector<uint32_t> &colorsLh,
+                                   const QVector<uint32_t> &colorsRh);
 
 private:
     // Note: ViewVisibilityProfile and SubView are defined in core/viewstate.h.
@@ -771,6 +829,10 @@ private:
     QThread* m_loadingThread = nullptr;             /**< Background thread for STC file loading. */
     StcLoadingWorker* m_stcWorker = nullptr;        /**< Worker object performing the STC load. */
     bool m_isLoadingStc = false;                    /**< True while an async STC load is in progress. */
+
+    // ── Real-time streaming ─────────────────────────────────────────────
+    std::unique_ptr<RtSourceDataController> m_rtController; /**< Real-time source data streaming controller. */
+    bool m_isRtStreaming = false;                   /**< True while real-time streaming is active. */
 
     // ── Multi-view support ─────────────────────────────────────────────
     ViewMode m_viewMode = SingleView;               /**< Current view mode (single or multi). */

@@ -212,6 +212,32 @@ public:
      */
     void updateThresholdsFromData();
 
+    //=========================================================================================================
+    /**
+     * Get the interpolation matrix for the left hemisphere.
+     *
+     * @return Shared pointer to the LH interpolation matrix (may be null).
+     */
+    QSharedPointer<Eigen::SparseMatrix<float>> interpolationMatLh() const { return m_interpolationMatLh; }
+
+    //=========================================================================================================
+    /**
+     * Get the interpolation matrix for the right hemisphere.
+     *
+     * @return Shared pointer to the RH interpolation matrix (may be null).
+     */
+    QSharedPointer<Eigen::SparseMatrix<float>> interpolationMatRh() const { return m_interpolationMatRh; }
+
+    //=========================================================================================================
+    /**
+     * Get a single column of concatenated source data (LH + RH) at a given time index.
+     * Used by the real-time streaming controller to feed data into the queue.
+     *
+     * @param[in] timeIndex  Time sample index.
+     * @return Concatenated source values vector (nSourcesLH + nSourcesRH).
+     */
+    Eigen::VectorXd sourceDataColumn(int timeIndex) const;
+
 private:
     //=========================================================================================================
     /**

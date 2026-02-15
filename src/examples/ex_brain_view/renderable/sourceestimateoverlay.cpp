@@ -397,3 +397,29 @@ void SourceEstimateOverlay::updateThresholdsFromData()
         qDebug() << "SourceEstimateOverlay: Auto thresholds set to" << m_threshMin << m_threshMid << m_threshMax;
     }
 }
+
+//=============================================================================================================
+
+Eigen::VectorXd SourceEstimateOverlay::sourceDataColumn(int timeIndex) const
+{
+    int nLh = m_hasLh ? m_stcLh.data.rows() : 0;
+    int nRh = m_hasRh ? m_stcRh.data.rows() : 0;
+
+    if (nLh == 0 && nRh == 0) {
+        return Eigen::VectorXd();
+    }
+
+    Eigen::VectorXd result(nLh + nRh);
+
+    if (m_hasLh) {
+        int tIdx = qBound(0, timeIndex, static_cast<int>(m_stcLh.data.cols()) - 1);
+        result.head(nLh) = m_stcLh.data.col(tIdx);
+    }
+
+    if (m_hasRh) {
+        int tIdx = qBound(0, timeIndex, static_cast<int>(m_stcRh.data.cols()) - 1);
+        result.segment(nLh, nRh) = m_stcRh.data.col(tIdx);
+    }
+
+    return result;
+}

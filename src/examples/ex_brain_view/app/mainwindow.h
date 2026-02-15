@@ -108,9 +108,6 @@ private:
     void setupConnections();
     void loadHemisphere(const QString &subjectPath, const QString &subjectName, const QString &hemi);
     void loadBem(const QString &subjectName, const QString &bemPath);
-    void loadDataPathSettings();
-    void rememberDataPath(const QString &category, const QString &filePath);
-    QString dataDialogStartPath(const QString &category) const;
 
 private:
     // Core components
@@ -136,9 +133,11 @@ private:
     QCheckBox *m_innerCheck = nullptr;
 
     // Control widgets - View
-    QComboBox *m_viewCountCombo = nullptr;
-    QPushButton *m_resetMultiViewLayoutBtn = nullptr;
-    QCheckBox *m_showInfoCheck = nullptr;
+    QCheckBox *m_multiViewCheck = nullptr;
+    QCheckBox *m_vpTopCheck = nullptr;
+    QCheckBox *m_vpBottomCheck = nullptr;
+    QCheckBox *m_vpFrontCheck = nullptr;
+    QCheckBox *m_vpLeftCheck = nullptr;
 
     // Control widgets - Brain Surface
     QPushButton *m_loadSurfaceBtn = nullptr;
@@ -157,15 +156,13 @@ private:
     QPushButton *m_playButton = nullptr;
     QComboBox *m_speedCombo = nullptr;
     QTimer *m_stcTimer = nullptr;
+    QCheckBox *m_realtimeCheck = nullptr;
+    QCheckBox *m_loopCheck = nullptr;
 
-    // Control widgets - Sensors & Digitizer
+    // Control widgets - Sensors
     QPushButton *m_loadDigBtn = nullptr;
     QPushButton *m_loadTransBtn = nullptr;
     QCheckBox *m_showMegCheck = nullptr;
-    QCheckBox *m_showMegGradCheck = nullptr;
-    QCheckBox *m_showMegMagCheck = nullptr;
-    QCheckBox *m_showMegHelmetCheck = nullptr;
-    QComboBox *m_megHelmetCombo = nullptr;
     QCheckBox *m_showEegCheck = nullptr;
     QCheckBox *m_showDigCheck = nullptr;
     QCheckBox *m_showDigCardinalCheck = nullptr;
@@ -174,18 +171,6 @@ private:
     QCheckBox *m_showDigExtraCheck = nullptr;
     QCheckBox *m_applyTransCheck = nullptr;
 
-    // Control widgets - Measurement
-    QPushButton *m_loadSensorDataBtn = nullptr;
-    QComboBox *m_evokedSetCombo = nullptr;
-    QCheckBox *m_showMegFieldCheck = nullptr;
-    QCheckBox *m_showEegFieldCheck = nullptr;
-    QCheckBox *m_showMegFieldContoursCheck = nullptr;
-    QCheckBox *m_showEegFieldContoursCheck = nullptr;
-    QCheckBox *m_megFieldMapOnHeadCheck = nullptr;
-    QSlider *m_sensorTimeSlider = nullptr;
-    QLabel *m_sensorTimeLabel = nullptr;
-    QCheckBox *m_linkTimeCheck = nullptr;
-
     // Control widgets - Dipoles
     QPushButton *m_loadDipoleBtn = nullptr;
     QCheckBox *m_showDipoleCheck = nullptr;
@@ -193,11 +178,6 @@ private:
     // Control widgets - Source Space
     QPushButton *m_loadSrcSpaceBtn = nullptr;
     QCheckBox *m_showSrcSpaceCheck = nullptr;
-
-    QString m_lastSensorPath;
-    QString m_lastMeasurementPath;
-    QString m_lastDataPath;
-    bool m_isSyncingTime = false;
 };
 
 #endif // MAINWINDOW_H

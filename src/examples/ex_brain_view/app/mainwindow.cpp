@@ -63,10 +63,6 @@
 #include <QGridLayout>
 #include <QTimer>
 #include <QDebug>
-#include <QCoreApplication>
-#include <QSignalBlocker>
-#include <QSettings>
-#include <QAbstractButton>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -84,81 +80,10 @@ MainWindow::MainWindow(QWidget *parent)
 {
     setWindowTitle("MNE-CPP Brain View");
 
-    loadDataPathSettings();
-
     setupUI();
     setupConnections();
 
     resize(1200, 800);
-}
-
-//=============================================================================================================
-
-void MainWindow::loadDataPathSettings()
-{
-    QSettings settings("MNECPP");
-    settings.beginGroup("ex_brain_view/MainWindow");
-
-    const QString defaultPath = settings.value("lastDataPath/default", QString()).toString();
-    const QString legacyPath = settings.value("lastDataPath", QString()).toString();
-
-    if (!defaultPath.isEmpty() && QDir(defaultPath).exists()) {
-        m_lastDataPath = defaultPath;
-    } else if (!legacyPath.isEmpty() && QDir(legacyPath).exists()) {
-        m_lastDataPath = legacyPath;
-    }
-    settings.endGroup();
-
-    if (!m_lastDataPath.isEmpty() && !QDir(m_lastDataPath).exists()) {
-        m_lastDataPath.clear();
-    }
-}
-
-//=============================================================================================================
-
-void MainWindow::rememberDataPath(const QString &category, const QString &filePath)
-{
-    if (category.isEmpty() || filePath.isEmpty()) {
-        return;
-    }
-
-    const QString dirPath = QFileInfo(filePath).absolutePath();
-    if (dirPath.isEmpty()) {
-        return;
-    }
-
-    QSettings settings("MNECPP");
-    settings.beginGroup("ex_brain_view/MainWindow");
-    settings.setValue(QString("lastDataPath/%1").arg(category), dirPath);
-    settings.setValue("lastDataPath/default", dirPath);
-    settings.endGroup();
-
-    m_lastDataPath = dirPath;
-}
-
-//=============================================================================================================
-
-QString MainWindow::dataDialogStartPath(const QString &category) const
-{
-    QSettings settings("MNECPP");
-    settings.beginGroup("ex_brain_view/MainWindow");
-    const QString categoryPath = settings.value(QString("lastDataPath/%1").arg(category), QString()).toString();
-    const QString defaultPath = settings.value("lastDataPath/default", QString()).toString();
-    settings.endGroup();
-
-    if (!categoryPath.isEmpty() && QDir(categoryPath).exists()) {
-        return categoryPath;
-    }
-
-    if (!defaultPath.isEmpty() && QDir(defaultPath).exists()) {
-        return defaultPath;
-    }
-
-    if (!m_lastDataPath.isEmpty() && QDir(m_lastDataPath).exists()) {
-        return m_lastDataPath;
-    }
-
-    return QDir::homePath();
 }
 
 //=============================================================================================================
@@ -274,7 +199,7 @@ void MainWindow::setupUI()
 
     QLabel *colormapLabel = new QLabel("Colormap:");
     m_colormapCombo = new QComboBox;
-    m_colormapCombo->addItems({"MNE", "Hot", "Jet", "Viridis", "Cool", "RedBlue", "Bone"});
+    m_colormapCombo->addItems({"Hot", "Jet", "Viridis", "Cool", "RedBlue", "Bone"});
 
     m_timeLabel = new QLabel("Time: 0.000 s");
     m_timeSlider = new QSlider(Qt::Horizontal);
@@ -315,6 +240,15 @@ void MainWindow::setupUI()
     playbackLayout->addWidget(m_playButton);
     playbackLayout->addWidget(m_speedCombo);
 
+    m_realtimeCheck = new QCheckBox("Realtime Streaming");
+    m_realtimeCheck->setToolTip("Use threaded real-time streaming pipeline instead of simple timer playback");
+    m_loopCheck = new QCheckBox("Loop");
+    m_loopCheck->setChecked(true);
+    m_loopCheck->setToolTip("Loop data when the end of the stream is reached");
+    QHBoxLayout *rtLayout = new QHBoxLayout;
+    rtLayout->addWidget(m_realtimeCheck);
+    rtLayout->addWidget(m_loopCheck);
+
     m_stcTimer = new QTimer(this);
 
     m_stcStatusLabel = new QLabel("");
@@ -336,6 +270,7 @@ void MainWindow::setupUI()
     stcLayout->addLayout(threshGrid);
     stcLayout->addWidget(playbackLabel);
     stcLayout->addLayout(playbackLayout);
+    stcLayout->addLayout(rtLayout);
     stcLayout->addWidget(m_timeSlider);
     stcLayout->addWidget(m_timeLabel);
     stcLayout->addStretch();
@@ -368,11 +303,11 @@ void MainWindow::setupUI()
     srcSpaceLayout->addWidget(m_loadSrcSpaceBtn);
     srcSpaceLayout->addWidget(m_showSrcSpaceCheck);
 
-    // ===== Sensors & Digitizer Group =====
-    QGroupBox *sensorDigGroup = new QGroupBox("Sensors && Digitizer");
-    QVBoxLayout *sensorDigLayout = new QVBoxLayout(sensorDigGroup);
-    sensorDigLayout->setContentsMargins(10, 15, 10, 10);
-    sensorDigLayout->setSpacing(8);
+    // ===== Sensor Group =====
+    QGroupBox *sensorGroup = new QGroupBox("Sensors");
+    QVBoxLayout *sensorLayout = new QVBoxLayout(sensorGroup);
+    sensorLayout->setContentsMargins(10, 15, 10, 10);
+    sensorLayout->setSpacing(8);
 
     m_loadDigBtn = new QPushButton("Load Digitizer...");
     m_loadTransBtn = new QPushButton("Load Transformation...");
@@ -380,33 +315,6 @@ void MainWindow::setupUI()
     m_showMegCheck = new QCheckBox("Show MEG");
     m_showMegCheck->setChecked(false);
     m_showMegCheck->setEnabled(false);
-
-    m_showMegGradCheck = new QCheckBox("  Gradiometers");
-    m_showMegGradCheck->setChecked(false);
-    m_showMegGradCheck->setEnabled(false);
-
-    m_showMegMagCheck = new QCheckBox("  Magnetometers");
-    m_showMegMagCheck->setChecked(false);
-    m_showMegMagCheck->setEnabled(false);
-
-    m_showMegHelmetCheck = new QCheckBox("  Helmet Surface");
-    m_showMegHelmetCheck->setChecked(false);
-    m_showMegHelmetCheck->setEnabled(false);
-
-    QLabel *megHelmetLabel = new QLabel("MEG Helmet Surface:");
-    m_megHelmetCombo = new QComboBox;
-    m_megHelmetCombo->addItem("Auto", "");
-    m_megHelmetCombo->setEnabled(false);
-    m_megHelmetCombo->setToolTip("Override the auto-selected helmet surface.");
-
-    QDir megHelmetDir(QCoreApplication::applicationDirPath()
-        + "/../resources/general/sensorSurfaces");
-    if (megHelmetDir.exists()) {
-        const QStringList files = megHelmetDir.entryList(QStringList() << "*.fif", QDir::Files, QDir::Name);
-        for (const auto &file : files) {
-            m_megHelmetCombo->addItem(file, megHelmetDir.absoluteFilePath(file));
-        }
-    }
 
     m_showEegCheck = new QCheckBox("Show EEG");
     m_showEegCheck->setChecked(false);
@@ -437,73 +345,16 @@ void MainWindow::setupUI()
     m_applyTransCheck->setChecked(true);
     m_applyTransCheck->setToolTip("Apply Head-to-MRI transformation to sensors if available.");
 
-    sensorDigLayout->addWidget(m_loadDigBtn);
-    sensorDigLayout->addWidget(m_loadTransBtn);
-    sensorDigLayout->addWidget(m_showMegCheck);
-    sensorDigLayout->addWidget(m_showMegGradCheck);
-    sensorDigLayout->addWidget(m_showMegMagCheck);
-    sensorDigLayout->addWidget(m_showMegHelmetCheck);
-    sensorDigLayout->addWidget(megHelmetLabel);
-    sensorDigLayout->addWidget(m_megHelmetCombo);
-    sensorDigLayout->addWidget(m_showEegCheck);
-    sensorDigLayout->addWidget(m_showDigCheck);
-    sensorDigLayout->addWidget(m_showDigCardinalCheck);
-    sensorDigLayout->addWidget(m_showDigHpiCheck);
-    sensorDigLayout->addWidget(m_showDigEegCheck);
-    sensorDigLayout->addWidget(m_showDigExtraCheck);
-    sensorDigLayout->addWidget(m_applyTransCheck);
-
-    // ===== Measurement Group =====
-    QGroupBox *measurementGroup = new QGroupBox("Measurement");
-    QVBoxLayout *measurementLayout = new QVBoxLayout(measurementGroup);
-    measurementLayout->setContentsMargins(10, 15, 10, 10);
-    measurementLayout->setSpacing(8);
-
-    m_loadSensorDataBtn = new QPushButton("Load Evoked...");
-    QLabel *evokedSetLabel = new QLabel("Evoked Data Set:");
-    m_evokedSetCombo = new QComboBox;
-    m_evokedSetCombo->setToolTip("Select which evoked data set to visualise.\nLoad an evoked file first.");
-    m_evokedSetCombo->setEnabled(false);
-
-    m_showMegFieldCheck = new QCheckBox("MEG Field Map");
-    m_showMegFieldCheck->setChecked(false);
-    m_showMegFieldCheck->setEnabled(false);
-
-    m_showEegFieldCheck = new QCheckBox("EEG Potential Map");
-    m_showEegFieldCheck->setChecked(false);
-    m_showEegFieldCheck->setEnabled(false);
-
-    m_showMegFieldContoursCheck = new QCheckBox("  MEG Contours");
-    m_showMegFieldContoursCheck->setChecked(false);
-    m_showMegFieldContoursCheck->setEnabled(false);
-
-    m_showEegFieldContoursCheck = new QCheckBox("  EEG Contours");
-    m_showEegFieldContoursCheck->setChecked(false);
-    m_showEegFieldContoursCheck->setEnabled(false);
-
-    m_megFieldMapOnHeadCheck = new QCheckBox("  MEG Map on Head Surface");
-    m_megFieldMapOnHeadCheck->setChecked(false);
-    m_megFieldMapOnHeadCheck->setEnabled(false);
-
-    m_sensorTimeLabel = new QLabel("Sensor Time: 0.000 s");
-    m_sensorTimeSlider = new QSlider(Qt::Horizontal);
-    m_sensorTimeSlider->setEnabled(false);
-
-    m_linkTimeCheck = new QCheckBox("Link Time with STC");
-    m_linkTimeCheck->setChecked(true);
-    m_linkTimeCheck->setToolTip("Synchronise the evoked and source estimate time sliders.");
-
-    measurementLayout->addWidget(m_loadSensorDataBtn);
-    measurementLayout->addWidget(evokedSetLabel);
-    measurementLayout->addWidget(m_evokedSetCombo);
-    measurementLayout->addWidget(m_showMegFieldCheck);
-    measurementLayout->addWidget(m_showMegFieldContoursCheck);
-    measurementLayout->addWidget(m_showEegFieldCheck);
-    measurementLayout->addWidget(m_showEegFieldContoursCheck);
-    measurementLayout->addWidget(m_megFieldMapOnHeadCheck);
-    measurementLayout->addWidget(m_sensorTimeSlider);
-    measurementLayout->addWidget(m_sensorTimeLabel);
-    measurementLayout->addWidget(m_linkTimeCheck);
+    sensorLayout->addWidget(m_loadDigBtn);
+    sensorLayout->addWidget(m_loadTransBtn);
+    sensorLayout->addWidget(m_showMegCheck);
+    sensorLayout->addWidget(m_showEegCheck);
+    sensorLayout->addWidget(m_showDigCheck);
+    sensorLayout->addWidget(m_showDigCardinalCheck);
+    sensorLayout->addWidget(m_showDigHpiCheck);
+    sensorLayout->addWidget(m_showDigEegCheck);
+    sensorLayout->addWidget(m_showDigExtraCheck);
+    sensorLayout->addWidget(m_applyTransCheck);
 
     // ===== View Group =====
     QGroupBox *viewGroup = new QGroupBox("View");
@@ -511,37 +362,46 @@ void MainWindow::setupUI()
     viewLayout->setContentsMargins(10, 15, 10, 10);
     viewLayout->setSpacing(8);
 
-    // View Count Selector
-    QHBoxLayout *viewCountRow = new QHBoxLayout();
-    viewCountRow->addWidget(new QLabel("Layout:"));
-    m_viewCountCombo = new QComboBox();
-    m_viewCountCombo->addItem("1 View",  1);
-    m_viewCountCombo->addItem("2 Views (Split)", 2);
-    m_viewCountCombo->addItem("3 Views", 3);
-    m_viewCountCombo->addItem("4 Views (Grid)", 4);
-    m_viewCountCombo->setCurrentIndex(0);
-    m_viewCountCombo->setToolTip("Number of viewport panes: 1 = single, 2 = split, 3 = two + one, 4 = 2×2 grid.");
-    viewCountRow->addWidget(m_viewCountCombo);
-    viewLayout->addLayout(viewCountRow);
+    // Multi-View Toggle
+    m_multiViewCheck = new QCheckBox("Multi-View (4 cameras)");
+    m_multiViewCheck->setChecked(false);
+    m_multiViewCheck->setToolTip("Toggle between single interactive camera and four fixed camera views.");
+    viewLayout->addWidget(m_multiViewCheck);
 
-    m_resetMultiViewLayoutBtn = new QPushButton("Reset Layout");
-    m_resetMultiViewLayoutBtn->setEnabled(false);
-    viewLayout->addWidget(m_resetMultiViewLayoutBtn);
+    // Viewport Toggles
+    QHBoxLayout *vpRow1 = new QHBoxLayout();
+    QHBoxLayout *vpRow2 = new QHBoxLayout();
 
-    // Info Panel Toggle
-    m_showInfoCheck = new QCheckBox("Show Info Panel");
-    m_showInfoCheck->setChecked(true);
-    m_showInfoCheck->setToolTip("Toggle the FPS / vertex / shader info overlay.");
-    viewLayout->addWidget(m_showInfoCheck);
+    m_vpTopCheck = new QCheckBox("Top");
+    m_vpBottomCheck = new QCheckBox("Bottom");
+    m_vpFrontCheck = new QCheckBox("Front");
+    m_vpLeftCheck = new QCheckBox("Left");
+
+    m_vpTopCheck->setChecked(true);
+    m_vpBottomCheck->setChecked(true);
+    m_vpFrontCheck->setChecked(true);
+    m_vpLeftCheck->setChecked(true);
+
+    m_vpTopCheck->setEnabled(false);
+    m_vpBottomCheck->setEnabled(false);
+    m_vpFrontCheck->setEnabled(false);
+    m_vpLeftCheck->setEnabled(false);
+
+    vpRow1->addWidget(m_vpTopCheck);
+    vpRow1->addWidget(m_vpBottomCheck);
+    vpRow2->addWidget(m_vpFrontCheck);
+    vpRow2->addWidget(m_vpLeftCheck);
+
+    viewLayout->addLayout(vpRow1);
+    viewLayout->addLayout(vpRow2);
 
     // Assemble side panel
     sideLayout->addWidget(surfGroup);
     sideLayout->addWidget(bemGroup);
-    sideLayout->addWidget(sensorDigGroup);
-    sideLayout->addWidget(measurementGroup);
     sideLayout->addWidget(stcGroup);
     sideLayout->addWidget(dipoleGroup);
     sideLayout->addWidget(srcSpaceGroup);
+    sideLayout->addWidget(sensorGroup);
     sideLayout->addWidget(viewGroup);
     sideLayout->addStretch();
 
@@ -558,121 +418,8 @@ void MainWindow::setupUI()
 
 void MainWindow::setupConnections()
 {
-    auto refreshVisualizationControls = [this]() {
-        const int target = m_brainView->visualizationEditTarget();
-
-        if (m_linkShadersCheck->isChecked()) {
-            m_brainView->syncBemShadersToBrainShaders();
-        }
-
-        {
-            const QSignalBlocker blockSurf(m_surfCombo);
-            m_surfCombo->setCurrentText(m_brainView->activeSurfaceForTarget(target));
-        }
-
-        {
-            const QSignalBlocker blockShader(m_shaderCombo);
-            m_shaderCombo->setCurrentText(m_brainView->shaderModeForTarget(target));
-        }
-
-        {
-            const QSignalBlocker blockOverlay(m_overlayCombo);
-            m_overlayCombo->setCurrentText(m_brainView->overlayModeForTarget(target));
-        }
-
-        {
-            const QSignalBlocker blockLh(m_lhCheck);
-            const QSignalBlocker blockRh(m_rhCheck);
-            const QSignalBlocker blockHead(m_headCheck);
-            const QSignalBlocker blockOuter(m_outerCheck);
-            const QSignalBlocker blockInner(m_innerCheck);
-            const QSignalBlocker blockMeg(m_showMegCheck);
-            const QSignalBlocker blockMegGrad(m_showMegGradCheck);
-            const QSignalBlocker blockMegMag(m_showMegMagCheck);
-            const QSignalBlocker blockMegHelmet(m_showMegHelmetCheck);
-            const QSignalBlocker blockEeg(m_showEegCheck);
-            const QSignalBlocker blockDig(m_showDigCheck);
-            const QSignalBlocker blockDigCardinal(m_showDigCardinalCheck);
-            const QSignalBlocker blockDigHpi(m_showDigHpiCheck);
-            const QSignalBlocker blockDigEeg(m_showDigEegCheck);
-            const QSignalBlocker blockDigExtra(m_showDigExtraCheck);
-            const QSignalBlocker blockMegField(m_showMegFieldCheck);
-            const QSignalBlocker blockEegField(m_showEegFieldCheck);
-            const QSignalBlocker blockMegContours(m_showMegFieldContoursCheck);
-            const QSignalBlocker blockEegContours(m_showEegFieldContoursCheck);
-            const QSignalBlocker blockMegOnHead(m_megFieldMapOnHeadCheck);
-            const QSignalBlocker blockDipoles(m_showDipoleCheck);
-            const QSignalBlocker blockSrc(m_showSrcSpaceCheck);
-
-            m_lhCheck->setChecked(m_brainView->objectVisibleForTarget("lh", target));
-            m_rhCheck->setChecked(m_brainView->objectVisibleForTarget("rh", target));
-            m_headCheck->setChecked(m_brainView->objectVisibleForTarget("bem_head", target));
-            m_outerCheck->setChecked(m_brainView->objectVisibleForTarget("bem_outer_skull", target));
-            m_innerCheck->setChecked(m_brainView->objectVisibleForTarget("bem_inner_skull", target));
-
-            m_showMegCheck->setChecked(m_brainView->objectVisibleForTarget("sens_meg", target));
-            m_showMegGradCheck->setChecked(m_brainView->objectVisibleForTarget("sens_meg_grad", target));
-            m_showMegMagCheck->setChecked(m_brainView->objectVisibleForTarget("sens_meg_mag", target));
-            m_showMegHelmetCheck->setChecked(m_brainView->objectVisibleForTarget("sens_meg_helmet", target));
-            m_showEegCheck->setChecked(m_brainView->objectVisibleForTarget("sens_eeg", target));
-
-            m_showDigCheck->setChecked(m_brainView->objectVisibleForTarget("dig", target));
-            m_showDigCardinalCheck->setChecked(m_brainView->objectVisibleForTarget("dig_cardinal", target));
-            m_showDigHpiCheck->setChecked(m_brainView->objectVisibleForTarget("dig_hpi", target));
-            m_showDigEegCheck->setChecked(m_brainView->objectVisibleForTarget("dig_eeg", target));
-            m_showDigExtraCheck->setChecked(m_brainView->objectVisibleForTarget("dig_extra", target));
-
-            m_showMegFieldCheck->setChecked(m_brainView->objectVisibleForTarget("field_meg", target));
-            m_showEegFieldCheck->setChecked(m_brainView->objectVisibleForTarget("field_eeg", target));
-            m_showMegFieldContoursCheck->setChecked(m_brainView->objectVisibleForTarget("contour_meg", target));
-            m_showEegFieldContoursCheck->setChecked(m_brainView->objectVisibleForTarget("contour_eeg", target));
-            m_megFieldMapOnHeadCheck->setChecked(m_brainView->megFieldMapOnHeadForTarget(target));
-
-            m_showDipoleCheck->setChecked(m_brainView->objectVisibleForTarget("dipoles", target));
-            m_showSrcSpaceCheck->setChecked(m_brainView->objectVisibleForTarget("source_space", target));
-        }
-
-        m_showMegGradCheck->setEnabled(m_showMegCheck->isEnabled() && m_showMegCheck->isChecked());
-        m_showMegMagCheck->setEnabled(m_showMegCheck->isEnabled() && m_showMegCheck->isChecked());
-        m_showMegHelmetCheck->setEnabled(m_showMegCheck->isEnabled() && m_showMegCheck->isChecked());
-        m_showDigCardinalCheck->setEnabled(m_showDigCheck->isEnabled() && m_showDigCheck->isChecked());
-        m_showDigHpiCheck->setEnabled(m_showDigCheck->isEnabled() && m_showDigCheck->isChecked());
-        m_showDigEegCheck->setEnabled(m_showDigCheck->isEnabled() && m_showDigCheck->isChecked());
-        m_showDigExtraCheck->setEnabled(m_showDigCheck->isEnabled() && m_showDigCheck->isChecked());
-
-        {
-            const QSignalBlocker blockBem(m_bemShaderCombo);
-            if (m_linkShadersCheck->isChecked()) {
-                m_bemShaderCombo->setCurrentText(m_shaderCombo->currentText());
-            } else {
-                m_bemShaderCombo->setCurrentText(m_brainView->bemShaderModeForTarget(target));
-            }
-        }
-
-        const bool isInflated = (m_surfCombo->currentText() == "inflated");
-        if (isInflated) {
-            m_headCheck->setChecked(false);
-            m_outerCheck->setChecked(false);
-            m_innerCheck->setChecked(false);
-        }
-        m_headCheck->setEnabled(!isInflated);
-        m_outerCheck->setEnabled(!isInflated);
-        m_innerCheck->setEnabled(!isInflated);
-
-        m_brainView->setActiveSurface(m_surfCombo->currentText());
-        m_brainView->setShaderMode(m_shaderCombo->currentText());
-        m_brainView->setVisualizationMode(m_overlayCombo->currentText());
-        if (m_linkShadersCheck->isChecked()) {
-            m_brainView->setBemShaderMode(m_shaderCombo->currentText());
-        } else {
-            m_brainView->setBemShaderMode(m_bemShaderCombo->currentText());
-        }
-    };
-
     // Surface type
-    connect(m_surfCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
-        m_brainView->setActiveSurface(text);
-    });
+    connect(m_surfCombo, &QComboBox::currentTextChanged, m_brainView, &BrainView::setActiveSurface);
 
     // Inflated surface logic
     connect(m_surfCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
@@ -688,12 +435,9 @@ void MainWindow::setupConnections()
     });
 
     // Shaders
-    connect(m_shaderCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
-        m_brainView->setShaderMode(text);
-    });
+    connect(m_shaderCombo, &QComboBox::currentTextChanged, m_brainView, &BrainView::setShaderMode);
     connect(m_shaderCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
         if (m_linkShadersCheck->isChecked()) {
-            m_brainView->syncBemShadersToBrainShaders();
             m_bemShaderCombo->setCurrentText(text);
         }
     });
@@ -701,20 +445,8 @@ void MainWindow::setupConnections()
     connect(m_linkShadersCheck, &QCheckBox::toggled, [this](bool checked) {
         m_bemShaderCombo->setEnabled(!checked);
         if (checked) {
-            m_brainView->syncBemShadersToBrainShaders();
             m_bemShaderCombo->setCurrentText(m_shaderCombo->currentText());
         }
-
-        QSettings settings("MNECPP");
-        settings.beginGroup("ex_brain_view/MainWindow");
-        settings.setValue("linkShaders", checked);
-        settings.endGroup();
-    });
-
-    // When user clicks a viewport in BrainView, refresh the visualization controls
-    connect(m_brainView, &BrainView::visualizationEditTargetChanged,
-            [this, refreshVisualizationControls](int /*target*/) {
-        refreshVisualizationControls();
     });
 
     // Overlay
@@ -732,9 +464,8 @@ void MainWindow::setupConnections()
 
     // BEM loading
     connect(m_loadBemBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select BEM Surface", dataDialogStartPath("bem"), "BEM Files (*-bem.fif *-bem-sol.fif);;FIF Files (*.fif);;All Files (*)");
+        QString path = QFileDialog::getOpenFileName(this, "Select BEM Surface", "", "BEM Files (*-bem.fif *-bem-sol.fif);;FIF Files (*.fif);;All Files (*)");
         if (path.isEmpty()) return;
-        rememberDataPath("bem", path);
         loadBem("User", path);
     });
 
@@ -744,22 +475,27 @@ void MainWindow::setupConnections()
     connect(m_innerCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setBemVisible("inner_skull", checked); });
     connect(m_bemColorCheck, &QCheckBox::toggled, m_brainView, &BrainView::setBemHighContrast);
 
-    // View count dropdown
-    connect(m_viewCountCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
-            [this, refreshVisualizationControls](int index) {
-        const int count = m_viewCountCombo->itemData(index).toInt();
-        m_brainView->setViewCount(count);
-        m_resetMultiViewLayoutBtn->setEnabled(count > 1);
-        refreshVisualizationControls();
+    // Multi-view
+    connect(m_multiViewCheck, &QCheckBox::toggled, [this](bool checked) {
+        m_vpTopCheck->setEnabled(checked);
+        m_vpBottomCheck->setEnabled(checked);
+        m_vpFrontCheck->setEnabled(checked);
+        m_vpLeftCheck->setEnabled(checked);
+        if (checked) {
+            m_brainView->showMultiView();
+        } else {
+            m_brainView->showSingleView();
+        }
     });
-    connect(m_resetMultiViewLayoutBtn, &QPushButton::clicked, m_brainView, &BrainView::resetMultiViewLayout);
-    connect(m_showInfoCheck, &QCheckBox::toggled, m_brainView, &BrainView::setInfoPanelVisible);
+    connect(m_vpTopCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(0, checked); });
+    connect(m_vpBottomCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(1, checked); });
+    connect(m_vpFrontCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(2, checked); });
+    connect(m_vpLeftCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(3, checked); });
 
     // Brain Surface
     connect(m_loadSurfaceBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select Surface", dataDialogStartPath("surface"), "FreeSurfer Surface (*.pial *.inflated *.white *.orig);;All Files (*)");
+        QString path = QFileDialog::getOpenFileName(this, "Select Surface", "", "FreeSurfer Surface (*.pial *.inflated *.white *.orig);;All Files (*)");
         if (path.isEmpty()) return;
-        rememberDataPath("surface", path);
 
         // Guess hemi and type
         QString fileName = QFileInfo(path).fileName();
@@ -772,17 +508,12 @@ void MainWindow::setupConnections()
         Surface surf(path);
         if (!surf.isEmpty()) {
             m_model->addSurface("User", hemi, type, surf);
-            // Set the combo to the loaded surface type so the active pane
-            // renders this surface.  Without this, the pane keeps its old
-            // surfaceType and may not match the newly loaded surface.
-            m_surfCombo->setCurrentText(type);
         }
     });
 
     connect(m_loadAtlasBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select Atlas", dataDialogStartPath("atlas"), "FreeSurfer Annotation (*.annot);;All Files (*)");
+        QString path = QFileDialog::getOpenFileName(this, "Select Atlas", "", "FreeSurfer Annotation (*.annot);;All Files (*)");
         if (path.isEmpty()) return;
-        rememberDataPath("atlas", path);
 
         // Guess hemi
         QString fileName = QFileInfo(path).fileName();
@@ -796,9 +527,8 @@ void MainWindow::setupConnections()
 
     // STC loading
     connect(m_loadStcBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select Source Estimate", dataDialogStartPath("stc"), "STC Files (*-lh.stc *-rh.stc *.stc)");
+        QString path = QFileDialog::getOpenFileName(this, "Select Source Estimate", "", "STC Files (*-lh.stc *-rh.stc *.stc)");
         if (path.isEmpty()) return;
-        rememberDataPath("stc", path);
 
         QString lhPath, rhPath;
         if (path.contains("-lh.stc")) {
@@ -853,38 +583,12 @@ void MainWindow::setupConnections()
         }
     });
 
-    connect(m_brainView, &BrainView::sourceThresholdsUpdated, [this](float min, float mid, float max) {
-        const QSignalBlocker blockMin(m_minThresh);
-        const QSignalBlocker blockMid(m_midThresh);
-        const QSignalBlocker blockMax(m_maxThresh);
-        m_minThresh->setValue(static_cast<double>(min));
-        m_midThresh->setValue(static_cast<double>(mid));
-        m_maxThresh->setValue(static_cast<double>(max));
-    });
-
     connect(m_timeSlider, &QSlider::valueChanged, m_brainView, &BrainView::setTimePoint);
     connect(m_brainView, &BrainView::timePointChanged, [this](int, float time) {
         m_timeLabel->setText(QString("Time: %1 s").arg(time, 0, 'f', 3));
-        // Sync evoked slider when link is active
-        if (!m_isSyncingTime && m_linkTimeCheck->isChecked() && m_sensorTimeSlider->isEnabled()) {
-            // Only sync if STC time falls within the evoked time range
-            float evokedTmin = 0, evokedTmax = 0;
-            if (m_brainView->sensorFieldTimeRange(evokedTmin, evokedTmax)
-                && time >= evokedTmin && time <= evokedTmax) {
-                int idx = m_brainView->closestSensorFieldIndex(time);
-                if (idx >= 0) {
-                    m_isSyncingTime = true;
-                    const QSignalBlocker block(m_sensorTimeSlider);
-                    m_sensorTimeSlider->setValue(idx);
-                    m_brainView->setSensorFieldTimePoint(idx);
-                    m_isSyncingTime = false;
-                }
-            }
-        }
     });
 
     connect(m_colormapCombo, &QComboBox::currentTextChanged, m_brainView, &BrainView::setSourceColormap);
-    connect(m_colormapCombo, &QComboBox::currentTextChanged, m_brainView, &BrainView::setSensorFieldColormap);
 
     auto updateThresholds = [this]() {
         m_brainView->setSourceThresholds(
@@ -899,15 +603,30 @@ void MainWindow::setupConnections()
 
     // Playback
     connect(m_playButton, &QPushButton::clicked, [this]() {
-        if (m_stcTimer->isActive()) {
-            m_stcTimer->stop();
-            m_playButton->setText("Play");
-        } else {
-            if (m_overlayCombo->currentText() != "Source Estimate") {
-                m_overlayCombo->setCurrentText("Source Estimate");
+        if (m_realtimeCheck->isChecked()) {
+            // Real-time streaming mode
+            if (m_brainView->isRealtimeStreaming()) {
+                m_brainView->stopRealtimeStreaming();
+                m_playButton->setText("Play");
+            } else {
+                if (m_overlayCombo->currentText() != "Source Estimate") {
+                    m_overlayCombo->setCurrentText("Source Estimate");
+                }
+                m_brainView->startRealtimeStreaming();
+                m_playButton->setText("Pause");
             }
-            m_stcTimer->start();
-            m_playButton->setText("Pause");
+        } else {
+            // Simple timer mode
+            if (m_stcTimer->isActive()) {
+                m_stcTimer->stop();
+                m_playButton->setText("Play");
+            } else {
+                if (m_overlayCombo->currentText() != "Source Estimate") {
+                    m_overlayCombo->setCurrentText("Source Estimate");
+                }
+                m_stcTimer->start();
+                m_playButton->setText("Pause");
+            }
         }
     });
 
@@ -917,6 +636,23 @@ void MainWindow::setupConnections()
             double factor = m_speedCombo->currentData().toDouble();
             int interval = static_cast<int>((tstep * 1000.0f) / factor);
             m_stcTimer->setInterval(interval);
+            // Also update real-time streaming interval
+            m_brainView->setRealtimeInterval(interval);
+        }
+    });
+
+    connect(m_loopCheck, &QCheckBox::toggled, [this](bool checked) {
+        m_brainView->setRealtimeLooping(checked);
+    });
+
+    connect(m_realtimeCheck, &QCheckBox::toggled, [this](bool checked) {
+        // If switching modes while playing, stop active playback
+        if (checked && m_stcTimer->isActive()) {
+            m_stcTimer->stop();
+            m_playButton->setText("Play");
+        } else if (!checked && m_brainView->isRealtimeStreaming()) {
+            m_brainView->stopRealtimeStreaming();
+            m_playButton->setText("Play");
         }
     });
 
@@ -928,17 +664,11 @@ void MainWindow::setupConnections()
 
     // Sensors
     connect(m_loadDigBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select Sensor/Digitizer File", dataDialogStartPath("digitizer"), "FIF Files (*.fif)");
+        QString path = QFileDialog::getOpenFileName(this, "Select Sensor/Digitizer File", "", "FIF Files (*.fif)");
         if (path.isEmpty()) return;
-        rememberDataPath("digitizer", path);
 
         if (m_brainView->loadSensors(path)) {
-            m_lastSensorPath = path;
             m_showMegCheck->setEnabled(true);
-            m_showMegGradCheck->setEnabled(false);
-            m_showMegMagCheck->setEnabled(false);
-            m_showMegHelmetCheck->setEnabled(false);
-            m_megHelmetCombo->setEnabled(true);
             m_showEegCheck->setEnabled(true);
             m_showDigCheck->setEnabled(true);
             // Sub-category checkboxes stay disabled until master is toggled on
@@ -946,80 +676,12 @@ void MainWindow::setupConnections()
     });
 
     connect(m_loadTransBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select Transformation", dataDialogStartPath("transform"), "FIF Files (*.fif)");
+        QString path = QFileDialog::getOpenFileName(this, "Select Transformation", "", "FIF Files (*.fif)");
         if (path.isEmpty()) return;
-        rememberDataPath("transform", path);
         m_brainView->loadTransformation(path);
     });
 
-    connect(m_loadSensorDataBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select Evoked/Average", dataDialogStartPath("measurement"), "Evoked/Average Files (*-ave.fif);;All FIF Files (*.fif)");
-        if (path.isEmpty()) return;
-        rememberDataPath("measurement", path);
-
-        // Probe available evoked sets and populate combo
-        QStringList setLabels = BrainView::probeEvokedSets(path);
-        {
-            const QSignalBlocker block(m_evokedSetCombo);
-            m_evokedSetCombo->clear();
-            for (int i = 0; i < setLabels.size(); ++i) {
-                m_evokedSetCombo->addItem(setLabels.at(i), i);
-            }
-        }
-        m_evokedSetCombo->setEnabled(setLabels.size() > 0);
-        m_lastMeasurementPath = path;
-
-        // Load the first set by default
-        int aveIndex = m_evokedSetCombo->currentData().toInt();
-        if (m_brainView->loadSensorField(path, aveIndex)) {
-            m_showMegFieldCheck->setEnabled(true);
-            m_showEegFieldCheck->setEnabled(true);
-            m_showMegFieldContoursCheck->setEnabled(true);
-            m_showEegFieldContoursCheck->setEnabled(true);
-            m_megFieldMapOnHeadCheck->setEnabled(true);
-            m_sensorTimeSlider->setEnabled(true);
-            m_showMegFieldCheck->setChecked(true);
-            m_showEegFieldCheck->setChecked(true);
-        }
-    });
-
-    // When user picks a different evoked set from the combo, reload
-    connect(m_evokedSetCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int /*index*/) {
-        if (m_lastMeasurementPath.isEmpty()) return;
-        int aveIndex = m_evokedSetCombo->currentData().toInt();
-        m_brainView->loadSensorField(m_lastMeasurementPath, aveIndex);
-    });
-
     connect(m_showMegCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("MEG", checked); });
-    connect(m_showMegCheck, &QCheckBox::toggled, [this](bool checked) {
-        m_showMegGradCheck->setEnabled(checked);
-        m_showMegMagCheck->setEnabled(checked);
-        m_showMegHelmetCheck->setEnabled(checked);
-        m_showMegGradCheck->setChecked(checked);
-        m_showMegMagCheck->setChecked(checked);
-        m_showMegHelmetCheck->setChecked(checked);
-    });
-    connect(m_showMegGradCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("MEG/Grad", checked); });
-    connect(m_showMegMagCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("MEG/Mag", checked); });
-    connect(m_showMegHelmetCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("MEG Helmet", checked); });
-    connect(m_megHelmetCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() {
-        const QString overridePath = m_megHelmetCombo->currentData().toString();
-        m_brainView->setMegHelmetOverride(overridePath);
-        if (!m_lastSensorPath.isEmpty()) {
-            if (m_brainView->loadSensors(m_lastSensorPath)) {
-                m_brainView->setSensorVisible("MEG", m_showMegCheck->isChecked());
-                m_brainView->setSensorVisible("MEG/Grad", m_showMegGradCheck->isChecked());
-                m_brainView->setSensorVisible("MEG/Mag", m_showMegMagCheck->isChecked());
-                m_brainView->setSensorVisible("MEG Helmet", m_showMegHelmetCheck->isChecked());
-                m_brainView->setSensorVisible("EEG", m_showEegCheck->isChecked());
-                m_brainView->setSensorVisible("Digitizer", m_showDigCheck->isChecked());
-                m_brainView->setSensorVisible("Digitizer/Cardinal", m_showDigCardinalCheck->isChecked());
-                m_brainView->setSensorVisible("Digitizer/HPI", m_showDigHpiCheck->isChecked());
-                m_brainView->setSensorVisible("Digitizer/EEG", m_showDigEegCheck->isChecked());
-                m_brainView->setSensorVisible("Digitizer/Extra", m_showDigExtraCheck->isChecked());
-            }
-        }
-    });
     connect(m_showEegCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("EEG", checked); });
     connect(m_showDigCheck, &QCheckBox::toggled, [this](bool checked) {
         m_brainView->setSensorVisible("Digitizer", checked);
@@ -1040,47 +702,10 @@ void MainWindow::setupConnections()
     connect(m_showDigExtraCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("Digitizer/Extra", checked); });
     connect(m_applyTransCheck, &QCheckBox::toggled, m_brainView, &BrainView::setSensorTransEnabled);
 
-    connect(m_showMegFieldCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorFieldVisible("MEG", checked); });
-    connect(m_showEegFieldCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorFieldVisible("EEG", checked); });
-    connect(m_showMegFieldContoursCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorFieldContourVisible("MEG", checked); });
-    connect(m_showEegFieldContoursCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorFieldContourVisible("EEG", checked); });
-    connect(m_megFieldMapOnHeadCheck, &QCheckBox::toggled, m_brainView, &BrainView::setMegFieldMapOnHead);
-    connect(m_sensorTimeSlider, &QSlider::valueChanged, m_brainView, &BrainView::setSensorFieldTimePoint);
-
-    connect(m_brainView, &BrainView::sensorFieldLoaded, [this](int numPoints) {
-        m_sensorTimeSlider->setRange(0, numPoints - 1);
-        m_sensorTimeSlider->setValue(0);
-        m_sensorTimeLabel->setText("Sensor Time: 0.000 s");
-    });
-    connect(m_brainView, &BrainView::sensorFieldTimePointChanged, [this](int, float time) {
-        m_sensorTimeLabel->setText(QString("Sensor Time: %1 s").arg(time, 0, 'f', 3));
-        // Sync STC slider when link is active
-        if (!m_isSyncingTime && m_linkTimeCheck->isChecked() && m_timeSlider->isEnabled()) {
-            // Only sync if evoked time falls within the STC time range
-            float stcTmin = m_brainView->stcTmin();
-            float stcStep = m_brainView->stcStep();
-            int stcN = m_brainView->stcNumTimePoints();
-            if (stcN > 0 && stcStep > 0) {
-                float stcTmax = stcTmin + (stcN - 1) * stcStep;
-                if (time >= stcTmin && time <= stcTmax) {
-                    int idx = m_brainView->closestStcIndex(time);
-                    if (idx >= 0) {
-                        m_isSyncingTime = true;
-                        const QSignalBlocker block(m_timeSlider);
-                        m_timeSlider->setValue(idx);
-                        m_brainView->setTimePoint(idx);
-                        m_isSyncingTime = false;
-                    }
-                }
-            }
-        }
-    });
-
     // Dipoles
     connect(m_loadDipoleBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select Dipoles", dataDialogStartPath("dipole"), "Dipole Files (*.dip *.bdip)");
+        QString path = QFileDialog::getOpenFileName(this, "Select Dipoles", "", "Dipole Files (*.dip *.bdip)");
         if (path.isEmpty()) return;
-        rememberDataPath("dipole", path);
         if (m_brainView->loadDipoles(path)) {
             m_showDipoleCheck->setEnabled(true);
         }
@@ -1090,10 +715,9 @@ void MainWindow::setupConnections()
 
     // Source Space
     connect(m_loadSrcSpaceBtn, &QPushButton::clicked, [this]() {
-        QString path = QFileDialog::getOpenFileName(this, "Select Source Space / Forward Solution", dataDialogStartPath("srcspace"),
+        QString path = QFileDialog::getOpenFileName(this, "Select Source Space / Forward Solution", "",
             "Source Space Files (*-src.fif *-fwd.fif);;All FIF Files (*.fif)");
         if (path.isEmpty()) return;
-        rememberDataPath("srcspace", path);
         if (m_brainView->loadSourceSpace(path)) {
             m_showSrcSpaceCheck->setEnabled(true);
             m_showSrcSpaceCheck->setChecked(false);
@@ -1103,40 +727,12 @@ void MainWindow::setupConnections()
 
     connect(m_showSrcSpaceCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSourceSpaceVisible(checked); });
 
-    {
-        QSettings settings("MNECPP");
-        settings.beginGroup("ex_brain_view/MainWindow");
-        const bool linkShaders = settings.value("linkShaders", true).toBool();
-        settings.endGroup();
-
-        const QSignalBlocker blockLink(m_linkShadersCheck);
-        m_linkShadersCheck->setChecked(linkShaders);
-        m_bemShaderCombo->setEnabled(!linkShaders);
-        if (linkShaders) {
-            m_brainView->syncBemShadersToBrainShaders();
-            m_bemShaderCombo->setCurrentText(m_shaderCombo->currentText());
-        }
-    }
-
-    const bool isMultiView = (m_brainView->viewMode() == BrainView::MultiView);
-    {
-        const QSignalBlocker blockCombo(m_viewCountCombo);
-        m_viewCountCombo->setCurrentIndex(m_brainView->viewCount() - 1);
-    }
-    m_resetMultiViewLayoutBtn->setEnabled(isMultiView);
-
-    // The BrainView already restored m_visualizationEditTarget from QSettings.
-    // If multi-view, ensure it's a valid pane (default to Perspective).
-    if (isMultiView) {
-        int editTarget = m_brainView->visualizationEditTarget();
-        if (editTarget < 0 || editTarget > 3) {
-            editTarget = 1;
-        }
-        m_brainView->setVisualizationEditTarget(editTarget);
-    } else {
-        m_brainView->setVisualizationEditTarget(-1);
-    }
-    refreshVisualizationControls();
+    // Sync initial state
+    m_brainView->setHemiVisible(0, m_lhCheck->isChecked());
+    m_brainView->setHemiVisible(1, m_rhCheck->isChecked());
+    m_brainView->setBemVisible("head", m_headCheck->isChecked());
+    m_brainView->setBemVisible("outer_skull", m_outerCheck->isChecked());
+    m_brainView->setBemVisible("inner_skull", m_innerCheck->isChecked());
 }
 
 //=============================================================================================================
@@ -1162,15 +758,10 @@ void MainWindow::loadInitialData(const QString &subjectPath,
         loadHemisphere(subjectPath, subjectName, "lh");
         loadHemisphere(subjectPath, subjectName, "rh");
         qDebug() << "Surfaces loaded.";
-
-        // After bulk-loading surfaces, sync the combo & active pane so the
-        // selected pane renders the first loaded surface type ("pial").
-        m_surfCombo->setCurrentText("pial");
     }
 
     // Auto-load atlas annotation (explicit path overrides auto-discovery in loadHemisphere)
     if (!atlasPath.isEmpty() && QFile::exists(atlasPath)) {
-        rememberDataPath("atlas", atlasPath);
         qDebug() << "Auto-loading atlas from:" << atlasPath;
         QString fileName = QFileInfo(atlasPath).fileName();
         QString lhAnnotPath, rhAnnotPath;
@@ -1202,21 +793,14 @@ void MainWindow::loadInitialData(const QString &subjectPath,
     }
 
     if (!bemPath.isEmpty()) {
-        rememberDataPath("bem", bemPath);
         loadBem(subjectName, bemPath);
     }
 
     // Auto-load digitizer
     if (!digitizerPath.isEmpty() && QFile::exists(digitizerPath)) {
-        rememberDataPath("digitizer", digitizerPath);
         qDebug() << "Auto-loading digitizer from:" << digitizerPath;
         if (m_brainView->loadSensors(digitizerPath)) {
-            m_lastSensorPath = digitizerPath;
             m_showMegCheck->setEnabled(true);
-            m_showMegGradCheck->setEnabled(false);
-            m_showMegMagCheck->setEnabled(false);
-            m_showMegHelmetCheck->setEnabled(false);
-            m_megHelmetCombo->setEnabled(true);
             m_showEegCheck->setEnabled(true);
             m_showDigCheck->setEnabled(true);
             // Sub-category checkboxes stay disabled until master is toggled on
@@ -1228,14 +812,12 @@ void MainWindow::loadInitialData(const QString &subjectPath,
 
     // Auto-load transformation
     if (!transPath.isEmpty() && QFile::exists(transPath)) {
-        rememberDataPath("transform", transPath);
         qDebug() << "Auto-loading transformation from:" << transPath;
         m_brainView->loadTransformation(transPath);
     }
 
     // Auto-load source space
     if (!srcSpacePath.isEmpty() && QFile::exists(srcSpacePath)) {
-        rememberDataPath("srcspace", srcSpacePath);
         qDebug() << "Auto-loading source space from:" << srcSpacePath;
         if (m_brainView->loadSourceSpace(srcSpacePath)) {
             m_showSrcSpaceCheck->setEnabled(true);
@@ -1246,7 +828,6 @@ void MainWindow::loadInitialData(const QString &subjectPath,
 
     // Auto-load STC
     if (!stcPath.isEmpty() && QFile::exists(stcPath)) {
-        rememberDataPath("stc", stcPath);
         qDebug() << "Auto-loading source estimate from:" << stcPath;
 
         QString lhPath, rhPath;

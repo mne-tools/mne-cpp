@@ -40,6 +40,7 @@ add_subdirectory(test_signalModel)
 
 add_subdirectory(test_interpolation)
 add_subdirectory(test_geometryinfo)
+add_subdirectory(test_rt_source_streaming)
 add_subdirectory(test_spectral_connectivity)
 add_subdirectory(test_mne_anonymize)
 add_subdirectory(test_edf2fiff_rwr)
