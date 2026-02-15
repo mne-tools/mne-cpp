@@ -48,10 +48,13 @@
 #include <mne/mne_bem_surface.h>
 #include <mne/mne_sourcespace.h>
 #include <fiff/fiff_dig_point.h>
+#include <connectivity/network/network.h>
 
 namespace INVERSELIB {
 class ECDSet;
 }
+
+class NetworkTreeItem;
 
 class SurfaceTreeItem;
 class BemTreeItem;
@@ -83,6 +86,9 @@ public:
 
     // Add source space points
     void addSourceSpace(const MNELIB::MNESourceSpace &srcSpace);
+
+    // Add connectivity network
+    NetworkTreeItem* addNetwork(const CONNECTIVITYLIB::Network &network, const QString &name = "Network");
 
 private:
    // Helpers to find specific items

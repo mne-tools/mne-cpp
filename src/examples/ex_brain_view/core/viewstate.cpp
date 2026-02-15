@@ -69,6 +69,7 @@ bool ViewVisibilityProfile::isObjectVisible(const QString &object) const
     if (object == "contour_eeg")       return eegFieldContours;
     if (object == "dipoles")           return dipoles;
     if (object == "source_space")      return sourceSpace;
+    if (object == "network")           return network;
     return true; // unknown objects default visible
 }
 
@@ -97,6 +98,7 @@ void ViewVisibilityProfile::setObjectVisible(const QString &object, bool visible
     else if (object == "contour_eeg")      eegFieldContours = visible;
     else if (object == "dipoles")          dipoles = visible;
     else if (object == "source_space")     sourceSpace = visible;
+    else if (object == "network")          network = visible;
 }
 
 //=============================================================================================================
@@ -124,6 +126,7 @@ void ViewVisibilityProfile::load(const QSettings &settings, const QString &prefi
     eegFieldContours = isTrue(settings.value(prefix + "eegFieldContours"), eegFieldContours);
     dipoles         = isTrue(settings.value(prefix + "dipoles"),         dipoles);
     sourceSpace     = isTrue(settings.value(prefix + "sourceSpace"),     sourceSpace);
+    network         = isTrue(settings.value(prefix + "network"),         network);
     megFieldMapOnHead = isTrue(settings.value(prefix + "megFieldMapOnHead"), megFieldMapOnHead);
 }
 
@@ -152,6 +155,7 @@ void ViewVisibilityProfile::save(QSettings &settings, const QString &prefix) con
     settings.setValue(prefix + "eegFieldContours", eegFieldContours);
     settings.setValue(prefix + "dipoles",         dipoles);
     settings.setValue(prefix + "sourceSpace",     sourceSpace);
+    settings.setValue(prefix + "network",         network);
     settings.setValue(prefix + "megFieldMapOnHead", megFieldMapOnHead);
 }
 

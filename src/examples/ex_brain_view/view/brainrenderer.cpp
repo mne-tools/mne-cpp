@@ -352,3 +352,87 @@ void BrainRenderer::renderDipoles(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
     
     cb->drawIndexed(dipoles->indexCount(), dipoles->instanceCount());
 }
+
+//=============================================================================================================
+
+void BrainRenderer::renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, NetworkObject *network)
+{
+    if (!network || !network->isVisible() || !network->hasData()) return;
+
+    if (m_pipelines.find(Dipole) == m_pipelines.end()) return;
+
+    auto *pipeline = m_pipelines[Dipole].get();
+    if (!pipeline) return;
+
+    // --- Render Nodes (instanced spheres) ---
+    if (network->nodeInstanceCount() > 0) {
+        QRhiResourceUpdateBatch *uNodes = rhi->nextResourceUpdateBatch();
+        network->updateNodeBuffers(rhi, uNodes);
+
+        int offset = m_currentUniformOffset;
+        m_currentUniformOffset += m_uniformBufferOffsetAlignment;
+        if (m_currentUniformOffset >= m_uniformBuffer->size()) {
+            qWarning("BrainRenderer: uniform buffer overflow in renderNetwork (nodes)");
+            return;
+        }
+
+        uNodes->updateDynamicBuffer(m_uniformBuffer.get(), offset + 0, 64, data.mvp.constData());
+        uNodes->updateDynamicBuffer(m_uniformBuffer.get(), offset + 64, 12, &data.cameraPos);
+        uNodes->updateDynamicBuffer(m_uniformBuffer.get(), offset + 80, 12, &data.lightDir);
+        float lighting = data.lightingEnabled ? 1.0f : 0.0f;
+        uNodes->updateDynamicBuffer(m_uniformBuffer.get(), offset + 92, 4, &lighting);
+
+        cb->resourceUpdate(uNodes);
+        cb->setViewport(data.viewport);
+        cb->setScissor(data.scissor);
+
+        cb->setGraphicsPipeline(pipeline);
+
+        const QRhiCommandBuffer::DynamicOffset srbOffset = { 0, uint32_t(offset) };
+        cb->setShaderResources(m_srb.get(), 1, &srbOffset);
+
+        const QRhiCommandBuffer::VertexInput nodeBindings[2] = {
+            QRhiCommandBuffer::VertexInput(network->nodeVertexBuffer(), 0),
+            QRhiCommandBuffer::VertexInput(network->nodeInstanceBuffer(), 0)
+        };
+
+        cb->setVertexInput(0, 2, nodeBindings, network->nodeIndexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
+        cb->drawIndexed(network->nodeIndexCount(), network->nodeInstanceCount());
+    }
+
+    // --- Render Edges (instanced cylinders) ---
+    if (network->edgeInstanceCount() > 0) {
+        QRhiResourceUpdateBatch *uEdges = rhi->nextResourceUpdateBatch();
+        network->updateEdgeBuffers(rhi, uEdges);
+
+        int offset = m_currentUniformOffset;
+        m_currentUniformOffset += m_uniformBufferOffsetAlignment;
+        if (m_currentUniformOffset >= m_uniformBuffer->size()) {
+            qWarning("BrainRenderer: uniform buffer overflow in renderNetwork (edges)");
+            return;
+        }
+
+        uEdges->updateDynamicBuffer(m_uniformBuffer.get(), offset + 0, 64, data.mvp.constData());
+        uEdges->updateDynamicBuffer(m_uniformBuffer.get(), offset + 64, 12, &data.cameraPos);
+        uEdges->updateDynamicBuffer(m_uniformBuffer.get(), offset + 80, 12, &data.lightDir);
+        float lighting = data.lightingEnabled ? 1.0f : 0.0f;
+        uEdges->updateDynamicBuffer(m_uniformBuffer.get(), offset + 92, 4, &lighting);
+
+        cb->resourceUpdate(uEdges);
+        cb->setViewport(data.viewport);
+        cb->setScissor(data.scissor);
+
+        cb->setGraphicsPipeline(pipeline);
+
+        const QRhiCommandBuffer::DynamicOffset srbOffset = { 0, uint32_t(offset) };
+        cb->setShaderResources(m_srb.get(), 1, &srbOffset);
+
+        const QRhiCommandBuffer::VertexInput edgeBindings[2] = {
+            QRhiCommandBuffer::VertexInput(network->edgeVertexBuffer(), 0),
+            QRhiCommandBuffer::VertexInput(network->edgeInstanceBuffer(), 0)
+        };
+
+        cb->setVertexInput(0, 2, edgeBindings, network->edgeIndexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
+        cb->drawIndexed(network->edgeIndexCount(), network->edgeInstanceCount());
+    }
+}

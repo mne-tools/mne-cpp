@@ -1,8 +1,7 @@
 //=============================================================================================================
 /**
- * @file     abstracttreeitem.h
- * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>;
- *           Lorenz Esch <lesch@mgh.harvard.edu>
+ * @file     networktreeitem.h
+ * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     February, 2026
  *
@@ -29,64 +28,48 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    AbstractTreeItem class declaration.
+ * @brief    NetworkTreeItem class declaration.
  *
  */
 
-#ifndef ABSTRACTTREEITEM_H
-#define ABSTRACTTREEITEM_H
+#ifndef NETWORKTREEITEM_H
+#define NETWORKTREEITEM_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <QStandardItem>
-#include <QVariant>
-#include <QMatrix4x4>
-#include <QVector3D>
+#include "abstracttreeitem.h"
 
-class AbstractTreeItem : public QStandardItem
+//=============================================================================================================
+/**
+ * NetworkTreeItem holds metadata about a connectivity network in the tree model.
+ *
+ * @brief Tree item representing a connectivity network.
+ */
+class NetworkTreeItem : public AbstractTreeItem
 {
 public:
-    enum ItemRole {
-        TypeRole = Qt::UserRole + 100,
-        VisibleRole,
-        TransformRole,
-        ColorRole,
-        AlphaRole
-    };
+    //=========================================================================================================
+    /**
+     * Constructs a NetworkTreeItem.
+     *
+     * @param[in] text           Display text.
+     * @param[in] objectKey      Unique key (e.g. "net_coherence").
+     */
+    explicit NetworkTreeItem(const QString &text = "Network",
+                             const QString &objectKey = QString());
 
-    enum ItemType {
-        AbstractItem = 0,
-        SurfaceItem,
-        BemItem,
-        SensorItem,
-        DipoleItem,
-        SourceSpaceItem,
-        DigitizerItem,
-        NetworkItem
-    };
+    //=========================================================================================================
+    /**
+     * Returns the object key identifying this network.
+     *
+     * @return The object key.
+     */
+    QString objectKey() const { return m_objectKey; }
 
-    explicit AbstractTreeItem(const QString &text = "", int type = AbstractItem);
-    virtual ~AbstractTreeItem() = default;
-
-    int type() const override;
-
-    // Type-safe accessors for common properties
-    void setVisible(bool visible);
-    bool isVisible() const;
-
-    void setTransform(const QMatrix4x4 &transform);
-    QMatrix4x4 transform() const;
-
-    void setColor(const QColor &color);
-    QColor color() const;
-
-    void setAlpha(float alpha);
-    float alpha() const;
-
-protected:
-    int m_type;
+private:
+    QString m_objectKey;    /**< Unique key for this network item. */
 };
 
-#endif // ABSTRACTTREEITEM_H
+#endif // NETWORKTREEITEM_H

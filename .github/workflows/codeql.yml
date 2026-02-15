@@ -53,8 +53,8 @@ jobs:
     # Build MNE-CPP
     - name: Configure and compile MNE-CPP
       run: |
-      cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-      cmake --build build
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+        cmake --build build
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v4

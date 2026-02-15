@@ -88,6 +88,7 @@ struct ViewVisibilityProfile
     bool eegFieldContours = false;
     bool dipoles         = true;
     bool sourceSpace     = false;
+    bool network         = false;
     bool megFieldMapOnHead = false;
 
     //=========================================================================================================

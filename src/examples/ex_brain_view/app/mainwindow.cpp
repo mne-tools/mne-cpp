@@ -303,6 +303,33 @@ void MainWindow::setupUI()
     srcSpaceLayout->addWidget(m_loadSrcSpaceBtn);
     srcSpaceLayout->addWidget(m_showSrcSpaceCheck);
 
+    // ===== Connectivity Network Group =====
+    QGroupBox *networkGroup = new QGroupBox("Connectivity Network");
+    QVBoxLayout *networkLayout = new QVBoxLayout(networkGroup);
+    networkLayout->setContentsMargins(10, 15, 10, 10);
+    networkLayout->setSpacing(8);
+
+    m_showNetworkCheck = new QCheckBox("Show Network");
+    m_showNetworkCheck->setChecked(false);
+    m_showNetworkCheck->setEnabled(false);
+
+    QLabel *netThreshLabel = new QLabel("Threshold:");
+    m_networkThresholdSlider = new QSlider(Qt::Horizontal);
+    m_networkThresholdSlider->setRange(0, 100);
+    m_networkThresholdSlider->setValue(50);
+    m_networkThresholdSlider->setEnabled(false);
+
+    QLabel *netCmapLabel = new QLabel("Colormap:");
+    m_networkColormapCombo = new QComboBox;
+    m_networkColormapCombo->addItems({"Hot", "Jet", "Bone", "RedBlue", "Plasma"});
+    m_networkColormapCombo->setEnabled(false);
+
+    networkLayout->addWidget(m_showNetworkCheck);
+    networkLayout->addWidget(netThreshLabel);
+    networkLayout->addWidget(m_networkThresholdSlider);
+    networkLayout->addWidget(netCmapLabel);
+    networkLayout->addWidget(m_networkColormapCombo);
+
     // ===== Sensor Group =====
     QGroupBox *sensorGroup = new QGroupBox("Sensors");
     QVBoxLayout *sensorLayout = new QVBoxLayout(sensorGroup);
@@ -401,6 +428,7 @@ void MainWindow::setupUI()
     sideLayout->addWidget(stcGroup);
     sideLayout->addWidget(dipoleGroup);
     sideLayout->addWidget(srcSpaceGroup);
+    sideLayout->addWidget(networkGroup);
     sideLayout->addWidget(sensorGroup);
     sideLayout->addWidget(viewGroup);
     sideLayout->addStretch();
@@ -727,6 +755,15 @@ void MainWindow::setupConnections()
 
     connect(m_showSrcSpaceCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSourceSpaceVisible(checked); });
 
+    // Connectivity Network
+    connect(m_showNetworkCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setNetworkVisible(checked); });
+    connect(m_networkThresholdSlider, &QSlider::valueChanged, [this](int value) {
+        m_brainView->setNetworkThreshold(value / 100.0);
+    });
+    connect(m_networkColormapCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
+        m_brainView->setNetworkColormap(text);
+    });
+
     // Sync initial state
     m_brainView->setHemiVisible(0, m_lhCheck->isChecked());
     m_brainView->setHemiVisible(1, m_rhCheck->isChecked());
@@ -902,4 +939,14 @@ void MainWindow::loadBem(const QString &subjectName, const QString &bemPath)
     } else {
         qDebug() << "BEM path provided but file not found:" << bemPath;
     }
+}
+
+//=============================================================================================================
+
+void MainWindow::enableNetworkControls()
+{
+    m_showNetworkCheck->setEnabled(true);
+    m_showNetworkCheck->setChecked(true);
+    m_networkThresholdSlider->setEnabled(true);
+    m_networkColormapCombo->setEnabled(true);
 }

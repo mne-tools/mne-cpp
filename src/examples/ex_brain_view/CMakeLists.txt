@@ -26,6 +26,7 @@ set(SOURCES
     renderable/brainsurface.cpp
     renderable/sourceestimateoverlay.cpp
     renderable/dipoleobject.cpp
+    renderable/networkobject.cpp
     workers/stcloadingworker.cpp
     workers/rtsourcedataworker.cpp
     workers/rtsourcedatacontroller.cpp
@@ -38,6 +39,7 @@ set(SOURCES
     model/items/sourcespacetreeitem.cpp
     model/items/digitizertreeitem.cpp
     model/items/digitizersettreeitem.cpp
+    model/items/networktreeitem.cpp
     helpers/geometryinfo.cpp
     helpers/interpolation.cpp
     helpers/field_map.cpp
@@ -75,6 +77,7 @@ set(MNE_LIBS_REQUIRED
     mne_disp
     mne_inverse
     mne_utils
+    mne_connectivity
 )
 
 # Add shaders (Interface library trick)

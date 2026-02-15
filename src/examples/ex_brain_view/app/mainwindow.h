@@ -103,6 +103,11 @@ public:
                          const QString &srcSpacePath = QString(),
                          const QString &atlasPath = QString());
 
+    /**
+     * Enable network UI controls (called after a network has been loaded).
+     */
+    void enableNetworkControls();
+
 private:
     void setupUI();
     void setupConnections();
@@ -178,6 +183,11 @@ private:
     // Control widgets - Source Space
     QPushButton *m_loadSrcSpaceBtn = nullptr;
     QCheckBox *m_showSrcSpaceCheck = nullptr;
+
+    // Control widgets - Connectivity Network
+    QCheckBox *m_showNetworkCheck = nullptr;
+    QSlider *m_networkThresholdSlider = nullptr;
+    QComboBox *m_networkColormapCombo = nullptr;
 };
 
 #endif // MAINWINDOW_H

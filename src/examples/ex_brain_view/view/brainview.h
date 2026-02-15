@@ -50,6 +50,7 @@
 #include "../geometry/meshfactory.h"
 #include "../renderable/brainsurface.h"
 #include "../renderable/dipoleobject.h"
+#include "../renderable/networkobject.h"
 #include "../renderable/sourceestimateoverlay.h"
 #include "../model/braintreemodel.h"
 #include "../model/items/surfacetreeitem.h"
@@ -59,6 +60,7 @@
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_evoked_set.h>
+#include <connectivity/network/network.h>
 #include <QWidget>
 #include <QRhiWidget>
 #include <QMap>
@@ -226,6 +228,40 @@ public slots:
      * @param[in] visible    Visibility state.
      */
     void setDipoleVisible(bool visible);
+
+    //=========================================================================================================
+    /**
+     * Load a connectivity network for visualization.
+     *
+     * @param[in] network    The connectivity network to visualize.
+     * @param[in] name       Display name for the network.
+     * @return True if successful.
+     */
+    bool loadNetwork(const CONNECTIVITYLIB::Network &network, const QString &name = "Network");
+
+    //=========================================================================================================
+    /**
+     * Toggle visibility of connectivity network.
+     *
+     * @param[in] visible    Visibility state.
+     */
+    void setNetworkVisible(bool visible);
+
+    //=========================================================================================================
+    /**
+     * Set the threshold for connectivity network edge filtering.
+     *
+     * @param[in] threshold  Threshold value (0.0–1.0).
+     */
+    void setNetworkThreshold(double threshold);
+
+    //=========================================================================================================
+    /**
+     * Set the colormap for connectivity network visualization.
+     *
+     * @param[in] name       Colormap name ("Hot", "Jet", etc.).
+     */
+    void setNetworkColormap(const QString &name);
 
     //=========================================================================================================
     /**
@@ -800,6 +836,7 @@ private:
     // ── Source estimate ────────────────────────────────────────────────
     std::unique_ptr<SourceEstimateOverlay> m_sourceOverlay; /**< Active source estimate overlay data. */
     std::unique_ptr<DipoleObject> m_dipoles;        /**< Standalone dipole set (loaded via file). */
+    std::unique_ptr<NetworkObject> m_network;        /**< Connectivity network visualization. */
     int m_currentTimePoint = 0;                     /**< Current source estimate time sample index. */
 
     /** Update the scene bounding box based on visible objects. */
@@ -810,6 +847,7 @@ private:
     bool m_applySensorTrans = true;                 /**< Whether to apply the transform to sensors/digitizers. */
     QString m_megHelmetOverridePath;                /**< Optional override path for MEG helmet surface. */
     bool m_dipolesVisible = true;                   /**< Whether dipoles are rendered. */
+    bool m_networkVisible = false;                  /**< Whether the connectivity network is rendered. */
 
     // ── Ray-pick hover state ───────────────────────────────────────────
     QStandardItem* m_hoveredItem = nullptr;         /**< Model item currently under the cursor. */

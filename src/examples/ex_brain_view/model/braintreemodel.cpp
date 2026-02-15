@@ -47,6 +47,7 @@
 #include "dipoletreeitem.h"
 #include "sourcespacetreeitem.h"
 #include "digitizersettreeitem.h"
+#include "networktreeitem.h"
 #include <inverse/dipoleFit/ecd_set.h>
 #include <mne/mne_hemisphere.h>
 
@@ -229,4 +230,29 @@ void BrainTreeModel::addDigitizerData(const QList<FIFFLIB::FiffDigPoint> &digiti
     qDebug() << "BrainTreeModel: Added digitizer set with"
              << setItem->totalPointCount() << "points in"
              << setItem->rowCount() << "categories";
+}
+
+//=============================================================================================================
+
+NetworkTreeItem* BrainTreeModel::addNetwork(const CONNECTIVITYLIB::Network &network, const QString &name)
+{
+    QString displayName = name;
+    if (displayName.isEmpty()) {
+        displayName = network.getConnectivityMethod();
+        if (displayName.isEmpty()) displayName = "Network";
+    }
+
+    QString objectKey = "net_" + displayName.toLower().replace(" ", "_");
+
+    auto *item = new NetworkTreeItem(displayName, objectKey);
+    item->setCheckable(true);
+    item->setCheckState(Qt::Checked);
+
+    this->appendRow(item);
+
+    qDebug() << "BrainTreeModel: Added network" << displayName
+             << "with" << network.getNodes().size() << "nodes and"
+             << network.getFullEdges().size() << "edges";
+
+    return item;
 }

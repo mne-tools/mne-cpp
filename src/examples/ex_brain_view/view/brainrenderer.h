@@ -48,6 +48,7 @@
 #include <memory>
 #include "brainsurface.h"
 #include "dipoleobject.h"
+#include "networkobject.h"
 
 //=============================================================================================================
 /**
@@ -138,6 +139,18 @@ public:
      * @param[in] dipoles    Pointer to DipoleObject.
      */
     void renderDipoles(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, DipoleObject *dipoles);
+
+    //=========================================================================================================
+    /**
+     * Render a connectivity network using instanced rendering.
+     * Renders both node spheres and edge cylinders as two draw calls.
+     *
+     * @param[in] cb         Command buffer.
+     * @param[in] rhi        QRhi pointer.
+     * @param[in] data       Scene uniforms.
+     * @param[in] network    Pointer to NetworkObject.
+     */
+    void renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneData &data, NetworkObject *network);
 
     //=========================================================================================================
     /**

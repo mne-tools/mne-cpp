@@ -585,6 +585,7 @@ void BrainView::setVisualizationEditTarget(int target)
     const bool remapMegSurface = (m_megFieldMapOnHead != visibility.megFieldMapOnHead);
     m_megFieldMapOnHead = visibility.megFieldMapOnHead;
     m_dipolesVisible = visibility.dipoles;
+    m_networkVisible = visibility.network;
 
     for (auto surf : m_surfaces) {
         surf->setVisualizationMode(m_currentVisMode);
@@ -1402,6 +1403,7 @@ void BrainView::render(QRhiCommandBuffer *cb)
         if (m_dipoles) {
             m_dipoles->updateBuffers(rhi(), preUpload);
         }
+        // Network buffers are updated inside renderNetwork() via updateNodeBuffers/updateEdgeBuffers
         cb->resourceUpdate(preUpload);
     }
 
@@ -1593,6 +1595,11 @@ void BrainView::render(QRhiCommandBuffer *cb)
 
     if (sv.visibility.dipoles && m_dipoles) {
         m_renderer->renderDipoles(cb, rhi(), sceneData, m_dipoles.get());
+    }
+
+    // Render Connectivity Network
+    if (sv.visibility.network && m_network) {
+        m_renderer->renderNetwork(cb, rhi(), sceneData, m_network.get());
     }
 
     // Intersection Pointer
@@ -2309,6 +2316,58 @@ bool BrainView::loadDipoles(const QString &dipPath)
     if (ecdSet.size() == 0) return false;
     m_model->addDipoles(ecdSet);
     return true;
+}
+
+//=============================================================================================================
+
+bool BrainView::loadNetwork(const CONNECTIVITYLIB::Network &network, const QString &name)
+{
+    if (network.getNodes().isEmpty()) return false;
+
+    m_network = std::make_unique<NetworkObject>();
+    m_network->load(network);
+    m_network->setVisible(true);
+
+    // Also register in the tree model
+    m_model->addNetwork(network, name);
+
+    qDebug() << "BrainView: Loaded network" << name
+             << "with" << network.getNodes().size() << "nodes";
+
+    update();
+    return true;
+}
+
+//=============================================================================================================
+
+void BrainView::setNetworkVisible(bool visible)
+{
+    auto &profile = visibilityProfileForTarget(m_visualizationEditTarget);
+    profile.network = visible;
+    m_networkVisible = visible;
+    if (m_network) m_network->setVisible(visible);
+    saveMultiViewSettings();
+    update();
+}
+
+//=============================================================================================================
+
+void BrainView::setNetworkThreshold(double threshold)
+{
+    if (m_network) {
+        m_network->setThreshold(threshold);
+        update();
+    }
+}
+
+//=============================================================================================================
+
+void BrainView::setNetworkColormap(const QString &name)
+{
+    if (m_network) {
+        m_network->setColormap(name);
+        update();
+    }
 }
 
 //=============================================================================================================
