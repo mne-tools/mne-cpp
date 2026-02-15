@@ -170,6 +170,16 @@ public:
 
     //=========================================================================================================
     /**
+     * Set explicit normalization thresholds for sensor data.
+     * Pass min == 0 and max == 0 to re-enable symmetric auto-normalization.
+     *
+     * @param[in] min        Lower threshold.
+     * @param[in] max        Upper threshold.
+     */
+    void setThresholds(double min, double max);
+
+    //=========================================================================================================
+    /**
      * Enable or disable looping (replay data when queue is exhausted).
      *
      * @param[in] enabled    True to enable looping.
@@ -189,6 +199,15 @@ public:
      * Clear all queued data and reset the worker state.
      */
     void clearData();
+
+    //=========================================================================================================
+    /**
+     * Toggle between emitting per-vertex color data (smoothed) and raw
+     * sensor values.
+     *
+     * @param[in] bStreamSmoothedData    True for smoothed colors (default), false for raw.
+     */
+    void setStreamSmoothedData(bool bStreamSmoothedData);
 
     //=========================================================================================================
     // ── On-the-fly interpolation matrix computation ─────────────────────
@@ -270,6 +289,14 @@ signals:
      */
     void newSensorColorsAvailable(const QString &surfaceKey,
                                   const QVector<uint32_t> &colors);
+
+    //=========================================================================================================
+    /**
+     * Emitted when raw (non-mapped) sensor data is available.
+     *
+     * @param[in] data        Raw sensor measurement vector.
+     */
+    void newRawSensorDataAvailable(const Eigen::VectorXf &data);
 
     //=========================================================================================================
     /**

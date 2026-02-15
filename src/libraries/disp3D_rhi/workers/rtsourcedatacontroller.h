@@ -44,6 +44,7 @@
 #include <QObject>
 #include <QSharedPointer>
 #include <QVector>
+#include <QList>
 #include <QString>
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
@@ -54,6 +55,10 @@
 
 class QThread;
 class QTimer;
+
+namespace FSLIB {
+    class Label;
+}
 
 namespace DISP3DRHILIB {
     class RtSourceDataWorker;
@@ -207,6 +212,27 @@ public:
     void clearData();
 
     //=========================================================================================================
+    /**
+     * Set the base surface colors for both hemispheres.
+     * Sub-threshold vertices will display these colors (e.g., curvature or
+     * annotation coloring) instead of being transparent.
+     *
+     * @param[in] baseColorsLh   Per-vertex ABGR colors for the left hemisphere.
+     * @param[in] baseColorsRh   Per-vertex ABGR colors for the right hemisphere.
+     */
+    void setSurfaceColor(const QVector<uint32_t> &baseColorsLh,
+                         const QVector<uint32_t> &baseColorsRh);
+
+    //=========================================================================================================
+    /**
+     * Toggle between emitting interpolated color data (smoothed) and raw
+     * source values split by hemisphere.
+     *
+     * @param[in] bStreamSmoothedData    True for smoothed colors (default), false for raw.
+     */
+    void setStreamSmoothedData(bool bStreamSmoothedData);
+
+    //=========================================================================================================
     // ── On-the-fly interpolation matrix computation ─────────────────────
     //=========================================================================================================
 
@@ -259,6 +285,38 @@ public:
      * The new matrices will be automatically forwarded to the data worker.
      */
     void recomputeInterpolation();
+
+    //=========================================================================================================
+    /**
+     * Set the visualization type (interpolation-based or annotation-based).
+     *
+     * @param[in] iVisType    0 = InterpolationBased, 1 = AnnotationBased.
+     */
+    void setVisualizationType(int iVisType);
+
+    //=========================================================================================================
+    /**
+     * Set annotation info for the left hemisphere.
+     *
+     * @param[in] vecLabelIds   Per-vertex label IDs.
+     * @param[in] lLabels       FreeSurfer Labels.
+     * @param[in] vecVertNo     Source vertex numbers.
+     */
+    void setAnnotationInfoLeft(const Eigen::VectorXi &vecLabelIds,
+                               const QList<FSLIB::Label> &lLabels,
+                               const Eigen::VectorXi &vecVertNo);
+
+    //=========================================================================================================
+    /**
+     * Set annotation info for the right hemisphere.
+     *
+     * @param[in] vecLabelIds   Per-vertex label IDs.
+     * @param[in] lLabels       FreeSurfer Labels.
+     * @param[in] vecVertNo     Source vertex numbers.
+     */
+    void setAnnotationInfoRight(const Eigen::VectorXi &vecLabelIds,
+                                const QList<FSLIB::Label> &lLabels,
+                                const Eigen::VectorXi &vecVertNo);
 
 signals:
     //=========================================================================================================

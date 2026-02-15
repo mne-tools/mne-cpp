@@ -123,6 +123,19 @@ public:
 
     //=========================================================================================================
     /**
+     * Set explicit normalization thresholds instead of auto-normalization.
+     * When set, the symmetric auto-normalization is replaced by fixed thresholds.
+     * Values below min are mapped to 0, above max to 1.
+     *
+     * Pass min == 0 and max == 0 to re-enable auto-normalization.
+     *
+     * @param[in] min        Lower threshold (values below are at colormap start).
+     * @param[in] max        Upper threshold (values above are at colormap end).
+     */
+    void setThresholds(double min, double max);
+
+    //=========================================================================================================
+    /**
      * Enable or disable looping (replay from beginning when queue is exhausted).
      *
      * @param[in] enabled    True to enable looping.
@@ -136,6 +149,20 @@ public:
      * @param[in] sFreq     Sampling frequency in Hz.
      */
     void setSFreq(double sFreq);
+
+    //=========================================================================================================
+    /**
+     * Toggle between emitting per-vertex color data (smoothed) and raw
+     * sensor values.
+     *
+     * When enabled (default), streamData() performs mapping + normalization +
+     * color conversion and emits newRtSensorColors(). When disabled, it
+     * emits newRtRawSensorData() with the raw measurement vector, which
+     * can be used for GPU-side mapping.
+     *
+     * @param[in] bStreamSmoothedData    True for smoothed colors (default), false for raw.
+     */
+    void setStreamSmoothedData(bool bStreamSmoothedData);
 
 public slots:
     //=========================================================================================================
@@ -156,6 +183,14 @@ signals:
      */
     void newRtSensorColors(const QString &surfaceKey,
                            const QVector<uint32_t> &colors);
+
+    //=========================================================================================================
+    /**
+     * Emitted when raw (non-mapped) sensor data is available.
+     *
+     * @param[in] data        Raw sensor measurement vector.
+     */
+    void newRtRawSensorData(const Eigen::VectorXf &data);
 
 private:
     //=========================================================================================================
@@ -181,9 +216,13 @@ private:
 
     int m_iNumAverages = 1;                                         /**< Number of samples to average. */
     bool m_bIsLooping = true;                                       /**< Whether to loop data. */
+    bool m_bStreamSmoothedData = true;                               /**< Whether to stream smoothed colors (true) or raw data (false). */
     double m_dSFreq = 1000.0;                                       /**< Sampling frequency in Hz. */
 
     QString m_sColormapType = QStringLiteral("MNE");                /**< Active colormap name. */
+    double m_dThreshMin = 0.0;                                       /**< Explicit min threshold (0 = auto). */
+    double m_dThreshMax = 0.0;                                       /**< Explicit max threshold (0 = auto). */
+    bool m_bUseAutoNorm = true;                                      /**< True = symmetric auto-norm (default). */
 };
 
 } // namespace DISP3DRHILIB

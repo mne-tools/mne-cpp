@@ -40,6 +40,8 @@
 #include "helpers/interpolation.h"
 #include "helpers/geometryinfo.h"
 
+#include <fs/label.h>
+
 #include <QDebug>
 
 using namespace DISP3DRHILIB;
@@ -95,6 +97,62 @@ void RtSourceInterpolationMatWorker::setInterpolationInfoRight(
     m_vecNeighborsRh = vecNeighborVertices;
     m_vecSourceVerticesRh = vecSourceVertices;
     m_hasRh = (!matVertices.isZero(0) && matVertices.rows() > 0 && !vecSourceVertices.isEmpty());
+}
+
+//=============================================================================================================
+
+void RtSourceInterpolationMatWorker::setVisualizationType(int iVisType)
+{
+    QMutexLocker locker(&m_mutex);
+    m_iVisualizationType = iVisType;
+}
+
+//=============================================================================================================
+
+void RtSourceInterpolationMatWorker::setAnnotationInfoLeft(const Eigen::VectorXi &vecLabelIds,
+                                                            const QList<FSLIB::Label> &lLabels,
+                                                            const Eigen::VectorXi &vecVertNo)
+{
+    if (vecLabelIds.rows() == 0 || lLabels.isEmpty()) {
+        qDebug() << "RtSourceInterpolationMatWorker::setAnnotationInfoLeft - Annotation data is empty.";
+        return;
+    }
+
+    QMutexLocker locker(&m_mutex);
+    m_lLabelsLh = lLabels;
+    m_mapLabelIdSourcesLh.clear();
+    m_vertNosLh.clear();
+
+    for (qint32 i = 0; i < vecVertNo.rows(); ++i) {
+        m_mapLabelIdSourcesLh.insert(vecVertNo(i), vecLabelIds(vecVertNo(i)));
+        m_vertNosLh.append(vecVertNo(i));
+    }
+
+    m_bAnnotationLhInit = true;
+}
+
+//=============================================================================================================
+
+void RtSourceInterpolationMatWorker::setAnnotationInfoRight(const Eigen::VectorXi &vecLabelIds,
+                                                             const QList<FSLIB::Label> &lLabels,
+                                                             const Eigen::VectorXi &vecVertNo)
+{
+    if (vecLabelIds.rows() == 0 || lLabels.isEmpty()) {
+        qDebug() << "RtSourceInterpolationMatWorker::setAnnotationInfoRight - Annotation data is empty.";
+        return;
+    }
+
+    QMutexLocker locker(&m_mutex);
+    m_lLabelsRh = lLabels;
+    m_mapLabelIdSourcesRh.clear();
+    m_vertNosRh.clear();
+
+    for (qint32 i = 0; i < vecVertNo.rows(); ++i) {
+        m_mapLabelIdSourcesRh.insert(vecVertNo(i), vecLabelIds(vecVertNo(i)));
+        m_vertNosRh.append(vecVertNo(i));
+    }
+
+    m_bAnnotationRhInit = true;
 }
 
 //=============================================================================================================
@@ -158,6 +216,13 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
     bool hasLh, hasRh;
     double cancelDist;
     QString interpFuncName;
+    int visType;
+
+    // Annotation data snapshots
+    QList<FSLIB::Label> labelsLh, labelsRh;
+    QMap<qint32, qint32> mapLabelIdSrcLh, mapLabelIdSrcRh;
+    QList<int> vertNosLh, vertNosRh;
+    bool annotLhInit, annotRhInit;
 
     {
         QMutexLocker locker(&m_mutex);
@@ -171,8 +236,45 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
         hasRh = m_hasRh;
         cancelDist = m_dCancelDist;
         interpFuncName = m_sInterpolationFunction;
+        visType = m_iVisualizationType;
+
+        labelsLh = m_lLabelsLh;
+        labelsRh = m_lLabelsRh;
+        mapLabelIdSrcLh = m_mapLabelIdSourcesLh;
+        mapLabelIdSrcRh = m_mapLabelIdSourcesRh;
+        vertNosLh = m_vertNosLh;
+        vertNosRh = m_vertNosRh;
+        annotLhInit = m_bAnnotationLhInit;
+        annotRhInit = m_bAnnotationRhInit;
     }
 
+    // ── Annotation-based mode ──────────────────────────────────────────
+    if (visType == AnnotationBased) {
+        qDebug() << "RtSourceInterpolationMatWorker: Computing annotation matrices...";
+
+        if (annotLhInit) {
+            auto mat = computeAnnotationOperator(labelsLh, mapLabelIdSrcLh, vertNosLh);
+            if (mat && mat->rows() > 0) {
+                qDebug() << "RtSourceInterpolationMatWorker: LH annotation matrix:"
+                         << mat->rows() << "x" << mat->cols();
+                emit newInterpolationMatrixLeftAvailable(mat);
+            }
+        }
+
+        if (annotRhInit) {
+            auto mat = computeAnnotationOperator(labelsRh, mapLabelIdSrcRh, vertNosRh);
+            if (mat && mat->rows() > 0) {
+                qDebug() << "RtSourceInterpolationMatWorker: RH annotation matrix:"
+                         << mat->rows() << "x" << mat->cols();
+                emit newInterpolationMatrixRightAvailable(mat);
+            }
+        }
+
+        qDebug() << "RtSourceInterpolationMatWorker: Annotation matrix computation complete.";
+        return;
+    }
+
+    // ── Interpolation-based mode (default) ─────────────────────────────
     if (!hasLh && !hasRh) {
         qDebug() << "RtSourceInterpolationMatWorker: No hemisphere data set, skipping.";
         return;
@@ -216,4 +318,42 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
     }
 
     qDebug() << "RtSourceInterpolationMatWorker: Interpolation matrix computation complete.";
+}
+
+//=============================================================================================================
+
+QSharedPointer<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::computeAnnotationOperator(
+    const QList<FSLIB::Label> &lLabels,
+    const QMap<qint32, qint32> &mapLabelIdSrc,
+    const QList<int> &vertNos)
+{
+    if (lLabels.isEmpty() || vertNos.isEmpty()) {
+        return QSharedPointer<Eigen::SparseMatrix<float>>();
+    }
+
+    // Count total vertices across all labels
+    int iNumVert = 0;
+    for (int i = 0; i < lLabels.size(); ++i) {
+        iNumVert += lLabels.at(i).vertices.rows();
+    }
+
+    auto mat = QSharedPointer<Eigen::SparseMatrix<float>>(
+        new Eigen::SparseMatrix<float>(iNumVert, vertNos.size()));
+
+    // For each label: assign uniform weight to all its vertices from sources in that label
+    for (int i = 0; i < lLabels.size(); ++i) {
+        const FSLIB::Label &label = lLabels.at(i);
+        QList<qint32> listSourcesVertNoLabel = mapLabelIdSrc.keys(label.label_id);
+
+        for (int j = 0; j < label.vertices.rows(); ++j) {
+            for (int k = 0; k < listSourcesVertNoLabel.size(); ++k) {
+                int colIdx = vertNos.indexOf(listSourcesVertNoLabel.at(k));
+                if (colIdx >= 0 && label.vertices(j) < iNumVert) {
+                    mat->coeffRef(label.vertices(j), colIdx) = 1.0f / listSourcesVertNoLabel.size();
+                }
+            }
+        }
+    }
+
+    return mat;
 }

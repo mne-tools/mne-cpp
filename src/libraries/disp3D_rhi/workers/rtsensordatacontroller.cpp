@@ -64,6 +64,8 @@ RtSensorDataController::RtSensorDataController(QObject *parent)
     // Forward worker signals to controller signals
     connect(m_pWorker, &DISP3DRHILIB::RtSensorDataWorker::newRtSensorColors,
             this, &RtSensorDataController::newSensorColorsAvailable);
+    connect(m_pWorker, &DISP3DRHILIB::RtSensorDataWorker::newRtRawSensorData,
+            this, &RtSensorDataController::newRawSensorDataAvailable);
 
     // Create timer for driving the streaming cadence
     m_pTimer = new QTimer(this);
@@ -187,6 +189,15 @@ void RtSensorDataController::setColormapType(const QString &name)
 
 //=============================================================================================================
 
+void RtSensorDataController::setThresholds(double min, double max)
+{
+    if (m_pWorker) {
+        m_pWorker->setThresholds(min, max);
+    }
+}
+
+//=============================================================================================================
+
 void RtSensorDataController::setLoopState(bool enabled)
 {
     if (m_pWorker) {
@@ -209,6 +220,15 @@ void RtSensorDataController::clearData()
 {
     if (m_pWorker) {
         m_pWorker->clear();
+    }
+}
+
+//=============================================================================================================
+
+void RtSensorDataController::setStreamSmoothedData(bool bStreamSmoothedData)
+{
+    if (m_pWorker) {
+        m_pWorker->setStreamSmoothedData(bStreamSmoothedData);
     }
 }
 

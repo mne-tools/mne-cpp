@@ -147,6 +147,24 @@ void RtSourceDataWorker::setSFreq(double sFreq)
 
 //=============================================================================================================
 
+void RtSourceDataWorker::setSurfaceColor(const QVector<uint32_t> &baseColorsLh,
+                                          const QVector<uint32_t> &baseColorsRh)
+{
+    QMutexLocker locker(&m_mutex);
+    m_baseColorsLh = baseColorsLh;
+    m_baseColorsRh = baseColorsRh;
+}
+
+//=============================================================================================================
+
+void RtSourceDataWorker::setStreamSmoothedData(bool bStreamSmoothedData)
+{
+    QMutexLocker locker(&m_mutex);
+    m_bStreamSmoothedData = bStreamSmoothedData;
+}
+
+//=============================================================================================================
+
 void RtSourceDataWorker::streamData()
 {
     QMutexLocker locker(&m_mutex);
@@ -219,9 +237,20 @@ void RtSourceDataWorker::streamData()
         dataRh = vecAbsData.segment(nSourcesLh, nSourcesRh);
     }
 
+    // Check streaming mode
+    if (!m_bStreamSmoothedData) {
+        // Raw mode: emit source values without interpolation
+        Eigen::VectorXd rawLh = dataLh.cast<double>();
+        Eigen::VectorXd rawRh = dataRh.cast<double>();
+
+        locker.unlock();
+        emit newRtRawData(rawLh, rawRh);
+        return;
+    }
+
     // Compute per-vertex colors for each hemisphere
-    QVector<uint32_t> colorsLh = computeHemiColors(dataLh, m_interpMatLh);
-    QVector<uint32_t> colorsRh = computeHemiColors(dataRh, m_interpMatRh);
+    QVector<uint32_t> colorsLh = computeHemiColors(dataLh, m_interpMatLh, m_baseColorsLh);
+    QVector<uint32_t> colorsRh = computeHemiColors(dataRh, m_interpMatRh, m_baseColorsRh);
 
     // Unlock before emitting (avoid deadlock if slot is direct connection)
     locker.unlock();
@@ -233,7 +262,8 @@ void RtSourceDataWorker::streamData()
 
 QVector<uint32_t> RtSourceDataWorker::computeHemiColors(
     const Eigen::VectorXf &sourceData,
-    const QSharedPointer<Eigen::SparseMatrix<float>> &interpMat) const
+    const QSharedPointer<Eigen::SparseMatrix<float>> &interpMat,
+    const QVector<uint32_t> &baseColors) const
 {
     if (sourceData.size() == 0 || !interpMat || interpMat->rows() == 0) {
         return QVector<uint32_t>();
@@ -244,6 +274,8 @@ QVector<uint32_t> RtSourceDataWorker::computeHemiColors(
 
     int nVertices = interpolated.size();
     QVector<uint32_t> colors(nVertices);
+
+    bool hasBaseColors = (baseColors.size() == nVertices);
 
     double range = m_dThreshMax - m_dThreshMin;
     if (range <= 0.0) range = 1.0;
@@ -258,12 +290,39 @@ QVector<uint32_t> RtSourceDataWorker::computeHemiColors(
         // Calculate alpha based on threshold
         uint8_t alpha = 255;
         if (value < m_dThreshMin) {
-            alpha = 0; // Fully transparent below minimum
+            // Below threshold: use base surface color or transparent
+            if (hasBaseColors) {
+                colors[i] = baseColors[i];
+            } else {
+                colors[i] = 0; // Fully transparent
+            }
+            continue;
         } else if (value < m_dThreshMid) {
             // Fade in from min to mid
             double fadeRange = m_dThreshMid - m_dThreshMin;
             if (fadeRange > 0.0) {
                 alpha = static_cast<uint8_t>(255.0 * (value - m_dThreshMin) / fadeRange);
+            }
+
+            // Blend activation color with base color
+            if (hasBaseColors && alpha < 255) {
+                uint32_t actColor = valueToColor(normalized, 255);
+                uint32_t baseColor = baseColors[i];
+
+                // Simple alpha blend: result = act * alpha/255 + base * (255-alpha)/255
+                uint32_t aR = actColor & 0xFF;
+                uint32_t aG = (actColor >> 8) & 0xFF;
+                uint32_t aB = (actColor >> 16) & 0xFF;
+                uint32_t bR = baseColor & 0xFF;
+                uint32_t bG = (baseColor >> 8) & 0xFF;
+                uint32_t bB = (baseColor >> 16) & 0xFF;
+
+                uint32_t rR = (aR * alpha + bR * (255 - alpha)) / 255;
+                uint32_t rG = (aG * alpha + bG * (255 - alpha)) / 255;
+                uint32_t rB = (aB * alpha + bB * (255 - alpha)) / 255;
+
+                colors[i] = (0xFFu << 24) | (rB << 16) | (rG << 8) | rR;
+                continue;
             }
         }
 

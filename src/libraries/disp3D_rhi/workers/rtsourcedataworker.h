@@ -151,6 +151,31 @@ public:
      */
     void setSFreq(double sFreq);
 
+    //=========================================================================================================
+    /**
+     * Toggle between emitting interpolated color data (smoothed) and raw
+     * source values split by hemisphere.
+     *
+     * When enabled (default), streamData() performs interpolation + colormap
+     * conversion and emits newRtSmoothedData(). When disabled, it emits
+     * newRtRawData() with the raw source values per hemisphere, which can
+     * be used for GPU-side interpolation.
+     *
+     * @param[in] bStreamSmoothedData    True for smoothed colors (default), false for raw.
+     */
+    void setStreamSmoothedData(bool bStreamSmoothedData);
+
+    //=========================================================================================================
+    /**
+     * Set the base surface colors for both hemispheres.
+     * Sub-threshold vertices will display these colors instead of being transparent.
+     *
+     * @param[in] baseColorsLh   Per-vertex ABGR colors for the left hemisphere.
+     * @param[in] baseColorsRh   Per-vertex ABGR colors for the right hemisphere.
+     */
+    void setSurfaceColor(const QVector<uint32_t> &baseColorsLh,
+                         const QVector<uint32_t> &baseColorsRh);
+
 public slots:
     //=========================================================================================================
     /**
@@ -200,7 +225,8 @@ private:
      * @return Per-vertex ABGR color array.
      */
     QVector<uint32_t> computeHemiColors(const Eigen::VectorXf &sourceData,
-                                        const QSharedPointer<Eigen::SparseMatrix<float>> &interpMat) const;
+                                        const QSharedPointer<Eigen::SparseMatrix<float>> &interpMat,
+                                        const QVector<uint32_t> &baseColors) const;
 
     mutable QMutex m_mutex;                                         /**< Protects data members. */
 
@@ -215,12 +241,16 @@ private:
 
     int m_iNumAverages = 1;                                         /**< Number of samples to average. */
     bool m_bIsLooping = true;                                       /**< Whether to loop data. */
+    bool m_bStreamSmoothedData = true;                               /**< Whether to stream smoothed colors (true) or raw data (false). */
     double m_dSFreq = 1000.0;                                       /**< Sampling frequency in Hz. */
 
     QString m_sColormapType = QStringLiteral("Hot");                /**< Active colormap name. */
     double m_dThreshMin = 0.0;                                      /**< Lower normalization threshold. */
     double m_dThreshMid = 0.5;                                      /**< Mid normalization threshold. */
     double m_dThreshMax = 1.0;                                      /**< Upper normalization threshold. */
+
+    QVector<uint32_t> m_baseColorsLh;                                /**< LH base surface colors (curvature/annotation). */
+    QVector<uint32_t> m_baseColorsRh;                                /**< RH base surface colors (curvature/annotation). */
 };
 
 } // namespace DISP3DRHILIB

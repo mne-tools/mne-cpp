@@ -113,6 +113,22 @@ void RtSensorDataWorker::setColormapType(const QString &name)
 
 //=============================================================================================================
 
+void RtSensorDataWorker::setThresholds(double min, double max)
+{
+    QMutexLocker locker(&m_mutex);
+    if (min == 0.0 && max == 0.0) {
+        m_bUseAutoNorm = true;
+        m_dThreshMin = 0.0;
+        m_dThreshMax = 0.0;
+    } else {
+        m_bUseAutoNorm = false;
+        m_dThreshMin = min;
+        m_dThreshMax = max;
+    }
+}
+
+//=============================================================================================================
+
 void RtSensorDataWorker::setLoopState(bool enabled)
 {
     QMutexLocker locker(&m_mutex);
@@ -125,6 +141,14 @@ void RtSensorDataWorker::setSFreq(double sFreq)
 {
     QMutexLocker locker(&m_mutex);
     m_dSFreq = qMax(1.0, sFreq);
+}
+
+//=============================================================================================================
+
+void RtSensorDataWorker::setStreamSmoothedData(bool bStreamSmoothedData)
+{
+    QMutexLocker locker(&m_mutex);
+    m_bStreamSmoothedData = bStreamSmoothedData;
 }
 
 //=============================================================================================================
@@ -166,6 +190,15 @@ void RtSensorDataWorker::streamData()
         m_iSampleCtr = 0;
     }
 
+    // Check streaming mode
+    if (!m_bStreamSmoothedData) {
+        // Raw mode: emit measurement vector without mapping
+        Eigen::VectorXf rawData = vecCurrentData;
+        locker.unlock();
+        emit newRtRawSensorData(rawData);
+        return;
+    }
+
     // Compute per-vertex colors using the dense mapping matrix
     QVector<uint32_t> colors = computeSurfaceColors(vecCurrentData);
 
@@ -197,22 +230,32 @@ QVector<uint32_t> RtSensorDataWorker::computeSurfaceColors(const Eigen::VectorXf
 
     int nVertices = mapped.size();
 
-    // Normalise to symmetric ±maxAbs range (same approach as SensorFieldMapper::apply())
-    float maxAbs = 0.0f;
-    for (int i = 0; i < nVertices; ++i) {
-        maxAbs = std::max(maxAbs, std::abs(mapped(i)));
+    // Determine normalization range
+    float normMin, normMax;
+    if (m_bUseAutoNorm) {
+        // Symmetric auto-normalization: ±maxAbs
+        float maxAbs = 0.0f;
+        for (int i = 0; i < nVertices; ++i) {
+            maxAbs = std::max(maxAbs, std::abs(mapped(i)));
+        }
+        if (maxAbs <= 0.0f) maxAbs = 1.0f;
+        normMin = -maxAbs;
+        normMax = maxAbs;
+    } else {
+        // Explicit thresholds
+        normMin = static_cast<float>(m_dThreshMin);
+        normMax = static_cast<float>(m_dThreshMax);
+        if (normMax <= normMin) normMax = normMin + 1.0f;
     }
-    if (maxAbs <= 0.0f) maxAbs = 1.0f;
+
+    float range = normMax - normMin;
 
     // Convert to per-vertex ABGR colours
     QVector<uint32_t> colors(nVertices);
 
-    // Check if we're using the custom MNE colormap
-    const bool useMneColormap = (m_sColormapType == QStringLiteral("MNE"));
-
     for (int i = 0; i < nVertices; ++i) {
-        // Symmetric normalisation: map [-maxAbs, +maxAbs] → [0, 1]
-        double norm = (static_cast<double>(mapped(i)) / maxAbs) * 0.5 + 0.5;
+        // Normalisation: map [normMin, normMax] → [0, 1]
+        double norm = static_cast<double>(mapped(i) - normMin) / static_cast<double>(range);
         norm = qBound(0.0, norm, 1.0);
 
         QRgb rgb = DISPLIB::ColorMap::valueToColor(norm, m_sColormapType);

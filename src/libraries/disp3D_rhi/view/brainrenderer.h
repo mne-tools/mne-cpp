@@ -78,7 +78,8 @@ public:
         Holographic,
         Anatomical,
         Dipole,
-        XRay
+        XRay,
+        ShowNormals
     };
 
     struct SceneData {

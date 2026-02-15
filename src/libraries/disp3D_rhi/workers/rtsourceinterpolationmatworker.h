@@ -45,9 +45,19 @@
 #include <QMutex>
 #include <QSharedPointer>
 #include <QVector>
+#include <QMap>
+#include <QList>
 #include <QString>
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FSLIB {
+    class Label;
+}
 
 //=============================================================================================================
 // DEFINE NAMESPACE
@@ -82,6 +92,15 @@ class DISP3DRHISHARED_EXPORT RtSourceInterpolationMatWorker : public QObject
     Q_OBJECT
 
 public:
+    //=========================================================================================================
+    /**
+     * Visualization type enum — selects which matrix the worker emits.
+     */
+    enum VisualizationType {
+        InterpolationBased = 0,   /**< Smooth distance-based interpolation (default). */
+        AnnotationBased    = 1    /**< Per-parcellation uniform coloring from annotation. */
+    };
+
     //=========================================================================================================
     /**
      * Constructor.
@@ -132,6 +151,41 @@ public:
     void setInterpolationInfoRight(const Eigen::MatrixX3f &matVertices,
                                    const QVector<QVector<int>> &vecNeighborVertices,
                                    const QVector<int> &vecSourceVertices);
+
+    //=========================================================================================================
+    /**
+     * Set the visualization type.
+     * When set to AnnotationBased, the worker emits annotation matrices
+     * instead of interpolation matrices.
+     *
+     * @param[in] iVisType    VisualizationType enum value.
+     */
+    void setVisualizationType(int iVisType);
+
+    //=========================================================================================================
+    /**
+     * Set annotation info for the left hemisphere.
+     * Required for AnnotationBased visualization.
+     *
+     * @param[in] vecLabelIds   Per-vertex label IDs for the surface.
+     * @param[in] lLabels       List of FreeSurfer Labels.
+     * @param[in] vecVertNo     Source-space vertex numbers.
+     */
+    void setAnnotationInfoLeft(const Eigen::VectorXi &vecLabelIds,
+                               const QList<FSLIB::Label> &lLabels,
+                               const Eigen::VectorXi &vecVertNo);
+
+    //=========================================================================================================
+    /**
+     * Set annotation info for the right hemisphere.
+     *
+     * @param[in] vecLabelIds   Per-vertex label IDs for the surface.
+     * @param[in] lLabels       List of FreeSurfer Labels.
+     * @param[in] vecVertNo     Source-space vertex numbers.
+     */
+    void setAnnotationInfoRight(const Eigen::VectorXi &vecLabelIds,
+                                const QList<FSLIB::Label> &lLabels,
+                                const Eigen::VectorXi &vecVertNo);
 
 public slots:
     //=========================================================================================================
@@ -187,6 +241,22 @@ private:
         double dCancelDist,
         double (*interpFunc)(double));
 
+    //=========================================================================================================
+    /**
+     * Compute annotation operator for one hemisphere.
+     * Builds a sparse matrix where each label's vertices share the average
+     * of sources falling within that label.
+     *
+     * @param[in] lLabels       FreeSurfer labels.
+     * @param[in] mapLabelIdSrc Map from source vertex number to label ID.
+     * @param[in] vertNos       List of source vertex numbers.
+     * @return Annotation matrix (nVertices x nSources).
+     */
+    static QSharedPointer<Eigen::SparseMatrix<float>> computeAnnotationOperator(
+        const QList<FSLIB::Label> &lLabels,
+        const QMap<qint32, qint32> &mapLabelIdSrc,
+        const QList<int> &vertNos);
+
     mutable QMutex m_mutex;                                      /**< Protects all data members. */
 
     // LH geometry
@@ -204,6 +274,21 @@ private:
     // Interpolation parameters
     double m_dCancelDist = 0.05;                                 /**< Cancel distance in meters. */
     QString m_sInterpolationFunction = QStringLiteral("cubic");  /**< Active interpolation function name. */
+
+    // Visualization type
+    int m_iVisualizationType = InterpolationBased;               /**< Current visualization type. */
+
+    // LH annotation data
+    QList<FSLIB::Label> m_lLabelsLh;                             /**< LH FreeSurfer labels. */
+    QMap<qint32, qint32> m_mapLabelIdSourcesLh;                  /**< LH source vertex → label ID map. */
+    QList<int> m_vertNosLh;                                      /**< LH source vertex numbers. */
+    bool m_bAnnotationLhInit = false;                             /**< Whether LH annotation data is set. */
+
+    // RH annotation data
+    QList<FSLIB::Label> m_lLabelsRh;                             /**< RH FreeSurfer labels. */
+    QMap<qint32, qint32> m_mapLabelIdSourcesRh;                  /**< RH source vertex → label ID map. */
+    QList<int> m_vertNosRh;                                      /**< RH source vertex numbers. */
+    bool m_bAnnotationRhInit = false;                             /**< Whether RH annotation data is set. */
 };
 
 } // namespace DISP3DRHILIB

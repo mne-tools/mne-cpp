@@ -40,6 +40,8 @@
 #include "rtsourcedataworker.h"
 #include "rtsourceinterpolationmatworker.h"
 
+#include <fs/label.h>
+
 #include <QThread>
 #include <QTimer>
 #include <QDebug>
@@ -234,6 +236,25 @@ void RtSourceDataController::clearData()
 
 //=============================================================================================================
 
+void RtSourceDataController::setSurfaceColor(const QVector<uint32_t> &baseColorsLh,
+                                              const QVector<uint32_t> &baseColorsRh)
+{
+    if (m_pWorker) {
+        m_pWorker->setSurfaceColor(baseColorsLh, baseColorsRh);
+    }
+}
+
+//=============================================================================================================
+
+void RtSourceDataController::setStreamSmoothedData(bool bStreamSmoothedData)
+{
+    if (m_pWorker) {
+        m_pWorker->setStreamSmoothedData(bStreamSmoothedData);
+    }
+}
+
+//=============================================================================================================
+
 void RtSourceDataController::setInterpolationFunction(const QString &sInterpolationFunction)
 {
     if (m_pInterpWorker) {
@@ -303,4 +324,35 @@ void RtSourceDataController::onNewInterpolationMatrixRight(QSharedPointer<Eigen:
     }
     // Re-emit so external listeners can react
     emit newInterpolationMatrixRightAvailable(interpMat);
+}
+
+//=============================================================================================================
+
+void RtSourceDataController::setVisualizationType(int iVisType)
+{
+    if (m_pInterpWorker) {
+        m_pInterpWorker->setVisualizationType(iVisType);
+    }
+}
+
+//=============================================================================================================
+
+void RtSourceDataController::setAnnotationInfoLeft(const Eigen::VectorXi &vecLabelIds,
+                                                    const QList<FSLIB::Label> &lLabels,
+                                                    const Eigen::VectorXi &vecVertNo)
+{
+    if (m_pInterpWorker) {
+        m_pInterpWorker->setAnnotationInfoLeft(vecLabelIds, lLabels, vecVertNo);
+    }
+}
+
+//=============================================================================================================
+
+void RtSourceDataController::setAnnotationInfoRight(const Eigen::VectorXi &vecLabelIds,
+                                                     const QList<FSLIB::Label> &lLabels,
+                                                     const Eigen::VectorXi &vecVertNo)
+{
+    if (m_pInterpWorker) {
+        m_pInterpWorker->setAnnotationInfoRight(vecLabelIds, lLabels, vecVertNo);
+    }
 }

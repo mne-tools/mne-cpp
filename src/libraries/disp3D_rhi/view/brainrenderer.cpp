@@ -101,16 +101,18 @@ void BrainRenderer::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int
     };
     
     // List of modes to initialize
-    QList<ShaderMode> modes = {Standard, Holographic, Anatomical, Dipole, XRay};
+    QList<ShaderMode> modes = {Standard, Holographic, Anatomical, Dipole, XRay, ShowNormals};
     
     for (ShaderMode mode : modes) {
         QString vert = (mode == Holographic || mode == XRay) ? ":/holographic.vert.qsb" : 
                        (mode == Anatomical) ? ":/anatomical.vert.qsb" : 
-                       (mode == Dipole) ? ":/dipole.vert.qsb" : ":/standard.vert.qsb";
+                       (mode == Dipole) ? ":/dipole.vert.qsb" :
+                       (mode == ShowNormals) ? ":/shownormals.vert.qsb" : ":/standard.vert.qsb";
         
         QString frag = (mode == Holographic || mode == XRay) ? ":/holographic.frag.qsb" : 
                        (mode == Anatomical) ? ":/anatomical.frag.qsb" : 
-                       (mode == Dipole) ? ":/dipole.frag.qsb" : ":/standard.frag.qsb";
+                       (mode == Dipole) ? ":/dipole.frag.qsb" :
+                       (mode == ShowNormals) ? ":/shownormals.frag.qsb" : ":/standard.frag.qsb";
         
         QShader vS = getShader(vert);
         QShader fS = getShader(frag);

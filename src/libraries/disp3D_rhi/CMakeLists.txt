@@ -108,6 +108,8 @@ qt_add_shaders(${PROJECT_NAME} "disp3d_rhi_shaders"
         "shaders/anatomical.frag"
         "shaders/dipole.vert"
         "shaders/dipole.frag"
+        "shaders/shownormals.vert"
+        "shaders/shownormals.frag"
 )
 
 target_include_directories(${PROJECT_NAME}
