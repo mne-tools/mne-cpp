@@ -44,6 +44,7 @@
 #include <QObject>
 #include <QSharedPointer>
 #include <QVector>
+#include <QString>
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 
@@ -56,19 +57,29 @@ class QTimer;
 
 namespace DISP3DRHILIB {
     class RtSourceDataWorker;
+    class RtSourceInterpolationMatWorker;
 }
 
 //=============================================================================================================
 /**
  * RtSourceDataController orchestrates real-time source estimate streaming.
- * It manages a background worker thread and a timer that drives the data flow.
+ * It manages a background data worker thread, an optional background
+ * interpolation matrix worker thread, and a timer that drives the data flow.
  *
  * The controller provides a simple public API for:
  * - Pushing new source estimate data
- * - Setting interpolation matrices (LH/RH)
+ * - Setting interpolation matrices (LH/RH) directly or triggering
+ *   on-the-fly recomputation when parameters change
  * - Configuring streaming parameters (speed, looping, averaging)
  * - Configuring visualization parameters (colormap, thresholds)
  * - Starting/stopping the streaming
+ *
+ * On-the-fly recomputation:
+ *   - Set surface/source geometry via setInterpolationInfoLeft/Right()
+ *   - Configure interpolation function and cancel distance via
+ *     setInterpolationFunction() / setCancelDistance()
+ *   - Call recomputeInterpolation() to trigger background computation
+ *   - The new matrices are automatically forwarded to the data worker
  *
  * Usage:
  *   1. Create controller
@@ -195,6 +206,60 @@ public:
      */
     void clearData();
 
+    //=========================================================================================================
+    // ── On-the-fly interpolation matrix computation ─────────────────────
+    //=========================================================================================================
+
+    /**
+     * Set the interpolation function for on-the-fly matrix computation.
+     *
+     * @param[in] sInterpolationFunction    Function name ("linear", "gaussian",
+     *                                      "square", "cubic").
+     */
+    void setInterpolationFunction(const QString &sInterpolationFunction);
+
+    //=========================================================================================================
+    /**
+     * Set the cancel distance for on-the-fly matrix computation.
+     * Distances larger than this are ignored in the interpolation.
+     *
+     * @param[in] dCancelDist    Cancel distance in meters.
+     */
+    void setCancelDistance(double dCancelDist);
+
+    //=========================================================================================================
+    /**
+     * Set the surface and source geometry for the left hemisphere.
+     * Used for on-the-fly interpolation matrix computation.
+     *
+     * @param[in] matVertices          Vertex positions (nVerts x 3).
+     * @param[in] vecNeighborVertices   Per-vertex neighbor index lists.
+     * @param[in] vecSourceVertices     Source vertex indices into the surface.
+     */
+    void setInterpolationInfoLeft(const Eigen::MatrixX3f &matVertices,
+                                  const QVector<QVector<int>> &vecNeighborVertices,
+                                  const QVector<int> &vecSourceVertices);
+
+    //=========================================================================================================
+    /**
+     * Set the surface and source geometry for the right hemisphere.
+     * Used for on-the-fly interpolation matrix computation.
+     *
+     * @param[in] matVertices          Vertex positions (nVerts x 3).
+     * @param[in] vecNeighborVertices   Per-vertex neighbor index lists.
+     * @param[in] vecSourceVertices     Source vertex indices into the surface.
+     */
+    void setInterpolationInfoRight(const Eigen::MatrixX3f &matVertices,
+                                   const QVector<QVector<int>> &vecNeighborVertices,
+                                   const QVector<int> &vecSourceVertices);
+
+    //=========================================================================================================
+    /**
+     * Trigger an asynchronous recomputation of the interpolation matrices.
+     * The new matrices will be automatically forwarded to the data worker.
+     */
+    void recomputeInterpolation();
+
 signals:
     //=========================================================================================================
     /**
@@ -216,12 +281,35 @@ signals:
     void newRawDataAvailable(const Eigen::VectorXd &dataLh,
                              const Eigen::VectorXd &dataRh);
 
+    //=========================================================================================================
+    /**
+     * Emitted when a new left hemisphere interpolation matrix has been computed.
+     *
+     * @param[in] interpMat   Sparse interpolation matrix (nVertices x nSources).
+     */
+    void newInterpolationMatrixLeftAvailable(QSharedPointer<Eigen::SparseMatrix<float>> interpMat);
+
+    //=========================================================================================================
+    /**
+     * Emitted when a new right hemisphere interpolation matrix has been computed.
+     *
+     * @param[in] interpMat   Sparse interpolation matrix (nVertices x nSources).
+     */
+    void newInterpolationMatrixRightAvailable(QSharedPointer<Eigen::SparseMatrix<float>> interpMat);
+
+private slots:
+    void onNewInterpolationMatrixLeft(QSharedPointer<Eigen::SparseMatrix<float>> interpMat);
+    void onNewInterpolationMatrixRight(QSharedPointer<Eigen::SparseMatrix<float>> interpMat);
+
 private:
     QThread *m_pWorkerThread = nullptr;                     /**< Background thread for the data worker. */
     DISP3DRHILIB::RtSourceDataWorker *m_pWorker = nullptr;  /**< Data streaming worker. */
     QTimer *m_pTimer = nullptr;                             /**< Timer driving the streaming cadence. */
     bool m_bIsStreaming = false;                             /**< Whether streaming is active. */
     int m_iTimeInterval = 17;                               /**< Streaming interval in ms (~60fps). */
+
+    QThread *m_pInterpThread = nullptr;                     /**< Background thread for interpolation matrix worker. */
+    DISP3DRHILIB::RtSourceInterpolationMatWorker *m_pInterpWorker = nullptr; /**< Interpolation matrix worker. */
 };
 
 #endif // BRAINVIEW_RTSOURCEDATACONTROLLER_H

@@ -43,6 +43,8 @@ set(SOURCES
     workers/rtsourcedatacontroller.cpp
     workers/rtsensordataworker.cpp
     workers/rtsensordatacontroller.cpp
+    workers/rtsensorinterpolationmatworker.cpp
+    workers/rtsourceinterpolationmatworker.cpp
 )
 
 set(HEADERS
@@ -79,6 +81,8 @@ set(HEADERS
     workers/rtsourcedatacontroller.h
     workers/rtsensordataworker.h
     workers/rtsensordatacontroller.h
+    workers/rtsensorinterpolationmatworker.h
+    workers/rtsourceinterpolationmatworker.h
 )
 
 # Build-info stamp

@@ -41,9 +41,13 @@
 
 #include "../disp3D_rhi_global.h"
 
+#include <fiff/fiff_evoked.h>
+#include <fiff/fiff_coord_trans.h>
+
 #include <QObject>
 #include <QSharedPointer>
 #include <QVector>
+#include <QString>
 #include <Eigen/Core>
 
 //=============================================================================================================
@@ -55,21 +59,31 @@ class QTimer;
 
 namespace DISP3DRHILIB {
     class RtSensorDataWorker;
+    class RtSensorInterpolationMatWorker;
 }
 
 //=============================================================================================================
 /**
  * RtSensorDataController orchestrates real-time sensor data streaming.
- * It manages a background worker thread and a timer that drives the data flow.
+ * It manages a background data worker thread, a background interpolation
+ * matrix worker thread, and a timer that drives the data flow.
  *
  * Unlike the source-estimate controller (which uses sparse interpolation matrices
  * split by hemisphere), this controller uses a single dense mapping matrix
  * produced by FieldMap::computeMeg/EegMapping() that maps sensor measurements
  * directly to surface vertex values.
  *
+ * The controller can either accept a precomputed mapping matrix via
+ * setMappingMatrix(), or compute one on-the-fly in a background thread
+ * by providing evoked data, surface geometry, and transforms via the
+ * setInterpolationInfo() / setEvoked() / setTransform() methods.
+ * When parameters change, recomputeMapping() triggers an asynchronous
+ * recomputation; the new matrix is automatically forwarded to the data worker.
+ *
  * Usage:
  *   1. Create controller
- *   2. Set mapping matrix via setMappingMatrix()
+ *   2. Either set mapping matrix via setMappingMatrix(), or configure
+ *      interpolation parameters and call recomputeMapping()
  *   3. Connect newSensorColorsAvailable() to your rendering update slot
  *   4. Call addData() to push sensor measurement vectors
  *   5. Call setStreamingState(true) to start streaming
@@ -176,6 +190,76 @@ public:
      */
     void clearData();
 
+    //=========================================================================================================
+    // ── On-the-fly interpolation matrix computation ─────────────────────
+    //=========================================================================================================
+
+    /**
+     * Set the evoked data that contains channel info and sensor definitions.
+     * This configures the interpolation worker for on-the-fly recomputation.
+     *
+     * @param[in] evoked    The evoked dataset.
+     */
+    void setEvoked(const FIFFLIB::FiffEvoked &evoked);
+
+    //=========================================================================================================
+    /**
+     * Set the head-to-MRI coordinate transform for the interpolation worker.
+     *
+     * @param[in] trans              The transform.
+     * @param[in] applySensorTrans   Whether to apply the transform.
+     */
+    void setTransform(const FIFFLIB::FiffCoordTrans &trans, bool applySensorTrans);
+
+    //=========================================================================================================
+    /**
+     * Set whether the MEG field should be mapped onto the head (BEM) surface
+     * rather than the helmet surface.
+     *
+     * @param[in] onHead    True to map onto head.
+     */
+    void setMegFieldMapOnHead(bool onHead);
+
+    //=========================================================================================================
+    /**
+     * Set the MEG target surface geometry for on-the-fly mapping.
+     *
+     * @param[in] surfaceKey    The key identifying the surface.
+     * @param[in] vertices      Vertex positions (nVerts x 3).
+     * @param[in] normals       Vertex normals (nVerts x 3).
+     * @param[in] triangles     Triangle indices (nTris x 3).
+     */
+    void setMegSurface(const QString &surfaceKey,
+                       const Eigen::MatrixX3f &vertices,
+                       const Eigen::MatrixX3f &normals,
+                       const Eigen::MatrixX3i &triangles);
+
+    //=========================================================================================================
+    /**
+     * Set the EEG target surface geometry for on-the-fly mapping.
+     *
+     * @param[in] surfaceKey    The key identifying the surface.
+     * @param[in] vertices      Vertex positions (nVerts x 3).
+     */
+    void setEegSurface(const QString &surfaceKey,
+                       const Eigen::MatrixX3f &vertices);
+
+    //=========================================================================================================
+    /**
+     * Set bad channels for the interpolation worker.
+     *
+     * @param[in] bads    List of bad channel names.
+     */
+    void setBadChannels(const QStringList &bads);
+
+    //=========================================================================================================
+    /**
+     * Trigger an asynchronous recomputation of the mapping matrix.
+     * The new matrix will be automatically forwarded to the data worker
+     * when ready.
+     */
+    void recomputeMapping();
+
 signals:
     //=========================================================================================================
     /**
@@ -187,12 +271,47 @@ signals:
     void newSensorColorsAvailable(const QString &surfaceKey,
                                   const QVector<uint32_t> &colors);
 
+    //=========================================================================================================
+    /**
+     * Emitted when a new MEG mapping matrix has been computed by the background worker.
+     *
+     * @param[in] surfaceKey    Target surface key.
+     * @param[in] mappingMat    Dense mapping matrix (nVerts x nChannels).
+     * @param[in] pick          Channel indices picked for this mapping.
+     */
+    void newMegMappingAvailable(const QString &surfaceKey,
+                                QSharedPointer<Eigen::MatrixXf> mappingMat,
+                                const QVector<int> &pick);
+
+    //=========================================================================================================
+    /**
+     * Emitted when a new EEG mapping matrix has been computed by the background worker.
+     *
+     * @param[in] surfaceKey    Target surface key.
+     * @param[in] mappingMat    Dense mapping matrix (nVerts x nChannels).
+     * @param[in] pick          Channel indices picked for this mapping.
+     */
+    void newEegMappingAvailable(const QString &surfaceKey,
+                                QSharedPointer<Eigen::MatrixXf> mappingMat,
+                                const QVector<int> &pick);
+
+private slots:
+    void onNewMegMapping(const QString &surfaceKey,
+                         QSharedPointer<Eigen::MatrixXf> mappingMat,
+                         const QVector<int> &pick);
+    void onNewEegMapping(const QString &surfaceKey,
+                         QSharedPointer<Eigen::MatrixXf> mappingMat,
+                         const QVector<int> &pick);
+
 private:
     QThread *m_pWorkerThread = nullptr;                         /**< Background thread for the data worker. */
     DISP3DRHILIB::RtSensorDataWorker *m_pWorker = nullptr;      /**< Data streaming worker. */
     QTimer *m_pTimer = nullptr;                                 /**< Timer driving the streaming cadence. */
     bool m_bIsStreaming = false;                                 /**< Whether streaming is active. */
     int m_iTimeInterval = 17;                                   /**< Streaming interval in ms (~60fps). */
+
+    QThread *m_pInterpThread = nullptr;                          /**< Background thread for interpolation matrix worker. */
+    DISP3DRHILIB::RtSensorInterpolationMatWorker *m_pInterpWorker = nullptr; /**< Interpolation matrix worker. */
 };
 
 #endif // BRAINVIEW_RTSENSORDATACONTROLLER_H

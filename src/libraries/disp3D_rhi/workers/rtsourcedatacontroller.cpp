@@ -38,6 +38,7 @@
 
 #include "rtsourcedatacontroller.h"
 #include "rtsourcedataworker.h"
+#include "rtsourceinterpolationmatworker.h"
 
 #include <QThread>
 #include <QTimer>
@@ -50,10 +51,10 @@
 RtSourceDataController::RtSourceDataController(QObject *parent)
     : QObject(parent)
 {
-    // Create worker
+    // Create data worker
     m_pWorker = new DISP3DRHILIB::RtSourceDataWorker();
 
-    // Create and configure thread
+    // Create and configure data thread
     m_pWorkerThread = new QThread(this);
     m_pWorker->moveToThread(m_pWorkerThread);
 
@@ -71,8 +72,23 @@ RtSourceDataController::RtSourceDataController(QObject *parent)
     m_pTimer->setTimerType(Qt::PreciseTimer);
     connect(m_pTimer, &QTimer::timeout, m_pWorker, &DISP3DRHILIB::RtSourceDataWorker::streamData);
 
-    // Start the worker thread
+    // Start the data worker thread
     m_pWorkerThread->start();
+
+    // Create interpolation matrix worker
+    m_pInterpWorker = new DISP3DRHILIB::RtSourceInterpolationMatWorker();
+    m_pInterpThread = new QThread(this);
+    m_pInterpWorker->moveToThread(m_pInterpThread);
+
+    connect(m_pInterpThread, &QThread::finished, m_pInterpWorker, &QObject::deleteLater);
+
+    // Forward interpolation results: auto-apply to data worker + re-emit
+    connect(m_pInterpWorker, &DISP3DRHILIB::RtSourceInterpolationMatWorker::newInterpolationMatrixLeftAvailable,
+            this, &RtSourceDataController::onNewInterpolationMatrixLeft);
+    connect(m_pInterpWorker, &DISP3DRHILIB::RtSourceInterpolationMatWorker::newInterpolationMatrixRightAvailable,
+            this, &RtSourceDataController::onNewInterpolationMatrixRight);
+
+    m_pInterpThread->start();
 
     qDebug() << "RtSourceDataController: Initialized with" << m_iTimeInterval << "ms interval";
 }
@@ -86,10 +102,16 @@ RtSourceDataController::~RtSourceDataController()
         m_pTimer->stop();
     }
 
-    // Stop the worker thread
+    // Stop the data worker thread
     if (m_pWorkerThread) {
         m_pWorkerThread->quit();
         m_pWorkerThread->wait();
+    }
+
+    // Stop the interpolation worker thread
+    if (m_pInterpThread) {
+        m_pInterpThread->quit();
+        m_pInterpThread->wait();
     }
 }
 
@@ -208,4 +230,77 @@ void RtSourceDataController::clearData()
     if (m_pWorker) {
         m_pWorker->clear();
     }
+}
+
+//=============================================================================================================
+
+void RtSourceDataController::setInterpolationFunction(const QString &sInterpolationFunction)
+{
+    if (m_pInterpWorker) {
+        m_pInterpWorker->setInterpolationFunction(sInterpolationFunction);
+    }
+}
+
+//=============================================================================================================
+
+void RtSourceDataController::setCancelDistance(double dCancelDist)
+{
+    if (m_pInterpWorker) {
+        m_pInterpWorker->setCancelDistance(dCancelDist);
+    }
+}
+
+//=============================================================================================================
+
+void RtSourceDataController::setInterpolationInfoLeft(const Eigen::MatrixX3f &matVertices,
+                                                       const QVector<QVector<int>> &vecNeighborVertices,
+                                                       const QVector<int> &vecSourceVertices)
+{
+    if (m_pInterpWorker) {
+        m_pInterpWorker->setInterpolationInfoLeft(matVertices, vecNeighborVertices, vecSourceVertices);
+    }
+}
+
+//=============================================================================================================
+
+void RtSourceDataController::setInterpolationInfoRight(const Eigen::MatrixX3f &matVertices,
+                                                        const QVector<QVector<int>> &vecNeighborVertices,
+                                                        const QVector<int> &vecSourceVertices)
+{
+    if (m_pInterpWorker) {
+        m_pInterpWorker->setInterpolationInfoRight(matVertices, vecNeighborVertices, vecSourceVertices);
+    }
+}
+
+//=============================================================================================================
+
+void RtSourceDataController::recomputeInterpolation()
+{
+    if (m_pInterpWorker) {
+        QMetaObject::invokeMethod(m_pInterpWorker, "computeInterpolationMatrix", Qt::QueuedConnection);
+    }
+}
+
+//=============================================================================================================
+
+void RtSourceDataController::onNewInterpolationMatrixLeft(QSharedPointer<Eigen::SparseMatrix<float>> interpMat)
+{
+    // Auto-forward to data worker so it immediately uses the new matrix
+    if (m_pWorker) {
+        m_pWorker->setInterpolationMatrixLeft(interpMat);
+    }
+    // Re-emit so external listeners can react
+    emit newInterpolationMatrixLeftAvailable(interpMat);
+}
+
+//=============================================================================================================
+
+void RtSourceDataController::onNewInterpolationMatrixRight(QSharedPointer<Eigen::SparseMatrix<float>> interpMat)
+{
+    // Auto-forward to data worker so it immediately uses the new matrix
+    if (m_pWorker) {
+        m_pWorker->setInterpolationMatrixRight(interpMat);
+    }
+    // Re-emit so external listeners can react
+    emit newInterpolationMatrixRightAvailable(interpMat);
 }

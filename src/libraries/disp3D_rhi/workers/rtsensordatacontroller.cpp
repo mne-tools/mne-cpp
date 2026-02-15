@@ -38,6 +38,7 @@
 
 #include "rtsensordatacontroller.h"
 #include "rtsensordataworker.h"
+#include "rtsensorinterpolationmatworker.h"
 
 #include <QThread>
 #include <QTimer>
@@ -50,10 +51,10 @@
 RtSensorDataController::RtSensorDataController(QObject *parent)
     : QObject(parent)
 {
-    // Create worker
+    // Create data worker
     m_pWorker = new DISP3DRHILIB::RtSensorDataWorker();
 
-    // Create and configure thread
+    // Create and configure data thread
     m_pWorkerThread = new QThread(this);
     m_pWorker->moveToThread(m_pWorkerThread);
 
@@ -69,8 +70,23 @@ RtSensorDataController::RtSensorDataController(QObject *parent)
     m_pTimer->setTimerType(Qt::PreciseTimer);
     connect(m_pTimer, &QTimer::timeout, m_pWorker, &DISP3DRHILIB::RtSensorDataWorker::streamData);
 
-    // Start the worker thread
+    // Start the data worker thread
     m_pWorkerThread->start();
+
+    // Create interpolation matrix worker
+    m_pInterpWorker = new DISP3DRHILIB::RtSensorInterpolationMatWorker();
+    m_pInterpThread = new QThread(this);
+    m_pInterpWorker->moveToThread(m_pInterpThread);
+
+    connect(m_pInterpThread, &QThread::finished, m_pInterpWorker, &QObject::deleteLater);
+
+    // Forward interpolation results: auto-apply to data worker + re-emit for external listeners
+    connect(m_pInterpWorker, &DISP3DRHILIB::RtSensorInterpolationMatWorker::newMegMappingAvailable,
+            this, &RtSensorDataController::onNewMegMapping);
+    connect(m_pInterpWorker, &DISP3DRHILIB::RtSensorInterpolationMatWorker::newEegMappingAvailable,
+            this, &RtSensorDataController::onNewEegMapping);
+
+    m_pInterpThread->start();
 
     qDebug() << "RtSensorDataController: Initialized with" << m_iTimeInterval << "ms interval";
 }
@@ -84,10 +100,16 @@ RtSensorDataController::~RtSensorDataController()
         m_pTimer->stop();
     }
 
-    // Stop the worker thread
+    // Stop the data worker thread
     if (m_pWorkerThread) {
         m_pWorkerThread->quit();
         m_pWorkerThread->wait();
+    }
+
+    // Stop the interpolation worker thread
+    if (m_pInterpThread) {
+        m_pInterpThread->quit();
+        m_pInterpThread->wait();
     }
 }
 
@@ -188,4 +210,112 @@ void RtSensorDataController::clearData()
     if (m_pWorker) {
         m_pWorker->clear();
     }
+}
+
+//=============================================================================================================
+// ── On-the-fly interpolation matrix computation ────────────────────────
+//=============================================================================================================
+
+void RtSensorDataController::setEvoked(const FIFFLIB::FiffEvoked &evoked)
+{
+    if (m_pInterpWorker) {
+        m_pInterpWorker->setEvoked(evoked);
+    }
+}
+
+//=============================================================================================================
+
+void RtSensorDataController::setTransform(const FIFFLIB::FiffCoordTrans &trans,
+                                            bool applySensorTrans)
+{
+    if (m_pInterpWorker) {
+        m_pInterpWorker->setTransform(trans, applySensorTrans);
+    }
+}
+
+//=============================================================================================================
+
+void RtSensorDataController::setMegFieldMapOnHead(bool onHead)
+{
+    if (m_pInterpWorker) {
+        m_pInterpWorker->setMegFieldMapOnHead(onHead);
+    }
+}
+
+//=============================================================================================================
+
+void RtSensorDataController::setMegSurface(const QString &surfaceKey,
+                                            const Eigen::MatrixX3f &vertices,
+                                            const Eigen::MatrixX3f &normals,
+                                            const Eigen::MatrixX3i &triangles)
+{
+    if (m_pInterpWorker) {
+        m_pInterpWorker->setMegSurface(surfaceKey, vertices, normals, triangles);
+    }
+}
+
+//=============================================================================================================
+
+void RtSensorDataController::setEegSurface(const QString &surfaceKey,
+                                            const Eigen::MatrixX3f &vertices)
+{
+    if (m_pInterpWorker) {
+        m_pInterpWorker->setEegSurface(surfaceKey, vertices);
+    }
+}
+
+//=============================================================================================================
+
+void RtSensorDataController::setBadChannels(const QStringList &bads)
+{
+    if (m_pInterpWorker) {
+        m_pInterpWorker->setBadChannels(bads);
+    }
+}
+
+//=============================================================================================================
+
+void RtSensorDataController::recomputeMapping()
+{
+    if (m_pInterpWorker) {
+        // Use QMetaObject::invokeMethod with queued connection to ensure
+        // computeMapping() runs on the interpolation worker thread.
+        QMetaObject::invokeMethod(m_pInterpWorker, "computeMapping", Qt::QueuedConnection);
+    }
+}
+
+//=============================================================================================================
+
+void RtSensorDataController::onNewMegMapping(const QString &surfaceKey,
+                                               QSharedPointer<Eigen::MatrixXf> mappingMat,
+                                               const QVector<int> &pick)
+{
+    // Auto-forward the new matrix to the data worker
+    if (m_pWorker && mappingMat) {
+        m_pWorker->setMappingMatrix(mappingMat);
+    }
+
+    // Re-emit for external listeners (e.g. BrainView)
+    emit newMegMappingAvailable(surfaceKey, mappingMat, pick);
+
+    qDebug() << "RtSensorDataController: New MEG mapping received and forwarded"
+             << "(" << mappingMat->rows() << "x" << mappingMat->cols() << ")";
+}
+
+//=============================================================================================================
+
+void RtSensorDataController::onNewEegMapping(const QString &surfaceKey,
+                                               QSharedPointer<Eigen::MatrixXf> mappingMat,
+                                               const QVector<int> &pick)
+{
+    // Auto-forward the new matrix to the data worker
+    if (m_pWorker && mappingMat) {
+        m_pWorker->setMappingMatrix(mappingMat);
+    }
+
+    // Re-emit for external listeners (e.g. BrainView)
+    emit newEegMappingAvailable(surfaceKey, mappingMat, pick);
+
+    qDebug() << "RtSensorDataController: New EEG mapping received and forwarded"
+             << "(" << mappingMat->rows() << "x" << mappingMat->cols() << ")";
 }

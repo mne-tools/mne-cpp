@@ -79,7 +79,7 @@ using namespace MNELIB;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    setWindowTitle("MNE-CPP Brain View");
+    setWindowTitle("Brain View");
 
     setupUI();
     setupConnections();
