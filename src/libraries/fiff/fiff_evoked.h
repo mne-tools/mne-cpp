@@ -146,7 +146,7 @@ public:
      *
      * @return true if is empty, false otherwise.
      */
-    inline bool isEmpty();
+    inline bool isEmpty() const;
 
     //=========================================================================================================
     /**
@@ -256,7 +256,7 @@ inline QString FiffEvoked::aspectKindToString() const
 
 //=============================================================================================================
 
-inline bool FiffEvoked::isEmpty()
+inline bool FiffEvoked::isEmpty() const
 {
     return nave == -1;
 }

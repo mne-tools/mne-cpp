@@ -331,7 +331,7 @@ bool SensorFieldMapper::buildMapping(
 void SensorFieldMapper::apply(
     QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
     const SubView &singleView,
-    const SubView (&subViews)[4])
+    const QVector<SubView> &subViews)
 {
     if (!m_loaded || m_evoked.isEmpty()) return;
 
@@ -407,7 +407,7 @@ void SensorFieldMapper::apply(
     bool anyEegField    = singleView.visibility.eegFieldMap;
     bool anyMegContours = singleView.visibility.megFieldContours;
     bool anyEegContours = singleView.visibility.eegFieldContours;
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < subViews.size(); ++i) {
         anyMegField    |= subViews[i].visibility.megFieldMap;
         anyEegField    |= subViews[i].visibility.eegFieldMap;
         anyMegContours |= subViews[i].visibility.megFieldContours;

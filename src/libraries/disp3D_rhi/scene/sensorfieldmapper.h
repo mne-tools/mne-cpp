@@ -129,6 +129,32 @@ public:
 
     //=========================================================================================================
     /**
+     * @return Const reference to the loaded evoked data.
+     */
+    const FIFFLIB::FiffEvoked &evoked() const { return m_evoked; }
+
+    /**
+     * @return Const reference to the MEG channel pick indices.
+     */
+    const QVector<int> &megPick() const { return m_megPick; }
+
+    /**
+     * @return Const reference to the EEG channel pick indices.
+     */
+    const QVector<int> &eegPick() const { return m_eegPick; }
+
+    /**
+     * @return Shared pointer to the MEG mapping matrix (may be null).
+     */
+    QSharedPointer<Eigen::MatrixXf> megMapping() const { return m_megMapping; }
+
+    /**
+     * @return Shared pointer to the EEG mapping matrix (may be null).
+     */
+    QSharedPointer<Eigen::MatrixXf> eegMapping() const { return m_eegMapping; }
+
+    //=========================================================================================================
+    /**
      * Build the MEG/EEG sensor-to-surface mapping matrices.
      *
      * Needs the caller's surface map to locate the helmet and/or head
@@ -157,7 +183,7 @@ public:
      */
     void apply(QMap<QString, std::shared_ptr<BrainSurface>> &surfaces,
                const SubView &singleView,
-               const SubView (&subViews)[4]);
+               const QVector<SubView> &subViews);
 
     //=========================================================================================================
     /**

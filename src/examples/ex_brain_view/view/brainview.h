@@ -45,9 +45,9 @@
 #include "../core/viewstate.h"
 #include "../input/cameracontroller.h"
 #include "../scene/sensorfieldmapper.h"
+#include "../scene/sourceestimatemanager.h"
 
 #include <fiff/fiff_coord_trans.h>
-#include <fiff/fiff_evoked.h>
 #include <QRhiWidget>
 #include <QMap>
 #include <QElapsedTimer>
@@ -62,7 +62,6 @@
 
 class QLabel;
 class QTimer;
-class QThread;
 class QStandardItem;
 class QFrame;
 class BrainTreeModel;
@@ -70,9 +69,6 @@ class BrainRenderer;
 class BrainSurface;
 class DipoleObject;
 class NetworkObject;
-class SourceEstimateOverlay;
-class StcLoadingWorker;
-class RtSourceDataController;
 class RtSensorDataController;
 namespace CONNECTIVITYLIB { class Network; }
 
@@ -786,11 +782,11 @@ signals:
 private slots:
     //=========================================================================================================
     /**
-     * Called when async STC loading finishes.
+     * Called when the SourceEstimateManager finishes loading.
      *
-     * @param[in] success    True if loading succeeded.
+     * @param[in] numTimePoints    Number of loaded time points.
      */
-    void onStcLoadingFinished(bool success);
+    void onSourceEstimateLoaded(int numTimePoints);
 
     //=========================================================================================================
     /**
@@ -824,20 +820,6 @@ private:
     const ViewVisibilityProfile& visibilityProfileForTarget(int target) const;
 
     void refreshSensorTransforms();
-
-    // ── Sensor field mapping (delegated to SensorFieldMapper) ──────────
-    bool buildSensorFieldMapping();
-    void applySensorFieldMap();
-    QString findHeadSurfaceKey() const;
-    QString findHelmetSurfaceKey() const;
-
-    // ── Contour helpers (TODO: migrate to SensorFieldMapper) ──────────
-    float contourStep(float minVal, float maxVal, int targetTicks) const;
-    void updateContourSurfaces(const QString &prefix,
-                               const BrainSurface &surface,
-                               const QVector<float> &values,
-                               float step,
-                               bool visible);
 
 protected:
     void initialize(QRhiCommandBuffer *cb) override;
@@ -896,6 +878,7 @@ private:
     CameraController   m_camera;                    /**< Camera maths helper. */
     MultiViewLayout    m_layout;                    /**< Multi-view pane geometry and splitter logic. */
     SensorFieldMapper  m_fieldMapper;               /**< Sensor → surface field mapping helper. */
+    SourceEstimateManager m_sourceManager;           /**< Source estimate lifecycle (load, stream, navigate). */
 
     // ── Camera state ───────────────────────────────────────────────────
     QQuaternion m_cameraRotation;                   /**< Global camera orientation quaternion. */
@@ -914,10 +897,8 @@ private:
     bool m_infoPanelVisible = true;                 /**< Whether the info overlay panel is shown. */
 
     // ── Source estimate ────────────────────────────────────────────────
-    std::unique_ptr<SourceEstimateOverlay> m_sourceOverlay; /**< Active source estimate overlay data. */
     std::unique_ptr<DipoleObject> m_dipoles;        /**< Standalone dipole set (loaded via file). */
     std::unique_ptr<NetworkObject> m_network;        /**< Connectivity network visualization. */
-    int m_currentTimePoint = 0;                     /**< Current source estimate time sample index. */
 
     /** Update the scene bounding box based on visible objects. */
     void updateSceneBounds();
@@ -943,15 +924,6 @@ private:
     QVector3D m_lastIntersectionPoint;              /**< World-space position of last ray hit. */
     bool m_hasIntersection = false;                 /**< Whether the last ray cast produced a hit. */
 
-    // ── Async STC loading ──────────────────────────────────────────────
-    QThread* m_loadingThread = nullptr;             /**< Background thread for STC file loading. */
-    StcLoadingWorker* m_stcWorker = nullptr;        /**< Worker object performing the STC load. */
-    bool m_isLoadingStc = false;                    /**< True while an async STC load is in progress. */
-
-    // ── Real-time streaming ─────────────────────────────────────────────
-    std::unique_ptr<RtSourceDataController> m_rtController; /**< Real-time source data streaming controller. */
-    bool m_isRtStreaming = false;                   /**< True while real-time streaming is active. */
-
     // ── Real-time sensor streaming ──────────────────────────────────────
     std::unique_ptr<RtSensorDataController> m_rtSensorController; /**< Real-time sensor data streaming controller. */
     bool m_isRtSensorStreaming = false;             /**< True while real-time sensor streaming is active. */
@@ -970,23 +942,6 @@ private:
     QFrame* m_verticalSeparator = nullptr;          /**< Visual separator between left/right panes. */
     QFrame* m_horizontalSeparator = nullptr;        /**< Visual separator between top/bottom panes. */
     bool m_perspectiveRotatedSincePress = false;    /**< True if mouse drag rotated a perspective pane. */
-
-    // ── Sensor field mapping state ─────────────────────────────────────
-    FIFFLIB::FiffEvoked m_sensorEvoked;             /**< Loaded evoked data for field mapping. */
-    bool m_sensorFieldLoaded = false;               /**< Whether evoked sensor data has been loaded. */
-    int m_sensorFieldTimePoint = 0;                 /**< Current time sample index for field display. */
-    bool m_megFieldMapOnHead = false;               /**< Whether MEG field map is projected onto head surface. */
-    QString m_sensorFieldColormap = QStringLiteral("MNE"); /**< Colormap name for field visualisation. */
-    QString m_megFieldSurfaceKey;                   /**< Surface key used for MEG field mapping. */
-    QString m_eegFieldSurfaceKey;                   /**< Surface key used for EEG field mapping. */
-    QString m_megFieldContourPrefix = QStringLiteral("sens_contour_meg"); /**< Key prefix for MEG contour surfaces. */
-    QString m_eegFieldContourPrefix = QStringLiteral("sens_contour_eeg"); /**< Key prefix for EEG contour surfaces. */
-    QVector<int> m_megFieldPick;                    /**< Channel indices picked for MEG field mapping. */
-    QVector<int> m_eegFieldPick;                    /**< Channel indices picked for EEG field mapping. */
-    QVector<Eigen::Vector3f> m_megFieldPositions;   /**< 3D positions of MEG sensor coils. */
-    QVector<Eigen::Vector3f> m_eegFieldPositions;   /**< 3D positions of EEG electrode locations. */
-    QSharedPointer<Eigen::MatrixXf> m_megFieldMapping; /**< Interpolation matrix: MEG sensors → surface. */
-    QSharedPointer<Eigen::MatrixXf> m_eegFieldMapping; /**< Interpolation matrix: EEG sensors → surface. */
 };
 
 #endif // BRAINVIEW_H

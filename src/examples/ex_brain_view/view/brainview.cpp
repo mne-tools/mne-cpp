@@ -44,7 +44,6 @@
 #include "../renderable/brainsurface.h"
 #include "../renderable/dipoleobject.h"
 #include "../renderable/networkobject.h"
-#include "../renderable/sourceestimateoverlay.h"
 #include "../core/surfacekeys.h"
 #include "../core/dataloader.h"
 #include "../input/raypicker.h"
@@ -58,8 +57,6 @@
 #include "dipoletreeitem.h"
 #include "sourcespacetreeitem.h"
 #include "digitizertreeitem.h"
-#include "../workers/stcloadingworker.h"
-#include "../workers/rtsourcedatacontroller.h"
 #include "../workers/rtsensordatacontroller.h"
 #include "../helpers/field_map.h"
 
@@ -77,7 +74,6 @@
 #include <QCoreApplication>
 #include <QMenu>
 #include <QStandardItem>
-#include <QThread>
 #include <algorithm>
 #include <cmath>
 
@@ -85,46 +81,8 @@
 #include <mne/mne_sourcespace.h>
 #include <fiff/fiff_evoked_set.h>
 #include <connectivity/network/network.h>
-#include <fs/surface.h>
-#include <fiff/fiff_constants.h>
-#include <fiff/c/fiff_coord_trans_old.h>
-#include <fwd/fwd_coil_set.h>
-#include <disp/plots/helpers/colormap.h>
 
 using namespace FIFFLIB;
-
-// Anonymous-namespace helpers used only by buildSensorFieldMapping().
-
-namespace
-{
-
-std::unique_ptr<FiffCoordTransOld> toOldTransform(const FiffCoordTrans& trans)
-{
-    if (trans.isEmpty()) {
-        return nullptr;
-    }
-
-    auto old = std::make_unique<FiffCoordTransOld>();
-    old->from = trans.from;
-    old->to = trans.to;
-    old->rot = trans.trans.block<3, 3>(0, 0);
-    old->move = trans.trans.block<3, 1>(0, 3);
-    FiffCoordTransOld::add_inverse(old.get());
-    return old;
-}
-
-Eigen::Vector3f applyOldTransform(const Eigen::Vector3f& point, const FiffCoordTransOld* trans)
-{
-    if (!trans) {
-        return point;
-    }
-
-    float r[3] = {point.x(), point.y(), point.z()};
-    FiffCoordTransOld::fiff_coord_trans(r, trans, FIFFV_MOVE);
-    return Eigen::Vector3f(r[0], r[1], r[2]);
-}
-
-} // anonymous namespace
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -230,18 +188,24 @@ BrainView::BrainView(QWidget *parent)
     // Setup Debug Pointer: Semi-transparent sphere for subtle intersection indicator
     m_debugPointerSurface = MeshFactory::createSphere(QVector3D(0, 0, 0), 0.002f,
                                                        QColor(200, 255, 255, 160));
+
+    // ── Connect SourceEstimateManager signals ─────────────────────────
+    connect(&m_sourceManager, &SourceEstimateManager::loaded,
+            this, &BrainView::onSourceEstimateLoaded);
+    connect(&m_sourceManager, &SourceEstimateManager::thresholdsUpdated,
+            this, &BrainView::sourceThresholdsUpdated);
+    connect(&m_sourceManager, &SourceEstimateManager::timePointChanged,
+            this, &BrainView::timePointChanged);
+    connect(&m_sourceManager, &SourceEstimateManager::loadingProgress,
+            this, &BrainView::stcLoadingProgress);
+    connect(&m_sourceManager, &SourceEstimateManager::realtimeColorsAvailable,
+            this, &BrainView::onRealtimeColorsAvailable);
 }
 
 //=============================================================================================================
 
 BrainView::~BrainView()
 {
-    // Stop worker thread before destroying anything it may reference
-    if (m_loadingThread) {
-        m_loadingThread->quit();
-        m_loadingThread->wait();
-    }
-
     saveMultiViewSettings();
 }
 
@@ -600,8 +564,8 @@ void BrainView::setVisualizationEditTarget(int target)
     m_currentVisMode    = sv.overlayMode;
     const ViewVisibilityProfile &visibility = sv.visibility;
 
-    const bool remapMegSurface = (m_megFieldMapOnHead != visibility.megFieldMapOnHead);
-    m_megFieldMapOnHead = visibility.megFieldMapOnHead;
+    const bool remapMegSurface = (m_fieldMapper.megFieldMapOnHead() != visibility.megFieldMapOnHead);
+    m_fieldMapper.setMegFieldMapOnHead(visibility.megFieldMapOnHead);
     m_dipolesVisible = visibility.dipoles;
     m_networkVisible = visibility.network;
 
@@ -609,11 +573,11 @@ void BrainView::setVisualizationEditTarget(int target)
         surf->setVisualizationMode(m_currentVisMode);
     }
 
-    if (m_sensorFieldLoaded) {
+    if (m_fieldMapper.isLoaded()) {
         if (remapMegSurface) {
-            buildSensorFieldMapping();
+            m_fieldMapper.buildMapping(m_surfaces, m_headToMriTrans, m_applySensorTrans);
         }
-        applySensorFieldMap();
+        m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
     }
 
     // Update viewport label highlighting
@@ -1812,147 +1776,23 @@ void BrainView::keyPressEvent(QKeyEvent *event)
 
 bool BrainView::loadSourceEstimate(const QString &lhPath, const QString &rhPath)
 {
-    // Prevent multiple simultaneous loads
-    if (m_isLoadingStc) {
-        qWarning() << "BrainView: STC loading already in progress";
-        return false;
-    }
-
-    // Find surfaces for the current active type
-    BrainSurface* lhSurface = nullptr;
-    BrainSurface* rhSurface = nullptr;
-
-    QString lhKey = "lh_" + m_activeSurfaceType;
-    QString rhKey = "rh_" + m_activeSurfaceType;
-
-    if (m_surfaces.contains(lhKey)) {
-        lhSurface = m_surfaces[lhKey].get();
-    }
-    if (m_surfaces.contains(rhKey)) {
-        rhSurface = m_surfaces[rhKey].get();
-    }
-
-    // Fallback: if active surface type didn't match, search for any lh_*/rh_* brain surface
-    if (!lhSurface || !rhSurface) {
-        for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-            if (it.value() && it.value()->tissueType() == BrainSurface::TissueBrain) {
-                if (!lhSurface && it.key().startsWith("lh_")) {
-                    lhSurface = it.value().get();
-                    qDebug() << "BrainView: Using fallback LH surface:" << it.key();
-                } else if (!rhSurface && it.key().startsWith("rh_")) {
-                    rhSurface = it.value().get();
-                    qDebug() << "BrainView: Using fallback RH surface:" << it.key();
-                }
-            }
-        }
-    }
-
-    if (!lhSurface && !rhSurface) {
-        qWarning() << "BrainView: No surfaces available for STC loading."
-                   << "Active surface type:" << m_activeSurfaceType
-                   << "Available keys:" << m_surfaces.keys();
-        return false;
-    }
-
-    // Clean up any previous loading thread
-    if (m_loadingThread) {
-        m_loadingThread->quit();
-        m_loadingThread->wait();
-        delete m_loadingThread;
-        m_loadingThread = nullptr;
-    }
-
-    // Create overlay for results
-    m_sourceOverlay = std::make_unique<SourceEstimateOverlay>();
-
-    // Create worker and thread
-    m_loadingThread = new QThread(this);
-    m_stcWorker = new StcLoadingWorker(lhPath, rhPath, lhSurface, rhSurface);
-    m_stcWorker->moveToThread(m_loadingThread);
-
-    // Connect signals
-    connect(m_loadingThread, &QThread::started, m_stcWorker, &StcLoadingWorker::process);
-    connect(m_stcWorker, &StcLoadingWorker::progress, this, &BrainView::stcLoadingProgress);
-    connect(m_stcWorker, &StcLoadingWorker::finished, this, &BrainView::onStcLoadingFinished);
-    connect(m_stcWorker, &StcLoadingWorker::finished, m_loadingThread, &QThread::quit);
-    connect(m_loadingThread, &QThread::finished, m_stcWorker, &QObject::deleteLater);
-
-    m_isLoadingStc = true;
-
-    // Start loading
-    m_loadingThread->start();
-
-    return true;
+    return m_sourceManager.load(lhPath, rhPath, m_surfaces, m_activeSurfaceType);
 }
 
 //=============================================================================================================
 
-void BrainView::onStcLoadingFinished(bool success)
+void BrainView::onSourceEstimateLoaded(int numTimePoints)
 {
-    m_isLoadingStc = false;
-
-    if (!success || !m_stcWorker) {
-        qWarning() << "BrainView: Async STC loading failed";
-        m_sourceOverlay.reset();
-        return;
-    }
-
-    // Transfer data from worker to overlay
-    if (m_stcWorker->hasLh()) {
-        m_sourceOverlay->setStcData(m_stcWorker->stcLh(), 0);
-        if (m_stcWorker->interpolationMatLh()) {
-            m_sourceOverlay->setInterpolationMatrix(m_stcWorker->interpolationMatLh(), 0);
-        }
-    }
-
-    if (m_stcWorker->hasRh()) {
-        m_sourceOverlay->setStcData(m_stcWorker->stcRh(), 1);
-        if (m_stcWorker->interpolationMatRh()) {
-            m_sourceOverlay->setInterpolationMatrix(m_stcWorker->interpolationMatRh(), 1);
-        }
-    }
-
-    // Update thresholds based on data
-    m_sourceOverlay->updateThresholdsFromData();
-    emit sourceThresholdsUpdated(m_sourceOverlay->thresholdMin(),
-                                 m_sourceOverlay->thresholdMid(),
-                                 m_sourceOverlay->thresholdMax());
-
-    if (m_sourceOverlay->isLoaded()) {
-        setVisualizationMode("Source Estimate");
-        emit sourceEstimateLoaded(m_sourceOverlay->numTimePoints());
-        setTimePoint(0);
-    } else {
-        m_sourceOverlay.reset();
-    }
+    setVisualizationMode("Source Estimate");
+    emit sourceEstimateLoaded(numTimePoints);
+    setTimePoint(0);
 }
 
 //=============================================================================================================
 
 void BrainView::setTimePoint(int index)
 {
-    if (!m_sourceOverlay || !m_sourceOverlay->isLoaded()) return;
-
-    m_currentTimePoint = qBound(0, index, m_sourceOverlay->numTimePoints() - 1);
-
-    // Collect all distinct surface types used across single + multi views
-    QSet<QString> activeTypes;
-    activeTypes.insert(m_singleView.surfaceType);
-    for (int i = 0; i < m_subViews.size(); ++i) {
-        activeTypes.insert(m_subViews[i].surfaceType);
-    }
-
-    // Apply source estimate to surfaces matching ANY active type
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-        for (const QString &type : activeTypes) {
-            if (it.key().endsWith(type)) {
-                m_sourceOverlay->applyToSurface(it.value().get(), m_currentTimePoint);
-                break;
-            }
-        }
-    }
-
-    emit timePointChanged(m_currentTimePoint, m_sourceOverlay->timeAtIndex(m_currentTimePoint));
+    m_sourceManager.setTimePoint(index, m_surfaces, m_singleView, m_subViews);
     update();
 }
 
@@ -1960,131 +1800,59 @@ void BrainView::setTimePoint(int index)
 
 void BrainView::setSourceColormap(const QString &name)
 {
-    if (m_sourceOverlay) {
-        m_sourceOverlay->setColormap(name);
-        // Re-apply current time point with new colormap
-        setTimePoint(m_currentTimePoint);
-    }
+    m_sourceManager.setColormap(name);
+    setTimePoint(m_sourceManager.currentTimePoint());
 }
 
 //=============================================================================================================
 
 void BrainView::setSourceThresholds(float min, float mid, float max)
 {
-    if (m_sourceOverlay) {
-        m_sourceOverlay->setThresholds(min, mid, max);
-        // Re-apply current time point with new thresholds
-        setTimePoint(m_currentTimePoint);
-    }
-
-    // Also update thresholds on the real-time controller if active
-    if (m_rtController) {
-        m_rtController->setThresholds(min, mid, max);
-    }
+    m_sourceManager.setThresholds(min, mid, max);
+    setTimePoint(m_sourceManager.currentTimePoint());
 }
 
 //=============================================================================================================
 
 void BrainView::startRealtimeStreaming()
 {
-    if (m_isRtStreaming) {
-        qDebug() << "BrainView: Real-time streaming already active";
-        return;
-    }
-
-    // Require loaded STC data and interpolation matrices
-    if (!m_sourceOverlay || !m_sourceOverlay->isLoaded()) {
-        qWarning() << "BrainView: Cannot start streaming — no source estimate loaded";
-        return;
-    }
-
-    // Create controller on first use
-    if (!m_rtController) {
-        m_rtController = std::make_unique<RtSourceDataController>(this);
-        connect(m_rtController.get(), &RtSourceDataController::newSmoothedDataAvailable,
-                this, &BrainView::onRealtimeColorsAvailable);
-    }
-
-    // Propagate interpolation matrices from the overlay
-    m_rtController->setInterpolationMatrixLeft(m_sourceOverlay->interpolationMatLh());
-    m_rtController->setInterpolationMatrixRight(m_sourceOverlay->interpolationMatRh());
-
-    // Propagate current visualization parameters
-    m_rtController->setColormapType(m_sourceOverlay->colormap());
-    m_rtController->setThresholds(m_sourceOverlay->thresholdMin(),
-                                   m_sourceOverlay->thresholdMid(),
-                                   m_sourceOverlay->thresholdMax());
-    m_rtController->setSFreq(1.0 / m_sourceOverlay->tstep());
-
-    // Feed all STC time-points as data into the queue
-    int nTimePoints = m_sourceOverlay->numTimePoints();
-    qDebug() << "BrainView: Feeding" << nTimePoints << "time points into real-time queue";
-    m_rtController->clearData();
-
-    // Get source data column by column from the overlay and push to controller
-    for (int t = 0; t < nTimePoints; ++t) {
-        Eigen::VectorXd col = m_sourceOverlay->sourceDataColumn(t);
-        if (col.size() > 0) {
-            m_rtController->addData(col);
-        }
-    }
-
-    // Ensure source estimate overlay is in SourceEstimate mode
     setVisualizationMode("Source Estimate");
-
-    // Start streaming
-    m_rtController->setStreamingState(true);
-    m_isRtStreaming = true;
-
-    qDebug() << "BrainView: Real-time streaming started";
+    m_sourceManager.startStreaming(m_surfaces, m_singleView, m_subViews);
 }
 
 //=============================================================================================================
 
 void BrainView::stopRealtimeStreaming()
 {
-    if (!m_isRtStreaming) return;
-
-    if (m_rtController) {
-        m_rtController->setStreamingState(false);
-    }
-    m_isRtStreaming = false;
-
-    qDebug() << "BrainView: Real-time streaming stopped";
+    m_sourceManager.stopStreaming();
 }
 
 //=============================================================================================================
 
 bool BrainView::isRealtimeStreaming() const
 {
-    return m_isRtStreaming;
+    return m_sourceManager.isStreaming();
 }
 
 //=============================================================================================================
 
 void BrainView::pushRealtimeSourceData(const Eigen::VectorXd &data)
 {
-    if (m_rtController) {
-        m_rtController->addData(data);
-    }
+    m_sourceManager.pushData(data);
 }
 
 //=============================================================================================================
 
 void BrainView::setRealtimeInterval(int msec)
 {
-    if (m_rtController) {
-        m_rtController->setTimeInterval(msec);
-    }
+    m_sourceManager.setInterval(msec);
 }
 
 //=============================================================================================================
 
 void BrainView::setRealtimeLooping(bool enabled)
 {
-    if (m_rtController) {
-        m_rtController->setLoopState(enabled);
-    }
+    m_sourceManager.setLooping(enabled);
 }
 
 //=============================================================================================================
@@ -2125,16 +1893,15 @@ bool BrainView::loadSensorField(const QString &evokedPath, int aveIndex)
     auto evoked = DataLoader::loadEvoked(evokedPath, aveIndex);
     if (evoked.isEmpty()) return false;
 
-    m_sensorEvoked = evoked;
-    m_sensorFieldLoaded = true;
-    m_sensorFieldTimePoint = 0;
+    m_fieldMapper.setEvoked(evoked);
+    m_fieldMapper.setTimePoint(0);
 
-    if (!buildSensorFieldMapping()) {
-        m_sensorFieldLoaded = false;
+    if (!m_fieldMapper.buildMapping(m_surfaces, m_headToMriTrans, m_applySensorTrans)) {
+        m_fieldMapper.setEvoked(FIFFLIB::FiffEvoked());
         return false;
     }
 
-    emit sensorFieldLoaded(m_sensorEvoked.times.size());
+    emit sensorFieldLoaded(m_fieldMapper.evoked().times.size());
     setSensorFieldTimePoint(0);
     return true;
 }
@@ -2150,18 +1917,18 @@ QStringList BrainView::probeEvokedSets(const QString &evokedPath)
 
 void BrainView::setSensorFieldTimePoint(int index)
 {
-    if (!m_sensorFieldLoaded || m_sensorEvoked.isEmpty()) {
+    if (!m_fieldMapper.isLoaded() || m_fieldMapper.evoked().isEmpty()) {
         return;
     }
 
-    int maxIdx = static_cast<int>(m_sensorEvoked.times.size()) - 1;
+    int maxIdx = static_cast<int>(m_fieldMapper.evoked().times.size()) - 1;
     if (maxIdx < 0) {
         return;
     }
 
-    m_sensorFieldTimePoint = qBound(0, index, maxIdx);
-    applySensorFieldMap();
-    emit sensorFieldTimePointChanged(m_sensorFieldTimePoint, m_sensorEvoked.times(m_sensorFieldTimePoint));
+    m_fieldMapper.setTimePoint(qBound(0, index, maxIdx));
+    m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
+    emit sensorFieldTimePointChanged(m_fieldMapper.timePoint(), m_fieldMapper.evoked().times(m_fieldMapper.timePoint()));
     update();
 }
 
@@ -2179,7 +1946,7 @@ void BrainView::setSensorFieldVisible(const QString &type, bool visible)
     }
 
     saveMultiViewSettings();
-    applySensorFieldMap();
+    m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
     update();
 }
 
@@ -2197,7 +1964,7 @@ void BrainView::setSensorFieldContourVisible(const QString &type, bool visible)
     }
 
     saveMultiViewSettings();
-    applySensorFieldMap();
+    m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
     update();
 }
 
@@ -2206,16 +1973,16 @@ void BrainView::setSensorFieldContourVisible(const QString &type, bool visible)
 void BrainView::setMegFieldMapOnHead(bool useHead)
 {
     auto &profile = visibilityProfileForTarget(m_visualizationEditTarget);
-    if (profile.megFieldMapOnHead == useHead && m_megFieldMapOnHead == useHead) {
+    if (profile.megFieldMapOnHead == useHead && m_fieldMapper.megFieldMapOnHead() == useHead) {
         return;
     }
 
     profile.megFieldMapOnHead = useHead;
-    m_megFieldMapOnHead = useHead;
+    m_fieldMapper.setMegFieldMapOnHead(useHead);
     saveMultiViewSettings();
-    if (m_sensorFieldLoaded) {
-        buildSensorFieldMapping();
-        applySensorFieldMap();
+    if (m_fieldMapper.isLoaded()) {
+        m_fieldMapper.buildMapping(m_surfaces, m_headToMriTrans, m_applySensorTrans);
+        m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
         update();
     }
 }
@@ -2224,11 +1991,11 @@ void BrainView::setMegFieldMapOnHead(bool useHead)
 
 void BrainView::setSensorFieldColormap(const QString &name)
 {
-    if (m_sensorFieldColormap == name) {
+    if (m_fieldMapper.colormap() == name) {
         return;
     }
-    m_sensorFieldColormap = name;
-    applySensorFieldMap();
+    m_fieldMapper.setColormap(name);
+    m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
     update();
 }
 
@@ -2236,44 +2003,35 @@ void BrainView::setSensorFieldColormap(const QString &name)
 
 float BrainView::stcStep() const
 {
-    if (m_sourceOverlay && m_sourceOverlay->isLoaded()) {
-        return m_sourceOverlay->tstep();
-    }
-    return 0.0f;
+    return m_sourceManager.tstep();
 }
 
 //=============================================================================================================
 
 float BrainView::stcTmin() const
 {
-    if (m_sourceOverlay && m_sourceOverlay->isLoaded()) {
-        return m_sourceOverlay->tmin();
-    }
-    return 0.0f;
+    return m_sourceManager.tmin();
 }
 
 //=============================================================================================================
 
 int BrainView::stcNumTimePoints() const
 {
-    if (m_sourceOverlay && m_sourceOverlay->isLoaded()) {
-        return m_sourceOverlay->numTimePoints();
-    }
-    return 0;
+    return m_sourceManager.numTimePoints();
 }
 
 //=============================================================================================================
 
 int BrainView::closestSensorFieldIndex(float timeSec) const
 {
-    if (!m_sensorFieldLoaded || m_sensorEvoked.nave == -1 || m_sensorEvoked.times.size() == 0) {
+    if (!m_fieldMapper.isLoaded() || m_fieldMapper.evoked().nave == -1 || m_fieldMapper.evoked().times.size() == 0) {
         return -1;
     }
 
     int bestIdx = 0;
-    float bestDist = std::abs(m_sensorEvoked.times(0) - timeSec);
-    for (int i = 1; i < m_sensorEvoked.times.size(); ++i) {
-        float dist = std::abs(m_sensorEvoked.times(i) - timeSec);
+    float bestDist = std::abs(m_fieldMapper.evoked().times(0) - timeSec);
+    for (int i = 1; i < m_fieldMapper.evoked().times.size(); ++i) {
+        float dist = std::abs(m_fieldMapper.evoked().times(i) - timeSec);
         if (dist < bestDist) {
             bestDist = dist;
             bestIdx = i;
@@ -2286,30 +2044,18 @@ int BrainView::closestSensorFieldIndex(float timeSec) const
 
 int BrainView::closestStcIndex(float timeSec) const
 {
-    if (!m_sourceOverlay || !m_sourceOverlay->isLoaded()) {
-        return -1;
-    }
-
-    float tmin = m_sourceOverlay->tmin();
-    float tstep = m_sourceOverlay->tstep();
-    int numPts = m_sourceOverlay->numTimePoints();
-    if (numPts <= 0 || tstep <= 0.0f) {
-        return -1;
-    }
-
-    int idx = qRound((timeSec - tmin) / tstep);
-    return qBound(0, idx, numPts - 1);
+    return m_sourceManager.closestIndex(timeSec);
 }
 
 //=============================================================================================================
 
 bool BrainView::sensorFieldTimeRange(float &tmin, float &tmax) const
 {
-    if (!m_sensorFieldLoaded || m_sensorEvoked.nave == -1 || m_sensorEvoked.times.size() == 0) {
+    if (!m_fieldMapper.isLoaded() || m_fieldMapper.evoked().nave == -1 || m_fieldMapper.evoked().times.size() == 0) {
         return false;
     }
-    tmin = m_sensorEvoked.times(0);
-    tmax = m_sensorEvoked.times(m_sensorEvoked.times.size() - 1);
+    tmin = m_fieldMapper.evoked().times(0);
+    tmax = m_fieldMapper.evoked().times(m_fieldMapper.evoked().times.size() - 1);
     return true;
 }
 
@@ -2325,7 +2071,7 @@ void BrainView::startRealtimeSensorStreaming(const QString &modality)
     }
 
     // Require loaded evoked data and a built mapping matrix
-    if (!m_sensorFieldLoaded || m_sensorEvoked.isEmpty()) {
+    if (!m_fieldMapper.isLoaded() || m_fieldMapper.evoked().isEmpty()) {
         qWarning() << "BrainView: Cannot start sensor streaming — no evoked data loaded";
         return;
     }
@@ -2336,13 +2082,13 @@ void BrainView::startRealtimeSensorStreaming(const QString &modality)
     QString surfaceKey;
 
     if (modality == QStringLiteral("MEG")) {
-        mappingMat = m_megFieldMapping;
-        pick = m_megFieldPick;
-        surfaceKey = m_megFieldSurfaceKey;
+        mappingMat = m_fieldMapper.megMapping();
+        pick = m_fieldMapper.megPick();
+        surfaceKey = m_fieldMapper.megSurfaceKey();
     } else if (modality == QStringLiteral("EEG")) {
-        mappingMat = m_eegFieldMapping;
-        pick = m_eegFieldPick;
-        surfaceKey = m_eegFieldSurfaceKey;
+        mappingMat = m_fieldMapper.eegMapping();
+        pick = m_fieldMapper.eegPick();
+        surfaceKey = m_fieldMapper.eegSurfaceKey();
     } else {
         qWarning() << "BrainView: Unknown modality for sensor streaming:" << modality;
         return;
@@ -2373,18 +2119,18 @@ void BrainView::startRealtimeSensorStreaming(const QString &modality)
     m_rtSensorController->setMappingMatrix(mappingMat);
 
     // Propagate current visualization parameters
-    m_rtSensorController->setColormapType(m_sensorFieldColormap);
+    m_rtSensorController->setColormapType(m_fieldMapper.colormap());
 
     // Compute sampling frequency from evoked data
     double sFreq = 1000.0;
-    if (m_sensorEvoked.times.size() > 1) {
-        double dt = m_sensorEvoked.times(1) - m_sensorEvoked.times(0);
+    if (m_fieldMapper.evoked().times.size() > 1) {
+        double dt = m_fieldMapper.evoked().times(1) - m_fieldMapper.evoked().times(0);
         if (dt > 0) sFreq = 1.0 / dt;
     }
     m_rtSensorController->setSFreq(sFreq);
 
     // Feed evoked time points as data into the queue
-    int nTimePoints = static_cast<int>(m_sensorEvoked.times.size());
+    int nTimePoints = static_cast<int>(m_fieldMapper.evoked().times.size());
     qDebug() << "BrainView: Feeding" << nTimePoints << modality
              << "sensor time points into real-time queue";
     m_rtSensorController->clearData();
@@ -2392,7 +2138,7 @@ void BrainView::startRealtimeSensorStreaming(const QString &modality)
     for (int t = 0; t < nTimePoints; ++t) {
         Eigen::VectorXf meas(pick.size());
         for (int i = 0; i < pick.size(); ++i) {
-            meas(i) = static_cast<float>(m_sensorEvoked.data(pick[i], t));
+            meas(i) = static_cast<float>(m_fieldMapper.evoked().data(pick[i], t));
         }
         m_rtSensorController->addData(meas);
     }
@@ -2616,486 +2362,11 @@ void BrainView::refreshSensorTransforms()
         }
     }
 
-    if (m_sensorFieldLoaded) {
-        buildSensorFieldMapping();
-        applySensorFieldMap();
+    if (m_fieldMapper.isLoaded()) {
+        m_fieldMapper.buildMapping(m_surfaces, m_headToMriTrans, m_applySensorTrans);
+        m_fieldMapper.apply(m_surfaces, m_singleView, m_subViews);
     }
 }
-
-//=============================================================================================================
-
-QString BrainView::findHeadSurfaceKey() const
-{
-    if (m_surfaces.contains("bem_head")) {
-        return "bem_head";
-    }
-
-    QString fallback;
-    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
-        if (!it.key().startsWith("bem_")) {
-            continue;
-        }
-        if (it.value() && it.value()->tissueType() == BrainSurface::TissueSkin) {
-            return it.key();
-        }
-        if (fallback.isEmpty()) {
-            fallback = it.key();
-        }
-    }
-    return fallback;
-}
-
-//=============================================================================================================
-
-QString BrainView::findHelmetSurfaceKey() const
-{
-    if (m_surfaces.contains("sens_surface_meg")) {
-        return "sens_surface_meg";
-    }
-    return QString();
-}
-
-//=============================================================================================================
-
-float BrainView::contourStep(float minVal, float maxVal, int targetTicks) const
-{
-    if (targetTicks <= 0) return 0.0f;
-    double range = static_cast<double>(maxVal - minVal);
-    if (range <= 0.0) return 0.0f;
-
-    double raw = range / static_cast<double>(targetTicks);
-    double exponent = std::floor(std::log10(raw));
-    double base = std::pow(10.0, exponent);
-    double frac = raw / base;
-
-    double niceFrac = 1.0;
-    if (frac <= 1.0)      niceFrac = 1.0;
-    else if (frac <= 2.0) niceFrac = 2.0;
-    else if (frac <= 5.0) niceFrac = 5.0;
-    else                  niceFrac = 10.0;
-
-    return static_cast<float>(niceFrac * base);
-}
-
-//=============================================================================================================
-
-void BrainView::updateContourSurfaces(const QString &prefix,
-                                      const BrainSurface &surface,
-                                      const QVector<float> &values,
-                                      float step,
-                                      bool visible)
-{
-    auto hideContours = [this, &prefix]() {
-        QStringList suffixes = {"_neg", "_zero", "_pos"};
-        for (const auto &suffix : suffixes) {
-            QString key = prefix + suffix;
-            if (m_surfaces.contains(key)) {
-                m_surfaces[key]->setVisible(false);
-            }
-        }
-    };
-
-    if (!visible || values.isEmpty() || step <= 0.0f) {
-        hideContours();
-        return;
-    }
-
-    float minVal = values[0], maxVal = values[0];
-    for (int i = 1; i < values.size(); ++i) {
-        minVal = std::min(minVal, values[i]);
-        maxVal = std::max(maxVal, values[i]);
-    }
-
-    QVector<float> negLevels, posLevels;
-    bool hasZero = (minVal < 0.0f && maxVal > 0.0f);
-
-    for (float level = -step; level >= minVal; level -= step) negLevels.append(level);
-    for (float level = step;  level <= maxVal; level += step) posLevels.append(level);
-
-    struct ContourBuffers {
-        QVector<Eigen::Vector3f> verts;
-        QVector<Eigen::Vector3f> norms;
-        QVector<Eigen::Vector3i> tris;
-    };
-
-    auto addSegment = [](ContourBuffers &buf, const QVector3D &p0, const QVector3D &p1,
-                         const QVector3D &normal, float halfWidth, float shift) {
-        QVector3D dir = (p1 - p0);
-        float len = dir.length();
-        if (len < 1e-6f) return;
-        dir /= len;
-
-        QVector3D binormal = QVector3D::crossProduct(normal, dir);
-        if (binormal.length() < 1e-6f) binormal = QVector3D::crossProduct(QVector3D(0,1,0), dir);
-        if (binormal.length() < 1e-6f) binormal = QVector3D::crossProduct(QVector3D(1,0,0), dir);
-        binormal.normalize();
-
-        QVector3D offset = normal * shift;
-        QVector3D w = binormal * halfWidth;
-
-        int base = buf.verts.size();
-        buf.verts.append(Eigen::Vector3f(p0.x()-w.x()+offset.x(), p0.y()-w.y()+offset.y(), p0.z()-w.z()+offset.z()));
-        buf.verts.append(Eigen::Vector3f(p0.x()+w.x()+offset.x(), p0.y()+w.y()+offset.y(), p0.z()+w.z()+offset.z()));
-        buf.verts.append(Eigen::Vector3f(p1.x()-w.x()+offset.x(), p1.y()-w.y()+offset.y(), p1.z()-w.z()+offset.z()));
-        buf.verts.append(Eigen::Vector3f(p1.x()+w.x()+offset.x(), p1.y()+w.y()+offset.y(), p1.z()+w.z()+offset.z()));
-
-        Eigen::Vector3f n(normal.x(), normal.y(), normal.z());
-        buf.norms.append(n); buf.norms.append(n); buf.norms.append(n); buf.norms.append(n);
-
-        buf.tris.append(Eigen::Vector3i(base+0, base+1, base+2));
-        buf.tris.append(Eigen::Vector3i(base+1, base+3, base+2));
-    };
-
-    auto buildContours = [&](const QVector<float> &levels, ContourBuffers &buf) {
-        const Eigen::MatrixX3f rr = surface.vertexPositions();
-        const Eigen::MatrixX3f nn = surface.vertexNormals();
-        const QVector<uint32_t> idx = surface.triangleIndices();
-        if (rr.rows() == 0 || nn.rows() == 0 || idx.isEmpty()) return;
-
-        const float shift = 0.001f, halfWidth = 0.0005f;
-        for (float level : levels) {
-            for (int t = 0; t + 2 < idx.size(); t += 3) {
-                int i0 = idx[t], i1 = idx[t+1], i2 = idx[t+2];
-                float v0 = values[i0], v1 = values[i1], v2 = values[i2];
-
-                QVector3D p0(rr(i0,0), rr(i0,1), rr(i0,2));
-                QVector3D p1(rr(i1,0), rr(i1,1), rr(i1,2));
-                QVector3D p2(rr(i2,0), rr(i2,1), rr(i2,2));
-
-                QVector3D n0(nn(i0,0), nn(i0,1), nn(i0,2));
-                QVector3D n1(nn(i1,0), nn(i1,1), nn(i1,2));
-                QVector3D n2(nn(i2,0), nn(i2,1), nn(i2,2));
-                QVector3D normal = (n0 + n1 + n2).normalized();
-                if (normal.length() < 1e-6f)
-                    normal = QVector3D::crossProduct(p1 - p0, p2 - p0).normalized();
-
-                QVector<QVector3D> hits;
-                auto checkEdge = [&](const QVector3D &a, const QVector3D &b, float va, float vb) {
-                    if (va == vb) return;
-                    float tval = (level - va) / (vb - va);
-                    if (tval >= 0.0f && tval < 1.0f) hits.append(a + (b - a) * tval);
-                };
-
-                checkEdge(p0, p1, v0, v1);
-                checkEdge(p1, p2, v1, v2);
-                checkEdge(p2, p0, v2, v0);
-
-                if (hits.size() == 2) addSegment(buf, hits[0], hits[1], normal, halfWidth, shift);
-            }
-        }
-    };
-
-    ContourBuffers negBuf, posBuf, zeroBuf;
-    buildContours(negLevels, negBuf);
-    buildContours(posLevels, posBuf);
-    if (hasZero) {
-        QVector<float> zeroLevels = {0.0f};
-        buildContours(zeroLevels, zeroBuf);
-    }
-
-    auto updateSurface = [this, &prefix](const QString &suffix, const ContourBuffers &buf,
-                                         const QColor &color, bool show) {
-        QString key = prefix + suffix;
-        if (!show || buf.verts.isEmpty()) {
-            if (m_surfaces.contains(key)) m_surfaces[key]->setVisible(false);
-            return;
-        }
-
-        Eigen::MatrixX3f rr(buf.verts.size(), 3);
-        Eigen::MatrixX3f nn(buf.norms.size(), 3);
-        Eigen::MatrixX3i tris(buf.tris.size(), 3);
-        for (int i = 0; i < buf.verts.size(); ++i) {
-            rr(i,0) = buf.verts[i].x(); rr(i,1) = buf.verts[i].y(); rr(i,2) = buf.verts[i].z();
-            nn(i,0) = buf.norms[i].x(); nn(i,1) = buf.norms[i].y(); nn(i,2) = buf.norms[i].z();
-        }
-        for (int i = 0; i < buf.tris.size(); ++i) tris.row(i) = buf.tris[i];
-
-        std::shared_ptr<BrainSurface> contourSurface;
-        if (m_surfaces.contains(key)) {
-            contourSurface = m_surfaces[key];
-        } else {
-            contourSurface = std::make_shared<BrainSurface>();
-            m_surfaces[key] = contourSurface;
-        }
-        contourSurface->createFromData(rr, nn, tris, color);
-        contourSurface->setVisible(true);
-    };
-
-    updateSurface("_neg",  negBuf,  QColor(0,0,255,200),   visible && !negBuf.verts.isEmpty());
-    updateSurface("_zero", zeroBuf, QColor(0,0,0,220),     visible && !zeroBuf.verts.isEmpty());
-    updateSurface("_pos",  posBuf,  QColor(255,0,0,200),   visible && !posBuf.verts.isEmpty());
-}
-
-//=============================================================================================================
-
-bool BrainView::buildSensorFieldMapping()
-{
-    if (!m_sensorFieldLoaded || m_sensorEvoked.isEmpty()) {
-        return false;
-    }
-
-    m_megFieldPick.clear();
-    m_eegFieldPick.clear();
-    m_megFieldPositions.clear();
-    m_eegFieldPositions.clear();
-    m_megFieldMapping.reset();
-    m_eegFieldMapping.reset();
-
-    QList<FiffChInfo> megChs;
-    QList<FiffChInfo> eegChs;
-
-    m_megFieldSurfaceKey = m_megFieldMapOnHead ? findHeadSurfaceKey() : findHelmetSurfaceKey();
-    if (m_megFieldMapOnHead && m_megFieldSurfaceKey.isEmpty()) {
-        m_megFieldSurfaceKey = findHelmetSurfaceKey();
-        if (!m_megFieldSurfaceKey.isEmpty()) {
-            qWarning() << "BrainView: Head surface missing for MEG map, falling back to helmet.";
-        }
-    }
-    m_eegFieldSurfaceKey = findHeadSurfaceKey();
-
-    if (m_megFieldSurfaceKey.isEmpty() && m_eegFieldSurfaceKey.isEmpty()) {
-        qWarning() << "BrainView: No helmet/head surface available for sensor field mapping.";
-        return false;
-    }
-
-    bool hasDevHead = false;
-    QMatrix4x4 devHeadQTrans;
-    if (!m_sensorEvoked.info.dev_head_t.isEmpty() &&
-        m_sensorEvoked.info.dev_head_t.from == FIFFV_COORD_DEVICE &&
-        m_sensorEvoked.info.dev_head_t.to == FIFFV_COORD_HEAD &&
-        !m_sensorEvoked.info.dev_head_t.trans.isIdentity()) {
-        hasDevHead = true;
-        devHeadQTrans = SurfaceKeys::toQMatrix4x4(m_sensorEvoked.info.dev_head_t.trans);
-    }
-
-    QMatrix4x4 headToMri;
-    if (m_applySensorTrans && !m_headToMriTrans.isEmpty()) {
-        headToMri = SurfaceKeys::toQMatrix4x4(m_headToMriTrans.trans);
-    }
-
-    auto isBad = [this](const QString &name) -> bool {
-        return m_sensorEvoked.info.bads.contains(name);
-    };
-
-    for (int k = 0; k < m_sensorEvoked.info.chs.size(); ++k) {
-        const auto &ch = m_sensorEvoked.info.chs[k];
-        if (isBad(ch.ch_name)) {
-            continue;
-        }
-
-        QVector3D pos(ch.chpos.r0(0), ch.chpos.r0(1), ch.chpos.r0(2));
-
-        if (ch.kind == FIFFV_MEG_CH) {
-            if (hasDevHead) {
-                pos = devHeadQTrans.map(pos);
-            }
-            if (m_applySensorTrans && !m_headToMriTrans.isEmpty()) {
-                pos = headToMri.map(pos);
-            }
-            m_megFieldPick.append(k);
-            m_megFieldPositions.append(Eigen::Vector3f(pos.x(), pos.y(), pos.z()));
-            megChs.append(ch);
-        } else if (ch.kind == FIFFV_EEG_CH) {
-            if (m_applySensorTrans && !m_headToMriTrans.isEmpty()) {
-                pos = headToMri.map(pos);
-            }
-            m_eegFieldPick.append(k);
-            m_eegFieldPositions.append(Eigen::Vector3f(pos.x(), pos.y(), pos.z()));
-            eegChs.append(ch);
-        }
-    }
-
-    // Constants matching MNE-Python _setup_dots / _make_surface_mapping
-    constexpr float kIntrad  = 0.06f;   // int_rad in _setup_dots
-    constexpr float kMegMiss = 1e-4f;   // miss for MEG in _make_surface_mapping
-    constexpr float kEegMiss = 1e-3f;   // miss for EEG in _make_surface_mapping
-    const Eigen::Vector3f defaultOrigin(0.0f, 0.0f, 0.04f);
-
-    auto headMriOld = (m_applySensorTrans && !m_headToMriTrans.isEmpty()) ? toOldTransform(m_headToMriTrans) : nullptr;
-    auto devHeadOld = (!m_sensorEvoked.info.dev_head_t.isEmpty() &&
-                       m_sensorEvoked.info.dev_head_t.from == FIFFV_COORD_DEVICE &&
-                       m_sensorEvoked.info.dev_head_t.to == FIFFV_COORD_HEAD)
-                          ? toOldTransform(m_sensorEvoked.info.dev_head_t)
-                          : nullptr;
-
-    if (!m_megFieldSurfaceKey.isEmpty() && m_surfaces.contains(m_megFieldSurfaceKey) && !megChs.isEmpty()) {
-        const BrainSurface& surface = *m_surfaces[m_megFieldSurfaceKey];
-        Eigen::MatrixX3f verts = surface.vertexPositions();
-        Eigen::MatrixX3f norms = surface.vertexNormals();
-        if (norms.rows() != verts.rows()) {
-            const QVector<uint32_t> idx = surface.triangleIndices();
-            const int nTris = idx.size() / 3;
-            if (nTris > 0) {
-                Eigen::MatrixX3i tris(nTris, 3);
-                for (int t = 0; t < nTris; ++t) {
-                    tris(t, 0) = static_cast<int>(idx[t * 3]);
-                    tris(t, 1) = static_cast<int>(idx[t * 3 + 1]);
-                    tris(t, 2) = static_cast<int>(idx[t * 3 + 2]);
-                }
-                norms = FSLIB::Surface::compute_normals(verts, tris);
-            }
-        }
-
-        if (verts.rows() > 0 && norms.rows() == verts.rows()) {
-            const QString coilPath = QCoreApplication::applicationDirPath()
-                + "/../resources/general/coilDefinitions/coil_def.dat";
-            std::unique_ptr<FWDLIB::FwdCoilSet> templates(FWDLIB::FwdCoilSet::read_coil_defs(coilPath));
-            if (templates) {
-                std::unique_ptr<FiffCoordTransOld> devToTarget;
-                if (m_megFieldMapOnHead && headMriOld) {
-                    if (devHeadOld) {
-                        devToTarget.reset(FiffCoordTransOld::fiff_combine_transforms(
-                            FIFFV_COORD_DEVICE, FIFFV_COORD_MRI, devHeadOld.get(), headMriOld.get()));
-                    }
-                } else if (devHeadOld) {
-                    devToTarget = std::make_unique<FiffCoordTransOld>(*devHeadOld);
-                }
-
-                Eigen::Vector3f origin = defaultOrigin;
-                if (m_megFieldMapOnHead && headMriOld) {
-                    origin = applyOldTransform(origin, headMriOld.get());
-                }
-
-                std::unique_ptr<FWDLIB::FwdCoilSet> coils(templates->create_meg_coils(
-                    megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, devToTarget.get()));
-                if (coils && coils->ncoil > 0) {
-                    m_megFieldMapping = BRAINVIEWLIB::FieldMap::computeMegMapping(
-                        *coils, verts, norms, origin, kIntrad, kMegMiss);
-                }
-            }
-        }
-    }
-
-    if (!m_eegFieldSurfaceKey.isEmpty() && m_surfaces.contains(m_eegFieldSurfaceKey) && !eegChs.isEmpty()) {
-        const BrainSurface& surface = *m_surfaces[m_eegFieldSurfaceKey];
-        Eigen::MatrixX3f verts = surface.vertexPositions();
-        if (verts.rows() > 0) {
-            Eigen::Vector3f origin = defaultOrigin;
-            if (headMriOld) {
-                origin = applyOldTransform(origin, headMriOld.get());
-            }
-
-            std::unique_ptr<FWDLIB::FwdCoilSet> eegCoils(FWDLIB::FwdCoilSet::create_eeg_els(
-                eegChs, eegChs.size(), headMriOld.get()));
-            if (eegCoils && eegCoils->ncoil > 0) {
-                m_eegFieldMapping = BRAINVIEWLIB::FieldMap::computeEegMapping(
-                    *eegCoils, verts, origin, kIntrad, kEegMiss);
-            }
-        }
-    }
-
-    return true;
-}
-
-//=============================================================================================================
-
-void BrainView::applySensorFieldMap()
-{
-    if (!m_sensorFieldLoaded || m_sensorEvoked.isEmpty()) {
-        return;
-    }
-
-    auto applyMap = [this](const QString &key,
-                           const QString &contourPrefix,
-                           const QVector<int> &pick,
-                           const QSharedPointer<Eigen::MatrixXf> &mat,
-                           bool visible,
-                           bool showContours) {
-        if (key.isEmpty() || !m_surfaces.contains(key)) {
-            return;
-        }
-
-        auto surface = m_surfaces[key];
-        if (!visible || !mat || pick.isEmpty()) {
-            surface->setVisualizationMode(BrainSurface::ModeSurface);
-            updateContourSurfaces(contourPrefix, *surface, QVector<float>(), 0.0f, false);
-            return;
-        }
-
-        if (mat->cols() != pick.size()) {
-            surface->setVisualizationMode(BrainSurface::ModeSurface);
-            updateContourSurfaces(contourPrefix, *surface, QVector<float>(), 0.0f, false);
-            return;
-        }
-
-        Eigen::VectorXf meas(pick.size());
-        for (int i = 0; i < pick.size(); ++i) {
-            meas(i) = static_cast<float>(m_sensorEvoked.data(pick[i], m_sensorFieldTimePoint));
-        }
-
-        Eigen::VectorXf mapped = (*mat) * meas;
-
-        float maxAbs = 0.0f;
-        float minVal = 0.0f;
-        float maxVal = 0.0f;
-        for (int i = 0; i < mapped.size(); ++i) {
-            float v = mapped(i);
-            if (i == 0) {
-                minVal = v;
-                maxVal = v;
-            } else {
-                minVal = std::min(minVal, v);
-                maxVal = std::max(maxVal, v);
-            }
-            maxAbs = std::max(maxAbs, std::abs(v));
-        }
-        if (maxAbs <= 0.0f) {
-            maxAbs = 1.0f;
-        }
-
-        QVector<uint32_t> colors(mapped.size());
-        for (int i = 0; i < mapped.size(); ++i) {
-            double norm = (mapped(i) / maxAbs) * 0.5 + 0.5;
-            norm = qBound(0.0, norm, 1.0);
-            QRgb rgb;
-            if (m_sensorFieldColormap == "MNE") {
-                rgb = mneAnalyzeColor(norm);
-            } else {
-                rgb = DISPLIB::ColorMap::valueToColor(norm, m_sensorFieldColormap);
-            }
-            uint32_t r = qRed(rgb);
-            uint32_t g = qGreen(rgb);
-            uint32_t b = qBlue(rgb);
-            colors[i] = (0xFFu << 24) | (b << 16) | (g << 8) | r;
-        }
-
-        surface->applySourceEstimateColors(colors);
-
-        QVector<float> values(mapped.size());
-        for (int i = 0; i < mapped.size(); ++i) {
-            values[i] = mapped(i);
-        }
-        float step = contourStep(-maxAbs, maxAbs, 20);
-        updateContourSurfaces(contourPrefix, *surface, values, step, showContours);
-    };
-
-    // Aggregate visibility across all SubViews so that field
-    // maps / contours are computed whenever ANY pane needs them.
-    bool anyMegField = m_singleView.visibility.megFieldMap;
-    bool anyEegField = m_singleView.visibility.eegFieldMap;
-    bool anyMegContours = m_singleView.visibility.megFieldContours;
-    bool anyEegContours = m_singleView.visibility.eegFieldContours;
-    for (int i = 0; i < m_subViews.size(); ++i) {
-        anyMegField    |= m_subViews[i].visibility.megFieldMap;
-        anyEegField    |= m_subViews[i].visibility.eegFieldMap;
-        anyMegContours |= m_subViews[i].visibility.megFieldContours;
-        anyEegContours |= m_subViews[i].visibility.eegFieldContours;
-    }
-
-    applyMap(m_megFieldSurfaceKey,
-             m_megFieldContourPrefix,
-             m_megFieldPick,
-             m_megFieldMapping,
-             anyMegField,
-             anyMegContours);
-    applyMap(m_eegFieldSurfaceKey,
-             m_eegFieldContourPrefix,
-             m_eegFieldPick,
-             m_eegFieldMapping,
-             anyEegField,
-             anyEegContours);
-}
-
 
 //=============================================================================================================
 
