@@ -49,6 +49,7 @@
 #include "input/cameracontroller.h"
 #include "scene/sensorfieldmapper.h"
 #include "scene/sourceestimatemanager.h"
+#include "scene/rtsensorstreammanager.h"
 
 #include <fiff/fiff_coord_trans.h>
 #include <QRhiWidget>
@@ -68,7 +69,6 @@ class QTimer;
 class QStandardItem;
 class QFrame;
 class BrainTreeModel;
-class RtSensorDataController;
 class BrainRenderer;
 class BrainSurface;
 class DipoleObject;
@@ -804,14 +804,9 @@ private slots:
                                    const QVector<uint32_t> &colorsRh);
 
     //=========================================================================================================
-    /**
-     * Called when new per-vertex colors arrive from the real-time sensor streaming controller.
-     *
-     * @param[in] surfaceKey  Key identifying the target surface.
-     * @param[in] colors      Per-vertex ABGR color array.
-     */
-    void onRealtimeSensorColorsAvailable(const QString &surfaceKey,
-                                         const QVector<uint32_t> &colors);
+    /** Repaint after sensor streaming produces new colours. */
+    void onSensorStreamColorsAvailable(const QString &surfaceKey,
+                                       const QVector<uint32_t> &colors);
 
 private:
     // Note: ViewVisibilityProfile and SubView are defined in core/viewstate.h.
@@ -884,6 +879,7 @@ private:
     MultiViewLayout         m_layout;               /**< Multi-view pane geometry and splitter logic. */
     SensorFieldMapper       m_fieldMapper;          /**< Sensor → surface field mapping helper. */
     SourceEstimateManager   m_sourceManager;        /**< Source estimate lifecycle (load, stream, navigate). */
+    RtSensorStreamManager   m_sensorStreamManager;  /**< Real-time sensor streaming lifecycle. */
 
     // ── Camera state ───────────────────────────────────────────────────
     QQuaternion m_cameraRotation;                   /**< Global camera orientation quaternion. */
@@ -929,10 +925,7 @@ private:
     QVector3D m_lastIntersectionPoint;              /**< World-space position of last ray hit. */
     bool m_hasIntersection = false;                 /**< Whether the last ray cast produced a hit. */
 
-    // ── Real-time sensor streaming ──────────────────────────────────────
-    std::unique_ptr<RtSensorDataController> m_rtSensorController; /**< Real-time sensor data streaming controller. */
-    bool m_isRtSensorStreaming = false;             /**< True while real-time sensor streaming is active. */
-    QString m_rtSensorModality;                     /**< Active modality: "MEG" or "EEG". */
+
 
     // ── Multi-view support ─────────────────────────────────────────────
     ViewMode m_viewMode = SingleView;               /**< Current view mode (single or multi). */

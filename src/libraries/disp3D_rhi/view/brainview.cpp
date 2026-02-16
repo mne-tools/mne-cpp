@@ -56,9 +56,7 @@
 #include "model/items/sensortreeitem.h"
 #include "model/items/dipoletreeitem.h"
 #include "model/items/sourcespacetreeitem.h"
-#include "model/items/digitizertreeitem.h"
-#include "workers/rtsensordatacontroller.h"
-#include "helpers/field_map.h"
+#include "model/items/digitizertreeitem.h"\n#include "helpers/field_map.h"
 
 #include <Eigen/Dense>
 #include <QMatrix4x4>
@@ -200,6 +198,10 @@ BrainView::BrainView(QWidget *parent)
             this, &BrainView::stcLoadingProgress);
     connect(&m_sourceManager, &SourceEstimateManager::realtimeColorsAvailable,
             this, &BrainView::onRealtimeColorsAvailable);
+
+    // RtSensorStreamManager → BrainView
+    connect(&m_sensorStreamManager, &RtSensorStreamManager::colorsAvailable,
+            this, &BrainView::onSensorStreamColorsAvailable);
 }
 
 //=============================================================================================================
@@ -2065,161 +2067,62 @@ bool BrainView::sensorFieldTimeRange(float &tmin, float &tmax) const
 
 void BrainView::startRealtimeSensorStreaming(const QString &modality)
 {
-    if (m_isRtSensorStreaming) {
-        qDebug() << "BrainView: Real-time sensor streaming already active";
-        return;
-    }
-
-    // Require loaded evoked data and a built mapping matrix
-    if (!m_fieldMapper.isLoaded() || m_fieldMapper.evoked().isEmpty()) {
-        qWarning() << "BrainView: Cannot start sensor streaming — no evoked data loaded";
-        return;
-    }
-
-    // Select the mapping matrix and pick vector based on modality
-    QSharedPointer<Eigen::MatrixXf> mappingMat;
-    QVector<int> pick;
-    QString surfaceKey;
-
-    if (modality == QStringLiteral("MEG")) {
-        mappingMat = m_fieldMapper.megMapping();
-        pick = m_fieldMapper.megPick();
-        surfaceKey = m_fieldMapper.megSurfaceKey();
-    } else if (modality == QStringLiteral("EEG")) {
-        mappingMat = m_fieldMapper.eegMapping();
-        pick = m_fieldMapper.eegPick();
-        surfaceKey = m_fieldMapper.eegSurfaceKey();
-    } else {
-        qWarning() << "BrainView: Unknown modality for sensor streaming:" << modality;
-        return;
-    }
-
-    if (!mappingMat || mappingMat->rows() == 0 || pick.isEmpty()) {
-        qWarning() << "BrainView: Mapping matrix not built for" << modality
-                   << "— call loadSensorField() first";
-        return;
-    }
-
-    if (surfaceKey.isEmpty() || !m_surfaces.contains(surfaceKey)) {
-        qWarning() << "BrainView: Target surface not found for" << modality
-                   << "streaming (key:" << surfaceKey << ")";
-        return;
-    }
-
-    m_rtSensorModality = modality;
-
-    // Create controller on first use
-    if (!m_rtSensorController) {
-        m_rtSensorController = std::make_unique<RtSensorDataController>(this);
-        connect(m_rtSensorController.get(), &RtSensorDataController::newSensorColorsAvailable,
-                this, &BrainView::onRealtimeSensorColorsAvailable);
-    }
-
-    // Propagate mapping matrix
-    m_rtSensorController->setMappingMatrix(mappingMat);
-
-    // Propagate current visualization parameters
-    m_rtSensorController->setColormapType(m_fieldMapper.colormap());
-
-    // Compute sampling frequency from evoked data
-    double sFreq = 1000.0;
-    if (m_fieldMapper.evoked().times.size() > 1) {
-        double dt = m_fieldMapper.evoked().times(1) - m_fieldMapper.evoked().times(0);
-        if (dt > 0) sFreq = 1.0 / dt;
-    }
-    m_rtSensorController->setSFreq(sFreq);
-
-    // Feed evoked time points as data into the queue
-    int nTimePoints = static_cast<int>(m_fieldMapper.evoked().times.size());
-    qDebug() << "BrainView: Feeding" << nTimePoints << modality
-             << "sensor time points into real-time queue";
-    m_rtSensorController->clearData();
-
-    for (int t = 0; t < nTimePoints; ++t) {
-        Eigen::VectorXf meas(pick.size());
-        for (int i = 0; i < pick.size(); ++i) {
-            meas(i) = static_cast<float>(m_fieldMapper.evoked().data(pick[i], t));
-        }
-        m_rtSensorController->addData(meas);
-    }
-
-    // Start streaming
-    m_rtSensorController->setStreamingState(true);
-    m_isRtSensorStreaming = true;
-
-    qDebug() << "BrainView: Real-time sensor streaming started for" << modality;
+    m_sensorStreamManager.startStreaming(modality, m_fieldMapper, m_surfaces);
 }
 
 //=============================================================================================================
 
 void BrainView::stopRealtimeSensorStreaming()
 {
-    if (!m_isRtSensorStreaming) return;
-
-    if (m_rtSensorController) {
-        m_rtSensorController->setStreamingState(false);
-    }
-    m_isRtSensorStreaming = false;
-
-    qDebug() << "BrainView: Real-time sensor streaming stopped";
+    m_sensorStreamManager.stopStreaming();
 }
 
 //=============================================================================================================
 
 bool BrainView::isRealtimeSensorStreaming() const
 {
-    return m_isRtSensorStreaming;
+    return m_sensorStreamManager.isStreaming();
 }
 
 //=============================================================================================================
 
 void BrainView::pushRealtimeSensorData(const Eigen::VectorXf &data)
 {
-    if (m_rtSensorController) {
-        m_rtSensorController->addData(data);
-    }
+    m_sensorStreamManager.pushData(data);
 }
 
 //=============================================================================================================
 
 void BrainView::setRealtimeSensorInterval(int msec)
 {
-    if (m_rtSensorController) {
-        m_rtSensorController->setTimeInterval(msec);
-    }
+    m_sensorStreamManager.setInterval(msec);
 }
 
 //=============================================================================================================
 
 void BrainView::setRealtimeSensorLooping(bool enabled)
 {
-    if (m_rtSensorController) {
-        m_rtSensorController->setLoopState(enabled);
-    }
+    m_sensorStreamManager.setLooping(enabled);
 }
 
 //=============================================================================================================
 
 void BrainView::setRealtimeSensorAverages(int numAvr)
 {
-    if (m_rtSensorController) {
-        m_rtSensorController->setNumberAverages(numAvr);
-    }
+    m_sensorStreamManager.setAverages(numAvr);
 }
 
 //=============================================================================================================
 
 void BrainView::setRealtimeSensorColormap(const QString &name)
 {
-    if (m_rtSensorController) {
-        m_rtSensorController->setColormapType(name);
-    }
+    m_sensorStreamManager.setColormap(name);
 }
 
 //=============================================================================================================
 
-void BrainView::onRealtimeSensorColorsAvailable(const QString &surfaceKey,
-                                                 const QVector<uint32_t> &colors)
+void BrainView::onSensorStreamColorsAvailable(const QString &surfaceKey,
+                                               const QVector<uint32_t> &colors)
 {
     if (surfaceKey.isEmpty() || !m_surfaces.contains(surfaceKey)) {
         return;

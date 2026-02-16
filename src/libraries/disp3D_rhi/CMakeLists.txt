@@ -34,6 +34,7 @@ set(SOURCES
     renderable/dipoleobject.cpp
     renderable/networkobject.cpp
     scene/sensorfieldmapper.cpp
+    scene/rtsensorstreammanager.cpp
     scene/sourceestimatemanager.cpp
     view/brainview.cpp
     view/brainrenderer.cpp
@@ -74,6 +75,7 @@ set(HEADERS
     renderable/dipoleobject.h
     renderable/networkobject.h
     scene/sensorfieldmapper.h
+    scene/rtsensorstreammanager.h
     scene/sourceestimatemanager.h
     view/brainview.h
     view/brainrenderer.h
