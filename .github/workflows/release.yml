@@ -203,6 +203,13 @@ jobs:
         mkdir -p ${{ runner.tool_cache }}/Qt/6.10.2/wasm_multithread
         tar xf /tmp/qt6_6102_static_binaries_wasm.tar.gz -C ${{ runner.tool_cache }}/Qt/6.10.2/wasm_multithread
         echo "Qt6_DIR=${{ runner.tool_cache }}/Qt/6.10.2" >> $GITHUB_ENV
+    - name: Download host Qt binaries for cross-compilation
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        gh release download qt_binaries -p 'qt6_6102_static_binaries_linux.tar.gz' -D /tmp
+        mkdir -p ${{ runner.tool_cache }}/Qt/6.10.2/gcc_64
+        tar xf /tmp/qt6_6102_static_binaries_linux.tar.gz -C ${{ runner.tool_cache }}/Qt/6.10.2/gcc_64
     - name: Build WASM
       run: |
         source ../emsdk/emsdk_env.sh

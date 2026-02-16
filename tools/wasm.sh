@@ -44,6 +44,9 @@ for (( j=0; j<argc; j++)); do
 	elif [ "${argv[j]}" == "--qt" ] || [ "${argv[j]}" == "-q" ]; then
 	        export Qt6_DIR="${argv[j+1]}"
 	        j=$j+1
+	elif [ "${argv[j]}" == "--qt-host" ]; then
+	        export QT_HOST_PATH="${argv[j+1]}"
+	        j=$j+1
 	elif [ "${argv[j]}" == "--help" ] || [ "${argv[j]}" == "-h" ]; then
 		SHOW_HELP="true"
 	fi
@@ -113,13 +116,15 @@ BUILD_DIRECTORY=${PROJECT_BASE_PATH}/build/wasm
 OUTPUT_DIRECTORY=${PROJECT_BASE_PATH}/out/wasm
 
 # Determine host Qt path for cross-compilation
-if [ -d "${Qt6_DIR}/gcc_64" ]; then
+if [ -n "${QT_HOST_PATH}" ] && [ -d "${QT_HOST_PATH}" ]; then
+    echo "Using QT_HOST_PATH from environment: ${QT_HOST_PATH}"
+elif [ -d "${Qt6_DIR}/gcc_64" ]; then
     QT_HOST_PATH="${Qt6_DIR}/gcc_64"
 elif [ -d "${Qt6_DIR}/macos" ]; then
     QT_HOST_PATH="${Qt6_DIR}/macos"
 else
-    # Fallback: use system Qt as host
-    QT_HOST_PATH=/usr
+    echo "ERROR: No host Qt found. Set QT_HOST_PATH or install a desktop Qt alongside the WASM Qt."
+    exit 1
 fi
 
 ${Qt6_DIR}/wasm_multithread/bin/qt-cmake \
