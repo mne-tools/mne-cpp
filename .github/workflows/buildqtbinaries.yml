@@ -153,11 +153,18 @@ jobs:
         ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qtshadertools
 
         # Build a minimal host Qt first (required for cross-compilation)
-        # Only qtbase + qtshadertools needed; no OpenGL on headless CI
+        # Configure only qtbase directly, then build qtshadertools on top
         cd ..
         mkdir qt6_host_build
         cd qt6_host_build
-        ../qt5/configure -release -prefix "$PWD/../Qt6_host" -no-opengl -submodules qtbase,qtshadertools -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -- -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
+        ../qt5/qtbase/configure -release -prefix "$PWD/../Qt6_host" -no-opengl -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -- -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
+        cmake --build . --parallel $(nproc)
+        cmake --install .
+        # Build qtshadertools for the host (provides qsb tool needed by disp3D_rhi)
+        cd ..
+        mkdir qt6_host_shadertools
+        cd qt6_host_shadertools
+        "$PWD/../Qt6_host/bin/qt-configure-module" ../qt5/qtshadertools
         cmake --build . --parallel $(nproc)
         cmake --install .
 
