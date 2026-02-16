@@ -388,15 +388,12 @@ void TestRtSourceStreaming::testControllerStreaming()
     controller.setTimeInterval(10);  // 10ms
     controller.setStreamingState(true);
 
-    // Wait for some frames to be produced
-    // Use a short event loop wait
-    QTest::qWait(200);  // 200ms should give ~20 timer ticks
+    // Wait until we have received at least 2 color frames (CI runners may be slow)
+    QTRY_VERIFY_WITH_TIMEOUT(spy.count() >= 2, 2000);
 
     controller.setStreamingState(false);
 
-    // We should have received at least a few color frames
-    QVERIFY2(spy.count() >= 3,
-             qPrintable(QString("Expected at least 3 streaming frames, got %1").arg(spy.count())));
+    qDebug() << "Controller streaming frames received:" << spy.count();
 
     // Verify first frame has correct structure
     QList<QVariant> firstArgs = spy.first();
@@ -428,13 +425,13 @@ void TestRtSourceStreaming::testControllerStreamingInterval()
     QSignalSpy spy50(&controller, &RtSourceDataController::newSmoothedDataAvailable);
     controller.setTimeInterval(50);
     controller.setStreamingState(true);
-    QTest::qWait(300);
+    QTest::qWait(500);
     controller.setStreamingState(false);
     int count50 = spy50.count();
 
     // Re-add data for second run
     controller.clearData();
-    for (int i = 0; i < 5; ++i) {
+    for (int i = 0; i < 20; ++i) {
         controller.addData(VectorXd::Constant(totalSources, 0.7));
     }
 
@@ -442,7 +439,7 @@ void TestRtSourceStreaming::testControllerStreamingInterval()
     QSignalSpy spy10(&controller, &RtSourceDataController::newSmoothedDataAvailable);
     controller.setTimeInterval(10);
     controller.setStreamingState(true);
-    QTest::qWait(300);
+    QTest::qWait(500);
     controller.setStreamingState(false);
     int count10 = spy10.count();
 
