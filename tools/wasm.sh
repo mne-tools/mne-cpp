@@ -15,7 +15,7 @@ function cleanAbsPath()
 }
 
 ECHO_FLAG=""
-EMSDK_VERSION="3.1.25"
+EMSDK_VERSION="4.0.7"
 SAVE_LOG="true"
 SHOW_HELP="false"
 
@@ -112,8 +112,18 @@ SOURCE_DIRECTORY=${PROJECT_BASE_PATH}/src
 BUILD_DIRECTORY=${PROJECT_BASE_PATH}/build/wasm
 OUTPUT_DIRECTORY=${PROJECT_BASE_PATH}/out/wasm
 
+# Determine host Qt path for cross-compilation
+if [ -d "${Qt6_DIR}/gcc_64" ]; then
+    QT_HOST_PATH="${Qt6_DIR}/gcc_64"
+elif [ -d "${Qt6_DIR}/macos" ]; then
+    QT_HOST_PATH="${Qt6_DIR}/macos"
+else
+    # Fallback: use system Qt as host
+    QT_HOST_PATH=/usr
+fi
+
 ${Qt6_DIR}/wasm_multithread/bin/qt-cmake \
-	-DQT_HOST_PATH=${Qt6_DIR}/gcc_64 \
+        -DQT_HOST_PATH=${QT_HOST_PATH} \
 	-DCMAKE_BUILD_TYPE=Release \
 	-DBINARY_OUTPUT_DIRECTORY=${OUTPUT_DIRECTORY} \
 	-S ${SOURCE_DIRECTORY} \

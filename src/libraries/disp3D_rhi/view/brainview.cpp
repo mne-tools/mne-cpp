@@ -94,7 +94,9 @@ BrainView::BrainView(QWidget *parent)
     setMinimumSize(800, 600);
     setSampleCount(1);
 
-#if defined(Q_OS_MACOS) || defined(Q_OS_IOS)
+#if defined(WASMBUILD) || defined(__EMSCRIPTEN__)
+    setApi(Api::OpenGL);  // WebGL 2 (OpenGL ES 3.0) on WASM
+#elif defined(Q_OS_MACOS) || defined(Q_OS_IOS)
     setApi(Api::Metal);
 #elif defined(Q_OS_WIN)
     setApi(Api::Direct3D11);

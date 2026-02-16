@@ -59,6 +59,4 @@ add_subdirectory(connectivity)
 add_subdirectory(events)
 add_subdirectory(disp)
 
-if(NOT WASM)
-  add_subdirectory(disp3D_rhi)
-endif()
+add_subdirectory(disp3D_rhi)

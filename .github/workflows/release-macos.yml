@@ -19,7 +19,7 @@ jobs:
       uses: jurplel/install-qt-action@v3
       with:
         version: 6.10.2
-        modules: qtcharts qt3d qtshadertools
+        modules: qtcharts qtshadertools
     - name: Install Qt Installer Framework
       run: |
         pip install aqtinstall
@@ -110,7 +110,7 @@ jobs:
         cd ..
         git clone https://code.qt.io/qt/qt5.git -b v6.10.2
         cd qt5
-        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d,qtshadertools
+        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qtshadertools
         cd ..
         mkdir qt6_shadow
         cd qt6_shadow

@@ -6,8 +6,16 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Gui GuiPrivate Widgets ShaderTools)
+set(QT_REQUIRED_COMPONENTS Core Gui Widgets ShaderTools)
+
+# GuiPrivate is needed for QRhi headers — check availability (may be absent in some WASM builds)
 find_package(Qt6 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
+find_package(Qt6 QUIET COMPONENTS GuiPrivate)
+if(NOT Qt6GuiPrivate_FOUND)
+  message(WARNING "Qt6::GuiPrivate not found — disp3D_rhi will not be built (required for QRhi)")
+  return()
+endif()
+list(APPEND QT_REQUIRED_COMPONENTS GuiPrivate)
 
 set(SOURCES
     disp3D_rhi_global.cpp
