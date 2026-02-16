@@ -64,7 +64,9 @@ namespace DISPLIB{
     class Control3DView;
 }
 
+#ifdef MNE_DISP3D_RHI
 class BrainTreeModel;
+#endif
 
 //=============================================================================================================
 // DEFINE NAMESPACE SURFERPLUGIN
@@ -174,7 +176,9 @@ private:
      *
      * @param[in] pModel   new 3D Model.
      */
+#ifdef MNE_DISP3D_RHI
     void init3DGui(QSharedPointer<BrainTreeModel> pModel);
+#endif
 
     //=========================================================================================================
     /**
@@ -232,9 +236,7 @@ private:
 
     QPointer<ANSHAREDLIB::Communicator>         m_pCommu;                   /**< Communicator to send events trhoug hevent manager. */
 
-    #ifndef WASMBUILD
     DISPLIB::Control3DView*                     m_pControl3DView;           /**< Controls for 3d View. */
-    #endif
 
     DISPLIB::ApplyToView*                       m_pApplyToView;             /**< Controls for selecting views to apply settings. */
     ANSHAREDLIB::ScalingParameters              m_ScalingParameters;        /**< Controls for scaling. */

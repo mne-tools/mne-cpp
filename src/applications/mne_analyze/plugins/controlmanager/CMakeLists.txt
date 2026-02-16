@@ -61,7 +61,7 @@ set(MNE_LIBS_REQUIRED
     mne_events
 )
 
-if(NOT WASM)
+if(TARGET mne_disp3D_rhi)
   list(APPEND MNE_LIBS_REQUIRED mne_disp3D_rhi)
 endif()
 

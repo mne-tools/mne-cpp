@@ -78,7 +78,7 @@ Q_IMPORT_PLUGIN(SourceLocalization)
 Q_IMPORT_PLUGIN(ControlManager)
 Q_IMPORT_PLUGIN(ChannelSelection)
 Q_IMPORT_PLUGIN(CoRegistration)
-#ifndef WASMBUILD
+#ifdef MNE_DISP3D_RHI
     Q_IMPORT_PLUGIN(View3D)
 #endif
 #endif
@@ -89,7 +89,7 @@ int main(int argc, char *argv[])
 {
     // When building a static version of MNE Analyze we have to init all resource (.qrc) files here manually
     #ifdef STATICBUILD
-        #ifndef WASMBUILD
+        #ifdef MNE_DISP3D_RHI
             // Q_INIT_RESOURCE(mne_disp3d);
             // Q_INIT_RESOURCE(analyze_view3d);
             // Q_INIT_RESOURCE(analyze_dipolefit);

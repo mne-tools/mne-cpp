@@ -8,10 +8,6 @@ set(CMAKE_AUTORCC ON)
 
 set(QT_REQUIRED_COMPONENTS Core Widgets Concurrent Network)
 
-if(NOT WASM)
-  list(APPEND QT_REQUIRED_COMPONENTS OpenGL)
-endif()
-
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
@@ -46,7 +42,7 @@ set(MNE_LIBS_REQUIRED
     mne_disp
 )
 
-if(NOT WASM)
+if(TARGET mne_disp3D_rhi)
   list(APPEND MNE_LIBS_REQUIRED mne_disp3D_rhi)
 endif()
 
@@ -72,7 +68,7 @@ if(NOT BUILD_SHARED_LIBS)
       analyze_sourcelocalization
   )
   
-  if(NOT WASM)
+  if(TARGET mne_disp3D_rhi)
     list(APPEND MNE_ANALYZE_PLUGINS analyze_view3d)
   endif()
 

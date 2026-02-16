@@ -31,7 +31,7 @@ add_subdirectory(filtering)
 add_subdirectory(rawdataviewer)
 add_subdirectory(sourcelocalization)
 
-if(NOT WASM)
+if(TARGET mne_disp3D_rhi)
   add_subdirectory(view3d)
 endif()
 

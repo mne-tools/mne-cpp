@@ -47,7 +47,9 @@
 #include <disp/viewers/control3dview.h>
 #include <disp/viewers/fiffrawviewsettings.h>
 
+#ifdef MNE_DISP3D_RHI
 #include <disp3D_rhi/model/braintreemodel.h>
+#endif
 
 //=============================================================================================================
 // QT INCLUDES
@@ -161,7 +163,6 @@ QDockWidget *ControlManager::getControl()
     m_ViewParameters.m_iTimeSpacers = pFiffViewSettings->getDistanceTimeSpacer();
     m_ViewParameters.m_sImageType = "";
 
-    #ifndef WASMBUILD
     //View3D Settings
     m_pControl3DView = new DISPLIB::Control3DView(QString("MNEANALYZE/%1").arg(this->getName()), Q_NULLPTR, slControlFlags);
 
@@ -181,7 +182,6 @@ QDockWidget *ControlManager::getControl()
             this, &ControlManager::onLightIntensityChanged);
     connect(m_pControl3DView, &DISPLIB::Control3DView::takeScreenshotChanged,
             this, &ControlManager::onTakeScreenshotChanged);
-    #endif
 
     m_pApplyToView = new DISPLIB::ApplyToView();
     pLayout->addWidget(pTabWidget);
@@ -214,9 +214,11 @@ void ControlManager::handleEvent(QSharedPointer<Event> e)
         }
         break;
 
+#ifdef MNE_DISP3D_RHI
     case EVENT_TYPE::SET_DATA3D_TREE_MODEL:
         init3DGui(e->getData().value<QSharedPointer<BrainTreeModel>>());
         break;
+#endif
     default:
         qWarning() << "[ControlManager::handleEvent] received an Event that is not handled by switch-cases";
         break;
@@ -229,7 +231,9 @@ QVector<EVENT_TYPE> ControlManager::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
     temp.push_back(SELECTED_MODEL_CHANGED);
+#ifdef MNE_DISP3D_RHI
     temp.push_back(SET_DATA3D_TREE_MODEL);
+#endif
 
     return temp;
 }
@@ -314,14 +318,12 @@ void ControlManager::onMakeScreenshot(const QString& imageType)
 
 //=============================================================================================================
 
+#ifdef MNE_DISP3D_RHI
 void ControlManager::init3DGui(QSharedPointer<BrainTreeModel> pModel)
 {
-#ifndef WASMBUILD
     m_pControl3DView->setModel(pModel.data());
-#else
-    Q_UNUSED(pModel)
-#endif
 }
+#endif
 
 //=============================================================================================================
 
