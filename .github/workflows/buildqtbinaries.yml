@@ -153,10 +153,11 @@ jobs:
         ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qtshadertools
 
         # Build a minimal host Qt first (required for cross-compilation)
+        # Only qtbase + qtshadertools needed; no OpenGL on headless CI
         cd ..
         mkdir qt6_host_build
         cd qt6_host_build
-        ../qt5/configure -release -prefix "$PWD/../Qt6_host" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -- -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
+        ../qt5/configure -release -prefix "$PWD/../Qt6_host" -no-opengl -submodules qtbase,qtshadertools -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -- -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF
         cmake --build . --parallel $(nproc)
         cmake --install .
 
