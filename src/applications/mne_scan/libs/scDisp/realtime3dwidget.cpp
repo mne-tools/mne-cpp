@@ -45,6 +45,7 @@
 
 #include <connectivity/network/network.h>
 
+#include <mne/mne_bem.h>
 #include <disp3D_rhi/view/brainview.h>
 #include <disp3D_rhi/model/braintreemodel.h>
 #include <disp3D_rhi/model/items/networktreeitem.h>

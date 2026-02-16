@@ -41,12 +41,16 @@
 
 #include "../disp3D_rhi_global.h"
 
-#include <rhi/qrhi.h>
 #include <QMatrix4x4>
 #include <QVector3D>
 #include <vector>
 #include <memory>
 #include <inverse/dipoleFit/ecd_set.h>
+
+// Forward-declare QRhi types so that this header stays QRhi-free
+class QRhi;
+class QRhiBuffer;
+class QRhiResourceUpdateBatch;
 
 class DISP3DRHISHARED_EXPORT DipoleObject
 {
@@ -60,10 +64,10 @@ public:
     void applyTransform(const QMatrix4x4 &trans);
 
     void updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u);
-    
-    QRhiBuffer* vertexBuffer() const { return m_vertexBuffer.get(); }
-    QRhiBuffer* indexBuffer() const { return m_indexBuffer.get(); }
-    QRhiBuffer* instanceBuffer() const { return m_instanceBuffer.get(); }
+
+    QRhiBuffer* vertexBuffer() const;
+    QRhiBuffer* indexBuffer() const;
+    QRhiBuffer* instanceBuffer() const;
     
     int indexCount() const { return m_indexCount; }
     int instanceCount() const { return m_instanceCount; }
@@ -89,10 +93,9 @@ public:
 private:
     void createGeometry();
     
-    std::unique_ptr<QRhiBuffer> m_vertexBuffer;
-    std::unique_ptr<QRhiBuffer> m_indexBuffer;
-    std::unique_ptr<QRhiBuffer> m_instanceBuffer;
-    
+    struct GpuBuffers;
+    std::unique_ptr<GpuBuffers> m_gpu;
+
     int m_indexCount = 0;
     int m_instanceCount = 0;
     bool m_visible = true;

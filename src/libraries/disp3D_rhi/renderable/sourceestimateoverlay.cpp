@@ -38,6 +38,7 @@
 
 #include "sourceestimateoverlay.h"
 #include "renderable/brainsurface.h"
+#include "core/rendertypes.h"
 
 #include <disp/plots/helpers/colormap.h>
 #include "helpers/interpolation.h"
@@ -282,7 +283,7 @@ uint32_t SourceEstimateOverlay::valueToColor(double value, uint8_t alpha) const
     uint32_t b = qBlue(rgb);
 
     // Pack as ABGR (same format as BrainSurface uses)
-    return (static_cast<uint32_t>(alpha) << 24) | (b << 16) | (g << 8) | r;
+    return packABGR(r, g, b, static_cast<uint32_t>(alpha));
 }
 
 //=============================================================================================================

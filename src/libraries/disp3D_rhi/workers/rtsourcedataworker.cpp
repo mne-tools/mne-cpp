@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "rtsourcedataworker.h"
+#include "core/rendertypes.h"
 
 #include <disp/plots/helpers/colormap.h>
 #include <QMutexLocker>
@@ -321,7 +322,7 @@ QVector<uint32_t> RtSourceDataWorker::computeHemiColors(
                 uint32_t rG = (aG * alpha + bG * (255 - alpha)) / 255;
                 uint32_t rB = (aB * alpha + bB * (255 - alpha)) / 255;
 
-                colors[i] = (0xFFu << 24) | (rB << 16) | (rG << 8) | rR;
+                colors[i] = packABGR(rR, rG, rB);
                 continue;
             }
         }
@@ -343,5 +344,5 @@ uint32_t RtSourceDataWorker::valueToColor(double value, uint8_t alpha) const
     uint32_t b = qBlue(rgb);
 
     // Pack as ABGR (same format as BrainSurface uses)
-    return (static_cast<uint32_t>(alpha) << 24) | (b << 16) | (g << 8) | r;
+    return packABGR(r, g, b, static_cast<uint32_t>(alpha));
 }

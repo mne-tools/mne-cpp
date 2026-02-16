@@ -37,18 +37,34 @@
 //=============================================================================================================
 
 #include "dipoleobject.h"
+
+#include <rhi/qrhi.h>
 #include <cmath>
 #include <QQuaternion>
 #include <QRandomGenerator>
 #include <QDebug>
 
+//=============================================================================================================
+// PIMPL
+//=============================================================================================================
+
+struct DipoleObject::GpuBuffers
+{
+    std::unique_ptr<QRhiBuffer> vertexBuffer;
+    std::unique_ptr<QRhiBuffer> indexBuffer;
+    std::unique_ptr<QRhiBuffer> instanceBuffer;
+};
+
 DipoleObject::DipoleObject()
+    : m_gpu(std::make_unique<GpuBuffers>())
 {
 }
 
-DipoleObject::~DipoleObject()
-{
-}
+DipoleObject::~DipoleObject() = default;
+
+QRhiBuffer* DipoleObject::vertexBuffer()  const { return m_gpu->vertexBuffer.get(); }
+QRhiBuffer* DipoleObject::indexBuffer()   const { return m_gpu->indexBuffer.get(); }
+QRhiBuffer* DipoleObject::instanceBuffer() const { return m_gpu->instanceBuffer.get(); }
 
 void DipoleObject::load(const INVERSELIB::ECDSet &ecdSet)
 {
@@ -306,28 +322,28 @@ void DipoleObject::createGeometry()
 void DipoleObject::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
 {
     if (m_geometryDirty) {
-        if (!m_vertexBuffer) {
-            m_vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, m_vertexData.size()));
-            m_vertexBuffer->create();
+        if (!m_gpu->vertexBuffer) {
+            m_gpu->vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, m_vertexData.size()));
+            m_gpu->vertexBuffer->create();
             qDebug() << "DipoleObject: Created vertex buffer size" << m_vertexData.size();
         }
-        if (!m_indexBuffer) {
-            m_indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, m_indexData.size()));
-            m_indexBuffer->create();
+        if (!m_gpu->indexBuffer) {
+            m_gpu->indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, m_indexData.size()));
+            m_gpu->indexBuffer->create();
             qDebug() << "DipoleObject: Created index buffer size" << m_indexData.size();
         }
-        u->uploadStaticBuffer(m_vertexBuffer.get(), m_vertexData.constData());
-        u->uploadStaticBuffer(m_indexBuffer.get(), m_indexData.constData());
+        u->uploadStaticBuffer(m_gpu->vertexBuffer.get(), m_vertexData.constData());
+        u->uploadStaticBuffer(m_gpu->indexBuffer.get(), m_indexData.constData());
         m_geometryDirty = false;
     }
     
     if (m_instancesDirty && m_instanceCount > 0) {
-        if (!m_instanceBuffer || m_instanceBuffer->size() < m_instanceData.size()) {
-            m_instanceBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::VertexBuffer, m_instanceData.size()));
-            m_instanceBuffer->create();
+        if (!m_gpu->instanceBuffer || m_gpu->instanceBuffer->size() < m_instanceData.size()) {
+            m_gpu->instanceBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::VertexBuffer, m_instanceData.size()));
+            m_gpu->instanceBuffer->create();
             qDebug() << "DipoleObject: Created instance buffer size" << m_instanceData.size();
         }
-        u->updateDynamicBuffer(m_instanceBuffer.get(), 0, m_instanceData.size(), m_instanceData.constData());
+        u->updateDynamicBuffer(m_gpu->instanceBuffer.get(), 0, m_instanceData.size(), m_instanceData.constData());
         m_instancesDirty = false;
     }
 }

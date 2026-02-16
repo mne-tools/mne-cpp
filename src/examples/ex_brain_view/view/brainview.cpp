@@ -41,27 +41,27 @@
 
 #include "brainview.h"
 #include "brainrenderer.h"
-#include "renderable/brainsurface.h"
-#include "renderable/dipoleobject.h"
-#include "renderable/networkobject.h"
-#include "renderable/sourceestimateoverlay.h"
-#include "core/surfacekeys.h"
-#include "core/dataloader.h"
-#include "input/raypicker.h"
-#include "geometry/meshfactory.h"
-#include "model/braintreemodel.h"
-#include "model/items/surfacetreeitem.h"
+#include "../renderable/brainsurface.h"
+#include "../renderable/dipoleobject.h"
+#include "../renderable/networkobject.h"
+#include "../renderable/sourceestimateoverlay.h"
+#include "../core/surfacekeys.h"
+#include "../core/dataloader.h"
+#include "../input/raypicker.h"
+#include "../geometry/meshfactory.h"
+#include "../model/braintreemodel.h"
+#include "surfacetreeitem.h"
 
 #include <rhi/qrhi.h>
-#include "model/items/bemtreeitem.h"
-#include "model/items/sensortreeitem.h"
-#include "model/items/dipoletreeitem.h"
-#include "model/items/sourcespacetreeitem.h"
-#include "model/items/digitizertreeitem.h"
-#include "workers/stcloadingworker.h"
-#include "workers/rtsourcedatacontroller.h"
-#include "workers/rtsensordatacontroller.h"
-#include "helpers/field_map.h"
+#include "bemtreeitem.h"
+#include "sensortreeitem.h"
+#include "dipoletreeitem.h"
+#include "sourcespacetreeitem.h"
+#include "digitizertreeitem.h"
+#include "../workers/stcloadingworker.h"
+#include "../workers/rtsourcedatacontroller.h"
+#include "../workers/rtsensordatacontroller.h"
+#include "../helpers/field_map.h"
 
 #include <Eigen/Dense>
 #include <QMatrix4x4>
@@ -2959,7 +2959,7 @@ bool BrainView::buildSensorFieldMapping()
                 std::unique_ptr<FWDLIB::FwdCoilSet> coils(templates->create_meg_coils(
                     megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, devToTarget.get()));
                 if (coils && coils->ncoil > 0) {
-                    m_megFieldMapping = DISP3DRHILIB::FieldMap::computeMegMapping(
+                    m_megFieldMapping = BRAINVIEWLIB::FieldMap::computeMegMapping(
                         *coils, verts, norms, origin, kIntrad, kMegMiss);
                 }
             }
@@ -2978,7 +2978,7 @@ bool BrainView::buildSensorFieldMapping()
             std::unique_ptr<FWDLIB::FwdCoilSet> eegCoils(FWDLIB::FwdCoilSet::create_eeg_els(
                 eegChs, eegChs.size(), headMriOld.get()));
             if (eegCoils && eegCoils->ncoil > 0) {
-                m_eegFieldMapping = DISP3DRHILIB::FieldMap::computeEegMapping(
+                m_eegFieldMapping = BRAINVIEWLIB::FieldMap::computeEegMapping(
                     *eegCoils, verts, origin, kIntrad, kEegMiss);
             }
         }
@@ -3056,7 +3056,7 @@ void BrainView::applySensorFieldMap()
             uint32_t r = qRed(rgb);
             uint32_t g = qGreen(rgb);
             uint32_t b = qBlue(rgb);
-            colors[i] = packABGR(r, g, b);
+            colors[i] = (0xFFu << 24) | (b << 16) | (g << 8) | r;
         }
 
         surface->applySourceEstimateColors(colors);

@@ -41,7 +41,6 @@
 
 #include "../disp3D_rhi_global.h"
 
-#include <rhi/qrhi.h>
 #include <QMatrix4x4>
 #include <QVector3D>
 #include <QColor>
@@ -49,6 +48,11 @@
 #include <memory>
 
 #include <connectivity/network/network.h>
+
+// Forward-declare QRhi types so that this header stays QRhi-free
+class QRhi;
+class QRhiBuffer;
+class QRhiResourceUpdateBatch;
 
 //=============================================================================================================
 /**
@@ -116,16 +120,16 @@ public:
     void updateEdgeBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u);
 
     // ── Node accessors ──────────────────────────────────────────────────
-    QRhiBuffer* nodeVertexBuffer() const { return m_nodeVertexBuffer.get(); }
-    QRhiBuffer* nodeIndexBuffer() const { return m_nodeIndexBuffer.get(); }
-    QRhiBuffer* nodeInstanceBuffer() const { return m_nodeInstanceBuffer.get(); }
+    QRhiBuffer* nodeVertexBuffer() const;
+    QRhiBuffer* nodeIndexBuffer() const;
+    QRhiBuffer* nodeInstanceBuffer() const;
     int nodeIndexCount() const { return m_nodeIndexCount; }
     int nodeInstanceCount() const { return m_nodeInstanceCount; }
 
     // ── Edge accessors ──────────────────────────────────────────────────
-    QRhiBuffer* edgeVertexBuffer() const { return m_edgeVertexBuffer.get(); }
-    QRhiBuffer* edgeIndexBuffer() const { return m_edgeIndexBuffer.get(); }
-    QRhiBuffer* edgeInstanceBuffer() const { return m_edgeInstanceBuffer.get(); }
+    QRhiBuffer* edgeVertexBuffer() const;
+    QRhiBuffer* edgeIndexBuffer() const;
+    QRhiBuffer* edgeInstanceBuffer() const;
     int edgeIndexCount() const { return m_edgeIndexCount; }
     int edgeInstanceCount() const { return m_edgeInstanceCount; }
 
@@ -159,9 +163,9 @@ private:
     QString m_colormap = "Viridis";
 
     // ── Node GPU resources ──────────────────────────────────────────────
-    std::unique_ptr<QRhiBuffer> m_nodeVertexBuffer;
-    std::unique_ptr<QRhiBuffer> m_nodeIndexBuffer;
-    std::unique_ptr<QRhiBuffer> m_nodeInstanceBuffer;
+    struct GpuBuffers;
+    std::unique_ptr<GpuBuffers> m_gpu;
+
     QByteArray m_nodeVertexData;
     QByteArray m_nodeIndexData;
     QByteArray m_nodeInstanceData;
@@ -171,9 +175,6 @@ private:
     bool m_nodeInstancesDirty = false;
 
     // ── Edge GPU resources ──────────────────────────────────────────────
-    std::unique_ptr<QRhiBuffer> m_edgeVertexBuffer;
-    std::unique_ptr<QRhiBuffer> m_edgeIndexBuffer;
-    std::unique_ptr<QRhiBuffer> m_edgeInstanceBuffer;
     QByteArray m_edgeVertexData;
     QByteArray m_edgeIndexData;
     QByteArray m_edgeInstanceData;

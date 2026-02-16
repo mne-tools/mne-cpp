@@ -39,6 +39,7 @@
 #include "sensorfieldmapper.h"
 #include "renderable/brainsurface.h"
 #include "helpers/field_map.h"
+#include "core/rendertypes.h"
 
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
@@ -387,7 +388,7 @@ void SensorFieldMapper::apply(
             uint32_t r = qRed(rgb);
             uint32_t g = qGreen(rgb);
             uint32_t b = qBlue(rgb);
-            colors[i] = (0xFFu << 24) | (b << 16) | (g << 8) | r;
+            colors[i] = packABGR(r, g, b);
         }
         surface->applySourceEstimateColors(colors);
 

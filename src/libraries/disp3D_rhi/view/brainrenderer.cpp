@@ -39,59 +39,117 @@
 //=============================================================================================================
 
 #include "brainrenderer.h"
+
+#include <rhi/qrhi.h>
+#include "renderable/brainsurface.h"
+#include "renderable/dipoleobject.h"
+#include "renderable/networkobject.h"
+
 #include <QFile>
 #include <QDebug>
+#include <map>
+
+//=============================================================================================================
+// PIMPL
+//=============================================================================================================
+
+struct BrainRenderer::Impl
+{
+    void createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int sampleCount);
+
+    std::unique_ptr<QRhiShaderResourceBindings> srb;
+
+    // Pipelines for each mode
+    std::map<ShaderMode, std::unique_ptr<QRhiGraphicsPipeline>> pipelines;
+    std::map<ShaderMode, std::unique_ptr<QRhiGraphicsPipeline>> pipelinesBackColor; // For Holographic back faces
+
+    std::unique_ptr<QRhiBuffer> uniformBuffer;
+    int uniformBufferOffsetAlignment = 0;
+    int currentUniformOffset = 0;
+
+    bool resourcesDirty = true;
+};
+
+//=============================================================================================================
+// Helpers
+//=============================================================================================================
+
+static inline QRhiViewport toViewport(const BrainRenderer::SceneData &d)
+{
+    return QRhiViewport(d.viewportX, d.viewportY, d.viewportW, d.viewportH);
+}
+
+static inline QRhiScissor toScissor(const BrainRenderer::SceneData &d)
+{
+    return QRhiScissor(d.scissorX, d.scissorY, d.scissorW, d.scissorH);
+}
+
+//=============================================================================================================
+// Uniform buffer layout constants — single source of truth for shader ↔ C++ interface
+//=============================================================================================================
+
+namespace {
+    // Uniform buffer sizing
+    constexpr int kUniformSlotCount   = 8192;   // Max draw calls before overflow
+    constexpr int kUniformBlockSize   = 256;    // Bound size per SRB dynamic slot (bytes)
+
+    // Per-object uniform byte offsets (must match .vert shader layout)
+    constexpr int kOffsetMVP          = 0;      // mat4  (64 bytes)
+    constexpr int kOffsetCameraPos    = 64;     // vec3  (12 bytes)
+    constexpr int kOffsetSelected     = 76;     // float
+    constexpr int kOffsetLightDir     = 80;     // vec3  (12 bytes)
+    constexpr int kOffsetTissueType   = 92;     // float
+    constexpr int kOffsetLighting     = 96;     // float
+    constexpr int kOffsetOverlayMode  = 100;    // float
+}
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
-#include <QFile>
-#include <QDebug>
 
 //=============================================================================================================
 
 BrainRenderer::BrainRenderer()
+    : d(std::make_unique<Impl>())
 {
 }
 
 //=============================================================================================================
 
-BrainRenderer::~BrainRenderer()
-{
-}
+BrainRenderer::~BrainRenderer() = default;
 
 //=============================================================================================================
 
 void BrainRenderer::initialize(QRhi *rhi, QRhiRenderPassDescriptor *rp, int sampleCount)
 {
-    if (m_resourcesDirty) {
-        createResources(rhi, rp, sampleCount);
+    if (d->resourcesDirty) {
+        d->createResources(rhi, rp, sampleCount);
     }
 }
 
 //=============================================================================================================
 
-void BrainRenderer::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int sampleCount)
+void BrainRenderer::Impl::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int sampleCount)
 {
-    m_uniformBufferOffsetAlignment = rhi->ubufAlignment();
+    uniformBufferOffsetAlignment = rhi->ubufAlignment();
     
     // Create Uniform Buffer
-    if (!m_uniformBuffer) {
+    if (!uniformBuffer) {
         // Size for 8192 slots with alignment — enough for 4 viewports × ~1000 surfaces
-        m_uniformBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::UniformBuffer, 8192 * m_uniformBufferOffsetAlignment));
-        m_uniformBuffer->create();
+        uniformBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::UniformBuffer, kUniformSlotCount * uniformBufferOffsetAlignment));
+        uniformBuffer->create();
     }
     
     // Create SRB
-    if (!m_srb) {
-        m_srb.reset(rhi->newShaderResourceBindings());
-        m_srb->setBindings({
+    if (!srb) {
+        srb.reset(rhi->newShaderResourceBindings());
+        srb->setBindings({
             // Use dynamic offset for the uniform buffer. 
             // The size of one uniform block in the shader is ~104 bytes, 
-            // but we use m_uniformBufferOffsetAlignment for the stride.
-            QRhiShaderResourceBinding::uniformBufferWithDynamicOffset(0, QRhiShaderResourceBinding::VertexStage | QRhiShaderResourceBinding::FragmentStage, m_uniformBuffer.get(), 256)
+            // but we use uniformBufferOffsetAlignment for the stride.
+            QRhiShaderResourceBinding::uniformBufferWithDynamicOffset(0, QRhiShaderResourceBinding::VertexStage | QRhiShaderResourceBinding::FragmentStage, uniformBuffer.get(),kUniformBlockSize)
         });
-        m_srb->create();
+        srb->create();
     }
     
     // Shader Loader
@@ -176,7 +234,7 @@ void BrainRenderer::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int
             }
             
             p->setVertexInputLayout(il);
-            p->setShaderResourceBindings(m_srb.get());
+            p->setShaderResourceBindings(srb.get());
             p->setRenderPassDescriptor(rp);
             p->setSampleCount(sampleCount);
             p->setCullMode(cull);
@@ -204,23 +262,23 @@ void BrainRenderer::createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int
         if (mode == Holographic || mode == XRay) { // Handle XRay back-faces same as Holographic
             auto pipelineBack = std::unique_ptr<QRhiGraphicsPipeline>(rhi->newGraphicsPipeline());
             setup(pipelineBack.get(), QRhiGraphicsPipeline::Front);
-            m_pipelinesBackColor[mode] = std::move(pipelineBack);
+            pipelinesBackColor[mode] = std::move(pipelineBack);
             setup(pipeline.get(), QRhiGraphicsPipeline::Back); // Front faces
         } else {
              // Culling: None (Double-sided) to be safe for FreeSurfer meshes
              setup(pipeline.get(), QRhiGraphicsPipeline::None);
         }
-        m_pipelines[mode] = std::move(pipeline);
+        pipelines[mode] = std::move(pipeline);
     }
 
-    m_resourcesDirty = false;
+    resourcesDirty = false;
 }
 
 //=============================================================================================================
 
 void BrainRenderer::beginFrame(QRhiCommandBuffer *cb, QRhiRenderTarget *rt)
 {
-    m_currentUniformOffset = 0;
+    d->currentUniformOffset = 0;
     cb->beginPass(rt, QColor(0, 0, 0), { 1.0f, 0 });
     const int w = rt->pixelSize().width();
     const int h = rt->pixelSize().height();
@@ -249,61 +307,61 @@ void BrainRenderer::renderSurface(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
     if (!surface || !surface->isVisible()) return;
 
     // Check if pipeline for this mode exists
-    if (m_pipelines.find(mode) == m_pipelines.end()) return;
+    if (d->pipelines.find(mode) == d->pipelines.end()) return;
     
-    auto *pipeline = m_pipelines[mode].get();
+    auto *pipeline = d->pipelines[mode].get();
     if (!pipeline) return;
 
     QRhiResourceUpdateBatch *u = rhi->nextResourceUpdateBatch();
     surface->updateBuffers(rhi, u);
 
     // Dynamic slot update
-    int offset = m_currentUniformOffset;
-    m_currentUniformOffset += m_uniformBufferOffsetAlignment;
-    if (m_currentUniformOffset >= m_uniformBuffer->size()) {
+    int offset = d->currentUniformOffset;
+    d->currentUniformOffset += d->uniformBufferOffsetAlignment;
+    if (d->currentUniformOffset >= d->uniformBuffer->size()) {
         qWarning("BrainRenderer: uniform buffer overflow (%d / %d bytes) — too many surfaces. Some draws will be skipped.",
-                 m_currentUniformOffset, (int)m_uniformBuffer->size());
+                 d->currentUniformOffset, (int)d->uniformBuffer->size());
         return;  // Skip this draw rather than silently corrupt earlier viewport data
     }
 
-    u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 0, 64, data.mvp.constData());
-    u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 64, 12, &data.cameraPos);
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetMVP, 64, data.mvp.constData());
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetCameraPos, 12, &data.cameraPos);
     
     float selected = surface->isSelected() ? 1.0f : 0.0f;
-    u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 76, 4, &selected);
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetSelected, 4, &selected);
     
-    u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 80, 12, &data.lightDir);
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLightDir, 12, &data.lightDir);
     
     // Pass tissue type for anatomical shader (offset 92, uses original _pad2 slot)
     float tissueType = static_cast<float>(surface->tissueType());
-    u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 92, 4, &tissueType);
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetTissueType, 4, &tissueType);
     
     float lighting = data.lightingEnabled ? 1.0f : 0.0f;
-    u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 96, 4, &lighting);
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLighting, 4, &lighting);
 
     float overlayMode = data.overlayMode;
-    u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 100, 4, &overlayMode);
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetOverlayMode, 4, &overlayMode);
 
     cb->resourceUpdate(u);
 
     // Re-assert the per-pane viewport and scissor after resourceUpdate.
     // The scissor provides a hard pixel clip that guarantees no cross-pane
     // bleeding, regardless of Metal render-encoder restarts.
-    cb->setViewport(data.viewport);
-    cb->setScissor(data.scissor);
+    cb->setViewport(toViewport(data));
+    cb->setScissor(toScissor(data));
 
     auto draw = [&](QRhiGraphicsPipeline *p) {
         cb->setGraphicsPipeline(p);
         
         const QRhiCommandBuffer::DynamicOffset srbOffset = { 0, uint32_t(offset) };
-        cb->setShaderResources(m_srb.get(), 1, &srbOffset);
+        cb->setShaderResources(d->srb.get(), 1, &srbOffset);
         const QRhiCommandBuffer::VertexInput vbuf(surface->vertexBuffer(), 0);
         cb->setVertexInput(0, 1, &vbuf, surface->indexBuffer(), 0, QRhiCommandBuffer::IndexUInt32);
         cb->drawIndexed(surface->indexCount());
     };
 
-    if (mode == Holographic && m_pipelinesBackColor.count(Holographic) > 0) {
-        draw(m_pipelinesBackColor[Holographic].get());
+    if (mode == Holographic && d->pipelinesBackColor.count(Holographic) > 0) {
+        draw(d->pipelinesBackColor[Holographic].get());
     }
     
     draw(pipeline);
@@ -315,35 +373,35 @@ void BrainRenderer::renderDipoles(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
 {
     if (!dipoles || !dipoles->isVisible() || dipoles->instanceCount() == 0) return;
 
-    if (m_pipelines.find(Dipole) == m_pipelines.end()) return;
+    if (d->pipelines.find(Dipole) == d->pipelines.end()) return;
     
-    auto *pipeline = m_pipelines[Dipole].get();
+    auto *pipeline = d->pipelines[Dipole].get();
     if (!pipeline) return;
 
     QRhiResourceUpdateBatch *u = rhi->nextResourceUpdateBatch();
     dipoles->updateBuffers(rhi, u);
 
     // Dynamic slot update
-    int offset = m_currentUniformOffset;
-    m_currentUniformOffset += m_uniformBufferOffsetAlignment;
-    if (m_currentUniformOffset >= m_uniformBuffer->size()) m_currentUniformOffset = 0;
+    int offset = d->currentUniformOffset;
+    d->currentUniformOffset += d->uniformBufferOffsetAlignment;
+    if (d->currentUniformOffset >= d->uniformBuffer->size()) d->currentUniformOffset = 0;
 
-    u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 0, 64, data.mvp.constData());
-    u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 64, 12, &data.cameraPos);
-    u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 80, 12, &data.lightDir);
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetMVP, 64, data.mvp.constData());
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetCameraPos, 12, &data.cameraPos);
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLightDir, 12, &data.lightDir);
     float lighting = data.lightingEnabled ? 1.0f : 0.0f;
-    u->updateDynamicBuffer(m_uniformBuffer.get(), offset + 92, 4, &lighting);
+    u->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLighting, 4, &lighting);
 
     cb->resourceUpdate(u);
 
     // Re-assert the per-pane viewport and scissor.
-    cb->setViewport(data.viewport);
-    cb->setScissor(data.scissor);
+    cb->setViewport(toViewport(data));
+    cb->setScissor(toScissor(data));
 
     cb->setGraphicsPipeline(pipeline);
     
     const QRhiCommandBuffer::DynamicOffset srbOffset = { 0, uint32_t(offset) };
-    cb->setShaderResources(m_srb.get(), 1, &srbOffset);
+    cb->setShaderResources(d->srb.get(), 1, &srbOffset);
     
     const QRhiCommandBuffer::VertexInput bindings[2] = {
         QRhiCommandBuffer::VertexInput(dipoles->vertexBuffer(), 0),
@@ -361,9 +419,9 @@ void BrainRenderer::renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
 {
     if (!network || !network->isVisible() || !network->hasData()) return;
 
-    if (m_pipelines.find(Dipole) == m_pipelines.end()) return;
+    if (d->pipelines.find(Dipole) == d->pipelines.end()) return;
 
-    auto *pipeline = m_pipelines[Dipole].get();
+    auto *pipeline = d->pipelines[Dipole].get();
     if (!pipeline) return;
 
     // --- Render Nodes (instanced spheres) ---
@@ -371,27 +429,27 @@ void BrainRenderer::renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
         QRhiResourceUpdateBatch *uNodes = rhi->nextResourceUpdateBatch();
         network->updateNodeBuffers(rhi, uNodes);
 
-        int offset = m_currentUniformOffset;
-        m_currentUniformOffset += m_uniformBufferOffsetAlignment;
-        if (m_currentUniformOffset >= m_uniformBuffer->size()) {
+        int offset = d->currentUniformOffset;
+        d->currentUniformOffset += d->uniformBufferOffsetAlignment;
+        if (d->currentUniformOffset >= d->uniformBuffer->size()) {
             qWarning("BrainRenderer: uniform buffer overflow in renderNetwork (nodes)");
             return;
         }
 
-        uNodes->updateDynamicBuffer(m_uniformBuffer.get(), offset + 0, 64, data.mvp.constData());
-        uNodes->updateDynamicBuffer(m_uniformBuffer.get(), offset + 64, 12, &data.cameraPos);
-        uNodes->updateDynamicBuffer(m_uniformBuffer.get(), offset + 80, 12, &data.lightDir);
+        uNodes->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetMVP, 64, data.mvp.constData());
+        uNodes->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetCameraPos, 12, &data.cameraPos);
+        uNodes->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLightDir, 12, &data.lightDir);
         float lighting = data.lightingEnabled ? 1.0f : 0.0f;
-        uNodes->updateDynamicBuffer(m_uniformBuffer.get(), offset + 92, 4, &lighting);
+        uNodes->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLighting, 4, &lighting);
 
         cb->resourceUpdate(uNodes);
-        cb->setViewport(data.viewport);
-        cb->setScissor(data.scissor);
+        cb->setViewport(toViewport(data));
+        cb->setScissor(toScissor(data));
 
         cb->setGraphicsPipeline(pipeline);
 
         const QRhiCommandBuffer::DynamicOffset srbOffset = { 0, uint32_t(offset) };
-        cb->setShaderResources(m_srb.get(), 1, &srbOffset);
+        cb->setShaderResources(d->srb.get(), 1, &srbOffset);
 
         const QRhiCommandBuffer::VertexInput nodeBindings[2] = {
             QRhiCommandBuffer::VertexInput(network->nodeVertexBuffer(), 0),
@@ -407,27 +465,27 @@ void BrainRenderer::renderNetwork(QRhiCommandBuffer *cb, QRhi *rhi, const SceneD
         QRhiResourceUpdateBatch *uEdges = rhi->nextResourceUpdateBatch();
         network->updateEdgeBuffers(rhi, uEdges);
 
-        int offset = m_currentUniformOffset;
-        m_currentUniformOffset += m_uniformBufferOffsetAlignment;
-        if (m_currentUniformOffset >= m_uniformBuffer->size()) {
+        int offset = d->currentUniformOffset;
+        d->currentUniformOffset += d->uniformBufferOffsetAlignment;
+        if (d->currentUniformOffset >= d->uniformBuffer->size()) {
             qWarning("BrainRenderer: uniform buffer overflow in renderNetwork (edges)");
             return;
         }
 
-        uEdges->updateDynamicBuffer(m_uniformBuffer.get(), offset + 0, 64, data.mvp.constData());
-        uEdges->updateDynamicBuffer(m_uniformBuffer.get(), offset + 64, 12, &data.cameraPos);
-        uEdges->updateDynamicBuffer(m_uniformBuffer.get(), offset + 80, 12, &data.lightDir);
+        uEdges->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetMVP, 64, data.mvp.constData());
+        uEdges->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetCameraPos, 12, &data.cameraPos);
+        uEdges->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLightDir, 12, &data.lightDir);
         float lighting = data.lightingEnabled ? 1.0f : 0.0f;
-        uEdges->updateDynamicBuffer(m_uniformBuffer.get(), offset + 92, 4, &lighting);
+        uEdges->updateDynamicBuffer(d->uniformBuffer.get(), offset + kOffsetLighting, 4, &lighting);
 
         cb->resourceUpdate(uEdges);
-        cb->setViewport(data.viewport);
-        cb->setScissor(data.scissor);
+        cb->setViewport(toViewport(data));
+        cb->setScissor(toScissor(data));
 
         cb->setGraphicsPipeline(pipeline);
 
         const QRhiCommandBuffer::DynamicOffset srbOffset = { 0, uint32_t(offset) };
-        cb->setShaderResources(m_srb.get(), 1, &srbOffset);
+        cb->setShaderResources(d->srb.get(), 1, &srbOffset);
 
         const QRhiCommandBuffer::VertexInput edgeBindings[2] = {
             QRhiCommandBuffer::VertexInput(network->edgeVertexBuffer(), 0),

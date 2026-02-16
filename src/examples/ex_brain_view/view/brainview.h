@@ -41,13 +41,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../disp3D_rhi_global.h"
-
-#include "../core/rendertypes.h"
 #include "multiviewlayout.h"
-#include "core/viewstate.h"
-#include "input/cameracontroller.h"
-#include "scene/sensorfieldmapper.h"
+#include "../core/viewstate.h"
+#include "../input/cameracontroller.h"
+#include "../scene/sensorfieldmapper.h"
 
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_evoked.h>
@@ -69,14 +66,14 @@ class QThread;
 class QStandardItem;
 class QFrame;
 class BrainTreeModel;
-class StcLoadingWorker;
-class RtSourceDataController;
-class RtSensorDataController;
 class BrainRenderer;
 class BrainSurface;
 class DipoleObject;
 class NetworkObject;
 class SourceEstimateOverlay;
+class StcLoadingWorker;
+class RtSourceDataController;
+class RtSensorDataController;
 namespace CONNECTIVITYLIB { class Network; }
 
 //=============================================================================================================
@@ -86,7 +83,7 @@ namespace CONNECTIVITYLIB { class Network; }
  *
  * @brief    BrainView class.
  */
-class DISP3DRHISHARED_EXPORT BrainView : public QRhiWidget
+class BrainView : public QRhiWidget
 {
     Q_OBJECT
 
@@ -890,9 +887,9 @@ private:
     int m_visualizationEditTarget = -1;             /**< Active pane for UI edits (-1 = single, 0..N-1 = multi). */
 
     // ── Active (runtime) copies — kept in sync with selected SubView ──
-    ShaderMode m_brainShaderMode = Standard;      /**< Current brain shader mode. */
-    ShaderMode m_bemShaderMode = Standard;        /**< Current BEM shader mode. */
-    VisualizationMode m_currentVisMode = ModeSurface; /**< Current overlay mode. */
+    BrainRenderer::ShaderMode m_brainShaderMode = BrainRenderer::Standard;      /**< Current brain shader mode. */
+    BrainRenderer::ShaderMode m_bemShaderMode = BrainRenderer::Standard;        /**< Current BEM shader mode. */
+    BrainSurface::VisualizationMode m_currentVisMode = BrainSurface::ModeSurface; /**< Current overlay mode. */
     bool m_lightingEnabled = true;                  /**< Whether per-fragment lighting is active. */
 
     // ── Extracted components ───────────────────────────────────────────

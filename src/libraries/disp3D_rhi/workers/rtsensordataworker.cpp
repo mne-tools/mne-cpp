@@ -37,6 +37,7 @@
 //=============================================================================================================
 
 #include "rtsensordataworker.h"
+#include "core/rendertypes.h"
 
 #include <disp/plots/helpers/colormap.h>
 #include <QMutexLocker>
@@ -265,7 +266,7 @@ QVector<uint32_t> RtSensorDataWorker::computeSurfaceColors(const Eigen::VectorXf
         uint32_t b = qBlue(rgb);
 
         // Pack as ABGR (same format as BrainSurface uses)
-        colors[i] = (0xFFu << 24) | (b << 16) | (g << 8) | r;
+        colors[i] = packABGR(r, g, b);
     }
 
     return colors;

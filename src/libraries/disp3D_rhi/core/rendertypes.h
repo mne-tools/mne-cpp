@@ -44,6 +44,24 @@
 
 #include "../disp3D_rhi_global.h"
 
+#include <cstdint>
+
+//=============================================================================================================
+/**
+ * Pack RGBA colour components into a single ABGR uint32_t suitable for
+ * GPU vertex attributes declared as UNormByte4.
+ *
+ * @param[in] r  Red   channel (0–255).
+ * @param[in] g  Green channel (0–255).
+ * @param[in] b  Blue  channel (0–255).
+ * @param[in] a  Alpha channel (0–255, default 255).
+ * @return Packed ABGR colour.
+ */
+inline uint32_t packABGR(uint32_t r, uint32_t g, uint32_t b, uint32_t a = 0xFF)
+{
+    return (a << 24) | (b << 16) | (g << 8) | r;
+}
+
 //=============================================================================================================
 /**
  * Shader pipeline modes supported by the renderer.

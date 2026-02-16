@@ -38,6 +38,19 @@
 
 #include "brainsurface.h"
 
+#include <rhi/qrhi.h>
+
+//=============================================================================================================
+// PIMPL
+//=============================================================================================================
+
+struct BrainSurface::GpuBuffers
+{
+    std::unique_ptr<QRhiBuffer> vertexBuffer;
+    std::unique_ptr<QRhiBuffer> indexBuffer;
+    bool dirty = true;
+};
+
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -47,14 +60,18 @@
 //=============================================================================================================
 
 BrainSurface::BrainSurface()
+    : m_gpu(std::make_unique<GpuBuffers>())
 {
 }
 
 //=============================================================================================================
 
-BrainSurface::~BrainSurface()
-{
-}
+BrainSurface::~BrainSurface() = default;
+
+//=============================================================================================================
+
+QRhiBuffer* BrainSurface::vertexBuffer() const { return m_gpu->vertexBuffer.get(); }
+QRhiBuffer* BrainSurface::indexBuffer()  const { return m_gpu->indexBuffer.get(); }
 
 //=============================================================================================================
 
@@ -90,7 +107,7 @@ void BrainSurface::fromSurface(const FSLIB::Surface &surf)
     }
     m_indexCount = m_indexData.size();
     
-    m_bBuffersDirty = true;
+    m_gpu->dirty = true;
     m_bAABBDirty = true;
     
     // Initial coloring based on current visualization mode
@@ -120,7 +137,7 @@ void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface &surf, const QColo
     
     m_defaultColor = color;
     m_baseColor = color;
-    uint32_t colorVal = (color.alpha() << 24) | (color.blue() << 16) | (color.green() << 8) | color.red();
+    uint32_t colorVal = packABGR(color.red(), color.green(), color.blue(), color.alpha());
 
     for (int i = 0; i < nVerts; ++i) {
         VertexData v;
@@ -141,7 +158,7 @@ void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface &surf, const QColo
     m_indexCount = m_indexData.size();
     
     m_originalVertexData = m_vertexData;
-    m_bBuffersDirty = true;
+    m_gpu->dirty = true;
 }
 
 void BrainSurface::createFromData(const Eigen::MatrixX3f &vertices, const Eigen::MatrixX3i &triangles, const QColor &color)
@@ -170,7 +187,7 @@ void BrainSurface::createFromData(const Eigen::MatrixX3f &vertices, const Eigen:
     
     m_defaultColor = color;
     m_baseColor = color;
-    uint32_t colorVal = (color.alpha() << 24) | (color.blue() << 16) | (color.green() << 8) | color.red();
+    uint32_t colorVal = packABGR(color.red(), color.green(), color.blue(), color.alpha());
 
     for (int i = 0; i < nVerts; ++i) {
         VertexData v;
@@ -191,7 +208,7 @@ void BrainSurface::createFromData(const Eigen::MatrixX3f &vertices, const Eigen:
     m_indexCount = m_indexData.size();
     
     m_originalVertexData = m_vertexData;
-    m_bBuffersDirty = true;
+    m_gpu->dirty = true;
 }
 
 //=============================================================================================================
@@ -230,7 +247,7 @@ bool BrainSurface::loadAnnotation(const QString &path)
     }
     m_hasAnnotation = true;
     updateVertexColors();
-    m_bBuffersDirty = true;
+    m_gpu->dirty = true;
     return true;
 }
 
@@ -239,7 +256,7 @@ void BrainSurface::addAnnotation(const FSLIB::Annotation &annotation)
     m_annotation = annotation;
     m_hasAnnotation = true;
     updateVertexColors();
-    m_bBuffersDirty = true;
+    m_gpu->dirty = true;
 }
 
 
@@ -272,7 +289,7 @@ void BrainSurface::applySourceEstimateColors(const QVector<uint32_t> &colors)
         m_vertexData[i].color = colors[i];
     }
     
-    m_bBuffersDirty = true;
+    m_gpu->dirty = true;
 }
 
 //=============================================================================================================
@@ -292,7 +309,7 @@ void BrainSurface::updateVertexColors()
     if (!m_curvature.isEmpty() && m_curvature.size() == m_vertexData.size()) {
         for (int i = 0; i < m_vertexData.size(); ++i) {
             const uint32_t val = (m_curvature[i] > 0.0f) ? 0x40u : 0xAAu;
-            m_vertexData[i].color = (255u << 24) | (val << 16) | (val << 8) | val;
+            m_vertexData[i].color = packABGR(val, val, val);
         }
     } else {
         // Fallback: normal-derived grayscale when curvature is unavailable
@@ -300,7 +317,7 @@ void BrainSurface::updateVertexColors()
             const float nz = m_vertexData[i].norm.normalized().z();
             const float t  = std::clamp((nz + 1.0f) * 0.5f, 0.0f, 1.0f);
             const uint32_t val = static_cast<uint32_t>(64.0f + t * (170.0f - 64.0f));
-            m_vertexData[i].color = (255u << 24) | (val << 16) | (val << 8) | val;
+            m_vertexData[i].color = packABGR(val, val, val);
         }
     }
 
@@ -329,7 +346,7 @@ void BrainSurface::updateVertexColors()
                     uint32_t g = ct.table(colorIdx, 1);
                     uint32_t b = ct.table(colorIdx, 2);
                     m_vertexData[vertexIdx].colorAnnotation =
-                        (255u << 24) | (b << 16) | (g << 8) | r;
+                        packABGR(r, g, b);
                 }
             }
         }
@@ -348,7 +365,7 @@ void BrainSurface::updateVertexColors()
             rv = static_cast<uint32_t>(rv * (1.0f - blendFactor) + goldR * blendFactor);
             gv = static_cast<uint32_t>(gv * (1.0f - blendFactor) + goldG * blendFactor);
             bv = static_cast<uint32_t>(bv * (1.0f - blendFactor) + goldB * blendFactor);
-            c = (a << 24) | (bv << 16) | (gv << 8) | rv;
+            c = packABGR(rv, gv, bv, a);
         };
         
         if (m_hasAnnotation && m_selectedRegionId != -1) {
@@ -385,12 +402,12 @@ void BrainSurface::updateVertexColors()
                 rv = static_cast<uint32_t>(rv * (1.0f - blendFactor) + hlR * blendFactor);
                 gv = static_cast<uint32_t>(gv * (1.0f - blendFactor) + hlG * blendFactor);
                 bv = static_cast<uint32_t>(bv * (1.0f - blendFactor) + hlB * blendFactor);
-                *c = (a << 24) | (bv << 16) | (gv << 8) | rv;
+                *c = packABGR(rv, gv, bv, a);
             }
         }
     }
 
-    m_bBuffersDirty = true;
+    m_gpu->dirty = true;
 }
 
 float BrainSurface::minX() const
@@ -416,7 +433,7 @@ void BrainSurface::translateX(float offset)
     for (auto &v : m_vertexData) {
         v.pos.setX(v.pos.x() + offset);
     }
-    m_bBuffersDirty = true;
+    m_gpu->dirty = true;
     m_bAABBDirty = true;
 }
 
@@ -449,7 +466,7 @@ void BrainSurface::transform(const QMatrix4x4 &m)
         float nz = d[2]*v.norm.x() + d[5]*v.norm.y() + d[8]*v.norm.z();
         v.norm = QVector3D(nx, ny, nz).normalized();
     }
-    m_bBuffersDirty = true;
+    m_gpu->dirty = true;
     m_bAABBDirty = true;
 }
 
@@ -461,7 +478,7 @@ void BrainSurface::applyTransform(const QMatrix4x4 &m)
     if (!m.isIdentity()) {
         transform(m);
     } else {
-        m_bBuffersDirty = true;
+        m_gpu->dirty = true;
         m_bAABBDirty = true;
     }
 }
@@ -470,23 +487,23 @@ void BrainSurface::applyTransform(const QMatrix4x4 &m)
 
 void BrainSurface::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
 {
-    if (!m_bBuffersDirty && m_vertexBuffer && m_indexBuffer) return;
+    if (!m_gpu->dirty && m_gpu->vertexBuffer && m_gpu->indexBuffer) return;
 
     const quint32 vbufSize = m_vertexData.size() * sizeof(VertexData);
     const quint32 ibufSize = m_indexData.size() * sizeof(uint32_t);
 
-    if (!m_vertexBuffer) {
-        m_vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, vbufSize));
-        m_vertexBuffer->create();
+    if (!m_gpu->vertexBuffer) {
+        m_gpu->vertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, vbufSize));
+        m_gpu->vertexBuffer->create();
     }
-    if (!m_indexBuffer) {
-        m_indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, ibufSize));
-        m_indexBuffer->create();
+    if (!m_gpu->indexBuffer) {
+        m_gpu->indexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, ibufSize));
+        m_gpu->indexBuffer->create();
     }
 
-    u->uploadStaticBuffer(m_vertexBuffer.get(), m_vertexData.constData());
-    u->uploadStaticBuffer(m_indexBuffer.get(), m_indexData.constData());
-    m_bBuffersDirty = false;
+    u->uploadStaticBuffer(m_gpu->vertexBuffer.get(), m_vertexData.constData());
+    u->uploadStaticBuffer(m_gpu->indexBuffer.get(), m_indexData.constData());
+    m_gpu->dirty = false;
 }
 
 //=============================================================================================================
@@ -741,7 +758,7 @@ void BrainSurface::setSelectedRegion(int regionId)
     if (m_selectedRegionId != regionId) {
         m_selectedRegionId = regionId;
         updateVertexColors();
-        m_bBuffersDirty = true;
+        m_gpu->dirty = true;
     }
 }
 
@@ -750,7 +767,7 @@ void BrainSurface::setSelected(bool selected)
     if (m_selected != selected) {
         m_selected = selected;
         updateVertexColors();
-        m_bBuffersDirty = true;
+        m_gpu->dirty = true;
     }
 }
 
@@ -760,6 +777,6 @@ void BrainSurface::setSelectedVertexRange(int start, int count)
         m_selectedVertexStart = start;
         m_selectedVertexCount = count;
         updateVertexColors();
-        m_bBuffersDirty = true;
+        m_gpu->dirty = true;
     }
 }

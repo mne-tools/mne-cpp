@@ -38,6 +38,8 @@
 
 #include "networkobject.h"
 
+#include <rhi/qrhi.h>
+
 #include <connectivity/network/networknode.h>
 #include <connectivity/network/networkedge.h>
 #include <disp/plots/helpers/colormap.h>
@@ -51,18 +53,42 @@ using namespace DISPLIB;
 using namespace Eigen;
 
 //=============================================================================================================
+// PIMPL
+//=============================================================================================================
+
+struct NetworkObject::GpuBuffers
+{
+    // Node buffers
+    std::unique_ptr<QRhiBuffer> nodeVertexBuffer;
+    std::unique_ptr<QRhiBuffer> nodeIndexBuffer;
+    std::unique_ptr<QRhiBuffer> nodeInstanceBuffer;
+    // Edge buffers
+    std::unique_ptr<QRhiBuffer> edgeVertexBuffer;
+    std::unique_ptr<QRhiBuffer> edgeIndexBuffer;
+    std::unique_ptr<QRhiBuffer> edgeInstanceBuffer;
+};
+
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 NetworkObject::NetworkObject()
+    : m_gpu(std::make_unique<GpuBuffers>())
 {
 }
 
 //=============================================================================================================
 
-NetworkObject::~NetworkObject()
-{
-}
+NetworkObject::~NetworkObject() = default;
+
+//=============================================================================================================
+
+QRhiBuffer* NetworkObject::nodeVertexBuffer()   const { return m_gpu->nodeVertexBuffer.get(); }
+QRhiBuffer* NetworkObject::nodeIndexBuffer()    const { return m_gpu->nodeIndexBuffer.get(); }
+QRhiBuffer* NetworkObject::nodeInstanceBuffer() const { return m_gpu->nodeInstanceBuffer.get(); }
+QRhiBuffer* NetworkObject::edgeVertexBuffer()   const { return m_gpu->edgeVertexBuffer.get(); }
+QRhiBuffer* NetworkObject::edgeIndexBuffer()    const { return m_gpu->edgeIndexBuffer.get(); }
+QRhiBuffer* NetworkObject::edgeInstanceBuffer() const { return m_gpu->edgeInstanceBuffer.get(); }
 
 //=============================================================================================================
 
@@ -440,26 +466,26 @@ void NetworkObject::buildEdgeInstances()
 void NetworkObject::updateNodeBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
 {
     if (m_nodeGeometryDirty) {
-        if (!m_nodeVertexBuffer) {
-            m_nodeVertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, m_nodeVertexData.size()));
-            m_nodeVertexBuffer->create();
+        if (!m_gpu->nodeVertexBuffer) {
+            m_gpu->nodeVertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, m_nodeVertexData.size()));
+            m_gpu->nodeVertexBuffer->create();
         }
-        if (!m_nodeIndexBuffer) {
-            m_nodeIndexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, m_nodeIndexData.size()));
-            m_nodeIndexBuffer->create();
+        if (!m_gpu->nodeIndexBuffer) {
+            m_gpu->nodeIndexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, m_nodeIndexData.size()));
+            m_gpu->nodeIndexBuffer->create();
         }
-        u->uploadStaticBuffer(m_nodeVertexBuffer.get(), m_nodeVertexData.constData());
-        u->uploadStaticBuffer(m_nodeIndexBuffer.get(), m_nodeIndexData.constData());
+        u->uploadStaticBuffer(m_gpu->nodeVertexBuffer.get(), m_nodeVertexData.constData());
+        u->uploadStaticBuffer(m_gpu->nodeIndexBuffer.get(), m_nodeIndexData.constData());
         m_nodeGeometryDirty = false;
     }
 
     if (m_nodeInstancesDirty && m_nodeInstanceCount > 0) {
         int requiredSize = m_nodeInstanceData.size();
-        if (!m_nodeInstanceBuffer || m_nodeInstanceBuffer->size() < requiredSize) {
-            m_nodeInstanceBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::VertexBuffer, requiredSize));
-            m_nodeInstanceBuffer->create();
+        if (!m_gpu->nodeInstanceBuffer || m_gpu->nodeInstanceBuffer->size() < requiredSize) {
+            m_gpu->nodeInstanceBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::VertexBuffer, requiredSize));
+            m_gpu->nodeInstanceBuffer->create();
         }
-        u->updateDynamicBuffer(m_nodeInstanceBuffer.get(), 0, requiredSize, m_nodeInstanceData.constData());
+        u->updateDynamicBuffer(m_gpu->nodeInstanceBuffer.get(), 0, requiredSize, m_nodeInstanceData.constData());
         m_nodeInstancesDirty = false;
     }
 }
@@ -469,26 +495,26 @@ void NetworkObject::updateNodeBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
 void NetworkObject::updateEdgeBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
 {
     if (m_edgeGeometryDirty) {
-        if (!m_edgeVertexBuffer) {
-            m_edgeVertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, m_edgeVertexData.size()));
-            m_edgeVertexBuffer->create();
+        if (!m_gpu->edgeVertexBuffer) {
+            m_gpu->edgeVertexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::VertexBuffer, m_edgeVertexData.size()));
+            m_gpu->edgeVertexBuffer->create();
         }
-        if (!m_edgeIndexBuffer) {
-            m_edgeIndexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, m_edgeIndexData.size()));
-            m_edgeIndexBuffer->create();
+        if (!m_gpu->edgeIndexBuffer) {
+            m_gpu->edgeIndexBuffer.reset(rhi->newBuffer(QRhiBuffer::Immutable, QRhiBuffer::IndexBuffer, m_edgeIndexData.size()));
+            m_gpu->edgeIndexBuffer->create();
         }
-        u->uploadStaticBuffer(m_edgeVertexBuffer.get(), m_edgeVertexData.constData());
-        u->uploadStaticBuffer(m_edgeIndexBuffer.get(), m_edgeIndexData.constData());
+        u->uploadStaticBuffer(m_gpu->edgeVertexBuffer.get(), m_edgeVertexData.constData());
+        u->uploadStaticBuffer(m_gpu->edgeIndexBuffer.get(), m_edgeIndexData.constData());
         m_edgeGeometryDirty = false;
     }
 
     if (m_edgeInstancesDirty && m_edgeInstanceCount > 0) {
         int requiredSize = m_edgeInstanceData.size();
-        if (!m_edgeInstanceBuffer || m_edgeInstanceBuffer->size() < requiredSize) {
-            m_edgeInstanceBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::VertexBuffer, requiredSize));
-            m_edgeInstanceBuffer->create();
+        if (!m_gpu->edgeInstanceBuffer || m_gpu->edgeInstanceBuffer->size() < requiredSize) {
+            m_gpu->edgeInstanceBuffer.reset(rhi->newBuffer(QRhiBuffer::Dynamic, QRhiBuffer::VertexBuffer, requiredSize));
+            m_gpu->edgeInstanceBuffer->create();
         }
-        u->updateDynamicBuffer(m_edgeInstanceBuffer.get(), 0, requiredSize, m_edgeInstanceData.constData());
+        u->updateDynamicBuffer(m_gpu->edgeInstanceBuffer.get(), 0, requiredSize, m_edgeInstanceData.constData());
         m_edgeInstancesDirty = false;
     }
 }

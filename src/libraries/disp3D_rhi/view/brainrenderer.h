@@ -45,14 +45,22 @@
 
 #include "../core/rendertypes.h"
 
-#include <rhi/qrhi.h>
 #include <QMatrix4x4>
 #include <QVector3D>
-#include <map>
 #include <memory>
-#include "renderable/brainsurface.h"
-#include "renderable/dipoleobject.h"
-#include "renderable/networkobject.h"
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class QRhi;
+class QRhiCommandBuffer;
+class QRhiRenderTarget;
+class QRhiRenderPassDescriptor;
+class QRhiResourceUpdateBatch;
+class BrainSurface;
+class DipoleObject;
+class NetworkObject;
 
 //=============================================================================================================
 /**
@@ -85,14 +93,23 @@ public:
     static constexpr ShaderMode XRay         = ::XRay;
     static constexpr ShaderMode ShowNormals  = ::ShowNormals;
 
+    /**
+     * Lightweight scene uniform block passed to every draw call.
+     *
+     * Viewport and scissor are stored as plain numbers so that this struct
+     * does not pull in any Qt-private QRhi headers.
+     */
     struct SceneData {
         QMatrix4x4 mvp;
         QVector3D cameraPos;
         QVector3D lightDir;
         bool lightingEnabled;
         float overlayMode = 0.0f;       // 0=Surface, 1=Annotation, 2=Scientific, 3=STC
-        QRhiViewport viewport;          // per-pane viewport – re-asserted before every draw
-        QRhiScissor scissor;            // per-pane scissor – hard pixel clip
+
+        // Viewport rectangle (floating-point, pixels)
+        float viewportX = 0, viewportY = 0, viewportW = 0, viewportH = 0;
+        // Scissor rectangle (integer, pixels)
+        int scissorX = 0, scissorY = 0, scissorW = 0, scissorH = 0;
     };
     
     //=========================================================================================================
@@ -167,19 +184,8 @@ public:
     void endFrame(QRhiCommandBuffer *cb);
     
 private:
-    void createResources(QRhi *rhi, QRhiRenderPassDescriptor *rp, int sampleCount);
-    
-    std::unique_ptr<QRhiShaderResourceBindings> m_srb;
-    
-    // Pipelines for each mode
-    std::map<ShaderMode, std::unique_ptr<QRhiGraphicsPipeline>> m_pipelines;
-    std::map<ShaderMode, std::unique_ptr<QRhiGraphicsPipeline>> m_pipelinesBackColor; // For Holographic back faces
-    
-    std::unique_ptr<QRhiBuffer> m_uniformBuffer;
-    int m_uniformBufferOffsetAlignment = 0;
-    int m_currentUniformOffset = 0;
-    
-    bool m_resourcesDirty = true;
+    struct Impl;
+    std::unique_ptr<Impl> d;
 };
 
 #endif // BRAINRENDERER_H

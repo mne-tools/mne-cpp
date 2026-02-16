@@ -7,8 +7,7 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 set(QT_REQUIRED_COMPONENTS Core Gui GuiPrivate Widgets ShaderTools)
-find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
-find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
+find_package(Qt6 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
 set(SOURCES
     disp3D_rhi_global.cpp
@@ -119,7 +118,7 @@ target_include_directories(${PROJECT_NAME}
 )
 
 set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
-list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
+list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt6::")
 
 set(MNE_LIBS_REQUIRED
     mne_utils
@@ -157,7 +156,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 # Qt6::GuiPrivate is PRIVATE — QRhi details are fully encapsulated in .cpp files.
 # Public headers use only forward declarations and lightweight rendertypes.h enums.
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    Qt${QT_VERSION_MAJOR}::GuiPrivate)
+    Qt6::GuiPrivate)
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     MNE_DISP3D_RHI_LIBRARY

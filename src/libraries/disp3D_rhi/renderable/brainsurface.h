@@ -47,13 +47,16 @@
 #include <QVector3D>
 #include <QColor>
 #include <memory>
-#include <rhi/qrhi.h>
 #include <fs/surface.h>
 #include <fs/annotation.h>
 #include <mne/mne_bem.h>
 
 #include <Eigen/Core>
-#include <atomic>
+
+// Forward-declare QRhi types so that this header stays QRhi-free
+class QRhi;
+class QRhiBuffer;
+class QRhiResourceUpdateBatch;
 
 //=============================================================================================================
 // STRUCTS
@@ -230,9 +233,9 @@ public:
      * @param[in] u          Resource update batch.
      */
     void updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u);
-    
-    QRhiBuffer* vertexBuffer() const { return m_vertexBuffer.get(); }
-    QRhiBuffer* indexBuffer() const { return m_indexBuffer.get(); }
+
+    QRhiBuffer* vertexBuffer() const;
+    QRhiBuffer* indexBuffer() const;
     uint32_t indexCount() const { return m_indexCount; }
     uint32_t vertexCount() const { return m_vertexData.size(); }
 
@@ -394,10 +397,9 @@ private:
     int m_hemi = -1; // 0=lh, 1=rh
     TissueType m_tissueType = TissueUnknown;
 
-    std::unique_ptr<QRhiBuffer> m_vertexBuffer;
-    std::unique_ptr<QRhiBuffer> m_indexBuffer;
-    bool m_bBuffersDirty = true;
-    
+    struct GpuBuffers;
+    std::unique_ptr<GpuBuffers> m_gpu;
+
     mutable QVector3D m_aabbMin;
     mutable QVector3D m_aabbMax;
     mutable bool m_bAABBDirty = true;
