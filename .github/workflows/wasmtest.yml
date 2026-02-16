@@ -24,10 +24,32 @@ jobs:
         ./emsdk install 4.0.7
         ./emsdk activate 4.0.7
     - name: Download pre-built WASM Qt binaries
+      id: download-qt-wasm
+      continue-on-error: true
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         gh release download qt_binaries -p 'qt6_6102_static_binaries_wasm.tar.gz' -D /tmp
+    - name: Trigger BuildQtBinaries and wait
+      if: steps.download-qt-wasm.outcome != 'success'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        echo "WASM Qt binaries not found, triggering BuildQtBinaries workflow..."
+        gh workflow run buildqtbinaries.yml
+        # Wait for the run to appear
+        sleep 10
+        # Get the latest run ID for BuildQtBinaries
+        RUN_ID=$(gh run list -w BuildQtBinaries -L 1 --json databaseId -q '.[0].databaseId')
+        echo "Waiting for BuildQtBinaries run $RUN_ID to complete..."
+        gh run watch "$RUN_ID" --interval 30
+        # Retry download
+        echo "Retrying download..."
+        gh release download qt_binaries -p 'qt6_6102_static_binaries_wasm.tar.gz' -D /tmp
+    - name: Extract WASM Qt binaries
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
         mkdir -p ${{ runner.tool_cache }}/Qt/6.10.2/wasm_multithread
         tar xf /tmp/qt6_6102_static_binaries_wasm.tar.gz -C ${{ runner.tool_cache }}/Qt/6.10.2/wasm_multithread
         echo "Qt6_DIR=${{ runner.tool_cache }}/Qt/6.10.2" >> $GITHUB_ENV
