@@ -186,6 +186,7 @@ jobs:
       if: matrix.os == 'ubuntu-latest'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
+        QT_QPA_PLATFORM: offscreen
       run: |
         ./tools/test_all.bat verbose withCoverage
     - name: Upload coverage to Codecov
@@ -197,6 +198,7 @@ jobs:
       if: matrix.os == 'macos-latest'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
+        QT_QPA_PLATFORM: offscreen
       run: |
         ./tools/test_all.bat verbose
     - name: Run tests (Windows)
