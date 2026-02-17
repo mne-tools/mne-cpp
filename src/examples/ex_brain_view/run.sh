@@ -10,6 +10,7 @@ MneSampleDataPath="${MNE_DATA_PATH:-$HOME/mne_data/MNE-sample-data}"
 StcFile="${MneSampleDataPath}/MEG/sample/sample_audvis-meg-eeg-lh.stc"
 DigitizerFile="${MneSampleDataPath}/MEG/sample/sample_audvis_raw.fif"
 TransFile="${MneSampleDataPath}/MEG/sample/all-trans.fif"
+EvokedFile="${MneSampleDataPath}/MEG/sample/sample_audvis-ave.fif"
 
 # Default build path (assuming run from project root or similar structure)
 # Try to find the executable relative to the script location
@@ -35,4 +36,4 @@ AtlasFile="${SubjectPath}/${Subject}/label/lh.aparc.annot"
 echo "launching ex_brain_view from $BuildPath..."
 "$BuildPath" --subjectPath "$SubjectPath" --subject "$Subject" --hemi "$Hemi" --bem "$BemFile" \
     --stc "$StcFile" --digitizer "$DigitizerFile" --trans "$TransFile" --srcSpace "$SrcSpaceFile" \
-    --atlas "$AtlasFile"
+    --atlas "$AtlasFile" --evoked "$EvokedFile"

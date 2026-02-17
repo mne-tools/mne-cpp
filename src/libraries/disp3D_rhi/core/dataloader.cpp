@@ -220,7 +220,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
 
                     auto helmetSurface = std::make_shared<BrainSurface>();
                     helmetSurface->fromBemSurface(helmetSurf, QColor(0, 0, 77, 200));
-                    helmetSurface->setVisible(false);
+                    helmetSurface->setVisible(true);
                     result.helmetSurface = helmetSurface;
                 }
             }

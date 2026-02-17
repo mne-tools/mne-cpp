@@ -94,6 +94,7 @@ public:
      * @param[in] digitizerPath  Optional digitizer/sensor file path.
      * @param[in] srcSpacePath   Optional source space file path.
      * @param[in] atlasPath      Optional atlas annotation file path.
+     * @param[in] evokedPath     Optional evoked/average file path.
      */
     void loadInitialData(const QString &subjectPath,
                          const QString &subjectName,
@@ -102,7 +103,8 @@ public:
                          const QString &stcPath = QString(),
                          const QString &digitizerPath = QString(),
                          const QString &srcSpacePath = QString(),
-                         const QString &atlasPath = QString());
+                         const QString &atlasPath = QString(),
+                         const QString &evokedPath = QString());
 
     /**
      * Enable network UI controls (called after a network has been loaded).
@@ -175,6 +177,7 @@ private:
     QCheckBox *m_showDigHpiCheck = nullptr;
     QCheckBox *m_showDigEegCheck = nullptr;
     QCheckBox *m_showDigExtraCheck = nullptr;
+    QCheckBox *m_showHelmetCheck = nullptr;
     QCheckBox *m_applyTransCheck = nullptr;
 
     // Control widgets - Dipoles
@@ -189,6 +192,19 @@ private:
     QCheckBox *m_showNetworkCheck = nullptr;
     QSlider *m_networkThresholdSlider = nullptr;
     QComboBox *m_networkColormapCombo = nullptr;
+
+    // Control widgets - Evoked / Field Maps
+    QPushButton *m_loadEvokedBtn = nullptr;
+    QComboBox *m_evokedSetCombo = nullptr;
+    QCheckBox *m_showMegFieldCheck = nullptr;
+    QCheckBox *m_showEegFieldCheck = nullptr;
+    QCheckBox *m_showMegContourCheck = nullptr;
+    QCheckBox *m_showEegContourCheck = nullptr;
+    QCheckBox *m_megOnHeadCheck = nullptr;
+    QSlider *m_sensorFieldTimeSlider = nullptr;
+    QLabel *m_sensorFieldTimeLabel = nullptr;
+    QCheckBox *m_syncTimesCheck = nullptr;
+    bool m_isSyncing = false;           //!< Guard against re-entrant slider sync
 
     // Control widgets - Sensor Streaming
     QPushButton *m_sensorStreamBtn = nullptr;

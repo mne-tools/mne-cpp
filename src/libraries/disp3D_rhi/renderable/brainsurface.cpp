@@ -271,10 +271,17 @@ void BrainSurface::setVisible(bool visible)
 
 void BrainSurface::setVisualizationMode(VisualizationMode mode)
 {
-    // Store the mode but do NOT re-write vertex data.
-    // The shader selects between color (curvature/STC) and
-    // colorAnnotation via the per-draw overlayMode uniform.
+    if (m_visMode == mode)
+        return;
+
     m_visMode = mode;
+
+    // Scientific and SourceEstimate both read from the primary colour
+    // channel (v_color).  When switching between them the vertex buffer
+    // must be refreshed so the channel holds curvature grays (Scientific)
+    // or STC colours (SourceEstimate).
+    updateVertexColors();
+    m_gpu->dirty = true;
 }
 
 //=============================================================================================================
@@ -302,22 +309,31 @@ void BrainSurface::setUseDefaultColor(bool useDefault)
 
 void BrainSurface::updateVertexColors()
 {
-    // ── 1. Populate the primary "color" channel: curvature-based gray.
-    //       The shader uses this for Scientific mode and as a lighting base.
-    //       In Surface mode the shader overrides with white;
-    //       in STC mode applySourceEstimateColors() overwrites this later.
+    // ── 1. Populate the primary "color" channel.
+    //       Brain surfaces (with curvature): curvature-based gray.
+    //       Non-brain surfaces (BEM, sensors, etc.): use m_baseColor.
+    //       The shader uses this for Scientific mode and as a lighting base;
+    //       in Surface mode the shader overrides with white for brain tissue.
     if (!m_curvature.isEmpty() && m_curvature.size() == m_vertexData.size()) {
         for (int i = 0; i < m_vertexData.size(); ++i) {
             const uint32_t val = (m_curvature[i] > 0.0f) ? 0x40u : 0xAAu;
             m_vertexData[i].color = packABGR(val, val, val);
         }
     } else {
-        // Fallback: normal-derived grayscale when curvature is unavailable
+        // Use the base colour (set via setUseDefaultColor / fromBemSurface).
+        // This preserves BEM Red/Green/Blue colours and sensor colours.
+        const uint32_t baseVal = packABGR(m_baseColor.red(), m_baseColor.green(),
+                                          m_baseColor.blue(), m_baseColor.alpha());
         for (int i = 0; i < m_vertexData.size(); ++i) {
-            const float nz = m_vertexData[i].norm.normalized().z();
-            const float t  = std::clamp((nz + 1.0f) * 0.5f, 0.0f, 1.0f);
-            const uint32_t val = static_cast<uint32_t>(64.0f + t * (170.0f - 64.0f));
-            m_vertexData[i].color = packABGR(val, val, val);
+            m_vertexData[i].color = baseVal;
+        }
+    }
+
+    // Restore STC colours so that hover/selection changes do not lose
+    // the source-estimate overlay.
+    if (m_visMode == ModeSourceEstimate && !m_stcColors.isEmpty()) {
+        for (int i = 0; i < qMin(m_stcColors.size(), m_vertexData.size()); ++i) {
+            m_vertexData[i].color = m_stcColors[i];
         }
     }
 

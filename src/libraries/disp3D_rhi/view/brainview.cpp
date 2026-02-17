@@ -786,8 +786,18 @@ void BrainView::setVisualizationMode(const QString &modeName)
     sv.overlayMode = mode;
 
     m_currentVisMode = mode;
-    // The overlay mode is now passed as a per-draw uniform to the shader.
-    // No need to mutate vertex data on the shared BrainSurface objects.
+
+    // Propagate the mode to brain hemisphere surfaces only (lh_*, rh_*)
+    // so that the primary colour channel holds the right data: curvature
+    // grays for Scientific or STC colours for SourceEstimate.
+    // BEM, sensor, and source-space surfaces are left untouched.
+    for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
+        const QString &key = it.key();
+        if (key.startsWith("lh_") || key.startsWith("rh_")) {
+            it.value()->setVisualizationMode(mode);
+        }
+    }
+
     saveMultiViewSettings();
     update();
 }
@@ -1570,9 +1580,13 @@ void BrainView::render(QRhiCommandBuffer *cb)
         return a.dist > b.dist;
     });
 
-    // BEM / sensor surfaces use tissue-type / shell colours, not brain overlays
+    // BEM / sensor surfaces pass vertex colours through via Scientific mode
+    // so that BEM Red/Green/Blue colours (set via setUseDefaultColor) are
+    // visible.  The holographic shader uses saturation detection: coloured
+    // BEM → data mode, white BEM → shell mode.  The anatomical shader
+    // ignores overlayMode for known tissue types and uses its own palette.
     BrainRenderer::SceneData bemSceneData = sceneData;
-    bemSceneData.overlayMode = 0.0f; // Surface mode → anatomical uses tissue type, holographic uses shell
+    bemSceneData.overlayMode = static_cast<float>(BrainSurface::ModeScientific);
 
     for (const auto &item : transparentItems) {
         m_renderer->renderSurface(cb, rhi(), bemSceneData, item.surf, item.mode);

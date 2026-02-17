@@ -63,8 +63,9 @@ int main(int argc, char *argv[])
     QCommandLineOption digitizerOption("digitizer", "Digitizer/sensor file path", "path", "");
     QCommandLineOption srcSpaceOption("srcSpace", "Source space / forward solution file path", "path", "");
     QCommandLineOption atlasOption("atlas", "Atlas annotation file path (lh or rh, sibling auto-detected)", "path", "");
+    QCommandLineOption evokedOption("evoked", "Evoked/average file path", "path", "");
 
-    parser.addOptions({subjectPathOption, subjectOption, hemiOption, bemOption, transOption, stcOption, digitizerOption, srcSpaceOption, atlasOption});
+    parser.addOptions({subjectPathOption, subjectOption, hemiOption, bemOption, transOption, stcOption, digitizerOption, srcSpaceOption, atlasOption, evokedOption});
     parser.process(app);
 
     MainWindow mainWindow;
@@ -76,7 +77,8 @@ int main(int argc, char *argv[])
         parser.value(stcOption),
         parser.value(digitizerOption),
         parser.value(srcSpaceOption),
-        parser.value(atlasOption)
+        parser.value(atlasOption),
+        parser.value(evokedOption)
     );
     mainWindow.show();
 

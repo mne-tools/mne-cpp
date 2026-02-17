@@ -195,7 +195,7 @@ bool SubView::shouldRenderSurface(const QString &key) const
 
     if (key.startsWith("sens_contour_meg")) return visibility.megFieldMap && visibility.megFieldContours;
     if (key.startsWith("sens_contour_eeg")) return visibility.eegFieldMap && visibility.eegFieldContours;
-    if (key.startsWith("sens_surface_meg")) return visibility.sensMeg && visibility.sensMegHelmet;
+    if (key.startsWith("sens_surface_meg")) return visibility.sensMegHelmet;
     if (key.startsWith("sens_meg_grad_"))   return visibility.sensMeg && visibility.sensMegGrad;
     if (key.startsWith("sens_meg_mag_"))    return visibility.sensMeg && visibility.sensMegMag;
     if (key.startsWith("sens_meg_"))        return visibility.sensMeg;

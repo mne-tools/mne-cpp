@@ -16,6 +16,7 @@ set "Hemi=0"
 set "StcFile=%MneSampleDataPath%\MEG\sample\sample_audvis-meg-eeg-lh.stc"
 set "DigitizerFile=%MneSampleDataPath%\MEG\sample\sample_audvis_raw.fif"
 set "TransFile=%MneSampleDataPath%\MEG\sample\all-trans.fif"
+set "EvokedFile=%MneSampleDataPath%\MEG\sample\sample_audvis-ave.fif"
 
 :: Default build path relative to script location
 set "ScriptDir=%~dp0"
@@ -37,6 +38,6 @@ set "AtlasFile=%SubjectPath%\%Subject%\label\lh.aparc.annot"
 echo launching ex_brain_view from %BuildPath%...
 "%BuildPath%" --subjectPath "%SubjectPath%" --subject "%Subject%" --hemi "%Hemi%" --bem "%BemFile%" ^
     --stc "%StcFile%" --digitizer "%DigitizerFile%" --trans "%TransFile%" --srcSpace "%SrcSpaceFile%" ^
-    --atlas "%AtlasFile%"
+    --atlas "%AtlasFile%" --evoked "%EvokedFile%"
 
 endlocal
