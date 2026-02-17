@@ -141,6 +141,7 @@ private:
     QCheckBox *m_innerCheck = nullptr;
 
     // Control widgets - View
+    QCheckBox *m_showInfoCheck = nullptr;
     QCheckBox *m_multiViewCheck = nullptr;
     QCheckBox *m_vpTopCheck = nullptr;
     QCheckBox *m_vpBottomCheck = nullptr;
@@ -200,7 +201,7 @@ private:
     QCheckBox *m_showEegFieldCheck = nullptr;
     QCheckBox *m_showMegContourCheck = nullptr;
     QCheckBox *m_showEegContourCheck = nullptr;
-    QCheckBox *m_megOnHeadCheck = nullptr;
+    QComboBox *m_megHelmetCombo = nullptr;
     QSlider *m_sensorFieldTimeSlider = nullptr;
     QLabel *m_sensorFieldTimeLabel = nullptr;
     QCheckBox *m_syncTimesCheck = nullptr;

@@ -383,6 +383,14 @@ public slots:
 
     //=========================================================================================================
     /**
+     * Whether the info panel is currently visible.
+     *
+     * @return True if visible.
+     */
+    bool isInfoPanelVisible() const { return m_infoPanelVisible; }
+
+    //=========================================================================================================
+    /**
      * Get the current view mode.
      *
      * @return Current ViewMode.

@@ -361,9 +361,11 @@ void MainWindow::setupUI()
     m_showEegContourCheck->setChecked(false);
     m_showEegContourCheck->setEnabled(false);
 
-    m_megOnHeadCheck = new QCheckBox("MEG on Head");
-    m_megOnHeadCheck->setChecked(false);
-    m_megOnHeadCheck->setEnabled(false);
+    QLabel *megSurfLabel = new QLabel("MEG Surface:");
+    m_megHelmetCombo = new QComboBox;
+    m_megHelmetCombo->addItems({"Helmet", "Head"});
+    m_megHelmetCombo->setToolTip("Choose whether MEG field mapping uses the helmet or head surface.");
+    m_megHelmetCombo->setEnabled(false);
 
     m_sensorFieldTimeSlider = new QSlider(Qt::Horizontal);
     m_sensorFieldTimeSlider->setRange(0, 0);
@@ -384,7 +386,8 @@ void MainWindow::setupUI()
     evokedLayout->addWidget(m_showEegFieldCheck);
     evokedLayout->addWidget(m_showMegContourCheck);
     evokedLayout->addWidget(m_showEegContourCheck);
-    evokedLayout->addWidget(m_megOnHeadCheck);
+    evokedLayout->addWidget(megSurfLabel);
+    evokedLayout->addWidget(m_megHelmetCombo);
     evokedLayout->addWidget(m_sensorFieldTimeLabel);
     evokedLayout->addWidget(m_sensorFieldTimeSlider);
     evokedLayout->addWidget(m_syncTimesCheck);
@@ -490,6 +493,12 @@ void MainWindow::setupUI()
     QVBoxLayout *viewLayout = new QVBoxLayout(viewGroup);
     viewLayout->setContentsMargins(6, 12, 6, 6);
     viewLayout->setSpacing(8);
+
+    // Info Panel Toggle
+    m_showInfoCheck = new QCheckBox("Show Info Labels");
+    m_showInfoCheck->setChecked(true);
+    m_showInfoCheck->setToolTip("Show or hide overlay info labels (FPS, shader, surface info).");
+    viewLayout->addWidget(m_showInfoCheck);
 
     // Multi-View Toggle
     m_multiViewCheck = new QCheckBox("Multi-View (4 cameras)");
@@ -943,7 +952,7 @@ void MainWindow::setupConnections()
         m_showEegFieldCheck->setEnabled(true);
         m_showMegContourCheck->setEnabled(true);
         m_showEegContourCheck->setEnabled(true);
-        m_megOnHeadCheck->setEnabled(true);
+        m_megHelmetCombo->setEnabled(true);
         m_syncTimesCheck->setEnabled(true);
 
         // Enable time slider
@@ -978,9 +987,12 @@ void MainWindow::setupConnections()
         m_brainView->setSensorFieldContourVisible("EEG", checked);
     });
 
-    // MEG on head vs helmet
-    connect(m_megOnHeadCheck, &QCheckBox::toggled, [this](bool checked) {
-        m_brainView->setMegFieldMapOnHead(checked);
+    // Info panel
+    connect(m_showInfoCheck, &QCheckBox::toggled, m_brainView, &BrainView::setInfoPanelVisible);
+
+    // MEG helmet surface selection
+    connect(m_megHelmetCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
+        m_brainView->setMegFieldMapOnHead(text == "Head");
     });
 
     // Sensor field time slider
@@ -1135,10 +1147,15 @@ void MainWindow::setupConnections()
     m_showEegContourCheck->setChecked(m_brainView->objectVisibleForTarget("contour_eeg", target));
     m_showEegContourCheck->blockSignals(false);
 
-    // MEG field map on head
-    m_megOnHeadCheck->blockSignals(true);
-    m_megOnHeadCheck->setChecked(m_brainView->megFieldMapOnHeadForTarget(target));
-    m_megOnHeadCheck->blockSignals(false);
+    // MEG field map surface
+    m_megHelmetCombo->blockSignals(true);
+    m_megHelmetCombo->setCurrentText(m_brainView->megFieldMapOnHeadForTarget(target) ? "Head" : "Helmet");
+    m_megHelmetCombo->blockSignals(false);
+
+    // Info panel visibility
+    m_showInfoCheck->blockSignals(true);
+    m_showInfoCheck->setChecked(m_brainView->isInfoPanelVisible());
+    m_showInfoCheck->blockSignals(false);
 }
 
 //=============================================================================================================

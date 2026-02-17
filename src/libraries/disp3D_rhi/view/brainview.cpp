@@ -1209,6 +1209,8 @@ void BrainView::loadMultiViewSettings()
     m_visualizationEditTarget = normalizedVisualizationTarget(
         settings.value("visualizationEditTarget", -1).toInt(), maxIdx);
 
+    m_infoPanelVisible = settings.value("infoPanelVisible", true).toBool();
+
     settings.endGroup();
 
     m_multiSplitX = std::clamp(m_multiSplitX, 0.15f, 0.85f);
@@ -1236,6 +1238,7 @@ void BrainView::saveMultiViewSettings() const
     for (int i = 0; i < m_subViews.size(); ++i)
         settings.setValue(QStringLiteral("viewportEnabled%1").arg(i), m_subViews[i].enabled);
     settings.setValue("visualizationEditTarget", m_visualizationEditTarget);
+    settings.setValue("infoPanelVisible", m_infoPanelVisible);
 
     // Delegate per-SubView serialization
     m_singleView.save(settings, "single_");
@@ -1263,6 +1266,7 @@ void BrainView::setViewportEnabled(int index, bool enabled)
 void BrainView::setInfoPanelVisible(bool visible)
 {
     m_infoPanelVisible = visible;
+    saveMultiViewSettings();
     updateOverlayLayout();
 }
 
