@@ -64,20 +64,32 @@ jobs:
       run: |
         source ../emsdk/emsdk_env.sh
         ./tools/wasm.sh --emsdk 4.0.7
+    - name: Prepare WASM artifacts
+      run: |
+        # Delete folders which we do not want to ship
+        rm -rf out/wasm/apps/mne_analyze_plugins
+        rm -rf resources/data
+        # Replace logo
+        cp resources/design/logos/qtlogo.svg out/wasm/apps/qtlogo.svg
+        if [ -d "out/wasm/examples" ]; then
+          cp resources/design/logos/qtlogo.svg out/wasm/examples/qtlogo.svg
+        fi
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
         credentials: ${{secrets.GIT_CREDENTIALS_WASM_TEST}}
-    - name: Update gh-pages branch with new wasm version
+    - name: Update gh-pages and main branches with new wasm version
       run: |
         # Setup git credentials
         git config --global user.email christoph.dinh@mne-cpp.org
         git config --global user.name chdinh
         # Save the wasm files first
         cp -RT out/wasm/apps ../bin
-        # Replace logo
-        cp resources/design/logos/qtlogo.svg ../bin/qtlogo.svg
-        # Checkout the gh-pages branch
+        if [ -d "out/wasm/examples" ]; then
+          cp -RT out/wasm/examples ../bin_examples
+        fi
+
+        # --- Update gh-pages branch ---
         git fetch origin gh-pages
         git checkout --track origin/gh-pages
         # Clean and remove all files first
@@ -86,6 +98,24 @@ jobs:
         git commit --amend -a -m 'Update wasm' --allow-empty
         # Add the saved wasm files
         cp -RT ../bin .
+        if [ -d "../bin_examples" ]; then
+          mkdir -p examples
+          cp -RT ../bin_examples examples
+        fi
         git add --all
         git commit --amend -a -m 'Update wasm'
         git push origin gh-pages -f
+
+        # --- Update main branch ---
+        git checkout main 2>/dev/null || git checkout -b main
+        git clean -f -d
+        git rm -rf --ignore-unmatch .
+        git commit --allow-empty -m 'Update wasm'
+        cp -RT ../bin .
+        if [ -d "../bin_examples" ]; then
+          mkdir -p examples
+          cp -RT ../bin_examples examples
+        fi
+        git add --all
+        git commit --amend -m 'Update wasm'
+        git push -f origin main

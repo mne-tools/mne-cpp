@@ -32,14 +32,14 @@ jobs:
       if: endsWith(github.ref, 'v2.0-dev') == true
       timeout-minutes: 5
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
         set -x  # Enable debug output
         
-        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git config --global user.name "github-actions[bot]"
+        git config --global user.email christoph.dinh@mne-cpp.org
+        git config --global user.name chdinh
         
-        # Configure git to use GITHUB_TOKEN
+        # Configure git to use token
         git remote set-url origin https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}
         
         # Delete current dev_build release remotely (if it exists)
@@ -108,7 +108,7 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       uses: svenstaro/upload-release-action@v2
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         file: doc/doxygen/qt-creator_doc/mne-cpp.qch
         asset_name: mne-cpp-${{ github.ref_name }}-doc-qtcreator.qch
         tag: ${{ github.ref }}
@@ -117,7 +117,7 @@ jobs:
       if: endsWith(github.ref, 'v2.0-dev') == true
       uses: svenstaro/upload-release-action@v2
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         file: doc/doxygen/qt-creator_doc/mne-cpp.qch
         asset_name: mne-cpp-v2.0-dev-doc-qtcreator.qch
         tag: dev_build
@@ -214,31 +214,76 @@ jobs:
       run: |
         source ../emsdk/emsdk_env.sh
         ./tools/wasm.sh --emsdk 4.0.7
+    - name: Prepare WASM artifacts
+      run: |
+        # Delete folders which we do not want to ship
+        rm -rf out/wasm/apps/mne_analyze_plugins
+        rm -rf resources/data
+        # Replace logo
+        cp resources/design/logos/qtlogo.svg out/wasm/apps/qtlogo.svg
+        if [ -d "out/wasm/examples" ]; then
+          cp resources/design/logos/qtlogo.svg out/wasm/examples/qtlogo.svg
+        fi
+    - name: Package WASM build as tar.gz
+      run: |
+        tar cfz mne-cpp-wasm.tar.gz -C out/wasm .
+    - name: Deploy WASM tar.gz with dev release on Github
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        file: mne-cpp-wasm.tar.gz
+        asset_name: mne-cpp-v2.0-dev-wasm.tar.gz
+        tag: dev_build
+        overwrite: true
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
         credentials: ${{secrets.GIT_CREDENTIALS}}
-    - name: Clone and update mne-cpp/wasm:gh-pages
+    - name: Clone and update mne-cpp/wasm repository
       env:
         GIT_CREDENTIALS: ${{ secrets.GIT_CREDENTIALS }}
       run: |
-        # Delete folders which we do not want to ship
-        rm -r out/wasm/apps/mne_analyze_plugins
-        rm -r resources/data
-        # Replace logo
-        cp resources/design/logos/qtlogo.svg out/wasm/apps/qtlogo.svg
-        # Clone repo and update with new wasm versions
         git config --global user.email christoph.dinh@mne-cpp.org
         git config --global user.name chdinh
-        git clone -b gh-pages --single-branch "https://${GIT_CREDENTIALS}@github.com/mne-cpp/wasm.git"
-        cd wasm
-        # Remove all files first
-        git rm * -r
-        git commit --amend -a -m 'Update wasm builds' --allow-empty
-        # Copy wasm files
-        cd ..
-        cp -RT out/wasm/apps wasm
-        cd wasm
+        git clone "https://${GIT_CREDENTIALS}@github.com/mne-cpp/wasm.git" wasm-repo
+        cd wasm-repo
+
+        # --- Update gh-pages branch ---
+        if git rev-parse --verify origin/gh-pages > /dev/null 2>&1; then
+          git checkout gh-pages
+        else
+          git checkout --orphan gh-pages
+        fi
+        git rm -rf --ignore-unmatch .
+        git clean -f -d
+        git commit --allow-empty -m 'Update wasm builds'
+        # Copy apps to root
+        cp -RT ../out/wasm/apps .
+        # Copy examples to examples/ subdirectory
+        if [ -d "../out/wasm/examples" ]; then
+          mkdir -p examples
+          cp -RT ../out/wasm/examples examples
+        fi
         git add .
-        git commit --amend -a -m 'Update wasm builds'
-        git push -f --all
+        git commit --amend -m 'Update wasm builds'
+        git push -f origin gh-pages
+
+        # --- Update main branch ---
+        if git rev-parse --verify origin/main > /dev/null 2>&1; then
+          git checkout main
+        else
+          git checkout --orphan main
+        fi
+        git rm -rf --ignore-unmatch .
+        git clean -f -d
+        git commit --allow-empty -m 'Update wasm builds'
+        # Copy apps to root
+        cp -RT ../out/wasm/apps .
+        # Copy examples to examples/ subdirectory
+        if [ -d "../out/wasm/examples" ]; then
+          mkdir -p examples
+          cp -RT ../out/wasm/examples examples
+        fi
+        git add .
+        git commit --amend -m 'Update wasm builds'
+        git push -f origin main

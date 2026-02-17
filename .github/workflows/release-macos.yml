@@ -35,7 +35,7 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       uses: svenstaro/upload-release-action@v2
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         file: mne-cpp-macos-dynamic-x86_64.tar.gz
         asset_name: mne-cpp-${{ github.ref_name }}-macos-dynamic-x86_64.tar.gz
         tag: ${{ github.ref }}
@@ -44,7 +44,7 @@ jobs:
       if: endsWith(github.ref, 'v2.0-dev') == true
       uses: svenstaro/upload-release-action@v2
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         file: mne-cpp-macos-dynamic-x86_64.tar.gz
         asset_name: mne-cpp-v2.0-dev-macos-dynamic-x86_64.tar.gz
         tag: dev_build
@@ -57,7 +57,7 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       uses: svenstaro/upload-release-action@v2
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         file: build_installer/MNE-CPP-*-Darwin.dmg
         file_glob: true
         asset_name: mne-cpp-${{ github.ref_name }}-macos-installer-x86_64.dmg
@@ -67,7 +67,7 @@ jobs:
       if: endsWith(github.ref, 'v2.0-dev') == true
       uses: svenstaro/upload-release-action@v2
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         file: build_installer/MNE-CPP-*-Darwin.dmg
         file_glob: true
         asset_name: mne-cpp-v2.0-dev-macos-installer-x86_64.dmg
@@ -128,7 +128,7 @@ jobs:
       if: startsWith(github.ref, 'refs/tags/')
       uses: svenstaro/upload-release-action@v2
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         file: mne-cpp-macos-static-x86_64.tar.gz
         asset_name: mne-cpp-${{ github.ref_name }}-macos-static-x86_64.tar.gz
         tag: ${{ github.ref }}
@@ -137,7 +137,7 @@ jobs:
       if: endsWith(github.ref, 'v2.0-dev') == true
       uses: svenstaro/upload-release-action@v2
       with:
-        repo_token: ${{ secrets.GITHUB_TOKEN }}
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         file: mne-cpp-macos-static-x86_64.tar.gz
         asset_name: mne-cpp-v2.0-dev-macos-static-x86_64.tar.gz
         tag: dev_build

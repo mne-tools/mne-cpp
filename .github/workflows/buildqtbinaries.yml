@@ -42,9 +42,9 @@ jobs:
         path: qt6_6102_static_binaries_linux.tar.gz
     - name: Create qt_binaries release and upload
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        gh release create qt_binaries --title "Static Qt Binaries" --notes "Pre-built static Qt 6.10.2 binaries for CI" 2>/dev/null || true
+        gh release create qt_binaries --prerelease --latest=false --title "Static Qt Binaries" --notes "Pre-built static Qt 6.10.2 binaries for CI" 2>/dev/null || true
         gh release upload qt_binaries qt6_6102_static_binaries_linux.tar.gz --clobber
 
   GenerateMacOSStaticBinaries:
@@ -80,9 +80,9 @@ jobs:
         path: qt6_6102_static_binaries_macos.tar.gz
     - name: Upload to qt_binaries release
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        gh release create qt_binaries --title "Static Qt Binaries" --notes "Pre-built static Qt 6.10.2 binaries for CI" 2>/dev/null || true
+        gh release create qt_binaries --prerelease --latest=false --title "Static Qt Binaries" --notes "Pre-built static Qt 6.10.2 binaries for CI" 2>/dev/null || true
         gh release upload qt_binaries qt6_6102_static_binaries_macos.tar.gz --clobber
 
   GenerateWinStaticBinaries:
@@ -124,9 +124,9 @@ jobs:
         path: qt6_6102_static_binaries_win.zip
     - name: Upload to qt_binaries release
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        gh release create qt_binaries --title "Static Qt Binaries" --notes "Pre-built static Qt 6.10.2 binaries for CI" 2>$null
+        gh release create qt_binaries --prerelease --latest=false --title "Static Qt Binaries" --notes "Pre-built static Qt 6.10.2 binaries for CI" 2>$null
         gh release upload qt_binaries qt6_6102_static_binaries_win.zip --clobber
 
   GenerateWasmBinaries:
@@ -211,7 +211,7 @@ jobs:
         path: qt6_6102_static_binaries_wasm.tar.gz
     - name: Upload to qt_binaries release
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        gh release create qt_binaries --title "Static Qt Binaries" --notes "Pre-built static Qt 6.10.2 binaries for CI" 2>/dev/null || true
+        gh release create qt_binaries --prerelease --latest=false --title "Static Qt Binaries" --notes "Pre-built static Qt 6.10.2 binaries for CI" 2>/dev/null || true
         gh release upload qt_binaries qt6_6102_static_binaries_wasm.tar.gz --clobber
