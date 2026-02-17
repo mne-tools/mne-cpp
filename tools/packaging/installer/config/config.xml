@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  config.xml
+  MNE-CPP Qt Installer Framework Configuration
+
+  This file describes the overall installer appearance and behaviour.
+  Component-specific metadata lives in packages/*/meta/package.xml.
+-->
+<Installer>
+    <Name>MNE-CPP</Name>
+    <Version>2.0.0</Version>
+    <Title>MNE-CPP Installer</Title>
+    <Publisher>MNE-CPP Developers</Publisher>
+    <StartMenuDir>MNE-CPP</StartMenuDir>
+    <TargetDir>@HomeDir@/MNE-CPP</TargetDir>
+
+    <!-- Allow the user to change the target directory -->
+    <AllowNonAsciiCharacters>true</AllowNonAsciiCharacters>
+    <AllowSpaceInPath>true</AllowSpaceInPath>
+
+    <!-- Maintenance tool for add / remove / update -->
+    <MaintenanceToolName>MNE-CPP-MaintenanceTool</MaintenanceToolName>
+
+    <!-- Wizard style -->
+    <WizardStyle>Modern</WizardStyle>
+    <WizardDefaultWidth>640</WizardDefaultWidth>
+    <WizardDefaultHeight>480</WizardDefaultHeight>
+
+    <!-- URLs -->
+    <ProductUrl>https://mne-cpp.github.io/</ProductUrl>
+    <InstallerWindowIcon>installer_icon</InstallerWindowIcon>
+</Installer>

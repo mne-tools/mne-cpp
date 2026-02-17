@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>Runtime Libraries</DisplayName>
+    <Description>Shared libraries required by MNE-CPP applications</Description>
+    <Version>2.0.0</Version>
+    <ReleaseDate>2026-02-17</ReleaseDate>
+    <Default>true</Default>
+    <ForcedInstallation>true</ForcedInstallation>
+    <Virtual>true</Virtual>
+    <SortingPriority>99</SortingPriority>
+</Package>

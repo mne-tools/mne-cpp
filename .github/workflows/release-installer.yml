@@ -1,0 +1,396 @@
+name: Release Installer
+
+# This workflow builds platform-specific installers using the Qt Installer
+# Framework (QIF).  It is called by release.yml AFTER the Linux, macOS, and
+# Windows release builds have completed successfully, and downloads the
+# already-uploaded release archives from GitHub Releases.
+
+on:
+  workflow_call:
+
+env:
+  # Qt Installer Framework version
+  QIF_VERSION: "4.7"
+  QIF_TOOL_ID: "qt.tools.ifw.47"
+  MNE_CPP_VERSION: "2.0.0"
+
+jobs:
+  # =========================================================================
+  # Linux Installer  (.run)
+  # =========================================================================
+  LinuxInstaller:
+    runs-on: ubuntu-24.04
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v3
+
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install Qt Installer Framework
+      run: |
+        pip install aqtinstall
+        aqt install-tool linux desktop tools_ifw ${{ env.QIF_TOOL_ID }} --outputdir $RUNNER_TOOL_CACHE/Qt
+        echo "$RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/${{ env.QIF_VERSION }}/bin" >> $GITHUB_PATH
+
+    - name: Determine release tag
+      id: tag
+      run: |
+        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "asset_prefix=mne-cpp-${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        else
+          echo "tag=dev_build" >> $GITHUB_OUTPUT
+          echo "asset_prefix=mne-cpp-v2.0-dev" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Download dynamic release from GitHub Releases
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ASSET="${{ steps.tag.outputs.asset_prefix }}-linux-dynamic-x86_64.tar.gz"
+        echo "Downloading ${ASSET} from release ${{ steps.tag.outputs.tag }}..."
+        gh release download "${{ steps.tag.outputs.tag }}" -p "${ASSET}" -D /tmp
+        echo "RELEASE_ARCHIVE=/tmp/${ASSET}" >> $GITHUB_ENV
+
+    - name: Stage release into QIF package layout
+      run: |
+        STAGING="tools/packaging/installer/packages"
+
+        # Applications — bin/
+        APP_DATA="${STAGING}/org.mnecpp.applications/data"
+        mkdir -p "${APP_DATA}/bin"
+        tar xf "$RELEASE_ARCHIVE" -C "${APP_DATA}" --strip-components=0 \
+          --wildcards '*/bin/*' 2>/dev/null || true
+        # Flatten: if extracted as mne-cpp-*/bin/*, move up
+        if [ -d "${APP_DATA}/mne-cpp"* ] 2>/dev/null; then
+          mv "${APP_DATA}"/mne-cpp*/bin/* "${APP_DATA}/bin/" 2>/dev/null || true
+          rm -rf "${APP_DATA}"/mne-cpp*
+        fi
+
+        # Runtime — lib/
+        RT_DATA="${STAGING}/org.mnecpp.runtime/data"
+        mkdir -p "${RT_DATA}/lib"
+        tar xf "$RELEASE_ARCHIVE" -C "${RT_DATA}" --strip-components=0 \
+          --wildcards '*/lib/*' 2>/dev/null || true
+        if [ -d "${RT_DATA}/mne-cpp"* ] 2>/dev/null; then
+          mv "${RT_DATA}"/mne-cpp*/lib/* "${RT_DATA}/lib/" 2>/dev/null || true
+          rm -rf "${RT_DATA}"/mne-cpp*
+        fi
+
+        # SDK — include/ + lib/cmake/
+        SDK_DATA="${STAGING}/org.mnecpp.sdk/data"
+        mkdir -p "${SDK_DATA}"
+        tar xf "$RELEASE_ARCHIVE" -C "${SDK_DATA}" --strip-components=0 \
+          --wildcards '*/include/*' '*/lib/cmake/*' 2>/dev/null || true
+        if [ -d "${SDK_DATA}/mne-cpp"* ] 2>/dev/null; then
+          cp -r "${SDK_DATA}"/mne-cpp*/* "${SDK_DATA}/" 2>/dev/null || true
+          rm -rf "${SDK_DATA}"/mne-cpp*
+        fi
+
+        # Scripts (sample data / mne-python / path config)
+        for comp in org.mnecpp.sampledata org.mnecpp.mnepython org.mnecpp.pathconfig; do
+          mkdir -p "${STAGING}/${comp}/data/scripts"
+        done
+        cp tools/packaging/scripts/download_sample_data.sh  "${STAGING}/org.mnecpp.sampledata/data/scripts/"
+        cp tools/packaging/scripts/download_sample_data.bat  "${STAGING}/org.mnecpp.sampledata/data/scripts/"
+        cp tools/packaging/scripts/install_mne_python.sh     "${STAGING}/org.mnecpp.mnepython/data/scripts/"
+        cp tools/packaging/scripts/install_mne_python.bat    "${STAGING}/org.mnecpp.mnepython/data/scripts/"
+        cp tools/packaging/scripts/configure_environment.sh  "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
+        cp tools/packaging/scripts/configure_environment.bat "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
+
+        echo "Staged package layout:"
+        find tools/packaging/installer -type f | head -60
+
+    - name: Build installer with binarycreator
+      run: |
+        binarycreator \
+          --offline-only \
+          -c tools/packaging/installer/config/config.xml \
+          -p tools/packaging/installer/packages \
+          MNE-CPP-${{ env.MNE_CPP_VERSION }}-Linux.run
+
+        ls -lh MNE-CPP-*.run
+
+    - name: Deploy installer (stable release)
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        file: MNE-CPP-*-Linux.run
+        file_glob: true
+        asset_name: mne-cpp-${{ github.ref_name }}-linux-installer-x86_64.run
+        tag: ${{ github.ref }}
+        overwrite: true
+
+    - name: Deploy installer (dev release)
+      if: endsWith(github.ref, 'v2.0-dev') == true
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        file: MNE-CPP-*-Linux.run
+        file_glob: true
+        asset_name: mne-cpp-v2.0-dev-linux-installer-x86_64.run
+        tag: dev_build
+        overwrite: true
+
+  # =========================================================================
+  # macOS Installer  (.dmg)
+  # =========================================================================
+  MacOSInstaller:
+    runs-on: macos-26
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v3
+
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        architecture: 'arm64'
+
+    - name: Install Qt Installer Framework
+      run: |
+        pip install aqtinstall
+        aqt install-tool mac desktop tools_ifw ${{ env.QIF_TOOL_ID }} --outputdir $RUNNER_TOOL_CACHE/Qt
+        echo "$RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/${{ env.QIF_VERSION }}/bin" >> $GITHUB_PATH
+
+    - name: Determine release tag
+      id: tag
+      run: |
+        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "asset_prefix=mne-cpp-${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        else
+          echo "tag=dev_build" >> $GITHUB_OUTPUT
+          echo "asset_prefix=mne-cpp-v2.0-dev" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Download dynamic release from GitHub Releases
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      run: |
+        ASSET="${{ steps.tag.outputs.asset_prefix }}-macos-dynamic-x86_64.tar.gz"
+        echo "Downloading ${ASSET} from release ${{ steps.tag.outputs.tag }}..."
+        gh release download "${{ steps.tag.outputs.tag }}" -p "${ASSET}" -D /tmp
+        echo "RELEASE_ARCHIVE=/tmp/${ASSET}" >> $GITHUB_ENV
+
+    - name: Stage release into QIF package layout
+      run: |
+        STAGING="tools/packaging/installer/packages"
+
+        # Applications — bin/
+        APP_DATA="${STAGING}/org.mnecpp.applications/data"
+        mkdir -p "${APP_DATA}/bin"
+        tar xf "$RELEASE_ARCHIVE" -C "${APP_DATA}" --strip-components=0 \
+          --wildcards '*/bin/*' 2>/dev/null || true
+        if ls "${APP_DATA}"/mne-cpp*/bin/* 1>/dev/null 2>&1; then
+          mv "${APP_DATA}"/mne-cpp*/bin/* "${APP_DATA}/bin/" 2>/dev/null || true
+          rm -rf "${APP_DATA}"/mne-cpp*
+        fi
+
+        # Runtime — lib/
+        RT_DATA="${STAGING}/org.mnecpp.runtime/data"
+        mkdir -p "${RT_DATA}/lib"
+        tar xf "$RELEASE_ARCHIVE" -C "${RT_DATA}" --strip-components=0 \
+          --wildcards '*/lib/*' 2>/dev/null || true
+        if ls "${RT_DATA}"/mne-cpp*/lib/* 1>/dev/null 2>&1; then
+          mv "${RT_DATA}"/mne-cpp*/lib/* "${RT_DATA}/lib/" 2>/dev/null || true
+          rm -rf "${RT_DATA}"/mne-cpp*
+        fi
+
+        # SDK — include/ + lib/cmake/
+        SDK_DATA="${STAGING}/org.mnecpp.sdk/data"
+        mkdir -p "${SDK_DATA}"
+        tar xf "$RELEASE_ARCHIVE" -C "${SDK_DATA}" --strip-components=0 \
+          --wildcards '*/include/*' '*/lib/cmake/*' 2>/dev/null || true
+        if ls "${SDK_DATA}"/mne-cpp*/* 1>/dev/null 2>&1; then
+          cp -r "${SDK_DATA}"/mne-cpp*/* "${SDK_DATA}/" 2>/dev/null || true
+          rm -rf "${SDK_DATA}"/mne-cpp*
+        fi
+
+        # Scripts
+        for comp in org.mnecpp.sampledata org.mnecpp.mnepython org.mnecpp.pathconfig; do
+          mkdir -p "${STAGING}/${comp}/data/scripts"
+        done
+        cp tools/packaging/scripts/download_sample_data.sh  "${STAGING}/org.mnecpp.sampledata/data/scripts/"
+        cp tools/packaging/scripts/download_sample_data.bat  "${STAGING}/org.mnecpp.sampledata/data/scripts/"
+        cp tools/packaging/scripts/install_mne_python.sh     "${STAGING}/org.mnecpp.mnepython/data/scripts/"
+        cp tools/packaging/scripts/install_mne_python.bat    "${STAGING}/org.mnecpp.mnepython/data/scripts/"
+        cp tools/packaging/scripts/configure_environment.sh  "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
+        cp tools/packaging/scripts/configure_environment.bat "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
+
+    - name: Build installer with binarycreator
+      run: |
+        binarycreator \
+          --offline-only \
+          -c tools/packaging/installer/config/config.xml \
+          -p tools/packaging/installer/packages \
+          MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin
+
+        # Create DMG from the generated installer
+        if [ -f "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app" ] || [ -d "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app" ]; then
+          hdiutil create -volname "MNE-CPP Installer" -srcfolder "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app" -ov -format UDZO "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.dmg"
+        elif [ -f "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin" ]; then
+          mkdir -p dmg_staging
+          cp "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin" dmg_staging/
+          hdiutil create -volname "MNE-CPP Installer" -srcfolder dmg_staging -ov -format UDZO "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.dmg"
+        fi
+
+        ls -lh MNE-CPP-*-Darwin*
+
+    - name: Deploy installer (stable release)
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        file: MNE-CPP-*-Darwin.dmg
+        file_glob: true
+        asset_name: mne-cpp-${{ github.ref_name }}-macos-installer-x86_64.dmg
+        tag: ${{ github.ref }}
+        overwrite: true
+
+    - name: Deploy installer (dev release)
+      if: endsWith(github.ref, 'v2.0-dev') == true
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        file: MNE-CPP-*-Darwin.dmg
+        file_glob: true
+        asset_name: mne-cpp-v2.0-dev-macos-installer-x86_64.dmg
+        tag: dev_build
+        overwrite: true
+
+  # =========================================================================
+  # Windows Installer  (.exe)
+  # =========================================================================
+  WindowsInstaller:
+    runs-on: windows-2025
+
+    steps:
+    - name: Clone repository
+      uses: actions/checkout@v3
+
+    - name: Install Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        architecture: 'x64'
+
+    - name: Install Qt Installer Framework
+      run: |
+        pip install aqtinstall
+        aqt install-tool windows desktop tools_ifw ${{ env.QIF_TOOL_ID }} --outputdir $env:RUNNER_TOOL_CACHE/Qt
+        echo "$env:RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/${{ env.QIF_VERSION }}/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+
+    - name: Determine release tag
+      id: tag
+      shell: bash
+      run: |
+        if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+          echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+          echo "asset_prefix=mne-cpp-${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        else
+          echo "tag=dev_build" >> $GITHUB_OUTPUT
+          echo "asset_prefix=mne-cpp-v2.0-dev" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Download dynamic release from GitHub Releases
+      env:
+        GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+      shell: bash
+      run: |
+        ASSET="${{ steps.tag.outputs.asset_prefix }}-windows-dynamic-x86_64.zip"
+        echo "Downloading ${ASSET} from release ${{ steps.tag.outputs.tag }}..."
+        gh release download "${{ steps.tag.outputs.tag }}" -p "${ASSET}" -D "$RUNNER_TEMP"
+        echo "RELEASE_ARCHIVE=${RUNNER_TEMP}/${ASSET}" >> $GITHUB_ENV
+
+    - name: Stage release into QIF package layout
+      shell: bash
+      run: |
+        STAGING="tools/packaging/installer/packages"
+
+        # Extract the full archive to a temp location first
+        EXTRACT_DIR="$RUNNER_TEMP/mne-cpp-extracted"
+        mkdir -p "$EXTRACT_DIR"
+        7z x "$RELEASE_ARCHIVE" -o"$EXTRACT_DIR" -y
+
+        # Find the actual root (may be inside a subfolder)
+        CONTENT_DIR="$EXTRACT_DIR"
+        if [ -d "$EXTRACT_DIR"/mne-cpp* ]; then
+          CONTENT_DIR=$(ls -d "$EXTRACT_DIR"/mne-cpp* | head -1)
+        fi
+
+        # Applications — bin/
+        APP_DATA="${STAGING}/org.mnecpp.applications/data"
+        mkdir -p "${APP_DATA}/bin"
+        if [ -d "$CONTENT_DIR/bin" ]; then
+          cp -r "$CONTENT_DIR/bin/"* "${APP_DATA}/bin/" 2>/dev/null || true
+        fi
+
+        # Runtime — lib/ and bin/*.dll
+        RT_DATA="${STAGING}/org.mnecpp.runtime/data"
+        mkdir -p "${RT_DATA}/lib" "${RT_DATA}/bin"
+        if [ -d "$CONTENT_DIR/lib" ]; then
+          cp -r "$CONTENT_DIR/lib/"* "${RT_DATA}/lib/" 2>/dev/null || true
+        fi
+        # Copy DLLs to runtime bin/ (Windows needs DLLs alongside exes or on PATH)
+        find "$CONTENT_DIR/bin" -name "*.dll" -exec cp {} "${RT_DATA}/bin/" \; 2>/dev/null || true
+
+        # SDK — include/ + lib/cmake/
+        SDK_DATA="${STAGING}/org.mnecpp.sdk/data"
+        mkdir -p "${SDK_DATA}"
+        if [ -d "$CONTENT_DIR/include" ]; then
+          cp -r "$CONTENT_DIR/include" "${SDK_DATA}/" 2>/dev/null || true
+        fi
+        if [ -d "$CONTENT_DIR/lib/cmake" ]; then
+          mkdir -p "${SDK_DATA}/lib"
+          cp -r "$CONTENT_DIR/lib/cmake" "${SDK_DATA}/lib/" 2>/dev/null || true
+        fi
+
+        # Scripts
+        for comp in org.mnecpp.sampledata org.mnecpp.mnepython org.mnecpp.pathconfig; do
+          mkdir -p "${STAGING}/${comp}/data/scripts"
+        done
+        cp tools/packaging/scripts/download_sample_data.sh  "${STAGING}/org.mnecpp.sampledata/data/scripts/"
+        cp tools/packaging/scripts/download_sample_data.bat  "${STAGING}/org.mnecpp.sampledata/data/scripts/"
+        cp tools/packaging/scripts/install_mne_python.sh     "${STAGING}/org.mnecpp.mnepython/data/scripts/"
+        cp tools/packaging/scripts/install_mne_python.bat    "${STAGING}/org.mnecpp.mnepython/data/scripts/"
+        cp tools/packaging/scripts/configure_environment.sh  "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
+        cp tools/packaging/scripts/configure_environment.bat "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
+
+    - name: Build installer with binarycreator
+      run: |
+        binarycreator `
+          --offline-only `
+          -c tools/packaging/installer/config/config.xml `
+          -p tools/packaging/installer/packages `
+          MNE-CPP-${{ env.MNE_CPP_VERSION }}-win64.exe
+
+        Get-ChildItem MNE-CPP-*-win64.exe
+
+    - name: Deploy installer (stable release)
+      if: startsWith(github.ref, 'refs/tags/')
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        file: MNE-CPP-*-win64.exe
+        file_glob: true
+        asset_name: mne-cpp-${{ github.ref_name }}-windows-installer-x86_64.exe
+        tag: ${{ github.ref }}
+        overwrite: true
+
+    - name: Deploy installer (dev release)
+      if: endsWith(github.ref, 'v2.0-dev') == true
+      uses: svenstaro/upload-release-action@v2
+      with:
+        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+        file: MNE-CPP-*-win64.exe
+        file_glob: true
+        asset_name: mne-cpp-v2.0-dev-windows-installer-x86_64.exe
+        tag: dev_build
+        overwrite: true

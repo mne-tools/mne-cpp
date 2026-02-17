@@ -61,9 +61,9 @@ jobs:
         # Send the new tag
         git push origin dev_build -f
         
-        # Create new dev_build release
+        # Create new dev_build release (use --target to avoid tag propagation race)
         echo "Creating new dev_build release..."
-        gh release create dev_build --prerelease --title "Development Builds" --notes "Development Builds"
+        gh release create dev_build --prerelease --title "Development Builds" --notes "Development Builds" --target ${{ github.sha }}
         echo "Release created successfully."
 
   # Platform-specific build workflows (run in parallel)
@@ -80,6 +80,14 @@ jobs:
   Windows:
     needs: CreateRelease
     uses: ./.github/workflows/release-windows.yml
+    secrets: inherit
+
+  # Build installers AFTER all platform releases have been uploaded.
+  # Downloads the release archives from GitHub Releases and packages them
+  # with the Qt Installer Framework.
+  Installer:
+    needs: [Linux, MacOS, Windows]
+    uses: ./.github/workflows/release-installer.yml
     secrets: inherit
 
   # Cross-platform jobs (Tests are handled by testci.yml)

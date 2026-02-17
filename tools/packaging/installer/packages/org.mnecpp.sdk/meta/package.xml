@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>Development SDK</DisplayName>
+    <Description>C++ headers, static libraries, and CMake package configuration for building custom applications with MNE-CPP</Description>
+    <Version>2.0.0</Version>
+    <ReleaseDate>2026-02-17</ReleaseDate>
+    <Default>false</Default>
+    <SortingPriority>80</SortingPriority>
+</Package>

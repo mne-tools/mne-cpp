@@ -21,11 +21,6 @@ jobs:
         version: 6.10.2
         arch: win64_msvc2022_64
         modules: qtcharts qtshadertools
-    - name: Install Qt Installer Framework
-      run: |
-        pip install aqtinstall
-        aqt install-tool windows desktop tools_ifw qt.tools.ifw.47 --outputdir $env:RUNNER_TOOL_CACHE/Qt
-        echo "$env:RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/4.7/bin" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Configure and compile MNE-CPP
       run: |
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
@@ -52,33 +47,7 @@ jobs:
         asset_name: mne-cpp-v2.0-dev-windows-dynamic-x86_64.zip
         tag: dev_build
         overwrite: true
-    # Build installer reusing the same environment (saves full rebuild)
-    - name: Build installer
-      run: |
-        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
-        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        cmake -S . -B build_installer -DMNE_ENABLE_INSTALLER=ON -DCMAKE_BUILD_TYPE=Release
-        cmake --build build_installer --target package
-    - name: Deploy installer with stable release on Github
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        file: build_installer/MNE-CPP-*-win64.exe
-        file_glob: true
-        asset_name: mne-cpp-${{ github.ref_name }}-windows-installer-x86_64.exe
-        tag: ${{ github.ref }}
-        overwrite: true
-    - name: Deploy installer with dev release on Github
-      if: endsWith(github.ref, 'v2.0-dev') == true
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        file: build_installer/MNE-CPP-*-win64.exe
-        file_glob: true
-        asset_name: mne-cpp-v2.0-dev-windows-installer-x86_64.exe
-        tag: dev_build
-        overwrite: true
+
 
   WinStatic:
     runs-on: windows-2025

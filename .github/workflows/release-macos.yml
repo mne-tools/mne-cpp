@@ -20,11 +20,6 @@ jobs:
       with:
         version: 6.10.2
         modules: qtcharts qtshadertools
-    - name: Install Qt Installer Framework
-      run: |
-        pip install aqtinstall
-        aqt install-tool mac desktop tools_ifw qt.tools.ifw.47 --outputdir $RUNNER_TOOL_CACHE/Qt
-        echo "$RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/4.7/bin" >> $GITHUB_PATH
     - name: Configure and compile MNE-CPP
       run: |
         ./tools/build_project.bat
@@ -49,30 +44,7 @@ jobs:
         asset_name: mne-cpp-v2.0-dev-macos-dynamic-x86_64.tar.gz
         tag: dev_build
         overwrite: true
-    # Build installer reusing the same environment (saves full rebuild)
-    - name: Build installer
-      run: |
-        ./tools/build_installer.sh
-    - name: Deploy installer with stable release on Github
-      if: startsWith(github.ref, 'refs/tags/')
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        file: build_installer/MNE-CPP-*-Darwin.dmg
-        file_glob: true
-        asset_name: mne-cpp-${{ github.ref_name }}-macos-installer-x86_64.dmg
-        tag: ${{ github.ref }}
-        overwrite: true
-    - name: Deploy installer with dev release on Github
-      if: endsWith(github.ref, 'v2.0-dev') == true
-      uses: svenstaro/upload-release-action@v2
-      with:
-        repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        file: build_installer/MNE-CPP-*-Darwin.dmg
-        file_glob: true
-        asset_name: mne-cpp-v2.0-dev-macos-installer-x86_64.dmg
-        tag: dev_build
-        overwrite: true
+
 
   MacOSStatic:
     runs-on: macos-26

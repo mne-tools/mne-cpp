@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>MNE Sample Dataset</DisplayName>
+    <Description>Download the MNE sample dataset (~1.5 GB) for testing and tutorials. Sets the MNE_DATASETS_SAMPLE_PATH environment variable.</Description>
+    <Version>2.0.0</Version>
+    <ReleaseDate>2026-02-17</ReleaseDate>
+    <Default>false</Default>
+    <SortingPriority>60</SortingPriority>
+    <Script>installscript.qs</Script>
+</Package>
