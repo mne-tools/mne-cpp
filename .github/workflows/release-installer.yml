@@ -33,7 +33,17 @@ jobs:
     - name: Install Qt Installer Framework
       run: |
         sudo apt-get update -qq
-        sudo apt-get install -y -qq libxkbcommon-x11-0
+        sudo apt-get install -y -qq \
+          libxkbcommon-x11-0 \
+          libxcb-icccm4 \
+          libxcb-image0 \
+          libxcb-keysyms1 \
+          libxcb-randr0 \
+          libxcb-render-util0 \
+          libxcb-shape0 \
+          libxcb-xinerama0 \
+          libxcb-xkb1 \
+          libxcb-cursor0
         pip install aqtinstall
         aqt install-tool linux desktop tools_ifw ${{ env.QIF_TOOL_ID }} --outputdir $RUNNER_TOOL_CACHE/Qt
         echo "$RUNNER_TOOL_CACHE/Qt/Tools/QtInstallerFramework/${{ env.QIF_VERSION }}/bin" >> $GITHUB_PATH
