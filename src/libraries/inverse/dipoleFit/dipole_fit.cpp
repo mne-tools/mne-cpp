@@ -5,7 +5,7 @@
 #include "guess_data.h"
 
 #include <string.h>
-#include <QScopedPointer>
+#include <memory>
 
 using namespace INVERSELIB;
 using namespace MNELIB;
@@ -559,7 +559,7 @@ DipoleFit::DipoleFit(DipoleFitSettings* p_settings)
 //todo split in initFit where the settings are handed over and the actual fit
 ECDSet DipoleFit::calculateFit() const
 {
-    QScopedPointer<GuessData>guess (Q_NULLPTR);
+    std::unique_ptr<GuessData> guess;
     ECDSet              set;
     FwdEegSphereModel*  eeg_model = NULL;
     DipoleFitData*      fit_data = NULL;
@@ -663,18 +663,18 @@ ECDSet DipoleFit::calculateFit() const
     guess.reset(new GuessData( settings->guessname,
                                settings->guess_surfname,
                                settings->guess_mindist, settings->guess_exclude, settings->guess_grid, fit_data));
-    if (guess.isNull())
+    if (!guess)
         goto out;
 
     fprintf (stderr,"\n---- Fitting : %7.1f ... %7.1f ms (step: %6.1f ms integ: %6.1f ms)\n\n",
              1000*settings->tmin,1000*settings->tmax,1000*settings->tstep,1000*settings->integ);
 
     if (raw) {
-        if (fit_dipoles_raw(settings->measname,raw,sel,fit_data,guess.take(),settings->tmin,settings->tmax,settings->tstep,settings->integ,settings->verbose) == FAIL)
+        if (fit_dipoles_raw(settings->measname,raw,sel,fit_data,guess.release(),settings->tmin,settings->tmax,settings->tstep,settings->integ,settings->verbose) == FAIL)
             goto out;
     }
     else {
-        if (fit_dipoles(settings->measname,data,fit_data,guess.take(),settings->tmin,settings->tmax,settings->tstep,settings->integ,settings->verbose,set) == FAIL)
+        if (fit_dipoles(settings->measname,data,fit_data,guess.release(),settings->tmin,settings->tmax,settings->tstep,settings->integ,settings->verbose,set) == FAIL)
             goto out;
     }
     printf("%d dipoles fitted\n",set.size());

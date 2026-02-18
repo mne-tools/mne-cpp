@@ -83,10 +83,10 @@ FilterSettingsView::FilterSettingsView(const QString& sSettingsPath,
                                                    Q_NULLPTR,
                                                    Qt::Dialog);
 
-    connect(m_pFilterView.data(), &FilterDesignView::updateFilterFrom,[=](double dFrom){
+    connect(m_pFilterView.data(), &FilterDesignView::updateFilterFrom,[=, this](double dFrom){
                 m_pUi->m_pDoubleSpinBoxFrom->setValue(dFrom);
             });
-    connect(m_pFilterView.data(), &FilterDesignView::updateFilterTo,[=](double dTo){
+    connect(m_pFilterView.data(), &FilterDesignView::updateFilterTo,[=, this](double dTo){
                 m_pUi->m_pDoubleSpinBoxTo->setValue(dTo);
             });
 

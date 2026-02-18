@@ -264,7 +264,7 @@ void WriteToFile::initPluginControlWidgets()
         connect(pProjectSettingsView, &ProjectSettingsView::fileNameChanged,
                 this, &WriteToFile::onFileNameChanged);
 
-        connect(pProjectSettingsView, &ProjectSettingsView::fileNameChanged, [=]() {
+        connect(pProjectSettingsView, &ProjectSettingsView::fileNameChanged, [=, this]() {
             pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
         });
 
@@ -277,7 +277,7 @@ void WriteToFile::initPluginControlWidgets()
 
         if(!m_pUpdateTimeInfoTimer) {
             m_pUpdateTimeInfoTimer = QSharedPointer<QTimer>(new QTimer(this));
-            connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout, [=]() {
+            connect(m_pUpdateTimeInfoTimer.data(), &QTimer::timeout, [=, this]() {
                     pProjectSettingsView->setRecordingElapsedTime(m_recordingStartedTime.elapsed());
             });
         }
@@ -496,9 +496,9 @@ void WriteToFile::clipRecording(bool bChecked)
 
 //=============================================================================================================
 
-void WriteToFile::setContinuous(int iState)
+void WriteToFile::setContinuous(Qt::CheckState iState)
 {
-    m_bContinuous = iState;
+    m_bContinuous = (iState == Qt::Checked);
     m_pActionClipRecording->setVisible(m_bContinuous);
 }
 

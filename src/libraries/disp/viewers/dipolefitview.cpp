@@ -168,7 +168,7 @@ void DipoleFitView::initGui()
     m_pUi->comboBox_meas->addItem("None");
 
     //Perform Fit
-    connect(m_pUi->pushButton_fit, &QPushButton::clicked, [=] {
+    connect(m_pUi->pushButton_fit, &QPushButton::clicked, [=, this] {
             emit performDipoleFit(m_pUi->lineEdit_name->text());
             });
 
@@ -176,25 +176,25 @@ void DipoleFitView::initGui()
             this, &DipoleFitView::setChanged, Qt::UniqueConnection);
 
     //Time settings
-    connect(m_pUi->spinBox_tmin, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
+    connect(m_pUi->spinBox_tmin, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue){
                 emit timeChanged(iValue,
                                  m_pUi->spinBox_tmax->value(),
                                  m_pUi->spinBox_tstep->value(),
                                  m_pUi->spinBox_tint->value());
             });
-    connect(m_pUi->spinBox_tmax, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
+    connect(m_pUi->spinBox_tmax, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue){
                 emit timeChanged(m_pUi->spinBox_tmin->value(),
                                  iValue,
                                  m_pUi->spinBox_tstep->value(),
                                  m_pUi->spinBox_tint->value());
             });
-    connect(m_pUi->spinBox_tstep, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
+    connect(m_pUi->spinBox_tstep, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue){
                 emit timeChanged(m_pUi->spinBox_tmin->value(),
                                  m_pUi->spinBox_tmax->value(),
                                  iValue,
                                  m_pUi->spinBox_tint->value());
             });
-    connect(m_pUi->spinBox_tint, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
+    connect(m_pUi->spinBox_tint, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue){
                 emit timeChanged(m_pUi->spinBox_tmin->value(),
                                  m_pUi->spinBox_tmax->value(),
                                  m_pUi->spinBox_tstep->value(),
@@ -202,7 +202,7 @@ void DipoleFitView::initGui()
             });
 
     //Baseline
-    connect(m_pUi->spinBox_bmin, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
+    connect(m_pUi->spinBox_bmin, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue){
                 if (iValue != m_pUi->spinBox_bmax->value()){
                     emit baselineChanged(iValue,
                                          m_pUi->spinBox_bmax->value());
@@ -210,7 +210,7 @@ void DipoleFitView::initGui()
                     emit baselineChanged(1e6, 1e6);
                 }
             });
-    connect(m_pUi->spinBox_bmax, QOverload<int>::of(&QSpinBox::valueChanged), [=](int iValue){
+    connect(m_pUi->spinBox_bmax, QOverload<int>::of(&QSpinBox::valueChanged), [=, this](int iValue){
                 if (iValue != m_pUi->spinBox_bmin->value()){
                     emit baselineChanged(m_pUi->spinBox_bmin->value(),
                                          iValue);
@@ -220,77 +220,77 @@ void DipoleFitView::initGui()
             });
 
     //Modality
-    connect(m_pUi->checkBox_EEG, &QCheckBox::toggled, [=](bool bChecked){
+    connect(m_pUi->checkBox_EEG, &QCheckBox::toggled, [=, this](bool bChecked){
                 emit modalityChanged(bChecked, m_pUi->checkBox_MEG->isChecked());
             });
-    connect(m_pUi->checkBox_MEG, &QCheckBox::toggled, [=](bool bChecked){
+    connect(m_pUi->checkBox_MEG, &QCheckBox::toggled, [=, this](bool bChecked){
                 emit modalityChanged(m_pUi->checkBox_EEG->isChecked(), bChecked);
             });
 
     //Fittings
-    connect(m_pUi->doubleSpinBox_dist, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+    connect(m_pUi->doubleSpinBox_dist, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
                 emit fittingChanged(dValue,
                                     m_pUi->doubleSpinBox_grid->value());
             });
-    connect(m_pUi->doubleSpinBox_grid, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+    connect(m_pUi->doubleSpinBox_grid, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
                 emit fittingChanged(m_pUi->doubleSpinBox_dist->value(),
                                     dValue);
             });
 
     //Noise
-    connect(m_pUi->doubleSpinBox_gradnoise, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+    connect(m_pUi->doubleSpinBox_gradnoise, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
                 emit noiseChanged(dValue,
                                   m_pUi->doubleSpinBox_magnoise->value(),
                                   m_pUi->doubleSpinBox_eegnoise->value());
             });
-    connect(m_pUi->doubleSpinBox_magnoise, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+    connect(m_pUi->doubleSpinBox_magnoise, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
                 emit noiseChanged(m_pUi->doubleSpinBox_gradnoise->value(),
                                   dValue,
                                   m_pUi->doubleSpinBox_eegnoise->value());
             });
-    connect(m_pUi->doubleSpinBox_eegnoise, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+    connect(m_pUi->doubleSpinBox_eegnoise, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
                 emit noiseChanged(m_pUi->doubleSpinBox_gradnoise->value(),
                                   m_pUi->doubleSpinBox_magnoise->value(),
                                   dValue);
             });
 
     //Reg
-    connect(m_pUi->doubleSpinBox_gradreg, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+    connect(m_pUi->doubleSpinBox_gradreg, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
                 emit regChanged(dValue,
                                 m_pUi->doubleSpinBox_magreg->value(),
                                 m_pUi->doubleSpinBox_eegreg->value());
             });
-    connect(m_pUi->doubleSpinBox_magreg, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+    connect(m_pUi->doubleSpinBox_magreg, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
                 emit regChanged(m_pUi->doubleSpinBox_gradreg->value(),
                                 dValue,
                                 m_pUi->doubleSpinBox_eegreg->value());
             });
-    connect(m_pUi->doubleSpinBox_eegreg, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+    connect(m_pUi->doubleSpinBox_eegreg, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
                 emit regChanged(m_pUi->doubleSpinBox_gradreg->value(),
                                 m_pUi->doubleSpinBox_magreg->value(),
                                 dValue);
             });
 
     //Sphere model
-    connect(m_pUi->doubleSpinBox_orgx, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+    connect(m_pUi->doubleSpinBox_orgx, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
                 emit sphereChanged(dValue,
                                    m_pUi->doubleSpinBox_orgy->value(),
                                    m_pUi->doubleSpinBox_orgz->value(),
                                    m_pUi->doubleSpinBox_rad->value());
             });
-    connect(m_pUi->doubleSpinBox_orgy, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+    connect(m_pUi->doubleSpinBox_orgy, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
                 emit sphereChanged(m_pUi->doubleSpinBox_orgx->value(),
                                    dValue,
                                    m_pUi->doubleSpinBox_orgz->value(),
                                    m_pUi->doubleSpinBox_rad->value());
             });
-    connect(m_pUi->doubleSpinBox_orgz, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+    connect(m_pUi->doubleSpinBox_orgz, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
                 emit sphereChanged(m_pUi->doubleSpinBox_orgx->value(),
                                    m_pUi->doubleSpinBox_orgy->value(),
                                    dValue,
                                    m_pUi->doubleSpinBox_rad->value());
             });
-    connect(m_pUi->doubleSpinBox_rad, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double dValue){
+    connect(m_pUi->doubleSpinBox_rad, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=, this](double dValue){
                 emit sphereChanged(m_pUi->doubleSpinBox_orgx->value(),
                                    m_pUi->doubleSpinBox_orgy->value(),
                                    m_pUi->doubleSpinBox_orgz->value(),
@@ -304,7 +304,7 @@ void DipoleFitView::initGui()
             this, &DipoleFitView::selectedNoise, Qt::UniqueConnection);
     connect(m_pUi->comboBox_mri, &QComboBox::currentTextChanged,
             this, &DipoleFitView::selectedMri, Qt::UniqueConnection);
-    connect(m_pUi->comboBox_meas, &QComboBox::currentTextChanged, [=](const QString& sFileName){
+    connect(m_pUi->comboBox_meas, &QComboBox::currentTextChanged, [=, this](const QString& sFileName){
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
             auto skip = QString::SkipEmptyParts;
 #else

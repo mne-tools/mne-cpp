@@ -783,10 +783,16 @@ public:
     /**
      * This nested class enables the range-based looping.
      */
-    class ChannelIterator : public std::iterator<std::random_access_iterator_tag, const double>
+    class ChannelIterator
     {
 
     public:
+        using iterator_category = std::random_access_iterator_tag;
+        using value_type = const double;
+        using difference_type = std::ptrdiff_t;
+        using pointer = const double*;
+        using reference = const double&;
+
         const ChannelData* cd;  /**< Pointer to the associated ChannelData container. */
         // Remember at which point we are currently (this is NOT the absolute sample number,
         // but the index relative to all stored samples in the associated ChannelData container):
@@ -798,8 +804,7 @@ public:
 
     public:
         ChannelIterator(const ChannelData* cd, qint32 index)
-        : std::iterator<std::random_access_iterator_tag, const double>()
-        , cd(cd)
+        : cd(cd)
         , currentIndex(index)
         , currentBlockToAccess(cd->m_lData.begin())
         , currentRelativeIndex(0)

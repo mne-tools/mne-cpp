@@ -174,7 +174,7 @@ public:
      *
      * @param[in] l Set the link between MAGs and GRADs active or inactive.
      */
-    void setMagGradLink(int l);
+    void setMagGradLink(Qt::CheckState l);
 
 signals:
     //=========================================================================================================

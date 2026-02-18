@@ -520,7 +520,7 @@ void MainWindow::createActions()
     m_pActionDefaultMode->setChecked(true);
     m_pActionStyleGroup->addAction(m_pActionDefaultMode);
     connect(m_pActionDefaultMode, &QAction::triggered,
-        [=]() {
+        [=, this]() {
         onStyleChanged("default");
     });
 
@@ -530,7 +530,7 @@ void MainWindow::createActions()
     m_pActionDarkMode->setChecked(false);
     m_pActionStyleGroup->addAction(m_pActionDarkMode);
     connect(m_pActionDarkMode, &QAction::triggered,
-        [=]() {
+        [=, this]() {
         onStyleChanged("dark");
     });
 

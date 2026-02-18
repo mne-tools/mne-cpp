@@ -45,8 +45,6 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QtCharts/QChart>
-#include <QtCharts/QSplineSeries>
 #include <QVector3D>
 
 //=============================================================================================================
@@ -61,15 +59,6 @@
 
 class QMouseEvent;
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-namespace QtCharts{
-    class QLineSeries;
-}
-#else
-class QLineSeries;
-#endif
-
-
 //=============================================================================================================
 // DEFINE NAMESPACE DISPLIB
 //=============================================================================================================
@@ -82,9 +71,9 @@ namespace DISPLIB
 //=============================================================================================================
 
 //=============================================================================================================
-/** Histogram display using Qtcharts/QSpline
+/** Histogram display using QPainter with spline interpolation
  *
- * @brief Spline class for histogram display using Qtcharts/QSpline
+ * @brief Spline class for histogram display using QPainter
  */
 class DISPSHARED_EXPORT Spline: public QWidget
 {
@@ -97,14 +86,14 @@ public:
     //=========================================================================================================
     /**
      * The constructor for Spline
-     * @param[in] title     string to specify the title displayed on the histogram, defaults to "Spline Histogram".
      * @param[in] parent    sets the behaviour of Spline as an object, defaults to no parent QWidget.
+     * @param[in] title     string to specify the title displayed on the histogram, defaults to "Spline Histogram".
      */
-    Spline(QWidget* parent = 0, const QString& title = "Spline Histogram");
+    Spline(QWidget* parent = nullptr, const QString& title = "Spline Histogram");
 
     //=========================================================================================================
     /**
-     * creates a qspline chart histogram from 2 vectors: class limits and class frequency
+     * creates a spline histogram from 2 vectors: class limits and class frequency
      *
      * @param[in] matClassLimitData      vector input filled with class limits.
      * @param[in] matClassFrequencyData  vector input filled with class frequency to the corresponding class.
@@ -133,16 +122,17 @@ public:
      *
      * @param[in] event      mouse press input.
      */
-    void mousePressEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent *event) override;
 
     //=========================================================================================================
     /**
-     * splitCoefficientAndExponent takes in QVector value of coefficient and exponent (example: 1.2e-10) and finds the coefficient (1.2) and the appropriate exponent (-12), normalize the exponents to either the lowest or highest exponent in the list then places the values in two separate QVectors
+     * splitCoefficientAndExponent takes in QVector value of coefficient and exponent
+     * and normalizes them.
      *
-     * @param[in] matClassLimitData      vector input filled with values of class limits (in coefficient and exponent form).
-     * @param[in] iClassCount            user input to determine the amount of classes in the histogram.
+     * @param[in] matClassLimitData      vector input filled with values of class limits.
+     * @param[in] iClassAmount           amount of classes in the histogram.
      * @param[out] vecCoefficientResults  vector filled with values of coefficient only.
-     * @param[out] vecExponentResults     vector filled with values of exponent only.
+     * @param[out] vecExponentValues      vector filled with values of exponent only.
      */
     template<typename T>
     void splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
@@ -152,38 +142,38 @@ public:
 
     //=========================================================================================================
     /**
-     * setThreshold takes in QVector value from outside sources and create the corresponding lines in the histogram
+     * setThreshold takes in QVector3D value and creates the corresponding lines in the histogram
      *
-     * @param[in] vecThresholdValues      QVector3D consisting of 3 values corresponding to the x-axis value of the threshold lines.
+     * @param[in] vecThresholdValues      QVector3D consisting of 3 values corresponding to the threshold lines.
      */
     void setThreshold(const QVector3D& vecThresholdValues);
 
     //=========================================================================================================
     /**
-     * getThreshold takes in QVector value from outside sources and create the corresponding lines in the histogram
+     * getThreshold retrieves the current threshold values
      *
-     * @return      returns QList consisting of QVector3D corresponding to the x-axis value of the threshold lines.
+     * @return      returns QVector3D corresponding to the x-axis value of the threshold lines.
      */
     const QVector3D& getThreshold();
 
     //=========================================================================================================
     /**
-     * correctionDisplayTrueValue takes in QVector value from outside sources and create the necessary adjustment of exponential multiplication with base 10
+     * correctionDisplayTrueValue creates necessary adjustment of exponential multiplication with base 10
      *
      * @param[in] vecOriginalValues     QVector3D consisting of 3 original values.
-     * @param[in] functionName          Choice between getThreshold or setThreshold.
+     * @param[in] upOrDown              Choice between "up" or "down" conversion direction.
      * @return     returns QVector3D after necessary adjustment.
      */
     QVector3D correctionDisplayTrueValue(QVector3D vecOriginalValues,
-                                         QString functionName);
+                                         QString upOrDown);
 
     //=========================================================================================================
     /**
-     * updateColorMap takes in string name of color map and the three threshold lines and creates the color gradient
+     * setColorMap sets the color mapping on the histogram background
      *
      * @param[in] colorMap  qstring of the color gradient from user input.
      */
-    void setColorMap (const QString &colorMap);
+    void setColorMap(const QString &colorMap);
 
     Eigen::VectorXi m_vecResultExponentValues; /**< Common exponent values for the entire histogram*/
     double          m_dMinAxisX;               /**< Display value of the smallest point of the series in x-axis. */
@@ -192,39 +182,72 @@ public:
 protected:
     //=========================================================================================================
     /**
-     * updateThreshold takes in string name of threshold and its corresponding Qlineseries and creates the line in the QChart
+     * Paints the spline chart.
      *
-     * @param[in] cThresholdName    name of the Line.
-     * @param[in] lineSeries        qlineseries of the corresponding threshold line.
+     * @param[in] event  The paint event.
      */
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    void updateThreshold (QtCharts::QLineSeries *lineSeries);
-    QtCharts::QChart*               m_pChart;            /**< Qchart object that will be shown in the widget. */
-    QtCharts::QSplineSeries*        m_pSeries;           /**< Spline data series that will contain the histogram data*/
-    QtCharts::QLineSeries*          m_pLeftThreshold;    /**< Vertical line series for the left threshold. */
-    QtCharts::QLineSeries*          m_pMiddleThreshold;  /**< Vertical line series for the middle threshold. */
-    QtCharts::QLineSeries*          m_pRightThreshold;   /**< Vertical line series for the right threshold. */
-#else
-    void updateThreshold (QLineSeries *lineSeries);
-    QChart*                  m_pChart;            /**< Qchart object that will be shown in the widget. */
-    QSplineSeries*           m_pSeries;           /**< Spline data series that will contain the histogram data*/
-    QLineSeries*             m_pLeftThreshold;    /**< Vertical line series for the left threshold. */
-    QLineSeries*             m_pMiddleThreshold;  /**< Vertical line series for the middle threshold. */
-    QLineSeries*             m_pRightThreshold;   /**< Vertical line series for the right threshold. */
-#endif
-    int                      m_iMaximumFrequency; /**< Highest value of frequency (y-axis). */
-    QList<QVector3D>         m_pReturnList;       /**< QList consisting of 2 QVector3D used in getThreshold function*/
-    QString                  m_colorMap;          /**< QString that will be used to set the color mapping on the histogram*/
-    QVector3D                m_vecReturnVector;   /**< QVector3D after correction with correctionDisplayTrueValue function*/
+    void paintEvent(QPaintEvent *event) override;
+
+    //=========================================================================================================
+    /**
+     * Converts data X coordinate to pixel X coordinate.
+     */
+    double dataToPixelX(double dataX) const;
+
+    //=========================================================================================================
+    /**
+     * Converts data Y coordinate to pixel Y coordinate.
+     */
+    double dataToPixelY(double dataY) const;
+
+    //=========================================================================================================
+    /**
+     * Converts pixel X coordinate to data X coordinate.
+     */
+    double pixelToDataX(double pixelX) const;
+
+    //=========================================================================================================
+    /**
+     * Returns the left margin in pixels.
+     */
+    int leftMargin() const { return 60; }
+
+    //=========================================================================================================
+    /**
+     * Returns the right margin in pixels.
+     */
+    int rightMargin() const { return 20; }
+
+    //=========================================================================================================
+    /**
+     * Returns the top margin in pixels.
+     */
+    int topMargin() const { return 30; }
+
+    //=========================================================================================================
+    /**
+     * Returns the bottom margin in pixels.
+     */
+    int bottomMargin() const { return 40; }
+
+    QList<QPointF>  m_seriesData;           /**< Spline data points (classMark, frequency). */
+    double          m_dLeftThreshold;       /**< X-axis value of the left threshold line. */
+    double          m_dMiddleThreshold;     /**< X-axis value of the middle threshold line. */
+    double          m_dRightThreshold;      /**< X-axis value of the right threshold line. */
+    bool            m_bHasData;             /**< Whether data has been loaded. */
+    bool            m_bHasThresholds;       /**< Whether thresholds have been set. */
+    int             m_iMaximumFrequency;    /**< Highest value of frequency (y-axis). */
+    QString         m_colorMap;             /**< Color map name for background gradient. */
+    QVector3D       m_vecReturnVector;      /**< Cached return value for getThreshold. */
 
 signals:
     //=========================================================================================================
     /**
      * emit signal consisting of three threshold lines x-axis value if any one of them is changed
      *
-     * @param[out]  leftThreshold      value of the left threshold line (initialized as minAxisX).
-     * @param[out]  middleThreshold    value of the middle threshold line (initialized as maxAxisX).
-     * @param[out]  rightThreshold     value of the right threshold line (initialized as maxAxisX).
+     * @param[out]  leftThreshold      value of the left threshold line.
+     * @param[out]  middleThreshold    value of the middle threshold line.
+     * @param[out]  rightThreshold     value of the right threshold line.
      */
     void borderChanged(double leftThreshold, double middleThreshold, double rightThreshold);
 };
@@ -261,59 +284,37 @@ void Spline::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& 
 {
     Eigen::VectorXd resultDisplayValues;
     int iClassAmount = matClassFrequencyData.rows();
-    this->splitCoefficientAndExponent (matClassLimitData, iClassAmount, resultDisplayValues, m_vecResultExponentValues);
-
-    //  Start of Qtchart histogram display
-    QString histogramExponent;
-    histogramExponent = "X-axis scale: 10e" + QString::number(m_vecResultExponentValues(0));   //used to tell the user the exponential scale used in the histogram
-    m_pSeries->setName(histogramExponent);
-    m_pSeries->clear();
-    m_pChart->removeSeries(m_pSeries);
-    m_pChart->removeSeries(m_pLeftThreshold);              //create new series and then clear the plot and update with new data
-    m_pChart->removeSeries(m_pMiddleThreshold);
-    m_pChart->removeSeries(m_pRightThreshold);
+    this->splitCoefficientAndExponent(matClassLimitData, iClassAmount, resultDisplayValues, m_vecResultExponentValues);
 
     m_dMinAxisX = resultDisplayValues(0);
     m_dMaxAxisX = resultDisplayValues(iClassAmount);
-    double classMark;                         //class mark is the middle point between lower and upper class limit
-    m_iMaximumFrequency = 0;                    //iMaximumFrequency used to create an intuitive histogram
+
+    m_seriesData.clear();
+    m_iMaximumFrequency = 0;
 
     for (int ir = 0; ir < iClassAmount; ++ir)
     {
-        classMark = (resultDisplayValues(ir) + resultDisplayValues(ir+1))/2 ;
-        m_pSeries->append(classMark, matClassFrequencyData(ir));
-        //std::cout << "Spline data points = " << classMark << ", " << matClassFrequencyData(ir) << std::endl;
+        double classMark = (resultDisplayValues(ir) + resultDisplayValues(ir + 1)) / 2.0;
+        m_seriesData.append(QPointF(classMark, matClassFrequencyData(ir)));
         if (matClassFrequencyData(ir) > m_iMaximumFrequency)
         {
             m_iMaximumFrequency = matClassFrequencyData(ir);
         }
     }
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    m_pLeftThreshold = new QtCharts::QLineSeries();
-    m_pMiddleThreshold = new QtCharts::QLineSeries();
-    m_pRightThreshold = new QtCharts::QLineSeries();
-#else
-    m_pLeftThreshold = new QLineSeries();
-    m_pMiddleThreshold = new QLineSeries();
-    m_pRightThreshold = new QLineSeries();
-#endif
+    m_bHasData = true;
+    m_dLeftThreshold = m_dMinAxisX;
+    m_dMiddleThreshold = m_dMaxAxisX;
+    m_dRightThreshold = m_dMaxAxisX;
+    m_bHasThresholds = false;
 
-    m_pLeftThreshold->setName("left");
-    m_pMiddleThreshold->setName("middle");
-    m_pRightThreshold->setName("right");
-
-    m_pChart->addSeries(m_pSeries);
-    m_pChart->legend()->setVisible(true);
-    m_pChart->legend()->setAlignment(Qt::AlignBottom);
-    m_pChart->createDefaultAxes();
-    m_pChart->axisX()->setRange(m_dMinAxisX, m_dMaxAxisX);
+    QWidget::update();
 }
 
 //=============================================================================================================
 
 template <typename T>
-void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
+void Spline::splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
                                           int iClassAmount,
                                           Eigen::VectorXd& vecCoefficientResults,
                                           Eigen::VectorXi& vecExponentValues)
@@ -327,20 +328,19 @@ void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic,
     for (int ir = 0; ir <= iClassAmount; ++ir)
     {
         originalValue = matClassLimitData(ir);
-        if (originalValue == 0.0)                          //mechanism to guard against evaluation of log(0.0) which is infinity
+        if (originalValue == 0.0)
         {
             doubleExponentValue = 0.0;
         }
-
         else
         {
-            doubleExponentValue = log10(std::fabs(originalValue));                    //return the exponent value in double
+            doubleExponentValue = log10(std::fabs(originalValue));
         }
 
-        limitExponentValue = round(doubleExponentValue);                        //round the exponent value to the nearest signed integer
-        limitDisplayValue = originalValue * (pow(10,-(limitExponentValue)));    //display value is derived from multiplying class limit with inverse 10 to the power of negative exponent
-        vecCoefficientResults(ir) = limitDisplayValue;                          //append the display value to the return vector
-        vecExponentValues(ir) = limitExponentValue;                             //append the exponent value to the return vector
+        limitExponentValue = round(doubleExponentValue);
+        limitDisplayValue = originalValue * (pow(10, -(limitExponentValue)));
+        vecCoefficientResults(ir) = limitDisplayValue;
+        vecExponentValues(ir) = limitExponentValue;
     }
 
     int lowestExponentValue{0},
@@ -350,9 +350,9 @@ void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic,
     {
         if (vecExponentValues(ir) < lowestExponentValue)
         {
-            lowestExponentValue = vecExponentValues(ir);        //find lowest exponent value to normalize display values for negative exponent
+            lowestExponentValue = vecExponentValues(ir);
         }
-        if (vecExponentValues(ir) > highestExponentValue)       //find highest exponent value to normalize display values for positive exponent
+        if (vecExponentValues(ir) > highestExponentValue)
         {
             highestExponentValue = vecExponentValues(ir);
         }
@@ -362,7 +362,7 @@ void Spline::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic,
     {
         for (int ir = 0; ir <= iClassAmount; ++ir)
         {
-            while (vecExponentValues(ir) < highestExponentValue)     //normalize the values by multiplying the display value by 10 and reducing the exponentValue by 1 until exponentValue reach the lowestExponentValue
+            while (vecExponentValues(ir) < highestExponentValue)
             {
                 vecCoefficientResults(ir) = vecCoefficientResults(ir) / 10;
                 vecExponentValues(ir)++;

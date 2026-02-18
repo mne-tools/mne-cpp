@@ -164,7 +164,7 @@ protected:
     /**
      * Slot called when modality check boxes were changed
      */
-    void onUpdateModalityCheckbox(qint32 state);
+    void onUpdateModalityCheckbox(Qt::CheckState state);
 
     QMap<QString, bool>                 m_modalityMap;                  /**< Map of different modalities. */
     QList<QCheckBox*>                   m_qListModalityCheckBox;        /**< List of modality checkboxes. */

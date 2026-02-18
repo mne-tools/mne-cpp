@@ -49,6 +49,7 @@
 
 #include <QStack>
 #include <QFileInfo>
+#include <QTimeZone>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -78,7 +79,7 @@ FiffAnonymizer::FiffAnonymizer()
 , m_dMaxValidFiffVerion(1.3)
 , m_sDefaultString("mne_anonymize")
 , m_sDefaultShortString("mne-cpp")
-, m_dDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0), Qt::LocalTime))
+, m_dDefaultDate(QDateTime(QDate(2000,1,1), QTime(1, 1, 0)))
 , m_dMeasurementDate(m_dDefaultDate)
 , m_iMeasurementDateOffset(0)
 , m_bUseMeasurementDateOffset(false)
@@ -264,7 +265,7 @@ void FiffAnonymizer::censorTag()
     case FIFF_REF_BLOCK_ID:
     {
         FIFFLIB::FiffId inId = m_pTag->toFiffID();
-        QDateTime inMeasDate = QDateTime::fromSecsSinceEpoch(inId.time.secs, Qt::LocalTime);
+        QDateTime inMeasDate = QDateTime::fromSecsSinceEpoch(inId.time.secs, QTimeZone::LocalTime);
         emit readingIdMeasurementDate(inMeasDate);
 
         QDateTime outMeasDate;
@@ -298,7 +299,7 @@ void FiffAnonymizer::censorTag()
     }
     case FIFF_MEAS_DATE:
     {
-        QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*m_pTag->toInt(), Qt::LocalTime));
+        QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*m_pTag->toInt(), QTimeZone::LocalTime));
         emit readingFileMeasurementDate(inMeasDate);
         QDateTime outMeasDate;
 

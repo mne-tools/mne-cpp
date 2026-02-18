@@ -6,7 +6,7 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Concurrent Widgets Svg Charts)
+set(QT_REQUIRED_COMPONENTS Core Concurrent Widgets Svg)
 
 if(NOT WASM)
   list(APPEND QT_REQUIRED_COMPONENTS OpenGL)

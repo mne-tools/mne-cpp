@@ -84,7 +84,7 @@ void DataMarker::setMovementBoundary(QRegion rect)
 void DataMarker::mousePressEvent(QMouseEvent *event)
 {
     if(event->buttons() == Qt::LeftButton)
-        m_oldPos = event->globalPos();
+        m_oldPos = event->globalPosition().toPoint();
 }
 
 
@@ -93,7 +93,7 @@ void DataMarker::mousePressEvent(QMouseEvent *event)
 void DataMarker::mouseMoveEvent(QMouseEvent *event)
 {
     if(event->buttons() == Qt::LeftButton) {
-        const QPoint delta = event->globalPos() - m_oldPos;
+        const QPoint delta = event->globalPosition().toPoint() - m_oldPos;
 
         QRect newPosition(x()+delta.x(), y(),
                           this->geometry().width(), this->geometry().height());
@@ -101,13 +101,13 @@ void DataMarker::mouseMoveEvent(QMouseEvent *event)
         //Check if new position is inside the boundary
         if(m_movableRegion.contains(newPosition.bottomLeft()) && m_movableRegion.contains(newPosition.bottomRight())) {
             move(x()+delta.x(), y());
-            m_oldPos = event->globalPos();
+            m_oldPos = event->globalPosition().toPoint();
         }
 
-        if(event->windowPos().x() < m_movableRegion.boundingRect().left())
+        if(event->scenePosition().x() < m_movableRegion.boundingRect().left())
             move(m_movableRegion.boundingRect().left(), y());
 
-        if(event->windowPos().x() > m_movableRegion.boundingRect().right())
+        if(event->scenePosition().x() > m_movableRegion.boundingRect().right())
             move(m_movableRegion.boundingRect().right()-2, y());
 
 //        qDebug()<<"globalPos"<<event->globalPos().x()<<event->globalPos().y();

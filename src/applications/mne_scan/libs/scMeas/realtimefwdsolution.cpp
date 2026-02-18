@@ -57,7 +57,7 @@ using namespace MNELIB;
 //=============================================================================================================
 
 RealTimeFwdSolution::RealTimeFwdSolution(QObject *parent)
-: Measurement(QMetaType::type("RealTimeFwdSolution::SPtr"), parent)
+: Measurement(QMetaType::fromName("RealTimeFwdSolution::SPtr").id(), parent)
 , m_bInitialized(false)
 , m_bClustered(false)
 , m_pFwdSolution(QSharedPointer<MNEForwardSolution>(new MNEForwardSolution))

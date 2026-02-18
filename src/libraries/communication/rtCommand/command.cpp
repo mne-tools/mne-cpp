@@ -48,10 +48,10 @@ Command::Command(const QString &p_sCommand, const QJsonObject &p_qCommandDescrip
     for(it = t_jsonObjectParameter.begin(); it != t_jsonObjectParameter.end(); ++it)
     {
         QJsonValue t_jsonValueType = it.value().toObject().value(QString("type"));
-        QVariant::Type t_type = QVariant::nameToType(t_jsonValueType.toString().toUtf8().constData());
+        QMetaType t_metaType = QMetaType::fromName(t_jsonValueType.toString().toUtf8().constData());
 
         this->m_qListParamNames.push_back(it.key());
-        this->m_qListParamValues.push_back(QVariant(t_type));
+        this->m_qListParamValues.push_back(QVariant(t_metaType));
         this->m_qListParamDescriptions.push_back(it.value().toObject().value(QString("description")).toString());
     }
 }

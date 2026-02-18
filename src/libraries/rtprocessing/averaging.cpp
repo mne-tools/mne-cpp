@@ -43,6 +43,8 @@
 
 #include <mne/mne_epoch_data_list.h>
 
+#include <memory>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -147,7 +149,7 @@ FiffEvoked RTPROCESSINGLIB::computeFilteredAverage(const FiffRawData& raw,
     MatrixXd timesDummy;
     MatrixXd times;
 
-    QScopedPointer<MNEEpochData> epoch(Q_NULLPTR);
+    std::unique_ptr<MNEEpochData> epoch;
     int iFilterDelay = filterKernel.getFilterOrder()/2;
 
     for (p = 0; p < count; ++p) {
@@ -156,7 +158,7 @@ FiffEvoked RTPROCESSINGLIB::computeFilteredAverage(const FiffRawData& raw,
         from = event_samp + fTMinS*raw.info.sfreq;
         to   = event_samp + floor(fTMaxS*raw.info.sfreq + 0.5);
 
-        epoch.reset(new MNEEpochData());
+        epoch = std::make_unique<MNEEpochData>();
 
         if(raw.read_raw_segment(epoch->epoch, timesDummy, from - iFilterDelay, to + iFilterDelay, picksNew)) {
             // Filter the data
@@ -184,10 +186,10 @@ FiffEvoked RTPROCESSINGLIB::computeFilteredAverage(const FiffRawData& raw,
             //Check if data block has the same size as the previous one
             if(!lstEpochDataList.isEmpty()) {
                 if(epoch->epoch.size() == lstEpochDataList.last()->epoch.size()) {
-                    lstEpochDataList.append(MNEEpochData::SPtr(epoch.take()));//List takes ownwership of the pointer - no delete need
+                    lstEpochDataList.append(MNEEpochData::SPtr(epoch.release()));//List takes ownwership of the pointer - no delete need
                 }
             } else {
-                lstEpochDataList.append(MNEEpochData::SPtr(epoch.take()));//List takes ownwership of the pointer - no delete need
+                lstEpochDataList.append(MNEEpochData::SPtr(epoch.release()));//List takes ownwership of the pointer - no delete need
             }
         } else {
             qWarning("[MNEEpochDataList::readEpochs] Can't read the event data segments.");

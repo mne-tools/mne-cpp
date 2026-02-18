@@ -713,7 +713,7 @@ void CoRegistration::getParamFromTrans(const Matrix4f& matTrans,
         matRot.col(i) = matRot.col(i) / vecScale(i);
     }
     // get rotation in rad - z,y,x
-    vecRot = matRot.eulerAngles(2,1,0);
+    vecRot = matRot.canonicalEulerAngles(2,1,0);
 
     // get translation vector
     vecTrans = m_transHeadMri.trans.block(0,3,3,1);

@@ -456,11 +456,11 @@ void ScalingView::drawScalingGUI()
 
 //=============================================================================================================
 
-void ScalingView::setMagGradLink(int l)
+void ScalingView::setMagGradLink(Qt::CheckState l)
 {
     if(m_qMapScaleControls.contains(MAG_TO_GRAD_LINK))
     {
-        m_bLinkMAGtoGRAD = (l == 2)? true: false;
+        m_bLinkMAGtoGRAD = (l == Qt::Checked);
     } else {
         m_bLinkMAGtoGRAD = false;
     }
@@ -603,6 +603,6 @@ void ScalingView::createLinkMagGradCheckBox()
 {
     m_pCheckBox = QPointer<QCheckBox>(new QCheckBox("Link MAGs -> GRADs"));
     m_pCheckBox->setChecked(m_bLinkMAGtoGRAD);
-    connect(m_pCheckBox, &QCheckBox::stateChanged, this, &ScalingView::setMagGradLink);
+    connect(m_pCheckBox, &QCheckBox::checkStateChanged, this, &ScalingView::setMagGradLink);
     m_pUi->verticalLayout->addWidget(m_pCheckBox);
 }

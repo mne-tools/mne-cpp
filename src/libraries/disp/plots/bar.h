@@ -46,11 +46,7 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QPointer>
-#include <QtCharts/QChart>
-#include <QtCharts/QBarCategoryAxis>
-#include <QtCharts/QBarSet>
-#include <QtCharts/QBarSeries>
+#include <QStringList>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -75,9 +71,9 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
- * Histogram display using Qtcharts, similar to matlab bar graph
+ * Histogram display using QPainter, similar to matlab bar graph
  *
- * @brief Bar class for histogram display using QtCharts
+ * @brief Bar class for histogram display using QPainter
  */
 class DISPSHARED_EXPORT Bar : public QWidget
 {
@@ -91,11 +87,11 @@ public:
     /**
      * The constructor for Bar.
      */
-    Bar(const QString& title = "", QWidget* parent = 0);
+    Bar(const QString& title = "", QWidget* parent = nullptr);
 
     //=========================================================================================================
     /**
-     * Sets new data to the bar chart using QtCharts
+     * Sets new data to the bar chart
      *
      * @param[in] matClassLimitData      vector input filled with class limits.
      * @param[in] matClassFrequencyData  vector input filled with class frequency to the corresponding class.
@@ -125,12 +121,13 @@ public:
 
     //=========================================================================================================
     /**
-     * splitCoefficientAndExponent takes in QVector value of coefficient and exponent (example: 1.2e-10) and finds the coefficient (1.2) and the appropriate exponent (-12), normalize the exponents to either the lowest or highest exponent in the list then places the values in two separate QVectors
+     * splitCoefficientAndExponent takes in QVector value of coefficient and exponent
+     * and normalizes them.
      *
-     * @param[in] matClassLimitData      vector input filled with values of class limits (in coefficient and exponent form).
-     * @param[in] iClassCount            user input to determine the amount of classes in the histogram.
+     * @param[in] matClassLimitData      vector input filled with values of class limits.
+     * @param[in] iClassAmount           amount of classes in the histogram.
      * @param[out] vecCoefficientResults  vector filled with values of coefficient only.
-     * @param[out] vecExponentResults     vector filled with values of exponent only.
+     * @param[out] vecExponentValues      vector filled with values of exponent only.
      */
     template<typename T>
     void splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
@@ -138,17 +135,21 @@ public:
                                      Eigen::VectorXd& vecCoefficientResults,
                                      Eigen::VectorXi& vecExponentValues);
 
+protected:
+    //=========================================================================================================
+    /**
+     * Paints the bar chart.
+     *
+     * @param[in] event  The paint event.
+     */
+    void paintEvent(QPaintEvent *event) override;
+
 private:
-
-
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    QPointer<QtCharts::QChart>              m_pChart;   /**< QChart object that will be shown in the widget. */
-    QPointer<QtCharts::QBarCategoryAxis>    m_pAxis;    /**< Customized axis for bar histogram*/
-#else
-    QPointer<QChart>                m_pChart;    /**< QChart object that will be shown in the widget. */
-    QPointer<QBarCategoryAxis>      m_pAxis;     /**< Customized axis for bar histogram*/
-#endif
-
+    QString         m_sTitle;           /**< Chart title. */
+    QString         m_sLegend;          /**< Legend text (exponent scale info). */
+    QStringList     m_categories;       /**< Category labels for x-axis. */
+    QList<int>      m_frequencies;      /**< Frequency values for each bar. */
+    int             m_iMaxFrequency;    /**< Maximum frequency value (for y-axis scaling). */
 };
 
 //=============================================================================================================
@@ -184,48 +185,39 @@ void Bar::updatePlot(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& mat
                      const Eigen::Matrix<int, Eigen::Dynamic, Eigen::Dynamic>& matClassFrequencyData,
                      int iPrecisionValue)
 {
-    #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    using namespace QtCharts;
-    #endif
     Eigen::VectorXd resultDisplayValues;
     Eigen::VectorXi resultExponentValues;
     int iClassAmount = matClassFrequencyData.rows();
-    this->splitCoefficientAndExponent (matClassLimitData, iClassAmount, resultDisplayValues, resultExponentValues);
+    this->splitCoefficientAndExponent(matClassLimitData, iClassAmount, resultDisplayValues, resultExponentValues);
 
-    //Setup legends
-    QString histogramExponent;
-    histogramExponent = "X-axis scale: 10e" + QString::number(resultExponentValues(0));
-    QBarSet* set = new QBarSet(histogramExponent);
-    QStringList categories;
-    QString currentLimits;
-    int classFreq;
+    // Setup legend text
+    m_sLegend = "X-axis scale: 10e" + QString::number(resultExponentValues(0));
+
+    // Build category labels and frequency list
+    m_categories.clear();
+    m_frequencies.clear();
+    m_iMaxFrequency = 0;
 
     for (int kr = 0; kr < iClassAmount; ++kr)
     {
-        classFreq = matClassFrequencyData(kr);
-        currentLimits = ((QString::number(resultDisplayValues(kr), 'g' ,iPrecisionValue) + " to " + (QString::number(resultDisplayValues(kr+1), 'g', iPrecisionValue))));
-        categories << currentLimits;
-        *set << classFreq;
-//        qDebug() << "Bar data points = " << currentLimits << " , " << classFreq;
+        int classFreq = matClassFrequencyData(kr);
+        QString currentLimits = QString::number(resultDisplayValues(kr), 'g', iPrecisionValue)
+                              + " to "
+                              + QString::number(resultDisplayValues(kr + 1), 'g', iPrecisionValue);
+        m_categories << currentLimits;
+        m_frequencies << classFreq;
+        if (classFreq > m_iMaxFrequency) {
+            m_iMaxFrequency = classFreq;
+        }
     }
 
-    //Create new series, then clear the plot and update with new data
-    QBarSeries *series = new QBarSeries();
-    series->append(set);
-
-    m_pChart->removeAllSeries();
-    m_pChart->addSeries(series);
-
-    m_pAxis->clear();
-    m_pAxis->append(categories);
-    m_pChart->createDefaultAxes();
-    m_pChart->setAxisX(m_pAxis, series);
+    QWidget::update();
 }
 
 //=============================================================================================================
 
 template <typename T>
-void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
+void Bar::splitCoefficientAndExponent(const Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>& matClassLimitData,
                                        int iClassAmount,
                                        Eigen::VectorXd& vecCoefficientResults, Eigen::VectorXi& vecExponentValues)
 {
@@ -238,19 +230,19 @@ void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Ei
     for (int ir = 0; ir <= iClassAmount; ++ir)
     {
         originalValue = matClassLimitData(ir);
-        if (originalValue == 0.0)                          //mechanism to guard against evaluation of log(0.0) which is infinity
+        if (originalValue == 0.0)
         {
             doubleExponentValue = 0.0;
         }
         else
         {
-            doubleExponentValue = log10(std::fabs(originalValue));                    //return the exponent value in double
+            doubleExponentValue = log10(std::fabs(originalValue));
         }
 
-        limitExponentValue = round(doubleExponentValue);                        //round the exponent value to the nearest signed integer
-        limitDisplayValue = originalValue * (pow(10,-(limitExponentValue)));    //display value is derived from multiplying class limit with inverse 10 to the power of negative exponent
-        vecCoefficientResults(ir) = limitDisplayValue;                          //append the display value to the return vector
-        vecExponentValues(ir) = limitExponentValue;                             //append the exponent value to the return vector
+        limitExponentValue = round(doubleExponentValue);
+        limitDisplayValue = originalValue * (pow(10, -(limitExponentValue)));
+        vecCoefficientResults(ir) = limitDisplayValue;
+        vecExponentValues(ir) = limitExponentValue;
     }
 
     int lowestExponentValue{0},
@@ -260,9 +252,9 @@ void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Ei
     {
         if (vecExponentValues(ir) < lowestExponentValue)
         {
-            lowestExponentValue = vecExponentValues(ir);        //find lowest exponent value to normalize display values for negative exponent
+            lowestExponentValue = vecExponentValues(ir);
         }
-        if (vecExponentValues(ir) > highestExponentValue)       //find highest exponent value to normalize display values for positive exponent
+        if (vecExponentValues(ir) > highestExponentValue)
         {
             highestExponentValue = vecExponentValues(ir);
         }
@@ -272,7 +264,7 @@ void Bar::splitCoefficientAndExponent (const Eigen::Matrix<T, Eigen::Dynamic, Ei
     {
         for (int ir = 0; ir <= iClassAmount; ++ir)
         {
-            while (vecExponentValues(ir) < highestExponentValue)     //normalize the values by multiplying the display value by 10 and reducing the exponentValue by 1 until exponentValue reach the lowestExponentValue
+            while (vecExponentValues(ir) < highestExponentValue)
             {
                 vecCoefficientResults(ir) = vecCoefficientResults(ir) / 10;
                 vecExponentValues(ir)++;

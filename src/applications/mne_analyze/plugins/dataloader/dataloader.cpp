@@ -139,19 +139,19 @@ QMenu *DataLoader::getMenu()
 
     QAction* pActionSaveData = new QAction(tr("Save data"));
     pActionLoadFile->setStatusTip(tr("Save the selected data file"));
-    connect(pActionSaveData, &QAction::triggered,[=] {
+    connect(pActionSaveData, &QAction::triggered,[=, this] {
                 onSaveFilePressed(DATA_FILE);
             });
 
     QAction* pActionSaveAvg = new QAction(tr("Save average"));
     pActionLoadFile->setStatusTip(tr("Save the selected data file"));
-    connect(pActionSaveAvg, &QAction::triggered,[=] {
+    connect(pActionSaveAvg, &QAction::triggered,[=, this] {
                 onSaveFilePressed(AVERAGE_FILE);
             });
 
     QAction* pActionSaveAnn = new QAction(tr("Save events"));
     pActionLoadFile->setStatusTip(tr("Save the selected data file"));
-    connect(pActionSaveAnn, &QAction::triggered,[=] {
+    connect(pActionSaveAnn, &QAction::triggered,[=, this] {
                 onSaveFilePressed(EVENT_FILE);
             });
 

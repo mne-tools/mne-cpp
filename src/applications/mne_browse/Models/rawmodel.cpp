@@ -706,7 +706,7 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
         for(qint32 i=0; i < m_chInfolist.size(); ++i) {
             if(!m_chInfolist.at(i).ch_name.contains("STI") && !m_chInfolist.at(i).ch_name.contains("MISC") && !m_chInfolist.at(i).ch_name.contains("TRG"))
                 if(!m_assignedOperators.values(i).contains(operatorPtr))
-                    m_assignedOperators.insertMulti(i,operatorPtr);
+                    m_assignedOperators.insert(i,operatorPtr);
         }
     }
     else {

@@ -110,7 +110,7 @@ CoregSettingsView::CoregSettingsView(const QString& sSettingsPath,
             this, &CoregSettingsView::changeSelectedBem, Qt::UniqueConnection);
 
     // Connect Fiducial Pickings
-    connect(m_pUi->m_qCheckBox_PickFiducials, &QCheckBox::stateChanged,
+    connect(m_pUi->m_qCheckBox_PickFiducials, &QCheckBox::checkStateChanged,
             this, &CoregSettingsView::onPickingStatus);
     connect(m_pUi->m_qRadioButton_LPA, &QCheckBox::toggled,
             this, &CoregSettingsView::onFiducialChanged);

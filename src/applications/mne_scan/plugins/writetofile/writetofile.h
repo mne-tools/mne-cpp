@@ -147,7 +147,7 @@ public:
      *
      * @param iState    state of checkbox - gets saved as bool 0 - false (not continuous), 1+ - true (continuous)
      */
-    void setContinuous(int iState);
+    void setContinuous(Qt::CheckState iState);
 
     //=========================================================================================================
     /**

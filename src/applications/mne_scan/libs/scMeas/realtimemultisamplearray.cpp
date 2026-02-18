@@ -63,7 +63,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 RealTimeMultiSampleArray::RealTimeMultiSampleArray(QObject *parent)
-: Measurement(QMetaType::type("RealTimeMultiSampleArray::SPtr"), parent)
+: Measurement(QMetaType::fromName("RealTimeMultiSampleArray::SPtr").id(), parent)
 , m_pFiffInfo_orig(nullptr)
 , m_pFiffDigitizerData_orig(nullptr)
 , m_fSamplingRate(0)

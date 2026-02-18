@@ -58,7 +58,7 @@ using namespace INVERSELIB;
 //=============================================================================================================
 
 RealTimeHpiResult::RealTimeHpiResult(QObject *parent)
-: Measurement(QMetaType::type("RealTimeHpiResult::SPtr"), parent)
+: Measurement(QMetaType::fromName("RealTimeHpiResult::SPtr").id(), parent)
 , m_bInitialized(false)
 , m_pHpiFitResult(QSharedPointer<HpiFitResult>(new HpiFitResult))
 {

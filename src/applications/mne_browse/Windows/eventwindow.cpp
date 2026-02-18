@@ -154,14 +154,14 @@ void EventWindow::initMVCSettings()
 
 void EventWindow::initCheckBoxes()
 {
-    connect(ui->m_checkBox_activateEvents,&QCheckBox::stateChanged, [this](int state){
-        m_pMainWindow->m_pDataWindow->getDataDelegate()->m_bActivateEvents = state;
+    connect(ui->m_checkBox_activateEvents,&QCheckBox::checkStateChanged, [this](Qt::CheckState state){
+        m_pMainWindow->m_pDataWindow->getDataDelegate()->m_bActivateEvents = (state == Qt::Checked);
         jumpToEvent(ui->m_tableView_eventTableView->selectionModel()->currentIndex(), QModelIndex());
         m_pMainWindow->m_pDataWindow->updateDataTableViews();
     });
 
-    connect(ui->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged, [this](int state){
-        m_pMainWindow->m_pDataWindow->getDataDelegate()->m_bShowSelectedEventsOnly = state;
+    connect(ui->m_checkBox_showSelectedEventsOnly,&QCheckBox::checkStateChanged, [this](Qt::CheckState state){
+        m_pMainWindow->m_pDataWindow->getDataDelegate()->m_bShowSelectedEventsOnly = (state == Qt::Checked);
         jumpToEvent(ui->m_tableView_eventTableView->selectionModel()->currentIndex(), QModelIndex());
         m_pMainWindow->m_pDataWindow->updateDataTableViews();
     });

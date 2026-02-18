@@ -212,7 +212,7 @@ set(Eigen_BINARY_DIR ${Eigen3_BINARY_DIR})
 # Imported target support
 add_library (eigen INTERFACE)
 add_library (Eigen3::Eigen ALIAS eigen)
-target_include_directories (eigen INTERFACE
+target_include_directories (eigen SYSTEM INTERFACE
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
   $<INSTALL_INTERFACE:${INCLUDE_INSTALL_DIR}>
 )

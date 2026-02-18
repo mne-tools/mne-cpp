@@ -293,7 +293,7 @@ void Control3DView::onCustomContextMenuRequested(QPoint pos)
 
     // Remove item
     QAction* pRemoveItem = menu->addAction(tr("Remove"));
-    connect(pRemoveItem, &QAction::triggered, [=]() {
+    connect(pRemoveItem, &QAction::triggered, [=, this]() {
         if (QMessageBox::question(this,
                                   tr("Remove item"),
                                   tr("Are you sure you want to delete the item?")) == QMessageBox::Yes) {

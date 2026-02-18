@@ -1293,7 +1293,7 @@ char *mne_format_file_id (fiffId id)
     ltime = localtime(&secs);
     (void)strftime(buf,MAXBUF,"%c",ltime);
 
-    sprintf(s,"%d.%d 0x%x%x %s",id->version>>16,id->version & 0xFFFF,id->machid[0],id->machid[1],buf);
+    snprintf(s,sizeof(s),"%d.%d 0x%x%x %s",id->version>>16,id->version & 0xFFFF,id->machid[0],id->machid[1],buf);
     return s;
 }
 

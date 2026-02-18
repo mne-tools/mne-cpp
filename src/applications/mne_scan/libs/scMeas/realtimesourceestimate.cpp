@@ -56,7 +56,7 @@ using namespace FSLIB;
 //=============================================================================================================
 
 RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
-: Measurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
+: Measurement(QMetaType::fromName("RealTimeSourceEstimate::SPtr").id(), parent)
 , m_pAnnotSet(AnnotationSet::SPtr(new AnnotationSet))
 , m_pSurfSet(SurfaceSet::SPtr(new SurfaceSet))
 , m_pFwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))

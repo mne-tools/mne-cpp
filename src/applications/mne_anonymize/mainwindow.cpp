@@ -324,7 +324,7 @@ void MainWindow::setupConnections()
 {
 
     //from gui to mainwindow class
-    QObject::connect(m_pUi->checkBoxShowOptions,&QCheckBox::stateChanged,
+    QObject::connect(m_pUi->checkBoxShowOptions,&QCheckBox::checkStateChanged,
                      this,&MainWindow::checkBoxShowOptionsChanged);
 
     QObject::connect(m_pUi->pushButtonReadData,&QPushButton::clicked,
@@ -346,17 +346,17 @@ void MainWindow::setupConnections()
     QObject::connect(m_pUi->openOutFileWindowButton,&QToolButton::clicked,
                      this,&MainWindow::openOutFileDialog);
 
-    QObject::connect(m_pUi->checkBoxBruteMode,&QCheckBox::stateChanged,
+    QObject::connect(m_pUi->checkBoxBruteMode,&QCheckBox::checkStateChanged,
                      this,&MainWindow::checkBoxBruteModeChanged);
 
-    QObject::connect(m_pUi->checkBoxMeasurementDateOffset,&QCheckBox::stateChanged,
+    QObject::connect(m_pUi->checkBoxMeasurementDateOffset,&QCheckBox::checkStateChanged,
                      this,&MainWindow::checkBoxMeasurementDateOffsetStateChanged);
     QObject::connect(m_pUi->spinBoxMeasurementDateOffset,QOverload<int>::of(&QSpinBox::valueChanged),
                      this,&MainWindow::spinBoxMeasurementDateOffsetValueChanged);
     QObject::connect(m_pUi->dateTimeMeasurementDate,&QDateTimeEdit::dateTimeChanged,
                      this,&MainWindow::dateTimeMeasurementDateDateTimeChanged);
 
-    QObject::connect(m_pUi->checkBoxBirthdayDateOffset,&QCheckBox::stateChanged,
+    QObject::connect(m_pUi->checkBoxBirthdayDateOffset,&QCheckBox::checkStateChanged,
                      this,&MainWindow::checkBoxBirthdayDateOffsetStateChanged);
     QObject::connect(m_pUi->dateEditBirthdayDate,&QDateEdit::dateChanged,
                      this,&MainWindow::dateEditBirthdayDateDateChanged);
@@ -803,7 +803,7 @@ void MainWindow::checkBoxBruteModeChanged()
 
 //=============================================================================================================
 
-void MainWindow::checkBoxMeasurementDateOffsetStateChanged(int arg)
+void MainWindow::checkBoxMeasurementDateOffsetStateChanged(Qt::CheckState arg)
 {
     Q_UNUSED(arg)
     bool state(m_pUi->checkBoxMeasurementDateOffset->isChecked());
@@ -820,7 +820,7 @@ void MainWindow::checkBoxMeasurementDateOffsetStateChanged(int arg)
 
 //=============================================================================================================
 
-void MainWindow::checkBoxBirthdayDateOffsetStateChanged(int arg)
+void MainWindow::checkBoxBirthdayDateOffsetStateChanged(Qt::CheckState arg)
 {
     Q_UNUSED(arg)
     bool state(m_pUi->checkBoxBirthdayDateOffset->isChecked());

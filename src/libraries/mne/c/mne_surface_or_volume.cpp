@@ -3300,11 +3300,11 @@ char * MneSurfaceOrVolume::mne_compose_surf_name(const char *subj,
     }
     if (prefix && strlen(prefix) > 0) {
         res = MALLOC_17(strlen(subjects_dir)+strlen(subj)+strlen(name)+strlen(prefix)+20,char);
-        sprintf(res,"%s/%s/surf/%s.%s",subjects_dir,subj,prefix,name);
+        snprintf(res,strlen(subjects_dir)+strlen(subj)+strlen(name)+strlen(prefix)+20,"%s/%s/surf/%s.%s",subjects_dir,subj,prefix,name);
     }
     else {
         res = MALLOC_17(strlen(subjects_dir)+strlen(subj)+strlen(name)+20,char);
-        sprintf(res,"%s/%s/surf/%s",subjects_dir,subj,name);
+        snprintf(res,strlen(subjects_dir)+strlen(subj)+strlen(name)+20,"%s/%s/surf/%s",subjects_dir,subj,name);
     }
     return res;
 }

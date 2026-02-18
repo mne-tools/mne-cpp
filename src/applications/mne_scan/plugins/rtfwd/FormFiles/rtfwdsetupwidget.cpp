@@ -106,18 +106,18 @@ RtFwdSetupWidget::RtFwdSetupWidget(RtFwd* toolbox, QWidget *parent)
     connect(m_ui.m_qLineEdit_MinDistName, &QLineEdit::textChanged, this, &RtFwdSetupWidget::onMinDistNameChanged);
 
     // connect checkboxes
-    connect(m_ui.m_check_bDoAll, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
-    connect(m_ui.m_check_bAccurate, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
-    connect(m_ui.m_check_bFixedOri, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
-    connect(m_ui.m_check_bCoordframe, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
-    connect(m_ui.m_check_bIncludeEEG, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
-    connect(m_ui.m_check_bIncludeMeg, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
-    connect(m_ui.m_check_bUseThreads, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
-    connect(m_ui.m_check_bComputeGrad, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
-    connect(m_ui.m_check_bScaleEegPos, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
-    connect(m_ui.m_check_bUseEquivEeg, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
-    connect(m_ui.m_check_bFilterSpaces, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
-    connect(m_ui.m_check_bMriHeadIdent, &QCheckBox::stateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bDoAll, &QCheckBox::checkStateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bAccurate, &QCheckBox::checkStateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bFixedOri, &QCheckBox::checkStateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bCoordframe, &QCheckBox::checkStateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bIncludeEEG, &QCheckBox::checkStateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bIncludeMeg, &QCheckBox::checkStateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bUseThreads, &QCheckBox::checkStateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bComputeGrad, &QCheckBox::checkStateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bScaleEegPos, &QCheckBox::checkStateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bUseEquivEeg, &QCheckBox::checkStateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bFilterSpaces, &QCheckBox::checkStateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
+    connect(m_ui.m_check_bMriHeadIdent, &QCheckBox::checkStateChanged, this, &RtFwdSetupWidget::onCheckStateChanged);
 
     // connect spin boxes
     connect(m_ui.m_doubleSpinBox_dMinDist,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RtFwdSetupWidget::onMinDistChanged);

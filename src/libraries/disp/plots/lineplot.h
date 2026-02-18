@@ -18,7 +18,7 @@
  *       the following disclaimer in the documentation and/or other materials provided with the distribution.
  *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
  *       to endorse or promote products derived from this software without specific prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
  * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -52,10 +52,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QChart>
-#include <QChartView>
-#include <QLineSeries>
+#include <QWidget>
 #include <QSharedPointer>
+#include <QVector>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -69,22 +68,16 @@ namespace DISPLIB
 {
 
 //=============================================================================================================
-// DISPLIBFORWARD DECLARATIONS
+// DISPLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
 //=============================================================================================================
 /**
- * Line Plot based on QtCharts
+ * Line Plot using QPainter
  *
  * @brief Line Plot
  */
-
-
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-class DISPSHARED_EXPORT LinePlot : public QtCharts::QChartView
-#else
-class DISPSHARED_EXPORT LinePlot : public QChartView
-#endif
+class DISPSHARED_EXPORT LinePlot : public QWidget
 {
     Q_OBJECT
 
@@ -96,9 +89,9 @@ public:
     /**
      * Constructs a line series plot
      *
-     * @param[in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
+     * @param[in] parent    If parent is nullptr, the new widget becomes a window.
      */
-    LinePlot(QWidget *parent = Q_NULLPTR);
+    LinePlot(QWidget *parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -106,11 +99,11 @@ public:
      *
      * @param[in] y         The double data vector.
      * @param[in] title     Plot title.
-     * @param[in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
+     * @param[in] parent    If parent is nullptr, the new widget becomes a window.
      */
     LinePlot(const QVector<double>& y,
              const QString& title = "",
-             QWidget *parent = Q_NULLPTR);
+             QWidget *parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -119,12 +112,12 @@ public:
      * @param[in] x         X-Axis data to plot.
      * @param[in] y         Y-Axis data to plot.
      * @param[in] title     Plot title.
-     * @param[in] parent    If parent is Q_NULLPTR, the new widget becomes a window. If parent is another widget, this widget becomes a child window inside parent. The new widget is deleted when its parent is deleted.
+     * @param[in] parent    If parent is nullptr, the new widget becomes a window.
      */
     LinePlot(const QVector<double>& x,
              const QVector<double>& y,
              const QString& title = "",
-             QWidget *parent = Q_NULLPTR);
+             QWidget *parent = nullptr);
 
     //=========================================================================================================
     /**
@@ -134,7 +127,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Sets the scaled image view title.
+     * Sets the plot title.
      *
      * @param[in] p_sTitle   The title.
      */
@@ -142,17 +135,17 @@ public:
 
     //=========================================================================================================
     /**
-     * Sets the label of the y axes
+     * Sets the label of the x axis
      *
-     * @param[in] p_sXLabel   The x axes label.
+     * @param[in] p_sXLabel   The x axis label.
      */
     void setXLabel(const QString &p_sXLabel);
 
     //=========================================================================================================
     /**
-     * Sets the label of the y axes
+     * Sets the label of the y axis
      *
-     * @param[in] p_sXLabel   The y axes label.
+     * @param[in] p_sYLabel   The y axis label.
      */
     void setYLabel(const QString &p_sYLabel);
 
@@ -174,32 +167,31 @@ public:
     void updateData(const QVector<double>& x,
                     const QVector<double>& y);
 
-private:
+protected:
     //=========================================================================================================
     /**
-     * Updates the plot.
+     * Paints the line plot.
+     *
+     * @param[in] event  The paint event.
      */
-    void update();
+    void paintEvent(QPaintEvent *event) override;
 
 private:
     QString                 m_sTitle;           /**< Title. */
-    QString                 m_sXLabel;          /**< X axes label. */
-    QString                 m_sYLabel;          /**< Y axes label. */
-
-
-
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-    QtCharts::QLineSeries*  m_pLineSeries;      /**< Line series. */
-    QtCharts::QChart*       m_pChart;           /**< The chart. */
-#else
-    QLineSeries*            m_pLineSeries;      /**< Line series. */
-    QChart*                 m_pChart;           /**< The chart. */
-#endif
+    QString                 m_sXLabel;          /**< X axis label. */
+    QString                 m_sYLabel;          /**< Y axis label. */
+    QVector<double>         m_vecXData;         /**< X data points. */
+    QVector<double>         m_vecYData;         /**< Y data points. */
+    double                  m_dMinX;            /**< Minimum X value. */
+    double                  m_dMaxX;            /**< Maximum X value. */
+    double                  m_dMinY;            /**< Minimum Y value. */
+    double                  m_dMaxY;            /**< Maximum Y value. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
 } // NAMESPACE
 
 #endif // LINEPLOT_H

@@ -49,6 +49,7 @@
 #include <QtTest>
 #include <QProcess>
 #include <QScopedPointer>
+#include <QTimeZone>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -96,8 +97,8 @@ private:
 //=============================================================================================================
 
 TestMneAnonymize::TestMneAnonymize()
-    : mDaysToOffsetDates(35),
-      mDefaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0), Qt::LocalTime)
+: mDaysToOffsetDates(35)
+, mDefaultMeasDate(QDate(2000,1,1), QTime(1, 1, 0), QTimeZone::LocalTime)
 {
 }
 
@@ -337,7 +338,7 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
             FiffId inId = pTag->toFiffID();
 
             if(testArg != "MeasDateOffset"){
-                QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(inId.time.secs, Qt::LocalTime));
+                QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(inId.time.secs, QTimeZone::LocalTime));
 
                 QVERIFY(inMeasDate == mDefaultMeasDate);
                 QVERIFY(inId.time.secs == static_cast<int32_t>(mDefaultMeasDate.toSecsSinceEpoch()));
@@ -351,8 +352,8 @@ void TestMneAnonymize::verifyTags(FIFFLIB::FiffStream::SPtr &stream,
         }
         case FIFF_MEAS_DATE:
         {
-            QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*pTag->toInt(), Qt::LocalTime));
-            QDateTime originalDateInFile(QDate(2002,12,3), QTime(14, 1, 10), Qt::LocalTime);
+            QDateTime inMeasDate(QDateTime::fromSecsSinceEpoch(*pTag->toInt(), QTimeZone::LocalTime));
+            QDateTime originalDateInFile(QDate(2002,12,3), QTime(14, 1, 10));
 
             qInfo() << "InMeasDate: " << inMeasDate;
             qInfo() << "originalDateInFile: " << originalDateInFile;

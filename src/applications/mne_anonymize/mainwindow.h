@@ -648,7 +648,7 @@ private slots:
      * Since the control for the number of offset days is otherwise disabled.
      *
      */
-    void checkBoxMeasurementDateOffsetStateChanged(int arg);
+    void checkBoxMeasurementDateOffsetStateChanged(Qt::CheckState arg);
 
     //=========================================================================================================
     /**
@@ -656,7 +656,7 @@ private slots:
      * substituting the subject's birthday or to use a number of offset days.
      *
      */
-    void checkBoxBirthdayDateOffsetStateChanged(int arg);
+    void checkBoxBirthdayDateOffsetStateChanged(Qt::CheckState arg);
 
     //=========================================================================================================
     /**

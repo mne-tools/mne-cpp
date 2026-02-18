@@ -146,11 +146,11 @@ void CommandManager::update(UTILSLIB::Subject* p_pSubject)
         //Parse Parameters
         for(quint32 i = 0; i < m_qMapCommands[t_sCommandName].count(); ++i)
         {
-            QVariant::Type t_type = m_qMapCommands[t_sCommandName][i].type();
+            QMetaType t_metaType = m_qMapCommands[t_sCommandName][i].metaType();
 
             QVariant t_qVariantParam(t_rawCommand.pValues()[i]);
 
-            if(t_qVariantParam.canConvert(t_type) && t_qVariantParam.convert(t_type))
+            if(t_qVariantParam.canConvert(t_metaType) && t_qVariantParam.convert(t_metaType))
                 m_qMapCommands[t_sCommandName][i] = t_qVariantParam;
             else
                 return;

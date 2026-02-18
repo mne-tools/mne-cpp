@@ -134,7 +134,7 @@ void BidsView::customMenuRequested(QPoint pos)
                 QMenu *menu = new QMenu(this);
 
                 QAction* pAddSessionAction = new QAction("Add Session", this);
-                connect(pAddSessionAction, &QAction::triggered, [=]() {
+                connect(pAddSessionAction, &QAction::triggered, [=, this]() {
                     bool ok;
                     QString text = QInputDialog::getText(this, tr("Adding Session"),
                                                          tr("Please name new session:"), QLineEdit::Normal,
@@ -164,7 +164,7 @@ void BidsView::customMenuRequested(QPoint pos)
                         qDebug() << "Relative model index" << pModel->item(i)->index();
                         qDebug() << "Relative item index" << pItem->data(BIDS_ITEM_SUBJECT).value<QModelIndex>();
                         QAction* pTargetAction = new QAction(pModel->item(i)->text());
-                        connect(pTargetAction, &QAction::triggered, [=] () {
+                        connect(pTargetAction, &QAction::triggered, [=, this] () {
                             emit onMoveSession(pModel->item(i)->index(), pItem->index());
                         });
                         pMoveMenu->addAction(pTargetAction);
@@ -193,7 +193,7 @@ void BidsView::customMenuRequested(QPoint pos)
                     for (int j = 0; j < pModel->item(i)->rowCount(); j++){
                         if(pModel->item(i)->child(j)->index() != pItem->data(BIDS_ITEM_SESSION).value<QModelIndex>()){
                             QAction* pTargetAction = new QAction(pModel->item(i)->child(j)->text());
-                            connect(pTargetAction, &QAction::triggered, [=] {
+                            connect(pTargetAction, &QAction::triggered, [=, this] {
                                 emit onMoveData(pModel->item(i)->child(j)->index(), pItem->index());
                             });
                             pSubjectMenu->addAction(pTargetAction);
@@ -221,7 +221,7 @@ void BidsView::customMenuRequested(QPoint pos)
                 break;
             }
         }
-        connect(pRemoveAction, &QAction::triggered, [=]() {
+        connect(pRemoveAction, &QAction::triggered, [=, this]() {
             QMessageBox msgBox;
 
             msgBox.setText("Are you sure you want to remove " + pItem->text() + "?");
@@ -238,7 +238,7 @@ void BidsView::customMenuRequested(QPoint pos)
         QMenu *menu = new QMenu(this);
 
         QAction* pAddSubjectAction = new QAction("Add Subject", this);
-        connect(pAddSubjectAction, &QAction::triggered, [=]() {
+        connect(pAddSubjectAction, &QAction::triggered, [=, this]() {
             bool ok;
             QString text = QInputDialog::getText(this, tr("Adding Subject"),
                                                  tr("Please name new subject:"), QLineEdit::Normal,

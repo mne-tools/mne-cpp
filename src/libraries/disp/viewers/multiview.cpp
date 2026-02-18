@@ -99,7 +99,7 @@ MultiViewWindow* MultiView::addWidgetTop(QWidget* pWidget,
 
     this->addDockWidget(Qt::DockWidgetArea::TopDockWidgetArea, pDockWidget);
 
-    connect(pDockWidget, &MultiViewWindow::dockLocationChanged, [=]() {
+    connect(pDockWidget, &MultiViewWindow::dockLocationChanged, [=, this]() {
         emit dockLocationChanged(pWidget);
     });
 
@@ -138,7 +138,7 @@ MultiViewWindow* MultiView::addWidgetBottom(QWidget* pWidget,
 
     m_lDockWidgets.append(pDockWidget);
 
-    connect(pDockWidget, &MultiViewWindow::dockLocationChanged, [=]() {
+    connect(pDockWidget, &MultiViewWindow::dockLocationChanged, [=, this]() {
         emit dockLocationChanged(pWidget);
     });
 

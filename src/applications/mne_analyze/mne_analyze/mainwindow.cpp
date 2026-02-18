@@ -340,7 +340,7 @@ void MainWindow::initMenuBar()
     pActionDefaultStyle->setChecked(true);
     pActionStyleGroup->addAction(pActionDefaultStyle);
     connect(pActionDefaultStyle, &QAction::triggered,
-        [=]() {
+        [=, this]() {
         setCurrentStyle("default");
     });
 
@@ -350,7 +350,7 @@ void MainWindow::initMenuBar()
     m_pActionDarkMode->setChecked(false);
     pActionStyleGroup->addAction(m_pActionDarkMode);
     connect(m_pActionDarkMode.data(), &QAction::triggered,
-        [=]() {
+        [=, this]() {
         setCurrentStyle("dark");
     });
 

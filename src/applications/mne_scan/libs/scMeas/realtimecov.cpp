@@ -57,7 +57,7 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 RealTimeCov::RealTimeCov(QObject *parent)
-: Measurement(QMetaType::type("RealTimeCov::SPtr"), parent)
+: Measurement(QMetaType::fromName("RealTimeCov::SPtr").id(), parent)
 , m_pFiffCov(FiffCov::SPtr::create())
 , m_pFiffInfo(FiffInfo::SPtr::create())
 , m_bInitialized(false)

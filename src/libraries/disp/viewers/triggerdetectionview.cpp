@@ -99,7 +99,7 @@ void TriggerDetectionView::init(const FiffInfo::SPtr pFiffInfo)
     if(pFiffInfo) {
         m_pFiffInfo = pFiffInfo;
         //Trigger detection
-        connect(m_pUi->m_checkBox_activateTriggerDetection, static_cast<void (QCheckBox::*)(int)>(&QCheckBox::stateChanged),
+        connect(m_pUi->m_checkBox_activateTriggerDetection, &QCheckBox::checkStateChanged,
                 this, &TriggerDetectionView::onTriggerInfoChanged);
 
         m_pUi->m_comboBox_triggerChannels->clear();

@@ -234,7 +234,7 @@ void ModalitySelectionView::redrawGUI()
             QCheckBox* t_pCheckBoxModality = new QCheckBox(i.key());
             t_pCheckBoxModality->setChecked(i.value());
             m_qListModalityCheckBox << t_pCheckBoxModality;
-            connect(t_pCheckBoxModality,&QCheckBox::stateChanged,
+            connect(t_pCheckBoxModality,&QCheckBox::checkStateChanged,
                     this, &ModalitySelectionView::onUpdateModalityCheckbox);
             topLayout->addWidget(t_pCheckBoxModality,count,0);
             count++;
@@ -247,7 +247,7 @@ void ModalitySelectionView::redrawGUI()
 
 //=============================================================================================================
 
-void ModalitySelectionView::onUpdateModalityCheckbox(qint32 state)
+void ModalitySelectionView::onUpdateModalityCheckbox(Qt::CheckState state)
 {
     Q_UNUSED(state)
 

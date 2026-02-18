@@ -144,12 +144,12 @@ void EventView::initMVCSettings()
 void EventView::initGUIFunctionality()
 {
     //'Activate events' checkbox
-    connect(m_pUi->m_checkBox_activateEvents, &QCheckBox::stateChanged,
-            this, &EventView::activeEventsChecked, Qt::UniqueConnection);
+    connect(m_pUi->m_checkBox_activateEvents, &QCheckBox::checkStateChanged,
+            this, [this](Qt::CheckState state) { emit activeEventsChecked(static_cast<int>(state)); }, Qt::UniqueConnection);
 
     //'Show selected event' checkbox
-    connect(m_pUi->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged,
-            this, &EventView::onSelectedEventsChecked, Qt::UniqueConnection);
+    connect(m_pUi->m_checkBox_showSelectedEventsOnly, &QCheckBox::checkStateChanged,
+            this, [this](Qt::CheckState state) { onSelectedEventsChecked(static_cast<int>(state)); }, Qt::UniqueConnection);
     connect(m_pUi->m_tableView_eventTableView->selectionModel(), &QItemSelectionModel::selectionChanged,
             this, &EventView::onCurrentSelectedChanged, Qt::UniqueConnection);
 
@@ -302,10 +302,10 @@ void EventView::disconnectFromModel()
 {
     disconnect(m_pEventModel.data(),&ANSHAREDLIB::EventModel::dataChanged,
             this, &EventView::onDataChanged);
-    disconnect(m_pUi->m_checkBox_activateEvents, &QCheckBox::stateChanged,
-            this, &EventView::activeEventsChecked);
-    disconnect(m_pUi->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged,
-            this, &EventView::onSelectedEventsChecked);
+    disconnect(m_pUi->m_checkBox_activateEvents, &QCheckBox::checkStateChanged,
+            this, nullptr);
+    disconnect(m_pUi->m_checkBox_showSelectedEventsOnly, &QCheckBox::checkStateChanged,
+            this, nullptr);
     disconnect(m_pUi->m_pushButton_addEventType, &QPushButton::clicked,
             this, &EventView::addEventGroup);
     disconnect(m_pUi->m_listWidget_groupListWidget->selectionModel(), &QItemSelectionModel::selectionChanged,

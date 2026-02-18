@@ -163,12 +163,12 @@ bool SpectrumView::eventFilter(QObject * watched,
         QMouseEvent *mouseEvent = static_cast <QMouseEvent*>( event );
         //qDebug()<<"MouseMove event!@"<<mouseEvent->x()<<":"<<mouseEvent->y();
 
-        int currentRow = m_pTableView->rowAt(mouseEvent->y());
+        int currentRow = m_pTableView->rowAt(static_cast<int>(mouseEvent->position().y()));
         m_pTableView->selectRow(currentRow);
 
         QModelIndex item = m_pTableView->currentIndex();
 
-        emit sendMouseLoc(item.row(), mouseEvent->x(), mouseEvent->y(),m_pTableView->visualRect(item) );
+        emit sendMouseLoc(item.row(), static_cast<int>(mouseEvent->position().x()), static_cast<int>(mouseEvent->position().y()),m_pTableView->visualRect(item) );
 
         return true;
     } else {

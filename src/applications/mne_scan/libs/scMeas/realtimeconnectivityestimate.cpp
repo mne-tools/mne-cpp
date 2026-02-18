@@ -65,7 +65,7 @@ using namespace FSLIB;
 //=============================================================================================================
 
 RealTimeConnectivityEstimate::RealTimeConnectivityEstimate(QObject *parent)
-: Measurement(QMetaType::type("RealTimeConnectivityEstimate::SPtr"), parent)
+: Measurement(QMetaType::fromName("RealTimeConnectivityEstimate::SPtr").id(), parent)
 , m_pAnnotSet(AnnotationSet::SPtr(new AnnotationSet))
 , m_pSurfSet(SurfaceSet::SPtr(new SurfaceSet))
 , m_pFwdSolution(MNEForwardSolution::SPtr(new MNEForwardSolution))

@@ -58,7 +58,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 RealTimeSpectrum::RealTimeSpectrum(QObject *parent)
-: Measurement(QMetaType::type("RealTimeSpectrum::SPtr"), parent)
+: Measurement(QMetaType::fromName("RealTimeSpectrum::SPtr").id(), parent)
 , m_bIsInit(false)
 , m_bContainsValues(false)
 , m_xScaleType(0)
