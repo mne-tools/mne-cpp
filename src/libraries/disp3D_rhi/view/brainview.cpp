@@ -573,9 +573,11 @@ void BrainView::setVisualizationEditTarget(int target)
     m_dipolesVisible = visibility.dipoles;
     m_networkVisible = visibility.network;
 
-    for (auto surf : m_surfaces) {
-        surf->setVisualizationMode(m_currentVisMode);
-    }
+    // Note: we intentionally do NOT call setVisualizationMode() on surfaces
+    // here.  Each viewport's overlay mode is sent as a per-draw shader
+    // uniform (sceneData.overlayMode), so the surface objects must keep
+    // their vertex data intact — in particular the STC colour channel —
+    // regardless of which viewport is currently selected for editing.
 
     if (m_fieldMapper.isLoaded()) {
         if (remapMegSurface) {

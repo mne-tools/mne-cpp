@@ -329,9 +329,13 @@ void BrainSurface::updateVertexColors()
         }
     }
 
-    // Restore STC colours so that hover/selection changes do not lose
-    // the source-estimate overlay.
-    if (m_visMode == ModeSourceEstimate && !m_stcColors.isEmpty()) {
+    // Always keep STC colours in the primary colour channel when available.
+    // Each viewport selects the overlay mode via a per-draw shader uniform
+    // (overlayMode), so the vertex buffer must hold STC data for any
+    // viewport that shows Source Estimate, regardless of this surface's
+    // m_visMode.  Annotation data lives in a separate vertex attribute
+    // (colorAnnotation) and is unaffected.
+    if (!m_stcColors.isEmpty()) {
         for (int i = 0; i < qMin(m_stcColors.size(), m_vertexData.size()); ++i) {
             m_vertexData[i].color = m_stcColors[i];
         }

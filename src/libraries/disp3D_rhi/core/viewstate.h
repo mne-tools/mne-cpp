@@ -222,23 +222,23 @@ struct SubView
 /**
  * Default perspective rotation quaternion used for the "Perspective" camera.
  */
-QQuaternion perspectivePresetRotation();
+DISP3DRHISHARED_EXPORT QQuaternion perspectivePresetRotation();
 
 /**
  * Human-readable name for a multi-view preset index (0–6).
  */
-QString multiViewPresetName(int preset);
+DISP3DRHISHARED_EXPORT QString multiViewPresetName(int preset);
 
 /**
  * Camera rotation quaternion for a multi-view preset index (0–6).
  */
-QQuaternion multiViewPresetOffset(int preset);
+DISP3DRHISHARED_EXPORT QQuaternion multiViewPresetOffset(int preset);
 
 /**
  * Whether a preset is a perspective (free-rotate) camera rather than an
  * orthographic-style fixed camera.
  */
-bool multiViewPresetIsPerspective(int preset);
+DISP3DRHISHARED_EXPORT bool multiViewPresetIsPerspective(int preset);
 
 //=============================================================================================================
 // FREE FUNCTIONS — enum ↔ string conversion
@@ -251,19 +251,19 @@ bool multiViewPresetIsPerspective(int preset);
  * @param[in] maxIndex Upper bound (inclusive).  Defaults to 3 for backwards
  *                     compatibility, but callers should pass viewportCount-1.
  */
-int normalizedVisualizationTarget(int target, int maxIndex = 3);
+DISP3DRHISHARED_EXPORT int normalizedVisualizationTarget(int target, int maxIndex = 3);
 
 /** Convert a shader name ("Standard", "Holographic", "Anatomical") to enum. */
-ShaderMode shaderModeFromName(const QString &name);
+DISP3DRHISHARED_EXPORT ShaderMode shaderModeFromName(const QString &name);
 
 /** Convert a ShaderMode enum to display string. */
-QString shaderModeName(ShaderMode mode);
+DISP3DRHISHARED_EXPORT QString shaderModeName(ShaderMode mode);
 
 /** Convert a visualization mode name to enum. */
-VisualizationMode visualizationModeFromName(const QString &name);
+DISP3DRHISHARED_EXPORT VisualizationMode visualizationModeFromName(const QString &name);
 
 /** Convert a VisualizationMode enum to display string. */
-QString visualizationModeName(VisualizationMode mode);
+DISP3DRHISHARED_EXPORT QString visualizationModeName(VisualizationMode mode);
 
 //=============================================================================================================
 // FREE FUNCTIONS — colormap
@@ -278,7 +278,7 @@ QString visualizationModeName(VisualizationMode mode);
  * @param[in] v   Normalised value in [0,1].
  * @return        Packed QRgb colour.
  */
-QRgb mneAnalyzeColor(double v);
+DISP3DRHISHARED_EXPORT QRgb mneAnalyzeColor(double v);
 
 //=============================================================================================================
 // FREE FUNCTIONS — QSettings helpers

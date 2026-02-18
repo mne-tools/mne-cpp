@@ -1453,6 +1453,75 @@ void MainWindow::syncUIToEditTarget(int target)
     m_innerCheck->blockSignals(true);
     m_innerCheck->setChecked(m_brainView->objectVisibleForTarget("bem_inner_skull", target));
     m_innerCheck->blockSignals(false);
+
+    // Sync sensor visibility
+    m_showMegCheck->blockSignals(true);
+    m_showMegCheck->setChecked(m_brainView->objectVisibleForTarget("sens_meg", target));
+    m_showMegCheck->blockSignals(false);
+
+    m_showEegCheck->blockSignals(true);
+    m_showEegCheck->setChecked(m_brainView->objectVisibleForTarget("sens_eeg", target));
+    m_showEegCheck->blockSignals(false);
+
+    m_showHelmetCheck->blockSignals(true);
+    m_showHelmetCheck->setChecked(m_brainView->objectVisibleForTarget("sens_meg_helmet", target));
+    m_showHelmetCheck->blockSignals(false);
+
+    // Sync digitizer visibility
+    m_showDigCheck->blockSignals(true);
+    m_showDigCheck->setChecked(m_brainView->objectVisibleForTarget("dig", target));
+    m_showDigCheck->blockSignals(false);
+
+    m_showDigCardinalCheck->blockSignals(true);
+    m_showDigCardinalCheck->setChecked(m_brainView->objectVisibleForTarget("dig_cardinal", target));
+    m_showDigCardinalCheck->blockSignals(false);
+
+    m_showDigHpiCheck->blockSignals(true);
+    m_showDigHpiCheck->setChecked(m_brainView->objectVisibleForTarget("dig_hpi", target));
+    m_showDigHpiCheck->blockSignals(false);
+
+    m_showDigEegCheck->blockSignals(true);
+    m_showDigEegCheck->setChecked(m_brainView->objectVisibleForTarget("dig_eeg", target));
+    m_showDigEegCheck->blockSignals(false);
+
+    m_showDigExtraCheck->blockSignals(true);
+    m_showDigExtraCheck->setChecked(m_brainView->objectVisibleForTarget("dig_extra", target));
+    m_showDigExtraCheck->blockSignals(false);
+
+    // Sync field map / contour visibility
+    m_showMegFieldCheck->blockSignals(true);
+    m_showMegFieldCheck->setChecked(m_brainView->objectVisibleForTarget("field_meg", target));
+    m_showMegFieldCheck->blockSignals(false);
+
+    m_showEegFieldCheck->blockSignals(true);
+    m_showEegFieldCheck->setChecked(m_brainView->objectVisibleForTarget("field_eeg", target));
+    m_showEegFieldCheck->blockSignals(false);
+
+    m_showMegContourCheck->blockSignals(true);
+    m_showMegContourCheck->setChecked(m_brainView->objectVisibleForTarget("contour_meg", target));
+    m_showMegContourCheck->blockSignals(false);
+
+    m_showEegContourCheck->blockSignals(true);
+    m_showEegContourCheck->setChecked(m_brainView->objectVisibleForTarget("contour_eeg", target));
+    m_showEegContourCheck->blockSignals(false);
+
+    // Sync MEG field map surface (helmet vs head)
+    m_megHelmetCombo->blockSignals(true);
+    m_megHelmetCombo->setCurrentIndex(m_brainView->megFieldMapOnHeadForTarget(target) ? 1 : 0);
+    m_megHelmetCombo->blockSignals(false);
+
+    // Sync dipole, source space, network visibility
+    m_showDipoleCheck->blockSignals(true);
+    m_showDipoleCheck->setChecked(m_brainView->objectVisibleForTarget("dipoles", target));
+    m_showDipoleCheck->blockSignals(false);
+
+    m_showSrcSpaceCheck->blockSignals(true);
+    m_showSrcSpaceCheck->setChecked(m_brainView->objectVisibleForTarget("source_space", target));
+    m_showSrcSpaceCheck->blockSignals(false);
+
+    m_showNetworkCheck->blockSignals(true);
+    m_showNetworkCheck->setChecked(m_brainView->objectVisibleForTarget("network", target));
+    m_showNetworkCheck->blockSignals(false);
 }
 
 //=============================================================================================================
