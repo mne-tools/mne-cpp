@@ -310,6 +310,22 @@ public slots:
     void setViewportEnabled(int index, bool enabled);
 
     /**
+     * Set the camera preset for a specific viewport.
+     *
+     * @param[in] index      Viewport index (0–3).
+     * @param[in] preset     Camera preset (0=Top, 1=Perspective, 2=Front, 3=Left, 4=Bottom, 5=Back, 6=Right).
+     */
+    void setViewportCameraPreset(int index, int preset);
+
+    /**
+     * Get the camera preset for a specific viewport.
+     *
+     * @param[in] index      Viewport index (0–3).
+     * @return               Camera preset index (0–6), or -1 if invalid.
+     */
+    int viewportCameraPreset(int index) const;
+
+    /**
      * Reset the multi-view splitter layout to equal-sized panes.
      */
     void resetMultiViewLayout();

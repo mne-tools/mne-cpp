@@ -94,7 +94,6 @@ public:
      * @param[in] digitizerPath  Optional digitizer/sensor file path.
      * @param[in] srcSpacePath   Optional source space file path.
      * @param[in] atlasPath      Optional atlas annotation file path.
-     * @param[in] evokedPath     Optional evoked/average file path.
      */
     void loadInitialData(const QString &subjectPath,
                          const QString &subjectName,
@@ -106,16 +105,14 @@ public:
                          const QString &atlasPath = QString(),
                          const QString &evokedPath = QString());
 
-    /**
-     * Enable network UI controls (called after a network has been loaded).
-     */
-    void enableNetworkControls();
-
 private:
     void setupUI();
     void setupConnections();
     void loadHemisphere(const QString &subjectPath, const QString &subjectName, const QString &hemi);
     void loadBem(const QString &subjectName, const QString &bemPath);
+    void syncUIToEditTarget(int target);
+    void updateViewportCheckboxes(int count);
+    void enableNetworkControls();
 
 private:
     // Core components
@@ -141,12 +138,11 @@ private:
     QCheckBox *m_innerCheck = nullptr;
 
     // Control widgets - View
-    QCheckBox *m_showInfoCheck = nullptr;
-    QCheckBox *m_multiViewCheck = nullptr;
-    QCheckBox *m_vpTopCheck = nullptr;
-    QCheckBox *m_vpBottomCheck = nullptr;
-    QCheckBox *m_vpFrontCheck = nullptr;
-    QCheckBox *m_vpLeftCheck = nullptr;
+    QComboBox *m_viewCountCombo = nullptr;
+    QComboBox *m_editTargetCombo = nullptr;
+    QComboBox *m_cameraPresetCombo = nullptr;
+    QLabel *m_editTargetLabel = nullptr;
+    QLabel *m_cameraPresetLabel = nullptr;
 
     // Control widgets - Brain Surface
     QPushButton *m_loadSurfaceBtn = nullptr;
@@ -165,8 +161,6 @@ private:
     QPushButton *m_playButton = nullptr;
     QComboBox *m_speedCombo = nullptr;
     QTimer *m_stcTimer = nullptr;
-    QCheckBox *m_realtimeCheck = nullptr;
-    QCheckBox *m_loopCheck = nullptr;
 
     // Control widgets - Sensors
     QPushButton *m_loadDigBtn = nullptr;
@@ -178,7 +172,6 @@ private:
     QCheckBox *m_showDigHpiCheck = nullptr;
     QCheckBox *m_showDigEegCheck = nullptr;
     QCheckBox *m_showDigExtraCheck = nullptr;
-    QCheckBox *m_showHelmetCheck = nullptr;
     QCheckBox *m_applyTransCheck = nullptr;
 
     // Control widgets - Dipoles
@@ -189,30 +182,40 @@ private:
     QPushButton *m_loadSrcSpaceBtn = nullptr;
     QCheckBox *m_showSrcSpaceCheck = nullptr;
 
-    // Control widgets - Connectivity Network
+    // Control widgets - Network
     QCheckBox *m_showNetworkCheck = nullptr;
     QSlider *m_networkThresholdSlider = nullptr;
     QComboBox *m_networkColormapCombo = nullptr;
 
-    // Control widgets - Evoked / Field Maps
+    // Control widgets - Evoked / Sensor Field
     QPushButton *m_loadEvokedBtn = nullptr;
     QComboBox *m_evokedSetCombo = nullptr;
     QCheckBox *m_showMegFieldCheck = nullptr;
     QCheckBox *m_showEegFieldCheck = nullptr;
     QCheckBox *m_showMegContourCheck = nullptr;
     QCheckBox *m_showEegContourCheck = nullptr;
+    QCheckBox *m_showHelmetCheck = nullptr;
     QComboBox *m_megHelmetCombo = nullptr;
     QSlider *m_sensorFieldTimeSlider = nullptr;
     QLabel *m_sensorFieldTimeLabel = nullptr;
     QCheckBox *m_syncTimesCheck = nullptr;
-    bool m_isSyncing = false;           //!< Guard against re-entrant slider sync
 
     // Control widgets - Sensor Streaming
     QPushButton *m_sensorStreamBtn = nullptr;
     QComboBox *m_sensorStreamModalityCombo = nullptr;
     QCheckBox *m_sensorStreamLoopCheck = nullptr;
-    QComboBox *m_sensorStreamColormapCombo = nullptr;
     QSpinBox *m_sensorStreamAvgSpin = nullptr;
+    QComboBox *m_sensorStreamColormapCombo = nullptr;
+
+    // Control widgets - STC Playback
+    QCheckBox *m_realtimeCheck = nullptr;
+    QCheckBox *m_loopCheck = nullptr;
+
+    // Control widgets - View (additional)
+    QCheckBox *m_showInfoCheck = nullptr;
+
+    // Sync state
+    bool m_isSyncing = false;
 };
 
 #endif // MAINWINDOW_H

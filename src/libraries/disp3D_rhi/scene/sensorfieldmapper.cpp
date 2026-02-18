@@ -485,22 +485,42 @@ void SensorFieldMapper::updateContourSurfaces(
         binormal.normalize();
 
         const QVector3D off = normal * shift;
-        const QVector3D w   = binormal * halfW;
-        const int base = buf.verts.size();
 
         auto toEig = [](const QVector3D &v) {
             return Eigen::Vector3f(v.x(), v.y(), v.z());
         };
-        Eigen::Vector3f n(normal.x(), normal.y(), normal.z());
 
-        buf.verts.append(toEig(p0 - w + off));
-        buf.verts.append(toEig(p0 + w + off));
-        buf.verts.append(toEig(p1 - w + off));
-        buf.verts.append(toEig(p1 + w + off));
-        buf.norms.append(n); buf.norms.append(n);
-        buf.norms.append(n); buf.norms.append(n);
-        buf.tris.append(Eigen::Vector3i(base, base + 1, base + 2));
-        buf.tris.append(Eigen::Vector3i(base + 1, base + 3, base + 2));
+        // Horizontal quad: width along binormal (visible from above)
+        {
+            const QVector3D w = binormal * halfW;
+            const int base = buf.verts.size();
+            Eigen::Vector3f n(normal.x(), normal.y(), normal.z());
+
+            buf.verts.append(toEig(p0 - w + off));
+            buf.verts.append(toEig(p0 + w + off));
+            buf.verts.append(toEig(p1 - w + off));
+            buf.verts.append(toEig(p1 + w + off));
+            buf.norms.append(n); buf.norms.append(n);
+            buf.norms.append(n); buf.norms.append(n);
+            buf.tris.append(Eigen::Vector3i(base, base + 1, base + 2));
+            buf.tris.append(Eigen::Vector3i(base + 1, base + 3, base + 2));
+        }
+
+        // Vertical quad: height along normal (visible from the side)
+        {
+            const QVector3D h = normal * halfW;
+            const int base = buf.verts.size();
+            Eigen::Vector3f n(binormal.x(), binormal.y(), binormal.z());
+
+            buf.verts.append(toEig(p0 - h + off));
+            buf.verts.append(toEig(p0 + h + off));
+            buf.verts.append(toEig(p1 - h + off));
+            buf.verts.append(toEig(p1 + h + off));
+            buf.norms.append(n); buf.norms.append(n);
+            buf.norms.append(n); buf.norms.append(n);
+            buf.tris.append(Eigen::Vector3i(base, base + 1, base + 2));
+            buf.tris.append(Eigen::Vector3i(base + 1, base + 3, base + 2));
+        }
     };
 
     // ── Marching-triangle iso-line extraction ──────────────────────────

@@ -39,6 +39,7 @@
 #include "mainwindow.h"
 #include <disp3D_rhi/view/brainview.h>
 #include <disp3D_rhi/model/braintreemodel.h>
+#include <disp3D_rhi/core/viewstate.h>
 
 #include <fs/surface.h>
 #include <fs/surfaceset.h>
@@ -500,38 +501,39 @@ void MainWindow::setupUI()
     m_showInfoCheck->setToolTip("Show or hide overlay info labels (FPS, shader, surface info).");
     viewLayout->addWidget(m_showInfoCheck);
 
-    // Multi-View Toggle
-    m_multiViewCheck = new QCheckBox("Multi-View (4 cameras)");
-    m_multiViewCheck->setChecked(false);
-    m_multiViewCheck->setToolTip("Toggle between single interactive camera and four fixed camera views.");
-    viewLayout->addWidget(m_multiViewCheck);
+    // View Count
+    QLabel *viewCountLabel = new QLabel("Layout:");
+    m_viewCountCombo = new QComboBox();
+    m_viewCountCombo->addItems({"Single View", "2 Views", "3 Views", "4 Views"});
+    m_viewCountCombo->setCurrentIndex(0);
+    m_viewCountCombo->setToolTip("Number of viewport panes (1 = single, 2 = side-by-side, 3 = two + one, 4 = 2×2 grid).");
+    QHBoxLayout *viewCountRow = new QHBoxLayout();
+    viewCountRow->addWidget(viewCountLabel);
+    viewCountRow->addWidget(m_viewCountCombo);
+    viewLayout->addLayout(viewCountRow);
 
-    // Viewport Toggles
-    QHBoxLayout *vpRow1 = new QHBoxLayout();
-    QHBoxLayout *vpRow2 = new QHBoxLayout();
+    // Edit Target
+    m_editTargetLabel = new QLabel("Edit Target:");
+    m_editTargetCombo = new QComboBox();
+    m_editTargetCombo->addItem("All Viewports");
+    m_editTargetCombo->setToolTip("Select which viewport the surface, shader, and overlay controls apply to.");
+    m_editTargetCombo->setEnabled(false);
+    QHBoxLayout *editTargetRow = new QHBoxLayout();
+    editTargetRow->addWidget(m_editTargetLabel);
+    editTargetRow->addWidget(m_editTargetCombo);
+    viewLayout->addLayout(editTargetRow);
 
-    m_vpTopCheck = new QCheckBox("Top");
-    m_vpBottomCheck = new QCheckBox("Bottom");
-    m_vpFrontCheck = new QCheckBox("Front");
-    m_vpLeftCheck = new QCheckBox("Left");
-
-    m_vpTopCheck->setChecked(true);
-    m_vpBottomCheck->setChecked(true);
-    m_vpFrontCheck->setChecked(true);
-    m_vpLeftCheck->setChecked(true);
-
-    m_vpTopCheck->setEnabled(false);
-    m_vpBottomCheck->setEnabled(false);
-    m_vpFrontCheck->setEnabled(false);
-    m_vpLeftCheck->setEnabled(false);
-
-    vpRow1->addWidget(m_vpTopCheck);
-    vpRow1->addWidget(m_vpBottomCheck);
-    vpRow2->addWidget(m_vpFrontCheck);
-    vpRow2->addWidget(m_vpLeftCheck);
-
-    viewLayout->addLayout(vpRow1);
-    viewLayout->addLayout(vpRow2);
+    // Camera Preset (per-viewport)
+    m_cameraPresetLabel = new QLabel("Camera:");
+    m_cameraPresetCombo = new QComboBox();
+    m_cameraPresetCombo->addItems({"Top", "Perspective", "Front", "Left", "Bottom", "Back", "Right"});
+    m_cameraPresetCombo->setCurrentIndex(1);  // Perspective
+    m_cameraPresetCombo->setToolTip("Camera orientation preset for the selected viewport.");
+    m_cameraPresetCombo->setEnabled(false);
+    QHBoxLayout *presetRow = new QHBoxLayout();
+    presetRow->addWidget(m_cameraPresetLabel);
+    presetRow->addWidget(m_cameraPresetCombo);
+    viewLayout->addLayout(presetRow);
 
     // Assemble side panel
     sideLayout->addWidget(surfGroup);
@@ -616,22 +618,66 @@ void MainWindow::setupConnections()
     connect(m_innerCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setBemVisible("inner_skull", checked); });
     connect(m_bemColorCheck, &QCheckBox::toggled, m_brainView, &BrainView::setBemHighContrast);
 
-    // Multi-view
-    connect(m_multiViewCheck, &QCheckBox::toggled, [this](bool checked) {
-        m_vpTopCheck->setEnabled(checked);
-        m_vpBottomCheck->setEnabled(checked);
-        m_vpFrontCheck->setEnabled(checked);
-        m_vpLeftCheck->setEnabled(checked);
-        if (checked) {
-            m_brainView->showMultiView();
+    // Multi-view: view count
+    connect(m_viewCountCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
+        const int count = index + 1;
+        m_brainView->setViewCount(count);
+        updateViewportCheckboxes(count);
+
+        const bool isMulti = (count > 1);
+        m_editTargetCombo->setEnabled(isMulti);
+        m_cameraPresetCombo->setEnabled(isMulti);
+
+        // Rebuild the edit-target combo items
+        m_editTargetCombo->blockSignals(true);
+        m_editTargetCombo->clear();
+        if (isMulti) {
+            for (int i = 0; i < count; ++i) {
+                const int preset = i;  // defaultForIndex assigns preset = index
+                m_editTargetCombo->addItem(multiViewPresetName(preset), i);
+            }
+            m_editTargetCombo->setCurrentIndex(0);
+            m_brainView->setVisualizationEditTarget(0);
+            syncUIToEditTarget(0);
         } else {
-            m_brainView->showSingleView();
+            m_editTargetCombo->addItem("All Viewports");
+            m_brainView->setVisualizationEditTarget(-1);
+            syncUIToEditTarget(-1);
+        }
+        m_editTargetCombo->blockSignals(false);
+    });
+
+    // Multi-view: edit target selection
+    connect(m_editTargetCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
+        if (m_brainView->viewMode() == BrainView::SingleView) return;
+        const int target = m_editTargetCombo->itemData(index).toInt();
+        m_brainView->setVisualizationEditTarget(target);
+        syncUIToEditTarget(target);
+    });
+
+    // Multi-view: camera preset for the selected viewport
+    connect(m_cameraPresetCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int presetIndex) {
+        if (m_brainView->viewMode() == BrainView::SingleView) return;
+        const int target = m_brainView->visualizationEditTarget();
+        if (target >= 0) {
+            m_brainView->setViewportCameraPreset(target, presetIndex);
         }
     });
-    connect(m_vpTopCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(0, checked); });
-    connect(m_vpBottomCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(1, checked); });
-    connect(m_vpFrontCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(2, checked); });
-    connect(m_vpLeftCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setViewportEnabled(3, checked); });
+
+    // Multi-view: bidirectional sync when user clicks viewport labels inside BrainView
+    connect(m_brainView, &BrainView::visualizationEditTargetChanged, [this](int target) {
+        if (target < 0) return;
+        // Update combo without re-triggering the connection
+        m_editTargetCombo->blockSignals(true);
+        for (int i = 0; i < m_editTargetCombo->count(); ++i) {
+            if (m_editTargetCombo->itemData(i).toInt() == target) {
+                m_editTargetCombo->setCurrentIndex(i);
+                break;
+            }
+        }
+        m_editTargetCombo->blockSignals(false);
+        syncUIToEditTarget(target);
+    });
 
     // Brain Surface
     connect(m_loadSurfaceBtn, &QPushButton::clicked, [this]() {
@@ -1355,4 +1401,63 @@ void MainWindow::enableNetworkControls()
     m_showNetworkCheck->setChecked(true);
     m_networkThresholdSlider->setEnabled(true);
     m_networkColormapCombo->setEnabled(true);
+}
+//=============================================================================================================
+
+void MainWindow::syncUIToEditTarget(int target)
+{
+    // Sync the surface, shader, overlay, and BEM shader combos to reflect
+    // the settings of the currently selected edit-target viewport.
+    // Block signals to avoid recursive updates.
+
+    m_surfCombo->blockSignals(true);
+    m_surfCombo->setCurrentText(m_brainView->activeSurfaceForTarget(target));
+    m_surfCombo->blockSignals(false);
+
+    m_shaderCombo->blockSignals(true);
+    m_shaderCombo->setCurrentText(m_brainView->shaderModeForTarget(target));
+    m_shaderCombo->blockSignals(false);
+
+    m_bemShaderCombo->blockSignals(true);
+    m_bemShaderCombo->setCurrentText(m_brainView->bemShaderModeForTarget(target));
+    m_bemShaderCombo->blockSignals(false);
+
+    m_overlayCombo->blockSignals(true);
+    m_overlayCombo->setCurrentText(m_brainView->overlayModeForTarget(target));
+    m_overlayCombo->blockSignals(false);
+
+    // Sync camera preset combo
+    if (target >= 0) {
+        m_cameraPresetCombo->blockSignals(true);
+        m_cameraPresetCombo->setCurrentIndex(m_brainView->viewportCameraPreset(target));
+        m_cameraPresetCombo->blockSignals(false);
+    }
+
+    // Sync hemisphere/BEM/dipole/network visibility from the target viewport
+    m_lhCheck->blockSignals(true);
+    m_lhCheck->setChecked(m_brainView->objectVisibleForTarget("lh", target));
+    m_lhCheck->blockSignals(false);
+
+    m_rhCheck->blockSignals(true);
+    m_rhCheck->setChecked(m_brainView->objectVisibleForTarget("rh", target));
+    m_rhCheck->blockSignals(false);
+
+    m_headCheck->blockSignals(true);
+    m_headCheck->setChecked(m_brainView->objectVisibleForTarget("bem_head", target));
+    m_headCheck->blockSignals(false);
+
+    m_outerCheck->blockSignals(true);
+    m_outerCheck->setChecked(m_brainView->objectVisibleForTarget("bem_outer_skull", target));
+    m_outerCheck->blockSignals(false);
+
+    m_innerCheck->blockSignals(true);
+    m_innerCheck->setChecked(m_brainView->objectVisibleForTarget("bem_inner_skull", target));
+    m_innerCheck->blockSignals(false);
+}
+
+//=============================================================================================================
+
+void MainWindow::updateViewportCheckboxes(int count)
+{
+    Q_UNUSED(count);
 }

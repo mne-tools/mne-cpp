@@ -748,6 +748,22 @@ void BrainView::setSensorVisible(const QString &type, bool visible)
 
     auto &profile = visibilityProfileForTarget(m_visualizationEditTarget);
     profile.setObjectVisible(object, visible);
+
+    // Cascade parent toggle to child sub-types so that e.g. "MEG" also
+    // enables/disables MEG/Grad, MEG/Mag, and MEG Helmet sub-types.
+    if (type == QLatin1String("MEG")) {
+        profile.sensMegGrad   = visible;
+        profile.sensMegMag    = visible;
+        profile.sensMegHelmet = visible;
+    } else if (type == QLatin1String("EEG")) {
+        // No sub-types for EEG currently, but keep symmetric.
+    } else if (type == QLatin1String("Digitizer")) {
+        profile.digCardinal = visible;
+        profile.digHpi      = visible;
+        profile.digEeg      = visible;
+        profile.digExtra    = visible;
+    }
+
     saveMultiViewSettings();
     update();
 }
@@ -1259,6 +1275,30 @@ void BrainView::setViewportEnabled(int index, bool enabled)
         updateOverlayLayout();
         update();
     }
+}
+
+//=============================================================================================================
+
+void BrainView::setViewportCameraPreset(int index, int preset)
+{
+    if (index < 0 || index >= static_cast<int>(m_subViews.size()))
+        return;
+    preset = std::clamp(preset, 0, 6);
+    if (m_subViews[index].preset == preset)
+        return;
+    m_subViews[index].preset = preset;
+    saveMultiViewSettings();
+    updateOverlayLayout();
+    update();
+}
+
+//=============================================================================================================
+
+int BrainView::viewportCameraPreset(int index) const
+{
+    if (index < 0 || index >= static_cast<int>(m_subViews.size()))
+        return -1;
+    return std::clamp(m_subViews[index].preset, 0, 6);
 }
 
 //=============================================================================================================
