@@ -200,6 +200,11 @@ void MainWindow::setupUI()
 
     m_loadStcBtn = new QPushButton("Load STC...");
 
+    QLabel *stcSelectLabel = new QLabel("Source Estimate:");
+    m_stcCombo = new QComboBox;
+    m_stcCombo->setEnabled(false);
+    m_stcCombo->setToolTip("Select which loaded source estimate to display");
+
     QLabel *colormapLabel = new QLabel("Colormap:");
     m_colormapCombo = new QComboBox;
     m_colormapCombo->addItems({"Hot", "Jet", "Viridis", "Cool", "RedBlue", "Bone"});
@@ -265,6 +270,8 @@ void MainWindow::setupUI()
     m_stcProgressBar->hide();
 
     stcLayout->addWidget(m_loadStcBtn);
+    stcLayout->addWidget(stcSelectLabel);
+    stcLayout->addWidget(m_stcCombo);
     stcLayout->addWidget(m_stcStatusLabel);
     stcLayout->addWidget(m_stcProgressBar);
     stcLayout->addWidget(colormapLabel);
@@ -712,23 +719,21 @@ void MainWindow::setupConnections()
         }
     });
 
-    // STC loading
+    // STC loading – add file to combo, which triggers the actual load
     connect(m_loadStcBtn, &QPushButton::clicked, [this]() {
         QString path = QFileDialog::getOpenFileName(this, "Select Source Estimate", "", "STC Files (*-lh.stc *-rh.stc *.stc)");
         if (path.isEmpty()) return;
+        addStcEntry(path, true);
+    });
 
-        QString lhPath, rhPath;
-        if (path.contains("-lh.stc")) {
-            lhPath = path;
-            QString sibling = path; sibling.replace("-lh.stc", "-rh.stc");
-            if (QFile::exists(sibling)) rhPath = sibling;
-        } else if (path.contains("-rh.stc")) {
-            rhPath = path;
-            QString sibling = path; sibling.replace("-rh.stc", "-lh.stc");
-            if (QFile::exists(sibling)) lhPath = sibling;
-        } else {
-            lhPath = path;
-        }
+    // STC combo selection changed – load the selected STC pair
+    connect(m_stcCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int index) {
+        if (index < 0) return;
+
+        QStringList pair = m_stcCombo->itemData(index).toStringList();
+        if (pair.size() < 2) return;
+        QString lhPath = pair[0];
+        QString rhPath = pair[1];
 
         m_loadStcBtn->setEnabled(false);
         m_stcStatusLabel->setText("Starting...");
@@ -1210,7 +1215,7 @@ void MainWindow::loadInitialData(const QString &subjectPath,
                                   const QString &subjectName,
                                   const QString &bemPath,
                                   const QString &transPath,
-                                  const QString &stcPath,
+                                  const QStringList &stcPaths,
                                   const QString &digitizerPath,
                                   const QString &srcSpacePath,
                                   const QString &atlasPath,
@@ -1297,30 +1302,13 @@ void MainWindow::loadInitialData(const QString &subjectPath,
         }
     }
 
-    // Auto-load STC
-    if (!stcPath.isEmpty() && QFile::exists(stcPath)) {
-        qDebug() << "Auto-loading source estimate from:" << stcPath;
-
-        QString lhPath, rhPath;
-        if (stcPath.contains("-lh.stc")) {
-            lhPath = stcPath;
-            QString sibling = stcPath; sibling.replace("-lh.stc", "-rh.stc");
-            if (QFile::exists(sibling)) rhPath = sibling;
-        } else if (stcPath.contains("-rh.stc")) {
-            rhPath = stcPath;
-            QString sibling = stcPath; sibling.replace("-rh.stc", "-lh.stc");
-            if (QFile::exists(sibling)) lhPath = sibling;
-        } else {
-            lhPath = stcPath;
+    // Auto-load STC(s) – add all provided paths to the combo; activate only the first
+    for (int i = 0; i < stcPaths.size(); ++i) {
+        const QString &stcPath = stcPaths[i];
+        if (!stcPath.isEmpty() && QFile::exists(stcPath)) {
+            qDebug() << "Auto-loading source estimate from:" << stcPath;
+            addStcEntry(stcPath, /*activate=*/ (i == 0));
         }
-
-        m_loadStcBtn->setEnabled(false);
-        m_stcStatusLabel->setText("Starting...");
-        m_stcStatusLabel->show();
-        m_stcProgressBar->setValue(0);
-        m_stcProgressBar->show();
-
-        m_brainView->loadSourceEstimate(lhPath, rhPath);
     }
 
     // Auto-load evoked
@@ -1339,6 +1327,61 @@ void MainWindow::loadInitialData(const QString &subjectPath,
         m_evokedSetCombo->setProperty("evokedPath", evokedPath);
 
         m_brainView->loadSensorField(evokedPath, 0);
+    }
+}
+
+//=============================================================================================================
+
+void MainWindow::addStcEntry(const QString &stcPath, bool activate)
+{
+    // Resolve the LH/RH pair
+    QString lhPath, rhPath;
+    if (stcPath.contains("-lh.stc")) {
+        lhPath = stcPath;
+        QString sibling = stcPath; sibling.replace("-lh.stc", "-rh.stc");
+        if (QFile::exists(sibling)) rhPath = sibling;
+    } else if (stcPath.contains("-rh.stc")) {
+        rhPath = stcPath;
+        QString sibling = stcPath; sibling.replace("-rh.stc", "-lh.stc");
+        if (QFile::exists(sibling)) lhPath = sibling;
+    } else {
+        lhPath = stcPath;
+    }
+
+    // Derive a display name from the filename:
+    // e.g. "sample_audvis-ave-spm-left_auditory-lh.stc" → "sample_audvis-ave-spm-left_auditory"
+    QString displayName;
+    QString refPath = !lhPath.isEmpty() ? lhPath : rhPath;
+    QFileInfo fi(refPath);
+    displayName = fi.fileName();
+    displayName.replace("-lh.stc", "").replace("-rh.stc", "");
+
+    // Avoid duplicates
+    for (int i = 0; i < m_stcCombo->count(); ++i) {
+        if (m_stcCombo->itemText(i) == displayName) {
+            if (activate) {
+                m_stcCombo->setCurrentIndex(i);
+            }
+            return;
+        }
+    }
+
+    // Store the LH/RH paths as item data
+    QStringList pair;
+    pair << lhPath << rhPath;
+
+    m_stcCombo->blockSignals(true);
+    m_stcCombo->addItem(displayName, pair);
+    m_stcCombo->setEnabled(m_stcCombo->count() > 1);
+    m_stcCombo->blockSignals(false);
+
+    if (activate) {
+        m_stcCombo->setCurrentIndex(m_stcCombo->count() - 1);
+        // If this is the first entry, combo didn't fire currentIndexChanged (was -1 → 0),
+        // so we need to trigger the load manually via the signal
+        if (m_stcCombo->count() == 1) {
+            emit m_stcCombo->currentIndexChanged(0);
+        }
     }
 }
 

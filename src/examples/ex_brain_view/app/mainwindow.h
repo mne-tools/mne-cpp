@@ -99,7 +99,7 @@ public:
                          const QString &subjectName,
                          const QString &bemPath = QString(),
                          const QString &transPath = QString(),
-                         const QString &stcPath = QString(),
+                         const QStringList &stcPaths = QStringList(),
                          const QString &digitizerPath = QString(),
                          const QString &srcSpacePath = QString(),
                          const QString &atlasPath = QString(),
@@ -113,6 +113,13 @@ private:
     void syncUIToEditTarget(int target);
     void updateViewportCheckboxes(int count);
     void enableNetworkControls();
+
+    /**
+     * Resolve an STC file path into a LH/RH pair and add an entry to the
+     * STC combo box.  When @p activate is true the new entry is also selected,
+     * triggering a load.
+     */
+    void addStcEntry(const QString &stcPath, bool activate = true);
 
 private:
     // Core components
@@ -150,6 +157,7 @@ private:
 
     // Control widgets - STC
     QPushButton *m_loadStcBtn = nullptr;
+    QComboBox *m_stcCombo = nullptr;
     QLabel *m_stcStatusLabel = nullptr;
     QProgressBar *m_stcProgressBar = nullptr;
     QComboBox *m_colormapCombo = nullptr;

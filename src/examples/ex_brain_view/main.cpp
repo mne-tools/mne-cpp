@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     QCommandLineOption hemiOption("hemi", "Hemisphere (unused)", "hemi", "0");
     QCommandLineOption bemOption("bem", "BEM file path", "path", "");
     QCommandLineOption transOption("trans", "Transformation file path", "path", "");
-    QCommandLineOption stcOption("stc", "Source estimate file path", "path", "");
+    QCommandLineOption stcOption("stc", "Source estimate file path (may be repeated)", "path");
     QCommandLineOption digitizerOption("digitizer", "Digitizer/sensor file path", "path", "");
     QCommandLineOption srcSpaceOption("srcSpace", "Source space / forward solution file path", "path", "");
     QCommandLineOption atlasOption("atlas", "Atlas annotation file path (lh or rh, sibling auto-detected)", "path", "");
@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
         parser.value(subjectOption),
         parser.value(bemOption),
         parser.value(transOption),
-        parser.value(stcOption),
+        parser.values(stcOption),
         parser.value(digitizerOption),
         parser.value(srcSpaceOption),
         parser.value(atlasOption),
