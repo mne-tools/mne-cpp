@@ -48,6 +48,7 @@ add_subdirectory(lsl)
 
 add_subdirectory(fiff)
 add_subdirectory(fs)
+add_subdirectory(mri)
 
 add_subdirectory(mne)
 add_subdirectory(fwd)

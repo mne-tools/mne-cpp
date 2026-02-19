@@ -83,10 +83,18 @@ def main():
     # Use get_meg_helmet_surf to get the upsampled helmet just like
     # make_field_map does, but then compute the mapping ourselves with
     # the 'accurate' mode so it matches the C++ Legendre evaluation.
-    print("[helmet-ref] Getting MEG helmet surface (upsampling=2)...")
     trans = mne.read_trans(fname_trans, verbose=False)
-    surf = get_meg_helmet_surf(evoked.info, trans=trans, upsampling=2,
-                               verbose=True)
+    try:
+        print("[helmet-ref] Getting MEG helmet surface (upsampling=2)...")
+        surf = get_meg_helmet_surf(evoked.info, trans=trans, upsampling=2,
+                                   verbose=True)
+    except RuntimeError as e:
+        if "pyvista" in str(e).lower():
+            print(f"[helmet-ref] pyvista not available, using upsampling=1")
+            surf = get_meg_helmet_surf(evoked.info, trans=trans,
+                                       verbose=True)
+        else:
+            raise
     print(f"[helmet-ref] Helmet surface: {surf['np']} vertices")
 
     # Auto-fit sphere origin (matching make_field_map(origin='auto'))
