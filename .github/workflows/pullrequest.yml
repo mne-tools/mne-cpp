@@ -149,62 +149,89 @@ jobs:
       fail-fast: false
       max-parallel: 3
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-24.04, macos-26, windows-2025]
 
     steps:
     - name: Clone repository
       uses: actions/checkout@v3
     - name: Clone mne-cpp test data
       run: git clone https://github.com/mne-tools/mne-cpp-test-data.git resources/data/mne-cpp-test-data
-    - name: Install Python 3.7 version
-      uses: actions/setup-python@v4
+    - name: Install Python 3.10 version
+      uses: actions/setup-python@v5
       with:
-        python-version: '3.7'
-        architecture: 'x64'
+        python-version: '3.10'
+        architecture: ${{ matrix.os == 'macos-26' && 'arm64' || 'x64' }}
+    - name: Install MNE-Python
+      run: |
+        pip install --upgrade pip
+        pip install mne numpy scipy
+    - name: Cache MNE sample data
+      id: cache-mne-data
+      uses: actions/cache@v4
+      with:
+        path: ~/mne_data/MNE-sample-data
+        key: mne-sample-data-v1
+    - name: Download MNE sample data
+      if: steps.cache-mne-data.outputs.cache-hit != 'true'
+      run: |
+        python -c "import mne; mne.datasets.sample.data_path()"
     - name: Install Qt (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-20.04') || (matrix.os == 'macos-11')
+      if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
       uses: jurplel/install-qt-action@v3
       with:
         version: 6.10.2
         modules: qtcharts qtshadertools
     - name: Install Qt (Windows)
-      if: matrix.os == 'windows-2019'
+      if: matrix.os == 'windows-2025'
       uses: jurplel/install-qt-action@v3
       with:
         version: 6.10.2
-        arch: win64_msvc2019_64
+        arch: win64_msvc2022_64
         modules: qtcharts qtshadertools
-    - name: Configure and compile MNE-CPP
-      if: (matrix.os == 'macos-latest') || (matrix.os == 'windows-latest')
+    - name: Configure and compile MNE-CPP (Linux)
+      if: matrix.os == 'ubuntu-24.04'
       run: |
-        ./tools/build_project.bat all  
-    - name: Configure and compile MNE-CPP
-      if: matrix.os == 'ubuntu-latest'
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON -DWITH_CODE_COV=ON
+        cmake --build build
+    - name: Configure and compile MNE-CPP (MacOS)
+      if: matrix.os == 'macos-26'
       run: |
-        ./tools/build_project.bat coverage all
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+        cmake --build build
+    - name: Configure and compile MNE-CPP (Windows)
+      if: matrix.os == 'windows-2025'
+      run: |
+        # Setup VS compiler
+        cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
+        Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
+        cmake -B build -S . -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
+        cmake --build build
     - name: Run tests (Linux)
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-24.04'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
         QT_QPA_PLATFORM: offscreen
+        MNE_DATA: ~/mne_data
       run: |
         ./tools/test_all.bat verbose withCoverage
     - name: Upload coverage to Codecov
-      if: matrix.os == 'ubuntu-latest'
+      if: matrix.os == 'ubuntu-24.04'
       uses: codecov/codecov-action@v4
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
     - name: Run tests (MacOS)
-      if: matrix.os == 'macos-latest'
+      if: matrix.os == 'macos-26'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
         QT_QPA_PLATFORM: offscreen
+        MNE_DATA: ~/mne_data
       run: |
-        ./tools/test_all.bat verbose
+        ./tools/test_all.bat Release verbose
     - name: Run tests (Windows)
-      if: matrix.os == 'windows-latest'
+      if: matrix.os == 'windows-2025'
       env:
         QTEST_FUNCTION_TIMEOUT: 900000
+        MNE_DATA: ~/mne_data
       run: |
         ./tools/test_all.bat Release verbose
 

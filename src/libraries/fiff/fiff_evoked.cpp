@@ -489,8 +489,15 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
     p_FiffEvoked.times = times;
     p_FiffEvoked.data = all_data;
 
-    // Run baseline correction
-    p_FiffEvoked.applyBaselineCorrection(t_baseline);
+    // Run baseline correction only if explicitly requested
+    // A baseline of (-1, -1) or (first == second) means "no baseline correction"
+    // This matches mne-python (baseline=None) and SVN-MNE (no --bmin/--bmax) behavior
+    if (t_baseline.first != t_baseline.second) {
+        p_FiffEvoked.applyBaselineCorrection(t_baseline);
+    } else {
+        p_FiffEvoked.baseline = t_baseline;
+        printf("\tNo baseline correction applied\n");
+    }
 
     return true;
 }
@@ -561,6 +568,12 @@ FiffEvoked & FiffEvoked::operator+=(const MatrixXd &newData)
 
 void FiffEvoked::applyBaselineCorrection(QPair<float, float>& p_baseline)
 {
+    // Skip baseline correction if sentinel value (-1, -1) or equal bounds are passed
+    if (p_baseline.first == p_baseline.second) {
+        printf("\tNo baseline correction applied\n");
+        return;
+    }
+
     // Run baseline correction
     printf("Applying baseline correction ... (mode: mean)\n");
     this->data = MNEMath::rescale(this->data, this->times, p_baseline, QString("mean"));

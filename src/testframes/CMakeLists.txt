@@ -46,4 +46,6 @@ add_subdirectory(test_network_visualization)
 add_subdirectory(test_sensor_streaming)
 add_subdirectory(test_mne_anonymize)
 add_subdirectory(test_edf2fiff_rwr)
+add_subdirectory(test_compute_raw_inverse)
+add_subdirectory(test_mne_compute_raw_inverse)
 
