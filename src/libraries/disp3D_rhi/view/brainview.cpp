@@ -56,7 +56,7 @@
 #include "model/items/sensortreeitem.h"
 #include "model/items/dipoletreeitem.h"
 #include "model/items/sourcespacetreeitem.h"
-#include "model/items/digitizertreeitem.h"\n#include "helpers/field_map.h"
+#include "model/items/digitizertreeitem.h"
 
 #include <Eigen/Dense>
 #include <QMatrix4x4>

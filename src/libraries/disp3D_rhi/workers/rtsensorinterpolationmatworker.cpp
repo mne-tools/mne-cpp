@@ -37,7 +37,7 @@
 //=============================================================================================================
 
 #include "rtsensorinterpolationmatworker.h"
-#include "helpers/field_map.h"
+#include <fwd/fwd_field_map.h>
 
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
@@ -303,7 +303,7 @@ void RtSensorInterpolationMatWorker::computeMapping()
                     megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, devToTarget.get()));
 
                 if (coils && coils->ncoil > 0) {
-                    auto mat = FieldMap::computeMegMapping(
+                    auto mat = FWDLIB::FwdFieldMap::computeMegMapping(
                         *coils, megVerts, norms, origin, kIntrad, kMegMiss);
 
                     if (mat && mat->rows() > 0) {
@@ -327,7 +327,7 @@ void RtSensorInterpolationMatWorker::computeMapping()
                     eegChs, eegChs.size(), headMriOld.get()));
 
             if (eegCoils && eegCoils->ncoil > 0) {
-                auto mat = FieldMap::computeEegMapping(
+                auto mat = FWDLIB::FwdFieldMap::computeEegMapping(
                     *eegCoils, eegVerts, origin, kIntrad, kEegMiss);
 
                 if (mat && mat->rows() > 0) {

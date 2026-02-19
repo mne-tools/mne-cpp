@@ -38,8 +38,9 @@
 
 #include "sensorfieldmapper.h"
 #include "renderable/brainsurface.h"
-#include "helpers/field_map.h"
 #include "core/rendertypes.h"
+
+#include <fwd/fwd_field_map.h>
 
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
@@ -211,6 +212,7 @@ bool SensorFieldMapper::buildMapping(
 
     // ── Classify channels ──────────────────────────────────────────────
     QList<FiffChInfo> megChs, eegChs;
+    QStringList megChNames, eegChNames;
 
     auto isBad = [this](const QString &name) {
         return m_evoked.info.bads.contains(name);
@@ -228,11 +230,13 @@ bool SensorFieldMapper::buildMapping(
             m_megPick.append(k);
             m_megPositions.append(Eigen::Vector3f(pos.x(), pos.y(), pos.z()));
             megChs.append(ch);
+            megChNames.append(ch.ch_name);
         } else if (ch.kind == FIFFV_EEG_CH) {
             if (applySensorTrans && !headToMriTrans.isEmpty()) pos = headToMri.map(pos);
             m_eegPick.append(k);
             m_eegPositions.append(Eigen::Vector3f(pos.x(), pos.y(), pos.z()));
             eegChs.append(ch);
+            eegChNames.append(ch.ch_name);
         }
     }
 
@@ -296,8 +300,10 @@ bool SensorFieldMapper::buildMapping(
                     megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, devToTarget.get()));
 
                 if (coils && coils->ncoil > 0) {
-                    m_megMapping = DISP3DRHILIB::FieldMap::computeMegMapping(
-                        *coils, verts, norms, origin, kIntrad, kMegMiss);
+                    m_megMapping = FWDLIB::FwdFieldMap::computeMegMapping(
+                        *coils, verts, norms, origin,
+                        m_evoked.info, megChNames,
+                        kIntrad, kMegMiss);
                 }
             }
         }
@@ -317,8 +323,10 @@ bool SensorFieldMapper::buildMapping(
                     eegChs, eegChs.size(), headMriOld.get()));
 
             if (eegCoils && eegCoils->ncoil > 0) {
-                m_eegMapping = DISP3DRHILIB::FieldMap::computeEegMapping(
-                    *eegCoils, verts, origin, kIntrad, kEegMiss);
+                m_eegMapping = FWDLIB::FwdFieldMap::computeEegMapping(
+                    *eegCoils, verts, origin,
+                    m_evoked.info, eegChNames,
+                    kIntrad, kEegMiss);
             }
         }
     }

@@ -21,6 +21,7 @@ set(SOURCES
     fwd_eeg_sphere_layer.cpp
     fwd_eeg_sphere_model.cpp
     fwd_eeg_sphere_model_set.cpp
+    fwd_field_map.cpp
     fwd_global.cpp
     fwd_thread_arg.cpp
 )
@@ -32,6 +33,7 @@ set(HEADERS
     fwd_bem_model.h
     fwd_bem_solution.h
     fwd_coil.h
+    fwd_field_map.h
     fwd_coil_set.h
     fwd_comp_data.h
     fwd_eeg_sphere_layer.h

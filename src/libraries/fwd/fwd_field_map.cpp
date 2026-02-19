@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     field_map.cpp
+ * @file     fwd_field_map.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
  * @date     January, 2026
@@ -46,9 +46,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "field_map.h"
+#include "fwd_field_map.h"
+
+#include <fiff/fiff_proj.h>
+#include <fiff/fiff_file.h>
 
 #include <Eigen/SVD>
+#include <QRegularExpression>
 #include <algorithm>
 #include <cmath>
 #include <vector>
@@ -414,20 +418,28 @@ VectorXd adHocEegStds(int ncoil)
  * The final mapping matrix is returned in float for GPU-friendly rendering.
  *
  * Steps (matching MNE-Python _compute_mapping_matrix):
+ *   0. Apply SSP projector: proj_dots = P^T @ self_dots @ P
  *   1. Whiten: whitener = diag(1 / noiseStds)
- *      (In Python: whitener = diag(1/sqrt(noise_cov.data)) where data = std^2)
- *   2. whitened_dots = whitener @ self_dots @ whitener
+ *   2. whitened_dots = whitener @ proj_dots @ whitener
  *   3. SVD → truncated pseudo-inverse (_pinv_trunc)
  *   4. inv_whitened = whitener @ inv @ whitener
- *   5. mapping = surface_dots @ inv_whitened
+ *   5. inv_whitened_proj = P^T @ inv_whitened  (because surface_dots are unprojected)
+ *   6. mapping = surface_dots @ inv_whitened_proj
+ *   7. For EEG with average ref: subtract column means
  *
- * Note: SSP projectors are not applied (proj_op = I).
- * Note: The average EEG reference projection is not applied.
+ * @param[in] selfDots      Sensor self-dot matrix (nchan × nchan)
+ * @param[in] surfaceDots   Surface-to-sensor dot matrix (nvert × nchan)
+ * @param[in] noiseStds     Ad-hoc noise standard deviations (nchan)
+ * @param[in] miss          Eigenvalue truncation threshold
+ * @param[in] projOp        SSP projector matrix (nchan × nchan), identity if empty
+ * @param[in] applyAvgRef   Whether to apply average reference (EEG)
  */
 QSharedPointer<MatrixXf> computeMappingMatrix(const MatrixXd& selfDots,
                                               const MatrixXd& surfaceDots,
                                               const VectorXd& noiseStds,
-                                              double miss)
+                                              double miss,
+                                              const MatrixXd& projOp = MatrixXd(),
+                                              bool applyAvgRef = false)
 {
     if (selfDots.rows() == 0 || surfaceDots.rows() == 0) {
         return QSharedPointer<MatrixXf>();
@@ -435,14 +447,24 @@ QSharedPointer<MatrixXf> computeMappingMatrix(const MatrixXd& selfDots,
 
     const int nchan = selfDots.rows();
 
+    // Step 0: Apply SSP projector to self-dots
+    // proj_dots = P^T @ self_dots @ P
+    MatrixXd projDots;
+    bool hasProj = (projOp.rows() == nchan && projOp.cols() == nchan);
+    if (hasProj) {
+        projDots = projOp.transpose() * selfDots * projOp;
+    } else {
+        projDots = selfDots;
+    }
+
     // Step 1: Build whitener = diag(1/std)
     VectorXd whitener(nchan);
     for (int i = 0; i < nchan; ++i) {
         whitener(i) = (noiseStds(i) > 0.0) ? (1.0 / noiseStds(i)) : 0.0;
     }
 
-    // Step 2: whitened_dots = whitener @ self_dots @ whitener
-    MatrixXd whitenedDots = whitener.asDiagonal() * selfDots * whitener.asDiagonal();
+    // Step 2: whitened_dots = whitener @ proj_dots @ whitener
+    MatrixXd whitenedDots = whitener.asDiagonal() * projDots * whitener.asDiagonal();
 
     // Step 3: SVD → truncated pseudo-inverse (port of _pinv_trunc)
     JacobiSVD<MatrixXd> svd(whitenedDots, ComputeFullU | ComputeFullV);
@@ -478,10 +500,25 @@ QSharedPointer<MatrixXf> computeMappingMatrix(const MatrixXd& selfDots,
     // Step 4: inv_whitened = whitener @ inv @ whitener
     MatrixXd invWhitened = whitener.asDiagonal() * inv * whitener.asDiagonal();
 
-    // Step 5: mapping = surface_dots @ inv_whitened
-    MatrixXd mapping = surfaceDots * invWhitened;
+    // Step 5: Apply projector to inverse (because surface_dots are unprojected)
+    // inv_whitened_proj = P^T @ inv_whitened
+    MatrixXd invWhitenedProj;
+    if (hasProj) {
+        invWhitenedProj = projOp.transpose() * invWhitened;
+    } else {
+        invWhitenedProj = invWhitened;
+    }
 
-    // Convert to float for rendering
+    // Step 6: mapping = surface_dots @ inv_whitened_proj
+    MatrixXd mapping = surfaceDots * invWhitenedProj;
+
+    // Step 7: For EEG with average reference, subtract column means
+    if (applyAvgRef) {
+        VectorXd colMeans = mapping.colwise().mean();
+        mapping.rowwise() -= colMeans.transpose();
+    }
+
+    // Convert to float
     MatrixXf mappingF = mapping.cast<float>();
     return QSharedPointer<MatrixXf>::create(std::move(mappingF));
 }
@@ -492,7 +529,7 @@ QSharedPointer<MatrixXf> computeMappingMatrix(const MatrixXd& selfDots,
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QSharedPointer<MatrixXf> DISP3DRHILIB::FieldMap::computeMegMapping(
+QSharedPointer<MatrixXf> FwdFieldMap::computeMegMapping(
     const FwdCoilSet& coils,
     const MatrixX3f& vertices,
     const MatrixX3f& normals,
@@ -518,7 +555,35 @@ QSharedPointer<MatrixXf> DISP3DRHILIB::FieldMap::computeMegMapping(
     return computeMappingMatrix(selfDots, surfaceDots, stds, static_cast<double>(miss));
 }
 
-QSharedPointer<MatrixXf> DISP3DRHILIB::FieldMap::computeEegMapping(
+QSharedPointer<MatrixXf> FwdFieldMap::computeMegMapping(
+    const FwdCoilSet& coils,
+    const MatrixX3f& vertices,
+    const MatrixX3f& normals,
+    const Vector3f& origin,
+    const FIFFLIB::FiffInfo& info,
+    const QStringList& chNames,
+    float intrad,
+    float miss)
+{
+    if (coils.ncoil <= 0 || vertices.rows() == 0 || normals.rows() != vertices.rows()) {
+        return QSharedPointer<MatrixXf>();
+    }
+
+    const Vector3d r0 = origin.cast<double>();
+
+    MatrixXd selfDots = doSelfDots(intrad, coils, r0, /*isMeg=*/true);
+    MatrixXd surfaceDots = doSurfaceDots(intrad, coils, vertices, normals, r0, /*isMeg=*/true);
+    VectorXd stds = adHocMegStds(coils);
+
+    // Build SSP projector
+    MatrixXd projOp;
+    FIFFLIB::FiffProj::make_projector(info.projs, chNames, projOp, info.bads);
+
+    return computeMappingMatrix(selfDots, surfaceDots, stds,
+                                static_cast<double>(miss), projOp, false);
+}
+
+QSharedPointer<MatrixXf> FwdFieldMap::computeEegMapping(
     const FwdCoilSet& coils,
     const MatrixX3f& vertices,
     const Vector3f& origin,
@@ -549,3 +614,47 @@ QSharedPointer<MatrixXf> DISP3DRHILIB::FieldMap::computeEegMapping(
     return computeMappingMatrix(selfDots, surfaceDots, stds, static_cast<double>(miss));
 }
 
+QSharedPointer<MatrixXf> FwdFieldMap::computeEegMapping(
+    const FwdCoilSet& coils,
+    const MatrixX3f& vertices,
+    const Vector3f& origin,
+    const FIFFLIB::FiffInfo& info,
+    const QStringList& chNames,
+    float intrad,
+    float miss)
+{
+    if (coils.ncoil <= 0 || vertices.rows() == 0) {
+        return QSharedPointer<MatrixXf>();
+    }
+
+    const double eegIntrad = intrad * kEegIntradScale;
+    const Vector3d r0 = origin.cast<double>();
+
+    MatrixX3f dummyNormals = MatrixX3f::Zero(vertices.rows(), 3);
+
+    MatrixXd selfDots = doSelfDots(eegIntrad, coils, r0, /*isMeg=*/false);
+    MatrixXd surfaceDots = doSurfaceDots(eegIntrad, coils, vertices, dummyNormals, r0, /*isMeg=*/false);
+    VectorXd stds = adHocEegStds(coils.ncoil);
+
+    // Build SSP projector
+    MatrixXd projOp;
+    FIFFLIB::FiffProj::make_projector(info.projs, chNames, projOp, info.bads);
+
+    // Check for average EEG reference projection
+    // Matches MNE-Python's _has_eeg_average_ref_proj:
+    // - kind == FIFFV_PROJ_ITEM_EEG_AVREF (10), OR
+    // - desc matches "Average .* reference"
+    // Note: Python default is check_active=False, so we don't require active.
+    bool hasAvgRef = false;
+    for (const auto& proj : info.projs) {
+        if (proj.kind == FIFFV_PROJ_ITEM_EEG_AVREF ||
+            proj.desc.contains(QRegularExpression("^Average .* reference$",
+                                                  QRegularExpression::CaseInsensitiveOption))) {
+            hasAvgRef = true;
+            break;
+        }
+    }
+
+    return computeMappingMatrix(selfDots, surfaceDots, stds,
+                                static_cast<double>(miss), projOp, hasAvgRef);
+}

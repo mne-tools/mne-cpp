@@ -24,7 +24,6 @@ set(SOURCES
     geometry/meshfactory.cpp
     helpers/geometryinfo.cpp
     helpers/interpolation.cpp
-    helpers/field_map.cpp
     input/cameracontroller.cpp
     input/raypicker.cpp
     model/braintreemodel.cpp
@@ -65,7 +64,6 @@ set(HEADERS
     geometry/meshfactory.h
     helpers/geometryinfo.h
     helpers/interpolation.h
-    helpers/field_map.h
     input/cameracontroller.h
     input/raypicker.h
     model/braintreemodel.h
