@@ -26,6 +26,8 @@ option(NO_IPC "Build project with no interprocess communication features (shared
 
 option(WASM "Setup build for wasm" OFF)
 
+option(NO_OPENGL "Build without QOpenGLWidget support" OFF)
+
 option(USE_FFTW "Use fftw backend for eigen" OFF)
 
 ##==============================================================================
@@ -39,10 +41,15 @@ endif()
 
 if(WASM)
   add_compile_definitions(WASMBUILD)
+  add_compile_definitions(NO_QOPENGLWIDGET)
   set(BUILD_SHARED_LIBS OFF)
   set(NO_TESTS ON)
   set(NO_EXAMPLES ON)
   set(NO_IPC ON)
+endif()
+
+if(NO_OPENGL)
+    add_compile_definitions(NO_QOPENGLWIDGET)
 endif()
 
 if(NO_IPC)

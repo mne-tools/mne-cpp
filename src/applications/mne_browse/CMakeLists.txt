@@ -6,7 +6,14 @@ set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
-set(QT_REQUIRED_COMPONENTS Core Widgets Concurrent Network Svg OpenGL OpenGLWidgets)
+set(QT_REQUIRED_COMPONENTS Core Widgets Concurrent Network Svg)
+
+if(NOT WASM AND NOT NO_OPENGL)
+  list(APPEND QT_REQUIRED_COMPONENTS OpenGL)
+  if(Qt6_FOUND OR QT_VERSION_MAJOR EQUAL 6)
+    list(APPEND QT_REQUIRED_COMPONENTS OpenGLWidgets)
+  endif()
+endif()
 
 if(NOT WASM)
   list(APPEND QT_REQUIRED_COMPONENTS PrintSupport)

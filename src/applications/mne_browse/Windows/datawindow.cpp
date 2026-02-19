@@ -40,8 +40,9 @@
 
 #include "datawindow.h"
 
+#if !defined(NO_QOPENGLWIDGET)
 #include <QOpenGLWidget>
-
+#endif
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -204,7 +205,7 @@ void DataWindow::initMVCSettings()
     //------ Init data window view ------
     //-----------------------------------
 
-#if defined(USE_OPENGL)
+#if !defined(NO_QOPENGLWIDGET)
     //Use GPU rendering
     QSurfaceFormat currentFormat;
     currentFormat.setSamples(10);
