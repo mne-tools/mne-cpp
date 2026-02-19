@@ -85,6 +85,17 @@ private:
     QString findApplication();
     QString findSubjectsDir();
 
+    /**
+     * Link or copy a file. On Unix uses symlink; on Windows copies the file
+     * since QFile::link creates .lnk shortcuts that are not real symlinks.
+     */
+    static bool linkOrCopy(const QString& src, const QString& dst);
+
+    /**
+     * Link or copy a directory. On Unix uses symlink; on Windows copies recursively.
+     */
+    static bool linkOrCopyDir(const QString& src, const QString& dst);
+
     QString m_sAppPath;         /**< Path to the mne_setup_mri executable. */
     bool m_bAppAvailable;       /**< Whether the app is found. */
     bool m_bDataAvailable;      /**< Whether sample data is found. */
@@ -98,6 +109,41 @@ TestMneSetupMri::TestMneSetupMri()
 : m_bAppAvailable(false)
 , m_bDataAvailable(false)
 {
+}
+
+//=============================================================================================================
+
+bool TestMneSetupMri::linkOrCopy(const QString& src, const QString& dst)
+{
+#ifdef Q_OS_WIN
+    return QFile::copy(src, dst);
+#else
+    return QFile::link(src, dst);
+#endif
+}
+
+//=============================================================================================================
+
+bool TestMneSetupMri::linkOrCopyDir(const QString& src, const QString& dst)
+{
+#ifdef Q_OS_WIN
+    // Recursively copy directory on Windows
+    QDir srcDir(src);
+    if (!srcDir.exists()) return false;
+    QDir().mkpath(dst);
+    for (const QFileInfo& fi : srcDir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot)) {
+        QString srcPath = fi.absoluteFilePath();
+        QString dstPath = dst + "/" + fi.fileName();
+        if (fi.isDir()) {
+            if (!linkOrCopyDir(srcPath, dstPath)) return false;
+        } else {
+            if (!QFile::copy(srcPath, dstPath)) return false;
+        }
+    }
+    return true;
+#else
+    return QFile::link(src, dst);
+#endif
 }
 
 //=============================================================================================================
@@ -226,11 +272,11 @@ void TestMneSetupMri::testFullRun()
     QString tempMriDir = tempSubjectDir + "/mri";
     QDir().mkpath(tempMriDir);
 
-    // Symlink the T1.mgz from sample data
+    // Symlink (or copy on Windows) the T1.mgz from sample data
     QString srcT1 = m_sSubjectsDir + "/sample/mri/T1.mgz";
     QString dstT1 = tempMriDir + "/T1.mgz";
     if (QFile::exists(srcT1)) {
-        QFile::link(srcT1, dstT1);
+        QVERIFY2(linkOrCopy(srcT1, dstT1), "Failed to link/copy T1.mgz");
     } else {
         QSKIP("T1.mgz not found in sample data");
     }
@@ -239,7 +285,8 @@ void TestMneSetupMri::testFullRun()
     QString srcTransforms = m_sSubjectsDir + "/sample/mri/transforms";
     QString dstTransforms = tempMriDir + "/transforms";
     if (QDir(srcTransforms).exists()) {
-        QFile::link(srcTransforms, dstTransforms);
+        QVERIFY2(linkOrCopyDir(srcTransforms, dstTransforms),
+                 "Failed to link/copy transforms dir");
     }
 
     // Run mne_setup_mri
@@ -291,12 +338,13 @@ void TestMneSetupMri::testOverwrite()
 
     QString srcT1 = m_sSubjectsDir + "/sample/mri/T1.mgz";
     QString dstT1 = tempMriDir + "/T1.mgz";
-    QFile::link(srcT1, dstT1);
+    QVERIFY2(linkOrCopy(srcT1, dstT1), "Failed to link/copy T1.mgz");
 
     QString srcTransforms = m_sSubjectsDir + "/sample/mri/transforms";
     QString dstTransforms = tempMriDir + "/transforms";
     if (QDir(srcTransforms).exists()) {
-        QFile::link(srcTransforms, dstTransforms);
+        QVERIFY2(linkOrCopyDir(srcTransforms, dstTransforms),
+                 "Failed to link/copy transforms dir");
     }
 
     QStringList baseArgs;

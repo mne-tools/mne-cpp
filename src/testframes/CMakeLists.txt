@@ -51,4 +51,6 @@ add_subdirectory(test_mne_compute_raw_inverse)
 add_subdirectory(test_field_map)
 add_subdirectory(test_mri_io)
 add_subdirectory(test_mne_setup_mri)
-
+add_subdirectory(test_mne_watershed_bem)
+add_subdirectory(test_mne_surf2bem)
+add_subdirectory(test_mne_flash_bem)

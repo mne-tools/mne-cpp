@@ -279,6 +279,7 @@ private:
     QString m_refDir;         // Python-generated reference directory
     QString m_coilDefPath;    // coil_def.dat
     QString m_pythonScript;   // generate_fieldmap_reference.py
+    QString m_pythonCmd;      // detected Python interpreter command
 
     // ── Data ──────────────────────────────────────────────────────────
     FiffEvokedSet m_evokedSet;
@@ -385,8 +386,31 @@ void TestFieldMap::initTestCase()
     QDir().mkpath(m_refDir);
 
     qDebug() << "Running Python reference generator...";
+
+    // Find Python interpreter (python3 on Unix, python on Windows)
+    QString pythonCmd;
+    {
+        QStringList pyCandidates;
+        pyCandidates << "python3" << "python";
+        for (const QString& py : pyCandidates) {
+            QProcess testProc;
+            testProc.start(py, QStringList() << "-c" << "import mne; print(mne.__version__)");
+            testProc.waitForFinished(10000);
+            if (testProc.exitCode() == 0) {
+                pythonCmd = py;
+                break;
+            }
+        }
+    }
+    if (pythonCmd.isEmpty()) {
+        QSKIP("Python with MNE not found. Install mne-python to run this test.");
+        return;
+    }
+    m_pythonCmd = pythonCmd;
+    qDebug() << "Using Python:" << m_pythonCmd;
+
     QProcess pyProc;
-    pyProc.setProgram("python3");
+    pyProc.setProgram(m_pythonCmd);
     pyProc.setArguments({
         m_pythonScript,
         "--evoked", evokedPath,
@@ -788,8 +812,12 @@ void TestFieldMap::testMultiEvokedMegMapping()
         QDir().mkpath(m_multiRefDir);
 
         qDebug() << "Running multi-evoked Python reference generator...";
+        if (m_pythonCmd.isEmpty()) {
+            QSKIP("Python interpreter not available");
+            return;
+        }
         QProcess pyProc;
-        pyProc.setProgram("python3");
+        pyProc.setProgram(m_pythonCmd);
         pyProc.setArguments({
             m_multiPythonScript,
             "--evoked", evokedPath,
@@ -1181,8 +1209,12 @@ void TestFieldMap::testHelmetFieldMap()
     QDir().mkpath(helmetRefDir);
 
     qDebug() << "Running helmet Python reference generator...";
+    if (m_pythonCmd.isEmpty()) {
+        QSKIP("Python interpreter not available");
+        return;
+    }
     QProcess pyProc;
-    pyProc.setProgram("python3");
+    pyProc.setProgram(m_pythonCmd);
     pyProc.setArguments({
         helmetScript,
         "--outdir", helmetRefDir,

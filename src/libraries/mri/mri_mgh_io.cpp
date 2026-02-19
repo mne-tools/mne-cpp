@@ -52,9 +52,10 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDataStream>
-#include <QProcess>
 #include <QDebug>
 #include <QRegularExpression>
+
+#include <zlib.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -146,18 +147,54 @@ bool MriMghIO::read(const QString& mgzFile,
 
 bool MriMghIO::decompress(const QString& mgzFile, QByteArray& rawData)
 {
-    QProcess process;
-    process.start("gunzip", QStringList() << "-c" << mgzFile);
-    if (!process.waitForFinished(30000)) {
-        qCritical() << "MriMghIO::decompress - Failed to decompress" << mgzFile;
+    QFile file(mgzFile);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qCritical() << "MriMghIO::decompress - Could not open" << mgzFile;
         return false;
     }
-    if (process.exitCode() != 0) {
-        qCritical() << "MriMghIO::decompress - gunzip failed for" << mgzFile
-                     << ":" << process.readAllStandardError();
+    QByteArray compressedData = file.readAll();
+    file.close();
+
+    if (compressedData.isEmpty()) {
+        qCritical() << "MriMghIO::decompress - File is empty:" << mgzFile;
         return false;
     }
-    rawData = process.readAllStandardOutput();
+
+    // Use zlib to decompress gzip data in memory
+    z_stream strm;
+    memset(&strm, 0, sizeof(strm));
+
+    // MAX_WBITS + 16 tells zlib to detect and handle gzip headers
+    int ret = inflateInit2(&strm, MAX_WBITS + 16);
+    if (ret != Z_OK) {
+        qCritical() << "MriMghIO::decompress - inflateInit2 failed";
+        return false;
+    }
+
+    strm.next_in = reinterpret_cast<Bytef*>(compressedData.data());
+    strm.avail_in = static_cast<uInt>(compressedData.size());
+
+    const int chunkSize = 256 * 1024;  // 256 KB chunks
+    rawData.clear();
+
+    do {
+        rawData.resize(rawData.size() + chunkSize);
+        strm.next_out = reinterpret_cast<Bytef*>(rawData.data() + rawData.size() - chunkSize);
+        strm.avail_out = chunkSize;
+
+        ret = inflate(&strm, Z_NO_FLUSH);
+        if (ret == Z_STREAM_ERROR || ret == Z_DATA_ERROR || ret == Z_MEM_ERROR) {
+            qCritical() << "MriMghIO::decompress - inflate failed for" << mgzFile
+                         << "- zlib error:" << ret;
+            inflateEnd(&strm);
+            return false;
+        }
+    } while (ret != Z_STREAM_END);
+
+    // Trim to actual decompressed size
+    rawData.resize(rawData.size() - static_cast<int>(strm.avail_out));
+    inflateEnd(&strm);
+
     return true;
 }
 

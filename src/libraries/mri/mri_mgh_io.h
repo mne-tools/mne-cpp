@@ -116,7 +116,7 @@ public:
      * center RAS), reads voxel data into per-slice MriSlice structures, and
      * extracts footer tags including the Talairach .xfm path.
      *
-     * For .mgz files, automatic gunzip decompression is performed via QProcess.
+     * For .mgz files, automatic gzip decompression is performed via zlib.
      *
      * @param[in]  mgzFile         Path to the .mgz or .mgh file.
      * @param[out] volData          MriVolData structure to populate.
