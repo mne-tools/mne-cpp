@@ -14,19 +14,20 @@ TransFile="${SampleDir}/all-trans.fif"
 EvokedFile="${SampleDir}/sample_audvis-ave.fif"
 
 # Default build path (assuming run from project root or similar structure)
-# Try to find the executable relative to the script location
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
-# Assuming standard build output structure relative to src/examples/ex_brain_view
-BuildPath="$SCRIPT_DIR/../../../out/Release/examples/ex_brain_view"
+BuildPath="$SCRIPT_DIR/../../../out/Release/apps/mne_inspect"
 
 # Kill any existing instances
-pkill -f ex_brain_view || true
+pkill -f mne_inspect || true
 
 # Check if executable exists
-
+if [ ! -f "$BuildPath" ]; then
+    # Try macOS app bundle
+    BuildPath="$SCRIPT_DIR/../../../out/Release/apps/mne_inspect.app/Contents/MacOS/mne_inspect"
+fi
 
 if [ ! -f "$BuildPath" ]; then
-     echo "Error: Could not locate ex_brain_view executable."
+     echo "Error: Could not locate mne_inspect executable."
      exit 1
 fi
 
@@ -34,7 +35,7 @@ BemFile="${SubjectPath}/${Subject}/bem/sample-5120-5120-5120-bem.fif"
 SrcSpaceFile="${SubjectPath}/${Subject}/bem/sample-oct-6-orig-src.fif"
 AtlasFile="${SubjectPath}/${Subject}/label/lh.aparc.annot"
 
-echo "launching ex_brain_view from $BuildPath..."
+echo "launching MNE Inspect from $BuildPath..."
 
 # Build --stc arguments: load all *-lh.stc files from the processed/ directory
 STC_ARGS=""

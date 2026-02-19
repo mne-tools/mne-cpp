@@ -3,7 +3,7 @@
  * @file     main.cpp
  * @author   Christoph Dinh <christoph.dinh@mne-cpp.org>
  * @since    2.0.0
- * @date     January, 2026
+ * @date     February, 2026
  *
  * @section  LICENSE
  *
@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Brain View example application.
+ * @brief    MNE Inspect application entry point.
  *
  */
 
@@ -48,9 +48,12 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
+    QCoreApplication::setApplicationName("MNE Inspect");
+    QCoreApplication::setOrganizationName("MNE-CPP");
+    QCoreApplication::setOrganizationDomain("mne-cpp.org");
 
     QCommandLineParser parser;
-    parser.setApplicationDescription("QRhi Brain View");
+    parser.setApplicationDescription("MNE Inspect - Brain Visualization & Source Analysis");
     parser.addHelpOption();
 
     QCommandLineOption subjectPathOption("subjectPath", "Path to subjects directory", "path",

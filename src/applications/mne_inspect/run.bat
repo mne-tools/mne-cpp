@@ -21,14 +21,14 @@ set "EvokedFile=%SampleDir%\sample_audvis-ave.fif"
 
 :: Default build path relative to script location
 set "ScriptDir=%~dp0"
-set "BuildPath=%ScriptDir%..\..\..\out\Release\examples\ex_brain_view.exe"
+set "BuildPath=%ScriptDir%..\..\..\out\Release\apps\mne_inspect.exe"
 
 :: Kill any existing instances
-taskkill /f /im ex_brain_view.exe >nul 2>&1
+taskkill /f /im mne_inspect.exe >nul 2>&1
 
 :: Check if executable exists
 if not exist "%BuildPath%" (
-    echo Error: Could not locate ex_brain_view executable at %BuildPath%
+    echo Error: Could not locate mne_inspect executable at %BuildPath%
     exit /b 1
 )
 
@@ -36,7 +36,7 @@ set "BemFile=%SubjectPath%\%Subject%\bem\sample-5120-5120-5120-bem.fif"
 set "SrcSpaceFile=%SubjectPath%\%Subject%\bem\sample-oct-6-orig-src.fif"
 set "AtlasFile=%SubjectPath%\%Subject%\label\lh.aparc.annot"
 
-echo launching ex_brain_view from %BuildPath%...
+echo launching MNE Inspect from %BuildPath%...
 
 :: Build --stc arguments: load all *-lh.stc files from the processed\ directory
 set "STC_ARGS="

@@ -760,7 +760,7 @@ signals:
      *
      * @param[in] numTimePoints     Number of time samples.
      */
-    void sensorFieldLoaded(int numTimePoints);
+    void sensorFieldLoaded(int numTimePoints, int initialTimePoint = 0);
 
     //=========================================================================================================
     /**

@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MainWindow class implementation.
+ * @brief    MNE Inspect MainWindow class implementation.
  *
  */
 
@@ -80,7 +80,7 @@ using namespace MNELIB;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    setWindowTitle("Brain View");
+    setWindowTitle("MNE Inspect");
 
     setupUI();
     setupConnections();
@@ -357,15 +357,15 @@ void MainWindow::setupUI()
     m_showMegFieldCheck->setChecked(false);
     m_showMegFieldCheck->setEnabled(false);
 
-    m_showEegFieldCheck = new QCheckBox("Show EEG Field Map");
+    m_showEegFieldCheck = new QCheckBox("Show EEG Potential Map");
     m_showEegFieldCheck->setChecked(false);
     m_showEegFieldCheck->setEnabled(false);
 
-    m_showMegContourCheck = new QCheckBox("Show MEG Contours");
+    m_showMegContourCheck = new QCheckBox("Show MEG Isofield Lines");
     m_showMegContourCheck->setChecked(false);
     m_showMegContourCheck->setEnabled(false);
 
-    m_showEegContourCheck = new QCheckBox("Show EEG Contours");
+    m_showEegContourCheck = new QCheckBox("Show EEG Equipotential Lines");
     m_showEegContourCheck->setChecked(false);
     m_showEegContourCheck->setEnabled(false);
 
@@ -997,7 +997,7 @@ void MainWindow::setupConnections()
         m_brainView->loadSensorField(path, index);
     });
 
-    connect(m_brainView, &BrainView::sensorFieldLoaded, [this](int numTimePoints) {
+    connect(m_brainView, &BrainView::sensorFieldLoaded, [this](int numTimePoints, int initialTimePoint) {
         // Enable field-map controls
         m_showMegFieldCheck->setEnabled(true);
         m_showEegFieldCheck->setEnabled(true);
@@ -1006,10 +1006,12 @@ void MainWindow::setupConnections()
         m_megHelmetCombo->setEnabled(true);
         m_syncTimesCheck->setEnabled(true);
 
-        // Enable time slider
+        // Enable time slider, preserving position when switching evoked sets
         m_sensorFieldTimeSlider->setEnabled(true);
+        m_sensorFieldTimeSlider->blockSignals(true);
         m_sensorFieldTimeSlider->setRange(0, numTimePoints - 1);
-        m_sensorFieldTimeSlider->setValue(0);
+        m_sensorFieldTimeSlider->setValue(qBound(0, initialTimePoint, numTimePoints - 1));
+        m_sensorFieldTimeSlider->blockSignals(false);
 
         // Enable streaming controls
         m_sensorStreamBtn->setEnabled(true);

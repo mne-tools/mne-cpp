@@ -1600,8 +1600,15 @@ void BrainView::render(QRhiCommandBuffer *cb)
         BrainSurface* surf;
         float dist;
         BrainRenderer::ShaderMode mode;
+        float overlayMode;  // per-item overlay mode
     };
     QVector<RenderItem> transparentItems;
+
+    // Determine per-viewport field-map visibility
+    const bool megFieldVisible = sv.visibility.megFieldMap;
+    const bool eegFieldVisible = sv.visibility.eegFieldMap;
+    const QString &megFieldKey = m_fieldMapper.megSurfaceKey();
+    const QString &eegFieldKey = m_fieldMapper.eegSurfaceKey();
 
     for (auto it = m_surfaces.begin(); it != m_surfaces.end(); ++it) {
         bool isSensor = it.key().startsWith("sens_");
@@ -1619,22 +1626,31 @@ void BrainView::render(QRhiCommandBuffer *cb)
         BrainRenderer::ShaderMode mode = BrainRenderer::Holographic;
         if (isBem) mode = currentBemShader;
 
-        transparentItems.append({it.value().get(), d, mode});
+        // For the field-map target surfaces, use ModeSurface (holographic
+        // shell) when the field map is not visible in this viewport.
+        // Otherwise use ModeScientific so the field-map vertex colours
+        // are passed through to the shader.
+        float itemOverlay = static_cast<float>(BrainSurface::ModeScientific);
+        if (it.key() == megFieldKey && !megFieldVisible) {
+            itemOverlay = static_cast<float>(BrainSurface::ModeSurface);
+        } else if (it.key() == eegFieldKey && !eegFieldVisible) {
+            itemOverlay = static_cast<float>(BrainSurface::ModeSurface);
+        }
+
+        transparentItems.append({it.value().get(), d, mode, itemOverlay});
     }
 
     std::sort(transparentItems.begin(), transparentItems.end(), [](const RenderItem &a, const RenderItem &b) {
         return a.dist > b.dist;
     });
 
-    // BEM / sensor surfaces pass vertex colours through via Scientific mode
-    // so that BEM Red/Green/Blue colours (set via setUseDefaultColor) are
-    // visible.  The holographic shader uses saturation detection: coloured
-    // BEM → data mode, white BEM → shell mode.  The anatomical shader
-    // ignores overlayMode for known tissue types and uses its own palette.
+    // BEM / sensor surfaces: per-item overlayMode controls whether field
+    // map colours are shown (Scientific) or the surface falls back to
+    // its default holographic shell appearance (Surface).
     BrainRenderer::SceneData bemSceneData = sceneData;
-    bemSceneData.overlayMode = static_cast<float>(BrainSurface::ModeScientific);
 
     for (const auto &item : transparentItems) {
+        bemSceneData.overlayMode = item.overlayMode;
         m_renderer->renderSurface(cb, rhi(), bemSceneData, item.surf, item.mode);
     }
 
@@ -1957,16 +1973,30 @@ bool BrainView::loadSensorField(const QString &evokedPath, int aveIndex)
     auto evoked = DataLoader::loadEvoked(evokedPath, aveIndex);
     if (evoked.isEmpty()) return false;
 
-    m_fieldMapper.setEvoked(evoked);
-    m_fieldMapper.setTimePoint(0);
+    // Preserve the current time point when switching between evoked sets
+    // that share the same sensor configuration (same file, different condition).
+    const int previousTimePoint = m_fieldMapper.timePoint();
+    const bool canReuse = m_fieldMapper.hasMappingFor(evoked);
 
-    if (!m_fieldMapper.buildMapping(m_surfaces, m_headToMriTrans, m_applySensorTrans)) {
-        m_fieldMapper.setEvoked(FIFFLIB::FiffEvoked());  // Clear state on failure
-        return false;
+    m_fieldMapper.setEvoked(evoked);
+
+    if (!canReuse) {
+        // Sensor config changed — full rebuild required (also precomputes global range)
+        if (!m_fieldMapper.buildMapping(m_surfaces, m_headToMriTrans, m_applySensorTrans)) {
+            m_fieldMapper.setEvoked(FIFFLIB::FiffEvoked());  // Clear state on failure
+            return false;
+        }
+    } else {
+        // Mapping reused — recompute normalization for new evoked data
+        m_fieldMapper.computeNormRange();
     }
 
-    emit sensorFieldLoaded(m_fieldMapper.evoked().times.size());
-    setSensorFieldTimePoint(0);
+    // Clamp preserved time point to the range of the new evoked data
+    const int numTimes = static_cast<int>(m_fieldMapper.evoked().times.size());
+    const int tp = qBound(0, previousTimePoint, numTimes - 1);
+
+    emit sensorFieldLoaded(numTimes, tp);
+    setSensorFieldTimePoint(tp);
     return true;
 }
 

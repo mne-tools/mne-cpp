@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MainWindow class declaration.
+ * @brief    MNE Inspect MainWindow class declaration.
  *
  */
 

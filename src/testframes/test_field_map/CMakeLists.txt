@@ -61,10 +61,20 @@ if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
 
-# ── Copy the Python cross-validation script next to the test binary ──────
+# ── Copy the Python cross-validation scripts next to the test binary ─────
 configure_file(
     ${CMAKE_CURRENT_SOURCE_DIR}/generate_fieldmap_reference.py
     ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/generate_fieldmap_reference.py
+    COPYONLY
+)
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/generate_multi_evoked_reference.py
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/generate_multi_evoked_reference.py
+    COPYONLY
+)
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/generate_helmet_reference.py
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/generate_helmet_reference.py
     COPYONLY
 )
 

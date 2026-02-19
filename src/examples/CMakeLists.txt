@@ -10,12 +10,6 @@ add_subdirectory(ex_averaging)
 add_subdirectory(ex_cancel_noise)
 add_subdirectory(ex_compute_forward)
 
-## ex_brain_view requires Qt6::GuiPrivate (available on WASM with Qt 6.10+)
-find_package(Qt6 QUIET COMPONENTS GuiPrivate)
-if(Qt6GuiPrivate_FOUND)
-  add_subdirectory(ex_brain_view)
-endif()
-
 ## Examples that link mne_disp3D_rhi but don't use 3D visualization directly
 if(NOT WASM)
   add_subdirectory(ex_connectivity_performance)
@@ -41,9 +35,8 @@ if(NOT WASM)
   add_subdirectory(ex_tf_plot)
 endif()
 
-## Examples using disp3D_rhi (require Qt6::GuiPrivate)
-find_package(Qt6 QUIET COMPONENTS GuiPrivate)
-if(Qt6GuiPrivate_FOUND)
+## Examples using disp3D_rhi
+if(TARGET mne_disp3D_rhi)
     add_subdirectory(ex_clustered_inverse_mne)
     add_subdirectory(ex_clustered_inverse_mne_raw)
     add_subdirectory(ex_clustered_inverse_pwl_rap_music_raw)

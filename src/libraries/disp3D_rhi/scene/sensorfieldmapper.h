@@ -133,6 +133,17 @@ public:
      */
     const FIFFLIB::FiffEvoked &evoked() const { return m_evoked; }
 
+    //=========================================================================================================
+    /**
+     * Check whether the current mapping matrices can be reused for a new
+     * evoked data set (i.e., same sensor configuration: same channels,
+     * same SSP projectors, same bad channels).
+     *
+     * @param[in] newEvoked     The candidate new evoked data.
+     * @return @c true if the existing mapping is compatible, @c false if rebuild is needed.
+     */
+    bool hasMappingFor(const FIFFLIB::FiffEvoked &newEvoked) const;
+
     /**
      * @return Const reference to the MEG channel pick indices.
      */
@@ -217,6 +228,40 @@ public:
      */
     static float contourStep(float minVal, float maxVal, int targetTicks);
 
+    /**
+     * Fit a sphere to the digitization headshape points.
+     *
+     * Replicates MNE-Python's ``fit_sphere_to_headshape`` (linear least-
+     * squares sphere fit).  Uses FIFFV_POINT_EXTRA digitization points by
+     * default; falls back to EXTRA + EEG if fewer than 4 extra points
+     * exist.  Nose/face points (z < 0 && y > 0) are excluded.
+     *
+     * @param[in]  info      FiffInfo containing the digitization points.
+     * @param[out] radius    Fitted sphere radius (metres).  May be @c nullptr.
+     * @return The sphere centre in head coordinates (metres).
+     *         Returns (0, 0, 0.04) if the fit cannot be performed.
+     */
+    static Eigen::Vector3f fitSphereOrigin(const FIFFLIB::FiffInfo &info,
+                                           float *radius = nullptr);
+
+    /**
+     * Compute the normalization range anchored at the peak-GFP time.
+     *
+     * For each modality the Global Field Power (GFP = sqrt(mean(V_i^2)))
+     * is evaluated across all time samples and we pick the time of
+     * maximum GFP.  vmax = max(|mapped|) is then computed at that peak
+     * time, giving the colour-map range [-vmax, +vmax].
+     *
+     * This matches MNE-Python's plot_field behaviour, where the initial
+     * view shows the evoked peak, so the colour scale is anchored to it.
+     * The range stays fixed during time scrubbing until explicitly
+     * recomputed (e.g. by switching to a new evoked data set).
+     *
+     * Must be called after building or reusing a mapping matrix with
+     * new evoked data.  @c buildMapping() calls this automatically.
+     */
+    void computeNormRange();
+
 private:
     //=========================================================================================================
     // ── Contour surface generation ─────────────────────────────────────
@@ -260,6 +305,9 @@ private:
     QVector<Eigen::Vector3f>  m_eegPositions;
     QSharedPointer<Eigen::MatrixXf> m_megMapping;
     QSharedPointer<Eigen::MatrixXf> m_eegMapping;
+
+    float m_megVmax = 0.0f;      /**< Colour-map normalisation: max |mapped| at peak-GFP time for MEG. */
+    float m_eegVmax = 0.0f;      /**< Colour-map normalisation: max |mapped| at peak-GFP time for EEG. */
 };
 
 #endif // SENSORFIELDMAPPER_H

@@ -1,25 +1,29 @@
-cmake_minimum_required(VERSION 3.10)
-project(ex_brain_view)
+cmake_minimum_required(VERSION 3.14)
+project(mne_inspect LANGUAGES CXX)
 
-# Find Qt
+# Handle qt uic, moc, rrc automatically
 set(CMAKE_AUTOUIC ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 
 set(QT_REQUIRED_COMPONENTS Core Gui Widgets)
+
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
 
-# Define the source files — only the application-specific files
 set(SOURCES
     main.cpp
     app/mainwindow.cpp
 )
 
+set(HEADERS
+    app/mainwindow.h
+)
+
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES})
+    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES} ${HEADERS})
 else()
-    add_executable(${PROJECT_NAME} ${SOURCES})
+    add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -42,7 +46,6 @@ set(MNE_LIBS_REQUIRED
     mne_connectivity
 )
 
-# Link against MNE-CPP libraries (including disp3D_rhi) and Qt
 target_link_libraries(${PROJECT_NAME} PRIVATE
     ${QT_REQUIRED_COMPONENT_LIBS}
     ${MNE_LIBS_REQUIRED}
@@ -50,14 +53,17 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER mne-cpp.org
-    MACOSX_BUNDLE ${BUILD_MAC_APP_BUNDLE}
-    WIN32_EXECUTABLE TRUE
+    MACOSX_BUNDLE FALSE
+    WIN32_EXECUTABLE FALSE
 )
 
-install(TARGETS ${PROJECT_NAME}
-    BUNDLE DESTINATION .
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
+# Install
+install(
+    TARGETS ${PROJECT_NAME}
+    BUNDLE DESTINATION . COMPONENT applications
+    RUNTIME DESTINATION bin COMPONENT applications
+    LIBRARY DESTINATION lib COMPONENT applications
+)
 
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(${PROJECT_NAME})
@@ -66,4 +72,3 @@ endif()
 if(NOT BUILD_SHARED_LIBS)
     target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
 endif()
-

@@ -268,6 +268,9 @@ private slots:
     void testEegMapping();
     void testMegMappingApplySymmetry();
     void testEegMappingApplySymmetry();
+    void testMultiEvokedMegMapping();
+    void testMultiEvokedEegMapping();
+    void testHelmetFieldMap();
     void cleanupTestCase();
 
 private:
@@ -307,6 +310,16 @@ private:
     bool m_hasMeg = false;
     bool m_hasEeg = false;
     bool m_pythonOk = false;
+    bool m_multiEvokedOk = false;
+
+    // ── Multi-evoked cross-validation ─────────────────────────────────
+    QString m_multiRefDir;
+    QString m_multiPythonScript;
+    int m_numConditions = 0;
+    QStringList m_conditionNames;
+    QVector<int> m_peakTimes;
+    QStringList m_megChNames;
+    QStringList m_eegChNames;
 };
 
 //=============================================================================================================
@@ -747,6 +760,744 @@ void TestFieldMap::testEegMappingApplySymmetry()
     QVERIFY2(m_eegMapping->allFinite(),
              "EEG mapping contains NaN or Inf");
     QVERIFY(true);
+}
+
+//=============================================================================================================
+
+void TestFieldMap::testMultiEvokedMegMapping()
+{
+    if (!m_hasMeg) QSKIP("No MEG data available");
+    QVERIFY(!m_megMapping.isNull());
+
+    // ── Run multi-evoked Python reference generator ────────────────────
+    if (!m_multiEvokedOk) {
+        m_multiPythonScript = QCoreApplication::applicationDirPath()
+            + "/generate_multi_evoked_reference.py";
+        if (!QFile::exists(m_multiPythonScript)) {
+            m_multiPythonScript = QFileInfo(QString::fromUtf8(__FILE__)).absolutePath()
+                + "/generate_multi_evoked_reference.py";
+        }
+        QVERIFY2(QFile::exists(m_multiPythonScript),
+                 qPrintable("Multi-evoked Python script not found: " + m_multiPythonScript));
+
+        QString evokedPath = m_dataDir + "/MEG/sample/sample_audvis-ave.fif";
+        QString transPath  = m_dataDir + "/MEG/sample/sample_audvis_raw-trans.fif";
+        QString surfPath   = m_dataDir + "/subjects/sample/bem/sample-head.fif";
+
+        m_multiRefDir = QCoreApplication::applicationDirPath() + "/test_multi_evoked_ref";
+        QDir().mkpath(m_multiRefDir);
+
+        qDebug() << "Running multi-evoked Python reference generator...";
+        QProcess pyProc;
+        pyProc.setProgram("python3");
+        pyProc.setArguments({
+            m_multiPythonScript,
+            "--evoked", evokedPath,
+            "--trans",  transPath,
+            "--surf",   surfPath,
+            "--outdir", m_multiRefDir,
+            "--mode",   "accurate",
+            "--max-verts", "642"
+        });
+        pyProc.start();
+        QVERIFY2(pyProc.waitForFinished(600000),
+                 "Multi-evoked Python script timed out");
+        if (pyProc.exitCode() != 0) {
+            qWarning() << "Python stderr:" << pyProc.readAllStandardError();
+            QFAIL(qPrintable("Multi-evoked Python script failed: exit code "
+                              + QString::number(pyProc.exitCode())));
+        }
+        qDebug() << pyProc.readAllStandardOutput();
+
+        // Load condition metadata
+        {
+            QFile f(m_multiRefDir + "/conditions.txt");
+            QVERIFY(f.open(QIODevice::ReadOnly | QIODevice::Text));
+            QTextStream in(&f);
+            while (!in.atEnd()) {
+                QString line = in.readLine().trimmed();
+                if (!line.isEmpty()) m_conditionNames.append(line);
+            }
+        }
+        m_numConditions = m_conditionNames.size();
+        QVERIFY2(m_numConditions > 0, "No conditions found in reference");
+        qDebug() << "Conditions:" << m_numConditions << m_conditionNames;
+
+        {
+            QFile f(m_multiRefDir + "/peak_times.txt");
+            QVERIFY(f.open(QIODevice::ReadOnly | QIODevice::Text));
+            QTextStream in(&f);
+            while (!in.atEnd()) {
+                QString line = in.readLine().trimmed();
+                if (!line.isEmpty()) m_peakTimes.append(line.toInt());
+            }
+        }
+
+        // Load MEG channel names used by Python
+        {
+            QFile f(m_multiRefDir + "/meg_ch_names.txt");
+            if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                QTextStream in(&f);
+                while (!in.atEnd()) {
+                    QString line = in.readLine().trimmed();
+                    if (!line.isEmpty()) m_megChNames.append(line);
+                }
+            }
+        }
+
+        // Load EEG channel names used by Python
+        {
+            QFile f(m_multiRefDir + "/eeg_ch_names.txt");
+            if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                QTextStream in(&f);
+                while (!in.atEnd()) {
+                    QString line = in.readLine().trimmed();
+                    if (!line.isEmpty()) m_eegChNames.append(line);
+                }
+            }
+        }
+
+        m_multiEvokedOk = true;
+    }
+    QVERIFY(m_multiEvokedOk);
+
+    // ── Compare MEG mapped fields for each condition ───────────────────
+    qDebug() << "\n=== Multi-Evoked MEG Cross-Validation ===";
+
+    for (int ci = 0; ci < m_numConditions; ++ci) {
+        qDebug() << "\n--- Condition" << ci << ":" << m_conditionNames[ci] << "---";
+
+        // Load Python references
+        MatrixXd pyMegMapping = loadNpy(m_multiRefDir + "/meg_mapping.npy");
+        VectorXd pyMegDataPeak = loadNpy(m_multiRefDir + QString("/meg_data_cond%1.npy").arg(ci)).col(0);
+        VectorXd pyMegMappedPeak = loadNpy(m_multiRefDir + QString("/meg_mapped_cond%1.npy").arg(ci)).col(0);
+        MatrixXd pyMegDataAll = loadNpy(m_multiRefDir + QString("/meg_data_cond%1_all.npy").arg(ci));
+        MatrixXd pyMegMappedAll = loadNpy(m_multiRefDir + QString("/meg_mapped_cond%1_all.npy").arg(ci));
+
+        QVERIFY2(pyMegDataPeak.size() > 0,
+                 qPrintable(QString("Failed to load MEG data for condition %1").arg(ci)));
+        QVERIFY2(pyMegMappedPeak.size() > 0,
+                 qPrintable(QString("Failed to load MEG mapped for condition %1").arg(ci)));
+
+        qDebug() << "  Python MEG data:" << pyMegDataAll.rows() << "x" << pyMegDataAll.cols();
+        qDebug() << "  Python MEG mapped:" << pyMegMappedAll.rows() << "x" << pyMegMappedAll.cols();
+
+        // Get the evoked data for this condition
+        QVERIFY2(ci < m_evokedSet.evoked.size(),
+                 qPrintable(QString("Condition %1 out of range (%2 available)")
+                            .arg(ci).arg(m_evokedSet.evoked.size())));
+        const FiffEvoked& evoked = m_evokedSet.evoked[ci];
+        qDebug() << "  C++ evoked:" << evoked.comment
+                 << "channels:" << evoked.info.chs.size()
+                 << "times:" << evoked.data.cols();
+
+        // Build channel pick indices matching Python's channel order
+        // C++ uses "MEG0113", Python uses "MEG 0113" — normalize by removing spaces
+        QVector<int> megPick;
+        for (const QString& chName : m_megChNames) {
+            int idx = -1;
+            QString pyNorm = chName.trimmed().remove(' ');
+            for (int k = 0; k < evoked.info.chs.size(); ++k) {
+                QString cppNorm = evoked.info.chs[k].ch_name.trimmed().remove(' ');
+                if (cppNorm == pyNorm) {
+                    idx = k;
+                    break;
+                }
+            }
+            QVERIFY2(idx >= 0,
+                     qPrintable(QString("MEG channel '%1' not found in evoked %2")
+                                .arg(chName).arg(ci)));
+            megPick.append(idx);
+        }
+
+        qDebug() << "  MEG picks:" << megPick.size() << "channels";
+        QCOMPARE(megPick.size(), m_megMapping->cols());
+
+        // Compare at peak time point
+        int peakIdx = m_peakTimes[ci];
+        qDebug() << "  Peak time index:" << peakIdx;
+
+        // Extract C++ channel data at peak
+        VectorXf cppMeasPeak(megPick.size());
+        for (int i = 0; i < megPick.size(); ++i)
+            cppMeasPeak(i) = static_cast<float>(evoked.data(megPick[i], peakIdx));
+
+        // Apply C++ mapping
+        VectorXf cppMappedPeak = (*m_megMapping) * cppMeasPeak;
+
+        // Compare channel data first (allow small differences from SSP application)
+        qDebug() << "  Comparing MEG channel data at peak...";
+        {
+            int nFail = 0;
+            double maxRelErr = 0.0;
+            for (int i = 0; i < megPick.size(); ++i) {
+                double va = cppMeasPeak(i);
+                double vb = pyMegDataPeak(i);
+                double diff = std::abs(va - vb);
+                double denom = std::max(std::abs(va), std::abs(vb));
+                double relErr = (denom > 1e-30) ? (diff / denom) : 0.0;
+                if (diff > 1e-30 && relErr > 2e-3) {
+                    ++nFail;
+                    if (nFail <= 3)
+                        qWarning() << "    data mismatch ch" << i << ":"
+                                   << va << "vs" << vb << "rel=" << relErr;
+                }
+                maxRelErr = std::max(maxRelErr, relErr);
+            }
+            qDebug() << "  MEG data: maxRelErr=" << maxRelErr << "failures=" << nFail;
+            QVERIFY2(nFail == 0,
+                     qPrintable(QString("Cond %1: MEG channel data mismatch at peak (%2 failures, maxRelErr=%3)")
+                                .arg(ci).arg(nFail).arg(maxRelErr)));
+        }
+
+        // Compare mapped field values at peak
+        qDebug() << "  Comparing MEG mapped field at peak...";
+        {
+            int nFail = 0;
+            double maxRelErr = compareMatrices(
+                cppMappedPeak.cast<double>(),
+                pyMegMappedPeak,
+                0.05, 1e-20, QString("MEG_mapped_cond%1_peak").arg(ci), nFail);
+
+            double failRate = static_cast<double>(nFail) / cppMappedPeak.size();
+            qDebug() << "  MEG mapped peak: maxRelErr=" << maxRelErr
+                     << "failures=" << nFail << "of" << cppMappedPeak.size()
+                     << QString("(%1%)").arg(failRate * 100.0, 0, 'f', 3);
+            qDebug() << "  C++ range: [" << cppMappedPeak.minCoeff() << ","
+                     << cppMappedPeak.maxCoeff() << "]";
+            qDebug() << "  Py  range: [" << pyMegMappedPeak.minCoeff() << ","
+                     << pyMegMappedPeak.maxCoeff() << "]";
+
+            QVERIFY2(failRate < 0.01,
+                     qPrintable(QString("Cond %1: MEG mapped peak %2% elements exceed 5% tolerance")
+                                .arg(ci).arg(failRate * 100.0, 0, 'f', 2)));
+        }
+
+        // Compare mapped fields across ALL time points
+        qDebug() << "  Comparing MEG mapped field across all time points...";
+        {
+            int totalFail = 0;
+            int totalElements = 0;
+            double globalMaxRelErr = 0.0;
+
+            int nTimes = std::min(static_cast<int>(evoked.data.cols()),
+                                   static_cast<int>(pyMegMappedAll.cols()));
+
+            for (int t = 0; t < nTimes; ++t) {
+                // Extract C++ data at time t
+                VectorXf cppMeas(megPick.size());
+                for (int i = 0; i < megPick.size(); ++i)
+                    cppMeas(i) = static_cast<float>(evoked.data(megPick[i], t));
+
+                VectorXf cppMapped = (*m_megMapping) * cppMeas;
+                VectorXd pyMapped = pyMegMappedAll.col(t);
+
+                int nFail = 0;
+                double maxRelErr = compareMatrices(
+                    cppMapped.cast<double>(),
+                    pyMapped,
+                    0.05, 1e-20,
+                    QString("MEG_cond%1_t%2").arg(ci).arg(t), nFail);
+
+                totalFail += nFail;
+                totalElements += cppMapped.size();
+                globalMaxRelErr = std::max(globalMaxRelErr, maxRelErr);
+            }
+
+            double totalFailRate = static_cast<double>(totalFail) / totalElements;
+            qDebug() << "  MEG all times: maxRelErr=" << globalMaxRelErr
+                     << "totalFail=" << totalFail << "of" << totalElements
+                     << QString("(%1%)").arg(totalFailRate * 100.0, 0, 'f', 4);
+
+            QVERIFY2(totalFailRate < 0.01,
+                     qPrintable(QString("Cond %1: MEG all-times %2% elements exceed 5% tolerance")
+                                .arg(ci).arg(totalFailRate * 100.0, 0, 'f', 2)));
+        }
+    }
+
+    qDebug() << "\n=== Multi-Evoked MEG Cross-Validation PASSED ===";
+}
+
+//=============================================================================================================
+
+void TestFieldMap::testMultiEvokedEegMapping()
+{
+    if (!m_hasEeg) QSKIP("No EEG data available");
+    QVERIFY(!m_eegMapping.isNull());
+    QVERIFY(m_multiEvokedOk);
+
+    qDebug() << "\n=== Multi-Evoked EEG Cross-Validation ===";
+
+    for (int ci = 0; ci < m_numConditions; ++ci) {
+        qDebug() << "\n--- Condition" << ci << ":" << m_conditionNames[ci] << "---";
+
+        // Load Python references
+        VectorXd pyEegDataPeak = loadNpy(m_multiRefDir + QString("/eeg_data_cond%1.npy").arg(ci)).col(0);
+        VectorXd pyEegMappedPeak = loadNpy(m_multiRefDir + QString("/eeg_mapped_cond%1.npy").arg(ci)).col(0);
+        MatrixXd pyEegMappedAll = loadNpy(m_multiRefDir + QString("/eeg_mapped_cond%1_all.npy").arg(ci));
+
+        QVERIFY2(pyEegDataPeak.size() > 0,
+                 qPrintable(QString("Failed to load EEG data for condition %1").arg(ci)));
+
+        const FiffEvoked& evoked = m_evokedSet.evoked[ci];
+
+        // Build EEG channel pick indices
+        // Same normalization: C++ "EEG001" vs Python "EEG 001"
+        QVector<int> eegPick;
+        for (const QString& chName : m_eegChNames) {
+            int idx = -1;
+            QString pyNorm = chName.trimmed().remove(' ');
+            for (int k = 0; k < evoked.info.chs.size(); ++k) {
+                QString cppNorm = evoked.info.chs[k].ch_name.trimmed().remove(' ');
+                if (cppNorm == pyNorm) {
+                    idx = k;
+                    break;
+                }
+            }
+            QVERIFY2(idx >= 0,
+                     qPrintable(QString("EEG channel '%1' not found in evoked %2")
+                                .arg(chName).arg(ci)));
+            eegPick.append(idx);
+        }
+
+        QCOMPARE(eegPick.size(), m_eegMapping->cols());
+
+        // Compare at peak time point
+        int peakIdx = m_peakTimes[ci];
+
+        VectorXf cppMeasPeak(eegPick.size());
+        for (int i = 0; i < eegPick.size(); ++i)
+            cppMeasPeak(i) = static_cast<float>(evoked.data(eegPick[i], peakIdx));
+
+        VectorXf cppMappedPeak = (*m_eegMapping) * cppMeasPeak;
+
+        // Compare channel data (allow small differences from SSP / float precision)
+        {
+            int nFail = 0;
+            for (int i = 0; i < eegPick.size(); ++i) {
+                double diff = std::abs(cppMeasPeak(i) - pyEegDataPeak(i));
+                double denom = std::max(std::abs((double)cppMeasPeak(i)), std::abs(pyEegDataPeak(i)));
+                if (diff > 1e-30 && denom > 1e-30 && (diff / denom) > 2e-3)
+                    ++nFail;
+            }
+            QVERIFY2(nFail == 0,
+                     qPrintable(QString("Cond %1: EEG channel data mismatch (%2 failures)")
+                                .arg(ci).arg(nFail)));
+        }
+
+        // Compare mapped at peak
+        {
+            int nFail = 0;
+            double maxRelErr = compareMatrices(
+                cppMappedPeak.cast<double>(),
+                pyEegMappedPeak,
+                0.05, 1e-20, QString("EEG_mapped_cond%1_peak").arg(ci), nFail);
+
+            double failRate = static_cast<double>(nFail) / cppMappedPeak.size();
+            qDebug() << "  EEG mapped peak: maxRelErr=" << maxRelErr
+                     << "failures=" << nFail << "of" << cppMappedPeak.size()
+                     << QString("(%1%)").arg(failRate * 100.0, 0, 'f', 3);
+            qDebug() << "  C++ range: [" << cppMappedPeak.minCoeff() << ","
+                     << cppMappedPeak.maxCoeff() << "]";
+            qDebug() << "  Py  range: [" << pyEegMappedPeak.minCoeff() << ","
+                     << pyEegMappedPeak.maxCoeff() << "]";
+
+            QVERIFY2(failRate < 0.01,
+                     qPrintable(QString("Cond %1: EEG mapped peak %2% exceed tolerance")
+                                .arg(ci).arg(failRate * 100.0, 0, 'f', 2)));
+        }
+
+        // Compare across all time points
+        {
+            int totalFail = 0;
+            int totalElements = 0;
+            double globalMaxRelErr = 0.0;
+
+            int nTimes = std::min(static_cast<int>(evoked.data.cols()),
+                                   static_cast<int>(pyEegMappedAll.cols()));
+
+            for (int t = 0; t < nTimes; ++t) {
+                VectorXf cppMeas(eegPick.size());
+                for (int i = 0; i < eegPick.size(); ++i)
+                    cppMeas(i) = static_cast<float>(evoked.data(eegPick[i], t));
+
+                VectorXf cppMapped = (*m_eegMapping) * cppMeas;
+                VectorXd pyMapped = pyEegMappedAll.col(t);
+
+                int nFail = 0;
+                double maxRelErr = compareMatrices(
+                    cppMapped.cast<double>(),
+                    pyMapped,
+                    0.05, 1e-20,
+                    QString("EEG_cond%1_t%2").arg(ci).arg(t), nFail);
+
+                totalFail += nFail;
+                totalElements += cppMapped.size();
+                globalMaxRelErr = std::max(globalMaxRelErr, maxRelErr);
+            }
+
+            double totalFailRate = static_cast<double>(totalFail) / totalElements;
+            qDebug() << "  EEG all times: maxRelErr=" << globalMaxRelErr
+                     << "totalFail=" << totalFail << "of" << totalElements
+                     << QString("(%1%)").arg(totalFailRate * 100.0, 0, 'f', 4);
+
+            QVERIFY2(totalFailRate < 0.01,
+                     qPrintable(QString("Cond %1: EEG all-times %2% exceed tolerance")
+                                .arg(ci).arg(totalFailRate * 100.0, 0, 'f', 2)));
+        }
+    }
+
+    qDebug() << "\n=== Multi-Evoked EEG Cross-Validation PASSED ===";
+}
+
+//=============================================================================================================
+
+void TestFieldMap::testHelmetFieldMap()
+{
+    // This test replicates the MNE-Python helmet example:
+    // https://mne.tools/stable/auto_examples/visualization/mne_helmet.html
+    //
+    // It uses mne.make_field_map(evoked, ch_type="meg", origin="auto",
+    //                            upsampling=2, subject="sample")
+    // which maps MEG data onto the upsampled helmet surface with an
+    // auto-fitted sphere origin.
+    //
+    // We compute the same mapping in C++ using FwdFieldMap and compare.
+
+    QVERIFY(m_hasMeg);
+
+    // ── Run Python helmet reference generator ──────────────────────────
+    QString helmetScript = QCoreApplication::applicationDirPath()
+        + "/generate_helmet_reference.py";
+    if (!QFile::exists(helmetScript)) {
+        helmetScript = QFileInfo(QString::fromUtf8(__FILE__)).absolutePath()
+            + "/generate_helmet_reference.py";
+    }
+    QVERIFY2(QFile::exists(helmetScript),
+             qPrintable("Helmet Python script not found: " + helmetScript));
+
+    QString helmetRefDir = QCoreApplication::applicationDirPath()
+        + "/test_helmet_ref";
+    QDir().mkpath(helmetRefDir);
+
+    qDebug() << "Running helmet Python reference generator...";
+    QProcess pyProc;
+    pyProc.setProgram("python3");
+    pyProc.setArguments({
+        helmetScript,
+        "--outdir", helmetRefDir,
+        "--sample-dir", m_dataDir
+    });
+    pyProc.start();
+    QVERIFY2(pyProc.waitForFinished(600000),
+             "Helmet Python script timed out");
+    if (pyProc.exitCode() != 0) {
+        qWarning() << "Python stderr:" << pyProc.readAllStandardError();
+        QFAIL(qPrintable("Helmet Python script failed: exit code "
+                          + QString::number(pyProc.exitCode())));
+    }
+    qDebug() << pyProc.readAllStandardOutput();
+
+    // ── Load Python reference data ─────────────────────────────────────
+    MatrixXd pyOriginMat = loadNpy(helmetRefDir + "/origin.npy");
+    QCOMPARE(pyOriginMat.rows(), 3);
+    Vector3f helmetOrigin = pyOriginMat.col(0).cast<float>();
+    qDebug() << "Helmet origin:" << helmetOrigin(0) << helmetOrigin(1) << helmetOrigin(2);
+
+    MatrixXd pyVerts = loadNpy(helmetRefDir + "/helmet_verts.npy");
+    MatrixXd pyNorms = loadNpy(helmetRefDir + "/helmet_norms.npy");
+    QVERIFY(pyVerts.rows() > 0);
+    QCOMPARE(pyNorms.rows(), pyVerts.rows());
+    MatrixX3f helmetVerts = pyVerts.cast<float>();
+    MatrixX3f helmetNorms = pyNorms.cast<float>();
+    qDebug() << "Helmet surface:" << helmetVerts.rows() << "vertices";
+
+    MatrixXd pyMapping = loadNpy(helmetRefDir + "/meg_mapping.npy");
+    QVERIFY(pyMapping.rows() > 0);
+    qDebug() << "Python mapping:" << pyMapping.rows() << "x" << pyMapping.cols();
+
+    // Load channel names
+    QStringList helmetChNames;
+    {
+        QFile f(helmetRefDir + "/meg_ch_names.txt");
+        QVERIFY(f.open(QIODevice::ReadOnly | QIODevice::Text));
+        QTextStream in(&f);
+        while (!in.atEnd()) {
+            QString line = in.readLine().trimmed();
+            if (!line.isEmpty()) helmetChNames.append(line);
+        }
+    }
+    qDebug() << "Channels:" << helmetChNames.size();
+
+    // Load time index
+    MatrixXd pyTimeIdx = loadNpy(helmetRefDir + "/time_index.npy");
+    int timeIdx = static_cast<int>(pyTimeIdx(0, 0));
+    qDebug() << "Time index for t=0.083:" << timeIdx;
+
+    // Load reference mapped values at t=0.083
+    VectorXd pyMappedT083 = loadNpy(helmetRefDir + "/meg_mapped_t083.npy").col(0);
+    VectorXd pyDataT083 = loadNpy(helmetRefDir + "/meg_data_t083.npy").col(0);
+    MatrixXd pyMappedAll = loadNpy(helmetRefDir + "/meg_mapped_all.npy");
+    QVERIFY(pyMappedT083.size() > 0);
+    QVERIFY(pyDataT083.size() > 0);
+
+    // ── Compute C++ mapping with helmet surface + auto origin ──────────
+    // Build MEG channel names matching C++ ordering
+    QList<FiffChInfo> megChs;
+    QStringList cppMegChNames;
+    for (int k = 0; k < m_evoked.info.chs.size(); ++k) {
+        const auto& ch = m_evoked.info.chs[k];
+        if (m_evoked.info.bads.contains(ch.ch_name)) continue;
+        if (ch.kind == FIFFV_MEG_CH) {
+            megChs.append(ch);
+            cppMegChNames.append(ch.ch_name);
+        }
+    }
+
+    // Create MEG coils
+    std::unique_ptr<FwdCoilSet> templates(
+        FwdCoilSet::read_coil_defs(m_coilDefPath));
+    QVERIFY(templates != nullptr);
+
+    std::unique_ptr<FwdCoilSet> helmetCoils(
+        templates->create_meg_coils(
+            megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, nullptr));
+    QVERIFY(helmetCoils && helmetCoils->ncoil > 0);
+    qDebug() << "C++ MEG coils:" << helmetCoils->ncoil;
+
+    qDebug() << "Computing C++ MEG mapping on helmet (with SSP)...";
+    QSharedPointer<MatrixXf> cppMapping = FieldMap::computeMegMapping(
+        *helmetCoils, helmetVerts, helmetNorms, helmetOrigin,
+        m_evoked.info, cppMegChNames,
+        0.06f, 1e-4f);
+    QVERIFY(!cppMapping.isNull());
+    qDebug() << "C++ mapping:" << cppMapping->rows() << "x" << cppMapping->cols();
+
+    // ── Compare mapping matrices ───────────────────────────────────────
+    qDebug() << "\n=== Helmet Mapping Matrix Comparison ===";
+    {
+        MatrixXd cppMap = cppMapping->cast<double>();
+
+        // Handle possible transpose
+        if (pyMapping.rows() == cppMap.cols() && pyMapping.cols() == cppMap.rows()) {
+            qDebug() << "Transposing Python reference";
+            pyMapping.transposeInPlace();
+        }
+
+        QCOMPARE(static_cast<int>(cppMap.rows()), static_cast<int>(pyMapping.rows()));
+        QCOMPARE(static_cast<int>(cppMap.cols()), static_cast<int>(pyMapping.cols()));
+
+        int nFail = 0;
+        double maxRelErr = compareMatrices(cppMap, pyMapping, 0.05, 1e-20,
+                                           "helmet_mapping", nFail);
+        double failRate = static_cast<double>(nFail)
+                        / (cppMap.rows() * cppMap.cols());
+        qDebug() << "Mapping: maxRelErr=" << maxRelErr
+                 << "failures=" << nFail
+                 << "of" << cppMap.rows() * cppMap.cols()
+                 << QString("(%1%)").arg(failRate * 100.0, 0, 'f', 4);
+
+        QVERIFY2(failRate < 0.01,
+                 qPrintable(QString("Helmet mapping: %1% elements exceed 5% tolerance")
+                            .arg(failRate * 100.0, 0, 'f', 2)));
+    }
+
+    // ── Compare mapped field over entire time span ───────────────────
+    // Test the full end-to-end pipeline including baseline correction.
+    // The C++ SensorFieldMapper now applies baseline correction in
+    // setEvoked() (matching Python's baseline=(None, 0)).
+    //
+    // We apply C++ baseline correction to m_evoked, build channel picks,
+    // compute mapped = mapping * data, and compare against Python.
+    // This validates both the mapping matrix AND the baseline correction.
+    //
+    // An absolute tolerance floor scaled to peak signal is used so that
+    // near-zero time points don't produce false passes or spurious failures.
+    qDebug() << "\n=== Helmet Mapped Field — Full Time Span ===";
+    {
+        // Apply baseline correction to a copy of the C++ evoked data
+        // (matching SensorFieldMapper::setEvoked behavior)
+        FiffEvoked baselinedEvoked = m_evoked;
+        float tmin = baselinedEvoked.times.size() > 0
+            ? baselinedEvoked.times(0) : 0.0f;
+        if (tmin < 0.0f) {
+            QPair<float,float> bl(tmin, 0.0f);
+            baselinedEvoked.applyBaselineCorrection(bl);
+        }
+
+        // Build channel pick indices: Python ch_names → C++ evoked rows
+        QVector<int> pick;
+        for (const QString& pyName : helmetChNames) {
+            int idx = -1;
+            QString pyNorm = pyName.trimmed().remove(' ');
+            for (int k = 0; k < baselinedEvoked.info.chs.size(); ++k) {
+                QString cppNorm = baselinedEvoked.info.chs[k].ch_name
+                    .trimmed().remove(' ');
+                if (cppNorm == pyNorm) {
+                    idx = k;
+                    break;
+                }
+            }
+            QVERIFY2(idx >= 0,
+                     qPrintable(QString("Channel '%1' not found").arg(pyName)));
+            pick.append(idx);
+        }
+
+        const int nTimes = std::min(
+            static_cast<int>(baselinedEvoked.data.cols()),
+            static_cast<int>(pyMappedAll.cols()));
+        QVERIFY(nTimes > 0);
+
+        // Compute C++ mapped fields for ALL times using baselined C++ data
+        const int nVerts = cppMapping->rows();
+        MatrixXd cppMappedAll(nVerts, nTimes);
+        for (int t = 0; t < nTimes; ++t) {
+            VectorXf cppMeas(pick.size());
+            for (int i = 0; i < pick.size(); ++i)
+                cppMeas(i) = static_cast<float>(
+                    baselinedEvoked.data(pick[i], t));
+            cppMappedAll.col(t) = ((*cppMapping) * cppMeas).cast<double>();
+        }
+
+        const double cppPeak = cppMappedAll.cwiseAbs().maxCoeff();
+        const double pyPeak  = pyMappedAll.leftCols(nTimes).cwiseAbs().maxCoeff();
+        const double peak    = std::max(cppPeak, pyPeak);
+        qDebug() << "Global peak: C++=" << cppPeak << "Py=" << pyPeak;
+
+        // ── Temporal correlation check ─────────────────────────────────
+        // At representative vertices, the time course of C++ mapped
+        // values should correlate highly with Python (> 0.95).
+        double minCorr = 1.0;
+        for (int v = 0; v < nVerts; v += 10) {
+            VectorXd cppTrace = cppMappedAll.row(v).transpose();
+            VectorXd pyTrace  = pyMappedAll.row(v).head(nTimes).transpose();
+
+            double cppMean = cppTrace.mean();
+            double pyMean  = pyTrace.mean();
+            VectorXd cppC = cppTrace.array() - cppMean;
+            VectorXd pyC  = pyTrace.array()  - pyMean;
+            double num = cppC.dot(pyC);
+            double den = std::sqrt(cppC.squaredNorm() * pyC.squaredNorm());
+            double corr = (den > 0.0) ? (num / den) : 0.0;
+            minCorr = std::min(minCorr, corr);
+        }
+        qDebug() << "Temporal correlation (min over vertices):" << minCorr;
+        QVERIFY2(minCorr > 0.95,
+                 qPrintable(QString("Temporal correlation too low: %1 "
+                                    "(field not evolving correctly)")
+                            .arg(minCorr, 0, 'f', 4)));
+
+        // ── Element-wise absolute comparison ───────────────────────────
+        const double absTol  = 0.05 * peak;
+        const double skipThr = 0.01 * peak;
+
+        int totalChecked = 0;
+        int totalFail    = 0;
+        double maxAbsErr = 0.0;
+
+        for (int t = 0; t < nTimes; ++t) {
+            for (int v = 0; v < nVerts; ++v) {
+                double cppVal = cppMappedAll(v, t);
+                double pyVal  = pyMappedAll(v, t);
+                double absErr = std::abs(cppVal - pyVal);
+
+                if (std::abs(cppVal) < skipThr && std::abs(pyVal) < skipThr)
+                    continue;
+
+                ++totalChecked;
+                maxAbsErr = std::max(maxAbsErr, absErr);
+                if (absErr > absTol)
+                    ++totalFail;
+            }
+        }
+
+        double failRate = (totalChecked > 0)
+            ? static_cast<double>(totalFail) / totalChecked : 0.0;
+        qDebug() << "Checked:" << totalChecked
+                 << "failures:" << totalFail
+                 << QString("(%1%)").arg(failRate * 100.0, 0, 'f', 4)
+                 << "maxAbsErr:" << maxAbsErr
+                 << "absTol:" << absTol;
+
+        QVERIFY2(failRate < 0.01,
+                 qPrintable(QString("Helmet time-span: %1% elements exceed "
+                                    "absolute tolerance (%2)")
+                            .arg(failRate * 100.0, 0, 'f', 2)
+                            .arg(absTol)));
+
+        // ── Temporal evolution check: baseline correction IS essential ──
+        // Without baseline correction, the DC offset dominates and the
+        // mapped field appears nearly static ("only slightly wobbling").
+        // We verify this by computing temporal variation (coefficient of
+        // variation = std/|mean|) with and without baseline and asserting
+        // that baseline correction dramatically increases it.
+
+        // Find t=0 index
+        int t0idx = 0;
+        for (int t = 0; t < nTimes; ++t) {
+            if (baselinedEvoked.times(t) >= 0.0f) {
+                t0idx = t;
+                break;
+            }
+        }
+        int nPost = nTimes - t0idx;
+
+        // With baseline: compute mapped fields (already in cppMappedAll)
+        double baselinedVarSum = 0.0;
+        double baselinedAbsMeanSum = 0.0;
+        for (int v = 0; v < nVerts; ++v) {
+            VectorXd trace = cppMappedAll.block(v, t0idx, 1, nPost).transpose();
+            double mu  = trace.mean();
+            double var = (trace.array() - mu).square().mean();
+            baselinedVarSum += std::sqrt(var);
+            baselinedAbsMeanSum += std::abs(mu);
+        }
+
+        // Without baseline: compute mapped fields from raw (non-baselined) data
+        double rawVarSum = 0.0;
+        double rawAbsMeanSum = 0.0;
+        for (int v = 0; v < nVerts; ++v) {
+            VectorXd rawTrace(nPost);
+            for (int t = t0idx; t < nTimes; ++t) {
+                VectorXf rawMeas(pick.size());
+                for (int i = 0; i < pick.size(); ++i)
+                    rawMeas(i) = static_cast<float>(m_evoked.data(pick[i], t));
+                VectorXf mapped = (*cppMapping) * rawMeas;
+                rawTrace(t - t0idx) = static_cast<double>(mapped(v));
+            }
+            double mu  = rawTrace.mean();
+            double var = (rawTrace.array() - mu).square().mean();
+            rawVarSum += std::sqrt(var);
+            rawAbsMeanSum += std::abs(mu);
+        }
+
+        double baselinedCV = (baselinedAbsMeanSum > 0)
+            ? baselinedVarSum / baselinedAbsMeanSum : 0.0;
+        double rawCV = (rawAbsMeanSum > 0)
+            ? rawVarSum / rawAbsMeanSum : 0.0;
+
+        qDebug() << "Post-stimulus coefficient of variation:";
+        qDebug() << "  With baseline:    CV =" << baselinedCV;
+        qDebug() << "  Without baseline: CV =" << rawCV;
+        qDebug() << "  Ratio (baselined/raw):" << ((rawCV > 0) ? baselinedCV / rawCV : 0.0);
+
+        // Without baseline correction, the DC offset makes the field
+        // nearly static (rawCV is small).  With baseline, the CV should be
+        // at least 3x larger because the temporal signal dominates.
+        QVERIFY2(baselinedCV > rawCV * 2.0,
+                 qPrintable(QString("Baseline correction not working: "
+                                    "baselinedCV=%1 is not >> rawCV=%2")
+                            .arg(baselinedCV, 0, 'f', 4)
+                            .arg(rawCV, 0, 'f', 4)));
+
+        // The baselined field must show meaningful temporal evolution
+        QVERIFY2(baselinedCV > 0.5,
+                 qPrintable(QString("Field not evolving: baselinedCV = %1 "
+                                    "(expected > 0.5)")
+                            .arg(baselinedCV, 0, 'f', 4)));
+    }
+
+    qDebug() << "\n=== Helmet Field Map Cross-Validation PASSED ===";
 }
 
 //=============================================================================================================

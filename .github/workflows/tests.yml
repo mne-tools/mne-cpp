@@ -121,6 +121,19 @@ jobs:
       with:
         python-version: '3.10'
         architecture: ${{ matrix.os == 'macos-26' && 'arm64' || 'x64' }}
+    - name: Install Qt (Linux|MacOS)
+      if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: 6.10.2
+        modules: qtcharts qtshadertools
+    - name: Install Qt (Windows)
+      if: matrix.os == 'windows-2025'
+      uses: jurplel/install-qt-action@v3
+      with:
+        version: 6.10.2
+        arch: win64_msvc2022_64
+        modules: qtcharts qtshadertools
     - name: Install MNE-Python
       run: |
         pip install --upgrade pip
@@ -135,19 +148,6 @@ jobs:
       if: steps.cache-mne-data.outputs.cache-hit != 'true'
       run: |
         python -c "import mne; mne.datasets.sample.data_path()"
-    - name: Install Qt (Linux|MacOS)
-      if: (matrix.os == 'ubuntu-24.04') || (matrix.os == 'macos-26')
-      uses: jurplel/install-qt-action@v3
-      with:
-        version: 6.10.2
-        modules: qtcharts qtshadertools
-    - name: Install Qt (Windows)
-      if: matrix.os == 'windows-2025'
-      uses: jurplel/install-qt-action@v3
-      with:
-        version: 6.10.2
-        arch: win64_msvc2022_64
-        modules: qtcharts qtshadertools
     - name: Configure and compile MNE-CPP (Linux)
       if: matrix.os == 'ubuntu-24.04'
       run: |
