@@ -117,7 +117,7 @@ private:
     QString findGenerateScript();
 
     /** Run the application with the given arguments. Returns exit code. */
-    int runApp(const QStringList &args, QString &stdoutStr, int timeoutMs = 120000);
+    int runApp(const QStringList &args, QString &stdoutStr, int timeoutMs = 300000);
 
     /** Read an STC file and return a MNESourceEstimate. */
     static bool readStc(const QString &path, MNESourceEstimate &stc);

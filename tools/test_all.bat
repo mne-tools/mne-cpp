@@ -14,7 +14,7 @@
   :; # ########## WINDOWS SECTION #########################
   
 @REM Setup default values
-setlocal
+setlocal EnableDelayedExpansion
 set scriptPath=%~dp0
 set basePath=%scriptPath%..
 
@@ -50,8 +50,18 @@ set /A "compoundOutput=0"
 
 cd %binOutputFolder%
 
+@REM Tests whose QProcess calls depend on external FreeSurfer tools
+@REM (mri_convert, mri_watershed) not available on Windows CI runners.
+set "skipTests=test_mne_flash_bem test_mne_watershed_bem"
+
 for /f %%f in ('dir test_*.exe /s /b ') do (
-  if "%verboseMode%"=="True" (
+  set "doSkip=0"
+  for %%s in (%skipTests%) do (
+    if /I "%%~nf"=="%%s" set "doSkip=1"
+  )
+  if !doSkip!==1 (
+    call:skipped %%~nxf
+  ) else if "%verboseMode%"=="True" (
     %%f && call:success %%~nxf || call:fail %%~nxf
   ) else (
     %%f > null 2>&1 && call:success %%~nxf || call:fail %%~nxf
@@ -96,7 +106,9 @@ exit /B 0
   ECHO [91m%~1[0m
   set /A "compoundOutput+=1"
 exit /B 0
-
+:skipped
+  ECHO [93m%~1 [SKIPPED - QProcess][0m
+exit /B 0
   :; # ########## WINDOWS SECTION ENDS ####################
   :; # ####################################################
   exit /b
