@@ -1487,17 +1487,19 @@ void TestFieldMap::testHelmetFieldMap()
         }
 
         // Without baseline: compute mapped fields from raw (non-baselined) data
+        // Pre-compute all mapped fields in one pass to avoid O(nVerts²) cost
+        MatrixXd rawMappedAll(nVerts, nPost);
+        for (int t = t0idx; t < nTimes; ++t) {
+            VectorXf rawMeas(pick.size());
+            for (int i = 0; i < pick.size(); ++i)
+                rawMeas(i) = static_cast<float>(m_evoked.data(pick[i], t));
+            rawMappedAll.col(t - t0idx) = ((*cppMapping) * rawMeas).cast<double>();
+        }
+
         double rawVarSum = 0.0;
         double rawAbsMeanSum = 0.0;
         for (int v = 0; v < nVerts; ++v) {
-            VectorXd rawTrace(nPost);
-            for (int t = t0idx; t < nTimes; ++t) {
-                VectorXf rawMeas(pick.size());
-                for (int i = 0; i < pick.size(); ++i)
-                    rawMeas(i) = static_cast<float>(m_evoked.data(pick[i], t));
-                VectorXf mapped = (*cppMapping) * rawMeas;
-                rawTrace(t - t0idx) = static_cast<double>(mapped(v));
-            }
+            VectorXd rawTrace = rawMappedAll.row(v).transpose();
             double mu  = rawTrace.mean();
             double var = (rawTrace.array() - mu).square().mean();
             rawVarSum += std::sqrt(var);
