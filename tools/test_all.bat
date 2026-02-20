@@ -47,6 +47,7 @@ SET "binOutputFolder=%basePath%\out\%buildName%\apps"
 call:doPrintConfiguration
 
 set /A "compoundOutput=0"
+set "failedTests="
 
 cd %binOutputFolder%
 
@@ -67,9 +68,20 @@ for /f %%f in ('dir test_*.exe /s /b ') do (
     %%f > null 2>&1 && call:success %%~nxf || call:fail %%~nxf
   )
 )
-rm -f null
+if exist null del null 2>nul
 
 cd %cd%
+
+ECHO.
+ECHO ====================================================================
+if %compoundOutput%==0 (
+  ECHO [92mAll tests passed.[0m
+) else (
+  ECHO [91m%compoundOutput% test^(s^) FAILED:[0m
+  ECHO [91m%failedTests%[0m
+)
+ECHO ====================================================================
+ECHO.
 
 exit /B %compoundOutput%
 
@@ -99,15 +111,16 @@ exit /B 0
 exit /B 0
 
 :success
-  ECHO [92m%~1[0m
+  ECHO [92m[PASS] %~1[0m
 exit /B 0
 
 :fail
-  ECHO [91m%~1[0m
+  ECHO [91m[FAIL] %~1[0m
   set /A "compoundOutput+=1"
+  set "failedTests=!failedTests!  %~1"
 exit /B 0
 :skipped
-  ECHO [93m%~1 [SKIPPED - QProcess][0m
+  ECHO [93m[SKIP] %~1[0m
 exit /B 0
   :; # ########## WINDOWS SECTION ENDS ####################
   :; # ####################################################
