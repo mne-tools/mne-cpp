@@ -51,7 +51,7 @@ set /A "compoundOutput=0"
 cd %binOutputFolder%
 
 for /f %%f in ('dir test_*.exe /s /b ') do (
-  if "%printOutput%"=="True" (
+  if "%verboseMode%"=="True" (
     %%f && call:success %%~nxf || call:fail %%~nxf
   ) else (
     %%f > null 2>&1 && call:success %%~nxf || call:fail %%~nxf
