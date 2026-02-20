@@ -123,6 +123,26 @@ endif()
 find_package(QT NAMES Qt6 Qt5)
 message("QT_DIR - ${QT_DIR}")
 
+# ── Pre-find all Qt components once ──────────────────────────────────────────
+# Qt6::Gui (pulled in transitively by Widgets) checks for WrapVulkanHeaders
+# every time find_package(Qt6 …) is called.  Since 40+ subdirectory
+# CMakeLists.txt each call find_package, the warning
+#   "Could NOT find WrapVulkanHeaders (missing: Vulkan_INCLUDE_DIR)"
+# would be printed dozens of times.  Finding all required components here
+# makes the subdirectory calls no-ops and prints the warning at most once.
+set(_MNE_QT_COMPONENTS Core Concurrent Gui Network Widgets Svg Xml)
+if(NOT WASM)
+    list(APPEND _MNE_QT_COMPONENTS OpenGL)
+    if(QT_VERSION_MAJOR EQUAL 6)
+        list(APPEND _MNE_QT_COMPONENTS OpenGLWidgets ShaderTools)
+    endif()
+endif()
+if(BUILD_TESTS)
+    list(APPEND _MNE_QT_COMPONENTS Test)
+endif()
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${_MNE_QT_COMPONENTS})
+unset(_MNE_QT_COMPONENTS)
+
 ##==============================================================================
 ## Save git hash for project
 

@@ -53,6 +53,7 @@
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_coord_trans.h>
+#include <fiff/c/fiff_coord_trans_old.h>
 #include <fwd/fwd_coil_set.h>
 #include <mne/mne_bem.h>
 
@@ -1287,16 +1288,20 @@ void TestFieldMap::testHelmetFieldMap()
         }
     }
 
-    // Create MEG coils
+    // Create MEG coils in head coordinates (matching _make_surface_mapping)
+    // The Python reference now creates coils in head coords using dev_head_t,
+    // so the C++ side must do the same.
     std::unique_ptr<FwdCoilSet> templates(
         FwdCoilSet::read_coil_defs(m_coilDefPath));
     QVERIFY(templates != nullptr);
 
+    FiffCoordTransOld devHeadOld = m_evoked.info.dev_head_t.toOld();
     std::unique_ptr<FwdCoilSet> helmetCoils(
         templates->create_meg_coils(
-            megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, nullptr));
+            megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, &devHeadOld));
     QVERIFY(helmetCoils && helmetCoils->ncoil > 0);
-    qDebug() << "C++ MEG coils:" << helmetCoils->ncoil;
+    qDebug() << "C++ MEG coils:" << helmetCoils->ncoil
+             << "(in head coordinates)";
 
     qDebug() << "Computing C++ MEG mapping on helmet (with SSP)...";
     QSharedPointer<MatrixXf> cppMapping = FieldMap::computeMegMapping(
@@ -1357,6 +1362,7 @@ void TestFieldMap::testHelmetFieldMap()
             QPair<float,float> bl(tmin, 0.0f);
             baselinedEvoked.applyBaselineCorrection(bl);
         }
+        fflush(stdout);  // ensure baseline message is visible before potential crash
 
         // Build channel pick indices: Python ch_names → C++ evoked rows
         QVector<int> pick;
@@ -1375,6 +1381,16 @@ void TestFieldMap::testHelmetFieldMap()
                      qPrintable(QString("Channel '%1' not found").arg(pyName)));
             pick.append(idx);
         }
+
+        // Verify dimensions before matrix multiplication to avoid
+        // silent crashes in Release builds (Eigen doesn't bounds-check)
+        qDebug() << "Picks:" << pick.size()
+                 << "mapping cols:" << cppMapping->cols()
+                 << "mapping rows:" << cppMapping->rows()
+                 << "pyMappedAll rows:" << pyMappedAll.rows();
+        QCOMPARE(pick.size(), cppMapping->cols());
+        QCOMPARE(static_cast<int>(cppMapping->rows()),
+                 static_cast<int>(pyMappedAll.rows()));
 
         const int nTimes = std::min(
             static_cast<int>(baselinedEvoked.data.cols()),

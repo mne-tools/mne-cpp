@@ -111,7 +111,7 @@ def main():
 
     n_verts_orig = surf_head["rr"].shape[0]
     if n_verts_orig > args.max_verts:
-        print(f"[multi-ref] Subsampling: {n_verts_orig} → {args.max_verts}")
+        print(f"[multi-ref] Subsampling: {n_verts_orig} -> {args.max_verts}")
         rng = np.random.RandomState(42)
         sel_verts = np.sort(rng.choice(n_verts_orig, args.max_verts,
                                         replace=False))

@@ -80,9 +80,16 @@ def main():
           f"nave={evoked.nave}")
 
     # ── Create field map using raw primitives (matching C++ pipeline) ───
-    # Use get_meg_helmet_surf to get the upsampled helmet just like
-    # make_field_map does, but then compute the mapping ourselves with
-    # the 'accurate' mode so it matches the C++ Legendre evaluation.
+    # We replicate MNE-Python's _make_surface_mapping exactly:
+    #   1. get_meg_helmet_surf returns surface in MRI coords (when trans given)
+    #   2. _make_surface_mapping transforms the surface BACK to head coords
+    #   3. MEG coils are created in head coords (using dev_head_t)
+    #   4. Origin is in head coords (from fit_sphere_to_headshape)
+    # Previously this script used inconsistent coordinate frames (surface in
+    # MRI, coils in device, origin in head).  Now everything is in head coords.
+    from copy import deepcopy
+    from mne.transforms import transform_surface_to
+
     trans = mne.read_trans(fname_trans, verbose=False)
     try:
         print("[helmet-ref] Getting MEG helmet surface (upsampling=2)...")
@@ -95,7 +102,12 @@ def main():
                                        verbose=True)
         else:
             raise
-    print(f"[helmet-ref] Helmet surface: {surf['np']} vertices")
+    print(f"[helmet-ref] Helmet surface (raw): {surf['np']} vertices, "
+          f"coord_frame={surf.get('coord_frame', '?')}")
+
+    # Transform the surface to head coordinates (matching _make_surface_mapping)
+    surf = transform_surface_to(deepcopy(surf), "head", trans)
+    print(f"[helmet-ref] Helmet surface (head coords): {surf['np']} vertices")
 
     # Auto-fit sphere origin (matching make_field_map(origin='auto'))
     from mne.bem import fit_sphere_to_headshape
@@ -107,11 +119,13 @@ def main():
     info = evoked.info
     meg_picks = mne.pick_types(info, meg=True, eeg=False, exclude='bads')
     meg_info = mne.pick_info(info, meg_picks, copy=True)
+    meg_info["dev_head_t"] = info["dev_head_t"]
     ch_names = list(meg_info["ch_names"])
     print(f"[helmet-ref] MEG channels: {len(ch_names)}")
 
-    # Create MEG coils and compute dots
-    meg_coils = _create_meg_coils(meg_info["chs"], "normal")
+    # Create MEG coils in head coordinates (matching _make_surface_mapping)
+    meg_coils = _create_meg_coils(meg_info["chs"], "normal",
+                                  meg_info["dev_head_t"])
     int_rad, noise, lut_fun, n_fact = _setup_dots(
         args.mode, meg_info, meg_coils, "meg"
     )
