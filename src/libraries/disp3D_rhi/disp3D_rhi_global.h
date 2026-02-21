@@ -54,6 +54,11 @@
 #  define DISP3DRHISHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
+//=============================================================================================================
+/**
+ * @namespace DISP3DRHILIB
+ * @brief     3-D brain visualisation using the Qt RHI rendering backend.
+ */
 namespace DISP3DRHILIB{
 
 //=============================================================================================================

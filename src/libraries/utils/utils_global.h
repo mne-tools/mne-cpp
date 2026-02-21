@@ -58,6 +58,11 @@
 #  define UTILSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
+//=============================================================================================================
+/**
+ * @namespace UTILSLIB
+ * @brief     Shared utilities (I/O helpers, spectral analysis, layout management, warp algorithms).
+ */
 namespace UTILSLIB{
 
 //=============================================================================================================

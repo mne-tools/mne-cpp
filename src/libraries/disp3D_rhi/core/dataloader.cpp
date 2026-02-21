@@ -92,7 +92,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
             info.dev_head_t.to == FIFFV_COORD_HEAD &&
             !info.dev_head_t.trans.isIdentity()) {
             hasDevHead = true;
-            devHeadQTrans = SurfaceKeys::toQMatrix4x4(info.dev_head_t.trans);
+            devHeadQTrans = SURFACEKEYS::toQMatrix4x4(info.dev_head_t.trans);
         }
 
         result.devHeadTrans = devHeadQTrans;

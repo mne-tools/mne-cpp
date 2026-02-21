@@ -56,6 +56,11 @@
 #  define MNESHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
+//=============================================================================================================
+/**
+ * @namespace MNELIB
+ * @brief     Core MNE data structures (source spaces, source estimates, hemispheres).
+ */
 namespace MNELIB{
 
 //=============================================================================================================

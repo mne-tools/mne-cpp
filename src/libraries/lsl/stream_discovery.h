@@ -53,7 +53,7 @@
 // DEFINE NAMESPACE lsl
 //=============================================================================================================
 
-namespace lsl {
+namespace LSLLIB {
 
 //=============================================================================================================
 /**
@@ -83,6 +83,6 @@ LSLSHARED_EXPORT std::vector<stream_info> resolve_stream(const std::string& prop
                                                          const std::string& value,
                                                          double timeout = 1.0);
 
-} // namespace lsl
+} // namespace LSLLIB
 
 #endif // LSL_STREAM_DISCOVERY_H

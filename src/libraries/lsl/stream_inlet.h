@@ -54,7 +54,7 @@
 // DEFINE NAMESPACE lsl
 //=============================================================================================================
 
-namespace lsl {
+namespace LSLLIB {
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -143,6 +143,6 @@ private:
     std::unique_ptr<StreamInletPrivate> m_pImpl;
 };
 
-} // namespace lsl
+} // namespace LSLLIB
 
 #endif // LSL_STREAM_INLET_H

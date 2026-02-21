@@ -51,7 +51,7 @@
 // DEFINE NAMESPACE lsl
 //=============================================================================================================
 
-namespace lsl {
+namespace LSLLIB {
 
 //=============================================================================================================
 /**
@@ -197,6 +197,6 @@ private:
     std::string         m_data_host;        /**< Data host address (set during discovery). */
 };
 
-} // namespace lsl
+} // namespace LSLLIB
 
 #endif // LSL_STREAM_INFO_H

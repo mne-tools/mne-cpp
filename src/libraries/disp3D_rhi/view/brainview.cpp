@@ -349,13 +349,13 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
             if (!m_headToMriTrans.isEmpty()) {
                 QMatrix4x4 m;
                 if (m_applySensorTrans) {
-                    m = SurfaceKeys::toQMatrix4x4(m_headToMriTrans.trans);
+                    m = SURFACEKEYS::toQMatrix4x4(m_headToMriTrans.trans);
                 }
                 brainSurf->applyTransform(m);
             }
 
             // Legacy map support
-            const QString keyPrefix = SurfaceKeys::sensorParentToKeyPrefix(parentText);
+            const QString keyPrefix = SURFACEKEYS::sensorParentToKeyPrefix(parentText);
 
             QString key = keyPrefix + sensItem->text() + "_" + QString::number((quintptr)sensItem);
             m_surfaces[key] = brainSurf;
@@ -404,7 +404,7 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
             if (!m_headToMriTrans.isEmpty()) {
                 QMatrix4x4 m;
                 if (m_applySensorTrans) {
-                    m = SurfaceKeys::toQMatrix4x4(m_headToMriTrans.trans);
+                    m = SURFACEKEYS::toQMatrix4x4(m_headToMriTrans.trans);
                 }
                 brainSurf->applyTransform(m);
             }
@@ -745,7 +745,7 @@ void BrainView::syncBemShadersToBrainShaders()
 
 void BrainView::setSensorVisible(const QString &type, bool visible)
 {
-    const QString object = SurfaceKeys::sensorTypeToObjectKey(type);
+    const QString object = SURFACEKEYS::sensorTypeToObjectKey(type);
     if (object.isEmpty()) return;
 
     auto &profile = visibilityProfileForTarget(m_visualizationEditTarget);
@@ -2363,7 +2363,7 @@ void BrainView::refreshSensorTransforms()
 {
     QMatrix4x4 qmat;
     if (m_applySensorTrans && !m_headToMriTrans.isEmpty()) {
-        qmat = SurfaceKeys::toQMatrix4x4(m_headToMriTrans.trans);
+        qmat = SURFACEKEYS::toQMatrix4x4(m_headToMriTrans.trans);
     }
 
     int surfCount = 0;

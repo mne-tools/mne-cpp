@@ -49,7 +49,7 @@
 
 //=============================================================================================================
 /**
- * @namespace SurfaceKeys
+ * @namespace SURFACEKEYS
  * @brief     Centralised string constants for surface map keys.
  *
  * Every surface stored in BrainView's `m_surfaces` map is identified by a
@@ -57,7 +57,7 @@
  * suffix.  Using these constants instead of raw string literals ensures
  * consistency and enables compile-time typo detection.
  */
-namespace SurfaceKeys
+namespace SURFACEKEYS
 {
     // ── Hemisphere prefixes ────────────────────────────────────────────
     inline constexpr QLatin1String kLhPrefix       {"lh_"};
@@ -158,6 +158,6 @@ inline QMatrix4x4 toQMatrix4x4(const Eigen::Matrix4f &m)
     return q;
 }
 
-} // namespace SurfaceKeys
+} // namespace SURFACEKEYS
 
 #endif // SURFACEKEYS_H
