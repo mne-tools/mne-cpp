@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# aqt install-qt linux desktop 6.5.0 wasm_multithread -m qtcharts --autodesktop
+# aqt install-qt linux desktop 6.5.0 wasm_multithread --autodesktop
 
 argc=$# # number of arguments passed (not counting the command itself)
 argv=("$@") # list of arguments passed (not including the command itself)

@@ -23,7 +23,7 @@ jobs:
         cd ..
         git clone https://code.qt.io/qt/qt5.git -b v6.10.2
         cd qt5
-        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qtshadertools
+        ./init-repository -f --module-subset=qtbase,qtsvg,qtshadertools
         # Create shadow build folder
         cd ..
         mkdir qt6_shadow
@@ -61,7 +61,7 @@ jobs:
         cd ..
         git clone https://code.qt.io/qt/qt5.git -b v6.10.2
         cd qt5
-        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qtshadertools
+        ./init-repository -f --module-subset=qtbase,qtsvg,qtshadertools
         # Create shadow build folder
         cd ..
         mkdir qt6_shadow
@@ -104,7 +104,7 @@ jobs:
         cd ..
         git clone https://code.qt.io/qt/qt5.git -b v6.10.2
         cd qt5
-        perl init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qt3d,qtshadertools
+        perl init-repository -f --module-subset=qtbase,qtsvg,qt3d,qtshadertools
         # Create shadow build folder
         cd ..
         mkdir qt6_shadow
@@ -152,7 +152,7 @@ jobs:
         # Clone Qt6 repo
         git clone https://code.qt.io/qt/qt5.git -b v6.10.2
         cd qt5
-        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qtshadertools
+        ./init-repository -f --module-subset=qtbase,qtsvg,qtshadertools
         # Create shadow build folder
         cd ..
         mkdir qt6_shadow

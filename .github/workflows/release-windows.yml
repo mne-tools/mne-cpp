@@ -20,7 +20,7 @@ jobs:
       with:
         version: 6.10.2
         arch: win64_msvc2022_64
-        modules: qtcharts qtshadertools
+        modules: qtshadertools
     - name: Configure and compile MNE-CPP
       run: |
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
@@ -88,7 +88,7 @@ jobs:
         cd qt6_shadow
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        ..\qt5\configure.bat -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "$env:GITHUB_WORKSPACE\..\Qt6_static" -skip webengine -nomake tools -nomake tests -nomake examples -opensource -confirm-license -init-submodules -submodules qtbase,qtcharts,qtsvg,qtshadertools
+        ..\qt5\configure.bat -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "$env:GITHUB_WORKSPACE\..\Qt6_static" -skip webengine -nomake tools -nomake tests -nomake examples -opensource -confirm-license -init-submodules -submodules qtbase,qtsvg,qtshadertools
         cmake --build . --parallel $env:NUMBER_OF_PROCESSORS
         cmake --install .
     - name: Configure and compile MNE-CPP (static)

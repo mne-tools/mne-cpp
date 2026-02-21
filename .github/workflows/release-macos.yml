@@ -19,7 +19,7 @@ jobs:
       uses: jurplel/install-qt-action@v3
       with:
         version: 6.10.2
-        modules: qtcharts qtshadertools
+        modules: qtshadertools
     - name: Configure and compile MNE-CPP
       run: |
         ./tools/build_project.bat
@@ -82,7 +82,7 @@ jobs:
         cd ..
         git clone https://code.qt.io/qt/qt5.git -b v6.10.2
         cd qt5
-        ./init-repository -f --module-subset=qtbase,qtcharts,qtsvg,qtshadertools
+        ./init-repository -f --module-subset=qtbase,qtsvg,qtshadertools
         cd ..
         mkdir qt6_shadow
         cd qt6_shadow
