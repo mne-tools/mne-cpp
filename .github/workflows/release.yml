@@ -110,7 +110,7 @@ jobs:
     - name: Run Doxygen and package result
       run: |
         git fetch --all
-        git checkout origin/main
+        git checkout origin/v2.0-dev
         cd doc/doxygen
         doxygen mne-cpp_doxyfile
     - name: Setup Github credentials
