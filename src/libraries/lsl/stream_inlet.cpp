@@ -66,7 +66,7 @@ using namespace LSLLIB;
 /**
  * @brief Private implementation for stream_inlet (PIMPL).
  */
-class lsl::StreamInletPrivate
+class LSLLIB::StreamInletPrivate
 {
 public:
     StreamInletPrivate(const stream_info& info)
