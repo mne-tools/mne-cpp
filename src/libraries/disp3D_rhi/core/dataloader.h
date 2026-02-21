@@ -93,6 +93,9 @@ public:
         QList<FIFFLIB::FiffDigPoint> digitizerPoints;
 
         std::shared_ptr<BrainSurface> helmetSurface; ///< May be null
+
+        QMatrix4x4                  devHeadTrans;  ///< Device→Head transform (identity if absent)
+        bool                        hasDevHead = false; ///< Whether a valid dev→head transform was found
     };
 
     // ── Static I/O methods ────────────────────────────────────────────
@@ -106,6 +109,19 @@ public:
      */
     static SensorLoadResult loadSensors(const QString &fifPath,
                                         const QString &megHelmetOverridePath = {});
+
+    /**
+     * Load a standalone MEG helmet surface from a BEM FIF file.
+     *
+     * @param[in] helmetFilePath   Path to the helmet BEM FIF file.
+     * @param[in] devHeadTrans     Device-to-Head transformation matrix (identity if none).
+     * @param[in] applyTrans       Whether to apply the dev→head transform.
+     * @return Shared pointer to the loaded BrainSurface, or nullptr on failure.
+     */
+    static std::shared_ptr<BrainSurface> loadHelmetSurface(
+        const QString &helmetFilePath,
+        const QMatrix4x4 &devHeadTrans = QMatrix4x4(),
+        bool applyTrans = false);
 
     /**
      * Load dipole set from a .dip file.

@@ -95,6 +95,9 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
             devHeadQTrans = SurfaceKeys::toQMatrix4x4(info.dev_head_t.trans);
         }
 
+        result.devHeadTrans = devHeadQTrans;
+        result.hasDevHead   = hasDevHead;
+
         for (const auto &ch : info.chs) {
             if (ch.kind == FIFFV_MEG_CH) {
                 QVector3D pos(ch.chpos.r0(0), ch.chpos.r0(1), ch.chpos.r0(2));
@@ -243,6 +246,62 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
     }
 
     return result;
+}
+
+//=============================================================================================================
+
+std::shared_ptr<BrainSurface> DataLoader::loadHelmetSurface(
+    const QString &helmetFilePath,
+    const QMatrix4x4 &devHeadTrans,
+    bool applyTrans)
+{
+    if (!QFile::exists(helmetFilePath)) {
+        qWarning() << "DataLoader::loadHelmetSurface: file not found:" << helmetFilePath;
+        return nullptr;
+    }
+
+    QFile helmetFile(helmetFilePath);
+    MNEBem helmetBem(helmetFile);
+    if (helmetBem.size() == 0) {
+        qWarning() << "DataLoader::loadHelmetSurface: no BEM surfaces in" << helmetFilePath;
+        return nullptr;
+    }
+
+    MNEBemSurface helmetSurf = helmetBem[0];
+
+    if (helmetSurf.nn.rows() != helmetSurf.rr.rows()) {
+        helmetSurf.nn = FSLIB::Surface::compute_normals(helmetSurf.rr, helmetSurf.tris);
+    }
+
+    if (applyTrans) {
+        QMatrix3x3 normalMat = devHeadTrans.normalMatrix();
+        for (int i = 0; i < helmetSurf.rr.rows(); ++i) {
+            QVector3D pos(helmetSurf.rr(i, 0), helmetSurf.rr(i, 1), helmetSurf.rr(i, 2));
+            pos = devHeadTrans.map(pos);
+            helmetSurf.rr(i, 0) = pos.x();
+            helmetSurf.rr(i, 1) = pos.y();
+            helmetSurf.rr(i, 2) = pos.z();
+
+            QVector3D nn(helmetSurf.nn(i, 0), helmetSurf.nn(i, 1), helmetSurf.nn(i, 2));
+            const float *d = normalMat.constData();
+            float nx = d[0] * nn.x() + d[3] * nn.y() + d[6] * nn.z();
+            float ny = d[1] * nn.x() + d[4] * nn.y() + d[7] * nn.z();
+            float nz = d[2] * nn.x() + d[5] * nn.y() + d[8] * nn.z();
+            QVector3D n = QVector3D(nx, ny, nz).normalized();
+            helmetSurf.nn(i, 0) = n.x();
+            helmetSurf.nn(i, 1) = n.y();
+            helmetSurf.nn(i, 2) = n.z();
+        }
+    }
+
+    auto surface = std::make_shared<BrainSurface>();
+    surface->fromBemSurface(helmetSurf, QColor(0, 0, 77, 200));
+    surface->setVisible(true);
+
+    qDebug() << "DataLoader: Loaded helmet surface from" << helmetFilePath
+             << "(" << helmetSurf.rr.rows() << "vertices)";
+
+    return surface;
 }
 
 //=============================================================================================================

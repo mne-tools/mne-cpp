@@ -64,6 +64,7 @@
 #include <QProgressBar>
 #include <QGridLayout>
 #include <QTimer>
+#include <QCoreApplication>
 #include <QDebug>
 
 //=============================================================================================================
@@ -480,6 +481,14 @@ void MainWindow::setupUI()
     m_showHelmetCheck->setChecked(false);
     m_showHelmetCheck->setEnabled(false);
 
+    m_helmetShapeCombo = new QComboBox;
+    m_helmetShapeCombo->blockSignals(true);   // prevent premature loadMegHelmetSurface during addItems
+    m_helmetShapeCombo->addItems({"306m", "122m", "306m RT", "BabyMEG",
+                                  "BabySQUID", "CTF 275", "KIT", "Magnes 2500WH", "Magnes 3600WH"});
+    m_helmetShapeCombo->blockSignals(false);
+    m_helmetShapeCombo->setToolTip("Select MEG helmet shape to display.");
+    m_helmetShapeCombo->setEnabled(false);
+
     m_applyTransCheck = new QCheckBox("Apply Transformation");
     m_applyTransCheck->setChecked(true);
     m_applyTransCheck->setToolTip("Apply Head-to-MRI transformation to sensors if available.");
@@ -494,6 +503,7 @@ void MainWindow::setupUI()
     sensorLayout->addWidget(m_showDigEegCheck);
     sensorLayout->addWidget(m_showDigExtraCheck);
     sensorLayout->addWidget(m_showHelmetCheck);
+    sensorLayout->addWidget(m_helmetShapeCombo);
     sensorLayout->addWidget(m_applyTransCheck);
 
     // ===== View Group =====
@@ -892,6 +902,7 @@ void MainWindow::setupConnections()
             m_showEegCheck->setEnabled(true);
             m_showDigCheck->setEnabled(true);
             m_showHelmetCheck->setEnabled(true);
+            m_helmetShapeCombo->setEnabled(true);
             // Sub-category checkboxes stay disabled until master is toggled on
         }
     });
@@ -922,6 +933,30 @@ void MainWindow::setupConnections()
     connect(m_showDigEegCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("Digitizer/EEG", checked); });
     connect(m_showDigExtraCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("Digitizer/Extra", checked); });
     connect(m_showHelmetCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("MEG Helmet", checked); });
+
+    // Helmet shape selection
+    connect(m_helmetShapeCombo, &QComboBox::currentTextChanged, [this](const QString &text) {
+        // Map combo text to helmet filename
+        static const QMap<QString, QString> helmetFileMap = {
+            {"122m",           "122m.fif"},
+            {"306m",           "306m.fif"},
+            {"306m RT",        "306m_rt.fif"},
+            {"BabyMEG",        "BabyMEG.fif"},
+            {"BabySQUID",      "BabySQUID.fif"},
+            {"CTF 275",        "CTF_275.fif"},
+            {"KIT",            "KIT.fif"},
+            {"Magnes 2500WH",  "Magnes_2500wh.fif"},
+            {"Magnes 3600WH",  "Magnes_3600wh.fif"}
+        };
+
+        QString fileName = helmetFileMap.value(text, "306m.fif");
+        QString helmetPath = QCoreApplication::applicationDirPath()
+            + "/../resources/general/sensorSurfaces/" + fileName;
+
+        m_brainView->setMegHelmetOverride(helmetPath);
+        m_brainView->loadMegHelmetSurface(helmetPath);
+    });
+
     connect(m_applyTransCheck, &QCheckBox::toggled, m_brainView, &BrainView::setSensorTransEnabled);
 
     // Dipoles
@@ -1281,10 +1316,26 @@ void MainWindow::loadInitialData(const QString &subjectPath,
             m_showEegCheck->setEnabled(true);
             m_showDigCheck->setEnabled(true);
             m_showHelmetCheck->setEnabled(true);
-            // Sub-category checkboxes stay disabled until master is toggled on
+            m_helmetShapeCombo->setEnabled(true);
+
+            // Sync checkboxes to the persisted visibility profile so the
+            // UI reflects what was saved last session.
+            syncUIToEditTarget(m_brainView->visualizationEditTarget());
+
+            // Now push the (possibly restored) checkbox states into BrainView.
+            // Helmet is set AFTER MEG so the MEG→Helmet cascade doesn't
+            // override the independently persisted helmet state.
             m_brainView->setSensorVisible("MEG", m_showMegCheck->isChecked());
             m_brainView->setSensorVisible("EEG", m_showEegCheck->isChecked());
             m_brainView->setSensorVisible("Digitizer", m_showDigCheck->isChecked());
+            m_brainView->setSensorVisible("MEG Helmet", m_showHelmetCheck->isChecked());
+
+            // Enable sub-category checkboxes if master is on
+            bool digOn = m_showDigCheck->isChecked();
+            m_showDigCardinalCheck->setEnabled(digOn);
+            m_showDigHpiCheck->setEnabled(digOn);
+            m_showDigEegCheck->setEnabled(digOn);
+            m_showDigExtraCheck->setEnabled(digOn);
         }
     }
 

@@ -752,11 +752,11 @@ void BrainView::setSensorVisible(const QString &type, bool visible)
     profile.setObjectVisible(object, visible);
 
     // Cascade parent toggle to child sub-types so that e.g. "MEG" also
-    // enables/disables MEG/Grad, MEG/Mag, and MEG Helmet sub-types.
+    // enables/disables MEG/Grad and MEG/Mag sub-types.
+    // Note: MEG Helmet has its own independent checkbox and is NOT cascaded.
     if (type == QLatin1String("MEG")) {
         profile.sensMegGrad   = visible;
         profile.sensMegMag    = visible;
-        profile.sensMegHelmet = visible;
     } else if (type == QLatin1String("EEG")) {
         // No sub-types for EEG currently, but keep symmetric.
     } else if (type == QLatin1String("Digitizer")) {
@@ -2234,6 +2234,10 @@ bool BrainView::loadSensors(const QString &fifPath) {
     auto r = DataLoader::loadSensors(fifPath, m_megHelmetOverridePath);
     if (!r.hasInfo && !r.hasDigitizer) return false;
 
+    // Store Device→Head transform for later helmet surface reloads
+    m_devHeadTrans = r.devHeadTrans;
+    m_hasDevHead   = r.hasDevHead;
+
     if (!r.megGradItems.isEmpty()) m_model->addSensors("MEG/Grad", r.megGradItems);
     if (!r.megMagItems.isEmpty())  m_model->addSensors("MEG/Mag",  r.megMagItems);
     if (!r.eegItems.isEmpty())     m_model->addSensors("EEG",      r.eegItems);
@@ -2244,6 +2248,19 @@ bool BrainView::loadSensors(const QString &fifPath) {
     if (!r.digitizerPoints.isEmpty())
         m_model->addDigitizerData(r.digitizerPoints);
 
+    return true;
+}
+
+//=============================================================================================================
+
+bool BrainView::loadMegHelmetSurface(const QString &helmetFilePath) {
+    auto surface = DataLoader::loadHelmetSurface(helmetFilePath, m_devHeadTrans, m_hasDevHead);
+    if (!surface) return false;
+
+    m_surfaces["sens_surface_meg"] = surface;
+    refreshSensorTransforms();
+    updateSceneBounds();
+    update();
     return true;
 }
 

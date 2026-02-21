@@ -220,6 +220,18 @@ public slots:
 
     //=========================================================================================================
     /**
+     * Load a standalone MEG helmet surface, replacing the current one.
+     *
+     * The Device→Head transform from the last loadSensors() call is applied
+     * automatically when available.
+     *
+     * @param[in] helmetFilePath   Absolute path to a helmet BEM FIF file.
+     * @return True if the helmet surface was loaded successfully.
+     */
+    bool loadMegHelmetSurface(const QString &helmetFilePath);
+
+    //=========================================================================================================
+    /**
      * Toggle visibility of dipoles.
      *
      * @param[in] visible    Visibility state.
@@ -932,6 +944,8 @@ private:
     FIFFLIB::FiffCoordTrans m_headToMriTrans;       /**< Head-to-MRI coordinate transform. */
     bool m_applySensorTrans = true;                 /**< Whether to apply the transform to sensors/digitizers. */
     QString m_megHelmetOverridePath;                /**< Optional override path for MEG helmet surface. */
+    QMatrix4x4 m_devHeadTrans;                      /**< Device→Head transformation from last sensor load. */
+    bool m_hasDevHead = false;                      /**< Whether a valid Device→Head transform is available. */
     bool m_dipolesVisible = true;                   /**< Whether dipoles are rendered. */
     bool m_networkVisible = false;                  /**< Whether the connectivity network is rendered. */
 

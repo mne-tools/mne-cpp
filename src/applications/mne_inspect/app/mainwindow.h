@@ -203,6 +203,7 @@ private:
     QCheckBox *m_showMegContourCheck = nullptr;
     QCheckBox *m_showEegContourCheck = nullptr;
     QCheckBox *m_showHelmetCheck = nullptr;
+    QComboBox *m_helmetShapeCombo = nullptr;
     QComboBox *m_megHelmetCombo = nullptr;
     QSlider *m_sensorFieldTimeSlider = nullptr;
     QLabel *m_sensorFieldTimeLabel = nullptr;
