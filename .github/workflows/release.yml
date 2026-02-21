@@ -98,10 +98,15 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v3
-    - name: Install Qt Dev Tools, Doxygen and Graphviz
+      with:
+        submodules: recursive
+    - name: Install Qt Dev Tools, Doxygen 1.16.1 and Graphviz
       run: |
         sudo apt-get update -qq
-        sudo apt-get install -qq qttools5-dev-tools doxygen graphviz
+        sudo apt-get install -qq qttools5-dev-tools graphviz
+        wget -q https://github.com/doxygen/doxygen/releases/download/Release_1_16_1/doxygen-1.16.1.linux.bin.tar.gz
+        tar xzf doxygen-1.16.1.linux.bin.tar.gz
+        sudo install -m 755 doxygen-1.16.1/bin/doxygen /usr/local/bin/doxygen
     - name: Run Doxygen and package result
       run: |
         git fetch --all
@@ -141,14 +146,14 @@ jobs:
         cd gh-pages
         # Remove all files first
         git rm * -r
-        git commit --amend -a -m 'Update docu' --allow-empty
+        git commit --amend --reset-author -a -m 'Update docu' --allow-empty
         touch .nojekyll
         # Copy doxygen files
         cp -r ../html/* .
         # Add all new files, commit and push
         git add *
         git add .nojekyll
-        git commit --amend -a -m 'Update docu'
+        git commit --amend --reset-author -a -m 'Update docu'
         git push -f --all
 
   gh-pages:
@@ -160,11 +165,24 @@ jobs:
     steps:
     - name: Clone repository
       uses: actions/checkout@v3
+      with:
+        submodules: recursive
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        cache-dependency-path: doc/website/package-lock.json
+    - name: Build Docusaurus site
+      run: |
+        cd doc/website
+        npm ci
+        npm run build
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:
         credentials: ${{secrets.GIT_CREDENTIALS}}
-    - name: Clone doc/gh-pages into gh-pages branch
+    - name: Deploy to mne-cpp.github.io
       env:
         GIT_CREDENTIALS: ${{ secrets.GIT_CREDENTIALS }}
       run: |
@@ -175,12 +193,13 @@ jobs:
         cd mne-cpp.github.io
         # Remove all files first
         git rm * -r
-        git commit --amend -a -m 'Update docu' --allow-empty
+        git commit --amend --reset-author -a -m 'Update docu' --allow-empty
         cd ..
-        cp -RT doc/gh-pages mne-cpp.github.io
+        # Copy the Docusaurus build output
+        cp -RT doc/website/build mne-cpp.github.io
         cd mne-cpp.github.io
         git add .
-        git commit --amend -a -m 'Update docu'
+        git commit --amend --reset-author -a -m 'Update docu'
         git push -f --all
 
   WebAssembly:
@@ -273,7 +292,7 @@ jobs:
           cp -RT ../out/wasm/examples examples
         fi
         git add .
-        git commit --amend -m 'Update wasm builds'
+        git commit --amend --reset-author -m 'Update wasm builds'
         git push -f origin gh-pages
 
         # --- Update main branch ---
@@ -293,5 +312,5 @@ jobs:
           cp -RT ../out/wasm/examples examples
         fi
         git add .
-        git commit --amend -m 'Update wasm builds'
+        git commit --amend --reset-author -m 'Update wasm builds'
         git push -f origin main

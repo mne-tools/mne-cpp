@@ -70,6 +70,10 @@ compile_commands.json
 # Generated docu Docker files
 /_site
 
+# Generated Doxygen output
+doc/doxygen/html/
+doc/doxygen/qt-creator_doc/
+
 /build*
 /out*
 /resources/data*

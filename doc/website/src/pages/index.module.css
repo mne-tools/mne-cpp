@@ -1,0 +1,290 @@
+/* ── Hero ── */
+.hero {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 7rem 2rem 8rem;
+    background: linear-gradient(175deg, #f8f9fc 0%, #eef0f6 50%, #f4f5fa 100%);
+    color: #1a1a2e;
+    overflow: hidden;
+}
+
+:global([data-theme='dark']) .hero {
+    background: linear-gradient(175deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
+    color: #fff;
+}
+
+.heroInner {
+    position: relative;
+    z-index: 1;
+    max-width: 640px;
+}
+
+.heroLogo {
+    width: 260px;
+    height: auto;
+    margin-bottom: 1.5rem;
+}
+
+.versionBadge {
+    display: inline-block;
+    background: rgba(108, 92, 231, 0.08);
+    border: 1px solid rgba(108, 92, 231, 0.2);
+    border-radius: 20px;
+    padding: 0.15rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    color: rgba(0, 0, 0, 0.5);
+    margin-bottom: 1.25rem;
+}
+
+:global([data-theme='dark']) .versionBadge {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.18);
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.heroTagline {
+    font-size: 1.6rem;
+    font-weight: 600;
+    line-height: 1.35;
+    margin: 0 0 2rem;
+    color: #2d3436;
+}
+
+:global([data-theme='dark']) .heroTagline {
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.heroCta {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.heroCta :global(.button--outline) {
+    color: var(--ifm-color-primary);
+    border-color: var(--ifm-color-primary);
+}
+
+.heroCta :global(.button--outline:hover) {
+    background: rgba(108, 92, 231, 0.06);
+    border-color: var(--ifm-color-primary-dark);
+    color: var(--ifm-color-primary-dark);
+}
+
+:global([data-theme='dark']) .heroCta :global(.button--outline) {
+    color: rgba(255, 255, 255, 0.85);
+    border-color: rgba(255, 255, 255, 0.25);
+}
+
+:global([data-theme='dark']) .heroCta :global(.button--outline:hover) {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: #fff;
+}
+
+/* ── Waves (subtle EEG-like traces) ── */
+.waveWrap {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.waveSvg {
+    display: block;
+    width: 200%;
+    height: 100%;
+}
+
+.wave1,
+.wave2,
+.wave3,
+.wave4,
+.wave5 {
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.wave1 {
+    stroke: rgba(108, 92, 231, 0.10);
+    stroke-width: 2;
+    animation: drift 14s ease-in-out infinite;
+}
+
+.wave2 {
+    stroke: rgba(108, 92, 231, 0.08);
+    stroke-width: 1.5;
+    animation: drift 18s ease-in-out infinite reverse;
+}
+
+.wave3 {
+    stroke: rgba(108, 92, 231, 0.06);
+    stroke-width: 2;
+    animation: drift 22s ease-in-out infinite;
+}
+
+.wave4 {
+    stroke: rgba(108, 92, 231, 0.05);
+    stroke-width: 1.2;
+    animation: drift 26s ease-in-out infinite reverse;
+}
+
+.wave5 {
+    stroke: rgba(108, 92, 231, 0.07);
+    stroke-width: 1.5;
+    animation: drift 16s ease-in-out infinite;
+}
+
+:global([data-theme='dark']) .wave1 {
+    stroke: rgba(162, 155, 254, 0.10);
+}
+
+:global([data-theme='dark']) .wave2 {
+    stroke: rgba(162, 155, 254, 0.07);
+}
+
+:global([data-theme='dark']) .wave3 {
+    stroke: rgba(162, 155, 254, 0.06);
+}
+
+:global([data-theme='dark']) .wave4 {
+    stroke: rgba(162, 155, 254, 0.05);
+}
+
+:global([data-theme='dark']) .wave5 {
+    stroke: rgba(162, 155, 254, 0.08);
+}
+
+@keyframes drift {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(-25%);
+    }
+}
+
+/* ── Applications ── */
+.apps {
+    padding: 5rem 0;
+}
+
+.appCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 2.5rem 1.5rem;
+    border-radius: 16px;
+    background: var(--ifm-background-surface-color);
+    border: 1px solid var(--ifm-color-emphasis-200);
+    height: 100%;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-decoration: none !important;
+    color: inherit !important;
+}
+
+.appCard:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+    text-decoration: none !important;
+}
+
+.appIcon {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 1.25rem;
+}
+
+.appTitle {
+    margin-bottom: 0.5rem;
+    font-size: 1.25rem;
+}
+
+.appDesc {
+    font-size: 0.92rem;
+    color: var(--ifm-color-emphasis-700);
+    flex: 1;
+}
+
+.appLink {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--ifm-color-primary);
+    margin-top: 0.75rem;
+}
+
+/* ── Logo sections (institutions & funders) ── */
+.logoSection {
+    padding: 4rem 0;
+}
+
+.logoSectionAlt {
+    background: var(--ifm-background-surface-color);
+}
+
+.sectionTitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--ifm-color-emphasis-500);
+    margin-bottom: 1.5rem;
+}
+
+.logoGrid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 2rem;
+}
+
+.logoLink img {
+    max-height: 48px;
+    width: auto;
+    opacity: 0.5;
+    filter: grayscale(100%);
+    transition: all 0.25s ease;
+}
+
+:global([data-theme='dark']) .logoLink img {
+    filter: grayscale(100%) invert(1);
+}
+
+.logoLink:hover img {
+    opacity: 1;
+    filter: none;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+    .heroLogo {
+        width: 180px;
+    }
+
+    .heroTagline {
+        font-size: 1.3rem;
+    }
+
+    .hero {
+        padding: 4rem 1.5rem 6rem;
+    }
+
+    .waveWrap {
+        height: 80px;
+    }
+}
