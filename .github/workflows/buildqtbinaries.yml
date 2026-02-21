@@ -104,17 +104,14 @@ jobs:
         # Clone Qt6 repo
         cd ..
         git clone https://code.qt.io/qt/qt5.git -b v6.10.2
-        cd qt5
-        perl init-repository -f --module-subset=qtbase,qtsvg,qt3d,qtshadertools
         # Create shadow build folder
-        cd ..
         mkdir qt6_shadow
         cd qt6_shadow
         # Setup the compiler 
         cmd.exe /c "call `"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat`" && set > %temp%\vcvars.txt"
         Get-Content "$env:temp\vcvars.txt" | Foreach-Object { if ($_ -match "^(.*?)=(.*)$") { Set-Content "env:\$($matches[1])" $matches[2] } }
-        # Configure Qt6
-        ..\qt5\configure.bat -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "..\Qt6_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -opensource -confirm-license
+        # Configure Qt6 (use -init-submodules instead of init-repository which requires /bin/sh)
+        ..\qt5\configure.bat -init-submodules -submodules qtbase,qtsvg,qtshadertools -release -static -no-pch -optimize-size -opengl desktop -platform win32-msvc -prefix "..\Qt6_binaries" -skip webengine -nomake tools -nomake tests -nomake examples -opensource -confirm-license
         cmake --build . --parallel $env:NUMBER_OF_PROCESSORS
         cmake --install .
     - name: Package binaries
@@ -146,20 +143,33 @@ jobs:
         git pull
         ./emsdk install 3.1.50
         ./emsdk activate 3.1.50
-    - name: Compile wasm Qt version
+    - name: Install dependencies
+      run: |
+        sudo apt-get update -q
+        sudo apt-get install -q build-essential libgl1-mesa-dev libvulkan-dev ninja-build
+    - name: Build host Qt (needed for cross-compilation)
       run: |
         cd ..
-        source ./emsdk/emsdk_env.sh
         # Clone Qt6 repo
         git clone https://code.qt.io/qt/qt5.git -b v6.10.2
         cd qt5
         ./init-repository -f --module-subset=qtbase,qtsvg,qtshadertools
-        # Create shadow build folder
+        # Build minimal host Qt
         cd ..
+        mkdir qt6_host_build
+        cd qt6_host_build
+        ../qt5/configure -release -prefix "$PWD/../Qt6_host" -skip webengine -nomake tools -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -- -DCMAKE_BUILD_TYPE=Release
+        cmake --build . --parallel $(nproc)
+        cmake --install .
+    - name: Compile wasm Qt version
+      run: |
+        cd ..
+        source ./emsdk/emsdk_env.sh
+        # Create shadow build folder
         mkdir qt6_shadow
         cd qt6_shadow
-        # Configure Qt6 for wasm
-        ../qt5/configure -qt-host-path /usr -xplatform wasm-emscripten -feature-thread -skip webengine -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -prefix "$PWD/../Qt6_binaries" -- -DCMAKE_BUILD_TYPE=Release
+        # Configure Qt6 for wasm (use the host Qt we just built)
+        ../qt5/configure -qt-host-path "$PWD/../Qt6_host" -xplatform wasm-emscripten -feature-thread -skip webengine -nomake tests -nomake examples -no-dbus -no-ssl -no-pch -opensource -confirm-license -prefix "$PWD/../Qt6_binaries" -- -DCMAKE_BUILD_TYPE=Release
         cmake --build . --parallel $(nproc)
         cmake --install .
     - name: Package binaries
