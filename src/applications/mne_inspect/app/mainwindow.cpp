@@ -64,6 +64,7 @@
 #include <QProgressBar>
 #include <QGridLayout>
 #include <QTimer>
+#include <QElapsedTimer>
 #include <QCoreApplication>
 #include <QDebug>
 
@@ -240,12 +241,16 @@ void MainWindow::setupUI()
     QHBoxLayout *playbackLayout = new QHBoxLayout;
     m_playButton = new QPushButton("Play");
     m_speedCombo = new QComboBox;
+    m_speedCombo->addItem("0.01x", 0.01);
+    m_speedCombo->addItem("0.05x", 0.05);
     m_speedCombo->addItem("0.1x", 0.1);
     m_speedCombo->addItem("0.25x", 0.25);
     m_speedCombo->addItem("0.5x", 0.5);
     m_speedCombo->addItem("1.0x", 1.0);
     m_speedCombo->addItem("2.0x", 2.0);
-    m_speedCombo->setCurrentIndex(3);
+    m_speedCombo->addItem("5.0x", 5.0);
+    m_speedCombo->addItem("10.0x", 10.0);
+    m_speedCombo->setCurrentIndex(2);
     playbackLayout->addWidget(m_playButton);
     playbackLayout->addWidget(m_speedCombo);
 
@@ -779,9 +784,8 @@ void MainWindow::setupConnections()
 
         float tstep = m_brainView->stcStep();
         if (tstep > 0) {
-            double factor = m_speedCombo->currentData().toDouble();
-            int interval = static_cast<int>((tstep * 1000.0f) / factor);
-            m_stcTimer->setInterval(interval);
+            m_stcTimer->setInterval(16);  // ~60 fps fixed frame rate
+            m_stcStepAccum = 0.0;
         }
     });
 
@@ -854,6 +858,8 @@ void MainWindow::setupConnections()
                 if (m_overlayCombo->currentText() != "Source Estimate") {
                     m_overlayCombo->setCurrentText("Source Estimate");
                 }
+                m_stcStepAccum = 0.0;
+                m_playbackClock.start();
                 m_stcTimer->start();
                 m_playButton->setText("Pause");
             }
@@ -863,11 +869,13 @@ void MainWindow::setupConnections()
     connect(m_speedCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() {
         float tstep = m_brainView->stcStep();
         if (tstep > 0) {
-            double factor = m_speedCombo->currentData().toDouble();
-            int interval = static_cast<int>((tstep * 1000.0f) / factor);
-            m_stcTimer->setInterval(interval);
+            // Reset clock so the next tick measures from now
+            m_playbackClock.start();
+            m_stcStepAccum = 0.0;
             // Also update real-time streaming interval
-            m_brainView->setRealtimeInterval(interval);
+            double factor = m_speedCombo->currentData().toDouble();
+            double idealInterval = (tstep * 1000.0) / factor;
+            m_brainView->setRealtimeInterval(static_cast<int>(idealInterval));
         }
     });
 
@@ -887,8 +895,34 @@ void MainWindow::setupConnections()
     });
 
     connect(m_stcTimer, &QTimer::timeout, [this]() {
-        int next = m_timeSlider->value() + 1;
-        if (next >= m_timeSlider->maximum()) next = 0;
+        float tstep = m_brainView->stcStep();
+        if (tstep <= 0) return;
+
+        // Measure actual elapsed wall-clock time since last reset
+        double elapsedMs = m_playbackClock.elapsed();
+        m_playbackClock.start();
+
+        double factor = m_speedCombo->currentData().toDouble();
+        // How many samples worth of data time elapsed
+        double samplesElapsed = (elapsedMs * factor) / (tstep * 1000.0);
+        m_stcStepAccum += samplesElapsed;
+
+        int steps = static_cast<int>(m_stcStepAccum);
+        if (steps < 1) return;
+        m_stcStepAccum -= steps;
+
+        int cur = m_timeSlider->value();
+        int maxVal = m_timeSlider->maximum();
+        int next = cur + steps;
+        if (next > maxVal) {
+            if (m_loopCheck->isChecked()) {
+                next = next % (maxVal + 1);
+            } else {
+                next = maxVal;
+                m_stcTimer->stop();
+                m_playButton->setText("Play");
+            }
+        }
         m_timeSlider->setValue(next);
     });
 

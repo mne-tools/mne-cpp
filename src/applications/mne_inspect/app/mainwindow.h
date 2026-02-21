@@ -40,6 +40,7 @@
 //=============================================================================================================
 
 #include <QMainWindow>
+#include <QElapsedTimer>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -222,6 +223,10 @@ private:
 
     // Control widgets - View (additional)
     QCheckBox *m_showInfoCheck = nullptr;
+
+    // Playback stepping (for real-time accurate playback)
+    QElapsedTimer m_playbackClock;          //!< Wall-clock for measuring actual elapsed time
+    double m_stcStepAccum = 0.0;            //!< Fractional sample accumulator
 
     // Sync state
     bool m_isSyncing = false;
