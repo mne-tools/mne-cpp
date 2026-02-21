@@ -53,7 +53,15 @@ function WaveBackground() {
     return (
         <div className={styles.waveWrap} aria-hidden="true">
             <svg className={styles.waveSvg} viewBox="0 0 1440 500" preserveAspectRatio="none">
-                {/* EEG-like trace lines — shifted lower to barely touch logo */}
+                {/* Semi-transparent filled bands below each wave */}
+                <path className={styles.waveFill1}
+                    d="M-200,260 C-100,210 0,310 100,240 C200,170 300,330 400,260 C500,190 600,350 700,260 C800,170 900,330 1000,240 C1100,150 1200,350 1300,260 C1400,170 1500,330 1600,240 C1700,150 1800,330 1900,260 L1900,500 L-200,500 Z" />
+                <path className={styles.waveFill2}
+                    d="M-200,220 C-80,170 40,270 160,200 C280,130 400,290 520,220 C640,150 760,310 880,220 C1000,130 1120,290 1240,200 C1360,110 1480,290 1600,220 C1720,150 1840,290 1960,200 L1960,500 L-200,500 Z" />
+                <path className={styles.waveFill3}
+                    d="M-200,340 C-60,290 80,390 220,330 C360,270 500,410 640,340 C780,270 920,410 1060,340 C1200,270 1340,410 1480,340 C1620,270 1760,410 1900,340 L1900,500 L-200,500 Z" />
+
+                {/* EEG-like trace lines */}
                 <path className={styles.wave1}
                     d="M-200,260 C-100,210 0,310 100,240 C200,170 300,330 400,260 C500,190 600,350 700,260 C800,170 900,330 1000,240 C1100,150 1200,350 1300,260 C1400,170 1500,330 1600,240 C1700,150 1800,330 1900,260" />
                 <path className={styles.wave2}

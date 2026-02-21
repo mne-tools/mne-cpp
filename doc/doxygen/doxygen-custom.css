@@ -1,0 +1,190 @@
+/*
+ * Custom Doxygen overrides to match the MNE-CPP Docusaurus navbar.
+ * Height ≈ 3.75rem (60px), system-ui font stack, semibold (500) nav links.
+ */
+
+/* ── Font & variable overrides ─────────────────────────────────── */
+html {
+    --font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu,
+        Cantarell, "Noto Sans", sans-serif, BlinkMacSystemFont;
+    --navigation-font-size: 0.9375rem;
+    /* 15px – matches Docusaurus body */
+    --title-font-size: 1.25rem;
+    /* 20px – keeps logo area compact */
+}
+
+/* ── Top bar: match Docusaurus 3.75rem (60px) height ───────────── */
+#top {
+    min-height: 3.75rem;
+}
+
+#titlearea {
+    padding: 0.25rem 1rem;
+}
+
+#titlearea table tbody tr {
+    height: auto !important;
+}
+
+#projectlogo img {
+    max-height: 1.75rem;
+    /* ~28px – compact like Docusaurus logo */
+    margin-right: 0.5rem;
+}
+
+/* ── Dark / light mode logo switching ──────────────────────────── */
+#projectlogo .logo-dark {
+    display: none;
+}
+
+html.dark-mode #projectlogo .logo-light {
+    display: none;
+}
+
+html.dark-mode #projectlogo .logo-dark {
+    display: inline;
+}
+
+#projectname {
+    font-size: var(--title-font-size);
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+#projectnumber {
+    font-size: 0.8rem;
+    font-weight: 500;
+    opacity: 0.75;
+}
+
+/* ── Navigation links: Docusaurus-style semibold ───────────────── */
+.sm-dox a,
+.sm-dox a:hover,
+.sm-dox a:focus,
+.tablist li,
+.tablist li a,
+.tablist li.current a {
+    font-family: var(--font-family) !important;
+    font-weight: 500 !important;
+    font-size: var(--navigation-font-size) !important;
+    letter-spacing: 0.01em;
+}
+
+/* Active / current tab – subtle bottom highlight like Docusaurus */
+.tablist li.current a {
+    border-bottom: 2px solid var(--primary-color);
+    border-radius: 0 !important;
+}
+
+/* ── Tab bar spacing to match Docusaurus padding ───────────────── */
+.tabs,
+.tabs2,
+.tabs3 {
+    padding: 0 1rem;
+}
+
+.tablist li {
+    padding: 0.375rem 0.75rem;
+}
+
+.sm-dox>li>a {
+    padding: 0.5rem 0.75rem !important;
+}
+
+#main-nav {
+    padding: 0.25rem 1rem;
+    display: flex;
+    align-items: center;
+}
+
+/* ── Vertically center & right-align search, toggle, GitHub ────── */
+
+/* The nav menu list takes available space, search etc. pushed right */
+#main-menu {
+    flex: 1;
+    display: flex !important;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* The search position item pushes to far right via margin-left:auto */
+#searchBoxPos2 {
+    margin-left: auto !important;
+    float: none !important;
+    display: flex !important;
+    align-items: center;
+    gap: 0.375rem;
+}
+
+/* Search box */
+.tabs #MSearchBox,
+#MSearchBox {
+    display: inline-flex !important;
+    align-items: center;
+    vertical-align: middle;
+    position: relative !important;
+    right: auto !important;
+}
+
+/* Center text vertically inside search input */
+#MSearchField {
+    line-height: var(--searchbar-height) !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    box-sizing: border-box;
+}
+
+/* Dark mode toggle & GitHub link: vertical centering */
+doxygen-awesome-dark-mode-toggle,
+.github-link {
+    vertical-align: middle;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ── Hide dropdown arrows (sub-arrows) ─────────────────────────── */
+.sm-dox a span.sub-arrow,
+.sm-dox ul a span.sub-arrow {
+    display: none !important;
+}
+
+/* ── GitHub link in header (matches Docusaurus style) ──────────── */
+.github-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    margin-left: 0.5rem;
+    border-radius: var(--border-radius-small, 4px);
+    vertical-align: middle;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.github-link:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+html.dark-mode .github-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.github-link svg {
+    width: 24px;
+    height: 24px;
+    fill: var(--header-foreground);
+}
+
+/* ── Dark mode toggle: match Docusaurus look ───────────────────── */
+doxygen-awesome-dark-mode-toggle {
+    width: 2rem !important;
+    height: 2rem !important;
+    font-size: 20px !important;
+}
+
+doxygen-awesome-dark-mode-toggle>svg {
+    width: 20px;
+    height: 20px;
+}

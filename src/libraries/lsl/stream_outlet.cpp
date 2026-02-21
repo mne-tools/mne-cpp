@@ -80,6 +80,7 @@ namespace {
 //=============================================================================================================
 
 /**
+ * @internal
  * @brief Private implementation for stream_outlet (PIMPL).
  *
  * Runs a background thread that:
@@ -87,7 +88,7 @@ namespace {
  *   2. Periodically sends UDP multicast discovery broadcasts.
  *   3. Drains the sample queue and writes data to all connected inlets.
  */
-class lsl::StreamOutletPrivate
+class LSLLIB::StreamOutletPrivate
 {
 public:
     StreamOutletPrivate(const stream_info& info)

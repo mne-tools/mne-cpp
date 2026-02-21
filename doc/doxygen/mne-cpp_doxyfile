@@ -54,14 +54,14 @@ PROJECT_NUMBER         = 2.0.0
 # for a project that appears at the top of each page and should give viewers a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          = "The C++ framework for real-time functional brain imaging"
+PROJECT_BRIEF          =
 
 # With the PROJECT_LOGO tag one can specify a logo or an icon that is included
 # in the documentation. The maximum height of the logo should not exceed 55
 # pixels and the maximum width should not exceed 200 pixels. Doxygen will copy
 # the logo to the output directory.
 
-PROJECT_LOGO           = MNE-CPP_Doxygen_Logo.svg
+PROJECT_LOGO           = MNE-CPP_Logo.svg
 
 # With the PROJECT_ICON tag one can specify an icon that is included in the tabs
 # when the HTML document is shown. Doxygen will copy the logo to the output
@@ -1439,8 +1439,7 @@ HTML_STYLESHEET        =
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
 HTML_EXTRA_STYLESHEET  = doxygen-awesome/doxygen-awesome.css \
-                         doxygen-awesome/doxygen-awesome-sidebar-only.css \
-                         doxygen-awesome/doxygen-awesome-sidebar-only-darkmode-toggle.css
+                         doxygen-custom.css
 
 # The HTML_EXTRA_FILES tag can be used to specify one or more extra images or
 # other source files which should be copied to the HTML output directory. Note
@@ -1454,7 +1453,8 @@ HTML_EXTRA_FILES       = doxygen-awesome/doxygen-awesome-darkmode-toggle.js \
                          doxygen-awesome/doxygen-awesome-fragment-copy-button.js \
                          doxygen-awesome/doxygen-awesome-paragraph-link.js \
                          doxygen-awesome/doxygen-awesome-interactive-toc.js \
-                         doxygen-awesome/doxygen-awesome-tabs.js
+                         doxygen-awesome/doxygen-awesome-tabs.js \
+                         MNE-CPP_Logo_Dark.svg
 
 # The HTML_COLORSTYLE tag can be used to specify if the generated HTML output
 # should be rendered with a dark or light theme.
@@ -1795,7 +1795,7 @@ DISABLE_INDEX          = NO
 # The default value is: YES.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-GENERATE_TREEVIEW      = YES
+GENERATE_TREEVIEW      = NO
 
 # When GENERATE_TREEVIEW is set to YES, the PAGE_OUTLINE_PANEL option determines
 # if an additional navigation panel is shown at the right hand side of the
@@ -1839,7 +1839,7 @@ SHOW_ENUM_VALUES       = NO
 # Minimum value: 0, maximum value: 1500, default value: 250.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-TREEVIEW_WIDTH         = 250
+TREEVIEW_WIDTH         = 335
 
 # If the EXT_LINKS_IN_WINDOW option is set to YES, Doxygen will open links to
 # external symbols imported via tag files in a separate window.

@@ -106,7 +106,7 @@ public:
     /**
      * Call this to provide the stream info for the producer.
      */
-    void setStreamInfo(const lsl::stream_info& stream);
+    void setStreamInfo(const LSLLIB::stream_info& stream);
 
     //=========================================================================================================
     /**
@@ -141,8 +141,8 @@ public slots:
 
 private:
     // LSL stuff
-    lsl::stream_info                m_StreamInfo;
-    lsl::stream_inlet*              m_StreamInlet;
+    LSLLIB::stream_info                m_StreamInfo;
+    LSLLIB::stream_inlet*              m_StreamInlet;
     bool                            m_bHasStreamInfo;
 
     // synchronization with main thread

@@ -94,7 +94,7 @@ void LSLAdapterProducer::readStream()
 
     // start to stream: build a stream inlet
     try {
-        m_StreamInlet = new lsl::stream_inlet(m_StreamInfo);
+        m_StreamInlet = new LSLLIB::stream_inlet(m_StreamInfo);
         m_StreamInlet->open_stream();
     }
     catch (std::exception& e) {
@@ -153,7 +153,7 @@ void LSLAdapterProducer::readStream()
 
 //=============================================================================================================
 
-void LSLAdapterProducer::setStreamInfo(const lsl::stream_info& stream)
+void LSLAdapterProducer::setStreamInfo(const LSLLIB::stream_info& stream)
 {
     m_StreamInfo = stream;   
     m_bHasStreamInfo = true;
@@ -176,7 +176,7 @@ void LSLAdapterProducer::reset()
     // clear buffer
     m_vBufferedSamples.clear();
     // reset lsl members
-    m_StreamInfo = lsl::stream_info();
+    m_StreamInfo = LSLLIB::stream_info();
     delete m_StreamInlet;
     m_StreamInlet = Q_NULLPTR;
 }

@@ -67,7 +67,7 @@ namespace {
 // DEFINE FUNCTIONS
 //=============================================================================================================
 
-std::vector<lsl::stream_info> lsl::resolve_streams(double timeout)
+std::vector<LSLLIB::stream_info> LSLLIB::resolve_streams(double timeout)
 {
     std::vector<stream_info> results;
     std::set<std::string> seenUIDs;  // track unique streams by UID
@@ -148,7 +148,7 @@ std::vector<lsl::stream_info> lsl::resolve_streams(double timeout)
 
 //=============================================================================================================
 
-std::vector<lsl::stream_info> lsl::resolve_stream(const std::string& prop,
+std::vector<LSLLIB::stream_info> LSLLIB::resolve_stream(const std::string& prop,
                                                    const std::string& value,
                                                    double timeout)
 {

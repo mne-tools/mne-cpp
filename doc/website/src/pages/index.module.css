@@ -105,6 +105,41 @@
     height: 100%;
 }
 
+/* Semi-transparent fills below the waves */
+.waveFill1,
+.waveFill2,
+.waveFill3 {
+    stroke: none;
+}
+
+.waveFill1 {
+    fill: rgba(255, 255, 255, 0.45);
+    animation: drift 14s ease-in-out infinite;
+}
+
+.waveFill2 {
+    fill: rgba(255, 255, 255, 0.30);
+    animation: drift 18s ease-in-out infinite reverse;
+}
+
+.waveFill3 {
+    fill: rgba(255, 255, 255, 0.20);
+    animation: drift 22s ease-in-out infinite;
+}
+
+:global([data-theme='dark']) .waveFill1 {
+    fill: rgba(255, 255, 255, 0.04);
+}
+
+:global([data-theme='dark']) .waveFill2 {
+    fill: rgba(255, 255, 255, 0.03);
+}
+
+:global([data-theme='dark']) .waveFill3 {
+    fill: rgba(255, 255, 255, 0.025);
+}
+
+/* Stroke lines */
 .wave1,
 .wave2,
 .wave3,

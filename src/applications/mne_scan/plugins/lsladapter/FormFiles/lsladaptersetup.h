@@ -94,7 +94,7 @@ public slots:
      * @param[in] vStreamInfos A vector of available LSL streams.
      * @param[in] currentStream The current LSL stream.
      */
-    void onLSLScanResults(const QVector<lsl::stream_info>& vStreamInfos, const lsl::stream_info& currentStream);
+    void onLSLScanResults(const QVector<LSLLIB::stream_info>& vStreamInfos, const LSLLIB::stream_info& currentStream);
 
 private slots:
     // auto-generated slots:
@@ -111,7 +111,7 @@ private:
      */
     void updateTextFields();
 
-    QMap<QListWidgetItem*, lsl::stream_info>    m_mItemToStreamInfo;
+    QMap<QListWidgetItem*, LSLLIB::stream_info>    m_mItemToStreamInfo;
     QListWidgetItem*                            m_pCurrentSelectedStream;
 
     Ui::LSLSetupWidget                          ui;
@@ -129,7 +129,7 @@ signals:
      *
      * @param[in] stream The newly selected LSL stream, represented by stream_info object.
      */
-    void streamSelectionChanged(const lsl::stream_info& stream);
+    void streamSelectionChanged(const LSLLIB::stream_info& stream);
 
     //=========================================================================================================
     /**

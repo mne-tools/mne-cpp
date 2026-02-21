@@ -64,6 +64,7 @@ using namespace LSLLIB;
 //=============================================================================================================
 
 /**
+ * @internal
  * @brief Private implementation for stream_inlet (PIMPL).
  */
 class LSLLIB::StreamInletPrivate
