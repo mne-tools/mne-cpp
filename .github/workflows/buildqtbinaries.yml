@@ -1,6 +1,7 @@
 name: BuildQtBinaries
 
 on:
+  workflow_dispatch:
   push:
     branches:
     # Change this to the branch name which you are developing on to trigger the workflow
