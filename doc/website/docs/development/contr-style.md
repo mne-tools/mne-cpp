@@ -45,14 +45,17 @@ FileLoader(int iOpenMode,
            const QString& sCommentIdentifier = "");
 ```
 
-## Add the MNE-CPP Wizards to QtCreator
+## MNE-CPP Class Templates
 
-The following steps will show you how to setup the MNE-CPP QtCreator wizard. This wizard is of great help to create new C++ classes which are conform with the MNE-CPP coding conventions. This helps streamlining the contribution process.
+MNE-CPP provides class templates under `resources/wizards/mnecpp/` that follow the project's coding conventions. These templates can help you quickly scaffold new classes that are consistent with the existing codebase.
 
- 1. Navigate to your MNE-CPP repository `\resources\wizards`
- 2. Copy the `mnecpp` folder to your QtCreator wizard folder location. Depending on your operating system, this folder will be in different locations ([see Qt documentation](https://doc.qt.io/qtcreator/creator-project-wizards.html) for more information). As an example, on Windows, if you installed your Qt instance in `C:\Qt` you should copy the `mnecpp` folder to `C:\Qt\Tools\QtCreator\share\qtcreator\templates\wizards`. On Mac, you should copy to `/Users/<userName>/Qt Creator.app/Contents/Resources/templates/wizards`. And on Linux, `/home/<userName>/Qt/share/qtcreator/templates/wizards/`.
- 3. Restart QtCreator.
- 4. Now you should be able to right click on the project where you want to add a new class and see the MNE-CPP category appear in the wizard.
+### Using with QtCreator
+
+If you use QtCreator as your IDE, you can install these templates as wizards:
+
+1. Copy the `resources/wizards/mnecpp` folder to your QtCreator wizard directory. The location varies by OS — see the [Qt documentation](https://doc.qt.io/qtcreator/creator-project-wizards.html) for details.
+2. Restart QtCreator.
+3. The MNE-CPP category will appear in the new file/class wizard.
 
 ## Command Line Outputs
 
@@ -106,9 +109,9 @@ MAINT: improved GitHubAction workflow for Linux deployment
 DOC: add documentation for new amplifier in MNE Scan
 ```
 
-## Add the MNE-CPP Documentation to QtCreator
+## MNE-CPP Documentation in QtCreator
 
-You can display external documentation in the Help mode, which you can open via pressing the F1 key. To augment or replace the documentation that ships with Qt Creator and Qt:
+You can integrate MNE-CPP's API documentation into QtCreator's Help mode (F1):
 
- * Download the .qch file `mne-cpp-doc-qtcreator.qch` file for the MNE-CPP version you use [here](https://github.com/mne-tools/mne-cpp/releases).
- * To add the .qch file to Qt Creator, select Tools > Options > Help > Documentation > Add.
+ * Download the `mne-cpp-doc-qtcreator.qch` file from the [MNE-CPP releases page](https://github.com/mne-tools/mne-cpp/releases).
+ * In QtCreator, go to **Tools → Options → Help → Documentation → Add** and select the `.qch` file.

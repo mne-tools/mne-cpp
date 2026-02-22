@@ -5,6 +5,13 @@ sidebar_label: Continuous Integration
 
 # Continuous Integration
 
-We have invested a significant amount of effort into a completely automatic workflow of processes that validate that any new change to the codebase does not break the functionality of the code. This is verified before each and every single change to the codebase is added.
+MNE-CPP uses a fully automated CI pipeline to ensure that every change to the codebase is validated across all supported platforms before it is merged.
 
-We do this with a combination of [Unit testing](writingtest.md), [Github Actions](ci-ghactions.md) and our enforced [contribution workflow](contr-guide.md). Please make sure you go through these documents in order to understand the whole development process.
+The CI system combines three key components:
+
+- **[GitHub Actions](ci-ghactions.md)** — The CI platform that runs all build, test, and deployment workflows automatically on every pull request and push.
+- **[Unit Testing](writingtest.md)** — Tests that verify individual functions and components produce correct results.
+- **[Deployment](ci-deployment.md)** — How release binaries are packaged and published for Windows, Linux, and macOS.
+- **[Release Guide](ci-releasecycle.md)** — The step-by-step process for creating a new stable release.
+
+Contributors should follow the [contribution workflow](contr-guide.md) to ensure their changes pass all CI checks before requesting a review.

@@ -7,7 +7,7 @@ sidebar_label: Contribution Guide
 
 MNE-CPP is an open-source project and is made better by contributions from our users. This guide should help you through the process of contributing to the project:
 
-1. Setup MNE-CPP to [build from source](buildguide.md).
+1. Setup MNE-CPP to [build from source](buildguide-cmake.md).
 2. Familiarize yourself with our [coding conventions](contr-style.md).
 3. Create a new feature-related branch. Do not issue a Pull Request from your fork's main branch. Make your changes to that feature-branch commit.
 4. Run tests locally via calling the testing scripts in `tools/testing`. Make sure you have the `resources/data/mne-cpp-test-data` submodule enabled. 

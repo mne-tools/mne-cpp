@@ -102,14 +102,14 @@ const config: Config = {
                     title: 'Documentation',
                     items: [
                         { label: 'Getting Started', to: '/docs/overview' },
-                        { label: 'MNE Scan', to: '/docs/documentation/scan' },
-                        { label: 'MNE Analyze', to: '/docs/documentation/analyze' },
+                        { label: 'Manual', to: '/docs/manual/intro' },
+                        { label: 'Publications', to: '/docs/publications' },
                     ],
                 },
                 {
                     title: 'Development',
                     items: [
-                        { label: 'Build from Source', to: '/docs/development/buildguide' },
+                        { label: 'Build from Source', to: '/docs/development/buildguide-cmake' },
                         { label: 'Contribute', to: '/docs/development/contribute' },
                         { label: 'API Reference', href: 'https://mne-cpp.github.io/doxygen-api/' },
                     ],
@@ -118,8 +118,8 @@ const config: Config = {
                     title: 'Community',
                     items: [
                         { label: 'GitHub', href: 'https://github.com/mne-tools/mne-cpp' },
-                        { label: 'Contact', to: '/docs/contact' },
                         { label: 'How to Cite', to: '/docs/cite' },
+                        { label: 'Legal Notice', to: '/docs/overview#legal-notice' },
                     ],
                 },
             ],

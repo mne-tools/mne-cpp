@@ -19,9 +19,11 @@ MNE Tracer does this register using a json file where each function call you spe
 
 In order to use there are basically three steps.
 - The functionality is ready in the Utils library (under ```libraries/utils```), so please make sure that Utils library is correctly added to your project (if you're using our recommended settings, this should be the case by default). But make sure Utils lib is correctly linked to your project. 
-- You will need to define the macro ```TRACE``` in your code. If you are using QtCreator and the project's build engine configuration files, you can add the ```trace``` option to the ```MNECPP_CONFIG``` variable in the ```mne-cpp.pri``` file (see image). You can also do this either through the command-line or through the project configuration options. You can also manually add the line ```#include TRACE``` to your code, however we recommend using the build-engine options. 
+- You will need to define the macro `TRACE` in your code. You can do this by adding `-DTRACE` to your CMake configuration or by adding `#define TRACE` before including the MNE Tracer header. When using CMake, you can pass the flag via:
 
-![](/img/mnetracer/trace_option.png)
+```bash
+cmake .. -DTRACE=ON
+```
 
 - Finally, and as usual with any C++ dependency, you have to include MNE Tracer's header file in whatever code you want to be able to use it. You can do that by adding the line ```#include <utils/mnetracer.h>```. Typically, every library, plugin or application has a global_project.h header file, which is in-turn included in every file within a project. If you include the line there, it is a neat way of making sure it will be included everywhere needed.
 

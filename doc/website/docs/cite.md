@@ -6,19 +6,27 @@ sidebar_position: 4
 
 # How to Cite MNE-CPP
 
-If you use any tools provided by the MNE-CPP project in your research, you should cite:
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.804073.svg)](https://doi.org/10.5281/zenodo.804073)
+
+If you use MNE-CPP in your research, we would appreciate if you cite the following:
+
+| |
+|---|
+| Dinh, C.; Esch, L.; Sun, L.; Schlembach, F.; Lew, S.; Kunze, T.; Knobl, D.; Henfling, M.; Pieloth, C.; Doshi, C.; Polo, F.; Strohmeier, D.; Luessi, M.; Okada, Y.; Haueisen, J.; Hämäläinen, M. S.: MNE-CPP. Zenodo. [DOI: 10.5281/zenodo.804073](https://doi.org/10.5281/zenodo.804073) |
+
+We also recommend citing the MNE software overview:
 
 | |
 |---|
 | Esch, L.; Dinh, C.; Larson, E.; Engemann, D.; Jas, M.; Khan, S.; Gramfort, A.; Hämäläinen, M.S.: MNE: Software for Acquiring, Processing and Visualizing MEG/EEG Data. Magnetoencephalography: From Signals to Dynamic Cortical Networks. 2nd Edition. Springer (2019), [DOI: 10.1007/978-3-319-62657-4_59-1](https://link.springer.com/referenceworkentry/10.1007%2F978-3-319-62657-4_59-1) |
 
-Additionally, if you use MNE Scan please cite:
+If your work involves MNE Scan, please also consider citing:
 
 | |
 |---|
 | Esch, L.; Sun, L.; Klüber, V.; Lew, S.; Baumgarten, D.; Grant, P. E.; Okada, Y.; Haueisen, J.; Hamalainen, M.S.; Dinh, C.: MNE Scan: Software for Real-Time Processing of Electrophysiological Data. Journal of Neuroscience Methods (2018), [DOI: 10.1016/j.jneumeth.2018.03.020](https://www.sciencedirect.com/science/article/pii/S0165027018300979) |
 
-You should as well cite the related method papers, e.g., for RTC-MNE:
+For specific methods such as RTC-MNE, please cite the relevant method paper as well:
 
 | |
 |---|

@@ -13,11 +13,11 @@ In general, every new functionality should be tested. You should think about the
 
 ## Creating a new Test
 
-As part of the MNE-CPP wizards for QtCreator, we provide a template for a new test project. How to setup and use the MNE-CPP wizards is described in our [Coding Conventions](contr-style.md). You can create a new test project as shown in following picture:
+A good starting point is to look at existing tests under `src/testframes/`. You can duplicate an existing test directory (e.g., `test_fiff_rwr`) and adapt it for your new test. Make sure to:
 
-![](/img/test_new.png)
-
-After this, a new window should open and allow you to choose from a variety of templates. Under `Projects` choose MNE-CPP and then `MNE-CPP Test`. After you completed all wizard steps you have created a new test project.
+1. Rename the directory and source files to match your test name.
+2. Update the `CMakeLists.txt` inside the new test directory.
+3. Register the new test in the parent `src/testframes/CMakeLists.txt` via `add_subdirectory()`.
 
 ## Structuring the Test
 

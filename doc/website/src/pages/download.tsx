@@ -52,7 +52,7 @@ export default function Download(): JSX.Element {
                     </ol>
                     <p>
                         For building from source, see the{' '}
-                        <Link to="/docs/development/buildguide">Build Guide</Link>.
+                        <Link to="/docs/development/buildguide-cmake">Build Guide</Link>.
                     </p>
                 </div>
 

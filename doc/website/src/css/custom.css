@@ -47,6 +47,46 @@ html {
     opacity: 0.7;
 }
 
+/* Logo grids in doc pages (funding & institutions) */
+.funding-logo-grid,
+.institution-logo-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 2.5rem;
+    margin: 1.5rem 0 2rem;
+}
+
+.funding-logo-grid a,
+.institution-logo-grid a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.funding-logo-grid img,
+.institution-logo-grid img {
+    height: 48px;
+    width: auto;
+    max-width: 160px;
+    object-fit: contain;
+    opacity: 0.55;
+    filter: grayscale(100%);
+    transition: all 0.25s ease;
+}
+
+[data-theme='dark'] .funding-logo-grid img,
+[data-theme='dark'] .institution-logo-grid img {
+    filter: grayscale(100%) invert(1);
+}
+
+.funding-logo-grid a:hover img,
+.institution-logo-grid a:hover img {
+    opacity: 1;
+    filter: none;
+}
+
 /* Version badge in navbar */
 .navbar-version-badge {
     font-size: 0.75rem;

@@ -145,13 +145,13 @@ Data is displayed to the user using views, which display the data contained in m
 
 ## Static Building
 
-When building statically, MNE Analyze needs to be told about the plugins at build time. To do this, the plugins are included with `Q_IMPORT_PLUGIN` in `applications/mne_analyze/mne_analyze/main.cpp` under the `#ifdef STATICBUILD` macro, as well as in `applications/mne_analyze/mne_analyze/mne_analyze.pro` under the section that checks for static builds, `contains(MNECPP_CONFIG, static)`.
+When building statically, MNE Analyze needs to be told about the plugins at build time. To do this, the plugins are included with `Q_IMPORT_PLUGIN` in `applications/mne_analyze/mne_analyze/main.cpp` under the `#ifdef STATICBUILD` macro. The CMake configuration handles the rest of the static build setup automatically.
 
 ## Getting the New Plugin Running
 
- - Make sure the new plugin is included in `plugins.pro` so that it is included in the build.
+ - Make sure the new plugin is added to the `CMakeLists.txt` in the plugins directory so that it is included in the build.
 
- - Make sure that the `.pro` file for your plugin has the correct file names, target, and included Libraries
+ - Make sure that the `CMakeLists.txt` for your plugin has the correct target name, source files, and linked libraries.
 
  - Make sure your plugin has a `*_global.h` file.
 

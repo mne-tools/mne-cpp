@@ -3,6 +3,11 @@ title: WebAssembly
 sidebar_label: WebAssembly
 ---
 
-# WebAssembly Development Resources
+# WebAssembly
 
-Below are some guides to get you started with developing for [WebAssembly (Wasm)](https://webassembly.org/) and MNE-CPP.
+MNE-CPP can be compiled to [WebAssembly (Wasm)](https://webassembly.org/), enabling MNE Analyze and other applications to run directly in a web browser without installation.
+
+The Wasm build uses the [Emscripten](https://emscripten.org/) toolchain together with Qt's WebAssembly target, configured through CMake.
+
+- **[Build Guide](wasm-buildguide.md)** — How to set up Emscripten and build MNE-CPP for WebAssembly.
+- **[Testing via CI](wasm-testing.md)** — How to deploy and test Wasm builds using GitHub Actions and GitHub Pages.

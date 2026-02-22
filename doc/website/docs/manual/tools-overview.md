@@ -1,0 +1,45 @@
+---
+title: Command-Line Tools Overview
+sidebar_label: Tools Overview
+sidebar_position: 6
+---
+
+# Command-Line Tools Reference
+
+MNE-CPP includes a comprehensive set of command-line tools for MEG/EEG data processing, BEM model creation, forward solution computation, and inverse estimation. These tools are C++ ports of the original MNE-C tools created by Matti Hämäläinen.
+
+## BEM Model Creation
+
+| Tool | Description |
+|---|---|
+| [mne_watershed_bem](tools-watershed-bem) | Creates BEM surfaces using FreeSurfer's watershed algorithm |
+| [mne_flash_bem](tools-flash-bem) | Creates BEM surfaces using multi-echo FLASH MRI sequences |
+| [mne_surf2bem](tools-surf2bem) | Converts FreeSurfer surfaces and ASCII triangle files into BEM FIFF files |
+| [mne_setup_forward_model](tools-setup-forward-model) | Sets up the BEM for forward modeling |
+
+## MRI Setup
+
+| Tool | Description |
+|---|---|
+| [mne_setup_mri](tools-setup-mri) | Sets up FreeSurfer MRI data for MNE processing |
+
+## Forward and Inverse Computation
+
+| Tool | Description |
+|---|---|
+| [mne_forward_solution](tools-forward-solution) | Computes the MEG/EEG forward solution |
+| [mne_compute_raw_inverse](tools-compute-raw-inverse) | Computes inverse solutions (MNE/dSPM/sLORETA) |
+| [mne_dipole_fit](tools-dipole-fit) | Performs electric current dipole fitting |
+
+## Data Conversion and Utilities
+
+| Tool | Description |
+|---|---|
+| [mne_edf2fiff](tools-edf2fiff) | Converts EDF files to FIFF format |
+| [mne_show_fiff](tools-show-fiff) | Lists the contents of a FIFF file |
+
+## Real-Time Streaming
+
+| Tool | Description |
+|---|---|
+| [mne_rt_server](tools-rt-server) | Real-time FIFF data streaming server |

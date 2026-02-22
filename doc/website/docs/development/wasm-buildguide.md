@@ -5,128 +5,50 @@ sidebar_label: Build Guide
 
 # WebAssembly Build Guide
 
-This tutorial will show you how to build a Wasm (WebAssembly) version of MNE-CPP. In order to build a Wasm version we need to do three things:
+This guide shows you how to build MNE-CPP for WebAssembly (Wasm) using CMake and the Qt-provided Emscripten toolchain.
 
- * Setup the emscripten compiler
- * Build a static wasm version of Qt (with thread support)
- * Compile MNE-CPP with the `wasm` flag
+## Prerequisites
 
-This tutorial runs on Ubuntu 18.04.03 64bit and assumes the following folder structure:
-```
-Git/
-├── emsdk/
-├── qt5/
-├── qt5_shadow/
-├── qt5_wasm_binaries/
-├── mne-cpp/
-└── mne-cpp_shadow/
-```
+1. **Emscripten SDK (emsdk)** — Install from [emscripten.org](https://emscripten.org/docs/getting_started/downloads.html). Make sure to activate and source the version required by your Qt Wasm build.
+2. **Qt for WebAssembly** — Install the Wasm target via the Qt Online Installer (e.g., `Qt 6.x → WebAssembly (single-threaded)` or `WebAssembly (multi-threaded)`). Qt ships a pre-configured CMake toolchain file for Emscripten.
+3. **CMake** (3.21 or later) and **Ninja** (recommended generator).
 
-## Basic Information on Qt Wasm with MNE-CPP 
+## Activate the Emscripten Environment
 
-According to the official [Qt Wasm guide](https://wiki.qt.io/Qt_for_WebAssembly), the preferred emscripten versions are:
+Before building, activate the emsdk environment in your terminal:
 
-```
-Qt 5.12: 1.38.16
-Qt 5.13: 1.38.27 (multithreading: 1.38.30)
-Qt 5.14: it's complicated (1.38.27)
-Qt 5.15: 1.39.7
-```
-
- | **Please note:** With the versions above some functions are not able to be linked and produce errors. It is possible that some MNE-CPP functions are not compatible with these emscripten versions. However, emscripten version 1.39.3 and 1.39.7 seem to be working with MNE-CPP code. The following setups should work: **Qt5.13.2 compiled with em++ 1.39.3 with thread support**, **Qt5.14.2 compiled with em++ 1.39.3 with thread support** and  **Qt5.15.0 compiled with em++ 1.39.7 with thread support**. | 
-
-## Setup the Emscripten Compiler
-
-Get the [emscripten](https://emscripten.org/) compiler:
-
-```
-# Get the emsdk repo
-git clone https://github.com/emscripten-core/emsdk.git
-
-# Enter that directory and pull
-cd emsdk
-git pull
-
-# Download and install the latest SDK tools.
-./emsdk install 1.39.3
-
-# Make the "latest" SDK "active" for the current user. (writes ~/.emscripten file)
-./emsdk activate 1.39.3
-
-# Activate PATH and other environment variables in the current terminal
+```bash
+cd /path/to/emsdk
+./emsdk activate <version>    # use the version matching your Qt Wasm build
 source ./emsdk_env.sh
 ```
 
-## Build Qt from Source with Wasm Support
+## Configure and Build
 
-This is needed since we want to have threading support which is deactivated for the pre-built QtWasm build. Also, the pre-built QtWasm binaries are build with emscripten version 1.38.30 which does not work with MNE-CPP code.
+Create a build directory and configure with CMake, pointing to the Qt Wasm toolchain:
 
-Make sure to activate and source the correct emscripten version since the compiler will be used when building qt against wasm. You could also add this to your .basrc file. For example:
+```bash
+mkdir build_wasm && cd build_wasm
 
-```
-./emsdk activate 1.39.3
-source ./emsdk_env.sh
-```
+cmake .. \
+  -G Ninja \
+  -DCMAKE_TOOLCHAIN_FILE=/path/to/Qt/6.x.x/wasm_singlethread/lib/cmake/Qt6/qt.toolchain.cmake \
+  -DCMAKE_BUILD_TYPE=Release
 
-Install some dependencies (just to make sure)
-
-```
-sudo apt-get install build-essential libgl1-mesa-dev python
+ninja
 ```
 
-Clone the current Qt version. For example Qt 5.14.2:
-
-```
-git clone https://code.qt.io/qt/qt5.git -b 5.14.2      
-cd qt5
-./init-repository -f --module-subset=qtbase,qtcharts,qtsvg
-```
-
-Navigate to the parent directory, create a new shadow build folder and cd into it:
-
-```
-cd ..
-mkdir qt5_shadow
-cd qt5_shadow
-```
-
-Call configure from the new working directory in order to setup a shadow build (remove the `-feature-thread` flag if you want to build without multithread support):
-
-```
-../qt5/configure -opensource -confirm-license -xplatform wasm-emscripten -feature-thread -nomake examples -no-dbus -no-ssl -prefix $PWD/../qt5_wasm_binaries
-```
-
-Build Qt and install to target (prefix) location afterwards. For MNE-CPP we only need the qt charts, qtsvg and qtbase module (see [https://wiki.qt.io/Qt_for_WebAssembly](https://wiki.qt.io/Qt_for_WebAssembly) for officially supported modules):
-
-```
-make module-qtbase module-qtsvg module-qtcharts -j8
-make install -j8
-```
-
-A static Qt Wasm version should now be setup in the `qt5_wasm_binaries` folder.
-
-## Building MNE-CPP Against QtWasm
-
-MNE-CPP needs to be build statically. This is automatically done if the `wasm` flag is set. Create a shadow build folder, run `qmake` and build MNE-CPP:
-
-```
-mkdir mne-cpp_shadow
-cd mne-cpp_shadow
-../qt5_wasm_binaries/resources/qmake ../mne-cpp/mne-cpp.pro MNECPP_CONFIG=wasm
-make -j8
-```
-
-This should build all Wasm enabled applications, e.g. MNE Analyze, to `mne-cpp/out/Release`.
+Replace `/path/to/Qt/6.x.x/wasm_singlethread` with the actual path to your Qt Wasm installation. For multi-threaded builds, use the `wasm_multithread` target instead.
 
 ## Run an Application
 
-Navigate to `mne-cpp/out/Release` and start a server:
+Navigate to the build output directory and start a local web server:
 
-```
+```bash
 python3 -m http.server
 ```
 
-Start to a suitable web browser (Chromium based browsers and Mozilla seem to work the best) and type:
+Open a Chromium-based browser or Firefox and visit:
 
 ```
 http://localhost:8000/mne_analyze.html
@@ -134,48 +56,18 @@ http://localhost:8000/mne_analyze.html
 
 ## Example Builds
 
-Example builds can be found here (Chromium based and Mozilla browsers seem to work the best):
+Live example builds can be found at:
 
-  [https://mne-cpp.github.io/wasm/mne_analyze.html](https://mne-cpp.github.io/wasm/mne_analyze.html)
+[https://mne-cpp.github.io/wasm/mne_analyze.html](https://mne-cpp.github.io/wasm/mne_analyze.html)
 
-## General Notes and Helpful Information
+## Notes
 
- * CentOS7 at Martinos does not seem to have a high enough gcc version
-     installed.
+- Chromium-based browsers and Firefox provide the best compatibility.
+- Multi-threaded Wasm builds require the server to send the `Cross-Origin-Opener-Policy` and `Cross-Origin-Embedder-Policy` headers. See the [Qt for WebAssembly documentation](https://doc.qt.io/qt-6/wasm.html) for details.
+- Qt3D is not supported in WebAssembly builds.
 
- * QtWebAssembly does not support concurrent and Qt3D modules.
-     [https://forum.qt.io/topic/109166/wasm-support-for-qt3d/4](https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading)
+## References
 
- * Thread support forQtWasm can be achieved since Qt5.13. Thread support is deactivated in pre-built binaries. The default Qt for WebAssembly build disables threads by default. To enable, build from source and configure with the `-feature-thread` flag. We've found that emscripten 1.38.30 works well for threaded builds. From [https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading](https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading)
-
- * Data access for local files:
-     [https://forum.qt.io/topic/104608/access-local-user-file-on-qt-for-web-assembly](https://forum.qt.io/topic/104608/access-local-user-file-on-qt-for-web-assembly) and
-     [https://stackoverflow.com/questions/56886410/access-local-user-file-on-qt-for-web-assembly](https://stackoverflow.com/questions/56886410/access-local-user-file-on-qt-for-web-assembly)
-
- * Emscripten installer only supports 64 bit versions. 32bit versions need to be build from scratch.
-
- * If you get an idbc error see [https://bugreports.qt.io/browse/QTBUG-79872](https://bugreports.qt.io/browse/QTBUG-79872).
-
- * For browser support information see [https://caniuse.com/#feat=wasm](https://caniuse.com/#feat=wasm).
-
-## Wasm References
-
-[https://www.qt.io/blog/2018/11/19/getting-started-qt-webassembly](https://www.qt.io/blog/2018/11/19/getting-started-qt-webassembly)
-
-[https://doc.qt.io/qt-5/wasm.html](https://doc.qt.io/qt-5/wasm.html)
-
-[https://medium.com/@jimmychen009/qt-quick-on-the-browser-30d5349c11ec](https://medium.com/@jimmychen009/qt-quick-on-the-browser-30d5349c11ec)
-
-[https://dev.to/captainsafia/why-the-heck-is-everyone-talking-about-webassembly-455a](https://dev.to/captainsafia/why-the-heck-is-everyone-talking-about-webassembly-455a)
-
-[https://wiki.qt.io/Qt_for_WebAssembly](https://wiki.qt.io/Qt_for_WebAssembly)
-
-[https://doc.qt.io/qt-5/qtwebassembly-platform-notes.html](https://doc.qt.io/qt-5/qtwebassembly-platform-notes.html)
-
-[https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading](https://www.qt.io/blog/2019/06/26/qt-webassembly-multithreading)
-
-[https://forum.qt.io/topic/107689/building-qt-apps-to-wasm/18](https://forum.qt.io/topic/107689/building-qt-apps-to-wasm/18)
-
-[https://doc-snapshots.qt.io/qtcreator-master/creator-setup-webassembly.html](https://doc-snapshots.qt.io/qtcreator-master/creator-setup-webassembly.html)
-
-[https://github.com/msorvig/qt-webassembly-examples](https://github.com/msorvig/qt-webassembly-examples)
+- [Qt for WebAssembly](https://doc.qt.io/qt-6/wasm.html)
+- [Emscripten documentation](https://emscripten.org/docs/)
+- [Qt for WebAssembly wiki](https://wiki.qt.io/Qt_for_WebAssembly)

@@ -5,40 +5,52 @@ sidebar_label: Contributing to the Website
 
 # Contributing to the Website
 
-This page shows you how to contribute to MNE-CPP's documentation website. As with other code contributions, you will need to fork MNE-CPP's repository in GitHub and then do a pull request.
+This page shows you how to contribute to MNE-CPP's documentation website. As with other code contributions, you will need to fork MNE-CPP's repository on GitHub and then submit a pull request.
 
-The content of this website is actually stored inside the code repository itself. The website is maintained via markdown language in `.md` files, which can be found in `mne-cpp/doc/gh-pages`. The easiest way to make changes to the documentation and check them before you do a pull request is to either use [Visual Studio Code (VS Code)](https://code.visualstudio.com) together with a [Docker](https://www.docker.com) container or to use GitHub Actions instead.
+The documentation website is built with [Docusaurus](https://docusaurus.io/) and lives inside the repository at `doc/website/`. Content pages are written in Markdown (`.md` files) and can be found in `doc/website/docs/`.
 
-## VS Code together with a Docker container (Recommended)
+## Local Development
 
-This solution works with VS Code and Docker installed on your system only. Detailed system requirements can be found [here](https://code.visualstudio.com/docs/remote/containers#_system-requirements).
+### Prerequisites
 
-1. Open VS Code and click on the lower left corner bar with the ```><``` symbol. This is the ```Remote Window Indicator``` which only shows up if you have the ```Remote Development Extensions``` installed. Select `Reopen in Container`. This might take a while since the needed docker images will be downloaded and a new container created. The first build after Docker installation might fail. If that is the case try closing and reopening VS Code and try again.
-2. Go to your web browser and open [http://localhost:4000/doc/gh-pages/](http://localhost:4000/doc/gh-pages/). You should be able to navigate through the documentation website.
-3. Inside VS Code navigate to `doc/gh-pages/pages` and make your changes.
-4. Everytime you save your changes in VS Code the website will automatically recompile. Refresh the website in your web browser to see the results.
+Make sure you have [Node.js](https://nodejs.org/) (v18 or later) installed.
 
-## GitHub Actions
+### Install Dependencies
 
-### Set up gh-pages
-
-If not present already, create a new branch called `gh-pages`. Please note that the `git rm -rf .` command will delete all files in your repository folder, which are not tracked by git:
-
-```
-git checkout --orphan gh-pages
-git rm -rf .
-touch README.md
-git add README.md
-git commit -m 'initial gh-pages commit'
-git push origin gh-pages
+```bash
+cd doc/website
+npm install
 ```
 
-Make sure that `gh-pages` is activated in your forked MNE-CPP repository settings. You can check: mne-cpp > Settings > Options > GitHub Pages > Source: gh-pages branch.
+### Start a Local Development Server
 
-### Make your Changes to the Documentation
+```bash
+npx docusaurus start
+```
 
-Create a new branch named `docu` and do your changes locally in that branch. When ready, commit and push your changes to your remote repository forked from MNE-CPP's.
+This launches a local server (typically at `http://localhost:3000/`) with hot-reload — any changes you save to `.md` or configuration files will be reflected in the browser immediately.
 
-If everything was setup correctly, the push should trigger a GitHub action to build your changes to the `gh-pages` branch (the one you created in the previous step). Once the GitHub action finishes, you will be able to take a look at your changes by visiting `http://$username.github.io/mne-cpp/`. Please note that it can take some time or multiple refreshes for the changes to show.
+### Build for Production
 
-If you decide to use a different branch name, instead of `docu`, to make changes to this website,  make sure to change the branch parameter in the `docutest.yml` file accordingly (this file is stored in `.github/workflows/docutest.yml`).
+To verify your changes produce a clean production build:
+
+```bash
+npx docusaurus build
+```
+
+The build will catch broken links and other issues. Fix any errors before submitting your pull request.
+
+### Serve the Production Build
+
+```bash
+npx docusaurus serve
+```
+
+## Making Changes
+
+1. Create a feature branch from `main`.
+2. Navigate to `doc/website/docs/` and edit or add Markdown files.
+3. If you add a new page, register it in `doc/website/sidebars.ts`.
+4. Preview your changes locally with `npx docusaurus start`.
+5. Run `npx docusaurus build` to verify there are no broken links.
+6. Commit, push, and open a pull request.

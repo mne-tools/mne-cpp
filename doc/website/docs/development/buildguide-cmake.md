@@ -1,9 +1,11 @@
 ---
-title: Building with CMake
-sidebar_label: Building with CMake
+title: Build from Source
+sidebar_label: Build from Source
 ---
 
-# Building with CMake
+# Build from Source
+
+MNE-CPP uses CMake as its build system. This guide walks through the full process of compiling MNE-CPP from source.
 
 ## Get a compiler
 
@@ -95,3 +97,12 @@ Once built, applications can be run from within QtCreator using the run button o
 ## Test the Build
 
 You might have to add the folders including the Qt libraries to your OS's corresponding environment variables. In order to run the examples you must download the MNE-Sample-Data-Set from [here](https://osf.io/86qa2/download) and extract the files to `mne-cpp/out/Release/resources/MNE-sample-data`. Once finished you can try to run one of the examples, e.g., ex_disp_3D. If the build was successful the example should start and display a window including a 3D brain as well as a source localization result.
+
+## Deploying Qt Dependencies
+
+To run compiled applications outside of QtCreator (e.g., from the terminal or OS file manager), you need to resolve Qt-related dependencies. MNE-CPP provides deployment scripts in `tools/deployment`:
+
+- **Windows:** `deploy.bat dynamic` (or `static`)
+- **Linux/macOS:** `deploy.sh dynamic` (or `static`)
+
+We recommend the dynamically linked version for development. For more details see the [Deployment](ci-deployment.md) page.
