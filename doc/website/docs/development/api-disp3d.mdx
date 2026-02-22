@@ -22,89 +22,60 @@ The library follows a clean separation of concerns inspired by several well-know
 - **Composition over inheritance** — Rather than deep inheritance hierarchies (as in the old Qt3D design where every renderable was a `QEntity` subclass), the RHI design composes independent objects: a `BrainSurface` is *not* a widget or an entity — it is a plain C++ object that knows how to upload geometry and draw itself when asked.
 
 ```mermaid
-%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '14px'}}}%%
-graph LR
-    classDef view fill:#4A90D9,stroke:#2E6BA6,color:#fff,rx:8,ry:8
-    classDef engine fill:#E8833A,stroke:#C06A2E,color:#fff,rx:8,ry:8
-    classDef renderable fill:#7B68EE,stroke:#5B48CE,color:#fff,rx:8,ry:8
-    classDef model fill:#50B86C,stroke:#3A9252,color:#fff,rx:8,ry:8
-    classDef core fill:#9E9E9E,stroke:#757575,color:#fff,rx:8,ry:8
-    classDef input fill:#F5A623,stroke:#D4891A,color:#fff,rx:8,ry:8
-    classDef scene fill:#E05D6F,stroke:#B8404F,color:#fff,rx:8,ry:8
-    classDef worker fill:#8D6E96,stroke:#6E4F77,color:#fff,rx:8,ry:8
+classDiagram
+    class ViewLayer {
+        BrainView
+        MultiViewLayout
+    }
 
-    subgraph VIEW [" View Layer "]
-        direction TB
-        BV["🖥️ BrainView<br/><i>QRhiWidget</i>"]:::view
-        MVL["◫ MultiViewLayout<br/><i>1–4 viewports</i>"]:::view
-    end
+    class RenderEngine {
+        BrainRenderer
+        GLSL Shaders
+    }
 
-    subgraph ENGINE [" Render Engine "]
-        direction TB
-        BR["⚙️ BrainRenderer<br/><i>pipelines · draw calls</i>"]:::engine
-        SH["🎨 GLSL Shaders<br/><i>6 visual modes</i>"]:::engine
-    end
+    class RenderableObjects {
+        BrainSurface
+        DipoleObject
+        NetworkObject
+        SourceEstimateOverlay
+    }
 
-    subgraph REND [" Renderable Objects "]
-        direction TB
-        BS["🧠 BrainSurface<br/><i>cortical · BEM mesh</i>"]:::renderable
-        DO["📍 DipoleObject<br/><i>instanced cones</i>"]:::renderable
-        NO["🔗 NetworkObject<br/><i>nodes · edges</i>"]:::renderable
-        SEO["📊 SourceEstimateOverlay<br/><i>STC amplitude</i>"]:::renderable
-    end
+    class DataModel {
+        BrainTreeModel
+        Surface / BEM / Digitizer
+        Dipole / Network / SourceSpace
+    }
 
-    subgraph MDL [" Data Model "]
-        direction TB
-        BTM["🌳 BrainTreeModel<br/><i>QStandardItemModel</i>"]:::model
-        ITEMS["SurfaceTreeItem · BemTreeItem<br/>DigitizerTreeItem · DipoleTreeItem<br/>NetworkTreeItem · SourceSpaceTreeItem"]:::model
-    end
+    class Input {
+        CameraController
+        RayPicker
+    }
 
-    subgraph CORE [" Core "]
-        direction TB
-        RT["RenderTypes<br/><i>ShaderMode · VisualizationMode</i>"]:::core
-        VS["ViewState<br/><i>per-pane visibility</i>"]:::core
-        DL["DataLoader"]:::core
-    end
+    class Core {
+        RenderTypes
+        ViewState
+        DataLoader
+    }
 
-    subgraph INP [" Input "]
-        direction TB
-        CC["🎥 CameraController<br/><i>orbit · zoom · pan</i>"]:::input
-        RP["🎯 RayPicker<br/><i>ray–triangle intersection</i>"]:::input
-    end
+    class SceneManagers {
+        SensorFieldMapper
+        SourceEstimateManager
+        RtSensorStreamManager
+    }
 
-    subgraph SCENE [" Scene Managers "]
-        direction TB
-        SFM["SensorFieldMapper"]:::scene
-        SEM["SourceEstimateManager"]:::scene
-        RSSM["RtSensorStreamManager"]:::scene
-    end
+    class BackgroundWorkers {
+        RtSensorDataWorker
+        RtSensorInterpolationMatWorker
+        RtSourceDataWorker
+        StcLoadingWorker
+    }
 
-    subgraph WORK [" Background Workers "]
-        direction TB
-        W1["RtSensorDataWorker"]:::worker
-        W2["RtSensorInterpolationMatWorker"]:::worker
-        W3["RtSourceDataWorker"]:::worker
-        W4["StcLoadingWorker"]:::worker
-    end
-
-    BV --> MVL
-    BV --> BR
-    BV --> CC
-    BV --> RP
-    BR --> SH
-    BR --> BS
-    BR --> DO
-    BR --> NO
-    BR --> SEO
-    BV --> BTM
-    BTM --> ITEMS
-    BV --> SFM
-    BV --> SEM
-    BV --> RSSM
-    RSSM --> W1
-    RSSM --> W2
-    SEM --> W3
-    SEM --> W4
+    ViewLayer --> RenderEngine : drives
+    RenderEngine --> RenderableObjects : draws
+    ViewLayer --> DataModel : reads
+    ViewLayer --> Input : delegates
+    ViewLayer --> SceneManagers : coordinates
+    SceneManagers --> BackgroundWorkers : dispatches
 ```
 
 ### Key Differences from the Qt3D Implementation
