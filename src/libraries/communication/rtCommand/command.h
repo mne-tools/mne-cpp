@@ -72,7 +72,7 @@ static QVariant defaultVariant;
 /**
  * Command, which includes beside command name also command parameters
  *
- * @brief Command
+ * @brief Named command with typed parameters for real-time server control
  */
 class COMMUNICATIONSHARED_EXPORT Command: public QObject, public UTILSLIB::ICommand
 {

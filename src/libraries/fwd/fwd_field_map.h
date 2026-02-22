@@ -58,6 +58,8 @@ namespace FWDLIB
 
 //=============================================================================================================
 /**
+ * @brief Computes and stores sensor-to-surface field mapping matrices for MEG/EEG forward solutions.
+ *
  * Sphere-model based sensor-to-surface field mapping.
  *
  * Uses Legendre polynomial series for lead-field dot products and SVD-based

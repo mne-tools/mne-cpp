@@ -59,6 +59,9 @@ namespace LSLLIB {
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+/**
+ * @brief Private PIMPL implementation class for stream_outlet, managing the TCP server, UDP discovery broadcasts, and sample queue.
+ */
 class StreamOutletPrivate;
 
 //=============================================================================================================

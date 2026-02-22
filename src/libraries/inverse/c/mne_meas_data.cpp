@@ -152,12 +152,18 @@ float **mne_cmatrix_9(int nr,int nc)
 namespace INVERSELIB
 {
 
+/**
+ * @brief Single ring buffer entry holding a float array and a pointer to its matrix view.
+ */
 typedef struct {
     int   size;		        /* Size of this buffer in floats */
     float *data;			/* The allocated buffer */
     float ***datap;		/* The matrix which uses this */
 } *ringBufBuf_9,ringBufBufRec_9;
 
+/**
+ * @brief Circular buffer managing a fixed-size pool of ringBufBuf_9 entries for streaming data reuse.
+ */
 typedef struct {
     ringBufBuf_9 *bufs;
     int        nbuf;

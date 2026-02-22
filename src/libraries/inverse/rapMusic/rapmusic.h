@@ -76,6 +76,8 @@ namespace INVERSELIB
 //=============================================================================================================
 /**
  * Declares a pair structure for index combinations used in RAP MUSIC algorithm.
+ *
+ * @brief Index pair representing two grid points evaluated together in the RAP MUSIC subspace scan
  */
 typedef struct Pair
 {
@@ -85,7 +87,7 @@ typedef struct Pair
 
 //=============================================================================================================
 /**
- * @brief    The RapMusic class provides the RAP MUSIC Algorithm CPU implementation. ToDo: Paper references.
+ * @brief RAP MUSIC (Recursively Applied and Projected Multiple Signal Classification) source localization algorithm
  *
  * ToDo Detailed description
  */

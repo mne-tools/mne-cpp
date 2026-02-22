@@ -67,7 +67,7 @@ namespace INVERSELIB
 /**
  * Implements DipoleForward (Replaces *dipoleForward,dipoleForwardRec struct of MNE-C fit_types.h).
  *
- * @brief DipoleForward description
+ * @brief Stores forward field matrices and source space data for magnetic dipole fitting.
  */
 class INVERSESHARED_EXPORT DipoleForward
 {

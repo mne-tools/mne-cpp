@@ -78,7 +78,7 @@ namespace RTPROCESSINGLIB
 
 //=============================================================================================================
 /**
- * @brief The FilterParameter class
+ * @brief Named filter-design parameter descriptor holding a human-readable name and description (e.g. design method or filter type).
  */
 class RTPROCESINGSHARED_EXPORT FilterParameter{
 

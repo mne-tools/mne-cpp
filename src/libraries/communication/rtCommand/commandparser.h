@@ -62,6 +62,9 @@
 namespace COMMUNICATIONLIB
 {
 
+/**
+ * @brief Tokenizes and parses JSON or CLI command strings into RawCommand objects
+ */
 class COMMUNICATIONSHARED_EXPORT CommandParser : public QObject, public UTILSLIB::Subject
 {
     Q_OBJECT

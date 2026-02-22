@@ -45,8 +45,11 @@ const config: Config = {
         ],
     ],
 
+    themes: ['@docusaurus/theme-mermaid'],
+
     markdown: {
         format: 'mdx',
+        mermaid: true,
     },
 
     stylesheets: [

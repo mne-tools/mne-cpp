@@ -83,7 +83,7 @@ namespace INVERSELIB
 /**
  * This class brings all the data and objects used for HPI fitting into the right format.
  *
- * @brief Brief description of this class.
+ * @brief Preprocesses raw HPI coil data (SSP projection, compensation, sinusoidal model fitting) before dipole localization
  */
 class INVERSESHARED_EXPORT HpiDataUpdater
 {

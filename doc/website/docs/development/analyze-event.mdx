@@ -5,23 +5,23 @@ sidebar_label: Event System
 
 # Event System
 
-This guide covers the event system used in MNE Analyze, not to be confused with the Event Manager plugin.
+This guide covers the event system used in MNE Analyze for inter-plugin communication, not to be confused with the Event Manager plugin.
 
 ## Overview
 
-In addition to the Qt Framerork's signal/slot system, MNE Analyze uses an event system for all communication between plugins. This event system is integrated in all plugins through the interface IPlugin, allowing all plugins to send and receive events. The event manager itself runs on a separate thread and runs on a cycle will check for buffered events and deliver them if available.
+In addition to the Qt Framework's signal/slot system, MNE Analyze uses a dedicated event system for all communication between plugins. This event system is integrated into all plugins through the `AbstractPlugin` interface, allowing every plugin to send and receive events. The event manager runs on a separate thread, cycling through a buffer and delivering queued events to subscribed plugins.
 
 ## Events
 
 Events can be used to send data, trigger things, or both. As an example: `SELECTED_MODEL_CHANGED`, one of the most widely used event types, which is triggered by the selection of a new item in the Data Manager, contains a `QSharedPointer<ANSHAREDLIB::AbstractModel>>`, a pointer to the selected data item; while `TRIGGER_REDRAW`, used for making the Signal Viewer update, contains no data.
 
-All event types are declared in `applications/mne_analyze/libs/anShared/Utils/types.h` in the enum `EVENT_TYPE`. Add a new event type by adding an entry to the list. Events ideally should only be used for a single purpose, and should always send and expect the same type of data, if any.
+All event types are declared in `applications/mne_analyze/libs/anShared/Utils/types.h` in the `EVENT_TYPE` enum. To add a new event type, simply add an entry to this enum. Events should ideally serve a single purpose and always send and expect the same type of data, if any.
 
 ## Sending Events
 
-Events are sent using the Communicator class (applications/mne_analyze/libs/anShared/Management/communicator.h), using `publishEvent()`. When sending an event we pass an event type, and can also pass data though a [QVariant](https://doc.qt.io/qt-5/qvariant.html). Below is a code snippet of the Filtering plugin broadcasting an event with data.
+Events are sent using the `Communicator` class (`applications/mne_analyze/libs/anShared/Management/communicator.h`) via its `publishEvent()` method. When sending an event you pass an event type and, optionally, data wrapped in a [QVariant](https://doc.qt.io/qt-6/qvariant.html). Below is a code snippet of the Filtering plugin broadcasting an event with data:
 
-```
+```cpp
 void Filtering::setFilterChannelType(const QString& sType)
 {
     QVariant data;
@@ -29,13 +29,14 @@ void Filtering::setFilterChannelType(const QString& sType)
     m_pCommu->publishEvent(EVENT_TYPE::FILTER_CHANNEL_TYPE_CHANGED, data);
 }
 ```
-The string `sType` is added to QVariant `data` with `setValue()`
+
+The string `sType` is stored in the `QVariant` via `setValue()` before being passed along with the event.
 
 ## Receiving Events
 
-To receive an event or a certain type, a plugin has to subscribe to that event type. This can be done in a plugin's implementation of IPlugin's `getEventSubscriptions()` by returning a vector of all the vent types the plugin is subscribing to. Below is a code snippet of the Averaging plugin subscribing to events.
+To receive events of a certain type, a plugin must subscribe to that type. This is done in the plugin's implementation of `getEventSubscriptions()` by returning a vector of all the event types the plugin is interested in. Below is a code snippet of the Averaging plugin subscribing to events:
 
-```
+```cpp
 QVector<EVENT_TYPE> Averaging::getEventSubscriptions(void) const
 {
     QVector<EVENT_TYPE> temp;
@@ -51,9 +52,9 @@ QVector<EVENT_TYPE> Averaging::getEventSubscriptions(void) const
 }
 ```
 
-Once subscribed, plugins can handle incoming events with `handleEvent()`. Below is how the AnnotationManager (Events) plugin handles its events.
+Once subscribed, plugins handle incoming events via `handleEvent()`. Below is how the AnnotationManager plugin handles its events:
 
-```
+```cpp
 void AnnotationManager::handleEvent(QSharedPointer<Event> e)
 {
     switch (e->getType()) {
@@ -70,6 +71,19 @@ void AnnotationManager::handleEvent(QSharedPointer<Event> e)
 }
 ```
 
-## Common Practice
+## Best Practices
 
-When receiving events, unless any conditional code is very short, we recommend outsourcing any functions or calculations to a separate function for the sake of neatness and code readability. See the function `onModelChanged` used in plugins that receive the `SELECTED_MODEL_CHANGED` event.
+- **Delegate to helper functions.** Unless the handling code is very short, move the logic into a dedicated method for readability. See the `onModelChanged()` pattern used in plugins that receive `SELECTED_MODEL_CHANGED`.
+- **One purpose per event.** Each event type should carry a consistent data payload and serve a single, well-defined purpose.
+- **Document your events.** When introducing a new `EVENT_TYPE`, add a brief comment in `types.h` describing what data it carries and which plugins produce/consume it.
+
+## Common Event Types
+
+| Event | Data Payload | Typical Use |
+|-------|-------------|-------------|
+| `SELECTED_MODEL_CHANGED` | `QSharedPointer<AbstractModel>` | A new item was selected in the Data Manager |
+| `FILTER_ACTIVE_CHANGED` | `bool` | Filter was toggled on/off |
+| `FILTER_DESIGN_CHANGED` | Filter parameters | Filter settings were modified |
+| `TRIGGER_REDRAW` | *(none)* | Request views to repaint |
+| `SCALING_MAP_CHANGED` | Scaling map | Channel scaling was updated |
+| `NEW_ANNOTATION_ADDED` | `int` (annotation index) | A new annotation was created |

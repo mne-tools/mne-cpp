@@ -27,7 +27,7 @@ QString sChName = "MEG0000";
 void loadTxtFile(const QString& sPath);
 ```
 
-In general, try to make your code match the one around it, e.g., indentations, use of linebreaks, etc. Please use the DoxyGen style to document your code, as seen [here](https://github.com/mne-tools/mne-cpp/blob/main/libraries/connectivity/network/network.h). If you introduce a new function, please make sure to use the `@since` tag to specify the current version you are developing for. Always align your function parameters in .h and .cpp files, for example:
+In general, try to make your code match the surrounding style — indentation, line breaks, etc. Use Doxygen-style comments to document your code (see [example](https://github.com/mne-tools/mne-cpp/blob/main/libraries/connectivity/network/network.h)). When introducing new functions, include the `@since` tag with the current version. Always align function parameters in `.h` and `.cpp` files:
 
 ```cpp
 //=========================================================================================================
@@ -59,7 +59,7 @@ If you use QtCreator as your IDE, you can install these templates as wizards:
 
 ## Command Line Outputs
 
-Every output should start with `[<ClassName::FunctionName>]`. Please make use of `qDebug()` during development and `qInfo()` for general user information. `qWarning()` should be used to alert about unusual situations which do not lead to a termination of the application. `qCritical()` should only be used if an error was catched which will lead to the application being terminated. For example:
+Every output should start with `[<ClassName::FunctionName>]`. Please make use of `qDebug()` during development and `qInfo()` for general user information. `qWarning()` should be used to alert about unusual situations that do not lead to a termination of the application. `qCritical()` should only be used if an error was caught that will lead to the application being terminated. For example:
 
 ```cpp
 void FileLoader::loadTxtFile(const QString& sPath)
@@ -75,7 +75,7 @@ void FileLoader::loadTxtFile(const QString& sPath)
         qCritical() << "[FileLoader::loadTxtFile] Unable to open file."
         return;
     }
-    ...
+    // ...
 }
 ```
 

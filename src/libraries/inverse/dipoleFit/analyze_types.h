@@ -74,6 +74,9 @@
 namespace INVERSELIB
 {
 
+/**
+ * @brief Display scale settings for MEG/EEG amplitude, time range, and baseline parameters.
+ */
 typedef struct {
   float  megmin,megmax;             /* MEG gradiometer vertical scale [T/m] */
   float  megaxmult;                 /* Multiplier for the magnetometer scaling [m] */
@@ -96,6 +99,9 @@ typedef struct {
 //  int   relative;		                     /* Are fthresh and fmid relative to the maximum value over the surface? */
 //} *mshColorScaleDef,mshColorScaleDefRec;
 
+/**
+ * @brief Preferences for MEG/EEG field mapping including interpolation grades, smoothing, and sphere model origins.
+ */
 typedef struct {
   int                  meg_mapping_grade;            /* Icosahedron downsampling grade for the scalp MEG map (only applies to the head surface map) */
   int                  eeg_mapping_grade;            /* Icosahedron downsampling grade for the scalp EEG map*/
@@ -115,6 +121,9 @@ typedef struct {
   float                eeg_maxval;		     /* Maximum absolute value at the time the EEG contour step was recalculated */
 } *fieldMappingPref,fieldMappingPrefRec;
 
+/**
+ * @brief MNE computation preferences including regularization, estimate type, color scales, and display options.
+ */
 typedef struct {
   int                  reg_method;                   /* The method used to compute regularization estimates */
   float                reg_SNR;	                     /* The virtual (power) SNR employed in regularization */
@@ -140,6 +149,9 @@ typedef struct {
    */
 } *mnePref,mnePrefRec;
 
+/**
+ * @brief Cortical label storing vertex indices, hemisphere assignment, and display color.
+ */
 typedef struct {		                     /* Stores label information */
   char  *file_name;		                     /* True file name */
   char  *short_name;		                     /* Nickname */
@@ -150,11 +162,17 @@ typedef struct {		                     /* Stores label information */
   float color[4];				     /* Color for this label */
 } *mshLabel,mshLabelRec;
 
+/**
+ * @brief Collection of cortical labels for region-of-interest analysis.
+ */
 typedef struct {
   mshLabel *labels;
   int      nlabel;
 } *mshLabelSet,mshLabelSetRec;
 
+/**
+ * @brief Overlay data for cortical or scalp surface display, including color scale, contour, and opacity settings.
+ */
 typedef struct {
   char                *short_name;		     /* Short name for this overlay */
   int                 surf_type;		     /* OVERLAY_CORTEX or OVERLAY_SCALP */
@@ -181,6 +199,9 @@ typedef struct {
   int                 nbin;			     /* How many bins */
 } *mneOverlay,mneOverlayRec;
 
+/**
+ * @brief Overlay display preferences storing color scale definitions, smoothing, opacity, and contour settings per overlay type.
+ */
 typedef struct {		                     /* Overlay preferences. This structure can be kept private */
   int                  type;                         /* What kind of overlay? (fMRI, other) */
   int                  do_signed;                    /* Preserve sign (current orientation)
@@ -199,6 +220,9 @@ typedef struct {		                     /* Overlay preferences. This structure ca
   int                  surf_type;                    /* OVERLAY_SCALP or OVERLAY_CORTEX */
 } *overlayPref,overlayPrefRec;
 
+/**
+ * @brief Sphere-model field mapping data holding coils, dot products, and the interpolation matrix for MEG or EEG.
+ */
 typedef struct {		                     /* This is used for field mapping with help of the sphere-model MNE */
   int          kind;				     /* Either FIELD_MAP_MEG or FIELD_MAP_EEG */
   MNELIB::MneSurfaceOld*   surf;		                     /* The surface on which we are mapping */
@@ -220,6 +244,9 @@ typedef struct {		                     /* This is used for field mapping with he
   float        **mapping_mat;		             /* The mapping matrix */
 } *fieldMappingData, fieldMappingDataRec;
 
+/**
+ * @brief Contour map values computed on a surface for MEG or EEG field visualization.
+ */
 typedef struct {		                     /* This is used for the calculated contours */
   int        kind;				     /* Either FIELD_MAP_MEG or FIELD_MAP_EEG */
   float      *map;				     /* The contour map values at the vertices of the surface (could go to the overlay data as well) */
@@ -247,6 +274,9 @@ typedef struct {		                     /* This is used for the calculated contou
 //  int            dist_valid;                /* Are the above data valid at this point? */
 //} *digitizerData,digitizerDataRec;
 
+/**
+ * @brief HPI measurement result storing coil positions, goodness-of-fit values, and head-to-device transformation.
+ */
 typedef struct {                                     /* These are the data from the HPI result block */
   char           *filename;			     /* Where did these come from */
   FIFFLIB::FiffCoordTransSet* meg_head_t;			     /* The MEG device <-> head coordinate system transformation */
@@ -261,6 +291,9 @@ typedef struct {                                     /* These are the data from 
   int            fit_accept;			     /* Was the fit accepted */
 } *hpiResultData,hpiResultDataRec;
 
+/**
+ * @brief Single saved timecourse extracted from source data or overlay, with label, vertex selection, and waveform.
+ */
 typedef struct {				     /* One saved timecourse */
   char          *file_name;			     /* The associated file name */
   char          *comment;	                     /* Descriptive comment */
@@ -283,11 +316,17 @@ typedef struct {				     /* One saved timecourse */
   float         color[3];	                     /* Color for drawing */
 } *timecourseData,timecourseDataRec;
 
+/**
+ * @brief Collection of saved timecourses for batch display and analysis.
+ */
 typedef struct {				     /* A collection of the above */
   timecourseData *timecourses;			     /* Pointers to the above structures */
   int            ncourse;			     /* How many */
 } *timecourseDataSet,timecourseDataSetRec;
 
+/**
+ * @brief Persistent state across data set changes, holding sample index, picked time, scale settings, and MNE preferences.
+ */
 typedef struct {
   int           sample;				     /* Which channel is the sample */
   float         picked_time;	                     /* Current time point */
@@ -296,6 +335,9 @@ typedef struct {
   mnePref       mne_prefs;
 } *dataSetData,dataSetDataRec;			     /* These have to be kept between data set changes */
 
+/**
+ * @brief Combined MEG/EEG measurement data with inverse operator, field mapping, dipole fitting, and display state.
+ */
 typedef struct {
   char          *meas_file;                     /* The measurement file */
   char          *inv_file;                      /* Inverse operator file */
@@ -459,6 +501,9 @@ typedef struct {
 
 typedef void (*colorEditorDoneFunc)(float *color, void *user);
 
+/**
+ * @brief Single continuous HPI data point with quaternion orientation, translation, and goodness-of-fit.
+ */
 typedef struct {
   float time;			/* Time point */
   int   samp;			/* Corresponding sample number */
@@ -468,6 +513,9 @@ typedef struct {
   FIFFLIB::FiffCoordTransOld *t;		/* The corresponding fiff coordinate transformation */
 } *contHpiData,contHpiDataRec;
 
+/**
+ * @brief Time series of continuous HPI measurements with coil movement and angular velocity tracking.
+ */
 typedef struct {
   contHpiData *hpi;		/* The data records */
   int         nhpi;		/* How many of them */

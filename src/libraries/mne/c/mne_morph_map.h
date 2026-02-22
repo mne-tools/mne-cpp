@@ -72,7 +72,7 @@ namespace MNELIB
 /**
  * Replaces *morphMap,morphMapRec struct (analyze_types.c).
  *
- * @brief The MneMorphMap class.
+ * @brief Vertex-to-vertex mapping between two FreeSurfer surface meshes for morphing source estimates.
  */
 class MNESHARED_EXPORT MneMorphMap
 {

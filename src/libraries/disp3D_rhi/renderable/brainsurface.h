@@ -62,6 +62,9 @@ class QRhiResourceUpdateBatch;
 // STRUCTS
 //=============================================================================================================
 
+/**
+ * @brief Interleaved vertex attributes (position, normal, color, curvature) for brain surface GPU upload.
+ */
 struct VertexData {
     QVector3D pos;
     QVector3D norm;
@@ -73,7 +76,7 @@ struct VertexData {
 /**
  * BrainSurface manages the geometry and visual properties of a single brain mesh.
  *
- * @brief    BrainSurface class.
+ * @brief Renderable cortical surface mesh with per-vertex color, curvature data, and GPU buffer management.
  */
 class DISP3DRHISHARED_EXPORT BrainSurface
 {
@@ -397,6 +400,7 @@ private:
     int m_hemi = -1; // 0=lh, 1=rh
     TissueType m_tissueType = TissueUnknown;
 
+    /** @brief QRhi vertex, index, and uniform buffers for brain surface GPU rendering. */
     struct GpuBuffers;
     std::unique_ptr<GpuBuffers> m_gpu;
 

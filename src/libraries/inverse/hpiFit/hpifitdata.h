@@ -79,6 +79,8 @@ namespace INVERSELIB
 //=============================================================================================================
 /**
  * The strucut specifing the dipole error.
+ *
+ * @brief Residual error and moment vector from a single magnetic dipole fit iteration
  */
 struct DipFitError {
     double error;
@@ -89,6 +91,8 @@ struct DipFitError {
 //=========================================================================================================
 /**
  * The strucut specifing the sorting parameters.
+ *
+ * @brief Helper for sorting HPI coil dipole fits by matching each fit to the nearest expected coil position
  */
 struct HPISortStruct {
     double base_arr;

@@ -56,6 +56,8 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
+ * @brief Utility for sharing FIFF file data between processes or threads via memory-mapped I/O.
+ *
  * FiffFileSharer provides a way to share fiff files while they are being saved in real time
  */
 class FIFFSHARED_EXPORT FiffFileSharer : public QObject

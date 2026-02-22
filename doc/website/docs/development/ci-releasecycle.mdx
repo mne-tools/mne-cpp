@@ -5,13 +5,98 @@ sidebar_label: Release Guide
 
 # Release Guide
 
-New development takes place on the `main` branch. Once the developers have rough consensus we create a new stable release on GitHub, following the `v0.x.y` tag syntax. The MNE-CPP stable release steps are:
+This page describes the complete process for creating a new MNE-CPP release, from preparation through publication.
 
-1. (Manually) Increment version number in [CMakeLists.txt](https://github.com/mne-tools/mne-cpp/blob/main/CMakeLists.txt) and [mne-cpp_doxyfile](https://github.com/mne-tools/mne-cpp/blob/main/doc/doxygen/mne-cpp_doxyfile) by `0.x.y`.
-2. (Manually) Change version numbers of applications, e.g., [MNE Scan](https://github.com/mne-tools/mne-cpp/blob/main/applications/mne_scan/mne_scan/info.h) and [MNE Analyze](https://github.com/mne-tools/mne-cpp/blob/main/applications/mne_analyze/mne_analyze/info.h).
-3. (Manually) Prepare and update the release table on the documentation website.
-4. (Manually) Prepare and update the changelog. The changelog of the to-be-released version can be found on the [GitHub Wiki](https://github.com/mne-tools/mne-cpp/wiki/Changelog-WIP). Note: The number of commits per contributor can be listed via: `git shortlog -s -n <branchName> --no-merges --since="<dateOfLastRelease"`.
-5. (Manually) Create release with tag `v0.x.y` via Github. 
-6. (Automated by [release.yml](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/release.yml)) Create a new branch named `v0.x.y` based on current `main` branch. A new branch is only created for minor version releases, e.g., going from `v0.1.0` to `v0.2.0`.
-7. (Automated by [release.yml](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/release.yml)) Build dynamically as well as statically linked binaries and upload them to the `v0.x.y` release on Github.
-8. (Manually) In case of a minor or major version bump, create branch protection rules for the newly created branch via the Github web interface.
+## Versioning Scheme
+
+MNE-CPP follows [Semantic Versioning](https://semver.org/) with the tag syntax `v<major>.<minor>.<patch>`:
+
+| Component | When to increment | Example |
+|-----------|-------------------|---------|
+| **Major** | Breaking API changes or major architectural redesign | `v1.0.0` → `v2.0.0` |
+| **Minor** | New features, new plugins, significant enhancements | `v0.1.0` → `v0.2.0` |
+| **Patch** | Bug fixes, documentation corrections, small improvements | `v0.1.0` → `v0.1.1` |
+
+## Branch Strategy
+
+New development takes place on the `main` branch. When a new **minor** release is created (e.g., going from `v0.1.x` to `v0.2.0`), a release branch named `v0.x.y` is automatically created from `main`. This branch receives only critical bug-fix back-ports and serves as the stable base for patch releases.
+
+```
+main ──────●──────●──────●──────●──────●───►  (ongoing development)
+            \                    \
+             v0.1.0               v0.2.0      (release branches)
+              \                    \
+               v0.1.1               ···       (patch releases)
+```
+
+## Release Steps
+
+Once the developers have rough consensus that `main` is ready for a new release, the following steps are performed:
+
+### 1. Increment Version Numbers (Manual)
+
+Update the version string in these files:
+
+- **[CMakeLists.txt](https://github.com/mne-tools/mne-cpp/blob/main/CMakeLists.txt)** — the top-level project version (`project(mne_cpp VERSION 0.x.y)`)
+- **[mne-cpp_doxyfile](https://github.com/mne-tools/mne-cpp/blob/main/doc/doxygen/mne-cpp_doxyfile)** — the Doxygen `PROJECT_NUMBER` field
+
+### 2. Update Application Version Info (Manual)
+
+Bump the version constants in each application's `info.h`:
+
+- [MNE Scan info.h](https://github.com/mne-tools/mne-cpp/blob/main/applications/mne_scan/mne_scan/info.h)
+- [MNE Analyze info.h](https://github.com/mne-tools/mne-cpp/blob/main/applications/mne_analyze/mne_analyze/info.h)
+
+### 3. Update the Release Table on the Website (Manual)
+
+Add the new version to the documentation website's download / release page so users can find it.
+
+### 4. Prepare the Changelog (Manual)
+
+The changelog for the release being prepared is maintained on the [GitHub Wiki (Changelog-WIP)](https://github.com/mne-tools/mne-cpp/wiki/Changelog-WIP). To generate contributor statistics since the last release:
+
+```bash
+git shortlog -s -n main --no-merges --since="<dateOfLastRelease>"
+```
+
+Move the work-in-progress changelog entries into the release notes.
+
+### 5. Create the GitHub Release (Manual)
+
+Go to the [GitHub Releases page](https://github.com/mne-tools/mne-cpp/releases) and create a new release:
+
+- **Tag**: `v0.x.y` (create the tag on `main`)
+- **Title**: `v0.x.y`
+- **Description**: Paste the changelog prepared in step 4
+
+### 6. CI Creates a Release Branch (Automated)
+
+The [release.yml](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/release.yml) workflow detects the new tag and:
+
+- Creates a branch named `v0.x.y` from `main` (only for **minor** or **major** version bumps, e.g., `v0.1.0` → `v0.2.0`)
+- Skips branch creation for patch releases, since the branch already exists
+
+### 7. CI Builds and Uploads Binaries (Automated)
+
+The same `release.yml` workflow:
+
+- Builds **dynamically linked** binaries for Windows, Linux, and macOS
+- Builds **statically linked** binaries for all platforms
+- Runs the deployment scripts (`tools/deploy.bat` / `tools/deploy.sh`) to bundle Qt dependencies
+- Packages the output into `.zip` (Windows) or `.tar.gz` (Linux/macOS) archives
+- Uploads the archives as release assets to the GitHub release created in step 5
+
+### 8. Protect the New Branch (Manual)
+
+For minor or major version bumps, add branch protection rules for the newly created `v0.x.y` branch via the GitHub web interface (**Settings → Branches → Add rule**):
+
+- Require pull request reviews before merging
+- Require status checks to pass
+
+## Post-Release
+
+After the release is published:
+
+- Verify that the release assets (binaries) are downloadable and functional
+- Announce the release on relevant channels (mailing lists, website news, etc.)
+- Clear the work-in-progress changelog on the [GitHub Wiki](https://github.com/mne-tools/mne-cpp/wiki/Changelog-WIP) for the next development cycle

@@ -67,7 +67,7 @@ namespace MNELIB
 /**
  * Replaces *mshPicked, mshPickedRec struct (analyze_types.c).
  *
- * @brief The MneMshPicked class.
+ * @brief Picked point on a displayed surface storing vertex index, coordinates, and source value.
  */
 class MNESHARED_EXPORT MneMshPicked
 {

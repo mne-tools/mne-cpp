@@ -70,7 +70,7 @@ namespace FWDLIB
 /**
  * Implements FwdCoilSet (Replaces *fwdCoilSet,fwdCoilSetRec; struct of MNE-C fwd_types.h).
  *
- * @brief FwdCoilSet description
+ * @brief Collection of FwdCoil objects representing a full MEG or EEG sensor array.
  */
 class FWDSHARED_EXPORT FwdCoilSet
 {

@@ -113,6 +113,9 @@ static float swap_float (float source)
 
 namespace INVERSELIB {
 
+/**
+ * @brief Binary-format dipole record for file I/O, storing fitted dipole parameters and error estimates.
+ */
 typedef struct {
     int   dipole;               /* Which dipole in a multi-dipole set */
     float begin,end;            /* Fitting time range */

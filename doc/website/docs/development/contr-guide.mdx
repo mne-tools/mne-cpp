@@ -5,22 +5,127 @@ sidebar_label: Contribution Guide
 
 # Contribution Guide
 
-MNE-CPP is an open-source project and is made better by contributions from our users. This guide should help you through the process of contributing to the project:
+MNE-CPP is an open-source project and is made better by contributions from our users. Whether you are fixing a bug, adding a new feature, or improving documentation, this guide walks you through the entire contribution workflow — from setting up your development environment to getting your code merged.
 
-1. Setup MNE-CPP to [build from source](buildguide-cmake.mdx).
-2. Familiarize yourself with our [coding conventions](contr-style.mdx).
-3. Create a new feature-related branch. Do not issue a Pull Request from your fork's main branch. Make your changes to that feature-branch commit.
-4. Run tests locally via calling the testing scripts in `tools/testing`. Make sure you have the `resources/data/mne-cpp-test-data` submodule enabled. 
-5. Check if your changes pass the cross-platform CI tests by running `git push origin <yourBranchName>:testci -f`. Check the Actions tab on your forked MNE-CPP repository's Github page and fix possible problems.
-6. Push your changes to your remote (forked GitHub) repository.
-7. Once all CI tests pass, go to your remote (forked GitHub) repository via the GitHub website and create a pull request:
-   * Right next to the branch selection tool, look for the New pull request button and click it.
-   * The Compare Changes page will appear.
-   * Select the appropriate base and compare branch . The base branch is the branch of the repository you want to merge your changes to (by default the base branch is a branch of the repository you forked from). The compare branch is the branch where you implemented the new feature(s), bugfix(es), etc.
-   * Name the pull request, describe your changes and hit Create pull request button.
-   * For a more detailed overview of how to make a pull request, we recommend checking out the [guide on the official GitHub website](https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project).
-8. After you created the pull request, wait for the [Continuous Integration](ci.mdx) checks and subsequent review process to finish:
-   * MNE-CPP developers will review your code.
-   * Please change your code on your local machine based on the comments made by the reviewers. Note: There is no need to create a new pull request for every new change you make to your code. Just commit the changes and push your code to your remote (forked GitHub) repository. The changes will automatically be added to your already created pull request.
-   * As soon as your code suits all of the MNE-CPP coding conventions and possible inconsistencies were dealt with, your code will be merged into the main MNE-CPP repository.
-9. Congratulations! You are now an official contributor to the MNE-CPP project.
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- A [GitHub account](https://github.com/join)
+- [Git](https://git-scm.com/) installed on your machine
+- A working MNE-CPP [build from source](buildguide-cmake.mdx) setup (CMake, C++20 compiler, Qt 6)
+- Familiarity with our [coding conventions](contr-style.mdx)
+
+## Step-by-Step Workflow
+
+### 1. Fork and Clone
+
+Fork [MNE-CPP's main repository](https://github.com/mne-tools/mne-cpp) to your own GitHub account, then clone it locally:
+
+```bash
+git clone https://github.com/<YourGitUserName>/mne-cpp.git
+cd mne-cpp
+git remote add upstream https://github.com/mne-tools/mne-cpp.git
+```
+
+### 2. Create a Feature Branch
+
+Always work on a dedicated branch — never commit directly to `main`:
+
+```bash
+git fetch upstream
+git checkout -b my-feature upstream/main
+```
+
+Choose a descriptive branch name, e.g., `fix-fiff-reader-crash` or `add-lsl-plugin`.
+
+### 3. Make Your Changes
+
+Implement your feature, bug fix, or documentation update. Follow the [coding conventions](contr-style.mdx) and make sure to:
+
+- Use meaningful commit messages with the appropriate prefix (`FIX:`, `ENH:`, `MAINT:`, `DOC:`)
+- Document new functions with Doxygen-style comments and the `@since` tag
+- Make atomic commits — each commit should be a single self-contained change
+
+### 4. Run Tests Locally
+
+Make sure your changes do not break existing functionality:
+
+```bash
+# Ensure the test data submodule is available
+git submodule update --init resources/data/mne-cpp-test-data
+
+# Build with tests enabled
+cmake -B build -S . -DBUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
+cmake --build build --parallel
+
+# Run all tests
+cd build
+ctest --output-on-failure
+```
+
+If you added new functionality, write unit tests for it. See [Writing Tests](writingtest.mdx) for guidance.
+
+### 5. Test on CI Without a Pull Request
+
+Before opening a formal PR, you can validate your changes across all platforms by pushing to the `testci` branch on your fork:
+
+```bash
+git push origin my-feature:testci -f
+```
+
+Check the **Actions** tab on your forked repository's GitHub page. Fix any platform-specific failures before proceeding.
+
+### 6. Push to Your Fork
+
+Once local tests pass, push your feature branch:
+
+```bash
+git push origin my-feature
+```
+
+### 7. Open a Pull Request
+
+Go to your fork on GitHub and create a pull request:
+
+1. Click **New pull request** next to the branch selector.
+2. Set the **base repository** to `mne-tools/mne-cpp` and the **base branch** to `main`.
+3. Set the **compare branch** to your feature branch.
+4. Give the PR a descriptive title using the commit prefix convention (e.g., `ENH: Add LSL acquisition plugin`).
+5. In the description, explain what your changes do, why they are needed, and how to test them.
+
+For a detailed overview of how to make a pull request, see the [guide on the official GitHub website](https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project).
+
+### 8. Code Review and Iteration
+
+After you create the pull request:
+
+- The [CI pipeline](ci.mdx) will automatically run builds and tests on all platforms.
+- MNE-CPP maintainers will review your code and may request changes.
+- Address review comments by making additional commits on your feature branch and pushing them — they are automatically added to the existing PR. There is no need to create a new pull request.
+- Once all CI checks pass and the reviewers approve, your code will be merged.
+
+### 9. Clean Up
+
+After your PR is merged, you can delete the feature branch:
+
+```bash
+git checkout main
+git branch -d my-feature
+git push origin --delete my-feature
+```
+
+Keep your fork's `main` branch up to date:
+
+```bash
+git fetch upstream
+git rebase upstream/main
+git push origin main
+```
+
+## Tips for a Smooth Review
+
+- **Keep PRs focused.** A PR that does one thing well is easier to review than one that mixes features, refactoring, and bug fixes.
+- **Write tests.** PRs with tests are reviewed faster and merged with more confidence.
+- **Respond promptly.** Address reviewer feedback within a few days to keep momentum.
+- **Ask questions.** If you are unsure about an approach, open a draft PR or start a discussion — maintainers are happy to help.

@@ -77,6 +77,9 @@ namespace INVERSELIB
 {
 enum class Accuracy : int{high = 2, medium = 1, low = 0};
 
+/**
+ * @brief Stores MEG sensor geometry (positions, orientations, weights, coil count) for a single sensor type
+ */
 class INVERSESHARED_EXPORT SensorSet {
 
 public:
@@ -242,7 +245,7 @@ inline bool SensorSet::operator!= (const SensorSet &b) const
 /**
  * Create a SensorSet struct from a channel list with specified accuracy.
  *
- * @brief Brief description of this class.
+ * @brief Builds SensorSet objects from FiffInfo channel definitions, applying SSP projections and compensation
  */
 class INVERSESHARED_EXPORT SensorSetCreator
 {

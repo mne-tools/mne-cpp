@@ -1129,6 +1129,9 @@ static int c_dsvd(double **mat,		/* The matrix */
 namespace FWDLIB
 {
 
+/**
+ * @brief Berg-Scherg parameter pair (magnitude and distance multiplier) for an equivalent dipole in the EEG sphere model approximation.
+ */
 typedef struct {
     double lambda;		/* Magnitude for the apparent dipole */
     double mu;			/* Distance multiplier for the apparent dipole */

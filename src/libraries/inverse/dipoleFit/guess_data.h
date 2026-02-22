@@ -73,7 +73,7 @@ class DipoleFitData;
 /**
  * Implements GuessData (Replaces *guessData,guessDataRec struct of MNE-C fit_types.h).
  *
- * @brief GuessData description
+ * @brief Precomputed guess point grid with forward fields for initial dipole position candidates.
  */
 class INVERSESHARED_EXPORT GuessData
 {

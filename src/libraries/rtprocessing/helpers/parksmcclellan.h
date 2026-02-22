@@ -90,7 +90,7 @@ namespace RTPROCESSINGLIB
 /**
  * DECLARE CLASS ParksMcClellan
  *
- * @brief The ParksMcClellan class provides the ParksMcClellan filter desing algorithm.
+ * @brief Parks-McClellan equiripple FIR filter design algorithm (Remez exchange).
  */
 class RTPROCESINGSHARED_EXPORT ParksMcClellan : public QObject
 {

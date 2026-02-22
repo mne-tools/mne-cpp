@@ -60,6 +60,9 @@ namespace LSLLIB {
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+/**
+ * @brief Private PIMPL implementation class for stream_inlet, managing the TCP connection and data reception.
+ */
 class StreamInletPrivate;
 
 //=============================================================================================================

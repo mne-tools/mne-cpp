@@ -5,88 +5,50 @@ sidebar_label: Library API
 
 # MNE-CPP Library API
 
-MNE-CPP provides a modular set of cross-platform C++ libraries built on [Qt](https://www.qt.io/) and [Eigen](http://eigen.tuxfamily.org/). All MNE-CPP applications (MNE Scan, MNE Analyze, MNE Anonymize, and the command-line tools) are built solely on these libraries.
+MNE-CPP provides a modular set of cross-platform C++ libraries built on [Qt](https://www.qt.io/) and [Eigen](http://eigen.tuxfamily.org/). All MNE-CPP applications — MNE Scan, MNE Analyze, MNE Anonymize, and the command-line tools — are built solely on these libraries, so any functionality available in an application can also be used programmatically.
 
-Below you will find an overview of each library and its capabilities, followed by guides for using the APIs in your own applications.
+The libraries are organized in layers: low-level I/O and math utilities at the bottom, domain-specific processing in the middle, and visualization at the top.
 
 ## Library Overview
 
-### Utils
+### Core Libraries
 
-- Basic mathematical routines (`MNEMath`)
-- Tapered spectral representations: FFT, CSD, PSD (`Spectral`)
-- Spectrogram computation (`Spectrogram`)
-- Thin Plate Spline warping of 3D surfaces (`Warp`) — e.g., warping template BEM models to digitizer points
-- Sphere fitting (`Sphere`)
-- Simplex solver (`SimplexAlgorithm`)
-- MNE `.sel` selection group file I/O (`SelectionIO`)
-- 2D layout generation from 3D layouts (`LayoutMaker`)
-- 2D layout loading from ANT `.elc` and MNE `.lout` files (`LayoutLoader`)
-- K-Means clustering (`KMeans`)
-- Binary data stream I/O and Eigen matrix `.txt` file I/O (`IOUtils`)
-- Circular buffer for arbitrary data types (`CircularBuffer`)
-- Design patterns: command pattern, observer pattern
-- Application logger based on `QDebug` (`ApplicationLogger`)
+| Library | Namespace | Purpose |
+|---------|-----------|---------|
+| **Utils** | `UTILSLIB` | Math routines (`MNEMath`), spectral analysis (FFT, CSD, PSD), spectrogram, TPS surface warping, sphere fitting, simplex solver, K-Means clustering, I/O helpers, `CircularBuffer`, application logger |
+| **Fs** | `FSLIB` | Load and save FreeSurfer surfaces and annotations |
+| **Fiff** | `FIFFLIB` | Read and write FIFF (Functional Imaging File Format) files |
+| **Mne** | `MNELIB` | Core data structures matching MNE-C: `ForwardSolution`, `InverseOperator`, `SourceEstimate`, `SourceSpace`, `BemSurface`, `EpochData`, and more |
 
-### Fs
+### Processing Libraries
 
-- Load and save FreeSurfer-generated surfaces and annotations
+| Library | Namespace | Purpose |
+|---------|-----------|---------|
+| **Fwd** | `FWDLIB` | Forward solution computation from FreeSurfer reconstructions for MEG/EEG source localization |
+| **Inverse** | `INVERSELIB` | Source localization: MNE estimation, single dipole fitting, HPI coil fitting, RAP-MUSIC (with optional GPU/CUDA) |
+| **RtProcessing** | `RTPROCESSINGLIB` | Real-time processing: averaging, filtering, ICP, trigger detection, SPHARA; asynchronous workers for connectivity, HPI fitting, inverse computation, and noise estimation |
+| **Connectivity** | `CONNECTIVITYLIB` | Functional connectivity metrics (Correlation, Cross-Correlation, Coherence, Imaginary Coherence, PLV, PLI, WPLI, and variants) with network storage, graph measures, and thresholding |
+| **Communication** | `COMMUNICATIONLIB` | Client/command interface for communicating with `mne_rt_server` |
 
-### Fiff
+### Visualization Libraries
 
-- Load and save FIFF (Functional Imaging File Format) files
+| Library | Namespace | Purpose |
+|---------|-----------|---------|
+| **Disp** | `DISPLIB` | 2D plot types (bar, graph, imagesc, lineplot, spline, tfplot) and ready-to-use `QWidget`-based viewers with GUI controls |
+| **Disp3D (RHI)** | `DISP3DRHILIB` | RHI-based 3D visualization: cortical surfaces, connectivity networks, digitizers, BEM models, source estimates, dipoles — supports Metal, Vulkan, D3D, and OpenGL backends |
 
-### Mne
-
-- Data structures matching MNE-C: `BemSurface`, `Bem`, `EpochData`, `EpochDataList`, `ForwardSolution`, `Hemisphere`, `InverseOperator`, `ProjectToSurface`, `SourceEstimate`, `SourceSpace`, `Surface`
-
-### Fwd
-
-- Forward solution computation based on FreeSurfer reconstructions for MEG/EEG source localization
-
-### Inverse
-
-- Single dipole fitting
-- HPI coil fitting
-- MNE source localization
-- RAP-MUSIC source localization (GPU/CUDA implementation available)
-
-### Communication
-
-- Client and command specifications for communicating with a running `mne_rt_server`
-
-### RtProcessing
-
-- General electrophysiological data processing: averaging, filtering, ICP, trigger detection, SPHARA
-- Asynchronous processing classes for: averaging, functional connectivity, HPI fitting, inverse operator creation, noise estimation — these outsource computation to separate threads via Qt's signal/slot system
-
-### Connectivity
-
-- Network data storage (nodes, edges) with basic graph measures: in-degree, clustering, thresholding, connectivity matrix generation
-- Functional connectivity methods: Correlation, Cross-Correlation, Coherence, Imaginary Coherence, PLV, PLI, WPLI, Unbiased Squared PLI, Debiased Squared WPLI
-
-### Disp
-
-- Plot types: bar, graph, imagesc, lineplot, spline, tfplot
-- Ready-to-use viewers with GUI for `QWidget`-based applications
-
-### Disp3D
-
-- Model/delegate/view architecture for 3D visualization
-- Supported data: source estimates, functional connectivity networks, digitizers, BEM models, FreeSurfer surfaces, 3D topoplots (MEG/EEG), sensor information, source space information
+For in-depth guides on specific libraries, see the [Connectivity](api-connectivity.mdx) and [Disp3D (RHI)](api-disp3d.mdx) pages.
 
 ## API Reference (Doxygen)
 
-The full auto-generated API documentation is available at the [API Reference](https://mne-cpp.github.io/doxygen-api/). Use these entry points to navigate the reference:
+The full auto-generated API documentation is available at the [API Reference](https://mne-cpp.github.io/doxygen-api/). Use these entry points to navigate:
 
 | Section | Description |
 |---|---|
-| [Namespace List](https://mne-cpp.github.io/doxygen-api/namespaces.html) | All namespaces with brief descriptions — one per library (e.g. `UTILSLIB`, `FIFFLIB`, `MNELIB`, `INVERSELIB`) |
-| [Class List](https://mne-cpp.github.io/doxygen-api/annotated.html) | Alphabetical list of all classes, structs, and unions with brief descriptions |
+| [Namespace List](https://mne-cpp.github.io/doxygen-api/namespaces.html) | All namespaces with brief descriptions — one per library |
+| [Class List](https://mne-cpp.github.io/doxygen-api/annotated.html) | Alphabetical list of all classes, structs, and unions |
 | [Class Index](https://mne-cpp.github.io/doxygen-api/classes.html) | Compact alphabetical class index for quick lookup |
-| [Class Hierarchy](https://mne-cpp.github.io/doxygen-api/hierarchy.html) | Inheritance tree showing parent-child relationships between classes |
-| [Class Members](https://mne-cpp.github.io/doxygen-api/functions.html) | Index of all documented class members (functions, variables, enums, typedefs) |
-| [Namespace Members](https://mne-cpp.github.io/doxygen-api/namespacemembers.html) | Index of all symbols declared at namespace scope |
-| [File List](https://mne-cpp.github.io/doxygen-api/files.html) | All source and header files with directory structure |
-
-## Development Guides
+| [Class Hierarchy](https://mne-cpp.github.io/doxygen-api/hierarchy.html) | Inheritance tree showing parent-child relationships |
+| [Class Members](https://mne-cpp.github.io/doxygen-api/functions.html) | Index of all documented class members |
+| [Namespace Members](https://mne-cpp.github.io/doxygen-api/namespacemembers.html) | All symbols declared at namespace scope |
+| [File List](https://mne-cpp.github.io/doxygen-api/files.html) | Source and header files with directory structure |

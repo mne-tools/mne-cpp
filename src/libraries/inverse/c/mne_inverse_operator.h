@@ -88,7 +88,7 @@ namespace INVERSELIB
 /**
  * Implements an MNE Inverse Operator (Replaces *mneInverseOperator,mneInverseOperatorRec; struct of MNE-C mne_types.h).
  *
- * @brief An inverse operator
+ * @brief MNE inverse operator combining noise covariance, forward solution, and source covariance for source estimation.
  */
 class INVERSESHARED_EXPORT MneInverseOperator
 {

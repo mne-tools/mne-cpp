@@ -5,9 +5,21 @@ sidebar_label: WebAssembly
 
 # WebAssembly
 
-MNE-CPP can be compiled to [WebAssembly (Wasm)](https://webassembly.org/), enabling MNE Analyze and other applications to run directly in a web browser without installation.
+MNE-CPP can be compiled to [WebAssembly (Wasm)](https://webassembly.org/), enabling MNE Analyze and other applications to run directly in a web browser — no installation, no platform-specific binaries. Users simply open a URL to start working with their data.
 
-The Wasm build uses the [Emscripten](https://emscripten.org/) toolchain together with Qt's WebAssembly target, configured through CMake.
+The Wasm build uses the [Emscripten](https://emscripten.org/) toolchain together with Qt's WebAssembly target, configured through CMake. MNE-CPP targets **multi-threaded** Wasm by default, which requires Chromium-based browsers or Firefox and specific HTTP headers (`Cross-Origin-Opener-Policy`, `Cross-Origin-Embedder-Policy`).
 
-- **[Build Guide](wasm-buildguide.mdx)** — How to set up Emscripten and build MNE-CPP for WebAssembly.
+:::tip Live Demo
+Try MNE Analyze in your browser right now: [mne-cpp.github.io/wasm/mne_analyze.html](https://mne-cpp.github.io/wasm/mne_analyze.html)
+:::
+
+## Guides
+
+- **[Build Guide](wasm-buildguide.mdx)** — How to set up Emscripten and build MNE-CPP for WebAssembly, including both scripted and manual build workflows.
 - **[Testing via CI](wasm-testing.mdx)** — How to deploy and test Wasm builds using GitHub Actions and GitHub Pages.
+
+## Limitations
+
+- Qt3D / `QOpenGLWidget` is not supported in WebAssembly builds — 3D visualization is excluded.
+- The Wasm build always uses **static linking** (`BUILD_SHARED_LIBS=OFF`).
+- File I/O operates through the browser's virtual file system rather than native disk access.

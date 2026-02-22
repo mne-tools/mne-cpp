@@ -80,7 +80,7 @@ namespace RTPROCESSINGLIB
 /**
  * Real-time connectivity worker.
  *
- * @brief Real-time connectivity worker.
+ * @brief Background worker thread that computes functional connectivity metrics in real time.
  */
 class RTPROCESINGSHARED_EXPORT RtConnectivityWorker : public QObject
 {
@@ -103,7 +103,7 @@ signals:
 /**
  * Real-time connectivity estimation.
  *
- * @brief Real-time connectivity estimation.
+ * @brief Controller that manages RtConnectivityWorker for online connectivity computation.
  */
 class RTPROCESINGSHARED_EXPORT RtConnectivity : public QObject
 {

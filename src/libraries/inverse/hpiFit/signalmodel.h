@@ -68,7 +68,7 @@ namespace INVERSELIB
 /**
  * Description of what this class is intended to do (in detail).
  *
- * @brief Brief description of this class.
+ * @brief Generates the forward sinusoidal model matrix for HPI coil signals at known drive frequencies
  */
 class INVERSESHARED_EXPORT SignalModel
 {

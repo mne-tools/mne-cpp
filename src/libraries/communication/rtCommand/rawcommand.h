@@ -64,7 +64,7 @@ namespace COMMUNICATIONLIB
 /**
  * RawCommand, which includes beside command name also command parameters. The parameter type is not jet specified.
  *
- * @brief RawCommand
+ * @brief Parsed but untyped command holding raw string parameters before type resolution
  */
 class COMMUNICATIONSHARED_EXPORT RawCommand : public QObject, public UTILSLIB::ICommand
 {

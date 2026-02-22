@@ -53,6 +53,9 @@
 namespace UTILSLIB
 {
 
+/**
+ * @brief Input parameters for short-time Fourier transform spectrogram computation.
+ */
 struct SpectogramInputData {
     Eigen::VectorXd vecInputData;
     quint32 iRangeLow;
@@ -60,6 +63,9 @@ struct SpectogramInputData {
     qint32 window_size;
 };
 
+/**
+ * @brief Computes time-frequency spectrograms via short-time Fourier transform with configurable window and overlap.
+ */
 class UTILSSHARED_EXPORT Spectrogram
 {
 

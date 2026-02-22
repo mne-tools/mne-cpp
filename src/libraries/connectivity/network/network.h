@@ -71,6 +71,9 @@ namespace CONNECTIVITYLIB {
 class NetworkEdge;
 class NetworkNode;
 
+/**
+ * @brief Holds threshold and color settings for network edge visualization
+ */
 struct VisualizationInfo {
     QString sMethod = "Map";                                    /**< The color method: Map (uses sColormap parameter) or Color (uses colNodes and colEdges).*/
     QString sColormap = "Viridis";                                 /**< The colormap.*/

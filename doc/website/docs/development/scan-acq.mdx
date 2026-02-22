@@ -5,20 +5,98 @@ sidebar_label: Acquisition Plugins
 
 # Acquisition Plugins in MNE Scan
 
-The acquisition plugins of MNE Scan have similiar structure and therefore can be explained on the basis of the gUSBamp EEG driver example. The following flow sheet describes the structure of this acquisition plugin.
+Acquisition plugins (also called sensor plugins) are the entry point for all data in MNE Scan. They interface with hardware devices or data sources — EEG amplifiers, MEG systems, file readers, or simulated signals — and stream data into the real-time processing pipeline.
+
+## Three-Tier Architecture
+
+All acquisition plugins follow a consistent three-tier architecture that separates concerns between the MNE Scan framework, the data acquisition logic, and the hardware driver:
+
+| Tier | Class Role | Responsibilities |
+|------|-----------|------------------|
+| **Plugin** (top) | Main plugin class, inherits from `AbstractSensor` | Communicates with MNE Scan; manages the GUI (setup widget, toolbar buttons); creates and owns the Producer |
+| **Producer** (middle) | Data acquisition controller | Manages the acquisition thread; pulls data from the Driver and pushes it into ring buffers; bridges Plugin ↔ Driver |
+| **Driver** (bottom) | Hardware/device interface | Directly communicates with the device SDK or API; handles device initialization, parameter configuration, and raw sample retrieval |
+
+This separation means that the Plugin and Producer classes are structurally similar across all acquisition plugins — only the Driver class changes significantly depending on the hardware.
+
+```
+┌─────────────────────────────────┐
+│         MNE Scan                │
+│  (plugin pipeline framework)   │
+└──────────┬──────────────────────┘
+           │  ← AbstractSensor interface
+┌──────────▼──────────────────────┐
+│       Plugin Class              │
+│  (e.g. GUSBamp, BabyMEG,       │
+│   FiffSimulator, LSLAdapter)    │
+│  • GUI setup widget             │
+│  • Start/stop acquisition       │
+│  • Output connectors            │
+└──────────┬──────────────────────┘
+           │
+┌──────────▼──────────────────────┐
+│      Producer Class             │
+│  (e.g. GUSBampProducer)         │
+│  • Runs acquisition thread      │
+│  • Ring buffer management       │
+│  • Calls driver for samples     │
+└──────────┬──────────────────────┘
+           │
+┌──────────▼──────────────────────┐
+│       Driver Class              │
+│  (e.g. GUSBampDriver)           │
+│  • Device SDK calls             │
+│  • Parameter configuration      │
+│  • Raw sample retrieval         │
+└──────────┬──────────────────────┘
+           │
+     ┌─────▼─────┐
+     │  Hardware  │
+     │  Device    │
+     └───────────┘
+```
+
+## Example: gUSBamp EEG Driver
+
+The gUSBamp plugin illustrates this pattern:
 
 ![](/img/eeg_amp_scan4.png "Flow sheet of the gUSBamp acquisition plugin")
 
-On the left side the border of MNE Scan can be seen, whereas on the right side the border to the actual device, in this case the gUSBamp amplifier, is depicted. In between, according to their hierarchical order, the three classes are shown as the interface between program and device:
+The left side shows the MNE Scan boundary; the right side shows the hardware device. The three classes mediate between them:
 
-* **gUSBamp**: regulates the communication between MNE Scan and the driver and acts as the main plugin class.
-* **gUSBampproducer**: controls the data acquisition and manages the interface between driver and gUSBamp
-* **gUSBampdriver**: actual driver which provides data acquisition and controls the communication between the project and the device
+* **gUSBamp** — main plugin class; communicates with MNE Scan and manages the GUI.
+* **gUSBampproducer** — controls the acquisition thread and bridges the plugin with the driver.
+* **gUSBampdriver** — communicates directly with the gUSBamp amplifier hardware.
 
-However, `gUSBampdriver` is the actual class used to communicate and exchange data with the device. The `gUSBamp` and `gUSBampproducer` classes can be seen as a way, how to integrate the gUSBampdriver class properly into the project.
+## Data Flow
 
-When establishing a new plugin to the plugin-box like shown in the gUSBAmp example, all three classes are initialized one after another by calling the constructors. During this process, all default parameter are generated. After that, the main thread returns to the program and the driver plugin is waiting for the start command or further changing instructions of the parameter by the GUI.
+All three classes are constructed sequentially during plugin initialization, setting up default parameters. Once initialized, the plugin waits for a start command or parameter changes from the GUI.
 
-By starting the acquisition, one class invokes the next. At the end, the `gUSBampdriver` class initializes the device with the new parameters and sets the device status to "run". After that, `gUSBamp` and `gUSBampproducer` class are each starting an internal thread which call repetitively for new data packages from the subordinate class and returning them to the overlying class until the data packages reach the MNE Scan environment. This is achieved with so called ring buffers and leads to a continuous data stream.
+### Starting Acquisition
 
-When stopping the acquisition, both threads are interrupted by putting the `is_running` parameter to false and the `gUSBampdriver` class puts the device into standby mode.
+Starting acquisition triggers a chain: the Plugin starts the Producer, and the Producer starts the Driver. The Driver initializes the hardware and begins sampling. Both the Plugin and Producer run internal threads that pull data from the class below and push it upward via **ring buffers** (`CircularBuffer`), creating a continuous data stream into MNE Scan.
+
+### Stopping Acquisition
+
+When stopping the acquisition, both threads are interrupted by setting the `m_bIsRunning` flag to `false`, and the Driver class puts the device into standby mode. The ring buffers are flushed and reset.
+
+## Key Base Classes
+
+| Class | Location | Purpose |
+|-------|----------|---------|
+| `AbstractSensor` | `src/applications/mne_scan/libs/scShared/` | Base class for all acquisition plugins |
+| `CircularBuffer` | `src/libraries/utils/` | Lock-free ring buffer for inter-thread data transfer |
+| `PluginOutputData` | `src/applications/mne_scan/libs/scShared/` | Typed output connector that passes data to downstream plugins |
+
+## Implementing a New Acquisition Plugin
+
+To create a new acquisition plugin:
+
+1. **Copy** an existing plugin folder (e.g., `dummytoolbox` or `fiffsimulator`) as a template.
+2. **Create three classes**: `MyPlugin` (inherits `AbstractSensor`), `MyPluginProducer`, and `MyPluginDriver`.
+3. **Implement the Driver** to interface with your device's SDK — initialize the device, configure parameters, and read raw samples.
+4. **Implement the Producer** to run the acquisition loop in a separate thread, pulling samples from the Driver and pushing them into a `CircularBuffer`.
+5. **Implement the Plugin** to set up the GUI, create output connectors, and manage the start/stop lifecycle.
+6. **Register** the plugin in the parent `CMakeLists.txt` and, for static builds, in `main.cpp` via `Q_IMPORT_PLUGIN`.
+
+See [Creating a Plugin](scan-plugin.mdx) for the general plugin scaffolding guide.

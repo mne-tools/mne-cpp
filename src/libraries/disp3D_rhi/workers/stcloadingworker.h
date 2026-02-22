@@ -58,7 +58,7 @@ class BrainSurface;
  * StcLoadingWorker performs source estimate loading and interpolation matrix computation
  * in a background thread to avoid blocking the UI.
  *
- * @brief    StcLoadingWorker class.
+ * @brief Background worker that loads source estimate (STC) files and emits loaded data for visualization.
  */
 class DISP3DRHISHARED_EXPORT StcLoadingWorker : public QObject
 {

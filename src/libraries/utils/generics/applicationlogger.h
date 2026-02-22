@@ -61,7 +61,7 @@ namespace UTILSLIB
 /**
  * The Apllicationlogger provides colorized keywords in terminal outputs for better overview
  *
- * @brief ApplicationLogger
+ * @brief Custom Qt message handler that formats and routes qDebug/qWarning/qCritical output to file or console.
  */
 class UTILSSHARED_EXPORT ApplicationLogger
 {

@@ -5,9 +5,20 @@ sidebar_label: MNE Scan
 
 # MNE Scan Development
 
-MNE Scan is the real-time data acquisition and processing application in MNE-CPP. Its functionality is organized as a plugin pipeline, where data flows from acquisition plugins through processing plugins to output plugins.
+MNE Scan is MNE-CPP's real-time data acquisition and processing application. It is built around a **plugin pipeline** — data flows from acquisition plugins (hardware drivers, file readers, simulators) through processing plugins (filtering, averaging, source localization) to output plugins (file writers, network senders).
 
-The guides in this section cover how to extend MNE Scan with your own plugins:
+Plugins are loaded as shared libraries at runtime. Each plugin inherits from one of three abstract base classes (`AbstractSensor`, `AbstractAlgorithm`, or `AbstractIOPlugin`) and communicates through typed input/output connectors that the user wires together in the GUI.
 
-- **[Acquisition Plugins](scan-acq.mdx)** — Architecture of sensor/driver plugins that interface with hardware devices.
-- **[Creating a Plugin](scan-plugin.mdx)** — Step-by-step guide to building a new MNE Scan plugin using the DummyToolbox template.
+## Guides
+
+- **[Acquisition Plugins](scan-acq.mdx)** — The three-tier architecture (Plugin → Producer → Driver) used by all sensor plugins, with the gUSBamp EEG driver as a worked example.
+- **[Creating a Plugin](scan-plugin.mdx)** — Step-by-step guide to building a new MNE Scan plugin using the DummyToolbox template, including CMake setup, virtual functions, connectors, and static build integration.
+
+## Key Concepts
+
+| Concept | Description |
+|---------|-------------|
+| **Connectors** | Typed input/output channels that link plugins in the pipeline |
+| **Ring buffers** | Lock-free `CircularBuffer` instances used for inter-thread data transfer |
+| **Plugin categories** | Sensor (acquisition), Algorithm (processing), IO (output) |
+| **Static builds** | Plugins registered via `Q_IMPORT_PLUGIN` for single-binary deployment |

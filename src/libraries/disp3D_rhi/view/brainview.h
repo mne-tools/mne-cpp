@@ -80,7 +80,7 @@ namespace CONNECTIVITYLIB { class Network; }
  * BrainView is the main widget for the 3D brain visualization. It handles user interaction,
  * surface loading, and coordinates with the BrainRenderer.
  *
- * @brief    BrainView class.
+ * @brief Top-level QWidget hosting the QRhi-based 3-D brain visualization with mouse interaction and multi-view support.
  */
 class DISP3DRHISHARED_EXPORT BrainView : public QRhiWidget
 {

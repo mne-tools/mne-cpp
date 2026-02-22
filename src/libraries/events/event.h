@@ -65,6 +65,8 @@ namespace EVENTSINTERNAL {
 
 //=============================================================================================================
 /**
+ * @brief Public event descriptor holding sample index, group membership, and unique identifier
+ *
  * This is a public Class to organize events and make it easy to manipulate
  * for the end-user of the library.
  */
@@ -108,6 +110,8 @@ namespace EVENTSINTERNAL {
 // at some point we can substitute int and idNum with std::int64_t. That will take that limitation away.
 // I don't see how I should ever think of this again.
 /**
+ * @brief Internal event representation with sample position, group link, and unique ID used by EventManager
+ *
  * The EventINT class
  *
  * The events are objects of this class internally in the library.

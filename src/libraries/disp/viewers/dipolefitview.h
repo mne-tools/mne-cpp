@@ -69,6 +69,9 @@ namespace DISPLIB
 {
 
 //=============================================================================================================
+/**
+ * @brief Settings panel for configuring and launching equivalent current dipole (ECD) fitting.
+ */
 class DISPSHARED_EXPORT DipoleFitView : public AbstractView
 {
     Q_OBJECT

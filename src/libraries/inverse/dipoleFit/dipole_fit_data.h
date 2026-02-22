@@ -81,6 +81,9 @@ typedef void (*fitUserFreeFunc)(void *);
 
 // (Replaces *dipoleFitFuncs,dipoleFitFuncsRec struct of MNE-C fit_types.h).
 
+/**
+ * @brief Forward field computation function pointers and client data for MEG and EEG dipole fitting.
+ */
 typedef struct {
   fwdFieldFunc    meg_field;	    /* MEG forward calculation functions */
   fwdVecFieldFunc meg_vec_field;

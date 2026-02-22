@@ -71,7 +71,7 @@ namespace MNELIB
 /**
  * Replaces *mshEyes,mshEyesRec struct (analyze_types.c).
  *
- * @brief The MneMshEyes class.
+ * @brief Eye/camera position and gaze direction for 3-D surface rendering.
  */
 class MNESHARED_EXPORT MneMshEyes
 {

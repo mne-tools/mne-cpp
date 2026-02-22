@@ -66,7 +66,7 @@ class NetworkObject;
 /**
  * BrainRenderer handles the low-level RHI rendering logic, managing pipelines, shaders, and draw calls for brain surfaces.
  *
- * @brief    BrainRenderer class.
+ * @brief Qt RHI-based 3-D renderer managing scene objects, lighting, camera, and render pipeline for brain visualization.
  */
 class DISP3DRHISHARED_EXPORT BrainRenderer
 {
@@ -94,6 +94,8 @@ public:
     static constexpr ShaderMode ShowNormals  = ::ShowNormals;
 
     /**
+     * @brief Aggregated GPU resources and render state for the 3-D brain visualization scene.
+     *
      * Lightweight scene uniform block passed to every draw call.
      *
      * Viewport and scissor are stored as plain numbers so that this struct
@@ -184,6 +186,7 @@ public:
     void endFrame(QRhiCommandBuffer *cb);
     
 private:
+    /** @brief Private implementation holding QRhi pipelines, shader resources, and uniform buffers (PIMPL). */
     struct Impl;
     std::unique_ptr<Impl> d;
 };

@@ -67,7 +67,7 @@ namespace INVERSELIB
 /**
  * Implements one Electric Current Dipole (Replaces *ecd,ecdRec struct of MNE-C fit_types.h).
  *
- * @brief Electric Current Dipole description
+ * @brief Single equivalent current dipole with position, orientation, amplitude, and goodness-of-fit.
  */
 class INVERSESHARED_EXPORT ECD
 {

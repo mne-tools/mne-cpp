@@ -8,17 +8,96 @@ sidebar_position: 2
 
 ## Overview
 
-This section describes a typical MEG/EEG workflow, from raw data preprocessing through to source reconstruction. The workflow applies to both MNE-CPP command-line tools and the GUI applications.
+This section describes the typical MEG/EEG workflow — from raw data preprocessing through to source reconstruction — as originally outlined in the MNE-C manual cookbook (Hämäläinen, 2009). The workflow applies to both MNE-CPP command-line tools and the GUI applications.
 
+The following diagram shows the complete workflow of the MNE software. The MRI processing path (left) and the MEG/EEG data path (right) converge at the forward solution computation.
+
+```mermaid
+flowchart TD
+    MRI_RAW["<b>🧠 MRI Data</b><br/><i style='font-weight:300'>Raw anatomical</i>"]
+    FS["<b>Reconstructed MRI</b><br/><i style='font-weight:300'>FreeSurfer</i>"]
+    COR_T1["<b>COR.fif</b> (T1)<br/><i style='font-weight:300'>mne_setup_mri</i>"]
+    COR_BRAIN["<b>COR.fif</b> (brain)<br/><i style='font-weight:300'>mne_setup_mri</i>"]
+    SRC["<b>Source Space</b><br/><i style='font-weight:300'>mne_setup_source_space</i>"]
+    COR_ALIGNED["<b>COR-aligned.fif</b><br/><i style='font-weight:300'>Coregistration</i>"]
+    BEM_MESH["<b>BEM Mesh</b><br/><i style='font-weight:300'>mne_watershed_bem</i><br/><i style='font-weight:300'>mne_flash_bem</i>"]
+    BEM_MODEL["<b>BEM Model</b><br/><i style='font-weight:300'>mne_setup_forward_model</i>"]
+
+    MEG_RAW["<b>👤 MEG/EEG Data</b><br/><i style='font-weight:300'>Raw recordings</i>"]
+    FILTERED["<b>Filtered &amp; Averaged</b><br/><i style='font-weight:300'>mne_browse_raw</i>"]
+    NOISE["<b>Noise Covariance</b><br/><i style='font-weight:300'>Matrix</i>"]
+
+    FWD["<b>Forward Solution</b><br/><i style='font-weight:300'>mne_forward_solution</i>"]
+    INV["<b>Inverse Operator</b><br/><i style='font-weight:300'>mne_inverse_operator</i>"]
+    ANALYZE["<b>Analyze &amp; Visualize</b><br/><i style='font-weight:300'>MNE Analyze</i>"]
+    OUTPUT["<b>Source Estimates</b><br/><i style='font-weight:300'>stc / w files, movies</i>"]
+
+    MRI_RAW --> FS
+    FS --> COR_T1
+    FS --> COR_BRAIN
+    FS --> SRC
+    COR_T1 --> COR_ALIGNED
+    COR_BRAIN --> BEM_MESH
+    BEM_MESH --> BEM_MODEL
+
+    MEG_RAW --> FILTERED
+    MEG_RAW --> NOISE
+
+    SRC --> FWD
+    BEM_MODEL --> FWD
+    COR_ALIGNED --> FWD
+    FILTERED --> FWD
+    NOISE --> INV
+
+    FWD --> INV
+    INV --> ANALYZE
+    FILTERED --> ANALYZE
+    ANALYZE --> OUTPUT
+
+    classDef mri fill:#d4edda,stroke:#28a745,stroke-width:2px,color:#155724,rx:8,ry:8
+    classDef meg fill:#cce5ff,stroke:#2874a6,stroke-width:2px,color:#0c3c60,rx:8,ry:8
+    classDef proc fill:#fff3cd,stroke:#d4a017,stroke-width:2px,color:#6b5900,rx:8,ry:8
+    classDef out fill:#f8d7da,stroke:#c0392b,stroke-width:2px,color:#721c24,rx:8,ry:8
+
+    class MRI_RAW,FS,COR_T1,COR_BRAIN,COR_ALIGNED,BEM_MESH,BEM_MODEL,SRC mri
+    class MEG_RAW,FILTERED,NOISE meg
+    class FWD,INV,ANALYZE proc
+    class OUTPUT out
+
+    linkStyle default stroke:#6c757d,stroke-width:1.5px
 ```
-Raw Data → Preprocessing → Epoching → Averaging → Source Localization → Group Analysis
-```
+
+*Figure: Workflow of the MNE software, adapted from the MNE-C manual (Hämäläinen, 2009). The MRI processing stages (green) are independent of the MEG/EEG data (blue) until the forward solution computation (yellow).*
+
+### Processing Stages at a Glance
 
 The main processing stages are:
 
-1. **Preprocessing** — Bad channel marking, filtering, artifact suppression
-2. **Epoching and averaging** — Creating evoked responses from event-related data
-3. **Source localization** — Anatomical processing, forward solution, inverse estimation
+1. **Setting up the analysis environment** — Configure `SUBJECTS_DIR`, FreeSurfer paths, and the analysis directory structure.
+2. **Anatomical processing** — FreeSurfer reconstruction, source space creation, BEM mesh generation.
+3. **Preprocessing** — Bad channel marking, filtering, downsampling, artifact suppression (SSP/ICA).
+4. **Epoching and averaging** — Creating evoked responses from event-related data.
+5. **Forward modeling** — Coordinate frame alignment, BEM model setup, forward solution computation.
+6. **Inverse estimation** — Noise-covariance estimation, inverse operator construction.
+7. **Source analysis** — Applying the inverse operator, visualization, morphing, group analysis.
+
+:::tip
+Steps 1–2 depend only on anatomical (geometrical) information and remain identical across different MEG/EEG studies on the same subject. Once the FreeSurfer reconstruction and BEM setup are complete, they can be reused for all experiments with that subject.
+:::
+
+## Setting Up the Analysis Environment
+
+Before starting the data analysis:
+
+1. **Set `SUBJECTS_DIR`** — Set the environment variable `SUBJECTS_DIR` to the directory containing the anatomical MRI data (FreeSurfer subject directories). Optionally, set `SUBJECT` to the name of the current subject's MRI directory under `SUBJECTS_DIR`. With this setting you can avoid entering the `--subject` option common to many MNE programs and scripts.
+
+2. **Set up FreeSurfer** — Ensure the FreeSurfer environment is configured before using MNE software. The FreeSurfer and MNE software are complementary tools.
+
+3. **Create an analysis directory** — It is recommended to create a new directory for the MEG/EEG data processing. Raw data files should be linked (using `ln -s`) rather than copied. On-line averages can be either copied or linked.
+
+:::note
+In the following sections, files in the FreeSurfer directory hierarchy are usually referred to without specifying the leading directories. Thus, `bem/subject-src.fif` refers to `$SUBJECTS_DIR/$SUBJECT/bem/subject-src.fif`.
+:::
 
 ## Preprocessing
 
@@ -56,6 +135,12 @@ For a detailed mathematical description of the SSP method, see [Signal-Space Pro
 #### Independent Component Analysis (ICA)
 
 Many MEG/EEG signals including biological artifacts reflect non-Gaussian processes. Therefore, PCA-based artifact rejection may perform worse at separating the signal from noise sources. ICA-based approaches provide an alternative method for separating neural activity from artifacts such as eye blinks, cardiac activity, and muscle artifacts.
+
+### Downsampling
+
+The minimum practical sampling frequency of the Vectorview system is 600 Hz. Lower sampling frequencies are allowed but result in elevated noise levels in the data. It is advisable to lowpass filter and downsample large raw data files — common in cognitive and patient studies — to speed up subsequent processing. This can be accomplished with `mne_browse_raw` or `mne_process_raw`.
+
+It is recommended that the original raw file is called `<name>_raw.fif` and the downsampled version `<name>_ds_raw.fif`.
 
 ## Epoching and Evoked Data
 
@@ -175,8 +260,20 @@ For mathematical details, see [The Minimum-Norm Estimates](inverse).
 
 ### Creating Source Estimates
 
-Once all the preprocessing steps described above have been completed, the inverse operator can be applied to the MEG and EEG data using **[mne_compute_raw_inverse](tools-compute-raw-inverse)**.
+Once all the preprocessing steps described above have been completed, the inverse operator can be applied to the MEG and EEG data and the results can be viewed and stored in several ways:
+
+- The interactive analysis tool **[MNE Analyze](analyze)** can be used to explore the data and to produce quantitative analysis results, screen snapshots, and movies.
+
+- The command-line tool **[mne_compute_raw_inverse](tools-compute-raw-inverse)** can be used to produce files containing source estimates at selected ROIs. The input data file can be either a raw data or evoked response MEG/EEG file.
+
+- Source estimates are stored in **stc** (source time course) and **w** (snapshot) file formats for subsequent processing, morphing, and visualization.
 
 ### Group Analyses
 
-Group analysis is facilitated by morphing source estimates to a common template brain (e.g., `fsaverage`).
+Group analysis is facilitated by morphing source estimates to a common template brain (e.g., `fsaverage`). Subject-to-subject morphing enables cross-subject averaging and comparison of data among subjects. It is also possible to average the source estimates across subjects after morphing to a common surface space.
+
+## References
+
+- Hämäläinen, M.S. (2009). *MNE Software User's Guide*. Martinos Center for Biomedical Imaging, Massachusetts General Hospital.
+- Gramfort, A., Luessi, M., Larson, E., Engemann, D.A., Strohmeier, D., Brodbeck, C., Goj, R., Jas, M., Brooks, T., Parkkonen, L., & Hämäläinen, M. (2013). MEG and EEG data analysis with MNE-Python. *Frontiers in Neuroscience*, 7, 267.
+- Gramfort, A., Luessi, M., Larson, E., Engemann, D.A., Strohmeier, D., Brodbeck, C., Parkkonen, L., & Hämäläinen, M.S. (2014). MNE software for processing MEG and EEG data. *NeuroImage*, 86, 446–460.

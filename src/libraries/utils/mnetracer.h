@@ -116,6 +116,8 @@ namespace UTILSLIB
  * a few other needed variables. This should be called before any MNETracer is created, and after the last MNETracer object is destructed.
  * For instance, in the main.cpp file.
  * The MNE_TRACE() macro is to be used for marking which method, function or block of code is to be measured and traced.
+ *
+ * @brief RAII-based function-level tracer that writes Chrome-compatible JSON trace events for performance profiling.
  */
 class UTILSSHARED_EXPORT MNETracer
 {

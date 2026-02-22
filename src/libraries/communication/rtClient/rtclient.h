@@ -75,7 +75,7 @@ namespace COMMUNICATIONLIB
 /**
  * The real-time client class provides an interface to communicate with a running mne_rt_server.
  *
- * @brief Real-time client
+ * @brief Threaded client that connects to mne_rt_server, retrieves measurement info, and streams raw data buffers
  */
 class COMMUNICATIONSHARED_EXPORT RtClient : public QThread
 {

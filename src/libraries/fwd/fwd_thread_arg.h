@@ -82,7 +82,7 @@ class FwdCoilSet;
 /**
  * Implements a Forward Thread Argument (Replaces *fwdThreadArg,fwdThreadArgRec; struct of MNE-C compute_forward.c).
  *
- * @brief Filter Thread Argument Description
+ * @brief Thread-local arguments for parallel forward field computation (source range, coils, result buffer).
  */
 class FWDSHARED_EXPORT FwdThreadArg
 {

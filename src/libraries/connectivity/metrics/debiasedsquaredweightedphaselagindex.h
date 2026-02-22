@@ -81,7 +81,7 @@ class Network;
 /**
  * This class computes the weighted phase lag index connectivity metric.
  *
- * @brief This class computes the weighted phase lag index connectivity metric.
+ * @brief Computes the debiased squared weighted phase lag index (DWPLI) connectivity metric
  */
 class CONNECTIVITYSHARED_EXPORT DebiasedSquaredWeightedPhaseLagIndex : public AbstractMetric
 {

@@ -73,7 +73,7 @@ namespace RTPROCESSINGLIB
 /**
  * Real-time noise Spectrum estimation
  *
- * @brief Real-time Noise estimation
+ * @brief Controller for real-time noise covariance and power spectral density estimation from empty-room or baseline data.
  */
 class RTPROCESINGSHARED_EXPORT RtNoise : public QThread
 {

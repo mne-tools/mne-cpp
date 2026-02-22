@@ -66,6 +66,9 @@ namespace DISPLIB
 {
 
 //=============================================================================================================
+/**
+ * @brief Dialog for selecting which views receive a particular configuration change.
+ */
 class DISPSHARED_EXPORT ApplyToView : public AbstractView
 {
 public:

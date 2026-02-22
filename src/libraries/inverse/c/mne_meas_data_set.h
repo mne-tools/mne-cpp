@@ -75,7 +75,7 @@ class MneMneData;
 /**
  * Implements MNE Meas Data Set (Replaces *mneMeasDataSet,mneMeasDataSetRec; struct of MNE-C mne_types.h).
  *
- * @brief One data set, used in mneMeasData
+ * @brief Single measurement epoch or average within MneMeasData, including data matrix and projectors.
  */
 class INVERSESHARED_EXPORT MneMeasDataSet
 {

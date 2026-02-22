@@ -70,6 +70,9 @@
 namespace UTILSLIB
 {
 
+/**
+ * @brief Input parameters for multi-taper spectral estimation (data matrix, taper weights, frequencies, sample rate).
+ */
 struct TaperedSpectraInputData {
     Eigen::RowVectorXd vecData;
     Eigen::MatrixXd matTaper;

@@ -5,11 +5,32 @@ sidebar_label: Contribute
 
 # Contribute
 
-Depending on your level of experience, contributing to the project might seem overwhelming at first. Don't worry if that is the case, once you are familiar with the tools and the workflows we use, it becomes really simple. 
+MNE-CPP is an open-source project and welcomes contributions of all kinds — code, documentation, bug reports, and feature requests. Whether you are fixing a typo or adding a new acquisition plugin, the workflow is the same: fork, branch, implement, test, and open a pull request.
 
-First, you need to understand that you can contribute to the project in several ways. For instance, you can submit your C++ code, or you can also submit a specific change in the [documentation webpage](https://mne-cpp.github.io/). Through the following guides, you will understand how to make these changes and, most importantly, how to submit them so that the project maintainers review them. 
+All code contributions are reviewed by maintainers and validated by the [CI pipeline](ci.mdx) across Windows, Linux, and macOS before merging.
 
-There are three main aspects to understand:
- - How to contribute to the code of the project itself. You can see our [contribution guide](contr-guide.mdx). Make sure you understand our [coding conventions](contr-style.mdx). These are simply a set of minimal rules to enforce consistency while writing code for this project.
- - Understand how to [contribute to the documentation webpage](contr-docuimprovements.mdx) of the MNE-CPP project.
- - Both contributions will require you to understand how we use [Git](https://git-scm.com/) and [GitHub](https://www.github.com) in MNE-CPP. Please make sure you are familiar with GitHub Actions and our [Git Workflow](contr-git.mdx).
+## Guides
+
+- **[Contribution Guide](contr-guide.mdx)** — The complete workflow from fork to merged pull request, including branching, testing on CI, and code review.
+- **[Coding Conventions](contr-style.mdx)** — Naming rules, documentation style (Doxygen), commit message prefixes, and class templates.
+- **[Git Workflow](contr-git.mdx)** — Day-to-day Git commands for branching, rebasing, and pushing to your fork.
+- **[Documentation](contr-docuimprovements.mdx)** — How to edit or add pages to this Docusaurus website.
+- **[MNE Tracer](contr-mnetracer.mdx)** — A built-in profiling tool for measuring function execution times.
+
+## Quick Start
+
+```bash
+# 1. Fork on GitHub, then clone
+git clone https://github.com/<you>/mne-cpp.git && cd mne-cpp
+git remote add upstream https://github.com/mne-tools/mne-cpp.git
+
+# 2. Create a feature branch
+git checkout -b my-feature upstream/main
+
+# 3. Build, make changes, run tests
+cmake -B build -S . -DBUILD_TESTS=ON && cmake --build build --parallel
+cd build && ctest --output-on-failure
+
+# 4. Push and open a pull request
+git push origin my-feature
+```

@@ -74,7 +74,7 @@ class Network;
 /**
  * This class handles the incoming settings and computes the actual connectivity estimation.
  *
- * @brief This class is a container for connectivity settings.
+ * @brief Computes functional connectivity estimates from ConnectivitySettings using the selected metric
  */
 class CONNECTIVITYSHARED_EXPORT Connectivity
 {

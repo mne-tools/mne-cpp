@@ -78,8 +78,9 @@ namespace DISPLIB
 
 //=============================================================================================================
 /**
- * This class provides the interface to the coregistration setting view.
+ * @brief Settings panel for MEG-MRI co-registration parameters and fiducial alignment.
  *
+ * This class provides the interface to the coregistration setting view.
  */
 class DISPSHARED_EXPORT CoregSettingsView : public AbstractView
 {

@@ -563,6 +563,9 @@ void FiffCoordTransOld::fiff_coord_trans_inv(float r[], FiffCoordTransOld *t, in
 namespace FIFFLIB
 {
 
+/**
+ * @brief Coordinate frame name record mapping a coordinate frame integer ID to its human-readable name string.
+ */
 typedef struct {
     int frame;
     const char *name;

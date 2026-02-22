@@ -70,7 +70,7 @@ namespace INVERSELIB {
 /**
  * Description of what this class is intended to do (in detail).
  *
- * @brief Brief description of this class.
+ * @brief Configuration parameters for the HPI signal model (line frequency, coil frequencies, sample rate, buffer size)
  */
 class INVERSESHARED_EXPORT HpiModelParameters
 {

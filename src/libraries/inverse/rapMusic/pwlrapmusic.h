@@ -75,7 +75,7 @@ namespace INVERSELIB
 
 //=============================================================================================================
 /**
- * @brief    The PwlRapMusic class provides the POWELL RAP MUSIC Algorithm CPU implementation. ToDo: Paper references.
+ * @brief Powell-accelerated RAP MUSIC variant using gradient-free optimization for refined dipole fitting
  *
  * ToDo Detailed description
  */

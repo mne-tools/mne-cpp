@@ -59,7 +59,7 @@ namespace UTILSLIB
 
 //=============================================================================================================
 /**
- * Class contianing static functions for common file operations.
+ * @brief Static utility methods for file and directory operations (existence checks, copying, path manipulation).
  */
 class UTILSSHARED_EXPORT File
 {

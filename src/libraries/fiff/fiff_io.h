@@ -77,6 +77,10 @@ namespace RTPROCESSINGLIB
 namespace FIFFLIB
 {
 
+//=============================================================================================================
+/**
+ * @brief High-level reader/writer that loads and saves complete FIFF measurement files.
+ */
 class FIFFSHARED_EXPORT FiffIO : public QObject
 {
 public:

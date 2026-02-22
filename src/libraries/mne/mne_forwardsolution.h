@@ -82,6 +82,8 @@ namespace MNELIB
 //=========================================================================================================
 /**
  * Gain matrix output data for one region, used for clustering
+ *
+ * @brief Output of a cluster-based forward solution computation for a single cortical region
  */
 struct RegionDataOut
 {
@@ -96,6 +98,8 @@ struct RegionDataOut
 //=========================================================================================================
 /**
  * Gain matrix input data for one region, used for clustering
+ *
+ * @brief Input parameters for cluster-based forward solution computation on a single cortical region
  */
 struct RegionData
 {

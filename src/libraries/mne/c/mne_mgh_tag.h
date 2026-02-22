@@ -71,7 +71,7 @@ namespace MNELIB
 /**
  * Replaces *mneMGHtag,mneMGHtagRec struct (mne_mgh_mri_io.c).
  *
- * @brief The MneMghTag class.
+ * @brief Single tag entry in a FreeSurfer MGH/MGZ file header containing typed metadata.
  */
 class MNESHARED_EXPORT MneMghTag
 {

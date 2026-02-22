@@ -97,6 +97,8 @@ namespace ChannelInfoModelRoles
 //=============================================================================================================
 /**
  * DECLARE CLASS ChannelInfoModel
+ *
+ * @brief Table model exposing per-channel metadata (name, type, unit, position) for QTableView display.
  */
 class DISPSHARED_EXPORT ChannelInfoModel : public QAbstractTableModel
 {

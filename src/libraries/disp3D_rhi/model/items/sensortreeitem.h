@@ -46,6 +46,9 @@
 #include <QVector3D>
 #include <QMatrix4x4>
 
+/**
+ * @brief Tree item representing MEG or EEG sensor positions in the 3-D scene hierarchy.
+ */
 class DISP3DRHISHARED_EXPORT SensorTreeItem : public AbstractTreeItem
 {
 public:

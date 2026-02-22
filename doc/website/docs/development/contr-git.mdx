@@ -5,65 +5,81 @@ sidebar_label: Git Workflow
 
 # Git Workflow
 
-This part is focused on giving a short overview of git commands that should cover the general git workflow in MNE-CPP. For further information you can check out this [Git tutorial video](https://www.youtube.com/watch?v=DtLrWCFaG0A&feature=youtu.be).
+This page gives a concise overview of the Git commands used in the MNE-CPP development workflow. For a deeper introduction, see this [Git tutorial video](https://www.youtube.com/watch?v=DtLrWCFaG0A&feature=youtu.be). For the full contribution process — from forking to pull request — see the [Contribution Guide](contr-guide.mdx).
 
-The first steps to get started, as described in the [build guide](buildguide-cmake.mdx), are:
-```
+## Initial Setup
+
+As described in the [Build from Source](buildguide-cmake.mdx) guide, start by cloning your fork and adding the upstream remote:
+
+```bash
 git clone https://github.com/<YourGitUserName>/mne-cpp.git
 git remote add upstream https://github.com/mne-tools/mne-cpp.git
 git fetch --all
 git rebase upstream/main
 ```
 
+## Daily Workflow
+
 The general workflow is covered by the following steps:
 
 - Create a new branch from `main`:
 
-```
+```bash
 git checkout -b <branchName> main
 ```
 
 - Get the latest changes and [rebase](https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase):
 
-```
+```bash
 git fetch upstream
 git rebase upstream/main
 ```
 
-- Solve [merge conflicts](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line), if they occure.
+- Solve [merge conflicts](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line), if they occur.
 
 - Make your changes and check the status:
 
-```
+```bash
 git status
 ```
 
-- Add unstaged changes (colored in red) to prepare next commit:
+- Add unstaged changes (shown in red) to prepare the next commit:
 
-```
+```bash
 git add <changedFileName>
-   or
+# or add all changes:
 git add --all
 ```
 
-- Commit the added files (colored in green in status report) and add a meaningful message about what changed and why (have a look at our [commit policy](contr-style.mdx)):
+- Commit the staged files (shown in green) with a meaningful message following our [commit policy](contr-style.mdx):
 
-```
-git commit -m "Fix: meaningful commit message"
-   or
+```bash
+git commit -m "FIX: meaningful commit message"
+# or commit all tracked changes:
 git commit --all
 ```
 
-- If you make small changes that are related to the previous commit, you can amend your changes to the previous commit with:
+- If you make small changes related to the previous commit, amend them:
 
-```
-git commit -m "Fix: meaningful commit message" --amend
+```bash
+git commit -m "FIX: meaningful commit message" --amend
 ```
 
-- Push your changes to origin (your MNE-CPP fork on GitHub). Pleaes note that a force push via `-f` might be necessary if you rebased:
+- Push your changes to origin (your fork on GitHub). Note that a force push (`-f`) may be necessary after a rebase:
 
-```
+```bash
 git push origin <branchName>
-   or
+# or force push after rebase:
 git push origin <branchName> -f
 ```
+
+## Useful Commands
+
+| Command | Purpose |
+|---------|--------|
+| `git log --oneline -20` | Show the last 20 commits in compact form |
+| `git diff` | Show unstaged changes |
+| `git diff --staged` | Show staged changes |
+| `git stash` / `git stash pop` | Temporarily shelve and restore changes |
+| `git branch -d <name>` | Delete a local branch after merging |
+| `git remote -v` | List configured remotes |

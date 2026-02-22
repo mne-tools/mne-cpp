@@ -69,7 +69,7 @@ class MneSurfaceOld;
 /**
  * Replaces *projData,projDataRec struct (mne_project_to_surface.c).
  *
- * @brief The MneProjData class.
+ * @brief Auxiliary projection data computed from MneProjOp for efficient repeated application.
  */
 class MNESHARED_EXPORT MneProjData
 {

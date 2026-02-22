@@ -95,6 +95,9 @@ public:
     typedef QSharedPointer<ConnectivitySettings> SPtr;            /**< Shared pointer type for ConnectivitySettings. */
     typedef QSharedPointer<const ConnectivitySettings> ConstSPtr; /**< Const shared pointer type for ConnectivitySettings. */
 
+    /**
+     * @brief Per-trial intermediate frequency-domain data used during connectivity computation
+     */
     struct IntermediateTrialData {
         Eigen::MatrixXd     matData;
         Eigen::MatrixXd     matPsd;
@@ -106,6 +109,9 @@ public:
         QVector<QPair<int,Eigen::MatrixXd> >    vecPairCsdImagSqrd;
     };
 
+    /**
+     * @brief Accumulated cross-spectral and auto-spectral sums across trials for final metric normalization
+     */
     struct IntermediateSumData {
         Eigen::MatrixXd     matPsdSum;
         QVector<QPair<int,Eigen::MatrixXcd> >   vecPairCsdSum;

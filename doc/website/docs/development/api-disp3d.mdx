@@ -1,124 +1,279 @@
 ---
-title: Disp3D
-sidebar_label: Disp3D
+title: Disp3D (RHI)
+sidebar_label: Disp3D (RHI)
 ---
 
-# Disp3D 
+# Disp3D — RHI-Based 3D Visualization
 
-All 3D visualization in MNE-CPP is realized within the Disp3D library, which is based on the Qt3D module. Qt3D is part of the Qt framework and actively developed by the KDAB group. The Qt3D module offers a layer on top of native OpenGL or Vulkan. It supports cross-platform compilation, is seamlessly integrated into the Qt framework and thus does not impose another external dependency on MNE-CPP. Qt3D utilizes a so-called framegraph and scenegraph approach. The framegraph is a description of how to render. The scenegraph is a description of what to render and is represented by an Entity-Relationship-Model (ECM). In an ECM, entities describe general purpose objects, which aggregate so-called components. These components are highly versatile and describe what the object is actually made of. In Qt3D, a component can be a surface mesh, material, 3D transformation, etc. The framegraph includes information about different render stages and specifies what each render run is composed of.
+Starting with MNE-CPP v2.0, the 3D visualization library has been rebuilt on top of Qt's **Rendering Hardware Interface (RHI)**. The library is now called `disp3D_rhi` (namespace `DISP3DRHILIB`). Unlike the previous Qt3D-based implementation, the RHI backend talks directly to the platform's native graphics API — Metal on macOS, Vulkan on Linux, Direct3D 11/12 on Windows, or OpenGL as a fallback — giving MNE-CPP a thinner, more portable rendering stack.
 
-![](/img/lib/disp3d_architecture.png "The Disp3D library architecture")
+:::info Why RHI?
+Qt3D provided a high-level scene-graph but added significant abstraction overhead. With RHI, the library manages its own render pipeline, vertex buffers, and shader programs directly, resulting in lower latency, smaller binary size, and better control over GPU resource lifetime — all critical for real-time neuroimaging visualization.
+:::
 
-The above figure depicts a simplified version of the Disp3D architecture and components. Disp3D consists out of two main components: Viewers and an engine. The latter hosts the data model, delegate and view. The *Framegraph* and *Camera* are included in Disp3D's view module and are both utilized by the *View3D* class. The *Camera* class provides the user to freely rotate the 3D scene. 
+## Architecture Overview
 
-Disp3D is backboned by its own tree (graph) based model *Data3DTreeModel* to store and organize data. The renderable tree model items inherit from the *Renderable3DEntity* class which itself inherits from Qt3D's *QEntity* class. Hence, next to organizing Disp3D's data, the *Data3DTreeModel* also serves as the scenegraph needed to render a 3D scene with Qt3D. Each tree item specializes in the visualization of a specific data type and includes parameters to change the visualization options on the fly during run-time. 
+The library follows a clean separation of concerns inspired by several well-known software patterns:
 
-The *Data3DTreeDelegate* was implemented to create appropriate editors for the item's control parameters. These control parameters can be changed by the user during the visualization. *Data3DTreeModel* and *Data3DTreeDelegate* can be passed to a *Control3DView*, which uses a *QTreeView* to display the entire Disp3D data tree and the items' control parameters with corresponding editors. Please note that since the *Control3DView* class is a GUI widget it is not actually part of the Disp3D but the Disp library. 
+- **Model–View separation** — The `BrainTreeModel` (a `QStandardItemModel`) owns all scene data and metadata. `BrainView` reads the model to decide *what* to show; `BrainRenderer` decides *how* to draw it. Neither the model nor the renderer know about each other directly — `BrainView` acts as the mediator.
+- **Retained-mode rendering** — Renderable objects (`BrainSurface`, `DipoleObject`, `NetworkObject`, `SourceEstimateOverlay`) each own their GPU resources (vertex buffers, index buffers, instance buffers, uniform buffers). They create these resources once on initialization and only update the data that changes per frame (e.g., vertex colors for a new time sample). This avoids per-frame allocation and keeps draw calls cheap.
+- **Strategy pattern for shaders** — The `BrainRenderer` maintains a set of pre-compiled shader pipelines (`Standard`, `Holographic`, `Anatomical`, `Dipole`, `XRay`, `ShowNormals`). Switching visual style is a pipeline swap, not a recompilation.
+- **Observer / worker pattern** — Real-time data (sensor streams, source estimates) flows through dedicated `QObject`-based workers running on background threads. Workers emit signals carrying per-vertex color arrays, which `BrainView` applies to the appropriate renderable before the next draw call. This keeps the render thread free from heavy computation.
+- **Composition over inheritance** — Rather than deep inheritance hierarchies (as in the old Qt3D design where every renderable was a `QEntity` subclass), the RHI design composes independent objects: a `BrainSurface` is *not* a widget or an entity — it is a plain C++ object that knows how to upload geometry and draw itself when asked.
 
-Materials ensure the correct displaying and interpolation of data. The materials internally rely on graphics shaders written in GLSL, which are executed on the GPU. Five materials and corresponding shaders were implemented in order to visualize and interpolate data in real-time. Two workers were implemented to stream sensor and source-level data sample-wise to the corresponding tree items. 
+```mermaid
+%%{init: {'theme': 'base', 'themeVariables': {'fontSize': '14px'}}}%%
+graph LR
+    classDef view fill:#4A90D9,stroke:#2E6BA6,color:#fff,rx:8,ry:8
+    classDef engine fill:#E8833A,stroke:#C06A2E,color:#fff,rx:8,ry:8
+    classDef renderable fill:#7B68EE,stroke:#5B48CE,color:#fff,rx:8,ry:8
+    classDef model fill:#50B86C,stroke:#3A9252,color:#fff,rx:8,ry:8
+    classDef core fill:#9E9E9E,stroke:#757575,color:#fff,rx:8,ry:8
+    classDef input fill:#F5A623,stroke:#D4891A,color:#fff,rx:8,ry:8
+    classDef scene fill:#E05D6F,stroke:#B8404F,color:#fff,rx:8,ry:8
+    classDef worker fill:#8D6E96,stroke:#6E4F77,color:#fff,rx:8,ry:8
 
-## Usage 
+    subgraph VIEW [" View Layer "]
+        direction TB
+        BV["🖥️ BrainView<br/><i>QRhiWidget</i>"]:::view
+        MVL["◫ MultiViewLayout<br/><i>1–4 viewports</i>"]:::view
+    end
 
-The Disp3D API is designed to minimize the user's exposure to low level functionality. There are two ways the user can utilize Disp3D to visualize data. First, the user can work with viewers, which already include all necessary tools to visualize a specific data type. Viewers have the advantage that they are easier to setup and come with already implemented control parameters depending on the data type. The following code snippet shows how to visualize connectivity results.
+    subgraph ENGINE [" Render Engine "]
+        direction TB
+        BR["⚙️ BrainRenderer<br/><i>pipelines · draw calls</i>"]:::engine
+        SH["🎨 GLSL Shaders<br/><i>6 visual modes</i>"]:::engine
+    end
 
-```cpp
-//Network data
-QList<Network> networks;
+    subgraph REND [" Renderable Objects "]
+        direction TB
+        BS["🧠 BrainSurface<br/><i>cortical · BEM mesh</i>"]:::renderable
+        DO["📍 DipoleObject<br/><i>instanced cones</i>"]:::renderable
+        NO["🔗 NetworkObject<br/><i>nodes · edges</i>"]:::renderable
+        SEO["📊 SourceEstimateOverlay<br/><i>STC amplitude</i>"]:::renderable
+    end
 
-//Init the NetworkView and add data
-NetworkView networkView;
-networkView.addData("sample", "audvis", networks);
+    subgraph MDL [" Data Model "]
+        direction TB
+        BTM["🌳 BrainTreeModel<br/><i>QStandardItemModel</i>"]:::model
+        ITEMS["SurfaceTreeItem · BemTreeItem<br/>DigitizerTreeItem · DipoleTreeItem<br/>NetworkTreeItem · SourceSpaceTreeItem"]:::model
+    end
+
+    subgraph CORE [" Core "]
+        direction TB
+        RT["RenderTypes<br/><i>ShaderMode · VisualizationMode</i>"]:::core
+        VS["ViewState<br/><i>per-pane visibility</i>"]:::core
+        DL["DataLoader"]:::core
+    end
+
+    subgraph INP [" Input "]
+        direction TB
+        CC["🎥 CameraController<br/><i>orbit · zoom · pan</i>"]:::input
+        RP["🎯 RayPicker<br/><i>ray–triangle intersection</i>"]:::input
+    end
+
+    subgraph SCENE [" Scene Managers "]
+        direction TB
+        SFM["SensorFieldMapper"]:::scene
+        SEM["SourceEstimateManager"]:::scene
+        RSSM["RtSensorStreamManager"]:::scene
+    end
+
+    subgraph WORK [" Background Workers "]
+        direction TB
+        W1["RtSensorDataWorker"]:::worker
+        W2["RtSensorInterpolationMatWorker"]:::worker
+        W3["RtSourceDataWorker"]:::worker
+        W4["StcLoadingWorker"]:::worker
+    end
+
+    BV --> MVL
+    BV --> BR
+    BV --> CC
+    BV --> RP
+    BR --> SH
+    BR --> BS
+    BR --> DO
+    BR --> NO
+    BR --> SEO
+    BV --> BTM
+    BTM --> ITEMS
+    BV --> SFM
+    BV --> SEM
+    BV --> RSSM
+    RSSM --> W1
+    RSSM --> W2
+    SEM --> W3
+    SEM --> W4
 ```
 
-Second, the user can implement a *View3D* and simply add data to its tree model. In order to allow the changing of control parameters, the user can implement a *Control3DView* GUI widget and pass a *Data3DTreeModel* and a *Data3DTreeDelegate* to it. See the following code snippet for an example:
+### Key Differences from the Qt3D Implementation
+
+| Aspect | Qt3D (v1.x) | RHI (v2.0) |
+|--------|-------------|------------|
+| **Widget base** | Custom `QWidget` + `QSurface3DFormat` | `QRhiWidget` |
+| **Render control** | Qt3D framegraph / scenegraph | Direct `QRhi` pipeline + command buffer |
+| **Shader language** | GLSL via Qt3D materials | GLSL compiled per-backend by Qt RHI |
+| **Data model** | `Data3DTreeModel` + `Renderable3DEntity` → `QEntity` | `BrainTreeModel` + `BrainSurface` / `DipoleObject` / `NetworkObject` |
+| **Multi-view** | Not built-in | `MultiViewLayout` with 1–4 panes |
+| **Instanced rendering** | `GeometryMultiplier` | Native QRhi instance buffers |
+| **Vertex picking** | Not implemented | `RayPicker` with CPU ray–triangle intersection |
+| **Graphics backends** | OpenGL only | Metal, Vulkan, D3D 11/12, OpenGL |
+
+## Module Breakdown
+
+### View Layer
+
+The view layer implements the **Mediator pattern** — `BrainView` sits between user input, the data model, and the renderer, coordinating their interactions without letting them reference each other directly.
+
+- **`BrainView`** — The top-level widget, inheriting from `QRhiWidget` (Qt's portable RHI surface widget). On each frame, Qt calls `BrainView::render()`, which assembles a `SceneData` struct containing the current MVP matrix, camera position, light direction, and overlay mode, then hands it to `BrainRenderer` for drawing. `BrainView` also handles all mouse/keyboard events and dispatches them to the `CameraController` (for orbit/zoom/pan) or `RayPicker` (for vertex selection). It supports two modes: `SingleView` with an interactive orbiting camera, and `MultiView` with up to four fixed-angle viewports (e.g., top, left, front, free).
+- **`MultiViewLayout`** — A pure-geometry helper with no widget dependencies. It stores fractional split positions and computes viewport rectangles, splitter hit-testing, and minimum pane sizes. `BrainView` queries this class for the pixel rectangles of each pane before issuing scissored draw calls. The layout supports 1, 2, 3, or 4 panes with draggable separators.
+
+### Render Engine
+
+The render engine is where the **Strategy pattern** is most visible. `BrainRenderer` holds a map of pre-compiled `QRhiGraphicsPipeline` objects — one per `ShaderMode` — and selects the appropriate pipeline at draw time.
+
+- **`BrainRenderer`** — The low-level workhorse. It creates and caches `QRhiGraphicsPipeline` objects, manages shared uniform buffers (for the scene-wide MVP and lighting data), and iterates over all visible renderables to issue draw calls. Each renderable provides its own vertex/index/instance buffers; `BrainRenderer` simply binds them and calls `drawIndexed()` or `draw()`. The renderer is stateless between frames — all per-frame data arrives via the `SceneData` struct, making it easy to render the same scene from multiple camera angles (multi-view).
+- **GLSL Shaders** — Six shader programs, each consisting of a `.vert` and `.frag` file. Qt's RHI layer compiles these at load time into the native shading language of the active backend (Metal Shading Language, SPIR-V for Vulkan, HLSL for D3D, or GLSL for OpenGL). The shaders receive per-vertex attributes (position, normal, packed ABGR color, packed ABGR annotation color) and a uniform block with the scene data. The `overlayMode` uniform controls which color channel the fragment shader samples — surface, annotation, scientific colormap, or source estimate.
+
+| Shader | Visual Style |
+|--------|-------------|
+| `standard` | Phong lighting (default) |
+| `holographic` | Two-sided holographic effect |
+| `anatomical` | Curvature-based coloring |
+| `dipole` | Dipole cone rendering |
+| `xray` | Semi-transparent x-ray |
+| `shownormals` | Surface-normal visualization |
+
+### Renderable Objects
+
+Renderables follow the **Self-Contained Resource** pattern — each object manages the full lifecycle of its GPU resources (creation, update, destruction) and exposes a uniform interface (`initResources()`, `updateResources()`, `draw()`) that `BrainRenderer` calls. This keeps the renderer agnostic about data types.
+
+| Class | Purpose | GPU Resources |
+|-------|---------|---------------|
+| `BrainSurface` | Cortical or BEM mesh with per-vertex curvature, annotation, and STC color channels | Vertex buffer (`VertexData`: pos, normal, ABGR base, ABGR annotation), index buffer, uniform buffer |
+| `DipoleObject` | Equivalent current dipoles rendered as instanced cones pointing in the moment direction | Shared cone geometry + per-instance transform/color buffer |
+| `NetworkObject` | Connectivity graph — nodes as instanced spheres (diameter ∝ degree), edges as instanced cylinders (diameter and color ∝ weight) | Shared sphere/cylinder geometry + per-instance transform/color buffers |
+| `SourceEstimateOverlay` | Per-vertex STC amplitude overlay streamed onto a `BrainSurface` | Updates the host surface's vertex color channel in-place |
+
+The `VertexData` struct deserves special mention. It packs four attributes into a compact interleaved layout:
 
 ```cpp
-//Init 3D view and model
-View3D* p3DView = new View3D();
-Data3DTreeModel* pDataModel = new Data3DTreeModel();
-p3DView->setModel(pDataModel);
-
-//Init 3D control
-Control3DView* pControl3DView = new Control3DView();
-Data3DTreeDelegate* pData3DTreeDelegate = new Data3DTreeDelegate();
-
-pControl3DView->setDelegate(pData3DTreeDelegate);
-pControl3DView->setModel(pDataModel);
-
-//Add BEM data
-MNEBem bem(QFile("sample-5120-5120-5120-bem.fif"));
-pDataModel->addBemData("sample", "BEM", bem);
-
-//Add source-level data for left hemisphere
-MNESourceEstimate sourceData(QFile("sample_audvis-meg-eeg-lh.stc"));
-MNEForwardSolution fwd(QFile("sample_audvis-meg-eeg-oct-6-fwd.fif"));
-SurfaceSet surfSet("sample", 0, "inflated", "../resources/data/MNE-sample-data/subjects");
-pDataModel->addSourceData("sample", "audvis", sourceData, fwd, surfSet);
+struct VertexData {
+    QVector3D pos;              // vertex position
+    QVector3D norm;             // vertex normal
+    uint32_t  color;            // curvature / base color   (ABGR packed)
+    uint32_t  colorAnnotation;  // annotation region color  (ABGR packed)
+};
 ```
 
-## Supported Data Types and Items
+Colors are stored as packed `uint32_t` values (`packABGR()`) rather than `QVector4D` floats, halving the per-vertex color footprint — a meaningful saving for high-resolution cortical meshes with 160 000+ vertices.
 
-The Disp3D library supports several data types as input to its model and render pipeline. Next to functional data, Disp3D is able to visualize anatomical and other measurement related information. Some of the *Data3DTreeModel* items are solely used for organizational purposes, e.g., to group subjects, measurements or MRI reconstructed hemispheres, to name a few. Organizational items inherit from the *AbstractTreeItem* class, which again inherits from *QStandardTreeItem*. They are therefore excluded from the scenegraph needed by Qt3D to render the 3D scene. All other items inherting from *Abstract3DTreeItem* or *AbstractMeshTreeItem* class are included in Qt3D's render process since they ultimately inherit, through the *RenderableEntity* class, from Qt3D's *QEntity* class. 
+### Data Model
 
-Basic geometric 3D primitives, such as sphere, cones, use the *Abstract3DTreeItem* functionalities. More complex 3D objects, such as surface meshes, use the *AbstractMeshTreeItem* functionalities. *MetaTreeItem* objects are used as children of a tree item, e.g., a *FsSurfaceTreeItem*, to present additional information about the visualized data and to provide user input editors, e.g., color pickers for changing the surface color. *MetaTreeItem* objects are described by types, which are parsed by the *Data3DTreeDelegate* to create the corresponding user input editors.  
+The data model applies the **Composite pattern** via Qt's `QStandardItemModel` tree structure. Every scene object is represented as a tree item; parent items group children logically (subject → hemisphere → surface, or subject → measurement → network). The tree can be displayed in a `QTreeView` to give users interactive visibility toggles, color pickers, and threshold sliders without any custom widget work.
 
-![](/img/lib/disp3d_items.png "The Disp3D data items")
+Crucially, tree items in the RHI design are **not** renderables. In the old Qt3D design, `Renderable3DEntity` *was* a `QEntity` — the data model and the scenegraph were one and the same. In the RHI design, tree items are pure data/metadata containers. `BrainView` reads the model to decide which `BrainSurface`, `DipoleObject`, or `NetworkObject` instances should be visible, then passes them to `BrainRenderer`. This separation makes it straightforward to render the same data in multiple viewports with different visibility profiles.
 
-**3D MRI Reconstructions and Annotations** 
-Surface reconstructions and annotations created with the Freesurfer toolbox can be visualized with Disp3D. The surface vertices, normals and triangulation data are passed to a *FsSurfaceTreeItem* object. Here, the data are used to create a *CustomMesh* object, which inherits from Qt3D's *QGeometryRenderer*. Next to the input data the *CustomMesh* uses the *PhongAlpha* material to create a Phong lighting model with support for transparency (alpha channel). The annotation data are stored in a separate *FsAnnotationTreeItem* object, which colorizes the *FsSurfaceTreeItem* based on the color per patch information. Both *FsSurfaceTreeItem* and *FsAnnotationTreeItem* are stored hemisphere-wise as children of the *MriTreeItem* and *MeasurementTreeItem* classes.
+| Tree Item | Data Source |
+|-----------|-----------|
+| `SurfaceTreeItem` | FreeSurfer surface + annotation |
+| `BemTreeItem` | BEM compartment surface |
+| `DigitizerTreeItem` / `DigitizerSetTreeItem` | HPI, fiducials, head-shape points |
+| `DipoleTreeItem` | `ECDSet` |
+| `NetworkTreeItem` | `Network` from the Connectivity library |
+| `SourceSpaceTreeItem` | `MNESourceSpace` |
 
-**Digitizer Data**
-The locations of HPI coils, fiducial markers and additional head surface points can be visualized with the *DigitizerTreeItem* class. The data are colored based on their type (HPI, fiducial marker or additional point) and are visualized with the help of the *GeometryMultiplier* and Qt3D's *QSphereGeometry* classes. The *GeometryMultiplier* facilitates so-called instance rendering via the *GeometryMultiplierMaterial*. Instead of sending the same 3D primitive mesh (*QSphereGeometry*) to the GPU for every, e.g., additional head surface point, the mesh information (vertices, normals, triangles) is only send once. Instance rendering only needs the transformations in 3D space (translation and rotation) as well as the colors per instance in order to 3D render the full data set. This saves recurrent calls as well as data transfers from MNE to GPU and allows the efficient rendering of 3D scenes consisting out of a large amount of the same 3D primitive. All digitizer related items are grouped under the *DigitizerSetTreeItem* and *MeasurementTreeItem* classes.
+### Core
 
-**M/EEG Sensors** 
-The M/EEG sensors are visualized via the *GeometryMultiplier* class as described above. In case of MEG, the helmet surface can be plotted with the help of the *SensorSurfaceTreeItem* class. All sensor information related items are grouped under the *SensorSetTreeItem* and *MeasurementTreeItem* class.
+The core module provides shared types and state that every other module depends on, without pulling in heavy Qt or QRhi headers.
 
-**M/EEG Data** 
-M/EEG sensor level data can be visualized topographically on the 3D helmet surface or scalp BEM compartment, respectively. The *SensorDataTreeItem* holds a *CustomMesh* object with the helmet surface or scalp BEM data. The color values of the *CustomMesh* object correspond to the interpolated MEG or EEG data per sample. M/EEG sensor level data items are grouped under the *MeasurementTreeItem* class.
+- **`RenderTypes`** — A lightweight header-only file defining `ShaderMode` and `VisualizationMode` enums and the `packABGR()` utility. It deliberately avoids any QRhi includes, so public API headers can use these enums without leaking GPU implementation details to downstream consumers.
+- **`ViewState`** — Captures all per-viewport settings: camera orientation, lighting parameters, and a `ViewVisibilityProfile` struct with independent boolean toggles for each data layer (LH, RH, BEM head, BEM outer skull, BEM inner skull, MEG sensors, etc.). Each viewport in a multi-view layout carries its own `ViewState`, enabling pane-specific views of the same dataset.
+- **`DataLoader`** — Centralized utilities for loading FreeSurfer surfaces, annotations, and BEM data into the model and creating the corresponding renderables.
 
-**BEM Compartments** 
-The *BemSurfaceTreeItem* class visualizes BEM compartments. The internal rendering is done similar to the one described for 3D MRI reconstructions. BEM data items are grouped under the *BemTreeItem* class.
+### Input
 
-**Source Space Model** 
-The source model created during the forward modeling can be visualized in 3D with the *SourceSpaceTreeItem* class. The input data can be passed in form of a forward solution defined by the *MNESourceSpace* class. The included surface is rendered similar to the one described for 3D MRI reconstructions. The modeled sources are rendered as spheres with *QSphereGeometry* and the *GeometryMultiplier* classes. Hence, the sources' orientations are discarded for visualization purposes. Source space items are grouped under the *HemisphereTreeItem* and *MeasurementTreeItem* classes.
+Input handling is decoupled from the widget, following the **Strategy pattern** — `BrainView` delegates input interpretation to specialized objects rather than handling it in monolithic `mousePressEvent` overrides.
 
-**MNE Data**  
-Source-level data in form of MNE estimates can be visualized with the help of the *MneTreeItem* class. The class functions similarly to those defined in *SensorDataTreeItem*. The dipole orientations are not visualized, instead the MNE amplitudes are interpolated and plotted on a cortical surface reconstruction. Source-level data items are grouped under the *MeasurementTreeItem* class.
+- **`CameraController`** — A widget-independent camera that takes mouse delta values and produces a `CameraResult` struct (projection, view, and model matrices, plus camera position and up vector). It supports orbiting around a focus point, dolly zoom, and panning. Because it has no widget dependency, it can compute matrices for any viewport rectangle, which is how multi-view rendering works — `BrainView` calls `CameraController` once per pane with different viewport sizes.
+- **`RayPicker`** — Performs CPU-side ray–triangle intersection testing against all visible `BrainSurface` meshes. Given a mouse position and viewport rectangle, it unprojects a ray and walks the triangle list of each surface to find the closest intersection. The result is a `PickResult` carrying the hit point, surface key, vertex index, distance, and (if available) the FreeSurfer annotation region name and label ID. Dipole picking is also supported.
 
-**Equivalent Current Dipoles (ECDs)** 
-ECD data are visualized as 3D cones pointing in the dipole moment's direction. The *EcdDataTreeItem* class uses the *QConeGeometry* and *GeometryMultiplier* classes in order to render the data. ECD data items are grouped under the *MeasurementTreeItem* class.
+### Scene Managers
 
-**Functional Connectivity Networks** 
-Connectivity networks and their including nodes as well as edges are plotted via the *NetworkTreeItem* class. The edges can be colorized in respect to their weight and a prior defined color map. The diameters of the edges reflect the strength of their weights. The nodes can be colorized in respect to their degree and a prior defined color map. The diameter of the nodes is proportional to their degree, making it easy to spot hubs during visualization. The nodes are rendered as *QSphereGeometry* objects via instance rendering. The edges are rendered as *QCylinderGeometry* objects. In order to connect nodes with edges, a transformation matrix is computed which is passed to the edge instance rendering process in the *GeometryMultiplier* class. The transformation matrices translate, rotate and scale the cylinders (edges) to the position in between the two connecting nodes. The diameter of the cylinder is chosen to be small enough to not corrupt the visualization presented to the user. Network data items are grouped under the *MeasurementTreeItem* class.
+Scene managers encapsulate domain-specific logic that would otherwise bloat `BrainView`. Each manager owns the lifecycle of its workers and the mapping between raw data and renderable updates.
 
-## User Interaction
+- **`SensorFieldMapper`** — Computes and caches the sparse interpolation matrix that maps sensor-level data (MEG channels or EEG electrodes) onto a scalp or helmet surface mesh. When new samples arrive, it multiplies the data vector by the interpolation matrix to produce per-vertex color values.
+- **`SourceEstimateManager`** — Handles loading and streaming of MNE source estimates (STC files or real-time data). It manages the interpolation from source-space vertices to the high-resolution cortical surface mesh and drives the `SourceEstimateOverlay`.
+- **`RtSensorStreamManager`** — Lifecycle manager for `RtSensorDataController`. It encapsulates the start/stop/configure cycle of real-time sensor streaming, keeping `BrainView` clean. Internally it manages `RtSensorDataWorker` and `RtSensorInterpolationMatWorker` on background threads.
 
-The user can rotate the camera either via the arrow keys or the right mouse button. The camera can be translated via the middle mouse button. The left mouse button is reserved for the upcoming support for vertex picking. Furthermore, the user is able to change multiple parameters affecting the visualization and interpolation of the data during run time. The *Control3DView* class together with its *QTreeView* serve as user input interface. Each item in the *Data3DTreeModel* is presented in the *QTreeView* via the *Data3DTreeDelegate*. Some items hold extra information about the data and are non interactive. Others can be used to change parameters on the fly. The delegate provides the user with the appropriate editor. The table below gives a summary of which parameters the user can see and change in each item.
+### Background Workers
 
-| Class Name | Possible User Interaction | 
-|-------|-------|
-| BemTreeItem | Toggle on/off|  
-| DigitizerSetTreeItem | Toggle on/off |  
-| HemisphereTreeItem | Toggle on/off|  
-| MeasurementTreeItem | Toggle on/off |  
-| MriTreeItem | Toggle on/off |  
-| SensorSetTreeItem | Toggle on/off |  
-| SubjectTreeItem | Toggle on/off |  
-| MetaTreeItem | Toggle on/off |  
-|-------|-------|
-| AbstractTreeItem | Toggle on/off |  
-| Abstract3DTreeItem | Toggle on/off, translate, scale, change color, change transparency|  
-| AbstractMeshTreeItem | Same as Abstract3DTreeItem, change material, change inner/outer tessellation, change triangle scale|   
-|-------|-------|
-| FsAnnotTreeItem | Same as AbstractTreeItem, display file name |  
-| FsSurfaceTreeItem | Same as AbstractMeshTreeItem, change sulci/gyri color, display file name |  
-| SensorDataTreeItem | Same as AbstractTreeItem, start/stop streaming, change colormap, change threshold, toggle loop mode, change number of trials to average, change streaming interval, change interpolation method |  
-| MneTreeItem | Same as AbstractTreeItem, start/stop streaming, toggle between annotation or interpolation based visualization, change colormap, change threshold, toggle loop mode, change number of averages, change streaming interval, change interpolation method|  
-| NetworkTreeItem | Same as Abstract3DTreeItem, change weight threshold, view connectivity matrix |  
-| DigitizerTreeItem | Same as Abstract3DTreeItem |  
-| SensorPositionTreeItem | Same as Abstract3DTreeItem |  
-| EcdDataTreeItem | Same as Abstract3DTreeItem |  
-| GpuInterpolationTreeItem | Same as Abstract3DTreeItem |  
-| BemSurfaceTreeItem | Same as AbstractMeshTreeItem |  
-| SensorSurfaceTreeItem | Same as AbstractMeshTreeItem |  
-| SourceSpaceTreeItem | Same as AbstractMeshTreeItem | 
+Workers implement the **Producer–Consumer pattern** on Qt's thread infrastructure. Each worker lives on a dedicated `QThread` and communicates with the main/render thread via queued signal–slot connections. This guarantees that heavy computation (interpolation matrix construction, per-vertex color mapping) never blocks the render loop.
+
+| Worker | Role |
+|--------|------|
+| `RtSensorDataWorker` | Receives raw sensor samples, applies the interpolation matrix, and emits per-vertex color arrays ready for GPU upload |
+| `RtSensorInterpolationMatWorker` | Builds the sparse interpolation matrix mapping sensor positions to surface vertices (recomputed when sensor geometry changes) |
+| `RtSourceDataWorker` | Streams source-estimate samples and computes per-vertex STC colors |
+| `RtSourceInterpolationMatWorker` | Builds the source-space interpolation matrix |
+| `StcLoadingWorker` | Asynchronous STC file I/O — loads large `.stc` files without blocking the UI |
+
+## Usage
+
+### Quick Start — Visualizing a Brain Surface
+
+```cpp
+#include <disp3D_rhi/view/brainview.h>
+#include <disp3D_rhi/model/braintreemodel.h>
+#include <fs/surface.h>
+#include <fs/annotation.h>
+
+// Create view and model
+BrainView *view = new BrainView();
+BrainTreeModel *model = new BrainTreeModel();
+view->setModel(model);
+
+// Load FreeSurfer surfaces
+FSLIB::Surface surfLh("sample", 0, "inflated", subjectsDir);
+FSLIB::Surface surfRh("sample", 1, "inflated", subjectsDir);
+model->addSurface("sample", "lh", "inflated", surfLh);
+model->addSurface("sample", "rh", "inflated", surfRh);
+
+// Load annotations
+FSLIB::Annotation annotLh("sample", 0, "aparc", subjectsDir);
+model->addAnnotation("sample", "lh", annotLh);
+
+view->show();
+```
+
+### Adding a Connectivity Network
+
+```cpp
+#include <disp3D_rhi/model/braintreemodel.h>
+#include <connectivity/network/network.h>
+
+// After computing connectivity (see Connectivity library docs)
+QList<Network> networks = Connectivity::calculate(settings);
+model->addNetwork(networks.first(), "PLI");
+```
+
+## Shader Modes and Visualization Modes
+
+The renderer supports multiple shader pipelines (`ShaderMode`) and surface overlay modes (`VisualizationMode`):
+
+| ShaderMode | Effect |
+|------------|--------|
+| `Standard` | Default Phong shading |
+| `Holographic` | Two-sided holographic effect |
+| `Anatomical` | Curvature-based coloring |
+| `Dipole` | Dipole cone rendering |
+| `XRay` | Semi-transparent x-ray effect |
+| `ShowNormals` | Surface normals as color |
+
+| VisualizationMode | Vertex Color Source |
+|-------------------|-------------------|
+| `ModeSurface` | Curvature-derived gray tones |
+| `ModeAnnotation` | Atlas / parcellation region colors |
+| `ModeScientific` | Scientific colormap |
+| `ModeSourceEstimate` | STC amplitude overlay |

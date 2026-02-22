@@ -75,6 +75,9 @@ namespace FIFFLIB {
 namespace RTPROCESSINGLIB
 {
 
+/**
+ * @brief Lightweight filter configuration holding kernel coefficients and overlap-add state for one channel.
+ */
 typedef struct {
     FilterKernel filterKernel;
     int iRow;
@@ -210,7 +213,7 @@ RTPROCESINGSHARED_EXPORT void filterChannel(FilterObject &channelDataTime);
  * Filtering with FFT convolution and the overlap add method for continous data streams. This class will hold
  * all needed information about the last block in order to overlap it with the current one.
  *
- * @brief Filtering with FFT convolution and the overlap add method for continous data streams.
+ * @brief Applies FIR filtering via FFT-based overlap-add convolution for continuous data streams.
  */
 class RTPROCESINGSHARED_EXPORT FilterOverlapAdd
 {

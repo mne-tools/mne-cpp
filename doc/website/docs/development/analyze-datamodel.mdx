@@ -3,48 +3,266 @@ title: Creating a new data model
 sidebar_label: Data Model
 ---
 
-# Creating a new data model
+# Creating a New Data Model
 
-## Overview
+MNE Analyze uses the [Model/View](https://doc.qt.io/qt-6/model-view-programming.html) architecture from Qt to separate data storage from presentation. All data — FIFF files, annotations, averages — is represented as a **model** that views can display. This guide explains how to create a new data model for a custom data type.
 
-All of the data models used in MNE Analyze are subclassed from the same base, AbstactModel (applications/mne_analyze/libs/anShared/Model/abstactmodel.h).
+## Architecture Overview
 
-## Subclassing AbstactModel
+```
+┌──────────────────┐     ┌──────────────────┐     ┌──────────────────┐
+│    Data Loader   │────►│   Data Manager    │────►│      Views       │
+│  (loads files)   │     │ (stores models)   │     │ (display models) │
+└──────────────────┘     └──────────────────┘     └──────────────────┘
+                                │
+                         ┌──────▼──────┐
+                         │ AbstractModel│
+                         │  (your new  │
+                         │   subclass) │
+                         └─────────────┘
+```
 
-Abstract model is itself a subclass of an abstract class, QAbstactItemModel. To correctly sub-class it, all of the pure virtual functions from QAbstractItemModel and AbstactModel must be implemented. For more information on the QAbstactItemModel functions, see the [Qt documentation](https://doc.qt.io/qt-5/qabstractitemmodel.html).
+All data models inherit from `AbstractModel`, which itself extends `QAbstractItemModel`. The `DataLoader` reads files from disk and creates model instances, while the `DataManager` (via `AnalyzeData`) stores and manages them. Plugins access models through the event system.
 
-The following are the functions that need to be implemented:
+## Subclassing AbstractModel
 
-### getType()
+`AbstractModel` is located at `applications/mne_analyze/libs/anShared/Model/abstractmodel.h`. Since it extends `QAbstractItemModel`, you must implement all pure virtual functions from both classes.
 
-Returns the type of the model. These types are declared in applications/mne_analyze/libs/anShared/Utils/types.h, and when creating a new model, a new item needs to be added to enum `MODEL_TYPE`.
+### Pure Virtual Functions
 
-### data()
+#### `getType()`
+Returns the type identifier for your model. Add a new entry to the `MODEL_TYPE` enum in `applications/mne_analyze/libs/anShared/Utils/types.h`:
 
-Returns data stored in model based on the input model index and role.
+```cpp
+enum MODEL_TYPE {
+    ANSHAREDLIB_FIFFRAW_MODEL,
+    ANSHAREDLIB_ANNOTATION_MODEL,
+    ANSHAREDLIB_AVERAGING_MODEL,
+    ANSHAREDLIB_MYDATA_MODEL,    // ← add your type here
+};
+```
 
-### flags()
+Then implement:
+```cpp
+MODEL_TYPE MyDataModel::getType() const
+{
+    return MODEL_TYPE::ANSHAREDLIB_MYDATA_MODEL;
+}
+```
 
-Returns the flags for the model index passed to the function.
+#### `data()`
+Returns data for a given model index and role. This is the primary function that views call to retrieve displayable content:
 
-### index()
+```cpp
+QVariant MyDataModel::data(const QModelIndex& index, int role) const
+{
+    if (!index.isValid())
+        return QVariant();
 
-Return an index for the data based on the input row and column.
+    if (role == Qt::DisplayRole) {
+        // Return data based on row and column
+        return m_data.at(index.row()).at(index.column());
+    }
 
-### parent()
+    return QVariant();
+}
+```
 
-Return a model index to the parent of this model. IF there is no parent, return an empty QModelIndex
+#### `flags()`
+Returns item flags (selectable, editable, enabled, etc.):
 
-### rowCount()
+```cpp
+Qt::ItemFlags MyDataModel::flags(const QModelIndex& index) const
+{
+    if (!index.isValid())
+        return Qt::NoItemFlags;
 
-Return an appropriate value depending on how you are organizing or representing your data. The FiffRawViewModel, for example, returns the amount of channels for which it has data.
+    return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+}
+```
 
-### columnCount()
+#### `index()`
+Creates and returns a `QModelIndex` for the given row, column, and parent:
 
-Return an appropriate value depending on how you are organizing or representing your data. The Annotation Model, for example, returns the number of columns of data it has to display.
+```cpp
+QModelIndex MyDataModel::index(int row, int column, const QModelIndex& parent) const
+{
+    Q_UNUSED(parent)
+    if (row < 0 || row >= rowCount() || column < 0 || column >= columnCount())
+        return QModelIndex();
 
-## Loading/Adding to Data Loader and Data Manager
+    return createIndex(row, column);
+}
+```
 
-If your data model will be loading data from a file, make sure that file type is included in DataLoader::loadFilePath() so the user can load in that file type. To save to a file, implement the function saveToFile() from the AbstractModel, and ensure that your file type is included in DataLoader::onSaveFilePressed().
+#### `parent()`
+Returns the parent index. For flat (non-hierarchical) models, return an empty index:
 
-To add your model to the data manager, add it to either addModel or loadModel in AnalyzeData.h, depending on whether you will be loading data from inside the application or from a file. You need to define the type of data your model corresponds to, bidsviewmodel.h for possible types, or add a new one.
+```cpp
+QModelIndex MyDataModel::parent(const QModelIndex& index) const
+{
+    Q_UNUSED(index)
+    return QModelIndex();
+}
+```
+
+#### `rowCount()`
+Returns the number of rows. The meaning depends on your data — for example, the `FiffRawViewModel` returns the number of channels:
+
+```cpp
+int MyDataModel::rowCount(const QModelIndex& parent) const
+{
+    Q_UNUSED(parent)
+    return m_data.size();
+}
+```
+
+#### `columnCount()`
+Returns the number of columns:
+
+```cpp
+int MyDataModel::columnCount(const QModelIndex& parent) const
+{
+    Q_UNUSED(parent)
+    return m_iNumColumns;
+}
+```
+
+### Optional: `saveToFile()`
+
+If your model supports saving data back to disk, override `saveToFile()` from `AbstractModel`:
+
+```cpp
+bool MyDataModel::saveToFile(const QString& sPath)
+{
+    QFile file(sPath);
+    if (!file.open(QIODevice::WriteOnly)) {
+        qWarning() << "[MyDataModel::saveToFile] Could not open" << sPath;
+        return false;
+    }
+    // Write your data format
+    // ...
+    return true;
+}
+```
+
+## Registering with the Data Loader and Data Manager
+
+### Loading from Files
+
+To allow users to load your data type from a file:
+
+1. In `DataLoader::loadFilePath()`, add support for your file extension so that the file dialog recognizes it.
+2. In the load handler, create a new instance of your model and pass it to the data manager.
+
+### Adding Models Programmatically
+
+To create a model from within a plugin (e.g., computed results rather than files):
+
+1. In `AnalyzeData.h`, extend `addModel()` to handle your `MODEL_TYPE`.
+2. Specify the data type your model corresponds to — see `bidsviewmodel.h` for the available types, or add a new one.
+
+### Saving to Files
+
+To support saving, ensure your file extension is included in `DataLoader::onSaveFilePressed()`, and implement `saveToFile()` in your model.
+
+## Complete Minimal Example
+
+```cpp
+// mydatamodel.h
+#pragma once
+
+#include "../Utils/types.h"
+#include "abstractmodel.h"
+
+class MyDataModel : public ANSHAREDLIB::AbstractModel
+{
+    Q_OBJECT
+
+public:
+    MyDataModel(const QList<QStringList>& data, QObject* parent = nullptr);
+
+    // AbstractModel
+    MODEL_TYPE getType() const override;
+
+    // QAbstractItemModel
+    QVariant data(const QModelIndex& index, int role) const override;
+    Qt::ItemFlags flags(const QModelIndex& index) const override;
+    QModelIndex index(int row, int col, const QModelIndex& parent = QModelIndex()) const override;
+    QModelIndex parent(const QModelIndex& index) const override;
+    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+
+private:
+    QList<QStringList> m_data;
+};
+```
+
+```cpp
+// mydatamodel.cpp
+#include "mydatamodel.h"
+
+MyDataModel::MyDataModel(const QList<QStringList>& data, QObject* parent)
+    : AbstractModel(parent)
+    , m_data(data)
+{
+}
+
+MODEL_TYPE MyDataModel::getType() const
+{
+    return MODEL_TYPE::ANSHAREDLIB_MYDATA_MODEL;
+}
+
+QVariant MyDataModel::data(const QModelIndex& index, int role) const
+{
+    if (!index.isValid() || role != Qt::DisplayRole)
+        return QVariant();
+
+    return m_data.at(index.row()).at(index.column());
+}
+
+Qt::ItemFlags MyDataModel::flags(const QModelIndex& index) const
+{
+    return index.isValid() ? (Qt::ItemIsEnabled | Qt::ItemIsSelectable) : Qt::NoItemFlags;
+}
+
+QModelIndex MyDataModel::index(int row, int col, const QModelIndex& parent) const
+{
+    Q_UNUSED(parent)
+    return createIndex(row, col);
+}
+
+QModelIndex MyDataModel::parent(const QModelIndex& index) const
+{
+    Q_UNUSED(index)
+    return QModelIndex();
+}
+
+int MyDataModel::rowCount(const QModelIndex& parent) const
+{
+    Q_UNUSED(parent)
+    return m_data.size();
+}
+
+int MyDataModel::columnCount(const QModelIndex& parent) const
+{
+    Q_UNUSED(parent)
+    return m_data.isEmpty() ? 0 : m_data.first().size();
+}
+```
+
+## Using Your Model in a Plugin
+
+Once registered, your plugin can create and display the model:
+
+```cpp
+// In your plugin's handleEvent() or a load function:
+QList<QStringList> data = parseMyFile(sFilePath);
+auto pModel = QSharedPointer<MyDataModel>::create(data);
+
+// Notify MNE Analyze about the new model via the event system
+QVariant varModel = QVariant::fromValue(pModel);
+m_pCommu->publishEvent(EVENT_TYPE::NEW_MODEL_AVAILABLE, varModel);
+```
+
+Views that are subscribed to `NEW_MODEL_AVAILABLE` will then receive and display the model.

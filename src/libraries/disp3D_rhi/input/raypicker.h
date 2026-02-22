@@ -57,6 +57,8 @@ class DipoleObject;
 
 //=============================================================================================================
 /**
+ * @brief Result of a ray–mesh intersection test containing the hit point, triangle index, and distance.
+ *
  * Describes the result of a ray-pick operation.
  */
 struct PickResult

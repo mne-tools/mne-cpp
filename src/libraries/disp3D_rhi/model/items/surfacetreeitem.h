@@ -46,6 +46,9 @@
 #include <fs/surface.h>
 #include <fs/annotation.h>
 
+/**
+ * @brief Tree item representing a FreeSurfer cortical surface in the 3-D scene hierarchy.
+ */
 class DISP3DRHISHARED_EXPORT SurfaceTreeItem : public AbstractTreeItem
 {
 public:

@@ -12,6 +12,47 @@ This page covers the definitions of different coordinate systems employed in MNE
 
 The coordinate systems used in MNE software (and FreeSurfer) and their relationships are described below. Except for the *sensor coordinates*, all of the coordinate systems are Cartesian and have the "RAS" (Right-Anterior-Superior) orientation, i.e., the $x$ axis points to the right, the $y$ axis to the front, and the $z$ axis up.
 
+The following diagram shows the relationships between all coordinate systems and the transformations connecting them:
+
+```mermaid
+flowchart LR
+    subgraph sg1 ["<b>MEG / EEG Domain</b>"]
+        direction LR
+        SENSOR["<b>Sensor</b><br/><i style='font-weight:300'>coordinates</i>"]
+        DEVICE["<b>Device</b><br/><i style='font-weight:300'>coordinates</i>"]
+        HEAD["<b>Head</b><br/><i style='font-weight:300'>coordinates</i>"]
+        SENSOR -->|"T_s₁ … T_sₙ"| DEVICE
+        DEVICE -->|"T₁"| HEAD
+    end
+
+    subgraph sg2 ["<b>MRI Domain</b>"]
+        direction LR
+        VOXEL["<b>MRI Voxel</b><br/><i style='font-weight:300'>coordinates</i>"]
+        SRAS["<b>Surface RAS</b><br/><i style='font-weight:300'>= MRI coords</i>"]
+        MNI["<b>MNI Talairach</b><br/><i style='font-weight:300'>coordinates</i>"]
+        FSTAL["<b>FreeSurfer<br/>Talairach</b><br/><i style='font-weight:300'>coordinates</i>"]
+        VOXEL -->|"T₃"| SRAS
+        SRAS -->|"T₄"| MNI
+        MNI -->|"T₋ / T₊"| FSTAL
+    end
+
+    HEAD -->|"<b>T₂</b>"| SRAS
+
+    classDef meeg fill:#cce5ff,stroke:#2874a6,stroke-width:2px,color:#0c3c60,rx:8,ry:8
+    classDef mri fill:#d4edda,stroke:#28a745,stroke-width:2px,color:#155724,rx:8,ry:8
+
+    class SENSOR,DEVICE,HEAD meeg
+    class VOXEL,SRAS,MNI,FSTAL mri
+
+    style sg1 fill:#eaf2fb,stroke:#2874a6,stroke-width:2px,color:#0c3c60,rx:10,ry:10
+    style sg2 fill:#eaf7ed,stroke:#28a745,stroke-width:2px,color:#155724,rx:10,ry:10
+
+    linkStyle default stroke:#6c757d,stroke-width:1.5px
+    linkStyle 4 stroke:#d4a017,stroke-width:2.5px
+```
+
+*Figure: MEG/EEG and MRI coordinate systems and the transformations between them. $T_1$ (Device → Head) is determined during MEG acquisition via HPI coils. $T_2$ (Head → MRI) is established during coregistration. $T_3$ and $T_4$ are provided by FreeSurfer.*
+
 ### Coordinate Systems Related to MEG/EEG Data
 
 **Head coordinates**

@@ -62,6 +62,9 @@
 namespace MNELIB
 {
 
+/**
+ * @brief Artifact rejection thresholds and flags for each channel type (grad, mag, eeg, eog) used during epoch dropping
+ */
 struct ArtifactRejectionData {
     bool bRejected = false;
     Eigen::RowVectorXd data;

@@ -118,11 +118,13 @@ extern "C" {
 /*
  * Complex data
  */
+/** @brief Single-precision complex number (re, im) used in MNE-C legacy computations. */
 typedef struct {
   float re;
   float im;
 } *mneComplex,**mneComplexMatrix,mneComplexRec;
 
+/** @brief Double-precision complex number (re, im) used in MNE-C legacy computations. */
 typedef struct {
   double re;
   double im;
@@ -132,6 +134,7 @@ typedef void (*mneUserFreeFunc)(void *);  /* General purpose */
 typedef fiffSparseMatrix mneSparseMatrix;
 typedef fiffSparseMatrixRec mneSparseMatrixRec;
 
+/** @brief Source-space patch descriptor with member vertices, area, and average normal direction. */
 typedef struct {
   int   vert;			/* Which vertex does this apply to */
   int   *memb_vert;		/* Which vertices constitute the patch? */
@@ -141,6 +144,7 @@ typedef struct {
   float dev_nn;			/* Average deviation of the patch normals from the average normal */
 } *mnePatchInfo,mnePatchInfoRec;
 
+/** @brief Nearest in-use vertex record linking each vertex to its closest active source-space vertex and patch. */
 typedef struct {		/* This is used in the patch definitions */
   int   vert;			/* Number of this vertex (to enable sorting) */
   int   nearest;		/* Nearest 'inuse' vertex */
@@ -148,6 +152,7 @@ typedef struct {		/* This is used in the patch definitions */
   mnePatchInfo patch;           /* The patch information record for the patch this vertex belongs to */
 } *mneNearest,mneNearestRec;
 
+/** @brief Triangle descriptor with vertex pointers, edge vectors, normal, area, and centroid for BEM/surface computations. */
 typedef struct {
   int   *vert;           	/* Triangle vertices (pointers to the itris member of the associated mneSurface) */
   float *r1,*r2,*r3;           	/* Triangle vertex locations (pointers to the rr member of the associated mneSurface) */
@@ -158,6 +163,7 @@ typedef struct {
   float ex[3],ey[3];		/* Other unit vectors (used by BEM calculations) */
 } *mneTriangle,mneTriangleRec;	/* Triangle data */
 
+/** @brief MRI volume geometry descriptor (voxel dimensions, RAS directions, center) as used by FreeSurfer. */
 typedef struct {
   int            valid;		             /* Is the information below valid */
   int            width,height,depth;	     /* Size of the stack */
@@ -175,6 +181,7 @@ typedef struct {
 #define MNE_SOURCE_SPACE_VOLUME   2 /* 3D volume source space */
 #define MNE_SOURCE_SPACE_DISCRETE 3 /* Discrete points */
 
+/** @brief Surface or volume source-space descriptor with vertex coordinates, triangulation, patches, and MRI volume information. */
 typedef struct {		    /* This defines a source space or a surface */
   int              type;	    /* Is this a volume or a surface */
   char             *subject;	    /* Name (id) of the subject */
@@ -272,6 +279,7 @@ typedef mneSurfaceOrVolumeRec mneVolumeRec;
 //  mneUserFreeFunc  user_data_free;  /* Function to set the above free */
 //} *mneSurfacePatch,mneSurfacePatchRec;
 
+/** @brief Dense named matrix with optional row and column name lists for channel-level data. */
 typedef struct {		/* Matrix specification with a channel list */
   int   nrow;			/* Number of rows */
   int   ncol;			/* Number of columns */
@@ -280,6 +288,7 @@ typedef struct {		/* Matrix specification with a channel list */
   float **data;                  /* The data itself (dense) */
 } *mneNamedMatrix,mneNamedMatrixRec;
 
+/** @brief Sparse matrix with named rows and columns for derivation and projection data. */
 typedef struct {		/* Matrix specification with a channel list */
   int   nrow;			/* Number of rows (same as in data) */
   int   ncol;			/* Number of columns (same as in data) */
@@ -288,12 +297,14 @@ typedef struct {		/* Matrix specification with a channel list */
   mneSparseMatrix data;		/* The data itself (sparse) */
 } *mneSparseNamedMatrix,mneSparseNamedMatrixRec;
 
+/** @brief Named vector associating a float array with a list of channel or element names. */
 typedef struct {		/* Vector specification with a channel list */
   int    nvec;			/* Number of elements */
   char   **names;		/* Name list for the elements */
   float  *data;			/* The data itself */
 } *mneNamedVector,mneNamedVectorRec;
 
+/** @brief Single SSP/PCA projection vector item with activation state and channel type flags. */
 typedef struct {		/* One linear projection item */
   mneNamedMatrix vecs;          /* The original projection vectors */
   int            nvec;          /* Number of vectors = vecs->nrow */
@@ -305,6 +316,7 @@ typedef struct {		/* One linear projection item */
   int            has_eeg;	/* Does it have EEG channels? */
 } *mneProjItem,mneProjItemRec;
 
+/** @brief Collection of SSP/PCA projection items with the orthogonalised projector matrix. */
 typedef struct {		/* Collection of projection items and the projector itself */
   mneProjItem    *items;        /* The projection items */
   int            nitems;        /* Number of items */
@@ -314,6 +326,7 @@ typedef struct {		/* Collection of projection items and the projector itself */
   float          **proj_data;	/* The orthogonalized projection vectors picked and orthogonalized from the original data */
 } *mneProjOp,mneProjOpRec;
 
+/** @brief Signal Space Separation (SSS) parameters including expansion origin, orders, and component usage. */
 typedef struct {
   int   job;			/* Value of FIFF_SSS_JOB tag */
   int   coord_frame;		/* Coordinate frame */
@@ -414,6 +427,7 @@ typedef struct {
 //  mneProjOp      proj;		          /* The associated projection operator */
 //} *mneInverseOperator,mneInverseOperatorRec;
 
+/** @brief W-file data record holding vertex numbers and associated floating-point values for one surface. */
 typedef struct {		/* For storing the wdata */
   int   id;			/* Surface id these data belong to */
   int   kind;			/* What kind of data */
@@ -423,6 +437,7 @@ typedef struct {		/* For storing the wdata */
   float *vals;			/* The values */
 } *mneWdata,mneWdataRec;
 
+/** @brief Source-estimate time-course (STC) data with vertex numbers and a time-by-vertex data matrix. */
 typedef struct {
   int   id;			/* Surface id these data belong to */
   int   kind;			/* What kind of data */
@@ -466,6 +481,7 @@ typedef struct {
 //				 * directory */
 //} mneRawInfoRec, *mneRawInfo;
 
+/** @brief Spatiotemporal map record with per-vertex, per-time-point data and optional vector values. */
 typedef struct {		/* Spatiotemporal map */
   int kind;			/* What kind of data */
   int coord_frame;		/* Coordinate frame for vector values */
@@ -478,6 +494,7 @@ typedef struct {		/* Spatiotemporal map */
   float **data;			/* The data values (time by time) */
 } mneMapRec, *mneMap;
 
+/** @brief Single viewport in a channel layout defining position, size, and assigned channel names. */
 typedef struct {				     /* Plotter layout port definition */
   int   portno;					     /* Running number of this viewport */
   int   invert;					     /* Invert the signal coming to this port */
@@ -486,6 +503,7 @@ typedef struct {				     /* Plotter layout port definition */
   int   match;					     /* Does this port match with our present channel? */
 } mneLayoutPortRec,*mneLayoutPort;
 
+/** @brief Complete channel layout with viewport array and coordinate limits for signal plotting. */
 typedef struct {				     /* Plotter layout */
   char          *name;				     /* File where this came from */
   float         xmin,xmax,ymin,ymax;		     /* The VDC limits */
@@ -503,6 +521,7 @@ typedef struct {				     /* Plotter layout */
 #define MNE_CH_SELECTION_FILE    1
 #define MNE_CH_SELECTION_USER    2
 
+/** @brief Named channel selection group with regex definitions and resolved channel picks. */
 typedef struct {
   char *name;			/* Name of this selection */
   char **chdef;			/* Channel definitions (may contain regular expressions) */
@@ -518,6 +537,7 @@ typedef struct {
   int  kind;			/* Loaded from file or created here? */
 } *mneChSelection,mneChSelectionRec;
 
+/** @brief Named set of channel selection groups with a current-selection index. */
 typedef struct {
   char        *name;		/* Name of this set */
   mneChSelection *sels;		/* These are the selections */
@@ -525,6 +545,7 @@ typedef struct {
   int         current;		/* Which is active now? */
 } *mneChSelectionSet, mneChSelectionSetRec;
 
+/** @brief Single event marker with sample position, transition values, and optional comment. */
 typedef struct {
   unsigned int from;		/* Source transition value */
   unsigned int to;		/* Destination transition value */
@@ -534,11 +555,13 @@ typedef struct {
   char         *comment;	/* Event comment */
 } *mneEvent,mneEventRec;
 
+/** @brief Ordered list of mneEvent markers associated with a raw data file. */
 typedef struct {		/* List of the above. */
   mneEvent     *events;
   int          nevent;
 } *mneEventList,mneEventListRec;
 
+/** @brief Filter parameter definition specifying band-pass, taper, and EOG filter settings for raw data. */
 typedef struct {
   int   filter_on;		/* Is it on? */
   int   size;			/* Length in samples (must be a power of 2) */
@@ -578,6 +601,7 @@ typedef struct {
  */
 #define MNE_4DV_COMP1           101
 
+/** @brief Single CTF compensation data set with pre/post-selection matrices and intermediate buffers. */
 typedef struct {
   int             kind;		     /* The compensation kind (CTF) */
   int             mne_kind;	     /* Our kind */
@@ -590,6 +614,7 @@ typedef struct {
   float           *postsel_data;
 } *mneCTFcompData,mneCTFcompDataRec;
 
+/** @brief Collection of CTF compensation data sets with channel info and undo/current compensation state. */
 typedef struct {
   mneCTFcompData *comps;	/* All available compensation data sets */
   int            ncomp;		/* How many? */
@@ -600,6 +625,7 @@ typedef struct {
 				 * taking into account channels presently available */
 } *mneCTFcompDataSet,mneCTFcompDataSetRec;
 
+/** @brief Single channel derivation item with sparse derivation matrix, validity flags, and source file info. */
 typedef struct {		        /* One item in a derivation data set */
   char                 *filename;       /* Source file name */
   char                 *shortname;      /* Short nickname for this derivation */
@@ -611,11 +637,13 @@ typedef struct {		        /* One item in a derivation data set */
   fiffChInfo           chs;		/* First matching channel info in each derivation */
 } *mneDeriv,mneDerivRec;
 
+/** @brief Collection of channel derivation items. */
 typedef struct {		        /* A collection of derivations */
   int      nderiv;		        /* How many? */
   mneDeriv *derivs;			/* Pointers to the items */
 } *mneDerivSet,mneDerivSetRec;
 
+/** @brief Comprehensive raw data handle with file reference, buffers, compensation, filter, projection, and derivation state. */
 typedef struct {			/* A comprehensive raw data structure */
   char             *filename;           /* This is our file */
   fiffFile         file;	        
@@ -657,6 +685,7 @@ typedef struct {			/* A comprehensive raw data structure */
   mneUserFreeFunc  user_free;		/* How this is freed */
 } *mneRawData,mneRawDataRec;		
 
+/** @brief Per-data-set MNE computation results: whitened data projection, predicted data, SNR, and regularisation. */
 typedef struct {		 /* Data associated with MNE computations for each mneMeasDataSet */
   float **datap;		 /* Projection of the whitened data onto the field eigenvectors */
   float **predicted;		 /* The predicted data */
@@ -665,6 +694,7 @@ typedef struct {		 /* Data associated with MNE computations for each mneMeasData
   float *lambda2;                /* Regularization parameter to be used (as a function of time) */      
 } *mneMneData,mneMneDataRec;
 
+/** @brief Single measurement data set with measured, projected, filtered, and whitened data arrays. */
 typedef struct {		 /* One data set, used in mneMeasData */
   /*
    * These are unique to each data set
@@ -687,6 +717,7 @@ typedef struct {		 /* One data set, used in mneMeasData */
   mneUserFreeFunc user_data_free;/* Function to set the above free */
 } *mneMeasDataSet,mneMeasDataSetRec;
 
+/** @brief Top-level measurement data container with channel info, transforms, inverse operator, and loaded data sets. */
 typedef struct {		 /* Measurement data representation in MNE calculations */
   /*
    * These are common to all data sets
@@ -720,6 +751,7 @@ typedef struct {		 /* Measurement data representation in MNE calculations */
   mneMeasDataSet     current;	 /* Which is the current one */
 } *mneMeasData,mneMeasDataRec;
 
+/** @brief Single parcellation region with name, color-table index, RGBA color, and vertex membership list. */
 typedef struct {		/* Identifier for the automatic parcellation */
   char  *name;			/* Name of this area */
   int   index;			/* Index in the parcellation */
@@ -729,6 +761,7 @@ typedef struct {		/* Identifier for the automatic parcellation */
   int   nvert;
 } *mneParc,mneParcRec;
 
+/** @brief Set of parcellation regions with per-vertex region assignment. */
 typedef struct {		/* A set of the above */
   int       *vert;		/* The assignment of each vertex */
   int       nvert;		/* How many */
@@ -736,6 +769,7 @@ typedef struct {		/* A set of the above */
   int       nparc;
 } *mneParcSet,mneParcSetRec;
 
+/** @brief Complete cortical parcellation data containing left and right hemisphere parcel sets. */
 typedef struct {
   mneParcSet   lh_parc;
   mneParcSet   rh_parc;
@@ -756,6 +790,7 @@ typedef struct {
 #define MNE_MRI_ALL_FRAMES    -1	     /* Load all frames */
 #define MNE_MRI_NO_FRAMES     -2	     /* Do not load data at all */
 
+/** @brief Union for a single MRI voxel value in unsigned-char, short, int, or float representation. */
 typedef union {
   unsigned char uval;
   short         sval;
@@ -763,6 +798,7 @@ typedef union {
   float         fval;
 } mneMRIvoxelVal;
 
+/** @brief Union of typed 3-D voxel slice arrays for different MRI data representations. */
 typedef union {
   unsigned char   ***uslices;	             /* Different types of voxels */
   short           ***sslices;
@@ -770,6 +806,7 @@ typedef union {
   float           ***fslices;
 } mneMRIvoxels;
 
+/** @brief Single MRI volume frame with voxel data, dimensions, and typed slice accessors. */
 typedef struct {
   int             type;			     /* Data type duplicated from mneMRIdata */
   int             width;		     /* Size of the stack duplicated from mneMRIdata*/
@@ -783,6 +820,7 @@ typedef struct {
   mneUserFreeFunc user_data_free;            /* Function to set the above free */
 } *mneMRIvolume,mneMRIvolumeRec;	     /* One volume of data */
 
+/** @brief MRI data container for mgh/mgz files with geometry, coordinate transforms, volume frames, and scan parameters. */
 typedef struct {
   char           *filename;                  /* Name of the source file */
   int            version;	             /* Version number of the data file */
@@ -820,6 +858,7 @@ typedef struct {
 /*
  * Wavelet transform structures
  */
+/** @brief Set of pre-computed wavelet filters at multiple frequencies with optional FFT representations. */
 typedef struct {
   float sfreq;			/* The sampling frequency */
   int   nfreq;		        /* How many frequencies */
@@ -836,6 +875,7 @@ typedef struct {
   mneUserFreeFunc  user_data_free;  /* Function to set the above free */
 } *mneWaveletSet,mneWaveletSetRec;
 
+/** @brief Multi-channel wavelet transform result storing time-frequency decomposition data. */
 typedef struct {                /* Used to store the wavelet transform */
   int   type;                   /* What is stored here? */
   int   nchan;			/* Number of channels */

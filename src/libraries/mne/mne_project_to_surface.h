@@ -77,7 +77,7 @@ class MNESurface;
 /**
  * Description of what this class is intended to do (in detail).
  *
- * @brief Brief description of this class.
+ * @brief Projects 3-D points onto a triangulated surface mesh and returns nearest vertices and distances
  */
 
 class MNESHARED_EXPORT MNEProjectToSurface

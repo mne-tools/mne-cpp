@@ -132,12 +132,14 @@ void mne_free_cmatrix_36 (float **m)
 namespace MNELIB
 {
 
+/** @brief Single element of a legacy ring buffer holding a float array and its matrix back-pointer. */
 typedef struct {
     int   size;		        /* Size of this buffer in floats */
     float *data;			/* The allocated buffer */
     float ***datap;		/* The matrix which uses this */
 } *ringBufBuf_36,ringBufBufRec_36;
 
+/** @brief Legacy ring buffer managing a circular array of ringBufBuf_36 elements. */
 typedef struct {
     ringBufBuf_36 *bufs;
     int        nbuf;
@@ -270,6 +272,7 @@ void mne_channel_names_to_name_list(const QList<FIFFLIB::FiffChInfo>& chs,
 namespace MNELIB
 {
 
+/** @brief Pre-computed frequency-domain filter state used for FFT-based raw data filtering. */
 typedef struct {
     float *freq_resp;		/* Frequency response */
     float *eog_freq_resp;		/* Frequency response (EOG) */
@@ -568,12 +571,14 @@ void mne_create_filter_response(mneFilterDef    filter,
 namespace MNELIB
 {
 
+/** @brief Single element of a ring buffer holding a float array and its matrix back-pointer. */
 typedef struct {
     int   size;		        /* Size of this buffer in floats */
     float *data;			/* The allocated buffer */
     float ***datap;		/* The matrix which uses this */
 } *ringBufBuf,ringBufBufRec;
 
+/** @brief Circular ring buffer managing a set of ringBufBuf elements for raw data I/O. */
 typedef struct {
     ringBufBuf *bufs;
     int        nbuf;

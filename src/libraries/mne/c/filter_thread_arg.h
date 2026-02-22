@@ -71,7 +71,7 @@ namespace MNELIB
 /**
  * Implements a Filter Thread Argument (Replaces *filterThreadArg,filterThreadArgRec; struct of MNE-C filter_source_space.c).
  *
- * @brief Filter Thread Argument Description
+ * @brief Thread-local arguments for parallel raw data filtering (channel range, filter kernel, buffer).
  */
 class MNESHARED_EXPORT FilterThreadArg
 {

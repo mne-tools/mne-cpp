@@ -67,6 +67,8 @@ namespace EVENTSINTERNAL {
 
 //=============================================================================================================
 /**
+ * @brief Simple RGB triplet for color-coding event groups
+ *
  * A holder for the color of an event group.
  *
  * This class interacts well with QtColor, since it has constructors dependant on rgb type data.

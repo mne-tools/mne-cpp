@@ -79,6 +79,8 @@ public:
     // ── Result structs ────────────────────────────────────────────────
 
     /**
+     * @brief Return value bundling loaded sensor geometry, labels, and channel-to-sensor mapping.
+     *
      * Result of reading a FIF file for sensor information.
      */
     struct SensorLoadResult

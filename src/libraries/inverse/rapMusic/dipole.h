@@ -51,6 +51,8 @@ class Dipole;
 /**
  * Declares a DipolePair structure consisting of two correlated dipoles which are the result of the RAP MUSIC
  * searching algorithm.
+ *
+ * @brief Pair of correlated dipole indices and orientations found by the RAP MUSIC scanning step
  */
 template<typename T>
 struct DipolePair
@@ -68,7 +70,7 @@ struct DipolePair
 /**
  * DECLARE CLASS Dipoles
  *
- * @brief ToDo
+ * @brief Stores position, orientation, and correlation of a single current dipole estimated by RAP MUSIC
  */
 template<class T>
 class Dipole

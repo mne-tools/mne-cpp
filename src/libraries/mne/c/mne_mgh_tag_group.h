@@ -73,7 +73,7 @@ class MneMghTag;
 /**
  * Replaces **mneMGHtagGroup,mneMGHtagGroupRec struct (mne_mgh_mri_io.c).
  *
- * @brief The MneMghTagGroup class.
+ * @brief Collection of MneMghTag entries from a FreeSurfer MGH/MGZ file footer.
  */
 class MNESHARED_EXPORT MneMghTagGroup
 {

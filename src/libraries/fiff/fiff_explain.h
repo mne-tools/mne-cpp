@@ -55,6 +55,9 @@ namespace FIFFLIB
 // Explaination Type
 //=============================================================================================================
 
+/**
+ * @brief FIFF tag explanation record mapping a FIFF tag kind to its human-readable description text.
+ */
 typedef struct {
   int kind;         /* What is this explanation good for? */
   const char *text;

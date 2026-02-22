@@ -85,6 +85,8 @@ namespace MNELIB
 //=========================================================================================================
 /**
  * Gain matrix output data for one region, used for clustering
+ *
+ * @brief Output of a multi-threaded inverse operator assembly step for a single cortical region
  */
 struct RegionMTOut
 {
@@ -99,6 +101,8 @@ struct RegionMTOut
 //=========================================================================================================
 /**
  * Gain matrix input data for one region, used for clustering
+ *
+ * @brief Input parameters for multi-threaded inverse operator assembly on a single cortical region
  */
 struct RegionMT
 {

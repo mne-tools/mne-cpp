@@ -52,6 +52,13 @@ class QRhi;
 class QRhiBuffer;
 class QRhiResourceUpdateBatch;
 
+//=============================================================================================================
+/**
+ * Renderable dipole object that builds instanced arrow geometry from an ECDSet
+ * and manages GPU buffers for QRhi-based rendering.
+ *
+ * @brief Renderable dipole arrow set with instanced GPU rendering for QRhi.
+ */
 class DISP3DRHISHARED_EXPORT DipoleObject
 {
 public:
@@ -93,6 +100,7 @@ public:
 private:
     void createGeometry();
     
+    /** @brief QRhi vertex, index, and instance buffers for dipole arrow GPU rendering. */
     struct GpuBuffers;
     std::unique_ptr<GpuBuffers> m_gpu;
 
@@ -100,11 +108,17 @@ private:
     int m_instanceCount = 0;
     bool m_visible = true;
     
+    /**
+     * @brief Interleaved vertex attributes for a single dipole arrow mesh.
+     */
     struct VertexData {
         float x, y, z;
         float nx, ny, nz;
     };
     
+    /**
+     * @brief Per-instance transform and color for GPU-instanced dipole rendering.
+     */
     // Instance data: Model Matrix (4x4) + Color (vec4)
     struct InstanceData {
         float model[16]; 

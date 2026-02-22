@@ -45,6 +45,9 @@
 #include "abstracttreeitem.h"
 #include <mne/mne_bem_surface.h>
 
+/**
+ * @brief Tree item representing a BEM surface layer in the 3-D scene hierarchy.
+ */
 class DISP3DRHISHARED_EXPORT BemTreeItem : public AbstractTreeItem
 {
 public:

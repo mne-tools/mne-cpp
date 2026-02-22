@@ -74,7 +74,7 @@ class MneMshLight;
 /**
  * Replaces *mshLightSet,mshLightSetRec struct (analyze_types.c).
  *
- * @brief The MneMshLightSet class.
+ * @brief Collection of MneMshLight objects defining the lighting setup for 3-D rendering.
  */
 class MNESHARED_EXPORT MneMshLightSet
 {

@@ -31,7 +31,7 @@ namespace COMMUNICATIONLIB
 
 //=============================================================================================================
 /**
- *
+ * @brief Registry of available commands; dispatches parsed command strings to the matching Command handler
  */
 class COMMUNICATIONSHARED_EXPORT CommandManager : public QObject, public UTILSLIB::IObserver
 {

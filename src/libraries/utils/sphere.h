@@ -58,6 +58,7 @@ namespace UTILSLIB
 // TYPEDEFS
 //=============================================================================================================
 
+/** @brief Workspace for sphere-fitting optimisation, holding 3-D point coordinates and a report flag. */
 typedef struct {
     Eigen::MatrixXf rr;
      bool   report;

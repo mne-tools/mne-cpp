@@ -67,6 +67,8 @@ class BrainSurface;
  * The class operates on surface and contour surfaces stored in the caller's
  * surface map. It reads from / writes to those surfaces but does not own
  * them, keeping ownership in the BrainView.
+ *
+ * @brief Sensor-to-surface field mapper that interpolates MEG/EEG measurements onto cortical meshes and generates iso-contour overlays.
  */
 class DISP3DRHISHARED_EXPORT SensorFieldMapper
 {

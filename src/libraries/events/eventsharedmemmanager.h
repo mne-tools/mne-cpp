@@ -84,6 +84,8 @@ enum EventUpdateType{ NULL_EVENT, NEW_EVENT, DELETE_EVENT};
 const std::string EventUpdateTypeString[3] = {"Null Event", "New Event", "Delete Event"};
 
 /**
+ * @brief Serializable delta record describing a single event creation, deletion, or modification for shared-memory transport
+ *
  * The EventUpdate class serves as a minimal class definition to store updates in the shared memory buffer.
  * The updates are events that happened and need to be processed by a shared memory reader object.
  */
@@ -155,6 +157,8 @@ protected:
 };
 
 /**
+ * @brief Publishes and receives event change notifications between processes via a shared-memory ring buffer
+ *
  * The EventSharedMemManager class
  */
 class EventSharedMemManager

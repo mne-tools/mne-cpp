@@ -66,7 +66,7 @@ namespace COMMUNICATIONLIB
 /**
  * The real-time command client class provides an interface to communicate with the command port 4217 of a running mne_rt_server.
  *
- * @brief Real-time command client
+ * @brief TCP client for sending JSON commands to and receiving responses from mne_rt_server (port 4217)
  */
 class COMMUNICATIONSHARED_EXPORT RtCmdClient : public QTcpSocket
 {

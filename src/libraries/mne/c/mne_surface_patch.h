@@ -75,7 +75,7 @@ class MneSourceSpaceOld;
 /**
  * Replaces *mneSurfacePatch,mneSurfacePatchRec struct (mne_types.c).
  *
- * @brief The MneSurfacePatch class.
+ * @brief Cortical surface patch linking a set of vertices to a single source space point.
  */
 class MNESHARED_EXPORT MneSurfacePatch
 {

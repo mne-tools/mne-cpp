@@ -71,7 +71,7 @@ namespace MNELIB
 /**
  * Replaces *mshLight,mshLightRec struct (analyze_types.c).
  *
- * @brief The MneMshLight class.
+ * @brief Single light source with position, color, and state for 3-D surface rendering.
  */
 class MNESHARED_EXPORT MneMshLight
 {

@@ -67,7 +67,7 @@ namespace MNELIB
 /**
  * Replaces *mshPicked, mshPickedRec struct (analyze_types.c).
  *
- * @brief The MneMshColorScaleDef class.
+ * @brief Color scale definition with value range and color mapping for surface visualization.
  */
 class MNESHARED_EXPORT MneMshColorScaleDef
 {

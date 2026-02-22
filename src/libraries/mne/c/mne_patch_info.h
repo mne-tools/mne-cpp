@@ -72,7 +72,7 @@ class MneSourceSpaceOld;
 /**
  * Implements an MNE Patch Information (Replaces *mnePatchInfo,mnePatchInfoRec; struct of MNE-C mne_types.h).
  *
- * @brief One item in a derivation data set
+ * @brief Patch information for a single source space point including vertex members and area.
  */
 class MNESHARED_EXPORT MnePatchInfo
 {

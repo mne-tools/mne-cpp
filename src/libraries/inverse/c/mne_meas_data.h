@@ -87,7 +87,7 @@ class MneMeasDataSet;
 /**
  * Implements MNE Meas Data (Replaces *mneMeasData,mneMeasDataRec; struct of MNE-C mne_types.h).
  *
- * @brief easurement data representation in MNE calculations
+ * @brief Measurement data container holding multiple data sets for MNE inverse computations.
  */
 class INVERSESHARED_EXPORT MneMeasData
 {

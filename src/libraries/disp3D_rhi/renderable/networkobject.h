@@ -140,6 +140,9 @@ public:
     bool hasData() const { return !m_network.isEmpty(); }
 
 private:
+    /**
+     * @brief Per-instance transform, color, and weight for GPU-instanced network edge rendering.
+     */
     // Instance data: identical layout to DipoleObject for shader compatibility
     // Model Matrix (4x4) + Color (vec4) + isSelected (float)
     struct InstanceData {
@@ -148,6 +151,9 @@ private:
         float isSelected;   // Always 0.0 for networks
     };
 
+    /**
+     * @brief Interleaved vertex attributes for network node and edge meshes.
+     */
     struct VertexData {
         float x, y, z;
         float nx, ny, nz;
@@ -163,6 +169,7 @@ private:
     QString m_colormap = "Viridis";
 
     // ── Node GPU resources ──────────────────────────────────────────────
+    /** @brief QRhi vertex, index, and instance buffers for network node and edge GPU rendering. */
     struct GpuBuffers;
     std::unique_ptr<GpuBuffers> m_gpu;
 

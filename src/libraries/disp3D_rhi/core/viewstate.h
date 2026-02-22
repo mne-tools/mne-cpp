@@ -62,6 +62,8 @@ class BrainSurface;
 
 //=============================================================================================================
 /**
+ * @brief Per-view toggle flags controlling which data layers (brain, sensors, sources, network) are visible.
+ *
  * Per-object visibility flags for a single viewport.
  *
  * Every viewport (single-view or multi-view pane) carries an independent
@@ -133,6 +135,8 @@ struct ViewVisibilityProfile
 
 //=============================================================================================================
 /**
+ * @brief Viewport subdivision holding its own camera, projection, and scissor rectangle.
+ *
  * Encapsulates all per-view state for a single viewport (single view or
  * one pane in multi-view).
  *

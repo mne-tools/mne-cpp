@@ -49,6 +49,47 @@ const funders = [
     { name: 'Azure', logo: 'img/funding_logos/azure.svg', url: 'https://azure.microsoft.com/' },
 ];
 
+const contributors = [
+    { login: 'LorenzE', contributions: 3902 },
+    { login: 'chdinh', contributions: 2868 },
+    { login: 'gabrielbmotta', contributions: 1326 },
+    { login: 'juangpc', contributions: 1207 },
+    { login: 'RDoerfel', contributions: 626 },
+    { login: '1DIce', contributions: 267 },
+    { login: 'LostSign', contributions: 194 },
+    { login: 'ViktorKL', contributions: 179 },
+    { login: 'GBeret', contributions: 169 },
+    { login: 'rickytjen', contributions: 156 },
+    { login: 'JanaKiesel', contributions: 144 },
+    { login: 'floschl', contributions: 76 },
+    { login: 'joewalter', contributions: 64 },
+    { login: 'sheinke', contributions: 58 },
+    { login: 'Andrey1994', contributions: 46 },
+    { login: 'TiKunze', contributions: 41 },
+    { login: 'farndt', contributions: 39 },
+    { login: 'imsorryk', contributions: 35 },
+    { login: 'louiseichhorst', contributions: 20 },
+    { login: 'femigr', contributions: 17 },
+    { login: 'johaenns', contributions: 14 },
+    { login: 'jobehrens', contributions: 12 },
+    { login: 'cdoshi', contributions: 12 },
+    { login: 'cpieloth', contributions: 11 },
+    { login: 'alexrockhill', contributions: 10 },
+    { login: 'buildqa', contributions: 9 },
+    { login: 'SachdevaS', contributions: 7 },
+    { login: 'er06645810', contributions: 6 },
+    { login: 'mfarisyahya', contributions: 6 },
+    { login: 'ag-fieldline', contributions: 5 },
+    { login: 'betaha', contributions: 4 },
+    { login: 'Julius-L', contributions: 4 },
+    { login: 'MKlamke', contributions: 4 },
+    { login: 'fjpolo', contributions: 4 },
+    { login: 'benkay86', contributions: 3 },
+    { login: 'jasmainak', contributions: 3 },
+    { login: 'PetrosSimidyan', contributions: 3 },
+    { login: 'larsoner', contributions: 2 },
+];
+
 function WaveBackground() {
     return (
         <div className={styles.waveWrap} aria-hidden="true">
@@ -127,10 +168,40 @@ export default function Home(): JSX.Element {
                     </div>
                 </section>
 
+                {/* Contributors */}
+                <section className={styles.contributorsSection}>
+                    <div className="container text--center">
+                        <Heading as="h2" className={styles.sectionTitle}>Contributors</Heading>
+                        <p className={styles.contributorsSubtitle}>
+                            MNE-CPP is built by an open-source community. Thank you to all our contributors!
+                        </p>
+                        <div className={styles.contributorsGrid}>
+                            {contributors.map((c, idx) => (
+                                <a
+                                    key={idx}
+                                    href={`https://github.com/${c.login}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className={styles.contributorLink}
+                                    title={`${c.login} — ${c.contributions} commits`}
+                                >
+                                    <img
+                                        src={`https://avatars.githubusercontent.com/${c.login}?s=96`}
+                                        alt={c.login}
+                                        className={styles.contributorAvatar}
+                                        loading="lazy"
+                                    />
+                                    <span className={styles.contributorName}>{c.login}</span>
+                                </a>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+
                 {/* Supported by Researchers */}
                 <section className={styles.logoSection}>
                     <div className="container text--center">
-                        <Heading as="h2" className={styles.sectionTitle}>Supported by Researchers at</Heading>
+                        <Heading as="h2" className={styles.sectionTitle}>Research Partners</Heading>
                         <div className={styles.logoGrid}>
                             {institutions.map((inst, idx) => (
                                 <a key={idx} href={inst.url} target="_blank" rel="noopener noreferrer" className={styles.logoLink}>

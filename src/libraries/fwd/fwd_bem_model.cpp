@@ -366,6 +366,9 @@ static QString strip_from(const QString& s, const QString& suffix)
 namespace FWDLIB
 {
 
+/**
+ * @brief Lookup record mapping a FIFF coordinate frame integer ID to its human-readable name.
+ */
 typedef struct {
     int frame;
     const QString name;

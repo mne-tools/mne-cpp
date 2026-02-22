@@ -81,7 +81,7 @@ class Network;
 /**
  * This class computes the phase lag index connectivity metric.
  *
- * @brief This class computes the phase lag index connectivity metric.
+ * @brief Computes the weighted phase lag index (WPLI) connectivity metric
  */
 class CONNECTIVITYSHARED_EXPORT WeightedPhaseLagIndex : public AbstractMetric
 {

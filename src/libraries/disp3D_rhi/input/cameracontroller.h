@@ -54,6 +54,8 @@
 /**
  * Result of a camera computation — all matrices and vectors needed for
  * rendering a single viewport.
+ *
+ * @brief Computed camera matrices (projection, view, model) and vectors for a single viewport.
  */
 struct CameraResult
 {

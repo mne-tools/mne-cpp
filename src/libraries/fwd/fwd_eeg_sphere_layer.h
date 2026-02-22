@@ -67,7 +67,7 @@ namespace FWDLIB
 /**
  * Implements FwdEegSphereLayer (Replaces *fwdEegSphereLayer,fwdEegSphereLayerRec struct of MNE-C fwd_types.h).
  *
- * @brief FwdEegSphereLayer description
+ * @brief Single concentric sphere layer with conductivity ratio for the EEG forward model.
  */
 class FWDSHARED_EXPORT FwdEegSphereLayer
 {

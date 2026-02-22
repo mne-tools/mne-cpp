@@ -77,6 +77,9 @@ namespace RTPROCESSINGLIB
 // RTPROCESSINGLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
+/**
+ * @brief Bundled output of a real-time covariance computation step containing the covariance matrix and sample count.
+ */
 struct RtCovComputeResult {
     Eigen::VectorXd mu;
     Eigen::MatrixXd matData;
@@ -86,7 +89,7 @@ struct RtCovComputeResult {
 /**
  * Real-time covariance worker.
  *
- * @brief Real-time covariance worker.
+ * @brief Controller that manages background covariance matrix estimation from streaming data.
  */
 class RTPROCESINGSHARED_EXPORT RtCov : public QObject
 {

@@ -75,6 +75,9 @@ namespace RTPROCESSINGLIB
 // RTPROCESSINGLIB FORWARD DECLARATIONS
 //=============================================================================================================
 
+/**
+ * @brief Input bundle for the real-time inverse operator worker containing noise covariance, forward solution, and settings.
+ */
 struct RtInvOpInput {
     QSharedPointer<FIFFLIB::FiffInfo>           pFiffInfo;
     QSharedPointer<MNELIB::MNEForwardSolution>  pFwd;
@@ -85,7 +88,7 @@ struct RtInvOpInput {
 /**
  * Real-time inverse operator worker.
  *
- * @brief Real-time inverse operator worker.
+ * @brief Background worker thread that recomputes the MNE inverse operator when covariance updates arrive.
  */
 class RTPROCESINGSHARED_EXPORT RtInvOpWorker : public QObject
 {
@@ -114,7 +117,7 @@ signals:
 /**
  * Real-time inverse dSPM, sLoreta inverse operator estimation
  *
- * @brief Real-time inverse operator estimation
+ * @brief Controller that manages RtInvOpWorker for online inverse operator updates.
  */
 class RTPROCESINGSHARED_EXPORT RtInvOp : public QObject
 {

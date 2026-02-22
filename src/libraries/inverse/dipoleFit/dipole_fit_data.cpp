@@ -459,6 +459,9 @@ FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense mat
 namespace MNELIB
 {
 
+/**
+ * @brief Workspace for the dipole fitting objective function, holding forward model, measured field, and fit limits.
+ */
 typedef struct {
     float          limit;
     int            report_dim;
@@ -1471,6 +1474,9 @@ int mne_simplex_minimize(float **p,		                              /* The initia
 namespace MNELIB
 {
 
+/**
+ * @brief Workspace for sphere-fitting optimization, holding digitizer point coordinates and count.
+ */
 typedef struct {
     float **rr;
     int   np;
@@ -2714,6 +2720,9 @@ out : {
 namespace MNELIB
 {
 
+/**
+ * @brief Lookup record mapping a FIFF coordinate frame integer ID to its human-readable name string.
+ */
 typedef struct {
     int frame;
     const char *name;

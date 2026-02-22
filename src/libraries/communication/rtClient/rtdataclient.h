@@ -67,7 +67,7 @@ namespace COMMUNICATIONLIB
 
 //=============================================================================================================
 /**
- * Struct that holds metadata for a measurement.
+ * @brief Bundles FiffInfo and FiffDigitizerData received from mne_rt_server for a measurement session
  */
 struct MetaData{
     MetaData(FIFFLIB::FiffInfo::SPtr pInfo,
@@ -83,7 +83,7 @@ struct MetaData{
 /**
  * The real-time data client class provides an interface to communicate with the data port 4218 of a running mne_rt_server.
  *
- * @brief Real-time data client
+ * @brief TCP client for streaming raw MEG/EEG measurement data from mne_rt_server (port 4218)
  */
 class COMMUNICATIONSHARED_EXPORT RtDataClient : public QTcpSocket
 {

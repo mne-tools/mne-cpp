@@ -82,7 +82,7 @@ class ChannelInfoModel;
 /**
  * DECLARE CLASS ButterflyView
  *
- * @brief The ButterflyView class provides a butterfly view.
+ * @brief Butterfly plot widget overlaying multiple channel waveforms in a single time-series view.
  */
 #if !defined(NO_QOPENGLWIDGET)
 class DISPSHARED_EXPORT ButterflyView : public QOpenGLWidget

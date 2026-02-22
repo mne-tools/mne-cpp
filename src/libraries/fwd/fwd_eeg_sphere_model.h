@@ -69,6 +69,9 @@ namespace FWDLIB
 /*
  * This is the beginning of the specific code
  */
+/**
+ * @brief Workspace for the linear least-squares fit of Berg-Scherg parameters in the EEG sphere model (SVD matrices, residuals, weights).
+ */
 typedef struct {
     double *y;
     double *resi;
@@ -86,7 +89,7 @@ typedef struct {
 /**
  * Implements FwdEegSphereModel (Replaces *fwdEegSphereModel,fwdEegSphereModelRec struct of MNE-C fwd_types.h).
  *
- * @brief Electric Current Dipole description
+ * @brief Multi-layer spherical head model for EEG forward computation.
  */
 class FWDSHARED_EXPORT FwdEegSphereModel
 {

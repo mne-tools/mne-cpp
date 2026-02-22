@@ -5,7 +5,19 @@ sidebar_label: Creating a Plugin
 
 # Creating a New Plugin
 
-MNE Scan's functionality is extended through plugins. Each plugin is a shared library that is loaded at runtime. This guide shows how to create a new MNE Scan plugin.
+MNE Scan's functionality is extended through plugins. Each plugin is a shared library that is loaded at runtime. This guide shows how to create a new MNE Scan plugin, from scaffolding to integration.
+
+## Plugin Categories
+
+MNE Scan distinguishes between three plugin categories, each with a corresponding abstract base class in `src/applications/mne_scan/libs/scShared/`:
+
+| Category | Base Class | Purpose | Examples |
+|----------|-----------|---------|----------|
+| **Sensor** (acquisition) | `AbstractSensor` | Provides data from hardware devices or simulations | FiffSimulator, BabyMEG, LSLAdapter |
+| **Algorithm** (processing) | `AbstractAlgorithm` | Applies real-time processing to the data stream | Filtering, Averaging, SourceLocalization |
+| **IO** (output) | `AbstractIOPlugin` | Writes data to disk or forwards it to other systems | FileWriter |
+
+Your new plugin must inherit from one of these base classes depending on its role in the pipeline.
 
 ## Getting Started with the DummyToolbox
 
@@ -26,28 +38,143 @@ A typical MNE Scan plugin consists of:
 | File | Purpose |
 |------|---------|
 | `myplugin.h / .cpp` | Main plugin class — inherits from the appropriate abstract base class |
-| `myplugin_global.h / .cpp` | Shared export/import macros |
+| `myplugin_global.h` | Shared export/import macros (`Q_DECL_EXPORT` / `Q_DECL_IMPORT`) |
 | `myplugin.json` | Plugin metadata (name, version) |
 | `CMakeLists.txt` | Build configuration |
 | `FormFiles/` | Optional Qt Designer `.ui` files for the plugin GUI |
 
-## Plugin Types
+## Key Virtual Functions
 
-MNE Scan distinguishes between three plugin categories:
+Every plugin must implement the following virtual functions from its base class:
 
-- **Sensor plugins** (acquisition): Provide data from hardware devices or simulations. See [Acquisition Plugins](scan-acq.mdx) for the architecture pattern.
-- **Algorithm plugins** (processing): Apply real-time processing to the data stream (e.g., filtering, averaging, source localization).
-- **IO plugins** (output): Write data to disk or forward it to other systems.
+### `clone()`
+Returns a new instance of the plugin (not a copy). Used by the plugin manager during loading:
+```cpp
+QSharedPointer<AbstractPlugin> MyPlugin::clone() const
+{
+    return QSharedPointer<AbstractPlugin>(new MyPlugin);
+}
+```
 
-Each category has a corresponding abstract base class in `src/applications/mne_scan/libs/scShared/`.
+### `init()`
+Called after all plugins are loaded into the Plugin Manager. Use it to allocate resources, initialize parameters, and set up internal data structures:
+```cpp
+void MyPlugin::init()
+{
+    m_pOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "MyPlugin Out", "MyPlugin output data");
+    m_outputConnectors.append(m_pOutput);
+}
+```
+
+### `unload()`
+Called when the application shuts down. Release resources and clean up here.
+
+### `getName()`
+Returns the plugin name as it appears in the MNE Scan GUI:
+```cpp
+QString MyPlugin::getName() const
+{
+    return "My Plugin";
+}
+```
+
+### `setupWidget()`
+Returns a `QWidget*` that serves as the plugin's configuration dialog. The user opens this from the plugin toolbar. Return `nullptr` if no setup is needed.
+
+### `run()`
+The main processing loop. This function runs in a separate thread. For an **algorithm plugin**, it typically reads data from an input connector, processes it, and writes results to an output connector:
+```cpp
+void MyPlugin::run()
+{
+    while(!isInterruptionRequested()) {
+        // Wait for new data
+        Eigen::MatrixXd matData = m_pInput->getValue();
+
+        // Process data
+        Eigen::MatrixXd matResult = processData(matData);
+
+        // Send to output
+        m_pOutput->measurementData()->setValue(matResult);
+    }
+}
+```
+
+## Connectors: Input and Output
+
+Plugins communicate through **connectors**. Input connectors receive data from upstream plugins; output connectors send data downstream.
+
+```cpp
+// In init(): create an output connector
+m_pOutput = PluginOutputData<RealTimeMultiSampleArray>::create(this, "Out", "Output data");
+m_outputConnectors.append(m_pOutput);
+
+// In init(): create an input connector
+m_pInput = PluginInputData<RealTimeMultiSampleArray>::create(this, "In", "Input data");
+m_inputConnectors.append(m_pInput);
+```
+
+MNE Scan's pipeline GUI allows the user to wire connectors between plugins by drawing connections.
+
+## CMakeLists.txt
+
+A minimal `CMakeLists.txt` for a plugin:
+
+```cmake
+set(TARGET_NAME myplugin)
+
+add_library(${TARGET_NAME} SHARED
+    myplugin.h
+    myplugin.cpp
+    myplugin_global.h
+)
+
+target_link_libraries(${TARGET_NAME}
+    PRIVATE
+        scShared
+        mne_utils
+        mne_fiff
+        Qt6::Core
+        Qt6::Widgets
+)
+
+# Install the plugin to the runtime plugins directory
+install(TARGETS ${TARGET_NAME}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/mne_scan_plugins
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}/mne_scan_plugins
+)
+```
+
+## Static Building
+
+When building statically, MNE Scan needs to be told about plugins at compile time. Add a `Q_IMPORT_PLUGIN` macro in `src/applications/mne_scan/mne_scan/main.cpp` under the `#ifdef STATICBUILD` guard:
+
+```cpp
+#ifdef STATICBUILD
+Q_IMPORT_PLUGIN(MyPlugin)
+#endif
+```
+
+The CMake configuration handles the rest of the static build setup automatically.
 
 ## Building and Testing
 
 After adding your plugin, rebuild MNE-CPP with CMake:
 
 ```bash
-cd build
-cmake --build . --target myplugin
+cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+cmake --build build --target myplugin --parallel
 ```
 
-The compiled plugin library will be placed in the output directory where MNE Scan can discover it at runtime.
+The compiled plugin library will be placed in the output directory where MNE Scan discovers it at runtime. Launch MNE Scan and verify that your plugin appears in the plugin toolbar.
+
+## Checklist
+
+Before submitting your plugin as a pull request, verify:
+
+- [ ] Plugin folder added under `src/applications/mne_scan/plugins/`
+- [ ] `add_subdirectory()` added to the parent `CMakeLists.txt`
+- [ ] Plugin has a `*_global.h` file with export macros
+- [ ] All virtual functions from the base class are implemented
+- [ ] `Q_IMPORT_PLUGIN` added for static builds
+- [ ] Plugin compiles and loads successfully in MNE Scan
+- [ ] Unit tests written for any processing logic (see [Writing Tests](writingtest.mdx))

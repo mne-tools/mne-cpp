@@ -47,6 +47,9 @@
 #include <QMatrix4x4>
 #include <QVector3D>
 
+/**
+ * @brief Base tree item providing check-state, visibility, and data-role storage for all 3-D scene items.
+ */
 class DISP3DRHISHARED_EXPORT AbstractTreeItem : public QStandardItem
 {
 public:

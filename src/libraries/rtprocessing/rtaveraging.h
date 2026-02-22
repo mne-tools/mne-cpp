@@ -78,7 +78,7 @@ namespace RTPROCESSINGLIB
 /**
  * Real-time averaging worker
  *
- * @brief Real-time averaging worker
+ * @brief Background worker thread that accumulates and averages epochs in real time.
  */
 class RTPROCESINGSHARED_EXPORT RtAveragingWorker : public QObject
 {
@@ -279,7 +279,7 @@ signals:
 /**
  * Real-time averaging
  *
- * @brief Real-time averaging
+ * @brief Controller that manages RtAveragingWorker for online epoch averaging with baseline correction.
  */
 class RTPROCESINGSHARED_EXPORT RtAveraging : public QObject
 {

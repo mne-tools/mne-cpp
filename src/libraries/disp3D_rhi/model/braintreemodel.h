@@ -61,6 +61,9 @@ class NetworkTreeItem;
 class SurfaceTreeItem;
 class BemTreeItem;
 
+/**
+ * @brief Hierarchical item model organizing all 3-D scene objects (surfaces, sensors, sources, networks) for QTreeView.
+ */
 class DISP3DRHISHARED_EXPORT BrainTreeModel : public QStandardItemModel
 {
     Q_OBJECT

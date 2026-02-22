@@ -81,7 +81,7 @@ class Network;
 /**
  * This class computes the phase lag index connectivity metric.
  *
- * @brief This class computes the phase lag index connectivity metric.
+ * @brief Computes the unbiased squared phase lag index (USPLI) connectivity metric
  */
 class CONNECTIVITYSHARED_EXPORT UnbiasedSquaredPhaseLagIndex : public AbstractMetric
 {

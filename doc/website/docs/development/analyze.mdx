@@ -5,10 +5,21 @@ sidebar_label: MNE Analyze
 
 # MNE Analyze Development
 
-MNE Analyze is the offline data analysis and visualization application in MNE-CPP. It uses a plugin architecture where all functionality — data loading, filtering, visualization, source localization — is implemented as plugins that communicate via an event system.
+MNE Analyze is MNE-CPP's offline data analysis and visualization application. All functionality — data loading, filtering, averaging, visualization, source localization — is implemented as **plugins** that communicate through a dedicated **event system**.
 
-The guides in this section cover how to extend MNE Analyze:
+Unlike MNE Scan, MNE Analyze does not differentiate between plugin types. Every plugin inherits from `AbstractPlugin` and can provide menus, control panels, and views that are assembled into the main window at runtime. Data is managed through Qt's [Model/View](https://doc.qt.io/qt-6/model-view-programming.html) architecture, with custom models inheriting from `AbstractModel`.
 
-- **[Creating a Plugin](analyze-plugin.mdx)** — Detailed guide to implementing a new MNE Analyze plugin, including GUI elements, menus, and controls.
-- **[Event System](analyze-event.mdx)** — How plugins communicate with each other using the built-in event manager.
-- **[Data Model](analyze-datamodel.mdx)** — How to create new data models for loading and displaying custom data types.
+## Guides
+
+- **[Creating a Plugin](analyze-plugin.mdx)** — Full walkthrough for implementing a new plugin, including GUI elements (menus, controls, views), event subscriptions, and static build setup.
+- **[Event System](analyze-event.mdx)** — How plugins send and receive events via the `Communicator` class, with subscription patterns and a reference table of common event types.
+- **[Data Model](analyze-datamodel.mdx)** — How to create a new data model for custom data types, including subclassing `AbstractModel`, registering with the data manager, and a complete minimal example.
+
+## Key Concepts
+
+| Concept | Description |
+|---------|-------------|
+| **Event system** | Decoupled inter-plugin communication running on a dedicated thread |
+| **AbstractPlugin** | Single base class for all MNE Analyze plugins |
+| **Model/View** | Qt pattern separating data storage (`AbstractModel`) from presentation |
+| **Sample plugin** | Empty plugin template at `applications/mne_analyze/plugins/sampleplugin` |

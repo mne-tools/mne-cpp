@@ -5,15 +5,21 @@ sidebar_label: Creating a Plugin
 
 # Creating a New Plugin
 
-This guide covers the creation of a new plugin.
+This guide explains how to create a new MNE Analyze plugin, including implementing the required virtual functions, setting up GUI elements, and integrating with the event system.
 
 ## Overview
 
-All MNE Analyze plugins are subclassed from the same base, AbstractPlugin (`/applications/mne_analyze/libs/anShared/Plugins/abstractplugin.h`). Unlike MNE Scan, MNE Analyze does not differentiate between types of plugins. MNE Analyze plugins are loaded into MNE Analyze at run time from `bin/mne_analyze_plugins`. Once loaded, MNE Analyze gets the menus, controls, and views from each of the plugins and displays them to the user. Currently the plugins are limited to returning one of each of these. For details on how these steps are done, see `/applications/mne_analyze/mne_analyze/analyzecore.cpp` function `initPluginManager()` for how plugins are loaded, and the constructor for `MainWindow` in `/applications/mne_analyze/mne_analyze/mainwindow.cpp` for how the GUI elements are loaded.
+All MNE Analyze plugins inherit from `AbstractPlugin` (`applications/mne_analyze/libs/anShared/Plugins/abstractplugin.h`). Unlike MNE Scan, MNE Analyze does not differentiate between plugin types.
+
+Plugins are loaded at runtime from `bin/mne_analyze_plugins`. Once loaded, MNE Analyze retrieves each plugin's menus, controls, and views and displays them to the user. Currently each plugin returns at most one of each GUI element.
+
+For implementation details, see:
+- `analyzecore.cpp` → `initPluginManager()` — how plugins are discovered and loaded
+- `mainwindow.cpp` constructor — how GUI elements are assembled
 
 ## Sample Plugin
 
-A sample plugin with no functionality is included in `/applications/mne_analyze/plugins/sampleplugin`. A good way to start implementing a plugin is to duplicate that folder and its contents and use an IDE to replace all instances of 'SamplePlugin' with the name of the new plugin. See the end of the guide for some easy to miss details on getting new plugins to work correctly.
+A sample plugin with no functionality is included in `applications/mne_analyze/plugins/sampleplugin`. To create a new plugin, duplicate that folder and replace all instances of `SamplePlugin` with your plugin name. See the checklist at the end of this guide for details that are easy to miss.
 
 ## Deriving from AbstractPlugin
 
@@ -23,8 +29,8 @@ AbstractPlugin has a number of pure virtual functions that need to be defined by
 
 Returns an instance of the plugin. This is not a copy. Most of the existing plugins do something like this:
 
-```
-    return QSharedPointer<AbstractPlugin> (new Averaging);
+```cpp
+return QSharedPointer<AbstractPlugin>(new Averaging);
 ```
 
 ### init()
@@ -43,9 +49,9 @@ Returns the plugin name, this will be used to set the plugin title on any views,
 
 Returns menu items to be added to the top dropdown menu bar. If the plugin does not need a menu, return a `Q_NULLPTR` (null pointer) instead.
 
-Create a menu object to return, and populate it with relevant actions. Below is a section of the data loader plugin as an example.
+Create a menu object to return, and populate it with relevant actions. Below is a section of the data loader plugin as an example:
 
-```
+```cpp
 QMenu* pMenuFile = new QMenu(tr("File"));
 
 QAction* pActionLoad = new QAction(tr("Open"));
@@ -58,11 +64,11 @@ If the name of the menu matches an existing one, the new actions will be added t
 
 ### getControl()
 
-Returns a QDockWidget* containing the control GUI elements of the plugin. If the plugin does not need controls, return a `Q_NULLPTR` (null pointer) instead. Here we also set the allowed docking areas and the tab name that appears when the plugin is docked.
+Returns a `QDockWidget*` containing the control GUI elements of the plugin. If the plugin does not need controls, return a `Q_NULLPTR` (null pointer) instead. Here we also set the allowed docking areas and the tab name that appears when the plugin is docked.
 
-The controls are set by adding any QWidget to the QDockWidget that needs to be returned. Below is an example of a QDockWidget with a single widget added, with the tab name set to the plugin name, that can be docked on the left or right sides of the window.
+The controls are set by adding any `QWidget` to the `QDockWidget` that needs to be returned. Below is an example with a single widget, the tab name set to the plugin name, docked on the left or right sides of the window:
 
-```
+```cpp
 QDockWidget* pControlDock = new QDockWidget(getName());
 pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 pControlDock->setObjectName(getName());
@@ -71,9 +77,9 @@ QPushButton* pSingleButton = new QPushButton("Compute");
 pControlDock->setWidget(pSingleButton);
 ```
 
-This is useful if the control widget is already created and all that needs to be done is add it to the dock widget. If instead the control widget needs to be created or multiple control widgets need to be added, a layout can be used to add multiple elements to the Widget being set in the QDockWidget.
+This is useful if the control widget is already created. If instead the control widget needs to be created or multiple widgets need to be added, a layout can be used:
 
-```
+```cpp
 QDockWidget* pControlDock = new QDockWidget(getName());
 pControlDock->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 pControlDock->setObjectName(getName());
@@ -89,23 +95,21 @@ pLayout->addWidget(pFirstButton);
 pLayout->addWidget(pSecondButton);
 ```
 
-A lot of control widgets are already implemented in the disp library, they can be used here.
+Many control widgets are already implemented in the Disp library and can be reused here.
 
-Many different plugins will be loaded to MNE_Analyze, to influence how high or low the controls of a particular plugin will appear in the drop-down menu "Control" tab, you can modify the variable ```m_iOrder```. By default it is set to 0, the higher you set that value to, the higher your control will appear. To force the controls to appear lower you can also use negative values.
+To influence the ordering of your plugin's controls in the "Control" drop-down menu, modify the `m_iOrder` variable. The default is 0; higher values place the controls higher in the menu. Negative values force controls to appear lower.
 
 ### getView()
 
-Returns a QWidget* with the view GUI element of the plugin. If the plugin does not need a view, return a `Q_NULLPTR` (null pointer) instead.
+Returns a `QWidget*` with the view GUI element of the plugin. If the plugin does not need a view, return a `Q_NULLPTR` (null pointer) instead.
 
-In all cases in MNE Analyze the view is created elsewhere and we simply return an instance of it here.
-
-A lot of view widgets are already implemented in the disp library, they can be used here.
+In all cases in MNE Analyze the view is created elsewhere and returned here as an instance. Many view widgets are already implemented in the Disp library and can be reused.
 
 ### getEventSubscriptions()
 
-Returns a QVector with the events the plugin is subscribed to. If the plugin does not care about incoming events, return an empty QVector. See example below:
+Returns a `QVector<EVENT_TYPE>` with the events the plugin is subscribed to. If the plugin does not care about incoming events, return an empty `QVector`. See example below:
 
-```
+```cpp
 QVector<EVENT_TYPE> temp;
 temp.push_back(SELECTED_MODEL_CHANGED);
 temp.push_back(FILTER_ACTIVE_CHANGED);
@@ -114,9 +118,9 @@ temp.push_back(FILTER_DESIGN_CHANGED);
 
 ### handleEvent()
 
-Receives event `e` that the plugin is subscribed to. Typically this is handled by a switch case for each of the subscribed events:
+Receives event `e` that the plugin is subscribed to. Typically this is handled by a switch-case for each subscribed event:
 
-```
+```cpp
 switch (e->getType()) {
     case EVENT_TYPE::SELECTED_MODEL_CHANGED:
         // do something
@@ -129,34 +133,37 @@ switch (e->getType()) {
         break;
     default:
         qWarning() << "[Averaging::handleEvent] Received an Event that is not handled by switch cases.";
+}
 ```
 
 ## Views and Controls
 
-Existing views and controls are in the library layer, in the disp library. These can be used when making you plugin's view or controls. Otherwise, custom ones can be made with QtCreator using `.ui` files. All of the views and controls used subclass from `AbstractView`.
+Existing views and controls live in the Disp library and can be reused when building your plugin's GUI. Custom widgets can be created with Qt Designer (`.ui` files). All views and controls subclass `AbstractView`.
 
-### Using the event system
+### Using the Event System
 
-Events are how the plugins in MNE Analyze communicate with each other. If your plugin needs to know about any new data that was loaded, any new item being selected, or wants to make use of any of the scaling or channel selection controls already provided by other plugins, you can subscribe to the relevant events. If you plugin needs to instead send out data, you can send the relevant events or create new ones to suit you needs. See the page on the [event system](analyze-event.mdx).
+Events are how MNE Analyze plugins communicate. Subscribe to events to receive notifications about loaded data, selected items, or scaling changes. Send events to broadcast data or trigger actions in other plugins. See the [Event System](analyze-event.mdx) page for details.
 
-### Setting/Clearing Data
+### Setting and Clearing Data
 
-Data is displayed to the user using views, which display the data contained in models, in a [Model/View](https://doc.qt.io/qt-5/model-view-programming.html) setup.
+Data is displayed using views that present the contents of models, following Qt's [Model/View](https://doc.qt.io/qt-6/model-view-programming.html) architecture.
 
 ## Static Building
 
 When building statically, MNE Analyze needs to be told about the plugins at build time. To do this, the plugins are included with `Q_IMPORT_PLUGIN` in `applications/mne_analyze/mne_analyze/main.cpp` under the `#ifdef STATICBUILD` macro. The CMake configuration handles the rest of the static build setup automatically.
 
-## Getting the New Plugin Running
+## Checklist
 
- - Make sure the new plugin is added to the `CMakeLists.txt` in the plugins directory so that it is included in the build.
+Before submitting your plugin as a pull request, verify:
 
- - Make sure that the `CMakeLists.txt` for your plugin has the correct target name, source files, and linked libraries.
-
- - Make sure your plugin has a `*_global.h` file.
+- [ ] Plugin added to the `CMakeLists.txt` in the plugins directory
+- [ ] Plugin's own `CMakeLists.txt` has correct target name, source files, and linked libraries
+- [ ] Plugin has a `*_global.h` file with export macros
+- [ ] All `AbstractPlugin` virtual functions are implemented
+- [ ] `Q_IMPORT_PLUGIN` added in `main.cpp` for static builds
+- [ ] Plugin compiles and loads successfully in MNE Analyze
 
 ## Useful References
 
- - [Guide on Layout Management in Qt](https://doc.qt.io/qt-5/layout.html)
-
- - [Guide on Basics of User Interface Design](https://www.usability.gov/what-and-why/user-interface-design.html)
+- [Qt Layout Management](https://doc.qt.io/qt-6/layout.html)
+- [Basics of User Interface Design](https://www.usability.gov/what-and-why/user-interface-design.html)

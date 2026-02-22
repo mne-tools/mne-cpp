@@ -74,7 +74,7 @@ namespace FWDLIB {
 /**
  * Definitions for the EEG Sphere Model Set (Replaces *fwdEegSphereModelSet,fwdEegSphereModelSetRec struct of MNE-C fwd_types.h).
  *
- * @brief Holds a set of Electric Current Dipoles.
+ * @brief Collection of FwdEegSphereModel objects for multi-model EEG forward solutions.
  */
 
 class FWDSHARED_EXPORT FwdEegSphereModelSet

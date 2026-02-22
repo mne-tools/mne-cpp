@@ -5,6 +5,10 @@ sidebar_label: MNE Inspect
 
 # MNE Inspect
 
+<div style={{float: 'left', marginRight: '1.5rem', marginBottom: '1rem'}}>
+  <img src="/img/icon_mne_inspect_256x256.png" alt="MNE Inspect" width="128" />
+</div>
+
 MNE Inspect is a 3D brain visualization and source analysis application. It provides an interactive viewer for FreeSurfer-reconstructed cortical surfaces, BEM models, source estimates, sensor layouts, functional connectivity networks, and evoked sensor-field maps — all within a single, integrated GUI.
 
 ![MNE Inspect – 3D brain visualization](/img/mne_inspect_screenshot.png)
@@ -121,6 +125,51 @@ mne_inspect \
 - Independent camera control per viewport
 - Camera presets (e.g., anterior, posterior, left, right, dorsal, ventral)
 - Per-viewport editing target selection
+
+## Usage
+
+The simplest way to get started is to launch MNE Inspect directly from the command line or by double-clicking the executable. When started without any arguments, the application opens with an empty scene and you can load data interactively through the GUI — use the toolbar buttons and file dialogs to add surfaces, overlays, sensors, or any other supported data type one at a time. You can also pass individual files via the [command-line options](#command-line-options) listed above to pre-load specific datasets on startup.
+
+For day-to-day work, however, you typically want to inspect a complete subject context at once — cortical surfaces together with BEM meshes, source estimates, sensor positions, coordinate transforms, and evoked data. Assembling all of those `--stc`, `--bem`, `--digitizer`, … flags by hand quickly becomes tedious. This is where the **convenience launch scripts** come in.
+
+### Quick Launch Scripts
+
+The source tree ships with ready-made scripts that launch MNE Inspect with **all** MNE sample-data files pre-loaded — surfaces, BEM, STC, digitizer, atlas, source space, evoked, and coordinate transform — so you can start exploring immediately without assembling a long command line.
+
+| Platform | Script |
+|----------|--------|
+| macOS / Linux | `src/applications/mne_inspect/run.sh` |
+| Windows | `src/applications/mne_inspect/run.bat` |
+
+#### What the Scripts Do
+
+1. **Locate the build** — resolve the `mne_inspect` executable relative to the script directory (supports both flat builds and macOS `.app` bundles).
+2. **Set data paths** — default to `~/mne_data/MNE-sample-data` (or `%USERPROFILE%\mne_data\MNE-sample-data` on Windows). Override by setting the `MNE_DATA_PATH` environment variable.
+3. **Auto-discover STC files** — scan the `processed/` subdirectory for all `*-lh.stc` files and pass each one via `--stc`. If no processed STCs exist, the script falls back to the original `sample_audvis-meg-eeg-lh.stc`.
+4. **Launch with full context** — the final command line includes `--subjectPath`, `--subject`, `--bem`, `--digitizer`, `--trans`, `--srcSpace`, `--atlas`, `--evoked`, and all discovered `--stc` arguments.
+
+#### Running the Scripts
+
+```bash
+# From the project root (macOS / Linux)
+./src/applications/mne_inspect/run.sh
+
+# Or point to a custom data location
+MNE_DATA_PATH=/data/my_mne_sample ./src/applications/mne_inspect/run.sh
+```
+
+```bat
+:: From the project root (Windows)
+src\applications\mne_inspect\run.bat
+
+:: Or with a custom data location
+set MNE_DATA_PATH=D:\data\my_mne_sample
+src\applications\mne_inspect\run.bat
+```
+
+:::tip
+The scripts are a good starting point for creating your own launch configurations. Copy one and adjust the paths to load your own subject, BEM, and STC files.
+:::
 
 ## Dependencies
 

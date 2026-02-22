@@ -84,6 +84,9 @@ public:
     bool               m_bShowAll;                 /**< Whether to show all channels. */
 };
 
+/**
+ * @brief Graphics item representing a selectable electrode or channel in a 2-D layout scene.
+ */
 class DISPSHARED_EXPORT SelectionSceneItem : public QGraphicsItem
 {
 

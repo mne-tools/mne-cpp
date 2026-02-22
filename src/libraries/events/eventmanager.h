@@ -77,6 +77,8 @@ namespace EVENTSINTERNAL {
 
 //=============================================================================================================
 /**
+ * @brief Central registry that creates, stores, queries, and groups Event objects across one or more data files
+ *
  * The EventManager class.
  *
  * This class can be understood as an API, for the whole Event system, which is the Events library (EVENTSLIB

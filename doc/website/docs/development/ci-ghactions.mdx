@@ -5,7 +5,11 @@ sidebar_label: Github Actions
 
 # Github Actions
 
-MNE-CPP facilitates Github Actions to do continous integration (CI). Github Actions operates on Github events which trigger so called workflows. You can read more on the terminology [here](https://help.github.com/en/actions/reference). Currently, the following Github events trigger MNE-CPP's CI pipeline:
+MNE-CPP uses [GitHub Actions](https://docs.github.com/en/actions) for all continuous integration (CI) work. GitHub Actions operates on repository events — pushes, pull requests, releases, and timers — which trigger **workflows** defined as YAML files in `.github/workflows/`. Each workflow contains one or more **jobs**, and each job runs a series of **steps** on a fresh virtual machine (runner). You can read more about the terminology in the [GitHub Actions documentation](https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions).
+
+## Workflow Overview
+
+The following table summarizes every CI workflow in MNE-CPP:
 
 | Event type | Workflow Name | Workflow Script | Effect |
 | ---------- | ------------- | --------------- | ------ |
@@ -16,4 +20,88 @@ MNE-CPP facilitates Github Actions to do continous integration (CI). Github Acti
 | Pushes to the `wasm` branch | `WasmTest` | [wasmtest.yml](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/wasmtest.yml) | Creates new versions of the WebAssembly capable MNE-CPP applications and makes them accessible via the repository's `gh-pages` branch. |
 | Pushes to the `testci` branch | `TestCI` | [testci.yml](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/testci.yml) | Triggers checks to run cross-platform build setups and tests without the need to create a Github PR. |
 | Timer runs out | `Coverity` | [coverity.yml](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/coverity.yml) | Triggers every two days to run [Coverity](https://scan.coverity.com/projects/mne-tools-mne-cpp) static code analysis tools. |
-| Pushes to the `generateqt` branch | `BuildQtBinaries` | [buildqtbinaries.yml](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/buildqtbinaries.yml) | Triggers builds of all needed Qt versions and makes them accesible as [artifacts via the Github Actions interface](https://help.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts). |  
+| Pushes to the `generateqt` branch | `BuildQtBinaries` | [buildqtbinaries.yml](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/buildqtbinaries.yml) | Triggers builds of all needed Qt versions and makes them accesible as [artifacts via the Github Actions interface](https://help.github.com/en/actions/configuring-and-managing-workflows/persisting-workflow-data-using-artifacts). |
+
+## How the Pull Request Workflow Works
+
+When a contributor opens or updates a pull request, `pullrequest.yml` runs a build-and-test matrix across all supported platforms. The workflow typically:
+
+1. **Checks out** the PR branch.
+2. **Installs Qt** using a cached Qt installation or the `aqtinstall` action.
+3. **Configures CMake** with `BUILD_TESTS=ON` so that unit tests are included.
+4. **Builds** the entire project in Release mode.
+5. **Runs CTest** to execute all unit tests and reports pass/fail status back to the pull request.
+
+The PR cannot be merged until all matrix jobs pass. This ensures that every change is validated on Windows, Linux, and macOS before it reaches the `main` branch.
+
+## How the Release Workflow Works
+
+`release.yml` is the most complex workflow. It is triggered by two different events:
+
+- **Pushes to `main`** — produces a *development release* (nightly build). Dynamically linked binaries are built for all three desktop platforms and uploaded to the `DevBuilds` release on GitHub.
+- **Publishing a tagged release (`v0.x.y`)** — produces a *stable release*. Both dynamically and statically linked binaries are built, deployment scripts bundle Qt dependencies, and the resulting archives are uploaded as release assets.
+
+Each platform job follows the same high-level pattern: install Qt, configure CMake, build, deploy (bundle Qt libraries), package into an archive, and upload.
+
+## Testing CI Without a Pull Request
+
+The `testci` branch provides a convenient way to run the full CI matrix without opening a pull request. Push your changes to the `testci` branch on your fork:
+
+```bash
+git push origin <yourBranch>:testci -f
+```
+
+Then check the **Actions** tab in your fork's GitHub page. This is especially useful for debugging platform-specific build failures before submitting a PR.
+
+## Workflow File Structure
+
+All workflow YAML files live in `.github/workflows/` and follow a common structure:
+
+```yaml
+name: WorkflowName
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Qt
+        # ...
+      - name: Configure
+        run: cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+      - name: Build
+        run: cmake --build build --parallel
+      - name: Test
+        run: cd build && ctest --output-on-failure
+```
+
+Key elements include the **trigger** (`on:`), the **matrix strategy** for cross-platform builds, and the **steps** that install dependencies, compile, test, and optionally deploy.
+
+## Secrets and Environment Variables
+
+Some workflows require GitHub repository secrets (configured in **Settings → Secrets and variables → Actions**):
+
+| Secret | Used by | Purpose |
+|--------|---------|---------|
+| `GITHUB_TOKEN` | All release workflows | Automatically provided; used to upload release assets |
+| `COVERITY_TOKEN` | `coverity.yml` | Authentication token for Coverity Scan |
+
+## Adding or Modifying a Workflow
+
+To add a new workflow:
+
+1. Create a new `.yml` file in `.github/workflows/`.
+2. Define the trigger event (`on:`) — push, pull_request, schedule, or workflow_dispatch.
+3. Define one or more jobs with the appropriate runner (`runs-on:`) and steps.
+4. Test the workflow by pushing to a feature branch or using `workflow_dispatch`.
+
+To modify an existing workflow, edit the corresponding `.yml` file and push the change. If the modification affects the PR workflow, open a PR to see the results immediately.

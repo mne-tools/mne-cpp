@@ -91,6 +91,8 @@ namespace INVERSELIB
 
 /**
  * The strucut specifing the coil parameters.
+ *
+ * @brief Estimated dipole parameters (position, moment, goodness-of-fit) for a single HPI coil
  */
 struct CoilParam {
     Eigen::MatrixXd pos;
@@ -108,6 +110,8 @@ struct CoilParam {
 
 /**
  * The struct specifing all data needed to perform coil-wise fitting.
+ *
+ * @brief Complete HPI fit output: per-coil dipole parameters, head-to-device transform, fit error, and head movement distance
  */
 struct HpiFitResult {
     QVector<int>                hpiFreqs;

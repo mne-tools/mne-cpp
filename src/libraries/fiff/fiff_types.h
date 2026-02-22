@@ -100,14 +100,17 @@ typedef char                 fiff_data_t; //unsig char instead of void -> avoid 
 // TYPEDEFS Structured types:
 //=============================================================================================================
 
-/** Accurate time stamps used in FIFF files.*/
-
+/**
+ * @brief Time stamp record storing seconds and microseconds since epoch, as used in FIFF files.
+ */
 typedef struct _fiffTimeRec {
  fiff_int_t secs;           /**< GMT time in seconds since epoch. */
  fiff_int_t usecs;          /**< Fraction of seconds in microseconds. */
 } *fiffTime, fiffTimeRec;   /**< Accurate time stamps used in FIFF files.*/
 
-/** Structure representing digitized strings. */
+/**
+ * @brief Digitized string record holding a sequence of 3D points representing digitized curves or outlines.
+ */
 
 //typedef struct _fiffDigStringRec {
 // fiff_int_t kind;		  /**< Most commonly FIFF_POINT_EXTRA. */
@@ -133,7 +136,9 @@ typedef struct _fiffTimeRec {
 // TYPEDEF Following types are used by the fiff library. They are not used within the files.:
 //=============================================================================================================
 
-/** Structure for sparse matrices */
+/**
+ * @brief Sparse matrix record storing a compressed matrix with its coding type, dimensions, non-zero data, index list, and pointer list.
+ */
 
 //typedef struct _fiff_sparse_matrix {
 // fiff_int_t   coding;          /**< coding (storage) type of the sparse matrix. */
@@ -147,7 +152,9 @@ typedef struct _fiffTimeRec {
 
 //typedef fiffSparseMatrixRec  fiff_sparse_matrix_t;
 
-/** Structure for event bits */
+/**
+ * @brief Event bit-mask record describing state transitions via from/to masks and states for trigger event detection.
+ */
 
 //typedef struct _fiff_event_bits {
 // fiff_int_t from_mask;         /**< from mask. */
@@ -156,7 +163,9 @@ typedef struct _fiffTimeRec {
 // fiff_int_t to_state;          /**< to state. */
 //} *fiffEventBits, fiffEventBitsRec;
 
-/** Structure for hpi coil */
+/**
+ * @brief HPI coil descriptor associating an event channel and event bits with a signal channel for a single HPI coil.
+ */
 
 //typedef struct _fiff_hpi_coil {
 // char *event_channel;          /**< event channel. */
@@ -164,15 +173,18 @@ typedef struct _fiffTimeRec {
 // char *signal_channel;         /**< signal channel. */
 //} *fiffHpiCoil, fiffHpiCoilRec;
 
-/** Structure for hpi subsystem */
+/**
+ * @brief HPI subsystem descriptor holding the collection of HPI coils used for continuous head position tracking.
+ */
 
 //typedef struct _fiff_hpi_subsys {
 // fiff_int_t   ncoils;          /**< number of hpi coils. */
 // fiffHpiCoil  coils;           /**< hpi coils. */
 //} *fiffHpiSubsys, fiffHpiSubsysRec;
 
-/** Structure for external file references */
-
+/**
+ * @brief External data reference record describing the type, byte order, size, and offset of data stored in an external file.
+ */
 typedef struct _fiff_data_ref {
     fiff_int_t      type;       /**< Type of the data. */
     fiff_int_t      endian;     /**< Are the data in the little or big endian byte order. */
@@ -299,7 +311,9 @@ typedef struct _fiffDigPointRec {
 //} *fiffFile,fiffFileRec;	/**< FIFF file handle. fiff_open() returns this. */
 
 /// ToDo Old implementation use new fiff_coord_trans.h instead
-/** Coordinate transformation descriptor */
+/**
+ * @brief Coordinate transformation record holding forward and inverse rotation/translation between two coordinate frames.
+ */
 
 //typedef struct _fiffCoordTransRec {
 // fiff_int_t   from;		      /**< Source coordinate system. */
@@ -314,7 +328,9 @@ typedef struct _fiffDigPointRec {
 
 /// ToDo Old implementation use new fiff_info.h instead
 
-/** Measurement channel position and coil type. */
+/**
+ * @brief Channel position record storing the coil type and the position/orientation vectors of a measurement channel.
+ */
 
 //typedef struct _fiffChPosRec {
 //    fiff_int_t   coil_type;     /**< What kind of coil. */

@@ -57,6 +57,9 @@ namespace Ui {
 namespace DISPLIB
 {
 
+/**
+ * @brief Indeterminate progress bar widget shown during long-running operations.
+ */
 class DISPSHARED_EXPORT ProgressView : public AbstractView
 {
 public:

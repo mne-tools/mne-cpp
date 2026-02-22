@@ -73,7 +73,7 @@ class MneDeriv;
 /**
  * Implements an MNE Derivation (Replaces *mneDerivSet,mneDerivSetRec; struct of MNE-C mne_types.h).
  *
- * @brief One item in a derivation data set
+ * @brief Collection of MneDeriv channel derivation definitions loaded from a file.
  */
 class MNESHARED_EXPORT MneDerivSet
 {

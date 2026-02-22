@@ -58,7 +58,7 @@ class BrainSurface;
  * SourceEstimateOverlay manages source estimate data (.stc files) and applies
  * colormap visualization to brain surfaces.
  *
- * @brief    SourceEstimateOverlay class.
+ * @brief Color-mapped source estimate overlay that interpolates activation values onto a cortical surface mesh.
  */
 class DISP3DRHISHARED_EXPORT SourceEstimateOverlay
 {

@@ -83,7 +83,7 @@ namespace FWDLIB
 /**
  * Implements FwdCoil (Replaces *fwdCoil,fwdCoilRec; struct of MNE-C fwd_types.h).
  *
- * @brief FwdCoil description
+ * @brief Single MEG or EEG sensor coil with integration points, weights, and coordinate frame.
  */
 class FWDSHARED_EXPORT FwdCoil
 {

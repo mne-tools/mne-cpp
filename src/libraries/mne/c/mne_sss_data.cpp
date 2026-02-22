@@ -219,6 +219,7 @@ bad : {
 namespace MNELIB
 {
 
+/** @brief Lookup record mapping a FIFF coordinate frame integer code to its human-readable name. */
 typedef struct {
     int frame;
     const char *name;
