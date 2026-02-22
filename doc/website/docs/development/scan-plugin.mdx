@@ -1,0 +1,53 @@
+---
+title: Creating a new plugin
+sidebar_label: Creating a Plugin
+---
+
+# Creating a New Plugin
+
+MNE Scan's functionality is extended through plugins. Each plugin is a shared library that is loaded at runtime. This guide shows how to create a new MNE Scan plugin.
+
+## Getting Started with the DummyToolbox
+
+The easiest way to create a new plugin is to start from the **DummyToolbox** template:
+
+1. Copy the `dummytoolbox` folder under `src/applications/mne_scan/plugins/dummytoolbox`.
+2. Rename the folder and all files to match your new plugin name.
+3. In all source files, replace `DummyToolbox` / `dummytoolbox` with your plugin name.
+4. Update the `CMakeLists.txt` inside your new plugin folder with the correct target name and source files.
+5. Register your plugin in the parent `src/applications/mne_scan/plugins/CMakeLists.txt` by adding an `add_subdirectory()` call for your plugin folder.
+
+The DummyToolbox source can also be viewed on [GitHub](https://github.com/mne-tools/mne-cpp/tree/main/src/applications/mne_scan/plugins/dummytoolbox).
+
+## Plugin Structure
+
+A typical MNE Scan plugin consists of:
+
+| File | Purpose |
+|------|---------|
+| `myplugin.h / .cpp` | Main plugin class — inherits from the appropriate abstract base class |
+| `myplugin_global.h / .cpp` | Shared export/import macros |
+| `myplugin.json` | Plugin metadata (name, version) |
+| `CMakeLists.txt` | Build configuration |
+| `FormFiles/` | Optional Qt Designer `.ui` files for the plugin GUI |
+
+## Plugin Types
+
+MNE Scan distinguishes between three plugin categories:
+
+- **Sensor plugins** (acquisition): Provide data from hardware devices or simulations. See [Acquisition Plugins](scan-acq.mdx) for the architecture pattern.
+- **Algorithm plugins** (processing): Apply real-time processing to the data stream (e.g., filtering, averaging, source localization).
+- **IO plugins** (output): Write data to disk or forward it to other systems.
+
+Each category has a corresponding abstract base class in `src/applications/mne_scan/libs/scShared/`.
+
+## Building and Testing
+
+After adding your plugin, rebuild MNE-CPP with CMake:
+
+```bash
+cd build
+cmake --build . --target myplugin
+```
+
+The compiled plugin library will be placed in the output directory where MNE Scan can discover it at runtime.

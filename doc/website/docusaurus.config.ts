@@ -1,6 +1,8 @@
 import { themes as prismThemes } from 'prism-react-renderer';
 import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 
 const config: Config = {
     title: 'MNE-CPP',
@@ -32,6 +34,8 @@ const config: Config = {
                 docs: {
                     sidebarPath: './sidebars.ts',
                     editUrl: 'https://github.com/mne-tools/mne-cpp/tree/main/doc/website/',
+                    remarkPlugins: [remarkMath],
+                    rehypePlugins: [rehypeKatex],
                 },
                 blog: false,
                 theme: {
@@ -42,8 +46,12 @@ const config: Config = {
     ],
 
     markdown: {
-        format: 'md',
+        format: 'mdx',
     },
+
+    stylesheets: [
+        '/katex.min.css',
+    ],
 
     themeConfig: {
         image: 'img/mne-cpp-social-card.png',

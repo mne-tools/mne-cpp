@@ -10,13 +10,13 @@ const applications = [
     {
         title: 'MNE Scan',
         description: 'Real-time acquisition and processing of MEG/EEG data with a modular plugin architecture.',
-        link: '/docs/documentation/scan',
+        link: '/docs/manual/scan',
         icon: 'img/icon_mne_scan_256x256.png',
     },
     {
         title: 'MNE Analyze',
         description: 'Visualization, filtering, averaging, co-registration, and source localization.',
-        link: '/docs/documentation/analyze',
+        link: '/docs/manual/analyze',
         icon: 'img/icon_mne-analyze_256x256.png',
     },
     {

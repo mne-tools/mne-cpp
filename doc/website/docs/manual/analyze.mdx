@@ -1,0 +1,52 @@
+---
+title: MNE Analyze
+sidebar_label: MNE Analyze
+---
+# MNE Analyze
+
+:::caution Under Development
+MNE Analyze is currently being ported to MNE-CPP and is not yet feature-complete compared to the original MNE-C `mne_analyze` application.
+:::
+
+MNE Analyze is a GUI application for comprehensive sensor- and source-level analysis of pre-recorded MEG/EEG data. It provides tools for data visualization, preprocessing, source localization, and interactive exploration of results. It currently supports the `.fif` (FIFF) file format.
+
+![MNE Analyze – main window](/img/analyze/mne_an_1.png)
+
+MNE Analyze offers a completely modular work area, with plugins and viewers that can stack, snap to sides, or act as separate windows.
+
+![MNE Analyze – modular layout](/img/analyze/mne_an_2.png)
+
+It also has two user modes, **Clinical** and **Research**, and two view styles, **Default** and **Dark**. These can be selected from the `Appearance` menu.
+
+## Plugin Architecture
+
+MNE Analyze uses a plugin-based architecture. The following plugins are currently available:
+
+| Plugin | Description |
+|---|---|
+| **Data Loader** | Loading FIFF data files |
+| **Data Manager** | Managing loaded datasets |
+| **Raw Data Viewer** | Browsing raw time-series data |
+| **Annotation Manager** | Event marking and annotation |
+| **Averaging** | Computing evoked responses |
+| **Filtering** | Data filtering |
+| **Channel Selection** | Selecting channel subsets |
+| **Co-registration** | MEG/MRI coordinate alignment |
+| **Scaling** | Signal amplitude scaling |
+| **Dipole Fit** | Interactive dipole fitting |
+| **Real-time** | Connection to real-time data streams |
+
+## Planned Features
+
+The original MNE-C `mne_analyze` provided extensive functionality that is planned for future MNE-CPP releases:
+
+- Full 3D visualization of source estimates on cortical surfaces
+- Interactive ROI (Region of Interest) definition
+- Time-frequency analysis displays
+- Connectivity visualization
+- Movie generation of source activity
+- Surface morphing and group analysis visualization
+
+## Plugin Guides
+
+Below are detailed guides for each MNE Analyze plugin.

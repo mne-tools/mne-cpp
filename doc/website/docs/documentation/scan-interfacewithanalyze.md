@@ -1,8 +1,0 @@
----
-title: Linking to MNE Analyze
-sidebar_label: Linking to MNE Analyze
----
-
-# Linking with MNE Analyze
-
-MNE Scan can send clips of recording data to MNE Analyze in real time. Follow [this guide](analyze-realtime.md) to set it up.
