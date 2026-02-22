@@ -5,12 +5,15 @@ sidebar_label: Testing via CI
 
 # Testing via CI
 
-This page shows you how to check your wasm build and deploy it to your `gh-pages` branch. 
+MNE-CPP provides a GitHub Actions workflow (`wasmtest.yml`) that builds the project for WebAssembly and deploys the result to your fork's `gh-pages` branch. This page explains how to set it up.
 
-## Set up gh-pages
+## Prerequisites
 
-If not present already, create a new branch called `gh-pages`. Please note that the `git rm -rf .` command will delete all files in your repository folder, which are not tracked by git:
-```
+### Set Up the `gh-pages` Branch
+
+If your fork does not already have a `gh-pages` branch, create one:
+
+```bash
 git checkout --orphan gh-pages
 git rm -rf .
 touch README.md
@@ -19,17 +22,47 @@ git commit -m 'initial gh-pages commit'
 git push origin gh-pages
 ```
 
-Make sure that `gh-pages` is activated in your forked MNE-CPP repository by checking: mne-cpp > Settings > Options > GitHub Pages > Source: gh-pages branch.
+Then enable GitHub Pages in your fork: **Settings > Pages > Source > Deploy from a branch** and select `gh-pages`.
 
-## Create an Access Token
+### Create a Personal Access Token
 
-Create a new access token and give it repo rights only. A guide on how to create a new token can be found [here](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line).
+Create a [personal access token](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with **repo** scope.
 
-## Set secrets
-A guide on how to create a new token can be found [here](https://help.github.com/en/actions/automating-your-workflow-with-github-actions/creating-and-using-encrypted-secrets#creating-encrypted-secrets). The secret must be named `GIT_CREDENTIALS_WASM_TEST` and have the following format `https://$username:$token@github.com/`, where `$token` is the access token created in the step above and `$username` is your GitHub user name.
+### Add the Repository Secret
 
-## Trigger the Github Actions Workflow
+In your fork go to **Settings > Secrets and variables > Actions** and create a new secret named `GIT_CREDENTIALS_WASM_TEST` with the value:
 
-Create a new branch named `wasm`. If you decide to use a different name make sure to change the branch parameter in the `wasmtest.yml` workflow file accordingly. When ready, commit and push your changes to your remote. This will trigger a wasm build being build via Github actions and then be pushed to your fork's `gh-pages` branch. Please note that this will delete everyhting presenet in your `gh-pages` branch. Building Qt and MNE-CPP for Wasm takes quite some time because we only have two CPU cores at our disposal.
+```
+https://<your-github-username>:<your-token>@github.com/
+```
 
-If everything was setup correctly, the push should trigger a GitHub action to build your changes to the `gh-pages` branch. Once the GitHub action finishes you can take a look at your changes by visiting `https://$username.github.io/mne-cpp/mne_analyze.html`. Please note that it can take some time or multiple refreshes for the changes to show.
+## Trigger the Workflow
+
+The `wasmtest.yml` workflow is triggered by pushes to the `wasm` branch. Create this branch (or use an existing one) and push:
+
+```bash
+git checkout -b wasm
+# make your changes
+git push origin wasm
+```
+
+This will start a GitHub Actions run that:
+
+1. Sets up **Emscripten 4.0.7** and downloads pre-built **Qt 6.10.2** static Wasm binaries (or triggers a build of those binaries if they don't yet exist).
+2. Downloads host Qt binaries (Linux) needed for cross-compilation.
+3. Builds MNE-CPP for WebAssembly using `./tools/wasm.sh --emsdk 4.0.7`.
+4. Pushes the resulting Wasm artifacts to both the `gh-pages` and `main` branches of your fork.
+
+:::note Build Times
+Building Qt and MNE-CPP for WebAssembly takes significant time on CI runners. Pre-built Qt binaries are cached to speed up subsequent builds.
+:::
+
+## View the Result
+
+Once the workflow completes, visit:
+
+```
+https://<your-github-username>.github.io/mne-cpp/mne_analyze.html
+```
+
+It may take a few minutes (or a browser refresh) for GitHub Pages to update.

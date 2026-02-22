@@ -5,104 +5,149 @@ sidebar_label: Build from Source
 
 # Build from Source
 
-MNE-CPP uses CMake as its build system. This guide walks through the full process of compiling MNE-CPP from source.
+MNE-CPP uses **CMake** as its build system and requires **C++20** and **Qt 6**. This guide walks through compiling MNE-CPP from source on Windows, Linux, and macOS.
 
-## Get a compiler
+## Prerequisites
 
-Make sure you have one of the following compilers installed:
+### CMake
 
-| Windows | Linux | MacOS |
+[CMake](https://cmake.org/download/) **3.15 or higher** is required.
+
+### Compiler
+
+MNE-CPP requires a compiler with **C++20 support**. The following compilers are tested in CI:
+
+| Windows | Linux | macOS |
 |---------|-------|-------|
-| min. MSVC 2015 (We recommend the [MSVC 2019 Community Version](https://visualstudio.microsoft.com/vs/older-downloads/) compiler. During installation, exclude everything except for VC++, Win 10 SDK and ATL support) | min. [GCC 5.3.1](https://gcc.gnu.org/releases.html) | min. [Clang 3.5](https://developer.apple.com/xcode/)|
+| [MSVC 2022](https://visualstudio.microsoft.com/vs/community/) (Visual Studio 2022 Community or higher. During installation select the **Desktop development with C++** workload.) | GCC 13+ (ships with Ubuntu 24.04) | Apple Clang via [Xcode](https://developer.apple.com/xcode/) (ships with macOS) |
 
-## Get Qt
+### Qt 6
 
-### Download the Qt installer
+Qt 6 is the only external dependency. **Qt 5 is no longer supported.**
 
-Qt is the only dependency you will need to install. Go to the Qt download section and download the [Qt installer](https://www.qt.io/download-qt-installer?hsCtaTracking=9f6a2170-a938-42df-a8e2-a9f0b1d6cdce%7C6cb0de4f-9bb5-4778-ab02-bfb62735f3e5).
-
-### Install Qt
-
-Please note that Qt 5.10.0 or higher is needed in order to have full Qt3D support. Qt 6 is supported. Install the Qt version with the minimum of the following features (uncheck all other boxes) to a path without white spaces:
-
-- A compiler for your system (MSVC, gcc, clang)
-- QtCharts
-
-After the installation is finished make sure to add the Qt bin folder (e.g. `<QtFolder>\5.15.1\msvc2019_64\bin`) to your `PATH` variable. On Linux and MacOS you might also need to add the Qt lib folder (e.g. `<QtFolder>\5.15.1\msvc2019_64\lib`) to the `LD_LIBRARY_PATH` and `DYLD_LIBRARY_PATH`, respectively.
+1. Download and run the [Qt Online Installer](https://www.qt.io/download-qt-installer).
+2. Install **Qt 6.5 or higher** (CI currently tests with Qt 6.10.x) to a path without spaces. During installation, select:
+   - The compiler target for your platform (e.g., `MSVC 2022 64-bit`, `Desktop gcc 64-bit`, or `macOS`)
+   - **Qt Shader Tools** (required)
+3. After installation, add the Qt `bin` folder to your `PATH`:
+   - **Windows:** e.g. `C:\Qt\6.10.2\msvc2022_64\bin`
+   - **Linux:** e.g. `$HOME/Qt/6.10.2/gcc_64/bin` — also add the `lib` folder to `LD_LIBRARY_PATH`
+   - **macOS:** e.g. `$HOME/Qt/6.10.2/macos/bin` — also add the `lib` folder to `DYLD_LIBRARY_PATH`
 
 ## Get the Source Code
 
-Fork [MNE-CPP's main repository](https://github.com/mne-tools/mne-cpp) to your own GitHub account. For a detailed guide on how to fork a repository, we recommend checking out the [guide on the official GitHub website](https://help.github.com/en/github/getting-started-with-github/fork-a-repo).
+Fork [MNE-CPP's main repository](https://github.com/mne-tools/mne-cpp) to your own GitHub account. For a detailed guide on how to fork a repository, see the [GitHub documentation](https://help.github.com/en/github/getting-started-with-github/fork-a-repo).
 
 Clone the fork to your local machine:
 
-```
+```bash
 git clone https://github.com/<YourGitUserName>/mne-cpp.git
 ```
 
-Setup a new remote pointing to MNE-CPP's main repository:
+Set up a remote pointing to the upstream repository:
 
-```
+```bash
 git remote add upstream https://github.com/mne-tools/mne-cpp.git
 ```
 
-Every time you want to update to the newest changes use:
+To update to the latest changes:
 
-```
+```bash
 git fetch --all
-git rebase upstream/main
+git rebase upstream/v2.0-dev
 ```
 
 ## Compile the Source Code
 
-### Via QtCreator
-
-| **Please note:** If you are working on an operating system on a "non-western" system, i.e. Japan, you might encounter problems with unicode interpretation. Please do the following: Go to Control Panel > Language and Region > Management tab > Language Settings for non-Unicode Programs > Set to English (U.S.) > Reboot your system. |
-
-1. Open mne-cpp in QtCreator. To open the project select the top CMakeLists.txt file in the `src` folder. 
-2. The first time you open the project you will be prompted to configure the project with a pre-defined kit. Select the appropriate kit, e.g., `Desktop Qt 5.15.1 MSVC2019 64bit` and configure the project.
-3. In QtCreator select the Release mode in the lower left corner.
-4. In the Qt Creator's Projects window, right mouse click on the top level MNE-CPP tree item and select Run CMake. Wait until the progress bar in lower right corner turns green (this step may take some time).
-5. Right mouse click again and then hit Build (this step may take some time). Wait until progress bar in lower right corner turns green.
-6. After the build process is finished, go to the `mne-cpp/out/Release` folder. All applications and libraries should have been created throughout the build process.
-
-For building on CentOS and other linux distros with older gcc versions, check if RHEL Developer Toolsets are available with newer versions. In Qt Creator, under `Tools > Options > Kits > Compilers`, you can add a new compiler, and then add it to your build kit in `Tools > Options > Kits > Kits`.
-
 ### Via Command Line
 
-Navigate to the mne-cpp base project folder.
+Navigate to the `mne-cpp` root folder. We provide a cross-platform build script that automatically detects your platform, finds Qt, configures CMake, and builds:
 
-We provide a cross-platform build script to automatically run CMake and build.
-```
+```bash
 ./tools/build_project.bat
 ```
 
-For more build options and how to set them, run:
-```
-./tools/build_project.bat help
+Common options:
+
+| Option | Description |
+|--------|-------------|
+| `help` | Show all available options |
+| `all` | Build everything (apps, examples, and tests) |
+| `static` | Build with static linking |
+| `Debug` | Build in Debug mode (default is Release) |
+| `clean` | Remove previous build before building |
+| `qt <path>` | Use a custom Qt installation path |
+
+Example — build everything in Release mode:
+```bash
+./tools/build_project.bat all
 ```
 
-Alternatively, you can manually run:
-```
+Alternatively, you can invoke CMake directly:
+
+```bash
 cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
-cmake --build build
+cmake --build build --parallel $(nproc)
 ```
 
-The building can be parallelized by adding `--parallel n` to run *n* parallel builds when calling, ex. `cmake --build build --parallel 6`. This is greatly recommended as it speeds up building and is done for you in the provided build script based on the number of available cores.
+On **Windows** with MSVC, first activate the compiler environment, then build:
+
+```powershell
+# Open a Developer Command Prompt for VS 2022, or run:
+cmd.exe /c "call ""C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Auxiliary\Build\vcvars64.bat"" && set > %temp%\vcvars.txt"
+
+cmake -B build -S . -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release --parallel %NUMBER_OF_PROCESSORS%
+```
+
+#### CMake Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `BUILD_SHARED_LIBS` | `ON` | Build shared (dynamic) libraries |
+| `BUILD_APPLICATIONS` | `ON` | Build GUI applications |
+| `BUILD_EXAMPLES` | `ON` | Build example programs |
+| `BUILD_TESTS` | `OFF` | Build unit tests |
+| `BUILD_ALL` | `OFF` | Enable apps, examples, and tests |
+| `WASM` | `OFF` | Configure for WebAssembly (see [WebAssembly](wasm.md)) |
+| `NO_OPENGL` | `OFF` | Disable QOpenGLWidget support |
+
+### Via Qt Creator
+
+1. Open Qt Creator and select **File > Open File or Project**. Navigate to the `mne-cpp` root folder and select the top-level `CMakeLists.txt`.
+2. When prompted, select a kit with your Qt 6 installation — e.g. `Desktop Qt 6.10.2 MSVC2022 64bit`.
+3. Select **Release** mode in the lower-left corner.
+4. In the Projects pane, right-click the top-level `mne_cpp` target and select **Run CMake**.
+5. Right-click again and select **Build** (this may take some time).
+6. Once complete, built binaries are located in `mne-cpp/out/Release`.
 
 ### Running Applications
 
-Once built, applications can be run from within QtCreator using the run button on the bottom left side. To instead run applications from the command line, navigate to `out/Release/apps` and run the program, ex. `./mne_scan`.
+From **Qt Creator**, use the Run button in the lower-left toolbar. From the **command line**, navigate to `out/Release/apps` and run the desired application, e.g.:
+
+```bash
+./mne_scan
+```
 
 ## Test the Build
 
-You might have to add the folders including the Qt libraries to your OS's corresponding environment variables. In order to run the examples you must download the MNE-Sample-Data-Set from [here](https://osf.io/86qa2/download) and extract the files to `mne-cpp/out/Release/resources/MNE-sample-data`. Once finished you can try to run one of the examples, e.g., ex_disp_3D. If the build was successful the example should start and display a window including a 3D brain as well as a source localization result.
+To verify your build, download the [MNE-Sample-Data-Set](https://osf.io/86qa2/download) and extract it to `mne-cpp/out/Release/resources/MNE-sample-data`. Then run one of the examples, e.g. `ex_disp_3D`. If the build is correct, a window with a 3D brain visualization and source localization result will appear.
 
-## Deploying Qt Dependencies
+To build and run the unit tests:
 
-To run compiled applications outside of QtCreator (e.g., from the terminal or OS file manager), you need to resolve Qt-related dependencies. MNE-CPP provides deployment scripts in `tools/deployment`:
+```bash
+./tools/build_project.bat all
+cd build/Release
+ctest --output-on-failure
+```
 
-- **Windows:** `deploy.bat dynamic` (or `static`)
-- **Linux/macOS:** `deploy.sh dynamic` (or `static`)
+## Deploy Qt Dependencies
 
-We recommend the dynamically linked version for development. For more details see the [Deployment](ci-deployment.md) page.
+To run compiled applications outside of Qt Creator (e.g. from the terminal or file manager), Qt runtime libraries must be bundled. MNE-CPP provides a cross-platform deployment script:
+
+```bash
+./tools/deploy.bat dynamic pack    # dynamic linking (recommended for development)
+./tools/deploy.bat static pack     # static linking
+```
+
+The dynamically linked version is recommended for development. For more details, see the [Deployment](ci-deployment.md) page.
