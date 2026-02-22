@@ -33,20 +33,20 @@ const institutions = [
     { name: 'Massachusetts General Hospital', url: 'https://www.massgeneral.org/', logo: 'img/institution_logos/MGH.svg' },
     { name: "Boston Children's Hospital", url: 'http://www.childrenshospital.org/', logo: 'img/institution_logos/bch.svg' },
     { name: 'Harvard Medical School', url: 'https://hms.harvard.edu/', logo: 'img/institution_logos/harvard.svg' },
-    { name: 'UTHealth Houston', url: 'https://www.uth.edu/', logo: 'img/institution_logos/uthealth.svg' },
+    { name: 'UTHealth Houston', url: 'https://www.uth.edu/', logo: 'img/institution_logos/uthealth.png' },
     { name: 'Universität Magdeburg', url: 'https://www.uni-magdeburg.de/', logo: 'img/institution_logos/magdeburg.svg' },
     { name: 'Forschungscampus Stimulate', url: 'https://www.forschungscampus-stimulate.de/', logo: 'img/institution_logos/stimulate_magdeburg.svg' },
-    { name: 'UMIT', url: 'https://umit.at/', logo: 'img/institution_logos/umit.svg' },
-    { name: 'Universitätsklinikum Jena', url: 'https://www.uniklinikum-jena.de/', logo: 'img/institution_logos/jena.svg' },
+    { name: 'Universität Innsbruck', url: 'https://www.uibk.ac.at/', logo: 'img/institution_logos/innsbruck.png' },
+    { name: 'Universitätsklinikum Jena', url: 'https://www.uniklinikum-jena.de/', logo: 'img/institution_logos/jena.png' },
 ];
 
 const funders = [
     { name: 'NIH / NIBIB', logo: 'img/funding_logos/nibib.svg', url: 'https://www.nibib.nih.gov/' },
     { name: 'NIH', logo: 'img/funding_logos/nih.svg', url: 'https://www.nih.gov/' },
-    { name: 'DFG', logo: 'img/funding_logos/dfg.svg', url: 'https://www.dfg.de/' },
+    { name: 'DFG', logo: 'img/funding_logos/dfg.png', url: 'https://www.dfg.de/' },
     { name: 'FWF', logo: 'img/funding_logos/fwf.svg', url: 'https://www.fwf.ac.at/' },
     { name: 'AWS', logo: 'img/funding_logos/aws.svg', url: 'https://aws.amazon.com/' },
-    { name: 'Azure', logo: 'img/funding_logos/azure.svg', url: 'https://azure.microsoft.com/' },
+    { name: 'Azure', logo: 'img/funding_logos/azure.png', url: 'https://azure.microsoft.com/' },
 ];
 
 const contributors = [

@@ -14,34 +14,40 @@ The following diagram shows the complete workflow of the MNE software. The MRI p
 
 ```mermaid
 flowchart TD
-    MRI_RAW["<b>🧠 MRI Data</b><br/><i style='font-weight:300'>Raw anatomical</i>"]
-    FS["<b>Reconstructed MRI</b><br/><i style='font-weight:300'>FreeSurfer</i>"]
-    COR_T1["<b>COR.fif</b> (T1)<br/><i style='font-weight:300'>mne_setup_mri</i>"]
-    COR_BRAIN["<b>COR.fif</b> (brain)<br/><i style='font-weight:300'>mne_setup_mri</i>"]
-    SRC["<b>Source Space</b><br/><i style='font-weight:300'>mne_setup_source_space</i>"]
-    COR_ALIGNED["<b>COR-aligned.fif</b><br/><i style='font-weight:300'>Coregistration</i>"]
-    BEM_MESH["<b>BEM Mesh</b><br/><i style='font-weight:300'>mne_watershed_bem</i><br/><i style='font-weight:300'>mne_flash_bem</i>"]
-    BEM_MODEL["<b>BEM Model</b><br/><i style='font-weight:300'>mne_setup_forward_model</i>"]
+    subgraph MRI_PATH["MRI Processing"]
+        direction TB
+        MRI_RAW["<b>MRI Data</b><br/><i style='font-weight:300'>Raw anatomical</i>"]
+        FS["<b>Reconstructed MRI</b><br/><i style='font-weight:300'>FreeSurfer</i>"]
+        COR_T1["<b>COR.fif</b> (T1)<br/><i style='font-weight:300'>mne_setup_mri</i>"]
+        COR_BRAIN["<b>COR.fif</b> (brain)<br/><i style='font-weight:300'>mne_setup_mri</i>"]
+        SRC["<b>Source Space</b><br/><i style='font-weight:300'>mne_setup_source_space</i>"]
+        COR_ALIGNED["<b>COR-aligned.fif</b><br/><i style='font-weight:300'>Coregistration</i>"]
+        BEM_MESH["<b>BEM Mesh</b><br/><i style='font-weight:300'>mne_watershed_bem</i><br/><i style='font-weight:300'>mne_flash_bem</i>"]
+        BEM_MODEL["<b>BEM Model</b><br/><i style='font-weight:300'>mne_setup_forward_model</i>"]
 
-    MEG_RAW["<b>👤 MEG/EEG Data</b><br/><i style='font-weight:300'>Raw recordings</i>"]
-    FILTERED["<b>Filtered &amp; Averaged</b><br/><i style='font-weight:300'>mne_browse_raw</i>"]
-    NOISE["<b>Noise Covariance</b><br/><i style='font-weight:300'>Matrix</i>"]
+        MRI_RAW --> FS
+        FS --> COR_T1
+        FS --> COR_BRAIN
+        FS --> SRC
+        COR_T1 --> COR_ALIGNED
+        COR_BRAIN --> BEM_MESH
+        BEM_MESH --> BEM_MODEL
+    end
+
+    subgraph MEG_PATH["MEG/EEG Processing"]
+        direction TB
+        MEG_RAW["<b>MEG/EEG Data</b><br/><i style='font-weight:300'>Raw recordings</i>"]
+        FILTERED["<b>Filtered &amp; Averaged</b><br/><i style='font-weight:300'>mne_browse_raw</i>"]
+        NOISE["<b>Noise Covariance</b><br/><i style='font-weight:300'>Matrix</i>"]
+
+        MEG_RAW --> FILTERED
+        MEG_RAW --> NOISE
+    end
 
     FWD["<b>Forward Solution</b><br/><i style='font-weight:300'>mne_forward_solution</i>"]
     INV["<b>Inverse Operator</b><br/><i style='font-weight:300'>mne_inverse_operator</i>"]
     ANALYZE["<b>Analyze &amp; Visualize</b><br/><i style='font-weight:300'>MNE Analyze</i>"]
     OUTPUT["<b>Source Estimates</b><br/><i style='font-weight:300'>stc / w files, movies</i>"]
-
-    MRI_RAW --> FS
-    FS --> COR_T1
-    FS --> COR_BRAIN
-    FS --> SRC
-    COR_T1 --> COR_ALIGNED
-    COR_BRAIN --> BEM_MESH
-    BEM_MESH --> BEM_MODEL
-
-    MEG_RAW --> FILTERED
-    MEG_RAW --> NOISE
 
     SRC --> FWD
     BEM_MODEL --> FWD
@@ -63,6 +69,9 @@ flowchart TD
     class MEG_RAW,FILTERED,NOISE meg
     class FWD,INV,ANALYZE proc
     class OUTPUT out
+
+    style MRI_PATH fill:none,stroke:#28a745,stroke-width:1px,stroke-dasharray:5 5
+    style MEG_PATH fill:none,stroke:#2874a6,stroke-width:1px,stroke-dasharray:5 5
 
     linkStyle default stroke:#6c757d,stroke-width:1.5px
 ```
@@ -274,6 +283,7 @@ Group analysis is facilitated by morphing source estimates to a common template 
 
 ## References
 
+- Esch, L., Dinh, C., Larson, E., Engemann, D., Jas, M., Khan, S., Gramfort, A., & Hämäläinen, M.S. (2019). MNE: Software for Acquiring, Processing and Visualizing MEG/EEG Data. *Magnetoencephalography: From Signals to Dynamic Cortical Networks*, 2nd Edition. Springer. DOI: [10.1007/978-3-319-62657-4_59-1](https://doi.org/10.1007/978-3-319-62657-4_59-1)
 - Hämäläinen, M.S. (2009). *MNE Software User's Guide*. Martinos Center for Biomedical Imaging, Massachusetts General Hospital.
-- Gramfort, A., Luessi, M., Larson, E., Engemann, D.A., Strohmeier, D., Brodbeck, C., Goj, R., Jas, M., Brooks, T., Parkkonen, L., & Hämäläinen, M. (2013). MEG and EEG data analysis with MNE-Python. *Frontiers in Neuroscience*, 7, 267.
-- Gramfort, A., Luessi, M., Larson, E., Engemann, D.A., Strohmeier, D., Brodbeck, C., Parkkonen, L., & Hämäläinen, M.S. (2014). MNE software for processing MEG and EEG data. *NeuroImage*, 86, 446–460.
+- Gramfort, A., Luessi, M., Larson, E., Engemann, D.A., Strohmeier, D., Brodbeck, C., Goj, R., Jas, M., Brooks, T., Parkkonen, L., & Hämäläinen, M. (2013). MEG and EEG data analysis with MNE-Python. *Frontiers in Neuroscience*, 7, 267. DOI: [10.3389/fnins.2013.00267](https://doi.org/10.3389/fnins.2013.00267)
+- Gramfort, A., Luessi, M., Larson, E., Engemann, D.A., Strohmeier, D., Brodbeck, C., Parkkonen, L., & Hämäläinen, M.S. (2014). MNE software for processing MEG and EEG data. *NeuroImage*, 86, 446–460. DOI: [10.1016/j.neuroimage.2013.10.027](https://doi.org/10.1016/j.neuroimage.2013.10.027)
