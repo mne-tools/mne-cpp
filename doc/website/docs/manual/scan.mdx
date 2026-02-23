@@ -6,4 +6,32 @@ sidebar_label: MNE Scan
 
 ![](https://github.com/mne-cpp/media/blob/main/images/sourceloc.gif?raw=true)
 
-Below are some guides to get you started with MNE Scan.
+MNE Scan is MNE-CPP's real-time data acquisition and processing application. It uses a modular **plugin pipeline** where data flows from acquisition plugins through processing stages to output plugins. Users wire plugins together in a visual GUI, enabling flexible experiment setups without writing code.
+
+## Key Features
+
+- **Real-time acquisition** from MEG and EEG hardware (BabyMEG, Neuromag/Elekta/MEGIN, BrainAmp, gUSBamp, EEGoSports, TMSI, Natus) or via generic protocols (FieldTrip Buffer, Lab Streaming Layer)
+- **Signal processing** including real-time filtering, noise reduction (SSP/compensators), signal-space separation, and artifact rejection
+- **Real-time averaging** with configurable baseline correction and artifact thresholds
+- **Forward modeling** with on-the-fly BEM-based computation and optional HPI-driven head-position updates
+- **Source localization** using minimum-norm estimates (MNE), including real-time cortical source mapping with 3D visualization
+- **Head position monitoring** with continuous HPI coil fitting for MEG systems
+- **Neuronal connectivity** estimation in real time
+- **File recording** in FIFF format for offline analysis
+- **Pre-recorded data playback** via the FiffSimulator plugin for testing and development
+
+## Plugin Architecture
+
+MNE Scan plugins fall into three categories:
+
+| Category | Role | Examples |
+|----------|------|----------|
+| **Sensor** | Acquire data from hardware or network streams | FiffSimulator, BabyMEG, BrainAmp, LSL, FieldTrip Buffer |
+| **Algorithm** | Process data in the pipeline | Averaging, Covariance, Noise Reduction, Forward Solution, MNE, HPI |
+| **IO** | Output or store results | Write-to-File |
+
+Plugins are loaded as shared libraries at runtime and communicate through typed input/output connectors linked by lock-free ring buffers.
+
+## Guides
+
+Below are guides to get you started with MNE Scan.

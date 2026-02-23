@@ -33,7 +33,6 @@ const config: Config = {
             {
                 docs: {
                     sidebarPath: './sidebars.ts',
-                    editUrl: 'https://github.com/mne-tools/mne-cpp/tree/main/doc/website/',
                     remarkPlugins: [remarkMath],
                     rehypePlugins: [rehypeKatex],
                 },
