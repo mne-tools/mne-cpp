@@ -5,10 +5,12 @@
 
 /* ── Font & variable overrides ─────────────────────────────────── */
 html {
-    --font-family: system-ui, -apple-system, "Segoe UI", Roboto, Ubuntu,
-        Cantarell, "Noto Sans", sans-serif, BlinkMacSystemFont;
-    --navigation-font-size: 0.9375rem;
-    /* 15px – matches Docusaurus body */
+    --font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu,
+        Cantarell, Noto Sans, sans-serif, BlinkMacSystemFont, "Segoe UI",
+        Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+        "Segoe UI Symbol";
+    --navigation-font-size: 1rem;
+    /* 16px – matches Docusaurus navbar (--ifm-font-size-base: 100%) */
     --title-font-size: 1.25rem;
     /* 20px – keeps logo area compact */
 }
@@ -27,8 +29,8 @@ html {
 }
 
 #projectlogo img {
-    max-height: 1.75rem;
-    /* ~28px – compact like Docusaurus logo */
+    max-height: 2rem;
+    /* 32px – matches Docusaurus navbar logo */
     margin-right: 0.5rem;
 }
 
@@ -52,9 +54,30 @@ html.dark-mode #projectlogo .logo-dark {
 }
 
 #projectnumber {
-    font-size: 0.8rem;
+    display: none;
+}
+
+/* ── Version badge (doxygen-awesome blue accent) ──────────────── */
+.version-badge {
+    font-size: 0.75rem;
     font-weight: 500;
-    opacity: 0.75;
+    padding: 0.15rem 0.55rem;
+    border-radius: 12px;
+    background: rgba(23, 121, 196, 0.1);
+    border: 1px solid rgba(23, 121, 196, 0.25);
+    color: var(--primary-color);
+    letter-spacing: 0.03em;
+    margin-right: 0.5rem;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+
+html.dark-mode .version-badge {
+    background: rgba(25, 130, 210, 0.12);
+    border-color: rgba(25, 130, 210, 0.25);
+    color: var(--primary-color);
 }
 
 /* ── Navigation links: Docusaurus-style semibold ───────────────── */
@@ -116,7 +139,7 @@ html.dark-mode #projectlogo .logo-dark {
     gap: 0.375rem;
 }
 
-/* Search box */
+/* Search box – pushed to outer right via flex order */
 .tabs #MSearchBox,
 #MSearchBox {
     display: inline-flex !important;
@@ -124,6 +147,8 @@ html.dark-mode #projectlogo .logo-dark {
     vertical-align: middle;
     position: relative !important;
     right: auto !important;
+    order: 100;
+    margin-left: 0.5rem !important;
 }
 
 /* Center text vertically inside search input */
@@ -151,30 +176,33 @@ doxygen-awesome-dark-mode-toggle,
 
 /* ── GitHub link in header (matches Docusaurus style) ──────────── */
 .github-link {
-    display: inline-flex;
+    display: inline-flex !important;
     align-items: center;
     justify-content: center;
-    width: 2rem;
-    height: 2rem;
+    width: auto;
+    height: auto;
     margin-left: 0.5rem;
     border-radius: var(--border-radius-small, 4px);
     vertical-align: middle;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
 }
 
 .github-link:hover {
-    background-color: rgba(0, 0, 0, 0.05);
-}
-
-html.dark-mode .github-link:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    opacity: 0.7;
+    text-decoration: none !important;
+    background: none !important;
+    color: inherit !important;
 }
 
 .github-link svg {
-    width: 24px;
-    height: 24px;
+    width: 24px !important;
+    height: 24px !important;
+    min-width: 24px;
+    min-height: 24px;
     fill: var(--header-foreground);
+    flex-shrink: 0;
 }
 
 /* ── Dark mode toggle: match Docusaurus look ───────────────────── */
@@ -182,9 +210,19 @@ doxygen-awesome-dark-mode-toggle {
     width: 2rem !important;
     height: 2rem !important;
     font-size: 20px !important;
+    border-radius: 50% !important;
+    transition: background var(--animation-duration) ease-in-out;
+}
+
+doxygen-awesome-dark-mode-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+html.dark-mode doxygen-awesome-dark-mode-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
 doxygen-awesome-dark-mode-toggle>svg {
-    width: 20px;
-    height: 20px;
+    width: 24px;
+    height: 24px;
 }

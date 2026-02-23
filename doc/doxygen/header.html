@@ -53,7 +53,7 @@
             gh.className = 'github-link';
             gh.title = 'GitHub';
             gh.innerHTML =
-                '<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
+                '<svg width="24" height="24" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">' +
                 '<path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 ' +
                 '8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04' +
                 '-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 ' +
@@ -67,14 +67,40 @@
                 '4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 ' +
                 '1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 ' +
                 '22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>';
-            /* Insert before the dark-mode toggle so it appears to its left */
-            var toggle = document.querySelector('doxygen-awesome-dark-mode-toggle');
-            if (toggle && toggle.parentNode) {
-                toggle.parentNode.insertBefore(gh, toggle);
-            } else {
-                var parent = document.getElementById('MSearchBox');
-                if (parent) parent.parentNode.appendChild(gh);
-            }
+            /* Version badge – reads the Doxygen #projectnumber element */
+            var pn = document.getElementById('projectnumber');
+            var badge = document.createElement('span');
+            badge.className = 'version-badge';
+            badge.textContent = pn ? pn.textContent.trim() : '';
+
+            /* Poll until the dark-mode toggle or #main-nav appears (doxygen-awesome creates them late) */
+            var attempts = 0;
+            var timer = setInterval(function () {
+                attempts++;
+                var toggle = document.querySelector('doxygen-awesome-dark-mode-toggle');
+                var mainNav = document.getElementById('main-nav');
+                var searchPos = document.getElementById('searchBoxPos2');
+                if (toggle && toggle.parentNode) {
+                    /* Badge goes left of search; GitHub link stays right next to toggle */
+                    if (searchPos) {
+                        searchPos.insertBefore(badge, searchPos.firstChild);
+                    } else {
+                        toggle.parentNode.insertBefore(badge, toggle);
+                    }
+                    toggle.parentNode.insertBefore(gh, toggle);
+                    clearInterval(timer);
+                } else if (mainNav) {
+                    if (searchPos) {
+                        searchPos.insertBefore(badge, searchPos.firstChild);
+                    } else {
+                        mainNav.appendChild(badge);
+                    }
+                    mainNav.appendChild(gh);
+                    clearInterval(timer);
+                } else if (attempts > 50) {
+                    clearInterval(timer);
+                }
+            }, 100);
         });
     </script>
 

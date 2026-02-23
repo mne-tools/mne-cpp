@@ -44,7 +44,20 @@ const config: Config = {
         ],
     ],
 
-    themes: ['@docusaurus/theme-mermaid'],
+    themes: [
+        '@docusaurus/theme-mermaid',
+        [
+            '@easyops-cn/docusaurus-search-local',
+            {
+                hashed: true,
+                indexDocs: true,
+                indexBlog: false,
+                docsRouteBasePath: '/docs',
+                searchBarShortcutHint: true,
+                searchBarPosition: 'right',
+            },
+        ],
+    ],
 
     markdown: {
         format: 'mdx',
