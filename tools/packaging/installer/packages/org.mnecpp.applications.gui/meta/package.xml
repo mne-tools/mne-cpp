@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>GUI Applications</DisplayName>
+    <Description>Graphical MNE-CPP applications: MNE Scan (real-time acquisition and processing), MNE Analyze (offline analysis and visualization), MNE Browse (raw data browser), MNE Inspect (3D source-space viewer), and MNE Anonymize (FIFF file de-identification with optional GUI).</Description>
+    <Version>2.0.0</Version>
+    <ReleaseDate>2026-02-24</ReleaseDate>
+    <Default>true</Default>
+    <SortingPriority>95</SortingPriority>
+    <Script>installscript.qs</Script>
+</Package>

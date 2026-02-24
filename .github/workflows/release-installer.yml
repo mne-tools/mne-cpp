@@ -72,35 +72,75 @@ jobs:
       run: |
         STAGING="tools/packaging/installer/packages"
 
-        # Applications — bin/
+        # CLI tools (QCoreApplication-based, no GUI dependencies)
+        CLI_APPS="mne_anonymize mne_edf2fiff mne_show_fiff mne_compute_raw_inverse mne_forward_solution mne_setup_mri mne_surf2bem mne_setup_forward_model mne_watershed_bem mne_flash_bem mne_rt_server mne_dipole_fit"
+
+        # GUI applications (QApplication-based, require display)
+        GUI_APPS="mne_scan mne_analyze mne_browse mne_inspect"
+
+        # --- Extract full archive to temp ---
+        EXTRACT_DIR="$(mktemp -d)"
+        tar xf "$RELEASE_ARCHIVE" -C "$EXTRACT_DIR" 2>/dev/null || true
+        # Find the actual content root
+        CONTENT_DIR="$EXTRACT_DIR"
+        if ls "$EXTRACT_DIR"/mne-cpp*/ 1>/dev/null 2>&1; then
+          CONTENT_DIR="$(ls -d "$EXTRACT_DIR"/mne-cpp*/ | head -1)"
+        fi
+
+        # --- CLI Tools → org.mnecpp.applications.cli ---
+        CLI_DATA="${STAGING}/org.mnecpp.applications.cli/data"
+        mkdir -p "${CLI_DATA}/bin"
+        for app in $CLI_APPS; do
+          if [ -f "$CONTENT_DIR/bin/$app" ]; then
+            cp "$CONTENT_DIR/bin/$app" "${CLI_DATA}/bin/"
+          fi
+        done
+
+        # --- GUI Apps → org.mnecpp.applications.gui ---
+        GUI_DATA="${STAGING}/org.mnecpp.applications.gui/data"
+        mkdir -p "${GUI_DATA}/bin"
+        for app in $GUI_APPS; do
+          if [ -f "$CONTENT_DIR/bin/$app" ]; then
+            cp "$CONTENT_DIR/bin/$app" "${GUI_DATA}/bin/"
+          elif [ -d "$CONTENT_DIR/bin/${app}.app" ]; then
+            cp -r "$CONTENT_DIR/bin/${app}.app" "${GUI_DATA}/bin/"
+          fi
+        done
+
+        # --- All apps also in the legacy parent component (backward compat) ---
         APP_DATA="${STAGING}/org.mnecpp.applications/data"
         mkdir -p "${APP_DATA}/bin"
-        tar xf "$RELEASE_ARCHIVE" -C "${APP_DATA}" --strip-components=0 \
-          --wildcards '*/bin/*' 2>/dev/null || true
-        # Flatten: if extracted as mne-cpp-*/bin/*, move up
-        if [ -d "${APP_DATA}/mne-cpp"* ] 2>/dev/null; then
-          mv "${APP_DATA}"/mne-cpp*/bin/* "${APP_DATA}/bin/" 2>/dev/null || true
-          rm -rf "${APP_DATA}"/mne-cpp*
+        if [ -d "$CONTENT_DIR/bin" ]; then
+          cp -r "$CONTENT_DIR/bin/"* "${APP_DATA}/bin/" 2>/dev/null || true
         fi
 
         # Runtime — lib/
         RT_DATA="${STAGING}/org.mnecpp.runtime/data"
         mkdir -p "${RT_DATA}/lib"
-        tar xf "$RELEASE_ARCHIVE" -C "${RT_DATA}" --strip-components=0 \
-          --wildcards '*/lib/*' 2>/dev/null || true
-        if [ -d "${RT_DATA}/mne-cpp"* ] 2>/dev/null; then
-          mv "${RT_DATA}"/mne-cpp*/lib/* "${RT_DATA}/lib/" 2>/dev/null || true
-          rm -rf "${RT_DATA}"/mne-cpp*
+        if [ -d "$CONTENT_DIR/lib" ]; then
+          cp -r "$CONTENT_DIR/lib/"* "${RT_DATA}/lib/" 2>/dev/null || true
         fi
 
         # SDK — include/ + lib/cmake/
         SDK_DATA="${STAGING}/org.mnecpp.sdk/data"
-        mkdir -p "${SDK_DATA}"
-        tar xf "$RELEASE_ARCHIVE" -C "${SDK_DATA}" --strip-components=0 \
-          --wildcards '*/include/*' '*/lib/cmake/*' 2>/dev/null || true
-        if [ -d "${SDK_DATA}/mne-cpp"* ] 2>/dev/null; then
-          cp -r "${SDK_DATA}"/mne-cpp*/* "${SDK_DATA}/" 2>/dev/null || true
-          rm -rf "${SDK_DATA}"/mne-cpp*
+        mkdir -p "${SDK_DATA}/include"
+        # Release archives don't ship headers; copy them from the source tree.
+        for lib_dir in src/libraries/*/; do
+          lib_name=$(basename "$lib_dir")
+          [ "$lib_name" = "CMakeLists.txt" ] && continue
+          find "$lib_dir" -name '*.h' | while read hdr; do
+            rel="${hdr#src/libraries/}"
+            dest_dir="${SDK_DATA}/include/$(dirname "$rel")"
+            mkdir -p "$dest_dir"
+            cp "$hdr" "$dest_dir/"
+          done
+        done
+        if [ -d "$CONTENT_DIR/include" ]; then
+          cp -r "$CONTENT_DIR/include/"* "${SDK_DATA}/include/" 2>/dev/null || true
+        fi
+        if [ -d "$CONTENT_DIR/lib/cmake" ]; then
+          mkdir -p "${SDK_DATA}/lib"
+          cp -r "$CONTENT_DIR/lib/cmake" "${SDK_DATA}/lib/" 2>/dev/null || true
         fi
 
         # Scripts (sample data / mne-python / path config)
@@ -114,8 +154,11 @@ jobs:
         cp tools/packaging/scripts/configure_environment.sh  "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
         cp tools/packaging/scripts/configure_environment.bat "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
 
+        # Clean up temp
+        rm -rf "$EXTRACT_DIR"
+
         echo "Staged package layout:"
-        find tools/packaging/installer -type f | head -60
+        find tools/packaging/installer -type f | head -80
 
     - name: Build installer with binarycreator
       run: |
@@ -186,7 +229,7 @@ jobs:
       env:
         GH_TOKEN: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
       run: |
-        ASSET="${{ steps.tag.outputs.asset_prefix }}-macos-dynamic-x86_64.tar.gz"
+        ASSET="${{ steps.tag.outputs.asset_prefix }}-macos-dynamic-arm64.tar.gz"
         echo "Downloading ${ASSET} from release ${{ steps.tag.outputs.tag }}..."
         gh release download "${{ steps.tag.outputs.tag }}" -p "${ASSET}" -D /tmp
         echo "RELEASE_ARCHIVE=/tmp/${ASSET}" >> $GITHUB_ENV
@@ -195,34 +238,77 @@ jobs:
       run: |
         STAGING="tools/packaging/installer/packages"
 
-        # Applications — bin/
+        # CLI tools (QCoreApplication-based, no GUI dependencies)
+        CLI_APPS="mne_anonymize mne_edf2fiff mne_show_fiff mne_compute_raw_inverse mne_forward_solution mne_setup_mri mne_surf2bem mne_setup_forward_model mne_watershed_bem mne_flash_bem mne_rt_server mne_dipole_fit"
+
+        # GUI applications (QApplication-based, require display)
+        GUI_APPS="mne_scan mne_analyze mne_browse mne_inspect"
+
+        # --- Extract full archive to temp ---
+        EXTRACT_DIR="$(mktemp -d)"
+        tar xf "$RELEASE_ARCHIVE" -C "$EXTRACT_DIR" 2>/dev/null || true
+        CONTENT_DIR="$EXTRACT_DIR"
+        if ls "$EXTRACT_DIR"/mne-cpp*/ 1>/dev/null 2>&1; then
+          CONTENT_DIR="$(ls -d "$EXTRACT_DIR"/mne-cpp*/ | head -1)"
+        fi
+
+        # --- CLI Tools → org.mnecpp.applications.cli ---
+        CLI_DATA="${STAGING}/org.mnecpp.applications.cli/data"
+        mkdir -p "${CLI_DATA}/bin"
+        for app in $CLI_APPS; do
+          # macOS: plain binary or .app bundle
+          if [ -f "$CONTENT_DIR/bin/$app" ]; then
+            cp "$CONTENT_DIR/bin/$app" "${CLI_DATA}/bin/"
+          elif [ -d "$CONTENT_DIR/bin/${app}.app" ]; then
+            cp -r "$CONTENT_DIR/bin/${app}.app" "${CLI_DATA}/bin/"
+          fi
+        done
+
+        # --- GUI Apps → org.mnecpp.applications.gui ---
+        GUI_DATA="${STAGING}/org.mnecpp.applications.gui/data"
+        mkdir -p "${GUI_DATA}/bin"
+        for app in $GUI_APPS; do
+          if [ -d "$CONTENT_DIR/bin/${app}.app" ]; then
+            cp -r "$CONTENT_DIR/bin/${app}.app" "${GUI_DATA}/bin/"
+          elif [ -f "$CONTENT_DIR/bin/$app" ]; then
+            cp "$CONTENT_DIR/bin/$app" "${GUI_DATA}/bin/"
+          fi
+        done
+
+        # --- Legacy parent component (backward compat) ---
         APP_DATA="${STAGING}/org.mnecpp.applications/data"
         mkdir -p "${APP_DATA}/bin"
-        tar xf "$RELEASE_ARCHIVE" -C "${APP_DATA}" --strip-components=0 \
-          --wildcards '*/bin/*' 2>/dev/null || true
-        if ls "${APP_DATA}"/mne-cpp*/bin/* 1>/dev/null 2>&1; then
-          mv "${APP_DATA}"/mne-cpp*/bin/* "${APP_DATA}/bin/" 2>/dev/null || true
-          rm -rf "${APP_DATA}"/mne-cpp*
+        if [ -d "$CONTENT_DIR/bin" ]; then
+          cp -r "$CONTENT_DIR/bin/"* "${APP_DATA}/bin/" 2>/dev/null || true
         fi
 
         # Runtime — lib/
         RT_DATA="${STAGING}/org.mnecpp.runtime/data"
         mkdir -p "${RT_DATA}/lib"
-        tar xf "$RELEASE_ARCHIVE" -C "${RT_DATA}" --strip-components=0 \
-          --wildcards '*/lib/*' 2>/dev/null || true
-        if ls "${RT_DATA}"/mne-cpp*/lib/* 1>/dev/null 2>&1; then
-          mv "${RT_DATA}"/mne-cpp*/lib/* "${RT_DATA}/lib/" 2>/dev/null || true
-          rm -rf "${RT_DATA}"/mne-cpp*
+        if [ -d "$CONTENT_DIR/lib" ]; then
+          cp -r "$CONTENT_DIR/lib/"* "${RT_DATA}/lib/" 2>/dev/null || true
         fi
 
         # SDK — include/ + lib/cmake/
         SDK_DATA="${STAGING}/org.mnecpp.sdk/data"
-        mkdir -p "${SDK_DATA}"
-        tar xf "$RELEASE_ARCHIVE" -C "${SDK_DATA}" --strip-components=0 \
-          --wildcards '*/include/*' '*/lib/cmake/*' 2>/dev/null || true
-        if ls "${SDK_DATA}"/mne-cpp*/* 1>/dev/null 2>&1; then
-          cp -r "${SDK_DATA}"/mne-cpp*/* "${SDK_DATA}/" 2>/dev/null || true
-          rm -rf "${SDK_DATA}"/mne-cpp*
+        mkdir -p "${SDK_DATA}/include"
+        # Release archives don't ship headers; copy from the source tree.
+        for lib_dir in src/libraries/*/; do
+          lib_name=$(basename "$lib_dir")
+          [ "$lib_name" = "CMakeLists.txt" ] && continue
+          find "$lib_dir" -name '*.h' | while read hdr; do
+            rel="${hdr#src/libraries/}"
+            dest_dir="${SDK_DATA}/include/$(dirname "$rel")"
+            mkdir -p "$dest_dir"
+            cp "$hdr" "$dest_dir/"
+          done
+        done
+        if [ -d "$CONTENT_DIR/include" ]; then
+          cp -r "$CONTENT_DIR/include/"* "${SDK_DATA}/include/" 2>/dev/null || true
+        fi
+        if [ -d "$CONTENT_DIR/lib/cmake" ]; then
+          mkdir -p "${SDK_DATA}/lib"
+          cp -r "$CONTENT_DIR/lib/cmake" "${SDK_DATA}/lib/" 2>/dev/null || true
         fi
 
         # Scripts
@@ -236,6 +322,90 @@ jobs:
         cp tools/packaging/scripts/configure_environment.sh  "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
         cp tools/packaging/scripts/configure_environment.bat "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
 
+        # Clean up temp
+        rm -rf "$EXTRACT_DIR"
+
+    # -----------------------------------------------------------------
+    # Code Signing & Notarization
+    # -----------------------------------------------------------------
+    # Required repository secrets:
+    #   APPLE_DEVELOPER_ID_P12       – Base64-encoded .p12 certificate
+    #                                  (Developer ID Application)
+    #   APPLE_DEVELOPER_ID_PASSWORD  – Password for the .p12 file
+    #   APPLE_TEAM_ID                – 10-char Apple Team ID
+    #   APPLE_ID                     – Apple ID email for notarytool
+    #   APPLE_APP_PASSWORD           – App-specific password for notarytool
+    # -----------------------------------------------------------------
+
+    - name: Import Apple Developer ID certificate
+      if: env.APPLE_DEVELOPER_ID_P12 != ''
+      env:
+        APPLE_DEVELOPER_ID_P12: ${{ secrets.APPLE_DEVELOPER_ID_P12 }}
+        APPLE_DEVELOPER_ID_PASSWORD: ${{ secrets.APPLE_DEVELOPER_ID_PASSWORD }}
+      run: |
+        # Create a temporary keychain
+        KEYCHAIN_PATH="$RUNNER_TEMP/signing.keychain-db"
+        KEYCHAIN_PASSWORD="$(openssl rand -hex 16)"
+
+        security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+        security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+        security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+        # Import the certificate
+        echo "$APPLE_DEVELOPER_ID_P12" | base64 --decode > "$RUNNER_TEMP/certificate.p12"
+        security import "$RUNNER_TEMP/certificate.p12" \
+          -k "$KEYCHAIN_PATH" \
+          -P "$APPLE_DEVELOPER_ID_PASSWORD" \
+          -T /usr/bin/codesign \
+          -T /usr/bin/productsign
+
+        security set-key-partition-list -S apple-tool:,apple:,codesign: \
+          -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+
+        # Add to search list
+        security list-keychains -d user -s "$KEYCHAIN_PATH" $(security list-keychains -d user | tr -d '"')
+
+        # Extract the signing identity
+        IDENTITY=$(security find-identity -v -p codesigning "$KEYCHAIN_PATH" | head -1 | awk -F'"' '{print $2}')
+        echo "CODESIGN_IDENTITY=$IDENTITY" >> $GITHUB_ENV
+        echo "KEYCHAIN_PATH=$KEYCHAIN_PATH" >> $GITHUB_ENV
+        echo "Signing identity: $IDENTITY"
+
+    - name: Codesign staged binaries
+      if: env.CODESIGN_IDENTITY != ''
+      run: |
+        STAGING="tools/packaging/installer/packages"
+        OPTS="--force --options runtime --timestamp"
+
+        echo "=== Signing shared libraries ==="
+        find "$STAGING" -name "*.dylib" -exec \
+          codesign $OPTS --sign "$CODESIGN_IDENTITY" {} \;
+
+        echo "=== Signing frameworks ==="
+        find "$STAGING" -name "*.framework" -type d | while read fw; do
+          codesign $OPTS --deep --sign "$CODESIGN_IDENTITY" "$fw"
+        done
+
+        echo "=== Signing CLI binaries ==="
+        CLI_DATA="$STAGING/org.mnecpp.applications.cli/data/bin"
+        if [ -d "$CLI_DATA" ]; then
+          find "$CLI_DATA" -type f -perm +111 ! -name "*.dylib" -exec \
+            codesign $OPTS --sign "$CODESIGN_IDENTITY" {} \;
+        fi
+
+        echo "=== Signing GUI .app bundles ==="
+        GUI_DATA="$STAGING/org.mnecpp.applications.gui/data/bin"
+        if [ -d "$GUI_DATA" ]; then
+          find "$GUI_DATA" -name "*.app" -type d | while read app; do
+            codesign $OPTS --deep --sign "$CODESIGN_IDENTITY" "$app"
+          done
+        fi
+
+        echo "=== Verifying signatures ==="
+        find "$STAGING" \( -name "*.app" -o -name "*.dylib" \) | head -5 | while read f; do
+          codesign --verify --verbose "$f" && echo "  OK: $f" || echo "  FAIL: $f"
+        done
+
     - name: Build installer with binarycreator
       run: |
         binarycreator \
@@ -244,16 +414,60 @@ jobs:
           -p tools/packaging/installer/packages \
           MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin
 
-        # Create DMG from the generated installer
-        if [ -f "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app" ] || [ -d "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app" ]; then
-          hdiutil create -volname "MNE-CPP Installer" -srcfolder "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app" -ov -format UDZO "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.dmg"
-        elif [ -f "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin" ]; then
-          mkdir -p dmg_staging
-          cp "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin" dmg_staging/
-          hdiutil create -volname "MNE-CPP Installer" -srcfolder dmg_staging -ov -format UDZO "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.dmg"
-        fi
+    - name: Codesign installer app
+      if: env.CODESIGN_IDENTITY != ''
+      run: |
+        codesign --force --deep --options runtime --timestamp \
+          --sign "$CODESIGN_IDENTITY" \
+          "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app"
+        codesign --verify --verbose "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app"
 
-        ls -lh MNE-CPP-*-Darwin*
+    - name: Create DMG
+      run: |
+        hdiutil create \
+          -volname "MNE-CPP ${{ env.MNE_CPP_VERSION }}" \
+          -srcfolder "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app" \
+          -ov -format UDZO \
+          "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.dmg"
+        ls -lh MNE-CPP-*-Darwin.dmg
+
+    - name: Codesign DMG
+      if: env.CODESIGN_IDENTITY != ''
+      run: |
+        codesign --force --timestamp \
+          --sign "$CODESIGN_IDENTITY" \
+          "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.dmg"
+        codesign --verify --verbose "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.dmg"
+
+    - name: Notarize DMG
+      if: env.CODESIGN_IDENTITY != ''
+      env:
+        APPLE_ID: ${{ secrets.APPLE_ID }}
+        APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+      run: |
+        echo "Submitting DMG to Apple notary service..."
+        xcrun notarytool submit \
+          "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.dmg" \
+          --apple-id "$APPLE_ID" \
+          --password "$APPLE_APP_PASSWORD" \
+          --team-id "$APPLE_TEAM_ID" \
+          --wait \
+          --timeout 30m
+
+        echo "Stapling notarization ticket to DMG..."
+        xcrun stapler staple "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.dmg"
+
+        echo "Verifying notarization..."
+        spctl --assess --type open --context context:primary-signature \
+          "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.dmg" \
+          && echo "Notarization verified successfully" \
+          || echo "Warning: spctl check returned non-zero (may be expected on CI)"
+
+    - name: Cleanup keychain
+      if: always() && env.KEYCHAIN_PATH != ''
+      run: |
+        security delete-keychain "$KEYCHAIN_PATH" 2>/dev/null || true
 
     - name: Deploy installer (stable release)
       if: startsWith(github.ref, 'refs/tags/')
@@ -262,7 +476,7 @@ jobs:
         repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         file: MNE-CPP-*-Darwin.dmg
         file_glob: true
-        asset_name: mne-cpp-${{ github.ref_name }}-macos-installer-x86_64.dmg
+        asset_name: mne-cpp-${{ github.ref_name }}-macos-installer-arm64.dmg
         tag: ${{ github.ref }}
         overwrite: true
 
@@ -273,7 +487,7 @@ jobs:
         repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
         file: MNE-CPP-*-Darwin.dmg
         file_glob: true
-        asset_name: mne-cpp-v2.0-dev-macos-installer-x86_64.dmg
+        asset_name: mne-cpp-v2.0-dev-macos-installer-arm64.dmg
         tag: dev_build
         overwrite: true
 
@@ -326,6 +540,12 @@ jobs:
       run: |
         STAGING="tools/packaging/installer/packages"
 
+        # CLI tools (QCoreApplication-based, no GUI dependencies)
+        CLI_APPS="mne_anonymize mne_edf2fiff mne_show_fiff mne_compute_raw_inverse mne_forward_solution mne_setup_mri mne_surf2bem mne_setup_forward_model mne_watershed_bem mne_flash_bem mne_rt_server mne_dipole_fit"
+
+        # GUI applications (QApplication-based, require display)
+        GUI_APPS="mne_scan mne_analyze mne_browse mne_inspect"
+
         # Extract the full archive to a temp location first
         EXTRACT_DIR="$RUNNER_TEMP/mne-cpp-extracted"
         mkdir -p "$EXTRACT_DIR"
@@ -337,7 +557,29 @@ jobs:
           CONTENT_DIR=$(ls -d "$EXTRACT_DIR"/mne-cpp* | head -1)
         fi
 
-        # Applications — bin/
+        # --- CLI Tools → org.mnecpp.applications.cli ---
+        CLI_DATA="${STAGING}/org.mnecpp.applications.cli/data"
+        mkdir -p "${CLI_DATA}/bin"
+        for app in $CLI_APPS; do
+          if [ -f "$CONTENT_DIR/bin/${app}.exe" ]; then
+            cp "$CONTENT_DIR/bin/${app}.exe" "${CLI_DATA}/bin/"
+          elif [ -f "$CONTENT_DIR/bin/$app" ]; then
+            cp "$CONTENT_DIR/bin/$app" "${CLI_DATA}/bin/"
+          fi
+        done
+
+        # --- GUI Apps → org.mnecpp.applications.gui ---
+        GUI_DATA="${STAGING}/org.mnecpp.applications.gui/data"
+        mkdir -p "${GUI_DATA}/bin"
+        for app in $GUI_APPS; do
+          if [ -f "$CONTENT_DIR/bin/${app}.exe" ]; then
+            cp "$CONTENT_DIR/bin/${app}.exe" "${GUI_DATA}/bin/"
+          elif [ -f "$CONTENT_DIR/bin/$app" ]; then
+            cp "$CONTENT_DIR/bin/$app" "${GUI_DATA}/bin/"
+          fi
+        done
+
+        # --- Legacy parent component (backward compat) ---
         APP_DATA="${STAGING}/org.mnecpp.applications/data"
         mkdir -p "${APP_DATA}/bin"
         if [ -d "$CONTENT_DIR/bin" ]; then
@@ -355,9 +597,20 @@ jobs:
 
         # SDK — include/ + lib/cmake/
         SDK_DATA="${STAGING}/org.mnecpp.sdk/data"
-        mkdir -p "${SDK_DATA}"
+        mkdir -p "${SDK_DATA}/include"
+        # Release archives don't ship headers; copy from the source tree.
+        for lib_dir in src/libraries/*/; do
+          lib_name=$(basename "$lib_dir")
+          [ "$lib_name" = "CMakeLists.txt" ] && continue
+          find "$lib_dir" -name '*.h' | while read hdr; do
+            rel="${hdr#src/libraries/}"
+            dest_dir="${SDK_DATA}/include/$(dirname "$rel")"
+            mkdir -p "$dest_dir"
+            cp "$hdr" "$dest_dir/"
+          done
+        done
         if [ -d "$CONTENT_DIR/include" ]; then
-          cp -r "$CONTENT_DIR/include" "${SDK_DATA}/" 2>/dev/null || true
+          cp -r "$CONTENT_DIR/include/"* "${SDK_DATA}/include/" 2>/dev/null || true
         fi
         if [ -d "$CONTENT_DIR/lib/cmake" ]; then
           mkdir -p "${SDK_DATA}/lib"

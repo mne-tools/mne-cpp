@@ -20,10 +20,17 @@ set(HEADERS
     app/mainwindow.h
 )
 
+set(RESOURCES
+    resources/images/appIcons/mne_inspect.icns
+)
+
+set_source_files_properties(resources/images/appIcons/mne_inspect.icns PROPERTIES
+    MACOSX_PACKAGE_LOCATION Resources)
+
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES} ${HEADERS})
+    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES} ${HEADERS} ${RESOURCES})
 else()
-    add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+    add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS} ${RESOURCES})
 endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE
@@ -53,8 +60,10 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    MACOSX_BUNDLE FALSE
-    WIN32_EXECUTABLE FALSE
+    MACOSX_BUNDLE_GUI_IDENTIFIER org.mne-cpp.mne_inspect
+    MACOSX_BUNDLE ${BUILD_MAC_APP_BUNDLE}
+    MACOSX_BUNDLE_ICON_FILE mne_inspect.icns
+    WIN32_EXECUTABLE TRUE
 )
 
 # Install

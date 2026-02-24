@@ -7,4 +7,7 @@
     <ForcedInstallation>true</ForcedInstallation>
     <Virtual>true</Virtual>
     <SortingPriority>99</SortingPriority>
+    <Licenses>
+        <License name="BSD 3-Clause License" file="license.txt" />
+    </Licenses>
 </Package>

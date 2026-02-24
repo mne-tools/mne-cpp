@@ -48,8 +48,7 @@ target_link_libraries(${PROJECT_NAME} PRIVATE
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    MACOSX_BUNDLE_GUI_IDENTIFIER org.mne-cpp.mne_show_fiff
-    MACOSX_BUNDLE ${BUILD_MAC_APP_BUNDLE}
+    MACOSX_BUNDLE FALSE
     WIN32_EXECUTABLE FALSE
 )
 

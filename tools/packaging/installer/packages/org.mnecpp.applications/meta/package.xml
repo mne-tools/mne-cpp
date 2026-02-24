@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
-    <DisplayName>Applications</DisplayName>
-    <Description>MNE-CPP command-line and GUI applications (mne_scan, mne_analyze, mne_browse, etc.)</Description>
+    <DisplayName>MNE-CPP Applications</DisplayName>
+    <Description>MEG and EEG data acquisition, processing, and visualization tools. Select the sub-components below to choose between command-line utilities and graphical applications.</Description>
     <Version>2.0.0</Version>
-    <ReleaseDate>2026-02-17</ReleaseDate>
+    <ReleaseDate>2026-02-24</ReleaseDate>
     <Default>true</Default>
-    <ForcedInstallation>true</ForcedInstallation>
     <SortingPriority>100</SortingPriority>
 </Package>

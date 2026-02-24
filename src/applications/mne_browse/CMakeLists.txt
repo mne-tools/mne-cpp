@@ -95,6 +95,9 @@ set(RESOURCES
     Resources/Images/ApplicationIcons/mne_browse.icns
 )
 
+set_source_files_properties(Resources/Images/ApplicationIcons/mne_browse.icns PROPERTIES
+    MACOSX_PACKAGE_LOCATION Resources)
+
 if(APPLE)
     set(RESOURCE_GROUPS
         selectionGroups

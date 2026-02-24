@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>Command-Line Tools</DisplayName>
+    <Description>Terminal-based MNE-CPP utilities for scripting and batch processing: mne_forward_solution, mne_dipole_fit, mne_edf2fiff, mne_show_fiff, mne_compute_raw_inverse, mne_setup_mri, mne_surf2bem, mne_setup_forward_model, mne_watershed_bem, mne_flash_bem, mne_rt_server.</Description>
+    <Version>2.0.0</Version>
+    <ReleaseDate>2026-02-24</ReleaseDate>
+    <Default>true</Default>
+    <SortingPriority>100</SortingPriority>
+</Package>

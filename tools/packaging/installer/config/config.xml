@@ -5,6 +5,16 @@
 
   This file describes the overall installer appearance and behaviour.
   Component-specific metadata lives in packages/*/meta/package.xml.
+
+  The directory layout mirrors Qt's own installation structure:
+      ~/MNE-CPP/
+      ├── 2.0.0/
+      │   ├── bin/
+      │   ├── lib/
+      │   └── include/
+      ├── data/
+      ├── Tools/
+      └── scripts/
 -->
 <Installer>
     <Name>MNE-CPP</Name>
@@ -20,13 +30,25 @@
 
     <!-- Maintenance tool for add / remove / update -->
     <MaintenanceToolName>MNE-CPP-MaintenanceTool</MaintenanceToolName>
+    <CreateLocalRepository>true</CreateLocalRepository>
 
     <!-- Wizard style -->
     <WizardStyle>Modern</WizardStyle>
-    <WizardDefaultWidth>640</WizardDefaultWidth>
-    <WizardDefaultHeight>480</WizardDefaultHeight>
+    <WizardDefaultWidth>900</WizardDefaultWidth>
+    <WizardDefaultHeight>600</WizardDefaultHeight>
+
+    <!-- Branding -->
+    <Logo>MNE-CPP_Logo.png</Logo>
+    <StyleSheet>style.qss</StyleSheet>
 
     <!-- URLs -->
     <ProductUrl>https://mne-cpp.github.io/</ProductUrl>
-    <InstallerWindowIcon>installer_icon</InstallerWindowIcon>
+
+    <!-- Interactive UI enhancements (does NOT auto-click) -->
+    <ControlScript>uiscript.qs</ControlScript>
+
+    <!--
+      For headless CLI-only installs, run the installer binary with
+      the controlscript.qs file passed via the script flag.
+    -->
 </Installer>

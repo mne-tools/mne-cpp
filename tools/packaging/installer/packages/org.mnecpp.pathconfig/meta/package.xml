@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Package>
-    <DisplayName>PATH Configuration</DisplayName>
-    <Description>Add MNE-CPP binary directory to the system PATH and set environment variables for the SDK and sample data.</Description>
+    <DisplayName>Add to PATH</DisplayName>
+    <Description>Makes MNE-CPP command-line tools available in any terminal window. On macOS/Linux this adds the MNE-CPP bin/ directory to your shell profile (~/.zshrc or ~/.bashrc). On Windows it updates the user PATH environment variable. After installation, you can run tools like mne_anonymize or mne_show_fiff directly from the command line.</Description>
     <Version>2.0.0</Version>
     <ReleaseDate>2026-02-17</ReleaseDate>
     <Default>true</Default>

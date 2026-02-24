@@ -32,13 +32,39 @@ include(CPackIFW)
 
 ##==============================================================================
 ## Component Definitions
+##
+## Component hierarchy (mirrors the QIF package tree):
+##
+##   org.mnecpp.applications                  (parent group)
+##   ├── org.mnecpp.applications.cli          Command-Line Tools  [default on]
+##   └── org.mnecpp.applications.gui          GUI Applications    [default on]
+##   org.mnecpp.runtime             Shared libraries           [hidden, required]
+##   org.mnecpp.sdk                 Development SDK            [optional]
+##   org.mnecpp.sampledata          MNE Sample Dataset         [optional]
+##   org.mnecpp.mnepython           MNE-Python                 [optional]
+##   org.mnecpp.pathconfig          PATH Configuration         [default on]
+##
+## The installer installs to ~/MNE-CPP (like Qt installs to ~/Qt).
 ##==============================================================================
 
-# --- 1. Applications (binaries) ---
-cpack_add_component(applications
+# --- Parent group: Applications ---
+cpack_add_component_group(applications
     DISPLAY_NAME "Applications"
-    DESCRIPTION "MNE-CPP command-line and GUI applications (mne_scan, mne_analyze, mne_browse, etc.)"
-    REQUIRED
+    DESCRIPTION "MNE-CPP applications for MEG/EEG data processing"
+)
+
+# --- 1a. CLI Tools (QCoreApplication-based, no display) ---
+cpack_add_component(cli
+    DISPLAY_NAME "Command-Line Tools"
+    DESCRIPTION "CLI applications: mne_anonymize, mne_edf2fiff, mne_show_fiff, mne_forward_solution, mne_compute_raw_inverse, mne_setup_mri, mne_surf2bem, mne_setup_forward_model, mne_rt_server, and more."
+    GROUP applications
+)
+
+# --- 1b. GUI Applications (QApplication-based, require display) ---
+cpack_add_component(gui
+    DISPLAY_NAME "GUI Applications"
+    DESCRIPTION "Graphical applications: MNE Scan (real-time acquisition), MNE Analyze (offline analysis), MNE Browse (data browser), MNE Inspect (3D viewer)."
+    GROUP applications
 )
 
 # --- 2. Runtime Libraries (shared libs, always needed) ---

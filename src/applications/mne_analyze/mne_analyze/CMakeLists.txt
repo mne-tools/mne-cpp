@@ -20,6 +20,9 @@ set(RESOURCES
     resources/images/appIcons/mne_analyze.icns
 )
 
+set_source_files_properties(resources/images/appIcons/mne_analyze.icns PROPERTIES
+    MACOSX_PACKAGE_LOCATION Resources)
+
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
   qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES} ${HEADERS} ${RESOURCES})
 else()
