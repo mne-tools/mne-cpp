@@ -43,7 +43,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "settingscontrollergui.h"
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -79,13 +78,13 @@ MainWindow::MainWindow()
 : m_bOptionsVisibility(false)
 , m_iDefaultWindowHeight(222)
 , m_iDefaultWindowHeightLarge(666)
-, m_bShowWraningMsgBoxInWasm(true)
+, m_bShowWarningMsgBoxInWasm(true)
 , m_sDefaultWasmInFile("/in.fif")
 , m_sDefaultWasmOutFile("/out.fif")
 , m_pUi(new Ui::MainWindow)
 {
     m_pUi->setupUi(this);
-    setDefautlStateUi();
+    setDefaultStateUi();
     setDefaultStateExtraInfo();
     setupConnections();
 }
@@ -114,24 +113,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
 bool MainWindow::confirmClose()
 {
     return true;
-//    const QMessageBox::StandardButton ret
-//            = QMessageBox::warning(this, tr("Application"),
-//                                   tr("Are you sure you want to exit?\n"),
-//                                   QMessageBox::Yes | QMessageBox::Cancel);
-//    switch (ret) {
-//    case QMessageBox::Yes:
-//        return true;
-//    case QMessageBox::Cancel:
-//        return false;
-//    default:
-//        break;
-//    }
-//    return false;
 }
 
 //=============================================================================================================
 
-void MainWindow::setDefautlStateUi()
+void MainWindow::setDefaultStateUi()
 {
     this->setWindowTitle(qApp->organizationName() + " ~ " + qApp->applicationName() + " ~ " + qApp->applicationVersion());
     #ifdef WASMBUILD
@@ -667,9 +653,9 @@ void MainWindow::openInFileDialog()
         }
     };
 
-    if(m_bShowWraningMsgBoxInWasm)
+    if(m_bShowWarningMsgBoxInWasm)
     {
-        m_bShowWraningMsgBoxInWasm = false;
+        m_bShowWarningMsgBoxInWasm = false;
         m_pUi->labelInFile->setText(m_pUi->labelInFile->text() + " [Max. 500MB]. ");
         QMessageBox msgBox(this);
         msgBox.setWindowTitle("Warning on FIFF maximum size.");
@@ -952,7 +938,7 @@ void MainWindow::checkBoxShowOptionsChanged()
 
 //=============================================================================================================
 
-void MainWindow::repaintTabWdiget()
+void MainWindow::repaintTabWidget()
 {
     m_pUi->tabWidget->repaint();
 }

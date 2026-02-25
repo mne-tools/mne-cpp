@@ -112,11 +112,6 @@ SettingsControllerCl::SettingsControllerCl(const QStringList& arguments)
     QObject::connect(this, &MNEANONYMIZE::SettingsControllerCl::finished,
                      qApp, &QCoreApplication::exit, Qt::QueuedConnection);
 
-//     for(auto& s : arguments)
-//     {
-//         qInfo() << s << "\n";
-//     }
-
     initParser();
     if(parseInputs(arguments))
     {

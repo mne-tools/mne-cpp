@@ -79,7 +79,7 @@ SettingsControllerGui::SettingsControllerGui(const QStringList& arguments)
 
     m_pWin->show();
 
-    QString msg("Mellow greetings!");
+    QString msg("Ready.");
     m_pWin->statusMsg(msg,2000);
 }
 
@@ -122,7 +122,7 @@ void SettingsControllerGui::readData()
         m_pAnonymizer->setVerboseMode(verboseMode);
         QString msg2("Input file information read correctly.");
         m_pWin->statusMsg(msg2,2000);
-        m_pWin->repaintTabWdiget();
+        m_pWin->repaintTabWidget();
     } else {
         m_pWin->winPopup("Cannot read data. Please select a valid input file first.");
     }
@@ -182,13 +182,6 @@ void SettingsControllerGui::fileOutChanged(const QString& strOutFile)
         m_pWin->setOutFile(m_fiOutFile.absoluteFilePath());
         return;
     }
-
-//    if(!newfiOutFile.isWritable())
-//    {
-//        m_pWin->winPopup("You might not have writing permissions to this folder");
-//        m_pWin->setOutFile(m_fiOutFile.absoluteFilePath());
-//        return;
-//    }
 
     m_fiOutFile.setFile(newfiOutFile.absoluteFilePath());
     m_pAnonymizer->setOutFile(m_fiOutFile.absoluteFilePath());
@@ -261,7 +254,7 @@ void SettingsControllerGui::setupCommunication()
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectHand,
                      m_pWin.data(),&MainWindow::setLineEditSubjectHand);
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectWeight,
-                     m_pWin.data(),&MainWindow::setLineEditSubjectHand);
+                     m_pWin.data(),&MainWindow::setLineEditSubjectWeight);
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectHeight,
                      m_pWin.data(),&MainWindow::setLineEditSubjectHeight);
     QObject::connect(m_pAnonymizer.data(),&FiffAnonymizer::readingSubjectComment,

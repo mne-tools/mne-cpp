@@ -43,7 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
+#include <cstdio>
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_types.h>
@@ -115,11 +115,7 @@ public:
      *
      * @param[in] A FiffAnonyzer object.
      */
-    FiffAnonymizer& operator = (const FiffAnonymizer &t)
-    {
-        Q_UNUSED(t)
-        return *this;
-    }
+    FiffAnonymizer& operator = (const FiffAnonymizer &t) = delete;
 
     //=========================================================================================================
     /**
@@ -374,24 +370,24 @@ signals:
 
     //=========================================================================================================
     /**
-     *  @brief Send the "project name" field of the current file, as defined in a "project name" tag.
-     *
-     *  @details This signal is emitted whenever runing <censorTag>"()" and a "project name" tag is in <m_pTag> (generally through
-     * <readTag>"()"). The project name tag stores the actual name of the project as a string value. This value is sent through this signal.
-     *
-     * @param[in] pName Project name in the current file.
-     *
-     */
-    void readingProjectAim(QString pAim);
-
-    //=========================================================================================================
-    /**
      *  @brief Send the "project aim" field of the current file, as defined in a "project aim" tag.
      *
      *  @details This signal is emitted whenever runing <censorTag>"()" and a "project aim" tag is in <m_pTag> (generally through
      * <readTag>"()"). The project aim tag stores the actual aim of the project as a string value. This value is sent through this signal.
      *
      * @param[in] pAim Project aim in the current file.
+     *
+     */
+    void readingProjectAim(QString pAim);
+
+    //=========================================================================================================
+    /**
+     *  @brief Send the "project persons" field of the current file, as defined in a "project persons" tag.
+     *
+     *  @details This signal is emitted whenever runing <censorTag>"()" and a "project persons" tag is in <m_pTag> (generally through
+     * <readTag>"()"). The project persons tag stores the persons involved in the project as a string value. This value is sent through this signal.
+     *
+     * @param[in] pPersons Project persons in the current file.
      *
      */
     void readingProjectPersons(QString pPersons);

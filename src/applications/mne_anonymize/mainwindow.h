@@ -239,7 +239,7 @@ public:
      * @brief Update or repaint the tab widget with information from the inptu file.
      *
      */
-    void repaintTabWdiget();
+    void repaintTabWidget();
 
 signals:
     //=========================================================================================================
@@ -744,7 +744,7 @@ private:
      * application.
      *
      */
-    void setDefautlStateUi();
+    void setDefaultStateUi();
 
     //=========================================================================================================
     /**
@@ -777,7 +777,7 @@ private:
     bool            m_bOptionsVisibility;               /**< Options and input file info is shown.*/
     const int       m_iDefaultWindowHeight;             /**< Default UI window height when the options are hidden.*/
     const int       m_iDefaultWindowHeightLarge;        /**< Defailt UI window height when the options are shown.*/
-    bool            m_bShowWraningMsgBoxInWasm;         /**< Flag to show a warning box about the size of the files, only once.*/
+    bool            m_bShowWarningMsgBoxInWasm;         /**< Flag to show a warning box about the size of the files, only once.*/
 
     QFileInfo       m_fiInFile;                         /**< Input file QFileInfo object.*/
     QFileInfo       m_fiOutFile;                        /**< Output file QFileInfo object.*/
