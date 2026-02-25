@@ -305,7 +305,7 @@ if [[ ${LinkOption} == "dynamic" ]]; then
         ${MockText}rm -r ${BasePath}/out/${BuildName}/apps/mne_analyze_plugins
 
         # Creating archive of all macos deployed applications
-        ${MockText}tar cfvz mne-cpp-macos-dynamic-x86_64.tar.gz ${BasePath}/out/${BuildName}/apps
+        ${MockText}tar cfvz mne-cpp-macos-dynamic-arm64.tar.gz ${BasePath}/out/${BuildName}/apps
     fi
 
 elif [[ ${LinkOption} == "static" ]]; then
@@ -338,7 +338,7 @@ elif [[ ${LinkOption} == "static" ]]; then
         ${MockText}rm -r mne-cpp/apps/mne_rt_server_plugins
 
         # Creating archive of all macos deployed applications
-        ${MockText}tar cfvz mne-cpp-macos-static-x86_64.tar.gz mne-cpp
+        ${MockText}tar cfvz mne-cpp-macos-static-arm64.tar.gz mne-cpp
     fi
 
 else 

@@ -31,8 +31,8 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        file: mne-cpp-macos-dynamic-x86_64.tar.gz
-        asset_name: mne-cpp-${{ github.ref_name }}-macos-dynamic-x86_64.tar.gz
+        file: mne-cpp-macos-dynamic-arm64.tar.gz
+        asset_name: mne-cpp-${{ github.ref_name }}-macos-dynamic-arm64.tar.gz
         tag: ${{ github.ref }}
         overwrite: true
     - name: Deploy binaries with dev release on Github
@@ -40,8 +40,8 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        file: mne-cpp-macos-dynamic-x86_64.tar.gz
-        asset_name: mne-cpp-v2.0-dev-macos-dynamic-x86_64.tar.gz
+        file: mne-cpp-macos-dynamic-arm64.tar.gz
+        asset_name: mne-cpp-v2.0-dev-macos-dynamic-arm64.tar.gz
         tag: dev_build
         overwrite: true
 
@@ -101,8 +101,8 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        file: mne-cpp-macos-static-x86_64.tar.gz
-        asset_name: mne-cpp-${{ github.ref_name }}-macos-static-x86_64.tar.gz
+        file: mne-cpp-macos-static-arm64.tar.gz
+        asset_name: mne-cpp-${{ github.ref_name }}-macos-static-arm64.tar.gz
         tag: ${{ github.ref }}
         overwrite: true
     - name: Deploy binaries with dev release on Github
@@ -110,7 +110,7 @@ jobs:
       uses: svenstaro/upload-release-action@v2
       with:
         repo_token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
-        file: mne-cpp-macos-static-x86_64.tar.gz
-        asset_name: mne-cpp-v2.0-dev-macos-static-x86_64.tar.gz
+        file: mne-cpp-macos-static-arm64.tar.gz
+        asset_name: mne-cpp-v2.0-dev-macos-static-arm64.tar.gz
         tag: dev_build
         overwrite: true
