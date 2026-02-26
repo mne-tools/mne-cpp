@@ -59,6 +59,8 @@ set(SOURCES
     c/mne_msh_eyes.cpp
     c/mne_mgh_tag.cpp
     c/mne_mgh_tag_group.cpp
+    mne_description_parser.cpp
+    mne_averaging.cpp
 )
 
 set(HEADERS
@@ -112,6 +114,9 @@ set(HEADERS
     c/mne_msh_eyes.h
     c/mne_mgh_tag.h
     c/mne_mgh_tag_group.h
+    mne_process_description.h
+    mne_description_parser.h
+    mne_averaging.h
 )
 
 set(FILE_TO_UPDATE mne_global.cpp)

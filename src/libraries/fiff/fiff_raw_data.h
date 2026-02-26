@@ -59,6 +59,7 @@
 
 #include <QList>
 #include <QSharedPointer>
+#include <QString>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
@@ -191,6 +192,25 @@ public:
                                 float from,
                                 float to,
                                 const Eigen::RowVectorXi& sel = defaultRowVectorXi) const;
+
+    //=========================================================================================================
+    /**
+     * Save raw data to a FIFF file, optionally with decimation and channel picking.
+     * Ported from save.c (MNE-C).
+     *
+     * @param[in] p_IODevice Output device to write to.
+     * @param[in] picks     Channel indices to include (empty = all channels).
+     * @param[in] decim     Decimation factor (1 = no decimation).
+     * @param[in] from      First sample to save (-1 = from start of raw data).
+     * @param[in] to        Last sample to save (-1 = to end of raw data).
+     *
+     * @return true on success.
+     */
+    bool save(QIODevice &p_IODevice,
+              const Eigen::RowVectorXi &picks = Eigen::RowVectorXi(),
+              int decim = 1,
+              int from = -1,
+              int to = -1) const;
 
 public:
     FiffStream::SPtr file;      /**< replaces fid. */

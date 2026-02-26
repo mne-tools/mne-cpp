@@ -47,6 +47,7 @@
 #include "fiff_info_base.h"
 #include "fiff_raw_data.h"
 #include "fiff_cov.h"
+#include "fiff_evoked_set.h"
 #include "fiff_coord_trans.h"
 #include "fiff_ch_info.h"
 #include "fiff_ch_pos.h"
@@ -3084,6 +3085,61 @@ fiff_long_t FiffStream::write_proj(const QList<FiffProj>& projs)
         this->end_block(FIFFB_PROJ_ITEM);
     }
     this->end_block(FIFFB_PROJ);
+
+    return pos;
+}
+
+//=============================================================================================================
+
+fiff_long_t FiffStream::write_evoked_set(const FiffEvokedSet& p_FiffEvokedSet)
+{
+    fiff_long_t pos = this->device()->pos();
+
+    if (p_FiffEvokedSet.evoked.isEmpty())
+        return -1;
+
+    this->start_block(FIFFB_MEAS);
+    this->write_id(FIFF_BLOCK_ID);
+
+    if (p_FiffEvokedSet.info.meas_id.version != -1)
+        this->write_id(FIFF_PARENT_BLOCK_ID, p_FiffEvokedSet.info.meas_id);
+
+    this->write_info_base(p_FiffEvokedSet.info);
+
+    for (int j = 0; j < p_FiffEvokedSet.evoked.size(); ++j) {
+        const FiffEvoked &evoked = p_FiffEvokedSet.evoked[j];
+
+        this->start_block(FIFFB_PROCESSED_DATA);
+        this->start_block(FIFFB_EVOKED);
+
+        this->write_string(FIFF_COMMENT, evoked.comment);
+
+        this->start_block(FIFFB_ASPECT);
+
+        int aspectKind = FIFFV_ASPECT_AVERAGE;
+        this->write_int(FIFF_ASPECT_KIND, &aspectKind);
+
+        int nave = evoked.nave;
+        this->write_int(FIFF_NAVE, &nave);
+
+        int first = evoked.first;
+        this->write_int(FIFF_FIRST_SAMPLE, &first);
+
+        int last = evoked.last;
+        this->write_int(FIFF_LAST_SAMPLE, &last);
+
+        Eigen::MatrixXf floatData = evoked.data.cast<float>();
+        for (int ch = 0; ch < floatData.rows(); ++ch) {
+            this->write_float(FIFF_EPOCH, floatData.row(ch).data(),
+                              static_cast<int>(floatData.cols()));
+        }
+
+        this->end_block(FIFFB_ASPECT);
+        this->end_block(FIFFB_EVOKED);
+        this->end_block(FIFFB_PROCESSED_DATA);
+    }
+
+    this->end_block(FIFFB_MEAS);
 
     return pos;
 }

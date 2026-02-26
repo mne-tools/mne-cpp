@@ -185,6 +185,26 @@ public:
                      QPair<float,float> baseline = defaultFloatPair,
                      bool proj = true);
 
+    //=========================================================================================================
+    /**
+     * Save this evoked data set to a FIFF file.
+     *
+     * @param[in] fileName  Output file path.
+     * @return true on success.
+     */
+    bool save(const QString &fileName) const;
+
+    //=========================================================================================================
+    /**
+     * Compute a grand average across multiple evoked data sets.
+     * Corresponding categories are averaged by summing data and dividing by the
+     * number of sets. The nave field accumulates the total count.
+     *
+     * @param[in] evokedSets    List of evoked data sets to combine.
+     * @return The grand-average evoked set, or an empty set if input is empty.
+     */
+    static FiffEvokedSet computeGrandAverage(const QList<FiffEvokedSet> &evokedSets);
+
 public:
     FiffInfo             info;   /**< FIFF measurement information. */
     QList<FiffEvoked>    evoked; /**< List of Fiff Evoked Data. */

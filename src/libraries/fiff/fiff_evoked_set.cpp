@@ -42,6 +42,7 @@
 #include "fiff_tag.h"
 #include "fiff_dir_node.h"
 #include "fiff_stream.h"
+#include "fiff_file.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -604,4 +605,60 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice,
 //        delete t_pStream;
 
 //    return true;
+}
+
+//=============================================================================================================
+
+bool FiffEvokedSet::save(const QString &fileName) const
+{
+    if (fileName.isEmpty()) {
+        qWarning() << "[FiffEvokedSet::save] Output file not specified.";
+        return false;
+    }
+
+    QFile file(fileName);
+    FiffStream::SPtr pStream = FiffStream::start_file(file);
+    if (!pStream) {
+        qWarning() << "[FiffEvokedSet::save] Cannot open" << fileName;
+        return false;
+    }
+
+    pStream->write_evoked_set(*this);
+    pStream->end_file();
+
+    qInfo() << "[FiffEvokedSet::save] Saved" << evoked.size()
+            << "average(s) to" << fileName;
+    return true;
+}
+
+//=============================================================================================================
+
+FiffEvokedSet FiffEvokedSet::computeGrandAverage(const QList<FiffEvokedSet> &evokedSets)
+{
+    FiffEvokedSet grandAvg;
+
+    if (evokedSets.isEmpty()) {
+        qWarning() << "[FiffEvokedSet::computeGrandAverage] No evoked sets provided.";
+        return grandAvg;
+    }
+
+    grandAvg = evokedSets[0];
+
+    for (int f = 1; f < evokedSets.size(); ++f) {
+        const FiffEvokedSet &eset = evokedSets[f];
+        int nCat = qMin(grandAvg.evoked.size(), eset.evoked.size());
+        for (int j = 0; j < nCat; ++j) {
+            if (grandAvg.evoked[j].data.cols() == eset.evoked[j].data.cols() &&
+                grandAvg.evoked[j].data.rows() == eset.evoked[j].data.rows()) {
+                grandAvg.evoked[j].data += eset.evoked[j].data;
+                grandAvg.evoked[j].nave += eset.evoked[j].nave;
+            }
+        }
+    }
+
+    for (int j = 0; j < grandAvg.evoked.size(); ++j) {
+        grandAvg.evoked[j].data /= static_cast<double>(evokedSets.size());
+    }
+
+    return grandAvg;
 }

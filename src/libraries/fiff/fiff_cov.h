@@ -69,6 +69,12 @@ namespace FIFFLIB
 {
 
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class FiffRawData;
+
+//=============================================================================================================
 /**
  * Fiff cov data, which corresponds to a covariance data matrix
  *
@@ -164,6 +170,56 @@ public:
      * @return the regularized covariance matrix.
      */
     FiffCov regularize(const FiffInfo& p_info, double p_fMag = 0.1, double p_fGrad = 0.1, double p_fEeg = 0.1, bool p_bProj = true, QStringList p_exclude = defaultQStringList) const;
+
+    //=========================================================================================================
+    /**
+     * Compute a noise covariance matrix from raw data based on event-locked epochs.
+     * Ported from compute_cov.c (MNE-C).
+     *
+     * @param[in] raw           The raw data.
+     * @param[in] events        Event matrix (nEvents x 3): [sample, before, after].
+     * @param[in] eventCodes    Which event codes to include.
+     * @param[in] tmin          Start of time window relative to event (seconds).
+     * @param[in] tmax          End of time window relative to event (seconds).
+     * @param[in] bmin          Baseline start (seconds, relative to event). Only used if doBaseline is true.
+     * @param[in] bmax          Baseline end (seconds, relative to event). Only used if doBaseline is true.
+     * @param[in] doBaseline    Whether to apply baseline correction before covariance computation.
+     * @param[in] removeMean    Whether to remove sample mean from the covariance estimate.
+     * @param[in] ignoreMask    Bit mask ANDed away from event codes before matching (default: 0 = no masking).
+     * @param[in] delay         Delay in seconds applied to the event sample before extracting the epoch (default: 0).
+     *
+     * @return The computed noise covariance matrix, or empty FiffCov on failure.
+     */
+    static FiffCov compute_from_epochs(const FiffRawData &raw,
+                                       const Eigen::MatrixXi &events,
+                                       const QList<int> &eventCodes,
+                                       float tmin,
+                                       float tmax,
+                                       float bmin = 0.0f,
+                                       float bmax = 0.0f,
+                                       bool doBaseline = false,
+                                       bool removeMean = true,
+                                       unsigned int ignoreMask = 0,
+                                       float delay = 0.0f);
+
+    //=========================================================================================================
+    /**
+     * Save this covariance matrix to a FIFF file.
+     *
+     * @param[in] fileName  Output file path.
+     * @return true on success.
+     */
+    bool save(const QString &fileName) const;
+
+    //=========================================================================================================
+    /**
+     * Compute a weighted grand-average covariance from multiple covariance matrices,
+     * weighting each by its degrees of freedom (nfree).
+     *
+     * @param[in] covs      List of covariance matrices to combine.
+     * @return The grand-average covariance matrix, or empty FiffCov if covs is empty.
+     */
+    static FiffCov computeGrandAverage(const QList<FiffCov> &covs);
 
     //=========================================================================================================
     /**

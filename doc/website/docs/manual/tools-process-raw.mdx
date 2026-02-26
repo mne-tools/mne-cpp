@@ -1,0 +1,289 @@
+---
+title: mne_process_raw
+sidebar_label: mne_process_raw
+sidebar_position: 8
+---
+
+# mne_process_raw
+
+## Overview
+
+`mne_process_raw` is the batch-mode raw data processing tool for MEG/EEG data. It provides a complete offline processing pipeline including filtering, decimation, event detection, epoch-based averaging, noise-covariance matrix estimation, and Signal-Space Projection (SSP) operator creation — all driven from the command line without a GUI.
+
+This is a C++ port of the original MNE-C `mne_process_raw` by Matti Hämäläinen. In the original MNE-C distribution, `mne_browse_raw` (interactive GUI) and `mne_process_raw` (batch mode) were two names for the same binary; when invoked as `mne_process_raw`, no user interface appeared and all operations were controlled through command-line options and description files.
+
+## Usage
+
+```bash
+mne_process_raw [options]
+```
+
+At minimum, one `--raw` file must be specified. All other options are optional and can be combined freely.
+
+## Options
+
+### General
+
+| Option | Description |
+|---|---|
+| `--help` | Print grouped help and exit |
+| `--version` | Print version information and exit |
+| `--cd <dir>` | Change working directory before processing |
+
+### Input
+
+| Option | Description |
+|---|---|
+| `--raw <file>` | Raw data file to process **(required, repeatable)**. When multiple files are given, grand averaging and grand covariance are computed across all files. |
+| `--grad <number>` | Desired software gradient compensation order (for CTF / 4D data) |
+| `--allowmaxshield` | Allow loading of unprocessed Elekta MaxShield data |
+
+### Events
+
+| Option | Description |
+|---|---|
+| `--events <file>` | Load event list from file (FIFF or text format) |
+| `--eventsout <file>` | Save detected events to file |
+| `--allevents` | Detect all trigger transitions, not just rising edges |
+| `--digtrig <name>` | Digital trigger channel name (default: `STI 014`). Use underscores for spaces, e.g. `STI_014`. |
+| `--digtrigmask <value>` | Bit mask applied to the trigger channel (decimal or `0x` hex) |
+
+### Projection (SSP)
+
+| Option | Description |
+|---|---|
+| `--proj <file>` | Load SSP vectors from file (repeatable) |
+| `--projon` | Activate SSP projections when processing |
+| `--projoff` | Deactivate SSP projections |
+| `--makeproj` | Compute new SSP operators from the data |
+| `--projevent <code>` | Event code selecting the epochs for SSP computation |
+| `--projtmin <sec>` | Start time of the window for SSP computation |
+| `--projtmax <sec>` | End time of the window for SSP computation |
+| `--projngrad <n>` | Number of gradiometer SSP components (default: 2) |
+| `--projnmag <n>` | Number of magnetometer SSP components (default: 2) |
+| `--projneeg <n>` | Number of EEG SSP components (default: 0) |
+| `--projgradrej <fT/cm>` | Gradiometer rejection threshold for SSP (default: 2000) |
+| `--projmagrej <fT>` | Magnetometer rejection threshold for SSP (default: 3000) |
+| `--projeegrej <µV>` | EEG rejection threshold for SSP (default: 0) |
+| `--saveprojtag <tag>` | Tag appended to SSP output filenames |
+
+### Filtering
+
+| Option | Description |
+|---|---|
+| `--filtersize <n>` | FFT length for the FIR filter (default: 8192) |
+| `--highpass <Hz>` | High-pass corner frequency |
+| `--lowpass <Hz>` | Low-pass corner frequency |
+| `--highpassw <Hz>` | High-pass transition bandwidth |
+| `--lowpassw <Hz>` | Low-pass transition bandwidth |
+| `--filteroff` | Do not filter the data |
+
+### Output / Decimation
+
+| Option | Description |
+|---|---|
+| `--save <file>` | Save processed (filtered, projected) raw data to file |
+| `--decim <factor>` | Decimation (down-sampling) factor (default: 1) |
+| `--split <MB>` | Split output files at this size in megabytes |
+| `--anon` | Omit subject information from the output file |
+| `--savehere` | Write output to the current directory instead of the raw file's directory |
+
+### Averaging
+
+| Option | Description |
+|---|---|
+| `--ave <file>` | Off-line averaging description file (repeatable) |
+| `--saveavetag <tag>` | Tag appended to average output filenames |
+| `--gave <file>` | Grand average output file (used with multiple `--raw` files) |
+
+### Covariance
+
+| Option | Description |
+|---|---|
+| `--cov <file>` | Covariance matrix description file (repeatable) |
+| `--savecovtag <tag>` | Tag appended to covariance output filenames |
+| `--gcov <file>` | Grand covariance output file (used with multiple `--raw` files) |
+
+## Description
+
+`mne_process_raw` orchestrates a complete batch processing pipeline for raw MEG/EEG data. Operations are executed in a natural order: the raw file is opened, events are attached or detected, projections are loaded, and then the requested processing steps (filtering, saving, averaging, covariance estimation, SSP computation) are carried out.
+
+### Processing Pipeline
+
+The processing pipeline proceeds in the following order for each input file:
+
+1. **Open raw data** — Load the FIFF raw data file and apply gradient compensation if requested.
+2. **Attach events** — Load events from an external file or detect them automatically from the digital trigger channel.
+3. **Load projections** — Read SSP vectors from external projection files and optionally activate them.
+4. **Filter and save** — If `--save` is specified, apply the filter and decimation settings and write the processed raw data to a new file.
+5. **Compute averages** — If `--ave` is specified, parse the averaging description file(s) and compute epoch-based averages with artifact rejection.
+6. **Compute covariance** — If `--cov` is specified, parse the covariance description file(s) and estimate noise-covariance matrices from the specified baseline epochs.
+7. **Compute SSP** — If `--makeproj` is specified, create new signal-space projection operators from the data.
+
+When multiple `--raw` files are given, the pipeline processes each file independently and then computes grand averages (`--gave`) and/or grand covariance matrices (`--gcov`) across all files.
+
+### Event Detection
+
+Events are detected from the digital trigger channel (default: `STI 014`). The trigger channel is scanned for transitions from zero to a nonzero value (rising edges). The event code is taken from the trigger channel value at the transition point.
+
+- Use `--digtrigmask` to mask out specific bits (e.g., `0xFF` to consider only the low 8 bits).
+- Use `--allevents` to detect all transitions (not just rising edges), which is useful when trigger lines carry multiple overlapping codes.
+
+:::tip
+Since the sampling clock and stimulation devices are usually not synchronized, trigger bits may not all transition at the same sample. The event detector automatically handles this by checking subsequent samples for additional transitions.
+:::
+
+### Description Files for Averaging
+
+The averaging description file (`.ave`) specifies one or more stimulus categories, each with its own event code, time window, baseline correction, and artifact rejection criteria. The format follows the MNE-C convention:
+
+```
+average {
+    name        "Auditory Left"
+    event       1
+    tmin        -0.2
+    tmax        0.5
+    basemin     -0.2
+    basemax     0.0
+    gradReject  3000e-13
+    magReject   4000e-15
+    eegReject   150e-6
+    eogReject   150e-6
+}
+```
+
+Key fields:
+- **`event`** — The trigger event code to epoch on.
+- **`tmin` / `tmax`** — Epoch boundaries relative to the event (seconds).
+- **`basemin` / `basemax`** — Baseline correction interval (seconds).
+- **`gradReject` / `magReject` / `eegReject` / `eogReject`** — Peak-to-peak artifact rejection thresholds.
+
+For detailed format documentation, see the [MNE-C manual](https://mne.tools/mne-c-manual/browse_raw.html).
+
+### Description Files for Covariance Estimation
+
+The covariance description file (`.cov`) specifies the time window and event-based epochs from which the noise-covariance matrix is estimated:
+
+```
+cov {
+    name        "Noise Covariance"
+    event       1
+    tmin        -0.2
+    tmax        0.0
+    basemin     -0.2
+    basemax     0.0
+    gradReject  3000e-13
+    magReject   4000e-15
+    eegReject   150e-6
+}
+```
+
+The noise-covariance matrix is a critical input for inverse modeling. For background on how it is used, see [The Minimum-Norm Estimates](inverse).
+
+### Signal-Space Projection (SSP)
+
+The `--makeproj` option computes new SSP operators from the raw data. This is typically done using **empty-room data** (recorded without a subject) to characterize environmental noise patterns.
+
+The SSP algorithm:
+1. Selects epochs around the specified event code (`--projevent`)
+2. Computes the covariance matrix of these epochs
+3. Extracts the leading eigenvectors as the noise subspace basis
+4. Saves the resulting projection operator
+
+Separate components are computed for gradiometers (`--projngrad`), magnetometers (`--projnmag`), and EEG channels (`--projneeg`). Rejection thresholds (`--projgradrej`, `--projmagrej`, `--projeegrej`) exclude noisy epochs from the computation.
+
+For the mathematical background on SSP, see [Signal-Space Projection](ssp).
+
+### Filtering and Decimation
+
+`mne_process_raw` applies an FFT-based FIR filter to the data before saving. The filter is specified by high-pass and low-pass corner frequencies and their transition bandwidths.
+
+:::important
+When decimating, the output sampling frequency must be at least three times the low-pass filter corner frequency to satisfy the Nyquist criterion and avoid aliasing.
+:::
+
+### Grand Averaging
+
+When multiple raw data files are specified with `--raw`, the tool can compute grand averages and grand covariance matrices across all files. This is useful for group-level analyses:
+
+- **`--gave <file>`** — After computing per-file averages (driven by `--ave`), combine them into a single grand-average evoked file.
+- **`--gcov <file>`** — After computing per-file covariance matrices (driven by `--cov`), combine them into a single grand covariance matrix.
+
+## Examples
+
+### Detect events and save them
+
+```bash
+mne_process_raw --raw sample_audvis_raw.fif \
+    --eventsout sample_audvis_raw-eve.fif
+```
+
+### Band-pass filter and decimate
+
+```bash
+mne_process_raw --raw sample_audvis_raw.fif \
+    --highpass 1 --lowpass 40 \
+    --decim 4 \
+    --save sample_audvis_filtered_raw.fif
+```
+
+### Compute averages from a description file
+
+```bash
+mne_process_raw --raw sample_audvis_raw.fif \
+    --ave auditory.ave
+```
+
+### Compute noise covariance from pre-stimulus baselines
+
+```bash
+mne_process_raw --raw sample_audvis_raw.fif \
+    --cov noise.cov
+```
+
+### Full pipeline with SSP, filtering, and averaging
+
+```bash
+mne_process_raw --raw sample_audvis_raw.fif \
+    --proj ssp_audvis.fif --projon \
+    --highpass 0.1 --lowpass 40 \
+    --ave auditory.ave \
+    --cov noise.cov
+```
+
+### Grand average across multiple subjects
+
+```bash
+mne_process_raw \
+    --raw subj01_audvis_raw.fif \
+    --raw subj02_audvis_raw.fif \
+    --raw subj03_audvis_raw.fif \
+    --ave paradigm.ave \
+    --gave grand_average-ave.fif
+```
+
+### Create SSP operators from empty-room data
+
+```bash
+mne_process_raw --raw empty_room.fif \
+    --makeproj \
+    --projngrad 3 --projnmag 3 \
+    --saveprojtag _emptyroom
+```
+
+### Save filtered data with anonymization
+
+```bash
+mne_process_raw --raw patient_data.fif \
+    --highpass 1 --lowpass 100 \
+    --save filtered_anon.fif --anon
+```
+
+## See Also
+
+- [Signal-Space Projection (SSP)](ssp) — Mathematical background on the SSP method
+- [The Minimum-Norm Estimates](inverse) — How the noise-covariance matrix is used in source estimation
+- [mne_compute_raw_inverse](tools-compute-raw-inverse) — Compute inverse solutions from the averaged data
+- [mne_forward_solution](tools-forward-solution) — Compute the forward model needed for source estimation
+- [mne_dipole_fit](tools-dipole-fit) — Fit equivalent current dipoles to averaged data
+- [The Typical Workflow](workflow) — Where `mne_process_raw` fits in the overall MEG/EEG analysis pipeline

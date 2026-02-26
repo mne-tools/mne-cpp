@@ -39,7 +39,11 @@
 //=============================================================================================================
 
 #include "fiff_proj.h"
+#include "fiff_raw_data.h"
+#include "fiff_constants.h"
+#include "fiff_file.h"
 #include <stdio.h>
+#include <cmath>
 #include <utils/mnemath.h>
 
 //=============================================================================================================
@@ -273,4 +277,147 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
     proj -= U*U.transpose();
 
     return nproj;
+}
+
+//=============================================================================================================
+
+QList<FiffProj> FiffProj::compute_from_raw(const FiffRawData &raw,
+                                           const MatrixXi &events,
+                                           int eventCode,
+                                           float tmin,
+                                           float tmax,
+                                           int nGrad,
+                                           int nMag,
+                                           int nEeg,
+                                           const QMap<QString,double> &mapReject)
+{
+    QList<FiffProj> projs;
+    float sfreq = raw.info.sfreq;
+    int nchan   = raw.info.nchan;
+
+    int minSamp = static_cast<int>(std::round(tmin * sfreq));
+    int maxSamp = static_cast<int>(std::round(tmax * sfreq));
+    int ns = maxSamp - minSamp + 1;
+
+    if (ns <= 0) {
+        qWarning() << "[FiffProj::compute_from_raw] Invalid time window.";
+        return projs;
+    }
+
+    // Classify channels
+    QList<int> gradIdx, magIdx, eegIdx;
+    for (int k = 0; k < nchan; ++k) {
+        if (raw.info.bads.contains(raw.info.ch_names[k]))
+            continue;
+        if (raw.info.chs[k].kind == FIFFV_MEG_CH) {
+            if (raw.info.chs[k].unit == FIFF_UNIT_T)
+                magIdx.append(k);
+            else
+                gradIdx.append(k);
+        } else if (raw.info.chs[k].kind == FIFFV_EEG_CH) {
+            eegIdx.append(k);
+        }
+    }
+
+    // Collect matching epochs
+    QList<MatrixXd> epochs;
+    double gradReject = mapReject.value("grad", 0.0);
+    double magReject  = mapReject.value("mag", 0.0);
+    double eegReject  = mapReject.value("eeg", 0.0);
+
+    for (int k = 0; k < events.rows(); ++k) {
+        if (events(k, 1) != 0 || events(k, 2) != eventCode)
+            continue;
+
+        int evSample = events(k, 0);
+        int epochStart = evSample + minSamp;
+        int epochEnd   = evSample + maxSamp;
+
+        if (epochStart < raw.first_samp || epochEnd > raw.last_samp)
+            continue;
+
+        MatrixXd epochData, epochTimes;
+        if (!raw.read_raw_segment(epochData, epochTimes, epochStart, epochEnd))
+            continue;
+
+        // Simple peak-to-peak rejection
+        bool ok = true;
+        for (int c = 0; c < nchan && ok; ++c) {
+            if (raw.info.bads.contains(raw.info.ch_names[c]))
+                continue;
+            double pp = epochData.row(c).maxCoeff() - epochData.row(c).minCoeff();
+            if (raw.info.chs[c].kind == FIFFV_MEG_CH) {
+                if (raw.info.chs[c].unit == FIFF_UNIT_T && magReject > 0 && pp > magReject)
+                    ok = false;
+                else if (raw.info.chs[c].unit != FIFF_UNIT_T && gradReject > 0 && pp > gradReject)
+                    ok = false;
+            } else if (raw.info.chs[c].kind == FIFFV_EEG_CH && eegReject > 0 && pp > eegReject) {
+                ok = false;
+            }
+        }
+        if (!ok) continue;
+
+        epochs.append(epochData);
+    }
+
+    if (epochs.isEmpty()) {
+        qWarning() << "[FiffProj::compute_from_raw] No valid epochs found for event" << eventCode;
+        return projs;
+    }
+
+    qInfo() << "[FiffProj::compute_from_raw]" << epochs.size() << "epochs collected for event" << eventCode;
+
+    // Lambda: compute SVD-based projectors for a channel subset
+    auto computeProjForChannels = [&](const QList<int> &chIdx, int nVec, const QString &desc) {
+        if (nVec <= 0 || chIdx.isEmpty())
+            return;
+
+        int nRows = epochs.size() * ns;
+        MatrixXd dataMat(nRows, chIdx.size());
+
+        for (int e = 0; e < epochs.size(); ++e) {
+            for (int c = 0; c < chIdx.size(); ++c) {
+                dataMat.block(e * ns, c, ns, 1) = epochs[e].row(chIdx[c]).transpose();
+            }
+        }
+
+        // Remove column mean
+        VectorXd colMean = dataMat.colwise().mean();
+        dataMat.rowwise() -= colMean.transpose();
+
+        // SVD
+        Eigen::JacobiSVD<MatrixXd> svd(dataMat, Eigen::ComputeThinV);
+        MatrixXd V = svd.matrixV();
+
+        int nComp = qMin(nVec, static_cast<int>(V.cols()));
+
+        for (int v = 0; v < nComp; ++v) {
+            FiffProj proj;
+            proj.kind   = FIFFV_PROJ_ITEM_FIELD;
+            proj.active = false;
+            proj.desc   = QString("%1-v%2").arg(desc).arg(v + 1);
+
+            FiffNamedMatrix::SDPtr namedMatrix(new FiffNamedMatrix());
+            namedMatrix->nrow = 1;
+            namedMatrix->ncol = nchan;
+            namedMatrix->row_names.clear();
+            namedMatrix->col_names = raw.info.ch_names;
+            namedMatrix->data = MatrixXd::Zero(1, nchan);
+
+            for (int c = 0; c < chIdx.size(); ++c) {
+                namedMatrix->data(0, chIdx[c]) = V(c, v);
+            }
+
+            proj.data = namedMatrix;
+            projs.append(proj);
+        }
+
+        qInfo() << "[FiffProj::compute_from_raw] Created" << nComp << desc << "projection vector(s)";
+    };
+
+    computeProjForChannels(gradIdx, nGrad, "PCA-grad");
+    computeProjForChannels(magIdx, nMag, "PCA-mag");
+    computeProjForChannels(eegIdx, nEeg, "PCA-eeg");
+
+    return projs;
 }

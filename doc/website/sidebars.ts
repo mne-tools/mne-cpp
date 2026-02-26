@@ -77,6 +77,7 @@ const sidebars: SidebarsConfig = {
                         'manual/tools-forward-solution',
                         'manual/tools-compute-raw-inverse',
                         'manual/tools-dipole-fit',
+                        'manual/tools-process-raw',
                         'manual/tools-edf2fiff',
                         'manual/tools-show-fiff',
                         'manual/tools-rt-server',

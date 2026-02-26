@@ -41,6 +41,8 @@
 
 #include "mne_epoch_data_list.h"
 
+#include <fiff/fiff_evoked_set.h>
+
 #include <utils/mnemath.h>
 
 //=============================================================================================================
@@ -387,4 +389,61 @@ void MNEEpochDataList::checkChThreshold(ArtifactRejectionData& inputData)
 //    } else {
 //        inputData.bRejected = false;
 //    }
+}
+
+//=============================================================================================================
+
+FiffEvokedSet MNEEpochDataList::averageCategories(const FiffRawData &raw,
+                                                    const MatrixXi &events,
+                                                    const QList<int> &eventCodes,
+                                                    const QStringList &comments,
+                                                    float tmin,
+                                                    float tmax,
+                                                    const QMap<QString,double> &mapReject,
+                                                    const QPair<float,float> &baseline,
+                                                    bool proj)
+{
+    FiffEvokedSet evokedSet;
+    evokedSet.info = raw.info;
+
+    float sfreq = raw.info.sfreq;
+    int nchan   = raw.info.nchan;
+
+    bool doBaseline = (baseline.first != baseline.second);
+
+    // Process each category (event code)
+    for (int j = 0; j < eventCodes.size(); ++j) {
+        int eventCode = eventCodes[j];
+        QString comment = (j < comments.size()) ? comments[j]
+                                                 : QString("cat_%1").arg(eventCode);
+
+        // Read epochs for this event code using the existing readEpochs
+        MNEEpochDataList epochList = MNEEpochDataList::readEpochs(raw, events,
+                                                                    tmin, tmax,
+                                                                    eventCode,
+                                                                    mapReject);
+
+        // Apply baseline correction
+        if (doBaseline) {
+            epochList.applyBaselineCorrection(baseline);
+        }
+
+        // Drop rejected epochs
+        epochList.dropRejected();
+
+        // Compute the average
+        int minSamp = static_cast<int>(std::round(tmin * sfreq));
+        int maxSamp = static_cast<int>(std::round(tmax * sfreq));
+
+        FiffEvoked evoked = epochList.average(raw.info,
+                                              minSamp,
+                                              maxSamp,
+                                              defaultVectorXi,
+                                              proj);
+
+        evoked.comment = comment;
+        evokedSet.evoked.append(evoked);
+    }
+
+    return evokedSet;
 }

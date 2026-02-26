@@ -86,6 +86,7 @@ class FiffInfo;
 class FiffInfoBase;
 class FiffCov;
 class FiffProj;
+class FiffEvokedSet;
 class FiffNamedMatrix;
 class FiffDigPoint;
 class FiffChInfo;
@@ -776,6 +777,22 @@ public:
      * @return the position where the named matrix struct was written to.
      */
     fiff_long_t write_named_matrix(fiff_int_t kind, const FiffNamedMatrix& mat);
+
+    //=========================================================================================================
+    /**
+     * fiff_write_evoked_set
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Writes a complete evoked data set to a fif stream (file).
+     * This writes FIFFB_MEAS containing measurement info and one FIFFB_EVOKED/FIFFB_ASPECT
+     * block per evoked response.
+     *
+     * @param[in] p_FiffEvokedSet   The evoked data set to write.
+     *
+     * @return the position where the evoked set was written to, or -1 on failure.
+     */
+    fiff_long_t write_evoked_set(const FiffEvokedSet& p_FiffEvokedSet);
 
     //=========================================================================================================
     /**

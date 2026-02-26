@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "fiff_raw_data.h"
+#include "fiff_events.h"
 #include "fiff_tag.h"
 #include "fiff_stream.h"
 #include "cstdlib"
@@ -813,4 +814,78 @@ bool FiffRawData::read_raw_segment_times(MatrixXd& data,
     //   Read it
     //
     return this->read_raw_segment(data, times, (qint32)from, (qint32)to, sel);
+}
+
+//=============================================================================================================
+
+bool FiffRawData::save(QIODevice &p_IODevice,
+                        const RowVectorXi &picks,
+                        int decim,
+                        int from,
+                        int to) const
+{
+    if (decim < 1) decim = 1;
+
+    int firstSamp = (from >= 0) ? from : first_samp;
+    int lastSamp  = (to >= 0) ? to : last_samp;
+
+    if (firstSamp > lastSamp) {
+        qWarning() << "[FiffRawData::save] Invalid sample range.";
+        return false;
+    }
+
+    // Prepare output info
+    FiffInfo outInfo;
+    if (picks.size() > 0) {
+        outInfo = info.pick_info(picks);
+    } else {
+        outInfo = info;
+    }
+
+    // Adjust sampling frequency for decimation
+    if (decim > 1) {
+        outInfo.sfreq = info.sfreq / static_cast<float>(decim);
+    }
+
+    // Use the standard start_writing_raw pipeline
+    RowVectorXd calsOut;
+    FiffStream::SPtr pStream = FiffStream::start_writing_raw(p_IODevice, outInfo, calsOut, picks);
+    if (!pStream) {
+        qWarning() << "[FiffRawData::save] Cannot start writing raw file.";
+        return false;
+    }
+
+    // Write data in blocks
+    const int blockSize = 2000;
+    int blockSamples = decim * blockSize;
+
+    for (int samp = firstSamp; samp <= lastSamp; samp += blockSamples) {
+        int nsamp = qMin(blockSamples, lastSamp - samp + 1);
+
+        MatrixXd segData;
+        MatrixXd segTimes;
+        if (!read_raw_segment(segData, segTimes, samp, samp + nsamp - 1, picks)) {
+            qWarning() << "[FiffRawData::save] Error reading data at sample" << samp;
+            pStream->finish_writing_raw();
+            return false;
+        }
+
+        // Decimate if needed
+        if (decim > 1) {
+            int nOut = (nsamp + decim - 1) / decim;
+            MatrixXd decimData(segData.rows(), nOut);
+            for (int s = 0, idx = 0; s < nsamp && idx < nOut; s += decim, ++idx) {
+                decimData.col(idx) = segData.col(s);
+            }
+            segData = decimData;
+        }
+
+        pStream->write_raw_buffer(segData, calsOut);
+    }
+
+    pStream->finish_writing_raw();
+
+    qInfo() << "[FiffRawData::save] Saved raw data from sample" << firstSamp
+            << "to" << lastSamp << "(decim=" << decim << ")";
+    return true;
 }

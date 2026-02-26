@@ -58,6 +58,7 @@
 #include "fiff_raw_dir.h"
 #include "fiff_stream.h"
 #include "fiff_evoked_set.h"
+#include "fiff_events.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES

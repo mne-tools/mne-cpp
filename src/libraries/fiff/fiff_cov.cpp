@@ -40,8 +40,10 @@
 
 #include "fiff_cov.h"
 #include "fiff_stream.h"
+#include "fiff_raw_data.h"
 #include "fiff_info_base.h"
 #include "fiff_dir_node.h"
+#include "fiff_file.h"
 
 #include <utils/mnemath.h>
 
@@ -50,6 +52,7 @@
 //=============================================================================================================
 
 #include <QPair>
+#include <QFile>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -476,4 +479,175 @@ FiffCov& FiffCov::operator= (const FiffCov &rhs)
     }
     // to support chained assignment operators (a=b=c), always return *this
     return *this;
+}
+
+//=============================================================================================================
+
+FiffCov FiffCov::compute_from_epochs(const FiffRawData &raw,
+                                      const MatrixXi &events,
+                                      const QList<int> &eventCodes,
+                                      float tmin,
+                                      float tmax,
+                                      float bmin,
+                                      float bmax,
+                                      bool doBaseline,
+                                      bool removeMean,
+                                      unsigned int ignoreMask,
+                                      float delay)
+{
+    FiffCov cov;
+    float sfreq = raw.info.sfreq;
+    int nchan   = raw.info.nchan;
+
+    int minSamp = static_cast<int>(std::round(tmin * sfreq));
+    int maxSamp = static_cast<int>(std::round(tmax * sfreq));
+    int ns = maxSamp - minSamp + 1;
+    int delaySamp = static_cast<int>(std::round(delay * sfreq));
+
+    if (ns <= 0) {
+        qWarning() << "[FiffCov::compute_from_epochs] Invalid time window.";
+        return cov;
+    }
+
+    int bminSamp = 0, bmaxSamp = 0;
+    if (doBaseline) {
+        bminSamp = static_cast<int>(std::round(bmin * sfreq)) - minSamp;
+        bmaxSamp = static_cast<int>(std::round(bmax * sfreq)) - minSamp;
+    }
+
+    MatrixXd covAccum = MatrixXd::Zero(nchan, nchan);
+    VectorXd meanAccum = VectorXd::Zero(nchan);
+    int totalSamples = 0;
+    int nAccepted = 0;
+
+    for (int k = 0; k < events.rows(); ++k) {
+        int evFrom = events(k, 1) & ~static_cast<int>(ignoreMask);
+        int evTo   = events(k, 2) & ~static_cast<int>(ignoreMask);
+
+        // Check if event matches any of the desired event codes
+        bool match = false;
+        for (int ec = 0; ec < eventCodes.size(); ++ec) {
+            if (evFrom == 0 && evTo == eventCodes[ec]) {
+                match = true;
+                break;
+            }
+        }
+        if (!match)
+            continue;
+
+        int evSample = events(k, 0);
+        int epochStart = evSample + delaySamp + minSamp;
+        int epochEnd   = evSample + delaySamp + maxSamp;
+
+        if (epochStart < raw.first_samp || epochEnd > raw.last_samp)
+            continue;
+
+        MatrixXd epochData;
+        MatrixXd epochTimes;
+        if (!raw.read_raw_segment(epochData, epochTimes, epochStart, epochEnd))
+            continue;
+
+        // Baseline subtraction
+        if (doBaseline) {
+            int bminIdx = qMax(0, bminSamp);
+            int bmaxIdx = qMin(static_cast<int>(epochData.cols()) - 1, bmaxSamp);
+            if (bmaxIdx > bminIdx) {
+                int nBase = bmaxIdx - bminIdx;
+                for (int c = 0; c < nchan; ++c) {
+                    double baseVal = epochData.row(c).segment(bminIdx, nBase).mean();
+                    epochData.row(c).array() -= baseVal;
+                }
+            }
+        }
+
+        // Accumulate
+        if (removeMean) {
+            VectorXd epochMean = epochData.rowwise().mean();
+            meanAccum += epochMean * static_cast<double>(ns);
+        }
+        covAccum += epochData * epochData.transpose();
+        totalSamples += ns;
+        nAccepted++;
+    }
+
+    if (totalSamples < 2) {
+        qWarning() << "[FiffCov::compute_from_epochs] Not enough data.";
+        return cov;
+    }
+
+    if (removeMean) {
+        VectorXd grandMean = meanAccum / static_cast<double>(totalSamples);
+        cov.data = (covAccum / static_cast<double>(totalSamples - 1))
+                   - (grandMean * grandMean.transpose()) * (static_cast<double>(totalSamples) / (totalSamples - 1));
+    } else {
+        cov.data = covAccum / static_cast<double>(totalSamples - 1);
+    }
+
+    cov.kind  = FIFFV_MNE_NOISE_COV;
+    cov.dim   = nchan;
+    cov.names = raw.info.ch_names;
+    cov.nfree = totalSamples - 1;
+    cov.bads  = raw.info.bads;
+    cov.projs = raw.info.projs;
+
+    qInfo() << "[FiffCov::compute_from_epochs] Computed:" << nchan << "channels,"
+            << nAccepted << "epochs," << totalSamples << "total samples.";
+
+    return cov;
+}
+
+//=============================================================================================================
+
+bool FiffCov::save(const QString &fileName) const
+{
+    if (fileName.isEmpty()) {
+        qWarning() << "[FiffCov::save] Output file not specified.";
+        return false;
+    }
+
+    QFile file(fileName);
+    FiffStream::SPtr pStream = FiffStream::start_file(file);
+    if (!pStream) {
+        qWarning() << "[FiffCov::save] Cannot open" << fileName;
+        return false;
+    }
+
+    pStream->start_block(FIFFB_MEAS);
+    pStream->write_id(FIFF_BLOCK_ID);
+    pStream->write_cov(*this);
+    pStream->end_block(FIFFB_MEAS);
+    pStream->end_file();
+
+    qInfo() << "[FiffCov::save] Saved covariance matrix to" << fileName;
+    return true;
+}
+
+//=============================================================================================================
+
+FiffCov FiffCov::computeGrandAverage(const QList<FiffCov> &covs)
+{
+    FiffCov grandCov;
+
+    if (covs.isEmpty()) {
+        qWarning() << "[FiffCov::computeGrandAverage] No covariance matrices provided.";
+        return grandCov;
+    }
+
+    grandCov = covs[0];
+    MatrixXd sumCov = grandCov.data * static_cast<double>(grandCov.nfree);
+    int totalNfree = grandCov.nfree;
+
+    for (int k = 1; k < covs.size(); ++k) {
+        if (covs[k].dim != grandCov.dim) {
+            qWarning() << "[FiffCov::computeGrandAverage] Dimension mismatch.";
+            return FiffCov();
+        }
+        sumCov += covs[k].data * static_cast<double>(covs[k].nfree);
+        totalNfree += covs[k].nfree;
+    }
+
+    grandCov.data = sumCov / static_cast<double>(totalNfree);
+    grandCov.nfree = totalNfree;
+
+    return grandCov;
 }

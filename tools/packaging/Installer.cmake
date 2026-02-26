@@ -56,7 +56,7 @@ cpack_add_component_group(applications
 # --- 1a. CLI Tools (QCoreApplication-based, no display) ---
 cpack_add_component(cli
     DISPLAY_NAME "Command-Line Tools"
-    DESCRIPTION "CLI applications: mne_anonymize, mne_edf2fiff, mne_show_fiff, mne_forward_solution, mne_compute_raw_inverse, mne_setup_mri, mne_surf2bem, mne_setup_forward_model, mne_rt_server, and more."
+    DESCRIPTION "CLI applications: mne_anonymize, mne_edf2fiff, mne_show_fiff, mne_forward_solution, mne_compute_raw_inverse, mne_process_raw, mne_setup_mri, mne_surf2bem, mne_setup_forward_model, mne_rt_server, and more."
     GROUP applications
 )
 

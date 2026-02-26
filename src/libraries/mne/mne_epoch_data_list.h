@@ -173,6 +173,36 @@ public:
                                  const QStringList &lExcludeChs = QStringList());
 
     static void checkChThreshold(ArtifactRejectionData& inputData);
+
+    //=========================================================================================================
+    /**
+     * averageCategories
+     *
+     * Multi-category offline averaging. Reads epochs from raw data for multiple event types
+     * and returns an FiffEvokedSet with one FiffEvoked per category.
+     * Ported from average.c (MNE-C).
+     *
+     * @param[in] raw           The raw data.
+     * @param[in] events        Event matrix (nEvents x 3): [sample, before, after].
+     * @param[in] eventCodes    List of event codes, one per category.
+     * @param[in] comments      List of category names/comments, one per category.
+     * @param[in] tmin          Start of epoch relative to event (seconds).
+     * @param[in] tmax          End of epoch relative to event (seconds).
+     * @param[in] mapReject     Rejection thresholds (key = channel type string, value = threshold).
+     * @param[in] baseline      Baseline interval [from, to] in seconds. If from==to, no baseline correction.
+     * @param[in] proj          Apply SSP projection vectors (optional, default = false).
+     *
+     * @return FiffEvokedSet containing one FiffEvoked per category.
+     */
+    static FIFFLIB::FiffEvokedSet averageCategories(const FIFFLIB::FiffRawData &raw,
+                                                     const Eigen::MatrixXi &events,
+                                                     const QList<int> &eventCodes,
+                                                     const QStringList &comments,
+                                                     float tmin,
+                                                     float tmax,
+                                                     const QMap<QString,double> &mapReject = QMap<QString,double>(),
+                                                     const QPair<float,float> &baseline = QPair<float,float>(0.0f, 0.0f),
+                                                     bool proj = false);
 };
 } // NAMESPACE
 

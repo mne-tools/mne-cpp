@@ -37,8 +37,8 @@ flowchart TD
     subgraph MEG_PATH["MEG/EEG Processing"]
         direction TB
         MEG_RAW["<b>MEG/EEG Data</b><br/><i style='font-weight:300'>Raw recordings</i>"]
-        FILTERED["<b>Filtered &amp; Averaged</b><br/><i style='font-weight:300'>mne_browse_raw</i>"]
-        NOISE["<b>Noise Covariance</b><br/><i style='font-weight:300'>Matrix</i>"]
+        FILTERED["<b>Filtered &amp; Averaged</b><br/><i style='font-weight:300'>mne_process_raw</i>"]
+        NOISE["<b>Noise Covariance</b><br/><i style='font-weight:300'>mne_process_raw</i>"]
 
         MEG_RAW --> FILTERED
         MEG_RAW --> NOISE
@@ -147,7 +147,7 @@ Many MEG/EEG signals including biological artifacts reflect non-Gaussian process
 
 ### Downsampling
 
-The minimum practical sampling frequency of the Vectorview system is 600 Hz. Lower sampling frequencies are allowed but result in elevated noise levels in the data. It is advisable to lowpass filter and downsample large raw data files — common in cognitive and patient studies — to speed up subsequent processing. This can be accomplished with `mne_browse_raw` or `mne_process_raw`.
+The minimum practical sampling frequency of the Vectorview system is 600 Hz. Lower sampling frequencies are allowed but result in elevated noise levels in the data. It is advisable to lowpass filter and downsample large raw data files — common in cognitive and patient studies — to speed up subsequent processing. This can be accomplished with [`mne_process_raw`](tools-process-raw).
 
 It is recommended that the original raw file is called `<name>_raw.fif` and the downsampled version `<name>_ds_raw.fif`.
 
@@ -253,9 +253,9 @@ After the MRI-MEG/EEG alignment has been set, the forward solution — the magne
 
 The MNE software employs an estimate of the noise-covariance matrix to weight the channels correctly in the calculations. The noise-covariance matrix provides information about field and potential patterns representing uninteresting noise sources of either human or environmental origin.
 
-The noise covariance matrix can be calculated in several ways:
+The noise covariance matrix can be calculated in several ways using **[mne_process_raw](tools-process-raw)**:
 
-- **From epochs**: Employ the individual epochs during off-line averaging to calculate the full noise covariance matrix. This is the recommended approach for evoked responses.
+- **From epochs**: Employ the individual epochs during off-line averaging to calculate the full noise covariance matrix. This is the recommended approach for evoked responses. Use the `--cov` option with a covariance description file.
 
 - **From empty room data**: Employ empty room data (collected without the subject) to calculate the full noise covariance matrix. This is recommended for analyzing ongoing spontaneous activity.
 

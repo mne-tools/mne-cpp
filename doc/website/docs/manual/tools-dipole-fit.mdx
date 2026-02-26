@@ -50,7 +50,7 @@ Dipole fitting is a parametric source localization approach that models the neur
 
 - **BEM vs. sphere model**: The forward model used for fitting can be either a full BEM model or a simpler sphere model. The BEM model is generally more accurate.
 
-- **Noise covariance**: A noise-covariance matrix is used to whiten the data and weight the channels appropriately in the fitting procedure.
+- **Noise covariance**: A noise-covariance matrix is used to whiten the data and weight the channels appropriately in the fitting procedure. This can be computed with **[mne_process_raw](tools-process-raw)** using the `--cov` option.
 
 ### Output
 
@@ -76,3 +76,9 @@ mne_dipole_fit \
     --meg \
     --dip sample_audvis.dip
 ```
+
+## See Also
+
+- [mne_process_raw](tools-process-raw) — Compute averaged data and noise-covariance matrices needed as inputs
+- [mne_forward_solution](tools-forward-solution) — Compute the forward solution (BEM)
+- [The Minimum-Norm Estimates](inverse) — Mathematical background for inverse methods

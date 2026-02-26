@@ -56,6 +56,10 @@
 
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_cov.h>
+#include <fiff/fiff_proj.h>
+#include <fiff/fiff_events.h>
+#include <fiff/fiff_evoked_set.h>
+#include <fiff/fiff_raw_data.h>
 
 #include <utils/mnemath.h>
 
@@ -64,6 +68,7 @@
 //=============================================================================================================
 
 #include <QMap>
+#include <QList>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -311,11 +316,14 @@ public:
         return orig.prepare_inverse_operator(nave, lambda2, dSPM, sLORETA);
     }
 
-    static bool read_events(QString t_sEventName,
+    inline static bool read_events(QString t_sEventName,
                             QString t_fileRawName,
-                            Eigen::MatrixXi& events);
+                            Eigen::MatrixXi& events)
+    {
+        return FIFFLIB::FiffEvents::read(t_sEventName, t_fileRawName, events);
+    }
 
-// ToDo Eventlist Class??
+// ToDo Eventlist Class?? -> Done: FiffEvents
     //=========================================================================================================
     /**
      * mne_read_events
@@ -329,8 +337,11 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    static bool read_events_from_fif(QIODevice &p_IODevice,
-                                     Eigen::MatrixXi& eventlist);
+    inline static bool read_events_from_fif(QIODevice &p_IODevice,
+                                     Eigen::MatrixXi& eventlist)
+    {
+        return FIFFLIB::FiffEvents::read_from_fif(p_IODevice, eventlist);
+    }
 
     //=========================================================================================================
     /**
@@ -343,8 +354,151 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    static bool read_events_from_ascii(QIODevice &p_IODevice,
-                                       Eigen::MatrixXi& eventlist);
+    inline static bool read_events_from_ascii(QIODevice &p_IODevice,
+                                       Eigen::MatrixXi& eventlist)
+    {
+        return FIFFLIB::FiffEvents::read_from_ascii(p_IODevice, eventlist);
+    }
+
+    //=========================================================================================================
+    /**
+     * write_events_to_fif
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Write an event list to a FIFF file.
+     *
+     * @param[in] p_IODevice   The I/O device to write to.
+     * @param[in] eventlist    The event list (nEvents x 3): [sample, before, after].
+     *
+     * @return true if succeeded, false otherwise.
+     */
+    inline static bool write_events_to_fif(QIODevice &p_IODevice,
+                                    const Eigen::MatrixXi& eventlist)
+    {
+        return FIFFLIB::FiffEvents::write_to_fif(p_IODevice, eventlist);
+    }
+
+    //=========================================================================================================
+    /**
+     * write_events_to_ascii
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Write an event list to a text file (MNE-C compatible format).
+     *
+     * @param[in] p_IODevice   The I/O device to write to.
+     * @param[in] eventlist    The event list (nEvents x 3): [sample, before, after].
+     * @param[in] sfreq        Sampling frequency for time column computation.
+     *
+     * @return true if succeeded, false otherwise.
+     */
+    inline static bool write_events_to_ascii(QIODevice &p_IODevice,
+                                      const Eigen::MatrixXi& eventlist,
+                                      float sfreq = 0.0f)
+    {
+        return FIFFLIB::FiffEvents::write_to_ascii(p_IODevice, eventlist, sfreq);
+    }
+
+    //=========================================================================================================
+    /**
+     * compute_epoch_covariance
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the FiffCov::compute_from_epochs static function
+     *
+     * Compute a noise covariance matrix from raw data based on event-locked epochs.
+     * Ported from compute_cov.c (MNE-C).
+     *
+     * @param[in] raw           The raw data.
+     * @param[in] events        Event matrix (nEvents x 3): [sample, before, after].
+     * @param[in] eventCodes    Which event codes to include.
+     * @param[in] tmin          Start of time window relative to event (seconds).
+     * @param[in] tmax          End of time window relative to event (seconds).
+     * @param[in] bmin          Baseline start (seconds, relative to event). Only used if doBaseline is true.
+     * @param[in] bmax          Baseline end (seconds, relative to event). Only used if doBaseline is true.
+     * @param[in] doBaseline    Whether to apply baseline correction before covariance computation.
+     * @param[in] removeMean    Whether to remove sample mean from the covariance estimate.
+     *
+     * @return The computed noise covariance matrix, or empty FiffCov on failure.
+     */
+    inline static FIFFLIB::FiffCov compute_epoch_covariance(const FIFFLIB::FiffRawData &raw,
+                                                            const Eigen::MatrixXi &events,
+                                                            const QList<int> &eventCodes,
+                                                            float tmin,
+                                                            float tmax,
+                                                            float bmin = 0.0f,
+                                                            float bmax = 0.0f,
+                                                            bool doBaseline = false,
+                                                            bool removeMean = true)
+    {
+        return FIFFLIB::FiffCov::compute_from_epochs(raw, events, eventCodes, tmin, tmax, bmin, bmax, doBaseline, removeMean);
+    }
+
+    //=========================================================================================================
+    /**
+     * compute_proj
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Create SSP (Signal-Space Projection) operators from raw data via SVD.
+     * Ported from make_ssp.c (MNE-C).
+     *
+     * @param[in] raw           The raw data.
+     * @param[in] events        Event matrix (nEvents x 3).
+     * @param[in] eventCode     Which event code to select epochs for.
+     * @param[in] tmin          Start of epoch relative to event (seconds).
+     * @param[in] tmax          End of epoch relative to event (seconds).
+     * @param[in] nGrad         Number of gradiometer projection vectors.
+     * @param[in] nMag          Number of magnetometer projection vectors.
+     * @param[in] nEeg          Number of EEG projection vectors.
+     * @param[in] mapReject     Rejection thresholds (key = channel type string, value = threshold).
+     *
+     * @return List of FiffProj items, or empty list on failure.
+     */
+    inline static QList<FIFFLIB::FiffProj> compute_proj(const FIFFLIB::FiffRawData &raw,
+                                                  const Eigen::MatrixXi &events,
+                                                  int eventCode,
+                                                  float tmin,
+                                                  float tmax,
+                                                  int nGrad,
+                                                  int nMag,
+                                                  int nEeg,
+                                                  const QMap<QString,double> &mapReject = QMap<QString,double>())
+    {
+        return FIFFLIB::FiffProj::compute_from_raw(raw, events, eventCode, tmin, tmax, nGrad, nMag, nEeg, mapReject);
+    }
+
+    //=========================================================================================================
+    /**
+     * save_raw
+     *
+     * ### MNE toolbox root function ###
+     *
+     * Wrapper for the FiffRawData::save member function
+     *
+     * Save raw data to a FIFF file, optionally with decimation and channel picking.
+     * Ported from save.c (MNE-C).
+     *
+     * @param[in] raw       The raw data to save.
+     * @param[in] p_IODevice Output device to write to.
+     * @param[in] picks     Channel indices to include (empty = all channels).
+     * @param[in] decim     Decimation factor (1 = no decimation).
+     * @param[in] from      First sample to save (-1 = from start of raw data).
+     * @param[in] to        Last sample to save (-1 = to end of raw data).
+     *
+     * @return true on success.
+     */
+    inline static bool save_raw(const FIFFLIB::FiffRawData &raw,
+                                QIODevice &p_IODevice,
+                                const Eigen::RowVectorXi &picks = Eigen::RowVectorXi(),
+                                int decim = 1,
+                                int from = -1,
+                                int to = -1)
+    {
+        return raw.save(p_IODevice, picks, decim, from, to);
+    }
 
     static void setup_compensators(FIFFLIB::FiffRawData& raw,
                                    FIFFLIB::fiff_int_t dest_comp,

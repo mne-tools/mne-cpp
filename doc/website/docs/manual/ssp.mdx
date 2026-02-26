@@ -64,6 +64,8 @@ Application of SSP requires the estimation of the signal vectors $b_1 \ldots b_m
 
 It is also customary to use a separate set of vectors for magnetometers and gradiometers in the Vectorview system.
 
+SSP vectors can be computed from raw data using **[mne_process_raw](tools-process-raw)** with the `--projon` and `--proj` options. Existing projection files (`.fif`) can also be loaded and applied during batch processing.
+
 ## EEG Average Electrode Reference
 
 The EEG average reference is the mean signal over all the sensors. It is typical in EEG analysis to subtract the average reference from all the sensor signals $b^1(t), \ldots, b^n(t)$:

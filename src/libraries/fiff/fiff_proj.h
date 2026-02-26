@@ -52,6 +52,7 @@
 #include <QSharedPointer>
 #include <QString>
 #include <QStringList>
+#include <QMap>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -65,6 +66,12 @@
 
 namespace FIFFLIB
 {
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class FiffRawData;
 
 //=============================================================================================================
 /**
@@ -138,6 +145,35 @@ public:
                                      Eigen::MatrixXd& proj,
                                      const QStringList& bads = defaultQStringList,
                                      Eigen::MatrixXd& U = defaultMatrixXd);
+
+    //=========================================================================================================
+    /**
+     * compute_from_raw
+     *
+     * Create SSP (Signal-Space Projection) operators from raw data via SVD.
+     * Ported from make_ssp.c (MNE-C).
+     *
+     * @param[in] raw           The raw data.
+     * @param[in] events        Event matrix (nEvents x 3).
+     * @param[in] eventCode     Which event code to select epochs for.
+     * @param[in] tmin          Start of epoch relative to event (seconds).
+     * @param[in] tmax          End of epoch relative to event (seconds).
+     * @param[in] nGrad         Number of gradiometer projection vectors.
+     * @param[in] nMag          Number of magnetometer projection vectors.
+     * @param[in] nEeg          Number of EEG projection vectors.
+     * @param[in] mapReject     Rejection thresholds (key = channel type string, value = threshold).
+     *
+     * @return List of FiffProj items, or empty list on failure.
+     */
+    static QList<FiffProj> compute_from_raw(const FiffRawData &raw,
+                                            const Eigen::MatrixXi &events,
+                                            int eventCode,
+                                            float tmin,
+                                            float tmax,
+                                            int nGrad,
+                                            int nMag,
+                                            int nEeg,
+                                            const QMap<QString,double> &mapReject = QMap<QString,double>());
 
     //=========================================================================================================
     /**
