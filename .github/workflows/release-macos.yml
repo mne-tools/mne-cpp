@@ -23,6 +23,17 @@ jobs:
     - name: Configure and compile MNE-CPP
       run: |
         ./tools/build_project.bat
+    - name: Disk usage before build
+      run: |
+        echo "Disk usage before build:" && df -h && du -sh $HOME/*
+    - name: Free up disk space before packaging
+      run: |
+        echo "Disk usage before cleanup:" && df -h && du -sh $HOME/*
+        sudo rm -rf /usr/local/share/gtk-doc /usr/local/Cellar /usr/local/lib/node_modules /usr/share/dotnet /opt/hostedtoolcache /Users/runner/Library/Caches/*
+        echo "Disk usage after cleanup:" && df -h && du -sh $HOME/*
+    - name: Disk usage before packaging
+      run: |
+        echo "Disk usage before packaging:" && df -h && du -sh $HOME/*
     - name: Deploy binaries (MacOS)
       run: |
         ./tools/deploy.bat dynamic pack
