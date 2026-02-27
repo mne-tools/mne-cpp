@@ -70,13 +70,15 @@
         
         cd %OUT_DIR_NAME%\apps
 
-        REM Solve dependencies for libraries
-        for /f %%f in ('dir *.dll /s /b') do (
+        REM Solve dependencies for top-level DLLs only (not plugin subdirs).
+        REM Using /b without /s to avoid recursing into mne_scan_plugins/ etc.
+        REM which would bloat each plugin dir with duplicate Qt DLLs.
+        for /f %%f in ('dir /b *.dll') do (
           %MOCK_TEXT%windeployqt %%f
         )
 
-        REM solve dependencies for applications
-        for /f %%f in ('dir *.exe /s /b') do (
+        REM Solve dependencies for top-level applications only
+        for /f %%f in ('dir /b *.exe') do (
             %MOCK_TEXT%windeployqt %%f
         )
 
@@ -94,8 +96,10 @@
             cd %BASE_PATH%
             REM Delete folders which we do not want to ship
             %MOCK_TEXT%rmdir %OUT_DIR_NAME%\resources\data /s /q 
-            REM Creating archive of all win deployed applications
-            %MOCK_TEXT%7z a %BASE_PATH%\mne-cpp-windows-dynamic-x86_64.zip %OUT_DIR_NAME%
+            REM Creating archive from inside output directory for clean top-level layout
+            cd %OUT_DIR_NAME%
+            %MOCK_TEXT%7z a %BASE_PATH%\mne-cpp-windows-dynamic-x86_64.zip apps lib resources
+            cd %BASE_PATH%
         )
 
         cd %cd%
@@ -263,49 +267,154 @@ doPrintConfiguration
 
 if [[ ${LinkOption} == "dynamic" ]]; then
 
-    # Call macdeployqt on all .app bundles in the bin folder
-    for f in ${BasePath}/out/${BuildName}/apps/*.app; do $Qt5_DIR/bin/macdeployqt ${MockText}$f ; done
+    # ---------------------------------------------------------------
+    # Locate macdeployqt — works with both Qt 5 ($Qt5_DIR) and Qt 6
+    # ($QT_ROOT_DIR or PATH set by jurplel/install-qt-action).
+    # ---------------------------------------------------------------
+    MACDEPLOYQT=""
+    if command -v macdeployqt &> /dev/null; then
+        MACDEPLOYQT="macdeployqt"
+    elif [ -n "${QT_ROOT_DIR}" ] && [ -x "${QT_ROOT_DIR}/bin/macdeployqt" ]; then
+        MACDEPLOYQT="${QT_ROOT_DIR}/bin/macdeployqt"
+    elif [ -n "${Qt6_DIR}" ] && [ -x "${Qt6_DIR}/../../../bin/macdeployqt" ]; then
+        MACDEPLOYQT="${Qt6_DIR}/../../../bin/macdeployqt"
+    elif [ -n "${Qt5_DIR}" ] && [ -x "${Qt5_DIR}/bin/macdeployqt" ]; then
+        MACDEPLOYQT="${Qt5_DIR}/bin/macdeployqt"
+    fi
 
-    # Solve for dependencies for mne_scan.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/mne_scan_plugins ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/mne_scan_plugins
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/resources
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/Frameworks
-    # ${MockText}cp -a $Qt5_DIR/plugins/renderers ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/PlugIns/renderers
+    if [ -z "${MACDEPLOYQT}" ]; then
+        echo "ERROR: macdeployqt not found. Ensure Qt bin/ is on PATH or set QT_ROOT_DIR."
+        exit 1
+    fi
+    echo "Using macdeployqt: ${MACDEPLOYQT}"
 
-    # Solve for dependencies for mne_analyze.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/mne_analyze_plugins ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/resources
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/Frameworks
-    # ${MockText}cp -a $Qt5_DIR/plugins/renderers ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/PlugIns/renderers
+    # Call macdeployqt on all .app bundles in the apps folder.
+    # macdeployqt copies Qt frameworks for the main binary's direct dependencies
+    # into Contents/Frameworks/. It does NOT resolve MNE-CPP dylib dependencies.
+    for f in ${BasePath}/out/${BuildName}/apps/*.app; do
+        echo "Running macdeployqt on $(basename $f) ..."
+        ${MockText}${MACDEPLOYQT} "$f"
+    done
 
-    # Solve for dependencies for mne_rt_server.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/mne_rt_server_plugins ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/mne_rt_server_plugins
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/resources
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/Frameworks
+    # ---------------------------------------------------------------
+    # Locate Qt lib directory for framework copying
+    # ---------------------------------------------------------------
+    QT_LIB_DIR=""
+    if [ -n "${QT_ROOT_DIR}" ] && [ -d "${QT_ROOT_DIR}/lib" ]; then
+        QT_LIB_DIR="${QT_ROOT_DIR}/lib"
+    elif [ -n "${Qt6_DIR}" ]; then
+        QT_LIB_DIR="$(cd "${Qt6_DIR}/../../.." 2>/dev/null && pwd)/lib"
+    elif [ -n "${Qt5_DIR}" ] && [ -d "${Qt5_DIR}/lib" ]; then
+        QT_LIB_DIR="${Qt5_DIR}/lib"
+    fi
 
-    # Solve for dependencies for mne_forward_solution.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/MacOS/resources
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_forward_solution.app/Contents/Frameworks
+    # ---------------------------------------------------------------
+    # Collect ALL required Qt frameworks (from CLI tools, MNE-CPP dylibs,
+    # and transitive Qt dependencies). macdeployqt only handles the main
+    # .app binary's direct Qt deps; MNE-CPP dylibs pull in additional
+    # Qt frameworks (Qt3D*, QtCharts, QtOpenGL, etc.) that we must add.
+    # ---------------------------------------------------------------
+    echo "Resolving all required Qt frameworks..."
+    QT_FRAMEWORKS=""
+    for exe in ${BasePath}/out/${BuildName}/apps/mne_*; do
+        [ -f "$exe" ] && [ -x "$exe" ] || continue
+        DEPS=$(otool -L "$exe" 2>/dev/null | grep -o '@rpath/Qt[^/]*\.framework' | sed 's|@rpath/||' | sort -u)
+        QT_FRAMEWORKS="${QT_FRAMEWORKS} ${DEPS}"
+    done
+    for dylib in ${BasePath}/out/${BuildName}/lib/*.dylib; do
+        DEPS=$(otool -L "$dylib" 2>/dev/null | grep -o '@rpath/Qt[^/]*\.framework' | sed 's|@rpath/||' | sort -u)
+        QT_FRAMEWORKS="${QT_FRAMEWORKS} ${DEPS}"
+    done
+    # Resolve transitive Qt framework dependencies
+    if [ -n "${QT_LIB_DIR}" ] && [ -d "${QT_LIB_DIR}" ]; then
+        for fw in $(echo "${QT_FRAMEWORKS}" | tr ' ' '\n' | sort -u | grep -v '^$'); do
+            FW_NAME=$(echo "$fw" | sed 's/\.framework//')
+            if [ -f "${QT_LIB_DIR}/${fw}/Versions/A/${FW_NAME}" ]; then
+                TRANS_DEPS=$(otool -L "${QT_LIB_DIR}/${fw}/Versions/A/${FW_NAME}" 2>/dev/null | grep -o '@rpath/Qt[^/]*\.framework' | sed 's|@rpath/||' | sort -u)
+                QT_FRAMEWORKS="${QT_FRAMEWORKS} ${TRANS_DEPS}"
+            fi
+        done
+    fi
+    QT_FRAMEWORKS=$(echo "${QT_FRAMEWORKS}" | tr ' ' '\n' | sort -u | grep -v '^$')
+    echo "  Required Qt frameworks: $(echo ${QT_FRAMEWORKS} | tr '\n' ' ')"
 
-    # Solve for dependencies for mne_dipole_fit.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_dipole_fit.app/Contents/MacOS/resources
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_dipole_fit.app/Contents/Frameworks
+    # ---------------------------------------------------------------
+    # Complete .app bundles: copy MNE-CPP dylibs + missing Qt frameworks
+    # into each .app bundle's Contents/Frameworks/.
+    # ---------------------------------------------------------------
+    for f in ${BasePath}/out/${BuildName}/apps/*.app; do
+        FWDIR="$f/Contents/Frameworks"
+        [ -d "$FWDIR" ] || continue
+        echo "Completing $(basename $f) bundle..."
 
-    # Solve for dependencies for mne_anonymize.app bundle
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/MacOS/resources
-    ${MockText}cp -a ${BasePath}/out/${BuildName}/lib ${BasePath}/out/${BuildName}/apps/mne_anonymize.app/Contents/Frameworks
+        # Copy MNE-CPP shared libraries into Frameworks/
+        for dylib in ${BasePath}/out/${BuildName}/lib/*.dylib; do
+            LIBNAME=$(basename "$dylib")
+            [ -f "${FWDIR}/${LIBNAME}" ] || ${MockText}cp -a "$dylib" "${FWDIR}/"
+        done
+
+        # Copy any missing Qt frameworks (needed by MNE-CPP dylibs)
+        if [ -n "${QT_LIB_DIR}" ]; then
+            for fw in ${QT_FRAMEWORKS}; do
+                if [ ! -d "${FWDIR}/${fw}" ] && [ -d "${QT_LIB_DIR}/${fw}" ]; then
+                    ${MockText}cp -a "${QT_LIB_DIR}/${fw}" "${FWDIR}/"
+                fi
+            done
+        fi
+    done
+
+    # Copy plugins and resources into the relevant .app bundles.
+
+    # mne_scan.app — plugins + resources
+    if [ -d "${BasePath}/out/${BuildName}/apps/mne_scan.app" ]; then
+        ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/mne_scan_plugins ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/mne_scan_plugins
+        ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_scan.app/Contents/MacOS/resources
+    fi
+
+    # mne_analyze.app — plugins + resources
+    if [ -d "${BasePath}/out/${BuildName}/apps/mne_analyze.app" ]; then
+        ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/mne_analyze_plugins ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/mne_analyze_plugins
+        ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_analyze.app/Contents/MacOS/resources
+    fi
+
+    # mne_rt_server.app — plugins + resources (if it exists as a .app bundle)
+    if [ -d "${BasePath}/out/${BuildName}/apps/mne_rt_server.app" ]; then
+        ${MockText}cp -a ${BasePath}/out/${BuildName}/apps/mne_rt_server_plugins ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/mne_rt_server_plugins
+        ${MockText}cp -a ${BasePath}/out/${BuildName}/resources ${BasePath}/out/${BuildName}/apps/mne_rt_server.app/Contents/MacOS/resources
+    fi
+
+    # ---------------------------------------------------------------
+    # Copy Qt frameworks into lib/ for standalone CLI executables.
+    # CLI tools use @rpath=@executable_path/../lib to find dependencies.
+    # ---------------------------------------------------------------
+    echo "Copying Qt frameworks into lib/ for CLI tools..."
+    if [ -n "${QT_LIB_DIR}" ] && [ -d "${QT_LIB_DIR}" ]; then
+        for fw in ${QT_FRAMEWORKS}; do
+            if [ -d "${QT_LIB_DIR}/${fw}" ]; then
+                echo "  Copying ${fw} to lib/ ..."
+                ${MockText}cp -a "${QT_LIB_DIR}/${fw}" "${BasePath}/out/${BuildName}/lib/"
+            else
+                echo "  WARNING: ${fw} not found in ${QT_LIB_DIR}"
+            fi
+        done
+    else
+        echo "  WARNING: Could not find Qt lib directory. CLI tools may not find Qt at runtime."
+    fi
 
     if [[ ${PackOption} == "true" ]]; then
 
         # Delete folders which we do not want to ship
-        ${MockText}rm -r ${BasePath}/out/${BuildName}/resouces/data
-        # delete these folders because they are in the macos app containers already
-        ${MockText}rm -r ${BasePath}/out/${BuildName}/apps/mne_rt_server_plugins
-        ${MockText}rm -r ${BasePath}/out/${BuildName}/apps/mne_scan_plugins
-        ${MockText}rm -r ${BasePath}/out/${BuildName}/apps/mne_analyze_plugins
+        ${MockText}rm -rf ${BasePath}/out/${BuildName}/resources/data
+        # mne_scan and mne_analyze plugins are inside their .app bundles now
+        ${MockText}rm -rf ${BasePath}/out/${BuildName}/apps/mne_scan_plugins
+        ${MockText}rm -rf ${BasePath}/out/${BuildName}/apps/mne_analyze_plugins
+        # mne_rt_server_plugins stays — mne_rt_server is a CLI tool (no .app bundle)
 
-        # Creating archive of all macos deployed applications
-        ${MockText}tar cfvz mne-cpp-macos-dynamic-arm64.tar.gz ${BasePath}/out/${BuildName}/apps
+        # Creating archive of all macos deployed applications.
+        # Include apps/ (with Qt frameworks inside .app bundles), lib/
+        # (MNE-CPP shared libraries + Qt frameworks for CLI tools),
+        # and resources/ (config files needed by CLI tools like mne_rt_server).
+        ${MockText}tar cfvz mne-cpp-macos-dynamic-arm64.tar.gz -C ${BasePath}/out/${BuildName} apps lib resources
     fi
 
 elif [[ ${LinkOption} == "static" ]]; then
@@ -468,41 +577,60 @@ if [[ ${LinkOption} == "dynamic" ]]; then
             cp -r ${Qt_ROOT_FOLDER}/lib/*.so ${BASE_PATH}/out/${BUILD_NAME}/lib
         fi
     else
-        # Install some additional packages so linuxdeployqt can find them
+        # Install some additional packages for xcb platform plugin
         sudo apt-get update
-        sudo apt-get install libxkbcommon-x11-0
-        sudo apt-get install libxcb-icccm4
-        sudo apt-get install libxcb-image0
-        sudo apt-get install libxcb-keysyms1
-        sudo apt-get install libxcb-render-util0
-        sudo apt-get install libbluetooth3
-        sudo apt-get install libxcb-xinerama0
-        ${MockText}export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/out/${BuildName}/lib/x86_64-linux-gnu/
+        sudo apt-get install -y libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 \
+            libxcb-keysyms1 libxcb-render-util0 libbluetooth3 libxcb-xinerama0 \
+            libxcb-cursor0
+        ${MockText}export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${BasePath}/out/${BuildName}/lib
 
-        # Downloading linuxdeployqt from continious release
-        ${MockText}get -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-        ${MockText}sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
+        # ---------------------------------------------------------------
+        # Locate the Qt installation directory.
+        # jurplel/install-qt-action sets QT_ROOT_DIR for Qt 6.
+        # ---------------------------------------------------------------
+        QT_DIR=""
+        if [ -n "${QT_ROOT_DIR}" ]; then
+            QT_DIR="${QT_ROOT_DIR}"
+        elif [ -n "${Qt6_DIR}" ]; then
+            QT_DIR="$(cd "${Qt6_DIR}/../../.." && pwd)"
+        elif [ -n "${Qt5_DIR}" ]; then
+            QT_DIR="${Qt5_DIR}"
+        fi
 
-        # linuxdeployqt uses mne_scan and mne_analyze binary to resolve dependencies
-        cd ${BASE_PATH}/mne-cpp
-        ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_scan -verbose2 -extra-plugins=renderers
-        ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_analyze -verbose2 -extra-plugins=renderers
+        if [ -z "${QT_DIR}" ] || [ ! -d "${QT_DIR}/lib" ]; then
+            echo "ERROR: Cannot locate Qt installation. Set QT_ROOT_DIR."
+            exit 1
+        fi
+        echo "Using Qt from: ${QT_DIR}"
 
-        # Manually copy in the libxcb-xinerama library which is needed by plugins/platforms/libxcb.so
-        ${MockText}cp /usr/out/${BuildName}/lib/x86_64-linux-gnu/libxcb-xinerama.so.0 ${BASE_PATH}/mne-cpp/out/${BuildName}/lib/
+        # Copy Qt shared libraries into lib/
+        echo "Copying Qt shared libraries..."
+        ${MockText}find "${QT_DIR}/lib" -maxdepth 1 -name "libQt6*.so*" -exec cp -a {} ${BasePath}/out/${BuildName}/lib/ \;
+        ${MockText}find "${QT_DIR}/lib" -maxdepth 1 -name "libicu*.so*" -exec cp -a {} ${BasePath}/out/${BuildName}/lib/ \;
+
+        # Copy Qt plugins (platforms, imageformats, etc.)
+        echo "Copying Qt plugins..."
+        ${MockText}mkdir -p ${BasePath}/out/${BuildName}/plugins
+        for plugdir in platforms imageformats xcbglintegrations wayland-shell-integration; do
+            if [ -d "${QT_DIR}/plugins/${plugdir}" ]; then
+                ${MockText}cp -a "${QT_DIR}/plugins/${plugdir}" ${BasePath}/out/${BuildName}/plugins/
+            fi
+        done
+
+        # Manually copy in the libxcb-xinerama library which is needed by plugins/platforms/libqxcb.so
+        XCBXINERAMA="/usr/lib/x86_64-linux-gnu/libxcb-xinerama.so.0"
+        if [ -f "${XCBXINERAMA}" ]; then
+            ${MockText}cp "${XCBXINERAMA}" ${BasePath}/out/${BuildName}/lib/
+        fi
 
         if [[ ${PackOption} == "true" ]]; then
             echo
-            echo ldd ./out/${BuildName}/apps/mne_scan
-            ${MockText}ldd ./out/${BuildName}/apps/mne_scan
-
-            echo
-            echo ldd ./plugins/platforms/libqxcb.so
-            ${MockText}ldd ./plugins/platforms/libqxcb.so
+            echo ldd ${BasePath}/out/${BuildName}/apps/mne_scan
+            ${MockText}ldd ${BasePath}/out/${BuildName}/apps/mne_scan
 
             # Delete folders which we do not want to ship
             ${MockText}cp -r ${BasePath}/out/${BuildName}/ mne-cpp
-            ${MockText}rm -r mne-cpp/resources/data
+            ${MockText}rm -rf mne-cpp/resources/data
 
             # Creating archive of everything in current directory
             ${MockText}tar cfvz ${BasePath}/mne-cpp-linux-dynamic-x86_64.tar.gz mne-cpp
@@ -517,48 +645,31 @@ elif [[ ${LinkOption} == "static" ]]; then
         exit 0
     fi
     sudo apt-get update
-    sudo apt-get install libxkbcommon-x11-0
-    sudo apt-get install libxcb-icccm4
-    sudo apt-get install libxcb-image0
-    sudo apt-get install libxcb-keysyms1
-    sudo apt-get install libxcb-render-util0
-    sudo apt-get install libbluetooth3
-    sudo apt-get install libxcb-xinerama0
-    ${MockText}export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/out/${BuildName}/lib/x86_64-linux-gnu/
+    sudo apt-get install -y libxkbcommon-x11-0 libxcb-icccm4 libxcb-image0 \
+        libxcb-keysyms1 libxcb-render-util0 libbluetooth3 libxcb-xinerama0 \
+        libxcb-cursor0
+    ${MockText}export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${BasePath}/out/${BuildName}/lib
 
-    # Downloading linuxdeployqt from continious release
-    ${MockText}wget -c -nv "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
-    ${MockText}sudo chmod a+x linuxdeployqt-continuous-x86_64.AppImage
-
-    # Creating a directory for linuxdeployqt to create results 
-    ${MockText}sudo mkdir -p -m777 mne-cpp
-
-    # linuxdeployqt uses mne_scan and mne_analyze binary to resolve dependencies
-    cd mne-cpp
-    ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_scan -verbose2 -extra-plugins=renderers
-    ../linuxdeployqt-continuous-x86_64.AppImage ${BasePath}/out/${BuildName}/apps/mne_analyze -verbose2 -extra-plugins=renderers
-
-    echo
-    echo ldd ./out/${BuildName}/apps/mne_scan
-    ${MockText}ldd ./out/${BuildName}/apps/mne_scan
+    # Static builds don't need Qt deploy tools — Qt is linked in.
+    # Just package the output.
 
     # Delete folders which we do not want to ship
-    ${MockText}cp -r ${BasePath}/out/ mne-cpp
-    ${MockText}rm -r mne-cpp/resources/data
-    ${MockText}rm -r mne-cpp/apps/mne_rt_server_plugins
-    ${MockText}rm -r mne-cpp/apps/mne_scan_plugins
-    ${MockText}rm -r mne-cpp/apps/mne_analyze_plugins
+    ${MockText}cp -r ${BasePath}/out/${BuildName}/ mne-cpp
+    ${MockText}rm -rf mne-cpp/resources/data
+    ${MockText}rm -rf mne-cpp/apps/mne_rt_server_plugins
+    ${MockText}rm -rf mne-cpp/apps/mne_scan_plugins
+    ${MockText}rm -rf mne-cpp/apps/mne_analyze_plugins
 
     if [[ ${PackOption} == "true" ]]; then
         # Creating archive of everything in the bin directory
         ${MockText}tar cfvz ${BasePath}/mne-cpp-linux-static-x86_64.tar.gz mne-cpp
     fi
 
-    else 
-        echo "Error. Link optin can only be dynamic or static."
-        doPrintHelp
-        exit ${EXIT_FAIL}
-    fi
+else 
+    echo "Error. Link option can only be dynamic or static."
+    doPrintHelp
+    exit ${EXIT_FAIL}
+fi
 
     # ############## LINUX SECTION ENDS ####################
     # ######################################################

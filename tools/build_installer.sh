@@ -63,7 +63,7 @@ done
 if [[ "$OSTYPE" == "darwin"* ]]; then
     PLATFORM="macos"
     INSTALLER_SUFFIX="Darwin"
-    ARCHIVE_PATTERN="*-macos-dynamic-x86_64.tar.gz"
+    ARCHIVE_PATTERN="*-macos-dynamic-*.tar.gz"
 elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" || "$OSTYPE" == "win32" ]]; then
     PLATFORM="windows"
     INSTALLER_SUFFIX="win64.exe"
@@ -150,7 +150,8 @@ echo ""
 echo "2. Staging release into QIF package layout..."
 
 # Clean previous data directories
-for pkg in org.mnecpp.applications org.mnecpp.runtime org.mnecpp.sdk \
+for pkg in org.mnecpp.applications org.mnecpp.applications.cli org.mnecpp.applications.gui \
+           org.mnecpp.runtime org.mnecpp.sdk \
            org.mnecpp.sampledata org.mnecpp.mnepython org.mnecpp.pathconfig; do
     rm -rf "${PACKAGES_DIR}/${pkg}/data"
 done
@@ -170,18 +171,70 @@ if [ "$(echo "$SUBDIRS" | wc -l)" -eq 1 ]; then
     CONTENT_DIR="$SUBDIRS"
 fi
 
-# Applications — bin/
-APP_DATA="${PACKAGES_DIR}/org.mnecpp.applications/data"
-mkdir -p "${APP_DATA}/bin"
-if [ -d "$CONTENT_DIR/bin" ]; then
-    cp -r "$CONTENT_DIR/bin/"* "${APP_DATA}/bin/" 2>/dev/null || true
+# -----------------------------------------------------------------------
+# Applications — split into GUI (.app bundles / executables with GUI)
+# and CLI (standalone command-line tools)
+# -----------------------------------------------------------------------
+GUI_DATA="${PACKAGES_DIR}/org.mnecpp.applications.gui/data"
+CLI_DATA="${PACKAGES_DIR}/org.mnecpp.applications.cli/data"
+mkdir -p "${GUI_DATA}/bin" "${CLI_DATA}/bin"
+
+if [ -d "$CONTENT_DIR/apps" ]; then
+    # macOS layout: apps/ contains both .app bundles and standalone executables
+    # .app bundles go to GUI, standalone executables go to CLI
+    for item in "$CONTENT_DIR/apps/"*; do
+        name=$(basename "$item")
+        if [[ "$name" == *.app ]]; then
+            echo "   [GUI] $name"
+            cp -R "$item" "${GUI_DATA}/bin/"
+        elif [ -f "$item" ] && [ -x "$item" ]; then
+            echo "   [CLI] $name"
+            cp "$item" "${CLI_DATA}/bin/"
+        elif [ -d "$item" ] && [[ "$name" == *_plugins ]]; then
+            # MNE-CPP plugin directories — route to matching component
+            if [[ "$name" == mne_scan_plugins ]] || [[ "$name" == mne_analyze_plugins ]]; then
+                echo "   [GUI plugin] $name"
+                cp -R "$item" "${GUI_DATA}/bin/"
+            else
+                echo "   [CLI plugin] $name"
+                cp -R "$item" "${CLI_DATA}/bin/"
+            fi
+        fi
+    done
+elif [ -d "$CONTENT_DIR/bin" ]; then
+    # Linux/Windows layout: bin/ has executables
+    # Heuristic: apps with .app or known GUI names go to GUI, rest to CLI
+    GUI_APPS="mne_scan mne_analyze mne_browse mne_inspect mne_anonymize"
+    GUI_PLUGINS="mne_scan_plugins mne_analyze_plugins"
+    for item in "$CONTENT_DIR/bin/"*; do
+        name=$(basename "$item")
+        base_name="${name%.*}"  # strip extension
+        if echo "$GUI_APPS" | grep -qw "$base_name"; then
+            echo "   [GUI] $name"
+            cp -r "$item" "${GUI_DATA}/bin/"
+        elif echo "$GUI_PLUGINS" | grep -qw "$name"; then
+            echo "   [GUI plugin] $name"
+            cp -r "$item" "${GUI_DATA}/bin/"
+        elif [[ "$name" == *_plugins ]]; then
+            echo "   [CLI plugin] $name"
+            cp -r "$item" "${CLI_DATA}/bin/"
+        else
+            echo "   [CLI] $name"
+            cp -r "$item" "${CLI_DATA}/bin/"
+        fi
+    done
 fi
 
-# Runtime — lib/
+# Also stage plugins/ into CLI if present (Linux)
+if [ -d "$CONTENT_DIR/plugins" ]; then
+    cp -r "$CONTENT_DIR/plugins" "${CLI_DATA}/"
+fi
+
+# Runtime — lib/ (MNE-CPP dylibs + Qt frameworks for CLI tools)
 RT_DATA="${PACKAGES_DIR}/org.mnecpp.runtime/data"
 mkdir -p "${RT_DATA}/lib"
 if [ -d "$CONTENT_DIR/lib" ]; then
-    cp -r "$CONTENT_DIR/lib/"* "${RT_DATA}/lib/" 2>/dev/null || true
+    cp -R "$CONTENT_DIR/lib/"* "${RT_DATA}/lib/" 2>/dev/null || true
 fi
 
 # SDK — include/ + lib/cmake/

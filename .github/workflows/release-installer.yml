@@ -87,38 +87,67 @@ jobs:
           CONTENT_DIR="$(ls -d "$EXTRACT_DIR"/mne-cpp*/ | head -1)"
         fi
 
+        # Auto-detect application directory (deploy.bat produces apps/)
+        APPS_SRC="apps"
+        if [ ! -d "$CONTENT_DIR/apps" ] && [ -d "$CONTENT_DIR/bin" ]; then
+          APPS_SRC="bin"
+        fi
+
         # --- CLI Tools → org.mnecpp.applications.cli ---
         CLI_DATA="${STAGING}/org.mnecpp.applications.cli/data"
         mkdir -p "${CLI_DATA}/bin"
         for app in $CLI_APPS; do
-          if [ -f "$CONTENT_DIR/bin/$app" ]; then
-            cp "$CONTENT_DIR/bin/$app" "${CLI_DATA}/bin/"
+          if [ -f "$CONTENT_DIR/${APPS_SRC}/$app" ]; then
+            cp "$CONTENT_DIR/${APPS_SRC}/$app" "${CLI_DATA}/bin/"
           fi
         done
+        # Stage mne_rt_server plugins alongside the CLI executable
+        if [ -d "$CONTENT_DIR/${APPS_SRC}/mne_rt_server_plugins" ]; then
+          cp -r "$CONTENT_DIR/${APPS_SRC}/mne_rt_server_plugins" "${CLI_DATA}/bin/"
+        fi
 
         # --- GUI Apps → org.mnecpp.applications.gui ---
         GUI_DATA="${STAGING}/org.mnecpp.applications.gui/data"
         mkdir -p "${GUI_DATA}/bin"
         for app in $GUI_APPS; do
-          if [ -f "$CONTENT_DIR/bin/$app" ]; then
-            cp "$CONTENT_DIR/bin/$app" "${GUI_DATA}/bin/"
-          elif [ -d "$CONTENT_DIR/bin/${app}.app" ]; then
-            cp -r "$CONTENT_DIR/bin/${app}.app" "${GUI_DATA}/bin/"
+          if [ -f "$CONTENT_DIR/${APPS_SRC}/$app" ]; then
+            cp "$CONTENT_DIR/${APPS_SRC}/$app" "${GUI_DATA}/bin/"
+          elif [ -d "$CONTENT_DIR/${APPS_SRC}/${app}.app" ]; then
+            cp -r "$CONTENT_DIR/${APPS_SRC}/${app}.app" "${GUI_DATA}/bin/"
+          fi
+        done
+        # Stage mne_scan and mne_analyze plugins alongside GUI apps
+        for plugdir in mne_scan_plugins mne_analyze_plugins; do
+          if [ -d "$CONTENT_DIR/${APPS_SRC}/${plugdir}" ]; then
+            cp -r "$CONTENT_DIR/${APPS_SRC}/${plugdir}" "${GUI_DATA}/bin/"
           fi
         done
 
         # --- All apps also in the legacy parent component (backward compat) ---
         APP_DATA="${STAGING}/org.mnecpp.applications/data"
         mkdir -p "${APP_DATA}/bin"
-        if [ -d "$CONTENT_DIR/bin" ]; then
-          cp -r "$CONTENT_DIR/bin/"* "${APP_DATA}/bin/" 2>/dev/null || true
+        if [ -d "$CONTENT_DIR/${APPS_SRC}" ]; then
+          cp -r "$CONTENT_DIR/${APPS_SRC}/"* "${APP_DATA}/bin/" 2>/dev/null || true
         fi
 
-        # Runtime — lib/
+        # Runtime — lib/ and plugins/ (contains Qt shared libs and Qt plugins)
         RT_DATA="${STAGING}/org.mnecpp.runtime/data"
         mkdir -p "${RT_DATA}/lib"
         if [ -d "$CONTENT_DIR/lib" ]; then
           cp -r "$CONTENT_DIR/lib/"* "${RT_DATA}/lib/" 2>/dev/null || true
+        fi
+        # Qt plugins (platforms, imageformats, etc.) — required at runtime
+        if [ -d "$CONTENT_DIR/plugins" ]; then
+          cp -r "$CONTENT_DIR/plugins" "${RT_DATA}/" 2>/dev/null || true
+        fi
+
+        # Verify Qt libraries are present in the archive
+        QT_LIB_COUNT=$(find "${RT_DATA}" -name "libQt6*.so*" -o -name "Qt6*.dll" -o -name "Qt*.framework" 2>/dev/null | wc -l)
+        echo "Qt libraries found in runtime staging: ${QT_LIB_COUNT}"
+        if [ "${QT_LIB_COUNT}" -eq 0 ]; then
+          echo "WARNING: No Qt libraries found in release archive!"
+          echo "The installer will not work without Qt libraries."
+          echo "Ensure deploy.bat was run with the dynamic option."
         fi
 
         # SDK — include/ + lib/cmake/
@@ -159,6 +188,9 @@ jobs:
 
         echo "Staged package layout:"
         find tools/packaging/installer -type f | head -80
+        echo ""
+        echo "Runtime component size:"
+        du -sh "${RT_DATA}" 2>/dev/null || true
 
     - name: Build installer with binarycreator
       run: |
@@ -252,41 +284,69 @@ jobs:
           CONTENT_DIR="$(ls -d "$EXTRACT_DIR"/mne-cpp*/ | head -1)"
         fi
 
+        # Auto-detect application directory (deploy.bat produces apps/)
+        APPS_SRC="apps"
+        if [ ! -d "$CONTENT_DIR/apps" ] && [ -d "$CONTENT_DIR/bin" ]; then
+          APPS_SRC="bin"
+        fi
+
         # --- CLI Tools → org.mnecpp.applications.cli ---
         CLI_DATA="${STAGING}/org.mnecpp.applications.cli/data"
         mkdir -p "${CLI_DATA}/bin"
         for app in $CLI_APPS; do
           # macOS: plain binary or .app bundle
-          if [ -f "$CONTENT_DIR/bin/$app" ]; then
-            cp "$CONTENT_DIR/bin/$app" "${CLI_DATA}/bin/"
-          elif [ -d "$CONTENT_DIR/bin/${app}.app" ]; then
-            cp -r "$CONTENT_DIR/bin/${app}.app" "${CLI_DATA}/bin/"
+          if [ -f "$CONTENT_DIR/${APPS_SRC}/$app" ]; then
+            cp "$CONTENT_DIR/${APPS_SRC}/$app" "${CLI_DATA}/bin/"
+          elif [ -d "$CONTENT_DIR/${APPS_SRC}/${app}.app" ]; then
+            cp -r "$CONTENT_DIR/${APPS_SRC}/${app}.app" "${CLI_DATA}/bin/"
           fi
         done
+        # Stage mne_rt_server plugins alongside the CLI executable
+        # (mne_rt_server is CLI — no .app bundle, so plugins stay standalone)
+        if [ -d "$CONTENT_DIR/${APPS_SRC}/mne_rt_server_plugins" ]; then
+          cp -r "$CONTENT_DIR/${APPS_SRC}/mne_rt_server_plugins" "${CLI_DATA}/bin/"
+        fi
 
         # --- GUI Apps → org.mnecpp.applications.gui ---
         GUI_DATA="${STAGING}/org.mnecpp.applications.gui/data"
         mkdir -p "${GUI_DATA}/bin"
         for app in $GUI_APPS; do
-          if [ -d "$CONTENT_DIR/bin/${app}.app" ]; then
-            cp -r "$CONTENT_DIR/bin/${app}.app" "${GUI_DATA}/bin/"
-          elif [ -f "$CONTENT_DIR/bin/$app" ]; then
-            cp "$CONTENT_DIR/bin/$app" "${GUI_DATA}/bin/"
+          if [ -d "$CONTENT_DIR/${APPS_SRC}/${app}.app" ]; then
+            cp -r "$CONTENT_DIR/${APPS_SRC}/${app}.app" "${GUI_DATA}/bin/"
+          elif [ -f "$CONTENT_DIR/${APPS_SRC}/$app" ]; then
+            cp "$CONTENT_DIR/${APPS_SRC}/$app" "${GUI_DATA}/bin/"
+          fi
+        done
+        # On macOS, mne_scan_plugins and mne_analyze_plugins are already
+        # inside their .app bundles (Contents/MacOS/). If standalone dirs
+        # exist (e.g. on non-macOS), copy them alongside GUI apps.
+        for plugdir in mne_scan_plugins mne_analyze_plugins; do
+          if [ -d "$CONTENT_DIR/${APPS_SRC}/${plugdir}" ]; then
+            cp -r "$CONTENT_DIR/${APPS_SRC}/${plugdir}" "${GUI_DATA}/bin/"
           fi
         done
 
         # --- Legacy parent component (backward compat) ---
         APP_DATA="${STAGING}/org.mnecpp.applications/data"
         mkdir -p "${APP_DATA}/bin"
-        if [ -d "$CONTENT_DIR/bin" ]; then
-          cp -r "$CONTENT_DIR/bin/"* "${APP_DATA}/bin/" 2>/dev/null || true
+        if [ -d "$CONTENT_DIR/${APPS_SRC}" ]; then
+          cp -r "$CONTENT_DIR/${APPS_SRC}/"* "${APP_DATA}/bin/" 2>/dev/null || true
         fi
 
-        # Runtime — lib/
+        # Runtime — lib/ (MNE-CPP shared libs; Qt frameworks are inside .app bundles)
         RT_DATA="${STAGING}/org.mnecpp.runtime/data"
         mkdir -p "${RT_DATA}/lib"
         if [ -d "$CONTENT_DIR/lib" ]; then
           cp -r "$CONTENT_DIR/lib/"* "${RT_DATA}/lib/" 2>/dev/null || true
+        fi
+
+        # Verify Qt frameworks are embedded inside at least one GUI .app bundle
+        QT_FW_COUNT=$(find "${GUI_DATA}" -name "Qt*.framework" -type d 2>/dev/null | wc -l)
+        echo "Qt frameworks found inside .app bundles: ${QT_FW_COUNT}"
+        if [ "${QT_FW_COUNT}" -eq 0 ]; then
+          echo "WARNING: No Qt frameworks found inside .app bundles!"
+          echo "macdeployqt may not have run during the release build."
+          echo "The installer will not work without Qt frameworks."
         fi
 
         # SDK — include/ + lib/cmake/
@@ -324,6 +384,14 @@ jobs:
 
         # Clean up temp
         rm -rf "$EXTRACT_DIR"
+
+        echo "Staged package layout:"
+        find tools/packaging/installer -type f | head -80
+        echo ""
+        echo "Runtime component size:"
+        du -sh "${RT_DATA}" 2>/dev/null || true
+        echo "GUI component size:"
+        du -sh "${GUI_DATA}" 2>/dev/null || true
 
     # -----------------------------------------------------------------
     # Code Signing & Notarization
@@ -557,43 +625,75 @@ jobs:
           CONTENT_DIR=$(ls -d "$EXTRACT_DIR"/mne-cpp* | head -1)
         fi
 
+        # Auto-detect application directory (deploy.bat produces apps/)
+        APPS_SRC="apps"
+        if [ ! -d "$CONTENT_DIR/apps" ] && [ -d "$CONTENT_DIR/bin" ]; then
+          APPS_SRC="bin"
+        fi
+
         # --- CLI Tools → org.mnecpp.applications.cli ---
         CLI_DATA="${STAGING}/org.mnecpp.applications.cli/data"
         mkdir -p "${CLI_DATA}/bin"
         for app in $CLI_APPS; do
-          if [ -f "$CONTENT_DIR/bin/${app}.exe" ]; then
-            cp "$CONTENT_DIR/bin/${app}.exe" "${CLI_DATA}/bin/"
-          elif [ -f "$CONTENT_DIR/bin/$app" ]; then
-            cp "$CONTENT_DIR/bin/$app" "${CLI_DATA}/bin/"
+          if [ -f "$CONTENT_DIR/${APPS_SRC}/${app}.exe" ]; then
+            cp "$CONTENT_DIR/${APPS_SRC}/${app}.exe" "${CLI_DATA}/bin/"
+          elif [ -f "$CONTENT_DIR/${APPS_SRC}/$app" ]; then
+            cp "$CONTENT_DIR/${APPS_SRC}/$app" "${CLI_DATA}/bin/"
           fi
         done
+        # Stage mne_rt_server plugins alongside the CLI executable
+        if [ -d "$CONTENT_DIR/${APPS_SRC}/mne_rt_server_plugins" ]; then
+          cp -r "$CONTENT_DIR/${APPS_SRC}/mne_rt_server_plugins" "${CLI_DATA}/bin/"
+        fi
 
         # --- GUI Apps → org.mnecpp.applications.gui ---
         GUI_DATA="${STAGING}/org.mnecpp.applications.gui/data"
         mkdir -p "${GUI_DATA}/bin"
         for app in $GUI_APPS; do
-          if [ -f "$CONTENT_DIR/bin/${app}.exe" ]; then
-            cp "$CONTENT_DIR/bin/${app}.exe" "${GUI_DATA}/bin/"
-          elif [ -f "$CONTENT_DIR/bin/$app" ]; then
-            cp "$CONTENT_DIR/bin/$app" "${GUI_DATA}/bin/"
+          if [ -f "$CONTENT_DIR/${APPS_SRC}/${app}.exe" ]; then
+            cp "$CONTENT_DIR/${APPS_SRC}/${app}.exe" "${GUI_DATA}/bin/"
+          elif [ -f "$CONTENT_DIR/${APPS_SRC}/$app" ]; then
+            cp "$CONTENT_DIR/${APPS_SRC}/$app" "${GUI_DATA}/bin/"
+          fi
+        done
+        # Stage mne_scan and mne_analyze plugins alongside GUI apps
+        for plugdir in mne_scan_plugins mne_analyze_plugins; do
+          if [ -d "$CONTENT_DIR/${APPS_SRC}/${plugdir}" ]; then
+            cp -r "$CONTENT_DIR/${APPS_SRC}/${plugdir}" "${GUI_DATA}/bin/"
           fi
         done
 
         # --- Legacy parent component (backward compat) ---
         APP_DATA="${STAGING}/org.mnecpp.applications/data"
         mkdir -p "${APP_DATA}/bin"
-        if [ -d "$CONTENT_DIR/bin" ]; then
-          cp -r "$CONTENT_DIR/bin/"* "${APP_DATA}/bin/" 2>/dev/null || true
+        if [ -d "$CONTENT_DIR/${APPS_SRC}" ]; then
+          cp -r "$CONTENT_DIR/${APPS_SRC}/"* "${APP_DATA}/bin/" 2>/dev/null || true
         fi
 
-        # Runtime — lib/ and bin/*.dll
+        # Runtime — lib/ and apps/*.dll (includes Qt DLLs deployed by windeployqt)
         RT_DATA="${STAGING}/org.mnecpp.runtime/data"
         mkdir -p "${RT_DATA}/lib" "${RT_DATA}/bin"
         if [ -d "$CONTENT_DIR/lib" ]; then
           cp -r "$CONTENT_DIR/lib/"* "${RT_DATA}/lib/" 2>/dev/null || true
         fi
         # Copy DLLs to runtime bin/ (Windows needs DLLs alongside exes or on PATH)
-        find "$CONTENT_DIR/bin" -name "*.dll" -exec cp {} "${RT_DATA}/bin/" \; 2>/dev/null || true
+        find "$CONTENT_DIR/${APPS_SRC}" -maxdepth 1 -name "*.dll" -exec cp {} "${RT_DATA}/bin/" \; 2>/dev/null || true
+
+        # Copy Qt plugins deployed by windeployqt (platforms/, imageformats/, etc.)
+        for plugdir in platforms imageformats styles tls networkinformation; do
+          if [ -d "$CONTENT_DIR/${APPS_SRC}/${plugdir}" ]; then
+            cp -r "$CONTENT_DIR/${APPS_SRC}/${plugdir}" "${RT_DATA}/bin/" 2>/dev/null || true
+          fi
+        done
+
+        # Verify Qt DLLs are present in the archive
+        QT_DLL_COUNT=$(find "${RT_DATA}" -name "Qt6*.dll" 2>/dev/null | wc -l)
+        echo "Qt DLLs found in runtime staging: ${QT_DLL_COUNT}"
+        if [ "${QT_DLL_COUNT}" -eq 0 ]; then
+          echo "WARNING: No Qt DLLs found in release archive!"
+          echo "The installer will not work without Qt libraries."
+          echo "Ensure deploy.bat was run with the dynamic option."
+        fi
 
         # SDK — include/ + lib/cmake/
         SDK_DATA="${STAGING}/org.mnecpp.sdk/data"
