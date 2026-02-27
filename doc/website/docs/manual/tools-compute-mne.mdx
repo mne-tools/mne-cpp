@@ -1,0 +1,43 @@
+---
+title: mne_compute_mne
+sidebar_label: mne_compute_mne
+sidebar_position: 12
+---
+
+# mne_compute_mne
+
+## Overview
+
+`mne_compute_mne` computes MNE, dSPM, or sLORETA source estimates from evoked data using a pre-computed forward solution and noise covariance. It supports advanced options for label restriction, baseline correction, dipole snapshots, predicted sensor data, and more.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_compute_mne [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--in <file>` | Evoked data input file (required) |
+| `--fwd <file>` | Forward solution file (required) |
+| `--cov <file>` | Noise covariance matrix file (required) |
+| `--out <file>` | Output source estimate file (required) |
+| `--snr <value>` | SNR value for regularization |
+| `--method <type>` | Inverse method: mne, dSPM, sLORETA |
+| `--label <file>` | Restrict estimation to label (repeatable) |
+| `--labeldir <dir>` | Process all labels in directory |
+| `--baseline <tmin> <tmax>` | Baseline correction interval (ms) |
+| `--collapse` | Collapse source estimates across labels |
+| `--scaling <factor>` | Scale output data |
+| `--dip <file>` | Output dipole snapshot file |
+| `--pick <time>` | Extract source estimate at specific time (ms) |
+| `--pred <file>` | Output predicted sensor data |
+| `--overwrite` | Overwrite output file if it exists |
+
+## Description
+
+This tool computes source estimates from evoked data using a forward solution and noise covariance. It supports label-based analysis, baseline correction, dipole snapshots, and predicted sensor data output. The output is compatible with MNE-CPP and MNE-Python.
