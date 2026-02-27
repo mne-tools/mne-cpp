@@ -586,19 +586,31 @@ if [[ ${LinkOption} == "dynamic" ]]; then
 
         # ---------------------------------------------------------------
         # Locate the Qt installation directory.
-        # jurplel/install-qt-action sets QT_ROOT_DIR for Qt 6.
+        # jurplel/install-qt-action sets Qt6_DIR to either:
+        #   - the Qt prefix     (e.g. <root>/Qt/6.x.y/gcc_64)      → has lib/
+        #   - the CMake cfg dir (e.g. <prefix>/lib/cmake/Qt6)       → go up 3
+        # QT_ROOT_DIR always takes precedence if set explicitly.
         # ---------------------------------------------------------------
         QT_DIR=""
         if [ -n "${QT_ROOT_DIR}" ]; then
             QT_DIR="${QT_ROOT_DIR}"
         elif [ -n "${Qt6_DIR}" ]; then
-            QT_DIR="$(cd "${Qt6_DIR}/../../.." && pwd)"
+            if [ -d "${Qt6_DIR}/lib" ]; then
+                # Qt6_DIR is already the prefix directory
+                QT_DIR="${Qt6_DIR}"
+            else
+                # Qt6_DIR is the CMake config dir; go up 3 levels
+                QT_DIR="$(cd "${Qt6_DIR}/../../.." && pwd)"
+            fi
         elif [ -n "${Qt5_DIR}" ]; then
             QT_DIR="${Qt5_DIR}"
         fi
 
         if [ -z "${QT_DIR}" ] || [ ! -d "${QT_DIR}/lib" ]; then
             echo "ERROR: Cannot locate Qt installation. Set QT_ROOT_DIR."
+            echo "  QT_ROOT_DIR=${QT_ROOT_DIR:-<not set>}"
+            echo "  Qt6_DIR=${Qt6_DIR:-<not set>}"
+            echo "  Qt5_DIR=${Qt5_DIR:-<not set>}"
             exit 1
         fi
         echo "Using Qt from: ${QT_DIR}"

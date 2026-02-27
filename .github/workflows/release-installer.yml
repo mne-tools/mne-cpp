@@ -73,7 +73,7 @@ jobs:
         STAGING="tools/packaging/installer/packages"
 
         # CLI tools (QCoreApplication-based, no GUI dependencies)
-        CLI_APPS="mne_anonymize mne_edf2fiff mne_show_fiff mne_compute_raw_inverse mne_forward_solution mne_setup_mri mne_surf2bem mne_setup_forward_model mne_watershed_bem mne_flash_bem mne_rt_server mne_dipole_fit mne_process_raw"
+        CLI_APPS="mne_anonymize mne_edf2fiff mne_show_fiff mne_compute_raw_inverse mne_compute_mne mne_inverse_operator mne_make_source_space mne_forward_solution mne_setup_mri mne_surf2bem mne_setup_forward_model mne_watershed_bem mne_flash_bem mne_rt_server mne_dipole_fit mne_process_raw"
 
         # GUI applications (QApplication-based, require display)
         GUI_APPS="mne_scan mne_analyze mne_browse mne_inspect"
@@ -81,6 +81,8 @@ jobs:
         # --- Extract full archive to temp ---
         EXTRACT_DIR="$(mktemp -d)"
         tar xf "$RELEASE_ARCHIVE" -C "$EXTRACT_DIR" 2>/dev/null || true
+        # Free disk: remove the compressed archive immediately
+        rm -f "$RELEASE_ARCHIVE"
         # Find the actual content root
         CONTENT_DIR="$EXTRACT_DIR"
         if ls "$EXTRACT_DIR"/mne-cpp*/ 1>/dev/null 2>&1; then
@@ -123,12 +125,9 @@ jobs:
           fi
         done
 
-        # --- All apps also in the legacy parent component (backward compat) ---
-        APP_DATA="${STAGING}/org.mnecpp.applications/data"
-        mkdir -p "${APP_DATA}/bin"
-        if [ -d "$CONTENT_DIR/${APPS_SRC}" ]; then
-          cp -r "$CONTENT_DIR/${APPS_SRC}/"* "${APP_DATA}/bin/" 2>/dev/null || true
-        fi
+        # NOTE: The legacy org.mnecpp.applications component has been
+        # removed to avoid duplicating all binaries a third time.
+        # CLI and GUI components above are authoritative.
 
         # Runtime — lib/ and plugins/ (contains Qt shared libs and Qt plugins)
         RT_DATA="${STAGING}/org.mnecpp.runtime/data"
@@ -326,12 +325,10 @@ jobs:
           fi
         done
 
-        # --- Legacy parent component (backward compat) ---
-        APP_DATA="${STAGING}/org.mnecpp.applications/data"
-        mkdir -p "${APP_DATA}/bin"
-        if [ -d "$CONTENT_DIR/${APPS_SRC}" ]; then
-          cp -r "$CONTENT_DIR/${APPS_SRC}/"* "${APP_DATA}/bin/" 2>/dev/null || true
-        fi
+        # NOTE: The legacy org.mnecpp.applications component has been
+        # removed to avoid duplicating all binaries a third time, which
+        # caused "No space left on device" on macOS CI runners.
+        # CLI and GUI components above are authoritative.
 
         # Runtime — lib/ (MNE-CPP shared libs; Qt frameworks are inside .app bundles)
         RT_DATA="${STAGING}/org.mnecpp.runtime/data"
@@ -490,6 +487,17 @@ jobs:
           "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app"
         codesign --verify --verbose "MNE-CPP-${{ env.MNE_CPP_VERSION }}-Darwin.app"
 
+    - name: Free up disk space before DMG creation
+      run: |
+        echo "=== Disk usage before cleanup ==="
+        df -h
+        # Remove caches and toolchains not needed for packaging
+        sudo rm -rf /usr/local/share/gtk-doc /usr/local/Cellar \
+          /usr/local/lib/node_modules /usr/share/dotnet \
+          /opt/hostedtoolcache /Users/runner/Library/Caches/* 2>/dev/null || true
+        echo "=== Disk usage after cleanup ==="
+        df -h
+
     - name: Create DMG
       run: |
         hdiutil create \
@@ -609,7 +617,7 @@ jobs:
         STAGING="tools/packaging/installer/packages"
 
         # CLI tools (QCoreApplication-based, no GUI dependencies)
-        CLI_APPS="mne_anonymize mne_edf2fiff mne_show_fiff mne_compute_raw_inverse mne_forward_solution mne_setup_mri mne_surf2bem mne_setup_forward_model mne_watershed_bem mne_flash_bem mne_rt_server mne_dipole_fit mne_process_raw"
+        CLI_APPS="mne_anonymize mne_edf2fiff mne_show_fiff mne_compute_raw_inverse mne_compute_mne mne_inverse_operator mne_make_source_space mne_forward_solution mne_setup_mri mne_surf2bem mne_setup_forward_model mne_watershed_bem mne_flash_bem mne_rt_server mne_dipole_fit mne_process_raw"
 
         # GUI applications (QApplication-based, require display)
         GUI_APPS="mne_scan mne_analyze mne_browse mne_inspect"
@@ -618,6 +626,8 @@ jobs:
         EXTRACT_DIR="$RUNNER_TEMP/mne-cpp-extracted"
         mkdir -p "$EXTRACT_DIR"
         7z x "$RELEASE_ARCHIVE" -o"$EXTRACT_DIR" -y
+        # Free disk: remove the compressed archive immediately
+        rm -f "$RELEASE_ARCHIVE"
 
         # Find the actual root (may be inside a subfolder)
         CONTENT_DIR="$EXTRACT_DIR"
@@ -663,12 +673,9 @@ jobs:
           fi
         done
 
-        # --- Legacy parent component (backward compat) ---
-        APP_DATA="${STAGING}/org.mnecpp.applications/data"
-        mkdir -p "${APP_DATA}/bin"
-        if [ -d "$CONTENT_DIR/${APPS_SRC}" ]; then
-          cp -r "$CONTENT_DIR/${APPS_SRC}/"* "${APP_DATA}/bin/" 2>/dev/null || true
-        fi
+        # NOTE: The legacy org.mnecpp.applications component has been
+        # removed to avoid duplicating all binaries a third time.
+        # CLI and GUI components above are authoritative.
 
         # Runtime — lib/ and apps/*.dll (includes Qt DLLs deployed by windeployqt)
         RT_DATA="${STAGING}/org.mnecpp.runtime/data"
@@ -727,6 +734,9 @@ jobs:
         cp tools/packaging/scripts/install_mne_python.bat    "${STAGING}/org.mnecpp.mnepython/data/scripts/"
         cp tools/packaging/scripts/configure_environment.sh  "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
         cp tools/packaging/scripts/configure_environment.bat "${STAGING}/org.mnecpp.pathconfig/data/scripts/"
+
+        # Clean up temp to free disk before binarycreator
+        rm -rf "$EXTRACT_DIR"
 
     - name: Build installer with binarycreator
       run: |

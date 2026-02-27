@@ -23,13 +23,9 @@ jobs:
     - name: Configure and compile MNE-CPP
       run: |
         ./tools/build_project.bat
-      env:
-        QT_ROOT_DIR: ${{ env.Qt6_DIR || env.Qt6_ROOT || '/opt/Qt/6.10.2/gcc_64' }}
     - name: Deploy binaries
       run: |
         ./tools/deploy.bat dynamic pack
-      env:
-        QT_ROOT_DIR: ${{ env.Qt6_DIR || env.Qt6_ROOT || '/opt/Qt/6.10.2/gcc_64' }}
     - name: Deploy binaries with stable release on Github
       if: startsWith(github.ref, 'refs/tags/')
       uses: svenstaro/upload-release-action@v2
