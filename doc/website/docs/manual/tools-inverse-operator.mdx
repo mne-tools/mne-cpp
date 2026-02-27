@@ -1,0 +1,41 @@
+---
+title: mne_inverse_operator
+sidebar_label: mne_inverse_operator
+sidebar_position: 10
+---
+
+# mne_inverse_operator
+
+## Overview
+
+`mne_inverse_operator` assembles a linear inverse operator from a forward solution and noise covariance matrix. It supports advanced options for source orientation, regularization, and output formats.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_inverse_operator [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--fwd <file>` | Input forward solution file (required) |
+| `--cov <file>` | Noise covariance matrix file (required) |
+| `--out <file>` | Output inverse operator file (required) |
+| `--loose <val>` | Loose orientation constraint (0=fixed, 1=free) |
+| `--depth <val>` | Depth weighting exponent |
+| `--fixed` | Fixed source orientations |
+| `--meg` | Use MEG channels only |
+| `--eeg` | Use EEG channels only |
+| `--bad <ch>` | Mark channel as bad (repeatable) |
+| `--exclude <ch>` | Exclude channel from computation |
+| `--noiserank <val>` | Set noise covariance rank |
+| `--fmri <file>` | fMRI prior file |
+| `--overwrite` | Overwrite output file if it exists |
+
+## Description
+
+This tool creates a linear inverse operator for source localization. It supports loose/fixed orientation, depth weighting, and channel selection. The output is a FIFF inverse operator file compatible with MNE-CPP and MNE-Python.

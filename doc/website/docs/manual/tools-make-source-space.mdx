@@ -1,0 +1,37 @@
+---
+title: mne_make_source_space
+sidebar_label: mne_make_source_space
+sidebar_position: 9
+---
+
+# mne_make_source_space
+
+## Overview
+
+`mne_make_source_space` creates cortical source spaces from FreeSurfer surfaces for use in MEG/EEG source localization. It supports surface and volume source spaces, morphing, and advanced options for source space setup.
+
+This is a C++ port of the original MNE-C tool by Matti Hämäläinen.
+
+## Usage
+
+```bash
+mne_make_source_space [options]
+```
+
+## Options
+
+| Option | Description |
+|---|---|
+| `--subject <name>` | Subject name (required) |
+| `--subjects_dir <dir>` | FreeSurfer SUBJECTS_DIR (required) |
+| `--surf <hemi>:<surf>` | Surface to use (default: white) |
+| `--spacing <val>` | Source spacing (e.g., ico-4, oct-6, all) |
+| `--morph` | Morph source space to another subject |
+| `--volume` | Create a volumetric source space |
+| `--exclude <label>` | Exclude label from source space |
+| `--out <file>` | Output source space file |
+| `--overwrite` | Overwrite output file if it exists |
+
+## Description
+
+This tool generates source spaces for MEG/EEG source localization. It can create surface-based or volumetric source spaces, supports morphing to other subjects, and allows exclusion of specific labels. The output is a FIFF source space file compatible with MNE-CPP and MNE-Python.
