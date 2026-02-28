@@ -40,14 +40,24 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../fiff_global.h"
-#include "../fiff_types.h"
+#include "fiff_global.h"
+#include "fiff_types.h"
+#include "fiff_dig_point.h"
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
+
+#include <memory>
+
 #include <QDebug>
 
 //=============================================================================================================
@@ -61,12 +71,11 @@ namespace FIFFLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class FiffCoordTransOld;
-class FiffDigPoint;
+class FiffCoordTrans;
 
 //=============================================================================================================
 /**
- * Replaces *digitizerData, digitizerDataRec struct (analyze_types.c).
+ * Digitizer data including points and transformations.
  *
  * @brief Digitization points container and description.
  */
@@ -92,7 +101,16 @@ public:
 
     //=========================================================================================================
     /**
-     * Default constructor.
+     * Copy assignment operator (deep-copies unique_ptr members).
+     *
+     * @param[in] rhs   Digitization point descriptor to assign from.
+     * @return Reference to this object.
+     */
+    FiffDigitizerData& operator=(const FiffDigitizerData& rhs);
+
+    //=========================================================================================================
+    /**
+     * Constructs a FiffDigitizerData by reading from an IO device.
      *
      * @param[in] p_IODevice   Input device to read data from.
      */
@@ -102,7 +120,7 @@ public:
     /**
      * Destroys the digitization point description.
      */
-    ~FiffDigitizerData();
+    ~FiffDigitizerData() = default;
 
     //=========================================================================================================
     /**
@@ -110,47 +128,58 @@ public:
      */
     void print() const;
 
-public:
-    QString        filename;                 /* Where did these come from */
-    FIFFLIB::FiffCoordTransOld* head_mri_t;            /* This is relevant for us */
-    FIFFLIB::FiffCoordTransOld* head_mri_t_adj;        /* This is the adjusted transformation */
-    QList<FIFFLIB::FiffDigPoint>   points;           /* The points */
-    int            coord_frame;               /* The coordinate frame of the above points */
-    QList<int>     active;                   /* Which are active */
-    QList<int>     discard;                  /* Which should be discarded? */
-    int            npoint;                    /* How many? */
-    FIFFLIB::FiffDigPoint*   mri_fids;         /* MRI coordinate system fiducials picked here */
-    int            nfids;                     /* How many? */
-    int            show;                      /* Should the digitizer data be shown */
-    int            show_minimal;              /* Show fiducials and coils only? */
-    float          *dist;                     /* Distance of each point from the head surface */
-    int            *closest;                  /* Closest vertex # on the head surface */
-    float          **closest_point;           /* Closest vertex locations on the head surface */
-    int            dist_valid;                /* Are the above data valid at this point? */
+    //=========================================================================================================
+    /**
+     * Returns the number of MRI fiducial points (cardinal points
+     * transformed into MRI coordinates via head_mri_t_adj).
+     *
+     * Kept as nfids() for API compatibility with the original MNE C code
+     * (digitizerDataRec.nfids in mne_analyze/analyze_types.h).
+     *
+     * @return Number of fiducials in mri_fids.
+     */
+    inline int nfids() const;
 
-//    typedef struct {                            /* The digitizer data will be loaded from the measurement file or elsewhere */
-//      char           *filename;                 /* Where did these come from */
-//      FIFFLIB::FiffCoordTransOld* head_mri_t;            /* This is relevant for us */
-//      FIFFLIB::FiffCoordTransOld* head_mri_t_adj;        /* This is the adjusted transformation */
-//      FIFFLIB::fiffDigPoint   points;           /* The points */
-//      int            coord_frame;               /* The coordinate frame of the above points */
-//      int            *active;                   /* Which are active */
-//      int            *discard;                  /* Which should be discarded? */
-//      int            npoint;                    /* How many? */
-//      FIFFLIB::fiffDigPoint   mri_fids;         /* MRI coordinate system fiducials picked here */
-//      int            nfids;                     /* How many? */
-//      int            show;                      /* Should the digitizer data be shown */
-//      int            show_minimal;              /* Show fiducials and coils only? */
-//      float          *dist;                     /* Distance of each point from the head surface */
-//      int            *closest;                  /* Closest vertex # on the head surface */
-//      float          **closest_point;           /* Closest vertex locations on the head surface */
-//      int            dist_valid;                /* Are the above data valid at this point? */
-//    } *digitizerData,digitizerDataRec;
+    //=========================================================================================================
+    /**
+     * Extracts cardinal digitizer points (LPA, Nasion, RPA) from the digitizer
+     * point list and transforms them into MRI coordinates using head_mri_t_adj,
+     * populating the mri_fids list.
+     *
+     * This is a port of the original C function update_fids_from_dig_data
+     * from mne_analyze/adjust_alignment.c.
+     */
+    void pickCardinalFiducials();
+
+
+public:
+    QString        filename;                 /**< Source file path. */
+    std::unique_ptr<FiffCoordTrans> head_mri_t;            /**< Head to MRI coordinate transformation. */
+    std::unique_ptr<FiffCoordTrans> head_mri_t_adj;        /**< Adjusted head to MRI transformation. */
+    QList<FIFFLIB::FiffDigPoint>   points;           /**< The digitizer points. */
+    int            coord_frame;               /**< The coordinate frame of the above points. */
+    QList<int>     active;                   /**< Which points are active. */
+    QList<int>     discard;                  /**< Which points should be discarded. */
+    int            npoint;                    /**< Number of points. */
+    QList<FIFFLIB::FiffDigPoint> mri_fids;      /**< MRI coordinate system fiducials. */
+    bool           show;                      /**< Whether the digitizer data should be shown. */
+    bool           show_minimal;              /**< Show fiducials and coils only. */
+    Eigen::VectorXf dist;                     /**< Distance of each point from the head surface. */
+    Eigen::VectorXi closest;                  /**< Closest vertex number on the head surface. */
+    Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> closest_point; /**< Closest vertex locations on the head surface (npoint x 3). */
+    bool           dist_valid;                /**< Whether the above distance data is valid. */
+
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline int FiffDigitizerData::nfids() const
+{
+    return static_cast<int>(mri_fids.size());
+}
+
 } // NAMESPACE
 
 #endif // FIFF_DIGITIZER_DATA_H

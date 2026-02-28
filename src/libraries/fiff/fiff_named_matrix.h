@@ -133,8 +133,6 @@ public:
     //ToDo return the transposed matrix instead of applying it to its members
     //=========================================================================================================
     /**
-     * ### MNE toolbox root function ###: Definition of the mne_transpose_named_matrix function
-     *
      * Transpose a named matrix (FiffNamedMatrix)
      */
     void transpose_named_matrix();
@@ -174,14 +172,6 @@ public:
     QStringList col_names;  /**< Column names. */
     Eigen::MatrixXd data;   /**< Matrix data. */
 
-// ### OLD STRUCT ###
-//typedef struct {            /* Matrix specification with a channel list */
-//    int   nrow;             /* Number of rows */
-//    int   ncol;             /* Number of columns */
-//    char  **rowlist;        /* Name list for the rows (may be NULL) */
-//    char  **collist;        /* Name list for the columns (may be NULL) */
-//    float **data;           /* The data itself (dense) */
-//} *mneNamedMatrix,mneNamedMatrixRec;
 };
 
 //=============================================================================================================
@@ -300,4 +290,4 @@ inline bool operator== (const FiffNamedMatrix &a, const FiffNamedMatrix &b)
 }
 } // NAMESPACE
 
-#endif // FIFF_SOLUTION_H
+#endif // FIFF_NAMED_MATRIX_H

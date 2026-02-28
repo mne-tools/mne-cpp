@@ -115,7 +115,7 @@ bool MriMghIO::read(const QString& mgzFile,
 
     // Step 3: Build the voxel -> surface RAS transform
     Matrix4f vox2ras = volData.computeVox2Ras();
-    volData.voxelSurfRasT = FiffCoordTrans::make(
+    volData.voxelSurfRasT = FiffCoordTrans(
         FIFFV_COORD_MRI_SLICE, FIFFV_COORD_MRI, vox2ras, true);
 
     if (verbose) {
@@ -387,12 +387,10 @@ bool MriMghIO::readVoxelData(const QByteArray& data, MriVolData& volData)
         sliceRot.col(1) = vox2ras.block<3, 1>(0, 1);   // y-pixel direction
         sliceRot.col(2) = vox2ras.block<3, 1>(0, 2);   // z (normal) direction
 
-        VectorXf sliceMove(3);
-        sliceMove(0) = sliceOrigin(0);
-        sliceMove(1) = sliceOrigin(1);
-        sliceMove(2) = sliceOrigin(2);
+        Vector3f sliceMove;
+        sliceMove << sliceOrigin(0), sliceOrigin(1), sliceOrigin(2);
 
-        slice.trans = FiffCoordTrans::make(FIFFV_COORD_MRI_SLICE, FIFFV_COORD_MRI, sliceRot, sliceMove);
+        slice.trans = FiffCoordTrans(FIFFV_COORD_MRI_SLICE, FIFFV_COORD_MRI, sliceRot, sliceMove);
     }
 
     return true;
@@ -512,7 +510,7 @@ bool MriMghIO::parseFooter(const QByteArray& data,
                                 rasMniTal(2, 3) /= 1000.0f;
 
                                 // Create RAS -> MNI Talairach transform
-                                FiffCoordTrans talTrans = FiffCoordTrans::make(
+                                FiffCoordTrans talTrans(
                                     FIFFV_COORD_MRI, FIFFV_COORD_MRI_DISPLAY,
                                     rasMniTal, true);
 

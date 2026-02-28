@@ -53,7 +53,6 @@
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_coord_trans.h>
-#include <fiff/c/fiff_coord_trans_old.h>
 #include <fwd/fwd_coil_set.h>
 #include <mne/mne_bem.h>
 
@@ -1295,10 +1294,9 @@ void TestFieldMap::testHelmetFieldMap()
         FwdCoilSet::read_coil_defs(m_coilDefPath));
     QVERIFY(templates != nullptr);
 
-    FiffCoordTransOld devHeadOld = m_evoked.info.dev_head_t.toOld();
     std::unique_ptr<FwdCoilSet> helmetCoils(
         templates->create_meg_coils(
-            megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, &devHeadOld));
+            megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, m_evoked.info.dev_head_t));
     QVERIFY(helmetCoils && helmetCoils->ncoil > 0);
     qDebug() << "C++ MEG coils:" << helmetCoils->ncoil
              << "(in head coordinates)";

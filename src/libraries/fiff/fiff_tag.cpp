@@ -42,7 +42,6 @@
 #include <utils/ioutils.h>
 
 #include <complex>
-#include <iostream>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -72,35 +71,6 @@ FiffTag::FiffTag()
 
 //=============================================================================================================
 
-FiffTag::FiffTag(const FiffTag* p_pFiffTag)
-: QByteArray( p_pFiffTag->data(), p_pFiffTag->size())
-, kind(p_pFiffTag->kind)
-, type(p_pFiffTag->type)
-, next(p_pFiffTag->next)
-{
-//    if(p_pFiffTag->m_pComplexFloatData)
-//        this->toComplexFloat();
-//    else
-//        m_pComplexFloatData = NULL;
-
-//    if(p_pFiffTag->m_pComplexDoubleData)
-//        this->toComplexDouble();
-//    else
-//        m_pComplexDoubleData = NULL;
-}
-
-//=============================================================================================================
-
-FiffTag::~FiffTag()
-{
-//    if(this->m_pComplexFloatData)
-//        delete this->m_pComplexFloatData;
-//    if(this->m_pComplexDoubleData)
-//        delete this->m_pComplexDoubleData;
-}
-
-//=============================================================================================================
-
 fiff_int_t FiffTag::getMatrixCoding() const
 {
    return IS_MATRIX & this->type;
@@ -121,7 +91,7 @@ bool FiffTag::isMatrix() const
 bool FiffTag::getMatrixDimensions(qint32& p_ndim, QVector<qint32>& p_Dims) const
 {
     p_Dims.clear();
-    if(!this->isMatrix() || this->data() == NULL)
+    if(!this->isMatrix() || this->data() == nullptr)
     {
         p_ndim = 0;
         return false;
@@ -142,7 +112,7 @@ bool FiffTag::getMatrixDimensions(qint32& p_ndim, QVector<qint32>& p_Dims) const
             p_Dims.append(t_pInt32[(this->size()-(i*4))/4]);
     else
     {
-        printf("Error: Cannot handle other than dense or sparse matrices yet.\n");//ToDo Throw
+        qWarning("Cannot handle other than dense or sparse matrices yet.");
         return false;
     }
 
@@ -329,7 +299,7 @@ void FiffTag::convert_matrix_from_file_data(FiffTag::SPtr tag)
 
     if (fiff_type_fundamental(tag->type) != FIFFTS_FS_MATRIX)
         return;
-    if (tag->data() == NULL)
+    if (tag->data() == nullptr)
         return;
     if (tsize < sizeof(fiff_int_t))
         return;
@@ -403,7 +373,7 @@ void FiffTag::convert_matrix_to_file_data(FiffTag::SPtr tag)
 
     if (fiff_type_fundamental(tag->type) != FIFFTS_FS_MATRIX)
         return;
-    if (tag->data() == NULL)
+    if (tag->data() == nullptr)
         return;
     if (tsize < sizeof(fiff_int_t))
         return;
@@ -483,7 +453,7 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
 //    fiffDigPoint   dpthis;
     fiffDataRef    drthis;
 
-    if (tag->data() == NULL || tag->size() == 0)
+    if (tag->data() == nullptr || tag->size() == 0)
         return;
 
     if (from_endian == FIFFV_NATIVE_ENDIAN)
@@ -702,7 +672,7 @@ void FiffTag::convert_tag_data(FiffTag::SPtr tag, int from_endian, int to_endian
         break;
 
     case FIFFT_DATA_REF_STRUCT :
-        np = tag->size()/sizeof(fiffDataRefRec);
+        np = tag->size()/FiffDataRef::storageSize();
         for (drthis = (fiffDataRef)tag->data(), k = 0; k < np; k++, drthis++) {
             drthis->type   = IOUtils::swap_int(drthis->type);
             drthis->endian = IOUtils::swap_int(drthis->endian);

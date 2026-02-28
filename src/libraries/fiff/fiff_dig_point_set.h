@@ -98,7 +98,7 @@ public:
     /**
      * Copy constructor.
      *
-     * @param[in] p_FiffDigPointSet.
+     * @param[in] p_FiffDigPointSet   FiffDigPointSet which should be copied.
      */
     FiffDigPointSet(const FiffDigPointSet &p_FiffDigPointSet);
 
@@ -112,7 +112,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Default constructor
+     * Constructs a FiffDigPointSet by reading from a IO device.
+     *
+     * @param[in] p_IODevice   IO device to read the digitizer point set from.
      */
     FiffDigPointSet(QIODevice &p_IODevice);
 
@@ -126,8 +128,8 @@ public:
     /**
      * Reads FiffDigPointSet from a fif file
      *
-     * @param+[\[]in, out] p_Stream     The opened fif file.
-     * @param[in, out] p_Dig            The read digitizer point set.
+     * @param[in, out] p_Stream     The opened fif file.
+     * @param[in, out] p_Dig        The read digitizer point set.
      *
      * @return true if succeeded, false otherwise.
      */
@@ -143,7 +145,7 @@ public:
     /**
      * True if FiffDigPointSet is empty.
      *
-     * @return true if MNE Bem is empty.
+     * @return true if FiffDigPointSet is empty.
      */
     inline bool isEmpty() const;
 
@@ -157,15 +159,17 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief write
-     * @param[in] p_IODevice.
+     * Writes the FiffDigPointSet to a FIFF file.
+     *
+     * @param[in] p_IODevice   IO device to write the digitizer point set to.
      */
     void write(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
-     * @brief writeToStream
-     * @param[in] p_pStream.
+     * Writes the FiffDigPointSet to a FIFF stream.
+     *
+     * @param[in] p_pStream   Pointer to the FIFF stream to write to.
      */
     void writeToStream(FiffStream* p_pStream);
 
@@ -221,7 +225,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Apply a transforamtion matrix on the 3D position of the digitzed points.
+     * Apply a transformation matrix on the 3D position of the digitized points.
      *
      * @param[in] coordTrans    FiffCoordTrans which is to be applied.
      * @param[in] bApplyInverse Whether to apply the inverse. False by default.

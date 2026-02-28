@@ -10,6 +10,7 @@
 #include "ecd.h"
 
 #include <fiff/fiff_stream.h>
+#include <fiff/fiff_coord_trans.h>
 #include <fwd/fwd_bem_model.h>
 #include <mne/c/mne_surface_old.h>
 
@@ -371,7 +372,6 @@ FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense mat
     int nz;
     int ptr;
     FiffSparseMatrix* sparse = NULL;
-    int size;
 
     if (small < 0) {		/* Automatic scaling */
         float maxval = 0.0;
@@ -395,19 +395,11 @@ FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense mat
         }
 
     if (nz <= 0) {
-        printf("No nonzero elements found.");
+        qWarning("No nonzero elements found.");
         return NULL;
     }
-    if (stor_type == FIFFTS_MC_CCS) {
-        size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (ncol+1)*(sizeof(fiff_int_t));
-    }
-    else if (stor_type == FIFFTS_MC_RCS) {
-        size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (nrow+1)*(sizeof(fiff_int_t));
-    }
-    else {
-        printf("Unknown sparse matrix storage type: %d",stor_type);
+    if (stor_type != FIFFTS_MC_CCS && stor_type != FIFFTS_MC_RCS) {
+        qWarning("Unknown sparse matrix storage type: %d",stor_type);
         return NULL;
     }
     sparse = new FiffSparseMatrix;
@@ -415,11 +407,11 @@ FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense mat
     sparse->m      = nrow;
     sparse->n      = ncol;
     sparse->nz     = nz;
-    sparse->data   = (float *)malloc(size);
-    sparse->inds   = (int *)(sparse->data+nz);
-    sparse->ptrs   = sparse->inds+nz;
+    sparse->data.resize(nz);
+    sparse->inds.resize(nz);
 
     if (stor_type == FIFFTS_MC_RCS) {
+        sparse->ptrs.resize(nrow + 1);
         for (j = 0, nz = 0; j < nrow; j++) {
             ptr = -1;
             for (k = 0; k < ncol; k++)
@@ -437,6 +429,7 @@ FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense mat
                 sparse->ptrs[j] = sparse->ptrs[j+1];
     }
     else if (stor_type == FIFFTS_MC_CCS) {
+        sparse->ptrs.resize(ncol + 1);
         for (k = 0, nz = 0; k < ncol; k++) {
             ptr = -1;
             for (j = 0; j < nrow; j++)
@@ -2220,7 +2213,7 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
                                     int            *nmeg_compp,
                                     QList<FiffChInfo>& eegp,	 /* EEG channels */
                                     int            *neegp,
-                                    FiffCoordTransOld** meg_head_t,
+                                    FiffCoordTrans *meg_head_t,
                                     fiffId         *idp)	 /* The measurement ID */
 /*
       * Read the channel information and split it into three arrays,
@@ -2243,7 +2236,7 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
     FiffDirNode::SPtr info;
     FiffTag::SPtr t_pTag;
     FiffChInfo   this_ch;
-    FiffCoordTransOld* t = NULL;
+    FiffCoordTrans t;
     fiff_int_t kind, pos;
     int j,k,to_find;
 
@@ -2285,11 +2278,10 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
         case FIFF_COORD_TRANS :
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
-            t = FiffCoordTransOld::read_helper( t_pTag );
-            if (t && (t->from != FIFFV_COORD_DEVICE || t->to != FIFFV_COORD_HEAD))
+            t = FiffCoordTrans::readFromTag( t_pTag );
+            if (!t.isEmpty() && (t.from != FIFFV_COORD_DEVICE || t.to != FIFFV_COORD_HEAD))
             {
-                delete t;
-                t = NULL;
+                t = FiffCoordTrans();
             }
             break;
 
@@ -2311,11 +2303,12 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
         qCritical("Some of the channel information was missing.");
         goto bad;
     }
-    if (t == NULL && meg_head_t != NULL) {
+    if (t.isEmpty() && meg_head_t != NULL) {
         /*
      * Try again in a more general fashion
      */
-        if ((t = FiffCoordTransOld::mne_read_meas_transform(name)) == NULL) {
+        t = FiffCoordTrans::readMeasTransform(name);
+        if (t.isEmpty()) {
             qCritical("MEG -> head coordinate transformation not found.");
             goto bad;
         }
@@ -2355,10 +2348,10 @@ int mne_read_meg_comp_eeg_ch_info_3(const QString& name,
     else
         *idp   = id;
     if (meg_head_t == NULL) {
-        delete t;
+        ; // value type, no cleanup needed
     }
     else
-        *meg_head_t = t;
+        *meg_head_t = std::move(t);
 
     return FIFF_OK;
 
@@ -2367,7 +2360,6 @@ bad : {
         stream->close();
         FREE_3(id);
 
-        delete t;
         return FIFF_FAIL;
     }
 }
@@ -2630,8 +2622,11 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
             for (p = 0; p < nn; p++)
                 cov[p] = f[p];
         }
-        else if ((cov_sparse = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag)) == NULL) {
-            goto out;
+        else {
+            auto cov_sparse_uptr = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
+            if (!cov_sparse_uptr)
+                goto out;
+            cov_sparse = cov_sparse_uptr.release();
         }
 
         if (nodes[k]->find_tag(stream, FIFF_MNE_COV_EIGENVALUES, t_pTag)) {
@@ -3344,9 +3339,7 @@ int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix*& c)
 //=============================================================================================================
 
 DipoleFitData::DipoleFitData()
-: mri_head_t (NULL)
-, meg_head_t (NULL)
-, coord_frame(FIFFV_COORD_UNKNOWN)
+: coord_frame(FIFFV_COORD_UNKNOWN)
 , nmeg (0)
 , neeg (0)
 , ch_names (NULL)
@@ -3378,11 +3371,6 @@ DipoleFitData::DipoleFitData()
 
 DipoleFitData::~DipoleFitData()
 {
-    if(mri_head_t)
-        delete mri_head_t;
-    if(meg_head_t)
-        delete meg_head_t;
-
     if(meg_coils)
         delete meg_coils;
     if(eeg_els)
@@ -3450,7 +3438,8 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
         if (FwdBemModel::fwd_bem_load_recompute_solution(d->bemname,FWD_BEM_UNKNOWN,FALSE,d->bem_model) == FAIL)
             goto out;
         printf("Employing the head->MRI coordinate transform with the BEM model.\n");
-        if (FwdBemModel::fwd_bem_set_head_mri_t(d->bem_model,d->mri_head_t) == FAIL)
+        Q_ASSERT(d->mri_head_t);
+        if (FwdBemModel::fwd_bem_set_head_mri_t(d->bem_model,*d->mri_head_t) == FAIL)
             goto out;
         printf("BEM model %s is now set up\n",d->bem_model->sol_name.toUtf8().constData());
         /*
@@ -3467,7 +3456,7 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
             if (fit_sphere_to_points(inner_skull->rr,inner_skull->np,simplex_size,d->r0,&R) == FAIL)
                 goto out;
 
-            FiffCoordTransOld::fiff_coord_trans(d->r0,d->mri_head_t,TRUE);
+            FiffCoordTrans::apply_trans(d->r0,*d->mri_head_t,TRUE);
             printf("Fitted sphere model origin : %6.1f %6.1f %6.1f mm rad = %6.1f mm.\n",
                    1000*d->r0[X_3],1000*d->r0[Y_3],1000*d->r0[Z_3],1000*R);
         }
@@ -3912,7 +3901,8 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
        * Read the coordinate transformations
        */
     if (!mriname.isEmpty()) {
-        if ((res->mri_head_t = FiffCoordTransOld::mne_read_mri_transform(mriname)) == NULL)
+        res->mri_head_t = std::make_unique<FiffCoordTrans>(FiffCoordTrans::readMriTransform(mriname));
+        if (res->mri_head_t->isEmpty())
             goto bad;
     }
     else if (!bemname.isEmpty()) {
@@ -3924,13 +3914,19 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
         float rot[3][3] = { { 1.0, 0.0, 0.0 },
                             { 0.0, 1.0, 0.0 },
                             { 0.0, 0.0, 1.0 } };
-        res->mri_head_t = new FiffCoordTransOld(FIFFV_COORD_MRI,FIFFV_COORD_HEAD,rot,move);
+        Eigen::Matrix3f rotMat;
+        rotMat << rot[0][0], rot[0][1], rot[0][2],
+                  rot[1][0], rot[1][1], rot[1][2],
+                  rot[2][0], rot[2][1], rot[2][2];
+        Eigen::Vector3f moveVec = Eigen::Map<Eigen::Vector3f>(move);
+        res->mri_head_t = std::make_unique<FiffCoordTrans>(FIFFV_COORD_MRI,FIFFV_COORD_HEAD,rotMat,moveVec);
     }
 
-    FiffCoordTransOld::mne_print_coord_transform(stdout,res->mri_head_t);
-    if ((res->meg_head_t = FiffCoordTransOld::mne_read_meas_transform(measname)) == NULL)
+    res->mri_head_t->print();
+    res->meg_head_t = std::make_unique<FiffCoordTrans>(FiffCoordTrans::readMeasTransform(measname));
+    if (res->meg_head_t->isEmpty())
         goto bad;
-    FiffCoordTransOld::mne_print_coord_transform(stdout,res->meg_head_t);
+    res->meg_head_t->print();
     /*
        * Read the bad channel lists
        */
@@ -4005,14 +4001,14 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
             goto bad;
         }
 
+        Q_ASSERT(res->meg_head_t);
         if ((res->meg_coils = templates->create_meg_coils(res->chs,
                                                           res->nmeg,
                                                           accurate_coils ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
-                                                          res->meg_head_t)) == NULL)
+                                                          *res->meg_head_t)) == NULL)
             goto bad;
         if ((res->eeg_els = FwdCoilSet::create_eeg_els(res->chs.mid(res->nmeg),
-                                                       res->neeg,
-                                                       NULL)) == NULL)
+                                                       res->neeg)) == NULL)
             goto bad;
         printf("Head coordinate coil definitions created.\n");
     }
@@ -4055,7 +4051,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
             if ((comp_coils = templates->create_meg_coils(comp_chs,
                                                           ncomp,
                                                           FWD_COIL_ACCURACY_NORMAL,
-                                                          res->meg_head_t)) == NULL) {
+                                                          *res->meg_head_t)) == NULL) {
                 goto bad;
             }
             printf("%d compensation channels in %s\n",comp_coils->ncoil,measname.toUtf8().data());

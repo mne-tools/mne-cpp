@@ -64,7 +64,7 @@ namespace FWDLIB{
 }
 
 namespace FIFFLIB{
-    class FiffCoordTransOld;
+    class FiffCoordTrans;
     class FiffDigPointSet;
     class FiffChInfo;
 }

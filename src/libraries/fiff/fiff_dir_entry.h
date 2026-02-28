@@ -59,7 +59,7 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * A Dir Entry, which replaces fiffDirEntryRec which had a size of 4*4 = 16
+ * A FIFF directory entry describing a tag's kind, type, size, and position.
  *
  * @brief Directory entry description.
  **/
@@ -104,18 +104,6 @@ public:
     fiff_int_t  size;   /**< How many bytes. */
     fiff_int_t  pos;    /**< Location in file; Note: the data is located at pos + FIFFC_DATA_OFFSET: 2GB restriction -> change this to fiff_long_t. */
 
-// ### OLD STRUCT ###
-//    /** Directories are composed of these structures. *
-//     typedef struct _fiffDirEntryRec {
-//      fiff_int_t  kind;		/**< Tag number *
-//      fiff_int_t  type;		/**< Data type *
-//      fiff_int_t  size;		/**< How many bytes *
-//      fiff_int_t  pos;		/**< Location in file
-//                      * Note: the data is located at pos +
-//                      * FIFFC_DATA_OFFSET *
-//     } fiffDirEntryRec,*fiffDirEntry;/**< Directory is composed of these *
-//     /** Alias for fiffDirEntryRec *
-//     typedef fiffDirEntryRec fiff_dir_entry_t;
 };
 
 //=============================================================================================================
@@ -124,7 +112,8 @@ public:
 
 inline qint32 FiffDirEntry::storageSize()
 {
-    return 16;
+    return sizeof(FiffDirEntry::kind) + sizeof(FiffDirEntry::type)
+         + sizeof(FiffDirEntry::size) + sizeof(FiffDirEntry::pos);
 }
 } // NAMESPACE
 

@@ -44,7 +44,7 @@
 
 #include <utils/ioutils.h>
 #include <fiff/fiff_info.h>
-#include <fiff/c/fiff_digitizer_data.h>
+#include <fiff/fiff_digitizer_data.h>
 #include <scMeas/realtimemultisamplearray.h>
 
 //=============================================================================================================

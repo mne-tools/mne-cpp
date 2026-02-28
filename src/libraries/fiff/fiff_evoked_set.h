@@ -118,8 +118,6 @@ public:
     /**
      * fiff_pick_channels_evoked
      *
-     * ### MNE toolbox root function ###
-     *
      * Pick desired channels from evoked-response data
      *
      * @param[in] include   - Channels to include (if empty, include all available).
@@ -134,12 +132,10 @@ public:
     /**
      * mne_compensate_to
      *
-     * ### MNE toolbox root function ### Definition of the mne_compensate_to function
-     *
      * Apply compensation to the data as desired
      *
-     * @param[in] to                 desired compensation in the output.
-     * @param[in, out] p_FiffEvoked   Evoked set to compensate.
+     * @param[in] to                  desired compensation in the output.
+     * @param[in, out] p_FiffEvokedSet Evoked set to compensate.
      *
      * @return true if succeeded, false otherwise.
      */
@@ -149,8 +145,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_find_evoked
-     *
-     * ### MNE toolbox root function ###
      *
      * Find evoked data sets
      *
@@ -163,8 +157,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_read_evoked
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffEvokedDataSet::read_evoked static function
      *

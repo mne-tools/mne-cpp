@@ -57,14 +57,13 @@
 
 #include <QSharedPointer>
 
+#include <memory>
+
 //=============================================================================================================
-// DEFINE NAMESPACE FIFFLIB
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB
-{
-    class FiffCoordTransOld;
-}
+namespace FIFFLIB { class FiffCoordTrans; }
 
 namespace MNELIB
 {
@@ -114,8 +113,8 @@ public:
     FIFFLIB::fiffId meas_id;            /* The assosiated measurement ID */
     MNELIB::MneSourceSpaceOld* *spaces; /* The source spaces */
     int            nspace;              /* Number of source spaces */
-    FIFFLIB::FiffCoordTransOld* meg_head_t;  /* MEG device <-> head coordinate transformation */
-    FIFFLIB::FiffCoordTransOld* mri_head_t;  /* MRI device <-> head coordinate transformation */
+    std::unique_ptr<FIFFLIB::FiffCoordTrans> meg_head_t;  /* MEG device <-> head coordinate transformation */
+    std::unique_ptr<FIFFLIB::FiffCoordTrans> mri_head_t;  /* MRI device <-> head coordinate transformation */
     int            methods;         /* EEG, MEG or EEG+MEG (see mne_fiff.h) */
     int            nchan;           /* Number of measurement channels */
     int            nsource;         /* Number of source points */

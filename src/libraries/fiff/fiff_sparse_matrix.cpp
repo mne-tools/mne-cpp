@@ -42,18 +42,13 @@
 #include <fiff/fiff_file.h>
 #include <fiff/fiff_types.h>
 
-#define MALLOC_18(x,t) (t *)malloc((x)*sizeof(t))
-
-#define REALLOC_18(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-
-#define FREE_18(x) if ((char *)(x) != NULL) free((char *)(x))
+#include <vector>
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace FIFFLIB;
 using namespace FIFFLIB;
 
 //============================= fiff_type_spec.h =============================
@@ -79,29 +74,28 @@ fiff_int_t fiff_type_matrix_coding(fiff_int_t type)
 
 //============================= fiff_matrix.c =============================
 
-int *fiff_get_matrix_dims(FiffTag::SPtr& tag)
+std::vector<int> fiff_get_matrix_dims(FiffTag::SPtr& tag)
 /*
       * Interpret dimensions from matrix data (dense and sparse)
       */
 {
     int ndim;
     int *dims;
-    int *res,k;
     unsigned int tsize = tag->size();
     /*
    * Initial checks
    */
-    if (tag->data() == NULL) {
+    if (tag->data() == nullptr) {
         qCritical("fiff_get_matrix_dims: no data available!");
-        return NULL;
+        return {};
     }
     if (fiff_type_fundamental(tag->type) != FIFFTS_FS_MATRIX) {
         qCritical("fiff_get_matrix_dims: tag does not contain a matrix!");
-        return NULL;
+        return {};
     }
     if (tsize < sizeof(fiff_int_t)) {
         qCritical("fiff_get_matrix_dims: too small matrix data!");
-        return NULL;
+        return {};
     }
     /*
    * Get the number of dimensions and check
@@ -109,37 +103,38 @@ int *fiff_get_matrix_dims(FiffTag::SPtr& tag)
     ndim = *((fiff_int_t *)((fiff_byte_t *)(tag->data())+tag->size()-sizeof(fiff_int_t)));
     if (ndim <= 0 || ndim > FIFFC_MATRIX_MAX_DIM) {
         qCritical("fiff_get_matrix_dims: unreasonable # of dimensions!");
-        return NULL;
+        return {};
     }
     if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_DENSE) {
         if (tsize < (ndim+1)*sizeof(fiff_int_t)) {
             qCritical("fiff_get_matrix_dims: too small matrix data!");
-            return NULL;
+            return {};
         }
-        res = MALLOC_18(ndim+1,int);
+        std::vector<int> res(ndim + 1);
         res[0] = ndim;
         dims = ((fiff_int_t *)((fiff_byte_t *)(tag->data())+tag->size())) - ndim - 1;
-        for (k = 0; k < ndim; k++)
+        for (int k = 0; k < ndim; k++)
             res[k+1] = dims[k];
+        return res;
     }
     else if (fiff_type_matrix_coding(tag->type) == FIFFTS_MC_CCS ||
              fiff_type_matrix_coding(tag->type) == FIFFTS_MC_RCS) {
         if (tsize < (ndim+2)*sizeof(fiff_int_t)) {
             qCritical("fiff_get_matrix_sparse_dims: too small matrix data!");
-            return NULL; }
-
-        res = MALLOC_18(ndim+2,int);
+            return {};
+        }
+        std::vector<int> res(ndim + 2);
         res[0] = ndim;
         dims = ((fiff_int_t *)((fiff_byte_t *)(tag->data())+tag->size())) - ndim - 1;
-        for (k = 0; k < ndim; k++)
+        for (int k = 0; k < ndim; k++)
             res[k+1] = dims[k];
         res[ndim+1] = dims[-1];
+        return res;
     }
     else {
         qCritical("fiff_get_matrix_dims: unknown matrix coding.");
-        return NULL;
+        return {};
     }
-    return res;
 }
 
 //=============================================================================================================
@@ -151,62 +146,20 @@ FiffSparseMatrix::FiffSparseMatrix()
 , m(0)
 , n(0)
 , nz(0)
-, data(NULL)
-, inds(NULL)
-, ptrs(NULL)
 {
 }
 
 //=============================================================================================================
 
-FiffSparseMatrix::FiffSparseMatrix(const FiffSparseMatrix &mat)
-{
-    int             size;
-
-    this->coding = mat.coding;
-    this->m      = mat.m;
-    this->n      = mat.n;
-    this->nz     = mat.nz;
-
-    if (mat.coding == FIFFTS_MC_CCS) {
-        size = mat.nz*(sizeof(FIFFLIB::fiff_float_t) + sizeof(FIFFLIB::fiff_int_t)) +
-                (mat.n+1)*(sizeof(FIFFLIB::fiff_int_t));
-    }
-    if (mat.coding == FIFFTS_MC_RCS) {
-        size = mat.nz*(sizeof(FIFFLIB::fiff_float_t) + sizeof(FIFFLIB::fiff_int_t)) +
-                (mat.m+1)*(sizeof(FIFFLIB::fiff_int_t));
-    }
-    else {
-        printf("Illegal sparse matrix storage type: %d",mat.coding);
-        return;
-    }
-    this->data   = (float *)malloc(size);
-    this->inds   = (int *)(this->data+this->nz);
-    this->ptrs   = this->inds+this->nz;
-    memcpy(data,mat.data,size);
-}
-
-//=============================================================================================================
-
-FiffSparseMatrix::~FiffSparseMatrix()
-{
-    if(data)
-        FREE_18(data);
-}
-
-//=============================================================================================================
-
-fiff_int_t *FiffSparseMatrix::fiff_get_matrix_sparse_dims(FiffTag::SPtr &tag)
+std::vector<int> FiffSparseMatrix::fiff_get_matrix_sparse_dims(FiffTag::SPtr &tag)
 {
     return fiff_get_matrix_dims(tag);
 }
 
 //=============================================================================================================
 
-FiffSparseMatrix *FiffSparseMatrix::fiff_get_float_sparse_matrix(FiffTag::SPtr &tag)
+FiffSparseMatrix::UPtr FiffSparseMatrix::fiff_get_float_sparse_matrix(FiffTag::SPtr &tag)
 {
-    int *dims;
-    FIFFLIB::FiffSparseMatrix* res = NULL;
     int   m,n,nz;
     int   coding,correct_size;
 
@@ -214,16 +167,17 @@ FiffSparseMatrix *FiffSparseMatrix::fiff_get_float_sparse_matrix(FiffTag::SPtr &
          fiff_type_base(tag->type)          != FIFFT_FLOAT ||
          (fiff_type_matrix_coding(tag->type) != FIFFTS_MC_CCS &&
           fiff_type_matrix_coding(tag->type) != FIFFTS_MC_RCS) ) {
-        printf("fiff_get_float_ccs_matrix: wrong data type!");
-        return NULL;
+        qWarning("[FiffSparseMatrix::fiff_get_float_sparse_matrix] wrong data type!");
+        return nullptr;
     }
 
-    if ((dims = fiff_get_matrix_sparse_dims(tag)) == NULL)
-        return NULL;
+    auto dims = fiff_get_matrix_sparse_dims(tag);
+    if (dims.empty())
+        return nullptr;
 
     if (dims[0] != 2) {
-        printf("fiff_get_float_sparse_matrix: wrong # of dimensions!");
-        return NULL;
+        qWarning("[FiffSparseMatrix::fiff_get_float_sparse_matrix] wrong # of dimensions!");
+        return nullptr;
     }
 
     m   = dims[1];
@@ -238,64 +192,56 @@ FiffSparseMatrix *FiffSparseMatrix::fiff_get_float_sparse_matrix(FiffTag::SPtr &
         correct_size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
                 (m+1+dims[0]+2)*(sizeof(fiff_int_t));
     else {
-        printf("fiff_get_float_sparse_matrix: Incomprehensible sparse matrix coding");
-        return NULL;
+        qWarning("[FiffSparseMatrix::fiff_get_float_sparse_matrix] Incomprehensible sparse matrix coding");
+        return nullptr;
     }
     if (tag->size() != correct_size) {
-        printf("fiff_get_float_sparse_matrix: wrong data size!");
-        FREE_18(dims);
-        return NULL;
+        qWarning("[FiffSparseMatrix::fiff_get_float_sparse_matrix] wrong data size!");
+        return nullptr;
     }
     /*
-        * Set up structure
-        */
-    res = new FIFFLIB::FiffSparseMatrix;
+     * Parse tag data into Eigen vectors via Map (zero-copy wrap + assignment copy)
+     */
+    auto res = std::make_unique<FiffSparseMatrix>();
     res->m      = m;
     res->n      = n;
     res->nz     = nz;
-    res->data   = MALLOC_18(correct_size,float);
-    memcpy (res->data,(float*)tag->data(),correct_size);
     res->coding = coding;
-    res->inds   = (int *)(res->data + res->nz);
-    res->ptrs   = res->inds + res->nz;
 
-    FREE_18(dims);
+    const float* src_data = reinterpret_cast<const float*>(tag->data());
+    const int*   src_inds = reinterpret_cast<const int*>(src_data + nz);
+    const int*   src_ptrs = src_inds + nz;
+    int ptrs_count = (coding == FIFFTS_MC_CCS) ? (n + 1) : (m + 1);
+
+    res->data = Eigen::Map<const Eigen::VectorXf>(src_data, nz);
+    res->inds = Eigen::Map<const Eigen::VectorXi>(src_inds, nz);
+    res->ptrs = Eigen::Map<const Eigen::VectorXi>(src_ptrs, ptrs_count);
 
     return res;
 }
 
 //=============================================================================================================
 
-FiffSparseMatrix *FiffSparseMatrix::create_sparse_rcs(int nrow, int ncol, int *nnz, int **colindex, float **vals) 	     /* The nonzero elements on each row
-                                                                  * If null, the matrix will be all zeroes */
+FiffSparseMatrix::UPtr FiffSparseMatrix::create_sparse_rcs(int nrow, int ncol, int *nnz, int **colindex, float **vals)
 {
-    FIFFLIB::FiffSparseMatrix* sparse = NULL;
-    int j,k,nz,ptr,size,ind;
-    int stor_type = FIFFTS_MC_RCS;
+    int j,k,nz,ptr,ind;
 
     for (j = 0, nz = 0; j < nrow; j++)
         nz = nz + nnz[j];
 
     if (nz <= 0) {
-        printf("No nonzero elements specified.");
-        return NULL;
+        qWarning("[FiffSparseMatrix::create_sparse_rcs] No nonzero elements specified.");
+        return nullptr;
     }
-    if (stor_type == FIFFTS_MC_RCS) {
-        size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (nrow+1)*(sizeof(fiff_int_t));
-    }
-    else {
-        printf("Illegal sparse matrix storage type: %d",stor_type);
-        return NULL;
-    }
-    sparse = new FIFFLIB::FiffSparseMatrix;
-    sparse->coding = stor_type;
+
+    auto sparse = std::make_unique<FiffSparseMatrix>();
+    sparse->coding = FIFFTS_MC_RCS;
     sparse->m      = nrow;
     sparse->n      = ncol;
     sparse->nz     = nz;
-    sparse->data   = (float *)malloc(size);
-    sparse->inds   = (int *)(sparse->data+nz);
-    sparse->ptrs   = sparse->inds+nz;
+    sparse->data   = Eigen::VectorXf::Zero(nz);
+    sparse->inds   = Eigen::VectorXi::Zero(nz);
+    sparse->ptrs   = Eigen::VectorXi::Zero(nrow + 1);
 
     for (j = 0, nz = 0; j < nrow; j++) {
         ptr = -1;
@@ -304,8 +250,8 @@ FiffSparseMatrix *FiffSparseMatrix::create_sparse_rcs(int nrow, int ncol, int *n
                 ptr = nz;
             ind = sparse->inds[nz] = colindex[j][k];
             if (ind < 0 || ind >= ncol) {
-                printf("Column index out of range in mne_create_sparse_rcs");
-                goto bad;
+                qWarning("[FiffSparseMatrix::create_sparse_rcs] Column index out of range");
+                return nullptr;
             }
             if (vals)
                 sparse->data[nz] = vals[j][k];
@@ -320,85 +266,67 @@ FiffSparseMatrix *FiffSparseMatrix::create_sparse_rcs(int nrow, int ncol, int *n
         if (sparse->ptrs[j] < 0)
             sparse->ptrs[j] = sparse->ptrs[j+1];
     return sparse;
-
-bad : {
-        if(sparse)
-            delete sparse;
-        return NULL;
-    }
 }
 
 //=============================================================================================================
 
-FiffSparseMatrix *FiffSparseMatrix::mne_add_upper_triangle_rcs()
+FiffSparseMatrix::UPtr FiffSparseMatrix::mne_add_upper_triangle_rcs()
 /*
-     * Fill in upper triangle with the lower triangle values
-     */
+ * Fill in upper triangle with the lower triangle values
+ */
 {
-    int *nnz       = NULL;
-    int **colindex = NULL;
-    float **vals   = NULL;
-    FIFFLIB::FiffSparseMatrix* res = NULL;
-    int i,j,k,row;
-    int *nadd = NULL;
-
     if (this->coding != FIFFTS_MC_RCS) {
-        printf("The input matrix to mne_add_upper_triangle_rcs must be in RCS format");
-        goto out;
+        qWarning("[FiffSparseMatrix::mne_add_upper_triangle_rcs] input must be in RCS format");
+        return nullptr;
     }
     if (this->m != this->n) {
-        printf("The input matrix to mne_add_upper_triangle_rcs must be square");
-        goto out;
+        qWarning("[FiffSparseMatrix::mne_add_upper_triangle_rcs] input must be square");
+        return nullptr;
     }
-    nnz      = MALLOC_18(this->m,int);
-    colindex = MALLOC_18(this->m,int *);
-    vals     = MALLOC_18(this->m,float *);
-    for (i = 0; i < this->m; i++) {
-        nnz[i]      = this->ptrs[i+1] - this->ptrs[i];
-        if (nnz[i] > 0) {
-            colindex[i] = MALLOC_18(nnz[i],int);
-            vals[i]   = MALLOC_18(nnz[i],float);
-            for (j = this->ptrs[i], k = 0; j < this->ptrs[i+1]; j++, k++) {
-                vals[i][k] = this->data[j];
+
+    // Build per-row data from existing lower triangle
+    std::vector<int> nnz_vec(this->m);
+    std::vector<std::vector<int>>   colindex(this->m);
+    std::vector<std::vector<float>> vals(this->m);
+
+    for (int i = 0; i < this->m; i++) {
+        nnz_vec[i] = this->ptrs[i+1] - this->ptrs[i];
+        if (nnz_vec[i] > 0) {
+            colindex[i].resize(nnz_vec[i]);
+            vals[i].resize(nnz_vec[i]);
+            for (int j = this->ptrs[i], k = 0; j < this->ptrs[i+1]; j++, k++) {
+                vals[i][k]     = this->data[j];
                 colindex[i][k] = this->inds[j];
             }
         }
-        else {
-            colindex[i] = NULL;
-            vals[i] = NULL;
-        }
     }
-    /*
-        * Add the elements
-        */
-    nadd = MALLOC_18(this->m,int);
-    for (i = 0; i < this->m; i++)
-        nadd[i] = 0;
-    for (i = 0; i < this->m; i++)
-        for (j = this->ptrs[i]; j < this->ptrs[i+1]; j++)
-            nadd[this->inds[j]]++;
-    for (i = 0; i < this->m; i++) {
-        colindex[i] = REALLOC_18(colindex[i],nnz[i]+nadd[i],int);
-        vals[i]     = REALLOC_18(vals[i],nnz[i]+nadd[i],float);
-    }
-    for (i = 0; i < this->m; i++)
-        for (j = this->ptrs[i]; j < this->ptrs[i+1]; j++) {
-            row = this->inds[j];
-            colindex[row][nnz[row]] = i;
-            vals[row][nnz[row]]     = this->data[j];
-            nnz[row]++;
-        }
-    res = create_sparse_rcs(this->m,this->n,nnz,colindex,vals);
 
-out : {
-        for (i = 0; i < this->m; i++) {
-            FREE_18(colindex[i]);
-            FREE_18(vals[i]);
-        }
-        FREE_18(nnz);
-        FREE_18(vals);
-        FREE_18(colindex);
-        FREE_18(nadd);
-        return res;
+    // Count additional upper-triangle entries per row
+    std::vector<int> nadd(this->m, 0);
+    for (int i = 0; i < this->m; i++)
+        for (int j = this->ptrs[i]; j < this->ptrs[i+1]; j++)
+            nadd[this->inds[j]]++;
+
+    // Expand per-row storage and add upper-triangle entries
+    for (int i = 0; i < this->m; i++) {
+        colindex[i].resize(nnz_vec[i] + nadd[i]);
+        vals[i].resize(nnz_vec[i] + nadd[i]);
     }
+    for (int i = 0; i < this->m; i++)
+        for (int j = this->ptrs[i]; j < this->ptrs[i+1]; j++) {
+            int row = this->inds[j];
+            colindex[row][nnz_vec[row]] = i;
+            vals[row][nnz_vec[row]]     = this->data[j];
+            nnz_vec[row]++;
+        }
+
+    // Build raw pointer arrays for create_sparse_rcs
+    std::vector<int*>   ci_ptrs(this->m);
+    std::vector<float*> val_ptrs(this->m);
+    for (int i = 0; i < this->m; i++) {
+        ci_ptrs[i]  = colindex[i].data();
+        val_ptrs[i] = vals[i].data();
+    }
+
+    return create_sparse_rcs(this->m, this->n, nnz_vec.data(), ci_ptrs.data(), val_ptrs.data());
 }

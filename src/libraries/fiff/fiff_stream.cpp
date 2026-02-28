@@ -53,21 +53,11 @@
 #include "fiff_ch_pos.h"
 #include "fiff_dig_point.h"
 #include "fiff_id.h"
-#include "c/fiff_digitizer_data.h"
+#include "fiff_digitizer_data.h"
 #include "fiff_dig_point.h"
 
 #include <utils/mnemath.h>
 #include <utils/ioutils.h>
-
-#define MALLOC_54(x,t) (t *)malloc((x)*sizeof(t))
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
 
 #include <iostream>
 #include <time.h>
@@ -327,7 +317,7 @@ bool FiffStream::open(QIODevice::OpenModeFlag mode)
     //
     //   Create the directory tree structure
     //
-    if((this->m_dirtree = this->make_subtree(m_dir)) == NULL)
+    if((this->m_dirtree = this->make_subtree(m_dir)) == nullptr)
         return false;
     else
         this->m_dirtree->parent.clear();
@@ -867,8 +857,8 @@ bool FiffStream::read_digitizer_data(const FiffDirNode::SPtr& p_Node, FiffDigiti
     p_digData.npoint      = npoint;
 
     for (int k = 0; k < p_digData.npoint; k++) {
-        p_digData.active.append(TRUE);
-        p_digData.discard.append(FALSE);
+        p_digData.active.append(1);
+        p_digData.discard.append(0);
     }
 
     return true;
@@ -991,9 +981,9 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
 
     FiffChInfo t_chInfo;
 
-    FiffCoordTrans cand;// = NULL;
-    FiffCoordTrans dev_head_t;// = NULL;
-    FiffCoordTrans ctf_head_t;// = NULL;
+    FiffCoordTrans cand;// = nullptr;
+    FiffCoordTrans dev_head_t;// = nullptr;
+    FiffCoordTrans ctf_head_t;// = nullptr;
 
     fiff_int_t meas_date[2];
     meas_date[0] = -1;
@@ -1508,7 +1498,7 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirNode::SPtr& p_Node)
             return projdata;
         }
         t_pFiffDirTreeItem->find_tag(this, FIFF_PROJ_ITEM_VECTORS, t_pTag);
-        MatrixXd data;// = NULL;
+        MatrixXd data;// = nullptr;
         if (t_pTag)
         {
             data = t_pTag->toFloatMatrix().cast<double>();
@@ -1734,7 +1724,7 @@ bool FiffStream::setup_read_raw(QIODevice &p_IODevice,
     //
     //   Read the measurement info
     //
-    FiffInfo info;// = NULL;
+    FiffInfo info;// = nullptr;
     FiffDirNode::SPtr meas;
     if(!t_pStream->read_meas_info(t_pStream->dirtree(), info, meas))
         return false;
@@ -1972,7 +1962,7 @@ FiffStream::SPtr FiffStream::open_update(QIODevice &p_IODevice)
 
     QFile *file = qobject_cast<QFile *>(t_pStream->device());
 
-    if (file != NULL) {
+    if (file != nullptr) {
         /*
         * Ensure that the last tag in the directory has next set to FIFF_NEXT_NONE
         */

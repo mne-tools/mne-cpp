@@ -1,15 +1,13 @@
 //=============================================================================================================
 /**
- * @file     fiff_ctf_comp.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * @file     fiff_time.h
+ * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @since    2.0.0
+ * @date     February, 2026
  *
  * @section  LICENSE
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2012, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,32 +28,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    FiffCtfComp class declaration.
+ * @brief    FiffTime class declaration.
  *
  */
 
-#ifndef FIFF_CTF_COMP_H
-#define FIFF_CTF_COMP_H
+#ifndef FIFF_TIME_H
+#define FIFF_TIME_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "fiff_global.h"
-#include "fiff_types.h"
-#include "fiff_named_matrix.h"
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QSharedPointer>
-
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
+#include <QtGlobal>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
@@ -66,50 +52,95 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * CTF software compensation data
+ * Accurate time stamps used in FIFF files.
  *
- * @brief CTF software compensation data
+ * @brief Time stamp record storing seconds and microseconds since epoch.
  */
-class FIFFSHARED_EXPORT FiffCtfComp {
 
+class FIFFSHARED_EXPORT FiffTime
+{
 public:
-    typedef QSharedPointer<FiffCtfComp> SPtr;               /**< Shared pointer type for FiffCtfComp. */
-    typedef QSharedPointer<const FiffCtfComp> ConstSPtr;    /**< Const shared pointer type for FiffCtfComp. */
-
     //=========================================================================================================
     /**
-     * Constructs the CTF software compensation data
+     * Default constructor. Initializes both fields to zero.
      */
-    FiffCtfComp();
+    FiffTime()
+        : secs(0)
+        , usecs(0)
+    {
+    }
 
     //=========================================================================================================
     /**
-     * Copy constructor.
+     * Parameterized constructor.
      *
-     * @param[in] p_FiffCtfComp   CTF software compensation data which should be copied.
+     * @param[in] p_secs    GMT time in seconds since epoch.
+     * @param[in] p_usecs   Fraction of seconds in microseconds.
      */
-    FiffCtfComp(const FiffCtfComp &p_FiffCtfComp);
+    FiffTime(qint32 p_secs, qint32 p_usecs)
+        : secs(p_secs)
+        , usecs(p_usecs)
+    {
+    }
 
     //=========================================================================================================
     /**
-     * Destroys the CTF software compensation data.
+     * Destroys the FiffTime.
      */
-    ~FiffCtfComp();
+    ~FiffTime() = default;
 
     //=========================================================================================================
     /**
-     * Initializes the CTF software compensation data.
+     * Size of the old struct (fiffTimeRec) 2*int = 2*4 = 8.
+     *
+     * @return the size of the old struct fiffTimeRec.
      */
-    void clear();
+    inline static qint32 storageSize();
 
 public:
-    fiff_int_t ctfkind;             /**< CTF kind. */
-    fiff_int_t kind;                /**< Fiff kind -> fiff_constants.h. */
-    bool save_calibrated;           /**< If data should be saved calibrated. */
-    Eigen::MatrixXd rowcals;        /**< Row calibrations. */
-    Eigen::MatrixXd colcals;        /**< Column calibrations. */
-    FiffNamedMatrix::SDPtr data;    /**< Compensation data. */
+    qint32 secs;    /**< GMT time in seconds since epoch. */
+    qint32 usecs;   /**< Fraction of seconds in microseconds. */
 };
-} // NAMESPACE
 
-#endif // FIFF_CTF_COMP_H
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline qint32 FiffTime::storageSize()
+{
+    return sizeof(FiffTime::secs) + sizeof(FiffTime::usecs);
+}
+
+//=============================================================================================================
+
+/**
+ * Compares two FiffTime instances for equality.
+ *
+ * @param[in] a   First time value.
+ * @param[in] b   Second time value.
+ *
+ * @return true if both secs and usecs are equal.
+ */
+inline bool operator==(const FiffTime& a, const FiffTime& b)
+{
+    return (a.secs == b.secs && a.usecs == b.usecs);
+}
+
+//=============================================================================================================
+
+/**
+ * Compares two FiffTime instances for inequality.
+ *
+ * @param[in] a   First time value.
+ * @param[in] b   Second time value.
+ *
+ * @return true if secs or usecs differ.
+ */
+inline bool operator!=(const FiffTime& a, const FiffTime& b)
+{
+    return !(a == b);
+}
+
+} // NAMESPACE FIFFLIB
+
+#endif // FIFF_TIME_H

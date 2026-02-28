@@ -47,7 +47,7 @@
 #include "mne_msh_light.h"
 #include "mne_msh_eyes.h"
 
-#include <fiff/c/fiff_coord_trans_set.h>
+#include <fiff/fiff_coord_trans_set.h>
 
 #define MALLOC_47(x,t) (t *)malloc((x)*sizeof(t))
 

@@ -143,7 +143,7 @@ SensorSet SensorSetCreator::updateSensorSet(const QList<FIFFLIB::FiffChInfo>& ch
     if(channelList.isEmpty()) {
         return SensorSet();
     } else {
-        auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(channelList, channelList.size(), static_cast<int>(accuracy), nullptr));
+        auto pCoilMeg = FwdCoilSet::SPtr(m_pCoilDefinitions->create_meg_coils(channelList, channelList.size(), static_cast<int>(accuracy)));
         return SensorSet(pCoilMeg);
     }
 }

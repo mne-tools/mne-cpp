@@ -213,7 +213,8 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         float          r0[3];
 
         VEC_COPY_16(r0,f->r0);
-        FiffCoordTransOld::fiff_coord_trans_inv(r0,f->mri_head_t,TRUE);
+        Q_ASSERT(f->mri_head_t);
+        FiffCoordTrans::apply_inverse_trans(r0,*f->mri_head_t,TRUE);
         if (f->bem_model) {
             printf("Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
             if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
@@ -230,9 +231,10 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         if (free_inner_skull)
             delete inner_skull;
     }
-    if (MneSurfaceOrVolume::mne_transform_source_spaces_to(f->coord_frame,f->mri_head_t,&guesses,1) != OK)
+    if (MneSurfaceOrVolume::mne_transform_source_spaces_to(f->coord_frame,*f->mri_head_t,&guesses,1) != OK)
         goto bad;
-    printf("Guess locations are now in %s coordinates.\n",FiffCoordTransOld::mne_coord_frame_name(f->coord_frame));
+    printf("Guess locations are now in %s coordinates.\n",FiffCoordTrans::frame_name(f->coord_frame).toUtf8().constData());
+
     this->nguess  = guesses->nuse;
     this->rr      = ALLOC_CMATRIX_16(guesses->nuse,3);
     for (k = 0, p = 0; k < guesses->np; k++)
@@ -311,7 +313,8 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         float          r0[3];
 
         VEC_COPY_16(r0,f->r0);
-        FiffCoordTransOld::fiff_coord_trans_inv(r0,f->mri_head_t,TRUE);
+        Q_ASSERT(f->mri_head_t);
+        FiffCoordTrans::apply_inverse_trans(r0,*f->mri_head_t,TRUE);
         if (f->bem_model) {
             printf("Using inner skull surface from the BEM (%s)...\n",f->bemname.toUtf8().constData());
             if ((inner_skull = f->bem_model->fwd_bem_find_surface(FIFFV_BEM_SURF_ID_BRAIN)) == NULL)
@@ -344,9 +347,9 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
     /*
      * Transform the guess locations to the appropriate coordinate frame
      */
-    if (MneSurfaceOrVolume::mne_transform_source_spaces_to(f->coord_frame,f->mri_head_t,&guesses,1) != OK)
+    if (MneSurfaceOrVolume::mne_transform_source_spaces_to(f->coord_frame,*f->mri_head_t,&guesses,1) != OK)
         goto bad;
-    printf("Guess locations are now in %s coordinates.\n",FiffCoordTransOld::mne_coord_frame_name(f->coord_frame));
+    printf("Guess locations are now in %s coordinates.\n",FiffCoordTrans::frame_name(f->coord_frame).toUtf8().constData());
 
     this->nguess  = guesses->nuse;
     this->rr      = ALLOC_CMATRIX_16(guesses->nuse,3);

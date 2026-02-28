@@ -114,8 +114,7 @@
 #include "mne_sss_data.h"
 #include "mne_named_matrix.h"
 #include "mne_deriv_set.h"
-#include <fiff/c/fiff_sparse_matrix.h>
-#include <fiff/c/fiff_coord_trans_old.h>
+#include <fiff/fiff_sparse_matrix.h>
 #include "mne_proj_item.h"
 #include "mne_proj_op.h"
 #include "mne_cov_matrix.h"

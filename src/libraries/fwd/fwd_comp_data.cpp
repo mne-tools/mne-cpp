@@ -280,7 +280,7 @@ FwdCompData *FwdCompData::fwd_make_comp_data(MneCTFCompDataSet *set,
         comp->set = NULL;
 
     if (comp_coils) {
-        comp->comp_coils = comp_coils->dup_coil_set(NULL);
+        comp->comp_coils = comp_coils->dup_coil_set();
     }
     else {
         qWarning("No coils to duplicate");

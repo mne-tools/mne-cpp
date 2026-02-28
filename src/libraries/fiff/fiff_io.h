@@ -164,10 +164,11 @@ public:
     /**
      * Write data to a single pIODevice.
      *
-     * @param[in] pIODevice               A fiff IO device like a fiff QFile or QTCPSocket.
-     * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA.
-     * @param[in] idx                    index of type, -1 for all entities of this type.
+     * @param[in] pIODevice   A fiff IO device like a fiff QFile or QTCPSocket.
+     * @param[in] type        Type of data to write (fiff constants types, e.g. FIFFB_RAW_DATA).
+     * @param[in] idx         Index of type, -1 for all entities of this type.
      *
+     * @return true if succeeded, false otherwise.
      */
     bool write(QIODevice& pIODevice,
                const fiff_int_t type,
@@ -177,9 +178,11 @@ public:
     /**
      * Write whole data of a type to a fiff file.
      *
-     * @param[in] p_QFile                   filename including the path but not the type, e.g. ./sample_date/sample_audvis.fif -> will be extended to ./sample_date/sample_audvis-type-1.fif.
-     * @param[in] type of data to write     fiff constants types, e.g. FIFFB_RAW_DATA.
-     * @param[in] idx                       index of type, -1 for all entities of this type.
+     * @param[in] p_QFile   Output file (name extended with type and index, e.g. sample_audvis-type-1.fif).
+     * @param[in] type      Type of data to write (fiff constants types, e.g. FIFFB_RAW_DATA).
+     * @param[in] idx       Index of type, -1 for all entities of this type.
+     *
+     * @return true if succeeded, false otherwise.
      */
     bool write(QFile& p_QFile,
                const fiff_int_t type,
@@ -189,18 +192,22 @@ public:
     /**
      * Write raw data to a pIODevice.
      *
-     * @param[in] pIODevice               A fiff IO device like a fiff QFile or QTCPSocket.
-     * @param[in] idx                    index of type, -1 for all entities of this type.
+     * @param[in] pIODevice   A fiff IO device like a fiff QFile or QTCPSocket.
+     * @param[in] idx         Index of type, -1 for all entities of this type.
      *
+     * @return true if succeeded, false otherwise.
      */
     bool write_raw(QIODevice& pIODevice,
                    const fiff_int_t idx) const;
 
     //=========================================================================================================
     /**
-     * Overloading ostream for printing member infos
+     * Overloading ostream for printing member infos.
      *
-     * @param[in] p_fiffIO    the fiffIO, whose members shall be printed.
+     * @param[in] out       The output stream.
+     * @param[in] p_fiffIO  The FiffIO whose members shall be printed.
+     *
+     * @return The output stream with the FiffIO data appended.
      */
 
     friend std::ostream& operator<<(std::ostream& out,
@@ -214,8 +221,8 @@ public:
     }
 
 public:
-    QList<QSharedPointer<FiffRawData> >     m_qlistRaw;
-    QList<QSharedPointer<FiffEvoked> >      m_qlistEvoked;
+    QList<QSharedPointer<FiffRawData> >     m_qlistRaw;     /**< List of raw data sets. */
+    QList<QSharedPointer<FiffEvoked> >      m_qlistEvoked;  /**< List of evoked data sets. */
 //    QList<QSharedPointer<MNEForwardSolution> > m_qlistFwd;
     //FiffCov, MNEInverseOperator, AnnotationSet,
 };

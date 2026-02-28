@@ -46,7 +46,7 @@
 
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_raw_data.h>
-#include <fiff/c/fiff_digitizer_data.h>
+#include <fiff/fiff_digitizer_data.h>
 
 #include <unordered_map>
 #include <functional>

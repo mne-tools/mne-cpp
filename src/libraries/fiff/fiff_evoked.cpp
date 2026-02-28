@@ -379,7 +379,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice,
                 break;
             case FIFF_EPOCH:
                 t_pStream->read_tag(t_pTag, pos);
-                epoch.append(FiffTag(t_pTag.data()));
+                epoch.append(FiffTag(*t_pTag));
                 break;
         }
     }

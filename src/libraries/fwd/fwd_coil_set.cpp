@@ -290,7 +290,7 @@ FwdCoilSet::~FwdCoilSet()
 
 //=============================================================================================================
 
-FwdCoil *FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const FiffCoordTransOld* t)
+FwdCoil *FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const FiffCoordTrans& t)
 {
     int        k,p,c;
     FwdCoil*    def;
@@ -334,12 +334,12 @@ FwdCoil *FwdCoilSet::create_meg_coil(const FiffChInfo& ch, int acc, const FiffCo
     /*
         * Apply a coordinate transformation if so desired
         */
-    if (t) {
-        FiffCoordTransOld::fiff_coord_trans(res->r0,t,FIFFV_MOVE);
-        FiffCoordTransOld::fiff_coord_trans(res->ex,t,FIFFV_NO_MOVE);
-        FiffCoordTransOld::fiff_coord_trans(res->ey,t,FIFFV_NO_MOVE);
-        FiffCoordTransOld::fiff_coord_trans(res->ez,t,FIFFV_NO_MOVE);
-        res->coord_frame = t->to;
+    if (!t.isEmpty()) {
+        FiffCoordTrans::apply_trans(res->r0,t,FIFFV_MOVE);
+        FiffCoordTrans::apply_trans(res->ex,t,FIFFV_NO_MOVE);
+        FiffCoordTrans::apply_trans(res->ey,t,FIFFV_NO_MOVE);
+        FiffCoordTrans::apply_trans(res->ez,t,FIFFV_NO_MOVE);
+        res->coord_frame = t.to;
     }
     else
         res->coord_frame = FIFFV_COORD_DEVICE;
@@ -363,7 +363,7 @@ bad : {
 FwdCoilSet *FwdCoilSet::create_meg_coils(const QList<FIFFLIB::FiffChInfo>& chs,
                                          int nch,
                                          int acc,
-                                         const FiffCoordTransOld* t)
+                                         const FiffCoordTrans& t)
 {
     FwdCoilSet* res = new FwdCoilSet();
     FwdCoil*    next;
@@ -375,8 +375,8 @@ FwdCoilSet *FwdCoilSet::create_meg_coils(const QList<FIFFLIB::FiffChInfo>& chs,
         res->coils = REALLOC_6(res->coils,res->ncoil+1,FwdCoil*);
         res->coils[res->ncoil++] = next;
     }
-    if (t)
-        res->coord_frame = t->to;
+    if (!t.isEmpty())
+        res->coord_frame = t.to;
     return res;
 
 bad : {
@@ -389,7 +389,7 @@ bad : {
 
 FwdCoilSet *FwdCoilSet::create_eeg_els(const QList<FIFFLIB::FiffChInfo>& chs,
                                        int nch,
-                                       const FiffCoordTransOld* t)
+                                       const FiffCoordTrans& t)
 {
     FwdCoilSet* res = new FwdCoilSet();
     FwdCoil*    next;
@@ -401,8 +401,8 @@ FwdCoilSet *FwdCoilSet::create_eeg_els(const QList<FIFFLIB::FiffChInfo>& chs,
         res->coils = REALLOC_6(res->coils,res->ncoil+1,FwdCoil*);
         res->coils[res->ncoil++] = next;
     }
-    if (t)
-        res->coord_frame = t->to;
+    if (!t.isEmpty())
+        res->coord_frame = t.to;
     return res;
 
 bad : {
@@ -503,20 +503,20 @@ bad : {
 
 //=============================================================================================================
 
-FwdCoilSet* FwdCoilSet::dup_coil_set(const FiffCoordTransOld* t) const
+FwdCoilSet* FwdCoilSet::dup_coil_set(const FiffCoordTrans& t) const
 {
     FwdCoilSet* res;
     FwdCoil*    coil;
 
-    if (t) {
-        if (this->coord_frame != t->from) {
+    if (!t.isEmpty()) {
+        if (this->coord_frame != t.from) {
             qWarning("Coordinate frame of the transformation does not match the coil set in fwd_dup_coil_set");
             return NULL;
         }
     }
     res = new FwdCoilSet();
-    if (t)
-        res->coord_frame = t->to;
+    if (!t.isEmpty())
+        res->coord_frame = t.to;
     else
         res->coord_frame = this->coord_frame;
 
@@ -528,17 +528,17 @@ FwdCoilSet* FwdCoilSet::dup_coil_set(const FiffCoordTransOld* t) const
         /*
      * Optional coordinate transformation
      */
-        if (t) {
-            FiffCoordTransOld::fiff_coord_trans(coil->r0,t,FIFFV_MOVE);
-            FiffCoordTransOld::fiff_coord_trans(coil->ex,t,FIFFV_NO_MOVE);
-            FiffCoordTransOld::fiff_coord_trans(coil->ey,t,FIFFV_NO_MOVE);
-            FiffCoordTransOld::fiff_coord_trans(coil->ez,t,FIFFV_NO_MOVE);
+        if (!t.isEmpty()) {
+            FiffCoordTrans::apply_trans(coil->r0,t,FIFFV_MOVE);
+            FiffCoordTrans::apply_trans(coil->ex,t,FIFFV_NO_MOVE);
+            FiffCoordTrans::apply_trans(coil->ey,t,FIFFV_NO_MOVE);
+            FiffCoordTrans::apply_trans(coil->ez,t,FIFFV_NO_MOVE);
 
             for (int p = 0; p < coil->np; p++) {
-                FiffCoordTransOld::fiff_coord_trans(coil->rmag[p],t,FIFFV_MOVE);
-                FiffCoordTransOld::fiff_coord_trans(coil->cosmag[p],t,FIFFV_NO_MOVE);
+                FiffCoordTrans::apply_trans(coil->rmag[p],t,FIFFV_MOVE);
+                FiffCoordTrans::apply_trans(coil->cosmag[p],t,FIFFV_NO_MOVE);
             }
-            coil->coord_frame = t->to;
+            coil->coord_frame = t.to;
         }
     }
     return res;

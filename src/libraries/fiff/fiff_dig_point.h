@@ -61,9 +61,9 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * Replaces fiffDigPointRec, *fiffDigPoint struct (analyze_types.h).
+ * Digitization point description.
  *
- * @brief Digitization point description
+ * @brief Digitization point description.
  */
 class FIFFSHARED_EXPORT FiffDigPoint
 {
@@ -104,7 +104,8 @@ public:
 
 inline qint32 FiffDigPoint::storageSize()
 {
-    return 20;
+    return sizeof(FiffDigPoint::kind) + sizeof(FiffDigPoint::ident)
+         + sizeof(FiffDigPoint::r);  // coord_frame is not part of on-disk format
 }
 } // NAMESPACE
 

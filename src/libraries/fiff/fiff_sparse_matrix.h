@@ -41,15 +41,21 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../fiff_global.h"
-#include "../fiff_types.h"
-#include "../fiff_tag.h"
+#include "fiff_global.h"
+#include "fiff_types.h"
+#include "fiff_tag.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
 #include <Eigen/Core>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -67,15 +73,16 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * Implements MNE Mne Data (Replaces *mneMneData,mneMneDataRec; struct of MNE-C mne_types.h).
+ * Implements a FIFF sparse matrix.
  *
- * @brief Data associated with MNE computations for each mneMeasDataSet
+ * @brief FIFF sparse matrix storage.
  */
 class FIFFSHARED_EXPORT FiffSparseMatrix
 {
 public:
     typedef QSharedPointer<FiffSparseMatrix> SPtr;              /**< Shared pointer type for FiffSparseMatrix. */
     typedef QSharedPointer<const FiffSparseMatrix> ConstSPtr;   /**< Const shared pointer type for FiffSparseMatrix. */
+    typedef std::unique_ptr<FiffSparseMatrix> UPtr;             /**< Unique pointer type for FiffSparseMatrix. */
 
     //=========================================================================================================
     /**
@@ -85,67 +92,107 @@ public:
 
     //=========================================================================================================
     /**
-     * Copies a FiffSparseMatrix
-     * Refactored: mne_dup_sparse_matrix (mne_sparse_matop.c)
-     *
-     * @param[in] mat     The Sparse Matrix which should be copied.
+     * Copies a FiffSparseMatrix (default — Eigen vectors handle deep copy).
      */
-    FiffSparseMatrix(const FiffSparseMatrix& mat);
+    FiffSparseMatrix(const FiffSparseMatrix& mat) = default;
 
     //=========================================================================================================
     /**
-     * Destroys the FiffSparseMatrix description
-     * Refactored: mne_free_sparse (mne_sparse_matop.c)
+     * Default move constructor.
      */
-    ~FiffSparseMatrix();
+    FiffSparseMatrix(FiffSparseMatrix&& mat) = default;
+
+    //=========================================================================================================
+    /**
+     * Default copy-assignment operator.
+     */
+    FiffSparseMatrix& operator=(const FiffSparseMatrix&) = default;
+
+    //=========================================================================================================
+    /**
+     * Default move-assignment operator.
+     */
+    FiffSparseMatrix& operator=(FiffSparseMatrix&&) = default;
+
+    //=========================================================================================================
+    /**
+     * Destroys the FiffSparseMatrix (default — Eigen vectors clean up automatically).
+     */
+    ~FiffSparseMatrix() = default;
 
     //============================= fiff_sparse.c =============================
-    /*
-     * Interpret dimensions and nz from matrix data
-     */
-    static FIFFLIB::fiff_int_t *fiff_get_matrix_sparse_dims(FIFFLIB::FiffTag::SPtr& tag);
 
-    /*
-     * Conversion into the standard representation
+    /**
+     * Interpret dimensions and nz from matrix data.
+     *
+     * @param[in] tag   The tag containing sparse matrix data.
+     *
+     * @return A vector with the matrix dimension info, or empty on error.
      */
-    static FIFFLIB::FiffSparseMatrix* fiff_get_float_sparse_matrix(FIFFLIB::FiffTag::SPtr& tag);
+    static std::vector<int> fiff_get_matrix_sparse_dims(FIFFLIB::FiffTag::SPtr& tag);
+
+    /**
+     * Conversion of tag data into the standard sparse representation.
+     *
+     * @param[in] tag   The tag containing sparse matrix data.
+     *
+     * @return A unique pointer to the newly constructed FiffSparseMatrix, or nullptr on error.
+     */
+    static FiffSparseMatrix::UPtr fiff_get_float_sparse_matrix(FIFFLIB::FiffTag::SPtr& tag);
 
     //============================= mne_sparse_matop.c =============================
 
-    //Refactored: mne_create_sparse_rcs
-    static FIFFLIB::FiffSparseMatrix* create_sparse_rcs( int nrow,       /* Number of rows */
-                                                            int ncol,       /* Number of columns */
-                                                            int *nnz,       /* Number of non-zero elements on each row */
-                                                            int **colindex, /* Column indices of non-zero elements on each row */
-                                                            float **vals);
+    /**
+     * Create a sparse RCS matrix from row-based data.
+     *
+     * @param[in] nrow      Number of rows.
+     * @param[in] ncol      Number of columns.
+     * @param[in] nnz       Number of non-zero elements on each row.
+     * @param[in] colindex  Column indices of non-zero elements on each row.
+     * @param[in] vals      Values of non-zero elements on each row.
+     *
+     * @return A unique pointer to the newly constructed FiffSparseMatrix, or nullptr on error.
+     */
+    static FiffSparseMatrix::UPtr create_sparse_rcs(int nrow,
+                                                    int ncol,
+                                                    int *nnz,
+                                                    int **colindex,
+                                                    float **vals);
 
-    FIFFLIB::FiffSparseMatrix* mne_add_upper_triangle_rcs();
+    /**
+     * Add the upper triangle to a lower-triangular sparse RCS matrix.
+     *
+     * @return A unique pointer to the newly constructed FiffSparseMatrix with both triangles.
+     */
+    FiffSparseMatrix::UPtr mne_add_upper_triangle_rcs();
+
+    /**
+     * Check whether this sparse matrix is empty (no non-zero elements).
+     *
+     * @return true if the matrix has no data.
+     */
+    inline bool is_empty() const;
 
 public:
     FIFFLIB::fiff_int_t   coding;    /**< coding (storage) type of the sparse matrix. */
     FIFFLIB::fiff_int_t   m;         /**< m rows. */
     FIFFLIB::fiff_int_t   n;         /**< n columns. */
     FIFFLIB::fiff_int_t   nz;        /**< nz nonzeros. */
-    FIFFLIB::fiff_float_t *data;     /**< owns the data. */
-    FIFFLIB::fiff_int_t   *inds;     /**< index list, points into data, no dealloc!. */
-    FIFFLIB::fiff_int_t   *ptrs;     /**< pointer list, points into data, no dealloc!. */
+    Eigen::VectorXf       data;      /**< Non-zero values (nz elements). */
+    Eigen::VectorXi       inds;      /**< Index array (nz elements). */
+    Eigen::VectorXi       ptrs;      /**< Pointer array (m+1 for RCS, n+1 for CCS). */
 
-// ### OLD STRUCT ###
-///** Structure for sparse matrices */
-//typedef struct _fiff_sparse_matrix {
-//    fiff_int_t   coding;    /**< coding (storage) type of the sparse matrix. */
-//    fiff_int_t   m;         /**< m rows. */
-//    fiff_int_t   n;         /**< n columns. */
-//    fiff_int_t   nz;        /**< nz nonzeros. */
-//    fiff_float_t *data;     /**< owns the data. */
-//    fiff_int_t   *inds;     /**< index list, points into data, no dealloc!. */
-//    fiff_int_t   *ptrs;     /**< pointer list, points into data, no dealloc!. */
-//} *fiffSparseMatrix, fiffSparseMatrixRec;
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline bool FiffSparseMatrix::is_empty() const
+{
+    return nz <= 0 || data.size() == 0;
+}
+
 } // NAMESPACE FIFFLIB
 
 #endif // FIFFSPARSEMATRIX_H

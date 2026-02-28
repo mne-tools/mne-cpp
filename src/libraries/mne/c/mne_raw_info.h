@@ -42,7 +42,6 @@
 //=============================================================================================================
 
 #include "../mne_global.h"
-#include <fiff/c/fiff_coord_trans_old.h>
 
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_stream.h>
@@ -58,7 +57,16 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+
+#include <memory>
+
 #include <QList>
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+namespace FIFFLIB { class FiffCoordTrans; }
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -66,10 +74,6 @@
 
 namespace MNELIB
 {
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
 //=============================================================================================================
 /**
@@ -117,9 +121,9 @@ public:
                               float *highpass,       /* Highpass filter freq. */
                               float *lowpass,        /* Lowpass filter setting */
                               QList<FIFFLIB::FiffChInfo>& chp,	 /* Channel descriptions */
-                              FIFFLIB::FiffCoordTransOld* *trans, /* Coordinate transformation
+                              FIFFLIB::FiffCoordTrans& trans,    /* Coordinate transformation
                                                                                   (head <-> device) */
-                              FIFFLIB::fiffTime *start_time);
+                              FIFFLIB::FiffTime* *start_time);
 
     static int mne_load_raw_info(const QString& name,int allow_maxshield,MneRawInfo* *infop);
 
@@ -131,13 +135,13 @@ public:
     int                 coord_frame;    /**< Which coordinate frame are the
                                          * positions defined in?
                                          */
-    FIFFLIB::FiffCoordTransOld* trans; /**< This is the coordinate transformation
+    std::unique_ptr<FIFFLIB::FiffCoordTrans> trans;  /**< This is the coordinate transformation
                                              * FIFF_COORD_HEAD <--> FIFF_COORD_DEVICE
                                              */
     float         sfreq;          /**< Sampling frequency. */
     float         lowpass;        /**< Lowpass filter setting. */
     float         highpass;       /**< Highpass filter setting. */
-    FIFFLIB::fiffTimeRec   start_time;    /**< Starting time of the acquisition
+    FIFFLIB::FiffTime      start_time;    /**< Starting time of the acquisition
                                              * taken from the meas date
                                              * or the meas block id
                                              * whence it may be inaccurate. */

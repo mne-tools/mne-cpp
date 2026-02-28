@@ -43,7 +43,7 @@
 
 #include "mne_types.h"
 
-#include <fiff/c/fiff_coord_trans_old.h>
+#include <fiff/fiff_coord_trans.h>
 
 #include <fiff/fiff_types.h>
 
@@ -138,7 +138,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
                                   int *nmeg_compp,
                                   QList<FIFFLIB::FiffChInfo>& eegp,	 /* EEG channels */
                                   int *neegp,
-                                  FiffCoordTransOld* *meg_head_t,
+                                  FiffCoordTrans *meg_head_t,
                                   fiffId *idp)	 /* The measurement ID */
 /*
       * Read the channel information and split it into three arrays,
@@ -161,7 +161,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
     FiffDirNode::SPtr info;
     FiffTag::SPtr t_pTag;
     FIFFLIB::FiffChInfo   this_ch;
-    FiffCoordTransOld* t = NULL;
+    FiffCoordTrans t;
     fiff_int_t kind, pos;
     int j,k,to_find;
 
@@ -206,9 +206,9 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
 //            t = t_pTag->toCoordTrans();
-            t = FiffCoordTransOld::read_helper( t_pTag );
-            if (t->from != FIFFV_COORD_DEVICE || t->to   != FIFFV_COORD_HEAD)
-                t = NULL;
+            t = FiffCoordTrans::readFromTag( t_pTag );
+            if (t.from != FIFFV_COORD_DEVICE || t.to   != FIFFV_COORD_HEAD)
+                t = FiffCoordTrans();
             break;
 
         case FIFF_CH_INFO : /* Information about one channel */
@@ -230,11 +230,12 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
         qCritical("Some of the channel information was missing.");
         goto bad;
     }
-    if (t == NULL && meg_head_t != NULL) {
+    if (t.isEmpty() && meg_head_t != NULL) {
         /*
      * Try again in a more general fashion
      */
-        if ((t = FiffCoordTransOld::mne_read_meas_transform(name)) == NULL) {
+        t = FiffCoordTrans::readMeasTransform(name);
+        if (t.isEmpty()) {
             qCritical("MEG -> head coordinate transformation not found.");
             goto bad;
         }
@@ -278,7 +279,6 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
     else
         *idp   = id;
     if (meg_head_t == NULL) {
-        FREE_32(t);
     }
     else
         *meg_head_t = t;
@@ -290,7 +290,6 @@ bad : {
         stream->close();
         FREE_32(id);
 //        FREE_32(tag.data);
-        FREE_32(t);
         return FIFF_FAIL;
     }
 }
@@ -339,7 +338,6 @@ FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matri
     int nz;
     int ptr;
     FiffSparseMatrix* sparse = NULL;
-    int size;
 
     if (small < 0) {		/* Automatic scaling */
         float maxval = 0.0;
@@ -363,19 +361,11 @@ FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matri
         }
 
     if (nz <= 0) {
-        printf("No nonzero elements found.");
+        qWarning("No nonzero elements found.");
         return NULL;
     }
-    if (stor_type == FIFFTS_MC_CCS) {
-        size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (ncol+1)*(sizeof(fiff_int_t));
-    }
-    else if (stor_type == FIFFTS_MC_RCS) {
-        size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-                (nrow+1)*(sizeof(fiff_int_t));
-    }
-    else {
-        printf("Unknown sparse matrix storage type: %d",stor_type);
+    if (stor_type != FIFFTS_MC_CCS && stor_type != FIFFTS_MC_RCS) {
+        qWarning("Unknown sparse matrix storage type: %d",stor_type);
         return NULL;
     }
     sparse = new FiffSparseMatrix;
@@ -383,11 +373,11 @@ FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matri
     sparse->m      = nrow;
     sparse->n      = ncol;
     sparse->nz     = nz;
-    sparse->data   = (float *)malloc(size);
-    sparse->inds   = (int *)(sparse->data+nz);
-    sparse->ptrs   = sparse->inds+nz;
+    sparse->data.resize(nz);
+    sparse->inds.resize(nz);
 
     if (stor_type == FIFFTS_MC_RCS) {
+        sparse->ptrs.resize(nrow + 1);
         for (j = 0, nz = 0; j < nrow; j++) {
             ptr = -1;
             for (k = 0; k < ncol; k++)
@@ -405,6 +395,7 @@ FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matri
                 sparse->ptrs[j] = sparse->ptrs[j+1];
     }
     else if (stor_type == FIFFTS_MC_CCS) {
+        sparse->ptrs.resize(ncol + 1);
         for (k = 0, nz = 0; k < ncol; k++) {
             ptr = -1;
             for (j = 0; j < nrow; j++)
@@ -455,7 +446,7 @@ int  mne_sparse_mat_mult2_32(FiffSparseMatrix* mat,     /* The sparse matrix */
         }
     }
     else {
-        printf("mne_sparse_mat_mult2: unknown sparse matrix storage type: %d",mat->coding);
+        qWarning("mne_sparse_mat_mult2: unknown sparse matrix storage type: %d",mat->coding);
         return -1;
     }
     return 0;
@@ -517,7 +508,7 @@ int  mne_sparse_vec_mult2_32(FiffSparseMatrix* mat,     /* The sparse matrix */
         return 0;
     }
     else {
-        printf("mne_sparse_vec_mult2: unknown sparse matrix storage type: %d",mat->coding);
+        qWarning("mne_sparse_vec_mult2: unknown sparse matrix storage type: %d",mat->coding);
         return -1;
     }
 }

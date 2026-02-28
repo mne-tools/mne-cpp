@@ -46,6 +46,7 @@
 #include <mne/c/mne_named_matrix.h>
 
 #include <fiff/fiff_types.h>
+#include <fiff/fiff_coord_trans.h>
 
 #include <time.h>
 
@@ -448,7 +449,7 @@ static char *get_meas_date (    FiffStream::SPtr& stream,const FiffDirNode::SPtr
         if (kind == FIFF_MEAS_DATE)
         {
             if (stream->read_tag(t_pTag,pos)) {
-                fiffTime meas_date = (fiffTime)t_pTag->data();
+                FiffTime* meas_date = (FiffTime*)t_pTag->data();
                 time_t   time = meas_date->secs;
                 struct   tm *ltime;
 
@@ -465,13 +466,13 @@ static char *get_meas_date (    FiffStream::SPtr& stream,const FiffDirNode::SPtr
 static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are reading */
                             const FiffDirNode::SPtr& node,  /* The directory node containing our data */
                             fiffId *id,                     /* The block id from the nearest FIFFB_MEAS parent */
-                            fiffTime *meas_date,            /* Measurement date */
+                            FiffTime* *meas_date,            /* Measurement date */
                             int *nchan,                     /* Number of channels */
                             float *sfreq,                   /* Sampling frequency */
                             float *highpass,                /* Highpass filter setting */
                             float *lowpass,                 /* Lowpass filter setting */
                             QList<FIFFLIB::FiffChInfo>& chp,                /* Channel descriptions */
-                            FiffCoordTransOld* *trans)          /* Coordinate transformation (head <-> device) */
+                            FiffCoordTrans *trans)              /* Coordinate transformation (head <-> device) */
 /*
  * Find channel information from
  * nearest FIFFB_MEAS_INFO parent of
@@ -480,7 +481,7 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
 {
     QList<FIFFLIB::FiffChInfo> ch;
     FIFFLIB::FiffChInfo this_ch;
-    FiffCoordTransOld* t = Q_NULLPTR;
+    FiffCoordTrans t;
     int j,k;
     int to_find = 4;
     QList<FiffDirNode::SPtr> hpi;
@@ -489,7 +490,7 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
     fiff_int_t kind, pos;
     FiffTag::SPtr t_pTag;
 
-     *trans   = NULL;
+     *trans   = FiffCoordTrans();
      *id      = NULL;
     /*
      * Find desired parents
@@ -546,8 +547,8 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
                 goto bad;
             if (*meas_date)
                 FREE_9(*meas_date);
-            *meas_date = MALLOC_9(1,fiffTimeRec);
-            **meas_date = *(fiffTime)t_pTag->data();
+            *meas_date = MALLOC_9(1,FiffTime);
+            **meas_date = *(FiffTime*)t_pTag->data();
             break;
 
         case FIFF_LOWPASS :
@@ -582,13 +583,11 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
         case FIFF_COORD_TRANS :
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
-            if(t)
-                delete t;
-            t = FiffCoordTransOld::read_helper( t_pTag );
+            t = FiffCoordTrans::readFromTag( t_pTag );
             /*
             * Require this particular transform!
             */
-            if (t->from == FIFFV_COORD_DEVICE && t->to == FIFFV_COORD_HEAD) {
+            if (t.from == FIFFV_COORD_DEVICE && t.to == FIFFV_COORD_HEAD) {
                 *trans = t;
                 break;
             }
@@ -601,17 +600,17 @@ static int get_meas_info (  FiffStream::SPtr& stream,       /* The stream we are
 
     hpi = meas_info->dir_tree_find(FIFFB_HPI_RESULT);
 
-    if (hpi.size() > 0 && *trans == NULL)
+    if (hpi.size() > 0 && trans->isEmpty())
         for (k = 0; k < hpi[0]->nent(); k++)
             if (hpi[0]->dir[k]->kind ==  FIFF_COORD_TRANS) {
                 if (!stream->read_tag(t_pTag,hpi[0]->dir[k]->pos))
                     goto bad;
-                t = FiffCoordTransOld::read_helper( t_pTag );
+                t = FiffCoordTrans::readFromTag( t_pTag );
 
                 /*
                 * Require this particular transform!
                 */
-                if (t->from == FIFFV_COORD_DEVICE && t->to == FIFFV_COORD_HEAD) {
+                if (t.from == FIFFV_COORD_DEVICE && t.to == FIFFV_COORD_HEAD) {
                     *trans = t;
                     break;
                 }
@@ -1120,9 +1119,9 @@ int mne_read_evoked(const QString& name,        /* Name of the file */
                     float      *lowpassp,       /* Lowpass frequency */
                     int        *navep,          /* How many averages */
                     int        *aspect_kindp,   /* What kind of an evoked data */
-                    FiffCoordTransOld* *transp,     /* Coordinate transformation */
+                    FiffCoordTrans *transp,         /* Coordinate transformation */
                     fiffId         *idp,        /* Measurement id */
-                    fiffTime       *meas_datep) /* Measurement date */
+                    FiffTime*      *meas_datep) /* Measurement date */
 /*
  * Load evoked-response data from a fif file
  */
@@ -1140,9 +1139,9 @@ int mne_read_evoked(const QString& name,        /* Name of the file */
     int          *artefs = NULL;        /* Artefact limits */
     int           nartef = 0;           /* How many */
     float       **epochs = NULL;        /* The averaged epochs */
-    FiffCoordTransOld* trans = NULL;        /* The coordinate transformation */
+    FiffCoordTrans trans;                /* The coordinate transformation */
     fiffId            id = NULL;        /* Measurement id */
-    fiffTime          meas_date = NULL; /* Measurement date */
+    FiffTime*         meas_date = NULL; /* Measurement date */
     int             nave = 1;           /* Number of averaged responses */
     float           tmin = 0;           /* Time scale minimum */
     float           lowpass;            /* Lowpass filter frequency */
@@ -1253,7 +1252,7 @@ int mne_read_evoked(const QString& name,        /* Name of the file */
         *lowpassp = lowpass;
     if (transp) {
         *transp = trans;
-        trans = NULL;
+        trans = FiffCoordTrans();
     }
     if (navep)
         *navep = nave;
@@ -1274,7 +1273,6 @@ int mne_read_evoked(const QString& name,        /* Name of the file */
 out : {
         comments.clear();
         FREE_9(artefs);
-        FREE_9(trans);
         FREE_9(id);
         FREE_9(meas_date);
         FREE_CMATRIX_9(epochs);
@@ -1310,7 +1308,7 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
                                     int            *nmeg_compp,
                                     QList<FiffChInfo>& eegp,	 /* EEG channels */
                                     int            *neegp,
-                                    FiffCoordTransOld* *meg_head_t,
+                                    FiffCoordTrans *meg_head_t,
                                     fiffId         *idp)	 /* The measurement ID */
 /*
       * Read the channel information and split it into three arrays,
@@ -1333,7 +1331,7 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
     FiffDirNode::SPtr info;
     FiffTag::SPtr t_pTag;
     FiffChInfo this_ch;
-    FiffCoordTransOld* t = NULL;
+    FiffCoordTrans t;
     fiff_int_t kind, pos;
     int j,k,to_find;
 
@@ -1378,9 +1376,9 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
             //            t = t_pTag->toCoordTrans();
-            t = FiffCoordTransOld::read_helper( t_pTag );
-            if (t->from != FIFFV_COORD_DEVICE || t->to   != FIFFV_COORD_HEAD)
-                t = NULL;
+            t = FiffCoordTrans::readFromTag( t_pTag );
+            if (t.from != FIFFV_COORD_DEVICE || t.to   != FIFFV_COORD_HEAD)
+                t = FiffCoordTrans();
             break;
 
         case FIFF_CH_INFO : /* Information about one channel */
@@ -1402,11 +1400,12 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
         qCritical("Some of the channel information was missing.");
         goto bad;
     }
-    if (t == NULL && meg_head_t != NULL) {
+    if (t.isEmpty() && meg_head_t != NULL) {
         /*
      * Try again in a more general fashion
      */
-        if ((t = FiffCoordTransOld::mne_read_meas_transform(name)) == NULL) {
+        t = FiffCoordTrans::readMeasTransform(name);
+        if (t.isEmpty()) {
             qCritical("MEG -> head coordinate transformation not found.");
             goto bad;
         }
@@ -1449,7 +1448,7 @@ int mne_read_meg_comp_eeg_ch_info_9(const QString& name,
     else
         *idp   = id;
     if (meg_head_t == NULL) {
-        FREE_9(t);
+        ; // value type, no cleanup needed
     }
     else
         *meg_head_t = t;
@@ -1461,7 +1460,6 @@ bad : {
         stream->close();
         FREE_9(id);
         //        FREE(tag.data);
-        FREE_9(t);
         return FIFF_FAIL;
     }
 }
@@ -1526,8 +1524,6 @@ MneMeasData::MneMeasData()
     ,nchan     (0)
     ,op        (NULL)
     ,fwd       (NULL)
-    ,meg_head_t(NULL)
-    ,mri_head_t(NULL)
     ,proj      (NULL)
     ,comp      (NULL)
     ,raw       (NULL)
@@ -1548,10 +1544,6 @@ MneMeasData::~MneMeasData()
 
     filename.clear();
     FREE_9(meas_id);
-    if(meg_head_t)
-        delete meg_head_t;
-    if(mri_head_t)
-        delete mri_head_t;
     if(proj)
         delete proj;
     if(comp)
@@ -1654,8 +1646,8 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
     int            nave;
     int            aspect_kind;
     fiffId         id = NULL;
-    FiffCoordTransOld* t = NULL;
-    fiffTime       meas_date = NULL;
+    FiffCoordTrans t;
+    FiffTime*      meas_date = NULL;
     QString        stim14_name;
     /*
      * Desired channels
@@ -1801,15 +1793,13 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
         new_data->nchan     = nchan;
         new_data->sfreq     = sfreq;
 
-        if (t) {
-            new_data->meg_head_t    = t;
-            t = NULL;
+        if (!t.isEmpty()) {
+            new_data->meg_head_t    = std::make_unique<FiffCoordTrans>(t);
+            t = FiffCoordTrans();
             printf("\tUsing MEG <-> head transform from the present data set\n");
         }
-        if (op != NULL && op->mri_head_t != NULL) { /* Copy if available */
-            if (!new_data->mri_head_t)
-                new_data->mri_head_t = new FiffCoordTransOld;
-            *(new_data->mri_head_t) = *(op->mri_head_t);
+        if (op != NULL && op->mri_head_t && !op->mri_head_t->isEmpty()) { /* Copy if available */
+            new_data->mri_head_t = std::make_unique<FiffCoordTrans>(*op->mri_head_t);
             printf("\tPicked MRI <-> head transform from the inverse operator\n");
         }
         /*
@@ -1911,7 +1901,6 @@ out : {
         FREE_9(sel);
         comment.clear();
         FREE_CMATRIX_9(data);
-        FREE_9(t);
         FREE_9(id);
         if (res == NULL && !add_to)
             delete new_data;

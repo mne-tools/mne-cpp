@@ -117,8 +117,8 @@ bool MriCorFifIO::write(const QString& fileName,
     // Write identity HEAD -> MRI transform
     // Ported from write_mri_set.c: identity rotation, zero translation
     Matrix3f identityRot = Matrix3f::Identity();
-    VectorXf zeroMove = VectorXf::Zero(3);
-    FiffCoordTrans headMriT = FiffCoordTrans::make(
+    Vector3f zeroMove = Vector3f::Zero();
+    FiffCoordTrans headMriT(
         FIFFV_COORD_HEAD, FIFFV_COORD_MRI, identityRot, zeroMove);
     stream->write_coord_trans(headMriT);
 

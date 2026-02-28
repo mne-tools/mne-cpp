@@ -44,7 +44,7 @@
 #include "fwd_global.h"
 #include "fwd_coil_set.h"
 
-#include <fiff/c/fiff_coord_trans_old.h>
+#include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_dir_node.h>
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_named_matrix.h>
@@ -178,7 +178,7 @@ public:
 
     static int fwd_bem_load_solution(const QString& name, int bem_method, FwdBemModel* m);
 
-    static int fwd_bem_set_head_mri_t(FwdBemModel* m, FIFFLIB::FiffCoordTransOld* t);
+    static int fwd_bem_set_head_mri_t(FwdBemModel* m, const FIFFLIB::FiffCoordTrans& t);
 
     //============================= dipole_fit_guesses.c =============================
 
@@ -514,7 +514,7 @@ public:
     float      *v0;             /* Space for the infinite-medium potentials */
     int        nsol;            /* Size of the solution matrix */
 
-    FIFFLIB::FiffCoordTransOld* head_mri_t;  /* Coordinate transformation from head to MRI coordinates */
+    FIFFLIB::FiffCoordTrans head_mri_t;  /* Coordinate transformation from head to MRI coordinates */
 
     float      ip_approach_limit;   /* Controls whether we need to use the isolated problem approach */
     bool       use_ip_approach;     /* Do we need it */

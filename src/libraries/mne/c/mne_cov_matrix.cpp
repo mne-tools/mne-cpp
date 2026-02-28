@@ -45,7 +45,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/Eigenvalues>
-#include <fiff/c/fiff_sparse_matrix.h>
+#include <fiff/fiff_sparse_matrix.h>
 
 //=============================================================================================================
 // USED NAMESPACES

@@ -43,8 +43,6 @@
 
 #include "../mne_global.h"
 
-#include <fiff/c/fiff_coord_trans_old.h>
-
 #include "mne_source_space_old.h"
 #include "mne_surface_old.h"
 
@@ -59,6 +57,10 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+
+#include <memory>
+
+namespace FIFFLIB { class FiffCoordTrans; }
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -95,7 +97,7 @@ public:
 
 public:
     MneSourceSpaceOld* s;           /* The source space to process */
-    FIFFLIB::FiffCoordTransOld* mri_head_t;  /* Coordinate transformation */
+    std::unique_ptr<FIFFLIB::FiffCoordTrans> mri_head_t;  /* Coordinate transformation */
     MneSurfaceOld*   surf;          /* The inner skull surface */
     float          limit;           /* Distance limit */
     FILE           *filtered;       /* Log omitted point locations here */

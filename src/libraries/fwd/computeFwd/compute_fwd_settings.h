@@ -44,7 +44,7 @@
 #include "../fwd_global.h"
 #include <fiff/fiff_constants.h>
 #include <fiff/fiff_info.h>
-#include <fiff/c/fiff_coord_trans_old.h>
+#include <fiff/fiff_coord_trans.h>
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -141,7 +141,7 @@ public:
     bool use_threads;        	/**< Parallelize?. */
 
     QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo;    /**< The FiffInfo file from the measurement.*/
-    FIFFLIB::FiffCoordTransOld* meg_head_t;         /**< Pointer to meg <-> head transformation.*/
+    FIFFLIB::FiffCoordTrans meg_head_t;         /**< The meg <-> head transformation.*/
 
 private:
     void initMembers();

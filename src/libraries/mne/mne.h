@@ -316,19 +316,20 @@ public:
         return orig.prepare_inverse_operator(nave, lambda2, dSPM, sLORETA);
     }
 
-    inline static bool read_events(QString t_sEventName,
-                            QString t_fileRawName,
+    inline static bool read_events(const QString &t_sEventName,
+                            const QString &t_fileRawName,
                             Eigen::MatrixXi& events)
     {
-        return FIFFLIB::FiffEvents::read(t_sEventName, t_fileRawName, events);
+        FIFFLIB::FiffEvents fiffEvents;
+        if (!FIFFLIB::FiffEvents::read(t_sEventName, t_fileRawName, fiffEvents))
+            return false;
+        events = fiffEvents.events;
+        return true;
     }
 
-// ToDo Eventlist Class?? -> Done: FiffEvents
     //=========================================================================================================
     /**
      * mne_read_events
-     *
-     * ### MNE toolbox root function ###
      *
      * Read an event list from a fif file
      *
@@ -340,7 +341,11 @@ public:
     inline static bool read_events_from_fif(QIODevice &p_IODevice,
                                      Eigen::MatrixXi& eventlist)
     {
-        return FIFFLIB::FiffEvents::read_from_fif(p_IODevice, eventlist);
+        FIFFLIB::FiffEvents fiffEvents;
+        if (!FIFFLIB::FiffEvents::read_from_fif(p_IODevice, fiffEvents))
+            return false;
+        eventlist = fiffEvents.events;
+        return true;
     }
 
     //=========================================================================================================
@@ -357,14 +362,16 @@ public:
     inline static bool read_events_from_ascii(QIODevice &p_IODevice,
                                        Eigen::MatrixXi& eventlist)
     {
-        return FIFFLIB::FiffEvents::read_from_ascii(p_IODevice, eventlist);
+        FIFFLIB::FiffEvents fiffEvents;
+        if (!FIFFLIB::FiffEvents::read_from_ascii(p_IODevice, fiffEvents))
+            return false;
+        eventlist = fiffEvents.events;
+        return true;
     }
 
     //=========================================================================================================
     /**
      * write_events_to_fif
-     *
-     * ### MNE toolbox root function ###
      *
      * Write an event list to a FIFF file.
      *
@@ -376,14 +383,14 @@ public:
     inline static bool write_events_to_fif(QIODevice &p_IODevice,
                                     const Eigen::MatrixXi& eventlist)
     {
-        return FIFFLIB::FiffEvents::write_to_fif(p_IODevice, eventlist);
+        FIFFLIB::FiffEvents fiffEvents;
+        fiffEvents.events = eventlist;
+        return fiffEvents.write_to_fif(p_IODevice);
     }
 
     //=========================================================================================================
     /**
      * write_events_to_ascii
-     *
-     * ### MNE toolbox root function ###
      *
      * Write an event list to a text file (MNE-C compatible format).
      *
@@ -397,7 +404,9 @@ public:
                                       const Eigen::MatrixXi& eventlist,
                                       float sfreq = 0.0f)
     {
-        return FIFFLIB::FiffEvents::write_to_ascii(p_IODevice, eventlist, sfreq);
+        FIFFLIB::FiffEvents fiffEvents;
+        fiffEvents.events = eventlist;
+        return fiffEvents.write_to_ascii(p_IODevice, sfreq);
     }
 
     //=========================================================================================================

@@ -40,6 +40,8 @@
 
 #include "filter_thread_arg.h"
 
+#include <fiff/fiff_coord_trans.h>
+
 #ifndef FAIL
 #define FAIL -1
 #endif
@@ -61,7 +63,6 @@ using namespace MNELIB;
 
 FilterThreadArg::FilterThreadArg()
 :s          (NULL)
-,mri_head_t (NULL)
 ,surf       (NULL)
 ,limit      (-1)
 ,filtered   (NULL)

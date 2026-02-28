@@ -57,13 +57,12 @@
 #define NOISE_NORMALIZED(e) ((e) == ESTIMATE_dSPM || (e) == ESTIMATE_sLORETA)
 
 #include <fiff/fiff_types.h>
-#include <fiff/c/fiff_coord_trans_old.h>
 #include <fwd/fwd_coil_set.h>
 #include "../c/mne_meas_data.h"
 #include <mne/c/mne_surface_or_volume.h>
 #include <mne/c/mne_cov_matrix.h>
-#include <fiff/c/fiff_digitizer_data.h>
-#include <fiff/c/fiff_coord_trans_set.h>
+#include <fiff/fiff_digitizer_data.h>
+#include <fiff/fiff_coord_trans_set.h>
 #include <mne/c/mne_msh_color_scale_def.h>
 #include <mne/c/mne_surface_patch.h>
 
@@ -510,7 +509,7 @@ typedef struct {
   float quater[4];		/* The unit quaternion */
   float move[3];		/* Translation */
   float good;			/* Geometric mean of the goodness of fits */
-  FIFFLIB::FiffCoordTransOld *t;		/* The corresponding fiff coordinate transformation */
+  FIFFLIB::FiffCoordTrans *t;		/* The corresponding fiff coordinate transformation */
 } *contHpiData,contHpiDataRec;
 
 /**

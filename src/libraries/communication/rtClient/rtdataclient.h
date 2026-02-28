@@ -46,7 +46,7 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_tag.h>
-#include <fiff/c/fiff_digitizer_data.h>
+#include <fiff/fiff_digitizer_data.h>
 
 #include <utility>
 

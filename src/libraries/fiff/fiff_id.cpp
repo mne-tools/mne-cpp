@@ -148,8 +148,8 @@ bool FiffId::get_machid(int *fixed_id)
             // We take the first address as machine identifier
             QStringList hexPresentation = possibleHardwareAdresses[0].split(":");
             if(hexPresentation.size() == 6) {
-                fixed_id[0] = QString(hexPresentation[0] + hexPresentation[1] + hexPresentation[2]).toInt(NULL,16);
-                fixed_id[1] = QString(hexPresentation[3] + hexPresentation[4] + hexPresentation[5]).toInt(NULL,16);
+                fixed_id[0] = QString(hexPresentation[0] + hexPresentation[1] + hexPresentation[2]).toInt(nullptr,16);
+                fixed_id[1] = QString(hexPresentation[3] + hexPresentation[4] + hexPresentation[5]).toInt(nullptr,16);
                 return true;
             }
         }

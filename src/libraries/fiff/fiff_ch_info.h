@@ -67,7 +67,7 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * Channel Info descriptor replaces _fiffChInfoRec struct.
+ * Channel info descriptor.
  *
  * @brief Channel info descriptor.
  */
@@ -116,36 +116,21 @@ public:
     friend bool operator== (const FiffChInfo &a, const FiffChInfo &b);
 
 public:
-    fiff_int_t    scanNo;       /**< Scanning order number 1*/
-    fiff_int_t    logNo;        /**< Logical channel # 1*/
-    fiff_int_t    kind;         /**< Kind of channel 1*/
-    fiff_float_t  range;        /**< Voltmeter range (-1 = auto ranging) 1*/
-    fiff_float_t  cal;          /**< Calibration from volts to units used 1*/
+    fiff_int_t    scanNo;       /**< Scanning order number. */
+    fiff_int_t    logNo;        /**< Logical channel #. */
+    fiff_int_t    kind;         /**< Kind of channel. */
+    fiff_float_t  range;        /**< Voltmeter range (-1 = auto ranging). */
+    fiff_float_t  cal;          /**< Calibration from volts to units used. */
     FiffChPos     chpos;        /**< Channel location. */
-    fiff_int_t    unit;         /**< Unit of measurement 1*/
-    fiff_int_t    unit_mul;     /**< Unit multiplier exponent 1*/
-    QString       ch_name;      /**< Descriptive name for the channel 16*/
+    fiff_int_t    unit;         /**< Unit of measurement. */
+    fiff_int_t    unit_mul;     /**< Unit multiplier exponent. */
+    QString       ch_name;      /**< Descriptive name for the channel. */
 
-    //Convinience members - MATLAB -
+    //Convenience members - MATLAB -
     Eigen::Matrix<float,4,4, Eigen::DontAlign>    coil_trans;     /**< Coil coordinate system transformation. */
     Eigen::Matrix<float,3,2, Eigen::DontAlign>    eeg_loc;        /**< Channel location. */
     fiff_int_t    coord_frame;                      /**< Coordinate Frame. */
 
-// ### OLD STRUCT ###
-//typedef struct _fiffChInfoRec {
-//    fiff_int_t    scanNo;       /**< Scanning order number. */
-//    fiff_int_t    logNo;        /**< Logical channel #. */
-//    fiff_int_t    kind;         /**< Kind of channel. */
-//    fiff_float_t  range;        /**< Voltmeter range (-1 = auto ranging). */
-//    fiff_float_t  cal;          /**< Calibration from volts to units used. */
-//    fiff_ch_pos_t chpos;        /**< Channel location. */
-//    fiff_int_t    unit;         /**< Unit of measurement. */
-//    fiff_int_t    unit_mul;     /**< Unit multiplier exponent. */
-//    fiff_char_t   ch_name[16];  /**< Descriptive name for the channel. */
-//} fiffChInfoRec,*fiffChInfo;    /**< Description of one channel. */
-
-// /** Alias for fiffChInfoRec *
-// typedef fiffChInfoRec fiff_ch_info_t;
 };
 
 //=============================================================================================================
@@ -154,7 +139,10 @@ public:
 
 inline qint32 FiffChInfo::storageSize()
 {
-    return 96;
+    // On-disk layout: scanNo, logNo, kind, range, cal, chpos, unit, unit_mul, ch_name[16]
+    // (C++ class uses QString but on-disk stores fixed 16-char name)
+    return 3 * sizeof(fiff_int_t) + 2 * sizeof(fiff_float_t)
+         + FiffChPos::storageSize() + 2 * sizeof(fiff_int_t) + 16;
 }
 
 //=============================================================================================================

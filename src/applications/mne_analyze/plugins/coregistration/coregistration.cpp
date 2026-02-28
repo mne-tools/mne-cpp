@@ -474,7 +474,7 @@ void CoRegistration::onFitFiducials()
     // make transform
     fiff_int_t iFrom = FIFFV_COORD_HEAD;
     fiff_int_t iTo = FIFFV_COORD_MRI;
-    m_transHeadMri = FiffCoordTrans::make(iFrom, iTo, matTrans);
+    m_transHeadMri = FiffCoordTrans(iFrom, iTo, matTrans);
 
     // update GUI
     Vector3f vecRot;

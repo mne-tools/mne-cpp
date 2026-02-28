@@ -62,6 +62,10 @@
 
 #include <QSharedPointer>
 
+#include <memory>
+
+namespace FIFFLIB { class FiffCoordTrans; }
+
 // ToDo move to cpp
 #define COLUMN_NORM_NONE 0	    /* No column normalization requested */
 #define COLUMN_NORM_COMP 1	    /* Componentwise normalization */
@@ -194,8 +198,8 @@ public:
                                      DipoleForward* old);
 
 public:
-      FIFFLIB::FiffCoordTransOld*    mri_head_t; /**< MRI <-> head coordinate transformation. */
-      FIFFLIB::FiffCoordTransOld*    meg_head_t; /**< MEG <-> head coordinate transformation. */
+      std::unique_ptr<FIFFLIB::FiffCoordTrans>    mri_head_t; /**< MRI <-> head coordinate transformation. */
+      std::unique_ptr<FIFFLIB::FiffCoordTrans>    meg_head_t; /**< MEG <-> head coordinate transformation. */
       int               coord_frame;        /**< Common coordinate frame. */
       QList<FIFFLIB::FiffChInfo>        chs;       /**< Channels. */
       int               nmeg;               /**< How many MEG. */

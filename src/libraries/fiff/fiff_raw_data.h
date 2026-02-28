@@ -104,6 +104,13 @@ public:
      */
     FiffRawData(QIODevice &p_IODevice);
 
+    //=========================================================================================================
+    /**
+     * Constructs fiff raw data, by reading from a IO device with specified endianness.
+     *
+     * @param[in] p_IODevice       IO device to read the raw data from.
+     * @param[in] b_littleEndian   If true, read data as little-endian.
+     */
     FiffRawData(QIODevice &p_IODevice, bool b_littleEndian);
 
     //=========================================================================================================
@@ -131,8 +138,6 @@ public:
 
     //=========================================================================================================
     /**
-     * ### MNE toolbox root function ###: Definition of the fiff_read_raw_segment function
-     *
      * Read a specific raw data segment
      *
      * @param[out] data      returns the data matrix (channels x samples).
@@ -152,8 +157,6 @@ public:
 
     //=========================================================================================================
     /**
-     * ### MNE toolbox root function ###: Definition of the fiff_read_raw_segment function
-     *
      * Read a specific raw data segment
      *
      * @param[out] data      returns the data matrix (channels x samples).
@@ -175,8 +178,6 @@ public:
 
     //=========================================================================================================
     /**
-     * ### MNE toolbox root function ###: Definition of the fiff_read_raw_segment function
-     *
      * Read a specific raw data segment
      *
      * @param[out] data      returns the data matrix (channels x samples).
@@ -215,10 +216,10 @@ public:
 public:
     FiffStream::SPtr file;      /**< replaces fid. */
     FiffInfo info;              /**< Fiff measurement information. */
-    fiff_int_t first_samp;      /**< Do we have a skip ToDo... */
-    fiff_int_t last_samp;       /**< Do we have a skip ToDo... */
-    Eigen::RowVectorXd cals;    /**< Calibration values. ToDo: Check if RowVectorXd is enough. */
-    QList<FiffRawDir> rawdir;   /**< Special fiff diretory entry for raw data. */
+    fiff_int_t first_samp;      /**< First sample number. */
+    fiff_int_t last_samp;       /**< Last sample number. */
+    Eigen::RowVectorXd cals;    /**< Calibration values. */
+    QList<FiffRawDir> rawdir;   /**< Special fiff directory entry for raw data. */
     Eigen::MatrixXd proj;       /**< SSP operator to apply to the data. */
     FiffCtfComp comp;           /**< Compensator. */
 

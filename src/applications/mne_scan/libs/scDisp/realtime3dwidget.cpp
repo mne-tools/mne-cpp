@@ -57,7 +57,7 @@
 #include <disp/viewers/control3dview.h>
 
 #include <fiff/fiff_ch_info.h>
-#include <fiff/c/fiff_digitizer_data.h>
+#include <fiff/fiff_digitizer_data.h>
 
 #include <mne/c/mne_msh_display_surface_set.h>
 #include <mne/c/mne_surface_or_volume.h>
@@ -315,12 +315,12 @@ QMatrix4x4 RealTime3DWidget::calculateInverseMatrix(const QSharedPointer<FIFFLIB
     for(int r = 0; r < 3; ++r) {
         for(int c = 0; c < 3; ++c) {
             // also apply scaling factor
-            invMat(r,c) = pDigData->head_mri_t_adj->invrot(r,c) * scale;
+            invMat(r,c) = pDigData->head_mri_t_adj->invrot()(r,c) * scale;
         }
     }
-    invMat(0,3) = pDigData->head_mri_t_adj->invmove(0);
-    invMat(1,3) = pDigData->head_mri_t_adj->invmove(1);
-    invMat(2,3) = pDigData->head_mri_t_adj->invmove(2);
+    invMat(0,3) = pDigData->head_mri_t_adj->invmove()(0);
+    invMat(1,3) = pDigData->head_mri_t_adj->invmove()(1);
+    invMat(2,3) = pDigData->head_mri_t_adj->invmove()(2);
 
     return invMat;
 }

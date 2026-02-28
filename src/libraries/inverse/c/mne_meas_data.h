@@ -58,11 +58,16 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+
+#include <memory>
+
 #include <QDebug>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+namespace FIFFLIB { class FiffCoordTrans; }
 
 namespace MNELIB
 {
@@ -139,10 +144,10 @@ public:
 public:
     QString                 filename;  /* The source file name */
     FIFFLIB::fiffId         meas_id;    /* The id from the measurement file */
-    FIFFLIB::fiffTimeRec    meas_date;  /* The measurement date from the file */
+    FIFFLIB::FiffTime       meas_date;  /* The measurement date from the file */
     QList<FIFFLIB::FiffChInfo>     chs;        /* The channel information */
-    FIFFLIB::FiffCoordTransOld* meg_head_t; /* MEG device <-> head coordinate transformation */
-    FIFFLIB::FiffCoordTransOld* mri_head_t; /* MRI device <-> head coordinate transformation (duplicated from the inverse operator or loaded separately) */
+    std::unique_ptr<FIFFLIB::FiffCoordTrans> meg_head_t; /* MEG device <-> head coordinate transformation */
+    std::unique_ptr<FIFFLIB::FiffCoordTrans> mri_head_t; /* MRI device <-> head coordinate transformation (duplicated from the inverse operator or loaded separately) */
     float                   sfreq;      /* Sampling frequency */
     int                     nchan;      /* Number of channels */
     float                   highpass;   /* Highpass filter setting */

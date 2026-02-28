@@ -3,7 +3,7 @@
  * @file     fifffilesharer.h
  * @author   Gabriel Motta <gabrielbenmotta@gmail.com>
  * @since    0.1.9
- * @date     MArch, 2021
+ * @date     March, 2021
  *
  * @section  LICENSE
  *
@@ -97,9 +97,9 @@ private:
 
     //=========================================================================================================
     /**
-     * Creates specified shared direcotry if it does not exist.
+     * Creates specified shared directory if it does not exist.
      *
-     * @return Retruns whether shared direcotry exists in file structure.
+     * @return Returns whether shared directory exists in file structure.
      */
     bool initSharedDirectory();
 

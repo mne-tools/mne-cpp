@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     fiff_coord_trans_set.cpp
+ * @file     fiff_coord_trans_set.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
@@ -29,45 +29,80 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the FiffCoordTransSet Class.
+ * @brief    FiffCoordTransSet class declaration.
  *
  */
+
+#ifndef FIFFCOORDTRANSSET_H
+#define FIFFCOORDTRANSSET_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "fiff_coord_trans_set.h"
+#include "fiff_global.h"
 
 //=============================================================================================================
-// USED NAMESPACES
+// EIGEN INCLUDES
 //=============================================================================================================
 
-using namespace FIFFLIB;
-
-#define FREE_48(x) if ((char *)(x) != Q_NULLPTR) free((char *)(x))
-
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// QT INCLUDES
 //=============================================================================================================
 
-FiffCoordTransSet::FiffCoordTransSet()
+#include <QSharedPointer>
+
+#include <memory>
+
+//=============================================================================================================
+// DEFINE NAMESPACE FIFFLIB
+//=============================================================================================================
+
+namespace FIFFLIB
 {
-    surf_RAS_RAS_t    = Q_NULLPTR;
-    head_surf_RAS_t   = Q_NULLPTR;
-    RAS_MNI_tal_t     = Q_NULLPTR;
-    MNI_tal_tal_gtz_t = Q_NULLPTR;
-    MNI_tal_tal_ltz_t = Q_NULLPTR;
-}
 
 //=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
-FiffCoordTransSet::~FiffCoordTransSet()
+class FiffCoordTrans;
+
+//=============================================================================================================
+/**
+ * Implements a FIFF coordinate transformation descriptor set.
+ *
+ * @brief Coordinate transformation descriptor set.
+ */
+class FIFFSHARED_EXPORT FiffCoordTransSet
 {
-    FREE_48(surf_RAS_RAS_t);
-    FREE_48(head_surf_RAS_t);
-    FREE_48(RAS_MNI_tal_t);
-    FREE_48(MNI_tal_tal_gtz_t);
-    FREE_48(MNI_tal_tal_ltz_t);
-}
+public:
+    typedef QSharedPointer<FiffCoordTransSet> SPtr;              /**< Shared pointer type for FiffCoordTransSet. */
+    typedef QSharedPointer<const FiffCoordTransSet> ConstSPtr;   /**< Const shared pointer type for FiffCoordTransSet. */
 
+    //=========================================================================================================
+    /**
+     * Constructs the FiffCoordTransSet
+     */
+    FiffCoordTransSet();
+
+    //=========================================================================================================
+    /**
+     * Destroys the FiffCoordTransSet
+     */
+    ~FiffCoordTransSet();
+
+public:
+    std::unique_ptr<FiffCoordTrans>    head_surf_RAS_t;   /**< Transform from MEG head coordinates to surface RAS. */
+    std::unique_ptr<FiffCoordTrans>    surf_RAS_RAS_t;    /**< Transform from surface RAS to RAS (nonzero origin) coordinates. */
+    std::unique_ptr<FiffCoordTrans>    RAS_MNI_tal_t;     /**< Transform from RAS (nonzero origin) to MNI Talairach coordinates. */
+    std::unique_ptr<FiffCoordTrans>    MNI_tal_tal_gtz_t; /**< Transform MNI Talairach to FreeSurfer Talairach coordinates (z > 0). */
+    std::unique_ptr<FiffCoordTrans>    MNI_tal_tal_ltz_t; /**< Transform MNI Talairach to FreeSurfer Talairach coordinates (z < 0). */
+
+};
+
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+} // NAMESPACE FIFFLIB
+
+#endif // FIFFCOORDTRANSSET_H

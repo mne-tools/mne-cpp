@@ -837,7 +837,7 @@ int  mne_sparse_vec_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
         return 0;
     }
     else {
-        printf("mne_sparse_vec_mult2: unknown sparse matrix storage type: %d",mat->coding);
+        qWarning("mne_sparse_vec_mult2: unknown sparse matrix storage type: %d",mat->coding);
         return -1;
     }
 }
@@ -873,7 +873,7 @@ int  mne_sparse_mat_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
         }
     }
     else {
-        printf("mne_sparse_mat_mult2: unknown sparse matrix storage type: %d",mat->coding);
+        qWarning("mne_sparse_mat_mult2: unknown sparse matrix storage type: %d",mat->coding);
         return -1;
     }
     return 0;

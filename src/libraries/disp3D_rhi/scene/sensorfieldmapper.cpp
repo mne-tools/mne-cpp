@@ -45,7 +45,7 @@
 
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_constants.h>
-#include <fiff/c/fiff_coord_trans_old.h>
+#include <fiff/fiff_coord_trans.h>
 #include <fwd/fwd_coil_set.h>
 #include <fs/surface.h>
 #include <disp/plots/helpers/colormap.h>
@@ -66,31 +66,14 @@ namespace
 {
 
 /**
- * Convert a modern FiffCoordTrans to the legacy FiffCoordTransOld format
- * required by FwdCoilSet::create_meg_coils / create_eeg_els.
+ * Apply a coordinate transform to a 3-D point using FiffCoordTrans.
  */
-std::unique_ptr<FiffCoordTransOld> toOldTransform(const FiffCoordTrans &trans)
+Eigen::Vector3f applyTransform(const Eigen::Vector3f &point,
+                               const FiffCoordTrans &trans)
 {
-    if (trans.isEmpty()) return nullptr;
-
-    auto old = std::make_unique<FiffCoordTransOld>();
-    old->from = trans.from;
-    old->to   = trans.to;
-    old->rot  = trans.trans.block<3, 3>(0, 0);
-    old->move = trans.trans.block<3, 1>(0, 3);
-    FiffCoordTransOld::add_inverse(old.get());
-    return old;
-}
-
-/**
- * Apply a legacy coordinate transform to a 3-D point.
- */
-Eigen::Vector3f applyOldTransform(const Eigen::Vector3f &point,
-                                   const FiffCoordTransOld *trans)
-{
-    if (!trans) return point;
+    if (trans.isEmpty()) return point;
     float r[3] = {point.x(), point.y(), point.z()};
-    FiffCoordTransOld::fiff_coord_trans(r, trans, FIFFV_MOVE);
+    FiffCoordTrans::apply_trans(r, trans, FIFFV_MOVE);
     return Eigen::Vector3f(r[0], r[1], r[2]);
 }
 
@@ -298,12 +281,12 @@ bool SensorFieldMapper::buildMapping(
     // make_field_map with origin='auto').
     const Eigen::Vector3f fittedOrigin = fitSphereOrigin(m_evoked.info);
 
-    auto headMriOld = (applySensorTrans && !headToMriTrans.isEmpty())
-        ? toOldTransform(headToMriTrans) : nullptr;
-    auto devHeadOld = (!m_evoked.info.dev_head_t.isEmpty() &&
+    FiffCoordTrans headMri = (applySensorTrans && !headToMriTrans.isEmpty())
+        ? headToMriTrans : FiffCoordTrans();
+    FiffCoordTrans devHead = (!m_evoked.info.dev_head_t.isEmpty() &&
                         m_evoked.info.dev_head_t.from == FIFFV_COORD_DEVICE &&
                         m_evoked.info.dev_head_t.to   == FIFFV_COORD_HEAD)
-        ? toOldTransform(m_evoked.info.dev_head_t) : nullptr;
+        ? m_evoked.info.dev_head_t : FiffCoordTrans();
 
     // ── MEG mapping ────────────────────────────────────────────────────
     if (!m_megSurfaceKey.isEmpty() && surfaces.contains(m_megSurfaceKey) && !megChs.isEmpty()) {
@@ -333,23 +316,23 @@ bool SensorFieldMapper::buildMapping(
                 FWDLIB::FwdCoilSet::read_coil_defs(coilPath));
 
             if (templates) {
-                std::unique_ptr<FiffCoordTransOld> devToTarget;
-                if (m_megOnHead && headMriOld) {
-                    if (devHeadOld) {
-                        devToTarget.reset(FiffCoordTransOld::fiff_combine_transforms(
+                FiffCoordTrans devToTarget;
+                if (m_megOnHead && !headMri.isEmpty()) {
+                    if (!devHead.isEmpty()) {
+                        devToTarget = FiffCoordTrans::combine(
                             FIFFV_COORD_DEVICE, FIFFV_COORD_MRI,
-                            devHeadOld.get(), headMriOld.get()));
+                            devHead, headMri);
                     }
-                } else if (devHeadOld) {
-                    devToTarget = std::make_unique<FiffCoordTransOld>(*devHeadOld);
+                } else if (!devHead.isEmpty()) {
+                    devToTarget = devHead;
                 }
 
                 Eigen::Vector3f origin = fittedOrigin;
-                if (m_megOnHead && headMriOld)
-                    origin = applyOldTransform(origin, headMriOld.get());
+                if (m_megOnHead && !headMri.isEmpty())
+                    origin = applyTransform(origin, headMri);
 
                 std::unique_ptr<FWDLIB::FwdCoilSet> coils(templates->create_meg_coils(
-                    megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, devToTarget.get()));
+                    megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, devToTarget));
 
                 if (coils && coils->ncoil > 0) {
                     m_megMapping = FWDLIB::FwdFieldMap::computeMegMapping(
@@ -368,11 +351,11 @@ bool SensorFieldMapper::buildMapping(
 
         if (verts.rows() > 0) {
             Eigen::Vector3f origin = fittedOrigin;
-            if (headMriOld) origin = applyOldTransform(origin, headMriOld.get());
+            if (!headMri.isEmpty()) origin = applyTransform(origin, headMri);
 
             std::unique_ptr<FWDLIB::FwdCoilSet> eegCoils(
                 FWDLIB::FwdCoilSet::create_eeg_els(
-                    eegChs, eegChs.size(), headMriOld.get()));
+                    eegChs, eegChs.size(), headMri));
 
             if (eegCoils && eegCoils->ncoil > 0) {
                 m_eegMapping = FWDLIB::FwdFieldMap::computeEegMapping(

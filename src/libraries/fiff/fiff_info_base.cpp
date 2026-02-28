@@ -224,7 +224,7 @@ RowVectorXi FiffInfoBase::pick_channels(const QStringList& ch_names, const QStri
 FiffInfoBase FiffInfoBase::pick_info(const RowVectorXi* sel) const
 {
     FiffInfoBase res = *this;//new FiffInfo(this);
-    if (sel == NULL)
+    if (sel == nullptr)
         return res;
 
     //ToDo when pointer List do deletion

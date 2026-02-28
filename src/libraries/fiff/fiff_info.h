@@ -117,8 +117,6 @@ public:
     /**
      * mne_make_compensator
      *
-     * ### MNE toolbox root function ### Definition of the mne_make_compensator function
-     *
      * Create a compensation matrix to bring the data from one compensation state to another
      *
      * @param[in] from               compensation in the input data.
@@ -134,8 +132,6 @@ public:
     /**
      * mne_get_current_comp
      *
-     * ### MNE toolbox root function ### Definition of the mne_get_current_comp function
-     *
      * Get the current compensation in effect in the data
      *
      * @return the current compensation.
@@ -145,8 +141,6 @@ public:
     //=========================================================================================================
     /**
      * mne_make_projector_info
-     *
-     * ### MNE toolbox root function ###  Definition of the mne_make_projector_info function
      *
      * Make a SSP operator using the meas info
      *
@@ -160,8 +154,6 @@ public:
     /**
      * mne_make_projector_info
      *
-     * ### MNE toolbox root function ###  Definition of the mne_make_projector_info function
-     *
      * Make a SSP operator using the meas info
      *
      * @param[out] proj      The projection operator to apply to the data.
@@ -174,8 +166,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_pick_info
-     *
-     * ### MNE toolbox root function ###
      *
      * Pick desired channels from measurement info
      *
@@ -196,8 +186,6 @@ public:
     //=========================================================================================================
     /**
      * mne_set_current_comp
-     *
-     * ### MNE toolbox root function ### Definition of the mne_set_current_comp function
      *
      * Consider taking the member function of set_current_comp(fiff_int_t value),
      * when compensation should be applied to the channels of FiffInfo
@@ -250,7 +238,7 @@ private:
 
 public: //Public because it's a mne struct
     FiffId file_id;                 /**< File ID. */
-    fiff_int_t  meas_date[2];       /**< Measurement date. TODO: use fiffTime instead to be MNE-C consistent*/
+    fiff_int_t  meas_date[2];       /**< Measurement date. TODO: use FiffTime instead to be MNE-C consistent*/
     float sfreq;                    /**< Sample frequency. */
     float linefreq;                 /**< Power line frequency. */
     float highpass;                 /**< Highpass frequency. */
@@ -262,13 +250,13 @@ public: //Public because it's a mne struct
     QString description;            /**< (Textual) Description of an object.*/
     QString utc_offset;             /**< UTC offset of related meas_date (sHH:MM).*/
     fiff_int_t gantry_angle;        /**< Tilt angle of the dewar in degrees.*/
-    FiffCoordTrans dev_ctf_t;       /**< Coordinate transformation ToDo... */
+    FiffCoordTrans dev_ctf_t;       /**< Device to CTF coordinate transformation. */
     QList<FiffDigPoint> dig;        /**< List of all digitization point descriptors. */
-    FiffCoordTrans dig_trans;       /**< Coordinate transformation ToDo... */
+    FiffCoordTrans dig_trans;       /**< Digitizer coordinate transformation. */
     QList<FiffProj> projs;          /**< List of available SSP projectors. */
     QList<FiffCtfComp> comps;       /**< List of available CTF software compensators. */
-    QString acq_pars;               /**< Acquisition information ToDo... */
-    QString acq_stim;               /**< Acquisition information ToDo... */
+    QString acq_pars;               /**< Acquisition parameters. */
+    QString acq_stim;               /**< Acquisition stimulus information. */
 };
 
 //=============================================================================================================

@@ -53,7 +53,8 @@
 #include "mne_mgh_tag.h"
 
 #include <fiff/fiff_stream.h>
-#include <fiff/c/fiff_digitizer_data.h>
+#include <fiff/fiff_coord_trans.h>
+#include <fiff/fiff_digitizer_data.h>
 #include <fiff/fiff_dig_point.h>
 
 #include <utils/sphere.h>
@@ -269,14 +270,13 @@ void fromIntEigenMatrix_17(const Eigen::MatrixXi& from_mat, int **&to_mat)
 
 //============================= make_volume_source_space.c =============================
 
-static FiffCoordTransOld* make_voxel_ras_trans(float *r0,
-                                               float *x_ras,
-                                               float *y_ras,
-                                               float *z_ras,
-                                               float *voxel_size)
+static FiffCoordTrans::UPtr make_voxel_ras_trans(float *r0,
+                                                  float *x_ras,
+                                                  float *y_ras,
+                                                  float *z_ras,
+                                                  float *voxel_size)
 
 {
-    FiffCoordTransOld* t;
     float rot[3][3],move[3];
     int   j,k;
 
@@ -292,9 +292,9 @@ static FiffCoordTransOld* make_voxel_ras_trans(float *r0,
         for (k = 0; k < 3; k++)
             rot[j][k]    = voxel_size[k]*rot[j][k];
 
-    t = new FiffCoordTransOld(FIFFV_MNE_COORD_MRI_VOXEL,FIFFV_COORD_MRI,rot,move);
-
-    return t;
+    return std::make_unique<FiffCoordTrans>(FIFFV_MNE_COORD_MRI_VOXEL,FIFFV_COORD_MRI,
+                                            Eigen::Map<Eigen::Matrix3f>(&rot[0][0]),
+                                            Eigen::Map<Eigen::Vector3f>(move));
 }
 
 static int comp_points1(const void *vp1,const void *vp2)
@@ -383,9 +383,7 @@ MneSurfaceOrVolume::~MneSurfaceOrVolume()
     }
     if(this->dist)
         delete this->dist;
-    FREE_17(this->voxel_surf_RAS_t);
-    FREE_17(this->MRI_voxel_surf_RAS_t);
-    FREE_17(this->MRI_surf_RAS_RAS_t);
+    // voxel_surf_RAS_t, MRI_voxel_surf_RAS_t, MRI_surf_RAS_RAS_t are value types now
     if(this->interpolator)
         delete this->interpolator;
     this->MRI_volume.clear();
@@ -440,7 +438,7 @@ double MneSurfaceOrVolume::sum_solids(float *from, MneSurfaceOld* surf)
 
 //=============================================================================================================
 
-int MneSurfaceOrVolume::mne_filter_source_spaces(MneSurfaceOld* surf, float limit, FiffCoordTransOld* mri_head_t, MneSourceSpaceOld* *spaces, int nspace, FILE *filtered)   /* Provide a list of filtered points here */
+int MneSurfaceOrVolume::mne_filter_source_spaces(MneSurfaceOld* surf, float limit, const FiffCoordTrans& mri_head_t, MneSourceSpaceOld* *spaces, int nspace, FILE *filtered)   /* Provide a list of filtered points here */
 /*
      * Remove all source space points closer to the surface than a given limit
      */
@@ -455,7 +453,7 @@ int MneSurfaceOrVolume::mne_filter_source_spaces(MneSurfaceOld* surf, float limi
 
     if (surf == NULL)
         return OK;
-    if (spaces[0]->coord_frame == FIFFV_COORD_HEAD && mri_head_t == NULL) {
+    if (spaces[0]->coord_frame == FIFFV_COORD_HEAD && mri_head_t.isEmpty()) {
         printf("Source spaces are in head coordinates and no coordinate transform was provided!");
         return FAIL;
     }
@@ -481,7 +479,7 @@ int MneSurfaceOrVolume::mne_filter_source_spaces(MneSurfaceOld* surf, float limi
             if (s->inuse[p1]) {
                 VEC_COPY_17(r1,s->rr[p1]);	/* Transform the point to MRI coordinates */
                 if (s->coord_frame == FIFFV_COORD_HEAD)
-                    FiffCoordTransOld::fiff_coord_trans_inv(r1,mri_head_t,FIFFV_MOVE);
+                    FiffCoordTrans::apply_inverse_trans(r1,mri_head_t,FIFFV_MOVE);
                 /*
                 * Check that the source is inside the inner skull surface
                 */
@@ -665,8 +663,10 @@ void *MneSurfaceOrVolume::filter_source_space(void *arg)
     for (p1 = 0; p1 < a->s->np; p1++) {
         if (a->s->inuse[p1]) {
             VEC_COPY_17(r1,a->s->rr[p1]);	/* Transform the point to MRI coordinates */
-            if (a->s->coord_frame == FIFFV_COORD_HEAD)
-                FiffCoordTransOld::fiff_coord_trans_inv(r1,a->mri_head_t,FIFFV_MOVE);
+            if (a->s->coord_frame == FIFFV_COORD_HEAD) {
+                Q_ASSERT(a->mri_head_t);
+                FiffCoordTrans::apply_inverse_trans(r1,*a->mri_head_t,FIFFV_MOVE);
+            }
             /*
            * Check that the source is inside the inner skull surface
            */
@@ -717,7 +717,7 @@ void *MneSurfaceOrVolume::filter_source_space(void *arg)
 
 //=============================================================================================================
 
-int MneSurfaceOrVolume::filter_source_spaces(float limit, char *bemfile, FiffCoordTransOld *mri_head_t, MneSourceSpaceOld* *spaces, int nspace, FILE *filtered, bool use_threads)                    /* Use multiple threads if possible? */
+int MneSurfaceOrVolume::filter_source_spaces(float limit, char *bemfile, const FiffCoordTrans& mri_head_t, MneSourceSpaceOld* *spaces, int nspace, FILE *filtered, bool use_threads)                    /* Use multiple threads if possible? */
 /*
           * Remove all source space points closer to the surface than a given limit
           */
@@ -755,7 +755,7 @@ int MneSurfaceOrVolume::filter_source_spaces(float limit, char *bemfile, FiffCoo
         for (k = 0; k < nspace; k++) {
             a = new FilterThreadArg();
             a->s = spaces[k];
-            a->mri_head_t = mri_head_t;
+            a->mri_head_t = std::make_unique<FiffCoordTrans>(mri_head_t);
             a->surf = surf;
             a->limit = limit;
             a->filtered = filtered;
@@ -774,7 +774,7 @@ int MneSurfaceOrVolume::filter_source_spaces(float limit, char *bemfile, FiffCoo
         for (k = 0; k < nspace; k++) {
             a = new FilterThreadArg();
             a->s = spaces[k];
-            a->mri_head_t = mri_head_t;
+            a->mri_head_t = std::make_unique<FiffCoordTrans>(mri_head_t);
             a->surf = surf;
             a->limit = limit;
             a->filtered = filtered;
@@ -994,7 +994,7 @@ MneSourceSpaceOld* MneSurfaceOrVolume::make_volume_source_space(MneSurfaceOld* s
         }
     }
     printf("%d sources after omitting infeasible sources.\n",sp->nuse);
-    if (mne_filter_source_spaces(surf,mindist,NULL,&sp,1,NULL) != OK)
+    if (mne_filter_source_spaces(surf,mindist,FiffCoordTrans(),&sp,1,NULL) != OK)
         goto bad;
     printf("%d sources remaining after excluding the sources outside the surface and less than %6.1f mm inside.\n",sp->nuse,1000*mindist);
     /*
@@ -1041,7 +1041,8 @@ MneSourceSpaceOld* MneSurfaceOrVolume::make_volume_source_space(MneSurfaceOld* s
         y_ras[1] = 1.0;
         z_ras[2] = 1.0;
 
-        if ((sp->voxel_surf_RAS_t = make_voxel_ras_trans(r0,x_ras,y_ras,z_ras,voxel_size)) == NULL)
+        sp->voxel_surf_RAS_t = make_voxel_ras_trans(r0,x_ras,y_ras,z_ras,voxel_size);
+        if (!sp->voxel_surf_RAS_t || sp->voxel_surf_RAS_t->isEmpty())
             goto bad;
 
         sp->vol_dims[0] = width;
@@ -1111,12 +1112,12 @@ MneSourceSpaceOld* MneSurfaceOrVolume::mne_new_source_space(int np)
     res->dist       = NULL;
     res->dist_limit = -1.0;
 
-    res->voxel_surf_RAS_t     = NULL;
+    res->voxel_surf_RAS_t.reset();
     res->vol_dims[0] = res->vol_dims[1] = res->vol_dims[2] = 0;
 
     res->MRI_volume.clear();
-    res->MRI_surf_RAS_RAS_t   = NULL;
-    res->MRI_voxel_surf_RAS_t = NULL;
+    res->MRI_surf_RAS_RAS_t.reset();
+    res->MRI_voxel_surf_RAS_t.reset();
     res->MRI_vol_dims[0] = res->MRI_vol_dims[1] = res->MRI_vol_dims[2] = 0;
     res->interpolator         = NULL;
 
@@ -1849,12 +1850,15 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
                 new_space->dist_limit = *t_pTag->toFloat();
                 if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_DIST, t_pTag)) {
                     //                    SparseMatrix<double> tmpSparse = t_pTag->toSparseFloatMatrix();
-                    FiffSparseMatrix* dist = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
-                    new_space->dist = dist->mne_add_upper_triangle_rcs();
-                    delete dist;
-                    if (!new_space->dist) {
+                    auto dist_lower = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
+                    if (!dist_lower) {
                         goto bad;
                     }
+                    auto dist_full = dist_lower->mne_add_upper_triangle_rcs();
+                    if (!dist_full) {
+                        goto bad;
+                    }
+                    new_space->dist = dist_full.release();
                 }
                 else
                     new_space->dist_limit = 0.0;
@@ -1905,7 +1909,7 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
             /*
                 * There might be a coordinate transformation and dimensions
                 */
-            new_space->voxel_surf_RAS_t   = FiffCoordTransOld::mne_read_transform_from_node(stream, node, FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS);
+            new_space->voxel_surf_RAS_t   = std::make_unique<FiffCoordTrans>(FiffCoordTrans::readTransformFromNode(stream, node, FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS));
             if (!node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS, t_pTag)) {
                 qDebug() << "ToDo: Check whether vol_dims contains the right stuff!!! - use VectorXi instead";
                 vol_dims = t_pTag->toInt();
@@ -1916,24 +1920,24 @@ int MneSurfaceOrVolume::mne_read_source_spaces(const QString &name, MneSourceSpa
                 QList<FiffDirNode::SPtr>  mris = node->dir_tree_find(FIFFB_MNE_PARENT_MRI_FILE);
 
                 if (mris.size() == 0) { /* The old way */
-                    new_space->MRI_surf_RAS_RAS_t = FiffCoordTransOld::mne_read_transform_from_node(stream, node, FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS);
+                    new_space->MRI_surf_RAS_RAS_t = std::make_unique<FiffCoordTrans>(FiffCoordTrans::readTransformFromNode(stream, node, FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS));
                     if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_MRI_FILE, t_pTag)) {
                         qDebug() << "ToDo: Check whether new_space->MRI_volume  contains the right stuff!!! - use QString instead";
                         new_space->MRI_volume = (char *)t_pTag->data();
                     }
                     if (node->find_tag(stream, FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, t_pTag)) {
-                        new_space->interpolator = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
+                        new_space->interpolator = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag).release();
                     }
                 }
                 else {
                     if (node->find_tag(stream, FIFF_MNE_FILE_NAME, t_pTag)) {
                         new_space->MRI_volume = (char *)t_pTag->data();
                     }
-                    new_space->MRI_surf_RAS_RAS_t = FiffCoordTransOld::mne_read_transform_from_node(stream, mris[0], FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS);
-                    new_space->MRI_voxel_surf_RAS_t   = FiffCoordTransOld::mne_read_transform_from_node(stream, mris[0], FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS);
+                    new_space->MRI_surf_RAS_RAS_t = std::make_unique<FiffCoordTrans>(FiffCoordTrans::readTransformFromNode(stream, mris[0], FIFFV_MNE_COORD_SURFACE_RAS, FIFFV_MNE_COORD_RAS));
+                    new_space->MRI_voxel_surf_RAS_t   = std::make_unique<FiffCoordTrans>(FiffCoordTrans::readTransformFromNode(stream, mris[0], FIFFV_MNE_COORD_MRI_VOXEL, FIFFV_MNE_COORD_SURFACE_RAS));
 
                     if (mris[0]->find_tag(stream, FIFF_MNE_SOURCE_SPACE_INTERPOLATOR, t_pTag)) {
-                        new_space->interpolator = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag);
+                        new_space->interpolator = FiffSparseMatrix::fiff_get_float_sparse_matrix(t_pTag).release();
                     }
                     if (mris[0]->find_tag(stream, FIFF_MRI_WIDTH, t_pTag)) {
                         new_space->MRI_vol_dims[0] = *t_pTag->toInt();
@@ -2027,7 +2031,7 @@ int MneSurfaceOrVolume::mne_is_left_hemi_source_space(MneSourceSpaceOld* s)
 
 //=============================================================================================================
 
-int MneSurfaceOrVolume::mne_transform_source_space(MneSourceSpaceOld* ss, FiffCoordTransOld *t)
+int MneSurfaceOrVolume::mne_transform_source_space(MneSourceSpaceOld* ss, const FiffCoordTrans& t)
 /*
      * Transform source space data into another coordinate frame
      */
@@ -2035,50 +2039,47 @@ int MneSurfaceOrVolume::mne_transform_source_space(MneSourceSpaceOld* ss, FiffCo
     int k;
     if (ss == NULL)
         return OK;
-    if (ss->coord_frame == t->to)
+    if (ss->coord_frame == t.to)
         return OK;
-    if (ss->coord_frame != t->from) {
+    if (ss->coord_frame != t.from) {
         printf("Coordinate transformation does not match with the source space coordinate system.");
         return FAIL;
     }
     for (k = 0; k < ss->np; k++) {
-        FiffCoordTransOld::fiff_coord_trans(ss->rr[k],t,FIFFV_MOVE);
-        FiffCoordTransOld::fiff_coord_trans(ss->nn[k],t,FIFFV_NO_MOVE);
+        FiffCoordTrans::apply_trans(ss->rr[k],t,FIFFV_MOVE);
+        FiffCoordTrans::apply_trans(ss->nn[k],t,FIFFV_NO_MOVE);
     }
     if (ss->tris) {
         for (k = 0; k < ss->ntri; k++)
-            FiffCoordTransOld::fiff_coord_trans(ss->tris[k].nn,t,FIFFV_NO_MOVE);
+            FiffCoordTrans::apply_trans(ss->tris[k].nn,t,FIFFV_NO_MOVE);
     }
-    ss->coord_frame = t->to;
+    ss->coord_frame = t.to;
     return OK;
 }
 
 //=============================================================================================================
 
-int MneSurfaceOrVolume::mne_transform_source_spaces_to(int coord_frame, FiffCoordTransOld *t, MneSourceSpaceOld* *spaces, int nspace)
+int MneSurfaceOrVolume::mne_transform_source_spaces_to(int coord_frame, const FiffCoordTrans& t, MneSourceSpaceOld* *spaces, int nspace)
 /*
  * Facilitate the transformation of the source spaces
  */
 {
     MneSourceSpaceOld* s;
     int k;
-    FiffCoordTransOld* my_t;
 
     for (k = 0; k < nspace; k++) {
         s = spaces[k];
         if (s->coord_frame != coord_frame) {
-            if (t) {
-                if (s->coord_frame == t->from && t->to == coord_frame) {
+            if (!t.isEmpty()) {
+                if (s->coord_frame == t.from && t.to == coord_frame) {
                     if (mne_transform_source_space(s,t) != OK)
                         return FAIL;
                 }
-                else if (s->coord_frame == t->to && t->from == coord_frame) {
-                    my_t = t->fiff_invert_transform();
+                else if (s->coord_frame == t.to && t.from == coord_frame) {
+                    FiffCoordTrans my_t = t.inverted();
                     if (mne_transform_source_space(s,my_t) != OK) {
-                        FREE_17(my_t);
                         return FAIL;
                     }
-                    FREE_17(my_t);
                 }
                 else {
                     printf("Could not transform a source space because of transformation incompatibility.");
@@ -2914,13 +2915,17 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
     }
 
     // Initial alignment
-    FREE_17(head_dig->head_mri_t_adj);
-    head_dig->head_mri_t_adj = FIFFLIB::FiffCoordTransOld::fiff_make_transform_card(FIFFV_COORD_HEAD,FIFFV_COORD_MRI,
-                                                                                    mri_fid[0],mri_fid[1],mri_fid[2]);
+    head_dig->head_mri_t_adj = std::make_unique<FiffCoordTrans>(FIFFLIB::FiffCoordTrans::fromCardinalPoints(FIFFV_COORD_HEAD,FIFFV_COORD_MRI,
+                                                                                    mri_fid[0],mri_fid[1],mri_fid[2]));
 
-    for (k = 0; k < head_dig->nfids; k++)
+    // Populate mri_fids from cardinal digitizer points transformed into MRI coords
+    head_dig->pickCardinalFiducials();
+
+    // Overwrite the fiducial locations with the ones from the MRI digitizer data
+    for (k = 0; k < head_dig->nfids(); k++)
         VEC_COPY_17(head_dig->mri_fids[k].r,mri_fid[k]);
-    FiffCoordTransOld::mne_print_coord_transform_label(stdout,QString("After simple alignment : ").toLatin1().data(),head_dig->head_mri_t_adj);
+    head_dig->head_mri_t_adj->print();
+    printf("After simple alignment : \n");
 
     if (omit_dist > 0)
         discard_outlier_digitizer_points(head_dig,head_surf,omit_dist);
@@ -2934,7 +2939,8 @@ int MneSurfaceOrVolume::align_fiducials(FiffDigitizerData* head_dig,
 
         printf("%d / %d iterations done. RMS dist = %7.1f mm\n",k,niter,
                 1000.0*rms_digitizer_distance(head_dig,head_surf));
-        FiffCoordTransOld::mne_print_coord_transform_label(stdout,QString("After refinement :").toLatin1().data(),head_dig->head_mri_t_adj);
+        printf("After refinement :\n");
+        head_dig->head_mri_t_adj->print();
     }
 
     return OK;
@@ -3023,18 +3029,18 @@ int MneSurfaceOrVolume::discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerD
     int k;
 
     if (d && head) {
-        d->dist_valid = FALSE;
+        d->dist_valid = false;
         calculate_digitizer_distances(d,head,TRUE,TRUE);
         for (k = 0; k < d->npoint; k++) {
-            d->discard[k] = FALSE;
+            d->discard[k] = 0;
             /*
             * Discard unless cardinal landmark or HPI coil
             */
-            if (std::fabs(d->dist[k]) > maxdist &&
+            if (std::fabs(d->dist(k)) > maxdist &&
                     d->points[k].kind != FIFFV_POINT_CARDINAL &&
                     d->points[k].kind != FIFFV_POINT_HPI) {
                 discarded++;
-                d->discard[k] = TRUE;
+                d->discard[k] = 1;
             }
         }
         printf("%d points discarded (maxdist = %6.1f mm).\n",discarded,1000*maxdist);
@@ -3055,7 +3061,8 @@ void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerDat
     int*                closest;
     float*              dist;
     FiffDigPoint        point;
-    FiffCoordTransOld*  t = dig->head_mri_t_adj ? dig->head_mri_t_adj : dig->head_mri_t;
+    Q_ASSERT(dig->head_mri_t);
+    const FiffCoordTrans& t = (dig->head_mri_t_adj && !dig->head_mri_t_adj->isEmpty()) ? *dig->head_mri_t_adj : *dig->head_mri_t;
     int                 nstep = 4;
 
     if (dig->dist_valid)
@@ -3064,18 +3071,15 @@ void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerDat
         return ;
     }
 
-    dig->dist = REALLOC_17(dig->dist,dig->npoint,float);
-    if (!dig->closest) {
+    dig->dist.conservativeResize(dig->npoint);
+    if (dig->closest.size() == 0) {
         /*
         * Ensure that all closest values are initialized correctly
         */
-        dig->closest       = MALLOC_17(dig->npoint,int);
-        for (k = 0; k < dig->npoint; k++)
-            dig->closest[k] = -1;
+        dig->closest = Eigen::VectorXi::Constant(dig->npoint, -1);
     }
-    FREE_CMATRIX_17(dig->closest_point);
 
-    dig->closest_point = ALLOC_CMATRIX_17(dig->npoint,3);
+    dig->closest_point.setZero(dig->npoint,3);
     closest            = MALLOC_17(dig->npoint,int);
     dist               = MALLOC_17(dig->npoint,float);
 
@@ -3083,9 +3087,9 @@ void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerDat
         if ((dig->active[k] && !dig->discard[k]) || do_all) {
             point = dig->points.at(k);
             VEC_COPY_17(rr[nactive],point.r);
-            FiffCoordTransOld::fiff_coord_trans(rr[nactive],t,FIFFV_MOVE);
+            FiffCoordTrans::apply_trans(rr[nactive],t,FIFFV_MOVE);
             if (do_approx) {
-                closest[nactive] = dig->closest[k];
+                closest[nactive] = dig->closest(k);
                 if (closest[nactive] < 0)
                     do_approx = FALSE;
             }
@@ -3103,18 +3107,18 @@ void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerDat
         printf("Inside or outside for %d points...",nactive);
     for (k = 0, nactive = 0; k < dig->npoint; k++) {
         if ((dig->active[k] && !dig->discard[k]) || do_all) {
-            dig->dist[k]    = dist[nactive];
-            dig->closest[k] = closest[nactive];
-            mne_project_to_triangle(head->s,dig->closest[k],rr[nactive],dig->closest_point[k]);
+            dig->dist(k)    = dist[nactive];
+            dig->closest(k) = closest[nactive];
+            mne_project_to_triangle(head->s,dig->closest(k),rr[nactive],dig->closest_point.row(k).data());
             /*
             * The above distance is with respect to the closest triangle only
             * We need to use the solid angle criterion to decide the sign reliably
             */
-            if (!do_approx && FALSE) {
+            if (!do_approx && false) {
                 if (sum_solids(rr[nactive],head->s)/(4*M_PI) > 0.9)
-                    dig->dist[k] = - std::fabs(dig->dist[k]);
+                    dig->dist(k) = - std::fabs(dig->dist(k));
                 else
-                    dig->dist[k] = std::fabs(dig->dist[k]);
+                    dig->dist(k) = std::fabs(dig->dist(k));
             }
             nactive++;
         }
@@ -3126,7 +3130,7 @@ void MneSurfaceOrVolume::calculate_digitizer_distances(FIFFLIB::FiffDigitizerDat
     FREE_CMATRIX_17(rr);
     FREE_17(closest);
     FREE_17(dist);
-    dig->dist_valid = TRUE;
+    dig->dist_valid = true;
 
     return;
 }
@@ -3148,7 +3152,7 @@ int MneSurfaceOrVolume::iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	
     float *w        = NULL;
     int             k,nactive;
     FiffDigPoint    point;
-    FiffCoordTransOld* t = NULL;
+    FiffCoordTrans t;
     float           max_diff = 40e-3;
 
     if (!dig->head_mri_t_adj) {
@@ -3171,7 +3175,7 @@ int MneSurfaceOrVolume::iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	
         if (dig->active[k] && !dig->discard[k]) {
             point = dig->points.at(k);
             VEC_COPY_17(rr_head[nactive],point.r);
-            VEC_COPY_17(rr_mri[nactive],dig->closest_point[k]);
+            VEC_COPY_17(rr_mri[nactive],dig->closest_point.row(k).data());
             /*
             * Special handling for the nasion
             */
@@ -3181,8 +3185,9 @@ int MneSurfaceOrVolume::iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	
                 if (nasion_mri) {
                     VEC_COPY_17(rr_mri[nactive],nasion_mri);
                     VEC_COPY_17(rr_head[nactive],nasion_mri);
-                    FiffCoordTransOld::fiff_coord_trans_inv(rr_head[nactive],
-                                                            dig->head_mri_t_adj ? dig->head_mri_t_adj : dig->head_mri_t,
+                    Q_ASSERT(dig->head_mri_t || dig->head_mri_t_adj);
+                    FiffCoordTrans::apply_inverse_trans(rr_head[nactive],
+                                                            dig->head_mri_t_adj ? *dig->head_mri_t_adj : *dig->head_mri_t,
                                                             FIFFV_MOVE);
                 }
             }
@@ -3195,17 +3200,16 @@ int MneSurfaceOrVolume::iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	
         qCritical() << "Not enough points to do the alignment";
         goto out;
     }
-    if ((t = FiffCoordTransOld::procrustes_align(FIFFV_COORD_HEAD, FIFFV_COORD_MRI,
-                                                 rr_head, rr_mri, w, nactive, max_diff)) == NULL)
+    if ((t = FiffCoordTrans::procrustesAlign(FIFFV_COORD_HEAD, FIFFV_COORD_MRI,
+                                                 rr_head, rr_mri, w, nactive, max_diff)).isEmpty())
         goto out;
 
     if (dig->head_mri_t_adj)
-        *dig->head_mri_t_adj = *t;
-    FREE_17(t);
+        dig->head_mri_t_adj = std::make_unique<FiffCoordTrans>(t);
     /*
      * Calculate final distances
      */
-    dig->dist_valid = FALSE;
+    dig->dist_valid = false;
     calculate_digitizer_distances(dig,head,FALSE,!last_step);
     res = OK;
     goto out;
@@ -3229,7 +3233,7 @@ float MneSurfaceOrVolume::rms_digitizer_distance(FIFFLIB::FiffDigitizerData* dig
 
     for (k = 0, rms = 0.0, nactive = 0; k < dig->npoint; k++)
         if (dig->active[k] && !dig->discard[k]) {
-            rms = rms + dig->dist[k]*dig->dist[k];
+            rms = rms + dig->dist(k)*dig->dist(k);
             nactive++;
         }
     if (nactive > 1)

@@ -131,12 +131,10 @@ bool MriCorIO::read(const QString& dir,
                 0.0f,  0.0f,  1.0f,
                 0.0f,  1.0f,  0.0f;
 
-        VectorXf move(3);
-        move(0) = 0.128f;
-        move(1) = -0.128f + static_cast<float>(k) / 1000.0f;
-        move(2) = 0.128f;
+        Eigen::Vector3f move;
+        move << 0.128f, -0.128f + static_cast<float>(k) / 1000.0f, 0.128f;
 
-        slice.trans = FiffCoordTrans::make(FIFFV_COORD_MRI_SLICE, FIFFV_COORD_MRI, rot, move);
+        slice.trans = FiffCoordTrans(FIFFV_COORD_MRI_SLICE, FIFFV_COORD_MRI, rot, move);
     }
 
     if (verbose) {

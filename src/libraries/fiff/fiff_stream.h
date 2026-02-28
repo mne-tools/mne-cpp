@@ -178,8 +178,6 @@ public:
 
     //=========================================================================================================
     /**
-     * ### MNE toolbox root function ###: Definition of the fiff_end_block function
-     *
      * Writes a FIFF_BLOCK_END tag
      *
      * @param[in] kind   The block kind to end.
@@ -192,14 +190,11 @@ public:
     //=========================================================================================================
     /**
      * Writes the closing tags to a fif file and closes the file
-     * Refactored: fiff_end_file (MNE-C); fiff_end_file (MNE-MATLAB)
      */
     void end_file();
 
     //=========================================================================================================
     /**
-     * ### MNE toolbox root function ###: Definition of the fiff_finish_writing_raw function
-     *
      * Finishes a raw file by writing all necessary end tags.
      *
      */
@@ -214,7 +209,7 @@ public:
      * @param[out] aspect_kinds  found aspect_kinds.
      * @param[out] t             text formatted found information.
      *
-     * @return true if information is available, fasle otherwise.
+     * @return true if information is available, false otherwise.
      */
     bool get_evoked_entries(const QList<FiffDirNode::SPtr> &evoked_node, QStringList &comments, QList<fiff_int_t> &aspect_kinds, QString &t);
 
@@ -229,7 +224,6 @@ public:
     //=========================================================================================================
     /**
      * Opens a fif file and provides the directory of tags
-     * Refactored: open_file (fiff_open.c)
      *
      * @param[in] mode      The open mode (Default = ReadOnly).
      *
@@ -241,7 +235,6 @@ public:
     /**
      * Close stream
      *
-     * Refactored: fiff_close (fiff_open.c)
      *    *
      * @return true if succeeded, false otherwise.
      */
@@ -250,7 +243,6 @@ public:
     //=========================================================================================================
     /**
      * Create the directory tree structure
-     * Refactored: make_subtree (fiff_dir_tree.c), fiff_make_dir_tree (MATLAB)
      *
      * @param[in] dentry     The dir entries of which the tree should be constructed.
      *
@@ -261,8 +253,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_read_bad_channels
-     *
-     * ### MNE toolbox root function ###
      *
      * Reads the bad channel list from a node if it exists
      * Note: In difference to mne-matlab this is not a static function. This is a method of the FiffDirNode
@@ -278,8 +268,6 @@ public:
     /**
      * mne_read_cov - also for mne_read_noise_cov
      *
-     * ### MNE toolbox root function ###
-     *
      * Reads a covariance matrix from a fiff file
      *
      * @param[in] p_Node          look for the matrix in here.
@@ -294,8 +282,6 @@ public:
     /**
      * fiff_read_ctf_comp
      *
-     * ### MNE toolbox root function ###
-     *
      * Read the CTF software compensation data from the given node
      *
      * @param[in] p_Node The node of interest.
@@ -309,22 +295,18 @@ public:
     /**
      * Reimplemntation of load_digitizer_data (digitizer.c)
      *
-     * ### MNE-C root function ###
-     *
      * Read the digitizer data from the given node.
      *
      * @param[in] p_Node     The node of interest.
      * @param[out] p_digData  The read digitizer data.
      *
-     * @return rue if succeeded, false otherwise.
+     * @return true if succeeded, false otherwise.
      */
     bool read_digitizer_data(const FiffDirNode::SPtr& p_Node, FiffDigitizerData& p_digData);
 
     //=========================================================================================================
     /**
      * fiff_read_meas_info
-     *
-     * ### MNE toolbox root function ###
      *
      * Read the measurement info
      * Source is assumed to be an open fiff file.
@@ -341,7 +323,7 @@ public:
     /**
      * python read_forward_meas_info
      *
-     * Read light measurement info from forward operator -> ToDo base class of FiffInfo
+     * Read light measurement info from forward operator.
      *
      * @param[in] p_Node         The node of interest.
      * @param[out] p_InfoForward The read light measurement info.
@@ -353,8 +335,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_read_named_matrix
-     *
-     * ### MNE toolbox root function ###
      *
      * Reads a named matrix.
      *
@@ -369,7 +349,6 @@ public:
     //=========================================================================================================
     /**
      * Read the SSP data under a given directory node
-     * Refactored: fiff_read_proj (MNE-MATLAB)
      *
      * @param[in] p_Node    The node of interest.
      *
@@ -381,7 +360,6 @@ public:
     /**
      * Read tag data from a fif file.
      * if pos is not provided, reading starts from the current file position
-     * Refactored: fiff_read_tag (MNE-MATLAB)
      *
      * @param[out] p_pTag the read tag.
      * @param[in] pos position of the tag inside the fif file.
@@ -394,7 +372,6 @@ public:
     /**
      * Read tag information of one tag from a fif file.
      * if pos is not provided, reading starts from the current file position
-     * Refactored: fiff_read_tag_info (MNE-MATLAB)
      *
      * @param[out] p_pTag the read tag info.
      * @param[in] p_bDoSkip if true it skips the data of the tag (optional, default = true).
@@ -418,7 +395,6 @@ public:
     /**
      * Read one tag from a fif file.
      * if pos is not provided, reading starts from the current file position
-     * Refactored: fiff_read_tag (MNE-MATLAB)
      *
      * @param[out] p_pTag the read tag.
      * @param[in] pos position of the tag inside the fif file.
@@ -431,8 +407,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_setup_read_raw
-     *
-     * ### MNE toolbox root function ###
      *
      * Read information about raw data file
      *
@@ -451,8 +425,6 @@ public:
     /**
      * fiff_split_name_list
      *
-     * ### MNE toolbox root function ###
-     *
      * Splits a string by looking for seperator ":"
      *
      * @param[in] p_sNameList    string to split.
@@ -464,7 +436,6 @@ public:
     //=========================================================================================================
     /**
      * Writes a FIFF_BLOCK_START tag
-     * Refactored: fiff_start_block (MNE-C); fiff_start_block (MNE-MATLAB)
      *
      * @param[in] kind       The block kind to start.
      *
@@ -475,7 +446,6 @@ public:
     //=========================================================================================================
     /**
      * Opens a fiff file for writing and writes the compulsory header tags
-     * Refactored: fiff_start_files (MNE-C); fiff_start_file (MNE-MATLAB)
      *
      * @param[in] p_IODevice    The IODevice (like QFile or QTCPSocket) to open. It is recommended that the name ends with .fif.
      *
@@ -486,7 +456,6 @@ public:
     //=========================================================================================================
     /**
      * Open fiff file for update
-     * Refactored: fiff_open_update (MNE-C)
      *
      * @param[in] p_IODevice    The IODevice (like QFile or QTCPSocket) to open. It is recommended that the name ends with .fif.
      *
@@ -497,8 +466,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_start_writing_raw
-     *
-     * ### MNE toolbox root function ###
      *
      * function [fid,cals] = fiff_start_writing_raw(name,info,sel)
      *
@@ -519,8 +486,7 @@ public:
     //=========================================================================================================
     /**
      * Write one tag to file including its data
-     * Data is not written if it is NULL
-     * Refactored: fiff_write_tag, fiff_write_this_tag (MNE-C)
+     * Data is not written if it is nullptr
      *
      * @param[in] p_pTag     Tag to write;.
      * @param[in] pos        the position where the entires should be written to (default -1, i.e. end of the file).
@@ -534,7 +500,6 @@ public:
      * Writes a channel information record to a fif file
      * The type, cal, unit, and pos members are explained in Table 9.5
      * of the MNE manual
-     * Refactored: fiff_write_ch_info (MNE-C); fiff_write_ch_info (MNE-MATLAB)
      *
      * @param[in] ch     The channel information structure to write.
      *
@@ -555,7 +520,6 @@ public:
     //=========================================================================================================
     /**
      * Writes a coordinate transformation structure
-     * Refactored: fiff_write_coord_trans (MNE-C); fiff_write_coord_trans (MNE-MATLAB)
      *
      * @param[in] trans  The coordinate transfomation structure.
      *
@@ -567,8 +531,6 @@ public:
     /**
      * Write a noise covariance matrix
      *
-     * ### MNE toolbox root function ###
-     *
      * @param[in] p_FiffCov      The noise covariance matrix to write.
      *
      * @return the position where the covaraince was written to.
@@ -578,8 +540,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_write_ctf_comp
-     *
-     * ### MNE toolbox root function ###
      *
      * Writes the CTF compensation data into a fif file
      *
@@ -592,8 +552,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_write_dig_point
-     *
-     * ### MNE toolbox root function ###
      *
      * Writes a digitizer data point into a fif file
      *
@@ -631,7 +589,6 @@ public:
     //=========================================================================================================
     /**
      * Writes a double-precision floating point tag to a fif file
-     * Refactored: fiff_write_double (MNE-MATLAB)
      *
      * @param[in] kind       Tag kind.
      * @param[in] data       The float data pointer.
@@ -645,7 +602,6 @@ public:
     /**
      * Writes fiff id
      * If the id argument is missing it will be generated here
-     * Refactored: fiff_write_this_id (MNE-C); fiff_write_id (MNE-MATLAB)
      *
      * @param[in] kind       The tag kind.
      * @param[in] id         The id to write.
@@ -667,7 +623,6 @@ public:
     //=========================================================================================================
     /**
      * Writes a 32-bit integer tag to a fif file
-     * Refactored: fiff_write_int_tag (MNE-C); fiff_write_int (MNE-MATLAB)
      *
      * @param[in] kind       Tag kind.
      * @param[in] data       The integer data pointer.
@@ -682,8 +637,6 @@ public:
     /**
      * fiff_write_int_matrix
      *
-     * ### MNE toolbox root function ###
-     *
      * Writes a integer matrix tag
      *
      * @param[in] kind       The tag kind.
@@ -696,7 +649,6 @@ public:
     //=========================================================================================================
     /**
      * Writes a single-precision floating point tag to a fif file
-     * Refactored: fiff_write_float_tag (MNE-C); fiff_write_float (MNE-MATLAB)
      *
      * @param[in] kind       Tag kind.
      * @param[in] data       The float data pointer.
@@ -709,7 +661,6 @@ public:
     //=========================================================================================================
     /**
      * Writes a single-precision floating-point matrix tag
-     * Refactored: fiff_write_float_matrix (MNE-C); fiff_write_float_matrix (MNE-MATLAB)
      *
      * @param[in] kind       The tag kind.
      * @param[in] mat        The data matrix.
@@ -721,8 +672,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_write_float_sparse_ccs
-     *
-     * ### MNE toolbox root function ###
      *
      * Writes a single-precision sparse (ccs) floating-point matrix tag
      *
@@ -737,8 +686,6 @@ public:
     /**
      * fiff_write_float_sparse_rcs
      *
-     * ### MNE toolbox root function ###
-     *
      * Writes a single-precision sparse (RCS) floating-point matrix tag
      *
      * @param[in] kind       The tag kind.
@@ -751,8 +698,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_write_name_list
-     *
-     * ### MNE toolbox root function ###
      *
      * Writes a colon-separated list of names
      *
@@ -767,8 +712,6 @@ public:
     /**
      * fiff_write_named_matrix
      *
-     * ### MNE toolbox root function ###
-     *
      * Writes a named single-precision floating-point matrix
      *
      * @param[in] kind       The tag kind to use for the data.
@@ -781,8 +724,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_write_evoked_set
-     *
-     * ### MNE toolbox root function ###
      *
      * Writes a complete evoked data set to a fif stream (file).
      * This writes FIFFB_MEAS containing measurement info and one FIFFB_EVOKED/FIFFB_ASPECT
@@ -798,8 +739,6 @@ public:
     /**
      * fiff_write_proj
      *
-     * ### MNE toolbox root function ###
-     *
      * Writes the projection data into a fif stream (file)
      *
      * @param[in] projs      The compensation data to write.
@@ -811,8 +750,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_write_raw_buffer
-     *
-     * ### MNE toolbox root function ###
      *
      * Writes a raw buffer.
      *
@@ -826,8 +763,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_write_raw_buffer
-     *
-     * ### MNE toolbox root function ###
      *
      * Writes a raw buffer.
      *
@@ -854,7 +789,6 @@ public:
     //=========================================================================================================
     /**
      * Writes a string tag
-     * Refactored: fiff_write_string_tag (MNE-C); fiff_write_string (MNE-MATLAB)
      *
      * @param[in] kind       The tag kind.
      * @param[in] data       The string data to write.
@@ -876,7 +810,6 @@ private:
     //=========================================================================================================
     /**
      * Check that the file starts properly.
-     * Refactored: check_beginning (fiff_open.c)
      *
      * @param[out] p_pTag     The tag containing the beginning.
      *
@@ -887,13 +820,12 @@ private:
     //=========================================================================================================
     /**
      * Scan the tag list to create a directory
-     * Refactored: fiff_make_dir (fiff_dir.c)
      *
      * @param[out] ok    If a conversion error occurs, *ok is set to false; otherwise *ok is set to true.
      *
      * @return The created directory.
      */
-    QList<FiffDirEntry::SPtr> make_dir(bool *ok=Q_NULLPTR);
+    QList<FiffDirEntry::SPtr> make_dir(bool *ok=nullptr);
 
 private:
 
@@ -906,20 +838,6 @@ private:
 //    char        *ext_file_name; /**< Name of the file holding the external data. */
 //    FILE        *ext_fd;        /**< The file descriptor of the above file if open . */
 
-// ### OLD STRUCT ###
-// /** FIFF file handle returned by fiff_open(). */
-//typedef struct _fiffFileRec {
-//    char         *file_name;    /**< Name of the file. */ -> part of the Parent class of the QIODevice, wrapped by streamName function
-//    FILE         *fd;           /**< The normal file descriptor. */
-//    fiffId       id;            /**< The file identifier. */
-//    fiffDirEntry dir;           /**< This is the directory.
-//                                   * If no directory exists, fiff_open
-//                                   * automatically scans the file to create one. */
-//    int         nent;           /**< How many entries?. */
-//    fiffDirNode dirtree;        /**< Directory compiled into a tree. */
-//    char        *ext_file_name; /**< Name of the file holding the external data. */
-//    FILE        *ext_fd;        /**< The file descriptor of the above file if open . */
-//} *fiffFile,fiffFileRec;        /**< FIFF file handle. fiff_open() returns this. */
 };
 } // NAMESPACE
 

@@ -106,8 +106,6 @@ public:
     /**
      * fiff_copy_tree
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the static FiffDirNode::copy_tree function
      *
      * Copies directory subtrees from fidin to fidout
@@ -128,8 +126,6 @@ public:
     /**
      * fiff_end_block
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffStream end_block member function
      *
      * Writes a FIFF_BLOCK_END tag
@@ -146,8 +142,6 @@ public:
     /**
      * fiff_end_file
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffStream end_file member function
      *
      * Writes the closing tags to a fif file and closes the file
@@ -163,8 +157,6 @@ public:
     /**
      * fiff_finish_writing_raw
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffStream finish_writing_raw member function
      *
      * Finishes a raw file by writing all necessary end tags.
@@ -179,8 +171,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_dir_tree_find
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffDirNode dir_tree_find member function
      *
@@ -200,8 +190,6 @@ public:
     /**
      * fiff_invert_transform
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the static FiffCoordTrans::invert_transform function
      *
      * Invert a coordinate transformation
@@ -218,8 +206,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_open
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffStream open member function
      *
@@ -241,8 +227,6 @@ public:
     /**
      * fiff_pick_channels
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffInfo::pick_channels static function
      *
      * Make a selector to pick desired channels from data
@@ -262,8 +246,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_pick_channels_evoked
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffEvokedDataSet pick_channels_evoked member function
      *
@@ -286,8 +268,6 @@ public:
     /**
      * fiff_find_evoked
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffEvokedDataSet find_evoked member function
      *
      * Find evoked data sets
@@ -304,8 +284,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_pick_info
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffInfo pick_info member function
      *
@@ -325,8 +303,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_pick_types
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffInfo pick_types member function
      *
@@ -355,8 +331,6 @@ public:
     /**
      * fiff_read_bad_channels
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffStream read_bad_channels member function
      *
      * Reads the bad channel list from a node if it exists
@@ -375,8 +349,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_read_ctf_comp
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffStream read_ctf_comp member function
      *
@@ -398,8 +370,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_read_evoked
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffEvoked::read static function
      *
@@ -445,8 +415,6 @@ public:
     /**
      * fiff_read_meas_info
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffStream read_meas_info member function
      *
      * Read the measurement info
@@ -468,8 +436,6 @@ public:
     /**
      * fiff_read_named_matrix
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffStream read_named_matrix member function
      *
      * Reads a named matrix.
@@ -488,8 +454,6 @@ public:
 
     //=========================================================================================================
     /**
-     * ### MNE toolbox root function ###
-     *
      * [ projdata ] = fiff_read_proj(fid,node)
      *
      * Read the SSP data under a given directory node
@@ -509,8 +473,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_read_raw_segment
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffRawData read_raw_segment member function
      *
@@ -537,8 +499,6 @@ public:
 
     /**
      * fiff_read_raw_segment
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffRawData read_raw_segment member function
      *
@@ -569,8 +529,6 @@ public:
     /**
      * fiff_read_tag
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffTag::read_tag function
      *
      * Read one tag from a fif file.
@@ -591,8 +549,6 @@ public:
     /**
      * fiff_read_tag_info
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffTag::read_tag_info function
      *
      * Read tag information of one tag from a fif file.
@@ -611,8 +567,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_setup_read_raw
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffStream::setup_read_raw static function
      *
@@ -633,8 +587,6 @@ public:
     /**
      * fiff_split_name_list
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffStream::split_name_list static function
      *
      * Splits a string by looking for seperator ":"
@@ -652,8 +604,6 @@ public:
     /**
      * fiff_start_block
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffStream start_block member function
      *
      * Writes a FIFF_BLOCK_START tag
@@ -669,8 +619,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_start_file
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffStream::start_file static function
      *
@@ -688,8 +636,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_start_writing_raw
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffStream::start_writing_raw static function
      *
@@ -714,8 +660,6 @@ public:
     /**
      * fiff_write_ch_info
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffStream write_ch_info member function
      *
      * Writes a channel information record to a fif file
@@ -734,8 +678,6 @@ public:
     /**
      * fiff_write_coord_trans
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffStream write_coord_trans member function
      *
      * Writes a coordinate transformation structure
@@ -751,8 +693,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_write_ctf_comp
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffStream write_ctf_comp member function
      *
@@ -770,8 +710,6 @@ public:
     /**
      * fiff_write_dig_point
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffStream write_dig_point member function
      *
      * Writes a digitizer data point into a fif file
@@ -787,8 +725,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_write_id
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffStream write_id member function
      *
@@ -808,8 +744,6 @@ public:
     /**
      * fiff_write_int
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffStream write_int member function
      *
      * Writes a 32-bit integer tag to a fif file
@@ -827,8 +761,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_write_float
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffStream write_float member function
      *
@@ -848,8 +780,6 @@ public:
     /**
      * fiff_write_float_matrix
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffStream write_float_matrix member function
      *
      * Writes a single-precision floating-point matrix tag
@@ -866,8 +796,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_write_name_list
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffStream write_name_list member function
      *
@@ -886,8 +814,6 @@ public:
     /**
      * fiff_write_named_matrix
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffStream write_named_matrix member function
      *
      * Writes a named single-precision floating-point matrix
@@ -905,8 +831,6 @@ public:
     /**
      * fiff_write_proj
      *
-     * ### MNE toolbox root function ###
-     *
      * Wrapper for the FiffStream write_proj member function
      *
      * Writes the projection data into a fif file
@@ -922,8 +846,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_write_raw_buffer
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffStream write_raw_buffer member function
      *
@@ -943,8 +865,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_write_string
-     *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffStream write_string member function
      *

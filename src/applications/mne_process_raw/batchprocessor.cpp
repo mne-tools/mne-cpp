@@ -159,7 +159,7 @@ int BatchProcessor::run(const ProcessingSettings &settings)
         //---------------------------------------------------------------------
         // Step 1: Event detection / loading
         //---------------------------------------------------------------------
-        MatrixXi events;
+        FiffEvents fiffEvents;
 
         // Try loading events from an event file first
         QString eventInFile;
@@ -170,23 +170,24 @@ int BatchProcessor::run(const ProcessingSettings &settings)
             qInfo() << "Loading events from" << eventInFile;
             if (eventInFile.endsWith(".fif", Qt::CaseInsensitive)) {
                 QFile evtFile(eventInFile);
-                MNE::read_events_from_fif(evtFile, events);
+                FiffEvents::read_from_fif(evtFile, fiffEvents);
             } else {
                 QFile evtFile(eventInFile);
-                MNE::read_events_from_ascii(evtFile, events);
+                FiffEvents::read_from_ascii(evtFile, fiffEvents);
             }
         }
 
-        if (events.rows() == 0) {
+        if (fiffEvents.is_empty()) {
             // Detect from trigger channel
             qInfo() << "Detecting events from trigger channel" << settings.digTrigger;
-            events = FiffEvents::detect_from_raw(raw,
-                                                 settings.digTrigger,
-                                                 settings.digTriggerMask,
-                                                 true);
+            FiffEvents::detect_from_raw(raw,
+                                     fiffEvents,
+                                     settings.digTrigger,
+                                     settings.digTriggerMask,
+                                     true);
         }
 
-        qInfo() << events.rows() << "events found.";
+        qInfo() << fiffEvents.num_events() << "events found.";
 
         //---------------------------------------------------------------------
         // Step 2: Save events if requested
@@ -199,10 +200,10 @@ int BatchProcessor::run(const ProcessingSettings &settings)
             qInfo() << "\n--- Saving events to" << eventOutFile << "---\n";
             if (eventOutFile.endsWith(".fif", Qt::CaseInsensitive)) {
                 QFile evtOutFile(eventOutFile);
-                MNE::write_events_to_fif(evtOutFile, events);
+                fiffEvents.write_to_fif(evtOutFile);
             } else {
                 QFile evtOutFile(eventOutFile);
-                MNE::write_events_to_ascii(evtOutFile, events, raw.info.sfreq);
+                fiffEvents.write_to_ascii(evtOutFile, raw.info.sfreq);
             }
         }
 
@@ -219,7 +220,7 @@ int BatchProcessor::run(const ProcessingSettings &settings)
                 projReject["eeg"]  = settings.projEegReject;
 
                 QList<FiffProj> newProjs = MNE::compute_proj(
-                    raw, events,
+                    raw, fiffEvents.events,
                     settings.projEvent,
                     settings.projTmin, settings.projTmax,
                     settings.projNGrad, settings.projNMag, settings.projNEeg,
@@ -315,7 +316,7 @@ int BatchProcessor::run(const ProcessingSettings &settings)
             }
 
             QString aveLog;
-            FiffEvokedSet evokedSet = MNEAveraging::computeAverages(raw, aveDesc, events, aveLog);
+            FiffEvokedSet evokedSet = MNEAveraging::computeAverages(raw, aveDesc, fiffEvents.events, aveLog);
 
             // Report results
             for (int j = 0; j < evokedSet.evoked.size(); ++j) {
@@ -372,7 +373,7 @@ int BatchProcessor::run(const ProcessingSettings &settings)
                     eventCodes.append(static_cast<int>(def.events[ec]));
 
                 FiffCov defCov = FiffCov::compute_from_epochs(
-                    raw, events, eventCodes,
+                    raw, fiffEvents.events, eventCodes,
                     def.tmin, def.tmax,
                     def.bmin, def.bmax,
                     def.doBaseline,

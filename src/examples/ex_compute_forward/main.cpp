@@ -40,7 +40,6 @@
 #include <utils/generics/applicationlogger.h>
 
 #include <fiff/fiff.h>
-#include <fiff/c/fiff_coord_trans_old.h>
 #include <fiff/fiff_info.h>
 
 #include <fwd/computeFwd/compute_fwd_settings.h>
@@ -124,9 +123,9 @@ int main(int argc, char *argv[])
     FiffRawData raw(t_fileIn);
     QSharedPointer<FiffInfo> pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(raw.info));
 
-    FiffCoordTransOld meg_head_t = pFiffInfo->dev_head_t.toOld();
+    FiffCoordTrans meg_head_t = pFiffInfo->dev_head_t;
 
-    pSettings->meg_head_t = &meg_head_t;
+    pSettings->meg_head_t = meg_head_t;
     pSettings->pFiffInfo = pFiffInfo;
 
     pSettings->checkIntegrity();
@@ -156,7 +155,7 @@ int main(int argc, char *argv[])
 
     // update head position to forward solution and only recompute necessary part
     timer4.start();
-    pComputeFwd->updateHeadPos(&meg_head_t);
+    pComputeFwd->updateHeadPos(meg_head_t);
     fTime4 = timer4.elapsed();
 
     // get updated solution

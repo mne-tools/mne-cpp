@@ -59,10 +59,9 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * These universially unique identifiers are also used to identify blocks within the files.
- * Replaces fiffIdRec which had a size of 5*4 = 20
+ * These universally unique identifiers are also used to identify blocks within the files.
  *
- * @brief Universially unique identifier.
+ * @brief Universally unique identifier.
  **/
 
 class FIFFSHARED_EXPORT FiffId {
@@ -93,8 +92,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs a (hopefully) unique file id
-     * Refactored: fiff_new_file_id (fiff_id.c)
+     * Constructs a (hopefully) unique file id.
+     *
+     * @return A new unique FiffId.
      */
     static FiffId new_file_id();
 
@@ -106,21 +106,25 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns the machine ID consisting of a two integer number
-     * Refactored: fiff_get_machid (fiff_get_machid.c)
+     * Returns the machine ID consisting of a two integer number.
+     *
+     * @param[out] fixed_id   Pointer to an array of at least 2 ints to receive the machine ID.
+     *
+     * @return true if succeeded, false otherwise.
      */
     static bool get_machid(int *fixed_id);
 
     //=========================================================================================================
     /**
-     * Returns a default FiffId object to be used as an mutable placeholder for a default instance of the class.
+     * Returns a default FiffId object to be used as a mutable placeholder for a default instance of the class.
+     *
+     * @return Reference to the default FiffId instance.
      */
     static FiffId& getDefault();
 
     //=========================================================================================================
     /**
-     * Prints the id
-     * Refactored: print_id (fiff_dir_tree.c)
+     * Prints the id.
      */
     void print() const;
 
@@ -142,30 +146,27 @@ public:
 
     //=========================================================================================================
     /**
-    * Print mac address in a fashionable manner.
-    */
+     * Returns the machine ID as a human-readable string.
+     *
+     * @return The machine ID formatted as a string.
+     */
     QString toMachidString() const;
-    
+
+    /**
+     * Compares two FiffId instances for equality.
+     *
+     * @param[in] f1   First FiffId.
+     * @param[in] f2   Second FiffId.
+     *
+     * @return true if both IDs are equal, false otherwise.
+     */
     friend bool operator== (const FiffId &f1, const FiffId &f2);
 
 public:
     fiff_int_t version;     /**< File version. */
     fiff_int_t machid[2];   /**< Unique machine ID. */
-    fiffTimeRec time;       /**< Time of the ID creation. */
+    FiffTime time;           /**< Time of the ID creation. */
 
-// ### OLD STRUCT ###
-///**
-//* A file ID.
-//*
-//* These universially unique identifiers are also
-//* used to identify blocks within fthe files.
-//*/
-//typedef struct _fiffIdRec {
-//    fiff_int_t version;     /**< File version. */
-//    fiff_int_t machid[2];   /**< Unique machine ID. */
-//    fiffTimeRec time;       /**< Time of the ID creation. */
-//} fiffIdRec,*fiffId;        /**< This is the file identifier. */
-//typedef fiffIdRec fiff_id_t;
 };
 
 //=============================================================================================================
@@ -181,7 +182,7 @@ inline bool FiffId::isEmpty() const
 
 inline qint32 FiffId::storageSize()
 {
-    return 20;
+    return sizeof(FiffId::version) + sizeof(FiffId::machid) + FiffTime::storageSize();
 }
 
 //=============================================================================================================

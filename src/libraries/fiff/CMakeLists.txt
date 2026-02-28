@@ -35,10 +35,9 @@ set(SOURCES
     fiff_io.cpp
     fiff_dig_point_set.cpp
     fiff_dir_node.cpp
-    c/fiff_coord_trans_old.cpp
-    c/fiff_sparse_matrix.cpp
-    c/fiff_digitizer_data.cpp
-    c/fiff_coord_trans_set.cpp
+    fiff_sparse_matrix.cpp
+    fiff_digitizer_data.cpp
+    fiff_coord_trans_set.cpp
     fifffilesharer.cpp
 )
 
@@ -48,6 +47,8 @@ set(HEADERS
     fiff_explain.h
     fiff_file.h
     fiff_types.h
+    fiff_time.h
+    fiff_data_ref.h
     fiff_id.h
     fiff_constants.h
     fiff_tag.h
@@ -71,11 +72,9 @@ set(HEADERS
     fiff_io.h
     fiff_dig_point_set.h
     fiff_dir_node.h
-    c/fiff_coord_trans_old.h
-    c/fiff_sparse_matrix.h
-    c/fiff_types_mne-c.h
-    c/fiff_digitizer_data.h
-    c/fiff_coord_trans_set.h
+    fiff_sparse_matrix.h
+    fiff_digitizer_data.h
+    fiff_coord_trans_set.h
     fifffilesharer.h
 )
 

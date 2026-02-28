@@ -65,42 +65,60 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-bool FiffEvents::read(QString t_sEventName,
-                      QString t_fileRawName,
-                      MatrixXi& events)
+FiffEvents::FiffEvents()
 {
+}
+
+//=============================================================================================================
+
+FiffEvents::FiffEvents(QIODevice &p_IODevice)
+{
+    // Try FIFF first, then ASCII
+    if (!read_from_fif(p_IODevice, *this)) {
+        read_from_ascii(p_IODevice, *this);
+    }
+}
+
+//=============================================================================================================
+
+bool FiffEvents::read(const QString &t_sEventName,
+                      const QString &t_fileRawName,
+                      FiffEvents &p_Events)
+{
+    QString eventName = t_sEventName;
     QFile t_EventFile;
     qint32 p;
 
-    if (t_sEventName.isEmpty()) {
-        p = t_fileRawName.indexOf(".fif");
+    if (eventName.isEmpty()) {
+        eventName = t_fileRawName;
+        p = eventName.indexOf(".fif");
         if (p > 0) {
-            t_sEventName = t_fileRawName.replace(p, 4, "-eve.fif");
+            eventName.replace(p, 4, "-eve.fif");
         } else {
             printf("Raw file name does not end properly\n");
-            return 0;
+            return false;
         }
 
-        t_EventFile.setFileName(t_sEventName);
-        if(!FiffEvents::read_from_fif(t_EventFile, events)) {
+        t_EventFile.setFileName(eventName);
+        if(!read_from_fif(t_EventFile, p_Events)) {
             printf("Error while read events.\n");
             return false;
         }
-        printf("Events read from %s\n",t_sEventName.toUtf8().constData());
+        printf("Events read from %s\n",eventName.toUtf8().constData());
     } else {
         // Binary file
-        if (t_sEventName.contains(".fif")) {
-            t_EventFile.setFileName(t_sEventName);
-            if(!FiffEvents::read_from_fif(t_EventFile, events)) {
+        if (eventName.contains(".fif")) {
+            t_EventFile.setFileName(eventName);
+            if(!read_from_fif(t_EventFile, p_Events)) {
                 printf("Error while read events.\n");
                 return false;
             }
-            printf("Binary event file %s read\n",t_sEventName.toUtf8().constData());
-        } else if(t_sEventName.contains(".eve")){
+            printf("Binary event file %s read\n",eventName.toUtf8().constData());
+        } else if(eventName.contains(".eve")){
 
         } else {
             // Text file
-            printf("Text file %s is not supported jet.\n",t_sEventName.toUtf8().constData());
+            printf("Text file %s is not supported jet.\n",eventName.toUtf8().constData());
         }
     }
 
@@ -110,7 +128,7 @@ bool FiffEvents::read(QString t_sEventName,
 //=============================================================================================================
 
 bool FiffEvents::read_from_fif(QIODevice &p_IODevice,
-                               MatrixXi& eventlist)
+                               FiffEvents &p_Events)
 {
     //
     // Open file
@@ -124,9 +142,9 @@ bool FiffEvents::read_from_fif(QIODevice &p_IODevice,
     //
     //   Find the desired block
     //
-    QList<FiffDirNode::SPtr> events = t_pStream->dirtree()->dir_tree_find(FIFFB_MNE_EVENTS);
+    QList<FiffDirNode::SPtr> eventsBlocks = t_pStream->dirtree()->dir_tree_find(FIFFB_MNE_EVENTS);
 
-    if (events.size() == 0)
+    if (eventsBlocks.size() == 0)
     {
         printf("Could not find event data\n");
         return false;
@@ -135,13 +153,13 @@ bool FiffEvents::read_from_fif(QIODevice &p_IODevice,
     qint32 k, nelem;
     fiff_int_t kind, pos;
     FiffTag::SPtr t_pTag;
-    quint32* serial_eventlist_uint = NULL;
-    qint32* serial_eventlist_int = NULL;
+    quint32* serial_eventlist_uint = nullptr;
+    qint32* serial_eventlist_int = nullptr;
 
-    for(k = 0; k < events[0]->nent(); ++k)
+    for(k = 0; k < eventsBlocks[0]->nent(); ++k)
     {
-        kind = events[0]->dir[k]->kind;
-        pos  = events[0]->dir[k]->pos;
+        kind = eventsBlocks[0]->dir[k]->kind;
+        pos  = eventsBlocks[0]->dir[k]->pos;
         if (kind == FIFF_MNE_EVENT_LIST)
         {
             t_pStream->read_tag(t_pTag,pos);
@@ -161,32 +179,30 @@ bool FiffEvents::read_from_fif(QIODevice &p_IODevice,
         }
     }
 
-    if(serial_eventlist_uint == NULL && serial_eventlist_int == NULL)
+    if(serial_eventlist_uint == nullptr && serial_eventlist_int == nullptr)
     {
         printf("Could not find any events\n");
         return false;
     }
-    else
-    {
-        eventlist.resize(nelem/3,3);
-        if(serial_eventlist_uint != NULL)
-        {
-            for(k = 0; k < nelem/3; ++k)
-            {
-                eventlist(k,0) = serial_eventlist_uint[k*3];
-                eventlist(k,1) = serial_eventlist_uint[k*3+1];
-                eventlist(k,2) = serial_eventlist_uint[k*3+2];
-            }
-        }
 
-        if(serial_eventlist_int != NULL)
+    p_Events.events.resize(nelem/3,3);
+    if(serial_eventlist_uint != nullptr)
+    {
+        for(k = 0; k < nelem/3; ++k)
         {
-            for(k = 0; k < nelem/3; ++k)
-            {
-                eventlist(k,0) = serial_eventlist_int[k*3];
-                eventlist(k,1) = serial_eventlist_int[k*3+1];
-                eventlist(k,2) = serial_eventlist_int[k*3+2];
-            }
+            p_Events.events(k,0) = serial_eventlist_uint[k*3];
+            p_Events.events(k,1) = serial_eventlist_uint[k*3+1];
+            p_Events.events(k,2) = serial_eventlist_uint[k*3+2];
+        }
+    }
+
+    if(serial_eventlist_int != nullptr)
+    {
+        for(k = 0; k < nelem/3; ++k)
+        {
+            p_Events.events(k,0) = serial_eventlist_int[k*3];
+            p_Events.events(k,1) = serial_eventlist_int[k*3+1];
+            p_Events.events(k,2) = serial_eventlist_int[k*3+2];
         }
     }
 
@@ -196,7 +212,7 @@ bool FiffEvents::read_from_fif(QIODevice &p_IODevice,
 //=============================================================================================================
 
 bool FiffEvents::read_from_ascii(QIODevice &p_IODevice,
-                                 MatrixXi& eventlist)
+                                 FiffEvents &p_Events)
 {
     if (!p_IODevice.open(QIODevice::ReadOnly | QIODevice::Text)){
         return false;
@@ -213,20 +229,19 @@ bool FiffEvents::read_from_ascii(QIODevice &p_IODevice,
         qDebug() << "Added event:" << iSample;
     }
 
-    eventlist.resize(simpleList.size(), 1);
+    p_Events.events.resize(simpleList.size(), 1);
 
     for(int i = 0; i < simpleList.size(); i++){
-        eventlist(i,0) = simpleList[i];
+        p_Events.events(i,0) = simpleList[i];
     }
     return true;
 }
 
 //=============================================================================================================
 
-bool FiffEvents::write_to_fif(QIODevice &p_IODevice,
-                              const MatrixXi& eventlist)
+bool FiffEvents::write_to_fif(QIODevice &p_IODevice) const
 {
-    if (eventlist.rows() == 0 || eventlist.cols() < 3)
+    if (events.rows() == 0 || events.cols() < 3)
         return false;
 
     FiffStream::SPtr pStream = FiffStream::start_file(p_IODevice);
@@ -234,7 +249,7 @@ bool FiffEvents::write_to_fif(QIODevice &p_IODevice,
         return false;
 
     pStream->start_block(FIFFB_MNE_EVENTS);
-    pStream->write_int(FIFF_MNE_EVENT_LIST, eventlist.data(), eventlist.rows() * 3);
+    pStream->write_int(FIFF_MNE_EVENT_LIST, events.data(), events.rows() * 3);
     pStream->end_block(FIFFB_MNE_EVENTS);
     pStream->end_file();
 
@@ -244,18 +259,17 @@ bool FiffEvents::write_to_fif(QIODevice &p_IODevice,
 //=============================================================================================================
 
 bool FiffEvents::write_to_ascii(QIODevice &p_IODevice,
-                                const MatrixXi& eventlist,
-                                float sfreq)
+                                float sfreq) const
 {
     if (!p_IODevice.open(QIODevice::WriteOnly | QIODevice::Text))
         return false;
 
-    QTextStream out(&p_IODevice);
-    for (int k = 0; k < eventlist.rows(); ++k) {
-        int sample = eventlist(k, 0);
-        int before = (eventlist.cols() > 1) ? eventlist(k, 1) : 0;
-        int after  = (eventlist.cols() > 2) ? eventlist(k, 2) : 0;
+    for (int k = 0; k < events.rows(); ++k) {
+        int sample = events(k, 0);
+        int before = (events.cols() > 1) ? events(k, 1) : 0;
+        int after  = (events.cols() > 2) ? events(k, 2) : 0;
         float time = (sfreq > 0.0f) ? static_cast<float>(sample) / sfreq : 0.0f;
+        QTextStream out(&p_IODevice);
         out << QString("%1 %2 %3 %4\n")
                .arg(sample, 6)
                .arg(time, -10, 'f', 3)
@@ -269,10 +283,11 @@ bool FiffEvents::write_to_ascii(QIODevice &p_IODevice,
 
 //=============================================================================================================
 
-MatrixXi FiffEvents::detect_from_raw(const FiffRawData &raw,
-                                     const QString &triggerCh,
-                                     unsigned int triggerMask,
-                                     bool leadingEdge)
+bool FiffEvents::detect_from_raw(const FiffRawData &raw,
+                                 FiffEvents &p_Events,
+                                 const QString &triggerCh,
+                                 unsigned int triggerMask,
+                                 bool leadingEdge)
 {
     QString stimCh = triggerCh.isEmpty() ? QString("STI 014") : triggerCh;
 
@@ -286,7 +301,7 @@ MatrixXi FiffEvents::detect_from_raw(const FiffRawData &raw,
     }
     if (triggerChIdx < 0) {
         qWarning() << "[FiffEvents::detect_from_raw] Trigger channel" << stimCh << "not found.";
-        return MatrixXi(0, 3);
+        return false;
     }
 
     // Read trigger channel data
@@ -295,7 +310,7 @@ MatrixXi FiffEvents::detect_from_raw(const FiffRawData &raw,
     if (!raw.read_raw_segment(data, times, raw.first_samp, raw.last_samp,
                               RowVectorXi::LinSpaced(1, triggerChIdx, triggerChIdx))) {
         qWarning() << "[FiffEvents::detect_from_raw] Could not read trigger channel data.";
-        return MatrixXi(0, 3);
+        return false;
     }
 
     RowVectorXd trigData = data.row(0);
@@ -320,12 +335,12 @@ MatrixXi FiffEvents::detect_from_raw(const FiffRawData &raw,
     }
 
     int nEvents = eventSamples.size();
-    MatrixXi events(nEvents, 3);
+    p_Events.events.resize(nEvents, 3);
     for (int k = 0; k < nEvents; ++k) {
-        events(k, 0) = eventSamples[k];
-        events(k, 1) = eventBefore[k];
-        events(k, 2) = eventAfter[k];
+        p_Events.events(k, 0) = eventSamples[k];
+        p_Events.events(k, 1) = eventBefore[k];
+        p_Events.events(k, 2) = eventAfter[k];
     }
 
-    return events;
+    return nEvents > 0;
 }

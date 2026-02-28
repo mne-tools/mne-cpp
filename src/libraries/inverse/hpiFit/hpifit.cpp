@@ -411,7 +411,7 @@ FIFFLIB::FiffCoordTrans HPIFit::computeDeviceHeadTransformation(const Eigen::Mat
                                                                 const Eigen::MatrixXd& matCoilsHead)
 {
     const MatrixXd matTrans = computeTransformation(matCoilsHead,matCoilsDev);
-    return FiffCoordTrans::make(1,4,matTrans.cast<float>(),true);
+    return FiffCoordTrans(1,4,matTrans.cast<float>(),true);
 }
 
 //=============================================================================================================

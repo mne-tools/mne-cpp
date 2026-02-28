@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 using namespace Eigen;
+using namespace FIFFLIB;
 using namespace FWDLIB;
 
 #define X 0
@@ -102,7 +103,7 @@ void ComputeFwdSettings::initMembers()
     use_threads = true;
 
     pFiffInfo = Q_NULLPTR;
-    meg_head_t = Q_NULLPTR;
+    meg_head_t = FiffCoordTrans();
 }
 
 //=============================================================================================================

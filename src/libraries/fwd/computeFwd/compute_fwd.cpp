@@ -3,7 +3,7 @@
 #include "compute_fwd.h"
 
 #include <fiff/fiff.h>
-#include <fiff/c/fiff_coord_trans_old.h>
+#include <fiff/fiff_coord_trans.h>
 #include "../fwd_coil_set.h"
 #include "../fwd_comp_data.h"
 #include <mne/c/mne_ctf_comp_data_set.h>
@@ -15,7 +15,7 @@
 #include <mne/c/mne_source_space_old.h>
 #include <mne/mne_forwardsolution.h>
 
-#include <fiff/c/fiff_sparse_matrix.h>
+#include <fiff/fiff_sparse_matrix.h>
 
 #include <fiff/fiff_types.h>
 
@@ -334,7 +334,7 @@ int ComputeFwd::mne_read_meg_comp_eeg_ch_info_41(FIFFLIB::FiffInfoBase::SPtr pFi
                                                  int& iNMegCmp,
                                                  QList<FiffChInfo>& listEegCh,
                                                  int &iNEeg,
-                                                 FiffCoordTransOld** transDevHeadOld,
+                                                 FiffCoordTrans& transDevHead,
                                                  FiffId& id)
 {
     int iNumCh = pFiffInfoBase->nchan;
@@ -351,12 +351,12 @@ int ComputeFwd::mne_read_meg_comp_eeg_ch_info_41(FIFFLIB::FiffInfoBase::SPtr pFi
         }
     }
 
-    if(!m_pSettings->meg_head_t) {
-        *transDevHeadOld = new FiffCoordTransOld(pFiffInfoBase->dev_head_t.toOld());
+    if(m_pSettings->meg_head_t.isEmpty()) {
+        transDevHead = pFiffInfoBase->dev_head_t;
     } else {
-        *transDevHeadOld = m_pSettings->meg_head_t;
+        transDevHead = m_pSettings->meg_head_t;
     }
-    if(!m_meg_head_t) {
+    if(m_meg_head_t.isEmpty()) {
         qCritical("MEG -> head coordinate transformation not found.");
         return FIFF_FAIL;
     }
@@ -435,7 +435,7 @@ void write_id_old(FiffStream::SPtr& t_pStream, fiff_int_t kind, fiffId id)
 
 //=============================================================================================================
 
-void write_coord_trans_old(FiffStream::SPtr& t_pStream, const FiffCoordTransOld* trans)
+void write_coord_trans_old(FiffStream::SPtr& t_pStream, const FiffCoordTrans& trans)
 {
     //?typedef struct _fiffCoordTransRec {
     //  fiff_int_t   from;                   /*!< Source coordinate system. */
@@ -455,8 +455,8 @@ void write_coord_trans_old(FiffStream::SPtr& t_pStream, const FiffCoordTransOld*
     //
     //   Start writing fiffCoordTransRec
     //
-     *t_pStream << (qint32)trans->from;
-     *t_pStream << (qint32)trans->to;
+     *t_pStream << (qint32)trans.from;
+     *t_pStream << (qint32)trans.to;
 
     //
     //   The transform...
@@ -464,18 +464,25 @@ void write_coord_trans_old(FiffStream::SPtr& t_pStream, const FiffCoordTransOld*
     qint32 r, c;
     for (r = 0; r < 3; ++r)
         for (c = 0; c < 3; ++c)
-            *t_pStream << (float)trans->rot(r,c);
+            *t_pStream << (float)trans.rot()(r,c);
     for (r = 0; r < 3; ++r)
-        *t_pStream << (float)trans->move[r];
+        *t_pStream << (float)trans.move()(r);
 
     //
     //   ...and its inverse
     //
     for (r = 0; r < 3; ++r)
         for (c = 0; c < 3; ++c)
-            *t_pStream << (float)trans->invrot(r,c);
+            *t_pStream << (float)trans.invrot()(r,c);
     for (r = 0; r < 3; ++r)
-        *t_pStream << (float)trans->invmove[r];
+        *t_pStream << (float)trans.invmove()(r);
+}
+
+// Write a coordinate transform to a FIFF stream.
+void write_coord_trans(FiffStream::SPtr& t_pStream, const FiffCoordTrans& trans)
+{
+    if (trans.isEmpty()) return;
+    write_coord_trans_old(t_pStream, trans);
 }
 
 static int **make_file_triangle_list_41(int **tris, int ntri)
@@ -868,9 +875,7 @@ FiffSparseMatrix* mne_create_sparse_rcs(int nrow,           /* Number of rows */
                                                      * If Q_NULLPTR, the matrix will be all zeroes */
 
 {
-    FiffSparseMatrix* sparse = Q_NULLPTR;
-    int j,k,nz,ptr,size,ind;
-    int stor_type = FIFFTS_MC_RCS;
+    int j,k,nz,ptr,ind;
 
     for (j = 0, nz = 0; j < nrow; j++)
         nz = nz + nnz[j];
@@ -879,17 +884,18 @@ FiffSparseMatrix* mne_create_sparse_rcs(int nrow,           /* Number of rows */
         qCritical("No nonzero elements specified.");
         return Q_NULLPTR;
     }
-    size = nz*(sizeof(fiff_float_t) + sizeof(fiff_int_t)) +
-            (nrow+1)*(sizeof(fiff_int_t));
 
-    sparse = new FiffSparseMatrix;
-    sparse->coding = stor_type;
+    FiffSparseMatrix* sparse = new FiffSparseMatrix;
+    sparse->coding = FIFFTS_MC_RCS;
     sparse->m      = nrow;
     sparse->n      = ncol;
     sparse->nz     = nz;
-    sparse->data   = (float *)malloc(size);
-    sparse->inds   = (int *)(sparse->data+nz);
-    sparse->ptrs   = sparse->inds+nz;
+    sparse->data.resize(nz);
+    sparse->data.setZero();
+    sparse->inds.resize(nz);
+    sparse->inds.setZero();
+    sparse->ptrs.resize(nrow + 1);
+    sparse->ptrs.setZero();
 
     for (j = 0, nz = 0; j < nrow; j++) {
         ptr = -1;
@@ -899,7 +905,8 @@ FiffSparseMatrix* mne_create_sparse_rcs(int nrow,           /* Number of rows */
             ind = sparse->inds[nz] = colindex[j][k];
             if (ind < 0 || ind >= ncol) {
                 qCritical("Column index out of range in mne_create_sparse_rcs");
-                goto bad;
+                delete sparse;
+                return Q_NULLPTR;
             }
             if (vals)
                 sparse->data[nz] = vals[j][k];
@@ -914,12 +921,6 @@ FiffSparseMatrix* mne_create_sparse_rcs(int nrow,           /* Number of rows */
         if (sparse->ptrs[j] < 0)
             sparse->ptrs[j] = sparse->ptrs[j+1];
     return sparse;
-
-bad : {
-        if(sparse)
-            delete sparse;
-        return Q_NULLPTR;
-    }
 }
 
 FiffSparseMatrix* mne_pick_lower_triangle_rcs(FiffSparseMatrix* mat)
@@ -927,31 +928,28 @@ FiffSparseMatrix* mne_pick_lower_triangle_rcs(FiffSparseMatrix* mat)
  * Fill in upper triangle with the lower triangle values
  */
 {
-    int             *nnz       = Q_NULLPTR;
-    int             **colindex = Q_NULLPTR;
-    float           **vals     = Q_NULLPTR;
-    FiffSparseMatrix* res = Q_NULLPTR;
     int             i,j,k;
 
     if (mat->coding != FIFFTS_MC_RCS) {
         qCritical("The input matrix to mne_add_upper_triangle_rcs must be in RCS format");
-        goto out;
+        return Q_NULLPTR;
     }
     if (mat->m != mat->n) {
         qCritical("The input matrix to mne_pick_lower_triangle_rcs must be square");
-        goto out;
+        return Q_NULLPTR;
     }
     /*
    * Pick the lower triangle elements
    */
-    nnz      = MALLOC_41(mat->m,int);
-    colindex = MALLOC_41(mat->m,int *);
-    vals     = MALLOC_41(mat->m,float *);
+    std::vector<int>                nnz(mat->m);
+    std::vector<std::vector<int>>   colindex(mat->m);
+    std::vector<std::vector<float>> vals(mat->m);
+
     for (i = 0; i < mat->m; i++) {
         nnz[i]      = mat->ptrs[i+1] - mat->ptrs[i];
         if (nnz[i] > 0) {
-            colindex[i] = MALLOC_41(nnz[i],int);
-            vals[i]   = MALLOC_41(nnz[i],float);
+            colindex[i].resize(nnz[i]);
+            vals[i].resize(nnz[i]);
             for (j = mat->ptrs[i], k = 0; j < mat->ptrs[i+1]; j++) {
                 if (mat->inds[j] <= i) {
                     vals[i][k] = mat->data[j];
@@ -961,26 +959,18 @@ FiffSparseMatrix* mne_pick_lower_triangle_rcs(FiffSparseMatrix* mat)
             }
             nnz[i] = k;
         }
-        else {
-            colindex[i] = Q_NULLPTR;
-            vals[i] = Q_NULLPTR;
-        }
     }
     /*
-   * Assemble the matrix
+   * Assemble the matrix — build raw pointer arrays for the C-style interface
    */
-    res = mne_create_sparse_rcs(mat->m,mat->n,nnz,colindex,vals);
-
-out : {
-        for (i = 0; i < mat->m; i++) {
-            FREE_41(colindex[i]);
-            FREE_41(vals[i]);
-        }
-        FREE_41(nnz);
-        FREE_41(vals);
-        FREE_41(colindex);
-        return res;
+    std::vector<int*>   ci_ptrs(mat->m);
+    std::vector<float*> val_ptrs(mat->m);
+    for (i = 0; i < mat->m; i++) {
+        ci_ptrs[i]  = colindex[i].empty() ? nullptr : colindex[i].data();
+        val_ptrs[i] = vals[i].empty() ? nullptr : vals[i].data();
     }
+
+    return mne_create_sparse_rcs(mat->m, mat->n, nnz.data(), ci_ptrs.data(), val_ptrs.data());
 }
 
 static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* ss, int selected_only)
@@ -1063,8 +1053,8 @@ static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOl
      * Write some additional stuff
      */
     if (!selected_only) {
-        if (ss->voxel_surf_RAS_t) {
-            write_coord_trans_old(t_pStream, ss->voxel_surf_RAS_t);//t_pStream->write_coord_trans(ss->voxel_surf_RAS_t);
+        if (ss->voxel_surf_RAS_t && !ss->voxel_surf_RAS_t->isEmpty()) {
+            write_coord_trans_old(t_pStream, *ss->voxel_surf_RAS_t);//t_pStream->write_coord_trans(ss->voxel_surf_RAS_t);
 
             t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_VOXEL_DIMS,ss->vol_dims,3);
             //            tag.next = FIFFV_NEXT_SEQ;
@@ -1077,10 +1067,10 @@ static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOl
         }
         if (ss->interpolator && !ss->MRI_volume.isEmpty()) {
             t_pStream->start_block(FIFFB_MNE_PARENT_MRI_FILE);
-            if (ss->MRI_surf_RAS_RAS_t)
-                write_coord_trans_old(t_pStream, ss->MRI_surf_RAS_RAS_t);//t_pStream->write_coord_trans(ss->MRI_surf_RAS_RAS_t);
-            if (ss->MRI_voxel_surf_RAS_t)
-                write_coord_trans_old(t_pStream, ss->MRI_voxel_surf_RAS_t);//t_pStream->write_coord_trans(ss->MRI_voxel_surf_RAS_t);
+            if (ss->MRI_surf_RAS_RAS_t && !ss->MRI_surf_RAS_RAS_t->isEmpty())
+                write_coord_trans_old(t_pStream, *ss->MRI_surf_RAS_RAS_t);//t_pStream->write_coord_trans(ss->MRI_surf_RAS_RAS_t);
+            if (ss->MRI_voxel_surf_RAS_t && !ss->MRI_voxel_surf_RAS_t->isEmpty())
+                write_coord_trans_old(t_pStream, *ss->MRI_voxel_surf_RAS_t);//t_pStream->write_coord_trans(ss->MRI_voxel_surf_RAS_t);
             t_pStream->write_string(FIFF_MNE_FILE_NAME,ss->MRI_volume);
             if (ss->interpolator)
                 fiff_write_float_sparse_matrix_old(t_pStream,FIFF_MNE_SOURCE_SPACE_INTERPOLATOR,ss->interpolator);
@@ -1408,10 +1398,10 @@ bool write_solution(const QString& name,         /* Destination file */
                     int nspace,
                     const QString& mri_file,     /* MRI file and data obtained from there */
                     fiffId mri_id,
-                    FiffCoordTransOld* mri_head_t,
+                    const FiffCoordTrans& mri_head_t,
                     const QString& meas_file,    /* MEG file and data obtained from there */
                     FiffId meas_id,
-                    FiffCoordTransOld* meg_head_t,
+                    const FiffCoordTrans& meg_head_t,
                     QList<FiffChInfo> meg_chs,
                     int nmeg,
                     QList<FiffChInfo> eeg_chs,
@@ -1839,10 +1829,6 @@ ComputeFwd::~ComputeFwd()
     for (int k = 0; k < m_iNSpace; k++)
         if(m_spaces[k])
             delete m_spaces[k];
-    if(m_mri_head_t)
-        delete m_mri_head_t;
-    if(m_meg_head_t)
-        delete m_meg_head_t;
     if(m_megcoils)
         delete m_megcoils;
     if(m_eegels)
@@ -1860,8 +1846,8 @@ void ComputeFwd::initFwd()
     m_iNSpace               = 0;
     m_iNSource              = 0;
 
-    m_mri_head_t            = Q_NULLPTR;
-    m_meg_head_t            = Q_NULLPTR;
+    m_mri_head_t            = FiffCoordTrans();
+    m_meg_head_t            = FiffCoordTrans();
 
     m_listMegChs = QList<FiffChInfo>();
     m_listEegChs = QList<FiffChInfo>();
@@ -1937,7 +1923,7 @@ void ComputeFwd::initFwd()
         }
     }
     printf("%s field computations\n",m_pSettings->accurate ? "Accurate" : "Standard");
-    printf("Do computations in %s coordinates.\n",FiffCoordTransOld::mne_coord_frame_name(m_pSettings->coord_frame));
+    printf("Do computations in %s coordinates.\n",FiffCoordTrans::frame_name(m_pSettings->coord_frame).toUtf8().constData());
     printf("%s source orientations\n",m_pSettings->fixed_ori ? "Fixed" : "Free");
     if (m_pSettings->compute_grad) {
         printf("Compute derivatives with respect to source location coordinates\n");
@@ -1975,7 +1961,8 @@ void ComputeFwd::initFwd()
     // Read the MRI -> head coordinate transformation
     printf("\n");
     if (!m_pSettings->mriname.isEmpty()) {
-        if ((m_mri_head_t = FiffCoordTransOld::mne_read_mri_transform(m_pSettings->mriname)) == Q_NULLPTR) {
+        m_mri_head_t = FiffCoordTrans::readMriTransform(m_pSettings->mriname);
+        if (m_mri_head_t.isEmpty()) {
             return;
         }
         if ((m_mri_id = get_file_id(m_pSettings->mriname)) == Q_NULLPTR) {
@@ -1984,18 +1971,15 @@ void ComputeFwd::initFwd()
         }
     }
     else if (!m_pSettings->transname.isEmpty()) {
-        FiffCoordTransOld* t;
-        if ((t = FiffCoordTransOld::mne_read_FShead2mri_transform(m_pSettings->transname.toUtf8().data())) == Q_NULLPTR) {
+        FiffCoordTrans t = FiffCoordTrans::readFShead2mriTransform(m_pSettings->transname.toUtf8().data());
+        if (t.isEmpty()) {
             return;
         }
-        m_mri_head_t = t->fiff_invert_transform();
-        if(t) {
-            delete t;
-        }
+        m_mri_head_t = t.inverted();
     } else {
-        m_mri_head_t = FiffCoordTransOld::mne_identity_transform(FIFFV_COORD_MRI,FIFFV_COORD_HEAD);
+        m_mri_head_t = FiffCoordTrans::identity(FIFFV_COORD_MRI,FIFFV_COORD_HEAD);
     }
-    FiffCoordTransOld::mne_print_coord_transform(stdout,m_mri_head_t);
+    m_mri_head_t.print();
 
     // Read the channel information and the MEG device -> head coordinate transformation
     // replace mne_read_meg_comp_eeg_ch_info_41()
@@ -2032,7 +2016,7 @@ void ComputeFwd::initFwd()
                                          iNComp,
                                          m_listEegChs,
                                          iNEeg,
-                                         &m_meg_head_t,
+                                         m_meg_head_t,
                                          m_meas_id) != OK) {
         return;
     }
@@ -2057,7 +2041,7 @@ void ComputeFwd::initFwd()
         iNComp = 0;
     }
     else
-        FiffCoordTransOld::mne_print_coord_transform(stdout,m_meg_head_t);
+        m_meg_head_t.print();
     if (!m_pSettings->include_eeg) {
         printf("EEG not requested. EEG channels omitted.\n");
         m_listEegChs.clear();
@@ -2103,9 +2087,9 @@ void ComputeFwd::initFwd()
         }
     }
     if (m_pSettings->coord_frame == FIFFV_COORD_MRI) {
-        FiffCoordTransOld* head_mri_t = m_mri_head_t->fiff_invert_transform();
-        FiffCoordTransOld* meg_mri_t = FiffCoordTransOld::fiff_combine_transforms(FIFFV_COORD_DEVICE,FIFFV_COORD_MRI,m_meg_head_t,head_mri_t);
-        if (meg_mri_t == Q_NULLPTR) {
+        FiffCoordTrans head_mri_t = m_mri_head_t.inverted();
+        FiffCoordTrans meg_mri_t = FiffCoordTrans::combine(FIFFV_COORD_DEVICE,FIFFV_COORD_MRI,m_meg_head_t,head_mri_t);
+        if (meg_mri_t.isEmpty()) {
             return;
         }
         if ((m_megcoils = m_templates->create_meg_coils(m_listMegChs,
@@ -2128,7 +2112,6 @@ void ComputeFwd::initFwd()
             return;
         }
 
-        FREE_41(head_mri_t);
         printf("MRI coordinate coil definitions created.\n");
     } else {
         if ((m_megcoils = m_templates->create_meg_coils(m_listMegChs,
@@ -2146,19 +2129,19 @@ void ComputeFwd::initFwd()
             }
         }
         if ((m_eegels = FwdCoilSet::create_eeg_els(m_listEegChs,
-                                                   iNEeg,
-                                                   Q_NULLPTR)) == Q_NULLPTR) {
+                                                   iNEeg)) == Q_NULLPTR) {
             return;
         }
         printf("Head coordinate coil definitions created.\n");
     }
 
     // Transform the source spaces into the appropriate coordinates
-
-    if (MneSurfaceOrVolume::mne_transform_source_spaces_to(m_pSettings->coord_frame,m_mri_head_t,m_spaces,m_iNSpace) != OK) {
-        return;
+    {
+        if (MneSurfaceOrVolume::mne_transform_source_spaces_to(m_pSettings->coord_frame,m_mri_head_t,m_spaces,m_iNSpace) != OK) {
+            return;
+        }
     }
-    printf("Source spaces are now in %s coordinates.\n",FiffCoordTransOld::mne_coord_frame_name(m_pSettings->coord_frame));
+    printf("Source spaces are now in %s coordinates.\n",FiffCoordTrans::frame_name(m_pSettings->coord_frame).toUtf8().constData());
 
     // Prepare the BEM model if necessary
 
@@ -2316,7 +2299,7 @@ void ComputeFwd::calculateFwd()
 
 //=========================================================================================================
 
-void ComputeFwd::updateHeadPos(FiffCoordTransOld* transDevHeadOld)
+void ComputeFwd::updateHeadPos(const FiffCoordTrans& transDevHead)
 {
 
     int iNMeg = 0;
@@ -2328,51 +2311,12 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* transDevHeadOld)
     if(m_compcoils) {
         iNComp = m_compcoils->ncoil;
     }
-//    // transformation in head space
-//    FiffCoordTransOld* transHeadHeadOld = new FiffCoordTransOld;
-//
-//    // get transformation matrix in Headspace between two meg -> head transformation
-//    // ToDo: the following part has to be tested
-//    if(transDevHeadOld->from != m_megcoils->coord_frame) {
-//        if(transDevHeadOld->to != m_megcoils->coord_frame) {
-//            qWarning() << "ComputeFwd::updateHeadPos: Target Space not in Head Space - Space: " << transDevHeadOld->to;
-//            return;
-//        }
-//        // calclulate rotation
-//        Matrix3f matRot = m_meg_head_t->rot;              // meg->head to origin
-//        Matrix3f matRotDest = transDevHeadOld->rot;       // meg->head after movement
-//        Matrix3f matRotNew = Matrix3f::Zero(3,3);         // rotation between origin and updated point
-//
-//        // get Quaternions
-//        Quaternionf quat(matRot);
-//        Quaternionf quatDest(matRotDest);
-//        Quaternionf quatNew;
-//        // Rotation between two rotation matrices is calculated by multiplying with the inverse
-//        // this is computitional easier with quaternions because for inverse we just have to flip signs
-//        quatNew = quat*quatDest.inverse();
-//        matRotNew = quatNew.toRotationMatrix();           // rotation between origin and updated point
-//
-//        // calculate translation
-//        // translation between to points = vector rsulting from substraction
-//        VectorXf vecTrans = m_meg_head_t->move;
-//        VectorXf vecTransDest = transDevHeadOld->move;
-//        VectorXf vecTransNew = vecTrans - vecTransDest;
-//
-//        // update new transformation matrix
-//        transHeadHeadOld->from = m_megcoils->coord_frame;
-//        transHeadHeadOld->to = m_megcoils->coord_frame;
-//        transHeadHeadOld->rot = matRotNew;
-//        transHeadHeadOld->move = vecTransNew;
-//        transHeadHeadOld->add_inverse(transHeadHeadOld);
-//    }
-//
-//    FwdCoilSet* megcoilsNew = m_megcoils->dup_coil_set(transHeadHeadOld);
 
     // create new coilset with updated head position
     if (m_pSettings->coord_frame == FIFFV_COORD_MRI) {
-        FiffCoordTransOld* head_mri_t = m_mri_head_t->fiff_invert_transform();
-        FiffCoordTransOld* meg_mri_t = FiffCoordTransOld::fiff_combine_transforms(FIFFV_COORD_DEVICE,FIFFV_COORD_MRI,transDevHeadOld,head_mri_t);
-        if (meg_mri_t == Q_NULLPTR) {
+        FiffCoordTrans head_mri_t = m_mri_head_t.inverted();
+        FiffCoordTrans meg_mri_t = FiffCoordTrans::combine(FIFFV_COORD_DEVICE,FIFFV_COORD_MRI,transDevHead,head_mri_t);
+        if (meg_mri_t.isEmpty()) {
             return;
         }
         if ((m_megcoils = m_templates->create_meg_coils(m_listMegChs,
@@ -2393,14 +2337,14 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* transDevHeadOld)
         if ((m_megcoils = m_templates->create_meg_coils(m_listMegChs,
                                                         iNMeg,
                                                         m_pSettings->accurate ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
-                                                        transDevHeadOld)) == Q_NULLPTR) {
+                                                        transDevHead)) == Q_NULLPTR) {
             return;
         }
 
         if (iNComp > 0) {
             if ((m_compcoils = m_templates->create_meg_coils(m_listCompChs,
                                                              iNComp,
-                                                             FWD_COIL_ACCURACY_NORMAL,transDevHeadOld)) == Q_NULLPTR) {
+                                                             FWD_COIL_ACCURACY_NORMAL,transDevHead)) == Q_NULLPTR) {
                 return;
             }
         }
@@ -2430,7 +2374,7 @@ void ComputeFwd::updateHeadPos(FiffCoordTransOld* transDevHeadOld)
     }
 
     // Update new Transformation Matrix
-    m_meg_head_t = new FiffCoordTransOld(*transDevHeadOld);
+    m_meg_head_t = transDevHead;
     // update solution
     sol->data.block(0,0,m_meg_forward->nrow,m_meg_forward->ncol) = m_meg_forward->data;
     if(m_pSettings->compute_grad) {
@@ -2444,8 +2388,10 @@ void ComputeFwd::storeFwd(const QString& sSolName)
 {
     // We are ready to spill it out
     // Transform the source spaces back into MRI coordinates
-    if (MneSourceSpaceOld::mne_transform_source_spaces_to(FIFFV_COORD_MRI,m_mri_head_t,m_spaces,m_iNSpace) != OK) {
-        return;
+    {
+        if (MneSourceSpaceOld::mne_transform_source_spaces_to(FIFFV_COORD_MRI,m_mri_head_t,m_spaces,m_iNSpace) != OK) {
+            return;
+        }
     }
 
     int iNMeg = m_megcoils->ncoil;

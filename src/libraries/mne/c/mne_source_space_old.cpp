@@ -40,6 +40,8 @@
 
 #include "mne_source_space_old.h"
 
+using FIFFLIB::FiffCoordTrans;
+
 #define X_51 0
 #define Y_51 1
 #define Z_51 2
@@ -149,12 +151,12 @@ MneSourceSpaceOld::MneSourceSpaceOld(int np)
     dist       = Q_NULLPTR;
     dist_limit = -1.0;
 
-    voxel_surf_RAS_t     = Q_NULLPTR;
+    voxel_surf_RAS_t.reset();
     vol_dims[0] = vol_dims[1] = vol_dims[2] = 0;
 
     MRI_volume           = "";
-    MRI_surf_RAS_RAS_t   = Q_NULLPTR;
-    MRI_voxel_surf_RAS_t = Q_NULLPTR;
+    MRI_surf_RAS_RAS_t.reset();
+    MRI_voxel_surf_RAS_t.reset();
     MRI_vol_dims[0] = MRI_vol_dims[1] = MRI_vol_dims[2] = 0;
     interpolator         = Q_NULLPTR;
 

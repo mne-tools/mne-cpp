@@ -429,7 +429,7 @@ FwdBemModel::FwdBemModel()
 ,bem_method (FWD_BEM_UNKNOWN)
 ,solution   (NULL)
 ,nsol       (0)
-,head_mri_t (NULL)
+,head_mri_t ()
 ,v0         (NULL)
 ,use_ip_approach(false)
 ,ip_approach_limit(FWD_BEM_IP_APPROACH_LIMIT)
@@ -448,8 +448,6 @@ FwdBemModel::~FwdBemModel()
     FREE_40(this->source_mult);
     FREE_40(this->field_mult);
     FREE_CMATRIX_40(this->gamma);
-    if(this->head_mri_t)
-        delete this->head_mri_t;
     this->fwd_bem_free_solution();
 }
 
@@ -756,21 +754,17 @@ not_found : {
 
 //=============================================================================================================
 
-int FwdBemModel::fwd_bem_set_head_mri_t(FwdBemModel *m, FiffCoordTransOld *t)
+int FwdBemModel::fwd_bem_set_head_mri_t(FwdBemModel *m, const FiffCoordTrans &t)
 /*
      * Set the coordinate transformation
      */
 {
-    if (t->from == FIFFV_COORD_HEAD && t->to == FIFFV_COORD_MRI) {
-        if(m->head_mri_t)
-            delete m->head_mri_t;
-        m->head_mri_t = new FiffCoordTransOld( *t );
+    if (t.from == FIFFV_COORD_HEAD && t.to == FIFFV_COORD_MRI) {
+        m->head_mri_t = t;
         return OK;
     }
-    else if (t->from == FIFFV_COORD_MRI && t->to == FIFFV_COORD_HEAD) {
-        if(m->head_mri_t)
-            delete m->head_mri_t;
-        m->head_mri_t = t->fiff_invert_transform();
+    else if (t.from == FIFFV_COORD_MRI && t.to == FIFFV_COORD_HEAD) {
+        m->head_mri_t = t.inverted();
         return OK;
     }
     else {
@@ -1606,8 +1600,8 @@ int FwdBemModel::fwd_bem_specify_els(FwdBemModel* m, FwdCoilSet *els)
          */
         for (p = 0; p < el->np; p++) {
             VEC_COPY_40(r,el->rmag[p]);
-            if (m->head_mri_t != NULL)
-                FiffCoordTransOld::fiff_coord_trans(r,m->head_mri_t,FIFFV_MOVE);
+            if (!m->head_mri_t.isEmpty())
+                FiffCoordTrans::apply_trans(r,m->head_mri_t,FIFFV_MOVE);
             best = MneSurfaceOrVolume::mne_project_to_surface(scalp,NULL,r,FALSE,&dist);
             if (best < 0) {
                 printf("One of the electrodes could not be projected onto the scalp surface. How come?");
@@ -1679,17 +1673,17 @@ void FwdBemModel::fwd_bem_pot_grad_calc(float *rd, float *Q, FwdBemModel* m, Fwd
 
     VEC_COPY_40(mri_rd,rd);
     VEC_COPY_40(mri_Q,Q);
-    if (m->head_mri_t) {
-        FiffCoordTransOld::fiff_coord_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
-        FiffCoordTransOld::fiff_coord_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
+    if (!m->head_mri_t.isEmpty()) {
+        FiffCoordTrans::apply_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
+        FiffCoordTrans::apply_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
     }
     for (pp = 0; pp < 3; pp++) {
         grad = grads[pp];
 
         for (p = 0; p < 3; p++)
             ee[p] = p == pp ? 1.0 : 0.0;
-        if (m->head_mri_t)
-            FiffCoordTransOld::fiff_coord_trans(ee,m->head_mri_t,FIFFV_NO_MOVE);
+        if (!m->head_mri_t.isEmpty())
+            FiffCoordTrans::apply_trans(ee,m->head_mri_t,FIFFV_NO_MOVE);
 
         for (s = 0, p = 0; s < m->nsurf; s++) {
             ntri = m->surfs[s]->ntri;
@@ -1735,9 +1729,9 @@ void FwdBemModel::fwd_bem_lin_pot_calc(float *rd, float *Q, FwdBemModel *m, FwdC
 
     VEC_COPY_40(mri_rd,rd);
     VEC_COPY_40(mri_Q,Q);
-    if (m->head_mri_t) {
-        FiffCoordTransOld::fiff_coord_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
-        FiffCoordTransOld::fiff_coord_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
+    if (!m->head_mri_t.isEmpty()) {
+        FiffCoordTrans::apply_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
+        FiffCoordTrans::apply_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
     }
     for (s = 0, p = 0; s < m->nsurf; s++) {
         np     = m->surfs[s]->np;
@@ -1789,17 +1783,17 @@ void FwdBemModel::fwd_bem_lin_pot_grad_calc(float *rd, float *Q, FwdBemModel *m,
 
     VEC_COPY_40(mri_rd,rd);
     VEC_COPY_40(mri_Q,Q);
-    if (m->head_mri_t) {
-        FiffCoordTransOld::fiff_coord_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
-        FiffCoordTransOld::fiff_coord_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
+    if (!m->head_mri_t.isEmpty()) {
+        FiffCoordTrans::apply_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
+        FiffCoordTrans::apply_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
     }
     for (pp = 0; pp < 3; pp++) {
         grad = grads[pp];
 
         for (p = 0; p < 3; p++)
             ee[p] = p == pp ? 1.0 : 0.0;
-        if (m->head_mri_t)
-            FiffCoordTransOld::fiff_coord_trans(ee,m->head_mri_t,FIFFV_NO_MOVE);
+        if (!m->head_mri_t.isEmpty())
+            FiffCoordTrans::apply_trans(ee,m->head_mri_t,FIFFV_NO_MOVE);
 
         for (s = 0, p = 0; s < m->nsurf; s++) {
             np     = m->surfs[s]->np;
@@ -1844,9 +1838,9 @@ void FwdBemModel::fwd_bem_pot_calc(float *rd, float *Q, FwdBemModel *m, FwdCoilS
 
     VEC_COPY_40(mri_rd,rd);
     VEC_COPY_40(mri_Q,Q);
-    if (m->head_mri_t) {
-        FiffCoordTransOld::fiff_coord_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
-        FiffCoordTransOld::fiff_coord_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
+    if (!m->head_mri_t.isEmpty()) {
+        FiffCoordTrans::apply_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
+        FiffCoordTrans::apply_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
     }
     for (s = 0, p = 0; s < m->nsurf; s++) {
         ntri = m->surfs[s]->ntri;
@@ -2163,7 +2157,7 @@ float **FwdBemModel::fwd_bem_field_coeff(FwdBemModel *m, FwdCoilSet *coils)	/* G
     }
     if (coils->coord_frame != FIFFV_COORD_MRI) {
         if (coils->coord_frame == FIFFV_COORD_HEAD) {
-            if (!m->head_mri_t) {
+            if (m->head_mri_t.isEmpty()) {
                 printf("head -> mri coordinate transform missing in fwd_bem_field_coeff");
                 return NULL;
             }
@@ -2381,7 +2375,7 @@ float **FwdBemModel::fwd_bem_lin_field_coeff(FwdBemModel *m, FwdCoilSet *coils, 
     }
     if (coils->coord_frame != FIFFV_COORD_MRI) {
         if (coils->coord_frame == FIFFV_COORD_HEAD) {
-            if (!m->head_mri_t) {
+            if (m->head_mri_t.isEmpty()) {
                 printf("head -> mri coordinate transform missing in fwd_bem_lin_field_coeff");
                 return NULL;
             }
@@ -2529,9 +2523,9 @@ void FwdBemModel::fwd_bem_lin_field_calc(float *rd, float *Q, FwdCoilSet *coils,
        */
     VEC_COPY_40(my_rd,rd);
     VEC_COPY_40(my_Q,Q);
-    if (m->head_mri_t) {
-        FiffCoordTransOld::fiff_coord_trans(my_rd,m->head_mri_t,FIFFV_MOVE);
-        FiffCoordTransOld::fiff_coord_trans(my_Q,m->head_mri_t,FIFFV_NO_MOVE);
+    if (!m->head_mri_t.isEmpty()) {
+        FiffCoordTrans::apply_trans(my_rd,m->head_mri_t,FIFFV_MOVE);
+        FiffCoordTrans::apply_trans(my_Q,m->head_mri_t,FIFFV_NO_MOVE);
     }
     /*
        * Compute the inifinite-medium potentials at the vertices
@@ -2591,9 +2585,9 @@ void FwdBemModel::fwd_bem_field_calc(float *rd, float *Q, FwdCoilSet *coils, Fwd
        */
     VEC_COPY_40(my_rd,rd);
     VEC_COPY_40(my_Q,Q);
-    if (m->head_mri_t) {
-        FiffCoordTransOld::fiff_coord_trans(my_rd,m->head_mri_t,FIFFV_MOVE);
-        FiffCoordTransOld::fiff_coord_trans(my_Q,m->head_mri_t,FIFFV_NO_MOVE);
+    if (!m->head_mri_t.isEmpty()) {
+        FiffCoordTrans::apply_trans(my_rd,m->head_mri_t,FIFFV_MOVE);
+        FiffCoordTrans::apply_trans(my_Q,m->head_mri_t,FIFFV_NO_MOVE);
     }
     /*
        * Compute the inifinite-medium potentials at the centers of the triangles
@@ -2658,9 +2652,9 @@ void FwdBemModel::fwd_bem_field_grad_calc(float *rd, float *Q, FwdCoilSet* coils
        */
     VEC_COPY_40(mri_rd,rd);
     VEC_COPY_40(mri_Q,Q);
-    if (m->head_mri_t) {
-        FiffCoordTransOld::fiff_coord_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
-        FiffCoordTransOld::fiff_coord_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
+    if (!m->head_mri_t.isEmpty()) {
+        FiffCoordTrans::apply_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
+        FiffCoordTrans::apply_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
     }
     for (pp = 0; pp < 3; pp++) {
         grad = grads[pp];
@@ -2670,8 +2664,8 @@ void FwdBemModel::fwd_bem_field_grad_calc(float *rd, float *Q, FwdCoilSet* coils
         for (p = 0; p < 3; p++)
             ee[p] = p == pp ? 1.0 : 0.0;
         VEC_COPY_40(mri_ee,ee);
-        if (m->head_mri_t)
-            FiffCoordTransOld::fiff_coord_trans(mri_ee,m->head_mri_t,FIFFV_NO_MOVE);
+        if (!m->head_mri_t.isEmpty())
+            FiffCoordTrans::apply_trans(mri_ee,m->head_mri_t,FIFFV_NO_MOVE);
         /*
          * Compute the inifinite-medium potential derivatives at the centers of the triangles
          */
@@ -2780,9 +2774,9 @@ void FwdBemModel::fwd_bem_lin_field_grad_calc(float *rd, float *Q, FwdCoilSet *c
        */
     VEC_COPY_40(mri_rd,rd);
     VEC_COPY_40(mri_Q,Q);
-    if (m->head_mri_t) {
-        FiffCoordTransOld::fiff_coord_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
-        FiffCoordTransOld::fiff_coord_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
+    if (!m->head_mri_t.isEmpty()) {
+        FiffCoordTrans::apply_trans(mri_rd,m->head_mri_t,FIFFV_MOVE);
+        FiffCoordTrans::apply_trans(mri_Q,m->head_mri_t,FIFFV_NO_MOVE);
     }
     for (pp = 0; pp < 3; pp++) {
         grad = grads[pp];
@@ -2792,8 +2786,8 @@ void FwdBemModel::fwd_bem_lin_field_grad_calc(float *rd, float *Q, FwdCoilSet *c
         for (p = 0; p < 3; p++)
             ee[p] = p == pp ? 1.0 : 0.0;
         VEC_COPY_40(mri_ee,ee);
-        if (m->head_mri_t)
-            FiffCoordTransOld::fiff_coord_trans(mri_ee,m->head_mri_t,FIFFV_NO_MOVE);
+        if (!m->head_mri_t.isEmpty())
+            FiffCoordTrans::apply_trans(mri_ee,m->head_mri_t,FIFFV_NO_MOVE);
         /*
          * Compute the inifinite-medium potentials at the vertices
          */

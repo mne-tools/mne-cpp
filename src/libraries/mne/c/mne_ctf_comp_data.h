@@ -44,7 +44,7 @@
 #include "../mne_global.h"
 
 #include "mne_named_matrix.h"
-#include <fiff/c/fiff_sparse_matrix.h>
+#include <fiff/fiff_sparse_matrix.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES

@@ -73,14 +73,34 @@ class FiffRawData;
 
 //=============================================================================================================
 /**
- * Provides FIFF event I/O operations.
+ * Provides FIFF event storage and I/O operations.
  *
- * @brief FIFF event reading and writing.
+ * Each event is stored as a row in an Nx3 matrix: [sample, before, after].
+ * The class provides methods to read/write events from/to FIFF or ASCII files,
+ * and to detect events from raw data trigger channels.
+ *
+ * @brief FIFF event container with reading, writing and detection.
  */
 class FIFFSHARED_EXPORT FiffEvents
 {
 
 public:
+    //=========================================================================================================
+    /**
+     * Default constructor. Creates an empty event set.
+     */
+    FiffEvents();
+
+    //=========================================================================================================
+    /**
+     * Constructs FiffEvents by reading from an I/O device.
+     *
+     * Attempts to read as FIFF first; if that fails, tries ASCII format.
+     *
+     * @param[in] p_IODevice    The I/O device to read from.
+     */
+    explicit FiffEvents(QIODevice &p_IODevice);
+
     //=========================================================================================================
     /**
      * Read events from a FIFF or ASCII event file.
@@ -90,63 +110,59 @@ public:
      *
      * @param[in] t_sEventName  Path to the event file (empty = derive from raw file name).
      * @param[in] t_fileRawName Path to the raw data file (used to derive event file name if needed).
-     * @param[out] events       The read event matrix (nEvents x 3): [sample, before, after].
+     * @param[out] p_Events     The loaded events.
      *
      * @return true if succeeded, false otherwise.
      */
-    static bool read(QString t_sEventName,
-                     QString t_fileRawName,
-                     Eigen::MatrixXi& events);
+    static bool read(const QString &t_sEventName,
+                     const QString &t_fileRawName,
+                     FiffEvents &p_Events);
 
     //=========================================================================================================
     /**
      * Read an event list from a FIFF file.
      *
      * @param[in] p_IODevice    The I/O device to read from.
-     * @param[out] eventlist    The read event list (nEvents x 3): [sample, before, after].
+     * @param[out] p_Events     The loaded events.
      *
      * @return true if succeeded, false otherwise.
      */
     static bool read_from_fif(QIODevice &p_IODevice,
-                              Eigen::MatrixXi& eventlist);
+                              FiffEvents &p_Events);
 
     //=========================================================================================================
     /**
      * Read a list of events from an ASCII event file.
      *
      * @param[in] p_IODevice    The I/O device to read from.
-     * @param[out] eventlist    The read event list.
+     * @param[out] p_Events     The loaded events.
      *
      * @return true if succeeded, false otherwise.
      */
     static bool read_from_ascii(QIODevice &p_IODevice,
-                                Eigen::MatrixXi& eventlist);
+                                FiffEvents &p_Events);
 
     //=========================================================================================================
     /**
-     * Write an event list to a FIFF file.
+     * Write the event list to a FIFF file.
      *
      * @param[in] p_IODevice    The I/O device to write to.
-     * @param[in] eventlist     The event list (nEvents x 3): [sample, before, after].
      *
      * @return true if succeeded, false otherwise.
      */
-    static bool write_to_fif(QIODevice &p_IODevice,
-                             const Eigen::MatrixXi& eventlist);
+    bool write_to_fif(QIODevice &p_IODevice) const;
 
     //=========================================================================================================
     /**
-     * Write an event list to a text file (MNE-C compatible format).
+     * Write the event list to a text file (MNE-C compatible format).
      *
      * @param[in] p_IODevice    The I/O device to write to.
-     * @param[in] eventlist     The event list (nEvents x 3): [sample, before, after].
      * @param[in] sfreq         Sampling frequency for time column computation.
      *
      * @return true if succeeded, false otherwise.
      */
-    static bool write_to_ascii(QIODevice &p_IODevice,
-                               const Eigen::MatrixXi& eventlist,
-                               float sfreq = 0.0f);
+    bool write_to_ascii(QIODevice &p_IODevice,
+                        float sfreq = 0.0f) const;
 
     //=========================================================================================================
     /**
@@ -154,18 +170,54 @@ public:
      * Ported from detect_events (MNE-C).
      *
      * @param[in] raw           The raw data.
+     * @param[out] p_Events     The detected events.
      * @param[in] triggerCh     Name of the trigger channel (empty = default "STI 014").
      * @param[in] triggerMask   Bitmask to apply to trigger values.
      * @param[in] leadingEdge   If true, only detect rising edges (default = true).
      *
-     * @return Event matrix (nEvents x 3): [sample, before, after], or empty matrix on failure.
+     * @return true if events were detected, false otherwise.
      */
-    static Eigen::MatrixXi detect_from_raw(const FiffRawData &raw,
-                                           const QString &triggerCh = QString("STI 014"),
-                                           unsigned int triggerMask = 0xFFFFFFFF,
-                                           bool leadingEdge = true);
+    static bool detect_from_raw(const FiffRawData &raw,
+                                FiffEvents &p_Events,
+                                const QString &triggerCh = QString("STI 014"),
+                                unsigned int triggerMask = 0xFFFFFFFF,
+                                bool leadingEdge = true);
+
+    //=========================================================================================================
+    /**
+     * Returns the number of events.
+     *
+     * @return Number of events.
+     */
+    inline int num_events() const;
+
+    //=========================================================================================================
+    /**
+     * Returns true if no events are stored.
+     *
+     * @return true if the event matrix has zero rows.
+     */
+    inline bool is_empty() const;
+
+    Eigen::MatrixXi events;     /**< Event matrix (nEvents x 3): [sample, before, after]. */
 };
 
 } // NAMESPACE
+
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline int FIFFLIB::FiffEvents::num_events() const
+{
+    return static_cast<int>(events.rows());
+}
+
+//=============================================================================================================
+
+inline bool FIFFLIB::FiffEvents::is_empty() const
+{
+    return events.rows() == 0;
+}
 
 #endif // FIFF_EVENTS_H

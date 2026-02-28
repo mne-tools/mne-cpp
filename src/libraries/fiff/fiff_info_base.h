@@ -126,8 +126,6 @@ public:
     /**
      * fiff_pick_channels
      *
-     * ### MNE toolbox root function ###
-     *
      * Make a selector to pick desired channels from data
      *
      * @param[in] ch_names  - The channel name list to consult.
@@ -144,21 +142,17 @@ public:
     /**
      * fiff_pick_info
      *
-     * ### MNE toolbox root function ###
-     *
      * Pick desired channels from measurement info
      *
      * @param[in] sel    List of channels to select.
      *
      * @return Info modified according to sel.
      */
-    FiffInfoBase pick_info(const Eigen::RowVectorXi* sel = Q_NULLPTR) const;
+    FiffInfoBase pick_info(const Eigen::RowVectorXi* sel = nullptr) const;
 
     //=========================================================================================================
     /**
      * fiff_pick_types (highy diversity in meg picking)
-     *
-     * ### MNE toolbox root function ###
      *
      * Create a selector to pick desired channel types from data
      *
@@ -179,8 +173,6 @@ public:
     //=========================================================================================================
     /**
      * fiff_pick_types
-     *
-     * ### MNE toolbox root function ###
      *
      * Create a selector to pick desired channel types from data
      * Use overloaded pick_types method to specify meg (grad, mag, ref_meg)type
@@ -222,8 +214,8 @@ public:
     fiff_int_t  nchan;          /**< Number of channels. */
     QList<FiffChInfo> chs;      /**< List of all channel info descriptors. */
     QStringList ch_names;       /**< List of all channel names. */
-    FiffCoordTrans dev_head_t;  /**< Coordinate transformation ToDo... */
-    FiffCoordTrans ctf_head_t;  /**< Coordinate transformation ToDo... */
+    FiffCoordTrans dev_head_t;  /**< Device to head coordinate transformation. */
+    FiffCoordTrans ctf_head_t;  /**< CTF to head coordinate transformation. */
 };
 
 //=============================================================================================================

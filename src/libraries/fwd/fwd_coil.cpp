@@ -204,7 +204,7 @@ FwdCoil::~FwdCoil()
 
 //=============================================================================================================
 
-FwdCoil *FwdCoil::create_eeg_el(const FiffChInfo& ch, const FiffCoordTransOld* t)
+FwdCoil *FwdCoil::create_eeg_el(const FiffChInfo& ch, const FiffCoordTrans& t)
 {
     FwdCoil*    res = NULL;
     int        c;
@@ -213,7 +213,7 @@ FwdCoil *FwdCoil::create_eeg_el(const FiffChInfo& ch, const FiffCoordTransOld* t
         qWarning() << ch.ch_name << "is not an EEG channel. Cannot create an electrode definition.";
         goto bad;
     }
-    if (t && t->from != FIFFV_COORD_HEAD) {
+    if (!t.isEmpty() && t.from != FIFFV_COORD_HEAD) {
         printf("Inappropriate coordinate transformation in fwd_create_eeg_el");
         goto bad;
     }
@@ -233,10 +233,10 @@ FwdCoil *FwdCoil::create_eeg_el(const FiffChInfo& ch, const FiffCoordTransOld* t
     /*
        * Optional coordinate transformation
        */
-    if (t) {
-        FiffCoordTransOld::fiff_coord_trans(res->r0,t,FIFFV_MOVE);
-        FiffCoordTransOld::fiff_coord_trans(res->ex,t,FIFFV_MOVE);
-        res->coord_frame = t->to;
+    if (!t.isEmpty()) {
+        FiffCoordTrans::apply_trans(res->r0,t,FIFFV_MOVE);
+        FiffCoordTrans::apply_trans(res->ex,t,FIFFV_MOVE);
+        res->coord_frame = t.to;
     }
     else
         res->coord_frame = FIFFV_COORD_HEAD;

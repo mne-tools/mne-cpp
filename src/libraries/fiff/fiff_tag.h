@@ -89,10 +89,7 @@
 #include "fiff_ch_info.h"
 #include "fiff_ch_pos.h"
 #include "fiff_dir_entry.h"
-#include "fiff_tag.h"
 #include "fiff_dig_point.h"
-
-#include <iostream>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -110,6 +107,12 @@
 #include <QList>
 #include <QSharedPointer>
 #include <QVector>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <iostream>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
@@ -154,21 +157,41 @@ public:
 
     //=========================================================================================================
     /**
-     * ctor //ToDo add FiffStream to constructor and remove static implementations --> make them members
+     * Constructs a default FiffTag.
      */
     FiffTag();
 
     //=========================================================================================================
     /**
-     * copy ctor //ToDo add FiffStream to constructor and remove static implementations --> make them members
+     * Copy constructor.
+     *
+     * @param[in] p_FiffTag   FiffTag to copy.
      */
-    FiffTag(const FiffTag* p_pFiffTag);
+    FiffTag(const FiffTag& p_FiffTag) = default;
+
+    //=========================================================================================================
+    /**
+     * Move constructor.
+     */
+    FiffTag(FiffTag&& other) = default;
+
+    //=========================================================================================================
+    /**
+     * Copy assignment operator.
+     */
+    FiffTag& operator=(const FiffTag& other) = default;
+
+    //=========================================================================================================
+    /**
+     * Move assignment operator.
+     */
+    FiffTag& operator=(FiffTag&& other) = default;
 
     //=========================================================================================================
     /**
      * Destroys the FiffTag.
      */
-    virtual ~FiffTag();
+    ~FiffTag() = default;
 
     //=========================================================================================================
     /**
@@ -220,7 +243,7 @@ public:
     //=========================================================================================================
     /**
      * to Byte
-     * Fast access; Data are deleted if tag gets deleted, and wise versa
+     * Fast access; Data are deleted if tag gets deleted, and vice versa
      *
      * @return type cast of the tag data pointer.
      */
@@ -229,7 +252,7 @@ public:
     //=========================================================================================================
     /**
      * to unsigned Short
-     * Fast access; Data are deleted if tag gets deleted, and wise versa
+     * Fast access; Data are deleted if tag gets deleted, and vice versa
      *
      * @return type cast of the tag data pointer.
      */
@@ -238,7 +261,7 @@ public:
     //=========================================================================================================
     /**
      * to Short
-     * Fast access; Data are deleted if tag gets deleted, and wise versa
+     * Fast access; Data are deleted if tag gets deleted, and vice versa
      *
      * @return type cast of the tag data pointer.
      */
@@ -247,7 +270,7 @@ public:
     //=========================================================================================================
     /**
      * to Int
-     * Fast access; Data are deleted if tag gets deleted, and wise versa
+     * Fast access; Data are deleted if tag gets deleted, and vice versa
      *
      * @return type cast of the tag data pointer.
      */
@@ -256,7 +279,7 @@ public:
     //=========================================================================================================
     /**
      * to Int
-     * Fast access; Data are deleted if tag gets deleted, and wise versa
+     * Fast access; Data are deleted if tag gets deleted, and vice versa
      *
      * @return type cast of the tag data pointer.
      */
@@ -265,7 +288,7 @@ public:
     //=========================================================================================================
     /**
     * to Julian
-    * Fast access; Data are deleted if tag gets deleted, and wise versa
+    * Fast access; Data are deleted if tag gets deleted, and vice versa
     *
     * @return type cast of the tag data pointer.
     */
@@ -274,7 +297,7 @@ public:
     //=========================================================================================================
     /**
     * to Float
-    * Fast access; Data are deleted if tag gets deleted, and wise versa
+    * Fast access; Data are deleted if tag gets deleted, and vice versa
     *
     * @return type cast of the tag data pointer.
     */
@@ -283,7 +306,7 @@ public:
     //=========================================================================================================
     /**
      * to Double
-     * Fast access; Data are deleted if tag gets deleted, and wise versa
+     * Fast access; Data are deleted if tag gets deleted, and vice versa
      *
      * @return type cast of the tag data pointer.
      */
@@ -300,29 +323,11 @@ public:
     //=========================================================================================================
     /**
      * to DauPack16
-     * Fast access; Data are deleted if tag gets deleted, and wise versa
+     * Fast access; Data are deleted if tag gets deleted, and vice versa
      *
      * @return type cast of the tag data pointer.
      */
     inline qint16* toDauPack16() const;
-
-    //=========================================================================================================
-    /**
-     * to complex float
-     * Allocates new memory - pointer has to be deleted ater use
-     *
-     * @return complex float array.
-     */
-//    inline std::complex<float>* toComplexFloat();
-
-    //=========================================================================================================
-    /**
-     * to complex double
-     * Allocates new memory - pointer has to be deleted ater use
-     *
-     * @return complex double array.
-     */
-//    inline std::complex<double>* toComplexDouble();
 
     //
     // Structures
@@ -400,7 +405,7 @@ public:
      *
      * parses a sparse fiff float matrix and returns a double sparse matrix to make sure only double is used
      *
-     * @return a sparse double matrix wich is newly created from the parsed float.
+     * @return a sparse double matrix which is newly created from the parsed float.
      */
     inline Eigen::SparseMatrix<double> toSparseFloatMatrix() const;
 
@@ -416,9 +421,6 @@ public:
      */
     static void convert_ch_pos(FiffChPos* pos);
 
-    //TODO: Check if this is of interest
-//    static void fiff_convert_tag_info(FiffTag*& tag);
-
     /*
      * Data type conversions for the little endian systems.
      */
@@ -429,15 +431,6 @@ public:
      *
      * Either of these may be specified as FIFFV_LITTLE_ENDIAN, FIFFV_BIG_ENDIAN, or FIFFV_NATIVE_ENDIAN.
      * The last choice means that the native byte order value will be substituted here before proceeding
-     */
-    //TODO: Check if this is of interest
-//    void fiff_convert_tag_data(fiffTag tag, int from_endian, int to_endian)
-
-    //=========================================================================================================
-    /**
-     * Convert matrix data read from a file inside a fiff tag
-     *
-     * @param[in, out] tag    matrix data to convert.
      */
     static void convert_matrix_from_file_data(FiffTag::SPtr tag);
 
@@ -475,6 +468,8 @@ public:
     /**
      * These return information about a fiff type.
      *
+     * @param[in] type   The fiff data type to query.
+     *
      * @return fiff type.
      */
     static fiff_int_t fiff_type_fundamental(fiff_int_t type);
@@ -482,6 +477,8 @@ public:
     //=========================================================================================================
     /**
      * These return information about fiff type base.
+     *
+     * @param[in] type   The fiff data type to query.
      *
      * @return fiff type.
      */
@@ -491,50 +488,45 @@ public:
     /**
      * These return information about the matrix coding.
      *
+     * @param[in] type   The fiff data type to query.
+     *
      * @return matrix coding.
      */
     static fiff_int_t fiff_type_matrix_coding(fiff_int_t type);
+
+    //=========================================================================================================
+    /**
+     * Size of the on-disk tag info header: kind + type + size + next = 4 x fiff_int_t.
+     * This corresponds to the old sizeof(fiffTagRec) - sizeof(fiff_data_t *).
+     *
+     * @return the byte size of the on-disk tag info header.
+     */
+    inline static qint32 storageSize();
 
 public:
     fiff_int_t  kind;       /**< Tag number.
                              *   This defines the meaning of the item */
     fiff_int_t  type;       /**< Data type.
                              *   This defines the representation of the data. */
-//    fiff_int_t  size;       /**< Size of the data.
-//                             *   The size is given in bytes and defines the
-//                             *   total size of the data. */
     fiff_int_t  next;       /**< Pointer to the next object.
                              *   Zero if the object follows
                              *   sequentially in file.
                              *   Negative at the end of file */
-//    QByteArray* data;       /**< Pointer to the data.
-//                             *   This point to the data read or to be written. */
-private:
-//    std::complex<float>* m_pComplexFloatData;
-
-//    std::complex<double>* m_pComplexDoubleData;
-
-// ### OLD STRUCT ###
-//typedef struct _fiffTagRec {
-//    fiff_int_t  kind;		/**< Tag number.
-//                 *   This defines the meaning of the item */
-//    fiff_int_t  type;		/**< Data type.
-//                 *   This defines the reperentation of the data. */
-//    fiff_int_t  size;		/**< Size of the data.
-//                 *   The size is given in bytes and defines the
-//                 *   total size of the data. */
-//    fiff_int_t  next;		/**< Pointer to the next object.
-//                 *   Zero if the object follows
-//                 *   sequentially in file.
-//                 *   Negative at the end of file */
-//    fiff_data_t *data;		/**< Pointer to the data.
-//                 *   This point to the data read or to be written. */
-//} *fiffTag,fiffTagRec;   /**< FIFF data tag. */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline qint32 FiffTag::storageSize()
+{
+    // On-disk layout: kind, type, size, next (4 x fiff_int_t)
+    // Note: 'size' is not a class member (QByteArray::size() is used at runtime),
+    //       but it is part of the on-disk wire format.
+    return sizeof(FiffTag::kind) + sizeof(FiffTag::type)
+         + sizeof(fiff_int_t)    /* size field on disk */
+         + sizeof(FiffTag::next);
+}
 
 //=============================================================================================================
 // Simple types
@@ -543,7 +535,7 @@ private:
 inline quint8* FiffTag::toByte() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_BYTE)
-        return NULL;
+        return nullptr;
     else
         return (quint8*)this->data();
 }
@@ -553,7 +545,7 @@ inline quint8* FiffTag::toByte() const
 inline quint16* FiffTag::toUnsignedShort() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_USHORT)
-        return NULL;
+        return nullptr;
     else
         return (quint16*)this->data();
 }
@@ -563,7 +555,7 @@ inline quint16* FiffTag::toUnsignedShort() const
 inline qint16* FiffTag::toShort() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_SHORT)
-        return NULL;
+        return nullptr;
     else
         return (qint16*)this->data();
 }
@@ -573,7 +565,7 @@ inline qint16* FiffTag::toShort() const
 inline quint32* FiffTag::toUnsignedInt() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_UINT)
-        return NULL;
+        return nullptr;
     else
         return (quint32*)this->data();
 }
@@ -584,7 +576,7 @@ inline qint32* FiffTag::toInt() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_INT) {
         printf("Expected an integer tag : %d (found data type %d instead)\n",this->kind,this->getType());
-        return NULL;
+        return nullptr;
     }
     else
         return (qint32*)this->data();
@@ -596,7 +588,7 @@ inline qint32* FiffTag::toJulian() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_JULIAN) {
         printf("Expected a julian tag : %d (found data type %d instead)\n",this->kind,this->getType());
-        return NULL;
+        return nullptr;
     }
     else
         return (qint32*)this->data();
@@ -607,7 +599,7 @@ inline qint32* FiffTag::toJulian() const
 inline float* FiffTag::toFloat() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_FLOAT)
-        return NULL;
+        return nullptr;
     else
         return (float*)this->data();
 }
@@ -617,7 +609,7 @@ inline float* FiffTag::toFloat() const
 inline double* FiffTag::toDouble() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_DOUBLE)
-        return NULL;
+        return nullptr;
     else
         return (double*)this->data();
 }
@@ -627,7 +619,7 @@ inline double* FiffTag::toDouble() const
 inline QString FiffTag::toString() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_STRING)
-        return NULL;
+        return nullptr;
     else
         return *this;
 }
@@ -637,7 +629,7 @@ inline QString FiffTag::toString() const
 inline qint16* FiffTag::toDauPack16() const
 {
     if(this->isMatrix() || this->getType() != FIFFT_DAU_PACK16)
-        return NULL;
+        return nullptr;
     else
         return (qint16*)this->data();
 }
@@ -647,8 +639,8 @@ inline qint16* FiffTag::toDauPack16() const
 //inline std::complex<float>* FiffTag::toComplexFloat()
 //{
 //    if(this->isMatrix() || this->getType() != FIFFT_COMPLEX_FLOAT)
-//        return NULL;
-//    else if(this->m_pComplexFloatData == NULL)
+//        return nullptr;
+//    else if(this->m_pComplexFloatData == nullptr)
 //    {
 //        float* t_pFloat = (float*)this->data();
 //        qDebug() << "ToDo toComplexFloat";
@@ -663,8 +655,8 @@ inline qint16* FiffTag::toDauPack16() const
 //inline std::complex<double>* FiffTag::toComplexDouble()
 //{
 //    if(this->isMatrix() || this->getType() != FIFFT_COMPLEX_DOUBLE)
-//        return NULL;
-//    else if(this->m_pComplexDoubleData == NULL)
+//        return nullptr;
+//    else if(this->m_pComplexDoubleData == nullptr)
 //    {
 //        double* t_pDouble = (double*)this->data();
 //        qDebug() << "ToDo toComplexDouble";
@@ -681,7 +673,7 @@ inline qint16* FiffTag::toDauPack16() const
 inline FiffId FiffTag::toFiffID() const
 {
     FiffId p_fiffID;
-    if(this->isMatrix() || this->getType() != FIFFT_ID_STRUCT || this->data() == NULL)
+    if(this->isMatrix() || this->getType() != FIFFT_ID_STRUCT || this->data() == nullptr)
         return p_fiffID;
     else
     {
@@ -703,7 +695,7 @@ inline FiffDigPoint FiffTag::toDigPoint() const
 {
 
     FiffDigPoint t_fiffDigPoint;
-    if(this->isMatrix() || this->getType() != FIFFT_DIG_POINT_STRUCT || this->data() == NULL)
+    if(this->isMatrix() || this->getType() != FIFFT_DIG_POINT_STRUCT || this->data() == nullptr)
         return t_fiffDigPoint;
     else
     {
@@ -729,7 +721,7 @@ inline FiffCoordTrans FiffTag::toCoordTrans() const
 {
 
     FiffCoordTrans p_FiffCoordTrans;
-    if(this->isMatrix() || this->getType() != FIFFT_COORD_TRANS_STRUCT || this->data() == NULL)
+    if(this->isMatrix() || this->getType() != FIFFT_COORD_TRANS_STRUCT || this->data() == nullptr)
         return p_FiffCoordTrans;
     else
     {
@@ -771,7 +763,7 @@ inline FiffChInfo FiffTag::toChInfo() const
 {
     FiffChInfo p_FiffChInfo;
 
-    if(this->isMatrix() || this->getType() != FIFFT_CH_INFO_STRUCT || this->data() == NULL)
+    if(this->isMatrix() || this->getType() != FIFFT_CH_INFO_STRUCT || this->data() == nullptr)
         return p_FiffChInfo;
     else
     {
@@ -866,7 +858,7 @@ inline QList< QSharedPointer<FiffDirEntry> > FiffTag::toDirEntry() const
 {
 //         tag.data = struct('kind',{},'type',{},'size',{},'pos',{});
     QList< QSharedPointer<FiffDirEntry> > p_ListFiffDir;
-    if(this->isMatrix() || this->getType() != FIFFT_DIR_ENTRY_STRUCT || this->data() == NULL)
+    if(this->isMatrix() || this->getType() != FIFFT_DIR_ENTRY_STRUCT || this->data() == nullptr)
         return p_ListFiffDir;
     else
     {
@@ -893,7 +885,7 @@ inline QList< QSharedPointer<FiffDirEntry> > FiffTag::toDirEntry() const
 
 inline Eigen::MatrixXi FiffTag::toIntMatrix() const
 {
-    if(!this->isMatrix() || this->getType() != FIFFT_INT || this->data() == NULL)
+    if(!this->isMatrix() || this->getType() != FIFFT_INT || this->data() == nullptr)
         return Eigen::MatrixXi();
 
     qint32 ndim;
@@ -917,7 +909,7 @@ inline Eigen::MatrixXi FiffTag::toIntMatrix() const
 
 inline Eigen::MatrixXf FiffTag::toFloatMatrix() const
 {
-    if(!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == NULL)
+    if(!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == nullptr)
         return Eigen::MatrixXf();//NULL;
 
     if (fiff_type_matrix_coding(this->type) != FIFFTS_MC_DENSE)
@@ -946,7 +938,7 @@ inline Eigen::MatrixXf FiffTag::toFloatMatrix() const
 
 inline Eigen::SparseMatrix<double> FiffTag::toSparseFloatMatrix() const
 {
-    if(!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == NULL)
+    if(!this->isMatrix() || this->getType() != FIFFT_FLOAT || this->data() == nullptr)
         return Eigen::SparseMatrix<double>();//NULL;
 
     if (fiff_type_matrix_coding(this->type) != FIFFTS_MC_CCS && fiff_type_matrix_coding(this->type) != FIFFTS_MC_RCS)

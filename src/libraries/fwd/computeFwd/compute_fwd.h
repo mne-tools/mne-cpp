@@ -45,7 +45,7 @@
 #include "../fwd_global.h"
 #include "compute_fwd_settings.h"
 
-#include <fiff/c/fiff_coord_trans_old.h>
+#include <fiff/fiff_coord_trans.h>
 #include "../fwd_coil_set.h"
 #include <mne/c/mne_ctf_comp_data_set.h>
 #include "../fwd_eeg_sphere_model_set.h"
@@ -56,7 +56,7 @@
 #include <mne/c/mne_source_space_old.h>
 #include <mne/mne_forwardsolution.h>
 
-#include <fiff/c/fiff_sparse_matrix.h>
+#include <fiff/fiff_sparse_matrix.h>
 
 #include <fiff/fiff_types.h>
 
@@ -127,7 +127,7 @@ public:
      * Update the heaposition with meg_head_t and recalculate the forward solution for meg
      * @param[in] transDevHeadOld        The meg <-> head transformation to use for updating head position.
      */
-    void updateHeadPos(FIFFLIB::FiffCoordTransOld* transDevHeadOld);
+    void updateHeadPos(const FIFFLIB::FiffCoordTrans& transDevHead);
 
     //=========================================================================================================
     /**
@@ -179,8 +179,8 @@ private:
 
     FIFFLIB::fiffId m_mri_id;                       /**< The MRI ID. */
     FIFFLIB::FiffId m_meas_id;                      /**< The Measurement ID. */
-    FIFFLIB::FiffCoordTransOld* m_mri_head_t;       /**< The MRI->head coordinate transformation. */
-    FIFFLIB::FiffCoordTransOld* m_meg_head_t;       /**< The MEG->head coordinate transformation. */
+    FIFFLIB::FiffCoordTrans m_mri_head_t;       /**< The MRI->head coordinate transformation. */
+    FIFFLIB::FiffCoordTrans m_meg_head_t;       /**< The MEG->head coordinate transformation. */
 
     QSharedPointer<FIFFLIB::FiffInfoBase> m_pInfoBase;
 
@@ -207,7 +207,7 @@ private:
                                          int& iNMegCmp,
                                          QList<FIFFLIB::FiffChInfo>& listEegCh,
                                          int& iNEeg,
-                                         FIFFLIB::FiffCoordTransOld** transDevHeadOld,
+                                         FIFFLIB::FiffCoordTrans& transDevHead,
                                          FIFFLIB::FiffId& id);
 
 };

@@ -121,7 +121,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Returns list of channel names stored in fiff info -> this is to stay consistent with python
+     * Returns list of channel names stored in fiff info -> this is to stay consistent with python.
+     *
+     * @return List of channel names.
      */
     inline QStringList ch_names();
 
@@ -152,7 +154,6 @@ public:
     /**
      * fiff_pick_channels_evoked
      *
-     * ### MNE toolbox root function ###
      *
      * Pick desired channels from evoked-response data
      *
@@ -168,7 +169,6 @@ public:
     /**
      * fiff_read_evoked
      *
-     * ### MNE toolbox root function ###
      *
      * Wrapper for the FiffEvokedDataSet::read_evoked static function
      *

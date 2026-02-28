@@ -420,7 +420,7 @@ void RtFwd::run()
     m_mutex.lock();
     m_pFwdSettings->pFiffInfo = m_pFiffInfo;
     m_pRTFSOutput->measurementData()->setFiffInfo(m_pFiffInfo);
-    FiffCoordTransOld transMegHeadOld = m_transDevHead.toOld();
+    FiffCoordTrans transMegHead = m_transDevHead;
     m_mutex.unlock();
 
     // initialize fwd solution
@@ -491,7 +491,7 @@ void RtFwd::run()
             // only recompute if hpi is connected
             m_mutex.lock();
             bIsLargeHeadMovement = m_pHpiFitResult->bIsLargeHeadMovement;
-            bIsDifferent = !(transMegHeadOld == m_pHpiFitResult->devHeadTrans.toOld());
+            bIsDifferent = !(transMegHead == m_pHpiFitResult->devHeadTrans);
             bDoRecomputation = m_bDoRecomputation;
             m_mutex.unlock();
 
@@ -500,10 +500,10 @@ void RtFwd::run()
                 emit statusInformationChanged(2);           // recomputing
                 m_mutex.lock();
                 m_bBusy = true;
-                transMegHeadOld = m_pHpiFitResult->devHeadTrans.toOld();
+                transMegHead = m_pHpiFitResult->devHeadTrans;
                 m_mutex.unlock();
 
-                pComputeFwd->updateHeadPos(&transMegHeadOld);
+                pComputeFwd->updateHeadPos(transMegHead);
                 pFwdSolution->sol = pComputeFwd->sol;
                 pFwdSolution->sol_grad = pComputeFwd->sol_grad;
 

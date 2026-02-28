@@ -55,8 +55,13 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+
+#include <memory>
+
 #include <QStringList>
 #include <QDebug>
+
+namespace FIFFLIB { class FiffCoordTrans; }
 
 //============================= mne_fiff.h =============================
 
@@ -146,7 +151,7 @@ public:
 
     static int mne_filter_source_spaces(MneSurfaceOld* surf,  /* The bounding surface must be provided */
                                         float limit,                                   /* Minimum allowed distance from the surface */
-                                        FIFFLIB::FiffCoordTransOld* mri_head_t,     /* Coordinate transformation (may not be needed) */
+                                        const FIFFLIB::FiffCoordTrans& mri_head_t,     /* Coordinate transformation (may not be needed) */
                                         MneSourceSpaceOld* *spaces,  /* The source spaces  */
                                         int nspace,
                                         FILE *filtered);
@@ -163,7 +168,7 @@ public:
 
     static int filter_source_spaces(float          limit,              /* Omit vertices which are closer than this to the inner skull */
                              char           *bemfile,                       /* Take the inner skull surface from here */
-                             FIFFLIB::FiffCoordTransOld* mri_head_t,                 /* Coordinate transformation is needed */
+                             const FIFFLIB::FiffCoordTrans& mri_head_t,                 /* Coordinate transformation is needed */
                              MneSourceSpaceOld* *spaces,  /* The source spaces */
                              int            nspace,                         /* How many? */
                              FILE           *filtered,                      /* Output the coordinates of the filtered points here */
@@ -259,10 +264,10 @@ public:
 
     static int mne_is_left_hemi_source_space(MneSourceSpaceOld* s);
 
-    static int mne_transform_source_space(MneSourceSpaceOld* ss, FIFFLIB::FiffCoordTransOld* t);
+    static int mne_transform_source_space(MneSourceSpaceOld* ss, const FIFFLIB::FiffCoordTrans& t);
 
     static int mne_transform_source_spaces_to(int            coord_frame,   /* Which coord frame do we want? */
-                                              FIFFLIB::FiffCoordTransOld* t,             /* The coordinate transformation */
+                                              const FIFFLIB::FiffCoordTrans& t,             /* The coordinate transformation */
                                               MneSourceSpaceOld* *spaces,       /* A list of source spaces */
                                               int            nspace);
 
@@ -472,13 +477,13 @@ public:
     /*
      * These are for volumes only
      */
-    FIFFLIB::FiffCoordTransOld*  voxel_surf_RAS_t;   /* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
+    std::unique_ptr<FIFFLIB::FiffCoordTrans>  voxel_surf_RAS_t;   /* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
     int             vol_dims[3];        /* Dimensions of the volume grid (width x height x depth) NOTE: This will be present only if the source space is a complete rectangular grid with unused vertices included */
     float           voxel_size[3];      /* Derived from the above */
     FIFFLIB::FiffSparseMatrix*   interpolator;       /* Matrix to interpolate into an MRI volume */
     QString         MRI_volume;         /* The name of the file the above interpolator is based on */
-    FIFFLIB::FiffCoordTransOld*  MRI_voxel_surf_RAS_t;
-    FIFFLIB::FiffCoordTransOld*  MRI_surf_RAS_RAS_t; /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
+    std::unique_ptr<FIFFLIB::FiffCoordTrans>  MRI_voxel_surf_RAS_t;
+    std::unique_ptr<FIFFLIB::FiffCoordTrans>  MRI_surf_RAS_RAS_t; /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
     int             MRI_vol_dims[3];       /* Dimensions of the MRI volume (width x height x depth) */
     /*
      * Possibility to add user-defined data

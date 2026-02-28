@@ -39,31 +39,10 @@
 //=============================================================================================================
 
 #include "fiff_digitizer_data.h"
-#include "fiff_coord_trans_old.h"
-#include "../fiff_dig_point.h"
+#include "fiff_coord_trans.h"
+#include "fiff_stream.h"
+#include "fiff_dig_point.h"
 #include <iostream>
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#define FREE_43(x) if ((char *)(x) != Q_NULLPTR) free((char *)(x))
-
-#define MALLOC_43(x,t) (t *)malloc((x)*sizeof(t))
-
-#define FREE_CMATRIX_43(m) mne_free_cmatrix_43((m))
-
-void mne_free_cmatrix_43(float **m)
-{
-    if (m) {
-        FREE_43(*m);
-        FREE_43(m);
-    }
-}
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -76,33 +55,25 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 FiffDigitizerData::FiffDigitizerData()
-: head_mri_t(Q_NULLPTR)
-, head_mri_t_adj(Q_NULLPTR)
-, coord_frame(FIFFV_COORD_UNKNOWN)
+: coord_frame(FIFFV_COORD_UNKNOWN)
 , npoint(0)
-, mri_fids(Q_NULLPTR)
-, nfids(0)
-, show(FALSE)
-, show_minimal(FALSE)
-, dist(Q_NULLPTR)
-, closest(Q_NULLPTR)
-, closest_point(Q_NULLPTR)
-, dist_valid(FALSE)
+, show(false)
+, show_minimal(false)
+, dist_valid(false)
 {
 }
 
 //=============================================================================================================
 
 FiffDigitizerData::FiffDigitizerData(const FiffDigitizerData& p_FiffDigitizerData)
-: head_mri_t(p_FiffDigitizerData.head_mri_t)
-, head_mri_t_adj(p_FiffDigitizerData.head_mri_t_adj)
+: head_mri_t(p_FiffDigitizerData.head_mri_t ? std::make_unique<FiffCoordTrans>(*p_FiffDigitizerData.head_mri_t) : nullptr)
+, head_mri_t_adj(p_FiffDigitizerData.head_mri_t_adj ? std::make_unique<FiffCoordTrans>(*p_FiffDigitizerData.head_mri_t_adj) : nullptr)
 , points(p_FiffDigitizerData.points)
 , coord_frame(p_FiffDigitizerData.coord_frame)
 , active(p_FiffDigitizerData.active)
 , discard(p_FiffDigitizerData.discard)
 , npoint(p_FiffDigitizerData.npoint)
 , mri_fids(p_FiffDigitizerData.mri_fids)
-, nfids(p_FiffDigitizerData.nfids)
 , show(p_FiffDigitizerData.show)
 , show_minimal(p_FiffDigitizerData.show_minimal)
 , dist(p_FiffDigitizerData.dist)
@@ -114,19 +85,36 @@ FiffDigitizerData::FiffDigitizerData(const FiffDigitizerData& p_FiffDigitizerDat
 
 //=============================================================================================================
 
+FiffDigitizerData& FiffDigitizerData::operator=(const FiffDigitizerData& rhs)
+{
+    if (this != &rhs) {
+        head_mri_t     = rhs.head_mri_t     ? std::make_unique<FiffCoordTrans>(*rhs.head_mri_t)     : nullptr;
+        head_mri_t_adj = rhs.head_mri_t_adj ? std::make_unique<FiffCoordTrans>(*rhs.head_mri_t_adj) : nullptr;
+        filename       = rhs.filename;
+        points         = rhs.points;
+        coord_frame    = rhs.coord_frame;
+        active         = rhs.active;
+        discard        = rhs.discard;
+        npoint         = rhs.npoint;
+        mri_fids       = rhs.mri_fids;
+        show           = rhs.show;
+        show_minimal   = rhs.show_minimal;
+        dist           = rhs.dist;
+        closest        = rhs.closest;
+        closest_point  = rhs.closest_point;
+        dist_valid     = rhs.dist_valid;
+    }
+    return *this;
+}
+
+//=============================================================================================================
+
 FiffDigitizerData::FiffDigitizerData(QIODevice &p_IODevice)
-: head_mri_t(Q_NULLPTR)
-, head_mri_t_adj(Q_NULLPTR)
-, coord_frame(FIFFV_COORD_UNKNOWN)
+: coord_frame(FIFFV_COORD_UNKNOWN)
 , npoint(0)
-, mri_fids(Q_NULLPTR)
-, nfids(0)
-, show(FALSE)
-, show_minimal(FALSE)
-, dist(Q_NULLPTR)
-, closest(Q_NULLPTR)
-, closest_point(Q_NULLPTR)
-, dist_valid(FALSE)
+, show(false)
+, show_minimal(false)
+, dist_valid(false)
 {
     // Open the io device
     FiffStream::SPtr t_pStream(new FiffStream(&p_IODevice));
@@ -155,18 +143,6 @@ FiffDigitizerData::FiffDigitizerData(QIODevice &p_IODevice)
 
 //=============================================================================================================
 
-FiffDigitizerData::~FiffDigitizerData()
-{
-    FREE_43(head_mri_t);
-    FREE_43(head_mri_t_adj);
-    FREE_43(dist);
-    FREE_43(closest);
-    FREE_CMATRIX_43(closest_point);
-    FREE_43(mri_fids);
-}
-
-//=============================================================================================================
-
 void FiffDigitizerData::print() const
 {
     std::cout << "Number of digitizer points: " << points.size() << "\n";
@@ -186,9 +162,32 @@ void FiffDigitizerData::print() const
         }
     }
 
-    std::cout << "Number of MRI fiducials: " << nfids << "\n";
+    std::cout << "Number of MRI fiducials: " << nfids() << "\n";
 
     if (head_mri_t){
 
+    }
+}
+
+//=============================================================================================================
+
+void FiffDigitizerData::pickCardinalFiducials()
+{
+    // Clear any existing MRI fiducials
+    mri_fids.clear();
+
+    if (!head_mri_t_adj) {
+        return;
+    }
+
+    // Extract cardinal points and transform them into MRI coordinates.
+    // This mirrors the original C function update_fids_from_dig_data
+    // from mne_analyze/adjust_alignment.c.
+    for (int k = 0; k < npoint; ++k) {
+        if (points[k].kind == FIFFV_POINT_CARDINAL) {
+            FiffDigPoint fid = points[k];
+            FiffCoordTrans::apply_trans(fid.r, *head_mri_t_adj, true);
+            mri_fids.append(fid);
+        }
     }
 }

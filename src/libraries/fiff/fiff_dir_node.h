@@ -67,9 +67,9 @@ class FiffTag;
 
 //=============================================================================================================
 /**
- * Replaces _fiffDirNode struct fiffDirNodeRec,*fiffDirNode
+ * FIFF directory tree node.
  *
- * @brief Directory Node structure
+ * @brief Directory node structure.
  */
 class FIFFSHARED_EXPORT FiffDirNode {
 public:
@@ -98,8 +98,6 @@ public:
 
     //=========================================================================================================
     /**
-     * ### MNE toolbox root function ###: Definition of the fiff_copy_tree function
-     *
      * Copies directory subtrees from fidin to fidout
      *
      * @param[in] p_pStreamIn    fiff file to copy from.
@@ -124,9 +122,6 @@ public:
 
     //=========================================================================================================
     /**
-     * ### MNE C function ###: Definition of the fiff_dir_tree_find
-     * ### MNE toolbox root function ###: Definition of the fiff_dir_tree_find function
-     *
      * Find nodes of the given kind from a directory tree structure
      *
      * @param[in] p_kind the given kind.
@@ -137,7 +132,6 @@ public:
 
     //=========================================================================================================
     /**
-     * ### MNE C function ###: Definition of the fiff_dir_tree_get_tag
      * Definition of the find_tag function in various files e.g. fiff_read_named_matrix.m,
      *
      * Founds a tag of a given kind within a tree, and reeds it from file.
@@ -154,7 +148,6 @@ public:
 
     //=========================================================================================================
     /**
-     * ### MNE C function ###: Definition of the fiff_dir_tree_get_tag
      * Definition of the find_tag function in various files e.g. fiff_read_named_matrix.m,
      *
      * Founds a tag of a given kind within a tree, and reeds it from file.
@@ -192,7 +185,6 @@ public:
     //=========================================================================================================
     /**
      * Prints elements of a tree.
-     * Refactored: print_tree (fiff_dir_tree.c)
      *
      * @param[in] indent     number of intendations.
      */
@@ -201,7 +193,6 @@ public:
     //=========================================================================================================
     /**
      * Try to explain a block...
-     * Refactored: fiff_explain_block (fiff_explain.c)
      *
      * @param[in] kind   Block kind.
      */
@@ -210,7 +201,6 @@ public:
     //=========================================================================================================
     /**
      * Try to explain...
-     * Refactored: fiff_explain (fiff_explain.c)
      *
      * @param[in] kind   directory kind.
      */
@@ -219,9 +209,10 @@ public:
     //=========================================================================================================
     /**
      * Get textual explanation of a tag
-     * Refactored: fiff_get_tag_explanation (fiff_explain.c)
      *
      * @param[in] kind   directory kind.
+     *
+     * @return Pointer to the static string explaining the tag, or nullptr if not found.
      */
     static const char *get_tag_explanation (int kind);
 
@@ -254,23 +245,6 @@ public:
     QList<FiffDirNode::SPtr>    children;   /**< Child nodes. */
 //    fiff_int_t                  nchild;     /**< Number of child nodes. */ -> use nchild() instead
 
-    // typedef struct _fiffDirNode {
-    //  int                 type;    /**< Block type for this directory *
-    //  fiffId              id;      /**< Id of this block if any *
-    //  fiffDirEntry        dir;     /**< Directory of tags in this node *
-    //  int                 nent;    /**< Number of entries in this node *
-    //  fiffDirEntry        dir_tree;    /**< Directory of tags within this node
-    //                                     * subtrees as well as FIFF_BLOCK_START and FIFF_BLOCK_END
-    //                   * included. NOTE: While dir is allocated separately
-    //                   * dir_tree is a pointer to the dirtree field
-    //                   * in the FiffStream structure. The dir_tree and nent_tree
-    //                   * fields are only used within the library to facilitate
-    //                   * certain operations. *
-    //  int                 nent_tree;   /**< Number of entries in the directory tree node *
-    //  struct _fiffDirNode *parent;     /**< Parent node *
-    //  struct _fiffDirNode **children;  /**< Child nodes *
-    //  int                 nchild;      /**< Number of child nodes *
-    // } fiffDirNodeRec,*fiffDirNode;    /**< Directory tree structure used by the fiff library routines. *
 };
 
 //=============================================================================================================

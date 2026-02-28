@@ -472,7 +472,7 @@ void MainWindow::setLogLevel(LogLevel lvl)
 //*************************************************************************************************************
 // SLOTS
 #ifdef WASMBUILD
-QByteArray array;
+static QByteArray s_wasmByteArray;
 #endif
 
 void MainWindow::openFile()
@@ -485,8 +485,8 @@ void MainWindow::openFile()
             //Clear event model
             m_pEventWindow->getEventModel()->clearModel();
 
-            array = fileContent;
-            QBuffer* buffer = new QBuffer(&array);
+            s_wasmByteArray = fileContent;
+            QBuffer* buffer = new QBuffer(&s_wasmByteArray);
             if(m_pDataWindow->getDataModel()->loadFiffData(buffer))
                 qDebug() << "Fiff data file" << fileName << "loaded.";
             else

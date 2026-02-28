@@ -146,8 +146,7 @@ void TestMneForwardSolution::computeForward()
     pFwdMEGEEGComputed->calculateFwd();
 
     // recalculate with same meg_head_t to check that we still get the same result
-    FIFFLIB::FiffCoordTransOld meg_head_t = pFiffInfo->dev_head_t.toOld();
-    pFwdMEGEEGComputed->updateHeadPos(&meg_head_t);
+    pFwdMEGEEGComputed->updateHeadPos(pFiffInfo->dev_head_t);
 
     pFwdMEGEEGComputed->storeFwd();
 

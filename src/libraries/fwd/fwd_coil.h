@@ -43,7 +43,7 @@
 
 #include "fwd_global.h"
 
-#include <fiff/c/fiff_coord_trans_old.h>
+#include <fiff/fiff_coord_trans.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -125,7 +125,7 @@ public:
      * @return   The created coil.
      */
     static FwdCoil* create_eeg_el(const FIFFLIB::FiffChInfo& ch,
-                                  const FIFFLIB::FiffCoordTransOld* t);
+                                  const FIFFLIB::FiffCoordTrans& t = FIFFLIB::FiffCoordTrans());
 
     //=========================================================================================================
     /**

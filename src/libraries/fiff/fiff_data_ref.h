@@ -1,15 +1,13 @@
 //=============================================================================================================
 /**
- * @file     fiff_ctf_comp.h
- * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
- *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
- *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
- * @since    0.1.0
- * @date     July, 2012
+ * @file     fiff_data_ref.h
+ * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @since    2.0.0
+ * @date     February, 2026
  *
  * @section  LICENSE
  *
- * Copyright (C) 2012, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ * Copyright (C) 2012, Christoph Dinh. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
  * the following conditions are met:
@@ -30,32 +28,20 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    FiffCtfComp class declaration.
+ * @brief    FiffDataRef class declaration.
  *
  */
 
-#ifndef FIFF_CTF_COMP_H
-#define FIFF_CTF_COMP_H
+#ifndef FIFF_DATA_REF_H
+#define FIFF_DATA_REF_H
 
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
 #include "fiff_global.h"
-#include "fiff_types.h"
-#include "fiff_named_matrix.h"
 
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QSharedPointer>
-
-//=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
+#include <QtGlobal>
 
 //=============================================================================================================
 // DEFINE NAMESPACE FIFFLIB
@@ -66,50 +52,67 @@ namespace FIFFLIB
 
 //=============================================================================================================
 /**
- * CTF software compensation data
+ * External data reference record describing the type, byte order, size, and offset
+ * of data stored in an external file.
  *
- * @brief CTF software compensation data
+ * @brief External data reference descriptor.
  */
-class FIFFSHARED_EXPORT FiffCtfComp {
 
+class FIFFSHARED_EXPORT FiffDataRef
+{
 public:
-    typedef QSharedPointer<FiffCtfComp> SPtr;               /**< Shared pointer type for FiffCtfComp. */
-    typedef QSharedPointer<const FiffCtfComp> ConstSPtr;    /**< Const shared pointer type for FiffCtfComp. */
-
     //=========================================================================================================
     /**
-     * Constructs the CTF software compensation data
+     * Default constructor. Initializes all fields to zero.
      */
-    FiffCtfComp();
+    FiffDataRef()
+        : type(0)
+        , endian(0)
+        , size(0)
+        , offset(0)
+    {
+    }
 
     //=========================================================================================================
     /**
-     * Copy constructor.
+     * Destroys the FiffDataRef.
+     */
+    ~FiffDataRef() = default;
+
+    //=========================================================================================================
+    /**
+     * Size of the old struct (fiffDataRefRec) 2*int + 2*long = 2*4 + 2*8 = 24.
      *
-     * @param[in] p_FiffCtfComp   CTF software compensation data which should be copied.
+     * @return the size of the old struct fiffDataRefRec.
      */
-    FiffCtfComp(const FiffCtfComp &p_FiffCtfComp);
-
-    //=========================================================================================================
-    /**
-     * Destroys the CTF software compensation data.
-     */
-    ~FiffCtfComp();
-
-    //=========================================================================================================
-    /**
-     * Initializes the CTF software compensation data.
-     */
-    void clear();
+    inline static qint32 storageSize();
 
 public:
-    fiff_int_t ctfkind;             /**< CTF kind. */
-    fiff_int_t kind;                /**< Fiff kind -> fiff_constants.h. */
-    bool save_calibrated;           /**< If data should be saved calibrated. */
-    Eigen::MatrixXd rowcals;        /**< Row calibrations. */
-    Eigen::MatrixXd colcals;        /**< Column calibrations. */
-    FiffNamedMatrix::SDPtr data;    /**< Compensation data. */
+    qint32  type;       /**< Type of the data. */
+    qint32  endian;     /**< Are the data in the little or big endian byte order. */
+    qint64  size;       /**< Size of the data, can be over 2 GB. */
+    qint64  offset;     /**< Offset to the data in the external file. */
 };
-} // NAMESPACE
 
-#endif // FIFF_CTF_COMP_H
+//=============================================================================================================
+// BACKWARD COMPATIBILITY TYPEDEFS
+//=============================================================================================================
+
+/** @brief Backward-compatible typedef for the old fiffDataRefRec struct. */
+typedef FiffDataRef fiffDataRefRec;
+/** @brief Backward-compatible pointer typedef for the old fiffDataRef pointer. */
+typedef FiffDataRef* fiffDataRef;
+
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline qint32 FiffDataRef::storageSize()
+{
+    return sizeof(FiffDataRef::type) + sizeof(FiffDataRef::endian)
+         + sizeof(FiffDataRef::size) + sizeof(FiffDataRef::offset);
+}
+
+} // NAMESPACE FIFFLIB
+
+#endif // FIFF_DATA_REF_H

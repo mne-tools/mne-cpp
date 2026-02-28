@@ -219,7 +219,7 @@ static _fiffExp _fiff_explanations[] = {
   { FIFF_INDEX_KIND,               "index kind     " },
   { FIFF_DACQ_PARS,                "acq. pars.     " },
   { FIFF_DACQ_STIM,                "acq. stim seq. " },
-  { -1,NULL} };
+  { -1,nullptr} };
 
 //=============================================================================================================
 
@@ -254,7 +254,7 @@ static _fiffExp _fiff_block_explanations[] = {
   { FIFFB_XFIT_PROJ_ITEM, "proj. item    " },
   { FIFFB_VOL_INFO,       "volume info   " },
   { FIFFB_INDEX,          "index         " },
-  { -1,                   NULL} };
+  { -1,                   nullptr} };
 
 //=============================================================================================================
 

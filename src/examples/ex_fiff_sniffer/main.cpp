@@ -10,14 +10,14 @@
 
 #include <fiff/fiff_io.h>
 #include <fiff/fiff_stream.h>
-#include <fiff/c/fiff_digitizer_data.h>
+#include <fiff/fiff_digitizer_data.h>
 
 ////////////////////////
 
 #include <connectivity/network/network.h>
 
 #include <fiff/fiff_ch_info.h>
-#include <fiff/c/fiff_digitizer_data.h>
+#include <fiff/fiff_digitizer_data.h>
 
 #include <mne/c/mne_msh_display_surface_set.h>
 #include <mne/c/mne_surface_or_volume.h>
@@ -30,6 +30,12 @@
 #include <QCommandLineParser>
 #include <QBuffer>
 #include <QtEndian>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <iostream>
 
 //=============================================================================================================
 // MAIN

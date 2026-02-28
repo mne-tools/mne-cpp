@@ -40,7 +40,7 @@
 #include <utils/generics/applicationlogger.h>
 
 #include <fiff/fiff_dig_point.h>
-#include <fiff/c/fiff_digitizer_data.h>
+#include <fiff/fiff_digitizer_data.h>
 
 //=============================================================================================================
 // QT INCLUDES

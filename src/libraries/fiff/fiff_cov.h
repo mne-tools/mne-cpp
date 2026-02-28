@@ -244,7 +244,7 @@ public:
 
 public:
     fiff_int_t  kind;       /**< Covariance kind -> fiff_constants.h. */
-    Eigen::VectorXi chClass;
+    Eigen::VectorXi chClass;    /**< Channel classification vector. */
     bool diag;              /**< If the covariance is stored in a diagonal order. */
     fiff_int_t dim;         /**< Dimension of the covariance (dim x dim). */
     QStringList names;      /**< Channel names. */
@@ -255,28 +255,6 @@ public:
     Eigen::VectorXd eig;    /**< Vector of eigenvalues. */
     Eigen::MatrixXd eigvec; /**< Matrix of eigenvectors (each row represents an eigenvector). */
 
-// ### OLD STRUCT ###
-// typedef struct {		/* Covariance matrix storage */
-//    int        kind;		/* Sensor or source covariance */
-//    int        ncov;		/* Dimension */
-//    int        nfree;		/* Number of degrees of freedom */
-//    int        nproj;		/* Number of dimensions projected out */
-//    int        nzero;		/* Number of zero or small eigenvalues */
-//    char       **names;		/* Names of the entries (optional) */
-//    double     *cov;		/* Covariance matrix in packed representation (lower triangle) */
-//    double     *cov_diag;		/* Diagonal covariance matrix */
-//    mneSparseMatrix cov_sparse;   /* A sparse covariance matrix
-//         * (Note: data are floats in this which is an inconsistency) */
-//    double     *lambda;		/* Eigenvalues of cov */
-//    double     *inv_lambda;	/* Inverses of the square roots of the eigenvalues of cov */
-//    float      **eigen;		/* Eigenvectors of cov */
-//    double     *chol;		/* Cholesky decomposition */
-//    mneProjOp  proj;		/* The projection which was active when this matrix was computed */
-//    mneSssData sss;		/* The SSS data present in the associated raw data file */
-//    int        *ch_class;		/* This will allow grouping of channels for regularization (MEG [T/m], MEG [T], EEG [V] */
-//    char       **bads;		/* Which channels were designated bad when this noise covariance matrix was computed? */
-//    int        nbad;		/* How many of them */
-// } *mneCovMatrix,mneCovMatrixRec;
 };
 
 //=============================================================================================================
