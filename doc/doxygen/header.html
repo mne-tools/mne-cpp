@@ -44,8 +44,22 @@
         DoxygenAwesomeInteractiveToc.init()
         DoxygenAwesomeTabs.init()
 
-        /* GitHub link – inserted left of the dark-mode toggle */
+        /*
+         * MNE-CPP navbar customisation
+         * 1. Creates version badge + GitHub link elements
+         * 2. Overrides Doxygen's 768px breakpoint → 996px
+         * 3. Re-injects badge + GitHub into #searchBoxPos2 on every
+         *    resize, because menu.js's resetState calls .html() which
+         *    destroys any previously-injected children.
+         *
+         * Desktop order (CSS flex order on #searchBoxPos2 children):
+         *   version(1) → GitHub(2) → dark-toggle(3) → search(4)
+         *
+         * Mobile: badge + GitHub + dark-toggle share one line,
+         *         search box goes full-width below.
+         */
         $(function () {
+            /* ── Create elements once ─────────────────────────── */
             var gh = document.createElement('a');
             gh.href = 'https://github.com/mne-tools/mne-cpp';
             gh.target = '_blank';
@@ -67,40 +81,94 @@
                 '4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 ' +
                 '1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 ' +
                 '22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>';
-            /* Version badge – reads the Doxygen #projectnumber element */
+
             var pn = document.getElementById('projectnumber');
             var badge = document.createElement('span');
             badge.className = 'version-badge';
             badge.textContent = pn ? pn.textContent.trim() : '';
 
-            /* Poll until the dark-mode toggle or #main-nav appears (doxygen-awesome creates them late) */
-            var attempts = 0;
-            var timer = setInterval(function () {
-                attempts++;
-                var toggle = document.querySelector('doxygen-awesome-dark-mode-toggle');
-                var mainNav = document.getElementById('main-nav');
-                var searchPos = document.getElementById('searchBoxPos2');
-                if (toggle && toggle.parentNode) {
-                    /* Badge goes left of search; GitHub link stays right next to toggle */
-                    if (searchPos) {
-                        searchPos.insertBefore(badge, searchPos.firstChild);
-                    } else {
-                        toggle.parentNode.insertBefore(badge, toggle);
-                    }
-                    toggle.parentNode.insertBefore(gh, toggle);
-                    clearInterval(timer);
-                } else if (mainNav) {
-                    if (searchPos) {
-                        searchPos.insertBefore(badge, searchPos.firstChild);
-                    } else {
-                        mainNav.appendChild(badge);
-                    }
-                    mainNav.appendChild(gh);
-                    clearInterval(timer);
-                } else if (attempts > 50) {
-                    clearInterval(timer);
+            /* ── Helper: (re-)inject badge, GitHub & dark-mode toggle
+                 into #searchBoxPos2.
+                 We call this after every resize because:
+                 • menu.js resetState replaces #searchBoxPos2 contents
+                   via .html() at ≥768px
+                 • menu.js moves MSearchBox into #searchBoxPos1 at <768px,
+                   and the darkmode-toggle.js appends the toggle to
+                   MSearchBox.parentNode — so it follows MSearchBox there.
+                 • We then empty searchBoxPos1, which destroys MSearchBox
+                   and the toggle.
+                 To survive this, we hold a persistent reference to the
+                 toggle element and re-inject everything each time. ──── */
+            var darkToggle = null; /* cached once found */
+
+            function injectToolbar() {
+                var sp2 = document.getElementById('searchBoxPos2');
+                if (!sp2) return;
+
+                /* Find the dark-mode toggle (may live in sp1, sp2, or detached) */
+                if (!darkToggle) {
+                    darkToggle = document.querySelector('doxygen-awesome-dark-mode-toggle');
                 }
-            }, 100);
+
+                /* (Re-)insert: badge → GitHub → toggle at start of sp2.
+                   appendChild/insertBefore MOVES the node if already in DOM. */
+                if (badge.parentNode !== sp2) sp2.insertBefore(badge, sp2.firstChild);
+                if (gh.parentNode !== sp2) sp2.insertBefore(gh, badge.nextSibling);
+                if (darkToggle && darkToggle.parentNode !== sp2) sp2.appendChild(darkToggle);
+            }
+
+            /* ── Breakpoint override: 768px → 996px ──────────── */
+            var MNE_BP = 997;
+            var prevW = 0;
+
+            function mneResetNav() {
+                var w = $(window).outerWidth();
+                if (w === prevW) return;
+                prevW = w;
+
+                var $menu = $('#main-menu');
+                var $state = $('#main-menu-state');
+
+                /* Grab the dark-mode toggle BEFORE emptying anything,
+                   so we keep a live reference even if its parent is wiped. */
+                if (!darkToggle) {
+                    darkToggle = document.querySelector('doxygen-awesome-dark-mode-toggle');
+                }
+                /* Detach toggle from wherever it is, so jQuery .empty()
+                   won't destroy it. */
+                if (darkToggle && darkToggle.parentNode) {
+                    darkToggle.parentNode.removeChild(darkToggle);
+                }
+
+                if (w < MNE_BP) {
+                    /* Mobile: hide menu unless hamburger is checked */
+                    if (!$state.prop('checked')) {
+                        $menu.hide();
+                    }
+                    $('#searchBoxPos1').empty().hide();
+                    $('#searchBoxPos2').show();
+                } else {
+                    /* Desktop: force flex layout, collapse hamburger */
+                    $menu.css('display', 'flex');
+                    $state.prop('checked', false);
+                    $('#searchBoxPos1').empty().hide();
+                    $('#searchBoxPos2').show();
+                }
+
+                /* Re-inject badge + GitHub + dark toggle */
+                injectToolbar();
+
+                if (typeof searchBox !== 'undefined') {
+                    searchBox.CloseResultsWindow();
+                }
+            }
+
+            /* Run after Doxygen's own initMenu has finished */
+            setTimeout(function () {
+                injectToolbar();
+                $(window).on('resize', mneResetNav);
+                mneResetNav();
+            }, 150);
         });
     </script>
 

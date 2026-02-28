@@ -1,6 +1,17 @@
 /*
  * Custom Doxygen overrides to match the MNE-CPP Docusaurus navbar.
+ * Responsive breakpoint raised from 768px → 996px to match Docusaurus.
  * Height ≈ 3.75rem (60px), system-ui font stack, semibold (500) nav links.
+ *
+ * DOM structure produced by menu.js:
+ *   #top
+ *     #titlearea          (logo + project name — static HTML)
+ *     div.sm.sm-dox       (checkbox + hamburger + searchBoxPos1 — injected)
+ *     #main-nav
+ *       ul#main-menu      (nav items + searchBoxPos2)
+ *
+ * KEY: #main-menu-state and #main-menu are NOT siblings, so CSS ~ selectors
+ *      cannot control visibility.  All menu toggling uses JS.
  */
 
 /* ── Font & variable overrides ─────────────────────────────────── */
@@ -10,18 +21,39 @@ html {
         Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
         "Segoe UI Symbol";
     --navigation-font-size: 1rem;
-    /* 16px – matches Docusaurus navbar (--ifm-font-size-base: 100%) */
     --title-font-size: 1.25rem;
-    /* 20px – keeps logo area compact */
 }
 
-/* ── Top bar: match Docusaurus 3.75rem (60px) height ───────────── */
+/* ══════════════════════════════════════════════════════════════════
+   #top — ALWAYS flex so titlearea + hamburger-div share a row.
+   Only border is #top's own border-bottom (from doxygen-awesome).
+   ══════════════════════════════════════════════════════════════════ */
 #top {
+    display: flex !important;
+    flex-wrap: wrap;
+    align-items: center;
+    position: relative;
     min-height: 3.75rem;
 }
 
+/* ── Hamburger wrapper div (div.sm.sm-dox child of #top) ───────── *
+ *  Contains the checkbox, hamburger label, and searchBoxPos1.
+ */
+#top>div.sm.sm-dox {
+    margin-left: auto;
+    display: flex !important;
+    align-items: center;
+    padding: 0 1rem;
+    border: none !important;
+    background: none !important;
+    line-height: 1;
+}
+
+/* ── Title area: logo + project name ───────────────────────────── */
 #titlearea {
     padding: 0.25rem 1rem;
+    border-bottom: none !important;
+    flex-shrink: 0;
 }
 
 #titlearea table tbody tr {
@@ -30,7 +62,6 @@ html {
 
 #projectlogo img {
     max-height: 2rem;
-    /* 32px – matches Docusaurus navbar logo */
     margin-right: 0.5rem;
 }
 
@@ -67,7 +98,6 @@ html.dark-mode #projectlogo .logo-dark {
     border: 1px solid rgba(23, 121, 196, 0.25);
     color: var(--primary-color);
     letter-spacing: 0.03em;
-    margin-right: 0.5rem;
     display: inline-flex;
     align-items: center;
     vertical-align: middle;
@@ -104,6 +134,7 @@ html.dark-mode .version-badge {
 .tabs2,
 .tabs3 {
     padding: 0 1rem;
+    border-bottom: none !important;
 }
 
 .tablist li {
@@ -114,41 +145,223 @@ html.dark-mode .version-badge {
     padding: 0.5rem 0.75rem !important;
 }
 
+/* ── #main-nav: NO extra borders ──────────────────────────────── */
 #main-nav {
     padding: 0.25rem 1rem;
-    display: flex;
-    align-items: center;
+    border-bottom: none !important;
+    border-top: none !important;
 }
 
-/* ── Vertically center & right-align search, toggle, GitHub ────── */
+/* ══════════════════════════════════════════════════════════════════
+   DESKTOP (≥ 997px) — horizontal flex bar
+   ══════════════════════════════════════════════════════════════════ */
+@media screen and (min-width: 997px) {
 
-/* The nav menu list takes available space, search etc. pushed right */
-#main-menu {
-    flex: 1;
-    display: flex !important;
-    align-items: center;
-    flex-wrap: wrap;
+    /* ── Hamburger wrapper: just contains the (hidden) hamburger */
+    #top>div.sm.sm-dox {
+        order: 2;
+        display: none !important;
+        /* Nothing to show on desktop */
+    }
+
+    #main-nav {
+        order: 1;
+        display: flex;
+        flex-grow: 5;
+        align-items: center;
+    }
+
+    /* Horizontal nav list */
+    #main-menu {
+        flex: 1;
+        display: flex !important;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    /* Float items horizontally — override tabs.css rules */
+    .sm-dox li,
+    .tablist li {
+        display: var(--menu-display);
+    }
+
+    /* Search / badge / toggle pushed to the right inside nav.
+       CSS order controls the visual sequence:
+       version(1) → GitHub(2) → dark-toggle(3) → search(4) */
+    #searchBoxPos2 {
+        margin-left: auto !important;
+        float: none !important;
+        display: flex !important;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    #searchBoxPos2 .version-badge {
+        order: 1;
+    }
+
+    #searchBoxPos2 .github-link {
+        order: 2;
+    }
+
+    #searchBoxPos2 doxygen-awesome-dark-mode-toggle {
+        order: 3;
+    }
+
+    #searchBoxPos2 #MSearchBox {
+        order: 4;
+    }
+
+    /* Hide hamburger button on desktop */
+    .main-menu-btn {
+        position: absolute !important;
+        top: -99999px !important;
+    }
+
+    /* Hide the mobile-only search slot */
+    #searchBoxPos1 {
+        display: none !important;
+    }
+
+    /* Dropdown sub-arrows */
+    .sm-dox a span.sub-arrow,
+    .sm-dox ul a span.sub-arrow {
+        display: none !important;
+    }
 }
 
-/* The search position item pushes to far right via margin-left:auto */
-#searchBoxPos2 {
-    margin-left: auto !important;
-    float: none !important;
-    display: flex !important;
-    align-items: center;
-    gap: 0.375rem;
+/* ══════════════════════════════════════════════════════════════════
+   MOBILE (≤ 996px) — Docusaurus-style hamburger + vertical dropdown
+   Menu visibility is controlled entirely by JS (mneResetNav).
+   ══════════════════════════════════════════════════════════════════ */
+@media screen and (max-width: 996px) {
+
+    /* ── Hamburger button — inline-block inside its container,
+         natural flex-item position (NOT absolute) ─────────────── */
+    .main-menu-btn {
+        display: inline-block !important;
+        position: relative !important;
+        top: auto !important;
+        width: 36px;
+        height: 36px;
+    }
+
+    /* ── Hide the secondary search position to avoid duplicates ── */
+    #searchBoxPos1 {
+        display: none !important;
+    }
+
+    /* ── #main-nav: wraps to its own full-width row ───────────── */
+    #main-nav {
+        flex-basis: 100%;
+        order: 2;
+        padding: 0;
+    }
+
+    /* ── Menu list: vertical column.
+         JS sets display:none / display:block / slideDown/slideUp.
+         Do NOT override display with !important here. ─────────── */
+    #main-menu {
+        flex-direction: column;
+        width: 100%;
+        padding: 0.25rem 0;
+        background: var(--page-background-color);
+        border-top: 1px solid var(--separator-color);
+    }
+
+    /* Override tabs.css @media(min-width:768px) float:left */
+    .sm-dox li {
+        float: none !important;
+        display: block !important;
+    }
+
+    .sm-dox>li>a {
+        display: block !important;
+        padding: 0.625rem 1.25rem !important;
+        white-space: normal !important;
+    }
+
+    .sm-dox>li>a:hover {
+        background: var(--menu-selected-background) !important;
+    }
+
+    /* Hide sub-arrows in mobile */
+    .sm-dox a span.sub-arrow {
+        display: none !important;
+    }
+
+    /* ── Submenu: full-width stacked ──────────────────────────── */
+    .sm-dox ul {
+        position: static !important;
+        width: 100% !important;
+        border: none !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        background: var(--page-background-color) !important;
+        padding: 0 !important;
+    }
+
+    .sm-dox ul a {
+        padding-left: 2.5rem !important;
+    }
+
+    /* ── Search box + toolbar inside menu: flex-wrap so
+         badge + GitHub + dark-toggle sit on one compact line
+         and the search box takes the full width below ─────────── */
+    #searchBoxPos2 {
+        float: none !important;
+        display: flex !important;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 0.5rem 1rem;
+        margin-left: 0 !important;
+    }
+
+    /* Badge, GitHub, dark toggle stay on one line */
+    #searchBoxPos2 .version-badge {
+        order: 1;
+    }
+
+    #searchBoxPos2 .github-link {
+        order: 2;
+    }
+
+    #searchBoxPos2 doxygen-awesome-dark-mode-toggle {
+        order: 3;
+    }
+
+    /* Search takes full width on the next line */
+    #searchBoxPos2 #MSearchBox {
+        order: 4;
+        flex-basis: 100%;
+        width: 100% !important;
+        margin: 0 !important;
+    }
+
+    #searchBoxPos2 #MSearchField {
+        width: calc(100% - 64px) !important;
+    }
+
+    /* ── Override doxygen-awesome's 768px rules ───────────────── */
+    .sm-dox {
+        padding: 0 !important;
+        background: none !important;
+    }
 }
 
-/* Search box – pushed to outer right via flex order */
-.tabs #MSearchBox,
+/* ══════════════════════════════════════════════════════════════════
+   SHARED / ALL-WIDTHS styles
+   ══════════════════════════════════════════════════════════════════ */
+
+/* Search box base styling */
 #MSearchBox {
     display: inline-flex !important;
     align-items: center;
     vertical-align: middle;
     position: relative !important;
     right: auto !important;
-    order: 100;
-    margin-left: 0.5rem !important;
 }
 
 /* Center text vertically inside search input */
@@ -168,22 +381,11 @@ doxygen-awesome-dark-mode-toggle,
     justify-content: center;
 }
 
-/* ── Hide dropdown arrows (sub-arrows) ─────────────────────────── */
-.sm-dox a span.sub-arrow,
-.sm-dox ul a span.sub-arrow {
-    display: none !important;
-}
-
 /* ── GitHub link in header (matches Docusaurus style) ──────────── */
 .github-link {
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
     width: auto;
     height: auto;
-    margin-left: 0.5rem;
     border-radius: var(--border-radius-small, 4px);
-    vertical-align: middle;
     cursor: pointer;
     transition: opacity 0.2s;
     flex-shrink: 0;
@@ -225,4 +427,5 @@ html.dark-mode doxygen-awesome-dark-mode-toggle:hover {
 doxygen-awesome-dark-mode-toggle>svg {
     width: 24px;
     height: 24px;
+}
 }
