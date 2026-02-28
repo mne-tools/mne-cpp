@@ -864,11 +864,10 @@ void MainWindow::setupConnections()
         m_playButton->setText("Play");
         m_stcTimer->stop();
 
-        float tstep = m_brainView->stcStep();
-        if (tstep > 0) {
-            m_stcTimer->setInterval(16);  // ~60 fps fixed frame rate
-            m_stcStepAccum = 0.0;
-        }
+        // Use a fixed display-rate interval; the wall-clock elapsed-time
+        // approach in the timeout handler dynamically computes the correct
+        // number of frames to advance for any speed factor.
+        m_stcTimer->setInterval(16);  // ~60 fps
     });
 
     connect(m_timeSlider, &QSlider::valueChanged, [this](int value) {
@@ -949,15 +948,16 @@ void MainWindow::setupConnections()
     });
 
     connect(m_speedCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), [this]() {
+        // Reset accumulator so the new speed takes effect cleanly
+        m_stcStepAccum = 0.0;
+        m_playbackClock.start();
+
+        // Update real-time streaming interval for the threaded pipeline
         float tstep = m_brainView->stcStep();
         if (tstep > 0) {
-            // Reset clock so the next tick measures from now
-            m_playbackClock.start();
-            m_stcStepAccum = 0.0;
-            // Also update real-time streaming interval
             double factor = m_speedCombo->currentData().toDouble();
-            double idealInterval = (tstep * 1000.0) / factor;
-            m_brainView->setRealtimeInterval(static_cast<int>(idealInterval));
+            int interval = static_cast<int>((tstep * 1000.0f) / factor);
+            m_brainView->setRealtimeInterval(interval);
         }
     });
 
@@ -980,7 +980,7 @@ void MainWindow::setupConnections()
         float tstep = m_brainView->stcStep();
         if (tstep <= 0) return;
 
-        // Measure actual elapsed wall-clock time since last reset
+        // Measure actual elapsed wall-clock time since last tick
         double elapsedMs = m_playbackClock.elapsed();
         m_playbackClock.start();
 
