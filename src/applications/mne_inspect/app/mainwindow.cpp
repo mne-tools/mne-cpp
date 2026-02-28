@@ -68,12 +68,40 @@
 #include <QCoreApplication>
 #include <QDebug>
 
+#ifdef WASMBUILD
+#include <QBuffer>
+#endif
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace FSLIB;
 using namespace MNELIB;
+
+//=============================================================================================================
+// WASM HELPERS
+//=============================================================================================================
+
+#ifdef WASMBUILD
+/**
+ * Write file content obtained from QFileDialog::getOpenFileContent() to a
+ * temporary path in the Emscripten virtual filesystem so that existing
+ * file-path-based loaders can consume it transparently.
+ */
+static QString wasmSaveToTemp(const QString &fileName, const QByteArray &fileContent)
+{
+    QString tempPath = QStringLiteral("/tmp/") + QFileInfo(fileName).fileName();
+    QFile f(tempPath);
+    if (!f.open(QIODevice::WriteOnly)) {
+        qWarning() << "WASM: failed to write temp file" << tempPath;
+        return QString();
+    }
+    f.write(fileContent);
+    f.close();
+    return tempPath;
+}
+#endif
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -629,9 +657,18 @@ void MainWindow::setupConnections()
 
     // BEM loading
     connect(m_loadBemBtn, &QPushButton::clicked, [this]() {
+#ifdef WASMBUILD
+        QFileDialog::getOpenFileContent("BEM Files (*.fif)", [this](const QString &fileName, const QByteArray &fileContent) {
+            if (fileName.isEmpty()) return;
+            QString path = wasmSaveToTemp(fileName, fileContent);
+            if (path.isEmpty()) return;
+            loadBem("User", path);
+        });
+#else
         QString path = QFileDialog::getOpenFileName(this, "Select BEM Surface", "", "BEM Files (*-bem.fif *-bem-sol.fif);;FIF Files (*.fif);;All Files (*)");
         if (path.isEmpty()) return;
         loadBem("User", path);
+#endif
     });
 
     // BEM visibility
@@ -703,6 +740,25 @@ void MainWindow::setupConnections()
 
     // Brain Surface
     connect(m_loadSurfaceBtn, &QPushButton::clicked, [this]() {
+#ifdef WASMBUILD
+        QFileDialog::getOpenFileContent("FreeSurfer Surface (*.*)", [this](const QString &fileName, const QByteArray &fileContent) {
+            if (fileName.isEmpty()) return;
+            QString path = wasmSaveToTemp(fileName, fileContent);
+            if (path.isEmpty()) return;
+
+            QString fn = QFileInfo(path).fileName();
+            QString hemi = fn.contains("lh.") ? "lh" : (fn.contains("rh.") ? "rh" : "lh");
+            QString type = "pial";
+            if (fn.contains("inflated")) type = "inflated";
+            else if (fn.contains("white")) type = "white";
+            else if (fn.contains("orig")) type = "orig";
+
+            Surface surf(path);
+            if (!surf.isEmpty()) {
+                m_model->addSurface("User", hemi, type, surf);
+            }
+        });
+#else
         QString path = QFileDialog::getOpenFileName(this, "Select Surface", "", "FreeSurfer Surface (*.pial *.inflated *.white *.orig);;All Files (*)");
         if (path.isEmpty()) return;
 
@@ -718,9 +774,25 @@ void MainWindow::setupConnections()
         if (!surf.isEmpty()) {
             m_model->addSurface("User", hemi, type, surf);
         }
+#endif
     });
 
     connect(m_loadAtlasBtn, &QPushButton::clicked, [this]() {
+#ifdef WASMBUILD
+        QFileDialog::getOpenFileContent("FreeSurfer Annotation (*.annot)", [this](const QString &fileName, const QByteArray &fileContent) {
+            if (fileName.isEmpty()) return;
+            QString path = wasmSaveToTemp(fileName, fileContent);
+            if (path.isEmpty()) return;
+
+            QString fn = QFileInfo(path).fileName();
+            QString hemi = fn.contains("lh.") ? "lh" : (fn.contains("rh.") ? "rh" : "lh");
+
+            Annotation annot(path);
+            if (!annot.isEmpty()) {
+                m_model->addAnnotation("User", hemi, annot);
+            }
+        });
+#else
         QString path = QFileDialog::getOpenFileName(this, "Select Atlas", "", "FreeSurfer Annotation (*.annot);;All Files (*)");
         if (path.isEmpty()) return;
 
@@ -732,13 +804,23 @@ void MainWindow::setupConnections()
         if (!annot.isEmpty()) {
             m_model->addAnnotation("User", hemi, annot);
         }
+#endif
     });
 
     // STC loading – add file to combo, which triggers the actual load
     connect(m_loadStcBtn, &QPushButton::clicked, [this]() {
+#ifdef WASMBUILD
+        QFileDialog::getOpenFileContent("STC Files (*.stc)", [this](const QString &fileName, const QByteArray &fileContent) {
+            if (fileName.isEmpty()) return;
+            QString path = wasmSaveToTemp(fileName, fileContent);
+            if (path.isEmpty()) return;
+            addStcEntry(path, true);
+        });
+#else
         QString path = QFileDialog::getOpenFileName(this, "Select Source Estimate", "", "STC Files (*-lh.stc *-rh.stc *.stc)");
         if (path.isEmpty()) return;
         addStcEntry(path, true);
+#endif
     });
 
     // STC combo selection changed – load the selected STC pair
@@ -928,6 +1010,21 @@ void MainWindow::setupConnections()
 
     // Sensors
     connect(m_loadDigBtn, &QPushButton::clicked, [this]() {
+#ifdef WASMBUILD
+        QFileDialog::getOpenFileContent("FIF Files (*.fif)", [this](const QString &fileName, const QByteArray &fileContent) {
+            if (fileName.isEmpty()) return;
+            QString path = wasmSaveToTemp(fileName, fileContent);
+            if (path.isEmpty()) return;
+
+            if (m_brainView->loadSensors(path)) {
+                m_showMegCheck->setEnabled(true);
+                m_showEegCheck->setEnabled(true);
+                m_showDigCheck->setEnabled(true);
+                m_showHelmetCheck->setEnabled(true);
+                m_helmetShapeCombo->setEnabled(true);
+            }
+        });
+#else
         QString path = QFileDialog::getOpenFileName(this, "Select Sensor/Digitizer File", "", "FIF Files (*.fif)");
         if (path.isEmpty()) return;
 
@@ -939,12 +1036,22 @@ void MainWindow::setupConnections()
             m_helmetShapeCombo->setEnabled(true);
             // Sub-category checkboxes stay disabled until master is toggled on
         }
+#endif
     });
 
     connect(m_loadTransBtn, &QPushButton::clicked, [this]() {
+#ifdef WASMBUILD
+        QFileDialog::getOpenFileContent("FIF Files (*.fif)", [this](const QString &fileName, const QByteArray &fileContent) {
+            if (fileName.isEmpty()) return;
+            QString path = wasmSaveToTemp(fileName, fileContent);
+            if (path.isEmpty()) return;
+            m_brainView->loadTransformation(path);
+        });
+#else
         QString path = QFileDialog::getOpenFileName(this, "Select Transformation", "", "FIF Files (*.fif)");
         if (path.isEmpty()) return;
         m_brainView->loadTransformation(path);
+#endif
     });
 
     connect(m_showMegCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSensorVisible("MEG", checked); });
@@ -995,17 +1102,40 @@ void MainWindow::setupConnections()
 
     // Dipoles
     connect(m_loadDipoleBtn, &QPushButton::clicked, [this]() {
+#ifdef WASMBUILD
+        QFileDialog::getOpenFileContent("Dipole Files (*.dip *.bdip)", [this](const QString &fileName, const QByteArray &fileContent) {
+            if (fileName.isEmpty()) return;
+            QString path = wasmSaveToTemp(fileName, fileContent);
+            if (path.isEmpty()) return;
+            if (m_brainView->loadDipoles(path)) {
+                m_showDipoleCheck->setEnabled(true);
+            }
+        });
+#else
         QString path = QFileDialog::getOpenFileName(this, "Select Dipoles", "", "Dipole Files (*.dip *.bdip)");
         if (path.isEmpty()) return;
         if (m_brainView->loadDipoles(path)) {
             m_showDipoleCheck->setEnabled(true);
         }
+#endif
     });
 
     connect(m_showDipoleCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setDipoleVisible(checked); });
 
     // Source Space
     connect(m_loadSrcSpaceBtn, &QPushButton::clicked, [this]() {
+#ifdef WASMBUILD
+        QFileDialog::getOpenFileContent("Source Space Files (*.fif)", [this](const QString &fileName, const QByteArray &fileContent) {
+            if (fileName.isEmpty()) return;
+            QString path = wasmSaveToTemp(fileName, fileContent);
+            if (path.isEmpty()) return;
+            if (m_brainView->loadSourceSpace(path)) {
+                m_showSrcSpaceCheck->setEnabled(true);
+                m_showSrcSpaceCheck->setChecked(false);
+                m_brainView->setSourceSpaceVisible(false);
+            }
+        });
+#else
         QString path = QFileDialog::getOpenFileName(this, "Select Source Space / Forward Solution", "",
             "Source Space Files (*-src.fif *-fwd.fif);;All FIF Files (*.fif)");
         if (path.isEmpty()) return;
@@ -1014,6 +1144,7 @@ void MainWindow::setupConnections()
             m_showSrcSpaceCheck->setChecked(false);
             m_brainView->setSourceSpaceVisible(false);
         }
+#endif
     });
 
     connect(m_showSrcSpaceCheck, &QCheckBox::toggled, [this](bool checked) { m_brainView->setSourceSpaceVisible(checked); });
@@ -1031,6 +1162,30 @@ void MainWindow::setupConnections()
 
     // Load Evoked (average FIF) – probe for evoked sets first
     connect(m_loadEvokedBtn, &QPushButton::clicked, [this]() {
+#ifdef WASMBUILD
+        QFileDialog::getOpenFileContent("Average FIF Files (*.fif)", [this](const QString &fileName, const QByteArray &fileContent) {
+            if (fileName.isEmpty()) return;
+            QString path = wasmSaveToTemp(fileName, fileContent);
+            if (path.isEmpty()) return;
+
+            QStringList sets = BrainView::probeEvokedSets(path);
+            m_evokedSetCombo->blockSignals(true);
+            m_evokedSetCombo->clear();
+            if (sets.isEmpty()) {
+                m_evokedSetCombo->addItem("(no evoked sets found)");
+                m_evokedSetCombo->setEnabled(false);
+                m_evokedSetCombo->blockSignals(false);
+                return;
+            }
+            m_evokedSetCombo->addItems(sets);
+            m_evokedSetCombo->setEnabled(sets.size() > 1);
+            m_evokedSetCombo->setCurrentIndex(0);
+            m_evokedSetCombo->blockSignals(false);
+
+            m_evokedSetCombo->setProperty("evokedPath", path);
+            m_brainView->loadSensorField(path, 0);
+        });
+#else
         QString path = QFileDialog::getOpenFileName(this,
             "Select Evoked / Average", "",
             "Average FIF Files (*-ave.fif);;All Files (*)");
@@ -1056,6 +1211,7 @@ void MainWindow::setupConnections()
 
         // Load the first evoked set
         m_brainView->loadSensorField(path, 0);
+#endif
     });
 
     // Evoked set selection changed – reload with new index
