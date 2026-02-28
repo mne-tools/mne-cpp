@@ -495,6 +495,34 @@ export default function Download(): JSX.Element {
                                             </a>
                                         </td>
                                     </tr>
+                                    <tr>
+                                        <td>MNE Browse</td>
+                                        <td>Browse and inspect raw MEG/EEG data files</td>
+                                        <td className="dl-table__right">
+                                            <a
+                                                href="https://mne-cpp.github.io/wasm/mne_browse.html"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="button button--sm button--outline button--primary"
+                                            >
+                                                Open
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>MNE Inspect</td>
+                                        <td>Inspect and review MEG/EEG channel data quality</td>
+                                        <td className="dl-table__right">
+                                            <a
+                                                href="https://mne-cpp.github.io/wasm/mne_inspect.html"
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="button button--sm button--outline button--primary"
+                                            >
+                                                Open
+                                            </a>
+                                        </td>
+                                    </tr>
                                 </tbody>
                             </table>
 

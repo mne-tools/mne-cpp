@@ -400,6 +400,48 @@ html {
     line-height: 1.35;
 }
 
+/* Badge labels */
+.dl-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0.15rem 0.55rem;
+    border-radius: 999px;
+    vertical-align: middle;
+    line-height: 1.4;
+}
+
+.dl-badge--experimental {
+    background: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffc107;
+}
+
+[data-theme='dark'] .dl-badge--experimental {
+    background: rgba(255, 193, 7, 0.15);
+    color: #ffd54f;
+    border-color: rgba(255, 193, 7, 0.4);
+}
+
+/* Experimental note block */
+.dl-experimental-note {
+    margin-top: 0.75rem;
+    padding: 0.75rem 1rem;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    color: var(--ifm-color-emphasis-700);
+    background: #fff8e1;
+    border-left: 3px solid #ffc107;
+    border-radius: 4px;
+}
+
+[data-theme='dark'] .dl-experimental-note {
+    background: rgba(255, 193, 7, 0.08);
+    color: var(--ifm-color-emphasis-600);
+}
+
 /* Right-side table of contents */
 .dl-toc {
     position: sticky;
