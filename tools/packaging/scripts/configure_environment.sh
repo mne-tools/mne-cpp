@@ -94,10 +94,25 @@ if [ -d "$LIB_DIR" ]; then
         add_to_rc "MNE-CPP runtime libraries" \
             "export DYLD_LIBRARY_PATH=\"\${MNE_CPP_ROOT}/lib:\$DYLD_LIBRARY_PATH\"" \
             "MNE_CPP_ROOT}/lib"
+        add_to_rc "MNE-CPP framework path (macOS)" \
+            "export DYLD_FRAMEWORK_PATH=\"\${MNE_CPP_ROOT}/lib:\$DYLD_FRAMEWORK_PATH\"" \
+            "MNE_CPP_ROOT.*DYLD_FRAMEWORK_PATH"
+        # Qt platform plugins for CLI tools (not .app-bundled)
+        if [ -d "${LIB_DIR}/plugins" ]; then
+            add_to_rc "MNE-CPP Qt plugin path (for CLI tools)" \
+                "export QT_PLUGIN_PATH=\"\${MNE_CPP_ROOT}/lib/plugins:\$QT_PLUGIN_PATH\"" \
+                "MNE_CPP_ROOT.*QT_PLUGIN_PATH"
+        fi
     else
         add_to_rc "MNE-CPP runtime libraries" \
             "export LD_LIBRARY_PATH=\"\${MNE_CPP_ROOT}/lib:\$LD_LIBRARY_PATH\"" \
             "MNE_CPP_ROOT}/lib"
+        # Qt platform plugins for Linux (xcb, imageformats, etc.)
+        if [ -d "${INSTALL_DIR}/plugins" ]; then
+            add_to_rc "MNE-CPP Qt plugin path (for applications)" \
+                "export QT_PLUGIN_PATH=\"\${MNE_CPP_ROOT}/plugins:\$QT_PLUGIN_PATH\"" \
+                "MNE_CPP_ROOT.*QT_PLUGIN_PATH"
+        fi
     fi
 fi
 

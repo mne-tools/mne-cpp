@@ -28,7 +28,26 @@ jobs:
         ./tools/build_project.bat
     - name: Deploy binaries (Windows)
       run: |
+        echo "Qt environment:"
+        echo "  QT_ROOT_DIR=$env:QT_ROOT_DIR"
+        echo "  Qt6_DIR=$env:Qt6_DIR"
+        Get-Command windeployqt -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source
         ./tools/deploy.bat dynamic pack
+        # Verify archive size
+        $archive = Get-Item mne-cpp-windows-dynamic-x86_64.zip -ErrorAction SilentlyContinue
+        if ($archive) {
+          $sizeMB = [math]::Round($archive.Length / 1MB)
+          echo "Archive size: ${sizeMB} MB"
+          if ($sizeMB -lt 60) {
+            echo "ERROR: Archive is too small (${sizeMB} MB). Qt DLLs likely missing."
+            echo "Listing archive contents..."
+            7z l mne-cpp-windows-dynamic-x86_64.zip | Select-String "Qt6" | Select-Object -First 10
+            exit 1
+          }
+        } else {
+          echo "ERROR: Archive file not found!"
+          exit 1
+        }
     - name: Deploy binaries with stable release on Github
       if: startsWith(github.ref, 'refs/tags/')
       uses: svenstaro/upload-release-action@v2

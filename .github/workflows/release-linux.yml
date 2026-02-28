@@ -25,6 +25,15 @@ jobs:
         ./tools/build_project.bat
     - name: Deploy binaries
       run: |
+        echo "Qt environment:"
+        echo "  QT_ROOT_DIR=${QT_ROOT_DIR:-<not set>}"
+        echo "  Qt6_DIR=${Qt6_DIR:-<not set>}"
+        echo "  Qt lib dir contents:"
+        QT_PREFIX="${QT_ROOT_DIR:-}"
+        if [ -z "$QT_PREFIX" ] && [ -n "${Qt6_DIR}" ]; then
+          QT_PREFIX="$(cd "${Qt6_DIR}/../../.." 2>/dev/null && pwd)"
+        fi
+        ls "$QT_PREFIX/lib"/libQt6*.so* 2>/dev/null | head -5 || echo "  No Qt .so files found at $QT_PREFIX/lib"
         ./tools/deploy.bat dynamic pack
     - name: Deploy binaries with stable release on Github
       if: startsWith(github.ref, 'refs/tags/')

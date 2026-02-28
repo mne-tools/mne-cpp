@@ -23,20 +23,37 @@ jobs:
     - name: Configure and compile MNE-CPP
       run: |
         ./tools/build_project.bat
-    - name: Disk usage before build
-      run: |
-        echo "Disk usage before build:" && df -h && du -sh $HOME/*
     - name: Free up disk space before packaging
       run: |
-        echo "Disk usage before cleanup:" && df -h && du -sh $HOME/*
-        sudo rm -rf /usr/local/share/gtk-doc /usr/local/Cellar /usr/local/lib/node_modules /usr/share/dotnet /opt/hostedtoolcache /Users/runner/Library/Caches/*
-        echo "Disk usage after cleanup:" && df -h && du -sh $HOME/*
-    - name: Disk usage before packaging
-      run: |
-        echo "Disk usage before packaging:" && df -h && du -sh $HOME/*
+        echo "Disk usage before cleanup:" && df -h
+        # Remove large unused toolchains BUT preserve Qt (/opt/hostedtoolcache/Qt)
+        sudo rm -rf /usr/local/share/gtk-doc /usr/local/Cellar /usr/local/lib/node_modules /usr/share/dotnet /Users/runner/Library/Caches/*
+        # Selectively clean hostedtoolcache without deleting Qt
+        find /opt/hostedtoolcache -mindepth 1 -maxdepth 1 ! -name 'Qt' -exec sudo rm -rf {} + 2>/dev/null || true
+        echo "Disk usage after cleanup:" && df -h
     - name: Deploy binaries (MacOS)
       run: |
+        echo "Qt environment:"
+        echo "  QT_ROOT_DIR=${QT_ROOT_DIR:-<not set>}"
+        echo "  Qt6_DIR=${Qt6_DIR:-<not set>}"
+        which macdeployqt || echo "WARNING: macdeployqt not on PATH"
         ./tools/deploy.bat dynamic pack
+        # Verify archive contains Qt frameworks
+        echo ""
+        echo "=== Archive verification ==="
+        ARCHIVE_SIZE=$(stat -f%z mne-cpp-macos-dynamic-arm64.tar.gz 2>/dev/null || echo 0)
+        echo "Archive size: $((ARCHIVE_SIZE / 1048576)) MB"
+        if [ "$ARCHIVE_SIZE" -lt 50000000 ]; then
+          echo "ERROR: Archive is too small ($((ARCHIVE_SIZE / 1048576)) MB). Qt frameworks likely missing."
+          echo "Archive contents:"
+          tar tzf mne-cpp-macos-dynamic-arm64.tar.gz | head -60
+          exit 1
+        fi
+        QT_FW_COUNT=$(tar tzf mne-cpp-macos-dynamic-arm64.tar.gz | grep -c 'Qt.*\.framework' || true)
+        echo "Qt framework entries in archive: ${QT_FW_COUNT}"
+        if [ "${QT_FW_COUNT}" -lt 10 ]; then
+          echo "WARNING: Very few Qt framework entries found. Deployment may be incomplete."
+        fi
     - name: Deploy binaries with stable release on Github
       if: startsWith(github.ref, 'refs/tags/')
       uses: svenstaro/upload-release-action@v2
