@@ -65,6 +65,10 @@ FiffDigitizerData::FiffDigitizerData()
 
 //=============================================================================================================
 
+FiffDigitizerData::~FiffDigitizerData() = default;
+
+//=============================================================================================================
+
 FiffDigitizerData::FiffDigitizerData(const FiffDigitizerData& p_FiffDigitizerData)
 : head_mri_t(p_FiffDigitizerData.head_mri_t ? std::make_unique<FiffCoordTrans>(*p_FiffDigitizerData.head_mri_t) : nullptr)
 , head_mri_t_adj(p_FiffDigitizerData.head_mri_t_adj ? std::make_unique<FiffCoordTrans>(*p_FiffDigitizerData.head_mri_t_adj) : nullptr)
