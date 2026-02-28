@@ -306,8 +306,7 @@ html.dark-mode .version-badge {
     }
 
     /* ── Search box + toolbar inside menu: flex-wrap so
-         badge + GitHub + dark-toggle sit on one compact line
-         and the search box takes the full width below ─────────── */
+         the search box takes the full width ─────────────────────── */
     #searchBoxPos2 {
         float: none !important;
         display: flex !important;
@@ -319,22 +318,15 @@ html.dark-mode .version-badge {
         margin-left: 0 !important;
     }
 
-    /* Badge, GitHub, dark toggle stay on one line */
-    #searchBoxPos2 .version-badge {
-        order: 1;
-    }
-
+    /* Badge, GitHub, dark toggle are now in the hamburger wrapper
+       (not in #searchBoxPos2) — hide any strays that might remain */
+    #searchBoxPos2 .version-badge,
     #searchBoxPos2 .github-link {
-        order: 2;
+        display: none !important;
     }
 
-    #searchBoxPos2 doxygen-awesome-dark-mode-toggle {
-        order: 3;
-    }
-
-    /* Search takes full width on the next line */
+    /* Search takes full width */
     #searchBoxPos2 #MSearchBox {
-        order: 4;
         flex-basis: 100%;
         width: 100% !important;
         margin: 0 !important;
@@ -342,6 +334,30 @@ html.dark-mode .version-badge {
 
     #searchBoxPos2 #MSearchField {
         width: calc(100% - 64px) !important;
+    }
+
+    /* ── Mobile toolbar: badge + GitHub + dark-toggle in
+         the hamburger wrapper row, visible next to the logo ───── */
+    #top > div.sm.sm-dox .version-badge,
+    #top > div.sm.sm-dox .github-link,
+    #top > div.sm.sm-dox doxygen-awesome-dark-mode-toggle {
+        display: inline-flex !important;
+        align-items: center;
+    }
+
+    #top > div.sm.sm-dox .version-badge {
+        order: -3;
+        margin-right: 0.25rem;
+    }
+
+    #top > div.sm.sm-dox .github-link {
+        order: -2;
+        margin-right: 0.25rem;
+    }
+
+    #top > div.sm.sm-dox doxygen-awesome-dark-mode-toggle {
+        order: -1;
+        margin-right: 0.5rem;
     }
 
     /* ── Override doxygen-awesome's 768px rules ───────────────── */

@@ -108,6 +108,7 @@ const config: Config = {
                 {
                     type: 'html',
                     position: 'right',
+                    className: 'navbar-version-item',
                     value: '<span class="navbar-version-badge">v2.0.0</span>',
                 },
                 {

@@ -97,6 +97,7 @@ html {
     border: 1px solid rgba(108, 92, 231, 0.25);
     color: var(--ifm-color-primary);
     letter-spacing: 0.03em;
+    white-space: nowrap;
 }
 
 [data-theme='dark'] .navbar-version-badge {
@@ -337,46 +338,6 @@ html {
     margin-top: 0.35rem;
 }
 
-/* Experimental badge */
-.dl-badge {
-    display: inline-block;
-    font-size: 0.65rem;
-    font-weight: 600;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-    padding: 0.15em 0.55em;
-    border-radius: 4px;
-    vertical-align: middle;
-    position: relative;
-    top: -2px;
-}
-.dl-badge--experimental {
-    background: var(--ifm-color-warning-contrast-background);
-    color: var(--ifm-color-warning-darkest, #6a4f00);
-    border: 1px solid var(--ifm-color-warning-dark, #c89700);
-}
-[data-theme='dark'] .dl-badge--experimental {
-    background: rgba(255, 183, 0, 0.15);
-    color: #ffc040;
-    border-color: rgba(255, 183, 0, 0.4);
-}
-
-/* Experimental note block */
-.dl-experimental-note {
-    font-size: 0.82rem;
-    line-height: 1.5;
-    margin-top: 0.75rem;
-    padding: 0.6rem 0.85rem;
-    border-left: 3px solid var(--ifm-color-warning-dark, #c89700);
-    background: var(--ifm-color-warning-contrast-background);
-    border-radius: 0 4px 4px 0;
-    color: var(--ifm-color-emphasis-700);
-}
-[data-theme='dark'] .dl-experimental-note {
-    background: rgba(255, 183, 0, 0.08);
-    border-left-color: rgba(255, 183, 0, 0.5);
-}
-
 /* License footer */
 .dl-license {
     text-align: center;
@@ -522,6 +483,13 @@ html {
     100% {
         background-position: -200% 0;
     }
+}
+
+/* Hide version badge and GitHub icon from the hamburger sidebar menu
+   (they are only relevant on the desktop top bar) */
+.navbar-sidebar .navbar-version-item,
+.navbar-sidebar .header-github-link {
+    display: none !important;
 }
 
 /* Responsive */
