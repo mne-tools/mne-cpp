@@ -338,24 +338,24 @@ html.dark-mode .version-badge {
 
     /* ── Mobile toolbar: badge + GitHub + dark-toggle in
          the hamburger wrapper row, visible next to the logo ───── */
-    #top > div.sm.sm-dox .version-badge,
-    #top > div.sm.sm-dox .github-link,
-    #top > div.sm.sm-dox doxygen-awesome-dark-mode-toggle {
+    #top>div.sm.sm-dox .version-badge,
+    #top>div.sm.sm-dox .github-link,
+    #top>div.sm.sm-dox doxygen-awesome-dark-mode-toggle {
         display: inline-flex !important;
         align-items: center;
     }
 
-    #top > div.sm.sm-dox .version-badge {
+    #top>div.sm.sm-dox .version-badge {
         order: -3;
         margin-right: 0.25rem;
     }
 
-    #top > div.sm.sm-dox .github-link {
+    #top>div.sm.sm-dox .github-link {
         order: -2;
         margin-right: 0.25rem;
     }
 
-    #top > div.sm.sm-dox doxygen-awesome-dark-mode-toggle {
+    #top>div.sm.sm-dox doxygen-awesome-dark-mode-toggle {
         order: -1;
         margin-right: 0.5rem;
     }
