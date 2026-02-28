@@ -27,6 +27,24 @@ set(RESOURCES
 set_source_files_properties(resources/images/appIcons/mne_inspect.icns PROPERTIES
     MACOSX_PACKAGE_LOCATION Resources)
 
+if(APPLE)
+    set(RESOURCE_GROUPS
+        selectionGroups
+        2DLayouts
+        default_filters
+        hpiAlignment
+        sensorSurfaces
+        coilDefinitions
+        3DLayouts
+    )
+
+    foreach(GROUP ${RESOURCE_GROUPS})
+        file(GLOB GROUP_FILES "${PROJECT_RESOURCES_DIR}/general/${GROUP}/*")
+        set_source_files_properties(${GROUP_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION "MacOS/../resources/general/${GROUP}")
+        list(APPEND SOURCES ${GROUP_FILES})
+    endforeach()
+endif()
+
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES} ${HEADERS} ${RESOURCES})
 else()

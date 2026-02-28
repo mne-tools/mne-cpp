@@ -386,8 +386,6 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
 
             QString key = "srcsp_" + srcItem->text();
             m_surfaces[key] = brainSurf;
-            qDebug() << "BrainView: Created batched source space mesh" << key
-                     << "with" << positions.size() << "points";
         }
 
         // Handle Digitizer Items (batched sphere mesh per category)
@@ -421,8 +419,6 @@ void BrainView::onRowsInserted(const QModelIndex &parent, int first, int last)
             }
             QString key = "dig_" + catName;
             m_surfaces[key] = brainSurf;
-            qDebug() << "BrainView: Created batched digitizer mesh" << key
-                     << "with" << positions.size() << "points";
         }
 
 
@@ -471,9 +467,6 @@ void BrainView::onDataChanged(const QModelIndex &topLeft, const QModelIndex &bot
 
 void BrainView::setActiveSurface(const QString &type)
 {
-    qDebug() << "[setActiveSurface] type=" << type
-             << "editTarget=" << m_visualizationEditTarget;
-
     subViewForTarget(m_visualizationEditTarget).surfaceType = type;
 
     m_activeSurfaceType = type;
@@ -1168,14 +1161,7 @@ void BrainView::updateViewportLabelHighlight()
 
 void BrainView::logPerspectiveRotation(const QString& context) const
 {
-    const QQuaternion perspectivePreset = perspectivePresetRotation();
-    const QQuaternion effective = m_cameraRotation * perspectivePreset;
-
-    qDebug() << "BrainView Perspective Rotation [" << context << "]"
-             << "userQuat=" << m_cameraRotation
-             << "userEuler=" << m_cameraRotation.toEulerAngles()
-             << "effectiveQuat=" << effective
-             << "effectiveEuler=" << effective.toEulerAngles();
+    Q_UNUSED(context);
 }
 
 //=============================================================================================================
@@ -2242,8 +2228,11 @@ bool BrainView::loadSensors(const QString &fifPath) {
     if (!r.megMagItems.isEmpty())  m_model->addSensors("MEG/Mag",  r.megMagItems);
     if (!r.eegItems.isEmpty())     m_model->addSensors("EEG",      r.eegItems);
 
-    if (r.helmetSurface)
+    if (r.helmetSurface) {
         m_surfaces["sens_surface_meg"] = r.helmetSurface;
+    } else {
+        qWarning() << "BrainView::loadSensors: NO helmet surface returned from DataLoader!";
+    }
 
     if (!r.digitizerPoints.isEmpty())
         m_model->addDigitizerData(r.digitizerPoints);
@@ -2255,7 +2244,10 @@ bool BrainView::loadSensors(const QString &fifPath) {
 
 bool BrainView::loadMegHelmetSurface(const QString &helmetFilePath) {
     auto surface = DataLoader::loadHelmetSurface(helmetFilePath, m_devHeadTrans, m_hasDevHead);
-    if (!surface) return false;
+    if (!surface) {
+        qWarning() << "BrainView::loadMegHelmetSurface: DataLoader returned nullptr!";
+        return false;
+    }
 
     m_surfaces["sens_surface_meg"] = surface;
     refreshSensorTransforms();
@@ -2286,9 +2278,6 @@ bool BrainView::loadNetwork(const CONNECTIVITYLIB::Network &network, const QStri
 
     // Also register in the tree model
     m_model->addNetwork(network, name);
-
-    qDebug() << "BrainView: Loaded network" << name
-             << "with" << network.getNodes().size() << "nodes";
 
     update();
     return true;

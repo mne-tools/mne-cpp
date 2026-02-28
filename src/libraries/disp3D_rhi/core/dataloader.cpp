@@ -195,7 +195,6 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
                 MNEBem helmetBem(helmetFile);
                 if (helmetBem.size() > 0) {
                     MNEBemSurface helmetSurf = helmetBem[0];
-
                     if (helmetSurf.nn.rows() != helmetSurf.rr.rows()) {
                         helmetSurf.nn = FSLIB::Surface::compute_normals(helmetSurf.rr, helmetSurf.tris);
                     }
@@ -225,6 +224,8 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
                     helmetSurface->fromBemSurface(helmetSurf, QColor(0, 0, 77, 200));
                     helmetSurface->setVisible(true);
                     result.helmetSurface = helmetSurface;
+                } else {
+                    qWarning() << "DataLoader::loadSensors: helmetBem[0] has 0 verts/tris!";
                 }
             }
         }
@@ -298,9 +299,6 @@ std::shared_ptr<BrainSurface> DataLoader::loadHelmetSurface(
     surface->fromBemSurface(helmetSurf, QColor(0, 0, 77, 200));
     surface->setVisible(true);
 
-    qDebug() << "DataLoader: Loaded helmet surface from" << helmetFilePath
-             << "(" << helmetSurf.rr.rows() << "vertices)";
-
     return surface;
 }
 
@@ -340,11 +338,6 @@ MNESourceSpace DataLoader::loadSourceSpace(const QString &fwdPath)
     if (srcSpace.isEmpty()) {
         qWarning() << "DataLoader: Source space is empty";
         return {};
-    }
-
-    qDebug() << "DataLoader: Loaded source space with" << srcSpace.size() << "hemispheres";
-    for (int h = 0; h < srcSpace.size(); ++h) {
-        qDebug() << "  Hemi" << h << ": nuse =" << srcSpace[h].nuse << "np =" << srcSpace[h].np;
     }
 
     return srcSpace;

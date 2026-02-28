@@ -340,6 +340,8 @@ bool SensorFieldMapper::buildMapping(
                         m_evoked.info, megChNames,
                         kIntrad, kMegMiss);
                 }
+            } else {
+                qWarning() << "MEG coil definitions not found at" << coilPath;
             }
         }
     }
@@ -446,11 +448,6 @@ Eigen::Vector3f SensorFieldMapper::fitSphereOrigin(const FIFFLIB::FiffInfo &info
         std::sqrt(x(0) * x(0) + x(1) * x(1) + x(2) * x(2) + x(3)));
 
     if (radius) *radius = R;
-
-    qDebug() << "SensorFieldMapper::fitSphereOrigin: fitted origin ="
-             << cx << cy << cz
-             << ", R =" << R * 1000.0f << "mm"
-             << "from" << n << "dig points";
 
     return Eigen::Vector3f(cx, cy, cz);
 }
