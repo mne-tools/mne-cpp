@@ -120,7 +120,7 @@ public:
     /**
      * Destroys the digitization point description.
      */
-    ~FiffDigitizerData() = default;
+    ~FiffDigitizerData();
 
     //=========================================================================================================
     /**
