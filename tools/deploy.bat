@@ -68,19 +68,48 @@
     
     IF "%LINK_OPTION%"=="dynamic" (
         
-        cd %OUT_DIR_NAME%\apps
+        ECHO Checking for windeployqt...
+        where windeployqt
+        IF ERRORLEVEL 1 (
+            ECHO ERROR: windeployqt not found on PATH. Ensure Qt bin\ is on PATH.
+            exit /B 1
+        )
+
+        ECHO Changing to output directory: %OUT_DIR_NAME%\apps
+        IF NOT EXIST "%OUT_DIR_NAME%\apps" (
+            ECHO ERROR: Output directory does not exist: %OUT_DIR_NAME%\apps
+            ECHO The build may have failed or used a different output path.
+            exit /B 1
+        )
+        cd /d %OUT_DIR_NAME%\apps
+
+        ECHO.
+        ECHO Files in apps directory before windeployqt:
+        dir /b *.exe 2>nul
+        dir /b *.dll 2>nul
+        ECHO.
 
         REM Solve dependencies for top-level DLLs only (not plugin subdirs).
         REM Using /b without /s to avoid recursing into mne_scan_plugins/ etc.
         REM which would bloat each plugin dir with duplicate Qt DLLs.
-        for /f %%f in ('dir /b *.dll') do (
+        SET "DLL_COUNT=0"
+        for /f %%f in ('dir /b *.dll 2^>nul') do (
+          ECHO Running windeployqt on %%f ...
           %MOCK_TEXT%windeployqt %%f
+          SET /A DLL_COUNT+=1
         )
 
         REM Solve dependencies for top-level applications only
-        for /f %%f in ('dir /b *.exe') do (
+        SET "EXE_COUNT=0"
+        for /f %%f in ('dir /b *.exe 2^>nul') do (
+            ECHO Running windeployqt on %%f ...
             %MOCK_TEXT%windeployqt %%f
+            SET /A EXE_COUNT+=1
         )
+
+        ECHO.
+        ECHO windeployqt summary: processed DLLs and EXEs
+        ECHO.
 
         REM REM solve dependencies for tests 
         REM for /f %%f in ('dir test_*.exe /s /b') do (
@@ -93,13 +122,26 @@
         REM )
 
         IF "%PACK_OPTION%"=="true" (
-            cd %BASE_PATH%
+            cd /d %BASE_PATH%
             REM Delete folders which we do not want to ship
             %MOCK_TEXT%rmdir %OUT_DIR_NAME%\resources\data /s /q 
             REM Creating archive from inside output directory for clean top-level layout
-            cd %OUT_DIR_NAME%
+            cd /d %OUT_DIR_NAME%
+            ECHO.
+            ECHO Contents of apps directory:
+            dir apps\*.dll 2>nul | find "File(s)"
+            dir apps\*.exe 2>nul | find "File(s)"
+            ECHO Checking for Qt DLLs...
+            dir apps\Qt6*.dll 2>nul | find "File(s)"
+            ECHO Checking for platform plugins...
+            IF EXIST apps\platforms (
+                ECHO   platforms\ directory found
+            ) ELSE (
+                ECHO   WARNING: platforms\ directory NOT found - windeployqt may have failed
+            )
+            ECHO.
             %MOCK_TEXT%7z a %BASE_PATH%\mne-cpp-windows-dynamic-x86_64.zip apps lib resources
-            cd %BASE_PATH%
+            cd /d %BASE_PATH%
         )
 
         cd %cd%
@@ -401,6 +443,28 @@ if [[ ${LinkOption} == "dynamic" ]]; then
         echo "  WARNING: Could not find Qt lib directory. CLI tools may not find Qt at runtime."
     fi
 
+    # ---------------------------------------------------------------
+    # Copy Qt plugins into lib/plugins/ for CLI tools.
+    # CLI tools are not .app bundles and need QT_PLUGIN_PATH set to
+    # find the platform plugin (cocoa) and others.
+    # ---------------------------------------------------------------
+    echo "Copying Qt plugins into lib/plugins/ for CLI tools..."
+    QT_PLUGINS_DIR=""
+    if [ -n "${QT_LIB_DIR}" ]; then
+        QT_PLUGINS_DIR="$(dirname "${QT_LIB_DIR}")/plugins"
+    fi
+    if [ -n "${QT_PLUGINS_DIR}" ] && [ -d "${QT_PLUGINS_DIR}" ]; then
+        mkdir -p "${BasePath}/out/${BuildName}/lib/plugins"
+        for plugdir in platforms imageformats iconengines networkinformation tls styles; do
+            if [ -d "${QT_PLUGINS_DIR}/${plugdir}" ]; then
+                echo "  Copying ${plugdir}/ ..."
+                ${MockText}cp -a "${QT_PLUGINS_DIR}/${plugdir}" "${BasePath}/out/${BuildName}/lib/plugins/"
+            fi
+        done
+    else
+        echo "  WARNING: Could not find Qt plugins directory. CLI tools may fail to find platform plugins."
+    fi
+
     if [[ ${PackOption} == "true" ]]; then
 
         # Delete folders which we do not want to ship
@@ -409,6 +473,22 @@ if [[ ${LinkOption} == "dynamic" ]]; then
         ${MockText}rm -rf ${BasePath}/out/${BuildName}/apps/mne_scan_plugins
         ${MockText}rm -rf ${BasePath}/out/${BuildName}/apps/mne_analyze_plugins
         # mne_rt_server_plugins stays — mne_rt_server is a CLI tool (no .app bundle)
+
+        # Verify Qt frameworks before packing
+        echo ""
+        echo "=== Pre-pack verification ==="
+        QT_FW_IN_BUNDLES=$(find ${BasePath}/out/${BuildName}/apps -name "Qt*.framework" -type d 2>/dev/null | wc -l)
+        QT_FW_IN_LIB=$(find ${BasePath}/out/${BuildName}/lib -name "Qt*.framework" -type d -maxdepth 1 2>/dev/null | wc -l)
+        echo "Qt frameworks in .app bundles: ${QT_FW_IN_BUNDLES}"
+        echo "Qt frameworks in lib/: ${QT_FW_IN_LIB}"
+        if [ "${QT_FW_IN_BUNDLES}" -lt 5 ]; then
+            echo "WARNING: Very few Qt frameworks in .app bundles. macdeployqt may have failed."
+        fi
+        if [ "${QT_FW_IN_LIB}" -lt 5 ]; then
+            echo "WARNING: Very few Qt frameworks in lib/. CLI tools may not work."
+        fi
+        echo "Total output size:"
+        du -sh ${BasePath}/out/${BuildName}/apps/ ${BasePath}/out/${BuildName}/lib/ 2>/dev/null
 
         # Creating archive of all macos deployed applications.
         # Include apps/ (with Qt frameworks inside .app bundles), lib/
@@ -620,6 +700,15 @@ if [[ ${LinkOption} == "dynamic" ]]; then
         ${MockText}find "${QT_DIR}/lib" -maxdepth 1 -name "libQt6*.so*" -exec cp -a {} ${BasePath}/out/${BuildName}/lib/ \;
         ${MockText}find "${QT_DIR}/lib" -maxdepth 1 -name "libicu*.so*" -exec cp -a {} ${BasePath}/out/${BuildName}/lib/ \;
 
+        # Verify Qt libraries were copied
+        QT_SO_COUNT=$(find ${BasePath}/out/${BuildName}/lib -maxdepth 1 -name "libQt6*.so*" 2>/dev/null | wc -l)
+        echo "  Qt .so files copied to lib/: ${QT_SO_COUNT}"
+        if [ "${QT_SO_COUNT}" -lt 5 ]; then
+            echo "  WARNING: Very few Qt libraries copied. Expected 15+."
+            echo "  Qt lib directory contents:"
+            ls -la "${QT_DIR}/lib"/libQt6*.so* 2>/dev/null | head -10 || echo "    No libQt6*.so* found in ${QT_DIR}/lib"
+        fi
+
         # Copy Qt plugins (platforms, imageformats, etc.)
         echo "Copying Qt plugins..."
         ${MockText}mkdir -p ${BasePath}/out/${BuildName}/plugins
@@ -644,8 +733,31 @@ if [[ ${LinkOption} == "dynamic" ]]; then
             ${MockText}cp -r ${BasePath}/out/${BuildName}/ mne-cpp
             ${MockText}rm -rf mne-cpp/resources/data
 
+            # Verify Qt libraries are in the staging directory
+            echo ""
+            echo "=== Deployment verification ==="
+            echo "Qt .so files in lib/:"
+            find mne-cpp/lib -maxdepth 1 -name "libQt6*.so*" 2>/dev/null | wc -l
+            echo "Qt plugins:"
+            find mne-cpp/plugins -type f -name "*.so" 2>/dev/null | wc -l
+            echo "Applications:"
+            find mne-cpp/apps -maxdepth 1 -type f -executable 2>/dev/null | wc -l
+            echo "Total staging size:"
+            du -sh mne-cpp/ 2>/dev/null
+
             # Creating archive of everything in current directory
             ${MockText}tar cfvz ${BasePath}/mne-cpp-linux-dynamic-x86_64.tar.gz mne-cpp
+
+            # Verify archive size
+            ARCHIVE_SIZE=$(stat -c%s ${BasePath}/mne-cpp-linux-dynamic-x86_64.tar.gz 2>/dev/null || echo 0)
+            echo ""
+            echo "Archive size: $((ARCHIVE_SIZE / 1048576)) MB"
+            if [ "${ARCHIVE_SIZE}" -lt 30000000 ]; then
+                echo "ERROR: Archive is too small ($((ARCHIVE_SIZE / 1048576)) MB). Expected 50+ MB with Qt."
+                echo "Archive contents:"
+                tar tzf ${BasePath}/mne-cpp-linux-dynamic-x86_64.tar.gz | head -40
+                exit 1
+            fi
         fi
     fi
 
