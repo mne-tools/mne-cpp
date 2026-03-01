@@ -4,12 +4,12 @@ sidebar_label: Try Online (Wasm)
 sidebar_position: 14
 ---
 
-# MNE-CPP in the Browser — Online Applications
+# Online Applications (WebAssembly)
 
-MNE-CPP can be compiled to [WebAssembly (Wasm)](https://webassembly.org/), which means that several of its GUI applications can run **directly inside a standard web browser** — no download, no installation, and no platform-specific binaries required. Users simply open a URL and start working.
+MNE-CPP can be compiled to [WebAssembly (Wasm)](https://webassembly.org/), allowing several of its GUI applications to run inside a standard web browser without installation. Users open a URL, load local `.fif` files, and work with the data directly — no data are uploaded to any server.
 
-:::tip Try MNE Browse Online
-**[Launch MNE Browse in your browser](https://mne-cpp.github.io/wasm/mne_browse.html)** — an experimental, fully functional build of MNE Browse running as a WebAssembly application. Load your `.fif` files directly in the browser and explore raw MEG/EEG data — no installation required, no data uploaded.
+:::caution Experimental builds
+All WebAssembly builds listed on this page are **experimental** and under active development. Functionality may be incomplete or differ from the corresponding desktop applications. Bug reports and feedback are welcome.
 :::
 
 ---
@@ -31,10 +31,10 @@ MNE-CPP's Wasm build is produced with the [Emscripten](https://emscripten.org/) 
 
 ---
 
-## Data Privacy — Your Data Never Leaves Your Computer {#data-privacy}
+## Data Privacy {#data-privacy}
 
-:::info Critical for clinical users
-**No data are uploaded to any server.** When you open an MNE-CPP WebAssembly application in your browser, the entire application runs **locally on your machine**. The browser merely provides the runtime environment — comparable to a local virtual machine. All file I/O happens through the browser's in-memory virtual file system; data you load stay in your computer's RAM and are never transmitted over the network.
+:::info
+**No data are uploaded to any server.** The WebAssembly application runs locally within the browser process. File I/O is handled through the browser's in-memory virtual file system; loaded data remain in RAM and are not transmitted over the network.
 :::
 
 Because MEG/EEG recordings frequently contain **Protected Health Information (PHI)** and **Personally Identifiable Information (PII)** — patient names, birth dates, hospital IDs, measurement dates, and more (see [MNE Anonymize](anonymize) for the full list) — data privacy is paramount. The WebAssembly architecture provides the following guarantees:
@@ -44,7 +44,7 @@ Because MEG/EEG recordings frequently contain **Protected Health Information (PH
 3. **Browser sandbox.** WebAssembly code cannot access arbitrary files on disk, cannot open network connections that the user has not initiated, and cannot bypass the browser's same-origin security policy.
 4. **No telemetry on user data.** MNE-CPP's Wasm deployment is a set of static files hosted on GitHub Pages. There is no backend, no database, and no analytics that touch the loaded measurement data.
 
-In short: **using MNE-CPP via WebAssembly in a browser is, from a data-flow perspective, equivalent to running a desktop application.** It simply uses the browser as a convenient, cross-platform runtime rather than requiring a native installation.
+In summary, using MNE-CPP via WebAssembly is, from a data-flow perspective, equivalent to running a desktop application. The browser serves as a cross-platform runtime; it does not act as an intermediary for data transfer.
 
 :::caution Anonymize before sharing
 While the Wasm application itself does not upload data, always ensure that files are properly anonymized with [MNE Anonymize](anonymize) before transferring them to any third party — regardless of transport method.
@@ -54,99 +54,73 @@ While the Wasm application itself does not upload data, always ensure that files
 
 ## Applications Available Online
 
-The following sections summarize which MNE-CPP applications are available or planned for the browser and what functionality they provide. Each section also links to the full desktop documentation for the respective application.
+The following MNE-CPP applications are currently available as WebAssembly builds. Each section links to the full desktop documentation.
 
-### MNE Analyze — Offline Analysis in the Browser {#analyze}
+### MNE Analyze {#analyze}
 
-| | |
-|---|---|
-| ![MNE Analyze](/img/icon_mne-analyze_256x256.png) | [**Full documentation**](analyze) &nbsp;·&nbsp; **[Launch in browser](https://mne-cpp.github.io/wasm/mne_analyze.html)** |
+<div style={{display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem'}}>
+  <img src="/img/icon_mne-analyze_256x256.png" alt="MNE Analyze" width="48" />
+  <span>[Full documentation](analyze) &nbsp;·&nbsp; **[Launch in browser](https://mne-cpp.github.io/wasm/mne_analyze.html)**</span>
+</div>
 
-MNE Analyze is also available as a WebAssembly build. It provides a comprehensive, plugin-based GUI for sensor- and source-level analysis of pre-recorded MEG/EEG data, including:
+MNE Analyze provides a plugin-based GUI for sensor- and source-level analysis of pre-recorded MEG/EEG data. The WebAssembly build supports:
 
-- **Data loading** — Open `.fif` files through the browser's file dialog. Files are read into the browser's in-memory virtual file system and are **not uploaded anywhere**.
-- **Raw data viewer** — Browse multi-channel time-series data with interactive scrolling, amplitude scaling, and channel grouping.
-- **Filtering** — Apply real-time FIR/IIR filters to the loaded data for visualization and preprocessing.
-- **Averaging** — Compute evoked responses from event-marked epochs.
-- **Annotation manager** — Mark events, bad segments, and custom annotations.
-- **Channel selection** — Select and group channels by type (MEG, EEG, etc.) or by region.
-- **Scaling** — Adjust signal amplitude scaling per channel type.
-- **Co-registration** — Align MEG sensor coordinates with MRI anatomy (where applicable).
-- **Dipole fitting** — Interactive dipole fitting on evoked data.
-- **Clinical and Research modes** — Switch between streamlined clinical and full research interfaces via the Appearance menu.
-- **Dark and Default themes** — Visual style preferences for ergonomic extended use.
+- Loading `.fif` files via the browser file dialog (data remain in local memory)
+- Multi-channel time-series browsing with scrolling, scaling, and channel grouping
+- Real-time FIR/IIR filtering
+- Epoch-based averaging (evoked responses)
+- Annotation and event management
+- Channel selection by type or region
+- Co-registration and dipole fitting (where applicable)
+- Clinical and Research interface modes
 
-The modular plugin architecture means that the application can be extended and that individual plugins can be enabled or disabled at runtime.
+### MNE Browse {#browse}
 
-:::note Experimental
-The WebAssembly build of MNE Analyze is **experimental**. Some features available in the native desktop build — in particular Qt3D-based 3D visualization — are not yet supported in the browser due to WebAssembly platform limitations. The application is under active development and new capabilities are being added continuously.
-:::
+<div style={{display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem'}}>
+  <img src="/img/icon_mne-browse_256x256.png" alt="MNE Browse" width="48" />
+  <span>[Full documentation](browse-raw) &nbsp;·&nbsp; **[Launch in browser](https://mne-cpp.github.io/wasm/mne_browse.html)**</span>
+</div>
 
-### MNE Browse — Raw Data Visualization {#browse}
+MNE Browse provides a lightweight interface for browsing raw MEG/EEG data in FIFF format. It does not depend on Qt3D or OpenGL, which makes it well suited for the WebAssembly platform. Supported features:
 
-| | |
-|---|---|
-| ![MNE Browse](/img/icon_mne-browse_256x256.png) | [**Full documentation**](browse-raw) &nbsp;·&nbsp; **[Launch in browser](https://mne-cpp.github.io/wasm/mne_browse.html)** |
+- Interactive scrolling through multi-channel time-series data
+- Adjustable time scale and amplitude scaling
+- Channel selection and grouping
+- Real-time filtering display
+- Bad channel marking
+- Event / trigger visualization
+- SSP projection toggling
 
-MNE Browse (`mne_browse`) is the **featured online application**. It provides a focused, lightweight interface for browsing and visualizing raw MEG/EEG data stored in FIFF format — directly in the browser:
+### MNE Inspect {#inspect}
 
-- **Interactive scrolling** through raw multi-channel data
-- **Adjustable time scale and amplitude scaling**
-- **Channel selection and grouping**
-- **Real-time filtering display**
-- **Bad channel marking**
-- **Event / trigger visualization**
-- **SSP projection toggling**
+<div style={{display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem'}}>
+  <img src="/img/icon_mne_inspect_256x256.png" alt="MNE Inspect" width="48" />
+  <span>[Full documentation](inspect) &nbsp;·&nbsp; **[Launch in browser](https://mne-cpp.github.io/wasm/mne_inspect.html)**</span>
+</div>
 
-Because MNE Browse is intentionally lightweight and does not depend on Qt3D or OpenGL, it is particularly well suited for the WebAssembly platform. Simply open the link above, use the file dialog to load a `.fif` file from your local disk, and start browsing — **your data stay entirely on your machine**.
-
-:::note Experimental
-The WebAssembly build of MNE Browse is **experimental** and under active development. New capabilities are being added continuously.
-:::
-
-### MNE Inspect — 3D Brain Visualization {#inspect}
-
-| | |
-|---|---|
-| ![MNE Inspect](/img/icon_mne_inspect_256x256.png) | [**Full documentation**](inspect) &nbsp;·&nbsp; **[Launch in browser](https://mne-cpp.github.io/wasm/mne_inspect.html)** |
-
-MNE Inspect is a standalone 3D brain visualization and source analysis application, also available as an experimental WebAssembly build:
+MNE Inspect is a 3D brain visualization and source analysis application. The WebAssembly build supports:
 
 - FreeSurfer cortical surface rendering (inflated, pial, white, sphere, etc.)
 - Atlas overlays (e.g., `aparc`, `aparc.a2009s`)
 - BEM model layers (inner skull, outer skull, head)
-- Source estimate (STC) visualization with animated playback and configurable colormaps
+- Source estimate (STC) visualization with animated playback
 - Sensor and digitizer point display
 - Functional connectivity network visualization
-- Evoked sensor-field mapping with contour lines
+- Evoked sensor-field mapping
 
-:::note Experimental
-The WebAssembly build of MNE Inspect is **experimental**. Some 3D rendering features may behave differently compared to the native desktop build due to WebAssembly platform constraints. The application is under active development.
-:::
+### MNE Anonymize {#anonymize}
 
-### MNE Anonymize — De-identification of Clinical Data {#anonymize}
+<div style={{display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem'}}>
+  <span>[Full documentation](anonymize) &nbsp;·&nbsp; **[Launch in browser](https://mne-cpp.github.io/wasm/mne_anonymize.html)**</span>
+</div>
 
-| | |
-|---|---|
-| | [**Full documentation**](anonymize) |
+MNE Anonymize removes or substitutes Protected Health Information (PHI) and Personally Identifiable Information (PII) from FIFF files, following the HIPAA Safe Harbor approach. Handled fields include measurement dates, subject demographics, experimenter name, HIS IDs, project metadata, and hardware MAC addresses. The output file is completely rewritten — hidden or unlinked FIFF tags are never carried over.
 
-MNE Anonymize (`mne_anonymize`) removes or substitutes Personal Health Information (PHI) and Personally Identifiable Information (PII) from FIFF files. It handles fields such as:
-
-- Measurement dates and subject birthdays
-- Subject name, ID, sex, handedness, weight, height
-- Experimenter name
-- Hospital Information System (HIS) IDs
-- Project metadata
-- Hardware MAC addresses embedded in file IDs
-- Working directory and command-line information
-
-MNE Anonymize supports both a graphical (GUI) and a command-line (CLI) mode. It implements the HIPAA Safe Harbor approach for de-identification and is designed so that the **output file is completely rewritten** — hidden or unlinked FIFF tags from the input file are never carried over.
-
-Running MNE Anonymize as a **WebAssembly application in the browser** would be particularly powerful: a clinician or researcher could open a web page, drop in a FIFF file, anonymize it, and download the result — **all without any data ever leaving the local machine**. This use case is under consideration for future Wasm releases.
+The WebAssembly build allows loading, anonymizing, and downloading a FIFF file entirely within the browser, with no data leaving the local machine. See the [full documentation](anonymize) for details on GUI and CLI modes.
 
 ---
 
-## How It Works — Technical Background
+## Technical Background
 
 ```mermaid
 flowchart LR
@@ -165,7 +139,7 @@ flowchart LR
         Static[".html + .js + .wasm<br/>(static hosting)"]
     end
 
-    Static -- "one-time download<br/>(app code only)" --> Browser
+    Static -- "one-time download<br/>(app code only)" --> Wasm
 
     style User_Machine fill:#e8f5e9,stroke:#2e7d32
     style Server fill:#fff3e0,stroke:#e65100
@@ -186,7 +160,7 @@ flowchart LR
 
 ### Current Limitations
 
-- **No 3D visualization.** Qt3D and `QOpenGLWidget` are not supported in WebAssembly builds. Applications requiring 3D rendering (MNE Inspect, 3D views in MNE Analyze) are excluded.
+- **Limited 3D visualization.** Qt3D and `QOpenGLWidget` support in WebAssembly is experimental. Some 3D views may not render as expected across all browsers.
 - **Static linking only.** The Wasm build uses `BUILD_SHARED_LIBS=OFF` — all libraries are linked statically into the final binary.
 - **Initial load time.** The Wasm binary and supporting JavaScript can be several tens of megabytes. First load requires a reasonably fast connection; subsequent loads benefit from browser caching.
 - **File size.** Very large FIFF files may approach browser memory limits, particularly on 32-bit browser processes.

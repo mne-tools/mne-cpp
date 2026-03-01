@@ -156,10 +156,12 @@ If a specific `tag` with PHI or PII infomation is not present in the FIFF file, 
 
 MNE Anonymize does not modify the input file. Moreover, this application can even read from write-protected folders. The new/altered output information will be stored in a newly created FIFF file. However, depending on the options, after MNE Anonymize has processed a FIFF file, there might be no way to recover the original information. Use this application with caution.
 
-## Browser / WebAssembly
+## Online (Experimental)
 
-MNE Anonymize is a strong candidate for a future [WebAssembly](online) build. A browser-based version would allow clinicians and researchers to open a web page, load a FIFF file, anonymize it, and download the result — **all without any data ever leaving the local machine**. WebAssembly runs entirely inside the browser's sandbox; the browser merely acts as a runtime, comparable to running a desktop application. Other MNE-CPP applications — [MNE Browse](browse-raw) and [MNE Analyze](analyze) — can already be [run directly in the browser](online) today.
+An experimental [WebAssembly](online) build of MNE Anonymize is available. It runs entirely **locally** inside the browser — no installation needed, no data uploaded. Load a FIFF file, anonymize it, and download the result — all without any data leaving your machine. [Learn more about data privacy](online#data-privacy).
+
+**[Launch MNE Anonymize in your browser](https://mne-cpp.github.io/wasm/mne_anonymize.html)**
 
 ## See Also
 
-- [Online Applications (WebAssembly)](online) — Browser-based MNE-CPP applications, data privacy details, and technical background
+- [Online Applications (WebAssembly)](online) — All browser-based MNE-CPP applications, data privacy, and technical background
