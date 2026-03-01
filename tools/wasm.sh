@@ -139,6 +139,18 @@ cmake \
 	--build ${BUILD_DIRECTORY} \
 	--parallel ${NUM_PARALLEL_PROC}
 
+## Post-build: inject COOP/COEP service worker for cross-origin isolation
+# Required for SharedArrayBuffer / multi-threaded Wasm in Chrome & Safari
+POSTBUILD_SCRIPT="${SCRIPT_PATH}/wasm/wasm_postbuild.sh"
+if [ -x "$POSTBUILD_SCRIPT" ]; then
+	if [ -d "${OUTPUT_DIRECTORY}/apps" ]; then
+		"$POSTBUILD_SCRIPT" "${OUTPUT_DIRECTORY}/apps"
+	fi
+	if [ -d "${OUTPUT_DIRECTORY}/examples" ]; then
+		"$POSTBUILD_SCRIPT" "${OUTPUT_DIRECTORY}/examples"
+	fi
+fi
+
 ## Log
 if [ ${SAVE_LOG} == "true" ]; then
 	echo "Saving build and system parameters..."

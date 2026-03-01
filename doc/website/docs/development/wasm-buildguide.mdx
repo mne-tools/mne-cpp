@@ -114,7 +114,23 @@ http://localhost:8000/mne_analyze.html
 ```
 
 :::caution Cross-Origin Headers
-Multi-threaded Wasm requires the server to send the `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp` headers. Python's simple HTTP server does **not** send these by default. For testing, use a tool like [user-agent-cors](https://www.npmjs.com/package/user-agent-cors) or configure your server accordingly. See the [Qt for WebAssembly documentation](https://doc.qt.io/qt-6/wasm.html) for details.
+Multi-threaded Wasm requires the server to send the `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp` headers. Without these headers, `SharedArrayBuffer` is unavailable and the application will **hang silently** in Chrome and Safari (Edge is more permissive).
+
+**Automatic fix (recommended):** Run the post-build script to inject a [COI service worker](https://github.com/nickvdp/coi-serviceworker) that adds these headers client-side — this works on any static host including GitHub Pages:
+
+```bash
+./tools/wasm/wasm_postbuild.sh out/wasm/apps
+```
+
+The `wasm.sh` build script runs this automatically. If you build manually with CMake, run the command above after `cmake --build`.
+
+**Alternative for local testing:** Use a server that sends COOP/COEP headers, e.g.:
+
+```bash
+npx coi-serviceworker-server out/wasm/apps
+```
+
+See the [Qt for WebAssembly documentation](https://doc.qt.io/qt-6/wasm.html) for details.
 :::
 
 ## Live Demo
