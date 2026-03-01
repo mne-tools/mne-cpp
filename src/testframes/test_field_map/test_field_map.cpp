@@ -484,7 +484,7 @@ void TestFieldMap::initTestCase()
     // since MNE-Python _create_meg_coils with acc='normal' uses no transform)
     if (megChs.size() > 0) {
         m_megCoils.reset(templates->create_meg_coils(
-            megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, nullptr));
+            megChs, megChs.size(), FWD_COIL_ACCURACY_NORMAL, FiffCoordTrans()));
         m_hasMeg = (m_megCoils && m_megCoils->ncoil > 0);
         qDebug() << "MEG coil set:" << (m_hasMeg ? m_megCoils->ncoil : 0) << "coils";
     }
@@ -492,7 +492,7 @@ void TestFieldMap::initTestCase()
     // EEG electrodes (in head coords)
     if (eegChs.size() > 0) {
         m_eegCoils.reset(FwdCoilSet::create_eeg_els(
-            eegChs, eegChs.size(), nullptr));
+            eegChs, eegChs.size(), FiffCoordTrans()));
         m_hasEeg = (m_eegCoils && m_eegCoils->ncoil > 0);
         qDebug() << "EEG electrode set:" << (m_hasEeg ? m_eegCoils->ncoil : 0) << "electrodes";
     }
