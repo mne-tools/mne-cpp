@@ -171,6 +171,20 @@ src\applications\mne_inspect\run.bat
 The scripts are a good starting point for creating your own launch configurations. Copy one and adjust the paths to load your own subject, BEM, and STC files.
 :::
 
+## Browser / WebAssembly
+
+MNE Inspect is available as an experimental [WebAssembly](online) build. It runs entirely **locally** inside the browser — no installation is needed and no data leave your computer. Files loaded through the browser’s file dialog stay in local memory and are never uploaded to any server, making it safe for clinical MEG/EEG data containing protected health information.
+
+**[Launch MNE Inspect in your browser](https://mne-cpp.github.io/wasm/mne_inspect.html)** · [Learn more about WebAssembly & data privacy](online)
+
+:::note Experimental
+The WebAssembly build of MNE Inspect is **experimental**. Some 3D rendering features may behave differently compared to the native desktop build due to WebAssembly platform constraints. The application is under active development.
+:::
+
 ## Dependencies
 
 MNE Inspect depends on the `mne_disp3D_rhi` library and is only built when this library is available. It also links against `mne_fs`, `mne_fiff`, `mne_fwd`, `mne_mne`, `mne_disp`, `mne_inverse`, `mne_utils`, and `mne_connectivity`.
+
+## See Also
+
+- [Online Applications (WebAssembly)](online) — Browser-based MNE-CPP applications, data privacy details, and technical background
