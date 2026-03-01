@@ -140,7 +140,12 @@
                 ECHO   WARNING: platforms\ directory NOT found - windeployqt may have failed
             )
             ECHO.
-            %MOCK_TEXT%7z a %BASE_PATH%\mne-cpp-windows-dynamic-x86_64.zip apps lib resources
+            REM Only include lib if it exists (on Windows, DLLs are in apps/)
+            SET "PACK_DIRS=apps resources"
+            IF EXIST lib (
+                SET "PACK_DIRS=apps lib resources"
+            )
+            %MOCK_TEXT%7z a %BASE_PATH%\mne-cpp-windows-dynamic-x86_64.zip %PACK_DIRS%
             cd /d %BASE_PATH%
         )
 
@@ -318,6 +323,8 @@ if [[ ${LinkOption} == "dynamic" ]]; then
         MACDEPLOYQT="macdeployqt"
     elif [ -n "${QT_ROOT_DIR}" ] && [ -x "${QT_ROOT_DIR}/bin/macdeployqt" ]; then
         MACDEPLOYQT="${QT_ROOT_DIR}/bin/macdeployqt"
+    elif [ -n "${Qt6_DIR}" ] && [ -x "${Qt6_DIR}/bin/macdeployqt" ]; then
+        MACDEPLOYQT="${Qt6_DIR}/bin/macdeployqt"
     elif [ -n "${Qt6_DIR}" ] && [ -x "${Qt6_DIR}/../../../bin/macdeployqt" ]; then
         MACDEPLOYQT="${Qt6_DIR}/../../../bin/macdeployqt"
     elif [ -n "${Qt5_DIR}" ] && [ -x "${Qt5_DIR}/bin/macdeployqt" ]; then
@@ -345,7 +352,13 @@ if [[ ${LinkOption} == "dynamic" ]]; then
     if [ -n "${QT_ROOT_DIR}" ] && [ -d "${QT_ROOT_DIR}/lib" ]; then
         QT_LIB_DIR="${QT_ROOT_DIR}/lib"
     elif [ -n "${Qt6_DIR}" ]; then
-        QT_LIB_DIR="$(cd "${Qt6_DIR}/../../.." 2>/dev/null && pwd)/lib"
+        if [ -d "${Qt6_DIR}/lib" ]; then
+            # Qt6_DIR is already the prefix directory
+            QT_LIB_DIR="${Qt6_DIR}/lib"
+        else
+            # Qt6_DIR is the CMake config dir; go up 3 levels
+            QT_LIB_DIR="$(cd "${Qt6_DIR}/../../.." 2>/dev/null && pwd)/lib"
+        fi
     elif [ -n "${Qt5_DIR}" ] && [ -d "${Qt5_DIR}/lib" ]; then
         QT_LIB_DIR="${Qt5_DIR}/lib"
     fi
@@ -566,7 +579,7 @@ BasePath="$(cleanAbsPath "$ScriptPath/..")"
 OutDirName=""
 LinkOption="dynamic"
 PackOption=""
-BuildName=""
+BuildName="Release"
 MockDeploy="false"
 MockText=""
 MartinosOption="false"
