@@ -47,13 +47,13 @@
 
 #include <fiff/fiff_coord_trans.h>
 #include "../fwd_coil_set.h"
-#include <mne/c/mne_ctf_comp_data_set.h>
+#include <mne/mne_ctf_comp_data_set.h>
 #include "../fwd_eeg_sphere_model_set.h"
 #include "../fwd_bem_model.h"
 
-#include <mne/c/mne_named_matrix.h>
-#include <mne/c/mne_nearest.h>
-#include <mne/c/mne_source_space_old.h>
+#include <mne/mne_named_matrix.h>
+#include <mne/mne_nearest.h>
+#include <mne/mne_source_space_old.h>
 #include <mne/mne_forwardsolution.h>
 
 #include <fiff/fiff_sparse_matrix.h>

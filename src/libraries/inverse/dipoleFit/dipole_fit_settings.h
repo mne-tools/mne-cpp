@@ -44,7 +44,7 @@
 #include "../inverse_global.h"
 #include "ecd_set.h"
 
-#include <mne/c/mne_types.h>
+#include <mne/mne_types.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES

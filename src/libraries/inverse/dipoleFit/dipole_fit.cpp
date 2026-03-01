@@ -227,7 +227,7 @@ int mne_ch_selection_assign_chs(mneChSelection sel,
     if (!sel || !data)
         return 0;
 
-    info = data->info;
+    info = data->info.get();
     sel->chspick.clear();
     sel->chspick_nospace.clear();
     /*
@@ -599,7 +599,7 @@ ECDSet DipoleFit::calculateFit() const
         float t1,t2;
 
         printf("\n---- Opening a raw data file...\n\n");
-        if ((raw = MneRawData::mne_raw_open_file(settings->measname.isEmpty() ? NULL : settings->measname.toUtf8().data(),TRUE,FALSE,&(settings->filter))) == NULL)
+        if ((raw = MneRawData::open_file(settings->measname.isEmpty() ? NULL : settings->measname.toUtf8().data(),TRUE,FALSE,&(settings->filter))) == NULL)
             goto out;
         /*
         * A channel selection is needed to access the data
@@ -752,14 +752,14 @@ int DipoleFit::fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSe
    * Load the initial data segment
    */
     stime = start/sfreq;
-    if (MneRawData::mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
+    if (raw->pick_data_filt(sel,start,length,data) == FAIL)
         goto bad;
     printf("Fitting...%c",verbose ? '\n' : '\0');
     for (s = 0, time = tmin; time < tmax; s++, time = tmin  + s*tstep) {
         picks = time*sfreq - start;
         if (picks > stepo) {		/* Need a new data segment? */
             start = start + step;
-            if (MneRawData::mne_raw_pick_data_filt(raw,sel,start,length,data) == FAIL)
+            if (raw->pick_data_filt(sel,start,length,data) == FAIL)
                 goto bad;
             picks = time*sfreq - start;
             stime = start/sfreq;

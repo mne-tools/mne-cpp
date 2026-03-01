@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "fiff_events.h"
+#include "fiff_evoked_set.h"
 #include "fiff_raw_data.h"
 #include "fiff_stream.h"
 #include "fiff_dir_node.h"
@@ -343,4 +344,59 @@ bool FiffEvents::detect_from_raw(const FiffRawData &raw,
     }
 
     return nEvents > 0;
+}
+
+//=============================================================================================================
+
+bool FiffEvents::matchEvent(const AverageCategory &cat,
+                            const MatrixXi &events,
+                            int eventIdx)
+{
+    if (eventIdx < 0 || eventIdx >= events.rows())
+        return false;
+
+    int evFrom = events(eventIdx, 1);
+    int evTo   = events(eventIdx, 2);
+
+    // Check if any of the category's event codes match
+    bool match = false;
+    for (int k = 0; k < cat.events.size(); ++k) {
+        if ((evFrom & ~cat.ignore) == 0 &&
+            (evTo & ~cat.ignore) == cat.events[k]) {
+            match = true;
+            break;
+        }
+    }
+    if (!match)
+        return false;
+
+    // Check previous event constraint
+    if (cat.prevEvent != 0) {
+        bool found = false;
+        for (int j = eventIdx - 1; j >= 0; --j) {
+            if ((events(j, 1) & ~cat.prevIgnore) == 0) {
+                found = true;
+                match = match && ((events(j, 2) & ~cat.prevIgnore) == cat.prevEvent);
+                break;
+            }
+        }
+        if (!found)
+            match = false;
+    }
+
+    // Check next event constraint
+    if (cat.nextEvent != 0) {
+        bool found = false;
+        for (int j = eventIdx + 1; j < events.rows(); ++j) {
+            if ((events(j, 1) & ~cat.nextIgnore) == 0) {
+                found = true;
+                match = match && ((events(j, 2) & ~cat.nextIgnore) == cat.nextEvent);
+                break;
+            }
+        }
+        if (!found)
+            match = false;
+    }
+
+    return match;
 }

@@ -47,7 +47,7 @@
 #include "abstractmodel.h"
 
 #include <fiff/fiff_io.h>
-#include <fiff/fifffilesharer.h>
+#include <fiff/fiff_file_sharer.h>
 
 #include <rtprocessing/helpers/filterkernel.h>
 

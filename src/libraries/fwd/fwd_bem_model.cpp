@@ -41,9 +41,9 @@
 #include "fwd_bem_model.h"
 #include "fwd_bem_solution.h"
 #include "fwd_eeg_sphere_model.h"
-#include <mne/c/mne_surface_old.h>
-#include <mne/c/mne_triangle.h>
-#include <mne/c/mne_source_space_old.h>
+#include <mne/mne_surface_old.h>
+#include <mne/mne_triangle.h>
+#include <mne/mne_source_space_old.h>
 
 #include "fwd_comp_data.h"
 #include "fwd_bem_model.h"
@@ -825,7 +825,7 @@ MneSurfaceOld* FwdBemModel::make_guesses(MneSurfaceOld* guess_surf, float guessr
             sphere->rr[k][Y_40] = guessrad*sphere->rr[k][Y_40]/dist + guess_r0[Y_40];
             sphere->rr[k][Z_40] = guessrad*sphere->rr[k][Z_40]/dist + guess_r0[Z_40];
         }
-        if (MneSurfaceOrVolume::mne_source_space_add_geometry_info((MneSourceSpaceOld*)sphere,TRUE) == FAIL)
+        if (MneSurfaceOrVolume::add_geometry_info((MneSourceSpaceOld*)sphere,TRUE) == FAIL)
             goto out;
         guess_surf = sphere;
     }
@@ -1602,7 +1602,7 @@ int FwdBemModel::fwd_bem_specify_els(FwdBemModel* m, FwdCoilSet *els)
             VEC_COPY_40(r,el->rmag[p]);
             if (!m->head_mri_t.isEmpty())
                 FiffCoordTrans::apply_trans(r,m->head_mri_t,FIFFV_MOVE);
-            best = MneSurfaceOrVolume::mne_project_to_surface(scalp,NULL,r,FALSE,&dist);
+            best = MneSurfaceOrVolume::project_to_surface(scalp,NULL,r,FALSE,&dist);
             if (best < 0) {
                 printf("One of the electrodes could not be projected onto the scalp surface. How come?");
                 goto bad;
@@ -1620,7 +1620,7 @@ int FwdBemModel::fwd_bem_specify_els(FwdBemModel* m, FwdCoilSet *els)
              * Calculate a linear interpolation between the vertex values
              */
                 tri = scalp->tris+best;
-                MneSurfaceOrVolume::mne_triangle_coords(r,scalp,best,&x,&y,&z);
+                MneSurfaceOrVolume::triangle_coords(r,scalp,best,&x,&y,&z);
 
                 w[X_40] = el->w[p]*(1.0 - x - y);
                 w[Y_40] = el->w[p]*x;

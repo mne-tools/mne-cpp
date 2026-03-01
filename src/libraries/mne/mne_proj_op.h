@@ -1,0 +1,283 @@
+//=============================================================================================================
+/**
+ * @file     mne_proj_op.h
+ * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
+ *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+ *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+ * @since    0.1.0
+ * @date     January, 2017
+ *
+ * @section  LICENSE
+ *
+ * Copyright (C) 2017, Lorenz Esch, Matti Hamalainen, Christoph Dinh. All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+ * the following conditions are met:
+ *     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+ *       following disclaimer.
+ *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+ *       the following disclaimer in the documentation and/or other materials provided with the distribution.
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+ *       to endorse or promote products derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * @brief    MNEProjOp class declaration.
+ *
+ */
+
+#ifndef MNEPROJOP_H
+#define MNEPROJOP_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "mne_global.h"
+#include "mne_named_matrix.h"
+
+#include <fiff/fiff_types.h>
+#include <fiff/fiff_stream.h>
+#include <fiff/fiff_dir_node.h>
+
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QSharedPointer>
+#include <QTextStream>
+#include <QList>
+
+//=============================================================================================================
+// DEFINE NAMESPACE MNELIB
+//=============================================================================================================
+
+namespace MNELIB
+{
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class MneProjItem;
+
+//=============================================================================================================
+/**
+ * Implements an MNE Projection Operator (Replaces *mneProjOp,mneProjOpRec; struct of MNE-C mne_types.h).
+ *
+ * @brief Projection operator managing a set of linear projection items and the final compiled projector matrix.
+ */
+class MNESHARED_EXPORT MneProjOp
+{
+public:
+    typedef QSharedPointer<MneProjOp> SPtr;              /**< Shared pointer type for MneProjOp. */
+    typedef QSharedPointer<const MneProjOp> ConstSPtr;   /**< Const shared pointer type for MneProjOp. */
+
+    //=========================================================================================================
+    /**
+     * Constructs the MNE Projection Operator
+     * Refactored: mne_new_proj_op (mne_lin_proj.c)
+     */
+    MneProjOp();
+
+    //=========================================================================================================
+    /**
+     * Destroys the MNE Projection Operator
+     * Refactored: mne_free_proj_op (mne_lin_proj.c)
+     */
+    ~MneProjOp();
+
+    //=========================================================================================================
+    /**
+     * Free Substructure; TODO: Remove later on
+     * Refactored: ne_free_proj_op_proj (mne_lin_proj.c)
+     */
+    void free_proj();
+
+    // mne_lin_proj.c
+
+    /**
+     * Append all projection items from another operator into this one,
+     * preserving each item's active_file flag.
+     *
+     * @param[in] from   Source operator whose items are copied.
+     *
+     * @return Pointer to this operator.
+     */
+    MneProjOp* combine(MneProjOp* from);
+
+    // mne_lin_proj.c
+
+    /**
+     * Add a projection item with an explicit active/inactive state.
+     * The projection kind (MEG/EEG) is auto-detected from channel names.
+     *
+     * @param[in] vecs       Named matrix holding the projection vectors.
+     * @param[in] kind       Projection kind constant.
+     * @param[in] desc       Human-readable description of the projection.
+     * @param[in] is_active  Whether the item is active on load.
+     */
+    void add_item_active(MneNamedMatrix* vecs, int kind, const  QString& desc, int is_active);
+
+    // mne_lin_proj.c
+
+    /**
+     * Add a projection item that is active by default. Convenience wrapper
+     * around add_item_active() with @c is_active set to TRUE.
+     *
+     * @param[in] vecs   Named matrix holding the projection vectors.
+     * @param[in] kind   Projection kind constant.
+     * @param[in] desc   Human-readable description of the projection.
+     */
+    void add_item(MneNamedMatrix* vecs, int kind, const QString& desc);
+
+    // mne_lin_proj.c
+
+    /**
+     * Create a deep copy of this projection operator, including all items,
+     * their vectors, descriptions, and active states.
+     *
+     * @return A newly allocated copy. Caller takes ownership.
+     */
+    MneProjOp* dup() const;
+
+    // mne_lin_proj.c
+
+    /**
+     * Create an average EEG reference projector by building a uniform-weight
+     * vector (\f$1/\sqrt{N_{\text{EEG}}}\f$) across all EEG channels.
+     *
+     * @param[in] chs   Channel information list.
+     * @param[in] nch   Number of channels.
+     *
+     * @return A new projection operator, or NULL if no EEG channels are found.
+     *         Caller takes ownership.
+     */
+    static MneProjOp* create_average_eeg_ref(const QList<FIFFLIB::FiffChInfo>& chs, int nch);
+
+    /**
+     * Count how many active projection vectors affect a given list of
+     * channel names.
+     *
+     * @param[in] list    List of channel names to test.
+     * @param[in] nlist   Number of channel names.
+     *
+     * @return Number of projection vectors that affect at least one channel
+     *         in the list (0 if none).
+     */
+    int affect(const QStringList& list, int nlist);
+
+    /**
+     * Count how many active projection vectors affect the given channels.
+     * Convenience wrapper that extracts channel names and delegates to
+     * affect().
+     *
+     * @param[in] chs   Channel information list.
+     * @param[in] nch   Number of channels.
+     *
+     * @return Number of affecting projection vectors (0 if none or nch == 0).
+     */
+    int affect_chs(const QList<FIFFLIB::FiffChInfo> &chs, int nch);
+
+    /**
+     * Apply the compiled projection operator to a data vector in-place.
+     *
+     * If @p do_complement is true, the projected components are subtracted
+     * from @p vec (signal cleaning). Otherwise, @p vec is replaced by the
+     * projection itself.
+     *
+     * @param[in, out] vec            Data vector of length nch.
+     * @param[in]      nvec          Expected number of channels (must match nch).
+     * @param[in]      do_complement If non-zero, compute the complement (I - P) * vec.
+     *
+     * @return OK on success, FAIL on dimension mismatch.
+     */
+    int project_vector(float *vec, int nvec, int do_complement);
+
+    //============================= mne_lin_proj_io.c =============================
+
+    /**
+     * Read all linear projection items from a FIFF tree node.
+     *
+     * @param[in] stream   An open FIFF stream.
+     * @param[in] start    The tree node to search for projection blocks.
+     *
+     * @return A populated projection operator (possibly with zero items),
+     *         or NULL on error. Caller takes ownership.
+     */
+    static MneProjOp* read_from_node(//fiffFile in,
+                                         FIFFLIB::FiffStream::SPtr& stream,
+                                         const FIFFLIB::FiffDirNode::SPtr& start);
+
+    /**
+     * Read a projection operator from a FIFF file by path.
+     * Convenience wrapper that opens the file and delegates to read_from_node().
+     *
+     * @param[in] name   Path to the FIFF file.
+     *
+     * @return The loaded projection operator, or NULL on error.
+     *         Caller takes ownership.
+     */
+    static MneProjOp* read(const QString& name);
+
+    /**
+     * Write a formatted summary of all projection items to a text stream,
+     * optionally including the full projection vector data while zeroing
+     * out excluded channels.
+     *
+     * @param[in, out] out        The text stream to write to.
+     * @param[in]      tag        Prefix string printed before each line.
+     * @param[in]      list_data  If non-zero, print full vector data.
+     * @param[in]      exclude    Array of channel names to exclude from the display.
+     * @param[in]      nexclude   Number of excluded channels.
+     */
+    void report_data(QTextStream &out,const char *tag, int list_data, char **exclude, int nexclude);
+
+    /**
+     * Write a one-line-per-item summary of all projection items to a text
+     * stream (no vector data). Convenience wrapper around report_data().
+     *
+     * @param[in, out] out   The text stream to write to.
+     * @param[in]      tag   Prefix string printed before each line.
+     */
+    void report(QTextStream &out,const char *tag);
+
+public:
+    QList<MNELIB::MneProjItem*> items;  /**< The projection items. */
+    int         nitems;                 /**< Number of items. */
+    QStringList names;                  /**< Names of the channels in the final compiled projector. */
+    int         nch;                    /**< Number of channels in the final projector. */
+    int         nvec;                   /**< Number of orthogonalized vectors in the final projector. */
+    float**     proj_data;              /**< The compiled projector: orthogonalized projection vectors (nvec x nch). */
+
+//// ### OLD STRUCT ###
+//typedef struct {                            /* Collection of projection items and the projector itself */
+//    QList<MNELIB::MneProjItem*> items;  /* The projection items */
+//    int            nitems;                  /* Number of items */
+//    char           **names;                 /* Names of the channels in the final projector */
+//    int            nch;                     /* Number of channels in the final projector */
+//    int            nvec;                    /* Number of vectors in the final projector */
+//    float          **proj_data;             /* The orthogonalized projection vectors picked and orthogonalized from the original data */
+//} *mneProjOp,mneProjOpRec;
+};
+
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+} // NAMESPACE MNELIB
+
+#endif // MNEPROJOP_H

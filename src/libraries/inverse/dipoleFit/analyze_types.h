@@ -59,12 +59,12 @@
 #include <fiff/fiff_types.h>
 #include <fwd/fwd_coil_set.h>
 #include "../c/mne_meas_data.h"
-#include <mne/c/mne_surface_or_volume.h>
-#include <mne/c/mne_cov_matrix.h>
+#include <mne/mne_surface_or_volume.h>
+#include <mne/mne_cov_matrix.h>
 #include <fiff/fiff_digitizer_data.h>
 #include <fiff/fiff_coord_trans_set.h>
-#include <mne/c/mne_msh_color_scale_def.h>
-#include <mne/c/mne_surface_patch.h>
+#include <mne/mne_msh_color_scale_def.h>
+#include <mne/mne_surface_patch.h>
 
 //=============================================================================================================
 // DEFINE NAMESPACE INVERSELIB
@@ -374,10 +374,10 @@ typedef struct {
   fieldMappingPref mapping_pref;                     /* Desired settings */
 
   void             *dipole_fit_setup;                /* Dipole fitting data (opaque for us) */
-  mneUserFreeFunc  dipole_fit_setup_free;
+  MNELIB::mneUserFreeFunc  dipole_fit_setup_free;
 
   void             *user_data;                       /* Can be used to store whatever */
-  mneUserFreeFunc  user_data_free;                   /* Called to free the above object */
+  MNELIB::mneUserFreeFunc  user_data_free;                   /* Called to free the above object */
 } *mshMegEegData,mshMegEegDataRec;
 
 //typedef struct {		/* Definition of lighting */

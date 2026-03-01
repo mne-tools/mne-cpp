@@ -112,8 +112,8 @@ bool RTPROCESSINGLIB::performIcp(const MNEProjectToSurface::SPtr mneSurfacePoint
     for(int iIter = 0; iIter < iMaxIter; ++iIter) {
 
         // Step a: compute the closest point on the surface; eq 29
-        if(!mneSurfacePoints->mne_find_closest_on_surface(matPk, iNP, matYk, vecNearest, vecDist)) {
-            qWarning() << "[RTPROCESSINGLIB::icp] mne_find_closest_on_surface was not sucessfull.";
+        if(!mneSurfacePoints->find_closest_on_surface(matPk, iNP, matYk, vecNearest, vecDist)) {
+            qWarning() << "[RTPROCESSINGLIB::icp] find_closest_on_surface was not sucessfull.";
             return false;
         }
 
@@ -273,8 +273,8 @@ bool RTPROCESSINGLIB::discard3DPointOutliers(const QSharedPointer<MNELIB::MNEPro
 
     // discard outliers if necessary
     if(fMaxDist > 0.0) {
-        if(!mneSurfacePoints->mne_find_closest_on_surface(matP, iNP, matYk, vecNearest, vecDist)) {
-            qWarning() << "[RTPROCESSINGLIB::icp] mne_find_closest_on_surface was not sucessfull.";
+        if(!mneSurfacePoints->find_closest_on_surface(matP, iNP, matYk, vecNearest, vecDist)) {
+            qWarning() << "[RTPROCESSINGLIB::icp] find_closest_on_surface was not sucessfull.";
             return false;
         }
 

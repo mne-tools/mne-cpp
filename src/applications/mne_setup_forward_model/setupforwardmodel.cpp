@@ -65,8 +65,8 @@
 
 #include <fwd/fwd_bem_model.h>
 
-#include <mne/c/mne_surface_old.h>
-#include <mne/c/mne_triangle.h>
+#include <mne/mne_surface_old.h>
+#include <mne/mne_triangle.h>
 
 #include <utils/ioutils.h>
 

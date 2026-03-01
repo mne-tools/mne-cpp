@@ -44,8 +44,8 @@
 #include "../inverse_global.h"
 #include <fiff/fiff_types.h>
 
-#include <mne/c/mne_types.h>
-#include <mne/c/mne_raw_data.h>
+#include <mne/mne_types.h>
+#include <mne/mne_raw_data.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES

@@ -39,9 +39,9 @@
 
 #include <utils/generics/applicationlogger.h>
 
-#include <mne/c/mne_msh_display_surface_set.h>
-#include <mne/c/mne_msh_display_surface.h>
-#include <mne/c/mne_surface_old.h>
+#include <mne/mne_msh_display_surface_set.h>
+#include <mne/mne_msh_display_surface.h>
+#include <mne/mne_surface_old.h>
 
 #include <fiff/fiff_file.h>
 
@@ -101,8 +101,7 @@ void TestMneMshDisplaySurfaceSet::initTestCase()
     //Read the results produced with MNE-CPP
     //Calculate the alignment of the fiducials
     m_pSurfSetBemLoaded = MneMshDisplaySurfaceSet::SPtr(new MneMshDisplaySurfaceSet());
-    MneMshDisplaySurfaceSet::add_bem_surface(m_pSurfSetBemLoaded.data(),
-                                             QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif",
+    m_pSurfSetBemLoaded->add_bem_surface(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif",
                                              FIFFV_BEM_SURF_ID_BRAIN,
                                              "5120",
                                              1,

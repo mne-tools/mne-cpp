@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     mne_project_to_surface.cpp
+ * @file     project_to_surface.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
@@ -147,7 +147,7 @@ MNEProjectToSurface::MNEProjectToSurface(const MNESurface &p_MNESurf)
 
 //=============================================================================================================
 
-bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixXf &r, const int np, MatrixXf &rTri,
+bool MNEProjectToSurface::find_closest_on_surface(const MatrixXf &r, const int np, MatrixXf &rTri,
                                                       VectorXi &nearest, VectorXf &dist)
 {
     // resize output
@@ -169,7 +169,7 @@ bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixXf &r, const i
          * To do: decide_search_restriction for the use in an iterative closest point to plane algorithm
          * For now it's OK to go through all triangles.
          */
-        if (!this->mne_project_to_surface(r.row(k).transpose(), rTriK, bestTri, bestDist))
+        if (!this->project_to_surface(r.row(k).transpose(), rTriK, bestTri, bestDist))
         {
             qDebug() << "The projection of point number " << k << " didn't work./n";
             return false;
@@ -183,7 +183,7 @@ bool MNEProjectToSurface::mne_find_closest_on_surface(const MatrixXf &r, const i
 
 //=============================================================================================================
 
-bool MNEProjectToSurface::mne_project_to_surface(const Vector3f &r, Vector3f &rTri, int &bestTri, float &bestDist)
+bool MNEProjectToSurface::project_to_surface(const Vector3f &r, Vector3f &rTri, int &bestTri, float &bestDist)
 {
     float p = 0, q = 0, p0 = 0, q0 = 0, dist0 = 0;
     bestDist = 0.0f;

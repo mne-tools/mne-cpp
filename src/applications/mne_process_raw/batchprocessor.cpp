@@ -40,7 +40,6 @@
 #include "batchprocessor.h"
 
 #include <mne/mne_description_parser.h>
-#include <mne/mne_averaging.h>
 
 #include <fiff/fiff_raw_data.h>
 #include <fiff/fiff_events.h>
@@ -316,7 +315,7 @@ int BatchProcessor::run(const ProcessingSettings &settings)
             }
 
             QString aveLog;
-            FiffEvokedSet evokedSet = MNEAveraging::computeAverages(raw, aveDesc, fiffEvents.events, aveLog);
+            FiffEvokedSet evokedSet = FiffEvokedSet::computeAverages(raw, aveDesc, fiffEvents.events, aveLog);
 
             // Report results
             for (int j = 0; j < evokedSet.evoked.size(); ++j) {

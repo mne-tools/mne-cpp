@@ -6,11 +6,11 @@
  */
 
 #include <fiff/fiff_types.h>
-#include <mne/c/mne_types.h>
+#include <mne/mne_types.h>
 
 #include "fwd_coil_set.h"
 
-#include <mne/c/mne_ctf_comp_data_set.h>
+#include <mne/mne_ctf_comp_data_set.h>
 
 typedef void (*fwdUserFreeFunc)(void *);  /* General purpose */
 

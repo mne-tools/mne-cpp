@@ -43,7 +43,7 @@
 
 #include "../inverse_global.h"
 #include <fiff/fiff_types.h>
-#include <mne/c/mne_surface_or_volume.h>
+#include <mne/mne_surface_or_volume.h>
 
 //=============================================================================================================
 // EIGEN INCLUDES

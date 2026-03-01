@@ -92,12 +92,12 @@ typedef struct {
   fwdFieldFunc    meg_field;	    /* MEG forward calculation functions */
   fwdVecFieldFunc meg_vec_field;
   void            *meg_client;	    /* Client data for MEG field computations */
-  mneUserFreeFunc meg_client_free;
+  MNELIB::mneUserFreeFunc meg_client_free;
 
   fwdFieldFunc    eeg_pot;	    /* EEG forward calculation functions */
   fwdVecFieldFunc eeg_vec_pot;
   void            *eeg_client;	    /* Client data for EEG field computations */
-  mneUserFreeFunc eeg_client_free;
+  MNELIB::mneUserFreeFunc eeg_client_free;
 } *dipoleFitFuncs,dipoleFitFuncsRec;
 
 //=============================================================================================================

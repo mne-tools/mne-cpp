@@ -70,6 +70,7 @@ namespace FIFFLIB
 
 // Forward declaration
 class FiffRawData;
+struct AverageCategory;
 
 //=============================================================================================================
 /**
@@ -198,6 +199,19 @@ public:
      * @return true if the event matrix has zero rows.
      */
     inline bool is_empty() const;
+
+    //=========================================================================================================
+    /**
+     * Check whether an event matches a category definition.
+     *
+     * @param[in] cat       The averaging category to match against.
+     * @param[in] events    Full event matrix (nEvents x 3): [sample, from, to].
+     * @param[in] eventIdx  Index of the current event row.
+     * @return true if the event matches.
+     */
+    static bool matchEvent(const AverageCategory &cat,
+                           const Eigen::MatrixXi &events,
+                           int eventIdx);
 
     Eigen::MatrixXi events;     /**< Event matrix (nEvents x 3): [sample, before, after]. */
 };

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     mne_project_to_surface.h
+ * @file     project_to_surface.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
  * @since    0.1.0
@@ -113,7 +113,7 @@ public:
     /**
      * Projects a set of points r on the Surface
      *
-     * @brief mne_find_closest_on_surface
+     * @brief find_closest_on_surface
      *
      * @param[in] r         Set of pionts, which are to be projectied.
      * @param[in] np        number of points.
@@ -123,7 +123,7 @@ public:
      *
      * @return true if succeeded, false otherwise.
      */
-    bool mne_find_closest_on_surface(const Eigen::MatrixXf &r, const int np, Eigen::MatrixXf &rTri,
+    bool find_closest_on_surface(const Eigen::MatrixXf &r, const int np, Eigen::MatrixXf &rTri,
                                      Eigen::VectorXi &nearest, Eigen::VectorXf &dist);
 
 protected:
@@ -133,7 +133,7 @@ private:
     /**
      * Projects a point r on the Surface
      *
-     * @brief mne_project_to_surface
+     * @brief project_to_surface
      *
      * @param[in] r         Piont, which is to be projectied.
      * @param[out] rTri     Point on the surface.
@@ -142,7 +142,7 @@ private:
      *
      * @return true if succeeded, false otherwise.
      */
-    bool mne_project_to_surface(const Eigen::Vector3f &r, Eigen::Vector3f &rTri, int &bestTri, float &bestDist);
+    bool project_to_surface(const Eigen::Vector3f &r, Eigen::Vector3f &rTri, int &bestTri, float &bestDist);
 
     //=========================================================================================================
     /**

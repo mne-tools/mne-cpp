@@ -26,41 +26,40 @@ set(SOURCES
     mne_bem.cpp
     mne_bem_surface.cpp
     mne_project_to_surface.cpp
-    c/mne_cov_matrix.cpp
-    c/mne_ctf_comp_data.cpp
-    c/mne_ctf_comp_data_set.cpp
-    c/mne_deriv.cpp
-    c/mne_deriv_set.cpp
-    c/mne_mne_data.cpp
-    c/mne_named_matrix.cpp
-    c/mne_proj_item.cpp
-    c/mne_proj_op.cpp
-    c/mne_raw_buf_def.cpp
-    c/mne_raw_data.cpp
-    c/mne_raw_info.cpp
-    c/mne_sss_data.cpp
-    c/mne_triangle.cpp
-    c/mne_vol_geom.cpp
-    c/mne_nearest.cpp
-    c/mne_patch_info.cpp
-    c/mne_source_space_old.cpp
-    c/mne_surface_old.cpp
-    c/mne_surface_or_volume.cpp
-    c/filter_thread_arg.cpp
-    c/mne_msh_display_surface.cpp
-    c/mne_msh_display_surface_set.cpp
-    c/mne_msh_picked.cpp
-    c/mne_morph_map.cpp
-    c/mne_msh_color_scale_def.cpp
-    c/mne_proj_data.cpp
-    c/mne_msh_light.cpp
-    c/mne_msh_light_set.cpp
-    c/mne_surface_patch.cpp
-    c/mne_msh_eyes.cpp
-    c/mne_mgh_tag.cpp
-    c/mne_mgh_tag_group.cpp
+    mne_cov_matrix.cpp
+    mne_ctf_comp_data.cpp
+    mne_ctf_comp_data_set.cpp
+    mne_deriv.cpp
+    mne_deriv_set.cpp
+    mne_mne_data.cpp
+    mne_named_matrix.cpp
+    mne_proj_item.cpp
+    mne_proj_op.cpp
+    mne_raw_buf_def.cpp
+    mne_raw_data.cpp
+    mne_raw_info.cpp
+    mne_sss_data.cpp
+    mne_triangle.cpp
+    mne_vol_geom.cpp
+    mne_nearest.cpp
+    mne_patch_info.cpp
+    mne_source_space_old.cpp
+    mne_surface_old.cpp
+    mne_surface_or_volume.cpp
+    filter_thread_arg.cpp
+    mne_msh_display_surface.cpp
+    mne_msh_display_surface_set.cpp
+    mne_msh_picked.cpp
+    mne_morph_map.cpp
+    mne_msh_color_scale_def.cpp
+    mne_proj_data.cpp
+    mne_msh_light.cpp
+    mne_msh_light_set.cpp
+    mne_surface_patch.cpp
+    mne_msh_eyes.cpp
+    mne_mgh_tag.cpp
+    mne_mgh_tag_group.cpp
     mne_description_parser.cpp
-    mne_averaging.cpp
 )
 
 set(HEADERS
@@ -79,44 +78,51 @@ set(HEADERS
     mne_bem.h
     mne_bem_surface.h
     mne_project_to_surface.h
-    c/mne_cov_matrix.h
-    c/mne_ctf_comp_data.h
-    c/mne_ctf_comp_data_set.h
-    c/mne_deriv.h
-    c/mne_deriv_set.h
-    c/mne_mne_data.h
-    c/mne_named_matrix.h
-    c/mne_proj_item.h
-    c/mne_proj_op.h
-    c/mne_raw_buf_def.h
-    c/mne_raw_data.h
-    c/mne_raw_info.h
-    c/mne_sss_data.h
-    c/mne_triangle.h
-    c/mne_types.h
-    c/mne_types_mne-c.h
-    c/mne_vol_geom.h
-    c/mne_nearest.h
-    c/mne_patch_info.h
-    c/mne_source_space_old.h
-    c/mne_surface_old.h
-    c/mne_surface_or_volume.h
-    c/filter_thread_arg.h
-    c/mne_msh_display_surface.h
-    c/mne_msh_display_surface_set.h
-    c/mne_msh_picked.h
-    c/mne_morph_map.h
-    c/mne_msh_color_scale_def.h
-    c/mne_proj_data.h
-    c/mne_msh_light.h
-    c/mne_msh_light_set.h
-    c/mne_surface_patch.h
-    c/mne_msh_eyes.h
-    c/mne_mgh_tag.h
-    c/mne_mgh_tag_group.h
+    mne_cov_matrix.h
+    mne_ctf_comp_data.h
+    mne_ctf_comp_data_set.h
+    mne_deriv.h
+    mne_deriv_set.h
+    mne_mne_data.h
+    mne_named_matrix.h
+    mne_named_vector.h
+    mne_sparse_named_matrix.h
+    mne_layout_port.h
+    mne_layout.h
+    mne_ch_selection.h
+    mne_event.h
+    mne_event_list.h
+    mne_filter_def.h
+    mne_proj_item.h
+    mne_proj_op.h
+    mne_raw_buf_def.h
+    mne_raw_data.h
+    mne_raw_info.h
+    mne_sss_data.h
+    mne_triangle.h
+    mne_types.h
+    mne_types_mne-c.h
+    mne_vol_geom.h
+    mne_nearest.h
+    mne_patch_info.h
+    mne_source_space_old.h
+    mne_surface_old.h
+    mne_surface_or_volume.h
+    filter_thread_arg.h
+    mne_msh_display_surface.h
+    mne_msh_display_surface_set.h
+    mne_msh_picked.h
+    mne_morph_map.h
+    mne_msh_color_scale_def.h
+    mne_proj_data.h
+    mne_msh_light.h
+    mne_msh_light_set.h
+    mne_surface_patch.h
+    mne_msh_eyes.h
+    mne_mgh_tag.h
+    mne_mgh_tag_group.h
     mne_process_description.h
     mne_description_parser.h
-    mne_averaging.h
 )
 
 set(FILE_TO_UPDATE mne_global.cpp)

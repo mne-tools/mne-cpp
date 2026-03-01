@@ -45,6 +45,9 @@
 #include "fiff_evoked.h"
 #include "fiff_global.h"
 
+#include <Eigen/Core>
+#include <QVector>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -66,6 +69,66 @@
 
 namespace FIFFLIB
 {
+
+class FiffRawData;
+
+//=============================================================================================================
+/**
+ * Rejection parameters for artifact detection.
+ * Ported from rejDataRec (MNE-C browser_types.h).
+ */
+struct FIFFSHARED_EXPORT RejectionParams {
+    float stimIgnore       = 0.0f;      /**< Ignore this many seconds around the stimulus. */
+    float megGradReject    = 2000e-13f;  /**< Gradiometer rejection (T/m). */
+    float megMagReject     = 3e-12f;     /**< Magnetometer rejection (T). */
+    float eegReject        = 100e-6f;    /**< EEG rejection (V). */
+    float eogReject        = 150e-6f;    /**< EOG rejection (V). */
+    float ecgReject        = 0.0f;       /**< ECG rejection (V). */
+    float megGradFlat      = 0.0f;      /**< Gradiometer flatness (T/m). */
+    float megMagFlat       = 0.0f;      /**< Magnetometer flatness (T). */
+    float eegFlat          = 0.0f;      /**< EEG flatness (V). */
+    float eogFlat          = 0.0f;      /**< EOG flatness (V). */
+    float ecgFlat          = 0.0f;      /**< ECG flatness (V). */
+};
+
+//=============================================================================================================
+/**
+ * One averaging category.
+ * Ported from aveCategRec (MNE-C browser_types.h).
+ */
+struct FIFFSHARED_EXPORT AverageCategory {
+    QString comment;                     /**< Description. */
+    QVector<unsigned int> events;        /**< The interesting events. */
+    unsigned int nextEvent  = 0;         /**< Require this event next. */
+    unsigned int prevEvent  = 0;         /**< Require this event just before. */
+    unsigned int ignore     = 0;         /**< Which trigger lines to ignore. */
+    unsigned int prevIgnore = 0;         /**< Ignore mask for previous event. */
+    unsigned int nextIgnore = 0;         /**< Ignore mask for next event. */
+    float delay             = 0.0f;      /**< Stimulus delay (s). */
+    float tmin              = -0.2f;     /**< Minimum time (s). */
+    float tmax              = 0.5f;      /**< Maximum time (s). */
+    float bmin              = 0.0f;      /**< Baseline min (s). */
+    float bmax              = 0.0f;      /**< Baseline max (s). */
+    bool  doBaseline        = false;     /**< Should we baseline? */
+    bool  doStdErr          = false;     /**< Compute std error of mean? */
+    bool  doAbs             = false;     /**< Compute absolute values? */
+    float color[3]          = {0,0,0};   /**< Display color (unused in batch). */
+};
+
+//=============================================================================================================
+/**
+ * Set of averaging categories loaded from a description file.
+ * Ported from aveDataRec (MNE-C browser_types.h).
+ */
+struct FIFFSHARED_EXPORT AverageDescription {
+    QString comment;                     /**< Description. */
+    QList<AverageCategory> categories;   /**< The categories. */
+    RejectionParams rej;                 /**< Rejection limits. */
+    bool fixSkew            = false;     /**< Fix skew on trigger lines. */
+    QString filename;                    /**< Output file. */
+    QString eventFile;                   /**< Read events from here. */
+    QString logFile;                     /**< Save log here. */
+};
 
 //=============================================================================================================
 /**
@@ -196,6 +259,53 @@ public:
      * @return The grand-average evoked set, or an empty set if input is empty.
      */
     static FiffEvokedSet computeGrandAverage(const QList<FiffEvokedSet> &evokedSets);
+
+    //=========================================================================================================
+    /**
+     * Compute epoch-based averages from raw data according to an averaging description.
+     *
+     * For each category in the description, matching events are epoched from the raw data,
+     * artifact-rejected, baseline-corrected, and averaged into a FiffEvoked entry.
+     *
+     * @param[in] raw           The raw data.
+     * @param[in] desc          The averaging description (categories, rejection, etc.).
+     * @param[in] events        Event matrix (nEvents x 3): [sample, from, to].
+     * @param[out] log          Processing log output.
+     * @return FiffEvokedSet containing one FiffEvoked per category, or empty set on failure.
+     */
+    static FiffEvokedSet computeAverages(const FiffRawData &raw,
+                                         const AverageDescription &desc,
+                                         const Eigen::MatrixXi &events,
+                                         QString &log);
+
+    //=========================================================================================================
+    /**
+     * Check whether an epoch passes artifact rejection criteria.
+     *
+     * @param[in] epoch     Epoch data (nChannels x nSamples).
+     * @param[in] info      Channel info.
+     * @param[in] bads      List of bad channel names.
+     * @param[in] rej       Rejection parameters.
+     * @param[out] reason   Rejection reason string (set only when rejected).
+     * @return true if epoch is clean (not rejected).
+     */
+    static bool checkArtifacts(const Eigen::MatrixXd &epoch,
+                               const FiffInfo &info,
+                               const QStringList &bads,
+                               const RejectionParams &rej,
+                               QString &reason);
+
+    /**
+     * @brief Subtract baseline from each channel of an epoch.
+     *
+     * For each row (channel), the mean of the samples in [bminSamp, bminSamp+nBase)
+     * is subtracted.
+     *
+     * @param[in,out] epoch     Data matrix (channels x samples) to correct in-place.
+     * @param[in] bminSamp      First baseline sample (clamped to 0).
+     * @param[in] bmaxSamp      Last baseline sample (clamped to epoch length - 1).
+     */
+    static void subtractBaseline(Eigen::MatrixXd &epoch, int bminSamp, int bmaxSamp);
 
 public:
     FiffInfo             info;   /**< FIFF measurement information. */
