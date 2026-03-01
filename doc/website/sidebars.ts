@@ -62,6 +62,7 @@ const sidebars: SidebarsConfig = {
                         'manual/anonymize',
                         'manual/inspect',
                         'manual/browse-raw',
+                        'manual/online',
                     ],
                 },
                 {
