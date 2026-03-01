@@ -311,19 +311,15 @@ void SourceEstimateOverlay::computeInterpolationMatrix(BrainSurface *surface, in
 
     // Get vertices and neighbor information needed for Dijkstra (SCDC)
     Eigen::MatrixX3f matVertices = surface->verticesAsMatrix();
-    QVector<QVector<int>> vecNeighbors = surface->computeNeighbors();
+    std::vector<Eigen::VectorXi> vecNeighbors = surface->computeNeighbors();
 
-    // Build source vertex subset from STC
-    QVector<int> vecSourceVertices;
-    vecSourceVertices.reserve(stc->vertices.size());
-    for (int i = 0; i < stc->vertices.size(); ++i) {
-        vecSourceVertices.append(stc->vertices(i));
-    }
+    // Source vertex subset from STC (already a VectorXi)
+    Eigen::VectorXi vecSourceVertices = stc->vertices;
 
     qDebug() << "SourceEstimateOverlay: Surface has" << matVertices.rows() << "vertices,"
              << vecSourceVertices.size() << "sources";
     
-    if (vecSourceVertices.isEmpty()) {
+    if (vecSourceVertices.size() == 0) {
         qWarning() << "SourceEstimateOverlay: No source vertices found";
         return;
     }

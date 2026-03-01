@@ -87,11 +87,11 @@ public:
     /**
      * @brief createInterpolationMat   Calculates the weight matrix for interpolation.
      */
-    static QSharedPointer<Eigen::SparseMatrix<float> > createInterpolationMat(const QVector<int> &vecProjectedSensors,
-                                                                              const QSharedPointer<Eigen::MatrixXd> matDistanceTable,
-                                                                              double (*interpolationFunction) (double),
-                                                                              const double dCancelDist = FLOAT_INFINITY,
-                                                                              const QVector<int> &vecExcludeIndex = QVector<int>());
+static QSharedPointer<Eigen::SparseMatrix<float> > createInterpolationMat(const Eigen::VectorXi &vecProjectedSensors,
+                                                                                const QSharedPointer<Eigen::MatrixXd> matDistanceTable,
+                                                                                double (*interpolationFunction) (double),
+                                                                                const double dCancelDist = FLOAT_INFINITY,
+                                                                                const Eigen::VectorXi &vecExcludeIndex = Eigen::VectorXi());
 
     //=========================================================================================================
     /**

@@ -69,7 +69,6 @@ namespace MNELIB {
 //=============================================================================================================
 
 class MNEBemSurface;
-class MNESurface;
 
 //TODO this needs to be removed - this has to be a function not a class!!!
 
@@ -100,14 +99,6 @@ public:
      * @param[in] p_MNEBemSurf   The MNEBemSurface to which is to be projected.
      */
     MNEProjectToSurface(const MNELIB::MNEBemSurface &p_MNEBemSurf);
-
-    //=========================================================================================================
-    /**
-     * Constructs a MNEProjectToSurface with the data of a MNESurf object.
-     * @brief MNEProjectToSurface
-     * @param[in] p_MNESurf      The MNESurface to which is to be projected.
-     */
-    MNEProjectToSurface(const MNELIB::MNESurface &p_MNESurf);
 
     //=========================================================================================================
     /**

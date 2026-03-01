@@ -68,19 +68,16 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 QSharedPointer<MatrixXd> GeometryInfo::scdc(const MatrixX3f &matVertices,
-                                            const QVector<QVector<int> > &vecNeighborVertices,
-                                            QVector<int> &vecVertSubset,
+                                            const std::vector<VectorXi> &vecNeighborVertices,
+                                            VectorXi &vecVertSubset,
                                             double dCancelDist)
 {
     // create matrix and check for empty subset:
-    qint32 iCols = vecVertSubset.size();
-    if(vecVertSubset.empty()) {
+    qint32 iCols = static_cast<qint32>(vecVertSubset.size());
+    if(vecVertSubset.size() == 0) {
         qDebug() << "[WARNING] SCDC received empty subset, calculating full distance table, make sure you have enough memory !";
-        vecVertSubset.reserve(matVertices.rows());
-        for(qint32 id = 0; id < matVertices.rows(); ++id) {
-            vecVertSubset.push_back(id);
-        }
-        iCols = matVertices.rows();
+        vecVertSubset = VectorXi::LinSpaced(matVertices.rows(), 0, static_cast<int>(matVertices.rows()) - 1);
+        iCols = static_cast<qint32>(matVertices.rows());
     }
 
     QSharedPointer<MatrixXd> returnMat = QSharedPointer<MatrixXd>::create(matVertices.rows(), iCols);
@@ -105,7 +102,7 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MatrixX3f &matVertices,
                                                         std::cref(vecNeighborVertices),
                                                         std::cref(vecVertSubset),
                                                         iBegin,
-                                                        vecVertSubset.size(),
+                                                        static_cast<qint32>(vecVertSubset.size()),
                                                         dCancelDist));
             break;
         }
@@ -133,10 +130,10 @@ QSharedPointer<MatrixXd> GeometryInfo::scdc(const MatrixX3f &matVertices,
 
 //=============================================================================================================
 
-QVector<int> GeometryInfo::projectSensors(const MatrixX3f &matVertices,
-                                          const QVector<Vector3f> &vecSensorPositions)
+VectorXi GeometryInfo::projectSensors(const MatrixX3f &matVertices,
+                                      const MatrixX3f &matSensorPositions)
 {
-    QVector<int> vecOutputArray;
+    const qint32 iNumSensors = static_cast<qint32>(matSensorPositions.rows());
 
     qint32 iCores = QThread::idealThreadCount();
     if (iCores <= 0)
@@ -144,17 +141,14 @@ QVector<int> GeometryInfo::projectSensors(const MatrixX3f &matVertices,
         iCores = 2;
     }
 
-    const qint32 iSubArraySize = int(double(vecSensorPositions.size()) / double(iCores));
+    const qint32 iSubArraySize = int(double(iNumSensors) / double(iCores));
 
     if(iSubArraySize <= 1)
     {
-        vecOutputArray.append(nearestNeighbor(matVertices,
-                                              vecSensorPositions.constBegin(),
-                                              vecSensorPositions.constEnd()));
-        return vecOutputArray;
+        return nearestNeighbor(matVertices, matSensorPositions, 0, iNumSensors);
     }
 
-    QVector<QFuture<QVector<int> > > vecThreads(iCores);
+    QVector<QFuture<VectorXi> > vecThreads(iCores);
     qint32 iBeginOffset = 0;
     qint32 iEndOffset = iBeginOffset + iSubArraySize;
     for(qint32 i = 0; i < vecThreads.size(); ++i)
@@ -163,28 +157,35 @@ QVector<int> GeometryInfo::projectSensors(const MatrixX3f &matVertices,
         {
             vecThreads[i] = QtConcurrent::run(nearestNeighbor,
                                               matVertices,
-                                              vecSensorPositions.constBegin() + iBeginOffset,
-                                              vecSensorPositions.constEnd());
+                                              matSensorPositions,
+                                              iBeginOffset,
+                                              iNumSensors);
             break;
         }
         else
         {
             vecThreads[i] = QtConcurrent::run(nearestNeighbor,
                                               matVertices,
-                                              vecSensorPositions.constBegin() + iBeginOffset,
-                                              vecSensorPositions.constBegin() + iEndOffset);
+                                              matSensorPositions,
+                                              iBeginOffset,
+                                              iEndOffset);
             iBeginOffset = iEndOffset;
             iEndOffset += iSubArraySize;
         }
     }
 
-    for (QFuture<QVector<int> >& f : vecThreads) {
+    for (QFuture<VectorXi>& f : vecThreads) {
         f.waitForFinished();
     }
 
+    // concatenate partial results
+    VectorXi vecOutputArray(iNumSensors);
+    qint32 iOffset = 0;
     for(qint32 i = 0; i < vecThreads.size(); ++i)
     {
-        vecOutputArray.append(std::move(vecThreads[i].result()));
+        const VectorXi& partial = vecThreads[i].result();
+        vecOutputArray.segment(iOffset, partial.size()) = partial;
+        iOffset += static_cast<qint32>(partial.size());
     }
 
     return vecOutputArray;
@@ -192,29 +193,29 @@ QVector<int> GeometryInfo::projectSensors(const MatrixX3f &matVertices,
 
 //=============================================================================================================
 
-QVector<int> GeometryInfo::nearestNeighbor(const MatrixX3f &matVertices,
-                                           QVector<Vector3f>::const_iterator itSensorBegin,
-                                           QVector<Vector3f>::const_iterator itSensorEnd)
+VectorXi GeometryInfo::nearestNeighbor(const MatrixX3f &matVertices,
+                                       const MatrixX3f &matSensorPositions,
+                                       qint32 iBegin,
+                                       qint32 iEnd)
 {
-    QVector<int> vecMappedSensors;
-    vecMappedSensors.reserve(std::distance(itSensorBegin, itSensorEnd));
+    VectorXi vecMappedSensors(iEnd - iBegin);
 
-    for(auto sensor = itSensorBegin; sensor != itSensorEnd; ++sensor)
+    for(qint32 s = iBegin; s < iEnd; ++s)
     {
         qint32 iChampionId = 0;
         double iChampDist = std::numeric_limits<double>::max();
         for(qint32 i = 0; i < matVertices.rows(); ++i)
         {
-            double dDist = sqrt(squared(matVertices(i, 0) - (*sensor)[0])
-                                + squared(matVertices(i, 1) - (*sensor)[1])
-                                + squared(matVertices(i, 2) - (*sensor)[2]));
+            double dDist = sqrt(squared(matVertices(i, 0) - matSensorPositions(s, 0))
+                                + squared(matVertices(i, 1) - matSensorPositions(s, 1))
+                                + squared(matVertices(i, 2) - matSensorPositions(s, 2)));
             if(dDist < iChampDist)
             {
                 iChampionId = i;
                 iChampDist = dDist;
             }
         }
-        vecMappedSensors.push_back(iChampionId);
+        vecMappedSensors[s - iBegin] = iChampionId;
     }
 
     return vecMappedSensors;
@@ -224,13 +225,13 @@ QVector<int> GeometryInfo::nearestNeighbor(const MatrixX3f &matVertices,
 
 void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> matOutputDistMatrix,
                                      const MatrixX3f &matVertices,
-                                     const QVector<QVector<int> > &vecNeighborVertices,
-                                     const QVector<int> &vecVertSubset,
+                                     const std::vector<VectorXi> &vecNeighborVertices,
+                                     const VectorXi &vecVertSubset,
                                      qint32 iBegin,
                                      qint32 iEnd,
                                      double dCancelDistance) {
-    const QVector<QVector<int> > &vecAdjacency = vecNeighborVertices;
-    qint32 n = vecAdjacency.size();
+    const std::vector<VectorXi> &vecAdjacency = vecNeighborVertices;
+    qint32 n = static_cast<qint32>(vecAdjacency.size());
     QVector<double> vecMinDists(n);
     std::set< std::pair< double, qint32> > vertexQ;
     const double INF = FLOAT_INFINITY;
@@ -240,7 +241,7 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> matOutputDistMatri
             qDebug() << "GeometryInfo::iterativeDijkstra progress:" << (i - iBegin) << "/" << (iEnd - iBegin) << " (Thread range:" << iBegin << "-" << iEnd << ")";
         }
 
-        qint32 iRoot = vecVertSubset.at(i);
+        qint32 iRoot = vecVertSubset[i];
         vertexQ.clear();
         vecMinDists.fill(INF);
         vecMinDists[iRoot] = 0.0;
@@ -252,9 +253,9 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> matOutputDistMatri
             vertexQ.erase(vertexQ.begin());
 
             if (dDist <= dCancelDistance) {
-                const QVector<int>& vecNeighbours = vecAdjacency[u];
+                const VectorXi& vecNeighbours = vecAdjacency[u];
 
-                for (qint32 ne = 0; ne < vecNeighbours.length(); ++ne) {
+                for (Eigen::Index ne = 0; ne < vecNeighbours.size(); ++ne) {
                     qint32 v = vecNeighbours[ne];
 
                     const double dDistX = matVertices(u, 0) - matVertices(v, 0);
@@ -279,10 +280,10 @@ void GeometryInfo::iterativeDijkstra(QSharedPointer<MatrixXd> matOutputDistMatri
 
 //=============================================================================================================
 
-QVector<int> GeometryInfo::filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDistanceTable,
-                                                const FIFFLIB::FiffInfo& fiffInfo,
-                                                qint32 iSensorType) {
-    QVector<int> vecBadColumns;
+VectorXi GeometryInfo::filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDistanceTable,
+                                         const FIFFLIB::FiffInfo& fiffInfo,
+                                         qint32 iSensorType) {
+    std::vector<int> vecBadColumns;
     QVector<const FiffChInfo*> vecSensors;
     for(const FiffChInfo& s : fiffInfo.chs){
         if(s.kind == iSensorType && (s.unit == FIFF_UNIT_T || s.unit == FIFF_UNIT_V)){
@@ -301,5 +302,6 @@ QVector<int> GeometryInfo::filterBadChannels(QSharedPointer<Eigen::MatrixXd> mat
             }
         }
     }
-    return vecBadColumns;
+
+    return Eigen::Map<VectorXi>(vecBadColumns.data(), static_cast<Eigen::Index>(vecBadColumns.size()));
 }

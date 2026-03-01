@@ -55,6 +55,7 @@
 
 #include <QSharedPointer>
 #include <QVector>
+#include <vector>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -91,36 +92,37 @@ public:
      * @brief scdc   Calculates surface constrained distances on a mesh.
      */
     static QSharedPointer<Eigen::MatrixXd> scdc(const Eigen::MatrixX3f &matVertices,
-                                                const QVector<QVector<int> > &vecNeighborVertices,
-                                                QVector<int> &pVecVertSubset,
+                                                const std::vector<Eigen::VectorXi> &vecNeighborVertices,
+                                                Eigen::VectorXi &vecVertSubset,
                                                 double dCancelDist = FLOAT_INFINITY);
 
     //=========================================================================================================
     /**
      * @brief projectSensors   Calculates the nearest neighbor vertex to each sensor.
      */
-    static QVector<int> projectSensors(const Eigen::MatrixX3f &matVertices,
-                                       const QVector<Eigen::Vector3f> &vecSensorPositions);
+    static Eigen::VectorXi projectSensors(const Eigen::MatrixX3f &matVertices,
+                                          const Eigen::MatrixX3f &matSensorPositions);
 
     //=========================================================================================================
     /**
      * @brief filterBadChannels   Filters bad channels from distance table.
      */
-    static QVector<int> filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDistanceTable,
-                                          const FIFFLIB::FiffInfo& fiffInfo,
-                                          qint32 iSensorType);
+    static Eigen::VectorXi filterBadChannels(QSharedPointer<Eigen::MatrixXd> matDistanceTable,
+                                             const FIFFLIB::FiffInfo& fiffInfo,
+                                             qint32 iSensorType);
 
 protected:
     static inline double squared(double dBase);
 
-    static QVector<int> nearestNeighbor(const Eigen::MatrixX3f &matVertices,
-                                        QVector<Eigen::Vector3f>::const_iterator itSensorBegin,
-                                        QVector<Eigen::Vector3f>::const_iterator itSensorEnd);
+    static Eigen::VectorXi nearestNeighbor(const Eigen::MatrixX3f &matVertices,
+                                           const Eigen::MatrixX3f &matSensorPositions,
+                                           qint32 iBegin,
+                                           qint32 iEnd);
 
     static void iterativeDijkstra(QSharedPointer<Eigen::MatrixXd> matOutputDistMatrix,
                                   const Eigen::MatrixX3f &matVertices,
-                                  const QVector<QVector<int> > &vecNeighborVertices,
-                                  const QVector<int> &vecVertSubset,
+                                  const std::vector<Eigen::VectorXi> &vecNeighborVertices,
+                                  const Eigen::VectorXi &vecVertSubset,
                                   qint32 iBegin,
                                   qint32 iEnd,
                                   double dCancelDistance);

@@ -732,9 +732,9 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
             // Vertex coordinates
             MatrixXf rr(s->np, 3);
             for (int v = 0; v < s->np; ++v) {
-                rr(v, 0) = s->rr[v][0];
-                rr(v, 1) = s->rr[v][1];
-                rr(v, 2) = s->rr[v][2];
+                rr(v, 0) = s->rr(v, 0);
+                rr(v, 1) = s->rr(v, 1);
+                rr(v, 2) = s->rr(v, 2);
             }
             stream->write_float_matrix(FIFF_BEM_SURF_NODES, rr);
 
@@ -752,9 +752,9 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
             // Vertex normals
             MatrixXf nn(s->np, 3);
             for (int v = 0; v < s->np; ++v) {
-                nn(v, 0) = s->nn[v][0];
-                nn(v, 1) = s->nn[v][1];
-                nn(v, 2) = s->nn[v][2];
+                nn(v, 0) = s->nn(v, 0);
+                nn(v, 1) = s->nn(v, 1);
+                nn(v, 2) = s->nn(v, 2);
             }
             stream->write_float_matrix(FIFF_BEM_SURF_NORMALS, nn);
 

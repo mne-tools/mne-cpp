@@ -109,44 +109,30 @@ MneSourceSpaceOld::MneSourceSpaceOld(int np)
 {
     this->np      = np;
     if (np > 0) {
-        rr      = ALLOC_CMATRIX_51(np,3);
-        nn      = ALLOC_CMATRIX_51(np,3);
-        inuse   = ALLOC_INT_51(np);
-        vertno  = ALLOC_INT_51(np);
-    }
-    else {
-        rr      = Q_NULLPTR;
-        nn      = Q_NULLPTR;
-        inuse   = Q_NULLPTR;
-        vertno  = Q_NULLPTR;
+        rr      = PointsT::Zero(np, 3);
+        nn      = NormalsT::Zero(np, 3);
+        inuse   = VectorXi::Zero(np);
+        vertno  = VectorXi::Zero(np);
     }
     nuse     = 0;
     ntri     = 0;
-    tris     = Q_NULLPTR;
-    itris    = Q_NULLPTR;
     tot_area = 0.0;
 
     nuse_tri  = 0;
-    use_tris  = Q_NULLPTR;
-    use_itris = Q_NULLPTR;
 
-    neighbor_tri = Q_NULLPTR;
-    nneighbor_tri = Q_NULLPTR;
-    curv = Q_NULLPTR;
-    val  = Q_NULLPTR;
+    // tris, use_tris are std::vector<MneTriangle> — default-constructed empty
 
-    neighbor_vert = Q_NULLPTR;
-    nneighbor_vert = Q_NULLPTR;
-    vert_dist = Q_NULLPTR;
+    // neighbor_tri, nneighbor_tri, curv, val,
+    // neighbor_vert, nneighbor_vert, vert_dist
+    // are Eigen/std::vector types — default-constructed empty
 
     coord_frame = FIFFV_COORD_MRI;
     id          = FIFFV_MNE_SURF_UNKNOWN;
     subject     = "";
     type        = FIFFV_MNE_SPACE_SURFACE;
 
-    nearest = Q_NULLPTR;
-    patches = Q_NULLPTR;
-    npatch  = 0;
+    // nearest is std::vector<MneNearest> — default-constructed empty
+    // patches is std::vector<unique_ptr<MnePatchInfo>> — default-constructed empty
 
     dist       = Q_NULLPTR;
     dist_limit = -1.0;
@@ -162,8 +148,6 @@ MneSourceSpaceOld::MneSourceSpaceOld(int np)
 
     vol_geom         = Q_NULLPTR;
     mgh_tags         = Q_NULLPTR;
-    user_data        = Q_NULLPTR;
-    user_data_free   = Q_NULLPTR;
 
     cm[X_51] = cm[Y_51] = cm[Z_51] = 0.0;
 }

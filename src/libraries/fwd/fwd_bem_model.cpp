@@ -820,10 +820,10 @@ MneSurfaceOld* FwdBemModel::make_guesses(MneSurfaceOld* guess_surf, float guessr
             goto out;
 
         for (k = 0; k < sphere->np; k++) {
-            dist = VEC_LEN_40(sphere->rr[k]);
-            sphere->rr[k][X_40] = guessrad*sphere->rr[k][X_40]/dist + guess_r0[X_40];
-            sphere->rr[k][Y_40] = guessrad*sphere->rr[k][Y_40]/dist + guess_r0[Y_40];
-            sphere->rr[k][Z_40] = guessrad*sphere->rr[k][Z_40]/dist + guess_r0[Z_40];
+            dist = VEC_LEN_40(&sphere->rr(k,0));
+            sphere->rr(k,X_40) = guessrad*sphere->rr(k,X_40)/dist + guess_r0[X_40];
+            sphere->rr(k,Y_40) = guessrad*sphere->rr(k,Y_40)/dist + guess_r0[Y_40];
+            sphere->rr(k,Z_40) = guessrad*sphere->rr(k,Z_40)/dist + guess_r0[Z_40];
         }
         if (MneSurfaceOrVolume::add_geometry_info((MneSourceSpaceOld*)sphere,TRUE) == FAIL)
             goto out;
@@ -1014,7 +1014,7 @@ void FwdBemModel::correct_auto_elements(MneSurfaceOld *surf, float **mat)
          * The rest is divided evenly among the member nodes...
          */
         miss = miss/(4.0*nmemb);
-        for (k = 0,tri = surf->tris; k < ntri; k++,tri++) {
+        for (k = 0,tri = surf->tris.data(); k < ntri; k++,tri++) {
             if (tri->vert[0] == j) {
                 row[tri->vert[1]] = row[tri->vert[1]] + miss;
                 row[tri->vert[2]] = row[tri->vert[2]] + miss;
@@ -1050,7 +1050,7 @@ float **FwdBemModel::fwd_bem_lin_pot_coeff(const QList<MneSurfaceOld*>& surfs)
     float **mat = NULL;
     float **sub_mat = NULL;
     int   np1,np2,ntri,np_tot,np_max;
-    float **nodes;
+    float **nodes_ptr;
     MneTriangle*   tri;
     double omega[3];
     double *row = NULL;
@@ -1074,7 +1074,7 @@ float **FwdBemModel::fwd_bem_lin_pot_coeff(const QList<MneSurfaceOld*>& surfs)
     for (p = 0, joff = 0; p < surfs.size(); p++, joff = joff + np1) {
         surf1 = surfs[p];
         np1   = surf1->np;
-        nodes = surf1->rr;
+        nodes_ptr = NULL; // UNUSED: was float** alias
         for (q = 0, koff = 0; q < surfs.size(); q++, koff = koff + np2) {
             surf2 = surfs[q];
             np2   = surf2->np;
@@ -1087,7 +1087,7 @@ float **FwdBemModel::fwd_bem_lin_pot_coeff(const QList<MneSurfaceOld*>& surfs)
             for (j = 0; j < np1; j++) {
                 for (k = 0; k < np2; k++)
                     row[k] = 0.0;
-                for (k = 0, tri = surf2->tris; k < ntri; k++,tri++) {
+                for (k = 0, tri = surf2->tris.data(); k < ntri; k++,tri++) {
                     /*
                * No contribution from a triangle that
                * this vertex belongs to
@@ -1097,7 +1097,7 @@ float **FwdBemModel::fwd_bem_lin_pot_coeff(const QList<MneSurfaceOld*>& surfs)
                     /*
                * Otherwise do the hard job
                */
-                    lin_pot_coeff (nodes[j],tri,omega);
+                    lin_pot_coeff (&surf1->rr(j,0),tri,omega);
                     for (c = 0; c < 3; c++)
                         row[tri->vert[c]] = row[tri->vert[c]] - omega[c];
                 }
@@ -1375,7 +1375,7 @@ float **FwdBemModel::fwd_bem_solid_angles(const QList<MneSurfaceOld*>& surfs)
             ntri2 = surf2->ntri;
             printf("\t\t%s (%d) -> %s (%d) ... ",fwd_bem_explain_surface(surf1->id).toUtf8().constData(),ntri1,fwd_bem_explain_surface(surf2->id).toUtf8().constData(),ntri2);
             for (j = 0; j < ntri1; j++)
-                for (k = 0, tri = surf2->tris; k < ntri2; k++, tri++) {
+                for (k = 0, tri = surf2->tris.data(); k < ntri2; k++, tri++) {
                     if (p == q && j == k)
                         result = 0.0;
                     else
@@ -1619,7 +1619,7 @@ int FwdBemModel::fwd_bem_specify_els(FwdBemModel* m, FwdCoilSet *els)
                 /*
              * Calculate a linear interpolation between the vertex values
              */
-                tri = scalp->tris+best;
+                tri = &scalp->tris[best];
                 MneSurfaceOrVolume::triangle_coords(r,scalp,best,&x,&y,&z);
 
                 w[X_40] = el->w[p]*(1.0 - x - y);
@@ -1687,7 +1687,7 @@ void FwdBemModel::fwd_bem_pot_grad_calc(float *rd, float *Q, FwdBemModel* m, Fwd
 
         for (s = 0, p = 0; s < m->nsurf; s++) {
             ntri = m->surfs[s]->ntri;
-            tri  = m->surfs[s]->tris;
+            tri  = m->surfs[s]->tris.data();
             mult = m->source_mult[s];
             for (k = 0; k < ntri; k++, tri++)
                 v0[p++] = mult*fwd_bem_inf_pot_der(mri_rd,mri_Q,tri->cent,ee);
@@ -1715,7 +1715,7 @@ void FwdBemModel::fwd_bem_lin_pot_calc(float *rd, float *Q, FwdBemModel *m, FwdC
  * using the linear potential approximation
  */
 {
-    float **rr;
+    float *rr_row;
     int   np;
     int   s,k,p,nsol;
     float mult,mri_rd[3],mri_Q[3];
@@ -1735,10 +1735,9 @@ void FwdBemModel::fwd_bem_lin_pot_calc(float *rd, float *Q, FwdBemModel *m, FwdC
     }
     for (s = 0, p = 0; s < m->nsurf; s++) {
         np     = m->surfs[s]->np;
-        rr     = m->surfs[s]->rr;
         mult   = m->source_mult[s];
         for (k = 0; k < np; k++)
-            v0[p++] = mult*fwd_bem_inf_pot(mri_rd,mri_Q,rr[k]);
+            v0[p++] = mult*fwd_bem_inf_pot(mri_rd,mri_Q,&m->surfs[s]->rr(k,0));
     }
     if (els) {
         FwdBemSolution* sol = (FwdBemSolution*)els->user_data;
@@ -1762,7 +1761,6 @@ void FwdBemModel::fwd_bem_lin_pot_grad_calc(float *rd, float *Q, FwdBemModel *m,
  * using the linear potential approximation
  */
 {
-    float **rr;
     int   np;
     int   s,k,p,nsol,pp;
     float mult,mri_rd[3],mri_Q[3];
@@ -1797,10 +1795,9 @@ void FwdBemModel::fwd_bem_lin_pot_grad_calc(float *rd, float *Q, FwdBemModel *m,
 
         for (s = 0, p = 0; s < m->nsurf; s++) {
             np     = m->surfs[s]->np;
-            rr     = m->surfs[s]->rr;
             mult   = m->source_mult[s];
             for (k = 0; k < np; k++)
-                v0[p++] = mult*fwd_bem_inf_pot_der(mri_rd,mri_Q,rr[k],ee);
+                v0[p++] = mult*fwd_bem_inf_pot_der(mri_rd,mri_Q,&m->surfs[s]->rr(k,0),ee);
         }
         if (els) {
             FwdBemSolution* sol = (FwdBemSolution*)els->user_data;
@@ -1844,7 +1841,7 @@ void FwdBemModel::fwd_bem_pot_calc(float *rd, float *Q, FwdBemModel *m, FwdCoilS
     }
     for (s = 0, p = 0; s < m->nsurf; s++) {
         ntri = m->surfs[s]->ntri;
-        tri  = m->surfs[s]->tris;
+        tri  = m->surfs[s]->tris.data();
         mult = m->source_mult[s];
         for (k = 0; k < ntri; k++, tri++)
             v0[p++] = mult*fwd_bem_inf_pot(mri_rd,mri_Q,tri->cent);
@@ -2185,7 +2182,7 @@ float **FwdBemModel::fwd_bem_field_coeff(FwdBemModel *m, FwdCoilSet *coils)	/* G
     for (s = 0, off = 0; s < m->nsurf; s++) {
         surf = m->surfs[s];
         ntri = surf->ntri;
-        tri  = surf->tris;
+        tri  = surf->tris.data();
         mult = m->field_mult[s];
 
         for (k = 0; k < ntri; k++,tri++) {
@@ -2414,7 +2411,7 @@ float **FwdBemModel::fwd_bem_lin_field_coeff(FwdBemModel *m, FwdCoilSet *coils, 
     for (s = 0, off = 0; s < m->nsurf; s++) {
         surf = m->surfs[s];
         ntri = surf->ntri;
-        tri  = surf->tris;
+        tri  = surf->tris.data();
         mult = m->field_mult[s];
 
         for (k = 0; k < ntri; k++,tri++) {
@@ -2509,7 +2506,6 @@ void FwdBemModel::fwd_bem_lin_field_calc(float *rd, float *Q, FwdCoilSet *coils,
     int   s,k,p,np;
     FwdCoil* coil;
     float  mult;
-    float  **rr;
     float  my_rd[3],my_Q[3];
     FwdBemSolution* sol = (FwdBemSolution*)coils->user_data;
     /*
@@ -2532,10 +2528,9 @@ void FwdBemModel::fwd_bem_lin_field_calc(float *rd, float *Q, FwdCoilSet *coils,
        */
     for (s = 0, p = 0; s < m->nsurf; s++) {
         np     = m->surfs[s]->np;
-        rr     = m->surfs[s]->rr;
         mult   = m->source_mult[s];
         for (k = 0; k < np; k++)
-            v0[p++] = mult*fwd_bem_inf_pot(my_rd,my_Q,rr[k]);
+            v0[p++] = mult*fwd_bem_inf_pot(my_rd,my_Q,&m->surfs[s]->rr(k,0));
     }
     /*
        * Primary current contribution
@@ -2594,7 +2589,7 @@ void FwdBemModel::fwd_bem_field_calc(float *rd, float *Q, FwdCoilSet *coils, Fwd
        */
     for (s = 0, p = 0; s < m->nsurf; s++) {
         ntri = m->surfs[s]->ntri;
-        tri  = m->surfs[s]->tris;
+        tri  = m->surfs[s]->tris.data();
         mult = m->source_mult[s];
         for (k = 0; k < ntri; k++, tri++)
             v0[p++] = mult*fwd_bem_inf_pot(my_rd,my_Q,tri->cent);
@@ -2671,7 +2666,7 @@ void FwdBemModel::fwd_bem_field_grad_calc(float *rd, float *Q, FwdCoilSet* coils
          */
         for (s = 0, p = 0; s < m->nsurf; s++) {
             ntri = m->surfs[s]->ntri;
-            tri  = m->surfs[s]->tris;
+            tri  = m->surfs[s]->tris.data();
             mult = m->source_mult[s];
             for (k = 0; k < ntri; k++, tri++) {
                 v0[p++] = mult*fwd_bem_inf_pot_der(mri_rd,mri_Q,tri->cent,mri_ee);
@@ -2756,7 +2751,7 @@ void FwdBemModel::fwd_bem_lin_field_grad_calc(float *rd, float *Q, FwdCoilSet *c
     int     s,k,p,np,pp;
     FwdCoil *coil;
     float   mult;
-    float   **rr,ee[3],mri_ee[3],mri_rd[3],mri_Q[3];
+    float   ee[3],mri_ee[3],mri_rd[3],mri_Q[3];
     float   *grads[3];
     float   *grad;
 
@@ -2793,11 +2788,10 @@ void FwdBemModel::fwd_bem_lin_field_grad_calc(float *rd, float *Q, FwdCoilSet *c
          */
         for (s = 0, p = 0; s < m->nsurf; s++) {
             np     = m->surfs[s]->np;
-            rr     = m->surfs[s]->rr;
             mult   = m->source_mult[s];
 
             for (k = 0; k < np; k++)
-                v0[p++] = mult*fwd_bem_inf_pot_der(mri_rd,mri_Q,rr[k],mri_ee);
+                v0[p++] = mult*fwd_bem_inf_pot_der(mri_rd,mri_Q,&m->surfs[s]->rr(k,0),mri_ee);
         }
         /*
          * Primary current contribution
@@ -2937,8 +2931,8 @@ void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
         if (a->field_pot_grad && a->res_grad) {                   /* Gradient requested? */
             for (j = 0; j < s->np; j++) {
                 if (s->inuse[j]) {
-                    if (a->field_pot_grad(s->rr[j],
-                                          s->nn[j],
+                    if (a->field_pot_grad(&s->rr(j,0),
+                                          &s->nn(j,0),
                                           a->coils_els,
                                           a->res[p],
                                           a->res_grad[q],
@@ -2954,8 +2948,8 @@ void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
         } else {
             for (j = 0; j < s->np; j++)
                 if (s->inuse[j])
-                    if (a->field_pot(s->rr[j],
-                                     s->nn[j],
+                    if (a->field_pot(&s->rr(j,0),
+                                     &s->nn(j,0),
                                      a->coils_els,
                                      a->res[p++],
                                      a->client) != OK)
@@ -2967,7 +2961,7 @@ void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
             for (j = 0; j < s->np; j++) {
                 if (s->inuse[j]) {
                     if (a->comp < 0) {				  /* Compute all components */
-                        if (a->field_pot_grad(s->rr[j],
+                        if (a->field_pot_grad(&s->rr(j,0),
                                               Qx,
                                               a->coils_els,
                                               a->res[p],
@@ -2977,7 +2971,7 @@ void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
                                               a->client) != OK)
                             goto bad;
                         q = q + 3; p++;
-                        if (a->field_pot_grad(s->rr[j],
+                        if (a->field_pot_grad(&s->rr(j,0),
                                               Qy,
                                               a->coils_els,
                                               a->res[p],
@@ -2987,7 +2981,7 @@ void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
                                               a->client) != OK)
                             goto bad;
                         q = q + 3; p++;
-                        if (a->field_pot_grad(s->rr[j],
+                        if (a->field_pot_grad(&s->rr(j,0),
                                               Qz,
                                               a->coils_els,
                                               a->res[p],
@@ -2999,7 +2993,7 @@ void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
                         q = q + 3; p++;
                     }
                     else if (a->comp == 0) {			  /* Compute x component */
-                        if (a->field_pot_grad(s->rr[j],
+                        if (a->field_pot_grad(&s->rr(j,0),
                                               Qx,
                                               a->coils_els,
                                               a->res[p],
@@ -3014,7 +3008,7 @@ void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
                     }
                     else if (a->comp == 1) {			  /* Compute y component */
                         q = q + 3; p++;
-                        if (a->field_pot_grad(s->rr[j],
+                        if (a->field_pot_grad(&s->rr(j,0),
                                               Qy,
                                               a->coils_els,
                                               a->res[p],
@@ -3029,7 +3023,7 @@ void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
                     else if (a->comp == 2) {			  /* Compute z component */
                         q = q + 3; p++;
                         q = q + 3; p++;
-                        if (a->field_pot_grad(s->rr[j],
+                        if (a->field_pot_grad(&s->rr(j,0),
                                               Qz,
                                               a->coils_els,
                                               a->res[p],
@@ -3050,32 +3044,32 @@ void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
                         xyz[0] = a->res[p++];
                         xyz[1] = a->res[p++];
                         xyz[2] = a->res[p++];
-                        if (a->vec_field_pot(s->rr[j],a->coils_els,xyz,a->client) != OK)
+                        if (a->vec_field_pot(&s->rr(j,0),a->coils_els,xyz,a->client) != OK)
                             goto bad;
                     }
                     else {
                         if (a->comp < 0) {				  /* Compute all components here */
-                            if (a->field_pot(s->rr[j],Qx,a->coils_els,a->res[p++],a->client) != OK)
+                            if (a->field_pot(&s->rr(j,0),Qx,a->coils_els,a->res[p++],a->client) != OK)
                                 goto bad;
-                            if (a->field_pot(s->rr[j],Qy,a->coils_els,a->res[p++],a->client) != OK)
+                            if (a->field_pot(&s->rr(j,0),Qy,a->coils_els,a->res[p++],a->client) != OK)
                                 goto bad;
-                            if (a->field_pot(s->rr[j],Qz,a->coils_els,a->res[p++],a->client) != OK)
+                            if (a->field_pot(&s->rr(j,0),Qz,a->coils_els,a->res[p++],a->client) != OK)
                                 goto bad;
                         }
                         else if (a->comp == 0) {			  /* Compute x component */
-                            if (a->field_pot(s->rr[j],Qx,a->coils_els,a->res[p++],a->client) != OK)
+                            if (a->field_pot(&s->rr(j,0),Qx,a->coils_els,a->res[p++],a->client) != OK)
                                 goto bad;
                             p++; p++;
                         }
                         else if (a->comp == 1) {			  /* Compute y component */
                             p++;
-                            if (a->field_pot(s->rr[j],Qy,a->coils_els,a->res[p++],a->client) != OK)
+                            if (a->field_pot(&s->rr(j,0),Qy,a->coils_els,a->res[p++],a->client) != OK)
                                 goto bad;
                             p++;
                         }
                         else if (a->comp == 2) {			  /* Compute z component */
                             p++; p++;
-                            if (a->field_pot(s->rr[j],Qz,a->coils_els,a->res[p++],a->client) != OK)
+                            if (a->field_pot(&s->rr(j,0),Qz,a->coils_els,a->res[p++],a->client) != OK)
                                 goto bad;
                         }
                     }

@@ -453,17 +453,6 @@ FiffSparseMatrix* mne_convert_to_sparse_3(float **dense,        /* The dense mat
 namespace MNELIB
 {
 
-/**
- * @brief Workspace for the dipole fitting objective function, holding forward model, measured field, and fit limits.
- */
-typedef struct {
-    float          limit;
-    int            report_dim;
-    float          *B;
-    double         B2;
-    DipoleForward*  fwd;
-} *fitDipUser,fitDipUserRec;
-
 }
 
 int mne_is_diag_cov_3(MneCovMatrix* c)
@@ -1457,7 +1446,7 @@ namespace MNELIB
  * @brief Workspace for sphere-fitting optimization, holding digitizer point coordinates and count.
  */
 typedef struct {
-    float **rr;
+    const MneSurfaceOrVolume::PointsT* rr;
     int   np;
     int   report;
 } *fitSphereUser,fitSphereUserRec;
@@ -1497,7 +1486,7 @@ static float fit_sphere_eval(float *fitpar,
     (void) npar; // avoid unused variable warning.
 
     for (k = 0, sum = sum2 = 0.0; k < user->np; k++) {
-        VEC_DIFF_3(r0,user->rr[k],diff);
+        VEC_DIFF_3(r0,&(*user->rr)(k,0),diff);
         one = VEC_LEN_3(diff);
         sum  += one;
         sum2 += one*one;
@@ -1518,14 +1507,14 @@ static float opt_rad(float *r0,fitSphereUser user)
     int   k;
 
     for (k = 0, sum = 0.0; k < user->np; k++) {
-        VEC_DIFF_3(r0,user->rr[k],diff);
+        VEC_DIFF_3(r0,&(*user->rr)(k,0),diff);
         one = VEC_LEN_3(diff);
         sum  += one;
     }
     return sum/user->np;
 }
 
-static void calculate_cm_ave_dist(float **rr, int np, float *cm, float *avep)
+static void calculate_cm_ave_dist(const MneSurfaceOrVolume::PointsT& rr, int np, float *cm, float *avep)
 
 {
     int k,q;
@@ -1536,7 +1525,7 @@ static void calculate_cm_ave_dist(float **rr, int np, float *cm, float *avep)
 
     for (k = 0; k < np; k++)
         for (q = 0; q < 3; q++)
-            cm[q] += rr[k][q];
+            cm[q] += rr(k,q);
 
     if (np > 0) {
         for (q = 0; q < 3; q++)
@@ -1544,7 +1533,7 @@ static void calculate_cm_ave_dist(float **rr, int np, float *cm, float *avep)
 
         for (k = 0, ave = 0.0; k < np; k++) {
             for (q = 0; q < 3; q++)
-                diff[q] = rr[k][q] - cm[q];
+                diff[q] = rr(k,q) - cm[q];
             ave += VEC_LEN_3(diff);
         }
         *avep = ave/np;
@@ -1570,7 +1559,7 @@ static float **make_initial_simplex(float  *pars,
     return (simplex);
 }
 
-int fit_sphere_to_points(float **rr,
+int fit_sphere_to_points(const MneSurfaceOrVolume::PointsT& rr,
                          int   np,
                          float simplex_size,
                          float *r0,
@@ -1592,7 +1581,7 @@ int fit_sphere_to_points(float **rr,
 
     int        res = FAIL;
 
-    user.rr = rr;
+    user.rr = &rr;
     user.np = np;
 
     calculate_cm_ave_dist(rr,np,cm,&R0);
@@ -1967,8 +1956,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
     char  name[20];
 #endif
 
-    FREE_CMATRIX_3(op->proj_data);
-    op->proj_data = NULL;
+    op->proj_data.resize(0, 0);
     op->nvec      = 0;
 
     if (op->nch <= 0)
@@ -2104,7 +2092,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
 #ifdef DEBUG
     printf("Number of linearly independent vectors = %d\n",op->nvec);
 #endif
-    op->proj_data = ALLOC_CMATRIX_3(op->nvec,op->nch);
+    op->proj_data = MneProjOp::RowMajorMatrixXf::Zero(op->nvec,op->nch);
 #ifdef DEBUG
     fprintf(stdout,"Final projection data:\n");
 #endif
@@ -2116,18 +2104,18 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
             * Avoid crosstalk between MEG/EEG
             */
             if (std::fabs(vv_meg[p][k]) < SMALL_VALUE)
-                op->proj_data[op->nvec][k] = 0.0;
+                op->proj_data(op->nvec,k) = 0.0;
             else
-                op->proj_data[op->nvec][k] = vv_meg[p][k];
+                op->proj_data(op->nvec,k) = vv_meg[p][k];
 
             /*
             * If the above did not work, this will (provided that EEG channels are called EEG*)
             */
-            clear_these(op->proj_data[op->nvec],op->names,op->nch,"EEG");
+            clear_these(op->proj_data.row(op->nvec).data(),op->names,op->nch,"EEG");
         }
 #ifdef DEBUG
         sprintf(name,"MEG %02d",p+1);
-        mne_print_vector(stdout,name,op->proj_data[op->nvec],op->nch);
+        mne_print_vector(stdout,name,op->proj_data.row(op->nvec).data(),op->nch);
 #endif
     }
     for (p = 0; p < nvec_eeg; p++, op->nvec++) {
@@ -2138,17 +2126,17 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
             * Avoid crosstalk between MEG/EEG
             */
             if (std::fabs(vv_eeg[p][k]) < SMALL_VALUE)
-                op->proj_data[op->nvec][k] = 0.0;
+                op->proj_data(op->nvec,k) = 0.0;
             else
-                op->proj_data[op->nvec][k] = vv_eeg[p][k];
+                op->proj_data(op->nvec,k) = vv_eeg[p][k];
             /*
             * If the above did not work, this will (provided that MEG channels are called MEG*)
             */
-            clear_these(op->proj_data[op->nvec],op->names,op->nch,"MEG");
+            clear_these(op->proj_data.row(op->nvec).data(),op->names,op->nch,"MEG");
         }
 #ifdef DEBUG
         sprintf(name,"EEG %02d",p+1);
-        mne_print_vector(stdout,name,op->proj_data[op->nvec],op->nch);
+        mne_print_vector(stdout,name,op->proj_data.row(op->nvec).data(),op->nch);
         fflush(stdout);
 #endif
     }
@@ -2164,7 +2152,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
     for (k = 0; k < op->nch; k++)
         if (op->names[k].contains("STI")){ //strstr(op->names[k],"STI") == op->names[k]) {
             for (p = 0; p < op->nvec; p++)
-                op->proj_data[p][k] = 0.0;
+                op->proj_data(p,k) = 0.0;
         }
 
     return OK;
@@ -3192,7 +3180,7 @@ int mne_proj_op_proj_dvector(MneProjOp* op, double *vec, int nch, int do_complem
     Eigen::VectorXd res = Eigen::VectorXd::Zero(op->nch);
 
     for (p = 0; p < op->nvec; p++) {
-        pvec = op->proj_data[p];
+        pvec = op->proj_data.row(p).data();
         w = 0.0;
         for (k = 0; k < op->nch; k++)
             w += vec[k]*pvec[k];
@@ -3248,7 +3236,7 @@ void mne_transpose_dsquare(double **mat, int n)
     return;
 }
 
-int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix*& c)
+int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix* c)
 /*
  * Apply the projection operator to a covariance matrix
  */
@@ -3326,25 +3314,15 @@ DipoleFitData::DipoleFitData()
 : coord_frame(FIFFV_COORD_UNKNOWN)
 , nmeg (0)
 , neeg (0)
-, ch_names (NULL)
-, pick (NULL)
-, meg_coils (NULL)
-, eeg_els (NULL)
-, eeg_model (NULL)
-, bem_model (NULL)
 , sphere_funcs (NULL)
 , bem_funcs (NULL)
 , funcs (NULL)
 , mag_dipole_funcs (NULL)
 , fixed_noise (FALSE)
-, noise_orig (NULL)
-, noise (NULL)
 , nave (1)
-, proj (NULL)
 , column_norm (COLUMN_NORM_NONE)
 , fit_mag_dipoles (FALSE)
 , user (NULL)
-, user_free (NULL)
 {
     r0[0] = 0.0f;
     r0[1] = 0.0f;
@@ -3355,29 +3333,7 @@ DipoleFitData::DipoleFitData()
 
 DipoleFitData::~DipoleFitData()
 {
-    if(meg_coils)
-        delete meg_coils;
-    if(eeg_els)
-        delete eeg_els;
-
-    bemname.clear();
-
-    mne_free_cov_3(noise);
-    mne_free_cov_3(noise_orig);
-    ch_names.clear();
-
-    if(pick)
-        delete pick;
-    if(bem_model)
-        delete bem_model;
-
-    if(eeg_model)
-        delete eeg_model;
-    if (user_free)
-        user_free(user);
-
-    if(proj)
-        delete proj;
+    // unique_ptr members (pick, meg_coils, eeg_els, eeg_model, bem_model, noise_orig, noise, proj) auto-cleanup
 
     free_dipole_fit_funcs(sphere_funcs);
     free_dipole_fit_funcs(bem_funcs);
@@ -3404,12 +3360,12 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
 
         printf("\nSetting up the BEM model using %s...\n",d->bemname.toUtf8().constData());
         printf("\nLoading surfaces...\n");
-        d->bem_model = FwdBemModel::fwd_bem_load_three_layer_surfaces(d->bemname);
+        d->bem_model.reset(FwdBemModel::fwd_bem_load_three_layer_surfaces(d->bemname));
         if (d->bem_model) {
             printf("Three-layer model surfaces loaded.\n");
         }
         else {
-            d->bem_model = FwdBemModel::fwd_bem_load_homog_surface(d->bemname);
+            d->bem_model.reset(FwdBemModel::fwd_bem_load_homog_surface(d->bemname));
             if (!d->bem_model)
                 goto out;
             printf("Homogeneous model surface loaded.\n");
@@ -3419,11 +3375,11 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
             goto out;
         }
         printf("\nLoading the solution matrix...\n");
-        if (FwdBemModel::fwd_bem_load_recompute_solution(d->bemname,FWD_BEM_UNKNOWN,FALSE,d->bem_model) == FAIL)
+        if (FwdBemModel::fwd_bem_load_recompute_solution(d->bemname,FWD_BEM_UNKNOWN,FALSE,d->bem_model.get()) == FAIL)
             goto out;
         printf("Employing the head->MRI coordinate transform with the BEM model.\n");
         Q_ASSERT(d->mri_head_t);
-        if (FwdBemModel::fwd_bem_set_head_mri_t(d->bem_model,*d->mri_head_t) == FAIL)
+        if (FwdBemModel::fwd_bem_set_head_mri_t(d->bem_model.get(),*d->mri_head_t) == FAIL)
             goto out;
         printf("BEM model %s is now set up\n",d->bem_model->sol_name.toUtf8().constData());
         /*
@@ -3450,16 +3406,16 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
            * Use the new compensated field computation
            * It works the same way independent of whether or not the compensation is in effect
            */
-            comp = FwdCompData::fwd_make_comp_data(comp_data,d->meg_coils,comp_coils,
-                                      FwdBemModel::fwd_bem_field,NULL,NULL,d->bem_model,NULL);
+            comp = FwdCompData::fwd_make_comp_data(comp_data,d->meg_coils.get(),comp_coils,
+                                      FwdBemModel::fwd_bem_field,NULL,NULL,d->bem_model.get(),NULL);
             if (!comp)
                 goto out;
             printf("Compensation setup done.\n");
 
             printf("MEG solution matrix...");
-            if (FwdBemModel::fwd_bem_specify_coils(d->bem_model,d->meg_coils) == FAIL)
+            if (FwdBemModel::fwd_bem_specify_coils(d->bem_model.get(),d->meg_coils.get()) == FAIL)
                 goto out;
-            if (FwdBemModel::fwd_bem_specify_coils(d->bem_model,comp->comp_coils) == FAIL)
+            if (FwdBemModel::fwd_bem_specify_coils(d->bem_model.get(),comp->comp_coils) == FAIL)
                 goto out;
             printf("[done]\n");
 
@@ -3470,12 +3426,12 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
         }
         if (d->neeg > 0) {
             printf("\tEEG solution matrix...");
-            if (FwdBemModel::fwd_bem_specify_els(d->bem_model,d->eeg_els) == FAIL)
+            if (FwdBemModel::fwd_bem_specify_els(d->bem_model.get(),d->eeg_els.get()) == FAIL)
                 goto out;
             printf("[done]\n");
             f->eeg_pot     = FwdBemModel::fwd_bem_pot_els;
             f->eeg_vec_pot = NULL;
-            f->eeg_client  = d->bem_model;
+            f->eeg_client  = d->bem_model.get();
         }
     }
     if (d->neeg > 0 && !d->eeg_model) {
@@ -3487,14 +3443,14 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
         VEC_COPY_3(d->eeg_model->r0,d->r0);
         f->eeg_pot     = FwdEegSphereModel::fwd_eeg_spherepot_coil;
         f->eeg_vec_pot = FwdEegSphereModel::fwd_eeg_spherepot_coil_vec;
-        f->eeg_client  = d->eeg_model;
+        f->eeg_client  = d->eeg_model.get();
     }
     if (d->nmeg > 0) {
         /*
          * Use the new compensated field computation
          * It works the same way independent of whether or not the compensation is in effect
          */
-        comp = FwdCompData::fwd_make_comp_data(comp_data,d->meg_coils,comp_coils,
+        comp = FwdCompData::fwd_make_comp_data(comp_data,d->meg_coils.get(),comp_coils,
                                   FwdBemModel::fwd_sphere_field,
                                   FwdBemModel::fwd_sphere_field_vec,
                                   NULL,
@@ -3517,7 +3473,7 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
          * Use the new compensated field computation
          * It works the same way independent of whether or not the compensation is in effect
          */
-        comp = FwdCompData::fwd_make_comp_data(comp_data,d->meg_coils,comp_coils,
+        comp = FwdCompData::fwd_make_comp_data(comp_data,d->meg_coils.get(),comp_coils,
                                   FwdBemModel::fwd_mag_dipole_field,
                                   FwdBemModel::fwd_mag_dipole_field_vec,
                                   NULL,
@@ -3683,7 +3639,7 @@ int DipoleFitData::scale_noise_cov(DipoleFitData *f, int nave)
 
     if (f->noise->cov != NULL) {
         printf("Decomposing the sensor noise covariance matrix...\n");
-        if (mne_decompose_eigen_cov_3(f->noise) == FAIL)
+        if (mne_decompose_eigen_cov_3(f->noise.get()) == FAIL)
             goto bad;
 
         for (k = 0; k < f->noise->ncov*(f->noise->ncov+1)/2; k++)
@@ -3693,14 +3649,14 @@ int DipoleFitData::scale_noise_cov(DipoleFitData *f, int nave)
             if (f->noise->lambda[k] < 0.0)
                 f->noise->lambda[k] = 0.0;
         }
-        if (mne_add_inv_cov_3(f->noise) == FAIL)
+        if (mne_add_inv_cov_3(f->noise.get()) == FAIL)
             goto bad;
     }
     else {
         for (k = 0; k < f->noise->ncov; k++)
             f->noise->cov_diag[k] = nave_ratio*f->noise->cov_diag[k];
         printf("Decomposition not needed for a diagonal noise covariance matrix.\n");
-        if (mne_add_inv_cov_3(f->noise) == FAIL)
+        if (mne_add_inv_cov_3(f->noise.get()) == FAIL)
             goto bad;
     }
     printf("Effective nave is now %d\n",nave);
@@ -3729,7 +3685,7 @@ int DipoleFitData::scale_dipole_fit_noise_cov(DipoleFitData *f, int nave)
          */
         printf("Decomposing the noise covariance...");
         if (f->noise->cov) {
-            if (mne_decompose_eigen_cov_3(f->noise) == FAIL)
+            if (mne_decompose_eigen_cov_3(f->noise.get()) == FAIL)
                 goto bad;
             for (k = 0; k < f->noise->ncov; k++) {
                 if (f->noise->lambda[k] < 0.0)
@@ -3743,14 +3699,14 @@ int DipoleFitData::scale_dipole_fit_noise_cov(DipoleFitData *f, int nave)
             if (f->noise->lambda[k] < 0.0)
                 f->noise->lambda[k] = 0.0;
         }
-        if (mne_add_inv_cov_3(f->noise) == FAIL)
+        if (mne_add_inv_cov_3(f->noise.get()) == FAIL)
             goto bad;
     }
     else {
         for (k = 0; k < f->noise->ncov; k++)
             f->noise->cov_diag[k] = nave_ratio*f->noise->cov_diag[k];
         printf("Decomposition not needed for a diagonal noise covariance matrix.\n");
-        if (mne_add_inv_cov_3(f->noise) == FAIL)
+        if (mne_add_inv_cov_3(f->noise.get()) == FAIL)
             goto bad;
     }
     printf("Effective nave is now %d\n",nave);
@@ -3807,7 +3763,7 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
                     nomit_meg++;
             }
         }
-        mne_free_cov_3(f->noise); f->noise = NULL;
+        f->noise.reset();
         if (nmeg > 0 && nmeg-nomit_meg > 0 && nmeg-nomit_meg < min_nchan) {
             qCritical("Too few MEG channels remaining");
             FREE_3(w);
@@ -3818,7 +3774,7 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
             FREE_3(w);
             return FAIL;
         }
-        f->noise = f->noise_orig->dup();
+        f->noise.reset(f->noise_orig->dup());
         if (nomit_meg+nomit_eeg > 0) {
             if (f->noise->cov) {
                 for (j = 0; j < f->noise->ncov; j++)
@@ -3839,7 +3795,7 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
     else {
         if (f->noise && f->nave == nave)
             return OK;
-        f->noise = f->noise_orig->dup();
+        f->noise.reset(f->noise_orig->dup());
     }
 
     return scale_dipole_fit_noise_cov(f,nave);
@@ -3986,13 +3942,15 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
         }
 
         Q_ASSERT(res->meg_head_t);
-        if ((res->meg_coils = templates->create_meg_coils(res->chs,
+        res->meg_coils.reset(templates->create_meg_coils(res->chs,
                                                           res->nmeg,
                                                           accurate_coils ? FWD_COIL_ACCURACY_ACCURATE : FWD_COIL_ACCURACY_NORMAL,
-                                                          *res->meg_head_t)) == NULL)
+                                                          *res->meg_head_t));
+        if (!res->meg_coils)
             goto bad;
-        if ((res->eeg_els = FwdCoilSet::create_eeg_els(res->chs.mid(res->nmeg),
-                                                       res->neeg)) == NULL)
+        res->eeg_els.reset(FwdCoilSet::create_eeg_els(res->chs.mid(res->nmeg),
+                                                       res->neeg));
+        if (!res->eeg_els)
             goto bad;
         printf("Head coordinate coil definitions created.\n");
     }
@@ -4009,7 +3967,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
         res->r0[1]     = (*r0)[1];
         res->r0[2]     = (*r0)[2];
     }
-    res->eeg_model = eeg_model;
+    res->eeg_model.reset(eeg_model);
     /*
        * Compensation data
        */
@@ -4055,18 +4013,22 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
     /*
        * Projection data should go here
        */
-    if (make_projection(projnames,
-                        res->chs,
-                        res->nmeg+res->neeg,
-                        &res->proj) == FAIL)
-        goto bad;
+    {
+        MneProjOp* proj_raw = nullptr;
+        if (make_projection(projnames,
+                            res->chs,
+                            res->nmeg+res->neeg,
+                            &proj_raw) == FAIL)
+            goto bad;
+        res->proj.reset(proj_raw);
+    }
     if (res->proj && res->proj->nitems > 0) {
         printf("Final projection operator is:\n");
-        { QTextStream errStream(stderr); mne_proj_op_report_3(errStream,"\t",res->proj); }
+        { QTextStream errStream(stderr); mne_proj_op_report_3(errStream,"\t",res->proj.get()); }
 
-        if (mne_proj_op_chs_3(res->proj,res->ch_names,res->nmeg+res->neeg) == FAIL)
+        if (mne_proj_op_chs_3(res->proj.get(),res->ch_names,res->nmeg+res->neeg) == FAIL)
             goto bad;
-        if (mne_proj_op_make_proj(res->proj) == FAIL)
+        if (mne_proj_op_make_proj(res->proj.get()) == FAIL)
             goto bad;
     }
     else
@@ -4082,15 +4044,15 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
                cov->cov_diag ? "diagonal" : "full", noisename.toUtf8().data());
     }
     else {
-        if ((cov = ad_hoc_noise(res->meg_coils,res->eeg_els,grad_std,mag_std,eeg_std)) == NULL)
+        if ((cov = ad_hoc_noise(res->meg_coils.get(),res->eeg_els.get(),grad_std,mag_std,eeg_std)) == NULL)
             goto bad;
     }
-    res->noise = mne_pick_chs_cov_omit(cov,
+    res->noise.reset(mne_pick_chs_cov_omit(cov,
                                        res->ch_names,
                                        res->nmeg+res->neeg,
                                        TRUE,
-                                       res->chs);
-    if (res->noise == NULL) {
+                                       res->chs));
+    if (!res->noise) {
         mne_free_cov_3(cov);
         goto bad;
     }
@@ -4102,7 +4064,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
        * Apply the projection operator to the noise-covariance matrix
        */
     if (res->proj && res->proj->nitems > 0 && res->proj->nvec > 0) {
-        if (mne_proj_op_apply_cov(res->proj,res->noise) == FAIL)
+        if (mne_proj_op_apply_cov(res->proj.get(),res->noise.get()) == FAIL)
             goto bad;
         printf("Projection applied to the covariance matrix.\n");
     }
@@ -4111,7 +4073,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
        * Force diagonal noise covariance?
        */
     if (diagnoise) {
-        mne_revert_to_diag_cov(res->noise);
+        mne_revert_to_diag_cov(res->noise.get());
         printf("Using only the main diagonal of the noise-covariance matrix.\n");
     }
 
@@ -4128,7 +4090,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
         /*
          * Classify the channels
          */
-        if (mne_classify_channels_cov(res->noise,
+        if (mne_classify_channels_cov(res->noise.get(),
                                       res->chs,
                                       res->nmeg+res->neeg) == FAIL)
             goto bad;
@@ -4144,7 +4106,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
          * Apply regularization if necessary
          */
         if (do_it > 0)
-            mne_regularize_cov(res->noise,regs);
+            mne_regularize_cov(res->noise.get(),regs);
         else
             printf("No regularization applied to the noise-covariance matrix\n");
     }
@@ -4154,7 +4116,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
        */
     printf("Decomposing the noise covariance...\n");
     if (res->noise->cov) {
-        if (mne_decompose_eigen_cov_3(res->noise) == FAIL)
+        if (mne_decompose_eigen_cov_3(res->noise.get()) == FAIL)
             goto bad;
         printf("Eigenvalue decomposition done.\n");
         for (k = 0; k < res->noise->ncov; k++) {
@@ -4164,7 +4126,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
     }
     else {
         printf("Decomposition not needed for a diagonal covariance matrix.\n");
-        if (mne_add_inv_cov_3(res->noise) == FAIL)
+        if (mne_add_inv_cov_3(res->noise.get()) == FAIL)
             goto bad;
     }
 
@@ -4345,7 +4307,7 @@ static float fit_eval(float *rd,int npar,void *user)
 {
     DipoleFitData* fit   = (DipoleFitData*)user;
     DipoleForward* fwd;
-    fitDipUser       fuser = (fitDipUser)fit->user;
+    FitDipUserRec*   fuser = fit->user;
     double        Bm2,one;
     int           ncomp,c;
     (void)npar; // avoid unused variable warning.
@@ -4678,7 +4640,7 @@ bool DipoleFitData::fit_one(DipoleFitData* fit,	            /* Precomputed fitti
 
     int        best;
     float      good,rd_guess[3],rd_final[3],Q[3],final_val;
-    fitDipUserRec user;
+    FitDipUserRec user;
     int        k,p,neval,neval_tot,nchan,ncomp;
     int        fit_fail;
 
@@ -4688,7 +4650,7 @@ bool DipoleFitData::fit_one(DipoleFitData* fit,	            /* Precomputed fitti
     if (fit->proj && fit->proj->project_vector(B,nchan,TRUE) == FAIL)
         goto bad;
 
-    if (mne_whiten_one_data(B,B,nchan,fit->noise) == FAIL)
+    if (mne_whiten_one_data(B,B,nchan,fit->noise.get()) == FAIL)
         goto bad;
     /*
    * Get the initial guess
@@ -4800,15 +4762,15 @@ int DipoleFitData::compute_dipole_field(DipoleFitData* d, float *rd, int whiten,
    */
     if (d->nmeg > 0) {
         if (d->funcs->meg_vec_field) {
-            if (d->funcs->meg_vec_field(rd,d->meg_coils,fwd,d->funcs->meg_client) != OK)
+            if (d->funcs->meg_vec_field(rd,d->meg_coils.get(),fwd,d->funcs->meg_client) != OK)
                 goto bad;
         }
         else {
-            if (d->funcs->meg_field(rd,Qx,d->meg_coils,fwd[0],d->funcs->meg_client) != OK)
+            if (d->funcs->meg_field(rd,Qx,d->meg_coils.get(),fwd[0],d->funcs->meg_client) != OK)
                 goto bad;
-            if (d->funcs->meg_field(rd,Qy,d->meg_coils,fwd[1],d->funcs->meg_client) != OK)
+            if (d->funcs->meg_field(rd,Qy,d->meg_coils.get(),fwd[1],d->funcs->meg_client) != OK)
                 goto bad;
-            if (d->funcs->meg_field(rd,Qz,d->meg_coils,fwd[2],d->funcs->meg_client) != OK)
+            if (d->funcs->meg_field(rd,Qz,d->meg_coils.get(),fwd[2],d->funcs->meg_client) != OK)
                 goto bad;
         }
     }
@@ -4818,15 +4780,15 @@ int DipoleFitData::compute_dipole_field(DipoleFitData* d, float *rd, int whiten,
             eeg_fwd[0] = fwd[0]+d->nmeg;
             eeg_fwd[1] = fwd[1]+d->nmeg;
             eeg_fwd[2] = fwd[2]+d->nmeg;
-            if (d->funcs->eeg_vec_pot(rd,d->eeg_els,eeg_fwd,d->funcs->eeg_client) != OK)
+            if (d->funcs->eeg_vec_pot(rd,d->eeg_els.get(),eeg_fwd,d->funcs->eeg_client) != OK)
                 goto bad;
         }
         else {
-            if (d->funcs->eeg_pot(rd,Qx,d->eeg_els,fwd[0]+d->nmeg,d->funcs->eeg_client) != OK)
+            if (d->funcs->eeg_pot(rd,Qx,d->eeg_els.get(),fwd[0]+d->nmeg,d->funcs->eeg_client) != OK)
                 goto bad;
-            if (d->funcs->eeg_pot(rd,Qy,d->eeg_els,fwd[1]+d->nmeg,d->funcs->eeg_client) != OK)
+            if (d->funcs->eeg_pot(rd,Qy,d->eeg_els.get(),fwd[1]+d->nmeg,d->funcs->eeg_client) != OK)
                 goto bad;
-            if (d->funcs->eeg_pot(rd,Qz,d->eeg_els,fwd[2]+d->nmeg,d->funcs->eeg_client) != OK)
+            if (d->funcs->eeg_pot(rd,Qz,d->eeg_els.get(),fwd[2]+d->nmeg,d->funcs->eeg_client) != OK)
                 goto bad;
         }
     }
@@ -4856,7 +4818,7 @@ int DipoleFitData::compute_dipole_field(DipoleFitData* d, float *rd, int whiten,
    * Whiten
    */
     if (d->noise && whiten) {
-        if (mne_whiten_data(fwd,fwd,3,d->nmeg+d->neeg,d->noise) == FAIL)
+        if (mne_whiten_data(fwd,fwd,3,d->nmeg+d->neeg,d->noise.get()) == FAIL)
             goto bad;
     }
 

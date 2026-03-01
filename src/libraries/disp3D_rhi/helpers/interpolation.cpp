@@ -46,6 +46,12 @@
 #include <QDebug>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <unordered_set>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -56,31 +62,34 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const QVector<int> &vecProjectedSensors,
-                                                                           const QSharedPointer<MatrixXd> matDistanceTable,
-                                                                           double (*interpolationFunction) (double),
-                                                                           const double dCancelDist,
-                                                                           const QVector<int> &vecExcludeIndex)
+QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const VectorXi &vecProjectedSensors,
+                                                                             const QSharedPointer<MatrixXd> matDistanceTable,
+                                                                             double (*interpolationFunction) (double),
+                                                                             const double dCancelDist,
+                                                                             const VectorXi &vecExcludeIndex)
 {
     if(matDistanceTable->rows() == 0 && matDistanceTable->cols() == 0) {
         qDebug() << "[WARNING] Interpolation::createInterpolationMat - received an empty distance table.";
         return QSharedPointer<SparseMatrix<float> >::create();
     }
 
-    QSharedPointer<Eigen::SparseMatrix<float> > matInterpolationMatrix = QSharedPointer<SparseMatrix<float> >::create(matDistanceTable->rows(), vecProjectedSensors.size());
+    QSharedPointer<Eigen::SparseMatrix<float> > matInterpolationMatrix = QSharedPointer<SparseMatrix<float> >::create(matDistanceTable->rows(), static_cast<int>(vecProjectedSensors.size()));
 
     QVector<Triplet<float> > vecNonZeroEntries;
     const qint32 iRows = matInterpolationMatrix->rows();
     const qint32 iCols = matInterpolationMatrix->cols();
 
-    QSet<qint32> sensorLookup;
-    int idx = 0;
+    // Build exclude set for O(1) lookup
+    std::unordered_set<int> excludeSet;
+    for(Eigen::Index i = 0; i < vecExcludeIndex.size(); ++i) {
+        excludeSet.insert(vecExcludeIndex[i]);
+    }
 
-    for(const qint32& s : vecProjectedSensors){
-        if(!vecExcludeIndex.contains(idx)){
-            sensorLookup.insert(s);
+    QSet<qint32> sensorLookup;
+    for(Eigen::Index idx = 0; idx < vecProjectedSensors.size(); ++idx){
+        if(excludeSet.count(static_cast<int>(idx)) == 0){
+            sensorLookup.insert(vecProjectedSensors[idx]);
         }
-        idx++;
     }
 
     for (qint32 r = 0; r < iRows; ++r) {
@@ -103,7 +112,14 @@ QSharedPointer<SparseMatrix<float> > Interpolation::createInterpolationMat(const
                 vecNonZeroEntries.push_back(Eigen::Triplet<float> (r, qp.first, qp.second / dWeightsSum));
             }
         } else {
-            const int iIndexInSubset = vecProjectedSensors.indexOf(r);
+            // Find index of r in vecProjectedSensors
+            int iIndexInSubset = 0;
+            for(Eigen::Index k = 0; k < vecProjectedSensors.size(); ++k) {
+                if(vecProjectedSensors[k] == r) {
+                    iIndexInSubset = static_cast<int>(k);
+                    break;
+                }
+            }
             vecNonZeroEntries.push_back(Eigen::Triplet<float> (r, iIndexInSubset, 1));
         }
     }

@@ -345,10 +345,10 @@ void MneMshDisplaySurfaceSet::decide_surface_extent(MneMshDisplaySurface* surf,
     float *r;
     MneSourceSpaceOld* s = (MneSourceSpaceOld*)surf->s;
 
-    VEC_COPY_47(minv,s->rr[0]);
-    VEC_COPY_47(maxv,s->rr[0]);
+    VEC_COPY_47(minv,&s->rr(0,0));
+    VEC_COPY_47(maxv,&s->rr(0,0));
     for (k = 0; k < s->np; k++) {
-        r = s->rr[k];
+        r = &s->rr(k,0);
         for (c = 0; c < 3; c++) {
             if (r[c] < minv[c])
                 minv[c] = r[c];

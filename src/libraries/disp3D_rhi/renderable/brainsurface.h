@@ -47,6 +47,7 @@
 #include <QVector3D>
 #include <QColor>
 #include <memory>
+#include <vector>
 #include <fs/surface.h>
 #include <fs/annotation.h>
 #include <mne/mne_bem.h>
@@ -347,7 +348,7 @@ public:
      *
      * @return Vector of neighbor indices for each vertex.
      */
-    QVector<QVector<int>> computeNeighbors() const;
+    std::vector<Eigen::VectorXi> computeNeighbors() const;
 
     //=========================================================================================================
     /**

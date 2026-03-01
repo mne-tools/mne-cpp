@@ -40,6 +40,8 @@
 
 #include <rhi/qrhi.h>
 
+#include <set>
+
 //=============================================================================================================
 // PIMPL
 //=============================================================================================================
@@ -528,9 +530,10 @@ void BrainSurface::updateBuffers(QRhi *rhi, QRhiResourceUpdateBatch *u)
 
 //=============================================================================================================
 
-QVector<QVector<int>> BrainSurface::computeNeighbors() const
+std::vector<Eigen::VectorXi> BrainSurface::computeNeighbors() const
 {
-    QVector<QVector<int>> neighbors(m_vertexData.size());
+    // Use temporary std::vector<std::set<int>> for dedup during construction
+    std::vector<std::set<int>> tempNeighbors(m_vertexData.size());
     
     // Triangles are stored in m_indexData as triplets
     for (int i = 0; i + 2 < m_indexData.size(); i += 3) {
@@ -538,13 +541,24 @@ QVector<QVector<int>> BrainSurface::computeNeighbors() const
         int v1 = m_indexData[i + 1];
         int v2 = m_indexData[i + 2];
         
-        // Add bidirectional edges
-        if (!neighbors[v0].contains(v1)) neighbors[v0].append(v1);
-        if (!neighbors[v0].contains(v2)) neighbors[v0].append(v2);
-        if (!neighbors[v1].contains(v0)) neighbors[v1].append(v0);
-        if (!neighbors[v1].contains(v2)) neighbors[v1].append(v2);
-        if (!neighbors[v2].contains(v0)) neighbors[v2].append(v0);
-        if (!neighbors[v2].contains(v1)) neighbors[v2].append(v1);
+        // Add bidirectional edges (set handles dedup)
+        tempNeighbors[v0].insert(v1);
+        tempNeighbors[v0].insert(v2);
+        tempNeighbors[v1].insert(v0);
+        tempNeighbors[v1].insert(v2);
+        tempNeighbors[v2].insert(v0);
+        tempNeighbors[v2].insert(v1);
+    }
+    
+    // Convert to std::vector<VectorXi>
+    std::vector<Eigen::VectorXi> neighbors(tempNeighbors.size());
+    for (size_t k = 0; k < tempNeighbors.size(); ++k) {
+        const auto& s = tempNeighbors[k];
+        neighbors[k].resize(static_cast<Eigen::Index>(s.size()));
+        Eigen::Index idx = 0;
+        for (int val : s) {
+            neighbors[k][idx++] = val;
+        }
     }
     
     return neighbors;

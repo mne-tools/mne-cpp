@@ -215,7 +215,6 @@ MneProjOp::MneProjOp()
 : nitems (0)
 , nch (0)
 , nvec (0)
-, proj_data (NULL)
 {
 }
 
@@ -235,12 +234,11 @@ MneProjOp::~MneProjOp()
 
 void MneProjOp::free_proj()
 {
-    FREE_CMATRIX_23(proj_data);
+    proj_data.resize(0, 0);
 
     names.clear();
     nch  = 0;
     nvec = 0;
-    proj_data = NULL;
 
     return;
 }
@@ -444,7 +442,7 @@ int MneProjOp::project_vector(float *vec, int nvec, int do_complement)
         res[k] = 0.0;
 
     for (p = 0; p < this->nvec; p++) {
-        pvec = proj_data[p];
+        pvec = proj_data.row(p).data();
         w = mne_dot_vectors_23(pvec,vec,nch);
         for (k = 0; k < nch; k++)
             res[k] = res[k] + w*pvec[k];

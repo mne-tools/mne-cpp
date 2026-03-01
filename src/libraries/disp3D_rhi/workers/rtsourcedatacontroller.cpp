@@ -274,8 +274,8 @@ void RtSourceDataController::setCancelDistance(double dCancelDist)
 //=============================================================================================================
 
 void RtSourceDataController::setInterpolationInfoLeft(const Eigen::MatrixX3f &matVertices,
-                                                       const QVector<QVector<int>> &vecNeighborVertices,
-                                                       const QVector<int> &vecSourceVertices)
+                                                       const std::vector<Eigen::VectorXi> &vecNeighborVertices,
+                                                       const Eigen::VectorXi &vecSourceVertices)
 {
     if (m_pInterpWorker) {
         m_pInterpWorker->setInterpolationInfoLeft(matVertices, vecNeighborVertices, vecSourceVertices);
@@ -285,8 +285,8 @@ void RtSourceDataController::setInterpolationInfoLeft(const Eigen::MatrixX3f &ma
 //=============================================================================================================
 
 void RtSourceDataController::setInterpolationInfoRight(const Eigen::MatrixX3f &matVertices,
-                                                        const QVector<QVector<int>> &vecNeighborVertices,
-                                                        const QVector<int> &vecSourceVertices)
+                                                        const std::vector<Eigen::VectorXi> &vecNeighborVertices,
+                                                        const Eigen::VectorXi &vecSourceVertices)
 {
     if (m_pInterpWorker) {
         m_pInterpWorker->setInterpolationInfoRight(matVertices, vecNeighborVertices, vecSourceVertices);

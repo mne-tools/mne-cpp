@@ -87,6 +87,9 @@ public:
     typedef QSharedPointer<MneProjOp> SPtr;              /**< Shared pointer type for MneProjOp. */
     typedef QSharedPointer<const MneProjOp> ConstSPtr;   /**< Const shared pointer type for MneProjOp. */
 
+    /** Dynamic float matrix stored in row-major order (contiguous rows for C-style interop). */
+    using RowMajorMatrixXf = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+
     //=========================================================================================================
     /**
      * Constructs the MNE Projection Operator
@@ -262,7 +265,7 @@ public:
     QStringList names;                  /**< Names of the channels in the final compiled projector. */
     int         nch;                    /**< Number of channels in the final projector. */
     int         nvec;                   /**< Number of orthogonalized vectors in the final projector. */
-    float**     proj_data;              /**< The compiled projector: orthogonalized projection vectors (nvec x nch). */
+    RowMajorMatrixXf proj_data; /**< The compiled projector: orthogonalized projection vectors (nvec x nch). */
 
 //// ### OLD STRUCT ###
 //typedef struct {                            /* Collection of projection items and the projector itself */
