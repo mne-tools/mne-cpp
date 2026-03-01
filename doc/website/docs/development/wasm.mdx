@@ -20,6 +20,6 @@ Try MNE Analyze in your browser right now: [mne-cpp.github.io/wasm/mne_analyze.h
 
 ## Limitations
 
-- Qt3D / `QOpenGLWidget` is not supported in WebAssembly builds — 3D visualization is excluded.
 - The Wasm build always uses **static linking** (`BUILD_SHARED_LIBS=OFF`).
 - File I/O operates through the browser's virtual file system rather than native disk access.
+- 3D visualization via `disp3D_rhi` is supported in WebAssembly builds when `Qt6::GuiPrivate` is available. The RHI backend uses OpenGL (WebGL) in the browser.
