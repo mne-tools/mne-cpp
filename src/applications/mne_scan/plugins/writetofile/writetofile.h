@@ -44,7 +44,7 @@
 
 #include <utils/generics/circularbuffer.h>
 #include <scShared/Plugins/abstractalgorithm.h>
-#include <fiff/fifffilesharer.h>
+#include <fiff/fiff_file_sharer.h>
 
 //=============================================================================================================
 // QT INCLUDES

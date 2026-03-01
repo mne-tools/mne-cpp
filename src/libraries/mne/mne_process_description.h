@@ -43,6 +43,8 @@
 
 #include "mne_global.h"
 
+#include <fiff/fiff_evoked_set.h>
+
 #include <QString>
 #include <QStringList>
 #include <QVector>
@@ -55,24 +57,10 @@
 namespace MNELIB
 {
 
-//=============================================================================================================
-/**
- * Rejection parameters for artifact detection.
- * Ported from rejDataRec (MNE-C browser_types.h).
- */
-struct MNESHARED_EXPORT RejectionParams {
-    float stimIgnore       = 0.0f;      /**< Ignore this many seconds around the stimulus. */
-    float megGradReject    = 2000e-13f;  /**< Gradiometer rejection (T/m). */
-    float megMagReject     = 3e-12f;     /**< Magnetometer rejection (T). */
-    float eegReject        = 100e-6f;    /**< EEG rejection (V). */
-    float eogReject        = 150e-6f;    /**< EOG rejection (V). */
-    float ecgReject        = 0.0f;       /**< ECG rejection (V). */
-    float megGradFlat      = 0.0f;       /**< Gradiometer flatness (T/m). */
-    float megMagFlat       = 0.0f;       /**< Magnetometer flatness (T). */
-    float eegFlat          = 0.0f;       /**< EEG flatness (V). */
-    float eogFlat          = 0.0f;       /**< EOG flatness (V). */
-    float ecgFlat          = 0.0f;       /**< ECG flatness (V). */
-};
+// Import averaging types from FIFFLIB for backward compatibility
+using FIFFLIB::RejectionParams;
+using FIFFLIB::AverageCategory;
+using FIFFLIB::AverageDescription;
 
 //=============================================================================================================
 /**
@@ -100,45 +88,6 @@ struct MNESHARED_EXPORT CovDescription {
     RejectionParams      rej;            /**< Rejection limits. */
     bool  removeSampleMean = true;       /**< Remove the mean at each sample. */
     bool  fixSkew          = false;      /**< Fix skew on trigger lines. */
-    QString filename;                    /**< Output file. */
-    QString eventFile;                   /**< Read events from here. */
-    QString logFile;                     /**< Save log here. */
-};
-
-//=============================================================================================================
-/**
- * One averaging category.
- * Ported from aveCategRec (MNE-C browser_types.h).
- */
-struct MNESHARED_EXPORT AverageCategory {
-    QString comment;                     /**< Description. */
-    QVector<unsigned int> events;        /**< The interesting events. */
-    unsigned int nextEvent  = 0;         /**< Require this event next. */
-    unsigned int prevEvent  = 0;         /**< Require this event just before. */
-    unsigned int ignore     = 0;         /**< Which trigger lines to ignore. */
-    unsigned int prevIgnore = 0;         /**< Ignore mask for previous event. */
-    unsigned int nextIgnore = 0;         /**< Ignore mask for next event. */
-    float delay             = 0.0f;      /**< Stimulus delay (s). */
-    float tmin              = -0.2f;     /**< Minimum time (s). */
-    float tmax              = 0.5f;      /**< Maximum time (s). */
-    float bmin              = 0.0f;      /**< Baseline min (s). */
-    float bmax              = 0.0f;      /**< Baseline max (s). */
-    bool  doBaseline        = false;     /**< Should we baseline? */
-    bool  doStdErr          = false;     /**< Compute std error of mean? */
-    bool  doAbs             = false;     /**< Compute absolute values? */
-    float color[3]          = {0,0,0};   /**< Display color (unused in batch). */
-};
-
-//=============================================================================================================
-/**
- * Set of averaging categories loaded from a description file.
- * Ported from aveDataRec (MNE-C browser_types.h).
- */
-struct MNESHARED_EXPORT AverageDescription {
-    QString comment;                     /**< Description. */
-    QList<AverageCategory> categories;   /**< The categories. */
-    RejectionParams rej;                 /**< Rejection limits. */
-    bool fixSkew            = false;     /**< Fix skew on trigger lines. */
     QString filename;                    /**< Output file. */
     QString eventFile;                   /**< Read events from here. */
     QString logFile;                     /**< Save log here. */

@@ -38,7 +38,7 @@ set(SOURCES
     fiff_sparse_matrix.cpp
     fiff_digitizer_data.cpp
     fiff_coord_trans_set.cpp
-    fifffilesharer.cpp
+    fiff_file_sharer.cpp
 )
 
 set(HEADERS
@@ -75,7 +75,7 @@ set(HEADERS
     fiff_sparse_matrix.h
     fiff_digitizer_data.h
     fiff_coord_trans_set.h
-    fifffilesharer.h
+    fiff_file_sharer.h
 )
 
 set(FILE_TO_UPDATE fiff_global.cpp)

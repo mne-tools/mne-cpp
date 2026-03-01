@@ -40,7 +40,7 @@
 
 #include "fwd_comp_data.h"
 
-#include <mne/c/mne_ctf_comp_data_set.h>
+#include <mne/mne_ctf_comp_data_set.h>
 #include <fiff/fiff_types.h>
 
 #include <iostream>
@@ -191,7 +191,7 @@ int FwdCompData::fwd_comp_field(float *rd, float *Q, FwdCoilSet *coils, float *r
     /*
        * Compute the compensated field
        */
-    return MneCTFCompDataSet::mne_apply_ctf_comp(comp->set,TRUE,res,coils->ncoil,comp->work,comp->comp_coils->ncoil);
+    return comp->set->apply(TRUE,res,coils->ncoil,comp->work,comp->comp_coils->ncoil);
 }
 
 //=============================================================================================================
@@ -217,7 +217,7 @@ int FwdCompData::fwd_make_ctf_comp_coils(MneCTFCompDataSet *set,
                                          FwdCoilSet *coils,
                                          FwdCoilSet *comp_coils)   /* The compensation coil set */
 /*
- * Call mne_make_ctf_comp using the information in the coil sets
+ * Call make_comp using the information in the coil sets
  */
 {
     QList<FiffChInfo> chs;
@@ -233,7 +233,7 @@ int FwdCompData::fwd_make_ctf_comp_coils(MneCTFCompDataSet *set,
     }
     /*
        * Create the fake channel info which contain just enough information
-       * for mne_make_ctf_comp
+       * for make_comp
        */
     for (k = 0; k < coils->ncoil; k++) {
         chs.append(FiffChInfo());
@@ -253,7 +253,7 @@ int FwdCompData::fwd_make_ctf_comp_coils(MneCTFCompDataSet *set,
         }
         ncomp = comp_coils->ncoil;
     }
-    res = MneCTFCompDataSet::mne_make_ctf_comp(set,chs,nchan,compchs,ncomp);
+    res = set->make_comp(chs,nchan,compchs,ncomp);
 
     return res;
 }
@@ -341,7 +341,7 @@ int FwdCompData::fwd_comp_field_vec(float *rd, FwdCoilSet *coils, float **res, v
        * Compute the compensated field of three orthogonal dipoles
        */
     for (k = 0; k < 3; k++) {
-        if (MneCTFCompDataSet::mne_apply_ctf_comp(comp->set,TRUE,res[k],coils->ncoil,comp->vec_work[k],comp->comp_coils->ncoil) == FAIL)
+        if (comp->set->apply(TRUE,res[k],coils->ncoil,comp->vec_work[k],comp->comp_coils->ncoil) == FAIL)
             return FAIL;
     }
     return OK;
@@ -385,13 +385,13 @@ int FwdCompData::fwd_comp_field_grad(float *rd, float *Q, FwdCoilSet* coils, flo
     /*
      * Compute the compensated field
      */
-    if (MneCTFCompDataSet::mne_apply_ctf_comp(comp->set,TRUE,res,coils->ncoil,comp->work,comp->comp_coils->ncoil) != OK)
+    if (comp->set->apply(TRUE,res,coils->ncoil,comp->work,comp->comp_coils->ncoil) != OK)
         return FAIL;
-    if (MneCTFCompDataSet::mne_apply_ctf_comp(comp->set,TRUE,xgrad,coils->ncoil,comp->vec_work[0],comp->comp_coils->ncoil) != OK)
+    if (comp->set->apply(TRUE,xgrad,coils->ncoil,comp->vec_work[0],comp->comp_coils->ncoil) != OK)
         return FAIL;
-    if (MneCTFCompDataSet::mne_apply_ctf_comp(comp->set,TRUE,ygrad,coils->ncoil,comp->vec_work[1],comp->comp_coils->ncoil) != OK)
+    if (comp->set->apply(TRUE,ygrad,coils->ncoil,comp->vec_work[1],comp->comp_coils->ncoil) != OK)
         return FAIL;
-    if (MneCTFCompDataSet::mne_apply_ctf_comp(comp->set,TRUE,zgrad,coils->ncoil,comp->vec_work[2],comp->comp_coils->ncoil) != OK)
+    if (comp->set->apply(TRUE,zgrad,coils->ncoil,comp->vec_work[2],comp->comp_coils->ncoil) != OK)
         return FAIL;
     return OK;
 }

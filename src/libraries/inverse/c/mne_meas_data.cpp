@@ -42,8 +42,8 @@
 #include "mne_meas_data_set.h"
 #include "mne_inverse_operator.h"
 
-#include <mne/c/mne_types.h>
-#include <mne/c/mne_named_matrix.h>
+#include <mne/mne_types.h>
+#include <mne/mne_named_matrix.h>
 
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_coord_trans.h>
@@ -51,6 +51,7 @@
 #include <time.h>
 
 #include <QFile>
+#include <QTextStream>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -1813,14 +1814,15 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
         new_data->op  = op;		/* Attach inverse operator */
         new_data->fwd = fwd;		/* ...or a fwd operator */
         if (op) 			/* Attach the projection operator and CTF compensation info to the data, too */
-            new_data->proj = MneProjOp::mne_dup_proj_op(op->proj);
+            new_data->proj = op->proj->dup();
         else {
-            new_data->proj = MneProjOp::mne_read_proj_op(name);
+            new_data->proj = MneProjOp::read(name);
             if (new_data->proj && new_data->proj->nitems > 0) {
                 printf("\tLoaded projection from %s:\n",name.toUtf8().data());
-                MneProjOp::mne_proj_op_report(stderr,"\t\t",new_data->proj);
+                QTextStream errStream(stderr);
+                new_data->proj->report(errStream,"\t\t");
             }
-            new_data->comp = MneCTFCompDataSet::mne_read_ctf_comp_data(name);
+            new_data->comp = MneCTFCompDataSet::read(name);
             if (new_data->comp == NULL)
                 goto out;
             if (new_data->comp->ncomp > 0)

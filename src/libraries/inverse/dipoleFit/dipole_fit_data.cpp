@@ -5,20 +5,21 @@
 #include "guess_data.h"
 #include "../c/mne_meas_data.h"
 #include "../c/mne_meas_data_set.h"
-#include <mne/c/mne_proj_item.h>
-#include <mne/c/mne_cov_matrix.h>
+#include <mne/mne_proj_item.h>
+#include <mne/mne_cov_matrix.h>
 #include "ecd.h"
 
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fwd/fwd_bem_model.h>
-#include <mne/c/mne_surface_old.h>
+#include <mne/mne_surface_old.h>
 
 #include <fwd/fwd_comp_data.h>
 
 #include <Eigen/Dense>
 
 #include <QFile>
+#include <QTextStream>
 #include <QCoreApplication>
 #include <QDebug>
 
@@ -586,22 +587,7 @@ void mne_free_cov_3(MneCovMatrix* c)
 {
     if (c == NULL)
         return;
-    FREE_3(c->cov);
-    FREE_3(c->cov_diag);
-    if(c->cov_sparse)
-        delete c->cov_sparse;
-    c->names.clear();
-    FREE_CMATRIX_3(c->eigen);
-    FREE_3(c->lambda);
-    FREE_3(c->inv_lambda);
-    FREE_3(c->chol);
-    FREE_3(c->ch_class);
-    if(c->proj)
-        delete c->proj;
-    if (c->sss)
-        delete c->sss;
-    c->bads.clear();
-    FREE_3(c);
+    delete c;
     return;
 }
 
@@ -1658,7 +1644,7 @@ out : {
 
 //============================= mne_lin_proj.c =============================
 
-void mne_proj_op_report_data_3(FILE *out,const char *tag, MneProjOp* op, int list_data,
+void mne_proj_op_report_data_3(QTextStream &out,const char *tag, MneProjOp* op, int list_data,
                              char **exclude, int nexclude)
 /*
  * Output info about the projection operator
@@ -1669,33 +1655,30 @@ void mne_proj_op_report_data_3(FILE *out,const char *tag, MneProjOp* op, int lis
     MneNamedMatrix* vecs;
     int found;
 
-    if (out == NULL)
-        return;
     if (op == NULL)
         return;
     if (op->nitems <= 0) {
-        fprintf(out,"Empty operator\n");
+        out << "Empty operator\n";
         return;
     }
 
     for (k = 0; k < op->nitems; k++) {
         it = op->items[k];
         if (list_data && tag)
-            fprintf(out,"%s\n",tag);
+            out << tag << "\n";
         if (tag)
-            fprintf(out,"%s",tag);
-        fprintf(out,"# %d : %s : %d vecs : %d chs %s %s\n",
-                k+1,it->desc.toUtf8().constData(),it->nvec,it->vecs->ncol,
-                it->has_meg ? "MEG" : "EEG",
-                it->active ? "active" : "idle");
+            out << tag;
+        out << "# " << (k+1) << " : " << it->desc << " : " << it->nvec << " vecs : " << it->vecs->ncol << " chs "
+            << (it->has_meg ? "MEG" : "EEG") << " "
+            << (it->active ? "active" : "idle") << "\n";
         if (list_data && tag)
-            fprintf(out,"%s\n",tag);
+            out << tag << "\n";
         if (list_data) {
-            vecs = op->items[k]->vecs;
+            vecs = op->items[k]->vecs.get();
 
             for (q = 0; q < vecs->ncol; q++) {
-                fprintf(out,"%-10s",vecs->collist[q].toUtf8().constData());
-                fprintf(out,q < vecs->ncol-1 ? " " : "\n");
+                out << qSetFieldWidth(10) << Qt::left << vecs->collist[q] << qSetFieldWidth(0);
+                out << (q < vecs->ncol-1 ? " " : "\n");
             }
             for (p = 0; p < vecs->nrow; p++)
                 for (q = 0; q < vecs->ncol; q++) {
@@ -1705,17 +1688,18 @@ void mne_proj_op_report_data_3(FILE *out,const char *tag, MneProjOp* op, int lis
                             break;
                         }
                     }
-                    fprintf(out,"%10.5g ",found ? 0.0 : vecs->data[p][q]);
-                    fprintf(out,q < vecs->ncol-1 ? " " : "\n");
+                    out << qSetFieldWidth(10) << qSetRealNumberPrecision(5) << Qt::forcepoint
+                        << (found ? 0.0 : vecs->data[p][q]) << qSetFieldWidth(0) << " ";
+                    out << (q < vecs->ncol-1 ? " " : "\n");
                 }
             if (list_data && tag)
-                fprintf(out,"%s\n",tag);
+                out << tag << "\n";
         }
     }
     return;
 }
 
-void mne_proj_op_report_3(FILE *out,const char *tag, MneProjOp* op)
+void mne_proj_op_report_3(QTextStream &out,const char *tag, MneProjOp* op)
 {
     mne_proj_op_report_data_3(out,tag,op, FALSE, NULL, 0);
 }
@@ -1895,8 +1879,8 @@ MneProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
         /*
         * Ready to add
         */
-        item = MneNamedMatrix::build_named_matrix(item_nvec,item_nchan,emptyList,item_names,item_vectors);
-        MneProjOp::mne_proj_op_add_item_act(op,item,item_kind,item_desc,item_active);
+        item = MneNamedMatrix::build(item_nvec,item_nchan,emptyList,item_names,item_vectors);
+        op->add_item_active(item,item_kind,item_desc,item_active);
         delete item;
         op->items[op->nitems-1]->active_file = item_active;
     }
@@ -1936,7 +1920,7 @@ int mne_proj_op_chs_3(MneProjOp* op, const QStringList& list, int nlist)
     if (op == NULL)
         return OK;
 
-    MneProjOp::mne_free_proj_op_proj(op);  /* These data are not valid any more */
+    op->free_proj();  /* These data are not valid any more */
 
     if (nlist == 0)
         return OK;
@@ -1992,7 +1976,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
     if (op->nitems <= 0)
         return OK;
 
-    nvec = MneProjOp::mne_proj_op_affect(op,op->names,op->nch);
+    nvec = op->affect(op->names,op->nch);
     if (nvec == 0)
         return OK;
 
@@ -2003,7 +1987,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
     fprintf(stdout,"mne_proj_op_make_proj_bad\n");
 #endif
     for (k = 0, nvec_meg = nvec_eeg = 0; k < op->nitems; k++) {
-        if (op->items[k]->active && MneProjItem::mne_proj_item_affect(op->items[k],op->names,op->nch)) {
+        if (op->items[k]->active && op->items[k]->affect(op->names,op->nch)) {
             vec.nvec  = op->items[k]->vecs->ncol;
             vec.names = op->items[k]->vecs->collist;
             if (op->items[k]->has_meg) {
@@ -2646,7 +2630,7 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
         /*
         * Read the optional SSS data
         */
-        if ((sss = MneSssData::read_sss_data_from_node(stream,nodes[k])) == NULL)
+        if ((sss = MneSssData::read_from_node(stream,nodes[k])) == NULL)
             goto out;
         /*
         * Read the optional bad channel list
@@ -2655,11 +2639,11 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
             goto out;
     }
     if (cov_sparse)
-        res = MneCovMatrix::mne_new_cov_sparse(kind,ncov,names,cov_sparse);
+        res = MneCovMatrix::create_sparse(kind,ncov,names,cov_sparse);
     else if (cov)
-        res = MneCovMatrix::mne_new_cov_dense(kind,ncov,names,cov);
+        res = MneCovMatrix::create_dense(kind,ncov,names,cov);
     else if (cov_diag)
-        res = MneCovMatrix::mne_new_cov_diag(kind,ncov,names,cov_diag);
+        res = MneCovMatrix::create_diag(kind,ncov,names,cov_diag);
     else {
         qCritical("mne_read_cov : covariance matrix data is not defined. How come?");
         goto out;
@@ -2683,11 +2667,11 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
     }
 
     if (op && op->nitems > 0) {
-        res->proj = op;
+        res->proj.reset(op);
         op = NULL;
     }
     if (sss && sss->ncomp > 0 && sss->job != FIFFV_SSS_JOB_NOTHING) {
-        res->sss = sss;
+        res->sss.reset(sss);
         sss = NULL;
     }
 
@@ -3170,12 +3154,12 @@ MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c,
         }
     }
 
-    res = MneCovMatrix::mne_new_cov(c->kind,ncov,names,cov,cov_diag);
+    res = MneCovMatrix::create(c->kind,ncov,names,cov,cov_diag);
 
     res->bads = c->bads;
     res->nbad = c->nbad;
-    res->proj = MneProjOp::mne_dup_proj_op(c->proj);
-    res->sss  = c->sss ? new MneSssData(*(c->sss)) : NULL;
+    res->proj.reset(c->proj ? c->proj->dup() : nullptr);
+    res->sss.reset(c->sss ? new MneSssData(*(c->sss)) : nullptr);
 
     if (c->ch_class) {
         res->ch_class = MALLOC_3(res->ncov,int);
@@ -3330,7 +3314,7 @@ int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix*& c)
 
     FREE_DCMATRIX_3(dcov);
 
-    c->nproj = MneProjOp::mne_proj_op_affect(op,c->names,c->ncov);
+    c->nproj = op->affect(c->names,c->ncov);
     return OK;
 }
 
@@ -3607,7 +3591,7 @@ MneCovMatrix* DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, floa
         }
     }
     names = ch_names;
-    return MneCovMatrix::mne_new_cov(FIFFV_MNE_NOISE_COV,nchan,names,NULL,stds);
+    return MneCovMatrix::create(FIFFV_MNE_NOISE_COV,nchan,names,NULL,stds);
 }
 
 //=============================================================================================================
@@ -3643,8 +3627,8 @@ int DipoleFitData::make_projection(const QList<QString> &projnames,
         }
         else {
             printf("Loaded projection from %s:\n",projnames[k].toUtf8().data());
-            mne_proj_op_report_3(stderr,"\t",one);
-            all = MneProjOp::mne_proj_op_combine(all,one);
+            { QTextStream errStream(stderr); mne_proj_op_report_3(errStream,"\t",one); }
+            all = all ? all->combine(one) : (new MneProjOp())->combine(one);
             if(one)
                 delete one;
             one = NULL;
@@ -3661,17 +3645,17 @@ int DipoleFitData::make_projection(const QList<QString> &projnames,
                 }
         }
         if (!found) {
-            if ((one = MneProjOp::mne_proj_op_average_eeg_ref(chs,nch)) != NULL) {
+            if ((one = MneProjOp::create_average_eeg_ref(chs,nch)) != NULL) {
                 printf("Average EEG reference projection added:\n");
-                mne_proj_op_report_3(stderr,"\t",one);
-                all = MneProjOp::mne_proj_op_combine(all,one);
+                { QTextStream errStream(stderr); mne_proj_op_report_3(errStream,"\t",one); }
+                all = all ? all->combine(one) : (new MneProjOp())->combine(one);
                 if(one)
                     delete one;
                 one = NULL;
             }
         }
     }
-    if (all && MneProjOp::mne_proj_op_affect_chs(all,chs,nch) == 0) {
+    if (all && all->affect_chs(chs,nch) == 0) {
         printf("Projection will not have any effect on selected channels. Projection omitted.\n");
         if(all)
             delete all;
@@ -3834,7 +3818,7 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
             FREE_3(w);
             return FAIL;
         }
-        f->noise = MneCovMatrix::mne_dup_cov(f->noise_orig);
+        f->noise = f->noise_orig->dup();
         if (nomit_meg+nomit_eeg > 0) {
             if (f->noise->cov) {
                 for (j = 0; j < f->noise->ncov; j++)
@@ -3855,7 +3839,7 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
     else {
         if (f->noise && f->nave == nave)
             return OK;
-        f->noise = MneCovMatrix::mne_dup_cov(f->noise_orig);
+        f->noise = f->noise_orig->dup();
     }
 
     return scale_dipole_fit_noise_cov(f,nave);
@@ -4029,7 +4013,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
     /*
        * Compensation data
        */
-    if ((comp_data = MneCTFCompDataSet::mne_read_ctf_comp_data(measname)) == NULL)
+    if ((comp_data = MneCTFCompDataSet::read(measname)) == NULL)
         goto bad;
     if (comp_data->ncomp > 0) {	/* Compensation channel information may be needed */
         QList<FiffChInfo> comp_chs;
@@ -4078,7 +4062,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
         goto bad;
     if (res->proj && res->proj->nitems > 0) {
         printf("Final projection operator is:\n");
-        mne_proj_op_report_3(stderr,"\t",res->proj);
+        { QTextStream errStream(stderr); mne_proj_op_report_3(errStream,"\t",res->proj); }
 
         if (mne_proj_op_chs_3(res->proj,res->ch_names,res->nmeg+res->neeg) == FAIL)
             goto bad;
@@ -4701,7 +4685,7 @@ bool DipoleFitData::fit_one(DipoleFitData* fit,	            /* Precomputed fitti
     nchan = fit->nmeg+fit->neeg;
     user.fwd = NULL;
 
-    if (MneProjOp::mne_proj_op_proj_vector(fit->proj,B,nchan,TRUE) == FAIL)
+    if (fit->proj && fit->proj->project_vector(B,nchan,TRUE) == FAIL)
         goto bad;
 
     if (mne_whiten_one_data(B,B,nchan,fit->noise) == FAIL)
@@ -4858,7 +4842,7 @@ int DipoleFitData::compute_dipole_field(DipoleFitData* d, float *rd, int whiten,
 #endif
 
     for (k = 0; k < 3; k++)
-        if (MneProjOp::mne_proj_op_proj_vector(d->proj,fwd[k],d->nmeg+d->neeg,TRUE) == FAIL)
+        if (d->proj && d->proj->project_vector(fwd[k],d->nmeg+d->neeg,TRUE) == FAIL)
             goto bad;
 
 #ifdef DEBUG

@@ -41,8 +41,8 @@
 #include "guess_data.h"
 #include "dipole_fit_data.h"
 #include "dipole_forward.h"
-#include <mne/c/mne_surface_old.h>
-#include <mne/c/mne_source_space_old.h>
+#include <mne/mne_surface_old.h>
+#include <mne/mne_source_space_old.h>
 
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
@@ -195,7 +195,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         /*
             * Read the guesses and transform to the appropriate coordinate frame
             */
-        if (MneSurfaceOrVolume::mne_read_source_spaces(guessname,&sp,&nsp) == FAIL)
+        if (MneSurfaceOrVolume::read_source_spaces(guessname,&sp,&nsp) == FAIL)
             goto bad;
         if (nsp != 1) {
             printf("Incorrect number of source spaces in guess file");
@@ -231,7 +231,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         if (free_inner_skull)
             delete inner_skull;
     }
-    if (MneSurfaceOrVolume::mne_transform_source_spaces_to(f->coord_frame,*f->mri_head_t,&guesses,1) != OK)
+    if (MneSurfaceOrVolume::transform_source_spaces_to(f->coord_frame,*f->mri_head_t,&guesses,1) != OK)
         goto bad;
     printf("Guess locations are now in %s coordinates.\n",FiffCoordTrans::frame_name(f->coord_frame).toUtf8().constData());
 
@@ -295,7 +295,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         /*
          * Read the guesses and transform to the appropriate coordinate frame
          */
-        if (MneSurfaceOrVolume::mne_read_source_spaces(guessname,&sp,&nsp) == FIFF_FAIL)
+        if (MneSurfaceOrVolume::read_source_spaces(guessname,&sp,&nsp) == FIFF_FAIL)
             goto bad;
         if (nsp != 1) {
             qCritical("Incorrect number of source spaces in guess file");
@@ -347,7 +347,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
     /*
      * Transform the guess locations to the appropriate coordinate frame
      */
-    if (MneSurfaceOrVolume::mne_transform_source_spaces_to(f->coord_frame,*f->mri_head_t,&guesses,1) != OK)
+    if (MneSurfaceOrVolume::transform_source_spaces_to(f->coord_frame,*f->mri_head_t,&guesses,1) != OK)
         goto bad;
     printf("Guess locations are now in %s coordinates.\n",FiffCoordTrans::frame_name(f->coord_frame).toUtf8().constData());
 

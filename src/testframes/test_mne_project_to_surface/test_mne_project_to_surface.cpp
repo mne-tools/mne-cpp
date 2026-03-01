@@ -113,7 +113,7 @@ void TestMNEProjectToSurface::initTestCase()
     MatrixXf matPointsShifted = bemSurface->rr.cast<float>() * 1.1;     // Move all points with same amout from surface
     int iNP = matPointsShifted.rows();
 
-    mneSurfacePoints->mne_find_closest_on_surface(matPointsShifted, iNP, matResult, vecNearest, vecDist);
+    mneSurfacePoints->find_closest_on_surface(matPointsShifted, iNP, matResult, vecNearest, vecDist);
 
     // read reference
     UTILSLIB::IOUtils::read_eigen_matrix(matRef,sRef);

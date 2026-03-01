@@ -1,0 +1,43 @@
+#ifndef MNE_SPARSE_NAMED_MATRIX_H
+#define MNE_SPARSE_NAMED_MATRIX_H
+
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "mne_global.h"
+
+#include <fiff/fiff_sparse_matrix.h>
+
+#include <QStringList>
+
+//=============================================================================================================
+// DEFINE NAMESPACE MNELIB
+//=============================================================================================================
+
+namespace MNELIB
+{
+
+/**
+ * Sparse named matrix - matrix specification with row/column name lists.
+ */
+class MNESHARED_EXPORT MneSparseNamedMatrix
+{
+public:
+    MneSparseNamedMatrix() = default;
+    ~MneSparseNamedMatrix() = default;
+
+    int   nrow = 0;                        /**< Number of rows (same as in data). */
+    int   ncol = 0;                        /**< Number of columns (same as in data). */
+    QStringList rowlist;                   /**< Name list for the rows. */
+    QStringList collist;                   /**< Name list for the columns. */
+    FIFFLIB::FiffSparseMatrix* data = nullptr; /**< The data itself (sparse). */
+};
+
+/** Backward-compatible typedef aliases. */
+typedef MneSparseNamedMatrix  mneSparseNamedMatrixRec;
+typedef MneSparseNamedMatrix* mneSparseNamedMatrix;
+
+} // namespace MNELIB
+
+#endif // MNE_SPARSE_NAMED_MATRIX_H

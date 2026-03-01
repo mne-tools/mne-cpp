@@ -19,8 +19,8 @@
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_digitizer_data.h>
 
-#include <mne/c/mne_msh_display_surface_set.h>
-#include <mne/c/mne_surface_or_volume.h>
+#include <mne/mne_msh_display_surface_set.h>
+#include <mne/mne_surface_or_volume.h>
 //////////////////////
 
 //=============================================================================================================

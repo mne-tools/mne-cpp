@@ -47,7 +47,7 @@
 #include "dipole_fit_data.h"
 #include "../c/mne_meas_data.h"
 
-#include <mne/c/mne_types.h>
+#include <mne/mne_types.h>
 
 //=============================================================================================================
 // QT INCLUDES
