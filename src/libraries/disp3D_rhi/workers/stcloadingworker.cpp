@@ -117,18 +117,14 @@ void StcLoadingWorker::process()
         emit progress(10, "Computing LH interpolation matrix...");
         
         Eigen::MatrixX3f matVertices = m_lhSurface->verticesAsMatrix();
-        QVector<QVector<int>> vecNeighbors = m_lhSurface->computeNeighbors();
+        std::vector<Eigen::VectorXi> vecNeighbors = m_lhSurface->computeNeighbors();
 
-        QVector<int> vecSourceVertices;
-        vecSourceVertices.reserve(m_stcLh.vertices.size());
-        for (int i = 0; i < m_stcLh.vertices.size(); ++i) {
-            vecSourceVertices.append(m_stcLh.vertices(i));
-        }
+        Eigen::VectorXi vecSourceVertices = m_stcLh.vertices;
 
         qDebug() << "StcLoadingWorker: LH surface has" << matVertices.rows() << "vertices,"
                  << vecSourceVertices.size() << "sources";
 
-        if (!vecSourceVertices.isEmpty()) {
+        if (vecSourceVertices.size() > 0) {
             // Compute distance table (SCDC - geodesic distance)
             emit progress(15, "Computing LH geodesic distances (SCDC)...");
             QSharedPointer<Eigen::MatrixXd> distTable = DISP3DRHILIB::GeometryInfo::scdc(
@@ -160,18 +156,14 @@ void StcLoadingWorker::process()
         emit progress(50, "Computing RH interpolation matrix...");
 
         Eigen::MatrixX3f matVertices = m_rhSurface->verticesAsMatrix();
-        QVector<QVector<int>> vecNeighbors = m_rhSurface->computeNeighbors();
+        std::vector<Eigen::VectorXi> vecNeighbors = m_rhSurface->computeNeighbors();
 
-        QVector<int> vecSourceVertices;
-        vecSourceVertices.reserve(m_stcRh.vertices.size());
-        for (int i = 0; i < m_stcRh.vertices.size(); ++i) {
-            vecSourceVertices.append(m_stcRh.vertices(i));
-        }
+        Eigen::VectorXi vecSourceVertices = m_stcRh.vertices;
 
         qDebug() << "StcLoadingWorker: RH surface has" << matVertices.rows() << "vertices,"
                  << vecSourceVertices.size() << "sources";
 
-        if (!vecSourceVertices.isEmpty()) {
+        if (vecSourceVertices.size() > 0) {
             // Compute distance table (SCDC - geodesic distance)
             emit progress(55, "Computing RH geodesic distances (SCDC)...");
             QSharedPointer<Eigen::MatrixXd> distTable = DISP3DRHILIB::GeometryInfo::scdc(

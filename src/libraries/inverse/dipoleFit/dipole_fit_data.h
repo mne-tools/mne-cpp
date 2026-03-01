@@ -78,11 +78,6 @@ namespace FIFFLIB { class FiffCoordTrans; }
 namespace INVERSELIB
 {
 
-/*
- * These are the type definitions for dipole fitting
- */
-typedef void (*fitUserFreeFunc)(void *);
-
 // (Replaces *dipoleFitFuncs,dipoleFitFuncsRec struct of MNE-C fit_types.h).
 
 /**
@@ -99,6 +94,17 @@ typedef struct {
   void            *eeg_client;	    /* Client data for EEG field computations */
   MNELIB::mneUserFreeFunc eeg_client_free;
 } *dipoleFitFuncs,dipoleFitFuncsRec;
+
+/**
+ * @brief Workspace for the dipole fitting objective function, holding forward model, measured field, and fit limits.
+ */
+struct FitDipUserRec {
+    float          limit;
+    int            report_dim;
+    float          *B;
+    double         B2;
+    DipoleForward*  fwd;
+};
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -205,14 +211,14 @@ public:
       int               nmeg;               /**< How many MEG. */
       int               neeg;               /**< How many EEG. */
       QStringList       ch_names;           /**< List of all channel names. */
-      FIFFLIB::FiffSparseMatrix* pick;   /**< Matrix to pick data from the full data set which may contain channels we are not interested in. */
-      FWDLIB::FwdCoilSet*        meg_coils;         /**< MEG coil definitions. */
-      FWDLIB::FwdCoilSet*        eeg_els;           /**< EEG electrode definitions. */
+      std::unique_ptr<FIFFLIB::FiffSparseMatrix> pick;   /**< Matrix to pick data from the full data set which may contain channels we are not interested in (currently unused). */
+      std::unique_ptr<FWDLIB::FwdCoilSet>        meg_coils;         /**< MEG coil definitions. */
+      std::unique_ptr<FWDLIB::FwdCoilSet>        eeg_els;           /**< EEG electrode definitions. */
       float             r0[3];              /**< Sphere model origin. */
       QString           bemname;           /**< Using a BEM?. */
 
-      FWDLIB::FwdEegSphereModel *eeg_model;         /**< EEG sphere model definition. */
-      FWDLIB::FwdBemModel       *bem_model;         /**< BEM model definition. */
+      std::unique_ptr<FWDLIB::FwdEegSphereModel> eeg_model;         /**< EEG sphere model definition. */
+      std::unique_ptr<FWDLIB::FwdBemModel>       bem_model;         /**< BEM model definition. */
 
       dipoleFitFuncs    sphere_funcs;       /**< These are the sphere model forward functions. */
       dipoleFitFuncs    bem_funcs;          /**< These are the BEM forward functions. */
@@ -220,51 +226,13 @@ public:
       dipoleFitFuncs    mag_dipole_funcs;   /**< Functions to fit a magnetic dipole. */
 
       int               fixed_noise;        /**< Were fixed noise values used rather than a noise-covariance matrix read from a file. */
-      MNELIB::MneCovMatrix*      noise_orig;         /**< Noise covariance matrix (original). */
-      MNELIB::MneCovMatrix*      noise;              /**< Noise covariance matrix (weighted to take the selection into account). */
+      std::unique_ptr<MNELIB::MneCovMatrix>      noise_orig;         /**< Noise covariance matrix (original, currently unused). */
+      std::unique_ptr<MNELIB::MneCovMatrix>      noise;              /**< Noise covariance matrix (weighted to take the selection into account). */
       int               nave;               /**< How many averages does this correspond to?. */
-      MNELIB::MneProjOp*        proj;               /**< The projection operator to use. */
+      std::unique_ptr<MNELIB::MneProjOp>        proj;               /**< The projection operator to use. */
       int               column_norm;        /**< What kind of column normalization to apply to the forward solution. */
       int               fit_mag_dipoles;    /**< Fit magnetic dipoles?. */
-      void              *user;              /**< User data for anything we need. */
-      fitUserFreeFunc   user_free;          /**< Function to free the above. */
-
-// ### OLD STRUCT ###
-//    typedef struct {		      /* This structure holds all fitting-related data */
-//      fiffCoordTrans    mri_head_t;	      /* MRI <-> head coordinate transformation */
-//      fiffCoordTrans    meg_head_t;	      /* MEG <-> head coordinate transformation */
-//      int               coord_frame;      /* Common coordinate frame */
-//      fiffChInfo        chs;              /* Channels */
-//      int               nmeg;	      /* How many MEG */
-//      int               neeg;	      /* How many EEG */
-//      char              **ch_names;	      /* List of all channel names */
-//      mneSparseMatrix   pick;	      /* Matrix to pick data from the
-//                         full data set which may contain channels
-//                         we are not interested in */
-//      fwdCoilSet        meg_coils;	      /* MEG coil definitions */
-//      fwdCoilSet        eeg_els;	      /* EEG electrode definitions */
-//      float             r0[3];	      /* Sphere model origin */
-//      char              *bemname;	      /* Using a BEM? */
-
-//      FwdEegSphereModel *eeg_model;	      /* EEG sphere model definition */
-//      fwdBemModel       bem_model;	      /* BEM model definition */
-
-//      dipoleFitFuncs    sphere_funcs;     /* These are the sphere model forward functions */
-//      dipoleFitFuncs    bem_funcs;	      /* These are the BEM forward functions */
-//      dipoleFitFuncs    funcs;	      /* Points to one of the two above */
-//      dipoleFitFuncs    mag_dipole_funcs; /* Functions to fit a magnetic dipole */
-
-//      int               fixed_noise;      /* Were fixed noise values used rather than a noise-covariance
-//                           * matrix read from a file */
-//      MneCovMatrix*      noise_orig;	      /* Noise covariance matrix (original) */
-//      MneCovMatrix*      noise;	      /* Noise covariance matrix (weighted to take the selection into account) */
-//      int               nave;	      /* How many averages does this correspond to? */
-//      mneProjOp         proj;	      /* The projection operator to use */
-//      int               column_norm;      /* What kind of column normalization to apply to the forward solution */
-//      int               fit_mag_dipoles;  /* Fit magnetic dipoles? */
-//      void              *user;	      /* User data for anything we need */
-//      fitUserFreeFunc   user_free;	      /* Function to free the above */
-//    } *dipoleFitData,dipoleFitDataRec;
+      FitDipUserRec     *user;              /**< Non-owning pointer to dipole fit workspace (set during fit_one). */
 };
 
 //=============================================================================================================

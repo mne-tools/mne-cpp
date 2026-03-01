@@ -46,6 +46,7 @@
 #include <QVector>
 #include <QList>
 #include <QString>
+#include <vector>
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 
@@ -263,8 +264,8 @@ public:
      * @param[in] vecSourceVertices     Source vertex indices into the surface.
      */
     void setInterpolationInfoLeft(const Eigen::MatrixX3f &matVertices,
-                                  const QVector<QVector<int>> &vecNeighborVertices,
-                                  const QVector<int> &vecSourceVertices);
+                                  const std::vector<Eigen::VectorXi> &vecNeighborVertices,
+                                  const Eigen::VectorXi &vecSourceVertices);
 
     //=========================================================================================================
     /**
@@ -276,8 +277,8 @@ public:
      * @param[in] vecSourceVertices     Source vertex indices into the surface.
      */
     void setInterpolationInfoRight(const Eigen::MatrixX3f &matVertices,
-                                   const QVector<QVector<int>> &vecNeighborVertices,
-                                   const QVector<int> &vecSourceVertices);
+                                   const std::vector<Eigen::VectorXi> &vecNeighborVertices,
+                                   const Eigen::VectorXi &vecSourceVertices);
 
     //=========================================================================================================
     /**

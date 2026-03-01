@@ -58,6 +58,7 @@
 //=============================================================================================================
 
 #include <QList>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -166,8 +167,8 @@ public:
     Eigen::MatrixX3d tri_cent;         /**< Triangle centers. */
     Eigen::MatrixX3d tri_nn;           /**< Triangle normals. */
     Eigen::VectorXd tri_area;          /**< Triangle areas. */
-    QVector<QVector<int> > neighbor_tri;           /**< Vector of neighboring triangles for each vertex. */
-    QVector<QVector<int> > neighbor_vert;          /**< Vector of neighboring vertices for each vertex. */
+    std::vector<Eigen::VectorXi> neighbor_tri;     /**< Vector of neighboring triangles for each vertex. */
+    std::vector<Eigen::VectorXi> neighbor_vert;    /**< Vector of neighboring vertices for each vertex. */
 };
 
 //=============================================================================================================

@@ -59,6 +59,7 @@
 //=============================================================================================================
 
 #include <QList>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -203,8 +204,8 @@ public:
     Eigen::MatrixX3d use_tri_nn;        /**< Triangle normals of used triangles. */
     Eigen::VectorXd use_tri_area;       /**< Triangle areas of used triangles. */
 
-    QVector<QVector<int> > neighbor_tri;           /**< Vector of neighboring triangles for each vertex. */
-    QVector<QVector<int> > neighbor_vert;          /**< Vector of neighboring vertices for each vertex. */
+    std::vector<Eigen::VectorXi> neighbor_tri;     /**< Vector of neighboring triangles for each vertex. */
+    std::vector<Eigen::VectorXi> neighbor_vert;    /**< Vector of neighboring vertices for each vertex. */
 
     MNEClusterInfo cluster_info; /**< Holds the cluster information. */
 private:
@@ -259,8 +260,22 @@ inline bool operator== (const MNEHemisphere &a, const MNEHemisphere &b)
             a.use_tri_cent.isApprox(b.use_tri_cent, 0.0001) &&
             a.use_tri_nn.isApprox(b.use_tri_nn, 0.0001) &&
             a.use_tri_area.isApprox(b.use_tri_area, 0.0001) &&
-            a.neighbor_tri == b.neighbor_tri &&
-            a.neighbor_vert == b.neighbor_vert &&
+            [&a, &b]() {
+                if (a.neighbor_tri.size() != b.neighbor_tri.size()) return false;
+                for (size_t i = 0; i < a.neighbor_tri.size(); ++i) {
+                    if (a.neighbor_tri[i].size() != b.neighbor_tri[i].size()) return false;
+                    if (a.neighbor_tri[i].size() > 0 && !(a.neighbor_tri[i].array() == b.neighbor_tri[i].array()).all()) return false;
+                }
+                return true;
+            }() &&
+            [&a, &b]() {
+                if (a.neighbor_vert.size() != b.neighbor_vert.size()) return false;
+                for (size_t i = 0; i < a.neighbor_vert.size(); ++i) {
+                    if (a.neighbor_vert[i].size() != b.neighbor_vert[i].size()) return false;
+                    if (a.neighbor_vert[i].size() > 0 && !(a.neighbor_vert[i].array() == b.neighbor_vert[i].array()).all()) return false;
+                }
+                return true;
+            }() &&
             a.cluster_info == b.cluster_info &&
             a.m_TriCoords.isApprox(b.m_TriCoords, 0.0001f));
 }

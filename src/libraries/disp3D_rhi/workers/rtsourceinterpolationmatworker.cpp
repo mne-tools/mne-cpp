@@ -75,28 +75,28 @@ void RtSourceInterpolationMatWorker::setCancelDistance(double dCancelDist)
 
 void RtSourceInterpolationMatWorker::setInterpolationInfoLeft(
     const Eigen::MatrixX3f &matVertices,
-    const QVector<QVector<int>> &vecNeighborVertices,
-    const QVector<int> &vecSourceVertices)
+    const std::vector<Eigen::VectorXi> &vecNeighborVertices,
+    const Eigen::VectorXi &vecSourceVertices)
 {
     QMutexLocker locker(&m_mutex);
     m_matVerticesLh = matVertices;
     m_vecNeighborsLh = vecNeighborVertices;
     m_vecSourceVerticesLh = vecSourceVertices;
-    m_hasLh = (!matVertices.isZero(0) && matVertices.rows() > 0 && !vecSourceVertices.isEmpty());
+    m_hasLh = (!matVertices.isZero(0) && matVertices.rows() > 0 && vecSourceVertices.size() > 0);
 }
 
 //=============================================================================================================
 
 void RtSourceInterpolationMatWorker::setInterpolationInfoRight(
     const Eigen::MatrixX3f &matVertices,
-    const QVector<QVector<int>> &vecNeighborVertices,
-    const QVector<int> &vecSourceVertices)
+    const std::vector<Eigen::VectorXi> &vecNeighborVertices,
+    const Eigen::VectorXi &vecSourceVertices)
 {
     QMutexLocker locker(&m_mutex);
     m_matVerticesRh = matVertices;
     m_vecNeighborsRh = vecNeighborVertices;
     m_vecSourceVerticesRh = vecSourceVertices;
-    m_hasRh = (!matVertices.isZero(0) && matVertices.rows() > 0 && !vecSourceVertices.isEmpty());
+    m_hasRh = (!matVertices.isZero(0) && matVertices.rows() > 0 && vecSourceVertices.size() > 0);
 }
 
 //=============================================================================================================
@@ -172,12 +172,12 @@ double (*RtSourceInterpolationMatWorker::resolveInterpolationFunction(const QStr
 
 QSharedPointer<Eigen::SparseMatrix<float>> RtSourceInterpolationMatWorker::computeHemi(
     const Eigen::MatrixX3f &matVertices,
-    const QVector<QVector<int>> &vecNeighborVertices,
-    QVector<int> vecSourceVertices,
+    const std::vector<Eigen::VectorXi> &vecNeighborVertices,
+    Eigen::VectorXi vecSourceVertices,
     double dCancelDist,
     double (*interpFunc)(double))
 {
-    if (matVertices.rows() == 0 || vecSourceVertices.isEmpty()) {
+    if (matVertices.rows() == 0 || vecSourceVertices.size() == 0) {
         return QSharedPointer<Eigen::SparseMatrix<float>>();
     }
 
@@ -211,8 +211,8 @@ void RtSourceInterpolationMatWorker::computeInterpolationMatrix()
 {
     // ── Snapshot parameters under lock ─────────────────────────────────
     Eigen::MatrixX3f vertsLh, vertsRh;
-    QVector<QVector<int>> neighborsLh, neighborsRh;
-    QVector<int> srcVertsLh, srcVertsRh;
+    std::vector<Eigen::VectorXi> neighborsLh, neighborsRh;
+    Eigen::VectorXi srcVertsLh, srcVertsRh;
     bool hasLh, hasRh;
     double cancelDist;
     QString interpFuncName;

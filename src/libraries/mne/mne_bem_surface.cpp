@@ -181,40 +181,49 @@ bool MNEBemSurface::add_geometry_info()
     int k,c,p,q;
     bool found;
 
-    //Create neighboring triangle vector
-    neighbor_tri = QVector<QVector<int> >(this->tris.rows());
-
-    //Create neighbor_tri information
-    for (p = 0; p < this->tris.rows(); p++) {
-        for (k = 0; k < 3; k++) {
-            this->neighbor_tri[this->tris(p,k)].append(p);
+    //Create neighboring triangle vector using temporary std::vector for efficient appending
+    {
+        std::vector<std::vector<int>> temp_ntri(this->tris.rows());
+        for (p = 0; p < this->tris.rows(); p++) {
+            for (k = 0; k < 3; k++) {
+                temp_ntri[this->tris(p,k)].push_back(p);
+            }
+        }
+        neighbor_tri.resize(this->tris.rows());
+        for (k = 0; k < static_cast<int>(temp_ntri.size()); k++) {
+            neighbor_tri[k] = Eigen::Map<Eigen::VectorXi>(temp_ntri[k].data(), temp_ntri[k].size());
         }
     }
 
-    //Create the neighboring vertices vector
-    neighbor_vert = QVector<QVector<int> >(this->np);
+    //Create the neighboring vertices vector using temporary std::vector
+    {
+        std::vector<std::vector<int>> temp_nvert(this->np);
+        for (k = 0; k < this->np; k++) {
+            for (p = 0; p < neighbor_tri[k].size(); p++) {
+                //Fit in the other vertices of the neighboring triangle
+                for (c = 0; c < 3; c++) {
+                    int vert = this->tris(neighbor_tri[k][p], c);
 
-    for (k = 0; k < this->np; k++) {
-        for (p = 0; p < this->neighbor_tri[k].size(); p++) {
-            //Fit in the other vertices of the neighboring triangle
-            for (c = 0; c < 3; c++) {
-                int vert = this->tris(this->neighbor_tri[k][p], c);
+                    if (vert != k) {
+                        found = false;
 
-                if (vert != k) {
-                    found = false;
-
-                    for (q = 0; q < this->neighbor_vert[k].size(); q++) {
-                        if (this->neighbor_vert[k][q] == vert) {
-                            found = true;
-                            break;
+                        for (q = 0; q < static_cast<int>(temp_nvert[k].size()); q++) {
+                            if (temp_nvert[k][q] == vert) {
+                                found = true;
+                                break;
+                            }
                         }
-                    }
 
-                    if(!found) {
-                        this->neighbor_vert[k].append(vert);
+                        if(!found) {
+                            temp_nvert[k].push_back(vert);
+                        }
                     }
                 }
             }
+        }
+        neighbor_vert.resize(this->np);
+        for (k = 0; k < this->np; k++) {
+            neighbor_vert[k] = Eigen::Map<Eigen::VectorXi>(temp_nvert[k].data(), temp_nvert[k].size());
         }
     }
 

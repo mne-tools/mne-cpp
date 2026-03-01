@@ -83,12 +83,11 @@ void MnePatchInfo::calculate_area(MneSourceSpaceOld* s)
 {
     int k,q;
     int nneigh;
-    int *neigh;
 
     area = 0.0;
     for (k = 0; k < nmemb; k++) {
         nneigh = s->nneighbor_tri[memb_vert[k]];
-        neigh  = s->neighbor_tri[memb_vert[k]];
+        const Eigen::VectorXi& neigh = s->neighbor_tri[memb_vert[k]];
         for (q = 0; q < nneigh; q++)
             area += s->tris[neigh[q]].area/3.0;
     }
@@ -106,9 +105,9 @@ void MnePatchInfo::calculate_normal_stats(MneSourceSpaceOld *s)
     ave_nn[Z_43] = 0.0;
 
     for (k = 0; k < nmemb; k++) {
-        ave_nn[X_43] += s->nn[memb_vert[k]][X_43];
-        ave_nn[Y_43] += s->nn[memb_vert[k]][Y_43];
-        ave_nn[Z_43] += s->nn[memb_vert[k]][Z_43];
+        ave_nn[X_43] += s->nn(memb_vert[k],X_43);
+        ave_nn[Y_43] += s->nn(memb_vert[k],Y_43);
+        ave_nn[Z_43] += s->nn(memb_vert[k],Z_43);
     }
     size = sqrt(VEC_DOT_43(ave_nn,ave_nn));
     ave_nn[X_43] = ave_nn[X_43]/size;
@@ -117,7 +116,7 @@ void MnePatchInfo::calculate_normal_stats(MneSourceSpaceOld *s)
 
     dev_nn = 0.0;
     for (k = 0; k < nmemb; k++) {
-        cos_theta = VEC_DOT_43(s->nn[memb_vert[k]],ave_nn);
+        cos_theta = VEC_DOT_43(&s->nn(memb_vert[k],0),ave_nn);
         if (cos_theta < -1.0)
             cos_theta = -1.0;
         else if (cos_theta > 1.0)

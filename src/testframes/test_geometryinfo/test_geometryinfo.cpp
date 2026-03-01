@@ -93,7 +93,7 @@ private:
     MNEBemSurface realSurface;
     // random data (keep computation times short)
     MNEBemSurface smallSurface;
-    QVector<int> vSmallSubset;
+    Eigen::VectorXi vSmallSubset;
 };
 
 //=============================================================================================================
@@ -124,19 +124,20 @@ void TestGeometryInfo::initTestCase() {
 
     // generate random adjacency, assume that every vertex has 4 neighbors
     for (int i = 0; i < 100; ++i) {
-        QVector<int> vNeighborList;
+        Eigen::VectorXi vNeighborList(4);
         for (int a = 0; a < 4; ++a) {
             // this allows duplicates, probably is not a problem
-            vNeighborList.push_back(rand() % 100);
+            vNeighborList[a] = rand() % 100;
         }
         smallSurface.neighbor_vert.push_back(vNeighborList);
     }
 
     //generate random subset of test mesh of size SubsetSize
     int iSubsetSize = rand() % 100;
+    vSmallSubset.resize(iSubsetSize + 1);
     for (int b = 0; b <= iSubsetSize; b++) {
         // this allows duplicates, probably is not a problem
-        vSmallSubset.push_back(rand() % 100);
+        vSmallSubset[b] = rand() % 100;
     }
 }
 
@@ -152,21 +153,28 @@ void TestGeometryInfo::testBadChannelFiltering() {
     {
         return;
     }
-    QVector<Vector3f> vMegSensors;
-    for( const FiffChInfo &info : evoked.info.chs) {
-        if(info.kind == FIFFV_MEG_CH) {
-            vMegSensors.push_back(info.chpos.r0);
+    // Build sensor position matrix
+    int nMegSensors = 0;
+    for (const FiffChInfo &info : evoked.info.chs) {
+        if (info.kind == FIFFV_MEG_CH) ++nMegSensors;
+    }
+    MatrixX3f matMegSensors(nMegSensors, 3);
+    int sIdx = 0;
+    for (const FiffChInfo &info : evoked.info.chs) {
+        if (info.kind == FIFFV_MEG_CH) {
+            matMegSensors.row(sIdx++) = info.chpos.r0.transpose();
         }
     }
 
     // projecting with MEG:
-    QVector<int> mappedSubSet = GeometryInfo::projectSensors(realSurface.rr, vMegSensors);
+    VectorXi mappedSubSet = GeometryInfo::projectSensors(realSurface.rr, matMegSensors);
     // SCDC with cancel distance 0.03:
     QSharedPointer<MatrixXd> pDistanceMatrix = GeometryInfo::scdc(realSurface.rr, realSurface.neighbor_vert, mappedSubSet, 0.03);
     // filter for bad MEG channels:
-    QVector<int> vErasedColums = GeometryInfo::filterBadChannels(pDistanceMatrix, evoked.info, FIFFV_MEG_CH);
+    VectorXi vErasedColums = GeometryInfo::filterBadChannels(pDistanceMatrix, evoked.info, FIFFV_MEG_CH);
 
-    for (qint32 col : vErasedColums) {
+    for (Eigen::Index c = 0; c < vErasedColums.size(); ++c) {
+        qint32 col = vErasedColums[c];
         qint64 iNotInfCount = 0;
         for (qint32 row = 0; row < pDistanceMatrix->rows(); ++row) {
             if (pDistanceMatrix->coeff(row, col) != FLOAT_INFINITY) {
@@ -181,15 +189,15 @@ void TestGeometryInfo::testBadChannelFiltering() {
 
 void TestGeometryInfo::testEmptyInputsForProjecting() {
     // sensor projecting:
-    QVector<Vector3f> vEmptySensors;
-    QVector<int> vEmptyMapping = GeometryInfo::projectSensors(realSurface.rr, vEmptySensors);
+    MatrixX3f matEmptySensors(0, 3);
+    VectorXi vEmptyMapping = GeometryInfo::projectSensors(realSurface.rr, matEmptySensors);
     QVERIFY(vEmptyMapping.size() == 0);
 }
 
 //=============================================================================================================
 
 void TestGeometryInfo::testEmptyInputsForSCDC() {
-    QVector<int> vVertSubset;
+    VectorXi vVertSubset;
     QSharedPointer<MatrixXd> pDistTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, vVertSubset);
     QVERIFY(pDistTable->rows() == pDistTable->cols());
 }

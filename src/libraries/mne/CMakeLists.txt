@@ -21,7 +21,6 @@ set(SOURCES
     mne_epoch_data.cpp
     mne_epoch_data_list.cpp
     mne_cluster_info.cpp
-    mne_surface.cpp
     mne_corsourceestimate.cpp
     mne_bem.cpp
     mne_bem_surface.cpp
@@ -73,7 +72,6 @@ set(HEADERS
     mne_epoch_data.h
     mne_epoch_data_list.h
     mne_cluster_info.h
-    mne_surface.h
     mne_corsourceestimate.h
     mne_bem.h
     mne_bem_surface.h

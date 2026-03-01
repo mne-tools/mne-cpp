@@ -125,21 +125,21 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    // positions of EEG and MEG sensors
-    QVector<Vector3f> eegSensors;
-    QVector<Vector3f> megSensors;
-    //fill both QVectors with the right sensor positions
-    for( const FiffChInfo &info : evoked.info.chs)
-    {
-        //EEG
-        if(info.kind == FIFFV_EEG_CH && info.unit == FIFF_UNIT_V)
-        {
-            eegSensors.push_back(info.chpos.r0);
+    // Build sensor position matrices
+    int nEeg = 0, nMeg = 0;
+    for (const FiffChInfo &info : evoked.info.chs) {
+        if (info.kind == FIFFV_EEG_CH && info.unit == FIFF_UNIT_V) ++nEeg;
+        if (info.kind == FIFFV_MEG_CH && info.unit == FIFF_UNIT_T) ++nMeg;
+    }
+    MatrixX3f eegSensors(nEeg, 3);
+    MatrixX3f megSensors(nMeg, 3);
+    int iEeg = 0, iMeg = 0;
+    for (const FiffChInfo &info : evoked.info.chs) {
+        if (info.kind == FIFFV_EEG_CH && info.unit == FIFF_UNIT_V) {
+            eegSensors.row(iEeg++) = info.chpos.r0.transpose();
         }
-        //MEG
-        if(info.kind == FIFFV_MEG_CH && info.unit == FIFF_UNIT_T)
-        {
-            megSensors.push_back(info.chpos.r0);
+        if (info.kind == FIFFV_MEG_CH && info.unit == FIFF_UNIT_T) {
+            megSensors.row(iMeg++) = info.chpos.r0.transpose();
         }
     }
 
@@ -149,7 +149,7 @@ int main(int argc, char *argv[])
 
     //projecting with MEG
     qint64 startTimeProjecting = QDateTime::currentMSecsSinceEpoch();
-    QVector<int> mappedSubSet = GeometryInfo::projectSensors(t_sensorSurfaceVV[0].rr, megSensors);
+    VectorXi mappedSubSet = GeometryInfo::projectSensors(t_sensorSurfaceVV[0].rr, megSensors);
     std::cout <<  "Projecting duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeProjecting <<" ms " << std::endl;
 
     //SCDC with cancel distance 0.03
@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
     std::cout << "Weight matrix duration: " << QDateTime::currentMSecsSinceEpoch() - startTimeWMat<< " ms " << std::endl;
 
     //realtime interpolation (1 iteration)
-    VectorXd signal = VectorXd::Random(megSensors.size());
+    VectorXd signal = VectorXd::Random(megSensors.rows());
     qint64 startTimeRTI = QDateTime::currentMSecsSinceEpoch();
     Interpolation::interpolateSignal(*interpolationMatrix, signal.cast<float>());
     std::cout << "Real time interpol. : " << QDateTime::currentMSecsSinceEpoch() - startTimeRTI << " ms " << std::endl;

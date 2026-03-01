@@ -79,7 +79,7 @@ MneProjData::MneProjData(MNELIB::MneSurfaceOld* s)
     c   = MALLOC_46(s->ntri,float);
     act = MALLOC_46(s->ntri,int);
 
-    for (k = 0, tri = s->tris; k < s->ntri; k++, tri++) {
+    for (k = 0, tri = s->tris.data(); k < s->ntri; k++, tri++) {
       a[k] =  VEC_DOT_46(tri->r12,tri->r12);
       b[k] =  VEC_DOT_46(tri->r13,tri->r13);
       c[k] =  VEC_DOT_46(tri->r12,tri->r13);

@@ -90,11 +90,11 @@ private slots:
 private:
     // real data
     MNEBemSurface realSurface;
-    QVector<Vector3f> vMegSensors;
+    MatrixX3f matMegSensors;
     FiffEvoked evoked;
     // random data (keep computation times short)
     MNEBemSurface smallSurface;
-    QVector<int> vSmallSubset;
+    VectorXi vSmallSubset;
 };
 
 //=============================================================================================================
@@ -119,9 +119,16 @@ void TestInterpolation::initTestCase()
     if(evoked.isEmpty()) {
         return;
     }
-    for( const FiffChInfo &info : evoked.info.chs) {
-        if(info.kind == FIFFV_MEG_CH && info.unit == FIFF_UNIT_T) {
-            vMegSensors.push_back(info.chpos.r0);
+    // Build sensor position matrix
+    int nMegSensors = 0;
+    for (const FiffChInfo &info : evoked.info.chs) {
+        if (info.kind == FIFFV_MEG_CH && info.unit == FIFF_UNIT_T) ++nMegSensors;
+    }
+    matMegSensors.resize(nMegSensors, 3);
+    int sIdx = 0;
+    for (const FiffChInfo &info : evoked.info.chs) {
+        if (info.kind == FIFFV_MEG_CH && info.unit == FIFF_UNIT_T) {
+            matMegSensors.row(sIdx++) = info.chpos.r0.transpose();
         }
     }
 
@@ -140,19 +147,20 @@ void TestInterpolation::initTestCase()
 
     // generate random adjacency, assume that every vertex has 4 neighbors
     for (int i = 0; i < 100; ++i) {
-        QVector<int> vNeighborList;
+        Eigen::VectorXi vNeighborList(4);
         for (int a = 0; a < 4; ++a) {
             // this allows duplicates, probably is not a problem
-            vNeighborList.push_back(rand() % 100);
+            vNeighborList[a] = rand() % 100;
         }
         smallSurface.neighbor_vert.push_back(vNeighborList);
     }
 
     // generate random subset of test mesh of size iSubsetSize
     int iSubsetSize = rand() % 100;
+    vSmallSubset.resize(iSubsetSize + 1);
     for (int b = 0; b <= iSubsetSize; b++) {
         // this allows duplicates, probably is not a problem
-        vSmallSubset.push_back(rand() % 100);
+        vSmallSubset[b] = rand() % 100;
     }
 }
 
@@ -186,8 +194,8 @@ void TestInterpolation::testDimensionsForInterpolation()
 void TestInterpolation::testSumOfRow()
 {
     // projecting with MEG:
-    QVector<int> vMappedSubSet = GeometryInfo::projectSensors(realSurface.rr,
-                                                                vMegSensors);
+    VectorXi vMappedSubSet = GeometryInfo::projectSensors(realSurface.rr,
+                                                                matMegSensors);
 
     // SCDC with cancel distance 0.20 m:
     QSharedPointer<MatrixXd> pDistanceMatrix = GeometryInfo::scdc(realSurface.rr,
@@ -230,7 +238,7 @@ void TestInterpolation::testEmptyInputsForWeightMatrix()
     QSharedPointer<MatrixXd> pDistTable = GeometryInfo::scdc(smallSurface.rr, smallSurface.neighbor_vert, vSmallSubset, 0.03);
 
     // ---------- empty sensor indices ----------
-    QVector<int> vEmptySensors;
+    VectorXi vEmptySensors;
     QVERIFY(Interpolation::createInterpolationMat(vEmptySensors,
                                                   pDistTable,
                                                   Interpolation::linear,

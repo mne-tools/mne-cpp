@@ -23,6 +23,8 @@
 
 #include <Eigen/Dense>
 
+#include <algorithm>
+
 #include <QCoreApplication>
 #include <QFile>
 #include <QDir>
@@ -846,28 +848,6 @@ int fiff_write_float_sparse_matrix_old(FiffStream::SPtr& t_pStream, int kind, Fi
 //    }
 }
 
-static int comp_points2(const void *vp1,const void *vp2)
-
-{
-    MneNearest* v1 = (MneNearest*)vp1;
-    MneNearest* v2 = (MneNearest*)vp2;
-
-    if (v1->vert > v2->vert)
-        return 1;
-    else if (v1->vert == v2->vert)
-        return 0;
-    else
-        return -1;
-}
-
-void mne_sort_nearest_by_vertex(MneNearest* points, int npoint)
-
-{
-    if (npoint > 1 && points != Q_NULLPTR)
-        qsort(points,npoint,sizeof(MneNearest),comp_points2);
-    return;
-}
-
 FiffSparseMatrix* mne_create_sparse_rcs(int nrow,           /* Number of rows */
                                         int ncol,           /* Number of columns */
                                         int *nnz,           /* Number of non-zero elements on each row */
@@ -983,13 +963,13 @@ static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOl
     int *nneighbors = Q_NULLPTR;
     int *neighbors = Q_NULLPTR;
     int *inuse_map = Q_NULLPTR;
-    int nneigh,*neigh;
+    int nneigh;
     int k,p;
     int res = FAIL;
 
     if (ss->type != FIFFV_MNE_SPACE_VOLUME)
         return OK;
-    if (!ss->neighbor_vert || !ss->nneighbor_vert)
+    if (ss->neighbor_vert.empty() || ss->nneighbor_vert.size() == 0)
         return OK;
     if (selected_only) {
         inuse_map = MALLOC_41(ss->np,int);
@@ -1009,7 +989,7 @@ static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOl
         */
         for (k = 0, nvert = 0, ntot = 0; k < ss->np; k++) {
             if (ss->inuse[k]) {
-                neigh  = ss->neighbor_vert[k];
+                const Eigen::VectorXi& neigh = ss->neighbor_vert[k];
                 nneigh = ss->nneighbor_vert[k];
                 nneighbors[nvert++] = nneigh;
                 for (p = 0; p < nneigh; p++)
@@ -1024,7 +1004,7 @@ static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOl
         neighbors = MALLOC_41(ntot,int);
         nvert     = ss->np;
         for (k = 0, ntot = 0; k < ss->np; k++) {
-            neigh  = ss->neighbor_vert[k];
+            const Eigen::VectorXi& neigh = ss->neighbor_vert[k];
             nneigh = ss->nneighbor_vert[k];
             nneighbors[k] = nneigh;
             for (p = 0; p < nneigh; p++)
@@ -1139,9 +1119,9 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
         t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS,&ss->nuse);
         for (p = 0, pp = 0; p < ss->np; p++) {
             if (ss->inuse[p]) {
-                sel[pp][X_41] = ss->rr[p][X_41];
-                sel[pp][Y_41] = ss->rr[p][Y_41];
-                sel[pp][Z_41] = ss->rr[p][Z_41];
+                sel[pp][X_41] = ss->rr(p,X_41);
+                sel[pp][Y_41] = ss->rr(p,Y_41);
+                sel[pp][Z_41] = ss->rr(p,Z_41);
                 pp++;
             }
         }
@@ -1149,9 +1129,9 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
 
         for (p = 0, pp = 0; p < ss->np; p++) {
             if (ss->inuse[p]) {
-                sel[pp][X_41] = ss->nn[p][X_41];
-                sel[pp][Y_41] = ss->nn[p][Y_41];
-                sel[pp][Z_41] = ss->nn[p][Z_41];
+                sel[pp][X_41] = ss->nn(p,X_41);
+                sel[pp][Y_41] = ss->nn(p,Y_41);
+                sel[pp][Z_41] = ss->nn(p,Z_41);
                 pp++;
             }
         }
@@ -1185,12 +1165,12 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
         //        fiffTagRec tag;
         t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NPOINTS,&ss->np);
 
-        fiff_write_float_matrix_old(t_pStream, FIFF_MNE_SOURCE_SPACE_POINTS, ss->rr, ss->np, 3);
+        t_pStream->write_float_matrix(FIFF_MNE_SOURCE_SPACE_POINTS, Eigen::MatrixXf(ss->rr));
 
-        fiff_write_float_matrix_old(t_pStream, FIFF_MNE_SOURCE_SPACE_NORMALS, ss->nn, ss->np, 3);
+        t_pStream->write_float_matrix(FIFF_MNE_SOURCE_SPACE_NORMALS, Eigen::MatrixXf(ss->nn));
 
-        if (ss->nuse > 0 && ss->inuse) {
-            t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_SELECTION,ss->inuse,ss->np);
+        if (ss->nuse > 0 && ss->inuse.size() > 0) {
+            t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_SELECTION,ss->inuse.data(),ss->np);
             //            tag.next = 0;
             //            tag.kind = FIFF_MNE_SOURCE_SPACE_SELECTION;
             //            tag.type = FIFFT_INT;
@@ -1206,31 +1186,28 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
             t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NTRI,&ss->ntri);
             //            if (fiff_write_int_tag(out,FIFF_MNE_SOURCE_SPACE_NTRI,ss->ntri) == FIFF_FAIL)
             //                goto bad;
-            tris = make_file_triangle_list_41(ss->itris,ss->ntri);
-
-            fiff_write_int_matrix_old(t_pStream, FIFF_MNE_SOURCE_SPACE_TRIANGLES, tris, ss->ntri, 3);
+            Eigen::MatrixXi file_tris = ss->itris.array() + 1;
+            t_pStream->write_int_matrix(FIFF_MNE_SOURCE_SPACE_TRIANGLES, file_tris);
             //            if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_TRIANGLES,tris,
             //                                      ss->ntri,3) == FIFF_FAIL)
             //                goto bad;
-            FREE_ICMATRIX_41(tris); tris = Q_NULLPTR;
         }
         if (ss->nuse_tri > 0) { /* Write the triangulation information for the vertices in use */
             t_pStream->write_int(FIFF_MNE_SOURCE_SPACE_NUSE_TRI,&ss->nuse_tri);
             //            if (fiff_write_int_tag(out,FIFF_MNE_SOURCE_SPACE_NUSE_TRI,ss->nuse_tri) == FIFF_FAIL)
             //                goto bad;
-            tris = make_file_triangle_list_41(ss->use_itris,ss->nuse_tri);
-
-            fiff_write_int_matrix_old(t_pStream, FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, tris, ss->nuse_tri, 3);
+            Eigen::MatrixXi file_use_tris = ss->use_itris.array() + 1;
+            t_pStream->write_int_matrix(FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES, file_use_tris);
             //            if (fiff_write_int_matrix(out,FIFF_MNE_SOURCE_SPACE_USE_TRIANGLES,tris,
             //                                      ss->nuse_tri,3) == FIFF_FAIL)
             //                goto bad;
-            FREE_ICMATRIX_41(tris); tris = Q_NULLPTR;
         }
-        if (ss->nearest) {    /* Write the patch information */
+        if (!ss->nearest.empty()) {    /* Write the patch information */
             nearest = MALLOC_41(ss->np,int);
             nearest_dist = MALLOC_41(ss->np,float);
 
-            mne_sort_nearest_by_vertex(ss->nearest,ss->np);
+            std::sort(ss->nearest.begin(), ss->nearest.end(),
+                      [](const MneNearest& a, const MneNearest& b) { return a.vert < b.vert; });
             for (p = 0; p < ss->np; p++) {
                 nearest[p] = ss->nearest[p].nearest;
                 nearest_dist[p] = ss->nearest[p].dist;

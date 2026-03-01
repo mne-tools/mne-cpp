@@ -239,7 +239,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
     this->rr      = ALLOC_CMATRIX_16(guesses->nuse,3);
     for (k = 0, p = 0; k < guesses->np; k++)
         if (guesses->inuse[k]) {
-            VEC_COPY_16(this->rr[p],guesses->rr[k]);
+            VEC_COPY_16(this->rr[p],&guesses->rr(k,0));
             p++;
         }
     delete guesses; guesses = NULL;
@@ -355,7 +355,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
     this->rr      = ALLOC_CMATRIX_16(guesses->nuse,3);
     for (k = 0, p = 0; k < guesses->np; k++)
         if (guesses->inuse[k]) {
-            VEC_COPY_16(this->rr[p],guesses->rr[k]);
+            VEC_COPY_16(this->rr[p],&guesses->rr(k,0));
             p++;
         }
     if(guesses)

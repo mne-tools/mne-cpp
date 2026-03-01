@@ -48,6 +48,7 @@
 #include <QMap>
 #include <QList>
 #include <QString>
+#include <vector>
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 
@@ -137,9 +138,8 @@ public:
      * @param[in] vecSourceVertices    Source vertex indices into the surface.
      */
     void setInterpolationInfoLeft(const Eigen::MatrixX3f &matVertices,
-                                  const QVector<QVector<int>> &vecNeighborVertices,
-                                  const QVector<int> &vecSourceVertices);
-
+                                    const std::vector<Eigen::VectorXi> &vecNeighborVertices,
+                                    const Eigen::VectorXi &vecSourceVertices);
     //=========================================================================================================
     /**
      * Set the surface and source geometry for the right hemisphere.
@@ -149,9 +149,8 @@ public:
      * @param[in] vecSourceVertices    Source vertex indices into the surface.
      */
     void setInterpolationInfoRight(const Eigen::MatrixX3f &matVertices,
-                                   const QVector<QVector<int>> &vecNeighborVertices,
-                                   const QVector<int> &vecSourceVertices);
-
+                                     const std::vector<Eigen::VectorXi> &vecNeighborVertices,
+                                     const Eigen::VectorXi &vecSourceVertices);
     //=========================================================================================================
     /**
      * Set the visualization type.
@@ -236,8 +235,8 @@ private:
      */
     static QSharedPointer<Eigen::SparseMatrix<float>> computeHemi(
         const Eigen::MatrixX3f &matVertices,
-        const QVector<QVector<int>> &vecNeighborVertices,
-        QVector<int> vecSourceVertices,
+        const std::vector<Eigen::VectorXi> &vecNeighborVertices,
+        Eigen::VectorXi vecSourceVertices,
         double dCancelDist,
         double (*interpFunc)(double));
 
@@ -261,14 +260,14 @@ private:
 
     // LH geometry
     Eigen::MatrixX3f m_matVerticesLh;                            /**< LH vertex positions. */
-    QVector<QVector<int>> m_vecNeighborsLh;                      /**< LH per-vertex neighbors. */
-    QVector<int> m_vecSourceVerticesLh;                           /**< LH source vertex indices. */
+    std::vector<Eigen::VectorXi> m_vecNeighborsLh;               /**< LH per-vertex neighbors. */
+    Eigen::VectorXi m_vecSourceVerticesLh;                        /**< LH source vertex indices. */
     bool m_hasLh = false;                                        /**< Whether LH data has been set. */
 
     // RH geometry
     Eigen::MatrixX3f m_matVerticesRh;                            /**< RH vertex positions. */
-    QVector<QVector<int>> m_vecNeighborsRh;                      /**< RH per-vertex neighbors. */
-    QVector<int> m_vecSourceVerticesRh;                           /**< RH source vertex indices. */
+    std::vector<Eigen::VectorXi> m_vecNeighborsRh;               /**< RH per-vertex neighbors. */
+    Eigen::VectorXi m_vecSourceVerticesRh;                        /**< RH source vertex indices. */
     bool m_hasRh = false;                                        /**< Whether RH data has been set. */
 
     // Interpolation parameters
