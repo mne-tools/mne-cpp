@@ -81,7 +81,7 @@ MNE Analyze provides a plugin-based GUI for sensor- and source-level analysis of
   <span>[Full documentation](browse-raw) &nbsp;·&nbsp; **[Launch in browser](https://mne-cpp.github.io/wasm/mne_browse.html)**</span>
 </div>
 
-MNE Browse provides a lightweight interface for browsing raw MEG/EEG data in FIFF format. It does not depend on Qt3D or OpenGL, which makes it well suited for the WebAssembly platform. Supported features:
+MNE Browse provides a lightweight interface for browsing raw MEG/EEG data in FIFF format. Supported features:
 
 - Interactive scrolling through multi-channel time-series data
 - Adjustable time scale and amplitude scaling
@@ -160,7 +160,7 @@ flowchart LR
 
 ### Current Limitations
 
-- **Limited 3D visualization.** Qt3D and `QOpenGLWidget` support in WebAssembly is experimental. Some 3D views may not render as expected across all browsers.
+- **3D visualization.** The RHI-based `disp3D_rhi` library provides 3D rendering in the browser via WebGL. Some advanced 3D features may behave differently across browsers.
 - **Static linking only.** The Wasm build uses `BUILD_SHARED_LIBS=OFF` — all libraries are linked statically into the final binary.
 - **Initial load time.** The Wasm binary and supporting JavaScript can be several tens of megabytes. First load requires a reasonably fast connection; subsequent loads benefit from browser caching.
 - **File size.** Very large FIFF files may approach browser memory limits, particularly on 32-bit browser processes.
