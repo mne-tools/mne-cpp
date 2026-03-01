@@ -74,6 +74,12 @@ jobs:
         if [ -d "out/wasm/examples" ]; then
           cp resources/design/logos/qtlogo.svg out/wasm/examples/qtlogo.svg
         fi
+        # Inject COOP/COEP service worker for cross-origin isolation
+        # (required for SharedArrayBuffer / multi-threaded Wasm in Chrome & Safari)
+        ./tools/wasm/wasm_postbuild.sh out/wasm/apps
+        if [ -d "out/wasm/examples" ]; then
+          ./tools/wasm/wasm_postbuild.sh out/wasm/examples
+        fi
     - name: Setup Github credentials
       uses: fusion-engineering/setup-git-credentials@v2
       with:

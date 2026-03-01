@@ -51,7 +51,8 @@ This will start a GitHub Actions run that:
 1. Sets up **Emscripten 4.0.7** and downloads pre-built **Qt 6.10.2** static Wasm binaries (or triggers a build of those binaries if they don't yet exist).
 2. Downloads host Qt binaries (Linux) needed for cross-compilation.
 3. Builds MNE-CPP for WebAssembly using `./tools/wasm.sh --emsdk 4.0.7`.
-4. Pushes the resulting Wasm artifacts to both the `gh-pages` and `main` branches of your fork.
+4. Injects a **COI service worker** (`coi-serviceworker.js`) into every HTML file to provide the `Cross-Origin-Opener-Policy` and `Cross-Origin-Embedder-Policy` headers required for `SharedArrayBuffer` on GitHub Pages.
+5. Pushes the resulting Wasm artifacts to both the `gh-pages` and `main` branches of your fork.
 
 :::note Build Times
 Building Qt and MNE-CPP for WebAssembly takes significant time on CI runners. Pre-built Qt binaries are cached to speed up subsequent builds.
