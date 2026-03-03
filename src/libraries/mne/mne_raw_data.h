@@ -219,7 +219,7 @@ public:
      *
      * @return A new raw data object, or NULL on failure. Caller takes ownership.
      */
-    static MneRawData* open_file_comp(const QString& name, int omit_skip, int allow_maxshield, mneFilterDef filter, int comp_set);
+    static MneRawData* open_file_comp(const QString& name, int omit_skip, int allow_maxshield, const MneFilterDef& filter, int comp_set);
 
     /**
      * Open a raw FIFF file using the file's native compensation grade.
@@ -232,7 +232,7 @@ public:
      *
      * @return A new raw data object, or NULL on failure. Caller takes ownership.
      */
-    static MneRawData* open_file(const QString& name, int omit_skip, int allow_maxshield, mneFilterDef filter);
+    static MneRawData* open_file(const QString& name, int omit_skip, int allow_maxshield, const MneFilterDef& filter);
 
 public:
     QString         filename;             /**< Path to the raw FIFF file. */
@@ -258,10 +258,10 @@ public:
     std::unique_ptr<MNELIB::MneCTFCompDataSet> comp;    /**< CTF compensation data. */
     int             comp_file;          /**< Compensation grade stored in the file. */
     int             comp_now;           /**< Current compensation grade applied to data. */
-    mneFilterDef    filter;             /**< Filter definition (highpass/lowpass). */
+    std::unique_ptr<MneFilterDef> filter; /**< Filter definition (highpass/lowpass). */
     void            *filter_data;       /**< Opaque filter state data. */
     mneUserFreeFunc filter_data_free;   /**< Function to free filter_data. */
-    mneEventList    event_list;         /**< Trigger event list. */
+    std::unique_ptr<MneEventList> event_list; /**< Trigger event list. */
     unsigned int    max_event;          /**< Maximum event number in use. */
     QString         dig_trigger;        /**< Name of the digital trigger channel. */
     unsigned int     dig_trigger_mask;  /**< Bit mask applied to digital trigger channel. */

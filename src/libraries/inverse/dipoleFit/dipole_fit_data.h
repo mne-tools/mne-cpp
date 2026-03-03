@@ -142,7 +142,7 @@ public:
 
     static int setup_forward_model(DipoleFitData* d, MNELIB::MneCTFCompDataSet* comp_data, FWDLIB::FwdCoilSet* comp_coils);
 
-    static MNELIB::MneCovMatrix* ad_hoc_noise(FWDLIB::FwdCoilSet* meg,          /* Channel name lists to define which channels are gradiometers */
+    static std::unique_ptr<MNELIB::MneCovMatrix> ad_hoc_noise(FWDLIB::FwdCoilSet* meg,          /* Channel name lists to define which channels are gradiometers */
                                      FWDLIB::FwdCoilSet* eeg,
                                      float      grad_std,
                                      float      mag_std,

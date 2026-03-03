@@ -72,9 +72,11 @@ namespace MNELIB
 
 //=============================================================================================================
 /**
- * Implements an MNE CTF Compensation Data (Replaces *mneCTFcompData,mneCTFcompDataRec; struct of MNE-C mne_types.h).
+ * @brief Represents a single CTF compensation data element.
  *
- * @brief One MNE CTF compensation description
+ * Holds the compensation matrix together with optional sparse
+ * pre-/post-selectors and intermediate computation buffers used
+ * by MneCTFCompDataSet::apply() and apply_transpose().
  */
 class MNESHARED_EXPORT MneCTFCompData
 {
@@ -84,22 +86,21 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs the MNE CTF Comepnsation Data
-     * Refactored: mne_new_ctf_comp_data (mne_ctf_comp.c)
+     * Constructs an empty MNE CTF Compensation Data object.
      */
     MneCTFCompData();
 
     //=========================================================================================================
     /**
-     * Copies MNE CTF Comepnsation Data
-     * Refactored: mne_dup_ctf_comp_data (mne_ctf_comp.c)
+     * Copy constructor.
+     *
+     * @param[in] comp  The compensation data to copy.
      */
     MneCTFCompData(const MneCTFCompData& comp);
 
     //=========================================================================================================
     /**
-     * Destroys the MNE CTF Comepnsation Data
-     * Refactored: mne_free_ctf_comp_data (mne_ctf_comp.c)
+     * Destructor.
      */
     ~MneCTFCompData();
 
@@ -124,22 +125,9 @@ public:
     std::unique_ptr<MneNamedMatrix>            data;      /**< The compensation matrix. */
     std::unique_ptr<FIFFLIB::FiffSparseMatrix>   presel;    /**< Sparse selector applied before compensation. */
     std::unique_ptr<FIFFLIB::FiffSparseMatrix>   postsel;   /**< Sparse selector applied after compensation. */
-    float           *presel_data;           /**< Intermediate buffer for pre-selection results. */
-    float           *comp_data;             /**< Intermediate buffer for compensation results. */
-    float           *postsel_data;          /**< Intermediate buffer for post-selection results. */
-
-//// ### OLD STRUCT ###
-//typedef struct {
-//    int             kind;                   /* The compensation kind (CTF) */
-//    int             mne_kind;               /* Our kind */
-//    int             calibrated;             /* Are the coefficients in the file calibrated already? */
-//    MNELIB::MneNamedMatrix*  data;      /* The compensation data */
-//    MNELIB::FiffSparseMatrix* presel;   /* Apply this selector prior to compensation */
-//    MNELIB::FiffSparseMatrix* postsel;  /* Apply this selector after compensation */
-//    float           *presel_data;           /* These are used for the intermediate results in the calculations */
-//    float           *comp_data;
-//    float           *postsel_data;
-//} *mneCTFcompData,mneCTFcompDataRec;
+    Eigen::VectorXf  presel_data;            /**< Intermediate buffer for pre-selection results. */
+    Eigen::VectorXf  comp_data;              /**< Intermediate buffer for compensation results. */
+    Eigen::VectorXf  postsel_data;           /**< Intermediate buffer for post-selection results. */
 };
 
 //=============================================================================================================

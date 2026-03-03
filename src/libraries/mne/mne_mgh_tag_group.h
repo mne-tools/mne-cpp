@@ -41,20 +41,20 @@
 //=============================================================================================================
 
 #include "mne_global.h"
+#include "mne_mgh_tag.h"
 
 //=============================================================================================================
-// EIGEN INCLUDES
+// STL INCLUDES
 //=============================================================================================================
+
+#include <memory>
+#include <vector>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -64,16 +64,10 @@ namespace MNELIB
 {
 
 //=============================================================================================================
-// MNELIB FORWARD DECLARATIONS
-//=============================================================================================================
-
-class MneMghTag;
-
-//=============================================================================================================
 /**
- * Replaces **mneMGHtagGroup,mneMGHtagGroupRec struct (mne_mgh_mri_io.c).
- *
  * @brief Collection of MneMghTag entries from a FreeSurfer MGH/MGZ file footer.
+ *
+ * Owns its tags via unique_ptr.
  */
 class MNESHARED_EXPORT MneMghTagGroup
 {
@@ -83,25 +77,23 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs the MneMghTagGroup.
+     * Constructs an empty MneMghTagGroup.
      */
-    MneMghTagGroup();
+    MneMghTagGroup() = default;
 
     //=========================================================================================================
     /**
-     * Destroys the MneMghTagGroup.
+     * Destructor.
      */
-    ~MneMghTagGroup();
+    ~MneMghTagGroup() = default;
 
 public:
-    int        ntags;              /**< Number of tags in the group. */
-    MneMghTag  **tags;             /**< Array of tag pointers. */
+    std::vector<std::unique_ptr<MneMghTag>> tags; /**< Owned tag entries. */
 
-// ### OLD STRUCT ###
-//    typedef struct {
-//      int        ntags;
-//      mneMGHtag  *tags;
-//    } *mneMGHtagGroup,mneMGHtagGroupRec;
+    /**
+     * @brief Returns the number of tags in the group.
+     */
+    int ntags() const { return static_cast<int>(tags.size()); }
 };
 
 //=============================================================================================================

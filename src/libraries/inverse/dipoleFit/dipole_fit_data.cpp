@@ -458,7 +458,7 @@ namespace MNELIB
 int mne_is_diag_cov_3(MneCovMatrix* c)
 
 {
-    return c->cov_diag != NULL;
+    return c->cov_diag.size() > 0;
 }
 
 void mne_scale_vector_3 (double scale,float *v,int   nn)
@@ -713,7 +713,7 @@ int mne_get_values_from_data_3 (float time,         /* Interesting time point */
 
 int mne_decompose_eigen_3(double *mat,
                          double *lambda,
-                         float  **vectors, /* Eigenvectors fit into floats easily */
+                         Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>& vectors,
                          int    dim)
 /*
       * Compute the eigenvalue decomposition of
@@ -723,17 +723,15 @@ int mne_decompose_eigen_3(double *mat,
       */
 {
     int    np  =   dim*(dim+1)/2;
-    double *w    = MALLOC_3(dim,double);
-    double *z    = MALLOC_3(dim*dim,double);
-    double *work = MALLOC_3(3*dim,double);
-    double *dmat = MALLOC_3(np,double);
-    float  *vecp = vectors[0];
+    VectorXd w(dim);
+    VectorXd z(dim*dim);
+    VectorXd dmat(np);
+    float  *vecp = vectors.data();
 
     int    info,k;
     int    maxi;
     double scale;
 
-//    maxi = idamax(&np,mat,&one);
 // idamax workaround begin
     maxi = 0;
     for(int i = 0; i < np; ++i)
@@ -741,11 +739,10 @@ int mne_decompose_eigen_3(double *mat,
             maxi = i;
 // idamax workaround end
 
-    scale = 1.0/mat[maxi];//scale = 1.0/mat[maxi-1];
+    scale = 1.0/mat[maxi];
 
     for (k = 0; k < np; k++)
         dmat[k] = mat[k]*scale;
-//    dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);
 
 // dspev workaround begin
     MatrixXd dmat_tmp = MatrixXd::Zero(dim,dim);
@@ -773,9 +770,6 @@ int mne_decompose_eigen_3(double *mat,
 
     info = 0;
 
-    qDebug() << "!!!DEBUG ToDo: dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);";
-
-    FREE_3(work);
     if (info != 0)
         printf("Eigenvalue decomposition failed (LAPACK info = %d)",info);
     else {
@@ -785,8 +779,6 @@ int mne_decompose_eigen_3(double *mat,
         for (k = 0; k < dim*dim; k++)
             vecp[k] = z[k];
     }
-    FREE_3(w);
-    FREE_3(z);
     if (info == 0)
         return 0;
     else
@@ -817,14 +809,14 @@ int mne_add_inv_cov_3(MneCovMatrix* c)
       * Calculate the inverse square roots for whitening
       */
 {
-    double *src = c->lambda ? c->lambda : c->cov_diag;
+    const Eigen::VectorXd& src = c->lambda.size() > 0 ? c->lambda : c->cov_diag;
     int k;
 
-    if (src == NULL) {
+    if (src.size() == 0) {
         qCritical("Covariance matrix is not diagonal or not decomposed.");
         return FAIL;
     }
-    c->inv_lambda = REALLOC_3(c->inv_lambda,c->ncov,double);
+    c->inv_lambda.resize(c->ncov);
     for (k = 0; k < c->ncov; k++) {
         if (src[k] <= 0.0)
             c->inv_lambda[k] = 0.0;
@@ -840,7 +832,7 @@ static int condition_cov_3(MneCovMatrix* c, float rank_threshold, int use_rank)
     double *scale  = NULL;
     double *cov    = NULL;
     double *lambda = NULL;
-    float  **eigen = NULL;
+    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> local_eigen;
     double **data1 = NULL;
     double **data2 = NULL;
     double magscale,gradscale,eegscale;
@@ -848,9 +840,9 @@ static int condition_cov_3(MneCovMatrix* c, float rank_threshold, int use_rank)
     int    j,k;
     int    res = FAIL;
 
-    if (c->cov_diag)
+    if (c->cov_diag.size() > 0)
         return OK;
-    if (!c->ch_class) {
+    if (c->ch_class.size() == 0) {
         qCritical("Channels not classified. Rank cannot be determined.");
         return FAIL;
     }
@@ -897,11 +889,11 @@ static int condition_cov_3(MneCovMatrix* c, float rank_threshold, int use_rank)
     }
     cov    = MALLOC_3(c->ncov*(c->ncov+1)/2.0,double);
     lambda = MALLOC_3(c->ncov,double);
-    eigen  = ALLOC_CMATRIX_3(c->ncov,c->ncov);
+    local_eigen.resize(c->ncov,c->ncov);
     for (j = 0; j < c->ncov; j++)
         for (k = 0; k <= j; k++)
             cov[mne_lt_packed_index_3(j,k)] = c->cov[mne_lt_packed_index_3(j,k)]*scale[j]*scale[k];
-    if (mne_decompose_eigen_3(cov,lambda,eigen,c->ncov) == 0) {
+    if (mne_decompose_eigen_3(cov,lambda,local_eigen,c->ncov) == 0) {
 #ifdef DEBUG
         for (k = 0; k < c->ncov; k++)
             fprintf(stdout,"%g ",lambda[k]/lambda[c->ncov-1]);
@@ -927,10 +919,10 @@ static int condition_cov_3(MneCovMatrix* c, float rank_threshold, int use_rank)
         data1 = ALLOC_DCMATRIX_3(c->ncov,c->ncov);
         for (j = 0; j < c->ncov; j++) {
 #ifdef DEBUG
-            mne_print_vector(stdout,NULL,eigen[j],c->ncov);
+            mne_print_vector(stdout,NULL,local_eigen.row(j).data(),c->ncov);
 #endif
             for (k = 0; k < c->ncov; k++)
-                data1[j][k] = sqrt(lambda[j])*eigen[j][k];
+                data1[j][k] = sqrt(lambda[j])*local_eigen(j,k);
         }
         data2 = mne_dmatt_dmat_mult2_3(data1,data1,c->ncov,c->ncov,c->ncov);
 #ifdef DEBUG
@@ -954,7 +946,6 @@ static int condition_cov_3(MneCovMatrix* c, float rank_threshold, int use_rank)
     FREE_3(cov);
     FREE_3(scale);
     FREE_3(lambda);
-    FREE_CMATRIX_3(eigen);
     FREE_DCMATRIX_3(data1);
     FREE_DCMATRIX_3(data2);
     return res;
@@ -989,7 +980,7 @@ int mne_classify_channels_cov(MneCovMatrix* cov,
         qCritical("Channel information not available in mne_classify_channels_cov");
         goto bad;
     }
-    cov->ch_class = REALLOC_3(cov->ch_class,cov->ncov,int);
+    cov->ch_class.resize(cov->ncov);
     for (k = 0; k < cov->ncov; k++) {
         cov->ch_class[k] = MNE_COV_CH_UNKNOWN;
         for (p = 0; p < nchan; p++) {
@@ -1014,8 +1005,7 @@ int mne_classify_channels_cov(MneCovMatrix* cov,
     return OK;
 
 bad : {
-        FREE_3(cov->ch_class);
-        cov->ch_class = NULL;
+        cov->ch_class.resize(0);
         return FAIL;
     }
 }
@@ -1033,9 +1023,9 @@ static int mne_decompose_eigen_cov_small_3(MneCovMatrix* c,float small, int use_
 
     if (!c)
         return OK;
-    if (c->cov_diag)
+    if (c->cov_diag.size() > 0)
         return mne_add_inv_cov_3(c);
-    if (c->lambda && c->eigen) {
+    if (c->lambda.size() > 0 && c->eigen.size() > 0) {
         printf("\n\tEigenvalue decomposition had been precomputed.\n");
         c->nzero = 0;
         for (k = 0; k < c->ncov; k++, c->nzero++)
@@ -1043,16 +1033,16 @@ static int mne_decompose_eigen_cov_small_3(MneCovMatrix* c,float small, int use_
                 break;
     }
     else {
-        FREE_3(c->lambda); c->lambda = NULL;
-        FREE_CMATRIX_3(c->eigen); c->eigen = NULL;
+        c->lambda.resize(0);
+        c->eigen.resize(0,0);
 
         if ((rank = condition_cov_3(c,rank_threshold,use_rank)) < 0)
             return FAIL;
 
         np = c->ncov*(c->ncov+1)/2;
-        c->lambda = MALLOC_3(c->ncov,double);
-        c->eigen  = ALLOC_CMATRIX_3(c->ncov,c->ncov);
-        if (mne_decompose_eigen_3(c->cov,c->lambda,c->eigen,c->ncov) != 0)
+        c->lambda.resize(c->ncov);
+        c->eigen.resize(c->ncov,c->ncov);
+        if (mne_decompose_eigen_3(c->cov.data(),c->lambda.data(),c->eigen,c->ncov) != 0)
             goto bad;
         c->nzero = c->ncov - rank;
         for (k = 0; k < c->nzero; k++)
@@ -1069,9 +1059,9 @@ static int mne_decompose_eigen_cov_small_3(MneCovMatrix* c,float small, int use_
                 meglike = eeglike = 0.0;
                 for (p = 0; p < c->ncov; p++)  {
                     if (c->ch_class[p] == MNE_COV_CH_EEG)
-                        eeglike += std::fabs(c->eigen[k][p]);
+                        eeglike += std::fabs(c->eigen(k,p));
                     else if (c->ch_class[p] == MNE_COV_CH_MEG_MAG || c->ch_class[p] == MNE_COV_CH_MEG_GRAD)
-                        meglike += std::fabs(c->eigen[k][p]);
+                        meglike += std::fabs(c->eigen(k,p));
                 }
                 if (meglike > eeglike)
                     nmeg++;
@@ -1084,8 +1074,8 @@ static int mne_decompose_eigen_cov_small_3(MneCovMatrix* c,float small, int use_
     return mne_add_inv_cov_3(c);
 
 bad : {
-        FREE_3(c->lambda); c->lambda = NULL;
-        FREE_CMATRIX_3(c->eigen); c->eigen = NULL;
+        c->lambda.resize(0);
+        c->eigen.resize(0,0);
         return FAIL;
     }
 }
@@ -1114,7 +1104,7 @@ int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, MneC
         printf("Incompatible covariance matrix. Cannot whiten the data.");
         return FAIL;
     }
-    inv = C->inv_lambda;
+    inv = C->inv_lambda.data();
     if (mne_is_diag_cov_3(C)) {
         //    printf("<DEBUG> Performing Diag\n");
         for (j = 0; j < np; j++) {
@@ -1133,7 +1123,7 @@ int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, MneC
             orig = data[j];
             white = whitened_data[j];
             for (k = C->nzero; k < nchan; k++)
-                one[k] = mne_dot_vectors_3(C->eigen[k],orig,nchan);
+                one[k] = mne_dot_vectors_3(C->eigen.row(k).data(),orig,nchan);
             for (k = 0; k < C->nzero; k++)
                 white[k] = 0.0;
             for (k = C->nzero; k < nchan; k++)
@@ -1238,7 +1228,7 @@ void mne_regularize_cov(MneCovMatrix* c,       /* The matrix to regularize */
     float  sums[3],nn[3];
     int    nkind = 3;
 
-    if (!c->cov || !c->ch_class)
+    if (c->cov.size() == 0 || c->ch_class.size() == 0)
         return;
 
     for (j = 0; j < nkind; j++) {
@@ -1652,18 +1642,18 @@ void mne_proj_op_report_data_3(QTextStream &out,const char *tag, MneProjOp* op, 
     }
 
     for (k = 0; k < op->nitems; k++) {
-        it = op->items[k];
+        it = &op->items[k];
         if (list_data && tag)
             out << tag << "\n";
         if (tag)
             out << tag;
-        out << "# " << (k+1) << " : " << it->desc << " : " << it->nvec << " vecs : " << it->vecs->ncol << " chs "
+        out << "# " << (k+1) << " : " << it->desc << " : " << it->nvec << " vecs : " << it->vecs.ncol << " chs "
             << (it->has_meg ? "MEG" : "EEG") << " "
             << (it->active ? "active" : "idle") << "\n";
         if (list_data && tag)
             out << tag << "\n";
         if (list_data) {
-            vecs = op->items[k]->vecs.get();
+            vecs = &op->items[k].vecs;
 
             for (q = 0; q < vecs->ncol; q++) {
                 out << qSetFieldWidth(10) << Qt::left << vecs->collist[q] << qSetFieldWidth(0);
@@ -1678,7 +1668,7 @@ void mne_proj_op_report_data_3(QTextStream &out,const char *tag, MneProjOp* op, 
                         }
                     }
                     out << qSetFieldWidth(10) << qSetRealNumberPrecision(5) << Qt::forcepoint
-                        << (found ? 0.0 : vecs->data[p][q]) << qSetFieldWidth(0) << " ";
+                        << (found ? 0.0 : vecs->data(p, q)) << qSetFieldWidth(0) << " ";
                     out << (q < vecs->ncol-1 ? " " : "\n");
                 }
             if (list_data && tag)
@@ -1695,7 +1685,7 @@ void mne_proj_op_report_3(QTextStream &out,const char *tag, MneProjOp* op)
 
 //============================= mne_named_vector.c =============================
 
-int mne_pick_from_named_vector_3(mneNamedVector vec, const QStringList& names, int nnames, int require_all, float *res)
+int mne_pick_from_named_vector_3(MneNamedVector* vec, const QStringList& names, int nnames, int require_all, float *res)
 /*
  * Pick the desired elements from the named vector
  */
@@ -1747,10 +1737,8 @@ MneProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
     int         global_nchan,item_nchan,nlist;
     QStringList item_names;
     int         item_kind;
-    float       **item_vectors = NULL;
     int         item_nvec;
     int         item_active;
-    MneNamedMatrix* item;
     FiffTag::SPtr t_pTag;
     QStringList emptyList;
     int pos;
@@ -1853,9 +1841,7 @@ MneProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
         if (!node->find_tag(stream,FIFF_PROJ_ITEM_VECTORS, t_pTag))
             goto bad;
 
-        MatrixXf tmp_item_vectors = t_pTag->toFloatMatrix().transpose();
-        item_vectors = ALLOC_CMATRIX_3(tmp_item_vectors.rows(),tmp_item_vectors.cols());
-        fromFloatEigenMatrix_3(tmp_item_vectors, item_vectors);
+        MatrixXf item_vectors = t_pTag->toFloatMatrix().transpose();
 
         /*
         * Is this item active?
@@ -1868,10 +1854,9 @@ MneProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
         /*
         * Ready to add
         */
-        item = MneNamedMatrix::build(item_nvec,item_nchan,emptyList,item_names,item_vectors);
-        op->add_item_active(item,item_kind,item_desc,item_active);
-        delete item;
-        op->items[op->nitems-1]->active_file = item_active;
+        auto item = MneNamedMatrix::build(item_nvec,item_nchan,emptyList,item_names,item_vectors);
+        op->add_item_active(item.get(),item_kind,item_desc,item_active);
+        op->items[op->nitems-1].active_file = item_active;
     }
 
 out :
@@ -1949,7 +1934,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
     float **mat_eeg = NULL;
     int   nvec_meg;
     int   nvec_eeg;
-    mneNamedVectorRec vec;
+    MneNamedVector vec;
     float size;
     int   nzero;
 #ifdef DEBUG
@@ -1975,29 +1960,29 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
     fprintf(stdout,"mne_proj_op_make_proj_bad\n");
 #endif
     for (k = 0, nvec_meg = nvec_eeg = 0; k < op->nitems; k++) {
-        if (op->items[k]->active && op->items[k]->affect(op->names,op->nch)) {
-            vec.nvec  = op->items[k]->vecs->ncol;
-            vec.names = op->items[k]->vecs->collist;
-            if (op->items[k]->has_meg) {
-                for (p = 0; p < op->items[k]->nvec; p++, nvec_meg++) {
-                    vec.data = op->items[k]->vecs->data[p];
+        if (op->items[k].active && op->items[k].affect(op->names,op->nch)) {
+            vec.nvec  = op->items[k].vecs.ncol;
+            vec.names = op->items[k].vecs.collist;
+            if (op->items[k].has_meg) {
+                for (p = 0; p < op->items[k].nvec; p++, nvec_meg++) {
+                    vec.data = op->items[k].vecs.data.row(p);
                     if (mne_pick_from_named_vector_3(&vec,op->names,op->nch,FALSE,mat_meg[nvec_meg]) == FAIL)
                         goto bad;
 #ifdef DEBUG
                     fprintf(stdout,"Original MEG:\n");
-                    mne_print_vector(stdout,op->items[k]->desc,mat_meg[nvec_meg],op->nch);
+                    mne_print_vector(stdout,op->items[k].desc,mat_meg[nvec_meg],op->nch);
                     fflush(stdout);
 #endif
                 }
             }
-            else if (op->items[k]->has_eeg) {
-                for (p = 0; p < op->items[k]->nvec; p++, nvec_eeg++) {
-                    vec.data = op->items[k]->vecs->data[p];
+            else if (op->items[k].has_eeg) {
+                for (p = 0; p < op->items[k].nvec; p++, nvec_eeg++) {
+                    vec.data = op->items[k].vecs.data.row(p);
                     if (mne_pick_from_named_vector_3(&vec,op->names,op->nch,FALSE,mat_eeg[nvec_eeg]) == FAIL)
                         goto bad;
 #ifdef DEBUG
                     fprintf (stdout,"Original EEG:\n");
-                    mne_print_vector(stdout,op->items[k]->desc,mat_eeg[nvec_eeg],op->nch);
+                    mne_print_vector(stdout,op->items[k].desc,mat_eeg[nvec_eeg],op->nch);
                     fflush(stdout);
 #endif
                 }
@@ -2476,7 +2461,7 @@ int mne_read_bad_channel_list_3(const QString& name, QStringList& listp, int& nl
     return res;
 }
 
-MneCovMatrix* mne_read_cov(const QString& name,int kind)
+std::unique_ptr<MneCovMatrix> mne_read_cov(const QString& name,int kind)
 /*
  * Read a covariance matrix from a fiff
  */
@@ -2490,17 +2475,17 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
 
     QStringList     names;	/* Optional channel name list */
     int             nnames     = 0;
-    double          *cov       = NULL;
-    double          *cov_diag  = NULL;
+    Eigen::VectorXd cov;
+    Eigen::VectorXd cov_diag;
     FiffSparseMatrix* cov_sparse = NULL;
-    double          *lambda    = NULL;
-    float           **eigen    = NULL;
+    Eigen::VectorXd lambda;
+    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> eigen;
     MatrixXf        tmp_eigen;
     QStringList     bads;
     int             nbad       = 0;
     int             ncov       = 0;
     int             nfree      = 1;
-    MneCovMatrix*    res        = NULL;
+    std::unique_ptr<MneCovMatrix> res;
 
     int            k,p,nn;
     float          *f;
@@ -2555,16 +2540,16 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
             goto out;
         else {
             if (t_pTag->getType() == FIFFT_DOUBLE) {
-                cov_diag = MALLOC_3(ncov,double);
+                cov_diag.resize(ncov);
                 qDebug() << "ToDo: Check whether cov_diag contains the right stuff!!! - use VectorXd instead";
                 d = t_pTag->toDouble();
                 for (p = 0; p < ncov; p++)
                     cov_diag[p] = d[p];
-                if (check_cov_data(cov_diag,ncov) != OK)
+                if (check_cov_data(cov_diag.data(),ncov) != OK)
                     goto out;
             }
             else if (t_pTag->getType() == FIFFT_FLOAT) {
-                cov_diag = MALLOC_3(ncov,double);
+                cov_diag.resize(ncov);
                 qDebug() << "ToDo: Check whether f contains the right stuff!!! - use VectorXf instead";
                 f = t_pTag->toFloat();
                 for (p = 0; p < ncov; p++)
@@ -2581,15 +2566,15 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
         if (t_pTag->getType() == FIFFT_DOUBLE) {
             qDebug() << "ToDo: Check whether cov contains the right stuff!!! - use VectorXd instead";
 //            qDebug() << t_pTag->size() / sizeof(double);
-            cov = MALLOC_3(nn,double);
+            cov.resize(nn);
             d = t_pTag->toDouble();
             for (p = 0; p < nn; p++)
                 cov[p] = d[p];
-            if (check_cov_data(cov,nn) != OK)
+            if (check_cov_data(cov.data(),nn) != OK)
                 goto out;
         }
         else if (t_pTag->getType() == FIFFT_FLOAT) {
-            cov = MALLOC_3(nn,double);
+            cov.resize(nn);
             f = t_pTag->toFloat();
             for (p = 0; p < nn; p++)
                 cov[p] = f[p];
@@ -2602,13 +2587,16 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
         }
 
         if (nodes[k]->find_tag(stream, FIFF_MNE_COV_EIGENVALUES, t_pTag)) {
-            lambda = (double *)t_pTag->toDouble();
+            const double *lambda_data = (const double *)t_pTag->toDouble();
+            lambda = Eigen::Map<const Eigen::VectorXd>(lambda_data, ncov);
             if (nodes[k]->find_tag(stream, FIFF_MNE_COV_EIGENVECTORS, t_pTag))
                 goto out;
 
             tmp_eigen = t_pTag->toFloatMatrix().transpose();
-            eigen = ALLOC_CMATRIX_3(tmp_eigen.rows(),tmp_eigen.cols());
-            fromFloatEigenMatrix_3(tmp_eigen, eigen);
+            eigen.resize(tmp_eigen.rows(),tmp_eigen.cols());
+            for (int r = 0; r < tmp_eigen.rows(); ++r)
+                for (int c = 0; c < tmp_eigen.cols(); ++c)
+                    eigen(r,c) = tmp_eigen(r,c);
         }
         /*
         * Read the optional projection operator
@@ -2628,26 +2616,24 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
     }
     if (cov_sparse)
         res = MneCovMatrix::create_sparse(kind,ncov,names,cov_sparse);
-    else if (cov)
+    else if (cov.size() > 0)
         res = MneCovMatrix::create_dense(kind,ncov,names,cov);
-    else if (cov_diag)
+    else if (cov_diag.size() > 0)
         res = MneCovMatrix::create_diag(kind,ncov,names,cov_diag);
     else {
         qCritical("mne_read_cov : covariance matrix data is not defined. How come?");
         goto out;
     }
-    cov         = NULL;
-    cov_diag    = NULL;
     cov_sparse  = NULL;
-    res->eigen  = eigen;
-    res->lambda = lambda;
+    res->eigen  = std::move(eigen);
+    res->lambda = std::move(lambda);
     res->nfree  = nfree;
     res->bads   = bads;
     res->nbad   = nbad;
     /*
      * Count the non-zero eigenvalues
      */
-    if (res->lambda) {
+    if (res->lambda.size() > 0) {
         res->nzero = 0;
         for (k = 0; k < res->ncov; k++, res->nzero++)
             if (res->lambda[k] > 0)
@@ -2658,7 +2644,7 @@ MneCovMatrix* mne_read_cov(const QString& name,int kind)
         res->proj.reset(op);
         op = NULL;
     }
-    if (sss && sss->ncomp > 0 && sss->job != FIFFV_SSS_JOB_NOTHING) {
+    if (sss && sss->comp_info.size() > 0 && sss->job != FIFFV_SSS_JOB_NOTHING) {
         res->sss.reset(sss);
         sss = NULL;
     }
@@ -2673,8 +2659,6 @@ out : {
         if (!res) {
             names.clear();
             bads.clear();
-            FREE_3(cov);
-            FREE_3(cov_diag);
             if(cov_sparse)
                 delete cov_sparse;
         }
@@ -3030,17 +3014,17 @@ void mne_revert_to_diag_cov(MneCovMatrix* c)
  */
 {
     int k,p;
-    if (c->cov == NULL)
+    if (c->cov.size() == 0)
         return;
 #define REALLY_REVERT
 #ifdef REALLY_REVERT
-    c->cov_diag = REALLOC_3(c->cov_diag,c->ncov,double);
+    c->cov_diag.resize(c->ncov);
 
     for (k = p = 0; k < c->ncov; k++) {
         c->cov_diag[k] = c->cov[p];
         p = p + k + 2;
     }
-    FREE_3(c->cov);  c->cov = NULL;
+    c->cov.resize(0);
 #else
     for (j = 0, p = 0; j < c->ncov; j++)
         for (k = 0; k <= j; k++, p++)
@@ -3048,12 +3032,12 @@ void mne_revert_to_diag_cov(MneCovMatrix* c)
                 c->cov[p] = 0.0;
             else
 #endif
-                FREE_3(c->lambda); c->lambda = NULL;
-    FREE_CMATRIX_3(c->eigen); c->eigen = NULL;
+                c->lambda.resize(0);
+    c->eigen.resize(0,0);
     return;
 }
 
-MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c,
+std::unique_ptr<MneCovMatrix> mne_pick_chs_cov_omit(MneCovMatrix* c,
                                     const QStringList& new_names,
                                     int ncov,
                                     int omit_meg_eeg,
@@ -3064,20 +3048,20 @@ MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c,
 {
     int j,k;
     int *pick = NULL;
-    double *cov = NULL;
-    double *cov_diag = NULL;
+    Eigen::VectorXd cov_local;
+    Eigen::VectorXd cov_diag_local;
     QStringList names;
     int   *is_meg = NULL;
     int   from,to;
-    MneCovMatrix* res;
+    std::unique_ptr<MneCovMatrix> res;
 
     if (ncov == 0) {
         qCritical("No channels specified for picking in mne_pick_chs_cov_omit");
-        return NULL;
+        return nullptr;
     }
     if (c->names.isEmpty()) {
         qCritical("No names in covariance matrix. Cannot do picking.");
-        return NULL;
+        return nullptr;
     }
     pick = MALLOC_3(ncov,int);
     for (j = 0; j < ncov; j++)
@@ -3092,7 +3076,7 @@ MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c,
         if (pick[j] < 0) {
             printf("All desired channels not found in the covariance matrix (at least missing %s).", new_names[j].toUtf8().constData());
             FREE_3(pick);
-            return NULL;
+            return nullptr;
         }
     }
     if (omit_meg_eeg) {
@@ -3112,15 +3096,15 @@ MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c,
                     is_meg[j] = FALSE;
         }
     }
-    if (c->cov_diag) {
-        cov_diag = MALLOC_3(ncov,double);
+    if (c->cov_diag.size() > 0) {
+        cov_diag_local.resize(ncov);
         for (j = 0; j < ncov; j++) {
-            cov_diag[j] = c->cov_diag[pick[j]];
+            cov_diag_local[j] = c->cov_diag[pick[j]];
             names.append(c->names[pick[j]]);
         }
     }
     else {
-        cov = MALLOC_3(ncov*(ncov+1)/2,double);
+        cov_local.resize(ncov*(ncov+1)/2);
         for (j = 0; j < ncov; j++) {
             names.append(c->names[pick[j]]);
             for (k = 0; k <= j; k++) {
@@ -3134,23 +3118,23 @@ MneCovMatrix* mne_pick_chs_cov_omit(MneCovMatrix* c,
                     printf("Wrong source index in mne_pick_chs_cov : %d %d %d\n",pick[j],pick[k],from);
                     exit(1);
                 }
-                cov[to] = c->cov[from];
+                cov_local[to] = c->cov[from];
                 if (omit_meg_eeg)
                     if (is_meg[j] != is_meg[k])
-                        cov[to] = 0.0;
+                        cov_local[to] = 0.0;
             }
         }
     }
 
-    res = MneCovMatrix::create(c->kind,ncov,names,cov,cov_diag);
+    res = MneCovMatrix::create(c->kind,ncov,names,cov_local,cov_diag_local);
 
     res->bads = c->bads;
     res->nbad = c->nbad;
     res->proj.reset(c->proj ? c->proj->dup() : nullptr);
     res->sss.reset(c->sss ? new MneSssData(*(c->sss)) : nullptr);
 
-    if (c->ch_class) {
-        res->ch_class = MALLOC_3(res->ncov,int);
+    if (c->ch_class.size() > 0) {
+        res->ch_class.resize(res->ncov);
         for (k = 0; k < res->ncov; k++)
             res->ch_class[k] = c->ch_class[pick[k]];
     }
@@ -3257,7 +3241,7 @@ int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix* c)
     /*
      * Return the appropriate result
      */
-    if (c->cov_diag) {  /* Pick the diagonals */
+    if (c->cov_diag.size() > 0) {  /* Pick the diagonals */
         for (j = 0, p = 0; j < c->ncov; j++)
             for (k = 0; k < c->ncov; k++)
                 dcov[j][k] = (j == k) ? c->cov_diag[j] : 0;
@@ -3288,11 +3272,11 @@ int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix* c)
     /*
      * Return the result
      */
-    if (c->cov_diag) {  /* Pick the diagonal elements */
+    if (c->cov_diag.size() > 0) {  /* Pick the diagonal elements */
         for (j = 0; j < c->ncov; j++) {
             c->cov_diag[j] = dcov[j][j];
         }
-        FREE_3(c->cov); c->cov = NULL;
+        c->cov.resize(0);
     }
     else {              /* Put everything back */
         for (j = 0, p = 0; j < c->ncov; j++)
@@ -3501,13 +3485,13 @@ out :
 
 //=============================================================================================================
 
-MneCovMatrix* DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, float grad_std, float mag_std, float eeg_std)
+std::unique_ptr<MneCovMatrix> DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, float grad_std, float mag_std, float eeg_std)
 /*
      * Specify constant noise values
      */
 {
     int    nchan;
-    double *stds;
+    Eigen::VectorXd stds;
     QStringList names, ch_names;
     int   k,n;
 
@@ -3521,7 +3505,7 @@ MneCovMatrix* DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, floa
     if (eeg)
         nchan = nchan + eeg->ncoil;
 
-    stds = MALLOC_3(nchan,double);
+    stds.resize(nchan);
 
     n = 0;
     if (meg) {
@@ -3547,7 +3531,7 @@ MneCovMatrix* DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, floa
         }
     }
     names = ch_names;
-    return MneCovMatrix::create(FIFFV_MNE_NOISE_COV,nchan,names,NULL,stds);
+    return MneCovMatrix::create(FIFFV_MNE_NOISE_COV,nchan,names,Eigen::VectorXd(),stds);
 }
 
 //=============================================================================================================
@@ -3595,7 +3579,7 @@ int DipoleFitData::make_projection(const QList<QString> &projnames,
         found = FALSE;
         if (all) {
             for (k = 0; k < all->nitems; k++)
-                if (all->items[k]->kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
+                if (all->items[k].kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
                     found = TRUE;
                     break;
                 }
@@ -3637,7 +3621,7 @@ int DipoleFitData::scale_noise_cov(DipoleFitData *f, int nave)
     if (!f->noise)
         return OK;
 
-    if (f->noise->cov != NULL) {
+    if (f->noise->cov.size() > 0) {
         printf("Decomposing the sensor noise covariance matrix...\n");
         if (mne_decompose_eigen_cov_3(f->noise.get()) == FAIL)
             goto bad;
@@ -3679,12 +3663,12 @@ int DipoleFitData::scale_dipole_fit_noise_cov(DipoleFitData *f, int nave)
     if (f->fixed_noise)
         return OK;
 
-    if (f->noise->cov) {
+    if (f->noise->cov.size() > 0) {
         /*
          * Do the decomposition and check that the matrix is positive definite
          */
         printf("Decomposing the noise covariance...");
-        if (f->noise->cov) {
+        if (f->noise->cov.size() > 0) {
             if (mne_decompose_eigen_cov_3(f->noise.get()) == FAIL)
                 goto bad;
             for (k = 0; k < f->noise->ncov; k++) {
@@ -3744,7 +3728,6 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
     if (d) {
         float  *w    = MALLOC_3(f->noise_orig->ncov,float);
         int    nomit_meg,nomit_eeg,nmeg,neeg;
-        double *val;
 
         nmeg = neeg = 0;
         nomit_meg = nomit_eeg = 0;
@@ -3774,19 +3757,17 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
             FREE_3(w);
             return FAIL;
         }
-        f->noise.reset(f->noise_orig->dup());
+        f->noise = f->noise_orig->dup();
         if (nomit_meg+nomit_eeg > 0) {
-            if (f->noise->cov) {
+            if (f->noise->cov.size() > 0) {
                 for (j = 0; j < f->noise->ncov; j++)
                     for (k = 0; k <= j; k++) {
-                        val = f->noise->cov+mne_lt_packed_index_3(j,k);
-                        *val = w[j]*w[k]*(*val);
+                        f->noise->cov[mne_lt_packed_index_3(j,k)] *= w[j]*w[k];
                     }
             }
             else {
                 for (j = 0; j < f->noise->ncov; j++) {
-                    val  = f->noise->cov_diag+j;
-                    *val = w[j]*w[j]*(*val);
+                    f->noise->cov_diag[j] *= w[j]*w[j];
                 }
             }
         }
@@ -3795,7 +3776,7 @@ int DipoleFitData::select_dipole_fit_noise_cov(DipoleFitData *f, mshMegEegData d
     else {
         if (f->noise && f->nave == nave)
             return OK;
-        f->noise.reset(f->noise_orig->dup());
+        f->noise = f->noise_orig->dup();
     }
 
     return scale_dipole_fit_noise_cov(f,nave);
@@ -3832,9 +3813,9 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
     QStringList     file_bads;
     int             file_nbad;
     int             coord_frame = FIFFV_COORD_HEAD;
-    MneCovMatrix*   cov;
+    std::unique_ptr<MneCovMatrix> cov;
     FwdCoilSet*     templates = NULL;
-    MneCTFCompDataSet* comp_data  = NULL;
+    std::unique_ptr<MneCTFCompDataSet> comp_data;
     FwdCoilSet*        comp_coils = NULL;
 
     /*
@@ -3971,7 +3952,8 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
     /*
        * Compensation data
        */
-    if ((comp_data = MneCTFCompDataSet::read(measname)) == NULL)
+    comp_data = MneCTFCompDataSet::read(measname);
+    if (!comp_data)
         goto bad;
     if (comp_data->ncomp > 0) {	/* Compensation channel information may be needed */
         QList<FiffChInfo> comp_chs;
@@ -4000,14 +3982,12 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
         }
     }
     else {          /* Get rid of the empty data set */
-        if(comp_data)
-            delete comp_data;
-        comp_data = NULL;
+        comp_data.reset();
     }
     /*
        * Ready to set up the forward model
        */
-    if (setup_forward_model(res,comp_data,comp_coils) == FAIL)
+    if (setup_forward_model(res,comp_data.get(),comp_coils) == FAIL)
         goto bad;
     res->column_norm = COLUMN_NORM_LOC;
     /*
@@ -4041,24 +4021,23 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
         if ((cov = mne_read_cov(noisename,FIFFV_MNE_SENSOR_COV)) == NULL)
             goto bad;
         printf("Read a %s noise-covariance matrix from %s\n",
-               cov->cov_diag ? "diagonal" : "full", noisename.toUtf8().data());
+               cov->cov_diag.size() > 0 ? "diagonal" : "full", noisename.toUtf8().data());
     }
     else {
         if ((cov = ad_hoc_noise(res->meg_coils.get(),res->eeg_els.get(),grad_std,mag_std,eeg_std)) == NULL)
             goto bad;
     }
-    res->noise.reset(mne_pick_chs_cov_omit(cov,
+    res->noise = mne_pick_chs_cov_omit(cov.get(),
                                        res->ch_names,
                                        res->nmeg+res->neeg,
                                        TRUE,
-                                       res->chs));
+                                       res->chs);
     if (!res->noise) {
-        mne_free_cov_3(cov);
         goto bad;
     }
 
     printf("Picked appropriate channels from the noise-covariance matrix.\n");
-    mne_free_cov_3(cov);
+    cov.reset();
 
     /*
        * Apply the projection operator to the noise-covariance matrix
@@ -4080,7 +4059,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
     /*
        * Regularize the possibly deficient noise-covariance matrix
        */
-    if (res->noise->cov) {
+    if (res->noise->cov.size() > 0) {
         float regs[3];
         int   do_it;
 
@@ -4115,7 +4094,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
        * Do the decomposition and check that the matrix is positive definite
        */
     printf("Decomposing the noise covariance...\n");
-    if (res->noise->cov) {
+    if (res->noise->cov.size() > 0) {
         if (mne_decompose_eigen_cov_3(res->noise.get()) == FAIL)
             goto bad;
         printf("Eigenvalue decomposition done.\n");
@@ -4133,16 +4112,12 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
     badlist.clear();
     delete templates;
     delete comp_coils;
-    if(comp_data)
-        delete comp_data;
     return res;
 
 bad : {
         badlist.clear();
         delete templates;
         delete comp_coils;
-        if(comp_data)
-            delete comp_data;
         if(res)
             delete res;
         return NULL;

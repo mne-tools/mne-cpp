@@ -65,6 +65,9 @@
 #include <fiff/fiff_coord_trans_set.h>
 #include <mne/mne_msh_color_scale_def.h>
 #include <mne/mne_surface_patch.h>
+#include <mne/mne_layout.h>
+
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE INVERSELIB
@@ -355,7 +358,7 @@ typedef struct {
   int           *bads;		                     /* Which channels are bad */
   int           *sels;		                     /* Which channels have been selected for dipole fitting? */
   char          *selname;	                     /* Name of the current channel selection (if any) */
-  MNELIB::mneLayout     lout;				     /* This is the layout */
+  std::unique_ptr<MNELIB::MneLayout> lout;	     /* This is the layout */
   mshScales     scales;				     /* Time and vertical scale and baseline */
 
   float         *custom_data;	                     /* Custom data to use instead of data picked from the responses */

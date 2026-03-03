@@ -43,6 +43,7 @@
 
 #include "mne_global.h"
 #include "mne_named_matrix.h"
+#include "mne_proj_item.h"
 
 #include <fiff/fiff_types.h>
 #include <fiff/fiff_stream.h>
@@ -60,7 +61,6 @@
 
 #include <QSharedPointer>
 #include <QTextStream>
-#include <QList>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -68,12 +68,6 @@
 
 namespace MNELIB
 {
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class MneProjItem;
 
 //=============================================================================================================
 /**
@@ -134,7 +128,7 @@ public:
      * @param[in] desc       Human-readable description of the projection.
      * @param[in] is_active  Whether the item is active on load.
      */
-    void add_item_active(MneNamedMatrix* vecs, int kind, const  QString& desc, int is_active);
+    void add_item_active(const MneNamedMatrix* vecs, int kind, const  QString& desc, int is_active);
 
     // mne_lin_proj.c
 
@@ -146,7 +140,7 @@ public:
      * @param[in] kind   Projection kind constant.
      * @param[in] desc   Human-readable description of the projection.
      */
-    void add_item(MneNamedMatrix* vecs, int kind, const QString& desc);
+    void add_item(const MneNamedMatrix* vecs, int kind, const QString& desc);
 
     // mne_lin_proj.c
 
@@ -260,7 +254,7 @@ public:
     void report(QTextStream &out,const char *tag);
 
 public:
-    QList<MNELIB::MneProjItem*> items;  /**< The projection items. */
+    QList<MNELIB::MneProjItem> items;  /**< The projection items. */
     int         nitems;                 /**< Number of items. */
     QStringList names;                  /**< Names of the channels in the final compiled projector. */
     int         nch;                    /**< Number of channels in the final projector. */

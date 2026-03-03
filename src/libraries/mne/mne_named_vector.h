@@ -7,6 +7,8 @@
 
 #include "mne_global.h"
 
+#include <Eigen/Core>
+
 #include <QStringList>
 
 //=============================================================================================================
@@ -27,12 +29,8 @@ public:
 
     int         nvec = 0;   /**< Number of elements. */
     QStringList names;      /**< Name list for the elements. */
-    float*      data = nullptr; /**< The data itself. */
+    Eigen::VectorXf data;      /**< The data itself. */
 };
-
-/** Backward-compatible typedef aliases. */
-typedef MneNamedVector  mneNamedVectorRec;
-typedef MneNamedVector* mneNamedVector;
 
 } // namespace MNELIB
 

@@ -46,6 +46,8 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -87,23 +89,14 @@ public:
     /**
      * Destroys the MneProjData.
      */
-    ~MneProjData();
+    ~MneProjData() = default;
 
 public:
-    float *a;
-    float *b;
-    float *c;
-    int   *act;
-    int   nactive;
-
-// ### OLD STRUCT ###
-//    typedef struct {
-//        float *a;
-//        float *b;
-//        float *c;
-//        int   *act;
-//        int   nactive;
-//    } *projData,projDataRec;
+    Eigen::VectorXf a;      /**< Triangle-local dot product r12 . r12 for each triangle. */
+    Eigen::VectorXf b;      /**< Triangle-local dot product r13 . r13 for each triangle. */
+    Eigen::VectorXf c;      /**< Triangle-local dot product r12 . r13 for each triangle. */
+    Eigen::VectorXi act;    /**< Per-triangle boolean flag: 1 if this triangle is active. */
+    int   nactive = 0;      /**< Number of currently active triangles. */
 };
 
 //=============================================================================================================

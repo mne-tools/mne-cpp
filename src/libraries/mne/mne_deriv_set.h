@@ -71,8 +71,6 @@ class MneDeriv;
 
 //=============================================================================================================
 /**
- * Implements an MNE Derivation (Replaces *mneDerivSet,mneDerivSetRec; struct of MNE-C mne_types.h).
- *
  * @brief Collection of MneDeriv channel derivation definitions loaded from a file.
  */
 class MNESHARED_EXPORT MneDerivSet
@@ -89,19 +87,12 @@ public:
 
     //=========================================================================================================
     /**
-     * Destroys the MNE Derivation Set
-     * Refactored: mne_free_deriv_set (mne_derivations.c)
+     * Destructor.
      */
     ~MneDerivSet();
 
 public:
     QList<MneDeriv*> derivs;       /**< List of derivation items. */
-
-// ### OLD STRUCT ###
-//typedef struct {            /* A collection of derivations */
-//    int      nderiv;        /* How many? */
-//    mneDeriv *derivs;       /* Pointers to the items */
-//} *mneDerivSet,mneDerivSetRec;
 };
 
 //=============================================================================================================

@@ -41,14 +41,8 @@
 #include "mne_surface_old.h"
 #include "mne_triangle.h"
 
-#define MALLOC_46(x,t) (t *)malloc((x)*sizeof(t))
-
 #ifndef TRUE
 #define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
 #endif
 
 #define X_46 0
@@ -56,8 +50,6 @@
 #define Z_46 2
 
 #define VEC_DOT_46(x,y) ((x)[X_46]*(y)[X_46] + (x)[Y_46]*(y)[Y_46] + (x)[Z_46]*(y)[Z_46])
-
-#define FREE_46(x) if ((char *)(x) != NULL) free((char *)(x))
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -71,15 +63,13 @@ using namespace MNELIB;
 
 MneProjData::MneProjData(MNELIB::MneSurfaceOld* s)
 {
-    int k;
-    MneTriangle* tri = Q_NULLPTR;
+    a.resize(s->ntri);
+    b.resize(s->ntri);
+    c.resize(s->ntri);
+    act.resize(s->ntri);
 
-    a   = MALLOC_46(s->ntri,float);
-    b   = MALLOC_46(s->ntri,float);
-    c   = MALLOC_46(s->ntri,float);
-    act = MALLOC_46(s->ntri,int);
-
-    for (k = 0, tri = s->tris.data(); k < s->ntri; k++, tri++) {
+    MneTriangle* tri = s->tris.data();
+    for (int k = 0; k < s->ntri; k++, tri++) {
       a[k] =  VEC_DOT_46(tri->r12,tri->r12);
       b[k] =  VEC_DOT_46(tri->r13,tri->r13);
       c[k] =  VEC_DOT_46(tri->r12,tri->r13);
@@ -87,13 +77,4 @@ MneProjData::MneProjData(MNELIB::MneSurfaceOld* s)
       act[k] = TRUE;
     }
     nactive = s->ntri;
-}
-
-//=============================================================================================================
-
-MneProjData::~MneProjData()
-{
-    FREE_46(a);
-    FREE_46(b);
-    FREE_46(c);
 }

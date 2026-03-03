@@ -43,18 +43,11 @@
 #include "mne_global.h"
 
 //=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
-//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+#include <QString>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -64,14 +57,10 @@ namespace MNELIB
 {
 
 //=============================================================================================================
-// MNELIB FORWARD DECLARATIONS
-//=============================================================================================================
-
-//=============================================================================================================
 /**
- * Replaces *mshEyes,mshEyesRec struct (analyze_types.c).
- *
  * @brief Eye/camera position and gaze direction for 3-D surface rendering.
+ *
+ * Stores left and right hemisphere viewpoints and up-vectors.
  */
 class MNESHARED_EXPORT MneMshEyes
 {
@@ -81,31 +70,22 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs the MneMshEyes.
+     * Constructs an empty MneMshEyes.
      */
-    MneMshEyes();
+    MneMshEyes() = default;
 
     //=========================================================================================================
     /**
-     * Destroys the MneMshEyes.
+     * Destructor.
      */
-    ~MneMshEyes();
+    ~MneMshEyes() = default;
 
 public:
-    char  *name;			/* Name of this definition */
-    float left[3];		/* Left hemisphere viewpoint */
-    float right[3];		/* Right hemisphere viewpoint */
-    float left_up[3];		/* The up vectors */
-    float right_up[3];		/* The up vectors */
-
-// ### OLD STRUCT ###
-//    typedef struct {		/* Where to look at the surfaces from */
-//      char  *name;			/* Name of this definition */
-//      float left[3];		/* Left hemisphere viewpoint */
-//      float right[3];		/* Right hemisphere viewpoint */
-//      float left_up[3];		/* The up vectors */
-//      float right_up[3];		/* The up vectors */
-//    } *mshEyes,mshEyesRec;
+    QString name;              /**< Name of this viewpoint definition. */
+    float   left[3] = {};      /**< Left hemisphere viewpoint (x, y, z). */
+    float   right[3] = {};     /**< Right hemisphere viewpoint (x, y, z). */
+    float   left_up[3] = {};   /**< Left hemisphere up-vector. */
+    float   right_up[3] = {};  /**< Right hemisphere up-vector. */
 };
 
 //=============================================================================================================

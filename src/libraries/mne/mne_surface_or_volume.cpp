@@ -502,8 +502,7 @@ int MneSurfaceOrVolume::add_patch_stats(MneSourceSpaceOld* s)
                 pinfo[q] = std::make_unique<MnePatchInfo>();
                 pinfo[q]->vert = nearest[p-1].nearest;
                 this_patch = nearest+p-nave;
-                pinfo[q]->memb_vert = MALLOC_17(nave,int);
-                pinfo[q]->nmemb     = nave;
+                pinfo[q]->memb_vert.resize(nave);
                 for (k = 0; k < nave; k++) {
                     pinfo[q]->memb_vert[k] = this_patch[k].vert;
                     this_patch[k].patch    = pinfo[q].get();
@@ -524,8 +523,7 @@ int MneSurfaceOrVolume::add_patch_stats(MneSourceSpaceOld* s)
         pinfo[q]       = std::make_unique<MnePatchInfo>();
         pinfo[q]->vert = nearest[p-1].nearest;
         this_patch = nearest+p-nave;
-        pinfo[q]->memb_vert = MALLOC_17(nave,int);
-        pinfo[q]->nmemb = nave;
+        pinfo[q]->memb_vert.resize(nave);
         for (k = 0; k < nave; k++) {
             pinfo[q]->memb_vert[k] = this_patch[k].vert;
             this_patch[k].patch = pinfo[q].get();
@@ -1515,7 +1513,7 @@ void MneSurfaceOrVolume::decide_search_restriction(MneSurfaceOld* s,
 
 //=============================================================================================================
 
-void MneSurfaceOrVolume::activate_neighbors(MneSurfaceOld* s, int start, int *act, int nstep)
+void MneSurfaceOrVolume::activate_neighbors(MneSurfaceOld* s, int start, Eigen::VectorXi &act, int nstep)
 /*
       * Blessed recursion...
       */
@@ -3609,16 +3607,15 @@ MneVolGeom* MneSurfaceOrVolume::get_volume_geom_from_tag(void *tagsp)
     MneMghTagGroup* tags = (MneMghTagGroup*)tagsp;
     MneMghTag*      tag  = NULL;
     MneVolGeom*     vg   = NULL;
-    int k;
 
     if (tags) {
-        for (k = 0; k < tags->ntags; k++)
-            if (tags->tags[k]->tag == TAG_OLD_SURF_GEOM) {
-                tag = tags->tags[k];
+        for (const auto &t : tags->tags)
+            if (t->tag == TAG_OLD_SURF_GEOM) {
+                tag = t.get();
                 break;
             }
         if (tag)
-            vg = dup_vol_geom((MneVolGeom*)tag->data);
+            vg = dup_vol_geom(reinterpret_cast<MneVolGeom*>(tag->data.data()));
     }
     return vg;
 }
@@ -3750,15 +3747,14 @@ int MneSurfaceOrVolume::read_tag_data(QFile &fp, int tag, long long nbytes, unsi
 
 MneMghTagGroup* MneSurfaceOrVolume::add_mgh_tag_to_group(MneMghTagGroup* g, int tag, long long len, unsigned char *data)
 {
-    MneMghTag* new_tag = NULL;
-
     if (!g)
         g = new MneMghTagGroup();
-    g->tags = REALLOC_17(g->tags,g->ntags+1,MneMghTag*);
-    g->tags[g->ntags++] = new_tag = new MneMghTag();
+    auto new_tag = std::make_unique<MneMghTag>();
     new_tag->tag  = tag;
     new_tag->len  = len;
-    new_tag->data = data;
+    new_tag->data = QByteArray(reinterpret_cast<const char*>(data), static_cast<int>(len));
+    free(data);
+    g->tags.push_back(std::move(new_tag));
 
     return g;
 }

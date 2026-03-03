@@ -125,22 +125,11 @@ public:
     void calculate_normal_stats(MneSourceSpaceOld* s);
 
 public:
-    int   vert;         /**< Source vertex index this patch applies to. */
-    int   *memb_vert;   /**< Array of vertex indices that constitute the patch. */
-    int   nmemb;        /**< Number of member vertices. */
-    float area;         /**< Total surface area of the patch (m^2). */
-    float ave_nn[3];    /**< Average outward surface normal of the patch. */
-    float dev_nn;       /**< Average angular deviation of member normals from ave_nn (radians). */
-
-// ### OLD STRUCT ###
-//typedef struct {
-//    int   vert;             /* Which vertex does this apply to */
-//    int   *memb_vert;       /* Which vertices constitute the patch? */
-//    int   nmemb;            /* How many? */
-//    float area;             /* Area of the patch */
-//    float ave_nn[3];        /* Average normal */
-//    float dev_nn;           /* Average deviation of the patch normals from the average normal */
-//} *mnePatchInfo,mnePatchInfoRec;
+    int   vert;                    /**< Source vertex index this patch applies to. */
+    Eigen::VectorXi memb_vert;     /**< Vertex indices that constitute the patch. */
+    float area;                    /**< Total surface area of the patch (m^2). */
+    float ave_nn[3];               /**< Average outward surface normal of the patch. */
+    float dev_nn;                  /**< Average angular deviation of member normals from ave_nn (radians). */
 };
 
 //=============================================================================================================

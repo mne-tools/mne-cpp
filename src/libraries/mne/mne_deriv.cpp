@@ -40,39 +40,6 @@
 
 #include "mne_deriv.h"
 
-#define FREE_15(x) if ((char *)(x) != NULL) free((char *)(x))
-
-void mne_free_name_list_15(char **list, int nlist)
-/*
- * Free a name list array
- */
-{
-    int k;
-    if (list == NULL || nlist == 0)
-        return;
-    for (k = 0; k < nlist; k++) {
-#ifdef FOO
-        printf("%d %s\n",k,list[k]);
-#endif
-        FREE_15(list[k]);
-    }
-    FREE_15(list);
-    return;
-}
-
-void mne_free_sparse_named_matrix_15(MNELIB::mneSparseNamedMatrix mat)
-/*
-      * Free the matrix and all the data from within
-      */
-{
-    if (!mat)
-        return;
-    if(mat->data)
-        delete mat->data;
-    FREE_15(mat);
-    return;
-}
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -85,11 +52,6 @@ using namespace MNELIB;
 //=============================================================================================================
 
 MneDeriv::MneDeriv()
-: filename(NULL)
-, shortname(NULL)
-, deriv_data(NULL)
-, in_use(NULL)
-, valid(NULL)
 {
 }
 
@@ -97,9 +59,4 @@ MneDeriv::MneDeriv()
 
 MneDeriv::~MneDeriv()
 {
-    FREE_15(filename);
-    FREE_15(shortname);
-    mne_free_sparse_named_matrix_15(deriv_data);
-    FREE_15(in_use);
-    FREE_15(valid);
 }

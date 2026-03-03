@@ -81,11 +81,12 @@ MneSssData::MneSssData()
 , nchan(0)
 , out_order(0)
 , in_order(0)
-, comp_info(NULL)
-, ncomp(0)
 , in_nuse(0)
 , out_nuse(0)
 {
+    origin[0] = 0;
+    origin[1] = 0;
+    origin[2] = 0;
 }
 
 //=============================================================================================================
@@ -96,27 +97,18 @@ MneSssData::MneSssData(const MneSssData& p_MneSssData)
 , nchan(p_MneSssData.nchan)
 , out_order(p_MneSssData.out_order)
 , in_order(p_MneSssData.in_order)
-, ncomp(p_MneSssData.ncomp)
+, comp_info(p_MneSssData.comp_info)
 , in_nuse(p_MneSssData.in_nuse)
 , out_nuse(p_MneSssData.out_nuse)
 {
     origin[0] = p_MneSssData.origin[0];
     origin[1] = p_MneSssData.origin[1];
     origin[2] = p_MneSssData.origin[2];
-
-    comp_info = (int *)malloc(ncomp*sizeof(int));
-
-    for (int k = 0; k < ncomp; k++)
-        comp_info[k] = p_MneSssData.comp_info[k];
 }
 
 //=============================================================================================================
 
-MneSssData::~MneSssData()
-{
-    if ((char *)(comp_info) != NULL)
-        free((char *)(comp_info));
-}
+MneSssData::~MneSssData() = default;
 
 //=============================================================================================================
 
@@ -180,13 +172,15 @@ MneSssData *MneSssData::read_from_node(QSharedPointer<FiffStream> &stream, const
 
         if (!node->find_tag(stream, FIFF_SSS_COMPONENTS, t_pTag))
             goto bad;
-        qDebug() << "ToDo: Check whether comp_info contains the right stuff!!! - use VectorXi instead";
-        s->comp_info = t_pTag->toInt();
-        s->ncomp     = t_pTag->size()/sizeof(fiff_int_t);
+        {
+            int ncomp = t_pTag->size()/sizeof(fiff_int_t);
+            int *raw  = t_pTag->toInt();
+            s->comp_info = Eigen::VectorXi::Map(raw, ncomp);
 
-        if (s->ncomp != (s->in_order*(2+s->in_order) + s->out_order*(2+s->out_order))) {
-            printf("Number of SSS components does not match the expansion orders listed in the file");
-            goto bad;
+            if (ncomp != (s->in_order*(2+s->in_order) + s->out_order*(2+s->out_order))) {
+                printf("Number of SSS components does not match the expansion orders listed in the file");
+                goto bad;
+            }
         }
         /*
             * Count the components in use
@@ -271,7 +265,7 @@ void MneSssData::print(QTextStream &out) const
     out << "in order    : " << this->in_order << "\n";
     out << "out order   : " << this->out_order << "\n";
     out << "nchan       : " << this->nchan << "\n";
-    out << "ncomp       : " << this->ncomp << "\n";
+    out << "ncomp       : " << this->comp_info.size() << "\n";
     out << "in nuse     : " << this->in_nuse << "\n";
     out << "out nuse    : " << this->out_nuse << "\n";
     out << "comps       : ";

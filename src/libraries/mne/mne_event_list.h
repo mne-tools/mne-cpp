@@ -8,6 +8,9 @@
 #include "mne_global.h"
 #include "mne_event.h"
 
+#include <memory>
+#include <vector>
+
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
 //=============================================================================================================
@@ -15,8 +18,11 @@
 namespace MNELIB
 {
 
+//=============================================================================================================
 /**
- * Ordered list of trigger event markers.
+ * @brief Ordered list of trigger-event markers.
+ *
+ * Owns its MneEvent objects via unique_ptr.
  */
 class MNESHARED_EXPORT MneEventList
 {
@@ -24,13 +30,14 @@ public:
     MneEventList() = default;
     ~MneEventList() = default;
 
-    MneEvent     **events = nullptr; /**< Array of events. */
-    int          nevent = 0;         /**< Number of events. */
-};
+    //=========================================================================================================
+    /**
+     * @brief Returns the number of events in the list.
+     */
+    int nevent() const { return static_cast<int>(events.size()); }
 
-/** Backward-compatible typedef aliases. */
-typedef MneEventList  mneEventListRec;
-typedef MneEventList* mneEventList;
+    std::vector<std::unique_ptr<MneEvent>> events; /**< Owned event pointers. */
+};
 
 } // namespace MNELIB
 

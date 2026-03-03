@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "mne_global.h"
+#include "mne_named_matrix.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -63,16 +64,17 @@ namespace MNELIB
 {
 
 //=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class MneNamedMatrix;
-
-//=============================================================================================================
 /**
- * Implements an MNE Projection Item (Replaces *mneProjItem,mneProjItemRec; struct of MNE-C mne_types.h).
+ * @brief A single SSP (Signal-Space Projection) item.
  *
- * @brief One linear projection item
+ * MneProjItem holds one linear projection operator consisting of a set of
+ * projection vectors (stored as an MneNamedMatrix), together with metadata
+ * such as the projection kind, a human-readable description, and flags
+ * indicating whether the item is currently active and which channel types
+ * (MEG / EEG) it covers.
+ *
+ * Projection items are aggregated by MneProjOp to form the complete SSP
+ * operator that is applied during inverse computations and dipole fitting.
  */
 class MNESHARED_EXPORT MneProjItem
 {
@@ -82,57 +84,69 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs the MNE Projection Item
-     * Refactored: mne_new_proj_op_item (mne_lin_proj.c)
+     * @brief Default constructor.
+     *
+     * Initialises all flags to their default values (active = true,
+     * kind = FIFFV_PROJ_ITEM_NONE, no MEG/EEG channels).
      */
     MneProjItem();
 
     //=========================================================================================================
     /**
-     * Destroys the MNE Projection Item
-     * Refactored: mne_free_proj_op_item (mne_lin_proj.c)
+     * @brief Copy constructor (defaulted).
+     */
+    MneProjItem(const MneProjItem&) = default;
+
+    //=========================================================================================================
+    /**
+     * @brief Copy assignment operator (defaulted).
+     */
+    MneProjItem& operator=(const MneProjItem&) = default;
+
+    //=========================================================================================================
+    /**
+     * @brief Move constructor (defaulted).
+     */
+    MneProjItem(MneProjItem&&) noexcept = default;
+
+    //=========================================================================================================
+    /**
+     * @brief Move assignment operator (defaulted).
+     */
+    MneProjItem& operator=(MneProjItem&&) noexcept = default;
+
+    //=========================================================================================================
+    /**
+     * @brief Destructor.
      */
     ~MneProjItem();
 
+    //=========================================================================================================
     /**
-     * Check whether this projection item would affect any of the named channels.
+     * @brief Test whether this projection item affects any of the listed channels.
      *
-     * Returns TRUE if at least one channel name in @p list matches a column
-     * in the projection vectors that has a non-zero entry.
+     * Iterates over @p list and checks if any channel name matches a column
+     * in the projection vectors that contains at least one non-zero entry.
      *
      * @param[in] list    Channel names to test against.
-     * @param[in] nlist   Number of channel names.
+     * @param[in] nlist   Number of channel names in @p list.
      *
-     * @return TRUE if this item affects any listed channel, FALSE otherwise.
+     * @return @c true (non-zero) if this item affects at least one channel,
+     *         @c false (0) otherwise.
      */
     int affect(const QStringList& list, int nlist) const;
 
 public:
-    std::unique_ptr<MneNamedMatrix> vecs;  /**< The original projection vectors. */
-    int             nvec;           /**< Number of vectors = vecs->nrow. */
-    QString         desc;           /**< Projection item description. */
-    int             kind;           /**< Projection item kind. */
-    int             active;         /**< Is this item active now?. */
-    int             active_file;    /**< Was this item active when loaded from file?. */
-    int             has_meg;        /**< Does it have MEG channels?. */
-    int             has_eeg;        /**< Does it have EEG channels?. */
-
-// ### OLD STRUCT ###
-//typedef struct {    /* One linear projection item */
-//    MNELIB::MneNamedMatrix* vecs;   /* The original projection vectors */
-//    int            nvec;                /* Number of vectors = vecs->nrow */
-//    char           *desc;               /* Projection item description */
-//    int            kind;                /* Projection item kind */
-//    int            active;              /* Is this item active now? */
-//    int            active_file;         /* Was this item active when loaded from file? */
-//    int            has_meg;             /* Does it have MEG channels? */
-//    int            has_eeg;             /* Does it have EEG channels? */
-//} *mneProjItem,mneProjItemRec;
+    MneNamedMatrix     vecs;           /**< Projection vectors (nrow = nvec, ncol = nch). */
+    int             nvec;           /**< Number of projection vectors (== vecs.nrow). */
+    QString         desc;           /**< Human-readable description (e.g. "PCA-v1"). */
+    int             kind;           /**< FIFF projection item kind (FIFFV_PROJ_ITEM_*). */
+    int             active;         /**< Whether this item is currently active. */
+    int             active_file;    /**< Whether this item was active when loaded from file. */
+    int             has_meg;        /**< Whether the projection covers MEG channels. */
+    int             has_eeg;        /**< Whether the projection covers EEG channels. */
 };
 
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
 } // NAMESPACE MNELIB
 
 #endif // MNEPROJITEM_H

@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MNE Named Matrix (MneNamedMatrix) class declaration.
+ * @brief    MneNamedMatrix class declaration.
  *
  */
 
@@ -50,11 +50,16 @@
 #include <Eigen/Core>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QDebug>
 #include <QStringList>
 
 //=============================================================================================================
@@ -76,10 +81,22 @@ namespace MNELIB
 
 //=============================================================================================================
 /**
- * Implements MNE Named Matrix (Replaces *mneNamedMatrix,mneNamedMatrixRec; struct of MNE-C mne_types.h).
- * !!!!TODO Merge with existing FiffNamedMatrix!!!!
+ * @brief A dense matrix with named rows and columns.
  *
- * @brief Matrix specification with a channel list
+ * MneNamedMatrix associates a dense float matrix (Eigen::MatrixXf) with optional
+ * row and column name lists (QStringList). It is the C++ equivalent of the MNE-C
+ * @c mneNamedMatrixRec struct, and is used throughout the library to represent
+ * projection vectors, CTF compensation matrices, and forward-solution gain matrices.
+ *
+ * The class provides factory methods to:
+ * - build() a matrix from its constituent parts,
+ * - read() a matrix from a FIFF stream, and
+ * - pick() a sub-matrix by selecting named rows and/or columns.
+ *
+ * All factory methods return @c std::unique_ptr<MneNamedMatrix> for clear ownership.
+ *
+ * @note This class is functionally similar to FIFFLIB::FiffNamedMatrix.
+ *       A future consolidation of both types is planned.
  */
 class MNESHARED_EXPORT MneNamedMatrix
 {
@@ -89,88 +106,101 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs the MNE Named Matrix
+     * @brief Default constructor.
+     *
+     * Creates an empty named matrix with zero rows and columns
+     * and no associated name lists.
      */
     MneNamedMatrix();
 
     //=========================================================================================================
     /**
-     * Copy constructor.
-     * Refactored: mne_dup_named_matrix (mne_named_matrix.c)
+     * @brief Copy constructor.
      *
-     * @param[in] p_MneNamedMatrix   MNE Named Matrix which should be copied.
+     * Performs a deep copy of all members: dimensions, name lists, and matrix data.
+     *
+     * @param[in] p_MneNamedMatrix   The named matrix to copy.
      */
     MneNamedMatrix(const MneNamedMatrix& p_MneNamedMatrix);
 
     //=========================================================================================================
     /**
-     * Destroys the MNE Named Matrix description
-     * Refactored: mne_free_named_matrix (mne_named_matrix.c)
+     * @brief Destructor.
+     *
+     * All members (Eigen::MatrixXf, QStringList) are value types and clean
+     * themselves up automatically.
      */
     ~MneNamedMatrix();
 
     //=========================================================================================================
     /**
-     * Build a named matrix from the ingredients
-     * Refactored: mne_build (mne_named_matrix.c)
+     * @brief Factory: build a named matrix from its constituent parts.
      *
-     * @param[in] nrow       Number of rows.
-     * @param[in] ncol       Number of columns.
-     * @param[in] rowlist    List of row (channel) names.
-     * @param[in] collist    List of column (channel) names.
-     * @param[in] data       Data to store.
+     * Assembles an MneNamedMatrix from dimension counts, optional row/column
+     * name lists, and a dense data matrix.
      *
-     * @return   The new named matrix.
+     * @param[in] nrow       Number of rows (must match @p data.rows()).
+     * @param[in] ncol       Number of columns (must match @p data.cols()).
+     * @param[in] rowlist    Name list for the rows (may be empty).
+     * @param[in] collist    Name list for the columns (may be empty).
+     * @param[in] data       Dense float matrix to store.
+     *
+     * @return A unique pointer to the newly created named matrix.
      */
-    static MneNamedMatrix* build(int  nrow, int  ncol, const QStringList& rowlist, const QStringList& collist, float **data);
+    static std::unique_ptr<MneNamedMatrix> build(int nrow,
+                                                 int ncol,
+                                                 const QStringList& rowlist,
+                                                 const QStringList& collist,
+                                                 const Eigen::MatrixXf& data);
 
     //=========================================================================================================
     /**
-     * Read a named matrix from the specified node
-     * Refactored: mne_read (mne_named_matrix.c)
+     * @brief Factory: read a named matrix from a FIFF file.
      *
-     * @param[in] stream     Stream to read from.
-     * @param[in] node       Node to read from.
-     * @param[in] kind       Block kind which should be read.
+     * Reads a two-dimensional tagged matrix of the given @p kind from
+     * @p node (or its first FIFFB_MNE_NAMED_MATRIX child). Row and column
+     * name lists are read from the associated FIFF_MNE_ROW_NAMES and
+     * FIFF_MNE_COL_NAMES tags when present.
      *
-     * @return   The read named matrix.
+     * @param[in] stream     Open FIFF stream to read from.
+     * @param[in] node       Directory node that contains (or is) the named-matrix block.
+     * @param[in] kind       FIFF tag kind that identifies the matrix data (e.g. FIFF_MNE_FORWARD_SOLUTION).
+     *
+     * @return A unique pointer to the read matrix, or @c nullptr on failure.
      */
-    static MneNamedMatrix* read(QSharedPointer<FIFFLIB::FiffStream>& stream,const QSharedPointer<FIFFLIB::FiffDirNode>& node,int kind);
+    static std::unique_ptr<MneNamedMatrix> read(QSharedPointer<FIFFLIB::FiffStream>& stream,
+                                                const QSharedPointer<FIFFLIB::FiffDirNode>& node,
+                                                int kind);
 
     //=========================================================================================================
     /**
-     * Pick appropriate rows and columns and build a new matrix
-     * Refactored: mne_pick (mne_named_matrix.c)
+     * @brief Create a sub-matrix by picking named rows and columns.
      *
-     * @param[in] pickrowlist    List of row names to pick.
-     * @param[in] picknrow       Number of rows.
-     * @param[in] pickcollist    List of column names to pick.
-     * @param[in] pickncol       Number of columns.
+     * Selects a subset of this matrix's rows and columns by matching their
+     * names against the supplied pick-lists. If a pick-list is empty, all
+     * rows (or columns) of the original are retained.
      *
-     * @return   The read named matrix.
+     * @param[in] pickrowlist    Row names to select (empty = keep all rows).
+     * @param[in] picknrow       Expected number of picked rows (used when @p pickrowlist is empty).
+     * @param[in] pickcollist    Column names to select (empty = keep all columns).
+     * @param[in] pickncol       Expected number of picked columns (used when @p pickcollist is empty).
+     *
+     * @return A unique pointer to the picked sub-matrix, or @c nullptr if a
+     *         requested name was not found.
      */
-    MneNamedMatrix* pick(const QStringList& pickrowlist, int picknrow, const QStringList& pickcollist, int pickncol) const;
+    std::unique_ptr<MneNamedMatrix> pick(const QStringList& pickrowlist,
+                                         int picknrow,
+                                         const QStringList& pickcollist,
+                                         int pickncol) const;
 
 public:
-    int   nrow;             /**< Number of rows. */
-    int   ncol;             /**< Number of columns. */
-    QStringList rowlist;    /**< Name list for the rows (may be empty). */
-    QStringList collist;    /**< Name list for the columns (may be empty). */
-    float **data;           /**< The data matrix (dense, row-major). */
-
-// ### OLD STRUCT ###
-//typedef struct {        /* Matrix specification with a channel list */
-//    int   nrow;         /* Number of rows */
-//    int   ncol;         /* Number of columns */
-//    char  **rowlist;    /* Name list for the rows (may be NULL) */
-//    char  **collist;    /* Name list for the columns (may be NULL) */
-//    float **data;       /* The data itself (dense) */
-//} *mneNamedMatrix,mneNamedMatrixRec;
+    int   nrow;             /**< Number of rows in @ref data. */
+    int   ncol;             /**< Number of columns in @ref data. */
+    QStringList rowlist;    /**< Name list for the rows (may be empty if unnamed). */
+    QStringList collist;    /**< Name list for the columns (may be empty if unnamed). */
+    Eigen::MatrixXf data;  /**< Dense data matrix of dimension @ref nrow x @ref ncol. */
 };
 
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
 } // NAMESPACE MNELIB
 
 #endif // MNENAMEDMATRIX_H

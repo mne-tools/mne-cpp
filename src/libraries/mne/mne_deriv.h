@@ -42,8 +42,9 @@
 //=============================================================================================================
 
 #include "mne_global.h"
+#include "mne_sparse_named_matrix.h"
+
 #include <fiff/fiff_types.h>
-#include "mne_types.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -56,6 +57,9 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QString>
+
+#include <memory>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -66,9 +70,10 @@ namespace MNELIB
 
 //=============================================================================================================
 /**
- * Implements an MNE Derivation (Replaces *mneDeriv,mneDerivRec; struct of MNE-C mne_types.h).
+ * @brief One item in a derivation data set.
  *
- * @brief One item in a derivation data set
+ * Holds a sparse named matrix of derivation coefficients together with
+ * validity and usage metadata and matched channel information.
  */
 class MNESHARED_EXPORT MneDeriv
 {
@@ -78,34 +83,23 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs the MNE Derivation
+     * Constructs an empty MNE Derivation.
      */
     MneDeriv();
 
     //=========================================================================================================
     /**
-     * Destroys the MNE Derivation
-     * Refactored: mne_free_deriv (mne_derivations.c)
+     * Destructor.
      */
     ~MneDeriv();
 
 public:
-    char                    *filename;  /**< Source file name the derivation was loaded from. */
-    char                    *shortname; /**< Short nickname for this derivation. */
-    mneSparseNamedMatrix    deriv_data; /**< The derivation data itself (sparse named matrix). */
-    int                     *in_use;    /**< Per-column count of non-zero elements in the derivation data (not always used). */
-    int                     *valid;     /**< Per-derivation validity flags considering input channel units (not always used). */
-    QList<FIFFLIB::FiffChInfo>     chs;        /**< First matching channel info for each derivation. */
-
-// ### OLD STRUCT ###
-//typedef struct {                        /* One item in a derivation data set */
-//    char                    *filename;  /* Source file name */
-//    char                    *shortname; /* Short nickname for this derivation */
-//    mneSparseNamedMatrix    deriv_data; /* The derivation data itself */
-//    int                     *in_use;    /* How many non-zero elements on each column of the derivation data (This field is not always used) */
-//    int                     *valid;     /* Which of the derivations are valid considering the units of the input channels (This field is not always used) */
-//    FIFFLIB::fiffChInfo     chs;        /* First matching channel info in each derivation */
-//} *mneDeriv,mneDerivRec;
+    QString                  filename;   /**< Source file name the derivation was loaded from. */
+    QString                  shortname;  /**< Short nickname for this derivation. */
+    std::unique_ptr<MneSparseNamedMatrix> deriv_data; /**< The derivation data itself (sparse named matrix). */
+    Eigen::VectorXi          in_use;     /**< Per-column count of non-zero elements in the derivation data. */
+    Eigen::VectorXi          valid;      /**< Per-derivation validity flags considering input channel units. */
+    QList<FIFFLIB::FiffChInfo> chs;      /**< First matching channel info for each derivation. */
 };
 
 //=============================================================================================================

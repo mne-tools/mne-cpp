@@ -41,21 +41,21 @@
 //=============================================================================================================
 
 #include "mne_global.h"
+#include "mne_msh_light.h"
 
 //=============================================================================================================
-// EIGEN INCLUDES
+// STL INCLUDES
 //=============================================================================================================
+
+#include <memory>
+#include <vector>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QList>
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+#include <QString>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -65,16 +65,8 @@ namespace MNELIB
 {
 
 //=============================================================================================================
-// MNELIB FORWARD DECLARATIONS
-//=============================================================================================================
-
-class MneMshLight;
-
-//=============================================================================================================
 /**
- * Replaces *mshLightSet,mshLightSetRec struct (analyze_types.c).
- *
- * @brief Collection of MneMshLight objects defining the lighting setup for 3-D rendering.
+ * @brief Collection of lights defining the lighting setup for 3-D rendering.
  */
 class MNESHARED_EXPORT MneMshLightSet
 {
@@ -84,27 +76,24 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs the MneMshLightSet.
+     * Constructs an empty MneMshLightSet.
      */
-    MneMshLightSet();
+    MneMshLightSet() = default;
 
     //=========================================================================================================
     /**
-     * Destroys the MneMshLightSet.
+     * Destructor.
      */
-    ~MneMshLightSet();
+    ~MneMshLightSet() = default;
 
 public:
-    char     *name;		/* Name of this set */
-    QList<MneMshLight*> lights;		/* Which lights */
-    int      nlight;		/* How many */
+    QString name;                                        /**< Name of this light set. */
+    std::vector<std::unique_ptr<MneMshLight>> lights;    /**< Owned light objects. */
 
-// ### OLD STRUCT ###
-//    typedef struct {		/* Light set */
-//      char     *name;		/* Name of this set */
-//      mshLight lights;		/* Which lights */
-//      int      nlight;		/* How many */
-//    } *mshLightSet,mshLightSetRec;
+    /**
+     * @brief Returns the number of lights in the set.
+     */
+    int nlight() const { return static_cast<int>(lights.size()); }
 };
 
 //=============================================================================================================

@@ -43,18 +43,11 @@
 #include "mne_global.h"
 
 //=============================================================================================================
-// EIGEN INCLUDES
-//=============================================================================================================
-
-//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QByteArray>
 #include <QSharedPointer>
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -64,14 +57,11 @@ namespace MNELIB
 {
 
 //=============================================================================================================
-// MNELIB FORWARD DECLARATIONS
-//=============================================================================================================
-
-//=============================================================================================================
 /**
- * Replaces *mneMGHtag,mneMGHtagRec struct (mne_mgh_mri_io.c).
+ * @brief Single tag entry in a FreeSurfer MGH/MGZ file header.
  *
- * @brief Single tag entry in a FreeSurfer MGH/MGZ file header containing typed metadata.
+ * MGH files can carry optional typed metadata tags in the file footer.
+ * Each tag has an integer identifier, a byte length, and a raw payload.
  */
 class MNESHARED_EXPORT MneMghTag
 {
@@ -81,27 +71,20 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs the MneMghTag.
+     * Constructs an empty MneMghTag.
      */
-    MneMghTag();
+    MneMghTag() = default;
 
     //=========================================================================================================
     /**
-     * Destroys the MneMghTag.
+     * Destructor.
      */
-    ~MneMghTag();
+    ~MneMghTag() = default;
 
 public:
-    int           tag;             /**< Tag identifier. */
-    long long     len;             /**< Length of the tag data in bytes. */
-    unsigned char *data;           /**< Raw tag data payload (heap-allocated). */
-
-// ### OLD STRUCT ###
-//    typedef struct {
-//        int           tag;
-//        long long     len;
-//        unsigned char *data;
-//    } *mneMGHtag,mneMGHtagRec;
+    int        tag = 0;            /**< Tag identifier code. */
+    long long  len = 0;            /**< Byte length of the tag data payload. */
+    QByteArray data;               /**< Raw tag data payload. */
 };
 
 //=============================================================================================================

@@ -1306,7 +1306,7 @@ int mne_write_named_matrix( FiffStream::SPtr& t_pStream,
         names = mne_name_list_to_string_41(mat->collist);
         t_pStream->write_string(FIFF_MNE_COL_NAMES,names);
     }
-    fiff_write_float_matrix_old (t_pStream,kind,mat->data,mat->nrow,mat->ncol);
+    t_pStream->write_float_matrix(kind, mat->data);
 
     t_pStream->end_block(FIFFB_MNE_NAMED_MATRIX);
 
@@ -1838,7 +1838,6 @@ void ComputeFwd::initFwd()
     m_templates             = Q_NULLPTR;
     m_megcoils              = Q_NULLPTR;
     m_compcoils             = Q_NULLPTR;
-    m_compData              = Q_NULLPTR;
     m_eegels                = Q_NULLPTR;
     m_eegModels             = Q_NULLPTR;
     m_iNChan                = 0;
@@ -2049,7 +2048,8 @@ void ComputeFwd::initFwd()
 
         // Compensation data
 
-        if ((m_compData = MneCTFCompDataSet::read(m_pSettings->measname)) == Q_NULLPTR) {
+        m_compData = MneCTFCompDataSet::read(m_pSettings->measname);
+        if (!m_compData) {
             return;
         }
         // Compensation channel information may be needed
@@ -2059,10 +2059,7 @@ void ComputeFwd::initFwd()
             m_listCompChs.clear();
             iNComp = 0;
 
-            if(m_compData) {
-                delete m_compData;
-            }
-            m_compData = Q_NULLPTR;
+            m_compData.reset();
         }
     }
     if (m_pSettings->coord_frame == FIFFV_COORD_MRI) {
@@ -2215,7 +2212,7 @@ void ComputeFwd::calculateFwd()
                                               m_iNSpace,
                                               m_megcoils,
                                               m_compcoils,
-                                              m_compData,
+                                              m_compData.get(),
                                               m_pSettings->fixed_ori,
                                               m_bemModel,
                                               &m_pSettings->r0,
@@ -2342,7 +2339,7 @@ void ComputeFwd::updateHeadPos(const FiffCoordTrans& transDevHead)
                                           m_iNSpace,
                                           m_megcoils,
                                           m_compcoils,
-                                          m_compData,                   // we might have to update this too
+                                          m_compData.get(),                   // we might have to update this too
                                           m_pSettings->fixed_ori,
                                           m_bemModel,
                                           &m_pSettings->r0,
