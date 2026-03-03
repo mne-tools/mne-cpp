@@ -825,7 +825,7 @@ MneSurfaceOld* FwdBemModel::make_guesses(MneSurfaceOld* guess_surf, float guessr
             sphere->rr(k,Y_40) = guessrad*sphere->rr(k,Y_40)/dist + guess_r0[Y_40];
             sphere->rr(k,Z_40) = guessrad*sphere->rr(k,Z_40)/dist + guess_r0[Z_40];
         }
-        if (MneSurfaceOrVolume::add_geometry_info((MneSourceSpaceOld*)sphere,TRUE) == FAIL)
+        if (MneSurfaceOrVolume::add_geometry_info(reinterpret_cast<MneSourceSpaceOld&>(*sphere),TRUE) == FAIL)
             goto out;
         guess_surf = sphere;
     }
@@ -835,7 +835,7 @@ MneSurfaceOld* FwdBemModel::make_guesses(MneSurfaceOld* guess_surf, float guessr
                mne_coord_frame_name_40(guess_surf->coord_frame).toUtf8().constData());
     }
     printf("Filtering (grid = %6.f mm)...\n",1000*grid);
-    res = (MneSurfaceOld*)MneSurfaceOrVolume::make_volume_source_space(guess_surf,grid,exclude,mindist);
+    res = (MneSurfaceOld*)MneSurfaceOrVolume::make_volume_source_space(*guess_surf,grid,exclude,mindist);
 
 out : {
         FREE_40(bemname);
@@ -1379,7 +1379,7 @@ float **FwdBemModel::fwd_bem_solid_angles(const QList<MneSurfaceOld*>& surfs)
                     if (p == q && j == k)
                         result = 0.0;
                     else
-                        result = MneSurfaceOrVolume::solid_angle (surf1->tris[j].cent,tri);
+                        result = MneSurfaceOrVolume::solid_angle (surf1->tris[j].cent,*tri);
                     solids[j+joff][k+koff] = result;
                 }
             for (j = 0; j < ntri1; j++)
@@ -1602,7 +1602,7 @@ int FwdBemModel::fwd_bem_specify_els(FwdBemModel* m, FwdCoilSet *els)
             VEC_COPY_40(r,el->rmag[p]);
             if (!m->head_mri_t.isEmpty())
                 FiffCoordTrans::apply_trans(r,m->head_mri_t,FIFFV_MOVE);
-            best = MneSurfaceOrVolume::project_to_surface(scalp,NULL,r,FALSE,&dist);
+            best = MneSurfaceOrVolume::project_to_surface(*scalp,nullptr,Eigen::Map<const Eigen::Vector3f>(r),dist);
             if (best < 0) {
                 printf("One of the electrodes could not be projected onto the scalp surface. How come?");
                 goto bad;
@@ -1620,7 +1620,7 @@ int FwdBemModel::fwd_bem_specify_els(FwdBemModel* m, FwdCoilSet *els)
              * Calculate a linear interpolation between the vertex values
              */
                 tri = &scalp->tris[best];
-                MneSurfaceOrVolume::triangle_coords(r,scalp,best,&x,&y,&z);
+                MneSurfaceOrVolume::triangle_coords(Eigen::Map<const Eigen::Vector3f>(r),*scalp,best,x,y,z);
 
                 w[X_40] = el->w[p]*(1.0 - x - y);
                 w[Y_40] = el->w[p]*x;
@@ -1690,7 +1690,7 @@ void FwdBemModel::fwd_bem_pot_grad_calc(float *rd, float *Q, FwdBemModel* m, Fwd
             tri  = m->surfs[s]->tris.data();
             mult = m->source_mult[s];
             for (k = 0; k < ntri; k++, tri++)
-                v0[p++] = mult*fwd_bem_inf_pot_der(mri_rd,mri_Q,tri->cent,ee);
+                v0[p++] = mult*fwd_bem_inf_pot_der(mri_rd,mri_Q,tri->cent.data(),ee);
         }
         if (els) {
             FwdBemSolution* sol = (FwdBemSolution*)els->user_data;
@@ -1844,7 +1844,7 @@ void FwdBemModel::fwd_bem_pot_calc(float *rd, float *Q, FwdBemModel *m, FwdCoilS
         tri  = m->surfs[s]->tris.data();
         mult = m->source_mult[s];
         for (k = 0; k < ntri; k++, tri++)
-            v0[p++] = mult*fwd_bem_inf_pot(mri_rd,mri_Q,tri->cent);
+            v0[p++] = mult*fwd_bem_inf_pot(mri_rd,mri_Q,tri->cent.data());
     }
     if (els) {
         FwdBemSolution* sol = (FwdBemSolution*)els->user_data;
@@ -2328,7 +2328,7 @@ void FwdBemModel::fwd_bem_one_lin_field_coeff_simple(float *dest, float *normal,
     float vec_result[3];
     float dl;
     int   k;
-    float *rr[3];
+    const float *rr[3];
 
     rr[0] = source->r1;
     rr[1] = source->r2;
@@ -2592,7 +2592,7 @@ void FwdBemModel::fwd_bem_field_calc(float *rd, float *Q, FwdCoilSet *coils, Fwd
         tri  = m->surfs[s]->tris.data();
         mult = m->source_mult[s];
         for (k = 0; k < ntri; k++, tri++)
-            v0[p++] = mult*fwd_bem_inf_pot(my_rd,my_Q,tri->cent);
+            v0[p++] = mult*fwd_bem_inf_pot(my_rd,my_Q,tri->cent.data());
     }
     /*
        * Primary current contribution
@@ -2669,7 +2669,7 @@ void FwdBemModel::fwd_bem_field_grad_calc(float *rd, float *Q, FwdCoilSet* coils
             tri  = m->surfs[s]->tris.data();
             mult = m->source_mult[s];
             for (k = 0; k < ntri; k++, tri++) {
-                v0[p++] = mult*fwd_bem_inf_pot_der(mri_rd,mri_Q,tri->cent,mri_ee);
+                v0[p++] = mult*fwd_bem_inf_pot_der(mri_rd,mri_Q,tri->cent.data(),mri_ee);
             }
         }
         /*
@@ -3088,8 +3088,7 @@ bad : {
 
 //=============================================================================================================
 
-int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
-                                     int nspace,
+int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MneSourceSpaceOld>>& spaces,
                                      FwdCoilSet *coils,
                                      FwdCoilSet *comp_coils,
                                      MneCTFCompDataSet *comp_data,
@@ -3117,6 +3116,7 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
                                              * for one dipole orientation */
     int                 nmeg = coils->ncoil;/* Number of channels */
     int                 nsource;            /* Total number of sources */
+    int                 nspace = static_cast<int>(spaces.size());
     int                 k,p,q,off;
     QStringList         names;              /* Channel names */
     void                *client;
@@ -3242,7 +3242,7 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
         if (fixed_ori || vec_field || nproc < 6) {
             for (k = 0, off = 0; k < nthread; k++) {
                 FwdThreadArg* t_arg = FwdThreadArg::create_meg_multi_thread_duplicate(one_arg,bem_model != NULL);
-                t_arg->s   = spaces[k];
+                t_arg->s   = spaces[k].get();
                 t_arg->off = off;
                 off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
                 args.append(t_arg);
@@ -3254,7 +3254,7 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
             for (k = 0, off = 0, q = 0; k < nspace; k++) {
                 for (p = 0; p < 3; p++,q++) {
                     FwdThreadArg* t_arg = FwdThreadArg::create_meg_multi_thread_duplicate(one_arg,bem_model != NULL);
-                    t_arg->s    = spaces[k];
+                    t_arg->s    = spaces[k].get();
                     t_arg->off  = off;
                     t_arg->comp = p;
                     args.append(t_arg);
@@ -3287,7 +3287,7 @@ int FwdBemModel::compute_forward_meg(MneSourceSpaceOld **spaces,
         printf("Computing MEG at %d source locations (%s orientations, no threads)...",
                 nsource,fixed_ori ? "fixed" : "free");
         for (k = 0, off = 0; k < nspace; k++) {
-            one_arg->s   = spaces[k];
+            one_arg->s   = spaces[k].get();
             one_arg->off = off;
             meg_eeg_fwd_one_source_space(one_arg);
             if (one_arg->stat != OK)
@@ -3352,8 +3352,7 @@ bad : {
 
 //=============================================================================================================
 
-int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces,
-                                     int nspace,
+int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MneSourceSpaceOld>>& spaces,
                                      FwdCoilSet *els,
                                      bool fixed_ori,
                                      FwdBemModel *bem_model,
@@ -3377,6 +3376,7 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces,
     fwdFieldGradFunc pot_grad;              /* Computes the potential and gradient with respect to dipole position
                                              * for one dipole orientation */
     int             nsource;                /* Total number of sources */
+    int             nspace = static_cast<int>(spaces.size());
     int             neeg = els->ncoil;      /* Number of channels */
     int             k,p,q,off;
     QStringList     names;                  /* Channel names */
@@ -3463,7 +3463,7 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces,
         if (fixed_ori || vec_pot || nproc < 6) {
             for (k = 0, off = 0; k < nthread; k++) {
                 FwdThreadArg* t_arg = FwdThreadArg::create_eeg_multi_thread_duplicate(one_arg,bem_model != NULL);
-                t_arg->s   = spaces[k];
+                t_arg->s   = spaces[k].get();
                 t_arg->off = off;
                 off = fixed_ori ? off + spaces[k]->nuse : off + 3*spaces[k]->nuse;
                 args.append(t_arg);
@@ -3474,7 +3474,7 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces,
             for (k = 0, off = 0, q = 0; k < nspace; k++) {
                 for (p = 0; p < 3; p++,q++) {
                     FwdThreadArg* t_arg = FwdThreadArg::create_eeg_multi_thread_duplicate(one_arg,bem_model != NULL);
-                    t_arg->s    = spaces[k];
+                    t_arg->s    = spaces[k].get();
                     t_arg->off  = off;
                     t_arg->comp = p;
                     args.append(t_arg);
@@ -3506,7 +3506,7 @@ int FwdBemModel::compute_forward_eeg(MneSourceSpaceOld **spaces,
         printf("Computing EEG at %d source locations (%s orientations, no threads)...",
                 nsource,fixed_ori ? "fixed" : "free");
         for (k = 0, off = 0; k < nspace; k++) {
-            one_arg->s   = spaces[k];
+            one_arg->s   = spaces[k].get();
             one_arg->off = off;
             meg_eeg_fwd_one_source_space(one_arg);
             if (one_arg->stat != OK)

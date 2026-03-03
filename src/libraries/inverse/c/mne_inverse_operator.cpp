@@ -41,6 +41,7 @@
 #include "mne_inverse_operator.h"
 
 #include <fiff/fiff_coord_trans.h>
+#include <mne/mne_source_space_old.h>
 
 //=============================================================================================================
 // USED NAMESPACES

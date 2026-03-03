@@ -71,9 +71,13 @@ namespace MNELIB
 
 //=============================================================================================================
 /**
- * Implements an MNE Projection Operator (Replaces *mneProjOp,mneProjOpRec; struct of MNE-C mne_types.h).
+ * @brief Projection operator managing a set of linear projection items
+ *        and the final compiled projector matrix.
  *
- * @brief Projection operator managing a set of linear projection items and the final compiled projector matrix.
+ * MneProjOp aggregates zero or more MneProjItem entries, each holding a
+ * named matrix of projection vectors. When the operator is compiled
+ * (make_projector), the individual items are orthogonalised into a single
+ * dense projector stored in @ref proj_data.
  */
 class MNESHARED_EXPORT MneProjOp
 {
@@ -86,30 +90,31 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs the MNE Projection Operator
-     * Refactored: mne_new_proj_op (mne_lin_proj.c)
+     * @brief Default constructor.
+     *
+     * Creates an empty operator with no projection items.
      */
     MneProjOp();
 
     //=========================================================================================================
     /**
-     * Destroys the MNE Projection Operator
-     * Refactored: mne_free_proj_op (mne_lin_proj.c)
+     * @brief Destructor.
      */
     ~MneProjOp();
 
     //=========================================================================================================
     /**
-     * Free Substructure; TODO: Remove later on
-     * Refactored: ne_free_proj_op_proj (mne_lin_proj.c)
+     * @brief Release the compiled projector data.
+     *
+     * Clears @ref proj_data, @ref names, @ref nch, and @ref nvec without
+     * touching the underlying projection items.
      */
     void free_proj();
 
-    // mne_lin_proj.c
-
     /**
-     * Append all projection items from another operator into this one,
-     * preserving each item's active_file flag.
+     * @brief Append all projection items from another operator.
+     *
+     * Each item's active_file flag is preserved.
      *
      * @param[in] from   Source operator whose items are copied.
      *
@@ -117,10 +122,9 @@ public:
      */
     MneProjOp* combine(MneProjOp* from);
 
-    // mne_lin_proj.c
-
     /**
-     * Add a projection item with an explicit active/inactive state.
+     * @brief Add a projection item with an explicit active/inactive state.
+     *
      * The projection kind (MEG/EEG) is auto-detected from channel names.
      *
      * @param[in] vecs       Named matrix holding the projection vectors.
@@ -130,11 +134,10 @@ public:
      */
     void add_item_active(const MneNamedMatrix* vecs, int kind, const  QString& desc, int is_active);
 
-    // mne_lin_proj.c
-
     /**
-     * Add a projection item that is active by default. Convenience wrapper
-     * around add_item_active() with @c is_active set to TRUE.
+     * @brief Add a projection item that is active by default.
+     *
+     * Convenience wrapper around add_item_active() with @c is_active = TRUE.
      *
      * @param[in] vecs   Named matrix holding the projection vectors.
      * @param[in] kind   Projection kind constant.
@@ -142,21 +145,20 @@ public:
      */
     void add_item(const MneNamedMatrix* vecs, int kind, const QString& desc);
 
-    // mne_lin_proj.c
-
     /**
-     * Create a deep copy of this projection operator, including all items,
-     * their vectors, descriptions, and active states.
+     * @brief Create a deep copy of this projection operator.
+     *
+     * Copies all items, their vectors, descriptions, and active states.
      *
      * @return A newly allocated copy. Caller takes ownership.
      */
     MneProjOp* dup() const;
 
-    // mne_lin_proj.c
-
     /**
-     * Create an average EEG reference projector by building a uniform-weight
-     * vector (\f$1/\sqrt{N_{\text{EEG}}}\f$) across all EEG channels.
+     * @brief Create an average EEG reference projector.
+     *
+     * Builds a uniform-weight vector (\f$1/\sqrt{N_{\text{EEG}}}\f$)
+     * across all EEG channels.
      *
      * @param[in] chs   Channel information list.
      * @param[in] nch   Number of channels.
@@ -205,10 +207,8 @@ public:
      */
     int project_vector(float *vec, int nvec, int do_complement);
 
-    //============================= mne_lin_proj_io.c =============================
-
     /**
-     * Read all linear projection items from a FIFF tree node.
+     * @brief Read all linear projection items from a FIFF tree node.
      *
      * @param[in] stream   An open FIFF stream.
      * @param[in] start    The tree node to search for projection blocks.
@@ -216,9 +216,8 @@ public:
      * @return A populated projection operator (possibly with zero items),
      *         or NULL on error. Caller takes ownership.
      */
-    static MneProjOp* read_from_node(//fiffFile in,
-                                         FIFFLIB::FiffStream::SPtr& stream,
-                                         const FIFFLIB::FiffDirNode::SPtr& start);
+    static MneProjOp* read_from_node(FIFFLIB::FiffStream::SPtr& stream,
+                                     const FIFFLIB::FiffDirNode::SPtr& start);
 
     /**
      * Read a projection operator from a FIFF file by path.
@@ -260,21 +259,8 @@ public:
     int         nch;                    /**< Number of channels in the final projector. */
     int         nvec;                   /**< Number of orthogonalized vectors in the final projector. */
     RowMajorMatrixXf proj_data; /**< The compiled projector: orthogonalized projection vectors (nvec x nch). */
-
-//// ### OLD STRUCT ###
-//typedef struct {                            /* Collection of projection items and the projector itself */
-//    QList<MNELIB::MneProjItem*> items;  /* The projection items */
-//    int            nitems;                  /* Number of items */
-//    char           **names;                 /* Names of the channels in the final projector */
-//    int            nch;                     /* Number of channels in the final projector */
-//    int            nvec;                    /* Number of vectors in the final projector */
-//    float          **proj_data;             /* The orthogonalized projection vectors picked and orthogonalized from the original data */
-//} *mneProjOp,mneProjOpRec;
 };
 
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
 } // NAMESPACE MNELIB
 
 #endif // MNEPROJOP_H

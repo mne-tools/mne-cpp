@@ -61,14 +61,14 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneProjData::MneProjData(MNELIB::MneSurfaceOld* s)
+MneProjData::MneProjData(const MNELIB::MneSurfaceOld* s)
 {
     a.resize(s->ntri);
     b.resize(s->ntri);
     c.resize(s->ntri);
     act.resize(s->ntri);
 
-    MneTriangle* tri = s->tris.data();
+    const MneTriangle* tri = s->tris.data();
     for (int k = 0; k < s->ntri; k++, tri++) {
       a[k] =  VEC_DOT_46(tri->r12,tri->r12);
       b[k] =  VEC_DOT_46(tri->r13,tri->r13);

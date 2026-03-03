@@ -47,11 +47,21 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QString>
+
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+#include <vector>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -94,55 +104,53 @@ public:
     ~MneMshDisplaySurface();
 
 public:
-    char           *filename;	/**< Path to the file this surface was loaded from. */
-    time_t         time_loaded;	/**< Timestamp when the surface was loaded. */
-    char           *subj;		/**< Subject name in SUBJECTS_DIR. */
-    char           *surf_name;	/**< Name of the surface (e.g., "inflated", "white"). */
-    MNELIB::MneSurfaceOld*     s;		/**< Underlying surface mesh data. */
-    float          eye[3];	/**< Eye position for 3D viewing. */
-    float          up[3];		/**< Up vector for 3D viewing. */
-    float          rot[3];        /**< Rotation angles of the MRI (in radians). */
-    float          move[3];	/**< Translation offset for the origin. */
+    QString        filename;	/**< Path to the file this surface was loaded from. */
+    time_t         time_loaded = 0;	/**< Timestamp when the surface was loaded. */
+    QString        subj;		/**< Subject name in SUBJECTS_DIR. */
+    QString        surf_name;	/**< Name of the surface (e.g., "inflated", "white"). */
+    std::unique_ptr<MNELIB::MneSurfaceOld> s;		/**< Underlying surface mesh data. */
+    Eigen::Vector3f eye{1.0f, 0.0f, 0.0f};	/**< Eye position for 3D viewing. */
+    Eigen::Vector3f up{0.0f, 0.0f, 1.0f};		/**< Up vector for 3D viewing. */
+    Eigen::Vector3f rot = Eigen::Vector3f::Zero();        /**< Rotation angles of the MRI (in radians). */
+    Eigen::Vector3f move = Eigen::Vector3f::Zero();	/**< Translation offset for the origin. */
 
-    float          fov;		/**< Field of view (extent of the surface). */
-    float          fov_scale;	/**< Scale factor for extra space around FOV. */
-    float          minv[3];	/**< Minimum values along the three coordinate axes. */
-    float          maxv[3];	/**< Maximum values along the three coordinate axes. */
-    float          *trans;	/**< Extra 4x4 transformation matrix for this surface. */
-    int            sketch;	/**< Non-zero to use sketch mode with decimated triangulation. */
+    float          fov = 2.0f;		/**< Field of view (extent of the surface). */
+    float          fov_scale = 1.0f;	/**< Scale factor for extra space around FOV. */
+    Eigen::Vector3f minv = Eigen::Vector3f::Constant(-1.0f);	/**< Minimum values along the three coordinate axes. */
+    Eigen::Vector3f maxv = Eigen::Vector3f::Constant(1.0f);	/**< Maximum values along the three coordinate axes. */
+    Eigen::Matrix4f trans = Eigen::Matrix4f::Identity();	/**< Extra 4x4 transformation matrix for this surface. */
+    int            sketch = 0;	/**< Non-zero to use sketch mode with decimated triangulation. */
 
-    MNELIB::MneMorphMap       **maps;		/**< Morphing maps from other surfaces to this one. */
-    int            nmap;		/**< Number of morph maps (normally just one). */
+    std::vector<std::unique_ptr<MNELIB::MneMorphMap>> maps;		/**< Morphing maps from other surfaces to this one. */
 
-    int   overlay_type;	        /**< Type identifier for the overlay values. */
-    float *overlay_values;	/**< Per-vertex overlay value array. */
-    int   alt_overlay_type;	/**< Alternative overlay type identifier. */
-    float *alt_overlay_values;  /**< Per-vertex alternative overlay values. */
-    float *marker_values;		/**< Per-vertex marker values (shown in shades of marker color). */
+    int   overlay_type = 0;	        /**< Type identifier for the overlay values. */
+    Eigen::VectorXf overlay_values;	/**< Per-vertex overlay value array. */
+    int   alt_overlay_type = 0;	/**< Alternative overlay type identifier. */
+    Eigen::VectorXf alt_overlay_values;  /**< Per-vertex alternative overlay values. */
+    Eigen::VectorXf marker_values;		/**< Per-vertex marker values (shown in shades of marker color). */
 
-    float *vertex_colors;		/**< Per-vertex RGBA color array. */
-    MNELIB::MneMshColorScaleDef* color_scale; /**< Color scale used to compute vertex colors. */
-    int   nvertex_colors;		/**< Number of color components per vertex. */
-    float even_vertex_color[4];	/**< Uniform RGBA color for non-data-driven coloring. */
+    Eigen::VectorXf vertex_colors;		/**< Per-vertex RGBA color array. */
+    std::unique_ptr<MNELIB::MneMshColorScaleDef> color_scale; /**< Color scale used to compute vertex colors. */
+    int   nvertex_colors = 3;		/**< Number of color components per vertex. */
+    Eigen::Vector4f even_vertex_color = Eigen::Vector4f::Zero();	/**< Uniform RGBA color for non-data-driven coloring. */
 
-    float *marker_colors;		/**< Per-vertex marker color array. */
-    int   nmarker_colors;		/**< Number of color components per marker vertex. */
-    int   **marker_tri;	        /**< Array of triangles containing markers. */
-    int   *marker_tri_no;		/**< Triangle indices of the marker triangles. */
-    int   nmarker_tri;		/**< Number of marker triangles. */
-    float marker_color[4];	/**< RGBA color for markers. */
-    int   curvature_color_mode;	/**< How curvature is visualized. */
+    Eigen::VectorXf marker_colors;		/**< Per-vertex marker color array. */
+    int   nmarker_colors = 3;		/**< Number of color components per marker vertex. */
+    Eigen::MatrixXi marker_tri;	        /**< Array of triangles containing markers. */
+    Eigen::VectorXi marker_tri_no;		/**< Triangle indices of the marker triangles. */
+    int   nmarker_tri = 0;		/**< Number of marker triangles. */
+    Eigen::Vector4f marker_color = Eigen::Vector4f::Zero();	/**< RGBA color for markers. */
+    int   curvature_color_mode = 0;	/**< How curvature is visualized. */
 
-    int   overlay_color_mode;	/**< How overlay data affects coloring. */
-    int   transparent;		/**< Non-zero if this surface is rendered transparently. */
+    int   overlay_color_mode = 0;	/**< How overlay data affects coloring. */
+    int   transparent = 0;		/**< Non-zero if this surface is rendered transparently. */
 
-    int   show_aux_data;		/**< Non-zero to show auxiliary data related to this surface. */
+    int   show_aux_data = 0;		/**< Non-zero to show auxiliary data related to this surface. */
 
-    MNELIB::MneMshPicked* picked;		/**< Array of picked locations in world coordinates. */
-    int       npicked;		/**< Number of picked locations. */
+    std::vector<MNELIB::MneMshPicked> picked;		/**< Picked locations in world coordinates. */
 
-    void              *user_data;       /**< Arbitrary user-defined data pointer. */
-    mneUserFreeFunc*   user_data_free;   /**< Function to free user_data. */
+    void              *user_data = nullptr;       /**< Arbitrary user-defined data pointer. */
+    mneUserFreeFunc    user_data_free = nullptr;   /**< Function to free user_data. */
 
 // ### OLD STRUCT ###
 //    typedef struct {		/* Display surface properties */

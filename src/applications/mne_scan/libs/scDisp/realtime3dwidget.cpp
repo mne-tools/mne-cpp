@@ -75,6 +75,8 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
+
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -272,14 +274,14 @@ void RealTime3DWidget::alignFiducials(QSharedPointer<FIFFLIB::FiffDigitizerData>
                                              1,
                                              1);
 
-    MneMshDisplaySurface* surface = pMneMshDisplaySurfaceSet->surfs[0];
+    MneMshDisplaySurface* surface = pMneMshDisplaySurfaceSet->surfs[0].get();
 
     QFile t_fileDigDataReference(QCoreApplication::applicationDirPath() + "/../resources/general/hpiAlignment/fsaverage-fiducials.fif");
 
-    float scales[3];
+    Eigen::Vector3f scales;
     QScopedPointer<FiffDigitizerData> t_digDataReference(new FiffDigitizerData(t_fileDigDataReference));
-    MneSurfaceOrVolume::align_fiducials(pDigData.data(),
-                                        t_digDataReference.data(),
+    MneSurfaceOrVolume::align_fiducials(*pDigData,
+                                        *t_digDataReference,
                                         surface,
                                         10,
                                         1,

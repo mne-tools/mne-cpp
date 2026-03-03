@@ -41,7 +41,6 @@
 //=============================================================================================================
 
 #include "mne_global.h"
-#include "mne_types.h"
 
 //=============================================================================================================
 // STL INCLUDES
@@ -53,6 +52,8 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
@@ -61,10 +62,6 @@
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
-//=============================================================================================================
-
-//=============================================================================================================
-// DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
 namespace MNELIB
@@ -78,9 +75,11 @@ class MneSourceSpaceOld;
 
 //=============================================================================================================
 /**
- * Replaces *mneSurfacePatch,mneSurfacePatchRec struct (mne_types.c).
- *
  * @brief Cortical surface patch linking a set of vertices to a single source space point.
+ *
+ * Each patch represents a contiguous region of a FreeSurfer cortical surface.
+ * It stores the mapping between patch-local and full-surface vertex/triangle
+ * indices and marks which vertices lie on the patch border.
  */
 class MNESHARED_EXPORT MneSurfacePatch
 {
@@ -90,7 +89,9 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs the MneSurfacePatch.
+     * Constructs a patch with @p np vertices.
+     *
+     * @param[in] np  Number of vertices in the patch (0 for an empty patch).
      */
     MneSurfacePatch(int np);
 
@@ -101,37 +102,15 @@ public:
     ~MneSurfacePatch();
 
 public:
-    std::unique_ptr<MneSourceSpaceOld> s;		    /**< Patch represented as a surface. */
-    int              *vert;	    /**< Vertex numbers in the complete surface. */
-    int              *surf_vert;	    /**< Mapping from complete surface vertex index to patch vertex index (-1 if not in patch). */
-    int              np_surf;	    /**< Number of points on the complete surface. */
-    int              *tri;	    /**< Mapping from patch triangle index to complete surface triangle index. */
-    int              *surf_tri;	    /**< Mapping from complete surface triangle index to patch triangle index (-1 if not in patch). */
-    int              ntri_surf;	    /**< Number of triangles on the complete surface. */
-    int              *border;	    /**< Boolean flag per vertex: non-zero if the vertex lies on the patch border. */
-    int              flat;	    /**< Non-zero if this is a flat patch. */
-    void             *user_data;      /**< Arbitrary user-defined data pointer. */
-    mneUserFreeFunc  user_data_free;  /**< Function to free user_data. */
-
-// ### OLD STRUCT ###
-//    typedef struct {		    /* FreeSurfer patches */
-//      mneSurface       s;		    /* Patch represented as a surface */
-//      int              *vert;	    /* Vertex numbers in the complete surface*/
-//      int              *surf_vert;	    /* Which vertex corresponds to each complete surface vertex here? */
-//      int              np_surf;	    /* How many points on the complete surface? */
-//      int              *tri;	    /* Which triangles in the complete surface correspond to our triangles? */
-//      int              *surf_tri;	    /* Which of our triangles corresponds to each triangle on the complete surface? */
-//      int              ntri_surf;	    /* How many triangles on the complete surface */
-//      int              *border;	    /* Is this vertex on the border? */
-//      int              flat;	    /* Is this a flat patch? */
-//      void             *user_data;      /* Anything else we want */
-//      mneUserFreeFunc  user_data_free;  /* Function to set the above free */
-//    } *mneSurfacePatch,mneSurfacePatchRec;
+    std::unique_ptr<MneSourceSpaceOld> s;		    /**< Patch represented as a source space surface. */
+    Eigen::VectorXi  vert;	    /**< Vertex numbers in the complete surface (size np). */
+    Eigen::VectorXi  surf_vert;	    /**< Map from complete-surface vertex index to patch vertex index (-1 if absent). */
+    Eigen::VectorXi  tri;	    /**< Map from patch triangle index to complete-surface triangle index. */
+    Eigen::VectorXi  surf_tri;	    /**< Map from complete-surface triangle index to patch triangle index (-1 if absent). */
+    Eigen::VectorXi  border;	    /**< Per-vertex flag: non-zero if the vertex lies on the patch border (size np). */
+    int              flat = 0;	    /**< Non-zero if the patch has been flattened. */
 };
 
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
 } // NAMESPACE MNELIB
 
 #endif // MNESURFACEPATCH_H

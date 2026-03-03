@@ -59,6 +59,7 @@
 //=============================================================================================================
 
 #include <memory>
+#include <vector>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -83,6 +84,9 @@ namespace MNELIB
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+struct RingBuffer;
+struct FilterData;
 
 //=============================================================================================================
 /**
@@ -242,79 +246,31 @@ public:
     QStringList     ch_names;           /**< Channel names as a flat list. */
     QStringList     badlist;            /**< Bad channel names. */
     int             nbad;               /**< Number of bad channels. */
-    int              *bad;              /**< Boolean array marking bad channels. */
-    MNELIB::MneRawBufDef* bufs;         /**< Raw data buffer definitions. */
-    int              nbuf;                  /**< Number of raw data buffers. */
-    MNELIB::MneRawBufDef* filt_bufs;    /**< Filtered data buffer definitions. */
-    int             nfilt_buf;              /**< Number of filtered buffers. */
+    Eigen::VectorXi  bad;               /**< Boolean array marking bad channels (0 = good, 1 = bad). */
+    std::vector<MNELIB::MneRawBufDef> bufs;  /**< Raw data buffer definitions. */
+    std::vector<MNELIB::MneRawBufDef> filt_bufs;  /**< Filtered data buffer definitions. */
     int             first_samp;         /**< First sample index in the file. */
     int             omit_samp;          /**< Number of skip samples omitted from the beginning. */
     int             first_samp_old;     /**< First sample index (old-version compatible value). */
     int             omit_samp_old;      /**< Omitted samples (old-version compatible value). */
     int             nsamp;              /**< Total number of samples in the file. */
-    float           *first_sample_val;  /**< Values at the first sample (for DC offset correction before filtering). */
+    Eigen::VectorXf  first_sample_val;  /**< Values at the first sample (for DC offset correction before filtering). */
     std::unique_ptr<MNELIB::MneProjOp> proj;            /**< SSP projection operator. */
     std::unique_ptr<MNELIB::MneSssData> sss;            /**< SSS data found in this file. */
     std::unique_ptr<MNELIB::MneCTFCompDataSet> comp;    /**< CTF compensation data. */
     int             comp_file;          /**< Compensation grade stored in the file. */
     int             comp_now;           /**< Current compensation grade applied to data. */
     std::unique_ptr<MneFilterDef> filter; /**< Filter definition (highpass/lowpass). */
-    void            *filter_data;       /**< Opaque filter state data. */
-    mneUserFreeFunc filter_data_free;   /**< Function to free filter_data. */
+    std::unique_ptr<FilterData> filter_data;  /**< Pre-computed frequency-domain filter state. */
     std::unique_ptr<MneEventList> event_list; /**< Trigger event list. */
     unsigned int    max_event;          /**< Maximum event number in use. */
     QString         dig_trigger;        /**< Name of the digital trigger channel. */
     unsigned int     dig_trigger_mask;  /**< Bit mask applied to digital trigger channel. */
-    float            *offsets;          /**< DC offset corrections for display. */
-    void             *ring;             /**< Ring buffer for raw data (opaque). */
-    void             *filt_ring;        /**< Ring buffer for filtered data (opaque). */
+    Eigen::VectorXf  offsets;           /**< DC offset corrections for display. */
+    std::unique_ptr<RingBuffer> ring;        /**< Ring buffer for raw data. */
+    std::unique_ptr<RingBuffer> filt_ring;   /**< Ring buffer for filtered data. */
     std::unique_ptr<MNELIB::MneDerivSet> deriv;        /**< Derivation data definitions. */
     std::unique_ptr<MNELIB::MneDeriv> deriv_matched;   /**< Derivation data matched to this raw data. */
-    float            *deriv_offsets;        /**< DC offset corrections for derived channels. */
-    void             *user;         /**< User-defined data pointer. */
-    mneUserFreeFunc  user_free;     /**< Function to free user data. */
-
-//// ### OLD STRUCT ###
-//typedef struct {        /* A comprehensive raw data structure */
-//    char             *filename;             /* This is our file */
-//    //  FIFFLIB::fiffFile       file;
-//    FIFFLIB::FiffStream::SPtr stream;
-//    MNELIB::MneRawInfo*      info;      /* Loaded using the mne routines */
-//    char             **ch_names;            /* Useful to have the channel names as a single list */
-//    char             **badlist;             /* Bad channel names */
-//    int              nbad;                  /* How many? */
-//    int              *bad;                  /* Which channels are bad? */
-//    MNELIB::MneRawBufDef* bufs;         /* These are the data */
-//    int              nbuf;                  /* How many? */
-//    MNELIB::MneRawBufDef* filt_bufs;    /* These are the filtered ones */
-//    int              nfilt_buf;
-//    int              first_samp;            /* First sample? */
-//    int              omit_samp;             /* How many samples of skip omitted in the beginning */
-//    int              first_samp_old;        /* This is the value first_samp would have in the old versions */
-//    int              omit_samp_old;         /* This is the value omit_samp would have in the old versions */
-//    int              nsamp;                 /* How many samples in total? */
-//    float            *first_sample_val;     /* Values at the first sample (for dc offset correction before filtering) */
-//    MNELIB::MneProjOp* proj;            /* Projection operator */
-//    MNELIB::MneSssData* sss;            /* SSS data found in this file */
-//    MNELIB::MneCTFCompDataSet* comp;    /* Compensation data */
-//    int              comp_file;             /* Compensation status of these raw data in file */
-//    int              comp_now;              /* Compensation status of these raw data in file */
-//    mneFilterDef     filter;                /* Filter definition */
-//    void             *filter_data;          /* This can be whatever the filter needs */
-//    mneUserFreeFunc  filter_data_free;      /* Function to free the above */
-//    mneEventList     event_list;            /* Trigger events */
-//    unsigned int     max_event;             /* Maximum event number in usenest */
-//    char             *dig_trigger;          /* Name of the digital trigger channel */
-//    unsigned int     dig_trigger_mask;      /* Mask applied to digital trigger channel before considering it */
-//    float            *offsets;              /* Dc offset corrections for display */
-//    void             *ring;                 /* The ringbuffer (structure is of no interest to us) */
-//    void             *filt_ring;            /* Separate ring buffer for filtered data */
-//    MNELIB::MneDerivSet*  deriv;        /* Derivation data */
-//    MNELIB::MneDeriv*     deriv_matched;/* Derivation data matched to this raw data and collected into a single item */
-//    float            *deriv_offsets;        /* Dc offset corrections for display of the derived channels */
-//    void             *user;	        /* Whatever */
-//    mneUserFreeFunc  user_free;     /* How this is freed */
-//} *mneRawData,mneRawDataRec;
 };
 
 //=============================================================================================================

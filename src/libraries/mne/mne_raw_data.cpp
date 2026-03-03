@@ -133,36 +133,40 @@ void mne_free_cmatrix_36 (float **m)
 namespace MNELIB
 {
 
-/** @brief Single element of a legacy ring buffer holding a float array and its matrix back-pointer. */
-typedef struct {
-    int   size;		        /* Size of this buffer in floats */
-    float *data;			/* The allocated buffer */
-    float ***datap;		/* The matrix which uses this */
-} *ringBufBuf_36,ringBufBufRec_36;
-
-/** @brief Legacy ring buffer managing a circular array of ringBufBuf_36 elements. */
-typedef struct {
-    ringBufBuf_36 *bufs;
-    int        nbuf;
-    int        next;
-} *ringBuf_36,ringBufRec_36;
-
-}
-
-void mne_free_ring_buffer_36(void *thisp)
-
+/**
+ * @brief Circular ring buffer for managing raw-data matrix allocations.
+ *
+ * Each slot tracks a single RowMajorMatrixXf.  When a slot is reused the
+ * previous occupant is evicted by resizing it to 0x0, which releases its
+ * heap storage while keeping the Eigen object itself alive.
+ */
+struct RingBuffer
 {
-    int k;
-    ringBuf_36 this_buf = (ringBuf_36)thisp;
+    struct Entry {
+        MneRawBufDef::RowMajorMatrixXf *user = nullptr;
+    };
 
-    if (!this_buf)
-        return;
+    std::vector<Entry> entries;
+    int next = 0;
 
-    for (k = 0; k < this_buf->nbuf; k++)
-        FREE_36(this_buf->bufs[k]->data);
-    FREE_36(this_buf->bufs);
-    FREE_36(this_buf);
-    return;
+    explicit RingBuffer(int nslots)
+        : entries(static_cast<size_t>(nslots))
+        , next(0)
+    {}
+
+    /** Allocate (or reclaim) an entry for @p res with dimensions @p nrow x @p ncol. */
+    void allocate(int nrow, int ncol, MneRawBufDef::RowMajorMatrixXf *res)
+    {
+        if (next >= static_cast<int>(entries.size()))
+            next = 0;
+        Entry &e = entries[static_cast<size_t>(next++)];
+        if (e.user)          // evict old occupant
+            e.user->resize(0, 0);
+        res->resize(nrow, ncol);
+        e.user = res;
+    }
+};
+
 }
 
 void mne_free_name_list_36(char **list, int nlist)
@@ -251,40 +255,24 @@ void mne_channel_names_to_name_list(const QList<FIFFLIB::FiffChInfo>& chs,
 namespace MNELIB
 {
 
-/** @brief Pre-computed frequency-domain filter state used for FFT-based raw data filtering. */
-typedef struct {
-    float *freq_resp;		/* Frequency response */
-    float *eog_freq_resp;		/* Frequency response (EOG) */
-    float *precalc;		/* Precalculated data for FFT */
-    int   np;			/* Length */
-    float nprec;
-} *filterData,filterDataRec;
-
-}
-
-static void filter_data_free(void *datap)
-
+/**
+ * @brief Pre-computed frequency-domain filter state used for FFT-based raw data filtering.
+ *
+ * Holds the frequency response arrays (normal + EOG) and an FFT
+ * pre-calculation buffer.  Owned by MneRawData via unique_ptr.
+ */
+struct FilterData
 {
-    filterData data = (filterData)datap;
-    if (!data)
-        return;
-    FREE_36(data->freq_resp);
-    FREE_36(data->eog_freq_resp);
-    FREE_36(data->precalc);
-    FREE_36(data);
-    return;
-}
+    std::vector<float> freq_resp;      /**< Frequency response. */
+    std::vector<float> eog_freq_resp;  /**< Frequency response (EOG). */
+    std::vector<float> precalc;        /**< Pre-calculated data for FFT. */
 
-static filterData new_filter_data()
+    explicit FilterData(int resp_size)
+        : freq_resp(static_cast<size_t>(resp_size), 1.0f)
+        , eog_freq_resp(static_cast<size_t>(resp_size), 1.0f)
+    {}
+};
 
-{
-    filterData data = MALLOC_36(1,filterDataRec);
-
-    data->freq_resp     = NULL;
-    data->eog_freq_resp = NULL;
-    data->precalc       = NULL;
-    data->np            = 0;
-    return data;
 }
 
 int mne_compare_filters(const MneFilterDef& f1,
@@ -309,66 +297,34 @@ int mne_compare_filters(const MneFilterDef& f1,
 
 //============================= mne_fft.c =============================
 
-void mne_fft_ana(float *data,int np, float **precalcp)
+void mne_fft_ana(float *data, int np, std::vector<float>& /*precalc*/)
 /*
       * FFT analysis for real data
       */
 {
-    //float *precalc;
-
+    Q_UNUSED(data);
+    Q_UNUSED(np);
     printf("##################### DEBUG Error: FFT analysis needs to be implemented");
-
-    //  if (precalcp && *precalcp)
-    //    precalc = *precalcp;
-    //  else {
-    //    precalc = MALLOC(2*np+15,float);
-    //    rffti(&np,precalc);
-    //    if (precalcp)
-    //      *precalcp = precalc;
-    //  }
-    //  rfftf(&np,data,precalc);
-//    if (!precalcp)
-//        FREE_36(precalc);
     return;
 }
 
-void mne_fft_syn(float *data,int np, float **precalcp)
+void mne_fft_syn(float *data, int np, std::vector<float>& /*precalc*/)
 /*
       * FFT synthesis for real data
       */
 {
-    //float *precalc;
-    //float mult;
-
+    Q_UNUSED(data);
+    Q_UNUSED(np);
     printf("##################### DEBUG Error: FFT synthesis needs to be implemented");
-
-    //  if (precalcp && *precalcp)
-    //    precalc = *precalcp;
-    //  else {
-    //    precalc = MALLOC(2*np+15,float);
-    //    rffti(&np,precalc);
-    //    if (precalcp)
-    //      *precalcp = precalc;
-    //  }
-    //  rfftb(&np,data,precalc);
-    //  /*
-    //   * Normalization
-    //   */
-    //  mult = 1.0/np;
-    //  mne_scale_vector(mult,data,np);
-
-//    if (!precalcp)
-//        FREE_36(precalc);
     return;
 }
 
-int mne_apply_filter(const MneFilterDef& filter, void *datap, float *data, int ns, int zero_pad, float dc_offset, int kind)
+int mne_apply_filter(const MneFilterDef& filter, FilterData *d, float *data, int ns, int zero_pad, float dc_offset, int kind)
 /*
  * Do the magick trick
  */
 {
     int   k,p,n;
-    filterData d = (filterData)datap;
     float *freq_resp;
 
     if (ns != filter.size + 2*filter.taper_size) {
@@ -395,12 +351,12 @@ int mne_apply_filter(const MneFilterDef& filter, void *datap, float *data, int n
     }
     if (!d)
         return OK;
-    if (!d->freq_resp)
+    if (d->freq_resp.empty())
         return OK;
     /*
    * Next comes the FFT
    */
-    mne_fft_ana(data,ns,&d->precalc);
+    mne_fft_ana(data,ns,d->precalc);
     /*
    * Multiply with the frequency response
    * See FFTpack doc for details of the arrangement
@@ -411,9 +367,9 @@ int mne_apply_filter(const MneFilterDef& filter, void *datap, float *data, int n
    * No imaginary part for the DC component
    */
     if (kind == FIFFV_EOG_CH)
-        freq_resp = d->eog_freq_resp;
+        freq_resp = d->eog_freq_resp.data();
     else
-        freq_resp = d->freq_resp;
+        freq_resp = d->freq_resp.data();
     data[p] = data[p]*freq_resp[0]; p++;
     /*
    * The other components
@@ -428,18 +384,16 @@ int mne_apply_filter(const MneFilterDef& filter, void *datap, float *data, int n
     if (ns % 2 == 0)
         data[p] = data[p]*freq_resp[k];
 
-    mne_fft_syn(data,ns,&d->precalc);
+    mne_fft_syn(data,ns,d->precalc);
 
     return OK;
 }
 
-void mne_create_filter_response(const MneFilterDef&   filter,
+std::unique_ptr<FilterData> mne_create_filter_response(const MneFilterDef&   filter,
                                 float           sfreq,
-                                void            **filter_datap,
-                                mneUserFreeFunc *filter_data_freep,
                                 int             *highpass_effective)
 /*
-      * Create a frequency response and return also the function to free it
+      * Create a frequency response
       */
 {
     int resp_size;
@@ -450,19 +404,10 @@ void mne_create_filter_response(const MneFilterDef&   filter,
     float *freq_resp;
     float pi4 = M_PI/4.0;
     float mult,add,c;
-    filterData filter_data;
 
     resp_size = (filter.size + 2*filter.taper_size)/2 + 1;
 
-    filter_data                = new_filter_data();
-    filter_data->freq_resp     = MALLOC_36(resp_size,float);
-    filter_data->eog_freq_resp = MALLOC_36(resp_size,float);
-    filter_data->np            = resp_size;
-
-    for (k = 0; k < resp_size; k++) {
-        filter_data->freq_resp[k]     = 1.0;
-        filter_data->eog_freq_resp[k] = 1.0;
-    }
+    auto filter_data = std::make_unique<FilterData>(resp_size);
      *highpass_effective = FALSE;
 
     for (f = 0; f < 2; f++) {
@@ -470,7 +415,7 @@ void mne_create_filter_response(const MneFilterDef&   filter,
         highpass_width = f == 0 ? filter.highpass_width : filter.eog_highpass_width;
         lowpass        = f == 0 ? filter.lowpass   : filter.eog_lowpass;
         lowpass_width  = f == 0 ? filter.lowpass_width  : filter.eog_lowpass_width;
-        freq_resp      = f == 0 ? filter_data->freq_resp : filter_data->eog_freq_resp;
+        freq_resp      = f == 0 ? filter_data->freq_resp.data() : filter_data->eog_freq_resp.data();
         /*
      * Start simple first
      */
@@ -540,106 +485,7 @@ void mne_create_filter_response(const MneFilterDef&   filter,
         else
             printf("NOTE: Filter is presently switched off.\n");
     }
-     *filter_datap      = filter_data;
-     *filter_data_freep = filter_data_free;
-    return;
-}
-
-//============================= mne_ringbuffer.c =============================
-
-namespace MNELIB
-{
-
-/** @brief Single element of a ring buffer holding a float array and its matrix back-pointer. */
-typedef struct {
-    int   size;		        /* Size of this buffer in floats */
-    float *data;			/* The allocated buffer */
-    float ***datap;		/* The matrix which uses this */
-} *ringBufBuf,ringBufBufRec;
-
-/** @brief Circular ring buffer managing a set of ringBufBuf elements for raw data I/O. */
-typedef struct {
-    ringBufBuf *bufs;
-    int        nbuf;
-    int        next;
-} *ringBuf,ringBufRec;
-
-}
-
-void mne_free_ring_buffer(void *thisp)
-
-{
-    int k;
-    ringBuf this_buf = (ringBuf)thisp;
-
-    if (!this_buf)
-        return;
-
-    for (k = 0; k < this_buf->nbuf; k++)
-        FREE_36(this_buf->bufs[k]->data);
-    FREE_36(this_buf->bufs);
-    FREE_36(this_buf);
-    return;
-}
-
-void *mne_initialize_ring(int nbuf)
-
-{
-    int k;
-    ringBuf ring;
-
-    ring = MALLOC_36(1,ringBufRec);
-    ring->bufs = MALLOC_36(nbuf,ringBufBuf);
-    ring->nbuf = nbuf;
-
-    for (k = 0; k < nbuf; k++) {
-        ring->bufs[k] = MALLOC_36(1,ringBufBufRec);
-        ring->bufs[k]->size  = 0;
-        ring->bufs[k]->data  = NULL;
-        ring->bufs[k]->datap = NULL;
-    }
-    ring->next = 0;
-
-#ifdef DEBUG
-    printf("Ring buffer structure with %d entries initialized\n",ring->nbuf);
-#endif
-
-    return ring;
-}
-
-void mne_allocate_from_ring(void *ringp, int nrow, int ncol, float ***res)
-/*
- * Get a new buffer
- */
-{
-    float **mat;
-    int   j;
-    ringBufBuf buf;
-    ringBuf    ring = (ringBuf)ringp;
-
-    if (ring->next > ring->nbuf-1)
-        ring->next = 0;
-
-#ifdef DEBUG
-    printf("Allocating buf # %d\n",ring->next);
-#endif
-
-    buf = ring->bufs[ring->next++];
-
-    if (buf->datap) {		/* Clear the reference */
-        FREE_36(*buf->datap);
-        *buf->datap = NULL;
-    }
-     *res = mat = MALLOC_36(nrow,float *);
-    if (buf->size < nrow*ncol)
-        buf->data = REALLOC_36(buf->data,nrow*ncol,float);
-
-    for (j = 0; j < nrow; j++)
-        mat[j] = buf->data + j*ncol;
-
-    buf->datap = res;
-
-    return;
+    return filter_data;
 }
 
 //============================= mne_raw_routines.c =============================
@@ -647,7 +493,7 @@ void mne_allocate_from_ring(void *ringp, int nrow, int ncol, float ***res)
 int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
                           FiffStream::SPtr& stream,
                           const FiffDirEntry::SPtr& ent,         /* The directory entry to read */
-                          float        **data,      /* Allocated for npick x nsamp samples */
+                          MneRawBufDef::RowMajorMatrixXf& data,  /* Matrix [npick x nsamp] to fill */
                           int          nchan,       /* Number of channels in the data */
                           int          nsamp,       /* Expected number of samples */
                           const QList<FIFFLIB::FiffChInfo>&   chs,         /* Channel info for ALL channels */
@@ -695,7 +541,7 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
         this_samplef = t_pTag->toFloat();
         for (s = 0; s < nsamp; s++, this_samplef += nchan) {
             for (c = 0; c < npick; c++)
-                data[c][s] = mult[c]*this_samplef[pickno[c]];
+                data(c,s) = mult[c]*this_samplef[pickno[c]];
         }
     }
     else if (ent->type == FIFFT_SHORT || ent->type == FIFFT_DAU_PACK16) {
@@ -707,7 +553,7 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
         this_samples = (fiff_short_t *)t_pTag->data();
         for (s = 0; s < nsamp; s++, this_samples += nchan) {
             for (c = 0; c < npick; c++)
-                data[c][s] = mult[c]*this_samples[pickno[c]];
+                data(c,s) = mult[c]*this_samples[pickno[c]];
         }
     }
     else if (ent->type == FIFFT_INT) {
@@ -719,7 +565,7 @@ int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
         this_sample = t_pTag->toInt();
         for (s = 0; s < nsamp; s++, this_sample += nchan) {
             for (c = 0; c < npick; c++)
-                data[c][s] = mult[c]*this_sample[pickno[c]];
+                data(c,s) = mult[c]*this_sample[pickno[c]];
         }
     }
     else {
@@ -822,7 +668,7 @@ int  mne_sparse_vec_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
 }
 
 int  mne_sparse_mat_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
-                          float           **mult,  /* Matrix to be multiplied */
+                          const MneRawBufDef::RowMajorMatrixXf& mult,  /* Matrix to be multiplied */
                           int             ncol,	   /* How many columns in the above */
                           float           **res)   /* Result of the multiplication */
 /*
@@ -837,7 +683,7 @@ int  mne_sparse_mat_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
             for (k = 0; k < ncol; k++) {
                 val = 0.0;
                 for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
-                    val += mat->data[j]*mult[mat->inds[j]][k];
+                    val += mat->data[j]*mult(mat->inds[j],k);
                 res[i][k] = val;
             }
         }
@@ -848,7 +694,7 @@ int  mne_sparse_mat_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
                 res[i][k] = 0.0;
             for (i = 0; i < mat->n; i++)
                 for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
-                    res[mat->inds[j]][k] += mat->data[j]*mult[i][k];
+                    res[mat->inds[j]][k] += mat->data[j]*mult(i,k);
         }
     }
     else {
@@ -869,32 +715,18 @@ static int approx_ring_buf_size = APPROX_RING_BUF_SIZE;
 MneRawData::MneRawData()
 :info(nullptr)
 ,nbad(0)
-,bad(NULL)
-,bufs(NULL)
-,nbuf(0)
-,filt_bufs(NULL)
-,nfilt_buf(0)
 ,first_samp(0)
 ,omit_samp(0)
 ,omit_samp_old(0)
-,first_sample_val(NULL)
 ,proj(nullptr)
 ,sss(nullptr)
 ,comp(nullptr)
 ,comp_file(MNE_CTFV_NOGRAD)
 ,comp_now(MNE_CTFV_NOGRAD)
-,filter_data(NULL)
-,filter_data_free(NULL)
 ,max_event(0)
 ,dig_trigger_mask(0)
-,offsets(NULL)
-,ring(NULL)
-,filt_ring(NULL)
 ,deriv(nullptr)
 ,deriv_matched(nullptr)
-,deriv_offsets(NULL)
-,user(NULL)
-,user_free(NULL)
 {
 }
 
@@ -907,25 +739,10 @@ MneRawData::~MneRawData()
     this->filename.clear();
     this->ch_names.clear();
 
-    MneRawBufDef::free_bufs(this->bufs,this->nbuf);
-    mne_free_ring_buffer_36(this->ring);
-
-    MneRawBufDef::free_bufs(this->filt_bufs,this->nfilt_buf);
-    mne_free_ring_buffer_36(this->filt_ring);
-
     this->badlist.clear();
-    FREE_36(this->first_sample_val);
-    FREE_36(this->bad);
-    FREE_36(this->offsets);
 
-    if (this->filter_data_free)
-        this->filter_data_free(this->filter_data);
-    if (this->user_free)
-        this->user_free(this->user);
     this->dig_trigger.clear();
     this->event_list.reset();
-
-    FREE_36(this->deriv_offsets);
 }
 
 //=============================================================================================================
@@ -938,10 +755,7 @@ void MneRawData::add_filter_response(int *highpass_effective)
     /*
        * Free the previous filter definition
        */
-    if (filter_data_free)
-        filter_data_free(filter_data);
-    filter_data      = NULL;
-    filter_data_free = NULL;
+    filter_data.reset();
     /*
        * Nothing more to do if there is no filter
        */
@@ -950,11 +764,9 @@ void MneRawData::add_filter_response(int *highpass_effective)
     /*
        * Create a new one
        */
-    mne_create_filter_response(*filter,
-                               info->sfreq,
-                               &filter_data,
-                               &filter_data_free,
-                               highpass_effective);
+    filter_data = mne_create_filter_response(*filter,
+                                             info->sfreq,
+                                             highpass_effective);
 }
 
 //=============================================================================================================
@@ -966,17 +778,13 @@ void MneRawData::setup_filter_bufs()
 {
     MneFilterDef* filter = this->filter.get();
     int       nfilt_buf;
-    MneRawBufDef* bufs;
-    int       j,k;
+    int       k;
     int       firstsamp;
     int       nring_buf;
     int       highpass_effective;
 
-    MneRawBufDef::free_bufs(this->filt_bufs,this->nfilt_buf);
-    this->filt_bufs = NULL;
-    this->nfilt_buf = 0;
-    mne_free_ring_buffer(this->filt_ring);
-    this->filt_ring = NULL;
+    this->filt_bufs.clear();
+    this->filt_ring.reset();
 
     if (!this->filter)
         return;
@@ -988,28 +796,22 @@ void MneRawData::setup_filter_bufs()
 #ifdef DEBUG
     printf("%d filter buffers needed\n",nfilt_buf);
 #endif
-    bufs = MALLOC_36(nfilt_buf,MneRawBufDef);
+    this->filt_bufs.resize(nfilt_buf);
     for (k = 0, firstsamp = this->first_samp-filter->taper_size; k < nfilt_buf; k++,
          firstsamp = firstsamp + filter->size) {
-        bufs[k].ns          = filter->size + 2*filter->taper_size;
-        bufs[k].firsts      = firstsamp;
-        bufs[k].lasts       = firstsamp + bufs[k].ns - 1;
+        filt_bufs[k].ns          = filter->size + 2*filter->taper_size;
+        filt_bufs[k].firsts      = firstsamp;
+        filt_bufs[k].lasts       = firstsamp + filt_bufs[k].ns - 1;
         //        bufs[k].ent         = NULL;
-        bufs[k].nchan       = this->info->nchan;
-        bufs[k].is_skip     = FALSE;
-        bufs[k].vals        = NULL;
-        bufs[k].valid       = FALSE;
-        bufs[k].ch_filtered = MALLOC_36(this->info->nchan,int);
-        bufs[k].comp_status = MNE_CTFV_NOGRAD;
-
-        for (j = 0; j < this->info->nchan; j++)
-            bufs[k].ch_filtered[j] = FALSE;
+        filt_bufs[k].nchan       = this->info->nchan;
+        filt_bufs[k].is_skip     = FALSE;
+        filt_bufs[k].valid       = FALSE;
+        filt_bufs[k].ch_filtered = Eigen::VectorXi::Zero(this->info->nchan);
+        filt_bufs[k].comp_status = MNE_CTFV_NOGRAD;
     }
-    this->filt_bufs = bufs;
-    this->nfilt_buf = nfilt_buf;
     nring_buf       = approx_ring_buf_size/((2*filter->taper_size+filter->size)*
                                             this->info->nchan*sizeof(float));
-    this->filt_ring = mne_initialize_ring(nring_buf);
+    this->filt_ring = std::make_unique<RingBuffer>(nring_buf);
     add_filter_response(&highpass_effective);
 
     return;
@@ -1026,9 +828,9 @@ int MneRawData::load_one_buffer(MneRawBufDef *buf)
         printf("Cannot load a skip");
         return FAIL;
     }
-    if (!buf->vals) {		/* The data space may have been reused */
+    if (buf->vals.size() == 0) {	/* The data space may have been reused */
         buf->valid = FALSE;
-        mne_allocate_from_ring(ring, buf->nchan,buf->ns,&buf->vals);
+        ring->allocate(buf->nchan,buf->ns,&buf->vals);
     }
     if (buf->valid)
         return OK;
@@ -1066,16 +868,13 @@ int MneRawData::compensate_buffer(MneRawBufDef *buf)
         return OK;
     if (buf->comp_status == comp_now)
         return OK;
-    if (!buf->vals)
+    if (buf->vals.size() == 0)
         return OK;
     /*
-       * Have to do the hard job — wrap buf->vals in a MatrixXf for compensation
+       * vals is now a RowMajorMatrixXf — wrap in a column-major MatrixXf for compensation
        */
     {
-        Eigen::MatrixXf dataMat(info->nchan, buf->ns);
-        for (int r = 0; r < info->nchan; r++)
-            for (int c = 0; c < buf->ns; c++)
-                dataMat(r, c) = buf->vals[r][c];
+        Eigen::MatrixXf dataMat = buf->vals;  /* implicit copy/conversion */
 
         if (comp->undo) {
             std::swap(comp->current, comp->undo);
@@ -1098,9 +897,7 @@ int MneRawData::compensate_buffer(MneRawBufDef *buf)
         /*
          * Copy result back to buf->vals
          */
-        for (int r = 0; r < info->nchan; r++)
-            for (int c = 0; c < buf->ns; c++)
-                buf->vals[r][c] = dataMat(r, c);
+        buf->vals = dataMat;
     }
     buf->comp_status = comp_now;
     return OK;
@@ -1156,7 +953,7 @@ int MneRawData::pick_data(mneChSelection sel, int firsts, int ns, float **picked
     /*
        * Have to to the hard work
        */
-    for (k = 0, this_buf = bufs, s = 0; k < nbuf; k++, this_buf++) {
+    for (k = 0, this_buf = bufs.data(), s = 0; k < (int)bufs.size(); k++, this_buf++) {
         if (this_buf->lasts >= firsts) {
             start = firsts - this_buf->firsts;
             if (start < 0)
@@ -1207,9 +1004,8 @@ int MneRawData::pick_data(mneChSelection sel, int firsts, int ns, float **picked
                  * First pick the ordinary channels...
                  */
                         if (sel->pick[c] >= 0) {
-                            values = this_buf->vals[sel->pick[c]];
                             for (p = start, s2 = s, ns2 = ns; p < this_buf->ns && ns2 > 0; p++, ns2--, s2++)
-                                picked[c][s2] = values[p];
+                                picked[c][s2] = this_buf->vals(sel->pick[c], p);
                         }
                         /*
                  * ...then the derived ones
@@ -1224,7 +1020,7 @@ int MneRawData::pick_data(mneChSelection sel, int firsts, int ns, float **picked
                 else {
                     for (c = 0; c < info->nchan; c++)
                         for (p = start, s2 = s, ns2 = ns; p < this_buf->ns && ns2 > 0; p++, ns2--, s2++)
-                            picked[c][s2] = this_buf->vals[c][p];
+                            picked[c][s2] = this_buf->vals(c, p);
                 }
                 s  = s2;
                 ns = ns2;
@@ -1270,7 +1066,7 @@ int MneRawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
 {
     int          k,s,p,start,c,fills;
     MneRawBufDef* this_buf;
-    float        **values;
+    MneRawBufDef::RowMajorMatrixXf *values;
     float        *pvalues;
     float        *deriv_pvalues = NULL;
 
@@ -1292,7 +1088,7 @@ int MneRawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
     else
         s = 0;
     pvalues = MALLOC_36(info->nchan,float);
-    for (k = 0, this_buf = bufs; k < nbuf; k++, this_buf++) {
+    for (k = 0, this_buf = bufs.data(); k < (int)bufs.size(); k++, this_buf++) {
         if (this_buf->lasts >= firsts) {
             start = firsts - this_buf->firsts;
             if (start < 0)
@@ -1324,12 +1120,12 @@ int MneRawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
                 /*
              * Apply projection
              */
-                values = this_buf->vals;
+                values = &this_buf->vals;
                 if (sel && sel->nderiv > 0 && deriv_matched)
                     deriv_pvalues = MALLOC_36(deriv_matched->deriv_data->nrow,float);
                 for (p = start; p < this_buf->ns && ns > 0; p++, ns--, s++) {
                     for (c = 0; c < info->nchan; c++)
-                        pvalues[c] = values[c][p];
+                        pvalues[c] = (*values)(c,p);
                     if (proj->project_vector(pvalues,info->nchan,TRUE) != OK)
                         qWarning()<<"Error";
                     if (sel) {
@@ -1402,9 +1198,9 @@ int MneRawData::load_one_filt_buf(MneRawBufDef *buf)
 
     float **vals;
 
-    if (!buf->vals) {
+    if (buf->vals.size() == 0) {
         buf->valid = FALSE;
-        mne_allocate_from_ring(filt_ring, buf->nchan, buf->ns,&buf->vals);
+        filt_ring->allocate(buf->nchan, buf->ns,&buf->vals);
     }
     if (buf->valid)
         return OK;
@@ -1412,7 +1208,7 @@ int MneRawData::load_one_filt_buf(MneRawBufDef *buf)
     vals = MALLOC_36(buf->nchan,float *);
     for (k = 0; k < buf->nchan; k++) {
         buf->ch_filtered[k] = FALSE;
-        vals[k] = buf->vals[k] + filter->taper_size;
+        vals[k] = buf->vals.row(k).data() + filter->taper_size;
     }
 
     res = pick_data_proj(NULL,buf->firsts + filter->taper_size,buf->ns - 2*filter->taper_size,vals);
@@ -1463,8 +1259,8 @@ int MneRawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
     /*
        * Take into account the initial dc offset (compensate and project)
        */
-    if (first_sample_val) {
-        dc = Eigen::Map<Eigen::VectorXf>(first_sample_val, info->nchan);
+    if (first_sample_val.size() > 0) {
+        dc = first_sample_val;
         /*
          * Is this correct??
          */
@@ -1479,11 +1275,11 @@ int MneRawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
     /*
        * Find the first buffer to consider
        */
-    for (k = 0, this_buf = filt_bufs; k < nfilt_buf; k++, this_buf++) {
+    for (k = 0, this_buf = filt_bufs.data(); k < (int)filt_bufs.size(); k++, this_buf++) {
         if (this_buf->lasts >= firsts)
             break;
     }
-    for (; k < nfilt_buf && this_buf->firsts <= lasts; k++, this_buf++) {
+    for (; k < (int)filt_bufs.size() && this_buf->firsts <= lasts; k++, this_buf++) {
 #ifdef DEBUG
         printf("this_buf (%d): %d..%d\n",k,this_buf->firsts,this_buf->lasts);
 #endif
@@ -1507,7 +1303,7 @@ int MneRawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
                             filter->filter_on = FALSE;
                         else if (dc.size() > 0)
                             dc_offset = dc[sel->pick[c]];
-                        if (mne_apply_filter(*filter,filter_data,this_buf->vals[sel->pick[c]],this_buf->ns,TRUE,
+                        if (mne_apply_filter(*filter,filter_data.get(),this_buf->vals.row(sel->pick[c]).data(),this_buf->ns,TRUE,
                                              dc_offset,info->chInfo[sel->pick[c]].kind) != OK) {
                             filter->filter_on = filter_was;
                             goto bad;
@@ -1533,7 +1329,7 @@ int MneRawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
                             filter->filter_on = FALSE;
                         else if (dc.size() > 0)
                             dc_offset = dc[c];
-                        if (mne_apply_filter(*filter,filter_data,this_buf->vals[c],this_buf->ns,TRUE,
+                        if (mne_apply_filter(*filter,filter_data.get(),this_buf->vals.row(c).data(),this_buf->ns,TRUE,
                                              dc_offset,info->chInfo[c].kind) != OK) {
                             filter->filter_on = filter_was;
                             goto bad;
@@ -1558,7 +1354,7 @@ int MneRawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
                         filter->filter_on = FALSE;
                     else if (dc.size() > 0)
                         dc_offset = dc[c];
-                    if (mne_apply_filter(*filter,filter_data,this_buf->vals[c],this_buf->ns,TRUE,
+                    if (mne_apply_filter(*filter,filter_data.get(),this_buf->vals.row(c).data(),this_buf->ns,TRUE,
                                          dc_offset,info->chInfo[c].kind) != OK) {
                         filter->filter_on = filter_was;
                         goto bad;
@@ -1613,7 +1409,7 @@ int MneRawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
              * First the ordinary channels
              */
                 if (sel->pick[c] >= 0) {
-                    values = this_buf->vals[sel->pick[c]];
+                    values = this_buf->vals.row(sel->pick[c]).data();
                     for (s = s1, bs = bs1; s < s2; s++, bs++)
                         picked[c][s] += values[bs];
                 }
@@ -1626,7 +1422,7 @@ int MneRawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
         }
         else {
             for (c = 0; c < info->nchan; c++) {
-                values = this_buf->vals[c];
+                values = this_buf->vals.row(c).data();
                 for (s = s1, bs = bs1; s < s2; s++, bs++)
                     picked[c][s] += values[bs];
             }
@@ -1653,8 +1449,8 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
      * Open a raw data file
      */
 {
-    MneRawInfo*        info  = NULL;
-    MneRawData*        data  = NULL;
+    std::unique_ptr<MneRawInfo> info;
+    std::unique_ptr<MneRawData> data;
 
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
@@ -1665,13 +1461,12 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
     //    fiffTagRec   tag;
     FiffTag::SPtr t_pTag;
     FiffChInfo   ch;
-    MneRawBufDef* bufs;
     int k, b, nbuf, ndir, nnames;
     int current_dir0 = 0;
 
     //    tag.data = NULL;
 
-    if (MneRawInfo::load(name,allow_maxshield,&info) == FAIL)
+    if (MneRawInfo::load(name,allow_maxshield,info) == FAIL)
         goto bad;
 
     for (k = 0; k < info->nchan; k++) {
@@ -1696,18 +1491,18 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
     if(!stream->open())
         goto bad;
 
-    data           = new MneRawData;
+    data           = std::make_unique<MneRawData>();
     data->filename = name;
     data->stream   = stream;
-    data->info.reset(info);
+    data->info = std::move(info);
     /*
        * Add the channel name list
        */
-    mne_channel_names_to_name_list(info->chInfo,
-                                   info->nchan,
+    mne_channel_names_to_name_list(data->info->chInfo,
+                                   data->info->nchan,
                                    data->ch_names,
                                    nnames);
-    if (nnames != info->nchan) {
+    if (nnames != data->info->nchan) {
         printf("Channel names were not translated correctly into a name list");
         goto bad;
     }
@@ -1815,34 +1610,30 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
         if (dir0[k]->kind == FIFF_DATA_BUFFER ||
                 dir0[k]->kind == FIFF_DATA_SKIP)
             nbuf++;
-    bufs = MALLOC_36(nbuf,MneRawBufDef);
+    data->bufs.resize(nbuf);
 
     //    for (k = 0, nbuf = 0, dir = dir0; k < ndir; k++, dir++)
     for (k = 0, nbuf = 0; k < ndir; k++)
         if (dir0[k]->kind == FIFF_DATA_BUFFER ||
                 dir0[k]->kind == FIFF_DATA_SKIP) {
-            bufs[nbuf].ns          = 0;
-            bufs[nbuf].ent         = dir0[k];
-            bufs[nbuf].nchan       = data->info->nchan;
-            bufs[nbuf].is_skip     = dir0[k]->kind == FIFF_DATA_SKIP;
-            bufs[nbuf].vals        = NULL;
-            bufs[nbuf].valid       = FALSE;
-            bufs[nbuf].ch_filtered = NULL;
-            bufs[nbuf].comp_status = data->comp_file;
+            data->bufs[nbuf].ns          = 0;
+            data->bufs[nbuf].ent         = dir0[k];
+            data->bufs[nbuf].nchan       = data->info->nchan;
+            data->bufs[nbuf].is_skip     = dir0[k]->kind == FIFF_DATA_SKIP;
+            data->bufs[nbuf].valid       = FALSE;
+            data->bufs[nbuf].comp_status = data->comp_file;
             nbuf++;
         }
-    data->bufs  = bufs;
-    data->nbuf  = nbuf;
     data->nsamp = 0;
     for (k = 0; k < nbuf; k++) {
-        dir = bufs[k].ent;
+        dir = data->bufs[k].ent;
         if (dir->kind == FIFF_DATA_BUFFER) {
             if (dir->type == FIFFT_DAU_PACK16 || dir->type == FIFFT_SHORT)
-                bufs[k].ns = dir->size/(data->info->nchan*sizeof(fiff_dau_pack16_t));
+                data->bufs[k].ns = dir->size/(data->info->nchan*sizeof(fiff_dau_pack16_t));
             else if (dir->type == FIFFT_FLOAT)
-                bufs[k].ns = dir->size/(data->info->nchan*sizeof(fiff_float_t));
+                data->bufs[k].ns = dir->size/(data->info->nchan*sizeof(fiff_float_t));
             else if (dir->type == FIFFT_INT)
-                bufs[k].ns = dir->size/(data->info->nchan*sizeof(fiff_int_t));
+                data->bufs[k].ns = dir->size/(data->info->nchan*sizeof(fiff_int_t));
             else {
                 printf("We are not prepared to handle raw data type: %d",dir->type);
                 goto bad;
@@ -1853,22 +1644,18 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
             //                goto bad;
             if (!stream->read_tag(t_pTag,dir->pos))
                 goto bad;
-            bufs[k].ns = data->info->buf_size*(*t_pTag->toInt());
+            data->bufs[k].ns = data->info->buf_size*(*t_pTag->toInt());
         }
-        bufs[k].firsts = k == 0 ? data->first_samp : bufs[k-1].lasts + 1;
-        bufs[k].lasts  = bufs[k].firsts + bufs[k].ns - 1;
-        data->nsamp += bufs[k].ns;
+        data->bufs[k].firsts = k == 0 ? data->first_samp : data->bufs[k-1].lasts + 1;
+        data->bufs[k].lasts  = data->bufs[k].firsts + data->bufs[k].ns - 1;
+        data->nsamp += data->bufs[k].ns;
     }
     //    FREE_36(tag.data);
     /*
        * Set up the first sample values
        */
-    data->bad = MALLOC_36(data->info->nchan,int);
-    data->offsets = MALLOC_36(data->info->nchan,float);
-    for (k = 0; k < data->info->nchan; k++) {
-        data->bad[k] = FALSE;
-        data->offsets[k] = 0.0;
-    }
+    data->bad = Eigen::VectorXi::Zero(data->info->nchan);
+    data->offsets = Eigen::VectorXf::Zero(data->info->nchan);
     /*
         * Th bad channel stuff
         */
@@ -1894,7 +1681,7 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
        * Initialize the raw data buffers
        */
     nbuf = approx_ring_buf_size/(data->info->buf_size*data->info->nchan*sizeof(float));
-    data->ring = mne_initialize_ring(nbuf);
+    data->ring = std::make_unique<RingBuffer>(nbuf);
     /*
        * Initialize the filter buffers
        */
@@ -1906,7 +1693,7 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
 
         if (data->pick_data(NULL,data->first_samp,1,vals) == FAIL)
             goto bad;
-        data->first_sample_val = MALLOC_36(data->info->nchan,float);
+        data->first_sample_val.resize(data->info->nchan);
         for (k = 0; k < data->info->nchan; k++)
             data->first_sample_val[k] = vals[k][0];
         FREE_CMATRIX_36(vals);
@@ -1918,16 +1705,10 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
     printf("\tsfreq  = %-8.3f Hz\n",data->info->sfreq);
     printf("\tlength = %-8.3f sec\n",data->nsamp/data->info->sfreq);
 
-    return data;
+    return data.release();
 
 bad : {
-        if (data)
-            delete(data);
-        else
-            if(info)
-                delete info;
-
-        return NULL;
+        return nullptr;
     }
 }
 

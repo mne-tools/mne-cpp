@@ -47,67 +47,49 @@
 #include "mne_msh_light.h"
 #include "mne_msh_eyes.h"
 
-#include <fiff/fiff_coord_trans_set.h>
+//=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
 
-#define MALLOC_47(x,t) (t *)malloc((x)*sizeof(t))
-
-#define FREE_47(x) if ((char *)(x) != Q_NULLPTR) free((char *)(x))
-
-#define REALLOC_47(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#ifndef FAIL
-#define FAIL -1
-#endif
-
-#ifndef OK
-#define OK 0
-#endif
-
-#define X_47 0
-#define Y_47 1
-#define Z_47 2
-
-#define SURF_LEFT_HEMI        FIFFV_MNE_SURF_LEFT_HEMI
-#define SURF_RIGHT_HEMI       FIFFV_MNE_SURF_RIGHT_HEMI
-
-#define VEC_COPY_47(to,from) {\
-    (to)[X_47] = (from)[X_47];\
-    (to)[Y_47] = (from)[Y_47];\
-    (to)[Z_47] = (from)[Z_47];\
-}
-
-#define SHOW_CURVATURE_NONE    0
-#define SHOW_CURVATURE_OVERLAY 1
-#define SHOW_OVERLAY_HEAT      1
-
-#define SURF_LEFT_MORPH_HEMI  (1 << 16 | FIFFV_MNE_SURF_LEFT_HEMI)
-#define SURF_RIGHT_MORPH_HEMI (1 << 16 | FIFFV_MNE_SURF_RIGHT_HEMI)
-
-#define POS_CURV_COLOR  0.25
-#define NEG_CURV_COLOR  0.375
-#define EVEN_CURV_COLOR 0.375
-
-static MNELIB::MneMshEyes   default_eyes;
-static MNELIB::MneMshEyes*  all_eyes     = Q_NULLPTR;
-static int          neyes        = 0;
-static int          current_eyes = -1;
-static int         ndefault         = 8;
-
-static MNELIB::MneMshLightSet* custom_lights = Q_NULLPTR;
+#include <Eigen/Core>
 
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <qmath.h>
+
+//=============================================================================================================
+// CONSTANTS
+//=============================================================================================================
+
+namespace {
+
+constexpr int  SURF_LEFT_HEMI        = FIFFV_MNE_SURF_LEFT_HEMI;
+constexpr int  SURF_RIGHT_HEMI       = FIFFV_MNE_SURF_RIGHT_HEMI;
+constexpr int  SURF_LEFT_MORPH_HEMI  = (1 << 16 | FIFFV_MNE_SURF_LEFT_HEMI);
+constexpr int  SURF_RIGHT_MORPH_HEMI = (1 << 16 | FIFFV_MNE_SURF_RIGHT_HEMI);
+
+constexpr int  SHOW_CURVATURE_NONE    = 0;
+constexpr int  SHOW_CURVATURE_OVERLAY = 1;
+constexpr int  SHOW_OVERLAY_HEAT      = 1;
+
+constexpr float POS_CURV_COLOR  = 0.25f;
+constexpr float NEG_CURV_COLOR  = 0.375f;
+constexpr float EVEN_CURV_COLOR = 0.375f;
+
+} // anonymous namespace
+
+//=============================================================================================================
+// STATIC DATA
+//=============================================================================================================
+
+static MNELIB::MneMshEyes   default_eyes;
+static MNELIB::MneMshEyes*  all_eyes     = nullptr;
+static int          neyes        = 0;
+static int          current_eyes = -1;
+
+static std::unique_ptr<MNELIB::MneMshLightSet> custom_lights;
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -121,426 +103,271 @@ using namespace MNELIB;
 
 MneMshDisplaySurfaceSet::MneMshDisplaySurfaceSet(int nsurf)
 {
-    default_eyes.name = Q_NULLPTR;
-
-    default_eyes.left[0] = -0.2f;
-    default_eyes.left[0] = 0.0f;
-    default_eyes.left[0] = 0.0f;
-
-    default_eyes.right[0] = 0.2f;
-    default_eyes.right[0] = 0.0f;
-    default_eyes.right[0] = 0.0f;
-
-    default_eyes.left_up[0] = 0.0f;
-    default_eyes.left_up[0] = 0.0f;
-    default_eyes.left_up[0] = 1.0f;
-
-    default_eyes.right_up[0] = 0.0f;
-    default_eyes.right_up[0] = 0.0f;
-    default_eyes.right_up[0] = 1.0f;
-
-    int k;
+    Eigen::Map<Eigen::Vector3f>(default_eyes.left)    = Eigen::Vector3f(-0.2f, 0.0f, 0.0f);
+    Eigen::Map<Eigen::Vector3f>(default_eyes.right)   = Eigen::Vector3f( 0.2f, 0.0f, 0.0f);
+    Eigen::Map<Eigen::Vector3f>(default_eyes.left_up)  = Eigen::Vector3f(0.0f, 0.0f, 1.0f);
+    Eigen::Map<Eigen::Vector3f>(default_eyes.right_up) = Eigen::Vector3f(0.0f, 0.0f, 1.0f);
 
     this->nsurf = nsurf;
     if (nsurf > 0) {
-        surfs = MALLOC_47(nsurf,MneMshDisplaySurface*);
-        patches = MALLOC_47(nsurf,MneSurfacePatch*);
-        patch_rot = MALLOC_47(nsurf,float);
+        surfs.resize(nsurf);
+        patches.resize(nsurf);
+        patch_rot.resize(nsurf, 0.0f);
         active = Eigen::VectorXi::Zero(nsurf);
         drawable = Eigen::VectorXi::Ones(nsurf);
-
-        for (k = 0; k < nsurf; k++) {
-            surfs[k]  = Q_NULLPTR;
-            patches[k] = Q_NULLPTR;
-            patch_rot[k] = 0.0;
-        }
-    } else {
-        surfs = Q_NULLPTR;
-        patches = Q_NULLPTR;
-        patch_rot= Q_NULLPTR;
     }
-    main_t     = Q_NULLPTR;
-    morph_t    = Q_NULLPTR;
 
-    use_patches = FALSE;
-    user_data = Q_NULLPTR;
-    user_data_free = Q_NULLPTR;
+    use_patches = false;
 
-    rot[0] = 0.0;
-    rot[1] = 0.0;
-    rot[2] = 0.0;
+    Eigen::Vector3f::Map(rot)  = Eigen::Vector3f::Zero();
+    Eigen::Vector3f::Map(move) = Eigen::Vector3f::Zero();
+    Eigen::Vector3f::Map(eye)  = Eigen::Vector3f(1.0f, 0.0f, 0.0f);
+    Eigen::Vector3f::Map(up)   = Eigen::Vector3f(0.0f, 0.0f, 1.0f);
 
-    move[0] = 0.0;
-    move[1] = 0.0;
-    move[2] = 0.0;
-
-    eye[0]      = 1.0;
-    eye[1]      = 0.0;
-    eye[2]      = 0.0;
-
-    up[0]       = 0.0;
-    up[1]       = 0.0;
-    up[2]       = 1.0;
-
-    bg_color[0] = 0.0;
-    bg_color[1] = 0.0;
-    bg_color[2] = 0.0;
-
-    text_color[0] = 1.0;
-    text_color[1] = 1.0;
-    text_color[2] = 1.0;
+    Eigen::Vector3f::Map(bg_color)   = Eigen::Vector3f::Zero();
+    Eigen::Vector3f::Map(text_color) = Eigen::Vector3f::Ones();
 }
 
 //=============================================================================================================
 
-MneMshDisplaySurfaceSet::~MneMshDisplaySurfaceSet()
-{
-    int k;
-
-    for (k = 0; k < nsurf; k++)
-        delete surfs[k];
-    if (patches) {
-        for (k = 0; k < nsurf; k++)
-            delete patches[k];
-        delete patches;
-    }
-    delete main_t;
-    delete morph_t;
-    FREE_47(patch_rot);
-    FREE_47(surfs);
-
-
-    if (user_data_free)
-        user_data_free(user_data);
-}
+MneMshDisplaySurfaceSet::~MneMshDisplaySurfaceSet() = default;
 
 //=============================================================================================================
 
-MneMshDisplaySurfaceSet* MneMshDisplaySurfaceSet::load(const QString &subject_id, const QString &surf, const QString &subjects_dir)
+std::unique_ptr<MneMshDisplaySurfaceSet> MneMshDisplaySurfaceSet::load(const QString &subject_id, const QString &surf, const QString &subjects_dir)
      /*
       * Load new display surface data
       */
 {
-    MneSourceSpaceOld* left  = Q_NULLPTR;
-    MneSourceSpaceOld* right = Q_NULLPTR;
-    char *left_file = Q_NULLPTR;
-    char *right_file = Q_NULLPTR;
-    char *this_surf = Q_NULLPTR;
-    char *this_curv = Q_NULLPTR;
-    MneMshDisplaySurface* pThis = Q_NULLPTR;
-    MneMshDisplaySurfaceSet* surfs = Q_NULLPTR;
-    QString pathLh, pathLhCurv, pathRh, pathRhCurv;
-    QByteArray ba_surf, ba_curv;
+    QString pathLh     = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg("lh").arg(surf);
+    QString pathLhCurv = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg("lh").arg("curv");
+    QString pathRh     = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg("rh").arg(surf);
+    QString pathRhCurv = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg("rh").arg("curv");
 
-    pathLh = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg("lh").arg(surf);
-    ba_surf = pathLh.toLatin1();
-    this_surf = ba_surf.data();
-
-    if (this_surf == Q_NULLPTR)
-        goto bad;
-
-    pathLhCurv = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg("lh").arg("curv");
-    ba_curv = pathLhCurv.toLatin1();
-    this_curv = ba_curv.data();
-
-    printf("Loading surface %s ...\n",this_surf);
-    if ((left = MneSurfaceOrVolume::load_surface(this_surf,this_curv)) == Q_NULLPTR) {
-        if ((left = MneSurfaceOrVolume::load_surface(this_surf,Q_NULLPTR)) == Q_NULLPTR)
-            goto bad;
-        else
-            MneSurfaceOrVolume::add_uniform_curv((MneSurfaceOld*)left);
+    printf("Loading surface %s ...\n", pathLh.toUtf8().constData());
+    std::unique_ptr<MneSourceSpaceOld> left(MneSurfaceOrVolume::load_surface(pathLh, pathLhCurv));
+    if (!left) {
+        left.reset(MneSurfaceOrVolume::load_surface(pathLh, QString()));
+        if (!left)
+            return nullptr;
+        MneSurfaceOrVolume::add_uniform_curv(reinterpret_cast<MneSurfaceOld&>(*left));
     }
-    left_file = this_surf; this_surf = Q_NULLPTR;
-    FREE_47(this_curv);
 
-    pathRh = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg("rh").arg(surf);
-    ba_surf = pathRh.toLatin1();
-    this_surf = ba_surf.data();
-
-    pathRhCurv = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg("rh").arg("curv");
-    ba_curv = pathRhCurv.toLatin1();
-    this_curv = ba_curv.data();
-
-    printf("Loading surface %s ...\n",this_surf);
-    if ((right = MneSurfaceOrVolume::load_surface(this_surf,this_curv)) == Q_NULLPTR) {
-        if ((right = MneSurfaceOrVolume::load_surface(this_surf,Q_NULLPTR)) == Q_NULLPTR)
-            goto bad;
-        else
-            MneSurfaceOrVolume::add_uniform_curv((MneSurfaceOld*)right);
+    printf("Loading surface %s ...\n", pathRh.toUtf8().constData());
+    std::unique_ptr<MneSourceSpaceOld> right(MneSurfaceOrVolume::load_surface(pathRh, pathRhCurv));
+    if (!right) {
+        right.reset(MneSurfaceOrVolume::load_surface(pathRh, QString()));
+        if (!right)
+            return nullptr;
+        MneSurfaceOrVolume::add_uniform_curv(reinterpret_cast<MneSurfaceOld&>(*right));
     }
-    right_file = this_surf; this_surf = Q_NULLPTR;
-    FREE_47(this_curv);
 
-    surfs = new MneMshDisplaySurfaceSet(2);
+    auto result = std::make_unique<MneMshDisplaySurfaceSet>(2);
 
-    surfs->surfs[0] = new MneMshDisplaySurface();
-    surfs->surfs[1] = new MneMshDisplaySurface();
+    result->surfs[0] = std::make_unique<MneMshDisplaySurface>();
+    result->surfs[1] = std::make_unique<MneMshDisplaySurface>();
 
-    surfs->active[0]  = TRUE;
-    surfs->active[1]  = FALSE;
-    surfs->drawable[0]  = TRUE;
-    surfs->drawable[1]  = TRUE;
+    result->active[0]  = true;
+    result->active[1]  = false;
+    result->drawable[0]  = true;
+    result->drawable[1]  = true;
 
-    pThis              = surfs->surfs[0];
-    pThis->filename    = left_file;
-    //pThis->time_loaded = time(Q_NULLPTR); //Comment out due to unknown timestemp function ToDo
-    pThis->s           = (MneSurfaceOld*)left;
+    auto* pThis        = result->surfs[0].get();
+    pThis->filename    = pathLh;
+    pThis->s.reset(reinterpret_cast<MneSurfaceOld*>(left.release()));
     pThis->s->id       = SURF_LEFT_HEMI;
-    pThis->subj        = subject_id.toUtf8().data();
-    pThis->surf_name   = surf.toUtf8().data();
+    pThis->subj        = subject_id;
+    pThis->surf_name   = surf;
 
-    decide_surface_extent(pThis,"Left hemisphere");
-    decide_curv_display(surf.toUtf8().data(),pThis);
-    setup_curvature_colors (pThis);
+    decide_surface_extent(*pThis,"Left hemisphere");
+    decide_curv_display(surf, *pThis);
+    setup_curvature_colors(*pThis);
 
-    pThis              = surfs->surfs[1];
-    pThis->filename    = right_file;
-    //pThis->time_loaded = time(Q_NULLPTR); //Comment out due to unknown timestemp function ToDo
-    pThis->s           = (MneSurfaceOld*)right;
+    pThis              = result->surfs[1].get();
+    pThis->filename    = pathRh;
+    pThis->s.reset(reinterpret_cast<MneSurfaceOld*>(right.release()));
     pThis->s->id       = SURF_RIGHT_HEMI;
-    pThis->subj        = subject_id.toUtf8().data();
-    pThis->surf_name   = surf.toUtf8().data();
+    pThis->subj        = subject_id;
+    pThis->surf_name   = surf;
 
-    decide_surface_extent(pThis,"Right hemisphere");
-    decide_curv_display(surf.toUtf8().data(),pThis);
-    setup_curvature_colors (pThis);
+    decide_surface_extent(*pThis,"Right hemisphere");
+    decide_curv_display(surf, *pThis);
+    setup_curvature_colors(*pThis);
 
-    surfs->apply_left_right_eyes();
+    result->apply_left_right_eyes();
+    result->setup_current_lights();
 
-    surfs->setup_current_lights();
-
-    return surfs;
-
-bad : {
-        FREE_47(left_file);
-        FREE_47(right_file);
-        delete left;
-        delete right;
-        //The following deletes are obsolete since the two char* are point to data of the QStrings which are deleted automatically
-//        FREE_47(this_surf);
-//        FREE_47(this_curv);
-        return Q_NULLPTR;
-    }
+    return result;
 }
 
 //=============================================================================================================
 
-void MneMshDisplaySurfaceSet::decide_surface_extent(MneMshDisplaySurface* surf,
-                                                    const char *tag)
+void MneMshDisplaySurfaceSet::decide_surface_extent(MneMshDisplaySurface& surf,
+                                                    const QString& tag)
 
 {
-    float minv[3],maxv[3];
-    int k,c;
-    float *r;
-    MneSourceSpaceOld* s = (MneSourceSpaceOld*)surf->s;
+    auto* s = reinterpret_cast<MneSourceSpaceOld*>(surf.s.get());
 
-    VEC_COPY_47(minv,&s->rr(0,0));
-    VEC_COPY_47(maxv,&s->rr(0,0));
-    for (k = 0; k < s->np; k++) {
-        r = &s->rr(k,0);
-        for (c = 0; c < 3; c++) {
-            if (r[c] < minv[c])
-                minv[c] = r[c];
-            if (r[c] > maxv[c])
-                maxv[c] = r[c];
-        }
+    Eigen::Vector3f minv = s->rr.row(0).transpose();
+    Eigen::Vector3f maxv = minv;
+
+    for (int k = 1; k < s->np; k++) {
+        Eigen::Vector3f r = s->rr.row(k).transpose();
+        minv = minv.cwiseMin(r);
+        maxv = maxv.cwiseMax(r);
     }
+
 #ifdef DEBUG
-    printf("%s:\n",tag);
-    printf("\tx = %f ... %f mm\n",1000*minv[X],1000*maxv[X]);
-    printf("\ty = %f ... %f mm\n",1000*minv[Y],1000*maxv[Y]);
-    printf("\tz = %f ... %f mm\n",1000*minv[Z],1000*maxv[Z]);
+    printf("%s:\n",tag.toUtf8().constData());
+    printf("\tx = %f ... %f mm\n",1000*minv[0],1000*maxv[0]);
+    printf("\ty = %f ... %f mm\n",1000*minv[1],1000*maxv[1]);
+    printf("\tz = %f ... %f mm\n",1000*minv[2],1000*maxv[2]);
 #endif
 
-    surf->fov = 0;
-    for (c = 0; c < 3; c++) {
-        if (std::fabs(minv[c]) > surf->fov)
-            surf->fov = std::fabs(minv[c]);
-        if (std::fabs(maxv[c]) > surf->fov)
-            surf->fov = std::fabs(maxv[c]);
-    }
-    VEC_COPY_47(surf->minv,minv);
-    VEC_COPY_47(surf->maxv,maxv);
-    surf->fov_scale = 1.1f;
-    return;
+    surf.fov = std::max(minv.cwiseAbs().maxCoeff(), maxv.cwiseAbs().maxCoeff());
+
+    surf.minv = minv;
+    surf.maxv = maxv;
+    surf.fov_scale = 1.1f;
 }
 
 //=============================================================================================================
 
-void MneMshDisplaySurfaceSet::decide_curv_display(const char *name,
-                MneMshDisplaySurface* s)
+void MneMshDisplaySurfaceSet::decide_curv_display(const QString& name,
+                MneMshDisplaySurface& s)
 
 {
-    if (strstr(name,"inflated") == name || strstr(name,"sphere") == name || strstr(name,"white") == name)
-        s->curvature_color_mode = SHOW_CURVATURE_OVERLAY;
+    if (name.startsWith("inflated") || name.startsWith("sphere") || name.startsWith("white"))
+        s.curvature_color_mode = SHOW_CURVATURE_OVERLAY;
     else
-        s->curvature_color_mode = SHOW_CURVATURE_NONE;
-    s->overlay_color_mode = SHOW_OVERLAY_HEAT;
-    /*
-  s->overlay_color_mode = SHOW_OVERLAY_NEGPOS;
-  */
-    return;
+        s.curvature_color_mode = SHOW_CURVATURE_NONE;
+    s.overlay_color_mode = SHOW_OVERLAY_HEAT;
 }
 
 //=============================================================================================================
 
-int MneMshDisplaySurfaceSet::add_bem_surface(QString              filepath,
+int MneMshDisplaySurfaceSet::add_bem_surface(const QString&       filepath,
                                                 int                  kind,
-                                                QString              bemname,
+                                                const QString&       bemname,
                                                 int                  full_geom,
                                                 int                  check)
 {
-    MneSurfaceOld*           surf = Q_NULLPTR;
-    MneMshDisplaySurface*    newSurf = new MneMshDisplaySurface();
+    printf("Loading BEM surface %s (id = %d) from %s ...\n",
+           bemname.toUtf8().constData(), kind, filepath.toUtf8().constData());
 
-    //Transform from QString to char*
-    QByteArray baFilepath = filepath.toLatin1();
-    char* filename = baFilepath.data();
+    std::unique_ptr<MneSurfaceOld> surf(MneSurfaceOld::read_bem_surface2(filepath,kind,full_geom,nullptr));
+    if (!surf)
+        return -1;
 
-    QByteArray baBemname = bemname.toLatin1();
-    char* name = baBemname.data();
-
-    printf("Loading BEM surface %s (id = %d) from %s ...\n",name,kind,filename);
-    if ((surf = MneSurfaceOld::read_bem_surface2(filename,kind,full_geom,Q_NULLPTR)) == Q_NULLPTR)
-        goto bad;
     if (check) {
-        double sum;
-        MneSurfaceOld::compute_surface_cm(surf);
-        sum = MneSurfaceOld::sum_solids(surf->cm,surf)/(4*M_PI);
+        MneSurfaceOld::compute_surface_cm(*surf);
+        double sum = MneSurfaceOld::sum_solids(Eigen::Map<const Eigen::Vector3f>(surf->cm), *surf) / (4*M_PI);
         if (std::fabs(sum - 1.0) > 1e-4) {
             printf( "%s surface is not closed "
-                                 "(sum of solid angles = %g * 4*PI).",name,sum);
-            goto bad;
+                                 "(sum of solid angles = %g * 4*PI).",
+                   bemname.toUtf8().constData(), sum);
+            return -1;
         }
     }
 
-    newSurf->filename    = MneSurfaceOld::strdup(filename);
-    //newSurf->time_loaded = time(Q_NULLPTR); //Comment out due to unknown timestemp function ToDo
-    newSurf->s           = surf;
+    auto newSurf = std::make_unique<MneMshDisplaySurface>();
+    newSurf->filename    = filepath;
+    //newSurf->time_loaded = time(nullptr); //Comment out due to unknown timestamp function ToDo
+    newSurf->s.reset(surf.release());
     newSurf->s->id       = kind;
-    newSurf->subj        = Q_NULLPTR;
-    newSurf->surf_name   = MneSurfaceOld::strdup(name);
+    newSurf->surf_name   = bemname;
 
     newSurf->curvature_color_mode = SHOW_CURVATURE_NONE;
     newSurf->overlay_color_mode   = SHOW_OVERLAY_HEAT;
 
-    decide_surface_extent(newSurf,name);
-    add_replace_surface(newSurf, true, true);
+    decide_surface_extent(*newSurf, bemname);
+    add_replace_surface(std::move(newSurf), true, true);
     apply_left_eyes();
     setup_current_lights();
 
-    return OK;
-
-bad :
-    {
-        if(surf)
-        {
-            delete surf;
-        }
-        if(newSurf)
-        {
-            delete newSurf;
-        }
-        return FAIL;
-    }
+    return 0;
 }
 
 //=============================================================================================================
 
-void MneMshDisplaySurfaceSet::add_replace_surface(MneMshDisplaySurface*    newSurf,
+void MneMshDisplaySurfaceSet::add_replace_surface(std::unique_ptr<MneMshDisplaySurface> newSurf,
                                                    bool                  replace,
                                                    bool                  drawable)
 {
-    MneMshDisplaySurface* surf;
-
     if (replace) {
         for (int k = 0; k < nsurf; k++) {
-            surf = surfs[k];
+            auto& surf = surfs[k];
             if (surf->s->id == newSurf->s->id) {
                 newSurf->transparent   = surf->transparent;
                 newSurf->show_aux_data = surf->show_aux_data;
-                delete surf;
-                surfs[k] = newSurf;
+                surfs[k] = std::move(newSurf);
                 if (!drawable) {
-                    active[k]   = FALSE;
-                    this->drawable[k] = FALSE;
+                    active[k]   = false;
+                    this->drawable[k] = false;
                 }
-                newSurf             = Q_NULLPTR;
-                break;
+                return;
             }
         }
     }
     if (newSurf) {		/* New surface */
-        surfs     = REALLOC_47(surfs,nsurf+1,MneMshDisplaySurface*);
-        patches   = REALLOC_47(patches,nsurf+1,MneSurfacePatch*);
-        patch_rot = REALLOC_47(patch_rot,nsurf+1,float);
+        surfs.push_back(std::move(newSurf));
+        patches.push_back(nullptr);
+        patch_rot.push_back(0.0f);
         active.conservativeResize(nsurf+1);
         this->drawable.conservativeResize(nsurf+1);
-        surfs[nsurf]     = newSurf;
         active[nsurf]    = drawable;
         this->drawable[nsurf]  = drawable;
-        patches[nsurf]   = NULL;
-        patch_rot[nsurf] = 0.0;
         nsurf++;
     }
-    return;
 }
 
 //=============================================================================================================
 
-void MneMshDisplaySurfaceSet::setup_curvature_colors(MneMshDisplaySurface* surf)
+void MneMshDisplaySurfaceSet::setup_curvature_colors(MneMshDisplaySurface& surf)
 {
-    int k,c;
-    MneSourceSpaceOld* s = NULL;;
-    float *col;
-    float curv_sum;
-    int   ncolor;
-
-    if (surf == NULL || surf->s == NULL)
+    if (!surf.s)
         return;
 
-    s = (MneSourceSpaceOld*)surf->s;
+    auto* s = reinterpret_cast<MneSourceSpaceOld*>(surf.s.get());
 
-    ncolor = surf->nvertex_colors;
+    const int ncolor = surf.nvertex_colors;
+    const int totalSize = ncolor * s->np;
 
-    if (!surf->vertex_colors)
-        surf->vertex_colors = MALLOC_47(ncolor*s->np,float);
-    col = surf->vertex_colors;
+    if (surf.vertex_colors.size() == 0)
+        surf.vertex_colors.resize(totalSize);
 
-    curv_sum = 0.0;
-    if (surf->curvature_color_mode == SHOW_CURVATURE_OVERLAY) {
-        for (k = 0; k < s->np; k++) {
+    float curv_sum = 0.0f;
+    if (surf.curvature_color_mode == SHOW_CURVATURE_OVERLAY) {
+        for (int k = 0; k < s->np; k++) {
+            const int base = k * ncolor;
             curv_sum += std::fabs(s->curv[k]);
-            for (c = 0; c < 3; c++)
-                col[c] = (s->curv[k] > 0) ? POS_CURV_COLOR : NEG_CURV_COLOR;
+            const float c = (s->curv[k] > 0) ? POS_CURV_COLOR : NEG_CURV_COLOR;
+            for (int j = 0; j < 3; j++)
+                surf.vertex_colors[base + j] = c;
             if (ncolor == 4)
-                col[3] = 1.0;
-            col = col+ncolor;
+                surf.vertex_colors[base + 3] = 1.0f;
         }
     }
     else {
-        for (k = 0; k < s->np; k++) {
+        for (int k = 0; k < s->np; k++) {
+            const int base = k * ncolor;
             curv_sum += std::fabs(s->curv[k]);
-            for (c = 0; c < 3; c++)
-                col[c] = EVEN_CURV_COLOR;
+            for (int j = 0; j < 3; j++)
+                surf.vertex_colors[base + j] = EVEN_CURV_COLOR;
             if (ncolor == 4)
-                col[3] = 1.0;
-            col = col+ncolor;
+                surf.vertex_colors[base + 3] = 1.0f;
         }
     }
 #ifdef DEBUG
     printf("Average curvature : %f\n",curv_sum/s->np);
 #endif
-    return;
 }
 
 //=============================================================================================================
 
 void MneMshDisplaySurfaceSet::apply_left_right_eyes()
 {
-    MneMshEyes* eyes = Q_NULLPTR;
-    MneMshDisplaySurface* surf = Q_NULLPTR;
-    int k;
+    MneMshEyes* eyes = nullptr;
 
     if (neyes == 0 || current_eyes < 0 || current_eyes > neyes-1) {
         eyes = &default_eyes;
@@ -548,45 +375,41 @@ void MneMshDisplaySurfaceSet::apply_left_right_eyes()
         eyes = all_eyes+current_eyes;
     }
 
-    for (k = 0; k < nsurf; k++) {
-        surf = surfs[k];
+    for (int k = 0; k < nsurf; k++) {
+        auto* surf = surfs[k].get();
         switch(surf->s->id) {
         case SURF_LEFT_HEMI :
         case SURF_LEFT_MORPH_HEMI :
-            VEC_COPY_47(surf->eye,eyes->left);
-            VEC_COPY_47(surf->up,eyes->left_up);
+            surf->eye = Eigen::Vector3f::Map(eyes->left);
+            surf->up  = Eigen::Vector3f::Map(eyes->left_up);
             break;
         case SURF_RIGHT_HEMI :
         case SURF_RIGHT_MORPH_HEMI :
-            VEC_COPY_47(surf->eye,eyes->right);
-            VEC_COPY_47(surf->up,eyes->right_up);
+            surf->eye = Eigen::Vector3f::Map(eyes->right);
+            surf->up  = Eigen::Vector3f::Map(eyes->right_up);
             break;
         default :
-            VEC_COPY_47(surf->eye,eyes->left);
-            VEC_COPY_47(surf->up,eyes->left_up);
+            surf->eye = Eigen::Vector3f::Map(eyes->left);
+            surf->up  = Eigen::Vector3f::Map(eyes->left_up);
             break;
         }
     }
-    return;
 }
 
 //=============================================================================================================
 
 void MneMshDisplaySurfaceSet::apply_left_eyes()
 {
-    int k;
-
-    for (k = 0; k < nsurf; k++) {
+    for (int k = 0; k < nsurf; k++) {
         if (neyes == 0 || current_eyes < 0 || current_eyes > neyes-1) {
-            VEC_COPY_47(surfs[k]->eye,default_eyes.left);
-            VEC_COPY_47(surfs[k]->up,default_eyes.left_up);
+            surfs[k]->eye = Eigen::Vector3f::Map(default_eyes.left);
+            surfs[k]->up  = Eigen::Vector3f::Map(default_eyes.left_up);
         }
         else {
-            VEC_COPY_47(surfs[k]->eye,all_eyes[current_eyes].left);
-            VEC_COPY_47(surfs[k]->up,all_eyes[current_eyes].left_up);
+            surfs[k]->eye = Eigen::Vector3f::Map(all_eyes[current_eyes].left);
+            surfs[k]->up  = Eigen::Vector3f::Map(all_eyes[current_eyes].left_up);
         }
     }
-    return;
 }
 
 //=============================================================================================================
@@ -594,8 +417,7 @@ void MneMshDisplaySurfaceSet::apply_left_eyes()
 void MneMshDisplaySurfaceSet::setup_current_lights()
 {
     initialize_custom_lights();
-    setup_lights(custom_lights);
-    return;
+    setup_lights(*custom_lights);
 }
 
 //=============================================================================================================
@@ -603,44 +425,35 @@ void MneMshDisplaySurfaceSet::setup_current_lights()
 void MneMshDisplaySurfaceSet::initialize_custom_lights()
 {
     if (!custom_lights) {
-        MneMshLightSet* s = new MneMshLightSet();
+        custom_lights = std::make_unique<MneMshLightSet>();
 
-        s->lights.push_back(std::make_unique<MneMshLight>(TRUE, 0.0f, 0.0f,  1.0f, 0.8f, 0.8f, 0.8f));
-        s->lights.push_back(std::make_unique<MneMshLight>(TRUE, 0.0f, 0.0f, -1.0f, 0.8f, 0.8f, 0.8f));
-        s->lights.push_back(std::make_unique<MneMshLight>(TRUE, 0.6f, -1.0f, -1.0f, 0.6f, 0.6f, 0.6f));
-        s->lights.push_back(std::make_unique<MneMshLight>(TRUE, -0.6f, -1.0f, -1.0f, 0.6f, 0.6f, 0.6f));
-        s->lights.push_back(std::make_unique<MneMshLight>(TRUE, 1.0f, 0.0f, 0.0f, 0.8f, 0.8f, 0.8f));
-        s->lights.push_back(std::make_unique<MneMshLight>(TRUE, -1.0f, 0.0f, 0.0f, 0.8f, 0.8f, 0.8f));
-        s->lights.push_back(std::make_unique<MneMshLight>(TRUE, 0.0f, 1.0f, 0.5f, 0.6f, 0.6f, 0.6f));
-        s->lights.push_back(std::make_unique<MneMshLight>(FALSE, 0.0f, 0.0f, -1.0, 1.0f, 1.0f, 1.0f));
-
-        custom_lights = dup_light_set(s);
-        delete s;
+        custom_lights->lights.push_back(std::make_unique<MneMshLight>(true, 0.0f, 0.0f,  1.0f, 0.8f, 0.8f, 0.8f));
+        custom_lights->lights.push_back(std::make_unique<MneMshLight>(true, 0.0f, 0.0f, -1.0f, 0.8f, 0.8f, 0.8f));
+        custom_lights->lights.push_back(std::make_unique<MneMshLight>(true, 0.6f, -1.0f, -1.0f, 0.6f, 0.6f, 0.6f));
+        custom_lights->lights.push_back(std::make_unique<MneMshLight>(true, -0.6f, -1.0f, -1.0f, 0.6f, 0.6f, 0.6f));
+        custom_lights->lights.push_back(std::make_unique<MneMshLight>(true, 1.0f, 0.0f, 0.0f, 0.8f, 0.8f, 0.8f));
+        custom_lights->lights.push_back(std::make_unique<MneMshLight>(true, -1.0f, 0.0f, 0.0f, 0.8f, 0.8f, 0.8f));
+        custom_lights->lights.push_back(std::make_unique<MneMshLight>(true, 0.0f, 1.0f, 0.5f, 0.6f, 0.6f, 0.6f));
+        custom_lights->lights.push_back(std::make_unique<MneMshLight>(false, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f, 1.0f));
     }
 }
 
 //=============================================================================================================
 
-MneMshLightSet* MneMshDisplaySurfaceSet::dup_light_set(MneMshLightSet* s)
+std::unique_ptr<MneMshLightSet> MneMshDisplaySurfaceSet::dup_light_set(const MneMshLightSet& s)
 {
-    MneMshLightSet* res = Q_NULLPTR;
+    auto res = std::make_unique<MneMshLightSet>();
 
-    if (s) {
-        res = new MneMshLightSet();
+    for (const auto &light : s.lights)
+        res->lights.push_back(std::make_unique<MneMshLight>(*light));
 
-        for (const auto &light : s->lights)
-            res->lights.push_back(std::make_unique<MneMshLight>(*light));
-    }
     return res;
 }
 
 //=============================================================================================================
 
-void MneMshDisplaySurfaceSet::setup_lights(MneMshLightSet* set)
+void MneMshDisplaySurfaceSet::setup_lights(const MneMshLightSet& set)
 {
-    if (!set)
-        return;
-    lights.reset(dup_light_set(set));
-    return;
+    lights = dup_light_set(set);
 }
 

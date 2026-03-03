@@ -40,24 +40,7 @@
 
 #include "mne_triangle.h"
 
-#define X_50 0
-#define Y_50 1
-#define Z_50 2
-
-#define VEC_DOT_50(x,y) ((x)[X_50]*(y)[X_50] + (x)[Y_50]*(y)[Y_50] + (x)[Z_50]*(y)[Z_50])
-#define VEC_LEN_50(x) sqrt(VEC_DOT_50(x,x))
-
-#define VEC_DIFF_50(from,to,diff) {\
-    (diff)[X_50] = (to)[X_50] - (from)[X_50];\
-    (diff)[Y_50] = (to)[Y_50] - (from)[Y_50];\
-    (diff)[Z_50] = (to)[Z_50] - (from)[Z_50];\
-    }
-
-#define CROSS_PRODUCT_50(x,y,xy) {\
-    (xy)[X_50] =   (x)[Y_50]*(y)[Z_50]-(y)[Y_50]*(x)[Z_50];\
-    (xy)[Y_50] = -((x)[X_50]*(y)[Z_50]-(y)[X_50]*(x)[Z_50]);\
-    (xy)[Z_50] =   (x)[X_50]*(y)[Y_50]-(y)[X_50]*(x)[Y_50];\
-    }
+#include <Eigen/Geometry>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -70,47 +53,29 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneTriangle::MneTriangle()
-{
-}
-
-//=============================================================================================================
-
-MneTriangle::~MneTriangle()
-{
-}
+MneTriangle::MneTriangle() = default;
 
 //=============================================================================================================
 
 void MneTriangle::compute_data()
-/*
- * Normal vector of a triangle and other stuff
- */
 {
-    float size,sizey;
-    int   c;
-    VEC_DIFF_50 (r1,r2,r12);
-    VEC_DIFF_50 (r1,r3,r13);
-    CROSS_PRODUCT_50 (r12,r13,nn);
-    size = VEC_LEN_50(nn);
-    /*
-        * Possibly zero area triangles
-        */
-    if (size > 0) {
-        nn[X_50] = nn[X_50]/size;
-        nn[Y_50] = nn[Y_50]/size;
-        nn[Z_50] = nn[Z_50]/size;
-    }
-    area = size/2.0;
-    sizey = VEC_LEN_50(r13);
+    r12 = Eigen::Map<const Eigen::Vector3f>(r2) - Eigen::Map<const Eigen::Vector3f>(r1);
+    r13 = Eigen::Map<const Eigen::Vector3f>(r3) - Eigen::Map<const Eigen::Vector3f>(r1);
+
+    nn = r12.cross(r13);
+    float size = nn.norm();
+    if (size > 0)
+        nn /= size;
+    area = size / 2.0f;
+
+    float sizey = r13.norm();
     if (sizey <= 0)
-        sizey = 1.0;
+        sizey = 1.0f;
+    ey = r13 / sizey;
 
-    for (c = 0; c < 3; c++) {
-        ey[c] = r13[c]/sizey;
-        cent[c] = (r1[c]+r2[c]+r3[c])/3.0;
-    }
-    CROSS_PRODUCT_50(ey,nn,ex);
+    cent = (Eigen::Map<const Eigen::Vector3f>(r1)
+          + Eigen::Map<const Eigen::Vector3f>(r2)
+          + Eigen::Map<const Eigen::Vector3f>(r3)) / 3.0f;
 
-    return;
+    ex = ey.cross(nn);
 }

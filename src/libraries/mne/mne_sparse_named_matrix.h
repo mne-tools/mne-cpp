@@ -36,10 +36,6 @@ public:
     std::unique_ptr<FIFFLIB::FiffSparseMatrix> data; /**< The data itself (sparse). */
 };
 
-/** Backward-compatible typedef aliases. */
-typedef MneSparseNamedMatrix  mneSparseNamedMatrixRec;
-typedef MneSparseNamedMatrix* mneSparseNamedMatrix;
-
 } // namespace MNELIB
 
 #endif // MNE_SPARSE_NAMED_MATRIX_H

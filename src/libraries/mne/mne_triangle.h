@@ -68,9 +68,12 @@ namespace MNELIB
 
 //=============================================================================================================
 /**
- * Implements the MNE Triangle description (Replaces *mneTriangle,mneTriangleRec; struct of MNE-C mne_types.h).
+ * @brief Per-triangle geometric data for a cortical or BEM surface.
  *
- * @brief Triangle data
+ * Stores vertex indices, edge vectors, normal, area, centroid and
+ * auxiliary unit vectors.  Vertex pointers (`r1`/`r2`/`r3`) and the
+ * index pointer (`vert`) alias data owned by the parent surface and
+ * must not be freed.
  */
 class MNESHARED_EXPORT MneTriangle
 {
@@ -80,45 +83,37 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs the MNE Triangle
+     * Constructs an empty MneTriangle with zeroed geometry.
      */
     MneTriangle();
 
     //=========================================================================================================
     /**
-     * Destroys the MNE Triangle
-     * Refactored:  (.c)
+     * Default destructor (non-owning pointers are not freed).
      */
-    ~MneTriangle();
+    ~MneTriangle() = default;
 
-    //============================= mne_add_geometry_info.c =============================
-
+    //=========================================================================================================
+    /**
+     * Compute derived geometry (edge vectors, normal, area, centroid,
+     * auxiliary unit vectors) from the current vertex positions.
+     */
     void compute_data();
 
 public:
-    int   *vert;            /* Triangle vertices (pointers to the itris member of the associated mneSurface) */
-    float *r1,*r2,*r3;      /* Triangle vertex locations (pointers to the rr member of the associated mneSurface) */
-    float r12[3],r13[3];    /* Vectors along the sides */
-    float nn[3];            /* Normal vector */
-    float area;             /* Area */
-    float cent[3];          /* Centroid */
-    float ex[3],ey[3];      /* Other unit vectors (used by BEM calculations) */
-
-// ### OLD STRUCT ###
-//typedef struct {
-//    int   *vert;            /* Triangle vertices (pointers to the itris member of the associated mneSurface) */
-//    float *r1,*r2,*r3;      /* Triangle vertex locations (pointers to the rr member of the associated mneSurface) */
-//    float r12[3],r13[3];    /* Vectors along the sides */
-//    float nn[3];            /* Normal vector */
-//    float area;             /* Area */
-//    float cent[3];          /* Centroid */
-//    float ex[3],ey[3];      /* Other unit vectors (used by BEM calculations) */
-//} *mneTriangle,mneTriangleRec;  /* Triangle data */
+    int              *vert = nullptr;  /**< Triangle vertex indices (non-owning; points into parent surface itris). */
+    const float      *r1 = nullptr;    /**< Position of vertex 0 (non-owning; points into parent surface rr). */
+    const float      *r2 = nullptr;    /**< Position of vertex 1 (non-owning; points into parent surface rr). */
+    const float      *r3 = nullptr;    /**< Position of vertex 2 (non-owning; points into parent surface rr). */
+    Eigen::Vector3f  r12 = Eigen::Vector3f::Zero();   /**< Edge vector from vertex 0 to vertex 1 (r2 - r1). */
+    Eigen::Vector3f  r13 = Eigen::Vector3f::Zero();   /**< Edge vector from vertex 0 to vertex 2 (r3 - r1). */
+    Eigen::Vector3f  nn  = Eigen::Vector3f::Zero();   /**< Unit normal vector. */
+    float            area = 0.0f;      /**< Triangle area. */
+    Eigen::Vector3f  cent = Eigen::Vector3f::Zero();  /**< Centroid position. */
+    Eigen::Vector3f  ex  = Eigen::Vector3f::Zero();   /**< In-plane unit vector (ey x nn; used by BEM). */
+    Eigen::Vector3f  ey  = Eigen::Vector3f::Zero();   /**< In-plane unit vector (normalized r13; used by BEM). */
 };
 
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
 } // NAMESPACE MNELIB
 
 #endif // MNETRIANGLE_H

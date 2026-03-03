@@ -111,8 +111,7 @@ public:
 
 public:
     FIFFLIB::fiffId meas_id;            /* The assosiated measurement ID */
-    MNELIB::MneSourceSpaceOld* *spaces; /* The source spaces */
-    int            nspace;              /* Number of source spaces */
+    std::vector<std::unique_ptr<MNELIB::MneSourceSpaceOld>> spaces; /* The source spaces */
     std::unique_ptr<FIFFLIB::FiffCoordTrans> meg_head_t;  /* MEG device <-> head coordinate transformation */
     std::unique_ptr<FIFFLIB::FiffCoordTrans> mri_head_t;  /* MRI device <-> head coordinate transformation */
     int            methods;         /* EEG, MEG or EEG+MEG (see mne_fiff.h) */

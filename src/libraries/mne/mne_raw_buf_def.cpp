@@ -69,15 +69,11 @@ MneRawBufDef::~MneRawBufDef()
 //=============================================================================================================
 
 void MneRawBufDef::free_bufs(MneRawBufDef *bufs, int nbuf)
-
 {
-    int k;
-    for (k = 0; k < nbuf; k++) {
-        FREE_34(bufs[k].ch_filtered);
-        /*
-         * Clear the pointers only, not the data which are in the ringbuffer
-         */
-        FREE_34(bufs[k].vals);
-    }
-    FREE_34(bufs);
+    /*
+     * vals and ch_filtered are now Eigen types that clean up automatically.
+     * We use delete[] to properly invoke destructors.
+     */
+    Q_UNUSED(nbuf)
+    delete[] bufs;
 }

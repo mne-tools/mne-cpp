@@ -47,6 +47,12 @@
 #include <fiff/fiff_stream.h>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
@@ -57,9 +63,6 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-
-#include <memory>
-
 #include <QList>
 
 //=============================================================================================================
@@ -77,9 +80,7 @@ namespace MNELIB
 
 //=============================================================================================================
 /**
- * Implements the MNE Raw Information (Replaces mneRawInfoRec, *mneRawInfo; struct of MNE-C mne_types.h).
- *
- * @brief Information about raw data in fiff file
+ * @brief Information about raw data in a FIFF file.
  */
 class MNESHARED_EXPORT MneRawInfo
 {
@@ -89,19 +90,15 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs the MNE Raw Info
-     * Refactored:  (.c)
+     * @brief Constructs a default MneRawInfo.
      */
     MneRawInfo();
 
     //=========================================================================================================
     /**
-     * Destroys the MNE Raw Info
-     * Refactored: mne_free_raw_info (mne_raw_routines.c)
+     * @brief Destroys the MneRawInfo and releases owned resources.
      */
     ~MneRawInfo();
-
-    //============================= read_ch_info.c =============================
 
     /**
      * Finds the nearest FIFFB_MEAS parent node in the FIFF directory tree.
@@ -166,7 +163,7 @@ public:
      *
      * @param[in]  stream      Open FIFF stream to read tags from.
      * @param[in]  node        Starting directory node (typically the raw data node).
-     * @param[out] id          Measurement ID (caller must free). Set to NULL if absent.
+     * @param[out] id          Measurement ID (managed via unique_ptr). Reset if absent.
      * @param[out] nchan       Number of channels.
      * @param[out] sfreq       Sampling frequency in Hz.
      * @param[out] highpass    Highpass filter cutoff frequency in Hz.
@@ -179,7 +176,7 @@ public:
      */
     static int get_meas_info (FIFFLIB::FiffStream::SPtr& stream,
                               FIFFLIB::FiffDirNode::SPtr& node,
-                              FIFFLIB::fiffId *id,
+                              std::unique_ptr<FIFFLIB::FiffId>& id,
                               int *nchan,
                               float *sfreq,
                               float *highpass,
@@ -204,67 +201,25 @@ public:
      *
      * @return FIFF_OK on success, FIFF_FAIL on failure.
      */
-    static int load(const QString& name, int allow_maxshield, MneRawInfo* *infop);
+    static int load(const QString& name, int allow_maxshield, std::unique_ptr<MneRawInfo>& infop);
 
 public:
     QString             filename;      /**< The name of the file this comes from. */
-    FIFFLIB::fiffId     id;             /**< Measurement id from the file. */
+    std::unique_ptr<FIFFLIB::FiffId> id;  /**< Measurement id from the file. */
     int                 nchan;          /**< Number of channels. */
     QList<FIFFLIB::FiffChInfo> chInfo;         /**< Channel info data . */
     int                 coord_frame;    /**< Which coordinate frame are the
                                          * positions defined in?
                                          */
-    std::unique_ptr<FIFFLIB::FiffCoordTrans> trans;  /**< This is the coordinate transformation
-                                             * FIFF_COORD_HEAD <--> FIFF_COORD_DEVICE
-                                             */
+    std::unique_ptr<FIFFLIB::FiffCoordTrans> trans;  /**< Coordinate transformation FIFF_COORD_HEAD <-> FIFF_COORD_DEVICE. */
     float         sfreq;          /**< Sampling frequency. */
     float         lowpass;        /**< Lowpass filter setting. */
     float         highpass;       /**< Highpass filter setting. */
-    FIFFLIB::FiffTime      start_time;    /**< Starting time of the acquisition
-                                             * taken from the meas date
-                                             * or the meas block id
-                                             * whence it may be inaccurate. */
+    FIFFLIB::FiffTime      start_time;    /**< Acquisition start time (from meas date or block id). */
     int         buf_size;       /**< Buffer size in samples. */
     int         maxshield_data; /**< Are these unprocessed MaxShield data. */
-    QList<FIFFLIB::FiffDirEntry::SPtr>  rawDir; /**< Directory of raw data tags
-                                                     * These may be of type
-                                                     *       FIFF_DATA_BUFFER
-                                                     *       FIFF_DATA_SKIP
-                                                     *       FIFF_DATA_SKIP_SAMP
-                                                     *       FIFF_NOP
-                                                     */
+    QList<FIFFLIB::FiffDirEntry::SPtr>  rawDir; /**< Directory of raw data tags (FIFF_DATA_BUFFER, FIFF_DATA_SKIP, etc.). */
     int           ndir;       /**< Number of tags in the above directory. */
-
-//// ### OLD STRUCT ###
-//typedef struct {        /**< Information about raw data in fiff file. */
-//    char                *filename;      /**< The name of the file this comes from. */
-//    FIFFLIB::fiffId     id;             /**< Measurement id from the file. */
-//    int                 nchan;          /**< Number of channels. */
-//    FIFFLIB::fiffChInfo chInfo;         /**< Channel info data . */
-//    int                 coord_frame;    /**< Which coordinate frame are the
-//                                         * positions defined in?
-//                                         */
-//    MNELIB::FiffCoordTransOld* trans; /**< This is the coordinate transformation
-//                                             * FIFF_COORD_HEAD <--> FIFF_COORD_DEVICE
-//                                             */
-//    float         sfreq;          /**< Sampling frequency. */
-//    float         lowpass;        /**< Lowpass filter setting. */
-//    float         highpass;       /**< Highpass filter setting. */
-//    FIFFLIB::fiffTimeRec   start_time;    /**< Starting time of the acquisition
-//                                             * taken from the meas date
-//                                             * or the meas block id
-//                                             * whence it may be inaccurate. */
-//    int         buf_size;       /**< Buffer size in samples. */
-//    int         maxshield_data; /**< Are these unprocessed MaxShield data. */
-//    QList<FIFFLIB::FiffDirEntry::SPtr>  rawDir; /**< Directory of raw data tags
-//                                                     * These may be of type
-//                                                     *       FIFF_DATA_BUFFER
-//                                                     *       FIFF_DATA_SKIP
-//                                                     *       FIFF_DATA_SKIP_SAMP
-//                                                     *       FIFF_NOP
-//                                                     */
-//    int           ndir;       /**< Number of tags in the above directory. */
-//} mneRawInfoRec, *mneRawInfo;
 };
 
 //=============================================================================================================
