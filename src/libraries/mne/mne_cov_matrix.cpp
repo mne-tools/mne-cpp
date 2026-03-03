@@ -63,99 +63,11 @@ using namespace MNELIB;
 #define OK 0
 #endif
 
-#define MALLOC_30(x,t) (t *)malloc((x)*sizeof(t))
-#define REALLOC_30(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-
-#define FREE_30(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#define FREE_CMATRIX_30(m) mne_free_cmatrix_30((m))
-#define FREE_DCMATRIX_30(m) mne_free_dcmatrix_30((m))
-
-void mne_free_cmatrix_30 (float **m)
-{
-    if (m) {
-        FREE_30(*m);
-        FREE_30(m);
-    }
-}
-
-void mne_free_dcmatrix_30 (double **m)
-
-{
-    if (m) {
-        FREE_30(*m);
-        FREE_30(m);
-    }
-}
-
-#define ALLOC_CMATRIX_30(x,y) mne_cmatrix_30((x),(y))
-
-#define ALLOC_DCMATRIX_30(x,y) mne_dmatrix_30((x),(y))
-
-static void matrix_error_30(int kind, int nr, int nc)
-
-{
-    if (kind == 1)
-        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
-    else if (kind == 2)
-        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
-    else
-        printf("Allocation error for a %d x %d matrix\n",nr,nc);
-    if (sizeof(void *) == 4) {
-        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
-        printf("Please consider moving to a 64-bit platform.");
-    }
-    printf("Cannot continue. Sorry.\n");
-    exit(1);
-}
-
-float **mne_cmatrix_30(int nr,int nc)
-
-{
-    int i;
-    float **m;
-    float *whole;
-
-    m = MALLOC_30(nr,float *);
-    if (!m)
-        matrix_error_30(1,nr,nc);
-
-    whole = MALLOC_30(nr*nc,float);
-    if (!whole)
-        matrix_error_30(2,nr,nc);
-
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
-
-    return m;
-}
-
-double **mne_dmatrix_30(int nr, int nc)
-
-{
-    int i;
-    double **m;
-    double *whole;
-
-    m = MALLOC_30(nr,double *);
-    if (!m)
-        matrix_error_30(1,nr,nc);
-
-    whole = MALLOC_30(nr*nc,double);
-    if (!whole)
-        matrix_error_30(2,nr,nc);
-
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
-
-    return m;
-}
-
 //============================= mne_decompose.c =============================
 
-int mne_decompose_eigen (double *mat,
-                         double *lambda,
-                         float  **vectors, /* Eigenvectors fit into floats easily */
+int mne_decompose_eigen (const VectorXd& mat,
+                         VectorXd& lambda,
+                         Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>& vectors,
                          int    dim)
 /*
       * Compute the eigenvalue decomposition of
@@ -165,17 +77,9 @@ int mne_decompose_eigen (double *mat,
       */
 {
     int    np  =   dim*(dim+1)/2;
-    double *w    = MALLOC_30(dim,double);
-    double *z    = MALLOC_30(dim*dim,double);
-    double *work = MALLOC_30(3*dim,double);
-    double *dmat = MALLOC_30(np,double);
-    float  *vecp = vectors[0];
-
-    int    info,k;
     int    maxi;
     double scale;
 
-//    maxi = idamax(&np,mat,&one);
 // idamax workaround begin
     maxi = 0;
     for(int i = 0; i < np; ++i)
@@ -183,88 +87,28 @@ int mne_decompose_eigen (double *mat,
             maxi = i;
 // idamax workaround end
 
-    scale = 1.0/mat[maxi];//scale = 1.0/mat[maxi-1];
-
-    for (k = 0; k < np; k++)
-        dmat[k] = mat[k]*scale;
-//    dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);
+    scale = 1.0/mat[maxi];
 
 // dspev workaround begin
-    MatrixXd dmat_tmp = MatrixXd::Zero(dim,dim);
+    MatrixXd dmat_full = MatrixXd::Zero(dim,dim);
     int idx = 0;
     for (int i = 0; i < dim; ++i) {
         for(int j = 0; j <= i; ++j) {
-            dmat_tmp(i,j) = dmat[idx];
-            dmat_tmp(j,i) = dmat[idx];
+            double val = mat[idx]*scale;
+            dmat_full(i,j) = val;
+            dmat_full(j,i) = val;
             ++idx;
         }
     }
     SelfAdjointEigenSolver<MatrixXd> es;
-    es.compute(dmat_tmp);
-    for ( int i = 0; i < dim; ++i )
-        w[i] = es.eigenvalues()[i];
-
-    idx = 0;
-    for ( int j = 0; j < dim; ++j ) {
-        for( int i = 0; i < dim; ++i ) {
-            z[idx] = es.eigenvectors()(i,j);// Column Major
-            ++idx;
-        }
-    }
+    es.compute(dmat_full);
 // dspev workaround end
 
-    info = 0;
+    scale = 1.0/scale;
+    lambda = es.eigenvalues() * scale;
+    vectors = es.eigenvectors().transpose().cast<float>();
 
-    qDebug() << "!!!DEBUG ToDo: dspev(compz,uplo,&dim,dmat,w,z,&dim,work,&info);";
-
-    FREE_30(work);
-    if (info != 0)
-        printf("Eigenvalue decomposition failed (LAPACK info = %d)",info);
-    else {
-        scale = 1.0/scale;
-        for (k = 0; k < dim; k++)
-            lambda[k] = scale*w[k];
-        for (k = 0; k < dim*dim; k++)
-            vecp[k] = z[k];
-    }
-    FREE_30(w);
-    FREE_30(z);
-    FREE_30(dmat);
-    if (info == 0)
-        return 0;
-    else
-        return -1;
-}
-
-double **mne_dmatt_dmat_mult2 (double **m1,double **m2, int d1,int d2,int d3)
-/* Matrix multiplication
-      * result(d1 x d3) = m1(d2 x d1)^T * m2(d2 x d3) */
-
-{
-    double **result = ALLOC_DCMATRIX_30(d1,d3);
-#ifdef BLAS
-    char  *transa = "N";
-    char  *transb = "T";
-    double zero = 0.0;
-    double one  = 1.0;
-
-    dgemm (transa,transb,&d3,&d1,&d2,
-           &one,m2[0],&d3,m1[0],&d1,&zero,result[0],&d3);
-
-    return result;
-#else
-    int j,k,p;
-    double sum;
-
-    for (j = 0; j < d1; j++)
-        for (k = 0; k < d3; k++) {
-            sum = 0.0;
-            for (p = 0; p < d2; p++)
-                sum = sum + m1[p][j]*m2[p][k];
-            result[j][k] = sum;
-        }
-    return result;
-#endif
+    return 0;
 }
 
 //=============================================================================================================
@@ -274,8 +118,8 @@ double **mne_dmatt_dmat_mult2 (double **m1,double **m2, int d1,int d2,int d3)
 MneCovMatrix::MneCovMatrix(int p_kind,
                            int p_ncov,
                            const QStringList& p_names,
-                           double *p_cov,
-                           double *p_cov_diag,
+                           const VectorXd& p_cov,
+                           const VectorXd& p_cov_diag,
                            FiffSparseMatrix* p_cov_sparse)
 :kind(p_kind)
 ,ncov(p_ncov)
@@ -286,13 +130,8 @@ MneCovMatrix::MneCovMatrix(int p_kind,
 ,cov(p_cov)
 ,cov_diag(p_cov_diag)
 ,cov_sparse(p_cov_sparse)
-,lambda(NULL)
-,inv_lambda(NULL)
-,eigen(NULL)
-,chol(NULL)
 ,proj(nullptr)
 ,sss(nullptr)
-,ch_class(NULL)
 ,nbad(0)
 {
 }
@@ -301,49 +140,20 @@ MneCovMatrix::MneCovMatrix(int p_kind,
 
 MneCovMatrix::~MneCovMatrix()
 {
-    FREE_30(cov);
-    FREE_30(cov_diag);
-    names.clear();
-    FREE_CMATRIX_30(eigen);
-    FREE_30(lambda);
-    FREE_30(inv_lambda);
-    FREE_30(chol);
-    FREE_30(ch_class);
-    bads.clear();
 }
 
 //=============================================================================================================
 
-MneCovMatrix *MneCovMatrix::dup() const
+std::unique_ptr<MneCovMatrix> MneCovMatrix::dup() const
 {
-    double       *vals;
-    int          nval;
-    int          k;
-    MneCovMatrix* res;
-
-    if (cov_diag)
-        nval = ncov;
-    else
-        nval = (ncov*(ncov+1))/2;
-
-    vals = MALLOC_30(nval,double);
-    if (cov_diag) {
-        for (k = 0; k < nval; k++)
-            vals[k] = cov_diag[k];
-        res = create(kind,ncov,names,NULL,vals);
-    }
-    else {
-        for (k = 0; k < nval; k++)
-            vals[k] = cov[k];
-        res = create(kind,ncov,names,vals,NULL);
-    }
+    auto res = cov_diag.size() > 0
+        ? create(kind,ncov,names,VectorXd(),VectorXd(cov_diag))
+        : create(kind,ncov,names,VectorXd(cov),VectorXd());
     /*
         * Duplicate additional items
         */
-    if (ch_class) {
-        res->ch_class = MALLOC_30(ncov,int);
-        for (k = 0; k < ncov; k++)
-            res->ch_class[k] = ch_class[k];
+    if (ch_class.size() > 0) {
+        res->ch_class = ch_class;
     }
     res->bads = bads;
     res->nbad = nbad;
@@ -358,7 +168,7 @@ MneCovMatrix *MneCovMatrix::dup() const
 
 int MneCovMatrix::is_diag() const
 {
-    return cov_diag != NULL;
+    return cov_diag.size() > 0;
 }
 
 //=============================================================================================================
@@ -368,14 +178,14 @@ int MneCovMatrix::add_inv()
           * Calculate the inverse square roots for whitening
           */
 {
-    double *src = lambda ? lambda : cov_diag;
+    const VectorXd& src = lambda.size() > 0 ? lambda : cov_diag;
     int k;
 
-    if (src == NULL) {
+    if (src.size() == 0) {
         qCritical("Covariance matrix is not diagonal or not decomposed.");
         return FAIL;
     }
-    inv_lambda = REALLOC_30(inv_lambda,ncov,double);
+    inv_lambda.resize(ncov);
     for (k = 0; k < ncov; k++) {
         if (src[k] <= 0.0)
             inv_lambda[k] = 0.0;
@@ -389,20 +199,19 @@ int MneCovMatrix::add_inv()
 
 int MneCovMatrix::condition(float rank_threshold, int use_rank)
 {
-    double *scale  = NULL;
-    double *cov    = NULL;
-    double *lambda = NULL;
-    float  **eigen = NULL;
-    double **data1 = NULL;
-    double **data2 = NULL;
+    VectorXd scale_vec;
+    VectorXd cov_local;
+    VectorXd lambda_local;
+    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> local_eigen;
+    MatrixXd data1;
     double magscale,gradscale,eegscale;
     int    nmag,ngrad,neeg,nok;
     int    j,k;
     int    res = FAIL;
 
-    if (cov_diag)
+    if (cov_diag.size() > 0)
         return OK;
-    if (!ch_class) {
+    if (ch_class.size() == 0) {
         qCritical("Channels not classified. Rank cannot be determined.");
         return FAIL;
     }
@@ -436,78 +245,73 @@ int MneCovMatrix::condition(float rank_threshold, int use_rank)
     fprintf(stdout,"%d %g\n",ngrad,gradscale);
     fprintf(stdout,"%d %g\n",neeg,eegscale);
 #endif
-    scale = MALLOC_30(ncov,double);
+    scale_vec.resize(ncov);
     for (k = 0; k < ncov; k++) {
         if (ch_class[k] == MNE_COV_CH_MEG_MAG)
-            scale[k] = magscale;
+            scale_vec[k] = magscale;
         else if (ch_class[k] == MNE_COV_CH_MEG_GRAD)
-            scale[k] = gradscale;
+            scale_vec[k] = gradscale;
         else if (ch_class[k] == MNE_COV_CH_EEG)
-            scale[k] = eegscale;
+            scale_vec[k] = eegscale;
         else
-            scale[k] = 1.0;
+            scale_vec[k] = 1.0;
     }
-    cov    = MALLOC_30(ncov*(ncov+1)/2.0,double);
-    lambda = MALLOC_30(ncov,double);
-    eigen  = ALLOC_CMATRIX_30(ncov,ncov);
+    cov_local.resize(ncov*(ncov+1)/2);
+    lambda_local.resize(ncov);
+    local_eigen.resize(ncov,ncov);
     for (j = 0; j < ncov; j++)
         for (k = 0; k <= j; k++)
-            cov[lt_packed_index(j,k)] = this->cov[lt_packed_index(j,k)]*scale[j]*scale[k];
-    if (mne_decompose_eigen(cov,lambda,eigen,ncov) == 0) {
+            cov_local[lt_packed_index(j,k)] = this->cov[lt_packed_index(j,k)]*scale_vec[j]*scale_vec[k];
+    if (mne_decompose_eigen(cov_local,lambda_local,local_eigen,ncov) == 0) {
 #ifdef DEBUG
         for (k = 0; k < ncov; k++)
-            fprintf(stdout,"%g ",lambda[k]/lambda[ncov-1]);
+            fprintf(stdout,"%g ",lambda_local[k]/lambda_local[ncov-1]);
         fprintf(stdout,"\n");
 #endif
         nok = 0;
         for (k = ncov-1; k >= 0; k--) {
-            if (lambda[k] >= rank_threshold*lambda[ncov-1])
+            if (lambda_local[k] >= rank_threshold*lambda_local[ncov-1])
                 nok++;
             else
                 break;
         }
-        printf("\n\tEstimated covariance matrix rank = %d (%g)\n",nok,lambda[ncov-nok]/lambda[ncov-1]);
+        printf("\n\tEstimated covariance matrix rank = %d (%g)\n",nok,lambda_local[ncov-nok]/lambda_local[ncov-1]);
         if (use_rank > 0 && use_rank < nok) {
             nok = use_rank;
-            printf("\tUser-selected covariance matrix rank = %d (%g)\n",nok,lambda[ncov-nok]/lambda[ncov-1]);
+            printf("\tUser-selected covariance matrix rank = %d (%g)\n",nok,lambda_local[ncov-nok]/lambda_local[ncov-1]);
         }
         /*
          * Put it back together
          */
         for (j = 0; j < ncov-nok; j++)
-            lambda[j] = 0.0;
-        data1 = ALLOC_DCMATRIX_30(ncov,ncov);
+            lambda_local[j] = 0.0;
+        data1.resize(ncov,ncov);
         for (j = 0; j < ncov; j++) {
 #ifdef DEBUG
-            mne_print_vector(stdout,NULL,eigen[j],ncov);
+            mne_print_vector(stdout,NULL,local_eigen.row(j).data(),ncov);
 #endif
             for (k = 0; k < ncov; k++)
-                data1[j][k] = sqrt(lambda[j])*eigen[j][k];
+                data1(j,k) = sqrt(lambda_local[j])*local_eigen(j,k);
         }
-        data2 = mne_dmatt_dmat_mult2(data1,data1,ncov,ncov,ncov);
+        MatrixXd data2 = data1.transpose() * data1;
 #ifdef DEBUG
         printf(">>>\n");
         for (j = 0; j < ncov; j++)
-            mne_print_dvector(stdout,NULL,data2[j],ncov);
+            mne_print_dvector(stdout,NULL,data2.row(j).data(),ncov);
         printf(">>>\n");
 #endif
         /*
          * Scale back
          */
         for (k = 0; k < ncov; k++)
-            if (scale[k] > 0.0)
-                scale[k] = 1.0/scale[k];
+            if (scale_vec[k] > 0.0)
+                scale_vec[k] = 1.0/scale_vec[k];
         for (j = 0; j < ncov; j++)
             for (k = 0; k <= j; k++)
                 if (this->cov[lt_packed_index(j,k)] != 0.0)
-                    this->cov[lt_packed_index(j,k)] = scale[j]*scale[k]*data2[j][k];
+                    this->cov[lt_packed_index(j,k)] = scale_vec[j]*scale_vec[k]*data2(j,k);
         res = nok;
     }
-    FREE_30(cov);
-    FREE_30(lambda);
-    FREE_CMATRIX_30(eigen);
-    FREE_DCMATRIX_30(data1);
-    FREE_DCMATRIX_30(data2);
     return res;
 }
 
@@ -518,15 +322,15 @@ int MneCovMatrix::decompose_eigen_small(float p_small, int use_rank)
           * Do the eigenvalue decomposition
           */
 {
-    int   np,k,p,rank;
+    int   k,p,rank;
     float rank_threshold = 1e-6;
 
     if (p_small < 0)
         p_small = 1.0;
 
-    if (cov_diag)
+    if (cov_diag.size() > 0)
         return add_inv();
-    if (lambda && eigen) {
+    if (lambda.size() > 0 && eigen.size() > 0) {
         printf("\n\tEigenvalue decomposition had been precomputed.\n");
         nzero = 0;
         for (k = 0; k < ncov; k++, nzero++)
@@ -534,16 +338,14 @@ int MneCovMatrix::decompose_eigen_small(float p_small, int use_rank)
                 break;
     }
     else {
-        FREE_30(lambda); lambda = NULL;
-        FREE_CMATRIX_30(eigen); eigen = NULL;
+        lambda.resize(0);
+        eigen.resize(0,0);
 
         if ((rank = condition(rank_threshold,use_rank)) < 0)
             return FAIL;
 
-        np = ncov*(ncov+1)/2;
-        (void)np; // squash unused variable warning, what is this for?
-        lambda = MALLOC_30(ncov,double);
-        eigen  = ALLOC_CMATRIX_30(ncov,ncov);
+        lambda.resize(ncov);
+        eigen.resize(ncov,ncov);
         if (mne_decompose_eigen (cov,lambda,eigen,ncov) != 0)
             goto bad;
         nzero = ncov - rank;
@@ -561,9 +363,9 @@ int MneCovMatrix::decompose_eigen_small(float p_small, int use_rank)
                 meglike = eeglike = 0.0;
                 for (p = 0; p < ncov; p++)  {
                     if (ch_class[p] == MNE_COV_CH_EEG)
-                        eeglike += std::fabs(eigen[k][p]);
+                        eeglike += std::fabs(eigen(k,p));
                     else if (ch_class[p] == MNE_COV_CH_MEG_MAG || ch_class[p] == MNE_COV_CH_MEG_GRAD)
-                        meglike += std::fabs(eigen[k][p]);
+                        meglike += std::fabs(eigen(k,p));
                 }
                 if (meglike > eeglike)
                     nmeg++;
@@ -576,8 +378,8 @@ int MneCovMatrix::decompose_eigen_small(float p_small, int use_rank)
     return add_inv();
 
 bad : {
-        FREE_30(lambda); lambda = NULL;
-        FREE_CMATRIX_30(eigen); eigen = NULL;
+        lambda.resize(0);
+        eigen.resize(0,0);
         return FAIL;
     }
 }

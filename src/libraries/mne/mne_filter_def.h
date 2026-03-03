@@ -38,9 +38,6 @@ public:
     float eog_lowpass_width = 0;     /**< EOG lowpass transition width in Hz. */
 };
 
-/** Backward-compatible typedef aliases. */
-typedef MneFilterDef  mneFilterDefRec;
-typedef MneFilterDef* mneFilterDef;
 #endif
 
 } // namespace MNELIB

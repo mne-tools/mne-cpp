@@ -222,12 +222,6 @@ MneProjOp::MneProjOp()
 
 MneProjOp::~MneProjOp()
 {
-    // mne_free_proj_op
-    for (int k = 0; k < nitems; k++)
-        if(items[k])
-            delete items[k];
-
-    // mne_free_proj_op_proj
 }
 
 //=============================================================================================================
@@ -250,14 +244,11 @@ MneProjOp *MneProjOp::combine(MneProjOp *from)
      * Copy items from 'from' operator to this operator
      */
 {
-    int k;
-    MneProjItem* it;
-
     if (from) {
-        for (k = 0; k < from->nitems; k++) {
-            it = from->items[k];
-            add_item(it->vecs.get(),it->kind,it->desc);
-            items[nitems-1]->active_file = it->active_file;
+        for (int k = 0; k < from->nitems; k++) {
+            const auto& it = from->items[k];
+            add_item(&it.vecs,it.kind,it.desc);
+            items[nitems-1].active_file = it.active_file;
         }
     }
     return this;
@@ -265,47 +256,41 @@ MneProjOp *MneProjOp::combine(MneProjOp *from)
 
 //=============================================================================================================
 
-void MneProjOp::add_item_active(MneNamedMatrix *vecs, int kind, const QString& desc, int is_active)
+void MneProjOp::add_item_active(const MneNamedMatrix *vecs, int kind, const QString& desc, int is_active)
 /*
  * Add a new item to an existing projection operator
  */
 {
-    MneProjItem* new_item;
-    int         k;
+    items.append(MneProjItem());
+    auto& new_item = items.back();
 
-    //    items = REALLOC(items,nitems+1,mneProjItem);
-    //    items[nitems] = new_item = new MneProjItem();
-
-    new_item = new MneProjItem();
-    items.append(new_item);
-
-    new_item->active      = is_active;
-    new_item->vecs        = std::make_unique<MneNamedMatrix>(*vecs);
+    new_item.active      = is_active;
+    new_item.vecs        = *vecs;
 
     if (kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
-        new_item->has_meg = FALSE;
-        new_item->has_eeg = TRUE;
+        new_item.has_meg = FALSE;
+        new_item.has_eeg = TRUE;
     }
     else {
-        for (k = 0; k < vecs->ncol; k++) {
+        for (int k = 0; k < vecs->ncol; k++) {
             if (vecs->collist[k].contains("EEG"))//strstr(vecs->collist[k],"EEG") == vecs->collist[k])
-                new_item->has_eeg = TRUE;
+                new_item.has_eeg = TRUE;
             if (vecs->collist[k].contains("MEG"))//strstr(vecs->collist[k],"MEG") == vecs->collist[k])
-                new_item->has_meg = TRUE;
+                new_item.has_meg = TRUE;
         }
-        if (!new_item->has_meg && !new_item->has_eeg) {
-            new_item->has_meg = TRUE;
-            new_item->has_eeg = FALSE;
+        if (!new_item.has_meg && !new_item.has_eeg) {
+            new_item.has_meg = TRUE;
+            new_item.has_eeg = FALSE;
         }
-        else if (new_item->has_meg && new_item->has_eeg) {
-            new_item->has_meg = TRUE;
-            new_item->has_eeg = FALSE;
+        else if (new_item.has_meg && new_item.has_eeg) {
+            new_item.has_meg = TRUE;
+            new_item.has_eeg = FALSE;
         }
     }
     if (!desc.isEmpty())
-        new_item->desc = desc;
-    new_item->kind = kind;
-    new_item->nvec = new_item->vecs->nrow;
+        new_item.desc = desc;
+    new_item.kind = kind;
+    new_item.nvec = new_item.vecs.nrow;
 
     nitems++;
 
@@ -315,7 +300,7 @@ void MneProjOp::add_item_active(MneNamedMatrix *vecs, int kind, const QString& d
 
 //=============================================================================================================
 
-void MneProjOp::add_item(MneNamedMatrix *vecs, int kind, const QString& desc)
+void MneProjOp::add_item(const MneNamedMatrix *vecs, int kind, const QString& desc)
 {
     add_item_active(vecs, kind, desc, TRUE);
 }
@@ -328,13 +313,11 @@ MneProjOp *MneProjOp::dup() const
  */
 {
     MneProjOp* res = new MneProjOp();
-    MneProjItem* it;
-    int k;
 
-    for (k = 0; k < nitems; k++) {
-        it = items[k];
-        res->add_item_active(it->vecs.get(),it->kind,it->desc,it->active);
-        res->items[k]->active_file = it->active_file;
+    for (int k = 0; k < nitems; k++) {
+        const auto& it = items[k];
+        res->add_item_active(&it.vecs,it.kind,it.desc,it.active);
+        res->items[k].active_file = it.active_file;
     }
     return res;
 }
@@ -348,9 +331,7 @@ MneProjOp *MneProjOp::create_average_eeg_ref(const QList<FiffChInfo>& chs, int n
 {
     int eegcount = 0;
     int k;
-    float       **vec_data;
     QStringList     names;
-    MneNamedMatrix* vecs;
     MneProjOp*      op;
 
     for (k = 0; k < nch; k++)
@@ -361,20 +342,17 @@ MneProjOp *MneProjOp::create_average_eeg_ref(const QList<FiffChInfo>& chs, int n
         return NULL;
     }
 
-    vec_data = ALLOC_CMATRIX_23(1,eegcount);
-
     for (k = 0; k < nch; k++)
         if (chs.at(k).kind == FIFFV_EEG_CH)
             names.append(chs.at(k).ch_name);
 
-    for (k = 0; k < eegcount; k++)
-        vec_data[0][k] = 1.0/sqrt((double)eegcount);
+    Eigen::MatrixXf vec_data = Eigen::MatrixXf::Constant(1, eegcount, 1.0f/sqrt((double)eegcount));
 
     QStringList emptyList;
-    vecs = MneNamedMatrix::build(1,eegcount,emptyList,names,vec_data);
+    auto vecs = MneNamedMatrix::build(1,eegcount,emptyList,names,vec_data);
 
     op = new MneProjOp();
-    op->add_item(vecs,FIFFV_MNE_PROJ_ITEM_EEG_AVREF,"Average EEG reference");
+    op->add_item(vecs.get(),FIFFV_MNE_PROJ_ITEM_EEG_AVREF,"Average EEG reference");
 
     return op;
 }
@@ -387,8 +365,8 @@ int MneProjOp::affect(const QStringList& list, int nlist)
     int naff;
 
     for (k = 0, naff = 0; k < nitems; k++)
-        if (items[k]->active && items[k]->affect(list,nlist))
-            naff += items[k]->nvec;
+        if (items[k].active && items[k].affect(list,nlist))
+            naff += items[k].nvec;
 
     return naff;
 }
@@ -475,10 +453,8 @@ MneProjOp *MneProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode
     int         global_nchan,item_nchan;
     QStringList item_names;
     int         item_kind;
-    float       **item_vectors = NULL;
     int         item_nvec;
     int         item_active;
-    MneNamedMatrix* item;
     FiffTag::SPtr t_pTag;
 
     if (!stream) {
@@ -581,9 +557,7 @@ MneProjOp *MneProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode
         if (!node->find_tag(stream,FIFF_PROJ_ITEM_VECTORS, t_pTag))
             goto bad;
 
-        MatrixXf tmp_item_vectors = t_pTag->toFloatMatrix().transpose();
-        item_vectors = ALLOC_CMATRIX_23(tmp_item_vectors.rows(),tmp_item_vectors.cols());
-        fromFloatEigenMatrix_23(tmp_item_vectors, item_vectors);
+        MatrixXf item_vectors = t_pTag->toFloatMatrix().transpose();
 
         /*
             * Is this item active?
@@ -597,10 +571,9 @@ MneProjOp *MneProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode
         * Ready to add
         */
         QStringList emptyList;
-        item = MneNamedMatrix::build(item_nvec,item_nchan,emptyList,item_names,item_vectors);
-        op->add_item_active(item,item_kind,item_desc,item_active);
-        delete item;
-        op->items[op->nitems-1]->active_file = item_active;
+        auto item = MneNamedMatrix::build(item_nvec,item_nchan,emptyList,item_names,item_vectors);
+        op->add_item_active(item.get(),item_kind,item_desc,item_active);
+        op->items[op->nitems-1].active_file = item_active;
     }
 
 out :
@@ -640,8 +613,7 @@ void MneProjOp::report_data(QTextStream &out, const char *tag, int list_data, ch
      * Output info about the projection operator
      */
 {
-    int j,k,p,q;
-    MneProjItem* it;
+    int j,p,q;
     MneNamedMatrix* vecs;
     int found;
 
@@ -650,19 +622,19 @@ void MneProjOp::report_data(QTextStream &out, const char *tag, int list_data, ch
         return;
     }
 
-    for (k = 0; k < nitems; k++) {
-        it = items[k];
+    for (int k = 0; k < nitems; k++) {
+        const auto& it = items[k];
         if (list_data && tag)
             out << tag << "\n";
         if (tag)
             out << tag;
-        out << "# " << (k+1) << " : " << it->desc << " : " << it->nvec << " vecs : " << it->vecs->ncol << " chs "
-            << (it->has_meg ? "MEG" : "EEG") << " "
-            << (it->active ? "active" : "idle") << "\n";
+        out << "# " << (k+1) << " : " << it.desc << " : " << it.nvec << " vecs : " << it.vecs.ncol << " chs "
+            << (it.has_meg ? "MEG" : "EEG") << " "
+            << (it.active ? "active" : "idle") << "\n";
         if (list_data && tag)
             out << tag << "\n";
         if (list_data) {
-            vecs = items[k]->vecs.get();
+            vecs = &items[k].vecs;
 
             for (q = 0; q < vecs->ncol; q++) {
                 out << qSetFieldWidth(10) << Qt::left << vecs->collist[q] << qSetFieldWidth(0);
@@ -677,7 +649,7 @@ void MneProjOp::report_data(QTextStream &out, const char *tag, int list_data, ch
                         }
                     }
                     out << qSetFieldWidth(10) << qSetRealNumberPrecision(5) << Qt::forcepoint
-                        << (found ? 0.0 : vecs->data[p][q]) << qSetFieldWidth(0) << " ";
+                        << (found ? 0.0 : vecs->data(p, q)) << qSetFieldWidth(0) << " ";
                     out << (q < vecs->ncol-1 ? " " : "\n");
                 }
             if (list_data && tag)

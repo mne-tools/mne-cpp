@@ -7,6 +7,8 @@
 
 #include "mne_global.h"
 
+#include <QString>
+
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
 //=============================================================================================================
@@ -14,8 +16,12 @@
 namespace MNELIB
 {
 
+//=============================================================================================================
 /**
- * Plotter layout port definition.
+ * @brief Single viewport in a plotter layout.
+ *
+ * Holds viewport bounds and the colon-separated list of channel
+ * names assigned to this viewport.
  */
 class MNESHARED_EXPORT MneLayoutPort
 {
@@ -23,11 +29,14 @@ public:
     MneLayoutPort() = default;
     ~MneLayoutPort() = default;
 
-    int   portno = 0;      /**< Running number of this viewport. */
-    int   invert = 0;      /**< Invert the signal coming to this port. */
-    float xmin = 0, xmax = 0, ymin = 0, ymax = 0;  /**< Limits. */
-    char  *names = nullptr; /**< Channels to go into this port (one line, separated by colons). */
-    int   match = 0;        /**< Does this port match with our present channel? */
+    int     portno = 0;         /**< Running number of this viewport. */
+    int     invert = 0;         /**< Invert the signal coming to this port. */
+    float   xmin = 0;           /**< Viewport left bound. */
+    float   xmax = 0;           /**< Viewport right bound. */
+    float   ymin = 0;           /**< Viewport bottom bound. */
+    float   ymax = 0;           /**< Viewport top bound. */
+    QString names;              /**< Channels assigned to this port (colon-separated). */
+    int     match = 0;          /**< Non-zero if this port matches the current channel. */
 };
 
 /** Backward-compatible typedef aliases. */

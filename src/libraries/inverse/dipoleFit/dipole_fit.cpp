@@ -166,15 +166,12 @@ void mne_free_name_list(char **list, int nlist)
 static mneChSelection new_ch_selection()
 
 {
-    mneChSelection newsel = MALLOC(1,mneChSelectionRec);
+    mneChSelection newsel = new MneChSelection();
 
     newsel->name.clear();
     newsel->chdef.clear();
     newsel->chspick.clear();
     newsel->chspick_nospace.clear();
-    newsel->pick    = NULL;
-    newsel->pick_deriv = NULL;
-    newsel->ch_kind = NULL;
     newsel->ndef    = 0;
     newsel->nchan   = 0;
     newsel->kind    = MNE_CH_SELECTION_UNKNOWN;
@@ -238,14 +235,11 @@ int mne_ch_selection_assign_chs(mneChSelection sel,
     omit_spaces(sel->chspick_nospace,sel->ndef);
     sel->nchan           = sel->ndef;
 
-    sel->pick        = REALLOC(sel->pick,sel->nchan,int);        /* Just in case */
-    sel->pick_deriv  = REALLOC(sel->pick_deriv,sel->nchan,int);
-    sel->ch_kind     = REALLOC(sel->ch_kind,sel->nchan,int);
+    sel->pick.setConstant(sel->nchan, -1);
+    sel->pick_deriv.setConstant(sel->nchan, -1);
+    sel->ch_kind.setConstant(sel->nchan, -1);
 
     for (c = 0; c < sel->nchan; c++) {
-        sel->pick[c]       = -1;
-        sel->pick_deriv[c] = -1;
-        sel->ch_kind[c]    = -1;
         for (rc = 0; rc < info->nchan; rc++) {
             if (QString::compare(sel->chspick[c],info->chInfo[rc].ch_name,Qt::CaseInsensitive) == 0 ||
                     QString::compare(sel->chspick_nospace[c],info->chInfo[rc].ch_name,Qt::CaseInsensitive) == 0) {
@@ -267,7 +261,7 @@ int mne_ch_selection_assign_chs(mneChSelection sel,
             if (sel->pick[c] == -1) {
                 for (d = 0; d < nderiv; d++) {
                     if (QString::compare(sel->chspick[c],deriv_names[d],Qt::CaseInsensitive) == 0 &&
-                            data->deriv_matched->valid && data->deriv_matched->valid[d]) {
+                            data->deriv_matched->valid.size() > 0 && data->deriv_matched->valid[d]) {
                         sel->pick_deriv[c] = d;
                         sel->ch_kind[c]    = data->deriv_matched->chs[d].kind;
                         sel->nderiv++;
@@ -599,7 +593,7 @@ ECDSet DipoleFit::calculateFit() const
         float t1,t2;
 
         printf("\n---- Opening a raw data file...\n\n");
-        if ((raw = MneRawData::open_file(settings->measname.isEmpty() ? NULL : settings->measname.toUtf8().data(),TRUE,FALSE,&(settings->filter))) == NULL)
+        if ((raw = MneRawData::open_file(settings->measname.isEmpty() ? NULL : settings->measname.toUtf8().data(),TRUE,FALSE,settings->filter)) == NULL)
             goto out;
         /*
         * A channel selection is needed to access the data

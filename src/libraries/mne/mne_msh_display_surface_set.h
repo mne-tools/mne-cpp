@@ -47,11 +47,16 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
+
+#include <memory>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QString>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -220,8 +225,8 @@ public:
     void setup_lights(MneMshLightSet* set);
 
 public:
-    char              *subj;	       /**< The name of the subject. */
-    char              *morph_subj;       /**< The subject we are morphing to. */
+    QString           subj;	       /**< The name of the subject. */
+    QString           morph_subj;       /**< The subject we are morphing to. */
     FIFFLIB::FiffCoordTransSet     *main_t;            /**< Coordinate transformations for the main surfaces. */
     FIFFLIB::FiffCoordTransSet     *morph_t;           /**< Coordinate transformations for the morph surfaces. */
     MneMshDisplaySurface **surfs;	       /**< Array of display surfaces. */
@@ -229,9 +234,9 @@ public:
     float             *patch_rot;	       /**< Rotation angles for the (flat) patches. */
     int               nsurf;	       /**< Number of surfaces. */
     int               use_patches;       /**< Whether to use patches for display. */
-    int               *active;	       /**< Boolean array indicating which surfaces are currently active. */
-    int               *drawable;	       /**< Boolean array indicating which surfaces could be drawn. */
-    MneMshLightSet*       lights;            /**< Current active lighting configuration. */
+    Eigen::VectorXi   active;	       /**< Boolean array indicating which surfaces are currently active. */
+    Eigen::VectorXi   drawable;	       /**< Boolean array indicating which surfaces could be drawn. */
+    std::unique_ptr<MneMshLightSet> lights;  /**< Current active lighting configuration. */
     float             rot[3];            /**< Rotation angles of the MRI (in radians). */
     float             move[3];	       /**< Translation offset for the origin. */
     float             fov;	       /**< Field of view (extent of the surface). */
@@ -242,32 +247,6 @@ public:
     float             text_color[3];     /**< Text color (RGB). */
     void              *user_data;        /**< User-defined data pointer. */
     mneUserFreeFunc   user_data_free;    /**< Function to free user_data. */
-
-// ### OLD STRUCT ###
-//    typedef struct {		       /* Set of display surfaces */
-//      char              *subj;	       /* The name of the subject */
-//      char              *morph_subj;       /* The subject we are morphing to */
-//      coordTransSet     main_t;            /* Coordinate transformations for the main surfaces */
-//      coordTransSet     morph_t;           /* Coordinate transformations for the morph surfaces */
-//      mshDisplaySurface *surfs;	       /* These are the surfaces */
-//      mneSurfacePatch   *patches;	       /* Optional patches for display */
-//      float             *patch_rot;	       /* Rotation angles for the (flat) patches */
-//      int               nsurf;	       /* How many? */
-//      int               use_patches;       /* Use patches for display? */
-//      int               *active;	       /* Which surfaces are currently active */
-//      int               *drawable;	       /* Which surfaces could be drawn? */
-//      mshLightSet       lights;            /* Lighting */
-//      float             rot[3];            /* Rotation angles of the MRI (in radians) */
-//      float             move[3];	       /* Possibly move the origin, too */
-//      float             fov;	       /* Field of view (extent of the surface) */
-//      float             fov_scale;	       /* How much space to leave */
-//      float             eye[3];	       /* Eye position for viewing (used in composite views) */
-//      float             up[3];	       /* Up vector for viewing */
-//      float             bg_color[3];       /* Background color */
-//      float             text_color[3];     /* Text color */
-//      void              *user_data;        /* Can be used to store whatever */
-//      mneUserFreeFunc   user_data_free;
-//    } *mshDisplaySurfaceSet,mshDisplaySurfaceSetRec;
 };
 
 //=============================================================================================================

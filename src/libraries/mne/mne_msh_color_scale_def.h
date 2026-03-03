@@ -95,17 +95,6 @@ public:
     float fslope;                   /* We still use the slope internally (sigh) */
     float tc_mult;                  /* Multiply the scales by this value for timecourses */
     int   relative;                 /* Are fthresh and fmid relative to the maximum value over the surface? */
-
-// ### OLD STRUCT ###
-//typedef struct {		                     /* The celebrated tksurfer-style values */
-//  int   type;		                             /* What is this scale setting good for? */
-//  float mult;			                     /* Convenience multiplier from internal units to displayed numbers */
-//  float fthresh;				     /* Threshold */
-//  float fmid;					     /* This is in the middle */
-//  float fslope;					     /* We still use the slope internally (sigh) */
-//  float tc_mult;			             /* Multiply the scales by this value for timecourses */
-//  int   relative;		                     /* Are fthresh and fmid relative to the maximum value over the surface? */
-//} *mshColorScaleDef,mshColorScaleDefRec;
 };
 
 //=============================================================================================================

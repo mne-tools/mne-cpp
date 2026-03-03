@@ -190,45 +190,6 @@ void mne_free_ring_buffer_9(void *thisp)
     return;
 }
 
-//============================= mne_events.c =============================
-
-void mne_free_event_9(mneEvent e)
-{
-    if (!e)
-        return;
-    FREE_9(e->comment);
-    FREE_9(e);
-    return;
-}
-
-void mne_free_event_list_9(mneEventList list)
-
-{
-    int k;
-    if (!list)
-        return;
-    for (k = 0; k < list->nevent; k++)
-        mne_free_event_9(list->events[k]);
-    FREE_9(list->events);
-    FREE_9(list);
-    return;
-}
-
-void mne_free_sparse_named_matrix_9(mneSparseNamedMatrix mat)
-/*
-      * Free the matrix and all the data from within
-      */
-{
-    if (!mat)
-        return;
-    mat->rowlist.clear();
-    mat->collist.clear();
-    if(mat->data)
-        delete mat->data;
-    FREE_9(mat);
-    return;
-}
-
 //============================= mne_raw_routines.c =============================
 
 void mne_ch_selection_free_9(mneChSelection s)
@@ -237,13 +198,10 @@ void mne_ch_selection_free_9(mneChSelection s)
     if (!s)
         return;
     s->name.clear();
-    FREE_9(s->pick);
-    FREE_9(s->pick_deriv);
-    FREE_9(s->ch_kind);
     s->chspick.clear();
     s->chspick_nospace.clear();
     s->chdef.clear();
-    FREE_9(s);
+    delete s;
     return;
 }
 
@@ -1526,7 +1484,7 @@ MneMeasData::MneMeasData()
     ,op        (NULL)
     ,fwd       (NULL)
     ,proj      (NULL)
-    ,comp      (NULL)
+    ,comp      (nullptr)
     ,raw       (NULL)
     ,chsel     (NULL)
     ,bad       (NULL)
@@ -1547,8 +1505,7 @@ MneMeasData::~MneMeasData()
     FREE_9(meas_id);
     if(proj)
         delete proj;
-    if(comp)
-        delete comp;
+    comp.reset();
     FREE_9(bad);
     badlist.clear();
 
@@ -1823,7 +1780,7 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
                 new_data->proj->report(errStream,"\t\t");
             }
             new_data->comp = MneCTFCompDataSet::read(name);
-            if (new_data->comp == NULL)
+            if (!new_data->comp)
                 goto out;
             if (new_data->comp->ncomp > 0)
                 printf("\tRead %d compensation data sets from %s\n",new_data->comp->ncomp,name.toUtf8().data());

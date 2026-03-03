@@ -71,55 +71,7 @@
 #define OK 0
 #endif
 
-#define MALLOC_32(x,t) (t *)malloc((x)*sizeof(t))
-#define REALLOC_32(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
 
-#define FREE_32(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#define FREE_CMATRIX_32(m) mne_free_cmatrix_32((m))
-#define ALLOC_CMATRIX_32(x,y) mne_cmatrix_32((x),(y))
-
-static void matrix_error_32(int kind, int nr, int nc)
-
-{
-    if (kind == 1)
-        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
-    else if (kind == 2)
-        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
-    else
-        printf("Allocation error for a %d x %d matrix\n",nr,nc);
-    if (sizeof(void *) == 4) {
-        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
-        printf("Please consider moving to a 64-bit platform.");
-    }
-    printf("Cannot continue. Sorry.\n");
-    exit(1);
-}
-
-float **mne_cmatrix_32(int nr,int nc)
-
-{
-    int i;
-    float **m;
-    float *whole;
-
-    m = MALLOC_32(nr,float *);
-    if (!m) matrix_error_32(1,nr,nc);
-    whole = MALLOC_32(nr*nc,float);
-    if (!whole) matrix_error_32(2,nr,nc);
-
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
-    return m;
-}
-
-void mne_free_cmatrix_32 (float **m)
-{
-    if (m) {
-        FREE_32(*m);
-        FREE_32(m);
-    }
-}
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -156,7 +108,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
     int        nmeg_comp = 0;
     QList<FIFFLIB::FiffChInfo> eeg;
     int        neeg  = 0;
-    fiffId     id    = NULL;
+    std::unique_ptr<FiffId> id;
     QList<FiffDirNode::SPtr> nodes;
     FiffDirNode::SPtr info;
     FiffTag::SPtr t_pTag;
@@ -198,8 +150,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
         case FIFF_PARENT_BLOCK_ID :
             if(!stream->read_tag(t_pTag, pos))
                 goto bad;
-//            id = t_pTag->toFiffID();
-            *id = *(fiffId)t_pTag->data();
+            id = std::make_unique<FiffId>(*(FiffId*)t_pTag->data());
             break;
 
         case FIFF_COORD_TRANS :
@@ -274,10 +225,10 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
     }
 
     if (idp == NULL) {
-        FREE_32(id);
+        /* id is auto-deleted by unique_ptr */
     }
     else
-        *idp   = id;
+        *idp   = id.release();
     if (meg_head_t == NULL) {
     }
     else
@@ -286,10 +237,7 @@ int mne_read_meg_comp_eeg_ch_info_32(const QString& name,
     return FIFF_OK;
 
 bad : {
-//        fiff_close(in);
         stream->close();
-        FREE_32(id);
-//        FREE_32(tag.data);
         return FIFF_FAIL;
     }
 }
@@ -323,9 +271,7 @@ int mne_unmap_ctf_comp_kind(int ctf_comp)
     return ctf_comp;
 }
 
-FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matrix to be converted */
-                                      int   nrow,           /* Number of rows in the dense matrix */
-                                      int   ncol,           /* Number of columns in the dense matrix */
+FiffSparseMatrix* mne_convert_to_sparse(const Eigen::MatrixXf& dense,   /* The dense matrix to be converted */
                                       int   stor_type,      /* Either FIFFTS_MC_CCS or FIFFTS_MC_RCS */
                                       float small)          /* How small elements should be ignored? */
 /*
@@ -337,18 +283,12 @@ FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matri
     int j,k;
     int nz;
     int ptr;
+    int nrow = static_cast<int>(dense.rows());
+    int ncol = static_cast<int>(dense.cols());
     FiffSparseMatrix* sparse = NULL;
 
     if (small < 0) {		/* Automatic scaling */
-        float maxval = 0.0;
-        float val;
-
-        for (j = 0; j < nrow; j++)
-            for (k = 0; k < ncol; k++) {
-                val = std::fabs(dense[j][k]);
-                if (val > maxval)
-                    maxval = val;
-            }
+        float maxval = dense.cwiseAbs().maxCoeff();
         if (maxval > 0)
             small = maxval*std::fabs(small);
         else
@@ -356,7 +296,7 @@ FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matri
     }
     for (j = 0, nz = 0; j < nrow; j++)
         for (k = 0; k < ncol; k++) {
-            if (std::fabs(dense[j][k]) > small)
+            if (std::fabs(dense(j,k)) > small)
                 nz++;
         }
 
@@ -381,8 +321,8 @@ FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matri
         for (j = 0, nz = 0; j < nrow; j++) {
             ptr = -1;
             for (k = 0; k < ncol; k++)
-                if (std::fabs(dense[j][k]) > small) {
-                    sparse->data[nz] = dense[j][k];
+                if (std::fabs(dense(j,k)) > small) {
+                    sparse->data[nz] = dense(j,k);
                     if (ptr < 0)
                         ptr = nz;
                     sparse->inds[nz++] = k;
@@ -399,8 +339,8 @@ FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matri
         for (k = 0, nz = 0; k < ncol; k++) {
             ptr = -1;
             for (j = 0; j < nrow; j++)
-                if (std::fabs(dense[j][k]) > small) {
-                    sparse->data[nz] = dense[j][k];
+                if (std::fabs(dense(j,k)) > small) {
+                    sparse->data[nz] = dense(j,k);
                     if (ptr < 0)
                         ptr = nz;
                     sparse->inds[nz++] = j;
@@ -413,73 +353,6 @@ FiffSparseMatrix* mne_convert_to_sparse(float **dense,        /* The dense matri
                 sparse->ptrs[k] = sparse->ptrs[k+1];
     }
     return sparse;
-}
-
-int  mne_sparse_mat_mult2_32(FiffSparseMatrix* mat,     /* The sparse matrix */
-                          float           **mult,  /* Matrix to be multiplied */
-                          int             ncol,	   /* How many columns in the above */
-                          float           **res)   /* Result of the multiplication */
-/*
-      * Multiply a dense matrix by a sparse matrix.
-      */
-{
-    int i,j,k;
-    float val;
-
-    if (mat->coding == FIFFTS_MC_RCS) {
-        for (i = 0; i < mat->m; i++) {
-            for (k = 0; k < ncol; k++) {
-                val = 0.0;
-                for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
-                    val += mat->data[j]*mult[mat->inds[j]][k];
-                res[i][k] = val;
-            }
-        }
-    }
-    else if (mat->coding == FIFFTS_MC_CCS) {
-        for (k = 0; k < ncol; k++) {
-            for (i = 0; i < mat->m; i++)
-                res[i][k] = 0.0;
-            for (i = 0; i < mat->n; i++)
-                for (j = mat->ptrs[i]; j < mat->ptrs[i+1]; j++)
-                    res[mat->inds[j]][k] += mat->data[j]*mult[i][k];
-        }
-    }
-    else {
-        qWarning("mne_sparse_mat_mult2: unknown sparse matrix storage type: %d",mat->coding);
-        return -1;
-    }
-    return 0;
-}
-
-float **mne_mat_mat_mult_32 (float **m1,float **m2,int d1,int d2,int d3)
-/* Matrix multiplication
-      * result(d1 x d3) = m1(d1 x d2) * m2(d2 x d3) */
-
-{
-#ifdef BLAS
-    float **result = ALLOC_CMATRIX_32(d1,d3);
-    char  *transa = "N";
-    char  *transb = "N";
-    float zero = 0.0;
-    float one  = 1.0;
-    sgemm (transa,transb,&d3,&d1,&d2,
-           &one,m2[0],&d3,m1[0],&d2,&zero,result[0],&d3);
-    return (result);
-#else
-    float **result = ALLOC_CMATRIX_32(d1,d3);
-    int j,k,p;
-    float sum;
-
-    for (j = 0; j < d1; j++)
-        for (k = 0; k < d3; k++) {
-            sum = 0.0;
-            for (p = 0; p < d2; p++)
-                sum = sum + m1[j][p]*m2[p][k];
-            result[j][k] = sum;
-        }
-    return (result);
-#endif
 }
 
 int  mne_sparse_vec_mult2_32(FiffSparseMatrix* mat,     /* The sparse matrix */
@@ -562,11 +435,7 @@ MneCTFCompDataSet::MneCTFCompDataSet()
 
 MneCTFCompDataSet::MneCTFCompDataSet(const MneCTFCompDataSet &set)
 {
-//    if (!set)
-//        return NULL;
-
     if (set.ncomp > 0) {
-//        this->comps = MALLOC_32(set.ncomp,mneCTFcompData);
         this->ncomp = set.comps.size();
         for (int k = 0; k < this->ncomp; k++)
             if(set.comps[k])
@@ -589,7 +458,7 @@ MneCTFCompDataSet::~MneCTFCompDataSet()
 
 //=============================================================================================================
 
-MneCTFCompDataSet *MneCTFCompDataSet::read(const QString &name)
+std::unique_ptr<MneCTFCompDataSet> MneCTFCompDataSet::read(const QString &name)
 /*
      * Read all CTF compensation data from a given file
      */
@@ -597,12 +466,11 @@ MneCTFCompDataSet *MneCTFCompDataSet::read(const QString &name)
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
 
-    MneCTFCompDataSet* set = NULL;
+    std::unique_ptr<MneCTFCompDataSet> set;
     MneCTFCompData* one;
     QList<FiffDirNode::SPtr> nodes;
     QList<FiffDirNode::SPtr> comps;
     int ncomp;
-    MneNamedMatrix* mat = NULL;
     int kind,k;
     FiffTag::SPtr t_pTag;
     QList<FiffChInfo> chs;
@@ -636,7 +504,7 @@ MneCTFCompDataSet *MneCTFCompDataSet::read(const QString &name)
         */
     if(!stream->open())
         goto bad;
-    set = new MneCTFCompDataSet();
+    set = std::make_unique<MneCTFCompDataSet>();
     /*
         * Locate the compensation data sets
         */
@@ -656,7 +524,7 @@ MneCTFCompDataSet *MneCTFCompDataSet::read(const QString &name)
         * Read each data set
         */
     for (k = 0; k < ncomp; k++) {
-        mat = MneNamedMatrix::read(stream,comps[k],FIFF_MNE_CTF_COMP_DATA);
+        auto mat = MneNamedMatrix::read(stream,comps[k],FIFF_MNE_CTF_COMP_DATA);
         if (!mat)
             goto bad;
         comps[k]->find_tag(stream, FIFF_MNE_CTF_COMP_KIND, t_pTag);
@@ -675,19 +543,17 @@ MneCTFCompDataSet *MneCTFCompDataSet::read(const QString &name)
             * Add these data to the set
             */
         one = new MneCTFCompData;
-        one->data.reset(mat); mat = NULL;
+        one->data = std::move(mat);
         one->kind                = kind;
         one->mne_kind            = mne_unmap_ctf_comp_kind(one->kind);
         one->calibrated          = calibrated;
 
         if (one->calibrate(set->chs,set->nch,TRUE) == FAIL) {
-            printf("Warning: Compensation data for '%s' omitted\n", explain_comp(one->kind));//,err_get_error(),explain_comp(one->kind));
+            printf("Warning: Compensation data for '%s' omitted\n", explain_comp(one->kind).toUtf8().constData());//,err_get_error(),explain_comp(one->kind));
             if(one)
                 delete one;
         }
         else {
-            //            set->comps               = REALLOC_9(set->comps,set->ncomp+1,mneCTFcompData);
-            //            set->comps[set->ncomp++] = one;
             set->comps.append(one);
             set->ncomp++;
         }
@@ -698,12 +564,8 @@ MneCTFCompDataSet *MneCTFCompDataSet::read(const QString &name)
     goto good;
 
 bad : {
-        if(mat)
-            delete mat;
         stream->close();
-        if(set)
-            delete set;
-        return NULL;
+        return nullptr;
     }
 
 good : {
@@ -722,18 +584,18 @@ int MneCTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
      * Make compensation data to apply to a set of channels to yield (or uncompensated) compensated data
      */
 {
-    int *comps = NULL;
+    Eigen::VectorXi comps;
     int need_comp;
     int first_comp;
     MneCTFCompData* this_comp;
-    int  *comp_sel = NULL;
+    Eigen::VectorXi comp_sel;
     QStringList names;
     QString name;
     int  j,k,p;
 
-    FiffSparseMatrix* presel  = NULL;
-    FiffSparseMatrix* postsel = NULL;
-    MneNamedMatrix*  data    = NULL;
+    std::unique_ptr<FiffSparseMatrix> presel;
+    std::unique_ptr<FiffSparseMatrix> postsel;
+    std::unique_ptr<MneNamedMatrix>   data;
 
     QStringList emptyList;
 
@@ -745,7 +607,7 @@ int MneCTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
     if (nch == 0)
         return OK;
     current.reset();
-    comps = MALLOC_32(nch,int);
+    comps.resize(nch);
     for (k = 0, need_comp = 0, first_comp = MNE_CTFV_COMP_NONE; k < nch; k++) {
         if (chs[k].kind == FIFFV_MEG_CH) {
             comps[k] = chs[k].chpos.coil_type >> 16;
@@ -755,7 +617,7 @@ int MneCTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
                 else {
                     if (comps[k] != first_comp) {
                         printf("We do not support nonuniform compensation yet.");
-                        goto bad;
+                        return FAIL;
                     }
                 }
                 need_comp++;
@@ -766,7 +628,6 @@ int MneCTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
     }
     if (need_comp == 0) {
         printf("\tNo compensation set. Nothing more to do.\n");
-        FREE_32(comps);
         return OK;
     }
     printf("\t%d out of %d channels have the compensation set.\n",need_comp,nch);
@@ -781,14 +642,14 @@ int MneCTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
     }
     if (!this_comp) {
         printf("Did not find the desired compensation data : %s",
-               explain_comp(map_comp_kind(first_comp)));
-        goto bad;
+               explain_comp(map_comp_kind(first_comp)).toUtf8().constData());
+        return FAIL;
     }
-    printf("\tDesired compensation data (%s) found.\n",explain_comp(map_comp_kind(first_comp)));
+    printf("\tDesired compensation data (%s) found.\n",explain_comp(map_comp_kind(first_comp)).toUtf8().constData());
     /*
         * Find the compensation channels
         */
-    comp_sel = MALLOC_32(this_comp->data->ncol,int);
+    comp_sel.resize(this_comp->data->ncol);
     for (k = 0; k < this_comp->data->ncol; k++) {
         comp_sel[k] = -1;
         name = this_comp->data->collist[k];
@@ -799,7 +660,7 @@ int MneCTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
             }
         if (comp_sel[k] < 0) {
             printf("Compensation channel %s not found",name.toUtf8().constData());
-            goto bad;
+            return FAIL;
         }
     }
     printf("\tAll compensation channels found.\n");
@@ -807,17 +668,13 @@ int MneCTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
         * Create the preselector
         */
     {
-        float **sel = ALLOC_CMATRIX_32(this_comp->data->ncol,ncomp);
-        for (j = 0; j < this_comp->data->ncol; j++) {
-            for (k = 0; k < ncomp; k++)
-                sel[j][k] = 0.0;
-            sel[j][comp_sel[j]] = 1.0;
-        }
-        if ((presel = mne_convert_to_sparse(sel,this_comp->data->ncol,ncomp,FIFFTS_MC_RCS,1e-30)) == NULL) {
-            FREE_CMATRIX_32(sel);
-            goto bad;
-        }
-        FREE_CMATRIX_32(sel);
+        Eigen::MatrixXf sel = Eigen::MatrixXf::Zero(this_comp->data->ncol, ncomp);
+        for (j = 0; j < this_comp->data->ncol; j++)
+            sel(j, comp_sel[j]) = 1.0f;
+        FiffSparseMatrix* ps = mne_convert_to_sparse(sel, FIFFTS_MC_RCS, 1e-30f);
+        if (!ps)
+            return FAIL;
+        presel.reset(ps);
         printf("\tPreselector created.\n");
     }
     /*
@@ -828,54 +685,37 @@ int MneCTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
             names.append(chs[k].ch_name);
     }
 
-    if ((data = this_comp->data->pick(names,need_comp,emptyList,0)) == NULL)
-        goto bad;
+    {
+        auto d = this_comp->data->pick(names, need_comp, emptyList, 0);
+        if (!d)
+            return FAIL;
+        data = std::move(d);
+    }
     printf("\tCompensation data matrix created.\n");
     /*
         * Create the postselector
         */
     {
-        float **sel = ALLOC_CMATRIX_32(nch,data->nrow);
+        Eigen::MatrixXf sel = Eigen::MatrixXf::Zero(nch, data->nrow);
         for (j = 0, p = 0; j < nch; j++) {
-            for (k = 0; k < data->nrow; k++)
-                sel[j][k] = 0.0;
             if (comps[j] != MNE_CTFV_COMP_NONE)
-                sel[j][p++] = 1.0;
+                sel(j, p++) = 1.0f;
         }
-        if ((postsel = mne_convert_to_sparse(sel,nch,data->nrow,FIFFTS_MC_RCS,1e-30)) == NULL) {
-            FREE_CMATRIX_32(sel);
-            goto bad;
-        }
-        FREE_CMATRIX_32(sel);
+        FiffSparseMatrix* ps = mne_convert_to_sparse(sel, FIFFTS_MC_RCS, 1e-30f);
+        if (!ps)
+            return FAIL;
+        postsel.reset(ps);
         printf("\tPostselector created.\n");
     }
     current           = std::make_unique<MneCTFCompData>();
     current->kind     = this_comp->kind;
     current->mne_kind = this_comp->mne_kind;
-    current->data.reset(data);
-    current->presel.reset(presel);
-    current->postsel.reset(postsel);
+    current->data     = std::move(data);
+    current->presel   = std::move(presel);
+    current->postsel  = std::move(postsel);
 
     printf("\tCompensation set up.\n");
-
-    names.clear();
-    FREE_32(comps);
-    FREE_32(comp_sel);
-
     return OK;
-
-bad : {
-        if(presel)
-            delete presel;
-        if(postsel)
-            delete postsel;
-        if(data)
-            delete data;
-        names.clear();
-        FREE_32(comps);
-        FREE_32(comp_sel);
-        return FAIL;
-    }
 }
 
 //=============================================================================================================
@@ -896,25 +736,28 @@ int MneCTFCompDataSet::set_comp(QList<FIFFLIB::FiffChInfo>& chs,
         }
     }
     printf("A new compensation value (%s) was assigned to %d MEG channels.\n",
-            explain_comp(map_comp_kind(comp)),nset);
+            explain_comp(map_comp_kind(comp)).toUtf8().constData(),nset);
     return nset;
 }
 
 //=============================================================================================================
 
-int MneCTFCompDataSet::apply(int do_it, float *data, int ndata, float *compdata, int ncompdata)
+int MneCTFCompDataSet::apply(int do_it, Eigen::VectorXf& data)
+{
+    return apply(do_it, data, data);
+}
+
+//=============================================================================================================
+
+int MneCTFCompDataSet::apply(int do_it, Eigen::VectorXf& data, const Eigen::VectorXf& compdata)
 /*
      * Apply compensation or revert to uncompensated data
      */
 {
     MneCTFCompData* this_comp;
-    float *presel,*comp;
-    int   k;
+    int   ndata = static_cast<int>(data.size());
+    int   ncompdata = static_cast<int>(compdata.size());
 
-    if (compdata == NULL) {
-        compdata  = data;
-        ncompdata = ndata;
-    }
     if (!current)
         return OK;
     this_comp = current.get();
@@ -948,60 +791,63 @@ int MneCTFCompDataSet::apply(int do_it, float *data, int ndata, float *compdata,
     /*
         * Preselection is optional
         */
+    const float *presel;
     if (this_comp->presel) {
-        if (!this_comp->presel_data)
-            this_comp->presel_data = MALLOC_32(this_comp->presel->m,float);
-        if (mne_sparse_vec_mult2_32(this_comp->presel.get(),compdata,this_comp->presel_data) != OK)
+        if (this_comp->presel_data.size() == 0)
+            this_comp->presel_data.resize(this_comp->presel->m);
+        if (mne_sparse_vec_mult2_32(this_comp->presel.get(),const_cast<float*>(compdata.data()),this_comp->presel_data.data()) != OK)
             return FAIL;
-        presel = this_comp->presel_data;
+        presel = this_comp->presel_data.data();
     }
     else
-        presel = compdata;
+        presel = compdata.data();
     /*
         * This always happens
         */
-    if (!this_comp->comp_data)
-        this_comp->comp_data = MALLOC_32(this_comp->data->nrow,float);
-    mne_mat_vec_mult2_32(this_comp->data->data,presel,this_comp->comp_data,this_comp->data->nrow,this_comp->data->ncol);
+    if (this_comp->comp_data.size() == 0)
+        this_comp->comp_data.resize(this_comp->data->nrow);
+    {
+        Eigen::Map<const Eigen::VectorXf> preselVec(presel, this_comp->data->ncol);
+        Eigen::Map<Eigen::VectorXf> compVec(this_comp->comp_data.data(), this_comp->data->nrow);
+        compVec = this_comp->data->data * preselVec;
+    }
     /*
         * Optional postselection
         */
+    const float *comp;
     if (!this_comp->postsel)
-        comp = this_comp->comp_data;
+        comp = this_comp->comp_data.data();
     else {
-        if (!this_comp->postsel_data) {
-            this_comp->postsel_data = MALLOC_32(this_comp->postsel->m,float);
-        }
-        if (mne_sparse_vec_mult2_32(this_comp->postsel.get(),this_comp->comp_data,this_comp->postsel_data) != OK)
+        if (this_comp->postsel_data.size() == 0)
+            this_comp->postsel_data.resize(this_comp->postsel->m);
+        if (mne_sparse_vec_mult2_32(this_comp->postsel.get(),this_comp->comp_data.data(),this_comp->postsel_data.data()) != OK)
             return FAIL;
-        comp = this_comp->postsel_data;
+        comp = this_comp->postsel_data.data();
     }
     /*
         * Compensate or revert compensation?
         */
-    if (do_it) {
-        for (k = 0; k < ndata; k++)
-            data[k] = data[k] - comp[k];
-    }
-    else {
-        for (k = 0; k < ndata; k++)
-            data[k] = data[k] + comp[k];
-    }
+    Eigen::Map<const Eigen::VectorXf> compVec(comp, ndata);
+    if (do_it)
+        data -= compVec;
+    else
+        data += compVec;
     return OK;
 }
 
 //=============================================================================================================
 
-int MneCTFCompDataSet::apply_transpose(int do_it, float **data, int ndata, int ns)      /* Number of samples */
+int MneCTFCompDataSet::apply_transpose(int do_it, Eigen::MatrixXf& data)
 /*
      * Apply compensation or revert to uncompensated data
      */
 {
+    using RowMatrixXf = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+
     MneCTFCompData* this_comp;
-    float **presel,**comp;
-    float **compdata = data;
+    int   ndata = static_cast<int>(data.rows());
+    int   ns    = static_cast<int>(data.cols());
     int   ncompdata  = ndata;
-    int   k,p;
 
     if (!current)
         return OK;
@@ -1034,49 +880,72 @@ int MneCTFCompDataSet::apply_transpose(int do_it, float **data, int ndata, int n
         return FAIL;
     }
     /*
-        * Preselection is optional
+        * Preselection is optional — sparse matrix * data
         */
+    Eigen::MatrixXf preselMat;
     if (this_comp->presel) {
-        presel = ALLOC_CMATRIX_32(this_comp->presel->m,ns);
-        if (mne_sparse_mat_mult2_32(this_comp->presel.get(),compdata,ns,presel) != OK) {
-            FREE_CMATRIX_32(presel);
+        preselMat.resize(this_comp->presel->m, ns);
+        FiffSparseMatrix* sp = this_comp->presel.get();
+        if (sp->coding == FIFFTS_MC_RCS) {
+            for (int i = 0; i < sp->m; i++)
+                for (int c = 0; c < ns; c++) {
+                    float val = 0.0f;
+                    for (int j = sp->ptrs[i]; j < sp->ptrs[i+1]; j++)
+                        val += sp->data[j] * data(sp->inds[j], c);
+                    preselMat(i, c) = val;
+                }
+        } else if (sp->coding == FIFFTS_MC_CCS) {
+            preselMat.setZero();
+            for (int c = 0; c < ns; c++)
+                for (int i = 0; i < sp->n; i++)
+                    for (int j = sp->ptrs[i]; j < sp->ptrs[i+1]; j++)
+                        preselMat(sp->inds[j], c) += sp->data[j] * data(i, c);
+        } else {
+            printf("Unknown sparse matrix storage type: %d", sp->coding);
             return FAIL;
         }
     }
-    else
-        presel = data;
+    else {
+        preselMat = data;
+    }
     /*
-        * This always happens
+        * Compensation: comp = data_matrix * preselMat
+        * data_matrix is float** (contiguous row-major via mne_cmatrix)
         */
-    comp = mne_mat_mat_mult_32(this_comp->data->data,presel,this_comp->data->nrow,this_comp->data->ncol,ns);
-    if (this_comp->presel)
-        FREE_CMATRIX_32(presel);
+    Eigen::MatrixXf comp = this_comp->data->data * preselMat;
     /*
-        * Optional postselection
+        * Optional postselection — sparse matrix * comp
         */
     if (this_comp->postsel) {
-        float **postsel = ALLOC_CMATRIX_32(this_comp->postsel->m,ns);
-        if (mne_sparse_mat_mult2_32(this_comp->postsel.get(),comp,ns,postsel) != OK) {
-            FREE_CMATRIX_32(postsel);
+        Eigen::MatrixXf postselMat(this_comp->postsel->m, ns);
+        FiffSparseMatrix* sp = this_comp->postsel.get();
+        if (sp->coding == FIFFTS_MC_RCS) {
+            for (int i = 0; i < sp->m; i++)
+                for (int c = 0; c < ns; c++) {
+                    float val = 0.0f;
+                    for (int j = sp->ptrs[i]; j < sp->ptrs[i+1]; j++)
+                        val += sp->data[j] * comp(sp->inds[j], c);
+                    postselMat(i, c) = val;
+                }
+        } else if (sp->coding == FIFFTS_MC_CCS) {
+            postselMat.setZero();
+            for (int c = 0; c < ns; c++)
+                for (int i = 0; i < sp->n; i++)
+                    for (int j = sp->ptrs[i]; j < sp->ptrs[i+1]; j++)
+                        postselMat(sp->inds[j], c) += sp->data[j] * comp(i, c);
+        } else {
+            printf("Unknown sparse matrix storage type: %d", sp->coding);
             return FAIL;
         }
-        FREE_CMATRIX_32(comp);
-        comp = postsel;
+        comp = std::move(postselMat);
     }
     /*
         * Compensate or revert compensation?
         */
-    if (do_it) {
-        for (k = 0; k < ndata; k++)
-            for (p = 0; p < ns; p++)
-                data[k][p] = data[k][p] - comp[k][p];
-    }
-    else {
-        for (k = 0; k < ndata; k++)
-            for (p = 0; p < ns; p++)
-                data[k][p] = data[k][p] + comp[k][p];
-    }
-    FREE_CMATRIX_32(comp);
+    if (do_it)
+        data -= comp;
+    else
+        data += comp;
     return OK;
 }
 
@@ -1121,9 +990,9 @@ int MneCTFCompDataSet::map_comp_kind(int grad)
 
 //=============================================================================================================
 
-const char *MneCTFCompDataSet::explain_comp(int kind)
+QString MneCTFCompDataSet::explain_comp(int kind)
 {
-    static struct {
+    static const struct {
         int kind;
         const char *expl;
     } explain[] = { { MNE_CTFV_COMP_NONE,    "uncompensated" },
@@ -1136,8 +1005,8 @@ const char *MneCTFCompDataSet::explain_comp(int kind)
 
     for (k = 0; explain[k].kind != MNE_CTFV_COMP_UNKNOWN; k++)
         if (explain[k].kind == kind)
-            return explain[k].expl;
-    return explain[k].expl;
+            return QString::fromLatin1(explain[k].expl);
+    return QString::fromLatin1(explain[k].expl);
 }
 
 //=============================================================================================================
@@ -1177,7 +1046,7 @@ int MneCTFCompDataSet::set_compensation(int compensate_to,
         * Are we there already?
         */
     if (current && current->mne_kind == compensate_to) {
-        printf("No further compensation necessary (comp = %s)\n",explain_comp(current->kind));
+        printf("No further compensation necessary (comp = %s)\n",explain_comp(current->kind).toUtf8().constData());
         current.reset();
         return OK;
     }
@@ -1195,8 +1064,8 @@ int MneCTFCompDataSet::set_compensation(int compensate_to,
         if (make_comp(chs,nchan,comp_chs,ncomp_chan) == FAIL)
             goto bad;
         printf("Compensation set up as requested (%s -> %s).\n",
-                explain_comp(map_comp_kind(comp_was)),
-                explain_comp(current->kind));
+                explain_comp(map_comp_kind(comp_was)).toUtf8().constData(),
+                explain_comp(current->kind).toUtf8().constData());
     }
     return OK;
 

@@ -166,7 +166,7 @@ private:
     FwdCoilSet* m_megcoils;                         /**< The MEG coil set. */
     FwdCoilSet* m_compcoils;                        /**< The compensator coil set. */
     FwdCoilSet* m_eegels;                           /**< The EEG eceltrode set. */
-    MNELIB::MneCTFCompDataSet *m_compData;          /**< The compensator data. */
+    std::unique_ptr<MNELIB::MneCTFCompDataSet> m_compData; /**< The compensator data. */
     FwdEegSphereModelSet* m_eegModels;              /**< The EEG model set. */
     FwdEegSphereModel* m_eegModel;                  /**< The EEG model. */
     FwdBemModel *m_bemModel;                        /**< BEM model definition. */

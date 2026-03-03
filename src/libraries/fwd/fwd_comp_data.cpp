@@ -191,7 +191,13 @@ int FwdCompData::fwd_comp_field(float *rd, float *Q, FwdCoilSet *coils, float *r
     /*
        * Compute the compensated field
        */
-    return comp->set->apply(TRUE,res,coils->ncoil,comp->work,comp->comp_coils->ncoil);
+    {
+        VectorXf resVec = Map<VectorXf>(res, coils->ncoil);
+        VectorXf workVec = Map<VectorXf>(comp->work, comp->comp_coils->ncoil);
+        int result = comp->set->apply(TRUE, resVec, workVec);
+        Map<VectorXf>(res, coils->ncoil) = resVec;
+        return result;
+    }
 }
 
 //=============================================================================================================
@@ -341,8 +347,11 @@ int FwdCompData::fwd_comp_field_vec(float *rd, FwdCoilSet *coils, float **res, v
        * Compute the compensated field of three orthogonal dipoles
        */
     for (k = 0; k < 3; k++) {
-        if (comp->set->apply(TRUE,res[k],coils->ncoil,comp->vec_work[k],comp->comp_coils->ncoil) == FAIL)
+        VectorXf resVec = Map<VectorXf>(res[k], coils->ncoil);
+        VectorXf workVec = Map<VectorXf>(comp->vec_work[k], comp->comp_coils->ncoil);
+        if (comp->set->apply(TRUE, resVec, workVec) == FAIL)
             return FAIL;
+        Map<VectorXf>(res[k], coils->ncoil) = resVec;
     }
     return OK;
 }
@@ -385,13 +394,33 @@ int FwdCompData::fwd_comp_field_grad(float *rd, float *Q, FwdCoilSet* coils, flo
     /*
      * Compute the compensated field
      */
-    if (comp->set->apply(TRUE,res,coils->ncoil,comp->work,comp->comp_coils->ncoil) != OK)
-        return FAIL;
-    if (comp->set->apply(TRUE,xgrad,coils->ncoil,comp->vec_work[0],comp->comp_coils->ncoil) != OK)
-        return FAIL;
-    if (comp->set->apply(TRUE,ygrad,coils->ncoil,comp->vec_work[1],comp->comp_coils->ncoil) != OK)
-        return FAIL;
-    if (comp->set->apply(TRUE,zgrad,coils->ncoil,comp->vec_work[2],comp->comp_coils->ncoil) != OK)
-        return FAIL;
+    {
+        int ncoil = coils->ncoil;
+        int ncomp_coil = comp->comp_coils->ncoil;
+
+        VectorXf resVec = Map<VectorXf>(res, ncoil);
+        VectorXf workVec = Map<VectorXf>(comp->work, ncomp_coil);
+        if (comp->set->apply(TRUE, resVec, workVec) != OK)
+            return FAIL;
+        Map<VectorXf>(res, ncoil) = resVec;
+
+        VectorXf xgradVec = Map<VectorXf>(xgrad, ncoil);
+        VectorXf vw0Vec = Map<VectorXf>(comp->vec_work[0], ncomp_coil);
+        if (comp->set->apply(TRUE, xgradVec, vw0Vec) != OK)
+            return FAIL;
+        Map<VectorXf>(xgrad, ncoil) = xgradVec;
+
+        VectorXf ygradVec = Map<VectorXf>(ygrad, ncoil);
+        VectorXf vw1Vec = Map<VectorXf>(comp->vec_work[1], ncomp_coil);
+        if (comp->set->apply(TRUE, ygradVec, vw1Vec) != OK)
+            return FAIL;
+        Map<VectorXf>(ygrad, ncoil) = ygradVec;
+
+        VectorXf zgradVec = Map<VectorXf>(zgrad, ncoil);
+        VectorXf vw2Vec = Map<VectorXf>(comp->vec_work[2], ncomp_coil);
+        if (comp->set->apply(TRUE, zgradVec, vw2Vec) != OK)
+            return FAIL;
+        Map<VectorXf>(zgrad, ncoil) = zgradVec;
+    }
     return OK;
 }

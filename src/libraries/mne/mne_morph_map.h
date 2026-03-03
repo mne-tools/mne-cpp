@@ -53,11 +53,14 @@
 // EIGEN INCLUDES
 //=============================================================================================================
 
+#include <Eigen/Core>
+
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QString>
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -90,29 +93,20 @@ public:
     /**
      * Constructs the MneMorphMap.
      */
-    MneMorphMap();
+    MneMorphMap() = default;
 
     //=========================================================================================================
     /**
      * Destroys the MneMorphMap.
      */
-    ~MneMorphMap();
+    ~MneMorphMap() = default;
 
 public:
-    std::unique_ptr<FIFFLIB::FiffSparseMatrix> map;		/**< Sparse interpolation matrix: multiply source surface data
-                                                                 * by this to obtain values on the target ('this') surface. */
-    int *best;			/**< Index of the closest source surface vertex for each target surface vertex. */
-    int from_kind;		/**< Surface kind identifier (e.g., hemisphere) of the source surface. */
-    char *from_subj;		/**< Subject name of the source surface. */
-
-// ### OLD STRUCT ###
-//    typedef struct {
-//      FIFFLIB::FiffSparseMatrix* map;		/* Multiply the data in the from surface with this to get to
-//                     * 'this' surface from the 'from' surface */
-//      int *best;			/* For each point on 'this' surface, the closest point on 'from' surface */
-//      int from_kind;		/* The kind field of the other surface */
-//      char *from_subj;		/* Name of the subject of the other surface */
-//    } *morphMap,morphMapRec;
+    std::unique_ptr<FIFFLIB::FiffSparseMatrix> map;  /**< Sparse interpolation matrix: multiply source surface data
+                                                          by this to obtain values on the target ('this') surface. */
+    Eigen::VectorXi best;                            /**< Index of the closest source surface vertex for each target vertex. */
+    int from_kind = -1;                              /**< Surface kind identifier (e.g., hemisphere) of the source surface (-1 = unknown). */
+    QString from_subj;                               /**< Subject name of the source surface. */
 };
 
 //=============================================================================================================

@@ -48,8 +48,6 @@
 
 #define VEC_DOT_43(x,y) ((x)[X_43]*(y)[X_43] + (x)[Y_43]*(y)[Y_43] + (x)[Z_43]*(y)[Z_43])
 
-#define FREE_43(x) if ((char *)(x) != NULL) free((char *)(x))
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -63,19 +61,17 @@ using namespace MNELIB;
 
 MnePatchInfo::MnePatchInfo()
     :vert (-1)
-    ,memb_vert (NULL)
-    ,nmemb (0)
     ,area (0)
     ,dev_nn (0)
 {
+    ave_nn[0] = 0;
+    ave_nn[1] = 0;
+    ave_nn[2] = 0;
 }
 
 //=============================================================================================================
 
-MnePatchInfo::~MnePatchInfo()
-{
-    FREE_43(memb_vert);
-}
+MnePatchInfo::~MnePatchInfo() = default;
 
 //=============================================================================================================
 
@@ -85,7 +81,7 @@ void MnePatchInfo::calculate_area(MneSourceSpaceOld* s)
     int nneigh;
 
     area = 0.0;
-    for (k = 0; k < nmemb; k++) {
+    for (k = 0; k < memb_vert.size(); k++) {
         nneigh = s->nneighbor_tri[memb_vert[k]];
         const Eigen::VectorXi& neigh = s->neighbor_tri[memb_vert[k]];
         for (q = 0; q < nneigh; q++)
@@ -104,7 +100,7 @@ void MnePatchInfo::calculate_normal_stats(MneSourceSpaceOld *s)
     ave_nn[Y_43] = 0.0;
     ave_nn[Z_43] = 0.0;
 
-    for (k = 0; k < nmemb; k++) {
+    for (k = 0; k < memb_vert.size(); k++) {
         ave_nn[X_43] += s->nn(memb_vert[k],X_43);
         ave_nn[Y_43] += s->nn(memb_vert[k],Y_43);
         ave_nn[Z_43] += s->nn(memb_vert[k],Z_43);
@@ -115,7 +111,7 @@ void MnePatchInfo::calculate_normal_stats(MneSourceSpaceOld *s)
     ave_nn[Z_43] = ave_nn[Z_43]/size;
 
     dev_nn = 0.0;
-    for (k = 0; k < nmemb; k++) {
+    for (k = 0; k < memb_vert.size(); k++) {
         cos_theta = VEC_DOT_43(&s->nn(memb_vert[k],0),ave_nn);
         if (cos_theta < -1.0)
             cos_theta = -1.0;
@@ -123,7 +119,7 @@ void MnePatchInfo::calculate_normal_stats(MneSourceSpaceOld *s)
             cos_theta = 1.0;
         dev_nn += acos(cos_theta);
     }
-    dev_nn = dev_nn/nmemb;
+    dev_nn = dev_nn/memb_vert.size();
 
     return;
 }

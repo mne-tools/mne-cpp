@@ -97,15 +97,9 @@ public:
     int   vert;             /**< Vertex index in the full surface mesh. */
     int   nearest;          /**< Index of the nearest 'inuse' vertex. */
     float dist;             /**< Distance to the nearest 'inuse' vertex (meters). */
-    MnePatchInfo* patch;    /**< Patch information record for the patch this vertex belongs to. */
-
-// ### OLD STRUCT ###
-//typedef struct {                /* This is used in the patch definitions */
-//    int   vert;                 /* Number of this vertex (to enable sorting) */
-//    int   nearest;              /* Nearest 'inuse' vertex */
-//    float dist;                 /* Distance to the nearest 'inuse' vertex */
-//    MnePatchInfo* patch;        /* The patch information record for the patch this vertex belongs to */
-//} *mneNearest,mneNearestRec;
+    MnePatchInfo* patch;    /**< Non-owning pointer to the patch this vertex belongs to.
+                             *   Owned by MneSourceSpaceOld::patches (unique_ptr).
+                             *   Multiple MneNearest objects share the same MnePatchInfo. */
 };
 
 //=============================================================================================================

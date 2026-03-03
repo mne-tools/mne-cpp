@@ -511,7 +511,7 @@ public:
      * @param[in, out] act     Triangle activation array (ntri elements).
      * @param[in]      nstep   Number of recursive expansion steps.
      */
-    static void activate_neighbors(MneSurfaceOld* s, int start, int *act, int nstep);
+    static void activate_neighbors(MneSurfaceOld* s, int start, Eigen::VectorXi &act, int nstep);
 
     //============================= mne_source_space.c =============================
 

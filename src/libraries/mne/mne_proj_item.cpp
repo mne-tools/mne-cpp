@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MNEProjItem Class.
+ * @brief    MneProjItem class definition.
  *
  */
 
@@ -39,23 +39,13 @@
 //=============================================================================================================
 
 #include "mne_proj_item.h"
+#include "mne_named_matrix.h"
 #include "mne_types.h"
-
-#define FREE_21(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
 
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
 using namespace MNELIB;
 
 //=============================================================================================================
@@ -63,12 +53,12 @@ using namespace MNELIB;
 //=============================================================================================================
 
 MneProjItem::MneProjItem()
-: nvec (0)
-, kind (FIFFV_PROJ_ITEM_NONE)
-, active (TRUE)
-, active_file (FALSE)
-, has_meg (FALSE)
-, has_eeg (FALSE)
+: nvec(0)
+, kind(FIFFV_PROJ_ITEM_NONE)
+, active(true)
+, active_file(false)
+, has_meg(false)
+, has_eeg(false)
 {
 }
 
@@ -76,28 +66,24 @@ MneProjItem::MneProjItem()
 
 MneProjItem::~MneProjItem()
 {
-    desc.clear();
 }
 
 //=============================================================================================================
 
 int MneProjItem::affect(const QStringList& list, int nlist) const
-/*
-     * Does this projection item affect this list of channels?
-     */
 {
-    int k,p,q;
+    if (nvec == 0)
+        return false;
 
-    if (vecs == NULL || nvec == 0)
-        return FALSE;
-
-    for (k = 0; k < nlist; k++)
-        for (p = 0; p < vecs->ncol; p++)
-            if (QString::compare(vecs->collist[p],list[k]) == 0) {
-                for (q = 0; q < vecs->nrow; q++) {
-                    if (vecs->data[q][p] != 0.0)
-                        return TRUE;
+    for (int k = 0; k < nlist; ++k) {
+        for (int p = 0; p < vecs.ncol; ++p) {
+            if (QString::compare(vecs.collist[p], list[k]) == 0) {
+                for (int q = 0; q < vecs.nrow; ++q) {
+                    if (vecs.data(q, p) != 0.0f)
+                        return true;
                 }
             }
-    return FALSE;
+        }
+    }
+    return false;
 }

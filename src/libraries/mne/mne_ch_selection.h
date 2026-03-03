@@ -7,6 +7,8 @@
 
 #include "mne_global.h"
 
+#include <Eigen/Core>
+
 #include <QString>
 #include <QStringList>
 
@@ -31,10 +33,10 @@ public:
     int         ndef = 0;           /**< How many of them. */
     QStringList chspick;            /**< Translated into channel names using the present data. */
     QStringList chspick_nospace;    /**< The same without spaces. */
-    int  *pick = nullptr;           /**< Corresponding channels in raw data (< 0 indicates missing). */
-    int  *pick_deriv = nullptr;     /**< Corresponding derivations in raw data. */
+    Eigen::VectorXi pick;           /**< Corresponding channels in raw data (< 0 indicates missing). */
+    Eigen::VectorXi pick_deriv;     /**< Corresponding derivations in raw data. */
     int  nderiv = 0;                /**< How many derivations in the above. */
-    int  *ch_kind = nullptr;        /**< Kinds of the channels corresponding to picks. */
+    Eigen::VectorXi ch_kind;        /**< Kinds of the channels corresponding to picks. */
     int  nchan = 0;                 /**< How many picked channels? */
     int  kind = 0;                  /**< Loaded from file or created here? */
 };

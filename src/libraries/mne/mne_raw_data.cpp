@@ -165,28 +165,6 @@ void mne_free_ring_buffer_36(void *thisp)
     return;
 }
 
-void mne_free_event(mneEvent e)
-{
-    if (!e)
-        return;
-    FREE_36(e->comment);
-    FREE_36(e);
-    return;
-}
-
-void mne_free_event_list_36(mneEventList list)
-
-{
-    int k;
-    if (!list)
-        return;
-    for (k = 0; k < list->nevent; k++)
-        mne_free_event(list->events[k]);
-    FREE_36(list->events);
-    FREE_36(list);
-    return;
-}
-
 void mne_free_name_list_36(char **list, int nlist)
 /*
  * Free a name list array
@@ -309,21 +287,21 @@ static filterData new_filter_data()
     return data;
 }
 
-int mne_compare_filters(mneFilterDef f1,
-                        mneFilterDef f2)
+int mne_compare_filters(const MneFilterDef& f1,
+                        const MneFilterDef& f2)
 /*
       * Return 0 if the two filter definitions are same, 1 otherwise
       */
 {
-    if (f1->filter_on != f2->filter_on ||
-            std::fabs(f1->lowpass - f2->lowpass) > 0.1 ||
-            std::fabs(f1->lowpass_width - f2->lowpass_width) > 0.1 ||
-            std::fabs(f1->highpass - f2->highpass) > 0.1 ||
-            std::fabs(f1->highpass_width - f2->highpass_width) > 0.1 ||
-            std::fabs(f1->eog_lowpass - f2->eog_lowpass) > 0.1 ||
-            std::fabs(f1->eog_lowpass_width - f2->eog_lowpass_width) > 0.1 ||
-            std::fabs(f1->eog_highpass - f2->eog_highpass) > 0.1 ||
-            std::fabs(f1->eog_highpass_width - f2->eog_highpass_width) > 0.1)
+    if (f1.filter_on != f2.filter_on ||
+            std::fabs(f1.lowpass - f2.lowpass) > 0.1 ||
+            std::fabs(f1.lowpass_width - f2.lowpass_width) > 0.1 ||
+            std::fabs(f1.highpass - f2.highpass) > 0.1 ||
+            std::fabs(f1.highpass_width - f2.highpass_width) > 0.1 ||
+            std::fabs(f1.eog_lowpass - f2.eog_lowpass) > 0.1 ||
+            std::fabs(f1.eog_lowpass_width - f2.eog_lowpass_width) > 0.1 ||
+            std::fabs(f1.eog_highpass - f2.eog_highpass) > 0.1 ||
+            std::fabs(f1.eog_highpass_width - f2.eog_highpass_width) > 0.1)
         return 1;
     else
         return 0;
@@ -384,7 +362,7 @@ void mne_fft_syn(float *data,int np, float **precalcp)
     return;
 }
 
-int mne_apply_filter(mneFilterDef filter, void *datap, float *data, int ns, int zero_pad, float dc_offset, int kind)
+int mne_apply_filter(const MneFilterDef& filter, void *datap, float *data, int ns, int zero_pad, float dc_offset, int kind)
 /*
  * Do the magick trick
  */
@@ -393,7 +371,7 @@ int mne_apply_filter(mneFilterDef filter, void *datap, float *data, int ns, int 
     filterData d = (filterData)datap;
     float *freq_resp;
 
-    if (ns != filter->size + 2*filter->taper_size) {
+    if (ns != filter.size + 2*filter.taper_size) {
         printf("Incorrect data length in apply_filter");
         return FAIL;
     }
@@ -401,18 +379,18 @@ int mne_apply_filter(mneFilterDef filter, void *datap, float *data, int ns, int 
    * Zero padding
    */
     if (zero_pad) {
-        for (k = 0; k < filter->taper_size; k++)
+        for (k = 0; k < filter.taper_size; k++)
             data[k] = 0.0;
-        for (k = filter->taper_size + filter->size; k < ns; k++)
+        for (k = filter.taper_size + filter.size; k < ns; k++)
             data[k] = 0.0;
     }
-    if (!filter->filter_on)	/* Nothing else to do */
+    if (!filter.filter_on)	/* Nothing else to do */
         return OK;
     /*
    * Make things nice by compensating for the dc offset
    */
     if (dc_offset != 0.0) {
-        for (k = filter->taper_size; k < filter->taper_size + filter->size; k++)
+        for (k = filter.taper_size; k < filter.taper_size + filter.size; k++)
             data[k] = data[k] - dc_offset;
     }
     if (!d)
@@ -455,7 +433,7 @@ int mne_apply_filter(mneFilterDef filter, void *datap, float *data, int ns, int 
     return OK;
 }
 
-void mne_create_filter_response(mneFilterDef    filter,
+void mne_create_filter_response(const MneFilterDef&   filter,
                                 float           sfreq,
                                 void            **filter_datap,
                                 mneUserFreeFunc *filter_data_freep,
@@ -474,7 +452,7 @@ void mne_create_filter_response(mneFilterDef    filter,
     float mult,add,c;
     filterData filter_data;
 
-    resp_size = (filter->size + 2*filter->taper_size)/2 + 1;
+    resp_size = (filter.size + 2*filter.taper_size)/2 + 1;
 
     filter_data                = new_filter_data();
     filter_data->freq_resp     = MALLOC_36(resp_size,float);
@@ -488,10 +466,10 @@ void mne_create_filter_response(mneFilterDef    filter,
      *highpass_effective = FALSE;
 
     for (f = 0; f < 2; f++) {
-        highpass       = f == 0 ? filter->highpass  : filter->eog_highpass;
-        highpass_width = f == 0 ? filter->highpass_width : filter->eog_highpass_width;
-        lowpass        = f == 0 ? filter->lowpass   : filter->eog_lowpass;
-        lowpass_width  = f == 0 ? filter->lowpass_width  : filter->eog_lowpass_width;
+        highpass       = f == 0 ? filter.highpass  : filter.eog_highpass;
+        highpass_width = f == 0 ? filter.highpass_width : filter.eog_highpass_width;
+        lowpass        = f == 0 ? filter.lowpass   : filter.eog_lowpass;
+        lowpass_width  = f == 0 ? filter.lowpass_width  : filter.eog_lowpass_width;
         freq_resp      = f == 0 ? filter_data->freq_resp : filter_data->eog_freq_resp;
         /*
      * Start simple first
@@ -502,14 +480,14 @@ void mne_create_filter_response(mneFilterDef    filter,
         lowpass_widths = ((resp_size-1)*lowpass_width)/(0.5*sfreq);
         lowpass_widths = (lowpass_widths+1)/2;    /* What user specified */
 
-        if (filter->highpass_width > 0.0) {
+        if (filter.highpass_width > 0.0) {
             highpass_widths = ((resp_size-1)*highpass_width)/(0.5*sfreq);
             highpass_widths  = (highpass_widths+1)/2;    /* What user specified */
         }
         else
             highpass_widths = 3;	   	             /* Minimal */
 
-        if (filter->filter_on) {
+        if (filter.filter_on) {
             printf("filter : %7.3f ... %6.1f Hz   bins : %d ... %d of %d hpw : %d lpw : %d\n",
                     highpass,
                     lowpass,
@@ -534,7 +512,7 @@ void mne_create_filter_response(mneFilterDef    filter,
             *highpass_effective = TRUE;
         }
         else
-            *highpass_effective = *highpass_effective || (filter->highpass == 0.0);
+            *highpass_effective = *highpass_effective || (filter.highpass == 0.0);
 
         if (lowpass_widths > 0) {
             w    = lowpass_widths;
@@ -553,7 +531,7 @@ void mne_create_filter_response(mneFilterDef    filter,
             for (k = lowpasss; k < resp_size; k++)
                 freq_resp[k] = 0.0;
         }
-        if (filter->filter_on) {
+        if (filter.filter_on) {
             if (*highpass_effective)
                 printf("Highpass filter will work as specified.\n");
             else
@@ -905,10 +883,8 @@ MneRawData::MneRawData()
 ,comp(nullptr)
 ,comp_file(MNE_CTFV_NOGRAD)
 ,comp_now(MNE_CTFV_NOGRAD)
-,filter(NULL)
 ,filter_data(NULL)
 ,filter_data_free(NULL)
-,event_list(NULL)
 ,max_event(0)
 ,dig_trigger_mask(0)
 ,offsets(NULL)
@@ -947,7 +923,7 @@ MneRawData::~MneRawData()
     if (this->user_free)
         this->user_free(this->user);
     this->dig_trigger.clear();
-    mne_free_event_list_36(this->event_list);
+    this->event_list.reset();
 
     FREE_36(this->deriv_offsets);
 }
@@ -974,7 +950,7 @@ void MneRawData::add_filter_response(int *highpass_effective)
     /*
        * Create a new one
        */
-    mne_create_filter_response(filter,
+    mne_create_filter_response(*filter,
                                info->sfreq,
                                &filter_data,
                                &filter_data_free,
@@ -988,7 +964,7 @@ void MneRawData::setup_filter_bufs()
      * These will hold the filtered data
      */
 {
-    mneFilterDef filter;
+    MneFilterDef* filter = this->filter.get();
     int       nfilt_buf;
     MneRawBufDef* bufs;
     int       j,k;
@@ -1004,7 +980,6 @@ void MneRawData::setup_filter_bufs()
 
     if (!this->filter)
         return;
-    filter = this->filter;
 
     for (nfilt_buf = 0, firstsamp = this->first_samp-filter->taper_size;
          firstsamp < this->nsamp + this->first_samp;
@@ -1094,25 +1069,38 @@ int MneRawData::compensate_buffer(MneRawBufDef *buf)
     if (!buf->vals)
         return OK;
     /*
-       * Have to do the hard job
+       * Have to do the hard job — wrap buf->vals in a MatrixXf for compensation
        */
-    if (comp->undo) {
-        std::swap(comp->current, comp->undo);
-        /*
-         * Undo the previous compensation
-         */
-        if (comp->apply_transpose(FALSE,buf->vals,info->nchan,buf->ns) != OK) {
+    {
+        Eigen::MatrixXf dataMat(info->nchan, buf->ns);
+        for (int r = 0; r < info->nchan; r++)
+            for (int c = 0; c < buf->ns; c++)
+                dataMat(r, c) = buf->vals[r][c];
+
+        if (comp->undo) {
             std::swap(comp->current, comp->undo);
-            goto bad;
+            /*
+             * Undo the previous compensation
+             */
+            if (comp->apply_transpose(FALSE, dataMat) != OK) {
+                std::swap(comp->current, comp->undo);
+                goto bad;
+            }
+            std::swap(comp->current, comp->undo);
         }
-        std::swap(comp->current, comp->undo);
-    }
-    if (comp->current) {
+        if (comp->current) {
+            /*
+             * Apply new compensation
+             */
+            if (comp->apply_transpose(TRUE, dataMat) != OK)
+                goto bad;
+        }
         /*
-         * Apply new compensation
+         * Copy result back to buf->vals
          */
-        if (comp->apply_transpose(TRUE,buf->vals,info->nchan,buf->ns) != OK)
-            goto bad;
+        for (int r = 0; r < info->nchan; r++)
+            for (int c = 0; c < buf->ns; c++)
+                buf->vals[r][c] = dataMat(r, c);
     }
     buf->comp_status = comp_now;
     return OK;
@@ -1209,7 +1197,7 @@ int MneRawData::pick_data(mneChSelection sel, int firsts, int ns, float **picked
                             nderiv      = deriv_matched->deriv_data->nrow;
                             deriv_ns    = this_buf->ns;
                         }
-                        if (mne_sparse_mat_mult2(deriv_matched->deriv_data->data,this_buf->vals,this_buf->ns,deriv_vals) == FAIL) {
+                        if (mne_sparse_mat_mult2(deriv_matched->deriv_data->data.get(),this_buf->vals,this_buf->ns,deriv_vals) == FAIL) {
                             FREE_CMATRIX_36(deriv_vals);
                             return FAIL;
                         }
@@ -1346,7 +1334,7 @@ int MneRawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
                         qWarning()<<"Error";
                     if (sel) {
                         if (sel->nderiv > 0 && deriv_matched) {
-                            if (mne_sparse_vec_mult2(deriv_matched->deriv_data->data,pvalues,deriv_pvalues) == FAIL)
+                            if (mne_sparse_vec_mult2(deriv_matched->deriv_data->data.get(),pvalues,deriv_pvalues) == FAIL)
                                 return FAIL;
                         }
                         for (c = 0; c < sel->nchan; c++) {
@@ -1452,13 +1440,13 @@ int MneRawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
     MneRawBufDef* this_buf;
     float        *values;
     float        **deriv_vals = NULL;
-    float        *dc          = NULL;
+    Eigen::VectorXf dc;
     float        dc_offset;
     int          deriv_ns     = 0;
     int          nderiv       = 0;
     int          filter_was;
 
-    if (!filter || !filter->filter_on)
+    if (!filter->filter_on)
         return pick_data_proj(sel,firsts,ns,picked);
 
     if (sel) {
@@ -1476,18 +1464,15 @@ int MneRawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
        * Take into account the initial dc offset (compensate and project)
        */
     if (first_sample_val) {
-        dc = MALLOC_36(info->nchan,float);
-
-        for (k = 0; k < info->nchan; k++)
-            dc[k] = first_sample_val[k];
+        dc = Eigen::Map<Eigen::VectorXf>(first_sample_val, info->nchan);
         /*
          * Is this correct??
          */
         if (comp && comp->current)
-            if (comp->apply(TRUE,dc,info->nchan,NULL,0) != OK)
+            if (comp->apply(TRUE,dc) != OK)
                 goto bad;
         if (proj)
-            if (proj->project_vector(dc,info->nchan,TRUE) != OK)
+            if (proj->project_vector(dc.data(),info->nchan,TRUE) != OK)
                 goto bad;
     }
     filter_was = filter->filter_on;
@@ -1520,9 +1505,9 @@ int MneRawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
                         dc_offset = 0.0;
                         if (info->chInfo[sel->pick[c]].kind == FIFFV_STIM_CH)
                             filter->filter_on = FALSE;
-                        else if (dc)
+                        else if (dc.size() > 0)
                             dc_offset = dc[sel->pick[c]];
-                        if (mne_apply_filter(filter,filter_data,this_buf->vals[sel->pick[c]],this_buf->ns,TRUE,
+                        if (mne_apply_filter(*filter,filter_data,this_buf->vals[sel->pick[c]],this_buf->ns,TRUE,
                                              dc_offset,info->chInfo[sel->pick[c]].kind) != OK) {
                             filter->filter_on = filter_was;
                             goto bad;
@@ -1546,9 +1531,9 @@ int MneRawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
                         dc_offset = 0.0;
                         if (info->chInfo[c].kind == FIFFV_STIM_CH)
                             filter->filter_on = FALSE;
-                        else if (dc)
+                        else if (dc.size() > 0)
                             dc_offset = dc[c];
-                        if (mne_apply_filter(filter,filter_data,this_buf->vals[c],this_buf->ns,TRUE,
+                        if (mne_apply_filter(*filter,filter_data,this_buf->vals[c],this_buf->ns,TRUE,
                                              dc_offset,info->chInfo[c].kind) != OK) {
                             filter->filter_on = filter_was;
                             goto bad;
@@ -1571,9 +1556,9 @@ int MneRawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
                     dc_offset = 0.0;
                     if (info->chInfo[c].kind == FIFFV_STIM_CH)
                         filter->filter_on = FALSE;
-                    else if (dc)
+                    else if (dc.size() > 0)
                         dc_offset = dc[c];
-                    if (mne_apply_filter(filter,filter_data,this_buf->vals[c],this_buf->ns,TRUE,
+                    if (mne_apply_filter(*filter,filter_data,this_buf->vals[c],this_buf->ns,TRUE,
                                          dc_offset,info->chInfo[c].kind) != OK) {
                         filter->filter_on = filter_was;
                         goto bad;
@@ -1620,7 +1605,7 @@ int MneRawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
                     nderiv      = deriv_matched->deriv_data->nrow;
                     deriv_ns    = this_buf->ns;
                 }
-                if (mne_sparse_mat_mult2(deriv_matched->deriv_data->data,this_buf->vals,this_buf->ns,deriv_vals) == FAIL)
+                if (mne_sparse_mat_mult2(deriv_matched->deriv_data->data.get(),this_buf->vals,this_buf->ns,deriv_vals) == FAIL)
                     goto bad;
             }
             for (c = 0; c < sel->nchan; c++) {
@@ -1649,12 +1634,10 @@ int MneRawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
     }
     (void)bs2; // squash compiler warning, this is unused
     FREE_CMATRIX_36(deriv_vals);
-    FREE_36(dc);
     return OK;
 
 bad : {
         FREE_CMATRIX_36(deriv_vals);
-        FREE_36(dc);
         return FAIL;
     }
 }
@@ -1664,7 +1647,7 @@ bad : {
 MneRawData *MneRawData::open_file_comp(const QString& name,
                                                int omit_skip,
                                                int allow_maxshield,
-                                               mneFilterDef filter,
+                                               const MneFilterDef& filter,
                                                int comp_set)
 /*
      * Open a raw data file
@@ -1731,7 +1714,7 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
     /*
        * Compensation data
        */
-    data->comp.reset(MneCTFCompDataSet::read(data->filename));
+    data->comp = MneCTFCompDataSet::read(data->filename);
     if (data->comp) {
         if (data->comp->ncomp > 0)
             printf("Read %d compensation data sets from %s\n",data->comp->ncomp,data->filename.toUtf8().constData());
@@ -1742,7 +1725,7 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
         qWarning() << "err_print_error()";
     if ((data->comp_file = MneCTFCompDataSet::get_comp(data->info->chInfo,data->info->nchan)) == FAIL)
         goto bad;
-    printf("Compensation in file : %s\n",MneCTFCompDataSet::explain_comp(MneCTFCompDataSet::map_comp_kind(data->comp_file)));
+    printf("Compensation in file : %s\n",MneCTFCompDataSet::explain_comp(MneCTFCompDataSet::map_comp_kind(data->comp_file)).toUtf8().constData());
     if (comp_set < 0)
         data->comp_now = data->comp_file;
     else
@@ -1763,7 +1746,7 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
        * SSS data
        */
     data->sss.reset(MneSssData::read(data->filename));
-    if (data->sss && data->sss->job != FIFFV_SSS_JOB_NOTHING && data->sss->ncomp > 0) {
+    if (data->sss && data->sss->job != FIFFV_SSS_JOB_NOTHING && data->sss->comp_info.size() > 0) {
         printf("SSS data read from %s :\n",data->filename.toUtf8().constData());
         QTextStream errStream(stderr);
         data->sss->print(errStream);
@@ -1915,8 +1898,7 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
     /*
        * Initialize the filter buffers
        */
-    data->filter  = MALLOC_36(1,mneFilterDefRec);
-     *data->filter = *filter;
+    data->filter = std::make_unique<MneFilterDef>(filter);
     data->setup_filter_bufs();
 
     {
@@ -1951,7 +1933,7 @@ bad : {
 
 //=============================================================================================================
 
-MneRawData *MneRawData::open_file(const QString& name, int omit_skip, int allow_maxshield, mneFilterDef filter)
+MneRawData *MneRawData::open_file(const QString& name, int omit_skip, int allow_maxshield, const MneFilterDef& filter)
 /*
      * Wrapper for open_file to work as before
      */

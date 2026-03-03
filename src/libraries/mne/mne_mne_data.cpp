@@ -44,42 +44,4 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
 using namespace MNELIB;
-
-#define FREE_7(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#define FREE_CMATRIX_7(m) mne_free_cmatrix_7((m))
-
-void mne_free_cmatrix_7 (float **m)
-{
-    if (m) {
-        FREE_7(*m);
-        FREE_7(m);
-    }
-}
-
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-MneMneData::MneMneData()
-: datap(NULL)
-, predicted(NULL)
-, SNR(NULL)
-, lambda2_est(NULL)
-, lambda2(NULL)
-{
-}
-
-//=============================================================================================================
-
-MneMneData::~MneMneData()
-{
-    FREE_CMATRIX_7(this->datap);
-    FREE_CMATRIX_7(this->predicted);
-
-    FREE_7(this->SNR);
-    FREE_7(this->lambda2_est);
-    FREE_7(this->lambda2);
-}

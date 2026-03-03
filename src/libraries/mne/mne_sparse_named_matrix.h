@@ -11,6 +11,8 @@
 
 #include <QStringList>
 
+#include <memory>
+
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
 //=============================================================================================================
@@ -31,7 +33,7 @@ public:
     int   ncol = 0;                        /**< Number of columns (same as in data). */
     QStringList rowlist;                   /**< Name list for the rows. */
     QStringList collist;                   /**< Name list for the columns. */
-    FIFFLIB::FiffSparseMatrix* data = nullptr; /**< The data itself (sparse). */
+    std::unique_ptr<FIFFLIB::FiffSparseMatrix> data; /**< The data itself (sparse). */
 };
 
 /** Backward-compatible typedef aliases. */

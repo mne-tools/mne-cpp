@@ -63,10 +63,6 @@
 #define OK 0
 #endif
 
-#define MALLOC_31(x,t) (t *)malloc((x)*sizeof(t))
-
-#define FREE_31(x) if ((char *)(x) != NULL) free((char *)(x))
-
 #define MNE_CTFV_COMP_UNKNOWN -1
 #define MNE_CTFV_COMP_NONE    0
 #define MNE_CTFV_COMP_G1BR    0x47314252
@@ -91,9 +87,6 @@ MneCTFCompData::MneCTFCompData()
 :kind(MNE_CTFV_COMP_UNKNOWN)
 ,mne_kind(MNE_CTFV_COMP_UNKNOWN)
 ,calibrated(FALSE)
-,presel_data(NULL)
-,comp_data(NULL)
-,postsel_data(NULL)
 {
 }
 
@@ -103,9 +96,6 @@ MneCTFCompData::MneCTFCompData(const MneCTFCompData& comp)
 :kind(MNE_CTFV_COMP_UNKNOWN)
 ,mne_kind(MNE_CTFV_COMP_UNKNOWN)
 ,calibrated(FALSE)
-,presel_data(NULL)
-,comp_data(NULL)
-,postsel_data(NULL)
 {
     kind       = comp.kind;
     mne_kind   = comp.mne_kind;
@@ -120,28 +110,19 @@ MneCTFCompData::MneCTFCompData(const MneCTFCompData& comp)
 
 MneCTFCompData::~MneCTFCompData()
 {
-    FREE_31(presel_data);
-    FREE_31(postsel_data);
-    FREE_31(comp_data);
 }
 
 //=============================================================================================================
 
 int MneCTFCompData::calibrate(const QList<FIFFLIB::FiffChInfo>& chs, int nch, int do_it)
-/*
-     * Calibrate or decalibrate a compensation data set
-     */
 {
-    float *col_cals,*row_cals;
+    Eigen::VectorXf col_cals(this->data->ncol);
+    Eigen::VectorXf row_cals(this->data->nrow);
     int   j,k,p,found;
     QString name;
-    float **data;
 
     if (calibrated)
         return OK;
-
-    row_cals = MALLOC_31(this->data->nrow,float);
-    col_cals = MALLOC_31(this->data->ncol,float);
 
     for (j = 0; j < this->data->nrow; j++) {
         name = this->data->rowlist[j];
@@ -171,16 +152,15 @@ int MneCTFCompData::calibrate(const QList<FIFFLIB::FiffChInfo>& chs, int nch, in
             return FAIL;
         }
     }
-    data = this->data->data;
     if (do_it) {
         for (j = 0; j < this->data->nrow; j++)
             for (k = 0; k < this->data->ncol; k++)
-                data[j][k] = row_cals[j]*data[j][k]/col_cals[k];
+                this->data->data(j, k) = row_cals[j]*this->data->data(j, k)/col_cals[k];
     }
     else {
         for (j = 0; j < this->data->nrow; j++)
             for (k = 0; k < this->data->ncol; k++)
-                data[j][k] = col_cals[k]*data[j][k]/row_cals[j];
+                this->data->data(j, k) = col_cals[k]*this->data->data(j, k)/row_cals[j];
     }
     return OK;
 }

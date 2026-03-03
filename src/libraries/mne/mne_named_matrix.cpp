@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the  MNE Named Matrix (MneNamedMatrix) Class.
+ * @brief    MneNamedMatrix class definition.
  *
  */
 
@@ -44,74 +44,18 @@
 #include <fiff/fiff_tag.h>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <vector>
+
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace Eigen;
 using namespace MNELIB;
 using namespace FIFFLIB;
-
-#define MALLOC_14(x,t) (t *)malloc((x)*sizeof(t))
-#define REALLOC_14(x,y,t) (t *)((x == NULL) ? malloc((y)*sizeof(t)) : realloc((x),(y)*sizeof(t)))
-#define ALLOC_CMATRIX_14(x,y) mne_cmatrix_14((x),(y))
-
-static void matrix_error_14(int kind, int nr, int nc)
-
-{
-    if (kind == 1)
-        printf("Failed to allocate memory pointers for a %d x %d matrix\n",nr,nc);
-    else if (kind == 2)
-        printf("Failed to allocate memory for a %d x %d matrix\n",nr,nc);
-    else
-        printf("Allocation error for a %d x %d matrix\n",nr,nc);
-    if (sizeof(void *) == 4) {
-        printf("This is probably because you seem to be using a computer with 32-bit architecture.\n");
-        printf("Please consider moving to a 64-bit platform.");
-    }
-    printf("Cannot continue. Sorry.\n");
-    exit(1);
-}
-
-float **mne_cmatrix_14(int nr,int nc)
-
-{
-    int i;
-    float **m;
-    float *whole;
-
-    m = MALLOC_14(nr,float *);
-    if (!m) matrix_error_14(1,nr,nc);
-    whole = MALLOC_14(nr*nc,float);
-    if (!whole) matrix_error_14(2,nr,nc);
-
-    for(i=0;i<nr;i++)
-        m[i] = whole + i*nc;
-    return m;
-}
-
-#define FREE_14(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#define FREE_CMATRIX_14(m) mne_free_cmatrix_14((m))
-
-void mne_free_cmatrix_14 (float **m)
-{
-    if (m) {
-        FREE_14(*m);
-        FREE_14(m);
-    }
-}
-
-void fromFloatEigenMatrix_14(const Eigen::MatrixXf& from_mat, float **& to_mat, const int m, const int n)
-{
-    for ( int i = 0; i < m; ++i)
-        for ( int j = 0; j < n; ++j)
-            to_mat[i][j] = from_mat(i,j);
-}
-
-void fromFloatEigenMatrix_14(const Eigen::MatrixXf& from_mat, float **& to_mat)
-{
-    fromFloatEigenMatrix_14(from_mat, to_mat, from_mat.rows(), from_mat.cols());
-}
 
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -120,44 +64,35 @@ void fromFloatEigenMatrix_14(const Eigen::MatrixXf& from_mat, float **& to_mat)
 MneNamedMatrix::MneNamedMatrix()
 : nrow(0)
 , ncol(0)
-, data(NULL)
 {
 }
 
 //=============================================================================================================
 
 MneNamedMatrix::MneNamedMatrix(const MneNamedMatrix &p_MneNamedMatrix)
+: nrow(p_MneNamedMatrix.nrow)
+, ncol(p_MneNamedMatrix.ncol)
+, rowlist(p_MneNamedMatrix.rowlist)
+, collist(p_MneNamedMatrix.collist)
+, data(p_MneNamedMatrix.data)
 {
-    float **data = ALLOC_CMATRIX_14(p_MneNamedMatrix.nrow,p_MneNamedMatrix.ncol);
-    int   j,k;
-
-    for (j = 0; j < p_MneNamedMatrix.nrow; j++)
-        for (k = 0; k < p_MneNamedMatrix.ncol; k++)
-            data[j][k] = p_MneNamedMatrix.data[j][k];
-    MneNamedMatrix* res = build(   p_MneNamedMatrix.nrow,p_MneNamedMatrix.ncol,p_MneNamedMatrix.rowlist,p_MneNamedMatrix.collist,data);
-    this->nrow = res->nrow;
-    this->ncol = res->ncol;
-    this->rowlist = res->rowlist;
-    this->collist = res->collist;
-    this->data = res->data;
 }
 
 //=============================================================================================================
 
 MneNamedMatrix::~MneNamedMatrix()
 {
-    FREE_CMATRIX_14(data);
 }
 
 //=============================================================================================================
 
-MneNamedMatrix *MneNamedMatrix::build(int nrow,
-                                                   int ncol,
-                                                   const QStringList& rowlist,
-                                                   const QStringList& collist,
-                                                   float **data)
+std::unique_ptr<MneNamedMatrix> MneNamedMatrix::build(int nrow,
+                                                      int ncol,
+                                                      const QStringList& rowlist,
+                                                      const QStringList& collist,
+                                                      const Eigen::MatrixXf& data)
 {
-    MneNamedMatrix* mat = new MneNamedMatrix;
+    auto mat = std::make_unique<MneNamedMatrix>();
     mat->nrow    = nrow;
     mat->ncol    = ncol;
     mat->rowlist = rowlist;
@@ -168,104 +103,107 @@ MneNamedMatrix *MneNamedMatrix::build(int nrow,
 
 //=============================================================================================================
 
-MneNamedMatrix *MneNamedMatrix::pick(const QStringList& pickrowlist, int picknrow, const QStringList& pickcollist, int pickncol) const
+std::unique_ptr<MneNamedMatrix> MneNamedMatrix::pick(const QStringList& pickrowlist,
+                                                     int picknrow,
+                                                     const QStringList& pickcollist,
+                                                     int pickncol) const
 {
-    int *pick_row = NULL;
-    int *pick_col = NULL;
-    QStringList my_pickrowlist;
-    QStringList my_pickcollist;
-    float **pickdata = NULL;
-    float **data;
-    int   row,j,k;
-    QString one;
-
+    /*
+     * Validate: picking by name requires names in the original matrix.
+     */
     if (!pickrowlist.isEmpty() && this->rowlist.isEmpty()) {
-        printf("Cannot pick rows: no names for rows in original.");
-        return NULL;
+        qCritical("MneNamedMatrix::pick - Cannot pick rows: no row names in original matrix.");
+        return nullptr;
     }
     if (!pickcollist.isEmpty() && this->collist.isEmpty()) {
-        printf("Cannot pick columns: no names for columns in original.");
-        return NULL;
+        qCritical("MneNamedMatrix::pick - Cannot pick columns: no column names in original matrix.");
+        return nullptr;
     }
+
+    /*
+     * When no pick-list is given, keep all rows / columns.
+     */
     if (pickrowlist.isEmpty())
         picknrow = this->nrow;
     if (pickcollist.isEmpty())
         pickncol = this->ncol;
-    pick_row = MALLOC_14(picknrow,int);
-    pick_col = MALLOC_14(pickncol,int);
+
     /*
-     * Decide what to pick
+     * Build row index mapping: for each picked row find its index in the original.
      */
+    std::vector<int> pick_row(picknrow);
+    QStringList my_pickrowlist;
+
     if (!pickrowlist.isEmpty()) {
-        for (j = 0; j < picknrow; j++) {
-            one = pickrowlist[j];
+        for (int j = 0; j < picknrow; ++j) {
+            const QString& name = pickrowlist[j];
             pick_row[j] = -1;
-            for (k = 0; k < this->nrow; k++) {
-                if (QString::compare(one,this->rowlist[k]) == 0) {
+            for (int k = 0; k < this->nrow; ++k) {
+                if (QString::compare(name, this->rowlist[k]) == 0) {
                     pick_row[j] = k;
                     break;
                 }
             }
             if (pick_row[j] == -1) {
-                printf("Row called %s not found in original matrix",one.toUtf8().constData());
-                goto bad;
+                qCritical("MneNamedMatrix::pick - Row '%s' not found in original matrix.",
+                          name.toUtf8().constData());
+                return nullptr;
             }
-            my_pickrowlist = pickrowlist;
         }
-    }
-    else {
-        for (k = 0; k < picknrow; k++)
+        my_pickrowlist = pickrowlist;
+    } else {
+        for (int k = 0; k < picknrow; ++k)
             pick_row[k] = k;
         my_pickrowlist = this->rowlist;
     }
+
+    /*
+     * Build column index mapping analogously.
+     */
+    std::vector<int> pick_col(pickncol);
+    QStringList my_pickcollist;
+
     if (!pickcollist.isEmpty()) {
-        for (j = 0; j < pickncol; j++) {
-            one = pickcollist[j];
+        for (int j = 0; j < pickncol; ++j) {
+            const QString& name = pickcollist[j];
             pick_col[j] = -1;
-            for (k = 0; k < this->ncol; k++) {
-                if (QString::compare(one,this->collist[k]) == 0) {
+            for (int k = 0; k < this->ncol; ++k) {
+                if (QString::compare(name, this->collist[k]) == 0) {
                     pick_col[j] = k;
                     break;
                 }
             }
             if (pick_col[j] == -1) {
-                printf("Column called %s not found in original matrix",one.toUtf8().constData());
-                goto bad;
+                qCritical("MneNamedMatrix::pick - Column '%s' not found in original matrix.",
+                          name.toUtf8().constData());
+                return nullptr;
             }
-            my_pickcollist = pickcollist;
         }
-    }
-    else {
-        for (k = 0; k < pickncol; k++)
+        my_pickcollist = pickcollist;
+    } else {
+        for (int k = 0; k < pickncol; ++k)
             pick_col[k] = k;
         my_pickcollist = this->collist;
     }
+
     /*
-     * Do the picking of the data accordingly
+     * Assemble the picked data matrix.
      */
-    pickdata = ALLOC_CMATRIX_14(picknrow,pickncol);
-
-    data = this->data;
-    for (j = 0; j < picknrow; j++) {
-        row = pick_row[j];
-        for (k = 0; k < pickncol; k++)
-            pickdata[j][k] = data[row][pick_col[k]];
+    Eigen::MatrixXf pickdata(picknrow, pickncol);
+    for (int j = 0; j < picknrow; ++j) {
+        const int row = pick_row[j];
+        for (int k = 0; k < pickncol; ++k)
+            pickdata(j, k) = this->data(row, pick_col[k]);
     }
 
-    FREE_14(pick_col);
-    FREE_14(pick_row);
-    return build(picknrow,pickncol,my_pickrowlist,my_pickcollist,pickdata);
-
-bad : {
-        FREE_14(pick_col);
-        FREE_14(pick_row);
-        return NULL;
-    }
+    return build(picknrow, pickncol, my_pickrowlist, my_pickcollist, pickdata);
 }
 
 //=============================================================================================================
 
-MneNamedMatrix *MneNamedMatrix::read(FiffStream::SPtr &stream, const FiffDirNode::SPtr &node, int kind)
+std::unique_ptr<MneNamedMatrix> MneNamedMatrix::read(FiffStream::SPtr& stream,
+                                                     const FiffDirNode::SPtr& node,
+                                                     int kind)
 {
     QStringList colnames;
     QStringList rownames;
@@ -273,102 +211,97 @@ MneNamedMatrix *MneNamedMatrix::read(FiffStream::SPtr &stream, const FiffDirNode
     int  nrow = 0;
     qint32 ndim;
     QVector<qint32> dims;
-    float **data = NULL;
-    QString s;
+    MatrixXf data;
     FiffTag::SPtr t_pTag;
-    int     k;
+    bool dataFound = false;
 
     FiffDirNode::SPtr tmp_node = node;
 
     /*
-     * If the node is a named-matrix mode, use it.
-     * Otherwise, look in first-generation children
+     * If the node itself is a FIFFB_MNE_NAMED_MATRIX block, read from it.
+     * Otherwise look in its first-generation children for such a block.
      */
     if (tmp_node->type == FIFFB_MNE_NAMED_MATRIX) {
-        if(!tmp_node->find_tag(stream, kind, t_pTag))
-            goto bad;
+        if (!tmp_node->find_tag(stream, kind, t_pTag))
+            return nullptr;
 
-        qint32 ndim;
-        QVector<qint32> dims;
         t_pTag->getMatrixDimensions(ndim, dims);
-
         if (ndim != 2) {
-            qCritical("MneNamedMatrix::read only works with two-dimensional matrices");
-            goto bad;
+            qCritical("MneNamedMatrix::read - Only two-dimensional matrices are supported.");
+            return nullptr;
         }
 
-        MatrixXf tmp_data = t_pTag->toFloatMatrix().transpose();
-        data = ALLOC_CMATRIX_14(tmp_data.rows(),tmp_data.cols());
-        fromFloatEigenMatrix_14(tmp_data, data);
-    }
-    else {
-        for (k = 0; k < tmp_node->nchild(); k++) {
+        data = t_pTag->toFloatMatrix().transpose();
+        dataFound = true;
+    } else {
+        for (int k = 0; k < tmp_node->nchild(); ++k) {
             if (tmp_node->children[k]->type == FIFFB_MNE_NAMED_MATRIX) {
-                if(tmp_node->children[k]->find_tag(stream, kind, t_pTag)) {
+                if (tmp_node->children[k]->find_tag(stream, kind, t_pTag)) {
                     t_pTag->getMatrixDimensions(ndim, dims);
                     if (ndim != 2) {
-                        qCritical("MneNamedMatrix::read only works with two-dimensional matrices");
-                        goto bad;
+                        qCritical("MneNamedMatrix::read - Only two-dimensional matrices are supported.");
+                        return nullptr;
                     }
 
-                    MatrixXf tmp_data = t_pTag->toFloatMatrix().transpose();
-                    data = ALLOC_CMATRIX_14(tmp_data.rows(),tmp_data.cols());
-                    fromFloatEigenMatrix_14(tmp_data, data);
-
+                    data = t_pTag->toFloatMatrix().transpose();
+                    dataFound = true;
                     tmp_node = tmp_node->children[k];
                     break;
                 }
             }
         }
-        if (!data)
-            goto bad;
+        if (!dataFound)
+            return nullptr;
     }
+
     /*
-        * Separate FIFF_MNE_NROW is now optional
-        */
-    if (!tmp_node->find_tag(stream, FIFF_MNE_NROW, t_pTag))
+     * Read optional FIFF_MNE_NROW / FIFF_MNE_NCOL dimension tags and
+     * cross-check them against the matrix data.
+     */
+    if (!tmp_node->find_tag(stream, FIFF_MNE_NROW, t_pTag)) {
         nrow = dims[0];
-    else {
+    } else {
         nrow = *t_pTag->toInt();
         if (nrow != dims[0]) {
-            qCritical("Number of rows in the FIFF_MNE_NROW tag and in the matrix data conflict.");
-            goto bad;
+            qCritical("MneNamedMatrix::read - FIFF_MNE_NROW tag (%d) conflicts with matrix data (%d).",
+                      nrow, dims[0]);
+            return nullptr;
         }
     }
-    /*
-        * Separate FIFF_MNE_NCOL is now optional
-        */
-    if(!tmp_node->find_tag(stream, FIFF_MNE_NCOL, t_pTag))
+
+    if (!tmp_node->find_tag(stream, FIFF_MNE_NCOL, t_pTag)) {
         ncol = dims[1];
-    else {
+    } else {
         ncol = *t_pTag->toInt();
         if (ncol != dims[1]) {
-            qCritical("Number of columns in the FIFF_MNE_NCOL tag and in the matrix data conflict.");
-            goto bad;
+            qCritical("MneNamedMatrix::read - FIFF_MNE_NCOL tag (%d) conflicts with matrix data (%d).",
+                      ncol, dims[1]);
+            return nullptr;
         }
     }
-    if(!tmp_node->find_tag(stream, FIFF_MNE_ROW_NAMES, t_pTag)) {
-        s = t_pTag->toString();
+
+    /*
+     * Read optional row and column name lists.
+     */
+    if (!tmp_node->find_tag(stream, FIFF_MNE_ROW_NAMES, t_pTag)) {
+        const QString s = t_pTag->toString();
         rownames = FiffStream::split_name_list(s);
         if (rownames.size() != nrow) {
-            qCritical("Incorrect number of entries in the row name list");
-            nrow = rownames.size();
-            goto bad;
+            qCritical("MneNamedMatrix::read - Row name count (%d) does not match nrow (%d).",
+                      static_cast<int>(rownames.size()), nrow);
+            return nullptr;
         }
     }
-    if(!tmp_node->find_tag(stream, FIFF_MNE_COL_NAMES, t_pTag)) {
-        s = t_pTag->toString();
+
+    if (!tmp_node->find_tag(stream, FIFF_MNE_COL_NAMES, t_pTag)) {
+        const QString s = t_pTag->toString();
         colnames = FiffStream::split_name_list(s);
         if (colnames.size() != ncol) {
-            qCritical("Incorrect number of entries in the column name list");
-            ncol = colnames.size();
-            goto bad;
+            qCritical("MneNamedMatrix::read - Column name count (%d) does not match ncol (%d).",
+                      static_cast<int>(colnames.size()), ncol);
+            return nullptr;
         }
     }
-    return build(nrow,ncol,rownames,colnames,data);
 
-bad : {
-        FREE_CMATRIX_14(data);
-        return NULL;
-    }
+    return build(nrow, ncol, rownames, colnames, data);
 }

@@ -146,30 +146,23 @@ MneMshDisplaySurfaceSet::MneMshDisplaySurfaceSet(int nsurf)
         surfs = MALLOC_47(nsurf,MneMshDisplaySurface*);
         patches = MALLOC_47(nsurf,MneSurfacePatch*);
         patch_rot = MALLOC_47(nsurf,float);
-        active = MALLOC_47(nsurf,int);
-        drawable = MALLOC_47(nsurf,int);
+        active = Eigen::VectorXi::Zero(nsurf);
+        drawable = Eigen::VectorXi::Ones(nsurf);
 
         for (k = 0; k < nsurf; k++) {
             surfs[k]  = Q_NULLPTR;
-            active[k] = FALSE;
-            drawable[k] = TRUE;
             patches[k] = Q_NULLPTR;
             patch_rot[k] = 0.0;
         }
     } else {
         surfs = Q_NULLPTR;
-        active = Q_NULLPTR;
         patches = Q_NULLPTR;
-        drawable = Q_NULLPTR;
         patch_rot= Q_NULLPTR;
     }
-    subj       = Q_NULLPTR;
-    morph_subj = Q_NULLPTR;
     main_t     = Q_NULLPTR;
     morph_t    = Q_NULLPTR;
 
     use_patches = FALSE;
-    lights  = Q_NULLPTR;
     user_data = Q_NULLPTR;
     user_data_free = Q_NULLPTR;
 
@@ -215,12 +208,8 @@ MneMshDisplaySurfaceSet::~MneMshDisplaySurfaceSet()
     delete morph_t;
     FREE_47(patch_rot);
     FREE_47(surfs);
-    FREE_47(subj);
-    FREE_47(morph_subj);
-    FREE_47(active);
-    FREE_47(drawable);
 
-    delete lights;
+
     if (user_data_free)
         user_data_free(user_data);
 }
@@ -485,8 +474,8 @@ void MneMshDisplaySurfaceSet::add_replace_surface(MneMshDisplaySurface*    newSu
         surfs     = REALLOC_47(surfs,nsurf+1,MneMshDisplaySurface*);
         patches   = REALLOC_47(patches,nsurf+1,MneSurfacePatch*);
         patch_rot = REALLOC_47(patch_rot,nsurf+1,float);
-        active    = REALLOC_47(active,nsurf+1,int);
-        this->drawable  = REALLOC_47(this->drawable,nsurf+1,int);
+        active.conservativeResize(nsurf+1);
+        this->drawable.conservativeResize(nsurf+1);
         surfs[nsurf]     = newSurf;
         active[nsurf]    = drawable;
         this->drawable[nsurf]  = drawable;
@@ -615,19 +604,15 @@ void MneMshDisplaySurfaceSet::initialize_custom_lights()
 {
     if (!custom_lights) {
         MneMshLightSet* s = new MneMshLightSet();
-        s->nlight = ndefault;
 
-        QList<MneMshLight*> default_lights;
-        default_lights << new MneMshLight(TRUE, 0.0f, 0.0f,  1.0f, 0.8f, 0.8f, 0.8f);
-        default_lights << new MneMshLight(TRUE, 0.0f, 0.0f, -1.0f, 0.8f, 0.8f, 0.8f);
-        default_lights << new MneMshLight(TRUE, 0.6f, -1.0f, -1.0f, 0.6f, 0.6f, 0.6f);
-        default_lights << new MneMshLight(TRUE, -0.6f, -1.0f, -1.0f, 0.6f, 0.6f, 0.6f);
-        default_lights << new MneMshLight(TRUE, 1.0f, 0.0f, 0.0f, 0.8f, 0.8f, 0.8f);
-        default_lights << new MneMshLight(TRUE, -1.0f, 0.0f, 0.0f, 0.8f, 0.8f, 0.8f);
-        default_lights << new MneMshLight(TRUE, 0.0f, 1.0f, 0.5f, 0.6f, 0.6f, 0.6f);
-        default_lights << new MneMshLight(FALSE, 0.0f, 0.0f, -1.0, 1.0f, 1.0f, 1.0f);
-
-        s->lights = default_lights;
+        s->lights.push_back(std::make_unique<MneMshLight>(TRUE, 0.0f, 0.0f,  1.0f, 0.8f, 0.8f, 0.8f));
+        s->lights.push_back(std::make_unique<MneMshLight>(TRUE, 0.0f, 0.0f, -1.0f, 0.8f, 0.8f, 0.8f));
+        s->lights.push_back(std::make_unique<MneMshLight>(TRUE, 0.6f, -1.0f, -1.0f, 0.6f, 0.6f, 0.6f));
+        s->lights.push_back(std::make_unique<MneMshLight>(TRUE, -0.6f, -1.0f, -1.0f, 0.6f, 0.6f, 0.6f));
+        s->lights.push_back(std::make_unique<MneMshLight>(TRUE, 1.0f, 0.0f, 0.0f, 0.8f, 0.8f, 0.8f));
+        s->lights.push_back(std::make_unique<MneMshLight>(TRUE, -1.0f, 0.0f, 0.0f, 0.8f, 0.8f, 0.8f));
+        s->lights.push_back(std::make_unique<MneMshLight>(TRUE, 0.0f, 1.0f, 0.5f, 0.6f, 0.6f, 0.6f));
+        s->lights.push_back(std::make_unique<MneMshLight>(FALSE, 0.0f, 0.0f, -1.0, 1.0f, 1.0f, 1.0f));
 
         custom_lights = dup_light_set(s);
         delete s;
@@ -639,15 +624,12 @@ void MneMshDisplaySurfaceSet::initialize_custom_lights()
 MneMshLightSet* MneMshDisplaySurfaceSet::dup_light_set(MneMshLightSet* s)
 {
     MneMshLightSet* res = Q_NULLPTR;
-    int k;
 
     if (s) {
         res = new MneMshLightSet();
-        //res->lights = MALLOC_47(s->nlight,mshLightRec);
-        res->nlight = s->nlight;
 
-        for (k = 0; k < s->nlight; k++)
-            res->lights.append(new MneMshLight(*s->lights[k]));
+        for (const auto &light : s->lights)
+            res->lights.push_back(std::make_unique<MneMshLight>(*light));
     }
     return res;
 }
@@ -658,9 +640,7 @@ void MneMshDisplaySurfaceSet::setup_lights(MneMshLightSet* set)
 {
     if (!set)
         return;
-    delete lights;
-    lights = Q_NULLPTR;
-    lights = dup_light_set(set);
+    lights.reset(dup_light_set(set));
     return;
 }
 

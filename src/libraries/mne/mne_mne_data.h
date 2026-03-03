@@ -54,7 +54,6 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QDebug>
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -77,32 +76,22 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs the MNE Mne Data
+     * Constructs the MneMneData.
      */
-    MneMneData();
+    MneMneData() = default;
 
     //=========================================================================================================
     /**
-     * Destroys the MNE Mne Data description
-     * Refactored: mne_free_mne_data (mne_inverse_util.c)
+     * Destroys the MneMneData.
      */
-    ~MneMneData();
+    ~MneMneData() = default;
 
 public:
-    float **datap;          /* Projection of the whitened data onto the field eigenvectors */
-    float **predicted;      /* The predicted data */
-    float *SNR;             /* Estimated power SNR as a function of time */
-    float *lambda2_est;     /* Regularization parameter estimated from available data */
-    float *lambda2;         /* Regularization parameter to be used (as a function of time) */
-
-// ### OLD STRUCT ###
-//typedef struct {        /* Data associated with MNE computations for each mneMeasDataSet */
-//    float **datap;          /* Projection of the whitened data onto the field eigenvectors */
-//    float **predicted;      /* The predicted data */
-//    float *SNR;             /* Estimated power SNR as a function of time */
-//    float *lambda2_est;     /* Regularization parameter estimated from available data */
-//    float *lambda2;             /* Regularization parameter to be used (as a function of time) */
-//} *mneMneData,mneMneDataRec;
+    Eigen::MatrixXf datap;          /**< Projection of the whitened data onto the field eigenvectors. */
+    Eigen::MatrixXf predicted;      /**< The predicted data. */
+    Eigen::VectorXf SNR;            /**< Estimated power SNR as a function of time. */
+    Eigen::VectorXf lambda2_est;    /**< Regularization parameter estimated from available data. */
+    Eigen::VectorXf lambda2;        /**< Regularization parameter to be used (as a function of time). */
 };
 
 //=============================================================================================================

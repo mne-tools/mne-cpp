@@ -62,13 +62,13 @@
 #include <QSharedPointer>
 #include <QStringList>
 
-/*
- * The class field in mneCovMatrix can have these values
+/**
+ * Channel-type classification constants for the ch_class field in MneCovMatrix.
  */
-#define MNE_COV_CH_UNKNOWN  -1	/* No idea */
-#define MNE_COV_CH_MEG_MAG   0  /* Axial gradiometer or magnetometer [T] */
-#define MNE_COV_CH_MEG_GRAD  1  /* Planar gradiometer [T/m] */
-#define MNE_COV_CH_EEG       2  /* EEG [V] */
+#define MNE_COV_CH_UNKNOWN  -1  /**< Unknown channel type. */
+#define MNE_COV_CH_MEG_MAG   0  /**< Axial gradiometer or magnetometer [T]. */
+#define MNE_COV_CH_MEG_GRAD  1  /**< Planar gradiometer [T/m]. */
+#define MNE_COV_CH_EEG       2  /**< EEG [V]. */
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -95,9 +95,11 @@ class MneSssData;
 
 //=============================================================================================================
 /**
- * Implements an MNE Covariance Matrix (Replaces *mneCovMatrix,mneCovMatrixRec; struct of MNE-C mne_types.h).
+ * @brief Covariance matrix storage.
  *
- * @brief Covariance matrix storage
+ * Stores a noise or source covariance matrix in dense (packed lower-triangle),
+ * diagonal, or sparse form together with its eigendecomposition and associated
+ * metadata (projection operator, SSS info, channel classification, bad channels).
  */
 class MNESHARED_EXPORT MneCovMatrix
 {
@@ -107,26 +109,33 @@ public:
 
     //=========================================================================================================
     /**
-     * Constructs the MNE Covariance Matrix
-     * Refactored: new_cov (mne_cov_matrix.c)
+     * Construct a covariance matrix.
+     *
+     * @param[in] p_kind        Covariance kind (sensor or source).
+     * @param[in] p_ncov        Dimension (number of channels).
+     * @param[in] p_names       Channel names.
+     * @param[in] p_cov         Packed lower-triangle data (may be empty).
+     * @param[in] p_cov_diag    Diagonal data (may be empty).
+     * @param[in] p_cov_sparse  Sparse covariance data (may be nullptr).
      */
-    MneCovMatrix(int p_kind, int p_ncov, const QStringList& p_names, double *p_cov, double *p_cov_diag, FIFFLIB::FiffSparseMatrix* p_cov_sparse);
+    MneCovMatrix(int p_kind, int p_ncov, const QStringList& p_names, const Eigen::VectorXd& p_cov, const Eigen::VectorXd& p_cov_diag, FIFFLIB::FiffSparseMatrix* p_cov_sparse);
 
     //=========================================================================================================
     /**
-     * Destroys the MNE Covariance Matrix
-     * Refactored: mne_free_cov (mne_cov_matrix.c)
+     * Destructor.
      */
     ~MneCovMatrix();
 
+    //=========================================================================================================
     /**
      * Create a deep copy of this covariance matrix including data,
      * channel classes, bad channel list, projection, and SSS info.
      *
-     * @return A newly allocated copy. Caller takes ownership.
+     * @return A newly allocated copy.
      */
-    MneCovMatrix* dup() const;
+    std::unique_ptr<MneCovMatrix> dup() const;
 
+    //=========================================================================================================
     /**
      * Create a dense (full lower-triangle packed) covariance matrix.
      *
@@ -135,52 +144,76 @@ public:
      * @param[in] names  Channel names.
      * @param[in] cov    Packed lower-triangle data (length ncov*(ncov+1)/2). Ownership transferred.
      *
-     * @return A new covariance matrix. Caller takes ownership.
+     * @return A new covariance matrix.
      */
-    static MneCovMatrix* create_dense(int    kind,
+    static std::unique_ptr<MneCovMatrix> create_dense(int    kind,
                                    int    ncov,
                                    const QStringList& names,
-                                   double *cov)
+                                   const Eigen::VectorXd& cov)
     {
-        return new MneCovMatrix(kind,ncov,names,cov,NULL,NULL);
+        return std::unique_ptr<MneCovMatrix>(new MneCovMatrix(kind,ncov,names,cov,Eigen::VectorXd(),nullptr));
     }
 
-    static MneCovMatrix* create_diag(int    kind,
+    //=========================================================================================================
+    /**
+     * Create a diagonal covariance matrix.
+     *
+     * @param[in] kind      Covariance kind (sensor or source).
+     * @param[in] ncov      Dimension (number of channels).
+     * @param[in] names     Channel names.
+     * @param[in] cov_diag  Diagonal data (ncov elements).
+     *
+     * @return A new covariance matrix.
+     */
+    static std::unique_ptr<MneCovMatrix> create_diag(int    kind,
                                   int    ncov,
                                   const QStringList& names,
-                                  double *cov_diag)
+                                  const Eigen::VectorXd& cov_diag)
     {
-        return new MneCovMatrix(kind,ncov,names,NULL,cov_diag,NULL);
+        return std::unique_ptr<MneCovMatrix>(new MneCovMatrix(kind,ncov,names,Eigen::VectorXd(),cov_diag,nullptr));
     }
 
-    static MneCovMatrix* create_sparse(    int kind,
+    //=========================================================================================================
+    /**
+     * Create a sparse covariance matrix.
+     *
+     * @param[in] kind        Covariance kind (sensor or source).
+     * @param[in] ncov        Dimension (number of channels).
+     * @param[in] names       Channel names.
+     * @param[in] cov_sparse  Sparse covariance data (note: data are floats).
+     *
+     * @return A new covariance matrix.
+     */
+    static std::unique_ptr<MneCovMatrix> create_sparse(    int kind,
                                                 int ncov,
                                                 const QStringList& names,
                                                 FIFFLIB::FiffSparseMatrix* cov_sparse)
     {
-        return new MneCovMatrix(kind,ncov,names,NULL,NULL,cov_sparse);
+        return std::unique_ptr<MneCovMatrix>(new MneCovMatrix(kind,ncov,names,Eigen::VectorXd(),Eigen::VectorXd(),cov_sparse));
     }
 
+    //=========================================================================================================
     /**
      * Create a covariance matrix from either dense or diagonal data.
      *
      * @param[in] kind      Covariance kind (sensor or source).
      * @param[in] ncov      Dimension (number of channels).
      * @param[in] names     Channel names.
-     * @param[in] cov       Packed lower-triangle data (may be NULL).
-     * @param[in] cov_diag  Diagonal data (may be NULL).
+     * @param[in] cov       Packed lower-triangle data (may be empty).
+     * @param[in] cov_diag  Diagonal data (may be empty).
      *
-     * @return A new covariance matrix. Caller takes ownership.
+     * @return A new covariance matrix.
      */
-    static MneCovMatrix* create(   int kind,
+    static std::unique_ptr<MneCovMatrix> create(   int kind,
                                         int ncov,
                                         const QStringList& names,
-                                        double      *cov,
-                                        double *cov_diag)
+                                        const Eigen::VectorXd& cov,
+                                        const Eigen::VectorXd& cov_diag)
     {
-        return new MneCovMatrix(kind,ncov,names,cov,cov_diag,NULL);
+        return std::unique_ptr<MneCovMatrix>(new MneCovMatrix(kind,ncov,names,cov,cov_diag,nullptr));
     }
 
+    //=========================================================================================================
     /**
      * Check whether this covariance matrix is stored in diagonal form.
      *
@@ -188,6 +221,7 @@ public:
      */
     int is_diag() const;
 
+    //=========================================================================================================
     /**
      * Compute the inverse square-root of eigenvalues (or diagonal elements)
      * for whitening, storing the result in inv_lambda.
@@ -196,6 +230,7 @@ public:
      */
     int add_inv();
 
+    //=========================================================================================================
     /**
      * Condition the covariance matrix by eigendecomposition with per-channel-type
      * scaling, zeroing sub-threshold eigenvalues, and reconstructing.
@@ -207,6 +242,7 @@ public:
      */
     int condition(float rank_threshold, int use_rank);
 
+    //=========================================================================================================
     /**
      * Perform eigenvalue decomposition of the covariance matrix, zero
      * sub-threshold eigenvalues, classify eigenvectors by channel type,
@@ -219,6 +255,7 @@ public:
      */
     int decompose_eigen_small(float p_small, int use_rank);
 
+    //=========================================================================================================
     /**
      * Convenience wrapper for decompose_eigen_small() with default threshold
      * and no rank override.
@@ -229,6 +266,7 @@ public:
 
 private:
 
+    //=========================================================================================================
     /**
      * Compute the linear index into a symmetric lower-triangular packed
      * storage array for element (j, k).
@@ -247,40 +285,17 @@ public:
     int         nproj;                          /**< Number of dimensions projected out. */
     int         nzero;                          /**< Number of zero or small eigenvalues. */
     QStringList names;                          /**< Channel names (optional). */
-    double      *cov;                           /**< Packed lower-triangle covariance data (ncov*(ncov+1)/2 elements). */
-    double      *cov_diag;                      /**< Diagonal covariance data (ncov elements). */
+    Eigen::VectorXd cov;                        /**< Packed lower-triangle covariance data (ncov*(ncov+1)/2 elements). */
+    Eigen::VectorXd cov_diag;                   /**< Diagonal covariance data (ncov elements). */
     std::unique_ptr<FIFFLIB::FiffSparseMatrix> cov_sparse;   /**< Sparse covariance matrix (note: data are floats). */
-    double      *lambda;                        /**< Eigenvalues of the covariance matrix. */
-    double      *inv_lambda;                    /**< Inverse square-roots of eigenvalues (for whitening). */
-    float       **eigen;                        /**< Eigenvectors of the covariance matrix (nzero columns removed). */
-    double      *chol;                          /**< Cholesky decomposition of the covariance matrix. */
+    Eigen::VectorXd lambda;                     /**< Eigenvalues of the covariance matrix. */
+    Eigen::VectorXd inv_lambda;                 /**< Inverse square-roots of eigenvalues (for whitening). */
+    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> eigen;  /**< Eigenvectors of the covariance matrix (nzero columns removed). */
     std::unique_ptr<MneProjOp> proj;            /**< The projection operator active when this matrix was computed. */
     std::unique_ptr<MneSssData> sss;            /**< SSS data from the associated raw data file. */
-    int         *ch_class;                      /**< Per-channel type classification for regularization (MEG grad, MEG mag, EEG). */
+    Eigen::VectorXi ch_class;                   /**< Per-channel type classification for regularization (MEG grad, MEG mag, EEG). */
     QStringList bads;                           /**< Channel names designated bad during computation. */
     int         nbad;                           /**< Number of bad channels. */
-
-// ### OLD STRUCT ###
-//typedef struct {                                /* Covariance matrix storage */
-//    int         kind;                           /* Sensor or source covariance */
-//    int         ncov;                           /* Dimension */
-//    int         nfree;                          /* Number of degrees of freedom */
-//    int         nproj;                          /* Number of dimensions projected out */
-//    int         nzero;                          /* Number of zero or small eigenvalues */
-//    char        **names;                        /* Names of the entries (optional) */
-//    double      *cov;                           /* Covariance matrix in packed representation (lower triangle) */
-//    double      *cov_diag;                      /* Diagonal covariance matrix */
-//    MNELIB::FiffSparseMatrix* cov_sparse;   /* A sparse covariance matrix (Note: data are floats in this which is an inconsistency) */
-//    double      *lambda;                /* Eigenvalues of cov */
-//    double      *inv_lambda;            /* Inverses of the square roots of the eigenvalues of cov */
-//    float       **eigen;                /* Eigenvectors of cov */
-//    double      *chol;                  /* Cholesky decomposition */
-//    MNELIB::MneProjOp*  proj;       /* The projection which was active when this matrix was computed */
-//    MNELIB::MneSssData* sss;        /* The SSS data present in the associated raw data file */
-//    int         *ch_class;              /* This will allow grouping of channels for regularization (MEG [T/m], MEG [T], EEG [V] */
-//    char        **bads;                 /* Which channels were designated bad when this noise covariance matrix was computed? */
-//    int         nbad;                   /* How many of them */
-//} *mneCovMatrix,mneCovMatrixRec;
 };
 
 //=============================================================================================================
