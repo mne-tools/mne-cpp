@@ -61,6 +61,7 @@
 #include <QTextStream>
 
 #include <memory>
+#include <optional>
 #include <vector>
 
 #include <QStringList>
@@ -68,20 +69,14 @@
 
 namespace FIFFLIB { class FiffCoordTrans; }
 
-//============================= mne_fiff.h =============================
-
 #define FIFF_MNE_SOURCE_SPACE_NNEIGHBORS    3594    /* Number of neighbors for each source space point (used for volume source spaces) */
 #define FIFF_MNE_SOURCE_SPACE_NEIGHBORS     3595    /* Neighbors for each source space point (used for volume source spaces) */
 
 #define FIFFV_MNE_COORD_SURFACE_RAS   FIFFV_COORD_MRI    /* The surface RAS coordinates */
 
-//============================= mne_surface_io.c =============================
-
 #define TRIANGLE_FILE_MAGIC_NUMBER  (0xfffffe)
 #define NEW_QUAD_FILE_MAGIC_NUMBER  (0xfffffd)
 #define QUAD_FILE_MAGIC_NUMBER      (0xffffff)
-
-//============================= mne_mgh_mri_io.c =============================
 
 #define TAG_OLD_SURF_GEOM           20
 
@@ -111,12 +106,15 @@ class MneSourceSpaceOld;
 class MneSurfaceOld;
 class MneMshDisplaySurface;
 class MneProjData;
+class FilterThreadArg;
 
 //=============================================================================================================
 /**
- * Implements MNE Surface or Volume (Replaces *mneSurfaceOrVolume,mneSurfaceOrVolumeRec; struct of MNE-C mne_types.h).
+ * @brief Defines a source space or a surface.
  *
- * @brief This defines a source space or a surface
+ * Holds vertex positions, normals, triangulation, patch statistics,
+ * neighborhood connectivity, and optional volume-grid metadata for
+ * MEG/EEG source-space analysis.
  */
 class MNESHARED_EXPORT MneSurfaceOrVolume
 {
@@ -132,28 +130,17 @@ public:
     typedef Eigen::Matrix<float, Eigen::Dynamic, 3, Eigen::RowMajor> NormalsT;    /**< Type abbreviation for np x 3 normal data. */
     typedef Eigen::Matrix<int,   Eigen::Dynamic, 3, Eigen::RowMajor> TrianglesT;  /**< Type abbreviation for ntri x 3 triangle indices. */
 
-    /*
-     * These are the aliases
-     */
-//    typedef MneSurfaceOrVolume MneCSourceSpace; //TODO create a derived class
-    //typedef mneSurfaceOrVolume mneSourceVolume;
-//    typedef MneSurfaceOrVolume MneCSurface; //TODO create a derived class
-    //typedef mneSurfaceOrVolume mneVolume;
-
     //=========================================================================================================
     /**
-     * Constructs the MNE Surface or Volume
+     * @brief Constructs the MNE Surface or Volume.
      */
     MneSurfaceOrVolume();
 
     //=========================================================================================================
     /**
-     * Destroys the MNE Surface or Volume description
-     * Refactored: mne_free_source_space (mne_source_space.c)
+     * @brief Destroys the MNE Surface or Volume description.
      */
     virtual ~MneSurfaceOrVolume();
-
-    //============================= make_filter_source_sapces.c =============================
 
     /**
      * Compute the solid angle subtended by a triangle as seen from a given point
@@ -164,8 +151,8 @@ public:
      *
      * @return The solid angle in steradians.
      */
-    static double solid_angle (float       *from,	/* From this point... */
-                               MNELIB::MneTriangle* tri);
+    static double solid_angle (const Eigen::Vector3f& from,	/* From this point... */
+                               const MNELIB::MneTriangle& tri);
 
     /**
      * Sum the solid angles of all triangles in a closed surface as seen from
@@ -177,7 +164,7 @@ public:
      *
      * @return The total solid angle in steradians.
      */
-    static double sum_solids(float *from, MneSurfaceOld* surf);
+    static double sum_solids(const Eigen::Vector3f& from, const MneSurfaceOld& surf);
 
     /**
      * Filter source space points by removing vertices that lie outside the
@@ -189,21 +176,17 @@ public:
      * @param[in]      surf         The bounding (inner skull) surface.
      * @param[in]      limit        Minimum allowed distance from the surface (m).
      * @param[in]      mri_head_t   MRI-to-head coordinate transformation.
-     * @param[in, out] spaces       Array of source spaces to filter.
-     * @param[in]      nspace       Number of source spaces in the array.
+     * @param[in, out] spaces       Source spaces to filter.
      * @param[in, out] filtered     If non-null, the coordinates of removed
      *                              vertices are written to this stream.
      *
      * @return OK on success, FAIL on error.
      */
-    static int filter_source_spaces(MneSurfaceOld* surf,  /* The bounding surface must be provided */
+    static int filter_source_spaces(const MneSurfaceOld& surf,  /* The bounding surface must be provided */
                                         float limit,                                   /* Minimum allowed distance from the surface */
                                         const FIFFLIB::FiffCoordTrans& mri_head_t,     /* Coordinate transformation (may not be needed) */
-                                        MneSourceSpaceOld* *spaces,  /* The source spaces  */
-                                        int nspace,
+                                        std::vector<std::unique_ptr<MneSourceSpaceOld>>& spaces,  /* The source spaces  */
                                         QTextStream *filtered);
-
-    //============================= mne_patches.c =============================
 
     /**
      * Compute patch statistics for a source space: group vertices by their
@@ -214,9 +197,7 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    static int add_patch_stats(MneSourceSpaceOld* s);
-
-    //============================= filter_source_sapces.c =============================
+    static int add_patch_stats(MneSourceSpaceOld& s);
 
     /**
      * Recount in-use vertices, rebuild the vertex-number array, and
@@ -224,20 +205,18 @@ public:
      *
      * @param[in, out] s   The source space to rearrange.
      */
-    static void rearrange_source_space(MneSourceSpaceOld* s);
+    static void rearrange_source_space(MneSourceSpaceOld& s);
 
     /**
      * Thread entry point for source space filtering. Performs the same
      * inside/outside solid-angle check and minimum-distance test as
      * filter_source_spaces(), designed to be called via QtConcurrent.
      *
-     * @param[in, out] arg   A FilterThreadArg pointer containing the source
+     * @param[in, out] arg   The thread argument containing the source
      *                       space, bounding surface, distance limit, and
      *                       coordinate transform.
-     *
-     * @return Always returns NULL.
      */
-    static void *filter_source_space(void *arg);
+    static void filter_source_space(FilterThreadArg *arg);
 
     /**
      * Filter source space points by loading the inner skull BEM surface
@@ -247,8 +226,7 @@ public:
      * @param[in]      limit        Minimum allowed distance from the inner skull (m).
      * @param[in]      bemfile      Path to the BEM file containing the inner skull surface.
      * @param[in]      mri_head_t   MRI-to-head coordinate transformation.
-     * @param[in, out] spaces       Array of source spaces to filter.
-     * @param[in]      nspace       Number of source spaces in the array.
+     * @param[in, out] spaces       Source spaces to filter.
      * @param[in, out] filtered     If non-null, the coordinates of removed
      *                              vertices are written to this stream.
      * @param[in]      use_threads  Whether to use multi-threaded filtering.
@@ -256,14 +234,11 @@ public:
      * @return OK on success, FAIL on error.
      */
     static int filter_source_spaces(float          limit,              /* Omit vertices which are closer than this to the inner skull */
-                             char           *bemfile,                       /* Take the inner skull surface from here */
+                             const QString& bemfile,                        /* Take the inner skull surface from here */
                              const FIFFLIB::FiffCoordTrans& mri_head_t,                 /* Coordinate transformation is needed */
-                             MneSourceSpaceOld* *spaces,  /* The source spaces */
-                             int            nspace,                         /* How many? */
+                             std::vector<std::unique_ptr<MneSourceSpaceOld>>& spaces,  /* The source spaces */
                              QTextStream    *filtered,                      /* Output the coordinates of the filtered points here */
                              bool           use_threads);
-
-    //============================= make_volume_source_space.c =============================
 
     /**
      * Create a volumetric source space by laying out a 3D grid of points
@@ -278,12 +253,10 @@ public:
      *
      * @return A new volumetric source space, or NULL on failure. Caller takes ownership.
      */
-    static MneSourceSpaceOld* make_volume_source_space(MneSurfaceOld* surf,
+    static MneSourceSpaceOld* make_volume_source_space(const MneSurfaceOld& surf,
                                                                          float grid,
                                                                          float exclude,
                                                                          float mindist);
-
-    //============================= mne_source_space.c =============================
 
     /**
      * Allocate and zero-initialize a new source space with @p np vertices.
@@ -294,8 +267,6 @@ public:
      * @return A newly allocated source space. Caller takes ownership.
      */
     static MneSourceSpaceOld* create_source_space(int np);
-
-    //============================= mne_bem_surface_io.c =============================
 
     /**
      * Read a BEM surface from a FIFF file with excess-neighbor checking enabled.
@@ -310,7 +281,6 @@ public:
      *
      * @return The loaded surface, or NULL on failure. Caller takes ownership.
      */
-    //Refactored: mne_read_bem_surface (mne_bem_surface_io.c)
     static MneSurfaceOld* read_bem_surface(const QString&  name,   /* Filename */
                                          int  which,             /* Which surface are we looking for (-1 loads the first one)*/
                                          int  add_geometry,      /* Add the geometry information */
@@ -326,7 +296,7 @@ public:
      *
      * @return The loaded surface, or NULL on failure. Caller takes ownership.
      */
-    static MneSurfaceOld* read_bem_surface2(char *name,	        /* Filename */
+    static MneSurfaceOld* read_bem_surface2(const QString& name,	        /* Filename */
                                      int  which,		/* Which surface are we looking for (-1 loads the first one)*/
                                      int  add_geometry,	/* Add the geometry information */
                                      float *sigmap);		/* Conductivity? */
@@ -347,14 +317,11 @@ public:
      *
      * @return The loaded surface, or NULL on failure. Caller takes ownership.
      */
-    //Refactored: read_bem_surface (mne_bem_surface_io.c)
     static MneSurfaceOld* read_bem_surface( const QString& name,    /* Filename */
                                           int  which,             /* Which surface are we looking for (-1 loads the first one)*/
                                           int  add_geometry,      /* Add the geometry information */
                                           float *sigmap,          /* Conductivity? */
                                           bool   check_too_many_neighbors);
-
-    //============================= project_to_surface.c =============================
 
     /**
      * Compute the barycentric-like coordinates (x, y) and perpendicular
@@ -363,16 +330,16 @@ public:
      * @param[in]  r     The point coordinates (3-element float array).
      * @param[in]  s     The surface containing the triangle.
      * @param[in]  tri   Index of the triangle.
-     * @param[out] x     Barycentric coordinate along the first edge.
-     * @param[out] y     Barycentric coordinate along the second edge.
-     * @param[out] z     Signed perpendicular distance from the triangle plane.
+     * @param[out] x     Barycentric coordinate along the first edge (reference).
+     * @param[out] y     Barycentric coordinate along the second edge (reference).
+     * @param[out] z     Signed perpendicular distance from the triangle plane (reference).
      */
-    static void triangle_coords(float       *r,       /* Location of a point */
-                                    MneSurfaceOld*  s,	       /* The surface */
+    static void triangle_coords(const Eigen::Vector3f& r,       /* Location of a point */
+                                    const MneSurfaceOld&  s,	       /* The surface */
                                     int         tri,      /* Which triangle */
-                                    float       *x,       /* Coordinates of the point on the triangle */
-                                    float       *y,
-                                    float       *z);
+                                    float       &x,       /* Coordinates of the point on the triangle */
+                                    float       &y,
+                                    float       &z);
 
     /**
      * Find the nearest point on a specific triangle to a given point.
@@ -385,19 +352,19 @@ public:
      * @param[in]  s     The surface containing the triangle.
      * @param[in]  user  Optional MneProjData restricting which triangles are active (may be NULL).
      * @param[in]  tri   Index of the triangle.
-     * @param[out] x     Barycentric coordinate along the first edge.
-     * @param[out] y     Barycentric coordinate along the second edge.
-     * @param[out] z     Signed distance from the triangle plane (absolute value = Euclidean distance).
+     * @param[out] x     Barycentric coordinate along the first edge (reference).
+     * @param[out] y     Barycentric coordinate along the second edge (reference).
+     * @param[out] z     Signed distance from the triangle plane (reference).
      *
      * @return TRUE if the triangle is active (or no projection data supplied), FALSE if inactive.
      */
-    static int nearest_triangle_point(float       *r,    /* Location of a point */
-                                      MneSurfaceOld*  s,     /* The surface */
-                                      void        *user, /* Something precomputed */
+    static int nearest_triangle_point(const Eigen::Vector3f& r,    /* Location of a point */
+                                      const MneSurfaceOld&  s,     /* The surface */
+                                      const MneProjData *user, /* Precomputed projection data (may be NULL) */
                                       int         tri,   /* Which triangle */
-                                      float       *x,    /* Coordinates of the point on the triangle */
-                                      float       *y,
-                                      float       *z);
+                                      float       &x,    /* Coordinates of the point on the triangle */
+                                      float       &y,
+                                      float       &z);
 
     /**
      * Compute the 3D position on a triangle from barycentric coordinates:
@@ -407,13 +374,13 @@ public:
      * @param[in]  tri   Index of the triangle.
      * @param[in]  p     Barycentric coordinate along the first edge.
      * @param[in]  q     Barycentric coordinate along the second edge.
-     * @param[out] r     The resulting 3D point (3-element float array).
+     *
+     * @return The resulting 3D point on the triangle.
      */
-    static void project_to_triangle(MneSurfaceOld* s,
+    static Eigen::Vector3f project_to_triangle(const MneSurfaceOld& s,
                                     int        tri,
                                     float      p,
-                                    float      q,
-                                    float      *r);
+                                    float      q);
 
     /**
      * Find the nearest point on a triangle to a given point (simplified
@@ -422,49 +389,47 @@ public:
      * @param[in]  r     The point coordinates (3-element float array).
      * @param[in]  s     The surface containing the triangle.
      * @param[in]  tri   Index of the triangle.
-     * @param[out] x     Barycentric coordinate along the first edge.
-     * @param[out] y     Barycentric coordinate along the second edge.
-     * @param[out] z     Signed distance from the triangle plane.
+     * @param[out] x     Barycentric coordinate along the first edge (reference).
+     * @param[out] y     Barycentric coordinate along the second edge (reference).
+     * @param[out] z     Signed distance from the triangle plane (reference).
      *
      * @return TRUE (always, since no activation data is used).
      */
-    static int nearest_triangle_point(float       *r,    /* Location of a point */
-                                          MneSurfaceOld*  s,     /* The surface */
+    static int nearest_triangle_point(const Eigen::Vector3f& r,    /* Location of a point */
+                                          const MneSurfaceOld&  s,     /* The surface */
                                           int         tri,   /* Which triangle */
-                                          float       *x,    /* Coordinates of the point on the triangle */
-                                          float       *y,
-                                          float       *z);
+                                          float       &x,    /* Coordinates of the point on the triangle */
+                                          float       &y,
+                                          float       &z);
 
     /**
      * Project a point onto the nearest triangle of a surface.
      *
      * Iterates over all (active) triangles to find the one whose nearest
-     * point has the smallest absolute distance, and optionally projects
-     * the point onto that triangle.
+     * point has the smallest absolute distance.
      *
      * @param[in]      s           The target surface.
      * @param[in]      proj_data   Optional MneProjData restricting active triangles (may be NULL).
-     * @param[in, out] r           The point to project (modified in-place if @p project_it is set).
-     * @param[in]      project_it  If non-zero, move @p r to the closest surface point.
-     * @param[out]     distp       If non-null, receives the signed distance to the surface.
+     * @param[in]      r           The 3D point to project.
+     * @param[out]     distp       Receives the signed distance to the surface.
      *
      * @return Index of the best (closest) triangle, or -1 if none found.
      */
-    static int project_to_surface(MneSurfaceOld* s, void *proj_data, float *r, int project_it, float *distp);
+    static int project_to_surface(const MneSurfaceOld& s, const MneProjData *proj_data, const Eigen::Vector3f& r, float &distp);
 
     /**
-     * Find the nearest point on a specific triangle to a given point and
-     * write the projected coordinates into @p proj.
+     * Find the nearest point on a specific triangle to a given point
+     * and return the projected 3D coordinates.
      *
      * @param[in]  s     The surface containing the triangle.
      * @param[in]  best  Index of the triangle.
-     * @param[in]  r     The source point (3-element float array).
-     * @param[out] proj  The projected 3D point (3-element float array).
+     * @param[in]  r     The source point.
+     *
+     * @return The projected 3D point on the triangle.
      */
-    static void project_to_triangle(MneSurfaceOld* s,
+    static Eigen::Vector3f project_to_triangle(const MneSurfaceOld& s,
                                             int        best,
-                                            float      *r,
-                                            float      *proj);
+                                            const Eigen::Vector3f& r);
 
     /**
      * For each point in @p r, find the closest point on the surface using a
@@ -475,11 +440,11 @@ public:
      * @param[in]      s        The target surface.
      * @param[in, out] r        Array of np point coordinates.
      * @param[in]      np       Number of points.
-     * @param[out]     nearest  Best triangle index for each point.
-     * @param[out]     dist     Distance to the surface for each point.
+     * @param[in, out] nearest  Best triangle index for each point (VectorXi, at least np elements).
+     * @param[out]     dist     Distance to the surface for each point (VectorXf, at least np elements).
      * @param[in]      nstep    Number of neighborhood expansion steps.
      */
-    static void find_closest_on_surface_approx(MneSurfaceOld* s, float **r, int np, int *nearest, float *dist, int nstep);
+    static void find_closest_on_surface_approx(const MneSurfaceOld& s, const PointsT& r, int np, Eigen::VectorXi& nearest, Eigen::VectorXf& dist, int nstep);
 
     /**
      * Set up the triangle activation mask for a restricted surface search.
@@ -494,12 +459,12 @@ public:
      * @param[in]      nstep        Number of neighborhood expansion levels.
      * @param[in]      r            The query point (3-element float array).
      */
-    static void decide_search_restriction(MneSurfaceOld* s,
-                          MneProjData*   p,
+    static void decide_search_restriction(const MneSurfaceOld& s,
+                          MneProjData&   p,
                           int        approx_best, /* We know the best triangle approximately
                                        * already */
                           int        nstep,
-                          float      *r);
+                          const Eigen::Vector3f& r);
 
     /**
      * Recursively mark all triangles neighboring the starting vertex as
@@ -511,9 +476,8 @@ public:
      * @param[in, out] act     Triangle activation array (ntri elements).
      * @param[in]      nstep   Number of recursive expansion steps.
      */
-    static void activate_neighbors(MneSurfaceOld* s, int start, Eigen::VectorXi &act, int nstep);
+    static void activate_neighbors(const MneSurfaceOld& s, int start, Eigen::VectorXi &act, int nstep);
 
-    //============================= mne_source_space.c =============================
 
     /**
      * Read source spaces from a FIFF file.
@@ -523,24 +487,22 @@ public:
      * matrices, volume neighborhoods, voxel transforms, and MRI metadata.
      *
      * @param[in]  name     Path to the FIFF file.
-     * @param[out] spacesp  Receives the array of loaded source spaces. Caller takes ownership.
-     * @param[out] nspacep  Receives the number of source spaces loaded.
+     * @param[out] spaces   Receives the loaded source spaces. Caller takes ownership of elements.
      *
      * @return FIFF_OK on success, FIFF_FAIL on error.
      */
     static int read_source_spaces(const QString& name,               /* Read from here */
-                                      MneSourceSpaceOld* **spacesp, /* These are the results */
-                                      int            *nspacep);
+                                      std::vector<std::unique_ptr<MneSourceSpaceOld>>& spaces); /* The loaded source spaces */
 
     /**
      * Replace the in-use array of a source space, recount the number of
      * active vertices, and rebuild the vertex-number index array.
      *
      * @param[in, out] s          The source space to update.
-     * @param[in]      new_inuse  New boolean array of length s->np indicating which vertices are in use.
+     * @param[in]      new_inuse  New boolean vector of length s->np indicating which vertices are in use.
      */
-    static void update_inuse(MneSourceSpaceOld* s,
-                                              int *new_inuse);
+    static void update_inuse(MneSourceSpaceOld& s,
+                                              Eigen::VectorXi new_inuse);
 
     /**
      * Determine whether a source space belongs to the left hemisphere by
@@ -551,7 +513,7 @@ public:
      *
      * @return TRUE if left hemisphere, FALSE otherwise.
      */
-    static int is_left_hemi(MneSourceSpaceOld* s);
+    static int is_left_hemi(const MneSourceSpaceOld& s);
 
     /**
      * Apply a coordinate transformation to all vertex positions, vertex
@@ -563,7 +525,7 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    static int transform_source_space(MneSourceSpaceOld* ss, const FIFFLIB::FiffCoordTrans& t);
+    static int transform_source_space(MneSourceSpaceOld& ss, const FIFFLIB::FiffCoordTrans& t);
 
     /**
      * Transform an array of source spaces to the specified coordinate frame,
@@ -572,67 +534,39 @@ public:
      *
      * @param[in]      coord_frame  Target coordinate frame.
      * @param[in]      t            The coordinate transformation.
-     * @param[in, out] spaces       Array of source spaces to transform.
-     * @param[in]      nspace       Number of source spaces.
+     * @param[in, out] spaces       Source spaces to transform.
      *
      * @return OK on success, FAIL on error.
      */
     static int transform_source_spaces_to(int            coord_frame,   /* Which coord frame do we want? */
                                               const FIFFLIB::FiffCoordTrans& t,             /* The coordinate transformation */
-                                              MneSourceSpaceOld* *spaces,       /* A list of source spaces */
-                                              int            nspace);
+                                              std::vector<std::unique_ptr<MneSourceSpaceOld>>& spaces);     /* A list of source spaces */
 
-    //============================= mne_forward_solution.c =============================
 
     /**
      * Mark all vertices in a source space as in-use, setting nuse equal to np.
      *
      * @param[in, out] s   The source space to modify.
      */
-    static void enable_all_sources(MneSourceSpaceOld* s);
+    static void enable_all_sources(MneSourceSpaceOld& s);
 
-    //============================= resrict_sources.c =============================
 
     /**
      * Restrict source spaces to only those vertices contained in the given
      * FreeSurfer label files. Hemisphere assignment is inferred from the
      * label filename ("-lh.label" vs "-rh.label").
      *
-     * @param[in, out] spaces   Array of source spaces (typically left and right hemisphere).
-     * @param[in]      nspace   Number of source spaces.
+     * @param[in, out] spaces   Source spaces (typically left and right hemisphere).
      * @param[in]      labels   List of label file paths.
      * @param[in]      nlabel   Number of label files.
      *
      * @return OK on success, FAIL on error.
      */
-    static int restrict_sources_to_labels(MneSourceSpaceOld* *spaces,
-                                          int            nspace,
+    static int restrict_sources_to_labels(std::vector<std::unique_ptr<MneSourceSpaceOld>>& spaces,
                                           const QStringList& labels,
                                           int            nlabel);
 
-    //============================= mne_labels.c =============================
     //TODO Move to separate label class
-
-    /**
-     * Find source space vertices that fall within a FreeSurfer label.
-     *
-     * For each labeled vertex that is in-use in the source space, computes
-     * its sequential index among in-use vertices (plus @p off) and collects
-     * these into the output selection array.
-     *
-     * @param[in]  label   Path to the FreeSurfer label file.
-     * @param[in]  s       The source space hemisphere containing the label's vertices.
-     * @param[in]  off     Offset added to each sequential index (for combining hemispheres).
-     * @param[out] selp    Receives the array of selected source indices. Caller takes ownership.
-     * @param[out] nselp   Receives the number of selected sources.
-     *
-     * @return OK on success, FAIL on error.
-     */
-    static int find_sources_in_label(char *label,          /* The label file */
-                                         MneSourceSpaceOld* s,	    /* The corresponding source space hemisphere */
-                                         int  off,		    /* Offset to the complete source space */
-                                         int  **selp,	    /* Sources selected */
-                                         int  *nselp);
 
     /**
      * Read a FreeSurfer label file.
@@ -641,54 +575,13 @@ public:
      * a vertex count, then lines of "vertex x y z value".
      *
      * @param[in]  label     Path to the label file.
-     * @param[out] commentp  If non-null, receives the comment string from the file.
-     * @param[out] selp      Receives the array of vertex indices. Caller takes ownership.
-     * @param[out] nselp     Receives the number of vertices in the label.
+     * @param[out] sel       Receives the vertex indices in the label.
      *
      * @return OK on success, FAIL on error.
      */
     static int read_label(const QString& label,	    /* The label file */
-                              char **commentp, /* The comment in the file */
-                              int  **selp,	    /* Points in label */
-                              int  *nselp);
+                              Eigen::VectorXi& sel);	    /* Vertex indices in label */
 
-    /**
-     * Write a FreeSurfer label file.
-     *
-     * Writes the standard format: a comment header line, vertex count,
-     * then "vertex x y z 0.0" for each selected vertex (coordinates in mm).
-     *
-     * @param[in] label    Path to the output label file.
-     * @param[in] comment  Comment string to include in the header.
-     * @param[in] sel      Array of vertex indices to write.
-     * @param[in] nsel     Number of vertices.
-     * @param[in] rr       Vertex coordinates (may be NULL; if so, zeros are written).
-     *
-     * @return OK on success, FAIL on error.
-     */
-    static int write_label(char *label,    /* The label file */
-                               char *comment,
-                               int  *sel,	    /* Points in label */
-                               int  nsel,	    /* How many? */
-                               float **rr);
-
-    /**
-     * Compute the cortical surface area covered by a FreeSurfer label.
-     *
-     * For each labeled vertex, one-third of the area of every neighboring
-     * triangle is accumulated (each triangle is shared by three vertices).
-     *
-     * @param[in]  label   Path to the FreeSurfer label file.
-     * @param[in]  s       The source space with triangle data.
-     * @param[out] areap   Receives the label area in square meters.
-     *
-     * @return OK on success, FAIL on error.
-     */
-    static int label_area(char *label,      /* The label file */
-                              MneSourceSpaceOld* s, /* The associated source space */
-                              float *areap);
-
-    //============================= mne_add_geometry_info.c =============================
 
     /**
      * Populate the MneTriangle structures for both the full and in-use
@@ -697,9 +590,8 @@ public:
      *
      * @param[in, out] s   The source space whose triangle data is filled in.
      */
-    static void add_triangle_data(MneSourceSpaceOld* s);
+    static void add_triangle_data(MneSourceSpaceOld& s);
 
-    //============================= mne_add_geometry_info.c =============================
 
     /**
      * Compute the center of mass (mean position) of a set of points.
@@ -708,14 +600,14 @@ public:
      * @param[in]  np   Number of points.
      * @param[out] cm   Receives the center of mass (3-element float array).
      */
-    static void compute_cm(const PointsT& rr, int np, float *cm);
+    static void compute_cm(const PointsT& rr, int np, float (&cm)[3]);
 
     /**
      * Compute and store the center of mass of a surface's vertices.
      *
      * @param[in, out] s   The surface whose cm field is set.
      */
-    static void compute_surface_cm(MneSurfaceOld* s);
+    static void compute_surface_cm(MneSurfaceOld& s);
 
     /**
      * Compute the Euclidean distances from each vertex to its topological
@@ -723,7 +615,7 @@ public:
      *
      * @param[in, out] s   The source space with neighbor_vert already set.
      */
-    static void calculate_vertex_distances(MneSourceSpaceOld* s);
+    static void calculate_vertex_distances(MneSourceSpaceOld& s);
 
     /**
      * Compute vertex normals by area-weighted accumulation of triangle
@@ -734,7 +626,7 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    static int add_vertex_normals(MneSourceSpaceOld* s);
+    static int add_vertex_normals(MneSourceSpaceOld& s);
 
     /**
      * Build complete geometry information for a source space: triangle data,
@@ -744,13 +636,11 @@ public:
      *
      * @param[in, out] s                        The source space to augment.
      * @param[in]      do_normals               If non-zero, compute vertex normals.
-     * @param[out]     border                   If non-null, receives the array of border
-     *                                          vertex flags (vertices touching a topological boundary).
      * @param[in]      check_too_many_neighbors If non-zero, fail on excessive neighbor count.
      *
      * @return OK on success, FAIL on error.
      */
-    static int add_geometry_info(MneSourceSpaceOld* s, int do_normals, int *border, int check_too_many_neighbors);
+    static int add_geometry_info(MneSourceSpaceOld& s, int do_normals, int check_too_many_neighbors);
 
     /**
      * Convenience overload that adds geometry information with border detection
@@ -761,7 +651,7 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    static int add_geometry_info(MneSourceSpaceOld* s, int do_normals);
+    static int add_geometry_info(MneSourceSpaceOld& s, int do_normals);
 
     /**
      * Add geometry information with excess-neighbor checking disabled
@@ -772,9 +662,8 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    static int add_geometry_info2(MneSourceSpaceOld* s, int do_normals);
+    static int add_geometry_info2(MneSourceSpaceOld& s, int do_normals);
 
-    //============================= digitizer.c =============================
 
     /**
      * Align MEG and MRI coordinate systems using fiducial points and ICP.
@@ -794,13 +683,13 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    static int align_fiducials(FIFFLIB::FiffDigitizerData* head_dig,
-                               FIFFLIB::FiffDigitizerData* mri_dig,
+    static int align_fiducials(FIFFLIB::FiffDigitizerData& head_dig,
+                               const FIFFLIB::FiffDigitizerData& mri_dig,
                                MneMshDisplaySurface* head_surf,
                                int niter,
                                int scale_head,
                                float omit_dist,
-                               float *scales);
+                               Eigen::Vector3f& scales);
 
     /**
      * Compute a uniform head scale factor by fitting spheres to the
@@ -812,10 +701,10 @@ public:
      * @param[in]  head_surf  The scalp surface.
      * @param[out] scales     Receives three identical scale factors (dig_radius / surface_radius).
      */
-    static void get_head_scale(FIFFLIB::FiffDigitizerData* dig,
-                                   float **mri_fid,
+    static void get_head_scale(FIFFLIB::FiffDigitizerData& dig,
+                                   const Eigen::Matrix<float, 3, 3, Eigen::RowMajor>& mri_fid,
                                    MneMshDisplaySurface* head_surf,
-                                   float *scales);
+                                   Eigen::Vector3f& scales);
 
     /**
      * Mark digitizer points whose distance to the head surface exceeds
@@ -828,8 +717,8 @@ public:
      *
      * @return The number of discarded points.
      */
-    static int discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerData* d,
-                                                 MneMshDisplaySurface* head,
+    static int discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerData& d,
+                                                 const MneMshDisplaySurface* head,
                                                  float maxdist);
 
     /**
@@ -842,7 +731,7 @@ public:
      * @param[in]      do_all     If non-zero, process all point types including HPI.
      * @param[in]      do_approx  If non-zero, use approximate (neighborhood-restricted) search.
      */
-    static void calculate_digitizer_distances(FIFFLIB::FiffDigitizerData* dig, MneMshDisplaySurface* head,
+    static void calculate_digitizer_distances(FIFFLIB::FiffDigitizerData& dig, const MneMshDisplaySurface& head,
                                                                   int do_all, int do_approx);
 
     /**
@@ -859,10 +748,10 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    static int iterate_alignment_once(FIFFLIB::FiffDigitizerData* dig,	   /* The digitizer data */
-                                                   MneMshDisplaySurface* head, /* The head surface */
+    static int iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig,	   /* The digitizer data */
+                                                   const MneMshDisplaySurface& head, /* The head surface */
                                                    int nasion_weight,	   /* Weight for the nasion */
-                                                   float *nasion_mri,	   /* Fixed correspondence point for the nasion (optional) */
+                                                   const std::optional<Eigen::Vector3f>& nasion_mri,   /* Fixed correspondence point for the nasion (optional) */
                                                    int last_step);          /* Is this the last iteration step */
 
     /**
@@ -874,9 +763,8 @@ public:
      *
      * @return The RMS distance in meters.
      */
-    static float rms_digitizer_distance(FIFFLIB::FiffDigitizerData* dig, MneMshDisplaySurface* head);
+    static float rms_digitizer_distance(FIFFLIB::FiffDigitizerData& dig, const MneMshDisplaySurface& head);
 
-    //============================= display_surfaces.c =============================
 
     /**
      * Scale a display surface's bounding box and all vertex positions by
@@ -885,8 +773,8 @@ public:
      * @param[in, out] surf    The display surface to scale.
      * @param[in]      scales  Per-axis scale factors (3-element float array: x, y, z).
      */
-    static void scale_display_surface(MneMshDisplaySurface* surf,
-                                        float *scales);
+    static void scale_display_surface(MneMshDisplaySurface& surf,
+                                        const Eigen::Vector3f& scales);
 
     /**
      * Allocate a curvature array and set all vertex curvature values to 1.0
@@ -894,26 +782,8 @@ public:
      *
      * @param[in, out] s   The surface to modify.
      */
-    static void add_uniform_curv(MneSurfaceOld* s);
+    static void add_uniform_curv(MneSurfaceOld& s);
 
-    //============================= mne_filename_util.c =============================
-
-    /**
-     * Construct a FreeSurfer surface file path in the format
-     * "$SUBJECTS_DIR/\<subj\>/surf/[\<prefix\>.]\<name\>".
-     *
-     * @param[in] subj    Subject name (or NULL to use $SUBJECT).
-     * @param[in] name    Surface name (e.g. "lh.white").
-     * @param[in] prefix  Optional prefix prepended with a dot separator (may be NULL).
-     *
-     * @return Heap-allocated path string, or NULL if environment variables are unset.
-     *         Caller must free the returned string.
-     */
-    static char * compose_surf_name(const char *subj,
-                                        const char *name,
-                                        const char *prefix);
-
-    //============================= mne_surface_io.c =============================
 
     /**
      * Load a FreeSurfer surface and optional curvature file, adding full
@@ -926,8 +796,8 @@ public:
      *
      * @return A new source space, or NULL on failure. Caller takes ownership.
      */
-    static MneSourceSpaceOld* load_surface(char *surf_file,
-                    char *curv_file);
+    static MneSourceSpaceOld* load_surface(const QString& surf_file,
+                    const QString& curv_file);
 
     /**
      * Load a FreeSurfer surface and optional curvature file with configurable
@@ -941,8 +811,8 @@ public:
      *
      * @return A new source space, or NULL on failure. Caller takes ownership.
      */
-    static MneSourceSpaceOld* load_surface_geom(char *surf_file,
-                         char *curv_file,
+    static MneSourceSpaceOld* load_surface_geom(const QString& surf_file,
+                         const QString& curv_file,
                          int  add_geometry,
                          int  check_too_many_neighbors);
 
@@ -955,20 +825,16 @@ public:
      * Optionally reads trailing MGH tags.
      *
      * @param[in]  fname   Path to the surface file.
-     * @param[out] nvertp  Receives the number of vertices.
-     * @param[out] ntrip   Receives the number of triangles.
-     * @param[out] vertp   Receives the vertex coordinate array. Caller takes ownership.
-     * @param[out] trip    Receives the triangle index array. Caller takes ownership.
-     * @param[out] tagsp   If non-null, receives a pointer to the MGH tag group.
+     * @param[out] vertices  Receives the vertex coordinates (nvert x 3, row-major).
+     * @param[out] triangles Receives the triangle vertex indices (ntri x 3, row-major).
+     * @param[out] tags      If non-null, receives the MGH tag group.
      *
      * @return OK on success, FAIL on error.
      */
-    static int read_triangle_file(char  *fname,
-                   int   *nvertp,
-                   int   *ntrip,
-                   float ***vertp,
-                   int   ***trip,
-                   void  **tagsp);
+    static int read_triangle_file(const QString& fname,
+                   PointsT& vertices,
+                   TrianglesT& triangles,
+                   std::unique_ptr<MneMghTagGroup>* tagsp);
 
     /**
      * Read a FreeSurfer curvature file (new or old binary format).
@@ -977,24 +843,12 @@ public:
      * Old format: 3-byte vertex count, then 2-byte integer values divided by 100.
      *
      * @param[in]  fname   Path to the curvature file.
-     * @param[out] curvsp  Receives the curvature values array. Caller takes ownership.
-     * @param[out] ncurvp  Receives the number of curvature values.
+     * @param[out] curv    Receives the curvature values.
      *
      * @return OK on success, FAIL on error.
      */
-    static int read_curvature_file(char  *fname,
-                    float **curvsp,
-                    int   *ncurvp);
-
-    /**
-     * Validate a quad's edge lengths to detect degenerate quads
-     * (edges shorter than 0.1 mm).
-     *
-     * @param[in] rr   The four vertex coordinates of the quad.
-     *
-     * @return OK if the quad is valid, FAIL if degenerate.
-     */
-    static int check_quad(float **rr);
+    static int read_curvature_file(const QString& fname,
+                    Eigen::VectorXf& curv);
 
     /**
      * Validate that a vertex index is within the valid range [0, maxno-1].
@@ -1006,7 +860,6 @@ public:
      */
     static int check_vertex(int no, int maxno);
 
-    //============================= mne_mgh_mri_io.c =============================
 
     /**
      * Search an MGH tag group for TAG_OLD_SURF_GEOM and extract a copy of
@@ -1016,7 +869,7 @@ public:
      *
      * @return A new copy of the volume geometry, or NULL if not found. Caller takes ownership.
      */
-    static MneVolGeom* get_volume_geom_from_tag(void *tagsp);
+    static std::unique_ptr<MneVolGeom> get_volume_geom_from_tag(const MneMghTagGroup *tagsp);
 
     /**
      * Deep-copy an MneVolGeom structure, including the filename string.
@@ -1025,7 +878,7 @@ public:
      *
      * @return A new copy, or NULL if @p g is NULL. Caller takes ownership.
      */
-    static MneVolGeom* dup_vol_geom(MneVolGeom* g);
+    static std::unique_ptr<MneVolGeom> dup_vol_geom(const MneVolGeom& g);
 
     /**
      * Read all MGH tags from the current file position until a tag with
@@ -1036,7 +889,7 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    static int read_mgh_tags(QFile &fp, void **tagsp);
+    static int read_mgh_tags(QFile &fp, std::unique_ptr<MneMghTagGroup>& tagsp);
 
     /**
      * Read a single MGH tag (ID and data) from the file. Handles both
@@ -1049,7 +902,7 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    static int read_next_tag(QFile &fp, int *tagp, long long *lenp, unsigned char **datap);
+    static int read_next_tag(QFile &fp, int &tagp, long long &lenp, unsigned char *&datap);
 
     /**
      * Read the raw data payload for a single MGH tag. Handles special cases
@@ -1064,7 +917,7 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    static int read_tag_data(QFile &fp, int tag, long long nbytes, unsigned char **val, long long *nbytesp);
+    static int read_tag_data(QFile &fp, int tag, long long nbytes, unsigned char *&val, long long &nbytesp);
 
     /**
      * Append a new tag entry to an MGH tag group, creating the group if needed.
@@ -1076,7 +929,7 @@ public:
      *
      * @return The (possibly newly created) tag group.
      */
-    static MneMghTagGroup* add_mgh_tag_to_group(MneMghTagGroup* g, int tag, long long len, unsigned char *data);
+    static void add_mgh_tag_to_group(std::unique_ptr<MneMghTagGroup>& g, int tag, long long len, unsigned char *data);
 
     /**
      * Read FreeSurfer volume geometry from text key-value lines in the file.
@@ -1091,7 +944,6 @@ public:
      */
     static MneVolGeom* read_vol_geom(QFile &fp);
 
-    //============================= mne_binio.c =============================
 
     /**
      * Read a 3-byte big-endian integer (FreeSurfer custom format) and
@@ -1102,7 +954,7 @@ public:
      *
      * @return OK on success, FAIL on read error.
      */
-    static int read_int3(QFile &in, int *ival);
+    static int read_int3(QFile &in, int &ival);
 
     /**
      * Read a 4-byte big-endian 32-bit integer and convert to native byte order.
@@ -1112,7 +964,7 @@ public:
      *
      * @return OK on success, FAIL on read error.
      */
-    static int read_int(QFile &in, qint32 *ival);
+    static int read_int(QFile &in, qint32 &ival);
 
     /**
      * Read a 2-byte big-endian short integer and convert to native byte order.
@@ -1122,7 +974,7 @@ public:
      *
      * @return OK on success, FAIL on read error.
      */
-    static int read_int2(QFile &in, int *ival);
+    static int read_int2(QFile &in, int &ival);
 
     /**
      * Read a 4-byte big-endian float and convert to native byte order.
@@ -1132,7 +984,7 @@ public:
      *
      * @return OK on success, FAIL on read error.
      */
-    static int read_float(QFile &in, float *fval);
+    static int read_float(QFile &in, float &fval);
 
     /**
      * Read an 8-byte big-endian long long and convert to native byte order.
@@ -1142,20 +994,8 @@ public:
      *
      * @return OK on success, FAIL on read error.
      */
-    static int read_long(QFile &in, long long *lval);
+    static int read_long(QFile &in, long long &lval);
 
-    //============================= mne_misc.c =============================
-
-    /**
-     * Allocate a heap copy of a C string using malloc (platform-independent
-     * implementation of POSIX strdup).
-     *
-     * @param[in] s   The string to duplicate (may be NULL).
-     *
-     * @return A new heap-allocated copy, or NULL if @p s is NULL.
-     *         Caller must free the returned string.
-     */
-    static char *strdup(const char *s);
 
 public:
     int             type;          /**< Is this a volume or a surface. */
@@ -1218,74 +1058,6 @@ public:
     std::unique_ptr<FIFFLIB::FiffCoordTrans>  MRI_voxel_surf_RAS_t; /**< Voxel-to-surface-RAS transform for the associated MRI volume. */
     std::unique_ptr<FIFFLIB::FiffCoordTrans>  MRI_surf_RAS_RAS_t; /**< Transform from surface RAS to scanner RAS in the associated MRI volume. */
     int             MRI_vol_dims[3];       /**< Dimensions of the associated MRI volume (width x height x depth). */
-
-// ### OLD STRUCT ###
-//typedef struct {                /* This defines a source space or a surface */
-//    int              type;          /* Is this a volume or a surface */
-//    char             *subject;      /* Name (id) of the subject */
-//    int              id;            /* Surface id */
-//    int              coord_frame;   /* Which coordinate system are the data in now */
-//    /*
-//    * These relate to the FreeSurfer way
-//    */
-//    mneVolGeom       vol_geom;      /* MRI volume geometry information as FreeSurfer likes it */
-//    void             *mgh_tags;     /* Tags listed in the file */
-//    /*
-//    * These are meaningful for both surfaces and volumes
-//    */
-//    int              np;        /* Number of vertices */
-//    float            **rr;      /* The vertex locations */
-//    float            **nn;      /* Surface normals at these points */
-//    float            cm[3];     /* Center of mass */
-
-//    int              *inuse;    /* Is this point in use in the source space */
-//    int              *vertno;   /* Vertex numbers of the used vertices in the full source space */
-//    int              nuse;      /* Number of points in use */
-
-//    int              **neighbor_vert; /* Vertices neighboring each vertex */
-//    int              *nneighbor_vert; /* Number of vertices neighboring each vertex */
-//    float            **vert_dist;     /* Distances between neigboring vertices */
-//    /*
-//    * These are for surfaces only
-//    */
-//    int              ntri;      /* Number of triangles */
-//    MneTriangle*      tris;      /* The triangulation information */
-//    int              **itris;   /* The vertex numbers */
-//    float            tot_area;  /* Total area of the surface, computed from the triangles */
-
-//    int              nuse_tri;      /* The triangulation corresponding to the vertices in use */
-//    MneTriangle*      use_tris;      /* The triangulation information for the vertices in use */
-//    int              **use_itris;   /* The vertex numbers for the 'use' triangulation */
-
-//    int              **neighbor_tri;    /* Neighboring triangles for each vertex Note: number of entries varies for vertex to vertex */
-//    int              *nneighbor_tri;    /* Number of neighboring triangles for each vertex */
-
-//    mneNearest       nearest;   /* Nearest inuse vertex info (number of these is the same as the number vertices) */
-//    mnePatchInfo     *patches;  /* Patch information (number of these is the same as the number of points in use) */
-//    int              npatch;    /* How many (should be same as nuse) */
-
-//    mneSparseMatrix  dist;          /* Distances between the (used) vertices (along the surface). */
-//    float            dist_limit;    /* Distances above this (in volume) have not been calculated. If negative, only used vertices have been considered */
-
-//    float            *curv; /* The FreeSurfer curvature values */
-//    float            *val;  /* Some other values associated with the vertices */
-//    /*
-//    * These are for volumes only
-//    */
-//    MNELIB::FiffCoordTransOld*   voxel_surf_RAS_t; /* Transform from voxel coordinate to the surface RAS (MRI) coordinates */
-//    int              vol_dims[3];   /* Dimensions of the volume grid (width x height x depth) NOTE: This will be present only if the source space is a complete rectangular grid with unused vertices included */
-//    float            voxel_size[3]; /* Derived from the above */
-//    mneSparseMatrix  interpolator;  /* Matrix to interpolate into an MRI volume */
-//    char             *MRI_volume;   /* The name of the file the above interpolator is based on */
-//    MNELIB::FiffCoordTransOld*   MRI_voxel_surf_RAS_t;
-//    MNELIB::FiffCoordTransOld*   MRI_surf_RAS_RAS_t;   /* Transform from surface RAS to RAS coordinates in the associated MRI volume */
-//    int              MRI_vol_dims[3];               /* Dimensions of the MRI volume (width x height x depth) */
-//    /*
-//    * Possibility to add user-defined data
-//    */
-//    void             *user_data;        /* Anything else we want */
-//    mneUserFreeFunc  user_data_free;    /* Function to set the above free */
-//} *mneSurfaceOrVolume,mneSurfaceOrVolumeRec;
 };
 
 //=============================================================================================================

@@ -99,7 +99,6 @@ set(HEADERS
     mne_sss_data.h
     mne_triangle.h
     mne_types.h
-    mne_types_mne-c.h
     mne_vol_geom.h
     mne_nearest.h
     mne_patch_info.h

@@ -45,6 +45,12 @@
 #include "mne_named_matrix.h"
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <memory>
+
+//=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
 
@@ -93,15 +99,19 @@ public:
 
     //=========================================================================================================
     /**
-     * @brief Copy constructor (defaulted).
+     * @brief Copy constructor.
+     *
+     * Deep-copies the projection vectors (unique_ptr member).
      */
-    MneProjItem(const MneProjItem&) = default;
+    MneProjItem(const MneProjItem& other);
 
     //=========================================================================================================
     /**
-     * @brief Copy assignment operator (defaulted).
+     * @brief Copy assignment operator.
+     *
+     * Deep-copies the projection vectors (unique_ptr member).
      */
-    MneProjItem& operator=(const MneProjItem&) = default;
+    MneProjItem& operator=(const MneProjItem& other);
 
     //=========================================================================================================
     /**
@@ -137,8 +147,8 @@ public:
     int affect(const QStringList& list, int nlist) const;
 
 public:
-    MneNamedMatrix     vecs;           /**< Projection vectors (nrow = nvec, ncol = nch). */
-    int             nvec;           /**< Number of projection vectors (== vecs.nrow). */
+    std::unique_ptr<MneNamedMatrix> vecs; /**< Projection vectors (nrow = nvec, ncol = nch); may be nullptr when nvec == 0. */
+    int             nvec;           /**< Number of projection vectors (== vecs->nrow when vecs is set). */
     QString         desc;           /**< Human-readable description (e.g. "PCA-v1"). */
     int             kind;           /**< FIFF projection item kind (FIFFV_PROJ_ITEM_*). */
     int             active;         /**< Whether this item is currently active. */

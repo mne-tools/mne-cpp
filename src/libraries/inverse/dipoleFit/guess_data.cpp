@@ -47,6 +47,7 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
 
+#include <memory>
 #include <QFile>
 
 //=============================================================================================================
@@ -183,29 +184,25 @@ GuessData::GuessData()
 
 GuessData::GuessData(const QString &guessname, const QString &guess_surfname, float mindist, float exclude, float grid, DipoleFitData *f)
 {
-    MneSourceSpaceOld* *sp = NULL;
-    int            nsp = 0;
 //    GuessData*      res = new GuessData();
     int            k,p;
     float          guessrad = 0.080;
-    MneSourceSpaceOld* guesses = NULL;
+    std::unique_ptr<MneSourceSpaceOld> guesses;
     dipoleFitFuncs orig;
 
     if (!guessname.isEmpty()) {
         /*
             * Read the guesses and transform to the appropriate coordinate frame
             */
-        if (MneSurfaceOrVolume::read_source_spaces(guessname,&sp,&nsp) == FAIL)
+        std::vector<std::unique_ptr<MneSourceSpaceOld>> sp;
+        if (MneSurfaceOrVolume::read_source_spaces(guessname,sp) == FAIL)
             goto bad;
-        if (nsp != 1) {
+        if (static_cast<int>(sp.size()) != 1) {
             printf("Incorrect number of source spaces in guess file");
-            for (k = 0; k < nsp; k++)
-                delete sp[k];
-            FREE_16(sp);
             goto bad;
         }
         printf("Read guesses from %s\n",guessname.toUtf8().constData());
-        guesses = sp[0]; FREE_16(sp);
+        guesses = std::move(sp[0]);
     }
     else {
         MneSurfaceOld*    inner_skull = NULL;
@@ -226,13 +223,19 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
                 goto bad;
             free_inner_skull = TRUE;
         }
-        if ((guesses = (MneSourceSpaceOld*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
+        guesses.reset((MneSourceSpaceOld*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist));
+        if (!guesses)
             goto bad;
         if (free_inner_skull)
             delete inner_skull;
     }
-    if (MneSurfaceOrVolume::transform_source_spaces_to(f->coord_frame,*f->mri_head_t,&guesses,1) != OK)
-        goto bad;
+    {
+        std::vector<std::unique_ptr<MneSourceSpaceOld>> guesses_vec;
+        guesses_vec.push_back(std::move(guesses));
+        if (MneSurfaceOrVolume::transform_source_spaces_to(f->coord_frame,*f->mri_head_t,guesses_vec) != OK)
+            goto bad;
+        guesses = std::move(guesses_vec[0]);
+    }
     printf("Guess locations are now in %s coordinates.\n",FiffCoordTrans::frame_name(f->coord_frame).toUtf8().constData());
 
     this->nguess  = guesses->nuse;
@@ -242,7 +245,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
             VEC_COPY_16(this->rr[p],&guesses->rr(k,0));
             p++;
         }
-    delete guesses; guesses = NULL;
+    guesses.reset();
 
     printf("Go through all guess source locations...");
     this->guess_fwd = MALLOC_16(this->nguess,DipoleForward*);
@@ -273,9 +276,6 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
 //    return res;
 
 bad : {
-        if(guesses)
-            delete guesses;
-
         return;
 //        return NULL;
     }
@@ -285,27 +285,23 @@ bad : {
 
 GuessData::GuessData(const QString &guessname, const QString &guess_surfname, float mindist, float exclude, float grid, DipoleFitData *f, char *guess_save_name)
 {
-    MneSourceSpaceOld* *sp = NULL;
-    int             nsp = 0;
     int             k,p;
     float           guessrad = 0.080f;
-    MneSourceSpaceOld*  guesses = NULL;
+    std::unique_ptr<MneSourceSpaceOld> guesses;
 
     if (!guessname.isEmpty()) {
         /*
          * Read the guesses and transform to the appropriate coordinate frame
          */
-        if (MneSurfaceOrVolume::read_source_spaces(guessname,&sp,&nsp) == FIFF_FAIL)
+        std::vector<std::unique_ptr<MneSourceSpaceOld>> sp;
+        if (MneSurfaceOrVolume::read_source_spaces(guessname,sp) == FIFF_FAIL)
             goto bad;
-        if (nsp != 1) {
+        if (static_cast<int>(sp.size()) != 1) {
             qCritical("Incorrect number of source spaces in guess file");
-            for (k = 0; k < nsp; k++)
-                delete sp[k];
-            FREE_16(sp);
             goto bad;
         }
         printf("Read guesses from %s\n",guessname.toUtf8().constData());
-        guesses = sp[0]; FREE_16(sp);
+        guesses = std::move(sp[0]);
     }
     else {
         MneSurfaceOld*     inner_skull = NULL;
@@ -326,7 +322,8 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
                 goto bad;
             free_inner_skull = TRUE;
         }
-        if ((guesses = (MneSourceSpaceOld*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist)) == NULL)
+        guesses.reset((MneSourceSpaceOld*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist));
+        if (!guesses)
             goto bad;
         if (free_inner_skull)
             delete inner_skull;
@@ -347,8 +344,13 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
     /*
      * Transform the guess locations to the appropriate coordinate frame
      */
-    if (MneSurfaceOrVolume::transform_source_spaces_to(f->coord_frame,*f->mri_head_t,&guesses,1) != OK)
-        goto bad;
+    {
+        std::vector<std::unique_ptr<MneSourceSpaceOld>> guesses_vec;
+        guesses_vec.push_back(std::move(guesses));
+        if (MneSurfaceOrVolume::transform_source_spaces_to(f->coord_frame,*f->mri_head_t,guesses_vec) != OK)
+            goto bad;
+        guesses = std::move(guesses_vec[0]);
+    }
     printf("Guess locations are now in %s coordinates.\n",FiffCoordTrans::frame_name(f->coord_frame).toUtf8().constData());
 
     this->nguess  = guesses->nuse;
@@ -358,9 +360,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
             VEC_COPY_16(this->rr[p],&guesses->rr(k,0));
             p++;
         }
-    if(guesses)
-        delete guesses;
-    guesses = NULL;
+    guesses.reset();
 
     this->guess_fwd = MALLOC_16(this->nguess,DipoleForward*);
     for (k = 0; k < this->nguess; k++)
@@ -374,8 +374,6 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
     return;
 
 bad : {
-        if(guesses)
-            delete guesses;
         return;
     }
 }

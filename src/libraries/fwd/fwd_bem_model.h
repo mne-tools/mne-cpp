@@ -49,6 +49,9 @@
 #include <fiff/fiff_tag.h>
 #include <fiff/fiff_named_matrix.h>
 
+#include <memory>
+#include <vector>
+
 //=============================================================================================================
 // EIGEN INCLUDES
 //=============================================================================================================
@@ -435,8 +438,7 @@ public:
     static void *meg_eeg_fwd_one_source_space(void *arg);
 
     // TODO check if this is the correct class or move
-    static int compute_forward_meg( MNELIB::MneSourceSpaceOld*  *spaces,        /**< Source spaces. */
-                                    int                         nspace,         /**< How many?. */
+    static int compute_forward_meg( std::vector<std::unique_ptr<MNELIB::MneSourceSpaceOld>>& spaces, /**< Source spaces. */
                                     FwdCoilSet*                 coils,          /**< MEG Coilset. */
                                     FwdCoilSet*                 comp_coils,     /**< Compensator Coilset. */
                                     MNELIB::MneCTFCompDataSet*  comp_data,      /**< Compensator Data. */
@@ -448,8 +450,7 @@ public:
                                     FIFFLIB::FiffNamedMatrix&   resp_grad,
                                     bool bDoGRad);                              /**< calculate gradient solution. */
 
-    static int compute_forward_eeg( MNELIB::MneSourceSpaceOld*  *spaces,        /**< Source spaces. */
-                                    int                         nspace,         /**< How many?. */
+    static int compute_forward_eeg( std::vector<std::unique_ptr<MNELIB::MneSourceSpaceOld>>& spaces, /**< Source spaces. */
                                     FwdCoilSet*                 els,            /**< Electrode locations. */
                                     bool                        fixed_ori,      /**< Use fixed-orientation dipoles. */
                                     FwdBemModel*                bem_model,      /**< BEM model definition. */

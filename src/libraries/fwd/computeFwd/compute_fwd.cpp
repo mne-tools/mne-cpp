@@ -1372,8 +1372,7 @@ bool fiff_put_dir (FiffStream::SPtr& t_pStream, const QList<FiffDirEntry::SPtr>&
 //============================= write_solution.c =============================
 
 bool write_solution(const QString& name,         /* Destination file */
-                    MneSourceSpaceOld* *spaces,  /* The source spaces */
-                    int nspace,
+                    std::vector<std::unique_ptr<MneSourceSpaceOld>>& spaces,  /* The source spaces */
                     const QString& mri_file,     /* MRI file and data obtained from there */
                     fiffId mri_id,
                     const FiffCoordTrans& mri_head_t,
@@ -1520,8 +1519,8 @@ bool write_solution(const QString& name,         /* Destination file */
     /*
      * Write the source spaces (again)
      */
-    for (k = 0, nvert = 0; k < nspace; k++) {
-        if (mne_write_one_source_space(t_pStream,spaces[k],FALSE) == FIFF_FAIL)
+    for (k = 0, nvert = 0; k < static_cast<int>(spaces.size()); k++) {
+        if (mne_write_one_source_space(t_pStream,spaces[k].get(),FALSE) == FIFF_FAIL)
             goto bad;
         nvert += spaces[k]->nuse;
     }
@@ -1804,9 +1803,6 @@ ComputeFwd::ComputeFwd(ComputeFwdSettings::SPtr pSettings)
 ComputeFwd::~ComputeFwd()
 {
     //ToDo Garbage collection
-    for (int k = 0; k < m_iNSpace; k++)
-        if(m_spaces[k])
-            delete m_spaces[k];
     if(m_megcoils)
         delete m_megcoils;
     if(m_eegels)
@@ -1820,8 +1816,7 @@ ComputeFwd::~ComputeFwd()
 void ComputeFwd::initFwd()
 {
     // TODO: This only temporary until we have the fwd dlibrary refactored. This is only done in order to provide easy testing in test_forward_solution.
-    m_spaces                = Q_NULLPTR;
-    m_iNSpace               = 0;
+    m_spaces.clear();
     m_iNSource              = 0;
 
     m_mri_head_t            = FiffCoordTrans();
@@ -1918,12 +1913,12 @@ void ComputeFwd::initFwd()
 
     printf("\n");
     printf("Reading %s...\n",m_pSettings->srcname.toUtf8().constData());
-    if (MneSurfaceOrVolume::read_source_spaces(m_pSettings->srcname,&m_spaces,&m_iNSpace) != OK) {
+    if (MneSurfaceOrVolume::read_source_spaces(m_pSettings->srcname,m_spaces) != OK) {
         return;
     }
-    for (k = 0, m_iNSource = 0; k < m_iNSpace; k++) {
+    for (k = 0, m_iNSource = 0; k < static_cast<int>(m_spaces.size()); k++) {
         if (m_pSettings->do_all) {
-            MneSurfaceOrVolume::enable_all_sources(m_spaces[k]);
+            MneSurfaceOrVolume::enable_all_sources(*m_spaces[k]);
         }
         m_iNSource += m_spaces[k]->nuse;
     }
@@ -1931,8 +1926,8 @@ void ComputeFwd::initFwd()
         qCritical("No sources are active in these source spaces. --all option should be used.");
         return;
     }
-    printf("Read %d source spaces a total of %d active source locations\n", m_iNSpace,m_iNSource);
-    if (MneSurfaceOrVolume::restrict_sources_to_labels(m_spaces,m_iNSpace,m_pSettings->labels,m_pSettings->nlabel) == FAIL) {
+    printf("Read %d source spaces a total of %d active source locations\n", static_cast<int>(m_spaces.size()),m_iNSource);
+    if (MneSurfaceOrVolume::restrict_sources_to_labels(m_spaces,m_pSettings->labels,m_pSettings->nlabel) == FAIL) {
         return;
     }
 
@@ -2113,7 +2108,7 @@ void ComputeFwd::initFwd()
 
     // Transform the source spaces into the appropriate coordinates
     {
-        if (MneSurfaceOrVolume::transform_source_spaces_to(m_pSettings->coord_frame,m_mri_head_t,m_spaces,m_iNSpace) != OK) {
+        if (MneSurfaceOrVolume::transform_source_spaces_to(m_pSettings->coord_frame,m_mri_head_t,m_spaces) != OK) {
             return;
         }
     }
@@ -2173,10 +2168,10 @@ void ComputeFwd::initFwd()
             printf("Omitted source space points will be output to : %s\n",m_pSettings->mindistoutname.toUtf8().constData());
         }
         MneSurfaceOrVolume::filter_source_spaces(m_pSettings->mindist,
-                                                 m_pSettings->bemname.toUtf8().data(),
+                                                 m_pSettings->bemname,
                                                  m_mri_head_t,
                                                  m_spaces,
-                                                 m_iNSpace,filteredStream,m_pSettings->use_threads);
+                                                 filteredStream,m_pSettings->use_threads);
         delete filteredStream;
         filteredStream = Q_NULLPTR;
     }
@@ -2201,7 +2196,7 @@ void ComputeFwd::calculateFwd()
 
     // check if source spaces are still in head space
     if(m_spaces[0]->coord_frame != FIFFV_COORD_HEAD) {
-        if (MneSurfaceOrVolume::transform_source_spaces_to(m_pSettings->coord_frame,m_mri_head_t,m_spaces,m_iNSpace) != OK) {
+        if (MneSurfaceOrVolume::transform_source_spaces_to(m_pSettings->coord_frame,m_mri_head_t,m_spaces) != OK) {
             return;
         }
     }
@@ -2209,7 +2204,6 @@ void ComputeFwd::calculateFwd()
     // Do the actual computation
     if (iNMeg > 0) {
         if ((FwdBemModel::compute_forward_meg(m_spaces,
-                                              m_iNSpace,
                                               m_megcoils,
                                               m_compcoils,
                                               m_compData.get(),
@@ -2225,7 +2219,6 @@ void ComputeFwd::calculateFwd()
     }
     if (iNEeg > 0) {
         if ((FwdBemModel::compute_forward_eeg(m_spaces,
-                                              m_iNSpace,
                                               m_eegels,
                                               m_pSettings->fixed_ori,
                                               m_bemModel,
@@ -2329,14 +2322,13 @@ void ComputeFwd::updateHeadPos(const FiffCoordTrans& transDevHead)
 
     // check if source spaces are still in head space
     if(m_spaces[0]->coord_frame != FIFFV_COORD_HEAD) {
-        if (MneSurfaceOrVolume::transform_source_spaces_to(m_pSettings->coord_frame,m_mri_head_t,m_spaces,m_iNSpace) != OK) {
+        if (MneSurfaceOrVolume::transform_source_spaces_to(m_pSettings->coord_frame,m_mri_head_t,m_spaces) != OK) {
             return;
         }
     }
 
     // recompute meg forward
     if ((FwdBemModel::compute_forward_meg(m_spaces,
-                                          m_iNSpace,
                                           m_megcoils,
                                           m_compcoils,
                                           m_compData.get(),                   // we might have to update this too
@@ -2366,7 +2358,7 @@ void ComputeFwd::storeFwd(const QString& sSolName)
     // We are ready to spill it out
     // Transform the source spaces back into MRI coordinates
     {
-        if (MneSourceSpaceOld::transform_source_spaces_to(FIFFV_COORD_MRI,m_mri_head_t,m_spaces,m_iNSpace) != OK) {
+        if (MneSourceSpaceOld::transform_source_spaces_to(FIFFV_COORD_MRI,m_mri_head_t,m_spaces) != OK) {
             return;
         }
     }
@@ -2386,7 +2378,6 @@ void ComputeFwd::storeFwd(const QString& sSolName)
 
     if (!write_solution(sName,                                  /* Destination file */
                         m_spaces,                               /* The source spaces */
-                        m_iNSpace,
                         m_pSettings->mriname,m_mri_id,          /* MRI file and data obtained from there */
                         m_mri_head_t,
                         m_pSettings->measname,m_meas_id,        /* MEG file and data obtained from there */

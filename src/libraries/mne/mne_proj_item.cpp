@@ -64,6 +64,37 @@ MneProjItem::MneProjItem()
 
 //=============================================================================================================
 
+MneProjItem::MneProjItem(const MneProjItem& other)
+: vecs(other.vecs ? std::make_unique<MneNamedMatrix>(*other.vecs) : nullptr)
+, nvec(other.nvec)
+, desc(other.desc)
+, kind(other.kind)
+, active(other.active)
+, active_file(other.active_file)
+, has_meg(other.has_meg)
+, has_eeg(other.has_eeg)
+{
+}
+
+//=============================================================================================================
+
+MneProjItem& MneProjItem::operator=(const MneProjItem& other)
+{
+    if (this != &other) {
+        vecs        = other.vecs ? std::make_unique<MneNamedMatrix>(*other.vecs) : nullptr;
+        nvec        = other.nvec;
+        desc        = other.desc;
+        kind        = other.kind;
+        active      = other.active;
+        active_file = other.active_file;
+        has_meg     = other.has_meg;
+        has_eeg     = other.has_eeg;
+    }
+    return *this;
+}
+
+//=============================================================================================================
+
 MneProjItem::~MneProjItem()
 {
 }
@@ -72,14 +103,14 @@ MneProjItem::~MneProjItem()
 
 int MneProjItem::affect(const QStringList& list, int nlist) const
 {
-    if (nvec == 0)
+    if (nvec == 0 || !vecs)
         return false;
 
     for (int k = 0; k < nlist; ++k) {
-        for (int p = 0; p < vecs.ncol; ++p) {
-            if (QString::compare(vecs.collist[p], list[k]) == 0) {
-                for (int q = 0; q < vecs.nrow; ++q) {
-                    if (vecs.data(q, p) != 0.0f)
+        for (int p = 0; p < vecs->ncol; ++p) {
+            if (QString::compare(vecs->collist[p], list[k]) == 0) {
+                for (int q = 0; q < vecs->nrow; ++q) {
+                    if (vecs->data(q, p) != 0.0f)
                         return true;
                 }
             }

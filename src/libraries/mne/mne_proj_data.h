@@ -83,7 +83,7 @@ public:
     /**
      * Constructs the MneProjData.
      */
-    MneProjData(MNELIB::MneSurfaceOld* s);
+    MneProjData(const MNELIB::MneSurfaceOld* s);
 
     //=========================================================================================================
     /**

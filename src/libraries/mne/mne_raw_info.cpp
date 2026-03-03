@@ -46,18 +46,6 @@
 
 #include <QFile>
 
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
-#define FREE_33(x) if ((char *)(x) != NULL) free((char *)(x))
-
-#define MALLOC_33(x,t) (t *)malloc((x)*sizeof(t))
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -78,43 +66,33 @@ MneRawInfo::MneRawInfo()
 
 MneRawInfo::~MneRawInfo()
 {
-    this->filename.clear();
-    // trans is a value type, auto-destructs
-//    FREE_33(this->rawDir);
-    FREE_33(this->id);
 }
 
 //=============================================================================================================
 
 FiffDirNode::SPtr MneRawInfo::find_meas(const FiffDirNode::SPtr &node)
-/*
-          * Find corresponding meas node
-          */
 {
     FiffDirNode::SPtr empty_node;
     FiffDirNode::SPtr tmp_node = node;
 
     while (tmp_node->type != FIFFB_MEAS) {
-        if (tmp_node->parent == NULL)
-            return empty_node;//(NULL);
+        if (tmp_node->parent == nullptr)
+            return empty_node;
         tmp_node = tmp_node->parent;
     }
-    return (tmp_node);
+    return tmp_node;
 }
 
 //=============================================================================================================
 
 FiffDirNode::SPtr MneRawInfo::find_meas_info(const FiffDirNode::SPtr &node)
-/*
-          * Find corresponding meas info node
-          */
 {
     int k;
     FiffDirNode::SPtr empty_node;
     FiffDirNode::SPtr tmp_node = node;
 
     while (tmp_node->type != FIFFB_MEAS) {
-        if (tmp_node->parent == NULL)
+        if (tmp_node->parent == nullptr)
             return empty_node;
         tmp_node = tmp_node->parent;
     }
@@ -127,9 +105,6 @@ FiffDirNode::SPtr MneRawInfo::find_meas_info(const FiffDirNode::SPtr &node)
 //=============================================================================================================
 
 FiffDirNode::SPtr MneRawInfo::find_raw(const FiffDirNode::SPtr &node)
-/*
-          * Find the raw data
-          */
 {
     FiffDirNode::SPtr raw;
     QList<FiffDirNode::SPtr> temp;
@@ -161,23 +136,16 @@ FiffDirNode::SPtr MneRawInfo::find_maxshield(const FiffDirNode::SPtr &node)
 
 int MneRawInfo::get_meas_info(FiffStream::SPtr &stream,
                               FiffDirNode::SPtr &node,
-                              fiffId *id,
+                              std::unique_ptr<FiffId>& id,
                               int *nchan,
                               float *sfreq,
                               float *highpass,
                               float *lowpass,
                               QList<FiffChInfo>& chp,
                               FiffCoordTrans& trans,
-                              FiffTime* *start_time)  /* Measurement date (starting time) */
-/*
-          * Find channel information from
-          * nearest FIFFB_MEAS_INFO parent of
-          * node.
-          */
+                              FiffTime* *start_time)
 {
     FiffTag::SPtr t_pTag;
-    //    fiffTagRec tag;
-    //    fiffDirEntry this_ent;
     QList<FiffChInfo> ch;
     FiffChInfo this_ch;
     FiffCoordTrans t;
@@ -187,37 +155,30 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream,
     FiffDirNode::SPtr meas;
     fiff_int_t kind, pos;
 
-    //    tag.data    = NULL;
      trans      = FiffCoordTrans();
-     *id         = NULL;
-     *start_time = NULL;
+     id.reset();
+     *start_time = nullptr;
     /*
         * Find desired parents
         */
-    //    meas = node->dir_tree_find(FIFFB_MEAS);
     if (!(meas = find_meas(node))) {
-        //    if (meas.size() == 0) {
         printf ("Meas. block not found!");
         goto bad;
     }
 
-    //    meas_info = node->dir_tree_find(FIFFB_MEAS_INFO);
     if (!(node = find_meas_info(node))) {
-        //    if (meas_info.count() == 0) {
         printf ("Meas. info not found!");
         goto bad;
     }
     /*
        * Is there a block id is in the FIFFB_MEAS node?
        */
-    //    if (meas->id != NULL) {
     if (!meas->id.isEmpty()) {
-        *id = MALLOC_33(1,fiffIdRec);
-        //        memcpy (*id,meas[0]->id,sizeof(fiffIdRec));
-        (*id)->version = meas->id.version;
-        (*id)->machid[0] = meas->id.machid[0];
-        (*id)->machid[1] = meas->id.machid[1];
-        (*id)->time = meas->id.time;
+        id = std::make_unique<FiffId>();
+        id->version = meas->id.version;
+        id->machid[0] = meas->id.machid[0];
+        id->machid[1] = meas->id.machid[1];
+        id->time = meas->id.time;
     }
     /*
        * Others from FIFFB_MEAS_INFO
@@ -230,9 +191,6 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream,
         switch (kind) {
 
         case FIFF_NCHAN :
-            //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
-            //                goto bad;
-            //            *nchan = *(int *)(tag.data);
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *nchan = *t_pTag->toInt();
@@ -245,9 +203,6 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream,
             break;
 
         case FIFF_SFREQ :
-            //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
-            //                goto bad;
-            //            *sfreq = *(float *)(tag.data);
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *sfreq = *t_pTag->toFloat();
@@ -255,9 +210,6 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream,
             break;
 
         case FIFF_LOWPASS :
-            //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
-            //                goto bad;
-            //            *lowpass = *(float *)(tag.data);
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *lowpass = *t_pTag->toFloat();
@@ -265,19 +217,13 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream,
             break;
 
         case FIFF_HIGHPASS :
-            //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
-            //                goto bad;
-            //            *highpass = *(float *)(tag.data);
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             *highpass = *t_pTag->toFloat();
             to_find--;
             break;
 
-        case FIFF_CH_INFO :		/* Information about one channel */
-            //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
-            //                goto bad;
-            //            this_ch = (fiffChInfo)(tag.data);
+        case FIFF_CH_INFO :
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
 
@@ -292,21 +238,12 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream,
             break;
 
         case FIFF_MEAS_DATE :
-            //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
-            //                goto bad;
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
-            if (*start_time)
-                FREE_33(*start_time);
-            //            *start_time = (fiffTime)tag.data;
             *start_time = (FiffTime*)t_pTag->data();
-            //            tag.data = NULL;
             break;
 
         case FIFF_COORD_TRANS :
-            //            if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
-            //                goto bad;
-            //            t = (fiffCoordTrans)tag.data;
             if (!stream->read_tag(t_pTag,pos))
                 goto bad;
             t = FiffCoordTrans::readFromTag( t_pTag );
@@ -315,7 +252,6 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream,
                 */
             if (t.from == FIFFV_COORD_DEVICE && t.to == FIFFV_COORD_HEAD) {
                 trans = t;
-                //                tag.data = NULL;
                 break;
             }
         }
@@ -324,28 +260,17 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream,
         * Search for the coordinate transformation from
         * HPI_RESULT block if it was not previously found
         */
-    //    hpi = fiff_dir_tree_find(node,FIFFB_HPI_RESULT);
-    //    node = hpi[0];
-
     hpi = node->dir_tree_find(FIFFB_HPI_RESULT);
     node = hpi[0];
 
-    //    FREE_33(hpi);
     if (hpi.size() > 0 && trans.isEmpty())
         for (k = 0; k < hpi[0]->nent(); k++)
             if (hpi[0]->dir[k]->kind ==  FIFF_COORD_TRANS) {
-                //                if (fiff_read_this_tag (file->fd,this_ent->pos,&tag) == -1)
-                //                    goto bad;
-                //                t = (fiffCoordTrans)tag.data;
                 if (!stream->read_tag(t_pTag,hpi[0]->dir[k]->pos))
                     goto bad;
                 t = FiffCoordTrans::readFromTag( t_pTag );
-                /*
-                    * Require this particular transform!
-                    */
                 if (t.from == FIFFV_COORD_DEVICE && t.to == FIFFV_COORD_HEAD) {
                     trans = t;
-                    //                    tag.data = NULL;
                     break;
                 }
             }
@@ -363,48 +288,38 @@ int MneRawInfo::get_meas_info(FiffStream::SPtr &stream,
         printf ("Not all essential tags were found!");
         goto bad;
     }
-    //    FREE_33(tag.data);
     chp = ch;
     return (0);
 
 bad : {
-        //        FREE_33(tag.data);
         return (-1);
     }
 }
 
 //=============================================================================================================
 
-int MneRawInfo::load(const QString& name, int allow_maxshield, MneRawInfo **infop)
-/*
-          * Load raw data information from a fiff file
-          */
+int MneRawInfo::load(const QString& name, int allow_maxshield, std::unique_ptr<MneRawInfo>& infop)
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
 
-    //    fiffFile       in       = NULL;
-
     int            res      = FIFF_FAIL;
     QList<FiffChInfo> chs;	/* Channel info */
     FiffCoordTrans trans;       /* The coordinate transformation */
-    fiffId         id       = NULL;	/* Measurement id */
+    std::unique_ptr<FiffId> id; /* Measurement id */
     QList<FiffDirEntry::SPtr>   rawDir;	/* Directory of raw data tags */
-    MneRawInfo*    info     = NULL;
+    std::unique_ptr<MneRawInfo> info;
     int            nchan    = 0;		/* Number of channels */
     float          sfreq    = 0.0;	/* Sampling frequency */
     float          highpass;		/* Highpass filter frequency */
     float          lowpass;		/* Lowpass filter frequency */
     FiffDirNode::SPtr    raw;
-    //    FiffDirEntry   one;
     FiffTime*      start_time = NULL;
     int            k;
-    int            maxshield_data = FALSE;
+    int            maxshield_data = false;
     /*
        * Open file
        */
-    //    if ((in = fiff_open(name)) == NULL)
-    //        goto out;
     if(!stream->open())
         goto out;
     raw = find_raw(stream->dirtree());
@@ -415,7 +330,7 @@ int MneRawInfo::load(const QString& name, int allow_maxshield, MneRawInfo **info
                 printf("No raw data in this file.");
                 goto out;
             }
-            maxshield_data = TRUE;
+            maxshield_data = true;
         }
         else {
             printf("No raw data in this file.");
@@ -427,7 +342,7 @@ int MneRawInfo::load(const QString& name, int allow_maxshield, MneRawInfo **info
        */
     if (get_meas_info (stream,
                        raw,
-                       &id,
+                       id,
                        &nchan,
                        &sfreq,
                        &highpass,
@@ -439,13 +354,11 @@ int MneRawInfo::load(const QString& name, int allow_maxshield, MneRawInfo **info
     /*
         * Get the raw directory
         */
-    //    rawDir = MALLOC_33(raw->nent,fiffDirEntryRec);
-    //    memcpy(rawDir,raw->dir,raw->nent*sizeof(fiffDirEntryRec));
     rawDir = raw->dir;
     /*
        * Ready to put everything together
        */
-    info = new MneRawInfo();
+    info = std::make_unique<MneRawInfo>();
     info->filename       = name;
     info->nchan          = nchan;
     info->chInfo         = chs;
@@ -454,14 +367,10 @@ int MneRawInfo::load(const QString& name, int allow_maxshield, MneRawInfo **info
     info->sfreq          = sfreq;
     info->lowpass        = lowpass;
     info->highpass       = highpass;
-    //    info->rawDir         = NULL;
     info->maxshield_data = maxshield_data;
     if (id) {
-        info->id           = MALLOC_33(1,fiffIdRec);
-        *info->id          = *id;
+        info->id = std::make_unique<FiffId>(*id);
     }
-    else
-        info->id           = NULL;
     /*
        * Getting starting time from measurement ID is not too accurate...
        */
@@ -476,11 +385,7 @@ int MneRawInfo::load(const QString& name, int allow_maxshield, MneRawInfo **info
         }
     }
     info->buf_size   = 0;
-    //    for (k = 0, one = raw->dir; k < raw->nent; k++, one++) {
     for (k = 0; k < raw->nent(); k++) {
-        //        raw->dir[k]->kind
-        //                raw->dir[k]->type
-        //                raw->dir[k].size
         if (raw->dir[k]->kind == FIFF_DATA_BUFFER) {
             if (raw->dir[k]->type == FIFFT_DAU_PACK16 || raw->dir[k]->type == FIFFT_SHORT)
                 info->buf_size = raw->dir[k]->size/(nchan*sizeof(fiff_short_t));
@@ -501,16 +406,10 @@ int MneRawInfo::load(const QString& name, int allow_maxshield, MneRawInfo **info
     }
     info->rawDir     = rawDir;
     info->ndir       = raw->nent();
-     *infop = info;
+    infop = std::move(info);
     res = FIFF_OK;
 
 out : {
-        if (res != FIFF_OK) {
-            //            FREE_33(rawDir);
-            FREE_33(info);
-        }
-        FREE_33(id);
-        //        fiff_close(in);
         stream->close();
         return (res);
     }

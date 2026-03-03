@@ -58,6 +58,9 @@
 
 #include <fiff/fiff_sparse_matrix.h>
 
+#include <vector>
+#include <memory>
+
 #include <fiff/fiff_types.h>
 
 //=============================================================================================================
@@ -159,8 +162,7 @@ private:
      */
     void initFwd();
 
-    MNELIB::MneSourceSpaceOld **m_spaces;           /**< Source spaces. */
-    int m_iNSpace;                                  /**< The number of source spaces. */
+    std::vector<std::unique_ptr<MNELIB::MneSourceSpaceOld>> m_spaces;  /**< Source spaces. */
     int m_iNSource;                                 /**< Number of source space points. */
     FwdCoilSet* m_templates;                        /**< The template coil set. */
     FwdCoilSet* m_megcoils;                         /**< The MEG coil set. */

@@ -41,17 +41,6 @@
 
 #include "mne_source_space_old.h"
 
-#define FREE_49(x) if ((char *)(x) != Q_NULLPTR) free((char *)(x))
-#define MALLOC_49(x,t) (t *)malloc((x)*sizeof(t))
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
-
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
@@ -65,35 +54,12 @@ using namespace MNELIB;
 MneSurfacePatch::MneSurfacePatch(int np)
 {
      if (np > 0) {
-       vert = MALLOC_49(np,int);
-       border = MALLOC_49(np,int);
-     }
-     else {
-       vert = Q_NULLPTR;
-       border = Q_NULLPTR;
+       vert   = Eigen::VectorXi::Zero(np);
+       border = Eigen::VectorXi::Zero(np);
      }
      s = std::make_unique<MneSourceSpaceOld>(np);
-     surf_vert = Q_NULLPTR;
-     tri       = Q_NULLPTR;
-     surf_tri  = Q_NULLPTR;
-
-     np_surf = 0;
-     ntri_surf = 0;
-
-     flat  = FALSE;
-     user_data = Q_NULLPTR;
-     user_data_free = Q_NULLPTR;
 }
 
 //=============================================================================================================
 
-MneSurfacePatch::~MneSurfacePatch()
-{
-    FREE_49(vert);
-    FREE_49(border);
-    FREE_49(surf_vert);
-    FREE_49(tri);
-    FREE_49(surf_tri);
-    if (user_data && user_data_free)
-        user_data_free(user_data);
-}
+MneSurfacePatch::~MneSurfacePatch() = default;

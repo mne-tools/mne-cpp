@@ -71,9 +71,13 @@ namespace MNELIB
 
 //=============================================================================================================
 /**
- * Implements the MNE Raw Information (Replaces *mneRawBufDef,mneRawBufDefRec; struct of MNE-C mne_types.h).
+ * @brief Definition of one raw data buffer within a FIFF file.
  *
- * @brief Information about raw data in fiff file
+ * Each MneRawBufDef describes a contiguous chunk of samples, either loaded
+ * from the FIFF file or produced by the overlap-add filter pipeline.
+ * Sample values are stored in a row-major matrix (nchan x ns) that is
+ * managed by an external ring buffer; an empty (0x0) matrix indicates
+ * that the data are not currently resident in memory.
  */
 class MNESHARED_EXPORT MneRawBufDef
 {
@@ -81,27 +85,26 @@ public:
     typedef QSharedPointer<MneRawBufDef> SPtr;              /**< Shared pointer type for MneRawBufDef. */
     typedef QSharedPointer<const MneRawBufDef> ConstSPtr;   /**< Const shared pointer type for MneRawBufDef. */
 
+    /** Row-major float matrix matching the legacy float** memory layout. */
+    using RowMajorMatrixXf = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
+
     //=========================================================================================================
     /**
-     * Constructs the MNE Raw Buffer Definition
-     * Refactored:  (.c)
+     * @brief Default constructor.
      */
     MneRawBufDef();
 
     //=========================================================================================================
     /**
-     * Destroys the MNE Raw Buffer Definition
-     * Refactored:  (.c)
+     * @brief Destructor.
      */
     ~MneRawBufDef();
 
     /**
-     * Frees an array of raw data buffer definitions.
+     * @brief Free an array of raw data buffer definitions.
      *
-     * Iterates through each buffer in the array, freeing the per-channel filter
-     * flags (ch_filtered) and the value pointer array (vals). Note that only the
-     * pointer array for vals is freed, not the underlying data which resides in
-     * a shared ring buffer. Finally, the buffer array itself is freed.
+     * The vals and ch_filtered members are Eigen types that clean up
+     * automatically. This function frees the C-allocated buffer array itself.
      *
      * @param[in] bufs   Pointer to the array of MneRawBufDef structures to free.
      * @param[in] nbuf   Number of buffer definitions in the array.
@@ -115,29 +118,12 @@ public:
     int   ns;               /**< Number of samples (lasts - firsts + 1). */
     int   nchan;            /**< Number of channels. */
     int   is_skip;          /**< Non-zero if this buffer represents a data skip. */
-    float **vals;           /**< Sample values array [nchan x ns] (NULL if not loaded into memory). */
+    RowMajorMatrixXf vals;  /**< Sample values matrix [nchan x ns], row-major (empty if not loaded into memory). */
     int   valid;            /**< Non-zero if the data in this buffer are meaningful. */
-    int   *ch_filtered;     /**< Per-channel flag: has this channel been filtered already (filtered buffers only). */
+    Eigen::VectorXi ch_filtered; /**< Per-channel flag: has this channel been filtered already (filtered buffers only). */
     int   comp_status;      /**< Compensation status for raw buffers. */
-
-//// ### OLD STRUCT ###
-//typedef struct {
-//    FIFFLIB::FiffDirEntry::SPtr ent;    /* Where is this in the file (file bufs only, pointer to info) */
-//    int   firsts,lasts;     /* First and last sample */
-//    int   ntaper;           /* For filtered buffers: taper length */
-//    int   ns;               /* Number of samples (last - first + 1) */
-//    int   nchan;            /* Number of channels */
-//    int   is_skip;          /* Is this a skip? */
-//    float **vals;           /* Values (null if not in memory) */
-//    int   valid;            /* Are the data meaningful? */
-//    int   *ch_filtered;     /* For filtered buffers: has this channel filtered already */
-//    int   comp_status;      /* For raw buffers: compensation status */
-//} *mneRawBufDef,mneRawBufDefRec;
 };
 
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
 } // NAMESPACE MNELIB
 
 #endif // MNERAWBUFDEF_H

@@ -1647,13 +1647,13 @@ void mne_proj_op_report_data_3(QTextStream &out,const char *tag, MneProjOp* op, 
             out << tag << "\n";
         if (tag)
             out << tag;
-        out << "# " << (k+1) << " : " << it->desc << " : " << it->nvec << " vecs : " << it->vecs.ncol << " chs "
+        out << "# " << (k+1) << " : " << it->desc << " : " << it->nvec << " vecs : " << it->vecs->ncol << " chs "
             << (it->has_meg ? "MEG" : "EEG") << " "
             << (it->active ? "active" : "idle") << "\n";
         if (list_data && tag)
             out << tag << "\n";
         if (list_data) {
-            vecs = &op->items[k].vecs;
+            vecs = op->items[k].vecs.get();
 
             for (q = 0; q < vecs->ncol; q++) {
                 out << qSetFieldWidth(10) << Qt::left << vecs->collist[q] << qSetFieldWidth(0);
@@ -1961,11 +1961,11 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
 #endif
     for (k = 0, nvec_meg = nvec_eeg = 0; k < op->nitems; k++) {
         if (op->items[k].active && op->items[k].affect(op->names,op->nch)) {
-            vec.nvec  = op->items[k].vecs.ncol;
-            vec.names = op->items[k].vecs.collist;
+            vec.nvec  = op->items[k].vecs->ncol;
+            vec.names = op->items[k].vecs->collist;
             if (op->items[k].has_meg) {
                 for (p = 0; p < op->items[k].nvec; p++, nvec_meg++) {
-                    vec.data = op->items[k].vecs.data.row(p);
+                    vec.data = op->items[k].vecs->data.row(p);
                     if (mne_pick_from_named_vector_3(&vec,op->names,op->nch,FALSE,mat_meg[nvec_meg]) == FAIL)
                         goto bad;
 #ifdef DEBUG
@@ -1977,7 +1977,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
             }
             else if (op->items[k].has_eeg) {
                 for (p = 0; p < op->items[k].nvec; p++, nvec_eeg++) {
-                    vec.data = op->items[k].vecs.data.row(p);
+                    vec.data = op->items[k].vecs->data.row(p);
                     if (mne_pick_from_named_vector_3(&vec,op->names,op->nch,FALSE,mat_eeg[nvec_eeg]) == FAIL)
                         goto bad;
 #ifdef DEBUG

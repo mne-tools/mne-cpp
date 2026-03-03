@@ -41,7 +41,6 @@
 //=============================================================================================================
 
 #include "mne_global.h"
-#include "mne_types.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -50,6 +49,7 @@
 #include <Eigen/Core>
 
 #include <memory>
+#include <vector>
 
 //=============================================================================================================
 // QT INCLUDES
@@ -62,9 +62,7 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-namespace FIFFLIB {
-    class FiffCoordTransSet;
-}
+
 
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -105,8 +103,6 @@ public:
      */
     ~MneMshDisplaySurfaceSet();
 
-    //============================= display_surfaces.c =============================
-
     /**
      * Load left and right hemisphere FreeSurfer surfaces (with curvature) from
      * the subjects directory, configuring eye positions and lighting.
@@ -117,7 +113,7 @@ public:
      *
      * @return A new display surface set, or NULL on failure. Caller takes ownership.
      */
-    static MneMshDisplaySurfaceSet* load(const QString &subject_id, const QString &surf, const QString &subjects_dir);
+    static std::unique_ptr<MneMshDisplaySurfaceSet> load(const QString &subject_id, const QString &surf, const QString &subjects_dir);
 
     /**
      * Compute and store the axis-aligned bounding box and field-of-view
@@ -126,8 +122,8 @@ public:
      * @param[in, out] surf   The display surface whose extent is computed.
      * @param[in]      tag    Surface name tag (used for logging).
      */
-    static void decide_surface_extent(MneMshDisplaySurface* surf,
-                                                        const char *tag);
+    static void decide_surface_extent(MneMshDisplaySurface& surf,
+                                      const QString& tag);
 
     /**
      * Set the curvature display mode based on the surface type name.
@@ -136,8 +132,8 @@ public:
      * @param[in]      name   Surface type name.
      * @param[in, out] s      The display surface whose curvature mode is set.
      */
-    static void decide_curv_display(const char *name,
-                    MneMshDisplaySurface* s);
+    static void decide_curv_display(const QString& name,
+                                    MneMshDisplaySurface& s);
 
     /**
      * Read a BEM surface from a FIFF file, optionally validate that it is
@@ -151,9 +147,9 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    int add_bem_surface(QString              filepath,
+    int add_bem_surface(const QString&       filepath,
                         int                  kind,
-                        QString              bemname,
+                        const QString&       bemname,
                         int                  full_geom,
                         int                  check);
 
@@ -165,11 +161,9 @@ public:
      * @param[in] replace    If true, replace an existing surface with matching ID.
      * @param[in] drawable   Whether the surface should be marked as drawable.
      */
-    void add_replace_surface(MneMshDisplaySurface*    newSurf,
+    void add_replace_surface(std::unique_ptr<MneMshDisplaySurface> newSurf,
                              bool                  replace,
                              bool                  drawable);
-
-    //============================= vertex_colors.c =============================
 
     /**
      * Allocate and fill per-vertex color arrays using positive/negative
@@ -177,9 +171,7 @@ public:
      *
      * @param[in, out] surf   The display surface whose curvature colors are set up.
      */
-    static void setup_curvature_colors(MneMshDisplaySurface* surf);
-
-    //============================= eyes.c =============================
+    static void setup_curvature_colors(MneMshDisplaySurface& surf);
 
     /**
      * Assign hemisphere-appropriate eye positions and up-vectors to each
@@ -192,8 +184,6 @@ public:
      * regardless of hemisphere.
      */
     void apply_left_eyes();
-
-    //============================= lights.c =============================
 
     /**
      * Initialize the custom light set (if needed) and apply it as the
@@ -210,11 +200,11 @@ public:
     /**
      * Deep-copy a light set including all individual light entries.
      *
-     * @param[in] s   The light set to duplicate (may be NULL).
+     * @param[in] s   The light set to duplicate.
      *
-     * @return A new copy, or NULL if input is NULL. Caller takes ownership.
+     * @return A new deep copy. Caller takes ownership.
      */
-    static MneMshLightSet* dup_light_set(MneMshLightSet* s);
+    static std::unique_ptr<MneMshLightSet> dup_light_set(const MneMshLightSet& s);
 
     /**
      * Replace the current active lighting with a deep copy of the provided
@@ -222,16 +212,14 @@ public:
      *
      * @param[in] set   The light set to apply.
      */
-    void setup_lights(MneMshLightSet* set);
+    void setup_lights(const MneMshLightSet& set);
 
 public:
     QString           subj;	       /**< The name of the subject. */
     QString           morph_subj;       /**< The subject we are morphing to. */
-    FIFFLIB::FiffCoordTransSet     *main_t;            /**< Coordinate transformations for the main surfaces. */
-    FIFFLIB::FiffCoordTransSet     *morph_t;           /**< Coordinate transformations for the morph surfaces. */
-    MneMshDisplaySurface **surfs;	       /**< Array of display surfaces. */
-    MneSurfacePatch   **patches;	       /**< Optional flat patches for display. */
-    float             *patch_rot;	       /**< Rotation angles for the (flat) patches. */
+    std::vector<std::unique_ptr<MneMshDisplaySurface>> surfs; /**< Array of display surfaces (owned). */
+    std::vector<std::unique_ptr<MneSurfacePatch>>  patches;    /**< Optional flat patches for display (owned). */
+    std::vector<float>            patch_rot;            /**< Rotation angles for the (flat) patches. */
     int               nsurf;	       /**< Number of surfaces. */
     int               use_patches;       /**< Whether to use patches for display. */
     Eigen::VectorXi   active;	       /**< Boolean array indicating which surfaces are currently active. */
@@ -245,8 +233,6 @@ public:
     float             up[3];	       /**< Up vector for viewing. */
     float             bg_color[3];       /**< Background color (RGB). */
     float             text_color[3];     /**< Text color (RGB). */
-    void              *user_data;        /**< User-defined data pointer. */
-    mneUserFreeFunc   user_data_free;    /**< Function to free user_data. */
 };
 
 //=============================================================================================================

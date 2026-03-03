@@ -40,27 +40,8 @@
 #include "mne_msh_display_surface.h"
 #include "mne_surface_old.h"
 #include "mne_morph_map.h"
-#include "mne_source_space_old.h"
-
-#define FREE_44(x) if ((char *)(x) != NULL) free((char *)(x))
-
-void mne_free_icmatrix_44 (int **m)
-{
-    if (m) {
-        FREE_44(*m);
-        FREE_44(m);
-    }
-}
-
-#define FREE_ICMATRIX_44(m) mne_free_icmatrix_44((m))
-
-#ifndef TRUE
-#define TRUE 1
-#endif
-
-#ifndef FALSE
-#define FALSE 0
-#endif
+#include "mne_msh_picked.h"
+#include "mne_msh_color_scale_def.h"
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -72,82 +53,13 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneMshDisplaySurface::MneMshDisplaySurface()
-{
-    int c;
-
-    filename = Q_NULLPTR;
-    time_loaded = 0;
-    s = Q_NULLPTR;
-    sketch = FALSE;
-    color_scale    = Q_NULLPTR;
-    vertex_colors  = Q_NULLPTR;
-    nvertex_colors = 3;
-    marker_colors  = Q_NULLPTR;
-    nmarker_colors = 3;
-    overlay_values = Q_NULLPTR;
-    alt_overlay_values = Q_NULLPTR;
-    marker_values      = Q_NULLPTR;
-    marker_tri         = Q_NULLPTR;
-    marker_tri_no      = Q_NULLPTR;
-    nmarker_tri        = 0;
-    subj               = Q_NULLPTR;
-    surf_name          = Q_NULLPTR;
-    rot[0]             = 0.0;
-    rot[1]             = 0.0;
-    rot[2]             = 0.0;
-
-    move[0]            = 0.0;
-    move[1]            = 0.0;
-    move[2]            = 0.0;
-
-    eye[0]             = 1.0;
-    eye[0]             = 0.0;
-    eye[0]             = 0.0;
-
-    up[0]              = 0.0;
-    up[1]              = 0.0;
-    up[2]              = 1.0;
-    fov                = 2.0;
-    fov_scale          = 1.0;
-    for (c = 0; c < 3; c++) {
-      minv[c] = -1.0;
-      maxv[c] = 1.0;
-    }
-    trans          = Q_NULLPTR;
-    transparent    = FALSE;
-    picked         = Q_NULLPTR;
-    npicked        = 0;
-    show_aux_data  = FALSE;
-    user_data      = Q_NULLPTR;
-    user_data_free = Q_NULLPTR;
-    maps = Q_NULLPTR;
-    nmap = 0;
-}
+MneMshDisplaySurface::MneMshDisplaySurface() = default;
 
 //=============================================================================================================
 
 MneMshDisplaySurface::~MneMshDisplaySurface()
 {
-    FREE_44(filename);
-    delete s;
-    FREE_44(marker_values);
-    FREE_44(overlay_values);
-    FREE_44(alt_overlay_values);
-    FREE_44(vertex_colors);
-    FREE_44(marker_colors);
-    FREE_44(color_scale);
-    FREE_ICMATRIX_44(marker_tri);
-    FREE_44(marker_tri_no);
-    FREE_44(subj);
-    FREE_44(surf_name);
-    FREE_44(picked);
     if (user_data_free)
-      (*user_data_free)(user_data);
-
-    for (int k = 0; k < nmap; k++)
-      delete maps[k];
-    FREE_44(maps);
-    FREE_44(trans);
+        user_data_free(user_data);
 }
 

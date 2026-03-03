@@ -247,7 +247,7 @@ MneProjOp *MneProjOp::combine(MneProjOp *from)
     if (from) {
         for (int k = 0; k < from->nitems; k++) {
             const auto& it = from->items[k];
-            add_item(&it.vecs,it.kind,it.desc);
+            add_item(it.vecs.get(),it.kind,it.desc);
             items[nitems-1].active_file = it.active_file;
         }
     }
@@ -265,7 +265,7 @@ void MneProjOp::add_item_active(const MneNamedMatrix *vecs, int kind, const QStr
     auto& new_item = items.back();
 
     new_item.active      = is_active;
-    new_item.vecs        = *vecs;
+    new_item.vecs        = std::make_unique<MneNamedMatrix>(*vecs);
 
     if (kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
         new_item.has_meg = FALSE;
@@ -290,7 +290,7 @@ void MneProjOp::add_item_active(const MneNamedMatrix *vecs, int kind, const QStr
     if (!desc.isEmpty())
         new_item.desc = desc;
     new_item.kind = kind;
-    new_item.nvec = new_item.vecs.nrow;
+    new_item.nvec = new_item.vecs->nrow;
 
     nitems++;
 
@@ -316,7 +316,7 @@ MneProjOp *MneProjOp::dup() const
 
     for (int k = 0; k < nitems; k++) {
         const auto& it = items[k];
-        res->add_item_active(&it.vecs,it.kind,it.desc,it.active);
+        res->add_item_active(it.vecs.get(),it.kind,it.desc,it.active);
         res->items[k].active_file = it.active_file;
     }
     return res;
@@ -628,13 +628,13 @@ void MneProjOp::report_data(QTextStream &out, const char *tag, int list_data, ch
             out << tag << "\n";
         if (tag)
             out << tag;
-        out << "# " << (k+1) << " : " << it.desc << " : " << it.nvec << " vecs : " << it.vecs.ncol << " chs "
+        out << "# " << (k+1) << " : " << it.desc << " : " << it.nvec << " vecs : " << it.vecs->ncol << " chs "
             << (it.has_meg ? "MEG" : "EEG") << " "
             << (it.active ? "active" : "idle") << "\n";
         if (list_data && tag)
             out << tag << "\n";
         if (list_data) {
-            vecs = &items[k].vecs;
+            vecs = items[k].vecs.get();
 
             for (q = 0; q < vecs->ncol; q++) {
                 out << qSetFieldWidth(10) << Qt::left << vecs->collist[q] << qSetFieldWidth(0);
