@@ -81,8 +81,24 @@ public:
      */
     MneMghTagGroup() = default;
 
-    MneMghTagGroup(const MneMghTagGroup&) = delete;
-    MneMghTagGroup& operator=(const MneMghTagGroup&) = delete;
+    MneMghTagGroup(const MneMghTagGroup& other)
+    {
+        tags.reserve(other.tags.size());
+        for (const auto& t : other.tags)
+            tags.push_back(std::make_unique<MneMghTag>(*t));
+    }
+
+    MneMghTagGroup& operator=(const MneMghTagGroup& other)
+    {
+        if (this != &other) {
+            tags.clear();
+            tags.reserve(other.tags.size());
+            for (const auto& t : other.tags)
+                tags.push_back(std::make_unique<MneMghTag>(*t));
+        }
+        return *this;
+    }
+
     MneMghTagGroup(MneMghTagGroup&&) = default;
     MneMghTagGroup& operator=(MneMghTagGroup&&) = default;
 

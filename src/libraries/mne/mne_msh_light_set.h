@@ -80,8 +80,26 @@ public:
      */
     MneMshLightSet() = default;
 
-    MneMshLightSet(const MneMshLightSet&) = delete;
-    MneMshLightSet& operator=(const MneMshLightSet&) = delete;
+    MneMshLightSet(const MneMshLightSet& other)
+        : name(other.name)
+    {
+        lights.reserve(other.lights.size());
+        for (const auto& l : other.lights)
+            lights.push_back(std::make_unique<MneMshLight>(*l));
+    }
+
+    MneMshLightSet& operator=(const MneMshLightSet& other)
+    {
+        if (this != &other) {
+            name = other.name;
+            lights.clear();
+            lights.reserve(other.lights.size());
+            for (const auto& l : other.lights)
+                lights.push_back(std::make_unique<MneMshLight>(*l));
+        }
+        return *this;
+    }
+
     MneMshLightSet(MneMshLightSet&&) = default;
     MneMshLightSet& operator=(MneMshLightSet&&) = default;
 

@@ -30,8 +30,24 @@ public:
     MneEventList() = default;
     ~MneEventList() = default;
 
-    MneEventList(const MneEventList&) = delete;
-    MneEventList& operator=(const MneEventList&) = delete;
+    MneEventList(const MneEventList& other)
+    {
+        events.reserve(other.events.size());
+        for (const auto& e : other.events)
+            events.push_back(std::make_unique<MneEvent>(*e));
+    }
+
+    MneEventList& operator=(const MneEventList& other)
+    {
+        if (this != &other) {
+            events.clear();
+            events.reserve(other.events.size());
+            for (const auto& e : other.events)
+                events.push_back(std::make_unique<MneEvent>(*e));
+        }
+        return *this;
+    }
+
     MneEventList(MneEventList&&) = default;
     MneEventList& operator=(MneEventList&&) = default;
 
