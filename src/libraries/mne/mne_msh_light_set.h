@@ -80,6 +80,11 @@ public:
      */
     MneMshLightSet() = default;
 
+    MneMshLightSet(const MneMshLightSet&) = delete;
+    MneMshLightSet& operator=(const MneMshLightSet&) = delete;
+    MneMshLightSet(MneMshLightSet&&) = default;
+    MneMshLightSet& operator=(MneMshLightSet&&) = default;
+
     //=========================================================================================================
     /**
      * Destructor.

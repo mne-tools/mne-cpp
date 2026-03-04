@@ -30,6 +30,11 @@ public:
     MneEventList() = default;
     ~MneEventList() = default;
 
+    MneEventList(const MneEventList&) = delete;
+    MneEventList& operator=(const MneEventList&) = delete;
+    MneEventList(MneEventList&&) = default;
+    MneEventList& operator=(MneEventList&&) = default;
+
     //=========================================================================================================
     /**
      * @brief Returns the number of events in the list.

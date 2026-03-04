@@ -233,7 +233,7 @@ done
 
 if [ "$RunCodeCoverage" == "true" ]; then
   echo "Generating coverage data..."
-  find ./src/libraries -type f -name "*.cpp" -exec gcov {} + &> /dev/null
+  find ./src/libraries -type f -name "*.cpp" -exec gcov {} + &> /dev/null || true
 fi
 
 exit $CompoundOutput
