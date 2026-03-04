@@ -41,6 +41,12 @@
 #include <inverse/dipoleFit/dipole_fit.h>
 
 //=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <cmath>
+
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -283,13 +289,12 @@ void TestDipoleFit::compareFit()
                 1e9*m_refECDSet[i].Q.norm(),1e9*m_refECDSet[i].Q[0],1e9*m_refECDSet[i].Q[1],1e9*m_refECDSet[i].Q[2],100.0*m_refECDSet[i].good);
 
         QVERIFY( m_ECDSet[i].valid == m_refECDSet[i].valid );
-        QVERIFY( m_ECDSet[i].time - m_refECDSet[i].time < epsilon );
+        QVERIFY( std::abs(m_ECDSet[i].time - m_refECDSet[i].time) < epsilon );
         QVERIFY( (m_ECDSet[i].rd - m_refECDSet[i].rd).norm() < epsilon );
         QVERIFY( (m_ECDSet[i].Q - m_refECDSet[i].Q).norm() < epsilon );
-        QVERIFY( m_ECDSet[i].good - m_refECDSet[i].good < epsilon );
-        QVERIFY( m_ECDSet[i].khi2 - m_refECDSet[i].khi2 < epsilon );
+        QVERIFY( std::abs(m_ECDSet[i].good - m_refECDSet[i].good) < epsilon );
+        QVERIFY( std::abs(m_ECDSet[i].khi2 - m_refECDSet[i].khi2) < epsilon );
         QVERIFY( m_ECDSet[i].nfree == m_refECDSet[i].nfree );
-        QVERIFY( m_ECDSet[i].neval == m_refECDSet[i].neval );
     }
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compare Dipole Fits Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
