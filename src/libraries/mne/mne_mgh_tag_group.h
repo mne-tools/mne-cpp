@@ -81,6 +81,11 @@ public:
      */
     MneMghTagGroup() = default;
 
+    MneMghTagGroup(const MneMghTagGroup&) = delete;
+    MneMghTagGroup& operator=(const MneMghTagGroup&) = delete;
+    MneMghTagGroup(MneMghTagGroup&&) = default;
+    MneMghTagGroup& operator=(MneMghTagGroup&&) = default;
+
     //=========================================================================================================
     /**
      * Destructor.
