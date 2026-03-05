@@ -83,6 +83,27 @@ if %compoundOutput%==0 (
 ECHO ====================================================================
 ECHO.
 
+@REM Re-run failed tests so their output appears at the end of the CI log
+@REM (GitHub Actions truncates long logs, cutting off earlier output)
+if %compoundOutput% neq 0 (
+  ECHO.
+  ECHO ====================================================================
+  ECHO ======= Re-running FAILED tests for diagnostic output =============
+  ECHO ====================================================================
+  cd %binOutputFolder%
+  for /f %%f in ('dir test_*.exe /s /b ') do (
+    for %%s in (!failedTests!) do (
+      if /I "%%~nxf"=="%%s" (
+        ECHO.
+        ECHO ---- Re-running %%~nxf ----
+        %%f
+        ECHO ---- Finished %%~nxf ^(exit code: !errorlevel!^) ----
+      )
+    )
+  )
+  ECHO ====================================================================
+)
+
 exit /B %compoundOutput%
 
 :doPrintConfiguration
@@ -207,6 +228,7 @@ testColumnWidth=60
 printf "%${testColumnWidth}s %s\n" " Test Name " " Result "
 
 CompoundOutput=0
+FailedTestNames=""
 for test in $BasePath/out/${BuildName}/tests/test_*;
 do
   # Run all tests and call gcov on all cpp files after each test run. Then upload to codecov for every test run.
@@ -220,6 +242,7 @@ do
 
   if [ $lastReturnValue -ne 0 ]; then 
     CompoundOutput=$((CompoundOutput + 1))
+    FailedTestNames="$FailedTestNames $(basename $test)"
     printf "%${testColumnWidth}s \e[91m\033[1m %s \033[0m\e[0m\n" "${test}" "Failed!"
     if [ "$ExitOnFirstFail" == "true" ];
     then
@@ -234,6 +257,26 @@ done
 if [ "$RunCodeCoverage" == "true" ]; then
   echo "Generating coverage data..."
   find ./src/libraries -type f -name "*.cpp" -exec gcov {} + &> /dev/null || true
+fi
+
+# Re-run failed tests so their output appears at the end of the CI log
+# (GitHub Actions truncates long logs, cutting off earlier output)
+if [ $CompoundOutput -ne 0 ]; then
+  echo " "
+  echo "===================================================================="
+  echo "======= Re-running FAILED tests for diagnostic output ============="
+  echo "===================================================================="
+  for test in $BasePath/out/${BuildName}/tests/test_*;
+  do
+    testName=$(basename "$test")
+    if echo "$FailedTestNames" | grep -q "$testName"; then
+      echo " "
+      echo "---- Re-running $testName ----"
+      $test
+      echo "---- Finished $testName (exit code: $?) ----"
+    fi
+  done
+  echo "===================================================================="
 fi
 
 exit $CompoundOutput

@@ -105,6 +105,7 @@ void TestDipoleFit::initTestCase()
 
 void TestDipoleFit::dipoleFitSimple()
 {
+    printf("[checkpoint] dipoleFitSimple() entered\n"); fflush(stdout);
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Dipole FitSimple >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     QString refFileName(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref_dip_fit.dat");
@@ -134,37 +135,49 @@ void TestDipoleFit::dipoleFitSimple()
     settings.checkIntegrity();
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Settings Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    fflush(stdout);
 
     //*********************************************************************************************************
     // Compute Dipole Fit
     //*********************************************************************************************************
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    fflush(stdout);
 
+    printf("[checkpoint] Creating DipoleFit (simple)...\n"); fflush(stdout);
     DipoleFit dipFit(&settings);
+    printf("[checkpoint] DipoleFit created, calling calculateFit() (simple)...\n"); fflush(stdout);
     ECDSet set = dipFit.calculateFit();
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute Dipole Fit Finished (simple, set size=%d) <<<<<<<<<<<<<<<<<<<<<<<<<\n", set.size());
+    fflush(stdout);
 
     //*********************************************************************************************************
     // Write Read Dipole Fit
     //*********************************************************************************************************
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Write Read Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    fflush(stdout);
 
     set.save_dipoles_dip(settings.dipname);
+    printf("[checkpoint] dipole file written (simple)\n"); fflush(stdout);
     m_ECDSet = ECDSet::read_dipoles_dip(settings.dipname);
+    printf("[checkpoint] dipole file read back (simple, size=%d)\n", m_ECDSet.size()); fflush(stdout);
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Write Read Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    fflush(stdout);
 
     //*********************************************************************************************************
     // Load reference Dipole Set
     //*********************************************************************************************************
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Load Dipole Fit Reference Set >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    fflush(stdout);
     m_refECDSet = ECDSet::read_dipoles_dip(refFileName);
+    printf("[checkpoint] reference loaded (simple, size=%d)\n", m_refECDSet.size()); fflush(stdout);
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Reference Set Loaded <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    fflush(stdout);
 
     //*********************************************************************************************************
     // Compare Fit
@@ -226,37 +239,49 @@ void TestDipoleFit::dipoleFitAdvanced()
     settings.checkIntegrity();
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Settings Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    fflush(stdout);
 
     //*********************************************************************************************************
     // Compute Dipole Fit
     //*********************************************************************************************************
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    fflush(stdout);
 
+    printf("[checkpoint] Creating DipoleFit (advanced)...\n"); fflush(stdout);
     DipoleFit dipFit(&settings);
+    printf("[checkpoint] DipoleFit created, calling calculateFit() (advanced)...\n"); fflush(stdout);
     ECDSet set = dipFit.calculateFit();
 
-    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute Dipole Fit Finished (advanced, set size=%d) <<<<<<<<<<<<<<<<<<<<<<<<<\n", set.size());
+    fflush(stdout);
 
     //*********************************************************************************************************
     // Write Read Dipole Fit
     //*********************************************************************************************************
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Write Read Dipole Fit >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    fflush(stdout);
 
     set.save_dipoles_dip(settings.dipname);
+    printf("[checkpoint] dipole file written (advanced)\n"); fflush(stdout);
     m_ECDSet = ECDSet::read_dipoles_dip(settings.dipname);
+    printf("[checkpoint] dipole file read back (advanced, size=%d)\n", m_ECDSet.size()); fflush(stdout);
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Write Read Dipole Fit Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    fflush(stdout);
 
     //*********************************************************************************************************
     // Load reference Dipole Set
     //*********************************************************************************************************
 
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Load Dipole Fit Reference Set >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    fflush(stdout);
     m_refECDSet = ECDSet::read_dipoles_dip(refFileName);
+    printf("[checkpoint] reference loaded (advanced, size=%d)\n", m_refECDSet.size()); fflush(stdout);
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Dipole Fit Reference Set Loaded <<<<<<<<<<<<<<<<<<<<<<<<<\n");
+    fflush(stdout);
 
     //*********************************************************************************************************
     // Compare Fit
