@@ -288,6 +288,18 @@ void TestDipoleFit::compareFit()
                 1000*m_refECDSet[i].rd[0],1000*m_refECDSet[i].rd[1],1000*m_refECDSet[i].rd[2],
                 1e9*m_refECDSet[i].Q.norm(),1e9*m_refECDSet[i].Q[0],1e9*m_refECDSet[i].Q[1],1e9*m_refECDSet[i].Q[2],100.0*m_refECDSet[i].good);
 
+        // Verbose diagnostics for CI debugging
+        double dt = std::abs(m_ECDSet[i].time - m_refECDSet[i].time);
+        double drd = (m_ECDSet[i].rd - m_refECDSet[i].rd).norm();
+        double dQ = (m_ECDSet[i].Q - m_refECDSet[i].Q).norm();
+        double dgood = std::abs(m_ECDSet[i].good - m_refECDSet[i].good);
+        double dkhi2 = std::abs(m_ECDSet[i].khi2 - m_refECDSet[i].khi2);
+        printf("  [diag] dipole %d: dt=%.10e drd=%.10e dQ=%.10e dgood=%.10e dkhi2=%.10e nfree=%d/%d valid=%d/%d\n",
+               i, dt, drd, dQ, dgood, dkhi2,
+               m_ECDSet[i].nfree, m_refECDSet[i].nfree,
+               m_ECDSet[i].valid, m_refECDSet[i].valid);
+        fflush(stdout);
+
         QVERIFY( m_ECDSet[i].valid == m_refECDSet[i].valid );
         QVERIFY( std::abs(m_ECDSet[i].time - m_refECDSet[i].time) < epsilon );
         QVERIFY( (m_ECDSet[i].rd - m_refECDSet[i].rd).norm() < epsilon );
