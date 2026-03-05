@@ -103,13 +103,18 @@ void TestMneForwardSolution::initTestCase()
 
 void TestMneForwardSolution::computeForward()
 {
+    printf("[checkpoint] computeForward() entered\n"); fflush(stdout);
+
     // Compute and Write Forward Solution
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute/Write/Read MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     // Read reference forward solution
+    printf("[checkpoint] Reading reference forward solution...\n"); fflush(stdout);
     QString fwdMEGEEGFileRef(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
     QFile fileFwdMEGEEGRef(fwdMEGEEGFileRef);
+    printf("[checkpoint] ref file exists: %d path: %s\n", fileFwdMEGEEGRef.exists() ? 1 : 0, fwdMEGEEGFileRef.toUtf8().constData()); fflush(stdout);
     m_pFwdMEGEEGRef = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(fileFwdMEGEEGRef));
+    printf("[checkpoint] Reference forward solution read (nchan=%d nsource=%d)\n", m_pFwdMEGEEGRef->nchan, m_pFwdMEGEEGRef->nsource); fflush(stdout);
 
     //Following is equivalent to:
     //mne_forward_solution
@@ -142,13 +147,18 @@ void TestMneForwardSolution::computeForward()
     pSettingsMEGEEG->pFiffInfo = pFiffInfo;
     pSettingsMEGEEG->checkIntegrity();
 
+    printf("[checkpoint] Creating ComputeFwd...\n"); fflush(stdout);
     QSharedPointer<ComputeFwd> pFwdMEGEEGComputed = QSharedPointer<ComputeFwd>(new ComputeFwd(pSettingsMEGEEG));
+    printf("[checkpoint] calculateFwd()...\n"); fflush(stdout);
     pFwdMEGEEGComputed->calculateFwd();
 
     // recalculate with same meg_head_t to check that we still get the same result
+    printf("[checkpoint] updateHeadPos()...\n"); fflush(stdout);
     pFwdMEGEEGComputed->updateHeadPos(pFiffInfo->dev_head_t);
 
+    printf("[checkpoint] storeFwd()...\n"); fflush(stdout);
     pFwdMEGEEGComputed->storeFwd();
+    printf("[checkpoint] storeFwd() done\n"); fflush(stdout);
 
     // Read newly created fwd
     QFile fileFwdMEGEEGRead(pSettingsMEGEEG->solname);
