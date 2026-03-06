@@ -103,18 +103,13 @@ void TestMneForwardSolution::initTestCase()
 
 void TestMneForwardSolution::computeForward()
 {
-    printf("[checkpoint] computeForward() entered\n"); fflush(stdout);
-
     // Compute and Write Forward Solution
     printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compute/Write/Read MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>\n");
 
     // Read reference forward solution
-    printf("[checkpoint] Reading reference forward solution...\n"); fflush(stdout);
     QString fwdMEGEEGFileRef(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/ref-sample_audvis-meg-eeg-oct-6-fwd.fif");
     QFile fileFwdMEGEEGRef(fwdMEGEEGFileRef);
-    printf("[checkpoint] ref file exists: %d path: %s\n", fileFwdMEGEEGRef.exists() ? 1 : 0, fwdMEGEEGFileRef.toUtf8().constData()); fflush(stdout);
     m_pFwdMEGEEGRef = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(fileFwdMEGEEGRef));
-    printf("[checkpoint] Reference forward solution read (nchan=%d nsource=%d)\n", m_pFwdMEGEEGRef->nchan, m_pFwdMEGEEGRef->nsource); fflush(stdout);
 
     //Following is equivalent to:
     //mne_forward_solution
@@ -147,18 +142,13 @@ void TestMneForwardSolution::computeForward()
     pSettingsMEGEEG->pFiffInfo = pFiffInfo;
     pSettingsMEGEEG->checkIntegrity();
 
-    printf("[checkpoint] Creating ComputeFwd...\n"); fflush(stdout);
     QSharedPointer<ComputeFwd> pFwdMEGEEGComputed = QSharedPointer<ComputeFwd>(new ComputeFwd(pSettingsMEGEEG));
-    printf("[checkpoint] calculateFwd()...\n"); fflush(stdout);
     pFwdMEGEEGComputed->calculateFwd();
 
     // recalculate with same meg_head_t to check that we still get the same result
-    printf("[checkpoint] updateHeadPos()...\n"); fflush(stdout);
     pFwdMEGEEGComputed->updateHeadPos(pFiffInfo->dev_head_t);
 
-    printf("[checkpoint] storeFwd()...\n"); fflush(stdout);
     pFwdMEGEEGComputed->storeFwd();
-    printf("[checkpoint] storeFwd() done\n"); fflush(stdout);
 
     // Read newly created fwd
     QFile fileFwdMEGEEGRead(pSettingsMEGEEG->solname);
@@ -169,77 +159,38 @@ void TestMneForwardSolution::computeForward()
     // The following verifies the forward solution round-trip:
     // compute -> write -> read-back must reproduce the same solution
 
-    // --- Verbose diagnostics for CI debugging ---
-    printf("[diag] source_ori: read=%d ref=%d\n", m_pFwdMEGEEGRead->source_ori, m_pFwdMEGEEGRef->source_ori);
-    printf("[diag] surf_ori: read=%d ref=%d\n", m_pFwdMEGEEGRead->surf_ori ? 1 : 0, m_pFwdMEGEEGRef->surf_ori ? 1 : 0);
-    printf("[diag] coord_frame: read=%d ref=%d\n", m_pFwdMEGEEGRead->coord_frame, m_pFwdMEGEEGRef->coord_frame);
-    printf("[diag] nsource: read=%d ref=%d\n", m_pFwdMEGEEGRead->nsource, m_pFwdMEGEEGRef->nsource);
-    printf("[diag] nchan: read=%d ref=%d\n", m_pFwdMEGEEGRead->nchan, m_pFwdMEGEEGRef->nchan);
-    printf("[diag] sol nrow: read=%d ref=%d\n", m_pFwdMEGEEGRead->sol->nrow, m_pFwdMEGEEGRef->sol->nrow);
-    printf("[diag] sol ncol: read=%d ref=%d\n", m_pFwdMEGEEGRead->sol->ncol, m_pFwdMEGEEGRef->sol->ncol);
-    printf("[diag] sol row_names match: %d\n", m_pFwdMEGEEGRead->sol->row_names == m_pFwdMEGEEGRef->sol->row_names ? 1 : 0);
-    printf("[diag] sol col_names match: %d\n", m_pFwdMEGEEGRead->sol->col_names == m_pFwdMEGEEGRef->sol->col_names ? 1 : 0);
-    printf("[diag] mri_head_t match: %d\n", (m_pFwdMEGEEGRead->mri_head_t == m_pFwdMEGEEGRef->mri_head_t) ? 1 : 0);
-    printf("[diag] source_rr isApprox: %d\n", m_pFwdMEGEEGRead->source_rr.isApprox(m_pFwdMEGEEGRef->source_rr, 1e-4f) ? 1 : 0);
-    printf("[diag] source_nn isApprox: %d\n", m_pFwdMEGEEGRead->source_nn.isApprox(m_pFwdMEGEEGRef->source_nn, 1e-4f) ? 1 : 0);
-    printf("[diag] sol_grad read nrow=%d ref nrow=%d\n", m_pFwdMEGEEGRead->sol_grad->nrow, m_pFwdMEGEEGRef->sol_grad->nrow);
-    fflush(stdout);
-
-    // --- FiffInfoBase comparison with per-field diagnostics ---
-    {
-        const auto& infoR = m_pFwdMEGEEGRead->info;
-        const auto& infoF = m_pFwdMEGEEGRef->info;
-        printf("[diag] info.filename match: %d ('%s' vs '%s')\n",
-               infoR.filename == infoF.filename ? 1 : 0,
-               infoR.filename.toUtf8().constData(), infoF.filename.toUtf8().constData());
-        printf("[diag] info.bads match: %d (read=%lld ref=%lld)\n",
-               infoR.bads == infoF.bads ? 1 : 0, (long long)infoR.bads.size(), (long long)infoF.bads.size());
-        printf("[diag] info.nchan: read=%d ref=%d\n", infoR.nchan, infoF.nchan);
-        printf("[diag] info.ch_names match: %d\n", infoR.ch_names == infoF.ch_names ? 1 : 0);
-        printf("[diag] info.dev_head_t match: %d\n", (infoR.dev_head_t == infoF.dev_head_t) ? 1 : 0);
-        printf("[diag] info.ctf_head_t match: %d\n", (infoR.ctf_head_t == infoF.ctf_head_t) ? 1 : 0);
-        printf("[diag] info.chs.size: read=%lld ref=%lld\n", (long long)infoR.chs.size(), (long long)infoF.chs.size());
-        int nChMatch = qMin(infoR.chs.size(), infoF.chs.size());
-        for (int c = 0; c < nChMatch; ++c) {
-            if (!(infoR.chs[c] == infoF.chs[c])) {
-                const auto& a = infoR.chs[c];
-                const auto& b = infoF.chs[c];
-                printf("[diag] info.chs[%d] MISMATCH: scanNo=%d/%d logNo=%d/%d kind=%d/%d "
-                       "range=%g/%g cal=%g/%g chpos=%d unit=%d/%d unit_mul=%d/%d "
-                       "ch_name='%s'/'%s' coord_frame=%d/%d\n",
-                       c, a.scanNo, b.scanNo, a.logNo, b.logNo, a.kind, b.kind,
-                       a.range, b.range, a.cal, b.cal,
-                       (a.chpos == b.chpos) ? 1 : 0,
-                       a.unit, b.unit, a.unit_mul, b.unit_mul,
-                       a.ch_name.toUtf8().constData(), b.ch_name.toUtf8().constData(),
-                       a.coord_frame, b.coord_frame);
-                printf("[diag]   coil_trans isApprox: %d  eeg_loc isApprox: %d\n",
-                       a.coil_trans.isApprox(b.coil_trans, 0.0001f) ? 1 : 0,
-                       a.eeg_loc.isApprox(b.eeg_loc, 0.0001f) ? 1 : 0);
-                if (!a.eeg_loc.isApprox(b.eeg_loc, 0.0001f)) {
-                    printf("[diag]   eeg_loc read:\n");
-                    for (int rr = 0; rr < 3; ++rr)
-                        printf("[diag]     %g %g\n", a.eeg_loc(rr,0), a.eeg_loc(rr,1));
-                    printf("[diag]   eeg_loc ref:\n");
-                    for (int rr = 0; rr < 3; ++rr)
-                        printf("[diag]     %g %g\n", b.eeg_loc(rr,0), b.eeg_loc(rr,1));
-                }
-                if (!a.coil_trans.isApprox(b.coil_trans, 0.0001f)) {
-                    printf("[diag]   coil_trans read row0: %g %g %g %g\n",
-                           a.coil_trans(0,0), a.coil_trans(0,1), a.coil_trans(0,2), a.coil_trans(0,3));
-                    printf("[diag]   coil_trans ref  row0: %g %g %g %g\n",
-                           b.coil_trans(0,0), b.coil_trans(0,1), b.coil_trans(0,2), b.coil_trans(0,3));
-                }
-                fflush(stdout);
-                // Only log first 5 mismatches to avoid flooding
-                if (c >= 4) { printf("[diag] ... (further ch mismatches suppressed)\n"); break; }
-            }
-        }
-        printf("[diag] info == match: %d\n", (infoR == infoF) ? 1 : 0);
-        fflush(stdout);
+    // Compare FiffInfoBase fields individually.
+    // We skip FiffChInfo::range because the reference was generated from the
+    // full sample_audvis_raw.fif (range=0.000305176) while the test uses the
+    // truncated sample_audvis_trunc_raw.fif (range=1.0, default).
+    // Note: the old FiffChInfo::operator== had a comma-operator bug that
+    // silently skipped range comparison anyway, so this maintains the same
+    // effective precision as before the bug fix.
+    QVERIFY(m_pFwdMEGEEGRead->info.bads == m_pFwdMEGEEGRef->info.bads);
+    QVERIFY(m_pFwdMEGEEGRead->info.nchan == m_pFwdMEGEEGRef->info.nchan);
+    QVERIFY(m_pFwdMEGEEGRead->info.ch_names == m_pFwdMEGEEGRef->info.ch_names);
+    QVERIFY(m_pFwdMEGEEGRead->info.dev_head_t == m_pFwdMEGEEGRef->info.dev_head_t);
+    QVERIFY(m_pFwdMEGEEGRead->info.ctf_head_t == m_pFwdMEGEEGRef->info.ctf_head_t);
+    QVERIFY(m_pFwdMEGEEGRead->info.chs.size() == m_pFwdMEGEEGRef->info.chs.size());
+    for (int i = 0; i < m_pFwdMEGEEGRead->info.chs.size(); ++i) {
+        const auto &a = m_pFwdMEGEEGRead->info.chs[i];
+        const auto &b = m_pFwdMEGEEGRef->info.chs[i];
+        // Skip scanNo: EEG channels have different sequential scan numbers
+        // because the full raw file has extra channels not in the truncated file.
+        // Skip range: the truncated raw file has range=1.0 (default) while the
+        // reference was generated from the full raw file (range=0.000305176).
+        // Both fields were never compared before (comma-operator bug in the old
+        // FiffChInfo::operator== meant only coord_frame was checked).
+        QVERIFY(a.logNo == b.logNo);
+        QVERIFY(a.kind == b.kind);
+        QVERIFY(a.cal == b.cal);
+        QVERIFY(a.chpos == b.chpos);
+        QVERIFY(a.unit == b.unit);
+        QVERIFY(a.unit_mul == b.unit_mul);
+        QVERIFY(a.coil_trans.isApprox(b.coil_trans, 0.0001f));
+        QVERIFY(a.eeg_loc.isApprox(b.eeg_loc, 0.0001f));
+        QVERIFY(a.coord_frame == b.coord_frame);
     }
-
-    QVERIFY(m_pFwdMEGEEGRead->info == m_pFwdMEGEEGRef->info);
     QVERIFY(m_pFwdMEGEEGRead->source_ori == m_pFwdMEGEEGRef->source_ori);
     QVERIFY(m_pFwdMEGEEGRead->surf_ori == m_pFwdMEGEEGRef->surf_ori);
     QVERIFY(m_pFwdMEGEEGRead->coord_frame == m_pFwdMEGEEGRef->coord_frame);
@@ -252,22 +203,12 @@ void TestMneForwardSolution::computeForward()
     QVERIFY(m_pFwdMEGEEGRead->sol->row_names == m_pFwdMEGEEGRef->sol->row_names);
     QVERIFY(m_pFwdMEGEEGRead->sol->col_names == m_pFwdMEGEEGRef->sol->col_names);
     for (Eigen::Index r = 0; r < m_pFwdMEGEEGRead->sol->data.rows(); ++r) {
-        if (!m_pFwdMEGEEGRead->sol->data.row(r).isApprox(m_pFwdMEGEEGRef->sol->data.row(r), 0.0001)) {
-            printf("[diag] sol->data row %lld MISMATCH (maxCoeff diff = %g)\n",
-                   (long long)r,
-                   (m_pFwdMEGEEGRead->sol->data.row(r) - m_pFwdMEGEEGRef->sol->data.row(r)).cwiseAbs().maxCoeff());
-            fflush(stdout);
-        }
         QVERIFY(m_pFwdMEGEEGRead->sol->data.row(r).isApprox(m_pFwdMEGEEGRef->sol->data.row(r), 0.0001));
     }
 
     // sol_grad may not be present in the forward solution files
     if (m_pFwdMEGEEGRead->sol_grad->nrow > 0 && m_pFwdMEGEEGRef->sol_grad->nrow > 0) {
         for (Eigen::Index r = 0; r < m_pFwdMEGEEGRead->sol_grad->data.rows(); ++r) {
-            if (!m_pFwdMEGEEGRead->sol_grad->data.row(r).isApprox(m_pFwdMEGEEGRef->sol_grad->data.row(r), 0.0001)) {
-                printf("[diag] sol_grad->data row %lld MISMATCH\n", (long long)r);
-                fflush(stdout);
-            }
             QVERIFY(m_pFwdMEGEEGRead->sol_grad->data.row(r).isApprox(m_pFwdMEGEEGRef->sol_grad->data.row(r), 0.0001));
         }
     }
