@@ -233,6 +233,15 @@ int FwdCompData::fwd_make_ctf_comp_coils(MneCTFCompDataSet *set,
     FwdCoil* coil;
     int k,res;
 
+    if (!set) {
+        /*
+         * No compensation data available.
+         * The original C code (mne_make_ctf_comp) handled NULL gracefully
+         * because it was a free function. Now that make_comp is a member
+         * function we must guard against NULL here.
+         */
+        return OK;
+    }
     if (!coils || coils->ncoil <= 0) {
         printf("Coil data missing in fwd_make_ctf_comp_coils");
         return FAIL;
