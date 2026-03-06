@@ -17,6 +17,13 @@ EvokedFile="${SampleDir}/sample_audvis-ave.fif"
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 BuildPath="$SCRIPT_DIR/../../../out/Release/apps/mne_inspect"
 
+# Set Qt plugin path so the platform plugin (cocoa) can be found at runtime.
+# Adjust QT_BASE if your Qt installation lives elsewhere.
+QT_BASE="${QT_BASE:-$HOME/Qt/6.10.2/macos}"
+if [ -d "$QT_BASE/plugins" ]; then
+    export QT_PLUGIN_PATH="$QT_BASE/plugins"
+fi
+
 # Kill any existing instances
 pkill -f mne_inspect || true
 
