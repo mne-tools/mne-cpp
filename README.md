@@ -35,7 +35,7 @@ For IDE discovery and manual builds, configure from the repository root:
 
 `cmake -S . -B build`
 
-For more in depth information on how to compile the project, please follow the [build guide](https://mne-cpp.github.io/pages/development/buildguide.html). The minimum requirements to build MNE-CPP are:
+For more in depth information on how to compile the project, please follow the [build guide](https://mne-cpp.github.io/docs/development/buildguide-cmake). The minimum requirements to build MNE-CPP are:
 
   * Compiler
     * Windows - [MSVC 2022](https://visualstudio.microsoft.com/vs/) or later
@@ -48,17 +48,17 @@ For more in depth information on how to compile the project, please follow the [
 Releases
 --------
 
-Release binaries for Windows, Mac and Linux are available [here](https://mne-cpp.github.io/pages/download/download.html).
+Release binaries for Windows, Mac and Linux are available [here](https://mne-cpp.github.io/download).
 
 Get involved
 ------------
 
-If you want to contribute to MNE-CPP you can find all necessary information [here](https://mne-cpp.github.io/pages/development/contribute.html).
+If you want to contribute to MNE-CPP you can find all necessary information [here](https://mne-cpp.github.io/docs/development/contribute).
 
 Contact
 -------
 
-A list of contact persons can be found [here](https://mne-cpp.github.io/contact.html).
+A list of contact persons can be found [here](https://mne-cpp.github.io/docs/overview#contact).
 
 License
 -------
