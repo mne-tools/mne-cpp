@@ -1440,59 +1440,14 @@ bool write_solution(const QString& name,         /* Destination file */
         int nchan = nmeg+neeg;
         t_pStream->write_int(FIFF_NCHAN,&nchan);
 
-        FiffChInfo chInfo;
         int k, p;
         for (k = 0, p = 0; k < nmeg; k++) {
-//            meg_chs[k].scanNo = ++p;
-//            chInfo.scanNo = meg_chs[k].scanNo;
-//            chInfo.logNo = meg_chs[k].logNo;
-//            chInfo.kind = meg_chs[k].kind;
-//            chInfo.range = meg_chs[k].range;
-//            chInfo.cal = meg_chs[k].cal;
-//            chInfo.chpos.coil_type = meg_chs[k].chpos.coil_type;
-//            chInfo.chpos.r0[0] = meg_chs[k].chpos.r0[0];
-//            chInfo.chpos.r0[1] = meg_chs[k].chpos.r0[1];
-//            chInfo.chpos.r0[2] = meg_chs[k].chpos.r0[2];
-//            chInfo.chpos.ex[0] = meg_chs[k].chpos.ex[0];
-//            chInfo.chpos.ex[1] = meg_chs[k].chpos.ex[1];
-//            chInfo.chpos.ex[2] = meg_chs[k].chpos.ex[2];
-//            chInfo.chpos.ey[0] = meg_chs[k].chpos.ey[0];
-//            chInfo.chpos.ey[1] = meg_chs[k].chpos.ey[1];
-//            chInfo.chpos.ey[2] = meg_chs[k].chpos.ey[2];
-//            chInfo.chpos.ez[0] = meg_chs[k].chpos.ez[0];
-//            chInfo.chpos.ez[1] = meg_chs[k].chpos.ez[1];
-//            chInfo.chpos.ez[2] = meg_chs[k].chpos.ez[2];
-//            chInfo.unit = meg_chs[k].unit;
-//            chInfo.unit_mul = meg_chs[k].unit_mul;
-//            chInfo.ch_name = QString(meg_chs[k].ch_name);
-
+            meg_chs[k].scanNo = ++p;
             t_pStream->write_ch_info(meg_chs[k]);
         }
 
         for (k = 0; k < neeg; k++) {
-//            eeg_chs[k].scanNo = ++p;
-//            chInfo.scanNo = eeg_chs[k].scanNo;
-//            chInfo.logNo = eeg_chs[k].logNo;
-//            chInfo.kind = eeg_chs[k].kind;
-//            chInfo.range = eeg_chs[k].range;
-//            chInfo.cal = eeg_chs[k].cal;
-//            chInfo.chpos.coil_type = eeg_chs[k].chpos.coil_type;
-//            chInfo.chpos.r0[0] = eeg_chs[k].chpos.r0[0];
-//            chInfo.chpos.r0[1] = eeg_chs[k].chpos.r0[1];
-//            chInfo.chpos.r0[2] = eeg_chs[k].chpos.r0[2];
-//            chInfo.chpos.ex[0] = eeg_chs[k].chpos.ex[0];
-//            chInfo.chpos.ex[1] = eeg_chs[k].chpos.ex[1];
-//            chInfo.chpos.ex[2] = eeg_chs[k].chpos.ex[2];
-//            chInfo.chpos.ey[0] = eeg_chs[k].chpos.ey[0];
-//            chInfo.chpos.ey[1] = eeg_chs[k].chpos.ey[1];
-//            chInfo.chpos.ey[2] = eeg_chs[k].chpos.ey[2];
-//            chInfo.chpos.ez[0] = eeg_chs[k].chpos.ez[0];
-//            chInfo.chpos.ez[1] = eeg_chs[k].chpos.ez[1];
-//            chInfo.chpos.ez[2] = eeg_chs[k].chpos.ez[2];
-//            chInfo.unit = eeg_chs[k].unit;
-//            chInfo.unit_mul = eeg_chs[k].unit_mul;
-//            chInfo.ch_name = QString(eeg_chs[k].ch_name);
-
+            eeg_chs[k].scanNo = ++p;
             t_pStream->write_ch_info(eeg_chs[k]);
         }
         /*

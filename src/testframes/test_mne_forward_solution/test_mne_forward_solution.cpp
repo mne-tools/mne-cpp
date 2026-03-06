@@ -155,42 +155,11 @@ void TestMneForwardSolution::computeForward()
     m_pFwdMEGEEGRead = QSharedPointer<MNEForwardSolution>(new MNEForwardSolution(fileFwdMEGEEGRead));
 
     printf("<<<<<<<<<<<<<<<<<<<<<<<<< Compute/Write/Read MEG/EEG Forward Solution Finished <<<<<<<<<<<<<<<<<<<<<<<<<\n");
-    printf(">>>>>>>>>>>>>>>>>>>>>>>>> Compare MEG/EEG Forward Solution >>>>>>>>>>>>>>>>>>>>>>>>>\n");
+
     // The following verifies the forward solution round-trip:
     // compute -> write -> read-back must reproduce the same solution
 
-    // Compare FiffInfoBase fields individually.
-    // We skip FiffChInfo::range because the reference was generated from the
-    // full sample_audvis_raw.fif (range=0.000305176) while the test uses the
-    // truncated sample_audvis_trunc_raw.fif (range=1.0, default).
-    // Note: the old FiffChInfo::operator== had a comma-operator bug that
-    // silently skipped range comparison anyway, so this maintains the same
-    // effective precision as before the bug fix.
-    QVERIFY(m_pFwdMEGEEGRead->info.bads == m_pFwdMEGEEGRef->info.bads);
-    QVERIFY(m_pFwdMEGEEGRead->info.nchan == m_pFwdMEGEEGRef->info.nchan);
-    QVERIFY(m_pFwdMEGEEGRead->info.ch_names == m_pFwdMEGEEGRef->info.ch_names);
-    QVERIFY(m_pFwdMEGEEGRead->info.dev_head_t == m_pFwdMEGEEGRef->info.dev_head_t);
-    QVERIFY(m_pFwdMEGEEGRead->info.ctf_head_t == m_pFwdMEGEEGRef->info.ctf_head_t);
-    QVERIFY(m_pFwdMEGEEGRead->info.chs.size() == m_pFwdMEGEEGRef->info.chs.size());
-    for (int i = 0; i < m_pFwdMEGEEGRead->info.chs.size(); ++i) {
-        const auto &a = m_pFwdMEGEEGRead->info.chs[i];
-        const auto &b = m_pFwdMEGEEGRef->info.chs[i];
-        // Skip scanNo: EEG channels have different sequential scan numbers
-        // because the full raw file has extra channels not in the truncated file.
-        // Skip range: the truncated raw file has range=1.0 (default) while the
-        // reference was generated from the full raw file (range=0.000305176).
-        // Both fields were never compared before (comma-operator bug in the old
-        // FiffChInfo::operator== meant only coord_frame was checked).
-        QVERIFY(a.logNo == b.logNo);
-        QVERIFY(a.kind == b.kind);
-        QVERIFY(a.cal == b.cal);
-        QVERIFY(a.chpos == b.chpos);
-        QVERIFY(a.unit == b.unit);
-        QVERIFY(a.unit_mul == b.unit_mul);
-        QVERIFY(a.coil_trans.isApprox(b.coil_trans, 0.0001f));
-        QVERIFY(a.eeg_loc.isApprox(b.eeg_loc, 0.0001f));
-        QVERIFY(a.coord_frame == b.coord_frame);
-    }
+    QVERIFY(m_pFwdMEGEEGRead->info == m_pFwdMEGEEGRef->info);
     QVERIFY(m_pFwdMEGEEGRead->source_ori == m_pFwdMEGEEGRef->source_ori);
     QVERIFY(m_pFwdMEGEEGRead->surf_ori == m_pFwdMEGEEGRef->surf_ori);
     QVERIFY(m_pFwdMEGEEGRead->coord_frame == m_pFwdMEGEEGRef->coord_frame);
