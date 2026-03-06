@@ -24,31 +24,30 @@
 
 -----------------
 
-MNE-CPP is an open-source software framework which offers a variety of neuroscientific tools. It provides a cross-platform library, which allows to build standalone applications for the acquisition and processing of MEG/EEG data, both in real-time and offline. For more information and documentation please visit https://mne-cpp.github.io/.
+MNE-CPP is an open-source, cross-platform C++ framework for real-time and offline processing of MEG, EEG, and related neurophysiological data. It provides modular libraries for building standalone acquisition and analysis applications. For more information and documentation please visit https://mne-cpp.github.io/.
 
 Build from source
 -----------------
 
-`tools/build_project.bat` builds the project for Windows, Linux, and MacOS.
+`tools/build_project.bat` builds the project for Windows, Linux, and macOS.
 
 For IDE discovery and manual builds, configure from the repository root:
 
 `cmake -S . -B build`
 
-For more in depth information on how to compile the project, please follow the [build guide](https://mne-cpp.github.io/docs/development/buildguide-cmake). The minimum requirements to build MNE-CPP are:
+For more in-depth information on how to compile the project, please follow the [build guide](https://mne-cpp.github.io/docs/development/buildguide-cmake). The minimum requirements to build MNE-CPP are:
 
   * Compiler
     * Windows - [MSVC 2022](https://visualstudio.microsoft.com/vs/) or later
     * Linux - [GCC 13](https://gcc.gnu.org/releases.html) or later
-    * MacOS - [Clang 14](https://developer.apple.com/xcode/) or later
+    * macOS - [Apple Clang (Xcode)](https://developer.apple.com/xcode/)
   * External dependencies
     * [Qt 6.10](https://www.qt.io/) or later
-    * [Python 3.10](https://www.python.org/) or later
 
 Releases
 --------
 
-Release binaries for Windows, Mac and Linux are available [here](https://mne-cpp.github.io/download).
+Release binaries for Windows, macOS, and Linux are available [here](https://mne-cpp.github.io/download).
 
 Get involved
 ------------
@@ -63,7 +62,7 @@ A list of contact persons can be found [here](https://mne-cpp.github.io/docs/ove
 License
 -------
 
-MNE-CPP is **BSD-licenced** (3 clause):
+MNE-CPP is **BSD-licensed** (3-clause):
 
     Copyright (c) 2011-2026, authors of MNE-CPP. All rights reserved.
 
