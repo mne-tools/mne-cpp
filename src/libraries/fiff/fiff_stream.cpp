@@ -903,6 +903,10 @@ bool FiffStream::read_meas_info_base(const FiffDirNode::SPtr& p_Node, FiffInfoBa
     //   Add the channel information and make a list of channel names
     //   for convenience
     //
+    if (!chs.isEmpty()) {
+        fprintf(stderr, "[diag-range] read_meas_info_base chs[0].ch_name=%s range=%g cal=%g\n",
+                chs[0].ch_name.toUtf8().constData(), chs[0].range, chs[0].cal);
+    }
     p_InfoForward.chs = chs;
     for (qint32 c = 0; c < p_InfoForward.chs.size(); ++c)
         p_InfoForward.ch_names << p_InfoForward.chs[c].ch_name;
@@ -2226,6 +2230,12 @@ fiff_long_t FiffStream::write_tag(const QSharedPointer<FiffTag> &p_pTag, fiff_lo
 
 fiff_long_t FiffStream::write_ch_info(const FiffChInfo& ch)
 {
+    static int s_writeChInfoCount = 0;
+    if (s_writeChInfoCount < 2) {
+        fprintf(stderr, "[diag-range] write_ch_info #%d ch=%s range=%g cal=%g\n",
+                s_writeChInfoCount, ch.ch_name.toUtf8().constData(), ch.range, ch.cal);
+    }
+    s_writeChInfoCount++;
     fiff_long_t pos = this->device()->pos();
 
     //typedef struct _fiffChPosRec {

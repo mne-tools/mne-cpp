@@ -1953,6 +1953,15 @@ void ComputeFwd::initFwd()
 
     m_iNChan = iNMeg + iNEeg;
 
+    if (!m_listMegChs.isEmpty()) {
+        fprintf(stderr, "[diag-range] initFwd m_listMegChs[0].range = %g, ch_name = %s\n",
+                m_listMegChs[0].range, m_listMegChs[0].ch_name.toUtf8().constData());
+    }
+    if (m_pInfoBase && !m_pInfoBase->chs.isEmpty()) {
+        fprintf(stderr, "[diag-range] initFwd m_pInfoBase->chs[0].range = %g, ch_name = %s\n",
+                m_pInfoBase->chs[0].range, m_pInfoBase->chs[0].ch_name.toUtf8().constData());
+    }
+
     printf("\n");
     if (iNMeg > 0) {
         printf("Read %3d MEG channels from %s\n",iNMeg,m_pSettings->measname.toUtf8().constData());
@@ -2325,6 +2334,14 @@ void ComputeFwd::storeFwd(const QString& sSolName)
 
     fprintf(stderr, "[storeFwd] iNMeg=%d, iNEeg=%d, m_listMegChs.size=%lld, m_listEegChs.size=%lld\n",
            iNMeg, iNEeg, (long long)m_listMegChs.size(), (long long)m_listEegChs.size());
+    if (!m_listMegChs.isEmpty()) {
+        fprintf(stderr, "[diag-range] storeFwd m_listMegChs[0].range = %g, ch_name = %s\n",
+                m_listMegChs[0].range, m_listMegChs[0].ch_name.toUtf8().constData());
+    }
+    if (!m_listEegChs.isEmpty()) {
+        fprintf(stderr, "[diag-range] storeFwd m_listEegChs[0].range = %g, ch_name = %s\n",
+                m_listEegChs[0].range, m_listEegChs[0].ch_name.toUtf8().constData());
+    }
 
     QString sName;
 
