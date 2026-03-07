@@ -904,7 +904,8 @@ bool FiffStream::read_meas_info_base(const FiffDirNode::SPtr& p_Node, FiffInfoBa
     //   for convenience
     //
     if (!chs.isEmpty()) {
-        fprintf(stderr, "[diag-range] read_meas_info_base chs[0].ch_name=%s range=%g cal=%g\n",
+        fprintf(stderr, "[diag-range] read_meas_info_base file=%s chs[0].ch_name=%s range=%g cal=%g\n",
+                this->streamName().toUtf8().constData(),
                 chs[0].ch_name.toUtf8().constData(), chs[0].range, chs[0].cal);
     }
     p_InfoForward.chs = chs;
@@ -1017,6 +1018,18 @@ bool FiffStream::read_meas_info(const FiffDirNode::SPtr& p_Node, FiffInfo& info,
             case FIFF_CH_INFO:
                 this->read_tag(t_pTag, pos);
                 chs.append( t_pTag->toChInfo() );
+                if (chs.size() == 1) {
+                    unsigned char* raw_bytes = (unsigned char*)t_pTag->data();
+                    fprintf(stderr, "[diag-range] read_meas_info FIRST_CH file=%s pos=%d tag_size=%d "
+                            "range_bytes=[%02x %02x %02x %02x] range=%g cal=%g ch=%s "
+                            "kind=%d type=%d\n",
+                            this->streamName().toUtf8().constData(),
+                            (int)pos, (int)t_pTag->size(),
+                            raw_bytes[12], raw_bytes[13], raw_bytes[14], raw_bytes[15],
+                            chs[0].range, chs[0].cal,
+                            chs[0].ch_name.toUtf8().constData(),
+                            (int)t_pTag->kind, (int)t_pTag->type);
+                }
                 break;
             case FIFF_LOWPASS:
                 this->read_tag(t_pTag, pos);
@@ -1691,6 +1704,23 @@ bool FiffStream::read_tag(FiffTag::SPtr &p_pTag,
     if (p_pTag->size() > 0)
     {
         this->readRawData(p_pTag->data(), p_pTag->size());
+
+        // Diagnostic: show raw bytes BEFORE byte-swap for the FIRST CH_INFO tag per file
+        if (p_pTag->type == FIFFT_CH_INFO_STRUCT && p_pTag->size() == 96) {
+            static QString s_lastFile;
+            QString curFile = this->streamName();
+            if (curFile != s_lastFile) {
+                s_lastFile = curFile;
+                unsigned char* rb = (unsigned char*)p_pTag->data();
+                fprintf(stderr, "[diag-range] read_tag PRE-SWAP file=%s pos=%lld "
+                        "raw[12..15]=[%02x %02x %02x %02x] endian=%s\n",
+                        curFile.toUtf8().constData(),
+                        (long long)(pos >= 0 ? pos : -1),
+                        rb[12], rb[13], rb[14], rb[15],
+                        endian == FIFFV_BIG_ENDIAN ? "big" : "little");
+            }
+        }
+
         //FiffTag::convert_tag_data(p_pTag,FIFFV_BIG_ENDIAN,FIFFV_NATIVE_ENDIAN);
         FiffTag::convert_tag_data(p_pTag,endian,FIFFV_NATIVE_ENDIAN);
     }
