@@ -13,23 +13,25 @@ The first steps to get started, as described in the [build guide](buildguide.md)
 git clone https://github.com/<YourGitUserName>/mne-cpp.git
 git remote add upstream https://github.com/mne-tools/mne-cpp.git
 git fetch --all
-git rebase upstream/main
+git rebase upstream/v2.0-dev
 ```
 
 The general workflow is covered by the following steps:
 
-- Create a new branch from `main`:
+- Create a new branch from `v2.0-dev`:
 
 ```
-git checkout -b <branchName> main
+git checkout -b <branchName> v2.0-dev
 ```
 
 - Get the latest changes and [rebase](https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase){:target="_blank" rel="noopener"}:
 
 ```
 git fetch upstream
-git rebase upstream/main
+git rebase upstream/v2.0-dev
 ```
+
+  If GitHub shows **"This branch cannot be rebased due to conflicts"**, resolve the conflicts locally during this rebase and then push with `--force-with-lease`.
 
 - Solve [merge conflicts](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line){:target="_blank" rel="noopener"}, if they occure.
 

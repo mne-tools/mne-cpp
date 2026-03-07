@@ -30,11 +30,11 @@ git remote add upstream https://github.com/mne-tools/mne-cpp.git
 
 ### 2. Create a Feature Branch
 
-Always work on a dedicated branch — never commit directly to `main`:
+Always work on a dedicated branch — never commit directly to `v2.0-dev`:
 
 ```bash
 git fetch upstream
-git checkout -b my-feature upstream/main
+git checkout -b my-feature upstream/v2.0-dev
 ```
 
 Choose a descriptive branch name, e.g., `fix-fiff-reader-crash` or `add-lsl-plugin`.
@@ -89,7 +89,7 @@ git push origin my-feature
 Go to your fork on GitHub and create a pull request:
 
 1. Click **New pull request** next to the branch selector.
-2. Set the **base repository** to `mne-tools/mne-cpp` and the **base branch** to `main`.
+2. Set the **base repository** to `mne-tools/mne-cpp` and the **base branch** to `v2.0-dev`.
 3. Set the **compare branch** to your feature branch.
 4. Give the PR a descriptive title using the commit prefix convention (e.g., `ENH: Add LSL acquisition plugin`).
 5. In the description, explain what your changes do, why they are needed, and how to test them.
@@ -105,6 +105,16 @@ After you create the pull request:
 - Address review comments by making additional commits on your feature branch and pushing them — they are automatically added to the existing PR. There is no need to create a new pull request.
 - Once all CI checks pass and the reviewers approve, your code will be merged.
 
+If GitHub shows **"This branch cannot be rebased due to conflicts"** for your PR, your feature branch and `v2.0-dev` both modified overlapping lines. Rebase locally, resolve conflicts, and push the updated branch:
+
+```bash
+git fetch upstream
+git rebase upstream/v2.0-dev
+# resolve conflicts, then:
+git rebase --continue
+git push --force-with-lease origin my-feature
+```
+
 ### 9. Clean Up
 
 After your PR is merged, you can delete the feature branch:
@@ -115,12 +125,12 @@ git branch -d my-feature
 git push origin --delete my-feature
 ```
 
-Keep your fork's `main` branch up to date:
+Keep your fork's `v2.0-dev` branch up to date:
 
 ```bash
 git fetch upstream
-git rebase upstream/main
-git push origin main
+git rebase upstream/v2.0-dev
+git push origin v2.0-dev
 ```
 
 ## Tips for a Smooth Review
