@@ -33,7 +33,7 @@ git rebase upstream/v2.0-dev
 
   If GitHub shows **"This branch cannot be rebased due to conflicts"**, resolve the conflicts locally during this rebase and then push with `--force-with-lease`.
 
-- Solve [merge conflicts](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line){:target="_blank" rel="noopener"}, if they occure.
+- Solve [merge conflicts](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line){:target="_blank" rel="noopener"}, if they occur.
 
 - Make your changes and check the status:
 
