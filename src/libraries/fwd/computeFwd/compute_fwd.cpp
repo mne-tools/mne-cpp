@@ -1448,8 +1448,10 @@ bool write_solution(const QString& name,         /* Destination file */
 
         for (k = 0; k < neeg; k++) {
             eeg_chs[k].scanNo = ++p;
+            if (k == 0) fprintf(stderr, "[write_solution] EEG[0] scanNo=%d, p=%d, nmeg=%d, neeg=%d\n", eeg_chs[k].scanNo, p, nmeg, neeg);
             t_pStream->write_ch_info(eeg_chs[k]);
         }
+        fprintf(stderr, "[write_solution] after loops: nmeg=%d, neeg=%d, p=%d, meg_chs.size=%lld, eeg_chs.size=%lld\n", nmeg, neeg, p, (long long)meg_chs.size(), (long long)eeg_chs.size());
         /*
         * Copy the bad channel list from the measurement file
         */
@@ -2320,6 +2322,9 @@ void ComputeFwd::storeFwd(const QString& sSolName)
 
     int iNMeg = m_megcoils->ncoil;
     int iNEeg = m_eegels->ncoil;
+
+    fprintf(stderr, "[storeFwd] iNMeg=%d, iNEeg=%d, m_listMegChs.size=%lld, m_listEegChs.size=%lld\n",
+           iNMeg, iNEeg, (long long)m_listMegChs.size(), (long long)m_listEegChs.size());
 
     QString sName;
 
