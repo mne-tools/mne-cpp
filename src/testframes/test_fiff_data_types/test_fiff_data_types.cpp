@@ -1,0 +1,317 @@
+#include <QtTest/QtTest>
+#include <QBuffer>
+#include <Eigen/Dense>
+
+#include <fiff/fiff_events.h>
+#include <fiff/fiff_dig_point_set.h>
+#include <fiff/fiff_dig_point.h>
+#include <fiff/fiff_evoked_set.h>
+#include <fiff/fiff_evoked.h>
+#include <fiff/fiff_coord_trans.h>
+#include <fiff/fiff_constants.h>
+
+using namespace FIFFLIB;
+using namespace Eigen;
+
+class TestFiffDataTypes : public QObject
+{
+    Q_OBJECT
+
+private slots:
+    //=========================================================================
+    // FiffEvents
+    //=========================================================================
+    void events_defaultCtor()
+    {
+        FiffEvents ev;
+        QVERIFY(ev.is_empty());
+        QCOMPARE(ev.num_events(), 0);
+    }
+
+    void events_asciiRoundTrip()
+    {
+        QBuffer buf;
+        buf.open(QIODevice::ReadWrite);
+        QTextStream ts(&buf);
+        for (int r = 0; r < 3; ++r) {
+            ts << (r + 1) * 100 << " 0 " << (r + 1) << "\n";
+        }
+        ts.flush();
+        buf.seek(0);
+
+        FiffEvents evRead;
+        bool ok = FiffEvents::read_from_ascii(buf, evRead);
+        QVERIFY(ok);
+        QCOMPARE(evRead.num_events(), 3);
+        QVERIFY(!evRead.is_empty());
+    }
+
+    void events_asciiWriteReadRoundTrip()
+    {
+        QBuffer buf;
+        buf.open(QIODevice::ReadWrite);
+        QTextStream ts(&buf);
+        ts << "100 0 1\n200 0 2\n300 0 3\n";
+        ts.flush();
+        buf.seek(0);
+
+        FiffEvents ev;
+        FiffEvents::read_from_ascii(buf, ev);
+        QCOMPARE(ev.num_events(), 3);
+
+        QBuffer buf2;
+        buf2.open(QIODevice::ReadWrite);
+        ev.write_to_ascii(buf2, 1000.0);
+        buf2.seek(0);
+
+        FiffEvents ev2;
+        FiffEvents::read_from_ascii(buf2, ev2);
+        QCOMPARE(ev2.num_events(), 3);
+    }
+
+    void events_fifRoundTrip()
+    {
+        QBuffer buf;
+        buf.open(QIODevice::ReadWrite);
+        QTextStream ts(&buf);
+        ts << "100 0 1\n200 0 2\n";
+        ts.flush();
+        buf.seek(0);
+        FiffEvents ev;
+        FiffEvents::read_from_ascii(buf, ev);
+
+        QBuffer fifBuf;
+        fifBuf.open(QIODevice::ReadWrite);
+        bool writeOk = ev.write_to_fif(fifBuf);
+        QVERIFY(writeOk);
+
+        fifBuf.seek(0);
+        FiffEvents ev2;
+        bool readOk = FiffEvents::read_from_fif(fifBuf, ev2);
+        if (readOk) {
+            QCOMPARE(ev2.num_events(), 2);
+        }
+    }
+
+    //=========================================================================
+    // FiffDigPointSet
+    //=========================================================================
+    void digPointSet_defaultCtor()
+    {
+        FiffDigPointSet dps;
+        QVERIFY(dps.isEmpty());
+        QCOMPARE(dps.size(), 0);
+    }
+
+    void digPointSet_addPoints()
+    {
+        FiffDigPointSet dps;
+        FiffDigPoint p1;
+        p1.kind = FIFFV_POINT_CARDINAL;
+        p1.ident = FIFFV_POINT_LPA;
+        p1.r[0] = -0.07f; p1.r[1] = 0.0f; p1.r[2] = 0.0f;
+        p1.coord_frame = FIFFV_COORD_HEAD;
+
+        FiffDigPoint p2;
+        p2.kind = FIFFV_POINT_CARDINAL;
+        p2.ident = FIFFV_POINT_RPA;
+        p2.r[0] = 0.07f; p2.r[1] = 0.0f; p2.r[2] = 0.0f;
+        p2.coord_frame = FIFFV_COORD_HEAD;
+
+        FiffDigPoint p3;
+        p3.kind = FIFFV_POINT_CARDINAL;
+        p3.ident = FIFFV_POINT_NASION;
+        p3.r[0] = 0.0f; p3.r[1] = 0.07f; p3.r[2] = 0.0f;
+        p3.coord_frame = FIFFV_COORD_HEAD;
+
+        dps << p1 << p2 << p3;
+        QCOMPARE(dps.size(), 3);
+        QVERIFY(!dps.isEmpty());
+    }
+
+    void digPointSet_copyCtor()
+    {
+        FiffDigPointSet dps;
+        FiffDigPoint p;
+        p.kind = FIFFV_POINT_CARDINAL;
+        p.r[0] = 1.0f; p.r[1] = 2.0f; p.r[2] = 3.0f;
+        dps << p;
+
+        FiffDigPointSet copy(dps);
+        QCOMPARE(copy.size(), 1);
+    }
+
+    void digPointSet_clear()
+    {
+        FiffDigPointSet dps;
+        FiffDigPoint p;
+        p.kind = FIFFV_POINT_EEG;
+        dps << p;
+        dps.clear();
+        QVERIFY(dps.isEmpty());
+    }
+
+    void digPointSet_pickTypes()
+    {
+        FiffDigPointSet dps;
+        FiffDigPoint p1; p1.kind = FIFFV_POINT_CARDINAL;
+        p1.r[0] = 0; p1.r[1] = 0; p1.r[2] = 0;
+        FiffDigPoint p2; p2.kind = FIFFV_POINT_EEG;
+        p2.r[0] = 0; p2.r[1] = 0; p2.r[2] = 0;
+        FiffDigPoint p3; p3.kind = FIFFV_POINT_EXTRA;
+        p3.r[0] = 0; p3.r[1] = 0; p3.r[2] = 0;
+        dps << p1 << p2 << p3;
+
+        QList<int> types;
+        types << FIFFV_POINT_CARDINAL;
+        FiffDigPointSet picked = dps.pickTypes(types);
+        QCOMPARE(picked.size(), 1);
+    }
+
+    void digPointSet_indexAccess()
+    {
+        FiffDigPointSet dps;
+        FiffDigPoint p;
+        p.kind = FIFFV_POINT_CARDINAL;
+        p.r[0] = 1.0f; p.r[1] = 2.0f; p.r[2] = 3.0f;
+        dps << p;
+
+        const FiffDigPoint &ref = dps[0];
+        QVERIFY(qAbs(ref.r[0] - 1.0f) < 1e-5f);
+    }
+
+    void digPointSet_applyTransform()
+    {
+        FiffDigPointSet dps;
+        FiffDigPoint p;
+        p.kind = FIFFV_POINT_CARDINAL;
+        p.coord_frame = FIFFV_COORD_HEAD;
+        p.r[0] = 1.0f; p.r[1] = 0.0f; p.r[2] = 0.0f;
+        dps << p;
+
+        FiffCoordTrans trans;
+        trans.from = FIFFV_COORD_HEAD;
+        trans.to = FIFFV_COORD_MRI;
+        trans.trans = Matrix4f::Identity();
+        trans.trans(0, 3) = 0.1f;
+
+        dps.applyTransform(trans, true);
+        QVERIFY(qAbs(dps[0].r[0] - 1.1f) < 1e-4f);
+    }
+
+    void digPointSet_getList()
+    {
+        FiffDigPointSet dps;
+        FiffDigPoint p; p.kind = FIFFV_POINT_CARDINAL;
+        p.r[0] = 0; p.r[1] = 0; p.r[2] = 0;
+        dps << p;
+        QList<FiffDigPoint> list = dps.getList();
+        QCOMPARE(list.size(), 1);
+    }
+
+    void digPointSet_writeRead()
+    {
+        FiffDigPointSet dps;
+        FiffDigPoint p;
+        p.kind = FIFFV_POINT_CARDINAL;
+        p.ident = FIFFV_POINT_LPA;
+        p.coord_frame = FIFFV_COORD_HEAD;
+        p.r[0] = -0.07f; p.r[1] = 0.0f; p.r[2] = 0.0f;
+        dps << p;
+
+        QBuffer buf;
+        buf.open(QIODevice::ReadWrite);
+        dps.write(buf);
+        QVERIFY(buf.size() > 0);
+    }
+
+    //=========================================================================
+    // FiffEvokedSet
+    //=========================================================================
+    void evokedSet_defaultCtor()
+    {
+        FiffEvokedSet es;
+        QVERIFY(es.evoked.isEmpty());
+    }
+
+    void evokedSet_subtractBaseline()
+    {
+        MatrixXd data(2, 10);
+        data.setOnes();
+        data.col(5) *= 5.0;
+
+        FiffEvokedSet::subtractBaseline(data, 0, 4);
+        QVERIFY(qAbs(data(0, 0)) < 1e-10);
+        QVERIFY(qAbs(data(0, 5) - 4.0) < 1e-10);
+    }
+
+    void evokedSet_readFromSampleFile()
+    {
+        QString path = QCoreApplication::applicationDirPath()
+                       + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
+        if (!QFile::exists(path)) {
+            QSKIP("Sample evoked file not found");
+        }
+        QFile file(path);
+        FiffEvokedSet es(file);
+        QVERIFY(!es.evoked.isEmpty());
+        QVERIFY(es.info.nchan > 0);
+    }
+
+    void evokedSet_pickChannels()
+    {
+        QString path = QCoreApplication::applicationDirPath()
+                       + "/../resources/data/mne-cpp-test-data/MEG/sample/sample_audvis-ave.fif";
+        if (!QFile::exists(path)) {
+            QSKIP("Sample evoked file not found");
+        }
+        QFile file(path);
+        FiffEvokedSet es(file);
+        if (es.evoked.isEmpty()) QSKIP("Failed to load evoked set");
+
+        QStringList include;
+        include << es.info.ch_names[0] << es.info.ch_names[1];
+        FiffEvokedSet picked = es.pick_channels(include);
+        QCOMPARE(picked.info.nchan, 2);
+    }
+
+    //=========================================================================
+    // FiffCoordTrans
+    //=========================================================================
+    void coordTrans_inverse()
+    {
+        FiffCoordTrans trans;
+        trans.from = FIFFV_COORD_HEAD;
+        trans.to = FIFFV_COORD_MRI;
+        trans.trans = Matrix4f::Identity();
+        trans.trans(0, 3) = 0.1f;
+
+        FiffCoordTrans inv = trans.inverted();
+        QCOMPARE(inv.from, FIFFV_COORD_MRI);
+        QCOMPARE(inv.to, FIFFV_COORD_HEAD);
+        QVERIFY(qAbs(inv.trans(0, 3) + 0.1f) < 1e-5f);
+    }
+
+    void coordTrans_compose()
+    {
+        FiffCoordTrans t1;
+        t1.from = FIFFV_COORD_HEAD;
+        t1.to = FIFFV_COORD_MRI;
+        t1.trans = Matrix4f::Identity();
+        t1.trans(0, 3) = 0.05f;
+        t1.invtrans = t1.trans.inverse();
+
+        FiffCoordTrans t2;
+        t2.from = FIFFV_COORD_MRI;
+        t2.to = FIFFV_COORD_DEVICE;
+        t2.trans = Matrix4f::Identity();
+        t2.trans(1, 3) = 0.03f;
+        t2.invtrans = t2.trans.inverse();
+
+        QVERIFY(qAbs(t1.trans(0, 3) - 0.05f) < 1e-5f);
+        QVERIFY(qAbs(t2.trans(1, 3) - 0.03f) < 1e-5f);
+    }
+};
+
+QTEST_GUILESS_MAIN(TestFiffDataTypes)
+#include "test_fiff_data_types.moc"
