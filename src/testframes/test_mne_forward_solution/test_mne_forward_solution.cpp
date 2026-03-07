@@ -139,6 +139,18 @@ void TestMneForwardSolution::computeForward()
     QFile t_name(pSettingsMEGEEG->measname);
     FIFFLIB::FiffRawData raw(t_name);
     QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo(raw.info));
+
+    // --- Diagnostic: trace range from raw file through to pFiffInfo ---
+    if (!raw.info.chs.isEmpty()) {
+        qDebug() << "[diag-range] raw.info.chs[0].range =" << raw.info.chs[0].range
+                 << "ch_name =" << raw.info.chs[0].ch_name;
+    }
+    if (!pFiffInfo->chs.isEmpty()) {
+        qDebug() << "[diag-range] pFiffInfo->chs[0].range =" << pFiffInfo->chs[0].range
+                 << "ch_name =" << pFiffInfo->chs[0].ch_name;
+    }
+    // --- End diagnostic ---
+
     pSettingsMEGEEG->pFiffInfo = pFiffInfo;
     pSettingsMEGEEG->checkIntegrity();
 
