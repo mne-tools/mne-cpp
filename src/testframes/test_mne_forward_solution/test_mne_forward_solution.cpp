@@ -137,17 +137,24 @@ void TestMneForwardSolution::computeForward()
     pSettingsMEGEEG->solname = QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/Result/sample_audvis-meg-eeg-oct-6-fwd.fif";
 
     QFile t_name(pSettingsMEGEEG->measname);
+
+    // --- Diagnostic: print type sizes to verify platform consistency ---
+    fprintf(stderr, "[diag-sizes] sizeof(Eigen::Vector3f)=%d FiffChPos::storageSize=%d FiffChInfo::storageSize=%d\n",
+            (int)sizeof(Eigen::Vector3f), FIFFLIB::FiffChPos::storageSize(), FIFFLIB::FiffChInfo::storageSize());
+
     FIFFLIB::FiffRawData raw(t_name);
     QSharedPointer<FIFFLIB::FiffInfo> pFiffInfo = QSharedPointer<FIFFLIB::FiffInfo>(new FIFFLIB::FiffInfo(raw.info));
 
     // --- Diagnostic: trace range from raw file through to pFiffInfo ---
     if (!raw.info.chs.isEmpty()) {
-        qDebug() << "[diag-range] raw.info.chs[0].range =" << raw.info.chs[0].range
-                 << "ch_name =" << raw.info.chs[0].ch_name;
+        fprintf(stderr, "[diag-range] raw.info.chs[0].range=%g cal=%g ch=%s nchs=%d\n",
+                raw.info.chs[0].range, raw.info.chs[0].cal,
+                raw.info.chs[0].ch_name.toUtf8().constData(), raw.info.nchan);
     }
     if (!pFiffInfo->chs.isEmpty()) {
-        qDebug() << "[diag-range] pFiffInfo->chs[0].range =" << pFiffInfo->chs[0].range
-                 << "ch_name =" << pFiffInfo->chs[0].ch_name;
+        fprintf(stderr, "[diag-range] pFiffInfo->chs[0].range=%g cal=%g ch=%s\n",
+                pFiffInfo->chs[0].range, pFiffInfo->chs[0].cal,
+                pFiffInfo->chs[0].ch_name.toUtf8().constData());
     }
     // --- End diagnostic ---
 
