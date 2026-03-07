@@ -775,18 +775,6 @@ inline FiffChInfo FiffTag::toChInfo() const
         p_FiffChInfo.range = t_pFloat[3];
         p_FiffChInfo.cal = t_pFloat[4];
 
-        {
-            static int s_toChInfoCount = 0;
-            if (s_toChInfoCount < 2) {
-                unsigned char* raw = (unsigned char*)this->data();
-                fprintf(stderr, "[diag-range] toChInfo #%d scanNo=%d range_bytes=[%02x %02x %02x %02x] range=%g tag_size=%d\n",
-                        s_toChInfoCount, p_FiffChInfo.scanNo,
-                        raw[12], raw[13], raw[14], raw[15],
-                        p_FiffChInfo.range, (int)this->size());
-            }
-            s_toChInfoCount++;
-        }
-
         p_FiffChInfo.chpos.coil_type = t_pInt32[5];
 
         //
