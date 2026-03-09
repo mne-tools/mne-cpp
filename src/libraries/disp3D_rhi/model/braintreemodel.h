@@ -48,7 +48,7 @@
 #include <fs/surface.h>
 #include <fs/annotation.h>
 #include <mne/mne_bem_surface.h>
-#include <mne/mne_sourcespace.h>
+#include <mne/mne_source_spaces.h>
 #include <fiff/fiff_dig_point.h>
 #include <connectivity/network/network.h>
 
@@ -90,7 +90,7 @@ public:
     void addDigitizerData(const QList<FIFFLIB::FiffDigPoint> &digitizerPoints);
 
     // Add source space points
-    void addSourceSpace(const MNELIB::MNESourceSpace &srcSpace);
+    void addSourceSpace(const MNELIB::MNESourceSpaces &srcSpace);
 
     // Add connectivity network
     NetworkTreeItem* addNetwork(const CONNECTIVITYLIB::Network &network, const QString &name = "Network");

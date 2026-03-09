@@ -49,7 +49,7 @@
 #include <mne/mne_inverse_operator.h>
 
 #include <fiff/fiff_evoked.h>
-#include <mne/mne_sourceestimate.h>
+#include <mne/mne_source_estimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 
 #include <utils/generics/applicationlogger.h>

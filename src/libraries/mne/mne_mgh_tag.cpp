@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneMghTag Class.
+ * @brief    Definition of the MNEMghTag Class.
  *
  */
 

@@ -49,7 +49,7 @@
 
 #include <mne/mne.h>
 #include <mne/mne_epoch_data_list.h>
-#include <mne/mne_sourceestimate.h>
+#include <mne/mne_source_estimate.h>
 
 #include <inverse/rapMusic/pwlrapmusic.h>
 
@@ -614,7 +614,7 @@ int main(int argc, char *argv[])
     QList<Label> t_qListLabels;
     QList<RowVector4i> t_qListRGBAs;
 
-    //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
+    //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpaces
     t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
     if(!t_sFileNameStc.isEmpty())

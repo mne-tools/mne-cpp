@@ -182,7 +182,7 @@ void BrainTreeModel::addDipoles(const INVERSELIB::ECDSet &set)
 
 //=============================================================================================================
 
-void BrainTreeModel::addSourceSpace(const MNELIB::MNESourceSpace &srcSpace)
+void BrainTreeModel::addSourceSpace(const MNELIB::MNESourceSpaces &srcSpace)
 {
     QStandardItem* parentItem = new QStandardItem("Source Space");
     parentItem->setCheckable(true);
@@ -192,7 +192,7 @@ void BrainTreeModel::addSourceSpace(const MNELIB::MNESourceSpace &srcSpace)
     QColor srcColor(212, 28, 92);
 
     for (int h = 0; h < srcSpace.size(); ++h) {
-        const MNELIB::MNEHemisphere &hemi = srcSpace[h];
+        const auto &hemi = srcSpace[h];
         QString hemiLabel = (h == 0) ? "LH" : "RH";
 
         // Collect all source point positions for this hemisphere

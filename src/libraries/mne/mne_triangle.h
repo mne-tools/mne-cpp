@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneTriangle class declaration.
+ * @brief    MNETriangle class declaration.
  *
  */
 
@@ -75,23 +75,23 @@ namespace MNELIB
  * index pointer (`vert`) alias data owned by the parent surface and
  * must not be freed.
  */
-class MNESHARED_EXPORT MneTriangle
+class MNESHARED_EXPORT MNETriangle
 {
 public:
-    typedef QSharedPointer<MneTriangle> SPtr;              /**< Shared pointer type for MneTriangle. */
-    typedef QSharedPointer<const MneTriangle> ConstSPtr;   /**< Const shared pointer type for MneTriangle. */
+    typedef QSharedPointer<MNETriangle> SPtr;              /**< Shared pointer type for MNETriangle. */
+    typedef QSharedPointer<const MNETriangle> ConstSPtr;   /**< Const shared pointer type for MNETriangle. */
 
     //=========================================================================================================
     /**
-     * Constructs an empty MneTriangle with zeroed geometry.
+     * Constructs an empty MNETriangle with zeroed geometry.
      */
-    MneTriangle();
+    MNETriangle();
 
     //=========================================================================================================
     /**
      * Default destructor (non-owning pointers are not freed).
      */
-    ~MneTriangle() = default;
+    ~MNETriangle() = default;
 
     //=========================================================================================================
     /**

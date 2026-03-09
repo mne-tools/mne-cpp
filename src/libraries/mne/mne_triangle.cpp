@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneTriangle Class.
+ * @brief    Definition of the MNETriangle Class.
  *
  */
 
@@ -53,11 +53,11 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneTriangle::MneTriangle() = default;
+MNETriangle::MNETriangle() = default;
 
 //=============================================================================================================
 
-void MneTriangle::compute_data()
+void MNETriangle::compute_data()
 {
     r12 = Eigen::Map<const Eigen::Vector3f>(r2) - Eigen::Map<const Eigen::Vector3f>(r1);
     r13 = Eigen::Map<const Eigen::Vector3f>(r3) - Eigen::Map<const Eigen::Vector3f>(r1);

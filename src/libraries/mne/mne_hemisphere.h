@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "mne_global.h"
+#include "mne_source_space.h"
 #include "mne_cluster_info.h"
 
 #include <fiff/fiff_types.h>
@@ -78,11 +79,11 @@ namespace MNELIB
  *
  * @brief Hemisphere provides geometry information
  */
-class MNESHARED_EXPORT MNEHemisphere
+class MNESHARED_EXPORT MNEHemisphere : public MNESourceSpace
 {
 public:
-    typedef QSharedPointer<MNEHemisphere> SPtr;             /**< Shared pointer type for MNEHemisphere. */
-    typedef QSharedPointer<const MNEHemisphere> ConstSPtr;  /**< Const shared pointer type for MNEHemisphere. */
+    using SPtr = std::shared_ptr<MNEHemisphere>;             /**< Shared pointer type for MNEHemisphere. */
+    using ConstSPtr = std::shared_ptr<const MNEHemisphere>;  /**< Const shared pointer type for MNEHemisphere. */
 
     //=========================================================================================================
     /**
@@ -102,7 +103,15 @@ public:
     /**
      * Destroys the hemisphere source space.
      */
-    ~MNEHemisphere();
+    ~MNEHemisphere() override;
+
+    //=========================================================================================================
+    /**
+     * Creates a deep copy of this hemisphere, preserving the MNEHemisphere type.
+     *
+     * @return a shared_ptr<MNESourceSpace> pointing to a cloned MNEHemisphere.
+     */
+    MNESourceSpace::SPtr clone() const override;
 
     //=========================================================================================================
     /**
@@ -113,6 +122,24 @@ public:
      * @return true if succeeded, false otherwise.
      */
     bool add_geometry_info();
+
+    //=========================================================================================================
+    /**
+     * Complete triangulation information (triangle centers, normals, areas)
+     * for both the main and use triangulations.
+     *
+     * @return true if succeeded, false otherwise.
+     */
+    bool complete_source_space_info();
+
+    //=========================================================================================================
+    /**
+     * Compute patch statistics from the nearest-vertex data. Fills
+     * pinfo (per-patch vertex lists) and patch_inds (patch index per vertex).
+     *
+     * @return true if patch info was computed, false if nearest data is empty.
+     */
+    bool compute_patch_info();
 
     //=========================================================================================================
     /**
@@ -166,6 +193,16 @@ public:
      */
     void writeToStream(FIFFLIB::FiffStream* p_pStream);
 
+    //=========================================================================================================
+    /**
+     * Copy assignment operator.
+     *
+     * @param[in] other    The MNEHemisphere to assign from.
+     *
+     * @return Reference to this object.
+     */
+    MNEHemisphere& operator=(const MNEHemisphere& other);
+
     //ToDo write(IODevice &)
 
     /**
@@ -178,34 +215,27 @@ public:
     friend bool operator== (const MNEHemisphere &a, const MNEHemisphere &b);
 
 public:
-    FIFFLIB::fiff_int_t type;           /**< Type of the source space: 1 = "surf" or 2 = "vol". ToDo not used yet. */
-    FIFFLIB::fiff_int_t id;             /**< Id information. */
-    FIFFLIB::fiff_int_t np;             /**< Number of vertices of the whole/original surface used to create the source locations. */
-    FIFFLIB::fiff_int_t ntri;           /**< Number of available triangles. */
-    FIFFLIB::fiff_int_t coord_frame;    /**< Coil coordinate system definition. */
-    Eigen::MatrixX3f rr;                /**< Vertices of the source space mesh/surface. */
-    Eigen::MatrixX3f nn;                /**< Normals of the source space mesh/surface. */
-    Eigen::MatrixX3i tris;              /**< Triangles of the source space mesh/surface. */
-    FIFFLIB::fiff_int_t nuse;           /**< Number of used dipoles. */
-    Eigen::VectorXi inuse;              /**< Used source points indicated by 1, 0 otherwise. */
-    Eigen::VectorXi vertno;             /**< Zero based (different to MATLAB) indices of the used vertices/If label based clustered gain matrix vertno contains label IDs*/
-    qint32 nuse_tri;                    /**< Number of used triangles. */
-    Eigen::MatrixX3i use_tris;          /**< Triangle information of the used triangles. */
-    Eigen::VectorXi nearest;            /**< All indeces mapped to the indeces of the used vertices (using option -cps during mne_setup_source_space). */
-    Eigen::VectorXd nearest_dist;       /**< Distance to the nearest vertices (using option -cps during mne_setup_source_space). */
+    // --- Fields inherited from MNESurfaceOrVolume via MNESourceSpace ---
+    // type, id, np, ntri, coord_frame, rr, nn, nuse, inuse, vertno,
+    // nuse_tri, dist_limit, dist, nearest, neighbor_tri, neighbor_vert
+    // are all available through the base class.
+    // Use nearestVertIdx() / nearestDistVec() accessors for VectorXi/VectorXd views.
+
+    // --- Shadowing fields (different type from base — TODO: unify in Phase 2) ---
+    // tris / use_tris removed: now use inherited itris / use_itris (TrianglesT, row-major)
+    // nearest / nearest_dist removed: now use inherited vector<MNENearest> nearest
+    //   + nearestVertIdx() / nearestDistVec() accessors
+    // dist removed: now use inherited FiffSparseMatrix dist + toEigenSparse() / fromEigenSparse()
     QList<Eigen::VectorXi> pinfo;       /**< Patch information (using option -cps during mne_setup_source_space). */
     Eigen::VectorXi patch_inds;         /**< List of neighboring vertices in the high resolution triangulation. */
-    float dist_limit;                   /**< ToDo... (using option -cps during mne_setup_source_space). */
-    Eigen::SparseMatrix<double> dist;   /**< ToDo... (using option -cps during mne_setup_source_space). */
+
+    // --- MNEHemisphere-specific fields ---
     Eigen::MatrixX3d tri_cent;          /**< Triangle centers. */
     Eigen::MatrixX3d tri_nn;            /**< Triangle normals. */
     Eigen::VectorXd tri_area;           /**< Triangle areas. */
     Eigen::MatrixX3d use_tri_cent;      /**< Triangle centers of used triangles. */
     Eigen::MatrixX3d use_tri_nn;        /**< Triangle normals of used triangles. */
     Eigen::VectorXd use_tri_area;       /**< Triangle areas of used triangles. */
-
-    std::vector<Eigen::VectorXi> neighbor_tri;     /**< Vector of neighboring triangles for each vertex. */
-    std::vector<Eigen::VectorXi> neighbor_vert;    /**< Vector of neighboring vertices for each vertex. */
 
     MNEClusterInfo cluster_info; /**< Holds the cluster information. */
 private:
@@ -243,17 +273,17 @@ inline bool operator== (const MNEHemisphere &a, const MNEHemisphere &b)
             a.coord_frame == b.coord_frame &&
             a.rr.isApprox(b.rr, 0.0001f) &&
             a.nn.isApprox(b.nn, 0.0001f) &&
-            a.tris.isApprox(b.tris) &&
+            a.itris.isApprox(b.itris) &&
             a.nuse == b.nuse &&
             a.inuse.isApprox(b.inuse) &&
             a.vertno.isApprox(b.vertno) &&
             a.nuse_tri == b.nuse_tri &&
-            a.use_tris.isApprox(b.use_tris) &&
-            a.nearest.isApprox(b.nearest) &&
-            a.nearest_dist.isApprox(b.nearest_dist, 0.0001) &&
+            a.use_itris.isApprox(b.use_itris) &&
+            a.nearestVertIdx().isApprox(b.nearestVertIdx()) &&
+            a.nearestDistVec().isApprox(b.nearestDistVec(), 0.0001) &&
             a.patch_inds.isApprox(b.patch_inds) &&
             //a.dist_limit == b.dist_limit && //TODO: We still not sure if dist_limit can also be a matrix. This needs to be debugged
-            a.dist.isApprox(b.dist, 0.0001) &&
+            a.dist.toEigenSparse().isApprox(b.dist.toEigenSparse(), 0.0001) &&
             a.tri_cent.isApprox(b.tri_cent, 0.0001) &&
             a.tri_nn.isApprox(b.tri_nn, 0.0001) &&
             a.tri_area.isApprox(b.tri_area, 0.0001) &&

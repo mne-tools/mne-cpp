@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneMshColorScaleDef class declaration.
+ * @brief    MNEMshColorScaleDef class declaration.
  *
  */
 
@@ -69,23 +69,23 @@ namespace MNELIB
  *
  * @brief Color scale definition with value range and color mapping for surface visualization.
  */
-class MNESHARED_EXPORT MneMshColorScaleDef
+class MNESHARED_EXPORT MNEMshColorScaleDef
 {
 public:
-    typedef QSharedPointer<MneMshColorScaleDef> SPtr;              /**< Shared pointer type for MneMshColorScaleDef. */
-    typedef QSharedPointer<const MneMshColorScaleDef> ConstSPtr;   /**< Const shared pointer type for MneMshColorScaleDef. */
+    typedef QSharedPointer<MNEMshColorScaleDef> SPtr;              /**< Shared pointer type for MNEMshColorScaleDef. */
+    typedef QSharedPointer<const MNEMshColorScaleDef> ConstSPtr;   /**< Const shared pointer type for MNEMshColorScaleDef. */
 
     //=========================================================================================================
     /**
-     * Constructs the MneMshColorScaleDef.
+     * Constructs the MNEMshColorScaleDef.
      */
-    MneMshColorScaleDef();
+    MNEMshColorScaleDef();
 
     //=========================================================================================================
     /**
-     * Destroys the MneMshColorScaleDef.
+     * Destroys the MNEMshColorScaleDef.
      */
-    ~MneMshColorScaleDef();
+    ~MNEMshColorScaleDef();
 
 public:
     int   type;                     /* What is this scale setting good for? */

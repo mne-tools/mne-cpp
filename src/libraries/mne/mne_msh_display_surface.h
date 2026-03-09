@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneMshDisplaySurface class declaration.
+ * @brief    MNEMshDisplaySurface class declaration.
  *
  */
 
@@ -42,6 +42,7 @@
 
 #include "mne_global.h"
 #include "mne_types.h"
+#include "mne_surface.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -74,10 +75,16 @@ namespace MNELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneMorphMap;
-class MneMshPicked;
-class MneMshColorScaleDef;
-class MneSurfaceOld;
+class MNEMorphMap;
+class MNEMshPicked;
+class MNEMshColorScaleDef;
+
+} // NAMESPACE MNELIB
+
+namespace FIFFLIB { class FiffDigitizerData; }
+
+namespace MNELIB
+{
 
 //=============================================================================================================
 /**
@@ -85,30 +92,29 @@ class MneSurfaceOld;
  *
  * @brief The MNE Msh Display Surface class holds information about a surface to be rendered.
  */
-class MNESHARED_EXPORT MneMshDisplaySurface
+class MNESHARED_EXPORT MNEMshDisplaySurface : public MNESurface
 {
 public:
-    typedef QSharedPointer<MneMshDisplaySurface> SPtr;              /**< Shared pointer type for MneMshDisplaySurface. */
-    typedef QSharedPointer<const MneMshDisplaySurface> ConstSPtr;   /**< Const shared pointer type for MneMshDisplaySurface. */
+    typedef QSharedPointer<MNEMshDisplaySurface> SPtr;              /**< Shared pointer type for MNEMshDisplaySurface. */
+    typedef QSharedPointer<const MNEMshDisplaySurface> ConstSPtr;   /**< Const shared pointer type for MNEMshDisplaySurface. */
 
     //=========================================================================================================
     /**
-     * Constructs the MneMshDisplaySurface.
+     * Constructs the MNEMshDisplaySurface.
      */
-    MneMshDisplaySurface();
+    MNEMshDisplaySurface();
 
     //=========================================================================================================
     /**
-     * Destroys the MneMshDisplaySurface.
+     * Destroys the MNEMshDisplaySurface.
      */
-    ~MneMshDisplaySurface();
+    ~MNEMshDisplaySurface();
 
 public:
     QString        filename;	/**< Path to the file this surface was loaded from. */
     time_t         time_loaded = 0;	/**< Timestamp when the surface was loaded. */
     QString        subj;		/**< Subject name in SUBJECTS_DIR. */
     QString        surf_name;	/**< Name of the surface (e.g., "inflated", "white"). */
-    std::unique_ptr<MNELIB::MneSurfaceOld> s;		/**< Underlying surface mesh data. */
     Eigen::Vector3f eye{1.0f, 0.0f, 0.0f};	/**< Eye position for 3D viewing. */
     Eigen::Vector3f up{0.0f, 0.0f, 1.0f};		/**< Up vector for 3D viewing. */
     Eigen::Vector3f rot = Eigen::Vector3f::Zero();        /**< Rotation angles of the MRI (in radians). */
@@ -121,7 +127,7 @@ public:
     Eigen::Matrix4f trans = Eigen::Matrix4f::Identity();	/**< Extra 4x4 transformation matrix for this surface. */
     int            sketch = 0;	/**< Non-zero to use sketch mode with decimated triangulation. */
 
-    std::vector<std::unique_ptr<MNELIB::MneMorphMap>> maps;		/**< Morphing maps from other surfaces to this one. */
+    std::vector<std::unique_ptr<MNELIB::MNEMorphMap>> maps;		/**< Morphing maps from other surfaces to this one. */
 
     int   overlay_type = 0;	        /**< Type identifier for the overlay values. */
     Eigen::VectorXf overlay_values;	/**< Per-vertex overlay value array. */
@@ -130,7 +136,7 @@ public:
     Eigen::VectorXf marker_values;		/**< Per-vertex marker values (shown in shades of marker color). */
 
     Eigen::VectorXf vertex_colors;		/**< Per-vertex RGBA color array. */
-    std::unique_ptr<MNELIB::MneMshColorScaleDef> color_scale; /**< Color scale used to compute vertex colors. */
+    std::unique_ptr<MNELIB::MNEMshColorScaleDef> color_scale; /**< Color scale used to compute vertex colors. */
     int   nvertex_colors = 3;		/**< Number of color components per vertex. */
     Eigen::Vector4f even_vertex_color = Eigen::Vector4f::Zero();	/**< Uniform RGBA color for non-data-driven coloring. */
 
@@ -147,10 +153,93 @@ public:
 
     int   show_aux_data = 0;		/**< Non-zero to show auxiliary data related to this surface. */
 
-    std::vector<MNELIB::MneMshPicked> picked;		/**< Picked locations in world coordinates. */
+    std::vector<MNELIB::MNEMshPicked> picked;		/**< Picked locations in world coordinates. */
 
     void              *user_data = nullptr;       /**< Arbitrary user-defined data pointer. */
     mneUserFreeFunc    user_data_free = nullptr;   /**< Function to free user_data. */
+
+    //=========================================================================================================
+    // Alignment functions (moved from MNESurfaceOrVolume)
+    //=========================================================================================================
+
+    /**
+     * Align MEG and MRI coordinate systems using fiducial points and ICP.
+     *
+     * @param[in, out] head_dig    MEG digitizer data (transformed in-place).
+     * @param[in]      mri_dig     MRI digitizer data with fiducial locations.
+     * @param[in]      head_surf   The scalp surface used for ICP.
+     * @param[in]      niter       Number of ICP iterations.
+     * @param[in]      scale_head  If non-zero, scale the head surface to match digitizer.
+     * @param[in]      omit_dist   Discard digitizer points farther than this from the surface (m).
+     * @param[out]     scales      If non-null, receives the per-axis scale factors applied.
+     *
+     * @return OK on success, FAIL on error.
+     */
+    int align_fiducials(FIFFLIB::FiffDigitizerData& head_dig,
+                       const FIFFLIB::FiffDigitizerData& mri_dig,
+                       int niter,
+                       int scale_head,
+                       float omit_dist,
+                       Eigen::Vector3f& scales);
+
+    /**
+     * Compute a uniform head scale factor by fitting spheres.
+     */
+    void get_head_scale(FIFFLIB::FiffDigitizerData& dig,
+                       const Eigen::Matrix<float, 3, 3, Eigen::RowMajor>& mri_fid,
+                       Eigen::Vector3f& scales);
+
+    /**
+     * Mark digitizer points whose distance to the head surface exceeds maxdist.
+     */
+    int discard_outlier_digitizer_points(FIFFLIB::FiffDigitizerData& d,
+                                       float maxdist) const;
+
+    /**
+     * Compute the distance from each active digitizer point to the head surface.
+     */
+    void calculate_digitizer_distances(FIFFLIB::FiffDigitizerData& dig,
+                                     int do_all, int do_approx) const;
+
+    /**
+     * Perform one iteration of ICP-like alignment.
+     */
+    int iterate_alignment_once(FIFFLIB::FiffDigitizerData& dig,
+                             int nasion_weight,
+                             const std::optional<Eigen::Vector3f>& nasion_mri,
+                             int last_step) const;
+
+    /**
+     * Compute the RMS distance from active digitizer points to the head surface.
+     */
+    float rms_digitizer_distance(FIFFLIB::FiffDigitizerData& dig) const;
+
+    /**
+     * Scale a display surface's bounding box and all vertex positions.
+     */
+    void scale(const Eigen::Vector3f& scales);
+
+    /**
+     * Compute and store the axis-aligned bounding box and field-of-view
+     * radius by iterating all vertex positions.
+     *
+     * @param[in] tag  Surface name tag (used for debug logging).
+     */
+    void decide_surface_extent(const QString& tag);
+
+    /**
+     * Set the curvature display mode based on a surface type name.
+     * Inflated, sphere, and white surfaces use overlay mode; others use none.
+     *
+     * @param[in] name  Surface type name.
+     */
+    void decide_curv_display(const QString& name);
+
+    /**
+     * Allocate and fill per-vertex color arrays using positive/negative
+     * curvature colors (if curvature overlay mode is on) or uniform gray.
+     */
+    void setup_curvature_colors();
 
 // ### OLD STRUCT ###
 //    typedef struct {		/* Display surface properties */
@@ -158,7 +247,7 @@ public:
 //      time_t         time_loaded;	/* When was the surface loaded */
 //      char           *subj;		/* The name of the subject in SUBJECTS_DIR */
 //      char           *surf_name;	/* The name of the surface */
-//      MNELIB::MneSurfaceOld*     s;		/* This is the surface */
+//      MNELIB::MNESurface*     s;		/* This is the surface */
 //      float          eye[3];	/* Eye position for viewing */
 //      float          up[3];		/* Up vector for viewing */
 //      float          rot[3];        /* Rotation angles of the MRI (in radians) */

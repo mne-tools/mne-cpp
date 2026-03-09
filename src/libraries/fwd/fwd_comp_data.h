@@ -62,7 +62,7 @@
 
 namespace MNELIB
 {
-    class MneCTFCompDataSet;
+    class MNECTFCompDataSet;
 }
 
 //=============================================================================================================
@@ -114,11 +114,11 @@ public:
 
     static void fwd_free_comp_data(void *d);
 
-    static int fwd_make_ctf_comp_coils(MNELIB::MneCTFCompDataSet* set,          /* The available compensation data */
+    static int fwd_make_ctf_comp_coils(MNELIB::MNECTFCompDataSet* set,          /* The available compensation data */
                                        FwdCoilSet*        coils,        /* The main coil set */
                                        FwdCoilSet*        comp_coils);
 
-    static FwdCompData* fwd_make_comp_data(MNELIB::MneCTFCompDataSet* set,           /* The CTF compensation data read from the file */
+    static FwdCompData* fwd_make_comp_data(MNELIB::MNECTFCompDataSet* set,           /* The CTF compensation data read from the file */
                                    FwdCoilSet*        coils,         /* The principal set of coils */
                                    FwdCoilSet*        comp_coils,    /* The compensation coils */
                                    fwdFieldFunc      field,	        /* The field computation functions */
@@ -134,7 +134,7 @@ public:
                 void *client);
 
 public:
-    MNELIB::MneCTFCompDataSet*  set;        /* The compensation data set */
+    MNELIB::MNECTFCompDataSet*  set;        /* The compensation data set */
     FwdCoilSet*         comp_coils; /* The compensation coil definitions */
     fwdFieldFunc        field;      /* Computes the field of given direction dipole */
     fwdVecFieldFunc     vec_field;  /* Computes the fields of all three dipole components  */
@@ -146,7 +146,7 @@ public:
 
 // ### OLD STRUCT ###
 //typedef struct {
-//    FWDLIB::MneCTFCompDataSet* set; /* The compensation data set */
+//    FWDLIB::MNECTFCompDataSet* set; /* The compensation data set */
 //    FWDLIB::FwdCoilSet* comp_coils; /* The compensation coil definitions */
 //    fwdFieldFunc      field;            /* Computes the field of given direction dipole */
 //    fwdVecFieldFunc   vec_field;        /* Computes the fields of all three dipole components  */

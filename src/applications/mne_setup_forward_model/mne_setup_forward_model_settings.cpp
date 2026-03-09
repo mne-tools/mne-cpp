@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneSetupForwardModelSettings class definition.
+ * @brief    MNESetupForwardModelSettings class definition.
  *
  */
 
@@ -57,7 +57,7 @@ using namespace MNESETUPFORWARDMODEL;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneSetupForwardModelSettings::MneSetupForwardModelSettings(int *argc, char **argv)
+MNESetupForwardModelSettings::MNESetupForwardModelSettings(int *argc, char **argv)
 : m_fScalpConductivity(0.3f)
 , m_fSkullConductivity(0.006f)
 , m_fBrainConductivity(0.3f)
@@ -224,112 +224,112 @@ MneSetupForwardModelSettings::MneSetupForwardModelSettings(int *argc, char **arg
 
 //=============================================================================================================
 
-QString MneSetupForwardModelSettings::subject() const
+QString MNESetupForwardModelSettings::subject() const
 {
     return m_sSubject;
 }
 
 //=============================================================================================================
 
-QString MneSetupForwardModelSettings::subjectsDir() const
+QString MNESetupForwardModelSettings::subjectsDir() const
 {
     return m_sSubjectsDir;
 }
 
 //=============================================================================================================
 
-float MneSetupForwardModelSettings::scalpConductivity() const
+float MNESetupForwardModelSettings::scalpConductivity() const
 {
     return m_fScalpConductivity;
 }
 
 //=============================================================================================================
 
-float MneSetupForwardModelSettings::skullConductivity() const
+float MNESetupForwardModelSettings::skullConductivity() const
 {
     return m_fSkullConductivity;
 }
 
 //=============================================================================================================
 
-float MneSetupForwardModelSettings::brainConductivity() const
+float MNESetupForwardModelSettings::brainConductivity() const
 {
     return m_fBrainConductivity;
 }
 
 //=============================================================================================================
 
-QString MneSetupForwardModelSettings::modelName() const
+QString MNESetupForwardModelSettings::modelName() const
 {
     return m_sModelName;
 }
 
 //=============================================================================================================
 
-bool MneSetupForwardModelSettings::homogeneous() const
+bool MNESetupForwardModelSettings::homogeneous() const
 {
     return m_bHomogeneous;
 }
 
 //=============================================================================================================
 
-bool MneSetupForwardModelSettings::useSurfFormat() const
+bool MNESetupForwardModelSettings::useSurfFormat() const
 {
     return m_bUseSurfFormat;
 }
 
 //=============================================================================================================
 
-int MneSetupForwardModelSettings::icoLevel() const
+int MNESetupForwardModelSettings::icoLevel() const
 {
     return m_iIcoLevel;
 }
 
 //=============================================================================================================
 
-bool MneSetupForwardModelSettings::noSolution() const
+bool MNESetupForwardModelSettings::noSolution() const
 {
     return m_bNoSolution;
 }
 
 //=============================================================================================================
 
-bool MneSetupForwardModelSettings::swap() const
+bool MNESetupForwardModelSettings::swap() const
 {
     return m_bSwap;
 }
 
 //=============================================================================================================
 
-bool MneSetupForwardModelSettings::meters() const
+bool MNESetupForwardModelSettings::meters() const
 {
     return m_bMeters;
 }
 
 //=============================================================================================================
 
-float MneSetupForwardModelSettings::innerShift() const
+float MNESetupForwardModelSettings::innerShift() const
 {
     return m_fInnerShift;
 }
 
 //=============================================================================================================
 
-float MneSetupForwardModelSettings::outerShift() const
+float MNESetupForwardModelSettings::outerShift() const
 {
     return m_fOuterShift;
 }
 
 //=============================================================================================================
 
-float MneSetupForwardModelSettings::scalpShift() const
+float MNESetupForwardModelSettings::scalpShift() const
 {
     return m_fScalpShift;
 }
 
 //=============================================================================================================
 
-bool MneSetupForwardModelSettings::overwrite() const
+bool MNESetupForwardModelSettings::overwrite() const
 {
     return m_bOverwrite;
 }

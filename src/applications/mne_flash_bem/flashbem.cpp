@@ -84,7 +84,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FlashBem::FlashBem(const MneFlashBemSettings& settings)
+FlashBem::FlashBem(const MNEFlashBemSettings& settings)
 : m_settings(settings)
 , m_step(0)
 {

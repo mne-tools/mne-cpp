@@ -22,11 +22,11 @@ namespace MNELIB
 /**
  * Channel selection.
  */
-class MNESHARED_EXPORT MneChSelection
+class MNESHARED_EXPORT MNEChSelection
 {
 public:
-    MneChSelection() = default;
-    ~MneChSelection() = default;
+    MNEChSelection() = default;
+    ~MNEChSelection() = default;
 
     QString     name;               /**< Name of this selection. */
     QStringList chdef;              /**< Channel definitions (may contain regular expressions). */
@@ -42,8 +42,8 @@ public:
 };
 
 /** Backward-compatible typedef aliases. */
-typedef MneChSelection  mneChSelectionRec;
-typedef MneChSelection* mneChSelection;
+typedef MNEChSelection  mneChSelectionRec;
+typedef MNEChSelection* mneChSelection;
 
 } // namespace MNELIB
 

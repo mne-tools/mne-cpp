@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneProjData Class.
+ * @brief    Definition of the MNEProjData Class.
  *
  */
 
@@ -38,7 +38,7 @@
 //=============================================================================================================
 
 #include "mne_proj_data.h"
-#include "mne_surface_old.h"
+#include "mne_surface.h"
 #include "mne_triangle.h"
 
 #ifndef TRUE
@@ -61,14 +61,14 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneProjData::MneProjData(const MNELIB::MneSurfaceOld* s)
+MNEProjData::MNEProjData(const MNELIB::MNESurface* s)
 {
     a.resize(s->ntri);
     b.resize(s->ntri);
     c.resize(s->ntri);
     act.resize(s->ntri);
 
-    const MneTriangle* tri = s->tris.data();
+    const MNETriangle* tri = s->tris.data();
     for (int k = 0; k < s->ntri; k++, tri++) {
       a[k] =  VEC_DOT_46(tri->r12,tri->r12);
       b[k] =  VEC_DOT_46(tri->r13,tri->r13);

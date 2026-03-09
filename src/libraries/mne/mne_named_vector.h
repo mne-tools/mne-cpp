@@ -21,11 +21,11 @@ namespace MNELIB
 /**
  * Named vector - vector specification with a channel list.
  */
-class MNESHARED_EXPORT MneNamedVector
+class MNESHARED_EXPORT MNENamedVector
 {
 public:
-    MneNamedVector() = default;
-    ~MneNamedVector() = default;
+    MNENamedVector() = default;
+    ~MNENamedVector() = default;
 
     int         nvec = 0;   /**< Number of elements. */
     QStringList names;      /**< Name list for the elements. */

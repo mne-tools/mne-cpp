@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MNE Derivation (MneDeriv) Class.
+ * @brief    Definition of the MNE Derivation (MNEDeriv) Class.
  *
  */
 
@@ -51,12 +51,12 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneDeriv::MneDeriv()
+MNEDeriv::MNEDeriv()
 {
 }
 
 //=============================================================================================================
 
-MneDeriv::~MneDeriv()
+MNEDeriv::~MNEDeriv()
 {
 }

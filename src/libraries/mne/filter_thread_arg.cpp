@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MNE Derivation (MneDeriv) Class.
+ * @brief    Definition of the MNE Derivation (MNEDeriv) Class.
  *
  */
 

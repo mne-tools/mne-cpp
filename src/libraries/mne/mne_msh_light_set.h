@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneMshLightSet class declaration.
+ * @brief    MNEMshLightSet class declaration.
  *
  */
 
@@ -68,50 +68,50 @@ namespace MNELIB
 /**
  * @brief Collection of lights defining the lighting setup for 3-D rendering.
  */
-class MNESHARED_EXPORT MneMshLightSet
+class MNESHARED_EXPORT MNEMshLightSet
 {
 public:
-    typedef QSharedPointer<MneMshLightSet> SPtr;              /**< Shared pointer type for MneMshLightSet. */
-    typedef QSharedPointer<const MneMshLightSet> ConstSPtr;   /**< Const shared pointer type for MneMshLightSet. */
+    typedef QSharedPointer<MNEMshLightSet> SPtr;              /**< Shared pointer type for MNEMshLightSet. */
+    typedef QSharedPointer<const MNEMshLightSet> ConstSPtr;   /**< Const shared pointer type for MNEMshLightSet. */
 
     //=========================================================================================================
     /**
-     * Constructs an empty MneMshLightSet.
+     * Constructs an empty MNEMshLightSet.
      */
-    MneMshLightSet() = default;
+    MNEMshLightSet() = default;
 
-    MneMshLightSet(const MneMshLightSet& other)
+    MNEMshLightSet(const MNEMshLightSet& other)
         : name(other.name)
     {
         lights.reserve(other.lights.size());
         for (const auto& l : other.lights)
-            lights.push_back(std::make_unique<MneMshLight>(*l));
+            lights.push_back(std::make_unique<MNEMshLight>(*l));
     }
 
-    MneMshLightSet& operator=(const MneMshLightSet& other)
+    MNEMshLightSet& operator=(const MNEMshLightSet& other)
     {
         if (this != &other) {
             name = other.name;
             lights.clear();
             lights.reserve(other.lights.size());
             for (const auto& l : other.lights)
-                lights.push_back(std::make_unique<MneMshLight>(*l));
+                lights.push_back(std::make_unique<MNEMshLight>(*l));
         }
         return *this;
     }
 
-    MneMshLightSet(MneMshLightSet&&) = default;
-    MneMshLightSet& operator=(MneMshLightSet&&) = default;
+    MNEMshLightSet(MNEMshLightSet&&) = default;
+    MNEMshLightSet& operator=(MNEMshLightSet&&) = default;
 
     //=========================================================================================================
     /**
      * Destructor.
      */
-    ~MneMshLightSet() = default;
+    ~MNEMshLightSet() = default;
 
 public:
     QString name;                                        /**< Name of this light set. */
-    std::vector<std::unique_ptr<MneMshLight>> lights;    /**< Owned light objects. */
+    std::vector<std::unique_ptr<MNEMshLight>> lights;    /**< Owned light objects. */
 
     /**
      * @brief Returns the number of lights in the set.

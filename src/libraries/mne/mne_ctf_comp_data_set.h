@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneCTFCompDataSet class declaration.
+ * @brief    MNECTFCompDataSet class declaration.
  *
  */
 
@@ -76,7 +76,7 @@ namespace MNELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneCTFCompData;
+class MNECTFCompData;
 
 //=============================================================================================================
 /**
@@ -86,17 +86,17 @@ class MneCTFCompData;
  * with the compiled current/undo operator pair used to switch between
  * compensation grades at runtime.
  */
-class MNESHARED_EXPORT MneCTFCompDataSet
+class MNESHARED_EXPORT MNECTFCompDataSet
 {
 public:
-    typedef QSharedPointer<MneCTFCompDataSet> SPtr;             /**< Shared pointer type for MneCTFCompDataSet. */
-    typedef QSharedPointer<const MneCTFCompDataSet> ConstSPtr;  /**< Const shared pointer type for MneCTFCompDataSet. */
+    typedef QSharedPointer<MNECTFCompDataSet> SPtr;             /**< Shared pointer type for MNECTFCompDataSet. */
+    typedef QSharedPointer<const MNECTFCompDataSet> ConstSPtr;  /**< Const shared pointer type for MNECTFCompDataSet. */
 
     //=========================================================================================================
     /**
      * Construct an empty compensation data set.
      */
-    MneCTFCompDataSet();
+    MNECTFCompDataSet();
 
     //=========================================================================================================
     /**
@@ -104,13 +104,13 @@ public:
      *
      * @param[in] set   The compensation data set to copy.
      */
-    MneCTFCompDataSet(const MneCTFCompDataSet& set);
+    MNECTFCompDataSet(const MNECTFCompDataSet& set);
 
     //=========================================================================================================
     /**
      * Destructor.
      */
-    ~MneCTFCompDataSet();
+    ~MNECTFCompDataSet();
 
     //=========================================================================================================
     /**
@@ -121,7 +121,7 @@ public:
      *
      * @return A new compensation data set, or nullptr on failure.
      */
-    static std::unique_ptr<MneCTFCompDataSet> read(const QString& name);
+    static std::unique_ptr<MNECTFCompDataSet> read(const QString& name);
 
     //=========================================================================================================
     /**
@@ -249,12 +249,12 @@ public:
                          int ncomp_chan);
 
 public:
-    QList<MneCTFCompData*> comps;   /**< All available compensation data sets. */
+    QList<MNECTFCompData*> comps;   /**< All available compensation data sets. */
     int            ncomp;           /**< Number of compensation data sets. */
     QList<FIFFLIB::FiffChInfo>     chs;    /**< Channel information associated with compensation. */
     int            nch;             /**< Number of channels. */
-    std::unique_ptr<MneCTFCompData> undo;           /**< Compensation data to undo the current state. */
-    std::unique_ptr<MneCTFCompData> current;        /**< Compiled compensation operator for the current target grade. */
+    std::unique_ptr<MNECTFCompData> undo;           /**< Compensation data to undo the current state. */
+    std::unique_ptr<MNECTFCompData> current;        /**< Compiled compensation operator for the current target grade. */
 };
 
 //=============================================================================================================

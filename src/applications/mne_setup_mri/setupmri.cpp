@@ -76,7 +76,7 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SetupMri::SetupMri(const MneSetupMriSettings& settings)
+SetupMri::SetupMri(const MNESetupMriSettings& settings)
 : m_settings(settings)
 {
 }

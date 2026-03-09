@@ -1,0 +1,38 @@
+cmake_minimum_required(VERSION 3.14)
+project(test_fs_annotation_labels LANGUAGES CXX)
+
+set(CMAKE_AUTOMOC ON)
+
+set(QT_REQUIRED_COMPONENTS Core Test)
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS})
+
+set(SOURCES test_fs_annotation_labels.cpp)
+
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    qt_add_executable(${PROJECT_NAME} MANUAL_FINALIZATION ${SOURCES})
+else()
+    add_executable(${PROJECT_NAME} ${SOURCES})
+endif()
+
+set(QT_REQUIRED_COMPONENT_LIBS ${QT_REQUIRED_COMPONENTS})
+list(TRANSFORM QT_REQUIRED_COMPONENT_LIBS PREPEND "Qt${QT_VERSION_MAJOR}::")
+
+set(MNE_LIBS_REQUIRED mne_fs mne_fiff mne_utils)
+
+target_link_libraries(${PROJECT_NAME} PRIVATE
+  ${QT_REQUIRED_COMPONENT_LIBS} ${MNE_LIBS_REQUIRED} eigen)
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/../../out/${CMAKE_BUILD_TYPE}/tests"
+  WIN32_EXECUTABLE FALSE
+  MACOSX_BUNDLE FALSE
+)
+
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    qt_finalize_executable(${PROJECT_NAME})
+endif()
+
+if(NOT BUILD_SHARED_LIBS)
+    target_compile_definitions(${PROJECT_NAME} PRIVATE STATICBUILD)
+endif()

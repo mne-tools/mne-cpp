@@ -1,15 +1,22 @@
 #include <QtTest/QtTest>
 #include <Eigen/Dense>
 
+#include <utils/generics/applicationlogger.h>
+
 #include <fiff/fiff_info_base.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_proj.h>
 #include <fiff/fiff_named_matrix.h>
 #include <fiff/fiff_ch_info.h>
 #include <fiff/fiff_raw_data.h>
+#include <fiff/fiff_cov.h>
+#include <fiff/fiff_evoked.h>
+#include <fiff/fiff_evoked_set.h>
 #include <fiff/fiff_constants.h>
+#include <fiff/fiff_dig_point_set.h>
 
 using namespace FIFFLIB;
+using namespace UTILSLIB;
 using namespace Eigen;
 
 class TestFiffInfo : public QObject
@@ -17,6 +24,10 @@ class TestFiffInfo : public QObject
     Q_OBJECT
 
 private:
+    QString m_sDataPath;
+
+    bool hasData() const { return !m_sDataPath.isEmpty(); }
+
     FiffChInfo makeCh(const QString &name, int kind, int unit, int coilType) {
         FiffChInfo ch;
         ch.ch_name = name;
@@ -41,6 +52,14 @@ private:
     }
 
 private slots:
+    void initTestCase()
+    {
+        qInstallMessageHandler(ApplicationLogger::customLogWriter);
+        QString base = QCoreApplication::applicationDirPath()
+                       + "/../resources/data/mne-cpp-test-data";
+        if (QFile::exists(base + "/MEG/sample/sample_audvis_trunc_raw.fif"))
+            m_sDataPath = base;
+    }
     //=========================================================================
     // FiffInfoBase
     //=========================================================================
@@ -239,6 +258,179 @@ private slots:
         QCOMPARE(chTypes.size(), raw.info.nchan);
         QVERIFY(chTypes.contains("mag") || chTypes.contains("grad") || chTypes.contains("eeg"));
     }
+
+    //=========================================================================
+    // DATA-DRIVEN: Full channel picking from real raw info
+    //=========================================================================
+    void data_pickTypes_allCombinations()
+    {
+        if (!hasData()) QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        FiffRawData raw(file);
+
+        // Pick magnetometers
+        RowVectorXi magPicks = raw.info.pick_types(QString("mag"), false, false);
+        QVERIFY(magPicks.size() > 0);
+
+        // Pick gradiometers
+        RowVectorXi gradPicks = raw.info.pick_types(QString("grad"), false, false);
+        QVERIFY(gradPicks.size() > 0);
+
+        // Pick EEG
+        RowVectorXi eegPicks = raw.info.pick_types(QString("eeg"), false, false);
+        QVERIFY(eegPicks.size() > 0);
+
+        // Pick STI
+        RowVectorXi stiPicks = raw.info.pick_types(QString("stim"), false, false);
+        QVERIFY(stiPicks.size() > 0);
+
+        // All combined should cover more
+        int totalPicked = magPicks.size() + gradPicks.size() + eegPicks.size() + stiPicks.size();
+        QVERIFY(totalPicked > 0);
+        QVERIFY(totalPicked <= raw.info.nchan);
+    }
+
+    void data_pickInfo_fromRaw()
+    {
+        if (!hasData()) QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        FiffRawData raw(file);
+
+        // Pick first 50 channels
+        RowVectorXi picks(50);
+        for (int i = 0; i < 50; ++i) picks(i) = i;
+
+        FiffInfo pickedInfo = raw.info.pick_info(picks);
+        QCOMPARE(pickedInfo.nchan, 50);
+        QCOMPARE(pickedInfo.ch_names.size(), 50);
+        QCOMPARE(pickedInfo.chs.size(), 50);
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: SSP projectors from real raw data
+    //=========================================================================
+    void data_proj_fromRealInfo()
+    {
+        if (!hasData()) QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        FiffRawData raw(file);
+
+        QList<FiffProj>& projs = raw.info.projs;
+        if (projs.isEmpty()) QSKIP("No projectors in file");
+
+        qDebug() << "Found" << projs.size() << "projectors:";
+        for (const FiffProj& p : projs) {
+            qDebug() << "  " << p.desc << " active=" << p.active
+                     << " kind=" << p.kind;
+        }
+
+        // Activate all
+        FiffProj::activate_projs(projs);
+        for (const FiffProj& p : projs)
+            QVERIFY(p.active);
+
+        // Make projector matrix
+        MatrixXd P;
+        int nProj = FiffProj::make_projector(projs, raw.info.ch_names, P);
+        QVERIFY(nProj > 0);
+        QCOMPARE(P.rows(), (Eigen::Index)raw.info.nchan);
+        QCOMPARE(P.cols(), (Eigen::Index)raw.info.nchan);
+
+        // P should be idempotent (P*P = P)
+        MatrixXd PP = P * P;
+        QVERIFY(PP.isApprox(P, 1e-10));
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: FiffCov from file
+    //=========================================================================
+    void data_cov_readAndPick()
+    {
+        if (!hasData()) QSKIP("No test data");
+        QString path = m_sDataPath + "/MEG/sample/sample_audvis-cov.fif";
+        QFile file(path);
+        if (!file.exists()) QSKIP("Covariance file not found");
+
+        FiffCov cov(file);
+        QVERIFY(!cov.isEmpty());
+        QVERIFY(cov.data.rows() > 0);
+        QCOMPARE(cov.data.rows(), cov.data.cols());
+        QVERIFY(cov.names.size() > 0);
+
+        // Pick subset
+        int nPick = qMin(30, cov.names.size());
+        QStringList pickNames = cov.names.mid(0, nPick);
+        FiffCov picked = cov.pick_channels(pickNames);
+        QCOMPARE(picked.names.size(), nPick);
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Read evoked and exercise info
+    //=========================================================================
+    void data_evokedInfo()
+    {
+        if (!hasData()) QSKIP("No test data");
+        QString path = m_sDataPath + "/MEG/sample/sample_audvis-ave.fif";
+        QFile file(path);
+        if (!file.exists()) QSKIP("Evoked file not found");
+
+        FiffEvokedSet evokedSet(file);
+        QVERIFY(evokedSet.evoked.size() > 0);
+        QVERIFY(evokedSet.info.nchan > 0);
+
+        // Exercise pick_channels
+        QStringList picks;
+        for (int i = 0; i < qMin(20, evokedSet.info.nchan); ++i)
+            picks << evokedSet.info.ch_names[i];
+
+        FiffEvokedSet pickedSet = evokedSet.pick_channels(picks);
+        QCOMPARE(pickedSet.info.nchan, picks.size());
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: Digitization points from raw info
+    //=========================================================================
+    void data_digPoints()
+    {
+        if (!hasData()) QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        FiffRawData raw(file);
+
+        FiffDigPointSet digSet = raw.info.dig;
+        if (digSet.size() == 0) QSKIP("No dig points");
+
+        qDebug() << "Found" << digSet.size() << "digitization points";
+
+        // Check that dig points have valid coordinates
+        for (int i = 0; i < digSet.size(); ++i) {
+            FiffDigPoint dp = digSet[i];
+            QVERIFY(dp.kind >= 0);
+        }
+    }
+
+    //=========================================================================
+    // DATA-DRIVEN: FiffInfo comp data
+    //=========================================================================
+    void data_compInfo()
+    {
+        if (!hasData()) QSKIP("No test data");
+        QFile file(m_sDataPath + "/MEG/sample/sample_audvis_trunc_raw.fif");
+        FiffRawData raw(file);
+
+        // Get current compensation
+        fiff_int_t comp = raw.info.get_current_comp();
+        qDebug() << "Current compensation grade:" << comp;
+
+        // Set compensation (exercise the code path)
+        raw.info.set_current_comp(0);
+        QCOMPARE(raw.info.get_current_comp(), (fiff_int_t)0);
+
+        // Restore
+        raw.info.set_current_comp(comp);
+        QCOMPARE(raw.info.get_current_comp(), comp);
+    }
+
+    void cleanupTestCase() {}
 };
 
 QTEST_GUILESS_MAIN(TestFiffInfo)

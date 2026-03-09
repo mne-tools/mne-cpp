@@ -196,7 +196,7 @@ const char* RapMusic::getName() const
 
 //=============================================================================================================
 
-const MNESourceSpace& RapMusic::getSourceSpace() const
+const MNESourceSpaces& RapMusic::getSourceSpace() const
 {
     return m_ForwardSolution.src;
 }

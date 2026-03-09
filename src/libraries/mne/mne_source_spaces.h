@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     mne_sourcespace.h
+ * @file     mne_source_spaces.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -30,12 +30,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MNESourceSpace class declaration.
+ * @brief    MNESourceSpaces class declaration.
  *
  */
 
-#ifndef MNE_SOURCESPACE_H
-#define MNE_SOURCESPACE_H
+#ifndef MNE_SOURCE_SPACES_H
+#define MNE_SOURCE_SPACES_H
 
 //=============================================================================================================
 // INCLUDES
@@ -50,6 +50,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <memory>
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -89,31 +90,31 @@ namespace MNELIB
  *
  * @brief Source Space descritpion
  */
-class MNESHARED_EXPORT MNESourceSpace
+class MNESHARED_EXPORT MNESourceSpaces
 {
 public:
-    typedef QSharedPointer<MNESourceSpace> SPtr;            /**< Shared pointer type for MNESourceSpace. */
-    typedef QSharedPointer<const MNESourceSpace> ConstSPtr; /**< Const shared pointer type for MNESourceSpace. */
+    using SPtr = std::shared_ptr<MNESourceSpaces>;            /**< Shared pointer type for MNESourceSpaces. */
+    using ConstSPtr = std::shared_ptr<const MNESourceSpaces>; /**< Const shared pointer type for MNESourceSpaces. */
 
     //=========================================================================================================
     /**
      * Default constructor
      */
-    MNESourceSpace();
+    MNESourceSpaces();
 
     //=========================================================================================================
     /**
      * Copy constructor.
      *
-     * @param[in] p_MNESourceSpace   MNE forward solution.
+     * @param[in] p_MNESourceSpaces   MNE forward solution.
      */
-    MNESourceSpace(const MNESourceSpace &p_MNESourceSpace);
+    MNESourceSpaces(const MNESourceSpaces &p_MNESourceSpaces);
 
     //=========================================================================================================
     /**
      * Destroys the MNE forward solution
      */
-    ~MNESourceSpace();
+    ~MNESourceSpaces();
 
     //=========================================================================================================
     /**
@@ -139,7 +140,7 @@ public:
      *
      * @return the deduced hemisphere id.
      */
-    static qint32 find_source_space_hemi(MNEHemisphere& p_Hemisphere);
+    static qint32 find_source_space_hemi(MNESourceSpace& p_SourceSpace);
 
     //=========================================================================================================
     /**
@@ -182,7 +183,7 @@ public:
      *
      * @return the reduced source space.
      */
-    MNESourceSpace pick_regions(const QList<FSLIB::Label> &p_qListLabels) const;
+    MNESourceSpaces pick_regions(const QList<FSLIB::Label> &p_qListLabels) const;
 
     //=========================================================================================================
     /**
@@ -198,7 +199,7 @@ public:
      */
     static bool readFromStream(FIFFLIB::FiffStream::SPtr& p_pStream,
                                bool add_geom,
-                               MNESourceSpace& p_SourceSpace);
+                               MNESourceSpaces& p_SourceSpace);
 
     //=========================================================================================================
     /**
@@ -211,9 +212,9 @@ public:
     //=========================================================================================================
     /**
      * ### MNE toolbox root function ###: Definition of the mne_transform_source_space_to function
-     * Wrapper for the MNESourceSpace transform_source_space_to member function
+     * Wrapper for the MNESourceSpaces transform_source_space_to member function
      *
-     * Note: In difference to mne-matlab this is not a static function. This is a method of the MNESourceSpace
+     * Note: In difference to mne-matlab this is not a static function. This is a method of the MNESourceSpaces
      *       class, that's why a tree object doesn't need to be handed to the function.
      *
      * Transforms source space data to the desired coordinate system
@@ -238,43 +239,83 @@ public:
 
     //=========================================================================================================
     /**
-     * Subscript operator [] to access parameter values by index
+     * Subscript operator [] to access source spaces by index.
      *
-     * @param[in] idx    the hemisphere index (0 or 1).
+     * @param[in] idx    the source space index (0 or 1).
      *
-     * @return Hemisphere related to the parameter index.
+     * @return Reference to the source space at the given index.
      */
-    MNEHemisphere& operator[] (qint32 idx);
+    MNESourceSpace& operator[] (qint32 idx);
 
     //=========================================================================================================
     /**
-     * Subscript operator [] to access parameter values by index
+     * Subscript operator [] to access source spaces by index.
      *
-     * @param[in] idx    the hemisphere index (0 or 1).
+     * @param[in] idx    the source space index (0 or 1).
      *
-     * @return Hemisphere related to the parameter index.
+     * @return Const reference to the source space at the given index.
      */
-    const MNEHemisphere& operator[] (qint32 idx) const;
+    const MNESourceSpace& operator[] (qint32 idx) const;
 
     //=========================================================================================================
     /**
-     * Subscript operator [] to access parameter values by index
+     * Subscript operator [] to access source spaces by hemisphere identifier.
      *
      * @param[in] idt    the hemisphere identifier ("lh" or "rh").
      *
-     * @return Hemisphere related to the parameter identifier.
+     * @return Reference to the source space for the given hemisphere.
      */
-    MNEHemisphere& operator[] (QString idt);
+    MNESourceSpace& operator[] (QString idt);
 
     //=========================================================================================================
     /**
-     * Subscript operator [] to access parameter values by index
+     * Subscript operator [] to access source spaces by hemisphere identifier.
      *
      * @param[in] idt    the hemisphere identifier ("lh" or "rh").
      *
-     * @return Hemisphere related to the parameter identifier.
+     * @return Const reference to the source space for the given hemisphere.
      */
-    const MNEHemisphere& operator[] (QString idt) const;
+    const MNESourceSpace& operator[] (QString idt) const;
+
+    //=========================================================================================================
+    /**
+     * Safe downcast to MNEHemisphere at the given index.
+     *
+     * @param[in] idx    the source space index.
+     *
+     * @return Pointer to MNEHemisphere, or nullptr if the element is not a hemisphere.
+     */
+    MNEHemisphere* hemisphereAt(qint32 idx);
+
+    //=========================================================================================================
+    /**
+     * Safe downcast to MNEHemisphere at the given index (const).
+     *
+     * @param[in] idx    the source space index.
+     *
+     * @return Const pointer to MNEHemisphere, or nullptr if the element is not a hemisphere.
+     */
+    const MNEHemisphere* hemisphereAt(qint32 idx) const;
+
+    //=========================================================================================================
+    /**
+     * Access the underlying shared_ptr at the given index.
+     *
+     * @param[in] idx    the source space index.
+     *
+     * @return shared_ptr to the MNESourceSpace.
+     */
+    std::shared_ptr<MNESourceSpace>& at(qint32 idx);
+
+    //=========================================================================================================
+    /**
+     * Access the underlying shared_ptr at the given index (const).
+     *
+     * @param[in] idx    the source space index.
+     *
+     * @return const shared_ptr to the MNESourceSpace.
+     */
+    const std::shared_ptr<MNESourceSpace>& at(qint32 idx) const;
 
     /**
      * Overloaded == operator to compare an object to this instance.
@@ -283,7 +324,7 @@ public:
      *
      * @return true if equal, false otherwise.
      */
-    friend bool operator== (const MNESourceSpace &a, const MNESourceSpace &b);
+    friend bool operator== (const MNESourceSpaces &a, const MNESourceSpaces &b);
 
 private:
 
@@ -316,31 +357,47 @@ private:
                                   MNEHemisphere& p_Hemisphere);
 
 private:
-    QList<MNEHemisphere> m_qListHemispheres;    /**< List of the hemispheres containing the source space information. */
+    std::vector<std::shared_ptr<MNESourceSpace>> m_sourceSpaces;    /**< Source spaces (typically hemispheres). */
 };
 
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool MNESourceSpace::isEmpty() const
+inline bool MNESourceSpaces::isEmpty() const
 {
-    return m_qListHemispheres.size() == 0;
+    return m_sourceSpaces.empty();
 }
 
 //=============================================================================================================
 
-inline qint32 MNESourceSpace::size() const
+inline qint32 MNESourceSpaces::size() const
 {
-    return m_qListHemispheres.size();
+    return static_cast<qint32>(m_sourceSpaces.size());
 }
 
 //=============================================================================================================
 
-inline bool operator== (const MNESourceSpace &a, const MNESourceSpace &b)
+inline bool operator== (const MNESourceSpaces &a, const MNESourceSpaces &b)
 {
-    return (a.m_qListHemispheres == b.m_qListHemispheres);
+    if (a.size() != b.size())
+        return false;
+    for (qint32 i = 0; i < a.size(); ++i) {
+        // Compare as hemispheres if both elements are hemispheres
+        auto* ha = dynamic_cast<const MNEHemisphere*>(&a[i]);
+        auto* hb = dynamic_cast<const MNEHemisphere*>(&b[i]);
+        if (ha && hb) {
+            if (!(*ha == *hb))
+                return false;
+        } else {
+            // Fallback: compare base-class identity (pointer equality or basic fields)
+            // For now, require both to be hemispheres for equality
+            return false;
+        }
+    }
+    return true;
 }
+
 } // NAMESPACE
 
-#endif // MNE_SOURCESPACE_H
+#endif // MNE_SOURCE_SPACES_H

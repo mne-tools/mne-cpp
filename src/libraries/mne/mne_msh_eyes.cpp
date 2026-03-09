@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneMshEyes Class.
+ * @brief    Definition of the MNEMshEyes Class.
  *
  */
 

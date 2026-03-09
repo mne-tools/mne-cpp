@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneNamedMatrix class declaration.
+ * @brief    MNENamedMatrix class declaration.
  *
  */
 
@@ -83,7 +83,7 @@ namespace MNELIB
 /**
  * @brief A dense matrix with named rows and columns.
  *
- * MneNamedMatrix associates a dense float matrix (Eigen::MatrixXf) with optional
+ * MNENamedMatrix associates a dense float matrix (Eigen::MatrixXf) with optional
  * row and column name lists (QStringList). It is the C++ equivalent of the MNE-C
  * @c mneNamedMatrixRec struct, and is used throughout the library to represent
  * projection vectors, CTF compensation matrices, and forward-solution gain matrices.
@@ -93,16 +93,16 @@ namespace MNELIB
  * - read() a matrix from a FIFF stream, and
  * - pick() a sub-matrix by selecting named rows and/or columns.
  *
- * All factory methods return @c std::unique_ptr<MneNamedMatrix> for clear ownership.
+ * All factory methods return @c std::unique_ptr<MNENamedMatrix> for clear ownership.
  *
  * @note This class is functionally similar to FIFFLIB::FiffNamedMatrix.
  *       A future consolidation of both types is planned.
  */
-class MNESHARED_EXPORT MneNamedMatrix
+class MNESHARED_EXPORT MNENamedMatrix
 {
 public:
-    typedef QSharedPointer<MneNamedMatrix> SPtr;              /**< Shared pointer type for MneNamedMatrix. */
-    typedef QSharedPointer<const MneNamedMatrix> ConstSPtr;   /**< Const shared pointer type for MneNamedMatrix. */
+    typedef QSharedPointer<MNENamedMatrix> SPtr;              /**< Shared pointer type for MNENamedMatrix. */
+    typedef QSharedPointer<const MNENamedMatrix> ConstSPtr;   /**< Const shared pointer type for MNENamedMatrix. */
 
     //=========================================================================================================
     /**
@@ -111,7 +111,7 @@ public:
      * Creates an empty named matrix with zero rows and columns
      * and no associated name lists.
      */
-    MneNamedMatrix();
+    MNENamedMatrix();
 
     //=========================================================================================================
     /**
@@ -121,7 +121,7 @@ public:
      *
      * @param[in] p_MneNamedMatrix   The named matrix to copy.
      */
-    MneNamedMatrix(const MneNamedMatrix& p_MneNamedMatrix);
+    MNENamedMatrix(const MNENamedMatrix& p_MneNamedMatrix);
 
     //=========================================================================================================
     /**
@@ -130,13 +130,13 @@ public:
      * All members (Eigen::MatrixXf, QStringList) are value types and clean
      * themselves up automatically.
      */
-    ~MneNamedMatrix();
+    ~MNENamedMatrix();
 
     //=========================================================================================================
     /**
      * @brief Factory: build a named matrix from its constituent parts.
      *
-     * Assembles an MneNamedMatrix from dimension counts, optional row/column
+     * Assembles an MNENamedMatrix from dimension counts, optional row/column
      * name lists, and a dense data matrix.
      *
      * @param[in] nrow       Number of rows (must match @p data.rows()).
@@ -147,7 +147,7 @@ public:
      *
      * @return A unique pointer to the newly created named matrix.
      */
-    static std::unique_ptr<MneNamedMatrix> build(int nrow,
+    static std::unique_ptr<MNENamedMatrix> build(int nrow,
                                                  int ncol,
                                                  const QStringList& rowlist,
                                                  const QStringList& collist,
@@ -168,7 +168,7 @@ public:
      *
      * @return A unique pointer to the read matrix, or @c nullptr on failure.
      */
-    static std::unique_ptr<MneNamedMatrix> read(QSharedPointer<FIFFLIB::FiffStream>& stream,
+    static std::unique_ptr<MNENamedMatrix> read(QSharedPointer<FIFFLIB::FiffStream>& stream,
                                                 const QSharedPointer<FIFFLIB::FiffDirNode>& node,
                                                 int kind);
 
@@ -188,7 +188,7 @@ public:
      * @return A unique pointer to the picked sub-matrix, or @c nullptr if a
      *         requested name was not found.
      */
-    std::unique_ptr<MneNamedMatrix> pick(const QStringList& pickrowlist,
+    std::unique_ptr<MNENamedMatrix> pick(const QStringList& pickrowlist,
                                          int picknrow,
                                          const QStringList& pickcollist,
                                          int pickncol) const;

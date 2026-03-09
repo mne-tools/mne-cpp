@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "mne_global.h"
-#include "mne_sourcespace.h"
+#include "mne_source_spaces.h"
 #include "mne_forwardsolution.h"
 
 #include <fiff/fiff_types.h>
@@ -373,7 +373,7 @@ public:
     FIFFLIB::FiffCov::SDPtr orient_prior;           /**< Orientation priors. */
     FIFFLIB::FiffCov::SDPtr depth_prior;            /**< Depth priors. */
     FIFFLIB::FiffCov::SDPtr fmri_prior;             /**< fMRI priors. */
-    MNESourceSpace src;                             /**< Source Space. */
+    MNESourceSpaces src;                             /**< Source Space. */
     FIFFLIB::FiffCoordTrans mri_head_t;             /**< MRI head coordinate transformation. */
     FIFFLIB::fiff_int_t nave;                       /**< Number of averages used to regularize the solution. Set to 1 on single Epoch by default.*/
     QList<FIFFLIB::FiffProj> projs;                 /**< SSP operator. */

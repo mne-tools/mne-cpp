@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MNE Patch Information (MnePatchInfo) class declaration.
+ * @brief    MNE Patch Information (MNEPatchInfo) class declaration.
  *
  */
 
@@ -66,7 +66,7 @@ namespace MNELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneSourceSpaceOld;
+class MNESourceSpace;
 
 //=============================================================================================================
 /**
@@ -74,25 +74,25 @@ class MneSourceSpaceOld;
  *
  * @brief Patch information for a single source space point including vertex members and area.
  */
-class MNESHARED_EXPORT MnePatchInfo
+class MNESHARED_EXPORT MNEPatchInfo
 {
 public:
-    typedef QSharedPointer<MnePatchInfo> SPtr;              /**< Shared pointer type for MnePatchInfo. */
-    typedef QSharedPointer<const MnePatchInfo> ConstSPtr;   /**< Const shared pointer type for MnePatchInfo. */
+    typedef QSharedPointer<MNEPatchInfo> SPtr;              /**< Shared pointer type for MNEPatchInfo. */
+    typedef QSharedPointer<const MNEPatchInfo> ConstSPtr;   /**< Const shared pointer type for MNEPatchInfo. */
 
     //=========================================================================================================
     /**
      * Constructs the MNE Patch Information
      * Refactored: mne_new_patch (mne_source_space.c)
      */
-    MnePatchInfo();
+    MNEPatchInfo();
 
     //=========================================================================================================
     /**
      * Destroys the MNE Patch Information
      * Refactored: mne_free_patch (mne_source_space.c)
      */
-    ~MnePatchInfo();
+    ~MNEPatchInfo();
 
     //=========================================================================================================
     /**
@@ -108,7 +108,7 @@ public:
      * @param[in] s   Pointer to the source space containing the triangle mesh
      *                (neighbor triangles and triangle areas).
      */
-    void calculate_area(MneSourceSpaceOld* s);
+    void calculate_area(MNESourceSpace* s);
 
     //=========================================================================================================
     /**
@@ -122,7 +122,7 @@ public:
      * @param[in] s   Pointer to the source space containing vertex normals (nn)
      *                for each vertex in the mesh.
      */
-    void calculate_normal_stats(MneSourceSpaceOld* s);
+    void calculate_normal_stats(MNESourceSpace* s);
 
 public:
     int   vert;                    /**< Source vertex index this patch applies to. */

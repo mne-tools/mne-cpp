@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneWatershedBemSettings class definition.
+ * @brief    MNEWatershedBemSettings class definition.
  *
  */
 
@@ -56,7 +56,7 @@ using namespace MNEWATERSHEDBEM;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneWatershedBemSettings::MneWatershedBemSettings(int *argc, char **argv)
+MNEWatershedBemSettings::MNEWatershedBemSettings(int *argc, char **argv)
 : m_sVolume("T1")
 , m_bOverwrite(false)
 , m_bAtlas(false)
@@ -173,63 +173,63 @@ MneWatershedBemSettings::MneWatershedBemSettings(int *argc, char **argv)
 
 //=============================================================================================================
 
-QString MneWatershedBemSettings::subject() const
+QString MNEWatershedBemSettings::subject() const
 {
     return m_sSubject;
 }
 
 //=============================================================================================================
 
-QString MneWatershedBemSettings::subjectsDir() const
+QString MNEWatershedBemSettings::subjectsDir() const
 {
     return m_sSubjectsDir;
 }
 
 //=============================================================================================================
 
-QString MneWatershedBemSettings::freeSurferHome() const
+QString MNEWatershedBemSettings::freeSurferHome() const
 {
     return m_sFreeSurferHome;
 }
 
 //=============================================================================================================
 
-QString MneWatershedBemSettings::volume() const
+QString MNEWatershedBemSettings::volume() const
 {
     return m_sVolume;
 }
 
 //=============================================================================================================
 
-bool MneWatershedBemSettings::overwrite() const
+bool MNEWatershedBemSettings::overwrite() const
 {
     return m_bOverwrite;
 }
 
 //=============================================================================================================
 
-bool MneWatershedBemSettings::atlas() const
+bool MNEWatershedBemSettings::atlas() const
 {
     return m_bAtlas;
 }
 
 //=============================================================================================================
 
-bool MneWatershedBemSettings::gcaAtlas() const
+bool MNEWatershedBemSettings::gcaAtlas() const
 {
     return m_bGcaAtlas;
 }
 
 //=============================================================================================================
 
-int MneWatershedBemSettings::preflood() const
+int MNEWatershedBemSettings::preflood() const
 {
     return m_iPreflood;
 }
 
 //=============================================================================================================
 
-bool MneWatershedBemSettings::verbose() const
+bool MNEWatershedBemSettings::verbose() const
 {
     return m_bVerbose;
 }

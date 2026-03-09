@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MNE Meas Data Set (MneMeasDataSet) Class.
+ * @brief    Definition of the MNE Meas Data Set (MNEMeasDataSet) Class.
  *
  */
 
@@ -67,7 +67,7 @@ void mne_free_cmatrix_8 (float **m)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneMeasDataSet::MneMeasDataSet()
+MNEMeasDataSet::MNEMeasDataSet()
 :data(NULL)
 ,data_filt(NULL)
 ,data_proj(NULL)
@@ -86,7 +86,7 @@ MneMeasDataSet::MneMeasDataSet()
 
 //=============================================================================================================
 
-MneMeasDataSet::~MneMeasDataSet()
+MNEMeasDataSet::~MNEMeasDataSet()
 {
     FREE_CMATRIX_8(data);
     FREE_CMATRIX_8(data_proj);

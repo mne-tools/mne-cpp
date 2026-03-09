@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneMshDisplaySurfaceSet Class.
+ * @brief    Definition of the MNEMshDisplaySurfaceSet Class.
  *
  */
 
@@ -40,9 +40,9 @@
 #include "mne_msh_display_surface_set.h"
 
 #include "mne_msh_display_surface.h"
-#include "mne_surface_old.h"
+#include "mne_surface.h"
 #include "mne_surface_patch.h"
-#include "mne_source_space_old.h"
+#include "mne_source_space.h"
 #include "mne_msh_light_set.h"
 #include "mne_msh_light.h"
 #include "mne_msh_eyes.h"
@@ -84,12 +84,12 @@ constexpr float EVEN_CURV_COLOR = 0.375f;
 // STATIC DATA
 //=============================================================================================================
 
-static MNELIB::MneMshEyes   default_eyes;
-static MNELIB::MneMshEyes*  all_eyes     = nullptr;
+static MNELIB::MNEMshEyes   default_eyes;
+static MNELIB::MNEMshEyes*  all_eyes     = nullptr;
 static int          neyes        = 0;
 static int          current_eyes = -1;
 
-static std::unique_ptr<MNELIB::MneMshLightSet> custom_lights;
+static std::unique_ptr<MNELIB::MNEMshLightSet> custom_lights;
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -101,7 +101,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneMshDisplaySurfaceSet::MneMshDisplaySurfaceSet(int nsurf)
+MNEMshDisplaySurfaceSet::MNEMshDisplaySurfaceSet(int nsurf)
 {
     Eigen::Map<Eigen::Vector3f>(default_eyes.left)    = Eigen::Vector3f(-0.2f, 0.0f, 0.0f);
     Eigen::Map<Eigen::Vector3f>(default_eyes.right)   = Eigen::Vector3f( 0.2f, 0.0f, 0.0f);
@@ -130,11 +130,11 @@ MneMshDisplaySurfaceSet::MneMshDisplaySurfaceSet(int nsurf)
 
 //=============================================================================================================
 
-MneMshDisplaySurfaceSet::~MneMshDisplaySurfaceSet() = default;
+MNEMshDisplaySurfaceSet::~MNEMshDisplaySurfaceSet() = default;
 
 //=============================================================================================================
 
-std::unique_ptr<MneMshDisplaySurfaceSet> MneMshDisplaySurfaceSet::load(const QString &subject_id, const QString &surf, const QString &subjects_dir)
+std::unique_ptr<MNEMshDisplaySurfaceSet> MNEMshDisplaySurfaceSet::load(const QString &subject_id, const QString &surf, const QString &subjects_dir)
      /*
       * Load new display surface data
       */
@@ -145,27 +145,27 @@ std::unique_ptr<MneMshDisplaySurfaceSet> MneMshDisplaySurfaceSet::load(const QSt
     QString pathRhCurv = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg("rh").arg("curv");
 
     printf("Loading surface %s ...\n", pathLh.toUtf8().constData());
-    std::unique_ptr<MneSourceSpaceOld> left(MneSurfaceOrVolume::load_surface(pathLh, pathLhCurv));
+    auto left = MNESourceSpace::load_surface(pathLh, pathLhCurv);
     if (!left) {
-        left.reset(MneSurfaceOrVolume::load_surface(pathLh, QString()));
+        left = MNESourceSpace::load_surface(pathLh, QString());
         if (!left)
             return nullptr;
-        MneSurfaceOrVolume::add_uniform_curv(reinterpret_cast<MneSurfaceOld&>(*left));
+        left->add_uniform_curv();
     }
 
     printf("Loading surface %s ...\n", pathRh.toUtf8().constData());
-    std::unique_ptr<MneSourceSpaceOld> right(MneSurfaceOrVolume::load_surface(pathRh, pathRhCurv));
+    auto right = MNESourceSpace::load_surface(pathRh, pathRhCurv);
     if (!right) {
-        right.reset(MneSurfaceOrVolume::load_surface(pathRh, QString()));
+        right = MNESourceSpace::load_surface(pathRh, QString());
         if (!right)
             return nullptr;
-        MneSurfaceOrVolume::add_uniform_curv(reinterpret_cast<MneSurfaceOld&>(*right));
+        right->add_uniform_curv();
     }
 
-    auto result = std::make_unique<MneMshDisplaySurfaceSet>(2);
+    auto result = std::make_unique<MNEMshDisplaySurfaceSet>(2);
 
-    result->surfs[0] = std::make_unique<MneMshDisplaySurface>();
-    result->surfs[1] = std::make_unique<MneMshDisplaySurface>();
+    result->surfs[0] = std::make_unique<MNEMshDisplaySurface>();
+    result->surfs[1] = std::make_unique<MNEMshDisplaySurface>();
 
     result->active[0]  = true;
     result->active[1]  = false;
@@ -174,25 +174,25 @@ std::unique_ptr<MneMshDisplaySurfaceSet> MneMshDisplaySurfaceSet::load(const QSt
 
     auto* pThis        = result->surfs[0].get();
     pThis->filename    = pathLh;
-    pThis->s.reset(reinterpret_cast<MneSurfaceOld*>(left.release()));
-    pThis->s->id       = SURF_LEFT_HEMI;
+    static_cast<MNESurfaceOrVolume&>(*pThis) = std::move(static_cast<MNESurfaceOrVolume&>(*left));
+    pThis->id       = SURF_LEFT_HEMI;
     pThis->subj        = subject_id;
     pThis->surf_name   = surf;
 
-    decide_surface_extent(*pThis,"Left hemisphere");
-    decide_curv_display(surf, *pThis);
-    setup_curvature_colors(*pThis);
+    pThis->decide_surface_extent("Left hemisphere");
+    pThis->decide_curv_display(surf);
+    pThis->setup_curvature_colors();
 
     pThis              = result->surfs[1].get();
     pThis->filename    = pathRh;
-    pThis->s.reset(reinterpret_cast<MneSurfaceOld*>(right.release()));
-    pThis->s->id       = SURF_RIGHT_HEMI;
+    static_cast<MNESurfaceOrVolume&>(*pThis) = std::move(static_cast<MNESurfaceOrVolume&>(*right));
+    pThis->id       = SURF_RIGHT_HEMI;
     pThis->subj        = subject_id;
     pThis->surf_name   = surf;
 
-    decide_surface_extent(*pThis,"Right hemisphere");
-    decide_curv_display(surf, *pThis);
-    setup_curvature_colors(*pThis);
+    pThis->decide_surface_extent("Right hemisphere");
+    pThis->decide_curv_display(surf);
+    pThis->setup_curvature_colors();
 
     result->apply_left_right_eyes();
     result->setup_current_lights();
@@ -202,51 +202,7 @@ std::unique_ptr<MneMshDisplaySurfaceSet> MneMshDisplaySurfaceSet::load(const QSt
 
 //=============================================================================================================
 
-void MneMshDisplaySurfaceSet::decide_surface_extent(MneMshDisplaySurface& surf,
-                                                    const QString& tag)
-
-{
-    auto* s = reinterpret_cast<MneSourceSpaceOld*>(surf.s.get());
-
-    Eigen::Vector3f minv = s->rr.row(0).transpose();
-    Eigen::Vector3f maxv = minv;
-
-    for (int k = 1; k < s->np; k++) {
-        Eigen::Vector3f r = s->rr.row(k).transpose();
-        minv = minv.cwiseMin(r);
-        maxv = maxv.cwiseMax(r);
-    }
-
-#ifdef DEBUG
-    printf("%s:\n",tag.toUtf8().constData());
-    printf("\tx = %f ... %f mm\n",1000*minv[0],1000*maxv[0]);
-    printf("\ty = %f ... %f mm\n",1000*minv[1],1000*maxv[1]);
-    printf("\tz = %f ... %f mm\n",1000*minv[2],1000*maxv[2]);
-#endif
-
-    surf.fov = std::max(minv.cwiseAbs().maxCoeff(), maxv.cwiseAbs().maxCoeff());
-
-    surf.minv = minv;
-    surf.maxv = maxv;
-    surf.fov_scale = 1.1f;
-}
-
-//=============================================================================================================
-
-void MneMshDisplaySurfaceSet::decide_curv_display(const QString& name,
-                MneMshDisplaySurface& s)
-
-{
-    if (name.startsWith("inflated") || name.startsWith("sphere") || name.startsWith("white"))
-        s.curvature_color_mode = SHOW_CURVATURE_OVERLAY;
-    else
-        s.curvature_color_mode = SHOW_CURVATURE_NONE;
-    s.overlay_color_mode = SHOW_OVERLAY_HEAT;
-}
-
-//=============================================================================================================
-
-int MneMshDisplaySurfaceSet::add_bem_surface(const QString&       filepath,
+int MNEMshDisplaySurfaceSet::add_bem_surface(const QString&       filepath,
                                                 int                  kind,
                                                 const QString&       bemname,
                                                 int                  full_geom,
@@ -255,13 +211,13 @@ int MneMshDisplaySurfaceSet::add_bem_surface(const QString&       filepath,
     printf("Loading BEM surface %s (id = %d) from %s ...\n",
            bemname.toUtf8().constData(), kind, filepath.toUtf8().constData());
 
-    std::unique_ptr<MneSurfaceOld> surf(MneSurfaceOld::read_bem_surface2(filepath,kind,full_geom,nullptr));
+    std::unique_ptr<MNESurface> surf(MNESurface::read_bem_surface2(filepath,kind,full_geom,nullptr));
     if (!surf)
         return -1;
 
     if (check) {
-        MneSurfaceOld::compute_surface_cm(*surf);
-        double sum = MneSurfaceOld::sum_solids(Eigen::Map<const Eigen::Vector3f>(surf->cm), *surf) / (4*M_PI);
+        surf->compute_surface_cm();
+        double sum = surf->sum_solids(Eigen::Map<const Eigen::Vector3f>(surf->cm)) / (4*M_PI);
         if (std::fabs(sum - 1.0) > 1e-4) {
             printf( "%s surface is not closed "
                                  "(sum of solid angles = %g * 4*PI).",
@@ -270,17 +226,17 @@ int MneMshDisplaySurfaceSet::add_bem_surface(const QString&       filepath,
         }
     }
 
-    auto newSurf = std::make_unique<MneMshDisplaySurface>();
+    auto newSurf = std::make_unique<MNEMshDisplaySurface>();
     newSurf->filename    = filepath;
     //newSurf->time_loaded = time(nullptr); //Comment out due to unknown timestamp function ToDo
-    newSurf->s.reset(surf.release());
-    newSurf->s->id       = kind;
+    static_cast<MNESurfaceOrVolume&>(*newSurf) = std::move(static_cast<MNESurfaceOrVolume&>(*surf));
+    newSurf->id       = kind;
     newSurf->surf_name   = bemname;
 
     newSurf->curvature_color_mode = SHOW_CURVATURE_NONE;
     newSurf->overlay_color_mode   = SHOW_OVERLAY_HEAT;
 
-    decide_surface_extent(*newSurf, bemname);
+    newSurf->decide_surface_extent(bemname);
     add_replace_surface(std::move(newSurf), true, true);
     apply_left_eyes();
     setup_current_lights();
@@ -290,14 +246,14 @@ int MneMshDisplaySurfaceSet::add_bem_surface(const QString&       filepath,
 
 //=============================================================================================================
 
-void MneMshDisplaySurfaceSet::add_replace_surface(std::unique_ptr<MneMshDisplaySurface> newSurf,
+void MNEMshDisplaySurfaceSet::add_replace_surface(std::unique_ptr<MNEMshDisplaySurface> newSurf,
                                                    bool                  replace,
                                                    bool                  drawable)
 {
     if (replace) {
         for (int k = 0; k < nsurf; k++) {
             auto& surf = surfs[k];
-            if (surf->s->id == newSurf->s->id) {
+            if (surf->id == newSurf->id) {
                 newSurf->transparent   = surf->transparent;
                 newSurf->show_aux_data = surf->show_aux_data;
                 surfs[k] = std::move(newSurf);
@@ -323,51 +279,9 @@ void MneMshDisplaySurfaceSet::add_replace_surface(std::unique_ptr<MneMshDisplayS
 
 //=============================================================================================================
 
-void MneMshDisplaySurfaceSet::setup_curvature_colors(MneMshDisplaySurface& surf)
+void MNEMshDisplaySurfaceSet::apply_left_right_eyes()
 {
-    if (!surf.s)
-        return;
-
-    auto* s = reinterpret_cast<MneSourceSpaceOld*>(surf.s.get());
-
-    const int ncolor = surf.nvertex_colors;
-    const int totalSize = ncolor * s->np;
-
-    if (surf.vertex_colors.size() == 0)
-        surf.vertex_colors.resize(totalSize);
-
-    float curv_sum = 0.0f;
-    if (surf.curvature_color_mode == SHOW_CURVATURE_OVERLAY) {
-        for (int k = 0; k < s->np; k++) {
-            const int base = k * ncolor;
-            curv_sum += std::fabs(s->curv[k]);
-            const float c = (s->curv[k] > 0) ? POS_CURV_COLOR : NEG_CURV_COLOR;
-            for (int j = 0; j < 3; j++)
-                surf.vertex_colors[base + j] = c;
-            if (ncolor == 4)
-                surf.vertex_colors[base + 3] = 1.0f;
-        }
-    }
-    else {
-        for (int k = 0; k < s->np; k++) {
-            const int base = k * ncolor;
-            curv_sum += std::fabs(s->curv[k]);
-            for (int j = 0; j < 3; j++)
-                surf.vertex_colors[base + j] = EVEN_CURV_COLOR;
-            if (ncolor == 4)
-                surf.vertex_colors[base + 3] = 1.0f;
-        }
-    }
-#ifdef DEBUG
-    printf("Average curvature : %f\n",curv_sum/s->np);
-#endif
-}
-
-//=============================================================================================================
-
-void MneMshDisplaySurfaceSet::apply_left_right_eyes()
-{
-    MneMshEyes* eyes = nullptr;
+    MNEMshEyes* eyes = nullptr;
 
     if (neyes == 0 || current_eyes < 0 || current_eyes > neyes-1) {
         eyes = &default_eyes;
@@ -377,7 +291,7 @@ void MneMshDisplaySurfaceSet::apply_left_right_eyes()
 
     for (int k = 0; k < nsurf; k++) {
         auto* surf = surfs[k].get();
-        switch(surf->s->id) {
+        switch(surf->id) {
         case SURF_LEFT_HEMI :
         case SURF_LEFT_MORPH_HEMI :
             surf->eye = Eigen::Vector3f::Map(eyes->left);
@@ -398,7 +312,7 @@ void MneMshDisplaySurfaceSet::apply_left_right_eyes()
 
 //=============================================================================================================
 
-void MneMshDisplaySurfaceSet::apply_left_eyes()
+void MNEMshDisplaySurfaceSet::apply_left_eyes()
 {
     for (int k = 0; k < nsurf; k++) {
         if (neyes == 0 || current_eyes < 0 || current_eyes > neyes-1) {
@@ -414,7 +328,7 @@ void MneMshDisplaySurfaceSet::apply_left_eyes()
 
 //=============================================================================================================
 
-void MneMshDisplaySurfaceSet::setup_current_lights()
+void MNEMshDisplaySurfaceSet::setup_current_lights()
 {
     initialize_custom_lights();
     setup_lights(*custom_lights);
@@ -422,37 +336,37 @@ void MneMshDisplaySurfaceSet::setup_current_lights()
 
 //=============================================================================================================
 
-void MneMshDisplaySurfaceSet::initialize_custom_lights()
+void MNEMshDisplaySurfaceSet::initialize_custom_lights()
 {
     if (!custom_lights) {
-        custom_lights = std::make_unique<MneMshLightSet>();
+        custom_lights = std::make_unique<MNEMshLightSet>();
 
-        custom_lights->lights.push_back(std::make_unique<MneMshLight>(true, 0.0f, 0.0f,  1.0f, 0.8f, 0.8f, 0.8f));
-        custom_lights->lights.push_back(std::make_unique<MneMshLight>(true, 0.0f, 0.0f, -1.0f, 0.8f, 0.8f, 0.8f));
-        custom_lights->lights.push_back(std::make_unique<MneMshLight>(true, 0.6f, -1.0f, -1.0f, 0.6f, 0.6f, 0.6f));
-        custom_lights->lights.push_back(std::make_unique<MneMshLight>(true, -0.6f, -1.0f, -1.0f, 0.6f, 0.6f, 0.6f));
-        custom_lights->lights.push_back(std::make_unique<MneMshLight>(true, 1.0f, 0.0f, 0.0f, 0.8f, 0.8f, 0.8f));
-        custom_lights->lights.push_back(std::make_unique<MneMshLight>(true, -1.0f, 0.0f, 0.0f, 0.8f, 0.8f, 0.8f));
-        custom_lights->lights.push_back(std::make_unique<MneMshLight>(true, 0.0f, 1.0f, 0.5f, 0.6f, 0.6f, 0.6f));
-        custom_lights->lights.push_back(std::make_unique<MneMshLight>(false, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f, 1.0f));
+        custom_lights->lights.push_back(std::make_unique<MNEMshLight>(true, 0.0f, 0.0f,  1.0f, 0.8f, 0.8f, 0.8f));
+        custom_lights->lights.push_back(std::make_unique<MNEMshLight>(true, 0.0f, 0.0f, -1.0f, 0.8f, 0.8f, 0.8f));
+        custom_lights->lights.push_back(std::make_unique<MNEMshLight>(true, 0.6f, -1.0f, -1.0f, 0.6f, 0.6f, 0.6f));
+        custom_lights->lights.push_back(std::make_unique<MNEMshLight>(true, -0.6f, -1.0f, -1.0f, 0.6f, 0.6f, 0.6f));
+        custom_lights->lights.push_back(std::make_unique<MNEMshLight>(true, 1.0f, 0.0f, 0.0f, 0.8f, 0.8f, 0.8f));
+        custom_lights->lights.push_back(std::make_unique<MNEMshLight>(true, -1.0f, 0.0f, 0.0f, 0.8f, 0.8f, 0.8f));
+        custom_lights->lights.push_back(std::make_unique<MNEMshLight>(true, 0.0f, 1.0f, 0.5f, 0.6f, 0.6f, 0.6f));
+        custom_lights->lights.push_back(std::make_unique<MNEMshLight>(false, 0.0f, 0.0f, -1.0f, 1.0f, 1.0f, 1.0f));
     }
 }
 
 //=============================================================================================================
 
-std::unique_ptr<MneMshLightSet> MneMshDisplaySurfaceSet::dup_light_set(const MneMshLightSet& s)
+std::unique_ptr<MNEMshLightSet> MNEMshDisplaySurfaceSet::dup_light_set(const MNEMshLightSet& s)
 {
-    auto res = std::make_unique<MneMshLightSet>();
+    auto res = std::make_unique<MNEMshLightSet>();
 
     for (const auto &light : s.lights)
-        res->lights.push_back(std::make_unique<MneMshLight>(*light));
+        res->lights.push_back(std::make_unique<MNEMshLight>(*light));
 
     return res;
 }
 
 //=============================================================================================================
 
-void MneMshDisplaySurfaceSet::setup_lights(const MneMshLightSet& set)
+void MNEMshDisplaySurfaceSet::setup_lights(const MNEMshLightSet& set)
 {
     lights = dup_light_set(set);
 }

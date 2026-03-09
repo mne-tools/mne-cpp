@@ -40,7 +40,7 @@ typedef int (*fwdFieldGradFunc)(float *rd,float *Q,FWDLIB::FwdCoilSet* coils, fl
 
 //typedef struct {
 //  char       *surf_name;	/* Name of the file where surfaces were loaded from */
-//  FWDLIB::MneCSurface* *surfs;   /* The interface surfaces from outside towards inside */
+//  FWDLIB::MNECSurface* *surfs;   /* The interface surfaces from outside towards inside */
 //  int        *ntri;		/* Number of triangles on each surface */
 //  int        *np;		/* Number of vertices on each surface */
 //  int        nsurf;		/* How many */
@@ -62,7 +62,7 @@ typedef int (*fwdFieldGradFunc)(float *rd,float *Q,FWDLIB::FwdCoilSet* coils, fl
 //} *fwdBemModel,fwdBemModelRec;	/* Holds the BEM model definition */
 
 //typedef struct {
-//  FWDLIB::MneCTFCompDataSet* set;	         /* The compensation data set */
+//  FWDLIB::MNECTFCompDataSet* set;	         /* The compensation data set */
 //  FWDLIB::FwdCoilSet*        comp_coils;	         /* The compensation coil definitions */
 //  fwdFieldFunc      field;	         /* Computes the field of given direction dipole */
 //  fwdVecFieldFunc   vec_field;	         /* Computes the fields of all three dipole components  */

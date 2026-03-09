@@ -85,7 +85,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("mne_watershed_bem");
     QCoreApplication::setApplicationVersion("1.0");
 
-    MneWatershedBemSettings settings(&argc, argv);
+    MNEWatershedBemSettings settings(&argc, argv);
     WatershedBem watershedBem(settings);
 
     return watershedBem.run();

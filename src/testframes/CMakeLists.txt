@@ -84,3 +84,23 @@ add_subdirectory(test_filter_data)
 add_subdirectory(test_fs_surface_annotation)
 add_subdirectory(test_mne_data_types)
 add_subdirectory(test_fwd_models)
+
+# Coverage boost tests
+add_subdirectory(test_inverse_rap_dipole)
+add_subdirectory(test_fiff_coord_transform)
+add_subdirectory(test_fs_annotation_labels)
+add_subdirectory(test_fwd_sphere_settings)
+add_subdirectory(test_mne_hemisphere_epoch)
+add_subdirectory(test_rtprocessing_averaging)
+
+# Data-driven coverage tests
+add_subdirectory(test_fiff_raw_io)
+add_subdirectory(test_mne_source_data)
+add_subdirectory(test_inverse_data)
+add_subdirectory(test_fwd_bem_data)
+
+# Library-level coverage tests (consolidated from boost + coverage tests)
+add_subdirectory(test_mne_library)
+add_subdirectory(test_fwd_library)
+add_subdirectory(test_fiff_fs_library)
+add_subdirectory(test_inv_rt_library)

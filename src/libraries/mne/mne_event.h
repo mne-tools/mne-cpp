@@ -23,11 +23,11 @@ namespace MNELIB
  * Records a stimulus transition (from one value to another) at a given
  * sample position, together with an optional free-text comment.
  */
-class MNESHARED_EXPORT MneEvent
+class MNESHARED_EXPORT MNEEvent
 {
 public:
-    MneEvent() = default;
-    ~MneEvent() = default;
+    MNEEvent() = default;
+    ~MNEEvent() = default;
 
     unsigned int from = 0;          /**< Source transition value. */
     unsigned int to = 0;            /**< Destination transition value. */

@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MNE Mne Data (MneMneData) Class.
+ * @brief    Definition of the MNE Mne Data (MNEMneData) Class.
  *
  */
 

@@ -49,7 +49,7 @@
 
 #include <mne/mne_epoch_data_list.h>
 
-#include <mne/mne_sourceestimate.h>
+#include <mne/mne_source_estimate.h>
 #include <inverse/rapMusic/pwlrapmusic.h>
 
 #include <disp3D_rhi/view/brainview.h>

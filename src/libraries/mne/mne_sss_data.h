@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MNE SSS Data (MneSssData) class declaration.
+ * @brief    MNE SSS Data (MNESssData) class declaration.
  *
  */
 
@@ -80,17 +80,17 @@ namespace MNELIB
  *
  * @brief Container for Signal Space Separation (SSS/Maxwell filtering) expansion coefficients and metadata.
  */
-class MNESHARED_EXPORT MneSssData
+class MNESHARED_EXPORT MNESssData
 {
 public:
-    typedef QSharedPointer<MneSssData> SPtr;              /**< Shared pointer type for MneSssData. */
-    typedef QSharedPointer<const MneSssData> ConstSPtr;   /**< Const shared pointer type for MneSssData. */
+    typedef QSharedPointer<MNESssData> SPtr;              /**< Shared pointer type for MNESssData. */
+    typedef QSharedPointer<const MNESssData> ConstSPtr;   /**< Const shared pointer type for MNESssData. */
 
     //=========================================================================================================
     /**
      * Constructs the MNE SSS Data
      */
-    MneSssData();
+    MNESssData();
 
     //=========================================================================================================
     /**
@@ -99,13 +99,13 @@ public:
      *
      * @param[in] p_MneSssData   MNE SSS Data which should be copied.
      */
-    MneSssData(const MneSssData& p_MneSssData);
+    MNESssData(const MNESssData& p_MneSssData);
 
     //=========================================================================================================
     /**
      * Destroys the MNE SSS Data description
      */
-    ~MneSssData();
+    ~MNESssData();
 
     //=========================================================================================================
     /**
@@ -116,7 +116,7 @@ public:
      *
      * @return   The read SSS data.
      */
-    static MneSssData *read(const QString& name);
+    static MNESssData *read(const QString& name);
 
     //=========================================================================================================
     /**
@@ -128,7 +128,7 @@ public:
      *
      * @return   The read SSS data.
      */
-    static MneSssData* read_from_node( QSharedPointer<FIFFLIB::FiffStream>& stream, const QSharedPointer<FIFFLIB::FiffDirNode>& start );
+    static MNESssData* read_from_node( QSharedPointer<FIFFLIB::FiffStream>& stream, const QSharedPointer<FIFFLIB::FiffDirNode>& start );
 
     //=========================================================================================================
     /**

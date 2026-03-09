@@ -140,9 +140,9 @@ public:
 
     //============================= dipole_fit_setup.c =============================
 
-    static int setup_forward_model(DipoleFitData* d, MNELIB::MneCTFCompDataSet* comp_data, FWDLIB::FwdCoilSet* comp_coils);
+    static int setup_forward_model(DipoleFitData* d, MNELIB::MNECTFCompDataSet* comp_data, FWDLIB::FwdCoilSet* comp_coils);
 
-    static std::unique_ptr<MNELIB::MneCovMatrix> ad_hoc_noise(FWDLIB::FwdCoilSet* meg,          /* Channel name lists to define which channels are gradiometers */
+    static std::unique_ptr<MNELIB::MNECovMatrix> ad_hoc_noise(FWDLIB::FwdCoilSet* meg,          /* Channel name lists to define which channels are gradiometers */
                                      FWDLIB::FwdCoilSet* eeg,
                                      float      grad_std,
                                      float      mag_std,
@@ -152,7 +152,7 @@ public:
     static int make_projection(const QList<QString>& projnames,
                                const QList<FIFFLIB::FiffChInfo>& chs,
                                int        nch,
-                               MNELIB::MneProjOp*  *res);
+                               MNELIB::MNEProjOp*  *res);
 
     static int scale_noise_cov(DipoleFitData* f,int nave);
 
@@ -226,10 +226,10 @@ public:
       dipoleFitFuncs    mag_dipole_funcs;   /**< Functions to fit a magnetic dipole. */
 
       int               fixed_noise;        /**< Were fixed noise values used rather than a noise-covariance matrix read from a file. */
-      std::unique_ptr<MNELIB::MneCovMatrix>      noise_orig;         /**< Noise covariance matrix (original, currently unused). */
-      std::unique_ptr<MNELIB::MneCovMatrix>      noise;              /**< Noise covariance matrix (weighted to take the selection into account). */
+      std::unique_ptr<MNELIB::MNECovMatrix>      noise_orig;         /**< Noise covariance matrix (original, currently unused). */
+      std::unique_ptr<MNELIB::MNECovMatrix>      noise;              /**< Noise covariance matrix (weighted to take the selection into account). */
       int               nave;               /**< How many averages does this correspond to?. */
-      std::unique_ptr<MNELIB::MneProjOp>        proj;               /**< The projection operator to use. */
+      std::unique_ptr<MNELIB::MNEProjOp>        proj;               /**< The projection operator to use. */
       int               column_norm;        /**< What kind of column normalization to apply to the forward solution. */
       int               fit_mag_dipoles;    /**< Fit magnetic dipoles?. */
       FitDipUserRec     *user;              /**< Non-owning pointer to dipole fit workspace (set during fit_one). */

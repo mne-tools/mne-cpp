@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("mne_flash_bem");
     QCoreApplication::setApplicationVersion("1.0");
 
-    MneFlashBemSettings settings(&argc, argv);
+    MNEFlashBemSettings settings(&argc, argv);
     FlashBem flashBem(settings);
 
     return flashBem.run();

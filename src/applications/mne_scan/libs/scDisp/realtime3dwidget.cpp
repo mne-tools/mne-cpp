@@ -60,6 +60,7 @@
 #include <fiff/fiff_digitizer_data.h>
 
 #include <mne/mne_msh_display_surface_set.h>
+#include <mne/mne_msh_display_surface.h>
 #include <mne/mne_surface_or_volume.h>
 
 #include <memory>
@@ -267,26 +268,25 @@ void RealTime3DWidget::alignFiducials(const QString& sFilePath)
 
 void RealTime3DWidget::alignFiducials(QSharedPointer<FIFFLIB::FiffDigitizerData> pDigData)
 {
-    std::unique_ptr<MneMshDisplaySurfaceSet> pMneMshDisplaySurfaceSet = std::make_unique<MneMshDisplaySurfaceSet>();
+    std::unique_ptr<MNEMshDisplaySurfaceSet> pMneMshDisplaySurfaceSet = std::make_unique<MNEMshDisplaySurfaceSet>();
     pMneMshDisplaySurfaceSet->add_bem_surface(QCoreApplication::applicationDirPath() + "/../resources/general/hpiAlignment/fsaverage-head.fif",
                                              FIFFV_BEM_SURF_ID_HEAD,
                                              "head",
                                              1,
                                              1);
 
-    MneMshDisplaySurface* surface = pMneMshDisplaySurfaceSet->surfs[0].get();
+    MNEMshDisplaySurface* surface = pMneMshDisplaySurfaceSet->surfs[0].get();
 
     QFile t_fileDigDataReference(QCoreApplication::applicationDirPath() + "/../resources/general/hpiAlignment/fsaverage-fiducials.fif");
 
     Eigen::Vector3f scales;
     QScopedPointer<FiffDigitizerData> t_digDataReference(new FiffDigitizerData(t_fileDigDataReference));
-    MneSurfaceOrVolume::align_fiducials(*pDigData,
-                                        *t_digDataReference,
-                                        surface,
-                                        10,
-                                        1,
-                                        0,
-                                        scales);
+    surface->align_fiducials(*pDigData,
+                            *t_digDataReference,
+                            10,
+                            1,
+                            0,
+                            scales);
 
     QMatrix4x4 invMat = calculateInverseMatrix(pDigData, scales[0]);
 

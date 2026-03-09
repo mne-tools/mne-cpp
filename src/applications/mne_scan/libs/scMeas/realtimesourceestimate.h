@@ -50,8 +50,8 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_coord_trans.h>
 
-#include <mne/mne_sourcespace.h>
-#include <mne/mne_sourceestimate.h>
+#include <mne/mne_source_spaces.h>
+#include <mne/mne_source_estimate.h>
 #include <mne/mne_forwardsolution.h>
 
 //=============================================================================================================

@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MNE Derivation Set (MneDerivSet) class declaration.
+ * @brief    MNE Derivation Set (MNEDerivSet) class declaration.
  *
  */
 
@@ -67,32 +67,32 @@ namespace MNELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneDeriv;
+class MNEDeriv;
 
 //=============================================================================================================
 /**
- * @brief Collection of MneDeriv channel derivation definitions loaded from a file.
+ * @brief Collection of MNEDeriv channel derivation definitions loaded from a file.
  */
-class MNESHARED_EXPORT MneDerivSet
+class MNESHARED_EXPORT MNEDerivSet
 {
 public:
-    typedef QSharedPointer<MneDerivSet> SPtr;              /**< Shared pointer type for MneDerivSet. */
-    typedef QSharedPointer<const MneDerivSet> ConstSPtr;   /**< Const shared pointer type for MneDerivSet. */
+    typedef QSharedPointer<MNEDerivSet> SPtr;              /**< Shared pointer type for MNEDerivSet. */
+    typedef QSharedPointer<const MNEDerivSet> ConstSPtr;   /**< Const shared pointer type for MNEDerivSet. */
 
     //=========================================================================================================
     /**
      * Constructs the MNE Derivation Set
      */
-    MneDerivSet();
+    MNEDerivSet();
 
     //=========================================================================================================
     /**
      * Destructor.
      */
-    ~MneDerivSet();
+    ~MNEDerivSet();
 
 public:
-    QList<MneDeriv*> derivs;       /**< List of derivation items. */
+    QList<MNEDeriv*> derivs;       /**< List of derivation items. */
 };
 
 //=============================================================================================================

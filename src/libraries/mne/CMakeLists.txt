@@ -13,9 +13,9 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${QT_REQUIRED_COMPONENTS}
 set(SOURCES
     mne.cpp
     mne_global.cpp
-    mne_sourcespace.cpp
+    mne_source_spaces.cpp
     mne_forwardsolution.cpp
-    mne_sourceestimate.cpp
+    mne_source_estimate.cpp
     mne_hemisphere.cpp
     mne_inverse_operator.cpp
     mne_epoch_data.cpp
@@ -42,8 +42,8 @@ set(SOURCES
     mne_vol_geom.cpp
     mne_nearest.cpp
     mne_patch_info.cpp
-    mne_source_space_old.cpp
-    mne_surface_old.cpp
+    mne_source_space.cpp
+    mne_surface.cpp
     mne_surface_or_volume.cpp
     filter_thread_arg.cpp
     mne_msh_display_surface.cpp
@@ -64,10 +64,10 @@ set(SOURCES
 set(HEADERS
     mne.h
     mne_global.h
-    mne_sourcespace.h
+    mne_source_spaces.h
     mne_hemisphere.h
     mne_forwardsolution.h
-    mne_sourceestimate.h
+    mne_source_estimate.h
     mne_inverse_operator.h
     mne_epoch_data.h
     mne_epoch_data_list.h
@@ -102,8 +102,8 @@ set(HEADERS
     mne_vol_geom.h
     mne_nearest.h
     mne_patch_info.h
-    mne_source_space_old.h
-    mne_surface_old.h
+    mne_source_space.h
+    mne_surface.h
     mne_surface_or_volume.h
     filter_thread_arg.h
     mne_msh_display_surface.h

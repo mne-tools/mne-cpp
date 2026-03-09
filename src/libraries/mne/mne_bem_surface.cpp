@@ -54,38 +54,36 @@ using namespace FIFFLIB;
 //=============================================================================================================
 
 MNEBemSurface::MNEBemSurface()
-: id(-1)
-, np(-1)
-, ntri(-1)
-, coord_frame(-1)
-, sigma(-1)
-, rr(MatrixX3f::Zero(0,3))
-, nn(MatrixX3f::Zero(0,3))
-, tris(MatrixX3i::Zero(0,3))
+: MNESurface()
 , tri_cent(MatrixX3d::Zero(0,3))
 , tri_nn(MatrixX3d::Zero(0,3))
 , tri_area(VectorXd::Zero(0))
 {
+    id = -1;
+    np = -1;
+    ntri = -1;
+    coord_frame = -1;
+    sigma = -1;
 }
 
 //=============================================================================================================
 
 MNEBemSurface::MNEBemSurface(const MNEBemSurface& p_MNEBemSurface)
-: id(p_MNEBemSurface.id)
-, np(p_MNEBemSurface.np)
-, ntri(p_MNEBemSurface.ntri)
-, coord_frame(p_MNEBemSurface.coord_frame)
-, sigma(p_MNEBemSurface.sigma)
-, rr(p_MNEBemSurface.rr)
-, nn(p_MNEBemSurface.nn)
-, tris(p_MNEBemSurface.tris)
+: MNESurface()
 , tri_cent(p_MNEBemSurface.tri_cent)
 , tri_nn(p_MNEBemSurface.tri_nn)
 , tri_area(p_MNEBemSurface.tri_area)
-, neighbor_tri(p_MNEBemSurface.neighbor_tri)
-, neighbor_vert(p_MNEBemSurface.neighbor_vert)
 {
-    //*m_pGeometryData = *p_MNEBemSurface.m_pGeometryData;
+    id           = p_MNEBemSurface.id;
+    np           = p_MNEBemSurface.np;
+    ntri         = p_MNEBemSurface.ntri;
+    coord_frame  = p_MNEBemSurface.coord_frame;
+    sigma        = p_MNEBemSurface.sigma;
+    rr           = p_MNEBemSurface.rr;
+    nn           = p_MNEBemSurface.nn;
+    itris        = p_MNEBemSurface.itris;
+    neighbor_tri  = p_MNEBemSurface.neighbor_tri;
+    neighbor_vert = p_MNEBemSurface.neighbor_vert;
 }
 
 //=============================================================================================================
@@ -103,12 +101,14 @@ void MNEBemSurface::clear()
     ntri = -1;
     coord_frame = -1;
     sigma = -1;
-    rr = MatrixX3f::Zero(0,3);
-    nn = MatrixX3f::Zero(0,3);
-    tris = MatrixX3i::Zero(0,3);
+    rr.resize(0, 3);
+    nn.resize(0, 3);
+    itris.resize(0, 3);
     tri_cent = MatrixX3d::Zero(0,3);
     tri_nn = MatrixX3d::Zero(0,3);
     tri_area = VectorXd::Zero(0);
+    neighbor_tri.clear();
+    neighbor_vert.clear();
 }
 
 //=============================================================================================================
@@ -131,7 +131,7 @@ bool MNEBemSurface::addTriangleData()
     {
         for ( qint32 j = 0; j < 3; ++j)
         {
-            k = this->tris(i, j);
+            k = this->itris(i, j);
 
             r(j,0) = this->rr(k, 0);
             r(j,1) = this->rr(k, 1);
@@ -183,13 +183,13 @@ bool MNEBemSurface::add_geometry_info()
 
     //Create neighboring triangle vector using temporary std::vector for efficient appending
     {
-        std::vector<std::vector<int>> temp_ntri(this->tris.rows());
-        for (p = 0; p < this->tris.rows(); p++) {
+        std::vector<std::vector<int>> temp_ntri(this->itris.rows());
+        for (p = 0; p < this->itris.rows(); p++) {
             for (k = 0; k < 3; k++) {
-                temp_ntri[this->tris(p,k)].push_back(p);
+                temp_ntri[this->itris(p,k)].push_back(p);
             }
         }
-        neighbor_tri.resize(this->tris.rows());
+        neighbor_tri.resize(this->itris.rows());
         for (k = 0; k < static_cast<int>(temp_ntri.size()); k++) {
             neighbor_tri[k] = Eigen::Map<Eigen::VectorXi>(temp_ntri[k].data(), temp_ntri[k].size());
         }
@@ -202,7 +202,7 @@ bool MNEBemSurface::add_geometry_info()
             for (p = 0; p < neighbor_tri[k].size(); p++) {
                 //Fit in the other vertices of the neighboring triangle
                 for (c = 0; c < 3; c++) {
-                    int vert = this->tris(neighbor_tri[k][p], c);
+                    int vert = this->itris(neighbor_tri[k][p], c);
 
                     if (vert != k) {
                         found = false;
@@ -246,7 +246,7 @@ bool MNEBemSurface::addVertexNormals()
         for (qint32 j = 0; j < 3 ; ++j)
         {
             int nodenr;
-            nodenr = this->tris(p,j);               //find the corners(nodes) of the triangles
+            nodenr = this->itris(p,j);               //find the corners(nodes) of the triangles
             this->nn(nodenr,0) += this->tri_nn(p,0);  //add the triangle normal to the nodenormal
             this->nn(nodenr,1) += this->tri_nn(p,1);
             this->nn(nodenr,2) += this->tri_nn(p,2);
@@ -277,10 +277,10 @@ void MNEBemSurface::writeToStream(FiffStream *p_pStream)
     p_pStream->write_int(FIFF_MNE_COORD_FRAME, &this->coord_frame);
     p_pStream->write_int(FIFF_BEM_SURF_NNODE, &this->np);
     p_pStream->write_int(FIFF_BEM_SURF_NTRI, &this->ntri);
-    p_pStream->write_float_matrix(FIFF_BEM_SURF_NODES, this->rr);
+    p_pStream->write_float_matrix(FIFF_BEM_SURF_NODES, Eigen::MatrixXf(this->rr));
     if (this->ntri > 0)
-        p_pStream->write_int_matrix(FIFF_BEM_SURF_TRIANGLES, this->tris.array() + 1);
-    p_pStream->write_float_matrix(FIFF_BEM_SURF_NORMALS, this->nn);
+        p_pStream->write_int_matrix(FIFF_BEM_SURF_TRIANGLES, Eigen::MatrixXi(this->itris.array() + 1));
+    p_pStream->write_float_matrix(FIFF_BEM_SURF_NORMALS, Eigen::MatrixXf(this->nn));
 }
 
 //=============================================================================================================

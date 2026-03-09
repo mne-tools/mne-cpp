@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneSurfacePatch Class.
+ * @brief    Definition of the MNESurfacePatch Class.
  *
  */
 
@@ -39,7 +39,7 @@
 
 #include "mne_surface_patch.h"
 
-#include "mne_source_space_old.h"
+#include "mne_source_space.h"
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -51,15 +51,15 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneSurfacePatch::MneSurfacePatch(int np)
+MNESurfacePatch::MNESurfacePatch(int np)
 {
      if (np > 0) {
        vert   = Eigen::VectorXi::Zero(np);
        border = Eigen::VectorXi::Zero(np);
      }
-     s = std::make_unique<MneSourceSpaceOld>(np);
+     s = std::make_unique<MNESourceSpace>(np);
 }
 
 //=============================================================================================================
 
-MneSurfacePatch::~MneSurfacePatch() = default;
+MNESurfacePatch::~MNESurfacePatch() = default;

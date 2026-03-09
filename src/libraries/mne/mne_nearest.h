@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneNearest class declaration.
+ * @brief    MNENearest class declaration.
  *
  */
 
@@ -66,7 +66,7 @@ namespace MNELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MnePatchInfo;
+class MNEPatchInfo;
 
 //=============================================================================================================
 /**
@@ -74,32 +74,32 @@ class MnePatchInfo;
  *
  * @brief This is used in the patch definitions
  */
-class MNESHARED_EXPORT MneNearest
+class MNESHARED_EXPORT MNENearest
 {
 public:
-    typedef QSharedPointer<MneNearest> SPtr;              /**< Shared pointer type for MneNearest. */
-    typedef QSharedPointer<const MneNearest> ConstSPtr;   /**< Const shared pointer type for MneNearest. */
+    typedef QSharedPointer<MNENearest> SPtr;              /**< Shared pointer type for MNENearest. */
+    typedef QSharedPointer<const MNENearest> ConstSPtr;   /**< Const shared pointer type for MNENearest. */
 
     //=========================================================================================================
     /**
      * Constructs the MNE Nearest
      */
-    MneNearest();
+    MNENearest();
 
     //=========================================================================================================
     /**
      * Destroys the MNE Nearest
      * Refactored:  (.c)
      */
-    ~MneNearest();
+    ~MNENearest();
 
 public:
     int   vert;             /**< Vertex index in the full surface mesh. */
     int   nearest;          /**< Index of the nearest 'inuse' vertex. */
     float dist;             /**< Distance to the nearest 'inuse' vertex (meters). */
-    MnePatchInfo* patch;    /**< Non-owning pointer to the patch this vertex belongs to.
-                             *   Owned by MneSourceSpaceOld::patches (unique_ptr).
-                             *   Multiple MneNearest objects share the same MnePatchInfo. */
+    MNEPatchInfo* patch;    /**< Non-owning pointer to the patch this vertex belongs to.
+                             *   Owned by MNESourceSpace::patches (unique_ptr).
+                             *   Multiple MNENearest objects share the same MNEPatchInfo. */
 };
 
 //=============================================================================================================

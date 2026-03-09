@@ -71,7 +71,7 @@ namespace MNEWATERSHEDBEM {
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneWatershedBemSettings;
+class MNEWatershedBemSettings;
 
 //=============================================================================================================
 /**
@@ -104,7 +104,7 @@ public:
      *
      * @param[in] settings  The parsed command-line settings.
      */
-    WatershedBem(const MneWatershedBemSettings& settings);
+    WatershedBem(const MNEWatershedBemSettings& settings);
 
     //=========================================================================================================
     /**
@@ -160,7 +160,7 @@ private:
 
     //=========================================================================================================
 
-    const MneWatershedBemSettings& m_settings;  /**< Command-line settings. */
+    const MNEWatershedBemSettings& m_settings;  /**< Command-line settings. */
 };
 
 } // namespace MNEWATERSHEDBEM

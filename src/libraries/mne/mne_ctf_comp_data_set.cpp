@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneCTFCompDataSet Class.
+ * @brief    Definition of the MNECTFCompDataSet Class.
  *
  */
 
@@ -423,7 +423,7 @@ void mne_mat_vec_mult2_32 (float **m,float *v,float *result, int d1,int d2)
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneCTFCompDataSet::MneCTFCompDataSet()
+MNECTFCompDataSet::MNECTFCompDataSet()
 :ncomp(0)
 ,nch(0)
 ,undo(nullptr)
@@ -433,22 +433,22 @@ MneCTFCompDataSet::MneCTFCompDataSet()
 
 //=============================================================================================================
 
-MneCTFCompDataSet::MneCTFCompDataSet(const MneCTFCompDataSet &set)
+MNECTFCompDataSet::MNECTFCompDataSet(const MNECTFCompDataSet &set)
 {
     if (set.ncomp > 0) {
         this->ncomp = set.comps.size();
         for (int k = 0; k < this->ncomp; k++)
             if(set.comps[k])
-                this->comps.append(new MneCTFCompData(*set.comps[k]));
+                this->comps.append(new MNECTFCompData(*set.comps[k]));
     }
 
     if(set.current)
-        this->current = std::make_unique<MneCTFCompData>(*set.current);
+        this->current = std::make_unique<MNECTFCompData>(*set.current);
 }
 
 //=============================================================================================================
 
-MneCTFCompDataSet::~MneCTFCompDataSet()
+MNECTFCompDataSet::~MNECTFCompDataSet()
 {
 
     for (int k = 0; k < comps.size(); k++)
@@ -458,7 +458,7 @@ MneCTFCompDataSet::~MneCTFCompDataSet()
 
 //=============================================================================================================
 
-std::unique_ptr<MneCTFCompDataSet> MneCTFCompDataSet::read(const QString &name)
+std::unique_ptr<MNECTFCompDataSet> MNECTFCompDataSet::read(const QString &name)
 /*
      * Read all CTF compensation data from a given file
      */
@@ -466,8 +466,8 @@ std::unique_ptr<MneCTFCompDataSet> MneCTFCompDataSet::read(const QString &name)
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
 
-    std::unique_ptr<MneCTFCompDataSet> set;
-    MneCTFCompData* one;
+    std::unique_ptr<MNECTFCompDataSet> set;
+    MNECTFCompData* one;
     QList<FiffDirNode::SPtr> nodes;
     QList<FiffDirNode::SPtr> comps;
     int ncomp;
@@ -504,7 +504,7 @@ std::unique_ptr<MneCTFCompDataSet> MneCTFCompDataSet::read(const QString &name)
         */
     if(!stream->open())
         goto bad;
-    set = std::make_unique<MneCTFCompDataSet>();
+    set = std::make_unique<MNECTFCompDataSet>();
     /*
         * Locate the compensation data sets
         */
@@ -524,7 +524,7 @@ std::unique_ptr<MneCTFCompDataSet> MneCTFCompDataSet::read(const QString &name)
         * Read each data set
         */
     for (k = 0; k < ncomp; k++) {
-        auto mat = MneNamedMatrix::read(stream,comps[k],FIFF_MNE_CTF_COMP_DATA);
+        auto mat = MNENamedMatrix::read(stream,comps[k],FIFF_MNE_CTF_COMP_DATA);
         if (!mat)
             goto bad;
         comps[k]->find_tag(stream, FIFF_MNE_CTF_COMP_KIND, t_pTag);
@@ -542,7 +542,7 @@ std::unique_ptr<MneCTFCompDataSet> MneCTFCompDataSet::read(const QString &name)
         /*
             * Add these data to the set
             */
-        one = new MneCTFCompData;
+        one = new MNECTFCompData;
         one->data = std::move(mat);
         one->kind                = kind;
         one->mne_kind            = mne_unmap_ctf_comp_kind(one->kind);
@@ -576,7 +576,7 @@ good : {
 
 //=============================================================================================================
 
-int MneCTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
+int MNECTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
                                  int nch,
                                  QList<FiffChInfo> compchs,
                                  int ncomp)      /* How many of these */
@@ -587,7 +587,7 @@ int MneCTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
     Eigen::VectorXi comps;
     int need_comp;
     int first_comp;
-    MneCTFCompData* this_comp;
+    MNECTFCompData* this_comp;
     Eigen::VectorXi comp_sel;
     QStringList names;
     QString name;
@@ -595,7 +595,7 @@ int MneCTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
 
     std::unique_ptr<FiffSparseMatrix> presel;
     std::unique_ptr<FiffSparseMatrix> postsel;
-    std::unique_ptr<MneNamedMatrix>   data;
+    std::unique_ptr<MNENamedMatrix>   data;
 
     QStringList emptyList;
 
@@ -707,7 +707,7 @@ int MneCTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
         postsel.reset(ps);
         printf("\tPostselector created.\n");
     }
-    current           = std::make_unique<MneCTFCompData>();
+    current           = std::make_unique<MNECTFCompData>();
     current->kind     = this_comp->kind;
     current->mne_kind = this_comp->mne_kind;
     current->data     = std::move(data);
@@ -720,7 +720,7 @@ int MneCTFCompDataSet::make_comp(const QList<FiffChInfo>& chs,
 
 //=============================================================================================================
 
-int MneCTFCompDataSet::set_comp(QList<FIFFLIB::FiffChInfo>& chs,
+int MNECTFCompDataSet::set_comp(QList<FIFFLIB::FiffChInfo>& chs,
                                 int nch,
                                 int comp)
 /*
@@ -742,19 +742,19 @@ int MneCTFCompDataSet::set_comp(QList<FIFFLIB::FiffChInfo>& chs,
 
 //=============================================================================================================
 
-int MneCTFCompDataSet::apply(int do_it, Eigen::VectorXf& data)
+int MNECTFCompDataSet::apply(int do_it, Eigen::VectorXf& data)
 {
     return apply(do_it, data, data);
 }
 
 //=============================================================================================================
 
-int MneCTFCompDataSet::apply(int do_it, Eigen::VectorXf& data, const Eigen::VectorXf& compdata)
+int MNECTFCompDataSet::apply(int do_it, Eigen::VectorXf& data, const Eigen::VectorXf& compdata)
 /*
      * Apply compensation or revert to uncompensated data
      */
 {
-    MneCTFCompData* this_comp;
+    MNECTFCompData* this_comp;
     int   ndata = static_cast<int>(data.size());
     int   ncompdata = static_cast<int>(compdata.size());
 
@@ -837,14 +837,14 @@ int MneCTFCompDataSet::apply(int do_it, Eigen::VectorXf& data, const Eigen::Vect
 
 //=============================================================================================================
 
-int MneCTFCompDataSet::apply_transpose(int do_it, Eigen::MatrixXf& data)
+int MNECTFCompDataSet::apply_transpose(int do_it, Eigen::MatrixXf& data)
 /*
      * Apply compensation or revert to uncompensated data
      */
 {
     using RowMatrixXf = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
 
-    MneCTFCompData* this_comp;
+    MNECTFCompData* this_comp;
     int   ndata = static_cast<int>(data.rows());
     int   ns    = static_cast<int>(data.cols());
     int   ncompdata  = ndata;
@@ -951,7 +951,7 @@ int MneCTFCompDataSet::apply_transpose(int do_it, Eigen::MatrixXf& data)
 
 //=============================================================================================================
 
-int MneCTFCompDataSet::get_comp(const QList<FIFFLIB::FiffChInfo> &chs, int nch)
+int MNECTFCompDataSet::get_comp(const QList<FIFFLIB::FiffChInfo> &chs, int nch)
 {
     int res = MNE_CTFV_NOGRAD;
     int first_comp,comp;
@@ -975,7 +975,7 @@ int MneCTFCompDataSet::get_comp(const QList<FIFFLIB::FiffChInfo> &chs, int nch)
 
 //=============================================================================================================
 
-int MneCTFCompDataSet::map_comp_kind(int grad)
+int MNECTFCompDataSet::map_comp_kind(int grad)
 /*
      * Simple mapping
      */
@@ -990,7 +990,7 @@ int MneCTFCompDataSet::map_comp_kind(int grad)
 
 //=============================================================================================================
 
-QString MneCTFCompDataSet::explain_comp(int kind)
+QString MNECTFCompDataSet::explain_comp(int kind)
 {
     static const struct {
         int kind;
@@ -1011,7 +1011,7 @@ QString MneCTFCompDataSet::explain_comp(int kind)
 
 //=============================================================================================================
 
-int MneCTFCompDataSet::set_compensation(int compensate_to,
+int MNECTFCompDataSet::set_compensation(int compensate_to,
                                         QList<FiffChInfo>& chs,
                                         int nchan,
                                         QList<FiffChInfo> comp_chs,

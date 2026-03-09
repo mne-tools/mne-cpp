@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneMghTagGroup class declaration.
+ * @brief    MNEMghTagGroup class declaration.
  *
  */
 
@@ -65,51 +65,51 @@ namespace MNELIB
 
 //=============================================================================================================
 /**
- * @brief Collection of MneMghTag entries from a FreeSurfer MGH/MGZ file footer.
+ * @brief Collection of MNEMghTag entries from a FreeSurfer MGH/MGZ file footer.
  *
  * Owns its tags via unique_ptr.
  */
-class MNESHARED_EXPORT MneMghTagGroup
+class MNESHARED_EXPORT MNEMghTagGroup
 {
 public:
-    typedef QSharedPointer<MneMghTagGroup> SPtr;              /**< Shared pointer type for MneMghTagGroup. */
-    typedef QSharedPointer<const MneMghTagGroup> ConstSPtr;   /**< Const shared pointer type for MneMghTagGroup. */
+    typedef QSharedPointer<MNEMghTagGroup> SPtr;              /**< Shared pointer type for MNEMghTagGroup. */
+    typedef QSharedPointer<const MNEMghTagGroup> ConstSPtr;   /**< Const shared pointer type for MNEMghTagGroup. */
 
     //=========================================================================================================
     /**
-     * Constructs an empty MneMghTagGroup.
+     * Constructs an empty MNEMghTagGroup.
      */
-    MneMghTagGroup() = default;
+    MNEMghTagGroup() = default;
 
-    MneMghTagGroup(const MneMghTagGroup& other)
+    MNEMghTagGroup(const MNEMghTagGroup& other)
     {
         tags.reserve(other.tags.size());
         for (const auto& t : other.tags)
-            tags.push_back(std::make_unique<MneMghTag>(*t));
+            tags.push_back(std::make_unique<MNEMghTag>(*t));
     }
 
-    MneMghTagGroup& operator=(const MneMghTagGroup& other)
+    MNEMghTagGroup& operator=(const MNEMghTagGroup& other)
     {
         if (this != &other) {
             tags.clear();
             tags.reserve(other.tags.size());
             for (const auto& t : other.tags)
-                tags.push_back(std::make_unique<MneMghTag>(*t));
+                tags.push_back(std::make_unique<MNEMghTag>(*t));
         }
         return *this;
     }
 
-    MneMghTagGroup(MneMghTagGroup&&) = default;
-    MneMghTagGroup& operator=(MneMghTagGroup&&) = default;
+    MNEMghTagGroup(MNEMghTagGroup&&) = default;
+    MNEMghTagGroup& operator=(MNEMghTagGroup&&) = default;
 
     //=========================================================================================================
     /**
      * Destructor.
      */
-    ~MneMghTagGroup() = default;
+    ~MNEMghTagGroup() = default;
 
 public:
-    std::vector<std::unique_ptr<MneMghTag>> tags; /**< Owned tag entries. */
+    std::vector<std::unique_ptr<MNEMghTag>> tags; /**< Owned tag entries. */
 
     /**
      * @brief Returns the number of tags in the group.

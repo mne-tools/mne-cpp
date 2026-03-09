@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneFiffExp class declaration.
+ * @brief    MNEFiffExp class declaration.
  *
  */
 
@@ -73,17 +73,17 @@ namespace SHOWFIFF
  *
  * @brief Mne Fiff Explanation description
  */
-class MneFiffExp
+class MNEFiffExp
 {
 public:
-    typedef QSharedPointer<MneFiffExp> SPtr;              /**< Shared pointer type for MneFiffExp. */
-    typedef QSharedPointer<const MneFiffExp> ConstSPtr;   /**< Const shared pointer type for MneFiffExp. */
+    typedef QSharedPointer<MNEFiffExp> SPtr;              /**< Shared pointer type for MNEFiffExp. */
+    typedef QSharedPointer<const MNEFiffExp> ConstSPtr;   /**< Const shared pointer type for MNEFiffExp. */
 
     //=========================================================================================================
     /**
      * Constructs the Mne Fiff Explanation
      */
-    MneFiffExp();
+    MNEFiffExp();
 
     //=========================================================================================================
     /**
@@ -91,22 +91,22 @@ public:
      *
      * @param[in] p_MneFiffExp      Mne Fiff Explanation which should be copied
      */
-    MneFiffExp(const MneFiffExp& p_MneFiffExp);
+    MNEFiffExp(const MNEFiffExp& p_MneFiffExp);
 
     //=========================================================================================================
     /**
      * Destroys the Mne Fiff Explanation
      */
-    ~MneFiffExp();
+    ~MNEFiffExp();
 
     //=========================================================================================================
     /**
      * Compares if Explanation ex1 is lesser than ex2
      *
-     * @param[in] ex1    MneFiffExp which should be checked wheter it is lesser than ex2.
-     * @param[in] ex2    MneFiffExp which should be checked wheter it is larger than ex1.
+     * @param[in] ex1    MNEFiffExp which should be checked wheter it is lesser than ex2.
+     * @param[in] ex2    MNEFiffExp which should be checked wheter it is larger than ex1.
      */
-    static bool comp_exp(const MneFiffExp& ex1, const MneFiffExp& ex2);
+    static bool comp_exp(const MNEFiffExp& ex1, const MNEFiffExp& ex2);
 
 public:
     int  exclass;   /**< Class of this explanation */

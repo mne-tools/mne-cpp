@@ -51,8 +51,8 @@
 
 #include <mne/mne.h>
 #include <mne/mne_inverse_operator.h>
-#include <mne/mne_sourceestimate.h>
-#include <mne/mne_sourcespace.h>
+#include <mne/mne_source_estimate.h>
+#include <mne/mne_source_spaces.h>
 
 #include <inverse/minimumNorm/minimumnorm.h>
 

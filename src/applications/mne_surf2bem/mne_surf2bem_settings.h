@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneSurf2BemSettings class declaration.
+ * @brief    MNESurf2BemSettings class declaration.
  *
  */
 
@@ -97,7 +97,7 @@ struct SurfaceInput
  *
  * @brief Command-line settings for mne_surf2bem.
  */
-class MneSurf2BemSettings
+class MNESurf2BemSettings
 {
 public:
     //=========================================================================================================
@@ -107,7 +107,7 @@ public:
      * @param[in] argc  Number of arguments.
      * @param[in] argv  Argument array.
      */
-    MneSurf2BemSettings(int *argc, char **argv);
+    MNESurf2BemSettings(int *argc, char **argv);
 
     //=========================================================================================================
     /**

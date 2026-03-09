@@ -211,7 +211,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneProjOp::MneProjOp()
+MNEProjOp::MNEProjOp()
 : nitems (0)
 , nch (0)
 , nvec (0)
@@ -220,13 +220,13 @@ MneProjOp::MneProjOp()
 
 //=============================================================================================================
 
-MneProjOp::~MneProjOp()
+MNEProjOp::~MNEProjOp()
 {
 }
 
 //=============================================================================================================
 
-void MneProjOp::free_proj()
+void MNEProjOp::free_proj()
 {
     proj_data.resize(0, 0);
 
@@ -239,7 +239,7 @@ void MneProjOp::free_proj()
 
 //=============================================================================================================
 
-MneProjOp *MneProjOp::combine(MneProjOp *from)
+MNEProjOp *MNEProjOp::combine(MNEProjOp *from)
 /*
      * Copy items from 'from' operator to this operator
      */
@@ -256,16 +256,16 @@ MneProjOp *MneProjOp::combine(MneProjOp *from)
 
 //=============================================================================================================
 
-void MneProjOp::add_item_active(const MneNamedMatrix *vecs, int kind, const QString& desc, int is_active)
+void MNEProjOp::add_item_active(const MNENamedMatrix *vecs, int kind, const QString& desc, int is_active)
 /*
  * Add a new item to an existing projection operator
  */
 {
-    items.append(MneProjItem());
+    items.append(MNEProjItem());
     auto& new_item = items.back();
 
     new_item.active      = is_active;
-    new_item.vecs        = std::make_unique<MneNamedMatrix>(*vecs);
+    new_item.vecs        = std::make_unique<MNENamedMatrix>(*vecs);
 
     if (kind == FIFFV_MNE_PROJ_ITEM_EEG_AVREF) {
         new_item.has_meg = FALSE;
@@ -300,19 +300,19 @@ void MneProjOp::add_item_active(const MneNamedMatrix *vecs, int kind, const QStr
 
 //=============================================================================================================
 
-void MneProjOp::add_item(const MneNamedMatrix *vecs, int kind, const QString& desc)
+void MNEProjOp::add_item(const MNENamedMatrix *vecs, int kind, const QString& desc)
 {
     add_item_active(vecs, kind, desc, TRUE);
 }
 
 //=============================================================================================================
 
-MneProjOp *MneProjOp::dup() const
+MNEProjOp *MNEProjOp::dup() const
 /*
  * Provide a duplicate (item data only)
  */
 {
-    MneProjOp* res = new MneProjOp();
+    MNEProjOp* res = new MNEProjOp();
 
     for (int k = 0; k < nitems; k++) {
         const auto& it = items[k];
@@ -324,7 +324,7 @@ MneProjOp *MneProjOp::dup() const
 
 //=============================================================================================================
 
-MneProjOp *MneProjOp::create_average_eeg_ref(const QList<FiffChInfo>& chs, int nch)
+MNEProjOp *MNEProjOp::create_average_eeg_ref(const QList<FiffChInfo>& chs, int nch)
 /*
      * Make the projection operator for average electrode reference
      */
@@ -332,7 +332,7 @@ MneProjOp *MneProjOp::create_average_eeg_ref(const QList<FiffChInfo>& chs, int n
     int eegcount = 0;
     int k;
     QStringList     names;
-    MneProjOp*      op;
+    MNEProjOp*      op;
 
     for (k = 0; k < nch; k++)
         if (chs.at(k).kind == FIFFV_EEG_CH)
@@ -349,9 +349,9 @@ MneProjOp *MneProjOp::create_average_eeg_ref(const QList<FiffChInfo>& chs, int n
     Eigen::MatrixXf vec_data = Eigen::MatrixXf::Constant(1, eegcount, 1.0f/sqrt((double)eegcount));
 
     QStringList emptyList;
-    auto vecs = MneNamedMatrix::build(1,eegcount,emptyList,names,vec_data);
+    auto vecs = MNENamedMatrix::build(1,eegcount,emptyList,names,vec_data);
 
-    op = new MneProjOp();
+    op = new MNEProjOp();
     op->add_item(vecs.get(),FIFFV_MNE_PROJ_ITEM_EEG_AVREF,"Average EEG reference");
 
     return op;
@@ -359,7 +359,7 @@ MneProjOp *MneProjOp::create_average_eeg_ref(const QList<FiffChInfo>& chs, int n
 
 //=============================================================================================================
 
-int MneProjOp::affect(const QStringList& list, int nlist)
+int MNEProjOp::affect(const QStringList& list, int nlist)
 {
     int k;
     int naff;
@@ -373,7 +373,7 @@ int MneProjOp::affect(const QStringList& list, int nlist)
 
 //=============================================================================================================
 
-int MneProjOp::affect_chs(const QList<FiffChInfo>& chs, int nch)
+int MNEProjOp::affect_chs(const QList<FiffChInfo>& chs, int nch)
 {
     QString ch_string;
     int  res;
@@ -391,7 +391,7 @@ int MneProjOp::affect_chs(const QList<FiffChInfo>& chs, int nch)
 
 //=============================================================================================================
 
-int MneProjOp::project_vector(float *vec, int nvec, int do_complement)
+int MNEProjOp::project_vector(float *vec, int nvec, int do_complement)
 /*
      * Apply projection operator to a vector (floats)
      * Assume that all dimension checking etc. has been done before
@@ -438,12 +438,12 @@ int MneProjOp::project_vector(float *vec, int nvec, int do_complement)
 
 //=============================================================================================================
 
-MneProjOp *MneProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode::SPtr &start)
+MNEProjOp *MNEProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode::SPtr &start)
 /*
      * Load all the linear projection data
      */
 {
-    MneProjOp*   op     = NULL;
+    MNEProjOp*   op     = NULL;
     QList<FiffDirNode::SPtr> proj;
     FiffDirNode::SPtr start_node;
     QList<FiffDirNode::SPtr> items;
@@ -467,7 +467,7 @@ MneProjOp *MneProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode
     else
         start_node = start;
 
-    op = new MneProjOp();
+    op = new MNEProjOp();
     proj = start_node->dir_tree_find(FIFFB_PROJ);
     if (proj.size() == 0 || proj[0]->isEmpty())   /* The caller must recognize an empty projection */
         goto out;
@@ -571,7 +571,7 @@ MneProjOp *MneProjOp::read_from_node(FiffStream::SPtr &stream, const FiffDirNode
         * Ready to add
         */
         QStringList emptyList;
-        auto item = MneNamedMatrix::build(item_nvec,item_nchan,emptyList,item_names,item_vectors);
+        auto item = MNENamedMatrix::build(item_nvec,item_nchan,emptyList,item_names,item_vectors);
         op->add_item_active(item.get(),item_kind,item_desc,item_active);
         op->items[op->nitems-1].active_file = item_active;
     }
@@ -588,7 +588,7 @@ bad : {
 
 //=============================================================================================================
 
-MneProjOp *MneProjOp::read(const QString &name)
+MNEProjOp *MNEProjOp::read(const QString &name)
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
@@ -596,7 +596,7 @@ MneProjOp *MneProjOp::read(const QString &name)
     if(!stream->open())
         return NULL;
 
-    MneProjOp*  res = NULL;
+    MNEProjOp*  res = NULL;
 
     FiffDirNode::SPtr t_default;
     res = read_from_node(stream,t_default);
@@ -608,13 +608,13 @@ MneProjOp *MneProjOp::read(const QString &name)
 
 //=============================================================================================================
 
-void MneProjOp::report_data(QTextStream &out, const char *tag, int list_data, char **exclude, int nexclude)
+void MNEProjOp::report_data(QTextStream &out, const char *tag, int list_data, char **exclude, int nexclude)
 /*
      * Output info about the projection operator
      */
 {
     int j,p,q;
-    MneNamedMatrix* vecs;
+    MNENamedMatrix* vecs;
     int found;
 
     if (nitems <= 0) {
@@ -661,7 +661,7 @@ void MneProjOp::report_data(QTextStream &out, const char *tag, int list_data, ch
 
 //=============================================================================================================
 
-void MneProjOp::report(QTextStream &out, const char *tag)
+void MNEProjOp::report(QTextStream &out, const char *tag)
 {
     report_data(out,tag, FALSE, NULL, 0);
 }

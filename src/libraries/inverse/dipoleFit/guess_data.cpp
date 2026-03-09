@@ -41,8 +41,8 @@
 #include "guess_data.h"
 #include "dipole_fit_data.h"
 #include "dipole_forward.h"
-#include <mne/mne_surface_old.h>
-#include <mne/mne_source_space_old.h>
+#include <mne/mne_surface.h>
+#include <mne/mne_source_space.h>
 
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_tag.h>
@@ -187,15 +187,15 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
 //    GuessData*      res = new GuessData();
     int            k,p;
     float          guessrad = 0.080;
-    std::unique_ptr<MneSourceSpaceOld> guesses;
+    std::unique_ptr<MNESourceSpace> guesses;
     dipoleFitFuncs orig;
 
     if (!guessname.isEmpty()) {
         /*
             * Read the guesses and transform to the appropriate coordinate frame
             */
-        std::vector<std::unique_ptr<MneSourceSpaceOld>> sp;
-        if (MneSurfaceOrVolume::read_source_spaces(guessname,sp) == FAIL)
+        std::vector<std::unique_ptr<MNESourceSpace>> sp;
+        if (MNESourceSpace::read_source_spaces(guessname,sp) == FAIL)
             goto bad;
         if (static_cast<int>(sp.size()) != 1) {
             printf("Incorrect number of source spaces in guess file");
@@ -205,7 +205,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         guesses = std::move(sp[0]);
     }
     else {
-        MneSurfaceOld*    inner_skull = NULL;
+        MNESurface*    inner_skull = NULL;
         int            free_inner_skull = FALSE;
         float          r0[3];
 
@@ -219,20 +219,20 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         }
         else if (!guess_surfname.isEmpty()) {
             printf("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
-            if ((inner_skull = MneSurfaceOrVolume::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
+            if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
                 goto bad;
             free_inner_skull = TRUE;
         }
-        guesses.reset((MneSourceSpaceOld*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist));
+        guesses.reset((MNESourceSpace*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist));
         if (!guesses)
             goto bad;
         if (free_inner_skull)
             delete inner_skull;
     }
     {
-        std::vector<std::unique_ptr<MneSourceSpaceOld>> guesses_vec;
+        std::vector<std::unique_ptr<MNESourceSpace>> guesses_vec;
         guesses_vec.push_back(std::move(guesses));
-        if (MneSurfaceOrVolume::transform_source_spaces_to(f->coord_frame,*f->mri_head_t,guesses_vec) != OK)
+        if (MNESourceSpace::transform_source_spaces_to(f->coord_frame,*f->mri_head_t,guesses_vec) != OK)
             goto bad;
         guesses = std::move(guesses_vec[0]);
     }
@@ -287,14 +287,14 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
 {
     int             k,p;
     float           guessrad = 0.080f;
-    std::unique_ptr<MneSourceSpaceOld> guesses;
+    std::unique_ptr<MNESourceSpace> guesses;
 
     if (!guessname.isEmpty()) {
         /*
          * Read the guesses and transform to the appropriate coordinate frame
          */
-        std::vector<std::unique_ptr<MneSourceSpaceOld>> sp;
-        if (MneSurfaceOrVolume::read_source_spaces(guessname,sp) == FIFF_FAIL)
+        std::vector<std::unique_ptr<MNESourceSpace>> sp;
+        if (MNESourceSpace::read_source_spaces(guessname,sp) == FIFF_FAIL)
             goto bad;
         if (static_cast<int>(sp.size()) != 1) {
             qCritical("Incorrect number of source spaces in guess file");
@@ -304,7 +304,7 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         guesses = std::move(sp[0]);
     }
     else {
-        MneSurfaceOld*     inner_skull = NULL;
+        MNESurface*     inner_skull = NULL;
         int            free_inner_skull = FALSE;
         float          r0[3];
 
@@ -318,11 +318,11 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
         }
         else if (!guess_surfname.isEmpty()) {
             printf("Reading inner skull surface from %s...\n",guess_surfname.toUtf8().data());
-            if ((inner_skull = MneSurfaceOrVolume::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
+            if ((inner_skull = MNESurface::read_bem_surface(guess_surfname,FIFFV_BEM_SURF_ID_BRAIN,TRUE,NULL)) == NULL)
                 goto bad;
             free_inner_skull = TRUE;
         }
-        guesses.reset((MneSourceSpaceOld*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist));
+        guesses.reset((MNESourceSpace*)FwdBemModel::make_guesses(inner_skull,guessrad,r0,grid,exclude,mindist));
         if (!guesses)
             goto bad;
         if (free_inner_skull)
@@ -345,9 +345,9 @@ GuessData::GuessData(const QString &guessname, const QString &guess_surfname, fl
      * Transform the guess locations to the appropriate coordinate frame
      */
     {
-        std::vector<std::unique_ptr<MneSourceSpaceOld>> guesses_vec;
+        std::vector<std::unique_ptr<MNESourceSpace>> guesses_vec;
         guesses_vec.push_back(std::move(guesses));
-        if (MneSurfaceOrVolume::transform_source_spaces_to(f->coord_frame,*f->mri_head_t,guesses_vec) != OK)
+        if (MNESourceSpace::transform_source_spaces_to(f->coord_frame,*f->mri_head_t,guesses_vec) != OK)
             goto bad;
         guesses = std::move(guesses_vec[0]);
     }

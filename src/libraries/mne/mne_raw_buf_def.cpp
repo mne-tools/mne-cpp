@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneRawBufDef Class.
+ * @brief    Definition of the MNERawBufDef Class.
  *
  */
 
@@ -56,19 +56,19 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneRawBufDef::MneRawBufDef()
+MNERawBufDef::MNERawBufDef()
 {
 }
 
 //=============================================================================================================
 
-MneRawBufDef::~MneRawBufDef()
+MNERawBufDef::~MNERawBufDef()
 {
 }
 
 //=============================================================================================================
 
-void MneRawBufDef::free_bufs(MneRawBufDef *bufs, int nbuf)
+void MNERawBufDef::free_bufs(MNERawBufDef *bufs, int nbuf)
 {
     /*
      * vals and ch_filtered are now Eigen types that clean up automatically.

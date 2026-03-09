@@ -79,7 +79,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Surf2Bem::Surf2Bem(const MneSurf2BemSettings& settings)
+Surf2Bem::Surf2Bem(const MNESurf2BemSettings& settings)
 : m_settings(settings)
 {
 }
@@ -286,10 +286,10 @@ bool Surf2Bem::readFreeSurferSurface(const SurfaceInput& input, MNEBemSurface& b
     bemSurf.ntri = nface;
     bemSurf.coord_frame = FIFFV_COORD_MRI;
     bemSurf.rr = verts.block(0, 0, nvert, 3);
-    bemSurf.tris = faces.block(0, 0, nface, 3);
+    bemSurf.itris = faces.block(0, 0, nface, 3);
 
     // Compute vertex normals
-    bemSurf.nn = Surface::compute_normals(bemSurf.rr, bemSurf.tris);
+    bemSurf.nn = Surface::compute_normals(Eigen::MatrixX3f(bemSurf.rr), Eigen::MatrixX3i(bemSurf.itris));
 
     fprintf(stderr, "Read FreeSurfer surface: %d vertices, %d triangles\n",
             bemSurf.np, bemSurf.ntri);
@@ -385,10 +385,10 @@ bool Surf2Bem::readAsciiTriSurface(const SurfaceInput& input, MNEBemSurface& bem
     bemSurf.np = nvert;
     bemSurf.ntri = ntri;
     bemSurf.rr = rr;
-    bemSurf.tris = tris;
+    bemSurf.itris = tris;
 
     // Compute vertex normals
-    bemSurf.nn = Surface::compute_normals(bemSurf.rr, bemSurf.tris);
+    bemSurf.nn = Surface::compute_normals(Eigen::MatrixX3f(bemSurf.rr), Eigen::MatrixX3i(bemSurf.itris));
 
     fprintf(stderr, "Read ASCII triangle surface: %d vertices, %d triangles\n",
             bemSurf.np, bemSurf.ntri);
@@ -413,7 +413,7 @@ bool Surf2Bem::shiftVertices(MNEBemSurface& surf, float shift)
     }
 
     // Recompute normals after shifting
-    surf.nn = Surface::compute_normals(surf.rr, surf.tris);
+    surf.nn = Surface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
 
     fprintf(stderr, "%s vertex locations shifted by %6.1f mm.\n",
             qPrintable(SurfaceChecks::getNameOf(surf.id)),

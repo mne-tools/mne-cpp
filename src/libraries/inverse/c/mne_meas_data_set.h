@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MNE Meas Data Set (MneMeasDataSet) class declaration.
+ * @brief    MNE Meas Data Set (MNEMeasDataSet) class declaration.
  *
  */
 
@@ -69,33 +69,33 @@ namespace INVERSELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneMneData;
+class MNEMneData;
 
 //=============================================================================================================
 /**
  * Implements MNE Meas Data Set (Replaces *mneMeasDataSet,mneMeasDataSetRec; struct of MNE-C mne_types.h).
  *
- * @brief Single measurement epoch or average within MneMeasData, including data matrix and projectors.
+ * @brief Single measurement epoch or average within MNEMeasData, including data matrix and projectors.
  */
-class INVERSESHARED_EXPORT MneMeasDataSet
+class INVERSESHARED_EXPORT MNEMeasDataSet
 {
 public:
-    typedef QSharedPointer<MneMeasDataSet> SPtr;              /**< Shared pointer type for MneMeasDataSet. */
-    typedef QSharedPointer<const MneMeasDataSet> ConstSPtr;   /**< Const shared pointer type for MneMeasDataSet. */
+    typedef QSharedPointer<MNEMeasDataSet> SPtr;              /**< Shared pointer type for MNEMeasDataSet. */
+    typedef QSharedPointer<const MNEMeasDataSet> ConstSPtr;   /**< Const shared pointer type for MNEMeasDataSet. */
 
     //=========================================================================================================
     /**
      * Constructs the MNE Meas Data Set
      * Refactored: mne_new_meas_data_set (mne_read_data.c)
      */
-    MneMeasDataSet();
+    MNEMeasDataSet();
 
     //=========================================================================================================
     /**
      * Destroys the MNE Meas Data Set description
      * Refactored: mne_free_meas_data_set (mne_read_data.c)
      */
-    ~MneMeasDataSet();
+    ~MNEMeasDataSet();
 
 public:
     /*
@@ -114,7 +114,7 @@ public:
     float           tmin;           /* Starting time */
     float           tstep;          /* Time step */
     float           *baselines;     /* Baseline values currently applied to the data */
-    MneMneData*     mne;            /* These are the data associated with MNE computations */
+    MNEMneData*     mne;            /* These are the data associated with MNE computations */
     void            *user_data;     /* Anything else we want */
     mneUserFreeFuncTmp_1 user_data_free; /* Function to set the above free */
 
@@ -136,7 +136,7 @@ public:
 //    float           tmin;           /* Starting time */
 //    float           tstep;          /* Time step */
 //    float           *baselines;     /* Baseline values currently applied to the data */
-//    INVERSELIB::MneMneData*   mne;  /* These are the data associated with MNE computations */
+//    INVERSELIB::MNEMneData*   mne;  /* These are the data associated with MNE computations */
 //    void            *user_data;     /* Anything else we want */
 //    mneUserFreeFunc user_data_free; /* Function to set the above free */
 //} *mneMeasDataSet,mneMeasDataSetRec;

@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneProjItem class definition.
+ * @brief    MNEProjItem class definition.
  *
  */
 
@@ -52,7 +52,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneProjItem::MneProjItem()
+MNEProjItem::MNEProjItem()
 : nvec(0)
 , kind(FIFFV_PROJ_ITEM_NONE)
 , active(true)
@@ -64,8 +64,8 @@ MneProjItem::MneProjItem()
 
 //=============================================================================================================
 
-MneProjItem::MneProjItem(const MneProjItem& other)
-: vecs(other.vecs ? std::make_unique<MneNamedMatrix>(*other.vecs) : nullptr)
+MNEProjItem::MNEProjItem(const MNEProjItem& other)
+: vecs(other.vecs ? std::make_unique<MNENamedMatrix>(*other.vecs) : nullptr)
 , nvec(other.nvec)
 , desc(other.desc)
 , kind(other.kind)
@@ -78,10 +78,10 @@ MneProjItem::MneProjItem(const MneProjItem& other)
 
 //=============================================================================================================
 
-MneProjItem& MneProjItem::operator=(const MneProjItem& other)
+MNEProjItem& MNEProjItem::operator=(const MNEProjItem& other)
 {
     if (this != &other) {
-        vecs        = other.vecs ? std::make_unique<MneNamedMatrix>(*other.vecs) : nullptr;
+        vecs        = other.vecs ? std::make_unique<MNENamedMatrix>(*other.vecs) : nullptr;
         nvec        = other.nvec;
         desc        = other.desc;
         kind        = other.kind;
@@ -95,13 +95,13 @@ MneProjItem& MneProjItem::operator=(const MneProjItem& other)
 
 //=============================================================================================================
 
-MneProjItem::~MneProjItem()
+MNEProjItem::~MNEProjItem()
 {
 }
 
 //=============================================================================================================
 
-int MneProjItem::affect(const QStringList& list, int nlist) const
+int MNEProjItem::affect(const QStringList& list, int nlist) const
 {
     if (nvec == 0 || !vecs)
         return false;

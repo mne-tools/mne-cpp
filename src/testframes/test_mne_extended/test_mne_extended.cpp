@@ -1,7 +1,7 @@
 /**
  * @file test_mne_extended.cpp
- * @brief Comprehensive tests for MNELIB classes: MneNamedMatrix, MNEEpochData,
- *        MNEEpochDataList, MNEClusterInfo, MNESourceSpace, MNEForwardSolution.
+ * @brief Comprehensive tests for MNELIB classes: MNENamedMatrix, MNEEpochData,
+ *        MNEEpochDataList, MNEClusterInfo, MNESourceSpaces, MNEForwardSolution.
  */
 #include <QTest>
 #include <QCoreApplication>
@@ -11,7 +11,7 @@
 
 #include <mne/mne.h>
 #include <mne/mne_forwardsolution.h>
-#include <mne/mne_sourcespace.h>
+#include <mne/mne_source_spaces.h>
 #include <mne/mne_hemisphere.h>
 #include <mne/mne_cluster_info.h>
 #include <mne/mne_epoch_data.h>
@@ -36,11 +36,11 @@ private:
 private slots:
 
     //=========================================================================
-    // MneNamedMatrix
+    // MNENamedMatrix
     //=========================================================================
     void mneNamedMatrix_defaultCtor()
     {
-        MneNamedMatrix m;
+        MNENamedMatrix m;
         QCOMPARE(m.nrow, 0);
         QCOMPARE(m.ncol, 0);
         QVERIFY(m.rowlist.isEmpty());
@@ -56,7 +56,7 @@ private slots:
         MatrixXf data(2, 3);
         data << 1, 2, 3, 4, 5, 6;
 
-        auto mat = MneNamedMatrix::build(2, 3, rows, cols, data);
+        auto mat = MNENamedMatrix::build(2, 3, rows, cols, data);
         QVERIFY(mat != nullptr);
         QCOMPARE(mat->nrow, 2);
         QCOMPARE(mat->ncol, 3);
@@ -72,8 +72,8 @@ private slots:
         MatrixXf data(2, 2);
         data << 1, 2, 3, 4;
 
-        auto orig = MneNamedMatrix::build(2, 2, rows, cols, data);
-        MneNamedMatrix copy(*orig);
+        auto orig = MNENamedMatrix::build(2, 2, rows, cols, data);
+        MNENamedMatrix copy(*orig);
 
         QCOMPARE(copy.nrow, orig->nrow);
         QCOMPARE(copy.ncol, orig->ncol);
@@ -91,7 +91,7 @@ private slots:
                 5, 6, 7, 8,
                 9, 10, 11, 12;
 
-        auto mat = MneNamedMatrix::build(3, 4, rows, cols, data);
+        auto mat = MNENamedMatrix::build(3, 4, rows, cols, data);
 
         // Pick row "r1" and cols "c1", "c3"
         QStringList pickRows = {"r1"};
@@ -114,7 +114,7 @@ private slots:
         MatrixXf data(2, 2);
         data << 1, 2, 3, 4;
 
-        auto mat = MneNamedMatrix::build(2, 2, rows, cols, data);
+        auto mat = MNENamedMatrix::build(2, 2, rows, cols, data);
 
         // Empty pick list = keep all
         QStringList emptyPick;
@@ -132,7 +132,7 @@ private slots:
         MatrixXf data(1, 1);
         data << 42;
 
-        auto mat = MneNamedMatrix::build(1, 1, rows, cols, data);
+        auto mat = MNENamedMatrix::build(1, 1, rows, cols, data);
         QStringList pickRows = {"nonexistent"};
         auto sub = mat->pick(pickRows, 1, QStringList(), 1);
         // Should return nullptr when name not found
@@ -442,24 +442,24 @@ private slots:
     }
 
     //=========================================================================
-    // MNESourceSpace
+    // MNESourceSpaces
     //=========================================================================
     void sourceSpace_defaultCtor()
     {
-        MNESourceSpace ss;
+        MNESourceSpaces ss;
         QVERIFY(ss.isEmpty());
     }
 
     void sourceSpace_copyCtor()
     {
-        MNESourceSpace ss;
-        MNESourceSpace copy(ss);
+        MNESourceSpaces ss;
+        MNESourceSpaces copy(ss);
         QVERIFY(copy.isEmpty());
     }
 
     void sourceSpace_clear()
     {
-        MNESourceSpace ss;
+        MNESourceSpaces ss;
         ss.clear();
         QVERIFY(ss.isEmpty());
     }

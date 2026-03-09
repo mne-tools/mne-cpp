@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneRawBufDef class declaration.
+ * @brief    MNERawBufDef class declaration.
  *
  */
 
@@ -73,17 +73,17 @@ namespace MNELIB
 /**
  * @brief Definition of one raw data buffer within a FIFF file.
  *
- * Each MneRawBufDef describes a contiguous chunk of samples, either loaded
+ * Each MNERawBufDef describes a contiguous chunk of samples, either loaded
  * from the FIFF file or produced by the overlap-add filter pipeline.
  * Sample values are stored in a row-major matrix (nchan x ns) that is
  * managed by an external ring buffer; an empty (0x0) matrix indicates
  * that the data are not currently resident in memory.
  */
-class MNESHARED_EXPORT MneRawBufDef
+class MNESHARED_EXPORT MNERawBufDef
 {
 public:
-    typedef QSharedPointer<MneRawBufDef> SPtr;              /**< Shared pointer type for MneRawBufDef. */
-    typedef QSharedPointer<const MneRawBufDef> ConstSPtr;   /**< Const shared pointer type for MneRawBufDef. */
+    typedef QSharedPointer<MNERawBufDef> SPtr;              /**< Shared pointer type for MNERawBufDef. */
+    typedef QSharedPointer<const MNERawBufDef> ConstSPtr;   /**< Const shared pointer type for MNERawBufDef. */
 
     /** Row-major float matrix matching the legacy float** memory layout. */
     using RowMajorMatrixXf = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
@@ -92,13 +92,13 @@ public:
     /**
      * @brief Default constructor.
      */
-    MneRawBufDef();
+    MNERawBufDef();
 
     //=========================================================================================================
     /**
      * @brief Destructor.
      */
-    ~MneRawBufDef();
+    ~MNERawBufDef();
 
     /**
      * @brief Free an array of raw data buffer definitions.
@@ -106,10 +106,10 @@ public:
      * The vals and ch_filtered members are Eigen types that clean up
      * automatically. This function frees the C-allocated buffer array itself.
      *
-     * @param[in] bufs   Pointer to the array of MneRawBufDef structures to free.
+     * @param[in] bufs   Pointer to the array of MNERawBufDef structures to free.
      * @param[in] nbuf   Number of buffer definitions in the array.
      */
-    static void free_bufs(MneRawBufDef* bufs, int nbuf);
+    static void free_bufs(MNERawBufDef* bufs, int nbuf);
 
 public:
     FIFFLIB::FiffDirEntry::SPtr ent;    /**< Directory entry locating this buffer in the FIFF file (file buffers only). */

@@ -144,7 +144,7 @@ float guess_rad;       			/**< Radius of spherical guess surface. */
     bool  do_baseline;         		/**< Are both baseline limits set?. */
     int   setno;             		/**< Which data set. */
     bool  verbose;
-    MNELIB::MneFilterDef filter;
+    MNELIB::MNEFilterDef filter;
     QStringList projnames;              /**< Projection file names. */
     bool omit_data_proj;
 

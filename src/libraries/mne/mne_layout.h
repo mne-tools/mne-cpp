@@ -27,11 +27,11 @@ namespace MNELIB
  * Describes the visual arrangement of signal channels in a
  * plotter display, loaded from a layout file.
  */
-class MNESHARED_EXPORT MneLayout
+class MNESHARED_EXPORT MNELayout
 {
 public:
-    MneLayout() = default;
-    ~MneLayout() = default;
+    MNELayout() = default;
+    ~MNELayout() = default;
 
     QString   name;              /**< Source file name this layout was loaded from. */
     float     xmin = 0;          /**< VDC left limit. */
@@ -42,7 +42,7 @@ public:
     float     cxmax = 0;         /**< Confined VDC right limit. */
     float     cymin = 0;         /**< Confined VDC bottom limit. */
     float     cymax = 0;         /**< Confined VDC top limit. */
-    std::vector<MneLayoutPort> ports; /**< Viewports. */
+    std::vector<MNELayoutPort> ports; /**< Viewports. */
     Eigen::MatrixXi match;       /**< Channel-to-port matching matrix (nchan x nport). */
 
     /**

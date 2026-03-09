@@ -22,34 +22,34 @@ namespace MNELIB
 /**
  * @brief Ordered list of trigger-event markers.
  *
- * Owns its MneEvent objects via unique_ptr.
+ * Owns its MNEEvent objects via unique_ptr.
  */
-class MNESHARED_EXPORT MneEventList
+class MNESHARED_EXPORT MNEEventList
 {
 public:
-    MneEventList() = default;
-    ~MneEventList() = default;
+    MNEEventList() = default;
+    ~MNEEventList() = default;
 
-    MneEventList(const MneEventList& other)
+    MNEEventList(const MNEEventList& other)
     {
         events.reserve(other.events.size());
         for (const auto& e : other.events)
-            events.push_back(std::make_unique<MneEvent>(*e));
+            events.push_back(std::make_unique<MNEEvent>(*e));
     }
 
-    MneEventList& operator=(const MneEventList& other)
+    MNEEventList& operator=(const MNEEventList& other)
     {
         if (this != &other) {
             events.clear();
             events.reserve(other.events.size());
             for (const auto& e : other.events)
-                events.push_back(std::make_unique<MneEvent>(*e));
+                events.push_back(std::make_unique<MNEEvent>(*e));
         }
         return *this;
     }
 
-    MneEventList(MneEventList&&) = default;
-    MneEventList& operator=(MneEventList&&) = default;
+    MNEEventList(MNEEventList&&) = default;
+    MNEEventList& operator=(MNEEventList&&) = default;
 
     //=========================================================================================================
     /**
@@ -57,7 +57,7 @@ public:
      */
     int nevent() const { return static_cast<int>(events.size()); }
 
-    std::vector<std::unique_ptr<MneEvent>> events; /**< Owned event pointers. */
+    std::vector<std::unique_ptr<MNEEvent>> events; /**< Owned event pointers. */
 };
 
 } // namespace MNELIB

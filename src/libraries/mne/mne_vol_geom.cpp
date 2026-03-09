@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneVolGeom Class.
+ * @brief    Definition of the MNEVolGeom Class.
  *
  */
 
@@ -51,12 +51,12 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneVolGeom::MneVolGeom()
+MNEVolGeom::MNEVolGeom()
 {
 }
 
 //=============================================================================================================
 
-MneVolGeom::~MneVolGeom()
+MNEVolGeom::~MNEVolGeom()
 {
 }

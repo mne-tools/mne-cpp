@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneMshColorScaleDef Class.
+ * @brief    Definition of the MNEMshColorScaleDef Class.
  *
  */
 
@@ -49,12 +49,12 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneMshColorScaleDef::MneMshColorScaleDef()
+MNEMshColorScaleDef::MNEMshColorScaleDef()
 {
 }
 
 //=============================================================================================================
 
-MneMshColorScaleDef::~MneMshColorScaleDef()
+MNEMshColorScaleDef::~MNEMshColorScaleDef()
 {
 }

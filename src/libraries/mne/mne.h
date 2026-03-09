@@ -48,7 +48,7 @@
 #include "mne_inverse_operator.h"
 #include "mne_forwardsolution.h"
 #include "mne_hemisphere.h"
-#include "mne_sourcespace.h"
+#include "mne_source_spaces.h"
 #include "mne_bem.h"
 #include "mne_bem_surface.h"
 #include "mne_epoch_data_list.h"
@@ -133,7 +133,7 @@ public:
      *
      * ### MNE toolbox root function ###
      *
-     * Wrapper for the MNESourceSpace::find_source_space_hemi static function
+     * Wrapper for the MNESourceSpaces::find_source_space_hemi static function
      *
      * Returns the hemisphere id (FIFFV_MNE_SURF_LEFT_HEMI or FIFFV_MNE_SURF_RIGHT_HEMI) for a source space.
      *
@@ -143,7 +143,7 @@ public:
      */
     inline static qint32 find_source_space_hemi(MNEHemisphere& p_Hemisphere)
     {
-        return MNESourceSpace::find_source_space_hemi(p_Hemisphere);
+        return p_Hemisphere.find_source_space_hemi();
     }
 
     //=========================================================================================================
@@ -277,7 +277,7 @@ public:
      *
      * ### MNE toolbox root function ###
      *
-     * Wrapper for the MNESourceSpace::patch_info static function
+     * Wrapper for the MNESourceSpaces::patch_info static function
      *
      * @param[in, out] p_Hemisphere  The source space.
      *
@@ -285,7 +285,7 @@ public:
      */
     static bool patch_info(MNEHemisphere &p_Hemisphere)
     {
-        return MNESourceSpace::patch_info(p_Hemisphere);
+        return p_Hemisphere.compute_patch_info();
     }
 
     //=========================================================================================================
@@ -601,7 +601,7 @@ public:
      *
      * ### MNE toolbox root function ###
      *
-     * Wrapper for the MNESourceSpace::read_source_spaces static function
+     * Wrapper for the MNESourceSpaces::read_source_spaces static function
      *
      * Reads source spaces from a fif file
      *
@@ -614,9 +614,9 @@ public:
      */
     static bool read_source_spaces(FIFFLIB::FiffStream::SPtr& p_pStream,
                                    bool add_geom,
-                                   MNESourceSpace& p_SourceSpace)
+                                   MNESourceSpaces& p_SourceSpace)
     {
-        return MNESourceSpace::readFromStream(p_pStream,
+        return MNESourceSpaces::readFromStream(p_pStream,
                                               add_geom,
                                               p_SourceSpace);
     }
@@ -652,21 +652,21 @@ public:
      *
      * ### MNE toolbox root function ###
      *
-     * Wrapper for the MNESourceSpace transform_source_space_to member function
+     * Wrapper for the MNESourceSpaces transform_source_space_to member function
      *
      * Transforms source space data to the desired coordinate system
      *
-     * @param[in, out] p_pMNESourceSpace the source space which is should be transformed.
+     * @param[in, out] p_pMNESourceSpaces the source space which is should be transformed.
      * @param[in] dest destination check code.
      * @param[in] trans transformation information.
      *
      * @return true if succeeded, false otherwise.
      */
-    static inline bool transform_source_space_to(MNESourceSpace& p_pMNESourceSpace,
+    static inline bool transform_source_space_to(MNESourceSpaces& p_pMNESourceSpaces,
                                                  FIFFLIB::fiff_int_t dest,
                                                  FIFFLIB::FiffCoordTrans& trans)
     {
-        return p_pMNESourceSpace.transform_source_space_to(dest,
+        return p_pMNESourceSpaces.transform_source_space_to(dest,
                                                            trans);
     }
 

@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "mne_global.h"
+#include "mne_surface.h"
 
 #include <fiff/fiff_types.h>
 #include <fiff/fiff.h>
@@ -73,11 +74,15 @@ namespace MNELIB
 
 //=============================================================================================================
 /**
- * BEM surface geometry information
+ * BEM surface geometry information.
+ *
+ * Inherits core geometry (vertices, normals, triangles, neighbors)
+ * from MNESurface/MNESurfaceOrVolume. Adds BEM-specific computed
+ * triangle metadata (centers, normals, areas) and I/O.
  *
  * @brief BEM surface provides geometry information
  */
-class MNESHARED_EXPORT MNEBemSurface
+class MNESHARED_EXPORT MNEBemSurface : public MNESurface
 {
 public:
     typedef QSharedPointer<MNEBemSurface> SPtr;             /**< Shared pointer type for MNEBemSurface. */
@@ -156,19 +161,9 @@ public:
     static QString id_name(int id);
 
 public:
-    FIFFLIB::fiff_int_t id;            /**< Id information. */
-    FIFFLIB::fiff_int_t np;            /**< Number of vertices of the whole/original surface used to create the source locations. */
-    FIFFLIB::fiff_int_t ntri;          /**< Number of available triangles. */
-    FIFFLIB::fiff_int_t coord_frame;   /**< Coil coordinate system definition. */
-    FIFFLIB::fiff_float_t sigma;       /**< Conductivity of a compartment. */
-    Eigen::MatrixX3f rr;               /**< Source locations of available dipoles. */
-    Eigen::MatrixX3f nn;               /**< Source normals of available dipoles. */
-    Eigen::MatrixX3i tris;             /**< Triangles. */
     Eigen::MatrixX3d tri_cent;         /**< Triangle centers. */
     Eigen::MatrixX3d tri_nn;           /**< Triangle normals. */
     Eigen::VectorXd tri_area;          /**< Triangle areas. */
-    std::vector<Eigen::VectorXi> neighbor_tri;     /**< Vector of neighboring triangles for each vertex. */
-    std::vector<Eigen::VectorXi> neighbor_vert;    /**< Vector of neighboring vertices for each vertex. */
 };
 
 //=============================================================================================================

@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneRawData class declaration.
+ * @brief    MNERawData class declaration.
  *
  */
 
@@ -94,25 +94,25 @@ struct FilterData;
  *
  * @brief A comprehensive raw data structure
  */
-class MNESHARED_EXPORT MneRawData
+class MNESHARED_EXPORT MNERawData
 {
 public:
-    typedef QSharedPointer<MneRawData> SPtr;              /**< Shared pointer type for MneRawData. */
-    typedef QSharedPointer<const MneRawData> ConstSPtr;   /**< Const shared pointer type for MneRawData. */
+    typedef QSharedPointer<MNERawData> SPtr;              /**< Shared pointer type for MNERawData. */
+    typedef QSharedPointer<const MNERawData> ConstSPtr;   /**< Const shared pointer type for MNERawData. */
 
     //=========================================================================================================
     /**
      * Constructs the MNE Raw Data
      * Refactored: new_raw_data (mne_raw_data.c)
      */
-    MneRawData();
+    MNERawData();
 
     //=========================================================================================================
     /**
      * Destroys the MNE Raw Data
      * Refactored: mne_raw_free_data (mne_raw_data.c)
      */
-    ~MneRawData();
+    ~MNERawData();
 
     /**
      * Create a frequency-domain filter response from the current filter
@@ -137,7 +137,7 @@ public:
      *
      * @return OK on success, FAIL on read error.
      */
-    int load_one_buffer(MneRawBufDef* buf);
+    int load_one_buffer(MNERawBufDef* buf);
 
     /**
      * Apply CTF compensation to a loaded raw data buffer if its
@@ -147,7 +147,7 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    int compensate_buffer(MneRawBufDef* buf);
+    int compensate_buffer(MNERawBufDef* buf);
 
     /**
      * Extract raw data samples for selected channels (including derived
@@ -190,7 +190,7 @@ public:
      *
      * @return OK on success, FAIL on error.
      */
-    int load_one_filt_buf(MneRawBufDef* buf);
+    int load_one_filt_buf(MNERawBufDef* buf);
 
     /**
      * Pick filtered data for a channel selection by loading filter buffers,
@@ -223,7 +223,7 @@ public:
      *
      * @return A new raw data object, or NULL on failure. Caller takes ownership.
      */
-    static MneRawData* open_file_comp(const QString& name, int omit_skip, int allow_maxshield, const MneFilterDef& filter, int comp_set);
+    static MNERawData* open_file_comp(const QString& name, int omit_skip, int allow_maxshield, const MNEFilterDef& filter, int comp_set);
 
     /**
      * Open a raw FIFF file using the file's native compensation grade.
@@ -236,41 +236,41 @@ public:
      *
      * @return A new raw data object, or NULL on failure. Caller takes ownership.
      */
-    static MneRawData* open_file(const QString& name, int omit_skip, int allow_maxshield, const MneFilterDef& filter);
+    static MNERawData* open_file(const QString& name, int omit_skip, int allow_maxshield, const MNEFilterDef& filter);
 
 public:
     QString         filename;             /**< Path to the raw FIFF file. */
     //  FIFFLIB::fiffFile       file;
     FIFFLIB::FiffStream::SPtr stream;     /**< Open FIFF stream for reading. */
-    std::unique_ptr<MNELIB::MneRawInfo> info;      /**< Raw data information loaded using MNE routines. */
+    std::unique_ptr<MNELIB::MNERawInfo> info;      /**< Raw data information loaded using MNE routines. */
     QStringList     ch_names;           /**< Channel names as a flat list. */
     QStringList     badlist;            /**< Bad channel names. */
     int             nbad;               /**< Number of bad channels. */
     Eigen::VectorXi  bad;               /**< Boolean array marking bad channels (0 = good, 1 = bad). */
-    std::vector<MNELIB::MneRawBufDef> bufs;  /**< Raw data buffer definitions. */
-    std::vector<MNELIB::MneRawBufDef> filt_bufs;  /**< Filtered data buffer definitions. */
+    std::vector<MNELIB::MNERawBufDef> bufs;  /**< Raw data buffer definitions. */
+    std::vector<MNELIB::MNERawBufDef> filt_bufs;  /**< Filtered data buffer definitions. */
     int             first_samp;         /**< First sample index in the file. */
     int             omit_samp;          /**< Number of skip samples omitted from the beginning. */
     int             first_samp_old;     /**< First sample index (old-version compatible value). */
     int             omit_samp_old;      /**< Omitted samples (old-version compatible value). */
     int             nsamp;              /**< Total number of samples in the file. */
     Eigen::VectorXf  first_sample_val;  /**< Values at the first sample (for DC offset correction before filtering). */
-    std::unique_ptr<MNELIB::MneProjOp> proj;            /**< SSP projection operator. */
-    std::unique_ptr<MNELIB::MneSssData> sss;            /**< SSS data found in this file. */
-    std::unique_ptr<MNELIB::MneCTFCompDataSet> comp;    /**< CTF compensation data. */
+    std::unique_ptr<MNELIB::MNEProjOp> proj;            /**< SSP projection operator. */
+    std::unique_ptr<MNELIB::MNESssData> sss;            /**< SSS data found in this file. */
+    std::unique_ptr<MNELIB::MNECTFCompDataSet> comp;    /**< CTF compensation data. */
     int             comp_file;          /**< Compensation grade stored in the file. */
     int             comp_now;           /**< Current compensation grade applied to data. */
-    std::unique_ptr<MneFilterDef> filter; /**< Filter definition (highpass/lowpass). */
+    std::unique_ptr<MNEFilterDef> filter; /**< Filter definition (highpass/lowpass). */
     std::unique_ptr<FilterData> filter_data;  /**< Pre-computed frequency-domain filter state. */
-    std::unique_ptr<MneEventList> event_list; /**< Trigger event list. */
+    std::unique_ptr<MNEEventList> event_list; /**< Trigger event list. */
     unsigned int    max_event;          /**< Maximum event number in use. */
     QString         dig_trigger;        /**< Name of the digital trigger channel. */
     unsigned int     dig_trigger_mask;  /**< Bit mask applied to digital trigger channel. */
     Eigen::VectorXf  offsets;           /**< DC offset corrections for display. */
     std::unique_ptr<RingBuffer> ring;        /**< Ring buffer for raw data. */
     std::unique_ptr<RingBuffer> filt_ring;   /**< Ring buffer for filtered data. */
-    std::unique_ptr<MNELIB::MneDerivSet> deriv;        /**< Derivation data definitions. */
-    std::unique_ptr<MNELIB::MneDeriv> deriv_matched;   /**< Derivation data matched to this raw data. */
+    std::unique_ptr<MNELIB::MNEDerivSet> deriv;        /**< Derivation data definitions. */
+    std::unique_ptr<MNELIB::MNEDeriv> deriv_matched;   /**< Derivation data matched to this raw data. */
 };
 
 //=============================================================================================================

@@ -96,7 +96,7 @@ typedef void (*mneUserFreeFunc)(void *);
 
 /**
  * @name Source-space types
- * Discriminators for the @c type field in MneSurfaceOrVolume / MneSourceSpaceOld.
+ * Discriminators for the @c type field in MNESurfaceOrVolume / MNESourceSpace.
  * @{
  */
 #define MNE_SOURCE_SPACE_UNKNOWN  -1  /**< Type not yet determined. */
@@ -111,7 +111,7 @@ typedef void (*mneUserFreeFunc)(void *);
 
 /**
  * @name Channel-selection kinds
- * Origin tag for MneChSelection records.
+ * Origin tag for MNEChSelection records.
  * @{
  */
 #define MNE_CH_SELECTION_UNKNOWN  0  /**< Unknown origin. */

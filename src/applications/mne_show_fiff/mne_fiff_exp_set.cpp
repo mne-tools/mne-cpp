@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneFiffExpSet class.
+ * @brief    Definition of the MNEFiffExpSet class.
  *
  */
 
@@ -89,14 +89,14 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneFiffExpSet::MneFiffExpSet()
+MNEFiffExpSet::MNEFiffExpSet()
 {
 }
 
 
 //*************************************************************************************************************
 
-MneFiffExpSet::MneFiffExpSet(const MneFiffExpSet &p_MneFiffExpSet)
+MNEFiffExpSet::MNEFiffExpSet(const MNEFiffExpSet &p_MneFiffExpSet)
 : m_qListExp(p_MneFiffExpSet.m_qListExp)
 {
 
@@ -105,7 +105,7 @@ MneFiffExpSet::MneFiffExpSet(const MneFiffExpSet &p_MneFiffExpSet)
 
 //*************************************************************************************************************
 
-MneFiffExpSet::~MneFiffExpSet()
+MNEFiffExpSet::~MNEFiffExpSet()
 {
 
 }
@@ -113,11 +113,11 @@ MneFiffExpSet::~MneFiffExpSet()
 
 //*************************************************************************************************************
 
-const MneFiffExp& MneFiffExpSet::operator[] (int idx) const
+const MNEFiffExp& MNEFiffExpSet::operator[] (int idx) const
 {
     if (idx >= m_qListExp.length())
     {
-        qWarning("Warning: Required MneFiffExp doesn't exist! Returning MneFiffExp '0'.");
+        qWarning("Warning: Required MNEFiffExp doesn't exist! Returning MNEFiffExp '0'.");
         idx=0;
     }
     return m_qListExp[idx];
@@ -126,11 +126,11 @@ const MneFiffExp& MneFiffExpSet::operator[] (int idx) const
 
 //*************************************************************************************************************
 
-MneFiffExp& MneFiffExpSet::operator[] (int idx)
+MNEFiffExp& MNEFiffExpSet::operator[] (int idx)
 {
     if (idx >= m_qListExp.length())
     {
-        qWarning("Warning: Required MneFiffExp doesn't exist! Returning MneFiffExp '0'.");
+        qWarning("Warning: Required MNEFiffExp doesn't exist! Returning MNEFiffExp '0'.");
         idx = 0;
     }
     return m_qListExp[idx];
@@ -139,7 +139,7 @@ MneFiffExp& MneFiffExpSet::operator[] (int idx)
 
 //*************************************************************************************************************
 
-MneFiffExpSet &MneFiffExpSet::operator<<(const MneFiffExp &p_MneFiffExp)
+MNEFiffExpSet &MNEFiffExpSet::operator<<(const MNEFiffExp &p_MneFiffExp)
 {
     this->m_qListExp.append(p_MneFiffExp);
     return *this;
@@ -148,11 +148,11 @@ MneFiffExpSet &MneFiffExpSet::operator<<(const MneFiffExp &p_MneFiffExp)
 
 //*************************************************************************************************************
 
-MneFiffExpSet MneFiffExpSet::read_fiff_explanations(const QString &name)
+MNEFiffExpSet MNEFiffExpSet::read_fiff_explanations(const QString &name)
 {
     QFile file(name);
 
-    MneFiffExpSet res;
+    MNEFiffExpSet res;
 
     int         exclass,kind;
     QString     text;
@@ -188,7 +188,7 @@ MneFiffExpSet MneFiffExpSet::read_fiff_explanations(const QString &name)
 
         text.remove("\"");
 
-        MneFiffExp exp;
+        MNEFiffExp exp;
         exp.exclass = exclass;
         exp.kind = kind;
         exp.text = text;
@@ -210,7 +210,7 @@ MneFiffExpSet MneFiffExpSet::read_fiff_explanations(const QString &name)
 
 //*************************************************************************************************************
 
-void MneFiffExpSet::list_fiff_explanations(FILE *out)
+void MNEFiffExpSet::list_fiff_explanations(FILE *out)
 {
     for (int k = 0; k < this->size(); k++)
         fprintf(out,"%d %d \"%s\"\n",this->m_qListExp[k].exclass,this->m_qListExp[k].kind,this->m_qListExp[k].text.toUtf8().constData());
@@ -219,14 +219,14 @@ void MneFiffExpSet::list_fiff_explanations(FILE *out)
 
 //*************************************************************************************************************
 
-QList<MneFiffExp>::const_iterator MneFiffExpSet::find_fiff_explanation(int exclass, int kind) const
+QList<MNEFiffExp>::const_iterator MNEFiffExpSet::find_fiff_explanation(int exclass, int kind) const
 {
-    MneFiffExp one;
+    MNEFiffExp one;
     one.exclass = exclass;
     one.kind  = kind;
 
-    auto it = std::lower_bound(this->m_qListExp.begin(), this->m_qListExp.end(), one, MneFiffExp::comp_exp);
-    if (it != this->m_qListExp.end() && !MneFiffExp::comp_exp(one, *it)) {
+    auto it = std::lower_bound(this->m_qListExp.begin(), this->m_qListExp.end(), one, MNEFiffExp::comp_exp);
+    if (it != this->m_qListExp.end() && !MNEFiffExp::comp_exp(one, *it)) {
         return it;
     }
     return this->m_qListExp.end();
@@ -235,7 +235,7 @@ QList<MneFiffExp>::const_iterator MneFiffExpSet::find_fiff_explanation(int excla
 
 //*************************************************************************************************************
 
-QList<MneFiffExp>::const_iterator MneFiffExpSet::constEnd() const
+QList<MNEFiffExp>::const_iterator MNEFiffExpSet::constEnd() const
 {
     return m_qListExp.constEnd();
 }
@@ -245,7 +245,7 @@ QList<MneFiffExp>::const_iterator MneFiffExpSet::constEnd() const
 
 //*************************************************************************************************************
 
-void MneFiffExpSet::print_file_id (FILE *out, FiffTag::SPtr tag)
+void MNEFiffExpSet::print_file_id (FILE *out, FiffTag::SPtr tag)
 {
     FiffId id = tag->toFiffID();
     struct tm *ltime;
@@ -265,10 +265,10 @@ void MneFiffExpSet::print_file_id (FILE *out, FiffTag::SPtr tag)
 
 //*************************************************************************************************************
 
-void MneFiffExpSet::print_ch_info (FILE *out, FiffTag::SPtr tag)
+void MNEFiffExpSet::print_ch_info (FILE *out, FiffTag::SPtr tag)
 {
     FiffChInfo info = tag->toChInfo();
-    QList<MneFiffExp>::const_iterator exp;
+    QList<MNEFiffExp>::const_iterator exp;
     QString text1, text2, text3;
 
     exp = this->find_fiff_explanation(CLASS_UNIT, info.unit);
@@ -287,7 +287,7 @@ void MneFiffExpSet::print_ch_info (FILE *out, FiffTag::SPtr tag)
 
 //*************************************************************************************************************
 
-void MneFiffExpSet::print_transform(FILE *out, FiffTag::SPtr tag)
+void MNEFiffExpSet::print_transform(FILE *out, FiffTag::SPtr tag)
 {
     FiffCoordTrans t = tag->toCoordTrans();
     int k, p;
@@ -311,7 +311,7 @@ void MneFiffExpSet::print_transform(FILE *out, FiffTag::SPtr tag)
 
 //*************************************************************************************************************
 
-void MneFiffExpSet::print_dig_point(FILE *out, FiffTag::SPtr tag)
+void MNEFiffExpSet::print_dig_point(FILE *out, FiffTag::SPtr tag)
 {
     FiffDigPoint point = tag->toDigPoint();
     switch (point.kind) {
@@ -334,7 +334,7 @@ void MneFiffExpSet::print_dig_point(FILE *out, FiffTag::SPtr tag)
 
 //*************************************************************************************************************
 
-void MneFiffExpSet::print_matrix(FILE *out, FiffStream::SPtr stream, FiffDirEntry::SPtr this_ent)
+void MNEFiffExpSet::print_matrix(FILE *out, FiffStream::SPtr stream, FiffDirEntry::SPtr this_ent)
 {
     // Simplified matrix info since we don't want to read the whole tag yet if it's large,
     // but FiffStream has some matrix reading logic.
@@ -344,7 +344,7 @@ void MneFiffExpSet::print_matrix(FILE *out, FiffStream::SPtr stream, FiffDirEntr
 
 //*************************************************************************************************************
 
-bool MneFiffExpSet::show_fiff_contents(FILE *out, const MneShowFiffSettings &settings)
+bool MNEFiffExpSet::show_fiff_contents(FILE *out, const MNEShowFiffSettings &settings)
 {
     return show_fiff_contents(out,settings.inname, settings.verbose,settings.tags,settings.indent,settings.long_strings,settings.blocks_only);
 }
@@ -352,7 +352,7 @@ bool MneFiffExpSet::show_fiff_contents(FILE *out, const MneShowFiffSettings &set
 
 //*************************************************************************************************************
 
-bool MneFiffExpSet::show_fiff_contents(FILE *out, const QString &name, bool verbose, const QList<int> &tags, int indent_step, bool long_strings, bool blocks_only)
+bool MNEFiffExpSet::show_fiff_contents(FILE *out, const QString &name, bool verbose, const QList<int> &tags, int indent_step, bool long_strings, bool blocks_only)
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
@@ -367,7 +367,7 @@ bool MneFiffExpSet::show_fiff_contents(FILE *out, const QString &name, bool verb
     bool            show_it = false;
     QString         s;
     bool            output_taginfo = false;
-    QList<MneFiffExp>::const_iterator exp;
+    QList<MNEFiffExp>::const_iterator exp;
 
     if (!stream->open())
         return false;
@@ -623,12 +623,12 @@ bool MneFiffExpSet::show_fiff_contents(FILE *out, const QString &name, bool verb
 
 //*************************************************************************************************************
 
-void MneFiffExpSet::sort_fiff_explanations()
+void MNEFiffExpSet::sort_fiff_explanations()
 {
     if (this->size() == 0)
         return;
 
-    std::sort(this->m_qListExp.begin(), this->m_qListExp.end(), MneFiffExp::comp_exp);
+    std::sort(this->m_qListExp.begin(), this->m_qListExp.end(), MNEFiffExp::comp_exp);
 
     return;
 }

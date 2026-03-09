@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneShowFiffSettings class declaration.
+ * @brief    MNEShowFiffSettings class declaration.
  *
  */
 
@@ -79,17 +79,17 @@ namespace SHOWFIFF
  *
  * @brief Show Fiff setting implementation
  */
-class MneShowFiffSettings
+class MNEShowFiffSettings
 {
 public:
-    typedef QSharedPointer<MneShowFiffSettings> SPtr;             /**< Shared pointer type for MneShowFiffSettings. */
-    typedef QSharedPointer<const MneShowFiffSettings> ConstSPtr;  /**< Const shared pointer type for MneShowFiffSettings. */
+    typedef QSharedPointer<MNEShowFiffSettings> SPtr;             /**< Shared pointer type for MNEShowFiffSettings. */
+    typedef QSharedPointer<const MNEShowFiffSettings> ConstSPtr;  /**< Const shared pointer type for MNEShowFiffSettings. */
 
     //=========================================================================================================
     /**
      * Default Constructor
      */
-    explicit MneShowFiffSettings();
+    explicit MNEShowFiffSettings();
 
     //=========================================================================================================
     /**
@@ -98,13 +98,13 @@ public:
      * @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
      * @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
      */
-    explicit MneShowFiffSettings(int *argc,char **argv);
+    explicit MNEShowFiffSettings(int *argc,char **argv);
 
     //=========================================================================================================
     /**
      * Destructs the Show Fiff Settings
      */
-    virtual ~MneShowFiffSettings();
+    virtual ~MNEShowFiffSettings();
 
     //=========================================================================================================
     /**

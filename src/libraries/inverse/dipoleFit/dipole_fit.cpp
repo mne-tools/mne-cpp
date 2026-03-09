@@ -166,7 +166,7 @@ void mne_free_name_list(char **list, int nlist)
 static mneChSelection new_ch_selection()
 
 {
-    mneChSelection newsel = new MneChSelection();
+    mneChSelection newsel = new MNEChSelection();
 
     newsel->name.clear();
     newsel->chdef.clear();
@@ -211,13 +211,13 @@ static void omit_spaces(QStringList names, int nnames)
 }
 
 int mne_ch_selection_assign_chs(mneChSelection sel,
-                                MneRawData*     data)
+                                MNERawData*     data)
 /*
       * Make the channel picking real easy
       */
 {
     int c,rc,d;
-    MneRawInfo*  info;
+    MNERawInfo*  info;
     int nch;
     QString dash;
 
@@ -557,8 +557,8 @@ ECDSet DipoleFit::calculateFit() const
     ECDSet              set;
     FwdEegSphereModel*  eeg_model = NULL;
     DipoleFitData*      fit_data = NULL;
-    MneMeasData*        data     = NULL;
-    MneRawData*         raw      = NULL;
+    MNEMeasData*        data     = NULL;
+    MNERawData*         raw      = NULL;
     mneChSelection      sel      = NULL;
 
     printf("---- Setting up...\n\n");
@@ -593,7 +593,7 @@ ECDSet DipoleFit::calculateFit() const
         float t1,t2;
 
         printf("\n---- Opening a raw data file...\n\n");
-        if ((raw = MneRawData::open_file(settings->measname.isEmpty() ? NULL : settings->measname.toUtf8().data(),TRUE,FALSE,settings->filter)) == NULL)
+        if ((raw = MNERawData::open_file(settings->measname.isEmpty() ? NULL : settings->measname.toUtf8().data(),TRUE,FALSE,settings->filter)) == NULL)
             goto out;
         /*
         * A channel selection is needed to access the data
@@ -623,7 +623,7 @@ ECDSet DipoleFit::calculateFit() const
     }
     else {
         printf("\n---- Reading data...\n\n");
-        if ((data = MneMeasData::mne_read_meas_data(settings->measname,
+        if ((data = MNEMeasData::mne_read_meas_data(settings->measname,
                                                     settings->setno,
                                                     NULL,
                                                     NULL,
@@ -680,7 +680,7 @@ out : {
 
 //=============================================================================================================
 
-int DipoleFit::fit_dipoles( const QString& dataname, MneMeasData* data, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
+int DipoleFit::fit_dipoles( const QString& dataname, MNEMeasData* data, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
 {
     float *one = MALLOC(data->nchan,float);
     float time;
@@ -723,7 +723,7 @@ int DipoleFit::fit_dipoles( const QString& dataname, MneMeasData* data, DipoleFi
 
 //=============================================================================================================
 
-int DipoleFit::fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
+int DipoleFit::fit_dipoles_raw(const QString& dataname, MNERawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set)
 {
     float *one    = MALLOC(sel->nchan,float);
     float sfreq   = raw->info->sfreq;
@@ -796,7 +796,7 @@ bad : {
 
 //=============================================================================================================
 
-int DipoleFit::fit_dipoles_raw(const QString& dataname, MneRawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose)
+int DipoleFit::fit_dipoles_raw(const QString& dataname, MNERawData* raw, mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose)
 {
     ECDSet set;
     return fit_dipoles_raw(dataname, raw, sel, fit, guess, tmin, tmax, tstep, integ, verbose, set);

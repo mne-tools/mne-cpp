@@ -41,9 +41,9 @@
 #include "fwd_bem_model.h"
 #include "fwd_bem_solution.h"
 #include "fwd_eeg_sphere_model.h"
-#include <mne/mne_surface_old.h>
+#include <mne/mne_surface.h>
 #include <mne/mne_triangle.h>
-#include <mne/mne_source_space_old.h>
+#include <mne/mne_source_space.h>
 
 #include "fwd_comp_data.h"
 #include "fwd_bem_model.h"
@@ -528,7 +528,7 @@ int FwdBemModel::get_int(FiffStream::SPtr &stream, const FiffDirNode::SPtr &node
 
 //=============================================================================================================
 
-MneSurfaceOld *FwdBemModel::fwd_bem_find_surface(int kind)
+MNESurface *FwdBemModel::fwd_bem_find_surface(int kind)
 {
     //    if (!model) {
     //        printf("No model specified for fwd_bem_find_surface");
@@ -548,7 +548,7 @@ FwdBemModel *FwdBemModel::fwd_bem_load_surfaces(const QString &name, int *kinds,
  * Load a set of surfaces
  */
 {
-    QList<MneSurfaceOld*> surfs;// = NULL;
+    QList<MNESurface*> surfs;// = NULL;
     float      *sigma = NULL;
     float      *sigma1;
     FwdBemModel *m = NULL;
@@ -559,16 +559,16 @@ FwdBemModel *FwdBemModel::fwd_bem_load_surfaces(const QString &name, int *kinds,
         return NULL;
     }
 
-//    surfs = MALLOC_40(nkind,MneSurfaceOld*);
+//    surfs = MALLOC_40(nkind,MNESurface*);
     sigma = MALLOC_40(nkind,float);
 //    for (k = 0; k < nkind; k++)
 //        surfs[k] = NULL;
 
     for (k = 0; k < nkind; k++) {
-        surfs.append(MneSurfaceOld::read_bem_surface(name,kinds[k],TRUE,sigma+k));
+        surfs.append(MNESurface::read_bem_surface(name,kinds[k],TRUE,sigma+k));
         if (surfs[k] == NULL)
             goto bad;
-        if ((surfs[k] = MneSurfaceOld::read_bem_surface(name,kinds[k],TRUE,sigma+k)) == NULL)
+        if ((surfs[k] = MNESurface::read_bem_surface(name,kinds[k],TRUE,sigma+k)) == NULL)
             goto bad;
         if (sigma[k] < 0.0) {
             qCritical("No conductivity available for surface %s",fwd_bem_explain_surface(kinds[k]).toUtf8().constData());
@@ -775,15 +775,15 @@ int FwdBemModel::fwd_bem_set_head_mri_t(FwdBemModel *m, const FiffCoordTrans &t)
 
 //=============================================================================================================
 
-MneSurfaceOld* FwdBemModel::make_guesses(MneSurfaceOld* guess_surf, float guessrad, float *guess_r0, float grid, float exclude, float mindist)		   /* Exclude points closer than this to
+MNESurface* FwdBemModel::make_guesses(MNESurface* guess_surf, float guessrad, float *guess_r0, float grid, float exclude, float mindist)		   /* Exclude points closer than this to
                                                         * the guess boundary surface */
 /*
      * Make a guess space inside a sphere
      */
 {
     char *bemname     = NULL;
-    MneSurfaceOld* sphere = NULL;
-    MneSurfaceOld* res    = NULL;
+    MNESurface* sphere = NULL;
+    MNESurface* res    = NULL;
     int        k;
     float      dist;
     float      r0[] = { 0.0, 0.0, 0.0 };
@@ -816,7 +816,7 @@ MneSurfaceOld* FwdBemModel::make_guesses(MneSurfaceOld* guess_surf, float guessr
         bemname = MALLOC_40(strlen(bemFile.fileName().toUtf8().data())+1,char);
         strcpy(bemname,bemFile.fileName().toUtf8().data());
 
-        if ((sphere = MneSourceSpaceOld::read_bem_surface(bemname,9003,FALSE,NULL)) == NULL)
+        if ((sphere = MNESurface::read_bem_surface(bemname,9003,FALSE,NULL)) == NULL)
             goto out;
 
         for (k = 0; k < sphere->np; k++) {
@@ -825,7 +825,7 @@ MneSurfaceOld* FwdBemModel::make_guesses(MneSurfaceOld* guess_surf, float guessr
             sphere->rr(k,Y_40) = guessrad*sphere->rr(k,Y_40)/dist + guess_r0[Y_40];
             sphere->rr(k,Z_40) = guessrad*sphere->rr(k,Z_40)/dist + guess_r0[Z_40];
         }
-        if (MneSurfaceOrVolume::add_geometry_info(reinterpret_cast<MneSourceSpaceOld&>(*sphere),TRUE) == FAIL)
+        if (sphere->add_geometry_info(TRUE) == FAIL)
             goto out;
         guess_surf = sphere;
     }
@@ -835,7 +835,7 @@ MneSurfaceOld* FwdBemModel::make_guesses(MneSurfaceOld* guess_surf, float guessr
                mne_coord_frame_name_40(guess_surf->coord_frame).toUtf8().constData());
     }
     printf("Filtering (grid = %6.f mm)...\n",1000*grid);
-    res = (MneSurfaceOld*)MneSurfaceOrVolume::make_volume_source_space(*guess_surf,grid,exclude,mindist);
+    res = (MNESurface*)MNESourceSpace::make_volume_source_space(*guess_surf,grid,exclude,mindist);
 
 out : {
         FREE_40(bemname);
@@ -864,7 +864,7 @@ double FwdBemModel::calc_beta(double *rk, double *rk1)
 
 //=============================================================================================================
 
-void FwdBemModel::lin_pot_coeff(float *from, MneTriangle* to, double omega[])	/* The final result */
+void FwdBemModel::lin_pot_coeff(float *from, MNETriangle* to, double omega[])	/* The final result */
 /*
           * The linear potential matrix element computations
           */
@@ -971,7 +971,7 @@ void FwdBemModel::lin_pot_coeff(float *from, MneTriangle* to, double omega[])	/*
 
 //=============================================================================================================
 
-void FwdBemModel::correct_auto_elements(MneSurfaceOld *surf, float **mat)
+void FwdBemModel::correct_auto_elements(MNESurface *surf, float **mat)
 /*
           * Improve auto-element approximation...
           */
@@ -983,7 +983,7 @@ void FwdBemModel::correct_auto_elements(MneSurfaceOld *surf, float **mat)
     int   nmemb;
     int   j,k;
     float pi2 = 2.0*M_PI;
-    MneTriangle*   tri;
+    MNETriangle*   tri;
 
 #ifdef SIMPLE
     for (j = 0; j < nnode; j++) {
@@ -1042,7 +1042,7 @@ void FwdBemModel::correct_auto_elements(MneSurfaceOld *surf, float **mat)
 
 //=============================================================================================================
 
-float **FwdBemModel::fwd_bem_lin_pot_coeff(const QList<MneSurfaceOld*>& surfs)
+float **FwdBemModel::fwd_bem_lin_pot_coeff(const QList<MNESurface*>& surfs)
 /*
  * Calculate the coefficients for linear collocation approach
  */
@@ -1051,13 +1051,13 @@ float **FwdBemModel::fwd_bem_lin_pot_coeff(const QList<MneSurfaceOld*>& surfs)
     float **sub_mat = NULL;
     int   np1,np2,ntri,np_tot,np_max;
     float **nodes_ptr;
-    MneTriangle*   tri;
+    MNETriangle*   tri;
     double omega[3];
     double *row = NULL;
     int    j,k,p,q,c;
     int    joff,koff;
-    MneSurfaceOld* surf1;
-    MneSurfaceOld* surf2;
+    MNESurface* surf1;
+    MNESurface* surf2;
 
     for (p = 0, np_tot = np_max = 0; p < surfs.size(); p++) {
         np_tot += surfs[p]->np;
@@ -1153,7 +1153,7 @@ int FwdBemModel::fwd_bem_linear_collocation_solution(FwdBemModel *m)
         fprintf (stderr,"IP approach required...\n");
 
         fprintf (stderr,"\tMatrix coefficients (homog)...\n");
-        QList<MneSurfaceOld*> last_surfs;
+        QList<MNESurface*> last_surfs;
         last_surfs << m->surfs.last();
         if ((coeff = fwd_bem_lin_pot_coeff(last_surfs))== NULL)//m->surfs+m->nsurf-1,1)) == NULL)
             goto bad;
@@ -1346,14 +1346,14 @@ int FwdBemModel::fwd_bem_check_solids(float **angles, int ntri1, int ntri2, floa
 
 //=============================================================================================================
 
-float **FwdBemModel::fwd_bem_solid_angles(const QList<MneSurfaceOld*>& surfs)
+float **FwdBemModel::fwd_bem_solid_angles(const QList<MNESurface*>& surfs)
 /*
           * Compute the solid angle matrix
           */
 {
-    MneSurfaceOld* surf1;
-    MneSurfaceOld* surf2;
-    MneTriangle* tri;
+    MNESurface* surf1;
+    MNESurface* surf2;
+    MNETriangle* tri;
     int ntri1,ntri2,ntri_tot;
     int j,k,p,q;
     int joff,koff;
@@ -1379,7 +1379,7 @@ float **FwdBemModel::fwd_bem_solid_angles(const QList<MneSurfaceOld*>& surfs)
                     if (p == q && j == k)
                         result = 0.0;
                     else
-                        result = MneSurfaceOrVolume::solid_angle (surf1->tris[j].cent,*tri);
+                        result = MNESurfaceOrVolume::solid_angle (surf1->tris[j].cent,*tri);
                     solids[j+joff][k+koff] = result;
                 }
             for (j = 0; j < ntri1; j++)
@@ -1437,7 +1437,7 @@ int FwdBemModel::fwd_bem_constant_collocation_solution(FwdBemModel *m)
         fprintf (stderr,"IP approach required...\n");
 
         fprintf (stderr,"\tSolid angles (homog)...\n");
-        QList<MneSurfaceOld*> last_surfs;
+        QList<MNESurface*> last_surfs;
         last_surfs << m->surfs.last();
         if ((solids = fwd_bem_solid_angles (last_surfs)) == NULL)//m->surfs+m->nsurf-1,1)) == NULL)
             goto bad;
@@ -1557,12 +1557,12 @@ int FwdBemModel::fwd_bem_specify_els(FwdBemModel* m, FwdCoilSet *els)
      */
 {
     FwdCoil*     el;
-    MneSurfaceOld*  scalp;
+    MNESurface*  scalp;
     int         k,p,q,v;
     float       *one_sol,*pick_sol;
     float       r[3],w[3],dist;
     int         best;
-    MneTriangle* tri;
+    MNETriangle* tri;
     float       x,y,z;
     FwdBemSolution* sol;
 
@@ -1602,7 +1602,7 @@ int FwdBemModel::fwd_bem_specify_els(FwdBemModel* m, FwdCoilSet *els)
             VEC_COPY_40(r,el->rmag[p]);
             if (!m->head_mri_t.isEmpty())
                 FiffCoordTrans::apply_trans(r,m->head_mri_t,FIFFV_MOVE);
-            best = MneSurfaceOrVolume::project_to_surface(*scalp,nullptr,Eigen::Map<const Eigen::Vector3f>(r),dist);
+            best = scalp->project_to_surface(nullptr,Eigen::Map<const Eigen::Vector3f>(r),dist);
             if (best < 0) {
                 printf("One of the electrodes could not be projected onto the scalp surface. How come?");
                 goto bad;
@@ -1620,7 +1620,7 @@ int FwdBemModel::fwd_bem_specify_els(FwdBemModel* m, FwdCoilSet *els)
              * Calculate a linear interpolation between the vertex values
              */
                 tri = &scalp->tris[best];
-                MneSurfaceOrVolume::triangle_coords(Eigen::Map<const Eigen::Vector3f>(r),*scalp,best,x,y,z);
+                scalp->triangle_coords(Eigen::Map<const Eigen::Vector3f>(r),best,x,y,z);
 
                 w[X_40] = el->w[p]*(1.0 - x - y);
                 w[Y_40] = el->w[p]*x;
@@ -1652,7 +1652,7 @@ void FwdBemModel::fwd_bem_pot_grad_calc(float *rd, float *Q, FwdBemModel* m, Fwd
  * Compute the potentials due to a current dipole
  */
 {
-    MneTriangle* tri;
+    MNETriangle* tri;
     int         ntri;
     int         s,k,p,nsol,pp;
     float       mult;
@@ -1821,7 +1821,7 @@ void FwdBemModel::fwd_bem_pot_calc(float *rd, float *Q, FwdBemModel *m, FwdCoilS
           * Compute the potentials due to a current dipole
           */
 {
-    MneTriangle* tri;
+    MNETriangle* tri;
     int         ntri;
     int         s,k,p,nsol;
     float       mult;
@@ -1978,7 +1978,7 @@ void FwdBemModel::calc_magic(double u, double z, double A, double B, double *bet
 
 //=============================================================================================================
 
-void FwdBemModel::field_integrals(float *from, MneTriangle* to, double *I1p, double *T, double *S1, double *S2, double *f0, double *fx, double *fy)
+void FwdBemModel::field_integrals(float *from, MNETriangle* to, double *I1p, double *T, double *S1, double *S2, double *f0, double *fx, double *fy)
 {
     double y1[3],y2[3],y3[3];
     double xx[4],yy[4];
@@ -2093,7 +2093,7 @@ void FwdBemModel::field_integrals(float *from, MneTriangle* to, double *I1p, dou
 
 //=============================================================================================================
 
-double FwdBemModel::one_field_coeff(float *dest, float *normal, MneTriangle* tri)
+double FwdBemModel::one_field_coeff(float *dest, float *normal, MNETriangle* tri)
 /*
  * Compute the integral over one triangle.
  * This looks magical but it is not.
@@ -2134,8 +2134,8 @@ float **FwdBemModel::fwd_bem_field_coeff(FwdBemModel *m, FwdCoilSet *coils)	/* G
      * Compute the weighting factors to obtain the magnetic field
      */
 {
-    MneSurfaceOld*     surf;
-    MneTriangle*    tri;
+    MNESurface*     surf;
+    MNETriangle*    tri;
     FwdCoil*        coil;
     FwdCoilSet*     tcoils = NULL;
     int            ntri;
@@ -2218,7 +2218,7 @@ double FwdBemModel::calc_gamma(double *rk, double *rk1)
 
 //=============================================================================================================
 
-void FwdBemModel::fwd_bem_one_lin_field_coeff_ferg(float *dest, float *dir, MneTriangle* tri, double *res)	/* The results */
+void FwdBemModel::fwd_bem_one_lin_field_coeff_ferg(float *dest, float *dir, MNETriangle* tri, double *res)	/* The results */
 {
     double c[3];			/* Component of dest vector normal to
                                      * the triangle plane */
@@ -2287,7 +2287,7 @@ void FwdBemModel::fwd_bem_one_lin_field_coeff_ferg(float *dest, float *dir, MneT
 
 //=============================================================================================================
 
-void FwdBemModel::fwd_bem_one_lin_field_coeff_uran(float *dest, float *dir, MneTriangle* tri, double *res)	/* The results */
+void FwdBemModel::fwd_bem_one_lin_field_coeff_uran(float *dest, float *dir, MNETriangle* tri, double *res)	/* The results */
 {
     double      I1,T[2],S1[2],S2[2];
     double      f0[3],fx[3],fy[3];
@@ -2319,7 +2319,7 @@ void FwdBemModel::fwd_bem_one_lin_field_coeff_uran(float *dest, float *dir, MneT
 
 //=============================================================================================================
 
-void FwdBemModel::fwd_bem_one_lin_field_coeff_simple(float *dest, float *normal, MneTriangle* source, double *res)     /* The result for each triangle node */
+void FwdBemModel::fwd_bem_one_lin_field_coeff_simple(float *dest, float *normal, MNETriangle* source, double *res)     /* The result for each triangle node */
 /*
           * Simple version...
           */
@@ -2351,8 +2351,8 @@ float **FwdBemModel::fwd_bem_lin_field_coeff(FwdBemModel *m, FwdCoilSet *coils, 
           * in the linear potential approximation
           */
 {
-    MneSurfaceOld*  surf;
-    MneTriangle* tri;
+    MNESurface*  surf;
+    MNETriangle* tri;
     FwdCoil*     coil;
     FwdCoilSet*  tcoils = NULL;
     int         ntri;
@@ -2565,7 +2565,7 @@ void FwdBemModel::fwd_bem_field_calc(float *rd, float *Q, FwdCoilSet *coils, Fwd
     float *v0;
     int   s,k,p,ntri;
     FwdCoil* coil;
-    MneTriangle* tri;
+    MNETriangle* tri;
     float   mult;
     float  my_rd[3],my_Q[3];
     FwdBemSolution* sol = (FwdBemSolution*)coils->user_data;
@@ -2628,7 +2628,7 @@ void FwdBemModel::fwd_bem_field_grad_calc(float *rd, float *Q, FwdCoilSet* coils
     float          *v0;
     int            s,k,p,ntri,pp;
     FwdCoil*       coil;
-    MneTriangle*   tri;
+    MNETriangle*   tri;
     float          mult;
     float          *grads[3],ee[3],mri_ee[3],mri_rd[3],mri_Q[3];
     float          *grad;
@@ -2921,7 +2921,7 @@ void *FwdBemModel::meg_eeg_fwd_one_source_space(void *arg)
  */
 {
     FwdThreadArg* a = (FwdThreadArg*)arg;
-    MneSourceSpaceOld* s = a->s;
+    MNESourceSpace* s = a->s;
     int            j,p,q;
     float          *xyz[3];
 
@@ -3088,10 +3088,10 @@ bad : {
 
 //=============================================================================================================
 
-int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MneSourceSpaceOld>>& spaces,
+int FwdBemModel::compute_forward_meg(std::vector<std::unique_ptr<MNESourceSpace>>& spaces,
                                      FwdCoilSet *coils,
                                      FwdCoilSet *comp_coils,
-                                     MneCTFCompDataSet *comp_data,
+                                     MNECTFCompDataSet *comp_data,
                                      bool fixed_ori,
                                      FwdBemModel *bem_model,
                                      Vector3f *r0,
@@ -3352,7 +3352,7 @@ bad : {
 
 //=============================================================================================================
 
-int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MneSourceSpaceOld>>& spaces,
+int FwdBemModel::compute_forward_eeg(std::vector<std::unique_ptr<MNESourceSpace>>& spaces,
                                      FwdCoilSet *els,
                                      bool fixed_ori,
                                      FwdBemModel *bem_model,
