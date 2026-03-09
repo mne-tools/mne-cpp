@@ -30,14 +30,14 @@ git remote add upstream https://github.com/mne-tools/mne-cpp.git
 
 ### 2. Create a Feature Branch
 
-Always work on a dedicated branch — never commit directly to `main`:
+Always work on a dedicated branch — never commit directly to `staging` or `main`. Feature branches are created from `staging`, which is the active development branch:
 
 ```bash
 git fetch upstream
-git checkout -b my-feature upstream/main
+git checkout -b my-feature upstream/staging
 ```
 
-Choose a descriptive branch name, e.g., `fix-fiff-reader-crash` or `add-lsl-plugin`.
+Choose a descriptive branch name, e.g., `fix/fiff-reader-crash` or `feature/lsl-plugin`.
 
 ### 3. Make Your Changes
 
@@ -66,15 +66,14 @@ ctest --output-on-failure
 
 If you added new functionality, write unit tests for it. See [Writing Tests](writingtest.mdx) for guidance.
 
-### 5. Test on CI Without a Pull Request
+### 5. Keep Your Branch Up to Date
 
-Before opening a formal PR, you can validate your changes across all platforms by pushing to the `testci` branch on your fork:
+Regularly rebase your feature branch on the latest `staging` to avoid large merge conflicts:
 
 ```bash
-git push origin my-feature:testci -f
+git fetch upstream
+git rebase upstream/staging
 ```
-
-Check the **Actions** tab on your forked repository's GitHub page. Fix any platform-specific failures before proceeding.
 
 ### 6. Push to Your Fork
 
@@ -89,10 +88,14 @@ git push origin my-feature
 Go to your fork on GitHub and create a pull request:
 
 1. Click **New pull request** next to the branch selector.
-2. Set the **base repository** to `mne-tools/mne-cpp` and the **base branch** to `main`.
+2. Set the **base repository** to `mne-tools/mne-cpp` and the **base branch** to **`staging`**.
 3. Set the **compare branch** to your feature branch.
 4. Give the PR a descriptive title using the commit prefix convention (e.g., `ENH: Add LSL acquisition plugin`).
 5. In the description, explain what your changes do, why they are needed, and how to test them.
+
+:::important
+Pull requests should target the **`staging`** branch, not `main`. The `main` branch is reserved for release-ready code and is updated only by maintainers merging from `staging`.
+:::
 
 For a detailed overview of how to make a pull request, see the [guide on the official GitHub website](https://git-scm.com/book/en/v2/GitHub-Contributing-to-a-Project).
 
@@ -103,24 +106,24 @@ After you create the pull request:
 - The [CI pipeline](ci.mdx) will automatically run builds and tests on all platforms.
 - MNE-CPP maintainers will review your code and may request changes.
 - Address review comments by making additional commits on your feature branch and pushing them — they are automatically added to the existing PR. There is no need to create a new pull request.
-- Once all CI checks pass and the reviewers approve, your code will be merged.
+- Once all CI checks pass and the reviewers approve, your code will be merged into `staging`.
 
 ### 9. Clean Up
 
 After your PR is merged, you can delete the feature branch:
 
 ```bash
-git checkout main
+git checkout staging
 git branch -d my-feature
 git push origin --delete my-feature
 ```
 
-Keep your fork's `main` branch up to date:
+Keep your fork's `staging` branch up to date:
 
 ```bash
 git fetch upstream
-git rebase upstream/main
-git push origin main
+git rebase upstream/staging
+git push origin staging
 ```
 
 ## Tips for a Smooth Review

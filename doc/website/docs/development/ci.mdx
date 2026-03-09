@@ -5,26 +5,26 @@ sidebar_label: Continuous Integration
 
 # Continuous Integration
 
-Every change to MNE-CPP is automatically built, tested, and — for releases — packaged across **Windows, Linux, and macOS** before it reaches users. The CI system runs on [GitHub Actions](https://docs.github.com/en/actions) and is triggered by pull requests, pushes to `main`, tagged releases, and dedicated test branches.
+Every change to MNE-CPP is automatically built, tested, and — for releases — packaged across **Windows, Linux, and macOS** before it reaches users. The CI system runs on [GitHub Actions](https://docs.github.com/en/actions) and is organized around the [Main – Staging – Feature branch model](ci-releasecycle.mdx).
 
-Pull requests cannot be merged until all platform jobs pass. Development builds (nightly) are published on every push to `main`; stable release binaries are created when a version tag (`v0.x.y`) is published.
+Pull requests cannot be merged until all platform jobs pass. Development builds are published on every push to `staging`; stable release binaries are created when a version tag (`v*`) is pushed on `main`.
 
 ## Guides
 
-- **[GitHub Actions](ci-ghactions.mdx)** — Workflow overview, the pull-request and release pipelines, secrets, and how to add or modify workflows.
+- **[GitHub Actions](ci-ghactions.mdx)** — Workflow overview, the pull-request, staging, and release pipelines, secrets, and how to add or modify workflows.
 - **[Unit Testing](writingtest.mdx)** — How to write and run unit tests using Qt Test, including test structure, reference data, and naming conventions.
 - **[Deployment](ci-deployment.mdx)** — How Qt dependencies are bundled on each platform using `windeployqt`, `linuxdeployqt`, and `macdeployqt`.
-- **[Release Guide](ci-releasecycle.mdx)** — The step-by-step process for creating a new stable release, from version bumps to automated binary uploads.
+- **[Release Guide](ci-releasecycle.mdx)** — Branch model, versioning, and the step-by-step process for creating a new stable release.
 
 ## At a Glance
 
 | Branch / Event | Workflow | What Happens |
 |----------------|----------|--------------|
-| Pull request | `pullrequest.yml` | Build + test on all platforms |
-| Push to `main` | `release.yml` | Development release (nightly binaries) |
-| Tag `v0.x.y` | `release.yml` | Stable release with static + dynamic binaries |
-| Push to `testci` | `testci.yml` | Full CI matrix without opening a PR |
+| Pull request → `staging` or `main` | `pull-request.yml` | Build matrix (Qt min + max) + tests on all platforms |
+| Push to `staging` | `staging.yml` | Dev release binaries, coverage checks, dev website + Doxygen, CodeQL |
+| Push to `main` | `main.yml` | Tests, stable website + Doxygen deployment |
+| Tag `v*` on `main` | `main.yml` | Full stable release: platform binaries, installers, WebAssembly |
 | Push to `wasm` | `wasmtest.yml` | WebAssembly build deployed to GitHub Pages |
-| Push to `docu` | `docutest.yml` | Documentation website rebuilt and published |
+| Timer (every 2 days) | `coverity.yml` | Coverity static code analysis |
 
 Contributors should follow the [contribution workflow](contr-guide.mdx) to ensure their changes pass all CI checks before requesting a review.

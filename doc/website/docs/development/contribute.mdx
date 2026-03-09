@@ -24,13 +24,13 @@ All code contributions are reviewed by maintainers and validated by the [CI pipe
 git clone https://github.com/<you>/mne-cpp.git && cd mne-cpp
 git remote add upstream https://github.com/mne-tools/mne-cpp.git
 
-# 2. Create a feature branch
-git checkout -b my-feature upstream/main
+# 2. Create a feature branch from staging
+git checkout -b my-feature upstream/staging
 
 # 3. Build, make changes, run tests
 cmake -B build -S . -DBUILD_TESTS=ON && cmake --build build --parallel
 cd build && ctest --output-on-failure
 
-# 4. Push and open a pull request
+# 4. Push and open a pull request targeting staging
 git push origin my-feature
 ```
