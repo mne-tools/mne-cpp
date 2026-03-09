@@ -16,7 +16,7 @@ MNE-CPP depends on [Qt](https://www.qt.io/) and [Eigen](http://eigen.tuxfamily.o
 
 ### Windows
 
-The `WinDynamic` workflow in [release.yml](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/release.yml) excludes examples and tests. MNE-CPP libraries are copied to both `mne-cpp/lib` and `mne-cpp/out/Release`.
+The `WinDynamic` workflow in [release-windows.yml](https://github.com/mne-tools/mne-cpp/blob/staging/.github/workflows/release-windows.yml) excludes examples and tests. MNE-CPP libraries are copied to both `mne-cpp/lib` and `mne-cpp/out/Release`.
 
 Dependency resolution uses `windeployqt` (maintained by Qt), called from [deploy.bat](https://github.com/mne-tools/mne-cpp/blob/main/tools/deploy.bat) with `dynamic` as the first argument. It runs against:
 - The MNE Scan `.exe` (covers all application-level Qt modules)
@@ -26,7 +26,7 @@ Afterward, Qt and system libraries reside in `mne-cpp/out/Release`. The test dat
 
 ### Linux
 
-The `LinuxDynamic` workflow in [release.yml](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/release.yml) excludes examples and tests. CMake configures the `RPATH` to link against libraries in `mne-cpp/lib`.
+The `LinuxDynamic` workflow in [release-linux.yml](https://github.com/mne-tools/mne-cpp/blob/staging/.github/workflows/release-linux.yml) excludes examples and tests. CMake configures the `RPATH` to link against libraries in `mne-cpp/lib`.
 
 Dependency resolution uses [linuxdeployqt](https://github.com/probonopd/linuxdeployqt), called from the deployment script under `tools/deployment`.
 
@@ -34,7 +34,7 @@ The test data folder is deleted, and the folders `out/Release/apps`, `out/Releas
 
 ### macOS
 
-The `MacOSDynamic` workflow in [release.yml](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/release.yml) excludes examples and tests. All applications are built as `.app` bundles.
+The `MacOSDynamic` workflow in [release-macos.yml](https://github.com/mne-tools/mne-cpp/blob/staging/.github/workflows/release-macos.yml) excludes examples and tests. All applications are built as `.app` bundles.
 
 Dependency resolution uses `macdeployqt` (maintained by Qt). MNE-CPP libraries are manually copied to each app's `Contents/Frameworks` folder, and resources and plugin folders are copied to the corresponding `.app` directories.
 

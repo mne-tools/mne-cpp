@@ -5,7 +5,7 @@ sidebar_label: Release Guide
 
 # Release Guide
 
-This page describes the complete process for creating a new MNE-CPP release, from preparation through publication.
+This page describes MNE-CPP's branch model, the development workflow, and the complete process for creating a new release.
 
 ## Versioning Scheme
 
@@ -17,41 +17,107 @@ MNE-CPP follows [Semantic Versioning](https://semver.org/) with the tag syntax `
 | **Minor** | New features, new plugins, significant enhancements | `v0.1.0` → `v0.2.0` |
 | **Patch** | Bug fixes, documentation corrections, small improvements | `v0.1.0` → `v0.1.1` |
 
-## Branch Strategy
+## Branch Model
 
-New development takes place on the `main` branch. When a new **minor** release is created (e.g., going from `v0.1.x` to `v0.2.0`), a release branch named `v0.x.y` is automatically created from `main`. This branch receives only critical bug-fix back-ports and serves as the stable base for patch releases.
+MNE-CPP uses a **Main – Staging – Feature** branch model with three tiers:
 
 ```
-main ──────●──────●──────●──────●──────●───►  (ongoing development)
-            \                    \
-             v0.1.0               v0.2.0      (release branches)
-              \                    \
-               v0.1.1               ···       (patch releases)
+feature/my-fix ──●──●──●──┐
+                           ▼  (PR → staging)
+staging ───●───●───●───●───●───●───●───●───►  (integration & dev builds)
+                            \
+                             ──► main         (merge when stable)
+                                  │
+                                  ├─ v2.0.0   (tag → stable release)
+                                  └─ v2.1.0   (tag → stable release)
 ```
+
+### `main` — Stable / Release Branch
+
+The `main` branch always reflects a **production-ready** state. It is updated only by merging from `staging` once the code is considered stable.
+
+- **Pushes to `main`** trigger builds, tests, and deploy the **stable** version of the website and Doxygen API documentation.
+- **Tagged releases** (`v*`) on `main` trigger the full release pipeline: platform binaries (Linux, macOS, Windows), installers, WebAssembly builds, and documentation uploads.
+- Direct commits to `main` are not allowed; all changes flow through `staging` first.
+
+### `staging` — Integration / Development Branch
+
+The `staging` branch is the active development integration branch. Feature branches are merged here via pull requests.
+
+- Every push to `staging` triggers:
+  - Cross-platform builds (minimum and maximum supported Qt versions)
+  - Unit tests with **code coverage** — threshold checks (≥ 50%) and regression detection
+  - A rolling **dev pre-release** (`dev_build`) with binaries for all platforms
+  - Deployment of the **dev** version of the website (at `/dev/`) and Doxygen API docs (at `/dev/`)
+  - CodeQL security analysis
+
+### Feature Branches
+
+All development work happens on short-lived feature branches created from `staging`:
+
+```bash
+git checkout -b feature/my-change staging
+```
+
+- Feature branches are merged into `staging` via pull requests.
+- The [pull-request pipeline](ci-ghactions.mdx) builds and tests every PR across all platforms before it can be merged.
+- Branch names should be descriptive, e.g., `fix/fiff-reader-crash`, `feature/lsl-plugin`, `doc/update-api`.
+
+### Flow Summary
+
+| From | To | How | When |
+|------|----|-----|------|
+| `staging` | feature branch | `git checkout -b feature/x staging` | Starting new work |
+| feature branch | `staging` | Pull request (reviewed + CI passes) | Feature is complete |
+| `staging` | `main` | Merge (maintainers only) | Code is release-ready |
+| `main` | GitHub Release | Tag `v*` on `main` | Cutting a release |
+
+## Dual-Version Documentation
+
+The website and Doxygen API docs are deployed in two versions simultaneously:
+
+| Version | URL | Updated by |
+|---------|-----|-----------|
+| **Stable** | `mne-cpp.github.io` / `mne-cpp.github.io/doxygen-api` | Pushes to `main` |
+| **Dev** | `mne-cpp.github.io/dev/` / `mne-cpp.github.io/doxygen-api/dev/` | Pushes to `staging` |
+
+Both versions are served from the same repository and branch (`gh-pages`), using subdirectory isolation — stable at the root, dev under `/dev/`. A version dropdown in the website header lets users switch between stable and dev documentation.
 
 ## Release Steps
 
-Once the developers have rough consensus that `main` is ready for a new release, the following steps are performed:
+Once `staging` is considered stable and ready for release, the maintainers perform the following steps:
 
-### 1. Increment Version Numbers (Manual)
+### 1. Merge Staging into Main
+
+Create a pull request from `staging` → `main`, or merge directly:
+
+```bash
+git checkout main
+git merge staging
+git push origin main
+```
+
+This triggers the `main` pipeline, which runs builds, tests, and deploys the **stable** website and Doxygen docs.
+
+### 2. Increment Version Numbers (Manual)
 
 Update the version string in these files:
 
-- **[CMakeLists.txt](https://github.com/mne-tools/mne-cpp/blob/main/CMakeLists.txt)** — the top-level project version (`project(mne_cpp VERSION 0.x.y)`)
+- **[CMakeLists.txt](https://github.com/mne-tools/mne-cpp/blob/main/CMakeLists.txt)** — the top-level project version (`project(mne_cpp VERSION x.y.z)`)
 - **[mne-cpp_doxyfile](https://github.com/mne-tools/mne-cpp/blob/main/doc/doxygen/mne-cpp_doxyfile)** — the Doxygen `PROJECT_NUMBER` field
 
-### 2. Update Application Version Info (Manual)
+### 3. Update Application Version Info (Manual)
 
 Bump the version constants in each application's `info.h`:
 
 - [MNE Scan info.h](https://github.com/mne-tools/mne-cpp/blob/main/applications/mne_scan/mne_scan/info.h)
 - [MNE Analyze info.h](https://github.com/mne-tools/mne-cpp/blob/main/applications/mne_analyze/mne_analyze/info.h)
 
-### 3. Update the Release Table on the Website (Manual)
+### 4. Update the Release Table on the Website (Manual)
 
 Add the new version to the documentation website's download / release page so users can find it.
 
-### 4. Prepare the Changelog (Manual)
+### 5. Prepare the Changelog (Manual)
 
 The changelog for the release being prepared is maintained on the [GitHub Wiki (Changelog-WIP)](https://github.com/mne-tools/mne-cpp/wiki/Changelog-WIP). To generate contributor statistics since the last release:
 
@@ -61,42 +127,37 @@ git shortlog -s -n main --no-merges --since="<dateOfLastRelease>"
 
 Move the work-in-progress changelog entries into the release notes.
 
-### 5. Create the GitHub Release (Manual)
+### 6. Tag and Create the GitHub Release (Manual)
 
-Go to the [GitHub Releases page](https://github.com/mne-tools/mne-cpp/releases) and create a new release:
+Tag the release on `main` and push the tag:
 
-- **Tag**: `v0.x.y` (create the tag on `main`)
+```bash
+git tag -a v0.x.y -m "Release v0.x.y"
+git push origin v0.x.y
+```
+
+Then go to the [GitHub Releases page](https://github.com/mne-tools/mne-cpp/releases) and create a new release:
+
+- **Tag**: `v0.x.y` (the tag you just pushed)
 - **Title**: `v0.x.y`
-- **Description**: Paste the changelog prepared in step 4
-
-### 6. CI Creates a Release Branch (Automated)
-
-The [release.yml](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/release.yml) workflow detects the new tag and:
-
-- Creates a branch named `v0.x.y` from `main` (only for **minor** or **major** version bumps, e.g., `v0.1.0` → `v0.2.0`)
-- Skips branch creation for patch releases, since the branch already exists
+- **Description**: Paste the changelog prepared in step 5
 
 ### 7. CI Builds and Uploads Binaries (Automated)
 
-The same `release.yml` workflow:
+The tag triggers the release jobs in [main.yml](https://github.com/mne-tools/mne-cpp/blob/main/.github/workflows/main.yml), which:
 
-- Builds **dynamically linked** binaries for Windows, Linux, and macOS
+- Builds **dynamically linked** binaries for Linux, macOS, and Windows via the platform-specific release workflows
 - Builds **statically linked** binaries for all platforms
 - Runs the deployment scripts (`tools/deploy.bat` / `tools/deploy.sh`) to bundle Qt dependencies
-- Packages the output into `.zip` (Windows) or `.tar.gz` (Linux/macOS) archives
-- Uploads the archives as release assets to the GitHub release created in step 5
+- Packages the output into `.zip` (Windows) or `.tar.gz` (Linux/macOS) archives and uploads them as release assets
+- Builds platform installers (`.run`, `.dmg`, `.exe`) via the installer workflow
+- Builds and deploys WebAssembly applications
 
-### 8. Protect the New Branch (Manual)
-
-For minor or major version bumps, add branch protection rules for the newly created `v0.x.y` branch via the GitHub web interface (**Settings → Branches → Add rule**):
-
-- Require pull request reviews before merging
-- Require status checks to pass
-
-## Post-Release
+### 8. Post-Release
 
 After the release is published:
 
-- Verify that the release assets (binaries) are downloadable and functional
+- Verify that the release assets (binaries, installers) are downloadable and functional
 - Announce the release on relevant channels (mailing lists, website news, etc.)
 - Clear the work-in-progress changelog on the [GitHub Wiki](https://github.com/mne-tools/mne-cpp/wiki/Changelog-WIP) for the next development cycle
+- Merge the version bump commit back into `staging` so development continues from the released state

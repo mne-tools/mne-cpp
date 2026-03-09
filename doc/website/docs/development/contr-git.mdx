@@ -7,6 +7,18 @@ sidebar_label: Git Workflow
 
 This page gives a concise overview of the Git commands used in the MNE-CPP development workflow. For a deeper introduction, see this [Git tutorial video](https://www.youtube.com/watch?v=DtLrWCFaG0A&feature=youtu.be). For the full contribution process — from forking to pull request — see the [Contribution Guide](contr-guide.mdx).
 
+## Branch Model
+
+MNE-CPP uses a **Main – Staging – Feature** branch model:
+
+| Branch | Purpose |
+|--------|---------|
+| `main` | Stable / release-ready code. Updated only from `staging`. |
+| `staging` | Active development integration branch. Feature branches merge here. |
+| `feature/*` | Short-lived branches for individual changes (bug fixes, features, docs). |
+
+See the [Release Guide](ci-releasecycle.mdx) for a detailed description of the branch model and release process.
+
 ## Initial Setup
 
 As described in the [Build from Source](buildguide-cmake.mdx) guide, start by cloning your fork and adding the upstream remote:
@@ -15,24 +27,24 @@ As described in the [Build from Source](buildguide-cmake.mdx) guide, start by cl
 git clone https://github.com/<YourGitUserName>/mne-cpp.git
 git remote add upstream https://github.com/mne-tools/mne-cpp.git
 git fetch --all
-git rebase upstream/main
+git rebase upstream/staging
 ```
 
 ## Daily Workflow
 
 The general workflow is covered by the following steps:
 
-- Create a new branch from `main`:
+- Create a new feature branch from `staging`:
 
 ```bash
-git checkout -b <branchName> main
+git checkout -b my-feature upstream/staging
 ```
 
 - Get the latest changes and [rebase](https://www.atlassian.com/git/tutorials/rewriting-history/git-rebase):
 
 ```bash
 git fetch upstream
-git rebase upstream/main
+git rebase upstream/staging
 ```
 
 - Solve [merge conflicts](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/resolving-a-merge-conflict-using-the-command-line), if they occur.
@@ -68,10 +80,12 @@ git commit -m "FIX: meaningful commit message" --amend
 - Push your changes to origin (your fork on GitHub). Note that a force push (`-f`) may be necessary after a rebase:
 
 ```bash
-git push origin <branchName>
+git push origin my-feature
 # or force push after rebase:
-git push origin <branchName> -f
+git push origin my-feature -f
 ```
+
+- Open a pull request targeting the **`staging`** branch on the upstream repository.
 
 ## Useful Commands
 
