@@ -22,7 +22,7 @@
 #
 # Branch model:  Feature → Staging → Main
 # ═══════════════════════════════════════════════════════════════════════════
-name: Main
+name: Release
 
 on:
   push:
