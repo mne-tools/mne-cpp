@@ -19,11 +19,11 @@ namespace MNELIB
 /**
  * Filter definition parameters.
  */
-class MNESHARED_EXPORT MneFilterDef
+class MNESHARED_EXPORT MNEFilterDef
 {
 public:
-    MneFilterDef() = default;
-    ~MneFilterDef() = default;
+    MNEFilterDef() = default;
+    ~MNEFilterDef() = default;
 
     bool  filter_on = false;         /**< Is it on? */
     int   size = 0;                  /**< Length in samples (must be a power of 2). */

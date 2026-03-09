@@ -364,14 +364,16 @@ void ConnectivitySettings::setNodePositions(const MNEForwardSolution& forwardSol
     MatrixX3f matNodeVertLeft, matNodeVertRight;
 
     if(forwardSolution.isClustered()) {
-        matNodeVertLeft.resize(forwardSolution.src[0].cluster_info.centroidVertno.size(),3);
+        auto* lhHemi = forwardSolution.src.hemisphereAt(0);
+        auto* rhHemi = forwardSolution.src.hemisphereAt(1);
+        matNodeVertLeft.resize(lhHemi->cluster_info.centroidVertno.size(),3);
         for(int j = 0; j < matNodeVertLeft.rows(); ++j) {
-            matNodeVertLeft.row(j) = surfSet[0].rr().row(forwardSolution.src[0].cluster_info.centroidVertno.at(j)) - surfSet[0].offset().transpose();
+            matNodeVertLeft.row(j) = surfSet[0].rr().row(lhHemi->cluster_info.centroidVertno.at(j)) - surfSet[0].offset().transpose();
         }
 
-        matNodeVertRight.resize(forwardSolution.src[1].cluster_info.centroidVertno.size(),3);
+        matNodeVertRight.resize(rhHemi->cluster_info.centroidVertno.size(),3);
         for(int j = 0; j < matNodeVertRight.rows(); ++j) {
-            matNodeVertRight.row(j) = surfSet[1].rr().row(forwardSolution.src[1].cluster_info.centroidVertno.at(j)) - surfSet[1].offset().transpose();
+            matNodeVertRight.row(j) = surfSet[1].rr().row(rhHemi->cluster_info.centroidVertno.at(j)) - surfSet[1].offset().transpose();
         }
     } else {
         matNodeVertLeft.resize(forwardSolution.src[0].vertno.rows(),3);

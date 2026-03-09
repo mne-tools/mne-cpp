@@ -52,7 +52,7 @@
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fiff/fiff_dig_point.h>
-#include <mne/mne_sourcespace.h>
+#include <mne/mne_source_spaces.h>
 #include <inverse/dipoleFit/ecd_set.h>
 
 //=============================================================================================================
@@ -139,7 +139,7 @@ public:
      * @param[in] fwdPath  Path to the FIF file with source space.
      * @return The loaded source space (may be empty on failure).
      */
-    static MNELIB::MNESourceSpace loadSourceSpace(const QString &fwdPath);
+    static MNELIB::MNESourceSpaces loadSourceSpace(const QString &fwdPath);
 
     /**
      * Load a coordinate transformation from a FIF file and normalise it

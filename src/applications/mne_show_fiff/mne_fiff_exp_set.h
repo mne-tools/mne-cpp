@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief     MneFiffExpSet class declaration.
+ * @brief     MNEFiffExpSet class declaration.
  *
  */
 
@@ -81,7 +81,7 @@ namespace SHOWFIFF
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneShowFiffSettings;
+class MNEShowFiffSettings;
 
 
 //=============================================================================================================
@@ -91,18 +91,18 @@ class MneShowFiffSettings;
  * @brief Holds a set of Electric Current Dipoles.
  */
 
-class MneFiffExpSet
+class MNEFiffExpSet
 {
 
 public:
-    typedef QSharedPointer<MneFiffExpSet> SPtr;            /**< Shared pointer type for MneFiffExpSet. */
-    typedef QSharedPointer<const MneFiffExpSet> ConstSPtr; /**< Const shared pointer type for MneFiffExpSet. */
+    typedef QSharedPointer<MNEFiffExpSet> SPtr;            /**< Shared pointer type for MNEFiffExpSet. */
+    typedef QSharedPointer<const MNEFiffExpSet> ConstSPtr; /**< Const shared pointer type for MNEFiffExpSet. */
 
     //=========================================================================================================
     /**
      * Constructs an MNE Fiff Explanation Set object.
      */
-    MneFiffExpSet();
+    MNEFiffExpSet();
 
     //=========================================================================================================
     /**
@@ -110,51 +110,51 @@ public:
      *
      * @param[in] p_MneFiffExpSet       MNE Fiff Explanation Set which should be copied
      */
-    MneFiffExpSet(const MneFiffExpSet &p_MneFiffExpSet);
+    MNEFiffExpSet(const MNEFiffExpSet &p_MneFiffExpSet);
 
     //=========================================================================================================
     /**
      * Destroys the Electric Current Dipole description
      */
-    ~MneFiffExpSet();
+    ~MNEFiffExpSet();
 
     //=========================================================================================================
     /**
-     * Returns the number of stored MneFiffExps
+     * Returns the number of stored MNEFiffExps
      *
-     * @return number of stored MneFiffExps
+     * @return number of stored MNEFiffExps
      */
     inline qint32 size() const;
 
     //=========================================================================================================
     /**
-     * Subscript operator [] to access MneFiffExp by index
+     * Subscript operator [] to access MNEFiffExp by index
      *
-     * @param[in] idx    the MneFiffExp index.
+     * @param[in] idx    the MNEFiffExp index.
      *
-     * @return MneFiffExp related to the parameter index.
+     * @return MNEFiffExp related to the parameter index.
      */
-    const MneFiffExp& operator[] (int idx) const;
+    const MNEFiffExp& operator[] (int idx) const;
 
     //=========================================================================================================
     /**
-     * Subscript operator [] to access MneFiffExp by index
+     * Subscript operator [] to access MNEFiffExp by index
      *
-     * @param[in] idx    the MneFiffExp index.
+     * @param[in] idx    the MNEFiffExp index.
      *
-     * @return MneFiffExp related to the parameter index.
+     * @return MNEFiffExp related to the parameter index.
      */
-    MneFiffExp& operator[] (int idx);
+    MNEFiffExp& operator[] (int idx);
 
     //=========================================================================================================
     /**
-     * Subscript operator << to add a new MneFiffExp
+     * Subscript operator << to add a new MNEFiffExp
      *
-     * @param[in] p_MneFiffExp      MneFiffExp to be added
+     * @param[in] p_MneFiffExp      MNEFiffExp to be added
      *
-     * @return MneFiffExpSet
+     * @return MNEFiffExpSet
      */
-    MneFiffExpSet& operator<< (const MneFiffExp& p_MneFiffExp);
+    MNEFiffExpSet& operator<< (const MNEFiffExp& p_MneFiffExp);
 
     //=========================================================================================================
     /**
@@ -163,7 +163,7 @@ public:
      *
      * @param[in] name   File to read
      */
-    static MneFiffExpSet read_fiff_explanations(const QString& name);
+    static MNEFiffExpSet read_fiff_explanations(const QString& name);
 
     //=========================================================================================================
     /**
@@ -182,7 +182,7 @@ public:
      * @param[in] exclass    explanation class to find
      * @param[in] kind       kind to find
      */
-    QList<MneFiffExp>::const_iterator find_fiff_explanation(int exclass, int kind) const;
+    QList<MNEFiffExp>::const_iterator find_fiff_explanation(int exclass, int kind) const;
 
     //=========================================================================================================
     /**
@@ -190,7 +190,7 @@ public:
      *
      * @return const STL-style iterator pointing to the item after the last item
      */
-    QList<MneFiffExp>::const_iterator constEnd() const;
+    QList<MNEFiffExp>::const_iterator constEnd() const;
 
     //=========================================================================================================
     /**
@@ -201,7 +201,7 @@ public:
      *
      * @return true if succeeded
      */
-    bool show_fiff_contents (FILE *out, const MneShowFiffSettings& settings);
+    bool show_fiff_contents (FILE *out, const MNEShowFiffSettings& settings);
 
     //=========================================================================================================
     /**
@@ -239,7 +239,7 @@ private:
     void print_matrix(FILE *out, FIFFLIB::FiffStream::SPtr stream, FIFFLIB::FiffDirEntry::SPtr this_ent);
 
 private:
-    QList<MneFiffExp> m_qListExp;     /**< List of Explanations. */
+    QList<MNEFiffExp> m_qListExp;     /**< List of Explanations. */
 
 // ### OLD STRUCT ###
 //    typedef struct {
@@ -254,7 +254,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-qint32 MneFiffExpSet::size() const
+qint32 MNEFiffExpSet::size() const
 {
     return m_qListExp.size();
 }

@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneCovMatrix class declaration.
+ * @brief    MNECovMatrix class declaration.
  *
  */
 
@@ -63,7 +63,7 @@
 #include <QStringList>
 
 /**
- * Channel-type classification constants for the ch_class field in MneCovMatrix.
+ * Channel-type classification constants for the ch_class field in MNECovMatrix.
  */
 #define MNE_COV_CH_UNKNOWN  -1  /**< Unknown channel type. */
 #define MNE_COV_CH_MEG_MAG   0  /**< Axial gradiometer or magnetometer [T]. */
@@ -90,8 +90,8 @@ namespace MNELIB
 // MNELIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneProjOp;
-class MneSssData;
+class MNEProjOp;
+class MNESssData;
 
 //=============================================================================================================
 /**
@@ -101,11 +101,11 @@ class MneSssData;
  * diagonal, or sparse form together with its eigendecomposition and associated
  * metadata (projection operator, SSS info, channel classification, bad channels).
  */
-class MNESHARED_EXPORT MneCovMatrix
+class MNESHARED_EXPORT MNECovMatrix
 {
 public:
-    typedef QSharedPointer<MneCovMatrix> SPtr;              /**< Shared pointer type for MneCovMatrix. */
-    typedef QSharedPointer<const MneCovMatrix> ConstSPtr;   /**< Const shared pointer type for MneCovMatrix. */
+    typedef QSharedPointer<MNECovMatrix> SPtr;              /**< Shared pointer type for MNECovMatrix. */
+    typedef QSharedPointer<const MNECovMatrix> ConstSPtr;   /**< Const shared pointer type for MNECovMatrix. */
 
     //=========================================================================================================
     /**
@@ -118,13 +118,13 @@ public:
      * @param[in] p_cov_diag    Diagonal data (may be empty).
      * @param[in] p_cov_sparse  Sparse covariance data (may be nullptr).
      */
-    MneCovMatrix(int p_kind, int p_ncov, const QStringList& p_names, const Eigen::VectorXd& p_cov, const Eigen::VectorXd& p_cov_diag, FIFFLIB::FiffSparseMatrix* p_cov_sparse);
+    MNECovMatrix(int p_kind, int p_ncov, const QStringList& p_names, const Eigen::VectorXd& p_cov, const Eigen::VectorXd& p_cov_diag, FIFFLIB::FiffSparseMatrix* p_cov_sparse);
 
     //=========================================================================================================
     /**
      * Destructor.
      */
-    ~MneCovMatrix();
+    ~MNECovMatrix();
 
     //=========================================================================================================
     /**
@@ -133,7 +133,7 @@ public:
      *
      * @return A newly allocated copy.
      */
-    std::unique_ptr<MneCovMatrix> dup() const;
+    std::unique_ptr<MNECovMatrix> dup() const;
 
     //=========================================================================================================
     /**
@@ -146,12 +146,12 @@ public:
      *
      * @return A new covariance matrix.
      */
-    static std::unique_ptr<MneCovMatrix> create_dense(int    kind,
+    static std::unique_ptr<MNECovMatrix> create_dense(int    kind,
                                    int    ncov,
                                    const QStringList& names,
                                    const Eigen::VectorXd& cov)
     {
-        return std::unique_ptr<MneCovMatrix>(new MneCovMatrix(kind,ncov,names,cov,Eigen::VectorXd(),nullptr));
+        return std::unique_ptr<MNECovMatrix>(new MNECovMatrix(kind,ncov,names,cov,Eigen::VectorXd(),nullptr));
     }
 
     //=========================================================================================================
@@ -165,12 +165,12 @@ public:
      *
      * @return A new covariance matrix.
      */
-    static std::unique_ptr<MneCovMatrix> create_diag(int    kind,
+    static std::unique_ptr<MNECovMatrix> create_diag(int    kind,
                                   int    ncov,
                                   const QStringList& names,
                                   const Eigen::VectorXd& cov_diag)
     {
-        return std::unique_ptr<MneCovMatrix>(new MneCovMatrix(kind,ncov,names,Eigen::VectorXd(),cov_diag,nullptr));
+        return std::unique_ptr<MNECovMatrix>(new MNECovMatrix(kind,ncov,names,Eigen::VectorXd(),cov_diag,nullptr));
     }
 
     //=========================================================================================================
@@ -184,12 +184,12 @@ public:
      *
      * @return A new covariance matrix.
      */
-    static std::unique_ptr<MneCovMatrix> create_sparse(    int kind,
+    static std::unique_ptr<MNECovMatrix> create_sparse(    int kind,
                                                 int ncov,
                                                 const QStringList& names,
                                                 FIFFLIB::FiffSparseMatrix* cov_sparse)
     {
-        return std::unique_ptr<MneCovMatrix>(new MneCovMatrix(kind,ncov,names,Eigen::VectorXd(),Eigen::VectorXd(),cov_sparse));
+        return std::unique_ptr<MNECovMatrix>(new MNECovMatrix(kind,ncov,names,Eigen::VectorXd(),Eigen::VectorXd(),cov_sparse));
     }
 
     //=========================================================================================================
@@ -204,13 +204,13 @@ public:
      *
      * @return A new covariance matrix.
      */
-    static std::unique_ptr<MneCovMatrix> create(   int kind,
+    static std::unique_ptr<MNECovMatrix> create(   int kind,
                                         int ncov,
                                         const QStringList& names,
                                         const Eigen::VectorXd& cov,
                                         const Eigen::VectorXd& cov_diag)
     {
-        return std::unique_ptr<MneCovMatrix>(new MneCovMatrix(kind,ncov,names,cov,cov_diag,nullptr));
+        return std::unique_ptr<MNECovMatrix>(new MNECovMatrix(kind,ncov,names,cov,cov_diag,nullptr));
     }
 
     //=========================================================================================================
@@ -291,8 +291,8 @@ public:
     Eigen::VectorXd lambda;                     /**< Eigenvalues of the covariance matrix. */
     Eigen::VectorXd inv_lambda;                 /**< Inverse square-roots of eigenvalues (for whitening). */
     Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> eigen;  /**< Eigenvectors of the covariance matrix (nzero columns removed). */
-    std::unique_ptr<MneProjOp> proj;            /**< The projection operator active when this matrix was computed. */
-    std::unique_ptr<MneSssData> sss;            /**< SSS data from the associated raw data file. */
+    std::unique_ptr<MNEProjOp> proj;            /**< The projection operator active when this matrix was computed. */
+    std::unique_ptr<MNESssData> sss;            /**< SSS data from the associated raw data file. */
     Eigen::VectorXi ch_class;                   /**< Per-channel type classification for regularization (MEG grad, MEG mag, EEG). */
     QStringList bads;                           /**< Channel names designated bad during computation. */
     int         nbad;                           /**< Number of bad channels. */

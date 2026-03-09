@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("mne_setup_forward_model");
     QCoreApplication::setApplicationVersion("1.0");
 
-    MneSetupForwardModelSettings settings(&argc, argv);
+    MNESetupForwardModelSettings settings(&argc, argv);
     SetupForwardModel setupFwdModel(settings);
 
     return setupFwdModel.run();

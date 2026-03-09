@@ -330,17 +330,17 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
             }
             else
             {
-                p_BemSurface.tris = t_pTag->toIntMatrix().transpose();
-                p_BemSurface.tris -= MatrixXi::Constant(p_BemSurface.tris.rows(),3,1);//0 based indizes
+                p_BemSurface.itris = t_pTag->toIntMatrix().transpose();
+                p_BemSurface.itris -= MatrixXi::Constant(p_BemSurface.itris.rows(),3,1);//0 based indizes
             }
         }
         else
         {
-            p_BemSurface.tris = t_pTag->toIntMatrix().transpose();
-            p_BemSurface.tris -= MatrixXi::Constant(p_BemSurface.tris.rows(),3,1);//0 based indizes
+            p_BemSurface.itris = t_pTag->toIntMatrix().transpose();
+            p_BemSurface.itris -= MatrixXi::Constant(p_BemSurface.itris.rows(),3,1);//0 based indizes
         }
 
-        if (p_BemSurface.tris.rows() != p_BemSurface.ntri)
+        if (p_BemSurface.itris.rows() != p_BemSurface.ntri)
         {
             p_pStream->close();
             std::cout << "Triangulation information is incorrect."; //ToDo: throw error.
@@ -350,7 +350,7 @@ bool MNEBem::readBemSurface(FiffStream::SPtr& p_pStream, const FiffDirNode::SPtr
     else
     {
         MatrixXi p_defaultMatrix(0, 0);
-        p_BemSurface.tris = p_defaultMatrix;
+        p_BemSurface.itris = p_defaultMatrix;
     }
 
     return true;

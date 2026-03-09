@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MNE Derivation (MneDeriv) class declaration.
+ * @brief    MNE Derivation (MNEDeriv) class declaration.
  *
  */
 
@@ -75,28 +75,28 @@ namespace MNELIB
  * Holds a sparse named matrix of derivation coefficients together with
  * validity and usage metadata and matched channel information.
  */
-class MNESHARED_EXPORT MneDeriv
+class MNESHARED_EXPORT MNEDeriv
 {
 public:
-    typedef QSharedPointer<MneDeriv> SPtr;              /**< Shared pointer type for MneDeriv. */
-    typedef QSharedPointer<const MneDeriv> ConstSPtr;   /**< Const shared pointer type for MneDeriv. */
+    typedef QSharedPointer<MNEDeriv> SPtr;              /**< Shared pointer type for MNEDeriv. */
+    typedef QSharedPointer<const MNEDeriv> ConstSPtr;   /**< Const shared pointer type for MNEDeriv. */
 
     //=========================================================================================================
     /**
      * Constructs an empty MNE Derivation.
      */
-    MneDeriv();
+    MNEDeriv();
 
     //=========================================================================================================
     /**
      * Destructor.
      */
-    ~MneDeriv();
+    ~MNEDeriv();
 
 public:
     QString                  filename;   /**< Source file name the derivation was loaded from. */
     QString                  shortname;  /**< Short nickname for this derivation. */
-    std::unique_ptr<MneSparseNamedMatrix> deriv_data; /**< The derivation data itself (sparse named matrix). */
+    std::unique_ptr<MNESparseNamedMatrix> deriv_data; /**< The derivation data itself (sparse named matrix). */
     Eigen::VectorXi          in_use;     /**< Per-column count of non-zero elements in the derivation data. */
     Eigen::VectorXi          valid;      /**< Per-derivation validity flags considering input channel units. */
     QList<FIFFLIB::FiffChInfo> chs;      /**< First matching channel info for each derivation. */

@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneMorphMap Class.
+ * @brief    Definition of the MNEMorphMap Class.
  *
  */
 

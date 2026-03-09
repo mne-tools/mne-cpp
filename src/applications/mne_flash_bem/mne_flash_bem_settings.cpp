@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneFlashBemSettings class definition.
+ * @brief    MNEFlashBemSettings class definition.
  *
  */
 
@@ -56,7 +56,7 @@ using namespace MNEFLASHBEM;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneFlashBemSettings::MneFlashBemSettings(int *argc, char **argv)
+MNEFlashBemSettings::MNEFlashBemSettings(int *argc, char **argv)
 : m_bNoConvert(false)
 , m_bNoFlash30(false)
 {
@@ -160,49 +160,49 @@ MneFlashBemSettings::MneFlashBemSettings(int *argc, char **argv)
 
 //=============================================================================================================
 
-QString MneFlashBemSettings::subject() const
+QString MNEFlashBemSettings::subject() const
 {
     return m_sSubject;
 }
 
 //=============================================================================================================
 
-QString MneFlashBemSettings::subjectsDir() const
+QString MNEFlashBemSettings::subjectsDir() const
 {
     return m_sSubjectsDir;
 }
 
 //=============================================================================================================
 
-QString MneFlashBemSettings::freeSurferHome() const
+QString MNEFlashBemSettings::freeSurferHome() const
 {
     return m_sFreeSurferHome;
 }
 
 //=============================================================================================================
 
-bool MneFlashBemSettings::noConvert() const
+bool MNEFlashBemSettings::noConvert() const
 {
     return m_bNoConvert;
 }
 
 //=============================================================================================================
 
-bool MneFlashBemSettings::noFlash30() const
+bool MNEFlashBemSettings::noFlash30() const
 {
     return m_bNoFlash30;
 }
 
 //=============================================================================================================
 
-QString MneFlashBemSettings::unwarp() const
+QString MNEFlashBemSettings::unwarp() const
 {
     return m_sUnwarp;
 }
 
 //=============================================================================================================
 
-QString MneFlashBemSettings::flashDir() const
+QString MNEFlashBemSettings::flashDir() const
 {
     return m_sFlashDir;
 }

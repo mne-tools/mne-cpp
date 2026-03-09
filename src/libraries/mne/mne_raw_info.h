@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneRawInfo class declaration.
+ * @brief    MNERawInfo class declaration.
  *
  */
 
@@ -82,23 +82,23 @@ namespace MNELIB
 /**
  * @brief Information about raw data in a FIFF file.
  */
-class MNESHARED_EXPORT MneRawInfo
+class MNESHARED_EXPORT MNERawInfo
 {
 public:
-    typedef QSharedPointer<MneRawInfo> SPtr;              /**< Shared pointer type for MneRawInfo. */
-    typedef QSharedPointer<const MneRawInfo> ConstSPtr;   /**< Const shared pointer type for MneRawInfo. */
+    typedef QSharedPointer<MNERawInfo> SPtr;              /**< Shared pointer type for MNERawInfo. */
+    typedef QSharedPointer<const MNERawInfo> ConstSPtr;   /**< Const shared pointer type for MNERawInfo. */
 
     //=========================================================================================================
     /**
-     * @brief Constructs a default MneRawInfo.
+     * @brief Constructs a default MNERawInfo.
      */
-    MneRawInfo();
+    MNERawInfo();
 
     //=========================================================================================================
     /**
-     * @brief Destroys the MneRawInfo and releases owned resources.
+     * @brief Destroys the MNERawInfo and releases owned resources.
      */
-    ~MneRawInfo();
+    ~MNERawInfo();
 
     /**
      * Finds the nearest FIFFB_MEAS parent node in the FIFF directory tree.
@@ -191,17 +191,17 @@ public:
      * Opens the specified FIFF file, locates the raw data block (or MaxShield
      * data block if allowed and no standard raw data is found), reads the
      * measurement information, determines the buffer size from the first data
-     * buffer tag, and assembles a complete MneRawInfo structure.
+     * buffer tag, and assembles a complete MNERawInfo structure.
      *
      * @param[in]  name              Path to the FIFF file to load.
      * @param[in]  allow_maxshield   If non-zero, fall back to MaxShield (SSS) data
      *                               when no standard raw data block is found.
-     * @param[out] infop             Pointer to receive the newly allocated MneRawInfo
+     * @param[out] infop             Pointer to receive the newly allocated MNERawInfo
      *                               structure. Only valid on success.
      *
      * @return FIFF_OK on success, FIFF_FAIL on failure.
      */
-    static int load(const QString& name, int allow_maxshield, std::unique_ptr<MneRawInfo>& infop);
+    static int load(const QString& name, int allow_maxshield, std::unique_ptr<MNERawInfo>& infop);
 
 public:
     QString             filename;      /**< The name of the file this comes from. */

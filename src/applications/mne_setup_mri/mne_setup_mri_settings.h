@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneSetupMriSettings class declaration.
+ * @brief    MNESetupMriSettings class declaration.
  *
  */
 
@@ -58,7 +58,7 @@ namespace MNESETUPMRI {
  *
  * @brief Command-line settings for mne_setup_mri.
  */
-class MneSetupMriSettings
+class MNESetupMriSettings
 {
 public:
     //=========================================================================================================
@@ -68,7 +68,7 @@ public:
      * @param[in] argc  Number of arguments.
      * @param[in] argv  Argument array.
      */
-    MneSetupMriSettings(int *argc, char **argv);
+    MNESetupMriSettings(int *argc, char **argv);
 
     //=========================================================================================================
     /**

@@ -96,9 +96,9 @@ MNEProjectToSurface::MNEProjectToSurface(const MNEBemSurface &p_MNEBemSurf)
 {
     for (int i = 0; i < p_MNEBemSurf.ntri; ++i)
     {
-        r1.row(i) = p_MNEBemSurf.rr.row(p_MNEBemSurf.tris(i,0));
-        r12.row(i) = p_MNEBemSurf.rr.row(p_MNEBemSurf.tris(i,1)) - r1.row(i);
-        r13.row(i) = p_MNEBemSurf.rr.row(p_MNEBemSurf.tris(i,2)) - r1.row(i);
+        r1.row(i) = p_MNEBemSurf.rr.row(p_MNEBemSurf.itris(i,0));
+        r12.row(i) = p_MNEBemSurf.rr.row(p_MNEBemSurf.itris(i,1)) - r1.row(i);
+        r13.row(i) = p_MNEBemSurf.rr.row(p_MNEBemSurf.itris(i,2)) - r1.row(i);
         a(i) = r12.row(i) * r12.row(i).transpose();
         b(i) = r13.row(i) * r13.row(i).transpose();
         c(i) = r12.row(i) * r13.row(i).transpose();

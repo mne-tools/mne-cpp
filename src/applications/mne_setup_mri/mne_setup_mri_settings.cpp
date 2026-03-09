@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneSetupMriSettings class definition.
+ * @brief    MNESetupMriSettings class definition.
  *
  */
 
@@ -55,7 +55,7 @@ using namespace MNESETUPMRI;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneSetupMriSettings::MneSetupMriSettings(int *argc, char **argv)
+MNESetupMriSettings::MNESetupMriSettings(int *argc, char **argv)
 : m_bOverwrite(false)
 , m_bVerbose(false)
 {
@@ -136,35 +136,35 @@ MneSetupMriSettings::MneSetupMriSettings(int *argc, char **argv)
 
 //=============================================================================================================
 
-QString MneSetupMriSettings::subject() const
+QString MNESetupMriSettings::subject() const
 {
     return m_sSubject;
 }
 
 //=============================================================================================================
 
-QString MneSetupMriSettings::subjectsDir() const
+QString MNESetupMriSettings::subjectsDir() const
 {
     return m_sSubjectsDir;
 }
 
 //=============================================================================================================
 
-QStringList MneSetupMriSettings::mriSets() const
+QStringList MNESetupMriSettings::mriSets() const
 {
     return m_slMriSets;
 }
 
 //=============================================================================================================
 
-bool MneSetupMriSettings::overwrite() const
+bool MNESetupMriSettings::overwrite() const
 {
     return m_bOverwrite;
 }
 
 //=============================================================================================================
 
-bool MneSetupMriSettings::verbose() const
+bool MNESetupMriSettings::verbose() const
 {
     return m_bVerbose;
 }

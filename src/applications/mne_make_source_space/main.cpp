@@ -47,7 +47,7 @@
 
 #include <mne/mne.h>
 #include <mne/mne_hemisphere.h>
-#include <mne/mne_sourcespace.h>
+#include <mne/mne_source_spaces.h>
 
 #include <fs/surface.h>
 #include <fs/surfaceset.h>
@@ -307,7 +307,7 @@ static MNEHemisphere buildHemisphere(const Surface &surf,
     // Copy vertex positions and normals
     hemi.rr = surf.rr();
     hemi.nn = surf.nn();
-    hemi.tris = surf.tris();
+    hemi.itris = surf.tris();
 
     // Selection info
     hemi.nuse = vertno.size();
@@ -317,16 +317,16 @@ static MNEHemisphere buildHemisphere(const Surface &surf,
     // Build use_tris (triangles that use only selected vertices)
     QVector<int> useTrisIdx;
     for (int t = 0; t < hemi.ntri; ++t) {
-        if (inuse(hemi.tris(t, 0)) &&
-            inuse(hemi.tris(t, 1)) &&
-            inuse(hemi.tris(t, 2))) {
+        if (inuse(hemi.itris(t, 0)) &&
+            inuse(hemi.itris(t, 1)) &&
+            inuse(hemi.itris(t, 2))) {
             useTrisIdx.append(t);
         }
     }
     hemi.nuse_tri = useTrisIdx.size();
-    hemi.use_tris.resize(hemi.nuse_tri, 3);
+    hemi.use_itris.resize(hemi.nuse_tri, 3);
     for (int i = 0; i < hemi.nuse_tri; ++i) {
-        hemi.use_tris.row(i) = hemi.tris.row(useTrisIdx[i]);
+        hemi.use_itris.row(i) = hemi.itris.row(useTrisIdx[i]);
     }
 
     // Add geometry information (normals, triangle centers, etc.)

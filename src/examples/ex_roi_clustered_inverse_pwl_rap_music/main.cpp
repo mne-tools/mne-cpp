@@ -46,7 +46,7 @@
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 
-#include <mne/mne_sourceestimate.h>
+#include <mne/mne_source_estimate.h>
 #include <inverse/rapMusic/pwlrapmusic.h>
 
 #include <disp3D_rhi/view/brainview.h>
@@ -169,7 +169,7 @@ int main(int argc, char *argv[])
     QList<Label> t_qListLabels;
     QList<RowVector4i> t_qListRGBAs;
 
-    //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
+    //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpaces
     t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
     QList<Label> t_qListLabelSelection;

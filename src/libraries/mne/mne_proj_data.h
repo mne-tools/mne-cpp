@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneProjData class declaration.
+ * @brief    MNEProjData class declaration.
  *
  */
 
@@ -65,31 +65,31 @@ namespace MNELIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneSurfaceOld;
+class MNESurface;
 
 //=============================================================================================================
 /**
  * Replaces *projData,projDataRec struct (mne_project_to_surface.c).
  *
- * @brief Auxiliary projection data computed from MneProjOp for efficient repeated application.
+ * @brief Auxiliary projection data computed from MNEProjOp for efficient repeated application.
  */
-class MNESHARED_EXPORT MneProjData
+class MNESHARED_EXPORT MNEProjData
 {
 public:
-    typedef QSharedPointer<MneProjData> SPtr;              /**< Shared pointer type for MneProjData. */
-    typedef QSharedPointer<const MneProjData> ConstSPtr;   /**< Const shared pointer type for MneProjData. */
+    typedef QSharedPointer<MNEProjData> SPtr;              /**< Shared pointer type for MNEProjData. */
+    typedef QSharedPointer<const MNEProjData> ConstSPtr;   /**< Const shared pointer type for MNEProjData. */
 
     //=========================================================================================================
     /**
-     * Constructs the MneProjData.
+     * Constructs the MNEProjData.
      */
-    MneProjData(const MNELIB::MneSurfaceOld* s);
+    MNEProjData(const MNELIB::MNESurface* s);
 
     //=========================================================================================================
     /**
-     * Destroys the MneProjData.
+     * Destroys the MNEProjData.
      */
-    ~MneProjData() = default;
+    ~MNEProjData() = default;
 
 public:
     Eigen::VectorXf a;      /**< Triangle-local dot product r12 . r12 for each triangle. */

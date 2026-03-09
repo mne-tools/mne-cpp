@@ -65,7 +65,7 @@
 
 #include <fwd/fwd_bem_model.h>
 
-#include <mne/mne_surface_old.h>
+#include <mne/mne_surface.h>
 #include <mne/mne_triangle.h>
 
 #include <utils/ioutils.h>
@@ -96,7 +96,7 @@ using namespace Eigen;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SetupForwardModel::SetupForwardModel(const MneSetupForwardModelSettings& settings)
+SetupForwardModel::SetupForwardModel(const MNESetupForwardModelSettings& settings)
 : m_settings(settings)
 {
 }
@@ -462,12 +462,12 @@ bool SetupForwardModel::readAsciiTriFile(const QString& fileName, int id, float 
     surf.ntri = ntri;
     surf.coord_frame = FIFFV_COORD_MRI;
     surf.rr = rr;
-    surf.tris = tris;
+    surf.itris = tris;
     surf.id = id;
     surf.sigma = sigma;
 
     // Compute vertex normals
-    surf.nn = Surface::compute_normals(surf.rr, surf.tris);
+    surf.nn = Surface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
 
     // Shift vertices if requested
     if (shift != 0.0f) {
@@ -539,12 +539,12 @@ bool SetupForwardModel::readFreeSurferSurf(const QString& fileName, int id, floa
     surf.ntri = nface;
     surf.coord_frame = FIFFV_COORD_MRI;
     surf.rr = verts.block(0, 0, nvert, 3);
-    surf.tris = faces;
+    surf.itris = faces;
     surf.id = id;
     surf.sigma = sigma;
 
     // Compute vertex normals
-    surf.nn = Surface::compute_normals(surf.rr, surf.tris);
+    surf.nn = Surface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
 
     // Shift vertices if requested
     if (shift != 0.0f) {
@@ -565,7 +565,7 @@ void SetupForwardModel::shiftVertices(MNEBemSurface& surf, float shift) const
     }
 
     // Recompute normals after shifting
-    surf.nn = Surface::compute_normals(surf.rr, surf.tris);
+    surf.nn = Surface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
 
     printf("Surface vertices shifted by %6.1f mm.\n", 1000.0f * shift);
 }
@@ -638,9 +638,9 @@ bool SetupForwardModel::exportSurfFile(const MNEBemSurface& surf,
 
     // Triangle vertex indices (as int32, 0-based)
     for (int k = 0; k < surf.ntri; ++k) {
-        ds << qint32(surf.tris(k, 0))
-           << qint32(surf.tris(k, 1))
-           << qint32(surf.tris(k, 2));
+        ds << qint32(surf.itris(k, 0))
+           << qint32(surf.itris(k, 1))
+           << qint32(surf.itris(k, 2));
     }
 
     file.close();
@@ -711,7 +711,7 @@ bool SetupForwardModel::prepareBemSolution(const QString& bemFile,
         for (int k = 0; k < bemModel->nsurf; ++k) {
             stream->start_block(FIFFB_BEM_SURF);
 
-            MneSurfaceOld* s = bemModel->surfs[k];
+            MNESurface* s = bemModel->surfs[k];
 
             // Surface ID
             int surfId = s->id;

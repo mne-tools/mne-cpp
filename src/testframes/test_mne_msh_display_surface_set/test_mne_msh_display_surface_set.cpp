@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Test for I/O of a MneMshDisplaySurfaceSet
+ * @brief    Test for I/O of a MNEMshDisplaySurfaceSet
  *
  */
 
@@ -41,7 +41,7 @@
 
 #include <mne/mne_msh_display_surface_set.h>
 #include <mne/mne_msh_display_surface.h>
-#include <mne/mne_surface_old.h>
+#include <mne/mne_surface.h>
 
 #include <fiff/fiff_file.h>
 
@@ -81,7 +81,7 @@ private slots:
 private:
     double dEpsilon;
 
-    MneMshDisplaySurfaceSet::SPtr m_pSurfSetBemLoaded;
+    MNEMshDisplaySurfaceSet::SPtr m_pSurfSetBemLoaded;
 };
 
 //=============================================================================================================
@@ -100,7 +100,7 @@ void TestMneMshDisplaySurfaceSet::initTestCase()
 
     //Read the results produced with MNE-CPP
     //Calculate the alignment of the fiducials
-    m_pSurfSetBemLoaded = MneMshDisplaySurfaceSet::SPtr(new MneMshDisplaySurfaceSet());
+    m_pSurfSetBemLoaded = MNEMshDisplaySurfaceSet::SPtr(new MNEMshDisplaySurfaceSet());
     m_pSurfSetBemLoaded->add_bem_surface(QCoreApplication::applicationDirPath() + "/../resources/data/mne-cpp-test-data/subjects/sample/bem/sample-5120-bem.fif",
                                              FIFFV_BEM_SURF_ID_BRAIN,
                                              "5120",
@@ -115,8 +115,8 @@ void TestMneMshDisplaySurfaceSet::initTestCase()
 void TestMneMshDisplaySurfaceSet::compareSurface()
 {
     if(m_pSurfSetBemLoaded->nsurf >= 1) {
-        QVERIFY( m_pSurfSetBemLoaded->surfs[0]->s->np == 2562 );
-        QVERIFY( m_pSurfSetBemLoaded->surfs[0]->s->ntri == 5120 );
+        QVERIFY( m_pSurfSetBemLoaded->surfs[0]->np == 2562 );
+        QVERIFY( m_pSurfSetBemLoaded->surfs[0]->ntri == 5120 );
     }
 }
 

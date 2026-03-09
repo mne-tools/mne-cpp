@@ -83,7 +83,7 @@ public:
     /**
      * Constructs a FiffSimulatorProducer.
      *
-     * @param[in] p_pMneRtClient   a pointer to the corresponding MneRtClient.
+     * @param[in] p_pMneRtClient   a pointer to the corresponding MNERtClient.
      */
     FiffSimulatorProducer(FiffSimulator* p_pFiffSimulator);
 
@@ -109,7 +109,7 @@ public:
 
     //=========================================================================================================
     /**
-     * Stops the MneRtClientProducer by stopping the producer's thread.
+     * Stops the MNERtClientProducer by stopping the producer's thread.
      */
     void stop();
 
@@ -136,7 +136,7 @@ private:
 
     QSharedPointer<COMMUNICATIONLIB::RtDataClient> m_pRtDataClient; /**< The data client.*/
 
-    FiffSimulator*          m_pFiffSimulator;                       /**< Holds a pointer to corresponding MneRtClient.*/
+    FiffSimulator*          m_pFiffSimulator;                       /**< Holds a pointer to corresponding MNERtClient.*/
 
     bool                    m_bDataClientIsConnected;               /**< If the data client is connected.*/
     bool                    m_bFlagInfoRequest;                     /**< Read Fiff Info flag. */

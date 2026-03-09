@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneNearest Class.
+ * @brief    Definition of the MNENearest Class.
  *
  */
 
@@ -52,12 +52,12 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneNearest::MneNearest()
+MNENearest::MNENearest()
 {
 }
 
 //=============================================================================================================
 
-MneNearest::~MneNearest()
+MNENearest::~MNENearest()
 {
 }

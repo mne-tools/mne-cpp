@@ -196,7 +196,7 @@ DataLoader::SensorLoadResult DataLoader::loadSensors(const QString &fifPath,
                 if (helmetBem.size() > 0) {
                     MNEBemSurface helmetSurf = helmetBem[0];
                     if (helmetSurf.nn.rows() != helmetSurf.rr.rows()) {
-                        helmetSurf.nn = FSLIB::Surface::compute_normals(helmetSurf.rr, helmetSurf.tris);
+                        helmetSurf.nn = FSLIB::Surface::compute_normals(Eigen::MatrixX3f(helmetSurf.rr), Eigen::MatrixX3i(helmetSurf.itris));
                     }
 
                     if (hasDevHead) {
@@ -271,7 +271,7 @@ std::shared_ptr<BrainSurface> DataLoader::loadHelmetSurface(
     MNEBemSurface helmetSurf = helmetBem[0];
 
     if (helmetSurf.nn.rows() != helmetSurf.rr.rows()) {
-        helmetSurf.nn = FSLIB::Surface::compute_normals(helmetSurf.rr, helmetSurf.tris);
+        helmetSurf.nn = FSLIB::Surface::compute_normals(Eigen::MatrixX3f(helmetSurf.rr), Eigen::MatrixX3i(helmetSurf.itris));
     }
 
     if (applyTrans) {
@@ -315,7 +315,7 @@ ECDSet DataLoader::loadDipoles(const QString &dipPath)
 
 //=============================================================================================================
 
-MNESourceSpace DataLoader::loadSourceSpace(const QString &fwdPath)
+MNESourceSpaces DataLoader::loadSourceSpace(const QString &fwdPath)
 {
     QFile file(fwdPath);
     if (!file.exists()) {
@@ -323,14 +323,14 @@ MNESourceSpace DataLoader::loadSourceSpace(const QString &fwdPath)
         return {};
     }
 
-    MNESourceSpace srcSpace;
+    MNESourceSpaces srcSpace;
     FiffStream::SPtr stream(new FiffStream(&file));
     if (!stream->open()) {
         qWarning() << "DataLoader: Failed to open FIF stream for source space";
         return {};
     }
 
-    if (!MNESourceSpace::readFromStream(stream, true, srcSpace)) {
+    if (!MNESourceSpaces::readFromStream(stream, true, srcSpace)) {
         qWarning() << "DataLoader: Failed to read source space from" << fwdPath;
         return {};
     }

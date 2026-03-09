@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneMshPicked Class.
+ * @brief    Definition of the MNEMshPicked Class.
  *
  */
 
@@ -49,12 +49,12 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneMshPicked::MneMshPicked()
+MNEMshPicked::MNEMshPicked()
 {
 }
 
 //=============================================================================================================
 
-MneMshPicked::~MneMshPicked()
+MNEMshPicked::~MNEMshPicked()
 {
 }

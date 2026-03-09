@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneFiffExp Class.
+ * @brief    Definition of the MNEFiffExp Class.
  *
  */
 
@@ -54,14 +54,14 @@ using namespace SHOWFIFF;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneFiffExp::MneFiffExp()
+MNEFiffExp::MNEFiffExp()
 {
 }
 
 
 //*************************************************************************************************************
 
-MneFiffExp::MneFiffExp(const MneFiffExp& p_MneFiffExp)
+MNEFiffExp::MNEFiffExp(const MNEFiffExp& p_MneFiffExp)
 : exclass(p_MneFiffExp.exclass)
 , kind(p_MneFiffExp.kind)
 , text(p_MneFiffExp.text)
@@ -71,7 +71,7 @@ MneFiffExp::MneFiffExp(const MneFiffExp& p_MneFiffExp)
 
 //*************************************************************************************************************
 
-MneFiffExp::~MneFiffExp()
+MNEFiffExp::~MNEFiffExp()
 {
 
 }
@@ -79,7 +79,7 @@ MneFiffExp::~MneFiffExp()
 
 //*************************************************************************************************************
 
-bool MneFiffExp::comp_exp(const MneFiffExp &ex1, const MneFiffExp &ex2)
+bool MNEFiffExp::comp_exp(const MNEFiffExp &ex1, const MNEFiffExp &ex2)
 {
     if (ex1.exclass == ex2.exclass) {
         if (ex1.kind > ex2.kind)

@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneCovMatrix Class.
+ * @brief    Definition of the MNECovMatrix Class.
  *
  */
 
@@ -115,7 +115,7 @@ int mne_decompose_eigen (const VectorXd& mat,
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneCovMatrix::MneCovMatrix(int p_kind,
+MNECovMatrix::MNECovMatrix(int p_kind,
                            int p_ncov,
                            const QStringList& p_names,
                            const VectorXd& p_cov,
@@ -138,13 +138,13 @@ MneCovMatrix::MneCovMatrix(int p_kind,
 
 //=============================================================================================================
 
-MneCovMatrix::~MneCovMatrix()
+MNECovMatrix::~MNECovMatrix()
 {
 }
 
 //=============================================================================================================
 
-std::unique_ptr<MneCovMatrix> MneCovMatrix::dup() const
+std::unique_ptr<MNECovMatrix> MNECovMatrix::dup() const
 {
     auto res = cov_diag.size() > 0
         ? create(kind,ncov,names,VectorXd(),VectorXd(cov_diag))
@@ -159,21 +159,21 @@ std::unique_ptr<MneCovMatrix> MneCovMatrix::dup() const
     res->nbad = nbad;
     res->proj.reset(proj ? proj->dup() : nullptr);
     if (sss)
-        res->sss = std::make_unique<MneSssData>(*sss);
+        res->sss = std::make_unique<MNESssData>(*sss);
 
     return res;
 }
 
 //=============================================================================================================
 
-int MneCovMatrix::is_diag() const
+int MNECovMatrix::is_diag() const
 {
     return cov_diag.size() > 0;
 }
 
 //=============================================================================================================
 
-int MneCovMatrix::add_inv()
+int MNECovMatrix::add_inv()
 /*
           * Calculate the inverse square roots for whitening
           */
@@ -197,7 +197,7 @@ int MneCovMatrix::add_inv()
 
 //=============================================================================================================
 
-int MneCovMatrix::condition(float rank_threshold, int use_rank)
+int MNECovMatrix::condition(float rank_threshold, int use_rank)
 {
     VectorXd scale_vec;
     VectorXd cov_local;
@@ -317,7 +317,7 @@ int MneCovMatrix::condition(float rank_threshold, int use_rank)
 
 //=============================================================================================================
 
-int MneCovMatrix::decompose_eigen_small(float p_small, int use_rank)
+int MNECovMatrix::decompose_eigen_small(float p_small, int use_rank)
 /*
           * Do the eigenvalue decomposition
           */
@@ -386,7 +386,7 @@ bad : {
 
 //=============================================================================================================
 
-int MneCovMatrix::decompose_eigen()
+int MNECovMatrix::decompose_eigen()
 
 {
     return decompose_eigen_small(-1.0,-1);
@@ -394,7 +394,7 @@ int MneCovMatrix::decompose_eigen()
 
 //=============================================================================================================
 
-int MneCovMatrix::lt_packed_index(int j, int k)
+int MNECovMatrix::lt_packed_index(int j, int k)
 
 {
     if (j >= k)

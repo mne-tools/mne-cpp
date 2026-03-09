@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneMshLight Class.
+ * @brief    Definition of the MNEMshLight Class.
  *
  */
 
@@ -49,13 +49,13 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneMshLight::MneMshLight()
+MNEMshLight::MNEMshLight()
 {
 }
 
 //=============================================================================================================
 
-MneMshLight::MneMshLight(const MneMshLight &p_mneMshLight)
+MNEMshLight::MNEMshLight(const MNEMshLight &p_mneMshLight)
 : state(p_mneMshLight.state)
 {
     this->pos[0] = p_mneMshLight.pos[0];
@@ -68,7 +68,7 @@ MneMshLight::MneMshLight(const MneMshLight &p_mneMshLight)
 
 //=============================================================================================================
 
-MneMshLight::MneMshLight(int state, float posX, float posY,float posZ, float diffX,float diffY,float diffZ)
+MNEMshLight::MNEMshLight(int state, float posX, float posY,float posZ, float diffX,float diffY,float diffZ)
 {
     this->state = state;
     this->pos[0] = posX;
@@ -81,6 +81,6 @@ MneMshLight::MneMshLight(int state, float posX, float posY,float posZ, float dif
 
 //=============================================================================================================
 
-MneMshLight::~MneMshLight()
+MNEMshLight::~MNEMshLight()
 {
 }

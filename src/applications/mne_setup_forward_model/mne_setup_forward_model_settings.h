@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneSetupForwardModelSettings class declaration.
+ * @brief    MNESetupForwardModelSettings class declaration.
  *
  *           Parses command-line settings for mne_setup_forward_model.
  *
@@ -64,7 +64,7 @@ namespace MNESETUPFORWARDMODEL {
  *
  * @brief Command-line settings for mne_setup_forward_model.
  */
-class MneSetupForwardModelSettings
+class MNESetupForwardModelSettings
 {
 public:
     //=========================================================================================================
@@ -74,7 +74,7 @@ public:
      * @param[in] argc  Number of arguments.
      * @param[in] argv  Argument array.
      */
-    MneSetupForwardModelSettings(int *argc, char **argv);
+    MNESetupForwardModelSettings(int *argc, char **argv);
 
     //=========================================================================================================
     /**

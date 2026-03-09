@@ -74,16 +74,16 @@ namespace MNELIB
  * @brief Projection operator managing a set of linear projection items
  *        and the final compiled projector matrix.
  *
- * MneProjOp aggregates zero or more MneProjItem entries, each holding a
+ * MNEProjOp aggregates zero or more MNEProjItem entries, each holding a
  * named matrix of projection vectors. When the operator is compiled
  * (make_projector), the individual items are orthogonalised into a single
  * dense projector stored in @ref proj_data.
  */
-class MNESHARED_EXPORT MneProjOp
+class MNESHARED_EXPORT MNEProjOp
 {
 public:
-    typedef QSharedPointer<MneProjOp> SPtr;              /**< Shared pointer type for MneProjOp. */
-    typedef QSharedPointer<const MneProjOp> ConstSPtr;   /**< Const shared pointer type for MneProjOp. */
+    typedef QSharedPointer<MNEProjOp> SPtr;              /**< Shared pointer type for MNEProjOp. */
+    typedef QSharedPointer<const MNEProjOp> ConstSPtr;   /**< Const shared pointer type for MNEProjOp. */
 
     /** Dynamic float matrix stored in row-major order (contiguous rows for C-style interop). */
     using RowMajorMatrixXf = Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor>;
@@ -94,13 +94,13 @@ public:
      *
      * Creates an empty operator with no projection items.
      */
-    MneProjOp();
+    MNEProjOp();
 
     //=========================================================================================================
     /**
      * @brief Destructor.
      */
-    ~MneProjOp();
+    ~MNEProjOp();
 
     //=========================================================================================================
     /**
@@ -120,7 +120,7 @@ public:
      *
      * @return Pointer to this operator.
      */
-    MneProjOp* combine(MneProjOp* from);
+    MNEProjOp* combine(MNEProjOp* from);
 
     /**
      * @brief Add a projection item with an explicit active/inactive state.
@@ -132,7 +132,7 @@ public:
      * @param[in] desc       Human-readable description of the projection.
      * @param[in] is_active  Whether the item is active on load.
      */
-    void add_item_active(const MneNamedMatrix* vecs, int kind, const  QString& desc, int is_active);
+    void add_item_active(const MNENamedMatrix* vecs, int kind, const  QString& desc, int is_active);
 
     /**
      * @brief Add a projection item that is active by default.
@@ -143,7 +143,7 @@ public:
      * @param[in] kind   Projection kind constant.
      * @param[in] desc   Human-readable description of the projection.
      */
-    void add_item(const MneNamedMatrix* vecs, int kind, const QString& desc);
+    void add_item(const MNENamedMatrix* vecs, int kind, const QString& desc);
 
     /**
      * @brief Create a deep copy of this projection operator.
@@ -152,7 +152,7 @@ public:
      *
      * @return A newly allocated copy. Caller takes ownership.
      */
-    MneProjOp* dup() const;
+    MNEProjOp* dup() const;
 
     /**
      * @brief Create an average EEG reference projector.
@@ -166,7 +166,7 @@ public:
      * @return A new projection operator, or NULL if no EEG channels are found.
      *         Caller takes ownership.
      */
-    static MneProjOp* create_average_eeg_ref(const QList<FIFFLIB::FiffChInfo>& chs, int nch);
+    static MNEProjOp* create_average_eeg_ref(const QList<FIFFLIB::FiffChInfo>& chs, int nch);
 
     /**
      * Count how many active projection vectors affect a given list of
@@ -216,7 +216,7 @@ public:
      * @return A populated projection operator (possibly with zero items),
      *         or NULL on error. Caller takes ownership.
      */
-    static MneProjOp* read_from_node(FIFFLIB::FiffStream::SPtr& stream,
+    static MNEProjOp* read_from_node(FIFFLIB::FiffStream::SPtr& stream,
                                      const FIFFLIB::FiffDirNode::SPtr& start);
 
     /**
@@ -228,7 +228,7 @@ public:
      * @return The loaded projection operator, or NULL on error.
      *         Caller takes ownership.
      */
-    static MneProjOp* read(const QString& name);
+    static MNEProjOp* read(const QString& name);
 
     /**
      * Write a formatted summary of all projection items to a text stream,
@@ -253,7 +253,7 @@ public:
     void report(QTextStream &out,const char *tag);
 
 public:
-    QList<MNELIB::MneProjItem> items;  /**< The projection items. */
+    QList<MNELIB::MNEProjItem> items;  /**< The projection items. */
     int         nitems;                 /**< Number of items. */
     QStringList names;                  /**< Names of the channels in the final compiled projector. */
     int         nch;                    /**< Number of channels in the final projector. */

@@ -330,3 +330,87 @@ FiffSparseMatrix::UPtr FiffSparseMatrix::mne_add_upper_triangle_rcs()
 
     return create_sparse_rcs(this->m, this->n, nnz_vec.data(), ci_ptrs.data(), val_ptrs.data());
 }
+
+//=============================================================================================================
+
+Eigen::SparseMatrix<double> FiffSparseMatrix::toEigenSparse() const
+{
+    if (is_empty())
+        return Eigen::SparseMatrix<double>();
+
+    typedef Eigen::Triplet<double> T;
+    std::vector<T> tripletList;
+    tripletList.reserve(nz);
+
+    if (coding == FIFFTS_MC_RCS) {
+        for (int row = 0; row < m; ++row) {
+            for (int j = ptrs[row]; j < ptrs[row + 1]; ++j) {
+                tripletList.push_back(T(row, inds[j], static_cast<double>(data[j])));
+            }
+        }
+    } else if (coding == FIFFTS_MC_CCS) {
+        for (int col = 0; col < n; ++col) {
+            for (int j = ptrs[col]; j < ptrs[col + 1]; ++j) {
+                tripletList.push_back(T(inds[j], col, static_cast<double>(data[j])));
+            }
+        }
+    } else {
+        qWarning("[FiffSparseMatrix::toEigenSparse] Unknown coding type: %d", coding);
+        return Eigen::SparseMatrix<double>();
+    }
+
+    Eigen::SparseMatrix<double> result(m, n);
+    result.setFromTriplets(tripletList.begin(), tripletList.end());
+    return result;
+}
+
+//=============================================================================================================
+
+FiffSparseMatrix FiffSparseMatrix::fromEigenSparse(const Eigen::SparseMatrix<double>& mat)
+{
+    FiffSparseMatrix result;
+    if (mat.nonZeros() == 0) {
+        return result;
+    }
+
+    // Store in RCS (row-compressed) format
+    // Eigen's default SparseMatrix is column-major, so we iterate by row
+    result.coding = FIFFTS_MC_RCS;
+    result.m = static_cast<fiff_int_t>(mat.rows());
+    result.n = static_cast<fiff_int_t>(mat.cols());
+    result.nz = static_cast<fiff_int_t>(mat.nonZeros());
+    result.data = Eigen::VectorXf::Zero(result.nz);
+    result.inds = Eigen::VectorXi::Zero(result.nz);
+    result.ptrs = Eigen::VectorXi::Zero(result.m + 1);
+
+    // Collect triplets sorted by row
+    typedef Eigen::Triplet<double> T;
+    std::vector<T> triplets;
+    triplets.reserve(mat.nonZeros());
+    for (int k = 0; k < mat.outerSize(); ++k) {
+        for (Eigen::SparseMatrix<double>::InnerIterator it(mat, k); it; ++it) {
+            triplets.push_back(T(it.row(), it.col(), it.value()));
+        }
+    }
+    std::sort(triplets.begin(), triplets.end(),
+              [](const T& a, const T& b) {
+                  return a.row() < b.row() || (a.row() == b.row() && a.col() < b.col());
+              });
+
+    int idx = 0;
+    int row = 0;
+    result.ptrs[0] = 0;
+    for (const auto& t : triplets) {
+        while (row < t.row()) {
+            result.ptrs[++row] = idx;
+        }
+        result.data[idx] = static_cast<float>(t.value());
+        result.inds[idx] = static_cast<int>(t.col());
+        ++idx;
+    }
+    while (row < result.m) {
+        result.ptrs[++row] = idx;
+    }
+
+    return result;
+}

@@ -40,7 +40,7 @@
 
 #include "minimumnorm.h"
 
-#include <mne/mne_sourceestimate.h>
+#include <mne/mne_source_estimate.h>
 #include <fiff/fiff_evoked.h>
 
 #include <iostream>
@@ -259,7 +259,7 @@ const char* MinimumNorm::getName() const
 
 //=============================================================================================================
 
-const MNESourceSpace& MinimumNorm::getSourceSpace() const
+const MNESourceSpaces& MinimumNorm::getSourceSpace() const
 {
     return m_inverseOperator.src;
 }

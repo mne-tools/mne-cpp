@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneFlashBemSettings class declaration.
+ * @brief    MNEFlashBemSettings class declaration.
  *
  */
 
@@ -64,7 +64,7 @@ namespace MNEFLASHBEM {
  *
  * @brief Command-line settings for mne_flash_bem.
  */
-class MneFlashBemSettings
+class MNEFlashBemSettings
 {
 public:
     //=========================================================================================================
@@ -74,7 +74,7 @@ public:
      * @param[in] argc  Number of arguments.
      * @param[in] argv  Argument array.
      */
-    MneFlashBemSettings(int *argc, char **argv);
+    MNEFlashBemSettings(int *argc, char **argv);
 
     //=========================================================================================================
     /**

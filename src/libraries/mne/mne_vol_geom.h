@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneVolGeom class declaration.
+ * @brief    MNEVolGeom class declaration.
  *
  */
 
@@ -73,24 +73,24 @@ namespace MNELIB
  *
  * @brief MRI data volume geometry information like FreeSurfer keeps it
  */
-class MNESHARED_EXPORT MneVolGeom
+class MNESHARED_EXPORT MNEVolGeom
 {
 public:
-    typedef QSharedPointer<MneVolGeom> SPtr;              /**< Shared pointer type for MneVolGeom. */
-    typedef QSharedPointer<const MneVolGeom> ConstSPtr;   /**< Const shared pointer type for MneVolGeom. */
+    typedef QSharedPointer<MNEVolGeom> SPtr;              /**< Shared pointer type for MNEVolGeom. */
+    typedef QSharedPointer<const MNEVolGeom> ConstSPtr;   /**< Const shared pointer type for MNEVolGeom. */
 
     //=========================================================================================================
     /**
      * Constructs the MNE Volume Geometry
      */
-    MneVolGeom();
+    MNEVolGeom();
 
     //=========================================================================================================
     /**
      * Destroys the MNE Volume Geometry
      * Refactored: mne_free_vol_geom (mne_mgh_mri_io.c)
      */
-    ~MneVolGeom();
+    ~MNEVolGeom();
 
 public:
     int     valid;                       /**< Non-zero if the geometry information below is valid. */

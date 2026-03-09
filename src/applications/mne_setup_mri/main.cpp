@@ -82,7 +82,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("mne_setup_mri");
     QCoreApplication::setApplicationVersion("1.0");
 
-    MneSetupMriSettings settings(&argc, argv);
+    MNESetupMriSettings settings(&argc, argv);
     SetupMri setupMri(settings);
 
     return setupMri.run();

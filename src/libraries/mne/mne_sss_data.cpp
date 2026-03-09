@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MNE SSS Data (MneSssData) Class.
+ * @brief    Definition of the MNE SSS Data (MNESssData) Class.
  *
  */
 
@@ -75,7 +75,7 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneSssData::MneSssData()
+MNESssData::MNESssData()
 : job(FIFFV_SSS_JOB_NOTHING)
 , coord_frame(FIFFV_COORD_UNKNOWN)
 , nchan(0)
@@ -91,7 +91,7 @@ MneSssData::MneSssData()
 
 //=============================================================================================================
 
-MneSssData::MneSssData(const MneSssData& p_MneSssData)
+MNESssData::MNESssData(const MNESssData& p_MneSssData)
 : job(p_MneSssData.job)
 , coord_frame(p_MneSssData.coord_frame)
 , nchan(p_MneSssData.nchan)
@@ -108,16 +108,16 @@ MneSssData::MneSssData(const MneSssData& p_MneSssData)
 
 //=============================================================================================================
 
-MneSssData::~MneSssData() = default;
+MNESssData::~MNESssData() = default;
 
 //=============================================================================================================
 
-MneSssData *MneSssData::read(const QString &name)
+MNESssData *MNESssData::read(const QString &name)
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
 
-    MneSssData* s  = NULL;
+    MNESssData* s  = NULL;
 
     if(stream->open())
         s = read_from_node(stream,stream->dirtree());
@@ -128,9 +128,9 @@ MneSssData *MneSssData::read(const QString &name)
 
 //=============================================================================================================
 
-MneSssData *MneSssData::read_from_node(QSharedPointer<FiffStream> &stream, const QSharedPointer<FiffDirNode> &start)
+MNESssData *MNESssData::read_from_node(QSharedPointer<FiffStream> &stream, const QSharedPointer<FiffDirNode> &start)
 {
-    MneSssData* s  = new MneSssData();
+    MNESssData* s  = new MNESssData();
     QList<FiffDirNode::SPtr> sss;
     FiffDirNode::SPtr node;
     FiffTag::SPtr t_pTag;
@@ -254,7 +254,7 @@ const char *mne_coord_frame_name_1(int frame)
 
 //=============================================================================================================
 
-void MneSssData::print(QTextStream &out) const
+void MNESssData::print(QTextStream &out) const
 {
     int j,p,q,n;
 

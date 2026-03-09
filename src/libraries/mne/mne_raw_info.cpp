@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneRawInfo Class.
+ * @brief    Definition of the MNERawInfo Class.
  *
  */
 
@@ -58,19 +58,19 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneRawInfo::MneRawInfo()
+MNERawInfo::MNERawInfo()
 {
 }
 
 //=============================================================================================================
 
-MneRawInfo::~MneRawInfo()
+MNERawInfo::~MNERawInfo()
 {
 }
 
 //=============================================================================================================
 
-FiffDirNode::SPtr MneRawInfo::find_meas(const FiffDirNode::SPtr &node)
+FiffDirNode::SPtr MNERawInfo::find_meas(const FiffDirNode::SPtr &node)
 {
     FiffDirNode::SPtr empty_node;
     FiffDirNode::SPtr tmp_node = node;
@@ -85,7 +85,7 @@ FiffDirNode::SPtr MneRawInfo::find_meas(const FiffDirNode::SPtr &node)
 
 //=============================================================================================================
 
-FiffDirNode::SPtr MneRawInfo::find_meas_info(const FiffDirNode::SPtr &node)
+FiffDirNode::SPtr MNERawInfo::find_meas_info(const FiffDirNode::SPtr &node)
 {
     int k;
     FiffDirNode::SPtr empty_node;
@@ -104,7 +104,7 @@ FiffDirNode::SPtr MneRawInfo::find_meas_info(const FiffDirNode::SPtr &node)
 
 //=============================================================================================================
 
-FiffDirNode::SPtr MneRawInfo::find_raw(const FiffDirNode::SPtr &node)
+FiffDirNode::SPtr MNERawInfo::find_raw(const FiffDirNode::SPtr &node)
 {
     FiffDirNode::SPtr raw;
     QList<FiffDirNode::SPtr> temp;
@@ -121,7 +121,7 @@ FiffDirNode::SPtr MneRawInfo::find_raw(const FiffDirNode::SPtr &node)
 
 //=============================================================================================================
 
-FiffDirNode::SPtr MneRawInfo::find_maxshield(const FiffDirNode::SPtr &node)
+FiffDirNode::SPtr MNERawInfo::find_maxshield(const FiffDirNode::SPtr &node)
 
 {
     FiffDirNode::SPtr raw;
@@ -134,7 +134,7 @@ FiffDirNode::SPtr MneRawInfo::find_maxshield(const FiffDirNode::SPtr &node)
 
 //=============================================================================================================
 
-int MneRawInfo::get_meas_info(FiffStream::SPtr &stream,
+int MNERawInfo::get_meas_info(FiffStream::SPtr &stream,
                               FiffDirNode::SPtr &node,
                               std::unique_ptr<FiffId>& id,
                               int *nchan,
@@ -298,7 +298,7 @@ bad : {
 
 //=============================================================================================================
 
-int MneRawInfo::load(const QString& name, int allow_maxshield, std::unique_ptr<MneRawInfo>& infop)
+int MNERawInfo::load(const QString& name, int allow_maxshield, std::unique_ptr<MNERawInfo>& infop)
 {
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
@@ -308,7 +308,7 @@ int MneRawInfo::load(const QString& name, int allow_maxshield, std::unique_ptr<M
     FiffCoordTrans trans;       /* The coordinate transformation */
     std::unique_ptr<FiffId> id; /* Measurement id */
     QList<FiffDirEntry::SPtr>   rawDir;	/* Directory of raw data tags */
-    std::unique_ptr<MneRawInfo> info;
+    std::unique_ptr<MNERawInfo> info;
     int            nchan    = 0;		/* Number of channels */
     float          sfreq    = 0.0;	/* Sampling frequency */
     float          highpass;		/* Highpass filter frequency */
@@ -358,7 +358,7 @@ int MneRawInfo::load(const QString& name, int allow_maxshield, std::unique_ptr<M
     /*
        * Ready to put everything together
        */
-    info = std::make_unique<MneRawInfo>();
+    info = std::make_unique<MNERawInfo>();
     info->filename       = name;
     info->nchan          = nchan;
     info->chInfo         = chs;

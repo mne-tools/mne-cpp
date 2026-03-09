@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("mne_surf2bem");
     QCoreApplication::setApplicationVersion("1.0");
 
-    MneSurf2BemSettings settings(&argc, argv);
+    MNESurf2BemSettings settings(&argc, argv);
     Surf2Bem surf2bem(settings);
 
     return surf2bem.run();

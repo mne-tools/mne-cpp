@@ -70,7 +70,7 @@ namespace MNESETUPMRI {
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneSetupMriSettings;
+class MNESetupMriSettings;
 
 //=============================================================================================================
 /**
@@ -97,7 +97,7 @@ public:
      *
      * @param[in] settings  The parsed command-line settings.
      */
-    SetupMri(const MneSetupMriSettings& settings);
+    SetupMri(const MNESetupMriSettings& settings);
 
     //=========================================================================================================
     /**
@@ -120,7 +120,7 @@ private:
 
     //=========================================================================================================
 
-    const MneSetupMriSettings& m_settings;      /**< Command-line settings. */
+    const MNESetupMriSettings& m_settings;      /**< Command-line settings. */
 };
 
 } // namespace MNESETUPMRI

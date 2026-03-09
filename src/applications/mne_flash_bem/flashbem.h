@@ -68,7 +68,7 @@ namespace MNEFLASHBEM {
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneFlashBemSettings;
+class MNEFlashBemSettings;
 
 //=============================================================================================================
 /**
@@ -96,7 +96,7 @@ public:
      *
      * @param[in] settings  The parsed command-line settings.
      */
-    FlashBem(const MneFlashBemSettings& settings);
+    FlashBem(const MNEFlashBemSettings& settings);
 
     //=========================================================================================================
     /**
@@ -237,7 +237,7 @@ private:
 
     //=========================================================================================================
 
-    const MneFlashBemSettings& m_settings;   /**< Command-line settings. */
+    const MNEFlashBemSettings& m_settings;   /**< Command-line settings. */
     int m_step;                              /**< Current processing step number. */
 };
 

@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneMshLight class declaration.
+ * @brief    MNEMshLight class declaration.
  *
  */
 
@@ -73,35 +73,35 @@ namespace MNELIB
  *
  * @brief Single light source with position, color, and state for 3-D surface rendering.
  */
-class MNESHARED_EXPORT MneMshLight
+class MNESHARED_EXPORT MNEMshLight
 {
 public:
-    typedef QSharedPointer<MneMshLight> SPtr;              /**< Shared pointer type for MneMshLight. */
-    typedef QSharedPointer<const MneMshLight> ConstSPtr;   /**< Const shared pointer type for MneMshLight. */
+    typedef QSharedPointer<MNEMshLight> SPtr;              /**< Shared pointer type for MNEMshLight. */
+    typedef QSharedPointer<const MNEMshLight> ConstSPtr;   /**< Const shared pointer type for MNEMshLight. */
 
     //=========================================================================================================
     /**
-     * Constructs the MneMshLight.
+     * Constructs the MNEMshLight.
      */
-    MneMshLight();
+    MNEMshLight();
 
     //=========================================================================================================
     /**
-     * Copy Constructs of the MneMshLight.
+     * Copy Constructs of the MNEMshLight.
      */
-    MneMshLight(const MneMshLight &p_mneMshLight);
+    MNEMshLight(const MNEMshLight &p_mneMshLight);
 
     //=========================================================================================================
     /**
-     * Constructs the MneMshLight.
+     * Constructs the MNEMshLight.
      */
-    MneMshLight(int state, float posX, float posY,float posZ,float diffX,float diffY,float diffZ);
+    MNEMshLight(int state, float posX, float posY,float posZ,float diffX,float diffY,float diffZ);
 
     //=========================================================================================================
     /**
-     * Destroys the MneMshLight.
+     * Destroys the MNEMshLight.
      */
-    ~MneMshLight();
+    ~MNEMshLight();
 
 public:
     int   state;			/* On or off? */

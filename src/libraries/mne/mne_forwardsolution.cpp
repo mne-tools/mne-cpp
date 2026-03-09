@@ -406,11 +406,11 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
                 for(qint32 k = 0; k < clusterVertnos.size(); ++k)
                     clusterVertnos(k) = this->src[h].vertno[clusterIdcs(k)];
 
-                p_fwdOut.src[h].cluster_info.clusterVertnos.append(clusterVertnos);
-                p_fwdOut.src[h].cluster_info.clusterSource_rr.append(clusterSource_rr);
-                p_fwdOut.src[h].cluster_info.clusterDistances.append(clusterDistance);
-                p_fwdOut.src[h].cluster_info.clusterLabelIds.append(label_ids[itOut->iLabelIdxOut]);
-                p_fwdOut.src[h].cluster_info.clusterLabelNames.append(t_CurrentColorTable.getNames()[itOut->iLabelIdxOut]);
+                p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterVertnos.append(clusterVertnos);
+                p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterSource_rr.append(clusterSource_rr);
+                p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterDistances.append(clusterDistance);
+                p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterLabelIds.append(label_ids[itOut->iLabelIdxOut]);
+                p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterLabelNames.append(t_CurrentColorTable.getNames()[itOut->iLabelIdxOut]);
             }
 
             //
@@ -447,14 +447,14 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
                     // Take the closest coordinates
                     qint32 sel_idx = itIn->idcs[j_min];
 
-                    p_fwdOut.src[h].cluster_info.centroidVertno.append(this->src[h].vertno[sel_idx]);
-                    p_fwdOut.src[h].cluster_info.centroidSource_rr.append(this->src[h].rr.row(this->src[h].vertno[sel_idx]));
+                    p_fwdOut.src.hemisphereAt(h)->cluster_info.centroidVertno.append(this->src[h].vertno[sel_idx]);
+                    p_fwdOut.src.hemisphereAt(h)->cluster_info.centroidSource_rr.append(this->src[h].rr.row(this->src[h].vertno[sel_idx]));
 //                    p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
 
 //                    // Option 1 closest vertno
 //                    p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx]; //ToDo resizing necessary?
                     // Option 2 label ID
-                    p_fwdOut.src[h].vertno[count] = p_fwdOut.src[h].cluster_info.clusterLabelIds[count];
+                    p_fwdOut.src[h].vertno[count] = p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterLabelIds[count];
 
 //                    //vertices
 //                    std::cout << this->src[h].vertno[sel_idx] << ", ";
@@ -481,7 +481,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
     //
     qint32 totalNumOfClust = 0;
     for (qint32 h = 0; h < 2; ++h)
-        totalNumOfClust += p_fwdOut.src[h].cluster_info.clusterVertnos.size();
+        totalNumOfClust += p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterVertnos.size();
 
     if(this->isFixedOrient())
         p_D = MatrixXd::Zero(this->sol->data.cols(), totalNumOfClust);
@@ -497,14 +497,14 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
     for (qint32 h = 0; h < 2; ++h)
     {
         int hemiOffset = h == 0 ? 0 : t_vertnos[0].size();
-        for(qint32 i = 0; i < p_fwdOut.src[h].cluster_info.clusterVertnos.size(); ++i)
+        for(qint32 i = 0; i < p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterVertnos.size(); ++i)
         {
             VectorXi idx_sel;
-            MNEMath::intersect(t_vertnos[h], p_fwdOut.src[h].cluster_info.clusterVertnos[i], idx_sel);
+            MNEMath::intersect(t_vertnos[h], p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterVertnos[i], idx_sel);
 
 //            std::cout << "\nVertnos:\n" << t_vertnos[h] << std::endl;
 
-//            std::cout << "clusterVertnos[i]:\n" << p_fwdOut.src[h].cluster_info.clusterVertnos[i] << std::endl;
+//            std::cout << "clusterVertnos[i]:\n" << p_fwdOut.src.hemisphereAt(h)->cluster_info.clusterVertnos[i] << std::endl;
 
             idx_sel.array() += hemiOffset;
 
@@ -1224,8 +1224,8 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
         return false;
     }
 
-    MNESourceSpace t_SourceSpace;// = NULL;
-    if(!MNESourceSpace::readFromStream(t_pStream, true, t_SourceSpace))
+    MNESourceSpaces t_SourceSpace;// = NULL;
+    if(!MNESourceSpaces::readFromStream(t_pStream, true, t_SourceSpace))
     {
         t_pStream->close();
         std::cout << "Could not read the source spaces\n"; // ToDo throw error
@@ -1234,7 +1234,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
     }
 
     for(qint32 k = 0; k < t_SourceSpace.size(); ++k)
-        t_SourceSpace[k].id = MNESourceSpace::find_source_space_hemi(t_SourceSpace[k]);
+        t_SourceSpace[k].id = t_SourceSpace[k].find_source_space_hemi();
 
     //
     //   Bad channel list
@@ -1395,7 +1395,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
     }
 
     printf("\tSource spaces transformed to the forward solution coordinate frame\n");
-    fwd.src = t_SourceSpace; //not new MNESourceSpace(t_SourceSpace); for sake of speed
+    fwd.src = t_SourceSpace; //not new MNESourceSpaces(t_SourceSpace); for sake of speed
     //
     //   Handle the source locations and orientations
     //
@@ -1448,7 +1448,8 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
         printf("\tConverting to surface-based source orientations...");
 
         bool use_ave_nn = false;
-        if(t_SourceSpace[0].patch_inds.size() > 0)
+        auto* hemi0 = t_SourceSpace.hemisphereAt(0);
+        if(hemi0 && hemi0->patch_inds.size() > 0)
         {
             use_ave_nn = true;
             printf("\tAverage patch normals will be employed in the rotation to the local surface coordinates...\n");
@@ -1475,7 +1476,8 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice,
                 Vector3f nn;
                 if(use_ave_nn)
                 {
-                    VectorXi t_vIdx = t_SourceSpace[k].pinfo[t_SourceSpace[k].patch_inds[p]];
+                    auto* hemiK = t_SourceSpace.hemisphereAt(k);
+                    VectorXi t_vIdx = hemiK->pinfo[hemiK->patch_inds[p]];
                     Matrix3Xf t_nn(3, t_vIdx.size());
                     for(qint32 i = 0; i < t_vIdx.size(); ++i)
                         t_nn.col(i) = t_SourceSpace[k].nn.block(t_vIdx[i],0,1,3).transpose();
@@ -1851,7 +1853,7 @@ MatrixX3f MNEForwardSolution::getSourcePositionsByLabel(const QList<Label> &lPic
             for(int k = 0; k < lPickedLabels.size(); k++) {
                 if(this->src[0].vertno(j) == lPickedLabels.at(k).label_id) {
                     matSourceVertLeft.conservativeResize(matSourceVertLeft.rows()+1,3);
-                    matSourceVertLeft.row(matSourceVertLeft.rows()-1) = tSurfSetInflated[0].rr().row(this->src[0].cluster_info.centroidVertno.at(j)) - tSurfSetInflated[0].offset().transpose();
+                    matSourceVertLeft.row(matSourceVertLeft.rows()-1) = tSurfSetInflated[0].rr().row(this->src.hemisphereAt(0)->cluster_info.centroidVertno.at(j)) - tSurfSetInflated[0].offset().transpose();
                     break;
                 }
             }
@@ -1861,7 +1863,7 @@ MatrixX3f MNEForwardSolution::getSourcePositionsByLabel(const QList<Label> &lPic
             for(int k = 0; k < lPickedLabels.size(); k++) {
                 if(this->src[1].vertno(j) == lPickedLabels.at(k).label_id) {
                     matSourceVertRight.conservativeResize(matSourceVertRight.rows()+1,3);
-                    matSourceVertRight.row(matSourceVertRight.rows()-1) = tSurfSetInflated[1].rr().row(this->src[1].cluster_info.centroidVertno.at(j)) - tSurfSetInflated[1].offset().transpose();
+                    matSourceVertRight.row(matSourceVertRight.rows()-1) = tSurfSetInflated[1].rr().row(this->src.hemisphereAt(1)->cluster_info.centroidVertno.at(j)) - tSurfSetInflated[1].offset().transpose();
                     break;
                 }
             }

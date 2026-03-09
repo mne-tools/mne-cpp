@@ -3,13 +3,13 @@
 #include <Eigen/Dense>
 #include <Eigen/SparseCore>
 
-#include <mne/mne_sourcespace.h>
+#include <mne/mne_source_spaces.h>
 #include <mne/mne_hemisphere.h>
 #include <mne/mne_bem.h>
 #include <mne/mne_bem_surface.h>
 #include <mne/mne_forwardsolution.h>
 #include <mne/mne_inverse_operator.h>
-#include <mne/mne_sourceestimate.h>
+#include <mne/mne_source_estimate.h>
 #include <mne/mne_epoch_data.h>
 #include <mne/mne_epoch_data_list.h>
 #include <mne/mne_named_matrix.h>
@@ -44,38 +44,38 @@ private:
 
 private slots:
     //=========================================================================
-    // MNESourceSpace
+    // MNESourceSpaces
     //=========================================================================
     void sourceSpace_defaultCtor()
     {
-        MNESourceSpace ss;
+        MNESourceSpaces ss;
         QVERIFY(ss.isEmpty());
         QCOMPARE(ss.size(), 0);
     }
 
     void sourceSpace_copyCtor()
     {
-        MNESourceSpace ss;
-        MNESourceSpace copy(ss);
+        MNESourceSpaces ss;
+        MNESourceSpaces copy(ss);
         QVERIFY(copy.isEmpty());
     }
 
     void sourceSpace_clear()
     {
-        MNESourceSpace ss;
+        MNESourceSpaces ss;
         ss.clear();
         QVERIFY(ss.isEmpty());
     }
 
     void sourceSpace_equality()
     {
-        MNESourceSpace ss1, ss2;
+        MNESourceSpaces ss1, ss2;
         QVERIFY(ss1 == ss2);
     }
 
     void sourceSpace_getVertno()
     {
-        MNESourceSpace ss;
+        MNESourceSpaces ss;
         QList<VectorXi> vertno = ss.get_vertno();
         QCOMPARE(vertno.size(), 0);
     }
@@ -93,8 +93,8 @@ private slots:
             QSKIP("Failed to open source space file");
         }
 
-        MNESourceSpace ss;
-        bool ok = MNESourceSpace::readFromStream(stream, true, ss);
+        MNESourceSpaces ss;
+        bool ok = MNESourceSpaces::readFromStream(stream, true, ss);
         stream->close();
         if (ok) {
             QVERIFY(!ss.isEmpty());
@@ -130,7 +130,7 @@ private slots:
         surf.np = 100;
         surf.ntri = 50;
         surf.rr = MatrixX3f::Random(100, 3);
-        surf.tris = MatrixX3i::Zero(50, 3);
+        surf.itris = MatrixX3i::Zero(50, 3);
         surf.nn = MatrixX3f::Random(100, 3);
         bem << surf;
         QCOMPARE(bem.size(), 1);
@@ -173,8 +173,8 @@ private slots:
                    0.0f, 1.0f, 0.0f,
                    0.0f, 0.0f, 1.0f;
         surf.nn = MatrixX3f::Zero(3, 3);
-        surf.tris.resize(1, 3);
-        surf.tris << 0, 1, 2;
+        surf.itris.resize(1, 3);
+        surf.itris << 0, 1, 2;
         bem << surf;
 
         FiffCoordTrans trans;
@@ -203,8 +203,8 @@ private slots:
         surf.rr << 0.01f, 0.0f, 0.0f, 0.0f, 0.01f, 0.0f, 0.0f, 0.0f, 0.01f;
         surf.nn.resize(3, 3);
         surf.nn << 1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f;
-        surf.tris.resize(1, 3);
-        surf.tris << 0, 1, 2;
+        surf.itris.resize(1, 3);
+        surf.itris << 0, 1, 2;
         bem << surf;
 
         QBuffer buf;

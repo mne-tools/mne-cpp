@@ -1267,13 +1267,13 @@ bool MNEInverseOperator::read_inverse_operator(QIODevice& p_IODevice, MNEInverse
     //
     //   Read the source spaces
     //
-    if(!MNESourceSpace::readFromStream(t_pStream, false, inv.src))
+    if(!MNESourceSpaces::readFromStream(t_pStream, false, inv.src))
     {
         printf("\tError: Could not read the source spaces.\n");
         return false;
     }
     for (qint32 k = 0; k < inv.src.size(); ++k)
-       inv.src[k].id = MNESourceSpace::find_source_space_hemi(inv.src[k]);
+       inv.src[k].id = inv.src[k].find_source_space_hemi();
     //
     //   Get the MRI <-> head coordinate transformation
     //

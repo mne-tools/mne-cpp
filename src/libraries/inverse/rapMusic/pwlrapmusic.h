@@ -46,7 +46,7 @@
 #include "dipole.h"
 
 #include <mne/mne_forwardsolution.h>
-#include <mne/mne_sourceestimate.h>
+#include <mne/mne_source_estimate.h>
 #include <time.h>
 
 #include <QVector>

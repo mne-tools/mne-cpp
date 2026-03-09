@@ -50,7 +50,7 @@
 #include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
-#include <mne/mne_sourceestimate.h>
+#include <mne/mne_source_estimate.h>
 #include <mne/mne_bem.h>
 
 #include <fiff/fiff_dig_point_set.h>

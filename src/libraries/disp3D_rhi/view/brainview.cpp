@@ -76,7 +76,7 @@
 #include <cmath>
 
 #include <mne/mne_bem.h>
-#include <mne/mne_sourcespace.h>
+#include <mne/mne_source_spaces.h>
 #include <fiff/fiff_evoked_set.h>
 #include <connectivity/network/network.h>
 

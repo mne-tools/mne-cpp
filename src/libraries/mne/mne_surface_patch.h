@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneSurfacePatch class declaration.
+ * @brief    MNESurfacePatch class declaration.
  *
  */
 
@@ -71,7 +71,7 @@ namespace MNELIB
 // MNELIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneSourceSpaceOld;
+class MNESourceSpace;
 
 //=============================================================================================================
 /**
@@ -81,11 +81,11 @@ class MneSourceSpaceOld;
  * It stores the mapping between patch-local and full-surface vertex/triangle
  * indices and marks which vertices lie on the patch border.
  */
-class MNESHARED_EXPORT MneSurfacePatch
+class MNESHARED_EXPORT MNESurfacePatch
 {
 public:
-    typedef QSharedPointer<MneSurfacePatch> SPtr;              /**< Shared pointer type for MneSurfacePatch. */
-    typedef QSharedPointer<const MneSurfacePatch> ConstSPtr;   /**< Const shared pointer type for MneSurfacePatch. */
+    typedef QSharedPointer<MNESurfacePatch> SPtr;              /**< Shared pointer type for MNESurfacePatch. */
+    typedef QSharedPointer<const MNESurfacePatch> ConstSPtr;   /**< Const shared pointer type for MNESurfacePatch. */
 
     //=========================================================================================================
     /**
@@ -93,16 +93,16 @@ public:
      *
      * @param[in] np  Number of vertices in the patch (0 for an empty patch).
      */
-    MneSurfacePatch(int np);
+    MNESurfacePatch(int np);
 
     //=========================================================================================================
     /**
-     * Destroys the MneSurfacePatch.
+     * Destroys the MNESurfacePatch.
      */
-    ~MneSurfacePatch();
+    ~MNESurfacePatch();
 
 public:
-    std::unique_ptr<MneSourceSpaceOld> s;		    /**< Patch represented as a source space surface. */
+    std::unique_ptr<MNESourceSpace> s;		    /**< Patch represented as a source space surface. */
     Eigen::VectorXi  vert;	    /**< Vertex numbers in the complete surface (size np). */
     Eigen::VectorXi  surf_vert;	    /**< Map from complete-surface vertex index to patch vertex index (-1 if absent). */
     Eigen::VectorXi  tri;	    /**< Map from patch triangle index to complete-surface triangle index. */

@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "fwd_thread_arg.h"
-#include <mne/mne_source_space_old.h>
+#include <mne/mne_source_space.h>
 #include "fwd_coil_set.h"
 #include "fwd_bem_model.h"
 #include "fwd_comp_data.h"
@@ -164,7 +164,7 @@ FwdThreadArg *FwdThreadArg::create_meg_multi_thread_duplicate(FwdThreadArg* one,
      *comp = *orig;
     comp->work     = NULL;
     comp->vec_work = NULL;
-    comp->set      = orig->set ? new MneCTFCompDataSet(*(orig->set)) : NULL;
+    comp->set      = orig->set ? new MNECTFCompDataSet(*(orig->set)) : NULL;
 
     if (bem_model) {
         FwdBemModel*   new_bem  = new FwdBemModel();

@@ -54,7 +54,7 @@ class FiffEvoked;
 
 namespace MNELIB
 {
-class MNESourceSpace;
+class MNESourceSpaces;
 class MNESourceEstimate;
 }
 
@@ -125,7 +125,7 @@ public:
      *
      * @return the mne source space information.
      */
-    virtual const MNELIB::MNESourceSpace& getSourceSpace() const = 0;
+    virtual const MNELIB::MNESourceSpaces& getSourceSpace() const = 0;
 };
 } //NAMESPACE
 

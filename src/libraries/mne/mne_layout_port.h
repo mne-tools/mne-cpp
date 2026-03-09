@@ -23,11 +23,11 @@ namespace MNELIB
  * Holds viewport bounds and the colon-separated list of channel
  * names assigned to this viewport.
  */
-class MNESHARED_EXPORT MneLayoutPort
+class MNESHARED_EXPORT MNELayoutPort
 {
 public:
-    MneLayoutPort() = default;
-    ~MneLayoutPort() = default;
+    MNELayoutPort() = default;
+    ~MNELayoutPort() = default;
 
     int     portno = 0;         /**< Running number of this viewport. */
     int     invert = 0;         /**< Invert the signal coming to this port. */
@@ -40,8 +40,8 @@ public:
 };
 
 /** Backward-compatible typedef aliases. */
-typedef MneLayoutPort  mneLayoutPortRec;
-typedef MneLayoutPort* mneLayoutPort;
+typedef MNELayoutPort  mneLayoutPortRec;
+typedef MNELayoutPort* mneLayoutPort;
 
 } // namespace MNELIB
 

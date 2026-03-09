@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneSurf2BemSettings class definition.
+ * @brief    MNESurf2BemSettings class definition.
  *
  *           Command-line parsing replicates the original MNE C tool's behavior
  *           where options like --id, --swap, --shift apply to the most recently
@@ -62,7 +62,7 @@ using namespace MNESURF2BEM;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneSurf2BemSettings::MneSurf2BemSettings(int *argc, char **argv)
+MNESurf2BemSettings::MNESurf2BemSettings(int *argc, char **argv)
 : m_iCoordFrame(FIFFV_COORD_MRI)
 , m_bCheck(false)
 , m_bCheckMore(false)
@@ -251,42 +251,42 @@ MneSurf2BemSettings::MneSurf2BemSettings(int *argc, char **argv)
 
 //=============================================================================================================
 
-const QVector<SurfaceInput>& MneSurf2BemSettings::surfaces() const
+const QVector<SurfaceInput>& MNESurf2BemSettings::surfaces() const
 {
     return m_surfaces;
 }
 
 //=============================================================================================================
 
-QString MneSurf2BemSettings::outputFile() const
+QString MNESurf2BemSettings::outputFile() const
 {
     return m_sOutputFile;
 }
 
 //=============================================================================================================
 
-int MneSurf2BemSettings::coordFrame() const
+int MNESurf2BemSettings::coordFrame() const
 {
     return m_iCoordFrame;
 }
 
 //=============================================================================================================
 
-bool MneSurf2BemSettings::check() const
+bool MNESurf2BemSettings::check() const
 {
     return m_bCheck;
 }
 
 //=============================================================================================================
 
-bool MneSurf2BemSettings::checkMore() const
+bool MNESurf2BemSettings::checkMore() const
 {
     return m_bCheckMore;
 }
 
 //=============================================================================================================
 
-bool MneSurf2BemSettings::force() const
+bool MNESurf2BemSettings::force() const
 {
     return m_bForce;
 }

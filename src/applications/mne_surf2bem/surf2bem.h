@@ -71,7 +71,7 @@ namespace MNESURF2BEM {
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneSurf2BemSettings;
+class MNESurf2BemSettings;
 struct SurfaceInput;
 
 //=============================================================================================================
@@ -97,7 +97,7 @@ public:
      *
      * @param[in] settings  The parsed command-line settings.
      */
-    Surf2Bem(const MneSurf2BemSettings& settings);
+    Surf2Bem(const MNESurf2BemSettings& settings);
 
     //=========================================================================================================
     /**
@@ -156,7 +156,7 @@ private:
 
     //=========================================================================================================
 
-    const MneSurf2BemSettings& m_settings;  /**< Command-line settings. */
+    const MNESurf2BemSettings& m_settings;  /**< Command-line settings. */
 };
 
 } // namespace MNESURF2BEM

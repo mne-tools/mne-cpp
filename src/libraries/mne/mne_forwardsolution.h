@@ -31,7 +31,7 @@
  *
  *
  * @brief     MNEForwardSolution class declaration, which provides the forward solution including
- *           the source space (MNESourceSpace).
+ *           the source space (MNESourceSpaces).
  *
  */
 
@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "mne_global.h"
-#include "mne_sourcespace.h"
+#include "mne_source_spaces.h"
 
 #include <utils/mnemath.h>
 #include <utils/kmeans.h>
@@ -530,7 +530,7 @@ public:
     FIFFLIB::FiffNamedMatrix::SDPtr sol;        /**< Forward solution. */
     FIFFLIB::FiffNamedMatrix::SDPtr sol_grad;   /**< ToDo... */
     FIFFLIB::FiffCoordTrans mri_head_t;         /**< MRI head coordinate transformation. */
-    MNESourceSpace src;                         /**< Geometric description of the source spaces (hemispheres). */
+    MNESourceSpaces src;                         /**< Geometric description of the source spaces (hemispheres). */
     Eigen::MatrixX3f source_rr;                 /**< Source locations. */
     Eigen::MatrixX3f source_nn;                 /**< Source normals (number depends on fixed or free orientation). */
 };
@@ -541,7 +541,8 @@ public:
 
 inline bool MNEForwardSolution::isClustered() const
 {
-    return src[0].isClustered();
+    auto* hemi = src.hemisphereAt(0);
+    return hemi && hemi->isClustered();
 }
 
 //=============================================================================================================

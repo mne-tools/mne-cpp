@@ -134,7 +134,7 @@ void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface &surf, const QColo
     // Compute normals if missing
     Eigen::MatrixX3f nn = surf.nn;
     if (nn.rows() != nVerts) {
-        nn = FSLIB::Surface::compute_normals(surf.rr, surf.tris);
+        nn = FSLIB::Surface::compute_normals(Eigen::MatrixX3f(surf.rr), Eigen::MatrixX3i(surf.itris));
     }
     
     m_defaultColor = color;
@@ -150,12 +150,12 @@ void BrainSurface::fromBemSurface(const MNELIB::MNEBemSurface &surf, const QColo
         m_vertexData.append(v);
     }
 
-    int nTris = surf.tris.rows();
+    int nTris = surf.itris.rows();
     m_indexData.reserve(nTris * 3);
     for (int i = 0; i < nTris; ++i) {
-        m_indexData.append(surf.tris(i, 0));
-        m_indexData.append(surf.tris(i, 1));
-        m_indexData.append(surf.tris(i, 2));
+        m_indexData.append(surf.itris(i, 0));
+        m_indexData.append(surf.itris(i, 1));
+        m_indexData.append(surf.itris(i, 2));
     }
     m_indexCount = m_indexData.size();
     

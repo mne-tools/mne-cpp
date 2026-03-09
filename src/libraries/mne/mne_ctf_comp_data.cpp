@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneCTFCompData Class.
+ * @brief    Definition of the MNECTFCompData Class.
  *
  */
 
@@ -83,7 +83,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneCTFCompData::MneCTFCompData()
+MNECTFCompData::MNECTFCompData()
 :kind(MNE_CTFV_COMP_UNKNOWN)
 ,mne_kind(MNE_CTFV_COMP_UNKNOWN)
 ,calibrated(FALSE)
@@ -92,7 +92,7 @@ MneCTFCompData::MneCTFCompData()
 
 //=============================================================================================================
 
-MneCTFCompData::MneCTFCompData(const MneCTFCompData& comp)
+MNECTFCompData::MNECTFCompData(const MNECTFCompData& comp)
 :kind(MNE_CTFV_COMP_UNKNOWN)
 ,mne_kind(MNE_CTFV_COMP_UNKNOWN)
 ,calibrated(FALSE)
@@ -100,7 +100,7 @@ MneCTFCompData::MneCTFCompData(const MneCTFCompData& comp)
     kind       = comp.kind;
     mne_kind   = comp.mne_kind;
     calibrated = comp.calibrated;
-    data       = std::make_unique<MneNamedMatrix>(*comp.data);
+    data       = std::make_unique<MNENamedMatrix>(*comp.data);
 
     presel     = std::make_unique<FiffSparseMatrix>(*comp.presel);
     postsel    = std::make_unique<FiffSparseMatrix>(*comp.postsel);
@@ -108,13 +108,13 @@ MneCTFCompData::MneCTFCompData(const MneCTFCompData& comp)
 
 //=============================================================================================================
 
-MneCTFCompData::~MneCTFCompData()
+MNECTFCompData::~MNECTFCompData()
 {
 }
 
 //=============================================================================================================
 
-int MneCTFCompData::calibrate(const QList<FIFFLIB::FiffChInfo>& chs, int nch, int do_it)
+int MNECTFCompData::calibrate(const QList<FIFFLIB::FiffChInfo>& chs, int nch, int do_it)
 {
     Eigen::VectorXf col_cals(this->data->ncol);
     Eigen::VectorXf row_cals(this->data->nrow);

@@ -116,9 +116,9 @@ double SurfaceChecks::sumSolids(const Vector3f& from, const MNEBemSurface& surf)
 {
     double totAngle = 0.0;
     for (int k = 0; k < surf.ntri; ++k) {
-        Vector3f v0 = surf.rr.row(surf.tris(k, 0));
-        Vector3f v1 = surf.rr.row(surf.tris(k, 1));
-        Vector3f v2 = surf.rr.row(surf.tris(k, 2));
+        Vector3f v0 = surf.rr.row(surf.itris(k, 0));
+        Vector3f v1 = surf.rr.row(surf.itris(k, 1));
+        Vector3f v2 = surf.rr.row(surf.itris(k, 2));
         totAngle += solidAngle(from, v0, v1, v2);
     }
     return totAngle;

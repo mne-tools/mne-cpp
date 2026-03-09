@@ -68,7 +68,7 @@ namespace MNESETUPFORWARDMODEL {
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneSetupForwardModelSettings;
+class MNESetupForwardModelSettings;
 
 //=============================================================================================================
 /**
@@ -93,7 +93,7 @@ public:
      *
      * @param[in] settings  The parsed command-line settings.
      */
-    SetupForwardModel(const MneSetupForwardModelSettings& settings);
+    SetupForwardModel(const MNESetupForwardModelSettings& settings);
 
     //=========================================================================================================
     /**
@@ -206,7 +206,7 @@ private:
 
     //=========================================================================================================
 
-    const MneSetupForwardModelSettings& m_settings;  /**< Command-line settings. */
+    const MNESetupForwardModelSettings& m_settings;  /**< Command-line settings. */
 };
 
 } // namespace MNESETUPFORWARDMODEL

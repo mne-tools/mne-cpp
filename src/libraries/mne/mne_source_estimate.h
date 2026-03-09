@@ -1,7 +1,7 @@
 
 //=============================================================================================================
 /**
- * @file     mne_sourceestimate.h
+ * @file     mne_source_estimate.h
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>

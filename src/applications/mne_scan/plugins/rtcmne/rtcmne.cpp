@@ -49,7 +49,7 @@
 #include <fiff/fiff_info.h>
 
 #include <mne/mne_forwardsolution.h>
-#include <mne/mne_sourceestimate.h>
+#include <mne/mne_source_estimate.h>
 #include <mne/mne_epoch_data_list.h>
 
 #include <inverse/minimumNorm/minimumnorm.h>

@@ -73,20 +73,20 @@ namespace MNELIB
 /**
  * @brief A single SSP (Signal-Space Projection) item.
  *
- * MneProjItem holds one linear projection operator consisting of a set of
- * projection vectors (stored as an MneNamedMatrix), together with metadata
+ * MNEProjItem holds one linear projection operator consisting of a set of
+ * projection vectors (stored as an MNENamedMatrix), together with metadata
  * such as the projection kind, a human-readable description, and flags
  * indicating whether the item is currently active and which channel types
  * (MEG / EEG) it covers.
  *
- * Projection items are aggregated by MneProjOp to form the complete SSP
+ * Projection items are aggregated by MNEProjOp to form the complete SSP
  * operator that is applied during inverse computations and dipole fitting.
  */
-class MNESHARED_EXPORT MneProjItem
+class MNESHARED_EXPORT MNEProjItem
 {
 public:
-    typedef QSharedPointer<MneProjItem> SPtr;              /**< Shared pointer type for MneProjItem. */
-    typedef QSharedPointer<const MneProjItem> ConstSPtr;   /**< Const shared pointer type for MneProjItem. */
+    typedef QSharedPointer<MNEProjItem> SPtr;              /**< Shared pointer type for MNEProjItem. */
+    typedef QSharedPointer<const MNEProjItem> ConstSPtr;   /**< Const shared pointer type for MNEProjItem. */
 
     //=========================================================================================================
     /**
@@ -95,7 +95,7 @@ public:
      * Initialises all flags to their default values (active = true,
      * kind = FIFFV_PROJ_ITEM_NONE, no MEG/EEG channels).
      */
-    MneProjItem();
+    MNEProjItem();
 
     //=========================================================================================================
     /**
@@ -103,7 +103,7 @@ public:
      *
      * Deep-copies the projection vectors (unique_ptr member).
      */
-    MneProjItem(const MneProjItem& other);
+    MNEProjItem(const MNEProjItem& other);
 
     //=========================================================================================================
     /**
@@ -111,25 +111,25 @@ public:
      *
      * Deep-copies the projection vectors (unique_ptr member).
      */
-    MneProjItem& operator=(const MneProjItem& other);
+    MNEProjItem& operator=(const MNEProjItem& other);
 
     //=========================================================================================================
     /**
      * @brief Move constructor (defaulted).
      */
-    MneProjItem(MneProjItem&&) noexcept = default;
+    MNEProjItem(MNEProjItem&&) noexcept = default;
 
     //=========================================================================================================
     /**
      * @brief Move assignment operator (defaulted).
      */
-    MneProjItem& operator=(MneProjItem&&) noexcept = default;
+    MNEProjItem& operator=(MNEProjItem&&) noexcept = default;
 
     //=========================================================================================================
     /**
      * @brief Destructor.
      */
-    ~MneProjItem();
+    ~MNEProjItem();
 
     //=========================================================================================================
     /**
@@ -147,7 +147,7 @@ public:
     int affect(const QStringList& list, int nlist) const;
 
 public:
-    std::unique_ptr<MneNamedMatrix> vecs; /**< Projection vectors (nrow = nvec, ncol = nch); may be nullptr when nvec == 0. */
+    std::unique_ptr<MNENamedMatrix> vecs; /**< Projection vectors (nrow = nvec, ncol = nch); may be nullptr when nvec == 0. */
     int             nvec;           /**< Number of projection vectors (== vecs->nrow when vecs is set). */
     QString         desc;           /**< Human-readable description (e.g. "PCA-v1"). */
     int             kind;           /**< FIFF projection item kind (FIFFV_PROJ_ITEM_*). */

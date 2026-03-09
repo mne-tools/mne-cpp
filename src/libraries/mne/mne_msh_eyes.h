@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneMshEyes class declaration.
+ * @brief    MNEMshEyes class declaration.
  *
  */
 
@@ -62,23 +62,23 @@ namespace MNELIB
  *
  * Stores left and right hemisphere viewpoints and up-vectors.
  */
-class MNESHARED_EXPORT MneMshEyes
+class MNESHARED_EXPORT MNEMshEyes
 {
 public:
-    typedef QSharedPointer<MneMshEyes> SPtr;              /**< Shared pointer type for MneMshEyes. */
-    typedef QSharedPointer<const MneMshEyes> ConstSPtr;   /**< Const shared pointer type for MneMshEyes. */
+    typedef QSharedPointer<MNEMshEyes> SPtr;              /**< Shared pointer type for MNEMshEyes. */
+    typedef QSharedPointer<const MNEMshEyes> ConstSPtr;   /**< Const shared pointer type for MNEMshEyes. */
 
     //=========================================================================================================
     /**
-     * Constructs an empty MneMshEyes.
+     * Constructs an empty MNEMshEyes.
      */
-    MneMshEyes() = default;
+    MNEMshEyes() = default;
 
     //=========================================================================================================
     /**
      * Destructor.
      */
-    ~MneMshEyes() = default;
+    ~MNEMshEyes() = default;
 
 public:
     QString name;              /**< Name of this viewpoint definition. */

@@ -12,7 +12,7 @@
 #include <fiff/fiff_stream.h>
 #include <fiff/fiff_coord_trans.h>
 #include <fwd/fwd_bem_model.h>
-#include <mne/mne_surface_old.h>
+#include <mne/mne_surface.h>
 
 #include <fwd/fwd_comp_data.h>
 
@@ -455,7 +455,7 @@ namespace MNELIB
 
 }
 
-int mne_is_diag_cov_3(MneCovMatrix* c)
+int mne_is_diag_cov_3(MNECovMatrix* c)
 
 {
     return c->cov_diag.size() > 0;
@@ -569,7 +569,7 @@ int mne_svd_3(float **mat,	/* The matrix */
     //  return info;
 }
 
-void mne_free_cov_3(MneCovMatrix* c)
+void mne_free_cov_3(MNECovMatrix* c)
 /*
  * Free a covariance matrix and all its data
  */
@@ -804,7 +804,7 @@ static int mne_lt_packed_index_3(int j, int k)
  * Handle the linear projection operators
  */
 
-int mne_add_inv_cov_3(MneCovMatrix* c)
+int mne_add_inv_cov_3(MNECovMatrix* c)
 /*
       * Calculate the inverse square roots for whitening
       */
@@ -826,7 +826,7 @@ int mne_add_inv_cov_3(MneCovMatrix* c)
     return OK;
 }
 
-static int condition_cov_3(MneCovMatrix* c, float rank_threshold, int use_rank)
+static int condition_cov_3(MNECovMatrix* c, float rank_threshold, int use_rank)
 
 {
     double *scale  = NULL;
@@ -966,7 +966,7 @@ static int check_cov_data(double *vals, int nval)
     return OK;
 }
 
-int mne_classify_channels_cov(MneCovMatrix* cov,
+int mne_classify_channels_cov(MNECovMatrix* cov,
                               const QList<FiffChInfo>& chs,
                               int nchan)
 /*
@@ -1010,7 +1010,7 @@ bad : {
     }
 }
 
-static int mne_decompose_eigen_cov_small_3(MneCovMatrix* c,float small, int use_rank)
+static int mne_decompose_eigen_cov_small_3(MNECovMatrix* c,float small, int use_rank)
 /*
       * Do the eigenvalue decomposition
       */
@@ -1080,7 +1080,7 @@ bad : {
     }
 }
 
-int mne_decompose_eigen_cov_3(MneCovMatrix* c)
+int mne_decompose_eigen_cov_3(MNECovMatrix* c)
 
 {
     return mne_decompose_eigen_cov_small_3(c,-1.0,-1);
@@ -1088,7 +1088,7 @@ int mne_decompose_eigen_cov_3(MneCovMatrix* c)
 
 //============================= mne_whiten.c =============================
 
-int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, MneCovMatrix* C)
+int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, MNECovMatrix* C)
 /*
       * Apply the whitening operation
       */
@@ -1134,7 +1134,7 @@ int mne_whiten_data(float **data, float **whitened_data, int np, int nchan, MneC
     return OK;
 }
 
-int mne_whiten_one_data(float *data, float *whitened_data, int nchan, MneCovMatrix* C)
+int mne_whiten_one_data(float *data, float *whitened_data, int nchan, MNECovMatrix* C)
 
 {
     float *datap[1];
@@ -1163,7 +1163,7 @@ static void free_dipole_fit_funcs(dipoleFitFuncs f)
     return;
 }
 
-//static void regularize_cov(MneCovMatrix* c,       /* The matrix to regularize */
+//static void regularize_cov(MNECovMatrix* c,       /* The matrix to regularize */
 //                           float        *regs,   /* Regularization values to apply (fractions of the
 //                                                     * average diagonal values for each class */
 //                           int          *active) /* Which of the channels are 'active' */
@@ -1217,7 +1217,7 @@ static void free_dipole_fit_funcs(dipoleFitFuncs f)
 //    return;
 //}
 
-void mne_regularize_cov(MneCovMatrix* c,       /* The matrix to regularize */
+void mne_regularize_cov(MNECovMatrix* c,       /* The matrix to regularize */
                         float        *regs)   /* Regularization values to apply (fractions of the
                            * average diagonal values for each class */
 /*
@@ -1436,7 +1436,7 @@ namespace MNELIB
  * @brief Workspace for sphere-fitting optimization, holding digitizer point coordinates and count.
  */
 typedef struct {
-    const MneSurfaceOrVolume::PointsT* rr;
+    const MNESurfaceOrVolume::PointsT* rr;
     int   np;
     int   report;
 } *fitSphereUser,fitSphereUserRec;
@@ -1504,7 +1504,7 @@ static float opt_rad(float *r0,fitSphereUser user)
     return sum/user->np;
 }
 
-static void calculate_cm_ave_dist(const MneSurfaceOrVolume::PointsT& rr, int np, float *cm, float *avep)
+static void calculate_cm_ave_dist(const MNESurfaceOrVolume::PointsT& rr, int np, float *cm, float *avep)
 
 {
     int k,q;
@@ -1549,7 +1549,7 @@ static float **make_initial_simplex(float  *pars,
     return (simplex);
 }
 
-int fit_sphere_to_points(const MneSurfaceOrVolume::PointsT& rr,
+int fit_sphere_to_points(const MNESurfaceOrVolume::PointsT& rr,
                          int   np,
                          float simplex_size,
                          float *r0,
@@ -1623,15 +1623,15 @@ out : {
 
 //============================= mne_lin_proj.c =============================
 
-void mne_proj_op_report_data_3(QTextStream &out,const char *tag, MneProjOp* op, int list_data,
+void mne_proj_op_report_data_3(QTextStream &out,const char *tag, MNEProjOp* op, int list_data,
                              char **exclude, int nexclude)
 /*
  * Output info about the projection operator
  */
 {
     int j,k,p,q;
-    MneProjItem* it;
-    MneNamedMatrix* vecs;
+    MNEProjItem* it;
+    MNENamedMatrix* vecs;
     int found;
 
     if (op == NULL)
@@ -1678,14 +1678,14 @@ void mne_proj_op_report_data_3(QTextStream &out,const char *tag, MneProjOp* op, 
     return;
 }
 
-void mne_proj_op_report_3(QTextStream &out,const char *tag, MneProjOp* op)
+void mne_proj_op_report_3(QTextStream &out,const char *tag, MNEProjOp* op)
 {
     mne_proj_op_report_data_3(out,tag,op, FALSE, NULL, 0);
 }
 
 //============================= mne_named_vector.c =============================
 
-int mne_pick_from_named_vector_3(MneNamedVector* vec, const QStringList& names, int nnames, int require_all, float *res)
+int mne_pick_from_named_vector_3(MNENamedVector* vec, const QStringList& names, int nnames, int require_all, float *res)
 /*
  * Pick the desired elements from the named vector
  */
@@ -1720,14 +1720,14 @@ int mne_pick_from_named_vector_3(MneNamedVector* vec, const QStringList& names, 
 
 //============================= mne_lin_proj_io.c =============================
 
-MneProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
+MNEProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
                                      FiffStream::SPtr& stream,
                                      const FiffDirNode::SPtr& start)
 /*
  * Load all the linear projection data
  */
 {
-    MneProjOp*  op     = NULL;
+    MNEProjOp*  op     = NULL;
     QList<FiffDirNode::SPtr> proj;
     FiffDirNode::SPtr start_node;
     QList<FiffDirNode::SPtr> items;
@@ -1753,7 +1753,7 @@ MneProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
     else
         start_node = start;
 
-    op = new MneProjOp();
+    op = new MNEProjOp();
     proj = start_node->dir_tree_find(FIFFB_PROJ);
     if (proj.size() == 0 || proj[0]->isEmpty())   /* The caller must recognize an empty projection */
         goto out;
@@ -1854,7 +1854,7 @@ MneProjOp* mne_read_proj_op_from_node_3(//fiffFile in,
         /*
         * Ready to add
         */
-        auto item = MneNamedMatrix::build(item_nvec,item_nchan,emptyList,item_names,item_vectors);
+        auto item = MNENamedMatrix::build(item_nvec,item_nchan,emptyList,item_names,item_vectors);
         op->add_item_active(item.get(),item_kind,item_desc,item_active);
         op->items[op->nitems-1].active_file = item_active;
     }
@@ -1869,7 +1869,7 @@ bad : {
     }
 }
 
-MneProjOp* mne_read_proj_op_3(const QString& name)
+MNEProjOp* mne_read_proj_op_3(const QString& name)
 
 {
     QFile file(name);
@@ -1878,7 +1878,7 @@ MneProjOp* mne_read_proj_op_3(const QString& name)
     if(!stream->open())
         return NULL;
 
-    MneProjOp*  res = NULL;
+    MNEProjOp*  res = NULL;
 
     FiffDirNode::SPtr t_default;
     res = mne_read_proj_op_from_node_3(stream,t_default);
@@ -1888,7 +1888,7 @@ MneProjOp* mne_read_proj_op_3(const QString& name)
     return res;
 }
 
-int mne_proj_op_chs_3(MneProjOp* op, const QStringList& list, int nlist)
+int mne_proj_op_chs_3(MNEProjOp* op, const QStringList& list, int nlist)
 
 {
     if (op == NULL)
@@ -1917,7 +1917,7 @@ static void clear_these(float *data, const QStringList& names, int nnames, const
 #define USE_LIMIT   1e-5
 #define SMALL_VALUE 1e-4
 
-int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
+int mne_proj_op_make_proj_bad(MNEProjOp* op, char **bad, int nbad)
 /*
  * Do the channel picking and SVD
  * Include a bad list at this phase
@@ -1934,7 +1934,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
     float **mat_eeg = NULL;
     int   nvec_meg;
     int   nvec_eeg;
-    MneNamedVector vec;
+    MNENamedVector vec;
     float size;
     int   nzero;
 #ifdef DEBUG
@@ -2077,7 +2077,7 @@ int mne_proj_op_make_proj_bad(MneProjOp* op, char **bad, int nbad)
 #ifdef DEBUG
     printf("Number of linearly independent vectors = %d\n",op->nvec);
 #endif
-    op->proj_data = MneProjOp::RowMajorMatrixXf::Zero(op->nvec,op->nch);
+    op->proj_data = MNEProjOp::RowMajorMatrixXf::Zero(op->nvec,op->nch);
 #ifdef DEBUG
     fprintf(stdout,"Final projection data:\n");
 #endif
@@ -2153,7 +2153,7 @@ bad : {
     }
 }
 
-int mne_proj_op_make_proj(MneProjOp* op)
+int mne_proj_op_make_proj(MNEProjOp* op)
 /*
  * Do the channel picking and SVD
  */
@@ -2461,7 +2461,7 @@ int mne_read_bad_channel_list_3(const QString& name, QStringList& listp, int& nl
     return res;
 }
 
-std::unique_ptr<MneCovMatrix> mne_read_cov(const QString& name,int kind)
+std::unique_ptr<MNECovMatrix> mne_read_cov(const QString& name,int kind)
 /*
  * Read a covariance matrix from a fiff
  */
@@ -2485,13 +2485,13 @@ std::unique_ptr<MneCovMatrix> mne_read_cov(const QString& name,int kind)
     int             nbad       = 0;
     int             ncov       = 0;
     int             nfree      = 1;
-    std::unique_ptr<MneCovMatrix> res;
+    std::unique_ptr<MNECovMatrix> res;
 
     int            k,p,nn;
     float          *f;
     double         *d;
-    MneProjOp*      op = NULL;
-    MneSssData*     sss = NULL;
+    MNEProjOp*      op = NULL;
+    MNESssData*     sss = NULL;
 
     if(!stream->open())
         goto out;
@@ -2606,7 +2606,7 @@ std::unique_ptr<MneCovMatrix> mne_read_cov(const QString& name,int kind)
         /*
         * Read the optional SSS data
         */
-        if ((sss = MneSssData::read_from_node(stream,nodes[k])) == NULL)
+        if ((sss = MNESssData::read_from_node(stream,nodes[k])) == NULL)
             goto out;
         /*
         * Read the optional bad channel list
@@ -2615,11 +2615,11 @@ std::unique_ptr<MneCovMatrix> mne_read_cov(const QString& name,int kind)
             goto out;
     }
     if (cov_sparse)
-        res = MneCovMatrix::create_sparse(kind,ncov,names,cov_sparse);
+        res = MNECovMatrix::create_sparse(kind,ncov,names,cov_sparse);
     else if (cov.size() > 0)
-        res = MneCovMatrix::create_dense(kind,ncov,names,cov);
+        res = MNECovMatrix::create_dense(kind,ncov,names,cov);
     else if (cov_diag.size() > 0)
-        res = MneCovMatrix::create_diag(kind,ncov,names,cov_diag);
+        res = MNECovMatrix::create_diag(kind,ncov,names,cov_diag);
     else {
         qCritical("mne_read_cov : covariance matrix data is not defined. How come?");
         goto out;
@@ -3008,7 +3008,7 @@ bad : {
     }
 }
 
-void mne_revert_to_diag_cov(MneCovMatrix* c)
+void mne_revert_to_diag_cov(MNECovMatrix* c)
 /*
  * Pick the diagonal elements of the full covariance matrix
  */
@@ -3037,7 +3037,7 @@ void mne_revert_to_diag_cov(MneCovMatrix* c)
     return;
 }
 
-std::unique_ptr<MneCovMatrix> mne_pick_chs_cov_omit(MneCovMatrix* c,
+std::unique_ptr<MNECovMatrix> mne_pick_chs_cov_omit(MNECovMatrix* c,
                                     const QStringList& new_names,
                                     int ncov,
                                     int omit_meg_eeg,
@@ -3053,7 +3053,7 @@ std::unique_ptr<MneCovMatrix> mne_pick_chs_cov_omit(MneCovMatrix* c,
     QStringList names;
     int   *is_meg = NULL;
     int   from,to;
-    std::unique_ptr<MneCovMatrix> res;
+    std::unique_ptr<MNECovMatrix> res;
 
     if (ncov == 0) {
         qCritical("No channels specified for picking in mne_pick_chs_cov_omit");
@@ -3126,12 +3126,12 @@ std::unique_ptr<MneCovMatrix> mne_pick_chs_cov_omit(MneCovMatrix* c,
         }
     }
 
-    res = MneCovMatrix::create(c->kind,ncov,names,cov_local,cov_diag_local);
+    res = MNECovMatrix::create(c->kind,ncov,names,cov_local,cov_diag_local);
 
     res->bads = c->bads;
     res->nbad = c->nbad;
     res->proj.reset(c->proj ? c->proj->dup() : nullptr);
-    res->sss.reset(c->sss ? new MneSssData(*(c->sss)) : nullptr);
+    res->sss.reset(c->sss ? new MNESssData(*(c->sss)) : nullptr);
 
     if (c->ch_class.size() > 0) {
         res->ch_class.resize(res->ncov);
@@ -3143,7 +3143,7 @@ std::unique_ptr<MneCovMatrix> mne_pick_chs_cov_omit(MneCovMatrix* c,
     return res;
 }
 
-int mne_proj_op_proj_dvector(MneProjOp* op, double *vec, int nch, int do_complement)
+int mne_proj_op_proj_dvector(MNEProjOp* op, double *vec, int nch, int do_complement)
 /*
  * Apply projection operator to a vector (doubles)
  * Assume that all dimension checking etc. has been done before
@@ -3220,7 +3220,7 @@ void mne_transpose_dsquare(double **mat, int n)
     return;
 }
 
-int mne_proj_op_apply_cov(MneProjOp* op, MneCovMatrix* c)
+int mne_proj_op_apply_cov(MNEProjOp* op, MNECovMatrix* c)
 /*
  * Apply the projection operator to a covariance matrix
  */
@@ -3326,7 +3326,7 @@ DipoleFitData::~DipoleFitData()
 
 //=============================================================================================================
 
-int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp_data, FwdCoilSet *comp_coils)
+int DipoleFitData::setup_forward_model(DipoleFitData *d, MNECTFCompDataSet* comp_data, FwdCoilSet *comp_coils)
 /*
      * Take care of some hairy details
      */
@@ -3370,7 +3370,7 @@ int DipoleFitData::setup_forward_model(DipoleFitData *d, MneCTFCompDataSet* comp
          * Find the best-fitting sphere
          */
         if (fit_sphere_to_bem) {
-            MneSurfaceOld* inner_skull;
+            MNESurface* inner_skull;
             float      simplex_size = 2e-2;
             float      R;
 
@@ -3485,7 +3485,7 @@ out :
 
 //=============================================================================================================
 
-std::unique_ptr<MneCovMatrix> DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, float grad_std, float mag_std, float eeg_std)
+std::unique_ptr<MNECovMatrix> DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCoilSet *eeg, float grad_std, float mag_std, float eeg_std)
 /*
      * Specify constant noise values
      */
@@ -3531,7 +3531,7 @@ std::unique_ptr<MneCovMatrix> DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCo
         }
     }
     names = ch_names;
-    return MneCovMatrix::create(FIFFV_MNE_NOISE_COV,nchan,names,Eigen::VectorXd(),stds);
+    return MNECovMatrix::create(FIFFV_MNE_NOISE_COV,nchan,names,Eigen::VectorXd(),stds);
 }
 
 //=============================================================================================================
@@ -3539,13 +3539,13 @@ std::unique_ptr<MneCovMatrix> DipoleFitData::ad_hoc_noise(FwdCoilSet *meg, FwdCo
 int DipoleFitData::make_projection(const QList<QString> &projnames,
                                    const QList<FiffChInfo>& chs,
                                    int nch,
-                                   MneProjOp* *res)
+                                   MNEProjOp* *res)
 /*
           * Process the projection data
           */
 {
-    MneProjOp* all  = NULL;
-    MneProjOp* one  = NULL;
+    MNEProjOp* all  = NULL;
+    MNEProjOp* one  = NULL;
     int       k,found;
     int       neeg;
 
@@ -3568,7 +3568,7 @@ int DipoleFitData::make_projection(const QList<QString> &projnames,
         else {
             printf("Loaded projection from %s:\n",projnames[k].toUtf8().data());
             { QTextStream errStream(stderr); mne_proj_op_report_3(errStream,"\t",one); }
-            all = all ? all->combine(one) : (new MneProjOp())->combine(one);
+            all = all ? all->combine(one) : (new MNEProjOp())->combine(one);
             if(one)
                 delete one;
             one = NULL;
@@ -3585,10 +3585,10 @@ int DipoleFitData::make_projection(const QList<QString> &projnames,
                 }
         }
         if (!found) {
-            if ((one = MneProjOp::create_average_eeg_ref(chs,nch)) != NULL) {
+            if ((one = MNEProjOp::create_average_eeg_ref(chs,nch)) != NULL) {
                 printf("Average EEG reference projection added:\n");
                 { QTextStream errStream(stderr); mne_proj_op_report_3(errStream,"\t",one); }
-                all = all ? all->combine(one) : (new MneProjOp())->combine(one);
+                all = all ? all->combine(one) : (new MNEProjOp())->combine(one);
                 if(one)
                     delete one;
                 one = NULL;
@@ -3813,9 +3813,9 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
     QStringList     file_bads;
     int             file_nbad;
     int             coord_frame = FIFFV_COORD_HEAD;
-    std::unique_ptr<MneCovMatrix> cov;
+    std::unique_ptr<MNECovMatrix> cov;
     FwdCoilSet*     templates = NULL;
-    std::unique_ptr<MneCTFCompDataSet> comp_data;
+    std::unique_ptr<MNECTFCompDataSet> comp_data;
     FwdCoilSet*        comp_coils = NULL;
 
     /*
@@ -3952,7 +3952,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
     /*
        * Compensation data
        */
-    comp_data = MneCTFCompDataSet::read(measname);
+    comp_data = MNECTFCompDataSet::read(measname);
     if (!comp_data)
         goto bad;
     if (comp_data->ncomp > 0) {	/* Compensation channel information may be needed */
@@ -3994,7 +3994,7 @@ DipoleFitData *DipoleFitData::setup_dipole_fit_data(const QString &mriname,
        * Projection data should go here
        */
     {
-        MneProjOp* proj_raw = nullptr;
+        MNEProjOp* proj_raw = nullptr;
         if (make_projection(projnames,
                             res->chs,
                             res->nmeg+res->neeg,
@@ -4133,7 +4133,7 @@ void print_fields(float       *rd,
                   float       time,
                   float       integ,
                   DipoleFitData* fit,
-                  MneMeasData* data)
+                  MNEMeasData* data)
 
 {
     float *one = MALLOC_3(data->nchan,float);

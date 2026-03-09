@@ -23,11 +23,11 @@ namespace MNELIB
 /**
  * Sparse named matrix - matrix specification with row/column name lists.
  */
-class MNESHARED_EXPORT MneSparseNamedMatrix
+class MNESHARED_EXPORT MNESparseNamedMatrix
 {
 public:
-    MneSparseNamedMatrix() = default;
-    ~MneSparseNamedMatrix() = default;
+    MNESparseNamedMatrix() = default;
+    ~MNESparseNamedMatrix() = default;
 
     int   nrow = 0;                        /**< Number of rows (same as in data). */
     int   ncol = 0;                        /**< Number of columns (same as in data). */

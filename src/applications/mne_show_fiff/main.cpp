@@ -78,8 +78,8 @@ int main(int argc, char *argv[])
 {
     QCoreApplication app(argc, argv);
 
-    MneShowFiffSettings settings(&argc,argv);
-    MneFiffExpSet expSet = MneFiffExpSet::read_fiff_explanations(QCoreApplication::applicationDirPath()+"/resources/general/explanations/fiff_explanations.txt");
+    MNEShowFiffSettings settings(&argc,argv);
+    MNEFiffExpSet expSet = MNEFiffExpSet::read_fiff_explanations(QCoreApplication::applicationDirPath()+"/resources/general/explanations/fiff_explanations.txt");
     expSet.show_fiff_contents(stdout, settings);
 
     return 0;

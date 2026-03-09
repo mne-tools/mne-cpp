@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneCTFCompData class declaration.
+ * @brief    MNECTFCompData class declaration.
  *
  */
 
@@ -76,19 +76,19 @@ namespace MNELIB
  *
  * Holds the compensation matrix together with optional sparse
  * pre-/post-selectors and intermediate computation buffers used
- * by MneCTFCompDataSet::apply() and apply_transpose().
+ * by MNECTFCompDataSet::apply() and apply_transpose().
  */
-class MNESHARED_EXPORT MneCTFCompData
+class MNESHARED_EXPORT MNECTFCompData
 {
 public:
-    typedef QSharedPointer<MneCTFCompData> SPtr;              /**< Shared pointer type for MneCTFCompData. */
-    typedef QSharedPointer<const MneCTFCompData> ConstSPtr;   /**< Const shared pointer type for MneCTFCompData. */
+    typedef QSharedPointer<MNECTFCompData> SPtr;              /**< Shared pointer type for MNECTFCompData. */
+    typedef QSharedPointer<const MNECTFCompData> ConstSPtr;   /**< Const shared pointer type for MNECTFCompData. */
 
     //=========================================================================================================
     /**
      * Constructs an empty MNE CTF Compensation Data object.
      */
-    MneCTFCompData();
+    MNECTFCompData();
 
     //=========================================================================================================
     /**
@@ -96,13 +96,13 @@ public:
      *
      * @param[in] comp  The compensation data to copy.
      */
-    MneCTFCompData(const MneCTFCompData& comp);
+    MNECTFCompData(const MNECTFCompData& comp);
 
     //=========================================================================================================
     /**
      * Destructor.
      */
-    ~MneCTFCompData();
+    ~MNECTFCompData();
 
     /**
      * Apply or remove channel calibration to/from the compensation matrix
@@ -122,7 +122,7 @@ public:
     int             kind;                   /**< The CTF compensation kind constant. */
     int             mne_kind;               /**< MNE-internal compensation kind. */
     int             calibrated;             /**< Whether the coefficients are already calibrated. */
-    std::unique_ptr<MneNamedMatrix>            data;      /**< The compensation matrix. */
+    std::unique_ptr<MNENamedMatrix>            data;      /**< The compensation matrix. */
     std::unique_ptr<FIFFLIB::FiffSparseMatrix>   presel;    /**< Sparse selector applied before compensation. */
     std::unique_ptr<FIFFLIB::FiffSparseMatrix>   postsel;   /**< Sparse selector applied after compensation. */
     Eigen::VectorXf  presel_data;            /**< Intermediate buffer for pre-selection results. */

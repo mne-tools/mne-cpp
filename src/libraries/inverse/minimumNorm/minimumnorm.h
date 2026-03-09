@@ -138,7 +138,7 @@ public:
      *
      * @return the source space corresponding to this inverse operator.
      */
-    virtual const MNELIB::MNESourceSpace& getSourceSpace() const;
+    virtual const MNELIB::MNESourceSpaces& getSourceSpace() const;
 
     //=========================================================================================================
     /**

@@ -43,8 +43,8 @@
 
 #include "mne_global.h"
 
-#include "mne_source_space_old.h"
-#include "mne_surface_old.h"
+#include "mne_source_space.h"
+#include "mne_surface.h"
 
 //=============================================================================================================
 // EIGEN INCLUDES
@@ -98,18 +98,18 @@ public:
     ~FilterThreadArg();
 
 public:
-    MneSourceSpaceOld* s;           /**< The source space to process. */
+    MNESourceSpace* s;           /**< The source space to process. */
     std::unique_ptr<FIFFLIB::FiffCoordTrans> mri_head_t;  /**< MRI-to-head coordinate transformation. */
-    QWeakPointer<MneSurfaceOld> surf;  /**< Non-owning reference to the inner skull BEM surface (caller holds QSharedPointer). */
+    QWeakPointer<MNESurface> surf;  /**< Non-owning reference to the inner skull BEM surface (caller holds QSharedPointer). */
     float          limit;           /**< Distance limit for filtering (meters). */
     QTextStream    *filtered;       /**< Optional stream to log omitted point locations (may be NULL). */
     int            stat;            /**< Status code indicating whether filtering succeeded. */
 
 // ### OLD STRUCT ###
 //typedef struct {
-//    MneSourceSpaceOld* s;           /* The source space to process */
+//    MNESourceSpace* s;           /* The source space to process */
 //    FiffCoordTransOld* mri_head_t;  /* Coordinate transformation */
-//    MneSurfaceOld*   surf;          /* The inner skull surface */
+//    MNESurface*   surf;          /* The inner skull surface */
 //    float          limit;           /* Distance limit */
 //    FILE           *filtered;       /* Log omitted point locations here */
 //    int            stat;            /* How was it? */

@@ -50,6 +50,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 //=============================================================================================================
 // STL INCLUDES
@@ -172,6 +173,24 @@ public:
      * @return true if the matrix has no data.
      */
     inline bool is_empty() const;
+
+    /**
+     * Convert this FiffSparseMatrix to an Eigen::SparseMatrix<double>.
+     * Supports both RCS and CCS coding.
+     *
+     * @return The equivalent Eigen sparse matrix.
+     */
+    Eigen::SparseMatrix<double> toEigenSparse() const;
+
+    /**
+     * Create a FiffSparseMatrix from an Eigen::SparseMatrix.
+     * Stores in RCS (row-compressed) format.
+     *
+     * @param[in] mat  The Eigen sparse matrix to convert.
+     *
+     * @return The equivalent FiffSparseMatrix.
+     */
+    static FiffSparseMatrix fromEigenSparse(const Eigen::SparseMatrix<double>& mat);
 
 public:
     FIFFLIB::fiff_int_t   coding;    /**< coding (storage) type of the sparse matrix. */

@@ -219,7 +219,7 @@ void TestMneForwardSolution::computeForward()
     }
 
     QVERIFY(m_pFwdMEGEEGRead->mri_head_t == m_pFwdMEGEEGRef->mri_head_t);
-    // Note: Full src (MNESourceSpace) deep comparison skipped here because
+    // Note: Full src (MNESourceSpaces) deep comparison skipped here because
     // MNEHemisphere::operator== calls isApprox on large geometry matrices which
     // can crash with Eigen 5. Source positions and normals are verified below.
     QVERIFY(m_pFwdMEGEEGRead->source_rr.isApprox(m_pFwdMEGEEGRef->source_rr, 1e-4f));

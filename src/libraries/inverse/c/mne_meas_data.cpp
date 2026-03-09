@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MNE Meas Data (MneMeasData) Class.
+ * @brief    Definition of the MNE Meas Data (MNEMeasData) Class.
  *
  */
 
@@ -1475,7 +1475,7 @@ int mne_read_bad_channel_list_9(const QString& name, QStringList& listp, int& nl
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneMeasData::MneMeasData()
+MNEMeasData::MNEMeasData()
     :meas_id   (NULL)
     ,current   (NULL)
     ,ch_major  (FALSE)
@@ -1497,7 +1497,7 @@ MneMeasData::MneMeasData()
 
 //=============================================================================================================
 
-MneMeasData::~MneMeasData()
+MNEMeasData::~MNEMeasData()
 {
     int k;
 
@@ -1521,7 +1521,7 @@ MneMeasData::~MneMeasData()
 
 //=============================================================================================================
 
-void MneMeasData::adjust_baselines(float bmin, float bmax)
+void MNEMeasData::adjust_baselines(float bmin, float bmax)
 {
     int b1,b2;
     float sfreq,tmin,tmax;
@@ -1581,13 +1581,13 @@ void MneMeasData::adjust_baselines(float bmin, float bmax)
 
 //=============================================================================================================
 
-MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
+MNEMeasData *MNEMeasData::mne_read_meas_data_add(const QString &name,
                                                  int set,
-                                                 MneInverseOperator* op,
-                                                 MneNamedMatrix *fwd,
+                                                 MNEInverseOperator* op,
+                                                 MNENamedMatrix *fwd,
                                                  const QStringList& namesp,
                                                  int nnamesp,
-                                                 MneMeasData *add_to)     /* Add to this */
+                                                 MNEMeasData *add_to)     /* Add to this */
 /*
           * Read an evoked-response data file
           */
@@ -1622,9 +1622,9 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
        */
     float       *source,tmin,tmax;
     int         k,p,c,np,n1,n2;
-    MneMeasData*    res = NULL;
-    MneMeasData*    new_data = add_to;
-    MneMeasDataSet* dataset = NULL;
+    MNEMeasData*    res = NULL;
+    MNEMeasData*    new_data = add_to;
+    MNEMeasDataSet* dataset = NULL;
 
     stim14_name = getenv(MNE_ENV_TRIGGER_CH);
     if (stim14_name.isEmpty() || stim14_name.size() == 0)
@@ -1730,7 +1730,7 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
        * Just put it together
        */
     if (!new_data) {			/* We need a new meas data structure */
-        new_data     = new MneMeasData;
+        new_data     = new MNEMeasData;
         new_data->filename  = name;
         new_data->meas_id   = id; id = NULL;
         /*
@@ -1773,13 +1773,13 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
         if (op) 			/* Attach the projection operator and CTF compensation info to the data, too */
             new_data->proj = op->proj->dup();
         else {
-            new_data->proj = MneProjOp::read(name);
+            new_data->proj = MNEProjOp::read(name);
             if (new_data->proj && new_data->proj->nitems > 0) {
                 printf("\tLoaded projection from %s:\n",name.toUtf8().data());
                 QTextStream errStream(stderr);
                 new_data->proj->report(errStream,"\t\t");
             }
-            new_data->comp = MneCTFCompDataSet::read(name);
+            new_data->comp = MNECTFCompDataSet::read(name);
             if (!new_data->comp)
                 goto out;
             if (new_data->comp->ncomp > 0)
@@ -1816,7 +1816,7 @@ MneMeasData *MneMeasData::mne_read_meas_data_add(const QString &name,
     /*
        * New data set is created anyway
        */
-    dataset = new MneMeasDataSet;
+    dataset = new MNEMeasDataSet;
     dataset->tmin      = tmin;
     dataset->tstep     = 1.0/sfreq;
     dataset->first     = n1;
@@ -1871,10 +1871,10 @@ out : {
 
 //=============================================================================================================
 
-MneMeasData *MneMeasData::mne_read_meas_data(const QString &name,
+MNEMeasData *MNEMeasData::mne_read_meas_data(const QString &name,
                                              int set,
-                                             MneInverseOperator* op,
-                                             MneNamedMatrix *fwd,
+                                             MNEInverseOperator* op,
+                                             MNENamedMatrix *fwd,
                                              const QStringList& namesp,
                                              int nnamesp)
 

@@ -41,7 +41,7 @@
 
 #include "../disp3D_rhi_global.h"
 
-#include <mne/mne_sourceestimate.h>
+#include <mne/mne_source_estimate.h>
 #include <QObject>
 #include <QString>
 #include <QSharedPointer>

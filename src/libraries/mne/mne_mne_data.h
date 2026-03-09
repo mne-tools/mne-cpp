@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MNE MNE Data (MneMneData) class declaration.
+ * @brief    MNE MNE Data (MNEMneData) class declaration.
  *
  */
 
@@ -68,23 +68,23 @@ namespace MNELIB
  *
  * @brief Data associated with MNE computations for each mneMeasDataSet
  */
-class MNESHARED_EXPORT MneMneData
+class MNESHARED_EXPORT MNEMneData
 {
 public:
-    typedef QSharedPointer<MneMneData> SPtr;              /**< Shared pointer type for MneMneData. */
-    typedef QSharedPointer<const MneMneData> ConstSPtr;   /**< Const shared pointer type for MneMneData. */
+    typedef QSharedPointer<MNEMneData> SPtr;              /**< Shared pointer type for MNEMneData. */
+    typedef QSharedPointer<const MNEMneData> ConstSPtr;   /**< Const shared pointer type for MNEMneData. */
 
     //=========================================================================================================
     /**
-     * Constructs the MneMneData.
+     * Constructs the MNEMneData.
      */
-    MneMneData() = default;
+    MNEMneData() = default;
 
     //=========================================================================================================
     /**
-     * Destroys the MneMneData.
+     * Destroys the MNEMneData.
      */
-    ~MneMneData() = default;
+    ~MNEMneData() = default;
 
 public:
     Eigen::MatrixXf datap;          /**< Projection of the whitened data onto the field eigenvectors. */

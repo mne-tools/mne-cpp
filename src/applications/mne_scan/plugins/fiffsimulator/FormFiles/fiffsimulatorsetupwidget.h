@@ -121,7 +121,7 @@ private:
 
     FiffSimulator*   m_pFiffSimulator;      /**< a pointer to corresponding mne rt client.*/
 
-    Ui::FiffSimulatorSetupWidgetClass ui;   /**< the user interface for the MneRtClientSetupWidget.*/
+    Ui::FiffSimulatorSetupWidgetClass ui;   /**< the user interface for the MNERtClientSetupWidget.*/
 
     bool m_bIsInit;                         /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized. */
 };

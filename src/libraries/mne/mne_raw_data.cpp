@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneRawData Class.
+ * @brief    Definition of the MNERawData Class.
  *
  */
 
@@ -143,7 +143,7 @@ namespace MNELIB
 struct RingBuffer
 {
     struct Entry {
-        MneRawBufDef::RowMajorMatrixXf *user = nullptr;
+        MNERawBufDef::RowMajorMatrixXf *user = nullptr;
     };
 
     std::vector<Entry> entries;
@@ -155,7 +155,7 @@ struct RingBuffer
     {}
 
     /** Allocate (or reclaim) an entry for @p res with dimensions @p nrow x @p ncol. */
-    void allocate(int nrow, int ncol, MneRawBufDef::RowMajorMatrixXf *res)
+    void allocate(int nrow, int ncol, MNERawBufDef::RowMajorMatrixXf *res)
     {
         if (next >= static_cast<int>(entries.size()))
             next = 0;
@@ -259,7 +259,7 @@ namespace MNELIB
  * @brief Pre-computed frequency-domain filter state used for FFT-based raw data filtering.
  *
  * Holds the frequency response arrays (normal + EOG) and an FFT
- * pre-calculation buffer.  Owned by MneRawData via unique_ptr.
+ * pre-calculation buffer.  Owned by MNERawData via unique_ptr.
  */
 struct FilterData
 {
@@ -275,8 +275,8 @@ struct FilterData
 
 }
 
-int mne_compare_filters(const MneFilterDef& f1,
-                        const MneFilterDef& f2)
+int mne_compare_filters(const MNEFilterDef& f1,
+                        const MNEFilterDef& f2)
 /*
       * Return 0 if the two filter definitions are same, 1 otherwise
       */
@@ -319,7 +319,7 @@ void mne_fft_syn(float *data, int np, std::vector<float>& /*precalc*/)
     return;
 }
 
-int mne_apply_filter(const MneFilterDef& filter, FilterData *d, float *data, int ns, int zero_pad, float dc_offset, int kind)
+int mne_apply_filter(const MNEFilterDef& filter, FilterData *d, float *data, int ns, int zero_pad, float dc_offset, int kind)
 /*
  * Do the magick trick
  */
@@ -389,7 +389,7 @@ int mne_apply_filter(const MneFilterDef& filter, FilterData *d, float *data, int
     return OK;
 }
 
-std::unique_ptr<FilterData> mne_create_filter_response(const MneFilterDef&   filter,
+std::unique_ptr<FilterData> mne_create_filter_response(const MNEFilterDef&   filter,
                                 float           sfreq,
                                 int             *highpass_effective)
 /*
@@ -493,7 +493,7 @@ std::unique_ptr<FilterData> mne_create_filter_response(const MneFilterDef&   fil
 int mne_read_raw_buffer_t(//fiffFile     in,        /* Input file */
                           FiffStream::SPtr& stream,
                           const FiffDirEntry::SPtr& ent,         /* The directory entry to read */
-                          MneRawBufDef::RowMajorMatrixXf& data,  /* Matrix [npick x nsamp] to fill */
+                          MNERawBufDef::RowMajorMatrixXf& data,  /* Matrix [npick x nsamp] to fill */
                           int          nchan,       /* Number of channels in the data */
                           int          nsamp,       /* Expected number of samples */
                           const QList<FIFFLIB::FiffChInfo>&   chs,         /* Channel info for ALL channels */
@@ -668,7 +668,7 @@ int  mne_sparse_vec_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
 }
 
 int  mne_sparse_mat_mult2(FiffSparseMatrix* mat,     /* The sparse matrix */
-                          const MneRawBufDef::RowMajorMatrixXf& mult,  /* Matrix to be multiplied */
+                          const MNERawBufDef::RowMajorMatrixXf& mult,  /* Matrix to be multiplied */
                           int             ncol,	   /* How many columns in the above */
                           float           **res)   /* Result of the multiplication */
 /*
@@ -712,7 +712,7 @@ static int approx_ring_buf_size = APPROX_RING_BUF_SIZE;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneRawData::MneRawData()
+MNERawData::MNERawData()
 :info(nullptr)
 ,nbad(0)
 ,first_samp(0)
@@ -732,7 +732,7 @@ MneRawData::MneRawData()
 
 //=============================================================================================================
 
-MneRawData::~MneRawData()
+MNERawData::~MNERawData()
 {
 //    fiff_close(this->file);
     this->stream->close();
@@ -747,7 +747,7 @@ MneRawData::~MneRawData()
 
 //=============================================================================================================
 
-void MneRawData::add_filter_response(int *highpass_effective)
+void MNERawData::add_filter_response(int *highpass_effective)
 /*
           * Add the standard filter frequency response function
           */
@@ -771,12 +771,12 @@ void MneRawData::add_filter_response(int *highpass_effective)
 
 //=============================================================================================================
 
-void MneRawData::setup_filter_bufs()
+void MNERawData::setup_filter_bufs()
 /*
      * These will hold the filtered data
      */
 {
-    MneFilterDef* filter = this->filter.get();
+    MNEFilterDef* filter = this->filter.get();
     int       nfilt_buf;
     int       k;
     int       firstsamp;
@@ -819,7 +819,7 @@ void MneRawData::setup_filter_bufs()
 
 //=============================================================================================================
 
-int MneRawData::load_one_buffer(MneRawBufDef *buf)
+int MNERawData::load_one_buffer(MNERawBufDef *buf)
 /*
      * load just one
      */
@@ -856,7 +856,7 @@ int MneRawData::load_one_buffer(MneRawBufDef *buf)
 
 //=============================================================================================================
 
-int MneRawData::compensate_buffer(MneRawBufDef *buf)
+int MNERawData::compensate_buffer(MNERawBufDef *buf)
 /*
      * Apply compensation channels
      */
@@ -908,14 +908,14 @@ bad :
 
 //=============================================================================================================
 
-int MneRawData::pick_data(mneChSelection sel, int firsts, int ns, float **picked)
+int MNERawData::pick_data(mneChSelection sel, int firsts, int ns, float **picked)
 /*
      * Data from a selection of channels
      */
 {
     int          k,s,p,start,c,fills;
     int          ns2,s2;
-    MneRawBufDef* this_buf;
+    MNERawBufDef* this_buf;
     float        *values;
     int          need_some;
 
@@ -1059,14 +1059,14 @@ int MneRawData::pick_data(mneChSelection sel, int firsts, int ns, float **picked
 
 //=============================================================================================================
 
-int MneRawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **picked)
+int MNERawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **picked)
 /*
      * Data from a set of channels, apply projection
      */
 {
     int          k,s,p,start,c,fills;
-    MneRawBufDef* this_buf;
-    MneRawBufDef::RowMajorMatrixXf *values;
+    MNERawBufDef* this_buf;
+    MNERawBufDef::RowMajorMatrixXf *values;
     float        *pvalues;
     float        *deriv_pvalues = NULL;
 
@@ -1188,7 +1188,7 @@ int MneRawData::pick_data_proj(mneChSelection sel, int firsts, int ns, float **p
 
 //=============================================================================================================
 
-int MneRawData::load_one_filt_buf(MneRawBufDef *buf)
+int MNERawData::load_one_filt_buf(MNERawBufDef *buf)
 /*
      * Load and filter one buffer
      */
@@ -1226,14 +1226,14 @@ int MneRawData::load_one_filt_buf(MneRawBufDef *buf)
 
 //=============================================================================================================
 
-int MneRawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **picked)
+int MNERawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **picked)
 /*
      * Data for a selection (filtered and picked)
      */
 {
     int          k,s,bs,c;
     int          bs1,bs2,s1,s2,lasts;
-    MneRawBufDef* this_buf;
+    MNERawBufDef* this_buf;
     float        *values;
     float        **deriv_vals = NULL;
     Eigen::VectorXf dc;
@@ -1317,7 +1317,7 @@ int MneRawData::pick_data_filt(mneChSelection sel, int firsts, int ns, float **p
            * Also check channels included in derivations if they are used
            */
             if (sel->nderiv > 0 && deriv_matched) {
-                MneDeriv* der = deriv_matched.get();
+                MNEDeriv* der = deriv_matched.get();
                 for (c = 0; c < der->deriv_data->ncol; c++) {
                     if (der->in_use[c] > 0 &&
                             !this_buf->ch_filtered[c]) {
@@ -1440,17 +1440,17 @@ bad : {
 
 //=============================================================================================================
 
-MneRawData *MneRawData::open_file_comp(const QString& name,
+MNERawData *MNERawData::open_file_comp(const QString& name,
                                                int omit_skip,
                                                int allow_maxshield,
-                                               const MneFilterDef& filter,
+                                               const MNEFilterDef& filter,
                                                int comp_set)
 /*
      * Open a raw data file
      */
 {
-    std::unique_ptr<MneRawInfo> info;
-    std::unique_ptr<MneRawData> data;
+    std::unique_ptr<MNERawInfo> info;
+    std::unique_ptr<MNERawData> data;
 
     QFile file(name);
     FiffStream::SPtr stream(new FiffStream(&file));
@@ -1466,7 +1466,7 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
 
     //    tag.data = NULL;
 
-    if (MneRawInfo::load(name,allow_maxshield,info) == FAIL)
+    if (MNERawInfo::load(name,allow_maxshield,info) == FAIL)
         goto bad;
 
     for (k = 0; k < info->nchan; k++) {
@@ -1491,7 +1491,7 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
     if(!stream->open())
         goto bad;
 
-    data           = std::make_unique<MneRawData>();
+    data           = std::make_unique<MNERawData>();
     data->filename = name;
     data->stream   = stream;
     data->info = std::move(info);
@@ -1509,7 +1509,7 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
     /*
        * Compensation data
        */
-    data->comp = MneCTFCompDataSet::read(data->filename);
+    data->comp = MNECTFCompDataSet::read(data->filename);
     if (data->comp) {
         if (data->comp->ncomp > 0)
             printf("Read %d compensation data sets from %s\n",data->comp->ncomp,data->filename.toUtf8().constData());
@@ -1518,9 +1518,9 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
     }
     else
         qWarning() << "err_print_error()";
-    if ((data->comp_file = MneCTFCompDataSet::get_comp(data->info->chInfo,data->info->nchan)) == FAIL)
+    if ((data->comp_file = MNECTFCompDataSet::get_comp(data->info->chInfo,data->info->nchan)) == FAIL)
         goto bad;
-    printf("Compensation in file : %s\n",MneCTFCompDataSet::explain_comp(MneCTFCompDataSet::map_comp_kind(data->comp_file)).toUtf8().constData());
+    printf("Compensation in file : %s\n",MNECTFCompDataSet::explain_comp(MNECTFCompDataSet::map_comp_kind(data->comp_file)).toUtf8().constData());
     if (comp_set < 0)
         data->comp_now = data->comp_file;
     else
@@ -1540,7 +1540,7 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
     /*
        * SSS data
        */
-    data->sss.reset(MneSssData::read(data->filename));
+    data->sss.reset(MNESssData::read(data->filename));
     if (data->sss && data->sss->job != FIFFV_SSS_JOB_NOTHING && data->sss->comp_info.size() > 0) {
         printf("SSS data read from %s :\n",data->filename.toUtf8().constData());
         QTextStream errStream(stderr);
@@ -1685,7 +1685,7 @@ MneRawData *MneRawData::open_file_comp(const QString& name,
     /*
        * Initialize the filter buffers
        */
-    data->filter = std::make_unique<MneFilterDef>(filter);
+    data->filter = std::make_unique<MNEFilterDef>(filter);
     data->setup_filter_bufs();
 
     {
@@ -1714,7 +1714,7 @@ bad : {
 
 //=============================================================================================================
 
-MneRawData *MneRawData::open_file(const QString& name, int omit_skip, int allow_maxshield, const MneFilterDef& filter)
+MNERawData *MNERawData::open_file(const QString& name, int omit_skip, int allow_maxshield, const MNEFilterDef& filter)
 /*
      * Wrapper for open_file to work as before
      */

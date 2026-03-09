@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneMshPicked class declaration.
+ * @brief    MNEMshPicked class declaration.
  *
  */
 
@@ -69,23 +69,23 @@ namespace MNELIB
  *
  * @brief Picked point on a displayed surface storing vertex index, coordinates, and source value.
  */
-class MNESHARED_EXPORT MneMshPicked
+class MNESHARED_EXPORT MNEMshPicked
 {
 public:
-    typedef QSharedPointer<MneMshPicked> SPtr;              /**< Shared pointer type for MneMshPicked. */
-    typedef QSharedPointer<const MneMshPicked> ConstSPtr;   /**< Const shared pointer type for MneMshPicked. */
+    typedef QSharedPointer<MNEMshPicked> SPtr;              /**< Shared pointer type for MNEMshPicked. */
+    typedef QSharedPointer<const MNEMshPicked> ConstSPtr;   /**< Const shared pointer type for MNEMshPicked. */
 
     //=========================================================================================================
     /**
-     * Constructs the MneMshPicked.
+     * Constructs the MNEMshPicked.
      */
-    MneMshPicked();
+    MNEMshPicked();
 
     //=========================================================================================================
     /**
-     * Destroys the MneMshPicked.
+     * Destroys the MNEMshPicked.
      */
-    ~MneMshPicked();
+    ~MNEMshPicked();
 
 public:
     int   vert;			/* Vertex # */

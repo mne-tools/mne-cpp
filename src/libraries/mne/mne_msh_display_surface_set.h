@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneMshDisplaySurfaceSet class declaration.
+ * @brief    MNEMshDisplaySurfaceSet class declaration.
  *
  */
 
@@ -75,9 +75,9 @@ namespace MNELIB
 // MNELIB FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneMshDisplaySurface;
-class MneMshLightSet;
-class MneSurfacePatch;
+class MNEMshDisplaySurface;
+class MNEMshLightSet;
+class MNESurfacePatch;
 
 //=============================================================================================================
 /**
@@ -85,23 +85,23 @@ class MneSurfacePatch;
  *
  * @brief The MNE Msh Display Surface Set class holds information about a set of surfaces to be rendered.
  */
-class MNESHARED_EXPORT MneMshDisplaySurfaceSet
+class MNESHARED_EXPORT MNEMshDisplaySurfaceSet
 {
 public:
-    typedef QSharedPointer<MneMshDisplaySurfaceSet> SPtr;              /**< Shared pointer type for MneMshDisplaySurfaceSet. */
-    typedef QSharedPointer<const MneMshDisplaySurfaceSet> ConstSPtr;   /**< Const shared pointer type for MneMshDisplaySurfaceSet. */
+    typedef QSharedPointer<MNEMshDisplaySurfaceSet> SPtr;              /**< Shared pointer type for MNEMshDisplaySurfaceSet. */
+    typedef QSharedPointer<const MNEMshDisplaySurfaceSet> ConstSPtr;   /**< Const shared pointer type for MNEMshDisplaySurfaceSet. */
 
     //=========================================================================================================
     /**
-     * Constructs the MneMshDisplaySurfaceSet.
+     * Constructs the MNEMshDisplaySurfaceSet.
      */
-    MneMshDisplaySurfaceSet(int nsurf = 0);
+    MNEMshDisplaySurfaceSet(int nsurf = 0);
 
     //=========================================================================================================
     /**
-     * Destroys the MneMshDisplaySurfaceSet.
+     * Destroys the MNEMshDisplaySurfaceSet.
      */
-    ~MneMshDisplaySurfaceSet();
+    ~MNEMshDisplaySurfaceSet();
 
     /**
      * Load left and right hemisphere FreeSurfer surfaces (with curvature) from
@@ -113,27 +113,9 @@ public:
      *
      * @return A new display surface set, or NULL on failure. Caller takes ownership.
      */
-    static std::unique_ptr<MneMshDisplaySurfaceSet> load(const QString &subject_id, const QString &surf, const QString &subjects_dir);
+    static std::unique_ptr<MNEMshDisplaySurfaceSet> load(const QString &subject_id, const QString &surf, const QString &subjects_dir);
 
-    /**
-     * Compute and store the axis-aligned bounding box and field-of-view
-     * radius for a surface by iterating all vertex positions.
-     *
-     * @param[in, out] surf   The display surface whose extent is computed.
-     * @param[in]      tag    Surface name tag (used for logging).
-     */
-    static void decide_surface_extent(MneMshDisplaySurface& surf,
-                                      const QString& tag);
 
-    /**
-     * Set the curvature display mode based on the surface type name.
-     * Inflated, sphere, and white surfaces use overlay mode; others use none.
-     *
-     * @param[in]      name   Surface type name.
-     * @param[in, out] s      The display surface whose curvature mode is set.
-     */
-    static void decide_curv_display(const QString& name,
-                                    MneMshDisplaySurface& s);
 
     /**
      * Read a BEM surface from a FIFF file, optionally validate that it is
@@ -161,17 +143,11 @@ public:
      * @param[in] replace    If true, replace an existing surface with matching ID.
      * @param[in] drawable   Whether the surface should be marked as drawable.
      */
-    void add_replace_surface(std::unique_ptr<MneMshDisplaySurface> newSurf,
+    void add_replace_surface(std::unique_ptr<MNEMshDisplaySurface> newSurf,
                              bool                  replace,
                              bool                  drawable);
 
-    /**
-     * Allocate and fill per-vertex color arrays using positive/negative
-     * curvature colors (if curvature overlay mode is on) or uniform gray.
-     *
-     * @param[in, out] surf   The display surface whose curvature colors are set up.
-     */
-    static void setup_curvature_colors(MneMshDisplaySurface& surf);
+
 
     /**
      * Assign hemisphere-appropriate eye positions and up-vectors to each
@@ -204,7 +180,7 @@ public:
      *
      * @return A new deep copy. Caller takes ownership.
      */
-    static std::unique_ptr<MneMshLightSet> dup_light_set(const MneMshLightSet& s);
+    static std::unique_ptr<MNEMshLightSet> dup_light_set(const MNEMshLightSet& s);
 
     /**
      * Replace the current active lighting with a deep copy of the provided
@@ -212,19 +188,19 @@ public:
      *
      * @param[in] set   The light set to apply.
      */
-    void setup_lights(const MneMshLightSet& set);
+    void setup_lights(const MNEMshLightSet& set);
 
 public:
     QString           subj;	       /**< The name of the subject. */
     QString           morph_subj;       /**< The subject we are morphing to. */
-    std::vector<std::unique_ptr<MneMshDisplaySurface>> surfs; /**< Array of display surfaces (owned). */
-    std::vector<std::unique_ptr<MneSurfacePatch>>  patches;    /**< Optional flat patches for display (owned). */
+    std::vector<std::unique_ptr<MNEMshDisplaySurface>> surfs; /**< Array of display surfaces (owned). */
+    std::vector<std::unique_ptr<MNESurfacePatch>>  patches;    /**< Optional flat patches for display (owned). */
     std::vector<float>            patch_rot;            /**< Rotation angles for the (flat) patches. */
     int               nsurf;	       /**< Number of surfaces. */
     int               use_patches;       /**< Whether to use patches for display. */
     Eigen::VectorXi   active;	       /**< Boolean array indicating which surfaces are currently active. */
     Eigen::VectorXi   drawable;	       /**< Boolean array indicating which surfaces could be drawn. */
-    std::unique_ptr<MneMshLightSet> lights;  /**< Current active lighting configuration. */
+    std::unique_ptr<MNEMshLightSet> lights;  /**< Current active lighting configuration. */
     float             rot[3];            /**< Rotation angles of the MRI (in radians). */
     float             move[3];	       /**< Translation offset for the origin. */
     float             fov;	       /**< Field of view (extent of the surface). */

@@ -54,8 +54,8 @@
 #include <mne/mne.h>
 #include <mne/mne_inverse_operator.h>
 #include <mne/mne_forwardsolution.h>
-#include <mne/mne_sourceestimate.h>
-#include <mne/mne_sourcespace.h>
+#include <mne/mne_source_estimate.h>
+#include <mne/mne_source_spaces.h>
 
 #include <inverse/minimumNorm/minimumnorm.h>
 
@@ -366,7 +366,7 @@ static bool writeLabelOutput(const Label &label,
  */
 static bool writeDipFile(const QString &fileName,
                          const MatrixXd &stcData,
-                         const MNESourceSpace &src,
+                         const MNESourceSpaces &src,
                          const QList<VectorXi> &vertno,
                          int timeIdx,
                          double time_ms)
@@ -386,7 +386,7 @@ static bool writeDipFile(const QString &fileName,
 
     int row = 0;
     for (int h = 0; h < vertno.size() && h < src.size(); ++h) {
-        const MNEHemisphere &hemi = src[h];
+        const auto &hemi = src[h];
         for (int v = 0; v < vertno[h].size(); ++v, ++row) {
             int vno = vertno[h](v);
             double amp = stcData(row, timeIdx);

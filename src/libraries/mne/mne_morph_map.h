@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneMorphMap class declaration.
+ * @brief    MNEMorphMap class declaration.
  *
  */
 
@@ -83,23 +83,23 @@ namespace MNELIB
  *
  * @brief Vertex-to-vertex mapping between two FreeSurfer surface meshes for morphing source estimates.
  */
-class MNESHARED_EXPORT MneMorphMap
+class MNESHARED_EXPORT MNEMorphMap
 {
 public:
-    typedef QSharedPointer<MneMorphMap> SPtr;              /**< Shared pointer type for MneMorphMap. */
-    typedef QSharedPointer<const MneMorphMap> ConstSPtr;   /**< Const shared pointer type for MneMorphMap. */
+    typedef QSharedPointer<MNEMorphMap> SPtr;              /**< Shared pointer type for MNEMorphMap. */
+    typedef QSharedPointer<const MNEMorphMap> ConstSPtr;   /**< Const shared pointer type for MNEMorphMap. */
 
     //=========================================================================================================
     /**
-     * Constructs the MneMorphMap.
+     * Constructs the MNEMorphMap.
      */
-    MneMorphMap() = default;
+    MNEMorphMap() = default;
 
     //=========================================================================================================
     /**
-     * Destroys the MneMorphMap.
+     * Destroys the MNEMorphMap.
      */
-    ~MneMorphMap() = default;
+    ~MNEMorphMap() = default;
 
 public:
     std::unique_ptr<FIFFLIB::FiffSparseMatrix> map;  /**< Sparse interpolation matrix: multiply source surface data

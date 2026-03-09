@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MNE Patch Information (MnePatchInfo) Class.
+ * @brief    Definition of the MNE Patch Information (MNEPatchInfo) Class.
  *
  */
 
@@ -39,7 +39,7 @@
 //=============================================================================================================
 
 #include "mne_patch_info.h"
-#include "mne_source_space_old.h"
+#include "mne_source_space.h"
 #include <mne/mne_triangle.h>
 
 #define X_43 0
@@ -59,7 +59,7 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MnePatchInfo::MnePatchInfo()
+MNEPatchInfo::MNEPatchInfo()
     :vert (-1)
     ,area (0)
     ,dev_nn (0)
@@ -71,11 +71,11 @@ MnePatchInfo::MnePatchInfo()
 
 //=============================================================================================================
 
-MnePatchInfo::~MnePatchInfo() = default;
+MNEPatchInfo::~MNEPatchInfo() = default;
 
 //=============================================================================================================
 
-void MnePatchInfo::calculate_area(MneSourceSpaceOld* s)
+void MNEPatchInfo::calculate_area(MNESourceSpace* s)
 {
     int k,q;
     int nneigh;
@@ -91,7 +91,7 @@ void MnePatchInfo::calculate_area(MneSourceSpaceOld* s)
 
 //=============================================================================================================
 
-void MnePatchInfo::calculate_normal_stats(MneSourceSpaceOld *s)
+void MNEPatchInfo::calculate_normal_stats(MNESourceSpace *s)
 {
     int k;
     float cos_theta,size;

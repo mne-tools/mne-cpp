@@ -12,7 +12,7 @@
 
 #include <mne/mne_named_matrix.h>
 #include <mne/mne_nearest.h>
-#include <mne/mne_source_space_old.h>
+#include <mne/mne_source_space.h>
 #include <mne/mne_forwardsolution.h>
 
 #include <fiff/fiff_sparse_matrix.h>
@@ -954,7 +954,7 @@ FiffSparseMatrix* mne_pick_lower_triangle_rcs(FiffSparseMatrix* mat)
     return mne_create_sparse_rcs(mat->m, mat->n, nnz.data(), ci_ptrs.data(), val_ptrs.data());
 }
 
-static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* ss, int selected_only)
+static int write_volume_space_info(FiffStream::SPtr& t_pStream, MNESourceSpace* ss, int selected_only)
 /*
  * Write the vertex neighbors and other information for a volume source space
  */
@@ -1054,7 +1054,7 @@ static int write_volume_space_info(FiffStream::SPtr& t_pStream, MneSourceSpaceOl
                 write_coord_trans_old(t_pStream, *ss->MRI_voxel_surf_RAS_t);//t_pStream->write_coord_trans(ss->MRI_voxel_surf_RAS_t);
             t_pStream->write_string(FIFF_MNE_FILE_NAME,ss->MRI_volume);
             if (ss->interpolator)
-                fiff_write_float_sparse_matrix_old(t_pStream,FIFF_MNE_SOURCE_SPACE_INTERPOLATOR,ss->interpolator.get());
+                fiff_write_float_sparse_matrix_old(t_pStream,FIFF_MNE_SOURCE_SPACE_INTERPOLATOR,&(*ss->interpolator));
             if (ss->MRI_vol_dims[0] > 0 && ss->MRI_vol_dims[1] > 0 && ss->MRI_vol_dims[2] > 0) {
                 t_pStream->write_int(FIFF_MRI_WIDTH,&ss->MRI_vol_dims[0]);
                 t_pStream->write_int(FIFF_MRI_HEIGHT,&ss->MRI_vol_dims[1]);
@@ -1081,7 +1081,7 @@ out : {
     }
 }
 
-int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* ss,bool selected_only)
+int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MNESourceSpace* ss,bool selected_only)
 {
     float **sel = Q_NULLPTR;
     int   **tris = Q_NULLPTR;
@@ -1207,7 +1207,7 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
             nearest_dist = MALLOC_41(ss->np,float);
 
             std::sort(ss->nearest.begin(), ss->nearest.end(),
-                      [](const MneNearest& a, const MneNearest& b) { return a.vert < b.vert; });
+                      [](const MNENearest& a, const MNENearest& b) { return a.vert < b.vert; });
             for (p = 0; p < ss->np; p++) {
                 nearest[p] = ss->nearest[p].nearest;
                 nearest_dist[p] = ss->nearest[p].dist;
@@ -1234,8 +1234,8 @@ int mne_write_one_source_space(FiffStream::SPtr& t_pStream, MneSourceSpaceOld* s
             FREE_41(nearest); nearest = Q_NULLPTR;
             FREE_41(nearest_dist); nearest_dist = Q_NULLPTR;
         }
-        if (ss->dist) {     /* Distance information */
-            FiffSparseMatrix* m = mne_pick_lower_triangle_rcs(ss->dist.get());
+        if (!ss->dist.is_empty()) {     /* Distance information */
+            FiffSparseMatrix* m = mne_pick_lower_triangle_rcs(&ss->dist);
             if (!m)
                 goto bad;
             if (fiff_write_float_sparse_matrix_old(t_pStream,FIFF_MNE_SOURCE_SPACE_DIST,m) == FIFF_FAIL) {
@@ -1287,7 +1287,7 @@ QString mne_name_list_to_string_41(const QStringList& list)
 
 int mne_write_named_matrix( FiffStream::SPtr& t_pStream,
                             int  kind,
-                            MneNamedMatrix* mat)
+                            MNENamedMatrix* mat)
 /*
  * Write a block which contains information about one named matrix
  */
@@ -1372,7 +1372,7 @@ bool fiff_put_dir (FiffStream::SPtr& t_pStream, const QList<FiffDirEntry::SPtr>&
 //============================= write_solution.c =============================
 
 bool write_solution(const QString& name,         /* Destination file */
-                    std::vector<std::unique_ptr<MneSourceSpaceOld>>& spaces,  /* The source spaces */
+                    std::vector<std::unique_ptr<MNESourceSpace>>& spaces,  /* The source spaces */
                     const QString& mri_file,     /* MRI file and data obtained from there */
                     fiffId mri_id,
                     const FiffCoordTrans& mri_head_t,
@@ -1870,12 +1870,12 @@ void ComputeFwd::initFwd()
 
     printf("\n");
     printf("Reading %s...\n",m_pSettings->srcname.toUtf8().constData());
-    if (MneSurfaceOrVolume::read_source_spaces(m_pSettings->srcname,m_spaces) != OK) {
+    if (MNESourceSpace::read_source_spaces(m_pSettings->srcname,m_spaces) != OK) {
         return;
     }
     for (k = 0, m_iNSource = 0; k < static_cast<int>(m_spaces.size()); k++) {
         if (m_pSettings->do_all) {
-            MneSurfaceOrVolume::enable_all_sources(*m_spaces[k]);
+            m_spaces[k]->enable_all_sources();
         }
         m_iNSource += m_spaces[k]->nuse;
     }
@@ -1884,7 +1884,7 @@ void ComputeFwd::initFwd()
         return;
     }
     printf("Read %d source spaces a total of %d active source locations\n", static_cast<int>(m_spaces.size()),m_iNSource);
-    if (MneSurfaceOrVolume::restrict_sources_to_labels(m_spaces,m_pSettings->labels,m_pSettings->nlabel) == FAIL) {
+    if (MNESourceSpace::restrict_sources_to_labels(m_spaces,m_pSettings->labels,m_pSettings->nlabel) == FAIL) {
         return;
     }
 
@@ -2000,7 +2000,7 @@ void ComputeFwd::initFwd()
 
         // Compensation data
 
-        m_compData = MneCTFCompDataSet::read(m_pSettings->measname);
+        m_compData = MNECTFCompDataSet::read(m_pSettings->measname);
         if (!m_compData) {
             return;
         }
@@ -2065,7 +2065,7 @@ void ComputeFwd::initFwd()
 
     // Transform the source spaces into the appropriate coordinates
     {
-        if (MneSurfaceOrVolume::transform_source_spaces_to(m_pSettings->coord_frame,m_mri_head_t,m_spaces) != OK) {
+        if (MNESourceSpace::transform_source_spaces_to(m_pSettings->coord_frame,m_mri_head_t,m_spaces) != OK) {
             return;
         }
     }
@@ -2124,7 +2124,7 @@ void ComputeFwd::initFwd()
             filteredStream = new QTextStream(&filteredFile);
             printf("Omitted source space points will be output to : %s\n",m_pSettings->mindistoutname.toUtf8().constData());
         }
-        MneSurfaceOrVolume::filter_source_spaces(m_pSettings->mindist,
+        MNESourceSpace::filter_source_spaces(m_pSettings->mindist,
                                                  m_pSettings->bemname,
                                                  m_mri_head_t,
                                                  m_spaces,
@@ -2153,7 +2153,7 @@ void ComputeFwd::calculateFwd()
 
     // check if source spaces are still in head space
     if(m_spaces[0]->coord_frame != FIFFV_COORD_HEAD) {
-        if (MneSurfaceOrVolume::transform_source_spaces_to(m_pSettings->coord_frame,m_mri_head_t,m_spaces) != OK) {
+        if (MNESourceSpace::transform_source_spaces_to(m_pSettings->coord_frame,m_mri_head_t,m_spaces) != OK) {
             return;
         }
     }
@@ -2279,7 +2279,7 @@ void ComputeFwd::updateHeadPos(const FiffCoordTrans& transDevHead)
 
     // check if source spaces are still in head space
     if(m_spaces[0]->coord_frame != FIFFV_COORD_HEAD) {
-        if (MneSurfaceOrVolume::transform_source_spaces_to(m_pSettings->coord_frame,m_mri_head_t,m_spaces) != OK) {
+        if (MNESourceSpace::transform_source_spaces_to(m_pSettings->coord_frame,m_mri_head_t,m_spaces) != OK) {
             return;
         }
     }
@@ -2315,7 +2315,7 @@ void ComputeFwd::storeFwd(const QString& sSolName)
     // We are ready to spill it out
     // Transform the source spaces back into MRI coordinates
     {
-        if (MneSourceSpaceOld::transform_source_spaces_to(FIFFV_COORD_MRI,m_mri_head_t,m_spaces) != OK) {
+        if (MNESourceSpace::transform_source_spaces_to(FIFFV_COORD_MRI,m_mri_head_t,m_spaces) != OK) {
             return;
         }
     }

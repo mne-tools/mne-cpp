@@ -68,7 +68,7 @@ namespace INVERSELIB
 
 //class DipoleFitData;
 //class GuessData;
-//class MneMeasData
+//class MNEMeasData
 
 //=============================================================================================================
 /**
@@ -115,7 +115,7 @@ public:
      *
      * @return true when successful.
      */
-    static int fit_dipoles( const QString& dataname, MneMeasData* data, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
+    static int fit_dipoles( const QString& dataname, MNEMeasData* data, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
 
     //=========================================================================================================
     /**
@@ -137,7 +137,7 @@ public:
      *
      * @return true when successful.
      */
-    static int fit_dipoles_raw(const QString& dataname, MNELIB::MneRawData* raw, MNELIB::mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
+    static int fit_dipoles_raw(const QString& dataname, MNELIB::MNERawData* raw, MNELIB::mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose, ECDSet& p_set);
 
     //=========================================================================================================
     /**
@@ -158,7 +158,7 @@ public:
      *
      * @return true when successful.
      */
-    static int fit_dipoles_raw(const QString& dataname, MNELIB::MneRawData* raw, MNELIB::mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
+    static int fit_dipoles_raw(const QString& dataname, MNELIB::MNERawData* raw, MNELIB::mneChSelection sel, DipoleFitData* fit, GuessData* guess, float tmin, float tmax, float tstep, float integ, int verbose);
 
 private:
     DipoleFitSettings* settings;

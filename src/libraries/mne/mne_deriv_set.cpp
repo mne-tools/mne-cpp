@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MNE Derivation Set (MneDerivSet) Class.
+ * @brief    Definition of the MNE Derivation Set (MNEDerivSet) Class.
  *
  */
 
@@ -52,13 +52,13 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneDerivSet::MneDerivSet()
+MNEDerivSet::MNEDerivSet()
 {
 }
 
 //=============================================================================================================
 
-MneDerivSet::~MneDerivSet()
+MNEDerivSet::~MNEDerivSet()
 {
     for (int k = 0; k < derivs.size(); k++)
         delete derivs[k];

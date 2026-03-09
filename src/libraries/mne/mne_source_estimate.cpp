@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
- * @file     mne_sourceestimate.cpp
+ * @file     mne_source_estimate.cpp
  * @author   Lorenz Esch <lesch@mgh.harvard.edu>;
  *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
  *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_sourceestimate.h"
+#include "mne_source_estimate.h"
 
 //=============================================================================================================
 // QT INCLUDES

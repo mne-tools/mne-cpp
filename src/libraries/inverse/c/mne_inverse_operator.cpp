@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MNE Patch Information (MnePatchInfo) Class.
+ * @brief    Definition of the MNE Patch Information (MNEPatchInfo) Class.
  *
  */
 
@@ -41,7 +41,7 @@
 #include "mne_inverse_operator.h"
 
 #include <fiff/fiff_coord_trans.h>
-#include <mne/mne_source_space_old.h>
+#include <mne/mne_source_space.h>
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -54,13 +54,13 @@ using namespace INVERSELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneInverseOperator::MneInverseOperator()
+MNEInverseOperator::MNEInverseOperator()
 {
 }
 
 //=============================================================================================================
 
-MneInverseOperator::~MneInverseOperator()
+MNEInverseOperator::~MNEInverseOperator()
 {
 }
 

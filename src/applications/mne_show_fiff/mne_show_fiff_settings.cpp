@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    Definition of the MneShowFiffSettings class.
+ * @brief    Definition of the MNEShowFiffSettings class.
  *
  */
 
@@ -67,7 +67,7 @@ using namespace SHOWFIFF;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneShowFiffSettings::MneShowFiffSettings()
+MNEShowFiffSettings::MNEShowFiffSettings()
 : indent(-1)
 , verbose(false)
 , long_strings(false)
@@ -79,7 +79,7 @@ MneShowFiffSettings::MneShowFiffSettings()
 
 //*************************************************************************************************************
 
-MneShowFiffSettings::MneShowFiffSettings(int *argc,char **argv)
+MNEShowFiffSettings::MNEShowFiffSettings(int *argc,char **argv)
 : indent(-1)
 , verbose(false)
 , long_strings(false)
@@ -96,7 +96,7 @@ MneShowFiffSettings::MneShowFiffSettings(int *argc,char **argv)
 
 //*************************************************************************************************************
 
-MneShowFiffSettings::~MneShowFiffSettings()
+MNEShowFiffSettings::~MNEShowFiffSettings()
 {
     //ToDo Garbage collection
 }
@@ -104,7 +104,7 @@ MneShowFiffSettings::~MneShowFiffSettings()
 
 //*************************************************************************************************************
 
-void MneShowFiffSettings::checkIntegrity()
+void MNEShowFiffSettings::checkIntegrity()
 {
     if (this->indent < 0)
         this->indent = this->verbose ? 0 : DEFAULT_INDENT;
@@ -113,7 +113,7 @@ void MneShowFiffSettings::checkIntegrity()
 
 //*************************************************************************************************************
 
-void MneShowFiffSettings::usage(char *name)
+void MNEShowFiffSettings::usage(char *name)
 {
     fprintf(stderr,"usage: %s [options]\n",name);
     fprintf(stderr,"List contents of a fif file to stdout\n");
@@ -131,7 +131,7 @@ void MneShowFiffSettings::usage(char *name)
 
 //*************************************************************************************************************
 
-bool MneShowFiffSettings::check_unrecognized_args(int argc, char **argv)
+bool MNEShowFiffSettings::check_unrecognized_args(int argc, char **argv)
 {
     int k;
 
@@ -149,7 +149,7 @@ bool MneShowFiffSettings::check_unrecognized_args(int argc, char **argv)
 
 //*************************************************************************************************************
 
-bool MneShowFiffSettings::check_args (int *argc,char **argv)
+bool MNEShowFiffSettings::check_args (int *argc,char **argv)
 {
     int k;
     int p;

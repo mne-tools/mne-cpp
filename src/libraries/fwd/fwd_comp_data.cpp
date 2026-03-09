@@ -219,7 +219,7 @@ void FwdCompData::fwd_free_comp_data(void *d)
 
 //=============================================================================================================
 
-int FwdCompData::fwd_make_ctf_comp_coils(MneCTFCompDataSet *set,
+int FwdCompData::fwd_make_ctf_comp_coils(MNECTFCompDataSet *set,
                                          FwdCoilSet *coils,
                                          FwdCoilSet *comp_coils)   /* The compensation coil set */
 /*
@@ -275,7 +275,7 @@ int FwdCompData::fwd_make_ctf_comp_coils(MneCTFCompDataSet *set,
 
 //=============================================================================================================
 
-FwdCompData *FwdCompData::fwd_make_comp_data(MneCTFCompDataSet *set,
+FwdCompData *FwdCompData::fwd_make_comp_data(MNECTFCompDataSet *set,
                                              FwdCoilSet *coils,
                                              FwdCoilSet *comp_coils,
                                              fwdFieldFunc field,
@@ -290,7 +290,7 @@ FwdCompData *FwdCompData::fwd_make_comp_data(MneCTFCompDataSet *set,
     FwdCompData* comp = new FwdCompData();
 
     if(set)
-        comp->set = new MneCTFCompDataSet(*set);
+        comp->set = new MNECTFCompDataSet(*set);
     else
         comp->set = NULL;
 

@@ -57,7 +57,7 @@
 #include <fs/annotationset.h>
 #include <fs/surfaceset.h>
 
-#include <mne/mne_sourceestimate.h>
+#include <mne/mne_source_estimate.h>
 #include <mne/mne_epoch_data_list.h>
 #include <mne/mne.h>
 

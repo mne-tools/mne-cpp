@@ -28,7 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneWatershedBemSettings class declaration.
+ * @brief    MNEWatershedBemSettings class declaration.
  *
  */
 
@@ -61,7 +61,7 @@ namespace MNEWATERSHEDBEM {
  *
  * @brief Command-line settings for mne_watershed_bem.
  */
-class MneWatershedBemSettings
+class MNEWatershedBemSettings
 {
 public:
     //=========================================================================================================
@@ -71,7 +71,7 @@ public:
      * @param[in] argc  Number of arguments.
      * @param[in] argv  Argument array.
      */
-    MneWatershedBemSettings(int *argc, char **argv);
+    MNEWatershedBemSettings(int *argc, char **argv);
 
     //=========================================================================================================
     /**

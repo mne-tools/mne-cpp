@@ -134,9 +134,9 @@ typedef struct {
   int                  do_signed;                    /* Preserve sign (current orientation) */
   int                  do_normal_comp;               /* Omit the components tangential to the cortex */
   int                  do_alt_noise;		     /* Try an alternate noise normalization */
-  MNELIB::MneMshColorScaleDef  scale_MNE;                    /* MNE scale */
-  MNELIB::MneMshColorScaleDef  scale_dSPM;                   /* SPM scale */
-  MNELIB::MneMshColorScaleDef  scale_sLORETA;                /* sLORETA scale */
+  MNELIB::MNEMshColorScaleDef  scale_MNE;                    /* MNE scale */
+  MNELIB::MNEMshColorScaleDef  scale_dSPM;                   /* SPM scale */
+  MNELIB::MNEMshColorScaleDef  scale_sLORETA;                /* sLORETA scale */
   int                  nstep;	                     /* Desired number of smoothsteps */
   float                integ;	                     /* Time integration to apply */
   int                  show_scale_bar;               /* Display the color scale? */
@@ -180,7 +180,7 @@ typedef struct {
   int                 surf_type;		     /* OVERLAY_CORTEX or OVERLAY_SCALP */
   int                 type;	                     /* Type of the overlay data */
   int                 is_signed;		     /* Are these data signed? */
-  MNELIB::MneMshColorScaleDef scale;			     /* Scale to use */
+  MNELIB::MNEMshColorScaleDef scale;			     /* Scale to use */
   int                 show_comments;		     /* Show the comment text */
   int                 show_scale_bar;		     /* Show the scale bar */
   int                 show_contours;		     /* Show the contour map for OVERLAY_SCALP */
@@ -208,11 +208,11 @@ typedef struct {		                     /* Overlay preferences. This structure ca
   int                  type;                         /* What kind of overlay? (fMRI, other) */
   int                  do_signed;                    /* Preserve sign (current orientation)
                               * This is never changed, just copied from the current overlay */
-  MNELIB::MneMshColorScaleDef  scale_MNE;                    /* MNE scale */
-  MNELIB::MneMshColorScaleDef  scale_dSPM;                   /* SPM scale */
-  MNELIB::MneMshColorScaleDef  scale_sLORETA;                /* sLORETA scale */
-  MNELIB::MneMshColorScaleDef  scale_fMRI;                   /* Scale */
-  MNELIB::MneMshColorScaleDef  scale_other;                  /* Scale */
+  MNELIB::MNEMshColorScaleDef  scale_MNE;                    /* MNE scale */
+  MNELIB::MNEMshColorScaleDef  scale_dSPM;                   /* SPM scale */
+  MNELIB::MNEMshColorScaleDef  scale_sLORETA;                /* sLORETA scale */
+  MNELIB::MNEMshColorScaleDef  scale_fMRI;                   /* Scale */
+  MNELIB::MNEMshColorScaleDef  scale_other;                  /* Scale */
   int                  nstep;	                     /* Desired number of smoothsteps */
   float                alpha;	                     /* opacity */
   int                  show_comments;		     /* Show comment text */
@@ -227,7 +227,7 @@ typedef struct {		                     /* Overlay preferences. This structure ca
  */
 typedef struct {		                     /* This is used for field mapping with help of the sphere-model MNE */
   int          kind;				     /* Either FIELD_MAP_MEG or FIELD_MAP_EEG */
-  MNELIB::MneSurfaceOld*   surf;		                     /* The surface on which we are mapping */
+  MNELIB::MNESurface*   surf;		                     /* The surface on which we are mapping */
   char         *surfname;	                     /* The name of the file where the above surface came from */
   int          *surface_sel;			     /* We may calculate the interpolation only in a subset of vertices */
   int          nsurface_sel;			     /* How many points in the above */
@@ -241,7 +241,7 @@ typedef struct {		                     /* This is used for field mapping with he
   float        **self_dots;	                     /* Dot products between the original leads */
   float        **surface_dots;			     /* Dot products from the original leads to the virtual leads */
   float        intrad;		                     /* The integration radius used */
-  MNELIB::MneCovMatrix* noise;				     /* Noise-covariance matrix to use */
+  MNELIB::MNECovMatrix* noise;				     /* Noise-covariance matrix to use */
   int          nest;	                             /* How many singular values to include? */
   float        **mapping_mat;		             /* The mapping matrix */
 } *fieldMappingData, fieldMappingDataRec;
@@ -345,7 +345,7 @@ typedef struct {
   char          *inv_file;                      /* Inverse operator file */
   char          *mri_trans_file;                /* Where does the MRI transform come from */
   int           nave;                           /* If nave < 0 use nave from the measurement data? */
-  INVERSELIB::MneMeasData*  meas;               /* The measurement */
+  INVERSELIB::MNEMeasData*  meas;               /* The measurement */
   float         raw_tmin,raw_tmax;		     /* Time range for raw data segments */
   int           sample;				     /* Which channel is the sample */
   int           firstp;		                     /* First data point in the current time range selection */
@@ -358,7 +358,7 @@ typedef struct {
   int           *bads;		                     /* Which channels are bad */
   int           *sels;		                     /* Which channels have been selected for dipole fitting? */
   char          *selname;	                     /* Name of the current channel selection (if any) */
-  std::unique_ptr<MNELIB::MneLayout> lout;	     /* This is the layout */
+  std::unique_ptr<MNELIB::MNELayout> lout;	     /* This is the layout */
   mshScales     scales;				     /* Time and vertical scale and baseline */
 
   float         *custom_data;	                     /* Custom data to use instead of data picked from the responses */
@@ -367,7 +367,7 @@ typedef struct {
   mnePref             mne_prefs;		     /* MNE calculation preferences */
   float               *cur_vals;                     /* Current values */
   FIFFLIB::FiffSparseMatrix* nn_vals;			     /* Noise normalization values */
-  MNELIB::MneMshColorScaleDef scale;	                     /* Scale presently used for display */
+  MNELIB::MNEMshColorScaleDef scale;	                     /* Scale presently used for display */
 
   FIFFLIB::FiffDigitizerData    *dig;                              /* These are the Polhemus data */
 
@@ -413,7 +413,7 @@ typedef struct {
 //  time_t         time_loaded;	/* When was the surface loaded */
 //  char           *subj;		/* The name of the subject in SUBJECTS_DIR */
 //  char           *surf_name;	/* The name of the surface */
-//  MNELIB::MneSurfaceOld*     s;		/* This is the surface */
+//  MNELIB::MNESurface*     s;		/* This is the surface */
 //  float          eye[3];	/* Eye position for viewing */
 //  float          up[3];		/* Up vector for viewing */
 //  float          rot[3];        /* Rotation angles of the MRI (in radians) */
@@ -473,8 +473,8 @@ typedef struct {
 //  char              *morph_subj;       /* The subject we are morphing to */
 //  FIFFLIB::FiffCoordTransSet*     main_t;            /* Coordinate transformations for the main surfaces */
 //  FIFFLIB::FiffCoordTransSet*     morph_t;           /* Coordinate transformations for the morph surfaces */
-//  MNELIB::MneMshDisplaySurface **surfs;	       /* These are the surfaces */
-//  MNELIB::MneSurfacePatch   **patches;	       /* Optional patches for display */
+//  MNELIB::MNEMshDisplaySurface **surfs;	       /* These are the surfaces */
+//  MNELIB::MNESurfacePatch   **patches;	       /* Optional patches for display */
 //  float             *patch_rot;	       /* Rotation angles for the (flat) patches */
 //  int               nsurf;	       /* How many? */
 //  int               use_patches;       /* Use patches for display? */

@@ -30,7 +30,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneNamedMatrix class definition.
+ * @brief    MNENamedMatrix class definition.
  *
  */
 
@@ -61,7 +61,7 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MneNamedMatrix::MneNamedMatrix()
+MNENamedMatrix::MNENamedMatrix()
 : nrow(0)
 , ncol(0)
 {
@@ -69,7 +69,7 @@ MneNamedMatrix::MneNamedMatrix()
 
 //=============================================================================================================
 
-MneNamedMatrix::MneNamedMatrix(const MneNamedMatrix &p_MneNamedMatrix)
+MNENamedMatrix::MNENamedMatrix(const MNENamedMatrix &p_MneNamedMatrix)
 : nrow(p_MneNamedMatrix.nrow)
 , ncol(p_MneNamedMatrix.ncol)
 , rowlist(p_MneNamedMatrix.rowlist)
@@ -80,19 +80,19 @@ MneNamedMatrix::MneNamedMatrix(const MneNamedMatrix &p_MneNamedMatrix)
 
 //=============================================================================================================
 
-MneNamedMatrix::~MneNamedMatrix()
+MNENamedMatrix::~MNENamedMatrix()
 {
 }
 
 //=============================================================================================================
 
-std::unique_ptr<MneNamedMatrix> MneNamedMatrix::build(int nrow,
+std::unique_ptr<MNENamedMatrix> MNENamedMatrix::build(int nrow,
                                                       int ncol,
                                                       const QStringList& rowlist,
                                                       const QStringList& collist,
                                                       const Eigen::MatrixXf& data)
 {
-    auto mat = std::make_unique<MneNamedMatrix>();
+    auto mat = std::make_unique<MNENamedMatrix>();
     mat->nrow    = nrow;
     mat->ncol    = ncol;
     mat->rowlist = rowlist;
@@ -103,7 +103,7 @@ std::unique_ptr<MneNamedMatrix> MneNamedMatrix::build(int nrow,
 
 //=============================================================================================================
 
-std::unique_ptr<MneNamedMatrix> MneNamedMatrix::pick(const QStringList& pickrowlist,
+std::unique_ptr<MNENamedMatrix> MNENamedMatrix::pick(const QStringList& pickrowlist,
                                                      int picknrow,
                                                      const QStringList& pickcollist,
                                                      int pickncol) const
@@ -112,11 +112,11 @@ std::unique_ptr<MneNamedMatrix> MneNamedMatrix::pick(const QStringList& pickrowl
      * Validate: picking by name requires names in the original matrix.
      */
     if (!pickrowlist.isEmpty() && this->rowlist.isEmpty()) {
-        qCritical("MneNamedMatrix::pick - Cannot pick rows: no row names in original matrix.");
+        qCritical("MNENamedMatrix::pick - Cannot pick rows: no row names in original matrix.");
         return nullptr;
     }
     if (!pickcollist.isEmpty() && this->collist.isEmpty()) {
-        qCritical("MneNamedMatrix::pick - Cannot pick columns: no column names in original matrix.");
+        qCritical("MNENamedMatrix::pick - Cannot pick columns: no column names in original matrix.");
         return nullptr;
     }
 
@@ -145,7 +145,7 @@ std::unique_ptr<MneNamedMatrix> MneNamedMatrix::pick(const QStringList& pickrowl
                 }
             }
             if (pick_row[j] == -1) {
-                qCritical("MneNamedMatrix::pick - Row '%s' not found in original matrix.",
+                qCritical("MNENamedMatrix::pick - Row '%s' not found in original matrix.",
                           name.toUtf8().constData());
                 return nullptr;
             }
@@ -174,7 +174,7 @@ std::unique_ptr<MneNamedMatrix> MneNamedMatrix::pick(const QStringList& pickrowl
                 }
             }
             if (pick_col[j] == -1) {
-                qCritical("MneNamedMatrix::pick - Column '%s' not found in original matrix.",
+                qCritical("MNENamedMatrix::pick - Column '%s' not found in original matrix.",
                           name.toUtf8().constData());
                 return nullptr;
             }
@@ -201,7 +201,7 @@ std::unique_ptr<MneNamedMatrix> MneNamedMatrix::pick(const QStringList& pickrowl
 
 //=============================================================================================================
 
-std::unique_ptr<MneNamedMatrix> MneNamedMatrix::read(FiffStream::SPtr& stream,
+std::unique_ptr<MNENamedMatrix> MNENamedMatrix::read(FiffStream::SPtr& stream,
                                                      const FiffDirNode::SPtr& node,
                                                      int kind)
 {
@@ -227,7 +227,7 @@ std::unique_ptr<MneNamedMatrix> MneNamedMatrix::read(FiffStream::SPtr& stream,
 
         t_pTag->getMatrixDimensions(ndim, dims);
         if (ndim != 2) {
-            qCritical("MneNamedMatrix::read - Only two-dimensional matrices are supported.");
+            qCritical("MNENamedMatrix::read - Only two-dimensional matrices are supported.");
             return nullptr;
         }
 
@@ -239,7 +239,7 @@ std::unique_ptr<MneNamedMatrix> MneNamedMatrix::read(FiffStream::SPtr& stream,
                 if (tmp_node->children[k]->find_tag(stream, kind, t_pTag)) {
                     t_pTag->getMatrixDimensions(ndim, dims);
                     if (ndim != 2) {
-                        qCritical("MneNamedMatrix::read - Only two-dimensional matrices are supported.");
+                        qCritical("MNENamedMatrix::read - Only two-dimensional matrices are supported.");
                         return nullptr;
                     }
 
@@ -263,7 +263,7 @@ std::unique_ptr<MneNamedMatrix> MneNamedMatrix::read(FiffStream::SPtr& stream,
     } else {
         nrow = *t_pTag->toInt();
         if (nrow != dims[0]) {
-            qCritical("MneNamedMatrix::read - FIFF_MNE_NROW tag (%d) conflicts with matrix data (%d).",
+            qCritical("MNENamedMatrix::read - FIFF_MNE_NROW tag (%d) conflicts with matrix data (%d).",
                       nrow, dims[0]);
             return nullptr;
         }
@@ -274,7 +274,7 @@ std::unique_ptr<MneNamedMatrix> MneNamedMatrix::read(FiffStream::SPtr& stream,
     } else {
         ncol = *t_pTag->toInt();
         if (ncol != dims[1]) {
-            qCritical("MneNamedMatrix::read - FIFF_MNE_NCOL tag (%d) conflicts with matrix data (%d).",
+            qCritical("MNENamedMatrix::read - FIFF_MNE_NCOL tag (%d) conflicts with matrix data (%d).",
                       ncol, dims[1]);
             return nullptr;
         }
@@ -287,7 +287,7 @@ std::unique_ptr<MneNamedMatrix> MneNamedMatrix::read(FiffStream::SPtr& stream,
         const QString s = t_pTag->toString();
         rownames = FiffStream::split_name_list(s);
         if (rownames.size() != nrow) {
-            qCritical("MneNamedMatrix::read - Row name count (%d) does not match nrow (%d).",
+            qCritical("MNENamedMatrix::read - Row name count (%d) does not match nrow (%d).",
                       static_cast<int>(rownames.size()), nrow);
             return nullptr;
         }
@@ -297,7 +297,7 @@ std::unique_ptr<MneNamedMatrix> MneNamedMatrix::read(FiffStream::SPtr& stream,
         const QString s = t_pTag->toString();
         colnames = FiffStream::split_name_list(s);
         if (colnames.size() != ncol) {
-            qCritical("MneNamedMatrix::read - Column name count (%d) does not match ncol (%d).",
+            qCritical("MNENamedMatrix::read - Column name count (%d) does not match ncol (%d).",
                       static_cast<int>(colnames.size()), ncol);
             return nullptr;
         }

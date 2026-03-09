@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  *
  *
- * @brief    MneMghTag class declaration.
+ * @brief    MNEMghTag class declaration.
  *
  */
 
@@ -63,23 +63,23 @@ namespace MNELIB
  * MGH files can carry optional typed metadata tags in the file footer.
  * Each tag has an integer identifier, a byte length, and a raw payload.
  */
-class MNESHARED_EXPORT MneMghTag
+class MNESHARED_EXPORT MNEMghTag
 {
 public:
-    typedef QSharedPointer<MneMghTag> SPtr;              /**< Shared pointer type for MneMghTag. */
-    typedef QSharedPointer<const MneMghTag> ConstSPtr;   /**< Const shared pointer type for MneMghTag. */
+    typedef QSharedPointer<MNEMghTag> SPtr;              /**< Shared pointer type for MNEMghTag. */
+    typedef QSharedPointer<const MNEMghTag> ConstSPtr;   /**< Const shared pointer type for MNEMghTag. */
 
     //=========================================================================================================
     /**
-     * Constructs an empty MneMghTag.
+     * Constructs an empty MNEMghTag.
      */
-    MneMghTag() = default;
+    MNEMghTag() = default;
 
     //=========================================================================================================
     /**
      * Destructor.
      */
-    ~MneMghTag() = default;
+    ~MNEMghTag() = default;
 
 public:
     int        tag = 0;            /**< Tag identifier code. */
