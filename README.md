@@ -3,7 +3,7 @@
 </p>
 <p align="center">
 <a href="https://github.com/mne-tools/mne-cpp/actions/workflows/main.yml" target="_blank">
-    <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/main.yml/badge.svg?branch=main" alt="Main">
+    <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/main.yml/badge.svg?branch=main" alt="Release">
 </a>
 <a href="https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml" target="_blank">
     <img src="https://github.com/mne-tools/mne-cpp/actions/workflows/staging.yml/badge.svg?branch=staging" alt="Staging">
